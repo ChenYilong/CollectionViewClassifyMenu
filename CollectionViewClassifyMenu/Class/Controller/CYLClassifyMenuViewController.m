@@ -31,6 +31,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 @property (nonatomic, strong) NSMutableArray *collectionContentViewFrames;
 @property (nonatomic, strong) NSMutableArray *collectionFirstRowFrames;
 @property (nonatomic, strong) NSMutableArray *collectionOffFirstRowFrames;
+@property (nonatomic, strong) NSMutableArray *moreAllCellArray;
+
 @property (nonatomic, assign) float priorCellY;
 @property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnBoolArray;
 
@@ -54,6 +56,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     self.leveTwoMenuDatasource = [NSMutableArray array];
     self.collectionHeaderFrames = [NSMutableArray array];
     self.collectionContentViewFrames = [NSMutableArray array];
+    self.moreAllCellArray = [NSMutableArray array];
+    
     self.collectionHeaderMoreBtnBoolArray = [NSMutableArray array];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:filePath];
@@ -124,8 +128,10 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     }
     if((cell.frame.origin.y-self.priorCellY)>0)
     {
-        NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-        self.collectionHeaderMoreBtnBoolArray[indexPath.section] = @YES;
+        if ((indexPath.section!=0)||(indexPath.row!=0)) {
+            NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
+            self.collectionHeaderMoreBtnBoolArray[indexPath.section] = @YES;
+    }
         // 删除模型数据
 //        [symptoms removeObjectAtIndex:indexPath.row];
         

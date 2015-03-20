@@ -44,11 +44,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CollectionViewClassifyMenu/Class/Controller/CYLClassifyMenuViewController.m"
-            timestampString = "448530886.700034"
+            timestampString = "448535321.545319"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "312"
-            endingLineNumber = "312"
+            startingLineNumber = "318"
+            endingLineNumber = "318"
             landmarkName = "-collectionView:didSelectItemAtIndexPath:"
             landmarkType = "5">
          </BreakpointContent>
