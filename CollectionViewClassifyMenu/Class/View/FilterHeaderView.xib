@@ -13,7 +13,7 @@
             <rect key="frame" x="0.0" y="0.0" width="300" height="38"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1j5-nO-dZh">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1j5-nO-dZh" customClass="CYLIndexPathButton">
                     <rect key="frame" x="-1" y="0.0" width="164" height="38"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="164" id="aPz-NX-kjh"/>
@@ -22,7 +22,7 @@
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jms-r2-KXm">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jms-r2-KXm" customClass="CYLIndexPathButton">
                     <rect key="frame" x="228" y="0.0" width="72" height="38"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="72" id="ZAH-vS-hoq"/>

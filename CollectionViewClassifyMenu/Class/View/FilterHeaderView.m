@@ -33,14 +33,17 @@ float CYLFilterHeaderViewHeigt = 38;
     self.titleButton.titleLabel.textAlignment = NSTextAlignmentLeft;
     //仅修改self.moreButton的宽度,xyh值不变
     self.moreButton.frame = CGRectMake(self.moreButton.frame.origin.x, self.moreButton.frame.origin.y, kMoreButtonWidth, self.moreButton.frame.size.height);
+    [self.moreButton setImage:[UIImage imageNamed:@"home_btn_more_normal"] forState:UIControlStateNormal];
+    [self.moreButton setImage:[UIImage imageNamed:@"home_btn_more_selected"] forState:UIControlStateSelected];
     self.moreButton.layer.borderColor = [UIColor redColor].CGColor;
     self.moreButton.layer.borderWidth = 1.f;
     self.moreButton.titleLabel.textAlignment = NSTextAlignmentRight;
+    self.moreButton.hidden = YES;
 }
 
 - (IBAction)moreBtnClicked:(id)sender {
     if ([self.delegate respondsToSelector:@selector(filterHeaderViewMoreBtnClicked:)]) {
-        [self.delegate filterHeaderViewMoreBtnClicked:self.titleButton];
+        [self.delegate filterHeaderViewMoreBtnClicked:self.moreButton];
     }
 }
 @end

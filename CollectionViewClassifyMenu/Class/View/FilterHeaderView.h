@@ -13,10 +13,11 @@
 @end
 
 #import <UIKit/UIKit.h>
+#import "CYLIndexPathButton.h"
 extern float CYLFilterHeaderViewHeigt;
 @interface FilterHeaderView : UICollectionReusableView
-@property (nonatomic, strong) IBOutlet UIButton *titleButton;
-@property (nonatomic, strong) IBOutlet UIButton *moreButton;
+@property (nonatomic, strong) IBOutlet CYLIndexPathButton *titleButton;
+@property (nonatomic, strong) IBOutlet CYLIndexPathButton *moreButton;
 @property (nonatomic, weak) id<FilterHeaderViewDelegate> delegate;
 - (IBAction)moreBtnClicked:(id)sender;
 

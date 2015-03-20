@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CYLIndexPathButton.h"
 
 @interface CollectionViewCell : UICollectionViewCell
-@property (nonatomic, strong)  UIButton *button;
+@property (nonatomic, strong)  CYLIndexPathButton *button;
 @end

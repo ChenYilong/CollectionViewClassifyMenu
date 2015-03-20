@@ -30,6 +30,7 @@
 		9A2DA4A91AB829490042E556 /* libReveal.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA4A71AB829390042E556 /* libReveal.dylib */; };
 		9A2DA4AB1AB9A8C20042E556 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA4AA1AB9A8C20042E556 /* data.json */; };
 		9A32960B1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */; };
+		9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,8 @@
 		9A3296041AB7D3880035EFAA /* CollectionViewClassifyMenuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CollectionViewClassifyMenuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A3296091AB7D3880035EFAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
+		9A88909F1ABAC82E005BD528 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
+		9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLIndexPathButton.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +220,8 @@
 				9A2DA49B1AB815CA0042E556 /* FilterHeaderView.h */,
 				9A2DA49C1AB815CA0042E556 /* FilterHeaderView.m */,
 				9A2DA49D1AB815CA0042E556 /* FilterHeaderView.xib */,
+				9A88909F1ABAC82E005BD528 /* CYLIndexPathButton.h */,
+				9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -375,6 +380,7 @@
 				9A1822941AB9B0C2004CCCD5 /* MJFoundation.m in Sources */,
 				9A2DA4911AB7DC060042E556 /* CYLClassifyMenuViewController.m in Sources */,
 				9A1822971AB9B0C2004CCCD5 /* NSObject+MJCoding.m in Sources */,
+				9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */,
 				9A2DA4971AB7DC060042E556 /* main.m in Sources */,
 				9A1822811AB9AF35004CCCD5 /* NSArray+log.m in Sources */,
 				9A1822981AB9B0C2004CCCD5 /* NSObject+MJIvar.m in Sources */,
