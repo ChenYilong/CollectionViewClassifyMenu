@@ -34,6 +34,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 @property (nonatomic, strong) NSMutableArray *moreAllCellArray;
 
 @property (nonatomic, assign) float priorCellY;
+@property (nonatomic, assign) int rowLine;
 @property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnBoolArray;
 
 @end
@@ -57,7 +58,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     self.collectionHeaderFrames = [NSMutableArray array];
     self.collectionContentViewFrames = [NSMutableArray array];
     self.moreAllCellArray = [NSMutableArray array];
-    
+    self.rowLine = 0;
     self.collectionHeaderMoreBtnBoolArray = [NSMutableArray array];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:filePath];
@@ -71,6 +72,24 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         [self.leveOneMenuDatasource addObject:sectionTitle];
         [self.collectionHeaderMoreBtnBoolArray addObject:@NO];
     }];
+    
+    // KVO注册监听
+    [self  addObserver:self forKeyPath:@"collectionHeaderMoreBtnBoolArray" options:NSKeyValueObservingOptionNew context:nil];
+    // 属性赋值,手动调用observeValueForKeyPath:ofObject:change:context:
+    [self observeValueForKeyPath:nil ofObject:nil change:nil context:nil];
+}
+
+// KVO监听执行
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"collectionHeaderMoreBtnBoolArray"]) {
+        NSArray *newArray = [NSArray arrayWithArray:change[NSKeyValueChangeNewKey]];
+    }
+    
+}
+- (void)dealloc {
+    // KVO反注册
+    [self removeObserver:self forKeyPath:@"collectionHeaderMoreBtnBoolArray"];
+    
 }
 - (void)addCollectionView {
     CGRect collectionViewFrame = CGRectMake(0, 20, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height-40);
@@ -121,79 +140,84 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     //    [self.dataSource[indexPath.section][indexPath.row] boolValue];
     cell.button.section = indexPath.section;
     cell.button.row = indexPath.row;
-
+    
     float cellMargin= (cell.frame.origin.y-self.priorCellY);
     if (cellMargin==88) {
         self.priorCellY =MAXFLOAT;
+        self.rowLine = 0;
     }
     if((cell.frame.origin.y-self.priorCellY)>0)
     {
         if ((indexPath.section!=0)||(indexPath.row!=0)) {
-            NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-            self.collectionHeaderMoreBtnBoolArray[indexPath.section] = @YES;
-    }
-        // 删除模型数据
-//        [symptoms removeObjectAtIndex:indexPath.row];
+            self.rowLine++;
+            NSLog(@"‼️‼️‼️‼️‼️%@",self.collectionHeaderMoreBtnBoolArray);
+        }
+        // 删除模型数据            self.collectionHeaderMoreBtnBoolArray[indexPath.section] = @YES;
+   // 删UI(刷新UI)
+        //        [collectionView deleteItemsAtIndexPaths:@[indexPath]];
         
         // 删UI(刷新UI)
-//        [collectionView deleteItemsAtIndexPaths:@[indexPath]];
-
-        // 删UI(刷新UI)
-//        [collectionView deleteItemsAtIndexPaths:@[indexPath]];
-
+        //        [collectionView deleteItemsAtIndexPaths:@[indexPath]];
+        
     }
     self.priorCellY = cell.frame.origin.y;
-//    switch (indexPath.section) {
-//        case 0:
-//          
-//            self.priorCellY = cell.frame.origin.y;
-//            break;
-//        case 1:
-//            self.priorCellY = MAXFLOAT;
-//            if(([@(cell.frame.origin.y) floatValue]-self.priorCellY)>0)
-//            {
-//                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-//            }
-//            self.priorCellY = cell.frame.origin.y;
-//
-//            break;
-//        case 2:
-//            self.priorCellY = MAXFLOAT;
-//            if((cell.frame.origin.y-self.priorCellY)>0)
-//            {
-//                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-//            }
-//            self.priorCellY = cell.frame.origin.y;
-//
-//            break;
-//        case 3:
-//            self.priorCellY = MAXFLOAT;
-//            if((cell.frame.origin.y-self.priorCellY)>0)
-//            {
-//                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-//            }
-//            self.priorCellY = cell.frame.origin.y;
-//
-//            break;
-//        default:
-//            break;
-//    }
-    NSLog(@"‼️‼️‼️‼️‼️这个 cell 在第%@行,y=%@",@(indexPath.row),@(cell.frame.origin.y));
-
+    //    switch (indexPath.section) {
+    //        case 0:
+    //
+    //            self.priorCellY = cell.frame.origin.y;
+    //            break;
+    //        case 1:
+    //            self.priorCellY = MAXFLOAT;
+    //            if(([@(cell.frame.origin.y) floatValue]-self.priorCellY)>0)
+    //            {
+    //                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
+    //            }
+    //            self.priorCellY = cell.frame.origin.y;
+    //
+    //            break;
+    //        case 2:
+    //            self.priorCellY = MAXFLOAT;
+    //            if((cell.frame.origin.y-self.priorCellY)>0)
+    //            {
+    //                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
+    //            }
+    //            self.priorCellY = cell.frame.origin.y;
+    //
+    //            break;
+    //        case 3:
+    //            self.priorCellY = MAXFLOAT;
+    //            if((cell.frame.origin.y-self.priorCellY)>0)
+    //            {
+    //                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
+    //            }
+    //            self.priorCellY = cell.frame.origin.y;
+    //
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    NSLog(@"‼️‼️‼️‼️‼️这个 cell 在第%@行,y=%@第%@section里的第%@行",@(indexPath.row),@(cell.frame.origin.y),@(indexPath.section),@(self.rowLine));
     return cell;
 }
 //- (void)getCellFrame:(NSIndexPath *)indexPath { CGRect offFirstRowRect =
-    //    CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat
-    //    height#>);
-    //    NSArray *offFirstRowCells = [NSArray array];
-    //    offFirstRowCells = [self.collectionView.collectionViewLayout layoutAttributesForElementsInRect:firstRowRect];
+//    CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat
+//    height#>);
+//    NSArray *offFirstRowCells = [NSArray array];
+//    offFirstRowCells = [self.collectionView.collectionViewLayout layoutAttributesForElementsInRect:firstRowRect];
 //}
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
 {
+    
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
         FilterHeaderView *filterHeaderView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier forIndexPath:indexPath];
+       
+     
+        if([self.collectionHeaderMoreBtnBoolArray[indexPath.section] boolValue] == NO) {
+            
+        }
+       
         filterHeaderView.delegate = self;
         NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
         filterHeaderView.titleButton.tag = indexPath.section;
@@ -203,50 +227,58 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         switch (indexPath.section) {
             case 0:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_face"] forState:UIControlStateNormal];
+                filterHeaderView.moreButton.hidden = NO;
                 break;
             case 1:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_common"] forState:UIControlStateNormal];
+                filterHeaderView.moreButton.hidden = NO;
                 break;
             case 2:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_child"] forState:UIControlStateNormal];
+                if (([[UIScreen mainScreen] bounds].size.height == 667)||([[UIScreen mainScreen] bounds].size.height == 736)) {
+                    filterHeaderView.moreButton.hidden = YES;
+                }
                 break;
             case 3:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"] forState:UIControlStateNormal];
+                if (([[UIScreen mainScreen] bounds].size.height == 667)||([[UIScreen mainScreen] bounds].size.height == 736)) {
+                    filterHeaderView.moreButton.hidden = YES;
+                }
                 break;
                 
             default:
                 break;
         }
-
+        if (([[UIScreen mainScreen] bounds].size.height == 568)||([[UIScreen mainScreen] bounds].size.height == 480)) {
+            filterHeaderView.moreButton.hidden = NO;
+        }
         CGRect frame = CGRectMake(CGRectGetMinX(filterHeaderView.frame),CGRectGetMinY(filterHeaderView.frame),CGRectGetWidth(filterHeaderView.frame),CGRectGetHeight(filterHeaderView.frame));
         NSValue *frameObj = [NSValue value:&frame withObjCType:@encode(CGRect)];
         [self.collectionHeaderFrames addObject:frameObj];
-        if([self.collectionHeaderMoreBtnBoolArray[indexPath.section] boolValue] == YES) {
-            filterHeaderView.moreButton.hidden = NO;
-        }
+        
         NSLog(@"‼️‼️‼️‼️‼️self.collectionHeaderFrames 有成员%@",@([(NSArray *)self.collectionHeaderFrames count]));
-//
-//        CGRect collectionHeaderFrame = self.collectionHeaderFrames[indexPath.section];
-//        CGRect firstRowRect =
-//        CGRectMake(kCollectionViewToLeftMargin,
-//                   CGRectGetMaxY(collectionHeaderFrame)+kCollectionViewToTopMargin,
-//                   self.collectionView.contentSize.width,
-//                   kCollectionViewToTopMargin+kCollectionViewCellHeight);
-//        [self.collectionFirstRowFrames addObject:firstRowRect];
-//        int lastSection = [self.dataSource count] - 1;
-//        
-//        
-//        if (!(indexPath.section == 0)) {
-//            CGRect priorSection = self.collectionHeaderFrames[indexPath.section-1];
-//            CGRect offFirstRowRect = CGRectMake(kCollectionViewToLeftMargin, CGRectGetMaxY(firstRowRect),self.collectionView.contentSize.width,priorSection.origin.y - CGRectGetMaxY(firstRowRect));
-//            [self.collectionOffFirstRowFrames addObject:offFirstRowRect];
-//        } else {
-//            float firstOffFirstRowHeight= self.collectionView.contentSize.height - CGRectGetMaxY(self.collectionHeaderFrames.lastObject);
-//            CGRect = CGRectMake(kCollectionViewToLeftMargin, CGRectGetMaxY(firstRowRect), self.collectionView.contentSize.width, lastOffFirstRowHeight);
-//            [self.collectionOffFirstRowFrames addObject:];
-//        }
-//        NSArray *offFirstRowCells = [NSArray array];
-//        offFirstRowCells = [self.collectionView.collectionViewLayout layoutAttributesForElementsInRect:firstRowRect];
+        //
+        //        CGRect collectionHeaderFrame = self.collectionHeaderFrames[indexPath.section];
+        //        CGRect firstRowRect =
+        //        CGRectMake(kCollectionViewToLeftMargin,
+        //                   CGRectGetMaxY(collectionHeaderFrame)+kCollectionViewToTopMargin,
+        //                   self.collectionView.contentSize.width,
+        //                   kCollectionViewToTopMargin+kCollectionViewCellHeight);
+        //        [self.collectionFirstRowFrames addObject:firstRowRect];
+        //        int lastSection = [self.dataSource count] - 1;
+        //
+        //
+        //        if (!(indexPath.section == 0)) {
+        //            CGRect priorSection = self.collectionHeaderFrames[indexPath.section-1];
+        //            CGRect offFirstRowRect = CGRectMake(kCollectionViewToLeftMargin, CGRectGetMaxY(firstRowRect),self.collectionView.contentSize.width,priorSection.origin.y - CGRectGetMaxY(firstRowRect));
+        //            [self.collectionOffFirstRowFrames addObject:offFirstRowRect];
+        //        } else {
+        //            float firstOffFirstRowHeight= self.collectionView.contentSize.height - CGRectGetMaxY(self.collectionHeaderFrames.lastObject);
+        //            CGRect = CGRectMake(kCollectionViewToLeftMargin, CGRectGetMaxY(firstRowRect), self.collectionView.contentSize.width, lastOffFirstRowHeight);
+        //            [self.collectionOffFirstRowFrames addObject:];
+        //        }
+        //        NSArray *offFirstRowCells = [NSArray array];
+        //        offFirstRowCells = [self.collectionView.collectionViewLayout layoutAttributesForElementsInRect:firstRowRect];
         
         return (UICollectionReusableView *)filterHeaderView;
     }
@@ -304,12 +336,12 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     switch (section) {
         case 0:
             return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
-
+            
             break;
             
         default:
             return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
-
+            
             break;
     }
 }
