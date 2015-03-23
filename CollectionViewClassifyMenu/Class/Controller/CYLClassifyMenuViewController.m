@@ -173,9 +173,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     NSString *text = [symptoms[indexPath.row] objectForKey:@"Patient_Name"];
     [cell.button setTitle:text forState:UIControlStateNormal];
     [cell.button setTitle:text forState:UIControlStateSelected];
-    //    [cell.button addTarget:self action:@selector(itemButtonClicked:)
-    //    forControlEvents:UIControlEventTouchUpInside]; cell.button.selected =
-    //    [self.dataSource[indexPath.section][indexPath.row] boolValue];
+    [cell.button addTarget:self action:@selector(itemButtonClicked:)
+        forControlEvents:UIControlEventTouchUpInside];
     cell.button.section = indexPath.section;
     cell.button.row = indexPath.row;
     
@@ -224,6 +223,16 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         return (UICollectionReusableView *)filterHeaderView;
     }
     return nil;
+}
+
+- (void)itemButtonClicked:(CYLIndexPathButton *)button
+{
+    //二级菜单数组
+    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[button.section] objectForKey:@"Symptoms"]];
+    NSString *sectionTitle = [self.dataSource[button.section] objectForKey:@"Type"];
+    NSString *cellTitle = [symptoms[button.row] objectForKey:@"Patient_Name"];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:cellTitle message:sectionTitle delegate:self cancelButtonTitle:@"取消" otherButtonTitles:nil];
+    [alert show];
 }
 
 #pragma mark - FilterHeaderViewDelegateMethod
