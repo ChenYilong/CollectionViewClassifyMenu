@@ -35,7 +35,7 @@ float CYLFilterHeaderViewHeigt = 38;
 }
 
 - (id)sharedInit {
-    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, [UIScreen mainScreen].bounds.size.width - kCureOfLineOffX, kCureOfLineHight)];
+    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, [UIScreen mainScreen].bounds.size.width - 2*kCureOfLineOffX, kCureOfLineHight)];
     cureOfLine.backgroundColor = [UIColor colorWithRed:188.0/255.0 green:188.0/255.0 blue:188.0/255.0 alpha:1.0];
     [self addSubview:cureOfLine];
     self.backgroundColor = [UIColor whiteColor];

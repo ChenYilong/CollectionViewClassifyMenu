@@ -27,19 +27,12 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 @interface CYLClassifyMenuViewController () <UICollectionViewDataSource,UICollectionViewDelegate,FilterHeaderViewDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSMutableArray *dataSource;
-@property (nonatomic, strong) NSMutableArray *leveOneMenuDatasource;
-@property (nonatomic, strong) NSMutableArray *leveTwoMenuDatasource;
-@property (nonatomic, strong) NSMutableArray *collectionHeaderFrames;
-@property (nonatomic, strong) NSMutableArray *collectionContentViewFrames;
-@property (nonatomic, strong) NSMutableArray *collectionFirstRowFrames;
-@property (nonatomic, strong) NSMutableArray *collectionOffFirstRowFrames;
-@property (nonatomic, strong) NSMutableArray *moreAllCellArray;
-
 @property (nonatomic, assign) float priorCellY;
 @property (nonatomic, assign) int rowLine;
 @property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnHideBoolArray;
 @property (nonatomic, strong) NSMutableArray *firstLineWidthArray;
-
+@property (nonatomic, strong) NSMutableArray *firstLineCellCountArray;
+@property (nonatomic, strong) NSMutableArray *expandSectionArray;
 @end
 
 @implementation CYLClassifyMenuViewController
@@ -47,42 +40,67 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initData];
+    [self addCollectionView];
     [self judgeMoreBtnShow];
     self.view.backgroundColor = [UIColor blueColor];
-    [self addCollectionView];
 }
+
+- (NSMutableArray *)collectionHeaderMoreBtnHideBoolArray
+{
+    if (_collectionHeaderMoreBtnHideBoolArray == nil) {
+        _collectionHeaderMoreBtnHideBoolArray = [[NSMutableArray alloc] init];
+    }
+    return _collectionHeaderMoreBtnHideBoolArray;
+}
+
+- (NSMutableArray *)firstLineWidthArray
+{
+    if (_firstLineWidthArray == nil) {
+        _firstLineWidthArray = [[NSMutableArray alloc] init];
+    }
+    return _firstLineWidthArray;
+}
+
+- (NSMutableArray *)firstLineCellCountArray
+{
+    if (_firstLineCellCountArray == nil) {
+        _firstLineCellCountArray = [[NSMutableArray alloc] init];
+    }
+    return _firstLineCellCountArray;
+}
+
+- (NSMutableArray *)expandSectionArray
+{
+    if (_expandSectionArray == nil) {
+        _expandSectionArray = [[NSMutableArray alloc] init];
+    }
+    return _expandSectionArray;
+}
+
+
 - (void)initData {
-    // 1.定义一个字典
-    //    面部皮肤问题
-    //    常见皮肤问题
-    //    儿童皮肤问题
-    //    皮肤美容与护理
-    self.leveOneMenuDatasource = [NSMutableArray array];
-    self.leveTwoMenuDatasource = [NSMutableArray array];
-    self.collectionHeaderFrames = [NSMutableArray array];
-    self.collectionContentViewFrames = [NSMutableArray array];
-    self.moreAllCellArray = [NSMutableArray array];
     self.firstLineWidthArray = [NSMutableArray array];
+    self.firstLineCellCountArray = [NSMutableArray array];
     self.rowLine = 0;
     self.collectionHeaderMoreBtnHideBoolArray = [NSMutableArray array];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:filePath];
     NSArray *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-//    [json writeToFile:@"/Users/chenyilong/Documents/123.plist" atomically:YES];
+    //    [json writeToFile:@"/Users/chenyilong/Documents/123.plist" atomically:YES];
     self.dataSource = [NSMutableArray arrayWithArray:json];
 }
+
 - (void)judgeMoreBtnShow {
-    
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:@"Symptoms"]];
         NSMutableArray *widthArray = [NSMutableArray array];
-        
+        __block int firstLineCellCount = 0;
         [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             NSString *text = [obj objectForKey:@"Patient_Name"];
             CGSize size = [text sizeWithAttributes:
                            @{NSFontAttributeName:
                                  [UIFont systemFontOfSize:16]}];
-            float textWidth = size.width;
+            //            float textWidth = size.width;
             float cellImageToLabelMargin = 0;
             float textAndImageWidth;
             if (obj == [symptoms lastObject]) {
@@ -91,7 +109,13 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
                 textAndImageWidth = size.width+cellImageToLabelMargin+kCellBtnCenterToBorderMargin+kCollectionViewCellsHorizonMargin;
             }
             [widthArray  addObject:@(textAndImageWidth)];
+            NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+            NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+            if ([sum intValue]<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                firstLineCellCount ++;
+            }
         }];
+        [self.firstLineCellCountArray addObject:@(firstLineCellCount)];
         NSArray *sumArray = [NSArray arrayWithArray:widthArray];
         NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
         [self.firstLineWidthArray addObject:sum];
@@ -118,12 +142,10 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     [self.collectionView registerClass:[FilterHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier];
     self.collectionView.showsHorizontalScrollIndicator = NO;
     self.collectionView.contentInset = UIEdgeInsetsMake(15, 0, 0, 0);
-    //  在 Nib 中已经注册，就无需再代码中继续注册，否则会crash于此处：collectionView:layout:sizeForItemAtIndexPath:
     self.collectionView.scrollsToTop = NO;
     //    self.collectionView.scrollEnabled = NO;
     [self.view addSubview:self.collectionView];
 }
-
 
 #pragma mark - UICollectionViewDataSource
 
@@ -134,9 +156,13 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    //二级菜单数组
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[section] objectForKey:@"Symptoms"]];
-    return [symptoms count];
+    for (NSNumber *ii in self.expandSectionArray) {
+        if (section == [ii integerValue]) {
+            return [symptoms count];
+        }
+    }
+    return [self.firstLineCellCountArray[section] integerValue];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -153,18 +179,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     cell.button.section = indexPath.section;
     cell.button.row = indexPath.row;
     
-    float cellMargin= (cell.frame.origin.y-self.priorCellY);
-    if (cellMargin==88) {
-        self.priorCellY =MAXFLOAT;
-        self.rowLine = 0;
-    }
-    if((cell.frame.origin.y-self.priorCellY)>0)
-    {
-        if ((indexPath.section!=0)||(indexPath.row!=0)) {
-            self.rowLine++;
-        }
-    }
-    self.priorCellY = cell.frame.origin.y;
     return cell;
 }
 
@@ -172,16 +186,16 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
 {
-    
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
         FilterHeaderView *filterHeaderView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier forIndexPath:indexPath];
         filterHeaderView.moreButton.hidden = [self.collectionHeaderMoreBtnHideBoolArray[indexPath.section] boolValue];
         filterHeaderView.delegate = self;
         NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
         filterHeaderView.titleButton.tag = indexPath.section;
+        filterHeaderView.moreButton.tag = indexPath.section;
+        filterHeaderView.moreButton.selected = NO;
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateNormal];
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
-        filterHeaderView.titleButton.selected = NO;
         if((int)[[self.firstLineWidthArray objectAtIndex:indexPath.section] intValue]> self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin) {
         } else {
             filterHeaderView.moreButton.hidden = YES;
@@ -199,15 +213,14 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
             case 3:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"] forState:UIControlStateNormal];
                 break;
-                
             default:
                 break;
         }
-        
-        CGRect frame = CGRectMake(CGRectGetMinX(filterHeaderView.frame),CGRectGetMinY(filterHeaderView.frame),CGRectGetWidth(filterHeaderView.frame),CGRectGetHeight(filterHeaderView.frame));
-        NSValue *frameObj = [NSValue value:&frame withObjCType:@encode(CGRect)];
-        [self.collectionHeaderFrames addObject:frameObj];
-        
+        for (NSNumber *ii in self.expandSectionArray) {
+            if (indexPath.section == [ii integerValue]) {
+                filterHeaderView.moreButton.selected = YES;
+            }
+        }
         return (UICollectionReusableView *)filterHeaderView;
     }
     return nil;
@@ -216,23 +229,14 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 #pragma mark - FilterHeaderViewDelegateMethod
 -(void)filterHeaderViewMoreBtnClicked:(UIButton *)sender {
     sender.selected = !sender.selected;
-    switch (sender.tag) {
-        case 0:
-            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
-            
-            break;
-        case 1:
-            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
-            break;
-        case 2:
-            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
-            break;
-        case 3:
-            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
-            break;
-        default:
-            break;
+    if (sender.selected) {
+        [self.expandSectionArray addObject:[NSNumber numberWithInteger:sender.tag]];
+    } else {
+        [self.expandSectionArray removeObject:[NSNumber numberWithInteger:sender.tag]];
     }
+    [self.collectionView performBatchUpdates:^{
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:sender.tag]];
+    } completion:nil];
 }
 
 #pragma mark - UICollectionViewDelegateLeftAlignedLayout
@@ -241,7 +245,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 {
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:@"Symptoms"]];
     NSString *text = [symptoms[indexPath.row] objectForKey:@"Patient_Name"];
-    
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
                          [UIFont systemFontOfSize:16]}];
