@@ -44,28 +44,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CollectionViewClassifyMenu/Class/Controller/CYLClassifyMenuViewController.m"
-            timestampString = "448786943.654637"
+            timestampString = "448787515.775298"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "283"
-            endingLineNumber = "283"
+            startingLineNumber = "254"
+            endingLineNumber = "254"
             landmarkName = "-collectionView:layout:referenceSizeForHeaderInSection:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "CollectionViewClassifyMenu/Class/Controller/CYLClassifyMenuViewController.m"
-            timestampString = "448775753.329201"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "88"
-            endingLineNumber = "88"
-            landmarkName = "-judgeMoreBtnShow"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

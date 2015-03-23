@@ -68,20 +68,12 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:filePath];
     NSArray *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-    //NSLog(@"%@",json);
     [json writeToFile:@"/Users/chenyilong/Documents/123.plist" atomically:YES];
     self.dataSource = [NSMutableArray arrayWithArray:json];
-    // KVO注册监听
-    [self  addObserver:self forKeyPath:@"collectionHeaderMoreBtnBoolArray" options:NSKeyValueObservingOptionNew context:nil];
-    // 属性赋值,手动调用observeValueForKeyPath:ofObject:change:context:
-    [self observeValueForKeyPath:nil ofObject:nil change:nil context:nil];
 }
 - (void)judgeMoreBtnShow {
     
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        //一级菜单数组
-        //        NSString *sectionTitle = [obj objectForKey:@"Type"];
-        //        [self.leveOneMenuDatasource addObject:sectionTitle];
         NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:@"Symptoms"]];
         NSMutableArray *widthArray = [NSMutableArray array];
         
@@ -100,28 +92,14 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         [self.firstLineWidthArray addObject:sum];
         [self.firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
-                [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
-            } else {
                 [self.collectionHeaderMoreBtnHideBoolArray addObject:@NO];
+            } else {
+                [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
             }
         }];
-        NSLog(@"‼️‼️‼️‼️‼️judgeMoreBtnShow长度是%@",sum);
     }];
-    
-    
 }
-// KVO监听执行
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([keyPath isEqualToString:@"collectionHeaderMoreBtnBoolArray"]) {
-        NSArray *newArray = [NSArray arrayWithArray:change[NSKeyValueChangeNewKey]];
-    }
-    
-}
-- (void)dealloc {
-    // KVO反注册
-    [self removeObserver:self forKeyPath:@"collectionHeaderMoreBtnBoolArray"];
-    
-}
+
 - (void)addCollectionView {
     CGRect collectionViewFrame = CGRectMake(0, 20, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height-40);
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
@@ -184,7 +162,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         }
     }
     self.priorCellY = cell.frame.origin.y;
-    
     return cell;
 }
 
@@ -195,7 +172,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
         FilterHeaderView *filterHeaderView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier forIndexPath:indexPath];
-        filterHeaderView.moreButton.hidden = ![self.collectionHeaderMoreBtnHideBoolArray[indexPath.section] boolValue];
+        filterHeaderView.moreButton.hidden = [self.collectionHeaderMoreBtnHideBoolArray[indexPath.section] boolValue];
         filterHeaderView.delegate = self;
         NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
         filterHeaderView.titleButton.tag = indexPath.section;
@@ -206,7 +183,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         } else {
             filterHeaderView.moreButton.hidden = YES;
         }
-        
         switch (indexPath.section) {
             case 0:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_face"] forState:UIControlStateNormal];
@@ -216,14 +192,9 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
                 break;
             case 2:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_child"] forState:UIControlStateNormal];
-                if (([[UIScreen mainScreen] bounds].size.height == 667)||([[UIScreen mainScreen] bounds].size.height == 736)) {
-                }
-                
                 break;
             case 3:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"] forState:UIControlStateNormal];
-                if (([[UIScreen mainScreen] bounds].size.height == 667)||([[UIScreen mainScreen] bounds].size.height == 736)) {
-                }
                 break;
                 
             default:
@@ -284,18 +255,9 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     return CGSizeMake([UIScreen mainScreen].bounds.size.width - 50, 38);
 }
 
-
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
 {
     return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
 }
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    //NSLog(@"‼️‼️‼️‼️‼️didSelectItemAtIndexPath");
-    // 删除模型数据
-    [self.dataSource removeObjectAtIndex:indexPath.item];
-    
-    // 删UI(刷新UI)
-    [collectionView deleteItemsAtIndexPaths:@[indexPath]];
-}
+
 @end
