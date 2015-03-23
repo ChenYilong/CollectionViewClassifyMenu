@@ -13,6 +13,8 @@
 #define kCollectionViewToRightMargin 10
 #define kCollectionViewToBottomtMargin 10
 
+#define kCellImageToLabelMargin 10
+#define kCellBtnCenterToBorderMargin 10
 #import "CYLClassifyMenuViewController.h"
 #import "UICollectionViewLeftAlignedLayout.h"
 #import "CollectionViewCell.h"
@@ -35,7 +37,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 @property (nonatomic, assign) float priorCellY;
 @property (nonatomic, assign) int rowLine;
-@property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnBoolArray;
+@property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnHideBoolArray;
+@property (nonatomic, strong) NSMutableArray *firstLineWidthArray;
 
 @end
 
@@ -44,6 +47,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initData];
+    [self judgeMoreBtnShow];
     self.view.backgroundColor = [UIColor blueColor];
     [self addCollectionView];
 }
@@ -58,27 +62,54 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     self.collectionHeaderFrames = [NSMutableArray array];
     self.collectionContentViewFrames = [NSMutableArray array];
     self.moreAllCellArray = [NSMutableArray array];
+    self.firstLineWidthArray = [NSMutableArray array];
     self.rowLine = 0;
-    self.collectionHeaderMoreBtnBoolArray = [NSMutableArray array];
+    self.collectionHeaderMoreBtnHideBoolArray = [NSMutableArray array];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:filePath];
     NSArray *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-    NSLog(@"%@",json);
+    //NSLog(@"%@",json);
     [json writeToFile:@"/Users/chenyilong/Documents/123.plist" atomically:YES];
     self.dataSource = [NSMutableArray arrayWithArray:json];
-    [json enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        //一级菜单数组
-        NSString *sectionTitle = [obj objectForKey:@"Type"];
-        [self.leveOneMenuDatasource addObject:sectionTitle];
-        [self.collectionHeaderMoreBtnBoolArray addObject:@NO];
-    }];
-    
     // KVO注册监听
     [self  addObserver:self forKeyPath:@"collectionHeaderMoreBtnBoolArray" options:NSKeyValueObservingOptionNew context:nil];
     // 属性赋值,手动调用observeValueForKeyPath:ofObject:change:context:
     [self observeValueForKeyPath:nil ofObject:nil change:nil context:nil];
 }
-
+- (void)judgeMoreBtnShow {
+    
+    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        //一级菜单数组
+        //        NSString *sectionTitle = [obj objectForKey:@"Type"];
+        //        [self.leveOneMenuDatasource addObject:sectionTitle];
+        NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:@"Symptoms"]];
+        NSMutableArray *widthArray = [NSMutableArray array];
+        
+        [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            NSString *text = [obj objectForKey:@"Patient_Name"];
+            CGSize size = [text sizeWithAttributes:
+                           @{NSFontAttributeName:
+                                 [UIFont systemFontOfSize:16]}];
+            float textWidth = size.width;
+            float cellImageToLabelMargin = 0;
+            float textAndImageWidth = size.width+cellImageToLabelMargin+kCellBtnCenterToBorderMargin+kCollectionViewCellsHorizonMargin;
+            [widthArray  addObject:@(textAndImageWidth)];
+        }];
+        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+        NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+        [self.firstLineWidthArray addObject:sum];
+        [self.firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
+            } else {
+                [self.collectionHeaderMoreBtnHideBoolArray addObject:@NO];
+            }
+        }];
+        NSLog(@"‼️‼️‼️‼️‼️judgeMoreBtnShow长度是%@",sum);
+    }];
+    
+    
+}
 // KVO监听执行
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if ([keyPath isEqualToString:@"collectionHeaderMoreBtnBoolArray"]) {
@@ -150,61 +181,13 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     {
         if ((indexPath.section!=0)||(indexPath.row!=0)) {
             self.rowLine++;
-            NSLog(@"‼️‼️‼️‼️‼️%@",self.collectionHeaderMoreBtnBoolArray);
         }
-        // 删除模型数据            self.collectionHeaderMoreBtnBoolArray[indexPath.section] = @YES;
-   // 删UI(刷新UI)
-        //        [collectionView deleteItemsAtIndexPaths:@[indexPath]];
-        
-        // 删UI(刷新UI)
-        //        [collectionView deleteItemsAtIndexPaths:@[indexPath]];
-        
     }
     self.priorCellY = cell.frame.origin.y;
-    //    switch (indexPath.section) {
-    //        case 0:
-    //
-    //            self.priorCellY = cell.frame.origin.y;
-    //            break;
-    //        case 1:
-    //            self.priorCellY = MAXFLOAT;
-    //            if(([@(cell.frame.origin.y) floatValue]-self.priorCellY)>0)
-    //            {
-    //                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-    //            }
-    //            self.priorCellY = cell.frame.origin.y;
-    //
-    //            break;
-    //        case 2:
-    //            self.priorCellY = MAXFLOAT;
-    //            if((cell.frame.origin.y-self.priorCellY)>0)
-    //            {
-    //                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-    //            }
-    //            self.priorCellY = cell.frame.origin.y;
-    //
-    //            break;
-    //        case 3:
-    //            self.priorCellY = MAXFLOAT;
-    //            if((cell.frame.origin.y-self.priorCellY)>0)
-    //            {
-    //                NSLog(@"‼️‼️‼️‼️‼️第%@行 两行以上",@(indexPath.section));
-    //            }
-    //            self.priorCellY = cell.frame.origin.y;
-    //
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    NSLog(@"‼️‼️‼️‼️‼️这个 cell 在第%@行,y=%@第%@section里的第%@行",@(indexPath.row),@(cell.frame.origin.y),@(indexPath.section),@(self.rowLine));
+    
     return cell;
 }
-//- (void)getCellFrame:(NSIndexPath *)indexPath { CGRect offFirstRowRect =
-//    CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat
-//    height#>);
-//    NSArray *offFirstRowCells = [NSArray array];
-//    offFirstRowCells = [self.collectionView.collectionViewLayout layoutAttributesForElementsInRect:firstRowRect];
-//}
+
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
@@ -212,73 +195,44 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
         FilterHeaderView *filterHeaderView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier forIndexPath:indexPath];
-       
-     
-        if([self.collectionHeaderMoreBtnBoolArray[indexPath.section] boolValue] == NO) {
-            
-        }
-       
+        filterHeaderView.moreButton.hidden = ![self.collectionHeaderMoreBtnHideBoolArray[indexPath.section] boolValue];
         filterHeaderView.delegate = self;
         NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
         filterHeaderView.titleButton.tag = indexPath.section;
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateNormal];
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
         filterHeaderView.titleButton.selected = NO;
+        if((int)[[self.firstLineWidthArray objectAtIndex:indexPath.section] intValue]> self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin) {
+        } else {
+            filterHeaderView.moreButton.hidden = YES;
+        }
+        
         switch (indexPath.section) {
             case 0:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_face"] forState:UIControlStateNormal];
-                filterHeaderView.moreButton.hidden = NO;
                 break;
             case 1:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_common"] forState:UIControlStateNormal];
-                filterHeaderView.moreButton.hidden = NO;
                 break;
             case 2:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_child"] forState:UIControlStateNormal];
                 if (([[UIScreen mainScreen] bounds].size.height == 667)||([[UIScreen mainScreen] bounds].size.height == 736)) {
-                    filterHeaderView.moreButton.hidden = YES;
                 }
+                
                 break;
             case 3:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"] forState:UIControlStateNormal];
                 if (([[UIScreen mainScreen] bounds].size.height == 667)||([[UIScreen mainScreen] bounds].size.height == 736)) {
-                    filterHeaderView.moreButton.hidden = YES;
                 }
                 break;
                 
             default:
                 break;
         }
-        if (([[UIScreen mainScreen] bounds].size.height == 568)||([[UIScreen mainScreen] bounds].size.height == 480)) {
-            filterHeaderView.moreButton.hidden = NO;
-        }
+        
         CGRect frame = CGRectMake(CGRectGetMinX(filterHeaderView.frame),CGRectGetMinY(filterHeaderView.frame),CGRectGetWidth(filterHeaderView.frame),CGRectGetHeight(filterHeaderView.frame));
         NSValue *frameObj = [NSValue value:&frame withObjCType:@encode(CGRect)];
         [self.collectionHeaderFrames addObject:frameObj];
-        
-        NSLog(@"‼️‼️‼️‼️‼️self.collectionHeaderFrames 有成员%@",@([(NSArray *)self.collectionHeaderFrames count]));
-        //
-        //        CGRect collectionHeaderFrame = self.collectionHeaderFrames[indexPath.section];
-        //        CGRect firstRowRect =
-        //        CGRectMake(kCollectionViewToLeftMargin,
-        //                   CGRectGetMaxY(collectionHeaderFrame)+kCollectionViewToTopMargin,
-        //                   self.collectionView.contentSize.width,
-        //                   kCollectionViewToTopMargin+kCollectionViewCellHeight);
-        //        [self.collectionFirstRowFrames addObject:firstRowRect];
-        //        int lastSection = [self.dataSource count] - 1;
-        //
-        //
-        //        if (!(indexPath.section == 0)) {
-        //            CGRect priorSection = self.collectionHeaderFrames[indexPath.section-1];
-        //            CGRect offFirstRowRect = CGRectMake(kCollectionViewToLeftMargin, CGRectGetMaxY(firstRowRect),self.collectionView.contentSize.width,priorSection.origin.y - CGRectGetMaxY(firstRowRect));
-        //            [self.collectionOffFirstRowFrames addObject:offFirstRowRect];
-        //        } else {
-        //            float firstOffFirstRowHeight= self.collectionView.contentSize.height - CGRectGetMaxY(self.collectionHeaderFrames.lastObject);
-        //            CGRect = CGRectMake(kCollectionViewToLeftMargin, CGRectGetMaxY(firstRowRect), self.collectionView.contentSize.width, lastOffFirstRowHeight);
-        //            [self.collectionOffFirstRowFrames addObject:];
-        //        }
-        //        NSArray *offFirstRowCells = [NSArray array];
-        //        offFirstRowCells = [self.collectionView.collectionViewLayout layoutAttributesForElementsInRect:firstRowRect];
         
         return (UICollectionReusableView *)filterHeaderView;
     }
@@ -290,17 +244,17 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     sender.selected = !sender.selected;
     switch (sender.tag) {
         case 0:
-            //            NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
+            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
             
             break;
         case 1:
-            //            NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
+            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
             break;
         case 2:
-            //            NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
+            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
             break;
         case 3:
-            //            NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
+            //            //NSLog(@"‼️‼️‼️‼️‼️点击第%@行",@(sender.tag));
             break;
         default:
             break;
@@ -317,7 +271,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
                          [UIFont systemFontOfSize:16]}];
-    return CGSizeMake(ceilf(size.width) + 10, kCollectionViewCellHeight);
+    return CGSizeMake(ceilf(size.width) + kCellBtnCenterToBorderMargin, kCollectionViewCellHeight);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
@@ -333,21 +287,11 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
 {
-    switch (section) {
-        case 0:
-            return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
-            
-            break;
-            
-        default:
-            return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
-            
-            break;
-    }
+    return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
 }
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"‼️‼️‼️‼️‼️didSelectItemAtIndexPath");
+    //NSLog(@"‼️‼️‼️‼️‼️didSelectItemAtIndexPath");
     // 删除模型数据
     [self.dataSource removeObjectAtIndex:indexPath.item];
     
