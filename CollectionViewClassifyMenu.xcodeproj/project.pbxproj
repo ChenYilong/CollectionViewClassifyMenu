@@ -25,12 +25,12 @@
 		9A2DA4971AB7DC060042E556 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA48F1AB7DC060042E556 /* main.m */; };
 		9A2DA49A1AB7DEE90042E556 /* CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA4991AB7DEE90042E556 /* CollectionViewCell.m */; };
 		9A2DA49E1AB815CA0042E556 /* FilterHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA49C1AB815CA0042E556 /* FilterHeaderView.m */; };
-		9A2DA49F1AB815CA0042E556 /* FilterHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA49D1AB815CA0042E556 /* FilterHeaderView.xib */; };
 		9A2DA4A61AB828F80042E556 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2DA4A51AB828F80042E556 /* Reveal.framework */; };
 		9A2DA4A91AB829490042E556 /* libReveal.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA4A71AB829390042E556 /* libReveal.dylib */; };
 		9A2DA4AB1AB9A8C20042E556 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA4AA1AB9A8C20042E556 /* data.json */; };
 		9A32960B1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */; };
 		9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */; };
+		9AF628711ABFFAB000E54B45 /* CYLRightImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF628701ABFFAB000E54B45 /* CYLRightImageButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,7 +77,6 @@
 		9A2DA4991AB7DEE90042E556 /* CollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionViewCell.m; sourceTree = "<group>"; };
 		9A2DA49B1AB815CA0042E556 /* FilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterHeaderView.h; sourceTree = "<group>"; };
 		9A2DA49C1AB815CA0042E556 /* FilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterHeaderView.m; sourceTree = "<group>"; };
-		9A2DA49D1AB815CA0042E556 /* FilterHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FilterHeaderView.xib; sourceTree = "<group>"; };
 		9A2DA4A51AB828F80042E556 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Reveal.framework; sourceTree = "<group>"; };
 		9A2DA4A71AB829390042E556 /* libReveal.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libReveal.dylib; sourceTree = "<group>"; };
 		9A2DA4AA1AB9A8C20042E556 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
@@ -87,6 +86,8 @@
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
 		9A88909F1ABAC82E005BD528 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
 		9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLIndexPathButton.m; sourceTree = "<group>"; };
+		9AF6286F1ABFFAB000E54B45 /* CYLRightImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLRightImageButton.h; sourceTree = "<group>"; };
+		9AF628701ABFFAB000E54B45 /* CYLRightImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLRightImageButton.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -219,9 +220,10 @@
 				9A2DA4991AB7DEE90042E556 /* CollectionViewCell.m */,
 				9A2DA49B1AB815CA0042E556 /* FilterHeaderView.h */,
 				9A2DA49C1AB815CA0042E556 /* FilterHeaderView.m */,
-				9A2DA49D1AB815CA0042E556 /* FilterHeaderView.xib */,
 				9A88909F1ABAC82E005BD528 /* CYLIndexPathButton.h */,
 				9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */,
+				9AF6286F1ABFFAB000E54B45 /* CYLRightImageButton.h */,
+				9AF628701ABFFAB000E54B45 /* CYLRightImageButton.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -354,7 +356,6 @@
 				9A2DA4941AB7DC060042E556 /* LaunchScreen.xib in Resources */,
 				9A2DA4951AB7DC060042E556 /* Images.xcassets in Resources */,
 				9A2DA4961AB7DC060042E556 /* Info.plist in Resources */,
-				9A2DA49F1AB815CA0042E556 /* FilterHeaderView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +374,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A2DA4921AB7DC060042E556 /* UICollectionViewLeftAlignedLayout.m in Sources */,
+				9AF628711ABFFAB000E54B45 /* CYLRightImageButton.m in Sources */,
 				9A1822951AB9B0C2004CCCD5 /* MJIvar.m in Sources */,
 				9A1822821AB9AF35004CCCD5 /* NSDictionary+log.m in Sources */,
 				9A2DA49A1AB7DEE90042E556 /* CollectionViewCell.m in Sources */,

@@ -1,16 +1,16 @@
-//
+
 //  CYLClassifyMenuViewController.m
 //  CollectionViewClassifyMenu
 //
 //  Created by chenyilong on 15/3/17.
 //  Copyright (c) 2015年 chenyilong. All rights reserved.
 //
-#define kCollectionViewCellsHorizonMargin 5
+#define kCollectionViewCellsHorizonMargin 12
 #define kCollectionViewCellHeight 30
 
-#define kCollectionViewToLeftMargin 10
-#define kCollectionViewToTopMargin 10
-#define kCollectionViewToRightMargin 10
+#define kCollectionViewToLeftMargin 16
+#define kCollectionViewToTopMargin 12
+#define kCollectionViewToRightMargin 16
 #define kCollectionViewToBottomtMargin 10
 
 #define kCellImageToLabelMargin 10
@@ -68,7 +68,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:filePath];
     NSArray *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-    [json writeToFile:@"/Users/chenyilong/Documents/123.plist" atomically:YES];
+//    [json writeToFile:@"/Users/chenyilong/Documents/123.plist" atomically:YES];
     self.dataSource = [NSMutableArray arrayWithArray:json];
 }
 - (void)judgeMoreBtnShow {
@@ -84,7 +84,12 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
                                  [UIFont systemFontOfSize:16]}];
             float textWidth = size.width;
             float cellImageToLabelMargin = 0;
-            float textAndImageWidth = size.width+cellImageToLabelMargin+kCellBtnCenterToBorderMargin+kCollectionViewCellsHorizonMargin;
+            float textAndImageWidth;
+            if (obj == [symptoms lastObject]) {
+                textAndImageWidth = size.width+cellImageToLabelMargin+kCellBtnCenterToBorderMargin;
+            } else {
+                textAndImageWidth = size.width+cellImageToLabelMargin+kCellBtnCenterToBorderMargin+kCollectionViewCellsHorizonMargin;
+            }
             [widthArray  addObject:@(textAndImageWidth)];
         }];
         NSArray *sumArray = [NSArray arrayWithArray:widthArray];
@@ -110,9 +115,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     self.collectionView.backgroundColor = [UIColor whiteColor];
     [self.collectionView registerClass:[CollectionViewCell class] forCellWithReuseIdentifier:kCellIdentifier];
     self.collectionView.allowsMultipleSelection = YES;
-    [self.collectionView registerNib:[UINib nibWithNibName:@"FilterHeaderView" bundle:nil]
-          forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                 withReuseIdentifier:kHeaderViewCellIdentifier];
+    [self.collectionView registerClass:[FilterHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier];
     self.collectionView.showsHorizontalScrollIndicator = NO;
     self.collectionView.contentInset = UIEdgeInsetsMake(15, 0, 0, 0);
     //  在 Nib 中已经注册，就无需再代码中继续注册，否则会crash于此处：collectionView:layout:sizeForItemAtIndexPath:
