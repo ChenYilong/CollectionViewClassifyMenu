@@ -101,18 +101,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         __block int firstLineCellCount = 0;
         [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             NSString *text = [obj objectForKey:@"Patient_Name"];
-            CGSize size = [text sizeWithAttributes:
-                           @{NSFontAttributeName:
-                                 [UIFont systemFontOfSize:16]}];
-            float cellWidth;
-            NSString *picture = [obj objectForKey:@"Picture"];
-            int pictureLength = [@(picture.length) intValue];
-            if(pictureLength>0) {
-                cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin*2;
-            } else {
-                cellWidth = ceilf(size.width) +kCellBtnCenterToBorderMargin;
-            }
-            
+            float cellWidth = [self getCollectionCellWidthText:text content:obj];
             float textAndImageWidth;
             if (obj == [symptoms lastObject]) {
                 textAndImageWidth = cellWidth;
@@ -139,6 +128,30 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         }];
     }];
 }
+
+- (float)getCollectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
+    float cellWidth;
+    CGSize size = [text sizeWithAttributes:
+                   @{NSFontAttributeName:
+                         [UIFont systemFontOfSize:16]}];
+    BOOL shouldShowPic;
+    
+    NSString *picture = [content objectForKey:@"Picture"];
+    int pictureLength = [@(picture.length) intValue];
+    if(pictureLength>0) {
+        shouldShowPic = YES;
+    } else {
+    shouldShowPic = NO;
+    }
+    
+    if(shouldShowPic) {
+        cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin*2;
+    } else {
+        cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin;
+    }
+    return cellWidth;
+}
+
 - (UIView *)addTableHeaderView
 {
     UIView *vw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
@@ -163,10 +176,9 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     lbl2.textColor = [UIColor grayColor];
     lbl2.text = @"来自全国一线皮肤科医师的专业指导";
     [vw addSubview:lbl2];
-    
-    
     return vw;
 }
+
 - (void)addCollectionView {
     CGRect collectionViewFrame = CGRectMake(0, kControllerHeaderViewHeight+kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height-40);
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
@@ -202,6 +214,15 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     }
     return [self.firstLineCellCountArray[section] integerValue];
 }
+- (BOOL)shouldCollectionCellPictureShowWithIndex:(NSIndexPath *)indexPath {
+    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:@"Symptoms"]];
+    NSString *picture = [symptoms[indexPath.row] objectForKey:@"Picture"];
+    int pictureLength = [@(picture.length) intValue];
+    if(pictureLength>0) {
+        return YES;
+    }
+    return NO;
+}
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -209,9 +230,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     cell.button.frame = CGRectMake(0, 0, cell.frame.size.width, cell.frame.size.height);
     NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:@"Symptoms"]];
     NSString *text = [symptoms[indexPath.row] objectForKey:@"Patient_Name"];
-    NSString *picture = [symptoms[indexPath.row] objectForKey:@"Picture"];
-    int pictureLength = [@(picture.length) intValue];
-    if(pictureLength>0) {
+    BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
+    if(shouldShowPic) {
         [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"] forState:UIControlStateNormal];
         [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"] forState:UIControlStateHighlighted];
         CGFloat spacing = kCollectionViewItemButtonImageToTextMargin;
@@ -222,7 +242,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         [cell.button setImage:nil forState:UIControlStateHighlighted];
         cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
         cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
-        
     }
     [cell.button setTitle:text forState:UIControlStateNormal];
     [cell.button setTitle:text forState:UIControlStateSelected];
@@ -306,20 +325,11 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:@"Symptoms"]];
-    float cellWidth;
     NSString *text = [symptoms[indexPath.row] objectForKey:@"Patient_Name"];
-    CGSize size = [text sizeWithAttributes:
-                   @{NSFontAttributeName:
-                         [UIFont systemFontOfSize:16]}];
-    NSString *picture = [symptoms[indexPath.row] objectForKey:@"Picture"];
-    int pictureLength = [@(picture.length) intValue];
-    if(pictureLength>0) {
-        cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin*2;
-    } else {
-        cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin;
-    }
+    float cellWidth = [self getCollectionCellWidthText:text content:symptoms[indexPath.row]];
     return CGSizeMake(cellWidth, kCollectionViewCellHeight);
 }
+
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 {
