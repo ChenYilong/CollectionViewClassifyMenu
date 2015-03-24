@@ -5,6 +5,8 @@
 //  Created by chenyilong on 15/3/17.
 //  Copyright (c) 2015年 chenyilong. All rights reserved.
 //
+#define kControllerHeaderViewHeight 90
+#define kControllerHeaderToCollectionViewMargin 0
 #define kCollectionViewCellsHorizonMargin 12
 #define kCollectionViewCellHeight 30
 
@@ -42,6 +44,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     [self initData];
     [self addCollectionView];
     [self judgeMoreBtnShow];
+   [self.view addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
 }
 
@@ -128,9 +131,36 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         }];
     }];
 }
-
+- (UIView *)addTableHeaderView
+{
+    UIView *vw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
+    vw.backgroundColor = [UIColor whiteColor];
+    
+    UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
+    lbl.font = [UIFont boldSystemFontOfSize:18];
+    lbl.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
+    lbl.text = @"您需要获得哪方面的帮助？";
+    [vw addSubview:lbl];
+    
+    UILabel *lbl2 = [[UILabel alloc] init];
+    //仅修改lbl2的x,ywh值不变
+    lbl2.frame = CGRectMake(lbl.frame.origin.x, lbl2.frame.origin.y, lbl2.frame.size.width, lbl2.frame.size.height);
+    //仅修改lbl2的y,xwh值不变
+    lbl2.frame = CGRectMake(lbl2.frame.origin.x, CGRectGetMaxY(lbl.frame) + 10, lbl2.frame.size.width, lbl2.frame.size.height);
+    //仅修改lbl2的宽度,xyh值不变
+    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y, lbl.frame.size.width, lbl2.frame.size.height);
+    //仅修改lbl2的高度,xyw值不变
+    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y, lbl2.frame.size.width, 14);
+    lbl2.font = [UIFont systemFontOfSize:12];
+    lbl2.textColor = [UIColor grayColor];
+    lbl2.text = @"来自全国一线皮肤科医师的专业指导";
+    [vw addSubview:lbl2];
+    
+    
+    return vw;
+}
 - (void)addCollectionView {
-    CGRect collectionViewFrame = CGRectMake(0, 20, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height-40);
+    CGRect collectionViewFrame = CGRectMake(0, kControllerHeaderViewHeight+kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height-40);
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
     self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout];
     //    layout.headerReferenceSize = CGSizeMake([UIScreen mainScreen].bounds.size.width, CYLFilterHeaderViewHeigt);  //设置head大小
