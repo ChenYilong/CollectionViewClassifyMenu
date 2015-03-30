@@ -11,5 +11,4 @@
 @interface CYLIndexPathButton : UIButton
 @property (nonatomic, assign) NSInteger section;
 @property (nonatomic, assign) NSInteger row;
-@property (nonatomic, assign) BOOL isShowImage;
 @end

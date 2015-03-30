@@ -18,6 +18,11 @@
 
 #define kCellImageToLabelMargin 10
 #define kCellBtnCenterToBorderMargin 19
+
+#define kDataSourceSectionKey @"Symptoms"
+#define kDataSourceCellTextKey @"Patient_Name"
+#define kDataSourceCellPictureKey @"Picture"
+
 #import "CYLClassifyMenuViewController.h"
 #import "UICollectionViewLeftAlignedLayout.h"
 #import "CollectionViewCell.h"
@@ -96,11 +101,11 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 - (void)judgeMoreBtnShow {
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:@"Symptoms"]];
+        NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
         NSMutableArray *widthArray = [NSMutableArray array];
         __block int firstLineCellCount = 0;
         [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSString *text = [obj objectForKey:@"Patient_Name"];
+            NSString *text = [obj objectForKey:kDataSourceCellTextKey];
             float cellWidth = [self getCollectionCellWidthText:text content:obj];
             float textAndImageWidth;
             if (obj == [symptoms lastObject]) {
@@ -136,7 +141,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
                          [UIFont systemFontOfSize:16]}];
     BOOL shouldShowPic;
     
-    NSString *picture = [content objectForKey:@"Picture"];
+    NSString *picture = [content objectForKey:kDataSourceCellPictureKey];
     int pictureLength = [@(picture.length) intValue];
     if(pictureLength>0) {
         shouldShowPic = YES;
@@ -206,7 +211,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[section] objectForKey:@"Symptoms"]];
+    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[section] objectForKey:kDataSourceSectionKey]];
     for (NSNumber *ii in self.expandSectionArray) {
         if (section == [ii integerValue]) {
             return [symptoms count];
@@ -214,9 +219,10 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     }
     return [self.firstLineCellCountArray[section] integerValue];
 }
+
 - (BOOL)shouldCollectionCellPictureShowWithIndex:(NSIndexPath *)indexPath {
-    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:@"Symptoms"]];
-    NSString *picture = [symptoms[indexPath.row] objectForKey:@"Picture"];
+    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
+    NSString *picture = [symptoms[indexPath.row] objectForKey:kDataSourceCellPictureKey];
     int pictureLength = [@(picture.length) intValue];
     if(pictureLength>0) {
         return YES;
@@ -228,8 +234,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 {
     CollectionViewCell *cell = (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
     cell.button.frame = CGRectMake(0, 0, cell.frame.size.width, cell.frame.size.height);
-    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:@"Symptoms"]];
-    NSString *text = [symptoms[indexPath.row] objectForKey:@"Patient_Name"];
+    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
+    NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
     if(shouldShowPic) {
         [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"] forState:UIControlStateNormal];
@@ -300,9 +306,9 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 - (void)itemButtonClicked:(CYLIndexPathButton *)button
 {
     //二级菜单数组
-    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[button.section] objectForKey:@"Symptoms"]];
+    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[button.section] objectForKey:kDataSourceSectionKey]];
     NSString *sectionTitle = [self.dataSource[button.section] objectForKey:@"Type"];
-    NSString *cellTitle = [symptoms[button.row] objectForKey:@"Patient_Name"];
+    NSString *cellTitle = [symptoms[button.row] objectForKey:kDataSourceCellTextKey];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:cellTitle message:sectionTitle delegate:self cancelButtonTitle:@"取消" otherButtonTitles:nil];
     [alert show];
 }
@@ -324,8 +330,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:@"Symptoms"]];
-    NSString *text = [symptoms[indexPath.row] objectForKey:@"Patient_Name"];
+    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
+    NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
     float cellWidth = [self getCollectionCellWidthText:text content:symptoms[indexPath.row]];
     return CGSizeMake(cellWidth, kCollectionViewCellHeight);
 }
