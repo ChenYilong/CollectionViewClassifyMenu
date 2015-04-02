@@ -23,6 +23,7 @@
 		9A2DA4AB1AB9A8C20042E556 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA4AA1AB9A8C20042E556 /* data.json */; };
 		9A32960B1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */; };
 		9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */; };
+		9AC8569E1ACD4679005E982D /* UIButton+CollectionCellStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC8569D1ACD4679005E982D /* UIButton+CollectionCellStyle.m */; };
 		9AF628711ABFFAB000E54B45 /* CYLRightImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF628701ABFFAB000E54B45 /* CYLRightImageButton.m */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +65,8 @@
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
 		9A88909F1ABAC82E005BD528 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
 		9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLIndexPathButton.m; sourceTree = "<group>"; };
+		9AC8569C1ACD4679005E982D /* UIButton+CollectionCellStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+CollectionCellStyle.h"; sourceTree = "<group>"; };
+		9AC8569D1ACD4679005E982D /* UIButton+CollectionCellStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+CollectionCellStyle.m"; sourceTree = "<group>"; };
 		9AF6286F1ABFFAB000E54B45 /* CYLRightImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLRightImageButton.h; sourceTree = "<group>"; };
 		9AF628701ABFFAB000E54B45 /* CYLRightImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLRightImageButton.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,6 +93,8 @@
 		9A18227C1AB9AF35004CCCD5 /* Category */ = {
 			isa = PBXGroup;
 			children = (
+				9AC8569C1ACD4679005E982D /* UIButton+CollectionCellStyle.h */,
+				9AC8569D1ACD4679005E982D /* UIButton+CollectionCellStyle.m */,
 				9A18227D1AB9AF35004CCCD5 /* NSArray+log.h */,
 				9A18227E1AB9AF35004CCCD5 /* NSArray+log.m */,
 				9A18227F1AB9AF35004CCCD5 /* NSDictionary+log.h */,
@@ -333,6 +338,7 @@
 				9A1822821AB9AF35004CCCD5 /* NSDictionary+log.m in Sources */,
 				9A2DA49A1AB7DEE90042E556 /* CollectionViewCell.m in Sources */,
 				9A2DA4911AB7DC060042E556 /* CYLClassifyMenuViewController.m in Sources */,
+				9AC8569E1ACD4679005E982D /* UIButton+CollectionCellStyle.m in Sources */,
 				9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */,
 				9A2DA4971AB7DC060042E556 /* main.m in Sources */,
 				9A1822811AB9AF35004CCCD5 /* NSArray+log.m in Sources */,

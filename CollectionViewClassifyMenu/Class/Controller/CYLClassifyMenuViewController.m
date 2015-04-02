@@ -100,9 +100,10 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 - (void)judgeMoreBtnShow {
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        __block int firstLineCellCount = 0;
+
         NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
         NSMutableArray *widthArray = [NSMutableArray array];
-        __block int firstLineCellCount = 0;
         [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             NSString *text = [obj objectForKey:kDataSourceCellTextKey];
             float cellWidth = [self getCollectionCellWidthText:text content:obj];
@@ -132,7 +133,48 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         }];
     }];
 }
+ 
+-(NSArray *)getSecondLineCellCount {
+    NSMutableArray *secondLineCellCountArray = [NSMutableArray array];
+    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        __block int firstLineCellCount = 0;
+        NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+        
+       float firstLineCount = [self getFirstLineCellCountWithArray:symptoms];
+        if (symptoms.count != firstLineCount) {
+            NSRange range = NSMakeRange(0, firstLineCount);
+            [symptoms removeObjectsInRange:range];
+            float secondLineCount = [self getFirstLineCellCountWithArray:symptoms];
+            [secondLineCellCountArray addObject:@(secondLineCount)];
+        } else {
+            [secondLineCellCountArray addObject:@(0)];
+        }
+    }];
+    return (NSArray *)secondLineCellCountArray;
 
+}
+
+- (int)getFirstLineCellCountWithArray:(NSArray *)array {
+    __block int firstLineCellCount = 0;
+    NSMutableArray *widthArray = [NSMutableArray array];
+    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSString *text = [obj objectForKey:kDataSourceCellTextKey];
+        float cellWidth = [self getCollectionCellWidthText:text content:obj];
+        float textAndImageWidth;
+        if (obj == [array lastObject]) {
+            textAndImageWidth = cellWidth;
+        } else {
+            textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
+        }
+        [widthArray  addObject:@(textAndImageWidth)];
+        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+        NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+        if ([sum intValue]-kCollectionViewCellsHorizonMargin<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+            firstLineCellCount ++;
+        }
+    }];
+    return firstLineCellCount;
+}
 
 - (float)getCollectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
     float cellWidth;
@@ -146,7 +188,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     if(pictureLength>0) {
         shouldShowPic = YES;
     } else {
-    shouldShowPic = NO;
+        shouldShowPic = NO;
     }
     
     if(shouldShowPic) {
