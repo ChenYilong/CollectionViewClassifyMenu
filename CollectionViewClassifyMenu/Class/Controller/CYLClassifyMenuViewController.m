@@ -27,7 +27,6 @@
 #import "UICollectionViewLeftAlignedLayout.h"
 #import "CollectionViewCell.h"
 #import "FilterHeaderView.h"
-#import "MJExtension.h"
 
 static NSString * const kCellIdentifier = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
@@ -133,6 +132,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         }];
     }];
 }
+
 
 - (float)getCollectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
     float cellWidth;

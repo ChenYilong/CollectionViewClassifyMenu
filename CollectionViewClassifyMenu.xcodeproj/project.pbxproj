@@ -9,13 +9,6 @@
 /* Begin PBXBuildFile section */
 		9A1822811AB9AF35004CCCD5 /* NSArray+log.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A18227E1AB9AF35004CCCD5 /* NSArray+log.m */; };
 		9A1822821AB9AF35004CCCD5 /* NSDictionary+log.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1822801AB9AF35004CCCD5 /* NSDictionary+log.m */; };
-		9A1822931AB9B0C2004CCCD5 /* MJConst.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1822851AB9B0C2004CCCD5 /* MJConst.m */; };
-		9A1822941AB9B0C2004CCCD5 /* MJFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1822881AB9B0C2004CCCD5 /* MJFoundation.m */; };
-		9A1822951AB9B0C2004CCCD5 /* MJIvar.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A18228A1AB9B0C2004CCCD5 /* MJIvar.m */; };
-		9A1822961AB9B0C2004CCCD5 /* MJType.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A18228C1AB9B0C2004CCCD5 /* MJType.m */; };
-		9A1822971AB9B0C2004CCCD5 /* NSObject+MJCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A18228E1AB9B0C2004CCCD5 /* NSObject+MJCoding.m */; };
-		9A1822981AB9B0C2004CCCD5 /* NSObject+MJIvar.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1822901AB9B0C2004CCCD5 /* NSObject+MJIvar.m */; };
-		9A1822991AB9B0C2004CCCD5 /* NSObject+MJKeyValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1822921AB9B0C2004CCCD5 /* NSObject+MJKeyValue.m */; };
 		9A2DA4911AB7DC060042E556 /* CYLClassifyMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA4811AB7DC060042E556 /* CYLClassifyMenuViewController.m */; };
 		9A2DA4921AB7DC060042E556 /* UICollectionViewLeftAlignedLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA4871AB7DC060042E556 /* UICollectionViewLeftAlignedLayout.m */; };
 		9A2DA4931AB7DC060042E556 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA48A1AB7DC060042E556 /* AppDelegate.m */; };
@@ -48,21 +41,6 @@
 		9A18227E1AB9AF35004CCCD5 /* NSArray+log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+log.m"; sourceTree = "<group>"; };
 		9A18227F1AB9AF35004CCCD5 /* NSDictionary+log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+log.h"; sourceTree = "<group>"; };
 		9A1822801AB9AF35004CCCD5 /* NSDictionary+log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+log.m"; sourceTree = "<group>"; };
-		9A1822841AB9B0C2004CCCD5 /* MJConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJConst.h; sourceTree = "<group>"; };
-		9A1822851AB9B0C2004CCCD5 /* MJConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJConst.m; sourceTree = "<group>"; };
-		9A1822861AB9B0C2004CCCD5 /* MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJExtension.h; sourceTree = "<group>"; };
-		9A1822871AB9B0C2004CCCD5 /* MJFoundation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJFoundation.h; sourceTree = "<group>"; };
-		9A1822881AB9B0C2004CCCD5 /* MJFoundation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJFoundation.m; sourceTree = "<group>"; };
-		9A1822891AB9B0C2004CCCD5 /* MJIvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJIvar.h; sourceTree = "<group>"; };
-		9A18228A1AB9B0C2004CCCD5 /* MJIvar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJIvar.m; sourceTree = "<group>"; };
-		9A18228B1AB9B0C2004CCCD5 /* MJType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJType.h; sourceTree = "<group>"; };
-		9A18228C1AB9B0C2004CCCD5 /* MJType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJType.m; sourceTree = "<group>"; };
-		9A18228D1AB9B0C2004CCCD5 /* NSObject+MJCoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MJCoding.h"; sourceTree = "<group>"; };
-		9A18228E1AB9B0C2004CCCD5 /* NSObject+MJCoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MJCoding.m"; sourceTree = "<group>"; };
-		9A18228F1AB9B0C2004CCCD5 /* NSObject+MJIvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MJIvar.h"; sourceTree = "<group>"; };
-		9A1822901AB9B0C2004CCCD5 /* NSObject+MJIvar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MJIvar.m"; sourceTree = "<group>"; };
-		9A1822911AB9B0C2004CCCD5 /* NSObject+MJKeyValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MJKeyValue.h"; sourceTree = "<group>"; };
-		9A1822921AB9B0C2004CCCD5 /* NSObject+MJKeyValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MJKeyValue.m"; sourceTree = "<group>"; };
 		9A2DA4801AB7DC060042E556 /* CYLClassifyMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLClassifyMenuViewController.h; sourceTree = "<group>"; };
 		9A2DA4811AB7DC060042E556 /* CYLClassifyMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLClassifyMenuViewController.m; sourceTree = "<group>"; };
 		9A2DA4861AB7DC060042E556 /* UICollectionViewLeftAlignedLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICollectionViewLeftAlignedLayout.h; sourceTree = "<group>"; };
@@ -120,28 +98,6 @@
 			path = Category;
 			sourceTree = "<group>";
 		};
-		9A1822831AB9B0C2004CCCD5 /* MJExtension */ = {
-			isa = PBXGroup;
-			children = (
-				9A1822841AB9B0C2004CCCD5 /* MJConst.h */,
-				9A1822851AB9B0C2004CCCD5 /* MJConst.m */,
-				9A1822861AB9B0C2004CCCD5 /* MJExtension.h */,
-				9A1822871AB9B0C2004CCCD5 /* MJFoundation.h */,
-				9A1822881AB9B0C2004CCCD5 /* MJFoundation.m */,
-				9A1822891AB9B0C2004CCCD5 /* MJIvar.h */,
-				9A18228A1AB9B0C2004CCCD5 /* MJIvar.m */,
-				9A18228B1AB9B0C2004CCCD5 /* MJType.h */,
-				9A18228C1AB9B0C2004CCCD5 /* MJType.m */,
-				9A18228D1AB9B0C2004CCCD5 /* NSObject+MJCoding.h */,
-				9A18228E1AB9B0C2004CCCD5 /* NSObject+MJCoding.m */,
-				9A18228F1AB9B0C2004CCCD5 /* NSObject+MJIvar.h */,
-				9A1822901AB9B0C2004CCCD5 /* NSObject+MJIvar.m */,
-				9A1822911AB9B0C2004CCCD5 /* NSObject+MJKeyValue.h */,
-				9A1822921AB9B0C2004CCCD5 /* NSObject+MJKeyValue.m */,
-			);
-			path = MJExtension;
-			sourceTree = "<group>";
-		};
 		9A2DA47E1AB7DC060042E556 /* Class */ = {
 			isa = PBXGroup;
 			children = (
@@ -183,7 +139,6 @@
 		9A2DA4841AB7DC060042E556 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
-				9A1822831AB9B0C2004CCCD5 /* MJExtension */,
 				9A2DA4A71AB829390042E556 /* libReveal.dylib */,
 				9A2DA4A51AB828F80042E556 /* Reveal.framework */,
 				9A2DA4851AB7DC060042E556 /* UICollectionViewLeftAlignedLayout */,
@@ -375,20 +330,13 @@
 			files = (
 				9A2DA4921AB7DC060042E556 /* UICollectionViewLeftAlignedLayout.m in Sources */,
 				9AF628711ABFFAB000E54B45 /* CYLRightImageButton.m in Sources */,
-				9A1822951AB9B0C2004CCCD5 /* MJIvar.m in Sources */,
 				9A1822821AB9AF35004CCCD5 /* NSDictionary+log.m in Sources */,
 				9A2DA49A1AB7DEE90042E556 /* CollectionViewCell.m in Sources */,
-				9A1822961AB9B0C2004CCCD5 /* MJType.m in Sources */,
-				9A1822941AB9B0C2004CCCD5 /* MJFoundation.m in Sources */,
 				9A2DA4911AB7DC060042E556 /* CYLClassifyMenuViewController.m in Sources */,
-				9A1822971AB9B0C2004CCCD5 /* NSObject+MJCoding.m in Sources */,
 				9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */,
 				9A2DA4971AB7DC060042E556 /* main.m in Sources */,
 				9A1822811AB9AF35004CCCD5 /* NSArray+log.m in Sources */,
-				9A1822981AB9B0C2004CCCD5 /* NSObject+MJIvar.m in Sources */,
 				9A2DA4931AB7DC060042E556 /* AppDelegate.m in Sources */,
-				9A1822931AB9B0C2004CCCD5 /* MJConst.m in Sources */,
-				9A1822991AB9B0C2004CCCD5 /* NSObject+MJKeyValue.m in Sources */,
 				9A2DA49E1AB815CA0042E556 /* FilterHeaderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
