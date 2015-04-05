@@ -49,10 +49,16 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     [self initData];
     [self addCollectionView];
     [self judgeMoreBtnShow];
+    [self initDefaultShowCellCount];
     [self.view addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
 }
-
+- (void)initDefaultShowCellCount {
+    for (NSUInteger index = 0; index < self.firstLineCellCountArray.count; index++) {
+        NSArray *secondLineCellCountArray = [NSArray arrayWithArray:[self getSecondLineCellCount]];
+        [self.firstLineCellCountArray replaceObjectAtIndex:index withObject:@([self.firstLineCellCountArray[index] intValue]+[secondLineCellCountArray[index] intValue])];
+    }
+}
 - (NSMutableArray *)collectionHeaderMoreBtnHideBoolArray
 {
     if (_collectionHeaderMoreBtnHideBoolArray == nil) {
@@ -133,7 +139,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         }];
     }];
 }
- 
+
 -(NSArray *)getSecondLineCellCount {
     NSMutableArray *secondLineCellCountArray = [NSMutableArray array];
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -373,6 +379,8 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
+    symptoms[indexPath.row];
+    NSLog(@"ok");
     NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
     float cellWidth = [self getCollectionCellWidthText:text content:symptoms[indexPath.row]];
     return CGSizeMake(cellWidth, kCollectionViewCellHeight);
