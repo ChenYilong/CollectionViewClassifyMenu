@@ -36,8 +36,8 @@
     self.button.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
     [self.contentView addSubview:self.button];
     [self.button generalStyle];
-//    [self.button homeStyle];
-    [self.button redStyle];
+    [self.button homeStyle];
+//    [self.button redStyle];
 }
 
 

@@ -37,7 +37,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 @property (nonatomic, assign) float priorCellY;
 @property (nonatomic, assign) int rowLine;
 @property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnHideBoolArray;
-@property (nonatomic, strong) NSMutableArray *firstLineWidthArray;
 @property (nonatomic, strong) NSMutableArray *firstLineCellCountArray;
 @property (nonatomic, strong) NSMutableArray *expandSectionArray;
 @end
@@ -49,6 +48,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     [self initData];
     [self addCollectionView];
     [self judgeMoreBtnShow];
+    [self judgeMoreBtnShowWhenShowTwoLine];
     [self initDefaultShowCellCount];
     [self.view addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
@@ -65,14 +65,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         _collectionHeaderMoreBtnHideBoolArray = [[NSMutableArray alloc] init];
     }
     return _collectionHeaderMoreBtnHideBoolArray;
-}
-
-- (NSMutableArray *)firstLineWidthArray
-{
-    if (_firstLineWidthArray == nil) {
-        _firstLineWidthArray = [[NSMutableArray alloc] init];
-    }
-    return _firstLineWidthArray;
 }
 
 - (NSMutableArray *)firstLineCellCountArray
@@ -93,7 +85,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
 
 - (void)initData {
-    self.firstLineWidthArray = [NSMutableArray array];
     self.firstLineCellCountArray = [NSMutableArray array];
     self.rowLine = 0;
     self.collectionHeaderMoreBtnHideBoolArray = [NSMutableArray array];
@@ -105,6 +96,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 }
 
 - (void)judgeMoreBtnShow {
+    NSMutableArray *firstLineWidthArray = [NSMutableArray array];
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         __block int firstLineCellCount = 0;
 
@@ -129,16 +121,64 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         [self.firstLineCellCountArray addObject:@(firstLineCellCount)];
         NSArray *sumArray = [NSArray arrayWithArray:widthArray];
         NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-        [self.firstLineWidthArray addObject:sum];
-        [self.firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
-                [self.collectionHeaderMoreBtnHideBoolArray addObject:@NO];
+        [firstLineWidthArray addObject:sum];
+    }];
+    
+    [firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+            [self.collectionHeaderMoreBtnHideBoolArray addObject:@NO];
+        } else {
+            [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
+        }
+    }];
+
+}
+
+
+- (void)judgeMoreBtnShowWhenShowTwoLine {
+    NSMutableArray *twoLineWidthArray = [NSMutableArray array];
+    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        __block int countTime = 0;
+        NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
+        NSMutableArray *widthArray = [NSMutableArray array];
+        [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            NSString *text = [obj objectForKey:kDataSourceCellTextKey];
+            float cellWidth = [self getCollectionCellWidthText:text content:obj];
+            float textAndImageWidth;
+            if (obj == [symptoms lastObject]) {
+                textAndImageWidth = cellWidth;
             } else {
-                [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
+                textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
+            }
+            [widthArray  addObject:@(textAndImageWidth)];
+            NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
+            NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+            if ([sum intValue]-kCollectionViewCellsHorizonMargin<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                //未超过一行
+            } else {
+                //超过一行时
+                if(countTime==0) {
+                [widthArray removeAllObjects];
+                [widthArray addObject:@(textAndImageWidth)];
+                }
+                countTime++;
             }
         }];
+
+        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+        NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+        [twoLineWidthArray addObject:sum];
+    }];
+    
+    [twoLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
+        } else {
+            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
+        }
     }];
 }
+
 
 -(NSArray *)getSecondLineCellCount {
     NSMutableArray *secondLineCellCountArray = [NSMutableArray array];
@@ -321,10 +361,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
         filterHeaderView.moreButton.selected = NO;
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateNormal];
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
-        if((int)[[self.firstLineWidthArray objectAtIndex:indexPath.section] intValue]> self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin) {
-        } else {
-            filterHeaderView.moreButton.hidden = YES;
-        }
         switch (indexPath.section) {
             case 0:
                 [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_face"] forState:UIControlStateNormal];
