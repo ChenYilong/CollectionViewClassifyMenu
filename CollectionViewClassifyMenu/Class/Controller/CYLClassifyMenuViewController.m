@@ -39,20 +39,32 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 @property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnHideBoolArray;
 @property (nonatomic, strong) NSMutableArray *firstLineCellCountArray;
 @property (nonatomic, strong) NSMutableArray *expandSectionArray;
+@property (nonatomic, strong) UIScrollView *bgScrollView;
+
 @end
 
 @implementation CYLClassifyMenuViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.bgScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
+    self.bgScrollView.backgroundColor = [UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:1];
+    [self.view addSubview:self.bgScrollView];
+    
     [self initData];
     [self addCollectionView];
     [self judgeMoreBtnShow];
     [self judgeMoreBtnShowWhenShowTwoLine];
     [self initDefaultShowCellCount];
-    [self.view addSubview:[self addTableHeaderView]];
+    [self.bgScrollView addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
 }
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.bgScrollView.scrollEnabled = YES;
+    [self updateViewHeight];
+}
+
 - (void)initDefaultShowCellCount {
     for (NSUInteger index = 0; index < self.firstLineCellCountArray.count; index++) {
         NSArray *secondLineCellCountArray = [NSArray arrayWithArray:[self getSecondLineCellCount]];
@@ -286,8 +298,15 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     self.collectionView.showsHorizontalScrollIndicator = NO;
     self.collectionView.contentInset = UIEdgeInsetsMake(15, 0, 0, 0);
     self.collectionView.scrollsToTop = NO;
-    //    self.collectionView.scrollEnabled = NO;
-    [self.view addSubview:self.collectionView];
+    self.collectionView.scrollEnabled = NO;
+    [self.bgScrollView addSubview:self.collectionView];
+}
+
+- (void)updateViewHeight {
+    //仅修改self.collectionView的高度,xyw值不变
+    self.collectionView.frame = CGRectMake(self.collectionView.frame.origin.x, self.collectionView.frame.origin.y, self.collectionView.frame.size.width, self.collectionView.contentSize.height+kCollectionViewToTopMargin+kCollectionViewToBottomtMargin);
+    
+    self.bgScrollView.contentSize = CGSizeMake([UIScreen mainScreen].bounds.size.width,  self.collectionView.contentSize.height+kControllerHeaderViewHeight+kCollectionViewToTopMargin+kCollectionViewToBottomtMargin);
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -407,7 +426,9 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     }
     [self.collectionView performBatchUpdates:^{
         [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:sender.tag]];
-    } completion:nil];
+    } completion:^(BOOL finished) {
+        [self updateViewHeight];
+    }];
 }
 
 #pragma mark - UICollectionViewDelegateLeftAlignedLayout
@@ -415,8 +436,6 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
-    symptoms[indexPath.row];
-    NSLog(@"ok");
     NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
     float cellWidth = [self getCollectionCellWidthText:text content:symptoms[indexPath.row]];
     return CGSizeMake(cellWidth, kCollectionViewCellHeight);
