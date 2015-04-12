@@ -3,57 +3,57 @@
   "Type": "主食",
   "Symptoms": [
                {
-               "Patient_Name": "炒饭",
+               "Food_Name": "炒饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "煲仔饭",
+               "Food_Name": "煲仔饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "盖浇饭",
+               "Food_Name": "盖浇饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "焗饭",
+               "Food_Name": "焗饭",
                },
                {
-               "Patient_Name": "烩饭",
+               "Food_Name": "烩饭",
                },
                {
-               "Patient_Name": "焖饭",
+               "Food_Name": "焖饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "粥",
+               "Food_Name": "粥",
                },
                {
-               "Patient_Name": "寿司",
+               "Food_Name": "寿司",
                },
                {
-               "Patient_Name": "饼",
+               "Food_Name": "饼",
                }
                ,
                {
-               "Patient_Name": "炒饼",
+               "Food_Name": "炒饼",
                },
                {
-               "Patient_Name": "意大利面",
+               "Food_Name": "意大利面",
                },
                {
-               "Patient_Name": "披萨",
+               "Food_Name": "披萨",
                },
                {
-               "Patient_Name": "面条",
+               "Food_Name": "面条",
                },
                {
-               "Patient_Name": "炒面",
+               "Food_Name": "炒面",
                },
                {
-               "Patient_Name": "焖面",
+               "Food_Name": "焖面",
                },
                {
-               "Patient_Name": "凉面",
+               "Food_Name": "凉面",
                }
                ]
   },
@@ -61,46 +61,46 @@
   "Type": "烘焙",
   "Symptoms": [
                {
-               "Patient_Name": "面包",
+               "Food_Name": "面包",
                },
                {
-               "Patient_Name": "饼干",
+               "Food_Name": "饼干",
                },
                {
-               "Patient_Name": "戚风蛋糕",
+               "Food_Name": "戚风蛋糕",
                },
                {
-               "Patient_Name": "泡芙",
+               "Food_Name": "泡芙",
                },
                {
-               "Patient_Name": "蛋糕卷",
+               "Food_Name": "蛋糕卷",
                },
                {
-               "Patient_Name": "杯子蛋糕",
+               "Food_Name": "杯子蛋糕",
                },
                {
-               "Patient_Name": "芝士蛋糕",
+               "Food_Name": "芝士蛋糕",
                },
                {
-               "Patient_Name": "马芬",
+               "Food_Name": "马芬",
                },
                {
-               "Patient_Name": "曲奇",
+               "Food_Name": "曲奇",
                },
                {
-               "Patient_Name": "吐司",
+               "Food_Name": "吐司",
                },
                {
-               "Patient_Name": "海绵蛋糕",
+               "Food_Name": "海绵蛋糕",
                },
                {
-               "Patient_Name": "慕斯蛋糕",
+               "Food_Name": "慕斯蛋糕",
                },
                {
-               "Patient_Name": "奶油蛋糕",
+               "Food_Name": "奶油蛋糕",
                },
                {
-               "Patient_Name": "磅蛋糕",
+               "Food_Name": "磅蛋糕",
                }
                ]
   },
@@ -108,17 +108,17 @@
   "Type": "菜系",
   "Symptoms": [
                {
-               "Patient_Name": "湘菜",
+               "Food_Name": "湘菜",
                },
                {
-               "Patient_Name": "粤菜",
+               "Food_Name": "粤菜",
                },
                {
-               "Patient_Name": "鲁菜",
+               "Food_Name": "鲁菜",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "东北菜",
+               "Food_Name": "东北菜",
                "Picture":"Picture"
                }
                ]
@@ -127,19 +127,19 @@
   "Type": "厨房工具",
   "Symptoms": [
                {
-               "Patient_Name": "烤箱食谱",
+               "Food_Name": "烤箱食谱",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "面包机食谱",
+               "Food_Name": "面包机食谱",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "电饭煲美食",
+               "Food_Name": "电饭煲美食",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "豆浆机食谱",
+               "Food_Name": "豆浆机食谱",
                "Picture":"Picture"
                }
                ]

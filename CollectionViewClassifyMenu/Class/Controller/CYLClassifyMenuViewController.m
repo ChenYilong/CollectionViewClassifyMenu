@@ -20,7 +20,7 @@
 #define kCellBtnCenterToBorderMargin               19
 
 #define kDataSourceSectionKey                      @"Symptoms"
-#define kDataSourceCellTextKey                     @"Patient_Name"
+#define kDataSourceCellTextKey                     @"Food_Name"
 #define kDataSourceCellPictureKey                  @"Picture"
 
 #import "CYLClassifyMenuViewController.h"
