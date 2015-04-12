@@ -8,9 +8,9 @@
 
 #import "FilterHeaderView.h"
 #define kTitleButtonWidth 250.f
-#define kMoreButtonWidth 36*2
-#define kCureOfLineHight 0.5
-#define kCureOfLineOffX 16
+#define kMoreButtonWidth  36*2
+#define kCureOfLineHight  0.5
+#define kCureOfLineOffX   16
 
 float CYLFilterHeaderViewHeigt = 38;
 @interface FilterHeaderView()

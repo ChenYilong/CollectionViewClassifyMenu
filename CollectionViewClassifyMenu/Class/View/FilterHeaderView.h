@@ -18,9 +18,9 @@
 
 extern float CYLFilterHeaderViewHeigt;
 @interface FilterHeaderView : UICollectionReusableView
-@property (nonatomic, strong)  CYLIndexPathButton *titleButton;
-@property (nonatomic, strong) CYLRightImageButton *moreButton;
-@property (nonatomic, weak) id<FilterHeaderViewDelegate> delegate;
+@property (nonatomic, strong) CYLIndexPathButton       *titleButton;
+@property (nonatomic, strong) CYLRightImageButton      *moreButton;
+@property (nonatomic, weak  ) id<FilterHeaderViewDelegate> delegate;
 - (void)moreBtnClicked:(id)sender;
 
 @end

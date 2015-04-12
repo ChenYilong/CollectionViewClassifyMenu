@@ -5,41 +5,47 @@
 //  Created by chenyilong on 15/3/17.
 //  Copyright (c) 2015年 chenyilong. All rights reserved.
 //
-#define kControllerHeaderViewHeight 90
-#define kControllerHeaderToCollectionViewMargin 0
-#define kCollectionViewCellsHorizonMargin 12
-#define kCollectionViewCellHeight 30
+#define kControllerHeaderViewHeight                90
+#define kControllerHeaderToCollectionViewMargin    0
+#define kCollectionViewCellsHorizonMargin          12
+#define kCollectionViewCellHeight                  30
 #define kCollectionViewItemButtonImageToTextMargin 5
 
-#define kCollectionViewToLeftMargin 16
-#define kCollectionViewToTopMargin 12
-#define kCollectionViewToRightMargin 16
-#define kCollectionViewToBottomtMargin 10
+#define kCollectionViewToLeftMargin                16
+#define kCollectionViewToTopMargin                 12
+#define kCollectionViewToRightMargin               16
+#define kCollectionViewToBottomtMargin             10
 
-#define kCellImageToLabelMargin 10
-#define kCellBtnCenterToBorderMargin 19
+#define kCellImageToLabelMargin                    10
+#define kCellBtnCenterToBorderMargin               19
 
-#define kDataSourceSectionKey @"Symptoms"
-#define kDataSourceCellTextKey @"Patient_Name"
-#define kDataSourceCellPictureKey @"Picture"
+#define kDataSourceSectionKey                      @"Symptoms"
+#define kDataSourceCellTextKey                     @"Patient_Name"
+#define kDataSourceCellPictureKey                  @"Picture"
 
 #import "CYLClassifyMenuViewController.h"
 #import "UICollectionViewLeftAlignedLayout.h"
 #import "CollectionViewCell.h"
 #import "FilterHeaderView.h"
 
-static NSString * const kCellIdentifier = @"CellIdentifier";
+static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 
-@interface CYLClassifyMenuViewController () <UICollectionViewDataSource,UICollectionViewDelegate,FilterHeaderViewDelegate>
+@interface CYLClassifyMenuViewController ()
+<
+UICollectionViewDataSource,
+UICollectionViewDelegate,
+FilterHeaderViewDelegate
+>
+
 @property (nonatomic, strong) UICollectionView *collectionView;
-@property (nonatomic, strong) NSMutableArray *dataSource;
-@property (nonatomic, assign) float priorCellY;
-@property (nonatomic, assign) int rowLine;
-@property (nonatomic, strong) NSMutableArray *collectionHeaderMoreBtnHideBoolArray;
-@property (nonatomic, strong) NSMutableArray *firstLineCellCountArray;
-@property (nonatomic, strong) NSMutableArray *expandSectionArray;
-@property (nonatomic, strong) UIScrollView *bgScrollView;
+@property (nonatomic, strong) NSMutableArray   *dataSource;
+@property (nonatomic, assign) float            priorCellY;
+@property (nonatomic, assign) int              rowLine;
+@property (nonatomic, strong) NSMutableArray   *collectionHeaderMoreBtnHideBoolArray;
+@property (nonatomic, strong) NSMutableArray   *firstLineCellCountArray;
+@property (nonatomic, strong) NSMutableArray   *expandSectionArray;
+@property (nonatomic, strong) UIScrollView     *bgScrollView;
 
 @end
 
@@ -54,6 +60,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     [self initData];
     [self addCollectionView];
     [self judgeMoreBtnShow];
+    // 如果想显示两行，请打开下面两行代码
     [self judgeMoreBtnShowWhenShowTwoLine];
     [self initDefaultShowCellCount];
     [self.bgScrollView addSubview:[self addTableHeaderView]];
@@ -265,7 +272,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
     lbl.font = [UIFont boldSystemFontOfSize:18];
     lbl.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
-    lbl.text = @"您需要获得哪方面的帮助？";
+    lbl.text = @"默认显示两行时的效果如下所示!";
     [vw addSubview:lbl];
     
     UILabel *lbl2 = [[UILabel alloc] init];
@@ -279,7 +286,7 @@ static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
     lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y, lbl2.frame.size.width, 14);
     lbl2.font = [UIFont systemFontOfSize:12];
     lbl2.textColor = [UIColor grayColor];
-    lbl2.text = @"来自全国一线皮肤科医师的专业指导";
+    lbl2.text = @"下面是本店的分类列表";
     [vw addSubview:lbl2];
     return vw;
 }

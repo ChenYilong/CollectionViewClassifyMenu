@@ -1,216 +1,145 @@
  [
   {
-  "Type": "损容性皮肤病",
+  "Type": "主食",
   "Symptoms": [
                {
-               "Patient_Name": "青春痘",
-               "Patient_Desc": "",
-               "Doctor_Name": "痤疮",
-               "Doctor_Desc": "",
+               "Patient_Name": "炒饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "黄褐斑",
-               "Patient_Desc": "",
-               "Doctor_Name": "黄褐斑",
-               "Doctor_Desc": "",
+               "Patient_Name": "煲仔饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "雀斑",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": "",
+               "Patient_Name": "盖浇饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "瘊子",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": ""
+               "Patient_Name": "焗饭",
                },
                {
-               "Patient_Name": "酒渣鼻",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": ""
+               "Patient_Name": "烩饭",
                },
                {
-               "Patient_Name": "激素依赖性皮炎",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": "",
+               "Patient_Name": "焖饭",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "脂溢性皮炎",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": ""
+               "Patient_Name": "粥",
                },
                {
-               "Patient_Name": "化妆品皮炎",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": ""
+               "Patient_Name": "寿司",
                },
                {
-               "Patient_Name": "毛细血管扩张",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": ""
+               "Patient_Name": "饼",
+               }
+               ,
+               {
+               "Patient_Name": "炒饼",
+               },
+               {
+               "Patient_Name": "意大利面",
+               },
+               {
+               "Patient_Name": "披萨",
+               },
+               {
+               "Patient_Name": "面条",
+               },
+               {
+               "Patient_Name": "炒面",
+               },
+               {
+               "Patient_Name": "焖面",
+               },
+               {
+               "Patient_Name": "凉面",
                }
                ]
   },
   {
-  "Type": "常见皮肤病",
+  "Type": "烘焙",
   "Symptoms": [
                {
-               "Patient_Name": "湿疹皮炎",
-               "Patient_Desc": "",
-               "Doctor_Name": "湿疹皮炎",
-               "Doctor_Desc": ""
+               "Patient_Name": "面包",
                },
                {
-               "Patient_Name": "牛皮癣",
-               "Patient_Desc": "",
-               "Doctor_Name": "银屑病",
-               "Doctor_Desc": ""
+               "Patient_Name": "饼干",
                },
                {
-               "Patient_Name": "白癜风",
-               "Patient_Desc": "",
-               "Doctor_Name": "白癜风",
-               "Doctor_Desc": ""
+               "Patient_Name": "戚风蛋糕",
                },
                {
-               "Patient_Name": "红斑狼疮",
-               "Patient_Desc": "",
-               "Doctor_Name": "结缔组织病",
-               "Doctor_Desc": ""
+               "Patient_Name": "泡芙",
                },
                {
-               "Patient_Name": "生殖器疱疹",
-               "Patient_Desc": "",
-               "Doctor_Name": "性病",
-               "Doctor_Desc": ""
+               "Patient_Name": "蛋糕卷",
                },
                {
-               "Patient_Name": "脚气",
-               "Patient_Desc": "",
-               "Doctor_Name": "真菌感染性皮肤病",
-               "Doctor_Desc": ""
+               "Patient_Name": "杯子蛋糕",
                },
                {
-               "Patient_Name": "天疱疮",
-               "Patient_Desc": "",
-               "Doctor_Name": "大疱性皮肤病",
-               "Doctor_Desc": ""
+               "Patient_Name": "芝士蛋糕",
                },
                {
-               "Patient_Name": "皮肤肿瘤",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤肿瘤",
-               "Doctor_Desc": ""
+               "Patient_Name": "马芬",
                },
                {
-               "Patient_Name": "毛周角化症",
-               "Patient_Desc": "",
-               "Doctor_Name": "遗传性皮肤病",
-               "Doctor_Desc": ""
+               "Patient_Name": "曲奇",
                },
                {
-               "Patient_Name": "脱发",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": ""
+               "Patient_Name": "吐司",
                },
                {
-               "Patient_Name": "荨麻疹",
-               "Patient_Desc": "",
-               "Doctor_Name": "变态反应性疾病",
-               "Doctor_Desc": ""
+               "Patient_Name": "海绵蛋糕",
                },
                {
-               "Patient_Name": "毛囊炎",
-               "Patient_Desc": "",
-               "Doctor_Name": "其他",
-               "Doctor_Desc": ""
+               "Patient_Name": "慕斯蛋糕",
                },
                {
-               "Patient_Name": "过敏性皮炎",
-               "Patient_Desc": "",
-               "Doctor_Name": "变态反应性疾病",
-               "Doctor_Desc": ""
+               "Patient_Name": "奶油蛋糕",
                },
                {
-               "Patient_Name": "色素痣",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": ""
+               "Patient_Name": "磅蛋糕",
                }
                ]
   },
   {
-  "Type": "儿童皮肤病",
+  "Type": "菜系",
   "Symptoms": [
                {
-               "Patient_Name": "红色胎记",
-               "Patient_Desc": "",
-               "Doctor_Name": "血管瘤",
-               "Doctor_Desc": ""
+               "Patient_Name": "湘菜",
                },
                {
-               "Patient_Name": "特应性皮炎",
-               "Patient_Desc": "",
-               "Doctor_Name": "其他",
-               "Doctor_Desc": ""
+               "Patient_Name": "粤菜",
                },
                {
-               "Patient_Name": "婴儿湿疹",
-               "Patient_Desc": "",
-               "Doctor_Name": "其他",
-               "Doctor_Desc": "",
+               "Patient_Name": "鲁菜",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "黄水疮",
-               "Patient_Desc": "",
-               "Doctor_Name": "其他",
-               "Doctor_Desc": "",
+               "Patient_Name": "东北菜",
                "Picture":"Picture"
                }
                ]
   },
   {
-  "Type": "皮肤美容与护理",
+  "Type": "厨房工具",
   "Symptoms": [
                {
-               "Patient_Name": "激光美肤",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": "",
+               "Patient_Name": "烤箱食谱",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "光子嫩肤",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": "",
+               "Patient_Name": "面包机食谱",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "化学换肤",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": "",
+               "Patient_Name": "电饭煲美食",
                "Picture":"Picture"
                },
                {
-               "Patient_Name": "注射微整",
-               "Patient_Desc": "",
-               "Doctor_Name": "皮肤美容",
-               "Doctor_Desc": "",
+               "Patient_Name": "豆浆机食谱",
                "Picture":"Picture"
                }
                ]
