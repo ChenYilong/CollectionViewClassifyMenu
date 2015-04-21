@@ -30,7 +30,7 @@
 
 static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
-
+typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 @interface CYLClassifyMenuViewController ()
 <
 UICollectionViewDataSource,
@@ -120,6 +120,38 @@ FilterHeaderViewDelegate
     self.dataSource = [NSMutableArray arrayWithArray:json];
 }
 
+- (float)checkCellLimitWidth:(float)cellWidth isLimitWidth:(ISLimitWidth)isLimitWidth {
+    float limitWidth = (CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
+    if (cellWidth >= limitWidth) {
+        cellWidth = limitWidth;
+        isLimitWidth?isLimitWidth(YES,@(cellWidth)):nil;
+        return cellWidth;
+    }
+    isLimitWidth?isLimitWidth(NO,@(cellWidth)):nil;
+    return cellWidth;
+}
+- (float)getTextAndImageWidth:(NSString *)text content:(id)obj array:(NSArray *)array {
+    __block float cellWidth = [self getCollectionCellWidthText:text content:obj];
+    __block float cellWidthAndRightMargin;
+    
+    [self checkCellLimitWidth:cellWidth isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
+        cellWidth = [data floatValue];
+        if (yesORNo == YES) {
+            cellWidthAndRightMargin = (CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
+        } else {
+            if (((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)-cellWidth >=kCollectionViewCellsHorizonMargin)) {
+                if (obj == [array lastObject]) {
+                    cellWidthAndRightMargin = cellWidth;
+                } else {
+                    cellWidthAndRightMargin = cellWidth+kCollectionViewCellsHorizonMargin;
+                }
+            } else {
+                cellWidthAndRightMargin = (CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
+            }
+        }
+    }];
+    return cellWidthAndRightMargin;
+}
 - (void)judgeMoreBtnShow {
     NSMutableArray *firstLineWidthArray = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
@@ -132,14 +164,8 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidth = [strongSelf getCollectionCellWidthText:text content:obj];
-                float textAndImageWidth;
-                if (obj == [weakSymptoms lastObject]) {
-                    textAndImageWidth = cellWidth;
-                } else {
-                    textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
-                }
-                [widthArray  addObject:@(textAndImageWidth)];
+                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text content:obj array:weakSymptoms];
+                [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
                 if ([sum intValue]<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
@@ -176,14 +202,8 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidth = [strongSelf getCollectionCellWidthText:text content:obj];
-                float textAndImageWidth;
-                if (obj == [weakSymptoms lastObject]) {
-                    textAndImageWidth = cellWidth;
-                } else {
-                    textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
-                }
-                [widthArray  addObject:@(textAndImageWidth)];
+                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text content:obj array:weakSymptoms];
+                [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
                 if ([sum intValue]<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
@@ -192,12 +212,25 @@ FilterHeaderViewDelegate
                     //超过一行时
                     if(countTime==0) {
                         [widthArray removeAllObjects];
-                        if (obj == [weakSymptoms lastObject]) {
-                            [widthArray addObject:@(textAndImageWidth+kCollectionViewCellsHorizonMargin)];
-                        } else {
-                            [widthArray addObject:@(textAndImageWidth)];
-                        }
-                    }
+                        [self checkCellLimitWidth:cellWidthAndRightMargin isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
+                            if (yesORNo == YES) {
+                                [widthArray addObject:@((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin))];
+                            } else {
+                                if (((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)-cellWidthAndRightMargin >=kCollectionViewCellsHorizonMargin)) {
+                                    if (obj == [weakSymptoms lastObject]) {
+                                        [widthArray addObject:@(cellWidthAndRightMargin+kCollectionViewCellsHorizonMargin)];
+                                    } else {
+                                        [widthArray addObject:@((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin))];
+                                    }
+
+                                } else {
+                                    [widthArray addObject:@((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin))];
+
+                                }
+                            }
+                        }];
+                        
+                                         }
                     countTime++;
                 }
             }];
@@ -248,13 +281,13 @@ FilterHeaderViewDelegate
         @autoreleasepool {
             NSString *text = [obj objectForKey:kDataSourceCellTextKey];
             float cellWidth = [self getCollectionCellWidthText:text content:obj];
-            float textAndImageWidth;
+            float cellWidthAndRightMargin;
             if (obj == [weakArray lastObject]) {
-                textAndImageWidth = cellWidth;
+                cellWidthAndRightMargin = cellWidth;
             } else {
-                textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
+                cellWidthAndRightMargin = cellWidth+kCollectionViewCellsHorizonMargin;
             }
-            [widthArray  addObject:@(textAndImageWidth)];
+            [widthArray  addObject:@(cellWidthAndRightMargin)];
             NSArray *sumArray = [NSArray arrayWithArray:widthArray];
             NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
             if ([sum intValue]<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
@@ -287,9 +320,7 @@ FilterHeaderViewDelegate
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin;
     }
     
-    if (cellWidth >= (CGRectGetWidth(self.collectionView.frame)- kCollectionViewToRightMargin *2)) {
-        cellWidth = CGRectGetWidth(self.collectionView.frame)- kCollectionViewToRightMargin *2;
-    }
+    cellWidth = [self checkCellLimitWidth:cellWidth isLimitWidth:nil];
     return cellWidth;
 }
 
