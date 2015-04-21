@@ -22,8 +22,7 @@
     [self setTitleColor:[UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:0.7] forState:UIControlStateSelected];
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
     
-    UIImage *imageHighlighted = [[UIImage alloc] init];
-    imageHighlighted = [[self class] imageWithColor:[UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:1]];
+    UIImage *imageHighlighted = [[self class] imageWithColor:[UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:1]];
     [self setBackgroundImage:imageHighlighted forState:UIControlStateHighlighted];
     self.layer.borderColor = [UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:1].CGColor;
 }
@@ -33,8 +32,7 @@
     [self setTitleColor:[UIColor colorWithRed:160/255.0 green:15/255.0 blue:85/255.0 alpha:1] forState:UIControlStateNormal];
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
     
-    UIImage *imageHighlighted = [[UIImage alloc] init];
-    imageHighlighted = [[self class] imageWithColor:[UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:1]];
+    UIImage *imageHighlighted  = [[self class] imageWithColor:[UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:1]];
     [self setBackgroundImage:imageHighlighted forState:UIControlStateHighlighted];
     self.layer.borderColor = [UIColor colorWithRed:160/255.0 green:15/255.0 blue:85/255.0 alpha:1].CGColor ;
 }

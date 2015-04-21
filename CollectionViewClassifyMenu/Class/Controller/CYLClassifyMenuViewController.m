@@ -107,25 +107,155 @@ FilterHeaderViewDelegate
     self.firstLineCellCountArray = [NSMutableArray array];
     self.rowLine = 0;
     self.collectionHeaderMoreBtnHideBoolArray = [NSMutableArray array];
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"];
-    NSData *data = [NSData dataWithContentsOfFile:filePath];
-    NSArray *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-    //    [json writeToFile:@"/Users/chenyilong/Documents/123.plist" atomically:YES];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data.json" ofType:nil];
+    NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath];
+    //    NSData *data = [NSData dataWithContentsOfFile:filePath];
+    NSError *error;
+    NSArray *json;
+    if (data) {
+        json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    }
+    //    [json writeToFile:@"/Users/chenyilong/Documents/123.plist"
+    //    atomically:YES];
     self.dataSource = [NSMutableArray arrayWithArray:json];
 }
 
 - (void)judgeMoreBtnShow {
     NSMutableArray *firstLineWidthArray = [NSMutableArray array];
+    __weak __typeof(self) weakSelf = self;
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        __strong typeof(self) strongSelf = weakSelf;
         __block int firstLineCellCount = 0;
+        @autoreleasepool {
+            NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
+            NSMutableArray *widthArray = [NSMutableArray array];
+            __weak __typeof(symptoms) weakSymptoms = symptoms;
+            [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                NSString *text = [obj objectForKey:kDataSourceCellTextKey];
+                float cellWidth = [strongSelf getCollectionCellWidthText:text content:obj];
+                float textAndImageWidth;
+                if (obj == [weakSymptoms lastObject]) {
+                    textAndImageWidth = cellWidth;
+                } else {
+                    textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
+                }
+                [widthArray  addObject:@(textAndImageWidth)];
+                NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+                NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+                if ([sum intValue]-kCollectionViewCellsHorizonMargin<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                    firstLineCellCount ++;
+                }
+            }];
+            [strongSelf.firstLineCellCountArray addObject:@(firstLineCellCount)];
+            NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+            NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+            [firstLineWidthArray addObject:sum];
+        }
+    }];
+    
+    [firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+            [self.collectionHeaderMoreBtnHideBoolArray addObject:@NO];
+        } else {
+            [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
+        }
+    }];
+    
+    
+}
 
-        NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
-        NSMutableArray *widthArray = [NSMutableArray array];
-        [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+- (void)judgeMoreBtnShowWhenShowTwoLine {
+    NSMutableArray *twoLineWidthArray = [NSMutableArray array];
+    __weak __typeof(self) weakSelf = self;
+    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        @autoreleasepool {
+            __strong typeof(self) strongSelf = weakSelf;
+            __block int countTime = 0;
+            NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
+            NSMutableArray *widthArray = [NSMutableArray array];
+            __weak __typeof(symptoms) weakSymptoms = symptoms;
+            [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                NSString *text = [obj objectForKey:kDataSourceCellTextKey];
+                float cellWidth = [strongSelf getCollectionCellWidthText:text content:obj];
+                float textAndImageWidth;
+                if (obj == [weakSymptoms lastObject]) {
+                    textAndImageWidth = cellWidth;
+                } else {
+                    textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
+                }
+                [widthArray  addObject:@(textAndImageWidth)];
+                NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
+                NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+                if ([sum intValue]<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                    //未超过一行
+                } else {
+                    //超过一行时
+                    if(countTime==0) {
+                        [widthArray removeAllObjects];
+                        if (obj == [weakSymptoms lastObject]) {
+                            [widthArray addObject:@(textAndImageWidth+kCollectionViewCellsHorizonMargin)];
+                        } else {
+                            [widthArray addObject:@(textAndImageWidth)];
+                        }
+                    }
+                    countTime++;
+                }
+            }];
+            
+            NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+            NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
+            [twoLineWidthArray addObject:sum];
+        }
+    }];
+    
+    [twoLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj intValue] > (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
+        } else {
+            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
+        }
+    }];
+    
+}
+
+
+-(NSArray *)getSecondLineCellCount {
+    
+    
+    
+    NSMutableArray *secondLineCellCountArray = [NSMutableArray array];
+    __weak __typeof(self) weakSelf = self;
+    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        @autoreleasepool {
+            __strong typeof(self) strongSelf = weakSelf;
+            __block int firstLineCellCount = 0;
+            NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+            
+            float firstLineCount = [strongSelf getFirstLineCellCountWithArray:symptoms];
+            if (symptoms.count != firstLineCount) {
+                NSRange range = NSMakeRange(0, firstLineCount);
+                [symptoms removeObjectsInRange:range];
+                float secondLineCount = [strongSelf getFirstLineCellCountWithArray:symptoms];
+                [secondLineCellCountArray addObject:@(secondLineCount)];
+            } else {
+                [secondLineCellCountArray addObject:@(0)];
+            }
+        }
+    }];
+    return (NSArray *)secondLineCellCountArray;
+    
+}
+
+- (int)getFirstLineCellCountWithArray:(NSArray *)array {
+    __block int firstLineCellCount = 0;
+    NSMutableArray *widthArray = [NSMutableArray array];
+    __weak __typeof(array) weakArray = array;
+    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        @autoreleasepool {
             NSString *text = [obj objectForKey:kDataSourceCellTextKey];
             float cellWidth = [self getCollectionCellWidthText:text content:obj];
             float textAndImageWidth;
-            if (obj == [symptoms lastObject]) {
+            if (obj == [weakArray lastObject]) {
                 textAndImageWidth = cellWidth;
             } else {
                 textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
@@ -136,109 +266,10 @@ FilterHeaderViewDelegate
             if ([sum intValue]-kCollectionViewCellsHorizonMargin<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
                 firstLineCellCount ++;
             }
-        }];
-        [self.firstLineCellCountArray addObject:@(firstLineCellCount)];
-        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-        NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-        [firstLineWidthArray addObject:sum];
-    }];
-    
-    [firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
-            [self.collectionHeaderMoreBtnHideBoolArray addObject:@NO];
-        } else {
-            [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
-        }
-    }];
-
-}
-
-
-- (void)judgeMoreBtnShowWhenShowTwoLine {
-    NSMutableArray *twoLineWidthArray = [NSMutableArray array];
-    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        __block int countTime = 0;
-        NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
-        NSMutableArray *widthArray = [NSMutableArray array];
-        [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-            float cellWidth = [self getCollectionCellWidthText:text content:obj];
-            float textAndImageWidth;
-            if (obj == [symptoms lastObject]) {
-                textAndImageWidth = cellWidth;
-            } else {
-                textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
-            }
-            [widthArray  addObject:@(textAndImageWidth)];
-            NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
-            NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-            if ([sum intValue]-kCollectionViewCellsHorizonMargin<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
-                //未超过一行
-            } else {
-                //超过一行时
-                if(countTime==0) {
-                [widthArray removeAllObjects];
-                [widthArray addObject:@(textAndImageWidth)];
-                }
-                countTime++;
-            }
-        }];
-
-        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-        NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-        [twoLineWidthArray addObject:sum];
-    }];
-    
-    [twoLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
-            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
-        } else {
-            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
-        }
-    }];
-}
-
-
--(NSArray *)getSecondLineCellCount {
-    NSMutableArray *secondLineCellCountArray = [NSMutableArray array];
-    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        __block int firstLineCellCount = 0;
-        NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-        
-       float firstLineCount = [self getFirstLineCellCountWithArray:symptoms];
-        if (symptoms.count != firstLineCount) {
-            NSRange range = NSMakeRange(0, firstLineCount);
-            [symptoms removeObjectsInRange:range];
-            float secondLineCount = [self getFirstLineCellCountWithArray:symptoms];
-            [secondLineCellCountArray addObject:@(secondLineCount)];
-        } else {
-            [secondLineCellCountArray addObject:@(0)];
-        }
-    }];
-    return (NSArray *)secondLineCellCountArray;
-
-}
-
-- (int)getFirstLineCellCountWithArray:(NSArray *)array {
-    __block int firstLineCellCount = 0;
-    NSMutableArray *widthArray = [NSMutableArray array];
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-        float cellWidth = [self getCollectionCellWidthText:text content:obj];
-        float textAndImageWidth;
-        if (obj == [array lastObject]) {
-            textAndImageWidth = cellWidth;
-        } else {
-            textAndImageWidth = cellWidth+kCollectionViewCellsHorizonMargin;
-        }
-        [widthArray  addObject:@(textAndImageWidth)];
-        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-        NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-        if ([sum intValue]-kCollectionViewCellsHorizonMargin<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
-            firstLineCellCount ++;
         }
     }];
     return firstLineCellCount;
+    
 }
 
 - (float)getCollectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
@@ -431,10 +462,13 @@ FilterHeaderViewDelegate
     } else {
         [self.expandSectionArray removeObject:[NSNumber numberWithInteger:sender.tag]];
     }
+    __weak __typeof(self) weakSelf = self;
     [self.collectionView performBatchUpdates:^{
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:sender.tag]];
+        __strong typeof(self) strongSelf = weakSelf;
+        [strongSelf.collectionView reloadSections:[NSIndexSet indexSetWithIndex:sender.tag]];
     } completion:^(BOOL finished) {
-        [self updateViewHeight];
+        __strong typeof(self) strongSelf = weakSelf;
+        [strongSelf updateViewHeight];
     }];
 }
 

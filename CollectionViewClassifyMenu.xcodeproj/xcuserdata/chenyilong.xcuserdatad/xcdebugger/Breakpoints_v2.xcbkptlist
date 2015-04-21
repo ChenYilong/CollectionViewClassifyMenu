@@ -44,11 +44,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CollectionViewClassifyMenu/Class/Controller/CYLClassifyMenuViewController.m"
-            timestampString = "450501049.182106"
+            timestampString = "451332055.298321"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "426"
-            endingLineNumber = "426"
+            startingLineNumber = "457"
+            endingLineNumber = "457"
             landmarkName = "-filterHeaderViewMoreBtnClicked:"
             landmarkType = "5">
          </BreakpointContent>
