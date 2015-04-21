@@ -61,8 +61,8 @@ FilterHeaderViewDelegate
     [self addCollectionView];
     [self judgeMoreBtnShow];
     // 如果想显示两行，请打开下面两行代码
-    [self judgeMoreBtnShowWhenShowTwoLine];
-    [self initDefaultShowCellCount];
+//    [self judgeMoreBtnShowWhenShowTwoLine];
+//    [self initDefaultShowCellCount];
     [self.bgScrollView addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
 }
@@ -142,7 +142,7 @@ FilterHeaderViewDelegate
                 [widthArray  addObject:@(textAndImageWidth)];
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                if ([sum intValue]-kCollectionViewCellsHorizonMargin<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                if ([sum intValue]<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
                     firstLineCellCount ++;
                 }
             }];
@@ -218,17 +218,12 @@ FilterHeaderViewDelegate
     
 }
 
-
 -(NSArray *)getSecondLineCellCount {
-    
-    
-    
     NSMutableArray *secondLineCellCountArray = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         @autoreleasepool {
             __strong typeof(self) strongSelf = weakSelf;
-            __block int firstLineCellCount = 0;
             NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
             
             float firstLineCount = [strongSelf getFirstLineCellCountWithArray:symptoms];
@@ -243,7 +238,6 @@ FilterHeaderViewDelegate
         }
     }];
     return (NSArray *)secondLineCellCountArray;
-    
 }
 
 - (int)getFirstLineCellCountWithArray:(NSArray *)array {
@@ -263,7 +257,7 @@ FilterHeaderViewDelegate
             [widthArray  addObject:@(textAndImageWidth)];
             NSArray *sumArray = [NSArray arrayWithArray:widthArray];
             NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-            if ([sum intValue]-kCollectionViewCellsHorizonMargin<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+            if ([sum intValue]<(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
                 firstLineCellCount ++;
             }
         }
@@ -303,7 +297,7 @@ FilterHeaderViewDelegate
     UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
     lbl.font = [UIFont boldSystemFontOfSize:18];
     lbl.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
-    lbl.text = @"默认显示两行时的效果如下所示!";
+    lbl.text = @"默认显示一行时的效果如下所示!";
     [vw addSubview:lbl];
     
     UILabel *lbl2 = [[UILabel alloc] init];
