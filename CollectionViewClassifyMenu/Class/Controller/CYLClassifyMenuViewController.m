@@ -19,14 +19,11 @@
 #define kCellImageToLabelMargin                    10
 #define kCellBtnCenterToBorderMargin               19
 
-#define kDataSourceSectionKey                      @"Symptoms"
-#define kDataSourceCellTextKey                     @"Food_Name"
-#define kDataSourceCellPictureKey                  @"Picture"
-
 #import "CYLClassifyMenuViewController.h"
 #import "UICollectionViewLeftAlignedLayout.h"
 #import "CollectionViewCell.h"
-#import "FilterHeaderView.h"
+#import "CYLFilterHeaderView.h"
+#import "CYLDBManager.h"
 
 static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
@@ -39,7 +36,7 @@ FilterHeaderViewDelegate
 >
 
 @property (nonatomic, strong) UICollectionView *collectionView;
-@property (nonatomic, strong) NSMutableArray   *dataSource;
+@property (nonatomic, strong) NSArray          *dataSource;
 @property (nonatomic, assign) float            priorCellY;
 @property (nonatomic, assign) int              rowLine;
 @property (nonatomic, strong) NSMutableArray   *collectionHeaderMoreBtnHideBoolArray;
@@ -53,19 +50,26 @@ FilterHeaderViewDelegate
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.bgScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
-    self.bgScrollView.backgroundColor = [UIColor colorWithRed:18/255.0 green:133/255.0 blue:117/255.0 alpha:1];
+    self.title = @"首页";
+    self.bgScrollView = [[UIScrollView alloc] initWithFrame:
+                         CGRectMake(0, 0,
+                                    [UIScreen mainScreen].bounds.size.width,
+                                    [UIScreen mainScreen].bounds.size.height)
+                         ];
+    self.bgScrollView.backgroundColor = [UIColor colorWithRed:18/255.0
+                                                        green:133/255.0 blue:117/255.0 alpha:1];
     [self.view addSubview:self.bgScrollView];
     
     [self initData];
     [self addCollectionView];
     [self judgeMoreBtnShow];
     // 如果想显示两行，请打开下面两行代码
-//    [self judgeMoreBtnShowWhenShowTwoLine];
-//    [self initDefaultShowCellCount];
+    //    [self judgeMoreBtnShowWhenShowTwoLine];
+    //    [self initDefaultShowCellCount];
     [self.bgScrollView addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
 }
+
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     self.bgScrollView.scrollEnabled = YES;
@@ -75,9 +79,13 @@ FilterHeaderViewDelegate
 - (void)initDefaultShowCellCount {
     for (NSUInteger index = 0; index < self.firstLineCellCountArray.count; index++) {
         NSArray *secondLineCellCountArray = [NSArray arrayWithArray:[self getSecondLineCellCount]];
-        [self.firstLineCellCountArray replaceObjectAtIndex:index withObject:@([self.firstLineCellCountArray[index] intValue]+[secondLineCellCountArray[index] intValue])];
+        NSNumber *object = @([self.firstLineCellCountArray[index] intValue]+
+        [secondLineCellCountArray[index] intValue]);
+        [self.firstLineCellCountArray replaceObjectAtIndex:index
+                                                withObject:object];
     }
 }
+
 - (NSMutableArray *)collectionHeaderMoreBtnHideBoolArray
 {
     if (_collectionHeaderMoreBtnHideBoolArray == nil) {
@@ -107,17 +115,7 @@ FilterHeaderViewDelegate
     self.firstLineCellCountArray = [NSMutableArray array];
     self.rowLine = 0;
     self.collectionHeaderMoreBtnHideBoolArray = [NSMutableArray array];
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data.json" ofType:nil];
-    NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath];
-    //    NSData *data = [NSData dataWithContentsOfFile:filePath];
-    NSError *error;
-    NSArray *json;
-    if (data) {
-        json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    }
-    //    [json writeToFile:@"/Users/chenyilong/Documents/123.plist"
-    //    atomically:YES];
-    self.dataSource = [NSMutableArray arrayWithArray:json];
+    self.dataSource = [NSArray arrayWithArray:[[CYLDBManager sharedCYLDBManager] getDataSource]];
 }
 
 - (float)checkCellLimitWidth:(float)cellWidth isLimitWidth:(ISLimitWidth)isLimitWidth {
@@ -130,14 +128,15 @@ FilterHeaderViewDelegate
     isLimitWidth?isLimitWidth(NO,@(cellWidth)):nil;
     return cellWidth;
 }
+
 - (float)getTextAndImageWidth:(NSString *)text content:(id)obj array:(NSArray *)array {
     __block float cellWidth = [self getCollectionCellWidthText:text content:obj];
     __block float cellWidthAndRightMargin;
-    
     [self checkCellLimitWidth:cellWidth isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
         cellWidth = [data floatValue];
         if (yesORNo == YES) {
-            cellWidthAndRightMargin = (CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
+            cellWidthAndRightMargin = CGRectGetWidth(self.collectionView.frame)-
+            kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
         } else {
             if (((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)-cellWidth >=kCollectionViewCellsHorizonMargin)) {
                 if (obj == [array lastObject]) {
@@ -146,12 +145,14 @@ FilterHeaderViewDelegate
                     cellWidthAndRightMargin = cellWidth+kCollectionViewCellsHorizonMargin;
                 }
             } else {
-                cellWidthAndRightMargin = (CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
+                cellWidthAndRightMargin = CGRectGetWidth(self.collectionView.frame)-
+                kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
             }
         }
     }];
     return cellWidthAndRightMargin;
 }
+
 - (void)judgeMoreBtnShow {
     NSMutableArray *firstLineWidthArray = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
@@ -164,11 +165,16 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text content:obj array:weakSymptoms];
+                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text
+                                                                         content:obj
+                                                                           array:weakSymptoms
+                                                 ];
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                if ([sum intValue]<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                int contentViewWidth = strongSelf.collectionView.frame.size.width-
+                kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
+                if ([sum intValue]<=contentViewWidth) {
                     firstLineCellCount ++;
                 }
             }];
@@ -178,7 +184,6 @@ FilterHeaderViewDelegate
             [firstLineWidthArray addObject:sum];
         }
     }];
-    
     [firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         if ([obj intValue]> (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
             [self.collectionHeaderMoreBtnHideBoolArray addObject:@NO];
@@ -186,8 +191,6 @@ FilterHeaderViewDelegate
             [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
         }
     }];
-    
-    
 }
 
 - (void)judgeMoreBtnShowWhenShowTwoLine {
@@ -202,11 +205,14 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text content:obj array:weakSymptoms];
+                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text
+                                                                         content:obj
+                                                                           array:weakSymptoms];
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                if ([sum intValue]<(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)||[sum intValue]==(strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
+                int contentViewWidth = strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
+                if ([sum intValue]<=contentViewWidth) {
                     //未超过一行
                 } else {
                     //超过一行时
@@ -222,25 +228,20 @@ FilterHeaderViewDelegate
                                     } else {
                                         [widthArray addObject:@((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin))];
                                     }
-
                                 } else {
                                     [widthArray addObject:@((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin))];
-
                                 }
                             }
                         }];
-                        
-                                         }
+                    }
                     countTime++;
                 }
             }];
-            
             NSArray *sumArray = [NSArray arrayWithArray:widthArray];
             NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
             [twoLineWidthArray addObject:sum];
         }
     }];
-    
     [twoLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         if ([obj intValue] > (self.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)) {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
@@ -248,7 +249,6 @@ FilterHeaderViewDelegate
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
         }
     }];
-    
 }
 
 -(NSArray *)getSecondLineCellCount {
@@ -258,7 +258,6 @@ FilterHeaderViewDelegate
         @autoreleasepool {
             __strong typeof(self) strongSelf = weakSelf;
             NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-            
             float firstLineCount = [strongSelf getFirstLineCellCountWithArray:symptoms];
             if (symptoms.count != firstLineCount) {
                 NSRange range = NSMakeRange(0, firstLineCount);
@@ -296,7 +295,6 @@ FilterHeaderViewDelegate
         }
     }];
     return firstLineCellCount;
-    
 }
 
 - (float)getCollectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
@@ -304,22 +302,13 @@ FilterHeaderViewDelegate
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
                          [UIFont systemFontOfSize:16]}];
-    BOOL shouldShowPic;
-    
     NSString *picture = [content objectForKey:kDataSourceCellPictureKey];
-    int pictureLength = [@(picture.length) intValue];
-    if(pictureLength>0) {
-        shouldShowPic = YES;
-    } else {
-        shouldShowPic = NO;
-    }
-    
+    BOOL shouldShowPic = [@(picture.length) boolValue];
     if(shouldShowPic) {
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin*2;
     } else {
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin;
     }
-    
     cellWidth = [self checkCellLimitWidth:cellWidth isLimitWidth:nil];
     return cellWidth;
 }
@@ -328,22 +317,24 @@ FilterHeaderViewDelegate
 {
     UIView *vw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
     vw.backgroundColor = [UIColor whiteColor];
-    
     UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
     lbl.font = [UIFont boldSystemFontOfSize:18];
     lbl.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
     lbl.text = @"默认显示一行时的效果如下所示!";
     [vw addSubview:lbl];
-    
     UILabel *lbl2 = [[UILabel alloc] init];
     //仅修改lbl2的x,ywh值不变
-    lbl2.frame = CGRectMake(lbl.frame.origin.x, lbl2.frame.origin.y, lbl2.frame.size.width, lbl2.frame.size.height);
+    lbl2.frame = CGRectMake(lbl.frame.origin.x, lbl2.frame.origin.y,
+                            lbl2.frame.size.width, lbl2.frame.size.height);
     //仅修改lbl2的y,xwh值不变
-    lbl2.frame = CGRectMake(lbl2.frame.origin.x, CGRectGetMaxY(lbl.frame) + 10, lbl2.frame.size.width, lbl2.frame.size.height);
+    lbl2.frame = CGRectMake(lbl2.frame.origin.x, CGRectGetMaxY(lbl.frame) + 10,
+                            lbl2.frame.size.width, lbl2.frame.size.height);
     //仅修改lbl2的宽度,xyh值不变
-    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y, lbl.frame.size.width, lbl2.frame.size.height);
+    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y,
+                            lbl.frame.size.width, lbl2.frame.size.height);
     //仅修改lbl2的高度,xyw值不变
-    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y, lbl2.frame.size.width, 14);
+    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y,
+                            lbl2.frame.size.width, 14);
     lbl2.font = [UIFont systemFontOfSize:12];
     lbl2.textColor = [UIColor grayColor];
     lbl2.text = @"下面是本店的分类列表";
@@ -352,16 +343,18 @@ FilterHeaderViewDelegate
 }
 
 - (void)addCollectionView {
-    CGRect collectionViewFrame = CGRectMake(0, kControllerHeaderViewHeight+kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height-40);
+    CGRect collectionViewFrame = CGRectMake(0, kControllerHeaderViewHeight+kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width,
+                                            [UIScreen mainScreen].bounds.size.height-40);
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
-    self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout];
-    //    layout.headerReferenceSize = CGSizeMake([UIScreen mainScreen].bounds.size.width, CYLFilterHeaderViewHeigt);  //设置head大小
+    self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame
+                                             collectionViewLayout:layout];
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
     self.collectionView.backgroundColor = [UIColor whiteColor];
-    [self.collectionView registerClass:[CollectionViewCell class] forCellWithReuseIdentifier:kCellIdentifier];
+    [self.collectionView registerClass:[CollectionViewCell class]
+            forCellWithReuseIdentifier:kCellIdentifier];
     self.collectionView.allowsMultipleSelection = YES;
-    [self.collectionView registerClass:[FilterHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier];
+    [self.collectionView registerClass:[CYLFilterHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier];
     self.collectionView.showsHorizontalScrollIndicator = NO;
     self.collectionView.contentInset = UIEdgeInsetsMake(15, 0, 0, 0);
     self.collectionView.scrollsToTop = NO;
@@ -371,19 +364,27 @@ FilterHeaderViewDelegate
 
 - (void)updateViewHeight {
     //仅修改self.collectionView的高度,xyw值不变
-    self.collectionView.frame = CGRectMake(self.collectionView.frame.origin.x, self.collectionView.frame.origin.y, self.collectionView.frame.size.width, self.collectionView.contentSize.height+kCollectionViewToTopMargin+kCollectionViewToBottomtMargin);
-    
-    self.bgScrollView.contentSize = CGSizeMake([UIScreen mainScreen].bounds.size.width,  self.collectionView.contentSize.height+kControllerHeaderViewHeight+kCollectionViewToTopMargin+kCollectionViewToBottomtMargin);
+    self.collectionView.frame = CGRectMake(self.collectionView.frame.origin.x,
+                                           self.collectionView.frame.origin.y,
+                                           self.collectionView.frame.size.width,
+                                           self.collectionView.contentSize.height+
+                                           kCollectionViewToTopMargin+
+                                           kCollectionViewToBottomtMargin);
+    self.bgScrollView.contentSize = CGSizeMake([UIScreen mainScreen].bounds.size.width,
+                                               self.collectionView.contentSize.height+
+                                               kControllerHeaderViewHeight+
+                                               kCollectionViewToTopMargin+
+                                               kCollectionViewToBottomtMargin);
 }
 
 #pragma mark - UICollectionViewDataSource
-
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     return [self.dataSource count];
 }
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+- (NSInteger)collectionView:(UICollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
 {
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[section] objectForKey:kDataSourceSectionKey]];
     for (NSNumber *ii in self.expandSectionArray) {
@@ -404,7 +405,8 @@ FilterHeaderViewDelegate
     return NO;
 }
 
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
+                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     CollectionViewCell *cell = (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
     cell.button.frame = CGRectMake(0, 0, cell.frame.size.width, cell.frame.size.height);
@@ -413,13 +415,11 @@ FilterHeaderViewDelegate
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
     if(shouldShowPic) {
         [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"] forState:UIControlStateNormal];
-        [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"] forState:UIControlStateHighlighted];
         CGFloat spacing = kCollectionViewItemButtonImageToTextMargin;
         cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
         cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
     } else {
         [cell.button setImage:nil forState:UIControlStateNormal];
-        [cell.button setImage:nil forState:UIControlStateHighlighted];
         cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
         cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
     }
@@ -429,7 +429,6 @@ FilterHeaderViewDelegate
           forControlEvents:UIControlEventTouchUpInside];
     cell.button.section = indexPath.section;
     cell.button.row = indexPath.row;
-    
     return cell;
 }
 
@@ -438,7 +437,7 @@ FilterHeaderViewDelegate
                                  atIndexPath:(NSIndexPath *)indexPath
 {
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
-        FilterHeaderView *filterHeaderView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier forIndexPath:indexPath];
+        CYLFilterHeaderView *filterHeaderView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier forIndexPath:indexPath];
         filterHeaderView.moreButton.hidden = [self.collectionHeaderMoreBtnHideBoolArray[indexPath.section] boolValue];
         filterHeaderView.delegate = self;
         NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
@@ -478,23 +477,32 @@ FilterHeaderViewDelegate
     //二级菜单数组
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[button.section] objectForKey:kDataSourceSectionKey]];
     NSString *sectionTitle = [self.dataSource[button.section] objectForKey:@"Type"];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
+    BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
     NSString *cellTitle = [symptoms[button.row] objectForKey:kDataSourceCellTextKey];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:cellTitle message:sectionTitle delegate:self cancelButtonTitle:@"取消" otherButtonTitles:nil];
+    NSString *message = shouldShowPic?[NSString stringWithFormat:@"★%@",cellTitle]:cellTitle;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:sectionTitle message:message delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
     [alert show];
+    int delayInSeconds = 1;
+    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(when, dispatch_get_main_queue(), ^{
+        [alert dismissWithClickedButtonIndex:0 animated:YES];
+    });
 }
 
 #pragma mark - FilterHeaderViewDelegateMethod
 -(void)filterHeaderViewMoreBtnClicked:(UIButton *)sender {
     sender.selected = !sender.selected;
     if (sender.selected) {
-        [self.expandSectionArray addObject:[NSNumber numberWithInteger:sender.tag]];
+        [self.expandSectionArray addObject:@(sender.tag)];
     } else {
-        [self.expandSectionArray removeObject:[NSNumber numberWithInteger:sender.tag]];
+        [self.expandSectionArray removeObject:@(sender.tag)];
     }
     __weak __typeof(self) weakSelf = self;
     [self.collectionView performBatchUpdates:^{
         __strong typeof(self) strongSelf = weakSelf;
-        [strongSelf.collectionView reloadSections:[NSIndexSet indexSetWithIndex:sender.tag]];
+        NSIndexSet *section = [NSIndexSet indexSetWithIndex:sender.tag];
+        [strongSelf.collectionView reloadSections:section];
     } completion:^(BOOL finished) {
         __strong typeof(self) strongSelf = weakSelf;
         [strongSelf updateViewHeight];
@@ -502,8 +510,9 @@ FilterHeaderViewDelegate
 }
 
 #pragma mark - UICollectionViewDelegateLeftAlignedLayout
-
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
     NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
@@ -511,18 +520,22 @@ FilterHeaderViewDelegate
     return CGSizeMake(cellWidth, kCollectionViewCellHeight);
 }
 
-
-- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
+- (CGFloat)collectionView:(UICollectionView *)collectionView
+                   layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 {
     return kCollectionViewCellsHorizonMargin;
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout*)collectionViewLayout
+referenceSizeForHeaderInSection:(NSInteger)section
 {
     return CGSizeMake([UIScreen mainScreen].bounds.size.width - 50, 38);
 }
 
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView
+                        layout:(UICollectionViewLayout *)collectionViewLayout
+        insetForSectionAtIndex:(NSInteger)section
 {
     return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
 }

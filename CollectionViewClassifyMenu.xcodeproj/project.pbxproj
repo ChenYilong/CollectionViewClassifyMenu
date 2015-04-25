@@ -14,13 +14,23 @@
 		9A2DA4931AB7DC060042E556 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA48A1AB7DC060042E556 /* AppDelegate.m */; };
 		9A2DA4941AB7DC060042E556 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA48B1AB7DC060042E556 /* LaunchScreen.xib */; };
 		9A2DA4951AB7DC060042E556 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA48D1AB7DC060042E556 /* Images.xcassets */; };
-		9A2DA4961AB7DC060042E556 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA48E1AB7DC060042E556 /* Info.plist */; };
 		9A2DA4971AB7DC060042E556 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA48F1AB7DC060042E556 /* main.m */; };
 		9A2DA49A1AB7DEE90042E556 /* CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA4991AB7DEE90042E556 /* CollectionViewCell.m */; };
-		9A2DA49E1AB815CA0042E556 /* FilterHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA49C1AB815CA0042E556 /* FilterHeaderView.m */; };
+		9A2DA49E1AB815CA0042E556 /* CYLFilterHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DA49C1AB815CA0042E556 /* CYLFilterHeaderView.m */; };
 		9A2DA4AB1AB9A8C20042E556 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A2DA4AA1AB9A8C20042E556 /* data.json */; };
 		9A32960B1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */; };
 		9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */; };
+		9ABE723F1AEBDDE900343316 /* CYLDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE723C1AEBDDE900343316 /* CYLDBManager.m */; };
+		9ABE72401AEBDDE900343316 /* CYLFilterParamsTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE723E1AEBDDE900343316 /* CYLFilterParamsTool.m */; };
+		9ABE72431AEBF8BE00343316 /* CYLMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE72421AEBF8BE00343316 /* CYLMainViewController.m */; };
+		9ABE72461AEBFC5800343316 /* DoctorFilterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE72451AEBFC5800343316 /* DoctorFilterController.m */; };
+		9ABE72481AEBFCCA00343316 /* FilterBaseController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ABE72471AEBFCCA00343316 /* FilterBaseController.xib */; };
+		9ABE724B1AEBFD0000343316 /* FilterBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE724A1AEBFD0000343316 /* FilterBaseController.m */; };
+		9ABE72511AEBFED900343316 /* FilterCollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE724D1AEBFED900343316 /* FilterCollectionCell.m */; };
+		9ABE72521AEBFED900343316 /* FilterHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE724F1AEBFED900343316 /* FilterHeaderView.m */; };
+		9ABE72531AEBFED900343316 /* FilterHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ABE72501AEBFED900343316 /* FilterHeaderView.xib */; };
+		9ABE72561AEC000A00343316 /* UIImage+Blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE72551AEC000A00343316 /* UIImage+Blur.m */; };
+		9ABE72591AEC058300343316 /* UIView+General.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ABE72581AEC058300343316 /* UIView+General.m */; };
 		9AC8569E1ACD4679005E982D /* UIButton+CollectionCellStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC8569D1ACD4679005E982D /* UIButton+CollectionCellStyle.m */; };
 		9AF628711ABFFAB000E54B45 /* CYLRightImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF628701ABFFAB000E54B45 /* CYLRightImageButton.m */; };
 /* End PBXBuildFile section */
@@ -52,8 +62,8 @@
 		9A2DA48F1AB7DC060042E556 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9A2DA4981AB7DEE90042E556 /* CollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionViewCell.h; sourceTree = "<group>"; };
 		9A2DA4991AB7DEE90042E556 /* CollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionViewCell.m; sourceTree = "<group>"; };
-		9A2DA49B1AB815CA0042E556 /* FilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterHeaderView.h; sourceTree = "<group>"; };
-		9A2DA49C1AB815CA0042E556 /* FilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterHeaderView.m; sourceTree = "<group>"; };
+		9A2DA49B1AB815CA0042E556 /* CYLFilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterHeaderView.h; sourceTree = "<group>"; };
+		9A2DA49C1AB815CA0042E556 /* CYLFilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterHeaderView.m; sourceTree = "<group>"; };
 		9A2DA4AA1AB9A8C20042E556 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		9A3295EB1AB7D3880035EFAA /* CollectionViewClassifyMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CollectionViewClassifyMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A3296041AB7D3880035EFAA /* CollectionViewClassifyMenuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CollectionViewClassifyMenuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -61,6 +71,26 @@
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
 		9A88909F1ABAC82E005BD528 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
 		9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLIndexPathButton.m; sourceTree = "<group>"; };
+		9ABE723B1AEBDDE900343316 /* CYLDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLDBManager.h; sourceTree = "<group>"; };
+		9ABE723C1AEBDDE900343316 /* CYLDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLDBManager.m; sourceTree = "<group>"; };
+		9ABE723D1AEBDDE900343316 /* CYLFilterParamsTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterParamsTool.h; sourceTree = "<group>"; };
+		9ABE723E1AEBDDE900343316 /* CYLFilterParamsTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterParamsTool.m; sourceTree = "<group>"; };
+		9ABE72411AEBF8BE00343316 /* CYLMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMainViewController.h; sourceTree = "<group>"; };
+		9ABE72421AEBF8BE00343316 /* CYLMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMainViewController.m; sourceTree = "<group>"; };
+		9ABE72441AEBFC5800343316 /* DoctorFilterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DoctorFilterController.h; sourceTree = "<group>"; };
+		9ABE72451AEBFC5800343316 /* DoctorFilterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DoctorFilterController.m; sourceTree = "<group>"; };
+		9ABE72471AEBFCCA00343316 /* FilterBaseController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FilterBaseController.xib; sourceTree = "<group>"; };
+		9ABE72491AEBFD0000343316 /* FilterBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterBaseController.h; sourceTree = "<group>"; };
+		9ABE724A1AEBFD0000343316 /* FilterBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterBaseController.m; sourceTree = "<group>"; };
+		9ABE724C1AEBFED900343316 /* FilterCollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterCollectionCell.h; sourceTree = "<group>"; };
+		9ABE724D1AEBFED900343316 /* FilterCollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterCollectionCell.m; sourceTree = "<group>"; };
+		9ABE724E1AEBFED900343316 /* FilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterHeaderView.h; sourceTree = "<group>"; };
+		9ABE724F1AEBFED900343316 /* FilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterHeaderView.m; sourceTree = "<group>"; };
+		9ABE72501AEBFED900343316 /* FilterHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FilterHeaderView.xib; sourceTree = "<group>"; };
+		9ABE72541AEC000A00343316 /* UIImage+Blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Blur.h"; sourceTree = "<group>"; };
+		9ABE72551AEC000A00343316 /* UIImage+Blur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Blur.m"; sourceTree = "<group>"; };
+		9ABE72571AEC058300343316 /* UIView+General.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+General.h"; sourceTree = "<group>"; };
+		9ABE72581AEC058300343316 /* UIView+General.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+General.m"; sourceTree = "<group>"; };
 		9AC8569C1ACD4679005E982D /* UIButton+CollectionCellStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+CollectionCellStyle.h"; sourceTree = "<group>"; };
 		9AC8569D1ACD4679005E982D /* UIButton+CollectionCellStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+CollectionCellStyle.m"; sourceTree = "<group>"; };
 		9AF6286F1ABFFAB000E54B45 /* CYLRightImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLRightImageButton.h; sourceTree = "<group>"; };
@@ -90,6 +120,10 @@
 			children = (
 				9AC8569C1ACD4679005E982D /* UIButton+CollectionCellStyle.h */,
 				9AC8569D1ACD4679005E982D /* UIButton+CollectionCellStyle.m */,
+				9ABE72541AEC000A00343316 /* UIImage+Blur.h */,
+				9ABE72551AEC000A00343316 /* UIImage+Blur.m */,
+				9ABE72571AEC058300343316 /* UIView+General.h */,
+				9ABE72581AEC058300343316 /* UIView+General.m */,
 				9A18227D1AB9AF35004CCCD5 /* NSArray+log.h */,
 				9A18227E1AB9AF35004CCCD5 /* NSArray+log.m */,
 				9A18227F1AB9AF35004CCCD5 /* NSDictionary+log.h */,
@@ -114,6 +148,13 @@
 			children = (
 				9A2DA4801AB7DC060042E556 /* CYLClassifyMenuViewController.h */,
 				9A2DA4811AB7DC060042E556 /* CYLClassifyMenuViewController.m */,
+				9ABE72411AEBF8BE00343316 /* CYLMainViewController.h */,
+				9ABE72421AEBF8BE00343316 /* CYLMainViewController.m */,
+				9ABE72441AEBFC5800343316 /* DoctorFilterController.h */,
+				9ABE72451AEBFC5800343316 /* DoctorFilterController.m */,
+				9ABE72491AEBFD0000343316 /* FilterBaseController.h */,
+				9ABE724A1AEBFD0000343316 /* FilterBaseController.m */,
+				9ABE72471AEBFCCA00343316 /* FilterBaseController.xib */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -129,6 +170,7 @@
 		9A2DA4831AB7DC060042E556 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				9ABE723A1AEBDDC900343316 /* Tool */,
 				9A18227C1AB9AF35004CCCD5 /* Category */,
 				9A2DA4841AB7DC060042E556 /* Lib */,
 				9A2DA4881AB7DC060042E556 /* Symtem */,
@@ -171,12 +213,17 @@
 			children = (
 				9A2DA4981AB7DEE90042E556 /* CollectionViewCell.h */,
 				9A2DA4991AB7DEE90042E556 /* CollectionViewCell.m */,
-				9A2DA49B1AB815CA0042E556 /* FilterHeaderView.h */,
-				9A2DA49C1AB815CA0042E556 /* FilterHeaderView.m */,
+				9A2DA49B1AB815CA0042E556 /* CYLFilterHeaderView.h */,
+				9A2DA49C1AB815CA0042E556 /* CYLFilterHeaderView.m */,
 				9A88909F1ABAC82E005BD528 /* CYLIndexPathButton.h */,
 				9A8890A01ABAC82E005BD528 /* CYLIndexPathButton.m */,
 				9AF6286F1ABFFAB000E54B45 /* CYLRightImageButton.h */,
 				9AF628701ABFFAB000E54B45 /* CYLRightImageButton.m */,
+				9ABE724C1AEBFED900343316 /* FilterCollectionCell.h */,
+				9ABE724D1AEBFED900343316 /* FilterCollectionCell.m */,
+				9ABE724E1AEBFED900343316 /* FilterHeaderView.h */,
+				9ABE724F1AEBFED900343316 /* FilterHeaderView.m */,
+				9ABE72501AEBFED900343316 /* FilterHeaderView.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -224,6 +271,17 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		9ABE723A1AEBDDC900343316 /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				9ABE723B1AEBDDE900343316 /* CYLDBManager.h */,
+				9ABE723C1AEBDDE900343316 /* CYLDBManager.m */,
+				9ABE723D1AEBDDE900343316 /* CYLFilterParamsTool.h */,
+				9ABE723E1AEBDDE900343316 /* CYLFilterParamsTool.m */,
+			);
+			path = Tool;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -268,7 +326,7 @@
 		9A3295E31AB7D3880035EFAA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = chenyilong;
 				TargetAttributes = {
 					9A3295EA1AB7D3880035EFAA = {
@@ -307,7 +365,8 @@
 				9A2DA4AB1AB9A8C20042E556 /* data.json in Resources */,
 				9A2DA4941AB7DC060042E556 /* LaunchScreen.xib in Resources */,
 				9A2DA4951AB7DC060042E556 /* Images.xcassets in Resources */,
-				9A2DA4961AB7DC060042E556 /* Info.plist in Resources */,
+				9ABE72481AEBFCCA00343316 /* FilterBaseController.xib in Resources */,
+				9ABE72531AEBFED900343316 /* FilterHeaderView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,16 +385,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A2DA4921AB7DC060042E556 /* UICollectionViewLeftAlignedLayout.m in Sources */,
+				9ABE72591AEC058300343316 /* UIView+General.m in Sources */,
 				9AF628711ABFFAB000E54B45 /* CYLRightImageButton.m in Sources */,
 				9A1822821AB9AF35004CCCD5 /* NSDictionary+log.m in Sources */,
+				9ABE723F1AEBDDE900343316 /* CYLDBManager.m in Sources */,
+				9ABE72461AEBFC5800343316 /* DoctorFilterController.m in Sources */,
 				9A2DA49A1AB7DEE90042E556 /* CollectionViewCell.m in Sources */,
+				9ABE724B1AEBFD0000343316 /* FilterBaseController.m in Sources */,
 				9A2DA4911AB7DC060042E556 /* CYLClassifyMenuViewController.m in Sources */,
+				9ABE72561AEC000A00343316 /* UIImage+Blur.m in Sources */,
 				9AC8569E1ACD4679005E982D /* UIButton+CollectionCellStyle.m in Sources */,
+				9ABE72511AEBFED900343316 /* FilterCollectionCell.m in Sources */,
 				9A8890A11ABAC82E005BD528 /* CYLIndexPathButton.m in Sources */,
+				9ABE72401AEBDDE900343316 /* CYLFilterParamsTool.m in Sources */,
 				9A2DA4971AB7DC060042E556 /* main.m in Sources */,
 				9A1822811AB9AF35004CCCD5 /* NSArray+log.m in Sources */,
 				9A2DA4931AB7DC060042E556 /* AppDelegate.m in Sources */,
-				9A2DA49E1AB815CA0042E556 /* FilterHeaderView.m in Sources */,
+				9ABE72431AEBF8BE00343316 /* CYLMainViewController.m in Sources */,
+				9A2DA49E1AB815CA0042E556 /* CYLFilterHeaderView.m in Sources */,
+				9ABE72521AEBFED900343316 /* FilterHeaderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

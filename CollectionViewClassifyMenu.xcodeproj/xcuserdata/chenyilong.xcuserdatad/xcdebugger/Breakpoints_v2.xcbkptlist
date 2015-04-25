@@ -20,11 +20,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "Yes"
             filePath = "CollectionViewClassifyMenu/Class/Other/Symtem/AppDelegate.m"
-            timestampString = "448440646.978242"
+            timestampString = "451679901.671401"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "20"
-            endingLineNumber = "20"
+            startingLineNumber = "27"
+            endingLineNumber = "27"
             landmarkName = "-application:didFinishLaunchingWithOptions:"
             landmarkType = "5">
             <Actions>
@@ -35,22 +35,6 @@
                   </ActionContent>
                </BreakpointActionProxy>
             </Actions>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "CollectionViewClassifyMenu/Class/Controller/CYLClassifyMenuViewController.m"
-            timestampString = "451338277.028937"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "486"
-            endingLineNumber = "486"
-            landmarkName = "-filterHeaderViewMoreBtnClicked:"
-            landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
