@@ -118,8 +118,7 @@
 - (NSString *)filename
 {
     if (_filename == nil) {
-        _filename = [[NSString alloc] init];
-        NSString *Path =[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
         _filename = [Path stringByAppendingPathComponent:udDoctorFilterSetting];
     }
     return _filename;

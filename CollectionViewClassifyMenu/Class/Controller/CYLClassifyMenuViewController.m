@@ -56,8 +56,7 @@ FilterHeaderViewDelegate
                                     [UIScreen mainScreen].bounds.size.width,
                                     [UIScreen mainScreen].bounds.size.height)
                          ];
-    self.bgScrollView.backgroundColor = [UIColor colorWithRed:18/255.0
-                                                        green:133/255.0 blue:117/255.0 alpha:1];
+    self.bgScrollView.backgroundColor = [UIColor colorWithRed:252.0f/255.f green:252.0f/255.f blue:252.0f/255.f alpha:2.f];
     [self.view addSubview:self.bgScrollView];
     
     [self initData];

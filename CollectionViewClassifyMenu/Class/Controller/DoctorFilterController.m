@@ -15,6 +15,8 @@
 @interface DoctorFilterController ()
 @property (nonatomic, strong) CYLFilterParamsTool *filterParamsTool;
 @property (nonatomic, strong) NSString *filename;
+@property (nonatomic, assign) NSUInteger secondSectionTagsCount;
+
 @end
 
 @implementation DoctorFilterController
@@ -28,39 +30,72 @@
 {
     if (_filterParamsTool == nil) {
         _filterParamsTool = [[CYLFilterParamsTool alloc] init];
+//        BOOL haveFileInBox =
+//        [[NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename] boolValue];
+//        if (haveFileInBox) {
+            _filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename];
+//        }
     }
     return _filterParamsTool;
 }
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    if([NSKeyedUnarchiver unarchiveObjectWithFile:self.filterParamsTool.filename]) {
-        self.filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:self.filterParamsTool.filename];
+    CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
+    [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
+    NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
+    if (allSecondSectionTagsCount >0) {
+        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     }
-       [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     self.collectionView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
+}
+
+/**
+ *  懒加载_secondSectionTagsCount
+ *
+ *  @return int
+ */
+- (NSUInteger)secondSectionTagsCount
+{
+    if (_secondSectionTagsCount == 0) {
+        NSMutableArray *types = [NSMutableArray arrayWithObject:@"全部"];
+        [types addObjectsFromArray:[[CYLDBManager sharedCYLDBManager] getAllSkillTags]];
+        _secondSectionTagsCount = [types count];
+    }
+    return _secondSectionTagsCount;
+}
+
+-(void)refreshFilterParams {
+    self.filterParamsTool = nil;
+    NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
+    if (allSecondSectionTagsCount >0) {
+        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
+    }
 }
 
 - (void)itemButtonClicked:(CYLIndexPathButton *)button
 {
+    //button.selected是指button原来的状态
+    //是否修改要看,数组第一个值是否是0,默认是1
     NSMutableArray *setting = self.filterParamsTool.filterParamsArray[button.section];
     if (button.section == 0) {
         if (button.row == 1) {
-//            // 如果点击的是选择医院按钮，则弹出选择医院的界面
-//            SelectProvinceController *controller = [SelectProvinceController instance];
-//            controller.dataSourceArray = [Util getStateData:udHospital];
-//            [controller setSelectedHandler:^(NSDictionary *successedData, NSString *text) {
-//                [setting replaceObjectAtIndex:1 withObject:@1];
-//                [setting replaceObjectAtIndex:0 withObject:@0];
-//                // 选择医院结束，将此医院保存，下次进入此界面，需显示
-//                self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] = text;
-//                NSMutableArray *array = self.filterParamsTool.dataSources[0];
-//                [array replaceObjectAtIndex:1 withObject:text];
-//                [[NativeUtil appDelegate].navigationController dismissViewControllerAnimated:YES completion:nil];
-//                [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
-//            }];
-//            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-//            [[NativeUtil appDelegate].navigationController presentViewController:navController animated:YES completion:nil];
+            //            // 如果点击的是选择医院按钮，则弹出选择医院的界面
+            //            SelectProvinceController *controller = [SelectProvinceController instance];
+            //            controller.dataSourceArray = [Util getStateData:udHospital];
+            //            [controller setSelectedHandler:^(NSDictionary *successedData, NSString *text) {
+            //                [setting replaceObjectAtIndex:1 withObject:@1];
+            //                [setting replaceObjectAtIndex:0 withObject:@0];
+            //                // 选择医院结束，将此医院保存，下次进入此界面，需显示
+            //                self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] = text;
+            //                NSMutableArray *array = self.filterParamsTool.dataSources[0];
+            //                [array replaceObjectAtIndex:1 withObject:text];
+            //                [[NativeUtil appDelegate].navigationController dismissViewControllerAnimated:YES completion:nil];
+            //                [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
+            //            }];
+            //            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+            //            [[NativeUtil appDelegate].navigationController presentViewController:navController animated:YES completion:nil];
             return;
         } else {
             // 点击的是“全部”按钮
@@ -69,36 +104,56 @@
             NSMutableArray *array = self.filterParamsTool.dataSources[0];
             [array replaceObjectAtIndex:1 withObject:@"请选择"];
             [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
+            [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
         }
     } else {
-        if (button.row == 0 && button.selected) {
-            return;
-        }
-        // 参考QuestionFilterController
-        [setting replaceObjectAtIndex:button.row withObject:@(!button.selected)];
-        if (button.row > 0) {
-            if (!button.selected) {
-                [setting replaceObjectAtIndex:0 withObject:@(0)];
-            } else {
-                if (![setting containsObject:@(1)]) {
-                    [setting replaceObjectAtIndex:0 withObject:@(1)];
-                }
-            }
-            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
-            [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-        } else {
-            for (int i = 0; i < setting.count; i++) {
-                if (i > 0) {
-                    [setting replaceObjectAtIndex:i withObject:@(0)];
-                }
-            }
-            [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
-        }
+        [self clickedInSecondSection:button withSetting:setting];
+        
     }
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
     [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
 }
 
+- (void)clickedInSecondSection:(CYLIndexPathButton *)button withSetting:(NSMutableArray *)setting{
+    NSString *text = self.filterParamsTool.dataSources[button.section][button.row];
+    if (button.row == 0) {
+        if (button.selected ) {
+            return;
+        } else  {
+            //处于修改状态
+            [self.filterParamsTool.filterParamsContentDictionary
+             removeObjectForKey:@"skilled"];
+        }
+    }
+    [setting replaceObjectAtIndex:button.row withObject:@(!button.selected)];
+    if (button.row > 0) {
+        if (!button.selected) {
+            [setting replaceObjectAtIndex:0 withObject:@(0)];
+            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] count] == 0) {
+                self.filterParamsTool.filterParamsContentDictionary[@"skilled"] = [NSMutableArray array];
+            }
+            if(![text isEqualToString:@"全部"])
+                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] addObject:text];
+        } else {
+            if (![setting containsObject:@(1)]) {
+                [setting replaceObjectAtIndex:0 withObject:@(1)];
+                [self.filterParamsTool.filterParamsContentDictionary
+                 removeObjectForKey:@"skilled"];
+            }
+            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text])
+            [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
+        }
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
+        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    } else {
+        for (int i = 0; i < setting.count; i++) {
+            if (i > 0) {
+                [setting replaceObjectAtIndex:i withObject:@(0)];
+            }
+        }
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
+    }
+}
 /**
  *  懒加载_filename
  *
@@ -108,7 +163,7 @@
 {
     if (_filename == nil) {
         _filename = [[NSString alloc] init];
-        NSString *Path =[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
         _filename = [Path stringByAppendingPathComponent:udDoctorFilterSetting];
     }
     return _filename;
@@ -116,6 +171,7 @@
 
 - (void)confirmButtonClicked:(id)sender
 {
+    [super confirmButtonClicked:sender];
     self.filterParamsTool.filterParamsDictionary[udDoctorFilterSetting] = self.filterParamsTool.filterParamsArray;
     BOOL modified = NO;
     for (NSArray *array in self.filterParamsTool.filterParamsArray) {
@@ -125,28 +181,37 @@
         }
     }
     if (modified == NO) {
-        // 删除选择的医院
-        if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
-            [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
-        }
+         //删除选择的医院
+                if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
+                    [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
+                }
+                if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
+                    [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
+                }
     } else {
-        //有筛选条件
-        
-        //=================NSKeyedArchiver========================
-        //----Save
-        //这一句是将路径和文件名合成文件完整路径
-        [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filename];
-        
+//        //有筛选条件
+//        BOOL firstModified = [[self.filterParamsTool.filterParamsArray[0] firstObject] boolValue];
+//        BOOL secondModified = [[self.filterParamsTool.filterParamsArray[1] firstObject] boolValue];
+//        if (firstModified&&!secondModified) {
+//            if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
+//                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
+//            }
+//        } else if(!firstModified&&secondModified) {
+//            // 删除选择的医院
+//            if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
+//                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
+//            }
+//        }
     }
     self.filterParamsTool.filterParamsDictionary[udDoctorFilterSettingModified] = @(modified);
-    [super confirmButtonClicked:sender];
+    [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filename];
 }
 
 - (void)restoreButtonClicked:(id)sender
 {
+    [super confirmButtonClicked:sender];
     self.filterParamsTool = [[CYLFilterParamsTool alloc] init];
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
-    [self confirmButtonClicked:nil];
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
@@ -196,21 +261,7 @@
     [cell.titleButton setTitle:text forState:UIControlStateNormal];
     [cell.titleButton setTitle:text forState:UIControlStateSelected];
     [cell.titleButton addTarget:self action:@selector(itemButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-
     cell.titleButton.selected = [self.filterParamsTool.filterParamsArray[indexPath.section][indexPath.row] boolValue];
-    if (indexPath.section == 1) {
-        if (![text isEqualToString:@"全部"]) {
-        if(cell.titleButton.selected) {
-            if (![self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text]) {
-            [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] addObject:text];
-            }
-        } else {
-            if ([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text]) {
-            [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
-        }
-        }
-    }
-    }
     cell.titleButton.section = indexPath.section;
     cell.titleButton.row = indexPath.row;
     return cell;

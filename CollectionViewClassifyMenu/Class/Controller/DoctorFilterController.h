@@ -9,5 +9,5 @@
 #import "FilterBaseController.h"
 
 @interface DoctorFilterController : FilterBaseController
-
+-(void)refreshFilterParams;
 @end
