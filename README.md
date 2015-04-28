@@ -17,7 +17,7 @@ Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 
 第一种是CollectionView做的两级菜单，可以折叠第二级菜单
 
-第二种是侧边栏菜单,具有多选功能,并可将数据持久化,在下次打开app后,保留用户的筛选条件.
+第二种是侧边栏菜单,具有多选功能,并可将数据持久化,在下次打开app后,保留用户的筛选条件.默认保存.
 
 数据持久化使用NSCoding,若要关闭该项功能,可在AppDelegate里清除固化数据,
  
@@ -36,12 +36,15 @@ Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 ```
 
 用法如下
+
+YES为保存,NO为不保存.
  
  
 ```Objective-C
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     //...
-    [self initFilterSetting:YES];
+    //设NO表示,每次启动程序,清楚用户上次的筛选条件,不写该行,默认保存.
+    [self initFilterSetting:NO];
     return YES;
 }
 ```
