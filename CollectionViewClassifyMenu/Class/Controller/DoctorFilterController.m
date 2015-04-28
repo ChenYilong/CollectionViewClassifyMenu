@@ -1,10 +1,11 @@
 //
 //  DoctorFilterController.m
-//  PiFuKeYiSheng
+//  http://cnblogs.com/ChenYilong/ 
 //
 //  Created by  https://github.com/ChenYilong  on 14-7-10.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
-//
+//  Multiple Choice Filter
+
 #define udDoctorFilterSetting         @"udDoctorFilterSetting"
 #define udDoctorFilterSettingModified @"udDoctorFilterSettingModified"
 #import "DoctorFilterController.h"
@@ -42,17 +43,6 @@
     return _filterParamsTool;
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
-    if (allSecondSectionTagsCount >0) {
-        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
-    }
-    self.collectionView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
-}
-
 /**
  *  懒加载_secondSectionTagsCount
  *
@@ -68,6 +58,17 @@
     return _secondSectionTagsCount;
 }
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
+    if (allSecondSectionTagsCount >0) {
+        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
+    }
+    self.collectionView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
+}
+
 -(void)refreshFilterParams {
     self.filterParamsTool = nil;
     NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
@@ -76,85 +77,6 @@
     }
 }
 
-- (void)itemButtonClicked:(CYLIndexPathButton *)button
-{
-    //button.selected是指button原来的状态
-    //是否修改要看,数组第一个值是否是0,默认是1
-    NSMutableArray *setting = self.filterParamsTool.filterParamsArray[button.section];
-    if (button.section == 0) {
-        if (button.row == 1) {
-            //            // 如果点击的是选择地区按钮，则弹出选择地区的界面
-            //            SelectProvinceController *controller = [SelectProvinceController instance];
-            //            controller.dataSourceArray = [Util getStateData:udHospital];
-            //            [controller setSelectedHandler:^(NSDictionary *successedData, NSString *text) {
-            //                [setting replaceObjectAtIndex:1 withObject:@1];
-            //                [setting replaceObjectAtIndex:0 withObject:@0];
-            //                // 选择地区结束，将此地区保存，下次进入此界面，需显示
-            //                self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] = text;
-            //                NSMutableArray *array = self.filterParamsTool.dataSources[0];
-            //                [array replaceObjectAtIndex:1 withObject:text];
-            //                [[NativeUtil appDelegate].navigationController dismissViewControllerAnimated:YES completion:nil];
-            //                [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
-            //            }];
-            //            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-            //            [[NativeUtil appDelegate].navigationController presentViewController:navController animated:YES completion:nil];
-            return;
-        } else {
-            // 点击的是“全部”按钮
-            [setting replaceObjectAtIndex:0 withObject:@1];
-            [setting replaceObjectAtIndex:1 withObject:@0];
-            NSMutableArray *array = self.filterParamsTool.dataSources[0];
-            [array replaceObjectAtIndex:1 withObject:@"请选择"];
-            [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
-            [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
-        }
-    } else {
-        [self clickedInSecondSection:button withSetting:setting];
-    }
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
-    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-}
-
-- (void)clickedInSecondSection:(CYLIndexPathButton *)button withSetting:(NSMutableArray *)setting{
-    NSString *text = self.filterParamsTool.dataSources[button.section][button.row];
-    if (button.row == 0) {
-        if (button.selected ) {
-            return;
-        } else  {
-            //处于修改状态
-            [self.filterParamsTool.filterParamsContentDictionary
-             removeObjectForKey:@"skilled"];
-        }
-    }
-    [setting replaceObjectAtIndex:button.row withObject:@(!button.selected)];
-    if (button.row > 0) {
-        if (!button.selected) {
-            [setting replaceObjectAtIndex:0 withObject:@(0)];
-            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] count] == 0) {
-                self.filterParamsTool.filterParamsContentDictionary[@"skilled"] = [NSMutableArray array];
-            }
-            if(![text isEqualToString:@"全部"])
-                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] addObject:text];
-        } else {
-            if (![setting containsObject:@(1)]) {
-                [setting replaceObjectAtIndex:0 withObject:@(1)];
-                [self.filterParamsTool.filterParamsContentDictionary
-                 removeObjectForKey:@"skilled"];
-            }
-            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text])
-                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
-        }
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
-        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-    } else {
-        for (int i = 0; i < setting.count; i++) {
-            if (i > 0) {
-                [setting replaceObjectAtIndex:i withObject:@(0)];
-            }
-        }
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:button.section]];
-    }
-}
 /**
  *  懒加载_filename
  *
@@ -181,29 +103,6 @@
             break;
         }
     }
-    if (modified == NO) {
-        //删除选择的地区
-        if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
-            [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
-        }
-        if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
-            [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
-        }
-    } else {
-        //        //有筛选条件
-        //        BOOL firstModified = [[self.filterParamsTool.filterParamsArray[0] firstObject] boolValue];
-        //        BOOL secondModified = [[self.filterParamsTool.filterParamsArray[1] firstObject] boolValue];
-        //        if (firstModified&&!secondModified) {
-        //            if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
-        //                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
-        //            }
-        //        } else if(!firstModified&&secondModified) {
-        //            // 删除选择的地区
-        //            if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
-        //                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
-        //            }
-        //        }
-    }
     self.filterParamsTool.filterParamsDictionary[udDoctorFilterSettingModified] = @(modified);
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filename];
 }
@@ -215,6 +114,7 @@
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
 }
 
+#pragma mark - UICollectionViewDelegate
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
@@ -238,6 +138,112 @@
     return nil;
 }
 
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
+                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    FilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FilterCollectionCell" forIndexPath:indexPath];
+    CGSize size = [self collectionView:collectionView layout:nil sizeForItemAtIndexPath:indexPath];
+    cell.titleButton.frame = CGRectMake(0, 0, size.width, size.height);
+    NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
+    [cell.titleButton setTitle:text forState:UIControlStateNormal];
+    [cell.titleButton setTitle:text forState:UIControlStateSelected];
+    cell.titleButton.selected = [self.filterParamsTool.filterParamsArray[indexPath.section][indexPath.row] boolValue];
+    cell.titleButton.section = indexPath.section;
+    cell.titleButton.row = indexPath.row;
+    return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    FilterCollectionCell *cell =
+    (FilterCollectionCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    //button.selected是指button原来的状态
+    //是否修改要看,数组第一个值是否是0,默认是1
+    NSMutableArray *setting = self.filterParamsTool.filterParamsArray[indexPath.section];
+    if (indexPath.section == 0) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:indexPath.row inSection:indexPath.section];
+        [self clickedInFirstSection:indexPath withButton:cell.titleButton withsetting:setting];
+    } else if (indexPath.section == 1) {
+        [self clickedInSecondSection:indexPath withButton:cell.titleButton withSetting:setting];
+    }
+    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)clickedInFirstSection:(NSIndexPath *)indexPath
+                   withButton:(CYLIndexPathButton *)button
+                  withsetting:(NSMutableArray *)setting {
+    if (indexPath.row == 1) {
+        NSString *area = @"北京";
+        [setting replaceObjectAtIndex:1 withObject:@1];
+        [setting replaceObjectAtIndex:0 withObject:@0];
+        // 选择医院结束，将此医院保存，下次进入此界面，需显示
+        self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] = area;
+        NSMutableArray *array = self.filterParamsTool.dataSources[0];
+        [array replaceObjectAtIndex:1 withObject:area];
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
+        
+        NSString *message = @"点击选择地区按钮，\n弹出选择地区的界面\n这里默认选北京";
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:message delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
+        [alert show];
+        NSUInteger delaySeconds = 1.5;
+        dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+        dispatch_after(when, dispatch_get_main_queue(), ^{
+            [alert dismissWithClickedButtonIndex:0 animated:YES];
+        });
+        return;
+    } else {
+        // 点击的是“全部”按钮
+        [setting replaceObjectAtIndex:0 withObject:@1];
+        [setting replaceObjectAtIndex:1 withObject:@0];
+        NSMutableArray *array = self.filterParamsTool.dataSources[0];
+        [array replaceObjectAtIndex:1 withObject:@"请选择"];
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
+        [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
+    }
+}
+
+- (void)clickedInSecondSection:(NSIndexPath *)indexPath
+                    withButton:(CYLIndexPathButton *)button
+                   withSetting:(NSMutableArray *)setting{
+    NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
+    if (indexPath.row == 0) {
+        if (button.selected ) {
+            return;
+        } else  {
+            //处于修改状态
+            [self.filterParamsTool.filterParamsContentDictionary
+             removeObjectForKey:@"skilled"];
+        }
+    }
+    [setting replaceObjectAtIndex:indexPath.row withObject:@(!button.selected)];
+    if (indexPath.row > 0) {
+        if (!button.selected) {
+            [setting replaceObjectAtIndex:0 withObject:@(0)];
+            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] count] == 0) {
+                self.filterParamsTool.filterParamsContentDictionary[@"skilled"] = [NSMutableArray array];
+            }
+            if(![text isEqualToString:@"全部"])
+                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] addObject:text];
+        } else {
+            if (![setting containsObject:@(1)]) {
+                [setting replaceObjectAtIndex:0 withObject:@(1)];
+                [self.filterParamsTool.filterParamsContentDictionary
+                 removeObjectForKey:@"skilled"];
+            }
+            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text])
+                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
+        }
+        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    } else {
+        for (int i = 0; i < setting.count; i++) {
+            if (i > 0) {
+                [setting replaceObjectAtIndex:i withObject:@(0)];
+            }
+        }
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
+    }
+}
+
+#pragma mark - UICollectionViewDataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     return [self.filterParamsTool.dataSources count];
@@ -253,22 +259,10 @@
     return 2;
 }
 
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    FilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FilterCollectionCell" forIndexPath:indexPath];
-    CGSize size = [self collectionView:collectionView layout:nil sizeForItemAtIndexPath:indexPath];
-    cell.titleButton.frame = CGRectMake(0, 0, size.width, size.height);
-    NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
-    [cell.titleButton setTitle:text forState:UIControlStateNormal];
-    [cell.titleButton setTitle:text forState:UIControlStateSelected];
-    [cell.titleButton addTarget:self action:@selector(itemButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-    cell.titleButton.selected = [self.filterParamsTool.filterParamsArray[indexPath.section][indexPath.row] boolValue];
-    cell.titleButton.section = indexPath.section;
-    cell.titleButton.row = indexPath.row;
-    return cell;
-}
-
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+#pragma mark - UICollectionViewDelegateLeftAlignedLayout
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
     CGSize size = [text sizeWithAttributes:

@@ -4,7 +4,8 @@
 //
 //  Created by https://github.com/ChenYilong on 15/3/17.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
-//
+//  Single Choice Filter
+
 #define kControllerHeaderViewHeight                90
 #define kControllerHeaderToCollectionViewMargin    0
 #define kCollectionViewCellsHorizonMargin          12
@@ -38,7 +39,7 @@ FilterHeaderViewDelegate
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSArray          *dataSource;
 @property (nonatomic, assign) float            priorCellY;
-@property (nonatomic, assign) int              rowLine;
+@property (nonatomic, assign) NSUInteger       rowLine;
 @property (nonatomic, strong) NSMutableArray   *collectionHeaderMoreBtnHideBoolArray;
 @property (nonatomic, strong) NSMutableArray   *firstLineCellCountArray;
 @property (nonatomic, strong) NSMutableArray   *expandSectionArray;
@@ -159,7 +160,7 @@ FilterHeaderViewDelegate
     __weak __typeof(self) weakSelf = self;
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         __strong typeof(self) strongSelf = weakSelf;
-        __block int firstLineCellCount = 0;
+        __block NSUInteger firstLineCellCount = 0;
         @autoreleasepool {
             NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
             NSMutableArray *widthArray = [NSMutableArray array];
@@ -173,7 +174,7 @@ FilterHeaderViewDelegate
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                int contentViewWidth = strongSelf.collectionView.frame.size.width-
+                NSUInteger contentViewWidth = strongSelf.collectionView.frame.size.width-
                 kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
                 if ([sum intValue]<=contentViewWidth) {
                     firstLineCellCount ++;
@@ -200,7 +201,7 @@ FilterHeaderViewDelegate
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         @autoreleasepool {
             __strong typeof(self) strongSelf = weakSelf;
-            __block int countTime = 0;
+            __block NSUInteger countTime = 0;
             NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
             NSMutableArray *widthArray = [NSMutableArray array];
             __weak __typeof(symptoms) weakSymptoms = symptoms;
@@ -212,7 +213,7 @@ FilterHeaderViewDelegate
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                int contentViewWidth = strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
+                NSUInteger contentViewWidth = strongSelf.collectionView.frame.size.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
                 if ([sum intValue]<=contentViewWidth) {
                     //未超过一行
                 } else {
@@ -274,7 +275,7 @@ FilterHeaderViewDelegate
 }
 
 - (int)getFirstLineCellCountWithArray:(NSArray *)array {
-    __block int firstLineCellCount = 0;
+    __block NSUInteger firstLineCellCount = 0;
     NSMutableArray *widthArray = [NSMutableArray array];
     __weak __typeof(array) weakArray = array;
     [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -321,7 +322,7 @@ FilterHeaderViewDelegate
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
     titleLabel.font = [UIFont boldSystemFontOfSize:18];
     titleLabel.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
-    NSString *title = @"默认显示一行时的效果如下所示!";
+    NSString *title = @"默认显示一行时的效果如下所示:";
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
     [text addAttribute:NSForegroundColorAttributeName
                  value:[UIColor redColor]
@@ -343,7 +344,7 @@ FilterHeaderViewDelegate
                             subtitleLabel.frame.size.width, 14);
     subtitleLabel.font = [UIFont systemFontOfSize:12];
     subtitleLabel.textColor = [UIColor grayColor];
-    subtitleLabel.text = @"超出默认行数,出现\"更多\"按钮,点击展开,@iOS程序犭袁 出品";
+    subtitleLabel.text = @"超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品";
     [vw addSubview:subtitleLabel];
     return vw;
 }
@@ -406,7 +407,7 @@ FilterHeaderViewDelegate
 - (BOOL)shouldCollectionCellPictureShowWithIndex:(NSIndexPath *)indexPath {
     NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
     NSString *picture = [symptoms[indexPath.row] objectForKey:kDataSourceCellPictureKey];
-    int pictureLength = [@(picture.length) intValue];
+    NSUInteger pictureLength = [@(picture.length) intValue];
     if(pictureLength>0) {
         return YES;
     }
@@ -416,13 +417,17 @@ FilterHeaderViewDelegate
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    CollectionViewCell *cell = (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
+    CollectionViewCell *cell =
+    (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier
+                                                                    forIndexPath:indexPath];
     cell.button.frame = CGRectMake(0, 0, cell.frame.size.width, cell.frame.size.height);
-    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
+    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
+                                                               objectForKey:kDataSourceSectionKey]];
     NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
     if(shouldShowPic) {
-        [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"] forState:UIControlStateNormal];
+        [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"]
+                     forState:UIControlStateNormal];
         CGFloat spacing = kCollectionViewItemButtonImageToTextMargin;
         cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
         cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
@@ -439,14 +444,42 @@ FilterHeaderViewDelegate
     cell.button.row = indexPath.row;
     return cell;
 }
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    CollectionViewCell *cell =
+    (CollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    //二级菜单数组
+    cell.button.highlighted = YES;
+    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section]
+                                                 objectForKey:kDataSourceSectionKey]];
+    NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
+    BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
+    NSString *cellTitle = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
+    NSString *message = shouldShowPic?[NSString stringWithFormat:@"★%@",cellTitle]:cellTitle;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:sectionTitle
+                                                    message:message
+                                                   delegate:self
+                                          cancelButtonTitle:nil
+                                          otherButtonTitles:nil];
+    [alert show];
+    NSUInteger delaySeconds = 1;
+    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+    dispatch_after(when, dispatch_get_main_queue(), ^{
+        cell.button.highlighted = NO;
+        [alert dismissWithClickedButtonIndex:0 animated:YES];
+    });
+}
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
 {
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
-        CYLFilterHeaderView *filterHeaderView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier forIndexPath:indexPath];
-        filterHeaderView.moreButton.hidden = [self.collectionHeaderMoreBtnHideBoolArray[indexPath.section] boolValue];
+        CYLFilterHeaderView *filterHeaderView =
+        [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                           withReuseIdentifier:kHeaderViewCellIdentifier
+                                                  forIndexPath:indexPath];
+        filterHeaderView.moreButton.hidden =
+        [self.collectionHeaderMoreBtnHideBoolArray[indexPath.section] boolValue];
         filterHeaderView.delegate = self;
         NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
         filterHeaderView.titleButton.tag = indexPath.section;
@@ -456,16 +489,20 @@ FilterHeaderViewDelegate
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
         switch (indexPath.section) {
             case 0:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_face"] forState:UIControlStateNormal];
+                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                                              forState:UIControlStateNormal];
                 break;
             case 1:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_common"] forState:UIControlStateNormal];
+                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                                              forState:UIControlStateNormal];
                 break;
             case 2:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_child"] forState:UIControlStateNormal];
+                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                                              forState:UIControlStateNormal];
                 break;
             case 3:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"] forState:UIControlStateNormal];
+                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                                              forState:UIControlStateNormal];
                 break;
             default:
                 break;
@@ -478,24 +515,6 @@ FilterHeaderViewDelegate
         return (UICollectionReusableView *)filterHeaderView;
     }
     return nil;
-}
-
-- (void)itemButtonClicked:(CYLIndexPathButton *)button
-{
-    //二级菜单数组
-    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[button.section] objectForKey:kDataSourceSectionKey]];
-    NSString *sectionTitle = [self.dataSource[button.section] objectForKey:@"Type"];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
-    BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
-    NSString *cellTitle = [symptoms[button.row] objectForKey:kDataSourceCellTextKey];
-    NSString *message = shouldShowPic?[NSString stringWithFormat:@"★%@",cellTitle]:cellTitle;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:sectionTitle message:message delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
-    [alert show];
-    int delayInSeconds = 1;
-    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-    dispatch_after(when, dispatch_get_main_queue(), ^{
-        [alert dismissWithClickedButtonIndex:0 animated:YES];
-    });
 }
 
 #pragma mark - FilterHeaderViewDelegateMethod

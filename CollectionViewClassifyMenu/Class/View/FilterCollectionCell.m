@@ -1,6 +1,6 @@
 //
 //  FilterCollectionCell.m
-//  PiFuKeYiSheng
+//  http://cnblogs.com/ChenYilong/ 
 //
 //  Created by  https://github.com/ChenYilong  on 14-7-9.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
@@ -38,6 +38,7 @@
 - (void)setup
 {
     self.titleButton = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
+    _titleButton.userInteractionEnabled = NO;
     _titleButton.titleLabel.font = [UIFont systemFontOfSize:15];
     [_titleButton setBackgroundImage:[UIImage stretchableImageNamed:@"btn_slide_normal"] forState:UIControlStateNormal];
     [_titleButton setBackgroundImage:[UIImage stretchableImageNamed:@"btn_slide_selected"] forState:UIControlStateSelected];

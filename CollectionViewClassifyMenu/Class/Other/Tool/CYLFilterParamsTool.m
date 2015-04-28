@@ -1,7 +1,7 @@
 
 //
 //  CYLFilterParamsTool.m
-//  PiFuKeYiSheng
+//  http://cnblogs.com/ChenYilong/ 
 //
 //  Created by https://github.com/ChenYilong on 15/4/22.
 //  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.

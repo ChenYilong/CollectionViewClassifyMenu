@@ -1,6 +1,6 @@
 //
 //  UIImage+Blur.m
-//  PiFuKeYiSheng
+//  http://cnblogs.com/ChenYilong/ 
 //
 //  Created by  https://github.com/ChenYilong  on 14-7-17.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.

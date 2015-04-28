@@ -2,18 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "home_btn_child.png"
+      "scale" : "1x"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "home_btn_child@2x.png"
+      "filename" : "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_normal@2X.png"
     },
     {
       "idiom" : "universal",
       "scale" : "3x",
-      "filename" : "home_btn_child@3x.png"
+      "filename" : "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_normal@3X.png"
     }
   ],
   "info" : {
