@@ -444,11 +444,14 @@ FilterHeaderViewDelegate
     cell.button.row = indexPath.row;
     return cell;
 }
+
+- (void)itemButtonClicked:(CYLIndexPathButton *)button {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
+    [self collectionView:self.collectionView didSelectItemAtIndexPath:indexPath];
+}
+
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    CollectionViewCell *cell =
-    (CollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
     //二级菜单数组
-    cell.button.highlighted = YES;
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section]
                                                  objectForKey:kDataSourceSectionKey]];
     NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
@@ -464,7 +467,6 @@ FilterHeaderViewDelegate
     NSUInteger delaySeconds = 1;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        cell.button.highlighted = NO;
         [alert dismissWithClickedButtonIndex:0 animated:YES];
     });
 }

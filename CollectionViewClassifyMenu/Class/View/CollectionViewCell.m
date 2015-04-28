@@ -33,12 +33,30 @@
 
 - (void)setup {
     self.button = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
-    self.button.userInteractionEnabled = NO;
     self.button.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
     [self.contentView addSubview:self.button];
     [self.button generalStyle];
     [self.button homeStyle];
 //    [self.button redStyle];
+}
+
+// Overriding this because the button's rect is partially outside the parent-view's bounds:
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    if ([super pointInside:point withEvent:event])
+    {
+        NSLog(@"inside cell");
+        return YES;
+    }
+    if ([self.button
+         pointInside:[self convertPoint:point
+                                 toView:self.button] withEvent:nil])
+    {
+        NSLog(@"inside button");
+        return YES;
+    }
+    
+    return NO;
 }
 
 
