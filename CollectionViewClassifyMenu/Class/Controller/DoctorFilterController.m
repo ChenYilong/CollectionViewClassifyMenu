@@ -110,7 +110,6 @@
         }
     } else {
         [self clickedInSecondSection:button withSetting:setting];
-        
     }
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
     [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];

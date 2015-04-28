@@ -31,17 +31,14 @@
 {
     [super viewDidLoad];
     self.view.frame = [UIScreen mainScreen].bounds;
-    
-    
     CGColorRef color = [UIColor lightGrayColor].CGColor;
     _restoreButton.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 44, ([UIScreen mainScreen].bounds.size.width - 50) / 2, 44);
     _okButton.frame = CGRectMake(_restoreButton.width, [UIScreen mainScreen].bounds.size.height - 44, [UIScreen mainScreen].bounds.size.width - 50 - _restoreButton.width, 44);
-    
     [_restoreButton addSubLayerWithFrame:CGRectMake(0, 0, _restoreButton.frame.size.width, 0.5f) color:color];
     [_okButton addSubLayerWithFrame:CGRectMake(0, 0, _okButton.frame.size.width, 0.5f) color:color];
     [_okButton addSubLayerWithFrame:CGRectMake(0, 0, 0.5f, 44) color:color];
     _contentView.backgroundColor = [UIColor blackColor];
-    
+    _collectionView.showsVerticalScrollIndicator = NO;
     _collectionView.delegate = self;
     _collectionView.dataSource = self;
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
@@ -51,9 +48,7 @@
     [_collectionView registerNib:[UINib nibWithNibName:@"FilterHeaderView" bundle:nil]
       forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
              withReuseIdentifier:@"FilterHeaderView"];
-    
     [_contentView setTarget:self action:@selector(hide)];
-    
 }
 
 

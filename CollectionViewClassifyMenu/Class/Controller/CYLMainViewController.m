@@ -5,7 +5,7 @@
 //  CollectionViewClassifyMenu
 //
 //  Created by https://github.com/ChenYilong on 15/4/26.
-//  Copyright (c) 2015年 chenyilong. All rights reserved.
+//  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //
 
 
@@ -82,7 +82,7 @@
 }
 - (void)initWithRightNavItem {
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithImage:nil style:UIBarButtonItemStylePlain target:self action:@selector(rightBarButtonClicked:)];
-    item.title = @"重置";
+    item.title = @"重置筛选条件";
     self.navigationItem.rightBarButtonItem = item;
 }
 
@@ -91,12 +91,7 @@
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
     [self initLeftBarButtonItem];
 }
-//- (void)viewDidDisplayByTabSelected
-//{
-//    self.parentViewController.title = @"首页";
-//    [self initLeftBarButtonItem];
-//    self.parentViewController.navigationItem.titleView = nil;
-//}
+
 /**
  * 初始化leftNavgationItem
  */

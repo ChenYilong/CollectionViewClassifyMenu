@@ -3,7 +3,7 @@
 //  CollectionViewClassifyMenu
 //
 //  Created by https://github.com/ChenYilong on 15/3/17.
-//  Copyright (c) 2015年 chenyilong. All rights reserved.
+//  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //
 #define kControllerHeaderViewHeight                90
 #define kControllerHeaderToCollectionViewMargin    0
@@ -50,12 +50,14 @@ FilterHeaderViewDelegate
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"首页";
+    self.title = @"@iOS程序犭袁";
     self.bgScrollView = [[UIScrollView alloc] initWithFrame:
                          CGRectMake(0, 0,
                                     [UIScreen mainScreen].bounds.size.width,
                                     [UIScreen mainScreen].bounds.size.height)
                          ];
+    self.bgScrollView.showsVerticalScrollIndicator = NO;
+    self.bgScrollView.alwaysBounceVertical = YES;
     self.bgScrollView.backgroundColor = [UIColor colorWithRed:252.0f/255.f green:252.0f/255.f blue:252.0f/255.f alpha:2.f];
     [self.view addSubview:self.bgScrollView];
     
@@ -316,28 +318,33 @@ FilterHeaderViewDelegate
 {
     UIView *vw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
     vw.backgroundColor = [UIColor whiteColor];
-    UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
-    lbl.font = [UIFont boldSystemFontOfSize:18];
-    lbl.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
-    lbl.text = @"默认显示一行时的效果如下所示!";
-    [vw addSubview:lbl];
-    UILabel *lbl2 = [[UILabel alloc] init];
-    //仅修改lbl2的x,ywh值不变
-    lbl2.frame = CGRectMake(lbl.frame.origin.x, lbl2.frame.origin.y,
-                            lbl2.frame.size.width, lbl2.frame.size.height);
-    //仅修改lbl2的y,xwh值不变
-    lbl2.frame = CGRectMake(lbl2.frame.origin.x, CGRectGetMaxY(lbl.frame) + 10,
-                            lbl2.frame.size.width, lbl2.frame.size.height);
-    //仅修改lbl2的宽度,xyh值不变
-    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y,
-                            lbl.frame.size.width, lbl2.frame.size.height);
-    //仅修改lbl2的高度,xyw值不变
-    lbl2.frame = CGRectMake(lbl2.frame.origin.x, lbl2.frame.origin.y,
-                            lbl2.frame.size.width, 14);
-    lbl2.font = [UIFont systemFontOfSize:12];
-    lbl2.textColor = [UIColor grayColor];
-    lbl2.text = @"下面是本店的分类列表";
-    [vw addSubview:lbl2];
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
+    titleLabel.font = [UIFont boldSystemFontOfSize:18];
+    titleLabel.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
+    NSString *title = @"默认显示一行时的效果如下所示!";
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
+    [text addAttribute:NSForegroundColorAttributeName
+                 value:[UIColor redColor]
+                 range:NSMakeRange(4, 2)];
+    titleLabel.attributedText = text;
+    [vw addSubview:titleLabel];
+    UILabel *subtitleLabel = [[UILabel alloc] init];
+    //仅修改subtitleLabel的x,ywh值不变
+    subtitleLabel.frame = CGRectMake(titleLabel.frame.origin.x, subtitleLabel.frame.origin.y,
+                            subtitleLabel.frame.size.width, subtitleLabel.frame.size.height);
+    //仅修改subtitleLabel的y,xwh值不变
+    subtitleLabel.frame = CGRectMake(subtitleLabel.frame.origin.x, CGRectGetMaxY(titleLabel.frame) + 10,
+                            subtitleLabel.frame.size.width, subtitleLabel.frame.size.height);
+    //仅修改subtitleLabel的宽度,xyh值不变
+    subtitleLabel.frame = CGRectMake(subtitleLabel.frame.origin.x, subtitleLabel.frame.origin.y,
+                            titleLabel.frame.size.width, subtitleLabel.frame.size.height);
+    //仅修改subtitleLabel的高度,xyw值不变
+    subtitleLabel.frame = CGRectMake(subtitleLabel.frame.origin.x, subtitleLabel.frame.origin.y,
+                            subtitleLabel.frame.size.width, 14);
+    subtitleLabel.font = [UIFont systemFontOfSize:12];
+    subtitleLabel.textColor = [UIColor grayColor];
+    subtitleLabel.text = @"超出默认行数,出现\"更多\"按钮,点击展开,@iOS程序犭袁 出品";
+    [vw addSubview:subtitleLabel];
     return vw;
 }
 
@@ -355,6 +362,7 @@ FilterHeaderViewDelegate
     self.collectionView.allowsMultipleSelection = YES;
     [self.collectionView registerClass:[CYLFilterHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier];
     self.collectionView.showsHorizontalScrollIndicator = NO;
+    self.collectionView.showsVerticalScrollIndicator = NO;
     self.collectionView.contentInset = UIEdgeInsetsMake(15, 0, 0, 0);
     self.collectionView.scrollsToTop = NO;
     self.collectionView.scrollEnabled = NO;
@@ -373,7 +381,8 @@ FilterHeaderViewDelegate
                                                self.collectionView.contentSize.height+
                                                kControllerHeaderViewHeight+
                                                kCollectionViewToTopMargin+
-                                               kCollectionViewToBottomtMargin);
+                                               kCollectionViewToBottomtMargin+
+                                               64);
 }
 
 #pragma mark - UICollectionViewDataSource
