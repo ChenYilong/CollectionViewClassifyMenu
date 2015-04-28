@@ -2,8 +2,8 @@
 //  DoctorFilterController.h
 //  PiFuKeYiSheng
 //
-//  Created by 喻平 on 14-7-10.
-//  Copyright (c) 2014年 com.pifukeyisheng. All rights reserved.
+//  Created by  https://github.com/ChenYilong  on 14-7-10.
+//  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //
 
 #import "FilterBaseController.h"

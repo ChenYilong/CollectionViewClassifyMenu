@@ -2,7 +2,7 @@
 //  UIButton+CollectionCellStyle.m
 //  CollectionViewClassifyMenu
 //
-//  Created by chenyilong on 15/4/2.
+//  Created by https://github.com/ChenYilong on 15/4/2.
 //  Copyright (c) 2015年 chenyilong. All rights reserved.
 //
 

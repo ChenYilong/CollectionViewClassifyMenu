@@ -2,8 +2,8 @@
 //  UIView+UIViewEXT.h
 //  CanXinTong
 //
-//  Created by 喻平 on 13-2-28.
-//  Copyright (c) 2013年 喻平. All rights reserved.
+//  Created by  https://github.com/ChenYilong  on 13-2-28.
+//  Copyright (c) 2013年  https://github.com/ChenYilong . All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

@@ -2,8 +2,8 @@
 //  UIImage+Blur.m
 //  PiFuKeYiSheng
 //
-//  Created by 喻平 on 14-7-17.
-//  Copyright (c) 2014年 com.pifukeyisheng. All rights reserved.
+//  Created by  https://github.com/ChenYilong  on 14-7-17.
+//  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //
 
 #import "UIImage+Blur.h"

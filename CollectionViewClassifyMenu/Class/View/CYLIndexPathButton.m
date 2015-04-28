@@ -2,7 +2,7 @@
 //  CYLIndexPathButton.m
 //  CollectionViewClassifyMenu
 //
-//  Created by chenyilong on 15/3/19.
+//  Created by https://github.com/ChenYilong on 15/3/19.
 //  Copyright (c) 2015年 chenyilong. All rights reserved.
 //
 

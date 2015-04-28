@@ -2,10 +2,10 @@
 //  DoctorFilterController.m
 //  PiFuKeYiSheng
 //
-//  Created by 喻平 on 14-7-10.
-//  Copyright (c) 2014年 com.pifukeyisheng. All rights reserved.
+//  Created by  https://github.com/ChenYilong  on 14-7-10.
+//  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //
-#define udDoctorFilterSetting @"udDoctorFilterSetting"
+#define udDoctorFilterSetting         @"udDoctorFilterSetting"
 #define udDoctorFilterSettingModified @"udDoctorFilterSettingModified"
 #import "DoctorFilterController.h"
 //#import "SelectProvinceController.h"
@@ -14,8 +14,8 @@
 
 @interface DoctorFilterController ()
 @property (nonatomic, strong) CYLFilterParamsTool *filterParamsTool;
-@property (nonatomic, strong) NSString *filename;
-@property (nonatomic, assign) NSUInteger secondSectionTagsCount;
+@property (nonatomic, strong) NSString            *filename;
+@property (nonatomic, assign) NSUInteger          secondSectionTagsCount;
 
 @end
 
@@ -30,11 +30,14 @@
 {
     if (_filterParamsTool == nil) {
         _filterParamsTool = [[CYLFilterParamsTool alloc] init];
-//        BOOL haveFileInBox =
-//        [[NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename] boolValue];
-//        if (haveFileInBox) {
-            _filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename];
-//        }
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        BOOL fileExists = [fileManager fileExistsAtPath:self.filterParamsTool.filename];
+        if (!fileExists) {
+            CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
+            [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
+        } else {
+        _filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename];
+        }
     }
     return _filterParamsTool;
 }
@@ -42,8 +45,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
-    [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
+    
     NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
     if (allSecondSectionTagsCount >0) {
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
@@ -81,13 +83,13 @@
     NSMutableArray *setting = self.filterParamsTool.filterParamsArray[button.section];
     if (button.section == 0) {
         if (button.row == 1) {
-            //            // 如果点击的是选择医院按钮，则弹出选择医院的界面
+            //            // 如果点击的是选择地区按钮，则弹出选择地区的界面
             //            SelectProvinceController *controller = [SelectProvinceController instance];
             //            controller.dataSourceArray = [Util getStateData:udHospital];
             //            [controller setSelectedHandler:^(NSDictionary *successedData, NSString *text) {
             //                [setting replaceObjectAtIndex:1 withObject:@1];
             //                [setting replaceObjectAtIndex:0 withObject:@0];
-            //                // 选择医院结束，将此医院保存，下次进入此界面，需显示
+            //                // 选择地区结束，将此地区保存，下次进入此界面，需显示
             //                self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] = text;
             //                NSMutableArray *array = self.filterParamsTool.dataSources[0];
             //                [array replaceObjectAtIndex:1 withObject:text];
@@ -141,7 +143,7 @@
                  removeObjectForKey:@"skilled"];
             }
             if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text])
-            [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
+                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
         }
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
         [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
@@ -181,27 +183,27 @@
         }
     }
     if (modified == NO) {
-         //删除选择的医院
-                if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
-                    [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
-                }
-                if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
-                    [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
-                }
+        //删除选择的地区
+        if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
+            [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
+        }
+        if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
+            [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
+        }
     } else {
-//        //有筛选条件
-//        BOOL firstModified = [[self.filterParamsTool.filterParamsArray[0] firstObject] boolValue];
-//        BOOL secondModified = [[self.filterParamsTool.filterParamsArray[1] firstObject] boolValue];
-//        if (firstModified&&!secondModified) {
-//            if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
-//                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
-//            }
-//        } else if(!firstModified&&secondModified) {
-//            // 删除选择的医院
-//            if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
-//                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
-//            }
-//        }
+        //        //有筛选条件
+        //        BOOL firstModified = [[self.filterParamsTool.filterParamsArray[0] firstObject] boolValue];
+        //        BOOL secondModified = [[self.filterParamsTool.filterParamsArray[1] firstObject] boolValue];
+        //        if (firstModified&&!secondModified) {
+        //            if ([self.filterParamsTool.filterParamsContentDictionary  count] >0) {
+        //                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"skilled"];
+        //            }
+        //        } else if(!firstModified&&secondModified) {
+        //            // 删除选择的地区
+        //            if(self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] != [NSNull null]&&self.filterParamsTool.filterParamsContentDictionary[@"Hospital"]) {
+        //                [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
+        //            }
+        //        }
     }
     self.filterParamsTool.filterParamsDictionary[udDoctorFilterSettingModified] = @(modified);
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filename];

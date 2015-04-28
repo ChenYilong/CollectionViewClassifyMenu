@@ -2,7 +2,7 @@
 //  CYLRightImageButton.m
 //  CollectionViewClassifyMenu
 //
-//  Created by chenyilong on 15/3/23.
+//  Created by https://github.com/ChenYilong on 15/3/23.
 //  Copyright (c) 2015年 chenyilong. All rights reserved.
 //
 #define kImageToTextMargin 7

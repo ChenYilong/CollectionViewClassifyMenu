@@ -2,8 +2,8 @@
 //  FilterBaseController.h
 //  PiFuKeYiSheng
 //
-//  Created by 喻平 on 14-5-12.
-//  Copyright (c) 2014年 com.pifukeyisheng. All rights reserved.
+//  Created by  https://github.com/ChenYilong  on 14-5-12.
+//  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //
 
 // 问题筛选和医生筛选的基础类
