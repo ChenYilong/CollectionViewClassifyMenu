@@ -1,10 +1,12 @@
 # CollectionViewClassifyMenu
-CollectionView做的两级菜单，可以折叠第二级菜单
-侧边栏菜单,具有多选功能,并可将数据持久化,在下次打开app后,保留用户的筛选条件.
+##Demo中具有两种样式,一种是CollectionView做的两级菜单，可以折叠第二级菜单
 
-若要关闭该项功能,可在AppDelegate里清除固化数据,
+第二种是侧边栏菜单,具有多选功能,并可将数据持久化,在下次打开app后,保留用户的筛选条件.
+
+数据持久化使用NSCoding,若要关闭该项功能,可在AppDelegate里清除固化数据,
  
-方法已经在工程中写出:
+ 
+清除方法已经在工程中写出:
  
  
 ```Objective-C
