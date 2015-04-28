@@ -45,9 +45,9 @@
     _collectionView.collectionViewLayout = layout;
     _collectionView.contentInset = UIEdgeInsetsMake(15, 0, 0, 0);
     [_collectionView registerClass:[FilterCollectionCell class] forCellWithReuseIdentifier:@"FilterCollectionCell"];
-    [_collectionView registerNib:[UINib nibWithNibName:@"FilterHeaderView" bundle:nil]
+    [_collectionView registerNib:[UINib nibWithNibName:@"CYLMultipleFilterHeaderView" bundle:nil]
       forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-             withReuseIdentifier:@"FilterHeaderView"];
+             withReuseIdentifier:@"CYLMultipleFilterHeaderView"];
     [_contentView setTarget:self action:@selector(hide)];
 }
 

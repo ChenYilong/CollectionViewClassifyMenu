@@ -6,10 +6,10 @@
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //
 
-#import "FilterHeaderView.h"
+#import "CYLMultipleFilterHeaderView.h"
 #import "UIView+General.h"
 
-@implementation FilterHeaderView
+@implementation CYLMultipleFilterHeaderView
 
 - (id)initWithFrame:(CGRect)frame
 {

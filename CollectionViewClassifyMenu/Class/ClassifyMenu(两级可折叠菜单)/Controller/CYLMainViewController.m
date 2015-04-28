@@ -30,16 +30,16 @@
 @end
 
 
-#define udDoctorFilterSettingModified @"udDoctorFilterSettingModified"
+#define kMultipleFilterSettingModified@"kMultipleFilterSettingModified"
 
 #import "CYLMainViewController.h"
-#import "DoctorFilterController.h"
+#import "CYLMultipleFilterController.h"
 #import "AppDelegate.h"
 #import "CYLFilterParamsTool.h"
 
 
 @interface CYLMainViewController ()<FilterControllerDelegate>
-@property (nonatomic, strong) DoctorFilterController *filterController;
+@property (nonatomic, strong) CYLMultipleFilterController *filterController;
 @property (nonatomic, strong) CYLFilterParamsTool *filterParamsTool;
 
 @end
@@ -51,10 +51,10 @@
  *
  *  @return filterController
  */
-- (DoctorFilterController *)filterController
+- (CYLMultipleFilterController *)filterController
 {
     if (_filterController == nil) {
-        _filterController = [[DoctorFilterController alloc] initWithNibName:@"FilterBaseController" bundle:nil];
+        _filterController = [[CYLMultipleFilterController alloc] initWithNibName:@"FilterBaseController" bundle:nil];
         _filterController.delegate = self;
     }
     return _filterController;
@@ -100,7 +100,7 @@
 - (void)initLeftBarButtonItem
 {
     self.filterParamsTool = nil;
-    BOOL shouldShowModified = [self.filterParamsTool.filterParamsDictionary[udDoctorFilterSettingModified] boolValue];
+    BOOL shouldShowModified = [self.filterParamsTool.filterParamsDictionary[kMultipleFilterSettingModified] boolValue];
     UIImage *image;
     if (shouldShowModified) {
         image =

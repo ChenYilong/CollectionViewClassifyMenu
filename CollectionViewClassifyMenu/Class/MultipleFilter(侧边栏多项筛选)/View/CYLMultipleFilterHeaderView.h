@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface FilterHeaderView : UICollectionReusableView
+@interface CYLMultipleFilterHeaderView : UICollectionReusableView
 @property (nonatomic, weak) IBOutlet UIImageView *imageView;
 @property (nonatomic, weak) IBOutlet UILabel *titleLabel;
 @end

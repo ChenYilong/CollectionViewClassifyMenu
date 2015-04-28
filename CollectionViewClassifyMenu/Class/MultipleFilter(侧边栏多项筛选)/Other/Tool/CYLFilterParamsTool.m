@@ -6,8 +6,8 @@
 //  Created by https://github.com/ChenYilong on 15/4/22.
 //  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
 //
-#define udDoctorFilterSetting @"udDoctorFilterSetting"
-#define udDoctorFilterSettingModified @"udDoctorFilterSettingModified"
+#define kMultipleFilterSetting @"kMultipleFilterSetting"
+#define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
 
 #import "CYLFilterParamsTool.h"
 #import "CYLDBManager.h"
@@ -47,8 +47,8 @@
 {
     if (_filterParamsDictionary == nil) {
         _filterParamsDictionary = [[NSMutableDictionary alloc] init];
-        _filterParamsDictionary[udDoctorFilterSettingModified] = @(NO);
-        _filterParamsDictionary[udDoctorFilterSetting] = self.filterParamsArray;
+        _filterParamsDictionary[kMultipleFilterSettingModified] = @(NO);
+        _filterParamsDictionary[kMultipleFilterSetting] = self.filterParamsArray;
     }
     return _filterParamsDictionary;
 }
@@ -119,7 +119,7 @@
 {
     if (_filename == nil) {
         NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
-        _filename = [Path stringByAppendingPathComponent:udDoctorFilterSetting];
+        _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
     }
     return _filename;
 }

@@ -15,7 +15,7 @@
 //#import "Constant.h"
 //#import "Util.h"
 #import "UICollectionViewLeftAlignedLayout.h"
-#import "FilterHeaderView.h"
+#import "CYLMultipleFilterHeaderView.h"
 #import "FilterCollectionCell.h"
 
 @class FilterBaseController;

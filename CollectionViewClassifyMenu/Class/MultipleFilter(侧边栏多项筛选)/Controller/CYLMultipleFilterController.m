@@ -1,26 +1,26 @@
 //
-//  DoctorFilterController.m
+//  CYLMultipleFilterController.m
 //  http://cnblogs.com/ChenYilong/ 
 //
 //  Created by  https://github.com/ChenYilong  on 14-7-10.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
-//  Multiple Choice Filter
+//  Multiple Choice Save Filter
 
-#define udDoctorFilterSetting         @"udDoctorFilterSetting"
-#define udDoctorFilterSettingModified @"udDoctorFilterSettingModified"
-#import "DoctorFilterController.h"
+#define kMultipleFilterSetting        @"kMultipleFilterSetting"
+#define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
+#import "CYLMultipleFilterController.h"
 //#import "SelectProvinceController.h"
 #import "CYLFilterParamsTool.h"
 #import "CYLDBManager.h"
 
-@interface DoctorFilterController ()
+@interface CYLMultipleFilterController ()
 @property (nonatomic, strong) CYLFilterParamsTool *filterParamsTool;
 @property (nonatomic, strong) NSString            *filename;
 @property (nonatomic, assign) NSUInteger          secondSectionTagsCount;
 
 @end
 
-@implementation DoctorFilterController
+@implementation CYLMultipleFilterController
 
 /**
  *  懒加载_filterParamsTool
@@ -93,7 +93,7 @@
     if (_filename == nil) {
         _filename = [[NSString alloc] init];
         NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
-        _filename = [Path stringByAppendingPathComponent:udDoctorFilterSetting];
+        _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
     }
     return _filename;
 }
@@ -101,7 +101,7 @@
 - (void)confirmButtonClicked:(id)sender
 {
     [super confirmButtonClicked:sender];
-    self.filterParamsTool.filterParamsDictionary[udDoctorFilterSetting] = self.filterParamsTool.filterParamsArray;
+    self.filterParamsTool.filterParamsDictionary[kMultipleFilterSetting] = self.filterParamsTool.filterParamsArray;
     BOOL modified = NO;
     for (NSArray *array in self.filterParamsTool.filterParamsArray) {
         if ([[array firstObject] boolValue] == NO) {
@@ -109,7 +109,7 @@
             break;
         }
     }
-    self.filterParamsTool.filterParamsDictionary[udDoctorFilterSettingModified] = @(modified);
+    self.filterParamsTool.filterParamsDictionary[kMultipleFilterSettingModified] = @(modified);
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filename];
 }
 
@@ -126,7 +126,7 @@
                                  atIndexPath:(NSIndexPath *)indexPath
 {
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
-        FilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"FilterHeaderView" forIndexPath:indexPath];
+        CYLMultipleFilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"CYLMultipleFilterHeaderView" forIndexPath:indexPath];
         switch (indexPath.section) {
             case 0:
                 view.imageView.image = [UIImage imageNamed:@"icon_slide_sort"];
