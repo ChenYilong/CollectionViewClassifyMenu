@@ -160,7 +160,6 @@
     //是否修改要看,数组第一个值是否是0,默认是1
     NSMutableArray *setting = self.filterParamsTool.filterParamsArray[indexPath.section];
     if (indexPath.section == 0) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:indexPath.row inSection:indexPath.section];
         [self clickedInFirstSection:indexPath withButton:cell.titleButton withsetting:setting];
     } else if (indexPath.section == 1) {
         [self clickedInSecondSection:indexPath withButton:cell.titleButton withSetting:setting];
@@ -232,7 +231,8 @@
             if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text])
                 [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
         }
-        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+        NSIndexPath *allBtnIndexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
+        [self.collectionView reloadItemsAtIndexPaths:@[allBtnIndexPath]];
     } else {
         for (int i = 0; i < setting.count; i++) {
             if (i > 0) {
