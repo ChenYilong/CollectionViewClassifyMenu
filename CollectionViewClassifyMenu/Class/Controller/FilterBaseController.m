@@ -57,17 +57,17 @@
     
 }
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
-           viewForSupplementaryElementOfKind:(NSString *)kind
-
-                                 atIndexPath:(NSIndexPath *)indexPath
-{
-    if ([kind isEqual:UICollectionElementKindSectionHeader]) {
-        FilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"FilterHeaderView" forIndexPath:indexPath];
-        return view;
-    }
-    return nil;
-}
+//- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+//           viewForSupplementaryElementOfKind:(NSString *)kind
+//
+//                                 atIndexPath:(NSIndexPath *)indexPath
+//{
+//    if ([kind isEqual:UICollectionElementKindSectionHeader]) {
+//        FilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"FilterHeaderView" forIndexPath:indexPath];
+//        return view;
+//    }
+//    return nil;
+//}
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
 {

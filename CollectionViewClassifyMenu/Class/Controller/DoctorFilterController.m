@@ -60,8 +60,10 @@
 
 - (void)viewDidLoad
 {
+    [self.collectionView reloadData];
+
     [super viewDidLoad];
-    
+    [self.collectionView reloadData];
     NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
     if (allSecondSectionTagsCount >0) {
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
@@ -76,7 +78,11 @@
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     }
 }
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.collectionView reloadData];
 
+}
 /**
  *  懒加载_filename
  *
@@ -234,7 +240,7 @@
         NSIndexPath *allBtnIndexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
         [self.collectionView reloadItemsAtIndexPaths:@[allBtnIndexPath]];
     } else {
-        for (int i = 0; i < setting.count; i++) {
+        for (NSUInteger i = 0; i < setting.count; i++) {
             if (i > 0) {
                 [setting replaceObjectAtIndex:i withObject:@(0)];
             }

@@ -10,8 +10,8 @@
 + (UIImage *)stretchableImageNamed:(NSString *)name
 {
     UIImage *image = [UIImage imageNamed:name];
-    return [image stretchableImageWithLeftCapWidth:(int)(image.size.width / 2)
-                                      topCapHeight:(int)(image.size.height / 2)];
+    return [image stretchableImageWithLeftCapWidth:(NSUInteger)(image.size.width / 2)
+                                      topCapHeight:(NSUInteger)(image.size.height / 2)];
 }
 @end
 #import "FilterCollectionCell.h"

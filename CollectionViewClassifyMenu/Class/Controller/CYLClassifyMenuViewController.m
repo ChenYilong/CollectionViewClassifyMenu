@@ -44,7 +44,7 @@ FilterHeaderViewDelegate
 @property (nonatomic, strong) NSMutableArray   *firstLineCellCountArray;
 @property (nonatomic, strong) NSMutableArray   *expandSectionArray;
 @property (nonatomic, strong) UIScrollView     *bgScrollView;
-
+@property (nonatomic, strong) UILabel          *titleLabel;
 @end
 
 @implementation CYLClassifyMenuViewController
@@ -274,7 +274,7 @@ FilterHeaderViewDelegate
     return (NSArray *)secondLineCellCountArray;
 }
 
-- (int)getFirstLineCellCountWithArray:(NSArray *)array {
+- (NSUInteger)getFirstLineCellCountWithArray:(NSArray *)array {
     __block NSUInteger firstLineCellCount = 0;
     NSMutableArray *widthArray = [NSMutableArray array];
     __weak __typeof(array) weakArray = array;
@@ -320,6 +320,7 @@ FilterHeaderViewDelegate
     UIView *vw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
     vw.backgroundColor = [UIColor whiteColor];
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, vw.frame.size.width, 20)];
+    self.titleLabel = titleLabel;
     titleLabel.font = [UIFont boldSystemFontOfSize:18];
     titleLabel.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
     NSString *title = @"默认显示一行时的效果如下所示:";
@@ -329,6 +330,18 @@ FilterHeaderViewDelegate
                  range:NSMakeRange(4, 2)];
     titleLabel.attributedText = text;
     [vw addSubview:titleLabel];
+    CGSize size = [title sizeWithAttributes:
+                   @{NSFontAttributeName:
+                         titleLabel.font}];
+    float cellWidth = ceilf(size.width);
+    //仅修改titleLabel的宽度,xyh值不变
+    titleLabel.frame = CGRectMake(titleLabel.frame.origin.x, titleLabel.frame.origin.y,
+                                  cellWidth, titleLabel.frame.size.height);
+    UISwitch *showLineSwitch = [[UISwitch alloc] init];
+   showLineSwitch.frame = CGRectMake(CGRectGetMaxX(titleLabel.frame)+10,
+                                     25, 30, 20);
+    [vw addSubview:showLineSwitch];
+    [showLineSwitch addTarget:self action:@selector(showLineSwitchClicked:) forControlEvents:UIControlEventAllEvents];
     UILabel *subtitleLabel = [[UILabel alloc] init];
     //仅修改subtitleLabel的x,ywh值不变
     subtitleLabel.frame = CGRectMake(titleLabel.frame.origin.x, subtitleLabel.frame.origin.y,
@@ -338,7 +351,7 @@ FilterHeaderViewDelegate
                             subtitleLabel.frame.size.width, subtitleLabel.frame.size.height);
     //仅修改subtitleLabel的宽度,xyh值不变
     subtitleLabel.frame = CGRectMake(subtitleLabel.frame.origin.x, subtitleLabel.frame.origin.y,
-                            titleLabel.frame.size.width, subtitleLabel.frame.size.height);
+                            [UIScreen mainScreen].bounds.size.width, subtitleLabel.frame.size.height);
     //仅修改subtitleLabel的高度,xyw值不变
     subtitleLabel.frame = CGRectMake(subtitleLabel.frame.origin.x, subtitleLabel.frame.origin.y,
                             subtitleLabel.frame.size.width, 14);
@@ -371,6 +384,8 @@ FilterHeaderViewDelegate
 }
 
 - (void)updateViewHeight {
+    [self.collectionView.collectionViewLayout invalidateLayout];
+    [self.collectionView.collectionViewLayout prepareLayout];
     //仅修改self.collectionView的高度,xyw值不变
     self.collectionView.frame = CGRectMake(self.collectionView.frame.origin.x,
                                            self.collectionView.frame.origin.y,
@@ -386,6 +401,38 @@ FilterHeaderViewDelegate
                                                64);
 }
 
+- (void)showLineSwitchClicked:(UISwitch *)sender {
+    if(sender.isOn) {
+        NSString *title = @"默认显示两行时的效果如下所示:";
+        NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
+        [text addAttribute:NSForegroundColorAttributeName
+                     value:[UIColor redColor]
+                     range:NSMakeRange(4, 2)];
+        self.titleLabel.attributedText = text;
+        [self initData];
+        [self judgeMoreBtnShow];
+        [self judgeMoreBtnShowWhenShowTwoLine];
+        [self initDefaultShowCellCount];
+    } else {
+        [self initData];
+        [self judgeMoreBtnShow];
+        NSString *title = @"默认显示一行时的效果如下所示:";
+        NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
+        [text addAttribute:NSForegroundColorAttributeName
+                     value:[UIColor redColor]
+                     range:NSMakeRange(4, 2)];
+        self.titleLabel.attributedText = text;
+    }
+    [self.collectionView reloadData];
+    __weak __typeof(self) weakSelf = self;
+    [self.collectionView performBatchUpdates:^{
+        __strong typeof(self) strongSelf = weakSelf;
+        [strongSelf.collectionView reloadData];
+    } completion:^(BOOL finished) {
+        __strong typeof(self) strongSelf = weakSelf;
+        [strongSelf updateViewHeight];
+    }];
+}
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {

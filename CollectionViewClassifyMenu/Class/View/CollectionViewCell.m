@@ -26,6 +26,7 @@
     }
     return self;
 }
+
 - (id)sharedInit {
     [self setup];
     return self;
@@ -39,25 +40,5 @@
     [self.button homeStyle];
 //    [self.button redStyle];
 }
-
-// Overriding this because the button's rect is partially outside the parent-view's bounds:
-- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
-{
-    if ([super pointInside:point withEvent:event])
-    {
-        NSLog(@"inside cell");
-        return YES;
-    }
-    if ([self.button
-         pointInside:[self convertPoint:point
-                                 toView:self.button] withEvent:nil])
-    {
-        NSLog(@"inside button");
-        return YES;
-    }
-    
-    return NO;
-}
-
 
 @end
