@@ -13,7 +13,7 @@
 #import "CYLFilterParamsTool.h"
 #import "AppDelegate.h"
 
-@interface FilterBaseController () <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
+@interface FilterBaseController () <UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 @property (nonatomic, weak) IBOutlet UIImageView *blurImageView;
 @end
 
@@ -56,18 +56,6 @@
 {
     
 }
-
-//- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
-//           viewForSupplementaryElementOfKind:(NSString *)kind
-//
-//                                 atIndexPath:(NSIndexPath *)indexPath
-//{
-//    if ([kind isEqual:UICollectionElementKindSectionHeader]) {
-//        FilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"FilterHeaderView" forIndexPath:indexPath];
-//        return view;
-//    }
-//    return nil;
-//}
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
 {

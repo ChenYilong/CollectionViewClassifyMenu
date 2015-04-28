@@ -30,7 +30,7 @@
 @end
 
 
-#define kMultipleFilterSettingModified@"kMultipleFilterSettingModified"
+#define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
 
 #import "CYLMainViewController.h"
 #import "CYLMultipleFilterController.h"

@@ -130,8 +130,8 @@
 			isa = PBXGroup;
 			children = (
 				9A5F02501AEFF47100FD9869 /* MultipleFilter(侧边栏多项筛选) */,
-				9A2DA4831AB7DC060042E556 /* Other */,
 				9A5F02381AEFF37800FD9869 /* ClassifyMenu(两级可折叠菜单) */,
+				9A2DA4831AB7DC060042E556 /* Other */,
 			);
 			path = Class;
 			sourceTree = "<group>";
@@ -250,9 +250,9 @@
 		9A5F02381AEFF37800FD9869 /* ClassifyMenu(两级可折叠菜单) */ = {
 			isa = PBXGroup;
 			children = (
-				9A5F023F1AEFF3F800FD9869 /* Other */,
-				9A2DA4901AB7DC060042E556 /* View */,
 				9A2DA47F1AB7DC060042E556 /* Controller */,
+				9A2DA4901AB7DC060042E556 /* View */,
+				9A5F023F1AEFF3F800FD9869 /* Other */,
 			);
 			path = "ClassifyMenu(两级可折叠菜单)";
 			sourceTree = "<group>";
@@ -277,9 +277,9 @@
 		9A5F02501AEFF47100FD9869 /* MultipleFilter(侧边栏多项筛选) */ = {
 			isa = PBXGroup;
 			children = (
+				9A5F02511AEFF48300FD9869 /* Controller */,
 				9A5F02531AEFF49400FD9869 /* View */,
 				9A5F02521AEFF48D00FD9869 /* Other */,
-				9A5F02511AEFF48300FD9869 /* Controller */,
 			);
 			name = "MultipleFilter(侧边栏多项筛选)";
 			sourceTree = "<group>";
