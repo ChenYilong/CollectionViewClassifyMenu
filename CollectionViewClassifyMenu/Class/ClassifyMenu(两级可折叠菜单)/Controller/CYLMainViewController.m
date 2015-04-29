@@ -7,29 +7,6 @@
 //  Created by https://github.com/ChenYilong on 15/4/26.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //
-
-
-#import <UIKit/UIKit.h>
-@implementation UIImage (YPGeneral)
-+ (UIImage *)imageWithColor:(UIColor *)color
-{
-    return [UIImage imageWithColor:color size:CGSizeMake(1, 1)];
-}
-+ (UIImage *)imageWithColor:(UIColor *)color size:(CGSize)size
-{
-    CGRect rect=CGRectMake(0.0f, 0.0f, size.width, size.height);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, rect);
-    
-    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return theImage;
-}
-@end
-
-
 #define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
 
 #import "CYLMainViewController.h"
@@ -75,8 +52,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor]}];
-     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageWithColor:[UIColor colorWithRed:(51)/255.f green:(171)/255.f blue:(160)/255.f alpha:1.f]] forBarMetrics:UIBarMetricsDefault];
     [self initLeftBarButtonItem];
     [self initWithRightNavItem];
     

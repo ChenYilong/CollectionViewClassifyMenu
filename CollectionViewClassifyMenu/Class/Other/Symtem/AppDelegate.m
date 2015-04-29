@@ -21,13 +21,17 @@
     //work in application:didFinishLaunchingWithOptions
     if([UINavigationBar conformsToProtocol:@protocol(UIAppearanceContainer)]) {
         [UINavigationBar appearance].tintColor = [UIColor whiteColor];
+        [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor]}];
+        [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:(51)/255.f green:(171)/255.f blue:(160)/255.f alpha:1.f]];
+        [[UINavigationBar appearance] setTranslucent:NO];
     }
     //later than iOS 7
     self.window.tintColor = [UIColor whiteColor];
-
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     CYLMainViewController *classifyMenuViewController = [[CYLMainViewController alloc] init];
     self.navigationController= [[UINavigationController alloc] initWithRootViewController:classifyMenuViewController];
+    
     self.window.rootViewController = self.navigationController;
     [self.window addSubview:classifyMenuViewController.view];
     self.window.backgroundColor = [UIColor whiteColor];
