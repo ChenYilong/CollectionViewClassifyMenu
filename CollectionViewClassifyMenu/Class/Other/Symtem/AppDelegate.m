@@ -27,11 +27,9 @@
     }
     //later than iOS 7
     self.window.tintColor = [UIColor whiteColor];
-    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     CYLMainViewController *classifyMenuViewController = [[CYLMainViewController alloc] init];
     self.navigationController= [[UINavigationController alloc] initWithRootViewController:classifyMenuViewController];
-    
     self.window.rootViewController = self.navigationController;
     [self.window addSubview:classifyMenuViewController.view];
     self.window.backgroundColor = [UIColor whiteColor];

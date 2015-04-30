@@ -45,5 +45,148 @@
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CollectionViewClassifyMenu/Class/ClassifyMenu(&#x4e24;&#x7ea7;&#x53ef;&#x6298;&#x53e0;&#x83dc;&#x5355;)/Controller/CYLClassifyMenuViewController.m"
+            timestampString = "452073075.243941"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "256"
+            endingLineNumber = "256"
+            landmarkName = "-judgeMoreBtnShowWhenShowTwoLine"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CollectionViewClassifyMenu/Class/ClassifyMenu(&#x4e24;&#x7ea7;&#x53ef;&#x6298;&#x53e0;&#x83dc;&#x5355;)/Controller/CYLClassifyMenuViewController.m"
+            timestampString = "452073075.243941"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "254"
+            endingLineNumber = "254"
+            landmarkName = "-judgeMoreBtnShowWhenShowTwoLine"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CollectionViewClassifyMenu/Class/ClassifyMenu(&#x4e24;&#x7ea7;&#x53ef;&#x6298;&#x53e0;&#x83dc;&#x5355;)/Controller/CYLClassifyMenuViewController.m"
+            timestampString = "452073075.243941"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "434"
+            endingLineNumber = "434"
+            landmarkName = "-showLineSwitchClicked:"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__55-[CYLClassifyMenuViewController showLineSwitchClicked:]_block_invoke"
+                  moduleName = "CollectionViewClassifyMenu"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
+                  timestampString = "452072925.853516"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "436"
+                  endingLineNumber = "436"
+                  offsetFromSymbolStart = "104">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__55-[CYLClassifyMenuViewController showLineSwitchClicked:]_block_invoke"
+                  moduleName = "CollectionViewClassifyMenu"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
+                  timestampString = "452072925.854097"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "436"
+                  endingLineNumber = "436"
+                  offsetFromSymbolStart = "112">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__55-[CYLClassifyMenuViewController showLineSwitchClicked:]_block_invoke267"
+                  moduleName = "CollectionViewClassifyMenu"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
+                  timestampString = "452072925.854286"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "437"
+                  endingLineNumber = "437"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CollectionViewClassifyMenu/Class/ClassifyMenu(&#x4e24;&#x7ea7;&#x53ef;&#x6298;&#x53e0;&#x83dc;&#x5355;)/Controller/CYLClassifyMenuViewController.m"
+            timestampString = "452073075.243941"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "252"
+            endingLineNumber = "252"
+            landmarkName = "-judgeMoreBtnShowWhenShowTwoLine"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[CYLClassifyMenuViewController judgeMoreBtnShowWhenShowTwoLine]"
+                  moduleName = "CollectionViewClassifyMenu"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
+                  timestampString = "452072925.855558"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "252"
+                  endingLineNumber = "252"
+                  offsetFromSymbolStart = "476">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__64-[CYLClassifyMenuViewController judgeMoreBtnShowWhenShowTwoLine]_block_invoke153"
+                  moduleName = "CollectionViewClassifyMenu"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
+                  timestampString = "452072925.85576"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "252"
+                  endingLineNumber = "252"
+                  offsetFromSymbolStart = "72">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>
