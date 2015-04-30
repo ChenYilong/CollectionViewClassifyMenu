@@ -8,6 +8,8 @@
 
 #define kMultipleFilterSetting        @"kMultipleFilterSetting"
 #define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
+#define kCollectionViewCellsHorizonMargin          12
+
 #import "CYLMultipleFilterController.h"
 //#import "SelectProvinceController.h"
 #import "CYLFilterParamsTool.h"
@@ -60,15 +62,15 @@
 
 - (void)viewDidLoad
 {
-    [self.collectionView reloadData];
-
     [super viewDidLoad];
-    [self.collectionView reloadData];
+    self.collectionView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
+    //【Fixed Bug】以下两行代码意在解决iphone 6p self.collectionView刷新不及时的bug
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+    [self collectionView:self.collectionView didSelectItemAtIndexPath:indexPath];
     NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
     if (allSecondSectionTagsCount >0) {
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     }
-    self.collectionView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
 }
 
 -(void)refreshFilterParams {
@@ -78,11 +80,7 @@
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     }
 }
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self.collectionView reloadData];
 
-}
 /**
  *  懒加载_filename
  *
@@ -281,9 +279,15 @@
 - (float)checkCellLimitWidth:(float)cellWidth {
     float limitWidth = (self.collectionView.contentSize.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
     if (cellWidth >= limitWidth) {
-        cellWidth = limitWidth;
+        cellWidth = limitWidth-kCollectionViewCellsHorizonMargin;
         return cellWidth;
     }
     return cellWidth +16 ;
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView
+                   layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
+{
+    return kCollectionViewCellsHorizonMargin;
 }
 @end
