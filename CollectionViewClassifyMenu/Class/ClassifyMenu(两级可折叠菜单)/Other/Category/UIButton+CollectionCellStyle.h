@@ -9,7 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface UIButton (CollectionCellStyle)
+
 - (void)generalStyle;
 - (void)homeStyle;
 - (void)redStyle;
+
 @end

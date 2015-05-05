@@ -7,7 +7,9 @@
 //
 
 #import "UIView+General.h"
+
 @implementation UIView (General)
+
 - (void)setWidth:(CGFloat)width
 {
     CGRect rect = self.frame;

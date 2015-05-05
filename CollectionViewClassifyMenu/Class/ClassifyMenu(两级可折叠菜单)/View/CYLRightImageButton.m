@@ -5,10 +5,12 @@
 //  Created by https://github.com/ChenYilong on 15/3/23.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //
-#define kImageToTextMargin 7
+static float const kImageToTextMargin = 7;
+
 #import "CYLRightImageButton.h"
 
 @implementation CYLRightImageButton
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -38,4 +40,5 @@
     return self;
 }
 -(void)setHighlighted:(BOOL)highlighted {}
+
 @end

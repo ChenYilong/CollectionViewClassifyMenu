@@ -10,7 +10,6 @@
 
 @implementation NSDictionary (log)
 
-
 - (NSString *)descriptionWithLocale:(id)locale
 {
     NSString *tempStr1 = [[self description] stringByReplacingOccurrencesOfString:@"\\u" withString:@"\\U"];
@@ -20,7 +19,5 @@
     NSString *str = [NSPropertyListSerialization propertyListFromData:tempData mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:NULL];
     return str;
 }
-
-
 
 @end

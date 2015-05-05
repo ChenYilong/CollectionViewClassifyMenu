@@ -6,19 +6,18 @@
 //  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //  Single Choice Filter
 
-#define kControllerHeaderViewHeight                90
-#define kControllerHeaderToCollectionViewMargin    0
-#define kCollectionViewCellsHorizonMargin          12
-#define kCollectionViewCellHeight                  30
-#define kCollectionViewItemButtonImageToTextMargin 5
+static float const kControllerHeaderViewHeight                = 90.f;
+static float const kControllerHeaderToCollectionViewMargin    = 0;
+static float const kCollectionViewCellsHorizonMargin          = 12;
+static float const kCollectionViewCellHeight                  = 30;
+static float const kCollectionViewItemButtonImageToTextMargin = 5;
 
-#define kCollectionViewToLeftMargin                16
-#define kCollectionViewToTopMargin                 12
-#define kCollectionViewToRightMargin               16
-#define kCollectionViewToBottomtMargin             10
+static float const kCollectionViewToLeftMargin                = 16;
+static float const kCollectionViewToTopMargin                 = 12;
+static float const kCollectionViewToRightMargin               = 16;
+static float const kCollectionViewToBottomtMargin             = 10;
 
-#define kCellImageToLabelMargin                    10
-#define kCellBtnCenterToBorderMargin               19
+static float const kCellBtnCenterToBorderMargin               = 19;
 
 #import "CYLClassifyMenuViewController.h"
 #import "UICollectionViewLeftAlignedLayout.h"
@@ -29,6 +28,7 @@
 static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
+
 @interface CYLClassifyMenuViewController ()
 <
 UICollectionViewDataSource,
@@ -45,6 +45,7 @@ FilterHeaderViewDelegate
 @property (nonatomic, strong) NSMutableArray   *expandSectionArray;
 @property (nonatomic, strong) UIScrollView     *bgScrollView;
 @property (nonatomic, strong) UILabel          *titleLabel;
+
 @end
 
 @implementation CYLClassifyMenuViewController

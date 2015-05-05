@@ -9,6 +9,7 @@
 #import "NSArray+log.h"
 
 @implementation NSArray (log)
+
 - (NSString *)descriptionWithLocale:(id)locale
 {
     NSMutableString *str = [NSMutableString stringWithFormat:@"%@ (\n", @(self.count)];
@@ -21,4 +22,5 @@
     
     return str;
 }
+
 @end

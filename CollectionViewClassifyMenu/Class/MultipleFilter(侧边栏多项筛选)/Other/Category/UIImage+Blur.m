@@ -8,7 +8,9 @@
 
 #import "UIImage+Blur.h"
 #import <Accelerate/Accelerate.h>
+
 @implementation UIImage (Blur)
+
 - (UIImage *)blurredImageWithRadius:(CGFloat)radius iterations:(NSUInteger)iterations tintColor:(UIColor *)tintColor
 {
     //image must be nonzero size
@@ -74,4 +76,5 @@
     //    UIImage *image = [[UIImage alloc]init];
     return image;
 }
+
 @end

@@ -14,7 +14,9 @@
 #import "AppDelegate.h"
 
 @interface FilterBaseController () <UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
+
 @property (nonatomic, weak) IBOutlet UIImageView *blurImageView;
+
 @end
 
 @implementation FilterBaseController
@@ -124,4 +126,5 @@
         [self.view removeFromSuperview];
     }];
 }
+
 @end

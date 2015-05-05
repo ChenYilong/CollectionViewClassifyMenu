@@ -6,16 +6,14 @@
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //  Multiple Choice Save Filter
 
-#define kMultipleFilterSetting        @"kMultipleFilterSetting"
-#define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
-#define kCollectionViewCellsHorizonMargin          12
+static float const kCollectionViewCellsHorizonMargin = 12;
 
 #import "CYLMultipleFilterController.h"
-//#import "SelectProvinceController.h"
 #import "CYLFilterParamsTool.h"
 #import "CYLDBManager.h"
 
 @interface CYLMultipleFilterController ()
+
 @property (nonatomic, strong) CYLFilterParamsTool *filterParamsTool;
 @property (nonatomic, strong) NSString            *filename;
 @property (nonatomic, assign) NSUInteger          secondSectionTagsCount;
@@ -290,4 +288,5 @@
 {
     return kCollectionViewCellsHorizonMargin;
 }
+
 @end

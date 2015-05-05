@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface CYLIndexPathButton : UIButton
+
 @property (nonatomic, assign) NSInteger section;
 @property (nonatomic, assign) NSInteger row;
+
 @end

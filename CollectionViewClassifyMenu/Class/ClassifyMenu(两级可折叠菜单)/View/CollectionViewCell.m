@@ -10,6 +10,7 @@
 #import "UIButton+CollectionCellStyle.h"
 
 @implementation CollectionViewCell
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];

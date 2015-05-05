@@ -9,8 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @interface UIImage (Blur)
+
 // 高斯模糊
 - (UIImage *)blurredImageWithRadius:(CGFloat)radius
                          iterations:(NSUInteger)iterations
                           tintColor:(UIColor *)tintColor;
+
 @end

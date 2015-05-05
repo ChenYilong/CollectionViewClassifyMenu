@@ -8,13 +8,19 @@
 
 #import "CYLDBManager.h"
 
+NSString *const kDataSourceSectionKey     = @"Symptoms";
+NSString *const kDataSourceCellTextKey    = @"Food_Name";
+NSString *const kDataSourceCellPictureKey = @"Picture";
 
 @interface CYLDBManager()
+
 @property (nonatomic, strong) NSMutableArray *dataSource;
 @property (nonatomic, strong) NSMutableArray *allSkills;
+
 @end
 
 @implementation CYLDBManager
+
 @synthesize dataSource = _dataSource;
 @synthesize allSkills = _allSkills;
 
@@ -76,6 +82,5 @@
     }
     return _allSkills;
 }
-
 
 @end

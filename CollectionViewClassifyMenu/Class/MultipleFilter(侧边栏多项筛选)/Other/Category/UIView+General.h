@@ -12,7 +12,9 @@
 #define LINE_COLOR_GREEN [UIColor colorWithRed:90/255.0 green:182/255.0 blue:171/255.0 alpha:1].CGColor //绿线
 #define LINE_COLOR_GRAY [UIColor colorWithRed:137/255.0 green:137/255.0 blue:137/255.0 alpha:1].CGColor //边框颜色灰色
 #define LINE_VIEW_COLOR [UIColor colorWithRed:138/255.0 green:205/255.0 blue:198/255.0 alpha:1]
+
 @interface UIView (General)
+
 - (void)setWidth:(CGFloat)width;
 - (void)setHeight:(CGFloat)height;
 - (void)setX:(CGFloat)x;

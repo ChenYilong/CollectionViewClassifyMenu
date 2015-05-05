@@ -7,15 +7,18 @@
 //
 
 #import "CYLFilterHeaderView.h"
-#define kTitleButtonWidth 250.f
-#define kMoreButtonWidth  36*2
-#define kCureOfLineHight  0.5
-#define kCureOfLineOffX   16
 
-float CYLFilterHeaderViewHeigt = 38;
+static float const kTitleButtonWidth = 250.f;
+static float const kMoreButtonWidth  = 36*2;
+static float const kCureOfLineHight  = 0.5;
+static float const kCureOfLineOffX   = 16;
+
+float const CYLFilterHeaderViewHeigt = 38;
+
 @interface CYLFilterHeaderView()
 
 @end
+
 @implementation CYLFilterHeaderView
 
 - (id)initWithFrame:(CGRect)frame
@@ -71,4 +74,5 @@ float CYLFilterHeaderViewHeigt = 38;
         [self.delegate filterHeaderViewMoreBtnClicked:self.moreButton];
     }
 }
+
 @end

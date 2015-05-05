@@ -6,11 +6,11 @@
 //  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
 //
 
-#define kDataSourceSectionKey                      @"Symptoms"
-#define kDataSourceCellTextKey                     @"Food_Name"
-#define kDataSourceCellPictureKey                  @"Picture"
-
 #import <Foundation/Foundation.h>
+
+extern NSString *const kDataSourceSectionKey;
+extern NSString *const kDataSourceCellTextKey;
+extern NSString *const kDataSourceCellPictureKey;
 
 @interface CYLDBManager : NSObject
 
@@ -19,4 +19,5 @@
 + (id)sharedCYLDBManager;
 - (NSArray *)getAllSkillTags;
 - (NSArray *)getDataSource;
+
 @end

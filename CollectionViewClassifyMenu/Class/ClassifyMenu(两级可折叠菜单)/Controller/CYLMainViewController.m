@@ -7,17 +7,16 @@
 //  Created by https://github.com/ChenYilong on 15/4/26.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //
-#define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
 
 #import "CYLMainViewController.h"
 #import "CYLMultipleFilterController.h"
 #import "AppDelegate.h"
 #import "CYLFilterParamsTool.h"
 
-
 @interface CYLMainViewController ()<FilterControllerDelegate>
+
 @property (nonatomic, strong) CYLMultipleFilterController *filterController;
-@property (nonatomic, strong) CYLFilterParamsTool *filterParamsTool;
+@property (nonatomic, strong) CYLFilterParamsTool         *filterParamsTool;
 
 @end
 
@@ -134,4 +133,5 @@
         [alert dismissWithClickedButtonIndex:0 animated:YES];
     });
 }
+
 @end

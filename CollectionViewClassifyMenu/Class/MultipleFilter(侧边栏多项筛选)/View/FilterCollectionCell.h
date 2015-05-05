@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLIndexPathButton.h"
+
 @interface FilterCollectionCell : UICollectionViewCell
+
 @property (nonatomic, strong) CYLIndexPathButton *titleButton;
+
 @end

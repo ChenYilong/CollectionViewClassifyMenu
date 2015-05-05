@@ -6,13 +6,15 @@
 //  Created by https://github.com/ChenYilong on 15/4/22.
 //  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
 //
-#define kMultipleFilterSetting @"kMultipleFilterSetting"
-#define kMultipleFilterSettingModified @"kMultipleFilterSettingModified"
 
 #import "CYLFilterParamsTool.h"
 #import "CYLDBManager.h"
 
+NSString *const kMultipleFilterSetting         = @"kMultipleFilterSetting";
+NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModified";
+
 @implementation CYLFilterParamsTool
+
 //===========================================================
 //  Keyed Archiving
 //
@@ -123,4 +125,5 @@
     }
     return _filename;
 }
+
 @end

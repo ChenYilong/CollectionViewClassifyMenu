@@ -8,12 +8,11 @@
 
 // 问题筛选和医生筛选的基础类
 
-#define kCollectionViewToLeftMargin                50
-#define kCollectionViewToTopMargin                 12
-#define kCollectionViewToRightMargin               5
-#define kCollectionViewToBottomtMargin             15
-//#import "Constant.h"
-//#import "Util.h"
+static float const kCollectionViewToLeftMargin    = 50;
+static float const kCollectionViewToTopMargin     = 12;
+static float const kCollectionViewToRightMargin   = 5;
+static float const kCollectionViewToBottomtMargin = 15;
+
 #import "UICollectionViewLeftAlignedLayout.h"
 #import "CYLMultipleFilterHeaderView.h"
 #import "FilterCollectionCell.h"
@@ -40,4 +39,5 @@
 - (void)itemButtonClicked:(CYLIndexPathButton *)button;
 - (IBAction)confirmButtonClicked:(id)sender;
 - (IBAction)restoreButtonClicked:(id)sender;
+
 @end

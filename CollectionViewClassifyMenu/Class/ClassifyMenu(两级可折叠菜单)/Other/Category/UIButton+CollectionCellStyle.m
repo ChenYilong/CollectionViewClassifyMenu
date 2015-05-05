@@ -9,6 +9,7 @@
 #import "UIButton+CollectionCellStyle.h"
 
 @implementation UIButton (CollectionCellStyle)
+
 - (void)generalStyle {
     self.layer.cornerRadius = 5.0;
     self.backgroundColor = [UIColor whiteColor];
@@ -50,4 +51,5 @@
     
     return image;
 }
+
 @end

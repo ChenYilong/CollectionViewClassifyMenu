@@ -8,11 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString *const kMultipleFilterSetting;
+extern NSString *const kMultipleFilterSettingModified;
+
 @interface CYLFilterParamsTool : NSObject
+
 @property (nonatomic, strong) NSMutableDictionary *filterParamsDictionary;
-@property (nonatomic, strong) NSMutableArray *filterParamsArray;
+@property (nonatomic, strong) NSMutableArray      *filterParamsArray;
 @property (nonatomic, strong) NSMutableDictionary *filterParamsContentDictionary;
-@property (nonatomic, strong) NSArray *dataSources;
-@property (nonatomic, strong) NSString *filename;
+@property (nonatomic, strong) NSArray             *dataSources;
+@property (nonatomic, strong) NSString            *filename;
 
 @end

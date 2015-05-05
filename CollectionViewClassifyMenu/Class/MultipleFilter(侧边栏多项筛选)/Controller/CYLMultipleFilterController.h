@@ -9,5 +9,7 @@
 #import "FilterBaseController.h"
 
 @interface CYLMultipleFilterController : FilterBaseController
+
 -(void)refreshFilterParams;
+
 @end

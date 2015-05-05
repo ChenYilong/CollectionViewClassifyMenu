@@ -7,14 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+
 @implementation UIImage (Stretch)
+
 + (UIImage *)stretchableImageNamed:(NSString *)name
 {
     UIImage *image = [UIImage imageNamed:name];
     return [image stretchableImageWithLeftCapWidth:(NSUInteger)(image.size.width / 2)
                                       topCapHeight:(NSUInteger)(image.size.height / 2)];
 }
+
 @end
+
 #import "FilterCollectionCell.h"
 
 @implementation FilterCollectionCell
@@ -40,6 +44,7 @@
     [_titleButton setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
     [self.contentView addSubview:_titleButton];
 }
+
 @end
 
 
