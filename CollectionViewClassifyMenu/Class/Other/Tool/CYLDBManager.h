@@ -14,10 +14,7 @@ extern NSString *const kDataSourceCellPictureKey;
 
 @interface CYLDBManager : NSObject
 
-- (NSMutableArray *)dataSource;
-- (NSMutableArray *)allSkills;
-+ (id)sharedCYLDBManager;
-- (NSArray *)getAllSkillTags;
-- (NSArray *)getDataSource;
++ (NSMutableArray *)dataSource;
++ (NSMutableArray *)allTags;
 
 @end

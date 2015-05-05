@@ -100,11 +100,11 @@
                   moduleName = "CollectionViewClassifyMenu"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
-                  timestampString = "452072925.853516"
+                  timestampString = "452539111.365578"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "436"
-                  endingLineNumber = "436"
+                  startingLineNumber = "435"
+                  endingLineNumber = "435"
                   offsetFromSymbolStart = "104">
                </Location>
                <Location
@@ -115,26 +115,26 @@
                   moduleName = "CollectionViewClassifyMenu"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
-                  timestampString = "452072925.854097"
+                  timestampString = "452539111.365758"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "436"
-                  endingLineNumber = "436"
+                  startingLineNumber = "435"
+                  endingLineNumber = "435"
                   offsetFromSymbolStart = "112">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "__55-[CYLClassifyMenuViewController showLineSwitchClicked:]_block_invoke267"
+                  symbolName = "__55-[CYLClassifyMenuViewController showLineSwitchClicked:]_block_invoke257"
                   moduleName = "CollectionViewClassifyMenu"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
-                  timestampString = "452072925.854286"
+                  timestampString = "452539111.36627"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "437"
-                  endingLineNumber = "437"
+                  startingLineNumber = "436"
+                  endingLineNumber = "436"
                   offsetFromSymbolStart = "24">
                </Location>
             </Locations>
@@ -163,29 +163,61 @@
                   moduleName = "CollectionViewClassifyMenu"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
-                  timestampString = "452072925.855558"
+                  timestampString = "452539111.45367"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "252"
-                  endingLineNumber = "252"
+                  startingLineNumber = "253"
+                  endingLineNumber = "253"
                   offsetFromSymbolStart = "476">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "__64-[CYLClassifyMenuViewController judgeMoreBtnShowWhenShowTwoLine]_block_invoke153"
+                  symbolName = "__64-[CYLClassifyMenuViewController judgeMoreBtnShowWhenShowTwoLine]_block_invoke141"
                   moduleName = "CollectionViewClassifyMenu"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/chenyilong/Documents/Demo/CollectionViewClassifyMenu/CollectionViewClassifyMenu/Class/ClassifyMenu(%E4%B8%A4%E7%BA%A7%E5%8F%AF%E6%8A%98%E5%8F%A0%E8%8F%9C%E5%8D%95)/Controller/CYLClassifyMenuViewController.m"
-                  timestampString = "452072925.85576"
+                  timestampString = "452539111.453835"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "252"
-                  endingLineNumber = "252"
+                  startingLineNumber = "253"
+                  endingLineNumber = "253"
                   offsetFromSymbolStart = "72">
                </Location>
             </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.m"
+            timestampString = "452539886.318811"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
+            landmarkName = "+allTags"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.m"
+            timestampString = "452539098.591385"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
+            landmarkName = "+dataSource"
+            landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

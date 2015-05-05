@@ -123,7 +123,7 @@ FilterHeaderViewDelegate
     self.firstLineCellCountArray = nil;
     self.collectionHeaderMoreBtnHideBoolArray = nil;
     self.rowLine = 0;
-    self.dataSource = [NSArray arrayWithArray:[[CYLDBManager sharedCYLDBManager] getDataSource]];
+    self.dataSource = [NSArray arrayWithArray:[CYLDBManager dataSource]];
 }
 
 - (float)checkCellLimitWidth:(float)cellWidth isLimitWidth:(ISLimitWidth)isLimitWidth {

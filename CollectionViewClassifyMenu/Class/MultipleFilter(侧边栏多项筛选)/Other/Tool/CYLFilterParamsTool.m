@@ -65,7 +65,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
     if (_filterParamsArray == nil) {
         NSMutableArray *state = [NSMutableArray arrayWithObjects:@1, @0,nil];
         NSMutableArray *types = [NSMutableArray arrayWithObject:@(1)];
-        NSArray *symptoms = [[CYLDBManager sharedCYLDBManager] getAllSkillTags];
+        NSArray *symptoms = [CYLDBManager allTags];
         [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             [types addObject:@0];
         }];
@@ -105,7 +105,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
         
         NSMutableArray *hospitals = [NSMutableArray arrayWithObjects:@"全部", @"请选择", nil];
         NSMutableArray *skillTypes = [NSMutableArray arrayWithObject:@"全部"];
-        [skillTypes addObjectsFromArray:[[CYLDBManager sharedCYLDBManager] getAllSkillTags]];
+        [skillTypes addObjectsFromArray:[CYLDBManager allTags]];
         _dataSources = [[NSArray alloc] initWithObjects:hospitals,skillTypes,nil];
     }
     return _dataSources;

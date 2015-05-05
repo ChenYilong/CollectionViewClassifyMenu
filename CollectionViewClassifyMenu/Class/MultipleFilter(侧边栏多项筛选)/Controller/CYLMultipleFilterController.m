@@ -52,7 +52,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 {
     if (_secondSectionTagsCount == 0) {
         NSMutableArray *types = [NSMutableArray arrayWithObject:@"全部"];
-        [types addObjectsFromArray:[[CYLDBManager sharedCYLDBManager] getAllSkillTags]];
+        [types addObjectsFromArray:[CYLDBManager allTags]];
         _secondSectionTagsCount = [types count];
     }
     return _secondSectionTagsCount;
@@ -255,7 +255,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 {
     if (section == 1) {
         NSMutableArray *types = [NSMutableArray arrayWithObject:@"全部"];
-        [types addObjectsFromArray:[[CYLDBManager sharedCYLDBManager] getAllSkillTags]];
+        [types addObjectsFromArray:[CYLDBManager allTags]];
         return [types count];
     }
     return 2;
