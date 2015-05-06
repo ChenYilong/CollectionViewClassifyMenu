@@ -43,7 +43,7 @@ YES为保存,NO为不保存.
 ```Objective-C
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     //...
-    //设NO表示,每次启动程序,清楚用户上次的筛选条件,不写该行,默认保存.
+    //设NO表示,每次启动程序,清除用户上次的筛选条件,不写该行,默认保存.
     [self initFilterSetting:NO];
     return YES;
 }
