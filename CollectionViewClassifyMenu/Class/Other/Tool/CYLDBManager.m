@@ -12,17 +12,7 @@ NSString *const kDataSourceSectionKey     = @"Symptoms";
 NSString *const kDataSourceCellTextKey    = @"Food_Name";
 NSString *const kDataSourceCellPictureKey = @"Picture";
 
-@interface CYLDBManager()
-
-@property (nonatomic, strong) NSMutableArray *dataSource;
-@property (nonatomic, strong) NSMutableArray *allTags;
-
-@end
-
 @implementation CYLDBManager
-
-@synthesize dataSource = _dataSource;
-@synthesize allTags = _allTags;
 
 /**
  *  懒加载_dataSource
