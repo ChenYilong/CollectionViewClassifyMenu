@@ -81,7 +81,7 @@ FilterHeaderViewDelegate
 
 - (void)initDefaultShowCellCount {
     for (NSUInteger index = 0; index < self.firstLineCellCountArray.count; index++) {
-        NSArray *secondLineCellCountArray = [NSArray arrayWithArray:[self getSecondLineCellCount]];
+        NSArray *secondLineCellCountArray = [NSArray arrayWithArray:[self secondLineCellCount]];
         NSNumber *object = @([self.firstLineCellCountArray[index] intValue]+
         [secondLineCellCountArray[index] intValue]);
         [self.firstLineCellCountArray replaceObjectAtIndex:index
@@ -126,7 +126,7 @@ FilterHeaderViewDelegate
     self.dataSource = [NSArray arrayWithArray:[CYLDBManager dataSource]];
 }
 
-- (float)checkCellLimitWidth:(float)cellWidth isLimitWidth:(ISLimitWidth)isLimitWidth {
+- (float)cellLimitWidth:(float)cellWidth isLimitWidth:(ISLimitWidth)isLimitWidth {
     float limitWidth = (CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
     if (cellWidth >= limitWidth) {
         cellWidth = limitWidth;
@@ -137,10 +137,10 @@ FilterHeaderViewDelegate
     return cellWidth;
 }
 
-- (float)getTextAndImageWidth:(NSString *)text content:(id)obj array:(NSArray *)array {
-    __block float cellWidth = [self getCollectionCellWidthText:text content:obj];
+- (float)textAndImageWidth:(NSString *)text content:(id)obj array:(NSArray *)array {
+    __block float cellWidth = [self collectionCellWidthText:text content:obj];
     __block float cellWidthAndRightMargin;
-    [self checkCellLimitWidth:cellWidth isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
+    [self cellLimitWidth:cellWidth isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
         cellWidth = [data floatValue];
         if (yesORNo == YES) {
             cellWidthAndRightMargin = CGRectGetWidth(self.collectionView.frame)-
@@ -175,7 +175,7 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text
+                float cellWidthAndRightMargin = [strongSelf textAndImageWidth:text
                                                                          content:obj
                                                                            array:weakSymptoms
                                                  ];
@@ -214,7 +214,7 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf getTextAndImageWidth:text
+                float cellWidthAndRightMargin = [strongSelf textAndImageWidth:text
                                                                          content:obj
                                                                            array:weakSymptoms];
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
@@ -226,7 +226,7 @@ FilterHeaderViewDelegate
                     //超过一行时
                     if(countTime==0) {
                         [widthArray removeAllObjects];
-                        [self checkCellLimitWidth:cellWidthAndRightMargin isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
+                        [self cellLimitWidth:cellWidthAndRightMargin isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
                             if (yesORNo == YES) {
                                 [widthArray addObject:@(contentViewWidth)];
                             } else {
@@ -259,18 +259,18 @@ FilterHeaderViewDelegate
     }];
 }
 
--(NSArray *)getSecondLineCellCount {
+-(NSArray *)secondLineCellCount {
     NSMutableArray *secondLineCellCountArray = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
     [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         @autoreleasepool {
             __strong typeof(self) strongSelf = weakSelf;
             NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-            float firstLineCount = [strongSelf getFirstLineCellCountWithArray:symptoms];
+            float firstLineCount = [strongSelf firstLineCellCountWithArray:symptoms];
             if (symptoms.count != firstLineCount) {
                 NSRange range = NSMakeRange(0, firstLineCount);
                 [symptoms removeObjectsInRange:range];
-                float secondLineCount = [strongSelf getFirstLineCellCountWithArray:symptoms];
+                float secondLineCount = [strongSelf firstLineCellCountWithArray:symptoms];
                 [secondLineCellCountArray addObject:@(secondLineCount)];
             } else {
                 [secondLineCellCountArray addObject:@(0)];
@@ -280,14 +280,14 @@ FilterHeaderViewDelegate
     return (NSArray *)secondLineCellCountArray;
 }
 
-- (NSUInteger)getFirstLineCellCountWithArray:(NSArray *)array {
+- (NSUInteger)firstLineCellCountWithArray:(NSArray *)array {
     __block NSUInteger firstLineCellCount = 0;
     NSMutableArray *widthArray = [NSMutableArray array];
     __weak __typeof(array) weakArray = array;
     [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         @autoreleasepool {
             NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-            float cellWidth = [self getCollectionCellWidthText:text content:obj];
+            float cellWidth = [self collectionCellWidthText:text content:obj];
             float cellWidthAndRightMargin;
             if (obj == [weakArray lastObject]) {
                 cellWidthAndRightMargin = cellWidth;
@@ -305,7 +305,7 @@ FilterHeaderViewDelegate
     return firstLineCellCount;
 }
 
-- (float)getCollectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
+- (float)collectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
     float cellWidth;
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
@@ -317,7 +317,7 @@ FilterHeaderViewDelegate
     } else {
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin;
     }
-    cellWidth = [self checkCellLimitWidth:cellWidth isLimitWidth:nil];
+    cellWidth = [self cellLimitWidth:cellWidth isLimitWidth:nil];
     return cellWidth;
 }
 
@@ -596,7 +596,7 @@ FilterHeaderViewDelegate
 {
     NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
     NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
-    float cellWidth = [self getCollectionCellWidthText:text content:symptoms[indexPath.row]];
+    float cellWidth = [self collectionCellWidthText:text content:symptoms[indexPath.row]];
     return CGSizeMake(cellWidth, kCollectionViewCellHeight);
 }
 
