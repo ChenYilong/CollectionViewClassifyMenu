@@ -1,6 +1,6 @@
 //
 //  CYLDoctorSkillDBManager.m
-//  http://cnblogs.com/ChenYilong/ 
+//  http://cnblogs.com/ChenYilong/
 //
 //  Created by https://github.com/ChenYilong on 15/4/22.
 //  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
@@ -15,29 +15,27 @@ NSString *const kDataSourceCellPictureKey = @"Picture";
 @implementation CYLDBManager
 
 /**
- *  懒加载_dataSource
+ *  lazy load _dataSource
  *
  *  @return NSMutableArray
  */
 + (NSMutableArray *)dataSource
 {
-        static NSMutableArray *dataSource = nil;
-        static dispatch_once_t dataSourceOnceToken;
-        dispatch_once(&dataSourceOnceToken,^{
-            NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data.json" ofType:nil];
-            NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath];
-            NSError *error;
-            if (data) {
-                dataSource = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-            }
-        });
-
+    static NSMutableArray *dataSource = nil;
+    static dispatch_once_t dataSourceOnceToken;
+    dispatch_once(&dataSourceOnceToken,^{
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data.json" ofType:nil];
+        NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath];
+        NSError *error;
+        if (data) {
+            dataSource = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        }
+    });
     return dataSource;
-    
 }
 
 /**
- *  懒加载_allTags
+ *  lazy load _allTags
  *
  *  @return NSMutableArray
  */
@@ -56,7 +54,6 @@ NSString *const kDataSourceCellPictureKey = @"Picture";
             }
         }];
     });
-
     return allTags;
 }
 

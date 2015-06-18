@@ -25,8 +25,6 @@
         [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:(51)/255.f green:(171)/255.f blue:(160)/255.f alpha:1.f]];
         [[UINavigationBar appearance] setTranslucent:NO];
     }
-    //later than iOS 7
-    self.window.tintColor = [UIColor whiteColor];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     CYLMainViewController *classifyMenuViewController = [[CYLMainViewController alloc] init];
     self.navigationController= [[UINavigationController alloc] initWithRootViewController:classifyMenuViewController];

@@ -41,7 +41,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
 
 
 /**
- *  懒加载_filterParamsDictionary
+ *  lazy load _filterParamsDictionary
  *
  *  @return NSMutableDictionary
  */
@@ -56,7 +56,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
 }
 
 /**
- *  懒加载_filterParamsArray
+ *  lazy load _filterParamsArray
  *
  *  @return NSMutableArray
  */
@@ -75,13 +75,13 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
 }
 
 /**
- *  懒加载_filterParamsContentArray
+ *  lazy load _filterParamsContentArray
  *
  *  @return NSMutableArray
  */
 
 /**
- *  懒加载_filterParamsContentDictionary
+ *  lazy load _filterParamsContentDictionary
  *
  *  @return NSMutableDictionary
  */
@@ -95,7 +95,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
 }
 
 /**
- *  懒加载_dataSources
+ *  lazy load _dataSources
  *
  *  @return NSArray
  */
@@ -113,7 +113,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
 
 
 /**
- *  懒加载_filename
+ *  lazy load _filename
  *
  *  @return NSString
  */

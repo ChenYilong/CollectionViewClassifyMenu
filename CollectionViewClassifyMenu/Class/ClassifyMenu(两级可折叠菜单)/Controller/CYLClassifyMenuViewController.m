@@ -19,10 +19,14 @@ static float const kCollectionViewToBottomtMargin             = 10;
 
 static float const kCellBtnCenterToBorderMargin               = 19;
 
+//View Controllers
 #import "CYLClassifyMenuViewController.h"
-#import "UICollectionViewLeftAlignedLayout.h"
-#import "CollectionViewCell.h"
+//Views
 #import "CYLFilterHeaderView.h"
+//Cells
+#import "CollectionViewCell.h"
+//Others
+#import "UICollectionViewLeftAlignedLayout.h"
 #import "CYLDBManager.h"
 
 static NSString * const kCellIdentifier           = @"CellIdentifier";
@@ -50,44 +54,7 @@ FilterHeaderViewDelegate
 
 @implementation CYLClassifyMenuViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    self.title = @"@iOS程序犭袁";
-    self.bgScrollView = [[UIScrollView alloc] initWithFrame:
-                         CGRectMake(0, 0,
-                                    [UIScreen mainScreen].bounds.size.width,
-                                    [UIScreen mainScreen].bounds.size.height)
-                         ];
-    self.bgScrollView.showsVerticalScrollIndicator = NO;
-    self.bgScrollView.alwaysBounceVertical = YES;
-    self.bgScrollView.backgroundColor = [UIColor colorWithRed:252.0f/255.f green:252.0f/255.f blue:252.0f/255.f alpha:2.f];
-    [self.view addSubview:self.bgScrollView];
-    
-    [self initData];
-    [self addCollectionView];
-    [self judgeMoreBtnShow];
-    // 如果想显示两行，请打开下面两行代码
-    //    [self judgeMoreBtnShowWhenShowTwoLine];
-    //    [self initDefaultShowCellCount];
-    [self.bgScrollView addSubview:[self addTableHeaderView]];
-    self.view.backgroundColor = [UIColor blueColor];
-}
-
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    self.bgScrollView.scrollEnabled = YES;
-    [self updateViewHeight];
-}
-
-- (void)initDefaultShowCellCount {
-    for (NSUInteger index = 0; index < self.firstLineCellCountArray.count; index++) {
-        NSArray *secondLineCellCountArray = [NSArray arrayWithArray:[self secondLineCellCount]];
-        NSNumber *object = @([self.firstLineCellCountArray[index] intValue]+
-        [secondLineCellCountArray[index] intValue]);
-        [self.firstLineCellCountArray replaceObjectAtIndex:index
-                                                withObject:object];
-    }
-}
+#pragma mark - 💤 LazyLoad Method
 
 - (NSMutableArray *)collectionHeaderMoreBtnHideBoolArray
 {
@@ -118,6 +85,48 @@ FilterHeaderViewDelegate
     return _expandSectionArray;
 }
 
+#pragma mark - ♻️ LifeCycle Method
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title = @"@iOS程序犭袁";
+    self.bgScrollView = [[UIScrollView alloc] initWithFrame:
+                         CGRectMake(0, 0,
+                                    [UIScreen mainScreen].bounds.size.width,
+                                    [UIScreen mainScreen].bounds.size.height)
+                         ];
+    self.bgScrollView.showsVerticalScrollIndicator = NO;
+    self.bgScrollView.alwaysBounceVertical = YES;
+    self.bgScrollView.backgroundColor = [UIColor colorWithRed:252.0f/255.f green:252.0f/255.f blue:252.0f/255.f alpha:2.f];
+    [self.view addSubview:self.bgScrollView];
+    
+    [self initData];
+    [self addCollectionView];
+    [self judgeMoreBtnShow];
+    // 如果想显示两行，请打开下面两行代码
+    //    [self judgeMoreBtnShowWhenShowTwoLine];
+    //    [self initDefaultShowCellCount];
+    [self.bgScrollView addSubview:[self addTableHeaderView]];
+    self.view.backgroundColor = [UIColor blueColor];
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.bgScrollView.scrollEnabled = YES;
+    [self updateViewHeight];
+}
+
+#pragma mark - 🆑 CYL Custom Method
+
+- (void)initDefaultShowCellCount {
+    for (NSUInteger index = 0; index < self.firstLineCellCountArray.count; index++) {
+        NSArray *secondLineCellCountArray = [NSArray arrayWithArray:[self secondLineCellCount]];
+        NSNumber *object = @([self.firstLineCellCountArray[index] intValue]+
+        [secondLineCellCountArray[index] intValue]);
+        [self.firstLineCellCountArray replaceObjectAtIndex:index
+                                                withObject:object];
+    }
+}
 
 - (void)initData {
     self.firstLineCellCountArray = nil;
@@ -146,7 +155,7 @@ FilterHeaderViewDelegate
             cellWidthAndRightMargin = CGRectGetWidth(self.collectionView.frame)-
             kCollectionViewToLeftMargin-kCollectionViewToRightMargin;
         } else {
-            if (((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)-cellWidth >=kCollectionViewCellsHorizonMargin)) {
+            if (((CGRectGetWidth(self.collectionView.frame)-kCollectionViewToLeftMargin-kCollectionViewToRightMargin)-cellWidth >= kCollectionViewCellsHorizonMargin)) {
                 if (obj == [array lastObject]) {
                     cellWidthAndRightMargin = cellWidth;
                 } else {
@@ -183,7 +192,7 @@ FilterHeaderViewDelegate
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
                 
-                if ([sum intValue]<=contentViewWidth) {
+                if ([sum intValue] <= contentViewWidth) {
                     firstLineCellCount ++;
                 }
             }];
@@ -220,7 +229,7 @@ FilterHeaderViewDelegate
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                if ([sum intValue]<=contentViewWidth) {
+                if ([sum intValue] <= contentViewWidth) {
                     //未超过一行
                 } else {
                     //超过一行时
@@ -230,7 +239,7 @@ FilterHeaderViewDelegate
                             if (yesORNo == YES) {
                                 [widthArray addObject:@(contentViewWidth)];
                             } else {
-                                if (contentViewWidth-cellWidthAndRightMargin >=kCollectionViewCellsHorizonMargin) {
+                                if (contentViewWidth-cellWidthAndRightMargin >= kCollectionViewCellsHorizonMargin) {
                                     if (obj == [weakSymptoms lastObject]) {
                                         [widthArray addObject:@(cellWidthAndRightMargin+kCollectionViewCellsHorizonMargin)];
                                     } else {
@@ -410,23 +419,19 @@ FilterHeaderViewDelegate
 - (void)showLineSwitchClicked:(UISwitch *)sender {
     [self initData];
     [self judgeMoreBtnShow];
+    NSString *title;
     if(sender.isOn) {
-        NSString *title = @"默认显示两行时的效果如下所示:";
-        NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
-        [text addAttribute:NSForegroundColorAttributeName
-                     value:[UIColor redColor]
-                     range:NSMakeRange(4, 2)];
-        self.titleLabel.attributedText = text;
+        title = @"默认显示两行时的效果如下所示:";
         [self judgeMoreBtnShowWhenShowTwoLine];
         [self initDefaultShowCellCount];
     } else {
-        NSString *title = @"默认显示一行时的效果如下所示:";
-        NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
-        [text addAttribute:NSForegroundColorAttributeName
-                     value:[UIColor redColor]
-                     range:NSMakeRange(4, 2)];
-        self.titleLabel.attributedText = text;
+        title = @"默认显示一行时的效果如下所示:";
     }
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
+    [text addAttribute:NSForegroundColorAttributeName
+                 value:[UIColor redColor]
+                 range:NSMakeRange(4, 2)];
+    self.titleLabel.attributedText = text;
     [self.collectionView reloadData];
     __weak __typeof(self) weakSelf = self;
     [self.collectionView performBatchUpdates:^{
@@ -437,7 +442,9 @@ FilterHeaderViewDelegate
         [strongSelf updateViewHeight];
     }];
 }
-#pragma mark - UICollectionViewDataSource
+
+#pragma mark - 🔌 UICollectionViewDataSource Method
+
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     return [self.dataSource count];
@@ -496,10 +503,14 @@ FilterHeaderViewDelegate
     return cell;
 }
 
+#pragma mark - 🎬 Actions Method
+
 - (void)itemButtonClicked:(CYLIndexPathButton *)button {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
     [self collectionView:self.collectionView didSelectItemAtIndexPath:indexPath];
 }
+
+#pragma mark - 🔌 UICollectionViewDelegate Method
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     //二级菜单数组
@@ -570,7 +581,8 @@ FilterHeaderViewDelegate
     return nil;
 }
 
-#pragma mark - FilterHeaderViewDelegateMethod
+#pragma mark - 🔌 FilterHeaderViewDelegateMethod Method
+
 -(void)filterHeaderViewMoreBtnClicked:(UIButton *)sender {
     sender.selected = !sender.selected;
     if (sender.selected) {
@@ -589,7 +601,8 @@ FilterHeaderViewDelegate
     }];
 }
 
-#pragma mark - UICollectionViewDelegateLeftAlignedLayout
+#pragma mark - 🔌 UICollectionViewDelegateLeftAlignedLayout Method
+
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath

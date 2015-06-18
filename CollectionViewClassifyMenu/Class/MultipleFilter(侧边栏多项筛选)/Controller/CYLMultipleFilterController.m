@@ -8,7 +8,9 @@
 
 static float const kCollectionViewCellsHorizonMargin = 12;
 
+//View Controllers
 #import "CYLMultipleFilterController.h"
+//Others
 #import "CYLFilterParamsTool.h"
 #import "CYLDBManager.h"
 
@@ -22,8 +24,10 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 @implementation CYLMultipleFilterController
 
+#pragma mark - 💤 LazyLoad Method
+
 /**
- *  懒加载_filterParamsTool
+ *  lazy load _filterParamsTool
  *
  *  @return CYLFilterParamsTool
  */
@@ -44,7 +48,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 }
 
 /**
- *  懒加载_secondSectionTagsCount
+ *  lazy load _secondSectionTagsCount
  *
  *  @return int
  */
@@ -57,6 +61,23 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     }
     return _secondSectionTagsCount;
 }
+
+/**
+ *  lazy load _filename
+ *
+ *  @return NSString
+ */
+- (NSString *)filename
+{
+    if (_filename == nil) {
+        _filename = [[NSString alloc] init];
+        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+        _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
+    }
+    return _filename;
+}
+
+#pragma mark - ♻️ LifeCycle Method
 
 - (void)viewDidLoad
 {
@@ -79,20 +100,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     }
 }
 
-/**
- *  懒加载_filename
- *
- *  @return NSString
- */
-- (NSString *)filename
-{
-    if (_filename == nil) {
-        _filename = [[NSString alloc] init];
-        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
-        _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
-    }
-    return _filename;
-}
+#pragma mark - 🎬 Actions Method
 
 - (void)confirmButtonClicked:(id)sender
 {
@@ -114,59 +122,6 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     [super confirmButtonClicked:sender];
     self.filterParamsTool = [[CYLFilterParamsTool alloc] init];
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
-}
-
-#pragma mark - UICollectionViewDelegate
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
-           viewForSupplementaryElementOfKind:(NSString *)kind
-                                 atIndexPath:(NSIndexPath *)indexPath
-{
-    if ([kind isEqual:UICollectionElementKindSectionHeader]) {
-        CYLMultipleFilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"CYLMultipleFilterHeaderView" forIndexPath:indexPath];
-        switch (indexPath.section) {
-            case 0:
-                view.imageView.image = [UIImage imageNamed:@"icon_slide_sort"];
-                view.titleLabel.text = @"地区过滤";
-                break;
-            case 1:
-                view.imageView.image = [UIImage imageNamed:@"icon_slide_people"];
-                view.titleLabel.text = @"菜品过滤";
-                break;
-            default:
-                break;
-        }
-        return view;
-    }
-    return nil;
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
-                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    FilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FilterCollectionCell" forIndexPath:indexPath];
-    CGSize size = [self collectionView:collectionView layout:nil sizeForItemAtIndexPath:indexPath];
-    cell.titleButton.frame = CGRectMake(0, 0, size.width, size.height);
-    NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
-    [cell.titleButton setTitle:text forState:UIControlStateNormal];
-    [cell.titleButton setTitle:text forState:UIControlStateSelected];
-    cell.titleButton.selected = [self.filterParamsTool.filterParamsArray[indexPath.section][indexPath.row] boolValue];
-    cell.titleButton.section = indexPath.section;
-    cell.titleButton.row = indexPath.row;
-    return cell;
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    FilterCollectionCell *cell =
-    (FilterCollectionCell *)[collectionView cellForItemAtIndexPath:indexPath];
-    //button.selected是指button原来的状态
-    //是否修改要看,数组第一个值是否是0,默认是1
-    NSMutableArray *setting = self.filterParamsTool.filterParamsArray[indexPath.section];
-    if (indexPath.section == 0) {
-        [self clickedInFirstSection:indexPath withButton:cell.titleButton withsetting:setting];
-    } else if (indexPath.section == 1) {
-        [self clickedInSecondSection:indexPath withButton:cell.titleButton withSetting:setting];
-    }
-    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
 }
 
 - (void)clickedInFirstSection:(NSIndexPath *)indexPath
@@ -245,7 +200,62 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     }
 }
 
-#pragma mark - UICollectionViewDataSource
+#pragma mark - 🔌 UICollectionViewDelegate Method
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath
+{
+    if ([kind isEqual:UICollectionElementKindSectionHeader]) {
+        CYLMultipleFilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"CYLMultipleFilterHeaderView" forIndexPath:indexPath];
+        switch (indexPath.section) {
+            case 0:
+                view.imageView.image = [UIImage imageNamed:@"icon_slide_sort"];
+                view.titleLabel.text = @"地区过滤";
+                break;
+            case 1:
+                view.imageView.image = [UIImage imageNamed:@"icon_slide_people"];
+                view.titleLabel.text = @"菜品过滤";
+                break;
+            default:
+                break;
+        }
+        return view;
+    }
+    return nil;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
+                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    FilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FilterCollectionCell" forIndexPath:indexPath];
+    CGSize size = [self collectionView:collectionView layout:nil sizeForItemAtIndexPath:indexPath];
+    cell.titleButton.frame = CGRectMake(0, 0, size.width, size.height);
+    NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
+    [cell.titleButton setTitle:text forState:UIControlStateNormal];
+    [cell.titleButton setTitle:text forState:UIControlStateSelected];
+    cell.titleButton.selected = [self.filterParamsTool.filterParamsArray[indexPath.section][indexPath.row] boolValue];
+    cell.titleButton.section = indexPath.section;
+    cell.titleButton.row = indexPath.row;
+    return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    FilterCollectionCell *cell =
+    (FilterCollectionCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    //button.selected是指button原来的状态
+    //是否修改要看,数组第一个值是否是0,默认是1
+    NSMutableArray *setting = self.filterParamsTool.filterParamsArray[indexPath.section];
+    if (indexPath.section == 0) {
+        [self clickedInFirstSection:indexPath withButton:cell.titleButton withsetting:setting];
+    } else if (indexPath.section == 1) {
+        [self clickedInSecondSection:indexPath withButton:cell.titleButton withSetting:setting];
+    }
+    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+}
+
+#pragma mark - 🔌 UICollectionViewDataSource Method
+
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     return [self.filterParamsTool.dataSources count];
@@ -261,7 +271,8 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     return 2;
 }
 
-#pragma mark - UICollectionViewDelegateLeftAlignedLayout
+#pragma mark - 🔌 UICollectionViewDelegateLeftAlignedLayout Method
+
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath

@@ -8,10 +8,12 @@
 //  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //
 
-#import "CYLMainViewController.h"
+//View Controllers
 #import "CYLMultipleFilterController.h"
-#import "AppDelegate.h"
+#import "CYLMainViewController.h"
+//Others
 #import "CYLFilterParamsTool.h"
+#import "AppDelegate.h"
 
 @interface CYLMainViewController ()<FilterControllerDelegate>
 
@@ -21,6 +23,8 @@
 @end
 
 @implementation CYLMainViewController
+
+#pragma mark - 💤 LazyLoad Method
 
 /**
  *  懒加载filterController
@@ -36,7 +40,7 @@
     return _filterController;
 }
 /**
- *  懒加载_filterParamsTool
+ *  lazy load _filterParamsTool
  *
  *  @return CYLFilterParamsTool
  */
@@ -49,23 +53,18 @@
     return _filterParamsTool;
 }
 
+#pragma mark - ♻️ LifeCycle Method
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initLeftBarButtonItem];
     [self initWithRightNavItem];
-    
 }
+
 - (void)initWithRightNavItem {
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithImage:nil style:UIBarButtonItemStylePlain target:self action:@selector(rightBarButtonClicked:)];
     item.title = @"重置筛选条件";
     self.navigationItem.rightBarButtonItem = item;
-}
-
-- (void)rightBarButtonClicked:(id)sender {
-    self.filterParamsTool = [[CYLFilterParamsTool alloc] init];
-    [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
-    [self initLeftBarButtonItem];
-    [self filterControllerDidCompleted:nil];
 }
 
 /**
@@ -91,6 +90,15 @@
     self.navigationItem.leftBarButtonItem = item;
 }
 
+#pragma mark - 🎬 Actions Method
+
+- (void)rightBarButtonClicked:(id)sender {
+    self.filterParamsTool = [[CYLFilterParamsTool alloc] init];
+    [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
+    [self initLeftBarButtonItem];
+    [self filterControllerDidCompleted:nil];
+}
+
 - (void)leftBarButtonClicked:(id)sender
 {
     [_filterController refreshFilterParams];
@@ -98,7 +106,8 @@
     [self.filterController showInView:delegate.navigationController.view];
 }
 
-#pragma mark - FilterControllerDelegate
+#pragma mark - 🔌 FilterControllerDelegate Method
+
 - (void)filterControllerDidCompleted:(FilterBaseController *)controller
 {
     self.filterParamsTool = nil;

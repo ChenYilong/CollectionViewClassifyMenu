@@ -21,6 +21,8 @@
 
 @implementation FilterBaseController
 
+#pragma mark - ♻️ LifeCycle Method
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -53,11 +55,7 @@
     [_contentView setTarget:self action:@selector(hide)];
 }
 
-
-- (void)itemButtonClicked:(CYLIndexPathButton *)button
-{
-    
-}
+#pragma mark - 🔌 UICollectionViewDelegateFlowLayout Method
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
 {
@@ -67,6 +65,13 @@
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
 {
     return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
+}
+
+#pragma mark - 🎬 Actions Method
+
+- (void)itemButtonClicked:(CYLIndexPathButton *)button
+{
+    
 }
 
 - (IBAction)confirmButtonClicked:(id)sender

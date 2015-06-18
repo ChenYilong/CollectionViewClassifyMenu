@@ -19,6 +19,7 @@ static float const kImageToTextMargin = 7;
     }
     return self;
 }
+
 - (id)initWithCoder: (NSCoder *)aDecoder {
     self = [super initWithCoder: aDecoder];
     if (self) {
@@ -26,6 +27,7 @@ static float const kImageToTextMargin = 7;
     }
     return self;
 }
+
 - (id)sharedInit {
     [self setTitle:@"更多" forState:UIControlStateNormal];
     [self setTitle:@"收起" forState:UIControlStateSelected];
@@ -39,6 +41,7 @@ static float const kImageToTextMargin = 7;
     self.imageEdgeInsets = UIEdgeInsetsMake(0, self.titleLabel.frame.size.width, 0, -self.titleLabel.frame.size.width);
     return self;
 }
+
 -(void)setHighlighted:(BOOL)highlighted {}
 
 @end

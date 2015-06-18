@@ -29,6 +29,7 @@ float const CYLFilterHeaderViewHeigt = 38;
     }
     return self;
 }
+
 - (id)initWithCoder: (NSCoder *)aDecoder {
     self = [super initWithCoder: aDecoder];
     if (self) {
