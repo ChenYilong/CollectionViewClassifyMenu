@@ -10,7 +10,14 @@
 Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 
 
+然并卵？
+请看以下应用场景：
 
+场景一：
+分类菜单：比如脉脉
+![enter image description here](https://i.imgur.com/3myM91J.gif)
+场景二：筛选条件：比如手机淘宝
+![enter image description here](https://i.imgur.com/joaU3Bf.gif)
 
 ##Demo中具有两种样式
 

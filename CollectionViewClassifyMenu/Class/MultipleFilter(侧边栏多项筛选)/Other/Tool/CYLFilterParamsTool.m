@@ -39,7 +39,6 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
     return self;
 }
 
-
 /**
  *  lazy load _filterParamsDictionary
  *
