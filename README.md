@@ -14,9 +14,9 @@ Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 请看以下应用场景：
 
 场景一：
-分类菜单：比如脉脉
+分类菜单：比如《脉脉App》中的搜索分类筛选
 ![enter image description here](https://i.imgur.com/3myM91J.gif)
-场景二：筛选条件：比如手机淘宝
+场景二：筛选条件，如果数目过多，可以折叠，：比如《手机淘宝App》中商品的评价筛选
 ![enter image description here](https://i.imgur.com/joaU3Bf.gif)
 
 ##Demo中具有两种样式
