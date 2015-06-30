@@ -243,11 +243,7 @@ FilterHeaderViewDelegate
                                         //如果cell宽度或者cell宽度加上间距超过collectionView的contentView宽度，则将cell自成一行
                                         [widthArray addObject:@(contentViewWidth)];
                                     } else {
-                                        //                                        if (obj != [weakSymptoms lastObject]) {
-                                        //                                            [widthArray addObject:@(cellWidthAndRightMargin+kCollectionViewCellsHorizonMargin)];
-                                        //                                        } else {
                                         [widthArray addObject:@(cellWidthAndRightMargin)];
-                                        //                                        }
                                     }
                                 }];
                     }
@@ -303,7 +299,8 @@ FilterHeaderViewDelegate
             [widthArray  addObject:@(cellWidthAndRightMargin)];
             NSArray *sumArray = [NSArray arrayWithArray:widthArray];
             NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
-            //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：https://i.imgur.com/6yFPQ8U.gif
+            //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：
+            //⓵https://i.imgur.com/6yFPQ8U.gif ⓶https://i.imgur.com/XzfNVda.png
             CGFloat firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
             if ((firstRowWidth <= contentViewWidth)) {
                 firstLineCellCount++;
