@@ -120,6 +120,18 @@
               {
               "Food_Name": "东北菜",
               "Picture":"Picture"
+              },
+              {
+              "Food_Name": "河南菜",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "四川菜",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "台湾菜",
+              "Picture":"Picture"
               }
               ]
  },

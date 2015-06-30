@@ -49,6 +49,7 @@ FilterHeaderViewDelegate
 @property (nonatomic, strong) NSMutableArray   *expandSectionArray;
 @property (nonatomic, strong) UIScrollView     *backgroundView;
 @property (nonatomic, strong) UILabel          *titleLabel;
+@property (nonatomic, strong) UISwitch         *showLineSwitch;
 
 @end
 
@@ -103,11 +104,11 @@ FilterHeaderViewDelegate
     [self initData];
     [self addCollectionView];
     [self judgeMoreBtnShow];
-    // 如果想显示两行，请打开下面两行代码
-//    [self judgeMoreBtnShowWhenShowTwoRows];
-//    [self initDefaultShowCellCount];
     [self.backgroundView addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
+    //如果想显示两行，请打开下面两行代码,(这两行代码必须在“[self addTableHeaderView]”之后)
+//    self.showLineSwitch.on = YES;
+//    [self showLineSwitchClicked:self.showLineSwitch];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
@@ -192,7 +193,7 @@ FilterHeaderViewDelegate
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
                 
-                if ([sum intValue] <= contentViewWidth) {
+                if ([sum floatValue] <= contentViewWidth) {
                     firstLineCellCount++;
                 }
             }];
@@ -203,7 +204,7 @@ FilterHeaderViewDelegate
         }
     }];
     [firstLineWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj intValue] > contentViewWidth) {
+        if ([obj floatValue] > contentViewWidth) {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
         } else {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];        }
@@ -229,7 +230,7 @@ FilterHeaderViewDelegate
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                if ([sum intValue] <= contentViewWidth) {
+                if ([sum floatValue] <= contentViewWidth) {
                     //未超过一行
                 } else {
                     //超过一行时
@@ -259,7 +260,7 @@ FilterHeaderViewDelegate
         }
     }];
     [twoRowsWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj intValue] > contentViewWidth) {
+        if ([obj floatValue] > contentViewWidth) {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
         } else {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
@@ -302,7 +303,9 @@ FilterHeaderViewDelegate
             [widthArray  addObject:@(cellWidthAndRightMargin)];
             NSArray *sumArray = [NSArray arrayWithArray:widthArray];
             NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
-            if (([sum intValue] < contentViewWidth) || ([sum intValue] == contentViewWidth)) {
+            //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：https://i.imgur.com/6yFPQ8U.gif
+            CGFloat firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
+            if ((firstRowWidth <= contentViewWidth)) {
                 firstLineCellCount++;
             }
         }
@@ -358,6 +361,7 @@ FilterHeaderViewDelegate
                                       25, 30, 20);
     [tableHeaderView addSubview:showLineSwitch];
     [showLineSwitch addTarget:self action:@selector(showLineSwitchClicked:) forControlEvents:UIControlEventAllEvents];
+    self.showLineSwitch = showLineSwitch;
     UILabel *subtitleLabel = [[UILabel alloc] init];
     subtitleLabel.frame = CGRectMake(titleLabel.frame.origin.x,
                                      CGRectGetMaxY(titleLabel.frame) + 10,
