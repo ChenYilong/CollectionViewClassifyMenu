@@ -104,8 +104,8 @@ FilterHeaderViewDelegate
     [self addCollectionView];
     [self judgeMoreBtnShow];
     // 如果想显示两行，请打开下面两行代码
-    [self judgeMoreBtnShowWhenShowTwoRows];
-    [self initDefaultShowCellCount];
+//    [self judgeMoreBtnShowWhenShowTwoRows];
+//    [self initDefaultShowCellCount];
     [self.backgroundView addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
 }
@@ -397,7 +397,7 @@ FilterHeaderViewDelegate
     [self.collectionView.collectionViewLayout prepareLayout];
     //仅修改self.collectionView的高度,xyw值不变
     self.collectionView.frame = CGRectMake(CGRectGetMinX(self.collectionView.frame),
-                                           CGRectGetMidY(self.collectionView.frame),
+                                           CGRectGetMinY(self.collectionView.frame),
                                            CGRectGetWidth(self.collectionView.frame),
                                            self.collectionView.contentSize.height +
                                            kCollectionViewToTopMargin +
