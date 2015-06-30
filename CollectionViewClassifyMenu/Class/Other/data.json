@@ -1,147 +1,147 @@
- [
-  {
-  "Type": "主食",
-  "Symptoms": [
-               {
-               "Food_Name": "炒饭",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "煲仔饭",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "盖浇饭",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "焗饭",
-               },
-               {
-               "Food_Name": "烩饭",
-               },
-               {
-               "Food_Name": "焖饭",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "粥",
-               },
-               {
-               "Food_Name": "寿司",
-               },
-               {
-               "Food_Name": "饼",
-               }
-               ,
-               {
-               "Food_Name": "炒饼",
-               },
-               {
-               "Food_Name": "意大利面",
-               },
-               {
-               "Food_Name": "披萨",
-               },
-               {
-               "Food_Name": "面条",
-               },
-               {
-               "Food_Name": "炒面",
-               },
-               {
-               "Food_Name": "焖面",
-               },
-               {
-               "Food_Name": "凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面",
-               }
-               ]
-  },
-  {
-  "Type": "烘焙",
-  "Symptoms": [
-               {
-               "Food_Name": "面包",
-               },
-               {
-               "Food_Name": "饼干",
-               },
-               {
-               "Food_Name": "戚风蛋糕",
-               },
-               {
-               "Food_Name": "泡芙",
-               },
-               {
-               "Food_Name": "蛋糕卷",
-               },
-               {
-               "Food_Name": "杯子蛋糕",
-               },
-               {
-               "Food_Name": "芝士蛋糕",
-               },
-               {
-               "Food_Name": "马芬",
-               },
-               {
-               "Food_Name": "曲奇",
-               },
-               {
-               "Food_Name": "吐司",
-               },
-               {
-               "Food_Name": "海绵蛋糕",
-               },
-               {
-               "Food_Name": "慕斯蛋糕",
-               },
-               {
-               "Food_Name": "奶油蛋糕",
-               },
-               {
-               "Food_Name": "磅蛋糕",
-               }
-               ]
-  },
-  {
-  "Type": "菜系",
-  "Symptoms": [
-               {
-               "Food_Name": "湘菜",
-               },
-               {
-               "Food_Name": "粤菜",
-               },
-               {
-               "Food_Name": "鲁菜",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "东北菜",
-               "Picture":"Picture"
-               }
-               ]
-  },
-  {
-  "Type": "厨房工具",
-  "Symptoms": [
-               {
-               "Food_Name": "烤箱食谱",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "面包机食谱",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "电饭煲美食",
-               "Picture":"Picture"
-               },
-               {
-               "Food_Name": "豆浆机食谱",
-               "Picture":"Picture"
-               }
-               ]
-  }
-  ]
+[
+ {
+ "Type": "主食",
+ "Symptoms": [
+              {
+              "Food_Name": "炒饭",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "煲仔饭",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "盖浇饭",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "焗饭",
+              },
+              {
+              "Food_Name": "烩饭",
+              },
+              {
+              "Food_Name": "焖饭",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "粥",
+              },
+              {
+              "Food_Name": "寿司",
+              },
+              {
+              "Food_Name": "饼",
+              }
+              ,
+              {
+              "Food_Name": "炒饼",
+              },
+              {
+              "Food_Name": "意大利面",
+              },
+              {
+              "Food_Name": "披萨",
+              },
+              {
+              "Food_Name": "面条",
+              },
+              {
+              "Food_Name": "炒面",
+              },
+              {
+              "Food_Name": "焖面",
+              },
+              {
+              "Food_Name": "凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面",
+              }
+              ]
+ },
+ {
+ "Type": "烘焙",
+ "Symptoms": [
+              {
+              "Food_Name": "面包",
+              },
+              {
+              "Food_Name": "饼干",
+              },
+              {
+              "Food_Name": "戚风蛋糕",
+              },
+              {
+              "Food_Name": "泡芙",
+              },
+              {
+              "Food_Name": "蛋糕卷",
+              },
+              {
+              "Food_Name": "杯子蛋糕",
+              },
+              {
+              "Food_Name": "芝士蛋糕",
+              },
+              {
+              "Food_Name": "马芬",
+              },
+              {
+              "Food_Name": "曲奇",
+              },
+              {
+              "Food_Name": "吐司",
+              },
+              {
+              "Food_Name": "海绵蛋糕",
+              },
+              {
+              "Food_Name": "慕斯蛋糕",
+              },
+              {
+              "Food_Name": "奶油蛋糕",
+              },
+              {
+              "Food_Name": "磅蛋糕",
+              }
+              ]
+ },
+ {
+ "Type": "菜系",
+ "Symptoms": [
+              {
+              "Food_Name": "湘菜",
+              },
+              {
+              "Food_Name": "粤菜",
+              },
+              {
+              "Food_Name": "鲁菜",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "东北菜",
+              "Picture":"Picture"
+              }
+              ]
+ },
+ {
+ "Type": "厨房工具",
+ "Symptoms": [
+              {
+              "Food_Name": "烤箱食谱",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "面包机食谱",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "电饭煲美食",
+              "Picture":"Picture"
+              },
+              {
+              "Food_Name": "豆浆机食谱",
+              "Picture":"Picture"
+              }
+              ]
+ }
+ ]

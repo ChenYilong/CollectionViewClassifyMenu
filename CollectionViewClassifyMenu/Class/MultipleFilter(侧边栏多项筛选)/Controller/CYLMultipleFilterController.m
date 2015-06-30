@@ -150,7 +150,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
         // 点击的是“全部”按钮
         [setting replaceObjectAtIndex:0 withObject:@1];
         [setting replaceObjectAtIndex:1 withObject:@0];
-        NSMutableArray *array = self.filterParamsTool.dataSources[0];
+        NSMutableArray *array = [NSMutableArray arrayWithArray:self.filterParamsTool.dataSources[0]];
         [array replaceObjectAtIndex:1 withObject:@"请选择"];
         [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
         [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
