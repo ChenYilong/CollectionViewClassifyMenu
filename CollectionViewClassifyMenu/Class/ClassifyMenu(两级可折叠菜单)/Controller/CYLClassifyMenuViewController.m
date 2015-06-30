@@ -132,7 +132,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
         }];
         _cellsCountArrayPerRowInSections = (NSArray *)cellsCountArrayPerRowInSections;
     }
-    //    NSLog(@"%@",_cellsCountArrayPerRowInSections);
     return _cellsCountArrayPerRowInSections;
 }
 
@@ -241,7 +240,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
             } else {
                 //|break;| Stop enumerating ;if wanna continue use |return| to Skip this object
                 //http://t.cn/RAsfoAi
-                NSLog(@"第%@行是%@个",@(cellsCountArrayPerRowIdx),@(sum));
                 *stop = YES;
                 return;
             }
