@@ -103,12 +103,12 @@ FilterHeaderViewDelegate
     
     [self initData];
     [self addCollectionView];
-    [self judgeMoreBtnShow];
+    [self judgeMoreButtonShow];
     [self.backgroundView addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
     //如果想显示两行，请打开下面两行代码,(这两行代码必须在“[self addTableHeaderView]”之后)
-//    self.showLineSwitch.on = YES;
-//    [self showLineSwitchClicked:self.showLineSwitch];
+    //    self.showLineSwitch.on = YES;
+    //    [self showLineSwitchClicked:self.showLineSwitch];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
@@ -149,31 +149,44 @@ FilterHeaderViewDelegate
     return cellWidth;
 }
 
-- (float)textAndImageWidth:(NSString *)text
-                   content:(id)obj
-                     array:(NSArray *)array {
+/*
+ 分行规则：cell与cell之间必须有大小为kCollectionViewCellsHorizonMargin的间距，左右可以没有间距。
+ ＝》》一旦cell+kCollectionViewCellsHorizonMargin超过contentViewWidth，则肯定要分行。cell超过contentViewWidth也会分行。两者的区别在于cell的宽度，前者还是自身宽度，但后者已经变成了contentViewWidth的宽度。
+ */
+- (float)textImageWidthAndRightMargin:(NSString *)text
+                              content:(id)obj
+                                array:(NSArray *)array {
     CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
     __block float cellWidth = [self collectionCellWidthText:text content:obj];
     __block float cellWidthAndRightMargin;
-    [self cellLimitWidth:cellWidth
-             limitMargin:kCollectionViewCellsHorizonMargin
-            isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
-                cellWidth = [data floatValue];
-                if (yesORNo == YES) {
-                    cellWidthAndRightMargin = contentViewWidth;
-                } else {
-                    if (obj == [array lastObject]) {
-                        cellWidthAndRightMargin = cellWidth;
-                    } else {
-                        cellWidthAndRightMargin = cellWidth + kCollectionViewCellsHorizonMargin;
-                    }
-                }
-            }];
+    
+    if(cellWidth == contentViewWidth) {
+        cellWidthAndRightMargin = contentViewWidth;
+    } else {
+        if (obj == [array lastObject]) {
+            cellWidthAndRightMargin = cellWidth;
+        } else {
+            [self cellLimitWidth:cellWidth
+                     limitMargin:kCollectionViewCellsHorizonMargin
+                    isLimitWidth:^(BOOL isLimitWidth, NSNumber *data) {
+                        if (isLimitWidth) {
+                            //当cell和kCollectionViewCellsHorizonMargin总和大于contentViewWidth，
+                            //但是cell却小于contentViewWidth时，还是占一行。
+                            cellWidthAndRightMargin = contentViewWidth;
+                        } else {
+                            //这个地方只是大概的估计下，他不能判断出当加上下一个cell的cellWidthAndRightMargin大于contentViewWidth时，
+                            //cellWidthAndRightMargin右侧剩余的部分
+                            //所以必须在后续判断与下个一cell的cellWidthAndRightMargin的和超出contentViewWidth时的情况
+                            cellWidthAndRightMargin = cellWidth + kCollectionViewCellsHorizonMargin;
+                        }
+                    }];
+        }
+    }
     return cellWidthAndRightMargin;
 }
 
-- (void)judgeMoreBtnShow {
-    CGFloat contentViewWidth = self.collectionView.frame.size.width -
+- (void)judgeMoreButtonShow {
+    CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) -
     kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
     NSMutableArray *firstLineWidthArray = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
@@ -186,9 +199,9 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf textAndImageWidth:text
-                                                                      content:obj
-                                                                        array:weakSymptoms];
+                float cellWidthAndRightMargin = [strongSelf textImageWidthAndRightMargin:text
+                                                                                 content:obj
+                                                                                   array:weakSymptoms];
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
@@ -211,7 +224,7 @@ FilterHeaderViewDelegate
     }];
 }
 
-- (void)judgeMoreBtnShowWhenShowTwoRows {
+- (void)judgeMoreButtonShowWhenShowTwoRows {
     CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
     NSMutableArray *twoRowsWidthArray = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
@@ -224,9 +237,9 @@ FilterHeaderViewDelegate
             __weak __typeof(symptoms) weakSymptoms = symptoms;
             [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf textAndImageWidth:text
-                                                                      content:obj
-                                                                        array:weakSymptoms];
+                float cellWidthAndRightMargin = [strongSelf textImageWidthAndRightMargin:text
+                                                                                 content:obj
+                                                                                   array:weakSymptoms];
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
@@ -236,16 +249,7 @@ FilterHeaderViewDelegate
                     //超过一行时
                     if(countTime == 0) {
                         [widthArray removeAllObjects];
-                        [self cellLimitWidth:cellWidthAndRightMargin
-                                 limitMargin:kCollectionViewCellsHorizonMargin
-                                isLimitWidth:^(BOOL yesORNo, NSNumber *data) {
-                                    if (yesORNo == YES) {
-                                        //如果cell宽度或者cell宽度加上间距超过collectionView的contentView宽度，则将cell自成一行
-                                        [widthArray addObject:@(contentViewWidth)];
-                                    } else {
-                                        [widthArray addObject:@(cellWidthAndRightMargin)];
-                                    }
-                                }];
+                        [widthArray addObject:@(cellWidthAndRightMargin)];
                     }
                     countTime++;
                 }
@@ -293,9 +297,9 @@ FilterHeaderViewDelegate
     [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         @autoreleasepool {
             NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-            float cellWidthAndRightMargin = [self textAndImageWidth:text
-                                                            content:obj
-                                                              array:weakArray];
+            float cellWidthAndRightMargin = [self textImageWidthAndRightMargin:text
+                                                                       content:obj
+                                                                         array:weakArray];
             [widthArray  addObject:@(cellWidthAndRightMargin)];
             NSArray *sumArray = [NSArray arrayWithArray:widthArray];
             NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
@@ -332,7 +336,7 @@ FilterHeaderViewDelegate
 {
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
     tableHeaderView.backgroundColor = [UIColor whiteColor];
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, tableHeaderView.frame.size.width, 20)];
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, CGRectGetWidth(tableHeaderView.frame), 20)];
     self.titleLabel = titleLabel;
     titleLabel.font = [UIFont boldSystemFontOfSize:18];
     titleLabel.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
@@ -360,7 +364,7 @@ FilterHeaderViewDelegate
     [showLineSwitch addTarget:self action:@selector(showLineSwitchClicked:) forControlEvents:UIControlEventAllEvents];
     self.showLineSwitch = showLineSwitch;
     UILabel *subtitleLabel = [[UILabel alloc] init];
-    subtitleLabel.frame = CGRectMake(titleLabel.frame.origin.x,
+    subtitleLabel.frame = CGRectMake(CGRectGetMinX(titleLabel.frame),
                                      CGRectGetMaxY(titleLabel.frame) + 10,
                                      [UIScreen mainScreen].bounds.size.width,
                                      14
@@ -413,11 +417,11 @@ FilterHeaderViewDelegate
 
 - (void)showLineSwitchClicked:(UISwitch *)sender {
     [self initData];
-    [self judgeMoreBtnShow];
+    [self judgeMoreButtonShow];
     NSString *title;
     if(sender.isOn) {
         title = @"默认显示两行时的效果如下所示:";
-        [self judgeMoreBtnShowWhenShowTwoRows];
+        [self judgeMoreButtonShowWhenShowTwoRows];
         [self initDefaultShowCellCount];
     } else {
         title = @"默认显示一行时的效果如下所示:";
@@ -473,7 +477,7 @@ FilterHeaderViewDelegate
     CollectionViewCell *cell =
     (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier
                                                                     forIndexPath:indexPath];
-    cell.button.frame = CGRectMake(0, 0, cell.frame.size.width, cell.frame.size.height);
+    cell.button.frame = CGRectMake(0, 0, CGRectGetWidth(cell.frame), CGRectGetHeight(cell.frame));
     NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
                                                                objectForKey:kDataSourceSectionKey]];
     NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
