@@ -38,13 +38,14 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSArray          *dataSource;
 @property (nonatomic, assign) float            priorCellY;
-@property (nonatomic, assign) NSUInteger       rowLine;
 @property (nonatomic, strong) NSMutableArray   *collectionHeaderMoreBtnHideBoolArray;
 @property (nonatomic, strong) NSMutableArray   *firstRowCellCountArray;
 @property (nonatomic, strong) NSMutableArray   *expandSectionArray;
 @property (nonatomic, strong) UIScrollView     *backgroundView;
 @property (nonatomic, strong) UILabel          *titleLabel;
 @property (nonatomic, strong) UISwitch         *rowsCountBydefaultSwitch;
+@property (nonatomic, strong) NSArray          *rowsCountPerSection;
+@property (nonatomic, strong) NSArray          *cellsCountArrayPerRowInSections;
 
 @end
 
@@ -68,7 +69,16 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 - (NSMutableArray *)firstRowCellCountArray
 {
     if (_firstRowCellCountArray == nil) {
-        _firstRowCellCountArray = [[NSMutableArray alloc] init];
+        _firstRowCellCountArray = [NSMutableArray arrayWithCapacity:self.dataSource.count];
+        __weak __typeof(self) weakSelf = self;
+        [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            __strong typeof(self) strongSelf = weakSelf;
+            @autoreleasepool {
+                NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+                NSUInteger secondRowCellCount = [self firstRowCellCountWithArray:symptoms];
+                [strongSelf.firstRowCellCountArray addObject:@(secondRowCellCount)];
+            }
+        }];
     }
     return _firstRowCellCountArray;
 }
@@ -79,6 +89,51 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
         _expandSectionArray = [[NSMutableArray alloc] init];
     }
     return _expandSectionArray;
+}
+
+/**
+ *  lazy load _rowsCountPerSection
+ *
+ *  @return NSArray
+ */
+- (NSArray *)rowsCountPerSection
+{
+    if (_rowsCountPerSection == nil) {
+        _rowsCountPerSection = [[NSArray alloc] init];
+        NSMutableArray *rowsCountPerSection = [NSMutableArray array];
+        [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            @autoreleasepool {
+                NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+                NSUInteger secondRowCellCount = [[self cellsInPerRowWhenLayoutWithArray:symptoms] count];
+                [rowsCountPerSection addObject:@(secondRowCellCount)];
+            }
+        }];
+        _rowsCountPerSection = (NSArray *)rowsCountPerSection;
+    }
+    return _rowsCountPerSection;
+}
+
+/**
+ *  lazy load _cellsCountArrayPerRowInSections
+ *
+ *  @return NSArray
+ */
+- (NSArray *)cellsCountArrayPerRowInSections
+{
+    if (_cellsCountArrayPerRowInSections == nil) {
+        _cellsCountArrayPerRowInSections = [[NSArray alloc] init];
+        NSMutableArray *cellsCountArrayPerRowInSections = [NSMutableArray array];
+        [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            @autoreleasepool {
+                NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+                NSArray *cellsInPerRowWhenLayoutWithArray = [self cellsInPerRowWhenLayoutWithArray:symptoms];
+                [cellsCountArrayPerRowInSections addObject:cellsInPerRowWhenLayoutWithArray];
+            }
+        }];
+        _cellsCountArrayPerRowInSections = (NSArray *)cellsCountArrayPerRowInSections;
+    }
+    //    NSLog(@"%@",_cellsCountArrayPerRowInSections);
+    return _cellsCountArrayPerRowInSections;
 }
 
 #pragma mark - ♻️ LifeCycle Method
@@ -98,15 +153,15 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     
     [self initData];
     [self addCollectionView];
-    [self judgeMoreButtonShow];
+    [self judgeMoreButtonShowWhenDefaultRowsCount:1];
     [self.backgroundView addSubview:[self addTableHeaderView]];
     self.view.backgroundColor = [UIColor blueColor];
     //如果想显示两行，请打开下面两行代码,(这两行代码必须在“[self addTableHeaderView]”之后)
-    //    self.rowsCountBydefaultSwitch.on = YES;
-    //    [self rowsCountBydefaultSwitchClicked:self.rowsCountBydefaultSwitch];
+    //        self.rowsCountBydefaultSwitch.on = YES;
+    //        [self rowsCountBydefaultSwitchClicked:self.rowsCountBydefaultSwitch];
 }
 
--(void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     self.backgroundView.scrollEnabled = YES;
     [self updateViewHeight];
@@ -114,20 +169,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 #pragma mark - 🆑 CYL Custom Method
 
-- (void)initDefaultShowCellCount {
-    for (NSUInteger index = 0; index < self.firstRowCellCountArray.count; index++) {
-        NSArray *secondRowCellCountArray = [NSArray arrayWithArray:[self secondRowCellCount]];
-        NSNumber *object = @([self.firstRowCellCountArray[index] integerValue] +
-        [secondRowCellCountArray[index] integerValue]);
-        [self.firstRowCellCountArray replaceObjectAtIndex:index
-                                                withObject:object];
-    }
-}
-
 - (void)initData {
     self.firstRowCellCountArray = nil;
     self.collectionHeaderMoreBtnHideBoolArray = nil;
-    self.rowLine = 0;
     self.dataSource = [NSArray arrayWithArray:[CYLDBManager dataSource]];
 }
 
@@ -180,106 +224,30 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     return cellWidthAndRightMargin;
 }
 
-- (void)judgeMoreButtonShow {
-    CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) -
-    kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
-    NSMutableArray *firstRowWidthArray = [NSMutableArray array];
-    __weak __typeof(self) weakSelf = self;
-    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        __strong typeof(self) strongSelf = weakSelf;
-        __block NSUInteger firstRowCellCount = 0;
-        @autoreleasepool {
-            NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
-            NSMutableArray *widthArray = [NSMutableArray array];
-            __weak __typeof(symptoms) weakSymptoms = symptoms;
-            [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf textImageWidthAndRightMargin:text
-                                                                                 content:obj
-                                                                                   array:weakSymptoms];
-                [widthArray  addObject:@(cellWidthAndRightMargin)];
-                NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-                NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                if ([sum floatValue] <= contentViewWidth) {
-                    firstRowCellCount++;
-                }
-            }];
-            [strongSelf.firstRowCellCountArray addObject:@(firstRowCellCount)];
-            NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-            NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-            [firstRowWidthArray addObject:sum];
-        }
-    }];
-    [firstRowWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj floatValue] > contentViewWidth) {
+- (void)judgeMoreButtonShowWhenDefaultRowsCount:(NSUInteger)defaultRowsCount {
+    [self.rowsCountPerSection enumerateObjectsUsingBlock:^(id  __nonnull obj, NSUInteger idx, BOOL * __nonnull stop) {
+        if ([obj integerValue] > defaultRowsCount) {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
         } else {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
         }
     }];
-}
-
-- (void)judgeMoreButtonShowWhenShowTwoRowsByDefault {
-    CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
-    NSMutableArray *twoRowsWidthArray = [NSMutableArray array];
-    __weak __typeof(self) weakSelf = self;
-    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        @autoreleasepool {
-            __strong typeof(self) strongSelf = weakSelf;
-            __block NSUInteger countTime = 0;
-            NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
-            NSMutableArray *widthArray = [NSMutableArray array];
-            __weak __typeof(symptoms) weakSymptoms = symptoms;
-            [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-                float cellWidthAndRightMargin = [strongSelf textImageWidthAndRightMargin:text
-                                                                                 content:obj
-                                                                                   array:weakSymptoms];
-                [widthArray  addObject:@(cellWidthAndRightMargin)];
-                NSMutableArray *sumArray = [NSMutableArray arrayWithArray:widthArray];
-                NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                if ([sum floatValue] > contentViewWidth) {
-                    //超过一行时
-                    if(countTime == 0) {
-                        [widthArray removeAllObjects];
-                        [widthArray addObject:@(cellWidthAndRightMargin)];
-                    }
-                    countTime++;
-                }
-            }];
-            NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-            NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-            [twoRowsWidthArray addObject:sum];
-        }
-    }];
-    [twoRowsWidthArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj floatValue] > contentViewWidth) {
-            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
-        } else {
-            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
-        }
-    }];
-}
-
--(NSArray *)secondRowCellCount {
-    NSMutableArray *secondRowCellCountArray = [NSMutableArray array];
-    __weak __typeof(self) weakSelf = self;
-    [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        @autoreleasepool {
-            __strong typeof(self) strongSelf = weakSelf;
-            NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-            float firstRowCount = [strongSelf firstRowCellCountWithArray:symptoms];
-            if (symptoms.count != firstRowCount) {
-                NSRange range = NSMakeRange(0, firstRowCount);
-                [symptoms removeObjectsInRange:range];
-                float secondRowCount = [strongSelf firstRowCellCountWithArray:symptoms];
-                [secondRowCellCountArray addObject:@(secondRowCount)];
+    
+    [self.cellsCountArrayPerRowInSections enumerateObjectsUsingBlock:^(id  __nonnull cellsCountArrayPerRow, NSUInteger idx, BOOL * __nonnull stop) {
+        NSUInteger __block sum = 0;
+        [cellsCountArrayPerRow enumerateObjectsUsingBlock:^(NSNumber  __nonnull *cellsCount, NSUInteger cellsCountArrayPerRowIdx, BOOL * __nonnull stop) {
+            if (cellsCountArrayPerRowIdx < defaultRowsCount) {
+                sum += [cellsCount integerValue];
             } else {
-                [secondRowCellCountArray addObject:@(0)];
+                //|break;| Stop enumerating ;if wanna continue use |return| to Skip this object
+                //http://t.cn/RAsfoAi
+                NSLog(@"第%@行是%@个",@(cellsCountArrayPerRowIdx),@(sum));
+                *stop = YES;
+                return;
             }
-        }
+        }];
+        [self.firstRowCellCountArray replaceObjectAtIndex:idx withObject:@(sum)];
     }];
-    return (NSArray *)secondRowCellCountArray;
 }
 
 - (NSUInteger)firstRowCellCountWithArray:(NSArray *)array {
@@ -305,6 +273,27 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
         }
     }];
     return firstRowCellCount;
+}
+
+- (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSMutableArray *)array
+{
+    __block NSUInteger secondRowCellCount = 0;
+    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:array];
+    NSUInteger firstRowCount = [self firstRowCellCountWithArray:symptoms];
+    NSMutableArray *cellCount = [NSMutableArray arrayWithObject:@(firstRowCount)];
+    for (NSUInteger index = 0; index < [array count]; index++) {
+        NSUInteger firstRowCount = [self firstRowCellCountWithArray:symptoms];
+        if (symptoms.count != firstRowCount) {
+            NSRange range = NSMakeRange(0, firstRowCount);
+            [symptoms removeObjectsInRange:range];
+            NSUInteger secondRowCount = [self firstRowCellCountWithArray:symptoms];
+            secondRowCellCount = secondRowCount;
+            [cellCount addObject:@(secondRowCount)];
+        } else {
+            return cellCount;
+        }
+    }
+    return cellCount;
 }
 
 - (float)collectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
@@ -352,7 +341,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
                                   );
     UISwitch *rowsCountBydefaultSwitch = [[UISwitch alloc] init];
     rowsCountBydefaultSwitch.frame = CGRectMake(CGRectGetMaxX(titleLabel.frame) + 10,
-                                      25, 30, 20);
+                                                25, 30, 20);
     [tableHeaderView addSubview:rowsCountBydefaultSwitch];
     [rowsCountBydefaultSwitch addTarget:self action:@selector(rowsCountBydefaultSwitchClicked:) forControlEvents:UIControlEventAllEvents];
     self.rowsCountBydefaultSwitch = rowsCountBydefaultSwitch;
@@ -472,12 +461,12 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 - (void)rowsCountBydefaultSwitchClicked:(UISwitch *)sender {
     [self initData];
-    [self judgeMoreButtonShow];
+    [self judgeMoreButtonShowWhenDefaultRowsCount:1];
+    
     NSString *title;
     if(sender.isOn) {
         title = @"默认显示两行时的效果如下所示:";
-        [self judgeMoreButtonShowWhenShowTwoRowsByDefault];
-        [self initDefaultShowCellCount];
+        [self judgeMoreButtonShowWhenDefaultRowsCount:2];
     } else {
         title = @"默认显示一行时的效果如下所示:";
     }
@@ -575,7 +564,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 #pragma mark - 🔌 FilterHeaderViewDelegateMethod Method
 
--(void)filterHeaderViewMoreBtnClicked:(UIButton *)sender {
+- (void)filterHeaderViewMoreBtnClicked:(UIButton *)sender {
     sender.selected = !sender.selected;
     if (sender.selected) {
         [self.expandSectionArray addObject:@(sender.tag)];
