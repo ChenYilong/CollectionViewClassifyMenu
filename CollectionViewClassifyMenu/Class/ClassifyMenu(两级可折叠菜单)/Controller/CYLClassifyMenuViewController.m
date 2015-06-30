@@ -33,12 +33,7 @@ static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
-@interface CYLClassifyMenuViewController ()
-<
-UICollectionViewDataSource,
-UICollectionViewDelegate,
-FilterHeaderViewDelegate
->
+@interface CYLClassifyMenuViewController () <UICollectionViewDataSource, UICollectionViewDelegate, FilterHeaderViewDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSArray          *dataSource;
@@ -205,7 +200,6 @@ FilterHeaderViewDelegate
                 [widthArray  addObject:@(cellWidthAndRightMargin)];
                 NSArray *sumArray = [NSArray arrayWithArray:widthArray];
                 NSNumber* sum = [sumArray valueForKeyPath: @"@sum.self"];
-                
                 if ([sum floatValue] <= contentViewWidth) {
                     firstLineCellCount++;
                 }
@@ -220,7 +214,8 @@ FilterHeaderViewDelegate
         if ([obj floatValue] > contentViewWidth) {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
         } else {
-            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];        }
+            [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@YES];
+        }
     }];
 }
 
@@ -415,33 +410,6 @@ FilterHeaderViewDelegate
                                                  64);
 }
 
-- (void)showLineSwitchClicked:(UISwitch *)sender {
-    [self initData];
-    [self judgeMoreButtonShow];
-    NSString *title;
-    if(sender.isOn) {
-        title = @"默认显示两行时的效果如下所示:";
-        [self judgeMoreButtonShowWhenShowTwoRows];
-        [self initDefaultShowCellCount];
-    } else {
-        title = @"默认显示一行时的效果如下所示:";
-    }
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
-    [text addAttribute:NSForegroundColorAttributeName
-                 value:[UIColor redColor]
-                 range:NSMakeRange(4, 2)];
-    self.titleLabel.attributedText = text;
-    [self.collectionView reloadData];
-    __weak __typeof(self) weakSelf = self;
-    [self.collectionView performBatchUpdates:^{
-        __strong typeof(self) strongSelf = weakSelf;
-        [strongSelf.collectionView reloadData];
-    } completion:^(BOOL finished) {
-        __strong typeof(self) strongSelf = weakSelf;
-        [strongSelf updateViewHeight];
-    }];
-}
-
 #pragma mark - 🔌 UICollectionViewDataSource Method
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
@@ -503,6 +471,33 @@ FilterHeaderViewDelegate
 }
 
 #pragma mark - 🎬 Actions Method
+
+- (void)showLineSwitchClicked:(UISwitch *)sender {
+    [self initData];
+    [self judgeMoreButtonShow];
+    NSString *title;
+    if(sender.isOn) {
+        title = @"默认显示两行时的效果如下所示:";
+        [self judgeMoreButtonShowWhenShowTwoRows];
+        [self initDefaultShowCellCount];
+    } else {
+        title = @"默认显示一行时的效果如下所示:";
+    }
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
+    [text addAttribute:NSForegroundColorAttributeName
+                 value:[UIColor redColor]
+                 range:NSMakeRange(4, 2)];
+    self.titleLabel.attributedText = text;
+    [self.collectionView reloadData];
+    __weak __typeof(self) weakSelf = self;
+    [self.collectionView performBatchUpdates:^{
+        __strong typeof(self) strongSelf = weakSelf;
+        [strongSelf.collectionView reloadData];
+    } completion:^(BOOL finished) {
+        __strong typeof(self) strongSelf = weakSelf;
+        [strongSelf updateViewHeight];
+    }];
+}
 
 - (void)itemButtonClicked:(CYLIndexPathButton *)button {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
