@@ -234,7 +234,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     
     [self.cellsCountArrayPerRowInSections enumerateObjectsUsingBlock:^(id  __nonnull cellsCountArrayPerRow, NSUInteger idx, BOOL * __nonnull stop) {
         NSUInteger __block sum = 0;
-        [cellsCountArrayPerRow enumerateObjectsUsingBlock:^(NSNumber  __nonnull *cellsCount, NSUInteger cellsCountArrayPerRowIdx, BOOL * __nonnull stop) {
+        [cellsCountArrayPerRow enumerateObjectsUsingBlock:^(NSNumber  * __nonnull cellsCount, NSUInteger cellsCountArrayPerRowIdx, BOOL * __nonnull stop) {
             if (cellsCountArrayPerRowIdx < defaultRowsCount) {
                 sum += [cellsCount integerValue];
             } else {
