@@ -1,5 +1,3 @@
-
-
 //
 //  CYLMainViewController.m
 //  CollectionViewClassifyMenu
@@ -102,7 +100,7 @@
 - (void)leftBarButtonClicked:(id)sender
 {
     [_filterController refreshFilterParams];
-    AppDelegate *delegate= (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     [self.filterController showInView:delegate.navigationController.view];
 }
 

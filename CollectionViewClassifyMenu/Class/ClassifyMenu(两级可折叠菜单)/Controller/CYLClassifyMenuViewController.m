@@ -57,10 +57,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 {
     if (_collectionHeaderMoreBtnHideBoolArray == nil) {
         _collectionHeaderMoreBtnHideBoolArray = [[NSMutableArray alloc] init];
-        __weak __typeof(self) weakSelf = self;
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            __strong typeof(self) strongSelf = weakSelf;
-            [strongSelf->_collectionHeaderMoreBtnHideBoolArray addObject:@YES];
+            [self.collectionHeaderMoreBtnHideBoolArray addObject:@YES];
         }];
     }
     return _collectionHeaderMoreBtnHideBoolArray;
@@ -70,14 +68,10 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 {
     if (_firstRowCellCountArray == nil) {
         _firstRowCellCountArray = [NSMutableArray arrayWithCapacity:self.dataSource.count];
-        __weak __typeof(self) weakSelf = self;
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            __strong typeof(self) strongSelf = weakSelf;
-            @autoreleasepool {
                 NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
                 NSUInteger secondRowCellCount = [self firstRowCellCountWithArray:symptoms];
-                [strongSelf.firstRowCellCountArray addObject:@(secondRowCellCount)];
-            }
+                [self.firstRowCellCountArray addObject:@(secondRowCellCount)];
         }];
     }
     return _firstRowCellCountArray;
@@ -102,11 +96,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
         _rowsCountPerSection = [[NSArray alloc] init];
         NSMutableArray *rowsCountPerSection = [NSMutableArray array];
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            @autoreleasepool {
                 NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
                 NSUInteger secondRowCellCount = [[self cellsInPerRowWhenLayoutWithArray:symptoms] count];
                 [rowsCountPerSection addObject:@(secondRowCellCount)];
-            }
         }];
         _rowsCountPerSection = (NSArray *)rowsCountPerSection;
     }
@@ -124,11 +116,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
         _cellsCountArrayPerRowInSections = [[NSArray alloc] init];
         NSMutableArray *cellsCountArrayPerRowInSections = [NSMutableArray array];
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            @autoreleasepool {
                 NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
                 NSArray *cellsInPerRowWhenLayoutWithArray = [self cellsInPerRowWhenLayoutWithArray:symptoms];
                 [cellsCountArrayPerRowInSections addObject:cellsInPerRowWhenLayoutWithArray];
-            }
         }];
         _cellsCountArrayPerRowInSections = (NSArray *)cellsCountArrayPerRowInSections;
     }
@@ -252,13 +242,11 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
     __block NSUInteger firstRowCellCount = 0;
     NSMutableArray *widthArray = [NSMutableArray array];
-    __weak __typeof(array) weakArray = array;
     [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        @autoreleasepool {
             NSString *text = [obj objectForKey:kDataSourceCellTextKey];
             float cellWidthAndRightMargin = [self textImageWidthAndRightMargin:text
                                                                        content:obj
-                                                                         array:weakArray];
+                                                                         array:array];
             [widthArray  addObject:@(cellWidthAndRightMargin)];
             NSArray *sumArray = [NSArray arrayWithArray:widthArray];
             NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
@@ -267,7 +255,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
             CGFloat firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
             if ((firstRowWidth <= contentViewWidth)) {
                 firstRowCellCount++;
-            }
         }
     }];
     return firstRowCellCount;

@@ -46,12 +46,10 @@ NSString *const kDataSourceCellPictureKey = @"Picture";
     dispatch_once(&allTagsOnceToken,^{
         allTags = [NSMutableArray array];
         [[[self class] dataSource] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            @autoreleasepool {
                 NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
                 [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                     [allTags addObject:[obj objectForKey:kDataSourceCellTextKey]];
                 }];
-            }
         }];
     });
     return allTags;

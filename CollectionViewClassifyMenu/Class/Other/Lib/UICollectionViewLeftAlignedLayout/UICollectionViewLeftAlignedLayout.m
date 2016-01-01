@@ -40,7 +40,14 @@
 #pragma mark -
 
 @implementation UICollectionViewLeftAlignedLayout
-
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+            self.sectionHeadersPinToVisibleBounds = YES;
+    }
+    return self;
+}
 #pragma mark - UICollectionViewLayout
 
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect {
