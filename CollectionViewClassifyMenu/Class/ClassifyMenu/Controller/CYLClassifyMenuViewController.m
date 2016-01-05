@@ -28,6 +28,7 @@ static float const kCellBtnCenterToBorderMargin               = 19;
 //Others
 #import "UICollectionViewLeftAlignedLayout.h"
 #import "CYLDBManager.h"
+#import "CYLParameterConfiguration.h"
 
 static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
@@ -124,7 +125,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"@iOS程序犭袁";
+    self.title = @"CYLTagView";
     self.backgroundView = [[UIScrollView alloc] initWithFrame:
                            CGRectMake(0, 0,
                                       [UIScreen mainScreen].bounds.size.width,
@@ -165,16 +166,27 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     float limitWidth = (CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin - limitMargin);
     if (cellWidth >= limitWidth) {
         cellWidth = limitWidth;
-        isLimitWidth?isLimitWidth(YES, @(cellWidth)) : nil;
+        isLimitWidth ? isLimitWidth(YES, @(cellWidth)) : nil;
         return cellWidth;
     }
-    isLimitWidth?isLimitWidth(NO, @(cellWidth)) : nil;
+    isLimitWidth ? isLimitWidth(NO, @(cellWidth)) : nil;
     return cellWidth;
 }
 
 /*
- 分行规则：cell与cell之间必须有大小为kCollectionViewCellsHorizonMargin的间距，左右可以没有间距。
- ＝》》一旦cell+kCollectionViewCellsHorizonMargin超过contentViewWidth，则肯定要分行。cell超过contentViewWidth也会分行。两者的区别在于cell的宽度，前者还是自身宽度，但后者已经变成了contentViewWidth的宽度。
+ 
+ @attention 特别注意：本方法已经对每个 section 的最后一个元素进行了考虑，不会加上右边的间隔。
+ 分行规则：
+ 
+ 1. cell与cell之间必须有大小为kCollectionViewCellsHorizonMargin的间距，
+ 2. 左右可以没有间距。
+ 
+ 那么有这样的规律：
+ 
+ 1. 一旦cell+kCollectionViewCellsHorizonMargin超过contentViewWidth，则肯定要分行。
+ 2. cell超过contentViewWidth也会分行。
+ 
+ 两者的区别在于cell的宽度，前者还是自身宽度，但后者已经变成了contentViewWidth的宽度。
  */
 - (float)textImageWidthAndRightMargin:(NSString *)text
                               content:(id)obj
@@ -243,9 +255,14 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         [widthArray  addObject:@(cellWidthAndRightMargin)];
         NSArray *sumArray = [NSArray arrayWithArray:widthArray];
         NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
-        //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：
-        //⓵https://i.imgur.com/6yFPQ8U.gif ⓶https://i.imgur.com/XzfNVda.png
-        CGFloat firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
+        CGFloat firstRowWidth;
+        if (obj == [array lastObject]) {
+            firstRowWidth = [sum floatValue];
+        } else {
+            //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：
+            //⓵https://i.imgur.com/6yFPQ8U.gif ⓶https://i.imgur.com/XzfNVda.png
+            firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
+        }
         if ((firstRowWidth <= contentViewWidth)) {
             firstRowCellCount++;
         }
@@ -277,7 +294,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     float cellWidth;
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
-                         [UIFont systemFontOfSize:16]}];
+                         CYLTagTitleFont}];
     NSString *picture = [content objectForKey:kDataSourceCellPictureKey];
     BOOL shouldShowPic = [@(picture.length) boolValue];
     if (shouldShowPic) {
@@ -297,7 +314,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, CGRectGetWidth(tableHeaderView.frame), 20)];
     self.titleLabel = titleLabel;
     titleLabel.font = [UIFont boldSystemFontOfSize:18];
-    titleLabel.textColor = [UIColor colorWithRed:0 green:150.0 / 255.0 blue:136.0 / 255.0 alpha:1.0];
+    titleLabel.textColor = CYLAppTintColor;
     NSString *title = @"默认显示一行时的效果如下所示:";
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
     [text addAttribute:NSForegroundColorAttributeName
@@ -407,7 +424,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
                                                                     forIndexPath:indexPath];
     cell.button.frame = CGRectMake(0, 0, CGRectGetWidth(cell.frame), CGRectGetHeight(cell.frame));
     NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
-                                                               objectForKey:kDataSourceSectionKey]];
+                                                            objectForKey:kDataSourceSectionKey]];
     NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
     if (shouldShowPic) {
@@ -469,7 +486,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     //二级菜单数组
     NSArray *items = [NSArray arrayWithArray:[self.dataSource[indexPath.section]
-                                                 objectForKey:kDataSourceSectionKey]];
+                                              objectForKey:kDataSourceSectionKey]];
     NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
     NSString *cellTitle = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
