@@ -9,7 +9,7 @@
 #import "CYLFilterHeaderView.h"
 
 static float const kTitleButtonWidth = 250.f;
-static float const kMoreButtonWidth  = 36*2;
+static float const kMoreButtonWidth  = 36 * 2;
 static float const kCureOfLineHight  = 0.5;
 static float const kCureOfLineOffX   = 16;
 
@@ -21,8 +21,7 @@ float const CYLFilterHeaderViewHeigt = 38;
 
 @implementation CYLFilterHeaderView
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         self = [self sharedInit];
@@ -30,8 +29,8 @@ float const CYLFilterHeaderViewHeigt = 38;
     return self;
 }
 
-- (id)initWithCoder: (NSCoder *)aDecoder {
-    self = [super initWithCoder: aDecoder];
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
     if (self) {
         self = [self sharedInit];
     }
@@ -39,8 +38,8 @@ float const CYLFilterHeaderViewHeigt = 38;
 }
 
 - (id)sharedInit {
-    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, [UIScreen mainScreen].bounds.size.width - 2*kCureOfLineOffX, kCureOfLineHight)];
-    cureOfLine.backgroundColor = [UIColor colorWithRed:188.0/255.0 green:188.0/255.0 blue:188.0/255.0 alpha:1.0];
+    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, [UIScreen mainScreen].bounds.size.width - 2 * kCureOfLineOffX, kCureOfLineHight)];
+    cureOfLine.backgroundColor = [UIColor colorWithRed:188.0 / 255.0 green:188.0 / 255.0 blue:188.0 / 255.0 alpha:1.0];
     [self addSubview:cureOfLine];
     self.backgroundColor = [UIColor whiteColor];
     //仅修改self.titleButton的宽度,xyh值不变

@@ -10,8 +10,8 @@
 
 @interface UIButton (CollectionCellStyle)
 
-- (void)generalStyle;
-- (void)homeStyle;
-- (void)redStyle;
+- (void)cyl_generalStyle;
+- (void)cyl_homeStyle;
+- (void)cyl_redStyle;
 
 @end

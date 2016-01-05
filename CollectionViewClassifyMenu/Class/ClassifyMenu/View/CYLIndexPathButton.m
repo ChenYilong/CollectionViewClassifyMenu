@@ -10,10 +10,4 @@
 
 @implementation CYLIndexPathButton
 
-/**
- *  重写高亮状态，让高亮状态不改变样式
- *
- */
-//-(void)setHighlighted:(BOOL)highlighted {}
-
 @end

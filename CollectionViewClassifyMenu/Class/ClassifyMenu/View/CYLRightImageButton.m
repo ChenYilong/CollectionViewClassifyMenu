@@ -11,8 +11,7 @@ static float const kImageToTextMargin = 7;
 
 @implementation CYLRightImageButton
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         self = [self sharedInit];
@@ -20,8 +19,8 @@ static float const kImageToTextMargin = 7;
     return self;
 }
 
-- (id)initWithCoder: (NSCoder *)aDecoder {
-    self = [super initWithCoder: aDecoder];
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
     if (self) {
         self = [self sharedInit];
     }
@@ -42,6 +41,6 @@ static float const kImageToTextMargin = 7;
     return self;
 }
 
--(void)setHighlighted:(BOOL)highlighted {}
+- (void)setHighlighted:(BOOL)highlighted {}
 
 @end

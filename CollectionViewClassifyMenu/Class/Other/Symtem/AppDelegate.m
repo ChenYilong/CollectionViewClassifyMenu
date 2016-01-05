@@ -19,15 +19,15 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     //work in application:didFinishLaunchingWithOptions
-    if([UINavigationBar conformsToProtocol:@protocol(UIAppearanceContainer)]) {
+    if ([UINavigationBar conformsToProtocol:@protocol(UIAppearanceContainer)]) {
         [UINavigationBar appearance].tintColor = [UIColor whiteColor];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor]}];
-        [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:(51)/255.f green:(171)/255.f blue:(160)/255.f alpha:1.f]];
+        [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:(51) / 255.f green:(171) / 255.f blue:(160) / 255.f alpha:1.f]];
         [[UINavigationBar appearance] setTranslucent:NO];
     }
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     CYLMainViewController *classifyMenuViewController = [[CYLMainViewController alloc] init];
-    self.navigationController= [[UINavigationController alloc] initWithRootViewController:classifyMenuViewController];
+    self.navigationController = [[UINavigationController alloc] initWithRootViewController:classifyMenuViewController];
     self.window.rootViewController = self.navigationController;
     [self.window addSubview:classifyMenuViewController.view];
     self.window.backgroundColor = [UIColor whiteColor];
@@ -36,13 +36,13 @@
     return YES;
 }
 
-- (void)initFilterSetting:(BOOL)restore
-{
+- (void)initFilterSetting:(BOOL)restore {
     if (!restore) {
         CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
         [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
     }
 }
+
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.

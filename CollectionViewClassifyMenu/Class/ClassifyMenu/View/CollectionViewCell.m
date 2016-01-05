@@ -11,8 +11,7 @@
 
 @implementation CollectionViewCell
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         [self setup];
@@ -20,8 +19,8 @@
     return self;
 }
 
-- (id)initWithCoder: (NSCoder *)aDecoder {
-    self = [super initWithCoder: aDecoder];
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
     if (self) {
         self = [self sharedInit];
     }
@@ -37,8 +36,8 @@
     self.button = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
     self.button.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
     [self.contentView addSubview:self.button];
-    [self.button generalStyle];
-    [self.button homeStyle];
+    [self.button cyl_generalStyle];
+    [self.button cyl_homeStyle];
 //    [self.button redStyle];
 }
 

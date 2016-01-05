@@ -1,6 +1,6 @@
 //
 //  UIImage+Blur.h
-//  http://cnblogs.com/ChenYilong/ 
+//  http://cnblogs.com/ChenYilong/
 //
 //  Created by  https://github.com/ChenYilong  on 14-7-17.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
@@ -11,8 +11,8 @@
 @interface UIImage (Blur)
 
 // 高斯模糊
-- (UIImage *)blurredImageWithRadius:(CGFloat)radius
-                         iterations:(NSUInteger)iterations
-                          tintColor:(UIColor *)tintColor;
+- (UIImage *)cyl_blurredImageWithRadius:(CGFloat)radius
+                             iterations:(NSUInteger)iterations
+                              tintColor:(UIColor *)tintColor;
 
 @end

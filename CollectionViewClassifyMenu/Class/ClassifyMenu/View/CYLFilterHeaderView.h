@@ -11,7 +11,7 @@
 @protocol FilterHeaderViewDelegate <NSObject>
 
 @required
--(void)filterHeaderViewMoreBtnClicked:(id)sender;
+- (void)filterHeaderViewMoreBtnClicked:(id)sender;
 
 @end
 

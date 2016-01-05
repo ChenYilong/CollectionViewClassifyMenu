@@ -1,6 +1,6 @@
 //
 //  UIImage+Blur.m
-//  http://cnblogs.com/ChenYilong/ 
+//  http://cnblogs.com/ChenYilong/
 //
 //  Created by  https://github.com/ChenYilong  on 14-7-17.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
@@ -11,14 +11,16 @@
 
 @implementation UIImage (Blur)
 
-- (UIImage *)blurredImageWithRadius:(CGFloat)radius iterations:(NSUInteger)iterations tintColor:(UIColor *)tintColor
-{
+- (UIImage *)cyl_blurredImageWithRadius:(CGFloat)radius iterations:(NSUInteger)iterations tintColor:(UIColor *)tintColor {
     //image must be nonzero size
-    if (floorf(self.size.width) * floorf(self.size.height) <= 0.0f) return self;
-    
+    if (floorf(self.size.width) * floorf(self.size.height) <= 0.0f) {
+        return self;
+    }
     //boxsize must be an odd integer
     uint32_t boxSize = (uint32_t)(radius * self.scale);
-    if (boxSize % 2 == 0) boxSize ++;
+    if (boxSize % 2 == 0) {
+        boxSize ++;
+    }
     
     //create image buffers
     CGImageRef imageRef = self.CGImage;
@@ -39,8 +41,7 @@
     memcpy(buffer1.data, CFDataGetBytePtr(dataSource), bytes);
     CFRelease(dataSource);
     
-    for (NSUInteger i = 0; i < iterations; i++)
-    {
+    for (NSUInteger i = 0; i < iterations; i++) {
         //perform blur
         vImageBoxConvolve_ARGB8888(&buffer1, &buffer2, tempBuffer, 0, 0, boxSize, boxSize, NULL, kvImageEdgeExtend);
         
@@ -60,8 +61,7 @@
                                              CGImageGetBitmapInfo(imageRef));
     
     //apply tint
-    if (tintColor && CGColorGetAlpha(tintColor.CGColor) > 0.0f)
-    {
+    if (tintColor && CGColorGetAlpha(tintColor.CGColor) > 0.0f) {
         CGContextSetFillColorWithColor(ctx, [tintColor colorWithAlphaComponent:0.25].CGColor);
         CGContextSetBlendMode(ctx, kCGBlendModePlusLighter);
         CGContextFillRect(ctx, CGRectMake(0, 0, buffer1.width, buffer1.height));

@@ -1,7 +1,7 @@
 
 //
 //  CYLFilterParamsTool.m
-//  http://cnblogs.com/ChenYilong/ 
+//  http://cnblogs.com/ChenYilong/
 //
 //  Created by https://github.com/ChenYilong on 15/4/22.
 //  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
@@ -19,16 +19,14 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
 //  Keyed Archiving
 //
 //===========================================================
-- (void)encodeWithCoder:(NSCoder *)encoder
-{
+- (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:self.filterParamsDictionary forKey:@"filterParamsDictionary"];
     [encoder encodeObject:self.filterParamsArray forKey:@"filterParamsArray"];
     [encoder encodeObject:self.filterParamsContentDictionary forKey:@"filterParamsContentDictionary"];
     [encoder encodeObject:self.dataSources forKey:@"dataSources"];
 }
 
-- (id)initWithCoder:(NSCoder *)decoder
-{
+- (id)initWithCoder:(NSCoder *)decoder {
     self = [super init];
     if (self) {
         self.filterParamsDictionary = [decoder decodeObjectForKey:@"filterParamsDictionary"];
@@ -44,8 +42,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
  *
  *  @return NSMutableDictionary
  */
-- (NSMutableDictionary *)filterParamsDictionary
-{
+- (NSMutableDictionary *)filterParamsDictionary {
     if (_filterParamsDictionary == nil) {
         _filterParamsDictionary = [[NSMutableDictionary alloc] init];
         _filterParamsDictionary[kMultipleFilterSettingModified] = @(NO);
@@ -59,13 +56,12 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
  *
  *  @return NSMutableArray
  */
-- (NSMutableArray *)filterParamsArray
-{
+- (NSMutableArray *)filterParamsArray {
     if (_filterParamsArray == nil) {
         NSMutableArray *state = [NSMutableArray arrayWithObjects:@1, @0,nil];
         NSMutableArray *types = [NSMutableArray arrayWithObject:@(1)];
-        NSArray *symptoms = [CYLDBManager allTags];
-        [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSArray *items = [CYLDBManager allTags];
+        [items enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             [types addObject:@0];
         }];
         _filterParamsArray = [NSMutableArray arrayWithArray:@[state, types]];
@@ -74,18 +70,11 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
 }
 
 /**
- *  lazy load _filterParamsContentArray
- *
- *  @return NSMutableArray
- */
-
-/**
  *  lazy load _filterParamsContentDictionary
  *
  *  @return NSMutableDictionary
  */
-- (NSMutableDictionary *)filterParamsContentDictionary
-{
+- (NSMutableDictionary *)filterParamsContentDictionary {
     if (_filterParamsContentDictionary == nil) {
         _filterParamsContentDictionary = [NSMutableDictionary dictionaryWithCapacity:2];
         _filterParamsContentDictionary[@"skilled"] = [NSMutableArray array];
@@ -98,28 +87,25 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
  *
  *  @return NSArray
  */
-- (NSArray *)dataSources
-{
+- (NSArray *)dataSources {
     if (_dataSources == nil) {
         
         NSMutableArray *hospitals = [NSMutableArray arrayWithObjects:@"全部", @"请选择", nil];
         NSMutableArray *skillTypes = [NSMutableArray arrayWithObject:@"全部"];
         [skillTypes addObjectsFromArray:[CYLDBManager allTags]];
-        _dataSources = [[NSArray alloc] initWithObjects:hospitals,skillTypes,nil];
+        _dataSources = [[NSArray alloc] initWithObjects:hospitals, skillTypes, nil];
     }
     return _dataSources;
 }
-
 
 /**
  *  lazy load _filename
  *
  *  @return NSString
  */
-- (NSString *)filename
-{
+- (NSString *)filename {
     if (_filename == nil) {
-        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
         _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
     }
     return _filename;

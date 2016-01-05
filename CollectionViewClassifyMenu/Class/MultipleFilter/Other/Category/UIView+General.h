@@ -1,8 +1,8 @@
 //
-//  UIView+UIViewEXT.h
-//  CanXinTong
+//  UIView+General.h
 //
-//  Created by  https://github.com/ChenYilong  on 13-2-28.
+//
+//  Created by  http://weibo.com/luohanchenyilong/ on 13-2-28.
 //  Copyright (c) 2013年  https://github.com/ChenYilong . All rights reserved.
 //
 
@@ -15,32 +15,27 @@
 
 @interface UIView (General)
 
-- (void)setWidth:(CGFloat)width;
-- (void)setHeight:(CGFloat)height;
-- (void)setX:(CGFloat)x;
-- (void)setY:(CGFloat)y;
+- (void)cyl_setWidth:(CGFloat)width;
+- (void)cyl_setHeight:(CGFloat)height;
+- (void)cyl_setX:(CGFloat)x;
+- (void)cyl_setY:(CGFloat)y;
 
-- (void)setSize:(CGSize)size;
+- (void)cyl_setSize:(CGSize)size;
 
-- (CGFloat)height;
-- (CGFloat)width;
-- (CGFloat)x;
-- (CGFloat)y;
-- (CGFloat)maxY;
-- (CGFloat)maxX;
-- (void)horizontalCenterWithWidth:(CGFloat)width;
-- (void)verticalCenterWithHeight:(CGFloat)height;
-- (void)verticalCenterInSuperView;
-- (void)horizontalCenterInSuperView;
-
-- (void)setBoarderWith:(CGFloat)width color:(CGColorRef)color;
-- (void)setCornerRadius:(CGFloat)radius;
-
-- (CALayer *)addSubLayerWithFrame:(CGRect)frame color:(CGColorRef)colorRef;
-
-
-- (void)setTarget:(id)target action:(SEL)action;
-
-- (UIImage *)capture;
+- (CGFloat)cyl_height;
+- (CGFloat)cyl_width;
+- (CGFloat)cyl_x;
+- (CGFloat)cyl_y;
+- (CGFloat)cyl_maxY;
+- (CGFloat)cyl_maxX;
+- (void)cyl_horizontalCenterWithWidth:(CGFloat)width;
+- (void)cyl_verticalCenterWithHeight:(CGFloat)height;
+- (void)cyl_verticalCenterInSuperView;
+- (void)cyl_horizontalCenterInSuperView;
+- (void)cyl_setBoarderWith:(CGFloat)width color:(CGColorRef)color;
+- (void)cyl_setCornerRadius:(CGFloat)radius;
+- (CALayer *)cyl_addSubLayerWithFrame:(CGRect)frame color:(CGColorRef)colorRef;
+- (void)cyl_setTarget:(id)target action:(SEL)action;
+- (UIImage *)cyl_capture;
 
 @end

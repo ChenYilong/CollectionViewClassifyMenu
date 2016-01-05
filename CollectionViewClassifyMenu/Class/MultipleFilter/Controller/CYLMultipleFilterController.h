@@ -10,6 +10,6 @@
 
 @interface CYLMultipleFilterController : FilterBaseController
 
--(void)refreshFilterParams;
+- (void)refreshFilterParams;
 
 @end

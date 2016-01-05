@@ -29,21 +29,20 @@
  *
  *  @return filterController
  */
-- (CYLMultipleFilterController *)filterController
-{
+- (CYLMultipleFilterController *)filterController {
     if (_filterController == nil) {
         _filterController = [[CYLMultipleFilterController alloc] initWithNibName:@"FilterBaseController" bundle:nil];
         _filterController.delegate = self;
     }
     return _filterController;
 }
+
 /**
  *  lazy load _filterParamsTool
  *
  *  @return CYLFilterParamsTool
  */
-- (CYLFilterParamsTool *)filterParamsTool
-{
+- (CYLFilterParamsTool *)filterParamsTool {
     if (_filterParamsTool == nil) {
         _filterParamsTool = [[CYLFilterParamsTool alloc] init];
         _filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:self.filterParamsTool.filename];
@@ -68,8 +67,7 @@
 /**
  * 初始化leftNavgationItem
  */
-- (void)initLeftBarButtonItem
-{
+- (void)initLeftBarButtonItem {
     self.filterParamsTool = nil;
     BOOL shouldShowModified = [self.filterParamsTool.filterParamsDictionary[kMultipleFilterSettingModified] boolValue];
     UIImage *image;
@@ -97,8 +95,7 @@
     [self filterControllerDidCompleted:nil];
 }
 
-- (void)leftBarButtonClicked:(id)sender
-{
+- (void)leftBarButtonClicked:(id)sender {
     [_filterController refreshFilterParams];
     AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     [self.filterController showInView:delegate.navigationController.view];
@@ -106,8 +103,7 @@
 
 #pragma mark - 🔌 FilterControllerDelegate Method
 
-- (void)filterControllerDidCompleted:(FilterBaseController *)controller
-{
+- (void)filterControllerDidCompleted:(FilterBaseController *)controller {
     self.filterParamsTool = nil;
     [self initLeftBarButtonItem];
     self.filterParamsTool = nil;
@@ -116,11 +112,11 @@
     NSString *foodMessage = @"🔴不筛选食物";
     NSString *area = self.filterParamsTool.filterParamsContentDictionary[@"Hospital"];
     id dicValue = area;
-    if((dicValue) && (dicValue != [NSNull null])) {
-        areaMessage = [NSString stringWithFormat:@"🔵筛选地区:%@",area];;
+    if ((dicValue) && (dicValue != [NSNull null])) {
+        areaMessage = [NSString stringWithFormat:@"🔵筛选地区:%@", area];;
     }
     NSMutableArray *messageArray = self.filterParamsTool.filterParamsContentDictionary[@"skilled"];
-    if(self.filterParamsTool.filterParamsContentDictionary[@"skilled"] && self.filterParamsTool.filterParamsContentDictionary[@"skilled"] != [NSNull null]) {
+    if (self.filterParamsTool.filterParamsContentDictionary[@"skilled"] && self.filterParamsTool.filterParamsContentDictionary[@"skilled"] != [NSNull null]) {
         __weak __typeof(messageArray) weakMessageArray = messageArray;
         [messageArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             obj =  [@"🔴" stringByAppendingString:obj];
@@ -131,7 +127,7 @@
             foodMessage = skilled;
         }
     }
-    message = [NSString stringWithFormat:@"%@\n%@",areaMessage,foodMessage];
+    message = [NSString stringWithFormat:@"%@\n%@", areaMessage, foodMessage];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:message delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
     [alert show];
     NSUInteger delaySeconds = 1;

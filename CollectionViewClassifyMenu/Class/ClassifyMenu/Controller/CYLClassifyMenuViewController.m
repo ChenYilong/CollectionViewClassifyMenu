@@ -31,9 +31,9 @@ static float const kCellBtnCenterToBorderMargin               = 19;
 
 static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
-typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
+typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
-@interface CYLClassifyMenuViewController () <UICollectionViewDataSource, UICollectionViewDelegate, FilterHeaderViewDelegate>
+@interface CYLClassifyMenuViewController ()<UICollectionViewDataSource, UICollectionViewDelegate, FilterHeaderViewDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSArray          *dataSource;
@@ -53,8 +53,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 #pragma mark - 💤 LazyLoad Method
 
-- (NSMutableArray *)collectionHeaderMoreBtnHideBoolArray
-{
+- (NSMutableArray *)collectionHeaderMoreBtnHideBoolArray {
     if (_collectionHeaderMoreBtnHideBoolArray == nil) {
         _collectionHeaderMoreBtnHideBoolArray = [[NSMutableArray alloc] init];
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -64,21 +63,19 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     return _collectionHeaderMoreBtnHideBoolArray;
 }
 
-- (NSMutableArray *)firstRowCellCountArray
-{
+- (NSMutableArray *)firstRowCellCountArray {
     if (_firstRowCellCountArray == nil) {
         _firstRowCellCountArray = [NSMutableArray arrayWithCapacity:self.dataSource.count];
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-                NSUInteger secondRowCellCount = [self firstRowCellCountWithArray:symptoms];
-                [self.firstRowCellCountArray addObject:@(secondRowCellCount)];
+            NSMutableArray *items = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+            NSUInteger secondRowCellCount = [self firstRowCellCountWithArray:items];
+            [self.firstRowCellCountArray addObject:@(secondRowCellCount)];
         }];
     }
     return _firstRowCellCountArray;
 }
 
-- (NSMutableArray *)expandSectionArray
-{
+- (NSMutableArray *)expandSectionArray {
     if (_expandSectionArray == nil) {
         _expandSectionArray = [[NSMutableArray alloc] init];
     }
@@ -90,15 +87,14 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
  *
  *  @return NSArray
  */
-- (NSArray *)rowsCountPerSection
-{
+- (NSArray *)rowsCountPerSection {
     if (_rowsCountPerSection == nil) {
         _rowsCountPerSection = [[NSArray alloc] init];
         NSMutableArray *rowsCountPerSection = [NSMutableArray array];
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-                NSUInteger secondRowCellCount = [[self cellsInPerRowWhenLayoutWithArray:symptoms] count];
-                [rowsCountPerSection addObject:@(secondRowCellCount)];
+            NSMutableArray *items = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+            NSUInteger secondRowCellCount = [[self cellsInPerRowWhenLayoutWithArray:items] count];
+            [rowsCountPerSection addObject:@(secondRowCellCount)];
         }];
         _rowsCountPerSection = (NSArray *)rowsCountPerSection;
     }
@@ -110,15 +106,14 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
  *
  *  @return NSArray
  */
-- (NSArray *)cellsCountArrayPerRowInSections
-{
+- (NSArray *)cellsCountArrayPerRowInSections {
     if (_cellsCountArrayPerRowInSections == nil) {
         _cellsCountArrayPerRowInSections = [[NSArray alloc] init];
         NSMutableArray *cellsCountArrayPerRowInSections = [NSMutableArray array];
         [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                NSMutableArray *symptoms = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-                NSArray *cellsInPerRowWhenLayoutWithArray = [self cellsInPerRowWhenLayoutWithArray:symptoms];
-                [cellsCountArrayPerRowInSections addObject:cellsInPerRowWhenLayoutWithArray];
+            NSMutableArray *items = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
+            NSArray *cellsInPerRowWhenLayoutWithArray = [self cellsInPerRowWhenLayoutWithArray:items];
+            [cellsCountArrayPerRowInSections addObject:cellsInPerRowWhenLayoutWithArray];
         }];
         _cellsCountArrayPerRowInSections = (NSArray *)cellsCountArrayPerRowInSections;
     }
@@ -137,7 +132,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
                            ];
     self.backgroundView.showsVerticalScrollIndicator = NO;
     self.backgroundView.alwaysBounceVertical = YES;
-    self.backgroundView.backgroundColor = [UIColor colorWithRed:252.0f/255.f green:252.0f/255.f blue:252.0f/255.f alpha:2.f];
+    self.backgroundView.backgroundColor = [UIColor colorWithRed:252.0f / 255.f green:252.0f / 255.f blue:252.0f / 255.f alpha:2.f];
     [self.view addSubview:self.backgroundView];
     
     [self initData];
@@ -170,10 +165,10 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     float limitWidth = (CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin - limitMargin);
     if (cellWidth >= limitWidth) {
         cellWidth = limitWidth;
-        isLimitWidth?isLimitWidth(YES,@(cellWidth)):nil;
+        isLimitWidth?isLimitWidth(YES, @(cellWidth)) : nil;
         return cellWidth;
     }
-    isLimitWidth?isLimitWidth(NO,@(cellWidth)):nil;
+    isLimitWidth?isLimitWidth(NO, @(cellWidth)) : nil;
     return cellWidth;
 }
 
@@ -187,8 +182,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
     __block float cellWidth = [self collectionCellWidthText:text content:obj];
     __block float cellWidthAndRightMargin;
-    
-    if(cellWidth == contentViewWidth) {
+    if (cellWidth == contentViewWidth) {
         cellWidthAndRightMargin = contentViewWidth;
     } else {
         if (obj == [array lastObject]) {
@@ -242,18 +236,18 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     __block NSUInteger firstRowCellCount = 0;
     NSMutableArray *widthArray = [NSMutableArray array];
     [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-            float cellWidthAndRightMargin = [self textImageWidthAndRightMargin:text
-                                                                       content:obj
-                                                                         array:array];
-            [widthArray  addObject:@(cellWidthAndRightMargin)];
-            NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-            NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
-            //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：
-            //⓵https://i.imgur.com/6yFPQ8U.gif ⓶https://i.imgur.com/XzfNVda.png
-            CGFloat firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
-            if ((firstRowWidth <= contentViewWidth)) {
-                firstRowCellCount++;
+        NSString *text = [obj objectForKey:kDataSourceCellTextKey];
+        float cellWidthAndRightMargin = [self textImageWidthAndRightMargin:text
+                                                                   content:obj
+                                                                     array:array];
+        [widthArray  addObject:@(cellWidthAndRightMargin)];
+        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
+        NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
+        //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：
+        //⓵https://i.imgur.com/6yFPQ8U.gif ⓶https://i.imgur.com/XzfNVda.png
+        CGFloat firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
+        if ((firstRowWidth <= contentViewWidth)) {
+            firstRowCellCount++;
         }
     }];
     return firstRowCellCount;
@@ -261,15 +255,15 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 - (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSMutableArray *)array {
     __block NSUInteger secondRowCellCount = 0;
-    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:array];
-    NSUInteger firstRowCount = [self firstRowCellCountWithArray:symptoms];
+    NSMutableArray *items = [NSMutableArray arrayWithArray:array];
+    NSUInteger firstRowCount = [self firstRowCellCountWithArray:items];
     NSMutableArray *cellCount = [NSMutableArray arrayWithObject:@(firstRowCount)];
     for (NSUInteger index = 0; index < [array count]; index++) {
-        NSUInteger firstRowCount = [self firstRowCellCountWithArray:symptoms];
-        if (symptoms.count != firstRowCount) {
+        NSUInteger firstRowCount = [self firstRowCellCountWithArray:items];
+        if (items.count != firstRowCount) {
             NSRange range = NSMakeRange(0, firstRowCount);
-            [symptoms removeObjectsInRange:range];
-            NSUInteger secondRowCount = [self firstRowCellCountWithArray:symptoms];
+            [items removeObjectsInRange:range];
+            NSUInteger secondRowCount = [self firstRowCellCountWithArray:items];
             secondRowCellCount = secondRowCount;
             [cellCount addObject:@(secondRowCount)];
         } else {
@@ -279,14 +273,14 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     return cellCount;
 }
 
-- (float)collectionCellWidthText:(NSString *)text content:(NSDictionary *)content{
+- (float)collectionCellWidthText:(NSString *)text content:(NSDictionary *)content {
     float cellWidth;
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
                          [UIFont systemFontOfSize:16]}];
     NSString *picture = [content objectForKey:kDataSourceCellPictureKey];
     BOOL shouldShowPic = [@(picture.length) boolValue];
-    if(shouldShowPic) {
+    if (shouldShowPic) {
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin * 2;
     } else {
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin;
@@ -297,14 +291,13 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     return cellWidth;
 }
 
-- (UIView *)addTableHeaderView
-{
+- (UIView *)addTableHeaderView {
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
     tableHeaderView.backgroundColor = [UIColor whiteColor];
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, CGRectGetWidth(tableHeaderView.frame), 20)];
     self.titleLabel = titleLabel;
     titleLabel.font = [UIFont boldSystemFontOfSize:18];
-    titleLabel.textColor = [UIColor colorWithRed:0 green:150.0/255.0 blue:136.0/255.0 alpha:1.0];
+    titleLabel.textColor = [UIColor colorWithRed:0 green:150.0 / 255.0 blue:136.0 / 255.0 alpha:1.0];
     NSString *title = @"默认显示一行时的效果如下所示:";
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
     [text addAttribute:NSForegroundColorAttributeName
@@ -343,7 +336,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 - (void)addCollectionView {
     CGRect collectionViewFrame = CGRectMake(0, kControllerHeaderViewHeight + kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width,
-                                            [UIScreen mainScreen].bounds.size.height-40);
+                                            [UIScreen mainScreen].bounds.size.height - 40);
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
     self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame
                                              collectionViewLayout:layout];
@@ -382,45 +375,42 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 #pragma mark - 🔌 UICollectionViewDataSource Method
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
-{
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return [self.dataSource count];
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
-     numberOfItemsInSection:(NSInteger)section
-{
-    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[section] objectForKey:kDataSourceSectionKey]];
+     numberOfItemsInSection:(NSInteger)section {
+    NSArray *items = [NSArray arrayWithArray:[self.dataSource[section] objectForKey:kDataSourceSectionKey]];
     for (NSNumber *i in self.expandSectionArray) {
         if (section == [i integerValue]) {
-            return [symptoms count];
+            return [items count];
         }
     }
     return [self.firstRowCellCountArray[section] integerValue];
 }
 
 - (BOOL)shouldCollectionCellPictureShowWithIndex:(NSIndexPath *)indexPath {
-    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
-    NSString *picture = [symptoms[indexPath.row] objectForKey:kDataSourceCellPictureKey];
+    NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
+    NSString *picture = [items[indexPath.row] objectForKey:kDataSourceCellPictureKey];
     NSUInteger pictureLength = [@(picture.length) integerValue];
-    if(pictureLength > 0) {
+    if (pictureLength > 0) {
         return YES;
     }
     return NO;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
-                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
+                  cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     CollectionViewCell *cell =
     (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier
                                                                     forIndexPath:indexPath];
     cell.button.frame = CGRectMake(0, 0, CGRectGetWidth(cell.frame), CGRectGetHeight(cell.frame));
-    NSMutableArray *symptoms = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
+    NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
                                                                objectForKey:kDataSourceSectionKey]];
-    NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
+    NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
-    if(shouldShowPic) {
+    if (shouldShowPic) {
         [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"]
                      forState:UIControlStateNormal];
         CGFloat spacing = kCollectionViewItemButtonImageToTextMargin;
@@ -447,7 +437,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     [self judgeMoreButtonShowWhenDefaultRowsCount:1];
     
     NSString *title;
-    if(sender.isOn) {
+    if (sender.isOn) {
         title = @"默认显示两行时的效果如下所示:";
         [self judgeMoreButtonShowWhenDefaultRowsCount:2];
     } else {
@@ -478,12 +468,12 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     //二级菜单数组
-    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section]
+    NSArray *items = [NSArray arrayWithArray:[self.dataSource[indexPath.section]
                                                  objectForKey:kDataSourceSectionKey]];
     NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
-    NSString *cellTitle = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
-    NSString *message = shouldShowPic?[NSString stringWithFormat:@"★%@",cellTitle]:cellTitle;
+    NSString *cellTitle = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
+    NSString *message = shouldShowPic ? [NSString stringWithFormat:@"★%@", cellTitle] : cellTitle;
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:sectionTitle
                                                     message:message
                                                    delegate:self
@@ -499,8 +489,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
-                                 atIndexPath:(NSIndexPath *)indexPath
-{
+                                 atIndexPath:(NSIndexPath *)indexPath {
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
         CYLFilterHeaderView *filterHeaderView =
         [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
@@ -569,31 +558,27 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
 
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
-  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    NSArray *symptoms = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
-    NSString *text = [symptoms[indexPath.row] objectForKey:kDataSourceCellTextKey];
-    float cellWidth = [self collectionCellWidthText:text content:symptoms[indexPath.row]];
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSArray *items = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
+    NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
+    float cellWidth = [self collectionCellWidthText:text content:items[indexPath.row]];
     return CGSizeMake(cellWidth, kCollectionViewCellHeight);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView
-                   layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
-{
+                   layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
     return kCollectionViewCellsHorizonMargin;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView
-                  layout:(UICollectionViewLayout*)collectionViewLayout
-referenceSizeForHeaderInSection:(NSInteger)section
-{
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+referenceSizeForHeaderInSection:(NSInteger)section {
     return CGSizeMake([UIScreen mainScreen].bounds.size.width - 50, 38);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView
                         layout:(UICollectionViewLayout *)collectionViewLayout
-        insetForSectionAtIndex:(NSInteger)section
-{
+        insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(kCollectionViewToTopMargin, kCollectionViewToLeftMargin, kCollectionViewToBottomtMargin, kCollectionViewToRightMargin);
 }
 

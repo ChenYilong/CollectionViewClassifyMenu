@@ -8,7 +8,7 @@
 
 #import "CYLDBManager.h"
 
-NSString *const kDataSourceSectionKey     = @"Symptoms";
+NSString *const kDataSourceSectionKey     = @"Items";
 NSString *const kDataSourceCellTextKey    = @"Food_Name";
 NSString *const kDataSourceCellPictureKey = @"Picture";
 
@@ -19,11 +19,10 @@ NSString *const kDataSourceCellPictureKey = @"Picture";
  *
  *  @return NSMutableArray
  */
-+ (NSMutableArray *)dataSource
-{
-    static NSMutableArray *dataSource = nil;
++ (NSMutableArray *)dataSource {
+    static NSMutableArray * dataSource = nil;
     static dispatch_once_t dataSourceOnceToken;
-    dispatch_once(&dataSourceOnceToken,^{
+    dispatch_once(&dataSourceOnceToken, ^{
         NSString *filePath = [[NSBundle mainBundle] pathForResource:@"data.json" ofType:nil];
         NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath];
         NSError *error;
@@ -39,15 +38,14 @@ NSString *const kDataSourceCellPictureKey = @"Picture";
  *
  *  @return NSMutableArray
  */
-+ (NSMutableArray *)allTags
-{
-    static NSMutableArray *allTags = nil;
++ (NSMutableArray *)allTags {
+    static NSMutableArray * allTags = nil;
     static dispatch_once_t allTagsOnceToken;
-    dispatch_once(&allTagsOnceToken,^{
+    dispatch_once(&allTagsOnceToken, ^{
         allTags = [NSMutableArray array];
         [[[self class] dataSource] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                NSArray *symptoms = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
-                [symptoms enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                NSArray *items = [NSArray arrayWithArray:[obj objectForKey:kDataSourceSectionKey]];
+                [items enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                     [allTags addObject:[obj objectForKey:kDataSourceCellTextKey]];
                 }];
         }];

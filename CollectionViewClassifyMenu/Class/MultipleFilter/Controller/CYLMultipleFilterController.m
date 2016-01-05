@@ -1,6 +1,6 @@
 //
 //  CYLMultipleFilterController.m
-//  http://cnblogs.com/ChenYilong/ 
+//  http://cnblogs.com/ChenYilong/
 //
 //  Created by  https://github.com/ChenYilong  on 14-7-10.
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
@@ -31,8 +31,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
  *
  *  @return CYLFilterParamsTool
  */
-- (CYLFilterParamsTool *)filterParamsTool
-{
+- (CYLFilterParamsTool *)filterParamsTool {
     if (_filterParamsTool == nil) {
         _filterParamsTool = [[CYLFilterParamsTool alloc] init];
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -41,7 +40,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
             CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
             [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
         } else {
-        _filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename];
+            _filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename];
         }
     }
     return _filterParamsTool;
@@ -52,8 +51,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
  *
  *  @return int
  */
-- (NSUInteger)secondSectionTagsCount
-{
+- (NSUInteger)secondSectionTagsCount {
     if (_secondSectionTagsCount == 0) {
         NSMutableArray *types = [NSMutableArray arrayWithObject:@"全部"];
         [types addObjectsFromArray:[CYLDBManager allTags]];
@@ -67,11 +65,10 @@ static float const kCollectionViewCellsHorizonMargin = 12;
  *
  *  @return NSString
  */
-- (NSString *)filename
-{
+- (NSString *)filename {
     if (_filename == nil) {
         _filename = [[NSString alloc] init];
-        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
         _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
     }
     return _filename;
@@ -79,8 +76,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 #pragma mark - ♻️ LifeCycle Method
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     self.collectionView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
     //【Fixed Bug】以下两行代码意在解决iphone 6p self.collectionView刷新不及时的bug
@@ -92,7 +88,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     }
 }
 
--(void)refreshFilterParams {
+- (void)refreshFilterParams {
     self.filterParamsTool = nil;
     NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
     if (allSecondSectionTagsCount >0) {
@@ -102,8 +98,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 #pragma mark - 🎬 Actions Method
 
-- (void)confirmButtonClicked:(id)sender
-{
+- (void)confirmButtonClicked:(id)sender {
     [super confirmButtonClicked:sender];
     self.filterParamsTool.filterParamsDictionary[kMultipleFilterSetting] = self.filterParamsTool.filterParamsArray;
     BOOL modified = NO;
@@ -117,8 +112,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filename];
 }
 
-- (void)restoreButtonClicked:(id)sender
-{
+- (void)restoreButtonClicked:(id)sender {
     [super confirmButtonClicked:sender];
     self.filterParamsTool = [[CYLFilterParamsTool alloc] init];
     [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
@@ -159,12 +153,12 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 - (void)clickedInSecondSection:(NSIndexPath *)indexPath
                     withButton:(CYLIndexPathButton *)button
-                   withSetting:(NSMutableArray *)setting{
+                   withSetting:(NSMutableArray *)setting {
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
     if (indexPath.row == 0) {
         if (button.selected ) {
             return;
-        } else  {
+        } else {
             //处于修改状态
             [self.filterParamsTool.filterParamsContentDictionary
              removeObjectForKey:@"skilled"];
@@ -174,19 +168,21 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     if (indexPath.row > 0) {
         if (!button.selected) {
             [setting replaceObjectAtIndex:0 withObject:@(0)];
-            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] count] == 0) {
+            if ([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] count] == 0) {
                 self.filterParamsTool.filterParamsContentDictionary[@"skilled"] = [NSMutableArray array];
             }
-            if(![text isEqualToString:@"全部"])
+            if (![text isEqualToString:@"全部"]) {
                 [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] addObject:text];
+            }
         } else {
             if (![setting containsObject:@(1)]) {
                 [setting replaceObjectAtIndex:0 withObject:@(1)];
                 [self.filterParamsTool.filterParamsContentDictionary
                  removeObjectForKey:@"skilled"];
             }
-            if([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text])
+            if ([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text]) {
                 [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
+            }
         }
         NSIndexPath *allBtnIndexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
         [self.collectionView reloadItemsAtIndexPaths:@[allBtnIndexPath]];
@@ -204,8 +200,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
-                                 atIndexPath:(NSIndexPath *)indexPath
-{
+                                 atIndexPath:(NSIndexPath *)indexPath {
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
         CYLMultipleFilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"CYLMultipleFilterHeaderView" forIndexPath:indexPath];
         switch (indexPath.section) {
@@ -226,8 +221,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
-                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
+                  cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     FilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FilterCollectionCell" forIndexPath:indexPath];
     CGSize size = [self collectionView:collectionView layout:nil sizeForItemAtIndexPath:indexPath];
     cell.titleButton.frame = CGRectMake(0, 0, size.width, size.height);
@@ -256,13 +250,11 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 #pragma mark - 🔌 UICollectionViewDataSource Method
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
-{
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return [self.filterParamsTool.dataSources count];
 }
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == 1) {
         NSMutableArray *types = [NSMutableArray arrayWithObject:@"全部"];
         [types addObjectsFromArray:[CYLDBManager allTags]];
@@ -275,8 +267,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
-  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
-{
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
@@ -286,17 +277,16 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 }
 
 - (float)checkCellLimitWidth:(float)cellWidth {
-    float limitWidth = (self.collectionView.contentSize.width-kCollectionViewToLeftMargin-kCollectionViewToRightMargin);
+    float limitWidth = (self.collectionView.contentSize.width - kCollectionViewToLeftMargin - kCollectionViewToRightMargin);
     if (cellWidth >= limitWidth) {
-        cellWidth = limitWidth-kCollectionViewCellsHorizonMargin;
+        cellWidth = limitWidth - kCollectionViewCellsHorizonMargin;
         return cellWidth;
     }
-    return cellWidth +16 ;
+    return cellWidth + 16 ;
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView
-                   layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
-{
+                   layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
     return kCollectionViewCellsHorizonMargin;
 }
 
