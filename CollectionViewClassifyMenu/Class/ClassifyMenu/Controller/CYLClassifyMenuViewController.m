@@ -229,7 +229,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
                 sum += [cellsCount integerValue];
             } else {
                 //|break;| Stop enumerating ;if wanna continue use |return| to Skip this object
-                //http://t.cn/RAsfoAi
                 *stop = YES;
                 return;
             }
@@ -260,8 +259,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo,id data);
     return firstRowCellCount;
 }
 
-- (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSMutableArray *)array
-{
+- (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSMutableArray *)array {
     __block NSUInteger secondRowCellCount = 0;
     NSMutableArray *symptoms = [NSMutableArray arrayWithArray:array];
     NSUInteger firstRowCount = [self firstRowCellCountWithArray:symptoms];

@@ -118,21 +118,21 @@
 		9A09E2B61BC7AFF00060C116 /* Class */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2B71BC7AFF00060C116 /* ClassifyMenu(两级可折叠菜单) */,
-				9A09E2CA1BC7AFF00060C116 /* MultipleFilter(侧边栏多项筛选) */,
+				9A09E2B71BC7AFF00060C116 /* ClassifyMenu */,
+				9A09E2CA1BC7AFF00060C116 /* MultipleFilter */,
 				9A09E2E01BC7AFF00060C116 /* Other */,
 			);
 			path = Class;
 			sourceTree = "<group>";
 		};
-		9A09E2B71BC7AFF00060C116 /* ClassifyMenu(两级可折叠菜单) */ = {
+		9A09E2B71BC7AFF00060C116 /* ClassifyMenu */ = {
 			isa = PBXGroup;
 			children = (
 				9A09E2B81BC7AFF00060C116 /* Controller */,
 				9A09E2BD1BC7AFF00060C116 /* Other */,
 				9A09E2C11BC7AFF00060C116 /* View */,
 			);
-			path = "ClassifyMenu(两级可折叠菜单)";
+			path = ClassifyMenu;
 			sourceTree = "<group>";
 		};
 		9A09E2B81BC7AFF00060C116 /* Controller */ = {
@@ -178,14 +178,14 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		9A09E2CA1BC7AFF00060C116 /* MultipleFilter(侧边栏多项筛选) */ = {
+		9A09E2CA1BC7AFF00060C116 /* MultipleFilter */ = {
 			isa = PBXGroup;
 			children = (
 				9A09E2CB1BC7AFF00060C116 /* Controller */,
 				9A09E2D11BC7AFF00060C116 /* Other */,
 				9A09E2DA1BC7AFF00060C116 /* View */,
 			);
-			path = "MultipleFilter(侧边栏多项筛选)";
+			path = MultipleFilter;
 			sourceTree = "<group>";
 		};
 		9A09E2CB1BC7AFF00060C116 /* Controller */ = {
