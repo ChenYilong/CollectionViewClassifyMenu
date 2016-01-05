@@ -12,6 +12,7 @@
 //Others
 #import "CYLFilterParamsTool.h"
 #import "AppDelegate.h"
+#import "CYLParameterConfiguration.h"
 
 @interface CYLMainViewController ()<FilterControllerDelegate>
 

@@ -36,9 +36,9 @@
     self.button = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
     self.button.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
     [self.contentView addSubview:self.button];
-    [self.button cyl_generalStyle];
-    [self.button cyl_homeStyle];
-//    [self.button redStyle];
+//    [self.button cyl_generalStyle];
+//    [self.button cyl_homeStyle];
+    [self.button cyl_chengNiStyle];
 }
 
 @end

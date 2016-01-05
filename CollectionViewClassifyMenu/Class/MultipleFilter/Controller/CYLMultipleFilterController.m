@@ -13,6 +13,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 //Others
 #import "CYLFilterParamsTool.h"
 #import "CYLDBManager.h"
+#import "CYLParameterConfiguration.h"
 
 @interface CYLMultipleFilterController ()
 
@@ -271,7 +272,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
-                         [UIFont systemFontOfSize:16]}];
+                         CYLTagTitleFont}];
     float width = [self checkCellLimitWidth:ceilf(size.width)] ;
     return CGSizeMake(width, 30);
 }

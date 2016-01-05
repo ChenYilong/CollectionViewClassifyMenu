@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "CYLMainViewController.h"
 #import "CYLFilterParamsTool.h"
+#import "CYLParameterConfiguration.h"
 
 @interface AppDelegate ()
 
@@ -22,7 +23,7 @@
     if ([UINavigationBar conformsToProtocol:@protocol(UIAppearanceContainer)]) {
         [UINavigationBar appearance].tintColor = [UIColor whiteColor];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor]}];
-        [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:(51) / 255.f green:(171) / 255.f blue:(160) / 255.f alpha:1.f]];
+        [[UINavigationBar appearance] setBarTintColor:CYLAppTintColor];
         [[UINavigationBar appearance] setTranslucent:NO];
     }
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

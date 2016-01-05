@@ -95,6 +95,7 @@
 		9A3296041AB7D3880035EFAA /* CollectionViewClassifyMenuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CollectionViewClassifyMenuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A3296091AB7D3880035EFAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
+		9ACA68C11C3C3E8100CDB987 /* CYLParameterConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLParameterConfiguration.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -299,6 +300,7 @@
 			children = (
 				9A09E2F41BC7AFF00060C116 /* CYLDBManager.h */,
 				9A09E2F51BC7AFF00060C116 /* CYLDBManager.m */,
+				9ACA68C11C3C3E8100CDB987 /* CYLParameterConfiguration.h */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
