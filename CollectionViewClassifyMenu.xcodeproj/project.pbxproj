@@ -32,18 +32,7 @@
 		9A09E30C1BC7AFF00060C116 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2F01BC7AFF00060C116 /* Images.xcassets */; };
 		9A09E30E1BC7AFF00060C116 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F21BC7AFF00060C116 /* main.m */; };
 		9A09E30F1BC7AFF00060C116 /* CYLDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F51BC7AFF00060C116 /* CYLDBManager.m */; };
-		9A32960B1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		9A3296051AB7D3880035EFAA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A3295E31AB7D3880035EFAA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9A3295EA1AB7D3880035EFAA;
-			remoteInfo = CollectionViewClassifyMenu;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		9A09E2B91BC7AFF00060C116 /* CYLClassifyMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLClassifyMenuViewController.h; sourceTree = "<group>"; };
@@ -92,7 +81,6 @@
 		9A09E2F41BC7AFF00060C116 /* CYLDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLDBManager.h; sourceTree = "<group>"; };
 		9A09E2F51BC7AFF00060C116 /* CYLDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLDBManager.m; sourceTree = "<group>"; };
 		9A3295EB1AB7D3880035EFAA /* CollectionViewClassifyMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CollectionViewClassifyMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A3296041AB7D3880035EFAA /* CollectionViewClassifyMenuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CollectionViewClassifyMenuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A3296091AB7D3880035EFAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
 		9ACA68C11C3C3E8100CDB987 /* CYLParameterConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLParameterConfiguration.h; sourceTree = "<group>"; };
@@ -100,13 +88,6 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		9A3295E81AB7D3880035EFAA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9A3296011AB7D3880035EFAA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -318,7 +299,6 @@
 			isa = PBXGroup;
 			children = (
 				9A3295EB1AB7D3880035EFAA /* CollectionViewClassifyMenu.app */,
-				9A3296041AB7D3880035EFAA /* CollectionViewClassifyMenuTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -369,24 +349,6 @@
 			productReference = 9A3295EB1AB7D3880035EFAA /* CollectionViewClassifyMenu.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9A3296031AB7D3880035EFAA /* CollectionViewClassifyMenuTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9A3296111AB7D3880035EFAA /* Build configuration list for PBXNativeTarget "CollectionViewClassifyMenuTests" */;
-			buildPhases = (
-				9A3296001AB7D3880035EFAA /* Sources */,
-				9A3296011AB7D3880035EFAA /* Frameworks */,
-				9A3296021AB7D3880035EFAA /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				9A3296061AB7D3880035EFAA /* PBXTargetDependency */,
-			);
-			name = CollectionViewClassifyMenuTests;
-			productName = CollectionViewClassifyMenuTests;
-			productReference = 9A3296041AB7D3880035EFAA /* CollectionViewClassifyMenuTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -398,10 +360,6 @@
 				TargetAttributes = {
 					9A3295EA1AB7D3880035EFAA = {
 						CreatedOnToolsVersion = 6.2;
-					};
-					9A3296031AB7D3880035EFAA = {
-						CreatedOnToolsVersion = 6.2;
-						TestTargetID = 9A3295EA1AB7D3880035EFAA;
 					};
 				};
 			};
@@ -419,7 +377,6 @@
 			projectRoot = "";
 			targets = (
 				9A3295EA1AB7D3880035EFAA /* CollectionViewClassifyMenu */,
-				9A3296031AB7D3880035EFAA /* CollectionViewClassifyMenuTests */,
 			);
 		};
 /* End PBXProject section */
@@ -434,13 +391,6 @@
 				9A09E3041BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib in Resources */,
 				9A09E3081BC7AFF00060C116 /* data.json in Resources */,
 				9A09E2FF1BC7AFF00060C116 /* FilterBaseController.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9A3296021AB7D3880035EFAA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,23 +441,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9A3296001AB7D3880035EFAA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9A32960B1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		9A3296061AB7D3880035EFAA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9A3295EA1AB7D3880035EFAA /* CollectionViewClassifyMenu */;
-			targetProxy = 9A3296051AB7D3880035EFAA /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		9A09E2EE1BC7AFF00060C116 /* LaunchScreen.xib */ = {
@@ -644,42 +578,6 @@
 			};
 			name = Release;
 		};
-		9A3296121AB7D3880035EFAA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = CollectionViewClassifyMenuTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CollectionViewClassifyMenu.app/CollectionViewClassifyMenu";
-			};
-			name = Debug;
-		};
-		9A3296131AB7D3880035EFAA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = CollectionViewClassifyMenuTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CollectionViewClassifyMenu.app/CollectionViewClassifyMenu";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -697,15 +595,6 @@
 			buildConfigurations = (
 				9A32960F1AB7D3880035EFAA /* Debug */,
 				9A3296101AB7D3880035EFAA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9A3296111AB7D3880035EFAA /* Build configuration list for PBXNativeTarget "CollectionViewClassifyMenuTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9A3296121AB7D3880035EFAA /* Debug */,
-				9A3296131AB7D3880035EFAA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
