@@ -9,7 +9,7 @@
 #import "CYLDBManager.h"
 
 NSString *const kDataSourceSectionKey     = @"Items";
-NSString *const kDataSourceCellTextKey    = @"Food_Name";
+NSString *const kDataSourceCellTextKey    = @"Item_Title";
 NSString *const kDataSourceCellPictureKey = @"Picture";
 
 @implementation CYLDBManager
