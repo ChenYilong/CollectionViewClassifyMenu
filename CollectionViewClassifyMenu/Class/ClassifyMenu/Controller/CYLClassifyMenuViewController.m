@@ -173,52 +173,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     return cellWidth;
 }
 
-/*
- 
- @attention 特别注意：本方法已经对每个 section 的最后一个元素进行了考虑，不会加上右边的间隔。
- 分行规则：
- 
- 1. cell与cell之间必须有大小为kCollectionViewCellsHorizonMargin的间距，
- 2. 左右可以没有间距。
- 
- 那么有这样的规律：
- 
- 1. 一旦cell+kCollectionViewCellsHorizonMargin超过contentViewWidth，则肯定要分行。
- 2. cell超过contentViewWidth也会分行。
- 
- 两者的区别在于cell的宽度，前者还是自身宽度，但后者已经变成了contentViewWidth的宽度。
- */
-- (float)textImageWidthAndRightMargin:(NSString *)text
-                              content:(id)obj
-                                array:(NSArray *)array {
-    CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
-    __block float cellWidth = [self collectionCellWidthText:text content:obj];
-    __block float cellWidthAndRightMargin;
-    if (cellWidth == contentViewWidth) {
-        cellWidthAndRightMargin = contentViewWidth;
-    } else {
-        if (obj == [array lastObject]) {
-            cellWidthAndRightMargin = cellWidth;
-        } else {
-            [self cellLimitWidth:cellWidth
-                     limitMargin:kCollectionViewCellsHorizonMargin
-                    isLimitWidth:^(BOOL isLimitWidth, NSNumber *data) {
-                        if (isLimitWidth) {
-                            //当cell和kCollectionViewCellsHorizonMargin总和大于contentViewWidth，
-                            //但是cell却小于contentViewWidth时，还是占一行。
-                            cellWidthAndRightMargin = contentViewWidth;
-                        } else {
-                            //这个地方只是大概的估计下，他不能判断出当加上下一个cell的cellWidthAndRightMargin大于contentViewWidth时，
-                            //cellWidthAndRightMargin右侧剩余的部分
-                            //所以必须在后续判断与下个一cell的cellWidthAndRightMargin的和超出contentViewWidth时的情况
-                            cellWidthAndRightMargin = cellWidth + kCollectionViewCellsHorizonMargin;
-                        }
-                    }];
-        }
-    }
-    return cellWidthAndRightMargin;
-}
-
 - (void)judgeMoreButtonShowWhenDefaultRowsCount:(NSUInteger)defaultRowsCount {
     [self.rowsCountPerSection enumerateObjectsUsingBlock:^(id  __nonnull obj, NSUInteger idx, BOOL * __nonnull stop) {
         if ([obj integerValue] > defaultRowsCount) {
@@ -245,29 +199,29 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (NSUInteger)firstRowCellCountWithArray:(NSArray *)array {
     CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
-    __block NSUInteger firstRowCellCount = 0;
-    NSMutableArray *widthArray = [NSMutableArray array];
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSString *text = [obj objectForKey:kDataSourceCellTextKey];
-        float cellWidthAndRightMargin = [self textImageWidthAndRightMargin:text
-                                                                   content:obj
-                                                                     array:array];
-        [widthArray  addObject:@(cellWidthAndRightMargin)];
-        NSArray *sumArray = [NSArray arrayWithArray:widthArray];
-        NSNumber *sum = [sumArray valueForKeyPath:@"@sum.self"];
-        CGFloat firstRowWidth;
-        if (obj == [array lastObject]) {
-            firstRowWidth = [sum floatValue];
+    NSUInteger firstRowCellCount = 0;
+    float currentCellWidthSum = 0;
+    float currentCellSpace = 0;
+    for (int i = 0; i < array.count; i++) {
+        NSString *text = [array[i] objectForKey:kDataSourceCellTextKey];
+        float cellWidth = [self collectionCellWidthText:text content:array[i]];
+        if (cellWidth >= contentViewWidth) {
+            return i == 0? 1 : firstRowCellCount;
         } else {
-            //之所以要减去kCollectionViewToRightMargin，是为防止这种情况发生：
-            //⓵https://i.imgur.com/6yFPQ8U.gif ⓶https://i.imgur.com/XzfNVda.png
-            firstRowWidth = [sum floatValue] - kCollectionViewToRightMargin;
+            currentCellWidthSum += cellWidth;
+            if (i == 0) {
+                firstRowCellCount++;
+                continue;
+            }
+            currentCellSpace = (contentViewWidth - currentCellWidthSum) / firstRowCellCount;
+            if (currentCellSpace <= kCollectionViewCellsHorizonMargin) {
+                return firstRowCellCount;
+            } else {
+                firstRowCellCount++;
+            }
         }
-        if ((firstRowWidth <= contentViewWidth)) {
-            firstRowCellCount++;
-        }
-    }];
-    return firstRowCellCount;
+    }
+   return firstRowCellCount;
 }
 
 - (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSMutableArray *)array {
