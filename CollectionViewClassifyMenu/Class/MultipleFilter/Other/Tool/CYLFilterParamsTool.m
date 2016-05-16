@@ -58,13 +58,12 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
  */
 - (NSMutableArray *)filterParamsArray {
     if (_filterParamsArray == nil) {
-        NSMutableArray *state = [NSMutableArray arrayWithObjects:@1, @0,nil];
-        NSMutableArray *types = [NSMutableArray arrayWithObject:@(1)];
-        NSArray *items = [CYLDBManager allTags];
-        [items enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            [types addObject:@0];
+        _filterParamsArray = [NSMutableArray array];
+        NSMutableArray *boolDataSource = [NSMutableArray arrayWithArray:self.dataSources];
+        [boolDataSource enumerateObjectsUsingBlock:^(NSMutableArray *obj, NSUInteger idx, BOOL *stop) {
+            NSMutableArray *array = [self filterParamsArrayCount:[obj count] defaultSelected:YES defaultSelectedIndex:0];
+            [_filterParamsArray addObject:array];
         }];
-        _filterParamsArray = [NSMutableArray arrayWithArray:@[state, types]];
     }
     return _filterParamsArray;
 }
@@ -93,10 +92,11 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
         NSMutableArray *hospitals = [NSMutableArray arrayWithObjects:@"全部", @"请选择", nil];
         NSMutableArray *skillTypes = [NSMutableArray arrayWithObject:@"全部"];
         [skillTypes addObjectsFromArray:[CYLDBManager allTags]];
-        _dataSources = [[NSArray alloc] initWithObjects:hospitals, skillTypes, nil];
+        _dataSources = [[NSArray alloc] initWithObjects:hospitals,skillTypes,nil];
     }
     return _dataSources;
 }
+
 
 /**
  *  lazy load _filename
@@ -105,10 +105,25 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
  */
 - (NSString *)filename {
     if (_filename == nil) {
-        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
         _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
     }
     return _filename;
+}
+
+- (NSMutableArray *)filterParamsArrayCount:(NSUInteger)arrayCount
+                           defaultSelected:(BOOL)existDefault
+                      defaultSelectedIndex:(NSUInteger)defaultSelectedIndex {
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:arrayCount];
+    for (NSUInteger index = 0; index < arrayCount; index++) {
+        if (existDefault && (index == defaultSelectedIndex)) {
+            [array addObject:@1];
+        } else {
+            
+            [array addObject:@0];
+        }
+    }
+    return array;
 }
 
 @end
