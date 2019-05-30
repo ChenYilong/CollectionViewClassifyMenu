@@ -1,10 +1,10 @@
 # CollectionViewClassifyMenu
 
 
-##功能展示
+## 功能展示
 ![Example screenshot](https://github.com/ChenYilong/CollectionViewClassifyMenu/blob/master/CollectionViewClassifyMenu用法展示.gif)
 
-##单选可折叠菜单的特性展示
+## 单选可折叠菜单的特性展示
 ![Example screenshot](https://github.com/ChenYilong/CollectionViewClassifyMenu/blob/master/单选菜单的特性展示.gif)
                   
 Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
@@ -30,7 +30,7 @@ Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 ![enter image description here](https://i.imgur.com/ZyJflPh.gif)
 
 
-##Demo中具有两种样式
+## Demo中具有两种样式
 
 
 第一种是CollectionView做的两级菜单，可以折叠第二级菜单
