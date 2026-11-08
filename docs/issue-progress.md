@@ -12,7 +12,7 @@ tags: [issues, ui, progress]
 
 | 存在的 issue | 修复 commit 地址 | 评估是否修复 |
 | --- | --- | --- |
-| [#13 复用后 cell 重叠](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/13) | [c5f4f01](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/c5f4f016ff9158e09070bc7dff2ba51ed2fd9c8b) | **90/100**：两套真实数据源逐项追加 emoji 和长文字，已验证滚动复用、展开、折叠和 320/390 pt 宽度；尚未覆盖所有设备和字体设置。 |
+| [#13 复用后 cell 重叠](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/13) | [c5f4f01](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/c5f4f016ff9158e09070bc7dff2ba51ed2fd9c8b)、[107b898](https://github.com/dennisxiaoding/CollectionViewClassifyMenu/commit/107b898e582513697c7c513a8555f81d5bc5f8b4) | **90/100**：保留长文字宽度限制，并结合属性副本和复用修复；两套真实数据源逐项追加 emoji 和长文字，已验证滚动复用、展开、折叠和 320/390 pt 宽度。尚未覆盖所有设备和字体设置。 |
 | [#12 layout attributes 被修改](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/12) | [c5f4f01](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/c5f4f016ff9158e09070bc7dff2ba51ed2fd9c8b) | **90/100**：布局返回属性副本，测试修改返回值后再次读取不受影响；尚未覆盖所有自定义布局和动态尺寸场景。 |
 | [#11 CocoaPods 支持](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/11) | 暂无 | 不是 UI 相关，本次 issue 修复无需处理。 |
 | [#9 标签太多时卡顿](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/9) | [c5f4f01](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/c5f4f016ff9158e09070bc7dff2ba51ed2fd9c8b) | **80/100**：1,200 项测试验证每项读取一次，不再递归重算；尚未在真机测量滚动帧率。 |

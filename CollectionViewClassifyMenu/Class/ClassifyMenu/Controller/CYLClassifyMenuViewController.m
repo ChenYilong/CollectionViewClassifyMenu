@@ -180,7 +180,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (float)cellLimitWidth:(float)cellWidth
             limitMargin:(CGFloat)limitMargin
            isLimitWidth:(ISLimitWidth)isLimitWidth {
-    float limitWidth = (CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin - limitMargin);
+    float limitWidth = MAX(0, CGRectGetWidth(self.collectionView.bounds) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin - limitMargin);
     if (cellWidth >= limitWidth) {
         cellWidth = limitWidth;
         isLimitWidth ? isLimitWidth(YES, @(cellWidth)) : nil;

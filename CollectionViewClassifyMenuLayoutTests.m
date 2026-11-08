@@ -316,4 +316,14 @@
     [self assertNoOverlaps:collectionView fixture:fixture];
 }
 
+- (void)testUnmeasuredMenuWidthNeverProducesNegativeItemSize {
+    UIViewController *menu = [[NSClassFromString(@"CYLClassifyMenuViewController") alloc] init];
+    [menu loadViewIfNeeded];
+    UICollectionView *collectionView = [menu valueForKey:@"collectionView"];
+    collectionView.frame = CGRectMake(0, 0, 0, 240);
+    id<UICollectionViewDelegateFlowLayout> delegate = (id<UICollectionViewDelegateFlowLayout>)collectionView.delegate;
+    CGSize size = [delegate collectionView:collectionView layout:collectionView.collectionViewLayout sizeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+    XCTAssertGreaterThanOrEqual(size.width, 0);
+}
+
 @end
