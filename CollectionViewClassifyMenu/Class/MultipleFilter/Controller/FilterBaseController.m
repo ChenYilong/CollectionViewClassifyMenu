@@ -11,7 +11,6 @@
 #import "UIImage+Blur.h"
 #import "UIView+General.h"
 #import "CYLFilterParamsTool.h"
-#import "AppDelegate.h"
 
 @interface FilterBaseController ()<UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 
@@ -93,9 +92,8 @@
 }
 
 - (void)showInView:(UIView *)view {
-    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     // 屏幕截图
-    UIImage *screen = [delegate.navigationController.view cyl_capture];
+    UIImage *screen = [view cyl_capture];
     // 生成高斯模糊背景
     UIImage *blur = [screen cyl_blurredImageWithRadius:25.0f iterations:10 tintColor:nil];
     [view addSubview:self.view];

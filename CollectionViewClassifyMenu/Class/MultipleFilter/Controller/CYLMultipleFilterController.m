@@ -224,8 +224,6 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     FilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FilterCollectionCell" forIndexPath:indexPath];
-    CGSize size = [self collectionView:collectionView layout:nil sizeForItemAtIndexPath:indexPath];
-    cell.titleButton.frame = CGRectMake(0, 0, size.width, size.height);
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
     [cell.titleButton setTitle:text forState:UIControlStateNormal];
     [cell.titleButton setTitle:text forState:UIControlStateSelected];
@@ -256,12 +254,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (section == 1) {
-        NSMutableArray *types = [NSMutableArray arrayWithObject:@"全部"];
-        [types addObjectsFromArray:[CYLDBManager allTags]];
-        return [types count];
-    }
-    return 2;
+    return [self.filterParamsTool.dataSources[section] count];
 }
 
 #pragma mark - 🔌 UICollectionViewDelegateLeftAlignedLayout Method
@@ -278,12 +271,8 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 }
 
 - (float)checkCellLimitWidth:(float)cellWidth {
-    float limitWidth = (self.collectionView.contentSize.width - kCollectionViewToLeftMargin - kCollectionViewToRightMargin);
-    if (cellWidth >= limitWidth) {
-        cellWidth = limitWidth - kCollectionViewCellsHorizonMargin;
-        return cellWidth;
-    }
-    return cellWidth + 16 ;
+    CGFloat limitWidth = MAX(0, CGRectGetWidth(self.collectionView.bounds) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin);
+    return MIN(cellWidth + 16, limitWidth);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView

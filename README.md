@@ -71,3 +71,15 @@ YES为保存,NO为不保存.
 
 
 Check out [my twitter](https://twitter.com/stevechen1010) for more info.
+
+## CocoaPods
+
+The project supports iOS 15.0 and later. Until a versioned release is
+available, add the current branch to your Podfile:
+
+```ruby
+pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :branch => 'master'
+```
+
+The pod includes the example's XIBs, images and sample `data.json`. The
+repository's existing copyright notices continue to apply.

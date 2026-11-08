@@ -1,0 +1,13 @@
+filters:
+  and:
+    - file.folder == "CollectionViewClassifyMenu/docs"
+    - file.ext == "md"
+    - file.basename != "instructions"
+views:
+  - type: table
+    name: 文档
+    order:
+      - file.name
+    sort:
+      - property: file.name
+        direction: ASC

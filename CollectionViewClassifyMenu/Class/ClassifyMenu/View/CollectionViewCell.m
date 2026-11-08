@@ -34,7 +34,8 @@
 
 - (void)setup {
     self.button = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
-    self.button.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
+    self.button.frame = self.contentView.bounds;
+    self.button.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.contentView addSubview:self.button];
 //    [self.button cyl_generalStyle];
 //    [self.button cyl_homeStyle];

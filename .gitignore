@@ -1,0 +1,12 @@
+.DS_Store
+._*
+..git
+..github
+..gitignore
+..claude
+
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+Pods/

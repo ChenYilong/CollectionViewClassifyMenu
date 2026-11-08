@@ -47,6 +47,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 @property (nonatomic, strong) UISwitch         *rowsCountBydefaultSwitch;
 @property (nonatomic, strong) NSArray          *rowsCountPerSection;
 @property (nonatomic, strong) NSArray          *cellsCountArrayPerRowInSections;
+@property (nonatomic, assign) CGFloat          calculatedCollectionWidth;
 
 @end
 
@@ -92,11 +93,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     if (_rowsCountPerSection == nil) {
         _rowsCountPerSection = [[NSArray alloc] init];
         NSMutableArray *rowsCountPerSection = [NSMutableArray array];
-        [self.dataSource enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSMutableArray *items = [[NSMutableArray alloc] initWithArray:[obj objectForKey:kDataSourceSectionKey]];
-            NSUInteger secondRowCellCount = [[self cellsInPerRowWhenLayoutWithArray:items] count];
-            [rowsCountPerSection addObject:@(secondRowCellCount)];
-        }];
+        for (NSArray *rows in self.cellsCountArrayPerRowInSections) {
+            [rowsCountPerSection addObject:@(rows.count)];
+        }
         _rowsCountPerSection = (NSArray *)rowsCountPerSection;
     }
     return _rowsCountPerSection;
@@ -132,6 +131,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
                                       [UIScreen mainScreen].bounds.size.height)
                            ];
     self.backgroundView.showsVerticalScrollIndicator = NO;
+    self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.backgroundView.alwaysBounceVertical = YES;
     self.backgroundView.backgroundColor = [UIColor colorWithRed:252.0f / 255.f green:252.0f / 255.f blue:252.0f / 255.f alpha:2.f];
     [self.view addSubview:self.backgroundView];
@@ -152,11 +152,28 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     [self updateViewHeight];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    CGFloat width = CGRectGetWidth(self.collectionView.bounds);
+    if (width > 0 && width != self.calculatedCollectionWidth) {
+        self.calculatedCollectionWidth = width;
+        self.firstRowCellCountArray = nil;
+        self.collectionHeaderMoreBtnHideBoolArray = nil;
+        self.rowsCountPerSection = nil;
+        self.cellsCountArrayPerRowInSections = nil;
+        [self judgeMoreButtonShowWhenDefaultRowsCount:self.rowsCountBydefaultSwitch.isOn ? 2 : 1];
+        [self.collectionView reloadData];
+        [self updateViewHeight];
+    }
+}
+
 #pragma mark - 🆑 CYL Custom Method
 
 - (void)initData {
     self.firstRowCellCountArray = nil;
     self.collectionHeaderMoreBtnHideBoolArray = nil;
+    self.rowsCountPerSection = nil;
+    self.cellsCountArrayPerRowInSections = nil;
     self.dataSource = [NSArray arrayWithArray:[CYLDBManager dataSource]];
 }
 
@@ -198,49 +215,25 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 }
 
 - (NSUInteger)firstRowCellCountWithArray:(NSArray *)array {
-    CGFloat contentViewWidth = CGRectGetWidth(self.collectionView.frame) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin;
-    NSUInteger firstRowCellCount = 0;
-    float currentCellWidthSum = 0;
-    float currentCellSpace = 0;
-    for (int i = 0; i < array.count; i++) {
-        NSString *text = [array[i] objectForKey:kDataSourceCellTextKey];
-        float cellWidth = [self collectionCellWidthText:text content:array[i]];
-        if (cellWidth >= contentViewWidth) {
-            return i == 0? 1 : firstRowCellCount;
-        } else {
-            currentCellWidthSum += cellWidth;
-            if (i == 0) {
-                firstRowCellCount++;
-                continue;
-            }
-            currentCellSpace = (contentViewWidth - currentCellWidthSum) / firstRowCellCount;
-            if (currentCellSpace <= kCollectionViewCellsHorizonMargin) {
-                return firstRowCellCount;
-            } else {
-                firstRowCellCount++;
-            }
-        }
-    }
-   return firstRowCellCount;
+    return [[[self cellsInPerRowWhenLayoutWithArray:array] firstObject] unsignedIntegerValue];
 }
 
-- (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSMutableArray *)array {
-    __block NSUInteger secondRowCellCount = 0;
-    NSMutableArray *items = [NSMutableArray arrayWithArray:array];
-    NSUInteger firstRowCount = [self firstRowCellCountWithArray:items];
-    NSMutableArray *cellCount = [NSMutableArray arrayWithObject:@(firstRowCount)];
-    for (NSUInteger index = 0; index < [array count]; index++) {
-        NSUInteger firstRowCount = [self firstRowCellCountWithArray:items];
-        if (items.count != firstRowCount) {
-            NSRange range = NSMakeRange(0, firstRowCount);
-            [items removeObjectsInRange:range];
-            NSUInteger secondRowCount = [self firstRowCellCountWithArray:items];
-            secondRowCellCount = secondRowCount;
-            [cellCount addObject:@(secondRowCount)];
-        } else {
-            return cellCount;
+- (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSArray *)array {
+    CGFloat availableWidth = MAX(0, CGRectGetWidth(self.collectionView.bounds) - kCollectionViewToLeftMargin - kCollectionViewToRightMargin);
+    CGFloat usedWidth = 0;
+    NSUInteger count = 0;
+    NSMutableArray *cellCount = [NSMutableArray array];
+    for (NSDictionary *item in array) {
+        CGFloat width = [self collectionCellWidthText:item[kDataSourceCellTextKey] content:item];
+        if (count > 0 && usedWidth + kCollectionViewCellsHorizonMargin + width > availableWidth) {
+            [cellCount addObject:@(count)];
+            count = 0;
+            usedWidth = 0;
         }
+        usedWidth += (count > 0 ? kCollectionViewCellsHorizonMargin : 0) + width;
+        count++;
     }
+    if (count > 0) [cellCount addObject:@(count)];
     return cellCount;
 }
 
@@ -264,8 +257,12 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (UIView *)addTableHeaderView {
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
+    tableHeaderView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     tableHeaderView.backgroundColor = [UIColor whiteColor];
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 35, CGRectGetWidth(tableHeaderView.frame), 20)];
+    UILabel *titleLabel = [[UILabel alloc] init];
+    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    titleLabel.adjustsFontSizeToFitWidth = YES;
+    titleLabel.minimumScaleFactor = 0.7;
     self.titleLabel = titleLabel;
     titleLabel.font = [UIFont boldSystemFontOfSize:18];
     titleLabel.textColor = CYLAppTintColor;
@@ -276,32 +273,29 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
                  range:NSMakeRange(4, 2)];
     titleLabel.attributedText = text;
     [tableHeaderView addSubview:titleLabel];
-    CGSize size = [title sizeWithAttributes:
-                   @{NSFontAttributeName:
-                         titleLabel.font}];
-    float cellWidth = ceilf(size.width);
-    //仅修改titleLabel的宽度,xyh值不变
-    titleLabel.frame = CGRectMake(CGRectGetMinX(titleLabel.frame),
-                                  CGRectGetMidY(titleLabel.frame),
-                                  cellWidth,
-                                  CGRectGetHeight(titleLabel.frame)
-                                  );
     UISwitch *rowsCountBydefaultSwitch = [[UISwitch alloc] init];
-    rowsCountBydefaultSwitch.frame = CGRectMake(CGRectGetMaxX(titleLabel.frame) + 10,
-                                                25, 30, 20);
+    rowsCountBydefaultSwitch.translatesAutoresizingMaskIntoConstraints = NO;
     [tableHeaderView addSubview:rowsCountBydefaultSwitch];
     [rowsCountBydefaultSwitch addTarget:self action:@selector(rowsCountBydefaultSwitchClicked:) forControlEvents:UIControlEventAllEvents];
     self.rowsCountBydefaultSwitch = rowsCountBydefaultSwitch;
     UILabel *subtitleLabel = [[UILabel alloc] init];
-    subtitleLabel.frame = CGRectMake(CGRectGetMinX(titleLabel.frame),
-                                     CGRectGetMaxY(titleLabel.frame) + 10,
-                                     [UIScreen mainScreen].bounds.size.width,
-                                     14
-                                     );
+    subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    subtitleLabel.adjustsFontSizeToFitWidth = YES;
+    subtitleLabel.minimumScaleFactor = 0.7;
     subtitleLabel.font = [UIFont systemFontOfSize:12];
     subtitleLabel.textColor = [UIColor grayColor];
     subtitleLabel.text = @"超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品";
     [tableHeaderView addSubview:subtitleLabel];
+    [NSLayoutConstraint activateConstraints:@[
+        [titleLabel.leadingAnchor constraintEqualToAnchor:tableHeaderView.leadingAnchor constant:16],
+        [titleLabel.centerYAnchor constraintEqualToAnchor:rowsCountBydefaultSwitch.centerYAnchor],
+        [titleLabel.trailingAnchor constraintLessThanOrEqualToAnchor:rowsCountBydefaultSwitch.leadingAnchor constant:-8],
+        [rowsCountBydefaultSwitch.trailingAnchor constraintEqualToAnchor:tableHeaderView.trailingAnchor constant:-16],
+        [rowsCountBydefaultSwitch.topAnchor constraintEqualToAnchor:tableHeaderView.topAnchor constant:20],
+        [subtitleLabel.leadingAnchor constraintEqualToAnchor:titleLabel.leadingAnchor],
+        [subtitleLabel.trailingAnchor constraintEqualToAnchor:tableHeaderView.trailingAnchor constant:-16],
+        [subtitleLabel.topAnchor constraintEqualToAnchor:rowsCountBydefaultSwitch.bottomAnchor constant:8]
+    ]];
     return tableHeaderView;
 }
 
@@ -311,6 +305,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
     self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame
                                              collectionViewLayout:layout];
+    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
     self.collectionView.backgroundColor = [UIColor whiteColor];
@@ -336,7 +331,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
                                            self.collectionView.contentSize.height +
                                            kCollectionViewToTopMargin +
                                            kCollectionViewToBottomtMargin);
-    self.backgroundView.contentSize = CGSizeMake([UIScreen mainScreen].bounds.size.width,
+    self.backgroundView.contentSize = CGSizeMake(CGRectGetWidth(self.backgroundView.bounds),
                                                  self.collectionView.contentSize.height +
                                                  kControllerHeaderViewHeight +
                                                  kCollectionViewToTopMargin +
@@ -376,7 +371,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     CollectionViewCell *cell =
     (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier
                                                                     forIndexPath:indexPath];
-    cell.button.frame = CGRectMake(0, 0, CGRectGetWidth(cell.frame), CGRectGetHeight(cell.frame));
     NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
                                                             objectForKey:kDataSourceSectionKey]];
     NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];

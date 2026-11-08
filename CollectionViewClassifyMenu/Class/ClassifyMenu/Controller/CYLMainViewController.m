@@ -11,7 +11,6 @@
 #import "CYLMainViewController.h"
 //Others
 #import "CYLFilterParamsTool.h"
-#import "AppDelegate.h"
 #import "CYLParameterConfiguration.h"
 
 @interface CYLMainViewController ()<FilterControllerDelegate>
@@ -97,9 +96,8 @@
 }
 
 - (void)leftBarButtonClicked:(id)sender {
-    [_filterController refreshFilterParams];
-    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    [self.filterController showInView:delegate.navigationController.view];
+    [self.filterController refreshFilterParams];
+    [self.filterController showInView:self.navigationController.view ?: self.view];
 }
 
 #pragma mark - 🔌 FilterControllerDelegate Method

@@ -33,6 +33,8 @@
 
 - (void)setup {
     self.titleButton = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
+    _titleButton.frame = self.contentView.bounds;
+    _titleButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _titleButton.userInteractionEnabled = NO;
     _titleButton.titleLabel.font = CYLTagTitleFont;
     [_titleButton setBackgroundImage:[UIImage stretchableImageNamed:@"btn_slide_normal"] forState:UIControlStateNormal];
@@ -44,7 +46,6 @@
 }
 
 @end
-
 
 
 
