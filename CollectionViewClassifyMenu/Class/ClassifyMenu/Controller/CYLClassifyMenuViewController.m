@@ -6,7 +6,6 @@
 //  Copyright (c)  http://weibo.com/luohanchenyilong/ . All rights reserved.
 //  Single Choice Filter
 
-static float const kControllerHeaderViewHeight                = 90.f;
 static float const kControllerHeaderToCollectionViewMargin    = 0;
 static float const kCollectionViewCellsHorizonMargin          = 12;
 static float const kCollectionViewCellHeight                  = 30;
@@ -27,8 +26,13 @@ static float const kCellBtnCenterToBorderMargin               = 19;
 #import "CollectionViewCell.h"
 //Others
 #import "UICollectionViewLeftAlignedLayout.h"
-#import "CYLDBManager.h"
+#import "CYLMenuKeys.h"
 #import "CYLParameterConfiguration.h"
+#import "CYLMenuResources.h"
+
+NSString *const kDataSourceSectionKey = @"Items";
+NSString *const kDataSourceCellTextKey = @"Item_Title";
+NSString *const kDataSourceCellPictureKey = @"Picture";
 
 static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
@@ -43,8 +47,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 @property (nonatomic, strong) NSMutableArray   *firstRowCellCountArray;
 @property (nonatomic, strong) NSMutableArray   *expandSectionArray;
 @property (nonatomic, strong) UIScrollView     *backgroundView;
-@property (nonatomic, strong) UILabel          *titleLabel;
-@property (nonatomic, strong) UISwitch         *rowsCountBydefaultSwitch;
 @property (nonatomic, strong) NSArray          *rowsCountPerSection;
 @property (nonatomic, strong) NSArray          *cellsCountArrayPerRowInSections;
 @property (nonatomic, assign) CGFloat          calculatedCollectionWidth;
@@ -52,6 +54,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 @end
 
 @implementation CYLClassifyMenuViewController
+
+@synthesize defaultVisibleRows = _defaultVisibleRows;
 
 #pragma mark - 💤 LazyLoad Method
 
@@ -138,12 +142,11 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     
     [self initData];
     [self addCollectionView];
-    [self judgeMoreButtonShowWhenDefaultRowsCount:1];
-    [self.backgroundView addSubview:[self addTableHeaderView]];
+    [self judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
+    if (self.menuHeaderView) {
+        [self.backgroundView addSubview:self.menuHeaderView];
+    }
     self.view.backgroundColor = [UIColor blueColor];
-    //如果想显示两行，请打开下面两行代码,(这两行代码必须在“[self addTableHeaderView]”之后)
-    //        self.rowsCountBydefaultSwitch.on = YES;
-    //        [self rowsCountBydefaultSwitchClicked:self.rowsCountBydefaultSwitch];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -161,7 +164,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         self.collectionHeaderMoreBtnHideBoolArray = nil;
         self.rowsCountPerSection = nil;
         self.cellsCountArrayPerRowInSections = nil;
-        [self judgeMoreButtonShowWhenDefaultRowsCount:self.rowsCountBydefaultSwitch.isOn ? 2 : 1];
+        [self judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
         [self.collectionView reloadData];
         [self updateViewHeight];
     }
@@ -174,9 +177,36 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     self.collectionHeaderMoreBtnHideBoolArray = nil;
     self.rowsCountPerSection = nil;
     self.cellsCountArrayPerRowInSections = nil;
-    self.dataSource = [NSArray arrayWithArray:[CYLDBManager dataSource]];
+    NSMutableArray *sections = [NSMutableArray array];
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    NSInteger sectionCount = [source numberOfSectionsInMenu];
+    for (NSInteger section = 0; section < sectionCount; section++) {
+        NSMutableArray *items = [NSMutableArray array];
+        NSInteger count = [source menuNumberOfItemsInSection:section];
+        for (NSInteger item = 0; item < count; item++) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
+            NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithObject:[source menuTitleForItemAtIndexPath:indexPath]
+                                                                             forKey:kDataSourceCellTextKey];
+            if ([source respondsToSelector:@selector(menuItemHasImageAtIndexPath:)] &&
+                [source menuItemHasImageAtIndexPath:indexPath]) {
+                entry[kDataSourceCellPictureKey] = @"Picture";
+            }
+            [items addObject:entry];
+        }
+        [sections addObject:@{@"Type": [source menuTitleForSection:section], kDataSourceSectionKey: items}];
+    }
+    self.dataSource = sections;
 }
 
+- (void)reloadMenuData {
+    [self initData];
+    if (self.isViewLoaded) {
+        self.expandSectionArray = nil;
+        [self judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
+        [self.collectionView reloadData];
+        [self updateViewHeight];
+    }
+}
 - (float)cellLimitWidth:(float)cellWidth
             limitMargin:(CGFloat)limitMargin
            isLimitWidth:(ISLimitWidth)isLimitWidth {
@@ -188,6 +218,19 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     }
     isLimitWidth ? isLimitWidth(NO, @(cellWidth)) : nil;
     return cellWidth;
+}
+
+- (NSUInteger)defaultVisibleRows {
+    return _defaultVisibleRows ?: 1;
+}
+
+- (void)setDefaultVisibleRows:(NSUInteger)defaultVisibleRows {
+    _defaultVisibleRows = MAX(1, defaultVisibleRows);
+    if (self.isViewLoaded) {
+        [self judgeMoreButtonShowWhenDefaultRowsCount:_defaultVisibleRows];
+        [self.collectionView reloadData];
+        [self updateViewHeight];
+    }
 }
 
 - (void)judgeMoreButtonShowWhenDefaultRowsCount:(NSUInteger)defaultRowsCount {
@@ -255,52 +298,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     return cellWidth;
 }
 
-- (UIView *)addTableHeaderView {
-    UIView *tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kControllerHeaderViewHeight)];
-    tableHeaderView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    tableHeaderView.backgroundColor = [UIColor whiteColor];
-    UILabel *titleLabel = [[UILabel alloc] init];
-    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    titleLabel.adjustsFontSizeToFitWidth = YES;
-    titleLabel.minimumScaleFactor = 0.7;
-    self.titleLabel = titleLabel;
-    titleLabel.font = [UIFont boldSystemFontOfSize:18];
-    titleLabel.textColor = CYLAppTintColor;
-    NSString *title = @"默认显示一行时的效果如下所示:";
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
-    [text addAttribute:NSForegroundColorAttributeName
-                 value:[UIColor redColor]
-                 range:NSMakeRange(4, 2)];
-    titleLabel.attributedText = text;
-    [tableHeaderView addSubview:titleLabel];
-    UISwitch *rowsCountBydefaultSwitch = [[UISwitch alloc] init];
-    rowsCountBydefaultSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-    [tableHeaderView addSubview:rowsCountBydefaultSwitch];
-    [rowsCountBydefaultSwitch addTarget:self action:@selector(rowsCountBydefaultSwitchClicked:) forControlEvents:UIControlEventAllEvents];
-    self.rowsCountBydefaultSwitch = rowsCountBydefaultSwitch;
-    UILabel *subtitleLabel = [[UILabel alloc] init];
-    subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    subtitleLabel.adjustsFontSizeToFitWidth = YES;
-    subtitleLabel.minimumScaleFactor = 0.7;
-    subtitleLabel.font = [UIFont systemFontOfSize:12];
-    subtitleLabel.textColor = [UIColor grayColor];
-    subtitleLabel.text = @"超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品";
-    [tableHeaderView addSubview:subtitleLabel];
-    [NSLayoutConstraint activateConstraints:@[
-        [titleLabel.leadingAnchor constraintEqualToAnchor:tableHeaderView.leadingAnchor constant:16],
-        [titleLabel.centerYAnchor constraintEqualToAnchor:rowsCountBydefaultSwitch.centerYAnchor],
-        [titleLabel.trailingAnchor constraintLessThanOrEqualToAnchor:rowsCountBydefaultSwitch.leadingAnchor constant:-8],
-        [rowsCountBydefaultSwitch.trailingAnchor constraintEqualToAnchor:tableHeaderView.trailingAnchor constant:-16],
-        [rowsCountBydefaultSwitch.topAnchor constraintEqualToAnchor:tableHeaderView.topAnchor constant:20],
-        [subtitleLabel.leadingAnchor constraintEqualToAnchor:titleLabel.leadingAnchor],
-        [subtitleLabel.trailingAnchor constraintEqualToAnchor:tableHeaderView.trailingAnchor constant:-16],
-        [subtitleLabel.topAnchor constraintEqualToAnchor:rowsCountBydefaultSwitch.bottomAnchor constant:8]
-    ]];
-    return tableHeaderView;
-}
-
 - (void)addCollectionView {
-    CGRect collectionViewFrame = CGRectMake(0, kControllerHeaderViewHeight + kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width,
+    CGRect collectionViewFrame = CGRectMake(0, CGRectGetHeight(self.menuHeaderView.frame) + kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width,
                                             [UIScreen mainScreen].bounds.size.height - 40);
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
     self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame
@@ -324,7 +323,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (void)updateViewHeight {
     [self.collectionView.collectionViewLayout invalidateLayout];
     [self.collectionView.collectionViewLayout prepareLayout];
-    //仅修改self.collectionView的高度,xyw值不变
+    // 仅修改self.collectionView的高度,xyw值不变 / Change only the collection view's height.
     self.collectionView.frame = CGRectMake(CGRectGetMinX(self.collectionView.frame),
                                            CGRectGetMinY(self.collectionView.frame),
                                            CGRectGetWidth(self.collectionView.frame),
@@ -333,7 +332,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
                                            kCollectionViewToBottomtMargin);
     self.backgroundView.contentSize = CGSizeMake(CGRectGetWidth(self.backgroundView.bounds),
                                                  self.collectionView.contentSize.height +
-                                                 kControllerHeaderViewHeight +
+                                                 CGRectGetHeight(self.menuHeaderView.frame) +
                                                  kCollectionViewToTopMargin +
                                                  kCollectionViewToBottomtMargin +
                                                  64);
@@ -376,7 +375,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
     BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
     if (shouldShowPic) {
-        [cell.button setImage:[UIImage imageNamed:@"home_btn_shrink"]
+        [cell.button setImage:[CYLMenuResources imageNamed:@"home_btn_shrink"]
                      forState:UIControlStateNormal];
         CGFloat spacing = kCollectionViewItemButtonImageToTextMargin;
         cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
@@ -397,33 +396,6 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 #pragma mark - 🎬 Actions Method
 
-- (void)rowsCountBydefaultSwitchClicked:(UISwitch *)sender {
-    [self initData];
-    [self judgeMoreButtonShowWhenDefaultRowsCount:1];
-    
-    NSString *title;
-    if (sender.isOn) {
-        title = @"默认显示两行时的效果如下所示:";
-        [self judgeMoreButtonShowWhenDefaultRowsCount:2];
-    } else {
-        title = @"默认显示一行时的效果如下所示:";
-    }
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
-    [text addAttribute:NSForegroundColorAttributeName
-                 value:[UIColor redColor]
-                 range:NSMakeRange(4, 2)];
-    self.titleLabel.attributedText = text;
-    [self.collectionView reloadData];
-    __weak __typeof(self) weakSelf = self;
-    [self.collectionView performBatchUpdates:^{
-        __strong typeof(self) strongSelf = weakSelf;
-        [strongSelf.collectionView reloadData];
-    } completion:^(BOOL finished) {
-        __strong typeof(self) strongSelf = weakSelf;
-        [strongSelf updateViewHeight];
-    }];
-}
-
 - (void)itemButtonClicked:(CYLIndexPathButton *)button {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:button.row inSection:button.section];
     [self collectionView:self.collectionView didSelectItemAtIndexPath:indexPath];
@@ -432,24 +404,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 #pragma mark - 🔌 UICollectionViewDelegate Method
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    //二级菜单数组
-    NSArray *items = [NSArray arrayWithArray:[self.dataSource[indexPath.section]
-                                              objectForKey:kDataSourceSectionKey]];
-    NSString *sectionTitle = [self.dataSource[indexPath.section] objectForKey:@"Type"];
-    BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
-    NSString *cellTitle = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
-    NSString *message = shouldShowPic ? [NSString stringWithFormat:@"★%@", cellTitle] : cellTitle;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:sectionTitle
-                                                    message:message
-                                                   delegate:self
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:nil];
-    [alert show];
-    NSUInteger delaySeconds = 1;
-    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-    dispatch_after(when, dispatch_get_main_queue(), ^{
-        [alert dismissWithClickedButtonIndex:0 animated:YES];
-    });
+    if ([self.menuDelegate respondsToSelector:@selector(menu:didSelectItemAtIndexPath:)]) {
+        [self.menuDelegate menu:self didSelectItemAtIndexPath:indexPath];
+    }
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
@@ -471,19 +428,19 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
         switch (indexPath.section) {
             case 0:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
                                               forState:UIControlStateNormal];
                 break;
             case 1:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
                                               forState:UIControlStateNormal];
                 break;
             case 2:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
                                               forState:UIControlStateNormal];
                 break;
             case 3:
-                [filterHeaderView.titleButton setImage:[UIImage imageNamed:@"home_btn_cosmetic"]
+                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
                                               forState:UIControlStateNormal];
                 break;
             default:

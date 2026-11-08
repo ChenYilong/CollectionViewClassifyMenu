@@ -3,14 +3,11 @@
 //  http://cnblogs.com/ChenYilong/ 
 //
 //  Created by https://github.com/ChenYilong on 15/4/22.
-//  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
+//  Copyright (c) 2015年 (year 2015)  https://github.com/ChenYilong . All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-
-extern NSString *const kDataSourceSectionKey;
-extern NSString *const kDataSourceCellTextKey;
-extern NSString *const kDataSourceCellPictureKey;
+#import "CYLMenuKeys.h"
 
 @interface CYLDBManager : NSObject
 

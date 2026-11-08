@@ -3,14 +3,10 @@
 //  http://cnblogs.com/ChenYilong/
 //
 //  Created by https://github.com/ChenYilong on 15/4/22.
-//  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
+//  Copyright (c) 2015年 (year 2015)  https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLDBManager.h"
-
-NSString *const kDataSourceSectionKey     = @"Items";
-NSString *const kDataSourceCellTextKey    = @"Item_Title";
-NSString *const kDataSourceCellPictureKey = @"Picture";
 
 @implementation CYLDBManager
 

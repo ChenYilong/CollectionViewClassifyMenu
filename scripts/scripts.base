@@ -1,0 +1,12 @@
+filters:
+  and:
+    - file.folder == "CollectionViewClassifyMenu/scripts"
+    - file.basename != "instructions"
+views:
+  - type: table
+    name: Scripts
+    order:
+      - file.name
+    sort:
+      - property: file.name
+        direction: ASC

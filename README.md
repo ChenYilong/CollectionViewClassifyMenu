@@ -35,9 +35,9 @@ Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 
 第一种是CollectionView做的两级菜单，可以折叠第二级菜单
 
-第二种是侧边栏菜单,具有多选功能,并可将数据持久化,在下次打开app后,保留用户的筛选条件.默认保存.
+第二种是侧边栏菜单，具有多选功能。示例应用保存筛选条件；组件本身不读取或持久化业务数据。
 
-数据持久化使用NSCoding,若要关闭该项功能,可在AppDelegate里清除固化数据,
+以下 NSCoding 用法是旧版本的历史说明；当前示例使用 `NSUserDefaults`，由宿主处理选择结果。旧版本若要关闭持久化，可在 AppDelegate 里清除固化数据。
  
  
 清除方法已经在工程中写出:
@@ -74,12 +74,72 @@ Check out [my twitter](https://twitter.com/stevechen1010) for more info.
 
 ## CocoaPods
 
-The project supports iOS 15.0 and later. Until a versioned release is
-available, add the current branch to your Podfile:
+The component supports iOS 15.0 and later. Until a versioned release is
+published, add the current branch to your Podfile:
 
 ```ruby
 pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :branch => 'master'
 ```
 
-The pod includes the example's XIBs, images and sample `data.json`. The
-repository's existing copyright notices continue to apply.
+The pod contains the reusable menus, XIBs and images, but **not** demo data.
+The existing copyright notices continue to apply.
+
+两个示例分别通过本地 Pod 引用同一个组件：
+
+```sh
+pod install
+open CollectionViewClassifyMenu.xcworkspace
+
+cd TagCollectionView
+pod install
+open TagCollectionView.xcworkspace
+```
+
+### Interface-oriented usage / 面向接口使用
+
+Implement `CYLMenuDataSource` in the host and retain it for as long as the
+menu is in use. The component holds the data source and delegate weakly.
+The host provides section and item titles, optional image and exclusive-item
+flags, handles selections, and decides whether and how to persist them.
+
+```objc
+@import CollectionViewClassifyMenu;
+
+// self implements CYLMenuDataSource and CYLMenuDelegate.
+CYLClassifyMenuViewController *menu = [[CYLClassifyMenuViewController alloc] init];
+menu.menuDataSource = self;
+menu.menuDelegate = self;
+menu.defaultVisibleRows = 2;  // Default: 1.
+// Present or embed menu as a child view controller.
+```
+
+The required data source methods are `numberOfSectionsInMenu`,
+`menuNumberOfItemsInSection:`, `menuTitleForSection:` and
+`menuTitleForItemAtIndexPath:`. Set an optional `menuHeaderView` before loading
+the view. After changing host data, call `reloadMenuData`. The filter
+controller uses the same protocols; `selectedIndexPaths` and
+`setSelectedIndexPaths:` allow the host to save and restore selections.
+`reloadMenuData` resets filter selections to each section's first exclusive
+item, if one is supplied.
+
+`TagView` also accepts the same protocols and supports both `[[TagView alloc]
+initWithFrame:]` and its existing `+[TagView TagView]` initializer. See the
+two demo controllers for complete implementations.
+
+### Release / 发布
+
+```sh
+scripts/pod-lint.sh lib
+scripts/pod-lint.sh version
+scripts/pod-lint.sh bump 0.1.1  # Commit the updated podspec first.
+scripts/pod-lint.sh check-tag 0.1.1
+# Create and push a matching Git tag, then explicitly:
+scripts/pod-lint.sh push
+```
+
+The push command requires a matching tag on `origin` and an authenticated
+CocoaPods trunk account. It is not run automatically. The `0.1.0` podspec
+does not imply that a CocoaPods release or Git tag already exists.
+
+设计分析与未覆盖场景见 `docs/component-architecture.md`；issue 进度见
+`docs/issue-progress.md`。

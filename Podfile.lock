@@ -1,0 +1,16 @@
+PODS:
+  - CollectionViewClassifyMenu (0.1.0)
+
+DEPENDENCIES:
+  - CollectionViewClassifyMenu (from `.`)
+
+EXTERNAL SOURCES:
+  CollectionViewClassifyMenu:
+    :path: "."
+
+SPEC CHECKSUMS:
+  CollectionViewClassifyMenu: cbca5066758e68999d2dd9ce55982e0f8894f84c
+
+PODFILE CHECKSUM: 6c1a7e550943cd2ef535656d2450dc749bef56c4
+
+COCOAPODS: 1.17.0

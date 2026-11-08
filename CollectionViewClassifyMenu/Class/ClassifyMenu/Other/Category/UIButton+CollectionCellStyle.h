@@ -13,7 +13,7 @@
 - (void)cyl_generalStyle;
 - (void)cyl_homeStyle;
 - (void)cyl_redStyle;
-//城觅客户端风格
+// 城觅客户端风格 / Chengmi client style.
 - (void)cyl_chengNiStyle;
 
 @end

@@ -7,8 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CYLMenuDataSource.h"
 
 @interface CYLClassifyMenuViewController : UIViewController
 
-@end
+@property (nonatomic, weak) id<CYLMenuDataSource> menuDataSource;
+@property (nonatomic, weak) id<CYLMenuDelegate> menuDelegate;
+@property (nonatomic, strong) UIView *menuHeaderView;
+@property (nonatomic, assign) NSUInteger defaultVisibleRows;
 
+- (void)reloadMenuData;
+
+@end

@@ -12,14 +12,11 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 #import "CYLMultipleFilterController.h"
 //Others
 #import "CYLFilterParamsTool.h"
-#import "CYLDBManager.h"
 #import "CYLParameterConfiguration.h"
 
-@interface CYLMultipleFilterController ()
+@interface CYLMultipleFilterController () <UICollectionViewDataSource>
 
 @property (nonatomic, strong) CYLFilterParamsTool *filterParamsTool;
-@property (nonatomic, strong) NSString            *filename;
-@property (nonatomic, assign) NSUInteger          secondSectionTagsCount;
 
 @end
 
@@ -35,14 +32,6 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 - (CYLFilterParamsTool *)filterParamsTool {
     if (_filterParamsTool == nil) {
         _filterParamsTool = [[CYLFilterParamsTool alloc] init];
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        BOOL fileExists = [fileManager fileExistsAtPath:self.filterParamsTool.filename];
-        if (!fileExists) {
-            CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
-            [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
-        } else {
-            _filterParamsTool = [NSKeyedUnarchiver unarchiveObjectWithFile:_filterParamsTool.filename];
-        }
     }
     return _filterParamsTool;
 }
@@ -52,149 +41,100 @@ static float const kCollectionViewCellsHorizonMargin = 12;
  *
  *  @return int
  */
-- (NSUInteger)secondSectionTagsCount {
-    if (_secondSectionTagsCount == 0) {
-        NSMutableArray *types = [NSMutableArray arrayWithObject:@"全部"];
-        [types addObjectsFromArray:[CYLDBManager allTags]];
-        _secondSectionTagsCount = [types count];
-    }
-    return _secondSectionTagsCount;
-}
-
-/**
- *  lazy load _filename
- *
- *  @return NSString
- */
-- (NSString *)filename {
-    if (_filename == nil) {
-        _filename = [[NSString alloc] init];
-        NSString *Path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-        _filename = [Path stringByAppendingPathComponent:kMultipleFilterSetting];
-    }
-    return _filename;
-}
-
 #pragma mark - ♻️ LifeCycle Method
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.collectionView.dataSource = self;
     self.collectionView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
-    //【Fixed Bug】以下两行代码意在解决iphone 6p self.collectionView刷新不及时的bug
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-    [self collectionView:self.collectionView didSelectItemAtIndexPath:indexPath];
-    NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
-    if (allSecondSectionTagsCount >0) {
-        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
-    }
+    [self reloadMenuData];
 }
 
 - (void)refreshFilterParams {
-    self.filterParamsTool = nil;
-    NSUInteger allSecondSectionTagsCount = [[self.collectionView indexPathsForVisibleItems] count];
-    if (allSecondSectionTagsCount >0) {
-        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
+    if (self.isViewLoaded) {
+        [self.collectionView reloadData];
     }
+}
+
+- (void)reloadMenuData {
+    NSMutableArray *sections = [NSMutableArray array];
+    NSMutableArray *selected = [NSMutableArray array];
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    for (NSInteger section = 0; section < [source numberOfSectionsInMenu]; section++) {
+        NSMutableArray *items = [NSMutableArray array];
+        NSMutableArray *states = [NSMutableArray array];
+        BOOL selectedExclusive = NO;
+        for (NSInteger item = 0; item < [source menuNumberOfItemsInSection:section]; item++) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
+            [items addObject:[source menuTitleForItemAtIndexPath:indexPath]];
+            BOOL exclusive = [source respondsToSelector:@selector(menuItemIsExclusiveAtIndexPath:)] &&
+                             [source menuItemIsExclusiveAtIndexPath:indexPath];
+            [states addObject:@(exclusive && !selectedExclusive)];
+            selectedExclusive |= exclusive;
+        }
+        [sections addObject:items];
+        [selected addObject:states];
+    }
+    self.filterParamsTool.dataSources = sections;
+    self.filterParamsTool.filterParamsArray = selected;
+    if (self.isViewLoaded) {
+        [self.collectionView reloadData];
+    }
+}
+
+- (NSArray<NSIndexPath *> *)selectedIndexPaths {
+    NSMutableArray *paths = [NSMutableArray array];
+    [self.filterParamsTool.filterParamsArray enumerateObjectsUsingBlock:^(NSArray *section, NSUInteger sectionIndex, BOOL *stop) {
+        [section enumerateObjectsUsingBlock:^(NSNumber *value, NSUInteger item, BOOL *itemStop) {
+            if (value.boolValue) {
+                [paths addObject:[NSIndexPath indexPathForItem:item inSection:sectionIndex]];
+            }
+        }];
+    }];
+    return paths;
+}
+
+- (void)setSelectedIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
+    [self loadViewIfNeeded];
+    NSMutableIndexSet *exclusiveSections = [NSMutableIndexSet indexSet];
+    NSMutableIndexSet *otherSections = [NSMutableIndexSet indexSet];
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    BOOL hasExclusive = [source respondsToSelector:@selector(menuItemIsExclusiveAtIndexPath:)];
+    for (NSIndexPath *path in indexPaths) {
+        if (path.section >= self.filterParamsTool.dataSources.count ||
+            path.item >= [self.filterParamsTool.dataSources[path.section] count]) {
+            [NSException raise:NSInvalidArgumentException format:@"Invalid menu selection: %@", path];
+        }
+        BOOL exclusive = hasExclusive && [source menuItemIsExclusiveAtIndexPath:path];
+        if ((exclusive && ([exclusiveSections containsIndex:path.section] || [otherSections containsIndex:path.section])) ||
+            (!exclusive && [exclusiveSections containsIndex:path.section])) {
+            [NSException raise:NSInvalidArgumentException format:@"Exclusive selection conflicts in section %ld", (long)path.section];
+        }
+        [(exclusive ? exclusiveSections : otherSections) addIndex:path.section];
+    }
+    for (NSMutableArray *section in self.filterParamsTool.filterParamsArray) {
+        for (NSUInteger index = 0; index < section.count; index++) {
+            section[index] = @NO;
+        }
+    }
+    for (NSIndexPath *path in indexPaths) {
+        self.filterParamsTool.filterParamsArray[path.section][path.item] = @YES;
+    }
+    [self.collectionView reloadData];
 }
 
 #pragma mark - 🎬 Actions Method
 
 - (void)confirmButtonClicked:(id)sender {
-    [super confirmButtonClicked:sender];
-    self.filterParamsTool.filterParamsDictionary[kMultipleFilterSetting] = self.filterParamsTool.filterParamsArray;
-    BOOL modified = NO;
-    for (NSArray *array in self.filterParamsTool.filterParamsArray) {
-        if ([[array firstObject] boolValue] == NO) {
-            modified = YES;
-            break;
-        }
+    if ([self.menuDelegate respondsToSelector:@selector(menu:didConfirmSelectedItems:)]) {
+        [self.menuDelegate menu:self didConfirmSelectedItems:self.selectedIndexPaths];
     }
-    self.filterParamsTool.filterParamsDictionary[kMultipleFilterSettingModified] = @(modified);
-    [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filename];
+    [super confirmButtonClicked:sender];
 }
 
 - (void)restoreButtonClicked:(id)sender {
-    [super confirmButtonClicked:sender];
-    self.filterParamsTool = [[CYLFilterParamsTool alloc] init];
-    [NSKeyedArchiver archiveRootObject:self.filterParamsTool toFile:self.filterParamsTool.filename];
-}
-
-- (void)clickedInFirstSection:(NSIndexPath *)indexPath
-                   withButton:(CYLIndexPathButton *)button
-                  withsetting:(NSMutableArray *)setting {
-    if (indexPath.row == 1) {
-        NSString *area = @"北京";
-        [setting replaceObjectAtIndex:1 withObject:@1];
-        [setting replaceObjectAtIndex:0 withObject:@0];
-        // 选择医院结束，将此医院保存，下次进入此界面，需显示
-        self.filterParamsTool.filterParamsContentDictionary[@"Hospital"] = area;
-        NSMutableArray *array = self.filterParamsTool.dataSources[0];
-        [array replaceObjectAtIndex:1 withObject:area];
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
-        
-        NSString *message = @"点击选择地区按钮，\n弹出选择地区的界面\n这里默认选北京";
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:message delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
-        [alert show];
-        NSUInteger delaySeconds = 1.5;
-        dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-        dispatch_after(when, dispatch_get_main_queue(), ^{
-            [alert dismissWithClickedButtonIndex:0 animated:YES];
-        });
-        return;
-    } else {
-        // 点击的是“全部”按钮
-        [setting replaceObjectAtIndex:0 withObject:@1];
-        [setting replaceObjectAtIndex:1 withObject:@0];
-        NSMutableArray *array = [NSMutableArray arrayWithArray:self.filterParamsTool.dataSources[0]];
-        [array replaceObjectAtIndex:1 withObject:@"请选择"];
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
-        [self.filterParamsTool.filterParamsContentDictionary removeObjectForKey:@"Hospital"];
-    }
-}
-
-- (void)clickedInSecondSection:(NSIndexPath *)indexPath
-                    withButton:(CYLIndexPathButton *)button
-                   withSetting:(NSMutableArray *)setting {
-    NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
-    if (indexPath.row == 0) {
-        if (button.selected ) {
-            return;
-        } else {
-            //处于修改状态
-            [self.filterParamsTool.filterParamsContentDictionary
-             removeObjectForKey:@"skilled"];
-        }
-    }
-    [setting replaceObjectAtIndex:indexPath.row withObject:@(!button.selected)];
-    if (indexPath.row > 0) {
-        if (!button.selected) {
-            [setting replaceObjectAtIndex:0 withObject:@(0)];
-            if ([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] count] == 0) {
-                self.filterParamsTool.filterParamsContentDictionary[@"skilled"] = [NSMutableArray array];
-            }
-            if (![text isEqualToString:@"全部"]) {
-                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] addObject:text];
-            }
-        } else {
-            if (![setting containsObject:@(1)]) {
-                [setting replaceObjectAtIndex:0 withObject:@(1)];
-                [self.filterParamsTool.filterParamsContentDictionary
-                 removeObjectForKey:@"skilled"];
-            }
-            if ([self.filterParamsTool.filterParamsContentDictionary[@"skilled"] containsObject:text]) {
-                [self.filterParamsTool.filterParamsContentDictionary[@"skilled"] removeObject:text];
-            }
-        }
-        NSIndexPath *allBtnIndexPath = [NSIndexPath indexPathForItem:0 inSection:button.section];
-        [self.collectionView reloadItemsAtIndexPaths:@[allBtnIndexPath]];
-    } else {
-        for (NSUInteger i = 0; i < setting.count; i++) {
-            if (i > 0) {
-                [setting replaceObjectAtIndex:i withObject:@(0)];
-            }
-        }
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
-    }
+    [self reloadMenuData];
+    [self confirmButtonClicked:sender];
 }
 
 #pragma mark - 🔌 UICollectionViewDelegate Method
@@ -204,18 +144,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
                                  atIndexPath:(NSIndexPath *)indexPath {
     if ([kind isEqual:UICollectionElementKindSectionHeader]) {
         CYLMultipleFilterHeaderView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"CYLMultipleFilterHeaderView" forIndexPath:indexPath];
-        switch (indexPath.section) {
-            case 0:
-                view.imageView.image = [UIImage imageNamed:@"icon_slide_sort"];
-                view.titleLabel.text = @"地区过滤";
-                break;
-            case 1:
-                view.imageView.image = [UIImage imageNamed:@"icon_slide_people"];
-                view.titleLabel.text = @"菜品过滤";
-                break;
-            default:
-                break;
-        }
+        view.titleLabel.text = [self.menuDataSource menuTitleForSection:indexPath.section];
         return view;
     }
     return nil;
@@ -234,17 +163,37 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    FilterCollectionCell *cell =
-    (FilterCollectionCell *)[collectionView cellForItemAtIndexPath:indexPath];
-    //button.selected是指button原来的状态
-    //是否修改要看,数组第一个值是否是0,默认是1
     NSMutableArray *setting = self.filterParamsTool.filterParamsArray[indexPath.section];
-    if (indexPath.section == 0) {
-        [self clickedInFirstSection:indexPath withButton:cell.titleButton withsetting:setting];
-    } else if (indexPath.section == 1) {
-        [self clickedInSecondSection:indexPath withButton:cell.titleButton withSetting:setting];
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    BOOL hasExclusive = [source respondsToSelector:@selector(menuItemIsExclusiveAtIndexPath:)];
+    BOOL exclusive = hasExclusive && [source menuItemIsExclusiveAtIndexPath:indexPath];
+    BOOL wasSelected = [setting[indexPath.item] boolValue];
+    if (exclusive) {
+        for (NSUInteger item = 0; item < setting.count; item++) {
+            setting[item] = @(item == indexPath.item);
+        }
+    } else {
+        setting[indexPath.item] = @(!wasSelected);
+        for (NSUInteger item = 0; item < setting.count; item++) {
+            NSIndexPath *other = [NSIndexPath indexPathForItem:item inSection:indexPath.section];
+            if (hasExclusive && [source menuItemIsExclusiveAtIndexPath:other]) {
+                setting[item] = @NO;
+            }
+        }
+        if (![setting containsObject:@YES] && hasExclusive) {
+            for (NSUInteger item = 0; item < setting.count; item++) {
+                NSIndexPath *other = [NSIndexPath indexPathForItem:item inSection:indexPath.section];
+                if ([source menuItemIsExclusiveAtIndexPath:other]) {
+                    setting[item] = @YES;
+                    break;
+                }
+            }
+        }
     }
-    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
+    if ([self.menuDelegate respondsToSelector:@selector(menu:didSelectItemAtIndexPath:)]) {
+        [self.menuDelegate menu:self didSelectItemAtIndexPath:indexPath];
+    }
 }
 
 #pragma mark - 🔌 UICollectionViewDataSource Method

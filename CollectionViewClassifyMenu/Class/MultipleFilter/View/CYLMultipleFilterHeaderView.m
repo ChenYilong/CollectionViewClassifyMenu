@@ -20,7 +20,8 @@
 }
 
 - (void)awakeFromNib {
-    //仅修改_titleLabel的宽度,xyh值不变
+    [super awakeFromNib];
+    // 仅修改_titleLabel的宽度,xyh值不变 / Change only the title label's width.
     float width = [UIScreen mainScreen].bounds.size.width - 50 - 50;
     _titleLabel.frame = CGRectMake(_titleLabel.frame.origin.x, _titleLabel.frame.origin.y, width, _titleLabel.frame.size.height);
     [_titleLabel cyl_addSubLayerWithFrame:CGRectMake(0, _titleLabel.frame.size.height - 0.5f, _titleLabel.frame.size.width, 0.5f) color:[UIColor colorWithRed:146 / 255.f green:175 / 255.f blue:164 / 255.f alpha:1.f].CGColor];

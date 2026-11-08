@@ -8,8 +8,6 @@
 
 #import "AppDelegate.h"
 #import "CYLMainViewController.h"
-#import "CYLFilterParamsTool.h"
-#import "CYLParameterConfiguration.h"
 
 @interface AppDelegate ()
 
@@ -23,7 +21,7 @@
     if ([UINavigationBar conformsToProtocol:@protocol(UIAppearanceContainer)]) {
         [UINavigationBar appearance].tintColor = [UIColor whiteColor];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor]}];
-        [[UINavigationBar appearance] setBarTintColor:CYLAppTintColor];
+        [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:42 / 255.0 green:185 / 255.0 blue:160 / 255.0 alpha:1]];
         [[UINavigationBar appearance] setTranslucent:NO];
     }
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -39,8 +37,7 @@
 
 - (void)initFilterSetting:(BOOL)restore {
     if (!restore) {
-        CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
-        [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CYLDemoFilterSelection"];
     }
 }
 

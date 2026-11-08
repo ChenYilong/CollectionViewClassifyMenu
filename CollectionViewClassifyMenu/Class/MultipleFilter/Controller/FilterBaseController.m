@@ -11,6 +11,7 @@
 #import "UIImage+Blur.h"
 #import "UIView+General.h"
 #import "CYLFilterParamsTool.h"
+#import "CYLMenuResources.h"
 
 @interface FilterBaseController ()<UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 
@@ -19,6 +20,10 @@
 @end
 
 @implementation FilterBaseController
+
+- (instancetype)init {
+    return [super initWithNibName:@"FilterBaseController" bundle:[CYLMenuResources bundle]];
+}
 
 #pragma mark - ♻️ LifeCycle Method
 
@@ -34,12 +39,11 @@
     _contentView.backgroundColor = [UIColor blackColor];
     _collectionView.showsVerticalScrollIndicator = NO;
     _collectionView.delegate = self;
-    _collectionView.dataSource = self;
     UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
     _collectionView.collectionViewLayout = layout;
     _collectionView.contentInset = UIEdgeInsetsMake(15, 0, 0, 0);
     [_collectionView registerClass:[FilterCollectionCell class] forCellWithReuseIdentifier:@"FilterCollectionCell"];
-    [_collectionView registerNib:[UINib nibWithNibName:@"CYLMultipleFilterHeaderView" bundle:nil]
+    [_collectionView registerNib:[UINib nibWithNibName:@"CYLMultipleFilterHeaderView" bundle:[CYLMenuResources bundle]]
       forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
              withReuseIdentifier:@"CYLMultipleFilterHeaderView"];
     [_contentView cyl_setTarget:self action:@selector(hide)];
@@ -92,9 +96,9 @@
 }
 
 - (void)showInView:(UIView *)view {
-    // 屏幕截图
+    // 屏幕截图 / Capture the host view.
     UIImage *screen = [view cyl_capture];
-    // 生成高斯模糊背景
+    // 生成高斯模糊背景 / Generate a Gaussian-blurred background.
     UIImage *blur = [screen cyl_blurredImageWithRadius:25.0f iterations:10 tintColor:nil];
     [view addSubview:self.view];
     _blurImageView.image = blur;

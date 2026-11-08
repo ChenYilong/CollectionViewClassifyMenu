@@ -1,7 +1,23 @@
 #import <XCTest/XCTest.h>
-#import "CollectionViewClassifyMenu/Class/Other/Lib/UICollectionViewLeftAlignedLayout/UICollectionViewLeftAlignedLayout.h"
+@import CollectionViewClassifyMenu;
 #import "CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.h"
-#import "CollectionViewClassifyMenu/Class/MultipleFilter/Other/Tool/CYLFilterParamsTool.h"
+#import "CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/CYLMainViewController.h"
+
+@interface CYLTestMenuSource : NSObject <CYLMenuDataSource, CYLMenuDelegate>
+@property (nonatomic, copy) NSArray<NSArray<NSString *> *> *sections;
+@property (nonatomic, copy) NSArray<NSIndexPath *> *confirmed;
+@property (nonatomic, strong) NSIndexPath *lastSelection;
+@end
+
+@implementation CYLTestMenuSource
+- (NSInteger)numberOfSectionsInMenu { return self.sections.count; }
+- (NSInteger)menuNumberOfItemsInSection:(NSInteger)section { return self.sections[section].count; }
+- (NSString *)menuTitleForSection:(NSInteger)section { return [NSString stringWithFormat:@"Section %ld", (long)section]; }
+- (NSString *)menuTitleForItemAtIndexPath:(NSIndexPath *)indexPath { return self.sections[indexPath.section][indexPath.item]; }
+- (BOOL)menuItemIsExclusiveAtIndexPath:(NSIndexPath *)indexPath { return indexPath.item == 0; }
+- (void)menu:(id)menu didSelectItemAtIndexPath:(NSIndexPath *)indexPath { self.lastSelection = indexPath; }
+- (void)menu:(id)menu didConfirmSelectedItems:(NSArray<NSIndexPath *> *)indexPaths { self.confirmed = indexPaths; }
+@end
 
 @interface CYLLayoutFixture : NSObject <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 @property (nonatomic, strong) NSArray<NSArray<NSString *> *> *sections;
@@ -50,7 +66,33 @@
 - (void)judgeMoreButtonShowWhenDefaultRowsCount:(NSUInteger)defaultRowsCount;
 @end
 
+@interface CYLMainViewController (CYLMigrationTesting)
+- (NSArray *)selectionFromLegacyArchiveData:(NSData *)data;
+- (NSArray<NSIndexPath *> *)validatedSelection:(NSArray *)stored;
+@end
+
 @implementation CollectionViewClassifyMenuLayoutTests
+
+- (void)testLegacyFilterSelectionMigrationValidatesArchivedStates {
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = @[@[@"All", @"One"], @[@"All", @"Two"]];
+    CYLMainViewController *controller = [[CYLMainViewController alloc] init];
+    [controller setValue:source forKey:@"filterSource"];
+    CYLFilterParamsTool *legacy = [[CYLFilterParamsTool alloc] init];
+    legacy.filterParamsArray = [@[[NSMutableArray arrayWithArray:@[@0, @1]],
+                                  [NSMutableArray arrayWithArray:@[@1, @0]]] mutableCopy];
+    NSError *error = nil;
+    NSData *archive = [NSKeyedArchiver archivedDataWithRootObject:legacy requiringSecureCoding:NO error:&error];
+    XCTAssertNotNil(archive);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects([controller selectionFromLegacyArchiveData:archive], (@[@[@0, @1], @[@1, @0]]));
+    XCTAssertNil([controller selectionFromLegacyArchiveData:[@"invalid" dataUsingEncoding:NSUTF8StringEncoding]]);
+    XCTAssertNil(([controller validatedSelection:@[@[@(-1), @0]]]));
+    XCTAssertNil(([controller validatedSelection:@[@[@0, @0], @[@0, @1]]]));
+    legacy.filterParamsArray[0][1] = @"bad";
+    archive = [NSKeyedArchiver archivedDataWithRootObject:legacy requiringSecureCoding:NO error:&error];
+    XCTAssertNil([controller selectionFromLegacyArchiveData:archive]);
+}
 
 - (NSArray<NSArray<NSString *> *> *)longEmojiSections {
     NSMutableArray *sections = [NSMutableArray array];
@@ -66,8 +108,8 @@
         }
         [sections addObject:titles];
     }
-    CYLFilterParamsTool *filter = [[CYLFilterParamsTool alloc] init];
-    for (NSArray *sourceSection in filter.dataSources) {
+    NSArray *filterSections = @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:[CYLDBManager allTags]]];
+    for (NSArray *sourceSection in filterSections) {
         NSMutableArray *titles = [NSMutableArray array];
         for (NSString *title in sourceSection) {
             [titles addObject:[title stringByAppendingString:index++ % 2 ? @" 🌟 额外文本" : @" 🧑‍💻🍜 更长的筛选内容"]];
@@ -186,7 +228,10 @@
         [expanded addObject:@(expanded.count)];
     }
 
+    CYLTestMenuSource *menuSource = [[CYLTestMenuSource alloc] init];
+    menuSource.sections = menuTitles;
     UIViewController *menu = [[NSClassFromString(@"CYLClassifyMenuViewController") alloc] init];
+    [menu setValue:menuSource forKey:@"menuDataSource"];
     UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
     window.rootViewController = menu;
     [window makeKeyAndVisible];
@@ -202,27 +247,31 @@
     [self assertNoOverlaps:menuCollection fixture:fixture];
     [self scrollAndCheck:menuCollection fixture:fixture buttonKey:@"button"];
 
-    UILabel *title = [menu valueForKey:@"titleLabel"];
-    UISwitch *toggle = [menu valueForKey:@"rowsCountBydefaultSwitch"];
+    UIViewController *demo = [[NSClassFromString(@"CYLMainViewController") alloc] init];
+    [demo loadViewIfNeeded];
+    UILabel *title = [demo valueForKey:@"titleLabel"];
+    UISwitch *toggle = [demo valueForKey:@"rowsCountBydefaultSwitch"];
     UIView *header = toggle.superview;
     header.frame = CGRectMake(0, 0, 320, CGRectGetHeight(header.frame));
     [header layoutIfNeeded];
     XCTAssertLessThanOrEqual(CGRectGetMaxX(toggle.frame), CGRectGetWidth(header.bounds));
     XCTAssertLessThanOrEqual(CGRectGetMaxX(title.frame), CGRectGetMinX(toggle.frame));
 
-    CYLFilterParamsTool *filter = [[CYLFilterParamsTool alloc] init];
     NSMutableArray *filterTitles = [NSMutableArray array];
-    for (NSArray *original in filter.dataSources) {
+    NSArray *filterSections = @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:[CYLDBManager allTags]]];
+    for (NSArray *original in filterSections) {
         NSMutableArray *titles = [NSMutableArray array];
         for (NSString *title in original) {
             [titles addObject:[title stringByAppendingString:@" 🧑‍💻🍜 长筛选文字"]];
         }
         [filterTitles addObject:titles];
     }
-    filter.dataSources = filterTitles;
-    UIViewController *filterController = [[NSClassFromString(@"CYLMultipleFilterController") alloc] initWithNibName:@"FilterBaseController" bundle:nil];
-    [filterController setValue:filter forKey:@"filterParamsTool"];
+    CYLTestMenuSource *filterSource = [[CYLTestMenuSource alloc] init];
+    filterSource.sections = filterTitles;
+    CYLMultipleFilterController *filterController = [[CYLMultipleFilterController alloc] init];
+    filterController.menuDataSource = filterSource;
     [filterController loadViewIfNeeded];
+    CYLFilterParamsTool *filter = [filterController valueForKey:@"filterParamsTool"];
     window.rootViewController = filterController;
     UICollectionView *filterCollection = [filterController valueForKey:@"collectionView"];
     filterCollection.frame = CGRectMake(0, 0, 320, 240);
@@ -317,13 +366,54 @@
 }
 
 - (void)testUnmeasuredMenuWidthNeverProducesNegativeItemSize {
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = @[@[@"测试长文字😀"]];
     UIViewController *menu = [[NSClassFromString(@"CYLClassifyMenuViewController") alloc] init];
+    [menu setValue:source forKey:@"menuDataSource"];
     [menu loadViewIfNeeded];
     UICollectionView *collectionView = [menu valueForKey:@"collectionView"];
     collectionView.frame = CGRectMake(0, 0, 0, 240);
     id<UICollectionViewDelegateFlowLayout> delegate = (id<UICollectionViewDelegateFlowLayout>)collectionView.delegate;
     CGSize size = [delegate collectionView:collectionView layout:collectionView.collectionViewLayout sizeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
     XCTAssertGreaterThanOrEqual(size.width, 0);
+}
+
+- (void)testExternalSourceSelectionAndResources {
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = @[@[@"All", @"Long external item 😀"], @[@"All", @"Other 🍜"]];
+    CYLMultipleFilterController *controller = [[CYLMultipleFilterController alloc] init];
+    controller.menuDataSource = source;
+    controller.menuDelegate = source;
+    [controller loadViewIfNeeded];
+    UICollectionView *collection = controller.collectionView;
+    NSIndexPath *item = [NSIndexPath indexPathForItem:1 inSection:0];
+    [collection.delegate collectionView:collection didSelectItemAtIndexPath:item];
+    XCTAssertEqualObjects(source.lastSelection, item);
+    XCTAssertTrue([controller.selectedIndexPaths containsObject:item]);
+    XCTAssertFalse([controller.selectedIndexPaths containsObject:[NSIndexPath indexPathForItem:0 inSection:0]]);
+    [controller confirmButtonClicked:nil];
+    XCTAssertEqualObjects(source.confirmed, controller.selectedIndexPaths);
+    [controller setSelectedIndexPaths:@[[NSIndexPath indexPathForItem:1 inSection:1]]];
+    XCTAssertEqualObjects(controller.selectedIndexPaths, (@[[NSIndexPath indexPathForItem:1 inSection:1]]));
+    XCTAssertThrowsSpecificNamed(([controller setSelectedIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:0],
+                                                                      [NSIndexPath indexPathForItem:1 inSection:0]]]),
+                                 NSException, NSInvalidArgumentException);
+    XCTAssertNotNil([CYLMenuResources imageNamed:@"home_btn_more_normal"]);
+    source.sections = @[@[@"New source 🌟"]];
+    [controller reloadMenuData];
+    XCTAssertEqual([collection numberOfSections], 1);
+    XCTAssertEqual([collection numberOfItemsInSection:0], 1);
+}
+
+- (void)testSectionHeaderFitsItsActualWidth {
+    CYLFilterHeaderView *header = [[CYLFilterHeaderView alloc] initWithFrame:CGRectMake(0, 0, 320, 38)];
+    for (NSNumber *width in @[@320, @240, @390]) {
+        header.frame = CGRectMake(0, 0, width.doubleValue, 38);
+        [header setNeedsLayout];
+        [header layoutIfNeeded];
+        XCTAssertLessThanOrEqual(CGRectGetMaxX(header.moreButton.frame), width.doubleValue);
+        XCTAssertLessThanOrEqual(CGRectGetMaxX(header.titleButton.frame), CGRectGetMinX(header.moreButton.frame));
+    }
 }
 
 @end

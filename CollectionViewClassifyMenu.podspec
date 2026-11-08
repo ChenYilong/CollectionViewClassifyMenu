@@ -7,17 +7,26 @@ Pod::Spec.new do |s|
   s.author       = { 'ChenYilong' => 'luohanchenyilong@163.com' }
   s.social_media_url = 'http://weibo.com/luohanchenyilong/'
   s.platform     = :ios, '15.0'
-  s.source       = { :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :branch => 'master' }
+  s.source       = { :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :tag => s.version.to_s }
   s.requires_arc = true
   s.static_framework = true
 
-  s.source_files = 'CollectionViewClassifyMenu/Class/**/*.{h,m}'
-  s.exclude_files = 'CollectionViewClassifyMenu/Class/Other/Symtem/{main.m,AppDelegate.h,AppDelegate.m}'
-  s.resources = [
+  s.source_files = [
+    'CollectionViewClassifyMenu/Class/**/*.{h,m}',
+    'TagCollectionView/TagCollectionView/{TagView,Model/*,Views/*}.{h,m}'
+  ]
+  s.exclude_files = [
+    'CollectionViewClassifyMenu/Class/Other/Symtem/{main.m,AppDelegate.h,AppDelegate.m}',
+    'CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/{CYLMainViewController,CYLDemoDataSource}.{h,m}',
+    'CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.{h,m}',
+    '**/._*'
+  ]
+  s.resource_bundles = { 'CYLClassifyMenuResources' => [
     'CollectionViewClassifyMenu/Class/MultipleFilter/**/*.xib',
     'CollectionViewClassifyMenu/Class/Other/Symtem/Images.xcassets',
-    'CollectionViewClassifyMenu/Class/Other/data.json'
-  ]
+    'TagCollectionView/TagCollectionView/TagView.xib',
+    'TagCollectionView/TagCollectionView/Views/*.xib'
+  ] }
   s.frameworks = 'UIKit', 'Accelerate'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 end

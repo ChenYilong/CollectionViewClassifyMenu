@@ -8,6 +8,7 @@
 static float const kImageToTextMargin = 7;
 
 #import "CYLRightImageButton.h"
+#import "CYLMenuResources.h"
 
 @implementation CYLRightImageButton
 
@@ -34,8 +35,8 @@ static float const kImageToTextMargin = 7;
     [self setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
     self.adjustsImageWhenHighlighted = NO;
-    [self setImage:[UIImage imageNamed:@"home_btn_more_normal"] forState:UIControlStateNormal];
-    [self setImage:[UIImage imageNamed:@"home_btn_more_selected"] forState:UIControlStateSelected];
+    [self setImage:[CYLMenuResources imageNamed:@"home_btn_more_normal"] forState:UIControlStateNormal];
+    [self setImage:[CYLMenuResources imageNamed:@"home_btn_more_selected"] forState:UIControlStateSelected];
     self.titleEdgeInsets = UIEdgeInsetsMake(0, -self.imageView.frame.size.width-kImageToTextMargin, 0, self.imageView.frame.size.width);
     self.imageEdgeInsets = UIEdgeInsetsMake(0, self.titleLabel.frame.size.width, 0, -self.titleLabel.frame.size.width);
     return self;

@@ -3,11 +3,35 @@
 //  TagCollectionViewTests
 //
 //  Created by ak on 16/1/26.
-//  Copyright © 2016年 AK. All rights reserved.
+//  Copyright © 2016年 (year 2016) AK. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>
 #import "TagView.h"
+
+@interface CYLCountingTagModel : TagModel
+@property (nonatomic, assign) NSUInteger widthReads;
+@end
+
+@implementation CYLCountingTagModel
+- (float)width {
+    self.widthReads++;
+    return [super width];
+}
+@end
+
+@interface CYLTagTestSource : NSObject <CYLMenuDataSource, CYLMenuDelegate>
+@property (nonatomic, copy) NSArray<NSString *> *titles;
+@property (nonatomic, strong) NSIndexPath *selection;
+@end
+
+@implementation CYLTagTestSource
+- (NSInteger)numberOfSectionsInMenu { return 1; }
+- (NSInteger)menuNumberOfItemsInSection:(NSInteger)section { return self.titles.count; }
+- (NSString *)menuTitleForSection:(NSInteger)section { return @"External section"; }
+- (NSString *)menuTitleForItemAtIndexPath:(NSIndexPath *)indexPath { return self.titles[indexPath.item]; }
+- (void)menu:(id)menu didSelectItemAtIndexPath:(NSIndexPath *)indexPath { self.selection = indexPath; }
+@end
 
 @interface TagCollectionViewTests : XCTestCase
 
@@ -71,7 +95,7 @@
             UICollectionViewLayoutAttributes *attributes =
                 [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
             XCTAssertNotNil(attributes);
-            XCTAssertLessThanOrEqual(CGRectGetMaxX(attributes.frame), width - kCollectionViewToRightMargin + 0.5);
+            XCTAssertLessThanOrEqual(CGRectGetMaxX(attributes.frame), width - kTagCollectionViewToRightMargin + 0.5);
             for (UICollectionViewLayoutAttributes *previous in items) {
                 XCTAssertFalse(CGRectIntersectsRect(attributes.frame, previous.frame));
             }
@@ -83,6 +107,52 @@
     [collection reloadData];
     XCTAssertEqual([collection numberOfItemsInSection:0], [group firstRowCellCountForContentWidth:358]);
     XCTAssertEqual([group firstRowCellCountForContentWidth:0], 1);
+}
+
+- (void)testRowCalculationIsLinearAndInvalidatedWhenItemsChange {
+    CYLCountingTagModel *model = [[CYLCountingTagModel alloc] init];
+    model.title = @"长标签 😀";
+    NSMutableArray *items = [NSMutableArray array];
+    for (NSUInteger i = 0; i < 1200; i++) {
+        [items addObject:model];
+    }
+    TagGroup *group = [[TagGroup alloc] init];
+    group.itemArr = items;
+    model.widthReads = 0;
+    NSArray *rows = group.cellsCountArrayPerRowInSections;
+    NSUInteger total = 0;
+    for (NSNumber *count in rows) {
+        total += count.unsignedIntegerValue;
+    }
+    XCTAssertEqual(total, items.count);
+    XCTAssertEqual(model.widthReads, items.count);
+    group.itemArr = @[[TagModel modelWithTitle:@"替换后的数据 🌟"]];
+    XCTAssertEqualObjects(group.cellsCountArrayPerRowInSections, (@[@1]));
+}
+
+- (void)testProgrammaticViewUsesExternalDataAndDelegate {
+    CYLTagTestSource *source = [[CYLTagTestSource alloc] init];
+    source.titles = @[@"External item 😀", @"Another item 🌟"];
+    TagView *view = [[TagView alloc] initWithFrame:CGRectMake(0, 0, 320, 240)];
+    view.menuDataSource = source;
+    view.menuDelegate = source;
+    [view reloadMenuData];
+    UICollectionView *collection = [view valueForKey:@"collectionView"];
+    ((TagGroup *)view.groups.firstObject).opened = YES;
+    [collection reloadData];
+    XCTAssertNotNil(collection);
+    XCTAssertEqual([collection numberOfSections], 1);
+    XCTAssertEqual([collection numberOfItemsInSection:0], 2);
+    NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:0];
+    [collection.delegate collectionView:collection didSelectItemAtIndexPath:path];
+    XCTAssertEqualObjects(source.selection, path);
+    view.showHeader = NO;
+    id<UICollectionViewDelegateFlowLayout> layoutDelegate = (id<UICollectionViewDelegateFlowLayout>)collection.delegate;
+    XCTAssertTrue(CGSizeEqualToSize([layoutDelegate collectionView:collection layout:collection.collectionViewLayout
+                                  referenceSizeForHeaderInSection:0], CGSizeZero));
+    source.titles = @[@"Updated 🧪"];
+    [view reloadMenuData];
+    XCTAssertEqual([collection numberOfItemsInSection:0], 1);
 }
 
 @end

@@ -1,0 +1,2 @@
+// Xcode 27's simulator SDK requires iOS 15 or later.
+IPHONEOS_DEPLOYMENT_TARGET = 15.0

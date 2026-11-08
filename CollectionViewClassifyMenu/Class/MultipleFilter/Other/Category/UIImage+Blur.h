@@ -10,7 +10,7 @@
 
 @interface UIImage (Blur)
 
-// 高斯模糊
+// 高斯模糊 / Gaussian blur.
 - (UIImage *)cyl_blurredImageWithRadius:(CGFloat)radius
                              iterations:(NSUInteger)iterations
                               tintColor:(UIColor *)tintColor;

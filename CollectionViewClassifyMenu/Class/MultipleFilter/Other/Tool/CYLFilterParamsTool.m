@@ -4,11 +4,10 @@
 //  http://cnblogs.com/ChenYilong/
 //
 //  Created by https://github.com/ChenYilong on 15/4/22.
-//  Copyright (c) 2015年  https://github.com/ChenYilong . All rights reserved.
+//  Copyright (c) 2015年 (year 2015)  https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLFilterParamsTool.h"
-#import "CYLDBManager.h"
 
 NSString *const kMultipleFilterSetting         = @"kMultipleFilterSetting";
 NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModified";
@@ -88,11 +87,7 @@ NSString *const kMultipleFilterSettingModified = @"kMultipleFilterSettingModifie
  */
 - (NSArray *)dataSources {
     if (_dataSources == nil) {
-        
-        NSMutableArray *hospitals = [NSMutableArray arrayWithObjects:@"全部", @"请选择", nil];
-        NSMutableArray *skillTypes = [NSMutableArray arrayWithObject:@"全部"];
-        [skillTypes addObjectsFromArray:[CYLDBManager allTags]];
-        _dataSources = [[NSArray alloc] initWithObjects:hospitals,skillTypes,nil];
+        _dataSources = @[];
     }
     return _dataSources;
 }

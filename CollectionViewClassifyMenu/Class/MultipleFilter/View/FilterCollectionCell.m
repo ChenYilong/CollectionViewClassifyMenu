@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLParameterConfiguration.h"
+#import "CYLMenuResources.h"
 
 @implementation UIImage (Stretch)
 
 + (UIImage *)stretchableImageNamed:(NSString *)name {
-    UIImage *image = [UIImage imageNamed:name];
+    UIImage *image = [CYLMenuResources imageNamed:name];
     return [image stretchableImageWithLeftCapWidth:(NSUInteger)(image.size.width / 2)
                                       topCapHeight:(NSUInteger)(image.size.height / 2)];
 }
@@ -46,6 +47,5 @@
 }
 
 @end
-
 
 

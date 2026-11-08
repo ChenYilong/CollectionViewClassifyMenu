@@ -3,7 +3,7 @@
 //
 //
 //  Created by  http://weibo.com/luohanchenyilong/ on 13-2-28.
-//  Copyright (c) 2013年  https://github.com/ChenYilong . All rights reserved.
+//  Copyright (c) 2013年 (year 2013)  https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "UIView+General.h"

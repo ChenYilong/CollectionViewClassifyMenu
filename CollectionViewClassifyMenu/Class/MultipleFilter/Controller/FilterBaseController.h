@@ -6,7 +6,7 @@
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //
 
-// 问题筛选和医生筛选的基础类
+// 问题筛选和医生筛选的基础类 / Base class for question and doctor filters.
 
 static float const kCollectionViewToLeftMargin    = 50;
 static float const kCollectionViewToTopMargin     = 12;
@@ -33,7 +33,7 @@ static float const kCollectionViewToBottomtMargin = 15;
 @property (nonatomic, weak) IBOutlet UIButton *okButton;
 @property (nonatomic, strong) NSArray *dataSource;
 @property (nonatomic, strong) NSMutableArray *settingArray;
-@property (nonatomic, assign) id<FilterControllerDelegate> delegate;
+@property (nonatomic, weak) id<FilterControllerDelegate> delegate;
 
 - (void)showInView:(UIView *)view;
 - (void)itemButtonClicked:(CYLIndexPathButton *)button;

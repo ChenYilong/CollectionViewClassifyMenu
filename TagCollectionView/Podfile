@@ -1,0 +1,10 @@
+platform :ios, '15.0'
+project 'TagCollectionView.xcodeproj'
+
+target 'TagCollectionView' do
+  pod 'CollectionViewClassifyMenu', :path => '..'
+
+  target 'TagCollectionViewTests' do
+    inherit! :search_paths
+  end
+end

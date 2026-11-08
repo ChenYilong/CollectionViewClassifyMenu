@@ -3,7 +3,7 @@
 //  TagCollectionView
 //
 //  Created by ak on 16/1/26.
-//  Copyright © 2016年 AK. All rights reserved.
+//  Copyright © 2016年 (year 2016) AK. All rights reserved.
 //
 
 #import "TagCell.h"
@@ -26,6 +26,7 @@
 //}
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     
     
 //    self.layer.borderColor=[UIColor grayColor].CGColor;

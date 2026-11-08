@@ -8,6 +8,7 @@
 
 #import "UIButton+CollectionCellStyle.h"
 #import "CYLParameterConfiguration.h"
+#import "CYLMenuResources.h"
 
 @implementation UIButton (CollectionCellStyle)
 
@@ -48,7 +49,7 @@
     [self setTitleColor:CYLAppTintColor forState:UIControlStateNormal];
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
     
-    UIImage *imageHighlighted  = [UIImage imageNamed:@"tag_btn_background_highlighted"];
+    UIImage *imageHighlighted  = [CYLMenuResources imageNamed:@"tag_btn_background_highlighted"];
     [self setBackgroundImage:imageHighlighted forState:UIControlStateHighlighted];
 }
 

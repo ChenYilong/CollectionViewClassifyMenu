@@ -7,9 +7,16 @@
 //  CYLMultipleFilterController Choice Storage Filter
 
 #import "FilterBaseController.h"
+#import "CYLMenuDataSource.h"
 
 @interface CYLMultipleFilterController : FilterBaseController
 
+@property (nonatomic, weak) id<CYLMenuDataSource> menuDataSource;
+@property (nonatomic, weak) id<CYLMenuDelegate> menuDelegate;
+
 - (void)refreshFilterParams;
+- (void)reloadMenuData;
+- (NSArray<NSIndexPath *> *)selectedIndexPaths;
+- (void)setSelectedIndexPaths:(NSArray<NSIndexPath *> *)indexPaths;
 
 @end

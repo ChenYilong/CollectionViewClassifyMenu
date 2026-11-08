@@ -8,32 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		0C5B40B81C8E76E37989934B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E15AD8B793C1220BD3475A73 /* Foundation.framework */; };
+		0D598B7DBBDFC184C56DF2DF /* CYLDemoDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 854DF1B1EFF12E75B8682B8D /* CYLDemoDataSource.m */; };
 		3D88C0F4439B89A1CB787F7D /* CollectionViewClassifyMenuLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F7CAAE3D0E8B5E789ACED925 /* CollectionViewClassifyMenuLayoutTests.m */; };
-		9A09E2F61BC7AFF00060C116 /* CYLClassifyMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2BA1BC7AFF00060C116 /* CYLClassifyMenuViewController.m */; };
+		84444FF4E1162FCBB49DAA17 /* libPods-CollectionViewClassifyMenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8255833E02347CE0E51C652D /* libPods-CollectionViewClassifyMenu.a */; };
 		9A09E2F71BC7AFF00060C116 /* CYLMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2BC1BC7AFF00060C116 /* CYLMainViewController.m */; };
-		9A09E2F81BC7AFF00060C116 /* UIButton+CollectionCellStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2C01BC7AFF00060C116 /* UIButton+CollectionCellStyle.m */; };
-		9A09E2F91BC7AFF00060C116 /* CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2C31BC7AFF00060C116 /* CollectionViewCell.m */; };
-		9A09E2FA1BC7AFF00060C116 /* CYLFilterHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.m */; };
-		9A09E2FB1BC7AFF00060C116 /* CYLIndexPathButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.m */; };
-		9A09E2FC1BC7AFF00060C116 /* CYLRightImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.m */; };
-		9A09E2FD1BC7AFF00060C116 /* CYLMultipleFilterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2CD1BC7AFF00060C116 /* CYLMultipleFilterController.m */; };
-		9A09E2FE1BC7AFF00060C116 /* FilterBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2CF1BC7AFF00060C116 /* FilterBaseController.m */; };
-		9A09E2FF1BC7AFF00060C116 /* FilterBaseController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2D01BC7AFF00060C116 /* FilterBaseController.xib */; };
-		9A09E3001BC7AFF00060C116 /* UIImage+Blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2D41BC7AFF00060C116 /* UIImage+Blur.m */; };
-		9A09E3011BC7AFF00060C116 /* UIView+General.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2D61BC7AFF00060C116 /* UIView+General.m */; };
-		9A09E3021BC7AFF00060C116 /* CYLFilterParamsTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2D91BC7AFF00060C116 /* CYLFilterParamsTool.m */; };
-		9A09E3031BC7AFF00060C116 /* CYLMultipleFilterHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.m */; };
-		9A09E3041BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2DD1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib */; };
-		9A09E3051BC7AFF00060C116 /* FilterCollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2DF1BC7AFF00060C116 /* FilterCollectionCell.m */; };
-		9A09E3061BC7AFF00060C116 /* NSArray+log.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2E31BC7AFF00060C116 /* NSArray+log.m */; };
-		9A09E3071BC7AFF00060C116 /* NSDictionary+log.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2E51BC7AFF00060C116 /* NSDictionary+log.m */; };
 		9A09E3081BC7AFF00060C116 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2E61BC7AFF00060C116 /* data.json */; };
-		9A09E3091BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2EA1BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout.m */; };
 		9A09E30A1BC7AFF00060C116 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2ED1BC7AFF00060C116 /* AppDelegate.m */; };
 		9A09E30B1BC7AFF00060C116 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2EE1BC7AFF00060C116 /* LaunchScreen.xib */; };
-		9A09E30C1BC7AFF00060C116 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2F01BC7AFF00060C116 /* Images.xcassets */; };
 		9A09E30E1BC7AFF00060C116 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F21BC7AFF00060C116 /* main.m */; };
 		9A09E30F1BC7AFF00060C116 /* CYLDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F51BC7AFF00060C116 /* CYLDBManager.m */; };
+		C2C32AF2E7649DACD6F80B82 /* libPods-CollectionViewClassifyMenuTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B215DA974F97C8F30036021D /* libPods-CollectionViewClassifyMenuTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,7 +31,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		36D7441816F6CD3BAB4BCFDC /* Pods-CollectionViewClassifyMenuTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenuTests.debug.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenuTests/Pods-CollectionViewClassifyMenuTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6D2AF93C0780F24AB7B0D623 /* CollectionViewClassifyMenuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CollectionViewClassifyMenuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7419754AC50CEEE7B0F88DE4 /* Pods-CollectionViewClassifyMenu.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenu.debug.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenu/Pods-CollectionViewClassifyMenu.debug.xcconfig"; sourceTree = "<group>"; };
+		7EE4C39F10CE3D159D305D6A /* CYLDemoDataSource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLDemoDataSource.h; sourceTree = "<group>"; };
+		8255833E02347CE0E51C652D /* libPods-CollectionViewClassifyMenu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CollectionViewClassifyMenu.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		854DF1B1EFF12E75B8682B8D /* CYLDemoDataSource.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLDemoDataSource.m; sourceTree = "<group>"; };
 		9A09E2B91BC7AFF00060C116 /* CYLClassifyMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLClassifyMenuViewController.h; sourceTree = "<group>"; };
 		9A09E2BA1BC7AFF00060C116 /* CYLClassifyMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLClassifyMenuViewController.m; sourceTree = "<group>"; };
 		9A09E2BB1BC7AFF00060C116 /* CYLMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMainViewController.h; sourceTree = "<group>"; };
@@ -97,7 +86,10 @@
 		9A3296091AB7D3880035EFAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
 		9ACA68C11C3C3E8100CDB987 /* CYLParameterConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLParameterConfiguration.h; sourceTree = "<group>"; };
+		B215DA974F97C8F30036021D /* libPods-CollectionViewClassifyMenuTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CollectionViewClassifyMenuTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E15AD8B793C1220BD3475A73 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		F11F86F0C1B8AEB5D44F8BE3 /* Pods-CollectionViewClassifyMenuTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenuTests.release.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenuTests/Pods-CollectionViewClassifyMenuTests.release.xcconfig"; sourceTree = "<group>"; };
+		F278F0AE5778F4B0553DBFDA /* Pods-CollectionViewClassifyMenu.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenu.release.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenu/Pods-CollectionViewClassifyMenu.release.xcconfig"; sourceTree = "<group>"; };
 		F7CAAE3D0E8B5E789ACED925 /* CollectionViewClassifyMenuLayoutTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuLayoutTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,6 +99,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C5B40B81C8E76E37989934B /* Foundation.framework in Frameworks */,
+				C2C32AF2E7649DACD6F80B82 /* libPods-CollectionViewClassifyMenuTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,12 +107,25 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84444FF4E1162FCBB49DAA17 /* libPods-CollectionViewClassifyMenu.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2501D470511B51E8EE02D17B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7419754AC50CEEE7B0F88DE4 /* Pods-CollectionViewClassifyMenu.debug.xcconfig */,
+				F278F0AE5778F4B0553DBFDA /* Pods-CollectionViewClassifyMenu.release.xcconfig */,
+				F11F86F0C1B8AEB5D44F8BE3 /* Pods-CollectionViewClassifyMenuTests.release.xcconfig */,
+				36D7441816F6CD3BAB4BCFDC /* Pods-CollectionViewClassifyMenuTests.debug.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		9A09E2B61BC7AFF00060C116 /* Class */ = {
 			isa = PBXGroup;
 			children = (
@@ -147,6 +153,8 @@
 				9A09E2BA1BC7AFF00060C116 /* CYLClassifyMenuViewController.m */,
 				9A09E2BB1BC7AFF00060C116 /* CYLMainViewController.h */,
 				9A09E2BC1BC7AFF00060C116 /* CYLMainViewController.m */,
+				7EE4C39F10CE3D159D305D6A /* CYLDemoDataSource.h */,
+				854DF1B1EFF12E75B8682B8D /* CYLDemoDataSource.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -317,6 +325,7 @@
 				9A3295EC1AB7D3880035EFAA /* Products */,
 				F8F8A0995D57FBDFE28AACC5 /* Frameworks */,
 				F7CAAE3D0E8B5E789ACED925 /* CollectionViewClassifyMenuLayoutTests.m */,
+				2501D470511B51E8EE02D17B /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -366,6 +375,8 @@
 			isa = PBXGroup;
 			children = (
 				C2FDF0AA0DB125E223AFC066 /* iOS */,
+				8255833E02347CE0E51C652D /* libPods-CollectionViewClassifyMenu.a */,
+				B215DA974F97C8F30036021D /* libPods-CollectionViewClassifyMenuTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -377,10 +388,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A32960E1AB7D3880035EFAA /* Build configuration list for PBXNativeTarget "CollectionViewClassifyMenu" */;
 			buildPhases = (
+				DAA7A161843F883DD3AC9578 /* [CP] Check Pods Manifest.lock */,
 				9A3295E71AB7D3880035EFAA /* Sources */,
 				9A3295E81AB7D3880035EFAA /* Frameworks */,
 				9A3295E91AB7D3880035EFAA /* Resources */,
 				OBJCLEANCUSTOMRUNSCRIPTT /* Objective-Clean Run Script */,
+				3366D13C7D0C11BF9C53D622 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -395,6 +408,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AED08EC1F4CA6FB92C6E26B0 /* Build configuration list for PBXNativeTarget "CollectionViewClassifyMenuTests" */;
 			buildPhases = (
+				0A377EAE459248E8A438102F /* [CP] Check Pods Manifest.lock */,
 				E96C21BE0CA1EF145B61B6A1 /* Sources */,
 				812A39F5A7A20C2B2E29C90E /* Frameworks */,
 				13396F528262F00130943E02 /* Resources */,
@@ -455,16 +469,75 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A09E30B1BC7AFF00060C116 /* LaunchScreen.xib in Resources */,
-				9A09E30C1BC7AFF00060C116 /* Images.xcassets in Resources */,
-				9A09E3041BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib in Resources */,
 				9A09E3081BC7AFF00060C116 /* data.json in Resources */,
-				9A09E2FF1BC7AFF00060C116 /* FilterBaseController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0A377EAE459248E8A438102F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CollectionViewClassifyMenuTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3366D13C7D0C11BF9C53D622 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CollectionViewClassifyMenu/Pods-CollectionViewClassifyMenu-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/CollectionViewClassifyMenu/CYLClassifyMenuResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLClassifyMenuResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CollectionViewClassifyMenu/Pods-CollectionViewClassifyMenu-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DAA7A161843F883DD3AC9578 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CollectionViewClassifyMenu-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		OBJCLEANCUSTOMRUNSCRIPTT /* Objective-Clean Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -486,26 +559,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A09E3091BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout.m in Sources */,
-				9A09E2FE1BC7AFF00060C116 /* FilterBaseController.m in Sources */,
 				9A09E30A1BC7AFF00060C116 /* AppDelegate.m in Sources */,
-				9A09E3071BC7AFF00060C116 /* NSDictionary+log.m in Sources */,
-				9A09E2FC1BC7AFF00060C116 /* CYLRightImageButton.m in Sources */,
-				9A09E3001BC7AFF00060C116 /* UIImage+Blur.m in Sources */,
 				9A09E2F71BC7AFF00060C116 /* CYLMainViewController.m in Sources */,
-				9A09E2FA1BC7AFF00060C116 /* CYLFilterHeaderView.m in Sources */,
 				9A09E30E1BC7AFF00060C116 /* main.m in Sources */,
-				9A09E3051BC7AFF00060C116 /* FilterCollectionCell.m in Sources */,
-				9A09E3061BC7AFF00060C116 /* NSArray+log.m in Sources */,
-				9A09E3031BC7AFF00060C116 /* CYLMultipleFilterHeaderView.m in Sources */,
-				9A09E2F61BC7AFF00060C116 /* CYLClassifyMenuViewController.m in Sources */,
-				9A09E2F91BC7AFF00060C116 /* CollectionViewCell.m in Sources */,
-				9A09E3011BC7AFF00060C116 /* UIView+General.m in Sources */,
-				9A09E3021BC7AFF00060C116 /* CYLFilterParamsTool.m in Sources */,
-				9A09E2FB1BC7AFF00060C116 /* CYLIndexPathButton.m in Sources */,
-				9A09E2FD1BC7AFF00060C116 /* CYLMultipleFilterController.m in Sources */,
 				9A09E30F1BC7AFF00060C116 /* CYLDBManager.m in Sources */,
-				9A09E2F81BC7AFF00060C116 /* UIButton+CollectionCellStyle.m in Sources */,
+				0D598B7DBBDFC184C56DF2DF /* CYLDemoDataSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,6 +600,7 @@
 /* Begin XCBuildConfiguration section */
 		40E8E1698F86D7196B8FBA8B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F11F86F0C1B8AEB5D44F8BE3 /* Pods-CollectionViewClassifyMenuTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -558,6 +617,7 @@
 		};
 		63CB04E5D00E3283DFA5EC7F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36D7441816F6CD3BAB4BCFDC /* Pods-CollectionViewClassifyMenuTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -652,6 +712,7 @@
 		};
 		9A32960F1AB7D3880035EFAA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7419754AC50CEEE7B0F88DE4 /* Pods-CollectionViewClassifyMenu.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -666,7 +727,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/CollectionViewClassifyMenu/Class/Other/Lib",
 				);
-				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier).2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -674,6 +734,7 @@
 		};
 		9A3296101AB7D3880035EFAA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F278F0AE5778F4B0553DBFDA /* Pods-CollectionViewClassifyMenu.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -688,7 +749,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/CollectionViewClassifyMenu/Class/Other/Lib",
 				);
-				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier).2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
