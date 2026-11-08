@@ -8,10 +8,10 @@
 #import <UIKit/UIKit.h>
 
 @class FilterHeaderView;
-@protocol FilterHeaderViewDelegate <NSObject>
+@protocol CYLFilterHeaderViewDelegate <NSObject>
 
 @required
-- (void)filterHeaderViewMoreBtnClicked:(id)sender;
+- (void)filterHeaderViewDidTapMoreButton:(id)sender;
 
 @end
 
@@ -25,8 +25,8 @@ extern const float CYLFilterHeaderViewHeigt;
 
 @property (nonatomic, strong) CYLIndexPathButton       *titleButton;
 @property (nonatomic, strong) CYLRightImageButton      *moreButton;
-@property (nonatomic, weak  ) id<FilterHeaderViewDelegate> delegate;
+@property (nonatomic, weak  ) id<CYLFilterHeaderViewDelegate> delegate;
 
-- (void)moreBtnClicked:(id)sender;
+- (void)moreButtonTapped:(id)sender;
 
 @end

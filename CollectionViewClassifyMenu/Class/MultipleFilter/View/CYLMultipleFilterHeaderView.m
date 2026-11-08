@@ -7,7 +7,7 @@
 //
 
 #import "CYLMultipleFilterHeaderView.h"
-#import "UIView+General.h"
+#import "UIView+CYLGeneral.h"
 
 @implementation CYLMultipleFilterHeaderView
 

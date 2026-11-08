@@ -1,0 +1,26 @@
+//
+//  CYLTagModel.h
+//  TagCollectionView
+//
+//  Created by ak on 16/1/26.
+//  Copyright © 2016年 (year 2016) AK. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface CYLTagModel : NSObject
+
+@property(nonatomic,copy) NSString * title;
+//
+//@property (nonatomic, assign) NSInteger  section;
+//
+//@property (nonatomic, assign) NSInteger  row;
+
+@property (nonatomic, assign,readonly) float width;
+@property (nonatomic, assign,readonly) float height;
+
+
+
++(instancetype)modelWithTitle:(NSString*)title;
+
+@end

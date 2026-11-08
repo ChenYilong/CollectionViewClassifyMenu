@@ -7,8 +7,10 @@ verify the behavior and update the applicable documentation.
 
 ## Code and naming
 
-- Preserve existing public APIs and user content; use the existing `CYL` prefix
-  for new project-specific Objective-C types.
+- Use the `CYL` prefix for project-specific Objective-C classes and protocols;
+  category names use `CYL` and category methods use `cyl_`. Preserve existing
+  public APIs unless a requested naming migration explicitly changes them;
+  document incompatible changes and update XIBs and callers.
 - Use descriptive English identifiers and conventional Objective-C naming.
   Keep existing names and localization unless a change is necessary.
 - Document user-visible changes and verify them with a targeted build or test.

@@ -152,7 +152,7 @@ static float const kCollectionViewCellsHorizonMargin = 12;
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    FilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FilterCollectionCell" forIndexPath:indexPath];
+    CYLFilterCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CYLFilterCollectionCell" forIndexPath:indexPath];
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
     [cell.titleButton setTitle:text forState:UIControlStateNormal];
     [cell.titleButton setTitle:text forState:UIControlStateSelected];

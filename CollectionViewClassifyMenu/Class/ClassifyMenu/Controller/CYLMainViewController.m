@@ -14,7 +14,7 @@
 #import "CYLMenuResources.h"
 @import CollectionViewClassifyMenu;
 
-@interface CYLMainViewController ()<FilterControllerDelegate, CYLMenuDelegate>
+@interface CYLMainViewController ()<CYLFilterControllerDelegate, CYLMenuDelegate>
 
 @property (nonatomic, strong) CYLMultipleFilterController *filterController;
 @property (nonatomic, strong) CYLDemoDataSource *classifySource;
@@ -45,7 +45,7 @@
             stored = [self legacyFilterSelection];
         }
         if (stored) {
-            NSArray<NSIndexPath *> *paths = [self validatedSelection:stored];
+            NSArray<NSIndexPath *> *paths = [self cyl_validatedSelection:stored];
             if (paths) {
                 [_filterController setSelectedIndexPaths:paths];
             } else {
@@ -63,7 +63,7 @@
     }
     NSError *error = nil;
     NSData *data = [NSData dataWithContentsOfFile:filename options:0 error:&error];
-    NSArray *result = data ? [self selectionFromLegacyArchiveData:data] : nil;
+    NSArray *result = data ? [self cyl_selectionFromLegacyArchiveData:data] : nil;
     if (!data) {
         NSLog(@"Cannot read existing demo filter settings: %@", error);
     }
@@ -73,7 +73,7 @@
     return result;
 }
 
-- (NSArray *)selectionFromLegacyArchiveData:(NSData *)data {
+- (NSArray *)cyl_selectionFromLegacyArchiveData:(NSData *)data {
     NSError *error = nil;
     id archive = nil;
     @try {
@@ -109,14 +109,14 @@
             }
         }
     }
-    if (![self validatedSelection:result]) {
+    if (![self cyl_validatedSelection:result]) {
         NSLog(@"Cannot migrate existing demo filter settings: conflicting selection.");
         return nil;
     }
     return result;
 }
 
-- (NSArray<NSIndexPath *> *)validatedSelection:(NSArray *)stored {
+- (NSArray<NSIndexPath *> *)cyl_validatedSelection:(NSArray *)stored {
     NSMutableArray *paths = [NSMutableArray array];
     NSMutableIndexSet *exclusiveSections = [NSMutableIndexSet indexSet];
     NSMutableIndexSet *otherSections = [NSMutableIndexSet indexSet];
@@ -243,7 +243,7 @@
     [self.filterController reloadMenuData];
     [self menu:self.filterController didConfirmSelectedItems:self.filterController.selectedIndexPaths];
     [self initLeftBarButtonItem];
-    [self filterControllerDidCompleted:nil];
+    [self filterControllerDidComplete:nil];
 }
 
 - (void)leftBarButtonClicked:(id)sender {
@@ -251,9 +251,9 @@
     [self.filterController showInView:self.navigationController.view ?: self.view];
 }
 
-#pragma mark - 🔌 FilterControllerDelegate Method
+#pragma mark - 🔌 CYLFilterControllerDelegate Method
 
-- (void)filterControllerDidCompleted:(FilterBaseController *)controller {
+- (void)filterControllerDidComplete:(CYLFilterBaseController *)controller {
     [self initLeftBarButtonItem];
 }
 

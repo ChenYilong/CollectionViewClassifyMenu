@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "."
 
 SPEC CHECKSUMS:
-  CollectionViewClassifyMenu: cbca5066758e68999d2dd9ce55982e0f8894f84c
+  CollectionViewClassifyMenu: cddf76aba48349377dbf0a704e1de9d44b5cb4b8
 
 PODFILE CHECKSUM: 6c1a7e550943cd2ef535656d2450dc749bef56c4
 

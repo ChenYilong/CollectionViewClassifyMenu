@@ -6,10 +6,10 @@
 //  Copyright (c)  http://weibo.com/luohanchenyilong/  . All rights reserved.
 //  CYLMultipleFilterController Choice Storage Filter
 
-#import "FilterBaseController.h"
+#import "CYLFilterBaseController.h"
 #import "CYLMenuDataSource.h"
 
-@interface CYLMultipleFilterController : FilterBaseController
+@interface CYLMultipleFilterController : CYLFilterBaseController
 
 @property (nonatomic, weak) id<CYLMenuDataSource> menuDataSource;
 @property (nonatomic, weak) id<CYLMenuDelegate> menuDelegate;

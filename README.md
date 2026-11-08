@@ -122,9 +122,34 @@ controller uses the same protocols; `selectedIndexPaths` and
 `reloadMenuData` resets filter selections to each section's first exclusive
 item, if one is supplied.
 
-`TagView` also accepts the same protocols and supports both `[[TagView alloc]
-initWithFrame:]` and its existing `+[TagView TagView]` initializer. See the
+`CYLTagView` also accepts the same protocols and supports both `[[CYLTagView alloc]
+initWithFrame:]` and `+[CYLTagView tagView]`. See the
 two demo controllers for complete implementations.
+
+### Naming migration / 命名迁移
+
+This naming change is **source and runtime incompatible** with the old names.
+Update imports, type references, custom XIB/storyboard classes, and any
+`NSClassFromString` calls when integrating the new version:
+
+| Old name | New name |
+| --- | --- |
+| `CollectionViewCell` | `CYLCollectionViewCell` |
+| `FilterBaseController`, `FilterCollectionCell` | `CYLFilterBaseController`, `CYLFilterCollectionCell` |
+| `UICollectionViewLeftAlignedLayout` | `CYLCollectionViewLeftAlignedLayout` |
+| `TagView`, `TagGroup`, `TagModel` | `CYLTagView`, `CYLTagGroup`, `CYLTagModel` |
+| `HeaderCell`, `TagCell` | `CYLTagHeaderCell`, `CYLTagCell` |
+| `FilterControllerDelegate`, `FilterHeaderViewDelegate`, `HeaderCellDelegate` | `CYLFilterControllerDelegate`, `CYLFilterHeaderViewDelegate`, `CYLTagHeaderCellDelegate` |
+| `+[TagView TagView]` | `+[CYLTagView tagView]` |
+| `filterControllerDidCompleted:` | `filterControllerDidComplete:` |
+| `filterHeaderViewMoreBtnClicked:`, `moreBtnClicked:` | `filterHeaderViewDidTapMoreButton:`, `moreButtonTapped:` |
+| `headerViewDidClickedNameView:index:` | `headerViewDidTapNameView:index:` |
+| `cyl_setBoarderWith:color:` | `cyl_setBorderWidth:color:` |
+
+Category headers use names such as `UIView+CYLGeneral.h`; category methods use
+the `cyl_` prefix. `NSArray` and `NSDictionary` no longer override the system
+`descriptionWithLocale:` for logging; call `cyl_descriptionWithLocale:`
+explicitly when the old custom format is desired.
 
 ### Release / 发布
 

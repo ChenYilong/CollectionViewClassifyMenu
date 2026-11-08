@@ -13,10 +13,10 @@ Pod::Spec.new do |s|
 
   s.source_files = [
     'CollectionViewClassifyMenu/Class/**/*.{h,m}',
-    'TagCollectionView/TagCollectionView/{TagView,Model/*,Views/*}.{h,m}'
+    'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.{h,m}'
   ]
   s.exclude_files = [
-    'CollectionViewClassifyMenu/Class/Other/Symtem/{main.m,AppDelegate.h,AppDelegate.m}',
+    'CollectionViewClassifyMenu/Class/Other/Symtem/{main.m,CYLAppDelegate.h,CYLAppDelegate.m}',
     'CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/{CYLMainViewController,CYLDemoDataSource}.{h,m}',
     'CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.{h,m}',
     '**/._*'
@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
   s.resource_bundles = { 'CYLClassifyMenuResources' => [
     'CollectionViewClassifyMenu/Class/MultipleFilter/**/*.xib',
     'CollectionViewClassifyMenu/Class/Other/Symtem/Images.xcassets',
-    'TagCollectionView/TagCollectionView/TagView.xib',
+    'TagCollectionView/TagCollectionView/CYLTagView.xib',
     'TagCollectionView/TagCollectionView/Views/*.xib'
   ] }
   s.frameworks = 'UIKit', 'Accelerate'

@@ -9,11 +9,11 @@
 /* Begin PBXBuildFile section */
 		0C5B40B81C8E76E37989934B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E15AD8B793C1220BD3475A73 /* Foundation.framework */; };
 		0D598B7DBBDFC184C56DF2DF /* CYLDemoDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 854DF1B1EFF12E75B8682B8D /* CYLDemoDataSource.m */; };
-		3D88C0F4439B89A1CB787F7D /* CollectionViewClassifyMenuLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F7CAAE3D0E8B5E789ACED925 /* CollectionViewClassifyMenuLayoutTests.m */; };
+		3D88C0F4439B89A1CB787F7D /* CYLCollectionViewClassifyMenuLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F7CAAE3D0E8B5E789ACED925 /* CYLCollectionViewClassifyMenuLayoutTests.m */; };
 		84444FF4E1162FCBB49DAA17 /* libPods-CollectionViewClassifyMenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8255833E02347CE0E51C652D /* libPods-CollectionViewClassifyMenu.a */; };
 		9A09E2F71BC7AFF00060C116 /* CYLMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2BC1BC7AFF00060C116 /* CYLMainViewController.m */; };
 		9A09E3081BC7AFF00060C116 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2E61BC7AFF00060C116 /* data.json */; };
-		9A09E30A1BC7AFF00060C116 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2ED1BC7AFF00060C116 /* AppDelegate.m */; };
+		9A09E30A1BC7AFF00060C116 /* CYLAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2ED1BC7AFF00060C116 /* CYLAppDelegate.m */; };
 		9A09E30B1BC7AFF00060C116 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2EE1BC7AFF00060C116 /* LaunchScreen.xib */; };
 		9A09E30E1BC7AFF00060C116 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F21BC7AFF00060C116 /* main.m */; };
 		9A09E30F1BC7AFF00060C116 /* CYLDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F51BC7AFF00060C116 /* CYLDBManager.m */; };
@@ -41,10 +41,10 @@
 		9A09E2BA1BC7AFF00060C116 /* CYLClassifyMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLClassifyMenuViewController.m; sourceTree = "<group>"; };
 		9A09E2BB1BC7AFF00060C116 /* CYLMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMainViewController.h; sourceTree = "<group>"; };
 		9A09E2BC1BC7AFF00060C116 /* CYLMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMainViewController.m; sourceTree = "<group>"; };
-		9A09E2BF1BC7AFF00060C116 /* UIButton+CollectionCellStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+CollectionCellStyle.h"; sourceTree = "<group>"; };
-		9A09E2C01BC7AFF00060C116 /* UIButton+CollectionCellStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+CollectionCellStyle.m"; sourceTree = "<group>"; };
-		9A09E2C21BC7AFF00060C116 /* CollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionViewCell.h; sourceTree = "<group>"; };
-		9A09E2C31BC7AFF00060C116 /* CollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionViewCell.m; sourceTree = "<group>"; };
+		9A09E2BF1BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+CYLCollectionCellStyle.h"; sourceTree = "<group>"; };
+		9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+CYLCollectionCellStyle.m"; sourceTree = "<group>"; };
+		9A09E2C21BC7AFF00060C116 /* CYLCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLCollectionViewCell.h; sourceTree = "<group>"; };
+		9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLCollectionViewCell.m; sourceTree = "<group>"; };
 		9A09E2C41BC7AFF00060C116 /* CYLFilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterHeaderView.h; sourceTree = "<group>"; };
 		9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterHeaderView.m; sourceTree = "<group>"; };
 		9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
@@ -53,29 +53,29 @@
 		9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLRightImageButton.m; sourceTree = "<group>"; };
 		9A09E2CC1BC7AFF00060C116 /* CYLMultipleFilterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMultipleFilterController.h; sourceTree = "<group>"; };
 		9A09E2CD1BC7AFF00060C116 /* CYLMultipleFilterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMultipleFilterController.m; sourceTree = "<group>"; };
-		9A09E2CE1BC7AFF00060C116 /* FilterBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterBaseController.h; sourceTree = "<group>"; };
-		9A09E2CF1BC7AFF00060C116 /* FilterBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterBaseController.m; sourceTree = "<group>"; };
-		9A09E2D01BC7AFF00060C116 /* FilterBaseController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FilterBaseController.xib; sourceTree = "<group>"; };
-		9A09E2D31BC7AFF00060C116 /* UIImage+Blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Blur.h"; sourceTree = "<group>"; };
-		9A09E2D41BC7AFF00060C116 /* UIImage+Blur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Blur.m"; sourceTree = "<group>"; };
-		9A09E2D51BC7AFF00060C116 /* UIView+General.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+General.h"; sourceTree = "<group>"; };
-		9A09E2D61BC7AFF00060C116 /* UIView+General.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+General.m"; sourceTree = "<group>"; };
+		9A09E2CE1BC7AFF00060C116 /* CYLFilterBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterBaseController.h; sourceTree = "<group>"; };
+		9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterBaseController.m; sourceTree = "<group>"; };
+		9A09E2D01BC7AFF00060C116 /* CYLFilterBaseController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLFilterBaseController.xib; sourceTree = "<group>"; };
+		9A09E2D31BC7AFF00060C116 /* UIImage+CYLBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYLBlur.h"; sourceTree = "<group>"; };
+		9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CYLBlur.m"; sourceTree = "<group>"; };
+		9A09E2D51BC7AFF00060C116 /* UIView+CYLGeneral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+CYLGeneral.h"; sourceTree = "<group>"; };
+		9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+CYLGeneral.m"; sourceTree = "<group>"; };
 		9A09E2D81BC7AFF00060C116 /* CYLFilterParamsTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterParamsTool.h; sourceTree = "<group>"; };
 		9A09E2D91BC7AFF00060C116 /* CYLFilterParamsTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterParamsTool.m; sourceTree = "<group>"; };
 		9A09E2DB1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMultipleFilterHeaderView.h; sourceTree = "<group>"; };
 		9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMultipleFilterHeaderView.m; sourceTree = "<group>"; };
 		9A09E2DD1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLMultipleFilterHeaderView.xib; sourceTree = "<group>"; };
-		9A09E2DE1BC7AFF00060C116 /* FilterCollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterCollectionCell.h; sourceTree = "<group>"; };
-		9A09E2DF1BC7AFF00060C116 /* FilterCollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterCollectionCell.m; sourceTree = "<group>"; };
-		9A09E2E21BC7AFF00060C116 /* NSArray+log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+log.h"; sourceTree = "<group>"; };
-		9A09E2E31BC7AFF00060C116 /* NSArray+log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+log.m"; sourceTree = "<group>"; };
-		9A09E2E41BC7AFF00060C116 /* NSDictionary+log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+log.h"; sourceTree = "<group>"; };
-		9A09E2E51BC7AFF00060C116 /* NSDictionary+log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+log.m"; sourceTree = "<group>"; };
+		9A09E2DE1BC7AFF00060C116 /* CYLFilterCollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterCollectionCell.h; sourceTree = "<group>"; };
+		9A09E2DF1BC7AFF00060C116 /* CYLFilterCollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterCollectionCell.m; sourceTree = "<group>"; };
+		9A09E2E21BC7AFF00060C116 /* NSArray+CYLLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+CYLLog.h"; sourceTree = "<group>"; };
+		9A09E2E31BC7AFF00060C116 /* NSArray+CYLLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+CYLLog.m"; sourceTree = "<group>"; };
+		9A09E2E41BC7AFF00060C116 /* NSDictionary+CYLLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+CYLLog.h"; sourceTree = "<group>"; };
+		9A09E2E51BC7AFF00060C116 /* NSDictionary+CYLLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+CYLLog.m"; sourceTree = "<group>"; };
 		9A09E2E61BC7AFF00060C116 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
-		9A09E2E91BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICollectionViewLeftAlignedLayout.h; sourceTree = "<group>"; };
-		9A09E2EA1BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UICollectionViewLeftAlignedLayout.m; sourceTree = "<group>"; };
-		9A09E2EC1BC7AFF00060C116 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		9A09E2ED1BC7AFF00060C116 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9A09E2E91BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLCollectionViewLeftAlignedLayout.h; sourceTree = "<group>"; };
+		9A09E2EA1BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLCollectionViewLeftAlignedLayout.m; sourceTree = "<group>"; };
+		9A09E2EC1BC7AFF00060C116 /* CYLAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLAppDelegate.h; sourceTree = "<group>"; };
+		9A09E2ED1BC7AFF00060C116 /* CYLAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLAppDelegate.m; sourceTree = "<group>"; };
 		9A09E2EF1BC7AFF00060C116 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		9A09E2F01BC7AFF00060C116 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9A09E2F11BC7AFF00060C116 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -90,7 +90,7 @@
 		E15AD8B793C1220BD3475A73 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		F11F86F0C1B8AEB5D44F8BE3 /* Pods-CollectionViewClassifyMenuTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenuTests.release.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenuTests/Pods-CollectionViewClassifyMenuTests.release.xcconfig"; sourceTree = "<group>"; };
 		F278F0AE5778F4B0553DBFDA /* Pods-CollectionViewClassifyMenu.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenu.release.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenu/Pods-CollectionViewClassifyMenu.release.xcconfig"; sourceTree = "<group>"; };
-		F7CAAE3D0E8B5E789ACED925 /* CollectionViewClassifyMenuLayoutTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuLayoutTests.m; sourceTree = "<group>"; };
+		F7CAAE3D0E8B5E789ACED925 /* CYLCollectionViewClassifyMenuLayoutTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLCollectionViewClassifyMenuLayoutTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,8 +170,8 @@
 		9A09E2BE1BC7AFF00060C116 /* Category */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2BF1BC7AFF00060C116 /* UIButton+CollectionCellStyle.h */,
-				9A09E2C01BC7AFF00060C116 /* UIButton+CollectionCellStyle.m */,
+				9A09E2BF1BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.h */,
+				9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -179,8 +179,8 @@
 		9A09E2C11BC7AFF00060C116 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2C21BC7AFF00060C116 /* CollectionViewCell.h */,
-				9A09E2C31BC7AFF00060C116 /* CollectionViewCell.m */,
+				9A09E2C21BC7AFF00060C116 /* CYLCollectionViewCell.h */,
+				9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.m */,
 				9A09E2C41BC7AFF00060C116 /* CYLFilterHeaderView.h */,
 				9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.m */,
 				9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */,
@@ -206,9 +206,9 @@
 			children = (
 				9A09E2CC1BC7AFF00060C116 /* CYLMultipleFilterController.h */,
 				9A09E2CD1BC7AFF00060C116 /* CYLMultipleFilterController.m */,
-				9A09E2CE1BC7AFF00060C116 /* FilterBaseController.h */,
-				9A09E2CF1BC7AFF00060C116 /* FilterBaseController.m */,
-				9A09E2D01BC7AFF00060C116 /* FilterBaseController.xib */,
+				9A09E2CE1BC7AFF00060C116 /* CYLFilterBaseController.h */,
+				9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.m */,
+				9A09E2D01BC7AFF00060C116 /* CYLFilterBaseController.xib */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -225,10 +225,10 @@
 		9A09E2D21BC7AFF00060C116 /* Category */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2D31BC7AFF00060C116 /* UIImage+Blur.h */,
-				9A09E2D41BC7AFF00060C116 /* UIImage+Blur.m */,
-				9A09E2D51BC7AFF00060C116 /* UIView+General.h */,
-				9A09E2D61BC7AFF00060C116 /* UIView+General.m */,
+				9A09E2D31BC7AFF00060C116 /* UIImage+CYLBlur.h */,
+				9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.m */,
+				9A09E2D51BC7AFF00060C116 /* UIView+CYLGeneral.h */,
+				9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -248,8 +248,8 @@
 				9A09E2DB1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.h */,
 				9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.m */,
 				9A09E2DD1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib */,
-				9A09E2DE1BC7AFF00060C116 /* FilterCollectionCell.h */,
-				9A09E2DF1BC7AFF00060C116 /* FilterCollectionCell.m */,
+				9A09E2DE1BC7AFF00060C116 /* CYLFilterCollectionCell.h */,
+				9A09E2DF1BC7AFF00060C116 /* CYLFilterCollectionCell.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -269,10 +269,10 @@
 		9A09E2E11BC7AFF00060C116 /* Category */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2E21BC7AFF00060C116 /* NSArray+log.h */,
-				9A09E2E31BC7AFF00060C116 /* NSArray+log.m */,
-				9A09E2E41BC7AFF00060C116 /* NSDictionary+log.h */,
-				9A09E2E51BC7AFF00060C116 /* NSDictionary+log.m */,
+				9A09E2E21BC7AFF00060C116 /* NSArray+CYLLog.h */,
+				9A09E2E31BC7AFF00060C116 /* NSArray+CYLLog.m */,
+				9A09E2E41BC7AFF00060C116 /* NSDictionary+CYLLog.h */,
+				9A09E2E51BC7AFF00060C116 /* NSDictionary+CYLLog.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -280,25 +280,25 @@
 		9A09E2E71BC7AFF00060C116 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2E81BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout */,
+				9A09E2E81BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
 		};
-		9A09E2E81BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout */ = {
+		9A09E2E81BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2E91BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout.h */,
-				9A09E2EA1BC7AFF00060C116 /* UICollectionViewLeftAlignedLayout.m */,
+				9A09E2E91BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.h */,
+				9A09E2EA1BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.m */,
 			);
-			path = UICollectionViewLeftAlignedLayout;
+			path = CYLCollectionViewLeftAlignedLayout;
 			sourceTree = "<group>";
 		};
 		9A09E2EB1BC7AFF00060C116 /* Symtem */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2EC1BC7AFF00060C116 /* AppDelegate.h */,
-				9A09E2ED1BC7AFF00060C116 /* AppDelegate.m */,
+				9A09E2EC1BC7AFF00060C116 /* CYLAppDelegate.h */,
+				9A09E2ED1BC7AFF00060C116 /* CYLAppDelegate.m */,
 				9A09E2EE1BC7AFF00060C116 /* LaunchScreen.xib */,
 				9A09E2F01BC7AFF00060C116 /* Images.xcassets */,
 				9A09E2F11BC7AFF00060C116 /* Info.plist */,
@@ -324,7 +324,7 @@
 				9A3296071AB7D3880035EFAA /* CollectionViewClassifyMenuTests */,
 				9A3295EC1AB7D3880035EFAA /* Products */,
 				F8F8A0995D57FBDFE28AACC5 /* Frameworks */,
-				F7CAAE3D0E8B5E789ACED925 /* CollectionViewClassifyMenuLayoutTests.m */,
+				F7CAAE3D0E8B5E789ACED925 /* CYLCollectionViewClassifyMenuLayoutTests.m */,
 				2501D470511B51E8EE02D17B /* Pods */,
 			);
 			sourceTree = "<group>";
@@ -559,7 +559,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A09E30A1BC7AFF00060C116 /* AppDelegate.m in Sources */,
+				9A09E30A1BC7AFF00060C116 /* CYLAppDelegate.m in Sources */,
 				9A09E2F71BC7AFF00060C116 /* CYLMainViewController.m in Sources */,
 				9A09E30E1BC7AFF00060C116 /* main.m in Sources */,
 				9A09E30F1BC7AFF00060C116 /* CYLDBManager.m in Sources */,
@@ -571,7 +571,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D88C0F4439B89A1CB787F7D /* CollectionViewClassifyMenuLayoutTests.m in Sources */,
+				3D88C0F4439B89A1CB787F7D /* CYLCollectionViewClassifyMenuLayoutTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

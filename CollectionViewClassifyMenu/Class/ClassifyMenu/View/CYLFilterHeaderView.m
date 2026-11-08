@@ -68,7 +68,7 @@ float const CYLFilterHeaderViewHeigt = 38;
     [self.moreButton setTitle:@"收起" forState:UIControlStateSelected];
     self.moreButton.titleLabel.textAlignment = NSTextAlignmentRight;
     self.moreButton.hidden = YES;
-    [self.moreButton addTarget:self action:@selector(moreBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.moreButton addTarget:self action:@selector(moreButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.moreButton];
     return self;
 }
@@ -85,9 +85,9 @@ float const CYLFilterHeaderViewHeigt = 38;
                                       MAX(0, width - 2 * kCureOfLineOffX), kCureOfLineHight);
 }
 
-- (void)moreBtnClicked:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(filterHeaderViewMoreBtnClicked:)]) {
-        [self.delegate filterHeaderViewMoreBtnClicked:self.moreButton];
+- (void)moreButtonTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(filterHeaderViewDidTapMoreButton:)]) {
+        [self.delegate filterHeaderViewDidTapMoreButton:self.moreButton];
     }
 }
 

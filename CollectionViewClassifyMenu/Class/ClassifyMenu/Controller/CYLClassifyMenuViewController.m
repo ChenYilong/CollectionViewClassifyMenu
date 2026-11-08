@@ -23,9 +23,9 @@ static float const kCellBtnCenterToBorderMargin               = 19;
 //Views
 #import "CYLFilterHeaderView.h"
 //Cells
-#import "CollectionViewCell.h"
+#import "CYLCollectionViewCell.h"
 //Others
-#import "UICollectionViewLeftAlignedLayout.h"
+#import "CYLCollectionViewLeftAlignedLayout.h"
 #import "CYLMenuKeys.h"
 #import "CYLParameterConfiguration.h"
 #import "CYLMenuResources.h"
@@ -38,7 +38,7 @@ static NSString * const kCellIdentifier           = @"CellIdentifier";
 static NSString * const kHeaderViewCellIdentifier = @"HeaderViewCellIdentifier";
 typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
-@interface CYLClassifyMenuViewController ()<UICollectionViewDataSource, UICollectionViewDelegate, FilterHeaderViewDelegate>
+@interface CYLClassifyMenuViewController ()<UICollectionViewDataSource, UICollectionViewDelegate, CYLFilterHeaderViewDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSArray          *dataSource;
@@ -142,7 +142,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     
     [self initData];
     [self addCollectionView];
-    [self judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
+    [self cyl_judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
     if (self.menuHeaderView) {
         [self.backgroundView addSubview:self.menuHeaderView];
     }
@@ -164,7 +164,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         self.collectionHeaderMoreBtnHideBoolArray = nil;
         self.rowsCountPerSection = nil;
         self.cellsCountArrayPerRowInSections = nil;
-        [self judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
+        [self cyl_judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
         [self.collectionView reloadData];
         [self updateViewHeight];
     }
@@ -202,7 +202,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     [self initData];
     if (self.isViewLoaded) {
         self.expandSectionArray = nil;
-        [self judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
+        [self cyl_judgeMoreButtonShowWhenDefaultRowsCount:self.defaultVisibleRows];
         [self.collectionView reloadData];
         [self updateViewHeight];
     }
@@ -227,13 +227,13 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (void)setDefaultVisibleRows:(NSUInteger)defaultVisibleRows {
     _defaultVisibleRows = MAX(1, defaultVisibleRows);
     if (self.isViewLoaded) {
-        [self judgeMoreButtonShowWhenDefaultRowsCount:_defaultVisibleRows];
+        [self cyl_judgeMoreButtonShowWhenDefaultRowsCount:_defaultVisibleRows];
         [self.collectionView reloadData];
         [self updateViewHeight];
     }
 }
 
-- (void)judgeMoreButtonShowWhenDefaultRowsCount:(NSUInteger)defaultRowsCount {
+- (void)cyl_judgeMoreButtonShowWhenDefaultRowsCount:(NSUInteger)defaultRowsCount {
     [self.rowsCountPerSection enumerateObjectsUsingBlock:^(id  __nonnull obj, NSUInteger idx, BOOL * __nonnull stop) {
         if ([obj integerValue] > defaultRowsCount) {
             [self.collectionHeaderMoreBtnHideBoolArray replaceObjectAtIndex:idx withObject:@NO];
@@ -301,14 +301,14 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (void)addCollectionView {
     CGRect collectionViewFrame = CGRectMake(0, CGRectGetHeight(self.menuHeaderView.frame) + kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width,
                                             [UIScreen mainScreen].bounds.size.height - 40);
-    UICollectionViewLeftAlignedLayout *layout = [[UICollectionViewLeftAlignedLayout alloc] init];
+    CYLCollectionViewLeftAlignedLayout *layout = [[CYLCollectionViewLeftAlignedLayout alloc] init];
     self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame
                                              collectionViewLayout:layout];
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
     self.collectionView.backgroundColor = [UIColor whiteColor];
-    [self.collectionView registerClass:[CollectionViewCell class]
+    [self.collectionView registerClass:[CYLCollectionViewCell class]
             forCellWithReuseIdentifier:kCellIdentifier];
     self.collectionView.allowsMultipleSelection = YES;
     [self.collectionView registerClass:[CYLFilterHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kHeaderViewCellIdentifier];
@@ -367,8 +367,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    CollectionViewCell *cell =
-    (CollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier
+    CYLCollectionViewCell *cell =
+    (CYLCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier
                                                                     forIndexPath:indexPath];
     NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
                                                             objectForKey:kDataSourceSectionKey]];
@@ -458,7 +458,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 #pragma mark - 🔌 FilterHeaderViewDelegateMethod Method
 
-- (void)filterHeaderViewMoreBtnClicked:(UIButton *)sender {
+- (void)filterHeaderViewDidTapMoreButton:(UIButton *)sender {
     sender.selected = !sender.selected;
     if (sender.selected) {
         [self.expandSectionArray addObject:@(sender.tag)];
