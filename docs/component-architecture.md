@@ -32,7 +32,8 @@ persistence in the demos.
   `jouns/CollectionViewClassifyMenu` 为空仓库，没有可合并的分支。
 - `SecondShuo/CollectionViewClassifyMenu-master` 的唯一提交是无共同祖先的旧项目快照，
   源码与本仓库历史快照实质相同，仅有空行和文件权限差异，还包含 Xcode 个人状态。
-  不应以其旧代码覆盖现有修复或重新提交个人状态。
+  已通过 [922cd7f](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/922cd7fc880c1a21d8275a4b1ce272ca587f079e)
+  合并其历史，同时保留现有代码和修复，未重新引入旧代码或个人状态。
 
 ## 验证边界 / Validation limits
 
