@@ -48,8 +48,7 @@ float const CYLFilterHeaderViewHeigt = 38;
     self.backgroundColor = [UIColor whiteColor];
     // 仅修改self.titleButton的宽度,xyh值不变 / Change only the title button's width.
     self.titleButton = [[CYLIndexPathButton alloc] init];
-    self.titleButton.titleEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 0);
-    self.titleButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+    self.titleButton.cyl_titleLeadingInset = 16;
     self.titleButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     self.titleButton.frame = CGRectMake(16, 0, kTitleButtonWidth,  self.frame.size.height);
     self.titleButton.titleLabel.textAlignment = NSTextAlignmentLeft;

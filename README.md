@@ -151,6 +151,16 @@ the `cyl_` prefix. `NSArray` and `NSDictionary` no longer override the system
 `descriptionWithLocale:` for logging; call `cyl_descriptionWithLocale:`
 explicitly when the old custom format is desired.
 
+### Button layout without deprecated insets / 按钮布局
+
+iOS 15 deprecates `titleEdgeInsets`, `imageEdgeInsets` and
+`adjustsImageWhenHighlighted`. The component no longer uses them:
+`CYLIndexPathButton` offers `cyl_imageTitleSpacing` and
+`cyl_titleLeadingInset`, and `CYLRightImageButton` places its image after the
+title by overriding the content rects. Image helpers use
+`UIGraphicsImageRenderer`. If you set edge insets on these buttons yourself,
+use the new properties instead.
+
 ### Release / 发布
 
 ```sh

@@ -377,13 +377,10 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     if (shouldShowPic) {
         [cell.button setImage:[CYLMenuResources imageNamed:@"home_btn_shrink"]
                      forState:UIControlStateNormal];
-        CGFloat spacing = kCollectionViewItemButtonImageToTextMargin;
-        cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
-        cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
+        cell.button.cyl_imageTitleSpacing = kCollectionViewItemButtonImageToTextMargin;
     } else {
         [cell.button setImage:nil forState:UIControlStateNormal];
-        cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
-        cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+        cell.button.cyl_imageTitleSpacing = 0;
     }
     [cell.button setTitle:text forState:UIControlStateNormal];
     [cell.button setTitle:text forState:UIControlStateSelected];

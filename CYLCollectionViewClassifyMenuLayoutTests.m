@@ -426,4 +426,33 @@
     }
 }
 
+- (void)testButtonsPlaceImageAndTitleWithoutDeprecatedInsets {
+    CYLIndexPathButton *button = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(0, 0, 120, 30);
+    [button setImage:[CYLMenuResources imageNamed:@"home_btn_shrink"] forState:UIControlStateNormal];
+    [button setTitle:@"Item 🌟" forState:UIControlStateNormal];
+    [button layoutIfNeeded];
+    CGRect plainImage = button.imageView.frame;
+    CGRect plainTitle = button.titleLabel.frame;
+    button.cyl_imageTitleSpacing = 5;
+    [button layoutIfNeeded];
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(button.imageView.frame), CGRectGetMinX(plainImage) - 2.5, 0.5);
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(button.titleLabel.frame), CGRectGetMinX(plainTitle) + 2.5, 0.5);
+    XCTAssertLessThanOrEqual(CGRectGetMaxX(button.titleLabel.frame), CGRectGetWidth(button.bounds));
+
+    CYLFilterHeaderView *header = [[CYLFilterHeaderView alloc] initWithFrame:CGRectMake(0, 0, 320, 38)];
+    header.moreButton.hidden = NO;
+    [header.titleButton setTitle:@"Section" forState:UIControlStateNormal];
+    [header layoutIfNeeded];
+    [header.titleButton layoutIfNeeded];
+    [header.moreButton layoutIfNeeded];
+    CGRect moreTitle = header.moreButton.titleLabel.frame;
+    CGRect moreImage = header.moreButton.imageView.frame;
+    XCTAssertGreaterThan(CGRectGetWidth(moreTitle), 0);
+    XCTAssertLessThanOrEqual(CGRectGetMaxX(moreTitle), CGRectGetMinX(moreImage));
+    XCTAssertLessThanOrEqual(CGRectGetMaxX(moreImage), CGRectGetWidth(header.moreButton.bounds) + 0.5);
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(header.titleButton.titleLabel.frame),
+                               header.titleButton.cyl_titleLeadingInset, 0.5);
+}
+
 @end
