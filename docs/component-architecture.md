@@ -1,6 +1,6 @@
 ---
 title: Component architecture and community review
-date: 2026-11-08
+date: 2026-11-09
 tags: [architecture, cocoapods, issues]
 ---
 
@@ -42,5 +42,8 @@ persistence in the demos.
   [#13](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/13)；
   section header 宽度对应 [#7](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/7)。
 - 演示和测试覆盖 320/390 pt、长文本及 emoji、复用和外部数据源；并未覆盖所有真机、
-  Dynamic Type、旋转或 VoiceOver 场景。CocoaPods lint 仍有历史弃用 API 警告。
+  Dynamic Type、旋转或 VoiceOver 场景。
+- iOS 15 已弃用的按钮 edge insets、`adjustsImageWhenHighlighted` 和
+  `UIGraphicsBeginImageContext` 已在 [32720b0](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/32720b0352a0ab93fb5722e711e9954356b63624) 中替换；
+  该环境没有 Xcode/CocoaPods，尚未重新运行 `pod lib lint` 确认警告全部消除。
 - 历史 3.5 英寸设备不支持项目现有的 iOS 15 最低版本，因此不能在原设备上复验 #7。
