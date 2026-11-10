@@ -38,17 +38,24 @@ xcrun simctl bootstatus "$DEVICE_ID" -b
 # [EN] A clean status bar, as in App Store screenshots. [CN] 干净的状态栏，与 App Store 截图一致。
 xcrun simctl status_bar "$DEVICE_ID" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 || true
 xcrun simctl install "$DEVICE_ID" "$APP"
+# [EN] SpringBoard can refuse a launch right after boot ("denied by service delegate"): give it time, and retry below.
+# [CN] 刚启动的模拟器中 SpringBoard 可能拒绝打开 App（“denied by service delegate”）：先等待，下面也会重试。
+sleep 10
 
 OLD_IFS=$IFS
 IFS=','
 for SCREEN in $SCREENS; do
   IFS=$OLD_IFS
   FILE="$OUT/$SCREEN.png"
-  for ATTEMPT in 1 2; do
+  for ATTEMPT in 1 2 3; do
     LOG="$OUT/$SCREEN.log"
     # [EN] The app prints a layout report ([CYLExampleLayout]) 3 s after launch; keep it with the screenshot.
     # [CN] App 在启动 3 秒后输出布局报告（[CYLExampleLayout]），与截图一起保存。
-    xcrun simctl launch --terminate-running-process --stdout="$LOG" --stderr="$LOG" "$DEVICE_ID" "$BUNDLE_ID" -CYLExampleScreen "$SCREEN"
+    if ! xcrun simctl launch --terminate-running-process --stdout="$LOG" --stderr="$LOG" "$DEVICE_ID" "$BUNDLE_ID" -CYLExampleScreen "$SCREEN"; then
+      echo "Launching $SCREEN failed (attempt $ATTEMPT); retrying"
+      sleep 10
+      continue
+    fi
     sleep 8
     # [EN] Still running? A crash leaves the home screen behind: report it and launch once more.
     # [CN] 仍在运行？崩溃后会回到主屏幕：报告并重新启动一次。

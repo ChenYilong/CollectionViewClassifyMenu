@@ -406,7 +406,11 @@
     XCTAssertEqualObjects(chevron.accessibilityLabel, @"分组 0 更多");
     [view setExpanded:YES forSection:0 animated:NO];
     [collection layoutIfNeeded];
+    // Thirty expanded tags are taller than the view: scroll the footer into view.
+    [collection setContentOffset:CGPointMake(0, MAX(0, collection.contentSize.height - CGRectGetHeight(collection.bounds))) animated:NO];
+    [collection layoutIfNeeded];
     footer = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
+    XCTAssertNotNil(footer);
     XCTAssertEqualObjects(((UIButton *)[footer valueForKey:@"chevronButton"]).accessibilityLabel, @"分组 0 收起");
 
     view.foldStyle = CYLMenuFoldStyleHeaderButton;
