@@ -1,3 +1,5 @@
+# [EN] Manual re-run of the Example screenshots; ios.yml already takes them on every build run.
+# [CN] 手动重新生成 Example 截图；ios.yml 已在每次构建时截图。
 # [EN] Screenshots of the Example app (scripts/example-screenshots.sh), modelled on CYLTabBarController's
 #      theme-screenshots.yml: the app launched once per README scenario screen on an iOS simulator. The screenshots are an
 #      artifact of the run, to put into docs/assets/ and the README.
@@ -12,19 +14,6 @@ on:
         description: "Screens, comma separated (empty: the default list)"
         required: false
         default: ""
-  pull_request:
-    paths:
-      - ".github/workflows/screenshots.yml"
-      - "scripts/example-screenshots.sh"
-      - "Example/**"
-      - "CollectionViewClassifyMenu/Class/**"
-  push:
-    branches: [ 'claude/**' ]
-    paths:
-      - ".github/workflows/screenshots.yml"
-      - "scripts/example-screenshots.sh"
-      - "Example/**"
-      - "CollectionViewClassifyMenu/Class/**"
 
 permissions:
   contents: read

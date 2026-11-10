@@ -144,3 +144,45 @@ jobs:
           name: unit-tests-${{ matrix.suite }}-log
           path: build/unit-tests-*.log
           if-no-files-found: ignore
+
+  # [EN] Example screenshots on every build run (AGENTS.md): each README scenario screen launched on a simulator.
+  # [CN] 每次构建都生成 Example 截图（AGENTS.md）：在模拟器上逐个启动 README 场景页面。
+  screenshots:
+    name: Example screenshots
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: CocoaPods cache
+        if: needs.changes.outputs.code == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods/repos
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-screenshots-${{ hashFiles('CollectionViewClassifyMenu.podspec', '**/Podfile', '**/Podfile.lock') }}
+          restore-keys: pods-${{ runner.os }}-screenshots-
+      - name: Screenshots
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/example-screenshots.sh
+      - name: Summary
+        if: always() && needs.changes.outputs.code == 'true'
+        run: |
+          {
+            echo "### Example screenshots"
+            echo
+            ls build/screenshots/*.png 2>/dev/null | sed 's|^|- |' || echo "- (none)"
+            echo
+            echo "Download the \`example-screenshots\` artifact of this run."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        # [EN] Screenshots are required (AGENTS.md); a failed upload must still be visible, so it is not ignored.
+        # [CN] 截图是必需的（AGENTS.md）；上传失败需要可见，因此不忽略。
+        if: always() && needs.changes.outputs.code == 'true'
+        with:
+          name: example-screenshots
+          path: |
+            build/screenshots/*.png
+            build/screenshots-build/build.log
+          if-no-files-found: error

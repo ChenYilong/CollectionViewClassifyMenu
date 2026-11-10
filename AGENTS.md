@@ -31,6 +31,19 @@ verify the behavior and update the applicable documentation.
 - Project-specific Xcode and verification guidance lives in
   `.agents/skills/cyl-xcode-compat/` and `.agents/skills/cyl-verify/`.
 
+## CI and Example screenshots
+
+- CI follows CYLTabBarController's `.github/workflows/ios.yml`; the scripts
+  live in `scripts/` (see `.agents/skills/cyl-verify/`).
+- Every CI run that builds code must provide screenshots of the Example app
+  (`example-screenshots` artifact of the `Example screenshots` job). When
+  reporting such a run, look at the screenshots and show them to the user,
+  checking that each README scenario renders as expected.
+- If the screenshots are missing or cannot be obtained, first find out why and
+  change the CI (workflow or `scripts/example-screenshots.sh`) so that they are
+  produced. If that is still not possible, explain the exact reason (for
+  example the runner, the simulator or artifact download) to the user.
+
 ## Repository hygiene
 
 - Ignore macOS AppleDouble metadata (`._*`), `.DS_Store`, and stray doubled-dot
