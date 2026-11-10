@@ -437,6 +437,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         filterHeaderView.titleButton.tag = indexPath.section;
         filterHeaderView.moreButton.tag = indexPath.section;
         filterHeaderView.moreButton.selected = NO;
+        // The title is a heading, not a control; the fold button names its section.
+        filterHeaderView.titleButton.accessibilityTraits = UIAccessibilityTraitHeader;
+        filterHeaderView.moreButton.accessibilityHint = sectionTitle;
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateNormal];
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
         id<CYLMenuDataSource> source = self.menuDataSource;

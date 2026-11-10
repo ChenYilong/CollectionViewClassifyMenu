@@ -20,7 +20,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"宝贝详情";
+    // navigationItem, not title: a view controller's title would replace its tab's title.
+    self.navigationItem.title = @"宝贝详情";
     self.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
     CYLReviewStore *store = [CYLReviewStore sharedStore];
 

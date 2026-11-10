@@ -552,6 +552,13 @@
         collection.frame = CGRectMake(0, 0, panelWidth, 240);
         [collection layoutIfNeeded];
         [self scrollAndCheck:collection fixture:fixture buttonKey:@"titleButton"];
+        for (UICollectionViewCell *cell in collection.visibleCells) {
+            // VoiceOver: the filter cell is the element, labelled with its title.
+            UIButton *button = [cell valueForKey:@"titleButton"];
+            XCTAssertTrue(cell.isAccessibilityElement);
+            XCTAssertEqualObjects(cell.accessibilityLabel, [button titleForState:UIControlStateNormal]);
+            XCTAssertEqual((BOOL)(cell.accessibilityTraits & UIAccessibilityTraitSelected), button.selected);
+        }
         [collection setContentOffset:CGPointMake(0, -collection.contentInset.top) animated:NO];
         [collection layoutIfNeeded];
         NSArray *headers = [collection visibleSupplementaryViewsOfKind:UICollectionElementKindSectionHeader];

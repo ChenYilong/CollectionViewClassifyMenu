@@ -83,6 +83,11 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     layer.backgroundColor = (selected ? style.selectedItemBackgroundColor : style.itemBackgroundColor).CGColor;
     layer.borderColor = (selected ? style.selectedBorderColor : style.borderColor).CGColor;
     layer.borderWidth = style.borderWidth;
+    if (UIAccessibilityDarkerSystemColorsEnabled()) {
+        // Increase Contrast: a visible outline in the text color.
+        layer.borderColor = (selected ? style.selectedBorderColor : (enabled ? style.textColor : style.disabledTextColor)).CGColor;
+        layer.borderWidth = MAX(1, style.borderWidth);
+    }
     layer.cornerRadius = style.cornerRadius < 0 ? CGFLOAT_MAX : style.cornerRadius;
     self.accessibilityLabel = title;
     UIAccessibilityTraits traits = UIAccessibilityTraitButton;
@@ -280,6 +285,10 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
                withReuseIdentifier:kCYLTagListFooterIdentifier];
     [self addSubview:_collectionView];
     [self cyl_applyStyleColors];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(cyl_refreshVisibleCells)
+                                                 name:UIAccessibilityDarkerSystemColorsStatusDidChangeNotification
+                                               object:nil];
 }
 
 #pragma mark Properties
@@ -507,7 +516,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
-    if (![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory]) {
+    if (![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory] ||
+        previousTraitCollection.legibilityWeight != self.traitCollection.legibilityWeight) {
+        // Dynamic Type or Bold Text changed: measure every tag again.
         [self cyl_invalidateMeasurements];
     }
 }
@@ -606,7 +617,8 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     void (^reload)(void) = ^{
         [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:(NSUInteger)section]];
     };
-    if (animated && self.window) {
+    // Reduce Motion: change the content without animating it.
+    if (animated && self.window && !UIAccessibilityIsReduceMotionEnabled()) {
         [self.collectionView performBatchUpdates:reload completion:nil];
     } else {
         [UIView performWithoutAnimation:^{
@@ -615,9 +627,40 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         }];
     }
     [self cyl_updateContentHeight];
+    [self cyl_moveAccessibilityFocusToFoldControlInSection:section];
     if ([self.menuDelegate respondsToSelector:@selector(menu:didChangeExpanded:inSection:)]) {
         [self.menuDelegate menu:self didChangeExpanded:expanded inSection:section];
     }
+}
+
+/// VoiceOver keeps its place after the section changes size: focus the section's fold control.
+- (void)cyl_moveAccessibilityFocusToFoldControlInSection:(NSInteger)section {
+    if (!UIAccessibilityIsVoiceOverRunning()) {
+        return;
+    }
+    [self.collectionView layoutIfNeeded];
+    UIView *control = [self cyl_foldControlInSection:section];
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, control);
+}
+
+- (nullable UIButton *)cyl_foldControlInSection:(NSInteger)section {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+    if (self.foldStyle == CYLMenuFoldStyleFooterChevron) {
+        CYLTagListFooterView *footer = (CYLTagListFooterView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:indexPath];
+        return footer.chevronButton;
+    }
+    if (self.foldStyle == CYLMenuFoldStyleHeaderButton) {
+        CYLTagListHeaderView *header = (CYLTagListHeaderView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
+        return header.foldButton.hidden ? nil : header.foldButton;
+    }
+    return nil;
+}
+
+/// "<section title> <expand or collapse title>", so a fold control says which section it changes.
+- (NSString *)cyl_foldAccessibilityLabelForSection:(NSInteger)section {
+    NSString *action = [self isSectionExpanded:section] ? self.style.collapseTitle : self.style.expandTitle;
+    NSString *title = [self.menuDataSource menuTitleForSection:section];
+    return title.length > 0 ? [NSString stringWithFormat:@"%@ %@", title, action] : action;
 }
 
 - (void)cyl_toggleSection:(NSInteger)section {
@@ -774,7 +817,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         UIImage *chevron = [UIImage systemImageNamed:expanded ? @"chevron.up" : @"chevron.down"];
         [footer.chevronButton setImage:chevron forState:UIControlStateNormal];
         footer.chevronButton.tintColor = self.style.foldControlColor;
-        footer.chevronButton.accessibilityLabel = expanded ? self.style.collapseTitle : self.style.expandTitle;
+        footer.chevronButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
         footer.foldHandler = ^(NSInteger tappedSection) {
             [weakSelf cyl_toggleSection:tappedSection];
         };
@@ -796,6 +839,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [header.foldButton setTitle:[self isSectionExpanded:section] ? self.style.collapseTitle : self.style.expandTitle
                        forState:UIControlStateNormal];
     [header.foldButton setTitleColor:self.style.foldControlColor forState:UIControlStateNormal];
+    header.foldButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
     header.foldHandler = ^(NSInteger tappedSection) {
         [weakSelf cyl_toggleSection:tappedSection];
     };

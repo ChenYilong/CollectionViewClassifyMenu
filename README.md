@@ -178,6 +178,18 @@ New APIs / 新增接口:
 image from `menuImageForItemAtIndexPath:` instead. Section icons of
 `CYLClassifyMenuViewController` now come from `menuImageForSection:`.
 
+### Accessibility / 无障碍
+
+| 设置 | 支持 |
+| --- | --- |
+| VoiceOver | 标签是带“按钮”特征的元素，选中、禁用状态通过 `selected` / `notEnabled` 朗读；分组标题带 `header` 特征；折叠按钮朗读“<分组> 更多/收起”，展开或收起后焦点保持在折叠按钮上。旧版多选筛选的单元格与 TagView 同样可朗读。 |
+| 动态字体 Dynamic Type | 字体随系统字号缩放（上限 2 倍），标签高度随之增加，字号变化后重新测量。 |
+| 粗体文本 Bold Text | 标签使用粗体，测量与绘制使用同一字体，不会被截断。 |
+| 增强对比度 Increase Contrast | 标签边框改用文字颜色并至少 1pt。 |
+| 减弱动态效果 Reduce Motion | 展开与收起不使用动画。 |
+
+宿主提供的分组右侧视图（如行业选择按钮）应设置自己的 `accessibilityLabel`，Example 中有示例。
+
 ### Example / 示例工程
 
 `Example/` 通过 Podfile 以本地路径集成核心库，并引入

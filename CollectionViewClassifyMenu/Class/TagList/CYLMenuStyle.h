@@ -52,7 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *expandTitle;
 @property (nonatomic, copy) NSString *collapseTitle;
 
-/// Item font for the given traits, applying Dynamic Type when enabled.
+/// Item font for the given traits: bold for the Bold Text setting, and scaled
+/// for Dynamic Type when adjustsFontForContentSizeCategory is YES.
 - (UIFont *)itemFontForTraitCollection:(nullable UITraitCollection *)traitCollection;
 /// Header font for the given traits, applying Dynamic Type when enabled.
 - (UIFont *)headerFontForTraitCollection:(nullable UITraitCollection *)traitCollection;

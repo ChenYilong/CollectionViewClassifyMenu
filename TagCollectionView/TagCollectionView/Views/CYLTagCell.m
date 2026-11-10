@@ -61,6 +61,9 @@
     
     
     self.titleLb.text=model.title;
+    self.isAccessibilityElement = YES;
+    self.accessibilityLabel = model.title;
+    self.accessibilityTraits = UIAccessibilityTraitButton;
     self.titleLb.font=[CYLTagModel titleFontForTraitCollection:self.traitCollection];
     
 }

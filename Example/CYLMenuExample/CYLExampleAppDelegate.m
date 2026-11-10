@@ -30,8 +30,54 @@
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     // `-CYLExampleScreen <name>` opens a screen directly (used by scripts/example-screenshots.sh).
-    [[self class] openScreen:[[NSUserDefaults standardUserDefaults] stringForKey:@"CYLExampleScreen"] inTabBarController:tabs];
+    NSString *screen = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLExampleScreen"];
+    [[self class] openScreen:screen inTabBarController:tabs];
+    if (screen.length > 0) {
+        // Layout report for scripts/example-screenshots.sh, printed before the screenshot is taken.
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [[self class] reportLayoutOfScreen:screen inTabBarController:tabs];
+        });
+    }
     return YES;
+}
+
++ (void)reportTagList:(CYLTagListView *)view named:(NSString *)name {
+    UICollectionView *collection = [view valueForKey:@"collectionView"];
+    NSMutableString *line = [NSMutableString stringWithFormat:@"[CYLExampleLayout] %@ frame=%@ hidden=%d window=%d contentHeight=%.1f collection=%@ contentSize=%@ offset=%@ adjustedInset=%@ sections=%ld",
+                             name, NSStringFromCGRect(view.frame), view.hidden, view.window != nil, view.contentHeight,
+                             NSStringFromCGRect(collection.frame), NSStringFromCGSize(collection.contentSize),
+                             NSStringFromCGPoint(collection.contentOffset), NSStringFromUIEdgeInsets(collection.adjustedContentInset),
+                             (long)collection.numberOfSections];
+    for (NSInteger section = 0; section < collection.numberOfSections; section++) {
+        [line appendFormat:@" items[%ld]=%ld", (long)section, (long)[collection numberOfItemsInSection:section]];
+    }
+    [line appendFormat:@" visibleCells=%lu", (unsigned long)collection.visibleCells.count];
+    UICollectionViewCell *first = collection.visibleCells.firstObject;
+    if (first) {
+        [line appendFormat:@" firstCell=%@ inWindow=%@ alpha=%.2f hidden=%d", NSStringFromCGRect(first.frame),
+                           NSStringFromCGRect([first convertRect:first.bounds toView:nil]), first.alpha, first.hidden];
+    }
+    fprintf(stderr, "%s\n", line.UTF8String);
+}
+
++ (void)reportLayoutOfScreen:(NSString *)screen inTabBarController:(CYLTabBarController *)tabs {
+    UINavigationController *navigation = (UINavigationController *)tabs.selectedViewController;
+    UIViewController *top = navigation.topViewController;
+    fprintf(stderr, "[CYLExampleLayout] screen=%s top=%s\n", screen.UTF8String, NSStringFromClass([top class]).UTF8String);
+    if ([top isKindOfClass:[CYLReviewListViewController class]]) {
+        CYLReviewListViewController *reviews = (CYLReviewListViewController *)top;
+        fprintf(stderr, "[CYLExampleLayout] tableHeader=%s table=%s\n",
+                NSStringFromCGRect(reviews.tableView.tableHeaderView.frame).UTF8String,
+                NSStringFromCGRect(reviews.tableView.frame).UTF8String);
+        [self reportTagList:reviews.filterView named:@"reviewFilter"];
+    } else if ([top isKindOfClass:[CYLProductViewController class]]) {
+        [self reportTagList:((CYLProductViewController *)top).previewView named:@"productPreview"];
+    } else if ([top isKindOfClass:[CYLSearchCategoryViewController class]]) {
+        CYLSearchCategoryViewController *search = (CYLSearchCategoryViewController *)top;
+        UITabBar *bar = search.categoryTabBarController.tabBar;
+        fprintf(stderr, "[CYLExampleLayout] categoryTabBar=%s\n", NSStringFromCGRect([bar convertRect:bar.bounds toView:nil]).UTF8String);
+        [self reportTagList:search.tagListView named:@"searchTags"];
+    }
 }
 
 + (void)openScreen:(NSString *)screen inTabBarController:(CYLTabBarController *)tabs {

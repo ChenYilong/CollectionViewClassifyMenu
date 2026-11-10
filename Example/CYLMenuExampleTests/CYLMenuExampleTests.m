@@ -363,6 +363,73 @@
     }
 }
 
+#pragma mark Accessibility
+
+- (void)testVoiceOverDescribesTagsAndFoldControls {
+    CYLExampleMenuSource *source = [self sourceWithItemCount:30 sections:1];
+    source.sections[0].items[2].enabled = NO;
+    CYLTagListView *view = [self hostedViewWithSource:source width:320];
+    view.foldStyle = CYLMenuFoldStyleFooterChevron;
+    view.defaultVisibleRows = 2;
+    view.selectedIndexPaths = @[[self ip:1 :0]];
+    [view layoutIfNeeded];
+    UICollectionView *collection = [self collectionViewOf:view];
+    [collection layoutIfNeeded];
+    for (NSInteger item = 0; item < 3; item++) {
+        UICollectionViewCell *cell = [collection cellForItemAtIndexPath:[self ip:item :0]];
+        XCTAssertTrue(cell.isAccessibilityElement);
+        XCTAssertEqualObjects(cell.accessibilityLabel, source.sections[0].items[item].title);
+        XCTAssertTrue(cell.accessibilityTraits & UIAccessibilityTraitButton);
+        XCTAssertEqual((BOOL)(cell.accessibilityTraits & UIAccessibilityTraitSelected), item == 1);
+        XCTAssertEqual((BOOL)(cell.accessibilityTraits & UIAccessibilityTraitNotEnabled), item == 2);
+    }
+    [self tap:view item:0 section:0];
+    XCTAssertTrue([collection cellForItemAtIndexPath:[self ip:0 :0]].accessibilityTraits & UIAccessibilityTraitSelected,
+                  @"Selection changes are reflected in the traits");
+
+    UICollectionReusableView *header = [collection supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:[self ip:0 :0]];
+    XCTAssertTrue(((UILabel *)[header valueForKey:@"titleLabel"]).accessibilityTraits & UIAccessibilityTraitHeader);
+    UICollectionReusableView *footer = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
+    UIButton *chevron = [footer valueForKey:@"chevronButton"];
+    XCTAssertEqualObjects(chevron.accessibilityLabel, @"分组 0 更多");
+    [view setExpanded:YES forSection:0 animated:NO];
+    [collection layoutIfNeeded];
+    footer = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
+    XCTAssertEqualObjects(((UIButton *)[footer valueForKey:@"chevronButton"]).accessibilityLabel, @"分组 0 收起");
+
+    view.foldStyle = CYLMenuFoldStyleHeaderButton;
+    [collection layoutIfNeeded];
+    header = [collection supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:[self ip:0 :0]];
+    XCTAssertEqualObjects(((UIButton *)[header valueForKey:@"foldButton"]).accessibilityLabel, @"分组 0 收起");
+}
+
+- (void)testBoldTextMakesTagsBoldAndWider {
+    CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+    UITraitCollection *regular = [UITraitCollection traitCollectionWithTraitsFromCollections:@[
+        [UITraitCollection traitCollectionWithLegibilityWeight:UILegibilityWeightRegular],
+        [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge]]];
+    UITraitCollection *bold = [UITraitCollection traitCollectionWithTraitsFromCollections:@[
+        [UITraitCollection traitCollectionWithLegibilityWeight:UILegibilityWeightBold],
+        [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge]]];
+    UIFont *regularFont = [style itemFontForTraitCollection:regular];
+    UIFont *boldFont = [style itemFontForTraitCollection:bold];
+    XCTAssertFalse(regularFont.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold);
+    XCTAssertTrue(boldFont.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold);
+    NSString *title = @"Accessibility 无障碍";
+    XCTAssertGreaterThan([title sizeWithAttributes:@{NSFontAttributeName: boldFont}].width,
+                         [title sizeWithAttributes:@{NSFontAttributeName: regularFont}].width,
+                         @"Measured with the bold font, so bold tags do not truncate");
+}
+
+- (void)testExampleControlsHaveSpokenLabels {
+    CYLSearchCategoryViewController *controller = [[CYLSearchCategoryViewController alloc] init];
+    [self hostController:controller];
+    XCTAssertEqualObjects(controller.industryButton.accessibilityLabel, @"行业 IT互联网");
+    XCTAssertEqualObjects(controller.industryButton.accessibilityHint, @"选择行业");
+    [controller selectIndustry:@"金融"];
+    XCTAssertEqualObjects(controller.industryButton.accessibilityLabel, @"行业 金融");
+}
+
 #pragma mark Scenario 1: review filter
 
 - (UINavigationController *)hostController:(UIViewController *)controller {
@@ -462,10 +529,12 @@
     XCTAssertTrue([tabs isKindOfClass:[CYLTabBarController class]]);
     XCTAssertEqual(tabs.viewControllers.count, 4u);
     XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"找人", @"动态", @"八卦", @"职位"]));
-    XCTAssertEqualWithAccuracy(CGRectGetMinY(tabs.tabBar.frame), 0, 0.5, @"The category tab bar is at the top");
     CYLTagListView *tags = controller.tagListView;
-    CGRect tagsFrame = [tags convertRect:tags.bounds toView:tabs.view];
-    XCTAssertGreaterThanOrEqual(CGRectGetMinY(tagsFrame), CGRectGetMaxY(tabs.tabBar.frame) - 0.5);
+    CGRect barFrame = [tabs.tabBar convertRect:tabs.tabBar.bounds toView:controller.view];
+    CGRect tagsFrame = [tags convertRect:tags.bounds toView:controller.view];
+    XCTAssertLessThan(CGRectGetMaxY(barFrame), CGRectGetHeight(controller.view.bounds) / 2, @"The category tab bar is at the top");
+    XCTAssertGreaterThanOrEqual(CGRectGetMinY(tagsFrame), CGRectGetMaxY(barFrame) - 0.5, @"Tags start below the tab bar");
+    XCTAssertFalse(tags.hidden);
 
     UICollectionView *collection = [self collectionViewOf:tags];
     XCTAssertEqual(controller.category, CYLSearchCategoryPeople);
@@ -483,6 +552,8 @@
     XCTAssertEqualObjects(controller.searchBar.placeholder, @"搜八卦");
     CYLTagListView *gossip = controller.tagListView;
     XCTAssertNotEqual(gossip, tags);
+    XCTAssertTrue(tags.hidden, @"Only the selected category is shown");
+    XCTAssertFalse(gossip.hidden);
     XCTAssertEqual([[self collectionViewOf:gossip] numberOfSections], 2);
     [self assertNoOverlapsOrOverflowIn:gossip];
     [self tap:gossip item:2 section:0];

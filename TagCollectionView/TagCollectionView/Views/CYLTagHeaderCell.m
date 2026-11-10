@@ -58,6 +58,9 @@
     }
     
     self.nameLb.text=group.groupName;
+    self.nameLb.accessibilityTraits = UIAccessibilityTraitHeader;
+    // The fold button names the group it changes.
+    self.btn.accessibilityHint = group.groupName;
     
 }
 @end

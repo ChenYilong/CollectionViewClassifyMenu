@@ -30,6 +30,8 @@ else
 fi
 mkdir -p "$WORK/repo/$DIR"
 cp "$SOURCE"/*.png "$WORK/repo/$DIR/"
+# [EN] Layout reports, when the app wrote them. [CN] App 输出的布局报告（如有）。
+find "$SOURCE" -name '*.log' -exec cp {} "$WORK/repo/$DIR/" \;
 git -C "$WORK/repo" add -A
 git -C "$WORK/repo" commit --quiet -m "Example screenshots for $REF_NAME@$(printf '%s' "$GITHUB_SHA" | cut -c1-7)" || true
 for ATTEMPT in 1 2 3; do

@@ -77,6 +77,14 @@
 }
 
 - (UIFont *)cyl_scaledFont:(UIFont *)font traits:(UITraitCollection *)traits {
+    UITraitCollection *effective = traits ?: [UITraitCollection currentTraitCollection];
+    if (effective.legibilityWeight == UILegibilityWeightBold) {
+        // Bold Text accessibility setting.
+        UIFontDescriptor *bold = [font.fontDescriptor fontDescriptorWithSymbolicTraits:font.fontDescriptor.symbolicTraits | UIFontDescriptorTraitBold];
+        if (bold) {
+            font = [UIFont fontWithDescriptor:bold size:font.pointSize];
+        }
+    }
     if (!self.adjustsFontForContentSizeCategory) {
         return font;
     }

@@ -45,13 +45,17 @@ for SCREEN in $SCREENS; do
   IFS=$OLD_IFS
   FILE="$OUT/$SCREEN.png"
   for ATTEMPT in 1 2; do
-    xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLExampleScreen "$SCREEN"
-    sleep 5
+    LOG="$OUT/$SCREEN.log"
+    # [EN] The app prints a layout report ([CYLExampleLayout]) 3 s after launch; keep it with the screenshot.
+    # [CN] App 在启动 3 秒后输出布局报告（[CYLExampleLayout]），与截图一起保存。
+    xcrun simctl launch --terminate-running-process --stdout="$LOG" --stderr="$LOG" "$DEVICE_ID" "$BUNDLE_ID" -CYLExampleScreen "$SCREEN"
+    sleep 8
     # [EN] Still running? A crash leaves the home screen behind: report it and launch once more.
     # [CN] 仍在运行？崩溃后会回到主屏幕：报告并重新启动一次。
     if xcrun simctl spawn "$DEVICE_ID" launchctl list | grep -q "UIKitApplication:$BUNDLE_ID"; then
       xcrun simctl io "$DEVICE_ID" screenshot "$FILE"
       echo "Saved $FILE"
+      grep 'CYLExampleLayout' "$LOG" || echo "No layout report for $SCREEN: the main thread may be blocked"
       break
     fi
     echo "The app is not running after launching $SCREEN (attempt $ATTEMPT): crashed?"

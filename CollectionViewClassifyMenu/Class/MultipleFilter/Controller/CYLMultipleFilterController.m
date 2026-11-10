@@ -161,6 +161,10 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     cell.titleButton.selected = [self.filterParamsTool.filterParamsArray[indexPath.section][indexPath.row] boolValue];
     cell.titleButton.section = indexPath.section;
     cell.titleButton.row = indexPath.row;
+    // The cell is the tappable element (the button ignores touches): describe it to VoiceOver.
+    cell.isAccessibilityElement = YES;
+    cell.accessibilityLabel = text;
+    cell.accessibilityTraits = UIAccessibilityTraitButton | (cell.titleButton.selected ? UIAccessibilityTraitSelected : 0);
     return cell;
 }
 

@@ -185,5 +185,6 @@ jobs:
           name: example-screenshots
           path: |
             build/screenshots/*.png
+            build/screenshots/*.log
             build/screenshots-build/build.log
           if-no-files-found: error
