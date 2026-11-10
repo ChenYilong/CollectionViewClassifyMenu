@@ -90,6 +90,8 @@ The existing copyright notices continue to apply.
 
 两个示例分别通过本地 Pod 引用同一个组件：
 
+`.xcworkspace` 与 `Podfile.lock` 由 `pod install` 生成，不提交到仓库（与 CYLTabBarController 的 `.gitignore` 相同）。
+
 ```sh
 pod install
 open CollectionViewClassifyMenu.xcworkspace

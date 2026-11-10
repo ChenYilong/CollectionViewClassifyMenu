@@ -1,15 +1,138 @@
-.DS_Store
-._*
+# Kept in line with CYLTabBarController's .gitignore (latest commit of feat/cross-platform-components):
+# every rule of it is here, with only its project names changed. Update it before every commit (AGENTS.md).
+# 与 CYLTabBarController 的 .gitignore（feat/cross-platform-components 最新提交）保持一致：包含其全部规则，
+# 只修改项目名称。每次提交前更新（见 AGENTS.md）。
+
+# This project 本项目
+# Stray doubled-dot copies (AGENTS.md: Repository hygiene)
 ..git
 ..github
 ..gitignore
 ..claude
-
 xcuserdata/
-*.xcuserstate
 DerivedData/
-build/
 Pods/
-
 # Animation files downloaded by scripts/fetch-animation-resources.py (pod install in Example)
 Example-Shared/PAGResources/pag-ios/
+
+# From CYLTabBarController 来自 CYLTabBarController
+
+.DS_Store 
+CollectionViewClassifyMenu.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
+Example/CYLMenuExample.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
+TagCollectionView/TagCollectionView.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
+build/ 
+*.pbxuser 
+!default.pbxuser 
+*.mode1v3 
+!default.mode1v3 
+*.mode2v3 
+!default.mode2v3 
+*.perspectivev3 
+!default.perspectivev3 
+!default.xcworkspace 
+xcuserdata 
+*.moved-aside 
+*.mobileprovision 
+DerivedData 
+.idea/ 
+Pods 
+# Lock files (*.lock: Podfile.lock, yarn.lock, pubspec.lock, Gemfile.lock) are never committed (AGENTS.md).
+# Gradle's gradle.lockfile is not a *.lock file and stays committed.
+*.lock
+*.xcworkspace
+
+
+CollectionViewClassifyMenu.xcodeproj/xcuserdata/*.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
+Example/CYLMenuExample.xcodeproj/xcuserdata/*.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
+TagCollectionView/TagCollectionView.xcodeproj/xcuserdata/*.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
+*.xcuserstate
+*.xcbkptlist
+*.xcuserstate
+*.xcbkptlist
+
+# Xcode
+#
+# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+
+## Build generated
+build/
+DerivedData
+
+## Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+
+## Other
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+#
+# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
+# Packages/
+.build/
+
+# CocoaPods
+#
+# We recommend against adding the Pods directory to your .gitignore. However
+# you should judge for yourself, the pros and cons are mentioned at:
+# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
+#
+# Pods/
+
+# Carthage
+#
+# Add this line if you want to avoid checking in source code from Carthage dependencies.
+# Carthage/Checkouts
+
+Carthage/Build
+
+# fastlane
+#
+# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the 
+# screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://github.com/fastlane/fastlane/blob/master/docs/Gitignore.md
+
+fastlane/report.xml
+fastlane/screenshots
+
+# macOS artifact
+.DS_Store
+
+# PAG animation files (issue #604): downloaded by scripts/fetch-animation-resources.py (`pod install` in Example),
+# not kept in the repository. PAG 动效文件：由脚本下载（Example 中执行 `pod install`），不保存在仓库中。
+Example-Shared/PAGResources/*/
+
+# The rest of the downloaded "SwiftUI Animations" course (DesignCode): only its final app is kept, as
+# Example-SwiftUI-Rive/AnimatedApp. 下载的「SwiftUI Animations」课程的其余部分：只保留最终的 App。
+Example-SwiftUI-Rive/SwiftUI Animations/
+Example-SwiftUI-Rive/AnimatedApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# Removed from the repository (#760); kept locally only. 已从仓库移除（#760），只保留在本地。
+Example-loadTabBarIconsFroNework/
+
+# Python bytecode of the scripts 脚本的 Python 字节码
+__pycache__/
+
+# macOS AppleDouble metadata written on external volumes: never commit
+._*
+*.base
