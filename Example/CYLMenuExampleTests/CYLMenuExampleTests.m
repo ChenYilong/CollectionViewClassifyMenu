@@ -9,6 +9,7 @@
 @import CollectionViewClassifyMenu;
 #import "CYLExampleMenuSource.h"
 #import "CYLExampleAppDelegate.h"
+#import "CYLSearchHomeViewController.h"
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
@@ -640,20 +641,20 @@
     [controller.tagListView layoutIfNeeded];
 }
 
-- (void)testSearchCategoriesUseATopTabBarAndFillTheSearchBar {
+- (void)testSearchCategoriesUseABottomTabBarAndFillTheSearchBar {
     CYLSearchCategoryViewController *controller = [[CYLSearchCategoryViewController alloc] init];
     [self hostController:controller];
     [self layOutSelectedCategoryOf:controller];
-    CYLTopTabBarController *tabs = controller.categoryTabBarController;
+    CYLTabBarController *tabs = controller.categoryTabBarController;
     XCTAssertTrue([tabs isKindOfClass:[CYLTabBarController class]]);
     XCTAssertEqual(tabs.viewControllers.count, 4u);
     XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"找人", @"动态", @"八卦", @"职位"]));
     CYLTagListView *tags = controller.tagListView;
     CGRect barFrame = [tabs.tabBar convertRect:tabs.tabBar.bounds toView:controller.view];
     CGRect tagsFrame = [tags convertRect:tags.bounds toView:controller.view];
-    XCTAssertLessThan(CGRectGetMaxY(barFrame), CGRectGetHeight(controller.view.bounds) / 2, @"The category tab bar is at the top");
-    XCTAssertGreaterThanOrEqual(CGRectGetMinY(tagsFrame), CGRectGetMaxY(barFrame) - 0.5, @"Tags start below the tab bar");
-    XCTAssertFalse(tags.hidden);
+    XCTAssertGreaterThan(CGRectGetMinY(barFrame), CGRectGetHeight(controller.view.bounds) / 2, @"Tab bars are always at the bottom");
+    XCTAssertLessThanOrEqual(CGRectGetMaxY(tagsFrame), CGRectGetMinY(barFrame) + 0.5, @"Tags end above the tab bar");
+    XCTAssertNotNil(tags.window);
 
     UICollectionView *collection = [self collectionViewOf:tags];
     XCTAssertEqual(controller.category, CYLSearchCategoryPeople);
@@ -671,8 +672,8 @@
     XCTAssertEqualObjects(controller.searchBar.placeholder, @"搜八卦");
     CYLTagListView *gossip = controller.tagListView;
     XCTAssertNotEqual(gossip, tags);
-    XCTAssertTrue(tags.hidden, @"Only the selected category is shown");
-    XCTAssertFalse(gossip.hidden);
+    XCTAssertNil(tags.window, @"Only the selected category's page is shown");
+    XCTAssertNotNil(gossip.window);
     XCTAssertEqual([[self collectionViewOf:gossip] numberOfSections], 2);
     [self assertNoOverlapsOrOverflowIn:gossip];
     [self tap:gossip item:2 section:0];
@@ -772,12 +773,17 @@
     UINavigationController *first = (UINavigationController *)tabs.viewControllers[0];
     UINavigationController *second = (UINavigationController *)tabs.viewControllers[1];
     XCTAssertTrue([first.viewControllers.firstObject isKindOfClass:[CYLProductViewController class]]);
-    XCTAssertTrue([second.viewControllers.firstObject isKindOfClass:[CYLSearchCategoryViewController class]]);
+    XCTAssertTrue([second.viewControllers.firstObject isKindOfClass:[CYLSearchHomeViewController class]]);
     XCTAssertGreaterThan(CGRectGetMinY(tabs.tabBar.frame), CGRectGetHeight(tabs.view.bounds) / 2, @"The root tab bar is at the bottom");
 
-    // Two tab bars with different roles: scenario 2 adds its own category tabs.
+    // Scenario 2: the home page pushes the search screen, which hides the root tab bar and
+    // shows its own category tab bar, also at the bottom: two tab bars with different roles.
     tabs.selectedIndex = 1;
-    CYLSearchCategoryViewController *search = (CYLSearchCategoryViewController *)second.viewControllers.firstObject;
+    CYLSearchHomeViewController *home = (CYLSearchHomeViewController *)second.viewControllers.firstObject;
+    [home loadViewIfNeeded];
+    CYLSearchCategoryViewController *search = [home openSearch];
+    XCTAssertEqual(second.topViewController, search);
+    XCTAssertTrue(search.hidesBottomBarWhenPushed);
     [search loadViewIfNeeded];
     XCTAssertNotEqual(search.categoryTabBarController, tabs);
     XCTAssertEqual(search.categoryTabBarController.parentViewController, search);

@@ -31,6 +31,34 @@ verify the behavior and update the applicable documentation.
 - Project-specific Xcode and verification guidance lives in
   `.agents/skills/cyl-xcode-compat/` and `.agents/skills/cyl-verify/`.
 
+## Tab bars
+
+- Tab bars are always at the bottom of the screen, including tab bars nested in
+  a screen (such as scenario 2's category tabs); never move a tab bar to the top.
+- A screen pushed from a tab sets `hidesBottomBarWhenPushed = YES`, so the
+  parent tab bar is hidden after the push.
+- Do not set a tab's root view controller `title`; set `navigationItem.title`,
+  otherwise it replaces the tab item's title.
+
+## Internationalization and localization
+
+- Localization usually spans several files: structure them before use. On iOS,
+  put all `<language>.lproj` string tables of one module into a single
+  `.bundle`; several bundles are allowed, one per module.
+- The core bundle (`CYLClassifyMenuResources.bundle`, sources in
+  `CollectionViewClassifyMenu/Resources/Localization/`) always stays. Update it
+  cautiously: keep keys stable, add every key to every language, never remove
+  or rename a key without a documented, incompatible change.
+- Example strings belong to an Example-level bundle
+  (`Example/CYLMenuExample/CYLMenuExample.bundle`), never to the core bundle.
+- Always look strings up through a macro that maps keys to its bundle:
+  `CYLMenuLocalizedString` for the core, `CYLExampleLocalizedString` for the
+  Example. Do not call `NSLocalizedString` or read a bundle directly.
+- Other platforms follow the same rules with their own resource mechanism: one
+  resource container per module, the core one kept stable, a lookup helper per
+  module.
+- Details and checks: `.agents/skills/cyl-localization/`.
+
 ## CI and Example screenshots
 
 - CI follows CYLTabBarController's `.github/workflows/ios.yml`; the scripts

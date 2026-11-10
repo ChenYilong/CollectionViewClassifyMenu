@@ -7,13 +7,14 @@
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLSearchCategoryViewController.h"
+#import "CYLSearchHomeViewController.h"
 #import "CYLExampleLocalization.h"
 
 @implementation CYLExampleAppDelegate
 
 + (CYLTabBarController *)makeRootTabBarController {
     UINavigationController *reviews = [[UINavigationController alloc] initWithRootViewController:[[CYLProductViewController alloc] init]];
-    UINavigationController *search = [[UINavigationController alloc] initWithRootViewController:[[CYLSearchCategoryViewController alloc] init]];
+    UINavigationController *search = [[UINavigationController alloc] initWithRootViewController:[[CYLSearchHomeViewController alloc] init]];
     NSArray *attributes = @[
         @{CYLTabBarItemTitle: CYLExampleLocalizedString(@"场景一：评价筛选"),
           CYLTabBarItemImage: [UIImage systemImageNamed:@"cart"],
@@ -119,10 +120,14 @@
             // 好评 + 有图: both conditions must match.
             [reviews selectFilterIndexes:@[@1, @4]];
         }
+    } else if ([screen isEqualToString:@"search-home"]) {
+        tabs.selectedIndex = 1;
     } else if ([screen hasPrefix:@"search"]) {
         tabs.selectedIndex = 1;
         UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[1];
-        CYLSearchCategoryViewController *search = (CYLSearchCategoryViewController *)navigation.viewControllers.firstObject;
+        CYLSearchCategoryViewController *search = [[CYLSearchCategoryViewController alloc] init];
+        search.hidesBottomBarWhenPushed = YES;
+        [navigation pushViewController:search animated:NO];
         if ([screen isEqualToString:@"search-gossip"]) {
             [search selectCategory:CYLSearchCategoryGossip];
         } else if ([screen isEqualToString:@"search-jobs"]) {

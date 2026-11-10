@@ -68,3 +68,7 @@
 "加载中…" = "Loading…";
 "服务器返回 %lu 条" = "Server returned %lu";
 "没有匹配的评价" = "No matching reviews";
+
+/* Scenario 2 home */
+"脉脉搜索" = "Search";
+"按分类浏览热门标签：找人、动态、八卦、职位" = "Browse trending tags by category: people, posts, gossip and jobs";

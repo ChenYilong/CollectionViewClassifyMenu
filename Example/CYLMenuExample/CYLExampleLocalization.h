@@ -12,7 +12,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// The Example's string for `key` (its Chinese source text) in the current language.
-FOUNDATION_EXTERN NSString *CYLExampleLocalizedString(NSString *key);
+/// The Example's string for `key` (its Chinese source text) in the current language,
+/// from CYLMenuExample.bundle.
+FOUNDATION_EXTERN NSString *CYLExampleLocalizedStringFromBundle(NSString *key);
+
+/// Use this macro, not the function, for every user-facing string: it maps a key to the
+/// Example's bundle in one place (as CYLMenuLocalizedString does for the core bundle).
+#define CYLExampleLocalizedString(key) CYLExampleLocalizedStringFromBundle(key)
 
 NS_ASSUME_NONNULL_END

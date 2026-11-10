@@ -12,21 +12,49 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 
 #pragma mark - Category page
 
-/// One tab of the category tab bar. Its content (a tag list, plus the job category
-/// sidebar on the 职位 page) is shown by the search screen below the tab strip.
+/// One tab of the category tab bar: a tag list, plus the job category sidebar on the 职位 page.
 @interface CYLSearchCategoryPageViewController : UIViewController
 @property (nonatomic, assign) CYLSearchCategory category;
 @property (nonatomic, strong) CYLTagListView *tagListView;
+@property (nonatomic, strong, nullable) UITableView *sidebar;
 @end
 
 @implementation CYLSearchCategoryPageViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor systemBackgroundColor];
+    self.tagListView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.tagListView];
+    // The safe area ends above the tab bar at the bottom.
+    UILayoutGuide *safe = self.view.safeAreaLayoutGuide;
+    NSLayoutXAxisAnchor *leading = self.view.leadingAnchor;
+    if (self.sidebar) {
+        self.sidebar.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:self.sidebar];
+        [NSLayoutConstraint activateConstraints:@[
+            [self.sidebar.topAnchor constraintEqualToAnchor:safe.topAnchor],
+            [self.sidebar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+            [self.sidebar.widthAnchor constraintEqualToConstant:kJobCategoryWidth],
+            [self.sidebar.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor],
+        ]];
+        leading = self.sidebar.trailingAnchor;
+    }
+    [NSLayoutConstraint activateConstraints:@[
+        [self.tagListView.topAnchor constraintEqualToAnchor:safe.topAnchor],
+        [self.tagListView.leadingAnchor constraintEqualToAnchor:leading],
+        [self.tagListView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [self.tagListView.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor],
+    ]];
+}
+
 @end
 
 #pragma mark - Search screen
 
 @interface CYLSearchCategoryViewController () <CYLMenuDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UITabBarControllerDelegate>
 @property (nonatomic, strong, readwrite) UISearchBar *searchBar;
-@property (nonatomic, strong, readwrite) CYLTopTabBarController *categoryTabBarController;
+@property (nonatomic, strong, readwrite) CYLTabBarController *categoryTabBarController;
 @property (nonatomic, strong, readwrite) UITableView *jobCategoryTableView;
 @property (nonatomic, strong, readwrite) UIButton *industryButton;
 @property (nonatomic, assign, readwrite) CYLSearchCategory category;
@@ -36,9 +64,6 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, CYLExampleMenuSource *> *menuSources;
 @property (nonatomic, copy) NSArray<NSString *> *jobCategories;
 @property (nonatomic, assign) NSUInteger jobCategoryIndex;
-@property (nonatomic, strong) UIView *contentView;
-@property (nonatomic, strong) NSLayoutConstraint *stripHeight;
-@property (nonatomic, strong) NSLayoutConstraint *jobTagsLeading;
 @end
 
 @implementation CYLSearchCategoryViewController
@@ -139,6 +164,9 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
         CYLSearchCategoryPageViewController *page = [[CYLSearchCategoryPageViewController alloc] init];
         page.category = (CYLSearchCategory)index;
         page.tagListView = [self makeTagListView];
+        if (index == CYLSearchCategoryJobs) {
+            page.sidebar = self.jobCategoryTableView;
+        }
         [pages addObject:page];
         [attributes addObject:@{
             CYLTabBarItemTitle: CYLExampleLocalizedString(titles[index]),
@@ -151,62 +179,17 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
         [self reloadTagsForCategory:page.category];
     }
 
-    // The second tab bar of the app: category tabs at the top of this screen. The
-    // embedded tab bar controller is a strip as tall as its bar; the selected
-    // category's content is shown below it.
-    self.categoryTabBarController = [[CYLTopTabBarController alloc] initWithViewControllers:pages tabBarItemsAttributes:attributes];
+    // The second tab bar of the app: the category tabs of this screen, at the bottom like
+    // every tab bar. The root tab bar is hidden while this screen is pushed.
+    self.categoryTabBarController = [[CYLTabBarController alloc] initWithViewControllers:pages tabBarItemsAttributes:attributes];
     self.categoryTabBarController.delegate = self;
     [self addChildViewController:self.categoryTabBarController];
-    UIView *strip = self.categoryTabBarController.view;
-    strip.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:strip];
+    UIView *tabs = self.categoryTabBarController.view;
+    tabs.frame = self.view.bounds;
+    tabs.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:tabs];
     [self.categoryTabBarController didMoveToParentViewController:self];
-
-    self.contentView = [[UIView alloc] init];
-    self.contentView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:self.contentView];
-    self.jobCategoryTableView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.contentView addSubview:self.jobCategoryTableView];
-    self.stripHeight = [strip.heightAnchor constraintEqualToConstant:49];
-    UILayoutGuide *safe = self.view.safeAreaLayoutGuide;
-    NSMutableArray *constraints = [NSMutableArray arrayWithArray:@[
-        [strip.topAnchor constraintEqualToAnchor:safe.topAnchor],
-        [strip.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [strip.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        self.stripHeight,
-        [self.contentView.topAnchor constraintEqualToAnchor:strip.bottomAnchor],
-        [self.contentView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [self.contentView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [self.contentView.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor],
-        [self.jobCategoryTableView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor],
-        [self.jobCategoryTableView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor],
-        [self.jobCategoryTableView.widthAnchor constraintEqualToConstant:kJobCategoryWidth],
-        [self.jobCategoryTableView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor],
-    ]];
-    for (CYLSearchCategoryPageViewController *page in pages) {
-        CYLTagListView *tags = page.tagListView;
-        tags.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.contentView addSubview:tags];
-        NSLayoutConstraint *leading = page.category == CYLSearchCategoryJobs
-            ? [tags.leadingAnchor constraintEqualToAnchor:self.jobCategoryTableView.trailingAnchor]
-            : [tags.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor];
-        [constraints addObjectsFromArray:@[
-            [tags.topAnchor constraintEqualToAnchor:self.contentView.topAnchor],
-            leading,
-            [tags.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor],
-            [tags.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor],
-        ]];
-    }
-    [NSLayoutConstraint activateConstraints:constraints];
     [self selectCategory:CYLSearchCategoryPeople];
-}
-
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    CGFloat height = [self.categoryTabBarController stripHeightForWidth:CGRectGetWidth(self.view.bounds)];
-    if (fabs(self.stripHeight.constant - height) > 0.5) {
-        self.stripHeight.constant = height;
-    }
 }
 
 - (CYLTagListView *)makeTagListView {
@@ -236,10 +219,6 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 - (void)categoryDidChange:(CYLSearchCategory)category {
     self.category = category;
     self.searchBar.placeholder = [[self class] placeholderForCategory:category];
-    for (CYLSearchCategoryPageViewController *page in self.pages) {
-        page.tagListView.hidden = page.category != category;
-    }
-    self.jobCategoryTableView.hidden = category != CYLSearchCategoryJobs;
     if (category == CYLSearchCategoryJobs) {
         [self.jobCategoryTableView reloadData];
         [self selectJobCategoryAtIndex:self.jobCategoryIndex];

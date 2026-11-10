@@ -6,7 +6,7 @@
 #import "CYLExampleLocalization.h"
 @import CollectionViewClassifyMenu;
 
-NSString *CYLExampleLocalizedString(NSString *key) {
+NSString *CYLExampleLocalizedStringFromBundle(NSString *key) {
     static NSBundle *bundle;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

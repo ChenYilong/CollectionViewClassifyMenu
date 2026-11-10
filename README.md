@@ -207,7 +207,7 @@ NSString *more = CYLMenuLocalizedString(@"CYLMenuExpand", nil);   // "More"
 切换语言后新创建的视图使用新语言。`CYLMenuStyle` 的 `expandTitle` / `collapseTitle` 默认取自该 bundle，
 也可由宿主覆盖。新增文案时，在三个 `.strings` 中加入相同的键（测试会检查键一致）。
 
-Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CYLMenuExample.bundle`，键为中文原文；
+Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CYLMenuExample.bundle`，通过宏 `CYLExampleLocalizedString` 读取，键为中文原文；
 评价关键词与标签属于示例数据，不翻译。启动参数 `-CYLExampleLanguage en` 可切换 Example 与组件的语言。
 
 ### Example / 示例工程
@@ -216,7 +216,9 @@ Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CY
 [CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 搭建两个作用不同的 TabBar：
 
 - 根 TabBar（底部）：「场景一：评价筛选」与「场景二：搜索分类」两个 Tab；
-- 分类 TabBar（场景二顶部）：嵌入在搜索页中的 `CYLTopTabBarController`，切换「找人/动态/八卦/职位」，每个 Tab 是一个标签页。
+- 分类 TabBar（场景二）：场景二首页点击搜索框 push 进入搜索页（`hidesBottomBarWhenPushed`，隐藏根 TabBar），搜索页内嵌的 CYLTabBarController 同样位于底部，切换「找人/动态/八卦/职位」，每个 Tab 是一个标签页。
+
+TabBar 总是位于底部；从 Tab 中 push 的页面隐藏根 TabBar。
 
 
 ```sh
@@ -228,7 +230,7 @@ open CYLMenuExample.xcworkspace
 | 场景 | 实现 |
 | --- | --- |
 | 场景一：淘宝评价筛选 | `CYLProductViewController` 在商品页用 `CYLMenuFoldStyleTruncate` 预览两行关键词；`CYLReviewListViewController` 使用多选、带图标和数量的筛选，默认折叠为两行，底部箭头旋转 180° 展开/收起。每次点击（显示点击事件）都按所有所选条件（AND，「全部」表示不限）刷新下方列表。顶部开关区分两种场景：**内存筛选**（`CYLMemoryReviewQuery`，在已加载的数据中同步匹配）与**网络筛选**（`CYLNetworkReviewQuery`，把条件编码为请求 URL，模拟服务器延迟返回，显示加载状态并丢弃过期响应）。 |
-| 场景二：脉脉搜索分类 | `CYLSearchCategoryViewController` 提供搜索框和顶部 CYLTabBarController 分类（找人/动态/八卦/职位）；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分组标题右侧为宿主提供的行业选择按钮。 |
+| 场景二：脉脉搜索分类 | `CYLSearchHomeViewController` push `CYLSearchCategoryViewController`，提供搜索框和底部 CYLTabBarController 分类（找人/动态/八卦/职位）；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分组标题右侧为宿主提供的行业选择按钮。 |
 
 `CYLExampleMenuSource` shows how a host turns its own models into a
 `CYLMenuDataSource`; the core library holds no business data.
