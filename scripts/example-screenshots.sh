@@ -49,9 +49,11 @@ for SCREEN in $SCREENS; do
   FILE="$OUT/$SCREEN.png"
   for ATTEMPT in 1 2 3; do
     LOG="$OUT/$SCREEN.log"
-    # [EN] The app prints a layout report ([CYLExampleLayout]) 3 s after launch; keep it with the screenshot.
-    # [CN] App 在启动 3 秒后输出布局报告（[CYLExampleLayout]），与截图一起保存。
-    if ! xcrun simctl launch --terminate-running-process --stdout="$LOG" --stderr="$LOG" "$DEVICE_ID" "$BUNDLE_ID" -CYLExampleScreen "$SCREEN"; then
+    # [EN] The app writes a layout report ([CYLExampleLayout]) to Documents/CYLExampleLayout.txt 3 s after
+    #      launch; it is copied next to the screenshot. (`simctl launch --stdout` made SpringBoard refuse launches.)
+    # [CN] App 在启动 3 秒后把布局报告写入 Documents/CYLExampleLayout.txt，随后复制到截图旁。
+    #      （使用 `simctl launch --stdout` 时 SpringBoard 会拒绝启动。）
+    if ! xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLExampleScreen "$SCREEN"; then
       echo "Launching $SCREEN failed (attempt $ATTEMPT); retrying"
       sleep 10
       continue
@@ -62,7 +64,13 @@ for SCREEN in $SCREENS; do
     if xcrun simctl spawn "$DEVICE_ID" launchctl list | grep -q "UIKitApplication:$BUNDLE_ID"; then
       xcrun simctl io "$DEVICE_ID" screenshot "$FILE"
       echo "Saved $FILE"
-      grep 'CYLExampleLayout' "$LOG" || echo "No layout report for $SCREEN: the main thread may be blocked"
+      DATA=$(xcrun simctl get_app_container "$DEVICE_ID" "$BUNDLE_ID" data 2>/dev/null || true)
+      if [ -n "$DATA" ] && [ -f "$DATA/Documents/CYLExampleLayout.txt" ]; then
+        cp "$DATA/Documents/CYLExampleLayout.txt" "$LOG"
+        cat "$LOG"
+      else
+        echo "No layout report for $SCREEN: the main thread may be blocked"
+      fi
       break
     fi
     echo "The app is not running after launching $SCREEN (attempt $ATTEMPT): crashed?"

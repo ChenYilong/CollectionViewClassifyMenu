@@ -45,12 +45,24 @@
     // `-CYLExampleScreen <name>` opens a screen directly (used by scripts/example-screenshots.sh).
     [[self class] openScreen:screen inTabBarController:tabs];
     if (screen.length > 0) {
+        NSURL *documents = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+        [[NSFileManager defaultManager] removeItemAtURL:[documents URLByAppendingPathComponent:@"CYLExampleLayout.txt"] error:NULL];
         // Layout report for scripts/example-screenshots.sh, printed before the screenshot is taken.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [[self class] reportLayoutOfScreen:screen inTabBarController:tabs];
         });
     }
     return YES;
+}
+
+/// Appends a line to Documents/CYLExampleLayout.txt, which scripts/example-screenshots.sh copies
+/// next to each screenshot.
++ (void)appendLayoutReport:(NSString *)line {
+    NSLog(@"%@", line);
+    NSURL *documents = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+    NSURL *file = [documents URLByAppendingPathComponent:@"CYLExampleLayout.txt"];
+    NSString *existing = [NSString stringWithContentsOfURL:file encoding:NSUTF8StringEncoding error:NULL] ?: @"";
+    [[existing stringByAppendingFormat:@"%@\n", line] writeToURL:file atomically:YES encoding:NSUTF8StringEncoding error:NULL];
 }
 
 + (void)reportTagList:(CYLTagListView *)view named:(NSString *)name {
@@ -69,25 +81,25 @@
         [line appendFormat:@" firstCell=%@ inWindow=%@ alpha=%.2f hidden=%d", NSStringFromCGRect(first.frame),
                            NSStringFromCGRect([first convertRect:first.bounds toView:nil]), first.alpha, first.hidden];
     }
-    fprintf(stderr, "%s\n", line.UTF8String);
+    [self appendLayoutReport:line];
 }
 
 + (void)reportLayoutOfScreen:(NSString *)screen inTabBarController:(CYLTabBarController *)tabs {
     UINavigationController *navigation = (UINavigationController *)tabs.selectedViewController;
     UIViewController *top = navigation.topViewController;
-    fprintf(stderr, "[CYLExampleLayout] screen=%s top=%s\n", screen.UTF8String, NSStringFromClass([top class]).UTF8String);
+    [self appendLayoutReport:[NSString stringWithFormat:@"[CYLExampleLayout] screen=%@ top=%@", screen, NSStringFromClass([top class])]];
     if ([top isKindOfClass:[CYLReviewListViewController class]]) {
         CYLReviewListViewController *reviews = (CYLReviewListViewController *)top;
-        fprintf(stderr, "[CYLExampleLayout] tableHeader=%s table=%s\n",
-                NSStringFromCGRect(reviews.tableView.tableHeaderView.frame).UTF8String,
-                NSStringFromCGRect(reviews.tableView.frame).UTF8String);
+        [self appendLayoutReport:[NSString stringWithFormat:@"[CYLExampleLayout] table=%@ rows=%ld status=%@",
+                                  NSStringFromCGRect(reviews.tableView.frame), (long)[reviews.tableView numberOfRowsInSection:0],
+                                  [reviews.statusLabel.text stringByReplacingOccurrencesOfString:@"\n" withString:@" | "]]];
         [self reportTagList:reviews.filterView named:@"reviewFilter"];
     } else if ([top isKindOfClass:[CYLProductViewController class]]) {
         [self reportTagList:((CYLProductViewController *)top).previewView named:@"productPreview"];
     } else if ([top isKindOfClass:[CYLSearchCategoryViewController class]]) {
         CYLSearchCategoryViewController *search = (CYLSearchCategoryViewController *)top;
         UITabBar *bar = search.categoryTabBarController.tabBar;
-        fprintf(stderr, "[CYLExampleLayout] categoryTabBar=%s\n", NSStringFromCGRect([bar convertRect:bar.bounds toView:nil]).UTF8String);
+        [self appendLayoutReport:[NSString stringWithFormat:@"[CYLExampleLayout] categoryTabBar=%@", NSStringFromCGRect([bar convertRect:bar.bounds toView:nil])]];
         [self reportTagList:search.tagListView named:@"searchTags"];
     }
 }
