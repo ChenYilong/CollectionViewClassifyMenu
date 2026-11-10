@@ -362,6 +362,10 @@ SQL 只用于展示。
 | 搜索 | 输入文字（不区分大小写，如 "ios" 找到 "iOS"）显示「搜索结果」，该名称的标签不存在时末尾为「+ 新建标签：ios」；点击或按键盘搜索键即新建、选中，结束搜索并滚动到新标签。 |
 | 管理 | 「管理」后点击「我的标签」中的标签可删除。 |
 
+演示数据来自本地 JSON：`CYLTagEditorExample.bundle/<语言>.lproj/tags.json`（简体中文、繁体中文、英文各一份，标签相同、顺序相同），
+由 `CYLTagData`（`Codable`）解析，按 App 当前语言加载。内容是有意义的联系人标签（家人、大学同学、客户、iOS 开发、读书会、深圳、待回复……），
+以及「最近使用」和编辑备注页初始选中的标签；修改文件即可替换数据。
+
 为此核心库新增：`-menuItemIsSelectableAtIndexPath:`（「+ 新建标签」这样的操作项：点击会回调，但不会被选中）、
 `-menuStyleForItemAtIndexPath:`（单个标签的外观，如带边框的「+ 新建标签」）与 `-scrollToItemAtIndexPath:animated:`。
 

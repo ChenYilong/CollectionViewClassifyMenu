@@ -4,6 +4,7 @@
 //
 //  The user's tags (like a chat app's contact tags): every tag in the user's order, and the
 //  recently used ones. New tags are added here; the editor only reads and asks it to change.
+//  The demo tags are read from a local JSON file per language (CYLTagData).
 //
 
 import Foundation
@@ -24,16 +25,19 @@ final class CYLTagStore {
         self.recentTags = Array(recentTags.filter { seen.contains($0) }.prefix(recentLimit))
     }
 
-    /// The tags of the screenshots this Example reproduces.
-    static func demo() -> CYLTagStore {
-        let tags = ["nz", "家人", "留学", "iOS", "英语", "公司", "同事", "寝室", "同学", "天蝎座", "巨蟹座", "6666", "猎头",
-                    "LeanCloud", "国外", "ChatKit", "澳洲", "whv", "加拿大", "阿里", "VIPABC", "Vipabc", "想移民", "李智维",
-                    "龙熠", "微博转发", "xdf", "杨佳", "雅思", "驻马店", "car", "婚礼必来", "婚礼待确认", "4月30",
-                    "mem", "ok", "nz 内推", "nz 租房", "nz 不租", "nzcar", "律师", "惠灵顿租房", "nz 兼职", "mz 兼职",
-                    "nz 代购", "nz 求代购", "美国代购", "右", "wellington", "nz 河南", "nz 待入群", "motor", "抖音", "中介",
-                    "无疑", "nz 中介", "Swift 高手", "wuyi", "拉黑", "租房", "买车", "AUT", "au t", "AUTCIS", "非 AUT",
-                    "ricky", "_lanepro", "cita", "创业"]
-        return CYLTagStore(tags: tags, recentTags: ["_lanepro", "创业"])
+    /// The demo tags of the current language, from tags.json in CYLTagEditorExample.bundle's .lproj folder
+    /// (see CYLTagData). An empty store if the file is missing or invalid.
+    static func bundled() -> CYLTagStore {
+        do {
+            return try CYLTagStore(data: CYLTagData.bundled())
+        } catch {
+            assertionFailure("Cannot load tags.json: \(error)")
+            return CYLTagStore(tags: [])
+        }
+    }
+
+    convenience init(data: CYLTagData) {
+        self.init(tags: data.tags, recentTags: data.recentTags)
     }
 
     /// A tag name as stored: without surrounding spaces and new lines.
@@ -83,5 +87,35 @@ final class CYLTagStore {
     func markUsed(_ used: [String]) {
         let used = used.filter(contains)
         recentTags = Array((used + recentTags.filter { !used.contains($0) }).prefix(recentLimit))
+    }
+}
+
+/// The contents of tags.json: the demo tags, the recently used ones and the tags the remark screen
+/// starts with. One file per language in CYLTagEditorExample.bundle/<language>.lproj/.
+struct CYLTagData: Codable, Equatable {
+    var version: Int
+    var tags: [String]
+    var recentTags: [String]
+    var selectedTags: [String]
+
+    enum LoadingError: Error, Equatable {
+        case fileNotFound(String)
+    }
+
+    /// Parses tags.json.
+    static func decode(_ data: Data) throws -> CYLTagData {
+        try JSONDecoder().decode(CYLTagData.self, from: data)
+    }
+
+    static func load(from url: URL) throws -> CYLTagData {
+        try decode(Data(contentsOf: url))
+    }
+
+    /// tags.json of the Example's current language (CYLTagEditorLocalization).
+    static func bundled(bundle: Bundle = CYLTagEditorLocalization.resourceBundle) throws -> CYLTagData {
+        guard let url = bundle.url(forResource: "tags", withExtension: "json") else {
+            throw LoadingError.fileNotFound("tags.json in \(bundle.bundlePath)")
+        }
+        return try load(from: url)
     }
 }

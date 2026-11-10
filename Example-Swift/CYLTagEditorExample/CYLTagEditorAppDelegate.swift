@@ -6,9 +6,9 @@
 //  "编辑标签" sheet. `-CYLExampleScreen <screen>[@<language>]` opens a screen directly for
 //  scripts/example-screenshots.sh:
 //    remark          编辑备注 with the tags chosen
-//    editor          编辑标签 (nz, 家人, 留学 selected)
+//    editor          编辑标签 (tags.json's selectedTags selected)
 //    editor-bottom   … scrolled to "+ 新建标签"
-//    editor-search   … searching "ios": 搜索结果 and "+ 新建标签：ios"
+//    editor-search   … searching "ios": 搜索结果 ("iOS 开发") and "+ 新建标签：ios"
 //    editor-created  … after tapping "+ 新建标签：ios": the new tag, selected, at the end
 //    editor-new      … the name prompt of "+ 新建标签"
 //
@@ -20,9 +20,10 @@ import CollectionViewClassifyMenu
 final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let store = CYLTagStore.demo()
-
-    static let demoSelection = ["nz", "家人", "留学"]
+    /// Loaded from tags.json after the language is chosen.
+    private(set) var store = CYLTagStore(tags: [])
+    /// The tags the remark screen starts with in the screenshots (tags.json's selectedTags).
+    private(set) var demoSelection: [String] = []
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -36,7 +37,11 @@ final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
             CYLTagEditorLocalization.preferredLanguage = language
         }
 
-        let remark = CYLRemarkViewController(store: store, tags: screen == "remark" ? Self.demoSelection : [])
+        // The demo tags of the chosen language, from the local JSON file.
+        let data = (try? CYLTagData.bundled()) ?? CYLTagData(version: 1, tags: [], recentTags: [], selectedTags: [])
+        store = CYLTagStore(data: data)
+        demoSelection = data.selectedTags
+        let remark = CYLRemarkViewController(store: store, tags: screen == "remark" ? demoSelection : [])
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = UINavigationController(rootViewController: remark)
         window.makeKeyAndVisible()
@@ -56,7 +61,7 @@ final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
 
     func open(_ screen: String, from remark: CYLRemarkViewController) {
         guard screen.hasPrefix("editor") else { return }
-        remark.updateTags(Self.demoSelection)
+        remark.updateTags(demoSelection)
         let editor = remark.editTags(animated: false)
         editor.loadViewIfNeeded()
         switch screen {
