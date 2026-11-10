@@ -31,6 +31,19 @@ verify the behavior and update the applicable documentation.
 - Project-specific Xcode and verification guidance lives in
   `.agents/skills/cyl-xcode-compat/` and `.agents/skills/cyl-verify/`.
 
+## CYLTabBarController reference
+
+- Every mention of CYLTabBarController (its code, APIs, podspec, initialization,
+  animation engine, CI, demos) means the latest commit of its
+  `feat/cross-platform-components` branch, not master or a CocoaPods release.
+  Check it with `git ls-remote https://github.com/ChenYilong/CYLTabBarController.git
+  refs/heads/feat/cross-platform-components` before relying on it.
+- The Example pins that commit (`CYL_TAB_BAR` in `Example/Podfile`); when the
+  branch moves, update the pin and anything copied from it together.
+- The core library does not depend on CYLTabBarController: it finds the
+  animation engine (`CYLTabBarItemAnimationFactory`) and the configuration
+  parser at runtime, because the published CocoaPods release lacks them.
+
 ## Tab bars
 
 - Tab bars are always at the bottom of the screen, including tab bars nested in
