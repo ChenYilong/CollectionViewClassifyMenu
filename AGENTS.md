@@ -17,6 +17,29 @@ verify the behavior and update the applicable documentation.
 - Use English Conventional Commit messages, such as `fix: 🐛 ...` and
   `docs: 📝 ...`.
 
+## Swift examples and a Swift-friendly core
+
+- Every iOS example is written in Swift. Do not add Objective-C example code. The
+  existing Objective-C examples (`Example/CYLMenuExample`, the demo app of
+  `CollectionViewClassifyMenu.xcodeproj`, `TagCollectionView`) are to be rewritten
+  in Swift; a change to one of them is the moment to port the part it touches.
+- The core library stays in Objective-C. When an example calls an Objective-C API
+  that reads badly in Swift, fix it in the core, never with workarounds in the
+  example: the Swift API Design Guidelines decide (`NS_SWIFT_NAME`, nullability,
+  lightweight generics, `NS_ENUM`/`NS_OPTIONS`/`NS_TYPED_ENUM` string constants,
+  class properties, `NS_DESIGNATED_INITIALIZER`, `NS_SWIFT_UNAVAILABLE`, `throws`
+  through `NSError **` as the last parameter).
+- `cyl_` methods: follow CYLTabBarController's rule ("Swift-friendly names for
+  underscored protocol methods" in its AGENTS.md, and its `docs/Swift-Guide.md`):
+  Swift names have no underscore, and the Swift name of an existing public method
+  never changes. Add a new method without the underscore that keeps the `cyl`
+  prefix (`-cyl_setWidth:` → `-cylSetWidth:`), give only the new one its Swift
+  name with `NS_SWIFT_NAME`, and run the same logic for both spellings (for a
+  protocol method, call the new one when implemented, otherwise the old one, and
+  make an old `@required` method `@optional`).
+- Details, the check of imported Swift names and the list of methods still to
+  adapt: `.agents/skills/cyl-swift/`.
+
 ## Xcode and CocoaPods
 
 - The minimum supported iOS version is 15.0. Keep the project and podspec
