@@ -50,7 +50,7 @@ end
 post_integrate do |installer|
   Dir.glob(File.join(installer.sandbox.root.to_s, 'Target Support Files', 'Pods-*', '*.xcconfig')).each do |path|
     text = File.read(path)
-    fixed = text.gsub('$(TOOLCHAIN_DIR)/usr/lib/swift', '$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift')
+    fixed = text.gsub(/[$][({]TOOLCHAIN_DIR[)}]\/usr\/lib\/swift/, '${DEVELOPER_DIR}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift')
     File.write(path, fixed) if fixed != text
   end
 end
