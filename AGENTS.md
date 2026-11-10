@@ -93,6 +93,23 @@ verify the behavior and update the applicable documentation.
 - Other platforms follow the same rules with their own resource mechanism: one
   resource container per module, the core one kept stable, a lookup helper per
   module.
+- Acceptance criteria (following CYLTabBarController's localization rule, latest
+  commit of `feat/cross-platform-components`: "Localization (i18n / l10n) file
+  structure" in its AGENTS.md):
+  - The core has its own lookup macro that reads the localized files inside the
+    core's resource bundle. The bundle's form, name and folder name may differ
+    per platform, but it is always a folder or package; on iOS it is a
+    `.bundle` folder (`CYLClassifyMenuResources.bundle`, macro
+    `CYLMenuLocalizedString`).
+  - Every example has its own lookup macro that reads the example's localized
+    files from the example-level bundle (`CYLExampleLocalizedString` for
+    `Example/CYLMenuExample`). Swift has no macros: a Swift example uses one
+    global function in the same role (`CYLTagEditorLocalizedString` for
+    `Example-Swift`), and a core macro also needs a function Swift can call.
+  - A project passes only if it has at least two different lookup macros (or
+    Swift functions), one per level, each reading a different bundle: the core
+    one and at least one example's. No code reads a bundle or calls
+    `NSLocalizedString` directly.
 - Details and checks: `.agents/skills/cyl-localization/`.
 
 ## CI and Example screenshots
