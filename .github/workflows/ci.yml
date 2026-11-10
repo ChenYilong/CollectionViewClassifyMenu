@@ -58,7 +58,7 @@ jobs:
 
       - name: Lint podspec
         if: always()
-        run: scripts/pod-lint.sh lib
+        run: sh scripts/pod-lint.sh lib
 
       - name: Lint podspec without allowing warnings
         continue-on-error: true

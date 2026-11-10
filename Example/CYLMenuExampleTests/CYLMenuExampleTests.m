@@ -385,7 +385,8 @@
     [self tap:filter item:1 section:0];  // 好评
     NSUInteger good = [store reviewsMatchingFilter:store.filters[1]].count;
     XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)good);
-    XCTAssertTrue([[store titleForFilter:store.filters[1]] hasSuffix:[NSString stringWithFormat:@"(%lu)", (unsigned long)good]]);
+    NSString *countSuffix = [NSString stringWithFormat:@"(%lu)", (unsigned long)good];
+    XCTAssertTrue([[store titleForFilter:store.filters[1]] hasSuffix:countSuffix]);
 
     [self tap:filter item:1 section:0];
     XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:1 :0]], @"Tapping the selected chip keeps it");
