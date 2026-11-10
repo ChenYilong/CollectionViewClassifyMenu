@@ -7,6 +7,7 @@
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
 #import "CYLExampleMenuSource.h"
+#import "CYLExampleLocalization.h"
 
 @interface CYLProductViewController () <CYLMenuDelegate>
 @property (nonatomic, strong, readwrite) CYLTagListView *previewView;
@@ -21,7 +22,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // navigationItem, not title: a view controller's title would replace its tab's title.
-    self.navigationItem.title = @"宝贝详情";
+    self.navigationItem.title = CYLExampleLocalizedString(@"宝贝详情");
     self.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
     CYLReviewStore *store = [CYLReviewStore sharedStore];
 
@@ -37,7 +38,7 @@
 
     UILabel *name = [self labelWithText:@"潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮" font:[UIFont systemFontOfSize:16] color:[UIColor labelColor]];
     UILabel *price = [self labelWithText:@"¥9.90-14.90" font:[UIFont boldSystemFontOfSize:22] color:[UIColor colorWithRed:1 green:0.31 blue:0 alpha:1]];
-    UILabel *reviewTitle = [self labelWithText:[NSString stringWithFormat:@"宝贝评价(%lu)", (unsigned long)store.reviews.count]
+    UILabel *reviewTitle = [self labelWithText:[NSString stringWithFormat:CYLExampleLocalizedString(@"宝贝评价(%lu)"), (unsigned long)store.reviews.count]
                                           font:[UIFont systemFontOfSize:15] color:[UIColor labelColor]];
 
     // Keyword chips only, two rows, no fold control: a preview of the review page.
@@ -51,7 +52,7 @@
         }
     }];
     self.previewFilterIndexes = indexes;
-    self.previewSource = [CYLExampleMenuSource sourceWithSections:@[[CYLExampleMenuSection sectionWithTitle:@"关键词" items:items]]];
+    self.previewSource = [CYLExampleMenuSource sourceWithSections:@[[CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"关键词") items:items]]];
     CYLMenuStyle *style = [CYLReviewListViewController reviewFilterStyle];
     style.sectionInsets = UIEdgeInsetsMake(4, 0, 12, 0);
     self.previewView = [[CYLTagListView alloc] init];
@@ -82,7 +83,7 @@
         [reviewStack addArrangedSubview:label];
     }
     UIButton *more = [UIButton buttonWithType:UIButtonTypeSystem];
-    [more setTitle:@"查看更多评价" forState:UIControlStateNormal];
+    [more setTitle:CYLExampleLocalizedString(@"查看更多评价") forState:UIControlStateNormal];
     [more addTarget:self action:@selector(moreTapped) forControlEvents:UIControlEventTouchUpInside];
     [more.heightAnchor constraintEqualToConstant:44].active = YES;
     [reviewStack addArrangedSubview:more];

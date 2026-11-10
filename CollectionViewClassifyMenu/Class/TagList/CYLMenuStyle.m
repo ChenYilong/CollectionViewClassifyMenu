@@ -5,6 +5,7 @@
 
 #import "CYLMenuStyle.h"
 #import "CYLParameterConfiguration.h"
+#import "CYLMenuResources.h"
 
 @implementation CYLMenuStyle
 
@@ -39,8 +40,8 @@
         _headerTextColor = [UIColor grayColor];
         _headerHorizontalInset = 16;
         _foldControlColor = [UIColor grayColor];
-        _expandTitle = @"更多";
-        _collapseTitle = @"收起";
+        _expandTitle = CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand a section");
+        _collapseTitle = CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse a section");
     }
     return self;
 }

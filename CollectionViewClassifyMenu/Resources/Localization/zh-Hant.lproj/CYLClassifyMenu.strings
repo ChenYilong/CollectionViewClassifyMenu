@@ -1,0 +1,12 @@
+/* CollectionViewClassifyMenu 字串。鍵是穩定的識別碼，各語言需保持一致。 */
+
+/* 展開分組中被摺疊的列。 */
+"CYLMenuExpand" = "更多";
+/* 再次摺疊分組。 */
+"CYLMenuCollapse" = "收合";
+/* 單選分類選單頁面的標題。 */
+"CYLMenuTitle" = "分類";
+/* 確認多選篩選的結果。 */
+"CYLFilterConfirm" = "確認篩選";
+/* 恢復多選篩選的預設選擇。 */
+"CYLFilterReset" = "恢復預設";

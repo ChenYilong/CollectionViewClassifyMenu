@@ -6,6 +6,7 @@
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
 #import "CYLExampleMenuSource.h"
+#import "CYLExampleLocalization.h"
 
 static NSString * const kReviewCellIdentifier = @"ReviewCell";
 
@@ -51,7 +52,7 @@ static NSString * const kReviewCellIdentifier = @"ReviewCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     CYLReviewStore *store = [CYLReviewStore sharedStore];
-    self.title = [NSString stringWithFormat:@"评价(%lu)", (unsigned long)store.reviews.count];
+    self.title = [NSString stringWithFormat:CYLExampleLocalizedString(@"评价(%lu)"), (unsigned long)store.reviews.count];
     self.view.backgroundColor = [UIColor systemBackgroundColor];
 
     NSMutableArray *items = [NSMutableArray array];
@@ -62,7 +63,7 @@ static NSString * const kReviewCellIdentifier = @"ReviewCell";
         item.enabled = [store reviewsMatchingFilter:filter].count > 0;
         [items addObject:item];
     }
-    self.menuSource = [CYLExampleMenuSource sourceWithSections:@[[CYLExampleMenuSection sectionWithTitle:@"评价" items:items]]];
+    self.menuSource = [CYLExampleMenuSource sourceWithSections:@[[CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"评价") items:items]]];
 
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

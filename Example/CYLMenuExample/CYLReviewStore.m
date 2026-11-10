@@ -4,6 +4,7 @@
 //
 
 #import "CYLReviewStore.h"
+#import "CYLExampleLocalization.h"
 
 @implementation CYLReview
 @end
@@ -109,10 +110,12 @@
 }
 
 - (NSString *)titleForFilter:(CYLReviewFilter *)filter {
+    // Rating filters are UI text and localized; keyword filters are sample data.
+    NSString *name = filter.isKeyword ? filter.name : CYLExampleLocalizedString(filter.name);
     if ([filter.name isEqualToString:@"全部"]) {
-        return filter.name;
+        return name;
     }
-    return [NSString stringWithFormat:@"%@(%lu)", filter.name, (unsigned long)[self reviewsMatchingFilter:filter].count];
+    return [NSString stringWithFormat:@"%@(%lu)", name, (unsigned long)[self reviewsMatchingFilter:filter].count];
 }
 
 @end

@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		0BD56347D4972673E228B829 /* CYLExampleAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */; };
+		06A8E35411402E09192D5FEA /* CYLExampleLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A93BEA1A5CE582344DB023FD /* CYLExampleLocalization.m */; };
 		E2D6D021FDE28DBA6F600779 /* CYLExampleMenuSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */; };
+		BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */; };
 		727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C294F38F03AB5368EB658D2A /* CYLProductViewController.m */; };
 		81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */; };
 		484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */; };
@@ -33,8 +35,11 @@
 /* Begin PBXFileReference section */
 		C1A99AA47419A059688F04EF /* CYLExampleAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleAppDelegate.h; sourceTree = "<group>"; };
 		7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleAppDelegate.m; sourceTree = "<group>"; };
+		659D03BD0243479204AC91D1 /* CYLExampleLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleLocalization.h; sourceTree = "<group>"; };
+		A93BEA1A5CE582344DB023FD /* CYLExampleLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleLocalization.m; sourceTree = "<group>"; };
 		C282EEE41F8DF5A22C7637BD /* CYLExampleMenuSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleMenuSource.h; sourceTree = "<group>"; };
 		43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleMenuSource.m; sourceTree = "<group>"; };
+		AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CYLMenuExample.bundle; sourceTree = "<group>"; };
 		5011505D5EC1E41832F588CA /* CYLProductViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLProductViewController.h; sourceTree = "<group>"; };
 		C294F38F03AB5368EB658D2A /* CYLProductViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLProductViewController.m; sourceTree = "<group>"; };
 		3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewListViewController.h; sourceTree = "<group>"; };
@@ -95,8 +100,11 @@
 			children = (
 				C1A99AA47419A059688F04EF /* CYLExampleAppDelegate.h */,
 				7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */,
+				659D03BD0243479204AC91D1 /* CYLExampleLocalization.h */,
+				A93BEA1A5CE582344DB023FD /* CYLExampleLocalization.m */,
 				C282EEE41F8DF5A22C7637BD /* CYLExampleMenuSource.h */,
 				43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */,
+				AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */,
 				5011505D5EC1E41832F588CA /* CYLProductViewController.h */,
 				C294F38F03AB5368EB658D2A /* CYLProductViewController.m */,
 				3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */,
@@ -231,6 +239,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,6 +323,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0BD56347D4972673E228B829 /* CYLExampleAppDelegate.m in Sources */,
+				06A8E35411402E09192D5FEA /* CYLExampleLocalization.m in Sources */,
 				E2D6D021FDE28DBA6F600779 /* CYLExampleMenuSource.m in Sources */,
 				727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */,
 				81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */,

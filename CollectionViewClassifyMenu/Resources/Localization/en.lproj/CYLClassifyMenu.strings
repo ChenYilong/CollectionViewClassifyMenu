@@ -1,0 +1,12 @@
+/* CollectionViewClassifyMenu strings. Keys are stable identifiers; keep every language in sync. */
+
+/* Button that shows the folded rows of a section. */
+"CYLMenuExpand" = "More";
+/* Button that folds a section again. */
+"CYLMenuCollapse" = "Less";
+/* Title of the single-choice classify menu screen. */
+"CYLMenuTitle" = "Categories";
+/* Confirms the selection in the multiple-choice filter. */
+"CYLFilterConfirm" = "Apply";
+/* Restores the default selection of the multiple-choice filter. */
+"CYLFilterReset" = "Reset";

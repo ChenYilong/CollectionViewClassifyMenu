@@ -190,6 +190,24 @@ image from `menuImageForItemAtIndexPath:` instead. Section icons of
 
 宿主提供的分组右侧视图（如行业选择按钮）应设置自己的 `accessibilityLabel`，Example 中有示例。
 
+### Localization / 国际化与本地化
+
+组件的全部资源只有一个 bundle：`CYLClassifyMenuResources.bundle`，其中包含图片、XIB 以及
+`en.lproj`、`zh-Hans.lproj`、`zh-Hant.lproj` 下的 `CYLClassifyMenu.strings`（源文件位于
+`CollectionViewClassifyMenu/Resources/Localization/`）。组件自己选择 `.lproj`，宿主 App 无需声明这些语言。
+
+```objc
+CYLMenuResources.preferredLanguage = @"en";   // App 内切换语言；nil 跟随系统
+NSString *more = CYLMenuLocalizedString(@"CYLMenuExpand", nil);   // "More"
+[CYLMenuResources localizedStringForKey:@"CYLMenuCollapse" language:@"zh-Hant"];   // "收合"
+```
+
+切换语言后新创建的视图使用新语言。`CYLMenuStyle` 的 `expandTitle` / `collapseTitle` 默认取自该 bundle，
+也可由宿主覆盖。新增文案时，在三个 `.strings` 中加入相同的键（测试会检查键一致）。
+
+Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CYLMenuExample.bundle`，键为中文原文；
+评价关键词与标签属于示例数据，不翻译。启动参数 `-CYLExampleLanguage en` 可切换 Example 与组件的语言。
+
 ### Example / 示例工程
 
 `Example/` 通过 Podfile 以本地路径集成核心库，并引入

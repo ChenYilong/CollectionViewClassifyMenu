@@ -1,0 +1,56 @@
+/* English strings of CYLMenuExample. Keys are the Chinese source text. Review keywords and tags are sample data and stay as they are. */
+
+/* Root tab bar */
+"场景一：评价筛选" = "Reviews";
+"场景二：搜索分类" = "Search";
+
+/* Scenario 1: product and reviews */
+"宝贝详情" = "Item";
+"宝贝评价(%lu)" = "Reviews (%lu)";
+"查看更多评价" = "See all reviews";
+"评价(%lu)" = "Reviews (%lu)";
+"评价" = "Reviews";
+"关键词" = "Keywords";
+"全部" = "All";
+"好评" = "Positive";
+"中评" = "Neutral";
+"差评" = "Negative";
+"有图" = "Photos";
+"追加" = "Follow-up";
+
+/* Scenario 2: search categories */
+"找人" = "People";
+"动态" = "Posts";
+"八卦" = "Gossip";
+"职位" = "Jobs";
+"搜人名,职位,公司..." = "Search people, titles, companies...";
+"搜动态" = "Search posts";
+"搜八卦" = "Search gossip";
+"搜职位" = "Search jobs";
+"认识同行" = "Meet peers";
+"找投资" = "Find investors";
+"谈合作" = "Partnerships";
+"挖人才" = "Hire talent";
+"热门动态关键词" = "Trending in posts";
+"热门词" = "Trending";
+"我关注的标签" = "Tags I follow";
+"热搜职位关键词:" = "Trending job keywords:";
+"开发" = "Development";
+"测试" = "QA";
+"运维/DBA" = "Ops/DBA";
+"硬件" = "Hardware";
+"产品" = "Product";
+"运营" = "Operations";
+"设计" = "Design";
+"编辑/记者" = "Editorial";
+"游戏" = "Games";
+"市场BD" = "Marketing/BD";
+"行业" = "Industry";
+"行业: %@ ▾" = "Industry: %@ ▾";
+"行业 %@" = "Industry %@";
+"选择行业" = "Choose an industry";
+"IT互联网" = "Internet";
+"金融" = "Finance";
+"教育培训" = "Education";
+"医疗健康" = "Healthcare";
+"房地产" = "Real estate";

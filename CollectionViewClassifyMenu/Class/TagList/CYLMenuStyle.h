@@ -49,7 +49,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Fold controls
 @property (nonatomic, strong) UIColor *foldControlColor;
+/// Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
 @property (nonatomic, copy) NSString *expandTitle;
+/// Defaults to the localized "Less" from CYLClassifyMenuResources.bundle.
 @property (nonatomic, copy) NSString *collapseTitle;
 
 /// Item font for the given traits: bold for the Bold Text setting, and scaled

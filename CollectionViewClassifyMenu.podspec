@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
   s.resource_bundles = { 'CYLClassifyMenuResources' => [
     'CollectionViewClassifyMenu/Class/MultipleFilter/**/*.xib',
     'CollectionViewClassifyMenu/Class/Other/Symtem/Images.xcassets',
+    'CollectionViewClassifyMenu/Resources/Localization/*.lproj',
     'TagCollectionView/TagCollectionView/CYLTagView.xib',
     'TagCollectionView/TagCollectionView/Views/*.xib'
   ] }

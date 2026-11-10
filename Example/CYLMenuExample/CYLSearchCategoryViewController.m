@@ -5,6 +5,7 @@
 
 #import "CYLSearchCategoryViewController.h"
 #import "CYLExampleMenuSource.h"
+#import "CYLExampleLocalization.h"
 
 static CGFloat const kJobCategoryWidth = 90;
 static NSString * const kJobCategoryCell = @"JobCategoryCell";
@@ -67,15 +68,15 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 + (NSArray<CYLExampleMenuSection *> *)sectionsForCategory:(CYLSearchCategory)category {
     switch (category) {
         case CYLSearchCategoryPeople:
-            return @[[CYLExampleMenuSection sectionWithTitle:@"认识同行" titles:@[@"百度研发", @"腾讯工程师", @"搜狗开发", @"腾讯开发", @"搜狗研究员"]],
-                     [CYLExampleMenuSection sectionWithTitle:@"找投资" titles:@[@"创投", @"IDG资本", @"晨兴资本", @"合伙人", @"投资经理"]],
-                     [CYLExampleMenuSection sectionWithTitle:@"谈合作" titles:@[@"CEO", @"副总裁", @"VP", @"总经理", @"总监"]],
-                     [CYLExampleMenuSection sectionWithTitle:@"挖人才" titles:@[@"Java", @"Android", @"JS", @"C++", @"HTML/CSS", @"iOS", @"PHP", @"前端"]]];
+            return @[[CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"认识同行") titles:@[@"百度研发", @"腾讯工程师", @"搜狗开发", @"腾讯开发", @"搜狗研究员"]],
+                     [CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"找投资") titles:@[@"创投", @"IDG资本", @"晨兴资本", @"合伙人", @"投资经理"]],
+                     [CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"谈合作") titles:@[@"CEO", @"副总裁", @"VP", @"总经理", @"总监"]],
+                     [CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"挖人才") titles:@[@"Java", @"Android", @"JS", @"C++", @"HTML/CSS", @"iOS", @"PHP", @"前端"]]];
         case CYLSearchCategoryFeeds:
-            return @[[CYLExampleMenuSection sectionWithTitle:@"热门动态关键词" titles:@[@"投资", @"创业", @"o2o", @"社交", @"招聘", @"运营", @"线下聚会", @"脉脉", @"融资", @"在线教育", @"硬件", @"电商", @"产品经理"]]];
+            return @[[CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"热门动态关键词") titles:@[@"投资", @"创业", @"o2o", @"社交", @"招聘", @"运营", @"线下聚会", @"脉脉", @"融资", @"在线教育", @"硬件", @"电商", @"产品经理"]]];
         case CYLSearchCategoryGossip:
-            return @[[CYLExampleMenuSection sectionWithTitle:@"热门词" titles:@[@"百度", @"新浪", @"程序猿", @"离职", @"阿里", @"360", @"创业", @"工资", @"跳槽", @"小三", @"裁员", @"加班", @"女同事", @"产品经理", @"投资人", @"老板"]],
-                     [CYLExampleMenuSection sectionWithTitle:@"我关注的标签" titles:@[@"社交", @"移动", @"程序猿"]]];
+            return @[[CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"热门词") titles:@[@"百度", @"新浪", @"程序猿", @"离职", @"阿里", @"360", @"创业", @"工资", @"跳槽", @"小三", @"裁员", @"加班", @"女同事", @"产品经理", @"投资人", @"老板"]],
+                     [CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"我关注的标签") titles:@[@"社交", @"移动", @"程序猿"]]];
         case CYLSearchCategoryJobs:
             return @[];
     }
@@ -83,7 +84,7 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 }
 
 + (NSString *)placeholderForCategory:(CYLSearchCategory)category {
-    return @[@"搜人名,职位,公司...", @"搜动态", @"搜八卦", @"搜职位"][category];
+    return CYLExampleLocalizedString(@[@"搜人名,职位,公司...", @"搜动态", @"搜八卦", @"搜职位"][category]);
 }
 
 + (CYLMenuStyle *)maimaiStyle {
@@ -140,7 +141,7 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
         page.tagListView = [self makeTagListView];
         [pages addObject:page];
         [attributes addObject:@{
-            CYLTabBarItemTitle: titles[index],
+            CYLTabBarItemTitle: CYLExampleLocalizedString(titles[index]),
             CYLTabBarItemImage: [UIImage systemImageNamed:symbols[index]],
             CYLTabBarItemSelectedImage: [UIImage systemImageNamed:[symbols[index] stringByAppendingString:@".fill"]] ?: [UIImage systemImageNamed:symbols[index]],
         }];
@@ -253,7 +254,7 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
     NSArray<CYLExampleMenuSection *> *sections;
     if (category == CYLSearchCategoryJobs) {
         NSString *name = self.jobCategories[self.jobCategoryIndex];
-        CYLExampleMenuSection *section = [CYLExampleMenuSection sectionWithTitle:@"热搜职位关键词:" titles:[[self class] jobKeywords][name]];
+        CYLExampleMenuSection *section = [CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"热搜职位关键词:") titles:[[self class] jobKeywords][name]];
         section.accessoryView = self.industryButton;
         sections = @[section];
     } else {
@@ -280,21 +281,22 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 }
 
 - (void)updateIndustryButton {
-    [self.industryButton setTitle:[NSString stringWithFormat:@"行业: %@ ▾", self.industry] forState:UIControlStateNormal];
+    NSString *industryName = CYLExampleLocalizedString(self.industry);
+    [self.industryButton setTitle:[NSString stringWithFormat:CYLExampleLocalizedString(@"行业: %@ ▾"), industryName] forState:UIControlStateNormal];
     // Without the "▾" glyph, which VoiceOver would read aloud.
-    self.industryButton.accessibilityLabel = [NSString stringWithFormat:@"行业 %@", self.industry];
-    self.industryButton.accessibilityHint = @"选择行业";
+    self.industryButton.accessibilityLabel = [NSString stringWithFormat:CYLExampleLocalizedString(@"行业 %@"), industryName];
+    self.industryButton.accessibilityHint = CYLExampleLocalizedString(@"选择行业");
     [self.industryButton sizeToFit];
     NSMutableArray<UIAction *> *actions = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
     for (NSString *industry in [[self class] industries]) {
-        UIAction *action = [UIAction actionWithTitle:industry image:nil identifier:nil handler:^(__kindof UIAction *a) {
+        UIAction *action = [UIAction actionWithTitle:CYLExampleLocalizedString(industry) image:nil identifier:nil handler:^(__kindof UIAction *a) {
             [weakSelf selectIndustry:industry];
         }];
         action.state = [industry isEqualToString:self.industry] ? UIMenuElementStateOn : UIMenuElementStateOff;
         [actions addObject:action];
     }
-    self.industryButton.menu = [UIMenu menuWithTitle:@"行业" children:actions];
+    self.industryButton.menu = [UIMenu menuWithTitle:CYLExampleLocalizedString(@"行业") children:actions];
 }
 
 #pragma mark CYLMenuDelegate
@@ -316,7 +318,7 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kJobCategoryCell forIndexPath:indexPath];
     UIListContentConfiguration *content = [UIListContentConfiguration cellConfiguration];
-    content.text = self.jobCategories[indexPath.row];
+    content.text = CYLExampleLocalizedString(self.jobCategories[indexPath.row]);
     content.textProperties.alignment = UIListContentTextAlignmentCenter;
     content.textProperties.font = [UIFont systemFontOfSize:15];
     cell.contentConfiguration = content;

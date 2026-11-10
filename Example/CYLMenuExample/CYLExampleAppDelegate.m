@@ -7,6 +7,7 @@
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLSearchCategoryViewController.h"
+#import "CYLExampleLocalization.h"
 
 @implementation CYLExampleAppDelegate
 
@@ -14,10 +15,10 @@
     UINavigationController *reviews = [[UINavigationController alloc] initWithRootViewController:[[CYLProductViewController alloc] init]];
     UINavigationController *search = [[UINavigationController alloc] initWithRootViewController:[[CYLSearchCategoryViewController alloc] init]];
     NSArray *attributes = @[
-        @{CYLTabBarItemTitle: @"场景一：评价筛选",
+        @{CYLTabBarItemTitle: CYLExampleLocalizedString(@"场景一：评价筛选"),
           CYLTabBarItemImage: [UIImage systemImageNamed:@"cart"],
           CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"cart.fill"]},
-        @{CYLTabBarItemTitle: @"场景二：搜索分类",
+        @{CYLTabBarItemTitle: CYLExampleLocalizedString(@"场景二：搜索分类"),
           CYLTabBarItemImage: [UIImage systemImageNamed:@"magnifyingglass.circle"],
           CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"magnifyingglass.circle.fill"]},
     ];
@@ -25,12 +26,23 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // `-CYLExampleLanguage en` (or a screen name ending in "@en") switches the language of the
+    // component and the Example, as an in-app language setting would.
+    NSString *screen = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLExampleScreen"];
+    NSString *language = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLExampleLanguage"];
+    NSRange at = [screen rangeOfString:@"@"];
+    if (at.location != NSNotFound) {
+        language = [screen substringFromIndex:at.location + 1];
+        screen = [screen substringToIndex:at.location];
+    }
+    if (language.length > 0) {
+        CYLMenuResources.preferredLanguage = language;
+    }
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     CYLTabBarController *tabs = [[self class] makeRootTabBarController];
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     // `-CYLExampleScreen <name>` opens a screen directly (used by scripts/example-screenshots.sh).
-    NSString *screen = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLExampleScreen"];
     [[self class] openScreen:screen inTabBarController:tabs];
     if (screen.length > 0) {
         // Layout report for scripts/example-screenshots.sh, printed before the screenshot is taken.

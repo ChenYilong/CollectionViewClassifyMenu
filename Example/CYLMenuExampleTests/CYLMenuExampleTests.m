@@ -53,9 +53,16 @@
 
 @implementation CYLMenuExampleTests
 
+- (void)setUp {
+    [super setUp];
+    // The expectations below are written in Chinese; the simulator's language may differ.
+    CYLMenuResources.preferredLanguage = @"zh-Hans";
+}
+
 - (void)tearDown {
     self.window.hidden = YES;
     self.window = nil;
+    CYLMenuResources.preferredLanguage = nil;
     [super tearDown];
 }
 
@@ -586,6 +593,58 @@
     XCTAssertEqual([collection numberOfItemsInSection:0], 7);
     [self tap:tags item:0 section:0];
     XCTAssertEqualObjects(controller.searchBar.text, @"测试工程师");
+}
+
+#pragma mark Localization
+
+- (void)testComponentStringsComeFromOneBundleInEveryLanguage {
+    NSBundle *bundle = [CYLMenuResources bundle];
+    XCTAssertEqualObjects(bundle.bundleURL.lastPathComponent, @"CYLClassifyMenuResources.bundle");
+    NSArray *languages = [CYLMenuResources availableLanguages];
+    XCTAssertEqualObjects(languages, (@[@"en", @"zh-Hans", @"zh-Hant"]));
+    NSDictionary *english = [NSDictionary dictionaryWithContentsOfFile:[bundle pathForResource:@"CYLClassifyMenu" ofType:@"strings" inDirectory:nil forLocalization:@"en"]];
+    XCTAssertGreaterThan(english.count, 0u);
+    for (NSString *language in languages) {
+        NSDictionary *table = [NSDictionary dictionaryWithContentsOfFile:[bundle pathForResource:@"CYLClassifyMenu" ofType:@"strings" inDirectory:nil forLocalization:language]];
+        XCTAssertEqualObjects([NSSet setWithArray:table.allKeys], [NSSet setWithArray:english.allKeys], @"%@ has the same keys as en", language);
+    }
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"CYLMenuExpand" language:@"en"], @"More");
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"CYLMenuExpand" language:@"zh-Hans"], @"更多");
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"CYLMenuCollapse" language:@"zh-Hant"], @"收合");
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"CYLMenuExpand" language:@"fr"], @"More", @"Unknown languages fall back to English");
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"NoSuchKey"], @"NoSuchKey");
+
+    CYLMenuResources.preferredLanguage = @"en";
+    XCTAssertEqualObjects([CYLMenuResources currentLanguage], @"en");
+    XCTAssertEqualObjects([CYLMenuStyle defaultStyle].expandTitle, @"More");
+    CYLMenuResources.preferredLanguage = @"zh-Hant-TW";
+    XCTAssertEqualObjects([CYLMenuResources currentLanguage], @"zh-Hant", @"Regional variants match their language");
+    XCTAssertEqualObjects([CYLMenuStyle defaultStyle].collapseTitle, @"收合");
+}
+
+- (void)testExampleSwitchesLanguage {
+    CYLMenuResources.preferredLanguage = @"en";
+    CYLTabBarController *tabs = [CYLExampleAppDelegate makeRootTabBarController];
+    self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 375, 667)];
+    self.window.rootViewController = tabs;
+    [self.window makeKeyAndVisible];
+    [tabs.view layoutIfNeeded];
+    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"Reviews", @"Search"]));
+
+    CYLSearchCategoryViewController *search = [[CYLSearchCategoryViewController alloc] init];
+    [self hostController:search];
+    XCTAssertEqualObjects([search.categoryTabBarController.tabBar.items valueForKey:@"title"], (@[@"People", @"Posts", @"Gossip", @"Jobs"]));
+    XCTAssertEqualObjects(search.searchBar.placeholder, @"Search people, titles, companies...");
+    XCTAssertEqualObjects(search.industryButton.accessibilityLabel, @"Industry Internet");
+    [search selectCategory:CYLSearchCategoryJobs];
+    [self layOutSelectedCategoryOf:search];
+    XCTAssertEqualObjects([search.tagListView.menuDataSource menuTitleForSection:0], @"Trending job keywords:");
+
+    CYLReviewListViewController *reviews = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0];
+    [self hostController:reviews];
+    XCTAssertEqualObjects([reviews.filterView.menuDataSource menuTitleForItemAtIndexPath:[self ip:0 :0]], @"All");
+    XCTAssertTrue([[reviews.filterView.menuDataSource menuTitleForItemAtIndexPath:[self ip:1 :0]] hasPrefix:@"Positive("]);
+    XCTAssertEqualObjects(reviews.filterView.style.expandTitle, @"More");
 }
 
 #pragma mark Root tab bar

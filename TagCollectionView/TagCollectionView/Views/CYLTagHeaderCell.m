@@ -7,6 +7,7 @@
 //
 
 #import "CYLTagHeaderCell.h"
+#import "CYLMenuResources.h"
 @interface CYLTagHeaderCell()
 
 @property (weak, nonatomic) IBOutlet UILabel *nameLb;
@@ -50,11 +51,11 @@
 
     if (group.isOpened) {
         
-        [self.btn setTitle:NSLocalizedString(@"Fold", @"Collapse tag group") forState:UIControlStateNormal];
+        [self.btn setTitle:CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse tag group") forState:UIControlStateNormal];
     }
     else{
         
-        [self.btn setTitle:NSLocalizedString(@"More", @"Expand tag group") forState:UIControlStateNormal];
+        [self.btn setTitle:CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand tag group") forState:UIControlStateNormal];
     }
     
     self.nameLb.text=group.groupName;

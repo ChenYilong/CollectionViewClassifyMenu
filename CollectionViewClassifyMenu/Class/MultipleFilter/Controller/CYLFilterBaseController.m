@@ -37,6 +37,9 @@
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.panelVisible = YES;
     CGColorRef color = [UIColor lightGrayColor].CGColor;
+    // Localized from CYLClassifyMenuResources.bundle; the XIB titles are placeholders.
+    [_restoreButton setTitle:CYLMenuLocalizedString(@"CYLFilterReset", @"Reset filter") forState:UIControlStateNormal];
+    [_okButton setTitle:CYLMenuLocalizedString(@"CYLFilterConfirm", @"Apply filter") forState:UIControlStateNormal];
     self.restoreTopLine = [_restoreButton cyl_addSubLayerWithFrame:CGRectZero color:color];
     self.okTopLine = [_okButton cyl_addSubLayerWithFrame:CGRectZero color:color];
     self.okLeadingLine = [_okButton cyl_addSubLayerWithFrame:CGRectZero color:color];

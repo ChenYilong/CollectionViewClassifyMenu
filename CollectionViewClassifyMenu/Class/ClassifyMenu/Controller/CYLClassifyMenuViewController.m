@@ -128,7 +128,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = NSLocalizedString(@"CYLTagView", @"Menu title");
+    self.title = CYLMenuLocalizedString(@"CYLMenuTitle", @"Menu title");
     self.backgroundView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     self.backgroundView.showsVerticalScrollIndicator = NO;
     self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

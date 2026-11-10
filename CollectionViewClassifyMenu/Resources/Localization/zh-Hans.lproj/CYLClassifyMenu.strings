@@ -1,0 +1,12 @@
+/* CollectionViewClassifyMenu 字符串。键是稳定的标识，各语言需保持一致。 */
+
+/* 展开分组中被折叠的行。 */
+"CYLMenuExpand" = "更多";
+/* 再次折叠分组。 */
+"CYLMenuCollapse" = "收起";
+/* 单选分类菜单页面的标题。 */
+"CYLMenuTitle" = "分类";
+/* 确认多选筛选的结果。 */
+"CYLFilterConfirm" = "确认筛选";
+/* 恢复多选筛选的默认选择。 */
+"CYLFilterReset" = "返回默认";
