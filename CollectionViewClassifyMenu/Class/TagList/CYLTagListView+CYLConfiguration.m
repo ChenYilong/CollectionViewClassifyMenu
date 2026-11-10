@@ -24,6 +24,7 @@ NSString *const CYLTagItemTitle = @"title";
 NSString *const CYLTagItemImage = @"image";
 NSString *const CYLTagItemSelectedImage = @"selectedImage";
 NSString *const CYLTagItemAnimation = @"animation";
+NSString *const CYLTagItemAnimationOptions = @"animationOptions";
 NSString *const CYLTagItemEnabled = @"enabled";
 NSString *const CYLTagItemExclusive = @"exclusive";
 
@@ -183,10 +184,44 @@ static UIFont *CYLFont(id value) {
     return font;
 }
 
+NSURL *CYLMenuAnimationURLWithOptions(NSURL *fileURL, NSDictionary<NSString *, id> *options) {
+    if (![fileURL isKindOfClass:[NSURL class]]) return nil;
+    if (![options isKindOfClass:[NSDictionary class]] || options.count == 0) return fileURL;
+    NSURLComponents *components = [NSURLComponents componentsWithURL:fileURL resolvingAgainstBaseURL:YES];
+    if (!components) return fileURL;
+    NSMutableCharacterSet *allowed = [[NSCharacterSet URLQueryAllowedCharacterSet] mutableCopy];
+    [allowed removeCharactersInString:@"&=+#?"];
+    NSMutableArray<NSString *> *names = [NSMutableArray array];
+    for (id name in options) {
+        if ([name isKindOfClass:[NSString class]] && [(NSString *)name length] > 0) [names addObject:name];
+    }
+    [names sortUsingSelector:@selector(compare:)];
+    NSMutableArray<NSString *> *items = [NSMutableArray array];
+    for (NSString *name in names) {
+        id value = options[name];
+        NSString *string = [value isKindOfClass:[NSString class]] ? value : ([value isKindOfClass:[NSNumber class]] ? [value stringValue] : nil);
+        NSString *encodedName = [name stringByAddingPercentEncodingWithAllowedCharacters:allowed];
+        NSString *encodedValue = [string stringByAddingPercentEncodingWithAllowedCharacters:allowed];
+        if (encodedName.length > 0 && encodedValue.length > 0) {
+            [items addObject:[NSString stringWithFormat:@"%@=%@", encodedName, encodedValue]];
+        }
+    }
+    components.percentEncodedFragment = items.count > 0 ? [items componentsJoinedByString:@"&"] : nil;
+    return components.URL ?: fileURL;
+}
+
 static NSURL *CYLFileURL(id value, NSURL *baseURL) {
     if ([value isKindOfClass:[NSURL class]]) return value;
     if (![value isKindOfClass:[NSString class]] || [value length] == 0) return nil;
     NSString *string = value;
+    // "file.riv#artboard=HOME": resolve the file, then keep the options.
+    NSRange hash = [string rangeOfString:@"#"];
+    if (hash.location != NSNotFound && hash.location > 0 && [NSURL URLWithString:string].scheme.length <= 1) {
+        NSURL *file = CYLFileURL([string substringToIndex:hash.location], baseURL);
+        NSURLComponents *components = file ? [NSURLComponents componentsWithURL:file resolvingAgainstBaseURL:YES] : nil;
+        components.percentEncodedFragment = [string substringFromIndex:hash.location + 1];
+        return components.URL ?: file;
+    }
     NSURL *URL = [NSURL URLWithString:string];
     if (URL.scheme.length > 1) return URL;
     if (string.isAbsolutePath) return [NSURL fileURLWithPath:string];
@@ -268,7 +303,8 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
 }
 
 - (NSURL *)menuAnimationURLForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CYLFileURL([self itemAtIndexPath:indexPath][CYLTagItemAnimation], self.baseURL);
+    NSDictionary *item = [self itemAtIndexPath:indexPath];
+    return CYLMenuAnimationURLWithOptions(CYLFileURL(item[CYLTagItemAnimation], self.baseURL), item[CYLTagItemAnimationOptions]);
 }
 
 - (UIImage *)menuImageForSection:(NSInteger)section {

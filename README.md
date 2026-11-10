@@ -222,6 +222,19 @@ pod 'CYLTabBarController/Lottie'   # 或 /PAG、/Rive、/GIF
 
 未链接动效引擎或文件无法加载时显示静态图标。
 
+动效库读取的选项（例如 Rive 文件的画板与状态机）写在 URL 中，编码方式与 CYLTabBarController 的
+`CYLTabBarAnimationURLWithOptions()` 相同：在代码中用 `CYLMenuAnimationURLWithOptions()`，在字典或配置文件中用
+`CYLTagItemAnimationOptions`（`"animationOptions"`），或直接写在文件名后（`"icons.riv#artboard=CHAT"`）：
+
+```objc
+item.animationURL = CYLMenuAnimationURLWithOptions(iconsURL, @{ @"artboard" : @"CHAT",
+                                                                @"stateMachine" : @"CHAT_Interactivity",
+                                                                @"input" : @"active" });
+```
+
+Lottie 2.x 按名称查找 JSON 引用的图片，因此 Example 把这些图片放在 `Assets.xcassets/LottieImages`
+（CYLTabBarController 的 Example 放在 App 根目录）。
+
 Example 的「动效」Tab（`CYLTagAnimationDemoViewController`）使用从 CYLTabBarController（`feat/cross-platform-components` 最新提交）
 Example 复制的资源：Lottie（含图片资源与占位图、绿色主题）、Rive、GIF 动效文件与 TabBar 图片（`Assets.xcassets/TabBarIcon`），
 PAG 文件由 `pod install` 下载；每个分组一种动效库，点击播放，可全部播放与切换速度。`style.animationSize`、`style.animationSpeed` 设置大小与速度。

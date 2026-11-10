@@ -623,6 +623,28 @@
 
 #pragma mark Animated icons (CYLTabBarController animation engine)
 
+- (void)testAnimationOptionsAreEncodedAsCYLTabBarControllerDoes {
+    NSURL *file = [NSURL fileURLWithPath:@"/tmp/icons.riv"];
+    XCTAssertNil(CYLMenuAnimationURLWithOptions(nil, @{@"artboard": @"CHAT"}));
+    XCTAssertEqualObjects(CYLMenuAnimationURLWithOptions(file, nil), file);
+    NSURL *URL = CYLMenuAnimationURLWithOptions(file, @{@"stateMachine": @"State Machine 1", @"artboard": @"A&B", @"duration": @2});
+    XCTAssertEqualObjects(URL.path, file.path);
+    XCTAssertEqualObjects(URL.fragment, @"artboard=A%26B&duration=2&stateMachine=State%20Machine%201", @"Sorted, percent-encoded");
+
+    CYLTagListView *view = [CYLTagListView tagListViewWithConfiguration:@{CYLTagListViewSections: @[@{CYLTagSectionItems: @[
+        @{CYLTagItemTitle: @"a", CYLTagItemAnimation: @"CYLMenuExample.bundle/Animations/Rive/icons.riv",
+          CYLTagItemAnimationOptions: @{@"artboard": @"CHAT", @"input": @"active"}},
+        @{CYLTagItemTitle: @"b", CYLTagItemAnimation: @"CYLMenuExample.bundle/Animations/Rive/icons.riv#artboard=USER"}]}]}];
+    NSURL *first = [view.menuDataSource menuAnimationURLForItemAtIndexPath:[self ip:0 :0]];
+    NSURL *second = [view.menuDataSource menuAnimationURLForItemAtIndexPath:[self ip:1 :0]];
+    XCTAssertEqualObjects(first.fragment, @"artboard=CHAT&input=active");
+    XCTAssertEqualObjects(second.fragment, @"artboard=USER", @"A fragment in a file name is kept");
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:first.path]);
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:second.path]);
+    XCTAssertNotNil([UIImage imageNamed:@"img_tab_home_0"], @"Lottie image assets are found by name, as in CYLTabBarController's Example");
+}
+
+
 - (void)testAnimatedIconsUseCYLTabBarControllerAnimationEngine {
     XCTAssertTrue([CYLTagButton isAnimationEngineAvailable], @"CYLTabBarController/CYLTabBarItemAnimation is linked");
     NSURL *resources = NSBundle.mainBundle.resourceURL;

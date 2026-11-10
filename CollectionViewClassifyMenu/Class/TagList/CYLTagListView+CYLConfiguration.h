@@ -57,6 +57,10 @@ FOUNDATION_EXTERN NSString *const CYLTagItemSelectedImage;
 /// NSURL, or a URL string, a file path or a file name (in the main bundle, or next to the
 /// configuration file): a Lottie .json, .pag, .riv or .gif animated icon.
 FOUNDATION_EXTERN NSString *const CYLTagItemAnimation;
+/// NSDictionary of strings (numbers are converted): options read by the animation's library, written into the
+/// animation URL with CYLMenuAnimationURLWithOptions(). For Rive, as in CYLTabBarController: "artboard",
+/// "stateMachine", "input", "triggerInput", "animation", "duration", "legacy"...
+FOUNDATION_EXTERN NSString *const CYLTagItemAnimationOptions;
 /// NSNumber, or "true" / "false". Default YES / NO.
 FOUNDATION_EXTERN NSString *const CYLTagItemEnabled;
 FOUNDATION_EXTERN NSString *const CYLTagItemExclusive;
@@ -108,6 +112,16 @@ typedef NS_ERROR_ENUM(CYLMenuConfigurationErrorDomain, CYLMenuConfigurationError
     CYLMenuConfigurationErrorInvalidContents,
     CYLMenuConfigurationErrorUnsupportedFormat,
 };
+
+/// An animation URL with options, encoded exactly as CYLTabBarController's CYLTabBarAnimationURLWithOptions()
+/// does ("name=value&…" in the fragment, percent-encoded and sorted by name), so that its animation libraries read
+/// them, e.g. which artboard and state machine of a Rive file a tag plays. Returns fileURL when there are no options,
+/// and nil when fileURL is nil.
+///
+///     item.animationURL = CYLMenuAnimationURLWithOptions(iconsURL, @{ @"artboard" : @"CHAT",
+///                                                                     @"stateMachine" : @"CHAT_Interactivity",
+///                                                                     @"input" : @"active" });
+FOUNDATION_EXTERN NSURL *_Nullable CYLMenuAnimationURLWithOptions(NSURL *_Nullable fileURL, NSDictionary<NSString *, id> *_Nullable options);
 
 @interface CYLTagListView (CYLConfiguration)
 

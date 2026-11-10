@@ -92,7 +92,12 @@
     if (first) {
         [line appendFormat:@" firstCell=%@ inWindow=%@ alpha=%.2f hidden=%d", NSStringFromCGRect(first.frame),
                            NSStringFromCGRect([first convertRect:first.bounds toView:nil]), first.alpha, first.hidden];
+        for (UIView *subview in first.contentView.subviews) {
+            [line appendFormat:@" sub=%@%@", NSStringFromClass([subview class]), NSStringFromCGRect(subview.frame)];
+        }
     }
+    [line appendFormat:@" collectionHidden=%d alpha=%.2f bg=%@ superviews=", collection.hidden, collection.alpha, collection.backgroundColor];
+    for (UIView *v = view.superview; v; v = v.superview) [line appendFormat:@"%@%@,", NSStringFromClass([v class]), NSStringFromCGRect(v.frame)];
     [self appendLayoutReport:line];
 }
 
@@ -113,6 +118,10 @@
         UITabBar *bar = search.categoryTabBarController.tabBar;
         [self appendLayoutReport:[NSString stringWithFormat:@"[CYLExampleLayout] categoryTabBar=%@", NSStringFromCGRect([bar convertRect:bar.bounds toView:nil])]];
         [self reportTagList:search.tagListView named:@"searchTags"];
+    } else if ([top isKindOfClass:[CYLTagStyleDemoViewController class]]) {
+        [self reportTagList:((CYLTagStyleDemoViewController *)top).tagListView named:@"styleTags"];
+    } else if ([top isKindOfClass:[CYLTagAnimationDemoViewController class]]) {
+        [self reportTagList:((CYLTagAnimationDemoViewController *)top).tagListView named:@"animationTags"];
     }
 }
 

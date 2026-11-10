@@ -29,6 +29,12 @@
     return item;
 }
 
++ (NSDictionary *)item:(NSString *)title rive:(NSString *)name options:(NSDictionary<NSString *, NSString *> *)options {
+    NSMutableDictionary *item = [[self item:title animation:[self animation:[NSString stringWithFormat:@"Rive/%@.riv", name]] image:nil] mutableCopy];
+    item[CYLTagItemAnimationOptions] = options;
+    return item;
+}
+
 + (NSDictionary<NSString *, id> *)configuration {
     NSArray *sections = @[
         @{CYLTagSectionTitle: @"Lottie · pod 'CYLTabBarController/Lottie'", CYLTagSectionItems: @[
@@ -49,14 +55,18 @@
         @{CYLTagSectionTitle: @"PAG · pod 'CYLTabBarController/PAG'", CYLTagSectionItems: @[
             [self item:@"动效一" animation:@"pag-ios/0.pag" image:nil],
             [self item:@"动效二" animation:@"pag-ios/1.pag" image:nil]]},
+        // The options CYLTabBarController's Rive examples use for each file (Example-SwiftUI-Rive): a Rive icon needs its
+        // artboard, state machine and input, given with CYLTagItemAnimationOptions.
         @{CYLTagSectionTitle: @"Rive · pod 'CYLTabBarController/Rive'", CYLTagSectionItems: @[
-            [self item:@"首页" animation:[self animation:@"Rive/house.riv"] image:nil],
-            [self item:@"完成" animation:[self animation:@"Rive/check.riv"] image:nil],
-            [self item:@"菜单" animation:[self animation:@"Rive/menu_button.riv"] image:nil],
-            [self item:@"按钮" animation:[self animation:@"Rive/button.riv"] image:nil],
-            [self item:@"图标" animation:[self animation:@"Rive/icons.riv"] image:nil],
-            [self item:@"形状" animation:[self animation:@"Rive/shapes.riv"] image:nil],
-            [self item:@"彩带" animation:[self animation:@"Rive/confetti.riv"] image:nil]]},
+            [self item:@"消息" rive:@"icons" options:@{@"artboard": @"CHAT", @"stateMachine": @"CHAT_Interactivity", @"input": @"active"}],
+            [self item:@"搜索" rive:@"icons" options:@{@"artboard": @"SEARCH", @"stateMachine": @"SEARCH_Interactivity", @"input": @"active"}],
+            [self item:@"我的" rive:@"icons" options:@{@"artboard": @"USER", @"stateMachine": @"USER_Interactivity", @"input": @"active"}],
+            [self item:@"首页" rive:@"house" options:@{@"stateMachine": @"State Machine 1"}],
+            [self item:@"完成" rive:@"check" options:@{@"stateMachine": @"State Machine 1", @"triggerInput": @"Check"}],
+            [self item:@"菜单" rive:@"menu_button" options:@{@"stateMachine": @"State Machine", @"input": @"isOpen", @"duration": @"0"}],
+            [self item:@"按钮" rive:@"button" options:@{@"animation": @"active"}],
+            [self item:@"形状" rive:@"shapes" options:@{@"legacy": @"1"}],
+            [self item:@"彩带" rive:@"confetti" options:@{@"stateMachine": @"State Machine 1", @"triggerInput": @"Trigger explosion"}]]},
         @{CYLTagSectionTitle: @"GIF · pod 'CYLTabBarController/GIF'", CYLTagSectionItems: @[
             [self item:@"火焰" animation:[self animation:@"GIF/tab_fire.gif"] image:nil],
             [self item:@"火箭" animation:[self animation:@"GIF/tab_rocket.gif"] image:nil],

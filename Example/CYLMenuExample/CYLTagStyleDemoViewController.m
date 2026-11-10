@@ -268,11 +268,19 @@ static NSString * const kStyleCell = @"StyleCell";
         @"lottie": @[@"CYLMenuExample.bundle/Animations/Lottie/tab_home_animate.json", @"CYLMenuExample.bundle/Animations/Lottie/tab_me_animate.json"],
         @"gif": @[@"CYLMenuExample.bundle/Animations/GIF/tab_star.gif", @"CYLMenuExample.bundle/Animations/GIF/cyl_tab_sample_animated.gif"],
         @"pag": @[@"pag-ios/0.pag", @"pag-ios/1.pag"],
-        @"rive": @[@"CYLMenuExample.bundle/Animations/Rive/check.riv", @"CYLMenuExample.bundle/Animations/Rive/menu_button.riv"],
+        @"rive": @[@"CYLMenuExample.bundle/Animations/Rive/icons.riv", @"CYLMenuExample.bundle/Animations/Rive/icons.riv"],
     };
     NSArray<NSString *> *names = files[self.animationLibrary];
     NSString *name = names[index % names.count];
-    return name ? [NSBundle.mainBundle.resourceURL URLByAppendingPathComponent:name] : nil;
+    NSURL *URL = name ? [NSBundle.mainBundle.resourceURL URLByAppendingPathComponent:name] : nil;
+    if ([self.animationLibrary isEqualToString:@"rive"]) {
+        // A Rive icon plays an artboard and state machine of icons.riv, as in CYLTabBarController's Rive example.
+        NSString *artboard = @[@"CHAT", @"SEARCH", @"TIMER", @"BELL", @"USER"][index % 5];
+        URL = CYLMenuAnimationURLWithOptions(URL, @{@"artboard": artboard,
+                                                    @"stateMachine": [artboard stringByAppendingString:@"_Interactivity"],
+                                                    @"input": @"active"});
+    }
+    return URL;
 }
 
 - (void)applyStyle {
