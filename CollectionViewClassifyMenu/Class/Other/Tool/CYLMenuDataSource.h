@@ -9,6 +9,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CYLMenuStyle;
+
 @protocol CYLMenuDataSource <NSObject>
 
 - (NSInteger)numberOfSectionsInMenu;
@@ -25,6 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// tab icon: it plays when a tap selects the item. Needs the library's CYLTabBarController
 /// subspec in the app (e.g. `pod 'CYLTabBarController/Lottie'`); without it the image is shown.
 - (nullable NSURL *)menuAnimationURLForItemAtIndexPath:(NSIndexPath *)indexPath;
+/// The frame (0...1) an animated icon shows while its item is not selected. Default (nil) 0, the first
+/// frame, as a CYLTabBarController tab icon; for a file whose first frame is empty, e.g. @1 for the last.
+- (nullable NSNumber *)menuAnimationRestingProgressForItemAtIndexPath:(NSIndexPath *)indexPath;
+/// The look of one section's tags (colors, fonts, borders, icon colors, title and image layout), e.g. dark
+/// tags for white icons. Return nil for the list's style. Item height, spacing and insets always come from
+/// the list's style. Return the same object for as long as it does not change.
+- (nullable CYLMenuStyle *)menuStyleForSection:(NSInteger)section;
 /// Icon drawn before the section title. Return nil for no icon.
 - (nullable UIImage *)menuImageForSection:(NSInteger)section;
 /// View placed at the trailing edge of the section header, such as a picker

@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)playSelectedAnimations;
 /// Cycles the animation speed (1x, 2x, 0.5x), as the speed button does.
 - (void)changeSpeed;
+/// Scrolls the tags to a section of +sectionIdentifiers (e.g. @"pag").
+- (void)scrollToSectionIdentifier:(NSString *)identifier;
 @end
 
 NS_ASSUME_NONNULL_END

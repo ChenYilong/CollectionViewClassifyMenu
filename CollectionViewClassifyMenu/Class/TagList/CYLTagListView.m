@@ -403,6 +403,20 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         ? [source menuAnimationURLForItemAtIndexPath:indexPath] : nil;
 }
 
+- (CGFloat)cyl_animationRestingProgressAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    NSNumber *progress = [source respondsToSelector:@selector(menuAnimationRestingProgressForItemAtIndexPath:)]
+        ? [source menuAnimationRestingProgressForItemAtIndexPath:indexPath] : nil;
+    return [progress isKindOfClass:[NSNumber class]] ? progress.doubleValue : 0;
+}
+
+/// The section's own look, or the list's style.
+- (CYLMenuStyle *)cyl_styleForSection:(NSInteger)section {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    CYLMenuStyle *style = [source respondsToSelector:@selector(menuStyleForSection:)] ? [source menuStyleForSection:section] : nil;
+    return [style isKindOfClass:[CYLMenuStyle class]] ? style : self.style;
+}
+
 - (UIImage *)cyl_selectedImageAtIndexPath:(NSIndexPath *)indexPath {
     id<CYLMenuDataSource> source = self.menuDataSource;
     return [source respondsToSelector:@selector(menuSelectedImageForItemAtIndexPath:)]
@@ -428,10 +442,10 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 }
 
 - (NSArray<NSArray<NSNumber *> *> *)cyl_widthsForContentWidth:(CGFloat)contentWidth {
-    CYLMenuStyle *style = self.style;
     UITraitCollection *traits = self.traitCollection;
     NSMutableArray *widths = [NSMutableArray arrayWithCapacity:self.titles.count];
     [self.titles enumerateObjectsUsingBlock:^(NSArray<NSString *> *items, NSUInteger section, BOOL *stop) {
+        CYLMenuStyle *style = [self cyl_styleForSection:section];
         NSMutableArray *sectionWidths = [NSMutableArray arrayWithCapacity:items.count];
         [items enumerateObjectsUsingBlock:^(NSString *title, NSUInteger item, BOOL *itemStop) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
@@ -562,6 +576,32 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         }
     }
     return ceil(height);
+}
+
+#pragma mark Scrolling
+
+- (void)scrollToSection:(NSInteger)section animated:(BOOL)animated {
+    UICollectionView *collection = self.collectionView;
+    if (section < 0 || section >= [collection numberOfSections]) {
+        return;
+    }
+    [self layoutIfNeeded];
+    [collection layoutIfNeeded];
+    UICollectionViewLayout *layout = collection.collectionViewLayout;
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+    CGFloat top = CGFLOAT_MAX;
+    UICollectionViewLayoutAttributes *header = [layout layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
+    if (header && CGRectGetHeight(header.frame) > 0) {
+        top = CGRectGetMinY(header.frame);
+    } else if ([collection numberOfItemsInSection:section] > 0) {
+        top = CGRectGetMinY([layout layoutAttributesForItemAtIndexPath:indexPath].frame) - self.style.sectionInsets.top;
+    }
+    if (top == CGFLOAT_MAX) {
+        return;
+    }
+    UIEdgeInsets inset = collection.adjustedContentInset;
+    CGFloat maxOffset = MAX(-inset.top, layout.collectionViewContentSize.height + inset.bottom - CGRectGetHeight(collection.bounds));
+    [collection setContentOffset:CGPointMake(collection.contentOffset.x, MIN(MAX(top - inset.top, -inset.top), maxOffset)) animated:animated];
 }
 
 #pragma mark Folding
@@ -820,9 +860,10 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
                        image:[self cyl_imageAtIndexPath:indexPath]
                selectedImage:[self cyl_selectedImageAtIndexPath:indexPath]
                 animationURL:[self cyl_animationURLAtIndexPath:indexPath]
-                       style:self.style
+                       style:[self cyl_styleForSection:indexPath.section]
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];
+    cell.button.animationRestingProgress = [self cyl_animationRestingProgressAtIndexPath:indexPath];
 }
 
 #pragma mark UICollectionViewDataSource

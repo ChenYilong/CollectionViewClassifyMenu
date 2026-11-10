@@ -232,12 +232,21 @@ item.animationURL = CYLMenuAnimationURLWithOptions(iconsURL, @{ @"artboard" : @"
                                                                 @"input" : @"active" });
 ```
 
+未选中时动效默认停在第一帧（与 CYLTabBarController 的 Tab 图标相同）；第一帧为空的文件可以停在其他帧：
+`-menuAnimationRestingProgressForItemAtIndexPath:`、`CYLTagButton.animationRestingProgress` 或字典中的
+`CYLTagItemAnimationRestingProgress`（0...1，例如 `@1` 为最后一帧）。
+
+每个分组可以有自己的外观：`-menuStyleForSection:` 或字典中的 `CYLTagSectionStyle`（覆盖在列表样式之上的
+`CYLMenuStyle…` 键），例如白色线条的 Rive 图标（CYLTabBarController 深色 TabBar 用的 `icons.riv`）放在深色标签上。
+颜色、字体、边框、图标颜色、图文布局按分组设置；高度、间距与内边距始终使用列表的样式。`-scrollToSection:animated:`
+滚动到某个分组。
+
 Lottie 2.x 按名称查找 JSON 引用的图片，因此 Example 把这些图片放在 `Assets.xcassets/LottieImages`
 （CYLTabBarController 的 Example 放在 App 根目录）。
 
 Example 的「动效」Tab（`CYLTagAnimationDemoViewController`）使用从 CYLTabBarController（`feat/cross-platform-components` 最新提交）
 Example 复制的资源：Lottie（含图片资源与占位图、绿色主题）、Rive、GIF 动效文件与 TabBar 图片（`Assets.xcassets/TabBarIcon`），
-PAG 文件由 `pod install` 下载；每个分组一种动效库，点击播放，可全部播放与切换速度。`style.animationSize`、`style.animationSpeed` 设置大小与速度。
+PAG 文件由 `pod install` 下载（包括 CYLTabBarController Example-PAG 的 Tab 图标 `tab_home`、`tab_health`、`tab_moments`、`tab_me`）；每个分组一种动效库，点击播放，可全部播放与切换速度。`style.animationSize`、`style.animationSpeed` 设置大小与速度。
 
 #### 字典与配置文件初始化 / Map and configuration file
 

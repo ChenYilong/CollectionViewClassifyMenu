@@ -48,6 +48,9 @@ FOUNDATION_EXTERN NSString *const CYLTagSectionTitle;
 FOUNDATION_EXTERN NSString *const CYLTagSectionImage;
 /// NSArray of item dictionaries (CYLTagItem… keys), or of strings (titles).
 FOUNDATION_EXTERN NSString *const CYLTagSectionItems;
+/// CYLMenuStyle, or a dictionary of CYLMenuStyle… keys applied over the list's style: the look of this
+/// section's tags (see -menuStyleForSection:), e.g. dark tags for white icons.
+FOUNDATION_EXTERN NSString *const CYLTagSectionStyle;
 
 #pragma mark Item keys
 FOUNDATION_EXTERN NSString *const CYLTagItemTitle;
@@ -61,6 +64,8 @@ FOUNDATION_EXTERN NSString *const CYLTagItemAnimation;
 /// animation URL with CYLMenuAnimationURLWithOptions(). For Rive, as in CYLTabBarController: "artboard",
 /// "stateMachine", "input", "triggerInput", "animation", "duration", "legacy"...
 FOUNDATION_EXTERN NSString *const CYLTagItemAnimationOptions;
+/// NSNumber 0...1: the frame shown while not selected (see -menuAnimationRestingProgressForItemAtIndexPath:).
+FOUNDATION_EXTERN NSString *const CYLTagItemAnimationRestingProgress;
 /// NSNumber, or "true" / "false". Default YES / NO.
 FOUNDATION_EXTERN NSString *const CYLTagItemEnabled;
 FOUNDATION_EXTERN NSString *const CYLTagItemExclusive;

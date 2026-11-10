@@ -21,6 +21,7 @@
 - (void)stop;
 @optional
 @property (nonatomic, assign) CGFloat animationSpeed;
+@property (nonatomic, assign) CGFloat progress;
 @end
 
 static Class<CYLTagAnimationFactory> CYLTagAnimationFactoryClass(void) {
@@ -137,7 +138,19 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         [player showLastFrame];
     } else {
         [player stop];
+        CGFloat resting = MIN(1, MAX(0, self.animationRestingProgress));
+        if (resting > 0 && [player respondsToSelector:@selector(setProgress:)]) {
+            player.progress = resting;
+        }
     }
+}
+
+- (void)setAnimationRestingProgress:(CGFloat)animationRestingProgress {
+    if (_animationRestingProgress == animationRestingProgress) {
+        return;
+    }
+    _animationRestingProgress = animationRestingProgress;
+    [self cyl_updateAnimationState];
 }
 
 - (void)playAnimation {

@@ -164,6 +164,11 @@
         if ([screen isEqualToString:@"animations-speed"]) {
             [demo loadViewIfNeeded];
             [demo changeSpeed];
+        } else if ([screen isEqualToString:@"animations-rive"]) {
+            // PAG, Rive and icons.riv on dark tags, below the first screen.
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [demo scrollToSectionIdentifier:@"pag"];
+            });
         }
     } else if ([screen isEqualToString:@"config"]) {
         tabs.selectedIndex = 2;

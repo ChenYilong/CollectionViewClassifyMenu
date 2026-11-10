@@ -94,6 +94,8 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 - (NSUInteger)numberOfRowsInSection:(NSInteger)section;
 /// Number of items currently shown in the section (fewer while collapsed).
 - (NSInteger)numberOfVisibleItemsInSection:(NSInteger)section;
+/// Scrolls so that the section (its header, or its first row) is at the top, as far as the content allows.
+- (void)scrollToSection:(NSInteger)section animated:(BOOL)animated;
 
 @end
 

@@ -19,12 +19,14 @@ NSString *const CYLTagListViewSelectedItems = @"selectedItems";
 NSString *const CYLTagSectionTitle = @"title";
 NSString *const CYLTagSectionImage = @"image";
 NSString *const CYLTagSectionItems = @"items";
+NSString *const CYLTagSectionStyle = @"style";
 
 NSString *const CYLTagItemTitle = @"title";
 NSString *const CYLTagItemImage = @"image";
 NSString *const CYLTagItemSelectedImage = @"selectedImage";
 NSString *const CYLTagItemAnimation = @"animation";
 NSString *const CYLTagItemAnimationOptions = @"animationOptions";
+NSString *const CYLTagItemAnimationRestingProgress = @"animationRestingProgress";
 NSString *const CYLTagItemEnabled = @"enabled";
 NSString *const CYLTagItemExclusive = @"exclusive";
 
@@ -264,6 +266,10 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
 @interface CYLTagListConfigurationSource : NSObject <CYLMenuDataSource>
 @property (nonatomic, copy) NSArray<NSDictionary *> *sections;
 @property (nonatomic, strong, nullable) NSURL *baseURL;
+/// The view whose style a section style dictionary starts from.
+@property (nonatomic, weak, nullable) CYLTagListView *owner;
+/// Section -> @[list style it was made from, section style], so the same object is returned until the list's style changes.
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSArray *> *sectionStyles;
 @end
 
 @implementation CYLTagListConfigurationSource
@@ -309,6 +315,24 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
 
 - (UIImage *)menuImageForSection:(NSInteger)section {
     return CYLImage(self.sections[section][CYLTagSectionImage], self.baseURL);
+}
+
+- (NSNumber *)menuAnimationRestingProgressForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return CYLNumber([self itemAtIndexPath:indexPath][CYLTagItemAnimationRestingProgress]);
+}
+
+- (CYLMenuStyle *)menuStyleForSection:(NSInteger)section {
+    id value = section < (NSInteger)self.sections.count ? self.sections[section][CYLTagSectionStyle] : nil;
+    if ([value isKindOfClass:[CYLMenuStyle class]]) return value;
+    if (![value isKindOfClass:[NSDictionary class]]) return nil;
+    CYLMenuStyle *base = self.owner.style ?: [CYLMenuStyle defaultStyle];
+    NSArray *cached = self.sectionStyles[@(section)];
+    if (cached && cached[0] == base) return cached[1];
+    CYLMenuStyle *style = [base copy];
+    [style applyConfiguration:value];
+    if (!self.sectionStyles) self.sectionStyles = [NSMutableDictionary dictionary];
+    self.sectionStyles[@(section)] = @[base, style];
+    return style;
 }
 
 - (BOOL)menuItemIsEnabledAtIndexPath:(NSIndexPath *)indexPath {
@@ -426,6 +450,7 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
         CYLTagListConfigurationSource *source = [[CYLTagListConfigurationSource alloc] init];
         source.sections = configuration[CYLTagListViewSections];
         source.baseURL = [baseURL isKindOfClass:[NSURL class]] ? baseURL : nil;
+        source.owner = self;
         // The view holds its data source weakly: keep this one alive with the view.
         objc_setAssociatedObject(self, @selector(configurationDataSource), source, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         self.menuDataSource = source;

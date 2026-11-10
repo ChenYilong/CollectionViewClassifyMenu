@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// Core does: add the library's subspec to the app, e.g. `pod 'CYLTabBarController/Lottie'`. Without
 /// it, or when the file cannot be loaded, `image` is shown.
 @property (nonatomic, strong, nullable) NSURL *animationURL;
+/// The frame (0...1) of the animated icon shown while not selected. Default 0, the first frame.
+@property (nonatomic, assign) CGFloat animationRestingProgress;
 /// The animation view in the icon slot, or nil.
 @property (nonatomic, strong, readonly, nullable) UIView *animationView;
 /// Its `CYLTabBarItemAnimationPlayer` (play, showLastFrame, stop), whatever the library, or nil.

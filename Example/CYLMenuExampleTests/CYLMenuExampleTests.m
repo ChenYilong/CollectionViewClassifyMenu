@@ -733,6 +733,52 @@
     XCTAssertFalse([tags.selectedIndexPaths containsObject:[self ip:0 :4]], @"One selected tag per section");
 }
 
+- (void)testSectionStyleRestingFrameAndScrollingInTheAnimationDemo {
+    CYLTagAnimationDemoViewController *demo = [[CYLTagAnimationDemoViewController alloc] init];
+    [self hostController:demo];
+    [demo.view layoutIfNeeded];
+    CYLTagListView *tags = demo.tagListView;
+    UICollectionView *collection = [self collectionViewOf:tags];
+    NSArray *sections = [CYLTagAnimationDemoViewController sectionIdentifiers];
+    NSInteger riveIcons = (NSInteger)[sections indexOfObject:@"rive-icons"];
+    NSInteger pag = (NSInteger)[sections indexOfObject:@"pag"];
+
+    // icons.riv's white artboards on dark tags: the section's own style, over the list's.
+    CYLMenuStyle *dark = [tags.menuDataSource menuStyleForSection:riveIcons];
+    XCTAssertNotNil(dark);
+    XCTAssertEqual([tags.menuDataSource menuStyleForSection:riveIcons], dark, @"The same object until the list's style changes");
+    XCTAssertNil([tags.menuDataSource menuStyleForSection:pag], @"Other sections use the list's style");
+    XCTAssertEqual(dark.itemHeight, tags.style.itemHeight);
+    [tags scrollToSection:riveIcons animated:NO];
+    [collection layoutIfNeeded];
+    NSIndexPath *chat = [self ip:0 :riveIcons], *search = [self ip:1 :riveIcons];
+    CYLTagButton *selected = [[collection cellForItemAtIndexPath:chat] valueForKey:@"button"];
+    CYLTagButton *normal = [[collection cellForItemAtIndexPath:search] valueForKey:@"button"];
+    XCTAssertNotNil(normal.animationView, @"icons.riv artboard");
+    XCTAssertTrue(CGColorEqualToColor(normal.layer.backgroundColor, [dark.normalAppearance.backgroundColor CGColor]), @"Dark tag");
+    XCTAssertTrue(CGColorEqualToColor(selected.layer.backgroundColor, [dark.selectedAppearance.backgroundColor CGColor]));
+    CGFloat red = 0, green = 0, blue = 0, alpha = 0;
+    [normal.titleLabel.textColor getRed:&red green:&green blue:&blue alpha:&alpha];
+    XCTAssertTrue(red > 0.99 && green > 0.99 && blue > 0.99, @"White titles: %@", normal.titleLabel.textColor);
+    CGRect visible = collection.bounds;
+    XCTAssertTrue(CGRectIntersectsRect([collection cellForItemAtIndexPath:chat].frame, visible), @"Scrolled to the section");
+
+    // 1.pag rests on its last frame; the others on their first.
+    NSInteger restingItem = [tags.menuDataSource menuNumberOfItemsInSection:pag] - 1;
+    XCTAssertEqualObjects([tags.menuDataSource menuAnimationRestingProgressForItemAtIndexPath:[self ip:restingItem :pag]], @1);
+    XCTAssertNil([tags.menuDataSource menuAnimationRestingProgressForItemAtIndexPath:[self ip:0 :pag]]);
+    [tags scrollToSection:pag animated:NO];
+    [collection layoutIfNeeded];
+    CYLTagButton *resting = [[collection cellForItemAtIndexPath:[self ip:restingItem :pag]] valueForKey:@"button"];
+    XCTAssertEqualWithAccuracy(resting.animationRestingProgress, 1, 0.001);
+    XCTAssertFalse(resting.isSelected);
+    XCTAssertEqualWithAccuracy([[resting.animationPlayer valueForKey:@"progress"] doubleValue], 1, 0.01, @"Shows its last frame");
+    for (NSString *name in @[@"tab_home", @"tab_health", @"tab_moments", @"tab_me"]) {
+        NSString *path = [NSBundle.mainBundle.resourcePath stringByAppendingFormat:@"/pag-ios/%@.pag", name];
+        XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:path], @"CYLTabBarController's PAG tab icon %@", name);
+    }
+}
+
 #pragma mark Accessibility
 
 - (void)testVoiceOverDescribesTagsAndFoldControls {

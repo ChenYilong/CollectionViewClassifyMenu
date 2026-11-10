@@ -14,7 +14,7 @@
 @implementation CYLTagAnimationDemoViewController
 
 + (NSArray<NSString *> *)sectionIdentifiers {
-    return @[@"lottie", @"lottie-images", @"lottie-green", @"pag", @"rive", @"gif", @"images"];
+    return @[@"lottie", @"lottie-images", @"lottie-green", @"pag", @"rive", @"rive-icons", @"gif", @"images"];
 }
 
 /// A file of CYLMenuExample.bundle/Animations (copied from CYLTabBarController's examples).
@@ -52,12 +52,18 @@
             [self item:@"资讯" animation:[self animation:@"Lottie/green_lottie_tab_news.json"] image:nil],
             [self item:@"发现" animation:[self animation:@"Lottie/green_lottie_tab_discover.json"] image:nil],
             [self item:@"我的" animation:[self animation:@"Lottie/green_lottie_tab_mine.json"] image:nil]]},
+        // The PAG tab icons of CYLTabBarController's Example-PAG (tab_*.pag, downloaded by `pod install`), and two
+        // libpag samples. 1.pag's first frame is empty: while not selected it rests on its last frame instead.
         @{CYLTagSectionTitle: @"PAG · pod 'CYLTabBarController/PAG'", CYLTagSectionItems: @[
+            [self item:@"首页" animation:@"pag-ios/tab_home.pag" image:nil],
+            [self item:@"健康" animation:@"pag-ios/tab_health.pag" image:nil],
+            [self item:@"动态" animation:@"pag-ios/tab_moments.pag" image:nil],
+            [self item:@"我的" animation:@"pag-ios/tab_me.pag" image:nil],
             [self item:@"动效一" animation:@"pag-ios/0.pag" image:nil],
-            [self item:@"动效二" animation:@"pag-ios/1.pag" image:nil]]},
+            @{CYLTagItemTitle: CYLExampleLocalizedString(@"动效二"), CYLTagItemAnimation: @"pag-ios/1.pag",
+              CYLTagItemAnimationRestingProgress: @1}]},
         // The options CYLTabBarController's Rive examples use for each file (Example-SwiftUI-Rive): a Rive icon needs its
-        // state machine and input (or animation), given with CYLTagItemAnimationOptions. icons.riv is left out: its
-        // artboards are white strokes for a dark tab bar, invisible on these light tags.
+        // state machine and input (or animation), given with CYLTagItemAnimationOptions. icons.riv follows, on dark tags.
         @{CYLTagSectionTitle: @"Rive · pod 'CYLTabBarController/Rive'", CYLTagSectionItems: @[
             [self item:@"首页" rive:@"house" options:@{@"stateMachine": @"State Machine 1"}],
             [self item:@"完成" rive:@"check" options:@{@"stateMachine": @"State Machine 1", @"triggerInput": @"Check"}],
@@ -65,6 +71,20 @@
             [self item:@"按钮" rive:@"button" options:@{@"animation": @"active"}],
             [self item:@"形状" rive:@"shapes" options:@{@"legacy": @"1"}],
             [self item:@"彩带" rive:@"confetti" options:@{@"stateMachine": @"State Machine 1", @"triggerInput": @"Trigger explosion"}]]},
+        // icons.riv, as on CYLTabBarController's dark Rive tab bar: its artboards are white strokes, so this
+        // section's tags are dark (CYLTagSectionStyle, over the list's style).
+        @{CYLTagSectionTitle: CYLExampleLocalizedString(@"Rive · icons.riv（深色标签）"),
+          CYLTagSectionStyle: @{
+              CYLMenuStyleNormal: @{CYLTagAppearanceBackgroundColor: @"#17203A", CYLTagAppearanceTextColor: @"#FFFFFF",
+                                    CYLTagAppearanceBorderColor: @"#17203A"},
+              CYLMenuStyleSelected: @{CYLTagAppearanceBackgroundColor: @"#3A4E8C", CYLTagAppearanceTextColor: @"#FFFFFF",
+                                      CYLTagAppearanceBorderColor: @"#6792FF"}},
+          CYLTagSectionItems: @[
+            [self item:@"聊天" rive:@"icons" options:@{@"artboard": @"CHAT", @"stateMachine": @"CHAT_Interactivity", @"input": @"active"}],
+            [self item:@"搜索" rive:@"icons" options:@{@"artboard": @"SEARCH", @"stateMachine": @"SEARCH_Interactivity", @"input": @"active"}],
+            [self item:@"计时" rive:@"icons" options:@{@"artboard": @"TIMER", @"stateMachine": @"TIMER_Interactivity", @"input": @"active"}],
+            [self item:@"提醒" rive:@"icons" options:@{@"artboard": @"BELL", @"stateMachine": @"BELL_Interactivity", @"input": @"active"}],
+            [self item:@"我的" rive:@"icons" options:@{@"artboard": @"USER", @"stateMachine": @"USER_Interactivity", @"input": @"active"}]]},
         @{CYLTagSectionTitle: @"GIF · pod 'CYLTabBarController/GIF'", CYLTagSectionItems: @[
             [self item:@"火焰" animation:[self animation:@"GIF/tab_fire.gif"] image:nil],
             [self item:@"火箭" animation:[self animation:@"GIF/tab_rocket.gif"] image:nil],
@@ -166,6 +186,14 @@
     NSString *section = [self.tagListView.menuDataSource menuTitleForSection:indexPath.section];
     NSString *title = [self.tagListView.menuDataSource menuTitleForItemAtIndexPath:indexPath];
     self.statusLabel.text = [NSString stringWithFormat:CYLExampleLocalizedString(@"点击「%@」"), [NSString stringWithFormat:@"%@ · %@", section, title]];
+}
+
+- (void)scrollToSectionIdentifier:(NSString *)identifier {
+    NSUInteger section = [[[self class] sectionIdentifiers] indexOfObject:identifier];
+    if (section == NSNotFound) return;
+    [self loadViewIfNeeded];
+    [self.view layoutIfNeeded];
+    [self.tagListView scrollToSection:(NSInteger)section animated:NO];
 }
 
 @end
