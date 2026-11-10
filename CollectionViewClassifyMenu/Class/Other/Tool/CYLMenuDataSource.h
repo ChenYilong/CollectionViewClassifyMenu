@@ -34,6 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// tags for white icons. Return nil for the list's style. Item height, spacing and insets always come from
 /// the list's style. Return the same object for as long as it does not change.
 - (nullable CYLMenuStyle *)menuStyleForSection:(NSInteger)section;
+/// The look of one item, over its section's (for example an outlined "+ 新建标签" action among the tags).
+/// Return nil for the section's style. Metrics come from the list's style, as for sections.
+- (nullable CYLMenuStyle *)menuStyleForItemAtIndexPath:(NSIndexPath *)indexPath;
 /// Icon drawn before the section title. Return nil for no icon.
 - (nullable UIImage *)menuImageForSection:(NSInteger)section;
 /// View placed at the trailing edge of the section header, such as a picker
@@ -45,6 +48,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// Selecting an exclusive item clears the other items in its section and
 /// vice versa (for example "全部"). Defaults to NO.
 - (BOOL)menuItemIsExclusiveAtIndexPath:(NSIndexPath *)indexPath;
+/// NO for an item that acts like a button in any selection mode, such as "+ 新建标签": a tap is
+/// reported through -menu:didSelectItemAtIndexPath: but the item never stays selected and the
+/// selection does not change. Defaults to YES.
+- (BOOL)menuItemIsSelectableAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
 

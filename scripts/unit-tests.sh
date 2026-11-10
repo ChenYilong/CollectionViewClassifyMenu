@@ -1,21 +1,23 @@
 #!/bin/sh
-# Usage: scripts/unit-tests.sh <suite> [simulator name]     suite: menu | tag | example
+# Usage: scripts/unit-tests.sh <suite> [simulator name]     suite: menu | tag | example | swift
 #
 # [EN] Installs the pods of one project and runs its unit tests on an iOS simulator (macOS with Xcode and CocoaPods):
 #      menu    → CollectionViewClassifyMenu.xcworkspace, scheme CollectionViewClassifyMenuTests
 #      tag     → TagCollectionView/TagCollectionView.xcworkspace, scheme TagCollectionView
 #      example → Example/CYLMenuExample.xcworkspace, scheme CYLMenuExample
+#      swift   → Example-Swift/CYLTagEditorExample.xcworkspace, scheme CYLTagEditorExample (the pure Swift Example)
 #      Prints every test case and the failures; the full log is build/unit-tests-<suite>.log. Exits with xcodebuild's status.
 # [CN] 安装一个工程的 pods，并在 iOS 模拟器上运行其单元测试（需要装有 Xcode 与 CocoaPods 的 macOS）。输出每个测试用例与失败原因；
 #      完整日志为 build/unit-tests-<suite>.log。退出码为 xcodebuild 的结果。
 set -eu
-SUITE="${1:?usage: $0 <menu|tag|example> [simulator name]}"
+SUITE="${1:?usage: $0 <menu|tag|example|swift> [simulator name]}"
 cd "$(dirname "$0")/.."
 ROOT="$PWD"
 case "$SUITE" in
   menu) DIR=.; WORKSPACE=CollectionViewClassifyMenu.xcworkspace; SCHEME=CollectionViewClassifyMenuTests ;;
   tag) DIR=TagCollectionView; WORKSPACE=TagCollectionView.xcworkspace; SCHEME=TagCollectionView ;;
   example) DIR=Example; WORKSPACE=CYLMenuExample.xcworkspace; SCHEME=CYLMenuExample ;;
+  swift) DIR=Example-Swift; WORKSPACE=CYLTagEditorExample.xcworkspace; SCHEME=CYLTagEditorExample ;;
   *) echo "error: unknown suite $SUITE" >&2; exit 2 ;;
 esac
 mkdir -p build

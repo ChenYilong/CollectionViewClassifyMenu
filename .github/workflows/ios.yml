@@ -114,7 +114,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [ menu, tag, example ]
+        suite: [ menu, tag, example, swift ]
     steps:
       - uses: actions/checkout@v4
       - name: CocoaPods cache

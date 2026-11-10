@@ -96,6 +96,9 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 - (NSInteger)numberOfVisibleItemsInSection:(NSInteger)section;
 /// Scrolls so that the section (its header, or its first row) is at the top, as far as the content allows.
 - (void)scrollToSection:(NSInteger)section animated:(BOOL)animated;
+/// Scrolls so that the item is centered vertically, as far as the content allows (e.g. a tag just
+/// created, or the last item). Does nothing for an item that is not shown (folded away).
+- (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
 
 @end
 

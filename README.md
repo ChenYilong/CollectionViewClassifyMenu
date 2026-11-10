@@ -349,6 +349,30 @@ SQL 只用于展示。
 `CYLExampleMenuSource` shows how a host turns its own models into a
 `CYLMenuDataSource`; the core library holds no business data.
 
+### Swift Example / 纯 Swift 示例：新建标签
+
+`Example-Swift/`（`CYLTagEditorExample`）是纯 Swift 编写的示例，同样通过 Podfile 以本地路径集成核心库
+（`pod 'CollectionViewClassifyMenu', :path => '..'`），修改核心代码后直接生效。它演示聊天 App 联系人「编辑备注 → 编辑标签」中
+**新建标签**的场景：
+
+| 页面 | 实现 |
+| --- | --- |
+| 编辑备注（`CYLRemarkViewController`） | 「标签」行显示已选标签（只读的 `CYLTagListView`），点击后以 sheet 弹出编辑标签。 |
+| 编辑标签（`CYLTagEditorViewController`） | 顶部「取消 / 编辑标签 / 完成」，「完成」有选择或改动时为绿色，搜索时不可用；搜索框；「最近使用」与「我的标签」（分组标题右侧为「管理」，`-menuAccessoryViewForSection:`）。选中的标签为绿色，同一标签在两个分组中同时选中。最后一个标签后是「+ 新建标签」，输入名称后新建并选中。 |
+| 搜索 | 输入文字（不区分大小写，如 "ios" 找到 "iOS"）显示「搜索结果」，该名称的标签不存在时末尾为「+ 新建标签：ios」；点击或按键盘搜索键即新建、选中，结束搜索并滚动到新标签。 |
+| 管理 | 「管理」后点击「我的标签」中的标签可删除。 |
+
+为此核心库新增：`-menuItemIsSelectableAtIndexPath:`（「+ 新建标签」这样的操作项：点击会回调，但不会被选中）、
+`-menuStyleForItemAtIndexPath:`（单个标签的外观，如带边框的「+ 新建标签」）与 `-scrollToItemAtIndexPath:animated:`。
+
+```sh
+cd Example-Swift
+pod install
+open CYLTagEditorExample.xcworkspace
+```
+
+CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成其截图（`swift-<页面>.png`）。
+
 ### Naming migration / 命名迁移
 
 This naming change is **source and runtime incompatible** with the old names.

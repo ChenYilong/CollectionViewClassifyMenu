@@ -13,9 +13,10 @@ smallest checks relevant to the change:
 scripts/unit-tests.sh menu       # CollectionViewClassifyMenuTests
 scripts/unit-tests.sh tag        # TagCollectionView tests
 scripts/unit-tests.sh example    # Example (CYLTagListView API and README scenarios)
+scripts/unit-tests.sh swift      # Example-Swift (pure Swift tag editor: new tags)
 scripts/library-warnings.sh      # build + analyze; fails on warnings in the library sources
 scripts/pod-lint.sh lib          # pod lib lint
-scripts/example-screenshots.sh   # simulator screenshots in build/screenshots/
+scripts/example-screenshots.sh   # simulator screenshots in build/screenshots/ (swift-*.png: Example-Swift)
 shellcheck scripts/*.sh
 ```
 

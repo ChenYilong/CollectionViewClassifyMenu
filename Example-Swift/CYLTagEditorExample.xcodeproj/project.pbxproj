@@ -1,0 +1,494 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		85C39F62A8B8E08A61C1F86D /* CYLRemarkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9849E67DD2412DD1240F9BBC /* CYLRemarkViewController.swift */; };
+		F7C1461C29BFDADA0DE22D5D /* CYLTagEditorAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DE5BEAF8017F20341C306F /* CYLTagEditorAppDelegate.swift */; };
+		40F00716DC1B0DA638C6C343 /* CYLTagEditorExample.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 195779B23A13B1FE0BEBC98B /* CYLTagEditorExample.bundle */; };
+		F9448100EA5CEB18E9BD35AB /* CYLTagEditorLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254AC40924DDE49B6A889892 /* CYLTagEditorLocalization.swift */; };
+		AA1C26E6F1163A238D4DE0C8 /* CYLTagEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFEBE6DB72D791D04EF98126 /* CYLTagEditorViewController.swift */; };
+		79A9175921383FB87C570168 /* CYLTagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CDE4D234A48BA27025704B /* CYLTagStore.swift */; };
+		2040ACB320C321BB3E1CED4F /* CYLTagEditorExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53694FCA6B9651EDD95604BE /* CYLTagEditorExampleTests.swift */; };
+		0490FE175868491DBA5FE998 /* Pods_CYLTagEditorExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLTagEditorExample.framework */; };
+		7FFC7CE0B51A13135C1F03C2 /* Pods_CYLTagEditorExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* Pods_CYLTagEditorExampleTests.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		431387EB7262E1CFC79B125E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 99889D60A11D60E2AA54819D;
+			remoteInfo = CYLTagEditorExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		9849E67DD2412DD1240F9BBC /* CYLRemarkViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLRemarkViewController.swift; sourceTree = "<group>"; };
+		16DE5BEAF8017F20341C306F /* CYLTagEditorAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorAppDelegate.swift; sourceTree = "<group>"; };
+		195779B23A13B1FE0BEBC98B /* CYLTagEditorExample.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CYLTagEditorExample.bundle; sourceTree = "<group>"; };
+		254AC40924DDE49B6A889892 /* CYLTagEditorLocalization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorLocalization.swift; sourceTree = "<group>"; };
+		EFEBE6DB72D791D04EF98126 /* CYLTagEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorViewController.swift; sourceTree = "<group>"; };
+		38CDE4D234A48BA27025704B /* CYLTagStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagStore.swift; sourceTree = "<group>"; };
+		E93964D34D5343D81FFD8487 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		53694FCA6B9651EDD95604BE /* CYLTagEditorExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorExampleTests.swift; sourceTree = "<group>"; };
+		2CF1AE40F1C8AEFEDC6C8314 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7F6D01D6546BCD07518D8398 /* CYLTagEditorExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLTagEditorExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		50ED88076C07C90FF1B1A76B /* CYLTagEditorExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLTagEditorExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLTagEditorExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_CYLTagEditorExample.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		57BB6E92C5DE5A01D940E2F0 /* Pods_CYLTagEditorExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_CYLTagEditorExampleTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		12FB6A7055872F5E26C0F65D /* Pods-CYLTagEditorExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTagEditorExample.debug.xcconfig"; path = "Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample.debug.xcconfig"; sourceTree = "<group>"; };
+		4D1F2C5A7C5C5BCDFA029447 /* Pods-CYLTagEditorExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTagEditorExample.release.xcconfig"; path = "Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample.release.xcconfig"; sourceTree = "<group>"; };
+		7E731D0C873CBA73AD9BB6FE /* Pods-CYLTagEditorExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTagEditorExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-CYLTagEditorExampleTests/Pods-CYLTagEditorExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		90D99A12DCA656D50041F5BD /* Pods-CYLTagEditorExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTagEditorExampleTests.release.xcconfig"; path = "Target Support Files/Pods-CYLTagEditorExampleTests/Pods-CYLTagEditorExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		885D3B69EA3BAD459F41048D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0490FE175868491DBA5FE998 /* Pods_CYLTagEditorExample.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		93AE8B951B16FE0E28B7788B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7FFC7CE0B51A13135C1F03C2 /* Pods_CYLTagEditorExampleTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2B731CEFC6751AAE0EC69B98 = {
+			isa = PBXGroup;
+			children = (
+				20F4BD606C0F6D1645AE4919 /* CYLTagEditorExample */,
+				C0D0581312912516FF12D747 /* CYLTagEditorExampleTests */,
+				86024CAD1E83101D97359D73 /* Products */,
+				37CFFB3065F967B06D412EEA /* Pods */,
+				17D4474801E7FB00E1C94899 /* Frameworks */,
+				E446029BCAEBE071AE6DF6EA /* Shared */,
+			);
+			sourceTree = "<group>";
+		};
+		20F4BD606C0F6D1645AE4919 /* CYLTagEditorExample */ = {
+			isa = PBXGroup;
+			children = (
+				9849E67DD2412DD1240F9BBC /* CYLRemarkViewController.swift */,
+				16DE5BEAF8017F20341C306F /* CYLTagEditorAppDelegate.swift */,
+				195779B23A13B1FE0BEBC98B /* CYLTagEditorExample.bundle */,
+				254AC40924DDE49B6A889892 /* CYLTagEditorLocalization.swift */,
+				EFEBE6DB72D791D04EF98126 /* CYLTagEditorViewController.swift */,
+				38CDE4D234A48BA27025704B /* CYLTagStore.swift */,
+				E93964D34D5343D81FFD8487 /* Info.plist */,
+			);
+			path = CYLTagEditorExample;
+			sourceTree = "<group>";
+		};
+		C0D0581312912516FF12D747 /* CYLTagEditorExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				53694FCA6B9651EDD95604BE /* CYLTagEditorExampleTests.swift */,
+				2CF1AE40F1C8AEFEDC6C8314 /* Info.plist */,
+			);
+			path = CYLTagEditorExampleTests;
+			sourceTree = "<group>";
+		};
+		E446029BCAEBE071AE6DF6EA /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		86024CAD1E83101D97359D73 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7F6D01D6546BCD07518D8398 /* CYLTagEditorExample.app */,
+				50ED88076C07C90FF1B1A76B /* CYLTagEditorExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		37CFFB3065F967B06D412EEA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				12FB6A7055872F5E26C0F65D /* Pods-CYLTagEditorExample.debug.xcconfig */,
+				4D1F2C5A7C5C5BCDFA029447 /* Pods-CYLTagEditorExample.release.xcconfig */,
+				7E731D0C873CBA73AD9BB6FE /* Pods-CYLTagEditorExampleTests.debug.xcconfig */,
+				90D99A12DCA656D50041F5BD /* Pods-CYLTagEditorExampleTests.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		17D4474801E7FB00E1C94899 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLTagEditorExample.framework */,
+				57BB6E92C5DE5A01D940E2F0 /* Pods_CYLTagEditorExampleTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		99889D60A11D60E2AA54819D /* CYLTagEditorExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E345CD130BDE71A07539FC5 /* Build configuration list for PBXNativeTarget "CYLTagEditorExample" */;
+			buildPhases = (
+				F2A0EAAF82B272E15DF53425 /* [CP] Check Pods Manifest.lock */,
+				E8E4FFBB286BA59E6C040EC3 /* Sources */,
+				885D3B69EA3BAD459F41048D /* Frameworks */,
+				F1E4C7A124641C6201468B9C /* Resources */,
+				1B05EBA6D227C0F8573B1421 /* [CP] Copy Pods Resources */,
+				BA59F172125A1A92A9D910E1 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CYLTagEditorExample;
+			productName = CYLTagEditorExample;
+			productReference = 7F6D01D6546BCD07518D8398 /* CYLTagEditorExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FB5BDAF40F71088308F0F591 /* CYLTagEditorExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 19C3ED96BF8CF288FF46FEB0 /* Build configuration list for PBXNativeTarget "CYLTagEditorExampleTests" */;
+			buildPhases = (
+				C86DB67C4E52B5851DCD29D2 /* [CP] Check Pods Manifest.lock */,
+				F59C492771BBD8408142EC60 /* Sources */,
+				93AE8B951B16FE0E28B7788B /* Frameworks */,
+				4D8F1B5AD56B6957A1012DC0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2254342BECCEAFBD04538E0A /* PBXTargetDependency */,
+			);
+			name = CYLTagEditorExampleTests;
+			productName = CYLTagEditorExampleTests;
+			productReference = 50ED88076C07C90FF1B1A76B /* CYLTagEditorExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1500;
+				ORGANIZATIONNAME = ChenYilong;
+				TargetAttributes = {
+					FB5BDAF40F71088308F0F591 = {
+						TestTargetID = 99889D60A11D60E2AA54819D;
+					};
+				};
+			};
+			buildConfigurationList = 01076EBF22530E406F54B419 /* Build configuration list for PBXProject "CYLTagEditorExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2B731CEFC6751AAE0EC69B98;
+			productRefGroup = 86024CAD1E83101D97359D73 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				99889D60A11D60E2AA54819D /* CYLTagEditorExample */,
+				FB5BDAF40F71088308F0F591 /* CYLTagEditorExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F1E4C7A124641C6201468B9C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				40F00716DC1B0DA638C6C343 /* CYLTagEditorExample.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D8F1B5AD56B6957A1012DC0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F2A0EAAF82B272E15DF53425 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CYLTagEditorExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C86DB67C4E52B5851DCD29D2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CYLTagEditorExampleTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1B05EBA6D227C0F8573B1421 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/CollectionViewClassifyMenu/CYLClassifyMenuResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLClassifyMenuResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BA59F172125A1A92A9D910E1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E8E4FFBB286BA59E6C040EC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85C39F62A8B8E08A61C1F86D /* CYLRemarkViewController.swift in Sources */,
+				F7C1461C29BFDADA0DE22D5D /* CYLTagEditorAppDelegate.swift in Sources */,
+				F9448100EA5CEB18E9BD35AB /* CYLTagEditorLocalization.swift in Sources */,
+				AA1C26E6F1163A238D4DE0C8 /* CYLTagEditorViewController.swift in Sources */,
+				79A9175921383FB87C570168 /* CYLTagStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F59C492771BBD8408142EC60 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2040ACB320C321BB3E1CED4F /* CYLTagEditorExampleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2254342BECCEAFBD04538E0A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 99889D60A11D60E2AA54819D /* CYLTagEditorExample */;
+			targetProxy = 431387EB7262E1CFC79B125E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FA9139DD8B03E3F922556BF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SWIFT_VERSION = 5.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		FFE2104CCFAB79205AC64460 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SWIFT_VERSION = 5.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		72FB3ED29B4639D83EC5DB14 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 12FB6A7055872F5E26C0F65D /* Pods-CYLTagEditorExample.debug.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = CYLTagEditorExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTagEditorExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Debug;
+		};
+		191734982F22ABEBB64A1AE0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4D1F2C5A7C5C5BCDFA029447 /* Pods-CYLTagEditorExample.release.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = CYLTagEditorExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTagEditorExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Release;
+		};
+		0B9D7A058B3133F2CFB1D4A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7E731D0C873CBA73AD9BB6FE /* Pods-CYLTagEditorExampleTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = CYLTagEditorExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTagEditorExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CYLTagEditorExample.app/CYLTagEditorExample";
+			};
+			name = Debug;
+		};
+		17BFBBF586B1A6F2699F7699 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 90D99A12DCA656D50041F5BD /* Pods-CYLTagEditorExampleTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = CYLTagEditorExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTagEditorExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CYLTagEditorExample.app/CYLTagEditorExample";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		01076EBF22530E406F54B419 /* Build configuration list for PBXProject "CYLTagEditorExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA9139DD8B03E3F922556BF8 /* Debug */,
+				FFE2104CCFAB79205AC64460 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7E345CD130BDE71A07539FC5 /* Build configuration list for PBXNativeTarget "CYLTagEditorExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72FB3ED29B4639D83EC5DB14 /* Debug */,
+				191734982F22ABEBB64A1AE0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		19C3ED96BF8CF288FF46FEB0 /* Build configuration list for PBXNativeTarget "CYLTagEditorExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B9D7A058B3133F2CFB1D4A0 /* Debug */,
+				17BFBBF586B1A6F2699F7699 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}

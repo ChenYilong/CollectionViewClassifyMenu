@@ -1,0 +1,21 @@
+/* CYLTagEditorExample: keys are the Simplified Chinese text. */
+"取消" = "Cancel";
+"完成" = "Done";
+"编辑备注" = "Edit Remarks";
+"备注名" = "Remark name";
+"标签" = "Tags";
+"编辑标签" = "Edit Tags";
+"添加标签" = "Add Tags";
+"搜索" = "Search";
+"搜索结果" = "Search Results";
+"最近使用" = "Recent";
+"我的标签" = "My Tags";
+"退出管理" = "Done Managing";
+"管理" = "Manage";
+"已新建标签：%@" = "Tag created: %@";
+"新建标签" = "New Tag";
+"标签名称" = "Tag name";
+"确定" = "OK";
+"删除标签「%@」？" = "Delete the tag “%@”?";
+"删除" = "Delete";
+"新建标签：%@" = "New tag: %@";

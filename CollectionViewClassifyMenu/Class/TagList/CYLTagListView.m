@@ -410,6 +410,18 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     return [progress isKindOfClass:[NSNumber class]] ? progress.doubleValue : 0;
 }
 
+/// The item's own look, or its section's.
+- (CYLMenuStyle *)cyl_styleForItemAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    CYLMenuStyle *style = [source respondsToSelector:@selector(menuStyleForItemAtIndexPath:)] ? [source menuStyleForItemAtIndexPath:indexPath] : nil;
+    return [style isKindOfClass:[CYLMenuStyle class]] ? style : [self cyl_styleForSection:indexPath.section];
+}
+
+- (BOOL)cyl_isSelectableAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    return ![source respondsToSelector:@selector(menuItemIsSelectableAtIndexPath:)] || [source menuItemIsSelectableAtIndexPath:indexPath];
+}
+
 /// The section's own look, or the list's style.
 - (CYLMenuStyle *)cyl_styleForSection:(NSInteger)section {
     id<CYLMenuDataSource> source = self.menuDataSource;
@@ -445,10 +457,10 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     UITraitCollection *traits = self.traitCollection;
     NSMutableArray *widths = [NSMutableArray arrayWithCapacity:self.titles.count];
     [self.titles enumerateObjectsUsingBlock:^(NSArray<NSString *> *items, NSUInteger section, BOOL *stop) {
-        CYLMenuStyle *style = [self cyl_styleForSection:section];
         NSMutableArray *sectionWidths = [NSMutableArray arrayWithCapacity:items.count];
         [items enumerateObjectsUsingBlock:^(NSString *title, NSUInteger item, BOOL *itemStop) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
+            CYLMenuStyle *style = [self cyl_styleForItemAtIndexPath:indexPath];
             CGSize iconSize = [CYLTagButton iconSizeForImage:[self cyl_imageAtIndexPath:indexPath]
                                                     animated:[self cyl_animationURLAtIndexPath:indexPath] != nil
                                                        style:style];
@@ -604,6 +616,25 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [collection setContentOffset:CGPointMake(collection.contentOffset.x, MIN(MAX(top - inset.top, -inset.top), maxOffset)) animated:animated];
 }
 
+- (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated {
+    if (![self cyl_isValidIndexPath:indexPath] || indexPath.item >= [self numberOfVisibleItemsInSection:indexPath.section]) {
+        return;
+    }
+    UICollectionView *collection = self.collectionView;
+    [self layoutIfNeeded];
+    [collection layoutIfNeeded];
+    UICollectionViewLayout *layout = collection.collectionViewLayout;
+    UICollectionViewLayoutAttributes *attributes = [layout layoutAttributesForItemAtIndexPath:indexPath];
+    if (!attributes) {
+        return;
+    }
+    UIEdgeInsets inset = collection.adjustedContentInset;
+    CGFloat visibleHeight = CGRectGetHeight(collection.bounds) - inset.top - inset.bottom;
+    CGFloat target = CGRectGetMidY(attributes.frame) - visibleHeight / 2 - inset.top;
+    CGFloat maxOffset = MAX(-inset.top, layout.collectionViewContentSize.height + inset.bottom - CGRectGetHeight(collection.bounds));
+    [collection setContentOffset:CGPointMake(collection.contentOffset.x, MIN(MAX(target, -inset.top), maxOffset)) animated:animated];
+}
+
 #pragma mark Folding
 
 - (BOOL)cyl_canFoldRowCount:(NSUInteger)rowCount {
@@ -746,14 +777,17 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
             if (![self cyl_isValidIndexPath:indexPath]) {
                 [NSException raise:NSInvalidArgumentException format:@"Invalid menu selection: %@", indexPath];
             }
-            [self cyl_applySelectionOfIndexPath:indexPath removed:nil];
+            if ([self cyl_isSelectableAtIndexPath:indexPath]) {
+                [self cyl_applySelectionOfIndexPath:indexPath removed:nil];
+            }
         }
     }
     [self cyl_refreshVisibleCells];
 }
 
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.selectionMode == CYLMenuSelectionModeNone || ![self cyl_isValidIndexPath:indexPath]) {
+    if (self.selectionMode == CYLMenuSelectionModeNone || ![self cyl_isValidIndexPath:indexPath] ||
+        ![self cyl_isSelectableAtIndexPath:indexPath]) {
         return;
     }
     [self cyl_applySelectionOfIndexPath:indexPath removed:nil];
@@ -806,7 +840,8 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     }
     NSMutableArray<NSIndexPath *> *removed = [NSMutableArray array];
     BOOL selected = NO;
-    switch (self.selectionMode) {
+    BOOL selectable = [self cyl_isSelectableAtIndexPath:indexPath];
+    switch (selectable ? self.selectionMode : CYLMenuSelectionModeNone) {
         case CYLMenuSelectionModeNone:
             selected = YES;
             break;
@@ -839,7 +874,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     if (selected && [delegate respondsToSelector:@selector(menu:didSelectItemAtIndexPath:)]) {
         [delegate menu:self didSelectItemAtIndexPath:indexPath];
     }
-    BOOL changed = removed.count > 0 || (selected && self.selectionMode != CYLMenuSelectionModeNone);
+    BOOL changed = removed.count > 0 || (selected && selectable && self.selectionMode != CYLMenuSelectionModeNone);
     if (changed && [delegate respondsToSelector:@selector(menu:didChangeSelectedItems:)]) {
         [delegate menu:self didChangeSelectedItems:self.selectedIndexPaths];
     }
@@ -860,7 +895,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
                        image:[self cyl_imageAtIndexPath:indexPath]
                selectedImage:[self cyl_selectedImageAtIndexPath:indexPath]
                 animationURL:[self cyl_animationURLAtIndexPath:indexPath]
-                       style:[self cyl_styleForSection:indexPath.section]
+                       style:[self cyl_styleForItemAtIndexPath:indexPath]
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];
     cell.button.animationRestingProgress = [self cyl_animationRestingProgressAtIndexPath:indexPath];
