@@ -171,6 +171,8 @@ New APIs / 新增接口:
 | `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
 | `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也可单独使用 |
 | `-menuSelectedImageForItemAtIndexPath:` | 选中态图标 |
+| `-menuAnimationURLForItemAtIndexPath:`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / GIF 动效图标（CYLTabBarController 动效引擎） |
+| `-initWithConfiguration:`, `+tagListViewWithConfigurationFile:error:`, `+styleWithConfiguration:` | 字典（map）与配置文件初始化 |
 | `selectionMode`, `allowsEmptySelection` | 无选择 / 单选 / 多选（支持互斥项“全部”） |
 | `foldStyle`, `defaultVisibleRows` | 标题“更多”按钮、底部箭头或仅截断预览 |
 | `showsSectionHeaders` | 分组或平铺 |
@@ -205,7 +207,44 @@ style.normalAppearance.margin = 12;
 style.selectedAppearance.backgroundColor = UIColor.systemBlueColor;
 ```
 
-数据源可通过 `-menuSelectedImageForItemAtIndexPath:` 提供选中态图标。Example 的「样式」Tab
+数据源可通过 `-menuSelectedImageForItemAtIndexPath:` 提供选中态图标。
+
+#### 动效图标 / Animated icons
+
+`-menuAnimationURLForItemAtIndexPath:`（或 `CYLTagButton.animationURL`）可以提供 Lottie（.json）、PAG（.pag）、
+Rive（.riv）、GIF 动效文件，播放方式与 CYLTabBarController 的 Tab 图标相同：点击选中时播放，选中时停在最后一帧，
+取消选中时回到第一帧（减弱动态效果时不播放）。动效视图与播放器来自 CYLTabBarController 的动效引擎
+（`CYLTabBarItemAnimationFactory`），组件在运行时查找，不依赖 CYLTabBarController；在 App 的 Podfile 中加入需要的动效库：
+
+```ruby
+pod 'CYLTabBarController/Lottie'   # 或 /PAG、/Rive、/GIF
+```
+
+未链接动效引擎或文件无法加载时显示静态图标。`style.animationSize`、`style.animationSpeed` 设置大小与速度。
+
+#### 字典与配置文件初始化 / Map and configuration file
+
+与 CYLTabBarController 的 `-initWithConfiguration:`、`-initWithConfigurationFile:error:` 相同：
+
+```objc
+CYLTagListView *tags = [[CYLTagListView alloc] initWithConfiguration:@{
+    CYLTagListViewSelectionMode : @"multiple",
+    CYLTagListViewFoldStyle : @"footerChevron",
+    CYLTagListViewStyle : @{ CYLMenuStyleNormal : @{ CYLTagAppearanceCornerRadius : @0 } },
+    CYLTagListViewSections : @[ @{ CYLTagSectionTitle : @"Tabs",
+                                   CYLTagSectionItems : @[ @{ CYLTagItemTitle : @"Home",
+                                                              CYLTagItemImage : @"system:house",
+                                                              CYLTagItemAnimation : @"tab_home.json" } ] } ],
+}];
+NSError *error = nil;
+CYLTagListView *fromFile = [CYLTagListView tagListViewWithConfigurationFile:@"tags.json" error:&error];
+```
+
+文件中的值都可以写成字符串（颜色 "#RRGGBB"、图片 "system:star"、内边距 "{t, l, b, r}" 或数组、枚举名称等），
+文件名相对于配置文件或 App 资源解析。JSON 与 plist 直接读取；YAML、TOML 等格式在链接 CYLTabBarController 时由其解析器读取。
+示例见 `Example/CYLMenuExample/CYLMenuExample.bundle/Configurations/animated-tags.json` 与
+`CYLTagConfigurationDemoViewController`。Example 的 PAG 示例文件由 `pod install` 下载（`scripts/fetch-animation-resources.py`，
+固定版本并校验 SHA-256，与 CYLTabBarController 相同）。Example 的「样式」Tab
 （`CYLTagStyleDemoViewController`）参照 `CYLFlatDesignTabBarDemoViewController`：上方为标签预览，
 点击下方列表的每一行即时修改一个参数。
 

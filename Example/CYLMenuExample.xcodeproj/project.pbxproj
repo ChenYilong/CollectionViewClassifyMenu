@@ -17,11 +17,13 @@
 		484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */; };
 		0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */; };
 		73A3277A5C672326E77E4A50 /* CYLSearchHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E23DA0EB4A75F0D0109EC27 /* CYLSearchHomeViewController.m */; };
+		CB427645F40F1C4CE7D760FF /* CYLTagConfigurationDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4908BFD078CB19FD08B40570 /* CYLTagConfigurationDemoViewController.m */; };
 		F00293E01049837C88AD1BD4 /* CYLTagStyleDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 826D801463BB6967615FEFB8 /* CYLTagStyleDemoViewController.m */; };
 		6345674F0F0AAACA8D0859D2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 714D4F5C3B6CCF802F032827 /* main.m */; };
 		5F0C081A2A1F3962E352DBFD /* CYLMenuExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */; };
-		0490FE175868491DBA5FE998 /* libPods-CYLMenuExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* libPods-CYLMenuExample.a */; };
-		7FFC7CE0B51A13135C1F03C2 /* libPods-CYLMenuExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* libPods-CYLMenuExampleTests.a */; };
+		0490FE175868491DBA5FE998 /* Pods_CYLMenuExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */; };
+		7FFC7CE0B51A13135C1F03C2 /* Pods_CYLMenuExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* Pods_CYLMenuExampleTests.framework */; };
+		0CA8FA5DC284C2D9D247254F /* pag-ios in Resources */ = {isa = PBXBuildFile; fileRef = BB7F96C76ED83BB97B6AC9F1 /* pag-ios */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +56,8 @@
 		9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSearchCategoryViewController.m; sourceTree = "<group>"; };
 		415F93E8CDE5FE1F1A4EEBB4 /* CYLSearchHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSearchHomeViewController.h; sourceTree = "<group>"; };
 		0E23DA0EB4A75F0D0109EC27 /* CYLSearchHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSearchHomeViewController.m; sourceTree = "<group>"; };
+		B4209A8A071E7E22B0A7BE2E /* CYLTagConfigurationDemoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagConfigurationDemoViewController.h; sourceTree = "<group>"; };
+		4908BFD078CB19FD08B40570 /* CYLTagConfigurationDemoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagConfigurationDemoViewController.m; sourceTree = "<group>"; };
 		E6A6E1EFAF90CE546689D69A /* CYLTagStyleDemoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagStyleDemoViewController.h; sourceTree = "<group>"; };
 		826D801463BB6967615FEFB8 /* CYLTagStyleDemoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagStyleDemoViewController.m; sourceTree = "<group>"; };
 		261CB08FA58627B5FB7DB381 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -62,8 +66,9 @@
 		C55FFF355A1E5A46E3D41489 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F6D01D6546BCD07518D8398 /* CYLMenuExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLMenuExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50ED88076C07C90FF1B1A76B /* CYLMenuExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLMenuExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B92E3BF9D9E55A1A7600BEB5 /* libPods-CYLMenuExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CYLMenuExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		57BB6E92C5DE5A01D940E2F0 /* libPods-CYLMenuExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CYLMenuExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_CYLMenuExample.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		57BB6E92C5DE5A01D940E2F0 /* Pods_CYLMenuExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_CYLMenuExampleTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB7F96C76ED83BB97B6AC9F1 /* pag-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "pag-ios"; path = "../Example-Shared/PAGResources/pag-ios"; sourceTree = SOURCE_ROOT; };
 		EAF5130865FE94D53B6E37BC /* Pods-CYLMenuExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExample.debug.xcconfig"; path = "Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample.debug.xcconfig"; sourceTree = "<group>"; };
 		651A60C563CAFE3ABD82F8A0 /* Pods-CYLMenuExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExample.release.xcconfig"; path = "Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample.release.xcconfig"; sourceTree = "<group>"; };
 		813659A7FC66C3A76C2AE901 /* Pods-CYLMenuExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-CYLMenuExampleTests/Pods-CYLMenuExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -75,7 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0490FE175868491DBA5FE998 /* libPods-CYLMenuExample.a in Frameworks */,
+				0490FE175868491DBA5FE998 /* Pods_CYLMenuExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +88,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7FFC7CE0B51A13135C1F03C2 /* libPods-CYLMenuExampleTests.a in Frameworks */,
+				7FFC7CE0B51A13135C1F03C2 /* Pods_CYLMenuExampleTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +103,7 @@
 				86024CAD1E83101D97359D73 /* Products */,
 				37CFFB3065F967B06D412EEA /* Pods */,
 				17D4474801E7FB00E1C94899 /* Frameworks */,
+				BB7F96C76ED83BB97B6AC9F1 /* pag-ios */,
 			);
 			sourceTree = "<group>";
 		};
@@ -123,6 +129,8 @@
 				9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */,
 				415F93E8CDE5FE1F1A4EEBB4 /* CYLSearchHomeViewController.h */,
 				0E23DA0EB4A75F0D0109EC27 /* CYLSearchHomeViewController.m */,
+				B4209A8A071E7E22B0A7BE2E /* CYLTagConfigurationDemoViewController.h */,
+				4908BFD078CB19FD08B40570 /* CYLTagConfigurationDemoViewController.m */,
 				E6A6E1EFAF90CE546689D69A /* CYLTagStyleDemoViewController.h */,
 				826D801463BB6967615FEFB8 /* CYLTagStyleDemoViewController.m */,
 				261CB08FA58627B5FB7DB381 /* Info.plist */,
@@ -164,8 +172,8 @@
 		17D4474801E7FB00E1C94899 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B92E3BF9D9E55A1A7600BEB5 /* libPods-CYLMenuExample.a */,
-				57BB6E92C5DE5A01D940E2F0 /* libPods-CYLMenuExampleTests.a */,
+				B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */,
+				57BB6E92C5DE5A01D940E2F0 /* Pods_CYLMenuExampleTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -182,6 +190,7 @@
 				885D3B69EA3BAD459F41048D /* Frameworks */,
 				F1E4C7A124641C6201468B9C /* Resources */,
 				1B05EBA6D227C0F8573B1421 /* [CP] Copy Pods Resources */,
+				BA59F172125A1A92A9D910E1 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -250,6 +259,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */,
+				0CA8FA5DC284C2D9D247254F /* pag-ios in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,6 +335,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		BA59F172125A1A92A9D910E1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -341,6 +368,7 @@
 				484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */,
 				0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */,
 				73A3277A5C672326E77E4A50 /* CYLSearchHomeViewController.m in Sources */,
+				CB427645F40F1C4CE7D760FF /* CYLTagConfigurationDemoViewController.m in Sources */,
 				F00293E01049837C88AD1BD4 /* CYLTagStyleDemoViewController.m in Sources */,
 				6345674F0F0AAACA8D0859D2 /* main.m in Sources */,
 			);

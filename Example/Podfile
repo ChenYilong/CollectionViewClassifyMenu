@@ -1,15 +1,43 @@
-# Integrates the local core library from the repository root, and CYLTabBarController for the app's tab bars:
-# the root tab bar (场景一 / 场景二) and the category tab bar at the top of 场景二.
+# Integrates the local core library from the repository root, and CYLTabBarController:
+# - the app's tab bars (root tab bar, and the category tab bar of scenario 2);
+# - its tab icon animation engine and libraries, which the core library's tags use for
+#   animated icons, found at runtime as CYLTabBarController's own Core does.
 platform :ios, '15.0'
+ENV['SWIFT_VERSION'] = '5'
 project 'CYLMenuExample.xcodeproj'
 
+# The revision whose API the Example uses (feat/cross-platform-components); update together.
+CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
+                :commit => '9b9fab4032f18794ed9a9c5d4f24dfc4865fadd1' }
+
 target 'CYLMenuExample' do
+  # As CYLTabBarController's examples: the Rive animator has Swift files.
+  use_frameworks!
   pod 'CollectionViewClassifyMenu', :path => '..'
-  # Pinned to the revision whose API the Example uses; update together with the Example.
-  pod 'CYLTabBarController', :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                             :commit => '4209e37da86a3b0f14334f5573d152ac938908c7'
+  pod 'CYLTabBarController', CYL_TAB_BAR
+  # Animated tag icons, the same libraries and animators as CYLTabBarController's tab icons.
+  pod 'CYLTabBarController/Lottie', CYL_TAB_BAR
+  pod 'CYLTabBarController/PAG', CYL_TAB_BAR
+  pod 'CYLTabBarController/Rive', CYL_TAB_BAR
+  pod 'CYLTabBarController/GIF', CYL_TAB_BAR
 
   target 'CYLMenuExampleTests' do
     inherit! :search_paths
+  end
+end
+
+# The .pag files are not in the repository: download them (pinned, SHA-256 checked) like the
+# pods themselves, as CYLTabBarController's Example-PAG does.
+pre_install do |installer|
+  # Pods/ is Example/Pods, so the script is two levels up.
+  script = File.expand_path('../../scripts/fetch-animation-resources.py', installer.sandbox.root.to_s)
+  system('python3', script, 'PAGResources') || abort('[!] Could not download the PAG files: python3 ' + script)
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
   end
 end

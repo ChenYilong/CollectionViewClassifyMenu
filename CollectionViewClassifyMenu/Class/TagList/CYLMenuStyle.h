@@ -62,6 +62,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// the icon at the leading margin (as CYLFlatDesignTabBarItem.layoutCentered = NO).
 @property (nonatomic, assign) BOOL layoutCentered;
 
+/// Size of animated icons (`menuAnimationURLForItemAtIndexPath:`). CGSizeZero (the default) uses imageSize.
+@property (nonatomic, assign) CGSize animationSize;
+/// Playback speed of animated icons, as `CYLTabBarController.tabBarItemAnimationSpeed`; 1 (the default)
+/// is the file's own speed.
+@property (nonatomic, assign) CGFloat animationSpeed;
+
 /// Scale the appearance fonts for Dynamic Type (capped at 2x). Defaults to YES.
 @property (nonatomic, assign) BOOL adjustsFontForContentSizeCategory;
 /// Minimum tag height; grows with the font for large text sizes. 30 by default.

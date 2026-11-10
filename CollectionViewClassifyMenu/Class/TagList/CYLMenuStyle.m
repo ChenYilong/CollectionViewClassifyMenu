@@ -39,6 +39,7 @@
         _imageTitleSpacing = 4;
         _imageSize = CGSizeMake(14, 14);
         _layoutCentered = YES;
+        _animationSpeed = 1;
         _adjustsFontForContentSizeCategory = YES;
         _itemHeight = 30;
         _interitemSpacing = 10;
@@ -67,6 +68,8 @@
     copy.titlePositionAdjustment = self.titlePositionAdjustment;
     copy.imagePositionAdjustment = self.imagePositionAdjustment;
     copy.layoutCentered = self.layoutCentered;
+    copy.animationSize = self.animationSize;
+    copy.animationSpeed = self.animationSpeed;
     copy.adjustsFontForContentSizeCategory = self.adjustsFontForContentSizeCategory;
     copy.itemHeight = self.itemHeight;
     copy.interitemSpacing = self.interitemSpacing;

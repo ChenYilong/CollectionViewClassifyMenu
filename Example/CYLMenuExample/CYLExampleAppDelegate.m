@@ -9,6 +9,7 @@
 #import "CYLSearchCategoryViewController.h"
 #import "CYLSearchHomeViewController.h"
 #import "CYLTagStyleDemoViewController.h"
+#import "CYLTagConfigurationDemoViewController.h"
 #import "CYLExampleLocalization.h"
 
 @implementation CYLExampleAppDelegate
@@ -134,10 +135,18 @@
             @"style-custom": @[@"cornerRadius", @"imageTitleSpacing", @"iconColor.normal", @"backgroundColor.selected", @"borderColor", @"borderWidth"],
             @"style-icon-only": @[@"content.iconOnly", @"cornerRadius"],
             @"style-title-uncentered": @[@"content.titleOnly", @"layoutCentered"],
+            @"style-lottie": @[@"animation.lottie"],
+            @"style-pag": @[@"animation.pag"],
+            @"style-rive": @[@"animation.rive"],
+            @"style-gif": @[@"animation.gif"],
         };
         for (NSString *action in actions[screen]) {
             [demo performAction:action];
         }
+    } else if ([screen isEqualToString:@"config"]) {
+        tabs.selectedIndex = 2;
+        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[2];
+        [navigation pushViewController:[[CYLTagConfigurationDemoViewController alloc] init] animated:NO];
     } else if ([screen isEqualToString:@"search-home"]) {
         tabs.selectedIndex = 1;
     } else if ([screen hasPrefix:@"search"]) {

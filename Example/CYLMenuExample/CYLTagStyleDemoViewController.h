@@ -25,6 +25,8 @@ typedef NS_ENUM(NSInteger, CYLTagStyleDemoContent) {
 /// The style being edited; applied to the preview after every action.
 @property (nonatomic, strong, readonly) CYLMenuStyle *style;
 @property (nonatomic, assign, readonly) CYLTagStyleDemoContent content;
+/// "lottie", "gif", "pag", "rive", or nil for static icons.
+@property (nonatomic, copy, readonly, nullable) NSString *animationLibrary;
 
 /// Identifiers of the actions, in table order (e.g. @"iconColor.normal", @"cornerRadius").
 - (NSArray<NSArray<NSString *> *> *)actionIdentifiers;

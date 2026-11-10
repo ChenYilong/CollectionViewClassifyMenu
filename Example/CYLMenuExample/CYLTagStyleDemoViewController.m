@@ -6,6 +6,7 @@
 #import "CYLTagStyleDemoViewController.h"
 #import "CYLExampleMenuSource.h"
 #import "CYLExampleLocalization.h"
+#import "CYLTagConfigurationDemoViewController.h"
 
 static NSString * const kStyleCell = @"StyleCell";
 
@@ -14,6 +15,7 @@ static NSString * const kStyleCell = @"StyleCell";
 @property (nonatomic, strong, readwrite) UITableView *tableView;
 @property (nonatomic, strong, readwrite) CYLMenuStyle *style;
 @property (nonatomic, assign, readwrite) CYLTagStyleDemoContent content;
+@property (nonatomic, copy, readwrite, nullable) NSString *animationLibrary;
 @property (nonatomic, assign) BOOL usesSelectedImage;
 @property (nonatomic, strong) CYLExampleMenuSource *menuSource;
 @property (nonatomic, strong) NSLayoutConstraint *previewHeight;
@@ -31,6 +33,7 @@ static NSString * const kStyleCell = @"StyleCell";
           @"imageTitleSpacing", @"imageSize", @"imageInsets", @"titlePositionAdjustment", @"imagePositionAdjustment",
           @"content.iconAndTitle", @"content.iconOnly", @"content.titleOnly", @"layoutCentered", @"selectedImage"],
         @[@"backgroundColor.normal", @"backgroundColor.selected", @"borderColor", @"borderWidth", @"cornerRadius", @"margin"],
+        @[@"animation.lottie", @"animation.pag", @"animation.rive", @"animation.gif", @"animation.off", @"animationSpeed", @"configuration"],
         @[@"reset"],
     ];
 }
@@ -38,6 +41,7 @@ static NSString * const kStyleCell = @"StyleCell";
 - (NSString *)titleForSection:(NSInteger)section {
     return @[CYLExampleLocalizedString(@"标题与图标（参照 CYLFlatDesignTabBarItem）"),
              CYLExampleLocalizedString(@"背景、边框与圆角（参照 CYLBadgeView）"),
+             CYLExampleLocalizedString(@"动效图标（CYLTabBarController 动效引擎）"),
              CYLExampleLocalizedString(@"其它")][section];
 }
 
@@ -64,6 +68,13 @@ static NSString * const kStyleCell = @"StyleCell";
         @"borderWidth": @"设置边框宽度 borderWidth",
         @"cornerRadius": @"设置圆角 cornerRadius（0 为胶囊）",
         @"margin": @"设置内边距 margin",
+        @"animation.lottie": @"Lottie 动效图标",
+        @"animation.pag": @"PAG 动效图标",
+        @"animation.rive": @"Rive 动效图标",
+        @"animation.gif": @"GIF 动效图标",
+        @"animation.off": @"关闭动效（静态图标）",
+        @"animationSpeed": @"设置动效速度 animationSpeed",
+        @"configuration": @"配置文件 / 字典（map）初始化",
         @"reset": @"重置 reset",
     };
     return CYLExampleLocalizedString(titles[identifier]);
@@ -154,9 +165,25 @@ static NSString * const kStyleCell = @"StyleCell";
         for (CYLTagAppearance *appearance in @[style.normalAppearance, style.selectedAppearance, style.disabledAppearance]) {
             appearance.margin = margin;
         }
+    } else if ([identifier hasPrefix:@"animation."]) {
+        NSString *library = [identifier substringFromIndex:@"animation.".length];
+        self.animationLibrary = [library isEqualToString:@"off"] ? nil : library;
+        [self reloadItems];
+        // Show the animations: play the selected tag's icon.
+        for (NSIndexPath *indexPath in self.tagListView.selectedIndexPaths) {
+            UICollectionView *collection = [self.tagListView valueForKey:@"collectionView"];
+            [collection layoutIfNeeded];
+            [(CYLTagButton *)[[collection cellForItemAtIndexPath:indexPath] valueForKey:@"button"] playAnimation];
+        }
+    } else if ([identifier isEqualToString:@"animationSpeed"]) {
+        style.animationSpeed = [@[@0.5, @2, @1][step % 3] doubleValue];
+    } else if ([identifier isEqualToString:@"configuration"]) {
+        [self.navigationController pushViewController:[[CYLTagConfigurationDemoViewController alloc] init] animated:YES];
+        return;
     } else if ([identifier isEqualToString:@"reset"]) {
         self.style = [[self class] demoStyle];
         self.content = CYLTagStyleDemoContentIconAndTitle;
+        self.animationLibrary = nil;
         self.usesSelectedImage = YES;
         [self.steps removeAllObjects];
         [self reloadItems];
@@ -177,6 +204,12 @@ static NSString * const kStyleCell = @"StyleCell";
     if ([identifier isEqualToString:@"borderWidth"]) return [NSString stringWithFormat:@"%.1f", style.normalAppearance.borderWidth];
     if ([identifier isEqualToString:@"cornerRadius"]) return [NSString stringWithFormat:@"%.0f", style.normalAppearance.cornerRadius];
     if ([identifier isEqualToString:@"margin"]) return [NSString stringWithFormat:@"%.0f", style.normalAppearance.margin];
+    if ([identifier isEqualToString:@"animationSpeed"]) return [NSString stringWithFormat:@"%.1f", style.animationSpeed];
+    if ([identifier hasPrefix:@"animation."]) {
+        NSString *library = [identifier substringFromIndex:@"animation.".length];
+        BOOL current = [library isEqualToString:@"off"] ? self.animationLibrary == nil : [library isEqualToString:self.animationLibrary ?: @""];
+        return current ? @"✓" : @"";
+    }
     if ([identifier hasPrefix:@"content."]) {
         NSString *current = @[@"content.iconAndTitle", @"content.iconOnly", @"content.titleOnly"][self.content];
         return [identifier isEqualToString:current] ? @"✓" : @"";
@@ -216,6 +249,9 @@ static NSString * const kStyleCell = @"StyleCell";
         item.image = titleOnly ? nil : [UIImage systemImageNamed:sample[1]];
         item.selectedImage = (titleOnly || !self.usesSelectedImage) ? nil : [UIImage systemImageNamed:sample[2]];
         item.enabled = ![sample[0] isEqualToString:@"已禁用"];
+        if (self.animationLibrary && item.enabled && !titleOnly) {
+            item.animationURL = [self animationURLForIndex:items.count];
+        }
         [items addObject:item];
     }
     self.menuSource = [CYLExampleMenuSource sourceWithSections:@[[CYLExampleMenuSection sectionWithTitle:@"" items:items]]];
@@ -223,6 +259,20 @@ static NSString * const kStyleCell = @"StyleCell";
     self.tagListView.menuDataSource = self.menuSource;
     [self.tagListView reloadMenuData];
     self.tagListView.selectedIndexPaths = selection.count > 0 ? selection : @[[NSIndexPath indexPathForItem:0 inSection:0]];
+}
+
+/// The demo's animated icons, from CYLTabBarController's examples (Lottie, GIF, Rive) and
+/// libpag/pag-ios (PAG, downloaded by `pod install`).
+- (NSURL *)animationURLForIndex:(NSUInteger)index {
+    NSDictionary<NSString *, NSArray<NSString *> *> *files = @{
+        @"lottie": @[@"CYLMenuExample.bundle/Animations/tab_home_animate.json", @"CYLMenuExample.bundle/Animations/tab_me_animate.json"],
+        @"gif": @[@"CYLMenuExample.bundle/Animations/tab_star.gif", @"CYLMenuExample.bundle/Animations/cyl_tab_sample_animated.gif"],
+        @"pag": @[@"pag-ios/0.pag", @"pag-ios/1.pag"],
+        @"rive": @[@"CYLMenuExample.bundle/Animations/check.riv", @"CYLMenuExample.bundle/Animations/menu_button.riv"],
+    };
+    NSArray<NSString *> *names = files[self.animationLibrary];
+    NSString *name = names[index % names.count];
+    return name ? [NSBundle.mainBundle.resourceURL URLByAppendingPathComponent:name] : nil;
 }
 
 - (void)applyStyle {

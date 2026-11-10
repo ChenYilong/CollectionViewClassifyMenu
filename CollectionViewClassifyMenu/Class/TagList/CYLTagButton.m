@@ -6,13 +6,49 @@
 #import "CYLTagButton.h"
 #import "CYLParameterConfiguration.h"
 
+/// The class side of CYLTabBarController's `CYLTabBarItemAnimationFactory` (CYLTabBarItemAnimation subspec).
+/// Found at runtime, so the component does not depend on CYLTabBarController; the libraries'
+/// animators register themselves with the engine, as for tab bar items.
+@protocol CYLTagAnimationFactory <NSObject>
++ (nullable UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode;
++ (nullable id)playerForView:(nullable UIView *)view;
+@end
+
+/// The methods of `CYLTabBarItemAnimationPlayer` the tag uses.
+@protocol CYLTagAnimationPlayer <NSObject>
+- (void)play;
+- (void)showLastFrame;
+- (void)stop;
+@optional
+@property (nonatomic, assign) CGFloat animationSpeed;
+@end
+
+static Class<CYLTagAnimationFactory> CYLTagAnimationFactoryClass(void) {
+    Class factory = NSClassFromString(@"CYLTabBarItemAnimationFactory");
+    if ([factory respondsToSelector:@selector(animationViewWithURL:size:contentMode:)] &&
+        [factory respondsToSelector:@selector(playerForView:)]) {
+        return factory;
+    }
+    return Nil;
+}
+
 static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     return @[@(UIControlStateNormal), @(UIControlStateSelected), @(UIControlStateDisabled)];
 }
 
+@interface CYLTagButton ()
+@property (nonatomic, strong, readwrite, nullable) UIView *animationView;
+@property (nonatomic, strong, readwrite, nullable) id animationPlayer;
+@property (nonatomic, assign) CGSize animationViewSize;
+@end
+
 @implementation CYLTagButton
 
 @synthesize style = _style;
+
++ (BOOL)isAnimationEngineAvailable {
+    return CYLTagAnimationFactoryClass() != Nil;
+}
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -37,6 +73,11 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 
 - (void)setStyle:(CYLMenuStyle *)style {
     _style = [(style ?: [CYLMenuStyle defaultStyle]) copy];
+    if (self.animationView && !CGSizeEqualToSize(self.animationViewSize, [self cyl_animationSize])) {
+        [self cyl_reloadAnimationView];
+    } else {
+        [self cyl_updateAnimationState];
+    }
     [self cyl_updateAppearance];
 }
 
@@ -50,13 +91,73 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     [self cyl_updateAppearance];
 }
 
+- (void)setAnimationURL:(NSURL *)animationURL {
+    if ((_animationURL == animationURL || [_animationURL isEqual:animationURL]) && (self.animationView || !animationURL)) {
+        return;
+    }
+    _animationURL = animationURL;
+    [self cyl_reloadAnimationView];
+}
+
+- (CGSize)cyl_animationSize {
+    CGSize size = self.style.animationSize;
+    return CGSizeEqualToSize(size, CGSizeZero) ? self.style.imageSize : size;
+}
+
+- (void)cyl_reloadAnimationView {
+    [self.animationView removeFromSuperview];
+    self.animationView = nil;
+    self.animationPlayer = nil;
+    Class<CYLTagAnimationFactory> factory = CYLTagAnimationFactoryClass();
+    if (self.animationURL && factory) {
+        CGSize size = [self cyl_animationSize];
+        UIView *view = [factory animationViewWithURL:self.animationURL size:size contentMode:UIViewContentModeScaleAspectFit];
+        if (view) {
+            view.userInteractionEnabled = NO;
+            [self addSubview:view];
+            self.animationView = view;
+            self.animationViewSize = size;
+            self.animationPlayer = [factory playerForView:view];
+        }
+    }
+    [self cyl_updateAnimationState];
+    [self cyl_updateAppearance];
+}
+
+/// Selected: the last frame (a selected tab's icon); otherwise the first frame.
+- (void)cyl_updateAnimationState {
+    id<CYLTagAnimationPlayer> player = self.animationPlayer;
+    if ([player respondsToSelector:@selector(setAnimationSpeed:)]) {
+        player.animationSpeed = self.style.animationSpeed > 0 ? self.style.animationSpeed : 1;
+    }
+    if (self.isSelected) {
+        [player showLastFrame];
+    } else {
+        [player stop];
+    }
+}
+
+- (void)playAnimation {
+    id<CYLTagAnimationPlayer> player = self.animationPlayer;
+    if (UIAccessibilityIsReduceMotionEnabled()) {
+        // Reduce Motion: jump to the end state instead of playing.
+        [self cyl_updateAnimationState];
+        return;
+    }
+    [player play];
+}
+
 - (void)setSelectedImage:(UIImage *)selectedImage {
     _selectedImage = selectedImage;
     [self cyl_updateAppearance];
 }
 
 - (void)setSelected:(BOOL)selected {
+    BOOL changed = selected != self.isSelected;
     [super setSelected:selected];
+    if (changed) {
+        [self cyl_updateAnimationState];
+    }
     [self cyl_updateAppearance];
 }
 
@@ -84,7 +185,10 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     UIControlState state = [self cyl_currentState];
     CYLTagAppearance *appearance = [self.style appearanceForState:state];
     UIImage *image = (state == UIControlStateSelected && self.selectedImage) ? self.selectedImage : self.image;
-    self.imageView.image = image;
+    // An animated icon takes the icon slot.
+    self.imageView.image = self.animationView ? nil : image;
+    self.imageView.hidden = self.animationView != nil;
+    self.animationView.alpha = state == UIControlStateDisabled ? 0.4 : 1;
     self.imageView.tintColor = [self.style iconColorForState:state];
     self.titleLabel.text = self.title;
     self.titleLabel.font = [self.style titleFontForState:state traitCollection:self.traitCollection];
@@ -112,7 +216,18 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     return CGSizeEqualToSize(style.imageSize, CGSizeZero) ? image.size : style.imageSize;
 }
 
++ (CGSize)iconSizeForImage:(UIImage *)image animated:(BOOL)animated style:(CYLMenuStyle *)style {
+    if (animated && [self isAnimationEngineAvailable]) {
+        return CGSizeEqualToSize(style.animationSize, CGSizeZero) ? style.imageSize : style.animationSize;
+    }
+    return [self cyl_iconSizeForImage:image style:style];
+}
+
 + (CGFloat)widthForTitle:(NSString *)title image:(UIImage *)image style:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
+    return [self widthForTitle:title iconSize:[self cyl_iconSizeForImage:image style:style] style:style traitCollection:traitCollection];
+}
+
++ (CGFloat)widthForTitle:(NSString *)title iconSize:(CGSize)iconSize style:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
     CGFloat width = 0;
     for (NSNumber *state in CYLTagButtonStates()) {
         UIControlState controlState = state.unsignedIntegerValue;
@@ -120,7 +235,7 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         CGFloat titleWidth = title.length > 0
             ? ceil([title sizeWithAttributes:@{NSFontAttributeName: [style titleFontForState:controlState traitCollection:traitCollection]}].width)
             : 0;
-        CGFloat iconWidth = [self cyl_iconSizeForImage:image style:style].width;
+        CGFloat iconWidth = iconSize.width;
         CGFloat content = titleWidth + iconWidth;
         if (titleWidth > 0 && iconWidth > 0) {
             content += style.imageTitleSpacing;
@@ -151,9 +266,10 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     CYLMenuStyle *style = self.style;
     CYLTagAppearance *appearance = [style appearanceForState:[self cyl_currentState]];
     CGFloat margin = appearance.margin;
-    BOOL showsImage = self.imageView.image != nil;
+    BOOL animated = self.animationView != nil;
+    BOOL showsImage = animated || self.imageView.image != nil;
     BOOL showsTitle = self.titleLabel.text.length > 0;
-    CGSize iconSize = [[self class] cyl_iconSizeForImage:self.imageView.image style:style];
+    CGSize iconSize = animated ? [self cyl_animationSize] : [[self class] cyl_iconSizeForImage:self.imageView.image style:style];
     CGFloat spacing = (showsImage && showsTitle) ? style.imageTitleSpacing : 0;
 
     CGFloat available = MAX(0, width - 2 * margin - (showsImage ? iconSize.width + spacing : 0));
@@ -189,7 +305,12 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         UIEdgeInsets insets = style.imageInsets;
         frame.size.width = MAX(0, frame.size.width - insets.left - insets.right);
         frame.size.height = MAX(0, frame.size.height - insets.top - insets.bottom);
-        self.imageView.frame = frame;
+        if (animated) {
+            self.animationView.frame = frame;
+            self.imageView.frame = CGRectZero;
+        } else {
+            self.imageView.frame = frame;
+        }
     } else {
         self.imageView.frame = CGRectZero;
     }

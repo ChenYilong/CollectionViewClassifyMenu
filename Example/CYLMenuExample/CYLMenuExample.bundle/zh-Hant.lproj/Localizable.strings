@@ -99,3 +99,18 @@
 "我的" = "我的";
 "一个很长很长的标签标题" = "一個很長很長的標籤標題";
 "已禁用" = "已停用";
+
+"动效图标（CYLTabBarController 动效引擎）" = "動效圖示（CYLTabBarController 動效引擎）";
+"Lottie 动效图标" = "Lottie 動效圖示";
+"PAG 动效图标" = "PAG 動效圖示";
+"Rive 动效图标" = "Rive 動效圖示";
+"GIF 动效图标" = "GIF 動效圖示";
+"关闭动效（静态图标）" = "關閉動效（靜態圖示）";
+"设置动效速度 animationSpeed" = "設定動效速度 animationSpeed";
+"配置文件 / 字典（map）初始化" = "設定檔 / 字典（map）初始化";
+"配置初始化" = "設定初始化";
+"配置文件初始化：%@" = "設定檔初始化：%@";
+"字典（map）初始化：-initWithConfiguration:" = "字典（map）初始化：-initWithConfiguration:";
+"字典（map）初始化" = "字典（map）初始化";
+"动效引擎：CYLTabBarItemAnimationFactory 已链接" = "動效引擎：CYLTabBarItemAnimationFactory 已連結";
+"动效引擎未链接：显示静态图标" = "動效引擎未連結：顯示靜態圖示";

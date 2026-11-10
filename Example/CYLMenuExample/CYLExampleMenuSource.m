@@ -71,6 +71,10 @@
     return [self itemAtIndexPath:indexPath].selectedImage;
 }
 
+- (NSURL *)menuAnimationURLForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return [self itemAtIndexPath:indexPath].animationURL;
+}
+
 - (UIImage *)menuImageForSection:(NSInteger)section {
     return self.sections[section].image;
 }

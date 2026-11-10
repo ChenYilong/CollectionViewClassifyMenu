@@ -42,6 +42,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 - (void)configureWithTitle:(NSString *)title
                      image:(UIImage *)image
              selectedImage:(UIImage *)selectedImage
+              animationURL:(NSURL *)animationURL
                      style:(CYLMenuStyle *)style
                   selected:(BOOL)selected
                    enabled:(BOOL)enabled {
@@ -49,6 +50,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         self.button.style = style;
         self.appliedStyle = style;
     }
+    self.button.animationURL = animationURL;
     self.button.title = title;
     self.button.image = image;
     self.button.selectedImage = selectedImage;
@@ -392,6 +394,12 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         ? [source menuImageForItemAtIndexPath:indexPath] : nil;
 }
 
+- (NSURL *)cyl_animationURLAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    return [source respondsToSelector:@selector(menuAnimationURLForItemAtIndexPath:)]
+        ? [source menuAnimationURLForItemAtIndexPath:indexPath] : nil;
+}
+
 - (UIImage *)cyl_selectedImageAtIndexPath:(NSIndexPath *)indexPath {
     id<CYLMenuDataSource> source = self.menuDataSource;
     return [source respondsToSelector:@selector(menuSelectedImageForItemAtIndexPath:)]
@@ -423,8 +431,11 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [self.titles enumerateObjectsUsingBlock:^(NSArray<NSString *> *items, NSUInteger section, BOOL *stop) {
         NSMutableArray *sectionWidths = [NSMutableArray arrayWithCapacity:items.count];
         [items enumerateObjectsUsingBlock:^(NSString *title, NSUInteger item, BOOL *itemStop) {
-            UIImage *image = [self cyl_imageAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]];
-            CGFloat width = [CYLTagButton widthForTitle:title image:image style:style traitCollection:traits];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
+            CGSize iconSize = [CYLTagButton iconSizeForImage:[self cyl_imageAtIndexPath:indexPath]
+                                                    animated:[self cyl_animationURLAtIndexPath:indexPath] != nil
+                                                       style:style];
+            CGFloat width = [CYLTagButton widthForTitle:title iconSize:iconSize style:style traitCollection:traits];
             [sectionWidths addObject:@(MIN(width, contentWidth))];
         }];
         [widths addObject:sectionWidths];
@@ -767,6 +778,13 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
             break;
     }
     [self cyl_refreshVisibleCells];
+    if (selected) {
+        // A tapped tag plays its animated icon, as a tapped tab does.
+        CYLTagListCell *cell = (CYLTagListCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+        if ([cell isKindOfClass:[CYLTagListCell class]]) {
+            [cell.button playAnimation];
+        }
+    }
     if ([delegate respondsToSelector:@selector(menu:didDeselectItemAtIndexPath:)]) {
         for (NSIndexPath *path in removed) {
             [delegate menu:self didDeselectItemAtIndexPath:path];
@@ -795,6 +813,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [cell configureWithTitle:self.titles[indexPath.section][indexPath.item]
                        image:[self cyl_imageAtIndexPath:indexPath]
                selectedImage:[self cyl_selectedImageAtIndexPath:indexPath]
+                animationURL:[self cyl_animationURLAtIndexPath:indexPath]
                        style:self.style
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];

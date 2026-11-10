@@ -107,3 +107,19 @@
 "我的" = "Me";
 "一个很长很长的标签标题" = "A very, very long tag title";
 "已禁用" = "Disabled";
+
+/* Animated icons and configuration */
+"动效图标（CYLTabBarController 动效引擎）" = "Animated icons (CYLTabBarController animation engine)";
+"Lottie 动效图标" = "Lottie animated icons";
+"PAG 动效图标" = "PAG animated icons";
+"Rive 动效图标" = "Rive animated icons";
+"GIF 动效图标" = "GIF animated icons";
+"关闭动效（静态图标）" = "No animation (static icons)";
+"设置动效速度 animationSpeed" = "Set animationSpeed";
+"配置文件 / 字典（map）初始化" = "Configuration file / dictionary (map)";
+"配置初始化" = "Configuration";
+"配置文件初始化：%@" = "From a configuration file: %@";
+"字典（map）初始化：-initWithConfiguration:" = "From a dictionary (map): -initWithConfiguration:";
+"字典（map）初始化" = "From a dictionary (map)";
+"动效引擎：CYLTabBarItemAnimationFactory 已链接" = "Animation engine: CYLTabBarItemAnimationFactory is linked";
+"动效引擎未链接：显示静态图标" = "Animation engine not linked: static icons";

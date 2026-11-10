@@ -1,0 +1,36 @@
+{
+  "comment": "Fetched by scripts/fetch-animation-resources.py (run by `pod install` in Example); the files themselves are not in this repository. Copied from CYLTabBarController's Example-Shared/PAGResources/pag-resources.json.",
+  "repositories": [
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "license": "Apache-2.0"
+    }
+  ],
+  "files": [
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "LICENSE",
+      "file": "pag-ios/LICENSE",
+      "size": 9480,
+      "sha256": "a4ddf2289697aaba6c02064e0d90fa77b5a917f53c1459dc3f5af26a00f57f62"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/0.pag",
+      "file": "pag-ios/0.pag",
+      "size": 7344,
+      "sha256": "882e8a34d8af6fb297ef7730d4a5bc62d028053762da00f820f89e7269953840"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/1.pag",
+      "file": "pag-ios/1.pag",
+      "size": 2085,
+      "sha256": "806d8f95e636d9f3c7ae59cdb89964d9d0106f84d5ee98e8905ec4c62b19bda2"
+    }
+  ]
+}

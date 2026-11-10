@@ -10,3 +10,6 @@ xcuserdata/
 DerivedData/
 build/
 Pods/
+
+# Animation files downloaded by scripts/fetch-animation-resources.py (pod install in Example)
+Example-Shared/PAGResources/pag-ios/

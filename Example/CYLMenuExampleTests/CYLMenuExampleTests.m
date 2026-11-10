@@ -11,6 +11,7 @@
 #import "CYLExampleAppDelegate.h"
 #import "CYLSearchHomeViewController.h"
 #import "CYLTagStyleDemoViewController.h"
+#import "CYLTagConfigurationDemoViewController.h"
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
@@ -536,6 +537,142 @@
     [demo performAction:@"reset"];
     XCTAssertEqual(demo.content, CYLTagStyleDemoContentIconAndTitle);
     XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 3);
+}
+
+#pragma mark Configuration (map and file, as CYLTabBarController)
+
+- (void)testDictionaryConfigurationCreatesAndStylesTheTags {
+    CYLTagListView *view = [[CYLTagListView alloc] initWithConfiguration:[CYLTagConfigurationDemoViewController mapConfiguration]];
+    view.frame = CGRectMake(0, 0, 375, 300);
+    [view layoutIfNeeded];
+    XCTAssertEqual(view.selectionMode, CYLMenuSelectionModeMultiple);
+    XCTAssertFalse(view.isScrollEnabled);
+    XCTAssertEqualObjects(view.selectedIndexPaths, @[[self ip:1 :0]]);
+    XCTAssertNotNil(view.configurationDataSource, @"The view keeps the data source it built");
+    XCTAssertEqual(view.menuDataSource, view.configurationDataSource);
+    XCTAssertEqual([view.menuDataSource menuNumberOfItemsInSection:0], 5);
+    XCTAssertEqualObjects([view.menuDataSource menuTitleForItemAtIndexPath:[self ip:4 :0]], @"Text only", @"A string item is a title");
+    XCTAssertNotNil([view.menuDataSource menuImageForItemAtIndexPath:[self ip:3 :0]], @"system: images are SF Symbols");
+    XCTAssertTrue(CGSizeEqualToSize(view.style.imageSize, CGSizeMake(20, 20)));
+    XCTAssertEqual(view.style.normalAppearance.cornerRadius, 8);
+    XCTAssertEqualObjects(view.style.normalAppearance.iconColor, UIColor.systemIndigoColor);
+}
+
+- (void)testConfigurationStringValuesAreConverted {
+    CYLTagListView *view = [CYLTagListView tagListViewWithConfiguration:@{
+        CYLTagListViewSelectionMode : @"single",
+        CYLTagListViewFoldStyle : @"footerChevron",
+        CYLTagListViewDefaultVisibleRows : @"2",
+        CYLTagListViewShowsSectionHeaders : @"false",
+        CYLTagListViewSelectedItems : @[@"1-0"],
+        CYLTagListViewStyle : @{
+            CYLMenuStyleImageInsets : @"{1, 2, 3, 4}",
+            CYLMenuStyleTitlePositionAdjustment : @[@2, @-1],
+            CYLMenuStyleImageSize : @{@"width": @18, @"height": @16},
+            CYLMenuStyleLayoutCentered : @"no",
+            CYLMenuStyleNormal : @{ CYLTagAppearanceTextColor : @"#FF0000",
+                                    CYLTagAppearanceBorderColor : @"systemBlue",
+                                    CYLTagAppearanceFont : @{@"size": @15, @"weight": @"bold"},
+                                    CYLTagAppearanceMargin : @"6" },
+        },
+        CYLTagListViewSections : @[ @{ CYLTagSectionTitle : @"A", CYLTagSectionItems : @[@"x", @"y"] },
+                                    @{ CYLTagSectionTitle : @"B", CYLTagSectionItems : @[ @{ CYLTagItemTitle : @"z", CYLTagItemEnabled : @"false" } ] } ],
+    }];
+    XCTAssertEqual(view.selectionMode, CYLMenuSelectionModeSingle);
+    XCTAssertEqual(view.foldStyle, CYLMenuFoldStyleFooterChevron);
+    XCTAssertEqual(view.defaultVisibleRows, 2u);
+    XCTAssertFalse(view.showsSectionHeaders);
+    XCTAssertEqualObjects(view.selectedIndexPaths, @[[self ip:0 :1]], @"\"section-item\"");
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(view.style.imageInsets, UIEdgeInsetsMake(1, 2, 3, 4)));
+    XCTAssertTrue(UIOffsetEqualToOffset(view.style.titlePositionAdjustment, UIOffsetMake(2, -1)));
+    XCTAssertTrue(CGSizeEqualToSize(view.style.imageSize, CGSizeMake(18, 16)));
+    XCTAssertFalse(view.style.layoutCentered);
+    CGFloat red = 0, green = 1, blue = 1, alpha = 0;
+    [view.style.normalAppearance.textColor getRed:&red green:&green blue:&blue alpha:&alpha];
+    XCTAssertEqualWithAccuracy(red, 1, 0.01);
+    XCTAssertEqualWithAccuracy(green, 0, 0.01);
+    XCTAssertEqualObjects(view.style.normalAppearance.borderColor, UIColor.systemBlueColor);
+    XCTAssertEqualWithAccuracy(view.style.normalAppearance.font.pointSize, 15, 0.01);
+    XCTAssertTrue(view.style.normalAppearance.font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold);
+    XCTAssertEqual(view.style.normalAppearance.margin, 6);
+    XCTAssertFalse([view.menuDataSource menuItemIsEnabledAtIndexPath:[self ip:0 :1]]);
+}
+
+- (void)testConfigurationFileCreatesAnimatedTags {
+    NSError *error = nil;
+    NSString *file = [CYLTagConfigurationDemoViewController configurationFilePath];
+    NSDictionary *configuration = [CYLTagListView configurationWithContentsOfFile:file error:&error];
+    XCTAssertNotNil(configuration, @"%@", error);
+    CYLTagListView *view = [CYLTagListView tagListViewWithConfigurationFile:file error:&error];
+    XCTAssertNotNil(view, @"%@", error);
+    XCTAssertEqual(view.selectionMode, CYLMenuSelectionModeSingle);
+    XCTAssertFalse(view.allowsEmptySelection);
+    XCTAssertEqual(view.foldStyle, CYLMenuFoldStyleFooterChevron);
+    XCTAssertEqualObjects(view.selectedIndexPaths, @[[self ip:0 :0]]);
+    XCTAssertEqual(view.style.normalAppearance.cornerRadius, 0, @"A capsule");
+    for (NSInteger item = 0; item < 4; item++) {
+        NSURL *URL = [view.menuDataSource menuAnimationURLForItemAtIndexPath:[self ip:item :0]];
+        XCTAssertNotNil(URL, @"item %ld", (long)item);
+        XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:URL.path], @"%@ resolves next to the file or in the app", URL);
+    }
+    XCTAssertNil([CYLTagListView tagListViewWithConfigurationFile:@"missing.json" error:&error]);
+    XCTAssertEqualObjects(error.domain, CYLMenuConfigurationErrorDomain);
+    XCTAssertEqual(error.code, CYLMenuConfigurationErrorFileNotFound);
+}
+
+#pragma mark Animated icons (CYLTabBarController animation engine)
+
+- (void)testAnimatedIconsUseCYLTabBarControllerAnimationEngine {
+    XCTAssertTrue([CYLTagButton isAnimationEngineAvailable], @"CYLTabBarController/CYLTabBarItemAnimation is linked");
+    NSURL *resources = NSBundle.mainBundle.resourceURL;
+    NSDictionary<NSString *, NSString *> *files = @{
+        @"GIF": @"CYLMenuExample.bundle/Animations/tab_star.gif",
+        @"Lottie": @"CYLMenuExample.bundle/Animations/tab_home_animate.json",
+        @"PAG": @"pag-ios/0.pag",
+        @"Rive": @"CYLMenuExample.bundle/Animations/check.riv",
+    };
+    for (NSString *library in files) {
+        NSURL *URL = [resources URLByAppendingPathComponent:files[library]];
+        XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:URL.path], @"%@ file in the app", library);
+        CYLTagButton *button = [self buttonWithTitle:library image:[UIImage systemImageNamed:@"star"] style:[CYLMenuStyle defaultStyle]];
+        button.animationURL = URL;
+        [button layoutIfNeeded];
+        XCTAssertNotNil(button.animationView, @"%@ view from CYLTabBarItemAnimationFactory", library);
+        XCTAssertNotNil(button.animationPlayer, @"%@ player", library);
+        XCTAssertTrue(button.imageView.hidden, @"%@ takes the icon slot", library);
+        XCTAssertTrue(CGSizeEqualToSize(button.animationView.frame.size, button.style.imageSize), @"%@ %@", library, NSStringFromCGRect(button.animationView.frame));
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(button.titleLabel.frame) - CGRectGetMaxX(button.animationView.frame), button.style.imageTitleSpacing, 0.5);
+        button.selected = YES;
+        [button playAnimation];
+        button.selected = NO;
+    }
+    CYLTagButton *missing = [self buttonWithTitle:@"x" image:[UIImage systemImageNamed:@"star"] style:[CYLMenuStyle defaultStyle]];
+    missing.animationURL = [resources URLByAppendingPathComponent:@"missing.json"];
+    XCTAssertNil(missing.animationView, @"Falls back to the image");
+    XCTAssertFalse(missing.imageView.hidden);
+}
+
+- (void)testStyleDemoShowsAnimatedIconsAndOpensTheConfigurationDemo {
+    CYLTagStyleDemoViewController *demo = [[CYLTagStyleDemoViewController alloc] init];
+    UINavigationController *navigation = [self hostController:demo];
+    UICollectionView *collection = [self collectionViewOf:demo.tagListView];
+    for (NSString *library in @[@"lottie", @"gif", @"pag", @"rive"]) {
+        [demo performAction:[@"animation." stringByAppendingString:library]];
+        [collection layoutIfNeeded];
+        CYLTagButton *button = [[collection cellForItemAtIndexPath:[self ip:0 :0]] valueForKey:@"button"];
+        XCTAssertEqualObjects(demo.animationLibrary, library);
+        XCTAssertNotNil(button.animationView, @"%@", library);
+    }
+    [demo performAction:@"animation.off"];
+    [collection layoutIfNeeded];
+    XCTAssertNil([[[collection cellForItemAtIndexPath:[self ip:0 :0]] valueForKey:@"button"] animationView]);
+
+    [demo performAction:@"configuration"];
+    CYLTagConfigurationDemoViewController *configuration = (CYLTagConfigurationDemoViewController *)navigation.topViewController;
+    XCTAssertTrue([configuration isKindOfClass:[CYLTagConfigurationDemoViewController class]]);
+    [configuration loadViewIfNeeded];
+    XCTAssertNotNil(configuration.fileTagListView, @"%@", configuration.configurationError);
+    XCTAssertNotNil(configuration.mapTagListView);
 }
 
 #pragma mark Accessibility

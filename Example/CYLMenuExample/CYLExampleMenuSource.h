@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, strong, nullable) UIImage *image;
 @property (nonatomic, strong, nullable) UIImage *selectedImage;
+/// Animated icon file (Lottie, PAG, Rive, GIF), played by CYLTabBarController's animation engine.
+@property (nonatomic, strong, nullable) NSURL *animationURL;
 @property (nonatomic, assign, getter=isEnabled) BOOL enabled;
 @property (nonatomic, assign, getter=isExclusive) BOOL exclusive;
 /// Free-form value for the host, such as a filter key.

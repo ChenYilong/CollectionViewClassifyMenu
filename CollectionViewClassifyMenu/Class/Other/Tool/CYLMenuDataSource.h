@@ -21,6 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable UIImage *)menuImageForItemAtIndexPath:(NSIndexPath *)indexPath;
 /// Icon shown while the item is selected; nil keeps the normal icon.
 - (nullable UIImage *)menuSelectedImageForItemAtIndexPath:(NSIndexPath *)indexPath;
+/// Animated icon (a Lottie .json, .pag, .riv or .gif file), played like a CYLTabBarController
+/// tab icon: it plays when a tap selects the item. Needs the library's CYLTabBarController
+/// subspec in the app (e.g. `pod 'CYLTabBarController/Lottie'`); without it the image is shown.
+- (nullable NSURL *)menuAnimationURLForItemAtIndexPath:(NSIndexPath *)indexPath;
 /// Icon drawn before the section title. Return nil for no icon.
 - (nullable UIImage *)menuImageForSection:(NSInteger)section;
 /// View placed at the trailing edge of the section header, such as a picker
