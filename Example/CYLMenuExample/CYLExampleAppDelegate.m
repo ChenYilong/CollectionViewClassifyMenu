@@ -96,13 +96,16 @@
     if ([screen hasPrefix:@"reviews"]) {
         tabs.selectedIndex = 0;
         UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[0];
-        NSUInteger index = [screen isEqualToString:@"reviews-good"] ? 1 : 0;
-        CYLReviewListViewController *reviews = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:index];
+        CYLReviewFilteringMode mode = [screen isEqualToString:@"reviews-network"] ? CYLReviewFilteringModeNetwork : CYLReviewFilteringModeMemory;
+        CYLReviewListViewController *reviews = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0 mode:mode];
         reviews.hidesBottomBarWhenPushed = YES;
         [navigation pushViewController:reviews animated:NO];
         if ([screen isEqualToString:@"reviews-expanded"]) {
             [reviews loadViewIfNeeded];
             [reviews.filterView setExpanded:YES forSection:0 animated:NO];
+        } else if ([screen isEqualToString:@"reviews-multi"] || [screen isEqualToString:@"reviews-network"]) {
+            // 好评 + 有图: both conditions must match.
+            [reviews selectFilterIndexes:@[@1, @4]];
         }
     } else if ([screen hasPrefix:@"search"]) {
         tabs.selectedIndex = 1;

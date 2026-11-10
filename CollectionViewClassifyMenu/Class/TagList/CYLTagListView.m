@@ -192,6 +192,8 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
 @interface CYLTagListFooterView : UICollectionReusableView
 @property (nonatomic, strong, readonly) UIButton *chevronButton;
+@property (nonatomic, assign, readonly, getter=isExpanded) BOOL expanded;
+- (void)setExpanded:(BOOL)expanded animated:(BOOL)animated;
 @property (nonatomic, assign) NSInteger section;
 @property (nonatomic, copy, nullable) void (^foldHandler)(NSInteger section);
 @end
@@ -218,6 +220,20 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 - (void)foldTapped {
     if (self.foldHandler) {
         self.foldHandler(self.section);
+    }
+}
+
+/// The chevron points down while folded and turns 180° when expanded.
+- (void)setExpanded:(BOOL)expanded animated:(BOOL)animated {
+    _expanded = expanded;
+    // Just under π, so that it turns the same way back and forth.
+    CGAffineTransform transform = expanded ? CGAffineTransformMakeRotation((CGFloat)M_PI - 0.0001) : CGAffineTransformIdentity;
+    if (animated && !UIAccessibilityIsReduceMotionEnabled()) {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.chevronButton.imageView.transform = transform;
+        }];
+    } else {
+        self.chevronButton.imageView.transform = transform;
     }
 }
 
@@ -609,23 +625,37 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     if (section < 0 || section >= (NSInteger)self.titles.count || expanded == [self isSectionExpanded:section]) {
         return;
     }
+    // Insert or delete only the rows beyond the folded ones, so the header and
+    // footer stay in place and their fold control can animate.
+    NSInteger before = [self.collectionView numberOfItemsInSection:section];
     if (expanded) {
         [self.expandedSections addIndex:(NSUInteger)section];
     } else {
         [self.expandedSections removeIndex:(NSUInteger)section];
     }
-    void (^reload)(void) = ^{
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:(NSUInteger)section]];
+    NSInteger after = [self numberOfVisibleItemsInSection:section];
+    NSMutableArray<NSIndexPath *> *changed = [NSMutableArray array];
+    for (NSInteger item = MIN(before, after); item < MAX(before, after); item++) {
+        [changed addObject:[NSIndexPath indexPathForItem:item inSection:section]];
+    }
+    void (^update)(void) = ^{
+        if (after > before) {
+            [self.collectionView insertItemsAtIndexPaths:changed];
+        } else if (after < before) {
+            [self.collectionView deleteItemsAtIndexPaths:changed];
+        }
     };
     // Reduce Motion: change the content without animating it.
-    if (animated && self.window && !UIAccessibilityIsReduceMotionEnabled()) {
-        [self.collectionView performBatchUpdates:reload completion:nil];
+    BOOL animate = animated && self.window && !UIAccessibilityIsReduceMotionEnabled();
+    if (animate) {
+        [self.collectionView performBatchUpdates:update completion:nil];
     } else {
         [UIView performWithoutAnimation:^{
-            reload();
+            [self.collectionView performBatchUpdates:update completion:nil];
             [self.collectionView layoutIfNeeded];
         }];
     }
+    [self cyl_updateFoldControlsInSection:section animated:animate];
     [self cyl_updateContentHeight];
     [self cyl_moveAccessibilityFocusToFoldControlInSection:section];
     if ([self.menuDelegate respondsToSelector:@selector(menu:didChangeExpanded:inSection:)]) {
@@ -641,6 +671,22 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [self.collectionView layoutIfNeeded];
     UIView *control = [self cyl_foldControlInSection:section];
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, control);
+}
+
+/// Updates the visible fold controls of a section without reloading it.
+- (void)cyl_updateFoldControlsInSection:(NSInteger)section animated:(BOOL)animated {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+    BOOL expanded = [self isSectionExpanded:section];
+    CYLTagListFooterView *footer = (CYLTagListFooterView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:indexPath];
+    if ([footer isKindOfClass:[CYLTagListFooterView class]]) {
+        [footer setExpanded:expanded animated:animated];
+        footer.chevronButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+    }
+    CYLTagListHeaderView *header = (CYLTagListHeaderView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
+    if ([header isKindOfClass:[CYLTagListHeaderView class]]) {
+        [header.foldButton setTitle:expanded ? self.style.collapseTitle : self.style.expandTitle forState:UIControlStateNormal];
+        header.foldButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+    }
 }
 
 - (nullable UIButton *)cyl_foldControlInSection:(NSInteger)section {
@@ -766,6 +812,10 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     if (selected && [delegate respondsToSelector:@selector(menu:didSelectItemAtIndexPath:)]) {
         [delegate menu:self didSelectItemAtIndexPath:indexPath];
     }
+    BOOL changed = removed.count > 0 || (selected && self.selectionMode != CYLMenuSelectionModeNone);
+    if (changed && [delegate respondsToSelector:@selector(menu:didChangeSelectedItems:)]) {
+        [delegate menu:self didChangeSelectedItems:self.selectedIndexPaths];
+    }
 }
 
 - (void)cyl_refreshVisibleCells {
@@ -814,8 +864,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
                                                                                  forIndexPath:indexPath];
         footer.section = section;
         BOOL expanded = [self isSectionExpanded:section];
-        UIImage *chevron = [UIImage systemImageNamed:expanded ? @"chevron.up" : @"chevron.down"];
-        [footer.chevronButton setImage:chevron forState:UIControlStateNormal];
+        [footer.chevronButton setImage:self.style.foldChevronImage ?: [UIImage systemImageNamed:@"chevron.down"]
+                              forState:UIControlStateNormal];
+        [footer setExpanded:expanded animated:NO];
         footer.chevronButton.tintColor = self.style.foldControlColor;
         footer.chevronButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
         footer.foldHandler = ^(NSInteger tappedSection) {

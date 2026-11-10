@@ -72,6 +72,7 @@
     copy.headerTextColor = self.headerTextColor;
     copy.headerHorizontalInset = self.headerHorizontalInset;
     copy.foldControlColor = self.foldControlColor;
+    copy.foldChevronImage = self.foldChevronImage;
     copy.expandTitle = self.expandTitle;
     copy.collapseTitle = self.collapseTitle;
     return copy;

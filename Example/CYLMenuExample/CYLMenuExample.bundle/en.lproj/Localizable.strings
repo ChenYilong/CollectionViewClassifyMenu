@@ -54,3 +54,17 @@
 "教育培训" = "Education";
 "医疗健康" = "Healthcare";
 "房地产" = "Real estate";
+
+/* Scenario 1: multiple choice filtering */
+"内存筛选" = "In memory";
+"网络筛选" = "Network";
+"点击「%@」" = "Tapped “%@”";
+"取消「%@」" = "Deselected “%@”";
+"已选：%@" = "Selected: %@";
+"、" = ", ";
+"内存筛选：在已加载的评价中立即匹配" = "In memory: matched instantly in the loaded reviews";
+"匹配 %lu 条" = "%lu matches";
+"网络筛选：向服务器发送条件" = "Network: conditions sent to the server";
+"加载中…" = "Loading…";
+"服务器返回 %lu 条" = "Server returned %lu";
+"没有匹配的评价" = "No matching reviews";

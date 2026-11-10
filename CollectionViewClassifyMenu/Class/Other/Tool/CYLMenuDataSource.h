@@ -42,6 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)menu:(id)menu didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 /// Called when a tap or another selection removes an item from the selection.
 - (void)menu:(id)menu didDeselectItemAtIndexPath:(NSIndexPath *)indexPath;
+/// Called once after a tap that changed the selection, after the select and
+/// deselect callbacks: the place to refresh content filtered by the selection.
+- (void)menu:(id)menu didChangeSelectedItems:(NSArray<NSIndexPath *> *)indexPaths;
 - (void)menu:(id)menu didConfirmSelectedItems:(NSArray<NSIndexPath *> *)indexPaths;
 /// Called after a section is expanded or collapsed by the user or the host.
 - (void)menu:(id)menu didChangeExpanded:(BOOL)expanded inSection:(NSInteger)section;

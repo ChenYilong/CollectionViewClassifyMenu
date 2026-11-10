@@ -165,6 +165,8 @@ New APIs / 新增接口:
 | `-menu:didDeselectItemAtIndexPath:` | 取消选中回调 |
 | `-menu:didChangeExpanded:inSection:` | 展开/折叠回调 |
 | `-menu:didChangeContentHeight:` | 内容高度变化，便于嵌入时调整高度 |
+| `-menu:didChangeSelectedItems:` | 每次点击改变选择后回调一次，用于刷新筛选结果 |
+| `CYLMenuStyle.foldChevronImage` | 底部折叠箭头图片，展开时旋转 180° |
 | `CYLMenuStyle` | 字体（支持 Dynamic Type）、颜色、边框、圆角、间距、内边距、高度、折叠文案 |
 | `selectionMode`, `allowsEmptySelection` | 无选择 / 单选 / 多选（支持互斥项“全部”） |
 | `foldStyle`, `defaultVisibleRows` | 标题“更多”按钮、底部箭头或仅截断预览 |
@@ -225,7 +227,7 @@ open CYLMenuExample.xcworkspace
 
 | 场景 | 实现 |
 | --- | --- |
-| 场景一：淘宝评价筛选 | `CYLProductViewController` 在商品页用 `CYLMenuFoldStyleTruncate` 预览两行关键词；`CYLReviewListViewController` 使用单选、带图标和数量、底部箭头折叠的筛选，作为表头随列表滚动，并按所选标签过滤评价。 |
+| 场景一：淘宝评价筛选 | `CYLProductViewController` 在商品页用 `CYLMenuFoldStyleTruncate` 预览两行关键词；`CYLReviewListViewController` 使用多选、带图标和数量的筛选，默认折叠为两行，底部箭头旋转 180° 展开/收起。每次点击（显示点击事件）都按所有所选条件（AND，「全部」表示不限）刷新下方列表。顶部开关区分两种场景：**内存筛选**（`CYLMemoryReviewQuery`，在已加载的数据中同步匹配）与**网络筛选**（`CYLNetworkReviewQuery`，把条件编码为请求 URL，模拟服务器延迟返回，显示加载状态并丢弃过期响应）。 |
 | 场景二：脉脉搜索分类 | `CYLSearchCategoryViewController` 提供搜索框和顶部 CYLTabBarController 分类（找人/动态/八卦/职位）；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分组标题右侧为宿主提供的行业选择按钮。 |
 
 `CYLExampleMenuSource` shows how a host turns its own models into a

@@ -28,6 +28,8 @@ typedef NS_ENUM(NSInteger, CYLReviewRating) {
 
 /// One filter chip, such as "好评(3)" or the keyword "质量不错(2)".
 @interface CYLReviewFilter : NSObject
+/// Stable identifier sent to the server: all, good, neutral, bad, photo, followup or keyword:<word>.
+@property (nonatomic, copy) NSString *identifier;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, strong, nullable) UIImage *image;
 /// YES for keyword chips, which also appear in the product page preview.
@@ -41,6 +43,9 @@ typedef NS_ENUM(NSInteger, CYLReviewRating) {
 @property (nonatomic, copy, readonly) NSArray<CYLReviewFilter *> *filters;
 + (instancetype)sharedStore;
 - (NSArray<CYLReview *> *)reviewsMatchingFilter:(CYLReviewFilter *)filter;
+/// Reviews that match every filter (AND); "all" adds no condition.
+- (NSArray<CYLReview *> *)reviewsMatchingAllFilters:(NSArray<CYLReviewFilter *> *)filters;
+- (nullable CYLReviewFilter *)filterWithIdentifier:(NSString *)identifier;
 /// "好评(3)".
 - (NSString *)titleForFilter:(CYLReviewFilter *)filter;
 @end

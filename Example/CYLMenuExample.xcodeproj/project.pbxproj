@@ -13,6 +13,7 @@
 		BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */; };
 		727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C294F38F03AB5368EB658D2A /* CYLProductViewController.m */; };
 		81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */; };
+		E5E7FC29B71C8890CE6260A8 /* CYLReviewQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B2252C99FC61C9A593319D /* CYLReviewQuery.m */; };
 		484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */; };
 		0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */; };
 		131CB814C7401917C1464F70 /* CYLTopTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = D06CF8E2B4A66C6BFDDA2351 /* CYLTopTabBarController.m */; };
@@ -44,6 +45,8 @@
 		C294F38F03AB5368EB658D2A /* CYLProductViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLProductViewController.m; sourceTree = "<group>"; };
 		3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewListViewController.h; sourceTree = "<group>"; };
 		3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLReviewListViewController.m; sourceTree = "<group>"; };
+		AF9363FDA0F033201CD16227 /* CYLReviewQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewQuery.h; sourceTree = "<group>"; };
+		60B2252C99FC61C9A593319D /* CYLReviewQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLReviewQuery.m; sourceTree = "<group>"; };
 		E6FEBA27A9A1405D4A0084CD /* CYLReviewStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewStore.h; sourceTree = "<group>"; };
 		701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLReviewStore.m; sourceTree = "<group>"; };
 		81FF2081F27EEF8C4C599B93 /* CYLSearchCategoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSearchCategoryViewController.h; sourceTree = "<group>"; };
@@ -109,6 +112,8 @@
 				C294F38F03AB5368EB658D2A /* CYLProductViewController.m */,
 				3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */,
 				3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */,
+				AF9363FDA0F033201CD16227 /* CYLReviewQuery.h */,
+				60B2252C99FC61C9A593319D /* CYLReviewQuery.m */,
 				E6FEBA27A9A1405D4A0084CD /* CYLReviewStore.h */,
 				701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */,
 				81FF2081F27EEF8C4C599B93 /* CYLSearchCategoryViewController.h */,
@@ -327,6 +332,7 @@
 				E2D6D021FDE28DBA6F600779 /* CYLExampleMenuSource.m in Sources */,
 				727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */,
 				81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */,
+				E5E7FC29B71C8890CE6260A8 /* CYLReviewQuery.m in Sources */,
 				484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */,
 				0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */,
 				131CB814C7401917C1464F70 /* CYLTopTabBarController.m in Sources */,

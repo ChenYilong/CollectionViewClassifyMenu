@@ -51,6 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIColor *foldControlColor;
 /// Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
 @property (nonatomic, copy) NSString *expandTitle;
+/// Footer chevron, pointing down while folded; it turns 180° when the section expands.
+/// nil uses the SF Symbol "chevron.down".
+@property (nonatomic, strong, nullable) UIImage *foldChevronImage;
 /// Defaults to the localized "Less" from CYLClassifyMenuResources.bundle.
 @property (nonatomic, copy) NSString *collapseTitle;
 

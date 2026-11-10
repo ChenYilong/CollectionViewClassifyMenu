@@ -2,18 +2,21 @@
 //  CYLReviewListViewController.h
 //  CYLMenuExample
 //
-//  场景一（评价页）：可折叠的单选评价筛选，选中后过滤下方评价列表。
+//  场景一（评价页）：多选评价筛选，折叠为两行，旋转箭头展开/收起；每次选择后按全部所选条件（AND）
+//  刷新下方评价列表。内存筛选与网络筛选是两种场景，通过顶部开关切换。
 //
 
 #import <UIKit/UIKit.h>
 @import CollectionViewClassifyMenu;
+#import "CYLReviewQuery.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLReviewListViewController : UIViewController
 
-/// Index into CYLReviewStore.filters to select first; 0 is "全部".
-- (instancetype)initWithSelectedFilterIndex:(NSUInteger)index NS_DESIGNATED_INITIALIZER;
+/// Opens with the filter at `index` of CYLReviewStore.filters selected (0 is "全部"), filtering in memory.
+- (instancetype)initWithSelectedFilterIndex:(NSUInteger)index;
+- (instancetype)initWithSelectedFilterIndex:(NSUInteger)index mode:(CYLReviewFilteringMode)mode NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil NS_UNAVAILABLE;
 - (instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;
 
@@ -22,7 +25,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) CYLTagListView *filterView;
 @property (nonatomic, strong, readonly) UITableView *tableView;
-@property (nonatomic, assign, readonly) NSUInteger selectedFilterIndex;
+@property (nonatomic, strong, readonly) UISegmentedControl *modeControl;
+/// The last tap and the query state, shown above the list.
+@property (nonatomic, strong, readonly) UILabel *statusLabel;
+@property (nonatomic, assign, readonly) CYLReviewFilteringMode mode;
+@property (nonatomic, strong, readonly) id<CYLReviewQuerying> query;
+@property (nonatomic, copy, readonly) NSArray<CYLReviewFilter *> *selectedFilters;
+@property (nonatomic, copy, readonly) NSArray<CYLReview *> *visibleReviews;
+
+- (void)setMode:(CYLReviewFilteringMode)mode;
+/// Selects filters by index (as if tapped one after another) and refreshes the list.
+- (void)selectFilterIndexes:(NSArray<NSNumber *> *)indexes;
 
 @end
 

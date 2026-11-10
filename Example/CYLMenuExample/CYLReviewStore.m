@@ -71,7 +71,13 @@
 
 + (CYLReviewFilter *)filterNamed:(NSString *)name symbol:(NSString *)symbol color:(UIColor *)color
                          keyword:(BOOL)keyword matches:(BOOL (^)(CYLReview *review))matches {
+    static NSDictionary<NSString *, NSString *> *identifiers;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        identifiers = @{@"全部": @"all", @"好评": @"good", @"中评": @"neutral", @"差评": @"bad", @"有图": @"photo", @"追加": @"followup"};
+    });
     CYLReviewFilter *filter = [[CYLReviewFilter alloc] init];
+    filter.identifier = keyword ? [@"keyword:" stringByAppendingString:name] : identifiers[name];
     filter.name = name;
     filter.keyword = keyword;
     filter.matches = matches;
@@ -107,6 +113,29 @@
         }
     }
     return result;
+}
+
+- (NSArray<CYLReview *> *)reviewsMatchingAllFilters:(NSArray<CYLReviewFilter *> *)filters {
+    NSMutableArray *result = [NSMutableArray array];
+    for (CYLReview *review in self.reviews) {
+        BOOL matches = YES;
+        for (CYLReviewFilter *filter in filters) {
+            matches = matches && filter.matches(review);
+        }
+        if (matches) {
+            [result addObject:review];
+        }
+    }
+    return result;
+}
+
+- (CYLReviewFilter *)filterWithIdentifier:(NSString *)identifier {
+    for (CYLReviewFilter *filter in self.filters) {
+        if ([filter.identifier isEqualToString:identifier]) {
+            return filter;
+        }
+    }
+    return nil;
 }
 
 - (NSString *)titleForFilter:(CYLReviewFilter *)filter {

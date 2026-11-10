@@ -80,7 +80,7 @@ static NSString *CYLMenuPreferredLanguage;
 }
 
 + (NSString *)localizedStringForKey:(NSString *)key language:(NSString *)language {
-    static NSString * const kMissing = @"\u0001CYLMenuMissingString";
+    static NSString * const kMissing = @"__CYLMenuMissingString__";
     for (NSString *candidate in @[language ?: kCYLMenuFallbackLanguage, kCYLMenuFallbackLanguage]) {
         NSBundle *bundle = [self cyl_bundleForLanguage:candidate];
         NSString *value = [bundle localizedStringForKey:key value:kMissing table:kCYLMenuStringsTable];

@@ -18,6 +18,7 @@
 @property (nonatomic, strong) NSMutableArray<NSString *> *events;
 @property (nonatomic, strong, nullable) NSIndexPath *blockedIndexPath;
 @property (nonatomic, assign) CGFloat lastHeight;
+@property (nonatomic, assign) NSUInteger changeCount;
 @end
 
 @implementation CYLRecordingDelegate
@@ -44,6 +45,9 @@
 }
 - (void)menu:(id)menu didChangeContentHeight:(CGFloat)height {
     self.lastHeight = height;
+}
+- (void)menu:(id)menu didChangeSelectedItems:(NSArray<NSIndexPath *> *)indexPaths {
+    self.changeCount++;
 }
 @end
 
@@ -138,6 +142,7 @@
     [self tap:view item:1 section:1];
     XCTAssertEqualObjects(view.selectedIndexPaths, (@[[self ip:2 :0], [self ip:1 :1]]));
     XCTAssertEqualObjects(delegate.events, (@[@"select 0-0", @"deselect 0-0", @"select 2-0", @"select 1-1"]));
+    XCTAssertEqual(delegate.changeCount, 3u, @"One change notification per tap that changed the selection");
 
     [self tap:view item:2 section:0];
     XCTAssertEqualObjects(view.selectedIndexPaths, (@[[self ip:1 :1]]), @"Empty selection is allowed by default");
@@ -449,42 +454,144 @@
     return navigation;
 }
 
-- (void)testReviewFilterSelectsAndFiltersReviews {
+- (void)waitForQueryOf:(CYLReviewListViewController *)controller {
+    NSPredicate *done = [NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *bindings) {
+        return !controller.query.isLoading;
+    }];
+    [self waitForExpectations:@[[[XCTNSPredicateExpectation alloc] initWithPredicate:done object:nil]] timeout:10];
+}
+
+- (NSArray *)identifiersOf:(NSArray<CYLReviewFilter *> *)filters {
+    return [filters valueForKey:@"identifier"];
+}
+
+- (void)testMemoryFilteringMatchesEverySelectedTagImmediately {
     CYLReviewStore *store = [CYLReviewStore sharedStore];
     CYLReviewListViewController *controller = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0];
     [self hostController:controller];
     CYLTagListView *filter = controller.filterView;
-    XCTAssertEqual(filter.foldStyle, CYLMenuFoldStyleFooterChevron);
+    XCTAssertEqual(controller.mode, CYLReviewFilteringModeMemory);
+    XCTAssertEqual(filter.selectionMode, CYLMenuSelectionModeMultiple);
     XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:0 :0]]);
     XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)store.reviews.count);
-    XCTAssertEqual(controller.tableView.tableHeaderView, filter);
-    XCTAssertEqualWithAccuracy(CGRectGetHeight(filter.frame), filter.contentHeight, 1);
-    // Regression: collapsed chips must be drawn inside the table header, not
-    // pushed out by the navigation bar's safe-area inset.
-    UICollectionView *filterCollection = [self collectionViewOf:filter];
-    [filterCollection layoutIfNeeded];
-    XCTAssertEqual(filterCollection.contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentNever);
-    XCTAssertEqualWithAccuracy(filterCollection.contentOffset.y, -filterCollection.contentInset.top, 0.5);
-    XCTAssertGreaterThan(filterCollection.visibleCells.count, 0u);
-    for (UICollectionViewCell *cell in filterCollection.visibleCells) {
-        CGRect frame = [cell convertRect:cell.bounds toView:filter];
-        XCTAssertTrue(CGRectContainsRect(CGRectInset(filter.bounds, -0.5, -0.5), frame), @"%@", NSStringFromCGRect(frame));
-    }
+    XCTAssertNil(controller.tableView.tableHeaderView, @"The filter sits above the list, not in it");
+    XCTAssertGreaterThan([self collectionViewOf:filter].visibleCells.count, 0u);
 
     [self tap:filter item:1 section:0];  // 好评
-    NSUInteger good = [store reviewsMatchingFilter:store.filters[1]].count;
-    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)good);
-    NSString *countSuffix = [NSString stringWithFormat:@"(%lu)", (unsigned long)good];
-    XCTAssertTrue([[store titleForFilter:store.filters[1]] hasSuffix:countSuffix]);
+    XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:1 :0]], @"Selecting a condition clears 全部");
+    NSArray *good = [store reviewsMatchingAllFilters:@[store.filters[1]]];
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)good.count, @"Refreshed synchronously");
+    XCTAssertTrue([controller.statusLabel.text containsString:@"点击「好评("]);
 
-    [self tap:filter item:1 section:0];
-    XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:1 :0]], @"Tapping the selected chip keeps it");
+    [self tap:filter item:4 section:0];  // 有图: both must match
+    NSArray *both = [store reviewsMatchingAllFilters:@[store.filters[1], store.filters[4]]];
+    XCTAssertLessThan(both.count, good.count);
+    XCTAssertEqualObjects([self identifiersOf:controller.selectedFilters], (@[@"good", @"photo"]));
+    XCTAssertEqualObjects(controller.visibleReviews, both);
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)both.count);
+    NSString *matches = [NSString stringWithFormat:@"匹配 %lu 条", (unsigned long)both.count];
+    XCTAssertTrue([controller.statusLabel.text containsString:matches], @"%@", controller.statusLabel.text);
+
+    [self tap:filter item:4 section:0];  // deselect 有图
+    XCTAssertTrue([controller.statusLabel.text containsString:@"取消「有图("]);
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)good.count);
+    [self tap:filter item:1 section:0];  // deselect the last condition
+    XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:0 :0]], @"Nothing selected shows 全部");
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)store.reviews.count);
+
     [self tap:filter item:3 section:0];  // 差评(0) is disabled.
-    XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:1 :0]]);
+    XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:0 :0]]);
+    [self tap:filter item:6 section:0];
+    [self tap:filter item:0 section:0];  // 全部 clears the conditions
+    XCTAssertEqualObjects(filter.selectedIndexPaths, @[[self ip:0 :0]]);
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)store.reviews.count);
+}
 
-    CGFloat collapsed = CGRectGetHeight(filter.frame);
-    [filter setExpanded:YES forSection:0 animated:NO];
-    XCTAssertGreaterThan(CGRectGetHeight(filter.frame), collapsed, @"The table header follows the expanded height");
+- (void)testNetworkFilteringRefreshesWhenTheResponseArrives {
+    CYLReviewStore *store = [CYLReviewStore sharedStore];
+    CYLReviewListViewController *controller = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0 mode:CYLReviewFilteringModeNetwork];
+    CYLNetworkReviewQuery *network = (CYLNetworkReviewQuery *)controller.query;
+    XCTAssertTrue([network isKindOfClass:[CYLNetworkReviewQuery class]]);
+    network.latency = 0.3;
+    [self hostController:controller];
+    XCTAssertTrue(network.isLoading, @"The first page is requested from the server");
+    [self waitForQueryOf:controller];
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)store.reviews.count);
+
+    [self tap:controller.filterView item:1 section:0];  // 好评
+    XCTAssertTrue(network.isLoading);
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)store.reviews.count, @"The list waits for the server");
+    XCTAssertTrue([controller.statusLabel.text containsString:@"加载中"]);
+    XCTAssertEqualObjects(network.lastRequestURL.absoluteString, @"https://api.example.com/reviews?filter=good");
+    [self waitForQueryOf:controller];
+    NSArray *good = [store reviewsMatchingAllFilters:@[store.filters[1]]];
+    XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)good.count);
+    NSString *returned = [NSString stringWithFormat:@"服务器返回 %lu 条", (unsigned long)good.count];
+    XCTAssertTrue([controller.statusLabel.text containsString:returned], @"%@", controller.statusLabel.text);
+
+    // Two quick changes: only the response to the last request is shown.
+    NSUInteger dropped = network.droppedResponseCount;
+    [self tap:controller.filterView item:4 section:0];
+    [self tap:controller.filterView item:4 section:0];
+    [self waitForQueryOf:controller];
+    NSPredicate *droppedOne = [NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *bindings) {
+        return network.droppedResponseCount > dropped;
+    }];
+    [self waitForExpectations:@[[[XCTNSPredicateExpectation alloc] initWithPredicate:droppedOne object:nil]] timeout:10];
+    XCTAssertEqualObjects(controller.visibleReviews, good);
+
+    // The server receives every condition.
+    NSURL *URL = [CYLNetworkReviewQuery requestURLForFilters:@[store.filters[1], store.filters[6]]];
+    XCTAssertTrue([URL.query containsString:@"filter=good"]);
+    XCTAssertEqualObjects([CYLReviewServer reviewsForRequestURL:URL], ([store reviewsMatchingAllFilters:@[store.filters[1], store.filters[6]]]));
+}
+
+- (void)testFilteringModesAreSeparateScenarios {
+    CYLReviewListViewController *controller = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0];
+    [self hostController:controller];
+    XCTAssertEqual(controller.navigationItem.titleView, controller.modeControl);
+    XCTAssertEqualObjects([controller.modeControl titleForSegmentAtIndex:0], @"内存筛选");
+    XCTAssertEqualObjects([controller.modeControl titleForSegmentAtIndex:1], @"网络筛选");
+    XCTAssertTrue([controller.query isKindOfClass:[CYLMemoryReviewQuery class]]);
+    XCTAssertTrue([controller.statusLabel.text containsString:@"内存筛选"]);
+    controller.modeControl.selectedSegmentIndex = 1;
+    [controller.modeControl sendActionsForControlEvents:UIControlEventValueChanged];
+    XCTAssertEqual(controller.mode, CYLReviewFilteringModeNetwork);
+    XCTAssertTrue([controller.query isKindOfClass:[CYLNetworkReviewQuery class]]);
+    XCTAssertTrue([controller.statusLabel.text containsString:@"网络筛选"]);
+    [self waitForQueryOf:controller];
+}
+
+- (void)testFoldChevronFoldsToTwoRowsAndTurns {
+    CYLReviewListViewController *controller = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0];
+    [self hostController:controller];
+    CYLTagListView *filter = controller.filterView;
+    UICollectionView *collection = [self collectionViewOf:filter];
+    [collection layoutIfNeeded];
+    XCTAssertTrue([filter canFoldSection:0]);
+    NSInteger total = [filter.menuDataSource menuNumberOfItemsInSection:0];
+    NSInteger folded = [collection numberOfItemsInSection:0];
+    XCTAssertLessThan(folded, total, @"Folded to two rows");
+    UICollectionReusableView *footer = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
+    UIButton *chevron = [footer valueForKey:@"chevronButton"];
+    XCTAssertNotNil(chevron);
+    XCTAssertTrue(CGAffineTransformIsIdentity(chevron.imageView.transform), @"Points down while folded");
+    CGFloat foldedHeight = CGRectGetHeight(filter.frame);
+
+    [chevron sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [controller.view layoutIfNeeded];
+    XCTAssertTrue([filter isSectionExpanded:0]);
+    XCTAssertEqual([collection numberOfItemsInSection:0], total, @"Every row is shown");
+    UICollectionReusableView *sameFooter = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
+    XCTAssertEqual(sameFooter, footer, @"The footer stays, so its chevron can turn");
+    XCTAssertEqualWithAccuracy(chevron.imageView.transform.a, -1, 0.01, @"Turned 180°");
+    XCTAssertGreaterThan(CGRectGetHeight(filter.frame), foldedHeight);
+
+    [chevron sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [controller.view layoutIfNeeded];
+    XCTAssertEqual([collection numberOfItemsInSection:0], folded);
+    XCTAssertEqualWithAccuracy(chevron.imageView.transform.a, 1, 0.01);
+    XCTAssertEqualWithAccuracy(CGRectGetHeight(filter.frame), foldedHeight, 1);
 }
 
 - (void)testReviewPagePreselectsAndRevealsKeywordFilter {
@@ -514,8 +621,9 @@
     [self tap:preview item:1 section:0];
     CYLReviewListViewController *reviews = (CYLReviewListViewController *)navigation.topViewController;
     XCTAssertTrue([reviews isKindOfClass:[CYLReviewListViewController class]]);
-    CYLReviewFilter *filter = [CYLReviewStore sharedStore].filters[reviews.selectedFilterIndex];
-    XCTAssertTrue(filter.isKeyword);
+    [reviews loadViewIfNeeded];
+    XCTAssertEqual(reviews.selectedFilters.count, 1u);
+    XCTAssertTrue(reviews.selectedFilters.firstObject.isKeyword);
     XCTAssertEqualObjects(preview.selectedIndexPaths, @[]);
 }
 
