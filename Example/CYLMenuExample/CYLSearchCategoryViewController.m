@@ -300,6 +300,10 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
     content.text = CYLExampleLocalizedString(self.jobCategories[indexPath.row]);
     content.textProperties.alignment = UIListContentTextAlignmentCenter;
     content.textProperties.font = [UIFont systemFontOfSize:15];
+    // Longer translations ("Development") wrap or shrink instead of being cut off.
+    content.textProperties.numberOfLines = 2;
+    content.textProperties.adjustsFontSizeToFitWidth = YES;
+    content.textProperties.minimumScaleFactor = 0.7;
     cell.contentConfiguration = content;
     cell.backgroundColor = [UIColor clearColor];
     UIView *selected = [[UIView alloc] init];

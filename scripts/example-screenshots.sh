@@ -46,6 +46,13 @@ OLD_IFS=$IFS
 IFS=','
 for SCREEN in $SCREENS; do
   IFS=$OLD_IFS
+  # [EN] Screens without "@<language>" are taken in Simplified Chinese, the language of the scenarios;
+  #      the simulator's own language is usually English.
+  # [CN] 未写 "@<语言>" 的页面使用简体中文截图（场景的语言）；模拟器自身通常为英文。
+  case "$SCREEN" in
+    *@*) ;;
+    *) SCREEN="$SCREEN@zh-Hans" ;;
+  esac
   FILE="$OUT/$SCREEN.png"
   for ATTEMPT in 1 2 3; do
     LOG="$OUT/$SCREEN.log"
