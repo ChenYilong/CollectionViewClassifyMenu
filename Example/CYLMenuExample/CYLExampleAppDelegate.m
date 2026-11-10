@@ -12,6 +12,9 @@
 #import "CYLTagConfigurationDemoViewController.h"
 #import "CYLTagAnimationDemoViewController.h"
 #import "CYLExampleLocalization.h"
+#import "CYLExamplePlusButton.h"
+#import "CYLQueryScenariosViewController.h"
+#import "CYLMenuLinkageViewController.h"
 
 @implementation CYLExampleAppDelegate
 
@@ -34,7 +37,28 @@
     ];
     UINavigationController *animations = [[UINavigationController alloc] initWithRootViewController:[[CYLTagAnimationDemoViewController alloc] init]];
     UINavigationController *styles = [[UINavigationController alloc] initWithRootViewController:[[CYLTagStyleDemoViewController alloc] init]];
-    return [[CYLTabBarController alloc] initWithViewControllers:@[reviews, search, styles, animations] tabBarItemsAttributes:attributes];
+    // The plus button in the middle opens the filter scenarios (CYLQueryScenariosViewController). Registered
+    // again for every root tab bar so that each gets its own child view controller; the root tab bar has its
+    // own context, so scenario 2's nested category tab bar has no plus button.
+    [CYLExamplePlusButton registerPlusButton];
+    return [[CYLTabBarController alloc] initWithViewControllers:@[reviews, search, styles, animations]
+                                          tabBarItemsAttributes:attributes
+                                                    imageInsets:UIEdgeInsetsZero
+                                        titlePositionAdjustment:UIOffsetZero
+                                                        context:CYLExampleRootTabBarContext];
+}
+
+/// Selects the tab whose root view controller is a `rootClass` and returns its navigation controller.
+/// (Indexes would move with the plus button's tab.)
++ (UINavigationController *)selectTabWithRootClass:(Class)rootClass inTabBarController:(CYLTabBarController *)tabs {
+    for (UIViewController *controller in tabs.viewControllers) {
+        UINavigationController *navigation = [controller isKindOfClass:[UINavigationController class]] ? (UINavigationController *)controller : nil;
+        if ([navigation.viewControllers.firstObject isKindOfClass:rootClass]) {
+            tabs.selectedViewController = navigation;
+            return navigation;
+        }
+    }
+    return nil;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -122,13 +146,39 @@
         [self reportTagList:((CYLTagStyleDemoViewController *)top).tagListView named:@"styleTags"];
     } else if ([top isKindOfClass:[CYLTagAnimationDemoViewController class]]) {
         [self reportTagList:((CYLTagAnimationDemoViewController *)top).tagListView named:@"animationTags"];
+    } else if ([top isKindOfClass:[CYLMenuLinkageViewController class]]) {
+        CYLMenuLinkageViewController *menu = (CYLMenuLinkageViewController *)top;
+        [self appendLayoutReport:[NSString stringWithFormat:@"[CYLExampleLayout] menuLinkage results=%lu footer=%@ sql=%@",
+                                  (unsigned long)menu.results.count, NSStringFromCGRect(menu.menuFooterView.frame), menu.lastQuery.displayString]];
+    }
+}
+
+/// The plus button's tab: "plus" (scenario list), "plus-reviews-db" (review filter on SQLite, 好评 + 有图),
+/// "plus-menu" (ported classify menu, every condition), "plus-menu-filtered" (a tag, regions and dishes).
++ (void)openPlusScreen:(NSString *)screen inTabBarController:(CYLTabBarController *)tabs {
+    UINavigationController *navigation = [self selectTabWithRootClass:[CYLQueryScenariosViewController class] inTabBarController:tabs];
+    CYLQueryScenariosViewController *scenarios = (CYLQueryScenariosViewController *)navigation.viewControllers.firstObject;
+    if ([screen isEqualToString:@"plus-reviews-db"]) {
+        CYLReviewListViewController *reviews = (CYLReviewListViewController *)[scenarios viewControllerForScenario:CYLQueryScenarioReviewsDatabase];
+        [navigation pushViewController:reviews animated:NO];
+        [reviews selectFilterIndexes:@[@1, @4]];
+    } else if ([screen hasPrefix:@"plus-menu"]) {
+        CYLMenuLinkageViewController *menu = (CYLMenuLinkageViewController *)[scenarios viewControllerForScenario:CYLQueryScenarioMenuLinkage];
+        [navigation pushViewController:menu animated:NO];
+        [menu loadViewIfNeeded];
+        [menu resetConditions];
+        if ([screen isEqualToString:@"plus-menu-filtered"]) {
+            // 吃 · 川菜, in 上海 or 深圳, dishes 川菜 or 特色火锅.
+            [menu selectClassifyItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]];
+            [menu confirmFilterSelection:@[[NSIndexPath indexPathForItem:2 inSection:0], [NSIndexPath indexPathForItem:4 inSection:0],
+                                           [NSIndexPath indexPathForItem:2 inSection:1], [NSIndexPath indexPathForItem:3 inSection:1]]];
+        }
     }
 }
 
 + (void)openScreen:(NSString *)screen inTabBarController:(CYLTabBarController *)tabs {
     if ([screen hasPrefix:@"reviews"]) {
-        tabs.selectedIndex = 0;
-        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[0];
+        UINavigationController *navigation = [self selectTabWithRootClass:[CYLProductViewController class] inTabBarController:tabs];
         CYLReviewFilteringMode mode = [screen isEqualToString:@"reviews-network"] ? CYLReviewFilteringModeNetwork : CYLReviewFilteringModeMemory;
         CYLReviewListViewController *reviews = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0 mode:mode];
         reviews.hidesBottomBarWhenPushed = YES;
@@ -141,8 +191,7 @@
             [reviews selectFilterIndexes:@[@1, @4]];
         }
     } else if ([screen hasPrefix:@"style"]) {
-        tabs.selectedIndex = 2;
-        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[2];
+        UINavigationController *navigation = [self selectTabWithRootClass:[CYLTagStyleDemoViewController class] inTabBarController:tabs];
         CYLTagStyleDemoViewController *demo = (CYLTagStyleDemoViewController *)navigation.viewControllers.firstObject;
         NSDictionary<NSString *, NSArray<NSString *> *> *actions = @{
             // A capsule with a wider icon spacing, colored icons and a colored selection.
@@ -158,8 +207,7 @@
             [demo performAction:action];
         }
     } else if ([screen hasPrefix:@"animations"]) {
-        tabs.selectedIndex = 3;
-        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[3];
+        UINavigationController *navigation = [self selectTabWithRootClass:[CYLTagAnimationDemoViewController class] inTabBarController:tabs];
         CYLTagAnimationDemoViewController *demo = (CYLTagAnimationDemoViewController *)navigation.viewControllers.firstObject;
         if ([screen isEqualToString:@"animations-speed"]) {
             [demo loadViewIfNeeded];
@@ -171,14 +219,14 @@
             });
         }
     } else if ([screen isEqualToString:@"config"]) {
-        tabs.selectedIndex = 2;
-        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[2];
+        UINavigationController *navigation = [self selectTabWithRootClass:[CYLTagStyleDemoViewController class] inTabBarController:tabs];
         [navigation pushViewController:[[CYLTagConfigurationDemoViewController alloc] init] animated:NO];
     } else if ([screen isEqualToString:@"search-home"]) {
-        tabs.selectedIndex = 1;
+        [self selectTabWithRootClass:[CYLSearchHomeViewController class] inTabBarController:tabs];
+    } else if ([screen hasPrefix:@"plus"]) {
+        [self openPlusScreen:screen inTabBarController:tabs];
     } else if ([screen hasPrefix:@"search"]) {
-        tabs.selectedIndex = 1;
-        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[1];
+        UINavigationController *navigation = [self selectTabWithRootClass:[CYLSearchHomeViewController class] inTabBarController:tabs];
         CYLSearchCategoryViewController *search = [[CYLSearchCategoryViewController alloc] init];
         search.hidesBottomBarWhenPushed = YES;
         [navigation pushViewController:search animated:NO];

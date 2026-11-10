@@ -7,7 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#if __has_include(<CollectionViewClassifyMenu/CYLMenuKeys.h>)
+#import <CollectionViewClassifyMenu/CYLMenuKeys.h>
+#else
 #import "CYLMenuKeys.h"
+#endif
 
 @interface CYLDBManager : NSObject
 

@@ -122,7 +122,10 @@ menu.defaultVisibleRows = 2;  // Default: 1.
 The required data source methods are `numberOfSectionsInMenu`,
 `menuNumberOfItemsInSection:`, `menuTitleForSection:` and
 `menuTitleForItemAtIndexPath:`. Set an optional `menuHeaderView` before loading
-the view. After changing host data, call `reloadMenuData`. The filter
+the view. `menuFooterView` sits below the tags in the same scroll view (for example
+the results of the selected tag; call `updateMenuLayout` after its content
+changes), and `selectedIndexPath` highlights the selected tag (set it from
+`-menu:didSelectItemAtIndexPath:`; taps do not change it). After changing host data, call `reloadMenuData`. The filter
 controller uses the same protocols; `selectedIndexPaths` and
 `setSelectedIndexPaths:` allow the host to save and restore selections.
 `reloadMenuData` resets filter selections to each section's first exclusive
@@ -318,6 +321,10 @@ Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CY
 - 根 TabBar（底部）：「场景一：评价筛选」与「场景二：搜索分类」两个 Tab；
 - 分类 TabBar（场景二）：场景二首页点击搜索框 push 进入搜索页（`hidesBottomBarWhenPushed`，隐藏根 TabBar），搜索页内嵌的 CYLTabBarController 同样位于底部，切换「找人/动态/八卦/职位」，每个 Tab 是一个标签页。
 
+- 根 TabBar 中间的 PlusButton（`CYLExamplePlusButton`，CYLTabBarController 的 `CYLPlusButton`）：点击后进入
+  `plusChildViewController`（`CYLQueryScenariosViewController`），按场景分组展示筛选演示。PlusButton 只注册在根 TabBar 的
+  context（`CYLExampleRootTabBarContext`）上，场景二内嵌的分类 TabBar 没有 PlusButton。
+
 TabBar 总是位于底部；从 Tab 中 push 的页面隐藏根 TabBar。
 
 
@@ -331,6 +338,13 @@ open CYLMenuExample.xcworkspace
 | --- | --- |
 | 场景一：淘宝评价筛选 | `CYLProductViewController` 在商品页用 `CYLMenuFoldStyleTruncate` 预览两行关键词；`CYLReviewListViewController` 使用多选、带图标和数量的筛选，默认折叠为两行，底部箭头旋转 180° 展开/收起。每次点击（显示点击事件）都按所有所选条件（AND，「全部」表示不限）刷新下方列表。顶部开关区分两种场景：**内存筛选**（`CYLMemoryReviewQuery`，在已加载的数据中同步匹配）与**网络筛选**（`CYLNetworkReviewQuery`，把条件编码为请求 URL，模拟服务器延迟返回，显示加载状态并丢弃过期响应）。 |
 | 场景二：脉脉搜索分类 | `CYLSearchHomeViewController` push `CYLSearchCategoryViewController`，提供搜索框和底部 CYLTabBarController 分类（找人/动态/八卦/职位）；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分组标题右侧为宿主提供的行业选择按钮。 |
+
+| 查询筛选（PlusButton）· 查询参数设置 | 淘宝评价默认显示全部；条件太多时由用户多选输入筛选条件，这正是标签列表（TagCollectionView）的用途。场景一的评价筛选增加第三种方式**数据库筛选**（`CYLDatabaseReviewQuery`）：所选条件生成一条 SQL（评分、有图、追加为 `reviews` 表的列，关键词为 `review_keywords` 表的行，全部 AND），在 SQLite 中查询，状态栏显示 SQL 与匹配数量。 |
+| 查询筛选（PlusButton）· 菜单选择 | 移植原 Demo（`CollectionViewClassifyMenu.xcodeproj`）的分类菜单与多选筛选：`CYLMenuLinkageViewController` 继承核心库的 `CYLClassifyMenuViewController`，左上角按钮打开核心库的 `CYLMultipleFilterController`，数据源直接复用原 Demo 的 `CYLDemoDataSource`、`CYLDBManager` 与 `data.json`（工程引用原文件，不复制）。原 Demo 只实现了筛选界面，没有筛选数据；现在点击分类标签（单选，高亮）或确认多选筛选（地区、菜品）都会生成 SQL，在 `places` 表中查询，并在标签下方（`menuFooterView`）显示条件、SQL 与结果；选择保存在数据库的 `selections` 表中，再次进入时恢复。 |
+
+数据库是 `CYLExampleDatabase`（iOS SDK 自带的 libsqlite3，文件在 Caches 目录）：每次启动由 App 内的数据重新生成
+`reviews`、`review_keywords`、`places` 表，`selections` 表保留各演示最后确认的条件。所有值都通过 `?` 绑定，界面上显示的
+SQL 只用于展示。
 
 `CYLExampleMenuSource` shows how a host turns its own models into a
 `CYLMenuDataSource`; the core library holds no business data.

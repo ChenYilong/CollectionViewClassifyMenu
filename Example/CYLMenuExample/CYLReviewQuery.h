@@ -7,16 +7,20 @@
 //  - CYLNetworkReviewQuery sends the conditions to a server and refreshes when the
 //    response arrives; responses to older requests are dropped. The server is
 //    simulated (CYLReviewServer) so the Example runs offline.
+//  - CYLDatabaseReviewQuery turns the conditions into one SQL statement and runs it on
+//    the Example's SQLite database (CYLExampleDatabase).
 //
 
 #import <Foundation/Foundation.h>
 #import "CYLReviewStore.h"
+#import "CYLExampleDatabase.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, CYLReviewFilteringMode) {
     CYLReviewFilteringModeMemory = 0,
     CYLReviewFilteringModeNetwork,
+    CYLReviewFilteringModeDatabase,
 };
 
 typedef void (^CYLReviewQueryCompletion)(NSArray<CYLReview *> *reviews);
@@ -44,6 +48,18 @@ typedef void (^CYLReviewQueryCompletion)(NSArray<CYLReview *> *reviews);
 @property (nonatomic, assign, readonly) NSUInteger requestCount;
 @property (nonatomic, assign, readonly) NSUInteger droppedResponseCount;
 + (NSURL *)requestURLForFilters:(NSArray<CYLReviewFilter *> *)filters;
+@end
+
+/// Runs the conditions as SQL on CYLExampleDatabase: rating, photo and follow-up are columns of
+/// `reviews`, keywords rows of `review_keywords`; every condition is ANDed.
+@interface CYLDatabaseReviewQuery : NSObject <CYLReviewQuerying>
+- (instancetype)initWithDatabase:(CYLExampleDatabase *)database NS_DESIGNATED_INITIALIZER;
+/// On CYLExampleDatabase.sharedDatabase.
+- (instancetype)init;
+@property (nonatomic, strong, readonly) CYLExampleDatabase *database;
+/// The statement of the last fetch.
+@property (nonatomic, strong, readonly, nullable) CYLExampleSQLQuery *lastQuery;
++ (CYLExampleSQLQuery *)queryForFilters:(NSArray<CYLReviewFilter *> *)filters;
 @end
 
 NS_ASSUME_NONNULL_END

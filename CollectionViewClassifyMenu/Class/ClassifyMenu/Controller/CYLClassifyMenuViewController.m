@@ -142,6 +142,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     if (self.menuHeaderView) {
         [self.backgroundView addSubview:self.menuHeaderView];
     }
+    if (self.menuFooterView) {
+        [self.backgroundView addSubview:self.menuFooterView];
+    }
     self.view.backgroundColor = [UIColor blueColor];
 }
 
@@ -343,12 +346,69 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
                                            self.collectionView.contentSize.height +
                                            kCollectionViewToTopMargin +
                                            kCollectionViewToBottomtMargin);
+    CGFloat footerHeight = [self cyl_layoutFooterBelowY:CGRectGetMaxY(self.collectionView.frame)];
     self.backgroundView.contentSize = CGSizeMake(CGRectGetWidth(self.backgroundView.bounds),
                                                  self.collectionView.contentSize.height +
                                                  CGRectGetHeight(self.menuHeaderView.frame) +
                                                  kCollectionViewToTopMargin +
                                                  kCollectionViewToBottomtMargin +
+                                                 footerHeight +
                                                  64);
+}
+
+/// Places the footer at `y`, as wide as the menu, and returns its height.
+- (CGFloat)cyl_layoutFooterBelowY:(CGFloat)y {
+    UIView *footer = self.menuFooterView;
+    if (!footer || !self.backgroundView || CGRectGetWidth(self.backgroundView.bounds) <= 0) {
+        // Not laid out yet: viewDidLoad and the first layout pass place it.
+        return 0;
+    }
+    if (footer.superview != self.backgroundView) {
+        [self.backgroundView addSubview:footer];
+    }
+    CGFloat width = CGRectGetWidth(self.backgroundView.bounds);
+    CGFloat height = CGRectGetHeight(footer.frame);
+    if (footer.constraints.count > 0 || footer.subviews.count > 0) {
+        CGSize fitting = [footer systemLayoutSizeFittingSize:CGSizeMake(width, UILayoutFittingCompressedSize.height)
+                               withHorizontalFittingPriority:UILayoutPriorityRequired
+                                     verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+        if (fitting.height > 0) {
+            height = fitting.height;
+        }
+    }
+    footer.translatesAutoresizingMaskIntoConstraints = YES;
+    footer.frame = CGRectMake(0, y, width, ceil(height));
+    return CGRectGetHeight(footer.frame);
+}
+
+- (void)updateMenuLayout {
+    if (self.isViewLoaded) {
+        [self updateViewHeight];
+    }
+}
+
+- (void)setMenuFooterView:(UIView *)menuFooterView {
+    if (_menuFooterView != menuFooterView) {
+        [_menuFooterView removeFromSuperview];
+    }
+    _menuFooterView = menuFooterView;
+    [self updateMenuLayout];
+}
+
+- (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath {
+    _selectedIndexPath = selectedIndexPath;
+    if (self.isViewLoaded) {
+        for (NSIndexPath *indexPath in self.collectionView.indexPathsForVisibleItems) {
+            CYLCollectionViewCell *cell = (CYLCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+            [self cyl_updateSelectionOfCell:cell atIndexPath:indexPath];
+        }
+    }
+}
+
+- (void)cyl_updateSelectionOfCell:(CYLCollectionViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    BOOL selected = [self.selectedIndexPath isEqual:indexPath];
+    cell.button.selected = selected;
+    cell.button.accessibilityTraits = selected ? (UIAccessibilityTraitButton | UIAccessibilityTraitSelected) : UIAccessibilityTraitButton;
 }
 
 #pragma mark - 🔌 UICollectionViewDataSource Method
@@ -404,6 +464,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
           forControlEvents:UIControlEventTouchUpInside];
     cell.button.section = indexPath.section;
     cell.button.row = indexPath.row;
+    [self cyl_updateSelectionOfCell:cell atIndexPath:indexPath];
     return cell;
 }
 

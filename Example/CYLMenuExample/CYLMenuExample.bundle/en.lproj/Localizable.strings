@@ -153,3 +153,29 @@
 "提醒" = "Alerts";
 "Rive · icons.riv（深色标签）" = "Rive · icons.riv (dark tags)";
 "卡车" = "Truck";
+
+/* Plus button: filter scenarios, database (CYLQueryScenariosViewController, CYLMenuLinkageViewController) */
+"%ld 行" = "%ld rows";
+"SQLite 返回 %lu 条（共 %ld 家）" = "SQLite returned %lu (of %ld places)";
+"分类菜单 + 多选筛选 · 数据库联动" = "Classify menu + multiple filter · database";
+"分类：%@ · 地区：%@ · 菜品：%@" = "Category: %@ · Regions: %@ · Dishes: %@";
+"原 Demo 只实现了筛选界面，没有筛选数据；现在每次选择都会生成 SQL、查询数据库并显示结果，选择也保存在数据库中。" = "The original demo only had the filter UI and filtered no data. Now every choice builds SQL, queries the database and shows the results; the choices are saved in the database too.";
+"场景：查询参数设置（多选）" = "Scenario: query parameters (multiple choice)";
+"场景：菜单选择（移植原 Demo）" = "Scenario: menu selection (ported original demo)";
+"多选筛选" = "Multiple filter";
+"已修改" = "Modified";
+"按场景分组的筛选演示" = "Filter demos grouped by scenario";
+"数据库筛选" = "Database";
+"数据库筛选：条件生成 SQL，在 SQLite 中查询" = "Database: the conditions become SQL, run on SQLite";
+"数据库（SQLite）" = "Database (SQLite)";
+"查询筛选" = "Filters";
+"每次启动时由 App 内的数据重新生成，selections 表保留各演示最后确认的条件。" = "Rebuilt from the app's data at every launch; the selections table keeps the conditions each demo confirmed last.";
+"每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果" = "Each choice → SQL → SQLite query → results below";
+"没有符合条件的商家" = "No matching places";
+"淘宝评价默认显示全部；条件太多时，由用户多选输入筛选条件，标签列表就是为此而做。每次选择后按全部条件（AND）刷新列表。" = "Taobao reviews show everything by default; with too many conditions, the user picks them by multiple choice, which is what the tag list is for. Each choice refreshes the list with every condition (AND).";
+"点按分类标签（单选），左上角按钮多选地区与菜品" = "Tap a category tag (single choice); the top-left button picks regions and dishes";
+"菜单选择 · 数据库联动" = "Menu selection · database";
+"评价筛选 · 内存" = "Review filter · memory";
+"评价筛选 · 数据库（SQLite）" = "Review filter · database (SQLite)";
+"评价筛选 · 网络" = "Review filter · network";
+"重置" = "Reset";

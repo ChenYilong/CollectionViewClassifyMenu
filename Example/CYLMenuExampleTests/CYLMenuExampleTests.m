@@ -17,6 +17,10 @@
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
 #import "CYLSearchCategoryViewController.h"
+#import "CYLExampleDatabase.h"
+#import "CYLExamplePlusButton.h"
+#import "CYLQueryScenariosViewController.h"
+#import "CYLMenuLinkageViewController.h"
 
 @interface CYLRecordingDelegate : NSObject <CYLMenuDelegate>
 @property (nonatomic, strong) NSMutableArray<NSString *> *events;
@@ -1166,7 +1170,7 @@
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     [tabs.view layoutIfNeeded];
-    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"Reviews", @"Search", @"Styles", @"Animations"]));
+    XCTAssertEqualObjects([self titlesOfTabsOf:tabs], (@[@"Reviews", @"Search", @"Styles", @"Animations"]));
 
     CYLSearchCategoryViewController *search = [[CYLSearchCategoryViewController alloc] init];
     [self hostController:search];
@@ -1186,14 +1190,37 @@
 
 #pragma mark Root tab bar
 
+/// The root tab bar's tab titles, without the plus button's tab.
+- (NSArray<NSString *> *)titlesOfTabsOf:(CYLTabBarController *)tabs {
+    NSMutableArray *titles = [NSMutableArray array];
+    for (UIViewController *controller in tabs.viewControllers) {
+        UINavigationController *navigation = (UINavigationController *)controller;
+        if (![navigation.viewControllers.firstObject isKindOfClass:[CYLQueryScenariosViewController class]]) {
+            [titles addObject:controller.tabBarItem.title ?: @""];
+        }
+    }
+    return titles;
+}
+
+/// The navigation controller of the tab whose root is a `rootClass`.
+- (UINavigationController *)tabOf:(CYLTabBarController *)tabs rootClass:(Class)rootClass {
+    for (UIViewController *controller in tabs.viewControllers) {
+        UINavigationController *navigation = (UINavigationController *)controller;
+        if ([navigation.viewControllers.firstObject isKindOfClass:rootClass]) {
+            return navigation;
+        }
+    }
+    return nil;
+}
+
 - (void)testRootTabBarHoldsBothScenarios {
     CYLTabBarController *tabs = [CYLExampleAppDelegate makeRootTabBarController];
     self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 375, 667)];
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     [tabs.view layoutIfNeeded];
-    XCTAssertEqual(tabs.viewControllers.count, 4u);
-    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"场景一：评价筛选", @"场景二：搜索分类", @"样式", @"动效"]));
+    XCTAssertEqual(tabs.viewControllers.count, 5u, @"Four tabs and the plus button's");
+    XCTAssertEqualObjects([self titlesOfTabsOf:tabs], (@[@"场景一：评价筛选", @"场景二：搜索分类", @"样式", @"动效"]));
     UINavigationController *first = (UINavigationController *)tabs.viewControllers[0];
     UINavigationController *second = (UINavigationController *)tabs.viewControllers[1];
     XCTAssertTrue([first.viewControllers.firstObject isKindOfClass:[CYLProductViewController class]]);
@@ -1202,7 +1229,7 @@
 
     // Scenario 2: the home page pushes the search screen, which hides the root tab bar and
     // shows its own category tab bar, also at the bottom: two tab bars with different roles.
-    tabs.selectedIndex = 1;
+    tabs.selectedViewController = second;
     CYLSearchHomeViewController *home = (CYLSearchHomeViewController *)second.viewControllers.firstObject;
     [home loadViewIfNeeded];
     CYLSearchCategoryViewController *search = [home openSearch];
@@ -1218,6 +1245,174 @@
     [product loadViewIfNeeded];
     [product showReviewsWithFilterIndex:0];
     XCTAssertTrue(first.topViewController.hidesBottomBarWhenPushed);
+}
+
+#pragma mark Plus button: filter scenarios and database
+
+- (void)testPlusButtonOpensFilterScenariosAndOnlyTheRootTabBarHasIt {
+    CYLTabBarController *tabs = [CYLExampleAppDelegate makeRootTabBarController];
+    self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 375, 667)];
+    self.window.rootViewController = tabs;
+    [self.window makeKeyAndVisible];
+    [tabs.view layoutIfNeeded];
+    XCTAssertEqualObjects(tabs.context, CYLExampleRootTabBarContext);
+    CYLPlusButton *plus = [CYLPlusButton plusButtonForTabBarContext:CYLExampleRootTabBarContext];
+    XCTAssertTrue([plus isKindOfClass:[CYLExamplePlusButton class]]);
+    XCTAssertTrue([plus isDescendantOfView:tabs.tabBar], @"In the root tab bar");
+    XCTAssertGreaterThan(CGRectGetMinY(tabs.tabBar.frame), CGRectGetHeight(tabs.view.bounds) / 2, @"At the bottom");
+    UINavigationController *plusTab = [self tabOf:tabs rootClass:[CYLQueryScenariosViewController class]];
+    XCTAssertNotNil(plusTab);
+    XCTAssertEqual([tabs.viewControllers indexOfObject:plusTab], [CYLExamplePlusButton indexOfPlusButtonInTabBar]);
+    XCTAssertEqual([CYLPlusButton plusChildViewControllerForTabBarContext:CYLExampleRootTabBarContext], plusTab);
+    [plus sendActionsForControlEvents:UIControlEventTouchUpInside];
+    XCTAssertEqual(tabs.selectedViewController, plusTab, @"The plus button selects its scenario list");
+
+    // Scenario 2's nested category tab bar has another context: no plus button there.
+    CYLSearchCategoryViewController *search = [[CYLSearchCategoryViewController alloc] init];
+    [self hostController:search];
+    XCTAssertNotEqualObjects(search.categoryTabBarController.context, CYLExampleRootTabBarContext);
+    XCTAssertEqual(search.categoryTabBarController.viewControllers.count, 4u);
+    for (UIView *view in search.categoryTabBarController.tabBar.subviews) {
+        XCTAssertFalse([view isKindOfClass:[CYLExamplePlusButton class]]);
+    }
+
+    // Grouped by scenario; every row pushes its demo without the tab bar.
+    CYLQueryScenariosViewController *scenarios = (CYLQueryScenariosViewController *)plusTab.viewControllers.firstObject;
+    [scenarios loadViewIfNeeded];
+    XCTAssertNil(scenarios.title, @"navigationItem.title only: the tab keeps its title");
+    XCTAssertEqual([scenarios.tableView numberOfSections], 3);
+    XCTAssertEqual([scenarios.tableView numberOfRowsInSection:0], 3);
+    XCTAssertEqual([scenarios.tableView numberOfRowsInSection:1], 1);
+    CYLReviewListViewController *reviews = (CYLReviewListViewController *)[scenarios viewControllerForScenario:CYLQueryScenarioReviewsDatabase];
+    XCTAssertTrue([reviews isKindOfClass:[CYLReviewListViewController class]]);
+    XCTAssertEqual(reviews.mode, CYLReviewFilteringModeDatabase);
+    XCTAssertTrue(reviews.hidesBottomBarWhenPushed);
+    UIViewController *menu = [scenarios viewControllerForScenario:CYLQueryScenarioMenuLinkage];
+    XCTAssertTrue([menu isKindOfClass:[CYLMenuLinkageViewController class]]);
+    XCTAssertTrue(menu.hidesBottomBarWhenPushed);
+}
+
+- (void)testExampleDatabaseHoldsTheDemoData {
+    NSError *error = nil;
+    CYLExampleDatabase *database = [[CYLExampleDatabase alloc] initWithPath:@":memory:" error:&error];
+    XCTAssertNotNil(database, @"%@", error);
+    XCTAssertEqual([database countOfTable:@"reviews"], (NSInteger)[CYLReviewStore sharedStore].reviews.count);
+    XCTAssertGreaterThan([database countOfTable:@"review_keywords"], 0);
+    XCTAssertGreaterThan([database countOfTable:@"places"], 40);
+    NSArray *tags = [database rowsForSQL:@"SELECT COUNT(DISTINCT tag) AS n, COUNT(DISTINCT region) AS r, COUNT(DISTINCT category) AS c FROM places" arguments:nil error:NULL];
+    XCTAssertEqual([tags.firstObject[@"c"] integerValue], 4, @"吃喝玩逛 of data.json");
+    XCTAssertEqual([tags.firstObject[@"r"] integerValue], 4, @"The filter's regions");
+    XCTAssertGreaterThan([tags.firstObject[@"n"] integerValue], 20, @"Every tag of data.json");
+
+    // Bound values, never formatted into the SQL; the display string shows them quoted.
+    NSArray *rows = [database rowsForSQL:@"SELECT ? AS text, ? AS number" arguments:@[@"it's", @2.5] error:NULL];
+    XCTAssertEqualObjects(rows.firstObject[@"text"], @"it's");
+    XCTAssertEqualWithAccuracy([rows.firstObject[@"number"] doubleValue], 2.5, 0.001);
+    CYLExampleSQLQuery *query = [CYLExampleSQLQuery querySQL:@"SELECT * FROM t WHERE a = ? AND b = ?" arguments:@[@"it's", @3]];
+    XCTAssertEqualObjects(query.displayString, @"SELECT * FROM t WHERE a = 'it''s' AND b = 3");
+    XCTAssertNil([database rowsForSQL:@"SELECT * FROM missing" arguments:nil error:&error]);
+    XCTAssertEqualObjects(error.domain, CYLExampleDatabaseErrorDomain);
+
+    // A failed transaction leaves nothing behind.
+    [database inTransaction:^BOOL(CYLExampleDatabase *db) {
+        [db saveSelection:@[[self ip:1 :0]] forScenario:@"test"];
+        return NO;
+    }];
+    XCTAssertTrue([database saveSelection:@[[self ip:3 :0], [self ip:2 :1]] forScenario:@"test"]);
+    XCTAssertEqualObjects([database savedSelectionForScenario:@"test"], (@[[self ip:3 :0], [self ip:2 :1]]));
+    XCTAssertNil([database savedSelectionForScenario:@"other"]);
+}
+
+- (void)testDatabaseReviewFilteringMatchesMemoryFiltering {
+    CYLReviewStore *store = [CYLReviewStore sharedStore];
+    CYLExampleDatabase *database = [[CYLExampleDatabase alloc] initWithPath:@":memory:" error:NULL];
+    CYLDatabaseReviewQuery *query = [[CYLDatabaseReviewQuery alloc] initWithDatabase:database];
+    XCTAssertEqual(query.mode, CYLReviewFilteringModeDatabase);
+    NSArray<NSArray<NSString *> *> *combinations = @[@[], @[@"good"], @[@"good", @"photo"], @[@"followup"], @[@"neutral"], @[@"bad"],
+                                                      @[@"keyword:质量不错"], @[@"good", @"keyword:质量不错", @"keyword:划算"], @[@"photo", @"followup"]];
+    for (NSArray<NSString *> *identifiers in combinations) {
+        NSMutableArray *filters = [NSMutableArray array];
+        for (NSString *identifier in identifiers) {
+            [filters addObject:[store filterWithIdentifier:identifier]];
+        }
+        __block NSArray *fromDatabase = nil;
+        [query fetchReviewsMatchingFilters:filters completion:^(NSArray<CYLReview *> *reviews) { fromDatabase = reviews; }];
+        XCTAssertNotNil(fromDatabase, @"Synchronous");
+        XCTAssertEqualObjects(fromDatabase, [store reviewsMatchingAllFilters:filters], @"%@", identifiers);
+    }
+    CYLExampleSQLQuery *sql = [CYLDatabaseReviewQuery queryForFilters:@[[store filterWithIdentifier:@"good"], [store filterWithIdentifier:@"keyword:划算"]]];
+    XCTAssertTrue([sql.SQL containsString:@"r.rating = ? AND EXISTS"], @"%@", sql.SQL);
+    XCTAssertEqualObjects(sql.arguments, (@[@(CYLReviewRatingGood), @"划算"]));
+
+    CYLReviewListViewController *controller = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:0 mode:CYLReviewFilteringModeDatabase];
+    [self hostController:controller];
+    XCTAssertEqual(controller.modeControl.numberOfSegments, 3);
+    [controller selectFilterIndexes:@[@1, @4]];
+    XCTAssertEqualObjects(controller.visibleReviews, [store reviewsMatchingAllFilters:controller.selectedFilters]);
+    XCTAssertTrue([controller.statusLabel.text containsString:@"SELECT r.id FROM reviews r WHERE"], @"%@", controller.statusLabel.text);
+}
+
+- (void)testPortedClassifyMenuDemoQueriesTheDatabase {
+    CYLExampleDatabase *database = [[CYLExampleDatabase alloc] initWithPath:@":memory:" error:NULL];
+    CYLMenuLinkageViewController *menu = [[CYLMenuLinkageViewController alloc] initWithDatabase:database];
+    [self hostController:menu];
+    [menu.view layoutIfNeeded];
+    NSInteger places = [database countOfTable:@"places"];
+    XCTAssertEqual(menu.results.count, (NSUInteger)places, @"Every condition is 全部 at first");
+    XCTAssertNil(menu.selectedIndexPath);
+    XCTAssertFalse([menu.lastQuery.SQL containsString:@"WHERE"]);
+
+    // Classify menu (single choice): a tag, highlighted, and only its places.
+    NSIndexPath *sichuan = [self ip:1 :0];
+    [menu selectClassifyItemAtIndexPath:sichuan];
+    NSString *tag = menu.selectedTag;
+    XCTAssertTrue([tag hasPrefix:@"川菜"], @"%@", tag);
+    XCTAssertEqualObjects(menu.selectedIndexPath, sichuan);
+    XCTAssertGreaterThan(menu.results.count, 0u);
+    for (NSDictionary *row in menu.results) {
+        XCTAssertEqualObjects(row[@"tag"], tag);
+    }
+    UICollectionView *collection = [menu valueForKey:@"collectionView"];
+    [collection layoutIfNeeded];
+    UIButton *button = [[collection cellForItemAtIndexPath:sichuan] valueForKey:@"button"];
+    XCTAssertTrue(button.isSelected, @"The selected tag is highlighted (core: selectedIndexPath)");
+    XCTAssertTrue(button.accessibilityTraits & UIAccessibilityTraitSelected);
+    // The results are the menu's footer, below the tags, in the scroll view.
+    XCTAssertGreaterThanOrEqual(CGRectGetMinY(menu.menuFooterView.frame), CGRectGetMaxY(collection.frame) - 0.5);
+    XCTAssertGreaterThan(CGRectGetHeight(menu.menuFooterView.frame), 40);
+    UIScrollView *scroll = (UIScrollView *)menu.menuFooterView.superview;
+    XCTAssertGreaterThanOrEqual(scroll.contentSize.height, CGRectGetMaxY(menu.menuFooterView.frame) - 0.5);
+    XCTAssertTrue([menu.statusLabel.text containsString:@"tag = '"], @"%@", menu.statusLabel.text);
+
+    // Multiple filter: regions (and dishes), ANDed with the tag.
+    [menu confirmFilterSelection:@[[self ip:2 :0], [self ip:0 :1]]];
+    XCTAssertEqualObjects(menu.selectedRegions, @[@"上海"]);
+    XCTAssertEqualObjects(menu.selectedDishes, @[]);
+    NSArray *expected = [database rowsForSQL:@"SELECT name FROM places WHERE tag = ? AND region = ?" arguments:@[tag, @"上海"] error:NULL];
+    XCTAssertEqual(menu.results.count, expected.count);
+    for (NSDictionary *row in menu.results) {
+        XCTAssertEqualObjects(row[@"region"], @"上海");
+    }
+    XCTAssertTrue([menu.lastQuery.SQL containsString:@"tag = ? AND region IN (?)"], @"%@", menu.lastQuery.SQL);
+
+    // Saved in the database: a new visit restores the conditions and the results.
+    CYLMenuLinkageViewController *again = [[CYLMenuLinkageViewController alloc] initWithDatabase:database];
+    [self hostController:again];
+    XCTAssertEqualObjects(again.selectedIndexPath, sichuan);
+    XCTAssertEqualObjects(again.selectedRegions, @[@"上海"]);
+    XCTAssertEqual(again.results.count, menu.results.count);
+
+    // Tapping the tag again clears it; reset brings every place back.
+    [again selectClassifyItemAtIndexPath:sichuan];
+    XCTAssertNil(again.selectedTag);
+    [again confirmFilterSelection:@[[self ip:0 :0], [self ip:2 :1], [self ip:3 :1]]];
+    XCTAssertEqual(again.selectedDishes.count, 2u);
+    for (NSDictionary *row in again.results) {
+        XCTAssertTrue([again.selectedDishes containsObject:row[@"tag"]]);
+    }
+    [again resetConditions];
+    XCTAssertEqual(again.results.count, (NSUInteger)places);
+    XCTAssertEqualObjects([database savedSelectionForScenario:CYLMenuLinkageClassifyScenario], nil);
 }
 
 @end

@@ -72,7 +72,11 @@ static NSString * const kReviewCellIdentifier = @"ReviewCell";
 }
 
 + (id<CYLReviewQuerying>)queryForMode:(CYLReviewFilteringMode)mode {
-    return mode == CYLReviewFilteringModeNetwork ? [[CYLNetworkReviewQuery alloc] init] : [[CYLMemoryReviewQuery alloc] init];
+    switch (mode) {
+        case CYLReviewFilteringModeNetwork: return [[CYLNetworkReviewQuery alloc] init];
+        case CYLReviewFilteringModeDatabase: return [[CYLDatabaseReviewQuery alloc] init];
+        default: return [[CYLMemoryReviewQuery alloc] init];
+    }
 }
 
 - (void)viewDidLoad {
@@ -81,7 +85,8 @@ static NSString * const kReviewCellIdentifier = @"ReviewCell";
     self.title = [NSString stringWithFormat:CYLExampleLocalizedString(@"评价(%lu)"), (unsigned long)store.reviews.count];
     self.view.backgroundColor = [UIColor systemBackgroundColor];
 
-    self.modeControl = [[UISegmentedControl alloc] initWithItems:@[CYLExampleLocalizedString(@"内存筛选"), CYLExampleLocalizedString(@"网络筛选")]];
+    self.modeControl = [[UISegmentedControl alloc] initWithItems:@[CYLExampleLocalizedString(@"内存筛选"), CYLExampleLocalizedString(@"网络筛选"),
+                                                                   CYLExampleLocalizedString(@"数据库筛选")]];
     self.modeControl.selectedSegmentIndex = self.mode;
     [self.modeControl addTarget:self action:@selector(modeChanged) forControlEvents:UIControlEventValueChanged];
     self.navigationItem.titleView = self.modeControl;
@@ -260,6 +265,11 @@ static NSString * const kReviewCellIdentifier = @"ReviewCell";
         [lines addObject:[NSString stringWithFormat:@"%@ · %@", CYLExampleLocalizedString(@"网络筛选：向服务器发送条件"), request]];
         [lines addObject:network.isLoading ? CYLExampleLocalizedString(@"加载中…")
                                            : [NSString stringWithFormat:CYLExampleLocalizedString(@"服务器返回 %lu 条"), (unsigned long)self.visibleReviews.count]];
+    } else if (self.mode == CYLReviewFilteringModeDatabase) {
+        CYLDatabaseReviewQuery *database = (CYLDatabaseReviewQuery *)self.query;
+        [lines addObject:[NSString stringWithFormat:@"%@ · %@", CYLExampleLocalizedString(@"数据库筛选：条件生成 SQL，在 SQLite 中查询"),
+                          [NSString stringWithFormat:CYLExampleLocalizedString(@"匹配 %lu 条"), (unsigned long)self.visibleReviews.count]]];
+        [lines addObject:database.lastQuery.displayString ?: @""];
     } else {
         [lines addObject:[NSString stringWithFormat:@"%@ · %@", CYLExampleLocalizedString(@"内存筛选：在已加载的评价中立即匹配"),
                           [NSString stringWithFormat:CYLExampleLocalizedString(@"匹配 %lu 条"), (unsigned long)self.visibleReviews.count]]];

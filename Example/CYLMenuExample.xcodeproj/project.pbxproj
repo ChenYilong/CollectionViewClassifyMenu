@@ -9,10 +9,14 @@
 /* Begin PBXBuildFile section */
 		066A913BADBFE2E9A0D0A0BF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 660A2BF34B17BD7B1EB4D425 /* Assets.xcassets */; };
 		0BD56347D4972673E228B829 /* CYLExampleAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */; };
+		9EE63EF942AF0038EC28D759 /* CYLExampleDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = FA971A398D805B1A1C05C7EC /* CYLExampleDatabase.m */; };
 		06A8E35411402E09192D5FEA /* CYLExampleLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = A93BEA1A5CE582344DB023FD /* CYLExampleLocalization.m */; };
 		E2D6D021FDE28DBA6F600779 /* CYLExampleMenuSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */; };
+		2A6D88930C097BEB4AF92321 /* CYLExamplePlusButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 246CD66ED46AC8E2804B0477 /* CYLExamplePlusButton.m */; };
 		BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */; };
+		76A2B3062AB0EFD5830A383E /* CYLMenuLinkageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AB1D6C740FCA3930CD9E96E4 /* CYLMenuLinkageViewController.m */; };
 		727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C294F38F03AB5368EB658D2A /* CYLProductViewController.m */; };
+		37F25E90468733CA970EBB45 /* CYLQueryScenariosViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DF88A90396EDE837536A4D3 /* CYLQueryScenariosViewController.m */; };
 		81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */; };
 		E5E7FC29B71C8890CE6260A8 /* CYLReviewQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B2252C99FC61C9A593319D /* CYLReviewQuery.m */; };
 		484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */; };
@@ -25,6 +29,9 @@
 		5F0C081A2A1F3962E352DBFD /* CYLMenuExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */; };
 		0490FE175868491DBA5FE998 /* Pods_CYLMenuExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */; };
 		7FFC7CE0B51A13135C1F03C2 /* Pods_CYLMenuExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* Pods_CYLMenuExampleTests.framework */; };
+		1EE010A9E2077353E49C8912 /* CYLDemoDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = C4322DCEFEAAEBBAB75D1898 /* CYLDemoDataSource.m */; };
+		E7BE62834487F3AD3FC4238D /* CYLDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 91DF9966D221FBD403424451 /* CYLDBManager.m */; };
+		84C3EECF84D97F850FE2FACC /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A79A9D090841321715CB3F35 /* data.json */; };
 		0CA8FA5DC284C2D9D247254F /* pag-ios in Resources */ = {isa = PBXBuildFile; fileRef = BB7F96C76ED83BB97B6AC9F1 /* pag-ios */; };
 /* End PBXBuildFile section */
 
@@ -42,13 +49,21 @@
 		660A2BF34B17BD7B1EB4D425 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C1A99AA47419A059688F04EF /* CYLExampleAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleAppDelegate.h; sourceTree = "<group>"; };
 		7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleAppDelegate.m; sourceTree = "<group>"; };
+		ACF753F7B992F4E27426277D /* CYLExampleDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleDatabase.h; sourceTree = "<group>"; };
+		FA971A398D805B1A1C05C7EC /* CYLExampleDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleDatabase.m; sourceTree = "<group>"; };
 		659D03BD0243479204AC91D1 /* CYLExampleLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleLocalization.h; sourceTree = "<group>"; };
 		A93BEA1A5CE582344DB023FD /* CYLExampleLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleLocalization.m; sourceTree = "<group>"; };
 		C282EEE41F8DF5A22C7637BD /* CYLExampleMenuSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleMenuSource.h; sourceTree = "<group>"; };
 		43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleMenuSource.m; sourceTree = "<group>"; };
+		A467EA2532778EA9B3A9522E /* CYLExamplePlusButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExamplePlusButton.h; sourceTree = "<group>"; };
+		246CD66ED46AC8E2804B0477 /* CYLExamplePlusButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExamplePlusButton.m; sourceTree = "<group>"; };
 		AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CYLMenuExample.bundle; sourceTree = "<group>"; };
+		95AF61968942368D2A33FD9F /* CYLMenuLinkageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMenuLinkageViewController.h; sourceTree = "<group>"; };
+		AB1D6C740FCA3930CD9E96E4 /* CYLMenuLinkageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMenuLinkageViewController.m; sourceTree = "<group>"; };
 		5011505D5EC1E41832F588CA /* CYLProductViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLProductViewController.h; sourceTree = "<group>"; };
 		C294F38F03AB5368EB658D2A /* CYLProductViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLProductViewController.m; sourceTree = "<group>"; };
+		B50D98280F29E6F8AA5768D4 /* CYLQueryScenariosViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLQueryScenariosViewController.h; sourceTree = "<group>"; };
+		0DF88A90396EDE837536A4D3 /* CYLQueryScenariosViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLQueryScenariosViewController.m; sourceTree = "<group>"; };
 		3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewListViewController.h; sourceTree = "<group>"; };
 		3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLReviewListViewController.m; sourceTree = "<group>"; };
 		AF9363FDA0F033201CD16227 /* CYLReviewQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewQuery.h; sourceTree = "<group>"; };
@@ -73,6 +88,11 @@
 		50ED88076C07C90FF1B1A76B /* CYLMenuExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLMenuExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_CYLMenuExample.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		57BB6E92C5DE5A01D940E2F0 /* Pods_CYLMenuExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_CYLMenuExampleTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B877A4B304483B6F80CDCA0D /* CYLDemoDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CYLDemoDataSource.h; path = "../CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/CYLDemoDataSource.h"; sourceTree = SOURCE_ROOT; };
+		C4322DCEFEAAEBBAB75D1898 /* CYLDemoDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CYLDemoDataSource.m; path = "../CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/CYLDemoDataSource.m"; sourceTree = SOURCE_ROOT; };
+		4380DC2DA92AC995FA06B5E9 /* CYLDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CYLDBManager.h; path = "../CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.h"; sourceTree = SOURCE_ROOT; };
+		91DF9966D221FBD403424451 /* CYLDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CYLDBManager.m; path = "../CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.m"; sourceTree = SOURCE_ROOT; };
+		A79A9D090841321715CB3F35 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = data.json; path = "../CollectionViewClassifyMenu/Class/Other/data.json"; sourceTree = SOURCE_ROOT; };
 		BB7F96C76ED83BB97B6AC9F1 /* pag-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "pag-ios"; path = "../Example-Shared/PAGResources/pag-ios"; sourceTree = SOURCE_ROOT; };
 		EAF5130865FE94D53B6E37BC /* Pods-CYLMenuExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExample.debug.xcconfig"; path = "Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample.debug.xcconfig"; sourceTree = "<group>"; };
 		651A60C563CAFE3ABD82F8A0 /* Pods-CYLMenuExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExample.release.xcconfig"; path = "Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample.release.xcconfig"; sourceTree = "<group>"; };
@@ -109,6 +129,7 @@
 				37CFFB3065F967B06D412EEA /* Pods */,
 				17D4474801E7FB00E1C94899 /* Frameworks */,
 				BB7F96C76ED83BB97B6AC9F1 /* pag-ios */,
+				E446029BCAEBE071AE6DF6EA /* Shared */,
 			);
 			sourceTree = "<group>";
 		};
@@ -118,13 +139,21 @@
 				660A2BF34B17BD7B1EB4D425 /* Assets.xcassets */,
 				C1A99AA47419A059688F04EF /* CYLExampleAppDelegate.h */,
 				7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */,
+				ACF753F7B992F4E27426277D /* CYLExampleDatabase.h */,
+				FA971A398D805B1A1C05C7EC /* CYLExampleDatabase.m */,
 				659D03BD0243479204AC91D1 /* CYLExampleLocalization.h */,
 				A93BEA1A5CE582344DB023FD /* CYLExampleLocalization.m */,
 				C282EEE41F8DF5A22C7637BD /* CYLExampleMenuSource.h */,
 				43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */,
+				A467EA2532778EA9B3A9522E /* CYLExamplePlusButton.h */,
+				246CD66ED46AC8E2804B0477 /* CYLExamplePlusButton.m */,
 				AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */,
+				95AF61968942368D2A33FD9F /* CYLMenuLinkageViewController.h */,
+				AB1D6C740FCA3930CD9E96E4 /* CYLMenuLinkageViewController.m */,
 				5011505D5EC1E41832F588CA /* CYLProductViewController.h */,
 				C294F38F03AB5368EB658D2A /* CYLProductViewController.m */,
+				B50D98280F29E6F8AA5768D4 /* CYLQueryScenariosViewController.h */,
+				0DF88A90396EDE837536A4D3 /* CYLQueryScenariosViewController.m */,
 				3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */,
 				3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */,
 				AF9363FDA0F033201CD16227 /* CYLReviewQuery.h */,
@@ -154,6 +183,18 @@
 				C55FFF355A1E5A46E3D41489 /* Info.plist */,
 			);
 			path = CYLMenuExampleTests;
+			sourceTree = "<group>";
+		};
+		E446029BCAEBE071AE6DF6EA /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				B877A4B304483B6F80CDCA0D /* CYLDemoDataSource.h */,
+				C4322DCEFEAAEBBAB75D1898 /* CYLDemoDataSource.m */,
+				4380DC2DA92AC995FA06B5E9 /* CYLDBManager.h */,
+				91DF9966D221FBD403424451 /* CYLDBManager.m */,
+				A79A9D090841321715CB3F35 /* data.json */,
+			);
+			name = Shared;
 			sourceTree = "<group>";
 		};
 		86024CAD1E83101D97359D73 /* Products */ = {
@@ -269,6 +310,7 @@
 				066A913BADBFE2E9A0D0A0BF /* Assets.xcassets in Resources */,
 				BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */,
 				0CA8FA5DC284C2D9D247254F /* pag-ios in Resources */,
+				84C3EECF84D97F850FE2FACC /* data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,9 +411,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				0BD56347D4972673E228B829 /* CYLExampleAppDelegate.m in Sources */,
+				9EE63EF942AF0038EC28D759 /* CYLExampleDatabase.m in Sources */,
 				06A8E35411402E09192D5FEA /* CYLExampleLocalization.m in Sources */,
 				E2D6D021FDE28DBA6F600779 /* CYLExampleMenuSource.m in Sources */,
+				2A6D88930C097BEB4AF92321 /* CYLExamplePlusButton.m in Sources */,
+				76A2B3062AB0EFD5830A383E /* CYLMenuLinkageViewController.m in Sources */,
 				727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */,
+				37F25E90468733CA970EBB45 /* CYLQueryScenariosViewController.m in Sources */,
 				81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */,
 				E5E7FC29B71C8890CE6260A8 /* CYLReviewQuery.m in Sources */,
 				484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */,
@@ -381,6 +427,8 @@
 				CB427645F40F1C4CE7D760FF /* CYLTagConfigurationDemoViewController.m in Sources */,
 				F00293E01049837C88AD1BD4 /* CYLTagStyleDemoViewController.m in Sources */,
 				6345674F0F0AAACA8D0859D2 /* main.m in Sources */,
+				1EE010A9E2077353E49C8912 /* CYLDemoDataSource.m in Sources */,
+				E7BE62834487F3AD3FC4238D /* CYLDBManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +519,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLMenuExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				CODE_SIGN_STYLE = Automatic;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lsqlite3",
+				);
 			};
 			name = Debug;
 		};
@@ -483,6 +535,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLMenuExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				CODE_SIGN_STYLE = Automatic;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lsqlite3",
+				);
 			};
 			name = Release;
 		};

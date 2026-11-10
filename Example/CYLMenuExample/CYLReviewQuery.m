@@ -90,3 +90,75 @@
 }
 
 @end
+
+@interface CYLDatabaseReviewQuery ()
+@property (nonatomic, strong, readwrite, nullable) CYLExampleSQLQuery *lastQuery;
+@end
+
+@implementation CYLDatabaseReviewQuery
+
+- (instancetype)init {
+    return [self initWithDatabase:[CYLExampleDatabase sharedDatabase]];
+}
+
+- (instancetype)initWithDatabase:(CYLExampleDatabase *)database {
+    self = [super init];
+    if (self) {
+        _database = database;
+    }
+    return self;
+}
+
+- (CYLReviewFilteringMode)mode {
+    return CYLReviewFilteringModeDatabase;
+}
+
+- (BOOL)isLoading {
+    return NO;
+}
+
++ (CYLExampleSQLQuery *)queryForFilters:(NSArray<CYLReviewFilter *> *)filters {
+    NSMutableArray<NSString *> *conditions = [NSMutableArray array];
+    NSMutableArray *arguments = [NSMutableArray array];
+    NSDictionary<NSString *, NSNumber *> *ratings = @{@"good": @(CYLReviewRatingGood), @"neutral": @(CYLReviewRatingNeutral), @"bad": @(CYLReviewRatingBad)};
+    for (CYLReviewFilter *filter in filters) {
+        NSString *identifier = filter.identifier;
+        if (ratings[identifier]) {
+            [conditions addObject:@"r.rating = ?"];
+            [arguments addObject:ratings[identifier]];
+        } else if ([identifier isEqualToString:@"photo"]) {
+            [conditions addObject:@"r.has_photo = 1"];
+        } else if ([identifier isEqualToString:@"followup"]) {
+            [conditions addObject:@"r.has_follow_up = 1"];
+        } else if (filter.isKeyword) {
+            [conditions addObject:@"EXISTS (SELECT 1 FROM review_keywords k WHERE k.review_id = r.id AND k.keyword = ?)"];
+            [arguments addObject:filter.name];
+        }
+    }
+    NSString *SQL = @"SELECT r.id FROM reviews r";
+    if (conditions.count > 0) {
+        SQL = [SQL stringByAppendingFormat:@" WHERE %@", [conditions componentsJoinedByString:@" AND "]];
+    }
+    return [CYLExampleSQLQuery querySQL:[SQL stringByAppendingString:@" ORDER BY r.id"] arguments:arguments];
+}
+
+- (void)fetchReviewsMatchingFilters:(NSArray<CYLReviewFilter *> *)filters completion:(CYLReviewQueryCompletion)completion {
+    CYLExampleSQLQuery *query = [[self class] queryForFilters:filters];
+    self.lastQuery = query;
+    NSError *error = nil;
+    NSArray *rows = [self.database rowsForQuery:query error:&error];
+    if (!rows) {
+        NSLog(@"[CYLMenuExample] %@: %@", query.SQL, error);
+    }
+    NSArray<CYLReview *> *reviews = [CYLReviewStore sharedStore].reviews;
+    NSMutableArray *result = [NSMutableArray array];
+    for (NSDictionary *row in rows) {
+        NSUInteger index = [row[@"id"] unsignedIntegerValue];
+        if (index < reviews.count) {
+            [result addObject:reviews[index]];
+        }
+    }
+    completion(result);
+}
+
+@end
