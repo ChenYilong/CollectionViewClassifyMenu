@@ -28,6 +28,7 @@ jobs:
         run: |
           pod install
           (cd TagCollectionView && pod install)
+          (cd Example && pod install)
 
       - name: Test CollectionViewClassifyMenu
         run: |
@@ -38,6 +39,7 @@ jobs:
           grep -q "\*\* TEST SUCCEEDED \*\*" menu-test.log
 
       - name: Test TagCollectionView
+        if: always()
         run: |
           set -o pipefail
           xcodebuild test -workspace TagCollectionView/TagCollectionView.xcworkspace \
@@ -45,7 +47,17 @@ jobs:
             CODE_SIGNING_ALLOWED=NO | tee tag-test.log | grep -E "Test Case|error:|warning:|\*\* TEST" || true
           grep -q "\*\* TEST SUCCEEDED \*\*" tag-test.log
 
+      - name: Test Example
+        if: always()
+        run: |
+          set -o pipefail
+          xcodebuild test -workspace Example/CYLMenuExample.xcworkspace \
+            -scheme CYLMenuExample -destination "$SIM_DESTINATION" \
+            CODE_SIGNING_ALLOWED=NO | tee example-test.log | grep -E "Test Case|error:|warning:|\*\* TEST" || true
+          grep -q "\*\* TEST SUCCEEDED \*\*" example-test.log
+
       - name: Lint podspec
+        if: always()
         run: scripts/pod-lint.sh lib
 
       - name: Lint podspec without allowing warnings

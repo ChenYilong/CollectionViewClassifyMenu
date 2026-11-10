@@ -1,0 +1,11 @@
+# Integrates the local core library from the repository root.
+platform :ios, '15.0'
+project 'CYLMenuExample.xcodeproj'
+
+target 'CYLMenuExample' do
+  pod 'CollectionViewClassifyMenu', :path => '..'
+
+  target 'CYLMenuExampleTests' do
+    inherit! :search_paths
+  end
+end

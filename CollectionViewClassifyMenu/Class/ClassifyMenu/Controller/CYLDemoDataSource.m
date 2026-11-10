@@ -1,5 +1,6 @@
 #import "CYLDemoDataSource.h"
 #import "CYLDBManager.h"
+#import "CYLMenuResources.h"
 
 @interface CYLDemoDataSource ()
 @property (nonatomic, copy) NSArray<NSDictionary *> *sections;
@@ -47,8 +48,13 @@
     return self.sections[indexPath.section][kDataSourceSectionKey][indexPath.item][kDataSourceCellTextKey];
 }
 
-- (BOOL)menuItemHasImageAtIndexPath:(NSIndexPath *)indexPath {
-    return self.sections[indexPath.section][kDataSourceSectionKey][indexPath.item][kDataSourceCellPictureKey] != nil;
+- (UIImage *)menuImageForItemAtIndexPath:(NSIndexPath *)indexPath {
+    BOOL hasImage = self.sections[indexPath.section][kDataSourceSectionKey][indexPath.item][kDataSourceCellPictureKey] != nil;
+    return hasImage ? [CYLMenuResources imageNamed:@"home_btn_shrink"] : nil;
+}
+
+- (UIImage *)menuImageForSection:(NSInteger)section {
+    return self.hasExclusiveFirstItem ? nil : [CYLMenuResources imageNamed:@"home_btn_cosmetic"];
 }
 
 - (BOOL)menuItemIsExclusiveAtIndexPath:(NSIndexPath *)indexPath {

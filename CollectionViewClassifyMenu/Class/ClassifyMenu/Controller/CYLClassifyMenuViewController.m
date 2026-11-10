@@ -192,9 +192,10 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
             NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithObject:[source menuTitleForItemAtIndexPath:indexPath]
                                                                              forKey:kDataSourceCellTextKey];
-            if ([source respondsToSelector:@selector(menuItemHasImageAtIndexPath:)] &&
-                [source menuItemHasImageAtIndexPath:indexPath]) {
-                entry[kDataSourceCellPictureKey] = @"Picture";
+            UIImage *image = [source respondsToSelector:@selector(menuImageForItemAtIndexPath:)]
+                ? [source menuImageForItemAtIndexPath:indexPath] : nil;
+            if (image) {
+                entry[kDataSourceCellPictureKey] = image;
             }
             [items addObject:entry];
         }
@@ -298,8 +299,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
                          [self cyl_tagFont]}];
-    NSString *picture = [content objectForKey:kDataSourceCellPictureKey];
-    BOOL shouldShowPic = [@(picture.length) boolValue];
+    BOOL shouldShowPic = [self cyl_imageForItem:content] != nil;
     if (shouldShowPic) {
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin * 2;
     } else {
@@ -368,14 +368,17 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     return [self.firstRowCellCountArray[section] integerValue];
 }
 
-- (BOOL)shouldCollectionCellPictureShowWithIndex:(NSIndexPath *)indexPath {
-    NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
-    NSString *picture = [items[indexPath.row] objectForKey:kDataSourceCellPictureKey];
-    NSUInteger pictureLength = [@(picture.length) integerValue];
-    if (pictureLength > 0) {
-        return YES;
+/// The item's image: a UIImage from -menuImageForItemAtIndexPath:, or the
+/// bundled default for legacy dictionaries that store a non-empty string.
+- (UIImage *)cyl_imageForItem:(NSDictionary *)item {
+    id picture = item[kDataSourceCellPictureKey];
+    if ([picture isKindOfClass:[UIImage class]]) {
+        return picture;
     }
-    return NO;
+    if ([picture isKindOfClass:[NSString class]] && [picture length] > 0) {
+        return [CYLMenuResources imageNamed:@"home_btn_shrink"];
+    }
+    return nil;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -386,10 +389,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
                                                             objectForKey:kDataSourceSectionKey]];
     NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
-    BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
-    if (shouldShowPic) {
-        [cell.button setImage:[CYLMenuResources imageNamed:@"home_btn_shrink"]
-                     forState:UIControlStateNormal];
+    UIImage *image = [self cyl_imageForItem:items[indexPath.row]];
+    if (image) {
+        [cell.button setImage:image forState:UIControlStateNormal];
         cell.button.cyl_imageTitleSpacing = kCollectionViewItemButtonImageToTextMargin;
     } else {
         [cell.button setImage:nil forState:UIControlStateNormal];
@@ -437,26 +439,10 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         filterHeaderView.moreButton.selected = NO;
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateNormal];
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
-        switch (indexPath.section) {
-            case 0:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            case 1:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            case 2:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            case 3:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            default:
-                break;
-        }
+        id<CYLMenuDataSource> source = self.menuDataSource;
+        UIImage *sectionImage = [source respondsToSelector:@selector(menuImageForSection:)]
+            ? [source menuImageForSection:indexPath.section] : nil;
+        [filterHeaderView.titleButton setImage:sectionImage forState:UIControlStateNormal];
         for (NSNumber *i in self.expandSectionArray) {
             if (indexPath.section == [i integerValue]) {
                 filterHeaderView.moreButton.selected = YES;

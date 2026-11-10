@@ -1,0 +1,490 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0BD56347D4972673E228B829 /* CYLExampleAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */; };
+		9C454FCB6664A2368FA35660 /* CYLExampleListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 958452078CDD2FB0AB2DE9BB /* CYLExampleListViewController.m */; };
+		E2D6D021FDE28DBA6F600779 /* CYLExampleMenuSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */; };
+		727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C294F38F03AB5368EB658D2A /* CYLProductViewController.m */; };
+		81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */; };
+		484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */; };
+		0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */; };
+		6345674F0F0AAACA8D0859D2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 714D4F5C3B6CCF802F032827 /* main.m */; };
+		5F0C081A2A1F3962E352DBFD /* CYLMenuExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */; };
+		0490FE175868491DBA5FE998 /* libPods-CYLMenuExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* libPods-CYLMenuExample.a */; };
+		7FFC7CE0B51A13135C1F03C2 /* libPods-CYLMenuExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* libPods-CYLMenuExampleTests.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		431387EB7262E1CFC79B125E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 99889D60A11D60E2AA54819D;
+			remoteInfo = CYLMenuExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C1A99AA47419A059688F04EF /* CYLExampleAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleAppDelegate.h; sourceTree = "<group>"; };
+		7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleAppDelegate.m; sourceTree = "<group>"; };
+		641D598EA0BD034B21931789 /* CYLExampleListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleListViewController.h; sourceTree = "<group>"; };
+		958452078CDD2FB0AB2DE9BB /* CYLExampleListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleListViewController.m; sourceTree = "<group>"; };
+		C282EEE41F8DF5A22C7637BD /* CYLExampleMenuSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLExampleMenuSource.h; sourceTree = "<group>"; };
+		43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLExampleMenuSource.m; sourceTree = "<group>"; };
+		5011505D5EC1E41832F588CA /* CYLProductViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLProductViewController.h; sourceTree = "<group>"; };
+		C294F38F03AB5368EB658D2A /* CYLProductViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLProductViewController.m; sourceTree = "<group>"; };
+		3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewListViewController.h; sourceTree = "<group>"; };
+		3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLReviewListViewController.m; sourceTree = "<group>"; };
+		E6FEBA27A9A1405D4A0084CD /* CYLReviewStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLReviewStore.h; sourceTree = "<group>"; };
+		701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLReviewStore.m; sourceTree = "<group>"; };
+		81FF2081F27EEF8C4C599B93 /* CYLSearchCategoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSearchCategoryViewController.h; sourceTree = "<group>"; };
+		9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSearchCategoryViewController.m; sourceTree = "<group>"; };
+		261CB08FA58627B5FB7DB381 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		714D4F5C3B6CCF802F032827 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMenuExampleTests.m; sourceTree = "<group>"; };
+		C55FFF355A1E5A46E3D41489 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7F6D01D6546BCD07518D8398 /* CYLMenuExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLMenuExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		50ED88076C07C90FF1B1A76B /* CYLMenuExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLMenuExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B92E3BF9D9E55A1A7600BEB5 /* libPods-CYLMenuExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CYLMenuExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		57BB6E92C5DE5A01D940E2F0 /* libPods-CYLMenuExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CYLMenuExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAF5130865FE94D53B6E37BC /* Pods-CYLMenuExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExample.debug.xcconfig"; path = "Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample.debug.xcconfig"; sourceTree = "<group>"; };
+		651A60C563CAFE3ABD82F8A0 /* Pods-CYLMenuExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExample.release.xcconfig"; path = "Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample.release.xcconfig"; sourceTree = "<group>"; };
+		813659A7FC66C3A76C2AE901 /* Pods-CYLMenuExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-CYLMenuExampleTests/Pods-CYLMenuExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		A46DF699F672D48901DE4B62 /* Pods-CYLMenuExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExampleTests.release.xcconfig"; path = "Target Support Files/Pods-CYLMenuExampleTests/Pods-CYLMenuExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		885D3B69EA3BAD459F41048D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0490FE175868491DBA5FE998 /* libPods-CYLMenuExample.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		93AE8B951B16FE0E28B7788B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7FFC7CE0B51A13135C1F03C2 /* libPods-CYLMenuExampleTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2B731CEFC6751AAE0EC69B98 = {
+			isa = PBXGroup;
+			children = (
+				20F4BD606C0F6D1645AE4919 /* CYLMenuExample */,
+				C0D0581312912516FF12D747 /* CYLMenuExampleTests */,
+				86024CAD1E83101D97359D73 /* Products */,
+				37CFFB3065F967B06D412EEA /* Pods */,
+				17D4474801E7FB00E1C94899 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		20F4BD606C0F6D1645AE4919 /* CYLMenuExample */ = {
+			isa = PBXGroup;
+			children = (
+				C1A99AA47419A059688F04EF /* CYLExampleAppDelegate.h */,
+				7C1E19A60F443F8328DE430F /* CYLExampleAppDelegate.m */,
+				641D598EA0BD034B21931789 /* CYLExampleListViewController.h */,
+				958452078CDD2FB0AB2DE9BB /* CYLExampleListViewController.m */,
+				C282EEE41F8DF5A22C7637BD /* CYLExampleMenuSource.h */,
+				43231C0FB41BC5825569C10A /* CYLExampleMenuSource.m */,
+				5011505D5EC1E41832F588CA /* CYLProductViewController.h */,
+				C294F38F03AB5368EB658D2A /* CYLProductViewController.m */,
+				3C4F7E3544759DFD6F63FBD0 /* CYLReviewListViewController.h */,
+				3C5351F15D8D08263A156124 /* CYLReviewListViewController.m */,
+				E6FEBA27A9A1405D4A0084CD /* CYLReviewStore.h */,
+				701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */,
+				81FF2081F27EEF8C4C599B93 /* CYLSearchCategoryViewController.h */,
+				9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */,
+				261CB08FA58627B5FB7DB381 /* Info.plist */,
+				714D4F5C3B6CCF802F032827 /* main.m */,
+			);
+			path = CYLMenuExample;
+			sourceTree = "<group>";
+		};
+		C0D0581312912516FF12D747 /* CYLMenuExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */,
+				C55FFF355A1E5A46E3D41489 /* Info.plist */,
+			);
+			path = CYLMenuExampleTests;
+			sourceTree = "<group>";
+		};
+		86024CAD1E83101D97359D73 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7F6D01D6546BCD07518D8398 /* CYLMenuExample.app */,
+				50ED88076C07C90FF1B1A76B /* CYLMenuExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		37CFFB3065F967B06D412EEA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				EAF5130865FE94D53B6E37BC /* Pods-CYLMenuExample.debug.xcconfig */,
+				651A60C563CAFE3ABD82F8A0 /* Pods-CYLMenuExample.release.xcconfig */,
+				813659A7FC66C3A76C2AE901 /* Pods-CYLMenuExampleTests.debug.xcconfig */,
+				A46DF699F672D48901DE4B62 /* Pods-CYLMenuExampleTests.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		17D4474801E7FB00E1C94899 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B92E3BF9D9E55A1A7600BEB5 /* libPods-CYLMenuExample.a */,
+				57BB6E92C5DE5A01D940E2F0 /* libPods-CYLMenuExampleTests.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		99889D60A11D60E2AA54819D /* CYLMenuExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E345CD130BDE71A07539FC5 /* Build configuration list for PBXNativeTarget "CYLMenuExample" */;
+			buildPhases = (
+				F2A0EAAF82B272E15DF53425 /* [CP] Check Pods Manifest.lock */,
+				E8E4FFBB286BA59E6C040EC3 /* Sources */,
+				885D3B69EA3BAD459F41048D /* Frameworks */,
+				F1E4C7A124641C6201468B9C /* Resources */,
+				1B05EBA6D227C0F8573B1421 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CYLMenuExample;
+			productName = CYLMenuExample;
+			productReference = 7F6D01D6546BCD07518D8398 /* CYLMenuExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FB5BDAF40F71088308F0F591 /* CYLMenuExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 19C3ED96BF8CF288FF46FEB0 /* Build configuration list for PBXNativeTarget "CYLMenuExampleTests" */;
+			buildPhases = (
+				C86DB67C4E52B5851DCD29D2 /* [CP] Check Pods Manifest.lock */,
+				F59C492771BBD8408142EC60 /* Sources */,
+				93AE8B951B16FE0E28B7788B /* Frameworks */,
+				4D8F1B5AD56B6957A1012DC0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2254342BECCEAFBD04538E0A /* PBXTargetDependency */,
+			);
+			name = CYLMenuExampleTests;
+			productName = CYLMenuExampleTests;
+			productReference = 50ED88076C07C90FF1B1A76B /* CYLMenuExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1500;
+				ORGANIZATIONNAME = ChenYilong;
+				TargetAttributes = {
+					FB5BDAF40F71088308F0F591 = {
+						TestTargetID = 99889D60A11D60E2AA54819D;
+					};
+				};
+			};
+			buildConfigurationList = 01076EBF22530E406F54B419 /* Build configuration list for PBXProject "CYLMenuExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2B731CEFC6751AAE0EC69B98;
+			productRefGroup = 86024CAD1E83101D97359D73 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				99889D60A11D60E2AA54819D /* CYLMenuExample */,
+				FB5BDAF40F71088308F0F591 /* CYLMenuExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F1E4C7A124641C6201468B9C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D8F1B5AD56B6957A1012DC0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F2A0EAAF82B272E15DF53425 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CYLMenuExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C86DB67C4E52B5851DCD29D2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CYLMenuExampleTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1B05EBA6D227C0F8573B1421 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/CollectionViewClassifyMenu/CYLClassifyMenuResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLClassifyMenuResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E8E4FFBB286BA59E6C040EC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0BD56347D4972673E228B829 /* CYLExampleAppDelegate.m in Sources */,
+				9C454FCB6664A2368FA35660 /* CYLExampleListViewController.m in Sources */,
+				E2D6D021FDE28DBA6F600779 /* CYLExampleMenuSource.m in Sources */,
+				727603F72FFE389949E0A2B2 /* CYLProductViewController.m in Sources */,
+				81CD3F759888AA87A3A84E69 /* CYLReviewListViewController.m in Sources */,
+				484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */,
+				0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */,
+				6345674F0F0AAACA8D0859D2 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F59C492771BBD8408142EC60 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F0C081A2A1F3962E352DBFD /* CYLMenuExampleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2254342BECCEAFBD04538E0A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 99889D60A11D60E2AA54819D /* CYLMenuExample */;
+			targetProxy = 431387EB7262E1CFC79B125E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FA9139DD8B03E3F922556BF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		FFE2104CCFAB79205AC64460 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		72FB3ED29B4639D83EC5DB14 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EAF5130865FE94D53B6E37BC /* Pods-CYLMenuExample.debug.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = CYLMenuExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLMenuExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Debug;
+		};
+		191734982F22ABEBB64A1AE0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 651A60C563CAFE3ABD82F8A0 /* Pods-CYLMenuExample.release.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = CYLMenuExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLMenuExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Release;
+		};
+		0B9D7A058B3133F2CFB1D4A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 813659A7FC66C3A76C2AE901 /* Pods-CYLMenuExampleTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = CYLMenuExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLMenuExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CYLMenuExample.app/CYLMenuExample";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/CYLMenuExample";
+			};
+			name = Debug;
+		};
+		17BFBBF586B1A6F2699F7699 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A46DF699F672D48901DE4B62 /* Pods-CYLMenuExampleTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = CYLMenuExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLMenuExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CYLMenuExample.app/CYLMenuExample";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/CYLMenuExample";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		01076EBF22530E406F54B419 /* Build configuration list for PBXProject "CYLMenuExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA9139DD8B03E3F922556BF8 /* Debug */,
+				FFE2104CCFAB79205AC64460 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7E345CD130BDE71A07539FC5 /* Build configuration list for PBXNativeTarget "CYLMenuExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72FB3ED29B4639D83EC5DB14 /* Debug */,
+				191734982F22ABEBB64A1AE0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		19C3ED96BF8CF288FF46FEB0 /* Build configuration list for PBXNativeTarget "CYLMenuExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B9D7A058B3133F2CFB1D4A0 /* Debug */,
+				17BFBBF586B1A6F2699F7699 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}

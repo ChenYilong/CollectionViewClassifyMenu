@@ -503,7 +503,12 @@
         UICollectionViewLayoutAttributes *first =
             [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
         XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), CYLTagHeightForFont(largeFont, 30), 0.5);
+        // Give the collection a fixed viewport, as the other controller tests do,
+        // so scrolling exercises cell reuse.
+        collection.frame = CGRectMake(0, 0, width.doubleValue, 240);
+        [collection layoutIfNeeded];
         [self scrollAndCheck:collection fixture:fixture buttonKey:@"button"];
+        XCTAssertGreaterThan(collection.visibleCells.count, 0u);
         for (UICollectionViewCell *cell in collection.visibleCells) {
             UIButton *button = [cell valueForKey:@"button"];
             XCTAssertEqualWithAccuracy(button.titleLabel.font.pointSize, largeFont.pointSize, 0.01);
@@ -544,6 +549,8 @@
         UICollectionViewLayoutAttributes *first =
             [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
         XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), CYLTagHeightForFont(largeFont, 30), 0.5);
+        collection.frame = CGRectMake(0, 0, panelWidth, 240);
+        [collection layoutIfNeeded];
         [self scrollAndCheck:collection fixture:fixture buttonKey:@"titleButton"];
         [collection setContentOffset:CGPointMake(0, -collection.contentInset.top) animated:NO];
         [collection layoutIfNeeded];
