@@ -59,14 +59,14 @@ final class CYLRemarkViewController: UIViewController {
         configuration.contentInsets = .zero
         tagsButton.configuration = configuration
         tagsButton.contentHorizontalAlignment = .leading
-        tagsButton.addTarget(self, action: #selector(editTags), for: .touchUpInside)
+        tagsButton.addTarget(self, action: #selector(editTagsTapped), for: .touchUpInside)
         tagsButton.accessibilityHint = CYLTagEditorLocalizedString("编辑标签")
 
         // The chosen tags, display only (taps open the editor).
         tagsView.style = CYLTagEditorViewController.tagStyle()
         tagsView.selectionMode = .none
         tagsView.showsSectionHeaders = false
-        tagsView.scrollEnabled = false
+        tagsView.isScrollEnabled = false
         tagsView.menuDataSource = self
         tagsView.menuDelegate = self
 
@@ -113,7 +113,7 @@ final class CYLRemarkViewController: UIViewController {
         return editor
     }
 
-    @objc private func editTags() {
+    @objc private func editTagsTapped() {
         editTags(animated: true)
     }
 

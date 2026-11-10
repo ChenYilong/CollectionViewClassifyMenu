@@ -171,8 +171,9 @@ jobs:
         run: scripts/example-screenshots.sh
       # [EN] Pull requests from forks have a read-only token; their screenshots stay in the artifact.
       # [CN] 来自 fork 的 PR 只有只读 token；其截图仅保存在 artifact 中。
+      # [EN] Also when one app's screenshots failed: the other app's are still published. [CN] 某个 App 截图失败时也发布另一个 App 的截图。
       - name: Publish screenshots
-        if: needs.changes.outputs.code == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        if: always() && needs.changes.outputs.code == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SCREENSHOT_REF: ${{ github.head_ref || github.ref_name }}

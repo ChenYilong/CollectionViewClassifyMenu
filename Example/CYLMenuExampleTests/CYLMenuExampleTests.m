@@ -1318,7 +1318,7 @@
         [db saveSelection:@[[self ip:1 :0]] forScenario:@"test"];
         return NO;
     }];
-    XCTAssertTrue([database saveSelection:@[[self ip:3 :0], [self ip:2 :1]] forScenario:@"test"]);
+    XCTAssertTrue(([database saveSelection:@[[self ip:3 :0], [self ip:2 :1]] forScenario:@"test"]));
     XCTAssertEqualObjects([database savedSelectionForScenario:@"test"], (@[[self ip:3 :0], [self ip:2 :1]]));
     XCTAssertNil([database savedSelectionForScenario:@"other"]);
 }
