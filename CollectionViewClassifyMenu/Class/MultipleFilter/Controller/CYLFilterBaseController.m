@@ -111,11 +111,12 @@
 - (IBAction)confirmButtonClicked:(id)sender {
     [UIView animateWithDuration:0.3f animations:^{
         [self changeXOfSubviewsInCollectionViewWhenShow];
-        _contentView.alpha = 0;
+        self.contentView.alpha = 0;
     } completion:^(BOOL finished) {
         [self.view removeFromSuperview];
-        if (_delegate && [_delegate respondsToSelector:@selector(filterControllerDidComplete:)]) {
-            [_delegate filterControllerDidComplete:self];
+        id<CYLFilterControllerDelegate> delegate = self.delegate;
+        if ([delegate respondsToSelector:@selector(filterControllerDidComplete:)]) {
+            [delegate filterControllerDidComplete:self];
         }
     }];
 }
@@ -137,14 +138,14 @@
     _contentView.alpha = 0;
     [UIView animateWithDuration:0.3f animations:^{
         [self changeXOfSubviewsInCollectionViewWhenHide];
-        _contentView.alpha = 0.35f;
+        self.contentView.alpha = 0.35f;
     }];
 }
 
 - (void)hide {
     [UIView animateWithDuration:0.3f animations:^{
         [self changeXOfSubviewsInCollectionViewWhenShow];
-        _contentView.alpha = 0;
+        self.contentView.alpha = 0;
     } completion:^(BOOL finished) {
         [self.view removeFromSuperview];
     }];

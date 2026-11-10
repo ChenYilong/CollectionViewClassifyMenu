@@ -39,37 +39,24 @@ static float const kImageToTextMargin = 7;
     return self;
 }
 
-// Place the title before the image without the image/title edge insets that
-// are deprecated in iOS 15. The content group keeps UIKit's alignment.
-- (CGFloat)cyl_groupOriginXForContentRect:(CGRect)contentRect {
-    CGRect imageRect = [super imageRectForContentRect:contentRect];
-    CGRect titleRect = [super titleRectForContentRect:contentRect];
-    if (CGRectIsEmpty(imageRect) || CGRectIsEmpty(titleRect)) {
-        return 0;
+// Places the title before the image after UIKit's layout, instead of the
+// edge insets and content-rect overrides deprecated in iOS 15. The group
+// keeps UIKit's alignment.
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    CGRect imageFrame = self.imageView.frame;
+    CGRect titleFrame = self.titleLabel.frame;
+    if (self.currentImage == nil || self.currentTitle.length == 0 ||
+        CGRectIsEmpty(imageFrame) || CGRectIsEmpty(titleFrame)) {
+        return;
     }
-    return MIN(CGRectGetMinX(imageRect), CGRectGetMinX(titleRect)) - kImageToTextMargin / 2.0;
-}
-
-- (CGRect)titleRectForContentRect:(CGRect)contentRect {
-    CGRect titleRect = [super titleRectForContentRect:contentRect];
-    CGRect imageRect = [super imageRectForContentRect:contentRect];
-    if (CGRectIsEmpty(imageRect) || CGRectIsEmpty(titleRect)) {
-        return titleRect;
-    }
-    titleRect.origin.x = MAX(CGRectGetMinX(contentRect), [self cyl_groupOriginXForContentRect:contentRect]);
-    CGFloat maxWidth = CGRectGetMaxX(contentRect) - CGRectGetWidth(imageRect) - kImageToTextMargin - CGRectGetMinX(titleRect);
-    titleRect.size.width = MAX(0, MIN(CGRectGetWidth(titleRect), maxWidth));
-    return titleRect;
-}
-
-- (CGRect)imageRectForContentRect:(CGRect)contentRect {
-    CGRect imageRect = [super imageRectForContentRect:contentRect];
-    CGRect titleRect = [self titleRectForContentRect:contentRect];
-    if (CGRectIsEmpty(imageRect) || CGRectIsEmpty(titleRect)) {
-        return imageRect;
-    }
-    imageRect.origin.x = CGRectGetMaxX(titleRect) + kImageToTextMargin;
-    return imageRect;
+    CGFloat groupX = MIN(CGRectGetMinX(imageFrame), CGRectGetMinX(titleFrame)) - kImageToTextMargin / 2.0;
+    titleFrame.origin.x = MAX(0, groupX);
+    CGFloat maxTitleWidth = CGRectGetWidth(self.bounds) - CGRectGetWidth(imageFrame) - kImageToTextMargin - CGRectGetMinX(titleFrame);
+    titleFrame.size.width = MAX(0, MIN(CGRectGetWidth(titleFrame), maxTitleWidth));
+    imageFrame.origin.x = CGRectGetMaxX(titleFrame) + kImageToTextMargin;
+    self.titleLabel.frame = titleFrame;
+    self.imageView.frame = imageFrame;
 }
 
 - (void)setHighlighted:(BOOL)highlighted {}

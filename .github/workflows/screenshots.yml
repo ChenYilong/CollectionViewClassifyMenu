@@ -1,0 +1,58 @@
+# [EN] Screenshots of the Example app (scripts/example-screenshots.sh), modelled on CYLTabBarController's
+#      theme-screenshots.yml: the app launched once per README scenario screen on an iOS simulator. The screenshots are an
+#      artifact of the run, to put into docs/assets/ and the README.
+# [CN] Example 截图（scripts/example-screenshots.sh），参照 CYLTabBarController 的 theme-screenshots.yml：在 iOS 模拟器上为 README 中
+#      每个场景页面启动一次 App。截图作为本次运行的 artifact，可放入 docs/assets/ 与 README。
+name: Example screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      screens:
+        description: "Screens, comma separated (empty: the default list)"
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - ".github/workflows/screenshots.yml"
+      - "scripts/example-screenshots.sh"
+      - "Example/**"
+      - "CollectionViewClassifyMenu/Class/**"
+  push:
+    branches: [ 'claude/**' ]
+    paths:
+      - ".github/workflows/screenshots.yml"
+      - "scripts/example-screenshots.sh"
+      - "Example/**"
+      - "CollectionViewClassifyMenu/Class/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: example-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Example screenshots
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Screenshots
+        env:
+          SCREENS_INPUT: ${{ github.event.inputs.screens }}
+        run: |
+          if [ -n "$SCREENS_INPUT" ]; then export SCREENS="$SCREENS_INPUT"; fi
+          scripts/example-screenshots.sh
+      - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded must not fail the job. [CN] 日志上传失败不应让 job 失败。
+        continue-on-error: true
+        if: always()
+        with:
+          name: example-screenshots
+          path: |
+            build/screenshots/*.png
+            build/screenshots-build/build.log
+          if-no-files-found: warn

@@ -77,7 +77,11 @@
     NSError *error = nil;
     id archive = nil;
     @try {
-        archive = [NSKeyedUnarchiver unarchiveTopLevelObjectWithData:data error:&error];
+        NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:data error:&error];
+        // Legacy archives were written without secure coding.
+        unarchiver.requiresSecureCoding = NO;
+        archive = [unarchiver decodeObjectForKey:NSKeyedArchiveRootObjectKey];
+        [unarchiver finishDecoding];
     } @catch (NSException *exception) {
         NSLog(@"Cannot decode existing demo filter settings: %@", exception);
         return nil;

@@ -499,8 +499,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     CGFloat height = 0;
     if (CGRectGetWidth(self.collectionView.bounds) > 0) {
         [self.collectionView layoutIfNeeded];
+        // Explicit insets only: safe-area adjustments belong to the host's layout.
         height = ceil(self.collectionView.collectionViewLayout.collectionViewContentSize.height +
-                      self.collectionView.adjustedContentInset.top + self.collectionView.adjustedContentInset.bottom);
+                      self.collectionView.contentInset.top + self.collectionView.contentInset.bottom);
     } else {
         height = [self heightThatFitsWidth:0];
     }

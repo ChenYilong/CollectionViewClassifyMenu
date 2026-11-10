@@ -26,27 +26,25 @@
     [self setNeedsLayout];
 }
 
-- (CGRect)imageRectForContentRect:(CGRect)contentRect {
-    CGRect rect = [super imageRectForContentRect:contentRect];
-    if (self.cyl_imageTitleSpacing > 0 && self.currentTitle.length > 0) {
-        rect.origin.x -= self.cyl_imageTitleSpacing / 2.0;
+// Positions the image and title after UIKit's layout instead of using the
+// image/title edge insets and content-rect overrides deprecated in iOS 15.
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    BOOL hasImage = self.currentImage != nil;
+    BOOL hasTitle = self.currentTitle.length > 0;
+    CGFloat titleOffset = self.cyl_titleLeadingInset;
+    if (self.cyl_imageTitleSpacing > 0 && hasImage && hasTitle) {
+        CGRect imageFrame = self.imageView.frame;
+        imageFrame.origin.x -= self.cyl_imageTitleSpacing / 2.0;
+        self.imageView.frame = imageFrame;
+        titleOffset += self.cyl_imageTitleSpacing / 2.0;
     }
-    return rect;
-}
-
-- (CGRect)titleRectForContentRect:(CGRect)contentRect {
-    CGRect rect = [super titleRectForContentRect:contentRect];
-    CGFloat offset = self.cyl_titleLeadingInset;
-    if (self.cyl_imageTitleSpacing > 0 && self.currentImage != nil) {
-        offset += self.cyl_imageTitleSpacing / 2.0;
+    if (titleOffset != 0 && hasTitle) {
+        CGRect titleFrame = self.titleLabel.frame;
+        titleFrame.origin.x += titleOffset;
+        titleFrame.size.width = MAX(0, MIN(CGRectGetWidth(titleFrame), CGRectGetWidth(self.bounds) - CGRectGetMinX(titleFrame)));
+        self.titleLabel.frame = titleFrame;
     }
-    if (offset == 0) {
-        return rect;
-    }
-    rect.origin.x += offset;
-    CGFloat maxWidth = CGRectGetMaxX(contentRect) - CGRectGetMinX(rect);
-    rect.size.width = MAX(0, MIN(CGRectGetWidth(rect), maxWidth));
-    return rect;
 }
 
 @end

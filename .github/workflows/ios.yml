@@ -1,0 +1,146 @@
+# [EN] iOS CI on GitHub-hosted macOS runners, modelled on CYLTabBarController's ios.yml. To use another runner without
+#      editing this file, set the repository variable MACOS_RUNNER (Settings → Secrets and variables → Actions → Variables).
+# [CN] 在 GitHub 托管的 macOS runner 上运行 iOS CI，参照 CYLTabBarController 的 ios.yml。想换 runner 而不改本文件时，设置仓库变量
+#      MACOS_RUNNER（Settings → Secrets and variables → Actions → Variables）。
+name: iOS
+
+on:
+  pull_request:
+  push:
+    branches: [ master, 'claude/**' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # [EN] A pull request that only changes docs (docs/, *.md, *.gif) skips the macOS steps; the jobs still report success.
+  # [CN] 只修改文档（docs/、*.md、*.gif）的 PR 会跳过 macOS 步骤；job 仍然报告成功。
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        name: Code changed?
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          CODE=$(git diff --name-only "$BASE"...HEAD | grep -vE '^(docs/)|\.(md|gif)$' || true)
+          echo "Code files changed:"
+          echo "${CODE:-(none)}"
+          if [[ -n "$CODE" ]]; then echo "code=true"; else echo "code=false"; fi >> "$GITHUB_OUTPUT"
+
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck scripts/*.sh
+
+  # [EN] Full `pod lib lint`, the verification AGENTS.md asks for. [CN] 完整的 `pod lib lint`，即 AGENTS.md 要求的验证。
+  lint:
+    name: pod lib lint
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: CocoaPods cache
+        if: needs.changes.outputs.code == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods/repos
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-lint-${{ hashFiles('CollectionViewClassifyMenu.podspec', '**/Podfile', '**/Podfile.lock') }}
+          restore-keys: pods-${{ runner.os }}-lint-
+      - name: Versions
+        if: needs.changes.outputs.code == 'true'
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphone
+          pod --version || sudo gem install cocoapods
+      - name: pod lib lint
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/pod-lint.sh lib --verbose
+
+  # [EN] Builds and analyzes the pod's sources (through the Example app); a warning in the library's sources fails the job.
+  # [CN] 编译并静态分析 pod 源码（通过 Example）；本库源码出现警告时该 job 失败。
+  library:
+    name: Library build and analyze
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, analyze and count warnings
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/library-warnings.sh
+      - name: Warnings summary
+        if: always() && needs.changes.outputs.code == 'true'
+        run: cat build/warnings.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded must not fail the job. [CN] 日志上传失败不应让 job 失败。
+        continue-on-error: true
+        if: always() && needs.changes.outputs.code == 'true'
+        with:
+          name: library-logs
+          path: build/library-*.log
+          if-no-files-found: ignore
+
+  # [EN] The unit tests of each project, one job each; one failing suite does not stop the others.
+  # [CN] 每个工程的单元测试各一个 job；一个失败不会中止其他 job。
+  unit-tests:
+    name: Unit tests (${{ matrix.suite }})
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [ menu, tag, example ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: CocoaPods cache
+        if: needs.changes.outputs.code == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods/repos
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-${{ matrix.suite }}-${{ hashFiles('CollectionViewClassifyMenu.podspec', '**/Podfile', '**/Podfile.lock') }}
+          restore-keys: pods-${{ runner.os }}-${{ matrix.suite }}-
+      - name: xcodebuild test
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/unit-tests.sh "${{ matrix.suite }}"
+      - name: Summary
+        if: always() && needs.changes.outputs.code == 'true'
+        run: |
+          {
+            echo "| Suite | Scheme | Result | Passed | Failed |"
+            echo "|:---|:---|:---:|---:|---:|"
+            cat build/summary.md 2>/dev/null || echo "| ${{ matrix.suite }} | - | ❌ | - | - |"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        continue-on-error: true
+        if: always() && needs.changes.outputs.code == 'true'
+        with:
+          name: unit-tests-${{ matrix.suite }}-log
+          path: build/unit-tests-*.log
+          if-no-files-found: ignore

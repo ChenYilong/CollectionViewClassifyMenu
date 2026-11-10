@@ -27,7 +27,8 @@
     return self;
 }
 - (NSString *)describe:(NSIndexPath *)indexPath {
-    return [NSString stringWithFormat:@"%ld-%ld", (long)indexPath.section, (long)indexPath.item];
+    // item-section, as the expectations are written.
+    return [NSString stringWithFormat:@"%ld-%ld", (long)indexPath.item, (long)indexPath.section];
 }
 - (BOOL)menu:(id)menu shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     return ![indexPath isEqual:self.blockedIndexPath];
@@ -297,6 +298,9 @@
     CYLExampleMenuSource *source = [self sourceWithItemCount:3 sections:1];
     UIImage *icon = [UIImage systemImageNamed:@"star.fill"];
     source.sections[0].items[0].image = icon;
+    // Same title, so the image alone accounts for the width difference
+    // (system digits are proportional).
+    source.sections[0].items[1].title = source.sections[0].items[0].title;
     source.sections[0].image = icon;
     UIButton *accessory = [UIButton buttonWithType:UIButtonTypeSystem];
     [accessory setTitle:@"行业: IT互联网 ▾" forState:UIControlStateNormal];
@@ -308,7 +312,7 @@
     CGFloat withImage = [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[self ip:0 :0]].frame.size.width;
     CGFloat withoutImage = [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[self ip:1 :0]].frame.size.width;
     XCTAssertEqualWithAccuracy(withImage - withoutImage, view.style.imageSize.width + view.style.imageTitleSpacing, 1,
-                               @"Titles differ only in their numbers, so the image accounts for the difference");
+                               @"The image accounts for the difference");
     UICollectionViewCell *cell = [collection cellForItemAtIndexPath:[self ip:0 :0]];
     UIImageView *iconView = [cell valueForKey:@"iconView"];
     XCTAssertEqual(iconView.image, icon);
