@@ -5,7 +5,8 @@
 //  编辑标签：a sheet for choosing a contact's tags, as in a chat app, built on the core's
 //  CYLTagListView (local pod).
 //  - "最近使用" and "我的标签" (with "管理") list the tags; a selected tag is green, in both sections.
-//  - "+ 新建标签" after the last tag adds a tag (it is an action, not a selectable tag).
+//  - "+ 新建标签" after the last tag adds a tag: the core's create item (CYLMenuItemTypeCreate,
+//    CYLTagCreateCell) with its plus icon and localized title, never selected.
 //  - Typing in the search field shows "搜索结果" (case-insensitive) and "+ 新建标签：<text>" when
 //    that exact tag does not exist yet; tapping it creates, selects and shows the tag.
 //  - "完成" (green) returns the selection; it is off while searching.
@@ -88,19 +89,6 @@ final class CYLTagEditorViewController: UIViewController {
         style.imageTitleSpacing = 6
         return style
     }
-
-    /// "+ 新建标签": an outlined action among the tags (the core's per-item style).
-    static func createStyle(from style: CYLMenuStyle) -> CYLMenuStyle {
-        let create = style.copy() as! CYLMenuStyle
-        create.normalAppearance.backgroundColor = .systemBackground
-        create.normalAppearance.borderColor = .separator
-        create.normalAppearance.borderWidth = 1
-        create.normalAppearance.textColor = .secondaryLabel
-        create.setIconColor(.tertiaryLabel, for: .normal)
-        return create
-    }
-
-    private lazy var createStyle = CYLTagEditorViewController.createStyle(from: tagListView.style)
 
     init(store: CYLTagStore, selectedTags: [String]) {
         self.store = store
@@ -350,33 +338,24 @@ extension CYLTagEditorViewController: CYLMenuDataSource {
         sections[section].title
     }
 
+    /// A tag's name; for "+ 新建标签" the name to create ("" asks for one). The core shows the create item
+    /// with its plus icon and the localized "新建标签" / "新建标签：<name>" (CYLTagCreateCell).
     func menuTitleForItem(at indexPath: IndexPath) -> String {
         switch sections[indexPath.section].items[indexPath.item] {
         case let .tag(tag): return tag
-        case let .create(name?): return CYLTagEditorLocalizedString("新建标签：%@", name)
-        case .create(nil): return CYLTagEditorLocalizedString("新建标签")
+        case let .create(name): return name ?? ""
         }
     }
 
-    func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
+    func menuItemType(at indexPath: IndexPath) -> CYLMenuItemType {
         if case .create = sections[indexPath.section].items[indexPath.item] {
-            return UIImage(systemName: "plus")
+            return .create
         }
-        return nil
-    }
-
-    func menuStyleForItem(at indexPath: IndexPath) -> CYLMenuStyle? {
-        if case .create = sections[indexPath.section].items[indexPath.item] {
-            return createStyle
-        }
-        return nil
+        return .tag
     }
 
     func menuItemIsSelectable(at indexPath: IndexPath) -> Bool {
-        if case .create = sections[indexPath.section].items[indexPath.item] {
-            return false
-        }
-        return !isManaging
+        !isManaging
     }
 
     func menuAccessoryView(forSection section: Int) -> UIView? {
@@ -389,17 +368,20 @@ extension CYLTagEditorViewController: CYLMenuDataSource {
 extension CYLTagEditorViewController: CYLMenuDelegate {
 
     func menu(_ menu: Any, didSelectItemAt indexPath: IndexPath) {
-        switch sections[indexPath.section].items[indexPath.item] {
-        case let .create(name?):
-            createTag(named: name)
-        case .create(nil):
+        guard case let .tag(tag) = sections[indexPath.section].items[indexPath.item] else { return }
+        if isManaging {
+            confirmDeleting(tag)
+        } else {
+            select(tag)
+        }
+    }
+
+    /// "+ 新建标签" (core create item): with the searched name, create it; otherwise ask for one.
+    func menu(_ menu: Any, didRequestNewItemWithName name: String, at indexPath: IndexPath) {
+        if name.isEmpty {
             promptForNewTag()
-        case let .tag(tag):
-            if isManaging {
-                confirmDeleting(tag)
-            } else {
-                select(tag)
-            }
+        } else {
+            createTag(named: name)
         }
     }
 

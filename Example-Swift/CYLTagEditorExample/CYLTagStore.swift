@@ -90,6 +90,12 @@ final class CYLTagStore {
     }
 }
 
+/// A titled group of tags in tags.json.
+struct CYLTagGroup: Codable, Equatable {
+    var title: String
+    var tags: [String]
+}
+
 /// The contents of tags.json: the demo tags, the recently used ones and the tags the remark screen
 /// starts with. One file per language in CYLTagEditorExample.bundle/<language>.lproj/.
 struct CYLTagData: Codable, Equatable {
@@ -97,6 +103,8 @@ struct CYLTagData: Codable, Equatable {
     var tags: [String]
     var recentTags: [String]
     var selectedTags: [String]
+    /// The same tags by kind (关系, 工作…), for the fold style demos.
+    var groups: [CYLTagGroup]?
 
     enum LoadingError: Error, Equatable {
         case fileNotFound(String)

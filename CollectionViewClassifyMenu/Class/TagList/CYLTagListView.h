@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CYLMenuDataSource.h"
 #import "CYLMenuStyle.h"
+#import "CYLMenuFoldControl.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,6 +23,13 @@ typedef NS_ENUM(NSInteger, CYLMenuSelectionMode) {
     CYLMenuSelectionModeMultiple,
 };
 
+/// Where the list's title (`title`) is: above every section, at the leading edge or centered.
+typedef NS_ENUM(NSInteger, CYLMenuTitlePosition) {
+    CYLMenuTitlePositionTopLeading = 0,
+    CYLMenuTitlePositionTopCenter,
+};
+
+/// The older way of choosing a fold control; foldControl gives the position and content separately.
 typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
     /// Every row is always visible.
     CYLMenuFoldStyleNone = 0,
@@ -35,6 +43,14 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 };
 
 @interface CYLTagListView : UIView
+
+/// A tag list with its fold control and title, the styles fixed at creation (both can change later).
+- (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl
+                              title:(nullable NSString *)title
+                      titlePosition:(CYLMenuTitlePosition)titlePosition;
+/// The same without a title.
+- (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl;
++ (instancetype)tagListViewWithFoldPosition:(CYLMenuFoldControlPosition)position content:(CYLMenuFoldControlContent)content;
 
 @property (nonatomic, weak, nullable) id<CYLMenuDataSource> menuDataSource;
 @property (nonatomic, weak, nullable) id<CYLMenuDelegate> menuDelegate;
@@ -51,8 +67,19 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 /// Defaults to YES. When NO, sections are laid out back to back without titles.
 @property (nonatomic, assign) BOOL showsSectionHeaders;
 
-/// Defaults to CYLMenuFoldStyleNone.
+/// The fold control of a foldable section (more rows than `defaultVisibleRows`): where it is and what
+/// it shows. Default: none. Setting it also sets `foldStyle` (Bottom: FooterChevron, Top…:
+/// HeaderButton, None: None, or Truncate when foldStyle was Truncate).
+@property (nonatomic, copy, null_resettable) CYLMenuFoldControl *foldControl;
+/// Defaults to CYLMenuFoldStyleNone. Setting it also sets `foldControl`: HeaderButton is a top
+/// trailing title ("更多"), FooterChevron a bottom icon; None and Truncate have none.
 @property (nonatomic, assign) CYLMenuFoldStyle foldStyle;
+
+/// A title above every section (nil, the default, for none), e.g. "评价". Its label is `titleLabel`
+/// (the headline font, scaled with Dynamic Type).
+@property (nonatomic, copy, nullable) NSString *title;
+@property (nonatomic, assign) CYLMenuTitlePosition titlePosition;
+@property (nonatomic, strong, readonly) UILabel *titleLabel;
 /// Rows shown while a foldable section is collapsed. 0 shows every row.
 /// Defaults to 1.
 @property (nonatomic, assign) NSUInteger defaultVisibleRows;

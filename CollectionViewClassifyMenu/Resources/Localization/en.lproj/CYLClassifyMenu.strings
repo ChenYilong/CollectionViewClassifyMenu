@@ -10,3 +10,9 @@
 "CYLFilterConfirm" = "Apply";
 /* Restores the default selection of the multiple-choice filter. */
 "CYLFilterReset" = "Reset";
+/* The action item that creates a tag. */
+"CYLMenuNewTag" = "New Tag";
+/* Creates a tag with this name; %@ is the name. */
+"CYLMenuNewTagNamed" = "New tag: %@";
+/* Accessibility hint of the fold control: expanding shows every tag. */
+"CYLMenuExpandHint" = "Shows every tag";

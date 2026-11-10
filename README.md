@@ -186,6 +186,45 @@ New APIs / 新增接口:
 | `contentHeight`, `-heightThatFitsWidth:`, `intrinsicContentSize`, `scrollEnabled` | 嵌入到表头、Stack View 或 Auto Layout |
 | `-numberOfRowsInSection:`, `-numberOfVisibleItemsInSection:` | 查询布局结果 |
 
+#### 折叠控件与标题 / Fold control and title
+
+折叠控件（「更多 ⌄」）与列表标题是**创建时的样式参数**，由核心库统一实现（`CYLMenuFoldControl`、`CYLTagFoldButton`）：
+
+```objc
+// 淘宝评价筛选：底部仅箭头，展开后箭头旋转 180°
+CYLTagListView *filter = [[CYLTagListView alloc] initWithFoldControl:
+    [CYLMenuFoldControl foldControlWithPosition:CYLMenuFoldControlPositionBottom content:CYLMenuFoldControlContentIcon]];
+// 原分类菜单：分组标题右上角「更多 ⌄」，列表标题居中
+CYLTagListView *menu = [[CYLTagListView alloc] initWithFoldControl:
+    [CYLMenuFoldControl foldControlWithPosition:CYLMenuFoldControlPositionTopTrailing content:CYLMenuFoldControlContentIconAndTitle]
+                                                              title:@"分类" titlePosition:CYLMenuTitlePositionTopCenter];
+```
+
+| 参数 | 取值 |
+| --- | --- |
+| `CYLMenuFoldControlPosition` | `None`、`Bottom`（分组下方居中，淘宝评价）、`TopTrailing`（分组标题右上角，原分类菜单）、`TopLeading`（分组标题左上角，标题之前） |
+| `CYLMenuFoldControlContent` | `IconAndTitle`（「更多 ⌄」）、`Title`（「更多」）、`Icon`（「⌄」）。展开后带图标的样式只保留箭头并旋转 180°，仅文字的样式显示「收起」 |
+| `CYLMenuFoldControl` 属性 | `title` / `collapseTitle`（默认本地化的「更多」「收起」）、`image`（默认核心 bundle 中的 `cyl_fold_chevron`）、`color`、`font`、`rotatesImageWhenExpanded` |
+| `title`、`titlePosition` | 整个列表上方的标题：`CYLMenuTitlePositionTopLeading`（左上角）或 `TopCenter`（居中）；`titleLabel` 可进一步定制 |
+
+折叠控件是一个无边框的 `CYLTagButton`（与标签相同的视图），图标位于文字之后（`CYLMenuStyle.imagePlacement = CYLTagImagePlacementTrailing`）。
+旧的 `foldStyle` 仍可使用，并与 `foldControl` 互相对应（`HeaderButton` 为右上角文字，`FooterChevron` 为底部箭头）。
+
+#### 新建标签 / New tag item
+
+`-menuItemTypeAtIndexPath:` 返回 `CYLMenuItemTypeCreate` 的项目由核心库的 `CYLTagCreateCell`（继承 `CYLTagListCell`）显示：
+核心 bundle 中的加号图标 `cyl_tag_plus`、本地化标题「新建标签」或「新建标签：<名称>」（`CYLMenuNewTag`、`CYLMenuNewTagNamed`，简体中文、繁体中文、英文）、
+带边框的外观，且不会被选中。数据源返回的标题是要新建的名称（空字符串表示由宿主询问名称），点击时回调
+`-menu:didRequestNewItemWithName:atIndexPath:`。
+
+#### 配置文件 / Configuration files
+
+以上参数都可以写在字典或配置文件中（`foldControl`：`position`、`content`、`title`、`collapseTitle`、`image`、`color`、`font`、
+`rotatesImageWhenExpanded`；`title`、`titlePosition`；项目的 `type: create`），与 CYLTabBarController 的配置文件初始化方式相同。
+JSON 与 plist 直接读取；JSON5、YAML、TOML、INI、.properties、XML、Protocol Buffers 文本等格式在链接 CYLTabBarController 时由其
+`CYLTabBarConfigurationParser` 读取，取值再按本项目的规则转换（枚举名、颜色、尺寸等均可写成字符串）。示例见
+`Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle/<语言>.lproj/fold-styles.{json,plist,yaml,xml}`。
+
 #### 标签外观 / Tag appearance
 
 每个标签由 `CYLTagButton` 绘制：图标与标题的参数完全参照 CYLTabBarController 的
@@ -365,6 +404,10 @@ SQL 只用于展示。
 演示数据来自本地 JSON：`CYLTagEditorExample.bundle/<语言>.lproj/tags.json`（简体中文、繁体中文、英文各一份，标签相同、顺序相同），
 由 `CYLTagData`（`Codable`）解析，按 App 当前语言加载。内容是有意义的联系人标签（家人、大学同学、客户、iOS 开发、读书会、深圳、待回复……），
 以及「最近使用」和编辑备注页初始选中的标签；修改文件即可替换数据。
+
+第二个 Tab「折叠样式」（`CYLFoldStylesViewController`）用初始化参数创建各种折叠控件与标题样式（底部仅箭头、底部文字 + 箭头、底部仅文字、
+右上角文字 + 箭头（原分类菜单）、右上角仅箭头、左上角文字 + 箭头、标题居中），再分别从 JSON、plist、YAML、XML 配置文件创建；
+根 TabBar 为 CYLTabBarController（底部）。
 
 为此核心库新增：`-menuItemIsSelectableAtIndexPath:`（「+ 新建标签」这样的操作项：点击会回调，但不会被选中）、
 `-menuStyleForItemAtIndexPath:`（单个标签的外观，如带边框的「+ 新建标签」）与 `-scrollToItemAtIndexPath:animated:`。

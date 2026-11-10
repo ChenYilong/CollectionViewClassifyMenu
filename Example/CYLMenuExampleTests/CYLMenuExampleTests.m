@@ -290,9 +290,11 @@
     [view layoutIfNeeded];
     UICollectionView *collection = [self collectionViewOf:view];
     UICollectionReusableView *header = [collection supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:[self ip:0 :0]];
-    UIButton *fold = [header valueForKey:@"foldButton"];
+    CYLTagButton *fold = [header valueForKey:@"foldButton"];
+    XCTAssertTrue([fold isKindOfClass:[CYLTagButton class]], @"The fold control is a tag view (CYLTagFoldButton)");
     XCTAssertFalse(fold.hidden);
-    XCTAssertEqualObjects([fold titleForState:UIControlStateNormal], view.style.expandTitle);
+    XCTAssertEqualObjects(fold.title, view.style.expandTitle);
+    XCTAssertEqual(view.foldControl.position, CYLMenuFoldControlPositionTopTrailing, @"foldStyle sets foldControl");
     [fold sendActionsForControlEvents:UIControlEventTouchUpInside];
     XCTAssertTrue([view isSectionExpanded:0]);
     XCTAssertFalse([view isSectionExpanded:1]);
@@ -819,7 +821,7 @@
     UICollectionReusableView *header = [collection supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:[self ip:0 :0]];
     XCTAssertTrue(((UILabel *)[header valueForKey:@"titleLabel"]).accessibilityTraits & UIAccessibilityTraitHeader);
     UICollectionReusableView *footer = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
-    UIButton *chevron = [footer valueForKey:@"chevronButton"];
+    CYLTagButton *chevron = [footer valueForKey:@"foldButton"];
     XCTAssertEqualObjects(chevron.accessibilityLabel, @"分组 0 更多");
     [view setExpanded:YES forSection:0 animated:NO];
     [collection layoutIfNeeded];
@@ -828,12 +830,12 @@
     [collection layoutIfNeeded];
     footer = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
     XCTAssertNotNil(footer);
-    XCTAssertEqualObjects(((UIButton *)[footer valueForKey:@"chevronButton"]).accessibilityLabel, @"分组 0 收起");
+    XCTAssertEqualObjects(((CYLTagButton *)[footer valueForKey:@"foldButton"]).accessibilityLabel, @"分组 0 收起");
 
     view.foldStyle = CYLMenuFoldStyleHeaderButton;
     [collection layoutIfNeeded];
     header = [collection supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:[self ip:0 :0]];
-    XCTAssertEqualObjects(((UIButton *)[header valueForKey:@"foldButton"]).accessibilityLabel, @"分组 0 收起");
+    XCTAssertEqualObjects(((CYLTagButton *)[header valueForKey:@"foldButton"]).accessibilityLabel, @"分组 0 收起");
 }
 
 - (void)testBoldTextMakesTagsBoldAndWider {
@@ -994,8 +996,10 @@
     NSInteger folded = [collection numberOfItemsInSection:0];
     XCTAssertLessThan(folded, total, @"Folded to two rows");
     UICollectionReusableView *footer = [collection supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:[self ip:0 :0]];
-    UIButton *chevron = [footer valueForKey:@"chevronButton"];
+    CYLTagButton *chevron = [footer valueForKey:@"foldButton"];
     XCTAssertNotNil(chevron);
+    XCTAssertEqual(filter.foldControl.position, CYLMenuFoldControlPositionBottom);
+    XCTAssertEqual(filter.foldControl.content, CYLMenuFoldControlContentIcon, @"Taobao: the chevron alone");
     XCTAssertTrue(CGAffineTransformIsIdentity(chevron.imageView.transform), @"Points down while folded");
     CGFloat foldedHeight = CGRectGetHeight(filter.frame);
 

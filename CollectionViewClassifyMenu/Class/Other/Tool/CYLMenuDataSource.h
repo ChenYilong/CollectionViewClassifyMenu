@@ -11,6 +11,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CYLMenuStyle;
 
+/// What an item of CYLTagListView is.
+typedef NS_ENUM(NSInteger, CYLMenuItemType) {
+    /// A tag (the default).
+    CYLMenuItemTypeTag = 0,
+    /// "+ 新建标签": an outlined action with the core's plus icon (CYLTagCreateCell), never selected. Its
+    /// title from -menuTitleForItemAtIndexPath: is the name to create, shown as "新建标签：<name>"
+    /// (localized); an empty title shows "新建标签". A tap calls -menu:didRequestNewItemWithName:atIndexPath:.
+    CYLMenuItemTypeCreate,
+};
+
 @protocol CYLMenuDataSource <NSObject>
 
 - (NSInteger)numberOfSectionsInMenu;
@@ -52,6 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// reported through -menu:didSelectItemAtIndexPath: but the item never stays selected and the
 /// selection does not change. Defaults to YES.
 - (BOOL)menuItemIsSelectableAtIndexPath:(NSIndexPath *)indexPath;
+/// Tag (default) or "+ 新建标签" (CYLMenuItemTypeCreate).
+- (CYLMenuItemType)menuItemTypeAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
 
@@ -60,8 +72,12 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 /// Return NO to ignore a tap. Not called for disabled items.
 - (BOOL)menu:(id)menu shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath;
-/// Called for every accepted tap, including in CYLMenuSelectionModeNone.
+/// Called for every accepted tap, including in CYLMenuSelectionModeNone. For a CYLMenuItemTypeCreate
+/// item, only when the delegate does not implement -menu:didRequestNewItemWithName:atIndexPath:.
 - (void)menu:(id)menu didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
+/// A tap on a "+ 新建标签" item (CYLMenuItemTypeCreate): `name` is its title from the data source, empty
+/// when the host should ask for one.
+- (void)menu:(id)menu didRequestNewItemWithName:(NSString *)name atIndexPath:(NSIndexPath *)indexPath;
 /// Called when a tap or another selection removes an item from the selection.
 - (void)menu:(id)menu didDeselectItemAtIndexPath:(NSIndexPath *)indexPath;
 /// Called once after a tap that changed the selection, after the select and

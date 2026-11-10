@@ -67,6 +67,7 @@
     copy.imageInsets = self.imageInsets;
     copy.titlePositionAdjustment = self.titlePositionAdjustment;
     copy.imagePositionAdjustment = self.imagePositionAdjustment;
+    copy.imagePlacement = self.imagePlacement;
     copy.layoutCentered = self.layoutCentered;
     copy.animationSize = self.animationSize;
     copy.animationSpeed = self.animationSpeed;

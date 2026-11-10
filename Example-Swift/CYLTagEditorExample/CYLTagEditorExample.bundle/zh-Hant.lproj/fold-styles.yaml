@@ -1,0 +1,42 @@
+# CYLTagListView configuration (YAML, read by CYLTabBarController's CYLTabBarConfigurationParser).
+title: "設定檔 YAML：左上角箭頭"
+selectionMode: "multiple"
+defaultVisibleRows: 1
+scrollEnabled: false
+foldControl:
+  position: "topLeading"
+  content: "icon"
+style:
+  itemHeight: 32
+  interitemSpacing: 10
+  lineSpacing: 10
+  sectionInsets: "{8, 16, 8, 16}"
+  normal:
+    cornerRadius: 6
+    borderWidth: 0
+    backgroundColor: "systemGray6"
+    margin: 12
+  selected:
+    cornerRadius: 6
+    borderWidth: 0
+    backgroundColor: "#E6F7EE"
+    textColor: "#07C160"
+    margin: 12
+sections:
+  - title: "興趣"
+    items:
+      - "跑步"
+      - "籃球"
+      - "攝影"
+      - "讀書會"
+      - "旅行"
+      - "美食"
+      - "健行"
+      - "音樂"
+  - title: "城市"
+    items:
+      - "北京"
+      - "上海"
+      - "深圳"
+      - "杭州"
+      - "海外"

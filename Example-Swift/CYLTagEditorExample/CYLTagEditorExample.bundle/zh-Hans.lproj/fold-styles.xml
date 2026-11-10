@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CYLTagListView configuration (XML: elements are keys; <item> children make a list). -->
+<CYLTagListView>
+    <title>配置文件 XML：标题居中，底部仅文字</title>
+    <titlePosition>topCenter</titlePosition>
+    <selectionMode>multiple</selectionMode>
+    <showsSectionHeaders>false</showsSectionHeaders>
+    <defaultVisibleRows>1</defaultVisibleRows>
+    <scrollEnabled>false</scrollEnabled>
+    <foldControl>
+        <position>bottom</position>
+        <content>title</content>
+    </foldControl>
+    <style>
+        <itemHeight>32</itemHeight>
+        <interitemSpacing>10</interitemSpacing>
+        <lineSpacing>10</lineSpacing>
+        <sectionInsets>{8, 16, 8, 16}</sectionInsets>
+        <normal>
+            <cornerRadius>6</cornerRadius>
+            <borderWidth>0</borderWidth>
+            <backgroundColor>systemGray6</backgroundColor>
+            <margin>12</margin>
+        </normal>
+        <selected>
+            <cornerRadius>6</cornerRadius>
+            <borderWidth>0</borderWidth>
+            <backgroundColor>#E6F7EE</backgroundColor>
+            <textColor>#07C160</textColor>
+            <margin>12</margin>
+        </selected>
+    </style>
+    <sections>
+        <item>
+            <title>状态</title>
+            <items>
+                <item>婚礼宾客</item>
+                <item>年会</item>
+                <item>重要</item>
+                <item>常联系</item>
+                <item>待回复</item>
+                <item>不常联系</item>
+            </items>
+        </item>
+        <item>
+            <title>工作</title>
+            <items>
+                <item>同事</item>
+                <item>前同事</item>
+                <item>领导</item>
+                <item>客户</item>
+                <item>供应商</item>
+                <item>合作伙伴</item>
+                <item>投资人</item>
+                <item>猎头</item>
+            </items>
+        </item>
+    </sections>
+</CYLTagListView>

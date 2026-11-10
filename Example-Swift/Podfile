@@ -1,10 +1,17 @@
 platform :ios, '15.0'
 project 'CYLTagEditorExample.xcodeproj'
 
+# Every CYLTabBarController mention means the latest commit of its feat/cross-platform-components branch (AGENTS.md);
+# the same pin as Example/Podfile.
+CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
+                :commit => 'd90802e68299546b1255af77c2102d385ebb6db1' }
+
 # The core library from this repository (local path), so that changes to it show up here at once.
 target 'CYLTagEditorExample' do
   use_frameworks!
   pod 'CollectionViewClassifyMenu', :path => '..'
+  # The bottom tab bar, and the configuration parser the core uses for YAML, XML, TOML… files.
+  pod 'CYLTabBarController', CYL_TAB_BAR
 
   target 'CYLTagEditorExampleTests' do
     inherit! :search_paths

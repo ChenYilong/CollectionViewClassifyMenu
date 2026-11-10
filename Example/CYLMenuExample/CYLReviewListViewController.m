@@ -103,12 +103,13 @@ static NSString * const kReviewCellIdentifier = @"ReviewCell";
     self.menuSource = [CYLExampleMenuSource sourceWithSections:@[[CYLExampleMenuSection sectionWithTitle:CYLExampleLocalizedString(@"评价") items:items]]];
 
     // Multiple choice, folded to two rows behind a chevron that turns when it expands.
-    self.filterView = [[CYLTagListView alloc] init];
+    // The shopping app's review filter: the chevron alone below the tags, turned 180° when expanded.
+    self.filterView = [[CYLTagListView alloc] initWithFoldControl:[CYLMenuFoldControl foldControlWithPosition:CYLMenuFoldControlPositionBottom
+                                                                                                       content:CYLMenuFoldControlContentIcon]];
     self.filterView.translatesAutoresizingMaskIntoConstraints = NO;
     self.filterView.style = [[self class] reviewFilterStyle];
     self.filterView.selectionMode = CYLMenuSelectionModeMultiple;
     self.filterView.showsSectionHeaders = NO;
-    self.filterView.foldStyle = CYLMenuFoldStyleFooterChevron;
     self.filterView.defaultVisibleRows = 2;
     self.filterView.scrollEnabled = NO;
     self.filterView.menuDelegate = self;

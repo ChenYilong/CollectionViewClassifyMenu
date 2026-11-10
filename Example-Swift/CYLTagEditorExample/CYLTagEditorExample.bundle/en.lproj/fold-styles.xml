@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CYLTagListView configuration (XML: elements are keys; <item> children make a list). -->
+<CYLTagListView>
+    <title>XML file: centered title, “More” text at the bottom</title>
+    <titlePosition>topCenter</titlePosition>
+    <selectionMode>multiple</selectionMode>
+    <showsSectionHeaders>false</showsSectionHeaders>
+    <defaultVisibleRows>1</defaultVisibleRows>
+    <scrollEnabled>false</scrollEnabled>
+    <foldControl>
+        <position>bottom</position>
+        <content>title</content>
+    </foldControl>
+    <style>
+        <itemHeight>32</itemHeight>
+        <interitemSpacing>10</interitemSpacing>
+        <lineSpacing>10</lineSpacing>
+        <sectionInsets>{8, 16, 8, 16}</sectionInsets>
+        <normal>
+            <cornerRadius>6</cornerRadius>
+            <borderWidth>0</borderWidth>
+            <backgroundColor>systemGray6</backgroundColor>
+            <margin>12</margin>
+        </normal>
+        <selected>
+            <cornerRadius>6</cornerRadius>
+            <borderWidth>0</borderWidth>
+            <backgroundColor>#E6F7EE</backgroundColor>
+            <textColor>#07C160</textColor>
+            <margin>12</margin>
+        </selected>
+    </style>
+    <sections>
+        <item>
+            <title>Status</title>
+            <items>
+                <item>Wedding Guests</item>
+                <item>Annual Party</item>
+                <item>Important</item>
+                <item>Frequent</item>
+                <item>To Reply</item>
+                <item>Rarely in Touch</item>
+            </items>
+        </item>
+        <item>
+            <title>Work</title>
+            <items>
+                <item>Coworkers</item>
+                <item>Former Coworkers</item>
+                <item>Managers</item>
+                <item>Clients</item>
+                <item>Suppliers</item>
+                <item>Partners</item>
+                <item>Investors</item>
+                <item>Recruiters</item>
+            </items>
+        </item>
+    </sections>
+</CYLTagListView>

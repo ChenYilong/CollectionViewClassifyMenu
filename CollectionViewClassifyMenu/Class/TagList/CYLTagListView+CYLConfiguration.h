@@ -41,6 +41,30 @@ FOUNDATION_EXTERN NSString *const CYLTagListViewScrollEnabled;
 FOUNDATION_EXTERN NSString *const CYLTagListViewDefaultVisibleRows;
 /// NSArray of NSIndexPath, "section-item" strings or [section, item] arrays.
 FOUNDATION_EXTERN NSString *const CYLTagListViewSelectedItems;
+/// CYLMenuFoldControl, a position name ("bottom", "topTrailing"…), or a dictionary of CYLMenuFoldControlKey…
+/// keys. Applied after CYLTagListViewFoldStyle.
+FOUNDATION_EXTERN NSString *const CYLTagListViewFoldControl;
+/// NSString: the list's title, above every section.
+FOUNDATION_EXTERN NSString *const CYLTagListViewTitle;
+/// NSNumber of CYLMenuTitlePosition, or "topLeading" ("leading", "left"), "topCenter" ("center").
+FOUNDATION_EXTERN NSString *const CYLTagListViewTitlePosition;
+
+#pragma mark Fold control keys (CYLMenuFoldControl)
+/// NSNumber of CYLMenuFoldControlPosition, or "none", "bottom", "topTrailing" ("topRight"), "topLeading" ("topLeft").
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyPosition;
+/// NSNumber of CYLMenuFoldControlContent, or "iconAndTitle" ("titleAndIcon"), "title", "icon".
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyContent;
+/// NSString.
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyTitle;
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyCollapseTitle;
+/// UIImage, or an image name, "system:<SF Symbol>" or a file path.
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyImage;
+/// UIColor or a color string.
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyColor;
+/// UIFont, a point size, or {size:, weight:, name:, italic:}.
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyFont;
+/// NSNumber, or "true" / "false".
+FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyRotatesImage;
 
 #pragma mark Section keys
 FOUNDATION_EXTERN NSString *const CYLTagSectionTitle;
@@ -69,6 +93,8 @@ FOUNDATION_EXTERN NSString *const CYLTagItemAnimationRestingProgress;
 /// NSNumber, or "true" / "false". Default YES / NO.
 FOUNDATION_EXTERN NSString *const CYLTagItemEnabled;
 FOUNDATION_EXTERN NSString *const CYLTagItemExclusive;
+/// NSNumber of CYLMenuItemType, or "tag" (default), "create" ("+ 新建标签"; its title is the name to create).
+FOUNDATION_EXTERN NSString *const CYLTagItemType;
 
 #pragma mark Style keys (CYLMenuStyle)
 /// Dictionaries of CYLTagAppearance… keys, for each state.
@@ -138,9 +164,11 @@ FOUNDATION_EXTERN NSURL *_Nullable CYLMenuAnimationURLWithOptions(NSURL *_Nullab
 - (void)applyConfiguration:(NSDictionary<NSString *, id> *)configuration;
 
 /// Reads a configuration file: a path, a file URL string, or a file name in the main bundle
-/// (e.g. @"tags.json" or @"Configurations.bundle/tags.plist"). JSON and property lists are read
-/// directly; other formats (YAML, TOML, INI...) are read by CYLTabBarController's parser when
-/// it is linked. Relative file names inside resolve next to the file.
+/// (e.g. @"tags.json" or @"Configurations.bundle/tags.plist"). JSON and property lists (XML or binary)
+/// are read directly; the other formats of CYLTabBarController's CYLTabBarConfigurationParser (JSON5,
+/// YAML, TOML, INI, .properties, XML, Protocol Buffers text…) are read by it when CYLTabBarController is
+/// linked. The values are then read by this project's rules (strings for every key, see above).
+/// Relative file names inside resolve next to the file.
 + (nullable NSDictionary<NSString *, id> *)configurationWithContentsOfFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
 - (nullable instancetype)initWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
 + (nullable instancetype)tagListViewWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
@@ -153,6 +181,12 @@ FOUNDATION_EXTERN NSURL *_Nullable CYLMenuAnimationURLWithOptions(NSURL *_Nullab
 @interface CYLMenuStyle (CYLConfiguration)
 /// A default style with the configuration's values (CYLMenuStyle… keys).
 + (instancetype)styleWithConfiguration:(NSDictionary<NSString *, id> *)configuration;
+- (void)applyConfiguration:(NSDictionary<NSString *, id> *)configuration;
+@end
+
+@interface CYLMenuFoldControl (CYLConfiguration)
+/// A fold control from a dictionary of CYLMenuFoldControlKey… keys, or from a position name.
++ (nullable instancetype)foldControlWithConfiguration:(id)configuration;
 - (void)applyConfiguration:(NSDictionary<NSString *, id> *)configuration;
 @end
 

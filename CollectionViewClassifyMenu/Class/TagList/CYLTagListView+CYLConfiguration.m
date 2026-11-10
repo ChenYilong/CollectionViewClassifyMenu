@@ -15,6 +15,18 @@ NSString *const CYLTagListViewShowsSectionHeaders = @"showsSectionHeaders";
 NSString *const CYLTagListViewScrollEnabled = @"scrollEnabled";
 NSString *const CYLTagListViewDefaultVisibleRows = @"defaultVisibleRows";
 NSString *const CYLTagListViewSelectedItems = @"selectedItems";
+NSString *const CYLTagListViewFoldControl = @"foldControl";
+NSString *const CYLTagListViewTitle = @"title";
+NSString *const CYLTagListViewTitlePosition = @"titlePosition";
+
+NSString *const CYLMenuFoldControlKeyPosition = @"position";
+NSString *const CYLMenuFoldControlKeyContent = @"content";
+NSString *const CYLMenuFoldControlKeyTitle = @"title";
+NSString *const CYLMenuFoldControlKeyCollapseTitle = @"collapseTitle";
+NSString *const CYLMenuFoldControlKeyImage = @"image";
+NSString *const CYLMenuFoldControlKeyColor = @"color";
+NSString *const CYLMenuFoldControlKeyFont = @"font";
+NSString *const CYLMenuFoldControlKeyRotatesImage = @"rotatesImageWhenExpanded";
 
 NSString *const CYLTagSectionTitle = @"title";
 NSString *const CYLTagSectionImage = @"image";
@@ -29,6 +41,7 @@ NSString *const CYLTagItemAnimationOptions = @"animationOptions";
 NSString *const CYLTagItemAnimationRestingProgress = @"animationRestingProgress";
 NSString *const CYLTagItemEnabled = @"enabled";
 NSString *const CYLTagItemExclusive = @"exclusive";
+NSString *const CYLTagItemType = @"type";
 
 NSString *const CYLMenuStyleNormal = @"normal";
 NSString *const CYLMenuStyleSelected = @"selected";
@@ -344,6 +357,56 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     return [CYLNumber([self itemAtIndexPath:indexPath][CYLTagItemExclusive]) boolValue];
 }
 
+- (CYLMenuItemType)menuItemTypeAtIndexPath:(NSIndexPath *)indexPath {
+    return CYLEnum([self itemAtIndexPath:indexPath][CYLTagItemType], @{@"tag": @(CYLMenuItemTypeTag), @"create": @(CYLMenuItemTypeCreate),
+                                                                       @"new": @(CYLMenuItemTypeCreate)}, CYLMenuItemTypeTag);
+}
+
+@end
+
+#pragma mark - Fold control
+
+@implementation CYLMenuFoldControl (CYLConfiguration)
+
++ (instancetype)foldControlWithConfiguration:(id)configuration {
+    if ([configuration isKindOfClass:[CYLMenuFoldControl class]]) {
+        return [configuration copy];
+    }
+    CYLMenuFoldControl *control = [CYLMenuFoldControl noFoldControl];
+    if ([configuration isKindOfClass:[NSString class]] || [configuration isKindOfClass:[NSNumber class]]) {
+        // A position alone: the content that suits it (an icon below, a title in the header).
+        [control applyConfiguration:@{CYLMenuFoldControlKeyPosition: configuration}];
+        control.content = control.position == CYLMenuFoldControlPositionBottom ? CYLMenuFoldControlContentIcon : CYLMenuFoldControlContentIconAndTitle;
+        return control;
+    }
+    if (![configuration isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    [control applyConfiguration:configuration];
+    return control;
+}
+
+- (void)applyConfiguration:(NSDictionary<NSString *, id> *)configuration {
+    if (![configuration isKindOfClass:[NSDictionary class]]) return;
+    id value;
+    if ((value = configuration[CYLMenuFoldControlKeyPosition])) {
+        self.position = CYLEnum(value, @{@"none": @(CYLMenuFoldControlPositionNone), @"bottom": @(CYLMenuFoldControlPositionBottom),
+                                         @"toptrailing": @(CYLMenuFoldControlPositionTopTrailing), @"topright": @(CYLMenuFoldControlPositionTopTrailing),
+                                         @"topleading": @(CYLMenuFoldControlPositionTopLeading), @"topleft": @(CYLMenuFoldControlPositionTopLeading)},
+                                self.position);
+    }
+    if ((value = configuration[CYLMenuFoldControlKeyContent])) {
+        self.content = CYLEnum(value, @{@"iconandtitle": @(CYLMenuFoldControlContentIconAndTitle), @"titleandicon": @(CYLMenuFoldControlContentIconAndTitle),
+                                        @"title": @(CYLMenuFoldControlContentTitle), @"icon": @(CYLMenuFoldControlContentIcon)}, self.content);
+    }
+    if ([configuration[CYLMenuFoldControlKeyTitle] isKindOfClass:[NSString class]]) self.title = configuration[CYLMenuFoldControlKeyTitle];
+    if ([configuration[CYLMenuFoldControlKeyCollapseTitle] isKindOfClass:[NSString class]]) self.collapseTitle = configuration[CYLMenuFoldControlKeyCollapseTitle];
+    if ((value = CYLImage(configuration[CYLMenuFoldControlKeyImage], configuration[kCYLConfigurationBaseURL]))) self.image = value;
+    if ((value = CYLColor(configuration[CYLMenuFoldControlKeyColor]))) self.color = value;
+    if ((value = CYLFont(configuration[CYLMenuFoldControlKeyFont]))) self.font = value;
+    if ((value = CYLNumber(configuration[CYLMenuFoldControlKeyRotatesImage]))) self.rotatesImageWhenExpanded = [value boolValue];
+}
+
 @end
 
 #pragma mark - Style
@@ -442,6 +505,26 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
         self.foldStyle = CYLEnum(value, @{@"none": @(CYLMenuFoldStyleNone), @"headerbutton": @(CYLMenuFoldStyleHeaderButton),
                                           @"footerchevron": @(CYLMenuFoldStyleFooterChevron), @"truncate": @(CYLMenuFoldStyleTruncate)}, self.foldStyle);
     }
+    if ((value = configuration[CYLTagListViewFoldControl])) {
+        if ([value isKindOfClass:[NSDictionary class]] && [baseURL isKindOfClass:[NSURL class]]) {
+            // A relative image file of the control resolves next to the configuration file.
+            NSMutableDictionary *withBase = [value mutableCopy];
+            withBase[kCYLConfigurationBaseURL] = baseURL;
+            value = withBase;
+        }
+        CYLMenuFoldControl *control = [CYLMenuFoldControl foldControlWithConfiguration:value];
+        if (control) {
+            self.foldControl = control;
+        }
+    }
+    if ((value = configuration[CYLTagListViewTitlePosition])) {
+        self.titlePosition = CYLEnum(value, @{@"topleading": @(CYLMenuTitlePositionTopLeading), @"leading": @(CYLMenuTitlePositionTopLeading),
+                                              @"left": @(CYLMenuTitlePositionTopLeading), @"topcenter": @(CYLMenuTitlePositionTopCenter),
+                                              @"center": @(CYLMenuTitlePositionTopCenter)}, self.titlePosition);
+    }
+    if ([configuration[CYLTagListViewTitle] isKindOfClass:[NSString class]]) {
+        self.title = configuration[CYLTagListViewTitle];
+    }
     if ((value = CYLNumber(configuration[CYLTagListViewAllowsEmptySelection]))) self.allowsEmptySelection = [value boolValue];
     if ((value = CYLNumber(configuration[CYLTagListViewShowsSectionHeaders]))) self.showsSectionHeaders = [value boolValue];
     if ((value = CYLNumber(configuration[CYLTagListViewScrollEnabled]))) self.scrollEnabled = [value boolValue];
@@ -492,9 +575,15 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
             }
         }
     } else {
-        // YAML, TOML, INI...: CYLTabBarController's configuration parser, when it is linked.
-        Class parser = NSClassFromString(@"CYLTabBarController");
-        SEL read = @selector(configurationWithContentsOfFile:error:);
+        // JSON5, YAML, TOML, INI, .properties, XML…: CYLTabBarController's configuration parser, when it is linked
+        // (found at runtime: this library does not depend on CYLTabBarController). The values are read below by this
+        // project's rules.
+        Class parser = NSClassFromString(@"CYLTabBarConfigurationParser");
+        SEL read = @selector(dictionaryWithContentsOfFile:error:);
+        if (![parser respondsToSelector:read]) {
+            parser = NSClassFromString(@"CYLTabBarController");
+            read = @selector(configurationWithContentsOfFile:error:);
+        }
         if (![parser respondsToSelector:read]) {
             if (error) *error = [NSError errorWithDomain:CYLMenuConfigurationErrorDomain code:CYLMenuConfigurationErrorUnsupportedFormat
                                                 userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Reading .%@ files needs CYLTabBarController; use JSON or a property list.", extension]}];

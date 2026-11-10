@@ -46,8 +46,13 @@ final class CYLTagEditorExampleTests: XCTestCase {
         collection.delegate?.collectionView?(collection, didSelectItemAt: indexPath)
     }
 
+    /// The titles shown: a create item shows the core's "新建标签" / "新建标签：<name>".
     private func titles(_ editor: CYLTagEditorViewController, section: Int) -> [String] {
-        (0..<editor.menuNumberOfItems(inSection: section)).map { editor.menuTitleForItem(at: IndexPath(item: $0, section: section)) }
+        (0..<editor.menuNumberOfItems(inSection: section)).map {
+            let indexPath = IndexPath(item: $0, section: section)
+            let title = editor.menuTitleForItem(at: indexPath)
+            return editor.menuItemType(at: indexPath) == .create ? CYLTagCreateCell.title(forName: title) : title
+        }
     }
 
     // MARK: Store
@@ -83,7 +88,7 @@ final class CYLTagEditorExampleTests: XCTestCase {
         XCTAssertEqual(editor.menuTitle(forSection: 1), "我的标签")
         XCTAssertEqual(titles(editor, section: 0), ["同事", "客户"])
         XCTAssertEqual(titles(editor, section: 1).last, "新建标签", "\"+ 新建标签\" after the last tag")
-        XCTAssertNotNil(editor.menuImageForItem(at: IndexPath(item: 7, section: 1)), "with a plus")
+        XCTAssertEqual(editor.menuItemType(at: IndexPath(item: 7, section: 1)), .create, "The core's create item")
         XCTAssertTrue(editor.menuAccessoryView(forSection: 1) === editor.manageButton, "\"管理\" in the header of 我的标签")
         XCTAssertNil(editor.menuAccessoryView(forSection: 0))
         XCTAssertEqual(Set(editor.tagListView.selectedIndexPaths), [IndexPath(item: 0, section: 1), IndexPath(item: 1, section: 1)])
@@ -102,20 +107,23 @@ final class CYLTagEditorExampleTests: XCTestCase {
     func testNewTagItemIsAnOutlinedActionNotASelectableTag() {
         let editor = makeEditor()
         let create = IndexPath(item: 7, section: 1)
-        XCTAssertFalse(editor.menuItemIsSelectable(at: create))
-        XCTAssertTrue(editor.menuItemIsSelectable(at: IndexPath(item: 0, section: 1)))
-        // Core: the item's own style (outlined), over the list's.
-        let style = editor.menuStyleForItem(at: create)
-        XCTAssertNotNil(style)
-        XCTAssertEqual(style?.normalAppearance.borderWidth, 1)
-        XCTAssertNil(editor.menuStyleForItem(at: IndexPath(item: 0, section: 1)))
+        XCTAssertEqual(editor.menuItemType(at: create), .create)
+        XCTAssertEqual(editor.menuTitleForItem(at: create), "", "No name: the core shows \"新建标签\"")
         let collection = editor.tagListView.value(forKey: "collectionView") as! UICollectionView
         editor.tagListView.scrollToItem(at: create, animated: false)
         collection.layoutIfNeeded()
-        let button = collection.cellForItem(at: create)?.value(forKey: "button") as? CYLTagButton
+        // Core: CYLTagCreateCell, a CYLTagListCell with the bundle's plus icon, the localized title, outlined.
+        let cell = collection.cellForItem(at: create)
+        XCTAssertTrue(cell is CYLTagCreateCell)
+        XCTAssertTrue(cell is CYLTagListCell)
+        let button = (cell as? CYLTagListCell)?.button
+        XCTAssertEqual(button?.title, "新建标签")
+        XCTAssertNotNil(button?.image)
+        XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_tag_plus"), "The plus icon is in the core bundle")
         XCTAssertEqual(button?.layer.borderWidth, 1, "Drawn outlined")
+        XCTAssertFalse(cell?.accessibilityTraits.contains(.selected) ?? true)
         XCTAssertTrue(collection.bounds.intersects(collection.cellForItem(at: create)?.frame ?? .zero), "Scrolled to the last item")
-        // A tap does not select it (core: menuItemIsSelectable); it asks for a name.
+        // A tap does not select it (the core never selects create items); it asks for a name.
         tap(editor, create)
         XCTAssertFalse(editor.tagListView.selectedIndexPaths.contains(create))
         XCTAssertEqual(editor.selectedTags, ["家人", "朋友"])
@@ -232,6 +240,94 @@ final class CYLTagEditorExampleTests: XCTestCase {
         }
         let json = #"{"version": 1, "tags": ["家人", "朋友"], "recentTags": ["朋友"], "selectedTags": [], "comment": "ignored"}"#
         XCTAssertEqual(try CYLTagData.decode(Data(json.utf8)).tags, ["家人", "朋友"])
+    }
+
+    // MARK: Fold styles (core: CYLMenuFoldControl, title, configuration files)
+
+    func testFoldStylesAreMadeWithParametersAndFromConfigurationFiles() throws {
+        let data = try CYLTagData.bundled()
+        XCTAssertEqual(data.groups?.count, 6, "Grouped tags in tags.json")
+        let styles = CYLFoldStylesViewController(data: data)
+        host(styles)
+        styles.view.layoutIfNeeded()
+        let demos = styles.demos()
+        XCTAssertTrue(styles.configurationErrors.isEmpty, "\(styles.configurationErrors) (YAML and XML need CYLTabBarController's parser)")
+        XCTAssertEqual(styles.tagListViews.count, demos.count + CYLFoldStylesViewController.configurationFiles.count)
+        // Every position and content.
+        let made = styles.tagListViews.prefix(demos.count)
+        XCTAssertEqual(made.map { $0.foldControl.position }, demos.map { $0.foldControl.position })
+        XCTAssertEqual(Set(made.map { $0.foldControl.position }), [.bottom, .topTrailing, .topLeading])
+        XCTAssertEqual(Set(made.map { $0.foldControl.content }), [.icon, .iconAndTitle, .title])
+        XCTAssertEqual(made.first?.foldStyle, .footerChevron, "foldControl sets foldStyle")
+        XCTAssertEqual(made.first?.title, "底部箭头（淘宝评价筛选）")
+        XCTAssertEqual(made.last?.titlePosition, .topCenter)
+        XCTAssertEqual(made.last?.titleLabel.textAlignment, .center)
+        // From the files: JSON, plist, YAML and XML.
+        let files = Array(styles.tagListViews.suffix(4))
+        XCTAssertEqual(files.map { $0.foldControl.position }, [.bottom, .topTrailing, .topLeading, .bottom])
+        XCTAssertEqual(files.map { $0.foldControl.content }, [.iconAndTitle, .title, .icon, .title])
+        XCTAssertEqual(files[3].titlePosition, .topCenter)
+        XCTAssertTrue(files.allSatisfy { ($0.title ?? "").count > 0 })
+        XCTAssertTrue(files.allSatisfy { $0.selectionMode == .multiple && !$0.isScrollEnabled })
+        for list in styles.tagListViews {
+            XCTAssertGreaterThan(list.contentHeight, 0, list.title ?? "")
+            XCTAssertGreaterThan(list.frame.minY, -1)
+        }
+    }
+
+    func testFoldControlTurnsItsChevronAndKeepsOnlyTheIconWhenExpanded() throws {
+        let styles = CYLFoldStylesViewController(data: try CYLTagData.bundled())
+        host(styles)
+        styles.view.layoutIfNeeded()
+        // "底部：文字 + 箭头": "更多 ⌄", then only the chevron, turned 180°.
+        let list = styles.tagListViews[1]
+        XCTAssertTrue(list.canFoldSection(0))
+        let collection = list.value(forKey: "collectionView") as! UICollectionView
+        collection.layoutIfNeeded()
+        var footer = collection.supplementaryView(forElementKind: UICollectionView.elementKindSectionFooter, at: IndexPath(item: 0, section: 0))
+        var fold = footer?.value(forKey: "foldButton") as? CYLTagButton
+        XCTAssertNotNil(fold, "A tag view (CYLTagFoldButton) below the section")
+        XCTAssertEqual(fold?.title, "更多")
+        XCTAssertNotNil(fold?.image)
+        XCTAssertEqual(fold?.layer.borderWidth, 0, "Borderless")
+        XCTAssertTrue(fold?.imageView.transform.isIdentity ?? false)
+        let heightBefore = list.contentHeight
+        fold?.sendActions(for: .touchUpInside)
+        list.layoutIfNeeded()
+        XCTAssertTrue(list.isSectionExpanded(0))
+        XCTAssertGreaterThan(list.contentHeight, heightBefore)
+        footer = collection.supplementaryView(forElementKind: UICollectionView.elementKindSectionFooter, at: IndexPath(item: 0, section: 0))
+        fold = footer?.value(forKey: "foldButton") as? CYLTagButton
+        XCTAssertNil(fold?.title, "Expanded: only the chevron")
+        XCTAssertEqual(fold?.imageView.transform.a ?? 0, -1, accuracy: 0.01, "Turned 180°")
+
+        // "左上角": the control before the section title.
+        let leading = styles.tagListViews[5]
+        let leadingCollection = leading.value(forKey: "collectionView") as! UICollectionView
+        leadingCollection.layoutIfNeeded()
+        let header = leadingCollection.supplementaryView(forElementKind: UICollectionView.elementKindSectionHeader, at: IndexPath(item: 0, section: 0))
+        let headerFold = header?.value(forKey: "foldButton") as? UIView
+        let headerTitle = header?.value(forKey: "titleLabel") as? UIView
+        XCTAssertNotNil(headerFold)
+        XCTAssertLessThan(headerFold?.frame.minX ?? .infinity, headerTitle?.frame.minX ?? 0, "At the leading edge, before the title")
+    }
+
+    func testCoreFoldControlDefaultsAreLocalized() {
+        let control = CYLMenuFoldControl(position: .bottom, content: .iconAndTitle)
+        XCTAssertEqual(control.title, "更多")
+        XCTAssertEqual(control.collapseTitle, "收起")
+        XCTAssertTrue(control.usesDefaultImage)
+        XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_fold_chevron"), "The chevron is in the core bundle")
+        XCTAssertEqual(control.title(whenExpanded: false), "更多")
+        XCTAssertNil(control.title(whenExpanded: true), "Icon and title: only the icon when expanded")
+        XCTAssertEqual(CYLMenuFoldControl(position: .topTrailing, content: .title).title(whenExpanded: true), "收起")
+        XCTAssertEqual(CYLTagCreateCell.title(forName: ""), "新建标签")
+        XCTAssertEqual(CYLTagCreateCell.title(forName: "ios"), "新建标签：ios")
+        CYLTagEditorLocalization.preferredLanguage = "en"
+        XCTAssertEqual(CYLMenuFoldControl(position: .bottom, content: .iconAndTitle).title, "More")
+        XCTAssertEqual(CYLTagCreateCell.title(forName: "ios"), "New tag: ios")
+        CYLTagEditorLocalization.preferredLanguage = "zh-Hant"
+        XCTAssertEqual(CYLTagCreateCell.title(forName: ""), "新增標籤")
     }
 
     func testEnglishStrings() {

@@ -13,7 +13,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 SCREENS="${SCREENS:-product,reviews,reviews-multi,reviews-expanded,reviews-network,search-home,search,search-gossip,search-jobs,style,style-custom,style-icon-only,style-title-uncentered,style-lottie,style-pag,style-rive,style-gif,config,animations,animations-speed,animations-rive,plus,plus-reviews-db,plus-menu,plus-menu-filtered,product@en,style@en,animations@en,reviews-expanded@en,search-jobs@en,search@zh-Hant,plus@en,plus-menu-filtered@en}"
-SWIFT_SCREENS="${SWIFT_SCREENS-remark,editor,editor-bottom,editor-search,editor-created,editor-new,editor@en,editor-search@en}"
+SWIFT_SCREENS="${SWIFT_SCREENS-remark,editor,editor-bottom,editor-search,editor-created,editor-new,styles,styles-expanded,styles-config,editor@en,editor-search@en,styles@en,styles-config@en}"
 DERIVED=build/screenshots-build
 OUT=build/screenshots
 mkdir -p "$DERIVED" "$OUT"

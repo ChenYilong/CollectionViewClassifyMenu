@@ -7,6 +7,10 @@
 #import "CYLCollectionViewLeftAlignedLayout.h"
 #import "CYLParameterConfiguration.h"
 #import "CYLTagButton.h"
+#import "CYLTagListCell.h"
+#import "CYLTagCreateCell.h"
+#import "CYLTagFoldButton.h"
+#import "CYLMenuResources.h"
 
 static NSString * const kCYLTagListCellIdentifier = @"CYLTagListCell";
 static NSString * const kCYLTagListHeaderIdentifier = @"CYLTagListHeader";
@@ -14,63 +18,15 @@ static NSString * const kCYLTagListFooterIdentifier = @"CYLTagListFooter";
 static CGFloat const kCYLTagListFooterHeight = 28;
 static CGFloat const kCYLTagListHeaderIconSize = 16;
 
-#pragma mark - Cell
-
-/// Hosts one CYLTagButton; the cell is the accessibility element and handles taps.
-@interface CYLTagListCell : UICollectionViewCell
-@property (nonatomic, strong, readonly) CYLTagButton *button;
-/// The list's style object last applied, so that a style is copied into the button only when it changes.
-@property (nonatomic, weak) CYLMenuStyle *appliedStyle;
-@end
-
-@implementation CYLTagListCell
-
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        _button = [[CYLTagButton alloc] initWithFrame:self.contentView.bounds];
-        _button.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        // The collection view handles taps.
-        _button.userInteractionEnabled = NO;
-        [self.contentView addSubview:_button];
-        self.isAccessibilityElement = YES;
-        self.accessibilityTraits = UIAccessibilityTraitButton;
-    }
-    return self;
-}
-
-- (void)configureWithTitle:(NSString *)title
-                     image:(UIImage *)image
-             selectedImage:(UIImage *)selectedImage
-              animationURL:(NSURL *)animationURL
-                     style:(CYLMenuStyle *)style
-                  selected:(BOOL)selected
-                   enabled:(BOOL)enabled {
-    if (self.appliedStyle != style) {
-        self.button.style = style;
-        self.appliedStyle = style;
-    }
-    self.button.animationURL = animationURL;
-    self.button.title = title;
-    self.button.image = image;
-    self.button.selectedImage = selectedImage;
-    self.button.enabled = enabled;
-    self.button.selected = selected;
-    self.accessibilityLabel = title;
-    UIAccessibilityTraits traits = UIAccessibilityTraitButton;
-    if (selected) traits |= UIAccessibilityTraitSelected;
-    if (!enabled) traits |= UIAccessibilityTraitNotEnabled;
-    self.accessibilityTraits = traits;
-}
-
-@end
-
 #pragma mark - Header
 
 @interface CYLTagListHeaderView : UICollectionReusableView
 @property (nonatomic, strong, readonly) UIImageView *iconView;
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
-@property (nonatomic, strong, readonly) UIButton *foldButton;
+@property (nonatomic, strong, readonly) CYLTagFoldButton *foldButton;
+/// The fold control's size, and whether it is at the leading edge (before the title).
+@property (nonatomic, assign) CGSize foldSize;
+@property (nonatomic, assign) BOOL foldAtLeadingEdge;
 @property (nonatomic, strong, nullable) UIView *accessoryView;
 @property (nonatomic, assign) CGFloat horizontalInset;
 @property (nonatomic, assign) NSInteger section;
@@ -86,8 +42,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         _iconView.contentMode = UIViewContentModeScaleAspectFit;
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.accessibilityTraits = UIAccessibilityTraitHeader;
-        _foldButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        _foldButton.titleLabel.font = [UIFont systemFontOfSize:12];
+        _foldButton = [[CYLTagFoldButton alloc] initWithFrame:CGRectZero];
         [_foldButton addTarget:self action:@selector(foldTapped) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:_iconView];
         [self addSubview:_titleLabel];
@@ -127,11 +82,19 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     CGFloat width = CGRectGetWidth(self.bounds);
     CGFloat height = CGRectGetHeight(self.bounds);
     CGFloat trailing = width - self.horizontalInset;
+    CGFloat leading = self.horizontalInset;
     if (!self.foldButton.hidden) {
-        CGSize size = [self.foldButton sizeThatFits:CGSizeMake(width / 3, height)];
-        trailing -= size.width;
-        self.foldButton.frame = CGRectMake(trailing, 0, size.width, height);
-        trailing -= 8;
+        CGSize size = CGSizeMake(MIN(self.foldSize.width, width / 2), MIN(self.foldSize.height, height));
+        CGFloat y = floor((height - size.height) / 2);
+        // The control's own margin lines its content up with the title.
+        if (self.foldAtLeadingEdge) {
+            self.foldButton.frame = CGRectMake(leading - 6, y, size.width, size.height);
+            leading += size.width - 6 + 4;
+        } else {
+            trailing -= size.width - 6;
+            self.foldButton.frame = CGRectMake(trailing, y, size.width, size.height);
+            trailing -= 8;
+        }
     }
     if (self.accessoryView) {
         CGSize size = [self.accessoryView sizeThatFits:CGSizeMake(width / 2, height)];
@@ -141,7 +104,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         self.accessoryView.frame = CGRectMake(trailing, floor((height - size.height) / 2), size.width, size.height);
         trailing -= 8;
     }
-    CGFloat x = self.horizontalInset;
+    CGFloat x = leading;
     if (self.iconView.image) {
         self.iconView.frame = CGRectMake(x, floor((height - kCYLTagListHeaderIconSize) / 2),
                                          kCYLTagListHeaderIconSize, kCYLTagListHeaderIconSize);
@@ -157,9 +120,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 #pragma mark - Footer
 
 @interface CYLTagListFooterView : UICollectionReusableView
-@property (nonatomic, strong, readonly) UIButton *chevronButton;
-@property (nonatomic, assign, readonly, getter=isExpanded) BOOL expanded;
-- (void)setExpanded:(BOOL)expanded animated:(BOOL)animated;
+/// The fold control below the section (CYLMenuFoldControlPositionBottom), centered.
+@property (nonatomic, strong, readonly) CYLTagFoldButton *foldButton;
+@property (nonatomic, assign) CGSize foldSize;
 @property (nonatomic, assign) NSInteger section;
 @property (nonatomic, copy, nullable) void (^foldHandler)(NSInteger section);
 @end
@@ -169,11 +132,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _chevronButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        _chevronButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _chevronButton.frame = self.bounds;
-        [_chevronButton addTarget:self action:@selector(foldTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:_chevronButton];
+        _foldButton = [[CYLTagFoldButton alloc] initWithFrame:CGRectZero];
+        [_foldButton addTarget:self action:@selector(foldTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:_foldButton];
     }
     return self;
 }
@@ -189,18 +150,11 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     }
 }
 
-/// The chevron points down while folded and turns 180° when expanded.
-- (void)setExpanded:(BOOL)expanded animated:(BOOL)animated {
-    _expanded = expanded;
-    // Just under π, so that it turns the same way back and forth.
-    CGAffineTransform transform = expanded ? CGAffineTransformMakeRotation((CGFloat)M_PI - 0.0001) : CGAffineTransformIdentity;
-    if (animated && !UIAccessibilityIsReduceMotionEnabled()) {
-        [UIView animateWithDuration:0.25 animations:^{
-            self.chevronButton.imageView.transform = transform;
-        }];
-    } else {
-        self.chevronButton.imageView.transform = transform;
-    }
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    CGSize size = CGSizeMake(MIN(self.foldSize.width, CGRectGetWidth(self.bounds)), MIN(self.foldSize.height, CGRectGetHeight(self.bounds)));
+    self.foldButton.frame = CGRectMake(floor((CGRectGetWidth(self.bounds) - size.width) / 2),
+                                       floor((CGRectGetHeight(self.bounds) - size.height) / 2), size.width, size.height);
 }
 
 @end
@@ -219,7 +173,15 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 /// going from 0 to the content height) lays the tags out again.
 @property (nonatomic, assign) CGSize laidOutSize;
 @property (nonatomic, assign, readwrite) CGFloat contentHeight;
+@property (nonatomic, strong, readwrite) UILabel *titleLabel;
+/// The outlined look of "+ 新建标签" items and the style it was made from.
+@property (nonatomic, strong) CYLMenuStyle *createItemStyle;
+@property (nonatomic, weak) CYLMenuStyle *createItemBaseStyle;
 @end
+
+static NSString * const kCYLTagCreateCellIdentifier = @"CYLTagCreateCell";
+/// Space around the list's title.
+static CGFloat const kCYLTagListTitleVerticalInset = 10;
 
 @implementation CYLTagListView
 
@@ -231,6 +193,24 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         [self cyl_commonInit];
     }
     return self;
+}
+
+- (instancetype)initWithFoldControl:(CYLMenuFoldControl *)foldControl title:(NSString *)title titlePosition:(CYLMenuTitlePosition)titlePosition {
+    self = [self initWithFrame:CGRectZero];
+    if (self) {
+        self.foldControl = foldControl;
+        self.titlePosition = titlePosition;
+        self.title = title;
+    }
+    return self;
+}
+
+- (instancetype)initWithFoldControl:(CYLMenuFoldControl *)foldControl {
+    return [self initWithFoldControl:foldControl title:nil titlePosition:CYLMenuTitlePositionTopLeading];
+}
+
++ (instancetype)tagListViewWithFoldPosition:(CYLMenuFoldControlPosition)position content:(CYLMenuFoldControlContent)content {
+    return [[self alloc] initWithFoldControl:[CYLMenuFoldControl foldControlWithPosition:position content:content]];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -247,6 +227,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     _allowsEmptySelection = YES;
     _showsSectionHeaders = YES;
     _defaultVisibleRows = 1;
+    _foldControl = [CYLMenuFoldControl noFoldControl];
     _titles = @[];
     _itemWidths = @[];
     _rows = @[];
@@ -256,12 +237,14 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
     CYLCollectionViewLeftAlignedLayout *layout = [[CYLCollectionViewLeftAlignedLayout alloc] init];
     _collectionView = [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:layout];
+    // Laid out in -layoutSubviews, below the title.
     _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
     _collectionView.alwaysBounceVertical = NO;
     _collectionView.showsHorizontalScrollIndicator = NO;
     [_collectionView registerClass:[CYLTagListCell class] forCellWithReuseIdentifier:kCYLTagListCellIdentifier];
+    [_collectionView registerClass:[CYLTagCreateCell class] forCellWithReuseIdentifier:kCYLTagCreateCellIdentifier];
     [_collectionView registerClass:[CYLTagListHeaderView class]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:kCYLTagListHeaderIdentifier];
@@ -269,6 +252,14 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:kCYLTagListFooterIdentifier];
     [self addSubview:_collectionView];
+    _titleLabel = [[UILabel alloc] init];
+    _titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    _titleLabel.adjustsFontForContentSizeCategory = YES;
+    _titleLabel.textColor = [UIColor labelColor];
+    _titleLabel.numberOfLines = 0;
+    _titleLabel.accessibilityTraits = UIAccessibilityTraitHeader;
+    _titleLabel.hidden = YES;
+    [self addSubview:_titleLabel];
     [self cyl_applyStyleColors];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(cyl_refreshVisibleCells)
@@ -309,6 +300,44 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [self cyl_refreshVisibleCells];
 }
 
+- (void)setFoldControl:(CYLMenuFoldControl *)foldControl {
+    _foldControl = [(foldControl ?: [CYLMenuFoldControl noFoldControl]) copy];
+    switch (_foldControl.position) {
+        case CYLMenuFoldControlPositionBottom: _foldStyle = CYLMenuFoldStyleFooterChevron; break;
+        case CYLMenuFoldControlPositionTopTrailing:
+        case CYLMenuFoldControlPositionTopLeading: _foldStyle = CYLMenuFoldStyleHeaderButton; break;
+        case CYLMenuFoldControlPositionNone:
+            if (_foldStyle != CYLMenuFoldStyleTruncate) _foldStyle = CYLMenuFoldStyleNone;
+            break;
+    }
+    [self cyl_reloadLayout];
+}
+
+- (void)setTitle:(NSString *)title {
+    _title = [title copy];
+    self.titleLabel.text = title;
+    self.titleLabel.hidden = title.length == 0;
+    [self setNeedsLayout];
+    [self cyl_updateContentHeight];
+}
+
+- (void)setTitlePosition:(CYLMenuTitlePosition)titlePosition {
+    _titlePosition = titlePosition;
+    self.titleLabel.textAlignment = titlePosition == CYLMenuTitlePositionTopCenter ? NSTextAlignmentCenter : NSTextAlignmentNatural;
+    [self setNeedsLayout];
+}
+
+/// The height of the title area at `width`, 0 without a title.
+- (CGFloat)cyl_titleHeightForWidth:(CGFloat)width {
+    if (self.title.length == 0) {
+        return 0;
+    }
+    CGFloat inset = self.style.sectionInsets.left;
+    CGFloat available = MAX(1, (width > 0 ? width : CGRectGetWidth(UIScreen.mainScreen.bounds)) - 2 * inset);
+    CGSize size = [self.titleLabel sizeThatFits:CGSizeMake(available, CGFLOAT_MAX)];
+    return ceil(size.height) + 2 * kCYLTagListTitleVerticalInset;
+}
+
 - (void)setShowsSectionHeaders:(BOOL)showsSectionHeaders {
     _showsSectionHeaders = showsSectionHeaders;
     [self cyl_reloadLayout];
@@ -316,6 +345,18 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
 - (void)setFoldStyle:(CYLMenuFoldStyle)foldStyle {
     _foldStyle = foldStyle;
+    switch (foldStyle) {
+        case CYLMenuFoldStyleHeaderButton:
+            _foldControl = [CYLMenuFoldControl foldControlWithPosition:CYLMenuFoldControlPositionTopTrailing content:CYLMenuFoldControlContentTitle];
+            break;
+        case CYLMenuFoldStyleFooterChevron:
+            _foldControl = [CYLMenuFoldControl foldControlWithPosition:CYLMenuFoldControlPositionBottom content:CYLMenuFoldControlContentIcon];
+            break;
+        default:
+            _foldControl = [CYLMenuFoldControl noFoldControl];
+            break;
+    }
+
     [self cyl_reloadLayout];
 }
 
@@ -360,7 +401,10 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         NSMutableArray *items = [NSMutableArray array];
         NSInteger count = [source menuNumberOfItemsInSection:section];
         for (NSInteger item = 0; item < count; item++) {
-            [items addObject:[source menuTitleForItemAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]] ?: @""];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
+            NSString *title = [source menuTitleForItemAtIndexPath:indexPath] ?: @"";
+            // "+ 新建标签": the title is the name to create; the item shows "新建标签：<name>".
+            [items addObject:[self cyl_itemTypeAtIndexPath:indexPath] == CYLMenuItemTypeCreate ? [CYLTagCreateCell titleForName:title] : title];
         }
         [titles addObject:items];
     }
@@ -392,9 +436,17 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 }
 
 - (UIImage *)cyl_imageAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self cyl_itemTypeAtIndexPath:indexPath] == CYLMenuItemTypeCreate) {
+        return [CYLTagCreateCell plusImage];
+    }
     id<CYLMenuDataSource> source = self.menuDataSource;
     return [source respondsToSelector:@selector(menuImageForItemAtIndexPath:)]
         ? [source menuImageForItemAtIndexPath:indexPath] : nil;
+}
+
+- (CYLMenuItemType)cyl_itemTypeAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    return [source respondsToSelector:@selector(menuItemTypeAtIndexPath:)] ? [source menuItemTypeAtIndexPath:indexPath] : CYLMenuItemTypeTag;
 }
 
 - (NSURL *)cyl_animationURLAtIndexPath:(NSIndexPath *)indexPath {
@@ -414,10 +466,25 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 - (CYLMenuStyle *)cyl_styleForItemAtIndexPath:(NSIndexPath *)indexPath {
     id<CYLMenuDataSource> source = self.menuDataSource;
     CYLMenuStyle *style = [source respondsToSelector:@selector(menuStyleForItemAtIndexPath:)] ? [source menuStyleForItemAtIndexPath:indexPath] : nil;
-    return [style isKindOfClass:[CYLMenuStyle class]] ? style : [self cyl_styleForSection:indexPath.section];
+    if ([style isKindOfClass:[CYLMenuStyle class]]) {
+        return style;
+    }
+    CYLMenuStyle *sectionStyle = [self cyl_styleForSection:indexPath.section];
+    if ([self cyl_itemTypeAtIndexPath:indexPath] != CYLMenuItemTypeCreate) {
+        return sectionStyle;
+    }
+    // "+ 新建标签": outlined, made once per base style.
+    if (self.createItemBaseStyle != sectionStyle || !self.createItemStyle) {
+        self.createItemStyle = [CYLTagCreateCell styleWithStyle:sectionStyle];
+        self.createItemBaseStyle = sectionStyle;
+    }
+    return self.createItemStyle;
 }
 
 - (BOOL)cyl_isSelectableAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self cyl_itemTypeAtIndexPath:indexPath] == CYLMenuItemTypeCreate) {
+        return NO;
+    }
     id<CYLMenuDataSource> source = self.menuDataSource;
     return ![source respondsToSelector:@selector(menuItemIsSelectableAtIndexPath:)] || [source menuItemIsSelectableAtIndexPath:indexPath];
 }
@@ -441,12 +508,32 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     return [CYLTagButton heightForStyle:self.style traitCollection:self.traitCollection];
 }
 
+- (BOOL)cyl_foldControlIsInHeader {
+    CYLMenuFoldControlPosition position = self.foldControl.position;
+    return position == CYLMenuFoldControlPositionTopTrailing || position == CYLMenuFoldControlPositionTopLeading;
+}
+
+- (BOOL)cyl_foldControlIsInFooter {
+    return self.foldControl.position == CYLMenuFoldControlPositionBottom;
+}
+
+/// The fold control's size in a state.
+- (CGSize)cyl_foldSizeExpanded:(BOOL)expanded {
+    return [CYLTagFoldButton sizeForFoldControl:self.foldControl expanded:expanded traitCollection:self.traitCollection];
+}
+
+- (CGFloat)cyl_footerHeight {
+    return MAX(kCYLTagListFooterHeight, [self cyl_foldSizeExpanded:NO].height);
+}
+
 - (CGFloat)cyl_headerHeight {
+    // A fold control at the top needs the header, also when section titles are hidden.
+    CGFloat foldHeight = [self cyl_foldControlIsInHeader] ? [self cyl_foldSizeExpanded:NO].height : 0;
     if (!self.showsSectionHeaders) {
-        return 0;
+        return foldHeight;
     }
     UIFont *font = [self.style headerFontForTraitCollection:self.traitCollection];
-    return MAX(self.style.headerHeight, ceil(font.lineHeight) + 12);
+    return MAX(MAX(self.style.headerHeight, ceil(font.lineHeight) + 12), foldHeight);
 }
 
 - (CGFloat)cyl_contentWidthForWidth:(CGFloat)width {
@@ -525,6 +612,17 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    // The list's title, then the sections.
+    CGFloat width = CGRectGetWidth(self.bounds);
+    CGFloat titleHeight = [self cyl_titleHeightForWidth:width];
+    CGFloat inset = self.style.sectionInsets.left;
+    self.titleLabel.frame = titleHeight > 0
+        ? CGRectMake(inset, kCYLTagListTitleVerticalInset, MAX(0, width - 2 * inset), titleHeight - 2 * kCYLTagListTitleVerticalInset)
+        : CGRectZero;
+    CGRect collectionFrame = CGRectMake(0, titleHeight, width, MAX(0, CGRectGetHeight(self.bounds) - titleHeight));
+    if (!CGRectEqualToRect(self.collectionView.frame, collectionFrame)) {
+        self.collectionView.frame = collectionFrame;
+    }
     if (CGRectGetWidth(self.collectionView.bounds) != self.measuredWidth) {
         [self cyl_reloadLayout];
     } else if (!CGSizeEqualToSize(self.collectionView.bounds.size, self.laidOutSize)) {
@@ -551,7 +649,8 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         [self.collectionView layoutIfNeeded];
         // Explicit insets only: safe-area adjustments belong to the host's layout.
         height = ceil(self.collectionView.collectionViewLayout.collectionViewContentSize.height +
-                      self.collectionView.contentInset.top + self.collectionView.contentInset.bottom);
+                      self.collectionView.contentInset.top + self.collectionView.contentInset.bottom) +
+                 [self cyl_titleHeightForWidth:CGRectGetWidth(self.bounds)];
     } else {
         height = [self heightThatFitsWidth:0];
     }
@@ -583,11 +682,11 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         if (rowCount > 0) {
             height += rowCount * itemHeight + (rowCount - 1) * self.style.lineSpacing;
         }
-        if (foldable && self.foldStyle == CYLMenuFoldStyleFooterChevron) {
-            height += kCYLTagListFooterHeight;
+        if (foldable && [self cyl_foldControlIsInFooter]) {
+            height += [self cyl_footerHeight];
         }
     }
-    return ceil(height);
+    return ceil(height) + [self cyl_titleHeightForWidth:width];
 }
 
 #pragma mark Scrolling
@@ -638,7 +737,8 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 #pragma mark Folding
 
 - (BOOL)cyl_canFoldRowCount:(NSUInteger)rowCount {
-    return self.foldStyle != CYLMenuFoldStyleNone && self.defaultVisibleRows > 0 && rowCount > self.defaultVisibleRows;
+    BOOL folds = self.foldStyle == CYLMenuFoldStyleTruncate || self.foldControl.position != CYLMenuFoldControlPositionNone;
+    return folds && self.defaultVisibleRows > 0 && rowCount > self.defaultVisibleRows;
 }
 
 - (BOOL)canFoldSection:(NSInteger)section {
@@ -730,23 +830,38 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     BOOL expanded = [self isSectionExpanded:section];
     CYLTagListFooterView *footer = (CYLTagListFooterView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:indexPath];
     if ([footer isKindOfClass:[CYLTagListFooterView class]]) {
-        [footer setExpanded:expanded animated:animated];
-        footer.chevronButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+        [self cyl_configureFoldButton:footer.foldButton section:section expanded:expanded animated:animated];
+        footer.foldSize = [self cyl_foldSizeExpanded:expanded];
+        [footer setNeedsLayout];
     }
     CYLTagListHeaderView *header = (CYLTagListHeaderView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
-    if ([header isKindOfClass:[CYLTagListHeaderView class]]) {
-        [header.foldButton setTitle:expanded ? self.style.collapseTitle : self.style.expandTitle forState:UIControlStateNormal];
-        header.foldButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+    if ([header isKindOfClass:[CYLTagListHeaderView class]] && !header.foldButton.hidden) {
+        [self cyl_configureFoldButton:header.foldButton section:section expanded:expanded animated:animated];
+        header.foldSize = [self cyl_foldSizeExpanded:expanded];
+        [header setNeedsLayout];
     }
 }
 
-- (nullable UIButton *)cyl_foldControlInSection:(NSInteger)section {
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
-    if (self.foldStyle == CYLMenuFoldStyleFooterChevron) {
-        CYLTagListFooterView *footer = (CYLTagListFooterView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:indexPath];
-        return footer.chevronButton;
+/// Shows the fold control in a state, with its VoiceOver label ("<section> 更多/收起") and value.
+- (void)cyl_configureFoldButton:(CYLTagFoldButton *)button section:(NSInteger)section expanded:(BOOL)expanded animated:(BOOL)animated {
+    CYLMenuFoldControl *control = self.foldControl;
+    // CYLMenuStyle.foldChevronImage replaces the default chevron, as before fold controls.
+    if (self.style.foldChevronImage && control.usesDefaultImage) {
+        control = [control copy];
+        control.image = self.style.foldChevronImage;
     }
-    if (self.foldStyle == CYLMenuFoldStyleHeaderButton) {
+    [button applyFoldControl:control color:self.style.foldControlColor expanded:expanded animated:animated];
+    button.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+    button.accessibilityHint = expanded ? nil : CYLMenuLocalizedString(@"CYLMenuExpandHint", @"Shows every tag");
+}
+
+- (nullable CYLTagFoldButton *)cyl_foldControlInSection:(NSInteger)section {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+    if ([self cyl_foldControlIsInFooter]) {
+        CYLTagListFooterView *footer = (CYLTagListFooterView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:indexPath];
+        return footer.foldButton;
+    }
+    if ([self cyl_foldControlIsInHeader]) {
         CYLTagListHeaderView *header = (CYLTagListHeaderView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
         return header.foldButton.hidden ? nil : header.foldButton;
     }
@@ -755,7 +870,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
 /// "<section title> <expand or collapse title>", so a fold control says which section it changes.
 - (NSString *)cyl_foldAccessibilityLabelForSection:(NSInteger)section {
-    NSString *action = [self isSectionExpanded:section] ? self.style.collapseTitle : self.style.expandTitle;
+    BOOL titled = self.foldControl.position != CYLMenuFoldControlPositionNone;
+    NSString *action = [self isSectionExpanded:section] ? (titled ? self.foldControl.collapseTitle : self.style.collapseTitle)
+                                                        : (titled ? self.foldControl.title : self.style.expandTitle);
     NSString *title = [self.menuDataSource menuTitleForSection:section];
     return title.length > 0 ? [NSString stringWithFormat:@"%@ %@", title, action] : action;
 }
@@ -838,6 +955,12 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         ![delegate menu:self shouldSelectItemAtIndexPath:indexPath]) {
         return;
     }
+    if ([self cyl_itemTypeAtIndexPath:indexPath] == CYLMenuItemTypeCreate &&
+        [delegate respondsToSelector:@selector(menu:didRequestNewItemWithName:atIndexPath:)]) {
+        NSString *name = [self.menuDataSource menuTitleForItemAtIndexPath:indexPath] ?: @"";
+        [delegate menu:self didRequestNewItemWithName:name atIndexPath:indexPath];
+        return;
+    }
     NSMutableArray<NSIndexPath *> *removed = [NSMutableArray array];
     BOOL selected = NO;
     BOOL selectable = [self cyl_isSelectableAtIndexPath:indexPath];
@@ -891,6 +1014,12 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     if (![self cyl_isValidIndexPath:indexPath]) {
         return;
     }
+    if ([cell isKindOfClass:[CYLTagCreateCell class]]) {
+        [(CYLTagCreateCell *)cell configureWithName:[self.menuDataSource menuTitleForItemAtIndexPath:indexPath]
+                                              style:[self cyl_styleForItemAtIndexPath:indexPath]
+                                            enabled:[self cyl_isEnabledAtIndexPath:indexPath]];
+        return;
+    }
     [cell configureWithTitle:self.titles[indexPath.section][indexPath.item]
                        image:[self cyl_imageAtIndexPath:indexPath]
                selectedImage:[self cyl_selectedImageAtIndexPath:indexPath]
@@ -912,7 +1041,8 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    CYLTagListCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCYLTagListCellIdentifier forIndexPath:indexPath];
+    NSString *identifier = [self cyl_itemTypeAtIndexPath:indexPath] == CYLMenuItemTypeCreate ? kCYLTagCreateCellIdentifier : kCYLTagListCellIdentifier;
+    CYLTagListCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
     [self cyl_configureCell:cell atIndexPath:indexPath];
     return cell;
 }
@@ -928,11 +1058,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
                                                                                  forIndexPath:indexPath];
         footer.section = section;
         BOOL expanded = [self isSectionExpanded:section];
-        [footer.chevronButton setImage:self.style.foldChevronImage ?: [UIImage systemImageNamed:@"chevron.down"]
-                              forState:UIControlStateNormal];
-        [footer setExpanded:expanded animated:NO];
-        footer.chevronButton.tintColor = self.style.foldControlColor;
-        footer.chevronButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+        [self cyl_configureFoldButton:footer.foldButton section:section expanded:expanded animated:NO];
+        footer.foldSize = [self cyl_foldSizeExpanded:expanded];
+        [footer setNeedsLayout];
         footer.foldHandler = ^(NSInteger tappedSection) {
             [weakSelf cyl_toggleSection:tappedSection];
         };
@@ -949,12 +1077,17 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     header.titleLabel.textColor = self.style.headerTextColor;
     header.iconView.image = [source respondsToSelector:@selector(menuImageForSection:)] ? [source menuImageForSection:section] : nil;
     header.accessoryView = [source respondsToSelector:@selector(menuAccessoryViewForSection:)] ? [source menuAccessoryViewForSection:section] : nil;
-    BOOL showsFoldButton = self.foldStyle == CYLMenuFoldStyleHeaderButton && [self canFoldSection:section];
+    BOOL showsFoldButton = [self cyl_foldControlIsInHeader] && [self canFoldSection:section];
     header.foldButton.hidden = !showsFoldButton;
-    [header.foldButton setTitle:[self isSectionExpanded:section] ? self.style.collapseTitle : self.style.expandTitle
-                       forState:UIControlStateNormal];
-    [header.foldButton setTitleColor:self.style.foldControlColor forState:UIControlStateNormal];
-    header.foldButton.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+    header.foldAtLeadingEdge = self.foldControl.position == CYLMenuFoldControlPositionTopLeading;
+    if (showsFoldButton) {
+        BOOL expanded = [self isSectionExpanded:section];
+        [self cyl_configureFoldButton:header.foldButton section:section expanded:expanded animated:NO];
+        header.foldSize = [self cyl_foldSizeExpanded:expanded];
+    }
+    // Section titles hidden: the header only holds the fold control.
+    header.titleLabel.hidden = !self.showsSectionHeaders;
+    header.iconView.hidden = !self.showsSectionHeaders;
     header.foldHandler = ^(NSInteger tappedSection) {
         [weakSelf cyl_toggleSection:tappedSection];
     };
@@ -1009,8 +1142,8 @@ referenceSizeForHeaderInSection:(NSInteger)section {
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
 referenceSizeForFooterInSection:(NSInteger)section {
-    BOOL showsChevron = self.foldStyle == CYLMenuFoldStyleFooterChevron && [self canFoldSection:section];
-    return showsChevron ? CGSizeMake(CGRectGetWidth(collectionView.bounds), kCYLTagListFooterHeight) : CGSizeZero;
+    BOOL showsControl = [self cyl_foldControlIsInFooter] && [self canFoldSection:section];
+    return showsControl ? CGSizeMake(CGRectGetWidth(collectionView.bounds), [self cyl_footerHeight]) : CGSizeZero;
 }
 
 @end

@@ -10,3 +10,9 @@
 "CYLFilterConfirm" = "确认筛选";
 /* 恢复多选筛选的默认选择。 */
 "CYLFilterReset" = "返回默认";
+/* 新建一个标签的操作项。 */
+"CYLMenuNewTag" = "新建标签";
+/* 新建指定名称的标签，%@ 为名称。 */
+"CYLMenuNewTagNamed" = "新建标签：%@";
+/* 折叠控件的无障碍提示：展开后显示全部标签。 */
+"CYLMenuExpandHint" = "显示全部标签";

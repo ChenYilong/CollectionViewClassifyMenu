@@ -275,6 +275,12 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 #pragma mark Layout
 
 /// CYLFlatDesignTabBarButton's `_updateLayout`, with the icon and title side by side.
+/// Bounds and center instead of frame, so that a transform (the fold chevron's 180° turn) is kept.
+- (void)cyl_placeImageView:(CGRect)frame {
+    self.imageView.bounds = CGRectMake(0, 0, CGRectGetWidth(frame), CGRectGetHeight(frame));
+    self.imageView.center = CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame));
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     CGFloat width = CGRectGetWidth(self.bounds);
@@ -297,8 +303,13 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     CGFloat titleX = 0;
     if (showsImage && showsTitle) {
         CGFloat group = iconSize.width + spacing + titleWidth;
-        imageX = floor((width - group) / 2);
-        titleX = imageX + iconSize.width + spacing;
+        if (style.imagePlacement == CYLTagImagePlacementTrailing) {
+            titleX = floor((width - group) / 2);
+            imageX = titleX + titleWidth + spacing;
+        } else {
+            imageX = floor((width - group) / 2);
+            titleX = imageX + iconSize.width + spacing;
+        }
     } else if (showsImage) {
         imageX = style.layoutCentered ? floor((width - iconSize.width) / 2) : margin;
     } else if (showsTitle) {
@@ -323,12 +334,12 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         frame.size.height = MAX(0, frame.size.height - insets.top - insets.bottom);
         if (animated) {
             self.animationView.frame = frame;
-            self.imageView.frame = CGRectZero;
+            [self cyl_placeImageView:CGRectZero];
         } else {
-            self.imageView.frame = frame;
+            [self cyl_placeImageView:frame];
         }
     } else {
-        self.imageView.frame = CGRectZero;
+        [self cyl_placeImageView:CGRectZero];
     }
     // 0 is automatic: a capsule, as for CYLBadgeAppearance.
     self.layer.cornerRadius = appearance.cornerRadius > 0 ? MIN(appearance.cornerRadius, height / 2) : height / 2;

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FFCFC108BD54B07DCCD9841E /* CYLFoldStylesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2FE0717E98EC39961B5317 /* CYLFoldStylesViewController.swift */; };
 		85C39F62A8B8E08A61C1F86D /* CYLRemarkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9849E67DD2412DD1240F9BBC /* CYLRemarkViewController.swift */; };
 		F7C1461C29BFDADA0DE22D5D /* CYLTagEditorAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DE5BEAF8017F20341C306F /* CYLTagEditorAppDelegate.swift */; };
 		40F00716DC1B0DA638C6C343 /* CYLTagEditorExample.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 195779B23A13B1FE0BEBC98B /* CYLTagEditorExample.bundle */; };
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9A2FE0717E98EC39961B5317 /* CYLFoldStylesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLFoldStylesViewController.swift; sourceTree = "<group>"; };
 		9849E67DD2412DD1240F9BBC /* CYLRemarkViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLRemarkViewController.swift; sourceTree = "<group>"; };
 		16DE5BEAF8017F20341C306F /* CYLTagEditorAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorAppDelegate.swift; sourceTree = "<group>"; };
 		195779B23A13B1FE0BEBC98B /* CYLTagEditorExample.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CYLTagEditorExample.bundle; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 		20F4BD606C0F6D1645AE4919 /* CYLTagEditorExample */ = {
 			isa = PBXGroup;
 			children = (
+				9A2FE0717E98EC39961B5317 /* CYLFoldStylesViewController.swift */,
 				9849E67DD2412DD1240F9BBC /* CYLRemarkViewController.swift */,
 				16DE5BEAF8017F20341C306F /* CYLTagEditorAppDelegate.swift */,
 				195779B23A13B1FE0BEBC98B /* CYLTagEditorExample.bundle */,
@@ -320,6 +323,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFCFC108BD54B07DCCD9841E /* CYLFoldStylesViewController.swift in Sources */,
 				85C39F62A8B8E08A61C1F86D /* CYLRemarkViewController.swift in Sources */,
 				F7C1461C29BFDADA0DE22D5D /* CYLTagEditorAppDelegate.swift in Sources */,
 				F9448100EA5CEB18E9BD35AB /* CYLTagEditorLocalization.swift in Sources */,

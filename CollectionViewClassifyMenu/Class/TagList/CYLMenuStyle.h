@@ -17,6 +17,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Where a tag's icon goes relative to its title.
+typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
+    /// Icon, then title (the default).
+    CYLTagImagePlacementLeading = 0,
+    /// Title, then icon, e.g. "更多 ⌄".
+    CYLTagImagePlacementTrailing,
+};
+
 @interface CYLMenuStyle : NSObject <NSCopying>
 
 /// Gray bordered tags, green selection. Used when no style is set.
@@ -57,6 +65,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) UIOffset titlePositionAdjustment;
 /// Moves the icon from its computed position.
 @property (nonatomic, assign) UIOffset imagePositionAdjustment;
+/// The icon before (default) or after the title.
+@property (nonatomic, assign) CYLTagImagePlacement imagePlacement;
 /// For a tag with only an icon or only a title: YES (the default) centers it;
 /// NO keeps it where it would be with both, the title after an empty icon slot,
 /// the icon at the leading margin (as CYLFlatDesignTabBarItem.layoutCentered = NO).

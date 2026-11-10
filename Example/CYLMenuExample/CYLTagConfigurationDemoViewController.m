@@ -28,7 +28,7 @@
     // In code, values keep their types (UIColor, NSValue, NSURL...); strings work too.
     return @{
         CYLTagListViewSelectionMode : @(CYLMenuSelectionModeMultiple),
-        CYLTagListViewFoldStyle : @(CYLMenuFoldStyleNone),
+        CYLTagListViewFoldControl : [CYLMenuFoldControl noFoldControl],
         CYLTagListViewScrollEnabled : @NO,
         CYLTagListViewSelectedItems : @[[NSIndexPath indexPathForItem:1 inSection:0]],
         CYLTagListViewStyle : @{

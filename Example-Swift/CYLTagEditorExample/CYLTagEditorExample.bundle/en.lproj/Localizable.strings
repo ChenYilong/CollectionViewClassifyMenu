@@ -19,3 +19,11 @@
 "删除标签「%@」？" = "Delete the tag “%@”?";
 "删除" = "Delete";
 "新建标签：%@" = "New tag: %@";
+"折叠样式" = "Fold Styles";
+"底部箭头（淘宝评价筛选）" = "Chevron at the bottom (review filter)";
+"底部：文字 + 箭头" = "Bottom: text and chevron";
+"底部：仅文字" = "Bottom: text only";
+"右上角：文字 + 箭头（原分类菜单）" = "Top trailing: text and chevron (original menu)";
+"右上角：仅箭头" = "Top trailing: chevron only";
+"左上角：文字 + 箭头" = "Top leading: text and chevron";
+"标题居中，右上角仅文字" = "Centered title, text at the top trailing edge";

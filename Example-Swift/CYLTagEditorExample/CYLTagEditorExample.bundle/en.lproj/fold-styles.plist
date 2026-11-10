@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>defaultVisibleRows</key>
+	<integer>1</integer>
+	<key>foldControl</key>
+	<dict>
+		<key>content</key>
+		<string>title</string>
+		<key>position</key>
+		<string>topTrailing</string>
+	</dict>
+	<key>scrollEnabled</key>
+	<false/>
+	<key>sections</key>
+	<array>
+		<dict>
+			<key>items</key>
+			<array>
+				<string>Family</string>
+				<string>Relatives</string>
+				<string>Friends</string>
+				<string>Close Friends</string>
+				<string>College Classmates</string>
+				<string>High School Classmates</string>
+				<string>Roommates</string>
+				<string>Neighbors</string>
+			</array>
+			<key>title</key>
+			<string>Relationships</string>
+		</dict>
+		<dict>
+			<key>items</key>
+			<array>
+				<string>Coworkers</string>
+				<string>Former Coworkers</string>
+				<string>Managers</string>
+				<string>Clients</string>
+				<string>Suppliers</string>
+				<string>Partners</string>
+				<string>Investors</string>
+				<string>Recruiters</string>
+			</array>
+			<key>title</key>
+			<string>Work</string>
+		</dict>
+	</array>
+	<key>selectionMode</key>
+	<string>multiple</string>
+	<key>style</key>
+	<dict>
+		<key>interitemSpacing</key>
+		<integer>10</integer>
+		<key>itemHeight</key>
+		<integer>32</integer>
+		<key>lineSpacing</key>
+		<integer>10</integer>
+		<key>normal</key>
+		<dict>
+			<key>backgroundColor</key>
+			<string>systemGray6</string>
+			<key>borderWidth</key>
+			<integer>0</integer>
+			<key>cornerRadius</key>
+			<integer>6</integer>
+			<key>margin</key>
+			<integer>12</integer>
+		</dict>
+		<key>sectionInsets</key>
+		<string>{8, 16, 8, 16}</string>
+		<key>selected</key>
+		<dict>
+			<key>backgroundColor</key>
+			<string>#E6F7EE</string>
+			<key>borderWidth</key>
+			<integer>0</integer>
+			<key>cornerRadius</key>
+			<integer>6</integer>
+			<key>margin</key>
+			<integer>12</integer>
+			<key>textColor</key>
+			<string>#07C160</string>
+		</dict>
+	</dict>
+	<key>title</key>
+	<string>plist file: “More” at the top trailing edge</string>
+	<key>titlePosition</key>
+	<string>topLeading</string>
+</dict>
+</plist>
