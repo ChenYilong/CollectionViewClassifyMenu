@@ -12,6 +12,7 @@
 #import "CYLSearchHomeViewController.h"
 #import "CYLTagStyleDemoViewController.h"
 #import "CYLTagConfigurationDemoViewController.h"
+#import "CYLTagAnimationDemoViewController.h"
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
@@ -626,10 +627,10 @@
     XCTAssertTrue([CYLTagButton isAnimationEngineAvailable], @"CYLTabBarController/CYLTabBarItemAnimation is linked");
     NSURL *resources = NSBundle.mainBundle.resourceURL;
     NSDictionary<NSString *, NSString *> *files = @{
-        @"GIF": @"CYLMenuExample.bundle/Animations/tab_star.gif",
-        @"Lottie": @"CYLMenuExample.bundle/Animations/tab_home_animate.json",
+        @"GIF": @"CYLMenuExample.bundle/Animations/GIF/tab_star.gif",
+        @"Lottie": @"CYLMenuExample.bundle/Animations/Lottie/tab_home_animate.json",
         @"PAG": @"pag-ios/0.pag",
-        @"Rive": @"CYLMenuExample.bundle/Animations/check.riv",
+        @"Rive": @"CYLMenuExample.bundle/Animations/Rive/check.riv",
     };
     for (NSString *library in files) {
         NSURL *URL = [resources URLByAppendingPathComponent:files[library]];
@@ -673,6 +674,41 @@
     [configuration loadViewIfNeeded];
     XCTAssertNotNil(configuration.fileTagListView, @"%@", configuration.configurationError);
     XCTAssertNotNil(configuration.mapTagListView);
+}
+
+- (void)testAnimationDemoPlaysEveryLibraryCopiedFromCYLTabBarController {
+    for (NSString *name in @[@"home_normal", @"home_highlight", @"fishpond_normal", @"message_highlight", @"account_normal", @"post_normal",
+                             @"gray_tabbar_home_animation_lottie_placeholder"]) {
+        XCTAssertNotNil([UIImage imageNamed:name], @"%@ from CYLTabBarController's Example images", name);
+    }
+    CYLTagAnimationDemoViewController *demo = [[CYLTagAnimationDemoViewController alloc] init];
+    [self hostController:demo];
+    [demo.view layoutIfNeeded];
+    CYLTagListView *tags = demo.tagListView;
+    UICollectionView *collection = [self collectionViewOf:tags];
+    NSArray *sections = [CYLTagAnimationDemoViewController sectionIdentifiers];
+    XCTAssertEqual([collection numberOfSections], (NSInteger)sections.count);
+    XCTAssertEqual(tags.selectedIndexPaths.count, sections.count, @"The first tag of every section is selected");
+    for (NSInteger section = 0; section < (NSInteger)sections.count; section++) {
+        NSIndexPath *indexPath = [self ip:0 :section];
+        [collection scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
+        [collection layoutIfNeeded];
+        CYLTagButton *button = [[collection cellForItemAtIndexPath:indexPath] valueForKey:@"button"];
+        XCTAssertNotNil(button, @"%@", sections[section]);
+        if ([sections[section] isEqualToString:@"images"]) {
+            XCTAssertNil(button.animationView);
+            XCTAssertEqualObjects(button.imageView.image, [UIImage imageNamed:@"home_highlight"], @"The selected image");
+        } else {
+            XCTAssertNotNil(button.animationView, @"%@ animated by CYLTabBarController's engine", sections[section]);
+        }
+    }
+    [demo playSelectedAnimations];
+    [demo changeSpeed];
+    XCTAssertEqualWithAccuracy(tags.style.animationSpeed, 2, 0.01);
+    XCTAssertEqualObjects(demo.navigationItem.leftBarButtonItem.title, @"2x");
+    [self tap:tags item:1 section:4];
+    XCTAssertTrue([tags.selectedIndexPaths containsObject:[self ip:1 :4]]);
+    XCTAssertFalse([tags.selectedIndexPaths containsObject:[self ip:0 :4]], @"One selected tag per section");
 }
 
 #pragma mark Accessibility
@@ -1041,7 +1077,7 @@
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     [tabs.view layoutIfNeeded];
-    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"Reviews", @"Search", @"Styles"]));
+    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"Reviews", @"Search", @"Styles", @"Animations"]));
 
     CYLSearchCategoryViewController *search = [[CYLSearchCategoryViewController alloc] init];
     [self hostController:search];
@@ -1067,8 +1103,8 @@
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     [tabs.view layoutIfNeeded];
-    XCTAssertEqual(tabs.viewControllers.count, 3u);
-    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"场景一：评价筛选", @"场景二：搜索分类", @"样式"]));
+    XCTAssertEqual(tabs.viewControllers.count, 4u);
+    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"场景一：评价筛选", @"场景二：搜索分类", @"样式", @"动效"]));
     UINavigationController *first = (UINavigationController *)tabs.viewControllers[0];
     UINavigationController *second = (UINavigationController *)tabs.viewControllers[1];
     XCTAssertTrue([first.viewControllers.firstObject isKindOfClass:[CYLProductViewController class]]);

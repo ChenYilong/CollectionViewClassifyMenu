@@ -10,6 +10,7 @@
 #import "CYLSearchHomeViewController.h"
 #import "CYLTagStyleDemoViewController.h"
 #import "CYLTagConfigurationDemoViewController.h"
+#import "CYLTagAnimationDemoViewController.h"
 #import "CYLExampleLocalization.h"
 
 @implementation CYLExampleAppDelegate
@@ -27,9 +28,13 @@
         @{CYLTabBarItemTitle: CYLExampleLocalizedString(@"样式"),
           CYLTabBarItemImage: [UIImage systemImageNamed:@"paintbrush"],
           CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"paintbrush.fill"]},
+        @{CYLTabBarItemTitle: CYLExampleLocalizedString(@"动效"),
+          CYLTabBarItemImage: [UIImage systemImageNamed:@"sparkles"],
+          CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"sparkles"]},
     ];
+    UINavigationController *animations = [[UINavigationController alloc] initWithRootViewController:[[CYLTagAnimationDemoViewController alloc] init]];
     UINavigationController *styles = [[UINavigationController alloc] initWithRootViewController:[[CYLTagStyleDemoViewController alloc] init]];
-    return [[CYLTabBarController alloc] initWithViewControllers:@[reviews, search, styles] tabBarItemsAttributes:attributes];
+    return [[CYLTabBarController alloc] initWithViewControllers:@[reviews, search, styles, animations] tabBarItemsAttributes:attributes];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -142,6 +147,14 @@
         };
         for (NSString *action in actions[screen]) {
             [demo performAction:action];
+        }
+    } else if ([screen hasPrefix:@"animations"]) {
+        tabs.selectedIndex = 3;
+        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[3];
+        CYLTagAnimationDemoViewController *demo = (CYLTagAnimationDemoViewController *)navigation.viewControllers.firstObject;
+        if ([screen isEqualToString:@"animations-speed"]) {
+            [demo loadViewIfNeeded];
+            [demo changeSpeed];
         }
     } else if ([screen isEqualToString:@"config"]) {
         tabs.selectedIndex = 2;

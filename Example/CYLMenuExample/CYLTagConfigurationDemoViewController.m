@@ -48,9 +48,9 @@
         CYLTagListViewSections : @[ @{
             CYLTagSectionTitle : CYLExampleLocalizedString(@"字典（map）初始化"),
             CYLTagSectionItems : @[
-                @{ CYLTagItemTitle : @"Lottie", CYLTagItemAnimation : [self animationNamed:@"tab_me_animate.json"] ?: @"" },
-                @{ CYLTagItemTitle : @"GIF", CYLTagItemAnimation : [self animationNamed:@"cyl_tab_sample_animated.gif"] ?: @"" },
-                @{ CYLTagItemTitle : @"Rive", CYLTagItemAnimation : [self animationNamed:@"menu_button.riv"] ?: @"" },
+                @{ CYLTagItemTitle : @"Lottie", CYLTagItemAnimation : [self animationNamed:@"Lottie/tab_me_animate.json"] ?: @"" },
+                @{ CYLTagItemTitle : @"GIF", CYLTagItemAnimation : [self animationNamed:@"GIF/cyl_tab_sample_animated.gif"] ?: @"" },
+                @{ CYLTagItemTitle : @"Rive", CYLTagItemAnimation : [self animationNamed:@"Rive/menu_button.riv"] ?: @"" },
                 @{ CYLTagItemImage : @"system:heart", CYLTagItemSelectedImage : @"system:heart.fill" },
                 @"Text only",
             ],

@@ -18,10 +18,10 @@
     {
       "title": "CYLTabBarController 动效（Lottie / PAG / Rive / GIF）",
       "items": [
-        { "title": "Lottie", "image": "system:sparkles", "animation": "../Animations/tab_home_animate.json" },
+        { "title": "Lottie", "image": "system:sparkles", "animation": "../Animations/Lottie/tab_home_animate.json" },
         { "title": "PAG", "image": "system:play.circle", "animation": "pag-ios/0.pag" },
-        { "title": "Rive", "image": "system:circle.hexagongrid", "animation": "../Animations/check.riv" },
-        { "title": "GIF", "image": "system:photo", "animation": "../Animations/tab_star.gif" },
+        { "title": "Rive", "image": "system:circle.hexagongrid", "animation": "../Animations/Rive/check.riv" },
+        { "title": "GIF", "image": "system:photo", "animation": "../Animations/GIF/tab_star.gif" },
         { "title": "SF Symbol", "image": "system:star", "selectedImage": "system:star.fill" },
         { "title": "Disabled", "image": "system:nosign", "enabled": false }
       ]

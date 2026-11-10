@@ -123,3 +123,27 @@
 "字典（map）初始化" = "From a dictionary (map)";
 "动效引擎：CYLTabBarItemAnimationFactory 已链接" = "Animation engine: CYLTabBarItemAnimationFactory is linked";
 "动效引擎未链接：显示静态图标" = "Animation engine not linked: static icons";
+
+/* Animation demo */
+"动效" = "Animations";
+"动效图标" = "Animated icons";
+"全部播放" = "Play all";
+"Lottie（带图片资源与占位图）" = "Lottie (image assets and placeholders)";
+"Lottie（绿色主题）" = "Lottie (green theme)";
+"静态图片（CYLTabBarController Example）" = "Static images (CYLTabBarController Example)";
+"搜索" = "Search";
+"资讯" = "News";
+"发现" = "Discover";
+"发布" = "Post";
+"动效一" = "Animation 1";
+"动效二" = "Animation 2";
+"完成" = "Done";
+"菜单" = "Menu";
+"按钮" = "Button";
+"图标" = "Icons";
+"形状" = "Shapes";
+"彩带" = "Confetti";
+"火焰" = "Fire";
+"火箭" = "Rocket";
+"星星" = "Star";
+"示例" = "Sample";
