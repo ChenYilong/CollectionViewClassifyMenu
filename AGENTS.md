@@ -30,7 +30,8 @@ verify the behavior and update the applicable documentation.
   class properties, `NS_DESIGNATED_INITIALIZER`, `NS_SWIFT_UNAVAILABLE`, `throws`
   through `NSError **` as the last parameter).
 - `cyl_` methods: follow CYLTabBarController's rule ("Swift-friendly names for
-  underscored protocol methods" in its AGENTS.md, and its `docs/Swift-Guide.md`):
+  underscored protocol methods" in its AGENTS.md, and its `docs/Swift-Guide.md`,
+  at its newest commit):
   Swift names have no underscore, and the Swift name of an existing public method
   never changes. Add a new method without the underscore that keeps the `cyl`
   prefix (`-cyl_setWidth:` → `-cylSetWidth:`), give only the new one its Swift
@@ -54,18 +55,30 @@ verify the behavior and update the applicable documentation.
 - Project-specific Xcode and verification guidance lives in
   `.agents/skills/cyl-xcode-compat/` and `.agents/skills/cyl-verify/`.
 
-## CYLTabBarController reference
+## CYLTabBarController reference and dependency
 
 - Every mention of CYLTabBarController (its code, APIs, podspec, initialization,
-  animation engine, CI, demos) means the latest commit of its
-  `feat/cross-platform-components` branch, not master or a CocoaPods release.
-  Check it with `git ls-remote https://github.com/ChenYilong/CYLTabBarController.git
-  refs/heads/feat/cross-platform-components` before relying on it.
-- The Example pins that commit (`CYL_TAB_BAR` in `Example/Podfile`); when the
-  branch moves, update the pin and anything copied from it together.
+  animation engine, CI, demos, rules) means its newest commit over every branch,
+  found by commit timestamp; it may be on a branch other than `master` or
+  `main` (so far `feat/cross-platform-components`), and it is never a CocoaPods
+  release.
+- This project always integrates CYLTabBarController through CocoaPods, by that
+  commit: `:git => 'https://github.com/ChenYilong/CYLTabBarController.git'` with
+  `:commit => '<sha>'` (the `CYL_TAB_BAR` hash of `Example/Podfile` and
+  `Example-Swift/Podfile`). Never a version number, `:branch` or `:tag`.
+- Before every build, find the newest commit with
+  `scripts/cyl-tabbar-latest-commit.sh` (it fetches the tip of every branch and
+  sorts by committer date; `--check` fails when a Podfile pins another commit).
+  When it changed, update every pin and anything copied from CYLTabBarController
+  in the same commit, after checking what changed in between.
+- If this project is CYLTabBarController itself, depend on it locally instead:
+  `pod 'CYLTabBarController', :path => '<relative path to the folder that holds
+  CYLTabBarController.podspec>'`. Every other project uses the commit.
 - The core library does not depend on CYLTabBarController: it finds the
   animation engine (`CYLTabBarItemAnimationFactory`) and the configuration
-  parser at runtime, because the published CocoaPods release lacks them.
+  parser (`CYLTabBarConfigurationParser`) at runtime, because the published
+  CocoaPods release lacks them. Only the examples link it.
+- Details: `.agents/skills/cyl-dependency/`.
 
 ## Tab bars
 
@@ -93,9 +106,8 @@ verify the behavior and update the applicable documentation.
 - Other platforms follow the same rules with their own resource mechanism: one
   resource container per module, the core one kept stable, a lookup helper per
   module.
-- Acceptance criteria (following CYLTabBarController's localization rule, latest
-  commit of `feat/cross-platform-components`: "Localization (i18n / l10n) file
-  structure" in its AGENTS.md):
+- Acceptance criteria (following CYLTabBarController's localization rule at its
+  newest commit: "Localization (i18n / l10n) file structure" in its AGENTS.md):
   - The core has its own lookup macro that reads the localized files inside the
     core's resource bundle. The bundle's form, name and folder name may differ
     per platform, but it is always a folder or package; on iOS it is a
@@ -139,8 +151,8 @@ verify the behavior and update the applicable documentation.
   afterward. Do not blindly delete files from Git's object store.
 - Stage only intended changes and check the staged diff before committing.
 - Before every commit, update `.gitignore` from CYLTabBarController's
-  `.gitignore` (latest commit of `feat/cross-platform-components`, see
-  "CYLTabBarController reference"): add every file and folder it ignores, and
+  `.gitignore` (its newest commit, see "CYLTabBarController reference and
+  dependency"): add every file and folder it ignores, and
   change only what does not match this project (project names such as
   `CYLTabBarController.xcodeproj`, example folder names). Keep this project's
   own rules. Then run `git ls-files -ci --exclude-standard`: remove every

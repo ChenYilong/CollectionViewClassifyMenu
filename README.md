@@ -288,7 +288,7 @@ item.animationURL = CYLMenuAnimationURLWithOptions(iconsURL, @{ @"artboard" : @"
 Lottie 2.x 按名称查找 JSON 引用的图片，因此 Example 把这些图片放在 `Assets.xcassets/LottieImages`
 （CYLTabBarController 的 Example 放在 App 根目录）。
 
-Example 的「动效」Tab（`CYLTagAnimationDemoViewController`）使用从 CYLTabBarController（`feat/cross-platform-components` 最新提交）
+Example 的「动效」Tab（`CYLTagAnimationDemoViewController`）使用从 CYLTabBarController（所有分支中最新的提交）
 Example 复制的资源：Lottie（含图片资源与占位图、绿色主题）、Rive、GIF 动效文件与 TabBar 图片（`Assets.xcassets/TabBarIcon`），
 PAG 文件由 `pod install` 下载（包括 CYLTabBarController Example-PAG 的 Tab 图标 `tab_home`、`tab_health`、`tab_moments`、`tab_me`）；每个分组一种动效库，点击播放，可全部播放与切换速度。`style.animationSize`、`style.animationSpeed` 设置大小与速度。
 

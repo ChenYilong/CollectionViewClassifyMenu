@@ -40,7 +40,7 @@ Verify with the Swift example and its tests (`scripts/unit-tests.sh swift`) and 
 ## cyl_ methods
 
 As CYLTabBarController does (its `AGENTS.md`, "Swift-friendly names for underscored protocol methods";
-`docs/Swift-Guide.md`; latest commit of `feat/cross-platform-components`):
+`docs/Swift-Guide.md`; its newest commit over every branch, see `cyl-dependency`):
 
 1. Swift names have no underscore, but an existing public method keeps its imported name (`cyl_setWidth(_:)`):
    adding `NS_SWIFT_NAME` to it would change a released Swift API.

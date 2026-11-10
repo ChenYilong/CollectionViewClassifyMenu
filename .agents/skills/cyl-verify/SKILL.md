@@ -16,6 +16,7 @@ scripts/unit-tests.sh example    # Example (CYLTagListView API and README scenar
 scripts/unit-tests.sh swift      # Example-Swift (pure Swift tag editor: new tags)
 scripts/library-warnings.sh      # build + analyze; fails on warnings in the library sources
 scripts/pod-lint.sh lib          # pod lib lint
+scripts/cyl-tabbar-latest-commit.sh --check   # the CYLTabBarController pin is its newest commit (before building)
 scripts/example-screenshots.sh   # simulator screenshots in build/screenshots/ (swift-*.png: Example-Swift)
 shellcheck scripts/*.sh
 ```

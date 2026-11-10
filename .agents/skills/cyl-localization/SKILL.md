@@ -38,8 +38,8 @@ description: Internationalization and localization rules and checks for Collecti
 
 ## Acceptance criteria
 
-Modelled on CYLTabBarController's rule ("Localization (i18n / l10n) file structure" in its `AGENTS.md`, latest
-commit of `feat/cross-platform-components`; its core lookup is `CYLLocalizedString`, an example's for instance
+Modelled on CYLTabBarController's rule ("Localization (i18n / l10n) file structure" in its `AGENTS.md`, newest
+commit over every branch, see `cyl-dependency`; its core lookup is `CYLLocalizedString`, an example's for instance
 `CYLDemoLocalizedString`).
 
 1. **A core lookup macro.** The core has one macro that maps a key to the localized files inside the core's

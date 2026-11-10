@@ -291,7 +291,10 @@ final class CYLTagEditorExampleTests: XCTestCase {
         XCTAssertTrue(leading.titleView is CYLTagButton, "The title reuses the tag view")
         XCTAssertEqual(leading.titleView.title, "标题：图标 + 文字（左上角）")
         XCTAssertNotNil(leading.titleView.image)
-        XCTAssertEqual(leading.titleLabel.font, UIFont.preferredFont(forTextStyle: .headline))
+        // The same font (the tag view scales its own copy for Dynamic Type, so compare name and size).
+        let headline = UIFont.preferredFont(forTextStyle: .headline)
+        XCTAssertEqual(leading.titleLabel.font.fontName, headline.fontName)
+        XCTAssertEqual(leading.titleLabel.font.pointSize, headline.pointSize, accuracy: 0.5)
         XCTAssertTrue(leading.titleView.accessibilityTraits.contains(.header))
         XCTAssertEqual(leading.titleView.frame.minX, leading.style.sectionInsets.left, accuracy: 0.5, "Top leading")
         XCTAssertLessThan(leading.titleView.imageView.frame.maxX, leading.titleLabel.frame.minX, "Icon, then title, side by side")
