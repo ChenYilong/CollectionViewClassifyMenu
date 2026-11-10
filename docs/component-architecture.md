@@ -1,6 +1,6 @@
 ---
 title: Component architecture and community review
-date: 2026-11-09
+date: 2026-11-10
 tags: [architecture, cocoapods, issues]
 ---
 
@@ -22,6 +22,28 @@ The original change usefully grouped tag views, cells and models, but tied
 data, screen geometry and callbacks to the implementation. The current Pod
 inverts that dependency through host-owned protocols and keeps sample data and
 persistence in the demos.
+
+## 低耦合接口 / Decoupled API (CYLTagListView)
+
+旧控制器把图片、分组图标、选择规则、折叠方式和尺寸写死在实现里，宿主只能改源码。
+新增的 `CYLTagListView` 只负责布局、折叠和选择状态，其余全部交给宿主：
+
+- 数据：`CYLMenuDataSource` 新增标签图标、分组图标、分组标题右侧视图和禁用状态。
+- 行为：`CYLMenuDelegate` 新增拦截选择、取消选中、展开/折叠和内容高度变化回调。
+- 外观：`CYLMenuStyle` 统一描述字体（含 Dynamic Type 上限）、颜色、边框、圆角、间距和高度；
+  视图持有样式副本，宿主修改原对象不会意外影响已显示的菜单。
+- 选择：`CYLMenuSelectionMode`（无 / 单选 / 多选）、`allowsEmptySelection` 和互斥项；
+  代码修改选择不触发回调，与 UIKit 惯例一致。
+- 折叠：`CYLMenuFoldStyle`（标题按钮、底部箭头、仅截断预览）与 `defaultVisibleRows`。
+- 嵌入：`contentHeight`、`intrinsicContentSize`、`heightThatFitsWidth:` 和 `scrollEnabled`，
+  可放进表头、Stack View 或 Auto Layout。
+
+行计算与旧组件相同，按实际容器宽度单次遍历；宽度或文字大小变化时重新测量。
+`Example/` 通过 Podfile 以本地路径集成核心库，用这些接口实现 README 的两个场景；
+`CYLExampleMenuSource` 演示宿主如何把自己的模型转成数据源。
+
+不兼容修改：移除 `menuItemHasImageAtIndexPath:`，改用 `menuImageForItemAtIndexPath:`；
+`CYLClassifyMenuViewController` 的分组图标改由 `menuImageForSection:` 提供。
 
 ## 社区提交 / Community commits
 
