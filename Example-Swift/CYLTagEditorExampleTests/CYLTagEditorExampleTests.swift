@@ -11,6 +11,12 @@ final class CYLTagEditorExampleTests: XCTestCase {
 
     private var window: UIWindow?
 
+    override func setUp() {
+        super.setUp()
+        // The simulator's language is usually English; the expectations use the Chinese strings.
+        CYLTagEditorLocalization.preferredLanguage = "zh-Hans"
+    }
+
     override func tearDown() {
         window = nil
         CYLTagEditorLocalization.preferredLanguage = nil
