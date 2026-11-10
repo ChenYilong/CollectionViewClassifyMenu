@@ -24,6 +24,7 @@ also exercise reuse, section changes and narrow screen sizes in a simulator,
 and attach the screenshots.
 
 Every CI run that builds code must provide Example screenshots (the
-`example-screenshots` artifact of the `Example screenshots` job in `ios.yml`).
+`example-screenshots` artifact of the `Example screenshots` job in `ios.yml`,
+also committed to the `ci-screenshots` branch under `<branch>/<commit>/`).
 Download them, look at each screen and show them to the user. If they are
 missing, fix the CI so it produces them; if that is impossible, explain why.

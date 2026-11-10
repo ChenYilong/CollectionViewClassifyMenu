@@ -152,6 +152,9 @@ jobs:
     needs: changes
     runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 45
+    # [EN] Writes the screenshots to the ci-screenshots branch. [CN] 把截图写入 ci-screenshots 分支。
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: CocoaPods cache
@@ -166,16 +169,14 @@ jobs:
       - name: Screenshots
         if: needs.changes.outputs.code == 'true'
         run: scripts/example-screenshots.sh
-      - name: Summary
-        if: always() && needs.changes.outputs.code == 'true'
-        run: |
-          {
-            echo "### Example screenshots"
-            echo
-            ls build/screenshots/*.png 2>/dev/null | sed 's|^|- |' || echo "- (none)"
-            echo
-            echo "Download the \`example-screenshots\` artifact of this run."
-          } >> "$GITHUB_STEP_SUMMARY"
+      # [EN] Pull requests from forks have a read-only token; their screenshots stay in the artifact.
+      # [CN] 来自 fork 的 PR 只有只读 token；其截图仅保存在 artifact 中。
+      - name: Publish screenshots
+        if: needs.changes.outputs.code == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SCREENSHOT_REF: ${{ github.head_ref || github.ref_name }}
+        run: scripts/publish-screenshots.sh
       - uses: actions/upload-artifact@v4
         # [EN] Screenshots are required (AGENTS.md); a failed upload must still be visible, so it is not ignored.
         # [CN] 截图是必需的（AGENTS.md）；上传失败需要可见，因此不忽略。

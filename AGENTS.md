@@ -36,7 +36,9 @@ verify the behavior and update the applicable documentation.
 - CI follows CYLTabBarController's `.github/workflows/ios.yml`; the scripts
   live in `scripts/` (see `.agents/skills/cyl-verify/`).
 - Every CI run that builds code must provide screenshots of the Example app
-  (`example-screenshots` artifact of the `Example screenshots` job). When
+  (`Example screenshots` job in `ios.yml`: the `example-screenshots` artifact,
+  and a copy on the `ci-screenshots` branch under `<branch>/<commit>/`, which
+  can be read through the GitHub API when artifact storage is not reachable). When
   reporting such a run, look at the screenshots and show them to the user,
   checking that each README scenario renders as expected.
 - If the screenshots are missing or cannot be obtained, first find out why and
