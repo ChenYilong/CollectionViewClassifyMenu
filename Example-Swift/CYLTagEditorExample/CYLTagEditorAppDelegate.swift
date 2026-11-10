@@ -66,10 +66,8 @@ final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
                 editor.tagListView.scrollToItem(at: IndexPath(item: editor.sections[last].items.count - 1, section: last), animated: false)
             }
         case "editor-search":
+            // Without focusing the field: the simulator's first-use keyboard tutorial would cover the sheet.
             editor.setQuery("ios")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                editor.searchField.becomeFirstResponder()
-            }
         case "editor-created":
             editor.setQuery("ios")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

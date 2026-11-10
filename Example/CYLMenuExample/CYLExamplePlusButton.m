@@ -15,9 +15,13 @@ NSString *const CYLExampleRootTabBarContext = @"CYLMenuExampleRoot";
     UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:30 weight:UIImageSymbolWeightSemibold];
     UIImage *image = [[UIImage systemImageNamed:@"plus.circle.fill" withConfiguration:configuration]
                       imageWithTintColor:[UIColor systemOrangeColor] renderingMode:UIImageRenderingModeAlwaysOriginal];
+    // An image only: with Liquid Glass, CYLTabBarController centers a plus button without a title in its own
+    // tab (a titled one is laid out beside the other tabs). The title stays for VoiceOver.
     NSString *title = CYLExampleLocalizedString(@"查询筛选");
-    CYLExamplePlusButton *button = [self cyl_plusButtonWithImage:image title:title selectedTitle:title
-                                              selectedTitleColor:[UIColor systemOrangeColor]];
+    CYLExamplePlusButton *button = [[self alloc] init];
+    [button setImage:image forState:UIControlStateNormal];
+    [button setImage:image forState:UIControlStateHighlighted];
+    [button sizeToFit];
     button.accessibilityLabel = title;
     button.accessibilityHint = CYLExampleLocalizedString(@"按场景分组的筛选演示");
     return button;

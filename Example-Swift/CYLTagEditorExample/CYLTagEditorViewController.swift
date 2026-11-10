@@ -47,7 +47,7 @@ final class CYLTagEditorViewController: UIViewController {
     let tagListView = CYLTagListView()
     let searchField = UISearchTextField()
     let cancelButton = UIButton(type: .system)
-    let doneButton = UIButton(type: .system)
+    let doneButton = UIButton(type: .custom)
     let titleLabel = UILabel()
     private(set) lazy var manageButton: UIButton = {
         let button = UIButton(type: .system)
@@ -129,20 +129,18 @@ final class CYLTagEditorViewController: UIViewController {
         titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
         titleLabel.accessibilityTraits = .header
 
-        let doneTitle = CYLTagEditorLocalizedString("完成")
-        doneButton.configurationUpdateHandler = { button in
-            // Green with white text when enabled, gray otherwise.
-            var configuration = UIButton.Configuration.filled()
-            var title = AttributedString(doneTitle)
-            title.font = .systemFont(ofSize: 17, weight: .semibold)
-            configuration.attributedTitle = title
-            configuration.baseBackgroundColor = button.isEnabled ? CYLTagEditorViewController.green : .secondarySystemFill
-            configuration.baseForegroundColor = button.isEnabled ? .white : .tertiaryLabel
-            configuration.cornerStyle = .fixed
-            configuration.background.cornerRadius = 4
-            configuration.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 14, bottom: 6, trailing: 14)
-            button.configuration = configuration
-        }
+        // A custom button with explicit colors: green with white text when enabled, gray otherwise.
+        doneButton.setTitle(CYLTagEditorLocalizedString("完成"), for: .normal)
+        doneButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        doneButton.setTitleColor(.white, for: .normal)
+        doneButton.setTitleColor(UIColor.white.withAlphaComponent(0.7), for: .highlighted)
+        doneButton.setTitleColor(.tertiaryLabel, for: .disabled)
+        doneButton.layer.cornerRadius = 4
+        doneButton.layer.masksToBounds = true
+        NSLayoutConstraint.activate([
+            doneButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 56),
+            doneButton.heightAnchor.constraint(equalToConstant: 32),
+        ])
         doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
 
         searchField.placeholder = CYLTagEditorLocalizedString("搜索")
@@ -231,7 +229,7 @@ final class CYLTagEditorViewController: UIViewController {
 
     func updateDoneButton() {
         doneButton.isEnabled = isDoneEnabled
-        doneButton.setNeedsUpdateConfiguration()
+        doneButton.backgroundColor = isDoneEnabled ? CYLTagEditorViewController.green : .secondarySystemFill
     }
 
     func indexPath(of tag: String) -> IndexPath? {
