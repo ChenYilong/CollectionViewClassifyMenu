@@ -1,0 +1,2 @@
+[CYLExampleLayout] screen=plus-menu top=CYLMenuLinkageViewController
+[CYLExampleLayout] menuLinkage results=83 footer={{0, 594}, {402, 3432}} sql=SELECT name, category, tag, region, rating, price FROM places ORDER BY rating DESC, id

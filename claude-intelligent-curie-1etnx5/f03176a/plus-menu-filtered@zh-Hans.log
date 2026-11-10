@@ -1,0 +1,2 @@
+[CYLExampleLayout] screen=plus-menu-filtered top=CYLMenuLinkageViewController
+[CYLExampleLayout] menuLinkage results=1 footer={{0, 594}, {402, 178}} sql=SELECT name, category, tag, region, rating, price FROM places WHERE tag = '川菜 扩展文字😀✨' AND region IN ('上海', '深圳') AND tag IN ('川菜 扩展文字😀✨', '特色火锅 扩展文字😀✨') ORDER BY rating DESC, id
