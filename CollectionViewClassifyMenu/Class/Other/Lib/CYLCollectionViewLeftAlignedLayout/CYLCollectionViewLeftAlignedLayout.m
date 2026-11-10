@@ -20,44 +20,11 @@
 
 #import "CYLCollectionViewLeftAlignedLayout.h"
 
-@interface CYLCollectionViewLeftAlignedLayout ()
-@property (nonatomic, strong) NSDictionary<NSIndexPath *, UICollectionViewLayoutAttributes *> *alignedAttributes;
-@end
-
 #pragma mark -
 
 @implementation CYLCollectionViewLeftAlignedLayout
 
 #pragma mark - UICollectionViewLayout
-
-- (void)prepareLayout {
-    [super prepareLayout];
-    NSMutableDictionary<NSIndexPath *, UICollectionViewLayoutAttributes *> *aligned = [NSMutableDictionary dictionary];
-    NSInteger sectionCount = [self.collectionView numberOfSections];
-    for (NSInteger section = 0; section < sectionCount; section++) {
-        UIEdgeInsets inset = [self evaluatedSectionInsetForItemAtIndex:section];
-        CGFloat spacing = [self evaluatedMinimumInteritemSpacingForItemAtIndex:section];
-        CGFloat width = MAX(0, CGRectGetWidth(self.collectionView.bounds) - inset.left - inset.right);
-        UICollectionViewLayoutAttributes *previous = nil;
-        NSInteger itemCount = [self.collectionView numberOfItemsInSection:section];
-        for (NSInteger item = 0; item < itemCount; item++) {
-            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
-            UICollectionViewLayoutAttributes *attributes = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
-            if (!attributes) {
-                previous = nil;
-                continue;
-            }
-            CGRect frame = attributes.frame;
-            CGRect row = CGRectMake(inset.left, frame.origin.y, width, frame.size.height);
-            frame.origin.x = previous && CGRectIntersectsRect(previous.frame, row)
-                ? CGRectGetMaxX(previous.frame) + spacing : inset.left;
-            attributes.frame = frame;
-            aligned[indexPath] = attributes;
-            previous = attributes;
-        }
-    }
-    self.alignedAttributes = aligned;
-}
 
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect {
     CGRect queryRect = rect;
@@ -74,9 +41,35 @@
     return result;
 }
 
+/// Computed from the flow layout's own attributes on every call, with no cache: a cache filled by an earlier
+/// prepareLayout (for example while the view still had no size) could give cells stale, empty frames.
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewLayoutAttributes *attributes = self.alignedAttributes[indexPath];
-    return attributes ? [attributes copy] : [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
+    UICollectionViewLayoutAttributes *attributes = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
+    if (!attributes) {
+        return nil;
+    }
+    NSInteger section = indexPath.section;
+    UIEdgeInsets inset = [self evaluatedSectionInsetForItemAtIndex:section];
+    CGFloat spacing = [self evaluatedMinimumInteritemSpacingForItemAtIndex:section];
+    CGFloat width = MAX(0, CGRectGetWidth(self.collectionView.bounds) - inset.left - inset.right);
+    CGRect frame = attributes.frame;
+    CGRect row = CGRectMake(inset.left, frame.origin.y, width, MAX(1, frame.size.height));
+    // The items before this one on its row, left to right.
+    NSMutableArray<NSValue *> *previousFrames = [NSMutableArray array];
+    for (NSInteger item = indexPath.item - 1; item >= 0; item--) {
+        UICollectionViewLayoutAttributes *previous = [super layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]];
+        if (!previous || !CGRectIntersectsRect(previous.frame, row)) {
+            break;
+        }
+        [previousFrames addObject:[NSValue valueWithCGRect:previous.frame]];
+    }
+    CGFloat x = inset.left;
+    for (NSValue *previous in previousFrames) {
+        x += CGRectGetWidth(previous.CGRectValue) + spacing;
+    }
+    frame.origin.x = x;
+    attributes.frame = frame;
+    return attributes;
 }
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {

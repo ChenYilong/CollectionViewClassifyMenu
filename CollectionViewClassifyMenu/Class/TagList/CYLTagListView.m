@@ -215,6 +215,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *selection;
 @property (nonatomic, strong) NSMutableIndexSet *expandedSections;
 @property (nonatomic, assign) CGFloat measuredWidth;
+/// The collection view's size at the last layout: any change (also the height, e.g. a host's height constraint
+/// going from 0 to the content height) lays the tags out again.
+@property (nonatomic, assign) CGSize laidOutSize;
 @property (nonatomic, assign, readwrite) CGFloat contentHeight;
 @end
 
@@ -498,7 +501,10 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [super layoutSubviews];
     if (CGRectGetWidth(self.collectionView.bounds) != self.measuredWidth) {
         [self cyl_reloadLayout];
+    } else if (!CGSizeEqualToSize(self.collectionView.bounds.size, self.laidOutSize)) {
+        [self.collectionView.collectionViewLayout invalidateLayout];
     }
+    self.laidOutSize = self.collectionView.bounds.size;
     if (!self.collectionView.scrollEnabled) {
         [self cyl_resetContentOffset];
     }

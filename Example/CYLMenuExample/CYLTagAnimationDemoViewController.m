@@ -56,11 +56,9 @@
             [self item:@"动效一" animation:@"pag-ios/0.pag" image:nil],
             [self item:@"动效二" animation:@"pag-ios/1.pag" image:nil]]},
         // The options CYLTabBarController's Rive examples use for each file (Example-SwiftUI-Rive): a Rive icon needs its
-        // artboard, state machine and input, given with CYLTagItemAnimationOptions.
+        // state machine and input (or animation), given with CYLTagItemAnimationOptions. icons.riv is left out: its
+        // artboards are white strokes for a dark tab bar, invisible on these light tags.
         @{CYLTagSectionTitle: @"Rive · pod 'CYLTabBarController/Rive'", CYLTagSectionItems: @[
-            [self item:@"消息" rive:@"icons" options:@{@"artboard": @"CHAT", @"stateMachine": @"CHAT_Interactivity", @"input": @"active"}],
-            [self item:@"搜索" rive:@"icons" options:@{@"artboard": @"SEARCH", @"stateMachine": @"SEARCH_Interactivity", @"input": @"active"}],
-            [self item:@"我的" rive:@"icons" options:@{@"artboard": @"USER", @"stateMachine": @"USER_Interactivity", @"input": @"active"}],
             [self item:@"首页" rive:@"house" options:@{@"stateMachine": @"State Machine 1"}],
             [self item:@"完成" rive:@"check" options:@{@"stateMachine": @"State Machine 1", @"triggerInput": @"Check"}],
             [self item:@"菜单" rive:@"menu_button" options:@{@"stateMachine": @"State Machine", @"input": @"isOpen", @"duration": @"0"}],

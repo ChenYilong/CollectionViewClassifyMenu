@@ -992,6 +992,8 @@
 #pragma mark Scenario 2: search categories
 
 - (void)layOutSelectedCategoryOf:(CYLSearchCategoryViewController *)controller {
+    // The embedded tab bar controller adds its selected page's view during appearance, on the next run loop pass.
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     [controller.view layoutIfNeeded];
     [controller.categoryTabBarController.view layoutIfNeeded];
     [controller.categoryTabBarController.selectedViewController.view layoutIfNeeded];

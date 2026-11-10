@@ -109,7 +109,10 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     self.animationView = nil;
     self.animationPlayer = nil;
     Class<CYLTagAnimationFactory> factory = CYLTagAnimationFactoryClass();
-    if (self.animationURL && factory) {
+    NSURL *URL = self.animationURL;
+    // A file that does not exist shows the image (some engines would create an empty view).
+    BOOL missingFile = URL.isFileURL && ![[NSFileManager defaultManager] fileExistsAtPath:URL.path];
+    if (URL && factory && !missingFile) {
         CGSize size = [self cyl_animationSize];
         UIView *view = [factory animationViewWithURL:self.animationURL size:size contentMode:UIViewContentModeScaleAspectFit];
         if (view) {
