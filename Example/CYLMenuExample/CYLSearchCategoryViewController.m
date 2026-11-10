@@ -109,7 +109,9 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 }
 
 + (NSString *)placeholderForCategory:(CYLSearchCategory)category {
-    return CYLExampleLocalizedString(@[@"搜人名,职位,公司...", @"搜动态", @"搜八卦", @"搜职位"][category]);
+    // A variable, not an inline array: commas inside the macro's argument would split it.
+    NSString *key = @[@"搜人名,职位,公司...", @"搜动态", @"搜八卦", @"搜职位"][category];
+    return CYLExampleLocalizedString(key);
 }
 
 + (CYLMenuStyle *)maimaiStyle {

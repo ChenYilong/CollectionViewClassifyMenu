@@ -18,6 +18,7 @@ FOUNDATION_EXTERN NSString *CYLExampleLocalizedStringFromBundle(NSString *key);
 
 /// Use this macro, not the function, for every user-facing string: it maps a key to the
 /// Example's bundle in one place (as CYLMenuLocalizedString does for the core bundle).
-#define CYLExampleLocalizedString(key) CYLExampleLocalizedStringFromBundle(key)
+/// Variadic, so that a comma inside the key expression (an array literal) cannot split it.
+#define CYLExampleLocalizedString(...) CYLExampleLocalizedStringFromBundle(__VA_ARGS__)
 
 NS_ASSUME_NONNULL_END
