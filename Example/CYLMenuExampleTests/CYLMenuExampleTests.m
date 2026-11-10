@@ -499,8 +499,8 @@
     button.style = style;
     [button layoutIfNeeded];
     XCTAssertEqualWithAccuracy(button.layer.cornerRadius, 5, 0.01);
-    XCTAssertEqual([style copy].normalAppearance.cornerRadius, 5);
-    XCTAssertNotEqual([style copy].normalAppearance, style.normalAppearance, @"A copy has its own appearances");
+    XCTAssertEqual(((CYLMenuStyle *)[style copy]).normalAppearance.cornerRadius, 5);
+    XCTAssertNotEqual(((CYLMenuStyle *)[style copy]).normalAppearance, style.normalAppearance, @"A copy has its own appearances");
 }
 
 - (void)testStyleDemoRowsRestyleTheTagsLive {

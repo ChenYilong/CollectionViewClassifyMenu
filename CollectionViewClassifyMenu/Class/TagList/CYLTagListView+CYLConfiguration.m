@@ -96,7 +96,7 @@ static NSArray<NSNumber *> *CYLNumbers(id value, NSUInteger count) {
     NSMutableArray *numbers = [NSMutableArray array];
     for (id part in parts) {
         NSNumber *number = CYLNumber(part);
-        if (!number) return nil;
+        if (number == nil) return nil;
         [numbers addObject:number];
     }
     return numbers;
@@ -118,7 +118,7 @@ static NSValue *CYLSize(id value) {
         return [NSValue valueWithCGSize:CGSizeMake([CYLNumber(value[@"width"]) doubleValue], [CYLNumber(value[@"height"]) doubleValue])];
     }
     NSNumber *side = CYLNumber(value);
-    if (side) return [NSValue valueWithCGSize:CGSizeMake(side.doubleValue, side.doubleValue)];
+    if (side != nil) return [NSValue valueWithCGSize:CGSizeMake(side.doubleValue, side.doubleValue)];
     NSArray<NSNumber *> *n = CYLNumbers(value, 2);
     return n ? [NSValue valueWithCGSize:CGSizeMake(n[0].doubleValue, n[1].doubleValue)] : nil;
 }
@@ -161,7 +161,7 @@ static UIColor *CYLColor(id value) {
 static UIFont *CYLFont(id value) {
     if ([value isKindOfClass:[UIFont class]]) return value;
     NSNumber *size = CYLNumber(value);
-    if (size) return [UIFont systemFontOfSize:size.doubleValue];
+    if (size != nil) return [UIFont systemFontOfSize:size.doubleValue];
     if (![value isKindOfClass:[NSDictionary class]]) return nil;
     CGFloat pointSize = [CYLNumber(value[@"size"]) doubleValue] ?: 14;
     NSDictionary<NSString *, NSNumber *> *weights = @{@"ultralight": @(UIFontWeightUltraLight), @"thin": @(UIFontWeightThin),
@@ -219,7 +219,7 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     if ([value isKindOfClass:[NSNumber class]]) return [value integerValue];
     if ([value isKindOfClass:[NSString class]]) {
         NSNumber *number = names[[value lowercaseString]] ?: CYLNumber(value);
-        if (number) return number.integerValue;
+        if (number != nil) return number.integerValue;
     }
     return fallback;
 }
@@ -277,7 +277,7 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
 
 - (BOOL)menuItemIsEnabledAtIndexPath:(NSIndexPath *)indexPath {
     NSNumber *enabled = CYLNumber([self itemAtIndexPath:indexPath][CYLTagItemEnabled]);
-    return enabled ? enabled.boolValue : YES;
+    return enabled != nil ? enabled.boolValue : YES;
 }
 
 - (BOOL)menuItemIsExclusiveAtIndexPath:(NSIndexPath *)indexPath {
