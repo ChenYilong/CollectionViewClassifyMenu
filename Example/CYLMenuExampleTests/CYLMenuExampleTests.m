@@ -991,6 +991,15 @@
 
 #pragma mark Scenario 2: search categories
 
+/// In a window, not hidden, transparent or off screen through any of its superviews.
+- (BOOL)isVisible:(UIView *)view {
+    if (!view.window) return NO;
+    for (UIView *v = view; v; v = v.superview) {
+        if (v.hidden || v.alpha < 0.01) return NO;
+    }
+    return CGRectIntersectsRect([view convertRect:view.bounds toView:nil], view.window.bounds);
+}
+
 - (void)layOutSelectedCategoryOf:(CYLSearchCategoryViewController *)controller {
     // The embedded tab bar controller adds its selected page's view during appearance, on the next run loop pass.
     [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
@@ -1031,7 +1040,8 @@
     XCTAssertEqualObjects(controller.searchBar.placeholder, @"搜八卦");
     CYLTagListView *gossip = controller.tagListView;
     XCTAssertNotEqual(gossip, tags);
-    XCTAssertNil(tags.window, @"Only the selected category's page is shown");
+    XCTAssertFalse([self isVisible:tags], @"Only the selected category's page is shown (a tab bar controller may keep the previous page hidden in the window)");
+    XCTAssertTrue([self isVisible:gossip]);
     XCTAssertNotNil(gossip.window);
     XCTAssertEqual([[self collectionViewOf:gossip] numberOfSections], 2);
     [self assertNoOverlapsOrOverflowIn:gossip];
