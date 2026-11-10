@@ -455,4 +455,130 @@
                                header.titleButton.cyl_titleLeadingInset, 0.5);
 }
 
+- (UIViewController *)cyl_hostChild:(UIViewController *)child
+                              width:(CGFloat)width
+                             traits:(UITraitCollection *)traits
+                             window:(UIWindow **)outWindow {
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, width, 600)];
+    UIViewController *parent = [[UIViewController alloc] init];
+    window.rootViewController = parent;
+    [window makeKeyAndVisible];
+    [parent addChildViewController:child];
+    child.view.frame = parent.view.bounds;
+    child.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [parent.view addSubview:child.view];
+    [child didMoveToParentViewController:parent];
+    [parent setOverrideTraitCollection:traits forChildViewController:child];
+    [child.view setNeedsLayout];
+    [child.view layoutIfNeeded];
+    *outWindow = window;
+    return parent;
+}
+
+- (void)testAccessibilityTextSizesScaleTagsWithoutOverlapOrOverflow {
+    UIContentSizeCategory category = UIContentSizeCategoryAccessibilityExtraExtraExtraLarge;
+    UITraitCollection *large = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:category];
+    UITraitCollection *standard = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge];
+    UIFont *standardFont = CYLTagTitleFontForTraitCollection(standard);
+    UIFont *largeFont = CYLTagTitleFontForTraitCollection(large);
+    XCTAssertEqualWithAccuracy(standardFont.pointSize, CYLTagTitleFontSize, 0.01);
+    XCTAssertGreaterThan(largeFont.pointSize, standardFont.pointSize);
+    XCTAssertLessThanOrEqual(largeFont.pointSize, CYLTagTitleFontSize * CYLMaximumFontScale + 0.01);
+    XCTAssertGreaterThan(CYLTagHeightForFont(largeFont, 30), 30);
+
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = [self longEmojiSections];
+    CYLLayoutFixture *fixture = [[CYLLayoutFixture alloc] init];
+    fixture.sections = source.sections;
+    for (NSNumber *width in @[@320, @240]) {
+        CYLClassifyMenuViewController *menu = [[CYLClassifyMenuViewController alloc] init];
+        menu.menuDataSource = source;
+        menu.defaultVisibleRows = 1000;  // Show every row so all items are laid out.
+        UIWindow *window = nil;
+        [self cyl_hostChild:menu width:width.doubleValue traits:large window:&window];
+        UICollectionView *collection = [menu valueForKey:@"collectionView"];
+        XCTAssertEqualObjects(collection.traitCollection.preferredContentSizeCategory, category);
+        [collection layoutIfNeeded];
+        [self assertNoOverlaps:collection fixture:fixture];
+        UICollectionViewLayoutAttributes *first =
+            [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+        XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), CYLTagHeightForFont(largeFont, 30), 0.5);
+        [self scrollAndCheck:collection fixture:fixture buttonKey:@"button"];
+        for (UICollectionViewCell *cell in collection.visibleCells) {
+            UIButton *button = [cell valueForKey:@"button"];
+            XCTAssertEqualWithAccuracy(button.titleLabel.font.pointSize, largeFont.pointSize, 0.01);
+        }
+        for (UICollectionReusableView *view in [collection visibleSupplementaryViewsOfKind:UICollectionElementKindSectionHeader]) {
+            CYLFilterHeaderView *header = (CYLFilterHeaderView *)view;
+            XCTAssertLessThanOrEqual(CGRectGetMaxX(header.moreButton.frame), CGRectGetWidth(header.bounds) + 0.5);
+        }
+        window.hidden = YES;
+    }
+
+    NSMutableArray *filterTitles = [NSMutableArray array];
+    for (NSArray *section in @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:[CYLDBManager allTags]]]) {
+        NSMutableArray *titles = [NSMutableArray array];
+        for (NSString *title in section) {
+            [titles addObject:[title stringByAppendingString:@" 🧑‍💻🍜 长筛选文字"]];
+        }
+        [filterTitles addObject:titles];
+    }
+    CYLTestMenuSource *filterSource = [[CYLTestMenuSource alloc] init];
+    filterSource.sections = filterTitles;
+    fixture.sections = filterTitles;
+    for (NSNumber *width in @[@320, @240]) {
+        CYLMultipleFilterController *filter = [[CYLMultipleFilterController alloc] init];
+        filter.menuDataSource = filterSource;
+        UIWindow *window = nil;
+        [self cyl_hostChild:filter width:width.doubleValue traits:large window:&window];
+        UICollectionView *collection = filter.collectionView;
+        CGFloat panelWidth = CGRectGetWidth(collection.bounds);
+        XCTAssertLessThan(panelWidth, width.doubleValue);
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(filter.restoreButton.frame), 0, 0.5);
+        XCTAssertEqualWithAccuracy(CGRectGetMaxX(filter.okButton.frame), panelWidth, 0.5);
+        XCTAssertEqualWithAccuracy(CGRectGetMaxX(filter.restoreButton.frame), CGRectGetMinX(filter.okButton.frame), 0.5);
+        XCTAssertEqualWithAccuracy(CGRectGetMaxY(filter.okButton.frame), CGRectGetHeight(filter.view.bounds), 0.5);
+        [collection reloadData];
+        [collection layoutIfNeeded];
+        [self assertNoOverlaps:collection fixture:fixture];
+        UICollectionViewLayoutAttributes *first =
+            [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+        XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), CYLTagHeightForFont(largeFont, 30), 0.5);
+        [self scrollAndCheck:collection fixture:fixture buttonKey:@"titleButton"];
+        [collection setContentOffset:CGPointMake(0, -collection.contentInset.top) animated:NO];
+        [collection layoutIfNeeded];
+        NSArray *headers = [collection visibleSupplementaryViewsOfKind:UICollectionElementKindSectionHeader];
+        XCTAssertGreaterThan(headers.count, 0u);
+        for (CYLMultipleFilterHeaderView *header in headers) {
+            [header layoutIfNeeded];
+            XCTAssertLessThanOrEqual(CGRectGetMaxX(header.titleLabel.frame), CGRectGetWidth(header.bounds) + 0.5);
+        }
+        window.hidden = YES;
+    }
+}
+
+- (void)testMenuRemeasuresWhenTextSizeChanges {
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = [self longEmojiSections];
+    CYLClassifyMenuViewController *menu = [[CYLClassifyMenuViewController alloc] init];
+    menu.menuDataSource = source;
+    UITraitCollection *standard = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge];
+    UIWindow *window = nil;
+    UIViewController *parent = [self cyl_hostChild:menu width:320 traits:standard window:&window];
+    UICollectionView *collection = [menu valueForKey:@"collectionView"];
+    NSInteger standardCount = [collection numberOfItemsInSection:0];
+    CGFloat standardHeight = CGRectGetHeight([collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].frame);
+
+    UITraitCollection *large = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge];
+    [parent setOverrideTraitCollection:large forChildViewController:menu];
+    [menu.view setNeedsLayout];
+    [menu.view layoutIfNeeded];
+    [collection layoutIfNeeded];
+    CGFloat largeHeight = CGRectGetHeight([collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].frame);
+    XCTAssertGreaterThan(largeHeight, standardHeight);
+    // Larger text fits fewer tags on the first row, so the collapsed count is re-measured.
+    XCTAssertLessThanOrEqual([collection numberOfItemsInSection:0], standardCount);
+    window.hidden = YES;
+}
+
 @end

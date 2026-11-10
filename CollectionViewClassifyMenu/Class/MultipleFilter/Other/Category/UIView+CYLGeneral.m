@@ -103,9 +103,13 @@
 }
 
 - (UIImage *)cyl_capture {
+    return [self cyl_captureWithWidth:270];
+}
+
+- (UIImage *)cyl_captureWithWidth:(CGFloat)width {
     UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat preferredFormat];
     format.opaque = self.opaque;
-    CGSize size = CGSizeMake(270, self.bounds.size.height);
+    CGSize size = CGSizeMake(MAX(1, width), MAX(1, self.bounds.size.height));
     UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
     return [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
         [self.layer renderInContext:rendererContext.CGContext];

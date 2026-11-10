@@ -16,6 +16,11 @@
 @interface CYLFilterBaseController ()<UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 
 @property (nonatomic, weak) IBOutlet UIImageView *blurImageView;
+@property (nonatomic, strong) CALayer *restoreTopLine;
+@property (nonatomic, strong) CALayer *okTopLine;
+@property (nonatomic, strong) CALayer *okLeadingLine;
+/// YES while the side panel is on screen; controls the buttons' x positions.
+@property (nonatomic, assign, getter=isPanelVisible) BOOL panelVisible;
 
 @end
 
@@ -29,13 +34,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.frame = [UIScreen mainScreen].bounds;
+    self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.panelVisible = YES;
     CGColorRef color = [UIColor lightGrayColor].CGColor;
-    _restoreButton.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 44, ([UIScreen mainScreen].bounds.size.width - 50) / 2, 44);
-    _okButton.frame = CGRectMake(_restoreButton.cyl_width, [UIScreen mainScreen].bounds.size.height - 44, [UIScreen mainScreen].bounds.size.width - 50 - _restoreButton.cyl_width, 44);
-    [_restoreButton cyl_addSubLayerWithFrame:CGRectMake(0, 0, _restoreButton.frame.size.width, 0.5f) color:color];
-    [_okButton cyl_addSubLayerWithFrame:CGRectMake(0, 0, _okButton.frame.size.width, 0.5f) color:color];
-    [_okButton cyl_addSubLayerWithFrame:CGRectMake(0, 0, 0.5f, 44) color:color];
+    self.restoreTopLine = [_restoreButton cyl_addSubLayerWithFrame:CGRectZero color:color];
+    self.okTopLine = [_okButton cyl_addSubLayerWithFrame:CGRectZero color:color];
+    self.okLeadingLine = [_okButton cyl_addSubLayerWithFrame:CGRectZero color:color];
     _contentView.backgroundColor = [UIColor blackColor];
     _collectionView.showsVerticalScrollIndicator = NO;
     _collectionView.delegate = self;
@@ -49,10 +53,33 @@
     [_contentView cyl_setTarget:self action:@selector(hide)];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [self cyl_layoutBottomButtons];
+}
+
+/// Sizes the bottom buttons from the panel's actual width rather than the screen.
+- (void)cyl_layoutBottomButtons {
+    CGFloat panelWidth = CGRectGetWidth(_collectionView.bounds);
+    CGFloat height = CGRectGetHeight(self.view.bounds);
+    CGFloat restoreWidth = floor(panelWidth / 2);
+    CGFloat okWidth = MAX(0, panelWidth - restoreWidth);
+    CGFloat restoreX = self.isPanelVisible ? 0 : -restoreWidth;
+    CGFloat okX = self.isPanelVisible ? restoreWidth : -okWidth;
+    _restoreButton.frame = CGRectMake(restoreX, height - 44, restoreWidth, 44);
+    _okButton.frame = CGRectMake(okX, height - 44, okWidth, 44);
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    self.restoreTopLine.frame = CGRectMake(0, 0, restoreWidth, 0.5f);
+    self.okTopLine.frame = CGRectMake(0, 0, okWidth, 0.5f);
+    self.okLeadingLine.frame = CGRectMake(0, 0, 0.5f, 44);
+    [CATransaction commit];
+}
+
 #pragma mark - 🔌 UICollectionViewDelegateFlowLayout Method
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
-    return CGSizeMake([UIScreen mainScreen].bounds.size.width - 50, 38);
+    return CGSizeMake(CGRectGetWidth(collectionView.bounds), 38);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
@@ -66,6 +93,7 @@
 }
 
 - (void)changeXOfSubviewsInCollectionViewWhenShow {
+    self.panelVisible = NO;
     [_collectionView cyl_setX:-_collectionView.cyl_width];
     [_restoreButton cyl_setX:-_restoreButton.cyl_width];
     [_blurImageView cyl_setX:-_blurImageView.cyl_width];
@@ -73,6 +101,7 @@
 }
 
 - (void)changeXOfSubviewsInCollectionViewWhenHide {
+    self.panelVisible = YES;
     [_collectionView cyl_setX:0];
     [_restoreButton cyl_setX:0];
     [_blurImageView cyl_setX:0];
@@ -97,7 +126,9 @@
 
 - (void)showInView:(UIView *)view {
     // 屏幕截图 / Capture the host view.
-    UIImage *screen = [view cyl_capture];
+    self.view.frame = view.bounds;
+    [self.view layoutIfNeeded];
+    UIImage *screen = [view cyl_captureWithWidth:CGRectGetWidth(_collectionView.bounds)];
     // 生成高斯模糊背景 / Generate a Gaussian-blurred background.
     UIImage *blur = [screen cyl_blurredImageWithRadius:25.0f iterations:10 tintColor:nil];
     [view addSubview:self.view];

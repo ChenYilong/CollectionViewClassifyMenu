@@ -41,7 +41,7 @@ float const CYLFilterHeaderViewHeigt = 38;
 }
 
 - (id)sharedInit {
-    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, [UIScreen mainScreen].bounds.size.width - 2 * kCureOfLineOffX, kCureOfLineHight)];
+    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, MAX(0, CGRectGetWidth(self.bounds) - 2 * kCureOfLineOffX), kCureOfLineHight)];
     self.separator = cureOfLine;
     cureOfLine.backgroundColor = [UIColor colorWithRed:188.0 / 255.0 green:188.0 / 255.0 blue:188.0 / 255.0 alpha:1.0];
     [self addSubview:cureOfLine];
@@ -58,7 +58,7 @@ float const CYLFilterHeaderViewHeigt = 38;
     CGRect  moreBtnFrame = CGRectMake(self.moreButton.frame.origin.x, 0, kMoreButtonWidth, self.frame.size.height);
     self.moreButton = [[CYLRightImageButton alloc] initWithFrame:moreBtnFrame];
     // 仅修改self.moreButton的x,ywh值不变 / Change only the more button's x position.
-    self.moreButton.frame = CGRectMake([UIScreen mainScreen].bounds.size.width - 12 - self.moreButton.frame.size.width, self.moreButton.frame.origin.y, self.moreButton.frame.size.width, self.moreButton.frame.size.height);
+    self.moreButton.frame = CGRectMake(MAX(0, CGRectGetWidth(self.bounds) - 12 - self.moreButton.frame.size.width), self.moreButton.frame.origin.y, self.moreButton.frame.size.width, self.moreButton.frame.size.height);
     [self.moreButton setImage:[CYLMenuResources imageNamed:@"home_btn_more_normal"] forState:UIControlStateNormal];
     [self.moreButton setImage:[CYLMenuResources imageNamed:@"home_btn_more_selected"] forState:UIControlStateSelected];
     [self.moreButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];

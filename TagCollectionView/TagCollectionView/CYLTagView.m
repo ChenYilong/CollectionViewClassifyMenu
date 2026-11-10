@@ -139,10 +139,15 @@ static NSString * const  HeaderCellIdenty =  @"HeaderViewCellIdentifier";
         NSMutableArray *items = [NSMutableArray array];
         for (NSInteger item = 0; item < [source menuNumberOfItemsInSection:section]; item++) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
-            [items addObject:[CYLTagModel modelWithTitle:[source menuTitleForItemAtIndexPath:indexPath]]];
+            CYLTagModel *model = [CYLTagModel modelWithTitle:[source menuTitleForItemAtIndexPath:indexPath]];
+            [model updateSizeForTraitCollection:self.traitCollection];
+            [items addObject:model];
         }
         group.itemArr = items;
         [groups addObject:group];
+    }
+    for (CYLTagGroup *group in groups) {
+        group.width = CGRectGetWidth(self.collectionView.bounds);
     }
     self.groups = groups;
     [self.collectionView reloadData];
@@ -180,8 +185,31 @@ static NSString * const  HeaderCellIdenty =  @"HeaderViewCellIdentifier";
     CGFloat width = CGRectGetWidth(self.collectionView.bounds);
     if (width != self.lastCollectionWidth) {
         self.lastCollectionWidth = width;
+        for (CYLTagGroup *group in self.groups) {
+            group.width = width;
+        }
         [self.collectionView reloadData];
     }
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory]) {
+        [self cyl_updateTagSizes];
+    }
+}
+
+/// Re-measures every tag for the current text size and reloads the layout.
+- (void)cyl_updateTagSizes {
+    for (CYLTagGroup *group in self.groups) {
+        for (CYLTagModel *model in group.itemArr) {
+            [model updateSizeForTraitCollection:self.traitCollection];
+        }
+        // Re-assigning invalidates the group's cached row counts.
+        group.itemArr = group.itemArr;
+    }
+    [self.collectionView.collectionViewLayout invalidateLayout];
+    [self.collectionView reloadData];
 }
 
 

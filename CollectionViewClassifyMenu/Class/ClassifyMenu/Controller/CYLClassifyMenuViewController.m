@@ -129,11 +129,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"CYLTagView";
-    self.backgroundView = [[UIScrollView alloc] initWithFrame:
-                           CGRectMake(0, 0,
-                                      [UIScreen mainScreen].bounds.size.width,
-                                      [UIScreen mainScreen].bounds.size.height)
-                           ];
+    self.backgroundView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     self.backgroundView.showsVerticalScrollIndicator = NO;
     self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.backgroundView.alwaysBounceVertical = YES;
@@ -153,6 +149,15 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     [super viewDidAppear:animated];
     self.backgroundView.scrollEnabled = YES;
     [self updateViewHeight];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory]) {
+        // Text size changed: measure every tag again on the next layout pass.
+        self.calculatedCollectionWidth = 0;
+        [self.view setNeedsLayout];
+    }
 }
 
 - (void)viewDidLayoutSubviews {
@@ -280,11 +285,19 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     return cellCount;
 }
 
+- (UIFont *)cyl_tagFont {
+    return CYLTagTitleFontForTraitCollection(self.collectionView.traitCollection ?: self.traitCollection);
+}
+
+- (CGFloat)cyl_cellHeight {
+    return CYLTagHeightForFont([self cyl_tagFont], kCollectionViewCellHeight);
+}
+
 - (float)collectionCellWidthText:(NSString *)text content:(NSDictionary *)content {
     float cellWidth;
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
-                         CYLTagTitleFont}];
+                         [self cyl_tagFont]}];
     NSString *picture = [content objectForKey:kDataSourceCellPictureKey];
     BOOL shouldShowPic = [@(picture.length) boolValue];
     if (shouldShowPic) {
@@ -299,8 +312,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 }
 
 - (void)addCollectionView {
-    CGRect collectionViewFrame = CGRectMake(0, CGRectGetHeight(self.menuHeaderView.frame) + kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width,
-                                            [UIScreen mainScreen].bounds.size.height - 40);
+    CGRect collectionViewFrame = CGRectMake(0, CGRectGetHeight(self.menuHeaderView.frame) + kControllerHeaderToCollectionViewMargin, CGRectGetWidth(self.view.bounds),
+                                            MAX(0, CGRectGetHeight(self.view.bounds) - 40));
     CYLCollectionViewLeftAlignedLayout *layout = [[CYLCollectionViewLeftAlignedLayout alloc] init];
     self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame
                                              collectionViewLayout:layout];
@@ -382,6 +395,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         [cell.button setImage:nil forState:UIControlStateNormal];
         cell.button.cyl_imageTitleSpacing = 0;
     }
+    cell.button.titleLabel.font = [self cyl_tagFont];
     [cell.button setTitle:text forState:UIControlStateNormal];
     [cell.button setTitle:text forState:UIControlStateSelected];
     [cell.button addTarget:self action:@selector(itemButtonClicked:)
@@ -481,7 +495,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     NSArray *items = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
     NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
     float cellWidth = [self collectionCellWidthText:text content:items[indexPath.row]];
-    return CGSizeMake(cellWidth, kCollectionViewCellHeight);
+    return CGSizeMake(cellWidth, [self cyl_cellHeight]);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView
@@ -492,7 +506,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
 referenceSizeForHeaderInSection:(NSInteger)section {
-    return CGSizeMake([UIScreen mainScreen].bounds.size.width - 50, 38);
+    return CGSizeMake(MAX(0, CGRectGetWidth(collectionView.bounds) - 50), 38);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView

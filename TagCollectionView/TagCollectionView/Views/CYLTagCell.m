@@ -49,12 +49,19 @@
 }
 
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    // Keep the drawn font in sync with the size CYLTagView measured for this text size.
+    self.titleLb.font = [CYLTagModel titleFontForTraitCollection:self.traitCollection];
+}
+
 -(void)setModel:(CYLTagModel *)model{
 
     _model=model;
     
     
     self.titleLb.text=model.title;
+    self.titleLb.font=[CYLTagModel titleFontForTraitCollection:self.traitCollection];
     
 }
 

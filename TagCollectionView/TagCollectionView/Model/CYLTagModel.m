@@ -7,6 +7,11 @@
 //
 #import <UIKit/UIKit.h>
 #import "CYLTagModel.h"
+#import "CYLParameterConfiguration.h"
+
+static CGFloat const kTagTitleFontSize = 17;
+static CGFloat const kTagMinimumHeight = 35;
+static CGFloat const kTagHorizontalPadding = 50;
 
 @implementation CYLTagModel
 
@@ -26,15 +31,17 @@
 }
 
 -(void)calcuWidth{
-    
-    _height=35;
-    
-    float fontSize=17;
+    [self updateSizeForTraitCollection:nil];
+}
 
-    CGSize size= [self.title  sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontSize]} ];
++ (UIFont *)titleFontForTraitCollection:(UITraitCollection *)traitCollection {
+    return CYLScaledSystemFont(kTagTitleFontSize, traitCollection);
+}
 
-    
-    _width=size.width+50;
-    
+- (void)updateSizeForTraitCollection:(UITraitCollection *)traitCollection {
+    UIFont *font = [[self class] titleFontForTraitCollection:traitCollection];
+    CGSize size = [self.title ?: @"" sizeWithAttributes:@{NSFontAttributeName: font}];
+    _width = ceil(size.width) + kTagHorizontalPadding;
+    _height = CYLTagHeightForFont(font, kTagMinimumHeight);
 }
 @end
