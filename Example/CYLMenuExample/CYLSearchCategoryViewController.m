@@ -9,18 +9,58 @@
 static CGFloat const kJobCategoryWidth = 90;
 static NSString * const kJobCategoryCell = @"JobCategoryCell";
 
-@interface CYLSearchCategoryViewController () <CYLMenuDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
+#pragma mark - Category page
+
+/// One tab of the category tab bar: a tag list, plus the job category sidebar on the 职位 page.
+@interface CYLSearchCategoryPageViewController : UIViewController
+@property (nonatomic, assign) CYLSearchCategory category;
+@property (nonatomic, strong) CYLTagListView *tagListView;
+@property (nonatomic, strong, nullable) UITableView *sidebar;
+@end
+
+@implementation CYLSearchCategoryPageViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor systemBackgroundColor];
+    [self.view addSubview:self.tagListView];
+    self.tagListView.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutXAxisAnchor *leading = self.view.leadingAnchor;
+    if (self.sidebar) {
+        self.sidebar.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:self.sidebar];
+        [NSLayoutConstraint activateConstraints:@[
+            [self.sidebar.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:CYLTopTabBarHeight],
+            [self.sidebar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+            [self.sidebar.widthAnchor constraintEqualToConstant:kJobCategoryWidth],
+            [self.sidebar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+        ]];
+        leading = self.sidebar.trailingAnchor;
+    }
+    [NSLayoutConstraint activateConstraints:@[
+        [self.tagListView.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:CYLTopTabBarHeight],
+        [self.tagListView.leadingAnchor constraintEqualToAnchor:leading],
+        [self.tagListView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [self.tagListView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+    ]];
+}
+
+@end
+
+#pragma mark - Search screen
+
+@interface CYLSearchCategoryViewController () <CYLMenuDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UITabBarControllerDelegate>
 @property (nonatomic, strong, readwrite) UISearchBar *searchBar;
-@property (nonatomic, strong, readwrite) UISegmentedControl *categoryControl;
-@property (nonatomic, strong, readwrite) CYLTagListView *tagListView;
+@property (nonatomic, strong, readwrite) CYLTopTabBarController *categoryTabBarController;
 @property (nonatomic, strong, readwrite) UITableView *jobCategoryTableView;
 @property (nonatomic, strong, readwrite) UIButton *industryButton;
 @property (nonatomic, assign, readwrite) CYLSearchCategory category;
 @property (nonatomic, copy, readwrite) NSString *industry;
-@property (nonatomic, strong) CYLExampleMenuSource *menuSource;
+@property (nonatomic, copy) NSArray<CYLSearchCategoryPageViewController *> *pages;
+/// One data source per tag list; the lists hold them weakly.
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, CYLExampleMenuSource *> *menuSources;
 @property (nonatomic, copy) NSArray<NSString *> *jobCategories;
 @property (nonatomic, assign) NSUInteger jobCategoryIndex;
-@property (nonatomic, strong) NSLayoutConstraint *tagListLeading;
 @end
 
 @implementation CYLSearchCategoryViewController
@@ -90,6 +130,7 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor systemBackgroundColor];
+    self.menuSources = [NSMutableDictionary dictionary];
     self.jobCategories = @[@"开发", @"测试", @"运维/DBA", @"硬件", @"产品", @"运营", @"设计", @"编辑/记者", @"游戏", @"市场BD"];
     self.industry = [[self class] industries].firstObject;
 
@@ -98,20 +139,13 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
     self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
     self.navigationItem.titleView = self.searchBar;
 
-    self.categoryControl = [[UISegmentedControl alloc] initWithItems:@[@"找人", @"动态", @"八卦", @"职位"]];
-    self.categoryControl.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.categoryControl addTarget:self action:@selector(categoryChanged) forControlEvents:UIControlEventValueChanged];
-    [self.view addSubview:self.categoryControl];
-
     self.jobCategoryTableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
-    self.jobCategoryTableView.translatesAutoresizingMaskIntoConstraints = NO;
     self.jobCategoryTableView.dataSource = self;
     self.jobCategoryTableView.delegate = self;
     self.jobCategoryTableView.rowHeight = 50;
     self.jobCategoryTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.jobCategoryTableView.backgroundColor = [UIColor secondarySystemBackgroundColor];
     [self.jobCategoryTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kJobCategoryCell];
-    [self.view addSubview:self.jobCategoryTableView];
 
     // A header accessory supplied by the host, not drawn by the menu.
     self.industryButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -119,73 +153,111 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
     self.industryButton.showsMenuAsPrimaryAction = YES;
     [self updateIndustryButton];
 
-    self.tagListView = [[CYLTagListView alloc] init];
-    self.tagListView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.tagListView.style = [[self class] maimaiStyle];
-    self.tagListView.selectionMode = CYLMenuSelectionModeNone;
-    self.tagListView.menuDelegate = self;
-    [self.view addSubview:self.tagListView];
+    NSArray<NSString *> *titles = @[@"找人", @"动态", @"八卦", @"职位"];
+    NSArray<NSString *> *symbols = @[@"person.2", @"bubble.left.and.bubble.right", @"flame", @"briefcase"];
+    NSMutableArray *pages = [NSMutableArray array];
+    NSMutableArray *attributes = [NSMutableArray array];
+    for (NSInteger index = 0; index < (NSInteger)titles.count; index++) {
+        CYLSearchCategoryPageViewController *page = [[CYLSearchCategoryPageViewController alloc] init];
+        page.category = (CYLSearchCategory)index;
+        page.tagListView = [self makeTagListView];
+        if (index == CYLSearchCategoryJobs) {
+            page.sidebar = self.jobCategoryTableView;
+        }
+        [pages addObject:page];
+        [attributes addObject:@{
+            CYLTabBarItemTitle: titles[index],
+            CYLTabBarItemImage: [UIImage systemImageNamed:symbols[index]],
+            CYLTabBarItemSelectedImage: [UIImage systemImageNamed:[symbols[index] stringByAppendingString:@".fill"]] ?: [UIImage systemImageNamed:symbols[index]],
+        }];
+    }
+    self.pages = pages;
+    for (CYLSearchCategoryPageViewController *page in pages) {
+        [self reloadTagsForCategory:page.category];
+    }
 
-    self.tagListLeading = [self.tagListView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor];
-    UILayoutGuide *safe = self.view.safeAreaLayoutGuide;
+    // The second tab bar of the app: category tabs at the top of this screen.
+    self.categoryTabBarController = [[CYLTopTabBarController alloc] initWithViewControllers:pages tabBarItemsAttributes:attributes];
+    self.categoryTabBarController.delegate = self;
+    [self addChildViewController:self.categoryTabBarController];
+    UIView *tabsView = self.categoryTabBarController.view;
+    tabsView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:tabsView];
     [NSLayoutConstraint activateConstraints:@[
-        [self.categoryControl.topAnchor constraintEqualToAnchor:safe.topAnchor constant:8],
-        [self.categoryControl.leadingAnchor constraintEqualToAnchor:safe.leadingAnchor constant:16],
-        [self.categoryControl.trailingAnchor constraintEqualToAnchor:safe.trailingAnchor constant:-16],
-        [self.jobCategoryTableView.topAnchor constraintEqualToAnchor:self.categoryControl.bottomAnchor constant:8],
-        [self.jobCategoryTableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [self.jobCategoryTableView.widthAnchor constraintEqualToConstant:kJobCategoryWidth],
-        [self.jobCategoryTableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-        [self.tagListView.topAnchor constraintEqualToAnchor:self.categoryControl.bottomAnchor constant:8],
-        self.tagListLeading,
-        [self.tagListView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [self.tagListView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+        [tabsView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
+        [tabsView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [tabsView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [tabsView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
     ]];
+    [self.categoryTabBarController didMoveToParentViewController:self];
     [self selectCategory:CYLSearchCategoryPeople];
+}
+
+- (CYLTagListView *)makeTagListView {
+    CYLTagListView *view = [[CYLTagListView alloc] init];
+    view.style = [[self class] maimaiStyle];
+    view.selectionMode = CYLMenuSelectionModeNone;
+    view.menuDelegate = self;
+    return view;
 }
 
 #pragma mark Category
 
-- (void)categoryChanged {
-    [self selectCategory:(CYLSearchCategory)self.categoryControl.selectedSegmentIndex];
+- (CYLTagListView *)tagListViewForCategory:(CYLSearchCategory)category {
+    return self.pages[category].tagListView;
+}
+
+- (CYLTagListView *)tagListView {
+    return [self tagListViewForCategory:self.category];
 }
 
 - (void)selectCategory:(CYLSearchCategory)category {
+    [self loadViewIfNeeded];
+    self.categoryTabBarController.selectedIndex = (NSUInteger)category;
+    [self categoryDidChange:category];
+}
+
+- (void)categoryDidChange:(CYLSearchCategory)category {
     self.category = category;
-    self.categoryControl.selectedSegmentIndex = category;
     self.searchBar.placeholder = [[self class] placeholderForCategory:category];
-    BOOL jobs = category == CYLSearchCategoryJobs;
-    self.jobCategoryTableView.hidden = !jobs;
-    self.tagListLeading.constant = jobs ? kJobCategoryWidth : 0;
-    if (jobs) {
+    if (category == CYLSearchCategoryJobs) {
         [self.jobCategoryTableView reloadData];
         [self selectJobCategoryAtIndex:self.jobCategoryIndex];
-    } else {
-        [self showSections:[[self class] sectionsForCategory:category]];
     }
 }
 
-- (void)showSections:(NSArray<CYLExampleMenuSection *> *)sections {
-    self.menuSource = [CYLExampleMenuSource sourceWithSections:sections];
-    self.tagListView.menuDataSource = self.menuSource;
-    [self.tagListView reloadMenuData];
-    [self.view setNeedsLayout];
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
+    [self categoryDidChange:((CYLSearchCategoryPageViewController *)viewController).category];
+}
+
+- (void)reloadTagsForCategory:(CYLSearchCategory)category {
+    NSArray<CYLExampleMenuSection *> *sections;
+    if (category == CYLSearchCategoryJobs) {
+        NSString *name = self.jobCategories[self.jobCategoryIndex];
+        CYLExampleMenuSection *section = [CYLExampleMenuSection sectionWithTitle:@"热搜职位关键词:" titles:[[self class] jobKeywords][name]];
+        section.accessoryView = self.industryButton;
+        sections = @[section];
+    } else {
+        sections = [[self class] sectionsForCategory:category];
+    }
+    CYLExampleMenuSource *source = [CYLExampleMenuSource sourceWithSections:sections];
+    self.menuSources[@(category)] = source;
+    CYLTagListView *view = [self tagListViewForCategory:category];
+    view.menuDataSource = source;
+    [view reloadMenuData];
 }
 
 - (void)selectJobCategoryAtIndex:(NSUInteger)index {
     self.jobCategoryIndex = MIN(index, self.jobCategories.count - 1);
     NSIndexPath *row = [NSIndexPath indexPathForRow:(NSInteger)self.jobCategoryIndex inSection:0];
     [self.jobCategoryTableView selectRowAtIndexPath:row animated:NO scrollPosition:UITableViewScrollPositionNone];
-    NSString *name = self.jobCategories[self.jobCategoryIndex];
-    CYLExampleMenuSection *section = [CYLExampleMenuSection sectionWithTitle:@"热搜职位关键词:" titles:[[self class] jobKeywords][name]];
-    section.accessoryView = self.industryButton;
-    [self showSections:@[section]];
+    [self reloadTagsForCategory:CYLSearchCategoryJobs];
 }
 
 - (void)selectIndustry:(NSString *)industry {
     self.industry = industry;
     [self updateIndustryButton];
-    [self.tagListView reloadMenuData];
+    [[self tagListViewForCategory:CYLSearchCategoryJobs] reloadMenuData];
 }
 
 - (void)updateIndustryButton {
@@ -206,7 +278,11 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 #pragma mark CYLMenuDelegate
 
 - (void)menu:(id)menu didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    self.searchBar.text = [self.menuSource itemAtIndexPath:indexPath].title;
+    for (NSNumber *category in self.menuSources) {
+        if ([self tagListViewForCategory:category.integerValue] == menu) {
+            self.searchBar.text = [self.menuSources[category] itemAtIndexPath:indexPath].title;
+        }
+    }
 }
 
 #pragma mark UITableView

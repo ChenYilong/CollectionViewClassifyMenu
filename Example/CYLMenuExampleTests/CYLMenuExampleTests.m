@@ -8,7 +8,7 @@
 #import <XCTest/XCTest.h>
 @import CollectionViewClassifyMenu;
 #import "CYLExampleMenuSource.h"
-#import "CYLExampleListViewController.h"
+#import "CYLExampleAppDelegate.h"
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
@@ -447,40 +447,60 @@
 
 #pragma mark Scenario 2: search categories
 
-- (void)testSearchCategoriesFillTheSearchBar {
+- (void)layOutSelectedCategoryOf:(CYLSearchCategoryViewController *)controller {
+    [controller.view layoutIfNeeded];
+    [controller.categoryTabBarController.view layoutIfNeeded];
+    [controller.categoryTabBarController.selectedViewController.view layoutIfNeeded];
+    [controller.tagListView layoutIfNeeded];
+}
+
+- (void)testSearchCategoriesUseATopTabBarAndFillTheSearchBar {
     CYLSearchCategoryViewController *controller = [[CYLSearchCategoryViewController alloc] init];
     [self hostController:controller];
+    [self layOutSelectedCategoryOf:controller];
+    CYLTopTabBarController *tabs = controller.categoryTabBarController;
+    XCTAssertTrue([tabs isKindOfClass:[CYLTabBarController class]]);
+    XCTAssertEqual(tabs.viewControllers.count, 4u);
+    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"找人", @"动态", @"八卦", @"职位"]));
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(tabs.tabBar.frame), 0, 0.5, @"The category tab bar is at the top");
     CYLTagListView *tags = controller.tagListView;
+    CGRect tagsFrame = [tags convertRect:tags.bounds toView:tabs.view];
+    XCTAssertGreaterThanOrEqual(CGRectGetMinY(tagsFrame), CGRectGetMaxY(tabs.tabBar.frame) - 0.5);
+
     UICollectionView *collection = [self collectionViewOf:tags];
     XCTAssertEqual(controller.category, CYLSearchCategoryPeople);
     XCTAssertEqual([collection numberOfSections], 4);
     XCTAssertEqualObjects(controller.searchBar.placeholder, @"搜人名,职位,公司...");
-    XCTAssertTrue(controller.jobCategoryTableView.hidden);
-
     [self tap:tags item:1 section:1];
     XCTAssertEqualObjects(controller.searchBar.text, @"IDG资本");
     XCTAssertEqualObjects(tags.selectedIndexPaths, @[]);
 
-    controller.categoryControl.selectedSegmentIndex = CYLSearchCategoryGossip;
-    [controller.categoryControl sendActionsForControlEvents:UIControlEventValueChanged];
-    [controller.view layoutIfNeeded];
-    XCTAssertEqual([collection numberOfSections], 2);
+    // A tap on the 八卦 tab, as the tab bar reports it.
+    tabs.selectedIndex = CYLSearchCategoryGossip;
+    [tabs.delegate tabBarController:tabs didSelectViewController:tabs.selectedViewController];
+    [self layOutSelectedCategoryOf:controller];
+    XCTAssertEqual(controller.category, CYLSearchCategoryGossip);
     XCTAssertEqualObjects(controller.searchBar.placeholder, @"搜八卦");
-    [self assertNoOverlapsOrOverflowIn:tags];
+    CYLTagListView *gossip = controller.tagListView;
+    XCTAssertNotEqual(gossip, tags);
+    XCTAssertEqual([[self collectionViewOf:gossip] numberOfSections], 2);
+    [self assertNoOverlapsOrOverflowIn:gossip];
+    [self tap:gossip item:2 section:0];
+    XCTAssertEqualObjects(controller.searchBar.text, @"程序猿");
 }
 
 - (void)testJobCategoriesUseSidebarAndIndustryAccessory {
     CYLSearchCategoryViewController *controller = [[CYLSearchCategoryViewController alloc] init];
     [self hostController:controller];
     [controller selectCategory:CYLSearchCategoryJobs];
-    [controller.view layoutIfNeeded];
+    [self layOutSelectedCategoryOf:controller];
+    XCTAssertEqual(controller.categoryTabBarController.selectedIndex, (NSUInteger)CYLSearchCategoryJobs);
     CYLTagListView *tags = controller.tagListView;
     UICollectionView *collection = [self collectionViewOf:tags];
-    XCTAssertFalse(controller.jobCategoryTableView.hidden);
+    XCTAssertEqual(controller.jobCategoryTableView.superview, tags.superview);
     XCTAssertEqualWithAccuracy(CGRectGetMinX(tags.frame), CGRectGetMaxX(controller.jobCategoryTableView.frame), 0.5);
     XCTAssertEqual([controller.jobCategoryTableView numberOfRowsInSection:0], 10);
-    NSInteger developmentCount = [collection numberOfItemsInSection:0];
-    XCTAssertEqual(developmentCount, 31);
+    XCTAssertEqual([collection numberOfItemsInSection:0], 31);
     [self assertNoOverlapsOrOverflowIn:tags];
 
     [collection layoutIfNeeded];
@@ -497,12 +517,35 @@
     XCTAssertEqualObjects(controller.searchBar.text, @"测试工程师");
 }
 
-- (void)testExampleListOpensBothScenarios {
-    CYLExampleListViewController *list = [[CYLExampleListViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
-    [self hostController:list];
-    XCTAssertEqual([list.tableView numberOfRowsInSection:0], 2);
-    XCTAssertTrue([[list viewControllerForRow:0] isKindOfClass:[CYLProductViewController class]]);
-    XCTAssertTrue([[list viewControllerForRow:1] isKindOfClass:[CYLSearchCategoryViewController class]]);
+#pragma mark Root tab bar
+
+- (void)testRootTabBarHoldsBothScenarios {
+    CYLTabBarController *tabs = [CYLExampleAppDelegate makeRootTabBarController];
+    self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 375, 667)];
+    self.window.rootViewController = tabs;
+    [self.window makeKeyAndVisible];
+    [tabs.view layoutIfNeeded];
+    XCTAssertEqual(tabs.viewControllers.count, 2u);
+    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"场景一：评价筛选", @"场景二：搜索分类"]));
+    UINavigationController *first = (UINavigationController *)tabs.viewControllers[0];
+    UINavigationController *second = (UINavigationController *)tabs.viewControllers[1];
+    XCTAssertTrue([first.viewControllers.firstObject isKindOfClass:[CYLProductViewController class]]);
+    XCTAssertTrue([second.viewControllers.firstObject isKindOfClass:[CYLSearchCategoryViewController class]]);
+    XCTAssertGreaterThan(CGRectGetMinY(tabs.tabBar.frame), CGRectGetHeight(tabs.view.bounds) / 2, @"The root tab bar is at the bottom");
+
+    // Two tab bars with different roles: scenario 2 adds its own category tabs.
+    tabs.selectedIndex = 1;
+    CYLSearchCategoryViewController *search = (CYLSearchCategoryViewController *)second.viewControllers.firstObject;
+    [search loadViewIfNeeded];
+    XCTAssertNotEqual(search.categoryTabBarController, tabs);
+    XCTAssertEqual(search.categoryTabBarController.parentViewController, search);
+
+    // The review page hides the root tab bar.
+    tabs.selectedIndex = 0;
+    CYLProductViewController *product = (CYLProductViewController *)first.viewControllers.firstObject;
+    [product loadViewIfNeeded];
+    [product showReviewsWithFilterIndex:0];
+    XCTAssertTrue(first.topViewController.hidesBottomBarWhenPushed);
 }
 
 @end

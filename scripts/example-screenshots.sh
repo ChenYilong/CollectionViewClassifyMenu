@@ -9,7 +9,7 @@
 #      SCREENS 可替换页面列表（以逗号分隔）。
 set -eu
 cd "$(dirname "$0")/.."
-SCREENS="${SCREENS:-list,product,reviews,reviews-good,reviews-expanded,search,search-gossip,search-jobs}"
+SCREENS="${SCREENS:-product,reviews,reviews-good,reviews-expanded,search,search-gossip,search-jobs}"
 DERIVED=build/screenshots-build
 OUT=build/screenshots
 mkdir -p "$DERIVED" "$OUT"

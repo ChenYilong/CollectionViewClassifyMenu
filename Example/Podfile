@@ -1,9 +1,13 @@
-# Integrates the local core library from the repository root.
+# Integrates the local core library from the repository root, and CYLTabBarController for the app's tab bars:
+# the root tab bar (场景一 / 场景二) and the category tab bar at the top of 场景二.
 platform :ios, '15.0'
 project 'CYLMenuExample.xcodeproj'
 
 target 'CYLMenuExample' do
   pod 'CollectionViewClassifyMenu', :path => '..'
+  # Pinned to the revision whose API the Example uses; update together with the Example.
+  pod 'CYLTabBarController', :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
+                             :commit => '4209e37da86a3b0f14334f5573d152ac938908c7'
 
   target 'CYLMenuExampleTests' do
     inherit! :search_paths

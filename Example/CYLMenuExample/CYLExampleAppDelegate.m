@@ -4,51 +4,58 @@
 //
 
 #import "CYLExampleAppDelegate.h"
-#import "CYLExampleListViewController.h"
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLSearchCategoryViewController.h"
 
 @implementation CYLExampleAppDelegate
 
++ (CYLTabBarController *)makeRootTabBarController {
+    UINavigationController *reviews = [[UINavigationController alloc] initWithRootViewController:[[CYLProductViewController alloc] init]];
+    UINavigationController *search = [[UINavigationController alloc] initWithRootViewController:[[CYLSearchCategoryViewController alloc] init]];
+    NSArray *attributes = @[
+        @{CYLTabBarItemTitle: @"场景一：评价筛选",
+          CYLTabBarItemImage: [UIImage systemImageNamed:@"cart"],
+          CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"cart.fill"]},
+        @{CYLTabBarItemTitle: @"场景二：搜索分类",
+          CYLTabBarItemImage: [UIImage systemImageNamed:@"magnifyingglass.circle"],
+          CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"magnifyingglass.circle.fill"]},
+    ];
+    return [[CYLTabBarController alloc] initWithViewControllers:@[reviews, search] tabBarItemsAttributes:attributes];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    CYLExampleListViewController *list = [[CYLExampleListViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
-    UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:list];
-    // `-CYLExampleScreen <name>` opens a screen directly (used by scripts/example-screenshots.sh).
-    NSString *screen = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLExampleScreen"];
-    NSArray<UIViewController *> *stack = [[self class] viewControllersForScreen:screen];
-    if (stack.count > 0) {
-        [navigation setViewControllers:[@[list] arrayByAddingObjectsFromArray:stack] animated:NO];
-    }
-    self.window.rootViewController = navigation;
+    CYLTabBarController *tabs = [[self class] makeRootTabBarController];
+    self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
-    UIViewController *top = stack.lastObject;
-    if ([screen isEqualToString:@"reviews-expanded"]) {
-        CYLReviewListViewController *reviews = (CYLReviewListViewController *)top;
-        [reviews loadViewIfNeeded];
-        [reviews.filterView setExpanded:YES forSection:0 animated:NO];
-    } else if ([screen isEqualToString:@"search-gossip"] || [screen isEqualToString:@"search-jobs"]) {
-        CYLSearchCategoryViewController *search = (CYLSearchCategoryViewController *)top;
-        [search loadViewIfNeeded];
-        [search selectCategory:[screen hasSuffix:@"jobs"] ? CYLSearchCategoryJobs : CYLSearchCategoryGossip];
-    }
+    // `-CYLExampleScreen <name>` opens a screen directly (used by scripts/example-screenshots.sh).
+    [[self class] openScreen:[[NSUserDefaults standardUserDefaults] stringForKey:@"CYLExampleScreen"] inTabBarController:tabs];
     return YES;
 }
 
-+ (NSArray<UIViewController *> *)viewControllersForScreen:(NSString *)screen {
-    if ([screen isEqualToString:@"product"]) {
-        return @[[[CYLProductViewController alloc] init]];
-    }
++ (void)openScreen:(NSString *)screen inTabBarController:(CYLTabBarController *)tabs {
     if ([screen hasPrefix:@"reviews"]) {
+        tabs.selectedIndex = 0;
+        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[0];
         NSUInteger index = [screen isEqualToString:@"reviews-good"] ? 1 : 0;
-        return @[[[CYLProductViewController alloc] init],
-                 [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:index]];
+        CYLReviewListViewController *reviews = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:index];
+        reviews.hidesBottomBarWhenPushed = YES;
+        [navigation pushViewController:reviews animated:NO];
+        if ([screen isEqualToString:@"reviews-expanded"]) {
+            [reviews loadViewIfNeeded];
+            [reviews.filterView setExpanded:YES forSection:0 animated:NO];
+        }
+    } else if ([screen hasPrefix:@"search"]) {
+        tabs.selectedIndex = 1;
+        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[1];
+        CYLSearchCategoryViewController *search = (CYLSearchCategoryViewController *)navigation.viewControllers.firstObject;
+        if ([screen isEqualToString:@"search-gossip"]) {
+            [search selectCategory:CYLSearchCategoryGossip];
+        } else if ([screen isEqualToString:@"search-jobs"]) {
+            [search selectCategory:CYLSearchCategoryJobs];
+        }
     }
-    if ([screen hasPrefix:@"search"]) {
-        return @[[[CYLSearchCategoryViewController alloc] init]];
-    }
-    return @[];
 }
 
 @end

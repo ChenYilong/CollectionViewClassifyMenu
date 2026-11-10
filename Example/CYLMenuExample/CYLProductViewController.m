@@ -150,6 +150,7 @@
 
 - (void)showReviewsWithFilterIndex:(NSUInteger)index {
     CYLReviewListViewController *reviews = [[CYLReviewListViewController alloc] initWithSelectedFilterIndex:index];
+    reviews.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:reviews animated:YES];
 }
 

@@ -180,7 +180,12 @@ image from `menuImageForItemAtIndexPath:` instead. Section icons of
 
 ### Example / 示例工程
 
-`Example/` 通过 Podfile 以本地路径集成核心库：
+`Example/` 通过 Podfile 以本地路径集成核心库，并引入
+[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 搭建两个作用不同的 TabBar：
+
+- 根 TabBar（底部）：「场景一：评价筛选」与「场景二：搜索分类」两个 Tab；
+- 分类 TabBar（场景二顶部）：嵌入在搜索页中的 `CYLTopTabBarController`，切换「找人/动态/八卦/职位」，每个 Tab 是一个标签页。
+
 
 ```sh
 cd Example
@@ -191,7 +196,7 @@ open CYLMenuExample.xcworkspace
 | 场景 | 实现 |
 | --- | --- |
 | 场景一：淘宝评价筛选 | `CYLProductViewController` 在商品页用 `CYLMenuFoldStyleTruncate` 预览两行关键词；`CYLReviewListViewController` 使用单选、带图标和数量、底部箭头折叠的筛选，作为表头随列表滚动，并按所选标签过滤评价。 |
-| 场景二：脉脉搜索分类 | `CYLSearchCategoryViewController` 提供搜索框和“找人/动态/八卦/职位”分类；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分组标题右侧为宿主提供的行业选择按钮。 |
+| 场景二：脉脉搜索分类 | `CYLSearchCategoryViewController` 提供搜索框和顶部 CYLTabBarController 分类（找人/动态/八卦/职位）；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分组标题右侧为宿主提供的行业选择按钮。 |
 
 `CYLExampleMenuSource` shows how a host turns its own models into a
 `CYLMenuDataSource`; the core library holds no business data.
