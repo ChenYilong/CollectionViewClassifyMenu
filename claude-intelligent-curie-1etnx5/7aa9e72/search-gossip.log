@@ -1,0 +1,3 @@
+[CYLExampleLayout] screen=search-gossip top=CYLSearchCategoryViewController
+[CYLExampleLayout] categoryTabBar={{0, 126}, {402, 83}}
+[CYLExampleLayout] searchTags frame={{0, 0}, {402, 582}} hidden=0 window=1 contentHeight=302.0 collection={{0, 0}, {402, 582}} contentSize={402, 302} offset={0, 0} adjustedInset={0, 0, 0, 0} sections=2 items[0]=16 items[1]=3 visibleCells=19 firstCell={{164, 36}, {70, 32}} inWindow={{164, 245}, {70, 32}} alpha=1.00 hidden=0

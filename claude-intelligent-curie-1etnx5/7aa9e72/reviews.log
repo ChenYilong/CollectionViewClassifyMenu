@@ -1,0 +1,3 @@
+[CYLExampleLayout] screen=reviews top=CYLReviewListViewController
+[CYLExampleLayout] table={{0, 289.66666666666669}, {402, 584.33333333333337}} rows=10 status=Tapped “All” · Selected: All | In memory: matched instantly in the loaded reviews · 10 matches
+[CYLExampleLayout] reviewFilter frame={{0, 116}, {402, 110}} hidden=0 window=1 contentHeight=110.0 collection={{0, 0}, {402, 110}} contentSize={402, 110} offset={0, 0} adjustedInset={0, 0, 0, 0} sections=1 items[0]=8 visibleCells=8 firstCell={{190, 48}, {93, 28}} inWindow={{190, 164}, {93, 28}} alpha=1.00 hidden=0

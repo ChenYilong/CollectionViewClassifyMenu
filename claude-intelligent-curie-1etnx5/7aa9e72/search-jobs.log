@@ -1,0 +1,3 @@
+[CYLExampleLayout] screen=search-jobs top=CYLSearchCategoryViewController
+[CYLExampleLayout] categoryTabBar={{0, 126}, {402, 83}}
+[CYLExampleLayout] searchTags frame={{90, 0}, {312, 582}} hidden=0 window=1 contentHeight=542.0 collection={{0, 0}, {312, 582}} contentSize={312, 542} offset={0, 0} adjustedInset={0, 0, 0, 0} sections=1 items[0]=31 visibleCells=31 firstCell={{221, 496}, {63, 32}} inWindow={{311, 705}, {63, 32}} alpha=1.00 hidden=0
