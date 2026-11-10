@@ -7,6 +7,12 @@
 #import "CYLParameterConfiguration.h"
 #import "CYLMenuResources.h"
 
+@interface CYLMenuStyle ()
+@property (nonatomic, strong, readwrite) CYLTagAppearance *normalAppearance;
+@property (nonatomic, strong, readwrite) CYLTagAppearance *selectedAppearance;
+@property (nonatomic, strong, readwrite) CYLTagAppearance *disabledAppearance;
+@end
+
 @implementation CYLMenuStyle
 
 + (instancetype)defaultStyle {
@@ -16,21 +22,25 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _font = [UIFont systemFontOfSize:14];
-        _adjustsFontForContentSizeCategory = YES;
-        _textColor = [UIColor colorWithWhite:0.25 alpha:1];
-        _selectedTextColor = [UIColor whiteColor];
-        _disabledTextColor = [UIColor colorWithWhite:0.7 alpha:1];
-        _itemBackgroundColor = [UIColor whiteColor];
-        _selectedItemBackgroundColor = CYLAppTintColor;
-        _borderColor = [UIColor colorWithWhite:0.82 alpha:1];
-        _selectedBorderColor = CYLAppTintColor;
-        _borderWidth = 1.0 / MAX(1, UIScreen.mainScreen.scale);
-        _cornerRadius = 3;
-        _itemHeight = 30;
-        _itemHorizontalPadding = 10;
-        _imageSize = CGSizeMake(14, 14);
+        CGFloat hairline = 1.0 / MAX(1, UIScreen.mainScreen.scale);
+        _normalAppearance = [[CYLTagAppearance alloc] init];
+        _normalAppearance.borderColor = [UIColor colorWithWhite:0.82 alpha:1];
+        _normalAppearance.borderWidth = hairline;
+        _selectedAppearance = [[CYLTagAppearance alloc] init];
+        _selectedAppearance.backgroundColor = CYLAppTintColor;
+        _selectedAppearance.textColor = [UIColor whiteColor];
+        _selectedAppearance.borderColor = CYLAppTintColor;
+        _selectedAppearance.borderWidth = hairline;
+        _disabledAppearance = [[CYLTagAppearance alloc] init];
+        _disabledAppearance.textColor = [UIColor colorWithWhite:0.7 alpha:1];
+        _disabledAppearance.borderColor = [UIColor colorWithWhite:0.88 alpha:1];
+        _disabledAppearance.borderWidth = hairline;
+
         _imageTitleSpacing = 4;
+        _imageSize = CGSizeMake(14, 14);
+        _layoutCentered = YES;
+        _adjustsFontForContentSizeCategory = YES;
+        _itemHeight = 30;
         _interitemSpacing = 10;
         _lineSpacing = 10;
         _sectionInsets = UIEdgeInsetsMake(10, 16, 10, 16);
@@ -48,21 +58,17 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     CYLMenuStyle *copy = [[[self class] allocWithZone:zone] init];
-    copy.font = self.font;
-    copy.adjustsFontForContentSizeCategory = self.adjustsFontForContentSizeCategory;
-    copy.textColor = self.textColor;
-    copy.selectedTextColor = self.selectedTextColor;
-    copy.disabledTextColor = self.disabledTextColor;
-    copy.itemBackgroundColor = self.itemBackgroundColor;
-    copy.selectedItemBackgroundColor = self.selectedItemBackgroundColor;
-    copy.borderColor = self.borderColor;
-    copy.selectedBorderColor = self.selectedBorderColor;
-    copy.borderWidth = self.borderWidth;
-    copy.cornerRadius = self.cornerRadius;
-    copy.itemHeight = self.itemHeight;
-    copy.itemHorizontalPadding = self.itemHorizontalPadding;
-    copy.imageSize = self.imageSize;
+    copy.normalAppearance = [self.normalAppearance copy];
+    copy.selectedAppearance = [self.selectedAppearance copy];
+    copy.disabledAppearance = [self.disabledAppearance copy];
     copy.imageTitleSpacing = self.imageTitleSpacing;
+    copy.imageSize = self.imageSize;
+    copy.imageInsets = self.imageInsets;
+    copy.titlePositionAdjustment = self.titlePositionAdjustment;
+    copy.imagePositionAdjustment = self.imagePositionAdjustment;
+    copy.layoutCentered = self.layoutCentered;
+    copy.adjustsFontForContentSizeCategory = self.adjustsFontForContentSizeCategory;
+    copy.itemHeight = self.itemHeight;
     copy.interitemSpacing = self.interitemSpacing;
     copy.lineSpacing = self.lineSpacing;
     copy.sectionInsets = self.sectionInsets;
@@ -77,6 +83,40 @@
     copy.collapseTitle = self.collapseTitle;
     return copy;
 }
+
+#pragma mark Appearances
+
+- (CYLTagAppearance *)appearanceForState:(UIControlState)state {
+    if (state & UIControlStateDisabled) {
+        return self.disabledAppearance;
+    }
+    if (state & UIControlStateSelected) {
+        return self.selectedAppearance;
+    }
+    return self.normalAppearance;
+}
+
+- (void)setTitleTextAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes forState:(UIControlState)state {
+    CYLTagAppearance *appearance = [self appearanceForState:state];
+    appearance.font = attributes[NSFontAttributeName];
+    appearance.textColor = attributes[NSForegroundColorAttributeName];
+}
+
+- (NSDictionary<NSAttributedStringKey, id> *)titleTextAttributesForState:(UIControlState)state {
+    CYLTagAppearance *appearance = [self appearanceForState:state];
+    return @{NSFontAttributeName: appearance.font, NSForegroundColorAttributeName: appearance.textColor};
+}
+
+- (void)setIconColor:(UIColor *)iconColor forState:(UIControlState)state {
+    [self appearanceForState:state].iconColor = iconColor;
+}
+
+- (UIColor *)iconColorForState:(UIControlState)state {
+    CYLTagAppearance *appearance = [self appearanceForState:state];
+    return appearance.iconColor ?: appearance.textColor;
+}
+
+#pragma mark Fonts
 
 - (UIFont *)cyl_scaledFont:(UIFont *)font traits:(UITraitCollection *)traits {
     UITraitCollection *effective = traits ?: [UITraitCollection currentTraitCollection];
@@ -95,8 +135,8 @@
                                compatibleWithTraitCollection:traits];
 }
 
-- (UIFont *)itemFontForTraitCollection:(UITraitCollection *)traitCollection {
-    return [self cyl_scaledFont:self.font traits:traitCollection];
+- (UIFont *)titleFontForState:(UIControlState)state traitCollection:(UITraitCollection *)traitCollection {
+    return [self cyl_scaledFont:[self appearanceForState:state].font traits:traitCollection];
 }
 
 - (UIFont *)headerFontForTraitCollection:(UITraitCollection *)traitCollection {

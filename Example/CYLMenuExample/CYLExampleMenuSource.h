@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CYLExampleMenuItem : NSObject
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, strong, nullable) UIImage *image;
+@property (nonatomic, strong, nullable) UIImage *selectedImage;
 @property (nonatomic, assign, getter=isEnabled) BOOL enabled;
 @property (nonatomic, assign, getter=isExclusive) BOOL exclusive;
 /// Free-form value for the host, such as a filter key.

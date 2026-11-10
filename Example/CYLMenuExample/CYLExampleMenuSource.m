@@ -67,6 +67,10 @@
     return [self itemAtIndexPath:indexPath].image;
 }
 
+- (UIImage *)menuSelectedImageForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return [self itemAtIndexPath:indexPath].selectedImage;
+}
+
 - (UIImage *)menuImageForSection:(NSInteger)section {
     return self.sections[section].image;
 }

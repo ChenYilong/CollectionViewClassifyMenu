@@ -30,21 +30,27 @@ static NSString * const kReviewCellIdentifier = @"ReviewCell";
 + (CYLMenuStyle *)reviewFilterStyle {
     UIColor *orange = [UIColor colorWithRed:1 green:0.31 blue:0 alpha:1];
     CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
-    style.font = [UIFont systemFontOfSize:12];
+    // Title and icon per state, as on a CYLFlatDesignTabBarItem.
+    UIFont *font = [UIFont systemFontOfSize:12];
+    [style setTitleTextAttributes:@{NSFontAttributeName: font, NSForegroundColorAttributeName: [UIColor colorWithWhite:0.3 alpha:1]} forState:UIControlStateNormal];
+    [style setTitleTextAttributes:@{NSFontAttributeName: font, NSForegroundColorAttributeName: [UIColor whiteColor]} forState:UIControlStateSelected];
+    [style setTitleTextAttributes:@{NSFontAttributeName: font, NSForegroundColorAttributeName: [UIColor colorWithWhite:0.7 alpha:1]} forState:UIControlStateDisabled];
+    style.imageSize = CGSizeMake(13, 13);
+    style.imageTitleSpacing = 3;
+    // The box per state, as on a CYLBadgeView.
+    for (CYLTagAppearance *appearance in @[style.normalAppearance, style.selectedAppearance, style.disabledAppearance]) {
+        appearance.cornerRadius = 2;
+        appearance.margin = 8;
+        appearance.borderWidth = 0.5;
+        appearance.backgroundColor = [UIColor colorWithWhite:0.96 alpha:1];
+        appearance.borderColor = [UIColor colorWithWhite:0.88 alpha:1];
+    }
+    style.selectedAppearance.backgroundColor = orange;
+    style.selectedAppearance.borderColor = orange;
     style.itemHeight = 28;
-    style.itemHorizontalPadding = 8;
-    style.cornerRadius = 2;
-    style.textColor = [UIColor colorWithWhite:0.3 alpha:1];
-    style.itemBackgroundColor = [UIColor colorWithWhite:0.96 alpha:1];
-    style.borderColor = [UIColor colorWithWhite:0.88 alpha:1];
-    style.selectedItemBackgroundColor = orange;
-    style.selectedBorderColor = orange;
-    style.selectedTextColor = [UIColor whiteColor];
     style.interitemSpacing = 8;
     style.lineSpacing = 10;
     style.sectionInsets = UIEdgeInsetsMake(10, 12, 6, 12);
-    style.imageSize = CGSizeMake(13, 13);
-    style.imageTitleSpacing = 3;
     style.foldControlColor = [UIColor colorWithWhite:0.45 alpha:1];
     return style;
 }

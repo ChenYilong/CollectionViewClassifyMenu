@@ -72,3 +72,38 @@
 /* Scenario 2 home */
 "脉脉搜索" = "Search";
 "按分类浏览热门标签：找人、动态、八卦、职位" = "Browse trending tags by category: people, posts, gossip and jobs";
+
+/* Tag style demo */
+"样式" = "Styles";
+"标签样式" = "Tag styles";
+"标题与图标（参照 CYLFlatDesignTabBarItem）" = "Title and icon (as CYLFlatDesignTabBarItem)";
+"背景、边框与圆角（参照 CYLBadgeView）" = "Background, border and corners (as CYLBadgeView)";
+"其它" = "Other";
+"设置 iconColor（normal）" = "Set iconColor (normal)";
+"设置 iconColor（selected）" = "Set iconColor (selected)";
+"设置文字颜色 titleTextAttributes（normal）" = "Set title color, titleTextAttributes (normal)";
+"设置文字颜色 titleTextAttributes（selected）" = "Set title color, titleTextAttributes (selected)";
+"设置字体 NSFontAttributeName" = "Set font, NSFontAttributeName";
+"设置 icon 与文字间距 imageTitleSpacing" = "Set icon-title spacing, imageTitleSpacing";
+"设置 icon 大小 imageSize" = "Set icon size, imageSize";
+"设置 imageInsets" = "Set imageInsets";
+"设置 titlePositionAdjustment" = "Set titlePositionAdjustment";
+"设置 imagePositionAdjustment" = "Set imagePositionAdjustment";
+"显示 icon + title" = "Show icon + title";
+"只显示 icon" = "Show icon only";
+"只显示 title" = "Show title only";
+"切换 layoutCentered（只有 icon 或 title 时居中）" = "Toggle layoutCentered (center a lone icon or title)";
+"切换选中图片 selectedImage" = "Toggle selectedImage";
+"设置背景色 backgroundColor（normal）" = "Set backgroundColor (normal)";
+"设置背景色 backgroundColor（selected）" = "Set backgroundColor (selected)";
+"设置边框颜色 borderColor" = "Set borderColor";
+"设置边框宽度 borderWidth" = "Set borderWidth";
+"设置圆角 cornerRadius（0 为胶囊）" = "Set cornerRadius (0 is a capsule)";
+"设置内边距 margin" = "Set margin";
+"重置 reset" = "Reset";
+"首页" = "Home";
+"同城" = "Nearby";
+"消息" = "Messages";
+"我的" = "Me";
+"一个很长很长的标签标题" = "A very, very long tag title";
+"已禁用" = "Disabled";

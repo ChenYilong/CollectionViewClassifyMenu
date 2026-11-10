@@ -167,7 +167,10 @@ New APIs / 新增接口:
 | `-menu:didChangeContentHeight:` | 内容高度变化，便于嵌入时调整高度 |
 | `-menu:didChangeSelectedItems:` | 每次点击改变选择后回调一次，用于刷新筛选结果 |
 | `CYLMenuStyle.foldChevronImage` | 底部折叠箭头图片，展开时旋转 180° |
-| `CYLMenuStyle` | 字体（支持 Dynamic Type）、颜色、边框、圆角、间距、内边距、高度、折叠文案 |
+| `CYLMenuStyle` | 标题字体与颜色、图标颜色（按状态）、图标与文字间距、图标大小、位置偏移、`layoutCentered`、间距、高度、折叠文案；Dynamic Type |
+| `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
+| `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也可单独使用 |
+| `-menuSelectedImageForItemAtIndexPath:` | 选中态图标 |
 | `selectionMode`, `allowsEmptySelection` | 无选择 / 单选 / 多选（支持互斥项“全部”） |
 | `foldStyle`, `defaultVisibleRows` | 标题“更多”按钮、底部箭头或仅截断预览 |
 | `showsSectionHeaders` | 分组或平铺 |
@@ -176,7 +179,37 @@ New APIs / 新增接口:
 | `contentHeight`, `-heightThatFitsWidth:`, `intrinsicContentSize`, `scrollEnabled` | 嵌入到表头、Stack View 或 Auto Layout |
 | `-numberOfRowsInSection:`, `-numberOfVisibleItemsInSection:` | 查询布局结果 |
 
-**Breaking change:** `menuItemHasImageAtIndexPath:` was removed; return the
+#### 标签外观 / Tag appearance
+
+每个标签由 `CYLTagButton` 绘制：图标与标题的参数完全参照 CYLTabBarController 的
+`CYLFlatDesignTabBarItem`，只是把纵向排列改为横向排列；背景、边框、圆角参照 `CYLBadgeView`
+（`CYLBadgeAppearance`），每种状态一个 `CYLTagAppearance`。
+
+```objc
+CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+// 标题与图标（CYLFlatDesignTabBarItem）
+[style setTitleTextAttributes:@{NSFontAttributeName: [UIFont systemFontOfSize:13],
+                                NSForegroundColorAttributeName: UIColor.darkGrayColor}
+                     forState:UIControlStateNormal];
+[style setIconColor:UIColor.systemBlueColor forState:UIControlStateNormal];   // 模板图标的 tintColor
+[style setIconColor:UIColor.whiteColor forState:UIControlStateSelected];
+style.imageTitleSpacing = 6;                       // 图标与文字间距
+style.imageSize = CGSizeMake(16, 16);
+style.titlePositionAdjustment = UIOffsetMake(0, 1);
+style.layoutCentered = YES;                        // 只有图标或只有标题时居中
+// 背景、边框、圆角（CYLBadgeView）
+style.normalAppearance.borderColor = UIColor.systemGray4Color;
+style.normalAppearance.borderWidth = 1;
+style.normalAppearance.cornerRadius = 0;           // 0 = 自动胶囊
+style.normalAppearance.margin = 12;
+style.selectedAppearance.backgroundColor = UIColor.systemBlueColor;
+```
+
+数据源可通过 `-menuSelectedImageForItemAtIndexPath:` 提供选中态图标。Example 的「样式」Tab
+（`CYLTagStyleDemoViewController`）参照 `CYLFlatDesignTabBarDemoViewController`：上方为标签预览，
+点击下方列表的每一行即时修改一个参数。
+
+**Breaking changes:** `CYLMenuStyle`'s flat color, border and padding properties (`textColor`, `itemBackgroundColor`, `borderColor`, `cornerRadius`, `itemHorizontalPadding`…) moved to its per-state `CYLTagAppearance` objects, `itemFontForTraitCollection:` became `titleFontForState:traitCollection:`, and a corner radius of 0 now means a capsule. `menuItemHasImageAtIndexPath:` was removed; return the
 image from `menuImageForItemAtIndexPath:` instead. Section icons of
 `CYLClassifyMenuViewController` now come from `menuImageForSection:`.
 

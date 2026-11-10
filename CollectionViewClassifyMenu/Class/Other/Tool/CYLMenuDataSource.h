@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 /// Icon drawn before the item's title. Return nil for a text-only item.
 - (nullable UIImage *)menuImageForItemAtIndexPath:(NSIndexPath *)indexPath;
+/// Icon shown while the item is selected; nil keeps the normal icon.
+- (nullable UIImage *)menuSelectedImageForItemAtIndexPath:(NSIndexPath *)indexPath;
 /// Icon drawn before the section title. Return nil for no icon.
 - (nullable UIImage *)menuImageForSection:(NSInteger)section;
 /// View placed at the trailing edge of the section header, such as a picker

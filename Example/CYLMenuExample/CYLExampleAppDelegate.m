@@ -8,6 +8,7 @@
 #import "CYLReviewListViewController.h"
 #import "CYLSearchCategoryViewController.h"
 #import "CYLSearchHomeViewController.h"
+#import "CYLTagStyleDemoViewController.h"
 #import "CYLExampleLocalization.h"
 
 @implementation CYLExampleAppDelegate
@@ -22,8 +23,12 @@
         @{CYLTabBarItemTitle: CYLExampleLocalizedString(@"场景二：搜索分类"),
           CYLTabBarItemImage: [UIImage systemImageNamed:@"magnifyingglass.circle"],
           CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"magnifyingglass.circle.fill"]},
+        @{CYLTabBarItemTitle: CYLExampleLocalizedString(@"样式"),
+          CYLTabBarItemImage: [UIImage systemImageNamed:@"paintbrush"],
+          CYLTabBarItemSelectedImage: [UIImage systemImageNamed:@"paintbrush.fill"]},
     ];
-    return [[CYLTabBarController alloc] initWithViewControllers:@[reviews, search] tabBarItemsAttributes:attributes];
+    UINavigationController *styles = [[UINavigationController alloc] initWithRootViewController:[[CYLTagStyleDemoViewController alloc] init]];
+    return [[CYLTabBarController alloc] initWithViewControllers:@[reviews, search, styles] tabBarItemsAttributes:attributes];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -119,6 +124,19 @@
         } else if ([screen isEqualToString:@"reviews-multi"] || [screen isEqualToString:@"reviews-network"]) {
             // 好评 + 有图: both conditions must match.
             [reviews selectFilterIndexes:@[@1, @4]];
+        }
+    } else if ([screen hasPrefix:@"style"]) {
+        tabs.selectedIndex = 2;
+        UINavigationController *navigation = (UINavigationController *)tabs.viewControllers[2];
+        CYLTagStyleDemoViewController *demo = (CYLTagStyleDemoViewController *)navigation.viewControllers.firstObject;
+        NSDictionary<NSString *, NSArray<NSString *> *> *actions = @{
+            // A capsule with a wider icon spacing, colored icons and a colored selection.
+            @"style-custom": @[@"cornerRadius", @"imageTitleSpacing", @"iconColor.normal", @"backgroundColor.selected", @"borderColor", @"borderWidth"],
+            @"style-icon-only": @[@"content.iconOnly", @"cornerRadius"],
+            @"style-title-uncentered": @[@"content.titleOnly", @"layoutCentered"],
+        };
+        for (NSString *action in actions[screen]) {
+            [demo performAction:action];
         }
     } else if ([screen isEqualToString:@"search-home"]) {
         tabs.selectedIndex = 1;

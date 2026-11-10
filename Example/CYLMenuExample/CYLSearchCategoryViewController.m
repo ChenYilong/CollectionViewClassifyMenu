@@ -116,13 +116,14 @@ static NSString * const kJobCategoryCell = @"JobCategoryCell";
 
 + (CYLMenuStyle *)maimaiStyle {
     CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
-    style.font = [UIFont systemFontOfSize:14];
-    style.textColor = [UIColor colorWithWhite:0.35 alpha:1];
-    style.borderColor = [UIColor colorWithWhite:0.8 alpha:1];
-    style.borderWidth = 1;
-    style.cornerRadius = 2;
+    [style setTitleTextAttributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14],
+                                    NSForegroundColorAttributeName: [UIColor colorWithWhite:0.35 alpha:1]}
+                         forState:UIControlStateNormal];
+    style.normalAppearance.borderColor = [UIColor colorWithWhite:0.8 alpha:1];
+    style.normalAppearance.borderWidth = 1;
+    style.normalAppearance.cornerRadius = 2;
+    style.normalAppearance.margin = 14;
     style.itemHeight = 32;
-    style.itemHorizontalPadding = 14;
     style.interitemSpacing = 14;
     style.lineSpacing = 14;
     style.sectionInsets = UIEdgeInsetsMake(4, 24, 14, 16);

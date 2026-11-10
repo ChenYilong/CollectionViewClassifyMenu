@@ -10,6 +10,7 @@
 #import "CYLExampleMenuSource.h"
 #import "CYLExampleAppDelegate.h"
 #import "CYLSearchHomeViewController.h"
+#import "CYLTagStyleDemoViewController.h"
 #import "CYLProductViewController.h"
 #import "CYLReviewListViewController.h"
 #import "CYLReviewStore.h"
@@ -208,7 +209,7 @@
 
 - (void)testSelectedCellsUseSelectedStyleAfterReuse {
     CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
-    style.selectedItemBackgroundColor = [UIColor redColor];
+    style.selectedAppearance.backgroundColor = [UIColor redColor];
     CYLTagListView *view = [self hostedViewWithSource:[self sourceWithItemCount:200 sections:1] width:320];
     view.style = style;
     view.frame = CGRectMake(0, 0, 320, 200);
@@ -221,7 +222,8 @@
     [collection layoutIfNeeded];
     for (NSIndexPath *indexPath in collection.indexPathsForVisibleItems) {
         UICollectionViewCell *cell = [collection cellForItemAtIndexPath:indexPath];
-        BOOL red = CGColorEqualToColor(cell.contentView.layer.backgroundColor, [UIColor redColor].CGColor);
+        CYLTagButton *button = [cell valueForKey:@"button"];
+        BOOL red = CGColorEqualToColor(button.layer.backgroundColor, [UIColor redColor].CGColor);
         XCTAssertEqual(red, indexPath.item == 0, @"%@", indexPath);
     }
 }
@@ -327,8 +329,8 @@
     XCTAssertEqualWithAccuracy(withImage - withoutImage, view.style.imageSize.width + view.style.imageTitleSpacing, 1,
                                @"The image accounts for the difference");
     UICollectionViewCell *cell = [collection cellForItemAtIndexPath:[self ip:0 :0]];
-    UIImageView *iconView = [cell valueForKey:@"iconView"];
-    XCTAssertEqual(iconView.image, icon);
+    CYLTagButton *button = [cell valueForKey:@"button"];
+    XCTAssertEqual(button.imageView.image, icon);
 
     UICollectionReusableView *header = [collection supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:[self ip:0 :0]];
     [header layoutIfNeeded];
@@ -343,7 +345,7 @@
     CYLTagListView *view = [self hostedViewWithSource:[self sourceWithItemCount:40 sections:1] width:320];
     CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
     style.itemHeight = 40;
-    style.cornerRadius = -1;
+    style.normalAppearance.cornerRadius = 0;  // automatic capsule
     view.style = style;
     [view layoutIfNeeded];
     UICollectionView *collection = [self collectionViewOf:view];
@@ -352,12 +354,13 @@
     XCTAssertEqualWithAccuracy(view.style.itemHeight, 40, 0.01, @"The view keeps its own copy");
 
     UITraitCollection *large = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge];
-    UIFont *largeFont = [view.style itemFontForTraitCollection:large];
-    XCTAssertGreaterThan(largeFont.pointSize, view.style.font.pointSize);
-    XCTAssertLessThanOrEqual(largeFont.pointSize, view.style.font.pointSize * CYLMaximumFontScale + 0.01);
+    UIFont *largeFont = [view.style titleFontForState:UIControlStateNormal traitCollection:large];
+    CGFloat base = view.style.normalAppearance.font.pointSize;
+    XCTAssertGreaterThan(largeFont.pointSize, base);
+    XCTAssertLessThanOrEqual(largeFont.pointSize, base * CYLMaximumFontScale + 0.01);
     CYLMenuStyle *fixed = [view.style copy];
     fixed.adjustsFontForContentSizeCategory = NO;
-    XCTAssertEqualWithAccuracy([fixed itemFontForTraitCollection:large].pointSize, fixed.font.pointSize, 0.01);
+    XCTAssertEqualWithAccuracy([fixed titleFontForState:UIControlStateNormal traitCollection:large].pointSize, base, 0.01);
 }
 
 - (void)testNarrowWidthsAndLongTitlesStayInside {
@@ -374,6 +377,165 @@
         [self assertNoOverlapsOrOverflowIn:view];
         XCTAssertEqualWithAccuracy(view.contentHeight, [view heightThatFitsWidth:width.doubleValue], 1);
     }
+}
+
+#pragma mark Tag button (CYLFlatDesignTabBarItem layout, CYLBadgeView box)
+
+- (CYLTagButton *)buttonWithTitle:(NSString *)title image:(UIImage *)image style:(CYLMenuStyle *)style {
+    CYLTagButton *button = [[CYLTagButton alloc] initWithFrame:CGRectMake(0, 0, 160, 30)];
+    button.style = style;
+    button.title = title;
+    button.image = image;
+    [button layoutIfNeeded];
+    return button;
+}
+
+- (void)testTagButtonPutsTheIconBeforeTheTitle {
+    CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+    style.imageTitleSpacing = 6;
+    CYLTagButton *button = [self buttonWithTitle:@"消息" image:[UIImage systemImageNamed:@"message"] style:style];
+    CGRect image = button.imageView.frame;
+    CGRect title = button.titleLabel.frame;
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(title) - CGRectGetMaxX(image), 6, 0.5, @"imageTitleSpacing");
+    XCTAssertEqualWithAccuracy(CGRectGetMidY(image), CGRectGetMidY(title), 1, @"Side by side, not stacked");
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(image), 160 - CGRectGetMaxX(title), 1, @"The group is centered");
+    XCTAssertTrue(CGSizeEqualToSize(image.size, style.imageSize));
+
+    CGFloat expected = 2 * style.normalAppearance.margin + style.imageSize.width + 6 +
+        ceil([@"消息" sizeWithAttributes:@{NSFontAttributeName: [style titleFontForState:UIControlStateNormal traitCollection:button.traitCollection]}].width);
+    XCTAssertEqualWithAccuracy([CYLTagButton widthForTitle:@"消息" image:[UIImage systemImageNamed:@"message"] style:style traitCollection:button.traitCollection], expected, 1);
+}
+
+- (void)testTagButtonLayoutCenteredForIconOnlyAndTitleOnly {
+    CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+    XCTAssertTrue(style.layoutCentered);
+    CYLTagButton *iconOnly = [self buttonWithTitle:nil image:[UIImage systemImageNamed:@"house"] style:style];
+    XCTAssertEqualWithAccuracy(CGRectGetMidX(iconOnly.imageView.frame), 80, 1);
+    XCTAssertTrue(CGRectIsEmpty(iconOnly.titleLabel.frame));
+    CYLTagButton *titleOnly = [self buttonWithTitle:@"首页" image:nil style:style];
+    XCTAssertEqualWithAccuracy(CGRectGetMidX(titleOnly.titleLabel.frame), 80, 1);
+    XCTAssertTrue(CGRectIsEmpty(titleOnly.imageView.frame));
+
+    style.layoutCentered = NO;
+    iconOnly = [self buttonWithTitle:nil image:[UIImage systemImageNamed:@"house"] style:style];
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(iconOnly.imageView.frame), style.normalAppearance.margin, 0.5);
+    titleOnly = [self buttonWithTitle:@"首页" image:nil style:style];
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(titleOnly.titleLabel.frame),
+                               style.normalAppearance.margin + style.imageSize.width + style.imageTitleSpacing, 0.5,
+                               @"The title keeps its place after an empty icon slot");
+    XCTAssertGreaterThan([CYLTagButton widthForTitle:@"首页" image:nil style:style traitCollection:nil],
+                         [CYLTagButton widthForTitle:@"首页" image:nil style:[CYLMenuStyle defaultStyle] traitCollection:nil]);
+}
+
+- (void)testTagButtonPositionAdjustmentsAndImageInsets {
+    CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+    CYLTagButton *plain = [self buttonWithTitle:@"同城" image:[UIImage systemImageNamed:@"mappin"] style:style];
+    style.titlePositionAdjustment = UIOffsetMake(3, -2);
+    style.imagePositionAdjustment = UIOffsetMake(-4, 1);
+    style.imageInsets = UIEdgeInsetsMake(2, 2, 2, 2);
+    CYLTagButton *moved = [self buttonWithTitle:@"同城" image:[UIImage systemImageNamed:@"mappin"] style:style];
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(moved.titleLabel.frame) - CGRectGetMinX(plain.titleLabel.frame), 3, 0.5);
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(moved.titleLabel.frame) - CGRectGetMinY(plain.titleLabel.frame), -2, 0.5);
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(moved.imageView.frame) - CGRectGetMinX(plain.imageView.frame), -4, 0.5);
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(moved.imageView.frame) - CGRectGetMinY(plain.imageView.frame), 1, 0.5);
+    XCTAssertEqualWithAccuracy(CGRectGetWidth(moved.imageView.frame), style.imageSize.width - 4, 0.01, @"imageInsets shrink the icon in place");
+}
+
+- (void)testTagButtonColorsFontsAndSelectedImagePerState {
+    CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+    UIFont *font = [UIFont boldSystemFontOfSize:17];
+    [style setTitleTextAttributes:@{NSFontAttributeName: font, NSForegroundColorAttributeName: [UIColor redColor]} forState:UIControlStateNormal];
+    [style setIconColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [style setIconColor:[UIColor yellowColor] forState:UIControlStateSelected];
+    XCTAssertEqualObjects([style titleTextAttributesForState:UIControlStateNormal][NSForegroundColorAttributeName], [UIColor redColor]);
+    XCTAssertEqualObjects(style.normalAppearance.font, font);
+    XCTAssertEqualObjects([style iconColorForState:UIControlStateDisabled], style.disabledAppearance.textColor, @"nil iconColor uses the text color");
+
+    UIImage *normal = [UIImage systemImageNamed:@"star"];
+    UIImage *selected = [UIImage systemImageNamed:@"star.fill"];
+    CYLTagButton *button = [self buttonWithTitle:@"我的" image:normal style:style];
+    button.selectedImage = selected;
+    XCTAssertEqualObjects(button.titleLabel.textColor, [UIColor redColor]);
+    XCTAssertEqualObjects(button.imageView.tintColor, [UIColor blueColor]);
+    XCTAssertEqual(button.imageView.image, normal);
+    button.selected = YES;
+    XCTAssertEqual(button.imageView.image, selected);
+    XCTAssertEqualObjects(button.imageView.tintColor, [UIColor yellowColor]);
+    XCTAssertEqualObjects(button.titleLabel.textColor, style.selectedAppearance.textColor);
+    button.enabled = NO;
+    XCTAssertEqualObjects(button.titleLabel.textColor, style.disabledAppearance.textColor, @"Disabled wins over selected");
+
+    [style setTitleTextAttributes:nil forState:UIControlStateNormal];
+    XCTAssertEqualObjects(style.normalAppearance.font, [UIFont systemFontOfSize:14], @"nil restores the default, as CYLBadgeAppearance");
+}
+
+- (void)testTagBoxFollowsCYLBadgeAppearance {
+    CYLTagAppearance *appearance = [[CYLTagAppearance alloc] init];
+    appearance.cornerRadius = -3;
+    appearance.borderWidth = NAN;
+    appearance.margin = -1;
+    XCTAssertEqual(appearance.cornerRadius, 0);
+    XCTAssertEqual(appearance.borderWidth, 0);
+    XCTAssertEqual(appearance.margin, 0);
+    appearance.backgroundColor = [UIColor redColor];
+    appearance.backgroundColor = nil;
+    XCTAssertEqualObjects(appearance.backgroundColor, [UIColor whiteColor], @"null_resettable");
+    [appearance reset];
+    XCTAssertEqual(appearance.margin, 10);
+
+    CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+    style.normalAppearance.cornerRadius = 0;
+    style.normalAppearance.borderColor = [UIColor greenColor];
+    style.normalAppearance.borderWidth = 2;
+    style.normalAppearance.backgroundColor = [UIColor cyanColor];
+    CYLTagButton *button = [self buttonWithTitle:@"首页" image:nil style:style];
+    XCTAssertEqualWithAccuracy(button.layer.cornerRadius, 15, 0.01, @"0 is an automatic capsule");
+    XCTAssertEqual(button.layer.borderWidth, 2);
+    XCTAssertTrue(CGColorEqualToColor(button.layer.borderColor, [UIColor greenColor].CGColor));
+    XCTAssertTrue(CGColorEqualToColor(button.layer.backgroundColor, [UIColor cyanColor].CGColor));
+    style.normalAppearance.cornerRadius = 5;
+    button.style = style;
+    [button layoutIfNeeded];
+    XCTAssertEqualWithAccuracy(button.layer.cornerRadius, 5, 0.01);
+    XCTAssertEqual([style copy].normalAppearance.cornerRadius, 5);
+    XCTAssertNotEqual([style copy].normalAppearance, style.normalAppearance, @"A copy has its own appearances");
+}
+
+- (void)testStyleDemoRowsRestyleTheTagsLive {
+    CYLTagStyleDemoViewController *demo = [[CYLTagStyleDemoViewController alloc] init];
+    [self hostController:demo];
+    [demo.view layoutIfNeeded];
+    NSArray<NSArray<NSString *> *> *actions = [demo actionIdentifiers];
+    XCTAssertEqual([demo.tableView numberOfSections], (NSInteger)actions.count);
+    XCTAssertEqual([demo.tableView numberOfRowsInSection:0], (NSInteger)actions[0].count);
+    UICollectionView *collection = [self collectionViewOf:demo.tagListView];
+    [collection layoutIfNeeded];
+    CYLTagButton *first = [[collection cellForItemAtIndexPath:[self ip:1 :0]] valueForKey:@"button"];
+    XCTAssertNotNil(first.imageView.image);
+    XCTAssertGreaterThan(first.title.length, 0u);
+
+    // A tap on the cornerRadius row: 0 makes capsules.
+    NSIndexPath *cornerRow = [NSIndexPath indexPathForRow:(NSInteger)[actions[1] indexOfObject:@"cornerRadius"] inSection:1];
+    [demo.tableView.delegate tableView:demo.tableView didSelectRowAtIndexPath:cornerRow];
+    [collection layoutIfNeeded];
+    first = [[collection cellForItemAtIndexPath:[self ip:1 :0]] valueForKey:@"button"];
+    XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 0);
+    XCTAssertEqualWithAccuracy(first.layer.cornerRadius, CGRectGetHeight(first.bounds) / 2, 0.5);
+
+    [demo performAction:@"iconColor.normal"];
+    [collection layoutIfNeeded];
+    first = [[collection cellForItemAtIndexPath:[self ip:1 :0]] valueForKey:@"button"];
+    XCTAssertEqualObjects(first.imageView.tintColor, [demo.style iconColorForState:UIControlStateNormal]);
+
+    [demo performAction:@"content.iconOnly"];
+    [collection layoutIfNeeded];
+    first = [[collection cellForItemAtIndexPath:[self ip:1 :0]] valueForKey:@"button"];
+    XCTAssertEqual(first.title.length, 0u);
+    XCTAssertEqualWithAccuracy(CGRectGetMidX(first.imageView.frame), CGRectGetWidth(first.bounds) / 2, 1, @"layoutCentered");
+
+    [demo performAction:@"reset"];
+    XCTAssertEqual(demo.content, CYLTagStyleDemoContentIconAndTitle);
+    XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 3);
 }
 
 #pragma mark Accessibility
@@ -428,8 +590,8 @@
     UITraitCollection *bold = [UITraitCollection traitCollectionWithTraitsFromCollections:@[
         [UITraitCollection traitCollectionWithLegibilityWeight:UILegibilityWeightBold],
         [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge]]];
-    UIFont *regularFont = [style itemFontForTraitCollection:regular];
-    UIFont *boldFont = [style itemFontForTraitCollection:bold];
+    UIFont *regularFont = [style titleFontForState:UIControlStateNormal traitCollection:regular];
+    UIFont *boldFont = [style titleFontForState:UIControlStateNormal traitCollection:bold];
     XCTAssertFalse(regularFont.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold);
     XCTAssertTrue(boldFont.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold);
     NSString *title = @"Accessibility 无障碍";
@@ -742,7 +904,7 @@
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     [tabs.view layoutIfNeeded];
-    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"Reviews", @"Search"]));
+    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"Reviews", @"Search", @"Styles"]));
 
     CYLSearchCategoryViewController *search = [[CYLSearchCategoryViewController alloc] init];
     [self hostController:search];
@@ -768,8 +930,8 @@
     self.window.rootViewController = tabs;
     [self.window makeKeyAndVisible];
     [tabs.view layoutIfNeeded];
-    XCTAssertEqual(tabs.viewControllers.count, 2u);
-    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"场景一：评价筛选", @"场景二：搜索分类"]));
+    XCTAssertEqual(tabs.viewControllers.count, 3u);
+    XCTAssertEqualObjects([tabs.tabBar.items valueForKey:@"title"], (@[@"场景一：评价筛选", @"场景二：搜索分类", @"样式"]));
     UINavigationController *first = (UINavigationController *)tabs.viewControllers[0];
     UINavigationController *second = (UINavigationController *)tabs.viewControllers[1];
     XCTAssertTrue([first.viewControllers.firstObject isKindOfClass:[CYLProductViewController class]]);

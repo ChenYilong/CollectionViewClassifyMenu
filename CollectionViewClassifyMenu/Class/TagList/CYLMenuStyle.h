@@ -4,8 +4,16 @@
 //
 //  Appearance of CYLTagListView. Copy a preset and change what you need.
 //
+//  Each tag is drawn like a CYLFlatDesignTabBarItem of CYLTabBarController, laid
+//  out horizontally (icon, then title) instead of vertically: per-state title
+//  text attributes and icon colors, image/title position adjustments, image
+//  insets and layoutCentered for icon-only or title-only tags. Its box (background,
+//  border, corner radius, margin) is configured like a CYLBadgeView, through one
+//  CYLTagAppearance per state.
+//
 
 #import <UIKit/UIKit.h>
+#import "CYLTagAppearance.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,26 +22,50 @@ NS_ASSUME_NONNULL_BEGIN
 /// Gray bordered tags, green selection. Used when no style is set.
 + (instancetype)defaultStyle;
 
-#pragma mark Items
-/// Base font; scaled for Dynamic Type when adjustsFontForContentSizeCategory is YES.
-@property (nonatomic, strong) UIFont *font;
-@property (nonatomic, assign) BOOL adjustsFontForContentSizeCategory;
-@property (nonatomic, strong) UIColor *textColor;
-@property (nonatomic, strong) UIColor *selectedTextColor;
-@property (nonatomic, strong) UIColor *disabledTextColor;
-@property (nonatomic, strong) UIColor *itemBackgroundColor;
-@property (nonatomic, strong) UIColor *selectedItemBackgroundColor;
-@property (nonatomic, strong) UIColor *borderColor;
-@property (nonatomic, strong) UIColor *selectedBorderColor;
-@property (nonatomic, assign) CGFloat borderWidth;
-/// Negative values make fully rounded (capsule) tags.
-@property (nonatomic, assign) CGFloat cornerRadius;
-/// Minimum item height; grows with the font for large text sizes.
-@property (nonatomic, assign) CGFloat itemHeight;
-/// Horizontal space between an item's border and its content.
-@property (nonatomic, assign) CGFloat itemHorizontalPadding;
-@property (nonatomic, assign) CGSize imageSize;
+#pragma mark Tag box and text, per state (CYLBadgeAppearance)
+
+/// Normal tags. The appearance objects belong to the style: change their properties.
+@property (nonatomic, strong, readonly) CYLTagAppearance *normalAppearance;
+@property (nonatomic, strong, readonly) CYLTagAppearance *selectedAppearance;
+@property (nonatomic, strong, readonly) CYLTagAppearance *disabledAppearance;
+
+/// The appearance for UIControlStateNormal, UIControlStateSelected or
+/// UIControlStateDisabled (disabled wins over selected); others give normal.
+- (CYLTagAppearance *)appearanceForState:(UIControlState)state;
+
+#pragma mark Title and icon (CYLFlatDesignTabBarItem)
+
+/// Like `-[UITabBarItem setTitleTextAttributes:forState:]`: NSFontAttributeName and
+/// NSForegroundColorAttributeName update the state's appearance font and textColor.
+- (void)setTitleTextAttributes:(nullable NSDictionary<NSAttributedStringKey, id> *)attributes forState:(UIControlState)state;
+/// The state's font and text color as text attributes.
+- (NSDictionary<NSAttributedStringKey, id> *)titleTextAttributesForState:(UIControlState)state;
+
+/// Tint of template icons in a state (like `UITabBarItemStateAppearance.iconColor`);
+/// nil uses the state's textColor.
+- (void)setIconColor:(nullable UIColor *)iconColor forState:(UIControlState)state;
+/// The effective icon tint for a state.
+- (UIColor *)iconColorForState:(UIControlState)state;
+
+/// Space between the icon and the title, 4 by default.
 @property (nonatomic, assign) CGFloat imageTitleSpacing;
+/// Icon size. CGSizeZero uses the image's own size. 14 x 14 by default.
+@property (nonatomic, assign) CGSize imageSize;
+/// Shrinks the icon from its slot without moving it, as `CYLFlatDesignTabBarItem.imageInsets`.
+@property (nonatomic, assign) UIEdgeInsets imageInsets;
+/// Moves the title from its computed position.
+@property (nonatomic, assign) UIOffset titlePositionAdjustment;
+/// Moves the icon from its computed position.
+@property (nonatomic, assign) UIOffset imagePositionAdjustment;
+/// For a tag with only an icon or only a title: YES (the default) centers it;
+/// NO keeps it where it would be with both, the title after an empty icon slot,
+/// the icon at the leading margin (as CYLFlatDesignTabBarItem.layoutCentered = NO).
+@property (nonatomic, assign) BOOL layoutCentered;
+
+/// Scale the appearance fonts for Dynamic Type (capped at 2x). Defaults to YES.
+@property (nonatomic, assign) BOOL adjustsFontForContentSizeCategory;
+/// Minimum tag height; grows with the font for large text sizes. 30 by default.
+@property (nonatomic, assign) CGFloat itemHeight;
 
 #pragma mark Layout
 @property (nonatomic, assign) CGFloat interitemSpacing;
@@ -57,9 +89,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Defaults to the localized "Less" from CYLClassifyMenuResources.bundle.
 @property (nonatomic, copy) NSString *collapseTitle;
 
-/// Item font for the given traits: bold for the Bold Text setting, and scaled
-/// for Dynamic Type when adjustsFontForContentSizeCategory is YES.
-- (UIFont *)itemFontForTraitCollection:(nullable UITraitCollection *)traitCollection;
+/// The title font of a state for the given traits: bold for the Bold Text setting,
+/// scaled for Dynamic Type when adjustsFontForContentSizeCategory is YES.
+- (UIFont *)titleFontForState:(UIControlState)state traitCollection:(nullable UITraitCollection *)traitCollection;
 /// Header font for the given traits, applying Dynamic Type when enabled.
 - (UIFont *)headerFontForTraitCollection:(nullable UITraitCollection *)traitCollection;
 

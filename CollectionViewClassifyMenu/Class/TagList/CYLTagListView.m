@@ -6,6 +6,7 @@
 #import "CYLTagListView.h"
 #import "CYLCollectionViewLeftAlignedLayout.h"
 #import "CYLParameterConfiguration.h"
+#import "CYLTagButton.h"
 
 static NSString * const kCYLTagListCellIdentifier = @"CYLTagListCell";
 static NSString * const kCYLTagListHeaderIdentifier = @"CYLTagListHeader";
@@ -15,12 +16,11 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
 #pragma mark - Cell
 
+/// Hosts one CYLTagButton; the cell is the accessibility element and handles taps.
 @interface CYLTagListCell : UICollectionViewCell
-@property (nonatomic, strong, readonly) UILabel *titleLabel;
-@property (nonatomic, strong, readonly) UIImageView *iconView;
-@property (nonatomic, assign) CGSize iconSize;
-@property (nonatomic, assign) CGFloat iconSpacing;
-@property (nonatomic, assign) CGFloat horizontalPadding;
+@property (nonatomic, strong, readonly) CYLTagButton *button;
+/// The list's style object last applied, so that a style is copied into the button only when it changes.
+@property (nonatomic, weak) CYLMenuStyle *appliedStyle;
 @end
 
 @implementation CYLTagListCell
@@ -28,73 +28,37 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _iconView = [[UIImageView alloc] init];
-        _iconView.contentMode = UIViewContentModeScaleAspectFit;
-        _titleLabel = [[UILabel alloc] init];
-        _titleLabel.textAlignment = NSTextAlignmentCenter;
-        _titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-        [self.contentView addSubview:_iconView];
-        [self.contentView addSubview:_titleLabel];
-        self.contentView.layer.masksToBounds = YES;
+        _button = [[CYLTagButton alloc] initWithFrame:self.contentView.bounds];
+        _button.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        // The collection view handles taps.
+        _button.userInteractionEnabled = NO;
+        [self.contentView addSubview:_button];
         self.isAccessibilityElement = YES;
         self.accessibilityTraits = UIAccessibilityTraitButton;
     }
     return self;
 }
 
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    CGRect bounds = self.contentView.bounds;
-    BOOL hasIcon = self.iconView.image != nil;
-    CGFloat iconWidth = hasIcon ? self.iconSize.width + self.iconSpacing : 0;
-    CGFloat available = MAX(0, CGRectGetWidth(bounds) - 2 * self.horizontalPadding - iconWidth);
-    CGFloat titleWidth = MIN(available, ceil([self.titleLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(bounds))].width));
-    CGFloat x = floor((CGRectGetWidth(bounds) - iconWidth - titleWidth) / 2);
-    if (hasIcon) {
-        self.iconView.frame = CGRectMake(x, floor((CGRectGetHeight(bounds) - self.iconSize.height) / 2),
-                                         self.iconSize.width, self.iconSize.height);
-        x += iconWidth;
-    } else {
-        self.iconView.frame = CGRectZero;
-    }
-    self.titleLabel.frame = CGRectMake(x, 0, titleWidth, CGRectGetHeight(bounds));
-    CGFloat radius = self.contentView.layer.cornerRadius;
-    if (radius > CGRectGetHeight(bounds) / 2) {
-        self.contentView.layer.cornerRadius = CGRectGetHeight(bounds) / 2;
-    }
-}
-
 - (void)configureWithTitle:(NSString *)title
                      image:(UIImage *)image
-                      font:(UIFont *)font
+             selectedImage:(UIImage *)selectedImage
                      style:(CYLMenuStyle *)style
                   selected:(BOOL)selected
                    enabled:(BOOL)enabled {
-    self.titleLabel.text = title;
-    self.titleLabel.font = font;
-    self.titleLabel.textColor = !enabled ? style.disabledTextColor
-                              : (selected ? style.selectedTextColor : style.textColor);
-    self.iconView.image = image;
-    self.iconView.alpha = enabled ? 1 : 0.4;
-    self.iconSize = style.imageSize;
-    self.iconSpacing = style.imageTitleSpacing;
-    self.horizontalPadding = style.itemHorizontalPadding;
-    CALayer *layer = self.contentView.layer;
-    layer.backgroundColor = (selected ? style.selectedItemBackgroundColor : style.itemBackgroundColor).CGColor;
-    layer.borderColor = (selected ? style.selectedBorderColor : style.borderColor).CGColor;
-    layer.borderWidth = style.borderWidth;
-    if (UIAccessibilityDarkerSystemColorsEnabled()) {
-        // Increase Contrast: a visible outline in the text color.
-        layer.borderColor = (selected ? style.selectedBorderColor : (enabled ? style.textColor : style.disabledTextColor)).CGColor;
-        layer.borderWidth = MAX(1, style.borderWidth);
+    if (self.appliedStyle != style) {
+        self.button.style = style;
+        self.appliedStyle = style;
     }
-    layer.cornerRadius = style.cornerRadius < 0 ? CGFLOAT_MAX : style.cornerRadius;
+    self.button.title = title;
+    self.button.image = image;
+    self.button.selectedImage = selectedImage;
+    self.button.enabled = enabled;
+    self.button.selected = selected;
     self.accessibilityLabel = title;
     UIAccessibilityTraits traits = UIAccessibilityTraitButton;
     if (selected) traits |= UIAccessibilityTraitSelected;
     if (!enabled) traits |= UIAccessibilityTraitNotEnabled;
     self.accessibilityTraits = traits;
-    [self setNeedsLayout];
 }
 
 @end
@@ -428,14 +392,16 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         ? [source menuImageForItemAtIndexPath:indexPath] : nil;
 }
 
-#pragma mark Measurement
-
-- (UIFont *)cyl_itemFont {
-    return [self.style itemFontForTraitCollection:self.traitCollection];
+- (UIImage *)cyl_selectedImageAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    return [source respondsToSelector:@selector(menuSelectedImageForItemAtIndexPath:)]
+        ? [source menuSelectedImageForItemAtIndexPath:indexPath] : nil;
 }
 
+#pragma mark Measurement
+
 - (CGFloat)cyl_itemHeight {
-    return CYLTagHeightForFont([self cyl_itemFont], self.style.itemHeight);
+    return [CYLTagButton heightForStyle:self.style traitCollection:self.traitCollection];
 }
 
 - (CGFloat)cyl_headerHeight {
@@ -451,17 +417,14 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 }
 
 - (NSArray<NSArray<NSNumber *> *> *)cyl_widthsForContentWidth:(CGFloat)contentWidth {
-    UIFont *font = [self cyl_itemFont];
-    NSDictionary *attributes = @{NSFontAttributeName: font};
     CYLMenuStyle *style = self.style;
+    UITraitCollection *traits = self.traitCollection;
     NSMutableArray *widths = [NSMutableArray arrayWithCapacity:self.titles.count];
     [self.titles enumerateObjectsUsingBlock:^(NSArray<NSString *> *items, NSUInteger section, BOOL *stop) {
         NSMutableArray *sectionWidths = [NSMutableArray arrayWithCapacity:items.count];
         [items enumerateObjectsUsingBlock:^(NSString *title, NSUInteger item, BOOL *itemStop) {
-            CGFloat width = ceil([title sizeWithAttributes:attributes].width) + 2 * style.itemHorizontalPadding;
-            if ([self cyl_imageAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]]) {
-                width += style.imageSize.width + style.imageTitleSpacing;
-            }
+            UIImage *image = [self cyl_imageAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]];
+            CGFloat width = [CYLTagButton widthForTitle:title image:image style:style traitCollection:traits];
             [sectionWidths addObject:@(MIN(width, contentWidth))];
         }];
         [widths addObject:sectionWidths];
@@ -831,7 +794,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     }
     [cell configureWithTitle:self.titles[indexPath.section][indexPath.item]
                        image:[self cyl_imageAtIndexPath:indexPath]
-                        font:[self cyl_itemFont]
+               selectedImage:[self cyl_selectedImageAtIndexPath:indexPath]
                        style:self.style
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];

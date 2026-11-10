@@ -17,6 +17,7 @@
 		484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 701EC4432AFC0EB51D50B77D /* CYLReviewStore.m */; };
 		0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */; };
 		73A3277A5C672326E77E4A50 /* CYLSearchHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E23DA0EB4A75F0D0109EC27 /* CYLSearchHomeViewController.m */; };
+		F00293E01049837C88AD1BD4 /* CYLTagStyleDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 826D801463BB6967615FEFB8 /* CYLTagStyleDemoViewController.m */; };
 		6345674F0F0AAACA8D0859D2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 714D4F5C3B6CCF802F032827 /* main.m */; };
 		5F0C081A2A1F3962E352DBFD /* CYLMenuExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */; };
 		0490FE175868491DBA5FE998 /* libPods-CYLMenuExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* libPods-CYLMenuExample.a */; };
@@ -53,6 +54,8 @@
 		9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSearchCategoryViewController.m; sourceTree = "<group>"; };
 		415F93E8CDE5FE1F1A4EEBB4 /* CYLSearchHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSearchHomeViewController.h; sourceTree = "<group>"; };
 		0E23DA0EB4A75F0D0109EC27 /* CYLSearchHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSearchHomeViewController.m; sourceTree = "<group>"; };
+		E6A6E1EFAF90CE546689D69A /* CYLTagStyleDemoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagStyleDemoViewController.h; sourceTree = "<group>"; };
+		826D801463BB6967615FEFB8 /* CYLTagStyleDemoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagStyleDemoViewController.m; sourceTree = "<group>"; };
 		261CB08FA58627B5FB7DB381 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		714D4F5C3B6CCF802F032827 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMenuExampleTests.m; sourceTree = "<group>"; };
@@ -120,6 +123,8 @@
 				9CFA200F38BBFC0E0FA933B0 /* CYLSearchCategoryViewController.m */,
 				415F93E8CDE5FE1F1A4EEBB4 /* CYLSearchHomeViewController.h */,
 				0E23DA0EB4A75F0D0109EC27 /* CYLSearchHomeViewController.m */,
+				E6A6E1EFAF90CE546689D69A /* CYLTagStyleDemoViewController.h */,
+				826D801463BB6967615FEFB8 /* CYLTagStyleDemoViewController.m */,
 				261CB08FA58627B5FB7DB381 /* Info.plist */,
 				714D4F5C3B6CCF802F032827 /* main.m */,
 			);
@@ -336,6 +341,7 @@
 				484F61566DB5BE4CE1AA73AA /* CYLReviewStore.m in Sources */,
 				0A0BE2839D1504A2B84B5E1B /* CYLSearchCategoryViewController.m in Sources */,
 				73A3277A5C672326E77E4A50 /* CYLSearchHomeViewController.m in Sources */,
+				F00293E01049837C88AD1BD4 /* CYLTagStyleDemoViewController.m in Sources */,
 				6345674F0F0AAACA8D0859D2 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
