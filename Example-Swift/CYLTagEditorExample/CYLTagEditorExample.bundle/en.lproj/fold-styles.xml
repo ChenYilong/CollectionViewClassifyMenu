@@ -2,6 +2,7 @@
 <!-- CYLTagListView configuration (XML: elements are keys; <item> children make a list). -->
 <CYLTagListView>
     <title>XML file: centered title, “More” text at the bottom</title>
+    <titleImage>system:text.aligncenter</titleImage>
     <titlePosition>topCenter</titlePosition>
     <selectionMode>multiple</selectionMode>
     <showsSectionHeaders>false</showsSectionHeaders>

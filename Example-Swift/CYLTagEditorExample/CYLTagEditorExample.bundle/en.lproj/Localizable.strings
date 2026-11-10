@@ -27,3 +27,8 @@
 "右上角：仅箭头" = "Top trailing: chevron only";
 "左上角：文字 + 箭头" = "Top leading: text and chevron";
 "标题居中，右上角仅文字" = "Centered title, text at the top trailing edge";
+"标题：图标 + 文字（左上角）" = "Title: icon and text (top leading)";
+"标题：仅文字（居中）" = "Title: text only (centered)";
+"标题：图标 + 文字（居中、绿色）" = "Title: icon and text (centered, green)";
+"标题：文字 + 图标（图标在后）" = "Title: text, then icon";
+"标题：仅图标" = "Title: icon only";

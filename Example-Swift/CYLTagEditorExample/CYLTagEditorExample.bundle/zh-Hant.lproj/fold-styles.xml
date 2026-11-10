@@ -2,6 +2,7 @@
 <!-- CYLTagListView configuration (XML: elements are keys; <item> children make a list). -->
 <CYLTagListView>
     <title>設定檔 XML：標題置中，底部僅文字</title>
+    <titleImage>system:text.aligncenter</titleImage>
     <titlePosition>topCenter</titlePosition>
     <selectionMode>multiple</selectionMode>
     <showsSectionHeaders>false</showsSectionHeaders>

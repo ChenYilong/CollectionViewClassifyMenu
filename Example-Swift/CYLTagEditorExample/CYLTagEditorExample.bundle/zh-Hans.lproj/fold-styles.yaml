@@ -1,5 +1,6 @@
 # CYLTagListView configuration (YAML, read by CYLTabBarController's CYLTabBarConfigurationParser).
 title: "配置文件 YAML：左上角箭头"
+titleImage: "system:heart"
 selectionMode: "multiple"
 defaultVisibleRows: 1
 scrollEnabled: false

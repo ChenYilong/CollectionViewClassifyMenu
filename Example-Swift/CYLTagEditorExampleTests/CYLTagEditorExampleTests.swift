@@ -194,6 +194,8 @@ final class CYLTagEditorExampleTests: XCTestCase {
         host(navigation)
         XCTAssertNil(remark.title, "navigationItem only")
         XCTAssertEqual(remark.menuTitleForItem(at: IndexPath(item: 0, section: 0)), "添加标签")
+        XCTAssertEqual(remark.tagsView.title, "标签", "\"标签 ›\" is the list's encapsulated title")
+        XCTAssertEqual(remark.tagsView.titleStyle.imagePlacement, .trailing)
         let editor = remark.editTags(animated: false)
         XCTAssertTrue(remark.presentedViewController === editor)
         XCTAssertEqual(editor.store.recentTags, ["同事", "客户", "读书会"], "From tags.json")
@@ -260,19 +262,62 @@ final class CYLTagEditorExampleTests: XCTestCase {
         XCTAssertEqual(Set(made.map { $0.foldControl.content }), [.icon, .iconAndTitle, .title])
         XCTAssertEqual(made.first?.foldStyle, .footerChevron, "foldControl sets foldStyle")
         XCTAssertEqual(made.first?.title, "底部箭头（淘宝评价筛选）")
-        XCTAssertEqual(made.last?.titlePosition, .topCenter)
-        XCTAssertEqual(made.last?.titleLabel.textAlignment, .center)
+        XCTAssertTrue(made.allSatisfy { $0.title != nil || $0.titleImage != nil }, "Every demo sets the encapsulated title")
         // From the files: JSON, plist, YAML and XML.
         let files = Array(styles.tagListViews.suffix(4))
         XCTAssertEqual(files.map { $0.foldControl.position }, [.bottom, .topTrailing, .topLeading, .bottom])
         XCTAssertEqual(files.map { $0.foldControl.content }, [.iconAndTitle, .title, .icon, .title])
         XCTAssertEqual(files[3].titlePosition, .topCenter)
+        XCTAssertTrue(files.allSatisfy { $0.titleImage != nil }, "titleImage from every file")
+        XCTAssertEqual(files[0].titleLabel.textColor, UIColor(red: 7 / 255, green: 193 / 255, blue: 96 / 255, alpha: 1), "titleStyle from the JSON file")
         XCTAssertTrue(files.allSatisfy { ($0.title ?? "").count > 0 })
         XCTAssertTrue(files.allSatisfy { $0.selectionMode == .multiple && !$0.isScrollEnabled })
         for list in styles.tagListViews {
             XCTAssertGreaterThan(list.contentHeight, 0, list.title ?? "")
             XCTAssertGreaterThan(list.frame.minY, -1)
         }
+    }
+
+    func testTitleIsATagViewWithIconAndTitleStyles() throws {
+        let styles = CYLFoldStylesViewController(data: try CYLTagData.bundled())
+        host(styles)
+        styles.view.layoutIfNeeded()
+        let demos = styles.demos()
+        func list(_ title: String?) -> CYLTagListView {
+            styles.tagListViews[demos.firstIndex { $0.title == title }!]
+        }
+        // The core's default title look: the bold headline font, as before.
+        let leading = list("标题：图标 + 文字（左上角）")
+        XCTAssertTrue(leading.titleView is CYLTagButton, "The title reuses the tag view")
+        XCTAssertEqual(leading.titleView.title, "标题：图标 + 文字（左上角）")
+        XCTAssertNotNil(leading.titleView.image)
+        XCTAssertEqual(leading.titleLabel.font, UIFont.preferredFont(forTextStyle: .headline))
+        XCTAssertTrue(leading.titleView.accessibilityTraits.contains(.header))
+        XCTAssertEqual(leading.titleView.frame.minX, leading.style.sectionInsets.left, accuracy: 0.5, "Top leading")
+        XCTAssertLessThan(leading.titleView.imageView.frame.maxX, leading.titleLabel.frame.minX, "Icon, then title, side by side")
+        XCTAssertEqual(leading.titleView.imageView.frame.midY, leading.titleLabel.frame.midY, accuracy: 1)
+        // Icon only, title only.
+        let iconOnly = list(nil)
+        XCTAssertNil(iconOnly.title)
+        XCTAssertNotNil(iconOnly.titleImage)
+        XCTAssertGreaterThan(iconOnly.titleView.frame.height, 0, "An icon alone is a title")
+        let centered = list("标题：仅文字（居中）")
+        XCTAssertNil(centered.titleImage)
+        XCTAssertEqual(centered.titleView.frame.midX, centered.bounds.midX, accuracy: 1, "Centered")
+        // Colors through titleStyle; the icon after the title.
+        let green = list("标题：图标 + 文字（居中、绿色）")
+        XCTAssertEqual(green.titleLabel.textColor, CYLTagEditorViewController.green)
+        XCTAssertEqual(green.titleView.frame.midX, green.bounds.midX, accuracy: 1)
+        let trailing = list("标题：文字 + 图标（图标在后）")
+        XCTAssertEqual(trailing.titleStyle.imagePlacement, .trailing)
+        XCTAssertGreaterThan(trailing.titleView.imageView.frame.minX, trailing.titleLabel.frame.maxX)
+        // No title and no icon: no title area.
+        let plain = CYLTagListView(foldControl: nil)
+        plain.frame = CGRect(x: 0, y: 0, width: 320, height: 200)
+        plain.layoutIfNeeded()
+        XCTAssertTrue(plain.titleView.isHidden)
+        plain.title = "评价"
+        XCTAssertFalse(plain.titleView.isHidden)
     }
 
     func testFoldControlTurnsItsChevronAndKeepsOnlyTheIconWhenExpanded() throws {

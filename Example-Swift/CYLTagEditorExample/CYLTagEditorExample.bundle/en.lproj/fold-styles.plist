@@ -85,6 +85,8 @@
 	</dict>
 	<key>title</key>
 	<string>plist file: “More” at the top trailing edge</string>
+	<key>titleImage</key>
+	<string>system:square.grid.2x2</string>
 	<key>titlePosition</key>
 	<string>topLeading</string>
 </dict>

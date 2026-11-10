@@ -173,7 +173,7 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 /// going from 0 to the content height) lays the tags out again.
 @property (nonatomic, assign) CGSize laidOutSize;
 @property (nonatomic, assign, readwrite) CGFloat contentHeight;
-@property (nonatomic, strong, readwrite) UILabel *titleLabel;
+@property (nonatomic, strong, readwrite) CYLTagButton *titleView;
 /// The outlined look of "+ 新建标签" items and the style it was made from.
 @property (nonatomic, strong) CYLMenuStyle *createItemStyle;
 @property (nonatomic, weak) CYLMenuStyle *createItemBaseStyle;
@@ -186,6 +186,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 @implementation CYLTagListView
 
 @synthesize style = _style;
+@synthesize titleStyle = _titleStyle;
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -196,10 +197,16 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 }
 
 - (instancetype)initWithFoldControl:(CYLMenuFoldControl *)foldControl title:(NSString *)title titlePosition:(CYLMenuTitlePosition)titlePosition {
+    return [self initWithFoldControl:foldControl title:title titleImage:nil titlePosition:titlePosition];
+}
+
+- (instancetype)initWithFoldControl:(CYLMenuFoldControl *)foldControl title:(NSString *)title titleImage:(UIImage *)titleImage
+                      titlePosition:(CYLMenuTitlePosition)titlePosition {
     self = [self initWithFrame:CGRectZero];
     if (self) {
         self.foldControl = foldControl;
         self.titlePosition = titlePosition;
+        self.titleImage = titleImage;
         self.title = title;
     }
     return self;
@@ -252,14 +259,15 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:kCYLTagListFooterIdentifier];
     [self addSubview:_collectionView];
-    _titleLabel = [[UILabel alloc] init];
-    _titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-    _titleLabel.adjustsFontForContentSizeCategory = YES;
-    _titleLabel.textColor = [UIColor labelColor];
-    _titleLabel.numberOfLines = 0;
-    _titleLabel.accessibilityTraits = UIAccessibilityTraitHeader;
-    _titleLabel.hidden = YES;
-    [self addSubview:_titleLabel];
+    // The list's title: a tag view (icon and/or title, horizontal), not tappable.
+    _titleStyle = [[self class] defaultTitleStyle];
+    _titleView = [[CYLTagButton alloc] initWithFrame:CGRectZero];
+    _titleView.style = _titleStyle;
+    _titleView.userInteractionEnabled = NO;
+    _titleView.isAccessibilityElement = YES;
+    _titleView.accessibilityTraits = UIAccessibilityTraitHeader;
+    _titleView.hidden = YES;
+    [self addSubview:_titleView];
     [self cyl_applyStyleColors];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(cyl_refreshVisibleCells)
@@ -313,29 +321,87 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     [self cyl_reloadLayout];
 }
 
-- (void)setTitle:(NSString *)title {
-    _title = [title copy];
-    self.titleLabel.text = title;
-    self.titleLabel.hidden = title.length == 0;
++ (CYLMenuStyle *)defaultTitleStyle {
+    CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+    UIFont *font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    for (NSNumber *state in @[@(UIControlStateNormal), @(UIControlStateSelected), @(UIControlStateDisabled)]) {
+        CYLTagAppearance *appearance = [style appearanceForState:state.unsignedIntegerValue];
+        appearance.backgroundColor = [UIColor clearColor];
+        appearance.borderWidth = 0;
+        appearance.borderColor = nil;
+        appearance.margin = 0;
+        appearance.font = font;
+        appearance.textColor = [UIColor labelColor];
+        [style setIconColor:[UIColor labelColor] forState:state.unsignedIntegerValue];
+    }
+    style.imageSize = CGSizeMake(18, 18);
+    style.imageTitleSpacing = 6;
+    style.layoutCentered = YES;
+    style.adjustsFontForContentSizeCategory = YES;
+    style.itemHeight = 24;
+    return style;
+}
+
+- (BOOL)cyl_hasTitle {
+    return self.title.length > 0 || self.titleImage != nil;
+}
+
+- (UILabel *)titleLabel {
+    return self.titleView.titleLabel;
+}
+
+- (void)cyl_titleDidChange {
+    self.titleView.hidden = ![self cyl_hasTitle];
+    self.titleView.accessibilityLabel = self.title.length > 0 ? self.title : self.titleImage.accessibilityLabel;
     [self setNeedsLayout];
     [self cyl_updateContentHeight];
 }
 
+- (void)setTitle:(NSString *)title {
+    _title = [title copy];
+    self.titleView.title = title;
+    [self cyl_titleDidChange];
+}
+
+- (void)setTitleImage:(UIImage *)titleImage {
+    _titleImage = titleImage;
+    self.titleView.image = titleImage;
+    [self cyl_titleDidChange];
+}
+
+- (CYLMenuStyle *)titleStyle {
+    return _titleStyle;
+}
+
+- (void)setTitleStyle:(CYLMenuStyle *)titleStyle {
+    _titleStyle = [(titleStyle ?: [[self class] defaultTitleStyle]) copy];
+    self.titleView.style = _titleStyle;
+    [self cyl_titleDidChange];
+}
+
 - (void)setTitlePosition:(CYLMenuTitlePosition)titlePosition {
     _titlePosition = titlePosition;
-    self.titleLabel.textAlignment = titlePosition == CYLMenuTitlePositionTopCenter ? NSTextAlignmentCenter : NSTextAlignmentNatural;
     [self setNeedsLayout];
 }
 
-/// The height of the title area at `width`, 0 without a title.
+/// The height of the title area, 0 without a title or an icon.
 - (CGFloat)cyl_titleHeightForWidth:(CGFloat)width {
-    if (self.title.length == 0) {
+    if (![self cyl_hasTitle]) {
         return 0;
     }
+    return ceil([CYLTagButton heightForStyle:self.titleStyle traitCollection:self.traitCollection]) + 2 * kCYLTagListTitleVerticalInset;
+}
+
+/// The title view's frame: as wide as its content (no wider than the list), at the leading edge or centered.
+- (CGRect)cyl_titleFrameForWidth:(CGFloat)width height:(CGFloat)titleHeight {
     CGFloat inset = self.style.sectionInsets.left;
-    CGFloat available = MAX(1, (width > 0 ? width : CGRectGetWidth(UIScreen.mainScreen.bounds)) - 2 * inset);
-    CGSize size = [self.titleLabel sizeThatFits:CGSizeMake(available, CGFLOAT_MAX)];
-    return ceil(size.height) + 2 * kCYLTagListTitleVerticalInset;
+    CGFloat available = MAX(0, width - 2 * inset);
+    CGFloat contentWidth = MIN(available, ceil([CYLTagButton widthForTitle:self.title image:self.titleImage
+                                                                     style:self.titleStyle traitCollection:self.traitCollection]));
+    BOOL rightToLeft = self.effectiveUserInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+    CGFloat x = self.titlePosition == CYLMenuTitlePositionTopCenter ? floor((width - contentWidth) / 2)
+                                                                    : (rightToLeft ? width - inset - contentWidth : inset);
+    return CGRectMake(x, kCYLTagListTitleVerticalInset, contentWidth, titleHeight - 2 * kCYLTagListTitleVerticalInset);
 }
 
 - (void)setShowsSectionHeaders:(BOOL)showsSectionHeaders {
@@ -615,10 +681,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     // The list's title, then the sections.
     CGFloat width = CGRectGetWidth(self.bounds);
     CGFloat titleHeight = [self cyl_titleHeightForWidth:width];
-    CGFloat inset = self.style.sectionInsets.left;
-    self.titleLabel.frame = titleHeight > 0
-        ? CGRectMake(inset, kCYLTagListTitleVerticalInset, MAX(0, width - 2 * inset), titleHeight - 2 * kCYLTagListTitleVerticalInset)
-        : CGRectZero;
+    self.titleView.frame = titleHeight > 0 ? [self cyl_titleFrameForWidth:width height:titleHeight] : CGRectZero;
     CGRect collectionFrame = CGRectMake(0, titleHeight, width, MAX(0, CGRectGetHeight(self.bounds) - titleHeight));
     if (!CGRectEqualToRect(self.collectionView.frame, collectionFrame)) {
         self.collectionView.frame = collectionFrame;

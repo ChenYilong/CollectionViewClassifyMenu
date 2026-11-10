@@ -1,5 +1,12 @@
 {
   "title": "配置文件 JSON：底部「更多 ⌄」",
+  "titleImage": "system:briefcase",
+  "titleStyle": {
+    "normal": {
+      "textColor": "#07C160",
+      "iconColor": "#07C160"
+    }
+  },
   "titlePosition": "topLeading",
   "selectionMode": "multiple",
   "showsSectionHeaders": false,

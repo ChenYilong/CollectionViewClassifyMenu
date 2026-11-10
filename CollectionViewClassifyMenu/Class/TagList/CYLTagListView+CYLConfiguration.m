@@ -18,6 +18,8 @@ NSString *const CYLTagListViewSelectedItems = @"selectedItems";
 NSString *const CYLTagListViewFoldControl = @"foldControl";
 NSString *const CYLTagListViewTitle = @"title";
 NSString *const CYLTagListViewTitlePosition = @"titlePosition";
+NSString *const CYLTagListViewTitleImage = @"titleImage";
+NSString *const CYLTagListViewTitleStyle = @"titleStyle";
 
 NSString *const CYLMenuFoldControlKeyPosition = @"position";
 NSString *const CYLMenuFoldControlKeyContent = @"content";
@@ -521,6 +523,18 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
         self.titlePosition = CYLEnum(value, @{@"topleading": @(CYLMenuTitlePositionTopLeading), @"leading": @(CYLMenuTitlePositionTopLeading),
                                               @"left": @(CYLMenuTitlePositionTopLeading), @"topcenter": @(CYLMenuTitlePositionTopCenter),
                                               @"center": @(CYLMenuTitlePositionTopCenter)}, self.titlePosition);
+    }
+    if ((value = configuration[CYLTagListViewTitleStyle])) {
+        if ([value isKindOfClass:[CYLMenuStyle class]]) {
+            self.titleStyle = value;
+        } else {
+            CYLMenuStyle *titleStyle = [[CYLTagListView defaultTitleStyle] copy];
+            [titleStyle applyConfiguration:value];
+            self.titleStyle = titleStyle;
+        }
+    }
+    if ((value = CYLImage(configuration[CYLTagListViewTitleImage], [baseURL isKindOfClass:[NSURL class]] ? baseURL : nil))) {
+        self.titleImage = value;
     }
     if ([configuration[CYLTagListViewTitle] isKindOfClass:[NSString class]]) {
         self.title = configuration[CYLTagListViewTitle];

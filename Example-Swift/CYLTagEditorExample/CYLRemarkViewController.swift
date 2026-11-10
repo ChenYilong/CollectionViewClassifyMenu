@@ -16,7 +16,6 @@ final class CYLRemarkViewController: UIViewController {
 
     let titleLabel = UILabel()
     let nameField = UITextField()
-    let tagsButton = UIButton(type: .system)
     let tagsView = CYLTagListView()
 
     init(store: CYLTagStore, tags: [String]) {
@@ -51,18 +50,25 @@ final class CYLRemarkViewController: UIViewController {
         nameField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 1))
         nameField.leftViewMode = .always
 
-        var configuration = UIButton.Configuration.plain()
-        configuration.title = CYLTagEditorLocalizedString("标签")
-        configuration.image = UIImage(systemName: "chevron.right")
-        configuration.imagePlacement = .trailing
-        configuration.baseForegroundColor = .secondaryLabel
-        configuration.contentInsets = .zero
-        tagsButton.configuration = configuration
-        tagsButton.contentHorizontalAlignment = .leading
-        tagsButton.addTarget(self, action: #selector(editTagsTapped), for: .touchUpInside)
-        tagsButton.accessibilityHint = CYLTagEditorLocalizedString("编辑标签")
-
-        // The chosen tags, display only (taps open the editor).
+        // The chosen tags, display only (taps open the editor). "标签 ›" is the list's own title (the core's title
+        // view): secondary color, regular weight, the chevron after the text.
+        tagsView.title = CYLTagEditorLocalizedString("标签")
+        tagsView.titleImage = UIImage(systemName: "chevron.right")
+        let titleStyle = CYLTagListView.defaultTitleStyle()
+        for state in [UIControl.State.normal, .selected, .disabled] {
+            titleStyle.appearance(for: state).font = .preferredFont(forTextStyle: .subheadline)
+            titleStyle.appearance(for: state).textColor = .secondaryLabel
+            titleStyle.setIconColor(.tertiaryLabel, for: state)
+        }
+        titleStyle.imagePlacement = .trailing
+        titleStyle.imageSize = CGSize(width: 12, height: 12)
+        titleStyle.imageTitleSpacing = 4
+        tagsView.titleStyle = titleStyle
+        tagsView.titleView.accessibilityHint = CYLTagEditorLocalizedString("编辑标签")
+        // The title is not a control: a tap on it opens the editor too.
+        let titleTap = UITapGestureRecognizer(target: self, action: #selector(tagsViewTapped(_:)))
+        titleTap.cancelsTouchesInView = false
+        tagsView.addGestureRecognizer(titleTap)
         tagsView.style = CYLTagEditorViewController.tagStyle()
         tagsView.selectionMode = .none
         tagsView.showsSectionHeaders = false
@@ -70,7 +76,7 @@ final class CYLRemarkViewController: UIViewController {
         tagsView.menuDataSource = self
         tagsView.menuDelegate = self
 
-        for subview in [titleLabel, nameField, tagsButton, tagsView] as [UIView] {
+        for subview in [titleLabel, nameField, tagsView] as [UIView] {
             subview.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(subview)
         }
@@ -82,10 +88,7 @@ final class CYLRemarkViewController: UIViewController {
             nameField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             nameField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             nameField.heightAnchor.constraint(equalToConstant: 48),
-            tagsButton.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 24),
-            tagsButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tagsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tagsView.topAnchor.constraint(equalTo: tagsButton.bottomAnchor, constant: 4),
+            tagsView.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 12),
             tagsView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tagsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             // Its height is its intrinsic content height (CYLTagListView.contentHeight).
@@ -113,8 +116,10 @@ final class CYLRemarkViewController: UIViewController {
         return editor
     }
 
-    @objc private func editTagsTapped() {
-        editTags(animated: true)
+    @objc private func tagsViewTapped(_ recognizer: UITapGestureRecognizer) {
+        if tagsView.titleView.bounds.contains(recognizer.location(in: tagsView.titleView)) {
+            editTags(animated: true)
+        }
     }
 
     func updateTags(_ tags: [String]) {

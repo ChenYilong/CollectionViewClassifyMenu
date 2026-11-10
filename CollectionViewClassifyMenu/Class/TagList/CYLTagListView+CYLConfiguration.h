@@ -48,6 +48,11 @@ FOUNDATION_EXTERN NSString *const CYLTagListViewFoldControl;
 FOUNDATION_EXTERN NSString *const CYLTagListViewTitle;
 /// NSNumber of CYLMenuTitlePosition, or "topLeading" ("leading", "left"), "topCenter" ("center").
 FOUNDATION_EXTERN NSString *const CYLTagListViewTitlePosition;
+/// UIImage, or an image name, "system:<SF Symbol>" or a file path: the title's icon.
+FOUNDATION_EXTERN NSString *const CYLTagListViewTitleImage;
+/// CYLMenuStyle, or a dictionary of CYLMenuStyle… keys applied over +[CYLTagListView defaultTitleStyle]
+/// (e.g. {normal: {textColor: "#07C160", iconColor: "#07C160"}}).
+FOUNDATION_EXTERN NSString *const CYLTagListViewTitleStyle;
 
 #pragma mark Fold control keys (CYLMenuFoldControl)
 /// NSNumber of CYLMenuFoldControlPosition, or "none", "bottom", "topTrailing" ("topRight"), "topLeading" ("topLeft").

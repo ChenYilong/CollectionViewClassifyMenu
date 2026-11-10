@@ -1,5 +1,12 @@
 {
   "title": "JSON file: “More ⌄” at the bottom",
+  "titleImage": "system:briefcase",
+  "titleStyle": {
+    "normal": {
+      "textColor": "#07C160",
+      "iconColor": "#07C160"
+    }
+  },
   "titlePosition": "topLeading",
   "selectionMode": "multiple",
   "showsSectionHeaders": false,

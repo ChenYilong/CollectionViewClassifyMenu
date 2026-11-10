@@ -11,6 +11,7 @@
 #import "CYLMenuDataSource.h"
 #import "CYLMenuStyle.h"
 #import "CYLMenuFoldControl.h"
+#import "CYLTagButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -48,6 +49,11 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 - (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl
                               title:(nullable NSString *)title
                       titlePosition:(CYLMenuTitlePosition)titlePosition;
+/// With an icon before the title (either may be nil: icon only, title only).
+- (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl
+                              title:(nullable NSString *)title
+                         titleImage:(nullable UIImage *)titleImage
+                      titlePosition:(CYLMenuTitlePosition)titlePosition;
 /// The same without a title.
 - (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl;
 + (instancetype)tagListViewWithFoldPosition:(CYLMenuFoldControlPosition)position content:(CYLMenuFoldControlContent)content;
@@ -75,11 +81,24 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 /// trailing title ("更多"), FooterChevron a bottom icon; None and Truncate have none.
 @property (nonatomic, assign) CYLMenuFoldStyle foldStyle;
 
-/// A title above every section (nil, the default, for none), e.g. "评价". Its label is `titleLabel`
-/// (the headline font, scaled with Dynamic Type).
+/// A title above every section (nil, the default, for none), e.g. "评价". It is drawn by `titleView`,
+/// the same tag view as the tags (CYLTagButton), laid out horizontally: an icon (`titleImage`), a title,
+/// or both. Neither: no title area.
 @property (nonatomic, copy, nullable) NSString *title;
+/// The title's icon, before the title (or after it with titleStyle.imagePlacement); nil for none.
+@property (nonatomic, strong, nullable) UIImage *titleImage;
 @property (nonatomic, assign) CYLMenuTitlePosition titlePosition;
+/// The title's look (font, colors, icon size and color, spacing…). Default `+defaultTitleStyle`: the bold
+/// headline font in the label color, no box. Setting copies the style.
+@property (nonatomic, copy, null_resettable) CYLMenuStyle *titleStyle;
+/// The view that draws the title: every public API of CYLTagButton is available (e.g. an animated icon
+/// with animationURL). Set the title, icon and style through the properties above.
+@property (nonatomic, strong, readonly) CYLTagButton *titleView;
+/// The title's label (`titleView.titleLabel`).
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
+/// The default title look: the headline font (bold, scaled with Dynamic Type) in the label color, an
+/// 18 pt icon in the label color, no background or border.
++ (CYLMenuStyle *)defaultTitleStyle;
 /// Rows shown while a foldable section is collapsed. 0 shows every row.
 /// Defaults to 1.
 @property (nonatomic, assign) NSUInteger defaultVisibleRows;

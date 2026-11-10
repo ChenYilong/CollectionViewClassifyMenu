@@ -85,6 +85,8 @@
 	</dict>
 	<key>title</key>
 	<string>配置文件 plist：右上角「更多」</string>
+	<key>titleImage</key>
+	<string>system:square.grid.2x2</string>
 	<key>titlePosition</key>
 	<string>topLeading</string>
 </dict>

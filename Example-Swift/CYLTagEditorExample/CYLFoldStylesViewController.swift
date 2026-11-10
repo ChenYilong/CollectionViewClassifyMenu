@@ -40,9 +40,16 @@ final class CYLFoldStylesViewController: UIViewController {
 
     /// One demo made in code.
     struct Demo {
-        let title: String
+        /// The list's title (nil: icon only).
+        let title: String?
         let foldControl: CYLMenuFoldControl
         var titlePosition: CYLMenuTitlePosition = .topLeading
+        /// The title's icon (an SF Symbol), nil for none.
+        var titleImage: String?
+        /// The title's text and icon color; nil keeps the default (the label color).
+        var titleColor: UIColor?
+        /// The icon after the title instead of before it.
+        var titleImageTrailing = false
         var showsSectionHeaders = true
         let groups: [Int]
     }
@@ -72,16 +79,52 @@ final class CYLFoldStylesViewController: UIViewController {
     }
 
     /// The demos made with the initialization parameters.
+    /// The demos made with the initialization parameters: the fold control styles, then the title styles.
     func demos() -> [Demo] {
         [
-            Demo(title: CYLTagEditorLocalizedString("底部箭头（淘宝评价筛选）"), foldControl: Self.fold(.bottom, .icon), showsSectionHeaders: false, groups: [0]),
-            Demo(title: CYLTagEditorLocalizedString("底部：文字 + 箭头"), foldControl: Self.fold(.bottom, .iconAndTitle), showsSectionHeaders: false, groups: [2]),
-            Demo(title: CYLTagEditorLocalizedString("底部：仅文字"), foldControl: Self.fold(.bottom, .title), showsSectionHeaders: false, groups: [3]),
-            Demo(title: CYLTagEditorLocalizedString("右上角：文字 + 箭头（原分类菜单）"), foldControl: Self.fold(.topTrailing, .iconAndTitle), groups: [0, 2]),
-            Demo(title: CYLTagEditorLocalizedString("右上角：仅箭头"), foldControl: Self.fold(.topTrailing, .icon), groups: [1, 3]),
-            Demo(title: CYLTagEditorLocalizedString("左上角：文字 + 箭头"), foldControl: Self.fold(.topLeading, .iconAndTitle), groups: [2, 4]),
-            Demo(title: CYLTagEditorLocalizedString("标题居中，右上角仅文字"), foldControl: Self.fold(.topTrailing, .title), titlePosition: .topCenter, groups: [5, 0]),
+            // Fold controls.
+            Demo(title: CYLTagEditorLocalizedString("底部箭头（淘宝评价筛选）"), foldControl: Self.fold(.bottom, .icon),
+                 titleImage: "star.bubble", showsSectionHeaders: false, groups: [0]),
+            Demo(title: CYLTagEditorLocalizedString("底部：文字 + 箭头"), foldControl: Self.fold(.bottom, .iconAndTitle),
+                 titleImage: "briefcase", showsSectionHeaders: false, groups: [2]),
+            Demo(title: CYLTagEditorLocalizedString("底部：仅文字"), foldControl: Self.fold(.bottom, .title),
+                 titleImage: "heart", showsSectionHeaders: false, groups: [3]),
+            Demo(title: CYLTagEditorLocalizedString("右上角：文字 + 箭头（原分类菜单）"), foldControl: Self.fold(.topTrailing, .iconAndTitle),
+                 titleImage: "square.grid.2x2", groups: [0, 2]),
+            Demo(title: CYLTagEditorLocalizedString("右上角：仅箭头"), foldControl: Self.fold(.topTrailing, .icon),
+                 titleImage: "chevron.down.square", groups: [1, 3]),
+            Demo(title: CYLTagEditorLocalizedString("左上角：文字 + 箭头"), foldControl: Self.fold(.topLeading, .iconAndTitle),
+                 titleImage: "arrow.left.square", groups: [2, 4]),
+            Demo(title: CYLTagEditorLocalizedString("标题居中，右上角仅文字"), foldControl: Self.fold(.topTrailing, .title),
+                 titlePosition: .topCenter, titleImage: "text.aligncenter", groups: [5, 0]),
+            // Title styles: the title is a tag view (icon and/or title, horizontal).
+            Demo(title: CYLTagEditorLocalizedString("标题：图标 + 文字（左上角）"), foldControl: Self.fold(.bottom, .icon),
+                 titleImage: "tag", showsSectionHeaders: false, groups: [1]),
+            Demo(title: nil, foldControl: Self.fold(.bottom, .icon), titleImage: "person.2", showsSectionHeaders: false, groups: [0]),
+            Demo(title: CYLTagEditorLocalizedString("标题：仅文字（居中）"), foldControl: Self.fold(.bottom, .iconAndTitle),
+                 titlePosition: .topCenter, showsSectionHeaders: false, groups: [4]),
+            Demo(title: CYLTagEditorLocalizedString("标题：图标 + 文字（居中、绿色）"), foldControl: Self.fold(.bottom, .icon),
+                 titlePosition: .topCenter, titleImage: "leaf", titleColor: CYLTagEditorViewController.green,
+                 showsSectionHeaders: false, groups: [3]),
+            Demo(title: CYLTagEditorLocalizedString("标题：文字 + 图标（图标在后）"), foldControl: Self.fold(.bottom, .icon),
+                 titleImage: "chevron.right", titleImageTrailing: true, showsSectionHeaders: false, groups: [5]),
         ]
+    }
+
+    /// The title look of a demo: the core's default (bold headline) with the demo's color and icon placement.
+    static func titleStyle(for demo: Demo) -> CYLMenuStyle {
+        let style = CYLTagListView.defaultTitleStyle()
+        if let color = demo.titleColor {
+            for state in [UIControl.State.normal, .selected, .disabled] {
+                style.appearance(for: state).textColor = color
+                style.setIconColor(color, for: state)
+            }
+        }
+        if demo.titleImageTrailing {
+            style.imagePlacement = .trailing
+            style.imageSize = CGSize(width: 14, height: 14)
+        }
+        return style
     }
 
     override func viewDidLoad() {
@@ -109,8 +152,13 @@ final class CYLFoldStylesViewController: UIViewController {
 
         let groups = data.groups ?? [CYLTagGroup(title: CYLTagEditorLocalizedString("我的标签"), tags: data.tags)]
         for demo in demos() {
-            // The styles are given when the view is created.
-            let list = CYLTagListView(foldControl: demo.foldControl, title: demo.title, titlePosition: demo.titlePosition)
+            // The styles are given when the view is created; the title is the core's title view.
+            let list = CYLTagListView(foldControl: demo.foldControl, title: demo.title,
+                                      titleImage: demo.titleImage.flatMap { UIImage(systemName: $0) }, titlePosition: demo.titlePosition)
+            list.titleStyle = Self.titleStyle(for: demo)
+            if demo.title == nil {
+                list.titleView.accessibilityLabel = CYLTagEditorLocalizedString("标题：仅图标")
+            }
             let style = CYLTagEditorViewController.tagStyle()
             style.backgroundColor = .secondarySystemGroupedBackground
             list.style = style
