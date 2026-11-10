@@ -74,7 +74,7 @@ final class CYLFoldStylesViewController: UIViewController {
     /// The demos made with the initialization parameters.
     func demos() -> [Demo] {
         [
-            Demo(title: CYLTagEditorLocalizedString("底部箭头（淘宝评价筛选）"), foldControl: Self.fold(.bottom, .icon), showsSectionHeaders: false, groups: [0, 1]),
+            Demo(title: CYLTagEditorLocalizedString("底部箭头（淘宝评价筛选）"), foldControl: Self.fold(.bottom, .icon), showsSectionHeaders: false, groups: [0]),
             Demo(title: CYLTagEditorLocalizedString("底部：文字 + 箭头"), foldControl: Self.fold(.bottom, .iconAndTitle), showsSectionHeaders: false, groups: [2]),
             Demo(title: CYLTagEditorLocalizedString("底部：仅文字"), foldControl: Self.fold(.bottom, .title), showsSectionHeaders: false, groups: [3]),
             Demo(title: CYLTagEditorLocalizedString("右上角：文字 + 箭头（原分类菜单）"), foldControl: Self.fold(.topTrailing, .iconAndTitle), groups: [0, 2]),
