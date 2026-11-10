@@ -1200,7 +1200,9 @@
     for (UIViewController *controller in tabs.viewControllers) {
         UINavigationController *navigation = (UINavigationController *)controller;
         if (![navigation.viewControllers.firstObject isKindOfClass:[CYLQueryScenariosViewController class]]) {
-            [titles addObject:controller.tabBarItem.title ?: @""];
+            // CYLTabBarController cuts long titles next to the plus button with "…" (so that the plus button stays on
+            // its slot) and keeps the full title as the accessibility label.
+            [titles addObject:controller.tabBarItem.accessibilityLabel ?: controller.tabBarItem.title ?: @""];
         }
     }
     return titles;

@@ -579,7 +579,8 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
         // (found at runtime: this library does not depend on CYLTabBarController). The values are read below by this
         // project's rules.
         Class parser = NSClassFromString(@"CYLTabBarConfigurationParser");
-        SEL read = @selector(dictionaryWithContentsOfFile:error:);
+        // By name: the parser's method is not declared here (no dependency on CYLTabBarController).
+        SEL read = NSSelectorFromString(@"dictionaryWithContentsOfFile:error:");
         if (![parser respondsToSelector:read]) {
             parser = NSClassFromString(@"CYLTabBarController");
             read = @selector(configurationWithContentsOfFile:error:);
