@@ -70,7 +70,8 @@
             [self item:@"菜单" rive:@"menu_button" options:@{@"stateMachine": @"State Machine", @"input": @"isOpen", @"duration": @"0"}],
             [self item:@"按钮" rive:@"button" options:@{@"animation": @"active"}],
             [self item:@"形状" rive:@"shapes" options:@{@"legacy": @"1"}],
-            [self item:@"彩带" rive:@"confetti" options:@{@"stateMachine": @"State Machine 1", @"triggerInput": @"Trigger explosion"}]]},
+            // truck.riv from rive-app/rive-ios's examples, in place of confetti.riv (empty until its explosion plays).
+            [self item:@"卡车" rive:@"truck" options:@{@"legacy": @"1"}]]},
         // icons.riv, as on CYLTabBarController's dark Rive tab bar: its artboards are white strokes, so this
         // section's tags are dark (CYLTagSectionStyle, over the list's style).
         @{CYLTagSectionTitle: CYLExampleLocalizedString(@"Rive · icons.riv（深色标签）"),

@@ -773,6 +773,15 @@
     XCTAssertEqualWithAccuracy(resting.animationRestingProgress, 1, 0.001);
     XCTAssertFalse(resting.isSelected);
     XCTAssertEqualWithAccuracy([[resting.animationPlayer valueForKey:@"progress"] doubleValue], 1, 0.01, @"Shows its last frame");
+    // truck.riv (rive-app/rive-ios) replaced confetti.riv, which draws nothing at rest.
+    NSInteger rive = (NSInteger)[sections indexOfObject:@"rive"];
+    NSInteger truckItem = [tags.menuDataSource menuNumberOfItemsInSection:rive] - 1;
+    NSURL *truck = [tags.menuDataSource menuAnimationURLForItemAtIndexPath:[self ip:truckItem :rive]];
+    XCTAssertEqualObjects(truck.lastPathComponent, @"truck.riv");
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:truck.path]);
+    [tags scrollToSection:rive animated:NO];
+    [collection layoutIfNeeded];
+    XCTAssertNotNil([[[collection cellForItemAtIndexPath:[self ip:truckItem :rive]] valueForKey:@"button"] animationView], @"truck.riv");
     for (NSString *name in @[@"tab_home", @"tab_health", @"tab_moments", @"tab_me"]) {
         NSString *path = [NSBundle.mainBundle.resourcePath stringByAppendingFormat:@"/pag-ios/%@.pag", name];
         XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:path], @"CYLTabBarController's PAG tab icon %@", name);
