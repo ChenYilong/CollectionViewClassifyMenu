@@ -128,7 +128,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"CYLTagView";
+    self.title = NSLocalizedString(@"CYLTagView", @"Menu title");
     self.backgroundView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     self.backgroundView.showsVerticalScrollIndicator = NO;
     self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -450,7 +450,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         }
         return (UICollectionReusableView *)filterHeaderView;
     }
-    return nil;
+    // Only headers have a size, so UIKit never asks for another kind.
+    return [[UICollectionReusableView alloc] initWithFrame:CGRectZero];
 }
 
 #pragma mark - 🔌 FilterHeaderViewDelegateMethod Method

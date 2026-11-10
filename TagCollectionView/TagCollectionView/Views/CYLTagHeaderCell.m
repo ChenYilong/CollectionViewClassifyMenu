@@ -50,11 +50,11 @@
 
     if (group.isOpened) {
         
-        [self.btn setTitle:@"Fold" forState:UIControlStateNormal];
+        [self.btn setTitle:NSLocalizedString(@"Fold", @"Collapse tag group") forState:UIControlStateNormal];
     }
     else{
         
-        [self.btn setTitle:@"More" forState:UIControlStateNormal];
+        [self.btn setTitle:NSLocalizedString(@"More", @"Expand tag group") forState:UIControlStateNormal];
     }
     
     self.nameLb.text=group.groupName;

@@ -385,6 +385,17 @@
     XCTAssertEqual([controller.tableView numberOfRowsInSection:0], (NSInteger)store.reviews.count);
     XCTAssertEqual(controller.tableView.tableHeaderView, filter);
     XCTAssertEqualWithAccuracy(CGRectGetHeight(filter.frame), filter.contentHeight, 1);
+    // Regression: collapsed chips must be drawn inside the table header, not
+    // pushed out by the navigation bar's safe-area inset.
+    UICollectionView *filterCollection = [self collectionViewOf:filter];
+    [filterCollection layoutIfNeeded];
+    XCTAssertEqual(filterCollection.contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentNever);
+    XCTAssertEqualWithAccuracy(filterCollection.contentOffset.y, -filterCollection.contentInset.top, 0.5);
+    XCTAssertGreaterThan(filterCollection.visibleCells.count, 0u);
+    for (UICollectionViewCell *cell in filterCollection.visibleCells) {
+        CGRect frame = [cell convertRect:cell.bounds toView:filter];
+        XCTAssertTrue(CGRectContainsRect(CGRectInset(filter.bounds, -0.5, -0.5), frame), @"%@", NSStringFromCGRect(frame));
+    }
 
     [self tap:filter item:1 section:0];  // 好评
     NSUInteger good = [store reviewsMatchingFilter:store.filters[1]].count;

@@ -276,7 +276,8 @@ static NSString * const  HeaderCellIdenty =  @"HeaderViewCellIdentifier";
         
         return header;
     }
-    return nil;
+    // Only headers have a size, so UIKit never asks for another kind.
+    return [[UICollectionReusableView alloc] initWithFrame:CGRectZero];
 }
 
 #pragma mark - 🔌 UICollectionViewDelegateLeftAlignedLayout Method

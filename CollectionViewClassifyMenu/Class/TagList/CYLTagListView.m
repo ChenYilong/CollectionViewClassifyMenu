@@ -336,6 +336,20 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled {
     self.collectionView.scrollEnabled = scrollEnabled;
+    // An embedded, non-scrolling menu is laid out by its host: safe-area insets
+    // (for example under a navigation bar in a table header) must not shift it.
+    self.collectionView.contentInsetAdjustmentBehavior = scrollEnabled
+        ? UIScrollViewContentInsetAdjustmentAutomatic : UIScrollViewContentInsetAdjustmentNever;
+    if (!scrollEnabled) {
+        [self cyl_resetContentOffset];
+    }
+}
+
+- (void)cyl_resetContentOffset {
+    CGPoint top = CGPointMake(0, -self.collectionView.contentInset.top);
+    if (!CGPointEqualToPoint(self.collectionView.contentOffset, top)) {
+        self.collectionView.contentOffset = top;
+    }
 }
 
 - (CGSize)intrinsicContentSize {
@@ -485,6 +499,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [super layoutSubviews];
     if (CGRectGetWidth(self.collectionView.bounds) != self.measuredWidth) {
         [self cyl_reloadLayout];
+    }
+    if (!self.collectionView.scrollEnabled) {
+        [self cyl_resetContentOffset];
     }
 }
 

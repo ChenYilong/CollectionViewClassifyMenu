@@ -29,8 +29,8 @@ static float const kImageToTextMargin = 7;
 }
 
 - (id)sharedInit {
-    [self setTitle:@"更多" forState:UIControlStateNormal];
-    [self setTitle:@"收起" forState:UIControlStateSelected];
+    [self setTitle:NSLocalizedString(@"更多", @"Expand menu section") forState:UIControlStateNormal];
+    [self setTitle:NSLocalizedString(@"收起", @"Collapse menu section") forState:UIControlStateSelected];
     self.titleLabel.font = [UIFont systemFontOfSize:12];
     [self setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];

@@ -147,7 +147,8 @@ static float const kCollectionViewCellsHorizonMargin = 12;
         view.titleLabel.text = [self.menuDataSource menuTitleForSection:indexPath.section];
         return view;
     }
-    return nil;
+    // Only headers have a size, so UIKit never asks for another kind.
+    return [[UICollectionReusableView alloc] initWithFrame:CGRectZero];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
