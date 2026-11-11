@@ -37,6 +37,28 @@ long or short, is one block above its declaration, and a file never mixes format
 
 Implementation notes (`.m`, private Swift, inside bodies) are not documentation: plain `//` or `/* */` there.
 
+4. **The official rules decide.** Every comment format follows the official specification of its language and
+   documentation tool, and the specification wins over anything here: the syntax inside a comment (tags, Markdown,
+   XML elements, docstring sections) is the official one, and a form the official tool does not read as
+   documentation is never used. The forms in the table are this project's choice among the officially valid ones
+   (each tool below reads them as documentation); for Python, PEP 257's multi-line layout (quotes on their own
+   lines) is used for one-line docstrings too, which PEP 257 allows.
+
+| Language / tool | Official rules |
+| --- | --- |
+| Objective-C (Clang, Xcode Quick Help) | Clang documentation comments (`/*!` and `/**`, HeaderDoc / Doxygen commands such as `@param`, `@return`), checked by `-Wdocumentation`: <https://clang.llvm.org/docs/UsersManual.html#comment-parsing-options> |
+| Swift | Swift Markup Formatting Reference (`/** */`, `- Parameter`, `- Returns:`): <https://developer.apple.com/library/archive/documentation/Xcode/Reference/xcode_markup_formatting_ref/> |
+| Kotlin | KDoc (`/** */`, Markdown, `@param`, `@return`): <https://kotlinlang.org/docs/kotlin-doc.html> |
+| Java | Javadoc documentation comment specification: <https://docs.oracle.com/en/java/javase/21/docs/specs/javadoc/doc-comment-spec.html> |
+| TypeScript | TSDoc: <https://tsdoc.org/> |
+| JavaScript | JSDoc: <https://jsdoc.app/> |
+| Python | PEP 257 docstring conventions: <https://peps.python.org/pep-0257/> |
+| Go | Go doc comments (a comment directly before the declaration; `/* */` is read like `//`): <https://go.dev/doc/comment> |
+| C# | XML documentation comments (delimited `/** */` form, `<summary>`, `<param>`, `<returns>`): <https://learn.microsoft.com/dotnet/csharp/language-reference/xmldoc/> |
+| Rust | rustdoc (outer block doc comments `/** */`, Markdown): <https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html> |
+
+When a rule here and the official specification disagree, follow the specification and fix this skill.
+
 ## Examples
 
 ```objc

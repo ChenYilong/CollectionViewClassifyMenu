@@ -47,6 +47,12 @@ verify the behavior and update the applicable documentation.
     - Rust: `/** */`.
     - A language without a block form uses its only documentation comment form
       throughout the file.
+  - Every comment format follows the official rules of its language and
+    documentation tool, which take precedence: the syntax inside a comment
+    (tags, Markdown, XML elements, docstring content) is the official one,
+    and a form the official tool does not read as documentation is never
+    used. The forms above are this project's choice among the officially
+    valid ones. References: `.agents/skills/cyl-comments/`.
   Details and the check: `.agents/skills/cyl-comments/`.
 - Use English Conventional Commit messages, such as `fix: 🐛 ...` and
   `docs: 📝 ...`.
