@@ -37,18 +37,20 @@ tags: [issues, ui, cocoapods, progress]
 
 2026-11-12 记录，分支 `claude/intelligent-curie-1etnx5`（[PR #15](https://github.com/ChenYilong/CollectionViewClassifyMenu/pull/15)）：
 
-- TODO（合并）：PR #15 的 CI 全部通过后合并到 `master`。当前状态：本地 example 79、swift 19 个测试通过；
-  CI 运行中。完成条件：`gh pr checks 15` 全部通过，查看 CI 截图，合并后在本表记录合并提交。
-- TODO（依赖）：`Example/Podfile` 与 `Example-Swift/Podfile` 固定的 CYLTabBarController 提交落后于最新提交
-  `0e69250`（`feat/cross-platform-components`，2026-11-12）。CI 的检查只警告，不失败。剩余工作：确认两次提交之间
-  的改动后更新两个 `CYL_TAB_BAR`，`pod install` 并运行全部测试。
-- TODO（Rive 资源）：`house.riv` 自带天空背景（`Rectangle-6`，紫色渐变）和灰色画板填充，在标签中显示为方形画面。
-  来源（Design+Code 课程附件）没有许可文件，按 PR #22 的规则不能修改。剩余工作：换成有许可的房子动画
-  （例如 rive-app 官方示例），或取得作者许可后把背景填充透明度设为 0，并在 `Animations/Rive/README.md` 记录。
-- TODO（可读性）：最大辅助字号下，搜索栏输入框里的占位文字被缩小（搜索发现、热门搜索页面）。属于
-  CYLSearchViewController 的 `CYLSearchBarView`：剩余工作是在那里让占位文字跟随字号或换行显示，再更新
-  `CYL_SEARCH`。验证：`CYLSearchBarPlacementTests` 的最大字号截图。
-- TODO（布局）：最大辅助字号下，图片标签的两个标签组位置固定，可能相互接触（组内不重叠）。剩余工作：按字号
-  调整组的位置或允许拖开；验证：`CYLAndroidSampleAccessibilityTests` 的大字号截图。
+- TODO（合并）：PR #15 的 CI 全部通过后合并到 `master`。当前状态：本地 menu 17、tag 6、example 80、swift 19
+  个测试通过，库无警告；CI 运行中。完成条件：`gh pr checks 15` 全部通过，查看 CI 截图，合并后在本表记录合并提交。
 - TODO（验证）：尚未在真机上用 VoiceOver、Voice Control、Switch Control 和 Accessibility Inspector 检查新增的
-  无障碍操作（标签前移/后移、图片标签组、搜索栏）；目前由单元测试覆盖标签、操作和字号。
+  无障碍操作（标签前移/后移、图片标签组、搜索栏）；原因：本机没有连接真机。目前由单元测试覆盖标签、操作和字号。
+
+### 已完成 / Done（2026-11-12）
+
+- 依赖：两个 Podfile 的 `CYL_TAB_BAR` 更新为最新提交 `0e69250`（`feat/cross-platform-components`）；两次提交之间
+  只有测试、文档、Liquid Glass PlusButton 修复与依赖更新，没有本项目复制的文件变化。`CYL_SEARCH` 更新为
+  CYLSearchViewController `167d6f4`。
+- Rive 资源：`truck.riv` 的红色画板背景、`house.riv` 的紫色天空与灰色画板填充设为透明（按维护者的决定），
+  记录与 SHA-256 见 `Example/CYLMenuExample/CYLMenuExample.bundle/Animations/Rive/README.md`；
+  `testTruckRiveDrawsNoBackgroundRectangle`、`testHouseRiveDrawsNoBackgroundSquare`。
+- 可读性：搜索栏的占位文字在最大字号下不再缩小到四分之一，改为同字号并以省略号截断（CYLSearchViewController
+  `placeholderLabel`）。
+- 布局：图片标签的标签组在最大字号下不再相互覆盖，`CYLImageTagView` 只移动显示位置（`displayOffset`），
+  不改数据；见 [tagviewgroup-api.md](tagviewgroup-api.md)。
