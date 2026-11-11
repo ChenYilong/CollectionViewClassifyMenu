@@ -14,6 +14,23 @@ verify the behavior and update the applicable documentation.
 - Use descriptive English identifiers and conventional Objective-C naming.
   Keep existing names and localization unless a change is necessary.
 - Document user-visible changes and verify them with a targeted build or test.
+- Code comments: a public API (everything in the pod's headers, and any
+  `public`/`open` Swift declaration) is documented with a documentation comment
+  that callers see in Xcode's Quick Help and in the Swift interface of the
+  Objective-C headers. A comment of more than one line is one block, never a
+  stack of single-line comments: in Objective-C headers use
+  ```objc
+  /*!
+   * What it does, and what callers must know.
+   */
+  ```
+  A one-line `///` is fine for a one-line comment. In Swift source, where the
+  compiler does not treat `/*!` as documentation, use `/** … */` (or `///` for
+  one line). Other platforms use their official documentation format (KDoc
+  `/** … */` for Kotlin, Javadoc for Java, JSDoc/TSDoc `/** … */` for
+  JavaScript/TypeScript, Dart `///`, Rust `///`, Python docstrings). Plain `//`
+  comments are for implementation notes only, never for public API docs.
+  Details and the check: `.agents/skills/cyl-comments/`.
 - Use English Conventional Commit messages, such as `fix: 🐛 ...` and
   `docs: 📝 ...`.
 - Every commit message's description (the body) must contain the author line

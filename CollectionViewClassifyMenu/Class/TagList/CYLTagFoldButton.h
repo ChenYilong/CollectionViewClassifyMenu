@@ -18,8 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly, nullable) CYLMenuFoldControl *foldControl;
 @property (nonatomic, assign, readonly, getter=isExpanded) BOOL expanded;
 
-/// Shows `foldControl` in `color` (its own color wins) for the expanded or collapsed state; the icon
-/// turns with an animation when `animated` (not with Reduce Motion).
+/*!
+ * Shows `foldControl` in `color` (its own color wins) for the expanded or collapsed state; the icon
+ * turns with an animation when `animated` (not with Reduce Motion).
+ */
 - (void)applyFoldControl:(CYLMenuFoldControl *)foldControl
                    color:(nullable UIColor *)color
                 expanded:(BOOL)expanded

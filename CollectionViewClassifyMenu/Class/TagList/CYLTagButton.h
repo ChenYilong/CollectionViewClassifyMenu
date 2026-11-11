@@ -21,10 +21,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) UIImage *image;
 /// Shown while selected; nil keeps `image` (as CYLFlatDesignTabBarItem.selectedImage).
 @property (nonatomic, strong, nullable) UIImage *selectedImage;
-/// Animated icon file (Lottie .json, .pag, .riv, .gif…). The view comes from CYLTabBarController's
-/// animation engine (`CYLTabBarItemAnimationFactory`), found at runtime as CYLTabBarController's own
-/// Core does: add the library's subspec to the app, e.g. `pod 'CYLTabBarController/Lottie'`. Without
-/// it, or when the file cannot be loaded, `image` is shown.
+/*!
+ * Animated icon file (Lottie .json, .pag, .riv, .gif…). The view comes from CYLTabBarController's
+ * animation engine (`CYLTabBarItemAnimationFactory`), found at runtime as CYLTabBarController's own
+ * Core does: add the library's subspec to the app, e.g. `pod 'CYLTabBarController/Lottie'`. Without
+ * it, or when the file cannot be loaded, `image` is shown.
+ */
 @property (nonatomic, strong, nullable) NSURL *animationURL;
 /// The frame (0...1) of the animated icon shown while not selected. Default 0, the first frame.
 @property (nonatomic, assign) CGFloat animationRestingProgress;
@@ -40,8 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// The style the tag is drawn with. Set it again after changing it.
 @property (nonatomic, copy, null_resettable) CYLMenuStyle *style;
 
-/// Width a tag needs for its content in every state (so that selecting it does not
-/// resize it), before any limit on the available width.
+/*!
+ * Width a tag needs for its content in every state (so that selecting it does not
+ * resize it), before any limit on the available width.
+ */
 + (CGFloat)widthForTitle:(nullable NSString *)title
                    image:(nullable UIImage *)image
                    style:(CYLMenuStyle *)style

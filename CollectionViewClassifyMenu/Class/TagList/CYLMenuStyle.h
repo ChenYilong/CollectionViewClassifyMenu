@@ -37,20 +37,26 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
 @property (nonatomic, strong, readonly) CYLTagAppearance *selectedAppearance;
 @property (nonatomic, strong, readonly) CYLTagAppearance *disabledAppearance;
 
-/// The appearance for UIControlStateNormal, UIControlStateSelected or
-/// UIControlStateDisabled (disabled wins over selected); others give normal.
+/*!
+ * The appearance for UIControlStateNormal, UIControlStateSelected or
+ * UIControlStateDisabled (disabled wins over selected); others give normal.
+ */
 - (CYLTagAppearance *)appearanceForState:(UIControlState)state;
 
 #pragma mark Title and icon (CYLFlatDesignTabBarItem)
 
-/// Like `-[UITabBarItem setTitleTextAttributes:forState:]`: NSFontAttributeName and
-/// NSForegroundColorAttributeName update the state's appearance font and textColor.
+/*!
+ * Like `-[UITabBarItem setTitleTextAttributes:forState:]`: NSFontAttributeName and
+ * NSForegroundColorAttributeName update the state's appearance font and textColor.
+ */
 - (void)setTitleTextAttributes:(nullable NSDictionary<NSAttributedStringKey, id> *)attributes forState:(UIControlState)state;
 /// The state's font and text color as text attributes.
 - (NSDictionary<NSAttributedStringKey, id> *)titleTextAttributesForState:(UIControlState)state;
 
-/// Tint of template icons in a state (like `UITabBarItemStateAppearance.iconColor`);
-/// nil uses the state's textColor.
+/*!
+ * Tint of template icons in a state (like `UITabBarItemStateAppearance.iconColor`);
+ * nil uses the state's textColor.
+ */
 - (void)setIconColor:(nullable UIColor *)iconColor forState:(UIControlState)state;
 /// The effective icon tint for a state.
 - (UIColor *)iconColorForState:(UIControlState)state;
@@ -67,15 +73,19 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
 @property (nonatomic, assign) UIOffset imagePositionAdjustment;
 /// The icon before (default) or after the title.
 @property (nonatomic, assign) CYLTagImagePlacement imagePlacement;
-/// For a tag with only an icon or only a title: YES (the default) centers it;
-/// NO keeps it where it would be with both, the title after an empty icon slot,
-/// the icon at the leading margin (as CYLFlatDesignTabBarItem.layoutCentered = NO).
+/*!
+ * For a tag with only an icon or only a title: YES (the default) centers it;
+ * NO keeps it where it would be with both, the title after an empty icon slot,
+ * the icon at the leading margin (as CYLFlatDesignTabBarItem.layoutCentered = NO).
+ */
 @property (nonatomic, assign) BOOL layoutCentered;
 
 /// Size of animated icons (`menuAnimationURLForItemAtIndexPath:`). CGSizeZero (the default) uses imageSize.
 @property (nonatomic, assign) CGSize animationSize;
-/// Playback speed of animated icons, as `CYLTabBarController.tabBarItemAnimationSpeed`; 1 (the default)
-/// is the file's own speed.
+/*!
+ * Playback speed of animated icons, as `CYLTabBarController.tabBarItemAnimationSpeed`; 1 (the default)
+ * is the file's own speed.
+ */
 @property (nonatomic, assign) CGFloat animationSpeed;
 
 /// Scale the appearance fonts for Dynamic Type (capped at 2x). Defaults to YES.
@@ -99,14 +109,18 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
 @property (nonatomic, strong) UIColor *foldControlColor;
 /// Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
 @property (nonatomic, copy) NSString *expandTitle;
-/// Footer chevron, pointing down while folded; it turns 180° when the section expands.
-/// nil uses the SF Symbol "chevron.down".
+/*!
+ * Footer chevron, pointing down while folded; it turns 180° when the section expands.
+ * nil uses the SF Symbol "chevron.down".
+ */
 @property (nonatomic, strong, nullable) UIImage *foldChevronImage;
 /// Defaults to the localized "Less" from CYLClassifyMenuResources.bundle.
 @property (nonatomic, copy) NSString *collapseTitle;
 
-/// The title font of a state for the given traits: bold for the Bold Text setting,
-/// scaled for Dynamic Type when adjustsFontForContentSizeCategory is YES.
+/*!
+ * The title font of a state for the given traits: bold for the Bold Text setting,
+ * scaled for Dynamic Type when adjustsFontForContentSizeCategory is YES.
+ */
 - (UIFont *)titleFontForState:(UIControlState)state traitCollection:(nullable UITraitCollection *)traitCollection;
 /// Header font for the given traits, applying Dynamic Type when enabled.
 - (UIFont *)headerFontForTraitCollection:(nullable UITraitCollection *)traitCollection;

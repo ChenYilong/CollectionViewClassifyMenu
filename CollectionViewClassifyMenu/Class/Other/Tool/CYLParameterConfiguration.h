@@ -10,12 +10,16 @@
 
 #define CYLAppTintColor [UIColor colorWithRed:42 / 255.0 green:185 / 255.0 blue:160 / 255.0 alpha:1]
 
-/// Largest multiple of the base size used for Dynamic Type, so tags stay usable
-/// at accessibility sizes.
+/*!
+ * Largest multiple of the base size used for Dynamic Type, so tags stay usable
+ * at accessibility sizes.
+ */
 static CGFloat const CYLMaximumFontScale = 2.0;
 
-/// System font of `pointSize` scaled for the content size category of `traits`
-/// (the app's current category when `traits` is nil).
+/*!
+ * System font of `pointSize` scaled for the content size category of `traits`
+ * (the app's current category when `traits` is nil).
+ */
 static inline UIFont *CYLScaledSystemFont(CGFloat pointSize, UITraitCollection *traits) {
     UIFont *font = [UIFont systemFontOfSize:pointSize];
     return [[UIFontMetrics defaultMetrics] scaledFontForFont:font

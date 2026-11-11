@@ -39,8 +39,10 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
     CYLMenuFoldStyleHeaderButton,
     /// A chevron below the section, as in shopping review filters.
     CYLMenuFoldStyleFooterChevron,
-    /// Shows only `defaultVisibleRows` rows with no control, for previews;
-    /// the host may still call -setExpanded:forSection:animated:.
+    /*!
+     * Shows only `defaultVisibleRows` rows with no control, for previews;
+     * the host may still call -setExpanded:forSection:animated:.
+     */
     CYLMenuFoldStyleTruncate,
 };
 
@@ -67,58 +69,82 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 
 /// Defaults to CYLMenuSelectionModeSingle.
 @property (nonatomic, assign) CYLMenuSelectionMode selectionMode;
-/// When NO, a tap never removes the last selected item of a section.
-/// Defaults to YES.
+/*!
+ * When NO, a tap never removes the last selected item of a section.
+ * Defaults to YES.
+ */
 @property (nonatomic, assign) BOOL allowsEmptySelection;
 
 /// Defaults to YES. When NO, sections are laid out back to back without titles.
 @property (nonatomic, assign) BOOL showsSectionHeaders;
 
-/// The fold control of a foldable section (more rows than `defaultVisibleRows`): where it is and what
-/// it shows. Default: none. Setting it also sets `foldStyle` (Bottom: FooterChevron, Top…:
-/// HeaderButton, None: None, or Truncate when foldStyle was Truncate).
+/*!
+ * The fold control of a foldable section (more rows than `defaultVisibleRows`): where it is and what
+ * it shows. Default: none. Setting it also sets `foldStyle` (Bottom: FooterChevron, Top…:
+ * HeaderButton, None: None, or Truncate when foldStyle was Truncate).
+ */
 @property (nonatomic, copy, null_resettable) CYLMenuFoldControl *foldControl;
-/// Defaults to CYLMenuFoldStyleNone. Setting it also sets `foldControl`: HeaderButton is a top
-/// trailing title ("更多"), FooterChevron a bottom icon; None and Truncate have none.
+/*!
+ * Defaults to CYLMenuFoldStyleNone. Setting it also sets `foldControl`: HeaderButton is a top
+ * trailing title ("更多"), FooterChevron a bottom icon; None and Truncate have none.
+ */
 @property (nonatomic, assign) CYLMenuFoldStyle foldStyle;
 
-/// A title above every section (nil, the default, for none), e.g. "评价". It is drawn by `titleView`,
-/// the same tag view as the tags (CYLTagButton), laid out horizontally: an icon (`titleImage`), a title,
-/// or both. Neither: no title area.
+/*!
+ * A title above every section (nil, the default, for none), e.g. "评价". It is drawn by `titleView`,
+ * the same tag view as the tags (CYLTagButton), laid out horizontally: an icon (`titleImage`), a title,
+ * or both. Neither: no title area.
+ */
 @property (nonatomic, copy, nullable) NSString *title;
 /// The title's icon, before the title (or after it with titleStyle.imagePlacement); nil for none.
 @property (nonatomic, strong, nullable) UIImage *titleImage;
 @property (nonatomic, assign) CYLMenuTitlePosition titlePosition;
-/// The title's look (font, colors, icon size and color, spacing…). Default `+defaultTitleStyle`: the bold
-/// headline font in the label color, no box. Setting copies the style.
+/*!
+ * The title's look (font, colors, icon size and color, spacing…). Default `+defaultTitleStyle`: the bold
+ * headline font in the label color, no box. Setting copies the style.
+ */
 @property (nonatomic, copy, null_resettable) CYLMenuStyle *titleStyle;
-/// The view that draws the title: every public API of CYLTagButton is available (e.g. an animated icon
-/// with animationURL). Set the title, icon and style through the properties above.
+/*!
+ * The view that draws the title: every public API of CYLTagButton is available (e.g. an animated icon
+ * with animationURL). Set the title, icon and style through the properties above.
+ */
 @property (nonatomic, strong, readonly) CYLTagButton *titleView;
 /// The title's label (`titleView.titleLabel`).
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
-/// The default title look: the headline font (bold, scaled with Dynamic Type) in the label color, an
-/// 18 pt icon in the label color, no background or border.
+/*!
+ * The default title look: the headline font (bold, scaled with Dynamic Type) in the label color, an
+ * 18 pt icon in the label color, no background or border.
+ */
 + (CYLMenuStyle *)defaultTitleStyle;
-/// Rows shown while a foldable section is collapsed. 0 shows every row.
-/// Defaults to 1.
+/*!
+ * Rows shown while a foldable section is collapsed. 0 shows every row.
+ * Defaults to 1.
+ */
 @property (nonatomic, assign) NSUInteger defaultVisibleRows;
 
-/// Turn off to embed the view in another scroll view and size it with
-/// contentHeight or Auto Layout's intrinsic content size. Defaults to YES.
+/*!
+ * Turn off to embed the view in another scroll view and size it with
+ * contentHeight or Auto Layout's intrinsic content size. Defaults to YES.
+ */
 @property (nonatomic, assign, getter=isScrollEnabled) BOOL scrollEnabled;
 
-/// Height needed to show the current content at the current width. Also
-/// reported as the intrinsic content height and through
-/// -menu:didChangeContentHeight:.
+/*!
+ * Height needed to show the current content at the current width. Also
+ * reported as the intrinsic content height and through
+ * -menu:didChangeContentHeight:.
+ */
 @property (nonatomic, assign, readonly) CGFloat contentHeight;
 
-/// Reads everything from the data source again. Selections and expanded
-/// sections that are still in range are kept.
+/*!
+ * Reads everything from the data source again. Selections and expanded
+ * sections that are still in range are kept.
+ */
 - (void)reloadMenuData;
 
-/// Height the content needs at `width` with the current data and fold state,
-/// without laying the view out.
+/*!
+ * Height the content needs at `width` with the current data and fold state,
+ * without laying the view out.
+ */
 - (CGFloat)heightThatFitsWidth:(CGFloat)width;
 
 #pragma mark Selection
@@ -143,8 +169,10 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 - (NSInteger)numberOfVisibleItemsInSection:(NSInteger)section;
 /// Scrolls so that the section (its header, or its first row) is at the top, as far as the content allows.
 - (void)scrollToSection:(NSInteger)section animated:(BOOL)animated;
-/// Scrolls so that the item is centered vertically, as far as the content allows (e.g. a tag just
-/// created, or the last item). Does nothing for an item that is not shown (folded away).
+/*!
+ * Scrolls so that the item is centered vertically, as far as the content allows (e.g. a tag just
+ * created, or the last item). Does nothing for an item that is not shown (folded away).
+ */
 - (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
 
 @end

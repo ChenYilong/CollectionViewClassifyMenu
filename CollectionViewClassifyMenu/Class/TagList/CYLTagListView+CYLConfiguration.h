@@ -41,8 +41,10 @@ FOUNDATION_EXTERN NSString *const CYLTagListViewScrollEnabled;
 FOUNDATION_EXTERN NSString *const CYLTagListViewDefaultVisibleRows;
 /// NSArray of NSIndexPath, "section-item" strings or [section, item] arrays.
 FOUNDATION_EXTERN NSString *const CYLTagListViewSelectedItems;
-/// CYLMenuFoldControl, a position name ("bottom", "topTrailing"…), or a dictionary of CYLMenuFoldControlKey…
-/// keys. Applied after CYLTagListViewFoldStyle.
+/*!
+ * CYLMenuFoldControl, a position name ("bottom", "topTrailing"…), or a dictionary of CYLMenuFoldControlKey…
+ * keys. Applied after CYLTagListViewFoldStyle.
+ */
 FOUNDATION_EXTERN NSString *const CYLTagListViewFoldControl;
 /// NSString: the list's title, above every section.
 FOUNDATION_EXTERN NSString *const CYLTagListViewTitle;
@@ -50,8 +52,10 @@ FOUNDATION_EXTERN NSString *const CYLTagListViewTitle;
 FOUNDATION_EXTERN NSString *const CYLTagListViewTitlePosition;
 /// UIImage, or an image name, "system:<SF Symbol>" or a file path: the title's icon.
 FOUNDATION_EXTERN NSString *const CYLTagListViewTitleImage;
-/// CYLMenuStyle, or a dictionary of CYLMenuStyle… keys applied over +[CYLTagListView defaultTitleStyle]
-/// (e.g. {normal: {textColor: "#07C160", iconColor: "#07C160"}}).
+/*!
+ * CYLMenuStyle, or a dictionary of CYLMenuStyle… keys applied over +[CYLTagListView defaultTitleStyle]
+ * (e.g. {normal: {textColor: "#07C160", iconColor: "#07C160"}}).
+ */
 FOUNDATION_EXTERN NSString *const CYLTagListViewTitleStyle;
 
 #pragma mark Fold control keys (CYLMenuFoldControl)
@@ -77,8 +81,10 @@ FOUNDATION_EXTERN NSString *const CYLTagSectionTitle;
 FOUNDATION_EXTERN NSString *const CYLTagSectionImage;
 /// NSArray of item dictionaries (CYLTagItem… keys), or of strings (titles).
 FOUNDATION_EXTERN NSString *const CYLTagSectionItems;
-/// CYLMenuStyle, or a dictionary of CYLMenuStyle… keys applied over the list's style: the look of this
-/// section's tags (see -menuStyleForSection:), e.g. dark tags for white icons.
+/*!
+ * CYLMenuStyle, or a dictionary of CYLMenuStyle… keys applied over the list's style: the look of this
+ * section's tags (see -menuStyleForSection:), e.g. dark tags for white icons.
+ */
 FOUNDATION_EXTERN NSString *const CYLTagSectionStyle;
 
 #pragma mark Item keys
@@ -86,12 +92,16 @@ FOUNDATION_EXTERN NSString *const CYLTagItemTitle;
 /// UIImage, or an image name, "system:<SF Symbol>" or a file path.
 FOUNDATION_EXTERN NSString *const CYLTagItemImage;
 FOUNDATION_EXTERN NSString *const CYLTagItemSelectedImage;
-/// NSURL, or a URL string, a file path or a file name (in the main bundle, or next to the
-/// configuration file): a Lottie .json, .pag, .riv or .gif animated icon.
+/*!
+ * NSURL, or a URL string, a file path or a file name (in the main bundle, or next to the
+ * configuration file): a Lottie .json, .pag, .riv or .gif animated icon.
+ */
 FOUNDATION_EXTERN NSString *const CYLTagItemAnimation;
-/// NSDictionary of strings (numbers are converted): options read by the animation's library, written into the
-/// animation URL with CYLMenuAnimationURLWithOptions(). For Rive, as in CYLTabBarController: "artboard",
-/// "stateMachine", "input", "triggerInput", "animation", "duration", "legacy"...
+/*!
+ * NSDictionary of strings (numbers are converted): options read by the animation's library, written into the
+ * animation URL with CYLMenuAnimationURLWithOptions(). For Rive, as in CYLTabBarController: "artboard",
+ * "stateMachine", "input", "triggerInput", "animation", "duration", "legacy"...
+ */
 FOUNDATION_EXTERN NSString *const CYLTagItemAnimationOptions;
 /// NSNumber 0...1: the frame shown while not selected (see -menuAnimationRestingProgressForItemAtIndexPath:).
 FOUNDATION_EXTERN NSString *const CYLTagItemAnimationRestingProgress;
@@ -149,31 +159,37 @@ typedef NS_ERROR_ENUM(CYLMenuConfigurationErrorDomain, CYLMenuConfigurationError
     CYLMenuConfigurationErrorUnsupportedFormat,
 };
 
-/// An animation URL with options, encoded exactly as CYLTabBarController's CYLTabBarAnimationURLWithOptions()
-/// does ("name=value&…" in the fragment, percent-encoded and sorted by name), so that its animation libraries read
-/// them, e.g. which artboard and state machine of a Rive file a tag plays. Returns fileURL when there are no options,
-/// and nil when fileURL is nil.
-///
-///     item.animationURL = CYLMenuAnimationURLWithOptions(iconsURL, @{ @"artboard" : @"CHAT",
-///                                                                     @"stateMachine" : @"CHAT_Interactivity",
-///                                                                     @"input" : @"active" });
+/*!
+ * An animation URL with options, encoded exactly as CYLTabBarController's CYLTabBarAnimationURLWithOptions()
+ * does ("name=value&…" in the fragment, percent-encoded and sorted by name), so that its animation libraries read
+ * them, e.g. which artboard and state machine of a Rive file a tag plays. Returns fileURL when there are no options,
+ * and nil when fileURL is nil.
+ *
+ *     item.animationURL = CYLMenuAnimationURLWithOptions(iconsURL, @{ @"artboard" : @"CHAT",
+ *                                                                     @"stateMachine" : @"CHAT_Interactivity",
+ *                                                                     @"input" : @"active" });
+ */
 FOUNDATION_EXTERN NSURL *_Nullable CYLMenuAnimationURLWithOptions(NSURL *_Nullable fileURL, NSDictionary<NSString *, id> *_Nullable options);
 
 @interface CYLTagListView (CYLConfiguration)
 
-/// Creates a tag list from one dictionary holding everything (see the keys above). The view
-/// keeps the data source it builds from CYLTagListViewSections.
+/*!
+ * Creates a tag list from one dictionary holding everything (see the keys above). The view
+ * keeps the data source it builds from CYLTagListViewSections.
+ */
 - (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration;
 + (instancetype)tagListViewWithConfiguration:(NSDictionary<NSString *, id> *)configuration;
 /// Applies a configuration to an existing view; keys that are missing keep their values.
 - (void)applyConfiguration:(NSDictionary<NSString *, id> *)configuration;
 
-/// Reads a configuration file: a path, a file URL string, or a file name in the main bundle
-/// (e.g. @"tags.json" or @"Configurations.bundle/tags.plist"). JSON and property lists (XML or binary)
-/// are read directly; the other formats of CYLTabBarController's CYLTabBarConfigurationParser (JSON5,
-/// YAML, TOML, INI, .properties, XML, Protocol Buffers text…) are read by it when CYLTabBarController is
-/// linked. The values are then read by this project's rules (strings for every key, see above).
-/// Relative file names inside resolve next to the file.
+/*!
+ * Reads a configuration file: a path, a file URL string, or a file name in the main bundle
+ * (e.g. @"tags.json" or @"Configurations.bundle/tags.plist"). JSON and property lists (XML or binary)
+ * are read directly; the other formats of CYLTabBarController's CYLTabBarConfigurationParser (JSON5,
+ * YAML, TOML, INI, .properties, XML, Protocol Buffers text…) are read by it when CYLTabBarController is
+ * linked. The values are then read by this project's rules (strings for every key, see above).
+ * Relative file names inside resolve next to the file.
+ */
 + (nullable NSDictionary<NSString *, id> *)configurationWithContentsOfFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
 - (nullable instancetype)initWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
 + (nullable instancetype)tagListViewWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;

@@ -18,7 +18,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-/**
+/*!
  *  Simple UICollectionViewFlowLayout that aligns the cells to the left rather than justify them
  *
  *  Based on http://stackoverflow.com/questions/13017257/how-do-you-determine-spacing-between-cells-in-uicollectionview-flowlayout
@@ -30,7 +30,7 @@
 
 @end
 
-/**
+/*!
  *  Just a convenience protocol to keep things consistent.
  *  Someone could find it confusing for a delegate object to conform to UICollectionViewDelegateFlowLayout
  *  while using CYLCollectionViewLeftAlignedLayout.

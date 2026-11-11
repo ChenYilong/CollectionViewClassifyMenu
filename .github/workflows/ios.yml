@@ -51,6 +51,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: shellcheck scripts/*.sh
+      # [EN] Public API comments are documentation blocks, not stacked /// lines (AGENTS.md, code comments).
+      # [CN] 公开 API 注释为文档注释块，而不是堆叠的 /// 单行注释（AGENTS.md，代码注释）。
+      - name: Public API documentation comments
+        run: python3 scripts/check-doc-comments.py
       # [EN] The Podfiles pin CYLTabBarController's newest commit over every branch (AGENTS.md); a newer one is a warning.
       # [CN] Podfile 依赖 CYLTabBarController 所有分支中最新的提交（AGENTS.md）；有更新的提交时给出警告。
       - name: CYLTabBarController pin is the newest commit
