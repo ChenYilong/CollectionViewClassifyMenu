@@ -66,3 +66,9 @@ Every CI run that builds code must provide Example screenshots (the
 also committed to the `ci-screenshots` branch under `<branch>/<commit>/`).
 Download them, look at each screen and show them to the user. If they are
 missing, fix the CI so it produces them; if that is impossible, explain why.
+
+## Closing the task
+
+When the verification is done, mark the task's `TODO` entry in `docs/` done (AGENTS.md, "Task log in docs/") and
+add the evidence: commits, test counts per suite, CI run and screenshots. An entry stays `TODO` while any step is
+unverified, with the reason.

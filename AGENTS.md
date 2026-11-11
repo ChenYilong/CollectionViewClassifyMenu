@@ -5,6 +5,15 @@ collection-view menu and a multiple-choice filter. Read `README.md` and the
 relevant source before changing behavior. If documentation and code disagree,
 verify the behavior and update the applicable documentation.
 
+## Task log in docs/
+
+- **Record every task in `docs/` before starting it.** Find the most relevant existing document in `docs/`
+  (create one only when none fits; `docs/issue-progress.md` holds the general TODO list). Add a `TODO` entry
+  first: the task's detailed context, the user's requirements, and the user's prompt quoted verbatim. Then do the
+  task. When it is finished, mark the entry done and add the result and its evidence (commits, tests,
+  screenshots). Purpose: if the work is interrupted, the context can be found again and the task resumed.
+- The same rule is in the vault's root `instructions.md` (section 16). Details: `.agents/skills/cyl-commit/`.
+
 ## Code and naming
 
 - Use the `CYL` prefix for project-specific Objective-C classes and protocols;

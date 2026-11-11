@@ -1,9 +1,19 @@
 ---
 name: cyl-commit
-description: Commit message format for CollectionViewClassifyMenu (Conventional Commits with emoji, the required author line), the checks to run before every commit, and the pull request every new branch gets.
+description: Commit message format for CollectionViewClassifyMenu (Conventional Commits with emoji, the required author line), the task log in docs/ kept before and after every task, the checks to run before every commit, and the pull request every new branch gets.
 ---
 
 # Commits
+
+## Task log in docs/ (before any work)
+
+1. Find the most relevant existing document in `docs/` (create one only when none fits); the general TODO list is
+   the "待办 / TODO" section of `docs/issue-progress.md`.
+2. Add a `TODO` entry before changing anything: the detailed context (branch, files, what was found so far), the
+   user's requirements, and the user's prompt quoted verbatim.
+3. Do the task. Commit the entry with the first commit of the task, so it survives an interruption.
+4. When the task is finished, mark the entry done and add the result and its evidence (commits, test counts,
+   screenshots).
 
 ## Message
 
