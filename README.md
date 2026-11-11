@@ -388,6 +388,33 @@ tagListView.tagDeleteHandler = { index, tag in print("deleted", index, tag.title
 
 示例 / Demo：「样式」Tab → 标签云（`CYLTagCloudDemoViewController`）。
 
+#### Android 标签库：评分与 Swift 复刻 / Android tag libraries: scores and Swift ports
+
+三个 Android 标签库的每个公开 API 都在本项目有对应版本（各 100 分），它们的示例也已复刻为 Swift（「样式」Tab →
+Android 标签库示例）。核心库负责绘制与交互，示例只传入数据、样式参数并处理点击。
+
+Every public API of three Android tag libraries has a counterpart here (100 each), and their samples are ported to
+Swift (样式 tab → Android tag library samples). The core draws and handles everything; the samples pass data and style
+values and handle taps.
+
+| 库 / Library | 对照表 / Table | 核心 API / Core API | 示例 / Sample |
+| --- | --- | --- | --- |
+| [kaedea/android-tagview](https://github.com/kaedea/android-tagview) | [docs/android-tagview-api.md](docs/android-tagview-api.md) | `CYLTag`, `CYLMenuStyle.tagCloud()`, badges, `headerIndicatorColor` | `CYLTagCloudSample.swift`（含 YY 热门搜索） |
+| [shellljx/TagViewGroup](https://github.com/shellljx/TagViewGroup) | [docs/tagviewgroup-api.md](docs/tagviewgroup-api.md) | `CYLImageTagGroupView`, `CYLImageTagView` | `CYLImageTagSample.swift` |
+| [whilu/AndroidTagView](https://github.com/whilu/AndroidTagView) | [docs/androidtagview-api.md](docs/androidtagview-api.md) | `CYLMenuStyle.tagContainer()`, `CYLTagColors`, reordering, long press, ripple, drawn cross | `CYLTagContainerSample.swift` |
+
+| 状态 / State | 截图 / Screenshot |
+| --- | :---: |
+| android-tagview：TagView Sample | <img src="assets/test-sample-tag-cloud.png" width="280" alt="TagView Sample"> |
+| android-tagview：YY 热门搜索 | <img src="assets/test-sample-hot-search.png" width="280" alt="热门搜索"> |
+| TagViewGroup：图片标签 | <img src="assets/test-sample-image-tag.png" width="280" alt="图片标签"> |
+| TagViewGroup：编辑 | <img src="assets/test-sample-image-tag-edit.png" width="280" alt="编辑"> |
+| AndroidTagView：五个容器 | <img src="assets/test-sample-tag-container.png" width="280" alt="标签容器"> |
+
+搜索框 / Search bars：Example 的所有搜索框（场景二搜索分类、搜索历史与发现、YY 热门搜索）都使用同级仓库
+[CYLSearchViewController](https://github.com/ChenYilong/CYLSearchViewController) 的 `CYLSearchBarView`，
+以 commit 依赖引入（`Example/Podfile` 的 `CYL_SEARCH`）。
+
 | 状态 / State | 截图 / Screenshot |
 | --- | :---: |
 | 标签云：代码与字典初始化 / Tag cloud in code and from a dictionary | <img src="assets/test-tag-cloud-android-api.png" width="280" alt="标签云"> |
@@ -539,7 +566,7 @@ CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成
 
 ### Tests / 测试
 
-两个示例的测试（`Example/CYLMenuExampleTests`：61 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
+两个示例的测试（`Example/CYLMenuExampleTests`：68 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
 每个功能一个测试类、一个文件（高内聚）；测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，
 同时编译进两个测试 target（低耦合，不重复）。
 
@@ -564,13 +591,14 @@ both test targets.
 | `CYLTagListSelectionTests` · `CYLTagListFoldingTests` · `CYLTagListLayoutTests` | 选择模式、折叠样式、布局与宽度 |
 | `CYLTagButtonTests` · `CYLTagConfigurationTests` · `CYLTagListAccessibilityTests` | 标签按钮外观、配置初始化、VoiceOver |
 | `CYLTagStyleDemoTests` · `CYLAnimatedIconTests` | 「样式」与「动效」页，CYLTabBarController 动效引擎 |
+| `CYLAndroidSampleTests` | 三个 Android 标签库示例的复刻与其核心功能：容器边框、对齐、主题、叉号、涟漪、拖动排序、长按、图片标签 |
 | `CYLTagCloudTests` | android-tagview 的 API：`CYLTag`、添加/删除标签、可删除标签、按下颜色、背景图、四边内边距、字号、配置键 |
 | `CYLReviewFilterScenarioTests` · `CYLSearchCategoryScenarioTests` | 场景一（评价筛选）、场景二（搜索分类） |
 | `CYLRootTabBarTests` · `CYLExampleDatabaseTests` · `CYLSearchDiscoverTests` · `CYLLocalizationTests` | 根 TabBar 与 PlusButton、SQLite、最近搜索 + 发现、国际化 |
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | 纯 Swift 示例：标签数据、编辑标签、折叠样式、无障碍 |
 
 ```sh
-scripts/unit-tests.sh example   # 61 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh example   # 68 tests; screenshots in build/test-screenshots/example/
 scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshots/swift/
 ```
 
@@ -579,7 +607,7 @@ establishing connection”）；两个示例和根目录的两个演示 App 因�
 `CYLSceneDelegate`、`CYLTagDemoSceneDelegate`；后两个是 `scripts/unit-tests.sh menu|tag` 的测试宿主），
 测试窗口也加入 App 的 scene。
 
-测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 61、swift 19、menu 17、tag 6，共 103 个测试全部通过）：
+测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 68、swift 19、menu 17、tag 6，共 110 个测试全部通过）：
 
 | 单选：替换同组选择 | 多选 | 底部箭头：折叠 | 底部箭头：展开 |
 | --- | --- | --- | --- |

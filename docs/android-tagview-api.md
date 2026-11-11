@@ -29,6 +29,21 @@ Verified by `Example/CYLMenuExampleTests/CYLTagCloudTests.swift` (8 tests) and t
 
 ![enter image description here](../assets/test-tag-cloud-android-api.png)
 
+## Sample port / 示例复刻
+
+android-tagview's whole sample is ported to Swift: 样式 tab → android-tagview 示例 (`CYLTagCloudSample.swift`):
+MainActivity ("TagView Sample", every tag of its `onCreate`, INPUT TAG TEXT + ADD A TAG, Activity Result, GitHub),
+SubActivity, ListViewActivity (51 rows), RecyclerViewActivity (21 rows and a footer), and the YY hot search screen of its
+README (orange `CYLSearchBarView` with 取消, 热门搜索 with a bar, 神 / 热 badges). The core draws all of it
+(`CYLMenuStyle.tagCloud()`, `CYLTag.badgeText`, `headerIndicatorColor`, `CYLTagCornerRadiusSquare`); the screens only
+pass data and style values and handle taps. Verified by `CYLAndroidSampleTests`.
+
+| 状态 / State | 截图 / Screenshot |
+| --- | :---: |
+| MainActivity：TagView Sample | ![enter image description here](../assets/test-sample-tag-cloud.png) |
+| ListViewActivity | ![enter image description here](../assets/test-sample-tag-cloud-list.png) |
+| YY 热门搜索（README 第二张截图） | ![enter image description here](../assets/test-sample-hot-search.png) |
+
 ## TagView
 
 | android-tagview | CollectionViewClassifyMenu |
