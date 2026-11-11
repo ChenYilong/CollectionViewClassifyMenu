@@ -27,7 +27,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 验证截图 / Screenshot evidence
 
-以下截图来自 CI（`Example screenshots`，提交 `ff35b27`，`macos-26`），对应表中的 issue：
+以下截图来自 CI（`Example screenshots`，提交 `3679915`，`macos-26`），对应表中的 issue：
 
 | #13 / #1：长文字与 emoji 标签复用后不重叠、选中状态保持 | #13：多选后折叠的长文字标签 | #7：分组标题按容器宽度布局，右侧有宿主视图 | #9：大量标签滚动到末尾 |
 | --- | --- | --- | --- |

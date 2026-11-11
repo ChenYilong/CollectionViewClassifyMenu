@@ -45,7 +45,7 @@ persistence in the demos.
 
 ## 截图 / Screenshots
 
-CI 截图（`Example screenshots`，提交 `ff35b27`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：
+CI 截图（`Example screenshots`，提交 `3679915`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：
 
 | 折叠控件与标题样式 | 全部展开（箭头旋转 180°） | 由 JSON / plist / YAML / XML 创建 |
 | --- | --- | --- |

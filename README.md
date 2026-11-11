@@ -409,7 +409,7 @@ SQL 只用于展示。
 `CYLExampleMenuSource` shows how a host turns its own models into a
 `CYLMenuDataSource`; the core library holds no business data.
 
-截图来自 CI（`Example screenshots`，提交 `ff35b27`，iPhone 模拟器）：
+截图来自 CI（`Example screenshots`，提交 `3679915`，iPhone 模拟器）：
 
 | 场景一：商品页预览 | 场景一：评价筛选（展开） | 场景二：搜索首页 | 场景二：职位分类 |
 | --- | --- | --- | --- |
