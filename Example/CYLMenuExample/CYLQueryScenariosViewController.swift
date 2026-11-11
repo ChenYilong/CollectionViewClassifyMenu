@@ -31,7 +31,7 @@ final class CYLQueryScenariosViewController: UITableViewController {
         super.init(style: .insetGrouped)
     }
 
-    override convenience init() {
+    convenience init() {
         self.init(database: CYLExampleDatabase.shared())
     }
 

@@ -39,7 +39,7 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
     }
 
     /// On CYLExampleDatabase.shared().
-    override convenience init() {
+    convenience init() {
         self.init(database: CYLExampleDatabase.shared())
     }
 
