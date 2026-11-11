@@ -15,10 +15,9 @@ Pod::Spec.new do |s|
     'CollectionViewClassifyMenu/Class/**/*.{h,m}',
     'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.{h,m}'
   ]
+  # The demo app's code (CYLMainViewController, CYLDemoDataSource, CYLDBManager, CYLAppDelegate…) is Swift and
+  # not matched by the patterns above; only AppleDouble files need excluding.
   s.exclude_files = [
-    'CollectionViewClassifyMenu/Class/Other/Symtem/{main.m,CYLAppDelegate.h,CYLAppDelegate.m,CYLDemoLocalization.h}',
-    'CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/{CYLMainViewController,CYLDemoDataSource}.{h,m}',
-    'CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.{h,m}',
     '**/._*'
   ]
   s.resource_bundles = { 'CYLClassifyMenuResources' => [

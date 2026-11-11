@@ -44,7 +44,7 @@ end
 
 # Apps that link a static framework with Swift code (CYLTabBarController's Lottie and Rive
 # animators) get "$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)" from CocoaPods. On Xcode 26
-# runners TOOLCHAIN_DIR resolves to an unmounted Metal toolchain, so the Objective-C app cannot find
+# runners TOOLCHAIN_DIR resolves to an unmounted Metal toolchain, so the app cannot find
 # the Swift back-deployment library (swiftCompatibility56). Point the search path at Xcode's default
 # toolchain, the fix of CYLTabBarController's scripts/ci-build-example.sh, here for every build.
 post_integrate do |installer|

@@ -20,7 +20,9 @@
 @property (nonatomic, strong) NSMutableArray *groups;
 @property (nonatomic, weak) id<CYLMenuDataSource> menuDataSource;
 @property (nonatomic, weak) id<CYLMenuDelegate> menuDelegate;
-+(instancetype)tagView;
+/// Loads the view from CYLTagView.xib (in the component's bundle). Swift: `CYLTagView.makeTagView()`; without the
+/// name Swift would import this factory as `CYLTagView()`, which does not load the nib.
++(instancetype)tagView NS_SWIFT_NAME(makeTagView());
 - (void)reloadMenuData;
 
 

@@ -12,10 +12,17 @@ Rules in `AGENTS.md` ("Swift examples and a Swift-friendly core"). This skill is
 - New examples and new screens are Swift (`Example-Swift/` is the model: local pod
   `pod 'CollectionViewClassifyMenu', :path => '..'`, `use_frameworks!`, `import CollectionViewClassifyMenu`,
   strings through its own bundle and lookup helper, tests in Swift).
-- The Objective-C examples still to port: `Example/CYLMenuExample` (scenarios 1 and 2, styles, animations,
-  plus button, database demos), the demo app of `CollectionViewClassifyMenu.xcodeproj` (`CYLMainViewController`,
-  `CYLDemoDataSource`, `CYLDBManager`) and `TagCollectionView`. Port the part a change touches, keep its
-  screenshots (`scripts/example-screenshots.sh`) and tests, then remove the Objective-C code it replaces.
+- Every example is Swift now: `Example/CYLMenuExample` (scenarios 1 and 2, styles, animations, plus button,
+  database demos; its project is generated as a Swift app), `Example-Swift/CYLTagEditorExample`, the demo app of
+  `CollectionViewClassifyMenu.xcodeproj` (`PRODUCT_MODULE_NAME = CYLClassifyMenuDemo`, because the target's name
+  clashes with the pod's module) and the `TagCollectionView` demo. `CYLDemoDataSource.swift` and
+  `CYLDBManager.swift` are shared by the demo app and `Example/CYLMenuExample` (referenced by path).
+- The port kept every class name; members kept the names Swift would import from the old headers, so tests and
+  screenshot hooks read the same. Core APIs the port needed in Swift got Swift annotations only
+  (`+[CYLTagView tagView]` → `makeTagView()`, because Swift imported the factory as `init()`, which skipped the nib).
+- An Objective-C API that raises `NSException` cannot be caught in Swift: validate before calling it (as
+  `CYLMenuLinkageViewController` does before `setSelectedIndexPaths:`), and never wrap it in Objective-C example
+  code.
 
 ## Fixing an API for Swift, in the core
 

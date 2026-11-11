@@ -365,13 +365,15 @@ Swift 无法调用宏，使用同名函数：`CYLMenuLocalizedString("CYLMenuExp
 切换语言后新创建的视图使用新语言。`CYLMenuStyle` 的 `expandTitle` / `collapseTitle` 默认取自该 bundle，
 也可由宿主覆盖。新增文案时，在三个 `.strings` 中加入相同的键（测试会检查键一致）。
 
-Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CYLMenuExample.bundle`，通过宏 `CYLExampleLocalizedString` 读取，键为中文原文；
+Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CYLMenuExample.bundle`，通过 Swift 函数 `CYLExampleLocalizedString` 读取，键为中文原文；
 评价关键词与标签属于示例数据，不翻译。启动参数 `-CYLExampleLanguage en` 可切换 Example 与组件的语言。
 Swift Example 使用函数 `CYLTagEditorLocalizedString` 读取 `CYLTagEditorExample.bundle`；`CollectionViewClassifyMenu.xcodeproj`
-的演示 App 使用宏 `CYLDemoLocalizedString` 读取 `CYLClassifyMenuDemo.bundle`。每一层各有自己的查找宏（或函数）与 bundle，
+的演示 App 使用 Swift 函数 `CYLDemoLocalizedString` 读取 `CYLClassifyMenuDemo.bundle`。每一层各有自己的查找宏（或函数）与 bundle，
 代码中不出现面向用户的中文字面量（含无障碍标签与提示）。
 
 ### Example / 示例工程
+
+所有示例（`Example/`、`Example-Swift/`、根目录工程的演示 App、`TagCollectionView` 演示）及其测试均以 Swift 编写；核心库保持 Objective-C，并通过 `NS_SWIFT_NAME` 等标注适配 Swift 命名。
 
 `Example/` 通过 Podfile 以本地路径集成核心库，并引入
 [CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 搭建两个作用不同的 TabBar：

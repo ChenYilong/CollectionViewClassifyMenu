@@ -10,8 +10,8 @@ description: Internationalization and localization rules and checks for Collecti
 | Module | Bundle | Sources | Lookup macro |
 | --- | --- | --- | --- |
 | Core (pod) | `CYLClassifyMenuResources.bundle` (also holds images and XIBs) | `CollectionViewClassifyMenu/Resources/Localization/<language>.lproj/CYLClassifyMenu.strings` | `CYLMenuLocalizedString(key, comment)`; Swift: `CYLMenuLocalizedString(_:)` (the C function `CYLMenuLocalizedStringForKey`); images: `CYLMenuImage(name)` |
-| Demo app of `CollectionViewClassifyMenu.xcodeproj` (not in the pod) | `CYLClassifyMenuDemo.bundle` | `CollectionViewClassifyMenu/Class/Other/Symtem/CYLClassifyMenuDemo.bundle/<language>.lproj/Localizable.strings` | `CYLDemoLocalizedString(key)` (header-only `CYLDemoLocalization.h`, excluded from the podspec) |
-| Example | `CYLMenuExample.bundle` | `Example/CYLMenuExample/CYLMenuExample.bundle/<language>.lproj/Localizable.strings` | `CYLExampleLocalizedString(key)` |
+| Demo app of `CollectionViewClassifyMenu.xcodeproj` (not in the pod) | `CYLClassifyMenuDemo.bundle` | `CollectionViewClassifyMenu/Class/Other/Symtem/CYLClassifyMenuDemo.bundle/<language>.lproj/Localizable.strings` | `CYLDemoLocalizedString(key)` (Swift function in `CYLDemoLocalization.swift`; the demo app is Swift, module `CYLClassifyMenuDemo`) |
+| Example | `CYLMenuExample.bundle` | `Example/CYLMenuExample/CYLMenuExample.bundle/<language>.lproj/Localizable.strings` | `CYLExampleLocalizedString(key, args...)` (Swift function in `CYLExampleLocalization.swift`) |
 | Swift Example | `CYLTagEditorExample.bundle` (also holds `tags.json` and the `fold-styles.*` configuration files per language) | `Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle/<language>.lproj/Localizable.strings` | `CYLTagEditorLocalizedString(key, args...)` (Swift function) |
 
 - Several `.lproj` files of one module always go into that module's single
@@ -48,9 +48,10 @@ commit over every branch, see `cyl-dependency`; its core lookup is `CYLLocalized
    `CYLClassifyMenuResources.bundle`. The bundle's form, name and folder name may differ per platform, but it is
    always a folder or package (iOS: a `.bundle` folder; Android: a module's `res/values*/`; web: a package's
    locale folder).
-2. **An example lookup macro per example.** Each example has its own macro over its own example-level bundle:
-   `CYLExampleLocalizedString` over `CYLMenuExample.bundle`. Swift has no macros, so a Swift example has one global
-   function in that role: `CYLTagEditorLocalizedString` over `CYLTagEditorExample.bundle`.
+2. **An example lookup per example.** Each example has its own lookup over its own example-level bundle. The
+   examples are Swift, which has no macros, so each has one global function in that role:
+   `CYLExampleLocalizedString` over `CYLMenuExample.bundle`, `CYLTagEditorLocalizedString` over
+   `CYLTagEditorExample.bundle`, `CYLDemoLocalizedString` over `CYLClassifyMenuDemo.bundle`.
 3. **At least two lookups, one per level.** A project passes only with at least two different lookup macros (or
    Swift functions), each reading a different bundle: the core's and at least one example's. Nothing else reads a
    bundle's strings or calls `NSLocalizedString` directly.
@@ -64,7 +65,7 @@ commit over every branch, see `cyl-dependency`; its core lookup is `CYLLocalized
 
 ```sh
 # Exactly the lookups below, one per level; no other bundle reads or NSLocalizedString calls.
-grep -rn "define CYLMenuLocalizedString\|define CYLExampleLocalizedString\|define CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
+grep -rn "define CYLMenuLocalizedString\|func CYLExampleLocalizedString\|func CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
   CollectionViewClassifyMenu Example Example-Swift
 grep -rn "NSLocalizedString(" CollectionViewClassifyMenu Example Example-Swift --include=*.m --include=*.swift
 ```
@@ -101,6 +102,6 @@ PY
 
 ### Known gaps
 
-- `CYLDemoDataSource` (shared by the demo app and `Example/CYLMenuExample`) still holds its sample sections
-  ("全部", "地区过滤", "菜品过滤") as Chinese data. Localize them when that data source is ported to Swift
-  (see `cyl-swift`).
+- `CYLDemoDataSource.swift` (shared by the demo app and `Example/CYLMenuExample`, which have different bundles)
+  keeps its sample sections ("全部", "地区过滤", "菜品过滤") as Chinese sample data; so does the `TagCollectionView`
+  demo's tag data. Localize them through a lookup both apps can reach if they become real UI text.

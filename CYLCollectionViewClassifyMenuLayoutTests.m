@@ -1,8 +1,27 @@
 #import <XCTest/XCTest.h>
 @import CollectionViewClassifyMenu;
-#import "CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.h"
-#import "CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/CYLMainViewController.h"
-#import "CollectionViewClassifyMenu/Class/Other/Symtem/CYLDemoLocalization.h"
+
+// Core tests: they use the demo data (data.json of the host app) but no demo code. The demo app's own tests
+// (CYLMainViewController, CYLDemoLocalizedString) are in CYLClassifyMenuDemoTests.swift.
+
+/// data.json's sections, read directly (the demo's CYLDBManager is Swift and app code).
+static NSArray<NSDictionary *> *CYLTestDataSource(void) {
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"data.json" withExtension:nil];
+    NSData *data = url ? [NSData dataWithContentsOfURL:url] : nil;
+    NSArray *sections = data ? [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL] : nil;
+    return [sections isKindOfClass:[NSArray class]] ? sections : @[];
+}
+
+/// Every item title of data.json, in order.
+static NSArray<NSString *> *CYLTestAllTags(void) {
+    NSMutableArray *tags = [NSMutableArray array];
+    for (NSDictionary *section in CYLTestDataSource()) {
+        for (NSDictionary *item in section[kDataSourceSectionKey]) {
+            [tags addObject:item[kDataSourceCellTextKey]];
+        }
+    }
+    return tags;
+}
 
 @interface CYLTestMenuSource : NSObject <CYLMenuDataSource, CYLMenuDelegate>
 @property (nonatomic, copy) NSArray<NSArray<NSString *> *> *sections;
@@ -67,11 +86,6 @@
 - (void)cyl_judgeMoreButtonShowWhenDefaultRowsCount:(NSUInteger)defaultRowsCount;
 @end
 
-@interface CYLMainViewController (CYLMigrationTesting)
-- (NSArray *)cyl_selectionFromLegacyArchiveData:(NSData *)data;
-- (NSArray<NSIndexPath *> *)cyl_validatedSelection:(NSArray *)stored;
-@end
-
 @implementation CYLCollectionViewClassifyMenuLayoutTests
 
 - (void)testNamespacedCategoryMethodsAndClasses {
@@ -84,30 +98,9 @@
     XCTAssertEqual(NSClassFromString(@"CYLTagView"), [CYLTagView class]);
 }
 
-- (void)testLegacyFilterSelectionMigrationValidatesArchivedStates {
-    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
-    source.sections = @[@[@"All", @"One"], @[@"All", @"Two"]];
-    CYLMainViewController *controller = [[CYLMainViewController alloc] init];
-    [controller setValue:source forKey:@"filterSource"];
-    CYLFilterParamsTool *legacy = [[CYLFilterParamsTool alloc] init];
-    legacy.filterParamsArray = [@[[NSMutableArray arrayWithArray:@[@0, @1]],
-                                  [NSMutableArray arrayWithArray:@[@1, @0]]] mutableCopy];
-    NSError *error = nil;
-    NSData *archive = [NSKeyedArchiver archivedDataWithRootObject:legacy requiringSecureCoding:NO error:&error];
-    XCTAssertNotNil(archive);
-    XCTAssertNil(error);
-    XCTAssertEqualObjects([controller cyl_selectionFromLegacyArchiveData:archive], (@[@[@0, @1], @[@1, @0]]));
-    XCTAssertNil([controller cyl_selectionFromLegacyArchiveData:[@"invalid" dataUsingEncoding:NSUTF8StringEncoding]]);
-    XCTAssertNil(([controller cyl_validatedSelection:@[@[@(-1), @0]]]));
-    XCTAssertNil(([controller cyl_validatedSelection:@[@[@0, @0], @[@0, @1]]]));
-    legacy.filterParamsArray[0][1] = @"bad";
-    archive = [NSKeyedArchiver archivedDataWithRootObject:legacy requiringSecureCoding:NO error:&error];
-    XCTAssertNil([controller cyl_selectionFromLegacyArchiveData:archive]);
-}
-
 - (NSArray<NSArray<NSString *> *> *)longEmojiSections {
     NSMutableArray *sections = [NSMutableArray array];
-    NSArray *source = [CYLDBManager dataSource];
+    NSArray *source = CYLTestDataSource();
     XCTAssertGreaterThan(source.count, 0u);
     NSUInteger index = 0;
     for (NSDictionary *section in source) {
@@ -119,7 +112,7 @@
         }
         [sections addObject:titles];
     }
-    NSArray *filterSections = @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:[CYLDBManager allTags]]];
+    NSArray *filterSections = @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:CYLTestAllTags()]];
     for (NSArray *sourceSection in filterSections) {
         NSMutableArray *titles = [NSMutableArray array];
         for (NSString *title in sourceSection) {
@@ -217,7 +210,7 @@
 }
 
 - (void)testRealMenuControllersWithLongEmojiData {
-    NSArray *source = [CYLDBManager dataSource];
+    NSArray *source = CYLTestDataSource();
     XCTAssertGreaterThan(source.count, 0u);
     NSMutableArray *menuData = [NSMutableArray array];
     NSMutableArray *menuTitles = [NSMutableArray array];
@@ -258,18 +251,10 @@
     [self assertNoOverlaps:menuCollection fixture:fixture];
     [self scrollAndCheck:menuCollection fixture:fixture buttonKey:@"button"];
 
-    UIViewController *demo = [[NSClassFromString(@"CYLMainViewController") alloc] init];
-    [demo loadViewIfNeeded];
-    UILabel *title = [demo valueForKey:@"titleLabel"];
-    UISwitch *toggle = [demo valueForKey:@"rowsCountBydefaultSwitch"];
-    UIView *header = toggle.superview;
-    header.frame = CGRectMake(0, 0, 320, CGRectGetHeight(header.frame));
-    [header layoutIfNeeded];
-    XCTAssertLessThanOrEqual(CGRectGetMaxX(toggle.frame), CGRectGetWidth(header.bounds));
-    XCTAssertLessThanOrEqual(CGRectGetMaxX(title.frame), CGRectGetMinX(toggle.frame));
+    // The demo app's header at this width: testDemoHeaderFitsANarrowScreen (CYLClassifyMenuDemoTests.swift).
 
     NSMutableArray *filterTitles = [NSMutableArray array];
-    NSArray *filterSections = @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:[CYLDBManager allTags]]];
+    NSArray *filterSections = @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:CYLTestAllTags()]];
     for (NSArray *original in filterSections) {
         NSMutableArray *titles = [NSMutableArray array];
         for (NSString *title in original) {
@@ -307,7 +292,7 @@
 }
 
 - (void)testCollapsedRowsMatchMeasuredLongEmojiItems {
-    NSArray *source = [CYLDBManager dataSource];
+    NSArray *source = CYLTestDataSource();
     XCTAssertGreaterThan(source.count, 0u);
     NSMutableArray *menuData = [NSMutableArray array];
     for (NSDictionary *original in source) {
@@ -416,17 +401,15 @@
     XCTAssertEqual([collection numberOfItemsInSection:0], 1);
 }
 
-- (void)testCoreAndDemoLookupsReadTheirOwnBundles {
+- (void)testCoreLookupsReadTheCoreBundle {
     NSString *saved = CYLMenuResources.preferredLanguage;
     CYLMenuResources.preferredLanguage = @"en";
     // Two lookups, two bundles: the core's and the demo app's.
     XCTAssertEqualObjects(CYLMenuLocalizedString(@"CYLMenuNewTag", nil), @"New Tag");
     XCTAssertEqualObjects(CYLMenuLocalizedStringForKey(@"CYLMenuNewTag"), @"New Tag");
-    XCTAssertEqualObjects(CYLDemoLocalizedString(@"重置筛选条件"), @"Reset filters");
     XCTAssertEqualObjects(CYLMenuLocalizedString(@"重置筛选条件", nil), @"重置筛选条件", @"Demo strings are not in the core bundle");
     XCTAssertNotNil(CYLMenuImage(@"cyl_tag_plus"));
-    CYLMenuResources.preferredLanguage = @"zh-Hant";
-    XCTAssertEqualObjects(CYLDemoLocalizedString(@"重置筛选条件"), @"重設篩選條件");
+    // The demo app's lookup over its own bundle: testDemoLookupReadsItsOwnBundle (CYLClassifyMenuDemoTests.swift).
     CYLMenuResources.preferredLanguage = saved;
 }
 
@@ -573,7 +556,7 @@
     }
 
     NSMutableArray *filterTitles = [NSMutableArray array];
-    for (NSArray *section in @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:[CYLDBManager allTags]]]) {
+    for (NSArray *section in @[@[@"全部", @"北京"], [@[@"全部"] arrayByAddingObjectsFromArray:CYLTestAllTags()]]) {
         NSMutableArray *titles = [NSMutableArray array];
         for (NSString *title in section) {
             [titles addObject:[title stringByAppendingString:@" 🧑‍💻🍜 长筛选文字"]];

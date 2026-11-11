@@ -19,10 +19,11 @@ verify the behavior and update the applicable documentation.
 
 ## Swift examples and a Swift-friendly core
 
-- Every iOS example is written in Swift. Do not add Objective-C example code. The
-  existing Objective-C examples (`Example/CYLMenuExample`, the demo app of
-  `CollectionViewClassifyMenu.xcodeproj`, `TagCollectionView`) are to be rewritten
-  in Swift; a change to one of them is the moment to port the part it touches.
+- Every iOS example is written in Swift, tests included: `Example/CYLMenuExample`,
+  `Example-Swift/CYLTagEditorExample`, the demo app of
+  `CollectionViewClassifyMenu.xcodeproj` (module `CYLClassifyMenuDemo`) and the
+  `TagCollectionView` demo. Never add Objective-C example code. Only the core
+  library (the pod's sources) and its own tests stay in Objective-C.
 - The core library stays in Objective-C. When an example calls an Objective-C API
   that reads badly in Swift, fix it in the core, never with workarounds in the
   example: the Swift API Design Guidelines decide (`NS_SWIFT_NAME`, nullability,
@@ -101,8 +102,10 @@ verify the behavior and update the applicable documentation.
 - Example strings belong to an Example-level bundle
   (`Example/CYLMenuExample/CYLMenuExample.bundle`), never to the core bundle.
 - Always look strings up through a macro that maps keys to its bundle:
-  `CYLMenuLocalizedString` for the core, `CYLExampleLocalizedString` for the
-  Example. Do not call `NSLocalizedString` or read a bundle directly.
+  `CYLMenuLocalizedString` for the core (Swift: `CYLMenuLocalizedString(_:)`), and
+  one Swift function per example (`CYLExampleLocalizedString`,
+  `CYLTagEditorLocalizedString`, `CYLDemoLocalizedString`). Do not call
+  `NSLocalizedString` or read a bundle directly.
 - Other platforms follow the same rules with their own resource mechanism: one
   resource container per module, the core one kept stable, a lookup helper per
   module.
@@ -113,11 +116,12 @@ verify the behavior and update the applicable documentation.
     per platform, but it is always a folder or package; on iOS it is a
     `.bundle` folder (`CYLClassifyMenuResources.bundle`, macro
     `CYLMenuLocalizedString`).
-  - Every example has its own lookup macro that reads the example's localized
-    files from the example-level bundle (`CYLExampleLocalizedString` for
-    `Example/CYLMenuExample`). Swift has no macros: a Swift example uses one
-    global function in the same role (`CYLTagEditorLocalizedString` for
-    `Example-Swift`), and a core macro also needs a function Swift can call.
+  - Every example has its own lookup that reads the example's localized files
+    from the example-level bundle. The examples are Swift, which has no macros,
+    so each uses one global function in that role: `CYLExampleLocalizedString`
+    (`Example/CYLMenuExample`), `CYLTagEditorLocalizedString` (`Example-Swift`),
+    `CYLDemoLocalizedString` (the demo app). A core macro also needs a function
+    Swift can call.
   - A project passes only if it has at least two different lookup macros (or
     Swift functions), one per level, each reading a different bundle: the core
     one and at least one example's. No code reads a bundle or calls
