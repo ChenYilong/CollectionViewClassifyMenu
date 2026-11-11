@@ -484,6 +484,80 @@ CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成
 | --- | --- | --- | --- | --- |
 | <img src="assets/swift-remark.png" width="200" alt="编辑备注"> | <img src="assets/swift-tag-editor.png" width="200" alt="编辑标签"> | <img src="assets/swift-tag-editor-search.png" width="200" alt="搜索并新建标签"> | <img src="assets/swift-fold-styles.png" width="200" alt="折叠样式"> | <img src="assets/swift-fold-styles-config.png" width="200" alt="配置文件创建"> |
 
+### Tests / 测试
+
+两个示例的测试（`Example/CYLMenuExampleTests`：52 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
+每个功能一个测试类、一个文件（高内聚）；测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，
+同时编译进两个测试 target（低耦合，不重复）。
+
+The tests of both examples are organized around protocols: one test case class and one file per feature, and the
+capabilities they share are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into
+both test targets.
+
+| 协议 / Protocol | 作用 / What it gives a test |
+| --- | --- |
+| `CYLWindowHosting` | 在 App 的 scene 中用自己的窗口显示页面（`show(_:)`、`showInNavigation(_:)`），测试结束时关闭 |
+| `CYLTagListInspecting` | 读取并点击标签列表：cell、标签按钮、分组头/尾、折叠控件、布局 frame、`assertItemsFit` |
+| `CYLAccessibilityQuerying` | 按 accessibility identifier 和 label 查找视图，不用坐标 |
+| `CYLScreenshotCapturing` | 记录被测状态的截图：附加到测试结果，并写入 `CYL_TEST_SCREENSHOTS_DIR` |
+| `CYLConditionWaiting` | 等待异步结果（`waitUntil { … }`），不用固定延时 |
+
+- 核心库的私有视图只通过 `CYLTagListProbe` 读取（唯一一处 key-value coding），核心改名时只改这一处。
+- 每个测试 target 只有一个很小的基类（`CYLMenuExampleTestCase`、`CYLTagEditorTestCase`，负责语言和要显示的页面），
+  测试数据与替身在各自的 `Support/` 中（`CYLMenuFixtures`、`CYLRecordingMenuDelegate`、`CYLTabBarInspecting`）。
+
+| 测试类 / Test case | 内容 |
+| --- | --- |
+| `CYLTagListSelectionTests` · `CYLTagListFoldingTests` · `CYLTagListLayoutTests` | 选择模式、折叠样式、布局与宽度 |
+| `CYLTagButtonTests` · `CYLTagConfigurationTests` · `CYLTagListAccessibilityTests` | 标签按钮外观、配置初始化、VoiceOver |
+| `CYLTagStyleDemoTests` · `CYLAnimatedIconTests` | 「样式」与「动效」页，CYLTabBarController 动效引擎 |
+| `CYLReviewFilterScenarioTests` · `CYLSearchCategoryScenarioTests` | 场景一（评价筛选）、场景二（搜索分类） |
+| `CYLRootTabBarTests` · `CYLExampleDatabaseTests` · `CYLSearchDiscoverTests` · `CYLLocalizationTests` | 根 TabBar 与 PlusButton、SQLite、最近搜索 + 发现、国际化 |
+| `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | 纯 Swift 示例：标签数据、编辑标签、折叠样式、无障碍 |
+
+```sh
+scripts/unit-tests.sh example   # 52 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshots/swift/
+```
+
+Xcode 27（iOS 27 SDK）要求 App 采用 scene 生命周期，否则启动即被 UIKit 终止（测试报 “The test runner crashed before
+establishing connection”）；两个示例因此各有一个 scene delegate（`CYLExampleSceneDelegate`、`CYLTagEditorSceneDelegate`），
+测试窗口也加入 App 的 scene。
+
+测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1，71 个测试全部通过）：
+
+| 单选：替换同组选择 | 多选 | 底部箭头：折叠 | 底部箭头：展开 |
+| --- | --- | --- | --- |
+| <img src="assets/test-selection-single.png" width="200" alt="单选"> | <img src="assets/test-selection-multiple.png" width="200" alt="多选"> | <img src="assets/test-fold-footer-chevron-folded.png" width="200" alt="底部箭头：折叠"> | <img src="assets/test-fold-footer-chevron-expanded.png" width="200" alt="底部箭头：展开"> |
+
+| 分组头按钮：各组独立折叠 | 行内折叠：折叠 | 行内折叠：展开 | 网格：每行两个 |
+| --- | --- | --- | --- |
+| <img src="assets/test-fold-header-button.png" width="200" alt="分组头按钮"> | <img src="assets/test-fold-inline-folded.png" width="200" alt="行内折叠：折叠"> | <img src="assets/test-fold-inline-expanded.png" width="200" alt="行内折叠：展开"> | <img src="assets/test-layout-grid-two-per-row.png" width="200" alt="网格"> |
+
+| 宿主图标与分组头附件 | 240pt 窄屏 | 样式页：胶囊 + 图标颜色 | 动效页 |
+| --- | --- | --- | --- |
+| <img src="assets/test-layout-host-images-and-accessory.png" width="200" alt="宿主图标与附件"> | <img src="assets/test-layout-narrow-240pt.png" width="200" alt="240pt 窄屏"> | <img src="assets/test-style-demo-capsule-icon-color.png" width="200" alt="样式页"> | <img src="assets/test-animation-demo.png" width="200" alt="动效页"> |
+
+| 动效页：深色分组（icons.riv） | 场景一：商品页预览 | 场景一：筛选折叠 | 场景一：筛选展开 |
+| --- | --- | --- | --- |
+| <img src="assets/test-animation-dark-section.png" width="200" alt="深色分组"> | <img src="assets/test-scenario1-product-preview.png" width="200" alt="商品页预览"> | <img src="assets/test-scenario1-review-filter-folded.png" width="200" alt="筛选折叠"> | <img src="assets/test-scenario1-review-filter-expanded.png" width="200" alt="筛选展开"> |
+
+| 场景一：好评 + 有图（内存） | 场景二：找人 | 场景二：职位 | 根 TabBar |
+| --- | --- | --- | --- |
+| <img src="assets/test-scenario1-memory-filter-good-photo.png" width="200" alt="好评 + 有图"> | <img src="assets/test-scenario2-search-people.png" width="200" alt="找人"> | <img src="assets/test-scenario2-search-jobs.png" width="200" alt="职位"> | <img src="assets/test-root-tab-bar.png" width="200" alt="根 TabBar"> |
+
+| PlusButton：查询筛选 | 评价筛选 · 数据库 | 菜单选择 · 数据库联动 | 最近搜索 + 发现 |
+| --- | --- | --- | --- |
+| <img src="assets/test-plus-query-scenarios.png" width="200" alt="查询筛选"> | <img src="assets/test-database-review-filter.png" width="200" alt="评价筛选 · 数据库"> | <img src="assets/test-database-menu-linkage.png" width="200" alt="菜单选择 · 数据库联动"> | <img src="assets/test-search-discover.png" width="200" alt="最近搜索 + 发现"> |
+
+| English: root tab bar | 纯 Swift：编辑标签 | 纯 Swift：搜索并新建 | 纯 Swift：管理 |
+| --- | --- | --- | --- |
+| <img src="assets/test-localization-root-english.png" width="200" alt="English root tab bar"> | <img src="assets/test-swift-tag-editor.png" width="200" alt="编辑标签"> | <img src="assets/test-swift-tag-editor-search.png" width="200" alt="搜索并新建"> | <img src="assets/test-swift-tag-editor-managing.png" width="200" alt="管理"> |
+
+| 纯 Swift：编辑备注 | 纯 Swift：折叠样式 |
+| --- | --- |
+| <img src="assets/test-swift-remark.png" width="200" alt="编辑备注"> | <img src="assets/test-swift-fold-styles.png" width="200" alt="折叠样式"> |
+
 ### Naming migration / 命名迁移
 
 This naming change is **source and runtime incompatible** with the old names.
