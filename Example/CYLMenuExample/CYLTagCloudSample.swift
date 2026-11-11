@@ -393,6 +393,8 @@ final class CYLHotSearchViewController: UIViewController {
         }
         tagListView = list
 
+        // Orange behind the status bar only: it ends where the search bar (orange itself) begins, so the search bar
+        // covers no view.
         let barBackground = UIView()
         barBackground.backgroundColor = Self.orange
         for subview in [barBackground, bar, list] as [UIView] {
@@ -404,7 +406,7 @@ final class CYLHotSearchViewController: UIViewController {
             barBackground.topAnchor.constraint(equalTo: view.topAnchor),
             barBackground.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             barBackground.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            barBackground.bottomAnchor.constraint(equalTo: bar.bottomAnchor),
+            barBackground.bottomAnchor.constraint(equalTo: bar.topAnchor),
             bar.topAnchor.constraint(equalTo: guide.topAnchor),
             bar.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
             bar.trailingAnchor.constraint(equalTo: guide.trailingAnchor),

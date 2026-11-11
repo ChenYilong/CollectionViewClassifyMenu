@@ -93,9 +93,9 @@ verify the behavior and update the applicable documentation.
 - Shared capabilities are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into
   the test targets of `Example/` and `Example-Swift/`: `CYLWindowHosting` (windows in the app's scene),
   `CYLTagListInspecting` (cells, headers, footers, fold controls, taps), `CYLAccessibilityQuerying` (find views by
-  identifier and label), `CYLScreenshotCapturing` and `CYLConditionWaiting`. Each test target has one small base
-  class (`CYLMenuExampleTestCase`, `CYLTagEditorTestCase`) for its language and its screens, and its fixtures in
-  `Support/`.
+  identifier and label), `CYLScreenshotCapturing`, `CYLConditionWaiting` and `CYLViewOverlapInspecting` (the views
+  a view covers in its window). Each test target has one small base class (`CYLMenuExampleTestCase`,
+  `CYLTagEditorTestCase`) for its language and its screens, and its fixtures in `Support/`.
 - Tests reach private views of the core only through `CYLTagListProbe` (key-value coding in one place).
 - Tests record screenshots of the states they check with `captureScreenshot(of:named:)` / `captureScreen(named:)`
   (names start with `test-`); `scripts/unit-tests.sh` writes them to `build/test-screenshots/<suite>/`.
@@ -157,6 +157,15 @@ verify the behavior and update the applicable documentation.
   parser (`CYLTabBarConfigurationParser`) at runtime, because the published
   CocoaPods release lacks them. Only the examples link it.
 - Details: `.agents/skills/cyl-dependency/`.
+
+## Search bars
+
+- A search bar never covers any view, at any time: not the view controller's view, not a sibling, not a background
+  view, not a bar item, in every state (scrolling, editing, Cancel shown) and at every Dynamic Type size. A screen
+  whose navigation bar holds the search bar removes `.top` from `edgesForExtendedLayout`; a `CYLSearchBarView` is
+  laid out against the safe area beside the content, and a colored area behind the status bar ends where the bar
+  begins. `CYLSearchBarPlacementTests` checks every screen with a search bar through `CYLViewOverlapInspecting`;
+  add a test there for each new one.
 
 ## Tab bars
 

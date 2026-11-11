@@ -13,6 +13,7 @@
 		E5B15AC9D9056D0D5A16A7AD /* CYLTagEditorAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1892D084C6840C1B6DABC54 /* CYLTagEditorAccessibilityTests.swift */; };
 		431B8E772A07BE6866D3610F /* CYLTagEditorTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85356B4EE81A8D35E405469B /* CYLTagEditorTestCase.swift */; };
 		54BE765644C6F40DEE726542 /* CYLWindowHosting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6159389886B3EA0857C667F /* CYLWindowHosting.swift */; };
+		E218701AD4D858B2829D7CFB /* CYLViewOverlapInspecting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0475DE8547FFAE51A8469E /* CYLViewOverlapInspecting.swift */; };
 		FAF0002C4552ACB829806FCF /* CYLTagListInspecting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6627EA4E0F4457A05AD4F525 /* CYLTagListInspecting.swift */; };
 		CBAA7F31F4FF04487A9EC707 /* CYLAccessibilityQuerying.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F21882F7FA25A8A547A8929 /* CYLAccessibilityQuerying.swift */; };
 		83EC8BB40995CF3C4E20F55A /* CYLScreenshotCapturing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE195600FC6B47A477EE669E /* CYLScreenshotCapturing.swift */; };
@@ -45,6 +46,7 @@
 		F1892D084C6840C1B6DABC54 /* CYLTagEditorAccessibilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorAccessibilityTests.swift; sourceTree = "<group>"; };
 		85356B4EE81A8D35E405469B /* CYLTagEditorTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorTestCase.swift; sourceTree = "<group>"; };
 		E6159389886B3EA0857C667F /* CYLWindowHosting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLWindowHosting.swift; sourceTree = "<group>"; };
+		7F0475DE8547FFAE51A8469E /* CYLViewOverlapInspecting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLViewOverlapInspecting.swift; sourceTree = "<group>"; };
 		6627EA4E0F4457A05AD4F525 /* CYLTagListInspecting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListInspecting.swift; sourceTree = "<group>"; };
 		2F21882F7FA25A8A547A8929 /* CYLAccessibilityQuerying.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAccessibilityQuerying.swift; sourceTree = "<group>"; };
 		FE195600FC6B47A477EE669E /* CYLScreenshotCapturing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLScreenshotCapturing.swift; sourceTree = "<group>"; };
@@ -178,6 +180,7 @@
 			isa = PBXGroup;
 			children = (
 				E6159389886B3EA0857C667F /* CYLWindowHosting.swift */,
+				7F0475DE8547FFAE51A8469E /* CYLViewOverlapInspecting.swift */,
 				6627EA4E0F4457A05AD4F525 /* CYLTagListInspecting.swift */,
 				2F21882F7FA25A8A547A8929 /* CYLAccessibilityQuerying.swift */,
 				FE195600FC6B47A477EE669E /* CYLScreenshotCapturing.swift */,
@@ -386,6 +389,7 @@
 				E5B15AC9D9056D0D5A16A7AD /* CYLTagEditorAccessibilityTests.swift in Sources */,
 				431B8E772A07BE6866D3610F /* CYLTagEditorTestCase.swift in Sources */,
 				54BE765644C6F40DEE726542 /* CYLWindowHosting.swift in Sources */,
+				E218701AD4D858B2829D7CFB /* CYLViewOverlapInspecting.swift in Sources */,
 				FAF0002C4552ACB829806FCF /* CYLTagListInspecting.swift in Sources */,
 				CBAA7F31F4FF04487A9EC707 /* CYLAccessibilityQuerying.swift in Sources */,
 				83EC8BB40995CF3C4E20F55A /* CYLScreenshotCapturing.swift in Sources */,

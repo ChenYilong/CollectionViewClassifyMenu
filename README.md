@@ -579,7 +579,7 @@ CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成
 
 ### Tests / 测试
 
-两个示例的测试（`Example/CYLMenuExampleTests`：75 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
+两个示例的测试（`Example/CYLMenuExampleTests`：78 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
 每个功能一个测试类、一个文件（高内聚）；测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，
 同时编译进两个测试 target（低耦合，不重复）。
 
@@ -594,6 +594,7 @@ both test targets.
 | `CYLAccessibilityQuerying` | 按 accessibility identifier 和 label 查找视图，不用坐标 |
 | `CYLScreenshotCapturing` | 记录被测状态的截图：附加到测试结果，并写入 `CYL_TEST_SCREENSHOTS_DIR` |
 | `CYLConditionWaiting` | 等待异步结果（`waitUntil { … }`），不用固定延时 |
+| `CYLViewOverlapInspecting` | 找出一个视图（如搜索栏）在窗口中覆盖的其他可见视图 |
 
 - 核心库的私有视图只通过 `CYLTagListProbe` 读取（唯一一处 key-value coding），核心改名时只改这一处。
 - 每个测试 target 只有一个很小的基类（`CYLMenuExampleTestCase`、`CYLTagEditorTestCase`，负责语言和要显示的页面），
@@ -605,6 +606,7 @@ both test targets.
 | `CYLTagButtonTests` · `CYLTagConfigurationTests` · `CYLTagListAccessibilityTests` | 标签按钮外观、配置初始化、VoiceOver |
 | `CYLTagStyleDemoTests` · `CYLAnimatedIconTests` | 「样式」与「动效」页，CYLTabBarController 动效引擎 |
 | `CYLAndroidSampleTests` | 三个 Android 标签库示例的复刻与其核心功能：容器边框、对齐、主题、叉号、涟漪、拖动排序、长按、图片标签 |
+| `CYLSearchBarPlacementTests` | 搜索栏在任何时候都不覆盖任何视图：分类搜索、搜索发现、热门搜索三个页面，默认与最大字号 |
 | `CYLAndroidSampleAccessibilityTests` | 这些示例的英文与繁体中文；代替长按、拖动和点图片的无障碍操作；徽标的朗读；图片标签的动态字体 |
 | `CYLTagCloudTests` | android-tagview 的 API：`CYLTag`、添加/删除标签、可删除标签、按下颜色、背景图、四边内边距、字号、配置键 |
 | `CYLReviewFilterScenarioTests` · `CYLSearchCategoryScenarioTests` | 场景一（评价筛选）、场景二（搜索分类） |
@@ -612,7 +614,7 @@ both test targets.
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | 纯 Swift 示例：标签数据、编辑标签、折叠样式、无障碍 |
 
 ```sh
-scripts/unit-tests.sh example   # 75 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh example   # 78 tests; screenshots in build/test-screenshots/example/
 scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshots/swift/
 ```
 
@@ -621,7 +623,7 @@ establishing connection”）；两个示例和根目录的两个演示 App 因�
 `CYLSceneDelegate`、`CYLTagDemoSceneDelegate`；后两个是 `scripts/unit-tests.sh menu|tag` 的测试宿主），
 测试窗口也加入 App 的 scene。
 
-测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 75、swift 19、menu 17、tag 6，共 117 个测试全部通过）：
+测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 78、swift 19、menu 17、tag 6，共 120 个测试全部通过）：
 
 | 单选：替换同组选择 | 多选 | 底部箭头：折叠 | 底部箭头：展开 |
 | --- | --- | --- | --- |

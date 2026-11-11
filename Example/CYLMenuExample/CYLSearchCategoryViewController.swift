@@ -144,6 +144,8 @@ final class CYLSearchCategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        // The view starts below the navigation bar that holds the search bar: the search bar covers no view.
+        edgesForExtendedLayout.remove(.top)
 
         searchBar.delegate = self
         // A navigation bar title view: the field fills the bar's height, no extra insets.
