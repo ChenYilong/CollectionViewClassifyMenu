@@ -5,6 +5,7 @@
 
 #import "CYLTagListView+CYLConfiguration.h"
 #import <objc/runtime.h>
+#import "CYLTag.h"
 
 NSString *const CYLTagListViewSections = @"sections";
 NSString *const CYLTagListViewStyle = @"style";
@@ -20,6 +21,7 @@ NSString *const CYLTagListViewTitle = @"title";
 NSString *const CYLTagListViewTitlePosition = @"titlePosition";
 NSString *const CYLTagListViewTitleImage = @"titleImage";
 NSString *const CYLTagListViewTitleStyle = @"titleStyle";
+NSString *const CYLTagListViewTags = @"tags";
 
 NSString *const CYLMenuFoldControlKeyPosition = @"position";
 NSString *const CYLMenuFoldControlKeyContent = @"content";
@@ -44,6 +46,9 @@ NSString *const CYLTagItemAnimationRestingProgress = @"animationRestingProgress"
 NSString *const CYLTagItemEnabled = @"enabled";
 NSString *const CYLTagItemExclusive = @"exclusive";
 NSString *const CYLTagItemType = @"type";
+NSString *const CYLTagItemDeletable = @"deletable";
+NSString *const CYLTagItemIdentifier = @"id";
+NSString *const CYLTagItemStyle = @"style";
 
 NSString *const CYLMenuStyleNormal = @"normal";
 NSString *const CYLMenuStyleSelected = @"selected";
@@ -69,6 +74,11 @@ NSString *const CYLMenuStyleBackgroundColor = @"backgroundColor";
 NSString *const CYLMenuStyleHeaderTextColor = @"headerTextColor";
 NSString *const CYLMenuStyleFoldControlColor = @"foldControlColor";
 NSString *const CYLMenuStyleHeaderFont = @"headerFont";
+NSString *const CYLMenuStyleHighlightedBackgroundColor = @"highlightedBackgroundColor";
+NSString *const CYLMenuStyleTagContentInsets = @"tagContentInsets";
+NSString *const CYLMenuStyleDeleteIndicatorTitle = @"deleteIndicatorTitle";
+NSString *const CYLMenuStyleDeleteIndicatorColor = @"deleteIndicatorColor";
+NSString *const CYLMenuStyleDeleteIndicatorFont = @"deleteIndicatorFont";
 
 NSString *const CYLTagAppearanceBackgroundColor = @"backgroundColor";
 NSString *const CYLTagAppearanceTextColor = @"textColor";
@@ -78,6 +88,8 @@ NSString *const CYLTagAppearanceCornerRadius = @"cornerRadius";
 NSString *const CYLTagAppearanceBorderColor = @"borderColor";
 NSString *const CYLTagAppearanceBorderWidth = @"borderWidth";
 NSString *const CYLTagAppearanceMargin = @"margin";
+NSString *const CYLTagAppearanceContentInsets = @"contentInsets";
+NSString *const CYLTagAppearanceBackgroundImage = @"backgroundImage";
 
 NSErrorDomain const CYLMenuConfigurationErrorDomain = @"CYLMenuConfigurationErrorDomain";
 
@@ -177,6 +189,10 @@ static UIColor *CYLColor(id value) {
         return [color isKindOfClass:[UIColor class]] ? color : nil;
     }
     return nil;
+}
+
+UIColor *CYLMenuColorFromString(NSString *string) {
+    return CYLColor(string);
 }
 
 static UIFont *CYLFont(id value) {
@@ -288,6 +304,8 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
 @property (nonatomic, weak, nullable) CYLTagListView *owner;
 /// Section -> @[list style it was made from, section style], so the same object is returned until the list's style changes.
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSArray *> *sectionStyles;
+/// Index path -> @[base style it was made from, item style] (CYLTagItemStyle).
+@property (nonatomic, strong) NSMutableDictionary<NSIndexPath *, NSArray *> *itemStyles;
 @end
 
 @implementation CYLTagListConfigurationSource
@@ -362,6 +380,37 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     return [CYLNumber([self itemAtIndexPath:indexPath][CYLTagItemExclusive]) boolValue];
 }
 
+- (BOOL)menuItemIsDeletableAtIndexPath:(NSIndexPath *)indexPath {
+    return [CYLNumber([self itemAtIndexPath:indexPath][CYLTagItemDeletable]) boolValue];
+}
+
+- (void)menuRemoveItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section < 0 || indexPath.section >= (NSInteger)self.sections.count) return;
+    NSMutableArray *items = [[self itemsInSection:indexPath.section] mutableCopy];
+    if (indexPath.item < 0 || indexPath.item >= (NSInteger)items.count) return;
+    [items removeObjectAtIndex:(NSUInteger)indexPath.item];
+    NSMutableArray *sections = [self.sections mutableCopy];
+    NSMutableDictionary *section = [sections[indexPath.section] mutableCopy];
+    section[CYLTagSectionItems] = items;
+    sections[indexPath.section] = section;
+    self.sections = sections;
+    [self.itemStyles removeAllObjects];
+}
+
+- (CYLMenuStyle *)menuStyleForItemAtIndexPath:(NSIndexPath *)indexPath {
+    id value = [self itemAtIndexPath:indexPath][CYLTagItemStyle];
+    if ([value isKindOfClass:[CYLMenuStyle class]]) return value;
+    if (![value isKindOfClass:[NSDictionary class]]) return nil;
+    CYLMenuStyle *base = [self menuStyleForSection:indexPath.section] ?: self.owner.style ?: [CYLMenuStyle defaultStyle];
+    NSArray *cached = self.itemStyles[indexPath];
+    if (cached && cached[0] == base) return cached[1];
+    CYLMenuStyle *style = [base copy];
+    [style applyConfiguration:value];
+    if (!self.itemStyles) self.itemStyles = [NSMutableDictionary dictionary];
+    self.itemStyles[indexPath] = @[base, style];
+    return style;
+}
+
 - (CYLMenuItemType)menuItemTypeAtIndexPath:(NSIndexPath *)indexPath {
     return CYLEnum([self itemAtIndexPath:indexPath][CYLTagItemType], @{@"tag": @(CYLMenuItemTypeTag), @"create": @(CYLMenuItemTypeCreate),
                                                                        @"new": @(CYLMenuItemTypeCreate)}, CYLMenuItemTypeTag);
@@ -430,6 +479,8 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     if ((value = CYLNumber(configuration[CYLTagAppearanceCornerRadius]))) self.cornerRadius = [value doubleValue];
     if ((value = CYLNumber(configuration[CYLTagAppearanceBorderWidth]))) self.borderWidth = [value doubleValue];
     if ((value = CYLNumber(configuration[CYLTagAppearanceMargin]))) self.margin = [value doubleValue];
+    if ((value = CYLInsets(configuration[CYLTagAppearanceContentInsets]))) self.contentInsets = [value UIEdgeInsetsValue];
+    if ((value = configuration[CYLTagAppearanceBackgroundImage])) self.backgroundImage = CYLImage(value, configuration[kCYLConfigurationBaseURL]);
 }
 
 @end
@@ -477,6 +528,11 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     if ((value = CYLColor(configuration[CYLMenuStyleHeaderTextColor]))) self.headerTextColor = value;
     if ((value = CYLColor(configuration[CYLMenuStyleFoldControlColor]))) self.foldControlColor = value;
     if ((value = CYLFont(configuration[CYLMenuStyleHeaderFont]))) self.headerFont = value;
+    if ((value = configuration[CYLMenuStyleHighlightedBackgroundColor])) self.highlightedBackgroundColor = CYLColor(value);
+    if ((value = CYLInsets(configuration[CYLMenuStyleTagContentInsets]))) self.tagContentInsets = [value UIEdgeInsetsValue];
+    if ([configuration[CYLMenuStyleDeleteIndicatorTitle] isKindOfClass:[NSString class]]) self.deleteIndicatorTitle = configuration[CYLMenuStyleDeleteIndicatorTitle];
+    if ((value = configuration[CYLMenuStyleDeleteIndicatorColor])) self.deleteIndicatorColor = CYLColor(value);
+    if ((value = configuration[CYLMenuStyleDeleteIndicatorFont])) self.deleteIndicatorFont = CYLFont(value);
 }
 
 @end
@@ -568,6 +624,20 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
         self.menuDataSource = source;
         [self reloadMenuData];
     }
+    if ([configuration[CYLTagListViewTags] isKindOfClass:[NSArray class]]) {
+        NSMutableArray<CYLTag *> *tags = [NSMutableArray array];
+        for (id item in configuration[CYLTagListViewTags]) {
+            NSDictionary *dictionary = [item isKindOfClass:[NSDictionary class]] ? item : @{CYLTagItemTitle: [item description] ?: @""};
+            if ([baseURL isKindOfClass:[NSURL class]]) {
+                NSMutableDictionary *withBase = [dictionary mutableCopy];
+                withBase[kCYLConfigurationBaseURL] = baseURL;
+                dictionary = withBase;
+            }
+            [tags addObject:[CYLTag tagWithConfiguration:dictionary]];
+        }
+        [self removeAllTags];
+        [self addTags:tags];
+    }
     if ([configuration[CYLTagListViewSelectedItems] isKindOfClass:[NSArray class]]) {
         NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
         for (id item in configuration[CYLTagListViewSelectedItems]) {
@@ -641,6 +711,30 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
 
 + (instancetype)tagListViewWithConfigurationFile:(NSString *)filePath error:(NSError **)error {
     return [[self alloc] initWithConfigurationFile:filePath error:error];
+}
+
+@end
+
+@implementation CYLTag (CYLConfiguration)
+
++ (instancetype)tagWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
+    NSDictionary *item = [configuration isKindOfClass:[NSDictionary class]] ? configuration : @{};
+    NSURL *baseURL = [item[kCYLConfigurationBaseURL] isKindOfClass:[NSURL class]] ? item[kCYLConfigurationBaseURL] : nil;
+    CYLTag *tag = [[self alloc] initWithIdentifier:[CYLNumber(item[CYLTagItemIdentifier]) integerValue]
+                                             title:[item[CYLTagItemTitle] description] ?: @""];
+    tag.image = CYLImage(item[CYLTagItemImage], baseURL);
+    tag.selectedImage = CYLImage(item[CYLTagItemSelectedImage], baseURL);
+    tag.animationURL = CYLMenuAnimationURLWithOptions(CYLFileURL(item[CYLTagItemAnimation], baseURL), item[CYLTagItemAnimationOptions]);
+    NSNumber *enabled = CYLNumber(item[CYLTagItemEnabled]);
+    tag.enabled = enabled != nil ? enabled.boolValue : YES;
+    tag.deletable = [CYLNumber(item[CYLTagItemDeletable]) boolValue];
+    id style = item[CYLTagItemStyle];
+    if ([style isKindOfClass:[CYLMenuStyle class]]) {
+        tag.style = style;
+    } else if ([style isKindOfClass:[NSDictionary class]]) {
+        tag.style = [CYLMenuStyle styleWithConfiguration:style];
+    }
+    return tag;
 }
 
 @end

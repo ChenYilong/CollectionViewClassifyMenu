@@ -202,3 +202,14 @@
 "好" = "OK";
 "正在搜索：%@" = "Searching: %@";
 "请按住麦克风按钮说出问题" = "Hold the mic button and say your question";
+"标签云（android-tagview）" = "Tag cloud (android-tagview)";
+"可删除" = "Deletable";
+"大字号" = "Large text";
+"背景图" = "Background image";
+"自定义删除" = "Custom delete";
+"点击第 %ld 个「%@」" = "Tapped #%ld “%@”";
+"删除第 %ld 个「%@」" = "Deleted #%ld “%@”";
+"点击标签，或点 × 删除" = "Tap a tag, or × to delete it";
+"代码初始化：addTags(withTitles:)、addTag(_:)" = "In code: addTags(withTitles:), addTag(_:)";
+"字典初始化：CYLTagListViewTags" = "From a dictionary: CYLTagListViewTags";
+"标签云：android-tagview 的初始化方式" = "Tag cloud: the android-tagview way";

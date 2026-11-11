@@ -192,3 +192,14 @@
 "好" = "好";
 "正在搜索：%@" = "正在搜尋：%@";
 "请按住麦克风按钮说出问题" = "請按住麥克風按鈕說出問題";
+"标签云（android-tagview）" = "標籤雲（android-tagview）";
+"可删除" = "可刪除";
+"大字号" = "大字號";
+"背景图" = "背景圖";
+"自定义删除" = "自訂刪除";
+"点击第 %ld 个「%@」" = "點擊第 %ld 個「%@」";
+"删除第 %ld 个「%@」" = "刪除第 %ld 個「%@」";
+"点击标签，或点 × 删除" = "點擊標籤，或點 × 刪除";
+"代码初始化：addTags(withTitles:)、addTag(_:)" = "程式碼初始化：addTags(withTitles:)、addTag(_:)";
+"字典初始化：CYLTagListViewTags" = "字典初始化：CYLTagListViewTags";
+"标签云：android-tagview 的初始化方式" = "標籤雲：android-tagview 的初始化方式";

@@ -31,7 +31,8 @@ static CGFloat CYLTagSanitized(CGFloat value) {
     _cornerRadius = 3;
     _borderColor = nil;
     _borderWidth = 0;
-    _margin = 10;
+    _contentInsets = UIEdgeInsetsMake(5, 10, 5, 10);
+    _backgroundImage = nil;
 }
 
 - (UIColor *)backgroundColor {
@@ -66,8 +67,18 @@ static CGFloat CYLTagSanitized(CGFloat value) {
     _borderWidth = CYLTagSanitized(borderWidth);
 }
 
+- (CGFloat)margin {
+    return MAX(_contentInsets.left, _contentInsets.right);
+}
+
 - (void)setMargin:(CGFloat)margin {
-    _margin = CYLTagSanitized(margin);
+    _contentInsets.left = CYLTagSanitized(margin);
+    _contentInsets.right = _contentInsets.left;
+}
+
+- (void)setContentInsets:(UIEdgeInsets)contentInsets {
+    _contentInsets = UIEdgeInsetsMake(CYLTagSanitized(contentInsets.top), CYLTagSanitized(contentInsets.left),
+                                      CYLTagSanitized(contentInsets.bottom), CYLTagSanitized(contentInsets.right));
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -79,7 +90,8 @@ static CGFloat CYLTagSanitized(CGFloat value) {
     copy->_cornerRadius = _cornerRadius;
     copy->_borderColor = _borderColor;
     copy->_borderWidth = _borderWidth;
-    copy->_margin = _margin;
+    copy->_contentInsets = _contentInsets;
+    copy->_backgroundImage = _backgroundImage;
     return copy;
 }
 

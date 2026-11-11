@@ -13,6 +13,7 @@
 #import "CYLMenuFoldControl.h"
 #import "CYLTagButton.h"
 #import "CYLTagListAccessibility.h"
+#import "CYLTag.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -178,6 +179,62 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  * without laying the view out.
  */
 - (CGFloat)heightThatFitsWidth:(CGFloat)width;
+
+#pragma mark Spacing (android-tagview's lineMargin, tagMargin and textPadding…)
+
+/*!
+ * Shortcuts to `style` (each one copies the style, changes it and sets it again), also settable in Interface Builder
+ * (IBInspectable), as android-tagview's XML attributes: the space between rows (style.lineSpacing, lineMargin),
+ * between tags in a row (style.interitemSpacing, tagMargin) and inside every tag (style.tagContentInsets,
+ * textPaddingTop / Left / Bottom / Right).
+ */
+@property (nonatomic, assign) IBInspectable CGFloat lineSpacing;
+@property (nonatomic, assign) IBInspectable CGFloat interitemSpacing;
+@property (nonatomic, assign) UIEdgeInsets tagContentInsets;
+@property (nonatomic, assign) IBInspectable CGFloat tagContentInsetTop;
+@property (nonatomic, assign) IBInspectable CGFloat tagContentInsetLeft;
+@property (nonatomic, assign) IBInspectable CGFloat tagContentInsetBottom;
+@property (nonatomic, assign) IBInspectable CGFloat tagContentInsetRight;
+
+#pragma mark Tags (android-tagview's TagView)
+
+/*!
+ * The list's own tags, for a list filled the android-tagview way: create it, add CYLTag objects (or titles), react to
+ * taps and deletions in blocks. The first tag method makes `tagDataSource` the menuDataSource and, the way android-tagview
+ * behaves, turns section headers off and sets selectionMode to CYLMenuSelectionModeNone (change them afterwards to
+ * select tags). Every other API (styles, folding, selection, configuration) keeps working.
+ */
+@property (nonatomic, strong, readonly) CYLTagDataSource *tagDataSource;
+/*!
+ * The tags of `tagDataSource`, in order (android-tagview's getTags()).
+ */
+@property (nonatomic, copy, readonly) NSArray<CYLTag *> *tags;
+- (void)addTag:(CYLTag *)tag;
+- (void)addTags:(NSArray<CYLTag *> *)tags;
+/*!
+ * Tags with these titles and the list's look (android-tagview's addTags(String[])).
+ */
+- (void)addTagsWithTitles:(NSArray<NSString *> *)titles NS_SWIFT_NAME(addTags(withTitles:));
+- (void)insertTag:(CYLTag *)tag atIndex:(NSUInteger)index;
+/*!
+ * Removes a tag (android-tagview's remove(position)); selections after it move up. Out-of-range indexes are ignored.
+ */
+- (void)removeTagAtIndex:(NSUInteger)index NS_SWIFT_NAME(removeTag(at:));
+- (void)removeAllTags;
+/*!
+ * Called for every accepted tap on one of `tags` (android-tagview's OnTagClickListener), after the menu delegate.
+ */
+@property (nonatomic, copy, nullable) void (^tagClickHandler)(NSInteger index, CYLTag *tag);
+/*!
+ * Called after a tap on a tag's delete indicator removed it (android-tagview's OnTagDeleteListener), after the menu delegate.
+ */
+@property (nonatomic, copy, nullable) void (^tagDeleteHandler)(NSInteger index, CYLTag *tag);
+/*!
+ * Deletes a deletable item as a tap on its delete indicator does: the data source removes it
+ * (-menuRemoveItemAtIndexPath:), the list reloads and reports it. Does nothing for an item that is not deletable or
+ * not enabled.
+ */
+- (void)deleteItemAtIndexPath:(NSIndexPath *)indexPath;
 
 #pragma mark Selection
 

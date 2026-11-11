@@ -4,6 +4,12 @@
 //
 
 #import "CYLTagListCell.h"
+#import "CYLMenuResources.h"
+
+@interface CYLTagListCell ()
+/// Covers the delete indicator, so that a tap on it deletes the tag instead of selecting it.
+@property (nonatomic, strong) UIControl *deleteControl;
+@end
 
 @implementation CYLTagListCell
 
@@ -15,10 +21,59 @@
         // The collection view handles taps.
         _button.userInteractionEnabled = NO;
         [self.contentView addSubview:_button];
+        _deleteControl = [[UIControl alloc] init];
+        _deleteControl.hidden = YES;
+        _deleteControl.accessibilityIdentifier = CYLTagListDeleteAccessibilityIdentifier;
+        [_deleteControl addTarget:self action:@selector(cyl_delete) forControlEvents:UIControlEventTouchUpInside];
+        [self.contentView addSubview:_deleteControl];
         self.isAccessibilityElement = YES;
         self.accessibilityTraits = UIAccessibilityTraitButton;
     }
     return self;
+}
+
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    // Pressed: CYLMenuStyle.highlightedBackgroundColor.
+    self.button.highlighted = highlighted;
+}
+
+- (void)setDeletable:(BOOL)deletable {
+    _deletable = deletable;
+    self.button.showsDeleteIndicator = deletable;
+    self.deleteControl.hidden = !deletable;
+    if (deletable) {
+        UIAccessibilityCustomAction *action = [[UIAccessibilityCustomAction alloc] initWithName:CYLMenuLocalizedString(@"CYLMenuDeleteTag", @"Deletes a tag")
+                                                                                         target:self
+                                                                                       selector:@selector(cyl_deleteAction)];
+        self.accessibilityCustomActions = @[action];
+    } else {
+        self.accessibilityCustomActions = nil;
+    }
+    [self setNeedsLayout];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self.button layoutIfNeeded];
+    self.deleteControl.frame = self.deletable ? [self.button convertRect:self.button.deleteIndicatorHitFrame toView:self.contentView] : CGRectZero;
+}
+
+- (void)cyl_delete {
+    if (self.deleteHandler) {
+        self.deleteHandler();
+    }
+}
+
+- (BOOL)cyl_deleteAction {
+    [self cyl_delete];
+    return YES;
+}
+
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    self.deleteHandler = nil;
+    self.deletable = NO;
 }
 
 - (void)configureWithTitle:(NSString *)title

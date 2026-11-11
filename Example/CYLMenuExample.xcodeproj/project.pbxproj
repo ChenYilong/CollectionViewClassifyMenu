@@ -13,6 +13,7 @@
 		80911EB6FE48C5E0BF1C3FB1 /* CYLTagButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0748AD44FAE907CE4F0410AF /* CYLTagButtonTests.swift */; };
 		36F6B935B4741FF150370A56 /* CYLTagConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D821A5B66C4E846C5AD62163 /* CYLTagConfigurationTests.swift */; };
 		99DE2046D4B9FF6F6A7E6A93 /* CYLTagStyleDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1F9CB554EA461136BA855B /* CYLTagStyleDemoTests.swift */; };
+		6C5508F7A4A7A16371B76F63 /* CYLTagCloudTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBAAC05F30994850DC9CA22 /* CYLTagCloudTests.swift */; };
 		F1BD6A71778D6E644975B206 /* CYLAnimatedIconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3C911455887AA33A034899 /* CYLAnimatedIconTests.swift */; };
 		90641626E7CCAB0F86EE47A2 /* CYLTagListAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */; };
 		9C94ADB69C81A89E68924136 /* CYLReviewFilterScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C70259D0FC02D874F453E4F /* CYLReviewFilterScenarioTests.swift */; };
@@ -48,6 +49,7 @@
 		30C4995E7E99E3B60BFBF06C /* CYLSearchHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */; };
 		6FBBB71E38045426792EFC54 /* CYLTagAnimationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */; };
 		121A997B0DED01158F518FB9 /* CYLTagConfigurationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */; };
+		7B94EC61291C45050DF4EFD3 /* CYLTagCloudDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7098A27C4DE353F18316DEA4 /* CYLTagCloudDemoViewController.swift */; };
 		8E3FBEA3D1656F25900D6E6A /* CYLTagStyleDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A60CF0D32B70D57CE937DC8 /* CYLTagStyleDemoViewController.swift */; };
 		0490FE175868491DBA5FE998 /* Pods_CYLMenuExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */; };
 		7FFC7CE0B51A13135C1F03C2 /* Pods_CYLMenuExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* Pods_CYLMenuExampleTests.framework */; };
@@ -74,6 +76,7 @@
 		0748AD44FAE907CE4F0410AF /* CYLTagButtonTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagButtonTests.swift; sourceTree = "<group>"; };
 		D821A5B66C4E846C5AD62163 /* CYLTagConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagConfigurationTests.swift; sourceTree = "<group>"; };
 		EB1F9CB554EA461136BA855B /* CYLTagStyleDemoTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagStyleDemoTests.swift; sourceTree = "<group>"; };
+		7BBAAC05F30994850DC9CA22 /* CYLTagCloudTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagCloudTests.swift; sourceTree = "<group>"; };
 		2A3C911455887AA33A034899 /* CYLAnimatedIconTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAnimatedIconTests.swift; sourceTree = "<group>"; };
 		7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListAccessibilityTests.swift; sourceTree = "<group>"; };
 		4C70259D0FC02D874F453E4F /* CYLReviewFilterScenarioTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLReviewFilterScenarioTests.swift; sourceTree = "<group>"; };
@@ -109,6 +112,7 @@
 		BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchHomeViewController.swift; sourceTree = "<group>"; };
 		C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagAnimationDemoViewController.swift; sourceTree = "<group>"; };
 		8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagConfigurationDemoViewController.swift; sourceTree = "<group>"; };
+		7098A27C4DE353F18316DEA4 /* CYLTagCloudDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagCloudDemoViewController.swift; sourceTree = "<group>"; };
 		2A60CF0D32B70D57CE937DC8 /* CYLTagStyleDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagStyleDemoViewController.swift; sourceTree = "<group>"; };
 		261CB08FA58627B5FB7DB381 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C55FFF355A1E5A46E3D41489 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -181,6 +185,7 @@
 				BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */,
 				C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */,
 				8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */,
+				7098A27C4DE353F18316DEA4 /* CYLTagCloudDemoViewController.swift */,
 				2A60CF0D32B70D57CE937DC8 /* CYLTagStyleDemoViewController.swift */,
 				261CB08FA58627B5FB7DB381 /* Info.plist */,
 			);
@@ -198,6 +203,7 @@
 				0748AD44FAE907CE4F0410AF /* CYLTagButtonTests.swift */,
 				D821A5B66C4E846C5AD62163 /* CYLTagConfigurationTests.swift */,
 				EB1F9CB554EA461136BA855B /* CYLTagStyleDemoTests.swift */,
+				7BBAAC05F30994850DC9CA22 /* CYLTagCloudTests.swift */,
 				2A3C911455887AA33A034899 /* CYLAnimatedIconTests.swift */,
 				7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */,
 				4C70259D0FC02D874F453E4F /* CYLReviewFilterScenarioTests.swift */,
@@ -474,6 +480,7 @@
 				30C4995E7E99E3B60BFBF06C /* CYLSearchHomeViewController.swift in Sources */,
 				6FBBB71E38045426792EFC54 /* CYLTagAnimationDemoViewController.swift in Sources */,
 				121A997B0DED01158F518FB9 /* CYLTagConfigurationDemoViewController.swift in Sources */,
+				7B94EC61291C45050DF4EFD3 /* CYLTagCloudDemoViewController.swift in Sources */,
 				8E3FBEA3D1656F25900D6E6A /* CYLTagStyleDemoViewController.swift in Sources */,
 				E52CAAD5396D07D81ED1CF12 /* CYLDemoDataSource.swift in Sources */,
 				300281D2E69E50BAA07F6DE4 /* CYLDBManager.swift in Sources */,
@@ -490,6 +497,7 @@
 				80911EB6FE48C5E0BF1C3FB1 /* CYLTagButtonTests.swift in Sources */,
 				36F6B935B4741FF150370A56 /* CYLTagConfigurationTests.swift in Sources */,
 				99DE2046D4B9FF6F6A7E6A93 /* CYLTagStyleDemoTests.swift in Sources */,
+				6C5508F7A4A7A16371B76F63 /* CYLTagCloudTests.swift in Sources */,
 				F1BD6A71778D6E644975B206 /* CYLAnimatedIconTests.swift in Sources */,
 				90641626E7CCAB0F86EE47A2 /* CYLTagListAccessibilityTests.swift in Sources */,
 				9C94ADB69C81A89E68924136 /* CYLReviewFilterScenarioTests.swift in Sources */,

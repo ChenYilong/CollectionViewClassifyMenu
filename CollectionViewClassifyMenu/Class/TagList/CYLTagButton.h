@@ -52,6 +52,21 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isAnimationEngineAvailable;
 
 /*!
+ * Shows the style's delete indicator ("×", CYLMenuStyle.deleteIndicatorTitle) after the title, as android-tagview's
+ * deletable tags. NO by default. CYLTagListView turns it on for deletable items and handles taps on it.
+ */
+@property (nonatomic, assign) BOOL showsDeleteIndicator;
+/*!
+ * The label that draws the delete indicator (hidden unless showsDeleteIndicator).
+ */
+@property (nonatomic, strong, readonly) UILabel *deleteIndicatorLabel;
+/*!
+ * The area a tap on the delete indicator should cover, in the tag's coordinates: from the space before it to the
+ * trailing edge, the tag's full height. CGRectZero while it is hidden.
+ */
+@property (nonatomic, assign, readonly) CGRect deleteIndicatorHitFrame;
+
+/*!
  * The style the tag is drawn with. Set it again after changing it.
  */
 @property (nonatomic, copy, null_resettable) CYLMenuStyle *style;
@@ -73,12 +88,21 @@ NS_ASSUME_NONNULL_BEGIN
                    style:(CYLMenuStyle *)style
          traitCollection:(nullable UITraitCollection *)traitCollection;
 /*!
+ * The same, with room for the delete indicator when `showsDeleteIndicator`.
+ */
++ (CGFloat)widthForTitle:(nullable NSString *)title
+                iconSize:(CGSize)iconSize
+    showsDeleteIndicator:(BOOL)showsDeleteIndicator
+                   style:(CYLMenuStyle *)style
+         traitCollection:(nullable UITraitCollection *)traitCollection;
+/*!
  * Size of the icon slot for an image, or for an animated icon when `animated` and the engine is linked.
  */
 + (CGSize)iconSizeForImage:(nullable UIImage *)image animated:(BOOL)animated style:(CYLMenuStyle *)style;
 
 /*!
- * Tag height: style.itemHeight, or more for large fonts.
+ * Tag height: style.itemHeight, or more when a line of the title font plus the appearance's top and bottom
+ * content insets needs it.
  */
 + (CGFloat)heightForStyle:(CYLMenuStyle *)style traitCollection:(nullable UITraitCollection *)traitCollection;
 

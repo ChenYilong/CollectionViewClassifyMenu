@@ -19,3 +19,4 @@
 
 /* The More button of a section header (three dots), read by VoiceOver after the section title. */
 "CYLMenuMoreActions" = "More";
+"CYLMenuDeleteTag" = "Delete";

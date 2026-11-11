@@ -54,6 +54,7 @@
         _expandTitle = CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand a section");
         _collapseTitle = CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse a section");
         _moreButtonColor = [UIColor secondaryLabelColor];
+        _deleteIndicatorTitle = @"\u00D7";
     }
     return self;
 }
@@ -115,10 +116,33 @@
     copy.contentAlignment = self.contentAlignment;
     copy.moreButtonImage = self.moreButtonImage;
     copy.moreButtonColor = self.moreButtonColor;
+    copy.highlightedBackgroundColor = self.highlightedBackgroundColor;
+    copy.deleteIndicatorTitle = self.deleteIndicatorTitle;
+    copy.deleteIndicatorColor = self.deleteIndicatorColor;
+    copy.deleteIndicatorFont = self.deleteIndicatorFont;
     return copy;
 }
 
 #pragma mark Appearances
+
+- (UIEdgeInsets)tagContentInsets {
+    return self.normalAppearance.contentInsets;
+}
+
+- (void)setTagContentInsets:(UIEdgeInsets)tagContentInsets {
+    for (CYLTagAppearance *appearance in @[self.normalAppearance, self.selectedAppearance, self.disabledAppearance]) {
+        appearance.contentInsets = tagContentInsets;
+    }
+}
+
+- (void)setDeleteIndicatorTitle:(NSString *)deleteIndicatorTitle {
+    _deleteIndicatorTitle = [deleteIndicatorTitle copy] ?: @"\u00D7";
+}
+
+- (UIFont *)deleteIndicatorFontForState:(UIControlState)state traitCollection:(UITraitCollection *)traitCollection {
+    return self.deleteIndicatorFont ? [self cyl_scaledFont:self.deleteIndicatorFont traits:traitCollection]
+                                    : [self titleFontForState:state traitCollection:traitCollection];
+}
 
 - (CYLTagAppearance *)appearanceForState:(UIControlState)state {
     if (state & UIControlStateDisabled) {

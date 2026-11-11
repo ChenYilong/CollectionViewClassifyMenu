@@ -42,7 +42,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
              "imageTitleSpacing", "imageSize", "imageInsets", "titlePositionAdjustment", "imagePositionAdjustment",
              "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"],
             ["backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"],
-            ["animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off", "animationSpeed", "configuration"],
+            ["animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
             ["reset"],
         ]
     }
@@ -84,6 +84,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         "animation.off": "关闭动效（静态图标）",
         "animationSpeed": "设置动效速度 animationSpeed",
         "configuration": "配置文件 / 字典（map）初始化",
+        "tagCloud": "标签云：android-tagview 的初始化方式",
         "reset": "重置 reset",
     ]
 
@@ -197,6 +198,9 @@ final class CYLTagStyleDemoViewController: UIViewController {
             style.animationSpeed = speeds[step % 3]
         case "configuration":
             navigationController?.pushViewController(CYLTagConfigurationDemoViewController(), animated: true)
+            return
+        case "tagCloud":
+            navigationController?.pushViewController(CYLTagCloudDemoViewController(), animated: true)
             return
         case "reset":
             self.style = Self.demoStyle()

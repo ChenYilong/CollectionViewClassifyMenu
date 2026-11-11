@@ -18,6 +18,7 @@ NSString *const CYLTagListFoldControlAccessibilityIdentifier = @"CYLTagListFoldC
 NSString *const CYLTagListItemAccessibilityIdentifier = @"CYLTagListItem";
 NSString *const CYLTagCreateItemAccessibilityIdentifier = @"CYLTagCreateItem";
 NSString *const CYLTagListMoreButtonAccessibilityIdentifier = @"CYLTagListMoreButton";
+NSString *const CYLTagListDeleteAccessibilityIdentifier = @"CYLTagListDeleteButton";
 
 static NSString * const kCYLTagListCellIdentifier = @"CYLTagListCell";
 static NSString * const kCYLTagListHeaderIdentifier = @"CYLTagListHeader";
@@ -202,6 +203,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, copy) NSArray<NSArray<NSString *> *> *titles;
 @property (nonatomic, copy) NSArray<NSArray<NSNumber *> *> *itemWidths;
+/// Each item's height: the list's item height, or more for an item whose own font needs it.
+@property (nonatomic, copy) NSArray<NSArray<NSNumber *> *> *itemHeights;
+@property (nonatomic, strong, readwrite) CYLTagDataSource *tagDataSource;
 @property (nonatomic, copy) NSArray<NSArray<NSNumber *> *> *rows;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *selection;
 @property (nonatomic, strong) NSMutableIndexSet *expandedSections;
@@ -209,6 +213,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 /// The collection view's size at the last layout: any change (also the height, e.g. a host's height constraint
 /// going from 0 to the content height) lays the tags out again.
 @property (nonatomic, assign) CGSize laidOutSize;
+/// Measured during the collection view's own layout (from -sizeForItemAtIndexPath:), where contentHeight cannot be
+/// updated: -layoutSubviews updates it.
+@property (nonatomic, assign) BOOL contentHeightNeedsUpdate;
 @property (nonatomic, assign, readwrite) CGFloat contentHeight;
 @property (nonatomic, strong, readwrite) CYLTagButton *titleView;
 /// The outlined look of "+ 新建标签" items and the style it was made from.
@@ -274,6 +281,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     _foldControl = [CYLMenuFoldControl noFoldControl];
     _titles = @[];
     _itemWidths = @[];
+    _itemHeights = @[];
     _rows = @[];
     _selection = [NSMutableSet set];
     _expandedSections = [NSMutableIndexSet indexSet];
@@ -322,6 +330,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 
 - (void)setStyle:(CYLMenuStyle *)style {
     _style = [(style ?: [CYLMenuStyle defaultStyle]) copy];
+    _tagDataSource.baseStyle = _style;
     [self cyl_applyStyleColors];
     [self cyl_invalidateMeasurements];
 }
@@ -507,6 +516,10 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 
 - (void)reloadMenuData {
     id<CYLMenuDataSource> source = self.menuDataSource;
+    if (source && source == (id)_tagDataSource) {
+        // A tag's look may have changed.
+        [_tagDataSource invalidateStyles];
+    }
     NSMutableArray *titles = [NSMutableArray array];
     NSInteger sections = source ? [source numberOfSectionsInMenu] : 0;
     for (NSInteger section = 0; section < sections; section++) {
@@ -539,6 +552,12 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     id<CYLMenuDataSource> source = self.menuDataSource;
     return ![source respondsToSelector:@selector(menuItemIsEnabledAtIndexPath:)] ||
            [source menuItemIsEnabledAtIndexPath:indexPath];
+}
+
+- (BOOL)cyl_isDeletableAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    return [self cyl_itemTypeAtIndexPath:indexPath] != CYLMenuItemTypeCreate &&
+           [source respondsToSelector:@selector(menuItemIsDeletableAtIndexPath:)] && [source menuItemIsDeletableAtIndexPath:indexPath];
 }
 
 - (BOOL)cyl_isExclusiveAtIndexPath:(NSIndexPath *)indexPath {
@@ -698,7 +717,8 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
             CGSize iconSize = [CYLTagButton iconSizeForImage:[self cyl_imageAtIndexPath:indexPath]
                                                     animated:[self cyl_animationURLAtIndexPath:indexPath] != nil
                                                        style:style];
-            CGFloat width = [CYLTagButton widthForTitle:title iconSize:iconSize style:style traitCollection:traits];
+            CGFloat width = [CYLTagButton widthForTitle:title iconSize:iconSize showsDeleteIndicator:[self cyl_isDeletableAtIndexPath:indexPath]
+                                                  style:style traitCollection:traits];
             NSUInteger perRow = [self cyl_styleForSection:(NSInteger)section].numberOfItemsPerRow;
             if (perRow > 0) {
                 // The grid: every item the same width, a longer title truncated.
@@ -709,6 +729,41 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         [widths addObject:sectionWidths];
     }];
     return widths;
+}
+
+- (NSArray<NSArray<NSNumber *> *> *)cyl_itemHeights {
+    UITraitCollection *traits = self.traitCollection;
+    CGFloat listHeight = [self cyl_itemHeight];
+    NSMutableArray *heights = [NSMutableArray arrayWithCapacity:self.titles.count];
+    [self.titles enumerateObjectsUsingBlock:^(NSArray<NSString *> *items, NSUInteger section, BOOL *stop) {
+        NSMutableArray *sectionHeights = [NSMutableArray arrayWithCapacity:items.count];
+        for (NSUInteger item = 0; item < items.count; item++) {
+            CYLMenuStyle *style = [self cyl_styleForItemAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]];
+            CGFloat height = style == self.style ? listHeight : MAX(listHeight, [CYLTagButton heightForStyle:style traitCollection:traits]);
+            [sectionHeights addObject:@(height)];
+        }
+        [heights addObject:sectionHeights];
+    }];
+    return heights;
+}
+
+/// The height of the first `rowCount` rows of a section: each row as tall as its tallest item. Rows past the measured
+/// ones (the inline fold cell on a row of its own) are the list's item height.
+- (CGFloat)cyl_heightOfRows:(NSUInteger)rowCount rows:(NSArray<NSNumber *> *)rows heights:(NSArray<NSNumber *> *)heights {
+    CGFloat total = 0;
+    NSUInteger item = 0;
+    for (NSUInteger row = 0; row < rowCount; row++) {
+        CGFloat rowHeight = [self cyl_itemHeight];
+        if (row < rows.count) {
+            NSUInteger count = rows[row].unsignedIntegerValue;
+            for (NSUInteger index = item; index < item + count && index < heights.count; index++) {
+                rowHeight = MAX(rowHeight, heights[index].doubleValue);
+            }
+            item += count;
+        }
+        total += rowHeight;
+    }
+    return total + (rowCount > 0 ? (rowCount - 1) * self.style.lineSpacing : 0);
 }
 
 /// The width of a grid item: the content width minus the spacing, divided evenly.
@@ -752,7 +807,10 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     self.measuredWidth = width;
     CGFloat contentWidth = [self cyl_contentWidthForWidth:width];
     self.itemWidths = [self cyl_widthsForContentWidth:contentWidth];
+    self.itemHeights = [self cyl_itemHeights];
     self.rows = [self cyl_rowsForWidths:self.itemWidths contentWidth:contentWidth];
+    self.contentHeightNeedsUpdate = YES;
+    [self setNeedsLayout];
 }
 
 - (void)cyl_invalidateMeasurements {
@@ -783,6 +841,9 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     } else if (!CGSizeEqualToSize(self.collectionView.bounds.size, self.laidOutSize)) {
         [self.collectionView.collectionViewLayout invalidateLayout];
     }
+    if (self.contentHeightNeedsUpdate) {
+        [self cyl_updateContentHeight];
+    }
     self.laidOutSize = self.collectionView.bounds.size;
     if (!self.collectionView.scrollEnabled) {
         [self cyl_resetContentOffset];
@@ -799,6 +860,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 }
 
 - (void)cyl_updateContentHeight {
+    self.contentHeightNeedsUpdate = NO;
     CGFloat height = 0;
     if (CGRectGetWidth(self.collectionView.bounds) > 0) {
         [self.collectionView layoutIfNeeded];
@@ -823,7 +885,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     CGFloat contentWidth = [self cyl_contentWidthForWidth:width];
     NSArray *widths = (width == self.measuredWidth) ? self.itemWidths : [self cyl_widthsForContentWidth:contentWidth];
     NSArray<NSArray<NSNumber *> *> *rows = (width == self.measuredWidth) ? self.rows : [self cyl_rowsForWidths:widths contentWidth:contentWidth];
-    CGFloat itemHeight = [self cyl_itemHeight];
+    NSArray<NSArray<NSNumber *> *> *heights = (width == self.measuredWidth) ? self.itemHeights : [self cyl_itemHeights];
     CGFloat headerHeight = [self cyl_headerHeight];
     UIEdgeInsets insets = self.style.sectionInsets;
     CGFloat height = 0;
@@ -839,9 +901,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
             rowCount = [self cyl_rowsForWidths:@[sectionWidths] contentWidth:contentWidth].firstObject.count;
         }
         height += headerHeight + insets.top + insets.bottom;
-        if (rowCount > 0) {
-            height += rowCount * itemHeight + (rowCount - 1) * self.style.lineSpacing;
-        }
+        height += [self cyl_heightOfRows:rowCount rows:rows[section] heights:section < heights.count ? heights[section] : @[]];
         if (foldable && [self cyl_foldControlIsInFooter]) {
             height += [self cyl_footerHeight];
         }
@@ -1214,6 +1274,195 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     if (changed && [delegate respondsToSelector:@selector(menu:didChangeSelectedItems:)]) {
         [delegate menu:self didChangeSelectedItems:self.selectedIndexPaths];
     }
+    CYLTag *tag = [self cyl_tagAtIndexPath:indexPath];
+    if (tag && self.tagClickHandler) {
+        self.tagClickHandler(indexPath.item, tag);
+    }
+}
+
+#pragma mark Tags
+
+- (CYLTagDataSource *)tagDataSource {
+    if (!_tagDataSource) {
+        _tagDataSource = [[CYLTagDataSource alloc] init];
+        _tagDataSource.baseStyle = self.style;
+    }
+    return _tagDataSource;
+}
+
+/// One of `tags` when the list shows them.
+- (CYLTag *)cyl_tagAtIndexPath:(NSIndexPath *)indexPath {
+    if (!_tagDataSource || self.menuDataSource != (id)_tagDataSource || indexPath.section != 0) {
+        return nil;
+    }
+    NSArray<CYLTag *> *tags = _tagDataSource.tags;
+    return indexPath.item >= 0 && indexPath.item < (NSInteger)tags.count ? tags[indexPath.item] : nil;
+}
+
+/// Shows `tagDataSource`, the way android-tagview does the first time: no section headers, taps only.
+- (CYLTagDataSource *)cyl_showTags {
+    CYLTagDataSource *source = self.tagDataSource;
+    if (self.menuDataSource != (id)source) {
+        self.menuDataSource = source;
+        self.showsSectionHeaders = NO;
+        self.selectionMode = CYLMenuSelectionModeNone;
+    }
+    return source;
+}
+
+- (NSArray<CYLTag *> *)tags {
+    return _tagDataSource.tags ?: @[];
+}
+
+- (void)addTag:(CYLTag *)tag {
+    [[self cyl_showTags] addTag:tag];
+    [self reloadMenuData];
+}
+
+- (void)addTags:(NSArray<CYLTag *> *)tags {
+    [[self cyl_showTags] addTags:tags];
+    [self reloadMenuData];
+}
+
+- (void)addTagsWithTitles:(NSArray<NSString *> *)titles {
+    NSMutableArray<CYLTag *> *tags = [NSMutableArray arrayWithCapacity:titles.count];
+    for (NSString *title in titles) {
+        [tags addObject:[[CYLTag alloc] initWithTitle:title]];
+    }
+    [self addTags:tags];
+}
+
+- (void)insertTag:(CYLTag *)tag atIndex:(NSUInteger)index {
+    CYLTagDataSource *source = [self cyl_showTags];
+    NSUInteger position = MIN(index, source.tags.count);
+    [source insertTag:tag atIndex:position];
+    [self cyl_shiftSelectionInSection:0 fromItem:(NSInteger)position by:1];
+    [self reloadMenuData];
+}
+
+- (void)removeTagAtIndex:(NSUInteger)index {
+    CYLTagDataSource *source = [self cyl_showTags];
+    if (index >= source.tags.count) {
+        return;
+    }
+    [source removeTagAtIndex:index];
+    [self cyl_removeSelectionAtIndexPath:[NSIndexPath indexPathForItem:(NSInteger)index inSection:0]];
+    [self reloadMenuData];
+}
+
+- (void)removeAllTags {
+    [[self cyl_showTags] removeAllTags];
+    [self.selection removeAllObjects];
+    [self reloadMenuData];
+}
+
+/// Moves selected items of a section at or after `item` by `offset`.
+- (void)cyl_shiftSelectionInSection:(NSInteger)section fromItem:(NSInteger)item by:(NSInteger)offset {
+    NSMutableSet<NSIndexPath *> *selection = [NSMutableSet setWithCapacity:self.selection.count];
+    for (NSIndexPath *indexPath in self.selection) {
+        BOOL moves = indexPath.section == section && indexPath.item >= item;
+        [selection addObject:moves ? [NSIndexPath indexPathForItem:indexPath.item + offset inSection:section] : indexPath];
+    }
+    self.selection = selection;
+}
+
+/// An item was removed: it leaves the selection and the items after it move up.
+- (void)cyl_removeSelectionAtIndexPath:(NSIndexPath *)indexPath {
+    [self.selection removeObject:indexPath];
+    [self cyl_shiftSelectionInSection:indexPath.section fromItem:indexPath.item + 1 by:-1];
+}
+
+- (void)deleteItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (![self cyl_isValidIndexPath:indexPath] || ![self cyl_isDeletableAtIndexPath:indexPath] || ![self cyl_isEnabledAtIndexPath:indexPath]) {
+        return;
+    }
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    CYLTag *tag = [self cyl_tagAtIndexPath:indexPath];
+    if ([source respondsToSelector:@selector(menuRemoveItemAtIndexPath:)]) {
+        [source menuRemoveItemAtIndexPath:indexPath];
+        [self cyl_removeSelectionAtIndexPath:indexPath];
+        [self reloadMenuData];
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+    }
+    id<CYLMenuDelegate> delegate = self.menuDelegate;
+    if ([delegate respondsToSelector:@selector(menu:didDeleteItemAtIndexPath:)]) {
+        [delegate menu:self didDeleteItemAtIndexPath:indexPath];
+    }
+    if (tag && self.tagDeleteHandler) {
+        self.tagDeleteHandler(indexPath.item, tag);
+    }
+}
+
+#pragma mark Spacing
+
+- (void)cyl_updateStyle:(void (^)(CYLMenuStyle *style))change {
+    CYLMenuStyle *style = [self.style copy];
+    change(style);
+    self.style = style;
+}
+
+- (CGFloat)lineSpacing {
+    return self.style.lineSpacing;
+}
+
+- (void)setLineSpacing:(CGFloat)lineSpacing {
+    [self cyl_updateStyle:^(CYLMenuStyle *style) { style.lineSpacing = lineSpacing; }];
+}
+
+- (CGFloat)interitemSpacing {
+    return self.style.interitemSpacing;
+}
+
+- (void)setInteritemSpacing:(CGFloat)interitemSpacing {
+    [self cyl_updateStyle:^(CYLMenuStyle *style) { style.interitemSpacing = interitemSpacing; }];
+}
+
+- (UIEdgeInsets)tagContentInsets {
+    return self.style.tagContentInsets;
+}
+
+- (void)setTagContentInsets:(UIEdgeInsets)tagContentInsets {
+    [self cyl_updateStyle:^(CYLMenuStyle *style) { style.tagContentInsets = tagContentInsets; }];
+}
+
+- (CGFloat)tagContentInsetTop {
+    return self.tagContentInsets.top;
+}
+
+- (void)setTagContentInsetTop:(CGFloat)value {
+    UIEdgeInsets insets = self.tagContentInsets;
+    insets.top = value;
+    self.tagContentInsets = insets;
+}
+
+- (CGFloat)tagContentInsetLeft {
+    return self.tagContentInsets.left;
+}
+
+- (void)setTagContentInsetLeft:(CGFloat)value {
+    UIEdgeInsets insets = self.tagContentInsets;
+    insets.left = value;
+    self.tagContentInsets = insets;
+}
+
+- (CGFloat)tagContentInsetBottom {
+    return self.tagContentInsets.bottom;
+}
+
+- (void)setTagContentInsetBottom:(CGFloat)value {
+    UIEdgeInsets insets = self.tagContentInsets;
+    insets.bottom = value;
+    self.tagContentInsets = insets;
+}
+
+- (CGFloat)tagContentInsetRight {
+    return self.tagContentInsets.right;
+}
+
+- (void)setTagContentInsetRight:(CGFloat)value {
+    UIEdgeInsets insets = self.tagContentInsets;
+    insets.right = value;
+    self.tagContentInsets = insets;
 }
 
 - (void)cyl_refreshVisibleCells {
@@ -1253,6 +1502,12 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];
     cell.button.animationRestingProgress = [self cyl_animationRestingProgressAtIndexPath:indexPath];
+    BOOL deletable = [self cyl_isDeletableAtIndexPath:indexPath] && [self cyl_isEnabledAtIndexPath:indexPath];
+    cell.deletable = deletable;
+    __weak __typeof(self) weakSelf = self;
+    cell.deleteHandler = deletable ? ^{
+        [weakSelf deleteItemAtIndexPath:indexPath];
+    } : nil;
     if ([self.menuDataSource respondsToSelector:@selector(menuAccessibilityHintForItemAtIndexPath:)]) {
         cell.accessibilityHint = [self.menuDataSource menuAccessibilityHintForItemAtIndexPath:indexPath];
     }
@@ -1377,7 +1632,12 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         indexPath.item < (NSInteger)self.itemWidths[indexPath.section].count) {
         width = self.itemWidths[indexPath.section][indexPath.item].doubleValue;
     }
-    return CGSizeMake(MAX(1, width), [self cyl_itemHeight]);
+    CGFloat height = [self cyl_itemHeight];
+    if (indexPath.section < (NSInteger)self.itemHeights.count &&
+        indexPath.item < (NSInteger)self.itemHeights[indexPath.section].count) {
+        height = self.itemHeights[indexPath.section][indexPath.item].doubleValue;
+    }
+    return CGSizeMake(MAX(1, width), height);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView

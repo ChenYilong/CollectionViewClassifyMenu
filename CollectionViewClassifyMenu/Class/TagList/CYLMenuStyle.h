@@ -68,6 +68,32 @@ typedef NS_ENUM(NSInteger, CYLTagContentAlignment) {
  */
 - (CYLTagAppearance *)appearanceForState:(UIControlState)state;
 
+/*!
+ * The background of a tag while a finger is on it (as android-tagview's layoutColorPress). nil (the default)
+ * keeps the state's background.
+ */
+@property (nonatomic, strong, nullable) UIColor *highlightedBackgroundColor;
+/*!
+ * The content insets of every state's appearance at once (as android-tagview's textPadding…); reading it gives the
+ * normal appearance's. {5, 10, 5, 10} by default.
+ */
+@property (nonatomic, assign) UIEdgeInsets tagContentInsets;
+
+#pragma mark Delete indicator (deletable tags)
+/*!
+ * Shown after the title of a deletable tag (`menuItemIsDeletableAtIndexPath:`, CYLTag.deletable); a tap on it deletes
+ * the tag. Defaults to "×" (as android-tagview's deleteIcon).
+ */
+@property (nonatomic, copy) NSString *deleteIndicatorTitle;
+/*!
+ * Its color; nil (the default) uses the state's text color.
+ */
+@property (nonatomic, strong, nullable) UIColor *deleteIndicatorColor;
+/*!
+ * Its font; nil (the default) uses the state's title font. Scaled for Dynamic Type as the title is.
+ */
+@property (nonatomic, strong, nullable) UIFont *deleteIndicatorFont;
+
 #pragma mark Title and icon (CYLFlatDesignTabBarItem)
 
 /*!
@@ -204,6 +230,10 @@ typedef NS_ENUM(NSInteger, CYLTagContentAlignment) {
  * scaled for Dynamic Type when adjustsFontForContentSizeCategory is YES.
  */
 - (UIFont *)titleFontForState:(UIControlState)state traitCollection:(nullable UITraitCollection *)traitCollection;
+/*!
+ * The delete indicator's font for the given traits (deleteIndicatorFont, or the state's title font).
+ */
+- (UIFont *)deleteIndicatorFontForState:(UIControlState)state traitCollection:(nullable UITraitCollection *)traitCollection;
 /*!
  * Header font for the given traits, applying Dynamic Type when enabled.
  */

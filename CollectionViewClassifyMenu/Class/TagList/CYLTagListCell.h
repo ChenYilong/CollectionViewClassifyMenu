@@ -21,6 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, nullable) CYLMenuStyle *appliedStyle;
 
 /*!
+ * Shows the delete indicator ("×") and makes it tappable; also adds a VoiceOver "Delete" action. NO by default.
+ */
+@property (nonatomic, assign) BOOL deletable;
+/*!
+ * Called when the delete indicator is tapped (or the VoiceOver action is used).
+ */
+@property (nonatomic, copy, nullable) void (^deleteHandler)(void);
+
+/*!
  * Shows a tag: its title (also its accessibility label), icons, look and state. An icon's accessibilityLabel, when
  * it has one (such as a "hot" icon), is read by VoiceOver as the tag's value.
  */

@@ -30,5 +30,9 @@ FOUNDATION_EXTERN NSString *const CYLTagCreateItemAccessibilityIdentifier;
  * The More button of a section header (`menuShowsMoreButtonInSection:`).
  */
 FOUNDATION_EXTERN NSString *const CYLTagListMoreButtonAccessibilityIdentifier;
+/*!
+ * The tappable delete indicator ("×") of a deletable tag; VoiceOver users get a "Delete" action on the tag instead.
+ */
+FOUNDATION_EXTERN NSString *const CYLTagListDeleteAccessibilityIdentifier;
 
 NS_ASSUME_NONNULL_END

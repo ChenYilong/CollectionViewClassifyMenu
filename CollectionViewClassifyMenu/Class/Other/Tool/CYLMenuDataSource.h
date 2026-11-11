@@ -112,6 +112,18 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  */
 - (nullable NSString *)menuAccessibilityLabelForMoreButtonInSection:(NSInteger)section
     NS_SWIFT_NAME(menuAccessibilityLabelForMoreButton(inSection:));
+/*!
+ * YES shows a delete indicator ("×", CYLMenuStyle.deleteIndicatorTitle) after the item's title, as android-tagview's
+ * deletable tags; a tap on it (or VoiceOver's "Delete" action) deletes the item. Defaults to NO. Only CYLTagListView
+ * shows it.
+ */
+- (BOOL)menuItemIsDeletableAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menuItemIsDeletable(at:));
+/*!
+ * Remove the item from your data: the delete indicator of a deletable item was tapped. The list then reloads and
+ * calls -menu:didDeleteItemAtIndexPath:. Without it, the list only reports the tap (the host removes the item and
+ * calls -reloadMenuData).
+ */
+- (void)menuRemoveItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menuRemoveItem(at:));
 
 @end
 
@@ -157,6 +169,12 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * for example loading other items and calling -reloadMenuData.
  */
 - (void)menu:(id)menu didTapMoreButtonInSection:(NSInteger)section NS_SWIFT_NAME(menu(_:didTapMoreButtonInSection:));
+
+/*!
+ * The delete indicator of a deletable item was tapped (as android-tagview's onTagDeleted). When the data source
+ * implements -menuRemoveItemAtIndexPath:, the item is already gone and `indexPath` is where it was.
+ */
+- (void)menu:(id)menu didDeleteItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menu(_:didDeleteItemAt:));
 
 @end
 

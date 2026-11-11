@@ -46,10 +46,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) CGFloat borderWidth;
 /*!
- * Horizontal space between the border and the content, 10 by default.
- * Negative or non-finite values are treated as 0.
+ * Horizontal space between the border and the content, 10 by default: the left and right of `contentInsets`.
+ * Setting it sets both; reading it gives the larger. Negative or non-finite values are treated as 0.
  */
 @property (nonatomic, assign) CGFloat margin;
+/*!
+ * Space between the border and the content on each side, {5, 10, 5, 10} by default (as android-tagview's
+ * textPaddingTop / Left / Bottom / Right). The left and right widen the tag; the top and bottom make it taller
+ * than the style's itemHeight only when the font needs it. Negative or non-finite values are treated as 0.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInsets;
+/*!
+ * Drawn behind the content, stretched to the tag (as android-tagview's Tag.background); use a resizable image
+ * for caps. nil (the default) for none: the background color only.
+ */
+@property (nullable, nonatomic, strong) UIImage *backgroundImage;
 
 /*!
  * Restores every property to its built-in default.

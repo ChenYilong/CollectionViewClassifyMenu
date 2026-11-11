@@ -21,6 +21,7 @@
 //
 
 #import "CYLTagListView.h"
+#import "CYLTag.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -77,6 +78,11 @@ FOUNDATION_EXTERN NSString *const CYLTagListViewTitleImage;
  * (e.g. {normal: {textColor: "#07C160", iconColor: "#07C160"}}).
  */
 FOUNDATION_EXTERN NSString *const CYLTagListViewTitleStyle;
+/*!
+ * NSArray of tags, as android-tagview's addTags(): strings (titles) or dictionaries of CYLTagItem… keys (title, image,
+ * id, deletable, enabled, style…). Replaces the list's tags (-addTags:, `tagDataSource`).
+ */
+FOUNDATION_EXTERN NSString *const CYLTagListViewTags;
 
 #pragma mark Fold control keys (CYLMenuFoldControl)
 /*!
@@ -156,6 +162,18 @@ FOUNDATION_EXTERN NSString *const CYLTagItemExclusive;
  * NSNumber of CYLMenuItemType, or "tag" (default), "create" ("+ 新建标签"; its title is the name to create).
  */
 FOUNDATION_EXTERN NSString *const CYLTagItemType;
+/*!
+ * NSNumber, or "true" / "false": shows the delete indicator ("×"); a tap removes the item. Default NO.
+ */
+FOUNDATION_EXTERN NSString *const CYLTagItemDeletable;
+/*!
+ * NSNumber: CYLTag.identifier (CYLTagListViewTags only).
+ */
+FOUNDATION_EXTERN NSString *const CYLTagItemIdentifier;
+/*!
+ * CYLMenuStyle, or a dictionary of CYLMenuStyle… keys applied over the section's style: this item's own look.
+ */
+FOUNDATION_EXTERN NSString *const CYLTagItemStyle;
 
 #pragma mark Style keys (CYLMenuStyle)
 /*!
@@ -215,6 +233,20 @@ FOUNDATION_EXTERN NSString *const CYLMenuStyleFoldControlColor;
  * UIFont, a point size, or {size:, weight: "semibold", name: "Menlo", italic: true}.
  */
 FOUNDATION_EXTERN NSString *const CYLMenuStyleHeaderFont;
+/*!
+ * A color: the background while pressed.
+ */
+FOUNDATION_EXTERN NSString *const CYLMenuStyleHighlightedBackgroundColor;
+/*!
+ * UIEdgeInsets for every state (android-tagview's textPaddingTop / Left / Bottom / Right).
+ */
+FOUNDATION_EXTERN NSString *const CYLMenuStyleTagContentInsets;
+/*!
+ * The delete indicator: a string ("×"), a color and a font.
+ */
+FOUNDATION_EXTERN NSString *const CYLMenuStyleDeleteIndicatorTitle;
+FOUNDATION_EXTERN NSString *const CYLMenuStyleDeleteIndicatorColor;
+FOUNDATION_EXTERN NSString *const CYLMenuStyleDeleteIndicatorFont;
 
 #pragma mark Appearance keys (CYLTagAppearance, as CYLBadgeAppearance)
 FOUNDATION_EXTERN NSString *const CYLTagAppearanceBackgroundColor;
@@ -225,6 +257,14 @@ FOUNDATION_EXTERN NSString *const CYLTagAppearanceCornerRadius;
 FOUNDATION_EXTERN NSString *const CYLTagAppearanceBorderColor;
 FOUNDATION_EXTERN NSString *const CYLTagAppearanceBorderWidth;
 FOUNDATION_EXTERN NSString *const CYLTagAppearanceMargin;
+/*!
+ * UIEdgeInsets: space between the border and the content on each side.
+ */
+FOUNDATION_EXTERN NSString *const CYLTagAppearanceContentInsets;
+/*!
+ * UIImage, or an image name, "system:<SF Symbol>" or a file path, drawn behind the content.
+ */
+FOUNDATION_EXTERN NSString *const CYLTagAppearanceBackgroundImage;
 
 FOUNDATION_EXTERN NSErrorDomain const CYLMenuConfigurationErrorDomain;
 typedef NS_ERROR_ENUM(CYLMenuConfigurationErrorDomain, CYLMenuConfigurationError) {
@@ -243,6 +283,11 @@ typedef NS_ERROR_ENUM(CYLMenuConfigurationErrorDomain, CYLMenuConfigurationError
  *                                                                     @"stateMachine" : @"CHAT_Interactivity",
  *                                                                     @"input" : @"active" });
  */
+/*!
+ * A color from "#RGB", "#RRGGBB", "#RRGGBBAA" or a UIColor name ("systemBlue", "systemBlueColor"); nil otherwise.
+ */
+FOUNDATION_EXTERN UIColor *_Nullable CYLMenuColorFromString(NSString *string);
+
 FOUNDATION_EXTERN NSURL *_Nullable CYLMenuAnimationURLWithOptions(NSURL *_Nullable fileURL, NSDictionary<NSString *, id> *_Nullable options);
 
 @interface CYLTagListView (CYLConfiguration)
@@ -295,6 +340,13 @@ FOUNDATION_EXTERN NSURL *_Nullable CYLMenuAnimationURLWithOptions(NSURL *_Nullab
 
 @interface CYLTagAppearance (CYLConfiguration)
 - (void)applyConfiguration:(NSDictionary<NSString *, id> *)configuration;
+@end
+
+@interface CYLTag (CYLConfiguration)
+/*!
+ * A tag from a dictionary of CYLTagItem… keys (title, image, selectedImage, animation, id, enabled, deletable, style).
+ */
++ (instancetype)tagWithConfiguration:(NSDictionary<NSString *, id> *)configuration;
 @end
 
 NS_ASSUME_NONNULL_END

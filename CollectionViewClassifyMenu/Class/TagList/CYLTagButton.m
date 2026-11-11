@@ -33,6 +33,12 @@ static Class<CYLTagAnimationFactory> CYLTagAnimationFactoryClass(void) {
     return Nil;
 }
 
+/// The y that centers something `size` tall between the top and bottom content insets, or in the whole tag when it
+/// does not fit between them.
+static CGFloat CYLTagCenteredY(CGFloat size, CGFloat contentTop, CGFloat contentHeight, CGFloat height) {
+    return size <= contentHeight ? contentTop + floor((contentHeight - size) / 2) : floor((height - size) / 2);
+}
+
 static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     return @[@(UIControlStateNormal), @(UIControlStateSelected), @(UIControlStateDisabled)];
 }
@@ -41,6 +47,8 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 @property (nonatomic, strong, readwrite, nullable) UIView *animationView;
 @property (nonatomic, strong, readwrite, nullable) id animationPlayer;
 @property (nonatomic, assign) CGSize animationViewSize;
+@property (nonatomic, strong) UIImageView *backgroundImageView;
+@property (nonatomic, assign, readwrite) CGRect deleteIndicatorHitFrame;
 @end
 
 @implementation CYLTagButton
@@ -59,8 +67,16 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         _imageView.contentMode = UIViewContentModeScaleAspectFit;
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+        _backgroundImageView = [[UIImageView alloc] init];
+        _backgroundImageView.hidden = YES;
+        _deleteIndicatorLabel = [[UILabel alloc] init];
+        _deleteIndicatorLabel.textAlignment = NSTextAlignmentCenter;
+        _deleteIndicatorLabel.hidden = YES;
+        _deleteIndicatorLabel.isAccessibilityElement = NO;
+        [self addSubview:_backgroundImageView];
         [self addSubview:_imageView];
         [self addSubview:_titleLabel];
+        [self addSubview:_deleteIndicatorLabel];
         self.layer.masksToBounds = YES;
     }
     return self;
@@ -182,6 +198,19 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     [self cyl_updateAppearance];
 }
 
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    [self cyl_updateAppearance];
+}
+
+- (void)setShowsDeleteIndicator:(BOOL)showsDeleteIndicator {
+    if (_showsDeleteIndicator == showsDeleteIndicator) {
+        return;
+    }
+    _showsDeleteIndicator = showsDeleteIndicator;
+    [self cyl_updateAppearance];
+}
+
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
     [self cyl_updateAppearance];
@@ -210,7 +239,18 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     self.titleLabel.font = [self.style titleFontForState:state traitCollection:self.traitCollection];
     self.titleLabel.textColor = appearance.textColor;
 
-    self.layer.backgroundColor = appearance.backgroundColor.CGColor;
+    UIColor *background = appearance.backgroundColor;
+    if (self.isHighlighted && state != UIControlStateDisabled && self.style.highlightedBackgroundColor) {
+        // Pressed, as android-tagview's layoutColorPress.
+        background = self.style.highlightedBackgroundColor;
+    }
+    self.layer.backgroundColor = background.CGColor;
+    self.backgroundImageView.image = appearance.backgroundImage;
+    self.backgroundImageView.hidden = appearance.backgroundImage == nil || (self.isHighlighted && self.style.highlightedBackgroundColor);
+    self.deleteIndicatorLabel.hidden = !self.showsDeleteIndicator;
+    self.deleteIndicatorLabel.text = self.showsDeleteIndicator ? self.style.deleteIndicatorTitle : nil;
+    self.deleteIndicatorLabel.font = [self.style deleteIndicatorFontForState:state traitCollection:self.traitCollection];
+    self.deleteIndicatorLabel.textColor = self.style.deleteIndicatorColor ?: appearance.textColor;
     UIColor *borderColor = appearance.borderColor;
     CGFloat borderWidth = borderColor ? appearance.borderWidth : 0;
     if (UIAccessibilityDarkerSystemColorsEnabled()) {
@@ -244,6 +284,17 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 }
 
 + (CGFloat)widthForTitle:(NSString *)title iconSize:(CGSize)iconSize style:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
+    return [self widthForTitle:title iconSize:iconSize showsDeleteIndicator:NO style:style traitCollection:traitCollection];
+}
+
+/// The delete indicator's width and the space before it, in a state.
++ (CGFloat)cyl_deleteIndicatorWidthForState:(UIControlState)state style:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
+    UIFont *font = [style deleteIndicatorFontForState:state traitCollection:traitCollection];
+    return ceil([style.deleteIndicatorTitle sizeWithAttributes:@{NSFontAttributeName: font}].width);
+}
+
++ (CGFloat)widthForTitle:(NSString *)title iconSize:(CGSize)iconSize showsDeleteIndicator:(BOOL)showsDeleteIndicator
+                   style:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
     CGFloat width = 0;
     for (NSNumber *state in CYLTagButtonStates()) {
         UIControlState controlState = state.unsignedIntegerValue;
@@ -259,7 +310,10 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
             // The title keeps its place after an empty icon slot.
             content += style.imageSize.width + style.imageTitleSpacing;
         }
-        width = MAX(width, ceil(content + 2 * appearance.margin));
+        if (showsDeleteIndicator) {
+            content += style.imageTitleSpacing + [self cyl_deleteIndicatorWidthForState:controlState style:style traitCollection:traitCollection];
+        }
+        width = MAX(width, ceil(content + appearance.contentInsets.left + appearance.contentInsets.right));
     }
     return width;
 }
@@ -267,7 +321,10 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 + (CGFloat)heightForStyle:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
     CGFloat height = style.itemHeight;
     for (NSNumber *state in CYLTagButtonStates()) {
-        height = MAX(height, CYLTagHeightForFont([style titleFontForState:state.unsignedIntegerValue traitCollection:traitCollection], style.itemHeight));
+        UIControlState controlState = state.unsignedIntegerValue;
+        UIEdgeInsets insets = [style appearanceForState:controlState].contentInsets;
+        UIFont *font = [style titleFontForState:controlState traitCollection:traitCollection];
+        height = MAX(height, ceil(font.lineHeight) + insets.top + insets.bottom);
     }
     return height;
 }
@@ -286,8 +343,29 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     CGFloat width = CGRectGetWidth(self.bounds);
     CGFloat height = CGRectGetHeight(self.bounds);
     CYLMenuStyle *style = self.style;
-    CYLTagAppearance *appearance = [style appearanceForState:[self cyl_currentState]];
-    CGFloat margin = appearance.margin;
+    UIControlState state = [self cyl_currentState];
+    CYLTagAppearance *appearance = [style appearanceForState:state];
+    UIEdgeInsets insets = appearance.contentInsets;
+    self.backgroundImageView.frame = self.bounds;
+    // The delete indicator at the trailing inset; the content lays out in what is left, as without it.
+    CGFloat deleteWidth = 0;
+    if (self.showsDeleteIndicator) {
+        CGFloat indicatorWidth = [[self class] cyl_deleteIndicatorWidthForState:state style:style traitCollection:self.traitCollection];
+        deleteWidth = indicatorWidth + style.imageTitleSpacing;
+        CGFloat indicatorX = MAX(insets.left, width - insets.right - indicatorWidth);
+        self.deleteIndicatorLabel.frame = CGRectMake(indicatorX, insets.top, indicatorWidth, MAX(0, height - insets.top - insets.bottom));
+        CGFloat hitX = MAX(0, indicatorX - style.imageTitleSpacing);
+        self.deleteIndicatorHitFrame = CGRectMake(hitX, 0, width - hitX, height);
+    } else {
+        self.deleteIndicatorLabel.frame = CGRectZero;
+        self.deleteIndicatorHitFrame = CGRectZero;
+    }
+    // The leading margin; `trailing` is the space after the content (the right inset and the delete indicator).
+    CGFloat margin = insets.left;
+    CGFloat trailing = insets.right + deleteWidth;
+    CGFloat contentTop = insets.top;
+    CGFloat contentHeight = MAX(0, height - insets.top - insets.bottom);
+    width -= trailing - margin;
     BOOL animated = self.animationView != nil;
     BOOL showsImage = animated || self.imageView.image != nil;
     BOOL showsTitle = self.titleLabel.text.length > 0;
@@ -327,19 +405,19 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 
     if (showsTitle) {
         self.titleLabel.frame = CGRectMake(titleX + style.titlePositionAdjustment.horizontal,
-                                           floor((height - titleHeight) / 2) + style.titlePositionAdjustment.vertical,
+                                           CYLTagCenteredY(titleHeight, contentTop, contentHeight, height) + style.titlePositionAdjustment.vertical,
                                            titleWidth, titleHeight);
     } else {
         self.titleLabel.frame = CGRectZero;
     }
     if (showsImage) {
         CGRect frame = CGRectMake(imageX + style.imagePositionAdjustment.horizontal,
-                                  floor((height - iconSize.height) / 2) + style.imagePositionAdjustment.vertical,
+                                  CYLTagCenteredY(iconSize.height, contentTop, contentHeight, height) + style.imagePositionAdjustment.vertical,
                                   iconSize.width, iconSize.height);
         // Only the size changes; x and y stay, as CYLFlatDesignTabBarItem.imageInsets.
-        UIEdgeInsets insets = style.imageInsets;
-        frame.size.width = MAX(0, frame.size.width - insets.left - insets.right);
-        frame.size.height = MAX(0, frame.size.height - insets.top - insets.bottom);
+        UIEdgeInsets imageInsets = style.imageInsets;
+        frame.size.width = MAX(0, frame.size.width - imageInsets.left - imageInsets.right);
+        frame.size.height = MAX(0, frame.size.height - imageInsets.top - imageInsets.bottom);
         if (animated) {
             self.animationView.frame = frame;
             [self cyl_placeImageView:CGRectZero];

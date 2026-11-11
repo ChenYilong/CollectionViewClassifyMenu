@@ -92,6 +92,10 @@ final class CYLRecordingMenuDelegate: NSObject, CYLMenuDelegate {
         events.append("select " + describe(indexPath))
     }
 
+    func menu(_ menu: Any, didDeleteItemAt indexPath: IndexPath) {
+        events.append("delete " + describe(indexPath))
+    }
+
     func menu(_ menu: Any, didDeselectItemAt indexPath: IndexPath) {
         events.append("deselect " + describe(indexPath))
     }
