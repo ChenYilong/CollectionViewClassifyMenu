@@ -332,6 +332,19 @@ image from `menuImageForItemAtIndexPath:` instead. Section icons of
 | 增强对比度 Increase Contrast | 标签边框改用文字颜色并至少 1pt。 |
 | 减弱动态效果 Reduce Motion | 展开与收起不使用动画。 |
 
+| Voice Control / Switch Control / 全键盘控制 | 每个标签、“+ 新建标签”、折叠按钮和列表标题都是带本地化标签的元素，可用名称点击或依次聚焦。 |
+
+`CYLTagListView` 的视图带有固定的 `accessibilityIdentifier`（声明于 `CYLTagListAccessibility.h`），测试与工具无需坐标即可找到它们：
+
+| 视图 | 标识符 | 朗读 |
+| --- | --- | --- |
+| 列表标题 `titleView` | `CYLTagListTitle` | 标题文字（仅图标时取图标的 `accessibilityLabel`，没有则作为装饰隐藏），`header` |
+| 标签 | `CYLTagListItem` | 标签文字，按钮，选中 / 禁用 |
+| “+ 新建标签” | `CYLTagCreateItem` | “新建标签” / “新建标签：<名称>”，按钮（从不“已选中”） |
+| 折叠按钮 | `CYLTagListFoldControl` | “<分组> 更多/收起”，按钮 |
+
+数据源可实现 `-menuAccessibilityHintForItemAtIndexPath:`（Swift：`menuAccessibilityHintForItem(at:)`）为标签提供朗读提示，如 Swift Example 管理模式下的“轻点两下删除此标签”。
+
 宿主提供的分组右侧视图（如行业选择按钮）应设置自己的 `accessibilityLabel`，Example 中有示例。
 
 ### Localization / 国际化与本地化
@@ -343,14 +356,20 @@ image from `menuImageForItemAtIndexPath:` instead. Section icons of
 ```objc
 CYLMenuResources.preferredLanguage = @"en";   // App 内切换语言；nil 跟随系统
 NSString *more = CYLMenuLocalizedString(@"CYLMenuExpand", nil);   // "More"
+UIImage *plus = CYLMenuImage(@"cyl_tag_plus");                     // 组件 bundle 中的图片
 [CYLMenuResources localizedStringForKey:@"CYLMenuCollapse" language:@"zh-Hant"];   // "收合"
 ```
+
+Swift 无法调用宏，使用同名函数：`CYLMenuLocalizedString("CYLMenuExpand")`。
 
 切换语言后新创建的视图使用新语言。`CYLMenuStyle` 的 `expandTitle` / `collapseTitle` 默认取自该 bundle，
 也可由宿主覆盖。新增文案时，在三个 `.strings` 中加入相同的键（测试会检查键一致）。
 
 Example 的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CYLMenuExample.bundle`，通过宏 `CYLExampleLocalizedString` 读取，键为中文原文；
 评价关键词与标签属于示例数据，不翻译。启动参数 `-CYLExampleLanguage en` 可切换 Example 与组件的语言。
+Swift Example 使用函数 `CYLTagEditorLocalizedString` 读取 `CYLTagEditorExample.bundle`；`CollectionViewClassifyMenu.xcodeproj`
+的演示 App 使用宏 `CYLDemoLocalizedString` 读取 `CYLClassifyMenuDemo.bundle`。每一层各有自己的查找宏（或函数）与 bundle，
+代码中不出现面向用户的中文字面量（含无障碍标签与提示）。
 
 ### Example / 示例工程
 

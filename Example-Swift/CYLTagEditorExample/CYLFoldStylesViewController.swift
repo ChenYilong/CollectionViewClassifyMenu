@@ -153,12 +153,14 @@ final class CYLFoldStylesViewController: UIViewController {
         let groups = data.groups ?? [CYLTagGroup(title: CYLTagEditorLocalizedString("我的标签"), tags: data.tags)]
         for demo in demos() {
             // The styles are given when the view is created; the title is the core's title view.
-            let list = CYLTagListView(foldControl: demo.foldControl, title: demo.title,
-                                      titleImage: demo.titleImage.flatMap { UIImage(systemName: $0) }, titlePosition: demo.titlePosition)
-            list.titleStyle = Self.titleStyle(for: demo)
+            let titleImage = demo.titleImage.flatMap { UIImage(systemName: $0) }
             if demo.title == nil {
-                list.titleView.accessibilityLabel = CYLTagEditorLocalizedString("标题：仅图标")
+                // An icon-only title needs a label of its own; the core reads it from the image.
+                titleImage?.accessibilityLabel = CYLTagEditorLocalizedString("标题：仅图标")
             }
+            let list = CYLTagListView(foldControl: demo.foldControl, title: demo.title,
+                                      titleImage: titleImage, titlePosition: demo.titlePosition)
+            list.titleStyle = Self.titleStyle(for: demo)
             let style = CYLTagEditorViewController.tagStyle()
             style.backgroundColor = .secondarySystemGroupedBackground
             list.style = style
@@ -209,6 +211,7 @@ final class CYLFoldStylesViewController: UIViewController {
         let label = UILabel()
         label.numberOfLines = 0
         label.font = .preferredFont(forTextStyle: .footnote)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = .systemRed
         label.text = "  \(file): \(error.localizedDescription)"
         return label

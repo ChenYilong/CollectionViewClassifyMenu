@@ -34,8 +34,8 @@ static float const kImageToTextMargin = 7;
     self.titleLabel.font = [UIFont systemFontOfSize:12];
     [self setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
-    [self setImage:[CYLMenuResources imageNamed:@"home_btn_more_normal"] forState:UIControlStateNormal];
-    [self setImage:[CYLMenuResources imageNamed:@"home_btn_more_selected"] forState:UIControlStateSelected];
+    [self setImage:CYLMenuImage(@"home_btn_more_normal") forState:UIControlStateNormal];
+    [self setImage:CYLMenuImage(@"home_btn_more_selected") forState:UIControlStateSelected];
     return self;
 }
 

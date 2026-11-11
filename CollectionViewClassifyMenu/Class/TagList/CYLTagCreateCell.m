@@ -9,7 +9,7 @@
 @implementation CYLTagCreateCell
 
 + (UIImage *)plusImage {
-    return [CYLMenuResources imageNamed:@"cyl_tag_plus"] ?: [UIImage systemImageNamed:@"plus"];
+    return CYLMenuImage(@"cyl_tag_plus") ?: [UIImage systemImageNamed:@"plus"];
 }
 
 + (NSString *)titleForName:(NSString *)name {
@@ -41,6 +41,7 @@
                        style:style selected:NO enabled:enabled];
     // An action, not a tag: never "selected" for VoiceOver.
     self.accessibilityTraits = enabled ? UIAccessibilityTraitButton : (UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled);
+    self.accessibilityIdentifier = CYLTagCreateItemAccessibilityIdentifier;
 }
 
 @end

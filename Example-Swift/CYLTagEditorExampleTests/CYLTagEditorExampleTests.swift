@@ -387,4 +387,101 @@ final class CYLTagEditorExampleTests: XCTestCase {
         XCTAssertEqual(titles(editor, section: 0).last, "New tag: ios")
         XCTAssertEqual(CYLMenuResources.preferredLanguage, "en", "The component follows the Example's language")
     }
+
+    // MARK: Accessibility (found by identifier and label, never by coordinates)
+
+    /// Every view under `root` (itself included) with this accessibility identifier.
+    private func views(withIdentifier identifier: String, in root: UIView) -> [UIView] {
+        var found = root.accessibilityIdentifier == identifier ? [root] : []
+        for subview in root.subviews {
+            found += views(withIdentifier: identifier, in: subview)
+        }
+        return found
+    }
+
+    func testCoreLookupIsCallableFromSwift() {
+        XCTAssertEqual(CYLMenuLocalizedString("CYLMenuNewTag"), "新建标签", "The core macro's Swift function")
+        XCTAssertEqual(CYLTagEditorLocalizedString("编辑标签"), "编辑标签", "The Example's own lookup")
+        CYLTagEditorLocalization.preferredLanguage = "en"
+        XCTAssertEqual(CYLMenuLocalizedString("CYLMenuNewTag"), "New Tag")
+        XCTAssertEqual(CYLTagEditorLocalizedString("编辑标签"), "Edit Tags")
+    }
+
+    func testEditorTagsAreAccessibilityElementsWithLabelsTraitsAndHints() {
+        let editor = makeEditor()
+        XCTAssertEqual(editor.searchField.accessibilityLabel, "搜索标签")
+        XCTAssertTrue(editor.titleLabel.accessibilityTraits.contains(.header))
+        let collection = editor.tagListView.value(forKey: "collectionView") as! UICollectionView
+        let items = views(withIdentifier: CYLTagListItemAccessibilityIdentifier, in: collection)
+        let family = items.first { $0.accessibilityLabel == "家人" }
+        XCTAssertNotNil(family, "Tags are found by their label")
+        XCTAssertTrue(family?.isAccessibilityElement ?? false)
+        XCTAssertTrue(family?.accessibilityTraits.contains(.button) ?? false)
+        XCTAssertTrue(family?.accessibilityTraits.contains(.selected) ?? false, "A selected tag says so")
+        XCTAssertFalse(items.first { $0.accessibilityLabel == "摄影" }?.accessibilityTraits.contains(.selected) ?? true)
+        // "+ 新建标签" has its own identifier and reads as a button, never as a selected tag.
+        editor.tagListView.scrollToItem(at: IndexPath(item: 7, section: 1), animated: false)
+        collection.layoutIfNeeded()
+        let create = views(withIdentifier: CYLTagCreateItemAccessibilityIdentifier, in: collection).first
+        XCTAssertEqual(create?.accessibilityLabel, "新建标签")
+        XCTAssertEqual(create?.accessibilityTraits, .button)
+        // In 管理 mode VoiceOver explains that a tap deletes the tag.
+        XCTAssertNil(editor.menuAccessibilityHintForItem(at: IndexPath(item: 0, section: 1)))
+        editor.toggleManaging()
+        XCTAssertEqual(editor.manageButton.accessibilityHint, "轻点两下完成管理")
+        XCTAssertEqual(editor.menuAccessibilityHintForItem(at: IndexPath(item: 0, section: 1)), "轻点两下删除此标签")
+        XCTAssertNil(editor.menuAccessibilityHintForItem(at: IndexPath(item: 0, section: 0)), "最近使用 is not managed")
+        editor.tagListView.scrollToItem(at: IndexPath(item: 0, section: 1), animated: false)
+        collection.layoutIfNeeded()
+        let managed = views(withIdentifier: CYLTagListItemAccessibilityIdentifier, in: collection)
+            .first { $0.accessibilityLabel == "家人" && $0.accessibilityHint != nil }
+        XCTAssertEqual(managed?.accessibilityHint, "轻点两下删除此标签", "The core applies the data source's hint to the cell")
+    }
+
+    func testRemarkTitleIsAHeaderThatOpensTheEditor() {
+        let remark = CYLRemarkViewController(store: CYLTagStore.bundled(), tags: [])
+        host(UINavigationController(rootViewController: remark))
+        let title = views(withIdentifier: CYLTagListTitleAccessibilityIdentifier, in: remark.tagsView).first
+        XCTAssertTrue(title === remark.tagsView.titleView)
+        XCTAssertEqual(title?.accessibilityLabel, "标签")
+        XCTAssertTrue(title?.isAccessibilityElement ?? false)
+        XCTAssertEqual(title?.accessibilityTraits, [.header, .button])
+        XCTAssertEqual(title?.accessibilityHint, "编辑标签")
+        XCTAssertEqual(remark.nameField.accessibilityLabel, "备注名")
+    }
+
+    func testFoldStylesTitlesAndFoldControlsAreLabelled() throws {
+        let styles = CYLFoldStylesViewController(data: try CYLTagData.bundled())
+        host(styles)
+        styles.view.layoutIfNeeded()
+        for list in styles.tagListViews {
+            let title = views(withIdentifier: CYLTagListTitleAccessibilityIdentifier, in: list).first
+            XCTAssertNotNil(title)
+            guard let title, !title.isHidden else { continue }
+            XCTAssertTrue(title.isAccessibilityElement, "Every visible title has a label")
+            XCTAssertFalse(title.accessibilityLabel?.isEmpty ?? true)
+            XCTAssertTrue(title.accessibilityTraits.contains(.header))
+        }
+        let iconOnly = styles.tagListViews.first { $0.title == nil && $0.titleImage != nil }
+        XCTAssertEqual(iconOnly?.titleView.accessibilityLabel, "标题：仅图标", "An icon-only title needs a label of its own")
+        let folds = styles.tagListViews.flatMap { views(withIdentifier: CYLTagListFoldControlAccessibilityIdentifier, in: $0) }
+            .filter { !$0.isHidden && $0.window != nil }
+        XCTAssertFalse(folds.isEmpty, "Fold controls are found by identifier")
+        for fold in folds {
+            XCTAssertTrue(fold.isAccessibilityElement)
+            XCTAssertTrue(fold.accessibilityTraits.contains(.button))
+            XCTAssertFalse(fold.accessibilityLabel?.isEmpty ?? true, "\(fold)")
+        }
+    }
+
+    func testIconOnlyTitleWithoutALabelIsDecorative() {
+        let list = CYLTagListView(foldControl: CYLMenuFoldControl(position: .bottom, content: .icon), title: nil,
+                                  titleImage: UIImage(systemName: "tag.circle"), titlePosition: .topLeading)
+        if list.titleImage?.accessibilityLabel == nil {
+            XCTAssertFalse(list.titleView.isAccessibilityElement, "Hidden from VoiceOver rather than read as an empty element")
+        }
+        list.title = "标签"
+        XCTAssertTrue(list.titleView.isAccessibilityElement)
+        XCTAssertEqual(list.titleView.accessibilityIdentifier, "CYLTagListTitle")
+    }
 }

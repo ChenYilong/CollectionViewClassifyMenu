@@ -14,6 +14,7 @@
 		9A09E2F71BC7AFF00060C116 /* CYLMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2BC1BC7AFF00060C116 /* CYLMainViewController.m */; };
 		9A09E3081BC7AFF00060C116 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2E61BC7AFF00060C116 /* data.json */; };
 		9A09E30A1BC7AFF00060C116 /* CYLAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2ED1BC7AFF00060C116 /* CYLAppDelegate.m */; };
+		9A0DE1100000000000000002 /* CYLClassifyMenuDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9A0DE1100000000000000001 /* CYLClassifyMenuDemo.bundle */; };
 		9A09E30B1BC7AFF00060C116 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2EE1BC7AFF00060C116 /* LaunchScreen.xib */; };
 		9A09E30E1BC7AFF00060C116 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F21BC7AFF00060C116 /* main.m */; };
 		9A09E30F1BC7AFF00060C116 /* CYLDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A09E2F51BC7AFF00060C116 /* CYLDBManager.m */; };
@@ -77,6 +78,7 @@
 		9A09E2EC1BC7AFF00060C116 /* CYLAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLAppDelegate.h; sourceTree = "<group>"; };
 		9A09E2ED1BC7AFF00060C116 /* CYLAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLAppDelegate.m; sourceTree = "<group>"; };
 		9A09E2EF1BC7AFF00060C116 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		9A0DE1100000000000000001 /* CYLClassifyMenuDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CYLClassifyMenuDemo.bundle; sourceTree = "<group>"; };
 		9A09E2F01BC7AFF00060C116 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9A09E2F11BC7AFF00060C116 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A09E2F21BC7AFF00060C116 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -301,6 +303,7 @@
 				9A09E2ED1BC7AFF00060C116 /* CYLAppDelegate.m */,
 				9A09E2EE1BC7AFF00060C116 /* LaunchScreen.xib */,
 				9A09E2F01BC7AFF00060C116 /* Images.xcassets */,
+				9A0DE1100000000000000001 /* CYLClassifyMenuDemo.bundle */,
 				9A09E2F11BC7AFF00060C116 /* Info.plist */,
 				9A09E2F21BC7AFF00060C116 /* main.m */,
 			);
@@ -469,6 +472,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A09E30B1BC7AFF00060C116 /* LaunchScreen.xib in Resources */,
+				9A0DE1100000000000000002 /* CYLClassifyMenuDemo.bundle in Resources */,
 				9A09E3081BC7AFF00060C116 /* data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

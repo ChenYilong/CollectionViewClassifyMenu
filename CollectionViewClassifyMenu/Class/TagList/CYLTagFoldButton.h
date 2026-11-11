@@ -9,6 +9,7 @@
 
 #import "CYLTagButton.h"
 #import "CYLMenuFoldControl.h"
+#import "CYLTagListAccessibility.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

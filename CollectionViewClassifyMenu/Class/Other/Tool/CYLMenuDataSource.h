@@ -64,6 +64,10 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
 - (BOOL)menuItemIsSelectableAtIndexPath:(NSIndexPath *)indexPath;
 /// Tag (default) or "+ 新建标签" (CYLMenuItemTypeCreate).
 - (CYLMenuItemType)menuItemTypeAtIndexPath:(NSIndexPath *)indexPath;
+/// The VoiceOver hint of an item (what a tap does, for example "Double-tap to remove"), already
+/// localized. The label is the item's title, the traits are set by the list. Defaults to nil.
+- (nullable NSString *)menuAccessibilityHintForItemAtIndexPath:(NSIndexPath *)indexPath
+    NS_SWIFT_NAME(menuAccessibilityHintForItem(at:));
 
 @end
 

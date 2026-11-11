@@ -52,7 +52,8 @@ final class CYLTagEditorViewController: UIViewController {
     let titleLabel = UILabel()
     private(set) lazy var manageButton: UIButton = {
         let button = UIButton(type: .system)
-        button.titleLabel?.font = .systemFont(ofSize: 15)
+        button.titleLabel?.font = UIFontMetrics(forTextStyle: .subheadline).scaledFont(for: .systemFont(ofSize: 15))
+        button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.setTitleColor(CYLTagEditorViewController.linkColor, for: .normal)
         button.addTarget(self, action: #selector(toggleManaging), for: .touchUpInside)
         return button
@@ -110,16 +111,19 @@ final class CYLTagEditorViewController: UIViewController {
 
         cancelButton.setTitle(CYLTagEditorLocalizedString("取消"), for: .normal)
         cancelButton.setTitleColor(.label, for: .normal)
-        cancelButton.titleLabel?.font = .systemFont(ofSize: 17)
+        cancelButton.titleLabel?.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: .systemFont(ofSize: 17))
+        cancelButton.titleLabel?.adjustsFontForContentSizeCategory = true
         cancelButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
 
         titleLabel.text = CYLTagEditorLocalizedString("编辑标签")
-        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.font = UIFontMetrics(forTextStyle: .headline).scaledFont(for: .systemFont(ofSize: 17, weight: .semibold))
+        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.accessibilityTraits = .header
 
         // A custom button with explicit colors: green with white text when enabled, gray otherwise.
         doneButton.setTitle(CYLTagEditorLocalizedString("完成"), for: .normal)
-        doneButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        doneButton.titleLabel?.font = UIFontMetrics(forTextStyle: .headline).scaledFont(for: .systemFont(ofSize: 17, weight: .semibold))
+        doneButton.titleLabel?.adjustsFontForContentSizeCategory = true
         doneButton.setTitleColor(.white, for: .normal)
         doneButton.setTitleColor(UIColor.white.withAlphaComponent(0.7), for: .highlighted)
         doneButton.setTitleColor(.tertiaryLabel, for: .disabled)
@@ -132,6 +136,8 @@ final class CYLTagEditorViewController: UIViewController {
         doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
 
         searchField.placeholder = CYLTagEditorLocalizedString("搜索")
+        searchField.accessibilityLabel = CYLTagEditorLocalizedString("搜索标签")
+        searchField.adjustsFontForContentSizeCategory = true
         searchField.returnKeyType = .search
         searchField.clearButtonMode = .whileEditing
         searchField.autocapitalizationType = .none
@@ -191,6 +197,7 @@ final class CYLTagEditorViewController: UIViewController {
     func reload() {
         sections = makeSections()
         manageButton.setTitle(CYLTagEditorLocalizedString(isManaging ? "退出管理" : "管理"), for: .normal)
+        manageButton.accessibilityHint = CYLTagEditorLocalizedString(isManaging ? "轻点两下完成管理" : "轻点两下选择或删除标签")
         manageButton.sizeToFit()
         tagListView.reloadMenuData()
         syncSelection()
@@ -356,6 +363,13 @@ extension CYLTagEditorViewController: CYLMenuDataSource {
 
     func menuItemIsSelectable(at indexPath: IndexPath) -> Bool {
         !isManaging
+    }
+
+    /// In "管理" mode a tag of "我的标签" is deleted by a tap: VoiceOver says so.
+    func menuAccessibilityHintForItem(at indexPath: IndexPath) -> String? {
+        guard isManaging, sections[indexPath.section].kind == .mine,
+              case .tag = sections[indexPath.section].items[indexPath.item] else { return nil }
+        return CYLTagEditorLocalizedString("轻点两下删除此标签")
     }
 
     func menuAccessoryView(forSection section: Int) -> UIView? {

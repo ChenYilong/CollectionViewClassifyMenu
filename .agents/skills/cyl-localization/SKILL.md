@@ -9,7 +9,8 @@ description: Internationalization and localization rules and checks for Collecti
 
 | Module | Bundle | Sources | Lookup macro |
 | --- | --- | --- | --- |
-| Core (pod) | `CYLClassifyMenuResources.bundle` (also holds images and XIBs) | `CollectionViewClassifyMenu/Resources/Localization/<language>.lproj/CYLClassifyMenu.strings` | `CYLMenuLocalizedString(key, comment)` |
+| Core (pod) | `CYLClassifyMenuResources.bundle` (also holds images and XIBs) | `CollectionViewClassifyMenu/Resources/Localization/<language>.lproj/CYLClassifyMenu.strings` | `CYLMenuLocalizedString(key, comment)`; Swift: `CYLMenuLocalizedString(_:)` (the C function `CYLMenuLocalizedStringForKey`); images: `CYLMenuImage(name)` |
+| Demo app of `CollectionViewClassifyMenu.xcodeproj` (not in the pod) | `CYLClassifyMenuDemo.bundle` | `CollectionViewClassifyMenu/Class/Other/Symtem/CYLClassifyMenuDemo.bundle/<language>.lproj/Localizable.strings` | `CYLDemoLocalizedString(key)` (header-only `CYLDemoLocalization.h`, excluded from the podspec) |
 | Example | `CYLMenuExample.bundle` | `Example/CYLMenuExample/CYLMenuExample.bundle/<language>.lproj/Localizable.strings` | `CYLExampleLocalizedString(key)` |
 | Swift Example | `CYLTagEditorExample.bundle` (also holds `tags.json` and the `fold-styles.*` configuration files per language) | `Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle/<language>.lproj/Localizable.strings` | `CYLTagEditorLocalizedString(key, args...)` (Swift function) |
 
@@ -63,14 +64,43 @@ commit over every branch, see `cyl-dependency`; its core lookup is `CYLLocalized
 
 ```sh
 # Exactly the lookups below, one per level; no other bundle reads or NSLocalizedString calls.
-grep -rn "define CYLMenuLocalizedString\|define CYLExampleLocalizedString\|func CYLTagEditorLocalizedString" \
+grep -rn "define CYLMenuLocalizedString\|define CYLExampleLocalizedString\|define CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
   CollectionViewClassifyMenu Example Example-Swift
 grep -rn "NSLocalizedString(" CollectionViewClassifyMenu Example Example-Swift --include=*.m --include=*.swift
 ```
 
-### Known gap
+### Swift and the core
 
-`CYLMenuLocalizedString(key, comment)` is a function-like macro, which Swift cannot call. CYLTabBarController
-declares its lookup as a C function (`FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString *key)`), usable from
-both languages. Add a core function Swift can call (keeping the macro for Objective-C) before Swift code needs core
-strings directly; Swift examples reach them today through `CYLMenuResources.localizedString(forKey:)`.
+`CYLMenuLocalizedString(key, comment)` is a function-like macro, which Swift cannot call. Like CYLTabBarController's
+`CYLLocalizedString`, the core also declares a C function, `CYLMenuLocalizedStringForKey`, imported into Swift as
+`CYLMenuLocalizedString(_:)` (`NS_SWIFT_NAME`). Both read the same bundle; tests check both
+(`testCoreLookupIsCallableFromSwift`, `testCoreAndDemoLookupsReadTheirOwnBundles`). Core images go through
+`CYLMenuImage(name)`, never `[UIImage imageNamed:]` or the bundle.
+
+## No user-facing text in code
+
+From CYLTabBarController's "No Chinese text in code" rule: every literal a user sees or hears (titles, placeholders,
+alerts, accessibility labels, values and hints) goes through its level's lookup; values are formatted with
+`[NSString stringWithFormat:]` / `String(format:)`. Exceptions: keys stored in tables and looked up later, resource
+identifiers (image or file names), sample data loaded as data, and tests. Never highlight part of a localized text
+by a fixed range: find the localized part with `rangeOfString:` (as `CYLMainViewController` does for "两行").
+
+```sh
+# Chinese literals outside lookups, comments and tests (review each hit):
+python3 - <<'PY'
+import re, pathlib
+for p in pathlib.Path('.').rglob('*'):
+    if p.suffix not in ('.m', '.swift') or 'Pods' in p.parts or 'Tests' in str(p):
+        continue
+    for i, line in enumerate(p.read_text(errors='ignore').splitlines(), 1):
+        code = line.split('//')[0]
+        if re.search(r'"[^"]*[\u4e00-\u9fff]', code) and not re.search(r'Localized(String)?\w*\(', code):
+            print(f'{p}:{i}: {line.strip()}')
+PY
+```
+
+### Known gaps
+
+- `CYLDemoDataSource` (shared by the demo app and `Example/CYLMenuExample`) still holds its sample sections
+  ("全部", "地区过滤", "菜品过滤") as Chinese data. Localize them when that data source is ported to Swift
+  (see `cyl-swift`).

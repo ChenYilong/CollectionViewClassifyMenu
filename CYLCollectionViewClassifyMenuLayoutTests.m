@@ -2,6 +2,7 @@
 @import CollectionViewClassifyMenu;
 #import "CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.h"
 #import "CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/CYLMainViewController.h"
+#import "CollectionViewClassifyMenu/Class/Other/Symtem/CYLDemoLocalization.h"
 
 @interface CYLTestMenuSource : NSObject <CYLMenuDataSource, CYLMenuDelegate>
 @property (nonatomic, copy) NSArray<NSArray<NSString *> *> *sections;
@@ -413,6 +414,57 @@
     [controller reloadMenuData];
     XCTAssertEqual([collection numberOfSections], 1);
     XCTAssertEqual([collection numberOfItemsInSection:0], 1);
+}
+
+- (void)testCoreAndDemoLookupsReadTheirOwnBundles {
+    NSString *saved = CYLMenuResources.preferredLanguage;
+    CYLMenuResources.preferredLanguage = @"en";
+    // Two lookups, two bundles: the core's and the demo app's.
+    XCTAssertEqualObjects(CYLMenuLocalizedString(@"CYLMenuNewTag", nil), @"New Tag");
+    XCTAssertEqualObjects(CYLMenuLocalizedStringForKey(@"CYLMenuNewTag"), @"New Tag");
+    XCTAssertEqualObjects(CYLDemoLocalizedString(@"重置筛选条件"), @"Reset filters");
+    XCTAssertEqualObjects(CYLMenuLocalizedString(@"重置筛选条件", nil), @"重置筛选条件", @"Demo strings are not in the core bundle");
+    XCTAssertNotNil(CYLMenuImage(@"cyl_tag_plus"));
+    CYLMenuResources.preferredLanguage = @"zh-Hant";
+    XCTAssertEqualObjects(CYLDemoLocalizedString(@"重置筛选条件"), @"重設篩選條件");
+    CYLMenuResources.preferredLanguage = saved;
+}
+
+- (void)testTagListViewsHaveStableAccessibilityIdentifiers {
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = @[@[@"All", @"One", @"Two", @"Three", @"Four", @"Five", @"Six", @"Seven", @"Eight", @"Nine"]];
+    CYLMenuFoldControl *fold = [CYLMenuFoldControl foldControlWithPosition:CYLMenuFoldControlPositionBottom
+                                                               content:CYLMenuFoldControlContentIcon];
+    CYLTagListView *list = [[CYLTagListView alloc] initWithFoldControl:fold];
+    list.frame = CGRectMake(0, 0, 200, 400);
+    list.title = @"Tags";
+    list.defaultVisibleRows = 1;
+    list.menuDataSource = source;
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 200, 400)];
+    [window addSubview:list];
+    [list reloadMenuData];
+    [list layoutIfNeeded];
+    XCTAssertEqualObjects(list.titleView.accessibilityIdentifier, @"CYLTagListTitle");
+    XCTAssertTrue(list.titleView.isAccessibilityElement);
+    XCTAssertTrue(list.titleView.accessibilityTraits & UIAccessibilityTraitHeader);
+    NSMutableArray<UIView *> *stack = [NSMutableArray arrayWithObject:list];
+    NSMutableArray<UIView *> *items = [NSMutableArray array];
+    UIView *foldControl = nil;
+    while (stack.count > 0) {
+        UIView *view = stack.lastObject;
+        [stack removeLastObject];
+        if ([view.accessibilityIdentifier isEqualToString:CYLTagListItemAccessibilityIdentifier]) {
+            [items addObject:view];
+        } else if ([view.accessibilityIdentifier isEqualToString:CYLTagListFoldControlAccessibilityIdentifier] && !view.hidden) {
+            foldControl = view;
+        }
+        [stack addObjectsFromArray:view.subviews];
+    }
+    XCTAssertTrue(items.count > 0);
+    XCTAssertTrue([[items valueForKey:@"accessibilityLabel"] containsObject:@"One"], @"Tags are found by their label");
+    XCTAssertNotNil(foldControl, @"The fold control is found by its identifier");
+    XCTAssertTrue(foldControl.accessibilityLabel.length > 0);
+    XCTAssertTrue(foldControl.accessibilityTraits & UIAccessibilityTraitButton);
 }
 
 - (void)testSectionHeaderFitsItsActualWidth {

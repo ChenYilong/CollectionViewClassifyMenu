@@ -436,7 +436,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         return picture;
     }
     if ([picture isKindOfClass:[NSString class]] && [picture length] > 0) {
-        return [CYLMenuResources imageNamed:@"home_btn_shrink"];
+        return CYLMenuImage(@"home_btn_shrink");
     }
     return nil;
 }

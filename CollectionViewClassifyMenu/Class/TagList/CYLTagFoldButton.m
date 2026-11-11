@@ -22,6 +22,7 @@ static CGFloat const kCYLTagFoldButtonHeight = 28;
     if (self) {
         self.isAccessibilityElement = YES;
         self.accessibilityTraits = UIAccessibilityTraitButton;
+        self.accessibilityIdentifier = CYLTagListFoldControlAccessibilityIdentifier;
     }
     return self;
 }

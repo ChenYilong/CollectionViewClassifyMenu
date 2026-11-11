@@ -36,7 +36,7 @@
 }
 
 - (UIImage *)image {
-    return _image ?: ([CYLMenuResources imageNamed:@"cyl_fold_chevron"] ?: [UIImage systemImageNamed:@"chevron.down"]);
+    return _image ?: (CYLMenuImage(@"cyl_fold_chevron") ?: [UIImage systemImageNamed:@"chevron.down"]);
 }
 
 - (BOOL)usesDefaultImage {

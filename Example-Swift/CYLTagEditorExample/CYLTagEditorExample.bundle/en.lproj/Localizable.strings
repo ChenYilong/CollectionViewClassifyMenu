@@ -32,3 +32,8 @@
 "标题：图标 + 文字（居中、绿色）" = "Title: icon and text (centered, green)";
 "标题：文字 + 图标（图标在后）" = "Title: text, then icon";
 "标题：仅图标" = "Title: icon only";
+/* Accessibility. */
+"搜索标签" = "Search tags";
+"轻点两下删除此标签" = "Double-tap to delete this tag";
+"轻点两下选择或删除标签" = "Double-tap to choose tags to delete";
+"轻点两下完成管理" = "Double-tap to stop managing tags";

@@ -1,0 +1,10 @@
+/* The demo app of CollectionViewClassifyMenu.xcodeproj. Keys are the Chinese source text. */
+"超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品" = "Beyond the default rows a \"More\" button appears; tap it to expand. By @iOS程序犭袁";
+"默认显示两行时的效果如下所示:" = "With two rows shown by default:";
+"默认显示一行时的效果如下所示:" = "With one row shown by default:";
+/* The highlighted part of the two titles above. */
+"两行" = "two rows";
+"一行" = "one row";
+"默认显示两行" = "Show two rows by default";
+"重置筛选条件" = "Reset filters";
+"清除所有已选标签" = "Clears every selected tag";

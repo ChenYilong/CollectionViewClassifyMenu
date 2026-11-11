@@ -39,11 +39,15 @@ final class CYLRemarkViewController: UIViewController {
         navigationController?.navigationBar.tintColor = .label
 
         titleLabel.text = CYLTagEditorLocalizedString("编辑备注")
-        titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
+        titleLabel.font = UIFontMetrics(forTextStyle: .largeTitle).scaledFont(for: .systemFont(ofSize: 28, weight: .bold))
+        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.textAlignment = .center
         titleLabel.accessibilityTraits = .header
 
         nameField.placeholder = CYLTagEditorLocalizedString("备注名")
+        nameField.accessibilityLabel = CYLTagEditorLocalizedString("备注名")
+        nameField.font = .preferredFont(forTextStyle: .body)
+        nameField.adjustsFontForContentSizeCategory = true
         nameField.borderStyle = .none
         nameField.backgroundColor = .systemGray6
         nameField.layer.cornerRadius = 8
@@ -64,6 +68,8 @@ final class CYLRemarkViewController: UIViewController {
         titleStyle.imageSize = CGSize(width: 12, height: 12)
         titleStyle.imageTitleSpacing = 4
         tagsView.titleStyle = titleStyle
+        // A header that opens the editor: VoiceOver reads it as both.
+        tagsView.titleView.accessibilityTraits = [.header, .button]
         tagsView.titleView.accessibilityHint = CYLTagEditorLocalizedString("编辑标签")
         // The title is not a control: a tap on it opens the editor too.
         let titleTap = UITapGestureRecognizer(target: self, action: #selector(tagsViewTapped(_:)))

@@ -49,7 +49,7 @@
     [self setTitleColor:CYLAppTintColor forState:UIControlStateNormal];
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
     
-    UIImage *imageHighlighted  = [CYLMenuResources imageNamed:@"tag_btn_background_highlighted"];
+    UIImage *imageHighlighted  = CYLMenuImage(@"tag_btn_background_highlighted");
     [self setBackgroundImage:imageHighlighted forState:UIControlStateHighlighted];
     // The selected tag of CYLClassifyMenuViewController.selectedIndexPath looks pressed.
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];

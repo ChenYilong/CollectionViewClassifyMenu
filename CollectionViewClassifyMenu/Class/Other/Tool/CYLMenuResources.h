@@ -10,8 +10,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// The core's lookups (one per kind of resource), always through CYLClassifyMenuResources.bundle: callers never
+/// name the bundle. Examples have their own lookups over their own bundles (AGENTS.md, localization).
 /// Looks up a key in the component's string table, in the component's language.
 #define CYLMenuLocalizedString(key, comment) [CYLMenuResources localizedStringForKey:(key)]
+/// An image of the component's bundle (e.g. @"cyl_tag_plus").
+#define CYLMenuImage(name) [CYLMenuResources imageNamed:(name)]
+
+/// CYLMenuLocalizedString for Swift, which cannot call function-like macros: `CYLMenuLocalizedString("CYLMenuExpand")`.
+/// Declared like CYLTabBarController's CYLLocalizedString().
+FOUNDATION_EXTERN NSString *CYLMenuLocalizedStringForKey(NSString *key) NS_SWIFT_NAME(CYLMenuLocalizedString(_:));
 
 @interface CYLMenuResources : NSObject
 

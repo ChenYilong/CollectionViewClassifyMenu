@@ -59,8 +59,8 @@ float const CYLFilterHeaderViewHeigt = 38;
     self.moreButton = [[CYLRightImageButton alloc] initWithFrame:moreBtnFrame];
     // 仅修改self.moreButton的x,ywh值不变 / Change only the more button's x position.
     self.moreButton.frame = CGRectMake(MAX(0, CGRectGetWidth(self.bounds) - 12 - self.moreButton.frame.size.width), self.moreButton.frame.origin.y, self.moreButton.frame.size.width, self.moreButton.frame.size.height);
-    [self.moreButton setImage:[CYLMenuResources imageNamed:@"home_btn_more_normal"] forState:UIControlStateNormal];
-    [self.moreButton setImage:[CYLMenuResources imageNamed:@"home_btn_more_selected"] forState:UIControlStateSelected];
+    [self.moreButton setImage:CYLMenuImage(@"home_btn_more_normal") forState:UIControlStateNormal];
+    [self.moreButton setImage:CYLMenuImage(@"home_btn_more_selected") forState:UIControlStateSelected];
     [self.moreButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self.moreButton setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
     [self.moreButton setTitle:CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand menu section") forState:UIControlStateNormal];

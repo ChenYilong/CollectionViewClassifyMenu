@@ -75,6 +75,10 @@ static NSString *CYLMenuPreferredLanguage;
     return path ? [NSBundle bundleWithPath:path] : nil;
 }
 
+NSString *CYLMenuLocalizedStringForKey(NSString *key) {
+    return [CYLMenuResources localizedStringForKey:key];
+}
+
 + (NSString *)localizedStringForKey:(NSString *)key {
     return [self localizedStringForKey:key language:[self currentLanguage]];
 }

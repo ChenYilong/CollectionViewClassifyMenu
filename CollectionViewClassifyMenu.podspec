@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
     'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.{h,m}'
   ]
   s.exclude_files = [
-    'CollectionViewClassifyMenu/Class/Other/Symtem/{main.m,CYLAppDelegate.h,CYLAppDelegate.m}',
+    'CollectionViewClassifyMenu/Class/Other/Symtem/{main.m,CYLAppDelegate.h,CYLAppDelegate.m,CYLDemoLocalization.h}',
     'CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/{CYLMainViewController,CYLDemoDataSource}.{h,m}',
     'CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.{h,m}',
     '**/._*'

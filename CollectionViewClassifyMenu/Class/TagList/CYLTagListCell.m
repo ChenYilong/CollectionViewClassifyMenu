@@ -39,6 +39,8 @@
     self.button.enabled = enabled;
     self.button.selected = selected;
     self.accessibilityLabel = title;
+    self.accessibilityIdentifier = CYLTagListItemAccessibilityIdentifier;
+    self.accessibilityHint = nil;
     UIAccessibilityTraits traits = UIAccessibilityTraitButton;
     if (selected) traits |= UIAccessibilityTraitSelected;
     if (!enabled) traits |= UIAccessibilityTraitNotEnabled;

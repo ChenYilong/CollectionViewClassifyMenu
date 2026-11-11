@@ -12,6 +12,7 @@
 //Others
 #import "CYLDemoDataSource.h"
 #import "CYLMenuResources.h"
+#import "../../Other/Symtem/CYLDemoLocalization.h"
 @import CollectionViewClassifyMenu;
 
 @interface CYLMainViewController ()<CYLFilterControllerDelegate, CYLMenuDelegate>
@@ -167,7 +168,9 @@
     title.translatesAutoresizingMaskIntoConstraints = NO;
     title.adjustsFontSizeToFitWidth = YES;
     title.minimumScaleFactor = 0.7;
-    title.font = [UIFont boldSystemFontOfSize:18];
+    title.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleHeadline] scaledFontForFont:[UIFont boldSystemFontOfSize:18]];
+    title.adjustsFontForContentSizeCategory = YES;
+    title.accessibilityTraits = UIAccessibilityTraitHeader;
     title.textColor = [UIColor colorWithRed:42 / 255.0 green:185 / 255.0 blue:160 / 255.0 alpha:1];
     self.titleLabel = title;
     [header addSubview:title];
@@ -175,6 +178,7 @@
     UISwitch *toggle = [[UISwitch alloc] init];
     toggle.translatesAutoresizingMaskIntoConstraints = NO;
     [toggle addTarget:self action:@selector(rowsCountBydefaultSwitchClicked:) forControlEvents:UIControlEventValueChanged];
+    toggle.accessibilityLabel = CYLDemoLocalizedString(@"默认显示两行");
     self.rowsCountBydefaultSwitch = toggle;
     [header addSubview:toggle];
 
@@ -182,9 +186,10 @@
     subtitle.translatesAutoresizingMaskIntoConstraints = NO;
     subtitle.adjustsFontSizeToFitWidth = YES;
     subtitle.minimumScaleFactor = 0.7;
-    subtitle.font = [UIFont systemFontOfSize:12];
-    subtitle.textColor = [UIColor grayColor];
-    subtitle.text = @"超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品";
+    subtitle.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleCaption1] scaledFontForFont:[UIFont systemFontOfSize:12]];
+    subtitle.adjustsFontForContentSizeCategory = YES;
+    subtitle.textColor = [UIColor secondaryLabelColor];
+    subtitle.text = CYLDemoLocalizedString(@"超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品");
     [header addSubview:subtitle];
     [NSLayoutConstraint activateConstraints:@[
         [title.leadingAnchor constraintEqualToAnchor:header.leadingAnchor constant:16],
@@ -202,15 +207,21 @@
 
 - (void)rowsCountBydefaultSwitchClicked:(UISwitch *)sender {
     self.defaultVisibleRows = sender.isOn ? 2 : 1;
-    NSString *title = sender.isOn ? @"默认显示两行时的效果如下所示:" : @"默认显示一行时的效果如下所示:";
+    NSString *title = sender.isOn ? CYLDemoLocalizedString(@"默认显示两行时的效果如下所示:") : CYLDemoLocalizedString(@"默认显示一行时的效果如下所示:");
+    NSString *highlight = sender.isOn ? CYLDemoLocalizedString(@"两行") : CYLDemoLocalizedString(@"一行");
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:title];
-    [text addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(4, 2)];
+    // The row count stands out in every language (found by text, not by a fixed range).
+    NSRange range = [title rangeOfString:highlight];
+    if (range.location != NSNotFound) {
+        [text addAttribute:NSForegroundColorAttributeName value:[UIColor systemRedColor] range:range];
+    }
     self.titleLabel.attributedText = text;
 }
 
 - (void)initWithRightNavItem {
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithImage:nil style:UIBarButtonItemStylePlain target:self action:@selector(rightBarButtonClicked:)];
-    item.title = @"重置筛选条件";
+    item.title = CYLDemoLocalizedString(@"重置筛选条件");
+    item.accessibilityHint = CYLDemoLocalizedString(@"清除所有已选标签");
     self.navigationItem.rightBarButtonItem = item;
 }
 

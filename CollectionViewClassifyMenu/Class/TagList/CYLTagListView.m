@@ -12,6 +12,11 @@
 #import "CYLTagFoldButton.h"
 #import "CYLMenuResources.h"
 
+NSString *const CYLTagListTitleAccessibilityIdentifier = @"CYLTagListTitle";
+NSString *const CYLTagListFoldControlAccessibilityIdentifier = @"CYLTagListFoldControl";
+NSString *const CYLTagListItemAccessibilityIdentifier = @"CYLTagListItem";
+NSString *const CYLTagCreateItemAccessibilityIdentifier = @"CYLTagCreateItem";
+
 static NSString * const kCYLTagListCellIdentifier = @"CYLTagListCell";
 static NSString * const kCYLTagListHeaderIdentifier = @"CYLTagListHeader";
 static NSString * const kCYLTagListFooterIdentifier = @"CYLTagListFooter";
@@ -266,6 +271,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     _titleView.userInteractionEnabled = NO;
     _titleView.isAccessibilityElement = YES;
     _titleView.accessibilityTraits = UIAccessibilityTraitHeader;
+    _titleView.accessibilityIdentifier = CYLTagListTitleAccessibilityIdentifier;
     _titleView.hidden = YES;
     [self addSubview:_titleView];
     [self cyl_applyStyleColors];
@@ -352,7 +358,10 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 
 - (void)cyl_titleDidChange {
     self.titleView.hidden = ![self cyl_hasTitle];
-    self.titleView.accessibilityLabel = self.title.length > 0 ? self.title : self.titleImage.accessibilityLabel;
+    NSString *label = self.title.length > 0 ? self.title : self.titleImage.accessibilityLabel;
+    self.titleView.accessibilityLabel = label;
+    // An icon-only title without a label is decorative; give the title image an accessibilityLabel to announce it.
+    self.titleView.isAccessibilityElement = label.length > 0;
     [self setNeedsLayout];
     [self cyl_updateContentHeight];
 }
@@ -1091,6 +1100,9 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];
     cell.button.animationRestingProgress = [self cyl_animationRestingProgressAtIndexPath:indexPath];
+    if ([self.menuDataSource respondsToSelector:@selector(menuAccessibilityHintForItemAtIndexPath:)]) {
+        cell.accessibilityHint = [self.menuDataSource menuAccessibilityHintForItemAtIndexPath:indexPath];
+    }
 }
 
 #pragma mark UICollectionViewDataSource

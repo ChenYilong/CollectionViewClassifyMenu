@@ -9,6 +9,7 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLTagButton.h"
+#import "CYLTagListAccessibility.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
