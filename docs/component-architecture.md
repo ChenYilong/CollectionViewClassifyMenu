@@ -43,6 +43,18 @@ persistence in the demos.
 `Example/` 通过 Podfile 以本地路径集成核心库，用这些接口实现 README 的两个场景；
 `CYLExampleMenuSource` 演示宿主如何把自己的模型转成数据源。
 
+## 截图 / Screenshots
+
+CI 截图（`Example screenshots`，提交 `ff35b27`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：
+
+| 折叠控件与标题样式 | 全部展开（箭头旋转 180°） | 由 JSON / plist / YAML / XML 创建 |
+| --- | --- | --- |
+| <img src="assets/tag-list-fold-styles.png" width="200" alt="折叠控件与标题样式"> | <img src="assets/tag-list-fold-styles-expanded.png" width="200" alt="全部展开（箭头旋转 180°）"> | <img src="assets/tag-list-configuration-files.png" width="200" alt="由 JSON / plist / YAML / XML 创建"> |
+
+| 多选（两个分组同时选中） | 搜索后新建并选中标签 | 分类菜单 + 多选筛选（数据库） | 评价筛选（SQLite） |
+| --- | --- | --- | --- |
+| <img src="assets/tag-list-selection.png" width="200" alt="多选（两个分组同时选中）"> | <img src="assets/tag-list-create-tag.png" width="200" alt="搜索后新建并选中标签"> | <img src="assets/classify-menu-filtered.png" width="200" alt="分类菜单 + 多选筛选（数据库）"> | <img src="assets/review-filter-database.png" width="200" alt="评价筛选（SQLite）"> |
+
 ## Swift 示例与 Swift 友好的核心 / Swift examples, Swift-friendly core
 
 所有示例（`Example/`、`Example-Swift/`、根目录工程的演示 App `CYLClassifyMenuDemo`、`TagCollectionView` 演示）及其测试均为 Swift；
