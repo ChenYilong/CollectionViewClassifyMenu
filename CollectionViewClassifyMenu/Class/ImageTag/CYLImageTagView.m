@@ -116,6 +116,65 @@
     }
 }
 
+#pragma mark Layout
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self cyl_separateGroups];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    [self setNeedsLayout];
+}
+
+/*!
+ * Keeps groups from covering each other (large Dynamic Type sizes make tags taller): each group that overlaps an
+ * earlier one moves up or down by the smallest distance that clears every earlier group and stays inside the view.
+ * Only the display moves (`displayOffset`); `percentPosition` and the groups' data do not change. While editing,
+ * groups stay where they are dragged.
+ */
+- (void)cyl_separateGroups {
+    static const CGFloat spacing = 4;
+    NSMutableArray<NSValue *> *placed = [NSMutableArray array];
+    CGFloat height = CGRectGetHeight(self.bounds);
+    for (CYLImageTagGroupView *view in self.views) {
+        view.displayOffset = CGPointZero;
+        [view layoutIfNeeded];
+        if (self.editing || view.isGroupHidden) {
+            [placed addObject:[NSValue valueWithCGRect:view.occupiedFrame]];
+            continue;
+        }
+        CGRect frame = view.occupiedFrame;
+        BOOL (^clear)(CGFloat) = ^BOOL(CGFloat dy) {
+            CGRect moved = CGRectOffset(frame, 0, dy);
+            if (CGRectGetMinY(moved) < 0 || CGRectGetMaxY(moved) > height) return NO;
+            for (NSValue *value in placed) {
+                if (CGRectIntersectsRect(CGRectInset(moved, 0, -spacing / 2), value.CGRectValue)) return NO;
+            }
+            return YES;
+        };
+        if (clear(0)) {
+            [placed addObject:[NSValue valueWithCGRect:frame]];
+            continue;
+        }
+        CGFloat best = CGFLOAT_MAX;
+        for (NSValue *value in placed) {
+            CGRect other = value.CGRectValue;
+            for (NSNumber *candidate in @[@(CGRectGetMaxY(other) + spacing - CGRectGetMinY(frame)),
+                                          @(CGRectGetMinY(other) - spacing - CGRectGetMaxY(frame))]) {
+                CGFloat dy = candidate.doubleValue;
+                if (fabs(dy) < fabs(best) && clear(dy)) best = dy;
+            }
+        }
+        if (best != CGFLOAT_MAX) {
+            view.displayOffset = CGPointMake(0, best);
+            [view layoutIfNeeded];
+        }
+        [placed addObject:[NSValue valueWithCGRect:view.occupiedFrame]];
+    }
+}
+
 - (NSArray<CYLImageTagGroupView *> *)groupViews {
     return [self.views copy];
 }
@@ -136,6 +195,7 @@
         self.groupConfiguration(view, self.views.count - 1);
     }
     [self addSubview:view];
+    [self setNeedsLayout];
 }
 
 - (void)removeTagGroupAtIndex:(NSUInteger)index {
@@ -157,6 +217,7 @@
 
 - (void)setEditing:(BOOL)editing {
     _editing = editing;
+    [self setNeedsLayout];
     for (CYLImageTagGroupView *view in self.views) {
         view.draggable = editing;
         view.showsRipple = !editing;

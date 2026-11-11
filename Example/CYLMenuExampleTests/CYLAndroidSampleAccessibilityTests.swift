@@ -235,7 +235,18 @@ final class CYLAndroidSampleAccessibilityTests: CYLMenuExampleTestCase {
         sample.tagImageView.layoutIfNeeded()
         XCTAssertGreaterThan(label.font.pointSize, base)
         XCTAssertGreaterThanOrEqual(label.bounds.height, label.font.lineHeight, "the group remeasured the tag")
+        // The two groups no longer cover each other: the second moves for display only, its position is kept.
+        let groups = sample.tagImageView.groupViews
+        XCTAssertEqual(groups.count, 2)
+        XCTAssertFalse(groups[0].occupiedFrame.intersects(groups[1].occupiedFrame),
+                       "\(groups[0].occupiedFrame) / \(groups[1].occupiedFrame)")
+        XCTAssertTrue(sample.tagImageView.bounds.contains(groups[1].occupiedFrame.insetBy(dx: 0.5, dy: 0.5)) ||
+                      groups[1].displayOffset == .zero, "a moved group stays inside the picture")
+        XCTAssertEqual(groups[1].percentPosition, CGPoint(x: 0.3, y: 0.2), "the data does not change")
         captureScreen(named: "test-sample-image-tag-large-text")
         navigation.view.window?.traitOverrides.preferredContentSizeCategory = .large
+        runMainLoop(for: 0.1)
+        sample.tagImageView.layoutIfNeeded()
+        XCTAssertFalse(groups[0].occupiedFrame.intersects(groups[1].occupiedFrame), "apart at the default size too")
     }
 }

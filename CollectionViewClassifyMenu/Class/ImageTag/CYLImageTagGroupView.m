@@ -302,6 +302,23 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
 - (void)setCircleInnerColor:(UIColor *)color { _circleInnerColor = color; [self cyl_updateCircles]; }
 - (void)setLineColor:(UIColor *)color { _lineColor = color; [self setNeedsLayout]; }
 
+- (void)setDisplayOffset:(CGPoint)displayOffset {
+    if (CGPointEqualToPoint(_displayOffset, displayOffset)) {
+        return;
+    }
+    _displayOffset = displayOffset;
+    [self setNeedsLayout];
+}
+
+- (CGRect)occupiedFrame {
+    CGFloat radius = self.circleRadius;
+    CGRect frame = CGRectMake(self.centerPoint.x - radius, self.centerPoint.y - radius, 2 * radius, 2 * radius);
+    for (UIView *view in self.itemViews) {
+        frame = CGRectUnion(frame, view.frame);
+    }
+    return frame;
+}
+
 - (void)setPercentPosition:(CGPoint)percentPosition {
     _percentPosition = CGPointMake(MIN(1, MAX(0, percentPosition.x)), MIN(1, MAX(0, percentPosition.y)));
     [self setNeedsLayout];
@@ -481,7 +498,7 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
     if (used.left > cx) cx += used.left - cx;
     if (used.bottom > height - cy) cy -= used.bottom - (height - cy);
     if (used.top > cy) cy += used.top - cy;
-    self.centerPoint = CGPointMake(cx, cy);
+    self.centerPoint = CGPointMake(cx + self.displayOffset.x, cy + self.displayOffset.y);
     for (CAShapeLayer *line in self.lineLayers) {
         [line removeFromSuperlayer];
     }

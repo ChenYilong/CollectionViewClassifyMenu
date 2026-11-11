@@ -201,6 +201,15 @@ IB_DESIGNABLE
  * The dot's center, in the view's coordinates (getCenterPoint).
  */
 @property (nonatomic, assign, readonly) CGPoint centerPoint;
+/*!
+ * Points added to the dot's place after it is computed from `percentPosition`, without changing
+ * `percentPosition`. CYLImageTagView sets it to keep groups from covering each other; zero by default.
+ */
+@property (nonatomic, assign) CGPoint displayOffset;
+/*!
+ * The area the group draws in, in the view's coordinates: the dot and every tag, after the last layout.
+ */
+@property (nonatomic, assign, readonly) CGRect occupiedFrame;
 
 #pragma mark Tags
 /*!

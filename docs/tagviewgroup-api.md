@@ -139,3 +139,7 @@ None. 无。
   long press and dragging (上移 / 下移 / 左移 / 右移); tags in edit mode say "轻点两下改变方向"; tag text scales with
   Dynamic Type, lines grow and long tags wrap instead of overlapping. Strings in English, Simplified and Traditional
   Chinese. Verified by `CYLAndroidSampleAccessibilityTests`.
+- Groups never cover each other (2026-11-12): when a group's dot and tags (`occupiedFrame`) would overlap an earlier
+  group, `CYLImageTagView` moves it up or down by the smallest distance that clears it and stays inside the picture
+  (`displayOffset`); `percentPosition` and the data do not change. While editing, groups stay where they are
+  dragged. Verified at the largest text size in `CYLAndroidSampleAccessibilityTests`.
