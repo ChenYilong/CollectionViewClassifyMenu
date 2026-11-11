@@ -124,6 +124,12 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  * Minimum tag height; grows with the font for large text sizes. 30 by default.
  */
 @property (nonatomic, assign) CGFloat itemHeight;
+/*!
+ * Grid layout: 0 (the default) lays the tags out one after another, each as wide as its title; a number above 0
+ * gives every tag the same width, that many per row (the content width minus the spacing between them, divided
+ * evenly), and truncates a longer title with an ellipsis ("…"), like a search app's suggestions, two per row.
+ */
+@property (nonatomic, assign) NSUInteger numberOfItemsPerRow;
 
 #pragma mark Layout
 @property (nonatomic, assign) CGFloat interitemSpacing;
@@ -152,6 +158,32 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  * Defaults to the localized "Less" from CYLClassifyMenuResources.bundle.
  */
 @property (nonatomic, copy) NSString *collapseTitle;
+
+#pragma mark Badges and the More button
+/*!
+ * The background of an item's badge (`menuBadgeForItemAtIndexPath:`, such as "热"). Defaults to the system red.
+ */
+@property (nonatomic, strong) UIColor *badgeBackgroundColor;
+/*!
+ * The text color of an item's badge. Defaults to white.
+ */
+@property (nonatomic, strong) UIColor *badgeTextColor;
+/*!
+ * The icon of the More button in a section header (`menuShowsMoreButtonInSection:`). nil (the default) uses the
+ * bundle's "cyl_more", three dots like the "ellipsis" icon of CYLTabBarController's More tab.
+ */
+@property (nonatomic, strong, nullable) UIImage *moreButtonImage;
+/*!
+ * The color of the More button. Defaults to the secondary label color.
+ */
+@property (nonatomic, strong) UIColor *moreButtonColor;
+
+/*!
+ * A grid of plain titles, like a search app's suggestions: `numberOfItemsPerRow` items per row, each as wide as
+ * the others, no background and no border, the title at the leading edge in the body font and truncated with an
+ * ellipsis. Change it like any other style.
+ */
++ (instancetype)gridStyleWithNumberOfItemsPerRow:(NSUInteger)numberOfItemsPerRow NS_SWIFT_NAME(gridStyle(itemsPerRow:));
 
 /*!
  * The title font of a state for the given traits: bold for the Bold Text setting,

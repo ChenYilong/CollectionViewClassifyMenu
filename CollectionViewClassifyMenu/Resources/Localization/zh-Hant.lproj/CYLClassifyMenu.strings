@@ -16,3 +16,6 @@
 "CYLMenuNewTagNamed" = "新增標籤：%@";
 /* 摺疊控制項的無障礙提示：展開後顯示全部標籤。 */
 "CYLMenuExpandHint" = "顯示全部標籤";
+
+/* The More button of a section header (three dots), read by VoiceOver after the section title. */
+"CYLMenuMoreActions" = "更多操作";

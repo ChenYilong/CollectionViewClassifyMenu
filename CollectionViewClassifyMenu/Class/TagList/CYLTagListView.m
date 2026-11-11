@@ -10,16 +10,21 @@
 #import "CYLTagListCell.h"
 #import "CYLTagCreateCell.h"
 #import "CYLTagFoldButton.h"
+#import "CYLTagFoldCell.h"
 #import "CYLMenuResources.h"
 
 NSString *const CYLTagListTitleAccessibilityIdentifier = @"CYLTagListTitle";
 NSString *const CYLTagListFoldControlAccessibilityIdentifier = @"CYLTagListFoldControl";
 NSString *const CYLTagListItemAccessibilityIdentifier = @"CYLTagListItem";
 NSString *const CYLTagCreateItemAccessibilityIdentifier = @"CYLTagCreateItem";
+NSString *const CYLTagListMoreButtonAccessibilityIdentifier = @"CYLTagListMoreButton";
 
 static NSString * const kCYLTagListCellIdentifier = @"CYLTagListCell";
 static NSString * const kCYLTagListHeaderIdentifier = @"CYLTagListHeader";
 static NSString * const kCYLTagListFooterIdentifier = @"CYLTagListFooter";
+static NSString * const kCYLTagFoldCellIdentifier = @"CYLTagFoldCell";
+/// The More button's touch target in a section header.
+static CGFloat const kCYLTagListMoreButtonSize = 44;
 static CGFloat const kCYLTagListFooterHeight = 28;
 static CGFloat const kCYLTagListHeaderIconSize = 16;
 
@@ -29,6 +34,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 @property (nonatomic, strong, readonly) UIImageView *iconView;
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
 @property (nonatomic, strong, readonly) CYLTagFoldButton *foldButton;
+/// The More button (three dots) at the trailing edge, hidden unless the data source asks for it.
+@property (nonatomic, strong, readonly) UIButton *moreButton;
+@property (nonatomic, copy, nullable) void (^moreHandler)(NSInteger section);
 /// The fold control's size, and whether it is at the leading edge (before the title).
 @property (nonatomic, assign) CGSize foldSize;
 @property (nonatomic, assign) BOOL foldAtLeadingEdge;
@@ -49,9 +57,17 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         _titleLabel.accessibilityTraits = UIAccessibilityTraitHeader;
         _foldButton = [[CYLTagFoldButton alloc] initWithFrame:CGRectZero];
         [_foldButton addTarget:self action:@selector(foldTapped) forControlEvents:UIControlEventTouchUpInside];
+        _moreButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        _moreButton.hidden = YES;
+        _moreButton.accessibilityIdentifier = CYLTagListMoreButtonAccessibilityIdentifier;
+        _moreButton.accessibilityLabel = CYLMenuLocalizedString(@"CYLMenuMoreActions", @"The More button of a section");
+        _moreButton.largeContentTitle = _moreButton.accessibilityLabel;
+        _moreButton.showsLargeContentViewer = YES;
+        [_moreButton addTarget:self action:@selector(moreTapped) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:_iconView];
         [self addSubview:_titleLabel];
         [self addSubview:_foldButton];
+        [self addSubview:_moreButton];
     }
     return self;
 }
@@ -60,6 +76,13 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     [super prepareForReuse];
     self.accessoryView = nil;
     self.foldHandler = nil;
+    self.moreHandler = nil;
+}
+
+- (void)moreTapped {
+    if (self.moreHandler) {
+        self.moreHandler(self.section);
+    }
 }
 
 - (void)setAccessoryView:(UIView *)accessoryView {
@@ -88,6 +111,15 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
     CGFloat height = CGRectGetHeight(self.bounds);
     CGFloat trailing = width - self.horizontalInset;
     CGFloat leading = self.horizontalInset;
+    if (!self.moreButton.hidden) {
+        // A 44 pt touch target whose icon lines up with the trailing inset.
+        CGFloat size = MIN(kCYLTagListMoreButtonSize, height > 0 ? MAX(height, 30) : kCYLTagListMoreButtonSize);
+        CGFloat iconWidth = self.moreButton.currentImage ? self.moreButton.currentImage.size.width : 22;
+        trailing += floor((size - iconWidth) / 2);
+        trailing -= size;
+        self.moreButton.frame = CGRectMake(trailing, floor((height - size) / 2), size, size);
+        trailing -= 4;
+    }
     if (!self.foldButton.hidden) {
         CGSize size = CGSizeMake(MIN(self.foldSize.width, width / 2), MIN(self.foldSize.height, height));
         CGFloat y = floor((height - size.height) / 2);
@@ -257,6 +289,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     _collectionView.showsHorizontalScrollIndicator = NO;
     [_collectionView registerClass:[CYLTagListCell class] forCellWithReuseIdentifier:kCYLTagListCellIdentifier];
     [_collectionView registerClass:[CYLTagCreateCell class] forCellWithReuseIdentifier:kCYLTagCreateCellIdentifier];
+    [_collectionView registerClass:[CYLTagFoldCell class] forCellWithReuseIdentifier:kCYLTagFoldCellIdentifier];
     [_collectionView registerClass:[CYLTagListHeaderView class]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:kCYLTagListHeaderIdentifier];
@@ -322,6 +355,10 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         case CYLMenuFoldControlPositionTopLeading: _foldStyle = CYLMenuFoldStyleHeaderButton; break;
         case CYLMenuFoldControlPositionNone:
             if (_foldStyle != CYLMenuFoldStyleTruncate) _foldStyle = CYLMenuFoldStyleNone;
+            break;
+        case CYLMenuFoldControlPositionInline:
+            // No legacy fold style matches a fold control among the tags.
+            _foldStyle = CYLMenuFoldStyleNone;
             break;
     }
     [self cyl_reloadLayout];
@@ -571,6 +608,16 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     return [style isKindOfClass:[CYLMenuStyle class]] ? style : self.style;
 }
 
+- (NSString *)cyl_badgeAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    return [source respondsToSelector:@selector(menuBadgeForItemAtIndexPath:)] ? [source menuBadgeForItemAtIndexPath:indexPath] : nil;
+}
+
+- (BOOL)cyl_showsMoreButtonInSection:(NSInteger)section {
+    id<CYLMenuDataSource> source = self.menuDataSource;
+    return [source respondsToSelector:@selector(menuShowsMoreButtonInSection:)] && [source menuShowsMoreButtonInSection:section];
+}
+
 - (UIImage *)cyl_selectedImageAtIndexPath:(NSIndexPath *)indexPath {
     id<CYLMenuDataSource> source = self.menuDataSource;
     return [source respondsToSelector:@selector(menuSelectedImageForItemAtIndexPath:)]
@@ -590,6 +637,36 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 
 - (BOOL)cyl_foldControlIsInFooter {
     return self.foldControl.position == CYLMenuFoldControlPositionBottom;
+}
+
+- (BOOL)cyl_foldControlIsInline {
+    return self.foldControl.position == CYLMenuFoldControlPositionInline;
+}
+
+/// Whether a section shows the inline fold cell (it can fold: some items do not fit in the visible rows).
+- (BOOL)cyl_showsInlineFoldCellInSection:(NSInteger)section {
+    return [self cyl_foldControlIsInline] && [self canFoldSection:section];
+}
+
+/// The inline fold cell comes right after the section's visible items.
+- (BOOL)cyl_isInlineFoldCellAtIndexPath:(NSIndexPath *)indexPath {
+    return [self cyl_showsInlineFoldCellInSection:indexPath.section] &&
+           indexPath.item == [self numberOfVisibleItemsInSection:indexPath.section];
+}
+
+/// The inline fold cell's look and size, from the section's item style (the default chevron or CYLMenuStyle.foldChevronImage).
+- (CYLMenuFoldControl *)cyl_displayedFoldControl {
+    CYLMenuFoldControl *control = self.foldControl;
+    if (self.style.foldChevronImage && control.usesDefaultImage) {
+        control = [control copy];
+        control.image = self.style.foldChevronImage;
+    }
+    return control;
+}
+
+- (CGSize)cyl_inlineFoldSizeInSection:(NSInteger)section expanded:(BOOL)expanded {
+    return [CYLTagFoldButton inlineSizeForFoldControl:[self cyl_displayedFoldControl] itemStyle:[self cyl_styleForSection:section]
+                                             expanded:expanded traitCollection:self.traitCollection];
 }
 
 /// The fold control's size in a state.
@@ -627,11 +704,23 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
                                                     animated:[self cyl_animationURLAtIndexPath:indexPath] != nil
                                                        style:style];
             CGFloat width = [CYLTagButton widthForTitle:title iconSize:iconSize style:style traitCollection:traits];
+            width += [CYLTagListCell badgeSizeForText:[self cyl_badgeAtIndexPath:indexPath] traitCollection:traits].width;
+            NSUInteger perRow = [self cyl_styleForSection:(NSInteger)section].numberOfItemsPerRow;
+            if (perRow > 0) {
+                // The grid: every item the same width, a longer title truncated.
+                width = [self cyl_gridItemWidthForContentWidth:contentWidth itemsPerRow:perRow];
+            }
             [sectionWidths addObject:@(MIN(width, contentWidth))];
         }];
         [widths addObject:sectionWidths];
     }];
     return widths;
+}
+
+/// The width of a grid item: the content width minus the spacing, divided evenly.
+- (CGFloat)cyl_gridItemWidthForContentWidth:(CGFloat)contentWidth itemsPerRow:(NSUInteger)itemsPerRow {
+    CGFloat spacing = self.style.interitemSpacing;
+    return MAX(1, floor((contentWidth - spacing * (CGFloat)(itemsPerRow - 1)) / (CGFloat)itemsPerRow));
 }
 
 /// Items per row, computed in a single pass.
@@ -749,6 +838,11 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         BOOL foldable = [self cyl_canFoldRowCount:rowCount];
         if (foldable && ![self.expandedSections containsIndex:section]) {
             rowCount = self.defaultVisibleRows;
+        } else if (foldable && [self cyl_foldControlIsInline]) {
+            // Expanded, the inline fold cell follows the last item and may start a row of its own.
+            NSMutableArray *sectionWidths = [widths[section] mutableCopy];
+            [sectionWidths addObject:@([self cyl_inlineFoldSizeInSection:(NSInteger)section expanded:YES].width)];
+            rowCount = [self cyl_rowsForWidths:@[sectionWidths] contentWidth:contentWidth].firstObject.count;
         }
         height += headerHeight + insets.top + insets.bottom;
         if (rowCount > 0) {
@@ -838,14 +932,37 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     }
     NSInteger visible = 0;
     NSArray<NSNumber *> *sectionRows = self.rows[section];
+    NSUInteger lastRowCount = 0;
     for (NSUInteger row = 0; row < self.defaultVisibleRows && row < sectionRows.count; row++) {
-        visible += sectionRows[row].integerValue;
+        lastRowCount = (NSUInteger)sectionRows[row].integerValue;
+        visible += (NSInteger)lastRowCount;
     }
-    return MIN(visible, total);
+    visible = MIN(visible, total);
+    if ([self cyl_foldControlIsInline] && lastRowCount > 0 && section < (NSInteger)self.itemWidths.count) {
+        // The inline fold cell ends the last visible row: hide the items it needs the room of.
+        NSArray<NSNumber *> *widths = self.itemWidths[section];
+        CGFloat spacing = self.style.interitemSpacing;
+        CGFloat contentWidth = [self cyl_contentWidthForWidth:self.measuredWidth];
+        CGFloat foldWidth = [self cyl_inlineFoldSizeInSection:section expanded:NO].width;
+        CGFloat used = 0;
+        for (NSInteger item = visible - (NSInteger)lastRowCount; item < visible; item++) {
+            used += (item > visible - (NSInteger)lastRowCount ? spacing : 0) + widths[item].doubleValue;
+        }
+        while (lastRowCount > 1 && used + spacing + foldWidth > contentWidth) {
+            used -= widths[visible - 1].doubleValue + spacing;
+            lastRowCount--;
+            visible--;
+        }
+    }
+    return visible;
 }
 
 - (void)setExpanded:(BOOL)expanded forSection:(NSInteger)section animated:(BOOL)animated {
     if (section < 0 || section >= (NSInteger)self.titles.count || expanded == [self isSectionExpanded:section]) {
+        return;
+    }
+    if ([self cyl_foldControlIsInline]) {
+        [self cyl_setInlineExpanded:expanded forSection:section animated:animated];
         return;
     }
     // Insert or delete only the rows beyond the folded ones, so the header and
@@ -879,6 +996,32 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         }];
     }
     [self cyl_updateFoldControlsInSection:section animated:animate];
+    [self cyl_updateContentHeight];
+    [self cyl_moveAccessibilityFocusToFoldControlInSection:section];
+    if ([self.menuDelegate respondsToSelector:@selector(menu:didChangeExpanded:inSection:)]) {
+        [self.menuDelegate menu:self didChangeExpanded:expanded inSection:section];
+    }
+}
+
+/// The inline fold cell moves with the items: reload the section (the chevron turns in its new place).
+- (void)cyl_setInlineExpanded:(BOOL)expanded forSection:(NSInteger)section animated:(BOOL)animated {
+    if (expanded) {
+        [self.expandedSections addIndex:(NSUInteger)section];
+    } else {
+        [self.expandedSections removeIndex:(NSUInteger)section];
+    }
+    BOOL animate = animated && self.window && !UIAccessibilityIsReduceMotionEnabled();
+    void (^update)(void) = ^{
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:(NSUInteger)section]];
+    };
+    if (animate) {
+        [self.collectionView performBatchUpdates:update completion:nil];
+    } else {
+        [UIView performWithoutAnimation:^{
+            [self.collectionView performBatchUpdates:update completion:nil];
+            [self.collectionView layoutIfNeeded];
+        }];
+    }
     [self cyl_updateContentHeight];
     [self cyl_moveAccessibilityFocusToFoldControlInSection:section];
     if ([self.menuDelegate respondsToSelector:@selector(menu:didChangeExpanded:inSection:)]) {
@@ -927,8 +1070,12 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     button.accessibilityHint = expanded ? nil : CYLMenuLocalizedString(@"CYLMenuExpandHint", @"Shows every tag");
 }
 
-- (nullable CYLTagFoldButton *)cyl_foldControlInSection:(NSInteger)section {
+- (nullable UIView *)cyl_foldControlInSection:(NSInteger)section {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+    if ([self cyl_showsInlineFoldCellInSection:section]) {
+        NSIndexPath *foldPath = [NSIndexPath indexPathForItem:[self numberOfVisibleItemsInSection:section] inSection:section];
+        return [self.collectionView cellForItemAtIndexPath:foldPath];
+    }
     if ([self cyl_foldControlIsInFooter]) {
         CYLTagListFooterView *footer = (CYLTagListFooterView *)[self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:indexPath];
         return footer.foldButton;
@@ -1082,7 +1229,19 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     }
 }
 
+- (void)cyl_configureFoldCell:(CYLTagFoldCell *)cell section:(NSInteger)section animated:(BOOL)animated {
+    BOOL expanded = [self isSectionExpanded:section];
+    [cell configureWithFoldControl:[self cyl_displayedFoldControl] itemStyle:[self cyl_styleForSection:section]
+                          expanded:expanded animated:animated];
+    cell.accessibilityLabel = [self cyl_foldAccessibilityLabelForSection:section];
+    cell.accessibilityHint = expanded ? nil : CYLMenuLocalizedString(@"CYLMenuExpandHint", @"Shows every tag");
+}
+
 - (void)cyl_configureCell:(CYLTagListCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    if ([cell isKindOfClass:[CYLTagFoldCell class]]) {
+        [self cyl_configureFoldCell:(CYLTagFoldCell *)cell section:indexPath.section animated:NO];
+        return;
+    }
     if (![self cyl_isValidIndexPath:indexPath]) {
         return;
     }
@@ -1100,6 +1259,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];
     cell.button.animationRestingProgress = [self cyl_animationRestingProgressAtIndexPath:indexPath];
+    [cell setBadgeText:[self cyl_badgeAtIndexPath:indexPath] style:[self cyl_styleForItemAtIndexPath:indexPath]];
     if ([self.menuDataSource respondsToSelector:@selector(menuAccessibilityHintForItemAtIndexPath:)]) {
         cell.accessibilityHint = [self.menuDataSource menuAccessibilityHintForItemAtIndexPath:indexPath];
     }
@@ -1112,10 +1272,16 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self numberOfVisibleItemsInSection:section];
+    // The inline fold cell follows the visible items.
+    return [self numberOfVisibleItemsInSection:section] + ([self cyl_showsInlineFoldCellInSection:section] ? 1 : 0);
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self cyl_isInlineFoldCellAtIndexPath:indexPath]) {
+        CYLTagFoldCell *foldCell = [collectionView dequeueReusableCellWithReuseIdentifier:kCYLTagFoldCellIdentifier forIndexPath:indexPath];
+        [self cyl_configureFoldCell:foldCell section:indexPath.section animated:NO];
+        return foldCell;
+    }
     NSString *identifier = [self cyl_itemTypeAtIndexPath:indexPath] == CYLMenuItemTypeCreate ? kCYLTagCreateCellIdentifier : kCYLTagListCellIdentifier;
     CYLTagListCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
     [self cyl_configureCell:cell atIndexPath:indexPath];
@@ -1166,6 +1332,24 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     header.foldHandler = ^(NSInteger tappedSection) {
         [weakSelf cyl_toggleSection:tappedSection];
     };
+    // The More button: the bundle's three dots (or the style's image), the host's action.
+    BOOL showsMore = [self cyl_showsMoreButtonInSection:section];
+    header.moreButton.hidden = !showsMore;
+    if (showsMore) {
+        UIImage *image = self.style.moreButtonImage ?: CYLMenuImage(@"cyl_more") ?: [UIImage systemImageNamed:@"ellipsis"];
+        [header.moreButton setImage:[image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        header.moreButton.tintColor = self.style.moreButtonColor;
+        NSString *title = [source menuTitleForSection:section];
+        NSString *more = CYLMenuLocalizedString(@"CYLMenuMoreActions", @"The More button of a section");
+        header.moreButton.accessibilityLabel = title.length > 0 ? [NSString stringWithFormat:@"%@ %@", title, more] : more;
+        header.moreHandler = ^(NSInteger tappedSection) {
+            __strong __typeof(weakSelf) strongSelf = weakSelf;
+            id<CYLMenuDelegate> delegate = strongSelf.menuDelegate;
+            if ([delegate respondsToSelector:@selector(menu:didTapMoreButtonInSection:)]) {
+                [delegate menu:strongSelf didTapMoreButtonInSection:tappedSection];
+            }
+        };
+    }
     [header setNeedsLayout];
     return header;
 }
@@ -1174,6 +1358,11 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [collectionView deselectItemAtIndexPath:indexPath animated:NO];
+    if ([self cyl_isInlineFoldCellAtIndexPath:indexPath]) {
+        // The inline fold cell's built-in action.
+        [self cyl_toggleSection:indexPath.section];
+        return;
+    }
     [self cyl_handleTapAtIndexPath:indexPath];
 }
 
@@ -1181,6 +1370,9 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     [self cyl_measureIfNeeded];
+    if ([self cyl_isInlineFoldCellAtIndexPath:indexPath]) {
+        return [self cyl_inlineFoldSizeInSection:indexPath.section expanded:[self isSectionExpanded:indexPath.section]];
+    }
     CGFloat width = 0;
     if (indexPath.section < (NSInteger)self.itemWidths.count &&
         indexPath.item < (NSInteger)self.itemWidths[indexPath.section].count) {

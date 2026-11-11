@@ -16,3 +16,6 @@
 "CYLMenuNewTagNamed" = "新建标签：%@";
 /* 折叠控件的无障碍提示：展开后显示全部标签。 */
 "CYLMenuExpandHint" = "显示全部标签";
+
+/* The More button of a section header (three dots), read by VoiceOver after the section title. */
+"CYLMenuMoreActions" = "更多操作";

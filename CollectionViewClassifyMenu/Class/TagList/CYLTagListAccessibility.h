@@ -26,5 +26,9 @@ FOUNDATION_EXTERN NSString *const CYLTagListItemAccessibilityIdentifier;
  * The "+ 新建标签" item (CYLMenuItemTypeCreate).
  */
 FOUNDATION_EXTERN NSString *const CYLTagCreateItemAccessibilityIdentifier;
+/*!
+ * The More button of a section header (`menuShowsMoreButtonInSection:`).
+ */
+FOUNDATION_EXTERN NSString *const CYLTagListMoreButtonAccessibilityIdentifier;
 
 NS_ASSUME_NONNULL_END

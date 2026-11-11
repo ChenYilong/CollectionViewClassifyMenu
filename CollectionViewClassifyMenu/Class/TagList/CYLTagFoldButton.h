@@ -28,6 +28,24 @@ NS_ASSUME_NONNULL_BEGIN
                 animated:(BOOL)animated;
 
 /*!
+ * The inline fold control (CYLMenuFoldControlPositionInline): the same content as
+ * -applyFoldControl:color:expanded:animated:, drawn like the tags of `itemStyle` (its normal look, outlined), so it
+ * reads as the last tag. An icon-only control is a circle.
+ */
+- (void)applyInlineFoldControl:(CYLMenuFoldControl *)foldControl
+                     itemStyle:(CYLMenuStyle *)itemStyle
+                      expanded:(BOOL)expanded
+                      animated:(BOOL)animated;
+
+/*!
+ * The size of the inline fold control in that state: the tags' height, and at least as wide as it is high.
+ */
++ (CGSize)inlineSizeForFoldControl:(CYLMenuFoldControl *)foldControl
+                         itemStyle:(CYLMenuStyle *)itemStyle
+                          expanded:(BOOL)expanded
+                   traitCollection:(nullable UITraitCollection *)traitCollection;
+
+/*!
  * The size the control needs in that state.
  */
 + (CGSize)sizeForFoldControl:(CYLMenuFoldControl *)foldControl

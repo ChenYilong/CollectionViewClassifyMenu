@@ -16,3 +16,6 @@
 "CYLMenuNewTagNamed" = "New tag: %@";
 /* Accessibility hint of the fold control: expanding shows every tag. */
 "CYLMenuExpandHint" = "Shows every tag";
+
+/* The More button of a section header (three dots), read by VoiceOver after the section title. */
+"CYLMenuMoreActions" = "More";

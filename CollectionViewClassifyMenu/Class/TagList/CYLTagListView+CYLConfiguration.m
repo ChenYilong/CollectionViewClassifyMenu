@@ -50,6 +50,7 @@ NSString *const CYLMenuStyleSelected = @"selected";
 NSString *const CYLMenuStyleDisabled = @"disabled";
 NSString *const CYLMenuStyleImageTitleSpacing = @"imageTitleSpacing";
 NSString *const CYLMenuStyleItemHeight = @"itemHeight";
+NSString *const CYLMenuStyleNumberOfItemsPerRow = @"itemsPerRow";
 NSString *const CYLMenuStyleInteritemSpacing = @"interitemSpacing";
 NSString *const CYLMenuStyleLineSpacing = @"lineSpacing";
 NSString *const CYLMenuStyleHeaderHeight = @"headerHeight";
@@ -394,7 +395,8 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     if ((value = configuration[CYLMenuFoldControlKeyPosition])) {
         self.position = CYLEnum(value, @{@"none": @(CYLMenuFoldControlPositionNone), @"bottom": @(CYLMenuFoldControlPositionBottom),
                                          @"toptrailing": @(CYLMenuFoldControlPositionTopTrailing), @"topright": @(CYLMenuFoldControlPositionTopTrailing),
-                                         @"topleading": @(CYLMenuFoldControlPositionTopLeading), @"topleft": @(CYLMenuFoldControlPositionTopLeading)},
+                                         @"topleading": @(CYLMenuFoldControlPositionTopLeading), @"topleft": @(CYLMenuFoldControlPositionTopLeading),
+                                         @"inline": @(CYLMenuFoldControlPositionInline)},
                                 self.position);
     }
     if ((value = configuration[CYLMenuFoldControlKeyContent])) {
@@ -446,6 +448,7 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     id value;
     if ((value = CYLNumber(configuration[CYLMenuStyleImageTitleSpacing]))) self.imageTitleSpacing = [value doubleValue];
     if ((value = CYLNumber(configuration[CYLMenuStyleItemHeight]))) self.itemHeight = [value doubleValue];
+    if ((value = CYLNumber(configuration[CYLMenuStyleNumberOfItemsPerRow]))) self.numberOfItemsPerRow = (NSUInteger)MAX(0, [value integerValue]);
     if ((value = CYLNumber(configuration[CYLMenuStyleInteritemSpacing]))) self.interitemSpacing = [value doubleValue];
     if ((value = CYLNumber(configuration[CYLMenuStyleLineSpacing]))) self.lineSpacing = [value doubleValue];
     if ((value = CYLNumber(configuration[CYLMenuStyleHeaderHeight]))) self.headerHeight = [value doubleValue];

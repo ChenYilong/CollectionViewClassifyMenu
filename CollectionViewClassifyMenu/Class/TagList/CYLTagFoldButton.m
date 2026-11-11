@@ -51,10 +51,59 @@ static CGFloat const kCYLTagFoldButtonHeight = 28;
     return style;
 }
 
+/// The inline control: the tags' normal look in every state (it is never selected), the icon after the title.
++ (CYLMenuStyle *)cyl_inlineStyleForFoldControl:(CYLMenuFoldControl *)control itemStyle:(CYLMenuStyle *)itemStyle {
+    CYLMenuStyle *style = [itemStyle copy];
+    CYLTagAppearance *normal = itemStyle.normalAppearance;
+    UIColor *tint = control.color ?: normal.iconColor ?: normal.textColor;
+    for (NSNumber *state in @[@(UIControlStateSelected), @(UIControlStateDisabled)]) {
+        CYLTagAppearance *appearance = [style appearanceForState:state.unsignedIntegerValue];
+        appearance.backgroundColor = normal.backgroundColor;
+        appearance.borderColor = normal.borderColor;
+        appearance.borderWidth = normal.borderWidth;
+        appearance.cornerRadius = normal.cornerRadius;
+        appearance.margin = normal.margin;
+        appearance.font = normal.font;
+        appearance.textColor = normal.textColor;
+    }
+    for (NSNumber *state in @[@(UIControlStateNormal), @(UIControlStateSelected), @(UIControlStateDisabled)]) {
+        [style setIconColor:tint forState:state.unsignedIntegerValue];
+    }
+    if (control.font) {
+        for (CYLTagAppearance *appearance in @[style.normalAppearance, style.selectedAppearance, style.disabledAppearance]) {
+            appearance.font = control.font;
+        }
+    }
+    style.imagePlacement = CYLTagImagePlacementTrailing;
+    style.imageSize = CGSizeMake(kCYLTagFoldButtonIconSize + 4, kCYLTagFoldButtonIconSize + 4);
+    style.imageTitleSpacing = 3;
+    style.layoutCentered = YES;
+    style.numberOfItemsPerRow = 0;
+    return style;
+}
+
+- (void)applyInlineFoldControl:(CYLMenuFoldControl *)foldControl itemStyle:(CYLMenuStyle *)itemStyle expanded:(BOOL)expanded animated:(BOOL)animated {
+    [self cyl_applyFoldControl:foldControl style:[[self class] cyl_inlineStyleForFoldControl:foldControl itemStyle:itemStyle]
+                      expanded:expanded animated:animated];
+}
+
++ (CGSize)inlineSizeForFoldControl:(CYLMenuFoldControl *)foldControl itemStyle:(CYLMenuStyle *)itemStyle expanded:(BOOL)expanded traitCollection:(UITraitCollection *)traitCollection {
+    CYLMenuStyle *style = [self cyl_inlineStyleForFoldControl:foldControl itemStyle:itemStyle];
+    UIImage *image = [foldControl showsImageWhenExpanded:expanded] ? foldControl.image : nil;
+    CGFloat height = [self heightForStyle:style traitCollection:traitCollection];
+    CGFloat width = [self widthForTitle:[foldControl titleWhenExpanded:expanded] image:image style:style traitCollection:traitCollection];
+    return CGSizeMake(MAX(height, ceil(width)), height);
+}
+
 - (void)applyFoldControl:(CYLMenuFoldControl *)foldControl color:(UIColor *)color expanded:(BOOL)expanded animated:(BOOL)animated {
+    [self cyl_applyFoldControl:foldControl style:[[self class] cyl_styleForFoldControl:foldControl color:color]
+                      expanded:expanded animated:animated];
+}
+
+- (void)cyl_applyFoldControl:(CYLMenuFoldControl *)foldControl style:(CYLMenuStyle *)style expanded:(BOOL)expanded animated:(BOOL)animated {
     self.foldControl = foldControl;
     self.expanded = expanded;
-    self.style = [[self class] cyl_styleForFoldControl:foldControl color:color];
+    self.style = style;
     self.title = [foldControl titleWhenExpanded:expanded];
     self.image = [foldControl showsImageWhenExpanded:expanded] ? foldControl.image : nil;
     [self setNeedsLayout];

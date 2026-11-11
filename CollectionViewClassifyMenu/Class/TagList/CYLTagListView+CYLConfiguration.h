@@ -80,7 +80,7 @@ FOUNDATION_EXTERN NSString *const CYLTagListViewTitleStyle;
 
 #pragma mark Fold control keys (CYLMenuFoldControl)
 /*!
- * NSNumber of CYLMenuFoldControlPosition, or "none", "bottom", "topTrailing" ("topRight"), "topLeading" ("topLeft").
+ * NSNumber of CYLMenuFoldControlPosition, or "none", "bottom", "topTrailing" ("topRight"), "topLeading" ("topLeft"), "inline" (a tag cell among the tags).
  */
 FOUNDATION_EXTERN NSString *const CYLMenuFoldControlKeyPosition;
 /*!
@@ -169,6 +169,10 @@ FOUNDATION_EXTERN NSString *const CYLMenuStyleDisabled;
  */
 FOUNDATION_EXTERN NSString *const CYLMenuStyleImageTitleSpacing;
 FOUNDATION_EXTERN NSString *const CYLMenuStyleItemHeight;
+/*!
+ * The grid's items per row (CYLMenuStyle.numberOfItemsPerRow, key "itemsPerRow"); 0 for the flow layout.
+ */
+FOUNDATION_EXTERN NSString *const CYLMenuStyleNumberOfItemsPerRow;
 FOUNDATION_EXTERN NSString *const CYLMenuStyleInteritemSpacing;
 FOUNDATION_EXTERN NSString *const CYLMenuStyleLineSpacing;
 FOUNDATION_EXTERN NSString *const CYLMenuStyleHeaderHeight;

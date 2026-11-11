@@ -53,8 +53,35 @@
         _foldControlColor = [UIColor grayColor];
         _expandTitle = CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand a section");
         _collapseTitle = CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse a section");
+        _badgeBackgroundColor = [UIColor systemRedColor];
+        _badgeTextColor = [UIColor whiteColor];
+        _moreButtonColor = [UIColor secondaryLabelColor];
     }
     return self;
+}
+
++ (instancetype)gridStyleWithNumberOfItemsPerRow:(NSUInteger)numberOfItemsPerRow {
+    CYLMenuStyle *style = [self defaultStyle];
+    style.numberOfItemsPerRow = MAX(1, numberOfItemsPerRow);
+    UIFont *font = [UIFont systemFontOfSize:17];
+    for (CYLTagAppearance *appearance in @[style.normalAppearance, style.selectedAppearance, style.disabledAppearance]) {
+        appearance.backgroundColor = [UIColor clearColor];
+        appearance.borderWidth = 0;
+        appearance.borderColor = nil;
+        appearance.margin = 0;
+        appearance.font = font;
+    }
+    style.normalAppearance.textColor = [UIColor labelColor];
+    style.selectedAppearance.textColor = [UIColor labelColor];
+    style.disabledAppearance.textColor = [UIColor tertiaryLabelColor];
+    // The title at the leading edge, without an empty icon slot before it.
+    style.layoutCentered = NO;
+    style.imageSize = CGSizeZero;
+    style.imageTitleSpacing = 0;
+    style.itemHeight = 32;
+    style.interitemSpacing = 24;
+    style.lineSpacing = 18;
+    return style;
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -85,6 +112,11 @@
     copy.foldChevronImage = self.foldChevronImage;
     copy.expandTitle = self.expandTitle;
     copy.collapseTitle = self.collapseTitle;
+    copy.numberOfItemsPerRow = self.numberOfItemsPerRow;
+    copy.badgeBackgroundColor = self.badgeBackgroundColor;
+    copy.badgeTextColor = self.badgeTextColor;
+    copy.moreButtonImage = self.moreButtonImage;
+    copy.moreButtonColor = self.moreButtonColor;
     return copy;
 }
 

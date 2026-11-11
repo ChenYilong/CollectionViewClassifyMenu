@@ -27,6 +27,22 @@ NS_ASSUME_NONNULL_BEGIN
                      style:(CYLMenuStyle *)style
                   selected:(BOOL)selected
                    enabled:(BOOL)enabled;
+
+/*!
+ * The badge after the title (`menuBadgeForItemAtIndexPath:`), such as "热"; hidden without a text.
+ */
+@property (nonatomic, strong, readonly) UILabel *badgeLabel;
+
+/*!
+ * Shows `text` as the badge in the colors of `style` (nil or empty hides it); the title is truncated to make room
+ * for it, and VoiceOver reads it as the cell's value.
+ */
+- (void)setBadgeText:(nullable NSString *)text style:(CYLMenuStyle *)style;
+
+/*!
+ * The badge's size for `text`, including the space before it; CGSizeZero without a text.
+ */
++ (CGSize)badgeSizeForText:(nullable NSString *)text traitCollection:(nullable UITraitCollection *)traitCollection;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -37,6 +37,13 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldControlPosition) {
      * At the leading edge of the section header, before the section title.
      */
     CYLMenuFoldControlPositionTopLeading,
+    /*!
+     * A tag cell among the tags, like a search app's recent searches: folded, it is the last visible item
+     * (the hidden items make room for it on the last visible row); expanded, it follows the last item. A tap on
+     * it expands or collapses the section. With CYLMenuFoldControlContentIcon it is a circle with the bundle's
+     * chevron, outlined like the tags (CYLTagFoldCell).
+     */
+    CYLMenuFoldControlPositionInline,
 };
 
 /*!
