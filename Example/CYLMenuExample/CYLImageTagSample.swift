@@ -35,23 +35,24 @@ final class CYLImageTagSampleViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "TagViewGroup"
+        title = CYLExampleLocalizedString("图片标签")
         view.backgroundColor = .systemBackground
         let imageView = CYLImageTagView()
         imageView.image = CYLAndroidSample.picture(0)
         imageView.tagGroups = CYLImageTagSampleData.tagGroups
         imageView.imageTapHandler = { [weak imageView] in imageView?.toggleTagGroups(animated: true) }
-        imageView.circleTapHandler = { [weak self] _ in self?.toast("点击中心圆") }
-        imageView.tagTapHandler = { [weak self] _, _, tag in self?.toast("点击Tag->" + tag.title) }
-        imageView.longPressHandler = { [weak self] _ in self?.toast("点击中心圆") }
+        imageView.imageAccessibilityHint = CYLExampleLocalizedString("轻点两下显示或隐藏标签")
+        imageView.circleTapHandler = { [weak self] _ in self?.toast(CYLExampleLocalizedString("点击中心圆")) }
+        imageView.tagTapHandler = { [weak self] _, _, tag in self?.toast(CYLExampleLocalizedString("点击标签：%@", tag.title)) }
+        imageView.longPressHandler = { [weak self] _ in self?.toast(CYLExampleLocalizedString("点击中心圆")) }
         tagImageView = imageView
 
-        let create = CYLAndroidSample.button("创建标签", color: .systemPink) { [weak self] in
+        let create = CYLAndroidSample.button(CYLExampleLocalizedString("创建标签"), identifier: "sample.createTags", color: .systemPink) { [weak self] in
             let edit = CYLImageTagEditViewController()
             edit.onSave = { [weak self] in self?.tagImageView.tagGroups = CYLImageTagSampleData.tagGroups }
             self?.navigationController?.pushViewController(edit, animated: true)
         }
-        let list = CYLAndroidSample.button("标签列表", color: .systemPink) { [weak self] in
+        let list = CYLAndroidSample.button(CYLExampleLocalizedString("标签列表"), identifier: "sample.tagList", color: .systemPink) { [weak self] in
             self?.navigationController?.pushViewController(CYLImageTagListViewController(), animated: true)
         }
         let buttons = UIStackView(arrangedSubviews: [create, list])
@@ -86,22 +87,24 @@ final class CYLImageTagEditViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "创建标签"
+        title = CYLExampleLocalizedString("创建标签")
         view.backgroundColor = .systemBackground
         let imageView = CYLImageTagView()
         imageView.image = CYLAndroidSample.picture(0)
         imageView.isEditing = true
-        imageView.circleTapHandler = { [weak self] _ in self?.toast("点击中心圆") }
+        imageView.circleTapHandler = { [weak self] _ in self?.toast(CYLExampleLocalizedString("点击中心圆")) }
         imageView.longPressHandler = { [weak self] index in self?.confirmDelete(groupAt: index) }
+        imageView.longPressAccessibilityActionName = CYLExampleLocalizedString("删除标签组")
         tagImageView = imageView
 
         let info = UILabel()
         info.numberOfLines = 0
         info.font = .preferredFont(forTextStyle: .footnote)
         info.textColor = .secondaryLabel
-        info.text = "1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3.点击单个标签，调整该标签的方向\n4. 点击中心圆弹出dialog\n5. 长按标签组删除"
-        let create = CYLAndroidSample.button("创建", color: .systemPink) { [weak self] in self?.showCreateDialog() }
-        let save = CYLAndroidSample.button("保存", color: .systemPink) { [weak self] in self?.save() }
+        info.text = CYLExampleLocalizedString("1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除")
+        info.adjustsFontForContentSizeCategory = true
+        let create = CYLAndroidSample.button(CYLExampleLocalizedString("创建"), identifier: "sample.create", color: .systemPink) { [weak self] in self?.showCreateDialog() }
+        let save = CYLAndroidSample.button(CYLExampleLocalizedString("保存"), identifier: "sample.save", color: .systemPink) { [weak self] in self?.save() }
         let buttons = UIStackView(arrangedSubviews: [create, save])
         buttons.spacing = 8
         buttons.distribution = .fillEqually
@@ -140,21 +143,25 @@ final class CYLImageTagEditViewController: UIViewController {
     }
 
     private func showCreateDialog() {
-        let alert = UIAlertController(title: "创建标签", message: nil, preferredStyle: .alert)
+        let alert = UIAlertController(title: CYLExampleLocalizedString("创建标签"), message: nil, preferredStyle: .alert)
         for index in 1...3 {
-            alert.addTextField { $0.placeholder = "标签 \(index)" }
+            alert.addTextField { field in
+                field.placeholder = CYLExampleLocalizedString("标签 %ld", index)
+                field.accessibilityLabel = field.placeholder
+            }
         }
-        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
-        alert.addAction(UIAlertAction(title: "确定", style: .default) { [weak self, weak alert] _ in
+        alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("取消"), style: .cancel))
+        alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("确定"), style: .default) { [weak self, weak alert] _ in
             self?.createGroup(withNames: alert?.textFields?.map { $0.text ?? "" } ?? [])
         })
         present(alert, animated: true)
     }
 
     private func confirmDelete(groupAt index: UInt) {
-        let alert = UIAlertController(title: "删除标签组", message: "你确定要删除该标签组吗？", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
-        alert.addAction(UIAlertAction(title: "确定", style: .destructive) { [weak self] _ in
+        let alert = UIAlertController(title: CYLExampleLocalizedString("删除标签组"), message: CYLExampleLocalizedString("你确定要删除该标签组吗？"),
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("取消"), style: .cancel))
+        alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("确定"), style: .destructive) { [weak self] _ in
             self?.tagImageView.removeTagGroup(at: index)
         })
         present(alert, animated: true)
@@ -190,6 +197,7 @@ final class CYLImageTagCell: UITableViewCell {
             height,
         ])
         tagImageView.imageTapHandler = { [weak self] in self?.tagImageView.toggleTagGroups(animated: true) }
+        tagImageView.imageAccessibilityHint = CYLExampleLocalizedString("轻点两下显示或隐藏标签")
     }
 
     @available(*, unavailable)
@@ -201,7 +209,7 @@ final class CYLImageTagListViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "标签列表"
+        title = CYLExampleLocalizedString("标签列表")
         tableView.register(CYLImageTagCell.self, forCellReuseIdentifier: "image")
         tableView.separatorStyle = .none
         tableView.rowHeight = UITableView.automaticDimension
@@ -217,9 +225,9 @@ final class CYLImageTagListViewController: UITableViewController {
         let groups = CYLImageTagSampleData.tagGroups
         cell.tagImageView.image = CYLAndroidSample.picture(indexPath.row % 3, size: CGSize(width: 400, height: 400))
         cell.tagImageView.tagGroups = groups.isEmpty ? [] : [groups[indexPath.row % groups.count]]
-        cell.tagImageView.circleTapHandler = { [weak self] _ in self?.toast("点击中心圆") }
-        cell.tagImageView.longPressHandler = { [weak self] _ in self?.toast("点击中心圆") }
-        cell.tagImageView.tagTapHandler = { [weak self] _, _, tag in self?.toast("点击Tag->" + tag.title) }
+        cell.tagImageView.circleTapHandler = { [weak self] _ in self?.toast(CYLExampleLocalizedString("点击中心圆")) }
+        cell.tagImageView.longPressHandler = { [weak self] _ in self?.toast(CYLExampleLocalizedString("点击中心圆")) }
+        cell.tagImageView.tagTapHandler = { [weak self] _, _, tag in self?.toast(CYLExampleLocalizedString("点击标签：%@", tag.title)) }
         return cell
     }
 

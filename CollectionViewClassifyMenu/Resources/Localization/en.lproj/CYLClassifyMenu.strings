@@ -20,3 +20,27 @@
 /* The More button of a section header (three dots), read by VoiceOver after the section title. */
 "CYLMenuMoreActions" = "More";
 "CYLMenuDeleteTag" = "Delete";
+
+/* Accessibility custom actions and labels: tag reordering, long press, tags on a picture. */
+/* Does what a long press does on a tag or a tag group (an accessibility custom action). */
+"CYLMenuLongPress" = "Long press";
+/* Moves a tag one place earlier (an accessibility custom action while reordering is on). */
+"CYLMenuMoveTagEarlier" = "Move earlier";
+/* Moves a tag one place later. */
+"CYLMenuMoveTagLater" = "Move later";
+/* Announced after a move; %ld is the new position, counted from 1. */
+"CYLMenuTagMoved" = "Moved to position %ld";
+/* The dot of a tag group on a picture; %@ is the list of its tags. */
+"CYLImageTagGroup" = "Tag group: %@";
+/* A picture with tags, when its image has no accessibilityLabel. */
+"CYLImageTagPicture" = "Picture";
+/* Hint of a tag on a picture in edit mode. */
+"CYLImageTagTurnHint" = "Double-tap to turn it";
+/* Moves a tag group up (an accessibility custom action in edit mode). */
+"CYLImageTagMoveUp" = "Move up";
+/* Moves a tag group down. */
+"CYLImageTagMoveDown" = "Move down";
+/* Moves a tag group left. */
+"CYLImageTagMoveLeft" = "Move left";
+/* Moves a tag group right. */
+"CYLImageTagMoveRight" = "Move right";

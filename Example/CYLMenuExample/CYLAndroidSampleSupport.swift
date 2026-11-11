@@ -45,21 +45,32 @@ enum CYLAndroidSample {
     private static let toastTag = 0x7A57
 
     /// A filled button, as the samples' buttons.
-    static func button(_ title: String, color: UIColor, action: @escaping () -> Void) -> UIButton {
+    /// A filled button, as the samples' buttons: a localized `title` (also its label, read by VoiceOver and spoken
+    /// for Voice Control), a stable `identifier`, a title that grows with Dynamic Type and wraps.
+    static func button(_ title: String, identifier: String, color: UIColor, action: @escaping () -> Void) -> UIButton {
         var configuration = UIButton.Configuration.filled()
         configuration.title = title
+        configuration.titleLineBreakMode = .byWordWrapping
+        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
+            var attributes = attributes
+            attributes.font = UIFont.preferredFont(forTextStyle: .body)
+            return attributes
+        }
         configuration.baseBackgroundColor = color
         configuration.baseForegroundColor = .white
         configuration.cornerStyle = .small
         let button = UIButton(configuration: configuration, primaryAction: UIAction { _ in action() })
-        button.accessibilityIdentifier = title
+        button.accessibilityIdentifier = identifier
+        button.titleLabel?.adjustsFontForContentSizeCategory = true
         return button
     }
 
-    /// A text field with a bottom line, as Android's EditText.
-    static func textField(placeholder: String) -> UITextField {
+    /// A text field with a bottom line, as Android's EditText; `label` is what VoiceOver reads (a placeholder
+    /// disappears once there is text).
+    static func textField(placeholder: String, label: String) -> UITextField {
         let field = UITextField()
         field.placeholder = placeholder
+        field.accessibilityLabel = label
         field.font = .preferredFont(forTextStyle: .body)
         field.adjustsFontForContentSizeCategory = true
         field.borderStyle = .none
@@ -80,13 +91,13 @@ enum CYLAndroidSample {
 
     /// A picture of the TagViewGroup sample: a gradient and a large symbol, `index` choosing the colors and the symbol.
     static func picture(_ index: Int, size: CGSize = CGSize(width: 750, height: 750)) -> UIImage {
-        let palettes: [(UIColor, UIColor, String)] = [
-            (UIColor(red: 0.55, green: 0.42, blue: 0.33, alpha: 1), UIColor(red: 0.85, green: 0.76, blue: 0.66, alpha: 1), "shoeprints.fill"),
-            (UIColor(red: 0.25, green: 0.35, blue: 0.5, alpha: 1), UIColor(red: 0.7, green: 0.8, blue: 0.9, alpha: 1), "handbag.fill"),
-            (UIColor(red: 0.3, green: 0.45, blue: 0.35, alpha: 1), UIColor(red: 0.78, green: 0.88, blue: 0.75, alpha: 1), "tshirt.fill"),
+        let palettes: [(UIColor, UIColor, String, String)] = [
+            (UIColor(red: 0.55, green: 0.42, blue: 0.33, alpha: 1), UIColor(red: 0.85, green: 0.76, blue: 0.66, alpha: 1), "shoeprints.fill", "鞋子图片"),
+            (UIColor(red: 0.25, green: 0.35, blue: 0.5, alpha: 1), UIColor(red: 0.7, green: 0.8, blue: 0.9, alpha: 1), "handbag.fill", "包图片"),
+            (UIColor(red: 0.3, green: 0.45, blue: 0.35, alpha: 1), UIColor(red: 0.78, green: 0.88, blue: 0.75, alpha: 1), "tshirt.fill", "衣服图片"),
         ]
-        let (dark, light, symbol) = palettes[index % palettes.count]
-        return UIGraphicsImageRenderer(size: size).image { context in
+        let (dark, light, symbol, labelKey) = palettes[index % palettes.count]
+        let image = UIGraphicsImageRenderer(size: size).image { context in
             let colors = [light.cgColor, dark.cgColor] as CFArray
             if let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: colors, locations: nil) {
                 context.cgContext.drawLinearGradient(gradient, start: .zero, end: CGPoint(x: size.width, y: size.height), options: [])
@@ -96,6 +107,9 @@ enum CYLAndroidSample {
                 image.draw(at: CGPoint(x: (size.width - image.size.width) / 2, y: (size.height - image.size.height) / 2))
             }
         }
+        // CYLImageTagView reads it as the picture's label.
+        image.accessibilityLabel = CYLExampleLocalizedString(labelKey)
+        return image
     }
 }
 

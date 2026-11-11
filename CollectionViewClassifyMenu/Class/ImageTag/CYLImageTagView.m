@@ -4,6 +4,24 @@
 //
 
 #import "CYLImageTagView.h"
+#import "CYLMenuResources.h"
+
+/// The picture: an accessibility element whose activation is a tap on it.
+@interface CYLImageTagPictureView : UIImageView
+@property (nonatomic, copy, nullable) void (^activationHandler)(void);
+@end
+
+@implementation CYLImageTagPictureView
+
+- (BOOL)accessibilityActivate {
+    if (!self.activationHandler) {
+        return NO;
+    }
+    self.activationHandler();
+    return YES;
+}
+
+@end
 
 @interface CYLImageTagView () <CYLImageTagGroupViewDelegate>
 @property (nonatomic, strong) NSMutableArray<CYLImageTagGroup *> *groups;
@@ -31,7 +49,13 @@
 - (void)cyl_commonInit {
     _groups = [NSMutableArray array];
     _views = [NSMutableArray array];
-    _imageView = [[UIImageView alloc] initWithFrame:self.bounds];
+    CYLImageTagPictureView *picture = [[CYLImageTagPictureView alloc] initWithFrame:self.bounds];
+    __weak __typeof(self) weakSelf = self;
+    picture.activationHandler = ^{
+        [weakSelf cyl_handleImageTap];
+    };
+    picture.isAccessibilityElement = YES;
+    _imageView = picture;
     _imageView.contentMode = UIViewContentModeScaleAspectFill;
     _imageView.clipsToBounds = YES;
     _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -40,12 +64,45 @@
     [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cyl_handleImageTap)]];
 }
 
+/// The picture's label, traits and hint.
+- (void)cyl_updatePictureAccessibility {
+    UIImageView *picture = self.imageView;
+    NSString *label = picture.image.accessibilityLabel;
+    picture.accessibilityLabel = label.length > 0 ? label : CYLMenuLocalizedString(@"CYLImageTagPicture", @"A picture with tags");
+    picture.accessibilityTraits = UIAccessibilityTraitImage | (self.imageTapHandler ? UIAccessibilityTraitButton : 0);
+    picture.accessibilityHint = self.imageAccessibilityHint;
+}
+
+- (void)setImageTapHandler:(void (^)(void))handler {
+    _imageTapHandler = [handler copy];
+    [self cyl_updatePictureAccessibility];
+}
+
+- (void)setImageAccessibilityHint:(NSString *)hint {
+    _imageAccessibilityHint = [hint copy];
+    [self cyl_updatePictureAccessibility];
+}
+
+- (void)setLongPressAccessibilityActionName:(NSString *)name {
+    _longPressAccessibilityActionName = [name copy];
+    for (CYLImageTagGroupView *view in self.views) {
+        view.longPressAccessibilityActionName = name;
+    }
+}
+
+/// Edit mode: the tags turn on a tap, so they say so.
+- (void)cyl_applyAccessibilityToGroupView:(CYLImageTagGroupView *)view {
+    view.longPressAccessibilityActionName = self.longPressAccessibilityActionName;
+    view.tagAccessibilityHint = self.editing ? CYLMenuLocalizedString(@"CYLImageTagTurnHint", @"Hint of a tag in edit mode") : nil;
+}
+
 - (UIImage *)image {
     return self.imageView.image;
 }
 
 - (void)setImage:(UIImage *)image {
     self.imageView.image = image;
+    [self cyl_updatePictureAccessibility];
 }
 
 - (NSArray<CYLImageTagGroup *> *)tagGroups {
@@ -72,6 +129,7 @@
     view.percentPosition = model.percentPosition;
     view.draggable = self.editing;
     view.showsRipple = !self.editing;
+    [self cyl_applyAccessibilityToGroupView:view];
     [self.groups addObject:model];
     [self.views addObject:view];
     if (self.groupConfiguration) {
@@ -102,6 +160,7 @@
     for (CYLImageTagGroupView *view in self.views) {
         view.draggable = editing;
         view.showsRipple = !editing;
+        [self cyl_applyAccessibilityToGroupView:view];
     }
 }
 
@@ -140,6 +199,10 @@
         // The sample's onTagClicked: the next direction.
         tag.direction = CYLImageTagDirectionNext(tag.direction);
         groupView.tags = self.groups[index].tags;
+        // The tag views were remade: keep VoiceOver on the turned tag.
+        if (tagIndex < (NSInteger)groupView.tagViews.count) {
+            UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, groupView.tagViews[tagIndex]);
+        }
     }
     if (self.tagTapHandler) {
         self.tagTapHandler(index, (NSUInteger)tagIndex, tag);

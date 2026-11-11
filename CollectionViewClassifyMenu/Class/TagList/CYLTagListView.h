@@ -281,6 +281,13 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  */
 @property (nonatomic, copy, nullable) void (^tagLongPressHandler)(NSInteger index, CYLTag *tag);
 /*!
+ * The name of the long-press custom action that VoiceOver, Voice Control and Switch Control users pick instead of a
+ * long press (each tag gets it while `tagLongPressHandler` is set or the delegate handles long presses), such as
+ * "删除". nil: "长按" (core string `CYLMenuLongPress`). While `allowsReordering`, tags also get 前移 / 后移 actions,
+ * which move them like a drag and announce the new position.
+ */
+@property (nonatomic, copy, nullable) NSString *longPressAccessibilityActionName;
+/*!
  * A long press and a move reorders the items of a section (container_enable_drag). Needs a data source that implements
  * -menuMoveItemAtIndexPath:toIndexPath: (CYLTagDataSource does). NO by default.
  */

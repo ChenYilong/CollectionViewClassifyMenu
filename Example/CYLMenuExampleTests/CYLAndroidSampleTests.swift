@@ -33,7 +33,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         captureScreen(named: "test-sample-tag-cloud")
 
         // Round Corner 0 is square, 20 px rounded, the default a capsule.
-        let squareIndex = list.tags.firstIndex { $0.title == "Round Corner" } ?? 0
+        let squareIndex = list.tags.firstIndex { $0.title == "圆角" } ?? 0
         list.scrollToItem(at: ip(squareIndex, 0), animated: false)
         list.probe.layOut()
         XCTAssertEqual(list.tagButton(at: ip(squareIndex, 0))?.layer.cornerRadius, 0)
@@ -44,7 +44,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         _ = first
 
         list.probe.tap(item: 2, section: 0)
-        XCTAssertEqual(CYLAndroidSample.toastText(in: sample.view), "click tag id = 2 position = 2")
+        XCTAssertEqual(CYLAndroidSample.toastText(in: sample.view), "点击标签 id = 2，位置 = 2")
 
         sample.random = { _ in 0 }
         sample.textField.text = "NEW"
@@ -53,13 +53,13 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertTrue(list.tags.last?.isDeletable ?? false)
         sample.textField.text = ""
         sample.addTag()
-        XCTAssertEqual(list.tags.last?.title, "ADD A TAG")
+        XCTAssertEqual(list.tags.last?.title, "添加标签")
 
         sample.openActivityResult()
         let sub = navigation.topViewController as? CYLTagCloudSubViewController
         XCTAssertNotNil(sub)
         sub?.finish()
-        XCTAssertEqual(list.tags.last?.title, "ADD AFTER ACTIVITY RESULT")
+        XCTAssertEqual(list.tags.last?.title, "返回结果后添加")
     }
 
     func testTagCloudListAndRecyclerScreens() {
@@ -68,7 +68,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         listScreen.tableView.layoutIfNeeded()
         XCTAssertEqual(listScreen.tableView.numberOfRows(inSection: 0), 51)
         let cell = listScreen.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? CYLTagCloudListCell
-        XCTAssertEqual(cell?.tagListView.tags.map(\.title), ["ITEM 1", "ITEM 1", "ITEM 1"])
+        XCTAssertEqual(cell?.tagListView.tags.map(\.title), ["条目 1", "条目 1", "条目 1"])
         XCTAssertGreaterThan(cell?.bounds.height ?? 0, 20)
         captureScreen(named: "test-sample-tag-cloud-list")
 
@@ -77,7 +77,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         recycler.tableView.layoutIfNeeded()
         XCTAssertEqual(recycler.tableView.numberOfRows(inSection: 0), 22)
         let footer = recycler.tableView.dataSource?.tableView(recycler.tableView, cellForRowAt: IndexPath(row: 21, section: 0)) as? CYLTagCloudListCell
-        XCTAssertEqual(footer?.tagListView.tags.map(\.title), ["FOOTER 1", "FOOTER 2"])
+        XCTAssertEqual(footer?.tagListView.tags.map(\.title), ["页脚 1", "页脚 2"])
     }
 
     func testHotSearchScreen() {
@@ -98,8 +98,8 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(bar3?.frame.width, 3)
         // 神 and 热 badges, drawn by the core.
         XCTAssertNotNil(list.tagButton(at: ip(0, 0))?.imageView.image)
-        XCTAssertEqual(list.tagButton(at: ip(0, 0))?.imageView.image?.accessibilityLabel, "神")
-        XCTAssertEqual(list.tagButton(at: ip(4, 0))?.imageView.image?.accessibilityLabel, "热")
+        XCTAssertEqual(list.tagButton(at: ip(0, 0))?.imageView.image?.accessibilityLabel, "神曲")
+        XCTAssertEqual(list.tagButton(at: ip(4, 0))?.imageView.image?.accessibilityLabel, "热门")
         XCTAssertNil(list.tagButton(at: ip(2, 0))?.imageView.image)
         XCTAssertEqual(list.tagButton(at: ip(4, 0))?.titleLabel.textColor, CYLHotSearchViewController.red)
         captureScreen(named: "test-sample-hot-search")
@@ -204,7 +204,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         // A cross tap only reports (onTagCrossClick).
         first.deleteItem(at: ip(1, 0))
         XCTAssertEqual(first.tags.count, 9)
-        XCTAssertEqual(CYLAndroidSample.toastText(in: sample.view), "Click TagView cross! position = 1")
+        XCTAssertEqual(CYLAndroidSample.toastText(in: sample.view), "点了标签的叉！位置 = 1")
         sample.textField.text = "Kotlin"
         sample.addTag()
         XCTAssertEqual(first.tags.last?.title, "Kotlin")

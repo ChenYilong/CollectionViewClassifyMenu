@@ -82,15 +82,24 @@
     _deletable = deletable;
     self.button.showsDeleteIndicator = deletable;
     self.deleteControl.hidden = !deletable;
-    if (deletable) {
-        UIAccessibilityCustomAction *action = [[UIAccessibilityCustomAction alloc] initWithName:CYLMenuLocalizedString(@"CYLMenuDeleteTag", @"Deletes a tag")
-                                                                                         target:self
-                                                                                       selector:@selector(cyl_deleteAction)];
-        self.accessibilityCustomActions = @[action];
-    } else {
-        self.accessibilityCustomActions = nil;
-    }
+    [self cyl_updateAccessibilityActions];
     [self setNeedsLayout];
+}
+
+- (void)setAdditionalAccessibilityActions:(NSArray<UIAccessibilityCustomAction *> *)actions {
+    _additionalAccessibilityActions = [actions copy];
+    [self cyl_updateAccessibilityActions];
+}
+
+- (void)cyl_updateAccessibilityActions {
+    NSMutableArray<UIAccessibilityCustomAction *> *actions = [NSMutableArray array];
+    if (self.deletable) {
+        [actions addObject:[[UIAccessibilityCustomAction alloc] initWithName:CYLMenuLocalizedString(@"CYLMenuDeleteTag", @"Deletes a tag")
+                                                                      target:self
+                                                                    selector:@selector(cyl_deleteAction)]];
+    }
+    [actions addObjectsFromArray:self.additionalAccessibilityActions ?: @[]];
+    self.accessibilityCustomActions = actions.count > 0 ? actions : nil;
 }
 
 - (void)layoutSubviews {
@@ -113,6 +122,7 @@
 - (void)prepareForReuse {
     [super prepareForReuse];
     self.deleteHandler = nil;
+    self.additionalAccessibilityActions = nil;
     self.deletable = NO;
 }
 

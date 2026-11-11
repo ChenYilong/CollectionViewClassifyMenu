@@ -15,6 +15,7 @@
 		99DE2046D4B9FF6F6A7E6A93 /* CYLTagStyleDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1F9CB554EA461136BA855B /* CYLTagStyleDemoTests.swift */; };
 		6C5508F7A4A7A16371B76F63 /* CYLTagCloudTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBAAC05F30994850DC9CA22 /* CYLTagCloudTests.swift */; };
 		6C160238D451E9111BF174BC /* CYLAndroidSampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4F0ECB9D87E13E0D7FCA4D /* CYLAndroidSampleTests.swift */; };
+		703A30179F794CD892DBB8BA /* CYLAndroidSampleAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E58EEAB93E2C6FA4F40F46 /* CYLAndroidSampleAccessibilityTests.swift */; };
 		F1BD6A71778D6E644975B206 /* CYLAnimatedIconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3C911455887AA33A034899 /* CYLAnimatedIconTests.swift */; };
 		90641626E7CCAB0F86EE47A2 /* CYLTagListAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */; };
 		9C94ADB69C81A89E68924136 /* CYLReviewFilterScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C70259D0FC02D874F453E4F /* CYLReviewFilterScenarioTests.swift */; };
@@ -83,6 +84,7 @@
 		EB1F9CB554EA461136BA855B /* CYLTagStyleDemoTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagStyleDemoTests.swift; sourceTree = "<group>"; };
 		7BBAAC05F30994850DC9CA22 /* CYLTagCloudTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagCloudTests.swift; sourceTree = "<group>"; };
 		DF4F0ECB9D87E13E0D7FCA4D /* CYLAndroidSampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAndroidSampleTests.swift; sourceTree = "<group>"; };
+		34E58EEAB93E2C6FA4F40F46 /* CYLAndroidSampleAccessibilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAndroidSampleAccessibilityTests.swift; sourceTree = "<group>"; };
 		2A3C911455887AA33A034899 /* CYLAnimatedIconTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAnimatedIconTests.swift; sourceTree = "<group>"; };
 		7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListAccessibilityTests.swift; sourceTree = "<group>"; };
 		4C70259D0FC02D874F453E4F /* CYLReviewFilterScenarioTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLReviewFilterScenarioTests.swift; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 				EB1F9CB554EA461136BA855B /* CYLTagStyleDemoTests.swift */,
 				7BBAAC05F30994850DC9CA22 /* CYLTagCloudTests.swift */,
 				DF4F0ECB9D87E13E0D7FCA4D /* CYLAndroidSampleTests.swift */,
+				34E58EEAB93E2C6FA4F40F46 /* CYLAndroidSampleAccessibilityTests.swift */,
 				2A3C911455887AA33A034899 /* CYLAnimatedIconTests.swift */,
 				7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */,
 				4C70259D0FC02D874F453E4F /* CYLReviewFilterScenarioTests.swift */,
@@ -518,6 +521,7 @@
 				99DE2046D4B9FF6F6A7E6A93 /* CYLTagStyleDemoTests.swift in Sources */,
 				6C5508F7A4A7A16371B76F63 /* CYLTagCloudTests.swift in Sources */,
 				6C160238D451E9111BF174BC /* CYLAndroidSampleTests.swift in Sources */,
+				703A30179F794CD892DBB8BA /* CYLAndroidSampleAccessibilityTests.swift in Sources */,
 				F1BD6A71778D6E644975B206 /* CYLAnimatedIconTests.swift in Sources */,
 				90641626E7CCAB0F86EE47A2 /* CYLTagListAccessibilityTests.swift in Sources */,
 				9C94ADB69C81A89E68924136 /* CYLReviewFilterScenarioTests.swift in Sources */,

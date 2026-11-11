@@ -73,6 +73,7 @@ static BOOL CYLTagIsSet(CGFloat value) {
     copy.selectedBackgroundColor = self.selectedBackgroundColor;
     copy.badgeText = self.badgeText;
     copy.badgeColor = self.badgeColor;
+    copy.badgeAccessibilityLabel = self.badgeAccessibilityLabel;
     copy.backgroundImage = self.backgroundImage;
     copy.cornerRadius = self.cornerRadius;
     copy.borderWidth = self.borderWidth;
@@ -264,6 +265,9 @@ static BOOL CYLTagIsSet(CGFloat value) {
     if (!tag.image && tag.badgeText.length > 0) {
         CGFloat side = MAX(self.baseStyle.imageSize.width, self.baseStyle.imageSize.height);
         tag.image = [CYLTag badgeImageWithText:tag.badgeText color:tag.badgeColor ?: tag.textColor diameter:side > 0 ? side : 16];
+        if (tag.badgeAccessibilityLabel.length > 0) {
+            tag.image.accessibilityLabel = tag.badgeAccessibilityLabel;
+        }
     }
     return tag.image;
 }

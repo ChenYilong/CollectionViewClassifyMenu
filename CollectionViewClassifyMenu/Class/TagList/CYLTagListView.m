@@ -1668,9 +1668,65 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     cell.deleteHandler = deletable ? ^{
         [weakSelf deleteItemAtIndexPath:indexPath];
     } : nil;
+    cell.additionalAccessibilityActions = [self cyl_accessibilityActionsForItemAtIndexPath:indexPath];
     if ([self.menuDataSource respondsToSelector:@selector(menuAccessibilityHintForItemAtIndexPath:)]) {
         cell.accessibilityHint = [self.menuDataSource menuAccessibilityHintForItemAtIndexPath:indexPath];
     }
+}
+
+/// What VoiceOver, Voice Control and Switch Control users pick instead of a long press or a drag.
+- (NSArray<UIAccessibilityCustomAction *> *)cyl_accessibilityActionsForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSMutableArray<UIAccessibilityCustomAction *> *actions = [NSMutableArray array];
+    __weak __typeof(self) weakSelf = self;
+    if ([self collectionView:self.collectionView canMoveItemAtIndexPath:indexPath]) {
+        NSInteger count = [self numberOfVisibleItemsInSection:indexPath.section];
+        if (indexPath.item > 0) {
+            [actions addObject:[[UIAccessibilityCustomAction alloc] initWithName:CYLMenuLocalizedString(@"CYLMenuMoveTagEarlier", @"Moves a tag one place earlier")
+                                                                   actionHandler:^BOOL(UIAccessibilityCustomAction *action) {
+                return [weakSelf cyl_accessibilityMoveItemAtIndexPath:indexPath by:-1];
+            }]];
+        }
+        if (indexPath.item + 1 < count) {
+            [actions addObject:[[UIAccessibilityCustomAction alloc] initWithName:CYLMenuLocalizedString(@"CYLMenuMoveTagLater", @"Moves a tag one place later")
+                                                                   actionHandler:^BOOL(UIAccessibilityCustomAction *action) {
+                return [weakSelf cyl_accessibilityMoveItemAtIndexPath:indexPath by:1];
+            }]];
+        }
+    }
+    id<CYLMenuDelegate> delegate = self.menuDelegate;
+    BOOL reportsLongPress = [delegate respondsToSelector:@selector(menu:didLongPressItemAtIndexPath:)]
+        || (self.tagLongPressHandler && [self cyl_tagAtIndexPath:indexPath]);
+    if (reportsLongPress) {
+        NSString *name = self.longPressAccessibilityActionName.length > 0 ? self.longPressAccessibilityActionName
+            : CYLMenuLocalizedString(@"CYLMenuLongPress", @"Does what a long press does");
+        [actions addObject:[[UIAccessibilityCustomAction alloc] initWithName:name actionHandler:^BOOL(UIAccessibilityCustomAction *action) {
+            [weakSelf cyl_reportLongPressAtIndexPath:indexPath];
+            return YES;
+        }]];
+    }
+    return actions;
+}
+
+/// 前移 / 后移: the same move as a drag, then the new position is announced.
+- (BOOL)cyl_accessibilityMoveItemAtIndexPath:(NSIndexPath *)indexPath by:(NSInteger)offset {
+    NSInteger target = indexPath.item + offset;
+    if (![self cyl_canReorder] || target < 0 || target >= [self numberOfVisibleItemsInSection:indexPath.section]) {
+        return NO;
+    }
+    NSIndexPath *destination = [NSIndexPath indexPathForItem:target inSection:indexPath.section];
+    if ([self.selection containsObject:indexPath]) {
+        [self cyl_reportSelectedDragAtIndexPath:indexPath];
+    }
+    [self.collectionView moveItemAtIndexPath:indexPath toIndexPath:destination];
+    [self collectionView:self.collectionView moveItemAtIndexPath:indexPath toIndexPath:destination];
+    NSString *announcement = [NSString stringWithFormat:CYLMenuLocalizedString(@"CYLMenuTagMoved", @"Announced after a move; %ld is the new position, from 1"),
+                              (long)(target + 1)];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UICollectionViewCell *cell = [self.collectionView cellForItemAtIndexPath:destination];
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, cell);
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, announcement);
+    });
+    return YES;
 }
 
 #pragma mark UICollectionViewDataSource
@@ -1923,6 +1979,17 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 - (void)setAllowsReordering:(BOOL)allowsReordering {
     _allowsReordering = allowsReordering;
     [self cyl_updateLongPressDuration];
+    [self cyl_refreshVisibleCells];
+}
+
+- (void)setTagLongPressHandler:(void (^)(NSInteger, CYLTag *))handler {
+    _tagLongPressHandler = [handler copy];
+    [self cyl_refreshVisibleCells];
+}
+
+- (void)setLongPressAccessibilityActionName:(NSString *)name {
+    _longPressAccessibilityActionName = [name copy];
+    [self cyl_refreshVisibleCells];
 }
 
 - (void)setReorderingSensitivity:(CGFloat)reorderingSensitivity {

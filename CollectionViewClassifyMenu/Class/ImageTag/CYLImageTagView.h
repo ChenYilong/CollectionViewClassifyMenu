@@ -55,6 +55,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) void (^longPressHandler)(NSUInteger groupIndex);
 @property (nonatomic, copy, nullable) void (^dragHandler)(NSUInteger groupIndex, CGPoint percentPosition);
 
+#pragma mark Accessibility
+/*!
+ * The picture is an accessibility element: its label is the image's `accessibilityLabel`, else "图片" (core string
+ * `CYLImageTagPicture`); it is also a button while `imageTapHandler` is set, and activating it runs the handler.
+ * Set the hint here, such as "轻点两下显示或隐藏标签". In edit mode the tags get the hint "轻点两下改变方向"
+ * (`CYLImageTagTurnHint`) and the groups the 上移 / 下移 / 左移 / 右移 actions.
+ */
+@property (nonatomic, copy, nullable) NSString *imageAccessibilityHint;
+/*!
+ * The name of every group's long-press custom action (CYLImageTagGroupView.longPressAccessibilityActionName), such
+ * as "删除标签组" in edit mode. nil: "长按".
+ */
+@property (nonatomic, copy, nullable) NSString *longPressAccessibilityActionName;
+
 @end
 
 NS_ASSUME_NONNULL_END

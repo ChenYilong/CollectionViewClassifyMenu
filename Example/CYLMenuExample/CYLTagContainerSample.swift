@@ -72,7 +72,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Sample"
+        title = CYLExampleLocalizedString("标签容器示例")
         view.backgroundColor = UIColor(white: 0.98, alpha: 1)
         let data = CYLTagContainerSampleData.self
 
@@ -91,13 +91,14 @@ final class CYLTagContainerSampleViewController: UIViewController {
         first.setTags(withTitles: data.list1)
         first.tagDataSource.tags.forEach { $0.isDeletable = true }
         first.reloadMenuData()
-        first.tagClickHandler = { [weak self] position, tag in self?.toast("click-position:\(position), text:\(tag.title)") }
+        first.tagClickHandler = { [weak self] position, tag in self?.toast(CYLExampleLocalizedString("点击位置：%ld，文字：%@", position, tag.title)) }
         first.tagLongPressHandler = { [weak self] position, _ in self?.confirmDelete(at: position) }
-        first.tagDeleteHandler = { [weak self] position, _ in self?.toast("Click TagView cross! position = \(position)") }
+        first.longPressAccessibilityActionName = CYLExampleLocalizedString("删除")
+        first.tagDeleteHandler = { [weak self] position, _ in self?.toast(CYLExampleLocalizedString("点了标签的叉！位置 = %ld", position)) }
 
-        let field = CYLAndroidSample.textField(placeholder: "")
+        let field = CYLAndroidSample.textField(placeholder: CYLExampleLocalizedString("新标签"), label: CYLExampleLocalizedString("新标签"))
         textField = field
-        let add = CYLAndroidSample.button("ADD TAG", color: .systemGray3) { [weak self] in self?.addTag() }
+        let add = CYLAndroidSample.button(CYLExampleLocalizedString("添加"), identifier: "sample.add", color: .systemGray) { [weak self] in self?.addTag() }
         let addRow = UIStackView(arrangedSubviews: [field, add])
         addRow.spacing = 12
         addRow.distribution = .fillEqually
@@ -147,7 +148,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
             let selected = third.selectedIndexPaths.map(\.item)
             // Deselect all when an unselected tag is tapped while others are selected; otherwise show the toast.
             if selected.isEmpty || selected.contains(position) {
-                self?.toast("click-position:\(position), text:\(tag.title)")
+                self?.toast(CYLExampleLocalizedString("点击位置：%ld，文字：%@", position, tag.title))
             } else {
                 third.deselectAllItems()
             }
@@ -155,9 +156,10 @@ final class CYLTagContainerSampleViewController: UIViewController {
         third.tagLongPressHandler = { [weak self, weak third] position, _ in
             guard let third else { return }
             third.toggleSelection(at: IndexPath(item: position, section: 0))
-            self?.toast("selected-positions:\(third.selectedIndexPaths.map(\.item))")
+            self?.toast(CYLExampleLocalizedString("已选位置：%@", third.selectedIndexPaths.map { String($0.item) }.joined(separator: ", ")))
         }
-        third.selectedTagDragHandler = { [weak self] _, tag in self?.toast("drag: \(tag.title)") }
+        third.longPressAccessibilityActionName = CYLExampleLocalizedString("选择或取消选择")
+        third.selectedTagDragHandler = { [weak self] _, tag in self?.toast(CYLExampleLocalizedString("拖动：%@", tag.title)) }
 
         // tagcontainerLayout4: centered, clickable, a 2 s black ripple at alpha 47, pure teal.
         let fourth = Self.makeContainer { list, style in
@@ -171,7 +173,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
             list.colorTheme = .pureTeal
         }
         fourth.setTags(withTitles: data.list4)
-        fourth.tagClickHandler = { [weak self] position, tag in self?.toast("click-position:\(position), text:\(tag.title)") }
+        fourth.tagClickHandler = { [weak self] position, tag in self?.toast(CYLExampleLocalizedString("点击位置：%ld，文字：%@", position, tag.title)) }
 
         // tagcontainerLayout5: a 4 pt square border, not clickable, random theme, but custom colors per tag.
         let fifth = Self.makeContainer { list, style in
@@ -230,13 +232,14 @@ final class CYLTagContainerSampleViewController: UIViewController {
 
     /// onTagLongClick: "You will delete this tag!".
     private func confirmDelete(at position: Int) {
-        let alert = UIAlertController(title: "long click", message: "You will delete this tag!", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+        let alert = UIAlertController(title: CYLExampleLocalizedString("长按"), message: CYLExampleLocalizedString("将删除这个标签！"),
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("删除"), style: .destructive) { [weak self] _ in
             guard let first = self?.containers.first, position < first.tags.count else { return }
             first.removeTag(at: UInt(position))
             self?.view.setNeedsLayout()
         })
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("取消"), style: .cancel))
         present(alert, animated: true)
     }
 

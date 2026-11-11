@@ -24,33 +24,33 @@ enum CYLTagCloudSampleData {
     static func mainTags() -> [CYLTag] {
         var tags = continents.map { CYLTag(title: $0) }
         for index in 1..<colors.count {
-            let tag = CYLTag(title: "Colorful Text")
+            let tag = CYLTag(title: CYLExampleLocalizedString("彩色文字"))
             tag.textColor = color(index)
             tags.append(tag)
         }
         for index in 0..<colors.count {
-            tags.append(CYLTag(title: "Colorful Background", backgroundColorHex: colors[index]))
+            tags.append(CYLTag(title: CYLExampleLocalizedString("彩色背景"), backgroundColorHex: colors[index]))
         }
         let borders: [(CGFloat, UIColor?)] = [(1, nil), (2, color(1)), (3, color(3))]
         for (width, color) in borders {
-            let tag = CYLTag(title: "Border")
+            let tag = CYLTag(title: CYLExampleLocalizedString("边框"))
             tag.borderWidth = width
             tag.borderColor = color
             tags.append(tag)
         }
         for radius: CGFloat in [CYLTagCornerRadiusSquare, 20.0 / 3, 60.0 / 3] {
-            let tag = CYLTag(title: "Round Corner")
+            let tag = CYLTag(title: CYLExampleLocalizedString("圆角"))
             tag.cornerRadius = radius
             tags.append(tag)
         }
-        let deletable = CYLTag(title: "Deletable")
+        let deletable = CYLTag(title: CYLExampleLocalizedString("可删除"))
         deletable.isDeletable = true
         tags.append(deletable)
-        let custom = CYLTag(title: "Custom Background")
+        let custom = CYLTag(title: CYLExampleLocalizedString("自定义背景"))
         custom.textColor = color(0)
         custom.backgroundImage = customBackground()
         tags.append(custom)
-        let detail = CYLTag(title: "Detail Tag")
+        let detail = CYLTag(title: CYLExampleLocalizedString("详情标签"))
         detail.textColor = .white
         detail.backgroundColor = CYLMenuColorFromString("#DDDDDD")
         detail.highlightedBackgroundColor = CYLMenuColorFromString("#555555")
@@ -86,14 +86,14 @@ final class CYLTagCloudSampleViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "TagView Sample"
+        title = CYLExampleLocalizedString("标签视图示例")
         view.backgroundColor = UIColor(white: 0.93, alpha: 1)
         let github = UIBarButtonItem(image: UIImage(systemName: "chevron.left.forwardslash.chevron.right"), primaryAction: UIAction { _ in
             if let url = URL(string: "https://github.com/kaedea/") {
                 UIApplication.shared.open(url)
             }
         })
-        github.accessibilityLabel = "GitHub"
+        github.accessibilityLabel = CYLExampleLocalizedString("在 GitHub 上查看")
         navigationItem.rightBarButtonItem = github
 
         // activity_main.xml: lineMargin 5dp, tagMargin 3dp, textPadding 10dp × 3dp.
@@ -104,26 +104,27 @@ final class CYLTagCloudSampleViewController: UIViewController {
         list.tagContentInsets = UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10)
         list.addTags(CYLTagCloudSampleData.mainTags())
         list.tagClickHandler = { [weak self] position, tag in
-            self?.toast("click tag id = \(tag.identifier) position = \(position)")
+            self?.toast(CYLExampleLocalizedString("点击标签 id = %ld，位置 = %ld", tag.identifier, position))
         }
         list.tagDeleteHandler = { [weak self] position, tag in
-            self?.toast("delete tag id = \(tag.identifier) position =\(position)")
+            self?.toast(CYLExampleLocalizedString("删除标签 id = %ld，位置 = %ld", tag.identifier, position))
         }
         tagListView = list
 
-        let field = CYLAndroidSample.textField(placeholder: "INPUT TAG TEXT")
+        let field = CYLAndroidSample.textField(placeholder: CYLExampleLocalizedString("输入标签文字"),
+                                             label: CYLExampleLocalizedString("标签文字"))
         textField = field
         let blue = CYLTagCloudSampleData.color(0) ?? .systemBlue
         let rows = [
-            [CYLAndroidSample.button("ADD A TAG", color: blue) { [weak self] in self?.addTag() },
-             CYLAndroidSample.button("Activity Result", color: blue) { [weak self] in self?.openActivityResult() }],
-            [CYLAndroidSample.button("LIST VIEW", color: blue) { [weak self] in
+            [CYLAndroidSample.button(CYLExampleLocalizedString("添加标签"), identifier: "sample.addTag", color: blue) { [weak self] in self?.addTag() },
+             CYLAndroidSample.button(CYLExampleLocalizedString("页面返回结果"), identifier: "sample.activityResult", color: blue) { [weak self] in self?.openActivityResult() }],
+            [CYLAndroidSample.button(CYLExampleLocalizedString("列表视图"), identifier: "sample.listView", color: blue) { [weak self] in
                 self?.navigationController?.pushViewController(CYLTagCloudListViewController(), animated: true)
             },
-             CYLAndroidSample.button("RECYCLER VIEW", color: blue) { [weak self] in
+             CYLAndroidSample.button(CYLExampleLocalizedString("回收视图"), identifier: "sample.recyclerView", color: blue) { [weak self] in
                 self?.navigationController?.pushViewController(CYLTagCloudRecyclerViewController(), animated: true)
             }],
-            [CYLAndroidSample.button("YY 热门搜索", color: .systemOrange) { [weak self] in
+            [CYLAndroidSample.button(CYLExampleLocalizedString("YY 热门搜索"), identifier: "sample.hotSearch", color: .systemOrange) { [weak self] in
                 self?.navigationController?.pushViewController(CYLHotSearchViewController(), animated: true)
             }],
         ].map { buttons -> UIStackView in
@@ -158,7 +159,7 @@ final class CYLTagCloudSampleViewController: UIViewController {
     /// tv_add: the typed text or "ADD A TAG", deletable half the time, one of the five colors.
     func addTag() {
         let text = textField.text ?? ""
-        let tag = CYLTag(title: text.isEmpty ? "ADD A TAG" : text)
+        let tag = CYLTag(title: text.isEmpty ? CYLExampleLocalizedString("添加标签") : text)
         tag.isDeletable = random(2) == 0
         tag.backgroundColor = CYLTagCloudSampleData.color(random(5))
         tag.identifier = tagListView.tags.count
@@ -170,7 +171,7 @@ final class CYLTagCloudSampleViewController: UIViewController {
     func openActivityResult() {
         let sub = CYLTagCloudSubViewController()
         sub.onResult = { [weak self] in
-            self?.tagListView.addTag(CYLTag(title: "ADD AFTER ACTIVITY RESULT"))
+            self?.tagListView.addTag(CYLTag(title: CYLExampleLocalizedString("返回结果后添加")))
         }
         navigationController?.pushViewController(sub, animated: true)
     }
@@ -186,9 +187,10 @@ final class CYLTagCloudSubViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "SubActivity"
+        title = CYLExampleLocalizedString("子页面")
         view.backgroundColor = .systemBackground
-        let button = CYLAndroidSample.button("Add Tag", color: CYLTagCloudSampleData.color(0) ?? .systemBlue) { [weak self] in
+        let button = CYLAndroidSample.button(CYLExampleLocalizedString("添加标签并返回"), identifier: "sample.finish",
+                                             color: CYLTagCloudSampleData.color(0) ?? .systemBlue) { [weak self] in
             self?.finish()
         }
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -245,12 +247,12 @@ final class CYLTagCloudListCell: UITableViewCell {
 final class CYLTagCloudListViewController: UITableViewController {
 
     static func tags(forRow row: Int) -> [CYLTag] {
-        ["#F06292", "#90CAF9", "#80DEEA"].map { CYLTag(title: "ITEM \(row)", backgroundColorHex: $0) }
+        ["#F06292", "#90CAF9", "#80DEEA"].map { CYLTag(title: CYLExampleLocalizedString("条目 %ld", row), backgroundColorHex: $0) }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "ListView"
+        title = CYLExampleLocalizedString("ListView 示例")
         tableView.register(CYLTagCloudListCell.self, forCellReuseIdentifier: "tags")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 60
@@ -269,11 +271,11 @@ final class CYLTagCloudListViewController: UITableViewController {
 
 /// RecyclerViewActivity: 21 text rows and a footer row with two tags.
 final class CYLTagCloudRecyclerViewController: UITableViewController {
-    static let texts = Array(repeating: "TEXT", count: 21)
+    static var texts: [String] { Array(repeating: CYLExampleLocalizedString("文本"), count: 21) }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "RecyclerView"
+        title = CYLExampleLocalizedString("RecyclerView 示例")
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "text")
         tableView.register(CYLTagCloudListCell.self, forCellReuseIdentifier: "tags")
         tableView.rowHeight = UITableView.automaticDimension
@@ -293,7 +295,7 @@ final class CYLTagCloudRecyclerViewController: UITableViewController {
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "tags", for: indexPath) as! CYLTagCloudListCell
-        cell.show([CYLTag(title: "FOOTER 1"), CYLTag(title: "FOOTER 2")])
+        cell.show([1, 2].map { CYLTag(title: CYLExampleLocalizedString("页脚 %ld", $0)) })
         return cell
     }
 }
@@ -309,18 +311,30 @@ final class CYLHotSearchViewController: UIViewController {
     static let blue = UIColor(red: 0.29, green: 0.64, blue: 0.94, alpha: 1)
     static let red = UIColor(red: 0.9, green: 0.31, blue: 0.29, alpha: 1)
 
-    /// (title, badge): 神 for songs, 热 for trending.
-    static let hotSearches: [(String, String?)] = [
-        ("入戏太深混合串烧版", "神"), ("他和她", "神"), ("妤宸", nil), ("赛菲尔", nil), ("小西瓜", "热"),
-        ("入戏太深", "神"), ("小虾米", nil), ("羽冰", nil), ("梦梦", nil), ("神曲不跳转呀呀呀56567", "神"),
+    /// The badge before a hot search: 神 for hit songs (blue), 热 for trending (red).
+    enum Badge {
+        case song, trending
+
+        /// The glyph in the badge (one character: 神 / 热 in Chinese).
+        var text: String { CYLExampleLocalizedString(self == .song ? "神" : "热") }
+        /// What VoiceOver reads after the title.
+        var accessibilityLabel: String { CYLExampleLocalizedString(self == .song ? "神曲" : "热门") }
+        var color: UIColor { self == .song ? CYLHotSearchViewController.blue : CYLHotSearchViewController.red }
+    }
+
+    /// (title, badge); the titles are sample data, as in the screenshot.
+    static let hotSearches: [(String, Badge?)] = [
+        ("入戏太深混合串烧版", .song), ("他和她", .song), ("妤宸", nil), ("赛菲尔", nil), ("小西瓜", .trending),
+        ("入戏太深", .song), ("小虾米", nil), ("羽冰", nil), ("梦梦", nil), ("神曲不跳转呀呀呀56567", .song),
     ]
 
     static func hotTags() -> [CYLTag] {
         hotSearches.map { title, badge in
             let tag = CYLTag(title: title)
             if let badge {
-                tag.badgeText = badge
-                tag.textColor = badge == "热" ? red : blue
+                tag.badgeText = badge.text
+                tag.badgeAccessibilityLabel = badge.accessibilityLabel
+                tag.textColor = badge.color
             }
             return tag
         }
@@ -357,11 +371,11 @@ final class CYLHotSearchViewController: UIViewController {
         bar.backgroundColor = Self.orange
         bar.fieldBackgroundColor = UIColor(red: 0.99, green: 0.91, blue: 0.82, alpha: 1)
         bar.fieldCornerRadius = 4
-        bar.placeholder = "主播昵称/直播间ID/神曲名"
+        bar.placeholder = CYLExampleLocalizedString("主播昵称/直播间ID/神曲名")
         bar.placeholderColor = UIColor(white: 0.6, alpha: 1)
         bar.searchIconTintColor = UIColor(white: 0.6, alpha: 1)
         bar.showsCancelButton = true
-        bar.cancelButtonTitle = "取消"
+        bar.cancelButtonTitle = CYLExampleLocalizedString("取消")
         bar.cancelButton.tintColor = .white
         bar.delegate = self
         searchBar = bar
@@ -369,12 +383,12 @@ final class CYLHotSearchViewController: UIViewController {
         let list = CYLTagListView()
         list.style = Self.hotStyle()
         list.addTags(Self.hotTags())
-        list.tagDataSource.sectionTitle = "热门搜索"
+        list.tagDataSource.sectionTitle = CYLExampleLocalizedString("热门搜索")
         list.showsSectionHeaders = true
         list.tagClickHandler = { [weak self] _, tag in
             self?.searchBar.text = tag.title
             if let view = self?.view {
-                CYLAndroidSample.toast("搜索「\(tag.title)」", in: view)
+                CYLAndroidSample.toast(CYLExampleLocalizedString("搜索「%@」", tag.title), in: view)
             }
         }
         tagListView = list

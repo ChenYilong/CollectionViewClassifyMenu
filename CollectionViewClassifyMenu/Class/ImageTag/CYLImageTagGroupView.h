@@ -48,13 +48,34 @@ FOUNDATION_EXTERN CYLImageTagDirection CYLImageTagDirectionNext(CYLImageTagDirec
 /*!
  * TagViewGroup's defaults, in points.
  */
-FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultCircleRadius;       // 8
-FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultCircleInnerRadius;  // 4
-FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultVerticalDistance;   // 28
-FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultTiltDistance;       // 20
-FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultLineWidth;          // 1
-FOUNDATION_EXTERN const NSUInteger CYLImageTagGroupMaximumTagCount;        // 6
-FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultRippleMaxRadius;    // 20
+/*!
+ * 8: the dot's outer radius.
+ */
+FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultCircleRadius;
+/*!
+ * 4: the dot's inner radius.
+ */
+FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultCircleInnerRadius;
+/*!
+ * 28: the vertical distance of the lines.
+ */
+FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultVerticalDistance;
+/*!
+ * 20: the tilt distance of the slanted lines.
+ */
+FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultTiltDistance;
+/*!
+ * 1: the line width.
+ */
+FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultLineWidth;
+/*!
+ * 6: the most tags in one group.
+ */
+FOUNDATION_EXTERN const NSUInteger CYLImageTagGroupMaximumTagCount;
+/*!
+ * 20: the ripple's largest radius.
+ */
+FOUNDATION_EXTERN const CGFloat CYLImageTagGroupDefaultRippleMaxRadius;
 
 /*!
  * Animatable values of a group (TagViewGroup's CIRCLE_RADIUS, CIRCLE_INNER_RADIUS, LINES_RATIO, TAG_ALPHA properties),
@@ -155,7 +176,9 @@ IB_DESIGNABLE
 
 /*!
  * The dot's outer and inner radius, the line width and the line lengths (TagViewGroup's radius, inner_radius,
- * line_width, v_distance, tilt_distance), in points.
+ * line_width, v_distance, tilt_distance), in points. When a tag is taller than `verticalDistance`, the layout grows both
+ * distances by the difference, so tags in neighboring directions never overlap at large Dynamic Type sizes; a tag wider than the room
+ * beside the dot wraps.
  */
 @property (nonatomic, assign) IBInspectable CGFloat circleRadius;
 @property (nonatomic, assign) IBInspectable CGFloat circleInnerRadius;
@@ -249,6 +272,27 @@ IB_DESIGNABLE
  * Lets the user drag the group (setOnTagGroupDragListener). NO by default.
  */
 @property (nonatomic, assign, getter=isDraggable) BOOL draggable;
+
+#pragma mark Accessibility
+/*!
+ * The dot as one VoiceOver / Voice Control / Switch Control element, before the tags. Its label is
+ * "标签组：<the tag titles>" (core string `CYLImageTagGroup`); activating it is a tap on the dot. Its custom actions:
+ * the long press (named by `longPressAccessibilityActionName`, when the delegate handles long presses), and
+ * 上移 / 下移 / 左移 / 右移 while `draggable` (each moves the group by `accessibilityMoveStep` and reports a drag).
+ */
+@property (nonatomic, strong, readonly) UIAccessibilityElement *circleAccessibilityElement;
+/*!
+ * The name of the long-press custom action of the dot, such as "删除标签组". nil: "长按" (core string `CYLMenuLongPress`).
+ */
+@property (nonatomic, copy, nullable) NSString *longPressAccessibilityActionName;
+/*!
+ * The hint of every tag view, such as "轻点两下改变方向" in edit mode. nil by default.
+ */
+@property (nonatomic, copy, nullable) NSString *tagAccessibilityHint;
+/*!
+ * How far one 上移 / 下移 / 左移 / 右移 action moves the group, as a fraction of the view. 0.05 by default.
+ */
+@property (nonatomic, assign) CGFloat accessibilityMoveStep;
 
 #pragma mark Geometry (TagGroupUtils)
 /*!

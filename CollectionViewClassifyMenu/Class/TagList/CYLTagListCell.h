@@ -28,6 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
  * Called when the delete indicator is tapped (or the VoiceOver action is used).
  */
 @property (nonatomic, copy, nullable) void (^deleteHandler)(void);
+/*!
+ * Custom actions after 删除 (the list's long-press and 前移 / 后移 actions); reset on reuse.
+ */
+@property (nonatomic, copy, nullable) NSArray<UIAccessibilityCustomAction *> *additionalAccessibilityActions;
 
 /*!
  * Plays CYLMenuStyle's touch ripple (rippleColor) from `point`, in the tag's coordinates; a touch plays it too.

@@ -6,6 +6,7 @@
 //
 
 #import "CYLImageTagGroupView.h"
+#import "CYLMenuResources.h"
 
 const CGFloat CYLImageTagGroupDefaultCircleRadius = 8;
 const CGFloat CYLImageTagGroupDefaultCircleInnerRadius = 4;
@@ -96,7 +97,10 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
         _contentInsets = UIEdgeInsetsMake(4, 12, 4, 12);
         _tagDirection = CYLImageTagDirectionRightCenter;
         self.textColor = [UIColor whiteColor];
-        self.font = [UIFont systemFontOfSize:13];
+        // 13 pt at the default text size, scaled with Dynamic Type.
+        self.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleFootnote] scaledFontForFont:[UIFont systemFontOfSize:13]];
+        self.adjustsFontForContentSizeCategory = YES;
+        self.numberOfLines = 0;
         self.layer.shadowColor = [UIColor blackColor].CGColor;
         self.layer.shadowOpacity = 1;
         self.layer.shadowRadius = 3.5;
@@ -112,8 +116,11 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
 }
 
 - (CGSize)sizeThatFits:(CGSize)size {
-    CGSize text = [super sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
-    return CGSizeMake(ceil(text.width + self.contentInsets.left + self.contentInsets.right),
+    // One line when it fits; wrapped to `size.width` otherwise (long titles, large Dynamic Type sizes).
+    CGFloat horizontal = self.contentInsets.left + self.contentInsets.right;
+    CGFloat maximum = size.width > horizontal ? size.width - horizontal : CGFLOAT_MAX;
+    CGSize text = [super sizeThatFits:CGSizeMake(maximum, CGFLOAT_MAX)];
+    return CGSizeMake(ceil(MIN(text.width, maximum) + horizontal),
                       ceil(text.height + self.contentInsets.top + self.contentInsets.bottom));
 }
 
@@ -187,7 +194,33 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
 
 #pragma mark - Group
 
+#pragma mark - Circle element
+
+/// The dot as an accessibility element: its frame follows the dot, activating it taps the dot.
+@interface CYLImageTagCircleElement : UIAccessibilityElement
+@property (nonatomic, weak) CYLImageTagGroupView *groupView;
+@end
+
+@interface CYLImageTagGroupView (CYLAccessibilityPrivate)
+- (CGRect)cyl_circleAccessibilityFrame;
+- (void)cyl_reportCircleTap;
+@end
+
+@implementation CYLImageTagCircleElement
+
+- (CGRect)accessibilityFrameInContainerSpace {
+    return [self.groupView cyl_circleAccessibilityFrame];
+}
+
+- (BOOL)accessibilityActivate {
+    [self.groupView cyl_reportCircleTap];
+    return YES;
+}
+
+@end
+
 @interface CYLImageTagGroupView ()
+@property (nonatomic, strong, readwrite) UIAccessibilityElement *circleAccessibilityElement;
 @property (nonatomic, strong) NSMutableArray<UIView<CYLImageTagItem> *> *itemViews;
 @property (nonatomic, strong) NSMutableArray<CAShapeLayer *> *lineLayers;
 @property (nonatomic, strong) CAShapeLayer *outerCircleLayer;
@@ -198,6 +231,9 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
 @property (nonatomic, strong, nullable) CADisplayLink *displayLink;
 @property (nonatomic, copy, nullable) void (^displayStep)(CFTimeInterval now);
 @property (nonatomic, assign) CGPoint dragOffset;
+/// The distances of the last layout: at least the tallest tag, so that tags in neighboring directions never overlap.
+@property (nonatomic, assign) CGFloat layoutVerticalDistance;
+@property (nonatomic, assign) CGFloat layoutTiltDistance;
 @end
 
 @implementation CYLImageTagGroupView
@@ -237,6 +273,11 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
     _itemViews = [NSMutableArray array];
     _lineLayers = [NSMutableArray array];
     _percentPosition = CGPointMake(0.5, 0.5);
+    _accessibilityMoveStep = 0.05;
+    CYLImageTagCircleElement *circle = [[CYLImageTagCircleElement alloc] initWithAccessibilityContainer:self];
+    circle.groupView = self;
+    circle.accessibilityTraits = UIAccessibilityTraitButton;
+    _circleAccessibilityElement = circle;
     self.backgroundColor = [UIColor clearColor];
     _outerCircleLayer = [CAShapeLayer layer];
     _innerCircleLayer = [CAShapeLayer layer];
@@ -342,6 +383,7 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
             CYLImageTag *tag = self.tags[index];
             CYLImageTagLabel *label = [[CYLImageTagLabel alloc] initWithFrame:CGRectZero];
             label.text = tag.title;
+            label.accessibilityLabel = tag.title;
             label.tagDirection = tag.direction;
             if (self.tagLabelConfiguration) {
                 self.tagLabelConfiguration(label, tag);
@@ -352,9 +394,13 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
             continue;
         }
         view.alpha = self.tagAlpha;
+        if (self.tagAccessibilityHint) {
+            view.accessibilityHint = self.tagAccessibilityHint;
+        }
         [self addSubview:view];
         [self.itemViews addObject:view];
     }
+    [self cyl_updateAccessibility];
     [self setNeedsLayout];
 }
 
@@ -362,7 +408,14 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
 
 - (UIEdgeInsets)tagSpaceUsedForSizes:(NSArray<NSValue *> *)sizes {
     __block CGFloat left = self.circleRadius, top = self.circleRadius, right = self.circleRadius, bottom = self.circleRadius;
-    CGFloat v = self.verticalDistance, t = self.tiltDistance;
+    CGFloat tallest = 0;
+    for (NSValue *size in sizes) {
+        tallest = MAX(tallest, size.CGSizeValue.height);
+    }
+    // Grown only when a tag is taller than the vertical distance (large text); the tilt grows by the same amount.
+    CGFloat v = MAX(self.verticalDistance, tallest), t = self.tiltDistance + (v - self.verticalDistance);
+    self.layoutVerticalDistance = v;
+    self.layoutTiltDistance = t;
     [self.itemViews enumerateObjectsUsingBlock:^(UIView<CYLImageTagItem> *view, NSUInteger index, BOOL *stop) {
         CGSize size = sizes[index].CGSizeValue;
         switch (view.tagDirection) {
@@ -385,7 +438,9 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
 - (NSArray<NSValue *> *)cyl_itemSizes {
     NSMutableArray<NSValue *> *sizes = [NSMutableArray arrayWithCapacity:self.itemViews.count];
     for (UIView *view in self.itemViews) {
-        [sizes addObject:[NSValue valueWithCGSize:[view sizeThatFits:self.bounds.size]]];
+        // A tag never needs more than the width beside the dot.
+        CGFloat width = MAX(44, CGRectGetWidth(self.bounds) - 2 * self.circleRadius - self.tiltDistance);
+        [sizes addObject:[NSValue valueWithCGSize:[view sizeThatFits:CGSizeMake(width, CGFLOAT_MAX)]]];
     }
     return sizes;
 }
@@ -395,7 +450,8 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
 }
 
 - (CGPoint)originForTagOfSize:(CGSize)size direction:(CYLImageTagDirection)direction {
-    CGFloat cx = self.centerPoint.x, cy = self.centerPoint.y, v = self.verticalDistance, t = self.tiltDistance;
+    CGFloat cx = self.centerPoint.x, cy = self.centerPoint.y;
+    CGFloat v = MAX(self.verticalDistance, self.layoutVerticalDistance), t = MAX(self.tiltDistance, self.layoutTiltDistance);
     switch (direction) {
         case CYLImageTagDirectionRightTopStraight: return CGPointMake(cx + t, cy - t - size.height);
         case CYLImageTagDirectionRightTop: return CGPointMake(cx, cy - v - size.height);
@@ -471,6 +527,115 @@ static BOOL CYLImageTagDirectionIsLeft(CYLImageTagDirection direction) {
     self.outerCircleLayer.fillColor = self.circleColor.CGColor;
     self.innerCircleLayer.path = [UIBezierPath bezierPathWithArcCenter:c radius:self.circleInnerRadius startAngle:0 endAngle:2 * M_PI clockwise:YES].CGPath;
     self.innerCircleLayer.fillColor = self.circleInnerColor.CGColor;
+}
+
+#pragma mark Accessibility
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory]) {
+        [self setNeedsLayout];
+    }
+}
+
+- (NSArray *)accessibilityElements {
+    if (self.groupHidden) {
+        return @[];
+    }
+    NSMutableArray *elements = [NSMutableArray arrayWithObject:self.circleAccessibilityElement];
+    if (self.tagAlpha > 0) {
+        [elements addObjectsFromArray:self.itemViews];
+    }
+    return elements;
+}
+
+- (CGRect)cyl_circleAccessibilityFrame {
+    CGFloat radius = MAX(self.circleRadius * 2, 22);
+    return CGRectMake(self.centerPoint.x - radius, self.centerPoint.y - radius, 2 * radius, 2 * radius);
+}
+
+- (void)cyl_reportCircleTap {
+    if ([self.delegate respondsToSelector:@selector(groupViewDidTapCircle:)]) {
+        [self.delegate groupViewDidTapCircle:self];
+    }
+}
+
+- (void)setDelegate:(id<CYLImageTagGroupViewDelegate>)delegate {
+    _delegate = delegate;
+    [self cyl_updateAccessibility];
+}
+
+- (void)setDraggable:(BOOL)draggable {
+    _draggable = draggable;
+    [self cyl_updateAccessibility];
+}
+
+- (void)setLongPressAccessibilityActionName:(NSString *)name {
+    _longPressAccessibilityActionName = [name copy];
+    [self cyl_updateAccessibility];
+}
+
+- (void)setTagAccessibilityHint:(NSString *)hint {
+    _tagAccessibilityHint = [hint copy];
+    for (UIView *view in self.itemViews) {
+        view.accessibilityHint = hint;
+    }
+}
+
+/// The dot's label ("标签组：<titles>") and its custom actions.
+- (void)cyl_updateAccessibility {
+    NSMutableArray<NSString *> *titles = [NSMutableArray array];
+    for (UIView *view in self.itemViews) {
+        // A data source's label view may rely on its text.
+        NSString *title = view.accessibilityLabel.length > 0 ? view.accessibilityLabel
+            : ([view isKindOfClass:[UILabel class]] ? ((UILabel *)view).text : nil);
+        if (title.length > 0) {
+            [titles addObject:title];
+        }
+    }
+    NSListFormatter *list = [[NSListFormatter alloc] init];
+    list.locale = [NSLocale localeWithLocaleIdentifier:[CYLMenuResources currentLanguage]];
+    NSString *joined = [list stringFromItems:titles] ?: @"";
+    self.circleAccessibilityElement.accessibilityLabel =
+        [NSString stringWithFormat:CYLMenuLocalizedString(@"CYLImageTagGroup", @"The dot of a tag group; %@ is the list of its tags"), joined];
+
+    NSMutableArray<UIAccessibilityCustomAction *> *actions = [NSMutableArray array];
+    __weak __typeof(self) weakSelf = self;
+    if ([self.delegate respondsToSelector:@selector(groupViewDidLongPress:)]) {
+        NSString *name = self.longPressAccessibilityActionName.length > 0 ? self.longPressAccessibilityActionName
+            : CYLMenuLocalizedString(@"CYLMenuLongPress", @"Does what a long press does");
+        [actions addObject:[[UIAccessibilityCustomAction alloc] initWithName:name actionHandler:^BOOL(UIAccessibilityCustomAction *action) {
+            [weakSelf.delegate groupViewDidLongPress:weakSelf];
+            return YES;
+        }]];
+    }
+    if (self.draggable) {
+        NSArray *moves = @[@[@"CYLImageTagMoveUp", @0, @-1], @[@"CYLImageTagMoveDown", @0, @1],
+                           @[@"CYLImageTagMoveLeft", @-1, @0], @[@"CYLImageTagMoveRight", @1, @0]];
+        for (NSArray *move in moves) {
+            CGFloat dx = [move[1] doubleValue], dy = [move[2] doubleValue];
+            [actions addObject:[[UIAccessibilityCustomAction alloc] initWithName:CYLMenuLocalizedStringForKey(move[0])
+                                                                   actionHandler:^BOOL(UIAccessibilityCustomAction *action) {
+                return [weakSelf cyl_accessibilityMoveByX:dx y:dy];
+            }]];
+        }
+    }
+    self.circleAccessibilityElement.accessibilityCustomActions = actions;
+}
+
+/// 上移 / 下移 / 左移 / 右移: a drag by `accessibilityMoveStep`.
+- (BOOL)cyl_accessibilityMoveByX:(CGFloat)dx y:(CGFloat)dy {
+    CGPoint old = self.percentPosition;
+    self.percentPosition = CGPointMake(old.x + dx * self.accessibilityMoveStep, old.y + dy * self.accessibilityMoveStep);
+    if (CGPointEqualToPoint(old, self.percentPosition)) {
+        return NO;
+    }
+    [self layoutIfNeeded];
+    if ([self.delegate respondsToSelector:@selector(groupView:didDragToPercentPosition:)]) {
+        [self.delegate groupView:self didDragToPercentPosition:self.percentPosition];
+    }
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.circleAccessibilityElement);
+    return YES;
 }
 
 #pragma mark Touches

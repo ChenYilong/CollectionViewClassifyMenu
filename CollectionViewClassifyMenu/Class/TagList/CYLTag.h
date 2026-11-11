@@ -86,6 +86,11 @@ FOUNDATION_EXTERN const CGFloat CYLTagUseListValue;
 @property (nonatomic, copy, nullable) NSString *badgeText;
 @property (nonatomic, strong, nullable) UIColor *badgeColor;
 /*!
+ * What VoiceOver reads for the badge, after the title (the tag's value), when the badge's glyph alone does not say
+ * it, such as "热门" for "热". nil: `badgeText`.
+ */
+@property (nonatomic, copy, nullable) NSString *badgeAccessibilityLabel;
+/*!
  * A round badge image: `text` in white on a `color` circle `diameter` points wide (rendered as original).
  */
 + (UIImage *)badgeImageWithText:(NSString *)text color:(UIColor *)color diameter:(CGFloat)diameter;
