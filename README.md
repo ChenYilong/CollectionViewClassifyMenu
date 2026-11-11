@@ -409,6 +409,20 @@ SQL 只用于展示。
 `CYLExampleMenuSource` shows how a host turns its own models into a
 `CYLMenuDataSource`; the core library holds no business data.
 
+截图来自 CI（`Example screenshots`，提交 `fc01fa7`，iPhone 模拟器）：
+
+| 场景一：商品页预览 | 场景一：评价筛选（展开） | 场景二：搜索首页 | 场景二：职位分类 |
+| --- | --- | --- | --- |
+| <img src="assets/scenario1-product-preview.png" width="200" alt="场景一：商品页预览"> | <img src="assets/scenario1-review-filter.png" width="200" alt="场景一：评价筛选（展开）"> | <img src="assets/scenario2-search-home.png" width="200" alt="场景二：搜索首页"> | <img src="assets/scenario2-search-jobs.png" width="200" alt="场景二：职位分类"> |
+
+| 查询筛选（PlusButton） | 评价筛选 · 数据库 | 菜单选择 · 数据库联动 | 配置初始化 |
+| --- | --- | --- | --- |
+| <img src="assets/plus-query-scenarios.png" width="200" alt="查询筛选（PlusButton）"> | <img src="assets/plus-review-filter-database.png" width="200" alt="评价筛选 · 数据库"> | <img src="assets/plus-menu-database.png" width="200" alt="菜单选择 · 数据库联动"> | <img src="assets/tag-configuration.png" width="200" alt="配置初始化"> |
+
+| 标签样式 | Tag styles (English) | 动效图标 |
+| --- | --- | --- |
+| <img src="assets/tag-styles.png" width="200" alt="标签样式"> | <img src="assets/tag-styles-english.png" width="200" alt="Tag styles (English)"> | <img src="assets/tag-animations.png" width="200" alt="动效图标"> |
+
 ### Swift Example / 纯 Swift 示例：新建标签
 
 `Example-Swift/`（`CYLTagEditorExample`）是纯 Swift 编写的示例，同样通过 Podfile 以本地路径集成核心库
@@ -441,6 +455,10 @@ open CYLTagEditorExample.xcworkspace
 ```
 
 CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成其截图（`swift-<页面>.png`）。
+
+| 编辑备注 | 编辑标签 | 搜索并新建标签 | 折叠样式 | 配置文件创建 |
+| --- | --- | --- | --- | --- |
+| <img src="assets/swift-remark.png" width="200" alt="编辑备注"> | <img src="assets/swift-tag-editor.png" width="200" alt="编辑标签"> | <img src="assets/swift-tag-editor-search.png" width="200" alt="搜索并新建标签"> | <img src="assets/swift-fold-styles.png" width="200" alt="折叠样式"> | <img src="assets/swift-fold-styles-config.png" width="200" alt="配置文件创建"> |
 
 ### Naming migration / 命名迁移
 
