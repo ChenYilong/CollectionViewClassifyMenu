@@ -1331,9 +1331,13 @@ final class CYLMenuExampleTests: XCTestCase {
         }
         scenarios.loadViewIfNeeded()
         XCTAssertNil(scenarios.title, "navigationItem.title only: the tab keeps its title")
-        XCTAssertEqual(scenarios.tableView.numberOfSections, 3)
+        // Query parameters, menu selection, search history + discover, then the database.
+        XCTAssertEqual(scenarios.tableView.numberOfSections, 4)
         XCTAssertEqual(scenarios.tableView.numberOfRows(inSection: 0), 3)
         XCTAssertEqual(scenarios.tableView.numberOfRows(inSection: 1), 1)
+        XCTAssertEqual(scenarios.tableView.numberOfRows(inSection: 2), 1)
+        XCTAssertEqual(scenarios.tableView.numberOfRows(inSection: CYLQueryScenariosViewController.databaseSection), 3)
+        XCTAssertTrue(scenarios.viewController(for: .searchDiscover) is CYLSearchDiscoverViewController)
         let reviews = scenarios.viewController(for: .reviewsDatabase) as? CYLReviewListViewController
         XCTAssertNotNil(reviews)
         XCTAssertEqual(reviews?.mode, .database)
@@ -1473,7 +1477,10 @@ final class CYLMenuExampleTests: XCTestCase {
     }
 
     func testInlineFoldCellIsTheLastTagAndTogglesTheSection() {
-        let view = hostedView(source: makeSource(itemCount: 14, sections: 1), width: 320)
+        // The data source is weak: keep it for the whole test.
+        let source = makeSource(itemCount: 14, sections: 1)
+        defer { withExtendedLifetime(source) {} }
+        let view = hostedView(source: source, width: 320)
         let delegate = CYLRecordingDelegate()
         view.menuDelegate = delegate
         view.foldControl = CYLMenuFoldControl(position: .inline, content: .icon)
@@ -1515,7 +1522,9 @@ final class CYLMenuExampleTests: XCTestCase {
     }
 
     func testInlineFoldCellIsHiddenWhenEverythingFits() {
-        let view = hostedView(source: makeSource(itemCount: 2, sections: 1), width: 390)
+        let source = makeSource(itemCount: 2, sections: 1)
+        defer { withExtendedLifetime(source) {} }
+        let view = hostedView(source: source, width: 390)
         view.foldControl = CYLMenuFoldControl(position: .inline, content: .icon)
         view.defaultVisibleRows = 2
         view.reloadMenuData()
@@ -1528,6 +1537,7 @@ final class CYLMenuExampleTests: XCTestCase {
         let source = CYLExampleMenuSource(sections: [CYLExampleMenuSection(title: "发现", titles: [
             "短", "一个非常非常非常长的、肯定放不下的发现标题", "番茄工作法", "空气炸锅食谱",
         ])])
+        defer { withExtendedLifetime(source) {} }
         let view = hostedView(source: source, width: 390)
         view.style = CYLMenuStyle.gridStyle(itemsPerRow: 2)
         view.selectionMode = .none

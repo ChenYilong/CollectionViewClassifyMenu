@@ -1,5 +1,5 @@
 {
-  "comment": "Sample data of the search history and discover demo (CYLSearchDiscoverViewController): recent searches, and a pool of discover topics (icon "hot" adds the 热 icon after the title); the More button shows another random selection of discoverCount topics. Sample data is not translated.",
+  "comment": "Sample data of the search history and discover demo (CYLSearchDiscoverViewController): recent searches, and a pool of discover topics (icon 'hot' adds the 热 icon after the title); the More button shows another random selection of discoverCount topics. Sample data is not translated.",
   "version": 1,
   "discoverCount": 6,
   "recentSearches": [
