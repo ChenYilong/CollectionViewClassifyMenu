@@ -55,7 +55,8 @@ static CGFloat const kCYLTagFoldButtonHeight = 28;
 + (CYLMenuStyle *)cyl_inlineStyleForFoldControl:(CYLMenuFoldControl *)control itemStyle:(CYLMenuStyle *)itemStyle {
     CYLMenuStyle *style = [itemStyle copy];
     CYLTagAppearance *normal = itemStyle.normalAppearance;
-    UIColor *tint = control.color ?: normal.iconColor ?: normal.textColor;
+    // The same color as the other fold controls (CYLMenuStyle.foldControlColor), lighter than the tags' titles.
+    UIColor *tint = control.color ?: itemStyle.foldControlColor ?: normal.textColor;
     for (NSNumber *state in @[@(UIControlStateSelected), @(UIControlStateDisabled)]) {
         CYLTagAppearance *appearance = [style appearanceForState:state.unsignedIntegerValue];
         appearance.backgroundColor = normal.backgroundColor;

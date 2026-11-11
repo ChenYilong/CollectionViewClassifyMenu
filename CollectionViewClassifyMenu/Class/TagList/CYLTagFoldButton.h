@@ -30,7 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * The inline fold control (CYLMenuFoldControlPositionInline): the same content as
  * -applyFoldControl:color:expanded:animated:, drawn like the tags of `itemStyle` (its normal look, outlined), so it
- * reads as the last tag. An icon-only control is a circle.
+ * reads as the last tag; its icon and title take the control's color, else `itemStyle.foldControlColor`, like the other
+ * fold controls. An icon-only control is a circle.
  */
 - (void)applyInlineFoldControl:(CYLMenuFoldControl *)foldControl
                      itemStyle:(CYLMenuStyle *)itemStyle
