@@ -96,6 +96,19 @@ verify the behavior and update the applicable documentation.
 - If this project is CYLTabBarController itself, depend on it locally instead:
   `pod 'CYLTabBarController', :path => '<relative path to the folder that holds
   CYLTabBarController.podspec>'`. Every other project uses the commit.
+- Default integration in the examples (unless a request says otherwise):
+  this project integrates CYLTabBarController by default, and every
+  CYLTabBarController at the example level is the version **with a
+  PlusButton that has a `plusChildViewController`** (the plus button selects
+  a page of its own), **created from a local configuration file** in the
+  example's bundle: `CYLTabBarController(configurationFile:)` /
+  `+tabBarControllerWithConfigurationFile:error:`, with the tabs in
+  `CYLTabBarControllerTabBarItemsAttributes`, the plus button in
+  `CYLTabBarControllerPlusButton` (its page through
+  `CYLTabBarItemPageIdentifier`), pages registered in
+  `CYLTabBarPageRegistry`, and a `CYLTabBarControllerContext` of its own per
+  tab bar. Build a tab bar in code, or leave out the plus button, only when a
+  request asks for it. Details: `.agents/skills/cyl-dependency/`.
 - The core library does not depend on CYLTabBarController: it finds the
   animation engine (`CYLTabBarItemAnimationFactory`) and the configuration
   parser (`CYLTabBarConfigurationParser`) at runtime, because the published
