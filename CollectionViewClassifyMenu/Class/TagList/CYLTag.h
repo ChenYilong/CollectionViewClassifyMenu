@@ -24,6 +24,7 @@
 #import <UIKit/UIKit.h>
 #import "CYLMenuDataSource.h"
 #import "CYLMenuStyle.h"
+#import "CYLTagColors.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -79,6 +80,16 @@ FOUNDATION_EXTERN const CGFloat CYLTagUseListValue;
  */
 @property (nonatomic, assign, getter=isDeletable) BOOL deletable;
 /*!
+ * A round badge before the title with this text, e.g. "热" or "神" in a search app's hot list; drawn in `badgeColor`
+ * (the title color by default) with white text, when the tag has no `image`.
+ */
+@property (nonatomic, copy, nullable) NSString *badgeText;
+@property (nonatomic, strong, nullable) UIColor *badgeColor;
+/*!
+ * A round badge image: `text` in white on a `color` circle `diameter` points wide (rendered as original).
+ */
++ (UIImage *)badgeImageWithText:(NSString *)text color:(UIColor *)color diameter:(CGFloat)diameter;
+/*!
  * Anything the host wants to keep with the tag.
  */
 @property (nonatomic, strong, nullable) id userInfo;
@@ -106,6 +117,15 @@ FOUNDATION_EXTERN const CGFloat CYLTagUseListValue;
  */
 @property (nonatomic, strong, nullable) UIColor *backgroundColor;
 @property (nonatomic, strong, nullable) UIColor *highlightedBackgroundColor;
+/*!
+ * The background while selected (AndroidTagView's tagSelectedBackgroundColor); nil for the style's.
+ */
+@property (nonatomic, strong, nullable) UIColor *selectedBackgroundColor;
+/*!
+ * Sets backgroundColor, borderColor, textColor and selectedBackgroundColor at once (AndroidTagView's color array), or
+ * reads them.
+ */
+@property (nonatomic, copy, null_resettable) CYLTagColors *colors;
 /*!
  * Drawn behind the title, stretched (android-tagview's background); nil for none.
  */
@@ -161,6 +181,10 @@ FOUNDATION_EXTERN const CGFloat CYLTagUseListValue;
  */
 - (void)removeTagAtIndex:(NSUInteger)index;
 - (void)removeAllTags;
+/*!
+ * Moves a tag; out-of-range indexes are ignored.
+ */
+- (void)moveTagAtIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex;
 /*!
  * Builds every tag's style again; call it after changing a tag's look (CYLTagListView's -reloadMenuData does).
  */

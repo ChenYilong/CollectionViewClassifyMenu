@@ -48,6 +48,8 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 @property (nonatomic, strong, readwrite, nullable) id animationPlayer;
 @property (nonatomic, assign) CGSize animationViewSize;
 @property (nonatomic, strong) UIImageView *backgroundImageView;
+/// The cross of CYLMenuStyle.deleteIndicatorLineWidth.
+@property (nonatomic, strong) CAShapeLayer *crossLayer;
 @property (nonatomic, assign, readwrite) CGRect deleteIndicatorHitFrame;
 @end
 
@@ -77,6 +79,10 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         [self addSubview:_imageView];
         [self addSubview:_titleLabel];
         [self addSubview:_deleteIndicatorLabel];
+        _crossLayer = [CAShapeLayer layer];
+        _crossLayer.fillColor = nil;
+        _crossLayer.lineCap = kCALineCapRound;
+        [self.layer addSublayer:_crossLayer];
         self.layer.masksToBounds = YES;
     }
     return self;
@@ -235,7 +241,7 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     self.imageView.hidden = self.animationView != nil;
     self.animationView.alpha = state == UIControlStateDisabled ? 0.4 : 1;
     self.imageView.tintColor = [self.style iconColorForState:state];
-    self.titleLabel.text = self.title;
+    self.titleLabel.text = [self.style displayedTitleForTitle:self.title];
     self.titleLabel.font = [self.style titleFontForState:state traitCollection:self.traitCollection];
     self.titleLabel.textColor = appearance.textColor;
 
@@ -247,8 +253,18 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     self.layer.backgroundColor = background.CGColor;
     self.backgroundImageView.image = appearance.backgroundImage;
     self.backgroundImageView.hidden = appearance.backgroundImage == nil || (self.isHighlighted && self.style.highlightedBackgroundColor);
-    self.deleteIndicatorLabel.hidden = !self.showsDeleteIndicator;
-    self.deleteIndicatorLabel.text = self.showsDeleteIndicator ? self.style.deleteIndicatorTitle : nil;
+    BOOL drawsCross = self.style.deleteIndicatorLineWidth > 0;
+    self.deleteIndicatorLabel.hidden = !self.showsDeleteIndicator || drawsCross;
+    self.deleteIndicatorLabel.text = self.showsDeleteIndicator && !drawsCross ? self.style.deleteIndicatorTitle : nil;
+    self.crossLayer.hidden = !self.showsDeleteIndicator || !drawsCross;
+    self.crossLayer.lineWidth = self.style.deleteIndicatorLineWidth;
+    self.crossLayer.strokeColor = (self.style.deleteIndicatorColor ?: appearance.textColor).CGColor;
+    CGFloat imageRadius = self.style.imageCornerRadius;
+    self.imageView.layer.cornerRadius = imageRadius > 0 ? MIN(imageRadius, MIN(self.style.imageSize.width, self.style.imageSize.height) / 2) : 0;
+    self.imageView.layer.masksToBounds = imageRadius > 0;
+    if (imageRadius > 0) {
+        self.imageView.contentMode = UIViewContentModeScaleAspectFill;
+    }
     self.deleteIndicatorLabel.font = [self.style deleteIndicatorFontForState:state traitCollection:self.traitCollection];
     self.deleteIndicatorLabel.textColor = self.style.deleteIndicatorColor ?: appearance.textColor;
     UIColor *borderColor = appearance.borderColor;
@@ -289,12 +305,19 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 
 /// The delete indicator's width and the space before it, in a state.
 + (CGFloat)cyl_deleteIndicatorWidthForState:(UIControlState)state style:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
+    if (style.deleteIndicatorWidth > 0) {
+        return style.deleteIndicatorWidth;
+    }
     UIFont *font = [style deleteIndicatorFontForState:state traitCollection:traitCollection];
+    if (style.deleteIndicatorLineWidth > 0) {
+        return ceil(font.lineHeight * 0.75) + 2 * style.deleteIndicatorPadding;
+    }
     return ceil([style.deleteIndicatorTitle sizeWithAttributes:@{NSFontAttributeName: font}].width);
 }
 
 + (CGFloat)widthForTitle:(NSString *)title iconSize:(CGSize)iconSize showsDeleteIndicator:(BOOL)showsDeleteIndicator
                    style:(CYLMenuStyle *)style traitCollection:(UITraitCollection *)traitCollection {
+    title = [style displayedTitleForTitle:title];
     CGFloat width = 0;
     for (NSNumber *state in CYLTagButtonStates()) {
         UIControlState controlState = state.unsignedIntegerValue;
@@ -352,17 +375,39 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
     if (self.showsDeleteIndicator) {
         CGFloat indicatorWidth = [[self class] cyl_deleteIndicatorWidthForState:state style:style traitCollection:self.traitCollection];
         deleteWidth = indicatorWidth + style.imageTitleSpacing;
-        CGFloat indicatorX = MAX(insets.left, width - insets.right - indicatorWidth);
-        self.deleteIndicatorLabel.frame = CGRectMake(indicatorX, insets.top, indicatorWidth, MAX(0, height - insets.top - insets.bottom));
-        CGFloat hitX = MAX(0, indicatorX - style.imageTitleSpacing);
-        self.deleteIndicatorHitFrame = CGRectMake(hitX, 0, width - hitX, height);
+        BOOL leadingIndicator = style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacementLeading;
+        CGFloat indicatorX = leadingIndicator ? insets.left : MAX(insets.left, width - insets.right - indicatorWidth);
+        CGRect indicator = CGRectMake(indicatorX, insets.top, indicatorWidth, MAX(0, height - insets.top - insets.bottom));
+        self.deleteIndicatorLabel.frame = indicator;
+        if (leadingIndicator) {
+            CGFloat hitMaxX = MIN(width, CGRectGetMaxX(indicator) + style.imageTitleSpacing);
+            self.deleteIndicatorHitFrame = CGRectMake(0, 0, hitMaxX, height);
+        } else {
+            CGFloat hitX = MAX(0, indicatorX - style.imageTitleSpacing);
+            self.deleteIndicatorHitFrame = CGRectMake(hitX, 0, width - hitX, height);
+        }
+        // A drawn cross: a square centered in the area, inset by the padding.
+        CGFloat side = MAX(0, MIN(CGRectGetWidth(indicator), CGRectGetHeight(indicator)) - 2 * style.deleteIndicatorPadding);
+        if (style.deleteIndicatorLineWidth > 0 && style.deleteIndicatorWidth <= 0) {
+            side = MAX(0, CGRectGetWidth(indicator) - 2 * style.deleteIndicatorPadding);
+        }
+        CGRect square = CGRectMake(CGRectGetMidX(indicator) - side / 2, CGRectGetMidY(indicator) - side / 2, side, side);
+        UIBezierPath *cross = [UIBezierPath bezierPath];
+        [cross moveToPoint:square.origin];
+        [cross addLineToPoint:CGPointMake(CGRectGetMaxX(square), CGRectGetMaxY(square))];
+        [cross moveToPoint:CGPointMake(CGRectGetMaxX(square), CGRectGetMinY(square))];
+        [cross addLineToPoint:CGPointMake(CGRectGetMinX(square), CGRectGetMaxY(square))];
+        self.crossLayer.frame = self.bounds;
+        self.crossLayer.path = cross.CGPath;
     } else {
         self.deleteIndicatorLabel.frame = CGRectZero;
         self.deleteIndicatorHitFrame = CGRectZero;
+        self.crossLayer.path = nil;
     }
+    BOOL indicatorFirst = self.showsDeleteIndicator && style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacementLeading;
     // The leading margin; `trailing` is the space after the content (the right inset and the delete indicator).
-    CGFloat margin = insets.left;
-    CGFloat trailing = insets.right + deleteWidth;
+    CGFloat margin = insets.left + (indicatorFirst ? deleteWidth : 0);
+    CGFloat trailing = insets.right + (indicatorFirst ? 0 : deleteWidth);
     CGFloat contentTop = insets.top;
     CGFloat contentHeight = MAX(0, height - insets.top - insets.bottom);
     width -= trailing - margin;

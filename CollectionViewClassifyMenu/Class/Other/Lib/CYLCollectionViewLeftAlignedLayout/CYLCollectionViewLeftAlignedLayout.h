@@ -27,6 +27,10 @@
 #import <UIKit/UIKit.h>
 
 @interface CYLCollectionViewLeftAlignedLayout : UICollectionViewFlowLayout
+/*!
+ * 0 leading (the default), 1 centered, 2 trailing (CYLTagRowAlignment).
+ */
+@property (nonatomic, assign) NSInteger rowAlignment;
 
 @end
 

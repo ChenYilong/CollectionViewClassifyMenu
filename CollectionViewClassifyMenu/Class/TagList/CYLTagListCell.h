@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) void (^deleteHandler)(void);
 
 /*!
+ * Plays CYLMenuStyle's touch ripple (rippleColor) from `point`, in the tag's coordinates; a touch plays it too.
+ */
+- (void)showRippleAtPoint:(CGPoint)point;
+
+/*!
  * Shows a tag: its title (also its accessibility label), icons, look and state. An icon's accessibilityLabel, when
  * it has one (such as a "hot" icon), is read by VoiceOver as the tag's value.
  */

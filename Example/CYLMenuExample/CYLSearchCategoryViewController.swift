@@ -9,6 +9,7 @@
 import UIKit
 import CollectionViewClassifyMenu
 import CYLTabBarController
+import CYLSearchViewController
 
 @objc enum CYLSearchCategory: Int {
     case people = 0
@@ -60,7 +61,7 @@ final class CYLSearchCategoryPageViewController: UIViewController {
 
 final class CYLSearchCategoryViewController: UIViewController {
 
-    private(set) var searchBar = UISearchBar()
+    private(set) var searchBar = CYLSearchBarView()
     /// The category tabs: a CYLTabBarController embedded in this screen, its bar at the bottom.
     private(set) var categoryTabBarController: CYLTabBarController!
     private(set) var jobCategoryTableView = UITableView(frame: .zero, style: .plain)
@@ -145,7 +146,9 @@ final class CYLSearchCategoryViewController: UIViewController {
         view.backgroundColor = .systemBackground
 
         searchBar.delegate = self
-        searchBar.searchBarStyle = .minimal
+        // A navigation bar title view: the field fills the bar's height, no extra insets.
+        searchBar.contentInsets = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0)
+        searchBar.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 44)
         navigationItem.titleView = searchBar
 
         jobCategoryTableView.dataSource = self
@@ -327,11 +330,11 @@ extension CYLSearchCategoryViewController: UITableViewDataSource, UITableViewDel
     }
 }
 
-// MARK: - UISearchBarDelegate
+// MARK: - CYLSearchBarViewDelegate
 
-extension CYLSearchCategoryViewController: UISearchBarDelegate {
+extension CYLSearchCategoryViewController: CYLSearchBarViewDelegate {
 
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
+    func searchBarViewSearchButtonClicked(_ searchBarView: CYLSearchBarView) {
+        searchBarView.textField.resignFirstResponder()
     }
 }

@@ -32,6 +32,46 @@
     return self;
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+    [self showRippleAtPoint:[touches.anyObject locationInView:self.button]];
+}
+
+- (void)showRippleAtPoint:(CGPoint)point {
+    CYLMenuStyle *style = self.button.style;
+    if (!style.rippleColor || UIAccessibilityIsReduceMotionEnabled()) {
+        return;
+    }
+    // AndroidTagView's ripple: a circle from the touch point to the farthest corner, fading out.
+    CGRect bounds = self.button.bounds;
+    CGFloat dx = MAX(point.x, CGRectGetWidth(bounds) - point.x);
+    CGFloat dy = MAX(point.y, CGRectGetHeight(bounds) - point.y);
+    CGFloat radius = sqrt(dx * dx + dy * dy);
+    CAShapeLayer *ripple = [CAShapeLayer layer];
+    ripple.name = @"CYLTagRipple";
+    ripple.frame = CGRectMake(point.x - radius, point.y - radius, 2 * radius, 2 * radius);
+    ripple.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, 2 * radius, 2 * radius)].CGPath;
+    ripple.fillColor = style.rippleColor.CGColor;
+    ripple.opacity = 0;
+    [self.button.layer addSublayer:ripple];
+    CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    scale.fromValue = @0.05;
+    scale.toValue = @1;
+    CABasicAnimation *fade = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    fade.fromValue = @(MIN(1, MAX(0, style.rippleAlpha)));
+    fade.toValue = @0;
+    CAAnimationGroup *group = [CAAnimationGroup animation];
+    group.animations = @[scale, fade];
+    group.duration = style.rippleDuration > 0 ? style.rippleDuration : 1;
+    group.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    [CATransaction begin];
+    [CATransaction setCompletionBlock:^{
+        [ripple removeFromSuperlayer];
+    }];
+    [ripple addAnimation:group forKey:@"ripple"];
+    [CATransaction commit];
+}
+
 - (void)setHighlighted:(BOOL)highlighted {
     [super setHighlighted:highlighted];
     // Pressed: CYLMenuStyle.highlightedBackgroundColor.

@@ -67,6 +67,20 @@
     for (NSValue *previous in previousFrames) {
         x += CGRectGetWidth(previous.CGRectValue) + spacing;
     }
+    if (self.rowAlignment != 0) {
+        // Centered or trailing: the row's width, with the items after this one.
+        CGFloat rowWidth = x + CGRectGetWidth(frame) - inset.left;
+        NSInteger count = [self.collectionView numberOfItemsInSection:section];
+        for (NSInteger item = indexPath.item + 1; item < count; item++) {
+            UICollectionViewLayoutAttributes *next = [super layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]];
+            if (!next || !CGRectIntersectsRect(next.frame, row)) {
+                break;
+            }
+            rowWidth += spacing + CGRectGetWidth(next.frame);
+        }
+        CGFloat free = MAX(0, width - rowWidth);
+        x += self.rowAlignment == 1 ? floor(free / 2) : free;
+    }
     frame.origin.x = x;
     attributes.frame = frame;
     return attributes;

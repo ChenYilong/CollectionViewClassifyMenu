@@ -12,6 +12,7 @@
 
 import UIKit
 import CollectionViewClassifyMenu
+import CYLSearchViewController
 
 /**
  * The recent searches, one section.
@@ -104,14 +105,17 @@ final class CYLSearchDiscoverViewController: UIViewController {
     var randomGenerator = CYLAnyRandomNumberGenerator(SystemRandomNumberGenerator())
 
     let backButton = UIButton(type: .system)
-    let searchField = UITextField()
+    /**
+     * The search bar (CYLSearchViewController's CYLSearchBarView) and its text field.
+     */
+    let searchBar = CYLSearchBarView()
+    var searchField: UITextField { searchBar.textField }
     let cameraButton = UIButton(type: .system)
     let searchButton = UIButton(type: .system)
     let recentList = CYLTagListView(foldControl: CYLMenuFoldControl(position: .inline, content: .icon))
     let discoverList = CYLTagListView()
     let hintLabel = UILabel()
     let micButton = UIButton(type: .system)
-    private let searchBar = UIView()
     private let scrollView = UIScrollView()
     private let stackView = UIStackView()
     private let bottomView = CYLAskBackgroundView()
@@ -214,8 +218,8 @@ final class CYLSearchDiscoverViewController: UIViewController {
     func updateLayerColors() {
         let contrast = UIAccessibility.isDarkerSystemColorsEnabled
         let border = contrast ? UIColor.label : UIColor.separator
-        searchBar.layer.borderColor = border.resolvedColor(with: traitCollection).cgColor
-        searchBar.layer.borderWidth = contrast ? 2 : 1
+        searchBar.fieldBorderColor = border
+        searchBar.fieldBorderWidth = contrast ? 2 : 1
         micButton.layer.borderColor = border.resolvedColor(with: traitCollection).cgColor
         micButton.layer.borderWidth = contrast ? 2 : 0
     }
@@ -247,20 +251,17 @@ final class CYLSearchDiscoverViewController: UIViewController {
         backButton.accessibilityLabel = CYLExampleLocalizedString("返回")
         backButton.addTarget(self, action: #selector(goBack), for: .touchUpInside)
 
-        searchBar.backgroundColor = .systemBackground
-        searchBar.layer.cornerRadius = 22
-        searchBar.layer.shadowColor = UIColor.black.cgColor
-        searchBar.layer.shadowOpacity = 0.06
-        searchBar.layer.shadowRadius = 6
-        searchBar.layer.shadowOffset = CGSize(width: 0, height: 2)
-
-        searchField.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: .systemFont(ofSize: 16))
-        searchField.adjustsFontForContentSizeCategory = true
-        searchField.returnKeyType = .search
-        searchField.clearButtonMode = .whileEditing
+        // A white capsule with a soft shadow, no magnifier: the camera and the 搜索 button sit inside it.
+        searchBar.delegate = self
+        searchBar.searchIcon = nil
+        searchBar.contentInsets = .zero
+        searchBar.fieldHeight = 46
+        searchBar.fieldCornerRadius = 22
+        searchBar.fieldBackgroundColor = .systemBackground
+        searchBar.fieldShadowOpacity = 0.06
+        searchBar.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: .systemFont(ofSize: 16))
         searchField.accessibilityLabel = CYLExampleLocalizedString("搜索")
         searchField.accessibilityIdentifier = "CYLSearchDiscoverField"
-        searchField.delegate = self
 
         cameraButton.setImage(UIImage(systemName: "camera.viewfinder", withConfiguration: UIImage.SymbolConfiguration(pointSize: 19, weight: .regular)), for: .normal)
         cameraButton.tintColor = .label
@@ -269,7 +270,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
         showsLargeContent(cameraButton)
         showsLargeContent(backButton)
 
-        let divider = UIView()
+        let divider = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 18))
         divider.backgroundColor = .separator
         divider.isAccessibilityElement = false
 
@@ -280,28 +281,12 @@ final class CYLSearchDiscoverViewController: UIViewController {
         searchButton.accessibilityIdentifier = "CYLSearchDiscoverSearchButton"
         searchButton.addTarget(self, action: #selector(searchTapped), for: .touchUpInside)
 
-        for subview in [searchField, cameraButton, divider, searchButton] as [UIView] {
-            subview.translatesAutoresizingMaskIntoConstraints = false
-            searchBar.addSubview(subview)
-        }
-        searchButton.setContentHuggingPriority(.required, for: .horizontal)
-        searchButton.setContentCompressionResistancePriority(.required, for: .horizontal)
-        NSLayoutConstraint.activate([
-            searchField.leadingAnchor.constraint(equalTo: searchBar.leadingAnchor, constant: 14),
-            searchField.topAnchor.constraint(equalTo: searchBar.topAnchor),
-            searchField.bottomAnchor.constraint(equalTo: searchBar.bottomAnchor),
-            cameraButton.leadingAnchor.constraint(equalTo: searchField.trailingAnchor, constant: 4),
-            cameraButton.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
-            cameraButton.widthAnchor.constraint(equalToConstant: 36),
-            cameraButton.heightAnchor.constraint(equalToConstant: 36),
-            divider.leadingAnchor.constraint(equalTo: cameraButton.trailingAnchor, constant: 8),
-            divider.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
-            divider.widthAnchor.constraint(equalToConstant: 1),
-            divider.heightAnchor.constraint(equalToConstant: 18),
-            searchButton.leadingAnchor.constraint(equalTo: divider.trailingAnchor, constant: 10),
-            searchButton.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: -14),
-            searchButton.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
-        ])
+        // The camera keeps a 36 pt touch area: a container of that size holds it.
+        let cameraArea = UIView(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
+        cameraButton.frame = cameraArea.bounds
+        cameraButton.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        cameraArea.addSubview(cameraButton)
+        searchBar.trailingAccessoryViews = [cameraArea, divider, searchButton]
     }
 
     private func setUpLists() {
@@ -509,14 +494,13 @@ extension CYLSearchDiscoverViewController: CYLMenuDelegate {
     }
 }
 
-// MARK: - UITextFieldDelegate
+// MARK: - CYLSearchBarViewDelegate
 
-extension CYLSearchDiscoverViewController: UITextFieldDelegate {
+extension CYLSearchDiscoverViewController: CYLSearchBarViewDelegate {
 
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    func searchBarViewSearchButtonClicked(_ searchBarView: CYLSearchBarView) {
         searchTapped()
-        textField.resignFirstResponder()
-        return true
+        searchBarView.textField.resignFirstResponder()
     }
 }
 

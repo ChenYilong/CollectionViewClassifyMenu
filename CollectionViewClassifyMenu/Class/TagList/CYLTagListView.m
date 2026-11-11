@@ -43,6 +43,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 @property (nonatomic, assign) BOOL foldAtLeadingEdge;
 @property (nonatomic, strong, nullable) UIView *accessoryView;
 @property (nonatomic, assign) CGFloat horizontalInset;
+/// CYLMenuStyle.headerIndicatorColor and size: a bar before the title.
+@property (nonatomic, strong, readonly) UIView *indicatorView;
+@property (nonatomic, assign) CGSize indicatorSize;
 @property (nonatomic, assign) NSInteger section;
 @property (nonatomic, copy, nullable) void (^foldHandler)(NSInteger section);
 @end
@@ -65,6 +68,9 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         _moreButton.largeContentTitle = _moreButton.accessibilityLabel;
         _moreButton.showsLargeContentViewer = YES;
         [_moreButton addTarget:self action:@selector(moreTapped) forControlEvents:UIControlEventTouchUpInside];
+        _indicatorView = [[UIView alloc] init];
+        _indicatorView.hidden = YES;
+        [self addSubview:_indicatorView];
         [self addSubview:_iconView];
         [self addSubview:_titleLabel];
         [self addSubview:_foldButton];
@@ -143,6 +149,11 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
         trailing -= 8;
     }
     CGFloat x = leading;
+    if (!self.indicatorView.hidden) {
+        CGSize bar = self.indicatorSize;
+        self.indicatorView.frame = CGRectMake(x, floor((height - bar.height) / 2), bar.width, bar.height);
+        x += bar.width + 8;
+    }
     if (self.iconView.image) {
         self.iconView.frame = CGRectMake(x, floor((height - kCYLTagListHeaderIconSize) / 2),
                                          kCYLTagListHeaderIconSize, kCYLTagListHeaderIconSize);
@@ -206,6 +217,14 @@ static CGFloat const kCYLTagListHeaderIconSize = 16;
 /// Each item's height: the list's item height, or more for an item whose own font needs it.
 @property (nonatomic, copy) NSArray<NSArray<NSNumber *> *> *itemHeights;
 @property (nonatomic, strong, readwrite) CYLTagDataSource *tagDataSource;
+/// Theme styles (colorTheme), index path -> @[base style, style].
+@property (nonatomic, strong) NSMutableDictionary<NSIndexPath *, NSArray *> *themeStyles;
+@property (nonatomic, strong) UILongPressGestureRecognizer *longPressRecognizer;
+@property (nonatomic, assign, readwrite, getter=isReordering) BOOL reordering;
+/// The item under the current long press, and whether the press moved it.
+@property (nonatomic, strong, nullable) NSIndexPath *pressedIndexPath;
+@property (nonatomic, assign) BOOL pressMoved;
+@property (nonatomic, assign) CGPoint pressStart;
 @property (nonatomic, copy) NSArray<NSArray<NSNumber *> *> *rows;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *selection;
 @property (nonatomic, strong) NSMutableIndexSet *expandedSections;
@@ -286,6 +305,11 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     _selection = [NSMutableSet set];
     _expandedSections = [NSMutableIndexSet indexSet];
     _measuredWidth = -1;
+    _allowsTapping = YES;
+    _removesItemsOnDelete = YES;
+    _reorderingSensitivity = 1;
+    _colorTheme = CYLTagColorThemeNone;
+    _themeStyles = [NSMutableDictionary dictionary];
 
     CYLCollectionViewLeftAlignedLayout *layout = [[CYLCollectionViewLeftAlignedLayout alloc] init];
     _collectionView = [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:layout];
@@ -305,6 +329,8 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                withReuseIdentifier:kCYLTagListFooterIdentifier];
     [self addSubview:_collectionView];
+    _longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(cyl_handleLongPress:)];
+    [_collectionView addGestureRecognizer:_longPressRecognizer];
     // The list's title: a tag view (icon and/or title, horizontal), not tappable.
     _titleStyle = [[self class] defaultTitleStyle];
     _titleView = [[CYLTagButton alloc] initWithFrame:CGRectZero];
@@ -338,6 +364,12 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 - (void)cyl_applyStyleColors {
     self.backgroundColor = _style.backgroundColor;
     self.collectionView.backgroundColor = _style.backgroundColor;
+    CYLCollectionViewLeftAlignedLayout *layout = (CYLCollectionViewLeftAlignedLayout *)self.collectionView.collectionViewLayout;
+    if ([layout isKindOfClass:[CYLCollectionViewLeftAlignedLayout class]] && layout.rowAlignment != _style.rowAlignment) {
+        layout.rowAlignment = _style.rowAlignment;
+        [layout invalidateLayout];
+    }
+    [self.themeStyles removeAllObjects];
 }
 
 - (void)setSelectionMode:(CYLMenuSelectionMode)selectionMode {
@@ -571,8 +603,9 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         return [CYLTagCreateCell plusImage];
     }
     id<CYLMenuDataSource> source = self.menuDataSource;
-    return [source respondsToSelector:@selector(menuImageForItemAtIndexPath:)]
+    UIImage *image = [source respondsToSelector:@selector(menuImageForItemAtIndexPath:)]
         ? [source menuImageForItemAtIndexPath:indexPath] : nil;
+    return image ?: self.defaultTagImage;
 }
 
 - (CYLMenuItemType)cyl_itemTypeAtIndexPath:(NSIndexPath *)indexPath {
@@ -602,7 +635,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     }
     CYLMenuStyle *sectionStyle = [self cyl_styleForSection:indexPath.section];
     if ([self cyl_itemTypeAtIndexPath:indexPath] != CYLMenuItemTypeCreate) {
-        return sectionStyle;
+        return [self cyl_themeStyleForItemAtIndexPath:indexPath baseStyle:sectionStyle];
     }
     // "+ 新建标签": outlined, made once per base style.
     if (self.createItemBaseStyle != sectionStyle || !self.createItemStyle) {
@@ -852,6 +885,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+    [self cyl_updateContainerBorderColor];
     if (![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory] ||
         previousTraitCollection.legibilityWeight != self.traitCollection.legibilityWeight) {
         // Dynamic Type or Bold Text changed: measure every tag again.
@@ -1176,7 +1210,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 }
 
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.selectionMode == CYLMenuSelectionModeNone || ![self cyl_isValidIndexPath:indexPath] ||
+    if (![self cyl_isValidIndexPath:indexPath] ||
         ![self cyl_isSelectableAtIndexPath:indexPath]) {
         return;
     }
@@ -1378,7 +1412,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     }
     id<CYLMenuDataSource> source = self.menuDataSource;
     CYLTag *tag = [self cyl_tagAtIndexPath:indexPath];
-    if ([source respondsToSelector:@selector(menuRemoveItemAtIndexPath:)]) {
+    if (self.removesItemsOnDelete && [source respondsToSelector:@selector(menuRemoveItemAtIndexPath:)]) {
         [source menuRemoveItemAtIndexPath:indexPath];
         [self cyl_removeSelectionAtIndexPath:indexPath];
         [self reloadMenuData];
@@ -1391,6 +1425,126 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     if (tag && self.tagDeleteHandler) {
         self.tagDeleteHandler(indexPath.item, tag);
     }
+}
+
+#pragma mark Container
+
+- (void)setContainerBorderWidth:(CGFloat)containerBorderWidth {
+    _containerBorderWidth = MAX(0, containerBorderWidth);
+    self.layer.borderWidth = _containerBorderWidth;
+}
+
+- (void)setContainerBorderColor:(UIColor *)containerBorderColor {
+    _containerBorderColor = containerBorderColor;
+    self.layer.borderColor = containerBorderColor.CGColor;
+}
+
+- (void)setContainerCornerRadius:(CGFloat)containerCornerRadius {
+    _containerCornerRadius = MAX(0, containerCornerRadius);
+    self.layer.cornerRadius = _containerCornerRadius;
+    self.layer.masksToBounds = _containerCornerRadius > 0;
+}
+
+- (void)cyl_updateContainerBorderColor {
+    self.layer.borderColor = [self.containerBorderColor resolvedColorWithTraitCollection:self.traitCollection].CGColor;
+}
+
+- (NSUInteger)maximumNumberOfRows {
+    return self.foldStyle == CYLMenuFoldStyleTruncate ? self.defaultVisibleRows : 0;
+}
+
+- (void)setMaximumNumberOfRows:(NSUInteger)maximumNumberOfRows {
+    if (maximumNumberOfRows > 0) {
+        self.foldStyle = CYLMenuFoldStyleTruncate;
+        self.defaultVisibleRows = maximumNumberOfRows;
+    } else if (self.foldStyle == CYLMenuFoldStyleTruncate) {
+        self.foldStyle = CYLMenuFoldStyleNone;
+    }
+}
+
+- (void)setColorTheme:(CYLTagColorTheme)colorTheme {
+    _colorTheme = colorTheme;
+    [self.themeStyles removeAllObjects];
+    [self cyl_invalidateMeasurements];
+}
+
+/// The theme's colors over `baseStyle` (colorTheme), one cached style per item.
+- (CYLMenuStyle *)cyl_themeStyleForItemAtIndexPath:(NSIndexPath *)indexPath baseStyle:(CYLMenuStyle *)baseStyle {
+    if (self.colorTheme == CYLTagColorThemeNone) {
+        return baseStyle;
+    }
+    NSArray *cached = self.themeStyles[indexPath];
+    if (cached && cached[0] == baseStyle) {
+        return cached[1];
+    }
+    NSUInteger seed = (NSUInteger)(indexPath.item + indexPath.section * 7);
+    CYLMenuStyle *style = [[CYLTagColors colorsForTheme:self.colorTheme seed:seed] styleByApplyingToStyle:baseStyle] ?: baseStyle;
+    self.themeStyles[indexPath] = @[baseStyle, style];
+    return style;
+}
+
+- (CYLTagButton *)tagButtonAtIndexPath:(NSIndexPath *)indexPath {
+    CYLTagListCell *cell = (CYLTagListCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+    return [cell isKindOfClass:[CYLTagListCell class]] ? cell.button : nil;
+}
+
+#pragma mark More tag methods
+
+- (void)replaceTags:(NSArray<CYLTag *> *)tags {
+    [self cyl_showTags].tags = tags ?: @[];
+    [self.selection removeAllObjects];
+    [self reloadMenuData];
+}
+
+- (void)setTagsWithTitles:(NSArray<NSString *> *)titles {
+    [self setTagsWithTitles:titles colors:@[]];
+}
+
+- (void)setTagsWithTitles:(NSArray<NSString *> *)titles colors:(NSArray<CYLTagColors *> *)colors {
+    NSMutableArray<CYLTag *> *tags = [NSMutableArray arrayWithCapacity:titles.count];
+    [titles enumerateObjectsUsingBlock:^(NSString *title, NSUInteger index, BOOL *stop) {
+        CYLTag *tag = [[CYLTag alloc] initWithTitle:title];
+        if (index < colors.count) {
+            tag.colors = colors[index];
+        }
+        [tags addObject:tag];
+    }];
+    [self replaceTags:tags];
+}
+
+- (void)addTagWithTitle:(NSString *)title {
+    [self addTag:[[CYLTag alloc] initWithTitle:title]];
+}
+
+- (void)insertTagWithTitle:(NSString *)title atIndex:(NSUInteger)index {
+    [self insertTag:[[CYLTag alloc] initWithTitle:title] atIndex:index];
+}
+
+- (void)removeTagsAtIndexes:(NSIndexSet *)indexes {
+    CYLTagDataSource *source = [self cyl_showTags];
+    [indexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger index, BOOL *stop) {
+        if (index < source.tags.count) {
+            [source removeTagAtIndex:index];
+            [self cyl_removeSelectionAtIndexPath:[NSIndexPath indexPathForItem:(NSInteger)index inSection:0]];
+        }
+    }];
+    [self reloadMenuData];
+}
+
+- (void)toggleSelectionOfItemAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self.selection containsObject:indexPath]) {
+        [self deselectItemAtIndexPath:indexPath];
+    } else {
+        [self selectItemAtIndexPath:indexPath];
+    }
+}
+
+- (NSArray<NSString *> *)selectedTitles {
+    NSMutableArray<NSString *> *titles = [NSMutableArray array];
+    for (NSIndexPath *indexPath in self.selectedIndexPaths) {
+        [titles addObject:[self.menuDataSource menuTitleForItemAtIndexPath:indexPath] ?: @""];
+    }
+    return titles;
 }
 
 #pragma mark Spacing
@@ -1561,6 +1715,9 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     id<CYLMenuDataSource> source = self.menuDataSource;
     header.section = section;
     header.horizontalInset = self.style.headerHorizontalInset;
+    header.indicatorView.hidden = self.style.headerIndicatorColor == nil;
+    header.indicatorView.backgroundColor = self.style.headerIndicatorColor;
+    header.indicatorSize = self.style.headerIndicatorSize;
     header.titleLabel.text = [source menuTitleForSection:section];
     header.titleLabel.font = [self.style headerFontForTraitCollection:self.traitCollection];
     header.titleLabel.textColor = self.style.headerTextColor;
@@ -1617,7 +1774,158 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         [self cyl_toggleSection:indexPath.section];
         return;
     }
+    if (!self.allowsTapping) {
+        return;
+    }
     [self cyl_handleTapAtIndexPath:indexPath];
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    return self.allowsTapping || [self cyl_isInlineFoldCellAtIndexPath:indexPath];
+}
+
+#pragma mark Reordering
+
+- (BOOL)cyl_canReorder {
+    return self.allowsReordering && [self.menuDataSource respondsToSelector:@selector(menuMoveItemAtIndexPath:toIndexPath:)];
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath {
+    return [self cyl_canReorder] && [self cyl_isValidIndexPath:indexPath] && ![self cyl_isInlineFoldCellAtIndexPath:indexPath];
+}
+
+- (NSIndexPath *)collectionView:(UICollectionView *)collectionView targetIndexPathForMoveOfItemFromOriginalIndexPath:(NSIndexPath *)originalIndexPath
+             atCurrentIndexPath:(NSIndexPath *)currentIndexPath toProposedIndexPath:(NSIndexPath *)proposedIndexPath {
+    // Within its section, among the shown items (not onto the inline fold cell).
+    NSInteger last = MAX(0, [self numberOfVisibleItemsInSection:originalIndexPath.section] - 1);
+    NSInteger item = proposedIndexPath.section == originalIndexPath.section ? MIN(proposedIndexPath.item, last)
+        : (proposedIndexPath.section < originalIndexPath.section ? 0 : last);
+    return [NSIndexPath indexPathForItem:item inSection:originalIndexPath.section];
+}
+
+- (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    if ([sourceIndexPath isEqual:destinationIndexPath] || ![self cyl_canReorder]) {
+        return;
+    }
+    [self.menuDataSource menuMoveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
+    // The selection moves with the items.
+    NSMutableSet<NSIndexPath *> *selection = [NSMutableSet set];
+    NSInteger from = sourceIndexPath.item;
+    NSInteger to = destinationIndexPath.item;
+    for (NSIndexPath *indexPath in self.selection) {
+        NSInteger item = indexPath.item;
+        if (indexPath.section == sourceIndexPath.section) {
+            if (item == from) {
+                item = to;
+            } else if (from < to && item > from && item <= to) {
+                item -= 1;
+            } else if (from > to && item >= to && item < from) {
+                item += 1;
+            }
+        }
+        [selection addObject:[NSIndexPath indexPathForItem:item inSection:indexPath.section]];
+    }
+    self.selection = selection;
+    id<CYLMenuDelegate> delegate = self.menuDelegate;
+    if ([delegate respondsToSelector:@selector(menu:didMoveItemAtIndexPath:toIndexPath:)]) {
+        [delegate menu:self didMoveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
+    }
+    if (self.tagMoveHandler && self.menuDataSource == (id)_tagDataSource) {
+        self.tagMoveHandler(from, to);
+    }
+    // The collection view has moved the cell; the measurements follow on the next pass.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadMenuData];
+    });
+}
+
+/// Reorders on a long press and a move; a long press that does not move is reported (onTagLongClick).
+- (void)cyl_handleLongPress:(UILongPressGestureRecognizer *)recognizer {
+    UICollectionView *collection = self.collectionView;
+    CGPoint point = [recognizer locationInView:collection];
+    switch (recognizer.state) {
+        case UIGestureRecognizerStateBegan: {
+            NSIndexPath *indexPath = [collection indexPathForItemAtPoint:point];
+            if (!indexPath || ![self cyl_isValidIndexPath:indexPath] || [self cyl_isInlineFoldCellAtIndexPath:indexPath]) {
+                self.pressedIndexPath = nil;
+                return;
+            }
+            self.pressedIndexPath = indexPath;
+            self.pressMoved = NO;
+            self.pressStart = point;
+            if ([self cyl_canReorder] && [collection beginInteractiveMovementForItemAtIndexPath:indexPath]) {
+                self.reordering = YES;
+                if ([self.selection containsObject:indexPath]) {
+                    [self cyl_reportSelectedDragAtIndexPath:indexPath];
+                }
+            } else {
+                [self cyl_reportLongPressAtIndexPath:indexPath];
+                self.pressedIndexPath = nil;
+            }
+            break;
+        }
+        case UIGestureRecognizerStateChanged:
+            if (self.reordering) {
+                if (hypot(point.x - self.pressStart.x, point.y - self.pressStart.y) > 8) {
+                    self.pressMoved = YES;
+                }
+                [collection updateInteractiveMovementTargetPosition:point];
+            }
+            break;
+        case UIGestureRecognizerStateEnded:
+            if (self.reordering) {
+                self.reordering = NO;
+                [collection endInteractiveMovement];
+                if (!self.pressMoved && self.pressedIndexPath) {
+                    [self cyl_reportLongPressAtIndexPath:self.pressedIndexPath];
+                }
+            }
+            self.pressedIndexPath = nil;
+            break;
+        default:
+            if (self.reordering) {
+                self.reordering = NO;
+                [collection cancelInteractiveMovement];
+            }
+            self.pressedIndexPath = nil;
+            break;
+    }
+}
+
+- (void)cyl_reportLongPressAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDelegate> delegate = self.menuDelegate;
+    if ([delegate respondsToSelector:@selector(menu:didLongPressItemAtIndexPath:)]) {
+        [delegate menu:self didLongPressItemAtIndexPath:indexPath];
+    }
+    CYLTag *tag = [self cyl_tagAtIndexPath:indexPath];
+    if (tag && self.tagLongPressHandler) {
+        self.tagLongPressHandler(indexPath.item, tag);
+    }
+}
+
+- (void)cyl_reportSelectedDragAtIndexPath:(NSIndexPath *)indexPath {
+    id<CYLMenuDelegate> delegate = self.menuDelegate;
+    if ([delegate respondsToSelector:@selector(menu:didBeginDraggingSelectedItemAtIndexPath:)]) {
+        [delegate menu:self didBeginDraggingSelectedItemAtIndexPath:indexPath];
+    }
+    CYLTag *tag = [self cyl_tagAtIndexPath:indexPath];
+    if (tag && self.selectedTagDragHandler) {
+        self.selectedTagDragHandler(indexPath.item, tag);
+    }
+}
+
+- (void)setAllowsReordering:(BOOL)allowsReordering {
+    _allowsReordering = allowsReordering;
+    [self cyl_updateLongPressDuration];
+}
+
+- (void)setReorderingSensitivity:(CGFloat)reorderingSensitivity {
+    _reorderingSensitivity = reorderingSensitivity > 0 ? reorderingSensitivity : 1;
+    [self cyl_updateLongPressDuration];
+}
+
+- (void)cyl_updateLongPressDuration {
+    self.longPressRecognizer.minimumPressDuration = self.allowsReordering ? 0.5 / self.reorderingSensitivity : 0.5;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView

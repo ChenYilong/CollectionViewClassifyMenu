@@ -55,6 +55,9 @@
         _collapseTitle = CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse a section");
         _moreButtonColor = [UIColor secondaryLabelColor];
         _deleteIndicatorTitle = @"\u00D7";
+        _rippleAlpha = 0.2;
+        _rippleDuration = 1;
+        _headerIndicatorSize = CGSizeMake(3, 16);
     }
     return self;
 }
@@ -120,6 +123,19 @@
     copy.deleteIndicatorTitle = self.deleteIndicatorTitle;
     copy.deleteIndicatorColor = self.deleteIndicatorColor;
     copy.deleteIndicatorFont = self.deleteIndicatorFont;
+    copy.deleteIndicatorLineWidth = self.deleteIndicatorLineWidth;
+    copy.deleteIndicatorWidth = self.deleteIndicatorWidth;
+    copy.deleteIndicatorPadding = self.deleteIndicatorPadding;
+    copy.deleteIndicatorPlacement = self.deleteIndicatorPlacement;
+    copy.rippleColor = self.rippleColor;
+    copy.rippleAlpha = self.rippleAlpha;
+    copy.rippleDuration = self.rippleDuration;
+    copy.maximumTitleLength = self.maximumTitleLength;
+    copy.reversesTitleCharacters = self.reversesTitleCharacters;
+    copy.rowAlignment = self.rowAlignment;
+    copy.headerIndicatorColor = self.headerIndicatorColor;
+    copy.headerIndicatorSize = self.headerIndicatorSize;
+    copy.imageCornerRadius = self.imageCornerRadius;
     return copy;
 }
 
@@ -137,6 +153,23 @@
 
 - (void)setDeleteIndicatorTitle:(NSString *)deleteIndicatorTitle {
     _deleteIndicatorTitle = [deleteIndicatorTitle copy] ?: @"\u00D7";
+}
+
+- (NSString *)displayedTitleForTitle:(NSString *)title {
+    NSString *text = title ?: @"";
+    if (self.maximumTitleLength > 0 && text.length > self.maximumTitleLength) {
+        NSRange range = [text rangeOfComposedCharacterSequencesForRange:NSMakeRange(0, self.maximumTitleLength)];
+        text = [[text substringWithRange:range] stringByAppendingString:@"..."];
+    }
+    if (self.reversesTitleCharacters && text.length > 1) {
+        NSMutableString *reversed = [NSMutableString stringWithCapacity:text.length];
+        [text enumerateSubstringsInRange:NSMakeRange(0, text.length) options:NSStringEnumerationByComposedCharacterSequences | NSStringEnumerationReverse
+                              usingBlock:^(NSString *substring, NSRange range, NSRange enclosing, BOOL *stop) {
+            [reversed appendString:substring];
+        }];
+        text = reversed;
+    }
+    return text;
 }
 
 - (UIFont *)deleteIndicatorFontForState:(UIControlState)state traitCollection:(UITraitCollection *)traitCollection {

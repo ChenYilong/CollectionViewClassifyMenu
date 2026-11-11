@@ -14,6 +14,7 @@
 #import "CYLTagButton.h"
 #import "CYLTagListAccessibility.h"
 #import "CYLTag.h"
+#import "CYLTagColors.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -236,6 +237,97 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  */
 - (void)deleteItemAtIndexPath:(NSIndexPath *)indexPath;
 
+#pragma mark Container (AndroidTagView's TagContainerLayout)
+
+/*!
+ * The list's own border (container_border_width, container_border_color, container_border_radius). 0, nil and 0 by
+ * default. The background is `style.backgroundColor`.
+ */
+@property (nonatomic, assign) CGFloat containerBorderWidth;
+@property (nonatomic, strong, nullable) UIColor *containerBorderColor;
+@property (nonatomic, assign) CGFloat containerCornerRadius;
+/*!
+ * At most this many rows of each section (container_max_lines); 0 (the default) shows every row. Setting it sets
+ * foldStyle to CYLMenuFoldStyleTruncate and defaultVisibleRows to it.
+ */
+@property (nonatomic, assign) NSUInteger maximumNumberOfRows;
+/*!
+ * Colors every item that has no look of its own from a theme (tag_theme): CYLTagColorThemeNone (the default), random,
+ * pure cyan or pure teal.
+ */
+@property (nonatomic, assign) CYLTagColorTheme colorTheme;
+/*!
+ * NO ignores taps on tags: no highlight, no selection, no callbacks (tag_clickable). Long presses still work. Defaults to YES.
+ */
+@property (nonatomic, assign) BOOL allowsTapping;
+/*!
+ * The icon of every item without one of its own (setDefaultImageDrawableID), e.g. an avatar. nil by default.
+ */
+@property (nonatomic, strong, nullable) UIImage *defaultTagImage;
+/*!
+ * NO makes a tap on a delete indicator only report it (AndroidTagView's onTagCrossClick); the host removes the item.
+ * Defaults to YES.
+ */
+@property (nonatomic, assign) BOOL removesItemsOnDelete;
+/*!
+ * The tag view of a shown item (getTagView), or nil when it is not on screen.
+ */
+- (nullable CYLTagButton *)tagButtonAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(tagButton(at:));
+
+#pragma mark Long press and reordering
+
+/*!
+ * A long press on an item without moving it: -menu:didLongPressItemAtIndexPath:, then this (onTagLongClick).
+ */
+@property (nonatomic, copy, nullable) void (^tagLongPressHandler)(NSInteger index, CYLTag *tag);
+/*!
+ * A long press and a move reorders the items of a section (container_enable_drag). Needs a data source that implements
+ * -menuMoveItemAtIndexPath:toIndexPath: (CYLTagDataSource does). NO by default.
+ */
+@property (nonatomic, assign) BOOL allowsReordering;
+/*!
+ * How quickly a press starts reordering (container_drag_sensitivity): the press lasts 0.5 s divided by it. 1 by default.
+ */
+@property (nonatomic, assign) CGFloat reorderingSensitivity;
+/*!
+ * Whether an item is being moved (getTagViewState).
+ */
+@property (nonatomic, assign, readonly, getter=isReordering) BOOL reordering;
+/*!
+ * One of `tags` moved (after -menu:didMoveItemAtIndexPath:toIndexPath:).
+ */
+@property (nonatomic, copy, nullable) void (^tagMoveHandler)(NSInteger fromIndex, NSInteger toIndex);
+/*!
+ * A selected tag started moving (onSelectedTagDrag), after -menu:didBeginDraggingSelectedItemAtIndexPath:.
+ */
+@property (nonatomic, copy, nullable) void (^selectedTagDragHandler)(NSInteger index, CYLTag *tag);
+
+#pragma mark More tag methods (AndroidTagView)
+
+/*!
+ * Replaces the tags (setTags).
+ */
+- (void)replaceTags:(NSArray<CYLTag *> *)tags;
+- (void)setTagsWithTitles:(NSArray<NSString *> *)titles NS_SWIFT_NAME(setTags(withTitles:));
+/*!
+ * With colors per tag, in order (setTags(List, List<int[]>)); tags past the colors keep the list's look.
+ */
+- (void)setTagsWithTitles:(NSArray<NSString *> *)titles colors:(NSArray<CYLTagColors *> *)colors NS_SWIFT_NAME(setTags(withTitles:colors:));
+- (void)addTagWithTitle:(NSString *)title NS_SWIFT_NAME(addTag(withTitle:));
+- (void)insertTagWithTitle:(NSString *)title atIndex:(NSUInteger)index NS_SWIFT_NAME(insertTag(withTitle:at:));
+/*!
+ * Removes several tags (removeConsecutiveTags).
+ */
+- (void)removeTagsAtIndexes:(NSIndexSet *)indexes NS_SWIFT_NAME(removeTags(at:));
+/*!
+ * Selects an unselected item or deselects a selected one (toggleSelectTagView).
+ */
+- (void)toggleSelectionOfItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(toggleSelection(at:));
+/*!
+ * The titles of the selected items, in order (getSelectedTagViewText).
+ */
+@property (nonatomic, copy, readonly) NSArray<NSString *> *selectedTitles;
+
 #pragma mark Selection
 
 /*!
@@ -243,7 +335,8 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  */
 @property (nonatomic, copy) NSArray<NSIndexPath *> *selectedIndexPaths;
 /*!
- * Applies the selection rules of `selectionMode` without calling the delegate.
+ * Applies the selection rules of `selectionMode` without calling the delegate. In CYLMenuSelectionModeNone, where taps
+ * never select, the host can still select items this way (any number).
  */
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath;
 - (void)deselectItemAtIndexPath:(NSIndexPath *)indexPath;

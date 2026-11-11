@@ -124,6 +124,11 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * calls -reloadMenuData).
  */
 - (void)menuRemoveItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menuRemoveItem(at:));
+/*!
+ * Move the item in your data: the user reordered the items of a section (CYLTagListView.allowsReordering).
+ */
+- (void)menuMoveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+    NS_SWIFT_NAME(menuMoveItem(at:to:));
 
 @end
 
@@ -175,6 +180,19 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * implements -menuRemoveItemAtIndexPath:, the item is already gone and `indexPath` is where it was.
  */
 - (void)menu:(id)menu didDeleteItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menu(_:didDeleteItemAt:));
+/*!
+ * A long press on an item that did not move it (AndroidTagView's onTagLongClick).
+ */
+- (void)menu:(id)menu didLongPressItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menu(_:didLongPressItemAt:));
+/*!
+ * The user moved an item; the data source has moved it.
+ */
+- (void)menu:(id)menu didMoveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+    NS_SWIFT_NAME(menu(_:didMoveItemAt:to:));
+/*!
+ * A selected item started moving (AndroidTagView's onSelectedTagDrag).
+ */
+- (void)menu:(id)menu didBeginDraggingSelectedItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menu(_:didBeginDraggingSelectedItemAt:));
 
 @end
 

@@ -10,6 +10,11 @@ project 'CYLMenuExample.xcodeproj'
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
                 :commit => '38f011558e92512e66d7538a5b0b875cefe5b795' }
 
+# The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
+# revision whose API the Example uses (feat/search-bar-view); update together.
+CYL_SEARCH = { :git => 'https://github.com/ChenYilong/CYLSearchViewController.git',
+               :commit => 'c581f12558d5b6d4cc656147cc39f1cb00c54e93' }
+
 target 'CYLMenuExample' do
   # As CYLTabBarController's examples: the Rive animator has Swift files.
   use_frameworks!
@@ -20,6 +25,7 @@ target 'CYLMenuExample' do
   pod 'CYLTabBarController/PAG', CYL_TAB_BAR
   pod 'CYLTabBarController/Rive', CYL_TAB_BAR
   pod 'CYLTabBarController/GIF', CYL_TAB_BAR
+  pod 'CYLSearchViewController', CYL_SEARCH
 
   target 'CYLMenuExampleTests' do
     inherit! :search_paths

@@ -70,6 +70,9 @@ static BOOL CYLTagIsSet(CGFloat value) {
     copy.font = self.font;
     copy.textSize = self.textSize;
     copy.highlightedBackgroundColor = self.highlightedBackgroundColor;
+    copy.selectedBackgroundColor = self.selectedBackgroundColor;
+    copy.badgeText = self.badgeText;
+    copy.badgeColor = self.badgeColor;
     copy.backgroundImage = self.backgroundImage;
     copy.cornerRadius = self.cornerRadius;
     copy.borderWidth = self.borderWidth;
@@ -80,6 +83,34 @@ static BOOL CYLTagIsSet(CGFloat value) {
     return copy;
 }
 
+- (CYLTagColors *)colors {
+    return [CYLTagColors colorsWithBackgroundColor:self.backgroundColor borderColor:self.borderColor textColor:self.textColor
+                           selectedBackgroundColor:self.selectedBackgroundColor];
+}
+
+- (void)setColors:(CYLTagColors *)colors {
+    self.backgroundColor = colors.backgroundColor;
+    self.borderColor = colors.borderColor;
+    self.textColor = colors.textColor;
+    self.selectedBackgroundColor = colors.selectedBackgroundColor;
+}
+
++ (UIImage *)badgeImageWithText:(NSString *)text color:(UIColor *)color diameter:(CGFloat)diameter {
+    CGFloat side = MAX(1, diameter);
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(side, side)];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [(color ?: [UIColor systemBlueColor]) setFill];
+        [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, side, side)] fill];
+        NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:side * 0.6],
+                                     NSForegroundColorAttributeName: [UIColor whiteColor]};
+        CGSize size = [text sizeWithAttributes:attributes];
+        [text drawAtPoint:CGPointMake((side - size.width) / 2, (side - size.height) / 2) withAttributes:attributes];
+    }];
+    image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    image.accessibilityLabel = text;
+    return image;
+}
+
 - (NSString *)description {
     return [NSString stringWithFormat:@"<%@: %p; identifier = %ld; title = %@>", NSStringFromClass([self class]), (void *)self,
                                       (long)self.identifier, self.title];
@@ -87,7 +118,7 @@ static BOOL CYLTagIsSet(CGFloat value) {
 
 - (BOOL)hasCustomStyle {
     return self.style || self.textColor || self.font || CYLTagIsSet(self.textSize) || self.backgroundColor ||
-           self.highlightedBackgroundColor || self.backgroundImage || CYLTagIsSet(self.cornerRadius) ||
+           self.highlightedBackgroundColor || self.selectedBackgroundColor || self.backgroundImage || CYLTagIsSet(self.cornerRadius) ||
            CYLTagIsSet(self.borderWidth) || self.borderColor || self.deleteIndicatorTitle || self.deleteIndicatorColor ||
            CYLTagIsSet(self.deleteIndicatorSize);
 }
@@ -110,6 +141,7 @@ static BOOL CYLTagIsSet(CGFloat value) {
         if (CYLTagIsSet(self.borderWidth)) appearance.borderWidth = self.borderWidth;
     }
     if (self.highlightedBackgroundColor) style.highlightedBackgroundColor = self.highlightedBackgroundColor;
+    if (self.selectedBackgroundColor) style.selectedAppearance.backgroundColor = self.selectedBackgroundColor;
     if (self.deleteIndicatorTitle) style.deleteIndicatorTitle = self.deleteIndicatorTitle;
     if (self.deleteIndicatorColor) style.deleteIndicatorColor = self.deleteIndicatorColor;
     if (CYLTagIsSet(self.deleteIndicatorSize) && self.deleteIndicatorSize > 0) {
@@ -180,6 +212,21 @@ static BOOL CYLTagIsSet(CGFloat value) {
     }
 }
 
+- (void)moveTagAtIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
+    if (fromIndex >= self.mutableTags.count || toIndex >= self.mutableTags.count || fromIndex == toIndex) {
+        return;
+    }
+    CYLTag *tag = self.mutableTags[fromIndex];
+    [self.mutableTags removeObjectAtIndex:fromIndex];
+    [self.mutableTags insertObject:tag atIndex:toIndex];
+}
+
+- (void)menuMoveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    if (sourceIndexPath.section == 0 && destinationIndexPath.section == 0) {
+        [self moveTagAtIndex:(NSUInteger)sourceIndexPath.item toIndex:(NSUInteger)destinationIndexPath.item];
+    }
+}
+
 - (void)removeAllTags {
     [self.mutableTags removeAllObjects];
     [self invalidateStyles];
@@ -213,7 +260,12 @@ static BOOL CYLTagIsSet(CGFloat value) {
 }
 
 - (UIImage *)menuImageForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return [self cyl_tagAtIndexPath:indexPath].image;
+    CYLTag *tag = [self cyl_tagAtIndexPath:indexPath];
+    if (!tag.image && tag.badgeText.length > 0) {
+        CGFloat side = MAX(self.baseStyle.imageSize.width, self.baseStyle.imageSize.height);
+        tag.image = [CYLTag badgeImageWithText:tag.badgeText color:tag.badgeColor ?: tag.textColor diameter:side > 0 ? side : 16];
+    }
+    return tag.image;
 }
 
 - (UIImage *)menuSelectedImageForItemAtIndexPath:(NSIndexPath *)indexPath {

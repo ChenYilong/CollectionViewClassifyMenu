@@ -46,6 +46,32 @@ typedef NS_ENUM(NSInteger, CYLTagContentAlignment) {
     CYLTagContentAlignmentLeading,
 };
 
+/*!
+ * How the tags of a row line up (android-tagview's AndroidTagView container_gravity).
+ */
+typedef NS_ENUM(NSInteger, CYLTagRowAlignment) {
+    /*!
+     * From the leading edge (the default).
+     */
+    CYLTagRowAlignmentLeading = 0,
+    CYLTagRowAlignmentCenter,
+    CYLTagRowAlignmentTrailing,
+};
+
+/*!
+ * Where a deletable tag's delete indicator is.
+ */
+typedef NS_ENUM(NSInteger, CYLTagDeleteIndicatorPlacement) {
+    /*!
+     * After the title (the default).
+     */
+    CYLTagDeleteIndicatorPlacementTrailing = 0,
+    /*!
+     * Before the content, as AndroidTagView's cross in right-to-left tags.
+     */
+    CYLTagDeleteIndicatorPlacementLeading,
+};
+
 @interface CYLMenuStyle : NSObject <NSCopying>
 
 /*!
@@ -93,6 +119,71 @@ typedef NS_ENUM(NSInteger, CYLTagContentAlignment) {
  * Its font; nil (the default) uses the state's title font. Scaled for Dynamic Type as the title is.
  */
 @property (nonatomic, strong, nullable) UIFont *deleteIndicatorFont;
+
+/*!
+ * Draws the delete indicator as a cross of two lines this wide instead of `deleteIndicatorTitle` (AndroidTagView's
+ * tag_cross_line_width); 0 (the default) draws the title.
+ */
+@property (nonatomic, assign) CGFloat deleteIndicatorLineWidth;
+/*!
+ * The width of the delete indicator's area (tag_cross_width); 0 (the default) fits the title, or the font's line height
+ * for a drawn cross.
+ */
+@property (nonatomic, assign) CGFloat deleteIndicatorWidth;
+/*!
+ * Space between the area's edges and a drawn cross (tag_cross_area_padding). 0 by default.
+ */
+@property (nonatomic, assign) CGFloat deleteIndicatorPadding;
+/*!
+ * After the title (the default) or before the content.
+ */
+@property (nonatomic, assign) CYLTagDeleteIndicatorPlacement deleteIndicatorPlacement;
+
+#pragma mark Touch ripple (AndroidTagView)
+/*!
+ * A circle that grows from the touch point while a tag is pressed (tag_ripple_color); nil (the default) for none.
+ */
+@property (nonatomic, strong, nullable) UIColor *rippleColor;
+/*!
+ * Its opacity at the start, 0...1 (tag_ripple_alpha). 0.2 by default.
+ */
+@property (nonatomic, assign) CGFloat rippleAlpha;
+/*!
+ * How long it grows, in seconds (tag_ripple_duration). 1 by default.
+ */
+@property (nonatomic, assign) NSTimeInterval rippleDuration;
+
+#pragma mark Titles
+/*!
+ * Titles longer than this many characters are cut and end with "..." (tag_max_length); 0 (the default) keeps them.
+ */
+@property (nonatomic, assign) NSUInteger maximumTitleLength;
+/*!
+ * Shows each title's characters in reverse order (AndroidTagView's tag_support_letters_rlt). NO by default.
+ */
+@property (nonatomic, assign) BOOL reversesTitleCharacters;
+/*!
+ * The title as a tag shows it: cut to `maximumTitleLength`, reversed when `reversesTitleCharacters`.
+ */
+- (NSString *)displayedTitleForTitle:(nullable NSString *)title;
+
+#pragma mark Rows and section headers
+/*!
+ * How the tags of a row line up: leading (the default), centered or trailing.
+ */
+@property (nonatomic, assign) CYLTagRowAlignment rowAlignment;
+/*!
+ * A bar before each section title, as in a "| 热门搜索" header; nil (the default) for none.
+ */
+@property (nonatomic, strong, nullable) UIColor *headerIndicatorColor;
+/*!
+ * The bar's size, {3, 16} by default.
+ */
+@property (nonatomic, assign) CGSize headerIndicatorSize;
+/*!
+ * Rounds the icon's corners (AndroidTagView's round avatars): half the icon's size or more makes it a circle. 0 by default.
+ */
+@property (nonatomic, assign) CGFloat imageCornerRadius;
 
 #pragma mark Title and icon (CYLFlatDesignTabBarItem)
 
