@@ -344,6 +344,55 @@ CYLTagListView *fromFile = [CYLTagListView tagListViewWithConfigurationFile:@"ta
 image from `menuImageForItemAtIndexPath:` instead. Section icons of
 `CYLClassifyMenuViewController` now come from `menuImageForSection:`.
 
+#### 标签云：android-tagview 的初始化方式 / Tag cloud, the android-tagview way
+
+参照 [kaedea/android-tagview](https://github.com/kaedea/android-tagview)：先创建列表、设置间距，再添加标签（`CYLTag`），
+用 block 监听点击和删除。它的每个公开 API 在本项目都有对应版本（47 / 47，100 分），对照表见
+[docs/android-tagview-api.md](docs/android-tagview-api.md)。
+
+Like android-tagview: create the list, set its spacing, add tags, and listen to taps and deletions in blocks. Every
+public API of android-tagview has a counterpart here; the table is in [docs/android-tagview-api.md](docs/android-tagview-api.md).
+
+```swift
+let tagListView = CYLTagListView()
+tagListView.lineSpacing = 5               // android-tagview: setLineMargin / app:lineMargin
+tagListView.interitemSpacing = 3          // setTagMargin / app:tagMargin
+tagListView.tagContentInsets = UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10)  // textPadding…
+tagListView.addTags(withTitles: ["Asia", "Europe", "Africa"])
+
+let tag = CYLTag(title: "Tag Text", backgroundColorHex: "#DDDDDD")
+tag.textColor = .white
+tag.highlightedBackgroundColor = UIColor(white: 0.33, alpha: 1)   // layoutColorPress
+tag.cornerRadius = 20
+tag.textSize = 14
+tag.borderWidth = 1
+tag.borderColor = .white
+tag.isDeletable = true                                            // a "×" after the title
+tagListView.addTag(tag)
+
+tagListView.tagClickHandler = { index, tag in print("click", index, tag.title) }
+tagListView.tagDeleteHandler = { index, tag in print("deleted", index, tag.title) }
+```
+
+- 新增 / New: `CYLTag`、`CYLTagDataSource`；`addTag(_:)`、`addTags(_:)`、`addTags(withTitles:)`、`insertTag(_:at:)`、
+  `removeTag(at:)`、`removeAllTags()`、`tags`、`tagClickHandler`、`tagDeleteHandler`、`deleteItem(at:)`。
+- 可删除的标签 / Deletable tags：数据源 `menuItemIsDeletable(at:)`、`menuRemoveItem(at:)`，代理 `menu(_:didDeleteItemAt:)`；
+  `CYLMenuStyle.deleteIndicatorTitle`（默认 "×"）、`deleteIndicatorColor`、`deleteIndicatorFont`；VoiceOver 有「删除」操作。
+- 按下颜色 / Pressed color：`CYLMenuStyle.highlightedBackgroundColor`。背景图 / Background image：`CYLTagAppearance.backgroundImage`。
+- 四边内边距 / Per-side padding：`CYLTagAppearance.contentInsets`（默认 {5, 10, 5, 10}，`margin` 是左右两边）、
+  `CYLMenuStyle.tagContentInsets`；Interface Builder 中可设置 `lineSpacing`、`interitemSpacing`、`tagContentInsetTop/Left/Bottom/Right`。
+- 每个标签可以有自己的字号，行高随之变化 / A tag with a larger text is taller than the others in its row.
+- 配置键 / Keys：`CYLTagListViewTags`、`CYLTagItemDeletable`、`CYLTagItemIdentifier`、`CYLTagItemStyle`、
+  `CYLMenuStyleHighlightedBackgroundColor`、`CYLMenuStyleTagContentInsets`、`CYLMenuStyleDeleteIndicator…`、
+  `CYLTagAppearanceContentInsets`、`CYLTagAppearanceBackgroundImage`；`CYLMenuColorFromString()`。
+
+示例 / Demo：「样式」Tab → 标签云（`CYLTagCloudDemoViewController`）。
+
+| 状态 / State | 截图 / Screenshot |
+| --- | :---: |
+| 标签云：代码与字典初始化 / Tag cloud in code and from a dictionary | <img src="assets/test-tag-cloud-android-api.png" width="280" alt="标签云"> |
+| 可删除的标签 / A deletable tag | <img src="assets/test-tag-cloud-deletable.png" width="280" alt="可删除"> |
+
 ### Accessibility / 无障碍
 
 | 设置 | 支持 |
@@ -490,7 +539,7 @@ CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成
 
 ### Tests / 测试
 
-两个示例的测试（`Example/CYLMenuExampleTests`：52 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
+两个示例的测试（`Example/CYLMenuExampleTests`：61 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
 每个功能一个测试类、一个文件（高内聚）；测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，
 同时编译进两个测试 target（低耦合，不重复）。
 
@@ -515,20 +564,22 @@ both test targets.
 | `CYLTagListSelectionTests` · `CYLTagListFoldingTests` · `CYLTagListLayoutTests` | 选择模式、折叠样式、布局与宽度 |
 | `CYLTagButtonTests` · `CYLTagConfigurationTests` · `CYLTagListAccessibilityTests` | 标签按钮外观、配置初始化、VoiceOver |
 | `CYLTagStyleDemoTests` · `CYLAnimatedIconTests` | 「样式」与「动效」页，CYLTabBarController 动效引擎 |
+| `CYLTagCloudTests` | android-tagview 的 API：`CYLTag`、添加/删除标签、可删除标签、按下颜色、背景图、四边内边距、字号、配置键 |
 | `CYLReviewFilterScenarioTests` · `CYLSearchCategoryScenarioTests` | 场景一（评价筛选）、场景二（搜索分类） |
 | `CYLRootTabBarTests` · `CYLExampleDatabaseTests` · `CYLSearchDiscoverTests` · `CYLLocalizationTests` | 根 TabBar 与 PlusButton、SQLite、最近搜索 + 发现、国际化 |
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | 纯 Swift 示例：标签数据、编辑标签、折叠样式、无障碍 |
 
 ```sh
-scripts/unit-tests.sh example   # 52 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh example   # 61 tests; screenshots in build/test-screenshots/example/
 scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshots/swift/
 ```
 
 Xcode 27（iOS 27 SDK）要求 App 采用 scene 生命周期，否则启动即被 UIKit 终止（测试报 “The test runner crashed before
-establishing connection”）；两个示例因此各有一个 scene delegate（`CYLExampleSceneDelegate`、`CYLTagEditorSceneDelegate`），
+establishing connection”）；两个示例和根目录的两个演示 App 因此各有一个 scene delegate（`CYLExampleSceneDelegate`、`CYLTagEditorSceneDelegate`、
+`CYLSceneDelegate`、`CYLTagDemoSceneDelegate`；后两个是 `scripts/unit-tests.sh menu|tag` 的测试宿主），
 测试窗口也加入 App 的 scene。
 
-测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1，71 个测试全部通过）：
+测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 61、swift 19、menu 17、tag 6，共 103 个测试全部通过）：
 
 | 单选：替换同组选择 | 多选 | 底部箭头：折叠 | 底部箭头：展开 |
 | --- | --- | --- | --- |
