@@ -37,6 +37,11 @@ When Swift code needs an Objective-C API, read its imported Swift name (Xcode: G
 Verify with the Swift example and its tests (`scripts/unit-tests.sh swift`) and the library build
 (`scripts/library-warnings.sh`: no warnings in the core).
 
+- A Swift name that matches a function-like macro (the C twin of a lookup macro, such as
+  `CYLMenuLocalizedString(_:)`) cannot go through `NS_SWIFT_NAME`: it forwards its argument through another macro,
+  which expands the lookup macro first ("too few arguments provided to function-like macro invocation"). Write
+  `__attribute__((swift_name("CYLMenuLocalizedString(_:)")))` with a string literal instead.
+
 ## cyl_ methods
 
 As CYLTabBarController does (its `AGENTS.md`, "Swift-friendly names for underscored protocol methods";

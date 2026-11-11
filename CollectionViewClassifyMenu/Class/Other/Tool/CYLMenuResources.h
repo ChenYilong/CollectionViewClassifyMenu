@@ -19,7 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// CYLMenuLocalizedString for Swift, which cannot call function-like macros: `CYLMenuLocalizedString("CYLMenuExpand")`.
 /// Declared like CYLTabBarController's CYLLocalizedString().
-FOUNDATION_EXTERN NSString *CYLMenuLocalizedStringForKey(NSString *key) NS_SWIFT_NAME(CYLMenuLocalizedString(_:));
+/// The Swift name is a string literal (not NS_SWIFT_NAME), so the CYLMenuLocalizedString macro is not expanded in it.
+FOUNDATION_EXTERN NSString *CYLMenuLocalizedStringForKey(NSString *key) __attribute__((swift_name("CYLMenuLocalizedString(_:)")));
 
 @interface CYLMenuResources : NSObject
 
