@@ -1332,9 +1332,15 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
         UIImage *image = self.style.moreButtonImage ?: CYLMenuImage(@"cyl_more") ?: [UIImage systemImageNamed:@"ellipsis"];
         [header.moreButton setImage:[image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
         header.moreButton.tintColor = self.style.moreButtonColor;
-        NSString *title = [source menuTitleForSection:section];
-        NSString *more = CYLMenuLocalizedString(@"CYLMenuMoreActions", @"The More button of a section");
-        header.moreButton.accessibilityLabel = title.length > 0 ? [NSString stringWithFormat:@"%@ %@", title, more] : more;
+        NSString *label = [source respondsToSelector:@selector(menuAccessibilityLabelForMoreButtonInSection:)]
+            ? [source menuAccessibilityLabelForMoreButtonInSection:section] : nil;
+        if (label.length == 0) {
+            NSString *title = [source menuTitleForSection:section];
+            NSString *more = CYLMenuLocalizedString(@"CYLMenuMoreActions", @"The More button of a section");
+            label = title.length > 0 ? [NSString stringWithFormat:@"%@ %@", title, more] : more;
+        }
+        header.moreButton.accessibilityLabel = label;
+        header.moreButton.largeContentTitle = label;
         header.moreHandler = ^(NSInteger tappedSection) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             id<CYLMenuDelegate> delegate = strongSelf.menuDelegate;

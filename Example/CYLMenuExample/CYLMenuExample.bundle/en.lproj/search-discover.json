@@ -1,0 +1,95 @@
+{
+  "comment": "Sample data of the search history and discover demo (CYLSearchDiscoverViewController), one file per language (the same topics, in the same order): recent searches, and a pool of discover topics; the More button shows another random selection of discoverCount topics. icon 'hot' adds the localized hot icon (discover-hot.png of the same .lproj) after the title.",
+  "version": 1,
+  "discoverCount": 6,
+  "recentSearches": [
+    "Swift concurrency",
+    "SwiftUI animations",
+    "Adapting to iOS 26 Liquid Glass",
+    "Tag cloud layout",
+    "What's new in Xcode 27",
+    "Private CocoaPods specs",
+    "Fold menu interaction design",
+    "VoiceOver test checklist",
+    "Dark mode colors",
+    "Why can't I sleep when I go to bed early"
+  ],
+  "discover": [
+    {
+      "title": "Spring camping gear checklist",
+      "icon": "hot"
+    },
+    {
+      "title": "Full guide: turn an old phone into a home server"
+    },
+    {
+      "title": "Pour-over coffee basics"
+    },
+    {
+      "title": "Pomodoro technique"
+    },
+    {
+      "title": "Low-sugar breakfast ideas"
+    },
+    {
+      "title": "Weekend road trip routes"
+    },
+    {
+      "title": "City cycling routes",
+      "icon": "hot"
+    },
+    {
+      "title": "Contributing to open source"
+    },
+    {
+      "title": "Minimal desk setup"
+    },
+    {
+      "title": "Indoor workouts for rainy days"
+    },
+    {
+      "title": "Film camera basics"
+    },
+    {
+      "title": "Switching your cat's food"
+    },
+    {
+      "title": "Homemade yogurt"
+    },
+    {
+      "title": "Reading notes you won't forget",
+      "icon": "hot"
+    },
+    {
+      "title": "Balcony vegetable garden"
+    },
+    {
+      "title": "Beginner fishing gear"
+    },
+    {
+      "title": "Saving money on train trips"
+    },
+    {
+      "title": "Coding for kids"
+    },
+    {
+      "title": "Night city photography settings"
+    },
+    {
+      "title": "Home storage tips"
+    },
+    {
+      "title": "Air fryer recipes",
+      "icon": "hot"
+    },
+    {
+      "title": "Training plan for a first half marathon"
+    },
+    {
+      "title": "Designers' favorite palettes"
+    },
+    {
+      "title": "Hiking safety essentials"
+    }
+  ]
+}

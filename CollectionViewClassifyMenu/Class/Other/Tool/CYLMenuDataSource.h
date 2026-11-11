@@ -106,6 +106,12 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * Defaults to NO. Only CYLTagListView shows it.
  */
 - (BOOL)menuShowsMoreButtonInSection:(NSInteger)section NS_SWIFT_NAME(menuShowsMoreButton(inSection:));
+/*!
+ * What VoiceOver, Voice Control and the Large Content Viewer call the section's More button, already localized:
+ * say what its action does, for example "换一批" (refresh). nil (the default) uses "<section title> 更多操作".
+ */
+- (nullable NSString *)menuAccessibilityLabelForMoreButtonInSection:(NSInteger)section
+    NS_SWIFT_NAME(menuAccessibilityLabelForMoreButton(inSection:));
 
 @end
 

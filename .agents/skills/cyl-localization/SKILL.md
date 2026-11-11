@@ -25,6 +25,10 @@ description: Internationalization and localization rules and checks for Collecti
   user's languages, else English), so hosts need not declare the languages.
   The Example follows the same language.
 - XIB texts are placeholders; set user-facing text in code through the macro.
+- Localized sample data and images go into the `.lproj` of their language inside the example's bundle, read through
+  the example's language (`CYLExampleLocalization.stringsBundle`): `search-discover.json` and the hot icon
+  `discover-hot.png` (热, 熱, HOT) of `Example/CYLMenuExample`, `tags.json` of `Example-Swift`. Every language has the
+  same items in the same order.
 - Other platforms: one resource container per module (for example Android
   `res/values-<locale>/` per module, web JSON per package), the core container
   kept stable, and a lookup helper per module.

@@ -2,14 +2,16 @@
 //  CYLSearchDiscoverData.swift
 //  CYLMenuExample
 //
-//  The data of the search history and discover demo, from CYLMenuExample.bundle/Data/search-discover.json:
-//  recent searches, and a pool of discover topics from which the More button picks another random selection.
+//  The data of the search history and discover demo, from CYLMenuExample.bundle/<language>.lproj/search-discover.json
+//  (one file per language, the same topics in the same order): recent searches, and a pool of discover topics from
+//  which the More button picks another random selection.
 //
 
-import Foundation
+import UIKit
 
 /**
- * One discover topic: a title (sample data, not translated), and an optional icon after it: "hot" for the 热 icon.
+ * One discover topic: a title (in the file's language), and an optional icon after it: "hot" for the localized hot
+ * icon (discover-hot.png of the same .lproj: 热, 熱, HOT).
  */
 struct CYLDiscoverTopic: Codable, Equatable {
     let title: String
@@ -33,10 +35,22 @@ struct CYLSearchDiscoverData: Codable {
     }
 
     /**
-     * The file in CYLMenuExample.bundle.
+     * The file of the current language (the Example's language, see CYLExampleLocalization), else the Simplified
+     * Chinese one.
      */
     static var fileURL: URL? {
-        CYLExampleLocalization.resourceBundle?.url(forResource: "search-discover", withExtension: "json", subdirectory: "Data")
+        CYLExampleLocalization.stringsBundle?.url(forResource: "search-discover", withExtension: "json")
+            ?? CYLExampleLocalization.resourceBundle?.url(forResource: "search-discover", withExtension: "json",
+                                                          subdirectory: nil, localization: "zh-Hans")
+    }
+
+    /**
+     * The hot icon of the current language, labelled for VoiceOver (read as the tag's value).
+     */
+    static func hotIcon() -> UIImage? {
+        let image = UIImage(named: "discover-hot", in: CYLExampleLocalization.stringsBundle, compatibleWith: nil)
+        image?.accessibilityLabel = CYLExampleLocalizedString("热门")
+        return image
     }
 
     /**

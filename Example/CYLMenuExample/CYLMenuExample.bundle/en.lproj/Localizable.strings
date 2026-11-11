@@ -194,3 +194,11 @@
 "场景：搜索历史与发现" = "Scenario: search history and discover";
 "最近搜索折叠为两行，箭头是最后一个标签；发现每行两个，超出部分显示省略号，右上角的更多按钮随机刷新。数据来自本地 JSON。" = "Recent searches fold to two rows, the chevron being the last tag; discover shows two topics per row, truncated with an ellipsis, and the More button at the top trailing edge refreshes them at random. The data comes from a local JSON file.";
 "热门" = "Hot";
+
+/* Search history and discover: accessibility and actions. */
+"轻点两下搜索" = "Double-tap to search";
+"换一批" = "Refresh topics";
+"演示中暂不支持以图搜索。" = "Search by image is not available in this demo.";
+"好" = "OK";
+"正在搜索：%@" = "Searching: %@";
+"请按住麦克风按钮说出问题" = "Hold the mic button and say your question";

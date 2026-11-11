@@ -64,7 +64,18 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
         XCTAssertFalse(more.isHidden)
         XCTAssertNotNil(more.currentImage, "The bundle's cyl_more icon")
         XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_more"))
-        XCTAssertEqual(more.accessibilityLabel, "发现 更多操作")
+        XCTAssertEqual(more.accessibilityLabel, "换一批", "VoiceOver says what the More button does")
+        XCTAssertEqual(more.largeContentTitle, "换一批")
+        // Every tag says what a tap does; the hint's sparkles are not read.
+        XCTAssertEqual(discover.cell(at: ip(0, 0))?.accessibilityHint, "轻点两下搜索")
+        XCTAssertEqual(recent.cell(at: ip(0, 0))?.accessibilityHint, "轻点两下搜索")
+        XCTAssertEqual(screen.hintLabel.accessibilityLabel, "按住提问，有问必答")
+        // Icon-only buttons: labelled, and shown in the Large Content Viewer.
+        for button in [screen.backButton, screen.cameraButton, screen.micButton, screen.recentSource.clearButton] {
+            XCTAssertFalse(button.accessibilityLabel?.isEmpty ?? true)
+            XCTAssertTrue(button.showsLargeContentViewer)
+            XCTAssertEqual(button.largeContentTitle, button.accessibilityLabel)
+        }
         XCTAssertEqual(screen.searchField.placeholder, screen.discoverSource.topics.first?.title)
         captureScreen(named: "test-search-discover")
         // The More button refreshes the topics (seeded here).
@@ -81,6 +92,13 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
         // Item 1 is always a tag (index 2 could be the fold cell on narrow rows).
         recent.tap(item: 1, section: 0)
         XCTAssertEqual(screen.recentSource.searches.first, screen.searchField.text)
+        // The camera button answers with an alert instead of ignoring the tap.
+        screen.cameraButton.sendActions(for: .touchUpInside)
+        let alert = screen.presentedViewController as? UIAlertController
+        XCTAssertEqual(alert?.title, "以图搜索")
+        XCTAssertEqual(alert?.message, "演示中暂不支持以图搜索。")
+        alert?.dismiss(animated: false)
+        runMainLoop(for: 0.1)
         // The trash clears them.
         screen.recentSource.clearButton.sendActions(for: .touchUpInside)
         XCTAssertTrue(screen.recentSource.searches.isEmpty)

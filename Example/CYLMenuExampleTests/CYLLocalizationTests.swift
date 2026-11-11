@@ -72,6 +72,34 @@ final class CYLLocalizationTests: CYLMenuExampleTestCase {
         XCTAssertEqual(screen.discoverSource.menuTitle(forSection: 0), "Discover")
         XCTAssertEqual(screen.searchButton.title(for: .normal), "Search")
         XCTAssertEqual(screen.hintLabel.text, "Hold to ask, answer all ✨")
+        XCTAssertEqual(screen.hintLabel.accessibilityLabel, "Hold to ask, answer all")
         XCTAssertEqual(CYLMenuLocalizedString("CYLMenuMoreActions"), "More")
+        // The data and the hot icon of the language.
+        XCTAssertEqual(screen.recentSource.searches.first, "Swift concurrency")
+        XCTAssertEqual(screen.discoverSource.topics.first?.title, "Spring camping gear checklist")
+        XCTAssertEqual(screen.searchField.placeholder, "Spring camping gear checklist")
+        let icon = CYLSearchDiscoverData.hotIcon()
+        XCTAssertEqual(icon?.accessibilityLabel, "Hot")
+        XCTAssertGreaterThan(icon?.size.width ?? 0, icon?.size.height ?? 0, "HOT is wider than 热")
+        XCTAssertEqual(screen.discoverSource.menuAccessibilityLabelForMoreButton(inSection: 0), "Refresh topics")
+        XCTAssertEqual(screen.discoverSource.menuAccessibilityHintForItem(at: ip(0, 0)), "Double-tap to search")
+    }
+
+    func testSearchDiscoverScreenInTraditionalChinese() throws {
+        CYLMenuResources.preferredLanguage = "zh-Hant"
+        let data = try CYLSearchDiscoverData.bundled()
+        XCTAssertEqual(data.recentSearches.first, "swift 並行")
+        XCTAssertEqual(data.discover.first?.title, "春季露營裝備清單")
+        XCTAssertEqual(data.discover.count, 24, "The same topics in every language")
+        XCTAssertEqual(data.discover.map(\.icon), try simplifiedChineseIcons(), "The same hot topics in every language")
+        XCTAssertEqual(CYLSearchDiscoverData.hotIcon()?.accessibilityLabel, "熱門")
+        XCTAssertEqual(CYLExampleLocalizedString("最近搜索"), "最近搜尋")
+        XCTAssertEqual(CYLExampleLocalizedString("换一批"), "換一批")
+    }
+
+    private func simplifiedChineseIcons() throws -> [String?] {
+        CYLMenuResources.preferredLanguage = "zh-Hans"
+        defer { CYLMenuResources.preferredLanguage = "zh-Hant" }
+        return try CYLSearchDiscoverData.bundled().discover.map(\.icon)
     }
 }

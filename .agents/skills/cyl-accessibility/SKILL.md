@@ -16,7 +16,7 @@ branch, see `cyl-dependency`). General practice: the copied `ios-accessibility`,
 | Tag cell (`CYLTagListCell`) | yes | the tag's title | button, + selected, + not enabled | `CYLTagListItem` (`CYLTagListItemAccessibilityIdentifier`) |
 | "+ 新建标签" (`CYLTagCreateCell`) | yes | "新建标签" / "新建标签：<name>" (core strings) | button (never selected) | `CYLTagCreateItem` |
 | Fold control (`CYLTagFoldButton`, header or bottom; `CYLTagFoldCell` for the inline position) | yes | "<section> 更多/收起" (core strings), hint `CYLMenuExpandHint` while folded | button | `CYLTagListFoldControl` |
-| More button (`menuShowsMoreButtonInSection:`) | yes | "<section> 更多操作" (core string `CYLMenuMoreActions`) | button | `CYLTagListMoreButton` |
+| More button (`menuShowsMoreButtonInSection:`) | yes | the host's `menuAccessibilityLabelForMoreButtonInSection:` (say the action, e.g. "换一批"), else "<section> 更多操作" (core string `CYLMenuMoreActions`); also the Large Content Viewer title | button | `CYLTagListMoreButton` |
 | A tag's icon with a meaning (such as the 热 icon) | no (part of the tag) | its `accessibilityLabel` is read as the tag's value | — | — |
 | List title (`CYLTagListView.titleView`) | when it has a label | `title`, else the title image's `accessibilityLabel` | header | `CYLTagListTitle` |
 | Section header label | yes | the section title | header | — |

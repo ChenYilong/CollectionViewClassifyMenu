@@ -1,0 +1,95 @@
+{
+  "comment": "Sample data of the search history and discover demo (CYLSearchDiscoverViewController), one file per language (the same topics, in the same order): recent searches, and a pool of discover topics; the More button shows another random selection of discoverCount topics. icon 'hot' adds the localized hot icon (discover-hot.png of the same .lproj) after the title.",
+  "version": 1,
+  "discoverCount": 6,
+  "recentSearches": [
+    "swift 並行",
+    "SwiftUI 動畫",
+    "iOS 26 液態玻璃適配",
+    "標籤雲版面",
+    "Xcode 27 新功能",
+    "CocoaPods 私有庫",
+    "摺疊選單互動設計",
+    "VoiceOver 測試清單",
+    "深色模式配色",
+    "為什麼越想早睡越睡不著"
+  ],
+  "discover": [
+    {
+      "title": "春季露營裝備清單",
+      "icon": "hot"
+    },
+    {
+      "title": "舊手機改造成家庭伺服器的完整教學"
+    },
+    {
+      "title": "手沖咖啡入門"
+    },
+    {
+      "title": "番茄工作法"
+    },
+    {
+      "title": "低糖早餐做法"
+    },
+    {
+      "title": "週末短途自駕路線"
+    },
+    {
+      "title": "城市騎行路線推薦",
+      "icon": "hot"
+    },
+    {
+      "title": "開源專案貢獻指南"
+    },
+    {
+      "title": "極簡桌面布置"
+    },
+    {
+      "title": "雨天室內運動"
+    },
+    {
+      "title": "底片相機入門"
+    },
+    {
+      "title": "貓咪換糧指南"
+    },
+    {
+      "title": "自製優格"
+    },
+    {
+      "title": "讀書筆記怎麼做才不會忘",
+      "icon": "hot"
+    },
+    {
+      "title": "陽台種菜"
+    },
+    {
+      "title": "新手釣魚裝備"
+    },
+    {
+      "title": "高鐵出行省錢技巧"
+    },
+    {
+      "title": "兒童程式啟蒙"
+    },
+    {
+      "title": "城市夜景拍攝參數"
+    },
+    {
+      "title": "居家收納技巧"
+    },
+    {
+      "title": "氣炸鍋食譜",
+      "icon": "hot"
+    },
+    {
+      "title": "第一次跑半程馬拉松的訓練計畫"
+    },
+    {
+      "title": "設計師常用配色"
+    },
+    {
+      "title": "登山健行安全須知"
+    }
+  ]
+}

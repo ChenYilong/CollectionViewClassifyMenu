@@ -42,6 +42,10 @@ final class CYLRecentSearchSource: NSObject, CYLMenuDataSource {
     func menuAccessoryView(forSection section: Int) -> UIView? {
         clearButton
     }
+
+    func menuAccessibilityHintForItem(at indexPath: IndexPath) -> String? {
+        CYLExampleLocalizedString("轻点两下搜索")
+    }
 }
 
 /**
@@ -67,16 +71,25 @@ final class CYLDiscoverSource: NSObject, CYLMenuDataSource {
     }
 
     /**
-     * The 热 icon after a hot topic's title; VoiceOver reads its label as the tag's value.
+     * The localized hot icon after a hot topic's title; VoiceOver reads its label as the tag's value.
      */
     func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
-        guard topics[indexPath.item].icon == "hot", let image = UIImage(named: "discover-hot") else { return nil }
-        image.accessibilityLabel = CYLExampleLocalizedString("热门")
-        return image
+        topics[indexPath.item].icon == "hot" ? CYLSearchDiscoverData.hotIcon() : nil
+    }
+
+    func menuAccessibilityHintForItem(at indexPath: IndexPath) -> String? {
+        CYLExampleLocalizedString("轻点两下搜索")
     }
 
     func menuShowsMoreButton(inSection section: Int) -> Bool {
         true
+    }
+
+    /**
+     * The More button refreshes the topics: VoiceOver says so instead of a generic "More".
+     */
+    func menuAccessibilityLabelForMoreButton(inSection section: Int) -> String? {
+        CYLExampleLocalizedString("换一批")
     }
 }
 
@@ -152,6 +165,8 @@ final class CYLSearchDiscoverViewController: UIViewController {
         for state in [UIControl.State.normal, .selected, .disabled] {
             style.appearance(for: state).font = .systemFont(ofSize: 17, weight: .medium)
         }
+        // The hot icon at its own size: square in Chinese (热, 熱), wider in English (HOT).
+        style.imageSize = .zero
         style.itemHeight = 36
         style.lineSpacing = 16
         style.sectionInsets = UIEdgeInsets(top: 4, left: 16, bottom: 16, right: 16)
@@ -176,7 +191,43 @@ final class CYLSearchDiscoverViewController: UIViewController {
         setUpLists()
         setUpAskArea()
         layOut()
+        updateLayerColors()
         reloadLists()
+        // Long presses on the icon-only buttons show them in the Large Content Viewer (large accessibility text sizes).
+        view.addInteraction(UILargeContentViewerInteraction())
+        NotificationCenter.default.addObserver(self, selector: #selector(contrastDidChange),
+                                               name: UIAccessibility.darkerSystemColorsStatusDidChangeNotification, object: nil)
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateLayerColors()
+    }
+
+    @objc private func contrastDidChange() {
+        updateLayerColors()
+    }
+
+    /**
+     * Layer colors are CGColors: resolve them again for dark mode and Increase Contrast (a visible outline then).
+     */
+    func updateLayerColors() {
+        let contrast = UIAccessibility.isDarkerSystemColorsEnabled
+        let border = contrast ? UIColor.label : UIColor.separator
+        searchBar.layer.borderColor = border.resolvedColor(with: traitCollection).cgColor
+        searchBar.layer.borderWidth = contrast ? 2 : 1
+        micButton.layer.borderColor = border.resolvedColor(with: traitCollection).cgColor
+        micButton.layer.borderWidth = contrast ? 2 : 0
+    }
+
+    /**
+     * Makes an icon-only button readable in the Large Content Viewer, under its accessibility label.
+     */
+    private func showsLargeContent(_ button: UIButton) {
+        button.showsLargeContentViewer = true
+        button.largeContentTitle = button.accessibilityLabel
+        button.largeContentImage = button.currentImage
+        button.scalesLargeContentImage = true
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -198,8 +249,6 @@ final class CYLSearchDiscoverViewController: UIViewController {
 
         searchBar.backgroundColor = .systemBackground
         searchBar.layer.cornerRadius = 22
-        searchBar.layer.borderWidth = 1
-        searchBar.layer.borderColor = UIColor.separator.cgColor
         searchBar.layer.shadowColor = UIColor.black.cgColor
         searchBar.layer.shadowOpacity = 0.06
         searchBar.layer.shadowRadius = 6
@@ -216,6 +265,9 @@ final class CYLSearchDiscoverViewController: UIViewController {
         cameraButton.setImage(UIImage(systemName: "camera.viewfinder", withConfiguration: UIImage.SymbolConfiguration(pointSize: 19, weight: .regular)), for: .normal)
         cameraButton.tintColor = .label
         cameraButton.accessibilityLabel = CYLExampleLocalizedString("以图搜索")
+        cameraButton.addTarget(self, action: #selector(searchByImage), for: .touchUpInside)
+        showsLargeContent(cameraButton)
+        showsLargeContent(backButton)
 
         let divider = UIView()
         divider.backgroundColor = .separator
@@ -264,6 +316,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
         recentSource.clearButton.tintColor = .secondaryLabel
         recentSource.clearButton.accessibilityLabel = CYLExampleLocalizedString("清空最近搜索")
         recentSource.clearButton.addTarget(self, action: #selector(clearRecentSearches), for: .touchUpInside)
+        showsLargeContent(recentSource.clearButton)
 
         // 发现: two per row, the More button refreshes the topics.
         discoverList.style = Self.discoverStyle()
@@ -274,7 +327,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
     }
 
     private func setUpAskArea() {
-        hintLabel.text = CYLExampleLocalizedString("按住提问，有问必答") + " ✨"
+        showHint(CYLExampleLocalizedString("按住提问，有问必答"))
         hintLabel.font = UIFontMetrics(forTextStyle: .title3).scaledFont(for: .systemFont(ofSize: 20))
         hintLabel.adjustsFontForContentSizeCategory = true
         hintLabel.textColor = .secondaryLabel
@@ -296,6 +349,17 @@ final class CYLSearchDiscoverViewController: UIViewController {
         let hold = UILongPressGestureRecognizer(target: self, action: #selector(holdToAsk(_:)))
         hold.minimumPressDuration = 0.2
         micButton.addGestureRecognizer(hold)
+        // A tap (VoiceOver's double tap, Switch Control, Full Keyboard Access) explains how to ask.
+        micButton.addTarget(self, action: #selector(micTapped), for: .touchUpInside)
+        showsLargeContent(micButton)
+    }
+
+    /**
+     * The hint above the mic button; the sparkles are decoration, so VoiceOver reads the text only.
+     */
+    private func showHint(_ text: String) {
+        hintLabel.text = text + " ✨"
+        hintLabel.accessibilityLabel = text
     }
 
     private func layOut() {
@@ -378,6 +442,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
         recentSource.searches.removeAll { $0 == query }
         recentSource.searches.insert(query, at: 0)
         reloadLists()
+        UIAccessibility.post(notification: .announcement, argument: CYLExampleLocalizedString("正在搜索：%@", query))
     }
 
     /**
@@ -393,6 +458,20 @@ final class CYLSearchDiscoverViewController: UIViewController {
         UIAccessibility.post(notification: .announcement, argument: CYLExampleLocalizedString("已清空最近搜索"))
     }
 
+    /**
+     * The camera button: not part of this demo, which says so instead of ignoring the tap.
+     */
+    @objc func searchByImage() {
+        let alert = UIAlertController(title: CYLExampleLocalizedString("以图搜索"),
+                                      message: CYLExampleLocalizedString("演示中暂不支持以图搜索。"), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("好"), style: .default))
+        present(alert, animated: true)
+    }
+
+    @objc private func micTapped() {
+        UIAccessibility.post(notification: .announcement, argument: CYLExampleLocalizedString("请按住麦克风按钮说出问题"))
+    }
+
     @objc private func goBack() {
         navigationController?.popViewController(animated: true)
     }
@@ -400,9 +479,10 @@ final class CYLSearchDiscoverViewController: UIViewController {
     @objc private func holdToAsk(_ recognizer: UILongPressGestureRecognizer) {
         switch recognizer.state {
         case .began:
-            hintLabel.text = CYLExampleLocalizedString("正在聆听…")
+            showHint(CYLExampleLocalizedString("正在聆听…"))
+            UIAccessibility.post(notification: .announcement, argument: CYLExampleLocalizedString("正在聆听…"))
         case .ended, .cancelled, .failed:
-            hintLabel.text = CYLExampleLocalizedString("按住提问，有问必答") + " ✨"
+            showHint(CYLExampleLocalizedString("按住提问，有问必答"))
         default:
             break
         }
