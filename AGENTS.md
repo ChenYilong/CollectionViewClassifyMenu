@@ -189,10 +189,26 @@ AGENTS.md, newest commit) and adapted to this project:
   `ios-accessibility`, `uikit-accessibility-auditor` and `accessibility-audit`
   skills).
 
-## CI and Example screenshots
+## CI/CD and Example screenshots
 
 - CI follows CYLTabBarController's `.github/workflows/ios.yml`; the scripts
   live in `scripts/` (see `.agents/skills/cyl-verify/`).
+- Runner environment (GitHub CI/CD): the iOS jobs run on **macOS 26** by
+  default (`runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}`, the image's
+  default Xcode 26.x; the repository variable `MACOS_RUNNER` selects another
+  runner without editing the workflow). Before changing a runner, an Xcode
+  version or a build setting that depends on them, always read
+  CYLTabBarController's workflow first to confirm the environment:
+  <https://github.com/ChenYilong/CYLTabBarController/blob/master/.github/workflows/ios.yml>,
+  and the same file at its newest commit (see "CYLTabBarController reference
+  and dependency"). Keep `ios.yml` on the runner they use.
+- Local runs ignore that runner rule. A local run does not go through GitHub
+  CI/CD: it uses the developer's Mac directly, with Xcode and the iOS
+  Simulator started on that machine (`scripts/unit-tests.sh`,
+  `scripts/example-screenshots.sh`, `xcodebuild`, `xcrun simctl`). Assume
+  **macOS 27 with Xcode 27** there unless `sw_vers` / `xcodebuild -version`
+  say otherwise, and pick a simulator that this Xcode provides
+  (`scripts/simulator-id.sh`).
 - Every CI run that builds code must provide screenshots of the Example app
   (`Example screenshots` job in `ios.yml`: the `example-screenshots` artifact,
   and a copy on the `ci-screenshots` branch under `<branch>/<commit>/`, which
@@ -214,7 +230,7 @@ AGENTS.md, newest commit) and adapted to this project:
 - Name files in English, lowercase with hyphens, after what they show
   (`swift-tag-editor.png`, `scenario1-taobao-review-filter.gif`).
 - README screenshots of the examples come from a CI run of the current commit
-  (the `ci-screenshots` branch, see "CI and Example screenshots"); replace them
+  (the `ci-screenshots` branch, see "CI/CD and Example screenshots"); replace them
   when the screens change.
 
 ## Repository hygiene

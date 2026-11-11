@@ -21,6 +21,33 @@ scripts/example-screenshots.sh   # simulator screenshots in build/screenshots/ (
 shellcheck scripts/*.sh
 ```
 
+## Environments
+
+| Where | System | Xcode | How |
+| --- | --- | --- | --- |
+| GitHub CI/CD (default) | macOS 26 runner (`macos-26`, Apple Silicon) | the image's default Xcode 26.x | `.github/workflows/ios.yml`: `runs-on: ${{ vars.MACOS_RUNNER \|\| 'macos-26' }}` |
+| GitHub CI/CD, other runner | the repository variable `MACOS_RUNNER` (for example `xcode-27`, Xcode 27 preview) | that image's Xcode | Settings → Secrets and variables → Actions → Variables |
+| Local run | macOS 27 (default assumption) | Xcode 27 | the scripts above, run directly on the Mac, with its Simulator |
+
+- **Always check CYLTabBarController's workflow first** before changing a runner, an Xcode version, a simulator
+  name or a setting that depends on them:
+  <https://github.com/ChenYilong/CYLTabBarController/blob/master/.github/workflows/ios.yml>, and the same file at
+  its newest commit over every branch (`cyl-dependency`):
+
+  ```sh
+  D=$(mktemp -d) && git clone -q --filter=blob:none https://github.com/ChenYilong/CYLTabBarController.git "$D"
+  git -C "$D" show origin/master:.github/workflows/ios.yml | grep -nE 'runs-on|macos|xcode'
+  git -C "$D" show "$(scripts/cyl-tabbar-latest-commit.sh | cut -d' ' -f1)":.github/workflows/ios.yml | grep -nE 'runs-on|macos|xcode'
+  ```
+
+  Keep this project's `ios.yml` on the same runner (today both use `macos-26`).
+- **A local run** does not use GitHub CI/CD: it runs on the developer's Mac, starting Xcode and the iOS Simulator
+  there. The runner rule does not apply; assume macOS 27 and Xcode 27, confirm with `sw_vers` and
+  `xcodebuild -version`, and let `scripts/simulator-id.sh` pick a simulator this Xcode has (pass a name to choose
+  one). Report the versions you actually used.
+- A Linux container (such as a cloud agent session) has neither: it can only push and read the CI results and
+  screenshots.
+
 Report existing warnings and unavailable checks. For UI or layout changes,
 also exercise reuse, section changes and narrow screen sizes in a simulator,
 and attach the screenshots.
