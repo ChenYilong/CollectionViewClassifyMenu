@@ -252,7 +252,7 @@ static BOOL CYLTagIsSet(CGFloat value) {
 }
 
 - (NSString *)menuTitleForSection:(NSInteger)section {
-    return @"";
+    return self.sectionTitle ?: @"";
 }
 
 - (NSString *)menuTitleForItemAtIndexPath:(NSIndexPath *)indexPath {

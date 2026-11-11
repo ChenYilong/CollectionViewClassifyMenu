@@ -473,7 +473,8 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         [self cyl_placeImageView:CGRectZero];
     }
     // 0 is automatic: a capsule, as for CYLBadgeAppearance.
-    self.layer.cornerRadius = appearance.cornerRadius > 0 ? MIN(appearance.cornerRadius, height / 2) : height / 2;
+    self.layer.cornerRadius = appearance.cornerRadius > 0
+        ? (appearance.cornerRadius <= CYLTagCornerRadiusSquare ? 0 : MIN(appearance.cornerRadius, height / 2)) : height / 2;
 }
 
 @end

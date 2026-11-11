@@ -43,6 +43,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
              "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"],
             ["backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"],
             ["animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
+            ["sample.tagCloud", "sample.imageTag", "sample.tagContainer"],
             ["reset"],
         ]
     }
@@ -51,6 +52,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         [CYLExampleLocalizedString("标题与图标（参照 CYLFlatDesignTabBarItem）"),
          CYLExampleLocalizedString("背景、边框与圆角（参照 CYLBadgeView）"),
          CYLExampleLocalizedString("动效图标（CYLTabBarController 动效引擎）"),
+         CYLExampleLocalizedString("Android 标签库示例（Swift 复刻）"),
          CYLExampleLocalizedString("其它")][section]
     }
 
@@ -85,6 +87,9 @@ final class CYLTagStyleDemoViewController: UIViewController {
         "animationSpeed": "设置动效速度 animationSpeed",
         "configuration": "配置文件 / 字典（map）初始化",
         "tagCloud": "标签云：android-tagview 的初始化方式",
+        "sample.tagCloud": "android-tagview 示例（Swift 版）",
+        "sample.imageTag": "TagViewGroup 示例：图片标签",
+        "sample.tagContainer": "AndroidTagView 示例：标签容器",
         "reset": "重置 reset",
     ]
 
@@ -201,6 +206,15 @@ final class CYLTagStyleDemoViewController: UIViewController {
             return
         case "tagCloud":
             navigationController?.pushViewController(CYLTagCloudDemoViewController(), animated: true)
+            return
+        case "sample.tagCloud":
+            navigationController?.pushViewController(CYLTagCloudSampleViewController(), animated: true)
+            return
+        case "sample.imageTag":
+            navigationController?.pushViewController(CYLImageTagSampleViewController(), animated: true)
+            return
+        case "sample.tagContainer":
+            navigationController?.pushViewController(CYLTagContainerSampleViewController(), animated: true)
             return
         case "reset":
             self.style = Self.demoStyle()

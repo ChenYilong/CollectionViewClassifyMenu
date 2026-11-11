@@ -1210,7 +1210,7 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 }
 
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (![self cyl_isValidIndexPath:indexPath] ||
+    if (self.selectionMode == CYLMenuSelectionModeNone || ![self cyl_isValidIndexPath:indexPath] ||
         ![self cyl_isSelectableAtIndexPath:indexPath]) {
         return;
     }
@@ -1534,6 +1534,12 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
 - (void)toggleSelectionOfItemAtIndexPath:(NSIndexPath *)indexPath {
     if ([self.selection containsObject:indexPath]) {
         [self deselectItemAtIndexPath:indexPath];
+    } else if (self.selectionMode == CYLMenuSelectionModeNone) {
+        // Taps never select in this mode; the host's toggle (a long press) adds any number of items.
+        if ([self cyl_isValidIndexPath:indexPath] && [self cyl_isSelectableAtIndexPath:indexPath]) {
+            [self cyl_applySelectionOfIndexPath:indexPath removed:nil];
+            [self cyl_refreshVisibleCells];
+        }
     } else {
         [self selectItemAtIndexPath:indexPath];
     }

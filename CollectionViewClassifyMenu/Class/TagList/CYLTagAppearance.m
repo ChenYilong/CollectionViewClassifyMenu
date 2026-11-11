@@ -9,6 +9,8 @@ static CGFloat CYLTagSanitized(CGFloat value) {
     return (isfinite(value) && value > 0) ? value : 0;
 }
 
+const CGFloat CYLTagCornerRadiusSquare = 0.001;
+
 @implementation CYLTagAppearance
 
 @synthesize backgroundColor = _backgroundColor;

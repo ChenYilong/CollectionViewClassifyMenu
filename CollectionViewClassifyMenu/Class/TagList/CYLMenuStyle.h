@@ -314,6 +314,19 @@ typedef NS_ENUM(NSInteger, CYLTagDeleteIndicatorPlacement) {
  * body font: the title, then its icon if it has one (CYLTagImagePlacementTrailing, such as a "热" icon), the title
  * truncated with an ellipsis. Change it like any other style.
  */
+/*!
+ * android-tagview's defaults (Constants): #00BFFF capsules with white 14 pt titles and no border, #88363636 while
+ * pressed, 5 × 8 pt padding, 5 pt between tags and between rows, "×" for deletable tags.
+ */
++ (instancetype)tagCloudStyle;
+
+/*!
+ * AndroidTagView's defaults: #33F44336 capsules with a 0.5 pt #88F44336 border and #666666 14 pt titles, #33FF7669
+ * while selected, 10 × 8 pt padding, 5 pt between tags and rows, titles cut after 23 characters, and a 1 pt black cross
+ * with 10 pt padding for deletable tags.
+ */
++ (instancetype)tagContainerStyle;
+
 + (instancetype)gridStyleWithNumberOfItemsPerRow:(NSUInteger)numberOfItemsPerRow NS_SWIFT_NAME(gridStyle(itemsPerRow:));
 
 /*!

@@ -62,6 +62,55 @@
     return self;
 }
 
++ (instancetype)tagCloudStyle {
+    CYLMenuStyle *style = [self defaultStyle];
+    UIColor *blue = [UIColor colorWithRed:0 green:0xBF / 255.0 blue:1 alpha:1];
+    for (CYLTagAppearance *appearance in @[style.normalAppearance, style.selectedAppearance, style.disabledAppearance]) {
+        appearance.backgroundColor = blue;
+        appearance.textColor = [UIColor whiteColor];
+        appearance.borderWidth = 0;
+        // android-tagview's layoutBorderColor: a tag that sets only a border width gets a white border.
+        appearance.borderColor = [UIColor whiteColor];
+        appearance.cornerRadius = 0;
+        appearance.font = [UIFont systemFontOfSize:14];
+    }
+    style.disabledAppearance.backgroundColor = [blue colorWithAlphaComponent:0.4];
+    style.highlightedBackgroundColor = [UIColor colorWithRed:0x36 / 255.0 green:0x36 / 255.0 blue:0x36 / 255.0 alpha:0x88 / 255.0];
+    style.tagContentInsets = UIEdgeInsetsMake(5, 8, 5, 8);
+    style.interitemSpacing = 5;
+    style.lineSpacing = 5;
+    style.itemHeight = 0;
+    style.backgroundColor = [UIColor clearColor];
+    return style;
+}
+
++ (instancetype)tagContainerStyle {
+    CYLMenuStyle *style = [self defaultStyle];
+    UIColor *red = [UIColor colorWithRed:0xF4 / 255.0 green:0x43 / 255.0 blue:0x36 / 255.0 alpha:1];
+    for (CYLTagAppearance *appearance in @[style.normalAppearance, style.selectedAppearance, style.disabledAppearance]) {
+        appearance.backgroundColor = [red colorWithAlphaComponent:0x33 / 255.0];
+        appearance.borderColor = [red colorWithAlphaComponent:0x88 / 255.0];
+        appearance.borderWidth = 0.5;
+        appearance.textColor = [UIColor colorWithWhite:0x66 / 255.0 alpha:1];
+        appearance.cornerRadius = 15;
+        appearance.font = [UIFont systemFontOfSize:14];
+    }
+    style.selectedAppearance.backgroundColor = [UIColor colorWithRed:1 green:0x76 / 255.0 blue:0x69 / 255.0 alpha:0x33 / 255.0];
+    style.disabledAppearance.textColor = [UIColor colorWithWhite:0x66 / 255.0 alpha:0.5];
+    style.tagContentInsets = UIEdgeInsetsMake(8, 10, 8, 10);
+    style.interitemSpacing = 5;
+    style.lineSpacing = 5;
+    style.itemHeight = 0;
+    style.maximumTitleLength = 23;
+    style.deleteIndicatorLineWidth = 1;
+    style.deleteIndicatorPadding = 10;
+    style.deleteIndicatorColor = [UIColor blackColor];
+    style.rippleColor = [UIColor colorWithWhite:0xEE / 255.0 alpha:1];
+    style.rippleAlpha = 128 / 255.0;
+    style.backgroundColor = [UIColor clearColor];
+    return style;
+}
+
 + (instancetype)gridStyleWithNumberOfItemsPerRow:(NSUInteger)numberOfItemsPerRow {
     CYLMenuStyle *style = [self defaultStyle];
     style.numberOfItemsPerRow = MAX(1, numberOfItemsPerRow);

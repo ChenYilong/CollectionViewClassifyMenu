@@ -130,6 +130,12 @@ verify the behavior and update the applicable documentation.
   sorts by committer date; `--check` fails when a Podfile pins another commit).
   When it changed, update every pin and anything copied from CYLTabBarController
   in the same commit, after checking what changed in between.
+- Search bars in the examples are CYLSearchViewController's `CYLSearchBarView`
+  (the sibling `../CYLSearchViewController` repository, unreleased, no API
+  compatibility to keep). Change it there as the examples need, commit and
+  push on a feature branch, then pin that commit as `CYL_SEARCH` in
+  `Example/Podfile` (`:git` + `:commit`, so CI can fetch it). Do not use a
+  local `:path` in a committed Podfile: CI does not have the sibling folder.
 - If this project is CYLTabBarController itself, depend on it locally instead:
   `pod 'CYLTabBarController', :path => '<relative path to the folder that holds
   CYLTabBarController.podspec>'`. Every other project uses the commit.

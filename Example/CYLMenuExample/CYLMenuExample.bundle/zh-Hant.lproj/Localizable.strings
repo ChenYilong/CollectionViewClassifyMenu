@@ -203,3 +203,7 @@
 "代码初始化：addTags(withTitles:)、addTag(_:)" = "程式碼初始化：addTags(withTitles:)、addTag(_:)";
 "字典初始化：CYLTagListViewTags" = "字典初始化：CYLTagListViewTags";
 "标签云：android-tagview 的初始化方式" = "標籤雲：android-tagview 的初始化方式";
+"Android 标签库示例（Swift 复刻）" = "Android 標籤庫範例（Swift 復刻）";
+"android-tagview 示例（Swift 版）" = "android-tagview 範例（Swift 版）";
+"TagViewGroup 示例：图片标签" = "TagViewGroup 範例：圖片標籤";
+"AndroidTagView 示例：标签容器" = "AndroidTagView 範例：標籤容器";

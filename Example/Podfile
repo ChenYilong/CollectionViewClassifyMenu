@@ -13,7 +13,7 @@ CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
 # The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
 # revision whose API the Example uses (feat/search-bar-view); update together.
 CYL_SEARCH = { :git => 'https://github.com/ChenYilong/CYLSearchViewController.git',
-               :commit => 'c581f12558d5b6d4cc656147cc39f1cb00c54e93' }
+               :commit => 'cb43069653700b826c3bf3ff007077b8d6c3b82d' }
 
 target 'CYLMenuExample' do
   # As CYLTabBarController's examples: the Rive animator has Swift files.

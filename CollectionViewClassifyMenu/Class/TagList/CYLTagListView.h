@@ -320,7 +320,8 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  */
 - (void)removeTagsAtIndexes:(NSIndexSet *)indexes NS_SWIFT_NAME(removeTags(at:));
 /*!
- * Selects an unselected item or deselects a selected one (toggleSelectTagView).
+ * Selects an unselected item or deselects a selected one (toggleSelectTagView). In CYLMenuSelectionModeNone, where taps
+ * never select, it still selects (any number of items), as AndroidTagView's long press does.
  */
 - (void)toggleSelectionOfItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(toggleSelection(at:));
 /*!
@@ -335,8 +336,7 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  */
 @property (nonatomic, copy) NSArray<NSIndexPath *> *selectedIndexPaths;
 /*!
- * Applies the selection rules of `selectionMode` without calling the delegate. In CYLMenuSelectionModeNone, where taps
- * never select, the host can still select items this way (any number).
+ * Applies the selection rules of `selectionMode` without calling the delegate.
  */
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath;
 - (void)deselectItemAtIndexPath:(NSIndexPath *)indexPath;

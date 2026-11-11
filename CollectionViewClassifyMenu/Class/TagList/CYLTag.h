@@ -169,6 +169,10 @@ FOUNDATION_EXTERN const CGFloat CYLTagUseListValue;
 
 @property (nonatomic, copy) NSArray<CYLTag *> *tags;
 /*!
+ * The title of the one section, shown when the list shows section headers ("热门搜索"); empty by default.
+ */
+@property (nonatomic, copy, nullable) NSString *sectionTitle;
+/*!
  * The style tags with their own look start from (CYLTagListView keeps it equal to its style).
  */
 @property (nonatomic, copy, null_resettable) CYLMenuStyle *baseStyle;

@@ -12,6 +12,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * A corner radius that keeps the corners square (0 means a capsule), as android-tagview's radius 0.
+ */
+FOUNDATION_EXTERN const CGFloat CYLTagCornerRadiusSquare;
+
 @interface CYLTagAppearance : NSObject <NSCopying>
 
 /*!
