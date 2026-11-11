@@ -86,6 +86,20 @@ verify the behavior and update the applicable documentation.
 - Details, the check of imported Swift names and the list of methods still to
   adapt: `.agents/skills/cyl-swift/`.
 
+## Example tests
+
+- One test case class per feature, one file each (`CYLTagListSelectionTests`, `CYLReviewFilterScenarioTests`, …);
+  never grow a single file that tests everything.
+- Shared capabilities are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into
+  the test targets of `Example/` and `Example-Swift/`: `CYLWindowHosting` (windows in the app's scene),
+  `CYLTagListInspecting` (cells, headers, footers, fold controls, taps), `CYLAccessibilityQuerying` (find views by
+  identifier and label), `CYLScreenshotCapturing` and `CYLConditionWaiting`. Each test target has one small base
+  class (`CYLMenuExampleTestCase`, `CYLTagEditorTestCase`) for its language and its screens, and its fixtures in
+  `Support/`.
+- Tests reach private views of the core only through `CYLTagListProbe` (key-value coding in one place).
+- Tests record screenshots of the states they check with `captureScreenshot(of:named:)` / `captureScreen(named:)`
+  (names start with `test-`); `scripts/unit-tests.sh` writes them to `build/test-screenshots/<suite>/`.
+
 ## Xcode and CocoaPods
 
 - The minimum supported iOS version is 15.0. Keep the project and podspec

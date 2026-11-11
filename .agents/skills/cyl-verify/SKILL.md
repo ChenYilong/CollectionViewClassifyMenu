@@ -21,6 +21,13 @@ scripts/example-screenshots.sh   # simulator screenshots in build/screenshots/ (
 shellcheck scripts/*.sh
 ```
 
+`unit-tests.sh example|swift` also writes the screenshots the tests record (`CYLScreenshotCapturing`) to
+`build/test-screenshots/<suite>/`; look at them and copy the ones the README shows to `assets/test-*.png`.
+
+Apps built with the iOS 27 SDK (Xcode 27) must adopt the scene lifecycle, otherwise UIKit stops them at launch
+(`_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption`, "The test runner crashed before establishing
+connection"). Both examples have a scene delegate; test windows join the app's scene (`CYLWindowHosting`).
+
 ## Environments
 
 | Where | System | Xcode | How |

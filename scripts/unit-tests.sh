@@ -7,8 +7,9 @@
 #      example → Example/CYLMenuExample.xcworkspace, scheme CYLMenuExample
 #      swift   → Example-Swift/CYLTagEditorExample.xcworkspace, scheme CYLTagEditorExample (the pure Swift Example)
 #      Prints every test case and the failures; the full log is build/unit-tests-<suite>.log. Exits with xcodebuild's status.
+#      Screenshots the tests record (CYLScreenshotCapturing) are written to build/test-screenshots/<suite>/.
 # [CN] 安装一个工程的 pods，并在 iOS 模拟器上运行其单元测试（需要装有 Xcode 与 CocoaPods 的 macOS）。输出每个测试用例与失败原因；
-#      完整日志为 build/unit-tests-<suite>.log。退出码为 xcodebuild 的结果。
+#      完整日志为 build/unit-tests-<suite>.log。退出码为 xcodebuild 的结果。测试记录的截图写入 build/test-screenshots/<suite>/。
 set -eu
 SUITE="${1:?usage: $0 <menu|tag|example|swift> [simulator name]}"
 cd "$(dirname "$0")/.."
@@ -30,8 +31,13 @@ xcodebuild -version
 DERIVED_DATA=$(mktemp -d "${TMPDIR:-/tmp}/cyl-unit-tests.XXXXXX")
 trap 'rm -rf "$DERIVED_DATA"' EXIT
 
+SCREENSHOTS="$ROOT/build/test-screenshots/$SUITE"
+rm -rf "$SCREENSHOTS"
+mkdir -p "$SCREENSHOTS"
+
 set +e
-(cd "$DIR" && xcodebuild test \
+# [EN] TEST_RUNNER_<name> reaches the tests as <name>. [CN] TEST_RUNNER_<name> 以 <name> 传给测试进程。
+(cd "$DIR" && TEST_RUNNER_CYL_TEST_SCREENSHOTS_DIR="$SCREENSHOTS" xcodebuild test \
   -workspace "$WORKSPACE" \
   -scheme "$SCHEME" \
   -destination "id=$DEVICE_ID" \
@@ -46,6 +52,7 @@ if [ "$STATUS" -ne 0 ]; then
   grep -nE "(error|fatal error):" "$LOG" | sort -u | head -n 60 || true
   tail -n 40 "$LOG"
 fi
+echo "Test screenshots: $(find "$SCREENSHOTS" -name '*.png' | wc -l | tr -d ' ') in $SCREENSHOTS"
 PASSED=$(grep -cE "^Test Case .*passed" "$LOG" || true)
 FAILED=$(grep -cE "^Test Case .*failed" "$LOG" || true)
 echo "| $SUITE | \`$SCHEME\` | $([ "$STATUS" -eq 0 ] && echo ✅ || echo ❌) | $PASSED | $FAILED |" >> "$ROOT/build/summary.md"
