@@ -1,6 +1,7 @@
 ---
 title: Component architecture and community review
 date: 2026-11-10
+updated: 2026-11-11
 tags: [architecture, cocoapods, issues]
 ---
 
@@ -42,6 +43,16 @@ persistence in the demos.
 `Example/` 通过 Podfile 以本地路径集成核心库，用这些接口实现 README 的两个场景；
 `CYLExampleMenuSource` 演示宿主如何把自己的模型转成数据源。
 
+## Swift 示例与 Swift 友好的核心 / Swift examples, Swift-friendly core
+
+所有示例（`Example/`、`Example-Swift/`、根目录工程的演示 App `CYLClassifyMenuDemo`、`TagCollectionView` 演示）及其测试均为 Swift；
+核心库保持 Objective-C，只通过 Swift 标注适配 Swift 调用（`NS_SWIFT_NAME`、字符串字面量形式的 `swift_name`、`cyl_` 方法的
+`cylXxx` 版本），从不修改 Objective-C 接口。例如 `+[CYLTagView tagView]` 在 Swift 中为 `makeTagView()`，
+`CYLMenuLocalizedString` 宏另有 Swift 可调用的同名函数。公开头文件的多行注释统一为 `/*! … */` 文档注释块
+（`scripts/check-doc-comments.py`），Xcode 快速帮助与 Swift 接口都能显示。
+The examples are all Swift; the core stays Objective-C and only gains Swift annotations next to its public
+declarations, so Objective-C callers see no change.
+
 不兼容修改：移除 `menuItemHasImageAtIndexPath:`，改用 `menuImageForItemAtIndexPath:`；
 `CYLClassifyMenuViewController` 的分组图标改由 `menuImageForSection:` 提供。
 
@@ -63,9 +74,11 @@ persistence in the demos.
   [#9](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/9) 和
   [#13](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/13)；
   section header 宽度对应 [#7](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/7)。
-- 演示和测试覆盖 320/390 pt、长文本及 emoji、复用和外部数据源；并未覆盖所有真机、
-  Dynamic Type、旋转或 VoiceOver 场景。
+- 演示和测试覆盖 320/390 pt、长文本及 emoji、复用和外部数据源，以及 Dynamic Type 字号缩放、
+  无障碍元素（标签、特征、提示与固定的 `accessibilityIdentifier`）；并未覆盖所有真机、旋转，
+  也没有在设备上用 VoiceOver 实际走查。
 - iOS 15 已弃用的按钮 edge insets、`adjustsImageWhenHighlighted` 和
   `UIGraphicsBeginImageContext` 已在 [32720b0](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/32720b0352a0ab93fb5722e711e9954356b63624) 中替换；
-  该环境没有 Xcode/CocoaPods，尚未重新运行 `pod lib lint` 确认警告全部消除。
+  2026-11-11 的 CI（[ff35b27](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/ff35b27)，`macos-26`）中
+  `pod lib lint` 与库的构建/静态分析（有警告即失败）均已通过。
 - 历史 3.5 英寸设备不支持项目现有的 iOS 15 最低版本，因此不能在原设备上复验 #7。
