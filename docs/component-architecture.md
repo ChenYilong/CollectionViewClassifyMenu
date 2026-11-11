@@ -51,7 +51,7 @@ persistence in the demos.
 
 ## 截图 / Screenshots
 
-CI 截图（`Example screenshots`，提交 `3679915`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：
+CI 截图（`Example screenshots`，提交 `22370a8`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：
 
 | 折叠控件与标题样式 | 全部展开（箭头旋转 180°） | 由 JSON / plist / YAML / XML 创建 |
 | --- | --- | --- |
@@ -60,6 +60,10 @@ CI 截图（`Example screenshots`，提交 `3679915`，iPhone 模拟器，`macos
 | 多选（两个分组同时选中） | 搜索后新建并选中标签 | 分类菜单 + 多选筛选（数据库） | 评价筛选（SQLite） |
 | --- | --- | --- | --- |
 | <img src="assets/tag-list-selection.png" width="200" alt="多选（两个分组同时选中）"> | <img src="assets/tag-list-create-tag.png" width="200" alt="搜索后新建并选中标签"> | <img src="assets/classify-menu-filtered.png" width="200" alt="分类菜单 + 多选筛选（数据库）"> | <img src="assets/review-filter-database.png" width="200" alt="评价筛选（SQLite）"> |
+
+| 折叠按钮作为最后一个标签（展开） | 网格：文字在左、图标在右，More 按钮 |
+| --- | --- |
+| <img src="assets/tag-list-inline-fold-expanded.png" width="200" alt="折叠按钮作为最后一个标签（展开）"> | <img src="assets/tag-list-grid-title-then-icon.png" width="200" alt="网格：文字在左、图标在右，More 按钮"> |
 
 ## Swift 示例与 Swift 友好的核心 / Swift examples, Swift-friendly core
 

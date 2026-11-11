@@ -433,7 +433,7 @@ SQL 只用于展示。
 `CYLExampleMenuSource` shows how a host turns its own models into a
 `CYLMenuDataSource`; the core library holds no business data.
 
-截图来自 CI（`Example screenshots`，提交 `3679915`，iPhone 模拟器）：
+截图来自 CI（`Example screenshots`，提交 `22370a8`，iPhone 模拟器）：
 
 | 场景一：商品页预览 | 场景一：评价筛选（展开） | 场景二：搜索首页 | 场景二：职位分类 |
 | --- | --- | --- | --- |
@@ -446,6 +446,10 @@ SQL 只用于展示。
 | 标签样式 | Tag styles (English) | 动效图标 |
 | --- | --- | --- |
 | <img src="assets/tag-styles.png" width="200" alt="标签样式"> | <img src="assets/tag-styles-english.png" width="200" alt="Tag styles (English)"> | <img src="assets/tag-animations.png" width="200" alt="动效图标"> |
+
+| 最近搜索 + 发现（箭头为最后一个标签） | 最近搜索展开 | Search history + discover (English) |
+| --- | --- | --- |
+| <img src="assets/search-discover.png" width="200" alt="最近搜索 + 发现（箭头为最后一个标签）"> | <img src="assets/search-discover-expanded.png" width="200" alt="最近搜索展开"> | <img src="assets/search-discover-english.png" width="200" alt="Search history + discover (English)"> |
 
 ### Swift Example / 纯 Swift 示例：新建标签
 
