@@ -37,8 +37,9 @@ persistence in the demos.
   代码修改选择不触发回调，与 UIKit 惯例一致。
 - 折叠：`CYLMenuFoldStyle`（标题按钮、底部箭头、仅截断预览）与 `defaultVisibleRows`；`CYLMenuFoldControl`
   的位置还包括 `Inline`：折叠按钮作为最后一个标签（`CYLTagFoldCell`），点击即展开/收起，隐藏的标签为它让出位置。
-- 网格与角标：`CYLMenuStyle.numberOfItemsPerRow`（`gridStyle(itemsPerRow:)`）让标签等宽、每行固定个数、超出省略号；
-  数据源 `menuBadgeForItemAtIndexPath:` 在标题后显示角标（如「热」）。
+- 网格与图标位置：`CYLMenuStyle.numberOfItemsPerRow`（`gridStyle(itemsPerRow:)`）让标签等宽、每行固定个数、超出省略号；
+  `imagePlacement`（图标在文字前或后）与 `contentAlignment`（居中或从左边距开始）让标签按钮支持「文字在左、图标在右」，
+  如「苹果官方社区… [热]」：文字截断，图标始终可见。
 - More 按钮：数据源 `menuShowsMoreButtonInSection:` 在分组标题右侧显示核心库的 More 按钮（三个点），
   事件由代理 `menu:didTapMoreButtonInSection:` 交给宿主（Example 中为随机刷新）。
 - 嵌入：`contentHeight`、`intrinsicContentSize`、`heightThatFitsWidth:` 和 `scrollEnabled`，

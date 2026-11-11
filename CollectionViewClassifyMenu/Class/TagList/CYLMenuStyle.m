@@ -53,8 +53,6 @@
         _foldControlColor = [UIColor grayColor];
         _expandTitle = CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand a section");
         _collapseTitle = CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse a section");
-        _badgeBackgroundColor = [UIColor systemRedColor];
-        _badgeTextColor = [UIColor whiteColor];
         _moreButtonColor = [UIColor secondaryLabelColor];
     }
     return self;
@@ -74,10 +72,11 @@
     style.normalAppearance.textColor = [UIColor labelColor];
     style.selectedAppearance.textColor = [UIColor labelColor];
     style.disabledAppearance.textColor = [UIColor tertiaryLabelColor];
-    // The title at the leading edge, without an empty icon slot before it.
-    style.layoutCentered = NO;
-    style.imageSize = CGSizeZero;
-    style.imageTitleSpacing = 0;
+    // The title at the leading edge, then its icon (such as "热"); no empty icon slot before a title alone.
+    style.contentAlignment = CYLTagContentAlignmentLeading;
+    style.imagePlacement = CYLTagImagePlacementTrailing;
+    style.imageSize = CGSizeMake(18, 18);
+    style.imageTitleSpacing = 6;
     style.itemHeight = 32;
     style.interitemSpacing = 24;
     style.lineSpacing = 18;
@@ -113,8 +112,7 @@
     copy.expandTitle = self.expandTitle;
     copy.collapseTitle = self.collapseTitle;
     copy.numberOfItemsPerRow = self.numberOfItemsPerRow;
-    copy.badgeBackgroundColor = self.badgeBackgroundColor;
-    copy.badgeTextColor = self.badgeTextColor;
+    copy.contentAlignment = self.contentAlignment;
     copy.moreButtonImage = self.moreButtonImage;
     copy.moreButtonColor = self.moreButtonColor;
     return copy;

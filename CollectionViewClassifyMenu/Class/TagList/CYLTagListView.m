@@ -608,11 +608,6 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
     return [style isKindOfClass:[CYLMenuStyle class]] ? style : self.style;
 }
 
-- (NSString *)cyl_badgeAtIndexPath:(NSIndexPath *)indexPath {
-    id<CYLMenuDataSource> source = self.menuDataSource;
-    return [source respondsToSelector:@selector(menuBadgeForItemAtIndexPath:)] ? [source menuBadgeForItemAtIndexPath:indexPath] : nil;
-}
-
 - (BOOL)cyl_showsMoreButtonInSection:(NSInteger)section {
     id<CYLMenuDataSource> source = self.menuDataSource;
     return [source respondsToSelector:@selector(menuShowsMoreButtonInSection:)] && [source menuShowsMoreButtonInSection:section];
@@ -704,7 +699,6 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
                                                     animated:[self cyl_animationURLAtIndexPath:indexPath] != nil
                                                        style:style];
             CGFloat width = [CYLTagButton widthForTitle:title iconSize:iconSize style:style traitCollection:traits];
-            width += [CYLTagListCell badgeSizeForText:[self cyl_badgeAtIndexPath:indexPath] traitCollection:traits].width;
             NSUInteger perRow = [self cyl_styleForSection:(NSInteger)section].numberOfItemsPerRow;
             if (perRow > 0) {
                 // The grid: every item the same width, a longer title truncated.
@@ -1259,7 +1253,6 @@ static CGFloat const kCYLTagListTitleVerticalInset = 10;
                     selected:[self.selection containsObject:indexPath]
                      enabled:[self cyl_isEnabledAtIndexPath:indexPath]];
     cell.button.animationRestingProgress = [self cyl_animationRestingProgressAtIndexPath:indexPath];
-    [cell setBadgeText:[self cyl_badgeAtIndexPath:indexPath] style:[self cyl_styleForItemAtIndexPath:indexPath]];
     if ([self.menuDataSource respondsToSelector:@selector(menuAccessibilityHintForItemAtIndexPath:)]) {
         cell.accessibilityHint = [self.menuDataSource menuAccessibilityHintForItemAtIndexPath:indexPath];
     }

@@ -4,7 +4,8 @@
 //
 //  搜索历史与发现：a search app's search page. "最近搜索" is a CYLTagListView whose fold control is a tag cell
 //  (CYLMenuFoldControlPositionInline: the chevron after the last visible tag, then after the last tag); "发现" is a
-//  grid of two plain titles per row (CYLMenuStyle.gridStyle(itemsPerRow:)), long titles truncated, a "热" badge, and
+//  grid of two plain titles per row (CYLMenuStyle.gridStyle(itemsPerRow:)), long titles truncated, a "热" icon after a
+//  title (title on the left, icon on the right: CYLTagImagePlacementTrailing, CYLTagContentAlignmentLeading), and
 //  the core's More button, here refreshing the topics at random. The data comes from search-discover.json; this
 //  screen only shows it and handles the taps.
 //
@@ -65,8 +66,13 @@ final class CYLDiscoverSource: NSObject, CYLMenuDataSource {
         topics[indexPath.item].title
     }
 
-    func menuBadgeForItem(at indexPath: IndexPath) -> String? {
-        topics[indexPath.item].badge
+    /**
+     * The 热 icon after a hot topic's title; VoiceOver reads its label as the tag's value.
+     */
+    func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
+        guard topics[indexPath.item].icon == "hot", let image = UIImage(named: "discover-hot") else { return nil }
+        image.accessibilityLabel = CYLExampleLocalizedString("热门")
+        return image
     }
 
     func menuShowsMoreButton(inSection section: Int) -> Bool {

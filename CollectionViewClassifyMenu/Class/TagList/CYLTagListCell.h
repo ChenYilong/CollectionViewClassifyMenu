@@ -20,6 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, weak, nullable) CYLMenuStyle *appliedStyle;
 
+/*!
+ * Shows a tag: its title (also its accessibility label), icons, look and state. An icon's accessibilityLabel, when
+ * it has one (such as a "hot" icon), is read by VoiceOver as the tag's value.
+ */
 - (void)configureWithTitle:(NSString *)title
                      image:(nullable UIImage *)image
              selectedImage:(nullable UIImage *)selectedImage
@@ -27,22 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
                      style:(CYLMenuStyle *)style
                   selected:(BOOL)selected
                    enabled:(BOOL)enabled;
-
-/*!
- * The badge after the title (`menuBadgeForItemAtIndexPath:`), such as "热"; hidden without a text.
- */
-@property (nonatomic, strong, readonly) UILabel *badgeLabel;
-
-/*!
- * Shows `text` as the badge in the colors of `style` (nil or empty hides it); the title is truncated to make room
- * for it, and VoiceOver reads it as the cell's value.
- */
-- (void)setBadgeText:(nullable NSString *)text style:(CYLMenuStyle *)style;
-
-/*!
- * The badge's size for `text`, including the space before it; CGSizeZero without a text.
- */
-+ (CGSize)badgeSizeForText:(nullable NSString *)text traitCollection:(nullable UITraitCollection *)traitCollection;
 @end
 
 NS_ASSUME_NONNULL_END

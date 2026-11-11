@@ -101,12 +101,6 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
 - (nullable NSString *)menuAccessibilityHintForItemAtIndexPath:(NSIndexPath *)indexPath
     NS_SWIFT_NAME(menuAccessibilityHintForItem(at:));
 /*!
- * A short badge after the item's title, such as "热" (already localized); nil (the default) for none. The title
- * is truncated to leave room for it; VoiceOver reads it as the item's value. Colors: CYLMenuStyle.badgeBackgroundColor
- * and badgeTextColor. Only CYLTagListView shows badges.
- */
-- (nullable NSString *)menuBadgeForItemAtIndexPath:(NSIndexPath *)indexPath NS_SWIFT_NAME(menuBadgeForItem(at:));
-/*!
  * YES shows a More button (three dots, CYLMenuStyle.moreButtonImage) at the trailing edge of the section header,
  * whose action the host decides in `-menu:didTapMoreButtonInSection:` (for example refreshing the section).
  * Defaults to NO. Only CYLTagListView shows it.

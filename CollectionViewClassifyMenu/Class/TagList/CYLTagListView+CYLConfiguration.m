@@ -62,6 +62,8 @@ NSString *const CYLMenuStyleSectionInsets = @"sectionInsets";
 NSString *const CYLMenuStyleTitlePositionAdjustment = @"titlePositionAdjustment";
 NSString *const CYLMenuStyleImagePositionAdjustment = @"imagePositionAdjustment";
 NSString *const CYLMenuStyleLayoutCentered = @"layoutCentered";
+NSString *const CYLMenuStyleImagePlacement = @"imagePlacement";
+NSString *const CYLMenuStyleContentAlignment = @"contentAlignment";
 NSString *const CYLMenuStyleAdjustsFontForContentSizeCategory = @"adjustsFontForContentSizeCategory";
 NSString *const CYLMenuStyleBackgroundColor = @"backgroundColor";
 NSString *const CYLMenuStyleHeaderTextColor = @"headerTextColor";
@@ -454,6 +456,16 @@ static NSInteger CYLEnum(id value, NSDictionary<NSString *, NSNumber *> *names, 
     if ((value = CYLNumber(configuration[CYLMenuStyleHeaderHeight]))) self.headerHeight = [value doubleValue];
     if ((value = CYLNumber(configuration[CYLMenuStyleAnimationSpeed]))) self.animationSpeed = [value doubleValue];
     if ((value = CYLNumber(configuration[CYLMenuStyleLayoutCentered]))) self.layoutCentered = [value boolValue];
+    if ((value = configuration[CYLMenuStyleImagePlacement])) {
+        self.imagePlacement = CYLEnum(value, @{@"leading": @(CYLTagImagePlacementLeading), @"left": @(CYLTagImagePlacementLeading),
+                                               @"trailing": @(CYLTagImagePlacementTrailing), @"right": @(CYLTagImagePlacementTrailing)},
+                                      self.imagePlacement);
+    }
+    if ((value = configuration[CYLMenuStyleContentAlignment])) {
+        self.contentAlignment = CYLEnum(value, @{@"center": @(CYLTagContentAlignmentCenter), @"leading": @(CYLTagContentAlignmentLeading),
+                                                 @"left": @(CYLTagContentAlignmentLeading)},
+                                        self.contentAlignment);
+    }
     if ((value = CYLNumber(configuration[CYLMenuStyleAdjustsFontForContentSizeCategory]))) self.adjustsFontForContentSizeCategory = [value boolValue];
     if ((value = CYLSize(configuration[CYLMenuStyleImageSize]))) self.imageSize = [value CGSizeValue];
     if ((value = CYLSize(configuration[CYLMenuStyleAnimationSize]))) self.animationSize = [value CGSizeValue];

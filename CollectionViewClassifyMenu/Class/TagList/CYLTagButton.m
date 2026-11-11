@@ -255,7 +255,7 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
         CGFloat content = titleWidth + iconWidth;
         if (titleWidth > 0 && iconWidth > 0) {
             content += style.imageTitleSpacing;
-        } else if (titleWidth > 0 && !style.layoutCentered) {
+        } else if (titleWidth > 0 && !style.layoutCentered && style.contentAlignment == CYLTagContentAlignmentCenter) {
             // The title keeps its place after an empty icon slot.
             content += style.imageSize.width + style.imageTitleSpacing;
         }
@@ -301,15 +301,23 @@ static NSArray<NSNumber *> *CYLTagButtonStates(void) {
 
     CGFloat imageX = 0;
     CGFloat titleX = 0;
+    BOOL leading = style.contentAlignment == CYLTagContentAlignmentLeading;
     if (showsImage && showsTitle) {
         CGFloat group = iconSize.width + spacing + titleWidth;
+        // Centered, or from the leading margin (the title truncated above, so the icon after it stays visible).
+        CGFloat start = leading ? margin : floor((width - group) / 2);
         if (style.imagePlacement == CYLTagImagePlacementTrailing) {
-            titleX = floor((width - group) / 2);
+            titleX = start;
             imageX = titleX + titleWidth + spacing;
         } else {
-            imageX = floor((width - group) / 2);
+            imageX = start;
             titleX = imageX + iconSize.width + spacing;
         }
+    } else if (showsImage && leading) {
+        imageX = margin;
+    } else if (showsTitle && leading) {
+        titleX = margin;
+        titleWidth = MIN(titleWidth, MAX(0, width - 2 * margin));
     } else if (showsImage) {
         imageX = style.layoutCentered ? floor((width - iconSize.width) / 2) : margin;
     } else if (showsTitle) {

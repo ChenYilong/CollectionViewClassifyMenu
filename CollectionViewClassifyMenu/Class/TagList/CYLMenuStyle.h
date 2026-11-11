@@ -31,6 +31,21 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
     CYLTagImagePlacementTrailing,
 };
 
+/*!
+ * Where a tag's content (its icon and title, in the order of CYLTagImagePlacement) sits in the tag.
+ */
+typedef NS_ENUM(NSInteger, CYLTagContentAlignment) {
+    /*!
+     * Centered in the tag (the default).
+     */
+    CYLTagContentAlignmentCenter = 0,
+    /*!
+     * At the leading margin: the title (or the icon) starts there and the other follows it, e.g. a search
+     * suggestion "苹果官方社区… [热]" whose title is truncated so the icon after it stays visible.
+     */
+    CYLTagContentAlignmentLeading,
+};
+
 @interface CYLMenuStyle : NSObject <NSCopying>
 
 /*!
@@ -105,6 +120,12 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  * the icon at the leading margin (as CYLFlatDesignTabBarItem.layoutCentered = NO).
  */
 @property (nonatomic, assign) BOOL layoutCentered;
+/*!
+ * Where the icon and title sit together: CYLTagContentAlignmentCenter (the default) centers them;
+ * CYLTagContentAlignmentLeading puts them at the leading margin, without an empty icon slot before a title
+ * alone. A title too long for the tag is truncated with an ellipsis, so its icon stays visible.
+ */
+@property (nonatomic, assign) CYLTagContentAlignment contentAlignment;
 
 /*!
  * Size of animated icons (`menuAnimationURLForItemAtIndexPath:`). CGSizeZero (the default) uses imageSize.
@@ -159,15 +180,7 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  */
 @property (nonatomic, copy) NSString *collapseTitle;
 
-#pragma mark Badges and the More button
-/*!
- * The background of an item's badge (`menuBadgeForItemAtIndexPath:`, such as "热"). Defaults to the system red.
- */
-@property (nonatomic, strong) UIColor *badgeBackgroundColor;
-/*!
- * The text color of an item's badge. Defaults to white.
- */
-@property (nonatomic, strong) UIColor *badgeTextColor;
+#pragma mark The More button
 /*!
  * The icon of the More button in a section header (`menuShowsMoreButtonInSection:`). nil (the default) uses the
  * bundle's "cyl_more", three dots like the "ellipsis" icon of CYLTabBarController's More tab.
@@ -180,8 +193,9 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
 
 /*!
  * A grid of plain titles, like a search app's suggestions: `numberOfItemsPerRow` items per row, each as wide as
- * the others, no background and no border, the title at the leading edge in the body font and truncated with an
- * ellipsis. Change it like any other style.
+ * the others, no background and no border, the content at the leading edge (CYLTagContentAlignmentLeading) in the
+ * body font: the title, then its icon if it has one (CYLTagImagePlacementTrailing, such as a "热" icon), the title
+ * truncated with an ellipsis. Change it like any other style.
  */
 + (instancetype)gridStyleWithNumberOfItemsPerRow:(NSUInteger)numberOfItemsPerRow NS_SWIFT_NAME(gridStyle(itemsPerRow:));
 

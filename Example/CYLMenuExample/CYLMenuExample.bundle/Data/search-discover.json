@@ -1,5 +1,5 @@
 {
-  "comment": "Sample data of the search history and discover demo (CYLSearchDiscoverViewController): recent searches, and a pool of discover topics; the More button shows another random selection of discoverCount topics. Sample data is not translated.",
+  "comment": "Sample data of the search history and discover demo (CYLSearchDiscoverViewController): recent searches, and a pool of discover topics (icon "hot" adds the 热 icon after the title); the More button shows another random selection of discoverCount topics. Sample data is not translated.",
   "version": 1,
   "discoverCount": 6,
   "recentSearches": [
@@ -15,27 +15,27 @@
     "为什么越想早睡越睡不着"
   ],
   "discover": [
-    { "title": "春季露营装备清单", "badge": "热" },
+    { "title": "春季露营装备清单", "icon": "hot" },
     { "title": "旧手机改造成家庭服务器的完整教程" },
     { "title": "手冲咖啡入门" },
     { "title": "番茄工作法" },
     { "title": "低糖早餐做法" },
     { "title": "周末短途自驾路线" },
-    { "title": "城市骑行路线推荐", "badge": "热" },
+    { "title": "城市骑行路线推荐", "icon": "hot" },
     { "title": "开源项目贡献指南" },
     { "title": "极简桌面布置" },
     { "title": "雨天室内运动" },
     { "title": "胶片相机入门" },
     { "title": "猫咪换粮指南" },
     { "title": "自制酸奶" },
-    { "title": "读书笔记怎么做才不会忘", "badge": "热" },
+    { "title": "读书笔记怎么做才不会忘", "icon": "hot" },
     { "title": "阳台种菜" },
     { "title": "新手钓鱼装备" },
     { "title": "高铁出行省钱技巧" },
     { "title": "儿童编程启蒙" },
     { "title": "城市夜景拍摄参数" },
     { "title": "居家收纳技巧" },
-    { "title": "空气炸锅食谱", "badge": "热" },
+    { "title": "空气炸锅食谱", "icon": "hot" },
     { "title": "第一次跑半程马拉松的训练计划" },
     { "title": "设计师常用配色" },
     { "title": "徒步登山安全须知" }

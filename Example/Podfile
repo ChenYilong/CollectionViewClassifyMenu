@@ -8,7 +8,7 @@ project 'CYLMenuExample.xcodeproj'
 
 # The revision whose API the Example uses (feat/cross-platform-components); update together.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => '4d16827eccc418749c7168d700fbaff4b90429c4' }
+                :commit => 'b9f450e9691e56ddb38e11ff406834e319baa548' }
 
 target 'CYLMenuExample' do
   # As CYLTabBarController's examples: the Rive animator has Swift files.

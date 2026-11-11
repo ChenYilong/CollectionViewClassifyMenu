@@ -9,11 +9,11 @@
 import Foundation
 
 /**
- * One discover topic: a title, and an optional badge such as "热" (sample data, not translated).
+ * One discover topic: a title (sample data, not translated), and an optional icon after it: "hot" for the 热 icon.
  */
 struct CYLDiscoverTopic: Codable, Equatable {
     let title: String
-    var badge: String?
+    var icon: String?
 }
 
 /**

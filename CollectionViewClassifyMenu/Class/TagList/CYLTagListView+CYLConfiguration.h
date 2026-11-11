@@ -196,6 +196,14 @@ FOUNDATION_EXTERN NSString *const CYLMenuStyleImagePositionAdjustment;
  * NSNumber, or "true" / "false".
  */
 FOUNDATION_EXTERN NSString *const CYLMenuStyleLayoutCentered;
+/*!
+ * NSNumber of CYLTagImagePlacement, or "leading" (icon, then title) / "trailing" (title, then icon).
+ */
+FOUNDATION_EXTERN NSString *const CYLMenuStyleImagePlacement;
+/*!
+ * NSNumber of CYLTagContentAlignment, or "center" / "leading".
+ */
+FOUNDATION_EXTERN NSString *const CYLMenuStyleContentAlignment;
 FOUNDATION_EXTERN NSString *const CYLMenuStyleAdjustsFontForContentSizeCategory;
 /*!
  * UIColor, or "#RGB", "#RRGGBB", "#RRGGBBAA" or a UIColor name ("systemBlue").

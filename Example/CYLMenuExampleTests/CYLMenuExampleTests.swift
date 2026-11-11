@@ -1463,7 +1463,7 @@ final class CYLMenuExampleTests: XCTestCase {
         XCTAssertNil(database.savedSelection(forScenario: CYLMenuLinkageClassifyScenario))
     }
 
-    // MARK: Inline fold cell, grid, badge and More button (core)
+    // MARK: Inline fold cell, grid, leading content with a trailing icon and More button (core)
 
     /**
      * Every view under `root` with this accessibility identifier.
@@ -1524,7 +1524,7 @@ final class CYLMenuExampleTests: XCTestCase {
         XCTAssertEqual(collectionView(of: view).numberOfItems(inSection: 0), 2, "No fold cell")
     }
 
-    func testGridStyleGivesEqualWidthsTruncatesAndShowsBadges() {
+    func testGridStyleGivesEqualWidthsAndTruncates() {
         let source = CYLExampleMenuSource(sections: [CYLExampleMenuSection(title: "发现", titles: [
             "短", "一个非常非常非常长的、肯定放不下的发现标题", "番茄工作法", "空气炸锅食谱",
         ])])
@@ -1558,13 +1558,50 @@ final class CYLMenuExampleTests: XCTestCase {
         XCTAssertTrue(CYLMenuStyle.gridStyle(itemsPerRow: 2).normalAppearance.backgroundColor == .clear)
     }
 
+    func testLeadingContentPutsTheTitleFirstAndKeepsItsTrailingIconVisible() {
+        let style = CYLMenuStyle.gridStyle(itemsPerRow: 2)
+        XCTAssertEqual(style.contentAlignment, .leading)
+        XCTAssertEqual(style.imagePlacement, .trailing, "Title on the left, icon on the right")
+        let icon = UIGraphicsImageRenderer(size: CGSize(width: 18, height: 18)).image { context in
+            UIColor.systemRed.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 18, height: 18))
+        }
+        // A short title: at the leading margin, the icon right after it (not centered, not at the far edge).
+        let short = CYLTagButton(frame: CGRect(x: 0, y: 0, width: 170, height: 32))
+        short.style = style
+        short.title = "番茄工作法"
+        short.image = icon
+        short.layoutIfNeeded()
+        XCTAssertEqual(short.titleLabel.frame.minX, 0, accuracy: 0.5)
+        XCTAssertEqual(short.imageView.frame.minX, short.titleLabel.frame.maxX + style.imageTitleSpacing, accuracy: 1)
+        XCTAssertLessThan(short.imageView.frame.maxX, 170 - 20, "The icon follows the title")
+        // A long title: truncated so that the icon after it stays inside the tag.
+        let long = CYLTagButton(frame: CGRect(x: 0, y: 0, width: 170, height: 32))
+        long.style = style
+        long.title = "一个非常非常非常长的、肯定放不下的发现标题"
+        long.image = icon
+        long.layoutIfNeeded()
+        let full = long.titleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 40)).width
+        XCTAssertLessThan(long.titleLabel.frame.width, full, "Truncated with an ellipsis")
+        XCTAssertLessThanOrEqual(long.imageView.frame.maxX, 170 + 0.5, "The icon stays visible")
+        XCTAssertGreaterThan(long.imageView.frame.minX, long.titleLabel.frame.maxX)
+        // A title alone: no empty icon slot before it.
+        let alone = CYLTagButton(frame: CGRect(x: 0, y: 0, width: 170, height: 32))
+        alone.style = style
+        alone.title = "自制酸奶"
+        alone.layoutIfNeeded()
+        XCTAssertEqual(alone.titleLabel.frame.minX, 0, accuracy: 0.5)
+        // The default stays centered.
+        XCTAssertEqual(CYLMenuStyle().contentAlignment, .center)
+    }
+
     func testSearchDiscoverDataComesFromTheJSONFile() throws {
         let data = try CYLSearchDiscoverData.bundled()
         XCTAssertEqual(data.recentSearches.count, 10)
         XCTAssertEqual(data.discover.count, 24)
         XCTAssertEqual(data.discoverCount, 6)
         XCTAssertEqual(data.initialTopics, Array(data.discover.prefix(6)))
-        XCTAssertFalse(data.discover.filter { $0.badge == "热" }.isEmpty, "Some topics are hot")
+        XCTAssertFalse(data.discover.filter { $0.icon == "hot" }.isEmpty, "Some topics have the 热 icon")
         var generator = CYLSeededRandomNumberGenerator(seed: 7)
         let refreshed = data.randomTopics(excluding: data.initialTopics, using: &generator)
         XCTAssertEqual(refreshed.count, 6)
@@ -1595,16 +1632,19 @@ final class CYLMenuExampleTests: XCTestCase {
         XCTAssertEqual(screen.recentList.foldControl.position, .inline)
         XCTAssertEqual(screen.recentSource.clearButton.accessibilityLabel, "清空最近搜索")
         XCTAssertFalse(screen.recentSource.clearButton.isHidden)
-        // 发现: two per row, a badge, the core's More button.
+        // 发现: two per row, the 热 icon after a hot title, the core's More button.
         let discover = collectionView(of: screen.discoverList)
         discover.layoutIfNeeded()
         XCTAssertEqual(discover.numberOfItems(inSection: 0), 6)
         XCTAssertEqual(screen.discoverList.style.numberOfItemsPerRow, 2)
-        let hot = try XCTUnwrap(screen.discoverSource.topics.firstIndex { $0.badge != nil })
+        let hot = try XCTUnwrap(screen.discoverSource.topics.firstIndex { $0.icon == "hot" })
         let hotCell = discover.cellForItem(at: ip(hot, 0)) as? CYLTagListCell
-        XCTAssertEqual(hotCell?.badgeLabel.text, "热")
-        XCTAssertFalse(hotCell?.badgeLabel.isHidden ?? true)
-        XCTAssertEqual(hotCell?.accessibilityValue, "热", "VoiceOver reads the badge as the value")
+        XCTAssertNotNil(hotCell?.button.image, "热 is an icon")
+        if let button = hotCell?.button {
+            button.layoutIfNeeded()
+            XCTAssertGreaterThan(button.imageView.frame.minX, button.titleLabel.frame.minX, "Title on the left, icon on the right")
+        }
+        XCTAssertEqual(hotCell?.accessibilityValue, "热门", "VoiceOver reads the icon's label as the value")
         let more = try XCTUnwrap(views(withIdentifier: CYLTagListMoreButtonAccessibilityIdentifier, in: screen.discoverList).first as? UIButton)
         XCTAssertFalse(more.isHidden)
         XCTAssertNotNil(more.currentImage, "The bundle's cyl_more icon")
