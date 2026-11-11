@@ -16,6 +16,10 @@ verify the behavior and update the applicable documentation.
 - Document user-visible changes and verify them with a targeted build or test.
 - Use English Conventional Commit messages, such as `fix: 🐛 ...` and
   `docs: 📝 ...`.
+- Every commit message's description (the body) must contain the author line
+  `By @ChenYilong <luohanchenyilong@163.com>`, exactly as written, on its own
+  line after the description and before any trailers. Details:
+  `.agents/skills/cyl-commit/`.
 
 ## Swift examples and a Swift-friendly core
 
