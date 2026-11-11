@@ -22,18 +22,21 @@ final class CYLAppDelegate: UIResponder, UIApplicationDelegate {
         appearance.titleTextAttributes = [.font: UIFont.boldSystemFont(ofSize: 18), .foregroundColor: UIColor.white]
         appearance.barTintColor = UIColor(red: 42 / 255.0, green: 185 / 255.0, blue: 160 / 255.0, alpha: 1)
         appearance.isTranslucent = false
+        initFilterSetting(restore: true)
+        return true
+    }
 
-        let window = UIWindow(frame: UIScreen.main.bounds)
+    /// The demo's window in `scene` (apps built with the iOS 27 SDK must use the scene life cycle).
+    func launch(in scene: UIWindowScene) -> UIWindow {
+        let window = UIWindow(windowScene: scene)
         let classifyMenuViewController = CYLMainViewController()
         let navigationController = UINavigationController(rootViewController: classifyMenuViewController)
         self.navigationController = navigationController
         window.rootViewController = navigationController
-        window.addSubview(classifyMenuViewController.view)
         window.backgroundColor = .white
         window.makeKeyAndVisible()
         self.window = window
-        initFilterSetting(restore: true)
-        return true
+        return window
     }
 
     /// Forgets the stored filter selection unless `restore`.
@@ -41,5 +44,16 @@ final class CYLAppDelegate: UIResponder, UIApplicationDelegate {
         if !restore {
             UserDefaults.standard.removeObject(forKey: CYLMainViewController.filterSelectionKey)
         }
+    }
+}
+
+@objc(CYLSceneDelegate)
+final class CYLSceneDelegate: UIResponder, UIWindowSceneDelegate {
+
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let scene = scene as? UIWindowScene, let app = UIApplication.shared.delegate as? CYLAppDelegate else { return }
+        window = app.launch(in: scene)
     }
 }

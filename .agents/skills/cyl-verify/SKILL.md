@@ -26,7 +26,9 @@ shellcheck scripts/*.sh
 
 Apps built with the iOS 27 SDK (Xcode 27) must adopt the scene lifecycle, otherwise UIKit stops them at launch
 (`_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption`, "The test runner crashed before establishing
-connection"). Both examples have a scene delegate; test windows join the app's scene (`CYLWindowHosting`).
+connection"). Both examples and both root demo apps (the hosts of `menu` and `tag`) have a scene delegate; test windows
+join the app's scene (`CYLWindowHosting`). `simulator-id.sh` without a name may pick a new device type (such as
+"iPhone Duo") whose tab bar is not at the bottom; pass "iPhone 17 Pro" to compare with earlier runs.
 
 ## Environments
 
