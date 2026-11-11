@@ -25,18 +25,29 @@ verify the behavior and update the applicable documentation.
    */
   ```
   In Swift source, where the compiler does not treat `/*!` as documentation,
-  use `/** … */`. Other platforms use their official documentation format
-  (KDoc `/** … */` for Kotlin, Javadoc for Java, JSDoc/TSDoc `/** … */` for
-  JavaScript/TypeScript, Dart `///`, Rust `///`, Python docstrings). Plain `//`
-  comments are for implementation notes only, never for public API docs.
-- The same format applies to one-line public API comments: in a file that
-  holds public API, every documentation comment, one line or several, uses the
-  same format, so the file stays uniform (an Objective-C header has only
-  `/*! … */` blocks, laid out as above even for one line; no `///`). This holds
-  for every platform and language: where the official format is a block
-  (Objective-C, Swift, Kotlin, Java, JavaScript/TypeScript), one-line comments
-  are blocks too; where it is a line form (Dart, Rust, C#, Go), every comment
-  uses that line form. Details and the check: `.agents/skills/cyl-comments/`.
+  use `/** … */` with the same layout. Plain `//` comments are for
+  implementation notes only, never for public API docs.
+- The format required for multi-line public API comments also applies to
+  one-line public API comments:
+  - One-line comments use the block format too: a one-line public API comment
+    is written like a multi-line one, as the three lines `/*!`, ` * text`,
+    ` */`, above the declaration. Never put `/*! text */` on one line, and
+    never add a trailing `/**< */`, `/*!< */`, `///<` or `//` after a
+    declaration or an enum value.
+  - Each file that holds public API uses one comment format, for long and
+    short comments alike.
+  - This applies to every platform and language, always with the block form of
+    the platform's documentation tool, laid out the same way (opener, one line
+    per text line, closer on its own line):
+    - Kotlin, Java, TypeScript, JavaScript: `/** */`.
+    - Python: a triple-quoted docstring whose quotes stand on lines of their
+      own.
+    - Go: `/* */`.
+    - C#: `/** */` with XML tags.
+    - Rust: `/** */`.
+    - A language without a block form uses its only documentation comment form
+      throughout the file.
+  Details and the check: `.agents/skills/cyl-comments/`.
 - Use English Conventional Commit messages, such as `fix: 🐛 ...` and
   `docs: 📝 ...`.
 - Every commit message's description (the body) must contain the author line
