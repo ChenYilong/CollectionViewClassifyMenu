@@ -22,7 +22,7 @@ Score = matched APIs ÷ android-tagview public APIs × 100. A full match counts 
 | Version | Matched | Score |
 | --- | --- | --- |
 | Before (`654f2cf`) | 17.5 / 47: the list existed, but no tag model, no add or remove methods, no deletable tags, no pressed color, no background image, no per-side padding, no delete listener | 37 |
-| This change | 47 / 47 | **100** |
+| [71930fe](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/71930fe) (feature), [abca838](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/abca838) (scene fix for the core tests) | 47 / 47; verified locally: example 61, swift 19, menu 17, tag 6 tests pass (macOS 27.3, Xcode 27.2, iPhone 17 Pro iOS 26.1) | **100** |
 
 Verified by `Example/CYLMenuExampleTests/CYLTagCloudTests.swift` (8 tests) and the 标签云 demo
 (`CYLTagCloudDemoViewController`, 样式 tab → 标签云).
