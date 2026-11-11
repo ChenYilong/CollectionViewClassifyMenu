@@ -179,3 +179,17 @@
 "评价筛选 · 数据库（SQLite）" = "Review filter · database (SQLite)";
 "评价筛选 · 网络" = "Review filter · network";
 "重置" = "Reset";
+
+/* Search history and discover (CYLSearchDiscoverViewController). */
+"最近搜索" = "Recent searches";
+"返回" = "Back";
+"以图搜索" = "Search by image";
+"清空最近搜索" = "Clear recent searches";
+"已清空最近搜索" = "Recent searches cleared";
+"按住提问，有问必答" = "Hold to ask, answer all";
+"按住提问" = "Hold to ask";
+"按住说出问题，松开发送" = "Hold and say your question, release to send";
+"正在聆听…" = "Listening…";
+"最近搜索 + 发现" = "Recent searches + discover";
+"场景：搜索历史与发现" = "Scenario: search history and discover";
+"最近搜索折叠为两行，箭头是最后一个标签；发现每行两个，超出部分显示省略号，右上角的更多按钮随机刷新。数据来自本地 JSON。" = "Recent searches fold to two rows, the chevron being the last tag; discover shows two topics per row, truncated with an ellipsis, and the More button at the top trailing edge refreshes them at random. The data comes from a local JSON file.";

@@ -21,6 +21,8 @@
 		E6881C225B2CF138889D6B43 /* CYLReviewQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FBD13B209A6B98DD7C2C8C9 /* CYLReviewQuery.swift */; };
 		4D84710BB0926DDE923AE45B /* CYLReviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BD14F01CB430BDEB40DE9D /* CYLReviewStore.swift */; };
 		829FC7E0D9B86BD403DB733F /* CYLSearchCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EC4CC759C68214FB50BC3 /* CYLSearchCategoryViewController.swift */; };
+		061C4E059059E60FBD70C516 /* CYLSearchDiscoverData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B8534AE0C203B528AA9F7A /* CYLSearchDiscoverData.swift */; };
+		5D73008D35D8035B24AAB882 /* CYLSearchDiscoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F5C919A57A018B96BC6359 /* CYLSearchDiscoverViewController.swift */; };
 		30C4995E7E99E3B60BFBF06C /* CYLSearchHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */; };
 		6FBBB71E38045426792EFC54 /* CYLTagAnimationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */; };
 		121A997B0DED01158F518FB9 /* CYLTagConfigurationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */; };
@@ -59,6 +61,8 @@
 		0FBD13B209A6B98DD7C2C8C9 /* CYLReviewQuery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLReviewQuery.swift; sourceTree = "<group>"; };
 		D4BD14F01CB430BDEB40DE9D /* CYLReviewStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLReviewStore.swift; sourceTree = "<group>"; };
 		829EC4CC759C68214FB50BC3 /* CYLSearchCategoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchCategoryViewController.swift; sourceTree = "<group>"; };
+		83B8534AE0C203B528AA9F7A /* CYLSearchDiscoverData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchDiscoverData.swift; sourceTree = "<group>"; };
+		92F5C919A57A018B96BC6359 /* CYLSearchDiscoverViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchDiscoverViewController.swift; sourceTree = "<group>"; };
 		BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchHomeViewController.swift; sourceTree = "<group>"; };
 		C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagAnimationDemoViewController.swift; sourceTree = "<group>"; };
 		8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagConfigurationDemoViewController.swift; sourceTree = "<group>"; };
@@ -130,6 +134,8 @@
 				0FBD13B209A6B98DD7C2C8C9 /* CYLReviewQuery.swift */,
 				D4BD14F01CB430BDEB40DE9D /* CYLReviewStore.swift */,
 				829EC4CC759C68214FB50BC3 /* CYLSearchCategoryViewController.swift */,
+				83B8534AE0C203B528AA9F7A /* CYLSearchDiscoverData.swift */,
+				92F5C919A57A018B96BC6359 /* CYLSearchDiscoverViewController.swift */,
 				BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */,
 				C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */,
 				8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */,
@@ -383,6 +389,8 @@
 				E6881C225B2CF138889D6B43 /* CYLReviewQuery.swift in Sources */,
 				4D84710BB0926DDE923AE45B /* CYLReviewStore.swift in Sources */,
 				829FC7E0D9B86BD403DB733F /* CYLSearchCategoryViewController.swift in Sources */,
+				061C4E059059E60FBD70C516 /* CYLSearchDiscoverData.swift in Sources */,
+				5D73008D35D8035B24AAB882 /* CYLSearchDiscoverViewController.swift in Sources */,
 				30C4995E7E99E3B60BFBF06C /* CYLSearchHomeViewController.swift in Sources */,
 				6FBBB71E38045426792EFC54 /* CYLTagAnimationDemoViewController.swift in Sources */,
 				121A997B0DED01158F518FB9 /* CYLTagConfigurationDemoViewController.swift in Sources */,

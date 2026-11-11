@@ -202,13 +202,35 @@ CYLTagListView *menu = [[CYLTagListView alloc] initWithFoldControl:
 
 | 参数 | 取值 |
 | --- | --- |
-| `CYLMenuFoldControlPosition` | `None`、`Bottom`（分组下方居中，淘宝评价）、`TopTrailing`（分组标题右上角，原分类菜单）、`TopLeading`（分组标题左上角，标题之前） |
+| `CYLMenuFoldControlPosition` | `None`、`Bottom`（分组下方居中，淘宝评价）、`TopTrailing`（分组标题右上角，原分类菜单）、`TopLeading`（分组标题左上角，标题之前）、`Inline`（作为标签之一：折叠时是最后一个可见标签，隐藏的标签为它让出位置；展开后跟在最后一个标签之后；点击即展开/收起，内置行为。仅图标时是与标签同款描边的圆形，箭头复用核心 bundle 的 `cyl_fold_chevron`，由 `CYLTagFoldCell` 绘制） |
 | `CYLMenuFoldControlContent` | `IconAndTitle`（「更多 ⌄」）、`Title`（「更多」）、`Icon`（「⌄」）。展开后带图标的样式只保留箭头并旋转 180°，仅文字的样式显示「收起」 |
 | `CYLMenuFoldControl` 属性 | `title` / `collapseTitle`（默认本地化的「更多」「收起」）、`image`（默认核心 bundle 中的 `cyl_fold_chevron`）、`color`、`font`、`rotatesImageWhenExpanded` |
 | `title`、`titleImage`、`titlePosition`、`titleStyle` | 整个列表上方的标题：`CYLMenuTitlePositionTopLeading`（左上角）或 `TopCenter`（居中）。标题由 `titleView` 绘制，与标签复用同一个视图（`CYLTagButton`，横向布局），可以只显示图标、只显示文字或两者都显示；`titleStyle` 是一个 `CYLMenuStyle`（字体、文字与图标颜色、图标大小与位置……），默认 `+defaultTitleStyle` 为加粗的 headline 字体；`titleView` 的全部公开 API（如动效图标 `animationURL`）都可使用 |
 
 折叠控件是一个无边框的 `CYLTagButton`（与标签相同的视图），图标位于文字之后（`CYLMenuStyle.imagePlacement = CYLTagImagePlacementTrailing`）。
 旧的 `foldStyle` 仍可使用，并与 `foldControl` 互相对应（`HeaderButton` 为右上角文字，`FooterChevron` 为底部箭头）。
+
+#### 网格、角标与 More 按钮 / Grid, badges and the More button
+
+搜索页常见的「最近搜索 / 发现」由核心库的接口实现，Example 只提供数据与点击事件：
+
+```swift
+// 最近搜索：折叠为两行，箭头是最后一个标签。
+let recent = CYLTagListView(foldControl: CYLMenuFoldControl(position: .inline, content: .icon))
+recent.defaultVisibleRows = 2
+
+// 发现：每行两个、等宽，超出部分末尾省略号；右上角 More 按钮。
+let discover = CYLTagListView()
+discover.style = CYLMenuStyle.gridStyle(itemsPerRow: 2)
+// 数据源：func menuBadgeForItem(at:) -> String?（如「热」）、func menuShowsMoreButton(inSection:) -> Bool
+// 代理：func menu(_:didTapMoreButtonInSection:)（由宿主决定，如随机刷新）
+```
+
+| 接口 | 说明 |
+| --- | --- |
+| `CYLMenuStyle.numberOfItemsPerRow`、`+gridStyleWithNumberOfItemsPerRow:`（Swift `gridStyle(itemsPerRow:)`） | 大于 0 时每行固定个数、所有标签等宽，文字超出时末尾省略号；`gridStyle` 为无背景、无边框、文字居左的网格外观。配置文件键 `itemsPerRow` |
+| `-menuBadgeForItemAtIndexPath:` | 标题后的角标（如「热」），标题为它让出位置；颜色 `badgeBackgroundColor` / `badgeTextColor`；VoiceOver 读作该标签的值 |
+| `-menuShowsMoreButtonInSection:`、`-menu:didTapMoreButtonInSection:` | 分组标题右侧的 More 按钮（三个点，核心 bundle 的 `cyl_more`，与 CYLTabBarController 的 More Tab 使用的 `ellipsis` 图标一致；`moreButtonImage` / `moreButtonColor` 可替换），点击事件由宿主实现；标识符 `CYLTagListMoreButton`，VoiceOver 读作「<分组> 更多操作」 |
 
 #### 新建标签 / New tag item
 
@@ -341,7 +363,8 @@ image from `menuImageForItemAtIndexPath:` instead. Section icons of
 | 列表标题 `titleView` | `CYLTagListTitle` | 标题文字（仅图标时取图标的 `accessibilityLabel`，没有则作为装饰隐藏），`header` |
 | 标签 | `CYLTagListItem` | 标签文字，按钮，选中 / 禁用 |
 | “+ 新建标签” | `CYLTagCreateItem` | “新建标签” / “新建标签：<名称>”，按钮（从不“已选中”） |
-| 折叠按钮 | `CYLTagListFoldControl` | “<分组> 更多/收起”，按钮 |
+| 折叠按钮（含作为标签的 `Inline` 折叠格） | `CYLTagListFoldControl` | “<分组> 更多/收起”，按钮 |
+| More 按钮 | `CYLTagListMoreButton` | “<分组> 更多操作”，按钮 |
 
 数据源可实现 `-menuAccessibilityHintForItemAtIndexPath:`（Swift：`menuAccessibilityHintForItem(at:)`）为标签提供朗读提示，如 Swift Example 管理模式下的“轻点两下删除此标签”。
 
@@ -400,6 +423,7 @@ open CYLMenuExample.xcworkspace
 | 场景二：脉脉搜索分类 | `CYLSearchHomeViewController` push `CYLSearchCategoryViewController`，提供搜索框和底部 CYLTabBarController 分类（找人/动态/八卦/职位）；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分组标题右侧为宿主提供的行业选择按钮。 |
 
 | 查询筛选（PlusButton）· 查询参数设置 | 淘宝评价默认显示全部；条件太多时由用户多选输入筛选条件，这正是标签列表（TagCollectionView）的用途。场景一的评价筛选增加第三种方式**数据库筛选**（`CYLDatabaseReviewQuery`）：所选条件生成一条 SQL（评分、有图、追加为 `reviews` 表的列，关键词为 `review_keywords` 表的行，全部 AND），在 SQLite 中查询，状态栏显示 SQL 与匹配数量。 |
+| 查询筛选（PlusButton）· 最近搜索 + 发现 | `CYLSearchDiscoverViewController`（纯 Swift）按搜索 App 的搜索页实现：顶部返回、搜索框（占位文字为第一个发现话题）、以图搜索与「搜索」按钮；「最近搜索」折叠为两行，箭头是最后一个标签（`CYLMenuFoldControlPositionInline`），右侧垃圾桶清空；「发现」每行两个（`gridStyle(itemsPerRow: 2)`），超出部分省略号，「热」角标，右上角 More 按钮随机刷新；底部「按住提问，有问必答 ✨」与麦克风按钮。数据来自 `CYLMenuExample.bundle/Data/search-discover.json`（最近搜索与 24 个发现话题），刷新时随机选取 6 个；点击话题或最近搜索即填入搜索框并移到最近搜索最前。 |
 | 查询筛选（PlusButton）· 菜单选择 | 移植原 Demo（`CollectionViewClassifyMenu.xcodeproj`）的分类菜单与多选筛选：`CYLMenuLinkageViewController` 继承核心库的 `CYLClassifyMenuViewController`，左上角按钮打开核心库的 `CYLMultipleFilterController`，数据源直接复用原 Demo 的 `CYLDemoDataSource`、`CYLDBManager` 与 `data.json`（工程引用原文件，不复制）。原 Demo 只实现了筛选界面，没有筛选数据；现在点击分类标签（单选，高亮）或确认多选筛选（地区、菜品）都会生成 SQL，在 `places` 表中查询，并在标签下方（`menuFooterView`）显示条件、SQL 与结果；选择保存在数据库的 `selections` 表中，再次进入时恢复。 |
 
 数据库是 `CYLExampleDatabase`（iOS SDK 自带的 libsqlite3，文件在 Caches 目录）：每次启动由 App 内的数据重新生成

@@ -155,6 +155,10 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
             reportTagList(styles.tagListView, named: "styleTags")
         } else if let animations = top as? CYLTagAnimationDemoViewController {
             reportTagList(animations.tagListView, named: "animationTags")
+        } else if let discover = top as? CYLSearchDiscoverViewController {
+            appendLayoutReport("[CYLExampleLayout] searchDiscover recent=\(discover.recentSource.searches.count) visible=\(discover.recentList.numberOfVisibleItems(inSection: 0)) expanded=\(discover.recentList.isSectionExpanded(0)) topics=\(discover.discoverSource.topics.map(\.title))")
+            reportTagList(discover.recentList, named: "recentSearches")
+            reportTagList(discover.discoverList, named: "discover")
         } else if let menu = top as? CYLMenuLinkageViewController {
             let footer = menu.menuFooterView.map { NSCoder.string(for: $0.frame) } ?? NSCoder.string(for: CGRect.zero)
             appendLayoutReport("[CYLExampleLayout] menuLinkage results=\(menu.results.count) footer=\(footer) sql=\(menu.lastQuery.displayString())")
@@ -164,7 +168,9 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: Screens
 
     /// The plus button's tab: "plus" (scenario list), "plus-reviews-db" (review filter on SQLite, 好评 + 有图),
-    /// "plus-menu" (ported classify menu, every condition), "plus-menu-filtered" (a tag, regions and dishes).
+    /// "plus-menu" (ported classify menu, every condition), "plus-menu-filtered" (a tag, regions and dishes),
+    /// "plus-discover" (recent searches folded, discover grid), "plus-discover-expanded" (recent searches expanded),
+    /// "plus-discover-refreshed" (the More button tapped once, seeded so the screenshot stays the same).
     static func openPlusScreen(_ screen: String, in tabs: CYLTabBarController) {
         guard let navigation = selectTab(withRootClass: CYLQueryScenariosViewController.self, in: tabs),
               let scenarios = navigation.viewControllers.first as? CYLQueryScenariosViewController else { return }
@@ -172,6 +178,17 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
             guard let reviews = scenarios.viewController(for: .reviewsDatabase) as? CYLReviewListViewController else { return }
             navigation.pushViewController(reviews, animated: false)
             reviews.selectFilterIndexes([1, 4])
+        } else if screen.hasPrefix("plus-discover") {
+            guard let discover = scenarios.viewController(for: .searchDiscover) as? CYLSearchDiscoverViewController else { return }
+            navigation.pushViewController(discover, animated: false)
+            discover.loadViewIfNeeded()
+            discover.view.layoutIfNeeded()
+            if screen == "plus-discover-expanded" {
+                discover.recentList.setExpanded(true, forSection: 0, animated: false)
+            } else if screen == "plus-discover-refreshed" {
+                discover.randomGenerator = CYLAnyRandomNumberGenerator(CYLSeededRandomNumberGenerator(seed: 2026))
+                discover.refreshDiscover()
+            }
         } else if screen.hasPrefix("plus-menu") {
             guard let menu = scenarios.viewController(for: .menuLinkage) as? CYLMenuLinkageViewController else { return }
             navigation.pushViewController(menu, animated: false)

@@ -1462,4 +1462,183 @@ final class CYLMenuExampleTests: XCTestCase {
         XCTAssertEqual(again.results.count, places)
         XCTAssertNil(database.savedSelection(forScenario: CYLMenuLinkageClassifyScenario))
     }
+
+    // MARK: Inline fold cell, grid, badge and More button (core)
+
+    /**
+     * Every view under `root` with this accessibility identifier.
+     */
+    private func views(withIdentifier identifier: String, in root: UIView) -> [UIView] {
+        (root.accessibilityIdentifier == identifier ? [root] : []) + root.subviews.flatMap { views(withIdentifier: identifier, in: $0) }
+    }
+
+    func testInlineFoldCellIsTheLastTagAndTogglesTheSection() {
+        let view = hostedView(source: makeSource(itemCount: 14, sections: 1), width: 320)
+        let delegate = CYLRecordingDelegate()
+        view.menuDelegate = delegate
+        view.foldControl = CYLMenuFoldControl(position: .inline, content: .icon)
+        view.defaultVisibleRows = 2
+        view.reloadMenuData()
+        view.layoutIfNeeded()
+        let collection = collectionView(of: view)
+        collection.layoutIfNeeded()
+        XCTAssertTrue(view.canFoldSection(0))
+        XCTAssertFalse(view.isSectionExpanded(0))
+        let visible = view.numberOfVisibleItems(inSection: 0)
+        XCTAssertLessThan(visible, 14)
+        // Folded: the visible tags, then the fold cell, all on the two visible rows.
+        XCTAssertEqual(collection.numberOfItems(inSection: 0), visible + 1)
+        let fold = collection.cellForItem(at: ip(visible, 0))
+        XCTAssertTrue(fold is CYLTagFoldCell, "The chevron is the last tag")
+        XCTAssertEqual(fold?.accessibilityIdentifier, CYLTagListFoldControlAccessibilityIdentifier)
+        XCTAssertTrue(fold?.accessibilityTraits.contains(.button) ?? false)
+        XCTAssertEqual(fold?.accessibilityLabel, "分组 0 更多")
+        XCTAssertTrue((fold as? CYLTagFoldCell)?.foldButton.foldControl?.usesDefaultImage ?? false, "The bundle's chevron")
+        let rows = Set((0...visible).compactMap { collection.layoutAttributesForItem(at: ip($0, 0))?.frame.minY })
+        XCTAssertEqual(rows.count, 2, "The fold cell ends the second row")
+        assertNoOverlapsOrOverflow(in: view)
+        // A tap on it expands: every tag, then the fold cell again.
+        tap(view, item: visible, section: 0)
+        collection.layoutIfNeeded()
+        XCTAssertTrue(view.isSectionExpanded(0))
+        XCTAssertEqual(view.numberOfVisibleItems(inSection: 0), 14)
+        XCTAssertEqual(collection.numberOfItems(inSection: 0), 15)
+        XCTAssertTrue(collection.cellForItem(at: ip(14, 0)) is CYLTagFoldCell)
+        XCTAssertEqual(collection.cellForItem(at: ip(14, 0))?.accessibilityLabel, "分组 0 收起")
+        XCTAssertEqual(delegate.events, ["expand 0"], "The tap toggles the section, it selects no tag")
+        assertNoOverlapsOrOverflow(in: view)
+        // And collapses again.
+        tap(view, item: 14, section: 0)
+        XCTAssertFalse(view.isSectionExpanded(0))
+        XCTAssertEqual(collection.numberOfItems(inSection: 0), visible + 1)
+        XCTAssertEqual(delegate.events, ["expand 0", "collapse 0"])
+    }
+
+    func testInlineFoldCellIsHiddenWhenEverythingFits() {
+        let view = hostedView(source: makeSource(itemCount: 2, sections: 1), width: 390)
+        view.foldControl = CYLMenuFoldControl(position: .inline, content: .icon)
+        view.defaultVisibleRows = 2
+        view.reloadMenuData()
+        view.layoutIfNeeded()
+        XCTAssertFalse(view.canFoldSection(0))
+        XCTAssertEqual(collectionView(of: view).numberOfItems(inSection: 0), 2, "No fold cell")
+    }
+
+    func testGridStyleGivesEqualWidthsTruncatesAndShowsBadges() {
+        let source = CYLExampleMenuSource(sections: [CYLExampleMenuSection(title: "发现", titles: [
+            "短", "一个非常非常非常长的、肯定放不下的发现标题", "番茄工作法", "空气炸锅食谱",
+        ])])
+        let view = hostedView(source: source, width: 390)
+        view.style = CYLMenuStyle.gridStyle(itemsPerRow: 2)
+        view.selectionMode = .none
+        view.reloadMenuData()
+        view.layoutIfNeeded()
+        let collection = collectionView(of: view)
+        collection.layoutIfNeeded()
+        let frames = (0..<4).compactMap { collection.layoutAttributesForItem(at: ip($0, 0))?.frame }
+        XCTAssertEqual(frames.count, 4)
+        let insets = view.style.sectionInsets
+        let expected = floor((390 - insets.left - insets.right - view.style.interitemSpacing) / 2)
+        for frame in frames {
+            XCTAssertEqual(frame.width, expected, accuracy: 0.5, "Every item the same width")
+        }
+        XCTAssertEqual(frames[0].minY, frames[1].minY, accuracy: 0.5, "Two per row")
+        XCTAssertGreaterThan(frames[2].minY, frames[0].minY)
+        XCTAssertEqual(frames[0].minX, insets.left, accuracy: 0.5)
+        // The long title is truncated, not wrapped and not wider than its column.
+        let long = (collection.cellForItem(at: ip(1, 0)) as? CYLTagListCell)?.button
+        XCTAssertNotNil(long)
+        if let long {
+            long.layoutIfNeeded()
+            let full = long.titleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 40)).width
+            XCTAssertLessThan(long.titleLabel.frame.width, full)
+            XCTAssertEqual(long.titleLabel.lineBreakMode, .byTruncatingTail)
+            XCTAssertLessThanOrEqual(long.titleLabel.frame.maxX, expected + 0.5)
+        }
+        XCTAssertTrue(CYLMenuStyle.gridStyle(itemsPerRow: 2).normalAppearance.backgroundColor == .clear)
+    }
+
+    func testSearchDiscoverDataComesFromTheJSONFile() throws {
+        let data = try CYLSearchDiscoverData.bundled()
+        XCTAssertEqual(data.recentSearches.count, 10)
+        XCTAssertEqual(data.discover.count, 24)
+        XCTAssertEqual(data.discoverCount, 6)
+        XCTAssertEqual(data.initialTopics, Array(data.discover.prefix(6)))
+        XCTAssertFalse(data.discover.filter { $0.badge == "热" }.isEmpty, "Some topics are hot")
+        var generator = CYLSeededRandomNumberGenerator(seed: 7)
+        let refreshed = data.randomTopics(excluding: data.initialTopics, using: &generator)
+        XCTAssertEqual(refreshed.count, 6)
+        XCTAssertEqual(Set(refreshed.map(\.title)).count, 6, "No topic twice")
+        XCTAssertTrue(refreshed.allSatisfy { !data.initialTopics.contains($0) }, "Another selection")
+        var again = CYLSeededRandomNumberGenerator(seed: 7)
+        XCTAssertEqual(data.randomTopics(excluding: data.initialTopics, using: &again), refreshed, "Seeded: repeatable")
+    }
+
+    func testSearchDiscoverScreenShowsTheDataAndHandlesTaps() throws {
+        let screen = CYLSearchDiscoverViewController()
+        let navigation = UINavigationController(rootViewController: UIViewController())
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        window.rootViewController = navigation
+        window.makeKeyAndVisible()
+        self.window = window
+        navigation.pushViewController(screen, animated: false)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        screen.loadViewIfNeeded()
+        screen.view.layoutIfNeeded()
+        XCTAssertTrue(navigation.isNavigationBarHidden, "The search bar replaces the navigation bar")
+        // 最近搜索: folded to two rows with the chevron as the last tag; the trash in the header.
+        let recent = collectionView(of: screen.recentList)
+        recent.layoutIfNeeded()
+        let visible = screen.recentList.numberOfVisibleItems(inSection: 0)
+        XCTAssertLessThan(visible, screen.recentSource.searches.count)
+        XCTAssertTrue(recent.cellForItem(at: ip(visible, 0)) is CYLTagFoldCell)
+        XCTAssertEqual(screen.recentList.foldControl.position, .inline)
+        XCTAssertEqual(screen.recentSource.clearButton.accessibilityLabel, "清空最近搜索")
+        XCTAssertFalse(screen.recentSource.clearButton.isHidden)
+        // 发现: two per row, a badge, the core's More button.
+        let discover = collectionView(of: screen.discoverList)
+        discover.layoutIfNeeded()
+        XCTAssertEqual(discover.numberOfItems(inSection: 0), 6)
+        XCTAssertEqual(screen.discoverList.style.numberOfItemsPerRow, 2)
+        let hot = try XCTUnwrap(screen.discoverSource.topics.firstIndex { $0.badge != nil })
+        let hotCell = discover.cellForItem(at: ip(hot, 0)) as? CYLTagListCell
+        XCTAssertEqual(hotCell?.badgeLabel.text, "热")
+        XCTAssertFalse(hotCell?.badgeLabel.isHidden ?? true)
+        XCTAssertEqual(hotCell?.accessibilityValue, "热", "VoiceOver reads the badge as the value")
+        let more = try XCTUnwrap(views(withIdentifier: CYLTagListMoreButtonAccessibilityIdentifier, in: screen.discoverList).first as? UIButton)
+        XCTAssertFalse(more.isHidden)
+        XCTAssertNotNil(more.currentImage, "The bundle's cyl_more icon")
+        XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_more"))
+        XCTAssertEqual(more.accessibilityLabel, "发现 更多操作")
+        XCTAssertEqual(screen.searchField.placeholder, screen.discoverSource.topics.first?.title)
+        // The More button refreshes the topics (seeded here).
+        let before = screen.discoverSource.topics
+        screen.randomGenerator = CYLAnyRandomNumberGenerator(CYLSeededRandomNumberGenerator(seed: 1))
+        more.sendActions(for: .touchUpInside)
+        XCTAssertNotEqual(screen.discoverSource.topics, before)
+        XCTAssertEqual(screen.discoverSource.topics.count, 6)
+        // A topic or a recent search is searched again and moves to the front of the recent searches.
+        tap(screen.discoverList, item: 0, section: 0)
+        let topic = screen.discoverSource.topics[0].title
+        XCTAssertEqual(screen.searchField.text, topic)
+        XCTAssertEqual(screen.recentSource.searches.first, topic)
+        // Item 1 is always a tag (index 2 could be the fold cell on narrow rows).
+        tap(screen.recentList, item: 1, section: 0)
+        XCTAssertEqual(screen.recentSource.searches.first, screen.searchField.text)
+        // The trash clears them.
+        screen.recentSource.clearButton.sendActions(for: .touchUpInside)
+        XCTAssertTrue(screen.recentSource.searches.isEmpty)
+        XCTAssertEqual(recent.numberOfSections, 0)
+    }
+
+    func testSearchDiscoverScreenInEnglish() {
+        CYLMenuResources.preferredLanguage = "en"
+        let screen = CYLSearchDiscoverViewController()
+        screen.loadViewIfNeeded()
+        XCTAssertEqual(screen.recentSource.menuTitle(forSection: 0), "Recent searches")
+        XCTAssertEqual(screen.discoverSource.menuTitle(forSection: 0), "Discover")
+        XCTAssertEqual(screen.searchButton.title(for: .normal), "Search")
+        XCTAssertEqual(screen.hintLabel.text, "Hold to ask, answer all ✨")
+        XCTAssertEqual(CYLMenuLocalizedString("CYLMenuMoreActions"), "More")
+    }
 }
