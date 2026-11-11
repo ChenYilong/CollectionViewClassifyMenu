@@ -4,7 +4,7 @@ project 'CYLTagEditorExample.xcodeproj'
 # Every CYLTabBarController mention means the latest commit of its feat/cross-platform-components branch (AGENTS.md);
 # the same pin as Example/Podfile.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => '3c3cda189968812b54bc19bf26b12bd9a84af959' }
+                :commit => '4d16827eccc418749c7168d700fbaff4b90429c4' }
 
 # The core library from this repository (local path), so that changes to it show up here at once.
 target 'CYLTagEditorExample' do
