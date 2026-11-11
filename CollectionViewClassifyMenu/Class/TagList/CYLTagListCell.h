@@ -15,7 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLTagListCell : UICollectionViewCell
 @property (nonatomic, strong, readonly) CYLTagButton *button;
-/// The list's style object last applied, so that a style is copied into the button only when it changes.
+/*!
+ * The list's style object last applied, so that a style is copied into the button only when it changes.
+ */
 @property (nonatomic, weak, nullable) CYLMenuStyle *appliedStyle;
 
 - (void)configureWithTitle:(NSString *)title

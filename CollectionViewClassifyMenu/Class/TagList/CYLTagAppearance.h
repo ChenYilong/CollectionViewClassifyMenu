@@ -14,9 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLTagAppearance : NSObject <NSCopying>
 
-/// Background color. White by default; set nil to restore it.
+/*!
+ * Background color. White by default; set nil to restore it.
+ */
 @property (null_resettable, nonatomic, strong) UIColor *backgroundColor;
-/// Title color. Dark gray by default; set nil to restore it.
+/*!
+ * Title color. Dark gray by default; set nil to restore it.
+ */
 @property (null_resettable, nonatomic, strong) UIColor *textColor;
 /*!
  * Title font. `[UIFont systemFontOfSize:14]` by default; set nil to restore it.
@@ -33,9 +37,13 @@ NS_ASSUME_NONNULL_BEGIN
  * CYLBadgeAppearance. Negative or non-finite values are treated as 0.
  */
 @property (nonatomic, assign) CGFloat cornerRadius;
-/// Border color, nil (no border) by default. Drawn only when borderWidth > 0.
+/*!
+ * Border color, nil (no border) by default. Drawn only when borderWidth > 0.
+ */
 @property (nullable, nonatomic, strong) UIColor *borderColor;
-/// Border width, 0 by default. Negative or non-finite values are treated as 0.
+/*!
+ * Border width, 0 by default. Negative or non-finite values are treated as 0.
+ */
 @property (nonatomic, assign) CGFloat borderWidth;
 /*!
  * Horizontal space between the border and the content, 10 by default.
@@ -43,7 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) CGFloat margin;
 
-/// Restores every property to its built-in default.
+/*!
+ * Restores every property to its built-in default.
+ */
 - (void)reset;
 
 @end

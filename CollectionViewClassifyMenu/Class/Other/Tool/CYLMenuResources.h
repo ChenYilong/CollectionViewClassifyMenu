@@ -16,7 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
  * Looks up a key in the component's string table, in the component's language.
  */
 #define CYLMenuLocalizedString(key, comment) [CYLMenuResources localizedStringForKey:(key)]
-/// An image of the component's bundle (e.g. @"cyl_tag_plus").
+/*!
+ * An image of the component's bundle (e.g. @"cyl_tag_plus").
+ */
 #define CYLMenuImage(name) [CYLMenuResources imageNamed:(name)]
 
 /*!
@@ -31,7 +33,9 @@ FOUNDATION_EXTERN NSString *CYLMenuLocalizedStringForKey(NSString *key) __attrib
 + (NSBundle *)bundle;
 + (nullable UIImage *)imageNamed:(NSString *)name;
 
-/// Languages the bundle has strings for, e.g. @[@"en", @"zh-Hans", @"zh-Hant"].
+/*!
+ * Languages the bundle has strings for, e.g. @[@"en", @"zh-Hans", @"zh-Hant"].
+ */
 + (NSArray<NSString *> *)availableLanguages;
 
 /*!
@@ -53,7 +57,9 @@ FOUNDATION_EXTERN NSString *CYLMenuLocalizedStringForKey(NSString *key) __attrib
  */
 + (NSString *)localizedStringForKey:(NSString *)key;
 
-/// The string for `key` in `language`, for hosts that show several languages.
+/*!
+ * The string for `key` in `language`, for hosts that show several languages.
+ */
 + (NSString *)localizedStringForKey:(NSString *)key language:(NSString *)language;
 
 @end

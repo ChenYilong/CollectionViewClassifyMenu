@@ -17,27 +17,43 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, CYLMenuSelectionMode) {
-    /// Items behave like buttons: taps are reported, nothing stays selected.
+    /*!
+     * Items behave like buttons: taps are reported, nothing stays selected.
+     */
     CYLMenuSelectionModeNone = 0,
-    /// At most one selected item per section.
+    /*!
+     * At most one selected item per section.
+     */
     CYLMenuSelectionModeSingle,
-    /// Any number of selected items; exclusive items clear the others.
+    /*!
+     * Any number of selected items; exclusive items clear the others.
+     */
     CYLMenuSelectionModeMultiple,
 };
 
-/// Where the list's title (`title`) is: above every section, at the leading edge or centered.
+/*!
+ * Where the list's title (`title`) is: above every section, at the leading edge or centered.
+ */
 typedef NS_ENUM(NSInteger, CYLMenuTitlePosition) {
     CYLMenuTitlePositionTopLeading = 0,
     CYLMenuTitlePositionTopCenter,
 };
 
-/// The older way of choosing a fold control; foldControl gives the position and content separately.
+/*!
+ * The older way of choosing a fold control; foldControl gives the position and content separately.
+ */
 typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
-    /// Every row is always visible.
+    /*!
+     * Every row is always visible.
+     */
     CYLMenuFoldStyleNone = 0,
-    /// A "更多/收起" button at the trailing edge of the section header.
+    /*!
+     * A "更多/收起" button at the trailing edge of the section header.
+     */
     CYLMenuFoldStyleHeaderButton,
-    /// A chevron below the section, as in shopping review filters.
+    /*!
+     * A chevron below the section, as in shopping review filters.
+     */
     CYLMenuFoldStyleFooterChevron,
     /*!
      * Shows only `defaultVisibleRows` rows with no control, for previews;
@@ -48,26 +64,36 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 
 @interface CYLTagListView : UIView
 
-/// A tag list with its fold control and title, the styles fixed at creation (both can change later).
+/*!
+ * A tag list with its fold control and title, the styles fixed at creation (both can change later).
+ */
 - (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl
                               title:(nullable NSString *)title
                       titlePosition:(CYLMenuTitlePosition)titlePosition;
-/// With an icon before the title (either may be nil: icon only, title only).
+/*!
+ * With an icon before the title (either may be nil: icon only, title only).
+ */
 - (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl
                               title:(nullable NSString *)title
                          titleImage:(nullable UIImage *)titleImage
                       titlePosition:(CYLMenuTitlePosition)titlePosition;
-/// The same without a title.
+/*!
+ * The same without a title.
+ */
 - (instancetype)initWithFoldControl:(nullable CYLMenuFoldControl *)foldControl;
 + (instancetype)tagListViewWithFoldPosition:(CYLMenuFoldControlPosition)position content:(CYLMenuFoldControlContent)content;
 
 @property (nonatomic, weak, nullable) id<CYLMenuDataSource> menuDataSource;
 @property (nonatomic, weak, nullable) id<CYLMenuDelegate> menuDelegate;
 
-/// Appearance. Setting copies the style; set it again after changing it.
+/*!
+ * Appearance. Setting copies the style; set it again after changing it.
+ */
 @property (nonatomic, copy, null_resettable) CYLMenuStyle *style;
 
-/// Defaults to CYLMenuSelectionModeSingle.
+/*!
+ * Defaults to CYLMenuSelectionModeSingle.
+ */
 @property (nonatomic, assign) CYLMenuSelectionMode selectionMode;
 /*!
  * When NO, a tap never removes the last selected item of a section.
@@ -75,7 +101,9 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  */
 @property (nonatomic, assign) BOOL allowsEmptySelection;
 
-/// Defaults to YES. When NO, sections are laid out back to back without titles.
+/*!
+ * Defaults to YES. When NO, sections are laid out back to back without titles.
+ */
 @property (nonatomic, assign) BOOL showsSectionHeaders;
 
 /*!
@@ -96,7 +124,9 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  * or both. Neither: no title area.
  */
 @property (nonatomic, copy, nullable) NSString *title;
-/// The title's icon, before the title (or after it with titleStyle.imagePlacement); nil for none.
+/*!
+ * The title's icon, before the title (or after it with titleStyle.imagePlacement); nil for none.
+ */
 @property (nonatomic, strong, nullable) UIImage *titleImage;
 @property (nonatomic, assign) CYLMenuTitlePosition titlePosition;
 /*!
@@ -109,7 +139,9 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
  * with animationURL). Set the title, icon and style through the properties above.
  */
 @property (nonatomic, strong, readonly) CYLTagButton *titleView;
-/// The title's label (`titleView.titleLabel`).
+/*!
+ * The title's label (`titleView.titleLabel`).
+ */
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
 /*!
  * The default title look: the headline font (bold, scaled with Dynamic Type) in the label color, an
@@ -149,9 +181,13 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 
 #pragma mark Selection
 
-/// Selected items in ascending order.
+/*!
+ * Selected items in ascending order.
+ */
 @property (nonatomic, copy) NSArray<NSIndexPath *> *selectedIndexPaths;
-/// Applies the selection rules of `selectionMode` without calling the delegate.
+/*!
+ * Applies the selection rules of `selectionMode` without calling the delegate.
+ */
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath;
 - (void)deselectItemAtIndexPath:(NSIndexPath *)indexPath;
 - (void)deselectAllItems;
@@ -159,15 +195,25 @@ typedef NS_ENUM(NSInteger, CYLMenuFoldStyle) {
 #pragma mark Folding
 
 - (BOOL)isSectionExpanded:(NSInteger)section;
-/// Expands or collapses a section and calls -menu:didChangeExpanded:inSection:.
+/*!
+ * Expands or collapses a section and calls -menu:didChangeExpanded:inSection:.
+ */
 - (void)setExpanded:(BOOL)expanded forSection:(NSInteger)section animated:(BOOL)animated;
-/// Whether the section has more rows than `defaultVisibleRows` and can fold.
+/*!
+ * Whether the section has more rows than `defaultVisibleRows` and can fold.
+ */
 - (BOOL)canFoldSection:(NSInteger)section;
-/// Number of rows the section's items occupy at the current width.
+/*!
+ * Number of rows the section's items occupy at the current width.
+ */
 - (NSUInteger)numberOfRowsInSection:(NSInteger)section;
-/// Number of items currently shown in the section (fewer while collapsed).
+/*!
+ * Number of items currently shown in the section (fewer while collapsed).
+ */
 - (NSInteger)numberOfVisibleItemsInSection:(NSInteger)section;
-/// Scrolls so that the section (its header, or its first row) is at the top, as far as the content allows.
+/*!
+ * Scrolls so that the section (its header, or its first row) is at the top, as far as the content allows.
+ */
 - (void)scrollToSection:(NSInteger)section animated:(BOOL)animated;
 /*!
  * Scrolls so that the item is centered vertically, as far as the content allows (e.g. a tag just

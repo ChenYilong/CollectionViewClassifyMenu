@@ -14,9 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLTagCreateCell : CYLTagListCell
 
-/// The plus icon of the core bundle (a template image, drawn in the icon color).
+/*!
+ * The plus icon of the core bundle (a template image, drawn in the icon color).
+ */
 + (UIImage *)plusImage;
-/// "新建标签" for an empty name, "新建标签：<name>" otherwise, in the component's language.
+/*!
+ * "新建标签" for an empty name, "新建标签：<name>" otherwise, in the component's language.
+ */
 + (NSString *)titleForName:(nullable NSString *)name;
 /*!
  * The outlined look of the item, from a list (or section) style: the list's background, a hairline
@@ -24,7 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (CYLMenuStyle *)styleWithStyle:(CYLMenuStyle *)style;
 
-/// Shows "+ 新建标签" or "+ 新建标签：<name>" in `style` (already outlined).
+/*!
+ * Shows "+ 新建标签" or "+ 新建标签：<name>" in `style` (already outlined).
+ */
 - (void)configureWithName:(nullable NSString *)name style:(CYLMenuStyle *)style enabled:(BOOL)enabled;
 
 @end

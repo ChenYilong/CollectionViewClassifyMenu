@@ -16,7 +16,9 @@
 
 @property(nonatomic,assign,getter=isShowHeader)BOOL showHeader;
 
-// 总数据group / All data groups.
+/*!
+ * 总数据group / All data groups.
+ */
 @property (nonatomic, strong) NSMutableArray *groups;
 @property (nonatomic, weak) id<CYLMenuDataSource> menuDataSource;
 @property (nonatomic, weak) id<CYLMenuDelegate> menuDelegate;

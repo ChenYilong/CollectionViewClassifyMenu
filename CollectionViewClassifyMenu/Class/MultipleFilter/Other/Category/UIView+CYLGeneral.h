@@ -37,7 +37,9 @@
 - (CALayer *)cyl_addSubLayerWithFrame:(CGRect)frame color:(CGColorRef)colorRef;
 - (void)cyl_setTarget:(id)target action:(SEL)action;
 - (UIImage *)cyl_capture;
-/// Captures the leading `width` points of the view at its full height.
+/*!
+ * Captures the leading `width` points of the view at its full height.
+ */
 - (UIImage *)cyl_captureWithWidth:(CGFloat)width;
 
 @end

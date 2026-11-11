@@ -27,14 +27,18 @@ static inline UIFont *CYLScaledSystemFont(CGFloat pointSize, UITraitCollection *
                                compatibleWithTraitCollection:traits];
 }
 
-/// Tag height that fits one line of `font` and is never below `minimumHeight`.
+/*!
+ * Tag height that fits one line of `font` and is never below `minimumHeight`.
+ */
 static inline CGFloat CYLTagHeightForFont(UIFont *font, CGFloat minimumHeight) {
     return MAX(minimumHeight, ceil(font.lineHeight) + 10);
 }
 
 static CGFloat const CYLTagTitleFontSize = 16;
 
-/// Tag font for the given traits. Use it for both measuring and drawing.
+/*!
+ * Tag font for the given traits. Use it for both measuring and drawing.
+ */
 static inline UIFont *CYLTagTitleFontForTraitCollection(UITraitCollection *traits) {
     return CYLScaledSystemFont(CYLTagTitleFontSize, traits);
 }

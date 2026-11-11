@@ -11,9 +11,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CYLMenuStyle;
 
-/// What an item of CYLTagListView is.
+/*!
+ * What an item of CYLTagListView is.
+ */
 typedef NS_ENUM(NSInteger, CYLMenuItemType) {
-    /// A tag (the default).
+    /*!
+     * A tag (the default).
+     */
     CYLMenuItemTypeTag = 0,
     /*!
      * "+ 新建标签": an outlined action with the core's plus icon (CYLTagCreateCell), never selected. Its
@@ -31,9 +35,13 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
 - (NSString *)menuTitleForItemAtIndexPath:(NSIndexPath *)indexPath;
 
 @optional
-/// Icon drawn before the item's title. Return nil for a text-only item.
+/*!
+ * Icon drawn before the item's title. Return nil for a text-only item.
+ */
 - (nullable UIImage *)menuImageForItemAtIndexPath:(NSIndexPath *)indexPath;
-/// Icon shown while the item is selected; nil keeps the normal icon.
+/*!
+ * Icon shown while the item is selected; nil keeps the normal icon.
+ */
 - (nullable UIImage *)menuSelectedImageForItemAtIndexPath:(NSIndexPath *)indexPath;
 /*!
  * Animated icon (a Lottie .json, .pag, .riv or .gif file), played like a CYLTabBarController
@@ -57,7 +65,9 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * Return nil for the section's style. Metrics come from the list's style, as for sections.
  */
 - (nullable CYLMenuStyle *)menuStyleForItemAtIndexPath:(NSIndexPath *)indexPath;
-/// Icon drawn before the section title. Return nil for no icon.
+/*!
+ * Icon drawn before the section title. Return nil for no icon.
+ */
 - (nullable UIImage *)menuImageForSection:(NSInteger)section;
 /*!
  * View placed at the trailing edge of the section header, such as a picker
@@ -65,7 +75,9 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * the header's lifetime; return the same instance to keep its state.
  */
 - (nullable UIView *)menuAccessoryViewForSection:(NSInteger)section;
-/// Disabled items are drawn dimmed and cannot be selected. Defaults to YES.
+/*!
+ * Disabled items are drawn dimmed and cannot be selected. Defaults to YES.
+ */
 - (BOOL)menuItemIsEnabledAtIndexPath:(NSIndexPath *)indexPath;
 /*!
  * Selecting an exclusive item clears the other items in its section and
@@ -78,7 +90,9 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * selection does not change. Defaults to YES.
  */
 - (BOOL)menuItemIsSelectableAtIndexPath:(NSIndexPath *)indexPath;
-/// Tag (default) or "+ 新建标签" (CYLMenuItemTypeCreate).
+/*!
+ * Tag (default) or "+ 新建标签" (CYLMenuItemTypeCreate).
+ */
 - (CYLMenuItemType)menuItemTypeAtIndexPath:(NSIndexPath *)indexPath;
 /*!
  * The VoiceOver hint of an item (what a tap does, for example "Double-tap to remove"), already
@@ -92,7 +106,9 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
 @protocol CYLMenuDelegate <NSObject>
 
 @optional
-/// Return NO to ignore a tap. Not called for disabled items.
+/*!
+ * Return NO to ignore a tap. Not called for disabled items.
+ */
 - (BOOL)menu:(id)menu shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 /*!
  * Called for every accepted tap, including in CYLMenuSelectionModeNone. For a CYLMenuItemTypeCreate
@@ -104,7 +120,9 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  * when the host should ask for one.
  */
 - (void)menu:(id)menu didRequestNewItemWithName:(NSString *)name atIndexPath:(NSIndexPath *)indexPath;
-/// Called when a tap or another selection removes an item from the selection.
+/*!
+ * Called when a tap or another selection removes an item from the selection.
+ */
 - (void)menu:(id)menu didDeselectItemAtIndexPath:(NSIndexPath *)indexPath;
 /*!
  * Called once after a tap that changed the selection, after the select and
@@ -112,7 +130,9 @@ typedef NS_ENUM(NSInteger, CYLMenuItemType) {
  */
 - (void)menu:(id)menu didChangeSelectedItems:(NSArray<NSIndexPath *> *)indexPaths;
 - (void)menu:(id)menu didConfirmSelectedItems:(NSArray<NSIndexPath *> *)indexPaths;
-/// Called after a section is expanded or collapsed by the user or the host.
+/*!
+ * Called after a section is expanded or collapsed by the user or the host.
+ */
 - (void)menu:(id)menu didChangeExpanded:(BOOL)expanded inSection:(NSInteger)section;
 /*!
  * Called when the height needed to show the whole menu changes, so that a

@@ -17,22 +17,32 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Where a tag's icon goes relative to its title.
+/*!
+ * Where a tag's icon goes relative to its title.
+ */
 typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
-    /// Icon, then title (the default).
+    /*!
+     * Icon, then title (the default).
+     */
     CYLTagImagePlacementLeading = 0,
-    /// Title, then icon, e.g. "更多 ⌄".
+    /*!
+     * Title, then icon, e.g. "更多 ⌄".
+     */
     CYLTagImagePlacementTrailing,
 };
 
 @interface CYLMenuStyle : NSObject <NSCopying>
 
-/// Gray bordered tags, green selection. Used when no style is set.
+/*!
+ * Gray bordered tags, green selection. Used when no style is set.
+ */
 + (instancetype)defaultStyle;
 
 #pragma mark Tag box and text, per state (CYLBadgeAppearance)
 
-/// Normal tags. The appearance objects belong to the style: change their properties.
+/*!
+ * Normal tags. The appearance objects belong to the style: change their properties.
+ */
 @property (nonatomic, strong, readonly) CYLTagAppearance *normalAppearance;
 @property (nonatomic, strong, readonly) CYLTagAppearance *selectedAppearance;
 @property (nonatomic, strong, readonly) CYLTagAppearance *disabledAppearance;
@@ -50,7 +60,9 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  * NSForegroundColorAttributeName update the state's appearance font and textColor.
  */
 - (void)setTitleTextAttributes:(nullable NSDictionary<NSAttributedStringKey, id> *)attributes forState:(UIControlState)state;
-/// The state's font and text color as text attributes.
+/*!
+ * The state's font and text color as text attributes.
+ */
 - (NSDictionary<NSAttributedStringKey, id> *)titleTextAttributesForState:(UIControlState)state;
 
 /*!
@@ -58,20 +70,34 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  * nil uses the state's textColor.
  */
 - (void)setIconColor:(nullable UIColor *)iconColor forState:(UIControlState)state;
-/// The effective icon tint for a state.
+/*!
+ * The effective icon tint for a state.
+ */
 - (UIColor *)iconColorForState:(UIControlState)state;
 
-/// Space between the icon and the title, 4 by default.
+/*!
+ * Space between the icon and the title, 4 by default.
+ */
 @property (nonatomic, assign) CGFloat imageTitleSpacing;
-/// Icon size. CGSizeZero uses the image's own size. 14 x 14 by default.
+/*!
+ * Icon size. CGSizeZero uses the image's own size. 14 x 14 by default.
+ */
 @property (nonatomic, assign) CGSize imageSize;
-/// Shrinks the icon from its slot without moving it, as `CYLFlatDesignTabBarItem.imageInsets`.
+/*!
+ * Shrinks the icon from its slot without moving it, as `CYLFlatDesignTabBarItem.imageInsets`.
+ */
 @property (nonatomic, assign) UIEdgeInsets imageInsets;
-/// Moves the title from its computed position.
+/*!
+ * Moves the title from its computed position.
+ */
 @property (nonatomic, assign) UIOffset titlePositionAdjustment;
-/// Moves the icon from its computed position.
+/*!
+ * Moves the icon from its computed position.
+ */
 @property (nonatomic, assign) UIOffset imagePositionAdjustment;
-/// The icon before (default) or after the title.
+/*!
+ * The icon before (default) or after the title.
+ */
 @property (nonatomic, assign) CYLTagImagePlacement imagePlacement;
 /*!
  * For a tag with only an icon or only a title: YES (the default) centers it;
@@ -80,7 +106,9 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  */
 @property (nonatomic, assign) BOOL layoutCentered;
 
-/// Size of animated icons (`menuAnimationURLForItemAtIndexPath:`). CGSizeZero (the default) uses imageSize.
+/*!
+ * Size of animated icons (`menuAnimationURLForItemAtIndexPath:`). CGSizeZero (the default) uses imageSize.
+ */
 @property (nonatomic, assign) CGSize animationSize;
 /*!
  * Playback speed of animated icons, as `CYLTabBarController.tabBarItemAnimationSpeed`; 1 (the default)
@@ -88,9 +116,13 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  */
 @property (nonatomic, assign) CGFloat animationSpeed;
 
-/// Scale the appearance fonts for Dynamic Type (capped at 2x). Defaults to YES.
+/*!
+ * Scale the appearance fonts for Dynamic Type (capped at 2x). Defaults to YES.
+ */
 @property (nonatomic, assign) BOOL adjustsFontForContentSizeCategory;
-/// Minimum tag height; grows with the font for large text sizes. 30 by default.
+/*!
+ * Minimum tag height; grows with the font for large text sizes. 30 by default.
+ */
 @property (nonatomic, assign) CGFloat itemHeight;
 
 #pragma mark Layout
@@ -107,14 +139,18 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
 
 #pragma mark Fold controls
 @property (nonatomic, strong) UIColor *foldControlColor;
-/// Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
+/*!
+ * Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
+ */
 @property (nonatomic, copy) NSString *expandTitle;
 /*!
  * Footer chevron, pointing down while folded; it turns 180° when the section expands.
  * nil uses the SF Symbol "chevron.down".
  */
 @property (nonatomic, strong, nullable) UIImage *foldChevronImage;
-/// Defaults to the localized "Less" from CYLClassifyMenuResources.bundle.
+/*!
+ * Defaults to the localized "Less" from CYLClassifyMenuResources.bundle.
+ */
 @property (nonatomic, copy) NSString *collapseTitle;
 
 /*!
@@ -122,7 +158,9 @@ typedef NS_ENUM(NSInteger, CYLTagImagePlacement) {
  * scaled for Dynamic Type when adjustsFontForContentSizeCategory is YES.
  */
 - (UIFont *)titleFontForState:(UIControlState)state traitCollection:(nullable UITraitCollection *)traitCollection;
-/// Header font for the given traits, applying Dynamic Type when enabled.
+/*!
+ * Header font for the given traits, applying Dynamic Type when enabled.
+ */
 - (UIFont *)headerFontForTraitCollection:(nullable UITraitCollection *)traitCollection;
 
 @end

@@ -28,7 +28,9 @@
 @property (nonatomic, assign) NSUInteger defaultVisibleRows;
 
 - (void)reloadMenuData;
-/// Lays the tags, the header and the footer out again, e.g. after the footer's content changed.
+/*!
+ * Lays the tags, the header and the footer out again, e.g. after the footer's content changed.
+ */
 - (void)updateMenuLayout;
 
 @end

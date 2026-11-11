@@ -19,7 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, nullable) NSString *title;
 @property (nonatomic, strong, nullable) UIImage *image;
-/// Shown while selected; nil keeps `image` (as CYLFlatDesignTabBarItem.selectedImage).
+/*!
+ * Shown while selected; nil keeps `image` (as CYLFlatDesignTabBarItem.selectedImage).
+ */
 @property (nonatomic, strong, nullable) UIImage *selectedImage;
 /*!
  * Animated icon file (Lottie .json, .pag, .riv, .gif…). The view comes from CYLTabBarController's
@@ -28,18 +30,30 @@ NS_ASSUME_NONNULL_BEGIN
  * it, or when the file cannot be loaded, `image` is shown.
  */
 @property (nonatomic, strong, nullable) NSURL *animationURL;
-/// The frame (0...1) of the animated icon shown while not selected. Default 0, the first frame.
+/*!
+ * The frame (0...1) of the animated icon shown while not selected. Default 0, the first frame.
+ */
 @property (nonatomic, assign) CGFloat animationRestingProgress;
-/// The animation view in the icon slot, or nil.
+/*!
+ * The animation view in the icon slot, or nil.
+ */
 @property (nonatomic, strong, readonly, nullable) UIView *animationView;
-/// Its `CYLTabBarItemAnimationPlayer` (play, showLastFrame, stop), whatever the library, or nil.
+/*!
+ * Its `CYLTabBarItemAnimationPlayer` (play, showLastFrame, stop), whatever the library, or nil.
+ */
 @property (nonatomic, strong, readonly, nullable) id animationPlayer;
-/// Plays the animated icon from the start, as a tab icon plays when the tab is tapped.
+/*!
+ * Plays the animated icon from the start, as a tab icon plays when the tab is tapped.
+ */
 - (void)playAnimation;
-/// Whether CYLTabBarController's animation engine is linked into the app.
+/*!
+ * Whether CYLTabBarController's animation engine is linked into the app.
+ */
 + (BOOL)isAnimationEngineAvailable;
 
-/// The style the tag is drawn with. Set it again after changing it.
+/*!
+ * The style the tag is drawn with. Set it again after changing it.
+ */
 @property (nonatomic, copy, null_resettable) CYLMenuStyle *style;
 
 /*!
@@ -51,15 +65,21 @@ NS_ASSUME_NONNULL_BEGIN
                    style:(CYLMenuStyle *)style
          traitCollection:(nullable UITraitCollection *)traitCollection;
 
-/// The same for an icon of `iconSize` (CGSizeZero for none), e.g. an animated icon.
+/*!
+ * The same for an icon of `iconSize` (CGSizeZero for none), e.g. an animated icon.
+ */
 + (CGFloat)widthForTitle:(nullable NSString *)title
                 iconSize:(CGSize)iconSize
                    style:(CYLMenuStyle *)style
          traitCollection:(nullable UITraitCollection *)traitCollection;
-/// Size of the icon slot for an image, or for an animated icon when `animated` and the engine is linked.
+/*!
+ * Size of the icon slot for an image, or for an animated icon when `animated` and the engine is linked.
+ */
 + (CGSize)iconSizeForImage:(nullable UIImage *)image animated:(BOOL)animated style:(CYLMenuStyle *)style;
 
-/// Tag height: style.itemHeight, or more for large fonts.
+/*!
+ * Tag height: style.itemHeight, or more for large fonts.
+ */
 + (CGFloat)heightForStyle:(CYLMenuStyle *)style traitCollection:(nullable UITraitCollection *)traitCollection;
 
 @end

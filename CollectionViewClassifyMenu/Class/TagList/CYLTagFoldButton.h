@@ -27,7 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
                 expanded:(BOOL)expanded
                 animated:(BOOL)animated;
 
-/// The size the control needs in that state.
+/*!
+ * The size the control needs in that state.
+ */
 + (CGSize)sizeForFoldControl:(CYLMenuFoldControl *)foldControl
                     expanded:(BOOL)expanded
              traitCollection:(nullable UITraitCollection *)traitCollection;

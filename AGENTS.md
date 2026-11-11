@@ -24,13 +24,19 @@ verify the behavior and update the applicable documentation.
    * What it does, and what callers must know.
    */
   ```
-  A one-line `///` is fine for a one-line comment. In Swift source, where the
-  compiler does not treat `/*!` as documentation, use `/** … */` (or `///` for
-  one line). Other platforms use their official documentation format (KDoc
-  `/** … */` for Kotlin, Javadoc for Java, JSDoc/TSDoc `/** … */` for
+  In Swift source, where the compiler does not treat `/*!` as documentation,
+  use `/** … */`. Other platforms use their official documentation format
+  (KDoc `/** … */` for Kotlin, Javadoc for Java, JSDoc/TSDoc `/** … */` for
   JavaScript/TypeScript, Dart `///`, Rust `///`, Python docstrings). Plain `//`
   comments are for implementation notes only, never for public API docs.
-  Details and the check: `.agents/skills/cyl-comments/`.
+- The same format applies to one-line public API comments: in a file that
+  holds public API, every documentation comment, one line or several, uses the
+  same format, so the file stays uniform (an Objective-C header has only
+  `/*! … */` blocks, laid out as above even for one line; no `///`). This holds
+  for every platform and language: where the official format is a block
+  (Objective-C, Swift, Kotlin, Java, JavaScript/TypeScript), one-line comments
+  are blocks too; where it is a line form (Dart, Rust, C#, Go), every comment
+  uses that line form. Details and the check: `.agents/skills/cyl-comments/`.
 - Use English Conventional Commit messages, such as `fix: 🐛 ...` and
   `docs: 📝 ...`.
 - Every commit message's description (the body) must contain the author line

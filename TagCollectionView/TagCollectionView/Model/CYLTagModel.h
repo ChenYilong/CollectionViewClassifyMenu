@@ -19,7 +19,9 @@
 
 +(instancetype)modelWithTitle:(NSString*)title;
 
-/// Font used to draw and measure the title for the given traits (Dynamic Type).
+/*!
+ * Font used to draw and measure the title for the given traits (Dynamic Type).
+ */
 + (UIFont *)titleFontForTraitCollection:(UITraitCollection *)traitCollection;
 
 /*!

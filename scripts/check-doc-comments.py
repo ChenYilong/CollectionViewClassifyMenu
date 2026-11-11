@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Usage: scripts/check-doc-comments.py [--fix] [header ...]
 
-[EN] Public API documentation comments (AGENTS.md, "Code comments"; .agents/skills/cyl-comments): a comment of more
-     than one line in a public Objective-C header is one /*! ... */ block, never stacked /// lines, so Xcode's Quick
-     Help and the Swift interface show it. Lists stacked /// lines and /** openers in the pod's public headers (or the
-     given headers) and exits 1 when there are any; --fix rewrites them as /*! ... */ blocks.
-[CN] 公开 API 的文档注释：公开 Objective-C 头文件中超过一行的注释写成一个 /*! ... */ 注释块，不堆叠 /// 单行注释，
-     以便 Xcode 快速帮助与 Swift 接口能显示。列出 pod 公开头文件（或指定头文件）中堆叠的 /// 与 /** 开头，存在时退出码为 1；
-     --fix 将其改写为 /*! ... */ 注释块。
+[EN] Public API documentation comments (AGENTS.md, "Code comments"; .agents/skills/cyl-comments): every comment that
+     documents a declaration in a public Objective-C header, one line or several, is one /*! ... */ block, so the file
+     has one comment format and Xcode's Quick Help and the Swift interface show it. Lists /// lines (single or
+     stacked), /** openers and plain // comments placed on a declaration in the pod's public headers (or the given
+     headers) and exits 1 when there are any; --fix rewrites them as /*! ... */ blocks.
+[CN] 公开 API 的文档注释：公开 Objective-C 头文件中说明声明的注释，无论单行还是多行，都写成一个 /*! ... */ 注释块，
+     使文件内注释格式统一，Xcode 快速帮助与 Swift 接口都能显示。列出 pod 公开头文件（或指定头文件）中的 /// 注释（单行或堆叠）、
+     /** 开头以及写在声明上的普通 // 注释，存在时退出码为 1；--fix 将其改写为 /*! ... */ 注释块。
 """
 import re
 import subprocess
@@ -20,29 +21,58 @@ PUBLIC_HEADERS = [
     'TagCollectionView/TagCollectionView/Model/*.h',
     'TagCollectionView/TagCollectionView/Views/*.h',
 ]
-STACKED = re.compile(r'^(\s*)///(?![/<])')
+DOC_LINE = re.compile(r'^(\s*)///(?![/<])')
+PLAIN_LINE = re.compile(r'^(\s*)//(?!/)')
+
+
+def block(indent, body, path, line_number):
+    if any('*/' in line for line in body):
+        raise SystemExit(f'{path}:{line_number}: "*/" inside the comment; fix it by hand')
+    return [indent + '/*!'] + [indent + (' * ' + line if line.strip() else ' *') for line in body] + [indent + ' */']
+
+
+def documents_declaration(lines, end):
+    """The comment ends right above a declaration (not a blank line, a directive or another comment)."""
+    if end >= len(lines):
+        return False
+    following = lines[end].strip()
+    return bool(following) and not following.startswith(('#', '//', '/*', '@end'))
 
 
 def convert(lines, path, report):
     out, i, found = [], 0, 0
+    # [EN] The file header (// File.h, licenses) before the first #import/#include is left alone.
+    # [CN] 第一个 #import/#include 之前的文件头注释（文件名、许可证）保持不变。
+    body_start = next((n for n, line in enumerate(lines) if re.match(r'\s*#\s*(import|include)', line)), len(lines))
     while i < len(lines):
-        match = STACKED.match(lines[i])
+        match = DOC_LINE.match(lines[i])
         if match:
             indent = match.group(1)
             end = i
             while end < len(lines) and re.match(r'^' + re.escape(indent) + r'///(?![/<])', lines[end]):
                 end += 1
-            if end - i >= 2:
-                body = [re.sub(r'^\s*/// ?', '', line) for line in lines[i:end]]
-                if any('*/' in line for line in body):
-                    raise SystemExit(f'{path}:{i + 1}: "*/" inside the comment; fix it by hand')
-                out.append(indent + '/*!')
-                out += [indent + (' * ' + line if line.strip() else ' *') for line in body]
-                out.append(indent + ' */')
-                report(f'{path}:{i + 1}: {end - i} stacked /// lines; use one /*! ... */ block')
+            body = [re.sub(r'^\s*/// ?', '', line) for line in lines[i:end]]
+            out += block(indent, body, path, i + 1)
+            report(f'{path}:{i + 1}: /// comment ({end - i} line(s)); use one /*! ... */ block')
+            found += 1
+            i = end
+            continue
+        match = PLAIN_LINE.match(lines[i])
+        if match and i >= body_start:
+            indent = match.group(1)
+            end = i
+            while end < len(lines) and re.match(r'^' + re.escape(indent) + r'//(?!/)', lines[end]):
+                end += 1
+            if documents_declaration(lines, end):
+                body = [re.sub(r'^\s*// ?', '', line) for line in lines[i:end]]
+                out += block(indent, body, path, i + 1)
+                report(f'{path}:{i + 1}: plain // comment on a declaration; use one /*! ... */ block')
                 found += 1
                 i = end
                 continue
+            out += lines[i:end]
+            i = end
+            continue
         if re.match(r'^\s*/\*\*(\s|$)', lines[i]):
             out.append(re.sub(r'/\*\*', '/*!', lines[i], count=1))
             report(f'{path}:{i + 1}: /** opener; use /*! in Objective-C headers')
