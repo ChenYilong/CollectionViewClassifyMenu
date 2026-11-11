@@ -158,6 +158,15 @@ verify the behavior and update the applicable documentation.
   CocoaPods release lacks them. Only the examples link it.
 - Details: `.agents/skills/cyl-dependency/`.
 
+## Bundled animation files
+
+- Keep copied animation files (Lottie, PAG, Rive, GIF) unmodified, with their source, commit, path and
+  license in the README next to them. One exception, as in CYLTableViewPlaceHolder
+  ([PR #22](https://github.com/ChenYilong/CYLTableViewPlaceHolder/pull/22)): a background fill baked into a
+  file (a Rive artboard fill, a "BG" shape) that draws a square behind an icon may be made transparent by
+  setting its alpha to 0, and nothing else, when the license allows modification. Record the change and
+  both SHA-256 values in that README (`Animations/Rive/README.md`, `truck.riv`).
+
 ## Search bars
 
 - A search bar never covers any view, at any time: not the view controller's view, not a sibling, not a background

@@ -314,6 +314,13 @@ Example 的「动效」Tab（`CYLTagAnimationDemoViewController`）使用从 CYL
 Example 复制的资源：Lottie（含图片资源与占位图、绿色主题）、Rive、GIF 动效文件与 TabBar 图片（`Assets.xcassets/TabBarIcon`），
 PAG 文件由 `pod install` 下载（包括 CYLTabBarController Example-PAG 的 Tab 图标 `tab_home`、`tab_health`、`tab_moments`、`tab_me`）；每个分组一种动效库，点击播放，可全部播放与切换速度。`style.animationSize`、`style.animationSpeed` 设置大小与速度。
 
+Rive 文件自带的背景：`truck.riv` 的画板填充（红色 `Background`）会在标签里画出一块矩形，按
+CYLTableViewPlaceHolder 的 [PR #22](https://github.com/ChenYilong/CYLTableViewPlaceHolder/pull/22)
+把它的透明度设为 0（只改这一个字节，记录见 `Animations/Rive/README.md`）。`house.riv` 自带天空背景，
+但来源没有许可文件，不修改。
+
+<img src="assets/rive-tags-transparent-background.png" width="450" alt="Rive 标签：卡车不再有红色背景">
+
 #### 字典与配置文件初始化 / Map and configuration file
 
 与 CYLTabBarController 的 `-initWithConfiguration:`、`-initWithConfigurationFile:error:` 相同：
@@ -579,7 +586,7 @@ CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成
 
 ### Tests / 测试
 
-两个示例的测试（`Example/CYLMenuExampleTests`：78 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
+两个示例的测试（`Example/CYLMenuExampleTests`：79 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
 每个功能一个测试类、一个文件（高内聚）；测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，
 同时编译进两个测试 target（低耦合，不重复）。
 
@@ -614,7 +621,7 @@ both test targets.
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | 纯 Swift 示例：标签数据、编辑标签、折叠样式、无障碍 |
 
 ```sh
-scripts/unit-tests.sh example   # 78 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh example   # 79 tests; screenshots in build/test-screenshots/example/
 scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshots/swift/
 ```
 
@@ -623,7 +630,7 @@ establishing connection”）；两个示例和根目录的两个演示 App 因�
 `CYLSceneDelegate`、`CYLTagDemoSceneDelegate`；后两个是 `scripts/unit-tests.sh menu|tag` 的测试宿主），
 测试窗口也加入 App 的 scene。
 
-测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 78、swift 19、menu 17、tag 6，共 120 个测试全部通过）：
+测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 79、swift 19、menu 17、tag 6，共 121 个测试全部通过）：
 
 | 单选：替换同组选择 | 多选 | 底部箭头：折叠 | 底部箭头：展开 |
 | --- | --- | --- | --- |

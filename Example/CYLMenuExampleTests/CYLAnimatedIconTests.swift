@@ -6,6 +6,7 @@
 //  animation demo and its per-section styles.
 //
 
+import CryptoKit
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
@@ -158,5 +159,19 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
             let path = (Bundle.main.resourcePath ?? "") + "/pag-ios/\(name).pag"
             XCTAssertTrue(FileManager.default.fileExists(atPath: path), "CYLTabBarController's PAG tab icon \(name)")
         }
+    }
+
+    /**
+     * truck.riv ships with its red artboard background made transparent (alpha 0, one byte), as
+     * CYLTableViewPlaceHolder's PR #22 did for CYLRefreshIcon.riv; see Animations/Rive/README.md.
+     */
+    func testTruckRiveDrawsNoBackgroundRectangle() throws {
+        let bundle = try XCTUnwrap(Bundle.main.url(forResource: "CYLMenuExample", withExtension: "bundle"))
+        let truck = bundle.appendingPathComponent("Animations/Rive/truck.riv")
+        let data = try Data(contentsOf: truck)
+        let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        XCTAssertEqual(digest, "c961c6c4853823ab058f7e114f2e3f3d6d7c9d68844a0e2e971daa2f1fa8b131", "The transparent version")
+        // The artboard fill's color: property key 37 (0x25), then ARGB little-endian; the alpha byte is 0.
+        XCTAssertEqual(Array(data[51...55]), [0x25, 0x60, 0x3a, 0xeb, 0x00])
     }
 }
