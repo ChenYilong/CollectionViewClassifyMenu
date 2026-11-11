@@ -1,7 +1,7 @@
 ---
 title: Issue 修复进度
 date: 2026-11-09
-updated: 2026-11-11
+updated: 2026-11-12
 tags: [issues, ui, cocoapods, progress]
 ---
 
@@ -32,3 +32,23 @@ tags: [issues, ui, cocoapods, progress]
 | #13 / #1：长文字与 emoji 标签复用后不重叠、选中状态保持 | #13：多选后折叠的长文字标签 | #7：分组标题按容器宽度布局，右侧有宿主视图 | #9：大量标签滚动到末尾 |
 | --- | --- | --- | --- |
 | <img src="assets/classify-menu-filtered.png" width="200" alt="#13 / #1：长文字与 emoji 标签复用后不重叠、选中状态保持"> | <img src="assets/issue-13-collapsed-long-titles.png" width="200" alt="#13：多选后折叠的长文字标签"> | <img src="assets/issue-7-section-header-width.png" width="200" alt="#7：分组标题按容器宽度布局，右侧有宿主视图"> | <img src="assets/issue-9-many-tags.png" width="200" alt="#9：大量标签滚动到末尾"> |
+
+## 待办 / TODO
+
+2026-11-12 记录，分支 `claude/intelligent-curie-1etnx5`（[PR #15](https://github.com/ChenYilong/CollectionViewClassifyMenu/pull/15)）：
+
+- TODO（合并）：PR #15 的 CI 全部通过后合并到 `master`。当前状态：本地 example 79、swift 19 个测试通过；
+  CI 运行中。完成条件：`gh pr checks 15` 全部通过，查看 CI 截图，合并后在本表记录合并提交。
+- TODO（依赖）：`Example/Podfile` 与 `Example-Swift/Podfile` 固定的 CYLTabBarController 提交落后于最新提交
+  `0e69250`（`feat/cross-platform-components`，2026-11-12）。CI 的检查只警告，不失败。剩余工作：确认两次提交之间
+  的改动后更新两个 `CYL_TAB_BAR`，`pod install` 并运行全部测试。
+- TODO（Rive 资源）：`house.riv` 自带天空背景（`Rectangle-6`，紫色渐变）和灰色画板填充，在标签中显示为方形画面。
+  来源（Design+Code 课程附件）没有许可文件，按 PR #22 的规则不能修改。剩余工作：换成有许可的房子动画
+  （例如 rive-app 官方示例），或取得作者许可后把背景填充透明度设为 0，并在 `Animations/Rive/README.md` 记录。
+- TODO（可读性）：最大辅助字号下，搜索栏输入框里的占位文字被缩小（搜索发现、热门搜索页面）。属于
+  CYLSearchViewController 的 `CYLSearchBarView`：剩余工作是在那里让占位文字跟随字号或换行显示，再更新
+  `CYL_SEARCH`。验证：`CYLSearchBarPlacementTests` 的最大字号截图。
+- TODO（布局）：最大辅助字号下，图片标签的两个标签组位置固定，可能相互接触（组内不重叠）。剩余工作：按字号
+  调整组的位置或允许拖开；验证：`CYLAndroidSampleAccessibilityTests` 的大字号截图。
+- TODO（验证）：尚未在真机上用 VoiceOver、Voice Control、Switch Control 和 Accessibility Inspector 检查新增的
+  无障碍操作（标签前移/后移、图片标签组、搜索栏）；目前由单元测试覆盖标签、操作和字号。
