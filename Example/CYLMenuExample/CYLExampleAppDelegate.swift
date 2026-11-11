@@ -65,6 +65,12 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        true
+    }
+
+    /// Builds the window of the app's scene (`CYLExampleSceneDelegate`): apps built with the iOS 27 SDK must
+    /// adopt the scene lifecycle, otherwise UIKit stops them at launch.
+    func launch(in scene: UIWindowScene) -> UIWindow {
         // `-CYLExampleLanguage en` (or a screen name ending in "@en") switches the language of the
         // component and the Example, as an in-app language setting would.
         var screen = UserDefaults.standard.string(forKey: "CYLExampleScreen") ?? ""
@@ -77,7 +83,7 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
             CYLMenuResources.preferredLanguage = language
         }
 
-        let window = UIWindow(frame: UIScreen.main.bounds)
+        let window = UIWindow(windowScene: scene)
         let tabs = Self.makeRootTabBarController()
         window.rootViewController = tabs
         window.makeKeyAndVisible()
@@ -92,7 +98,7 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
                 Self.reportLayout(ofScreen: screen, in: tabs)
             }
         }
-        return true
+        return window
     }
 
     // MARK: Layout report
@@ -263,5 +269,17 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
                 search.select(.jobs)
             }
         }
+    }
+}
+
+/// The app's only scene: its window is built by `CYLExampleAppDelegate.launch(in:)` (`UIApplicationSceneManifest`
+/// in Info.plist).
+final class CYLExampleSceneDelegate: UIResponder, UIWindowSceneDelegate {
+
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let scene = scene as? UIWindowScene, let app = UIApplication.shared.delegate as? CYLExampleAppDelegate else { return }
+        window = app.launch(in: scene)
     }
 }

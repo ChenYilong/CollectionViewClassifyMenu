@@ -34,6 +34,12 @@ final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        true
+    }
+
+    /// Builds the window of the app's scene (`CYLTagEditorSceneDelegate`): apps built with the iOS 27 SDK must
+    /// adopt the scene lifecycle, otherwise UIKit stops them at launch.
+    func launch(in scene: UIWindowScene) -> UIWindow {
         var screen = UserDefaults.standard.string(forKey: "CYLExampleScreen") ?? ""
         var language = UserDefaults.standard.string(forKey: "CYLExampleLanguage")
         if let at = screen.firstIndex(of: "@") {
@@ -50,7 +56,7 @@ final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
         store = CYLTagStore(data: data)
         demoSelection = data.selectedTags
         let remark = CYLRemarkViewController(store: store, tags: screen == "remark" ? demoSelection : [])
-        let window = UIWindow(frame: UIScreen.main.bounds)
+        let window = UIWindow(windowScene: scene)
         // Two tabs at the bottom: the tag editor, and the fold styles of the core's tag list.
         let styles = CYLFoldStylesViewController(data: data)
         foldStyles = styles
@@ -69,7 +75,7 @@ final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
                 self.reportLayout(of: screen, root: remark)
             }
         }
-        return true
+        return window
     }
 
     /// The root tab bar (CYLTabBarController, at the bottom): 编辑标签 and 折叠样式.
@@ -159,5 +165,17 @@ final class CYLTagEditorAppDelegate: UIResponder, UIApplicationDelegate {
                                     + "done=\(editor.isDoneEnabled) tagList=\(NSCoder.string(for: editor.tagListView.frame)) "
                                     + "contentHeight=\(editor.tagListView.contentHeight) selectedIndexPaths=\(editor.tagListView.selectedIndexPaths.count)")
         }
+    }
+}
+
+/// The app's only scene: its window is built by `CYLTagEditorAppDelegate.launch(in:)` (`UIApplicationSceneManifest`
+/// in Info.plist).
+final class CYLTagEditorSceneDelegate: UIResponder, UIWindowSceneDelegate {
+
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let scene = scene as? UIWindowScene, let app = UIApplication.shared.delegate as? CYLTagEditorAppDelegate else { return }
+        window = app.launch(in: scene)
     }
 }
