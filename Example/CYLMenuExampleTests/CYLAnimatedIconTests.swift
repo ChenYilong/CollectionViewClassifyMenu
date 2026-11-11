@@ -174,4 +174,18 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
         // The artboard fill's color: property key 37 (0x25), then ARGB little-endian; the alpha byte is 0.
         XCTAssertEqual(Array(data[51...55]), [0x25, 0x60, 0x3a, 0xeb, 0x00])
     }
+
+    /**
+     * house.riv ships with its sky gradient and artboard fill made transparent (three alpha bytes), so its tag shows
+     * the house without a square scene behind it; see Animations/Rive/README.md.
+     */
+    func testHouseRiveDrawsNoBackgroundSquare() throws {
+        let bundle = try XCTUnwrap(Bundle.main.url(forResource: "CYLMenuExample", withExtension: "bundle"))
+        let data = try Data(contentsOf: bundle.appendingPathComponent("Animations/Rive/house.riv"))
+        let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        XCTAssertEqual(digest, "2e06b33ce5ff2d8863053b0dff1fcf2f62b537cc51e38c48e11a01b927e28c65", "The transparent version")
+        for offset in [8770, 8780, 8795] {
+            XCTAssertEqual(data[offset], 0, "alpha byte at \(offset)")
+        }
+    }
 }

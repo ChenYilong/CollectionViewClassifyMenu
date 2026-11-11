@@ -164,8 +164,9 @@ verify the behavior and update the applicable documentation.
   license in the README next to them. One exception, as in CYLTableViewPlaceHolder
   ([PR #22](https://github.com/ChenYilong/CYLTableViewPlaceHolder/pull/22)): a background fill baked into a
   file (a Rive artboard fill, a "BG" shape) that draws a square behind an icon may be made transparent by
-  setting its alpha to 0, and nothing else, when the license allows modification. Record the change and
-  both SHA-256 values in that README (`Animations/Rive/README.md`, `truck.riv`).
+  setting its alpha to 0, and nothing else, when the license allows modification, or when the maintainer
+  decides so for a file without a license (`house.riv`, 2026-11-12). Record the change and both SHA-256
+  values in that README (`Animations/Rive/README.md`: `truck.riv`, `house.riv`).
 
 ## Search bars
 

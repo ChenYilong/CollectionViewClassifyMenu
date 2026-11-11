@@ -19,6 +19,11 @@
 - Checked and unchanged: `button.riv`, `menu_button.riv` and `shapes.riv` have a dark artboard fill
   that is switched off (`isVisible` 0); `check.riv`'s artboard fill is fully transparent; `icons.riv`'s
   tab icon artboards and `confetti.riv` have no background fill.
-- `house.riv` draws its own sky (`Rectangle-6`, a purple gradient) and a grey artboard fill, so its tag
-  shows a square scene. It is not changed: it comes from the Design+Code course download, which has no
-  license file, and the exception below needs a license that allows modification.
+- `house.riv` (2026-11-12, at the maintainer's request): its sky (`Rectangle-6`, a purple radial
+  gradient, stops `#ffe0c0f9` and `#ff808efb`) and its artboard fill (`#ff5d5d5d`) drew a square scene
+  behind the house on its tag. The alpha of these three colors is set to 0 (three bytes, offsets 8770,
+  8780 and 8795); nothing else changed. The ground under the house (`Rectangle-6-Copy`) is part of the
+  drawing and stays. The file comes from the Design+Code course download, which has no license file:
+  the copyright stays with its author, and the change was made because the maintainer decided so.
+  SHA-256 before: `632474611244a3ea9cdf455719624bcc0e6684de09f734ade923fe474ba94039`;
+  after: `2e06b33ce5ff2d8863053b0dff1fcf2f62b537cc51e38c48e11a01b927e28c65`.
