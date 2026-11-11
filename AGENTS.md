@@ -139,6 +139,19 @@ verify the behavior and update the applicable documentation.
   produced. If that is still not possible, explain the exact reason (for
   example the runner, the simulator or artifact download) to the user.
 
+## Documentation assets
+
+- Images and other attachments of a Markdown file go into an `assets/` folder
+  next to that file (as Obsidian saves new attachments): `README.md` uses
+  `assets/`, a file in `docs/` uses `docs/assets/`. Link them with the shortest
+  relative path (`![…](assets/<file>)`), never with absolute GitHub URLs or
+  external image hosts.
+- Name files in English, lowercase with hyphens, after what they show
+  (`swift-tag-editor.png`, `scenario1-taobao-review-filter.gif`).
+- README screenshots of the examples come from a CI run of the current commit
+  (the `ci-screenshots` branch, see "CI and Example screenshots"); replace them
+  when the screens change.
+
 ## Repository hygiene
 
 - Ignore macOS AppleDouble metadata (`._*`), `.DS_Store`, and stray doubled-dot

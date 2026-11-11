@@ -2,10 +2,10 @@
 
 
 ## 功能展示
-![Example screenshot](https://github.com/ChenYilong/CollectionViewClassifyMenu/blob/master/CollectionViewClassifyMenu用法展示.gif)
+![功能展示](assets/classify-menu-demo.gif)
 
 ## 单选可折叠菜单的特性展示
-![Example screenshot](https://github.com/ChenYilong/CollectionViewClassifyMenu/blob/master/单选菜单的特性展示.gif)
+![单选可折叠菜单](assets/single-choice-fold-menu.gif)
                   
 Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 
@@ -19,7 +19,7 @@ Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 筛选条件，如果数目过多，可以折叠，：比如《手机淘宝App》中商品的评价筛选
 
 
-![enter image description here](https://i.imgur.com/8AM2QTc.gif)
+![场景一：手机淘宝评价筛选](assets/scenario1-taobao-review-filter.gif)
 
 > 已在 `Example/` 中实现：`CYLProductViewController`（商品页两行预览）和 `CYLReviewListViewController`（可折叠单选评价筛选）。
 
@@ -29,7 +29,7 @@ Check out [my weibo](http://weibo.com/luohanchenyilong/) for more info.
 分类菜单：比如《脉脉App》中的搜索分类筛选
 
 
-![enter image description here](https://i.imgur.com/ZyJflPh.gif)
+![场景二：脉脉搜索分类](assets/scenario2-maimai-search-categories.gif)
 
 > 已在 `Example/` 中实现：`CYLSearchCategoryViewController`（搜索分类、职位类别侧栏与行业选择）。
 
