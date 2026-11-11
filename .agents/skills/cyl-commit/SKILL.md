@@ -1,6 +1,6 @@
 ---
 name: cyl-commit
-description: Commit message format for CollectionViewClassifyMenu (Conventional Commits with emoji, the required author line) and the checks to run before every commit.
+description: Commit message format for CollectionViewClassifyMenu (Conventional Commits with emoji, the required author line), the checks to run before every commit, and the pull request every new branch gets.
 ---
 
 # Commits
@@ -39,3 +39,21 @@ git log -1 --format=%B | grep -qxF 'By @ChenYilong <luohanchenyilong@163.com>' &
    untrack what it lists (AGENTS.md, "Repository hygiene").
 3. Stage only the intended files and read `git diff --cached --stat` (no `._*`, `.DS_Store`, user state or Pods).
 4. For an issue fix, update `docs/issue-progress.md`.
+
+## Branches and pull requests
+
+Every time a branch is created, open its pull request automatically; never ask first.
+
+1. Note the source branch before creating the new one: `SOURCE=$(git branch --show-current)`.
+2. Create the branch, commit, and push it: `git push -u origin <new-branch>`.
+3. Open the pull request against the source branch, preferred; use `main` or `master` only when the source branch
+   is not on the remote (or the branch was not created from another branch):
+
+   ```sh
+   gh pr create --base "$SOURCE" --head <new-branch> --title "<commit-style title>" --body "<summary>"
+   ```
+
+4. Give the pull request link in the reply. If a pull request for the branch already exists
+   (`gh pr list --head <new-branch> --state all`), reuse it instead of opening another one.
+
+Opening is automatic; merging follows the repository's rules and the user's approval.
