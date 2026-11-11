@@ -25,6 +25,7 @@
 		6FBBB71E38045426792EFC54 /* CYLTagAnimationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */; };
 		121A997B0DED01158F518FB9 /* CYLTagConfigurationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */; };
 		8E3FBEA3D1656F25900D6E6A /* CYLTagStyleDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A60CF0D32B70D57CE937DC8 /* CYLTagStyleDemoViewController.swift */; };
+		A6AC4CF0E89284CFF0D3290A /* CYLMenuExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F49D00D9A0421036BE307D0 /* CYLMenuExampleTests.swift */; };
 		0490FE175868491DBA5FE998 /* Pods_CYLMenuExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */; };
 		7FFC7CE0B51A13135C1F03C2 /* Pods_CYLMenuExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* Pods_CYLMenuExampleTests.framework */; };
 		E52CAAD5396D07D81ED1CF12 /* CYLDemoDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427518F3D432513B298F33FD /* CYLDemoDataSource.swift */; };
@@ -63,7 +64,7 @@
 		8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagConfigurationDemoViewController.swift; sourceTree = "<group>"; };
 		2A60CF0D32B70D57CE937DC8 /* CYLTagStyleDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagStyleDemoViewController.swift; sourceTree = "<group>"; };
 		261CB08FA58627B5FB7DB381 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMenuExampleTests.m; sourceTree = "<group>"; };
+		1F49D00D9A0421036BE307D0 /* CYLMenuExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLMenuExampleTests.swift; sourceTree = "<group>"; };
 		C55FFF355A1E5A46E3D41489 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F6D01D6546BCD07518D8398 /* CYLMenuExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLMenuExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50ED88076C07C90FF1B1A76B /* CYLMenuExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLMenuExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -141,7 +142,7 @@
 		C0D0581312912516FF12D747 /* CYLMenuExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				60539BAEF0F4BA7876BF9949 /* CYLMenuExampleTests.m */,
+				1F49D00D9A0421036BE307D0 /* CYLMenuExampleTests.swift */,
 				C55FFF355A1E5A46E3D41489 /* Info.plist */,
 			);
 			path = CYLMenuExampleTests;
@@ -395,6 +396,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6AC4CF0E89284CFF0D3290A /* CYLMenuExampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
