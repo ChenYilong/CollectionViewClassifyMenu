@@ -125,6 +125,8 @@ android-tagview's own to-do list (animations, performance in list cells) is cove
 - Cell reuse (`UICollectionView`): android-tagview removes and re-adds every tag view on each change.
 - Accessibility: VoiceOver labels, traits, a "Delete" action on deletable tags, Dynamic Type, Bold Text, Increase Contrast,
   Reduce Motion; localization in English, 简体中文 and 繁體中文.
+- Badges read as the tag's value (`badgeAccessibilityLabel`, e.g. 神曲 for 神); the sample and the YY screen are
+  localized, English being android-tagview's own text (`CYLAndroidSampleAccessibilityTests`).
 - Auto Layout: `contentHeight`, the intrinsic content size, `heightThatFitsWidth(_:)`, `menu(_:didChangeContentHeight:)`.
 
 ## Initialization, the android-tagview way

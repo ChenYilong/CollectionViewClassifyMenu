@@ -135,3 +135,7 @@ None. 无。
 - Colors of the ring, dot and lines; groups move inward vertically too when tags would leave the picture.
 - Only the dot and the tags take touches, so groups overlap each other and the picture's own gestures.
 - Reduce Motion: animations jump to their end; tag labels are VoiceOver buttons.
+- Accessibility: the picture and each group's dot are elements ("标签组：…"); the dot's custom actions replace the
+  long press and dragging (上移 / 下移 / 左移 / 右移); tags in edit mode say "轻点两下改变方向"; tag text scales with
+  Dynamic Type, lines grow and long tags wrap instead of overlapping. Strings in English, Simplified and Traditional
+  Chinese. Verified by `CYLAndroidSampleAccessibilityTests`.

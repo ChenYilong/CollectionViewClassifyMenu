@@ -411,6 +411,19 @@ values and handle taps.
 | TagViewGroup：编辑 | <img src="assets/test-sample-image-tag-edit.png" width="280" alt="编辑"> |
 | AndroidTagView：五个容器 | <img src="assets/test-sample-tag-container.png" width="280" alt="标签容器"> |
 
+语言与无障碍 / Languages and accessibility：示例的文字在 `CYLMenuExample.bundle` 中有简体中文、繁体中文和英文三种语言，
+英文即三个 Android 示例的原文。核心为不能长按、拖动或点图片的用户（VoiceOver、Voice Control、Switch Control）提供了
+替代操作：标签的「前移 / 后移」与长按动作（`longPressAccessibilityActionName`）；图片标签的圆点是一个元素
+（「标签组：…」），可「上移 / 下移 / 左移 / 右移」和删除；图片本身是一个按钮；徽标读作标签的值
+（`badgeAccessibilityLabel`）。图片标签的文字随动态字体放大，放大时线段变长、长标签自动换行，标签互不重叠。
+
+| 状态 / State | 截图 / Screenshot |
+| --- | :---: |
+| English：TagView Sample | <img src="assets/test-sample-tag-cloud-english.png" width="280" alt="TagView Sample in English"> |
+| English：hot search | <img src="assets/test-sample-hot-search-english.png" width="280" alt="Hot search in English"> |
+| English：tag containers | <img src="assets/test-sample-tag-container-english.png" width="280" alt="Tag containers in English"> |
+| 最大辅助字号：图片标签 / Largest accessibility text size | <img src="assets/test-sample-image-tag-large-text.png" width="280" alt="图片标签，最大字号"> |
+
 搜索框 / Search bars：Example 的所有搜索框（场景二搜索分类、搜索历史与发现、YY 热门搜索）都使用同级仓库
 [CYLSearchViewController](https://github.com/ChenYilong/CYLSearchViewController) 的 `CYLSearchBarView`，
 以 commit 依赖引入（`Example/Podfile` 的 `CYL_SEARCH`）。
@@ -566,7 +579,7 @@ CI 中 `Unit tests (swift)` 运行其测试，`Example screenshots` 同时生成
 
 ### Tests / 测试
 
-两个示例的测试（`Example/CYLMenuExampleTests`：68 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
+两个示例的测试（`Example/CYLMenuExampleTests`：75 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：
 每个功能一个测试类、一个文件（高内聚）；测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，
 同时编译进两个测试 target（低耦合，不重复）。
 
@@ -592,13 +605,14 @@ both test targets.
 | `CYLTagButtonTests` · `CYLTagConfigurationTests` · `CYLTagListAccessibilityTests` | 标签按钮外观、配置初始化、VoiceOver |
 | `CYLTagStyleDemoTests` · `CYLAnimatedIconTests` | 「样式」与「动效」页，CYLTabBarController 动效引擎 |
 | `CYLAndroidSampleTests` | 三个 Android 标签库示例的复刻与其核心功能：容器边框、对齐、主题、叉号、涟漪、拖动排序、长按、图片标签 |
+| `CYLAndroidSampleAccessibilityTests` | 这些示例的英文与繁体中文；代替长按、拖动和点图片的无障碍操作；徽标的朗读；图片标签的动态字体 |
 | `CYLTagCloudTests` | android-tagview 的 API：`CYLTag`、添加/删除标签、可删除标签、按下颜色、背景图、四边内边距、字号、配置键 |
 | `CYLReviewFilterScenarioTests` · `CYLSearchCategoryScenarioTests` | 场景一（评价筛选）、场景二（搜索分类） |
 | `CYLRootTabBarTests` · `CYLExampleDatabaseTests` · `CYLSearchDiscoverTests` · `CYLLocalizationTests` | 根 TabBar 与 PlusButton、SQLite、最近搜索 + 发现、国际化 |
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | 纯 Swift 示例：标签数据、编辑标签、折叠样式、无障碍 |
 
 ```sh
-scripts/unit-tests.sh example   # 68 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh example   # 75 tests; screenshots in build/test-screenshots/example/
 scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshots/swift/
 ```
 
@@ -607,7 +621,7 @@ establishing connection”）；两个示例和根目录的两个演示 App 因�
 `CYLSceneDelegate`、`CYLTagDemoSceneDelegate`；后两个是 `scripts/unit-tests.sh menu|tag` 的测试宿主），
 测试窗口也加入 App 的 scene。
 
-测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 68、swift 19、menu 17、tag 6，共 110 个测试全部通过）：
+测试截图（本地运行：macOS 27.3、Xcode 27.2、iPhone 17 Pro 模拟器 iOS 26.1；example 75、swift 19、menu 17、tag 6，共 117 个测试全部通过）：
 
 | 单选：替换同组选择 | 多选 | 底部箭头：折叠 | 底部箭头：展开 |
 | --- | --- | --- | --- |

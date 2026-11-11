@@ -188,4 +188,7 @@ None. 无。
 - Sections, folding, section headers, single and multiple selection rules, exclusive items, animated icons, grids,
   configuration files, Auto Layout sizing (`heightThatFitsWidth(_:)`), cell reuse.
 - Per-tag looks (`CYLTag`), badges, pressed colors, accessibility (VoiceOver "Delete" action, Dynamic Type, Reduce Motion).
+- Reordering and long presses without gestures: 前移 / 后移 custom actions (with an announcement of the new position)
+  and a long-press action named by `longPressAccessibilityActionName`, for VoiceOver, Voice Control and Switch Control.
+  The sample is localized (English is AndroidTagView's own text) and verified by `CYLAndroidSampleAccessibilityTests`.
 - Themes stay the same color for a tag across reloads (AndroidTagView picks a new random color each time).
