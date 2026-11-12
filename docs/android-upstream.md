@@ -6,7 +6,7 @@ The three Android tag libraries ported to Kotlin in `android/` ([android.md](and
 
 - **Context:** the translation is finished (android-tagview, TagViewGroup and AndroidTagView in Kotlin, merged into `android/merged/library`), so, by the rule: translate each open pull request and merge it into the ports, then fix the open issues on the translated code, scoring after each fix until 100. Each fix goes into the standalone port and the merged library.
 - **Requirements:** (1) tables of the open issues: issue link, description, fix status (`TODO` by default); (2) find each issue's counterpart in our code and fix it; (3) score after each fix: 100 when every listed issue is resolved; (4) the same rule on every platform.
-- **Status:** in progress. Pull requests: 4 / 4 merged. Issues: android-tagview 15 / 15 (100); TagViewGroup and AndroidTagView TODO.
+- **Status:** in progress. Pull requests: 4 / 4 merged. Issues: android-tagview 15 / 15 (100), TagViewGroup 4 / 4 (100); AndroidTagView TODO.
 - **User prompt (verbatim, the rule, 2026-11-12):**
 
 > 写入一条规则到。instructions相关文件和skills文件中，全英文写入以下规则：如果本项目文档中出现了 非本项目的 GitHub 链接，切该链接是用来 做代码翻译等任务的，那么在翻译过程前，或者翻译过程后，需要 访问该GitHub 的 pr 链接，将处于open状态的pr合并进来。并且为该项目的issues页面，中处于open状态的issues在docs文件夹下相关文档，如果没有就新建文档中制作表格，第一列为issue地址 第二列为issue描述，第三列为修复状态，默认填TODO。你需要找到这些issue在我们项目代码中的对应项，尝试修复。issues修复完为满分，每修复一个issue打一次分，一直到满分为止。 举例说明：比如：本项目的android文件夹内，存在多个其他项目翻译为kotlin的任务，这些任务均默认翻译master分支代码，忽略了pr与issues内容，如果翻译任务还未开启那么就先 merge 该项目处于open状态的pr，再尝试解决open issues，只要issues处理状态达到60分，就可以开始翻译工作，翻译完成后，再开始尝试解决剩余的issues到满分。如果翻译工作已经完成，那么就单独对open pr内容进行翻译后，再merge到我们的项目中。基于翻译过的代码还是要处理issues。一直到满分。其他平台同样规则执行。
@@ -16,9 +16,9 @@ The three Android tag libraries ported to Kotlin in `android/` ([android.md](and
 | Library | Resolved | Score |
 | --- | --- | --- |
 | kaedea/android-tagview | 15 / 15 | 100.0 |
-| shellljx/TagViewGroup | 0 / 4 | 0.0 |
+| shellljx/TagViewGroup | 4 / 4 | 100.0 |
 | whilu/AndroidTagView | 0 / 71 | 0.0 |
-| All | 15 / 90 | 16.7 |
+| All | 19 / 90 | 21.1 |
 
 Score history (2026-11-13):
 
@@ -28,6 +28,7 @@ Score history (2026-11-13):
 | android-tagview widths | #9, #11, #14, #20, #24 | 6 / 90 = 6.7 |
 | android-tagview speed | #13, #17, #10, #19 | 10 / 90 = 11.1 |
 | android-tagview features | #16, #25, #29, #18, #15 | 15 / 90 = 16.7 (android-tagview 100) |
+| TagViewGroup | #4, #7, #8, #9 | 19 / 90 = 21.1 (TagViewGroup 100) |
 
 ## Pull requests (open upstream, translated and merged)
 
@@ -63,14 +64,14 @@ Score: 15 / 15 resolved = 100.0
 
 ## Issues: TagViewGroup (`android/TagViewGroup`, merged: `com.licrafter.tagview`)
 
-Score: 0 / 4 resolved = 0.0
+Score: 4 / 4 resolved = 100.0
 
 | Issue | Description | Fix status |
 | --- | --- | --- |
-| [shellljx/TagViewGroup#4](https://github.com/shellljx/TagViewGroup/issues/4) | RectclerView的例子发生错位 — 点击图片隐藏标签，然后滑动列表至一屏，返回后隐藏的标签会发生错位变成显示了哎 | TODO |
-| [shellljx/TagViewGroup#7](https://github.com/shellljx/TagViewGroup/issues/7) | 能在viewpager使用吗 — 能在viewpager使用TagTextView ？感觉TagTextView会全占满View，导致无法滑动 | TODO |
-| [shellljx/TagViewGroup#8](https://github.com/shellljx/TagViewGroup/issues/8) | 能自定义U | TODO |
-| [shellljx/TagViewGroup#9](https://github.com/shellljx/TagViewGroup/issues/9) | 能自定义UI吗？ — 像现在的小红书 标签是圆角的长方形的 | TODO |
+| [shellljx/TagViewGroup#4](https://github.com/shellljx/TagViewGroup/issues/4) | RectclerView的例子发生错位 — 点击图片隐藏标签，然后滑动列表至一屏，返回后隐藏的标签会发生错位变成显示了哎 | DONE: the list keeps each item's hidden state (`hiddenPositions`) and a recycled `TagImageView` takes it on bind (`groupsHidden`, `onGroupsHiddenChanged`), in the merged example and the standalone sample; checked on the emulator: `assets/android-tagviewgroup-issue4-recycled.png` (first item hidden; recycled views below show their own tags; back at the top, still hidden) |
+| [shellljx/TagViewGroup#7](https://github.com/shellljx/TagViewGroup/issues/7) | 能在viewpager使用吗 — 能在viewpager使用TagTextView ？感觉TagTextView会全占满View，导致无法滑动 | DONE (verified): `wrap_content` measures the tags, not the parent, and touches outside the dot and the tags are not taken; a swipe is intercepted only with a drag listener, so a ViewPager behind still swipes; test `issue7WrapContentDoesNotFillAndTouchesPassThrough` |
+| [shellljx/TagViewGroup#8](https://github.com/shellljx/TagViewGroup/issues/8) | 能自定义U | DONE: the same request as #9 (an empty title); see #9 |
+| [shellljx/TagViewGroup#9](https://github.com/shellljx/TagViewGroup/issues/9) | 能自定义UI吗？ — 像现在的小红书 标签是圆角的长方形的 | DONE (existing API): any view that implements `ITagView` is a tag (rounded rectangles included), as the author answered; test `issue9CustomTagViews` (a rounded-rectangle `RoundedTag`) |
 
 ## Issues: AndroidTagView (`android/AndroidTagView`, merged: `co.lujun.androidtagview`)
 

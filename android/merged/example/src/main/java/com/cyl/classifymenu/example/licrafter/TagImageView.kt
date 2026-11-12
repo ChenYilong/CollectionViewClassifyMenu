@@ -22,7 +22,22 @@ class TagImageView @JvmOverloads constructor(context: Context, attrs: AttributeS
     val imageView = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
     private val groupViews = ArrayList<TagViewGroup>()
     private val groups = ArrayList<TagGroupModel>()
-    private var groupsHidden = false
+    /**
+     * Whether the groups are hidden (a tap on the picture toggles it). A list keeps it per item and sets it when it
+     * binds a recycled view (TagViewGroup issue #4: a recycled view showed hidden tags again, misplaced).
+     */
+    var groupsHidden: Boolean
+        get() = hiddenState
+        set(value) {
+            hiddenState = value
+            groupViews.forEach { it.visibility = if (value) View.INVISIBLE else View.VISIBLE }
+        }
+    private var hiddenState = false
+
+    /**
+     * Called when a tap on the picture shows or hides the groups.
+     */
+    var onGroupsHiddenChanged: ((hidden: Boolean) -> Unit)? = null
 
     var editing = false
         set(value) {
@@ -78,16 +93,22 @@ class TagImageView @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     fun toggleGroups() {
-        groupsHidden = !groupsHidden
+        val hidden = !hiddenState
         for (group in groupViews) {
-            if (groupsHidden) group.startHideAnimator() else group.startShowAnimator()
+            group.visibility = View.VISIBLE
+            if (hidden) group.startHideAnimator() else group.startShowAnimator()
         }
+        // The animators show or hide the groups, so only the state changes here.
+        hiddenState = hidden
+        onGroupsHiddenChanged?.invoke(hidden)
     }
 
     private fun rebuildGroups() {
         groupViews.forEach { removeView(it) }
         groupViews.clear()
         groups.forEachIndexed { index, model -> groupViews.add(makeGroup(index, model)) }
+        // New groups take the current state (hidden groups stay hidden after the list binds new data).
+        if (hiddenState) groupViews.forEach { it.visibility = View.INVISIBLE }
     }
 
     private fun makeGroup(index: Int, model: TagGroupModel): TagViewGroup {
