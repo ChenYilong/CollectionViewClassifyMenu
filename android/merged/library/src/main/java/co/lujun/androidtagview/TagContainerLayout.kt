@@ -119,6 +119,16 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** TagView typeface */
     private var mTagTypeface: Typeface = Typeface.DEFAULT
 
+    /**
+     * TagView text font family, e.g. "sans-serif-medium" (whilu/AndroidTagView PR #110, `tag_text_font_family`).
+     */
+    private var mTagTextFontFamily: String? = null
+
+    /**
+     * TagView text style: Typeface.NORMAL, BOLD, ITALIC or BOLD_ITALIC (PR #110, `tag_text_style`).
+     */
+    private var mTagTextStyle: Int = Typeface.NORMAL
+
     /** Whether TagView can clickable(default unclickable) */
     private var isTagViewClickable = false
 
@@ -210,6 +220,8 @@ open class TagContainerLayout @JvmOverloads constructor(
         mTagBackgroundColor = attributes.getColor(R.styleable.AndroidTagView_tag_background_color, mTagBackgroundColor)
         mTagTextColor = attributes.getColor(R.styleable.AndroidTagView_tag_text_color, mTagTextColor)
         mTagTextDirection = attributes.getInt(R.styleable.AndroidTagView_tag_text_direction, mTagTextDirection)
+        mTagTextFontFamily = attributes.getString(R.styleable.AndroidTagView_tag_text_font_family)
+        mTagTextStyle = attributes.getInt(R.styleable.AndroidTagView_tag_text_style, mTagTextStyle)
         isTagViewClickable = attributes.getBoolean(R.styleable.AndroidTagView_tag_clickable, false)
         isTagViewSelectable = attributes.getBoolean(R.styleable.AndroidTagView_tag_selectable, false)
         mRippleColor = attributes.getColor(R.styleable.AndroidTagView_tag_ripple_color, Color.parseColor("#EEEEEE"))
@@ -428,7 +440,13 @@ open class TagContainerLayout @JvmOverloads constructor(
         tagView.setTagSelectedBackgroundColor(colors[3])
         tagView.setTagMaxLength(mTagMaxLength)
         tagView.textDirection = mTagTextDirection
-        tagView.setTypeface(mTagTypeface)
+        // PR #110: the font family and text style, when set, replace the typeface.
+        val family = mTagTextFontFamily
+        when {
+            family == null && mTagTextStyle != Typeface.NORMAL -> tagView.setTypeface(Typeface.defaultFromStyle(mTagTextStyle))
+            family != null -> tagView.setTypeface(Typeface.create(family, mTagTextStyle))
+            else -> tagView.setTypeface(mTagTypeface)
+        }
         tagView.setBorderWidth(mTagBorderWidth)
         tagView.setBorderRadius(mTagBorderRadius)
         tagView.setTextSize(mTagTextSize)
@@ -892,6 +910,30 @@ open class TagContainerLayout @JvmOverloads constructor(
      */
     fun setTagTextDirection(textDirection: Int) {
         mTagTextDirection = textDirection
+    }
+
+    /**
+     * Get TagView font family (PR #110).
+     */
+    fun getTagTextFontFamily(): String? = mTagTextFontFamily
+
+    /**
+     * Set TagView font family, e.g. "sans-serif-black" (PR #110); applies to tags added afterwards.
+     */
+    fun setTagTextFontFamily(fontFamily: String?) {
+        mTagTextFontFamily = fontFamily
+    }
+
+    /**
+     * Get TagView text style (PR #110).
+     */
+    fun getTagTextStyle(): Int = mTagTextStyle
+
+    /**
+     * Set TagView text style: Typeface.NORMAL, BOLD, ITALIC or BOLD_ITALIC (PR #110); applies to tags added afterwards.
+     */
+    fun setTagTextStyle(textStyle: Int) {
+        mTagTextStyle = textStyle
     }
 
     /** Get TagView typeface. */

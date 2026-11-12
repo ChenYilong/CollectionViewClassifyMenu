@@ -23,6 +23,12 @@ class Tag(
     @JvmField var layoutBorderColor: Int = Constants.DEFAULT_TAG_LAYOUT_BORDER_COLOR
     @JvmField var background: Drawable? = null
 
+    /**
+     * Whether the tag can be tapped (kaedea/android-tagview PR #22 / #21): false disables the tag's view, so neither
+     * the click listener nor the pressed color reacts.
+     */
+    @JvmField var clickable: Boolean = true
+
     constructor(text: String) : this(0, text, Constants.DEFAULT_TAG_LAYOUT_COLOR)
 
     constructor(text: String, color: Int) : this(0, text, color)

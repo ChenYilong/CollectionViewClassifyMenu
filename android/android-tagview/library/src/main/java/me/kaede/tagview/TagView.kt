@@ -38,6 +38,23 @@ open class TagView @JvmOverloads constructor(
     private var mClickListener: OnTagClickListener? = null
     private var mDeleteListener: OnTagDeleteListener? = null
 
+    /**
+     * Single selection (kaedea/android-tagview PR #21, opt-in here so existing layouts keep their colors): a tap
+     * checks the tag (`checkedLayoutColor`) and unchecks the others (their own colors). The checked positions are kept
+     * in `checkedTagArray`.
+     */
+    var isSingleSelectionMode: Boolean = false
+
+    /**
+     * The background color of the checked tag in single selection mode (PR #21 used green).
+     */
+    var checkedLayoutColor: Int = android.graphics.Color.GREEN
+
+    /**
+     * The checked state of each tag position (single selection mode).
+     */
+    val checkedTagArray = android.util.SparseBooleanArray()
+
     init {
         LogUtil.v(TAG, "[init]")
         Constants.DEBUG = (context.applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
@@ -113,7 +130,26 @@ open class TagView @JvmOverloads constructor(
             tagView.layoutParams = params
             tagView.setTextColor(tag.tagTextColor)
             tagView.setTextSize(TypedValue.COMPLEX_UNIT_SP, tag.tagTextSize)
-            tagLayout.setOnClickListener { mClickListener?.onTagClick(position, tag) }
+            if (!checkedTagArray.get(position, false)) checkedTagArray.put(position, false)
+            if (isSingleSelectionMode && checkedTagArray.get(position)) tagLayout.background = getSelector(tag, checkedLayoutColor)
+            tagLayout.setOnClickListener {
+                // PR #21: only an enabled, clickable tag reacts; single selection checks it and unchecks the others.
+                if (!tagLayout.isEnabled || !tagLayout.isClickable) return@setOnClickListener
+                if (isSingleSelectionMode && !checkedTagArray.get(position)) {
+                    for (index in 0 until childCount) {
+                        if (checkedTagArray.get(index)) getChildAt(index)?.background = getSelector(mTags[index])
+                        checkedTagArray.put(index, false)
+                    }
+                    checkedTagArray.put(position, true)
+                    tagLayout.background = getSelector(tag, checkedLayoutColor)
+                }
+                mClickListener?.onTagClick(position, tag)
+            }
+            // PR #22 / #21: a tag that is not clickable is disabled.
+            if (!tag.clickable) {
+                tagLayout.isEnabled = false
+                tagLayout.isClickable = false
+            }
             // calculate the tag layout width
             var tagWidth = tagView.paint.measureText(tag.text) + textPaddingLeft + textPaddingRight
             // deletable text
@@ -137,8 +173,11 @@ open class TagView @JvmOverloads constructor(
             // add the margin of each line
             tagParams.bottomMargin = lineMargin
             if (mWidth <= total + tagMargin + tagWidth + ResolutionUtil.dpToPx(context, Constants.LAYOUT_WIDTH_OFFSET)) {
-                // needs a new line
-                tagParams.addRule(BELOW, viewId(indexBottom))
+                // needs a new line; the first tag has no line above it (PR #27: a first tag wider than the view was laid
+                // out below itself and disappeared)
+                if (listIndex != 1) tagParams.addRule(BELOW, viewId(indexBottom))
+                // PR #21 (right-to-left languages, issue #28): a line starts at the start edge, not always the left
+                tagParams.addRule(ALIGN_PARENT_START)
                 // reset total (layout padding left & layout padding right)
                 total = (paddingLeft + paddingRight).toFloat()
                 indexBottom = listIndex
@@ -146,10 +185,12 @@ open class TagView @JvmOverloads constructor(
             } else {
                 // same line
                 tagParams.addRule(ALIGN_TOP, viewId(indexHeader))
-                // not the header of the line
+                if (listIndex == indexHeader) tagParams.addRule(ALIGN_PARENT_START)
+                // not the header of the line: after the previous tag, in the reading direction (END_OF, as PR #21's
+                // right-to-left support asks; RIGHT_OF hid tags in Urdu, issue #28)
                 if (listIndex != indexHeader) {
-                    tagParams.addRule(RIGHT_OF, viewId(listIndex - 1))
-                    tagParams.leftMargin = tagMargin
+                    tagParams.addRule(END_OF, viewId(listIndex - 1))
+                    tagParams.marginStart = tagMargin
                     total += tagMargin
                     if (tagPre != null && tagPre.tagTextSize < tag.tagTextSize) {
                         indexBottom = listIndex
@@ -163,11 +204,11 @@ open class TagView @JvmOverloads constructor(
         }
     }
 
-    private fun getSelector(tag: Tag): Drawable {
-        tag.background?.let { return it }
+    private fun getSelector(tag: Tag, layoutColor: Int = tag.layoutColor): Drawable {
+        tag.background?.takeIf { layoutColor == tag.layoutColor }?.let { return it }
         val states = StateListDrawable()
         val gdNormal = GradientDrawable()
-        gdNormal.setColor(tag.layoutColor)
+        gdNormal.setColor(layoutColor)
         gdNormal.cornerRadius = tag.radius
         if (tag.layoutBorderSize > 0) {
             gdNormal.setStroke(ResolutionUtil.dpToPx(context, tag.layoutBorderSize), tag.layoutBorderColor)
