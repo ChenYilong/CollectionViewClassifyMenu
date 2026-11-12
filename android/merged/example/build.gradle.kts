@@ -7,6 +7,8 @@ plugins {
 android {
     // The shared example database of every platform (Example-Shared/Database/cyl_places.sqlite, docs/cross-platform.md).
     sourceSets["main"].assets.srcDir("../../../Example-Shared/Database")
+    // The tag editor example's bundle (Example-Swift): its <language>.lproj folders (strings, tags.json, fold-styles.*).
+    sourceSets["main"].assets.srcDir("../../../Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle")
     namespace = "com.cyl.classifymenu.example"
     compileSdk = 35
     defaultConfig {

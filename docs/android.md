@@ -84,8 +84,9 @@ Android chapter.
   (`CYLImageTagGroupView` and friends) map to the TagViewGroup API.
 - [x] Step 5: missing APIs: 709 / 709 aligned, full marks (score history below; 29 library unit tests)
 - [ ] Step 6: iOS examples ported, screenshots, README Android chapter. Progress: the demo app (Classify, Filter tabs)
-  and the TagCollectionView demo (Tags tab) are ported; the tab bar scrolls (one tab per example); next: the Menu
-  example (`Example/CYLMenuExample`), then the Tag editor (`Example-Swift`). Plan (2026-11-12):
+  the TagCollectionView demo (Tags tab) and the Tag editor (`Example-Swift`, Editor tab: Edit tags with the editor
+  sheet, Fold styles with the configuration files) are ported; the tab bar scrolls (one tab per example); next: the
+  Menu example (`Example/CYLMenuExample`). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
      Menu (`Example/CYLMenuExample`: review filter, search categories, styles, animations, and its plus page, the
      query scenarios), Tag editor (`Example-Swift/CYLTagEditorExample`), Classify demo (the demo app of
@@ -97,6 +98,23 @@ Android chapter.
      emulator versions, SDK, commit and time, in `docs/android.md`; then the README Android chapter.
 
 Cross-platform rules (one shared database, the same look as iOS): [cross-platform.md](cross-platform.md).
+
+## TODO (2026-11-12): replace the wording of the Tags tab and remove its keywords everywhere
+
+- **Status:** DONE (this commit).
+- **Context:** the Tags tab (the TagCollectionView demo) showed sample data copied from the iOS demo, with an
+  inappropriate tag and placeholder text (random letters in section titles and tags), screenshot
+  `assets/request-tags-tab-wording.png`. The same words are in `TagCollectionView/TagCollectionView/CYLTagDemoViewController.swift`
+  and in commented-out code of `CYLTagView.m`; the shared database does not contain them.
+- **Requirements:** replace the wording shown in the screenshot; search the whole project for its keywords and
+  delete them from documents, code and the local database; record it here with the screenshot.
+- **Result:** the iOS demo (`CYLTagDemoViewController.swift`) and the Android Tags tab use neutral sample data
+  (sections 日常安排 / 周末活动, everyday tags); the commented-out sample data in `CYLTagView.m` is removed;
+  `git grep` finds none of the keywords in code, documents or data; the shared database never had them. The old Tags
+  tab screenshot is replaced (`assets/android-tags-tab.png`).
+- **Prompt (verbatim):**
+
+  > 替换截图中的文案，并全项目搜索图片中的关键词，从文档，代码，本地数据库中删除。并在文档中加入android相关文档中附带截图 标注为TODO continue
 
 ## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
@@ -160,6 +178,9 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Classify tab: single-choice classify menu; the selected tag (云南味道) queries SQLite, 3 of 83 places | <img src="assets/android-classify-tab.png" width="300" alt="Classify tab with linked results"> |
 | Filter tab: the filter slides in from the left over most of the screen (北京 and 川菜 selected, Reset / Apply) | <img src="assets/android-filter-panel.png" width="300" alt="Multiple-choice filter panel"> |
 | Tags tab: the TagCollectionView demo (`CYLTagView`); the tab bar scrolls, one tab per example | <img src="assets/android-tags-tab.png" width="300" alt="Tags tab"> |
+| Editor tab: Edit remarks (the tag editor example's first screen) | <img src="assets/android-editor-remark.png" width="300" alt="Editor tab, remarks"> |
+| Editor tab: the editor sheet (search, Recent, My Tags with Manage, several chosen) | <img src="assets/android-editor-sheet.png" width="300" alt="Editor sheet"> |
+| Editor tab: Fold styles (every fold control and title style) | <img src="assets/android-editor-fold-styles.png" width="300" alt="Fold styles"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots

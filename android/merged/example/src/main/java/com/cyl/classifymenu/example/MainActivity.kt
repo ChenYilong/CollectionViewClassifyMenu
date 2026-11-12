@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import com.cyl.classifymenu.example.classify.ClassifyMainFragment
 import com.cyl.classifymenu.example.classify.FilterDemoFragment
 import com.cyl.classifymenu.example.tagcollection.TagCollectionDemoFragment
+import com.cyl.classifymenu.example.tageditor.TagEditorFragment
 import com.cyl.classifymenu.example.kaede.KaedeTagViewFragment
 import com.cyl.classifymenu.example.licrafter.LicrafterTagEditFragment
 import com.cyl.classifymenu.example.licrafter.LicrafterTagGroupFragment
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
             "list.bullet.rectangle" to R.drawable.ic_tab_classify,
             "line.3.horizontal.decrease.circle" to R.drawable.ic_tab_filter,
             "tag.square" to R.drawable.ic_tab_tags,
+            "tag.circle" to R.drawable.ic_tab_editor,
             "plus.circle.fill" to R.drawable.ic_plus_raised,
         )
 
@@ -69,6 +71,7 @@ class MainActivity : AppCompatActivity() {
             pages.registerPageProvider({ _, _ -> ClassifyMainFragment() }, "classify")
             pages.registerPageProvider({ _, _ -> FilterDemoFragment() }, "filter")
             pages.registerPageProvider({ _, _ -> TagCollectionDemoFragment() }, "tagcollection")
+            pages.registerPageProvider({ _, _ -> TagEditorFragment() }, "editor")
             pages.registerPageProvider({ _, _ -> LicrafterTagEditFragment() }, "plus")
         }
     }

@@ -19,10 +19,10 @@ final class CYLTagDemoViewController: UIViewController {
 
     /// Sample data: the tags of each section, and the section titles.
     let sections: [[String]] = [
-        ["约炮", "吃饭", "睡觉", "哈", "对对对", "睡觉asdfsfasfds", "asdfdsfdsf睡觉", "睡sdfdsf觉"],
-        ["吃饭", "睡觉", "对对对", "睡觉asdfsfasfds", "asdfdsfdsf睡觉", "睡sdfdsf觉", "约炮", "打豆豆", "练武功"],
+        ["吃饭", "睡觉", "看书", "跑步", "听音乐", "看电影", "做饭", "逛公园"],
+        ["吃饭", "睡觉", "看书", "游泳", "爬山", "打豆豆", "练武功", "写代码"],
     ]
-    let sectionTitles = ["dddd打游戏了", "打游戏了"]
+    let sectionTitles = ["日常安排", "周末活动"]
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -41,55 +41,6 @@ static NSString * const  HeaderCellIdenty =  @"HeaderViewCellIdentifier";
 
 - (NSArray *)groups
 {
-//    // 默认数据 当有请求时候刷新数据 / Default data; refresh it when a request completes.
-//    if (_groups == nil) {
-//        
-//        NSMutableArray *groupArray = [NSMutableArray array];
-//   
-//        
-//        CYLTagModel *m1 =[CYLTagModel modelWithTitle:@"对对对"]; // Yes, yes, yes.
-//        
-//        CYLTagModel *m2 =[CYLTagModel modelWithTitle:@"吃饭"]; // Eat.
-//        
-//        CYLTagModel *m3 =[CYLTagModel modelWithTitle:@"睡觉"]; // Sleep.
-//        
-//        CYLTagModel *m4=[CYLTagModel modelWithTitle:@"睡觉asdfsfasfds"]; // Sleep, with extra text.
-//        
-//        CYLTagModel *m5 =[CYLTagModel modelWithTitle:@"asdfdsfdsf睡觉"]; // Extra text, then sleep.
-//        
-//        CYLTagModel *m6 =[CYLTagModel modelWithTitle:@"睡sdfdsf觉"]; // Sleep, with text in the middle.
-//        
-//        CYLTagModel *m7 =[CYLTagModel modelWithTitle:@"约炮"]; // Hook up.
-//        
-//        CYLTagModel *m8 =[CYLTagModel modelWithTitle:@"哈"]; // Ha.
-//        
-//        CYLTagModel *m9 =[CYLTagModel modelWithTitle:@"练武功"]; // Practice martial arts.
-//        
-//        CYLTagModel *m10 =[CYLTagModel modelWithTitle:@"打豆豆"]; // Play with Doudou.
-//        
-//        CYLTagGroup *g1=[[CYLTagGroup alloc]init];
-//        
-//        g1.itemArr=@[m7,m2,m3,m8,m1,m4,m5,m6];
-//        
-//        g1.groupName=@"dddd打游戏了"; // dddd, play games.
-//        
-//        [groupArray addObject:g1];
-//        
-//        
-//        CYLTagGroup *g2=[[CYLTagGroup alloc]init];
-//        
-//        g2.groupName=@"打游戏了"; // Play games.
-//        
-//        g2.itemArr=@[m2,m3,m1,m4,m5,m6,m7,m10,m9];
-//        
-//        [groupArray addObject:g2];
-//       
-//        
-//        _groups = groupArray;
-//        
-//        
-//    }
-    
     return _groups;
 }
 

@@ -24,10 +24,10 @@ class TagCollectionDemoFragment : Fragment(), CYLMenuDataSource, CYLMenuDelegate
 
     // Sample data of the iOS demo, kept as data.
     val sections: List<List<String>> = listOf(
-        listOf("约炮", "吃饭", "睡觉", "哈", "对对对", "睡觉asdfsfasfds", "asdfdsfdsf睡觉", "睡sdfdsf觉"),
-        listOf("吃饭", "睡觉", "对对对", "睡觉asdfsfasfds", "asdfdsfdsf睡觉", "睡sdfdsf觉", "约炮", "打豆豆", "练武功"),
+        listOf("吃饭", "睡觉", "看书", "跑步", "听音乐", "看电影", "做饭", "逛公园"),
+        listOf("吃饭", "睡觉", "看书", "游泳", "爬山", "打豆豆", "练武功", "写代码"),
     )
-    val sectionTitles = listOf("dddd打游戏了", "打游戏了")
+    val sectionTitles = listOf("日常安排", "周末活动")
 
     var tagView: CYLTagView? = null
         private set
