@@ -1,0 +1,205 @@
+# Upstream pull requests and issues of the Android ports
+
+The three Android tag libraries ported to Kotlin in `android/` ([android.md](android.md)) are upstream projects of a translation, so their open pull requests are merged into the ports and their open issues are fixed in our code (rule: AGENTS.md "Upstream projects (translations and ports)").
+
+## TODO (2026-11-13): open pull requests and issues of the three upstream libraries
+
+- **Context:** the translation is finished (android-tagview, TagViewGroup and AndroidTagView in Kotlin, merged into `android/merged/library`), so, by the rule: translate each open pull request and merge it into the ports, then fix the open issues on the translated code, scoring after each fix until 100. Each fix goes into the standalone port and the merged library.
+- **Requirements:** (1) tables of the open issues: issue link, description, fix status (`TODO` by default); (2) find each issue's counterpart in our code and fix it; (3) score after each fix: 100 when every listed issue is resolved; (4) the same rule on every platform.
+- **Status:** in progress. Pull requests: 4 / 4 merged (this commit). Issues: see the scores.
+- **User prompt (verbatim, the rule, 2026-11-12):**
+
+> 写入一条规则到。instructions相关文件和skills文件中，全英文写入以下规则：如果本项目文档中出现了 非本项目的 GitHub 链接，切该链接是用来 做代码翻译等任务的，那么在翻译过程前，或者翻译过程后，需要 访问该GitHub 的 pr 链接，将处于open状态的pr合并进来。并且为该项目的issues页面，中处于open状态的issues在docs文件夹下相关文档，如果没有就新建文档中制作表格，第一列为issue地址 第二列为issue描述，第三列为修复状态，默认填TODO。你需要找到这些issue在我们项目代码中的对应项，尝试修复。issues修复完为满分，每修复一个issue打一次分，一直到满分为止。 举例说明：比如：本项目的android文件夹内，存在多个其他项目翻译为kotlin的任务，这些任务均默认翻译master分支代码，忽略了pr与issues内容，如果翻译任务还未开启那么就先 merge 该项目处于open状态的pr，再尝试解决open issues，只要issues处理状态达到60分，就可以开始翻译工作，翻译完成后，再开始尝试解决剩余的issues到满分。如果翻译工作已经完成，那么就单独对open pr内容进行翻译后，再merge到我们的项目中。基于翻译过的代码还是要处理issues。一直到满分。其他平台同样规则执行。
+
+## Scores
+
+| Library | Resolved | Score |
+| --- | --- | --- |
+| kaedea/android-tagview | 1 / 15 | 6.7 |
+| shellljx/TagViewGroup | 0 / 4 | 0.0 |
+| whilu/AndroidTagView | 0 / 71 | 0.0 |
+| All | 1 / 90 | 1.1 |
+
+Score history: 2026-11-13, pull requests merged and kaedea/android-tagview#28 fixed: 1 / 90 = 1.1.
+
+## Pull requests (open upstream, translated and merged)
+
+| Pull request | Change | Status |
+| --- | --- | --- |
+| [kaedea/android-tagview#27](https://github.com/kaedea/android-tagview/pull/27) | A first tag wider than the view was laid out below itself and disappeared | DONE: the first tag gets no BELOW rule; test `firstTagWiderThanTheViewIsNotBelowItself` |
+| [kaedea/android-tagview#22](https://github.com/kaedea/android-tagview/pull/22) | `Tag.clickable` (default true) | DONE: `Tag.clickable` |
+| [kaedea/android-tagview#21](https://github.com/kaedea/android-tagview/pull/21) | Not clickable tags; single selection; right-to-left lines | DONE, adapted: a tag with `clickable = false` is disabled; single selection is opt-in (`isSingleSelectionMode`, `checkedLayoutColor`, `checkedTagArray`), because the PR forced blue / green on every layout and overwrote the other tags' colors; right-to-left uses ALIGN_PARENT_START / END_OF, because the PR's ALIGN_PARENT_RIGHT right-aligned every line in left-to-right languages too. Tests `notClickableTagIsDisabled`, `singleSelectionChecksOneTag`, `linesUseStartAndEndRulesForRightToLeft` |
+| [whilu/AndroidTagView#110](https://github.com/whilu/AndroidTagView/pull/110) | `tag_text_style` and `tag_text_font_family` (attributes, getters and setters) | DONE: `TagContainerLayout` attributes, `get/setTagTextStyle`, `get/setTagTextFontFamily`; test `containerAppliesTextStyleAndFontFamily` |
+| [shellljx/TagViewGroup](https://github.com/shellljx/TagViewGroup/pulls) | No open pull request | — |
+
+## Issues: android-tagview (`android/android-tagview`, merged: `me.kaede.tagview`)
+
+Score: 1 / 15 resolved = 6.7
+
+| Issue | Description | Fix status |
+| --- | --- | --- |
+| [kaedea/android-tagview#9](https://github.com/kaedea/android-tagview/issues/9) | Prevent collapse of text (end ellipsize effect) — In Few phones the tags get broken in the middle and shows only "..." at the end. Any idea as how to disable it and show the tag fully in next line?  ![screen sh… | TODO |
+| [kaedea/android-tagview#10](https://github.com/kaedea/android-tagview/issues/10) | Slow tags — What is the best way to change a tag on click? I have at least 50, and when I click on one of them I want to change the tag's color/pressed state. The way I am … | TODO |
+| [kaedea/android-tagview#11](https://github.com/kaedea/android-tagview/issues/11) | TagView is not initiated or not display and also get overlap — I have added tagview to my recyclerview's footer. I am facing issue like, when I scroll to down. initially tags that is in the footer is not going to display. B… | TODO |
+| [kaedea/android-tagview#13](https://github.com/kaedea/android-tagview/issues/13) | Performance improvement detected by BlockCanary — TagView  private void drawTags() {     ...     View tagLayout = (View) mInflater.inflate(R.layout.tagview_item, null);     ... }  drawTags is called in addTag, … | TODO |
+| [kaedea/android-tagview#14](https://github.com/kaedea/android-tagview/issues/14) | Does it work correctly when using wrap content? — I have tried to resize it dinamically. Used wrap_content and it seems that it occupies the space because the editext next to it shrinks. But no tag is draw. Do … | TODO |
+| [kaedea/android-tagview#15](https://github.com/kaedea/android-tagview/issues/15) | how to connect it to gradle? — where is your compile "librarynameString" thing? | TODO |
+| [kaedea/android-tagview#16](https://github.com/kaedea/android-tagview/issues/16) | How to change background and text color of a selected tag ? — This library offers all other necessary features but i badly in need of this to change color of a selected tag ,so that user can get visual feedback which tag w… | TODO |
+| [kaedea/android-tagview#17](https://github.com/kaedea/android-tagview/issues/17) | ListView里面使用 的时候  ,列表滚动非常卡 — ListView里面使用 的时候  ,列表滚动非常卡,频繁的移除和创建view | TODO |
+| [kaedea/android-tagview#18](https://github.com/kaedea/android-tagview/issues/18) | 优化问题 — TagView 类里面的 这行代码 float tagWidth = tagView.getPaint().measureText(tag.text ) + textPaddingLeft + textPaddingRight; 建议优化一下，tag.text为null的时候判断下。 | TODO |
+| [kaedea/android-tagview#19](https://github.com/kaedea/android-tagview/issues/19) | Performance issues when 50+ Tags in TagView — Observed significant performance issues when: - Created a tagview layout inside ScrollView with 50+ tags. - Change tag attribute (say color) in `OnTagClickListe… | TODO |
+| [kaedea/android-tagview#20](https://github.com/kaedea/android-tagview/issues/20) | ListView中的问题 — 你好，最近在做标签的功能，使用了你的控件，效果不错，也方便的。在ListView中使用的过程中遇到的问题哈，想请教一下你。 问题描述如下：        在ListView中，我使用了Tagview，在就多Tag的时候，出现了一开始只显示一部分的情况Tag，后面超出的部分Tag处于隐藏状态，通过ListView滑动后才… | TODO |
+| [kaedea/android-tagview#24](https://github.com/kaedea/android-tagview/issues/24) | 不会自动换行的bug解决方案 — 我在使用时，发现，listview加载完之后，tagview不会自动换行，看了一下源码，只需要在tagview下添加以下代码：
+     
+ ```
+ 	public void setMaxWith(int width) {
+ 		mWidth = width;
+ 	}
+ ```
+ 
+ 并在使用tagview之前，调用… | TODO |
+| [kaedea/android-tagview#25](https://github.com/kaedea/android-tagview/issues/25) | Disable tag layoutColorPress — Is there a way to disable the layout color press event on a tag? 
+ 
+ The purpose is to not change any thing on the tag layout, when the user clicks it. The tag … | TODO |
+| [kaedea/android-tagview#28](https://github.com/kaedea/android-tagview/issues/28) | Some Tags are not visible in RTL (Urdu ) language — When I am adding a TAG in the Urdu language. Some of the tags are not visible in TagView | DONE: tags follow the reading direction (ALIGN_PARENT_START / END_OF instead of RIGHT_OF), from PR #21; test `UpstreamPullRequestsTest.linesUseStartAndEndRulesForRightToLeft` |
+| [kaedea/android-tagview#29](https://github.com/kaedea/android-tagview/issues/29) | Not able to scroll horizontally. — How do I arrange all the tags horizontally and scroll them horizontally from left to right. | TODO |
+
+## Issues: TagViewGroup (`android/TagViewGroup`, merged: `com.licrafter.tagview`)
+
+Score: 0 / 4 resolved = 0.0
+
+| Issue | Description | Fix status |
+| --- | --- | --- |
+| [shellljx/TagViewGroup#4](https://github.com/shellljx/TagViewGroup/issues/4) | RectclerView的例子发生错位 — 点击图片隐藏标签，然后滑动列表至一屏，返回后隐藏的标签会发生错位变成显示了哎 | TODO |
+| [shellljx/TagViewGroup#7](https://github.com/shellljx/TagViewGroup/issues/7) | 能在viewpager使用吗 — 能在viewpager使用TagTextView ？感觉TagTextView会全占满View，导致无法滑动 | TODO |
+| [shellljx/TagViewGroup#8](https://github.com/shellljx/TagViewGroup/issues/8) | 能自定义U | TODO |
+| [shellljx/TagViewGroup#9](https://github.com/shellljx/TagViewGroup/issues/9) | 能自定义UI吗？ — 像现在的小红书 标签是圆角的长方形的 | TODO |
+
+## Issues: AndroidTagView (`android/AndroidTagView`, merged: `co.lujun.androidtagview`)
+
+Score: 0 / 71 resolved = 0.0
+
+| Issue | Description | Fix status |
+| --- | --- | --- |
+| [whilu/AndroidTagView#6](https://github.com/whilu/AndroidTagView/issues/6) | enhancement support — is there a way to adding a layout mode 1. single selection - it will change the background color or any configuration on the tagView as selected and others are … | TODO |
+| [whilu/AndroidTagView#7](https://github.com/whilu/AndroidTagView/issues/7) | View cover problem — I call child view of index 2 the index-2 child for short. so when I drag index-3 child over index-2 child, the index-3 is on top of index-2 child which is what … | TODO |
+| [whilu/AndroidTagView#12](https://github.com/whilu/AndroidTagView/issues/12) | Selected state for TagView — I wonder if we can set selected state when we click on a TagView. Or at least, should we have `getTagView(int position)` method in the `TagContainerLayout` and … | TODO |
+| [whilu/AndroidTagView#17](https://github.com/whilu/AndroidTagView/issues/17) | use in item of RecyclerView — I'm using your `TagContainerLayout` in the item of `RecyclerView`. I observed that the width of TagContainerLayout will always fill parent, it caused my trigger… | TODO |
+| [whilu/AndroidTagView#19](https://github.com/whilu/AndroidTagView/issues/19) | How can I get tag text to wrap when it is longer than the width of container — I set the tag max length to 255. When I enter tag text that gets around 100, the tag is created as expected but the text is all on a single line. I would have e… | TODO |
+| [whilu/AndroidTagView#20](https://github.com/whilu/AndroidTagView/issues/20) | 可以添加针对于某个tag的属性设置么 — 现在设置的theme应该是针对于整个TagContainerLayout的，可以针对其中的某个TagView，或者某个位置的tagView设置背景色等属性么？ | TODO |
+| [whilu/AndroidTagView#21](https://github.com/whilu/AndroidTagView/issues/21) | 在ListView的Item里面，ListView的OnItemClick事件处理 — 我把 TagContainerLayout 放在了ListView的Item布局里面，也已经设置了app:tag_clickable="false"，但是如果点击事件在TagContainerLayout上，不会触发ListView的OnItemClick事件，求教作者该如何做处理 谢谢 | TODO |
+| [whilu/AndroidTagView#22](https://github.com/whilu/AndroidTagView/issues/22) | Changing Properties of a tag on click — I cannot find a way to change the properties of tag on clicking it. | TODO |
+| [whilu/AndroidTagView#23](https://github.com/whilu/AndroidTagView/issues/23) | 三星手机不能点击 — 三星手机不能点击 | TODO |
+| [whilu/AndroidTagView#24](https://github.com/whilu/AndroidTagView/issues/24) | 拖拽时重新排列的动画有点生硬，可否顺滑一点😁 | TODO |
+| [whilu/AndroidTagView#25](https://github.com/whilu/AndroidTagView/issues/25) | Fatal Exception: java.lang.NullPointerException Attempt to invoke virtual method 'int co.lujun.androidtagview.TagContainerLayout.getTagViewState()' on a null object reference — http://crashes.to/s/1a932f4a0b2 | TODO |
+| [whilu/AndroidTagView#26](https://github.com/whilu/AndroidTagView/issues/26) | java.lang.ArrayIndexOutOfBoundsException: on TagContainerLayout.onInterceptTouchEvent — In some of the android devices i am getting this error.  `ava.lang.ArrayIndexOutOfBoundsException: length=1; index=1\n\tat android.support.v4.widget.ViewDragHel… | TODO |
+| [whilu/AndroidTagView#27](https://github.com/whilu/AndroidTagView/issues/27) | TagView截获了父布局的点击事件 — 您好，我在使用过程中，发现TagContainerLayout在ScrollView中工作的不是很好， 假设 TagContainerLayout 外层包裹了一层Layout，Layout可以点击。理想情况是TagContainerLayout不应该处理任何Touch事件，它也工作的很好，但现在出现了两种情况： 1、点… | TODO |
+| [whilu/AndroidTagView#28](https://github.com/whilu/AndroidTagView/issues/28) | How to set container_max_lines? couldn't find it. help! — container_max_lines function is not updated in library. i checked it twice. please update the library. | TODO |
+| [whilu/AndroidTagView#29](https://github.com/whilu/AndroidTagView/issues/29) | How to set highlighted of Selected tag Theme | TODO |
+| [whilu/AndroidTagView#32](https://github.com/whilu/AndroidTagView/issues/32) | sometimes click on tags not recognized! — I use this library in items of recyclerview and set onClickListener to each of tags : 
+ `mTagContainerLayout.setOnTagClickListener(new TagView.OnTagClickListene… | TODO |
+| [whilu/AndroidTagView#34](https://github.com/whilu/AndroidTagView/issues/34) | android:minHeight  invalid | TODO |
+| [whilu/AndroidTagView#36](https://github.com/whilu/AndroidTagView/issues/36) | Failed to find style 'tickMarkTintMode' in current theme (3 similar errors not shown) — Missing styles. Is the correct theme chosen for this layout?  Use the Theme combo box above the layout to choose a different layout, or fix the theme style refe… | TODO |
+| [whilu/AndroidTagView#38](https://github.com/whilu/AndroidTagView/issues/38) | crash，空指针了 — java.lang.NullPointerException: Attempt to invoke virtual method 'int co.lujun.androidtagview.TagContainerLayout.getTagViewState()' on a null object reference
+ … | TODO |
+| [whilu/AndroidTagView#39](https://github.com/whilu/AndroidTagView/issues/39) | 短按、长按点击事件经常失效 | TODO |
+| [whilu/AndroidTagView#42](https://github.com/whilu/AndroidTagView/issues/42) | TagContainerLayout in HorizontalScrollView — Hello I would like to put my tag on one line and if it goes beyond the maximum edge of the display, scroll through the tags in a horizzontalscollview you can do… | TODO |
+| [whilu/AndroidTagView#53](https://github.com/whilu/AndroidTagView/issues/53) | 同时长按2个tag会崩溃，内附stacktrace — java.lang.NullPointerException: Attempt to invoke virtual method 'int co.lujun.androidtagview.TagContainerLayout.getTagViewState()' on a null object reference
+ … | TODO |
+| [whilu/AndroidTagView#57](https://github.com/whilu/AndroidTagView/issues/57) | Tag view background color is not changing form xml — Tag view background color is not changing from its default theme.
+ It needs to set app:tag_theme="none" 
+ please change the default to none or mention this in d… | TODO |
+| [whilu/AndroidTagView#58](https://github.com/whilu/AndroidTagView/issues/58) | The container is not scrolling on setting container_max_lines — For too many items i am setting container_max_lines="3" but the entries after the 3rd line are not visible and the container is not scrolling for those items. | TODO |
+| [whilu/AndroidTagView#59](https://github.com/whilu/AndroidTagView/issues/59) | Container not scrolling. — Container not scrolling. if touch over tag view then container not scrolling. | TODO |
+| [whilu/AndroidTagView#60](https://github.com/whilu/AndroidTagView/issues/60) | EnableCross width problem. — I have a problem when I set a Tagview to setEnableCross(true).
+ The tagview can't show the whole text inside it and it doesn't expand to show the string complet… | TODO |
+| [whilu/AndroidTagView#62](https://github.com/whilu/AndroidTagView/issues/62) | support databing — can ? | TODO |
+| [whilu/AndroidTagView#63](https://github.com/whilu/AndroidTagView/issues/63) | 有两个问题：一是整个背景能修改吗？第二是超过max_lines行，能上下滑动吗？ — 两个问题：
+ 一是整个背景能修改吗？（不是每个tag的背景）
+ 二是超过max_lines行，能上下滑动吗？（比如我只设置三行，但是超过三行的数据，需要滑动，怎样做呢？） | TODO |
+| [whilu/AndroidTagView#64](https://github.com/whilu/AndroidTagView/issues/64) | stop handle all touches — TagContainerLayout View always handle all touches, even if it doesn't capture any child view.
+ i suggest to change **[467](https://github.com/whilu/AndroidTagVi… | TODO |
+| [whilu/AndroidTagView#65](https://github.com/whilu/AndroidTagView/issues/65) | Scroll Issue — When i add the tagview inside scrollview there is issue in scrolling | TODO |
+| [whilu/AndroidTagView#66](https://github.com/whilu/AndroidTagView/issues/66) | 我的手机屏幕，一个tag文字过长，同时显示cross图标时，tag的边框就会被截取，如图 — [
+ ![wechatimg67](https://user-images.githubusercontent.com/5211460/31609055-32c6e2ec-b2a5-11e7-8b4c-025ecfa51a29.jpeg)
+ ](url) | TODO |
+| [whilu/AndroidTagView#67](https://github.com/whilu/AndroidTagView/issues/67) | Manifest merger failed — Hi!
+ 
+ I have come across an issue while implementing your library:
+ `Error:Execution failed for task ':app:processDebugManifest'.
+ > Manifest merger failed : A… | TODO |
+| [whilu/AndroidTagView#68](https://github.com/whilu/AndroidTagView/issues/68) | Add support for Gravity.START and Gravity.END values — RTL locales support is a good idea for a lot of production-ready apps. So it would be nice to add more abstract "start" and "end" container gravity values inste… | TODO |
+| [whilu/AndroidTagView#70](https://github.com/whilu/AndroidTagView/issues/70) | How can i change the icon for remove? Could't not find it! — Hello, 
+ Is there any way to change the remove icon instead of 'X' to another drawable icons ? | TODO |
+| [whilu/AndroidTagView#73](https://github.com/whilu/AndroidTagView/issues/73) | TagView的minWidth — 麻烦请教一下，我看到属性里面有tag_max_length，如果我想添加一个tag_min_length有什么便捷的方法么？ | TODO |
+| [whilu/AndroidTagView#74](https://github.com/whilu/AndroidTagView/issues/74) | container_max_lines的bug — 在TagContainerLayout中设置最大行数的地方：
+ `return mMaxLines <= 0 ? lines : mMaxLines;`
+ 建议修改为：
+ `return mMaxLines > lines ? lines : mMaxLines;`
+ 不然容器的高度总是为最高的高度 | TODO |
+| [whilu/AndroidTagView#75](https://github.com/whilu/AndroidTagView/issues/75) | 怎么设置每个tag标签的大小一样，还有怎么支持多选，现在都是单选啊 — 怎么设置每个tag标签的大小一样，还有怎么支持多选，现在都是单选啊，🙏 | TODO |
+| [whilu/AndroidTagView#76](https://github.com/whilu/AndroidTagView/issues/76) | Provide addTag with color method — Is it possible to provide addTag(String text, in color) method?
+ I am using 2 layouts in one activity and adding moving tags with color information from one to … | TODO |
+| [whilu/AndroidTagView#77](https://github.com/whilu/AndroidTagView/issues/77) | Tag background color not changing — tagLanguage.setTheme(ColorFactory.NONE);
+   tagLanguage.setTagBackgroundColor(Color.WHITE);
+ 
+ I used the above code but still it didn't change the background c… | TODO |
+| [whilu/AndroidTagView#78](https://github.com/whilu/AndroidTagView/issues/78) | 请问删除图标如何添加呢？谢谢！ | TODO |
+| [whilu/AndroidTagView#79](https://github.com/whilu/AndroidTagView/issues/79) | Elevation/Shadow support — I integrated this library on my project and it works pretty fine and so easy to play with. but i am having issues with the shadow/elevation thing since i didn't… | TODO |
+| [whilu/AndroidTagView#80](https://github.com/whilu/AndroidTagView/issues/80) | Get Visible tag count — Hello, 
+ 
+ I have set maxLine as 1 and I have added 10 tags. So all will not be visible. So i want how many are visible and how many not visible on 1 line. How … | TODO |
+| [whilu/AndroidTagView#83](https://github.com/whilu/AndroidTagView/issues/83) | null exception — int co.lujun.androidtagview.TagContainerLayout.getTagViewState()' on a null object reference
+ 
+ tagview 报空指针异常，代码行数：138
+  int state = ((TagContainerLayout)getPa… | TODO |
+| [whilu/AndroidTagView#86](https://github.com/whilu/AndroidTagView/issues/86) | 下载demo 运行，启动就挂掉 — Process: co.lujun.sample, PID: 2711
+     java.lang.OutOfMemoryError: Failed to allocate a 10240012 byte allocation with 9783176 free bytes and 9MB until OOM
+   … | TODO |
+| [whilu/AndroidTagView#87](https://github.com/whilu/AndroidTagView/issues/87) | int co.lujun.androidtagview.TagContainerLayout.getTagViewState()' on a null object reference | TODO |
+| [whilu/AndroidTagView#88](https://github.com/whilu/AndroidTagView/issues/88) | java.lang.IllegalArgumentException: Invalid Region.Op - only INTERSECT and DIFFERENCE are allowed — As of API Level Build.VERSION_CODES.P only Region.Op.INTERSECT and Region.Op.DIFFERENCE are valid Region.Op parameters. 
+ 
+ gradle 1.1.4
+ java.lang.IllegalArgum… | TODO |
+| [whilu/AndroidTagView#89](https://github.com/whilu/AndroidTagView/issues/89) | Android P没有适配 — java.lang.IllegalArgumentException: Invalid Region.Op - only INTERSECT and DIFFERENCE are allowed | TODO |
+| [whilu/AndroidTagView#92](https://github.com/whilu/AndroidTagView/issues/92) | TagContainerLayout.getTagViewState()空指针 — java.lang.NullPointerException: Attempt to invoke virtual method 'int co.lujun.androidtagview.TagContainerLayout.getTagViewState()' on a null object reference
+ … | TODO |
+| [whilu/AndroidTagView#95](https://github.com/whilu/AndroidTagView/issues/95) | 1.1.7无法运行 — 编译能通过，但是app一运行就报错：
+ java.lang.RuntimeException: Unable to start activity ComponentInfo{com.lvic.loyalvalley/com.lvic.loyalvalley.activity.SearchActivity}: andro… | TODO |
+| [whilu/AndroidTagView#96](https://github.com/whilu/AndroidTagView/issues/96) | java.lang.ClassNotFoundException — when i intent to activity,app crash and adivce me:
+ I/ubo.goaltracke: Rejecting re-init on previously-failed class java.lang.Class<co.lujun.androidtagview.TagCo… | TODO |
+| [whilu/AndroidTagView#100](https://github.com/whilu/AndroidTagView/issues/100) | layout_width="wrap_content" doesn't work — 只能使用layout_width="0dp" && layout_weight="1"来避免TagContainer占据整行 | TODO |
+| [whilu/AndroidTagView#101](https://github.com/whilu/AndroidTagView/issues/101) | Add Drawable — support to add drawable at `top`, `bottom`, `start` and `end`? | TODO |
+| [whilu/AndroidTagView#102](https://github.com/whilu/AndroidTagView/issues/102) | Set text font family — Could you please add the ability to set the font family for the tag text? | TODO |
+| [whilu/AndroidTagView#103](https://github.com/whilu/AndroidTagView/issues/103) | For Android OS version 9+ tagview appearing as empty — Tagviews are loading but cant see the contents in it for devices having android OS 9+ | TODO |
+| [whilu/AndroidTagView#104](https://github.com/whilu/AndroidTagView/issues/104) | Text is not vertically centered — The text is not vertically centered and always leans toward the bottom 2dp or so. | TODO |
+| [whilu/AndroidTagView#105](https://github.com/whilu/AndroidTagView/issues/105) | 如何设置Text与cross的距离 — 如何设置Text与cross的距离 | TODO |
+| [whilu/AndroidTagView#106](https://github.com/whilu/AndroidTagView/issues/106) | container_max_lines not working? — So I'm trying to set '**container_max_lines="1"**' to prevent the TagContainerLayout from auto-expanding vertically. I want the TagContainerLayout to expand onl… | TODO |
+| [whilu/AndroidTagView#107](https://github.com/whilu/AndroidTagView/issues/107) | `toggleSelectTagView` does not change color to selected state colors. — I have a use case where I need tags to be pre-selected (with respective "selected state" colors). I found `toggleSelectTagView` function , which I thing, suppos… | TODO |
+| [whilu/AndroidTagView#108](https://github.com/whilu/AndroidTagView/issues/108) | Cannot Click TagContainerLayout | TODO |
+| [whilu/AndroidTagView#111](https://github.com/whilu/AndroidTagView/issues/111) | Cross icon not visible — the cross icon is not visible just an empty space in its place. | TODO |
+| [whilu/AndroidTagView#112](https://github.com/whilu/AndroidTagView/issues/112) | Disable TagContainer ClickListener? — How i disable TagContainer Click-listener because of that i have a requirement to change the selected tagView Color so i first loop through every tag in tagsLis… | TODO |
+| [whilu/AndroidTagView#113](https://github.com/whilu/AndroidTagView/issues/113) | Crash on Android Pie — Not working in Android Pie | TODO |
+| [whilu/AndroidTagView#114](https://github.com/whilu/AndroidTagView/issues/114) | how to change selected tag color — how to set selector of tag view in TagContainerLayout | TODO |
+| [whilu/AndroidTagView#115](https://github.com/whilu/AndroidTagView/issues/115) | Horizontal scrolling tags in the container layout. — horizontal scrolling is not working, i don't want more than one line in the tagView. | TODO |
+| [whilu/AndroidTagView#117](https://github.com/whilu/AndroidTagView/issues/117) | get all tag — hi, i saw u had decread
+ ```
+     private List<String> mTags;
+ ```
+ 
+ but i coundn't find any way to get all tag, can u help? | TODO |
+| [whilu/AndroidTagView#118](https://github.com/whilu/AndroidTagView/issues/118) | Delete icon — Can we change delete icon in the tag container | TODO |
+| [whilu/AndroidTagView#119](https://github.com/whilu/AndroidTagView/issues/119) | How to remove cross icon for specific tag? — First of thanks for this wonderful library for tag view.
+ 
+ I don't want a cross icon on my first or specific tag example mention below.
+ 
+ `@BindView(R.id.tagV… | TODO |
+| [whilu/AndroidTagView#120](https://github.com/whilu/AndroidTagView/issues/120) | mavenCentral() support — Android Studio 4.2 suggests change jcenter() to mavenCentral(). Will mavenCentral() be supported at future updates?
+ 
+ https://developer.android.com/studio/buil… | TODO |
+| [whilu/AndroidTagView#121](https://github.com/whilu/AndroidTagView/issues/121) | get tag position to remove? — I want to get the tag position for removing it? But i can not get the position to remove. how could i do it? | TODO |
+| [whilu/AndroidTagView#122](https://github.com/whilu/AndroidTagView/issues/122) | Tag Ripple not working — ![Screenshot_20220707-113540](https://user-images.githubusercontent.com/95573063/177729921-1752c4ab-5610-4d78-9114-e37659af9503.png)
+ 
+ I'm trying to add ripple… | TODO |
+| [whilu/AndroidTagView#123](https://github.com/whilu/AndroidTagView/issues/123) | does't change background color of view when click on onTagClick | TODO |
+

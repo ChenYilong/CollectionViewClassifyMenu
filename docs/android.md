@@ -183,7 +183,9 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
 ## TODO (2026-11-12): open pull requests and issues of the three ported projects
 
-- **Status:** TODO, after step 6 (tasks run in the order given).
+- **Status:** in progress (2026-11-13): the 4 open pull requests are translated and merged; the issue tables (90 open
+  issues), the fixes and the scores are in [android-upstream.md](android-upstream.md) (one document for the three
+  projects instead of their API documents, so the scores add up in one place). Score: 1 / 90.
 - **Context:** the rule "Upstream projects (translations and ports)" (AGENTS.md, `.agents/skills/cyl-upstream/`). The
   three Kotlin ports translated the default branches of kaedea/android-tagview, shellljx/TagViewGroup and
   whilu/AndroidTagView only. The translations are done, so: translate each open pull request's change and merge it

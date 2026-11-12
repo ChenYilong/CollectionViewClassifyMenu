@@ -35,6 +35,14 @@
             <enum name="pure_cyan" value="1" />
             <enum name="pure_teal" value="2" />
         </attr>
+        <!-- whilu/AndroidTagView PR #110: the tags' font family (e.g. sans-serif-medium) and text style. -->
+        <attr name="tag_text_font_family" format="string" />
+        <attr name="tag_text_style" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+            <enum name="bold_italic" value="3" />
+        </attr>
         <attr name="tag_text_direction" format="enum" >
             <enum name="ltr" value="3" />
             <enum name="rtl" value="4" />
