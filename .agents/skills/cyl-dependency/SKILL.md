@@ -94,6 +94,13 @@ screen) is integrated the same way:
    `CYLTabBarItemAccessibilityHint`).
 5. The other tab bar rules still apply (AGENTS.md, "Tab bars"): at the bottom, `hidesBottomBarWhenPushed` on
    pushes, `navigationItem.title` instead of `title`.
+6. **Raised plus button**: whenever an example integrates a PlusButton to demonstrate it, always prefer the raised
+   ("bulging") plus button effect: the top of the plus button extends beyond the top edge of the tab bar. In the
+   configuration's `CYLTabBarControllerPlusButton` dictionary, set `CYLPlusButtonCenterYOffset` to a negative value
+   (or `CYLPlusButtonCenterYMultiplier` below 0.5) so the button's top is above the tab bar; in code, return it from
+   `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` / `+multiplierOfTabBarHeight:` (`CYLPlusButtonSubclassing`).
+   Check that the raised part still receives taps and is not clipped, and show it in the example's screenshots. A
+   flat plus button (its top inside the tab bar) needs a request.
 
 ### Status of the examples
 

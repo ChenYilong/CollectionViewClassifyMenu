@@ -8,3 +8,9 @@
   most relevant document here (the general list is in `issue-progress.md`) with the task's detailed context, the
   user's requirements and the user's prompt quoted verbatim; mark it done with the result and evidence when the
   task is finished, so an interrupted task can be resumed from it.
+- Screenshots (English rule, AGENTS.md "CI/CD and Example screenshots"): every screenshot, from CI/CD or a local
+  build, is saved in the repository and shown in the related document here (images in `assets/`; default document
+  `screenshots.md`), labeled with platform (iOS, Android, Flutter, React Native, HarmonyOS, Mini Program), OS version,
+  simulator / emulator version, platform SDK version, repository version or commit URL and the time taken; clear
+  originals; README images are cropped key details, stitched vertically first, then two columns, then at most three
+  side by side.
