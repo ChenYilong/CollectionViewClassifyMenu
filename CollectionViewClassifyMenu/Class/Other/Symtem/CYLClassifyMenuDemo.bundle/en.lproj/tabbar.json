@@ -1,0 +1,26 @@
+{
+  "CYLTabBarControllerContext": "CYLClassifyMenuDemoRoot",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Classify",
+      "CYLTabBarItemImage": "system:list.bullet.rectangle",
+      "CYLTabBarItemSelectedImage": "system:list.bullet.rectangle.fill",
+      "CYLTabBarItemPageIdentifier": "classify",
+      "CYLTabBarItemAccessibilityLabel": "Classify"
+    },
+    {
+      "CYLTabBarItemTitle": "Filter",
+      "CYLTabBarItemImage": "system:line.3.horizontal.decrease.circle",
+      "CYLTabBarItemSelectedImage": "system:line.3.horizontal.decrease.circle.fill",
+      "CYLTabBarItemPageIdentifier": "filter",
+      "CYLTabBarItemAccessibilityLabel": "Filter"
+    }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "About",
+    "CYLTabBarItemImage": "system:plus.circle.fill",
+    "CYLTabBarItemPageIdentifier": "about",
+    "CYLPlusButtonImageSize": "{52, 52}",
+    "CYLTabBarItemAccessibilityLabel": "About"
+  }
+}
