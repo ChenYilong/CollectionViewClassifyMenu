@@ -1,0 +1,26 @@
+{
+  "CYLTabBarControllerContext": "CYLClassifyMenuDemoRoot",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "分类",
+      "CYLTabBarItemImage": "system:list.bullet.rectangle",
+      "CYLTabBarItemSelectedImage": "system:list.bullet.rectangle.fill",
+      "CYLTabBarItemPageIdentifier": "classify",
+      "CYLTabBarItemAccessibilityLabel": "分类"
+    },
+    {
+      "CYLTabBarItemTitle": "筛选",
+      "CYLTabBarItemImage": "system:line.3.horizontal.decrease.circle",
+      "CYLTabBarItemSelectedImage": "system:line.3.horizontal.decrease.circle.fill",
+      "CYLTabBarItemPageIdentifier": "filter",
+      "CYLTabBarItemAccessibilityLabel": "筛选"
+    }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "关于",
+    "CYLTabBarItemImage": "system:plus.circle.fill",
+    "CYLTabBarItemPageIdentifier": "about",
+    "CYLPlusButtonImageSize": "{52, 52}",
+    "CYLTabBarItemAccessibilityLabel": "关于"
+  }
+}

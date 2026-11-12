@@ -128,7 +128,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = CYLMenuLocalizedString(@"CYLMenuTitle", @"Menu title");
+    // The navigation item's title, not `title`: in a tab bar, `title` would replace the tab's own title.
+    self.navigationItem.title = CYLMenuLocalizedString(@"CYLMenuTitle", @"Menu title");
     self.backgroundView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     self.backgroundView.showsVerticalScrollIndicator = NO;
     self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

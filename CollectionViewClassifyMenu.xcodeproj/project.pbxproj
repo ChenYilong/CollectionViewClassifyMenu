@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C7F41325104389BD571348AF /* CYLFilterDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70CF8AB0EAC6F797ADF09A7 /* CYLFilterDemoViewController.swift */; };
 		9A0DE1200000000000000002 /* CYLMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A0DE1200000000000000001 /* CYLMainViewController.swift */; };
 		9A0DE1200000000000000004 /* CYLDemoDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A0DE1200000000000000003 /* CYLDemoDataSource.swift */; };
 		9A0DE1200000000000000006 /* CYLDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A0DE1200000000000000005 /* CYLDBManager.swift */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C70CF8AB0EAC6F797ADF09A7 /* CYLFilterDemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLFilterDemoViewController.swift; sourceTree = "<group>"; };
 		9A0DE1200000000000000001 /* CYLMainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLMainViewController.swift; sourceTree = "<group>"; };
 		9A0DE1200000000000000003 /* CYLDemoDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLDemoDataSource.swift; sourceTree = "<group>"; };
 		9A0DE1200000000000000005 /* CYLDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLDBManager.swift; sourceTree = "<group>"; };
@@ -156,6 +158,7 @@
 				9A09E2B91BC7AFF00060C116 /* CYLClassifyMenuViewController.h */,
 				9A09E2BA1BC7AFF00060C116 /* CYLClassifyMenuViewController.m */,
 				9A0DE1200000000000000001 /* CYLMainViewController.swift */,
+				C70CF8AB0EAC6F797ADF09A7 /* CYLFilterDemoViewController.swift */,
 				9A0DE1200000000000000003 /* CYLDemoDataSource.swift */,
 			);
 			path = Controller;
@@ -566,6 +569,7 @@
 			files = (
 				9A0DE1200000000000000008 /* CYLAppDelegate.swift in Sources */,
 				9A0DE1200000000000000002 /* CYLMainViewController.swift in Sources */,
+				C7F41325104389BD571348AF /* CYLFilterDemoViewController.swift in Sources */,
 				9A0DE1200000000000000006 /* CYLDBManager.swift in Sources */,
 				9A0DE1200000000000000004 /* CYLDemoDataSource.swift in Sources */,
 				9A0DE120000000000000000A /* CYLDemoLocalization.swift in Sources */,

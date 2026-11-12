@@ -61,10 +61,19 @@
     [self cyl_layoutBottomButtons];
 }
 
-/// Sizes the bottom buttons from the panel's actual width rather than the screen.
+- (void)viewSafeAreaInsetsDidChange {
+    [super viewSafeAreaInsetsDidChange];
+    [self.view setNeedsLayout];
+}
+
+/// Sizes the bottom buttons from the panel's actual width rather than the screen, above the bottom safe area (the
+/// home indicator), with the list ending where they begin.
 - (void)cyl_layoutBottomButtons {
     CGFloat panelWidth = CGRectGetWidth(_collectionView.bounds);
-    CGFloat height = CGRectGetHeight(self.view.bounds);
+    CGFloat height = CGRectGetHeight(self.view.bounds) - self.view.safeAreaInsets.bottom;
+    CGRect listFrame = _collectionView.frame;
+    listFrame.size.height = MAX(0, height - 44 - CGRectGetMinY(listFrame));
+    _collectionView.frame = listFrame;
     CGFloat restoreWidth = floor(panelWidth / 2);
     CGFloat okWidth = MAX(0, panelWidth - restoreWidth);
     CGFloat restoreX = self.isPanelVisible ? 0 : -restoreWidth;

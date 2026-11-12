@@ -96,7 +96,9 @@ Android chapter.
 
 ## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
-- **Status:** TODO. Not started: the earlier tasks run first, in the order they were given.
+- **Status:** TODO. Not started: the earlier tasks run first, in the order they were given. When React Native or
+  Flutter examples are added, show the classify menu and the multiple filter in tabs of their own, as the iOS and
+  Android examples do (request of 2026-11-12, `issue-progress.md`).
 - **Context:** the Android library and example (`android/merged`) and the cross-platform components (Flutter and React
   Native, as in CYLTabBarController's `CrossPlatform/`) should also run on HarmonyOS NEXT, which no longer runs
   Android apps.

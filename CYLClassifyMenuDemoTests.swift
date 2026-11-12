@@ -30,7 +30,7 @@ final class CYLClassifyMenuDemoTests: XCTestCase {
 
     func testLegacyFilterSelectionMigrationValidatesArchivedStates() throws {
         let source = CYLDemoTestMenuSource(sections: [["All", "One"], ["All", "Two"]])
-        let controller = CYLMainViewController()
+        let controller = CYLFilterDemoViewController()
         controller.filterSource = source
         let legacy = CYLFilterParamsTool()
         legacy.filterParamsArray = NSMutableArray(array: [NSMutableArray(array: [0, 1]), NSMutableArray(array: [1, 0])])
@@ -42,6 +42,37 @@ final class CYLClassifyMenuDemoTests: XCTestCase {
         (legacy.filterParamsArray[0] as! NSMutableArray)[1] = "bad"
         archive = try NSKeyedArchiver.archivedData(withRootObject: legacy, requiringSecureCoding: false)
         XCTAssertNil(controller.selection(fromLegacyArchiveData: archive))
+    }
+
+    /// The two features have a tab each (Classify, Filter); the plus button's page is About.
+    func testClassifyAndFilterHaveTabsOfTheirOwn() throws {
+        let tabs = try XCTUnwrap(CYLAppDelegate.makeTabBarController())
+        tabs.loadViewIfNeeded()
+        let roots = (tabs.viewControllers ?? []).compactMap { ($0 as? UINavigationController)?.viewControllers.first }
+        XCTAssertTrue(roots.contains { $0 is CYLMainViewController }, "a Classify tab")
+        XCTAssertTrue(roots.contains { $0 is CYLFilterDemoViewController }, "a Filter tab")
+        XCTAssertFalse(roots.contains { $0 is CYLMainViewController && $0 is CYLFilterDemoViewController })
+        let classify = try XCTUnwrap(roots.first { $0 is CYLMainViewController })
+        classify.loadViewIfNeeded()
+        XCTAssertNil(classify.navigationItem.leftBarButtonItem, "the Classify tab has no filter button")
+    }
+
+    /// The Filter tab lists the demo places of the selected regions and dishes.
+    func testFilterTabListsTheMatchingPlaces() throws {
+        UserDefaults.standard.removeObject(forKey: CYLFilterDemoViewController.filterSelectionKey)
+        let filter = CYLFilterDemoViewController()
+        filter.loadViewIfNeeded()
+        XCTAssertEqual(filter.results.count, CYLDemoPlaces.all.count)
+        XCTAssertNotNil(filter.navigationItem.leftBarButtonItem, "the filter button")
+        let source = try XCTUnwrap(filter.filterSource)
+        let beijing = IndexPath(item: 1, section: 0)
+        let region = source.menuTitleForItem(at: beijing)
+        filter.menu(filter.filterController, didConfirmSelectedItems: [beijing, IndexPath(item: 0, section: 1)])
+        XCTAssertFalse(filter.results.isEmpty)
+        XCTAssertTrue(filter.results.allSatisfy { $0.region == region })
+        XCTAssertEqual(filter.results, CYLDemoPlaces.places(regions: [region], dishes: []))
+        XCTAssertEqual(CYLDemoPlaces.all.count, 83, "the same places as the example's database and the Android demo")
+        UserDefaults.standard.removeObject(forKey: CYLFilterDemoViewController.filterSelectionKey)
     }
 
     func testDemoHeaderFitsANarrowScreen() throws {
