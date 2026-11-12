@@ -89,7 +89,7 @@ The same rules as AGENTS.md, "CI/CD and Example screenshots":
   full-screen captures unless necessary. Prefer one stitched image that shows several key details.
 - **Screenshots: stitching layout.** Stitch in this order of preference: (1) stacked vertically, top to bottom, which
   reads best on a phone; (2) two columns, several rows; (3) last resort, side by side in one row, at most three
-  columns per row.
+  columns per row. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
 
 ## Closing the task
 
