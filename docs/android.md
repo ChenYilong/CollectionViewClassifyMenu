@@ -63,9 +63,22 @@ Android chapter.
 
 ### Status
 
-- [ ] Step 1: folders
-- [ ] Step 2: Kotlin transcriptions (android-tagview, AndroidTagView) and the TagViewGroup reimplementation
+- [x] Step 1: folders (`android/android-tagview`, `android/TagViewGroup`, `android/AndroidTagView`; `merged` next)
+- [x] Step 2 (2026-11-12): Kotlin transcriptions of android-tagview (`13ba988`) and AndroidTagView (`643ba99`),
+  the TagViewGroup API reimplementation (`b510e7d`). Each folder builds its sample (`assembleDebug`); the three
+  samples run on the API 35 emulator (screenshots below). Samples opt out of Android 15's edge-to-edge
+  enforcement (`values-v35`), as their original target SDKs never drew under the system bars.
 - [ ] Step 3: merged library and example with CYLTabBarController
 - [ ] Step 4: API table
 - [ ] Step 5: missing APIs (score per added API)
 - [ ] Step 6: iOS examples ported, screenshots, README Android chapter
+
+## Screenshots
+
+Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTagView, TagViewGroup.
+
+<img src="assets/android-sample-android-tagview.png" width="300" alt="android-tagview sample in Kotlin">
+
+<img src="assets/android-sample-androidtagview.png" width="300" alt="AndroidTagView sample in Kotlin">
+
+<img src="assets/android-sample-tagviewgroup.png" width="300" alt="TagViewGroup sample in Kotlin">
