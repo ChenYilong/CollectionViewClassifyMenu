@@ -7,7 +7,7 @@ port (`android/merged/library/.../CYLCollectionViewLeftAlignedLayout.kt`) follow
 
 ## Task log
 
-- **Status:** TODO (started 2026-11-12, branch `feat/android-kotlin`).
+- **Status:** DONE (2026-11-12, branch `feat/android-kotlin`). 25 / 25 rows, score 100.
 - **Context:** while porting the tag list to Kotlin (`docs/android.md`, step 5), the layout is reworked. The user asked to merge
   four upstream pull requests and to handle every issue in the upstream issue list.
 - **Requirements:**
@@ -26,44 +26,53 @@ port (`android/merged/library/.../CYLCollectionViewLeftAlignedLayout.kt`) follow
 
 ## Score
 
-Score = rows done / 24 rows (4 pull requests + 20 issues) × 100.
+Score = rows done / 25 rows (4 pull requests + 21 issues; #6 and #15 are questions, not scored) × 100.
 
 | Date | Done | Score |
 | --- | --- | --- |
-| 2026-11-12 | 0 / 24 | 0 |
+| 2026-11-12 | 0 / 25 | 0 |
+| 2026-11-12 | 25 / 25 | 100 |
+
+## Evidence
+
+- `scripts/unit-tests.sh menu`: 28 tests, 0 failures, including the 10 of `CYLCollectionViewLeftAlignedLayoutTests.m`
+  and `CYLLeftAlignedLayoutSwiftTests.swift`.
+- Android: `CYLCollectionViewLeftAlignedLayoutTest` (3 tests: full-width fractional rows, trailing inset, 2000 items),
+  0 failures.
+- `scripts/pod-lint.sh lib`: passed validation.
 
 ## Pull requests
 
 | Pull request | TODO |
 | --- | --- |
-| [#37](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/37) Horizontal scrolling: rows are only left-aligned when the layout scrolls vertically. | TODO: return the flow layout's own frames (copied) when `scrollDirection` is horizontal; test. |
-| [#31](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/31) Full-width cells on 3x devices: fractional `y` makes a cell look like it is on the previous row (`FLT_EPSILON`). | TODO: decide rows by vertical overlap with a tolerance, not by any intersection; test with fractional heights. |
-| [#25](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/25) iOS 9 crash (#9): copy the attributes only on iOS 10+. | TODO: the minimum is iOS 15, so attributes are always copied; test self-sizing (`estimatedItemSize`) does not crash. |
-| [#20](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/20) A cell as wide as the screen gets a wrong `x`. | TODO: clamp every frame inside the section insets of the collection view (not the screen); test. |
+| [#37](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/37) Horizontal scrolling: rows are only left-aligned when the layout scrolls vertically. | Done: horizontal layouts return copies of the flow layout's frames (`cyl_alignsRows`). Test: `CYLCollectionViewLeftAlignedLayoutTests` `testHorizontalScrollingKeepsTheFlowLayoutFrames`. |
+| [#31](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/31) Full-width cells on 3x devices: fractional `y` makes a cell look like it is on the previous row (`FLT_EPSILON`). | Done: rows are found by vertical centers with a tolerance (`CYLFramesShareRow`), not by any intersection. Test: `testFullWidthCellsWithFractionalHeightsStartTheirOwnRows`. |
+| [#25](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/25) iOS 9 crash (#9): copy the attributes only on iOS 10+. | Done: iOS 15+ always copies (the iOS 9 branch is not needed). Test: `testSelfSizingCellsAppearAndSettle`, `testReturnedAttributesAreCopies`. |
+| [#20](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/pull/20) A cell as wide as the screen gets a wrong `x`. | Done: frames are clamped inside the section insets of the collection view (not the screen width). Test: `testFullWidthCellsWithFractionalHeightsStartTheirOwnRows`, `testCellsNeverPassTheTrailingInset`. |
 
 ## Issues
 
 | Issue | TODO |
 | --- | --- |
-| [#36](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/36) Add a privacy manifest. | TODO: add `PrivacyInfo.xcprivacy` to the pod (no tracking, no required-reason API). |
-| [#33](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/33) iOS 11.4: the right section inset is ignored. | TODO: no frame passes `width - inset.right`; test. |
-| [#32](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/32) Section headers not positioned correctly. | TODO: headers and footers keep the flow layout's frames; test several sections. |
-| [#30](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/30) Horizontal scrolling: every `x` becomes 0. | TODO: same fix as #37; test. |
-| [#29](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/29) 2000 items: slow scrolling and memory exit. | TODO: no recursion, work per row; test 2000 items within a time limit. |
-| [#28](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/28) Podspec points to an old version. | TODO: check our podspec version and tag rule. |
-| [#27](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/27) Accuracy problem of fractional `y`. | TODO: same fix as #31; test. |
-| [#26](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/26) A section of full-width cells is laid out wrongly. | TODO: same fix as #31 / #20; test. |
-| [#22](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/22) Header moves down when a section has one item (closed by the reporter). | TODO: test a one-item section's header. |
-| [#21](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/21) A Swift port. | TODO: Swift-friendly API (nullability, Swift names); Swift use is covered by the Swift examples. |
-| [#18](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/18) `estimatedItemSize`: no cells are shown. | TODO: test self-sizing cells appear. |
-| [#17](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/17) Recursive loop with `preferredLayoutAttributesFittingAttributes:`. | TODO: test self-sizing cells finish layout. |
-| [#16](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/16) Crash with section footers. | TODO: test headers and footers. |
-| [#13](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/13) Cell sizing with Auto Layout. | TODO: same test as #18. |
-| [#11](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/11) Crash reading `collectionViewContentSize` with estimated sizes. | TODO: test reading the content size with self-sizing cells. |
-| [#10](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/10) Stutters on the first scroll. | TODO: same as #29. |
-| [#9](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/9) `EXC_BAD_ACCESS` with `estimatedItemSize`. | TODO: same as #25. |
-| [#8](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/8) Two cells get the same frame after rotation. | TODO: no cache, invalidate on width change; test a width change. |
-| [#7](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/7) Horizontal scrolling: cells overlap. | TODO: same as #37. |
-| [#4](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/4) "Cached frame mismatch" warning. | TODO: every attribute returned is a copy; test. |
-| [#2](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/2) Cells of different sizes. | TODO: test cells of different widths and heights. |
+| [#36](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/36) Add a privacy manifest. | Done: `CollectionViewClassifyMenu/Resources/Privacy/PrivacyInfo.xcprivacy` in the `CYLClassifyMenuResources` bundle (no tracking, no data, no required-reason API; the core uses none). Test: `testThePodShipsAPrivacyManifest`; `pod-lint.sh lib` passes. |
+| [#33](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/33) iOS 11.4: the right section inset is ignored. | Done: no frame passes `width - inset.right`; too-wide items are clamped. Test: `testCellsNeverPassTheTrailingInset`. |
+| [#32](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/32) Section headers not positioned correctly. | Done: headers and footers keep the flow layout's frames. Test: `testHeadersAndFootersKeepTheFlowLayoutFrames`. |
+| [#30](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/30) Horizontal scrolling: every `x` becomes 0. | Done: same fix as PR #37. Test: `testHorizontalScrollingKeepsTheFlowLayoutFrames` (no x of 0). |
+| [#29](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/29) 2000 items: slow scrolling and memory exit. | Done: no recursion, each item walks only its row (`testLargeTagSetDoesNotRecursivelyRecomputePreviousItems`). Test: `testTwoThousandItemsLayOutQuickly` (0.17 s for 2000 items and a full scroll). |
+| [#28](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/28) Podspec points to an old version. | Done: our podspec takes the tag from `s.version`, and `scripts/pod-lint.sh check-tag <tag>` refuses a release whose tag differs. |
+| [#27](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/27) Accuracy problem of fractional `y`. | Done: same fix as PR #31. Test: `testFullWidthCellsWithFractionalHeightsStartTheirOwnRows`. |
+| [#26](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/26) A section of full-width cells is laid out wrongly. | Done: same fix as PR #31 / #20. Test: `testFullWidthCellsWithFractionalHeightsStartTheirOwnRows`. |
+| [#22](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/22) Header moves down when a section has one item (closed by the reporter). | Done: a one-item section's header stays above its cell. Test: `testHeadersAndFootersKeepTheFlowLayoutFrames` (section 1 has one item). |
+| [#21](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/21) A Swift port. | Done: the header is `NS_ASSUME_NONNULL`; Swift uses non-optional types. Test: `CYLLeftAlignedLayoutSwiftTests.testLayoutIsUsableFromSwift`. |
+| [#18](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/18) `estimatedItemSize`: no cells are shown. | Done: self-sizing cells are shown. Test: `testSelfSizingCellsAppearAndSettle`. |
+| [#17](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/17) Recursive loop with `preferredLayoutAttributesFittingAttributes:`. | Done: self-sizing cells settle (no loop). Test: `testSelfSizingCellsAppearAndSettle`. |
+| [#16](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/16) Crash with section footers. | Done: footers in a rect query do not crash. Test: `testHeadersAndFootersKeepTheFlowLayoutFrames`. |
+| [#13](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/13) Cell sizing with Auto Layout. | Done: cells take their own (self-sized) widths. Test: `testSelfSizingCellsAppearAndSettle`. |
+| [#11](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/11) Crash reading `collectionViewContentSize` with estimated sizes. | Done: `collectionViewContentSize` is read with self-sizing cells. Test: `testSelfSizingCellsAppearAndSettle`. |
+| [#10](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/10) Stutters on the first scroll. | Done: same as #29. Test: `testTwoThousandItemsLayOutQuickly`. |
+| [#9](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/9) `EXC_BAD_ACCESS` with `estimatedItemSize`. | Done: same as PR #25. Test: `testSelfSizingCellsAppearAndSettle`. |
+| [#8](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/8) Two cells get the same frame after rotation. | Done: no cache, the layout is invalidated on a width change. Test: `testWidthChangeRecomputesEveryFrame`. |
+| [#7](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/7) Horizontal scrolling: cells overlap. | Done: same as PR #37. Test: `testHorizontalScrollingKeepsTheFlowLayoutFrames` (no overlap). |
+| [#4](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/4) "Cached frame mismatch" warning. | Done: every attribute returned is a copy. Test: `testReturnedAttributesAreCopies`. |
+| [#2](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/2) Cells of different sizes. | Done: cells of different widths and heights, every row alignment. Test: `testCellsOfDifferentSizes`. |
 | [#6](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/6), [#15](https://github.com/mokagio/UICollectionViewLeftAlignedLayout/issues/15) Questions / thanks, no defect. | Nothing to fix (not scored). |
