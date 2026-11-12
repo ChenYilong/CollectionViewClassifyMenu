@@ -85,6 +85,23 @@ Android chapter.
 - [ ] Step 5: missing APIs (score per added API, history below)
 - [ ] Step 6: iOS examples ported, screenshots, README Android chapter
 
+## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
+
+- **Status:** TODO. Not started: the earlier tasks run first, in the order they were given.
+- **Context:** the Android library and example (`android/merged`) and the cross-platform components (Flutter and React
+  Native, as in CYLTabBarController's `CrossPlatform/`) should also run on HarmonyOS NEXT, which no longer runs
+  Android apps.
+- **Requirements:**
+  1. Support and adapt the Android code and the cross-platform platforms (React Native, Flutter) to HarmonyOS NEXT.
+  2. Flutter first; adapt React Native only after the Flutter version passes its tests.
+- **Prompt (verbatim):**
+
+  > 找到docs android相关文档写一个英文TODO：android 与跨端平台（REactNative flutter，先flutter，flutter测试通过后再适配 REactNative）支持适配 android 鸿蒙 NEXT系统。
+
+- **Prompt (English):** find the Android document in docs and write an English TODO: support and adapt Android and the
+  cross-platform platforms (React Native, Flutter; Flutter first, React Native only after the Flutter tests pass) to
+  HarmonyOS NEXT.
+
 ## Score history
 
 Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out of 100; one row per change of

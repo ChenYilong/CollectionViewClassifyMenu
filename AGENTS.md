@@ -161,6 +161,12 @@ verify the behavior and update the applicable documentation.
   `CYLTabBarPageRegistry`, and a `CYLTabBarControllerContext` of its own per
   tab bar. Build a tab bar in code, or leave out the plus button, only when a
   request asks for it. Details: `.agents/skills/cyl-dependency/`.
+- Raised plus button: whenever an example integrates a PlusButton to demonstrate it, always prefer the raised
+  ("bulging") plus button effect. Raised means the top of the plus button extends beyond the top edge of the tab
+  bar. In a configuration file, raise it with `CYLPlusButtonCenterYOffset` (a negative offset) or
+  `CYLPlusButtonCenterYMultiplier`; in code, with `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` /
+  `+multiplierOfTabBarHeight:` of `CYLPlusButtonSubclassing`. A flat plus button needs a request. Details:
+  `.agents/skills/cyl-dependency/`.
 - The core library does not depend on CYLTabBarController: it finds the
   animation engine (`CYLTabBarItemAnimationFactory`) and the configuration
   parser (`CYLTabBarConfigurationParser`) at runtime, because the published
@@ -303,6 +309,26 @@ AGENTS.md, newest commit) and adapted to this project:
   change the CI (workflow or `scripts/example-screenshots.sh`) so that they are
   produced. If that is still not possible, explain the exact reason (for
   example the runner, the simulator or artifact download) to the user.
+
+- **Screenshots: where they go.** Every screenshot, from CI/CD and from local builds alike, is saved in the
+  Git repository and shown in the related document in `docs/` (images in `docs/assets/`); when no document fits,
+  create one (the default is `docs/screenshots.md`). At the right moment, when you judge that the result looks as
+  expected, update `README.md` with the newest images, in the matching section (create it if missing).
+- **Screenshots: labels.** Every screenshot shown in `docs/` or `README.md` is labeled with:
+  - the platform it ran on: iOS, Android, Flutter, React Native, HarmonyOS or Mini Program;
+  - the environment: the operating system version, the simulator / emulator version, and the platform's SDK version
+    (iOS, Android, Flutter, React Native, HarmonyOS or Mini Program SDK);
+  - this repository's version number or commit URL;
+  - the current time (when it was taken).
+- **Screenshots: quality.** Use clear original images; never downscale or recompress them.
+- **Screenshots: key moments.** Update the README images at key moments: for example when a `TODO` keyword or a
+  `Linux` keyword can be removed, when a pull request can be merged, or when you judge the result as expected, with
+  no bug and no open issue.
+- **Screenshots: crop to the detail.** Screenshots in `README.md` show the key details, cropped; do not use
+  full-screen captures unless necessary. Prefer one stitched image that shows several key details.
+- **Screenshots: stitching layout.** Stitch in this order of preference: (1) stacked vertically, top to bottom, which
+  reads best on a phone; (2) two columns, several rows; (3) last resort, side by side in one row, at most three
+  columns per row.
 
 ## Documentation assets
 
