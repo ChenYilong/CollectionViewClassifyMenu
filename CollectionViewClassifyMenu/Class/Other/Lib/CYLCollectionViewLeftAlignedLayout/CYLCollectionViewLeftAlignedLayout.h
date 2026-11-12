@@ -26,9 +26,12 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CYLCollectionViewLeftAlignedLayout : UICollectionViewFlowLayout
 /*!
- * 0 leading (the default), 1 centered, 2 trailing (CYLTagRowAlignment).
+ * 0 leading (the default), 1 centered, 2 trailing (CYLTagRowAlignment). Rows are aligned only while
+ * `scrollDirection` is vertical; a horizontal layout keeps the flow layout's frames.
  */
 @property (nonatomic, assign) NSInteger rowAlignment;
 
@@ -42,3 +45,5 @@
 @protocol UICollectionViewDelegateLeftAlignedLayout <UICollectionViewDelegateFlowLayout>
 
 @end
+
+NS_ASSUME_NONNULL_END
