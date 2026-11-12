@@ -57,6 +57,8 @@ class CYLMenuHomeScreen(context: Context, navigator: CYLMenuNavigator, onOpen: (
             "场景二：搜索分类" to { CYLSearchHomeScreen(context, navigator) },
             "样式" to { CYLTagStyleScreen(context, navigator) },
             "动效" to { CYLTagAnimationScreen(context) },
+            // The iOS example's plus page (its plus button's page): the query scenarios.
+            "查询筛选" to { CYLQueryScenariosScreen(context, navigator) },
         )
         val list = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(Color.WHITE) }
         for ((key, make) in parts) {

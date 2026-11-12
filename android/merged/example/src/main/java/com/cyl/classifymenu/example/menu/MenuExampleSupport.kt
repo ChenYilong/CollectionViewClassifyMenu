@@ -183,7 +183,10 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
      */
     fun setTrailing(view: View?) {
         trailingSlot.removeAllViews()
-        view?.let { trailingSlot.addView(it, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)) }
+        view?.let { trailingSlot.addView(it, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.END)) }
+        // Wide enough for its buttons, never narrower than the space that keeps the title centered.
+        trailingSlot.layoutParams = trailingSlot.layoutParams?.apply { width = if (view == null) (88 * d).toInt() else LayoutParams.WRAP_CONTENT }
+        trailingSlot.minimumWidth = (88 * d).toInt()
     }
 
     fun refreshTitle() {
@@ -196,7 +199,6 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
         top?.let {
             (it.view.parent as? android.view.ViewGroup)?.removeView(it.view)
             content.addView(it.view)
-            (it as? CYLMenuScreenLifecycle)?.screenDidAppear(this)
         }
         titleLabel.text = top?.title
         titleSlot.removeAllViews()
@@ -207,7 +209,10 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
         }
         titleLabel.visibility = if (titleView == null) View.VISIBLE else View.INVISIBLE
         trailingSlot.layoutParams = trailingSlot.layoutParams?.apply { width = if (titleView == null) (88 * d).toInt() else (12 * d).toInt() }
+        trailingSlot.minimumWidth = if (titleView == null) (88 * d).toInt() else 0
         back.visibility = if (stack.size > 1) View.VISIBLE else View.INVISIBLE
+        // Last, so the bar items a screen sets (setTrailing) are not reset above.
+        (top as? CYLMenuScreenLifecycle)?.screenDidAppear(this)
         onDepthChanged?.invoke()
     }
 }
