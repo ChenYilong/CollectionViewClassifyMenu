@@ -22,4 +22,5 @@
     <string name="filter_hint">点左上角按钮从左侧打开筛选，多选地区与菜品后确认。每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果。</string>
     <string name="classify_tag_hint">点按分类标签（单选，再点一次取消）。每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果。</string>
     <string name="tagcollection_title">标签集合视图</string>
+    <string name="editor_tab">编辑标签</string>
 </resources>

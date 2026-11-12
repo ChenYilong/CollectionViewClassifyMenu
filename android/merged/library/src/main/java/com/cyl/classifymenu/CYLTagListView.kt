@@ -1405,7 +1405,16 @@ open class CYLTagListView @JvmOverloads constructor(
             place(titleLabel, CYLRect(x, 0f, max(0f, trailing - x), height))
         }
 
-        private fun place(view: View, frame: CYLRect) = view.layout(px(frame.x), px(frame.y), px(frame.maxX), px(frame.maxY))
+        /**
+         * Measures `view` at the size of `frame`, then lays it out there, so a label's vertical centering uses the
+         * header's height (as the iOS frames do), not its own natural height.
+         */
+        private fun place(view: View, frame: CYLRect) {
+            val width = px(frame.maxX) - px(frame.x)
+            val height = px(frame.maxY) - px(frame.y)
+            view.measure(MeasureSpec.makeMeasureSpec(maxOf(0, width), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(maxOf(0, height), MeasureSpec.EXACTLY))
+            view.layout(px(frame.x), px(frame.y), px(frame.x) + maxOf(0, width), px(frame.y) + maxOf(0, height))
+        }
     }
 
     /** A section footer with the fold control at the bottom. */
