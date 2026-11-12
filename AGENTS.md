@@ -373,6 +373,24 @@ AGENTS.md, newest commit) and adapted to this project:
 - Opening is automatic; merging still follows the rules of the repository and the user's approval.
 - Details: `.agents/skills/cyl-commit/`. The same rule is in the vault's root `instructions.md` (section 15).
 
+## Upstream projects (translations and ports)
+
+- **Upstream projects used for translation.** When a document of this project links to a GitHub repository of
+  another project, and that repository is the source of a translation or port (for example the projects ported to
+  Kotlin in `android/`), do not translate only its default branch:
+  1. **Pull requests.** Visit the upstream's open pull requests and bring them in. If the translation has not started,
+     merge the open pull requests into the source first; if it is already done, translate each open pull request's
+     change and merge it into our port.
+  2. **Issues.** List the upstream's open issues in a table in the related document in `docs/` (create one when none
+     fits): column 1 the issue link, column 2 its description, column 3 the fix status (`TODO` by default). Find each
+     issue's counterpart in our code and try to fix it.
+  3. **Score.** 100 means every listed issue is resolved. Give a score after each fixed issue and continue until 100.
+  4. **Order.** For a translation not started yet: merge the open pull requests, fix issues until the score reaches
+     60, translate, then fix the remaining issues up to 100. For a finished translation: translate and merge the open
+     pull requests, then fix the issues on the translated code up to 100.
+  5. The same rule applies to every platform (iOS, Android, Flutter, React Native, HarmonyOS, Mini Program).
+  Details: `.agents/skills/cyl-upstream/`. The same rule is in the vault's root `instructions.md` (section 17).
+
 ## Issue progress
 
 - Keep all issues in `docs/issue-progress.md`, including non-UI issues.

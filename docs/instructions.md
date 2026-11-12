@@ -14,3 +14,7 @@
   simulator / emulator version, platform SDK version, repository version or commit URL and the time taken; clear
   originals; README images are cropped key details, stitched vertically first, then two columns, then at most three
   side by side.
+- Upstream projects (English rule, AGENTS.md "Upstream projects (translations and ports)"): when a project linked in
+  these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
+  of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each
+  fix until 100; a translation not started yet waits until the score reaches 60.

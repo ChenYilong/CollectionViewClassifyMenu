@@ -111,6 +111,17 @@ Android chapter.
   cross-platform platforms (React Native, Flutter; Flutter first, React Native only after the Flutter tests pass) to
   HarmonyOS NEXT.
 
+## TODO (2026-11-12): open pull requests and issues of the three ported projects
+
+- **Status:** TODO, after step 6 (tasks run in the order given).
+- **Context:** the rule "Upstream projects (translations and ports)" (AGENTS.md, `.agents/skills/cyl-upstream/`). The
+  three Kotlin ports translated the default branches of kaedea/android-tagview, shellljx/TagViewGroup and
+  whilu/AndroidTagView only. The translations are done, so: translate each open pull request's change and merge it
+  into `android/<project>` and `android/merged`; list each project's open issues (issue link, description, status
+  `TODO`) in its API document (`android-tagview-api.md`, `tagviewgroup-api.md`, `androidtagview-api.md`); fix them on
+  the translated code and score after each fix until 100. TagViewGroup is reimplemented (GPL-3.0): read its pull
+  requests and issues as behavior only, copy no code.
+
 ## Score history
 
 Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out of 100; one row per change of
