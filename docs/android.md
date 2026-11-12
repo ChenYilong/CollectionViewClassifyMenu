@@ -114,7 +114,13 @@ Android chapter.
   [CYLTabBarController PR #790](https://github.com/ChenYilong/CYLTabBarController/pull/790) (`4639a0c`, test
   `CYLRiveInputsTest`), and the Android pin moved to that commit. TODO: the iOS Podfile pins (root `Podfile` at
   `53766de`; `Example/` and `Example-Swift/` at `0e69250`, see issue-progress.md) are not moved to `4639a0c` in this
-  Android-only task. TODO: discover (plus page),
+  Android-only task. The plus page (the iOS example's plus button page, a fifth row "Filters" in the Menu home, since
+  the merged app's plus button belongs to the TagViewGroup editor) is in progress: the query scenarios list (the review
+  filter in its three modes, the menu linkage, search discover, and the tables with their row counts) and the menu
+  linkage are DONE: the classify menu (single choice) and the multiple-choice filter on one screen, both building
+  the `places` SQL on the shared database, the choices saved in a `selections` table (an app-local
+  `cyl_selections.sqlite`, because the shared file is read-only) and restored when the screen opens again. TODO:
+  discover (plus page),
   animations (Lottie / Rive / GIF from `CYLMenuExample.bundle`), the plus page (query scenarios, menu linkage, tag
   cloud, configuration). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
@@ -221,6 +227,8 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Menu tab, Styles, top to bottom: default; after icon color, title color, background, border, corner radius (0 = capsule); Lottie, GIF, PAG icons | <img src="assets/android-menu-styles-actions.png" width="300" alt="Styles actions and animated icons"> |
 | Menu tab, Animations (top): Lottie, Lottie with image assets, green Lottie, PAG; first tag of each section selected | <img src="assets/android-menu-animations-lottie-pag.png" width="300" alt="Animations: Lottie and PAG"> |
 | Menu tab, Animations (bottom): Rive (six files), icons.riv on dark tags (Search tapped), GIF, static images; speed 2x | <img src="assets/android-menu-animations-rive-gif.png" width="300" alt="Animations: Rive, GIF, images"> |
+| Menu tab, plus page: the query scenarios and the tables (reviews 10, places 83, selections) | <img src="assets/android-menu-query-scenarios.png" width="300" alt="Query scenarios"> |
+| Menu tab, menu linkage: 川菜 (classify) + 北京 (filter, modified icon) → SQL → 1 of 83 places; saved and restored | <img src="assets/android-menu-linkage.png" width="300" alt="Menu linkage"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots
