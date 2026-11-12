@@ -33,7 +33,11 @@ class MenuFragment : Fragment() {
         val context = requireContext()
         navigator = CYLMenuNavigator(context)
         navigator.push(CYLMenuHomeScreen(context, navigator) { back.isEnabled = navigator.depth > 1 })
-        navigator.onDepthChanged = { back.isEnabled = navigator.depth > 1 }
+        // A pushed screen hides the app's tab bar, as hidesBottomBarWhenPushed does on iOS; it comes back at the root.
+        navigator.onDepthChanged = {
+            back.isEnabled = navigator.depth > 1
+            (activity as? com.cyl.classifymenu.example.MainActivity)?.tabBarController?.setTabBarHidden(navigator.depth > 1, true)
+        }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, back)
         return navigator
     }
@@ -50,7 +54,7 @@ class CYLMenuHomeScreen(context: Context, navigator: CYLMenuNavigator, onOpen: (
         val d = context.resources.displayMetrics.density
         val parts = listOf<Pair<String, (() -> CYLMenuScreen)?>>(
             "场景一：评价筛选" to { CYLProductScreen(context, navigator) },
-            "场景二：搜索分类" to null,
+            "场景二：搜索分类" to { CYLSearchHomeScreen(context, navigator) },
             "样式" to null,
             "动效" to null,
         )

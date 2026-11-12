@@ -110,6 +110,11 @@ class CYLExampleMenuSource(var sections: List<CYLExampleMenuSection>) : CYLMenuD
 interface CYLMenuScreen {
     val title: CharSequence
     val view: View
+
+    /**
+     * A view shown in the bar instead of the title (`navigationItem.titleView`), such as a search bar.
+     */
+    val titleView: View? get() = null
 }
 
 /**
@@ -134,6 +139,7 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
         setOnClickListener { pop() }
     }
     private val trailingSlot = FrameLayout(context)
+    private val titleSlot = FrameLayout(context)
     private val content = FrameLayout(context)
 
     init {
@@ -142,7 +148,10 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
             gravity = Gravity.CENTER_VERTICAL
             setBackgroundColor(CYLAppTintColor)
             addView(back, LayoutParams((44 * d).toInt(), (44 * d).toInt()))
-            addView(titleLabel, LayoutParams(0, LayoutParams.MATCH_PARENT, 1f))
+            addView(FrameLayout(context).apply {
+                addView(titleLabel, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+                addView(titleSlot, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+            }, LayoutParams(0, LayoutParams.MATCH_PARENT, 1f))
             addView(trailingSlot, LayoutParams((88 * d).toInt(), LayoutParams.MATCH_PARENT))
         }
         addView(bar, LayoutParams(LayoutParams.MATCH_PARENT, (48 * d).toInt()))
@@ -190,6 +199,14 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
             (it as? CYLMenuScreenLifecycle)?.screenDidAppear(this)
         }
         titleLabel.text = top?.title
+        titleSlot.removeAllViews()
+        val titleView = top?.titleView
+        titleView?.let {
+            (it.parent as? android.view.ViewGroup)?.removeView(it)
+            titleSlot.addView(it, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        }
+        titleLabel.visibility = if (titleView == null) View.VISIBLE else View.INVISIBLE
+        trailingSlot.layoutParams = trailingSlot.layoutParams?.apply { width = if (titleView == null) (88 * d).toInt() else (12 * d).toInt() }
         back.visibility = if (stack.size > 1) View.VISIBLE else View.INVISIBLE
         onDepthChanged?.invoke()
     }
