@@ -1,0 +1,46 @@
+/* CollectionViewClassifyMenu 字符串。键是稳定的标识，各语言需保持一致。 */
+
+/* 展开分组中被折叠的行。 */
+"CYLMenuExpand" = "更多";
+/* 再次折叠分组。 */
+"CYLMenuCollapse" = "收起";
+/* 单选分类菜单页面的标题。 */
+"CYLMenuTitle" = "分类";
+/* 确认多选筛选的结果。 */
+"CYLFilterConfirm" = "确认筛选";
+/* 恢复多选筛选的默认选择。 */
+"CYLFilterReset" = "返回默认";
+/* 新建一个标签的操作项。 */
+"CYLMenuNewTag" = "新建标签";
+/* 新建指定名称的标签，%@ 为名称。 */
+"CYLMenuNewTagNamed" = "新建标签：%@";
+/* 折叠控件的无障碍提示：展开后显示全部标签。 */
+"CYLMenuExpandHint" = "显示全部标签";
+
+/* The More button of a section header (three dots), read by VoiceOver after the section title. */
+"CYLMenuMoreActions" = "更多操作";
+"CYLMenuDeleteTag" = "删除";
+
+/* Accessibility custom actions and labels: tag reordering, long press, tags on a picture. */
+/* Does what a long press does on a tag or a tag group (an accessibility custom action). */
+"CYLMenuLongPress" = "长按";
+/* Moves a tag one place earlier (an accessibility custom action while reordering is on). */
+"CYLMenuMoveTagEarlier" = "前移";
+/* Moves a tag one place later. */
+"CYLMenuMoveTagLater" = "后移";
+/* Announced after a move; %ld is the new position, counted from 1. */
+"CYLMenuTagMoved" = "已移到第 %ld 个";
+/* The dot of a tag group on a picture; %@ is the list of its tags. */
+"CYLImageTagGroup" = "标签组：%@";
+/* A picture with tags, when its image has no accessibilityLabel. */
+"CYLImageTagPicture" = "图片";
+/* Hint of a tag on a picture in edit mode. */
+"CYLImageTagTurnHint" = "轻点两下改变方向";
+/* Moves a tag group up (an accessibility custom action in edit mode). */
+"CYLImageTagMoveUp" = "上移";
+/* Moves a tag group down. */
+"CYLImageTagMoveDown" = "下移";
+/* Moves a tag group left. */
+"CYLImageTagMoveLeft" = "左移";
+/* Moves a tag group right. */
+"CYLImageTagMoveRight" = "右移";
