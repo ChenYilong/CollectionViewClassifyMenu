@@ -45,6 +45,12 @@
             <enum name="italic" value="2" />
             <enum name="bold_italic" value="3" />
         </attr>
+        <!-- Selection and sizes (AndroidTagView issues #6, #12, #29, #73, #75, #114, #123). -->
+        <attr name="tag_selected_background_color" format="color" />
+        <attr name="tag_selected_text_color" format="color" />
+        <attr name="tag_min_width" format="dimension" />
+        <attr name="tag_select_on_click" format="boolean" />
+        <attr name="container_single_selection" format="boolean" />
         <attr name="tag_text_direction" format="enum" >
             <enum name="ltr" value="3" />
             <enum name="rtl" value="4" />

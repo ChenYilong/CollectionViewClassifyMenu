@@ -131,7 +131,37 @@ open class TagContainerLayout @JvmOverloads constructor(
     private var mTagBackgroundColor = Color.parseColor("#33F44336")
 
     /** Selected TagView background color(default #33FF7669) */
-    private val mSelectedTagBackgroundColor = Color.parseColor("#33FF7669")
+    private var mSelectedTagBackgroundColor = Color.parseColor("#33FF7669")
+
+    /**
+     * The text color of selected tags (issues #29 / #114, `tag_selected_text_color`); null keeps the text color.
+     */
+    private var mSelectedTagTextColor: Int? = null
+
+    /**
+     * Whether the selected background was set (XML or code): it then wins over the theme's (issues #29 / #114).
+     */
+    private var mSelectedColorSet = false
+
+    /**
+     * The minimum width of the tags, in pixels (issues #73 / #75, `tag_min_width`).
+     */
+    private var mTagMinWidth = 0
+
+    /**
+     * A tap selects or deselects a tag (issues #12 / #22 / #123, `tag_select_on_click`; needs `tag_selectable`).
+     */
+    private var mSelectTagOnClick = false
+
+    /**
+     * Selecting a tag deselects the others (issue #6, `container_single_selection`).
+     */
+    private var mSingleSelection = false
+
+    /**
+     * The colors of the next tag added with addTag(text, position, colors) (issue #76).
+     */
+    private var mNextTagColors: IntArray? = null
 
     /** TagView text color(default #FF666666) */
     private var mTagTextColor = Color.parseColor("#FF666666")
@@ -239,6 +269,16 @@ open class TagContainerLayout @JvmOverloads constructor(
         mTagTextSize = attributes.getDimension(R.styleable.AndroidTagView_tag_text_size, sp2px(context, mTagTextSize))
         mTagBorderColor = attributes.getColor(R.styleable.AndroidTagView_tag_border_color, mTagBorderColor)
         mTagBackgroundColor = attributes.getColor(R.styleable.AndroidTagView_tag_background_color, mTagBackgroundColor)
+        mSelectedColorSet = attributes.hasValue(R.styleable.AndroidTagView_tag_selected_background_color)
+        mSelectedTagBackgroundColor = attributes.getColor(R.styleable.AndroidTagView_tag_selected_background_color, mSelectedTagBackgroundColor)
+        if (attributes.hasValue(R.styleable.AndroidTagView_tag_selected_text_color)) mSelectedTagTextColor = attributes.getColor(R.styleable.AndroidTagView_tag_selected_text_color, 0)
+        mTagMinWidth = attributes.getDimensionPixelSize(R.styleable.AndroidTagView_tag_min_width, mTagMinWidth)
+        mSelectTagOnClick = attributes.getBoolean(R.styleable.AndroidTagView_tag_select_on_click, mSelectTagOnClick)
+        mSingleSelection = attributes.getBoolean(R.styleable.AndroidTagView_container_single_selection, mSingleSelection)
+        // Issue #57: colors set in XML without a tag_theme are used (the default theme, pure cyan, replaced them).
+        val explicitColors = listOf(R.styleable.AndroidTagView_tag_background_color, R.styleable.AndroidTagView_tag_border_color,
+            R.styleable.AndroidTagView_tag_text_color).any { attributes.hasValue(it) }
+        if (explicitColors && !attributes.hasValue(R.styleable.AndroidTagView_tag_theme)) mTheme = ColorFactory.NONE
         mTagTextColor = attributes.getColor(R.styleable.AndroidTagView_tag_text_color, mTagTextColor)
         mTagTextDirection = attributes.getInt(R.styleable.AndroidTagView_tag_text_direction, mTagTextDirection)
         mTagTextFontFamily = attributes.getString(R.styleable.AndroidTagView_tag_text_font_family)
@@ -543,7 +583,12 @@ open class TagContainerLayout @JvmOverloads constructor(
 
     private fun initTagView(tagView: TagView, position: Int) {
         val colorList = mColorArrayList
-        val colors: IntArray = if (colorList != null && colorList.isNotEmpty()) {
+        val nextColors = mNextTagColors
+        mNextTagColors = null
+        tagView.setTag(R.id.androidtagview_own_colors, nextColors != null)
+        val colors: IntArray = if (nextColors != null) {
+            nextColors
+        } else if (colorList != null && colorList.isNotEmpty()) {
             if (colorList.size == mTags?.size && colorList[position].size >= 4) {
                 colorList[position]
             } else {
@@ -556,7 +601,10 @@ open class TagContainerLayout @JvmOverloads constructor(
         tagView.setTagBackgroundColor(colors[0])
         tagView.setTagBorderColor(colors[1])
         tagView.setTagTextColor(colors[2])
-        tagView.setTagSelectedBackgroundColor(colors[3])
+        tagView.setTagSelectedBackgroundColor(if (mSelectedColorSet && nextColors == null) mSelectedTagBackgroundColor else colors[3])
+        tagView.setTagSelectedTextColor(mSelectedTagTextColor)
+        tagView.setTagMinWidth(mTagMinWidth)
+        tagView.selectOnClick = mSelectTagOnClick
         tagView.setTagMaxLength(mTagMaxLength)
         tagView.textDirection = mTagTextDirection
         // PR #110: the font family and text style, when set, replace the typeface.
@@ -754,6 +802,20 @@ open class TagContainerLayout @JvmOverloads constructor(
         postInvalidate()
     }
 
+    /**
+     * Adds a tag with its own colors (issue #76): background, border, text, selected background.
+     */
+    fun addTag(text: String, colors: IntArray) = addTag(text, mChildViews.size, colors)
+
+    /**
+     * Inserts a tag with its own colors at `position` (issue #76).
+     */
+    fun addTag(text: String, position: Int, colors: IntArray) {
+        require(colors.size >= 4) { "colors: background, border, text, selected background" }
+        mNextTagColors = colors
+        addTag(text, position)
+    }
+
     /** Remove a TagView in specified position. */
     fun removeTag(position: Int) {
         onRemoveTag(position)
@@ -786,14 +848,81 @@ open class TagContainerLayout @JvmOverloads constructor(
             if (tagView.getIsViewSelected()) {
                 tagView.deselectView()
             } else {
-                tagView.selectView()
+                selectTagView(position)
             }
         }
     }
 
-    /** Select a tag */
+    /** Select a tag (single selection: the others are deselected, issue #6) */
     fun selectTagView(position: Int) {
-        if (isTagViewSelectable) (mChildViews[position] as TagView).selectView()
+        if (!isTagViewSelectable) return
+        if (mSingleSelection) {
+            for ((index, view) in mChildViews.withIndex()) if (index != position) (view as TagView).deselectView()
+        }
+        (mChildViews[position] as TagView).selectView()
+    }
+
+    /**
+     * Selecting a tag deselects the others (issue #6); `container_single_selection` in XML.
+     */
+    fun setSingleSelection(single: Boolean) {
+        mSingleSelection = single
+    }
+
+    fun isSingleSelection(): Boolean = mSingleSelection
+
+    /**
+     * A tap selects or deselects a tag (issues #12 / #22 / #123); needs `setIsTagViewClickable(true)` and
+     * `setIsTagViewSelectable(true)` (`tag_clickable`, `tag_selectable`).
+     */
+    fun setSelectTagViewOnClick(select: Boolean) {
+        mSelectTagOnClick = select
+        mChildViews.forEach { (it as TagView).selectOnClick = select }
+    }
+
+    /**
+     * The background color of selected tags (issues #29 / #114), for the tags shown and the next ones.
+     */
+    fun setSelectedTagBackgroundColor(color: Int) {
+        mSelectedTagBackgroundColor = color
+        mSelectedColorSet = true
+        applyColorsToTags()
+    }
+
+    fun getSelectedTagBackgroundColor(): Int = mSelectedTagBackgroundColor
+
+    /**
+     * The text color of selected tags (issues #29 / #114); null keeps the text color.
+     */
+    fun setSelectedTagTextColor(color: Int?) {
+        mSelectedTagTextColor = color
+        mChildViews.forEach { (it as TagView).setTagSelectedTextColor(color) }
+    }
+
+    /**
+     * The minimum width of the tags, in pixels (issues #73 / #75: same-size tags).
+     */
+    fun setTagMinWidth(width: Int) {
+        mTagMinWidth = width
+        mChildViews.forEach { (it as TagView).setTagMinWidth(width) }
+        requestLayout()
+    }
+
+    /**
+     * The theme and container colors applied to the tags already shown too (issue #77: they changed only new tags);
+     * tags with their own colors (setTags with colors, addTag with colors) keep them.
+     */
+    private fun applyColorsToTags() {
+        if (mColorArrayList?.isNotEmpty() == true) return
+        for (view in mChildViews) {
+            val tagView = view as TagView
+            if (tagView.getTag(R.id.androidtagview_own_colors) == true) continue
+            val colors = onUpdateColorFactory()
+            tagView.setTagBackgroundColor(colors[0])
+            tagView.setTagBorderColor(colors[1])
+            tagView.setTagTextColor(colors[2])
+            tagView.setTagSelectedBackgroundColor(if (mSelectedColorSet) mSelectedTagBackgroundColor else colors[3])
+        }
     }
 
     /** Deselect a tag */
@@ -943,6 +1072,7 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** Set TagView theme. */
     fun setTheme(theme: Int) {
         mTheme = theme
+        applyColorsToTags()
     }
 
     /** Get TagView theme. */
@@ -1012,6 +1142,7 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** Set TagView border color. */
     fun setTagBorderColor(color: Int) {
         mTagBorderColor = color
+        applyColorsToTags()
     }
 
     /** Get TagView background color. */
@@ -1020,6 +1151,7 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** Set TagView background color. */
     fun setTagBackgroundColor(color: Int) {
         mTagBackgroundColor = color
+        applyColorsToTags()
     }
 
     /** Get TagView text color. */
@@ -1071,6 +1203,7 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** Set TagView text color. */
     fun setTagTextColor(color: Int) {
         mTagTextColor = color
+        applyColorsToTags()
     }
 
     /** Get the ripple effect color's alpha. */

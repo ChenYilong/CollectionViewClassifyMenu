@@ -2,4 +2,6 @@
 <resources>
     <!-- The iOS accessibilityIdentifier of a core view, stored as a view tag under this key. -->
     <item name="cyl_accessibility_identifier" type="id" />
+    <!-- AndroidTagView: a tag added with its own colors keeps them when the theme changes (issue #77). -->
+    <item name="androidtagview_own_colors" type="id" />
 </resources>
