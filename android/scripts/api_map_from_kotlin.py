@@ -42,6 +42,11 @@ def declares_member(text, name):
     return re.search(rf"\b(?:var|val|fun)\s+(?:<[^>]+>\s+)?(?:[\w.]+\.)?{re.escape(name)}\b", text) is not None
 
 
+def declares_extension(sources, type_name, name):
+    pattern = re.compile(rf"\b(?:var|val|fun)\s+(?:<[^>]+>\s+)?{re.escape(type_name)}(?:\.Companion)?\.{re.escape(name)}\b")
+    return any(pattern.search(text) for text in sources.values())
+
+
 def declares_top_level(sources, name):
     pattern = re.compile(rf"^(?:const\s+val|val|var|fun|@JvmField\s+val)\s+(?:[\w.]+\.)?{re.escape(name)}\b|^\s*{re.escape(name)}\s*[(,]|^\s*{re.escape(name)}\s*$", re.M)
     return any(pattern.search(text) for text in sources.values())
@@ -70,7 +75,7 @@ def main() -> int:
             type_name, member = member_name(symbol)
             type_name = type_name.split(" (")[0]
             path = type_file(sources, type_name)
-            if path and declares_member(sources[path], member):
+            if path and (declares_member(sources[path], member) or declares_extension(sources, type_name, member)):
                 target = f"{type_name}.{member}"
             elif path:
                 missing.append(symbol)
