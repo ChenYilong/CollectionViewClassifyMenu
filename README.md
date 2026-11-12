@@ -441,6 +441,52 @@ values and handle taps.
 | 标签云：代码与字典初始化 / Tag cloud in code and from a dictionary | <img src="assets/test-tag-cloud-android-api.png" width="280" alt="标签云"> |
 | 可删除的标签 / A deletable tag | <img src="assets/test-tag-cloud-deletable.png" width="280" alt="可删除"> |
 
+### Android / Android 版（Kotlin）
+
+`android/` 是 Android 版：三个 Android 标签库各自转写为 Kotlin（`android-tagview`、`TagViewGroup`、
+`AndroidTagView`），再合并为一个库 `android/merged/library`（包名 `com.cyl.classifymenu`），保留三者的全部 API，
+并对齐 iOS 端的全部公开 API：709 / 709，满分（对照表见 [docs/android-api.md](docs/android-api.md)）。
+示例 `android/merged/example` 只有一个 App：CYLTabBarController 的 Android 版按提交（commit）集成
+（`android/merged/gradle.properties`），由配置文件创建 TabBar，一个示例一个 Tab，PlusButton 凸出 TabBar。
+
+`android/` is the Android version: the three Android tag libraries, each transcribed to Kotlin, merged into one library
+(`android/merged/library`, package `com.cyl.classifymenu`) that keeps all their APIs and matches every public API of the
+iOS library: 709 / 709 (table: [docs/android-api.md](docs/android-api.md)). The example app (`android/merged/example`)
+integrates CYLTabBarController for Android by commit (`android/merged/gradle.properties`), builds its tab bar from a
+configuration file, gives each example a tab, and raises the plus button above the bar.
+
+| Tab | 示例 / Example |
+| --- | --- |
+| TagView · Container · ViewGroup | 三个 Android 原库的示例 / the three original Android libraries' samples |
+| Classify · Filter | iOS 演示 App：单选分类菜单、多选筛选（从左侧滑入），查询共享的 SQLite 数据库 / the iOS demo app's classify menu and multiple-choice filter, querying the shared SQLite database |
+| Tags | TagCollectionView 示例 / the TagCollectionView demo |
+| Editor | `Example-Swift` 的标签编辑器与折叠样式 / the tag editor and fold styles of `Example-Swift` |
+| Menu | `Example/CYLMenuExample` 全部场景：评价筛选（内存 / 网络 / 数据库）、搜索分类、样式、动效（Lottie / PAG / Rive / GIF）、查询筛选（菜单联动、最近搜索与发现、标签云、配置初始化） / every scenario of `Example/CYLMenuExample` |
+| New（PlusButton） | TagViewGroup 的编辑页 / TagViewGroup's editor |
+
+```sh
+android/scripts/gradle.sh merged :library:testDebugUnitTest :example:assembleDebug
+```
+
+关键细节（自上而下：TabBar 与凸出的 PlusButton；评价筛选的网络模式；菜单联动生成的 SQL；搜索分类的职位页；Rive 与
+GIF 动效标签；最近搜索与发现；标签编辑器）/ Key details, top to bottom: the tab bar and its raised plus button, the
+review filter in network mode, the SQL of the menu linkage, the jobs page of the search categories, Rive and GIF tags,
+recent searches and discover, the tag editor:
+
+<img src="assets/android-key-screens.png" width="360" alt="Android 示例的关键细节 / Key details of the Android example">
+
+- 平台 / Platform: Android
+- 环境 / Environment: Android 15（API 35）模拟器 `CYL_API35_arm64`（sdk_gphone64_arm64，主机 GPU 渲染 / host GPU
+  rendering）；compileSdk / targetSdk 35，AGP 8.7.3，Kotlin 2.0.21，JDK 17；主机 macOS 27.3 / host macOS 27.3
+- 版本 / Version: [`b9b6a90`](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/b9b6a90)（各截图取自
+  `001e917` 至 `b9b6a90` 的提交，TabBar 取自 `b9b6a90` / the crops come from commits `001e917` to `b9b6a90`, the tab
+  bar from `b9b6a90`）；CYLTabBarController for Android
+  [`4639a0c`](https://github.com/ChenYilong/CYLTabBarController/commit/4639a0c)
+- 时间 / Taken: 2026-11-12 至 2026-11-13（NZDT，UTC+13）
+
+每个屏幕的完整截图与移植记录 / Every screen, full size, and the porting log: [docs/android.md](docs/android.md)；
+跨平台规则（共享数据库、与 iOS 一致的外观）/ cross-platform rules: [docs/cross-platform.md](docs/cross-platform.md)。
+
 ### Accessibility / 无障碍
 
 | 设置 | 支持 |
