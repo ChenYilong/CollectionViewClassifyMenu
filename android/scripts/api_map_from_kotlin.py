@@ -52,6 +52,18 @@ def declares_enum_entry(sources, name):
     return any(pattern.search(text) for text in sources.values())
 
 
+# iOS types of categories and the Android types their extension functions extend.
+CATEGORY_RECEIVERS = {"UIView": "View", "UIImage": "Bitmap", "NSArray": "List<*>", "NSDictionary": "Map<*, *>", "UIButton": "TextView"}
+
+
+def declares_category_extension(sources, type_name, name):
+    receiver = CATEGORY_RECEIVERS.get(type_name)
+    if not receiver:
+        return None
+    pattern = re.compile(rf"\bfun\s+{re.escape(receiver)}\.{re.escape(name)}\b")
+    return receiver if any(pattern.search(text) for text in sources.values()) else None
+
+
 def declares_top_level(sources, name):
     pattern = re.compile(rf"^(?:const\s+val|val|var|fun|@JvmField\s+val)\s+(?:[\w.]+\.)?{re.escape(name)}\b|^\s*{re.escape(name)}\s*[(,]|^\s*{re.escape(name)}\s*$", re.M)
     return any(pattern.search(text) for text in sources.values())
@@ -84,6 +96,8 @@ def main() -> int:
                 target = f"{type_name}.{member}"
             elif path:
                 missing.append(symbol)
+            elif " (" in symbol and declares_category_extension(sources, type_name, member):
+                target = f"{declares_category_extension(sources, type_name, member)}.{member}"
         elif kind in ("constant", "enum value", "function", "typedef", "macro", "enum"):
             if kind == "enum" and type_file(sources, symbol):
                 target = f"com.cyl.classifymenu.{symbol}"
@@ -93,7 +107,10 @@ def main() -> int:
                 target = symbol
         elif kind == "category":
             category = re.match(r"^(\w+) \((\w+)\)$", symbol)
-            if category and any(path.name == f"{category.group(1)}{category.group(2).removeprefix('CYL')}.kt" or
+            if category and category.group(1) in CATEGORY_RECEIVERS and any(
+                    re.search(rf"\bfun\s+{re.escape(CATEGORY_RECEIVERS[category.group(1)])}\.cyl_\w+", text) for text in sources.values()):
+                target = f"extension functions on {CATEGORY_RECEIVERS[category.group(1)]}"
+            elif category and any(path.name == f"{category.group(1)}{category.group(2).removeprefix('CYL')}.kt" or
                                 re.search(rf"\bfun\s+{category.group(1)}(?:\.Companion)?\.\w+", text)
                                 for path, text in sources.items()):
                 target = f"extension functions on {category.group(1)}"
