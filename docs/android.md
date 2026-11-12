@@ -83,7 +83,16 @@ Android chapter.
   `android/merged/api-map.json` (`--check` reports a stale table). First alignment: the picture tags
   (`CYLImageTagGroupView` and friends) map to the TagViewGroup API.
 - [x] Step 5: missing APIs: 678 / 678 aligned, full marks (score history below; 27 library unit tests)
-- [ ] Step 6: iOS examples ported, screenshots, README Android chapter
+- [ ] Step 6: iOS examples ported, screenshots, README Android chapter. Plan (2026-11-12):
+  1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
+     Menu (`Example/CYLMenuExample`: review filter, search categories, styles, animations, and its plus page, the
+     query scenarios), Tag editor (`Example-Swift/CYLTagEditorExample`), Classify demo (the demo app of
+     `CollectionViewClassifyMenu.xcodeproj`: `CYLClassifyMenuViewController`, `CYLMultipleFilterController`).
+  2. The plus button is raised (its top above the tab bar), per the raised plus button rule.
+  3. Translate each Swift screen to Kotlin using only the Android APIs of `docs/android-api.md`; example strings in
+     the example's own resources (its lookup helper), not in the library's.
+  4. Emulator screenshots per screen (cropped key details, stitched vertically), labeled with platform, Android and
+     emulator versions, SDK, commit and time, in `docs/android.md`; then the README Android chapter.
 
 ## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
