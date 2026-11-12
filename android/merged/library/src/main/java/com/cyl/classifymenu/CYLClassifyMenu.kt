@@ -251,6 +251,12 @@ open class CYLClassifyMenuViewController : Fragment() {
             content?.rebuild()
         }
 
+    /**
+     * The menu's title ("Categories", localized): `self.title` on iOS. A Fragment shares its activity's title with the
+     * other pages, so the host shows it where it fits (the demo's navigation bar).
+     */
+    val menuTitle: String get() = CYLMenuLocalizedString("CYLMenuTitle", "Menu title")
+
     private var scrollView: ScrollView? = null
     private var column: LinearLayout? = null
     private var content: MenuContent? = null
@@ -259,7 +265,6 @@ open class CYLClassifyMenuViewController : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
-        activity?.title = CYLMenuLocalizedString("CYLMenuTitle", "Menu title")
         val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
         val content = MenuContent(context)
         column.addView(content, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))

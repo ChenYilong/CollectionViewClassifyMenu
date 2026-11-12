@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Classify demo's strings (the iOS demo app's CYLClassifyMenuDemo.bundle). -->
+<resources>
+    <string name="classify_subtitle">超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品</string>
+    <string name="classify_title_two_rows">默认显示两行时的效果如下所示:</string>
+    <string name="classify_title_one_row">默认显示一行时的效果如下所示:</string>
+    <string name="classify_two_rows">两行</string>
+    <string name="classify_one_row">一行</string>
+    <string name="classify_show_two_rows">默认显示两行</string>
+    <string name="classify_reset_filters">重置筛选条件</string>
+    <string name="classify_reset_filters_hint">清除所有已选标签</string>
+    <string name="classify_filter">筛选</string>
+    <string name="classify_tab">分类</string>
+    <string name="classify_all">全部</string>
+    <string name="classify_separator">、</string>
+    <string name="classify_sqlite_count">SQLite 返回 %1$d 条（共 %2$d 家）</string>
+    <string name="classify_conditions">分类：%1$s · 地区：%2$s · 菜品：%3$s</string>
+    <string name="classify_no_places">没有符合条件的商家</string>
+    <string name="classify_linkage_hint">点按分类标签（单选），左上角按钮多选地区与菜品。每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果。</string>
+    <string name="filter_tab">筛选</string>
+    <string name="filter_title">多选筛选</string>
+    <string name="filter_hint">点左上角按钮从左侧打开筛选，多选地区与菜品后确认。每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果。</string>
+    <string name="classify_tag_hint">点按分类标签（单选，再点一次取消）。每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果。</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Classify demo's strings (the iOS demo app's CYLClassifyMenuDemo.bundle). -->
+<resources>
+    <string name="classify_subtitle">Beyond the default rows a \"More\" button appears; tap it to expand. By @iOS程序犭袁</string>
+    <string name="classify_title_two_rows">With two rows shown by default:</string>
+    <string name="classify_title_one_row">With one row shown by default:</string>
+    <string name="classify_two_rows">two rows</string>
+    <string name="classify_one_row">one row</string>
+    <string name="classify_show_two_rows">Show two rows by default</string>
+    <string name="classify_reset_filters">Reset filters</string>
+    <string name="classify_reset_filters_hint">Clears every selected tag</string>
+    <string name="classify_filter">Filter</string>
+    <string name="classify_tab">Classify</string>
+    <string name="classify_all">All</string>
+    <string name="classify_separator">, </string>
+    <string name="classify_sqlite_count">SQLite returned %1$d (of %2$d places)</string>
+    <string name="classify_conditions">Category: %1$s · Regions: %2$s · Dishes: %3$s</string>
+    <string name="classify_no_places">No matching places</string>
+    <string name="classify_linkage_hint">Tap a category tag (single choice); the top-left button picks regions and dishes. Each choice → SQL → SQLite query → results below.</string>
+    <string name="filter_tab">Filter</string>
+    <string name="filter_title">Multiple-choice filter</string>
+    <string name="filter_hint">The top-left button opens the filter: pick regions and dishes, then Apply. Each choice → SQL → SQLite query → results below.</string>
+    <string name="classify_tag_hint">Tap a category tag (single choice; tap it again to clear). Each choice → SQL → SQLite query → results below.</string>
+</resources>

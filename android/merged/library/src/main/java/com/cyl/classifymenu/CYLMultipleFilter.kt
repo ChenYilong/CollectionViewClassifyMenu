@@ -91,6 +91,44 @@ class CYLFilterParamsTool {
 }
 
 /**
+ * `-stretchableImageWithLeftCapWidth:topCapHeight:` with caps at half the image (`+[UIImage stretchableImageNamed:]`
+ * of the iOS cell): the corners are drawn at their size and only the middle column and row stretch.
+ */
+internal class CYLStretchableDrawable(private val bitmap: android.graphics.Bitmap) : android.graphics.drawable.Drawable() {
+    private val paint = android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG)
+
+    override fun draw(canvas: Canvas) {
+        val b = bounds
+        if (b.isEmpty) return
+        val w = bitmap.width
+        val h = bitmap.height
+        val capX = w / 2
+        val capY = h / 2
+        val scale = bitmap.density.takeIf { it > 0 }?.let { android.content.res.Resources.getSystem().displayMetrics.densityDpi.toFloat() / it } ?: 1f
+        val dx = minOf((capX * scale).toInt(), b.width() / 2)
+        val dy = minOf((capY * scale).toInt(), b.height() / 2)
+        val xs = intArrayOf(0, capX, capX + 1, w)
+        val ys = intArrayOf(0, capY, capY + 1, h)
+        val dxs = intArrayOf(b.left, b.left + dx, b.right - dx, b.right)
+        val dys = intArrayOf(b.top, b.top + dy, b.bottom - dy, b.bottom)
+        for (row in 0..2) for (col in 0..2) {
+            canvas.drawBitmap(bitmap, android.graphics.Rect(xs[col], ys[row], xs[col + 1], ys[row + 1]),
+                android.graphics.Rect(dxs[col], dys[row], dxs[col + 1], dys[row + 1]), paint)
+        }
+    }
+
+    override fun setAlpha(alpha: Int) { paint.alpha = alpha }
+    override fun setColorFilter(colorFilter: android.graphics.ColorFilter?) { paint.colorFilter = colorFilter }
+    @Deprecated("Deprecated in Java")
+    override fun getOpacity(): Int = android.graphics.PixelFormat.TRANSLUCENT
+
+    companion object {
+        fun named(name: String): android.graphics.drawable.Drawable? =
+            (CYLMenuImage(name) as? android.graphics.drawable.BitmapDrawable)?.bitmap?.let { CYLStretchableDrawable(it) }
+    }
+}
+
+/**
  * `CYLFilterCollectionCell`: an item of the multiple filter: a button with the slide backgrounds (green title, white
  * when selected), not touchable itself (the cell is).
  */
@@ -103,8 +141,8 @@ class CYLFilterCollectionCell @JvmOverloads constructor(context: Context, attrs:
         setTextSize(TypedValue.COMPLEX_UNIT_SP, font.size)
         gravity = Gravity.CENTER
         background = android.graphics.drawable.StateListDrawable().apply {
-            CYLMenuImage("btn_slide_selected")?.let { addState(intArrayOf(android.R.attr.state_selected), it) }
-            CYLMenuImage("btn_slide_normal")?.let { addState(intArrayOf(), it) }
+            CYLStretchableDrawable.named("btn_slide_selected")?.let { addState(intArrayOf(android.R.attr.state_selected), it) }
+            CYLStretchableDrawable.named("btn_slide_normal")?.let { addState(intArrayOf(), it) }
         }
         setTextColor(android.content.res.ColorStateList(arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf()),
             intArrayOf(Color.WHITE, Color.rgb(96, 147, 130))))
@@ -242,12 +280,16 @@ open class CYLFilterBaseController : Fragment() {
         val restore = Button(context).apply {
             text = CYLMenuLocalizedString("CYLFilterReset", "Reset filter")
             isAllCaps = false
+            setTextColor(Color.BLACK)
+            stateListAnimator = null
             setBackgroundColor(Color.WHITE)
             setOnClickListener { restoreButtonClicked(it) }
         }
         val ok = Button(context).apply {
             text = CYLMenuLocalizedString("CYLFilterConfirm", "Apply filter")
             isAllCaps = false
+            setTextColor(Color.BLACK)
+            stateListAnimator = null
             setBackgroundColor(Color.WHITE)
             setOnClickListener { confirmButtonClicked(it) }
         }

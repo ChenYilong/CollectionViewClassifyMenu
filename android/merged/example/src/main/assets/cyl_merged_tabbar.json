@@ -4,10 +4,14 @@
   "CYLTabBarControllerTabBarItemsAttributes": [
     { "CYLTabBarItemTitle": "TagView", "CYLTabBarItemImage": "system:tag", "CYLTabBarItemIdentifier": "kaede",
       "CYLTabBarItemPageIdentifier": "kaede" },
-    { "CYLTabBarItemTitle": "TagContainer", "CYLTabBarItemImage": "system:square.grid.2x2", "CYLTabBarItemIdentifier": "lujun",
+    { "CYLTabBarItemTitle": "Container", "CYLTabBarItemImage": "system:square.grid.2x2", "CYLTabBarItemIdentifier": "lujun",
       "CYLTabBarItemPageIdentifier": "lujun" },
-    { "CYLTabBarItemTitle": "TagViewGroup", "CYLTabBarItemImage": "system:photo", "CYLTabBarItemIdentifier": "licrafter",
+    { "CYLTabBarItemTitle": "ViewGroup", "CYLTabBarItemImage": "system:photo", "CYLTabBarItemIdentifier": "licrafter",
       "CYLTabBarItemPageIdentifier": "licrafter" },
+    { "CYLTabBarItemTitle": "Classify", "CYLTabBarItemImage": "system:list.bullet.rectangle", "CYLTabBarItemIdentifier": "classify",
+      "CYLTabBarItemPageIdentifier": "classify" },
+    { "CYLTabBarItemTitle": "Filter", "CYLTabBarItemImage": "system:line.3.horizontal.decrease.circle", "CYLTabBarItemIdentifier": "filter",
+      "CYLTabBarItemPageIdentifier": "filter" },
     { "CYLTabBarItemTitle": "About", "CYLTabBarItemImage": "system:info.circle", "CYLTabBarItemIdentifier": "about",
       "CYLTabBarItemPageIdentifier": "about" }
   ],
@@ -15,6 +19,7 @@
     "CYLTabBarItemTitle": "New",
     "CYLTabBarItemImage": "system:plus.circle.fill",
     "CYLTabBarItemIdentifier": "plus",
-    "CYLTabBarItemPageIdentifier": "plus"
+    "CYLTabBarItemPageIdentifier": "plus",
+    "CYLPlusButtonImageSize": "{52, 52}"
   }
 }
