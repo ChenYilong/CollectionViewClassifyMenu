@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tab icon of the TagCollectionView demo: stacked tags. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="?android:attr/textColorSecondary">
+    <path android:fillColor="@android:color/white" android:pathData="M4,5h9a3,3 0,0 1,0 6H4a3,3 0,0 1,0 -6zM9,13h11a3,3 0,0 1,0 6H9a3,3 0,0 1,0 -6z"/>
+</vector>
