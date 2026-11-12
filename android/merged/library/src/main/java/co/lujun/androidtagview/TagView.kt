@@ -159,7 +159,9 @@ open class TagView : View {
 
     private val mLongClickHandle = Runnable {
         if (!isMoved && !isUp) {
-            val state = (parent as TagContainerLayout).getTagViewState()
+            // Issues #25 / #38 / #53 / #83 / #87 / #92: the tag may have left its container (removed, recycled) before
+            // the long press fired; the unchecked cast of `parent` crashed with a NullPointerException.
+            val state = (parent as? TagContainerLayout)?.getTagViewState() ?: return@Runnable
             if (state == ViewDragHelper.STATE_IDLE) {
                 isExecLongClick = true
                 mOnTagClickListener?.onTagLongClick(tag as Int, getText())
@@ -185,6 +187,11 @@ open class TagView : View {
         mOriginText = text ?: ""
         mMoveSlop = dp2px(context, mMoveSlop.toFloat()).toInt()
         mSlopThreshold = dp2px(context, mSlopThreshold.toFloat()).toInt()
+        // Issues #23 / #32 / #39: 4–5 dp is below the system's touch slop, so the slight movement of a finger (more on
+        // some devices) turned taps into moves and they were lost; the thresholds are at least the system's slop.
+        val touchSlop = android.view.ViewConfiguration.get(context).scaledTouchSlop
+        mMoveSlop = maxOf(mMoveSlop, touchSlop)
+        mSlopThreshold = maxOf(mSlopThreshold, touchSlop)
     }
 
     private fun onDealText() {
@@ -292,8 +299,20 @@ open class TagView : View {
         return super.dispatchTouchEvent(event)
     }
 
+    override fun onDetachedFromWindow() {
+        // A pending long press never fires for a tag that left the window (issues #25, #53).
+        removeCallbacks(mLongClickHandle)
+        super.onDetachedFromWindow()
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val action = event.action
+        val action = event.actionMasked
+        if (action == MotionEvent.ACTION_CANCEL) {
+            // Issue #39: a parent (a list) took the gesture over: no click, and no long press later.
+            isUp = true
+            isMoved = true
+            removeCallbacks(mLongClickHandle)
+        }
         if (action == MotionEvent.ACTION_DOWN) {
             mRippleRadius = 0.0f
             mTouchX = event.x
@@ -328,6 +347,7 @@ open class TagView : View {
                 }
                 MotionEvent.ACTION_UP -> {
                     isUp = true
+                    removeCallbacks(mLongClickHandle)
                     if (!isExecLongClick && !isMoved) {
                         listener.onTagClick(tag as Int, getText())
                     }
@@ -385,7 +405,7 @@ open class TagView : View {
                 canvas.save()
                 mPath.reset()
 
-                canvas.clipPath(mPath)
+                // Issue #122: the clip used to be set to the empty path first, which hid the ripple entirely.
                 mPath.addRoundRect(mRectF, mBorderRadius, mBorderRadius, Path.Direction.CCW)
 
                 // bug: https://github.com/whilu/AndroidTagView/issues/88
