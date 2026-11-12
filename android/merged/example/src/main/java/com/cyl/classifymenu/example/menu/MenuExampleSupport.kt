@@ -115,6 +115,11 @@ interface CYLMenuScreen {
      * A view shown in the bar instead of the title (`navigationItem.titleView`), such as a search bar.
      */
     val titleView: View? get() = null
+
+    /**
+     * Whether the navigation bar is hidden while this screen is on top (`setNavigationBarHidden(_:animated:)`).
+     */
+    val hidesNavigationBar: Boolean get() = false
 }
 
 /**
@@ -141,10 +146,11 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
     private val trailingSlot = FrameLayout(context)
     private val titleSlot = FrameLayout(context)
     private val content = FrameLayout(context)
+    private val bar: LinearLayout
 
     init {
         orientation = VERTICAL
-        val bar = LinearLayout(context).apply {
+        bar = LinearLayout(context).apply {
             gravity = Gravity.CENTER_VERTICAL
             setBackgroundColor(CYLAppTintColor)
             addView(back, LayoutParams((44 * d).toInt(), (44 * d).toInt()))
@@ -211,6 +217,7 @@ class CYLMenuNavigator(context: Context) : LinearLayout(context) {
         trailingSlot.layoutParams = trailingSlot.layoutParams?.apply { width = if (titleView == null) (88 * d).toInt() else (12 * d).toInt() }
         trailingSlot.minimumWidth = if (titleView == null) (88 * d).toInt() else 0
         back.visibility = if (stack.size > 1) View.VISIBLE else View.INVISIBLE
+        bar.visibility = if (top?.hidesNavigationBar == true) View.GONE else View.VISIBLE
         // Last, so the bar items a screen sets (setTrailing) are not reset above.
         (top as? CYLMenuScreenLifecycle)?.screenDidAppear(this)
         onDepthChanged?.invoke()

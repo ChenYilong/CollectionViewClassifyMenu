@@ -119,8 +119,13 @@ Android chapter.
   filter in its three modes, the menu linkage, search discover, and the tables with their row counts) and the menu
   linkage are DONE: the classify menu (single choice) and the multiple-choice filter on one screen, both building
   the `places` SQL on the shared database, the choices saved in a `selections` table (an app-local
-  `cyl_selections.sqlite`, because the shared file is read-only) and restored when the screen opens again. TODO:
-  discover (plus page),
+  `cyl_selections.sqlite`, because the shared file is read-only) and restored when the screen opens again. Search
+  discover is DONE: no navigation bar; a search field with image search and Search; recent searches folded to two rows
+  (the chevron as the last tag, a clear button); discover two per row with ellipses, localized "hot" pictures and a More
+  button ("Refresh topics") that picks others at random (`search-discover.json` of the iOS bundle); hold-to-ask. Core
+  addition on the way: `CYLOriginalImageDrawable` / `Drawable.cyl_imageWithRenderingModeAlwaysOriginal()`, the
+  counterpart of `UIImageRenderingModeAlwaysOriginal`: tags tint their icons with `iconColor` (as iOS tints template
+  images), and a wrapped image keeps its colors (the "hot" picture was a black block). TODO:
   animations (Lottie / Rive / GIF from `CYLMenuExample.bundle`), the plus page (query scenarios, menu linkage, tag
   cloud, configuration). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
@@ -229,6 +234,8 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Menu tab, Animations (bottom): Rive (six files), icons.riv on dark tags (Search tapped), GIF, static images; speed 2x | <img src="assets/android-menu-animations-rive-gif.png" width="300" alt="Animations: Rive, GIF, images"> |
 | Menu tab, plus page: the query scenarios and the tables (reviews 10, places 83, selections) | <img src="assets/android-menu-query-scenarios.png" width="300" alt="Query scenarios"> |
 | Menu tab, menu linkage: 川菜 (classify) + 北京 (filter, modified icon) → SQL → 1 of 83 places; saved and restored | <img src="assets/android-menu-linkage.png" width="300" alt="Menu linkage"> |
+| Menu tab, search discover: recent searches (two rows, chevron last), discover two per row with the "HOT" picture | <img src="assets/android-menu-search-discover.png" width="300" alt="Search discover"> |
+| Menu tab, search discover after a search, the recent searches expanded and Refresh topics | <img src="assets/android-menu-search-discover-refreshed.png" width="300" alt="Search discover, refreshed"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots
