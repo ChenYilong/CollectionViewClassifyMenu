@@ -5,7 +5,20 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
 ## TODO (2026-11-12): one shared local database for every platform
 
-- **Status:** TODO.
+- **Status:** iOS demo app and Android DONE (this commit); `Example/CYLMenuExample`, React Native and Flutter TODO.
+- **The database:** `Example-Shared/Database/cyl_places.sqlite` (table `places`: id, name, category, tag, region,
+  rating, price; 83 rows), made from `data.json` by `scripts/generate-places-db.py`; `--check` fails when the
+  committed file no longer matches the data. Every platform opens this one file read-only and builds the same SQL
+  (`tag = ?`, `region IN (…)`, `tag IN (…)`, `ORDER BY rating DESC, id`):
+  - iOS demo app: bundled through a project reference (`SOURCE_ROOT/Example-Shared/Database`), read with SQLite3
+    (`CYLDemoPlaces` in `CYLFilterDemoViewController.swift`); the Filter tab shows the conditions, the SQL and the count.
+  - Android example: `Example-Shared/Database` is an asset folder (`example/build.gradle.kts`); `ClassifyPlacesDatabase`
+    copies the asset to the app's databases folder when it differs and opens it read-only.
+  - Next: `Example/CYLMenuExample`'s `CYLExampleDatabase` still fills its own `places` table at run time; read the
+    shared file instead (attach it). React Native and Flutter examples, when added, bundle the same file.
+- **Evidence:** both show `SELECT name, category, tag, region, rating, price FROM places ORDER BY rating DESC, id` →
+  83 of 83, first 日式拉面 · 北京 ★5.0 ¥93 (`assets/ios-demo-filter-tab.png`, `assets/android-filter-results.png`);
+  `scripts/unit-tests.sh menu` 30 tests, 0 failures (the Filter test reads the bundled file).
 - **Context:** the Android Classify / Filter tabs query a SQLite `places` table made on the device; the iOS demo app
   filters the same places in memory, and `Example/CYLMenuExample` builds its own SQLite database at run time.
 - **Requirements:**

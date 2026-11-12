@@ -5,6 +5,8 @@ plugins {
 }
 
 android {
+    // The shared example database of every platform (Example-Shared/Database/cyl_places.sqlite, docs/cross-platform.md).
+    sourceSets["main"].assets.srcDir("../../../Example-Shared/Database")
     namespace = "com.cyl.classifymenu.example"
     compileSdk = 35
     defaultConfig {

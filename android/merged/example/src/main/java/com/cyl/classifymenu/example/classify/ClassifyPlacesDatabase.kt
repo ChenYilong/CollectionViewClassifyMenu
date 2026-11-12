@@ -2,9 +2,6 @@ package com.cyl.classifymenu.example.classify
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import com.cyl.classifymenu.kDataSourceCellTextKey
-import com.cyl.classifymenu.kDataSourceSectionKey
 
 /**
  * A query and its arguments (`CYLExampleSQLQuery`).
@@ -25,56 +22,34 @@ data class ClassifySQLQuery(val sql: String, val arguments: List<String>) {
 }
 
 /**
- * The local SQLite database of the Classify demo: the `places` table of the iOS example's `CYLExampleDatabase`, made
- * the same way from the demo data (every tag in some of the filter's regions, same names, ratings and prices), and
- * the saved selections.
+ * The local SQLite database of the Classify demo: the shared example database of every platform,
+ * `Example-Shared/Database/cyl_places.sqlite` (bundled as an asset, made by `scripts/generate-places-db.py` from the
+ * demo data), copied once to the app's databases folder and opened read-only. The iOS demo app reads the same file.
  */
-class ClassifyPlacesDatabase(context: Context) : SQLiteOpenHelper(context.applicationContext, "classify_places.sqlite", null, 1) {
-    private val appContext = context.applicationContext
+class ClassifyPlacesDatabase(context: Context) {
+    private val database: SQLiteDatabase
 
-    override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL("CREATE TABLE places (id INTEGER PRIMARY KEY, name TEXT NOT NULL, category TEXT NOT NULL, tag TEXT NOT NULL, region TEXT NOT NULL, rating REAL NOT NULL, price INTEGER NOT NULL)")
-        db.execSQL("CREATE INDEX places_tag ON places(tag)")
-        db.execSQL("CREATE INDEX places_region ON places(region)")
-        db.execSQL("CREATE TABLE selections (scenario TEXT NOT NULL, section INTEGER NOT NULL, item INTEGER NOT NULL)")
-        db.beginTransaction()
-        try {
-            val regions = ClassifyDemoDataSource.regions()
-            var placeID = 0
-            var tagIndex = 0
-            for (category in ClassifyDemoDatabase.dataSource(appContext)) {
-                val type = category[ClassifyDemoDataSource.SECTION_TITLE_KEY] as? String ?: ""
-                @Suppress("UNCHECKED_CAST")
-                val items = category[kDataSourceSectionKey] as? List<Map<String, Any?>> ?: emptyList()
-                for (item in items) {
-                    val tag = item[kDataSourceCellTextKey] as? String ?: ""
-                    regions.forEachIndexed { region, regionName ->
-                        if ((tagIndex + region) % 3 == 2) return@forEachIndexed
-                        val rating = 3.5 + ((tagIndex * 7 + region * 3) % 16) / 10.0
-                        val price = 30 + ((tagIndex * 37 + region * 53) % 270)
-                        val name = "${ClassifyDemoDataSource.shortTitle(tag)} · ${ClassifyDemoDataSource.shortTitle(regionName)}"
-                        db.execSQL("INSERT INTO places VALUES (?, ?, ?, ?, ?, ?, ?)", arrayOf<Any>(placeID, name, type, tag, regionName, rating, price))
-                        placeID++
-                    }
-                    tagIndex++
-                }
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
+    init {
+        val appContext = context.applicationContext
+        val file = appContext.getDatabasePath(FILE_NAME)
+        // The bundled file wins: it is copied again whenever it differs (a new app version with new data).
+        val bundled = appContext.assets.open(FILE_NAME).use { it.readBytes() }
+        if (!file.exists() || !file.readBytes().contentEquals(bundled)) {
+            file.parentFile?.mkdirs()
+            file.writeBytes(bundled)
         }
+        database = SQLiteDatabase.openDatabase(file.path, null, SQLiteDatabase.OPEN_READONLY)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS places")
-        db.execSQL("DROP TABLE IF EXISTS selections")
-        onCreate(db)
-    }
+    /**
+     * Closes the database.
+     */
+    fun close() = database.close()
 
     /**
      * The rows of `query`: name, category, tag, region, rating, price.
      */
-    fun rows(query: ClassifySQLQuery): List<Map<String, Any>> = readableDatabase.rawQuery(query.sql, query.arguments.toTypedArray()).use { cursor ->
+    fun rows(query: ClassifySQLQuery): List<Map<String, Any>> = database.rawQuery(query.sql, query.arguments.toTypedArray()).use { cursor ->
         val rows = ArrayList<Map<String, Any>>()
         while (cursor.moveToNext()) {
             rows.add(mapOf(
@@ -88,9 +63,14 @@ class ClassifyPlacesDatabase(context: Context) : SQLiteOpenHelper(context.applic
     /**
      * The number of rows of `table`.
      */
-    fun countOfTable(table: String): Int = readableDatabase.rawQuery("SELECT COUNT(*) FROM $table", null).use { if (it.moveToFirst()) it.getInt(0) else 0 }
+    fun countOfTable(table: String): Int = database.rawQuery("SELECT COUNT(*) FROM $table", null).use { if (it.moveToFirst()) it.getInt(0) else 0 }
 
     companion object {
+        /**
+         * The shared database file (an asset).
+         */
+        const val FILE_NAME = "cyl_places.sqlite"
+
         /**
          * `+queryForTag:regions:dishes:` of the iOS menu linkage: tag = ?, region IN (…), tag IN (…), by rating.
          */

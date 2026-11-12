@@ -71,7 +71,10 @@ final class CYLClassifyMenuDemoTests: XCTestCase {
         XCTAssertFalse(filter.results.isEmpty)
         XCTAssertTrue(filter.results.allSatisfy { $0.region == region })
         XCTAssertEqual(filter.results, CYLDemoPlaces.places(regions: [region], dishes: []))
-        XCTAssertEqual(CYLDemoPlaces.all.count, 83, "the same places as the example's database and the Android demo")
+        XCTAssertEqual(CYLDemoPlaces.all.count, 83, "the shared database: the same places as the Android example")
+        XCTAssertEqual(CYLDemoPlaces.all.first?.name, "日式拉面 · 北京", "the shared database's first place by rating")
+        XCTAssertEqual(filter.lastQuery.displayString(),
+                       "SELECT name, category, tag, region, rating, price FROM places WHERE region IN ('\(region)') ORDER BY rating DESC, id")
         UserDefaults.standard.removeObject(forKey: CYLFilterDemoViewController.filterSelectionKey)
     }
 

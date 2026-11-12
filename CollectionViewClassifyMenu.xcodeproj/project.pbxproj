@@ -20,6 +20,7 @@
 		3D88C0F4439B89A1CB787F7D /* CYLCollectionViewClassifyMenuLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F7CAAE3D0E8B5E789ACED925 /* CYLCollectionViewClassifyMenuLayoutTests.m */; };
 		84444FF4E1162FCBB49DAA17 /* libPods-CollectionViewClassifyMenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8255833E02347CE0E51C652D /* libPods-CollectionViewClassifyMenu.a */; };
 		9A09E3081BC7AFF00060C116 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2E61BC7AFF00060C116 /* data.json */; };
+		C7A59B93DE8368F77086D15B /* cyl_places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = C774DFC249ECAFF98B816588 /* cyl_places.sqlite */; };
 		9A0DE1100000000000000002 /* CYLClassifyMenuDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9A0DE1100000000000000001 /* CYLClassifyMenuDemo.bundle */; };
 		9A09E30B1BC7AFF00060C116 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A09E2EE1BC7AFF00060C116 /* LaunchScreen.xib */; };
 		C2C32AF2E7649DACD6F80B82 /* libPods-CollectionViewClassifyMenuTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B215DA974F97C8F30036021D /* libPods-CollectionViewClassifyMenuTests.a */; };
@@ -84,6 +85,7 @@
 		9A09E2E91BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLCollectionViewLeftAlignedLayout.h; sourceTree = "<group>"; };
 		9A09E2EA1BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLCollectionViewLeftAlignedLayout.m; sourceTree = "<group>"; };
 		9A09E2EF1BC7AFF00060C116 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		C774DFC249ECAFF98B816588 /* cyl_places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = cyl_places.sqlite; path = "Example-Shared/Database/cyl_places.sqlite"; sourceTree = SOURCE_ROOT; };
 		9A0DE1100000000000000001 /* CYLClassifyMenuDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CYLClassifyMenuDemo.bundle; sourceTree = "<group>"; };
 		9A09E2F01BC7AFF00060C116 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9A09E2F11BC7AFF00060C116 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 				9A0DE1200000000000000009 /* CYLDemoLocalization.swift */,
 				9A0DE1200000000000000007 /* CYLAppDelegate.swift */,
 				9A0DE1100000000000000001 /* CYLClassifyMenuDemo.bundle */,
+				C774DFC249ECAFF98B816588 /* cyl_places.sqlite */,
 				9A09E2F11BC7AFF00060C116 /* Info.plist */,
 			);
 			path = Symtem;
@@ -477,6 +480,7 @@
 			files = (
 				9A09E30B1BC7AFF00060C116 /* LaunchScreen.xib in Resources */,
 				9A0DE1100000000000000002 /* CYLClassifyMenuDemo.bundle in Resources */,
+				C7A59B93DE8368F77086D15B /* cyl_places.sqlite in Resources */,
 				9A09E3081BC7AFF00060C116 /* data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
