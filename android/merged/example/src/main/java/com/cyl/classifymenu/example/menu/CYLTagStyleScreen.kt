@@ -103,9 +103,22 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
     fun titleForAction(identifier: String) = CYLExampleLocalizedString(context, actionTitles[identifier] ?: identifier)
 
     /**
-     * The screens these actions open are ported with the menu example's plus page; until then they are disabled.
+     * Every action is available (the screens they open are ported).
      */
-    private fun isAvailable(identifier: String) = identifier !in setOf("configuration", "tagCloud", "sample.tagCloud", "sample.imageTag", "sample.tagContainer")
+    private fun isAvailable(@Suppress("UNUSED_PARAMETER") identifier: String) = true
+
+    /**
+     * The Android tag libraries' samples are Swift copies on iOS; here they are the original libraries, each a tab of
+     * the app (TagView: android-tagview, Container: AndroidTagView, ViewGroup: TagViewGroup). The tab is selected.
+     */
+    private fun selectAppTab(pageIdentifier: String) {
+        val controller = (context as? com.cyl.classifymenu.example.MainActivity)?.tabBarController ?: return
+        val index = listOf("kaede", "lujun", "licrafter").indexOf(pageIdentifier)
+        if (index < 0) return
+        // Back to the Menu home first: it shows the app's tab bar again (hidden while a screen is pushed).
+        while (navigator.pop()) Unit
+        controller.selectedIndex = index
+    }
 
     fun color(step: Int) = palette[step % palette.size]
 
@@ -174,6 +187,11 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
                 tagListView.post { tagListView.selectedIndexPaths.forEach { tagListView.tagButtonAtIndexPath(it)?.playAnimation() } }
             }
             "animationSpeed" -> style.animationSpeed = listOf(0.5f, 2f, 1f)[step % 3]
+            "configuration" -> { navigator.push(CYLTagConfigurationScreen(context)); return }
+            "tagCloud" -> { navigator.push(CYLTagCloudScreen(context)); return }
+            "sample.tagCloud" -> { selectAppTab("kaede"); return }
+            "sample.imageTag" -> { selectAppTab("licrafter"); return }
+            "sample.tagContainer" -> { selectAppTab("lujun"); return }
             "reset" -> {
                 this.style = demoStyle()
                 content = CYLTagStyleDemoContent.ICON_AND_TITLE

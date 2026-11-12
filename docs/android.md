@@ -86,7 +86,7 @@ Android chapter.
 - [ ] Step 6: iOS examples ported, screenshots, README Android chapter. Progress: the demo app (Classify, Filter tabs)
   the TagCollectionView demo (Tags tab) and the Tag editor (`Example-Swift`, Editor tab: Edit tags with the editor
   sheet, Fold styles with the configuration files) are ported; the tab bar scrolls (one tab per example). Menu example
-  (`Example/CYLMenuExample`, Menu tab, in progress): the tab holds a home list with one row per part of the iOS
+  (`Example/CYLMenuExample`, Menu tab, DONE): the tab holds a home list with one row per part of the iOS
   example's tab bar. Scenario 1 (review filter) is DONE: the product screen (keywords, two rows) and the review list
   (several filters, "全部" exclusive, chevron fold, In memory / Network / Database modes, the request URL and the SQL
   shown), reading the reviews from the shared database. Scenario 2 (search categories) is DONE: the search home, and
@@ -100,7 +100,7 @@ Android chapter.
   CYLTabBarController's engine (lottie-android, libpag and rive-android added to the example; GIF needs none):
   Lottie, GIF and PAG play. Core fix on the way: `CYLTagButton` took an asset URL (`file:///android_asset/…`) for a
   missing file and never animated it. The rows that open other screens (configuration, tag cloud, the three Android
-  samples) wait for the plus page. Rive (was TODO, DONE with Animations below). Note: PAG needs GPU rendering on the
+  samples) waited for the plus page (DONE below). Rive (was TODO, DONE with Animations below). Note: PAG needs GPU rendering on the
   emulator (`-gpu host`); with `swiftshader_indirect` its icons stay empty and frames take seconds. Animations is DONE:
   the configuration-dictionary tag list of the iOS screen (Lottie plain / with image assets / green, PAG, Rive,
   icons.riv on dark tags, GIF, static images), "Play all", the speed button (1x, 2x, 0.5x) and the tapped tag in the
@@ -115,7 +115,7 @@ Android chapter.
   `CYLRiveInputsTest`), and the Android pin moved to that commit. TODO: the iOS Podfile pins (root `Podfile` at
   `53766de`; `Example/` and `Example-Swift/` at `0e69250`, see issue-progress.md) are not moved to `4639a0c` in this
   Android-only task. The plus page (the iOS example's plus button page, a fifth row "Filters" in the Menu home, since
-  the merged app's plus button belongs to the TagViewGroup editor) is in progress: the query scenarios list (the review
+  the merged app's plus button belongs to the TagViewGroup editor) is DONE: the query scenarios list (the review
   filter in its three modes, the menu linkage, search discover, and the tables with their row counts) and the menu
   linkage are DONE: the classify menu (single choice) and the multiple-choice filter on one screen, both building
   the `places` SQL on the shared database, the choices saved in a `selections` table (an app-local
@@ -125,9 +125,14 @@ Android chapter.
   button ("Refresh topics") that picks others at random (`search-discover.json` of the iOS bundle); hold-to-ask. Core
   addition on the way: `CYLOriginalImageDrawable` / `Drawable.cyl_imageWithRenderingModeAlwaysOriginal()`, the
   counterpart of `UIImageRenderingModeAlwaysOriginal`: tags tint their icons with `iconColor` (as iOS tints template
-  images), and a wrapped image keeps its colors (the "hot" picture was a black block). TODO:
-  animations (Lottie / Rive / GIF from `CYLMenuExample.bundle`), the plus page (query scenarios, menu linkage, tag
-  cloud, configuration). Plan (2026-11-12):
+  images), and a wrapped image keeps its colors (the "hot" picture was a black block). Tag cloud and configuration
+  are DONE (the last rows of Styles): the tag cloud in code (`addTagsWithTitles`, `addTag`, `addTags`, click and
+  delete handlers) and from `CYLTagListViewTags`; the configuration file (`animated-tags.json`) and dictionary tag
+  lists. The three Android library samples (Swift copies on iOS) select the original libraries' tabs (TagView,
+  ViewGroup, Container). Core fixes on the way: paths relative to a configuration file ("../Animations/…") resolve
+  their ".." (the assets cannot), and "system:<name>" images other than the core's three are the app's drawables
+  `cyl_system_<name>` (Android has no SF Symbols; the example provides the ones it uses). The Menu example is DONE.
+  Remaining for step 6: the README Android chapter. Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
      Menu (`Example/CYLMenuExample`: review filter, search categories, styles, animations, and its plus page, the
      query scenarios), Tag editor (`Example-Swift/CYLTagEditorExample`), Classify demo (the demo app of
@@ -236,6 +241,8 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Menu tab, menu linkage: 川菜 (classify) + 北京 (filter, modified icon) → SQL → 1 of 83 places; saved and restored | <img src="assets/android-menu-linkage.png" width="300" alt="Menu linkage"> |
 | Menu tab, search discover: recent searches (two rows, chevron last), discover two per row with the "HOT" picture | <img src="assets/android-menu-search-discover.png" width="300" alt="Search discover"> |
 | Menu tab, search discover after a search, the recent searches expanded and Refresh topics | <img src="assets/android-menu-search-discover-refreshed.png" width="300" alt="Search discover, refreshed"> |
+| Menu tab, tag cloud: in code (continents, detailed tag, styled tags) and from CYLTagListViewTags; "Asia" tapped | <img src="assets/android-menu-tag-cloud.png" width="300" alt="Tag cloud"> |
+| Menu tab, configuration: from animated-tags.json (Lottie, PAG, Rive, GIF, symbol, disabled) and from a dictionary | <img src="assets/android-menu-configuration.png" width="300" alt="Configuration"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots
