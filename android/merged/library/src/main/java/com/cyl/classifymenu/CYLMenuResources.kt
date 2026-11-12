@@ -21,13 +21,19 @@ object CYLMenuResources {
     fun bundle(): String = BUNDLE
 
     /**
-     * `+imageNamed:`: a drawable of the bundle; the iOS bundle has no images, so null unless one is added under
-     * `CYLClassifyMenuResources/<name>.png`.
+     * `+imageNamed:`: a drawable of the bundle's images (`CYLClassifyMenuResources/<name>@3x.png`, `@2x` or 1x, copied
+     * from the iOS asset catalog), scaled like the iOS image (3x as xxhdpi, 2x as xhdpi, 1x as mdpi); null when missing.
      */
     @JvmStatic
     fun imageNamed(name: String): Drawable? {
-        val stream = javaClass.classLoader?.getResourceAsStream("$BUNDLE/$name.png") ?: return null
-        return stream.use { Drawable.createFromStream(it, name) }
+        val loader = javaClass.classLoader ?: return null
+        for ((suffix, density) in listOf("@3x" to android.util.DisplayMetrics.DENSITY_XXHIGH, "@2x" to android.util.DisplayMetrics.DENSITY_XHIGH, "" to android.util.DisplayMetrics.DENSITY_MEDIUM)) {
+            val stream = loader.getResourceAsStream("$BUNDLE/$name$suffix.png") ?: continue
+            val bitmap = stream.use { android.graphics.BitmapFactory.decodeStream(it) } ?: continue
+            bitmap.density = density
+            return android.graphics.drawable.BitmapDrawable(android.content.res.Resources.getSystem(), bitmap)
+        }
+        return null
     }
 
     /** `+availableLanguages`, sorted. */
