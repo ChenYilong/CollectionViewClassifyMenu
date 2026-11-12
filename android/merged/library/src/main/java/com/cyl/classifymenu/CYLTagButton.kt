@@ -227,7 +227,7 @@ open class CYLTagButton @JvmOverloads constructor(
         animationView?.alpha = if (state == CYLControlState.DISABLED) 0.4f else 1f
         imageView.imageTintList = null
         imageView.setColorFilter(style.iconColorForState(state))
-        if (icon is CYLBadgeDrawable) imageView.clearColorFilter()
+        if (icon is CYLBadgeDrawable || icon is CYLOriginalImageDrawable) imageView.clearColorFilter()
         titleLabel.text = style.displayedTitleForTitle(title)
         val font = style.titleFontForState(state)
         titleLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, font.size)

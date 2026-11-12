@@ -116,7 +116,7 @@ class CYLQueryScenariosScreen(private val context: Context, private val navigato
         CYLQueryScenario.REVIEWS_MEMORY -> CYLReviewListScreen(context, 0, CYLReviewFilteringMode.MEMORY)
         CYLQueryScenario.REVIEWS_NETWORK -> CYLReviewListScreen(context, 0, CYLReviewFilteringMode.NETWORK)
         CYLQueryScenario.MENU_LINKAGE -> CYLMenuLinkageScreen(context)
-        CYLQueryScenario.SEARCH_DISCOVER -> null
+        CYLQueryScenario.SEARCH_DISCOVER -> CYLSearchDiscoverScreen(context, navigator)
     }
 
     fun open(scenario: CYLQueryScenario) = screen(scenario)?.also { navigator.push(it) }

@@ -182,6 +182,19 @@ class CYLTag(
 class CYLBadgeDrawable(resources: Resources, bitmap: Bitmap, var accessibilityLabel: String?) : BitmapDrawable(resources, bitmap)
 
 /**
+ * `-[UIImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]` for tags: `drawable` drawn in its own colors.
+ * A tag tints its icon with `iconColor` (as iOS tints template images such as SF Symbols); an image wrapped in this
+ * class keeps its colors, as a non-template image does on iOS (a colored badge, a localized "hot" picture).
+ */
+class CYLOriginalImageDrawable(val image: Drawable) : android.graphics.drawable.InsetDrawable(image, 0)
+
+/**
+ * `imageWithRenderingMode(.alwaysOriginal)`: this drawable, drawn in its own colors by tags (see
+ * `CYLOriginalImageDrawable`).
+ */
+fun Drawable.cyl_imageWithRenderingModeAlwaysOriginal(): Drawable = this as? CYLOriginalImageDrawable ?: CYLOriginalImageDrawable(this)
+
+/**
  * `CYLTagDataSource`: a one-section `CYLMenuDataSource` of `CYLTag`s, with a section title and the list's base style;
  * each tag's style is computed once and cached until it or the base style changes (`invalidateStyles()`).
  */
