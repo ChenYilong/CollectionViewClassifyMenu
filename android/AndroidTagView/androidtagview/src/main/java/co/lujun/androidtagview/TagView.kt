@@ -74,6 +74,22 @@ open class TagView : View {
     /** TagView text color */
     private var mTextColor = 0
 
+    /**
+     * The text color of a selected tag (issues #29 / #114); null keeps `mTextColor`.
+     */
+    private var mSelectedTextColor: Int? = null
+
+    /**
+     * The tag's minimum width in pixels (issues #73 / #75: tags of the same size).
+     */
+    private var mMinWidth = 0
+
+    /**
+     * A tap selects or deselects the tag (issues #12 / #22 / #123), through the container when it has one so that
+     * single selection applies.
+     */
+    var selectOnClick = false
+
     /** Whether this view clickable */
     private var isViewClickable = false
 
@@ -218,7 +234,7 @@ open class TagView : View {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val height = mVerticalPadding * 2 + fontH.toInt()
-        val width = mHorizontalPadding * 2 + fontW.toInt() + (if (isEnableCross()) height else 0) + (if (isEnableImage()) height else 0)
+        val width = max(mMinWidth, mHorizontalPadding * 2 + fontW.toInt() + (if (isEnableCross()) height else 0) + (if (isEnableImage()) height else 0))
         mCrossAreaWidth = min(max(mCrossAreaWidth, height.toFloat()), width.toFloat())
         setMeasuredDimension(width, height)
     }
@@ -245,7 +261,7 @@ open class TagView : View {
 
         // draw text
         mPaint.style = Paint.Style.FILL
-        mPaint.color = mTextColor
+        mPaint.color = if (getIsViewSelected()) mSelectedTextColor ?: mTextColor else mTextColor
 
         if (mTextDirection == View.TEXT_DIRECTION_RTL) {
             if (mTagSupportLettersRTL) {
@@ -325,7 +341,7 @@ open class TagView : View {
                 listener.onTagCrossClick(tag as Int)
             }
             return true
-        } else if (isViewClickable && listener != null) {
+        } else if (isViewClickable && (listener != null || selectOnClick)) {
             val x = event.x.toInt()
             val y = event.y.toInt()
             when (action) {
@@ -341,7 +357,7 @@ open class TagView : View {
                     if (!isMoved && (abs(mLastX - x) > mMoveSlop || abs(mLastY - y) > mMoveSlop)) {
                         isMoved = true
                         if (isViewSelected) {
-                            listener.onSelectedTagDrag(tag as Int, getText())
+                            listener?.onSelectedTagDrag(tag as Int, getText())
                         }
                     }
                 }
@@ -349,7 +365,12 @@ open class TagView : View {
                     isUp = true
                     removeCallbacks(mLongClickHandle)
                     if (!isExecLongClick && !isMoved) {
-                        listener.onTagClick(tag as Int, getText())
+                        if (selectOnClick && isViewSelectable) {
+                            val container = parent as? TagContainerLayout
+                            if (container != null) container.toggleSelectTagView(tag as Int)
+                            else if (isViewSelected) deselectView() else selectView()
+                        }
+                        listener?.onTagClick(tag as Int, getText())
                     }
                 }
             }
@@ -462,18 +483,42 @@ open class TagView : View {
 
     fun setTagBackgroundColor(color: Int) {
         mBackgroundColor = color
+        // Issue #20: a change after the tag is shown (per tag, through getTagView) is drawn at once.
+        postInvalidate()
     }
 
     fun setTagSelectedBackgroundColor(color: Int) {
         mSelectedBackgroundColor = color
+        // Issue #20: a change after the tag is shown (per tag, through getTagView) is drawn at once.
+        postInvalidate()
     }
 
     fun setTagBorderColor(color: Int) {
         mBorderColor = color
+        // Issue #20: a change after the tag is shown (per tag, through getTagView) is drawn at once.
+        postInvalidate()
+    }
+
+    /**
+     * The text color of a selected tag (issues #29 / #114); null keeps the text color.
+     */
+    fun setTagSelectedTextColor(color: Int?) {
+        mSelectedTextColor = color
+        postInvalidate()
+    }
+
+    /**
+     * The minimum width of the tag, in pixels (issues #73 / #75).
+     */
+    fun setTagMinWidth(width: Int) {
+        mMinWidth = width
+        requestLayout()
     }
 
     fun setTagTextColor(color: Int) {
         mTextColor = color
+        // Issue #20: a change after the tag is shown (per tag, through getTagView) is drawn at once.
+        postInvalidate()
     }
 
     fun setBorderWidth(width: Float) {

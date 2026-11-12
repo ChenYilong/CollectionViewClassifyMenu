@@ -161,4 +161,68 @@ class LujunTagContainerIssuesTest {
         assertTrue(view.measuredWidth >= (0 until view.childCount).sumOf { view.getChildAt(it).measuredWidth })
         assertTrue((0 until view.childCount).all { view.getChildAt(it).top == view.getChildAt(0).top })
     }
+
+    private fun tagAt(view: TagContainerLayout, index: Int) = view.getTagView(index)
+
+    @Test
+    fun xmlColorsWithoutAThemeAreUsed() {
+        // #57: tag_background_color in XML, without tag_theme, is used (the default theme replaced it).
+        val attrs = org.robolectric.Robolectric.buildAttributeSet()
+            .addAttribute(com.cyl.classifymenu.R.attr.tag_background_color, "#FFFF0000").build()
+        val view = TagContainerLayout(context, attrs)
+        view.addTag("red")
+        assertEquals(0xFFFF0000.toInt(), tagAt(view, 0).getTagBackgroundColor())
+    }
+
+    @Test
+    fun colorSettersReachShownTags() {
+        // #77: setTheme(NONE) and setTagBackgroundColor change the tags already shown, not only new ones.
+        val view = TagContainerLayout(context)
+        view.addTag("one")
+        view.setTheme(co.lujun.androidtagview.ColorFactory.NONE)
+        view.setTagBackgroundColor(android.graphics.Color.WHITE)
+        assertEquals(android.graphics.Color.WHITE, tagAt(view, 0).getTagBackgroundColor())
+    }
+
+    @Test
+    fun tagWithItsOwnColors() {
+        // #76 / #20: a tag added with its own colors keeps them; one tag's color can be changed later.
+        val view = TagContainerLayout(context)
+        view.addTag("own", intArrayOf(0xFF112233.toInt(), 0, 0xFFFFFFFF.toInt(), 0))
+        view.addTag("theme")
+        view.setTheme(co.lujun.androidtagview.ColorFactory.NONE)
+        view.setTagBackgroundColor(android.graphics.Color.WHITE)
+        assertEquals(0xFF112233.toInt(), tagAt(view, 0).getTagBackgroundColor())
+        tagAt(view, 1).setTagBackgroundColor(android.graphics.Color.BLACK)
+        assertEquals(android.graphics.Color.BLACK, tagAt(view, 1).getTagBackgroundColor())
+    }
+
+    @Test
+    fun selectionOnTapSingleAndColors() {
+        // #12 / #22 / #123: a tap selects; #6: single selection; #107: toggleSelectTagView selects; #29 / #114: the
+        // selected colors are settable.
+        val view = container(3, 1080) {
+            setIsTagViewClickable(true)
+            setIsTagViewSelectable(true)
+            setSelectTagViewOnClick(true)
+            setSingleSelection(true)
+        }
+        view.setSelectedTagBackgroundColor(0xFF00FF00.toInt())
+        assertEquals(0xFF00FF00.toInt(), tagAt(view, 0).getTagSelectedBackgroundColor())
+        val first = tagAt(view, 0)
+        first.dispatchTouchEvent(event(MotionEvent.ACTION_DOWN, 5f, 5f))
+        first.dispatchTouchEvent(event(MotionEvent.ACTION_UP, 5f, 5f))
+        assertTrue(first.getIsViewSelected())
+        view.toggleSelectTagView(1)
+        assertTrue(tagAt(view, 1).getIsViewSelected())
+        assertFalse(first.getIsViewSelected())
+        assertEquals(listOf(1), view.getSelectedTagViewPositions())
+    }
+
+    @Test
+    fun minimumTagWidth() {
+        // #73 / #75: tags at least as wide as tag_min_width (same-size tags).
+        val view = container(2, 1080) { setTagMinWidth(400) }
+        assertTrue((0 until view.childCount).all { view.getChildAt(it).measuredWidth >= 400 })
+    }
 }
