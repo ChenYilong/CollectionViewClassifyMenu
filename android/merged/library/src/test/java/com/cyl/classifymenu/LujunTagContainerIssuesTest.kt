@@ -110,4 +110,55 @@ class LujunTagContainerIssuesTest {
         container.setDragEnable(true)
         assertFalse(container.onInterceptTouchEvent(event(MotionEvent.ACTION_MOVE, 5f, 5f)))
     }
+
+    private fun container(tags: Int, width: Int, configure: TagContainerLayout.() -> Unit = {}): TagContainerLayout =
+        TagContainerLayout(context).apply {
+            configure()
+            for (i in 0 until tags) addTag("Tag $i")
+            measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+            layout(0, 0, measuredWidth, measuredHeight)
+        }
+
+    @Test
+    fun maxLinesIsAnUpperBound() {
+        // #74 / #28: container_max_lines (setMaxLines) limits the height; fewer lines need less height.
+        val one = container(1, 1080)
+        val limited = container(1, 1080) { setMaxLines(5) }
+        assertEquals(5, limited.getMaxLines())
+        assertEquals(one.measuredHeight, limited.measuredHeight)
+    }
+
+    @Test
+    fun linesBeyondMaxLinesScroll() {
+        // #58 / #63: with more lines than container_max_lines, a vertical drag scrolls to the others.
+        val view = container(30, 300) { setMaxLines(1) }
+        assertTrue(view.canScrollVertically(1))
+        view.onTouchEvent(event(MotionEvent.ACTION_DOWN, 50f, 40f))
+        view.onTouchEvent(event(MotionEvent.ACTION_MOVE, 50f, 10f))
+        view.onTouchEvent(event(MotionEvent.ACTION_MOVE, 50f, -400f))
+        assertTrue(view.scrollY > 0)
+        view.onTouchEvent(event(MotionEvent.ACTION_MOVE, 50f, -100_000f))
+        assertFalse(view.canScrollVertically(1))
+    }
+
+    @Test
+    fun visibleTagCount() {
+        // #80: the tags on the visible lines.
+        val view = container(30, 300) { setMaxLines(1) }
+        assertTrue(view.getVisibleTagCount() in 1 until 30)
+        assertEquals(30, container(30, 300).getVisibleTagCount())
+    }
+
+    @Test
+    fun singleLineForAHorizontalScrollView() {
+        // #42 / #106 / #115: one line, as wide as the tags when the width is unspecified (HorizontalScrollView).
+        val view = TagContainerLayout(context).apply {
+            setSingleLine(true)
+            for (i in 0 until 20) addTag("Tag $i")
+            measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+            layout(0, 0, measuredWidth, measuredHeight)
+        }
+        assertTrue(view.measuredWidth >= (0 until view.childCount).sumOf { view.getChildAt(it).measuredWidth })
+        assertTrue((0 until view.childCount).all { view.getChildAt(it).top == view.getChildAt(0).top })
+    }
 }

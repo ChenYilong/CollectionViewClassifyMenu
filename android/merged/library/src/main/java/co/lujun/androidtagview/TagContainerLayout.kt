@@ -83,6 +83,26 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** The max line count of TagContainerLayout */
     private var mMaxLines = 0
 
+    /**
+     * Every tag on one line (issues #42 / #106 / #115): measured as wide as its tags when the width is unspecified,
+     * as in a HorizontalScrollView, which then scrolls them.
+     */
+    private var mSingleLine = false
+
+    /**
+     * The lines the tags need, before `mMaxLines` limits the height (issues #58 / #63: the rest scrolls).
+     */
+    private var mTotalLines = 0
+
+    /**
+     * The line of each tag (`getVisibleTagCount`, issue #80).
+     */
+    private var mViewLines = IntArray(0)
+
+    private val mTouchSlop = android.view.ViewConfiguration.get(context).scaledTouchSlop
+    private var mScrollLastY = 0f
+    private var mScrollingContent = false
+
     /** The max length for TagView(default max length 23) */
     private var mTagMaxLength = 23
 
@@ -209,6 +229,7 @@ open class TagContainerLayout @JvmOverloads constructor(
         mSensitivity = attributes.getFloat(R.styleable.AndroidTagView_container_drag_sensitivity, mSensitivity)
         mGravity = attributes.getInt(R.styleable.AndroidTagView_container_gravity, mGravity)
         mMaxLines = attributes.getInt(R.styleable.AndroidTagView_container_max_lines, mMaxLines)
+        mSingleLine = attributes.getBoolean(R.styleable.AndroidTagView_container_single_line, mSingleLine)
         mTagMaxLength = attributes.getInt(R.styleable.AndroidTagView_tag_max_length, mTagMaxLength)
         mTheme = attributes.getInt(R.styleable.AndroidTagView_tag_theme, mTheme)
         mTagBorderWidth = attributes.getDimension(R.styleable.AndroidTagView_tag_border_width, dp2px(context, mTagBorderWidth))
@@ -260,12 +281,17 @@ open class TagContainerLayout @JvmOverloads constructor(
         val heightSpecSize = MeasureSpec.getSize(heightMeasureSpec)
         val heightSpecMode = MeasureSpec.getMode(heightMeasureSpec)
 
+        // Single line in a HorizontalScrollView (unspecified width): as wide as the tags (#42 / #106 / #115).
+        var width = widthSpecSize
+        if (mSingleLine && MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED && childCount > 0) {
+            width = paddingLeft + paddingRight + (0 until childCount).sumOf { getChildAt(it).measuredWidth } + mHorizontalInterval * (childCount - 1)
+        }
         if (childCount == 0) {
             setMeasuredDimension(0, 0)
         } else if (heightSpecMode == MeasureSpec.AT_MOST || heightSpecMode == MeasureSpec.UNSPECIFIED) {
-            setMeasuredDimension(widthSpecSize, (mVerticalInterval + mChildHeight) * lines - mVerticalInterval + paddingTop + paddingBottom)
+            setMeasuredDimension(width, (mVerticalInterval + mChildHeight) * lines - mVerticalInterval + paddingTop + paddingBottom)
         } else {
-            setMeasuredDimension(widthSpecSize, heightSpecSize)
+            setMeasuredDimension(width, heightSpecSize)
         }
     }
 
@@ -285,13 +311,14 @@ open class TagContainerLayout @JvmOverloads constructor(
         var curLeft = paddingLeft
         var sPos = 0
         mViewPos = IntArray(childCount * 2)
+        mViewLines = IntArray(childCount)
 
         for (i in 0 until childCount) {
             val childView = getChildAt(i)
             if (childView.visibility != GONE) {
                 val width = childView.measuredWidth
                 if (mGravity == Gravity.RIGHT) {
-                    if (curRight - width < paddingLeft) {
+                    if (!mSingleLine && curRight - width < paddingLeft) {
                         curRight = measuredWidth - paddingRight
                         curTop += mChildHeight + mVerticalInterval
                     }
@@ -299,7 +326,7 @@ open class TagContainerLayout @JvmOverloads constructor(
                     mViewPos[i * 2 + 1] = curTop
                     curRight -= width + mHorizontalInterval
                 } else if (mGravity == Gravity.CENTER) {
-                    if (curLeft + width - paddingLeft > availableW) {
+                    if (!mSingleLine && curLeft + width - paddingLeft > availableW) {
                         val leftW = measuredWidth - mViewPos[(i - 1) * 2] - getChildAt(i - 1).measuredWidth - paddingRight
                         for (j in sPos until i) {
                             mViewPos[j * 2] = mViewPos[j * 2] + leftW / 2
@@ -319,7 +346,7 @@ open class TagContainerLayout @JvmOverloads constructor(
                         }
                     }
                 } else {
-                    if (curLeft + width - paddingLeft > availableW) {
+                    if (!mSingleLine && curLeft + width - paddingLeft > availableW) {
                         curLeft = paddingLeft
                         curTop += mChildHeight + mVerticalInterval
                     }
@@ -328,6 +355,13 @@ open class TagContainerLayout @JvmOverloads constructor(
                     curLeft += width + mHorizontalInterval
                 }
             }
+        }
+
+        // the line of each tag (#80)
+        var line = 0
+        for (i in 1 until childCount) {
+            if (mViewPos[i * 2 + 1] > mViewPos[(i - 1) * 2 + 1]) line++
+            mViewLines[i] = line
         }
 
         // layout all child views
@@ -351,7 +385,7 @@ open class TagContainerLayout @JvmOverloads constructor(
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean = try {
-        mViewDragHelper.shouldInterceptTouchEvent(ev)
+        interceptContentScroll(ev) || mViewDragHelper.shouldInterceptTouchEvent(ev)
     } catch (error: RuntimeException) {
         // Issue #26: ViewDragHelper throws ArrayIndexOutOfBoundsException / IllegalArgumentException for pointer ids
         // it never saw (a second finger, a gesture that began outside); the event is simply not intercepted.
@@ -361,7 +395,7 @@ open class TagContainerLayout @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         // Issues #21 / #27 / #64 / #108 / #112: the container took every touch, so a parent (a list item, a clickable
         // layout) never got its click and the container's own click listener never fired. Only dragging needs them.
-        if (!mDragEnable) return super.onTouchEvent(event)
+        if (!mDragEnable) return scrollContent(event) || super.onTouchEvent(event)
         try {
             mViewDragHelper.processTouchEvent(event)
         } catch (error: RuntimeException) {
@@ -369,6 +403,76 @@ open class TagContainerLayout @JvmOverloads constructor(
         }
         return true
     }
+
+    /**
+     * The height of every line, padding included (the content scrolls when it is taller than the view: #58 / #63).
+     */
+    private fun contentHeight(): Int =
+        if (mTotalLines == 0) 0 else (mVerticalInterval + mChildHeight) * mTotalLines - mVerticalInterval + paddingTop + paddingBottom
+
+    private fun maxContentScroll(): Int = max(0, contentHeight() - height)
+
+    override fun computeVerticalScrollRange(): Int = max(contentHeight(), height)
+
+    override fun computeVerticalScrollOffset(): Int = scrollY
+
+    override fun computeVerticalScrollExtent(): Int = height
+
+    /**
+     * Takes a vertical drag over a container whose lines go beyond `container_max_lines` (#58 / #63); a tap still goes
+     * to the tag.
+     */
+    private fun interceptContentScroll(ev: MotionEvent): Boolean {
+        if (mDragEnable || maxContentScroll() <= 0) return false
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> { mScrollLastY = ev.y; mScrollingContent = false }
+            MotionEvent.ACTION_MOVE -> if (abs(ev.y - mScrollLastY) > mTouchSlop) {
+                mScrollingContent = true
+                mScrollLastY = ev.y
+                parent?.requestDisallowInterceptTouchEvent(true)
+            }
+        }
+        return mScrollingContent
+    }
+
+    private fun scrollContent(event: MotionEvent): Boolean {
+        if (maxContentScroll() <= 0) return false
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> { mScrollLastY = event.y; return true }
+            MotionEvent.ACTION_MOVE -> {
+                val dy = (mScrollLastY - event.y).toInt()
+                if (!mScrollingContent && abs(dy) <= mTouchSlop) return true
+                mScrollingContent = true
+                mScrollLastY = event.y
+                scrollTo(0, min(max(scrollY + dy, 0), maxContentScroll()))
+                return true
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                val scrolled = mScrollingContent
+                mScrollingContent = false
+                return scrolled
+            }
+        }
+        return false
+    }
+
+    /**
+     * The number of tags on the visible lines (issue #80): all of them without `container_max_lines`.
+     */
+    fun getVisibleTagCount(): Int {
+        if (mMaxLines <= 0 || mSingleLine) return childCount
+        return mViewLines.count { it < mMaxLines }
+    }
+
+    /**
+     * Every tag on one line (issues #42 / #106 / #115); `container_single_line` in XML.
+     */
+    fun setSingleLine(singleLine: Boolean) {
+        mSingleLine = singleLine
+        requestLayout()
+    }
+
+    fun isSingleLine(): Boolean = mSingleLine
 
     override fun computeScroll() {
         super.computeScroll()
@@ -387,12 +491,14 @@ open class TagContainerLayout @JvmOverloads constructor(
             val height = childView.measuredHeight
             mChildHeight = if (i == 0) height else min(mChildHeight, height)
             curLineW += dis
-            if (curLineW - mHorizontalInterval > availableW) {
+            if (!mSingleLine && curLineW - mHorizontalInterval > availableW) {
                 lines++
                 curLineW = dis
             }
         }
-        return if (mMaxLines <= 0) lines else mMaxLines
+        mTotalLines = lines
+        // Issue #74: the height is that of the lines the tags need, at most `mMaxLines` (it was always mMaxLines).
+        return if (mMaxLines <= 0) lines else min(lines, mMaxLines)
     }
 
     private fun onUpdateColorFactory(): IntArray = when (mTheme) {
