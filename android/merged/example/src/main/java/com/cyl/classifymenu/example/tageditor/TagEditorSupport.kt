@@ -31,7 +31,7 @@ object CYLTagEditorLocalization {
     /**
      * The path of a file of the current language's folder.
      */
-    fun path(file: String) = "${language()}.lproj/$file"
+    fun path(file: String) = "CYLTagEditorExample.bundle/${language()}.lproj/$file"
 
     fun table(context: Context): Map<String, String> = tables.getOrPut(language()) {
         val text = try {
@@ -160,6 +160,27 @@ class CYLSymbolDrawable(private val name: String, private val sizeDp: Float, den
         val path = Path()
         when (name) {
             "plus" -> { path.moveTo(x + w / 2, y + h * 0.15f); path.lineTo(x + w / 2, y + h * 0.85f); path.moveTo(x + w * 0.15f, y + h / 2); path.lineTo(x + w * 0.85f, y + h / 2) }
+            "chevron.left" -> { path.moveTo(x + w * 0.62f, y + h * 0.2f); path.lineTo(x + w * 0.32f, y + h / 2); path.lineTo(x + w * 0.62f, y + h * 0.8f) }
+            "hand.thumbsup.fill", "hand.thumbsdown.fill" -> {
+                canvas.save()
+                if (name == "hand.thumbsdown.fill") canvas.rotate(180f, x + w / 2, y + h / 2)
+                paint.style = Paint.Style.FILL
+                canvas.drawRoundRect(r(0.1f, 0.45f, 0.3f, 0.9f), w * 0.04f, w * 0.04f, paint)
+                path.moveTo(x + w * 0.36f, y + h * 0.45f); path.lineTo(x + w * 0.5f, y + h * 0.1f); path.lineTo(x + w * 0.6f, y + h * 0.15f)
+                path.lineTo(x + w * 0.56f, y + h * 0.4f); path.lineTo(x + w * 0.88f, y + h * 0.42f); path.lineTo(x + w * 0.8f, y + h * 0.9f); path.lineTo(x + w * 0.36f, y + h * 0.9f); path.close()
+                canvas.drawPath(path, paint)
+                paint.style = Paint.Style.STROKE
+                canvas.restore()
+                return
+            }
+            "hand.raised.fill" -> {
+                paint.style = Paint.Style.FILL
+                for (i in 0..3) canvas.drawRoundRect(r(0.2f + i * 0.16f, 0.12f + (if (i == 0 || i == 3) 0.08f else 0f), 0.32f + i * 0.16f, 0.6f), w * 0.06f, w * 0.06f, paint)
+                canvas.drawRoundRect(r(0.2f, 0.45f, 0.8f, 0.9f), w * 0.15f, w * 0.15f, paint)
+                paint.style = Paint.Style.STROKE
+                return
+            }
+            "person.crop.circle" -> { canvas.drawCircle(x + w / 2, y + h / 2, w * 0.42f, paint); canvas.drawCircle(x + w / 2, y + h * 0.4f, w * 0.14f, paint); canvas.drawArc(r(0.25f, 0.58f, 0.75f, 0.95f), 200f, 140f, false, paint) }
             "chevron.right" -> { path.moveTo(x + w * 0.38f, y + h * 0.2f); path.lineTo(x + w * 0.68f, y + h / 2); path.lineTo(x + w * 0.38f, y + h * 0.8f) }
             "star.bubble" -> { canvas.drawRoundRect(r(0.1f, 0.12f, 0.9f, 0.75f), w * 0.15f, w * 0.15f, paint); path.moveTo(x + w * 0.3f, y + h * 0.75f); path.lineTo(x + w * 0.25f, y + h * 0.92f); path.lineTo(x + w * 0.45f, y + h * 0.75f); canvas.drawCircle(x + w / 2, y + h * 0.43f, w * 0.1f, paint) }
             "briefcase" -> { canvas.drawRoundRect(r(0.1f, 0.3f, 0.9f, 0.85f), w * 0.08f, w * 0.08f, paint); canvas.drawRoundRect(r(0.35f, 0.15f, 0.65f, 0.3f), w * 0.05f, w * 0.05f, paint) }

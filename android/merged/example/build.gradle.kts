@@ -7,8 +7,8 @@ plugins {
 android {
     // The shared example database of every platform (Example-Shared/Database/cyl_places.sqlite, docs/cross-platform.md).
     sourceSets["main"].assets.srcDir("../../../Example-Shared/Database")
-    // The tag editor example's bundle (Example-Swift): its <language>.lproj folders (strings, tags.json, fold-styles.*).
-    sourceSets["main"].assets.srcDir("../../../Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle")
+    // The iOS examples' bundles (strings, data, animations), each under its own folder: see copyExampleBundles.
+    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/cylBundles"))
     namespace = "com.cyl.classifymenu.example"
     compileSdk = 35
     defaultConfig {
@@ -44,3 +44,14 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
 }
+
+// The iOS examples' resource bundles, used as they are (no copies in the repository): CYLTagEditorExample.bundle
+// (Example-Swift) and CYLMenuExample.bundle (Example), synced into build/generated/cylBundles before every build and
+// read as assets under their own folder names (<Name>.bundle/<language>.lproj/…).
+val copyExampleBundles by tasks.registering(Sync::class) {
+    from("../../../Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle") { into("CYLTagEditorExample.bundle") }
+    from("../../../Example/CYLMenuExample/CYLMenuExample.bundle") { into("CYLMenuExample.bundle") }
+    exclude("**/._*", "**/.claude/**", "**/*.md")
+    into(layout.buildDirectory.dir("generated/cylBundles"))
+}
+tasks.named("preBuild") { dependsOn(copyExampleBundles) }

@@ -61,6 +61,24 @@ class ClassifyPlacesDatabase(context: Context) {
     }
 
     /**
+     * The rows of any statement, as column → value (Long, Double, String or null).
+     */
+    fun rowsOf(sql: String, arguments: List<String> = emptyList()): List<Map<String, Any?>> = database.rawQuery(sql, arguments.toTypedArray()).use { cursor ->
+        val rows = ArrayList<Map<String, Any?>>()
+        while (cursor.moveToNext()) {
+            rows.add((0 until cursor.columnCount).associate { index ->
+                cursor.getColumnName(index) to when (cursor.getType(index)) {
+                    android.database.Cursor.FIELD_TYPE_INTEGER -> cursor.getLong(index)
+                    android.database.Cursor.FIELD_TYPE_FLOAT -> cursor.getDouble(index)
+                    android.database.Cursor.FIELD_TYPE_NULL -> null
+                    else -> cursor.getString(index)
+                }
+            })
+        }
+        rows
+    }
+
+    /**
      * The number of rows of `table`.
      */
     fun countOfTable(table: String): Int = database.rawQuery("SELECT COUNT(*) FROM $table", null).use { if (it.moveToFirst()) it.getInt(0) else 0 }

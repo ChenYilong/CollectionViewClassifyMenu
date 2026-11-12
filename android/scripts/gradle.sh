@@ -24,6 +24,9 @@ rsync -a --delete --exclude '._*' ../Example-Shared/Database "$MIRROR/../Example
 # The tag editor example's bundle (its strings, tags.json, fold-styles.*), read by the Android example as assets.
 mkdir -p "$MIRROR/../Example-Swift/CYLTagEditorExample"
 rsync -a --delete --exclude '._*' ../Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle "$MIRROR/../Example-Swift/CYLTagEditorExample/"
+# The menu example's bundle (strings, search data, animations).
+mkdir -p "$MIRROR/../Example/CYLMenuExample"
+rsync -a --delete --exclude '._*' ../Example/CYLMenuExample/CYLMenuExample.bundle "$MIRROR/../Example/CYLMenuExample/"
 GRADLE=${GRADLE:-$(command -v gradle || ls -d "$HOME"/.gradle/wrapper/dists/gradle-9.3.1-all/*/gradle-9.3.1/bin/gradle | head -1)}
 cd "$MIRROR/$PROJECT"
 "$GRADLE" --no-daemon "$@"
