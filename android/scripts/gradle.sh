@@ -30,6 +30,7 @@ rsync -a --delete --exclude '._*' ../Example-Shared/PAGResources "$MIRROR/../Exa
 # The menu example's bundle (strings, search data, animations).
 mkdir -p "$MIRROR/../Example/CYLMenuExample"
 rsync -a --delete --exclude '._*' ../Example/CYLMenuExample/CYLMenuExample.bundle "$MIRROR/../Example/CYLMenuExample/"
+rsync -a --delete --exclude '._*' ../Example/CYLMenuExample/Assets.xcassets "$MIRROR/../Example/CYLMenuExample/"
 GRADLE=${GRADLE:-$(command -v gradle || ls -d "$HOME"/.gradle/wrapper/dists/gradle-9.3.1-all/*/gradle-9.3.1/bin/gradle | head -1)}
 cd "$MIRROR/$PROJECT"
 "$GRADLE" --no-daemon "$@"

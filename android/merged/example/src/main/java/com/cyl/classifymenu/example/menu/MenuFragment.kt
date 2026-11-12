@@ -56,7 +56,7 @@ class CYLMenuHomeScreen(context: Context, navigator: CYLMenuNavigator, onOpen: (
             "场景一：评价筛选" to { CYLProductScreen(context, navigator) },
             "场景二：搜索分类" to { CYLSearchHomeScreen(context, navigator) },
             "样式" to { CYLTagStyleScreen(context, navigator) },
-            "动效" to null,
+            "动效" to { CYLTagAnimationScreen(context) },
         )
         val list = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(Color.WHITE) }
         for ((key, make) in parts) {
