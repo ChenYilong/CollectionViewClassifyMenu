@@ -9,7 +9,7 @@ tags: [android, kotlin, tagview, api-parity]
 This document tracks the Android work in `android/`: Kotlin transcriptions of three Android tag libraries, the
 library merged from them, its API table against the iOS core, and the Android ports of the iOS examples.
 
-## TODO (2026-11-12): Kotlin ports, merged library, API parity with iOS, iOS examples on Android
+## DONE (2026-11-13, logged as TODO 2026-11-12): Kotlin ports, merged library, API parity with iOS, iOS examples on Android
 
 ### Context
 
@@ -83,7 +83,7 @@ Android chapter.
   `android/merged/api-map.json` (`--check` reports a stale table). First alignment: the picture tags
   (`CYLImageTagGroupView` and friends) map to the TagViewGroup API.
 - [x] Step 5: missing APIs: 709 / 709 aligned, full marks (score history below; 29 library unit tests)
-- [ ] Step 6: iOS examples ported, screenshots, README Android chapter. Progress: the demo app (Classify, Filter tabs)
+- [x] Step 6 (DONE 2026-11-13): iOS examples ported, screenshots, README Android chapter (README "Android / Android 版（Kotlin）", one stitched image of key details, labeled; `assets/android-key-screens.png`). Progress: the demo app (Classify, Filter tabs)
   the TagCollectionView demo (Tags tab) and the Tag editor (`Example-Swift`, Editor tab: Edit tags with the editor
   sheet, Fold styles with the configuration files) are ported; the tab bar scrolls (one tab per example). Menu example
   (`Example/CYLMenuExample`, Menu tab, DONE): the tab holds a home list with one row per part of the iOS
@@ -132,7 +132,7 @@ Android chapter.
   ViewGroup, Container). Core fixes on the way: paths relative to a configuration file ("../Animations/…") resolve
   their ".." (the assets cannot), and "system:<name>" images other than the core's three are the app's drawables
   `cyl_system_<name>` (Android has no SF Symbols; the example provides the ones it uses). The Menu example is DONE.
-  Remaining for step 6: the README Android chapter. Plan (2026-11-12):
+  The README Android chapter is written (step 6 DONE). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
      Menu (`Example/CYLMenuExample`: review filter, search categories, styles, animations, and its plus page, the
      query scenarios), Tag editor (`Example-Swift/CYLTagEditorExample`), Classify demo (the demo app of
