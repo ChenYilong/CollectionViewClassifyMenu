@@ -24,6 +24,9 @@ rsync -a --delete --exclude '._*' ../Example-Shared/Database "$MIRROR/../Example
 # The tag editor example's bundle (its strings, tags.json, fold-styles.*), read by the Android example as assets.
 mkdir -p "$MIRROR/../Example-Swift/CYLTagEditorExample"
 rsync -a --delete --exclude '._*' ../Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle "$MIRROR/../Example-Swift/CYLTagEditorExample/"
+# The PAG icons shared by the iOS examples.
+mkdir -p "$MIRROR/../Example-Shared"
+rsync -a --delete --exclude '._*' ../Example-Shared/PAGResources "$MIRROR/../Example-Shared/"
 # The menu example's bundle (strings, search data, animations).
 mkdir -p "$MIRROR/../Example/CYLMenuExample"
 rsync -a --delete --exclude '._*' ../Example/CYLMenuExample/CYLMenuExample.bundle "$MIRROR/../Example/CYLMenuExample/"

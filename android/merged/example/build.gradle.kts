@@ -40,6 +40,11 @@ dependencies {
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.material)
     implementation(libs.glide)
+    // Animated tag icons (the Styles and Animations screens of the menu example): CYLTabBarController's animation
+    // engine registers Lottie, PAG and Rive when their libraries are present (GIF needs none).
+    implementation(libs.lottie)
+    implementation(libs.libpag)
+    implementation(libs.rive)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
@@ -51,6 +56,8 @@ dependencies {
 val copyExampleBundles by tasks.registering(Sync::class) {
     from("../../../Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle") { into("CYLTagEditorExample.bundle") }
     from("../../../Example/CYLMenuExample/CYLMenuExample.bundle") { into("CYLMenuExample.bundle") }
+    // CYLTabBarController's Example-PAG icons (pag-ios/*.pag), shared by the iOS examples.
+    from("../../../Example-Shared/PAGResources")
     exclude("**/._*", "**/.claude/**", "**/*.md")
     into(layout.buildDirectory.dir("generated/cylBundles"))
 }

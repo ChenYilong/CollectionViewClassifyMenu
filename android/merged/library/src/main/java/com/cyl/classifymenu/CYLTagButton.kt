@@ -179,7 +179,9 @@ open class CYLTagButton @JvmOverloads constructor(
         animationView = null
         animationPlayer = null
         val url = animationURL
-        val missingFile = url != null && url.scheme == "file" && url.path?.let { !java.io.File(it).exists() } == true
+        // A file URL whose file is gone shows the static image; an asset (file:///android_asset/…) is not on the
+        // file system, so it is never "missing" here (the engine opens it from the assets).
+        val missingFile = url != null && url.scheme == "file" && url.path?.let { !it.startsWith("/android_asset/") && !java.io.File(it).exists() } == true
         if (url != null && !missingFile) {
             val size = animationSize()
             val view = CYLTagAnimationEngine.animationView(context, url.toString(), size)
