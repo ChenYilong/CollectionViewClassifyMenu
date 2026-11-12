@@ -90,6 +90,10 @@ open class TagView @JvmOverloads constructor(
         removeAllViews()
         // layout padding left & layout padding right
         var total = (paddingLeft + paddingRight).toFloat()
+        // Unique ids for the layout rules (View.generateViewId()): the original used the positions 1, 2, 3…, which collide
+        // with other views' ids in the window (a fragment container found by id landed inside a tag).
+        val ids = HashMap<Int, Int>()
+        fun viewId(index: Int) = ids.getOrPut(index) { View.generateViewId() }
         var listIndex = 1 // list index
         var indexBottom = 1 // the tag to add below
         var indexHeader = 1 // the header tag of this line
@@ -99,7 +103,7 @@ open class TagView @JvmOverloads constructor(
             val tag = item
             // inflate tag layout
             val tagLayout = mInflater.inflate(R.layout.tagview_item, null)
-            tagLayout.id = listIndex
+            tagLayout.id = viewId(listIndex)
             tagLayout.background = getSelector(tag)
             // tag text
             val tagView = tagLayout.findViewById<TextView>(R.id.tv_tag_item_contain)
@@ -134,17 +138,17 @@ open class TagView @JvmOverloads constructor(
             tagParams.bottomMargin = lineMargin
             if (mWidth <= total + tagMargin + tagWidth + ResolutionUtil.dpToPx(context, Constants.LAYOUT_WIDTH_OFFSET)) {
                 // needs a new line
-                tagParams.addRule(BELOW, indexBottom)
+                tagParams.addRule(BELOW, viewId(indexBottom))
                 // reset total (layout padding left & layout padding right)
                 total = (paddingLeft + paddingRight).toFloat()
                 indexBottom = listIndex
                 indexHeader = listIndex
             } else {
                 // same line
-                tagParams.addRule(ALIGN_TOP, indexHeader)
+                tagParams.addRule(ALIGN_TOP, viewId(indexHeader))
                 // not the header of the line
                 if (listIndex != indexHeader) {
-                    tagParams.addRule(RIGHT_OF, listIndex - 1)
+                    tagParams.addRule(RIGHT_OF, viewId(listIndex - 1))
                     tagParams.leftMargin = tagMargin
                     total += tagMargin
                     if (tagPre != null && tagPre.tagTextSize < tag.tagTextSize) {

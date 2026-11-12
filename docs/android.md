@@ -89,7 +89,12 @@ Android chapter.
   (`Example/CYLMenuExample`, Menu tab, in progress): the tab holds a home list with one row per part of the iOS
   example's tab bar. Scenario 1 (review filter) is DONE: the product screen (keywords, two rows) and the review list
   (several filters, "全部" exclusive, chevron fold, In memory / Network / Database modes, the request URL and the SQL
-  shown), reading the reviews from the shared database. TODO: scenario 2 (search categories, discover), styles,
+  shown), reading the reviews from the shared database. Scenario 2 (search categories) is DONE: the search home, and
+  the category screen with a search field in the bar and a nested CYLTabBarController at the bottom (people, feeds,
+  gossip, jobs; jobs with the job category sidebar and the industry menu); a tag fills the search field; the app's
+  tab bar hides while a screen is pushed (`hidesBottomBarWhenPushed`). Fix on the way: the kaede `TagView` gave its
+  tags the view ids 1, 2, 3…, so the nested tab bar's page container (found by id) landed inside a tag; the ids are
+  generated now (merged library and `android-tagview`). TODO: discover (plus page), styles,
   animations (Lottie / Rive / GIF from `CYLMenuExample.bundle`), the plus page (query scenarios, menu linkage, tag
   cloud, configuration). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
@@ -190,6 +195,8 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Menu tab, scenario 1: the review list, In memory mode, "划算" selected: 3 of 10 | <img src="assets/android-menu-reviews-memory.png" width="300" alt="Review list, memory mode"> |
 | Menu tab, scenario 1: Database mode: the filters as SQL on `reviews` / `review_keywords`, 3 matches | <img src="assets/android-menu-reviews-database.png" width="300" alt="Review list, database mode"> |
 | Menu tab, scenario 1: Network mode: `GET /reviews?filter=photo&filter=keyword:划算`, the server returns 1 | <img src="assets/android-menu-reviews-network.png" width="300" alt="Review list, network mode"> |
+| Menu tab, scenario 2: the category screen, People page, nested tab bar at the bottom (the app's tab bar hidden) | <img src="assets/android-menu-search-people.png" width="300" alt="Search categories, People"> |
+| Menu tab, scenario 2: Jobs: the job category sidebar (Product), the industry menu (Finance); a tag filled the search field | <img src="assets/android-menu-search-jobs.png" width="300" alt="Search categories, Jobs"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots
