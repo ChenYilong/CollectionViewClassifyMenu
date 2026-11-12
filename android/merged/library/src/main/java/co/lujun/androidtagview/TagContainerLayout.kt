@@ -350,10 +350,23 @@ open class TagContainerLayout @JvmOverloads constructor(
         canvas.drawRoundRect(mRectF, mBorderRadius, mBorderRadius, mPaint)
     }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean = mViewDragHelper.shouldInterceptTouchEvent(ev)
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean = try {
+        mViewDragHelper.shouldInterceptTouchEvent(ev)
+    } catch (error: RuntimeException) {
+        // Issue #26: ViewDragHelper throws ArrayIndexOutOfBoundsException / IllegalArgumentException for pointer ids
+        // it never saw (a second finger, a gesture that began outside); the event is simply not intercepted.
+        false
+    }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        mViewDragHelper.processTouchEvent(event)
+        // Issues #21 / #27 / #64 / #108 / #112: the container took every touch, so a parent (a list item, a clickable
+        // layout) never got its click and the container's own click listener never fired. Only dragging needs them.
+        if (!mDragEnable) return super.onTouchEvent(event)
+        try {
+            mViewDragHelper.processTouchEvent(event)
+        } catch (error: RuntimeException) {
+            return false
+        }
         return true
     }
 
@@ -558,7 +571,9 @@ open class TagContainerLayout @JvmOverloads constructor(
         }
 
         override fun tryCaptureView(child: View, pointerId: Int): Boolean {
-            requestDisallowInterceptTouchEvent(true)
+            // Issues #59 / #65: only a drag keeps the parent (a ScrollView) from scrolling; without drag the touch on a
+            // tag no longer blocks it.
+            if (mDragEnable) requestDisallowInterceptTouchEvent(true)
             return mDragEnable
         }
 
