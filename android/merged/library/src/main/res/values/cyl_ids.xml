@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The iOS accessibilityIdentifier of a core view, stored as a view tag under this key. -->
+    <item name="cyl_accessibility_identifier" type="id" />
+</resources>
