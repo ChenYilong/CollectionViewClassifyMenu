@@ -94,7 +94,18 @@ Android chapter.
   gossip, jobs; jobs with the job category sidebar and the industry menu); a tag fills the search field; the app's
   tab bar hides while a screen is pushed (`hidesBottomBarWhenPushed`). Fix on the way: the kaede `TagView` gave its
   tags the view ids 1, 2, 3…, so the nested tab bar's page container (found by id) landed inside a tag; the ids are
-  generated now (merged library and `android-tagview`). TODO: discover (plus page), styles,
+  generated now (merged library and `android-tagview`). Styles is DONE: the preview tags and every action of the iOS
+  screen (icon and title colors, font, spacing, sizes, insets, position adjustments, content, layoutCentered,
+  selected image, background, border, corner radius, margin, animation speed, reset), and animated icons through
+  CYLTabBarController's engine (lottie-android, libpag and rive-android added to the example; GIF needs none):
+  Lottie, GIF and PAG play. Core fix on the way: `CYLTagButton` took an asset URL (`file:///android_asset/…`) for a
+  missing file and never animated it. The rows that open other screens (configuration, tag cloud, the three Android
+  samples) wait for the plus page. TODO (Rive on Android): the Rive icons (`house.riv`, `menu_button.riv`) stay empty
+  on the emulator: rive-android loads (`librive-android.so ok`) and the views are made, but nothing is drawn, with
+  software or host GPU rendering; CYLTabBarController's `docs/Android-QMUI-Comparison.md` also lists a Rive native
+  library error on the emulator as open. Check on a device and in CYLTabBarController's `example-rive`. Note: PAG
+  needs GPU rendering on the emulator (`-gpu host`); with `swiftshader_indirect` its icons stay empty and frames take
+  seconds. TODO: discover (plus page),
   animations (Lottie / Rive / GIF from `CYLMenuExample.bundle`), the plus page (query scenarios, menu linkage, tag
   cloud, configuration). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
@@ -197,6 +208,8 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Menu tab, scenario 1: Network mode: `GET /reviews?filter=photo&filter=keyword:划算`, the server returns 1 | <img src="assets/android-menu-reviews-network.png" width="300" alt="Review list, network mode"> |
 | Menu tab, scenario 2: the category screen, People page, nested tab bar at the bottom (the app's tab bar hidden) | <img src="assets/android-menu-search-people.png" width="300" alt="Search categories, People"> |
 | Menu tab, scenario 2: Jobs: the job category sidebar (Product), the industry menu (Finance); a tag filled the search field | <img src="assets/android-menu-search-jobs.png" width="300" alt="Search categories, Jobs"> |
+| Menu tab, Styles: the preview tags (Home selected, Disabled) over the actions with their values | <img src="assets/android-menu-styles.png" width="300" alt="Styles screen"> |
+| Menu tab, Styles, top to bottom: default; after icon color, title color, background, border, corner radius (0 = capsule); Lottie, GIF, PAG icons | <img src="assets/android-menu-styles-actions.png" width="300" alt="Styles actions and animated icons"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots

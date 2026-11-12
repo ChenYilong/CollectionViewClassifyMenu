@@ -10,6 +10,10 @@ recyclerview = "1.3.2"
 coordinatorlayout = "1.2.0"
 customview = "1.1.0"
 glide = "4.16.0"
+# The animation libraries CYLTabBarController's engine finds by reflection (its own versions).
+lottie = "6.6.2"
+libpag = "4.5.98"
+rive = "10.3.0"
 robolectric = "4.14.1"
 junit = "4.13.2"
 androidx-test-core = "1.6.1"
@@ -21,6 +25,9 @@ androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version
 androidx-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "coordinatorlayout" }
 androidx-customview = { module = "androidx.customview:customview", version.ref = "customview" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
+libpag = { module = "com.tencent.tav:libpag", version.ref = "libpag" }
+rive = { module = "app.rive:rive-android", version.ref = "rive" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 junit = { module = "junit:junit", version.ref = "junit" }
