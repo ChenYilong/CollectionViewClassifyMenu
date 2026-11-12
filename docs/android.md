@@ -94,6 +94,8 @@ Android chapter.
   4. Emulator screenshots per screen (cropped key details, stitched vertically), labeled with platform, Android and
      emulator versions, SDK, commit and time, in `docs/android.md`; then the README Android chapter.
 
+Cross-platform rules (one shared database, the same look as iOS): [cross-platform.md](cross-platform.md).
+
 ## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
 - **Status:** TODO. Not started: the earlier tasks run first, in the order they were given. When React Native or
