@@ -11,12 +11,12 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 
 /**
- * The core's default icons, drawn in code (SF Symbols on iOS): the fold chevron ("chevron.down") and the plus of the
- * "+ New tag" item ("plus"). They draw in black and take the tint (`setColorFilter` / `setTint`) of the view.
+ * The core's default icons, drawn in code (SF Symbols on iOS): the fold chevron ("chevron.down"), the plus of the
+ * "+ New tag" item ("plus") and the More button ("ellipsis"). They draw in black and take the tint (`setColorFilter` / `setTint`) of the view.
  */
 class CYLMenuIconDrawable(private val kind: Kind) : Drawable() {
 
-    enum class Kind { CHEVRON_DOWN, PLUS }
+    enum class Kind { CHEVRON_DOWN, PLUS, ELLIPSIS }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -38,6 +38,13 @@ class CYLMenuIconDrawable(private val kind: Kind) : Drawable() {
                 path.moveTo(b.left + w * 0.2f, b.top + h * 0.38f)
                 path.lineTo(b.left + w * 0.5f, b.top + h * 0.66f)
                 path.lineTo(b.left + w * 0.8f, b.top + h * 0.38f)
+            }
+            Kind.ELLIPSIS -> {
+                val radius = minOf(w, h) * 0.08f
+                paint.style = Paint.Style.FILL
+                for (fraction in listOf(0.22f, 0.5f, 0.78f)) canvas.drawCircle(b.left + w * fraction, b.top + h * 0.5f, radius, paint)
+                paint.style = Paint.Style.STROKE
+                return
             }
             Kind.PLUS -> {
                 path.moveTo(b.left + w * 0.5f, b.top + h * 0.18f)

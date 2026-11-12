@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
     'CollectionViewClassifyMenu/Class/MultipleFilter/**/*.xib',
     'CollectionViewClassifyMenu/Class/Other/Symtem/Images.xcassets',
     'CollectionViewClassifyMenu/Resources/Localization/*.lproj',
+    'CollectionViewClassifyMenu/Resources/Privacy/PrivacyInfo.xcprivacy',
     'TagCollectionView/TagCollectionView/CYLTagView.xib',
     'TagCollectionView/TagCollectionView/Views/*.xib'
   ] }
