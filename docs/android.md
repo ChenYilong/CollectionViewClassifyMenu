@@ -111,6 +111,7 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | --- | --- | --- | --- |
 | step 4 | The TagViewGroup API counts for the picture tags | 56 / 678 | 8.3 |
 | batch A | `com.cyl.classifymenu`: value types, `CYLMenuResources` (the iOS `.strings`), keys, parameters, `CYLTagColors`, `CYLTagAppearance`, `CYLMenuStyle`, `CYLTag`, `CYLTagDataSource`, `CYLMenuDataSource` / `CYLMenuDelegate`, `CYLMenuColorFromString`; 10 unit tests | 265 / 678 | 39.1 |
+| batch B | Tag list views: `CYLTagButton`, `CYLTagFoldButton`, `CYLTagListCell`, `CYLTagFoldCell`, `CYLTagCreateCell`, `CYLMenuFoldControl`, the left-aligned layout, `CYLTagListView` (sections, folding, selection, tags, deletion, long press, reordering, accessibility) and `CYLTagListView+CYLConfiguration` (keys, JSON / plist files, `CYLMenuAnimationURLWithOptions`, style / appearance / fold control / tag configuration); 19 unit tests | 511 / 678 | 75.4 |
 
 ## Screenshots
 
