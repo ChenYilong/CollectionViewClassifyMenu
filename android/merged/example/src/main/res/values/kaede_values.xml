@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- android-tagview's sample (me.kaede.sample), prefixed: kaede_. -->
+<resources>
+    <string name="kaede_action_github">Github Project</string>
+    <string name="kaede_action_settings">Settings</string>
+    <string name="kaede_title_second">SecondActivity</string>
+    <string name="kaede_title_list_view">ListViewActivity</string>
+    <dimen name="kaede_activity_horizontal_margin">16dp</dimen>
+    <dimen name="kaede_activity_vertical_margin">16dp</dimen>
+    <string-array name="kaede_continents">
+        <item>AFRICA</item>
+        <item>EUROPE</item>
+        <item>ASIA</item>
+        <item>NORTH AMERICA</item>
+        <item>SOUTH AMERICA</item>
+        <item>ANTARCTICA</item>
+        <item>AUSTRALIA</item>
+    </string-array>
+    <string-array name="kaede_colors">
+        <item>#00BFFF</item>
+        <item>#E91E63</item>
+        <item>#F44336</item>
+        <item>#9C27B0</item>
+        <item>#673AB7</item>
+    </string-array>
+</resources>

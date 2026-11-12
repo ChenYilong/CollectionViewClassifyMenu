@@ -1,0 +1,17 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/kaede_activity_horizontal_margin"
+    android:paddingRight="@dimen/kaede_activity_horizontal_margin"
+    android:paddingTop="@dimen/kaede_activity_vertical_margin"
+    android:paddingBottom="@dimen/kaede_activity_vertical_margin"
+    >
+
+    <TextView android:padding="5dp" android:text="Add Tag" android:layout_width="wrap_content"
+        android:background="@drawable/kaede_shape_tagview"
+        android:layout_centerInParent="true"
+        android:textColor="#FFFFFF"
+        android:onClick="onclick_tv_add"
+        android:id="@+id/tv_add"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
