@@ -488,11 +488,27 @@ private fun fileURL(context: Context?, value: Any?, baseURL: Uri?): Uri? {
     if ((parsed.scheme?.length ?: 0) > 1) return parsed
     if (string.startsWith("/")) return Uri.fromFile(File(string))
     if (baseURL != null) {
-        val candidate = baseURL.buildUpon().appendEncodedPath(string).build()
+        val candidate = normalized(baseURL.buildUpon().appendEncodedPath(string).build())
         if (exists(context, candidate)) return candidate
     }
     val asset = Uri.parse("file:///android_asset/$string")
     return if (context == null || exists(context, asset)) asset else null
+}
+
+/**
+ * `uri` with its "." and ".." path segments resolved (`-[NSURL standardizedURL]`): a path relative to a configuration
+ * file, such as "../Animations/a.json", must name the file itself, because the assets do not resolve "..".
+ */
+private fun normalized(uri: Uri): Uri {
+    val segments = ArrayList<String>()
+    for (segment in uri.pathSegments) {
+        when (segment) {
+            "." -> Unit
+            ".." -> if (segments.isNotEmpty()) segments.removeAt(segments.size - 1)
+            else -> segments.add(segment)
+        }
+    }
+    return uri.buildUpon().encodedPath("/" + segments.joinToString("/") { Uri.encode(it) }).build()
 }
 
 private fun exists(context: Context?, uri: Uri): Boolean {
@@ -529,7 +545,15 @@ private fun image(context: Context?, value: Any?, baseURL: Uri?): Drawable? {
     if (value is Drawable) return value
     val string = value as? String ?: return null
     if (string.isEmpty()) return null
-    if (string.startsWith("system:")) return SYSTEM_IMAGES[string.removePrefix("system:")]?.let { CYLMenuIconDrawable(it) }
+    if (string.startsWith("system:")) {
+        val name = string.removePrefix("system:")
+        SYSTEM_IMAGES[name]?.let { return CYLMenuIconDrawable(it) }
+        // Android has no SF Symbols: any other "system:<name>" is the app's drawable "cyl_system_<name>" (dots as
+        // underscores, e.g. "system:star.fill" -> R.drawable.cyl_system_star_fill), tinted like a template image.
+        context ?: return null
+        val id = context.resources.getIdentifier("cyl_system_" + name.replace('.', '_').replace('-', '_').lowercase(), "drawable", context.packageName)
+        return if (id != 0) androidx.core.content.ContextCompat.getDrawable(context, id) else null
+    }
     if (context != null) {
         val name = string.substringBeforeLast('.').replace('-', '_').lowercase()
         val id = context.resources.getIdentifier(name, "drawable", context.packageName)

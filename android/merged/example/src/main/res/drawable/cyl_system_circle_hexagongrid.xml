@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "system:circle.hexagongrid" (an SF Symbol on iOS) for the tag lists of the menu example's configurations. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="1.8"
+        android:strokeLineJoin="round" android:strokeLineCap="round" android:pathData="M12,12m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0M12,7l2.6,1.5v3L12,13l-2.6,-1.5v-3zM7.5,13.5l2.6,1.5v3M16.5,13.5l-2.6,1.5v3" />
+</vector>
