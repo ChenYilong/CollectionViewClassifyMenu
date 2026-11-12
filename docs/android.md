@@ -85,8 +85,13 @@ Android chapter.
 - [x] Step 5: missing APIs: 709 / 709 aligned, full marks (score history below; 29 library unit tests)
 - [ ] Step 6: iOS examples ported, screenshots, README Android chapter. Progress: the demo app (Classify, Filter tabs)
   the TagCollectionView demo (Tags tab) and the Tag editor (`Example-Swift`, Editor tab: Edit tags with the editor
-  sheet, Fold styles with the configuration files) are ported; the tab bar scrolls (one tab per example); next: the
-  Menu example (`Example/CYLMenuExample`). Plan (2026-11-12):
+  sheet, Fold styles with the configuration files) are ported; the tab bar scrolls (one tab per example). Menu example
+  (`Example/CYLMenuExample`, Menu tab, in progress): the tab holds a home list with one row per part of the iOS
+  example's tab bar. Scenario 1 (review filter) is DONE: the product screen (keywords, two rows) and the review list
+  (several filters, "全部" exclusive, chevron fold, In memory / Network / Database modes, the request URL and the SQL
+  shown), reading the reviews from the shared database. TODO: scenario 2 (search categories, discover), styles,
+  animations (Lottie / Rive / GIF from `CYLMenuExample.bundle`), the plus page (query scenarios, menu linkage, tag
+  cloud, configuration). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
      Menu (`Example/CYLMenuExample`: review filter, search categories, styles, animations, and its plus page, the
      query scenarios), Tag editor (`Example-Swift/CYLTagEditorExample`), Classify demo (the demo app of
@@ -181,6 +186,10 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Editor tab: Edit remarks (the tag editor example's first screen) | <img src="assets/android-editor-remark.png" width="300" alt="Editor tab, remarks"> |
 | Editor tab: the editor sheet (search, Recent, My Tags with Manage, several chosen) | <img src="assets/android-editor-sheet.png" width="300" alt="Editor sheet"> |
 | Editor tab: Fold styles (every fold control and title style) | <img src="assets/android-editor-fold-styles.png" width="300" alt="Fold styles"> |
+| Menu tab, scenario 1: the product screen, review keywords with counts from the shared database | <img src="assets/android-menu-product.png" width="300" alt="Product screen"> |
+| Menu tab, scenario 1: the review list, In memory mode, "划算" selected: 3 of 10 | <img src="assets/android-menu-reviews-memory.png" width="300" alt="Review list, memory mode"> |
+| Menu tab, scenario 1: Database mode: the filters as SQL on `reviews` / `review_keywords`, 3 matches | <img src="assets/android-menu-reviews-database.png" width="300" alt="Review list, database mode"> |
+| Menu tab, scenario 1: Network mode: `GET /reviews?filter=photo&filter=keyword:划算`, the server returns 1 | <img src="assets/android-menu-reviews-network.png" width="300" alt="Review list, network mode"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots

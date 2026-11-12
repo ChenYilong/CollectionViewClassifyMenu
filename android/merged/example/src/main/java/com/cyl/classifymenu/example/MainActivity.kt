@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
             "line.3.horizontal.decrease.circle" to R.drawable.ic_tab_filter,
             "tag.square" to R.drawable.ic_tab_tags,
             "tag.circle" to R.drawable.ic_tab_editor,
+            "cart" to R.drawable.ic_tab_menu,
             "plus.circle.fill" to R.drawable.ic_plus_raised,
         )
 
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() {
             pages.registerPageProvider({ _, _ -> FilterDemoFragment() }, "filter")
             pages.registerPageProvider({ _, _ -> TagCollectionDemoFragment() }, "tagcollection")
             pages.registerPageProvider({ _, _ -> TagEditorFragment() }, "editor")
+            pages.registerPageProvider({ _, _ -> com.cyl.classifymenu.example.menu.MenuFragment() }, "menu")
             pages.registerPageProvider({ _, _ -> LicrafterTagEditFragment() }, "plus")
         }
     }

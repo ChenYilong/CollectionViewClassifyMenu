@@ -23,4 +23,5 @@
     <string name="classify_tag_hint">Tap a category tag (single choice; tap it again to clear). Each choice → SQL → SQLite query → results below.</string>
     <string name="tagcollection_title">TagCollectionView</string>
     <string name="editor_tab">Editor</string>
+    <string name="menu_title">Menu example</string>
 </resources>

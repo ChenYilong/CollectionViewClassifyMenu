@@ -14,8 +14,11 @@ Program) show the same screens with the same data and look the same as iOS, whic
     (`CYLDemoPlaces` in `CYLFilterDemoViewController.swift`); the Filter tab shows the conditions, the SQL and the count.
   - Android example: `Example-Shared/Database` is an asset folder (`example/build.gradle.kts`); `ClassifyPlacesDatabase`
     copies the asset to the app's databases folder when it differs and opens it read-only.
-  - Next: `Example/CYLMenuExample`'s `CYLExampleDatabase` still fills its own `places` table at run time; read the
-    shared file instead (attach it). React Native and Flutter examples, when added, bundle the same file.
+  - The file also holds the menu example's reviews (tables `reviews`, `review_keywords`, the 10 reviews of
+    `CYLReviewStore.mockReviews()` in the same order and schema): the Android Menu tab reads them, and its database
+    mode runs the iOS example's SQL on them (2026-11-12).
+  - Next (TODO): `Example/CYLMenuExample`'s `CYLExampleDatabase` still fills its own `places` and `reviews` tables at
+    run time; read the shared file instead (attach it). React Native and Flutter examples, when added, bundle the same file.
 - **Evidence:** both show `SELECT name, category, tag, region, rating, price FROM places ORDER BY rating DESC, id` →
   83 of 83, first 日式拉面 · 北京 ★5.0 ¥93 (`assets/ios-demo-filter-tab.png`, `assets/android-filter-results.png`);
   `scripts/unit-tests.sh menu` 30 tests, 0 failures (the Filter test reads the bundled file).
