@@ -25,7 +25,11 @@ import kotlin.math.roundToInt
 
 /**
  * `CYLIndexPathButton`: a button that knows its item (section, row), with spacing between its image and title and
- * an inset before the title (dp).
+ * an inset before the title (dp). It lays its image and title out as the iOS button does: centered gravity centers
+ * image and title together (`UIControlContentHorizontalAlignmentCenter`), start gravity puts them at the leading edge;
+ * then the image moves `cyl_imageTitleSpacing / 2` toward the leading edge and the title the same toward the trailing
+ * edge, plus `cyl_titleLeadingInset`. So with the same parameters the padding before the image equals the padding
+ * after the title, as on iOS.
  */
 open class CYLIndexPathButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : Button(context, attrs) {
     var section: Int = 0
@@ -38,7 +42,7 @@ open class CYLIndexPathButton @JvmOverloads constructor(context: Context, attrs:
         set(value) {
             if (field == value) return
             field = value
-            compoundDrawablePadding = (value * resources.displayMetrics.density).roundToInt()
+            requestLayout()
         }
 
     /**
@@ -48,8 +52,14 @@ open class CYLIndexPathButton @JvmOverloads constructor(context: Context, attrs:
         set(value) {
             if (field == value) return
             field = value
-            setPaddingRelative((value * resources.displayMetrics.density).roundToInt(), paddingTop, paddingEnd, paddingBottom)
+            requestLayout()
         }
+
+    /**
+     * The horizontal gravity the caller asked for (null: centered, the iOS default); the button itself always uses
+     * start gravity with computed padding.
+     */
+    private var requestedHorizontalGravity: Int? = null
 
     init {
         isAllCaps = false
@@ -59,6 +69,12 @@ open class CYLIndexPathButton @JvmOverloads constructor(context: Context, attrs:
         minimumWidth = 0
         setPadding(0, 0, 0, 0)
         stateListAnimator = null
+        maxLines = 1
+    }
+
+    override fun setGravity(gravity: Int) {
+        requestedHorizontalGravity = gravity and android.view.Gravity.HORIZONTAL_GRAVITY_MASK
+        super.setGravity((gravity and android.view.Gravity.VERTICAL_GRAVITY_MASK).let { if (it == 0) Gravity.CENTER_VERTICAL else it } or Gravity.START)
     }
 
     /**
@@ -67,12 +83,52 @@ open class CYLIndexPathButton @JvmOverloads constructor(context: Context, attrs:
     fun setImage(image: Drawable?) {
         image?.setBounds(0, 0, image.intrinsicWidth, image.intrinsicHeight)
         setCompoundDrawablesRelative(image, null, null, null)
+        requestLayout()
     }
 
     /**
      * `currentImage`.
      */
     val currentImage: Drawable? get() = compoundDrawablesRelative[0]
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        cyl_layoutContent(right - left)
+        super.onLayout(changed, left, top, right, bottom)
+    }
+
+    override fun onTextChanged(text: CharSequence?, start: Int, lengthBefore: Int, lengthAfter: Int) {
+        super.onTextChanged(text, start, lengthBefore, lengthAfter)
+        requestLayout()
+    }
+
+    /**
+     * `-layoutSubviews` of the iOS button: the padding before the image (or the title) and the gap between them.
+     */
+    private fun cyl_layoutContent(width: Int) {
+        val density = resources.displayMetrics.density
+        val image = currentImage
+        val hasTitle = !text.isNullOrEmpty()
+        val imageWidth = image?.bounds?.width() ?: 0
+        val titleWidth = if (hasTitle) paint.measureText(text.toString()) else 0f
+        val inset = cyl_titleLeadingInset * density
+        val halfSpacing = if (image != null && hasTitle && cyl_imageTitleSpacing > 0) cyl_imageTitleSpacing * density / 2 else 0f
+        val centered = (requestedHorizontalGravity ?: Gravity.CENTER_HORIZONTAL) == Gravity.CENTER_HORIZONTAL
+        // The content's leading edge before the iOS adjustments: centered, or at the start.
+        val contentStart = if (centered) (width - imageWidth - titleWidth) / 2 else 0f
+        val start: Float
+        val gap: Float
+        if (image != null) {
+            start = contentStart - halfSpacing
+            gap = 2 * halfSpacing + if (hasTitle) inset else 0f
+        } else {
+            start = contentStart + if (hasTitle) inset else 0f
+            gap = 0f
+        }
+        val startPx = kotlin.math.max(0, start.roundToInt())
+        val gapPx = kotlin.math.max(0, gap.roundToInt())
+        if (paddingStart != startPx || paddingEnd != 0) setPaddingRelative(startPx, paddingTop, 0, paddingBottom)
+        if (compoundDrawablePadding != gapPx) compoundDrawablePadding = gapPx
+    }
 }
 
 /**
@@ -189,6 +245,7 @@ class CYLFilterHeaderView @JvmOverloads constructor(context: Context, attrs: Att
         val moreX = max(16f, w - 12 - moreWidth)
         moreButton.measure(MeasureSpec.makeMeasureSpec((moreWidth * density).roundToInt(), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
         titleButton.measure(MeasureSpec.makeMeasureSpec((max(0f, moreX - 24) * density).roundToInt(), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+        // iOS: titleButton.frame = (16, 0, moreX - 24, height), image at its leading edge, title 16 after it.
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -196,7 +253,7 @@ class CYLFilterHeaderView @JvmOverloads constructor(context: Context, attrs: Att
         val moreWidth = min(72f, max(0f, w - 28))
         val moreX = max(16f, w - 12 - moreWidth)
         moreButton.layout((moreX * density).roundToInt(), 0, ((moreX + moreWidth) * density).roundToInt(), b - t)
-        titleButton.layout(0, 0, (max(0f, moreX - 8) * density).roundToInt(), b - t)
+        titleButton.layout((16 * density).roundToInt(), 0, (max(16f, moreX - 8) * density).roundToInt(), b - t)
     }
 
     override fun onDraw(canvas: Canvas) {
