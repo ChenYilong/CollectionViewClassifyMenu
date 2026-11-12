@@ -35,7 +35,8 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-- TODO（两个功能分到不同 tabbaritem，2026-11-12，`feat/android-kotlin`）：
+- 进行中（两个功能分到不同 tabbaritem，2026-11-12，`feat/android-kotlin`）：Android 已完成（Classify 与 Filter 两个 tab，截图见
+  [android.md](android.md)「Screenshots: Classify and Filter tabs」）；iOS 演示 app 拆分待做；跨端：本仓库无 RN / Flutter 示例。
   - 上下文：用户附两张 Android 截图（`assets/request-split-classify-menu.png` 单选可折叠菜单，`assets/request-split-multiple-filter.jpg`
     多选筛选），二者此前共用 Classify 一个 tab。
   - 要求：拆成两个 tabbaritem 分开展示，不共用；适用于所有平台的 example：iOS、Android、跨端 React Native / Flutter。
@@ -44,7 +45,8 @@ tags: [issues, ui, cocoapods, progress]
   - 用户提示词原文：
     > 拆分截图中的两个功能，使用不同的tabbaritem 分开展示。不要共用一个tabbatitem。该改变适用于所有平台example展示。包括iOS端和android端以及跨端rn flutter。continue
 
-- TODO（多选筛选页在 example 层展示并与本地数据联动，2026-11-12，`feat/android-kotlin`）：
+- 进行中（多选筛选页在 example 层展示并与本地数据联动，2026-11-12，`feat/android-kotlin`）：Android 已完成（Filter tab：左上按钮从左侧滑出、
+  占大半屏，选择后 SQL 查询本地 SQLite `places` 并显示结果；修复底部按钮无文字、背景图按中心拉伸）；iOS 验证待做。
   - 上下文：用户附图（`assets/request-multiple-filter-reference.png`，README 的多选筛选动图：左上角按钮点击后从左侧滑出、占大半屏，
     地区/菜品两组、"全部"互斥、底部"返回默认/确认筛选"）。iOS Swift 版原 ObjC 示例（`CYLMainViewController`）有此页；
     `Example/CYLMenuExample` 的 `CYLMenuLinkageViewController`（加号页 → 查询场景 → 菜单联动）已用同一页面并与 SQLite

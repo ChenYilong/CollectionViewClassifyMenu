@@ -135,6 +135,24 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | batch C | Picture tags in `com.cyl.classifymenu` under the iOS names: `CYLImageTagDirection`, `CYLImageTag`, `CYLImageTagGroup`, `CYLImageTagLabel`, `CYLImageTagRippleView`, `CYLImageTagGroupView` (layout, lines, dot, ripple, keyed animations, show / hide, tap / long press / drag, accessibility element with move actions) and `CYLImageTagView` (groups kept apart, edit mode); the mapper now matches one-line enum entries and categories; 23 unit tests | 583 / 678 | 86.0 |
 | batch D | The classify menu and the multiple filter: `CYLClassifyMenuViewController` and `CYLFilterBaseController` / `CYLMultipleFilterController` as Fragments, `CYLFilterHeaderView`, `CYLCollectionViewCell`, `CYLIndexPathButton`, `CYLRightImageButton`, `CYLFilterParamsTool`, `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`; the categories as extension functions (`View` frame helpers, border, corners, overlay layers, capture; `Bitmap.cyl_blurredImageWithRadius`; `List` / `Map` descriptions; `TextView` button styles); the iOS images copied into the resource bundle; 27 unit tests | 678 / 678 | 100.0 |
 
+## Screenshots: Classify and Filter tabs (iOS demo app on Android)
+
+The iOS demo app's two features have a tab each (one feature per tab item), both linked to the local SQLite `places`
+table as the iOS example's menu linkage. The plus button is raised (its top above the tab bar). Stacked top to bottom.
+
+- **Platform:** Android (Kotlin, `android/merged/example`).
+- **Environment:** macOS 27.3, Android Emulator `CYL_API35_arm64` (sdk_gphone64_arm64, Android 15, API 35),
+  compileSdk / targetSdk 35, AGP 8.7.3, Kotlin 2.0.21; CYLTabBarController for Android at `27a7c55`.
+- **Repository:** branch `feat/android-kotlin`, the commit that adds this section (see `git log -- docs/assets/android-filter-panel.png`).
+- **Taken:** 2026-11-12 18:35 NZDT (UTC+13).
+
+| Screen | Screenshot |
+| --- | --- |
+| Tab bar: six tabs (TagView, Container, ViewGroup, Classify, Filter, About) and the raised plus button | <img src="assets/android-tabbar-raised-plus.png" width="360" alt="Tab bar with the raised plus button"> |
+| Classify tab: single-choice classify menu; the selected tag (云南味道) queries SQLite, 3 of 83 places | <img src="assets/android-classify-tab.png" width="300" alt="Classify tab with linked results"> |
+| Filter tab: the filter slides in from the left over most of the screen (北京 and 川菜 selected, Reset / Apply) | <img src="assets/android-filter-panel.png" width="300" alt="Multiple-choice filter panel"> |
+| Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
+
 ## Screenshots
 
 The merged example, top to bottom: the TagView, TagContainer, plus (New), TagViewGroup and About tabs.
