@@ -36,12 +36,20 @@ class LicrafterTagListActivity : AppCompatActivity() {
             return Holder(view)
         }
 
+        /**
+         * The items whose groups are hidden (TagViewGroup issue #4).
+         */
+        val hiddenPositions = HashSet<Int>()
+
         override fun getItemCount(): Int = 30
 
         override fun onBindViewHolder(holder: Holder, position: Int) {
             val groups = DataRepo.tagGroups
             holder.tagImageView.setPicture(position % 3, 400)
             holder.tagImageView.setTagGroups(if (groups.isEmpty()) emptyList() else listOf(groups[position % groups.size]))
+            // Issue #4: each item keeps its own hidden state; a recycled view takes the state of the item it shows.
+            holder.tagImageView.groupsHidden = position in hiddenPositions
+            holder.tagImageView.onGroupsHiddenChanged = { hidden -> if (hidden) hiddenPositions.add(position) else hiddenPositions.remove(position) }
             holder.tagImageView.onCircleClick = { toast(getString(R.string.licrafter_circle_click)) }
             holder.tagImageView.onLongPress = { toast(getString(R.string.licrafter_circle_click)) }
             holder.tagImageView.onTagClick = { _, _, title -> toast(getString(R.string.licrafter_tag_click, title)) }
