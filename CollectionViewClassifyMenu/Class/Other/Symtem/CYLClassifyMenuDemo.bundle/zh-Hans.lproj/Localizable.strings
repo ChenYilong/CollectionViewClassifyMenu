@@ -1,0 +1,10 @@
+/* The demo app of CollectionViewClassifyMenu.xcodeproj. Keys are the Chinese source text. */
+"超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品" = "超出默认行数,出现\"更多\"按钮,点击展开.@iOS程序犭袁 出品";
+"默认显示两行时的效果如下所示:" = "默认显示两行时的效果如下所示:";
+"默认显示一行时的效果如下所示:" = "默认显示一行时的效果如下所示:";
+/* The highlighted part of the two titles above. */
+"两行" = "两行";
+"一行" = "一行";
+"默认显示两行" = "默认显示两行";
+"重置筛选条件" = "重置筛选条件";
+"清除所有已选标签" = "清除所有已选标签";

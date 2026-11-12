@@ -128,12 +128,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"CYLTagView";
-    self.backgroundView = [[UIScrollView alloc] initWithFrame:
-                           CGRectMake(0, 0,
-                                      [UIScreen mainScreen].bounds.size.width,
-                                      [UIScreen mainScreen].bounds.size.height)
-                           ];
+    self.title = CYLMenuLocalizedString(@"CYLMenuTitle", @"Menu title");
+    self.backgroundView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     self.backgroundView.showsVerticalScrollIndicator = NO;
     self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.backgroundView.alwaysBounceVertical = YES;
@@ -146,6 +142,9 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     if (self.menuHeaderView) {
         [self.backgroundView addSubview:self.menuHeaderView];
     }
+    if (self.menuFooterView) {
+        [self.backgroundView addSubview:self.menuFooterView];
+    }
     self.view.backgroundColor = [UIColor blueColor];
 }
 
@@ -153,6 +152,15 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     [super viewDidAppear:animated];
     self.backgroundView.scrollEnabled = YES;
     [self updateViewHeight];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory]) {
+        // Text size changed: measure every tag again on the next layout pass.
+        self.calculatedCollectionWidth = 0;
+        [self.view setNeedsLayout];
+    }
 }
 
 - (void)viewDidLayoutSubviews {
@@ -187,9 +195,10 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
             NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithObject:[source menuTitleForItemAtIndexPath:indexPath]
                                                                              forKey:kDataSourceCellTextKey];
-            if ([source respondsToSelector:@selector(menuItemHasImageAtIndexPath:)] &&
-                [source menuItemHasImageAtIndexPath:indexPath]) {
-                entry[kDataSourceCellPictureKey] = @"Picture";
+            UIImage *image = [source respondsToSelector:@selector(menuImageForItemAtIndexPath:)]
+                ? [source menuImageForItemAtIndexPath:indexPath] : nil;
+            if (image) {
+                entry[kDataSourceCellPictureKey] = image;
             }
             [items addObject:entry];
         }
@@ -280,13 +289,20 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     return cellCount;
 }
 
+- (UIFont *)cyl_tagFont {
+    return CYLTagTitleFontForTraitCollection(self.collectionView.traitCollection ?: self.traitCollection);
+}
+
+- (CGFloat)cyl_cellHeight {
+    return CYLTagHeightForFont([self cyl_tagFont], kCollectionViewCellHeight);
+}
+
 - (float)collectionCellWidthText:(NSString *)text content:(NSDictionary *)content {
     float cellWidth;
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
-                         CYLTagTitleFont}];
-    NSString *picture = [content objectForKey:kDataSourceCellPictureKey];
-    BOOL shouldShowPic = [@(picture.length) boolValue];
+                         [self cyl_tagFont]}];
+    BOOL shouldShowPic = [self cyl_imageForItem:content] != nil;
     if (shouldShowPic) {
         cellWidth = ceilf(size.width) + kCellBtnCenterToBorderMargin * 2;
     } else {
@@ -299,8 +315,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 }
 
 - (void)addCollectionView {
-    CGRect collectionViewFrame = CGRectMake(0, CGRectGetHeight(self.menuHeaderView.frame) + kControllerHeaderToCollectionViewMargin, [UIScreen mainScreen].bounds.size.width,
-                                            [UIScreen mainScreen].bounds.size.height - 40);
+    CGRect collectionViewFrame = CGRectMake(0, CGRectGetHeight(self.menuHeaderView.frame) + kControllerHeaderToCollectionViewMargin, CGRectGetWidth(self.view.bounds),
+                                            MAX(0, CGRectGetHeight(self.view.bounds) - 40));
     CYLCollectionViewLeftAlignedLayout *layout = [[CYLCollectionViewLeftAlignedLayout alloc] init];
     self.collectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame
                                              collectionViewLayout:layout];
@@ -330,12 +346,69 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
                                            self.collectionView.contentSize.height +
                                            kCollectionViewToTopMargin +
                                            kCollectionViewToBottomtMargin);
+    CGFloat footerHeight = [self cyl_layoutFooterBelowY:CGRectGetMaxY(self.collectionView.frame)];
     self.backgroundView.contentSize = CGSizeMake(CGRectGetWidth(self.backgroundView.bounds),
                                                  self.collectionView.contentSize.height +
                                                  CGRectGetHeight(self.menuHeaderView.frame) +
                                                  kCollectionViewToTopMargin +
                                                  kCollectionViewToBottomtMargin +
+                                                 footerHeight +
                                                  64);
+}
+
+/// Places the footer at `y`, as wide as the menu, and returns its height.
+- (CGFloat)cyl_layoutFooterBelowY:(CGFloat)y {
+    UIView *footer = self.menuFooterView;
+    if (!footer || !self.backgroundView || CGRectGetWidth(self.backgroundView.bounds) <= 0) {
+        // Not laid out yet: viewDidLoad and the first layout pass place it.
+        return 0;
+    }
+    if (footer.superview != self.backgroundView) {
+        [self.backgroundView addSubview:footer];
+    }
+    CGFloat width = CGRectGetWidth(self.backgroundView.bounds);
+    CGFloat height = CGRectGetHeight(footer.frame);
+    if (footer.constraints.count > 0 || footer.subviews.count > 0) {
+        CGSize fitting = [footer systemLayoutSizeFittingSize:CGSizeMake(width, UILayoutFittingCompressedSize.height)
+                               withHorizontalFittingPriority:UILayoutPriorityRequired
+                                     verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+        if (fitting.height > 0) {
+            height = fitting.height;
+        }
+    }
+    footer.translatesAutoresizingMaskIntoConstraints = YES;
+    footer.frame = CGRectMake(0, y, width, ceil(height));
+    return CGRectGetHeight(footer.frame);
+}
+
+- (void)updateMenuLayout {
+    if (self.isViewLoaded) {
+        [self updateViewHeight];
+    }
+}
+
+- (void)setMenuFooterView:(UIView *)menuFooterView {
+    if (_menuFooterView != menuFooterView) {
+        [_menuFooterView removeFromSuperview];
+    }
+    _menuFooterView = menuFooterView;
+    [self updateMenuLayout];
+}
+
+- (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath {
+    _selectedIndexPath = selectedIndexPath;
+    if (self.isViewLoaded) {
+        for (NSIndexPath *indexPath in self.collectionView.indexPathsForVisibleItems) {
+            CYLCollectionViewCell *cell = (CYLCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+            [self cyl_updateSelectionOfCell:cell atIndexPath:indexPath];
+        }
+    }
+}
+
+- (void)cyl_updateSelectionOfCell:(CYLCollectionViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    BOOL selected = [self.selectedIndexPath isEqual:indexPath];
+    cell.button.selected = selected;
+    cell.button.accessibilityTraits = selected ? (UIAccessibilityTraitButton | UIAccessibilityTraitSelected) : UIAccessibilityTraitButton;
 }
 
 #pragma mark - 🔌 UICollectionViewDataSource Method
@@ -355,14 +428,17 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     return [self.firstRowCellCountArray[section] integerValue];
 }
 
-- (BOOL)shouldCollectionCellPictureShowWithIndex:(NSIndexPath *)indexPath {
-    NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
-    NSString *picture = [items[indexPath.row] objectForKey:kDataSourceCellPictureKey];
-    NSUInteger pictureLength = [@(picture.length) integerValue];
-    if (pictureLength > 0) {
-        return YES;
+/// The item's image: a UIImage from -menuImageForItemAtIndexPath:, or the
+/// bundled default for legacy dictionaries that store a non-empty string.
+- (UIImage *)cyl_imageForItem:(NSDictionary *)item {
+    id picture = item[kDataSourceCellPictureKey];
+    if ([picture isKindOfClass:[UIImage class]]) {
+        return picture;
     }
-    return NO;
+    if ([picture isKindOfClass:[NSString class]] && [picture length] > 0) {
+        return CYLMenuImage(@"home_btn_shrink");
+    }
+    return nil;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -373,24 +449,22 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     NSMutableArray *items = [NSMutableArray arrayWithArray:[self.dataSource[indexPath.section]
                                                             objectForKey:kDataSourceSectionKey]];
     NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
-    BOOL shouldShowPic = [self shouldCollectionCellPictureShowWithIndex:indexPath];
-    if (shouldShowPic) {
-        [cell.button setImage:[CYLMenuResources imageNamed:@"home_btn_shrink"]
-                     forState:UIControlStateNormal];
-        CGFloat spacing = kCollectionViewItemButtonImageToTextMargin;
-        cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
-        cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
+    UIImage *image = [self cyl_imageForItem:items[indexPath.row]];
+    if (image) {
+        [cell.button setImage:image forState:UIControlStateNormal];
+        cell.button.cyl_imageTitleSpacing = kCollectionViewItemButtonImageToTextMargin;
     } else {
         [cell.button setImage:nil forState:UIControlStateNormal];
-        cell.button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
-        cell.button.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+        cell.button.cyl_imageTitleSpacing = 0;
     }
+    cell.button.titleLabel.font = [self cyl_tagFont];
     [cell.button setTitle:text forState:UIControlStateNormal];
     [cell.button setTitle:text forState:UIControlStateSelected];
     [cell.button addTarget:self action:@selector(itemButtonClicked:)
           forControlEvents:UIControlEventTouchUpInside];
     cell.button.section = indexPath.section;
     cell.button.row = indexPath.row;
+    [self cyl_updateSelectionOfCell:cell atIndexPath:indexPath];
     return cell;
 }
 
@@ -424,28 +498,15 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         filterHeaderView.titleButton.tag = indexPath.section;
         filterHeaderView.moreButton.tag = indexPath.section;
         filterHeaderView.moreButton.selected = NO;
+        // The title is a heading, not a control; the fold button names its section.
+        filterHeaderView.titleButton.accessibilityTraits = UIAccessibilityTraitHeader;
+        filterHeaderView.moreButton.accessibilityHint = sectionTitle;
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateNormal];
         [filterHeaderView.titleButton setTitle:sectionTitle forState:UIControlStateSelected];
-        switch (indexPath.section) {
-            case 0:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            case 1:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            case 2:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            case 3:
-                [filterHeaderView.titleButton setImage:[CYLMenuResources imageNamed:@"home_btn_cosmetic"]
-                                              forState:UIControlStateNormal];
-                break;
-            default:
-                break;
-        }
+        id<CYLMenuDataSource> source = self.menuDataSource;
+        UIImage *sectionImage = [source respondsToSelector:@selector(menuImageForSection:)]
+            ? [source menuImageForSection:indexPath.section] : nil;
+        [filterHeaderView.titleButton setImage:sectionImage forState:UIControlStateNormal];
         for (NSNumber *i in self.expandSectionArray) {
             if (indexPath.section == [i integerValue]) {
                 filterHeaderView.moreButton.selected = YES;
@@ -453,7 +514,8 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
         }
         return (UICollectionReusableView *)filterHeaderView;
     }
-    return nil;
+    // Only headers have a size, so UIKit never asks for another kind.
+    return [[UICollectionReusableView alloc] initWithFrame:CGRectZero];
 }
 
 #pragma mark - 🔌 FilterHeaderViewDelegateMethod Method
@@ -484,7 +546,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
     NSArray *items = [NSArray arrayWithArray:[self.dataSource[indexPath.section] objectForKey:kDataSourceSectionKey]];
     NSString *text = [items[indexPath.row] objectForKey:kDataSourceCellTextKey];
     float cellWidth = [self collectionCellWidthText:text content:items[indexPath.row]];
-    return CGSizeMake(cellWidth, kCollectionViewCellHeight);
+    return CGSizeMake(cellWidth, [self cyl_cellHeight]);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView
@@ -495,7 +557,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
 referenceSizeForHeaderInSection:(NSInteger)section {
-    return CGSizeMake([UIScreen mainScreen].bounds.size.width - 50, 38);
+    return CGSizeMake(MAX(0, CGRectGetWidth(collectionView.bounds) - 50), 38);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView

@@ -1,0 +1,84 @@
+{
+  "comment": "Fetched by scripts/fetch-animation-resources.py (run by `pod install` in Example); the files themselves are not in this repository. Copied from CYLTabBarController's Example-Shared/PAGResources/pag-resources.json: libpag/pag-ios samples, and the PAG tab icons of its Example-PAG (tab-icons/ there, pag-ios/tab_*.pag here).",
+  "repositories": [
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "license": "Apache-2.0"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "license": "Apache-2.0"
+    }
+  ],
+  "files": [
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "LICENSE",
+      "file": "pag-ios/LICENSE",
+      "size": 9480,
+      "sha256": "a4ddf2289697aaba6c02064e0d90fa77b5a917f53c1459dc3f5af26a00f57f62"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/0.pag",
+      "file": "pag-ios/0.pag",
+      "size": 7344,
+      "sha256": "882e8a34d8af6fb297ef7730d4a5bc62d028053762da00f820f89e7269953840"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/1.pag",
+      "file": "pag-ios/1.pag",
+      "size": 2085,
+      "sha256": "806d8f95e636d9f3c7ae59cdb89964d9d0106f84d5ee98e8905ec4c62b19bda2"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "LICENSE.txt",
+      "file": "pag-ios/LICENSE-libpag.txt",
+      "size": 116512,
+      "sha256": "564047c2ea762f7b50d3c7d191b8305a464d3def329ad6ef259ec3228823a353"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/refreshing.pag",
+      "lfs": true,
+      "file": "pag-ios/tab_home.pag",
+      "size": 1582,
+      "sha256": "069f7cf1b54f5d7a896deffc6fafd622e3ed439550a64df2ec329e1b99a6d72f"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/wstask_circle.pag",
+      "lfs": true,
+      "file": "pag-ios/tab_health.pag",
+      "size": 2627,
+      "sha256": "abfac793abe73ef23a3cb4464b1dda573fd1a64cf3f36c9d4076a0e271c2d864"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/like.pag",
+      "lfs": true,
+      "file": "pag-ios/tab_me.pag",
+      "size": 6922,
+      "sha256": "bc40511dc95bf2452a89fda2d494e2d3c3d74aacf39623fcbe22f7a242bbe1b0"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/2.pag",
+      "file": "pag-ios/tab_moments.pag",
+      "size": 2366,
+      "sha256": "86262b2775863b102d6679ca4a1e1f54479c5b5a7fac2b6e4a450d25d6b1a0ed"
+    }
+  ]
+}

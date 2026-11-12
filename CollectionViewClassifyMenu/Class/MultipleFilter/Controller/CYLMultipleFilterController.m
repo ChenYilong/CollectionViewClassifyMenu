@@ -147,7 +147,8 @@ static float const kCollectionViewCellsHorizonMargin = 12;
         view.titleLabel.text = [self.menuDataSource menuTitleForSection:indexPath.section];
         return view;
     }
-    return nil;
+    // Only headers have a size, so UIKit never asks for another kind.
+    return [[UICollectionReusableView alloc] initWithFrame:CGRectZero];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -156,9 +157,14 @@ static float const kCollectionViewCellsHorizonMargin = 12;
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
     [cell.titleButton setTitle:text forState:UIControlStateNormal];
     [cell.titleButton setTitle:text forState:UIControlStateSelected];
+    cell.titleButton.titleLabel.font = [self cyl_tagFont];
     cell.titleButton.selected = [self.filterParamsTool.filterParamsArray[indexPath.section][indexPath.row] boolValue];
     cell.titleButton.section = indexPath.section;
     cell.titleButton.row = indexPath.row;
+    // The cell is the tappable element (the button ignores touches): describe it to VoiceOver.
+    cell.isAccessibilityElement = YES;
+    cell.accessibilityLabel = text;
+    cell.accessibilityTraits = UIAccessibilityTraitButton | (cell.titleButton.selected ? UIAccessibilityTraitSelected : 0);
     return cell;
 }
 
@@ -212,11 +218,25 @@ static float const kCollectionViewCellsHorizonMargin = 12;
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     NSString *text = self.filterParamsTool.dataSources[indexPath.section][indexPath.row];
+    UIFont *font = [self cyl_tagFont];
     CGSize size = [text sizeWithAttributes:
                    @{NSFontAttributeName:
-                         CYLTagTitleFont}];
+                         font}];
     float width = [self checkCellLimitWidth:ceilf(size.width)] ;
-    return CGSizeMake(width, 30);
+    return CGSizeMake(width, CYLTagHeightForFont(font, 30));
+}
+
+- (UIFont *)cyl_tagFont {
+    return CYLTagTitleFontForTraitCollection(self.collectionView.traitCollection ?: self.traitCollection);
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (self.isViewLoaded &&
+        ![previousTraitCollection.preferredContentSizeCategory isEqualToString:self.traitCollection.preferredContentSizeCategory]) {
+        [self.collectionView.collectionViewLayout invalidateLayout];
+        [self.collectionView reloadData];
+    }
 }
 
 - (float)checkCellLimitWidth:(float)cellWidth {

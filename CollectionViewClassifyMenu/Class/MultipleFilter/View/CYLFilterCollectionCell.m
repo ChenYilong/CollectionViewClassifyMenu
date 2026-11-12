@@ -13,7 +13,7 @@
 @implementation UIImage (Stretch)
 
 + (UIImage *)stretchableImageNamed:(NSString *)name {
-    UIImage *image = [CYLMenuResources imageNamed:name];
+    UIImage *image = CYLMenuImage(name);
     return [image stretchableImageWithLeftCapWidth:(NSUInteger)(image.size.width / 2)
                                       topCapHeight:(NSUInteger)(image.size.height / 2)];
 }

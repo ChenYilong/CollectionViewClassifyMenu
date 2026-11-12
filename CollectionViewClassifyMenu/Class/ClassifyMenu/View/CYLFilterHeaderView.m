@@ -41,15 +41,14 @@ float const CYLFilterHeaderViewHeigt = 38;
 }
 
 - (id)sharedInit {
-    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, [UIScreen mainScreen].bounds.size.width - 2 * kCureOfLineOffX, kCureOfLineHight)];
+    UIView *cureOfLine = [[UIView alloc] initWithFrame:CGRectMake(kCureOfLineOffX, CYLFilterHeaderViewHeigt-kCureOfLineHight, MAX(0, CGRectGetWidth(self.bounds) - 2 * kCureOfLineOffX), kCureOfLineHight)];
     self.separator = cureOfLine;
     cureOfLine.backgroundColor = [UIColor colorWithRed:188.0 / 255.0 green:188.0 / 255.0 blue:188.0 / 255.0 alpha:1.0];
     [self addSubview:cureOfLine];
     self.backgroundColor = [UIColor whiteColor];
     // 仅修改self.titleButton的宽度,xyh值不变 / Change only the title button's width.
     self.titleButton = [[CYLIndexPathButton alloc] init];
-    self.titleButton.titleEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 0);
-    self.titleButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+    self.titleButton.cyl_titleLeadingInset = 16;
     self.titleButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     self.titleButton.frame = CGRectMake(16, 0, kTitleButtonWidth,  self.frame.size.height);
     self.titleButton.titleLabel.textAlignment = NSTextAlignmentLeft;
@@ -59,13 +58,13 @@ float const CYLFilterHeaderViewHeigt = 38;
     CGRect  moreBtnFrame = CGRectMake(self.moreButton.frame.origin.x, 0, kMoreButtonWidth, self.frame.size.height);
     self.moreButton = [[CYLRightImageButton alloc] initWithFrame:moreBtnFrame];
     // 仅修改self.moreButton的x,ywh值不变 / Change only the more button's x position.
-    self.moreButton.frame = CGRectMake([UIScreen mainScreen].bounds.size.width - 12 - self.moreButton.frame.size.width, self.moreButton.frame.origin.y, self.moreButton.frame.size.width, self.moreButton.frame.size.height);
-    [self.moreButton setImage:[CYLMenuResources imageNamed:@"home_btn_more_normal"] forState:UIControlStateNormal];
-    [self.moreButton setImage:[CYLMenuResources imageNamed:@"home_btn_more_selected"] forState:UIControlStateSelected];
+    self.moreButton.frame = CGRectMake(MAX(0, CGRectGetWidth(self.bounds) - 12 - self.moreButton.frame.size.width), self.moreButton.frame.origin.y, self.moreButton.frame.size.width, self.moreButton.frame.size.height);
+    [self.moreButton setImage:CYLMenuImage(@"home_btn_more_normal") forState:UIControlStateNormal];
+    [self.moreButton setImage:CYLMenuImage(@"home_btn_more_selected") forState:UIControlStateSelected];
     [self.moreButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self.moreButton setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
-    [self.moreButton setTitle:@"更多" forState:UIControlStateNormal];
-    [self.moreButton setTitle:@"收起" forState:UIControlStateSelected];
+    [self.moreButton setTitle:CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand menu section") forState:UIControlStateNormal];
+    [self.moreButton setTitle:CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse menu section") forState:UIControlStateSelected];
     self.moreButton.titleLabel.textAlignment = NSTextAlignmentRight;
     self.moreButton.hidden = YES;
     [self.moreButton addTarget:self action:@selector(moreButtonTapped:) forControlEvents:UIControlEventTouchUpInside];

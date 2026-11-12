@@ -1,0 +1,31 @@
+{
+  "selectionMode": "single",
+  "allowsEmptySelection": false,
+  "foldControl": { "position": "bottom", "content": "iconAndTitle" },
+  "defaultVisibleRows": 2,
+  "scrollEnabled": false,
+  "selectedItems": ["0-0"],
+  "style": {
+    "imageSize": "{22, 22}",
+    "imageTitleSpacing": 6,
+    "itemHeight": 40,
+    "sectionInsets": [12, 16, 12, 16],
+    "headerTextColor": "#8E8E93",
+    "normal": { "font": { "size": 14, "weight": "medium" }, "textColor": "#3C3C43", "cornerRadius": 0, "borderColor": "#C7C7CC", "borderWidth": 1, "margin": 12 },
+    "selected": { "font": { "size": 14, "weight": "semibold" }, "textColor": "#FFFFFF", "backgroundColor": "#FF6A00", "borderColor": "#FF6A00", "borderWidth": 1, "cornerRadius": 0, "margin": 12 }
+  },
+  "sections": [
+    {
+      "title": "CYLTabBarController 动效（Lottie / PAG / Rive / GIF）",
+      "items": [
+        { "title": "Lottie", "image": "system:sparkles", "animation": "../Animations/Lottie/tab_home_animate.json" },
+        { "title": "PAG", "image": "system:play.circle", "animation": "pag-ios/0.pag" },
+        { "title": "Rive", "image": "system:circle.hexagongrid", "animation": "../Animations/Rive/house.riv",
+          "animationOptions": { "stateMachine": "State Machine 1" } },
+        { "title": "GIF", "image": "system:photo", "animation": "../Animations/GIF/tab_star.gif" },
+        { "title": "SF Symbol", "image": "system:star", "selectedImage": "system:star.fill" },
+        { "title": "Disabled", "image": "system:nosign", "enabled": false }
+      ]
+    }
+  ]
+}

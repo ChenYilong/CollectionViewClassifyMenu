@@ -9,6 +9,10 @@
 #import "CYLMultipleFilterHeaderView.h"
 #import "UIView+CYLGeneral.h"
 
+@interface CYLMultipleFilterHeaderView ()
+@property (nonatomic, strong) CALayer *separator;
+@end
+
 @implementation CYLMultipleFilterHeaderView
 
 - (id)initWithFrame:(CGRect)frame {
@@ -21,11 +25,20 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    // 仅修改_titleLabel的宽度,xyh值不变 / Change only the title label's width.
-    float width = [UIScreen mainScreen].bounds.size.width - 50 - 50;
-    _titleLabel.frame = CGRectMake(_titleLabel.frame.origin.x, _titleLabel.frame.origin.y, width, _titleLabel.frame.size.height);
-    [_titleLabel cyl_addSubLayerWithFrame:CGRectMake(0, _titleLabel.frame.size.height - 0.5f, _titleLabel.frame.size.width, 0.5f) color:[UIColor colorWithRed:146 / 255.f green:175 / 255.f blue:164 / 255.f alpha:1.f].CGColor];
+    self.separator = [_titleLabel cyl_addSubLayerWithFrame:CGRectZero color:[UIColor colorWithRed:146 / 255.f green:175 / 255.f blue:164 / 255.f alpha:1.f].CGColor];
     _titleLabel.textColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5f];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    // 标题宽度跟随 header 实际宽度 / The title follows the header's actual width.
+    CGRect frame = _titleLabel.frame;
+    frame.size.width = MAX(0, CGRectGetWidth(self.bounds) - CGRectGetMinX(frame));
+    _titleLabel.frame = frame;
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    self.separator.frame = CGRectMake(0, CGRectGetHeight(frame) - 0.5f, CGRectGetWidth(frame), 0.5f);
+    [CATransaction commit];
 }
 
 @end

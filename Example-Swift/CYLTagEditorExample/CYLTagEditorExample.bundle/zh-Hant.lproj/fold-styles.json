@@ -1,0 +1,57 @@
+{
+  "title": "設定檔 JSON：底部「更多 ⌄」",
+  "titleImage": "system:briefcase",
+  "titleStyle": {
+    "normal": {
+      "textColor": "#07C160",
+      "iconColor": "#07C160"
+    }
+  },
+  "titlePosition": "topLeading",
+  "selectionMode": "multiple",
+  "showsSectionHeaders": false,
+  "defaultVisibleRows": 1,
+  "scrollEnabled": false,
+  "foldControl": {
+    "position": "bottom",
+    "content": "iconAndTitle"
+  },
+  "style": {
+    "itemHeight": 32,
+    "interitemSpacing": 10,
+    "lineSpacing": 10,
+    "sectionInsets": "{8, 16, 8, 16}",
+    "normal": {
+      "cornerRadius": 6,
+      "borderWidth": 0,
+      "backgroundColor": "systemGray6",
+      "margin": 12
+    },
+    "selected": {
+      "cornerRadius": 6,
+      "borderWidth": 0,
+      "backgroundColor": "#E6F7EE",
+      "textColor": "#07C160",
+      "margin": 12
+    }
+  },
+  "sections": [
+    {
+      "title": "職業",
+      "items": [
+        "產品經理",
+        "設計師",
+        "iOS 開發",
+        "Android 開發",
+        "前端開發",
+        "後端開發",
+        "營運",
+        "行銷",
+        "老師",
+        "醫生",
+        "律師",
+        "房東"
+      ]
+    }
+  ]
+}

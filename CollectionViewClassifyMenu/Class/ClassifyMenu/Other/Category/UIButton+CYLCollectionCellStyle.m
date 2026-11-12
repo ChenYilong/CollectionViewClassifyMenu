@@ -49,21 +49,24 @@
     [self setTitleColor:CYLAppTintColor forState:UIControlStateNormal];
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
     
-    UIImage *imageHighlighted  = [CYLMenuResources imageNamed:@"tag_btn_background_highlighted"];
+    UIImage *imageHighlighted  = CYLMenuImage(@"tag_btn_background_highlighted");
     [self setBackgroundImage:imageHighlighted forState:UIControlStateHighlighted];
+    // The selected tag of CYLClassifyMenuViewController.selectedIndexPath looks pressed.
+    [self setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    [self setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected | UIControlStateHighlighted];
+    [self setBackgroundImage:imageHighlighted forState:UIControlStateSelected];
+    [self setBackgroundImage:imageHighlighted forState:UIControlStateSelected | UIControlStateHighlighted];
 }
 
 + (UIImage *)cyl_imageWithColor:(UIColor *)color {
     CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, rect);
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
+    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat preferredFormat];
+    format.scale = 1;
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:rect.size format:format];
+    return [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
+        [color setFill];
+        [rendererContext fillRect:rect];
+    }];
 }
 
 @end

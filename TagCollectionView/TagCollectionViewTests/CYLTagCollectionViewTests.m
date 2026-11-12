@@ -155,4 +155,59 @@
     XCTAssertEqual([collection numberOfItemsInSection:0], 1);
 }
 
+- (void)testTagViewScalesWithAccessibilityTextSize {
+    UITraitCollection *large = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge];
+    UITraitCollection *standard = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge];
+    CYLTagModel *model = [CYLTagModel modelWithTitle:@"一个非常非常长的标签 🧪🚀"];
+    [model updateSizeForTraitCollection:standard];
+    CGFloat standardWidth = model.width;
+    XCTAssertEqualWithAccuracy(model.height, 35, 0.01);
+    [model updateSizeForTraitCollection:large];
+    XCTAssertGreaterThan(model.width, standardWidth);
+    XCTAssertGreaterThan(model.height, 35);
+
+    CYLTagTestSource *source = [[CYLTagTestSource alloc] init];
+    source.titles = @[@"短标签 😀", @"稍长的标签 🎉", @"一个非常非常非常非常非常非常非常长的标签 🧪🚀", @"另一个长标签 🌟"];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 240, 600)];
+    UIViewController *parent = [[UIViewController alloc] init];
+    UIViewController *child = [[UIViewController alloc] init];
+    window.rootViewController = parent;
+    [window makeKeyAndVisible];
+    [parent addChildViewController:child];
+    child.view.frame = parent.view.bounds;
+    [parent.view addSubview:child.view];
+    [child didMoveToParentViewController:parent];
+    CYLTagView *view = [[CYLTagView alloc] initWithFrame:child.view.bounds];
+    view.menuDataSource = source;
+    [child.view addSubview:view];
+    [view reloadMenuData];
+    [parent setOverrideTraitCollection:large forChildViewController:child];
+    [child.view setNeedsLayout];
+    [child.view layoutIfNeeded];
+    [view layoutIfNeeded];
+    CYLTagGroup *group = view.groups.firstObject;
+    group.opened = YES;
+    UICollectionView *collection = [view valueForKey:@"collectionView"];
+    [collection reloadData];
+    [collection layoutIfNeeded];
+    UIFont *largeFont = [CYLTagModel titleFontForTraitCollection:large];
+    NSMutableArray<UICollectionViewLayoutAttributes *> *items = [NSMutableArray array];
+    for (NSInteger index = 0; index < group.itemArr.count; index++) {
+        UICollectionViewLayoutAttributes *attributes =
+            [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+        XCTAssertNotNil(attributes);
+        XCTAssertGreaterThan(CGRectGetHeight(attributes.frame), 35);
+        XCTAssertLessThanOrEqual(CGRectGetMaxX(attributes.frame), 240 - kTagCollectionViewToRightMargin + 0.5);
+        for (UICollectionViewLayoutAttributes *previous in items) {
+            XCTAssertFalse(CGRectIntersectsRect(attributes.frame, previous.frame));
+        }
+        [items addObject:attributes];
+    }
+    for (UICollectionViewCell *cell in collection.visibleCells) {
+        UILabel *label = [cell valueForKey:@"titleLb"];
+        XCTAssertEqualWithAccuracy(label.font.pointSize, largeFont.pointSize, 0.01);
+    }
+    window.hidden = YES;
+}
+
 @end

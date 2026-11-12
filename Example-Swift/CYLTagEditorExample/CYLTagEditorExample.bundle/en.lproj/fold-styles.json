@@ -1,0 +1,57 @@
+{
+  "title": "JSON file: “More ⌄” at the bottom",
+  "titleImage": "system:briefcase",
+  "titleStyle": {
+    "normal": {
+      "textColor": "#07C160",
+      "iconColor": "#07C160"
+    }
+  },
+  "titlePosition": "topLeading",
+  "selectionMode": "multiple",
+  "showsSectionHeaders": false,
+  "defaultVisibleRows": 1,
+  "scrollEnabled": false,
+  "foldControl": {
+    "position": "bottom",
+    "content": "iconAndTitle"
+  },
+  "style": {
+    "itemHeight": 32,
+    "interitemSpacing": 10,
+    "lineSpacing": 10,
+    "sectionInsets": "{8, 16, 8, 16}",
+    "normal": {
+      "cornerRadius": 6,
+      "borderWidth": 0,
+      "backgroundColor": "systemGray6",
+      "margin": 12
+    },
+    "selected": {
+      "cornerRadius": 6,
+      "borderWidth": 0,
+      "backgroundColor": "#E6F7EE",
+      "textColor": "#07C160",
+      "margin": 12
+    }
+  },
+  "sections": [
+    {
+      "title": "Roles",
+      "items": [
+        "Product Managers",
+        "Designers",
+        "iOS Developers",
+        "Android Developers",
+        "Frontend Developers",
+        "Backend Developers",
+        "Operations",
+        "Marketing",
+        "Teachers",
+        "Doctors",
+        "Lawyers",
+        "Landlords"
+      ]
+    }
+  ]
+}

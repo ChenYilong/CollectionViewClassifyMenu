@@ -1,6 +1,7 @@
 ---
 title: Component architecture and community review
-date: 2026-11-08
+date: 2026-11-10
+updated: 2026-11-11
 tags: [architecture, cocoapods, issues]
 ---
 
@@ -23,6 +24,60 @@ data, screen geometry and callbacks to the implementation. The current Pod
 inverts that dependency through host-owned protocols and keeps sample data and
 persistence in the demos.
 
+## 低耦合接口 / Decoupled API (CYLTagListView)
+
+旧控制器把图片、分组图标、选择规则、折叠方式和尺寸写死在实现里，宿主只能改源码。
+新增的 `CYLTagListView` 只负责布局、折叠和选择状态，其余全部交给宿主：
+
+- 数据：`CYLMenuDataSource` 新增标签图标、分组图标、分组标题右侧视图和禁用状态。
+- 行为：`CYLMenuDelegate` 新增拦截选择、取消选中、展开/折叠和内容高度变化回调。
+- 外观：`CYLMenuStyle` 统一描述字体（含 Dynamic Type 上限）、颜色、边框、圆角、间距和高度；
+  视图持有样式副本，宿主修改原对象不会意外影响已显示的菜单。
+- 选择：`CYLMenuSelectionMode`（无 / 单选 / 多选）、`allowsEmptySelection` 和互斥项；
+  代码修改选择不触发回调，与 UIKit 惯例一致。
+- 折叠：`CYLMenuFoldStyle`（标题按钮、底部箭头、仅截断预览）与 `defaultVisibleRows`；`CYLMenuFoldControl`
+  的位置还包括 `Inline`：折叠按钮作为最后一个标签（`CYLTagFoldCell`），点击即展开/收起，隐藏的标签为它让出位置。
+- 网格与图标位置：`CYLMenuStyle.numberOfItemsPerRow`（`gridStyle(itemsPerRow:)`）让标签等宽、每行固定个数、超出省略号；
+  `imagePlacement`（图标在文字前或后）与 `contentAlignment`（居中或从左边距开始）让标签按钮支持「文字在左、图标在右」，
+  如「苹果官方社区… [热]」：文字截断，图标始终可见。
+- More 按钮：数据源 `menuShowsMoreButtonInSection:` 在分组标题右侧显示核心库的 More 按钮（三个点），
+  事件由代理 `menu:didTapMoreButtonInSection:` 交给宿主（Example 中为随机刷新）。
+- 嵌入：`contentHeight`、`intrinsicContentSize`、`heightThatFitsWidth:` 和 `scrollEnabled`，
+  可放进表头、Stack View 或 Auto Layout。
+
+行计算与旧组件相同，按实际容器宽度单次遍历；宽度或文字大小变化时重新测量。
+`Example/` 通过 Podfile 以本地路径集成核心库，用这些接口实现 README 的两个场景；
+`CYLExampleMenuSource` 演示宿主如何把自己的模型转成数据源。
+
+## 截图 / Screenshots
+
+CI 截图（`Example screenshots`，提交 `22370a8`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：
+
+| 折叠控件与标题样式 | 全部展开（箭头旋转 180°） | 由 JSON / plist / YAML / XML 创建 |
+| --- | --- | --- |
+| <img src="assets/tag-list-fold-styles.png" width="200" alt="折叠控件与标题样式"> | <img src="assets/tag-list-fold-styles-expanded.png" width="200" alt="全部展开（箭头旋转 180°）"> | <img src="assets/tag-list-configuration-files.png" width="200" alt="由 JSON / plist / YAML / XML 创建"> |
+
+| 多选（两个分组同时选中） | 搜索后新建并选中标签 | 分类菜单 + 多选筛选（数据库） | 评价筛选（SQLite） |
+| --- | --- | --- | --- |
+| <img src="assets/tag-list-selection.png" width="200" alt="多选（两个分组同时选中）"> | <img src="assets/tag-list-create-tag.png" width="200" alt="搜索后新建并选中标签"> | <img src="assets/classify-menu-filtered.png" width="200" alt="分类菜单 + 多选筛选（数据库）"> | <img src="assets/review-filter-database.png" width="200" alt="评价筛选（SQLite）"> |
+
+| 折叠按钮作为最后一个标签（展开） | 网格：文字在左、图标在右，More 按钮 |
+| --- | --- |
+| <img src="assets/tag-list-inline-fold-expanded.png" width="200" alt="折叠按钮作为最后一个标签（展开）"> | <img src="assets/tag-list-grid-title-then-icon.png" width="200" alt="网格：文字在左、图标在右，More 按钮"> |
+
+## Swift 示例与 Swift 友好的核心 / Swift examples, Swift-friendly core
+
+所有示例（`Example/`、`Example-Swift/`、根目录工程的演示 App `CYLClassifyMenuDemo`、`TagCollectionView` 演示）及其测试均为 Swift；
+核心库保持 Objective-C，只通过 Swift 标注适配 Swift 调用（`NS_SWIFT_NAME`、字符串字面量形式的 `swift_name`、`cyl_` 方法的
+`cylXxx` 版本），从不修改 Objective-C 接口。例如 `+[CYLTagView tagView]` 在 Swift 中为 `makeTagView()`，
+`CYLMenuLocalizedString` 宏另有 Swift 可调用的同名函数。公开头文件的多行注释统一为 `/*! … */` 文档注释块
+（`scripts/check-doc-comments.py`），Xcode 快速帮助与 Swift 接口都能显示。
+The examples are all Swift; the core stays Objective-C and only gains Swift annotations next to its public
+declarations, so Objective-C callers see no change.
+
+不兼容修改：移除 `menuItemHasImageAtIndexPath:`，改用 `menuImageForItemAtIndexPath:`；
+`CYLClassifyMenuViewController` 的分组图标改由 `menuImageForSection:` 提供。
+
 ## 社区提交 / Community commits
 
 - [ce86ea2](https://github.com/XIAODINGPA/CollectionViewClassifyMenu/commit/ce86ea2bedce65c89344ebb6933bb5cf01cbab82)
@@ -41,6 +96,11 @@ persistence in the demos.
   [#9](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/9) 和
   [#13](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/13)；
   section header 宽度对应 [#7](https://github.com/ChenYilong/CollectionViewClassifyMenu/issues/7)。
-- 演示和测试覆盖 320/390 pt、长文本及 emoji、复用和外部数据源；并未覆盖所有真机、
-  Dynamic Type、旋转或 VoiceOver 场景。CocoaPods lint 仍有历史弃用 API 警告。
+- 演示和测试覆盖 320/390 pt、长文本及 emoji、复用和外部数据源，以及 Dynamic Type 字号缩放、
+  无障碍元素（标签、特征、提示与固定的 `accessibilityIdentifier`）；并未覆盖所有真机、旋转，
+  也没有在设备上用 VoiceOver 实际走查。
+- iOS 15 已弃用的按钮 edge insets、`adjustsImageWhenHighlighted` 和
+  `UIGraphicsBeginImageContext` 已在 [32720b0](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/32720b0352a0ab93fb5722e711e9954356b63624) 中替换；
+  2026-11-11 的 CI（[ff35b27](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/ff35b27)，`macos-26`）中
+  `pod lib lint` 与库的构建/静态分析（有警告即失败）均已通过。
 - 历史 3.5 英寸设备不支持项目现有的 iOS 15 最低版本，因此不能在原设备上复验 #7。

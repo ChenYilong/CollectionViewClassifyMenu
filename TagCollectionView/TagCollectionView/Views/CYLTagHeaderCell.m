@@ -7,6 +7,7 @@
 //
 
 #import "CYLTagHeaderCell.h"
+#import "CYLMenuResources.h"
 @interface CYLTagHeaderCell()
 
 @property (weak, nonatomic) IBOutlet UILabel *nameLb;
@@ -50,14 +51,17 @@
 
     if (group.isOpened) {
         
-        [self.btn setTitle:@"Fold" forState:UIControlStateNormal];
+        [self.btn setTitle:CYLMenuLocalizedString(@"CYLMenuCollapse", @"Collapse tag group") forState:UIControlStateNormal];
     }
     else{
         
-        [self.btn setTitle:@"More" forState:UIControlStateNormal];
+        [self.btn setTitle:CYLMenuLocalizedString(@"CYLMenuExpand", @"Expand tag group") forState:UIControlStateNormal];
     }
     
     self.nameLb.text=group.groupName;
+    self.nameLb.accessibilityTraits = UIAccessibilityTraitHeader;
+    // The fold button names the group it changes.
+    self.btn.accessibilityHint = group.groupName;
     
 }
 @end

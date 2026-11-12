@@ -38,7 +38,7 @@ case "$command" in
     tmp=$(mktemp "${PODSPEC}.XXXXXX")
     trap 'rm -f "$tmp"' EXIT HUP INT TERM
     sed "s/^\\([[:space:]]*s\\.version[[:space:]]*=[[:space:]]*['\"]\\)[^'\"]*\\(['\"]\\)/\\1$next\\2/" "$PODSPEC" > "$tmp"
-    if [ "$(grep -c "s.version[[:space:]]*=[[:space:]]*['\"]$next['\"]" "$tmp")" -ne 1 ]; then
+    if [ "$(grep -c "s.version[[:space:]]*=[[:space:]]*['\"]${next}['\"]" "$tmp")" -ne 1 ]; then
       echo "error: could not update the unique podspec version" >&2
       exit 1
     fi

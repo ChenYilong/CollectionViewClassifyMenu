@@ -27,7 +27,7 @@ static float const kTagCollectionViewToBottomtMargin             = 10;
 
 
 
-/**
+/*!
  *  标识这组是否需要展开, YES: 展开, NO: 关闭 / Whether the group is expanded.
  */
 @property (nonatomic, assign, getter = isOpened) BOOL opened;
@@ -40,7 +40,7 @@ static float const kTagCollectionViewToBottomtMargin             = 10;
 @property(nonatomic,assign)NSUInteger firstRowCount;
 
 - (NSUInteger)firstRowCellCountForContentWidth:(CGFloat)contentWidth;
-/**
+/*!
  * 有几行 每行有几个item / Number of items in each row.
  */
 @property (nonatomic, strong) NSArray *cellsCountArrayPerRowInSections;

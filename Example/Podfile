@@ -1,0 +1,62 @@
+# Integrates the local core library from the repository root, and CYLTabBarController:
+# - the app's tab bars (root tab bar, and the category tab bar of scenario 2);
+# - its tab icon animation engine and libraries, which the core library's tags use for
+#   animated icons, found at runtime as CYLTabBarController's own Core does.
+platform :ios, '15.0'
+ENV['SWIFT_VERSION'] = '5'
+project 'CYLMenuExample.xcodeproj'
+
+# The revision whose API the Example uses (feat/cross-platform-components); update together.
+CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
+                :commit => '0e69250f028c4c7d71312fdca50659a7bd15cb01' }
+
+# The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
+# revision whose API the Example uses (feat/search-bar-view); update together.
+CYL_SEARCH = { :git => 'https://github.com/ChenYilong/CYLSearchViewController.git',
+               :commit => '167d6f4bf500a1e166932195faf00ab0698889b0' }
+
+target 'CYLMenuExample' do
+  # As CYLTabBarController's examples: the Rive animator has Swift files.
+  use_frameworks!
+  pod 'CollectionViewClassifyMenu', :path => '..'
+  pod 'CYLTabBarController', CYL_TAB_BAR
+  # Animated tag icons, the same libraries and animators as CYLTabBarController's tab icons.
+  pod 'CYLTabBarController/Lottie', CYL_TAB_BAR
+  pod 'CYLTabBarController/PAG', CYL_TAB_BAR
+  pod 'CYLTabBarController/Rive', CYL_TAB_BAR
+  pod 'CYLTabBarController/GIF', CYL_TAB_BAR
+  pod 'CYLSearchViewController', CYL_SEARCH
+
+  target 'CYLMenuExampleTests' do
+    inherit! :search_paths
+  end
+end
+
+# The .pag files are not in the repository: download them (pinned, SHA-256 checked) like the
+# pods themselves, as CYLTabBarController's Example-PAG does.
+pre_install do |installer|
+  # Pods/ is Example/Pods, so the script is two levels up.
+  script = File.expand_path('../../scripts/fetch-animation-resources.py', installer.sandbox.root.to_s)
+  system('python3', script, 'PAGResources') || abort('[!] Could not download the PAG files: python3 ' + script)
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+  end
+end
+
+# Apps that link a static framework with Swift code (CYLTabBarController's Lottie and Rive
+# animators) get "$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)" from CocoaPods. On Xcode 26
+# runners TOOLCHAIN_DIR resolves to an unmounted Metal toolchain, so the app cannot find
+# the Swift back-deployment library (swiftCompatibility56). Point the search path at Xcode's default
+# toolchain, the fix of CYLTabBarController's scripts/ci-build-example.sh, here for every build.
+post_integrate do |installer|
+  Dir.glob(File.join(installer.sandbox.root.to_s, 'Target Support Files', 'Pods-*', '*.xcconfig')).each do |path|
+    text = File.read(path)
+    fixed = text.gsub(/[$][({]TOOLCHAIN_DIR[)}]\/usr\/lib\/swift/, '${DEVELOPER_DIR}/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift')
+    File.write(path, fixed) if fixed != text
+  end
+end

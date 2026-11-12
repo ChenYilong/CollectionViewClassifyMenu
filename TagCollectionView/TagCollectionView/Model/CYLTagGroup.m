@@ -18,7 +18,8 @@
 
 
 -(instancetype)init{
-    if (self==[super init]) {
+    self = [super init];
+    if (self) {
         [self setup];
     }
     return self;
@@ -32,7 +33,8 @@
 
 -(void)caculate{
     
-    _width=[UIScreen mainScreen].bounds.size.width - 50;
+    // Width is supplied by the hosting view; see -firstRowCellCountForContentWidth:.
+    _width=0;
     
     _height=38;
 }
@@ -117,8 +119,7 @@
 }
 
 - (NSMutableArray *)cellsInPerRowWhenLayoutWithArray:(NSMutableArray *)array {
-    CGFloat available = MAX(0, [UIScreen mainScreen].bounds.size.width -
-                                  kTagCollectionViewToLeftMargin - kTagCollectionViewToRightMargin);
+    CGFloat available = [self cyl_defaultContentWidth];
     NSMutableArray *counts = [NSMutableArray array];
     CGFloat used = 0;
     NSUInteger count = 0;
@@ -140,7 +141,14 @@
 
 - (NSUInteger)firstRowCellCountWithArray:(NSArray *)array {
     return [self firstRowCellCountWithArray:array
-                               contentWidth:MAX(0, [UIScreen mainScreen].bounds.size.width - kTagCollectionViewToLeftMargin - kTagCollectionViewToRightMargin)];
+                               contentWidth:[self cyl_defaultContentWidth]];
+}
+
+/// Content width used before a hosting view supplies one: the group's `width`
+/// when set, otherwise the screen width as a legacy fallback.
+- (CGFloat)cyl_defaultContentWidth {
+    CGFloat width = self.width > 0 ? self.width : [UIScreen mainScreen].bounds.size.width;
+    return MAX(0, width - kTagCollectionViewToLeftMargin - kTagCollectionViewToRightMargin);
 }
 
 - (NSUInteger)firstRowCellCountForContentWidth:(CGFloat)contentWidth {
@@ -187,7 +195,7 @@
                               content:(CYLTagModel*)obj
                                 array:(NSArray *)array {
     
-    CGFloat contentViewWidth = [UIScreen mainScreen].bounds.size.width - kTagCollectionViewToLeftMargin - kTagCollectionViewToRightMargin;
+    CGFloat contentViewWidth = [self cyl_defaultContentWidth];
     __block float cellWidth = obj.width;
     __block float cellWidthAndRightMargin;
     if (cellWidth == contentViewWidth) {
@@ -224,7 +232,7 @@ typedef void(^ISLimitWidth)(BOOL yesORNo, id data);
 - (float)cellLimitWidth:(float)cellWidth
             limitMargin:(CGFloat)limitMargin
            isLimitWidth:(ISLimitWidth)isLimitWidth {
-    float limitWidth = ([UIScreen mainScreen].bounds.size.width - kTagCollectionViewToLeftMargin - kTagCollectionViewToRightMargin - limitMargin);
+    float limitWidth = ([self cyl_defaultContentWidth] - limitMargin);
     if (cellWidth >= limitWidth) {
         cellWidth = limitWidth;
         isLimitWidth ? isLimitWidth(YES, @(cellWidth)) : nil;
