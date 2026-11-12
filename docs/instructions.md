@@ -13,7 +13,7 @@
   `screenshots.md`), labeled with platform (iOS, Android, Flutter, React Native, HarmonyOS, Mini Program), OS version,
   simulator / emulator version, platform SDK version, repository version or commit URL and the time taken; clear
   originals; README images are cropped key details, stitched vertically first, then two columns, then at most three
-  side by side.
+  side by side. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
 - Upstream projects (English rule, AGENTS.md "Upstream projects (translations and ports)"): when a project linked in
   these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
   of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each
