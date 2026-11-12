@@ -47,6 +47,11 @@ def declares_extension(sources, type_name, name):
     return any(pattern.search(text) for text in sources.values())
 
 
+def declares_enum_entry(sources, name):
+    pattern = re.compile(rf"enum\s+class\s+\w+[^{{]*\{{[^}}]*\b{re.escape(name)}\b")
+    return any(pattern.search(text) for text in sources.values())
+
+
 def declares_top_level(sources, name):
     pattern = re.compile(rf"^(?:const\s+val|val|var|fun|@JvmField\s+val)\s+(?:[\w.]+\.)?{re.escape(name)}\b|^\s*{re.escape(name)}\s*[(,]|^\s*{re.escape(name)}\s*$", re.M)
     return any(pattern.search(text) for text in sources.values())
@@ -84,6 +89,14 @@ def main() -> int:
                 target = f"com.cyl.classifymenu.{symbol}"
             elif declares_top_level(sources, symbol):
                 target = symbol
+            elif kind == "enum value" and declares_enum_entry(sources, symbol):
+                target = symbol
+        elif kind == "category":
+            category = re.match(r"^(\w+) \((\w+)\)$", symbol)
+            if category and any(path.name == f"{category.group(1)}{category.group(2).removeprefix('CYL')}.kt" or
+                                re.search(rf"\bfun\s+{category.group(1)}(?:\.Companion)?\.\w+", text)
+                                for path, text in sources.items()):
+                target = f"extension functions on {category.group(1)}"
         if target:
             added[symbol] = target
     if "--dry-run" not in sys.argv:
