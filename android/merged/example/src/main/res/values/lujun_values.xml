@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AndroidTagView's sample (co.lujun.sample), prefixed: lujun_. -->
+<resources>
+    <string name="lujun_action_settings">Settings</string>
+    <dimen name="lujun_activity_horizontal_margin">16dp</dimen>
+    <dimen name="lujun_activity_vertical_margin">16dp</dimen>
+</resources>

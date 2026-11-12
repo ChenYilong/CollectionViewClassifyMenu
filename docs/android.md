@@ -68,12 +68,32 @@ Android chapter.
   the TagViewGroup API reimplementation (`b510e7d`). Each folder builds its sample (`assembleDebug`); the three
   samples run on the API 35 emulator (screenshots below). Samples opt out of Android 15's edge-to-edge
   enforcement (`values-v35`), as their original target SDKs never drew under the system bars.
-- [ ] Step 3: merged library and example with CYLTabBarController
+- [x] Step 3 (2026-11-12): `android/merged`. The `library` module keeps every public API of the three libraries in
+  their own packages (`me.kaede.tagview`, `co.lujun.androidtagview`, `com.licrafter.tagview`), copied by
+  `android/scripts/sync_merged_sources.py` (only the `R` import changes; `--check` reports drift). The `example`
+  app is a CYLTabBarController built from `assets/cyl_merged_tabbar.json`: tabs TagView, TagContainer, TagViewGroup,
+  About, pages registered by page ID, and a plus button (New) whose page is the TagViewGroup editor.
+  CYLTabBarController by commit: `gradle.properties` pins `cyl.tabbar.commit` (now `1fddee2`, the newest commit on
+  any branch); `settings.gradle.kts` checks that commit out (sparse, blobless clone into `.cyltabbar/`) and includes
+  its `Example-Android` build in place of `io.github.chenyilong:cyltabbarcontroller`; when the clone fails it uses the
+  local folder `cyl.tabbar.localPath`. Verified on the API 35 emulator (screenshots below).
 - [ ] Step 4: API table
 - [ ] Step 5: missing APIs (score per added API)
 - [ ] Step 6: iOS examples ported, screenshots, README Android chapter
 
 ## Screenshots
+
+The merged example, top to bottom: the TagView, TagContainer, plus (New), TagViewGroup and About tabs.
+
+<img src="assets/android-merged-tagview.png" width="300" alt="Merged example, TagView tab">
+
+<img src="assets/android-merged-tagcontainer.png" width="300" alt="Merged example, TagContainer tab">
+
+<img src="assets/android-merged-plus.png" width="300" alt="Merged example, the plus button's page">
+
+<img src="assets/android-merged-tagviewgroup.png" width="300" alt="Merged example, TagViewGroup tab">
+
+<img src="assets/android-merged-about.png" width="300" alt="Merged example, About tab">
 
 Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTagView, TagViewGroup.
 

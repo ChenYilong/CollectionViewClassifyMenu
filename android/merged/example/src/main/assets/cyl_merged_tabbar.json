@@ -1,0 +1,20 @@
+{
+  "CYLTabBarControllerContext": "CYLClassifyMenuMerged",
+  "CYLTabBarControllerTitlePositionAdjustment": "{0, -2}",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    { "CYLTabBarItemTitle": "TagView", "CYLTabBarItemImage": "system:tag", "CYLTabBarItemIdentifier": "kaede",
+      "CYLTabBarItemPageIdentifier": "kaede" },
+    { "CYLTabBarItemTitle": "TagContainer", "CYLTabBarItemImage": "system:square.grid.2x2", "CYLTabBarItemIdentifier": "lujun",
+      "CYLTabBarItemPageIdentifier": "lujun" },
+    { "CYLTabBarItemTitle": "TagViewGroup", "CYLTabBarItemImage": "system:photo", "CYLTabBarItemIdentifier": "licrafter",
+      "CYLTabBarItemPageIdentifier": "licrafter" },
+    { "CYLTabBarItemTitle": "About", "CYLTabBarItemImage": "system:info.circle", "CYLTabBarItemIdentifier": "about",
+      "CYLTabBarItemPageIdentifier": "about" }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "New",
+    "CYLTabBarItemImage": "system:plus.circle.fill",
+    "CYLTabBarItemIdentifier": "plus",
+    "CYLTabBarItemPageIdentifier": "plus"
+  }
+}
