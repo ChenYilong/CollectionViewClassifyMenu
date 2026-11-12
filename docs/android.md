@@ -100,12 +100,21 @@ Android chapter.
   CYLTabBarController's engine (lottie-android, libpag and rive-android added to the example; GIF needs none):
   Lottie, GIF and PAG play. Core fix on the way: `CYLTagButton` took an asset URL (`file:///android_asset/…`) for a
   missing file and never animated it. The rows that open other screens (configuration, tag cloud, the three Android
-  samples) wait for the plus page. TODO (Rive on Android): the Rive icons (`house.riv`, `menu_button.riv`) stay empty
-  on the emulator: rive-android loads (`librive-android.so ok`) and the views are made, but nothing is drawn, with
-  software or host GPU rendering; CYLTabBarController's `docs/Android-QMUI-Comparison.md` also lists a Rive native
-  library error on the emulator as open. Check on a device and in CYLTabBarController's `example-rive`. Note: PAG
-  needs GPU rendering on the emulator (`-gpu host`); with `swiftshader_indirect` its icons stay empty and frames take
-  seconds. TODO: discover (plus page),
+  samples) wait for the plus page. Rive (was TODO, DONE with Animations below). Note: PAG needs GPU rendering on the
+  emulator (`-gpu host`); with `swiftshader_indirect` its icons stay empty and frames take seconds. Animations is DONE:
+  the configuration-dictionary tag list of the iOS screen (Lottie plain / with image assets / green, PAG, Rive,
+  icons.riv on dark tags, GIF, static images), "Play all", the speed button (1x, 2x, 0.5x) and the tapped tag in the
+  status line; the asset catalog's PNGs (TabBarIcon, LottieImages) are synced into generated drawables at build time
+  (no copies committed). Fixes on the way: (1) core, `CYLTagButton` measured its children as UNSPECIFIED and only laid
+  them out, so the engine's Rive view (a RiveAnimationView at MATCH_PARENT inside a FrameLayout) stayed 0 × 0: this
+  was why Rive icons were empty; it now measures each child at its frame. (2) core, Lottie files with image assets
+  crashed ("You must set an images folder"): the tag button gives Lottie views an image delegate that loads the
+  drawable of the same name, as Lottie on iOS loads images by name. (3) CYLTabBarController, deselecting a Rive tag
+  whose state machine has no "active" input crashed on rive-android's render thread: fixed upstream in
+  [CYLTabBarController PR #790](https://github.com/ChenYilong/CYLTabBarController/pull/790) (`4639a0c`, test
+  `CYLRiveInputsTest`), and the Android pin moved to that commit. TODO: the iOS Podfile pins (root `Podfile` at
+  `53766de`; `Example/` and `Example-Swift/` at `0e69250`, see issue-progress.md) are not moved to `4639a0c` in this
+  Android-only task. TODO: discover (plus page),
   animations (Lottie / Rive / GIF from `CYLMenuExample.bundle`), the plus page (query scenarios, menu linkage, tag
   cloud, configuration). Plan (2026-11-12):
   1. Tabs of the merged example, one per example: TagView, TagContainer, TagViewGroup (the three Android originals),
@@ -210,6 +219,8 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Menu tab, scenario 2: Jobs: the job category sidebar (Product), the industry menu (Finance); a tag filled the search field | <img src="assets/android-menu-search-jobs.png" width="300" alt="Search categories, Jobs"> |
 | Menu tab, Styles: the preview tags (Home selected, Disabled) over the actions with their values | <img src="assets/android-menu-styles.png" width="300" alt="Styles screen"> |
 | Menu tab, Styles, top to bottom: default; after icon color, title color, background, border, corner radius (0 = capsule); Lottie, GIF, PAG icons | <img src="assets/android-menu-styles-actions.png" width="300" alt="Styles actions and animated icons"> |
+| Menu tab, Animations (top): Lottie, Lottie with image assets, green Lottie, PAG; first tag of each section selected | <img src="assets/android-menu-animations-lottie-pag.png" width="300" alt="Animations: Lottie and PAG"> |
+| Menu tab, Animations (bottom): Rive (six files), icons.riv on dark tags (Search tapped), GIF, static images; speed 2x | <img src="assets/android-menu-animations-rive-gif.png" width="300" alt="Animations: Rive, GIF, images"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
 
 ## Screenshots

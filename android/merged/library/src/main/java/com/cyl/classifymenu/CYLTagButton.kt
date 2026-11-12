@@ -186,6 +186,7 @@ open class CYLTagButton @JvmOverloads constructor(
             val size = animationSize()
             val view = CYLTagAnimationEngine.animationView(context, url.toString(), size)
             if (view != null) {
+                CYLTagAnimationEngine.prepareLottieImages(context, view)
                 view.isClickable = false
                 view.isFocusable = false
                 addView(view)
@@ -384,8 +385,15 @@ open class CYLTagButton @JvmOverloads constructor(
         if (drawsCross) canvas.drawPath(crossPath, crossPaint)
     }
 
+    /**
+     * Measures `view` at the size of `frame`, then lays it out there: a container (the engine's Rive view wraps a
+     * RiveAnimationView at MATCH_PARENT) lays its children out by their measured sizes, which stay 0 × 0 without it.
+     */
     private fun place(view: View, frame: CYLRect) {
-        view.layout(px(frame.x), px(frame.y), px(frame.maxX), px(frame.maxY))
+        val width = maxOf(0, px(frame.maxX) - px(frame.x))
+        val height = maxOf(0, px(frame.maxY) - px(frame.y))
+        view.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+        view.layout(px(frame.x), px(frame.y), px(frame.x) + width, px(frame.y) + height)
     }
 
     companion object {
@@ -504,6 +512,45 @@ internal object CYLTagAnimationEngine {
         } catch (error: Throwable) {
             null
         }
+    }
+
+    /**
+     * Gives the Lottie views in `view` an image delegate: the images of a Lottie file (its "assets" with a "p" file
+     * name) load from the app's drawable of the same name, as Lottie on iOS loads them by name from the app's assets.
+     * Without one, lottie-android throws when it draws an image layer ("You must set an images folder"). By reflection,
+     * because the core does not depend on lottie-android.
+     */
+    fun prepareLottieImages(context: Context, view: View) {
+        val lottieView = findView(view, "com.airbnb.lottie.LottieAnimationView") ?: return
+        try {
+            val delegateType = Class.forName("com.airbnb.lottie.ImageAssetDelegate")
+            val delegate = java.lang.reflect.Proxy.newProxyInstance(delegateType.classLoader, arrayOf(delegateType)) { _, method, arguments ->
+                if (method.name != "fetchBitmap") return@newProxyInstance null
+                val asset = arguments?.firstOrNull() ?: return@newProxyInstance null
+                val fileName = asset.javaClass.getMethod("getFileName").invoke(asset) as? String ?: return@newProxyInstance null
+                lottieBitmap(context, fileName)
+            }
+            lottieView.javaClass.getMethod("setImageAssetDelegate", delegateType).invoke(lottieView, delegate)
+        } catch (error: Throwable) {
+            // An older lottie-android without the delegate: the engine's failure listener shows the static image.
+        }
+    }
+
+    private fun lottieBitmap(context: Context, fileName: String): android.graphics.Bitmap? {
+        val name = fileName.substringAfterLast('/').substringBeforeLast('.').replace('-', '_').lowercase()
+        val id = context.resources.getIdentifier(name, "drawable", context.packageName)
+        if (id == 0) return null
+        return android.graphics.BitmapFactory.decodeResource(context.resources, id)
+    }
+
+    private fun findView(view: View, className: String): View? {
+        var type: Class<*>? = view.javaClass
+        while (type != null) {
+            if (type.name == className) return view
+            type = type.superclass
+        }
+        if (view is android.view.ViewGroup) for (index in 0 until view.childCount) findView(view.getChildAt(index), className)?.let { return it }
+        return null
     }
 
     fun player(view: View): Any? {

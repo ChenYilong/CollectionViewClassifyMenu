@@ -9,6 +9,8 @@ android {
     sourceSets["main"].assets.srcDir("../../../Example-Shared/Database")
     // The iOS examples' bundles (strings, data, animations), each under its own folder: see copyExampleBundles.
     sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/cylBundles"))
+    // The menu example's tab icons and Lottie images (its Assets.xcassets), as drawables: see copyExampleImages.
+    sourceSets["main"].res.srcDir(layout.buildDirectory.dir("generated/cylRes"))
     namespace = "com.cyl.classifymenu.example"
     compileSdk = 35
     defaultConfig {
@@ -61,4 +63,24 @@ val copyExampleBundles by tasks.registering(Sync::class) {
     exclude("**/._*", "**/.claude/**", "**/*.md")
     into(layout.buildDirectory.dir("generated/cylBundles"))
 }
-tasks.named("preBuild") { dependsOn(copyExampleBundles) }
+// The PNGs of the menu example's asset catalog (TabBarIcon, LottieImages), used as they are: <name>@3x.png goes to
+// drawable-xxhdpi, @2x to drawable-xhdpi and 1x to drawable-mdpi, so `"image": "home_normal"` finds the same picture.
+val copyExampleImages by tasks.registering(Sync::class) {
+    from("../../../Example/CYLMenuExample/Assets.xcassets") {
+        include("TabBarIcon/**/*.png", "LottieImages/**/*.png")
+        exclude("**/._*")
+    }
+    includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    eachFile {
+        val base = name.removeSuffix(".png")
+        val (resourceName, folder) = when {
+            base.endsWith("@3x") -> base.removeSuffix("@3x") to "drawable-xxhdpi"
+            base.endsWith("@2x") -> base.removeSuffix("@2x") to "drawable-xhdpi"
+            else -> base to "drawable-mdpi"
+        }
+        path = "$folder/$resourceName.png"
+    }
+    into(layout.buildDirectory.dir("generated/cylRes"))
+}
+tasks.named("preBuild") { dependsOn(copyExampleBundles, copyExampleImages) }
