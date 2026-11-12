@@ -18,6 +18,9 @@ fi
 export JAVA_HOME ANDROID_HOME
 mkdir -p "$MIRROR"
 rsync -a --delete --exclude '._*' --exclude build --exclude .gradle --exclude .kotlin --exclude .cyltabbar ./ "$MIRROR/"
+# The shared example data (Example-Shared/Database/cyl_places.sqlite), next to the mirror as it is next to android/.
+mkdir -p "$MIRROR/../Example-Shared"
+rsync -a --delete --exclude '._*' ../Example-Shared/Database "$MIRROR/../Example-Shared/"
 GRADLE=${GRADLE:-$(command -v gradle || ls -d "$HOME"/.gradle/wrapper/dists/gradle-9.3.1-all/*/gradle-9.3.1/bin/gradle | head -1)}
 cd "$MIRROR/$PROJECT"
 "$GRADLE" --no-daemon "$@"

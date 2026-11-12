@@ -3,17 +3,17 @@
 //  CollectionViewClassifyMenu
 //
 //  The demo app's Filter tab: the multiple-choice filter (CYLMultipleFilterController) behind the left bar button,
-//  sliding in from the left over most of the screen, with the places of the demo data (CYLDemoPlaces) that match
-//  the selected regions and dishes listed on the page. The selection is stored in the user defaults; selections
+//  sliding in from the left over most of the screen; the selected regions and dishes query the shared example
+//  database (CYLDemoPlaces, the same SQLite file as the Android example), shown with the SQL and the rows. The selection is stored in the user defaults; selections
 //  archived by older versions (CYLFilterParamsTool) are migrated once. The plus button's page, CYLDemoAboutViewController,
 //  is here too.
 //
 
 import UIKit
+import SQLite3
 import CollectionViewClassifyMenu
 
-/// The places of the demo data: every tag of data.json in some of the filter's regions, made as the example's
-/// database makes its `places` table (CYLMenuExample's CYLExampleDatabase), so all demos show the same places.
+/// A place of the shared example database.
 struct CYLDemoPlace: Equatable {
     let name: String
     let category: String
@@ -23,33 +23,90 @@ struct CYLDemoPlace: Equatable {
     let price: Int
 }
 
-enum CYLDemoPlaces {
+/// A statement and its arguments (`CYLExampleSQLQuery` of the example, `ClassifySQLQuery` on Android).
+struct CYLDemoSQLQuery: Equatable {
+    let sql: String
+    let arguments: [String]
 
-    /// All places, sorted by rating (highest first), then in creation order.
-    static let all: [CYLDemoPlace] = {
-        var places: [(Int, CYLDemoPlace)] = []
-        var tagIndex = 0
-        for category in CYLDBManager.dataSource() {
-            let type = category[CYLDemoDataSource.sectionTitleKey] as? String ?? ""
-            for item in category[kDataSourceSectionKey] as? [[String: Any]] ?? [] {
-                let tag = item[kDataSourceCellTextKey] as? String ?? ""
-                for (region, regionName) in CYLDemoDataSource.regions().enumerated() where (tagIndex + region) % 3 != 2 {
-                    let place = CYLDemoPlace(
-                        name: "\(CYLDemoDataSource.shortTitle(forTitle: tag)) · \(CYLDemoDataSource.shortTitle(forTitle: regionName))",
-                        category: type, tag: tag, region: regionName,
-                        rating: 3.5 + Double((tagIndex * 7 + region * 3) % 16) / 10.0,
-                        price: 30 + ((tagIndex * 37 + region * 53) % 270))
-                    places.append((places.count, place))
-                }
-                tagIndex += 1
+    /// The statement with its arguments inlined and quoted, for display.
+    func displayString() -> String {
+        let parts = sql.components(separatedBy: "?")
+        var result = ""
+        for (index, part) in parts.enumerated() {
+            result += part
+            if index + 1 < parts.count {
+                result += "'\((index < arguments.count ? arguments[index] : "").replacingOccurrences(of: "'", with: "''"))'"
             }
         }
-        return places.sorted { $0.1.rating != $1.1.rating ? $0.1.rating > $1.1.rating : $0.0 < $1.0 }.map(\.1)
+        return result
+    }
+}
+
+/// The shared example database of every platform, `Example-Shared/Database/cyl_places.sqlite` (made by
+/// `scripts/generate-places-db.py` from data.json, bundled by this app and by the Android example), opened read-only.
+enum CYLDemoPlaces {
+
+    private static let handle: OpaquePointer? = {
+        guard let path = Bundle.main.path(forResource: "cyl_places", ofType: "sqlite") else {
+            NSLog("[CYLClassifyMenuDemo] cyl_places.sqlite is missing from the app")
+            return nil
+        }
+        var db: OpaquePointer?
+        guard sqlite3_open_v2(path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK else {
+            NSLog("[CYLClassifyMenuDemo] Cannot open %@", path)
+            sqlite3_close(db)
+            return nil
+        }
+        return db
     }()
+
+    /// `+queryForTag:regions:dishes:` of the menu linkage: tag = ?, region IN (…), tag IN (…), by rating.
+    static func query(tag: String?, regions: [String], dishes: [String]) -> CYLDemoSQLQuery {
+        var conditions: [String] = []
+        var arguments: [String] = []
+        if let tag, !tag.isEmpty {
+            conditions.append("tag = ?")
+            arguments.append(tag)
+        }
+        for (column, values) in [("region", regions), ("tag", dishes)] where !values.isEmpty {
+            conditions.append("\(column) IN (\(Array(repeating: "?", count: values.count).joined(separator: ", ")))")
+            arguments.append(contentsOf: values)
+        }
+        var sql = "SELECT name, category, tag, region, rating, price FROM places"
+        if !conditions.isEmpty {
+            sql += " WHERE \(conditions.joined(separator: " AND "))"
+        }
+        return CYLDemoSQLQuery(sql: sql + " ORDER BY rating DESC, id", arguments: arguments)
+    }
+
+    /// The rows of `query`.
+    static func rows(for query: CYLDemoSQLQuery) -> [CYLDemoPlace] {
+        guard let handle else { return [] }
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(handle, query.sql, -1, &statement, nil) == SQLITE_OK else {
+            NSLog("[CYLClassifyMenuDemo] %@: %s", query.sql, sqlite3_errmsg(handle))
+            return []
+        }
+        defer { sqlite3_finalize(statement) }
+        let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+        for (index, argument) in query.arguments.enumerated() {
+            sqlite3_bind_text(statement, Int32(index + 1), argument, -1, transient)
+        }
+        func text(_ column: Int32) -> String { sqlite3_column_text(statement, column).map { String(cString: $0) } ?? "" }
+        var places: [CYLDemoPlace] = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            places.append(CYLDemoPlace(name: text(0), category: text(1), tag: text(2), region: text(3),
+                                       rating: sqlite3_column_double(statement, 4), price: Int(sqlite3_column_int(statement, 5))))
+        }
+        return places
+    }
+
+    /// Every place, by rating.
+    static var all: [CYLDemoPlace] { rows(for: query(tag: nil, regions: [], dishes: [])) }
 
     /// The places in `regions` (any when empty) with a tag in `dishes` (any when empty).
     static func places(regions: [String], dishes: [String]) -> [CYLDemoPlace] {
-        all.filter { (regions.isEmpty || regions.contains($0.region)) && (dishes.isEmpty || dishes.contains($0.tag)) }
+        rows(for: query(tag: nil, regions: regions, dishes: dishes))
     }
 }
 
@@ -66,6 +123,9 @@ final class CYLFilterDemoViewController: UIViewController {
     private(set) var selectedDishes: [String] = []
 
     private(set) var results: [CYLDemoPlace] = []
+
+    /// The last statement (shown with its rows, as on Android).
+    private(set) var lastQuery = CYLDemoPlaces.query(tag: nil, regions: [], dishes: [])
 
     private(set) var statusLabel = UILabel()
 
@@ -292,7 +352,8 @@ final class CYLFilterDemoViewController: UIViewController {
         }
         selectedRegions = regions
         selectedDishes = dishes
-        results = CYLDemoPlaces.places(regions: regions, dishes: dishes)
+        lastQuery = CYLDemoPlaces.query(tag: nil, regions: regions, dishes: dishes)
+        results = CYLDemoPlaces.rows(for: lastQuery)
         initLeftBarButtonItem()
         showResults()
     }
@@ -303,8 +364,11 @@ final class CYLFilterDemoViewController: UIViewController {
         func names(_ values: [String]) -> String {
             values.isEmpty ? all : values.map(CYLDemoDataSource.shortTitle(forTitle:)).joined(separator: separator)
         }
-        statusLabel.text = CYLDemoLocalizedString("地区：%@ · 菜品：%@ · 共 %ld / %ld 家", names(selectedRegions), names(selectedDishes),
-                                                  results.count, CYLDemoPlaces.all.count)
+        statusLabel.text = [
+            CYLDemoLocalizedString("分类：%@ · 地区：%@ · 菜品：%@", all, names(selectedRegions), names(selectedDishes)),
+            lastQuery.displayString(),
+            CYLDemoLocalizedString("SQLite 返回 %ld 条（共 %ld 家）", results.count, CYLDemoPlaces.all.count),
+        ].joined(separator: "\n")
         for view in resultsStack.arrangedSubviews {
             view.removeFromSuperview()
         }
