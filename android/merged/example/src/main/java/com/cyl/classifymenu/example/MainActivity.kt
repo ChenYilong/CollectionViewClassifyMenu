@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.cyl.classifymenu.example.classify.ClassifyMainFragment
 import com.cyl.classifymenu.example.classify.FilterDemoFragment
+import com.cyl.classifymenu.example.tagcollection.TagCollectionDemoFragment
 import com.cyl.classifymenu.example.kaede.KaedeTagViewFragment
 import com.cyl.classifymenu.example.licrafter.LicrafterTagEditFragment
 import com.cyl.classifymenu.example.licrafter.LicrafterTagGroupFragment
@@ -13,6 +14,7 @@ import com.cyl.classifymenu.example.lujun.LujunTagContainerFragment
 import com.cyl.tabbar.CYLTabBarConfiguration
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.CYLTabBarPageRegistry
+import com.cyl.tabbar.CYLTabBarScrollMode
 
 /**
  * The example: a CYLTabBarController built from the configuration file `cyl_merged_tabbar.json` (assets), one tab per
@@ -30,6 +32,8 @@ class MainActivity : AppCompatActivity() {
         registerPages()
         val controller = CYLTabBarController.tabBarControllerWithConfigurationFile(this, CONFIGURATION_FILE)
         tabBarController = controller
+        // One tab per example (more than fit side by side on a phone): the tabs scroll (Android only).
+        controller.tabBar.cyl_scrollMode = CYLTabBarScrollMode.Scrollable
         setContentView(controller.view)
     }
 
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             "info.circle" to R.drawable.ic_tab_info,
             "list.bullet.rectangle" to R.drawable.ic_tab_classify,
             "line.3.horizontal.decrease.circle" to R.drawable.ic_tab_filter,
+            "tag.square" to R.drawable.ic_tab_tags,
             "plus.circle.fill" to R.drawable.ic_plus_raised,
         )
 
@@ -63,6 +68,7 @@ class MainActivity : AppCompatActivity() {
             pages.registerPageProvider({ _, _ -> AboutFragment() }, "about")
             pages.registerPageProvider({ _, _ -> ClassifyMainFragment() }, "classify")
             pages.registerPageProvider({ _, _ -> FilterDemoFragment() }, "filter")
+            pages.registerPageProvider({ _, _ -> TagCollectionDemoFragment() }, "tagcollection")
             pages.registerPageProvider({ _, _ -> LicrafterTagEditFragment() }, "plus")
         }
     }

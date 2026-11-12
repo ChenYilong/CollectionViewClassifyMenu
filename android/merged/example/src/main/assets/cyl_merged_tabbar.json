@@ -12,6 +12,8 @@
       "CYLTabBarItemPageIdentifier": "classify" },
     { "CYLTabBarItemTitle": "Filter", "CYLTabBarItemImage": "system:line.3.horizontal.decrease.circle", "CYLTabBarItemIdentifier": "filter",
       "CYLTabBarItemPageIdentifier": "filter" },
+    { "CYLTabBarItemTitle": "Tags", "CYLTabBarItemImage": "system:tag.square", "CYLTabBarItemIdentifier": "tagcollection",
+      "CYLTabBarItemPageIdentifier": "tagcollection" },
     { "CYLTabBarItemTitle": "About", "CYLTabBarItemImage": "system:info.circle", "CYLTabBarItemIdentifier": "about",
       "CYLTabBarItemPageIdentifier": "about" }
   ],

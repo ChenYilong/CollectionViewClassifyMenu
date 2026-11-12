@@ -21,4 +21,5 @@
     <string name="filter_title">Multiple-choice filter</string>
     <string name="filter_hint">The top-left button opens the filter: pick regions and dishes, then Apply. Each choice → SQL → SQLite query → results below.</string>
     <string name="classify_tag_hint">Tap a category tag (single choice; tap it again to clear). Each choice → SQL → SQLite query → results below.</string>
+    <string name="tagcollection_title">TagCollectionView</string>
 </resources>
