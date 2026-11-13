@@ -488,12 +488,28 @@ open class TagContainerLayout @JvmOverloads constructor(
         val lineTops = IntArray(lineCount)
         for (l in 1 until lineCount) lineTops[l] = lineTops[l - 1] + heights[l - 1] + mVerticalInterval
 
+        // Issue #24: where each tag is drawn now, to slide it to its new place after a reorder.
+        val animate = mAnimateNextLayout
+        mAnimateNextLayout = false
+        val oldPositions = if (animate) (0 until childCount).map { val c = getChildAt(it); c to floatArrayOf(c.left + c.translationX, c.top + c.translationY, if (c.width > 0) 1f else 0f) } else emptyList()
+
         // layout all child views
         for (i in 0 until mViewPos.size / 2) {
             val childView = getChildAt(i)
             val line = mViewLines[i]
             val top = paddingTop + lineTops[line] + (heights[line] - childView.measuredHeight) / 2
             childView.layout(mViewPos[i * 2], top, mViewPos[i * 2] + childView.measuredWidth, top + childView.measuredHeight)
+        }
+        for ((child, old) in oldPositions) {
+            if (child === mDraggedView || old[2] == 0f) continue
+            val dx = old[0] - child.left
+            val dy = old[1] - child.top
+            if (dx != 0f || dy != 0f) {
+                child.animate().cancel()
+                child.translationX = dx
+                child.translationY = dy
+                child.animate().translationX(0f).translationY(0f).setDuration(REORDER_ANIMATION_DURATION).start()
+            }
         }
     }
 
@@ -807,7 +823,24 @@ open class TagContainerLayout @JvmOverloads constructor(
         return pos
     }
 
+    /**
+     * Issue #24: set before a reorder; the next layout slides the other tags from where they were to their new places
+     * instead of making them jump.
+     */
+    private var mAnimateNextLayout = false
+
+    /**
+     * The tag being dragged; it is not slid (the drag helper settles it).
+     */
+    private var mDraggedView: View? = null
+
+    /**
+     * The drag helper, for tests.
+     */
+    internal fun dragHelper(): ViewDragHelper = mViewDragHelper
+
     private fun onChangeView(view: View, newPos: Int, originPos: Int) {
+        mAnimateNextLayout = true
         mChildViews.removeAt(originPos)
         mChildViews.add(newPos, view)
         for (child in mChildViews) {
@@ -824,6 +857,17 @@ open class TagContainerLayout @JvmOverloads constructor(
         override fun onViewDragStateChanged(state: Int) {
             super.onViewDragStateChanged(state)
             mTagViewState = state
+            if (state == ViewDragHelper.STATE_IDLE) {
+                mDraggedView?.translationZ = 0f
+                mDraggedView = null
+            }
+        }
+
+        override fun onViewCaptured(capturedChild: View, activePointerId: Int) {
+            super.onViewCaptured(capturedChild, activePointerId)
+            // Issue #7: the dragged tag is drawn above every other tag, also above the ones after it in the list.
+            mDraggedView = capturedChild
+            capturedChild.translationZ = max(1f, (0 until childCount).maxOf { getChildAt(it).elevation } + 1f) * resources.displayMetrics.density * 8
         }
 
         override fun tryCaptureView(child: View, pointerId: Int): Boolean {
@@ -1062,7 +1106,35 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** Get TagView text. */
     fun getTagText(position: Int): String = (mChildViews[position] as TagView).getText()
 
-    /** Get a string list for all tags in TagContainerLayout. */
+    /**
+     * The position of the first tag with this text, or -1 (issue #121: to remove a tag by its text).
+     */
+    fun indexOfTag(text: String): Int = mChildViews.indexOfFirst { (it as? TagView)?.getText() == text }
+
+    /**
+     * Removes the first tag with this text (issue #121); returns false when there is none. A tap on a tag's cross
+     * reports its position through `OnTagClickListener.onTagCrossClick(position)`, for `removeTag(position)`.
+     */
+    fun removeTag(text: String): Boolean {
+        val position = indexOfTag(text)
+        if (position < 0) return false
+        removeTag(position)
+        return true
+    }
+
+    /**
+     * Moves a tag to another position; the tags in between slide to their new places (issue #24), as after a drag.
+     */
+    fun moveTag(from: Int, to: Int) {
+        if (from !in mChildViews.indices || to !in mChildViews.indices || from == to) return
+        onChangeView(mChildViews[from], to, from)
+    }
+
+    /**
+     * The texts of all tags in their current order (issue #117), including tags added, removed or dragged since
+     * [setTags]. With data binding (issue #62), `app:tags="@{viewModel.tags}"` calls [setTags] by its name; no
+     * binding adapter is needed.
+     */
     fun getTags(): List<String> {
         val tmpList = ArrayList<String>()
         for (view in mChildViews) {
@@ -1457,5 +1529,10 @@ open class TagContainerLayout @JvmOverloads constructor(
 
         /** Default tag min length */
         private const val TAG_MIN_LENGTH = 3
+
+        /**
+         * How long the other tags take to slide to their new places after a reorder (issue #24), in milliseconds.
+         */
+        private const val REORDER_ANIMATION_DURATION = 200L
     }
 }
