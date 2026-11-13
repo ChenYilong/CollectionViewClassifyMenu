@@ -118,3 +118,13 @@ with the installed Swift skills: `swift-api-design-guidelines-skill` (naming), `
   selector differs from the Swift name, so the core's Objective-C tests and XIB `customClass` entries still resolve.
 - A file migrates whole: delete its `.h` / `.m`, add the `.swift`, and check the four test suites
   (`scripts/unit-tests.sh menu|tag|example|swift`).
+
+### Priority: core quality first, examples last (2026-11-13)
+
+- An example that no longer compiles or passes after a migration step is fixed in the example (`Example/`,
+  `Example-Swift/`, the demo app, the `TagCollectionView` demo, their tests). Examples have the lowest weight.
+- Never keep an old name, a `T!`, an Objective-C-style signature, `NSArray` / `NSDictionary`, a factory method or
+  any other construct in the core only because an example uses it; no compatibility work for examples at all.
+- The core's Swift follows `docs/Swift-Coding-Standard.md` section 1: API changes the standard asks for are allowed,
+  reported by `scripts/swift-api-check.sh`, listed in `docs/Swift-Migration.md` ("Swift API changes"), with the
+  baseline refreshed in the same commit. The core's own tests are updated with the API.

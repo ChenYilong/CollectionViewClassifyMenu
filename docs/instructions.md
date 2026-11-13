@@ -24,3 +24,6 @@
 - Swift (English rule, AGENTS.md "Swift examples and a Swift-friendly core"): `Swift-Coding-Standard.md` is the Swift
   coding standard (compatibility of the Swift and Objective-C API, files, language, concurrency, comments,
   verification); `Swift-Migration.md` logs the core's migration to Swift with its score after every commit.
+- Swift migration priority (English rule, AGENTS.md "Core quality first, examples last"): example compile errors and
+  test failures caused by the migration are fixed in the example code first; the examples have the lowest weight and
+  get no compatibility work; the core's Swift code follows `Swift-Coding-Standard.md` with no baggage kept for them.
