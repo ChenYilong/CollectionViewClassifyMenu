@@ -4,9 +4,17 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    `maven-publish`
 }
 
 android {
+    // Issue #120 (whilu/AndroidTagView): published as a Maven artifact (Maven Central layout, no jcenter); the
+    // dependencies resolve from google() and mavenCentral() only (settings.gradle.kts).
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
     namespace = "com.cyl.classifymenu"
     compileSdk = 35
     defaultConfig {
@@ -31,4 +39,25 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.cyl"
+                artifactId = "classifymenu"
+                version = "0.1.0"
+            }
+        }
+        repositories {
+            // `publishReleasePublicationToBuildRepository` checks the artifact locally; a Maven Central (Sonatype)
+            // repository with credentials is added here for a release.
+            maven {
+                name = "build"
+                url = uri(layout.buildDirectory.dir("repo"))
+            }
+        }
+    }
 }

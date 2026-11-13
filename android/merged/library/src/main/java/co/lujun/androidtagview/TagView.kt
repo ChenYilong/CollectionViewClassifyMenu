@@ -203,6 +203,9 @@ open class TagView : View {
 
     private var mBitmapImage: Bitmap? = null
 
+    private var mScaledImage: Bitmap? = null
+    private var mScaledImageSource: Bitmap? = null
+
     private var mEnableCross = false
 
     private var mCrossAreaWidth = 0f
@@ -238,7 +241,27 @@ open class TagView : View {
 
     constructor(context: Context, text: String?, defaultImageID: Int) : super(context) {
         init(context, text)
-        mBitmapImage = BitmapFactory.decodeResource(resources, defaultImageID)
+        mBitmapImage = decodeSharedImage(context, defaultImageID)
+    }
+
+    companion object {
+        private val sharedImages = HashMap<Int, java.lang.ref.WeakReference<Bitmap>>()
+
+        /**
+         * Issue #86: every tag decoded its own full-size copy of the default image (scaled up for the screen density),
+         * and the sample ran out of memory at launch. The image is decoded once per resource, at most 256 px, and
+         * shared by the tags.
+         */
+        internal fun decodeSharedImage(context: Context, resId: Int): Bitmap? {
+            sharedImages[resId]?.get()?.let { return it }
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeResource(context.resources, resId, bounds)
+            var sample = 1
+            while (bounds.outWidth / (sample * 2) >= 256 && bounds.outHeight / (sample * 2) >= 256) sample *= 2
+            val bitmap = BitmapFactory.decodeResource(context.resources, resId, BitmapFactory.Options().apply { inSampleSize = sample })
+            if (bitmap != null) sharedImages[resId] = java.lang.ref.WeakReference(bitmap)
+            return bitmap
+        }
     }
 
     private fun init(context: Context, text: String?) {
@@ -502,7 +525,13 @@ open class TagView : View {
         val image = mBitmapImage
         if (isEnableImage() && image != null) {
             val side = (mAccessorySize - mBorderWidth * 2).roundToInt().coerceAtLeast(1)
-            val scaledImageBitmap = Bitmap.createScaledBitmap(image, side, side, false)
+            // Issue #86: the scaled copy is made once per size, not on every draw.
+            var scaledImageBitmap = mScaledImage
+            if (scaledImageBitmap == null || mScaledImageSource !== image || scaledImageBitmap.width != side) {
+                scaledImageBitmap = Bitmap.createScaledBitmap(image, side, side, true)
+                mScaledImage = scaledImageBitmap
+                mScaledImageSource = image
+            }
             val top = (height - mAccessorySize) / 2f
             val paint = Paint()
             paint.isAntiAlias = true
@@ -742,8 +771,14 @@ open class TagView : View {
 
     fun setImage(newImage: Bitmap?) {
         mBitmapImage = newImage
+        mScaledImage = null
         invalidate()
     }
+
+    /**
+     * The image drawn at the start of the tag (a downsampled, shared copy for the container's default image).
+     */
+    fun getImage(): Bitmap? = mBitmapImage
 
     fun setIsViewSelectable(viewSelectable: Boolean) {
         isViewSelectable = viewSelectable

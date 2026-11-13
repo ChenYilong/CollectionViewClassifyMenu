@@ -487,6 +487,18 @@ recent searches and discover, the tag editor:
 每个屏幕的完整截图与移植记录 / Every screen, full size, and the porting log: [docs/android.md](docs/android.md)；
 跨平台规则（共享数据库、与 iOS 一致的外观）/ cross-platform rules: [docs/cross-platform.md](docs/cross-platform.md)。
 
+上游 PR 与 issue 已全部处理（评分 100）/ Upstream pull requests and issues of the three ported libraries: all 4 pull
+requests merged and all 90 open issues resolved (score 100, [docs/android-upstream.md](docs/android-upstream.md)).
+AndroidTagView, top to bottom: a long tag starts a new line instead of being shortened; end gravity, wrapped text,
+elevation, a start icon, a custom delete icon and a tag without one:
+
+<img src="assets/android-androidtagview-upstream-fixes.png" width="360" alt="AndroidTagView 上游 issue 修复 / AndroidTagView upstream fixes">
+
+- 平台 / Platform: Android；环境 / Environment: Android 15（API 35）模拟器 `CYL_API35_arm64`，compileSdk / targetSdk 35，
+  AGP 8.7.3，Kotlin 2.0.21；主机 macOS 27.3
+- 版本 / Version: `c7101dc`（上 / top）与 `1d37d32`（下 / bottom）on `feat/android-kotlin`；时间 / Taken: 2026-11-13
+  14:14 与 14:25（NZDT）
+
 ### Accessibility / 无障碍
 
 | 设置 | 支持 |
