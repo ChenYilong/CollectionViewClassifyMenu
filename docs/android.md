@@ -194,7 +194,7 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
   the translated code and score after each fix until 100. TagViewGroup is reimplemented (GPL-3.0): read its pull
   requests and issues as behavior only, copy no code.
 
-## TODO (2026-11-13): Android bug: a long tag is shortened instead of starting a new line (Container tab)
+## DONE (2026-11-13, logged as TODO the same day): Android bug: a long tag is shortened instead of starting a new line (Container tab)
 
 - **Context:** in the merged example's Container tab (first container), the tag "Welcome to use AndroidTagView!" is
   drawn as "Welcome to use Andro…" after "Html" on the same line, although on a line of its own it would show in
@@ -210,7 +210,19 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
   was chosen, so the shortened tag fitted after "Html".
 - **Fix:** the default is no character limit; the width of the whole text decides the line; a tag wider than a
   line starts a new line and is shortened to the line's width.
-- **Status:** TODO.
+- **Status:** DONE. `TagContainerLayout` (standalone port and merged library): `tag_max_length` defaults to 0 (no
+  limit; `setTagMaxLength(0)` removes a limit); the line-break and maximum-width logic of the tag layout round
+  (`71adee9`) then places a tag that does not fit after the others at the start of a new line. Tests
+  `longTagStartsANewLineInsteadOfBeingShortened` and `tagWiderThanALineStartsANewLineThenIsShortened`; library tests
+  69, 0 failures.
+- **Screenshot (before, top; after, bottom):** Android, merged example, Container tab, first container; macOS 27.3,
+  Android Emulator `CYL_API35_arm64` (Android 15, API 35), compileSdk / targetSdk 35, AGP 8.7.3, Kotlin 2.0.21;
+  branch `feat/android-kotlin`, before at `71adee9`, after at the commit that adds this image
+  (`git log -- docs/assets/android-androidtagview-line-break-before-after.png`); taken 2026-11-13 11:56 and 14:14
+  NZDT. "Welcome to use AndroidTagView!" now starts a new line in full; the Chinese tag, wider than a line, starts its
+  own line and ends with "…" at the line's width.
+
+<img src="assets/android-androidtagview-line-break-before-after.png" width="540" alt="Before: Welcome tag shortened after Html; after: on a new line in full">
 - **User prompt (verbatim, 2026-11-13, with the Container tab screenshot):**
 
 > 全英文记录：图中演示，tag含有welcome字样的cell应该另外新起一行以保证文字能够最大可能展示完整而非使用省略符号。标记为android端bug，标记todo参考iOS端实现策略，换行策略，修复core核心层面代码以修复该bug，找到android端相关文档标记TODO。
@@ -224,12 +236,19 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
   The "Welcome" tag in the screenshot must start a new line to show as much text as possible. Android bug; follow
   the iOS line-break strategy; fix it in the core; mark it TODO in the Android document.
 
-## TODO (2026-11-13): merge the open pull requests into this branch, keep one pull request
+## DONE (2026-11-13, logged as TODO the same day): merge the open pull requests into this branch, keep one pull request
 
 - **Context / requirements:** merge every open pull request of this repository into `feat/android-kotlin` and
   close it after merging; commit local uncommitted work to this branch; keep one pull request (#16) and one active
   branch (`feat/android-kotlin`).
-- **Status:** TODO.
+- **Status:** DONE. PR #17 (`fix/android-tag-title-ellipsis`, tag titles end with "…") merged in `d33907b`
+  (conflict in `CYLTagButton.place` resolved: children measured EXACTLY at their frame) and shown as merged; its
+  remote branch deleted. Another session's branch `docs/animation-playback-controls` (the same animation controls
+  rule, written in parallel) merged in `8c81478` and folded into `docs/example-demo-rules.md`; its remote branch
+  deleted. Open pull requests now: #16 only; remote branches: `master`, `feat/android-kotlin` and `ci-screenshots`
+  (CI's screenshot storage, kept). The local branches of those two pull requests stay checked out in the other
+  session's worktrees (git cannot delete a checked-out branch); their commits are all in this branch. No local
+  uncommitted code was left (four empty `*-pr.diff` files removed).
 - **User prompt (verbatim, 2026-11-13):**
 
 > 合并所有处于open 状态的pr到本分支，或者本地所有未提交的代码到本分支 continue
