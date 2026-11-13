@@ -130,8 +130,8 @@ final class CYLImageTagEditViewController: UIViewController {
     /// TagEditDialog.createTagGroup: the non-empty names, the sample's directions, at the center.
     static func group(withNames names: [String]) -> CYLImageTagGroup {
         let titles = names.filter { !$0.isEmpty }
-        let directions = CYLImageTagGroup.defaultDirections(forTagCount: UInt(titles.count))
-        let tags = zip(titles, directions).map { CYLImageTag(title: $0, direction: CYLImageTagDirection(rawValue: $1.intValue) ?? .rightCenter) }
+        let directions = CYLImageTagGroup.defaultDirections(forTagCount: titles.count)
+        let tags = zip(titles, directions).map { CYLImageTag(title: $0, direction: $1) }
         return CYLImageTagGroup(tags: tags, percentPosition: CGPoint(x: 0.5, y: 0.5))
     }
 
@@ -157,7 +157,7 @@ final class CYLImageTagEditViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    private func confirmDelete(groupAt index: UInt) {
+    private func confirmDelete(groupAt index: Int) {
         let alert = UIAlertController(title: CYLExampleLocalizedString("删除标签组"), message: CYLExampleLocalizedString("你确定要删除该标签组吗？"),
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("取消"), style: .cancel))

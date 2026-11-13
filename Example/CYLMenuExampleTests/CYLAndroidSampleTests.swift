@@ -139,7 +139,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertFalse(group.isGroupHidden)
         XCTAssertEqual(group.linesProgress, 1)
         group.linesProgress = 0.5
-        XCTAssertEqual(group.value(forKey: CYLImageTagGroupKeyLinesProgress) as? CGFloat, 0.5)
+        XCTAssertEqual(group.value(of: .linesProgress), 0.5)
     }
 
     func testImageTagSampleEditAndList() {
@@ -160,15 +160,15 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         captureScreen(named: "test-sample-image-tag-edit")
 
         // A tap on a tag turns it (TagImageView.onTagClicked); a drag moves the group.
-        group.delegate?.groupView?(group, didTapTagAt: 0)
+        group.delegate?.groupView(group, didTapTagAt: 0)
         XCTAssertEqual(imageView.tagGroups[0].tags[0].direction, .rightTopStraight)
-        group.delegate?.groupView?(group, didDragToPercentPosition: CGPoint(x: 0.2, y: 0.7))
+        group.delegate?.groupView(group, didDragToPercentPosition: CGPoint(x: 0.2, y: 0.7))
         XCTAssertEqual(imageView.tagGroups[0].percentPosition, CGPoint(x: 0.2, y: 0.7))
         edit.save()
         XCTAssertTrue(saved)
         XCTAssertEqual(CYLImageTagSampleData.tagGroups.count, 1)
         XCTAssertEqual(CYLImageTagSampleData.tagGroups[0].tags.first?.title, "上衣")
-        XCTAssertEqual(CYLImageTagDirectionNext(.rightBottomStraight), .leftCenter)
+        XCTAssertEqual(CYLImageTagDirection.rightBottomStraight.next, .leftCenter)
 
         CYLImageTagSampleData.tagGroups = CYLImageTagSampleData.initialGroups()
         let list = CYLImageTagListViewController()
