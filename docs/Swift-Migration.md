@@ -35,6 +35,37 @@ The core library (the CocoaPods pod's sources: `CollectionViewClassifyMenu/Class
   or keywords also counts as translated. No Objective-C code left is full marks. Score after every commit, check for
   full marks after every commit, and continue until full marks.
 
+## Rule (2026-11-13): core quality first, examples last
+
+- **Rule:** when the migration causes compile errors or test failures in an example, change the example's code first.
+  Every example has the lowest weight; where an example needs no change, no compatibility is considered, and example
+  code may be changed freely so that the core's code carries no baggage. Never lower the quality of the core's Swift
+  code because of how an example uses it; the Swift coding standard decides (`docs/Swift-Coding-Standard.md`
+  section 1, which replaced "compatibility first"). Recorded in AGENTS.md, `docs/instructions.md` and
+  `.agents/skills/cyl-swift/`.
+- **Consequence:** the API check becomes a report: an API change the standard asks for (idiomatic names, `T?` / `T`
+  instead of `T!`, Swift collections and value types) is allowed, listed under "Swift API changes" below, with the
+  baseline refreshed. The files migrated in step 2 kept the Objective-C shapes (`T!`, `NSMutableArray`, factory
+  methods); they are cleaned up to the standard in a later step (TODO).
+- **Status:** rule recorded (2026-11-13); applied from step 3 on.
+- **Prompt (verbatim):**
+
+  > 在文档中找到objc迁移swift相关文档，包含docs instructions skils 相关文档。全英文更新，追加规则：更新example 编译错误，规则为优先改example层代码，所有example权重为最低，无须example修改的考虑兼容性。任意修改example代码，全力保障core核心层代码没有包袱，负担。不要因为example层的用法而降低core swif代码质量。以swift编码规范为准。
+
+- **Prompt (English):** find the Objective-C to Swift migration documents (docs, instructions, skills) and update them
+  in English with an added rule: for example compile errors, change the example code first; all examples have the
+  lowest weight; where an example needs no change, do not consider compatibility. Change example code as needed and
+  make every effort to keep the core free of baggage and burden. Do not lower the quality of the core's Swift code
+  because of how an example uses it; the Swift coding standard decides.
+
+## Swift API changes
+
+API changes the standard asks for (rule above). Each is reported by `scripts/swift-api-check.sh`, and the examples
+and the core's tests are updated in the same commit.
+
+| Step | Declaration | Change | Reason |
+| --- | --- | --- | --- |
+
 ## Score
 
 Score = (1 − Objective-C files left in the core / 76) × 100. Baseline: 76 Objective-C files (`.h` + `.m`, 11,592

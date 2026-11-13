@@ -81,10 +81,18 @@ verify the behavior and update the applicable documentation.
 - **The core moves to Swift** (since 2026-11-12): the pod's sources are translated
   file by file, following `docs/Swift-Coding-Standard.md` and the Swift skills it
   lists (`swift-api-design-guidelines-skill`, `migration-patterns`,
-  `swift-concurrency`, `cyl-swift`). The Swift API callers see and the
-  Objective-C names stay the same (`@objc(CYLName)`, `@objc(selector:)`);
-  `scripts/swift-api-check.sh` must report no API breakage after every commit.
-  Progress and score (no Objective-C file left = 100): `docs/Swift-Migration.md`.
+  `swift-concurrency`, `cyl-swift`). Progress and score (no Objective-C file
+  left = 100): `docs/Swift-Migration.md`.
+- **Core quality first, examples last (2026-11-13).** When the migration breaks
+  an example (a compile error or a test), change the example's code first: the
+  examples have the lowest weight in the project, and no compatibility is kept
+  for them. Change example code freely so that the core's Swift code carries no
+  baggage: never lower the core's Swift quality to fit an example's usage; the
+  Swift coding standard (`docs/Swift-Coding-Standard.md`) decides. The Swift API
+  may become idiomatic; `scripts/swift-api-check.sh` reports each change, which
+  is listed in `docs/Swift-Migration.md` with the baseline refreshed.
+  Objective-C names stay only where the core's own Objective-C tests, XIBs,
+  selectors or key-value coding need them.
 - Until a part of the core is Swift: when an example calls an Objective-C API
   that reads badly in Swift, fix it in the core, never with workarounds in the
   example: the Swift API Design Guidelines decide (`NS_SWIFT_NAME`, nullability,

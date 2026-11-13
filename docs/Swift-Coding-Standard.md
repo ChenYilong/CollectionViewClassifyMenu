@@ -13,32 +13,38 @@ Skills that apply (in `.agents/skills/`):
 - `cyl-swift`: this project's Swift-facing names (`NS_SWIFT_NAME`, `cyl_` methods) and how to check imported names.
 - `cyl-comments`: the documentation comment format.
 
-## 1. Compatibility first: no break for callers
+## 1. Core quality first; the examples adapt
 
-The migration changes the language, not the API.
+**Priority (rule of 2026-11-13, replaces "compatibility first"):** the Swift code of the core follows this standard and
+the Swift API Design Guidelines, with no burden kept for the examples. The examples have the lowest weight of all code
+in the project.
 
-1. **The Swift API stays the same.** Every type, method, property, initializer, constant and enum case keeps the
-   Swift name, the argument labels, the optionality and the types Swift imported from the Objective-C headers.
-   `scripts/swift-api-check.sh` compares the module's API with `scripts/swift-api-baseline.json` (the Objective-C
-   core's) and must report no breakage after every migration commit. An intended change needs a documented reason in
-   `docs/Swift-Migration.md` and a new baseline (`--baseline`) in the same commit.
-2. **The Objective-C API stays available.** Objective-C callers (the core's own tests, any app that uses the pod from
-   Objective-C) keep the class names, selectors and constants they had: public classes and protocols are
-   `@objc(CYLOriginalName)` and inherit from `NSObject` (or the UIKit class they extended); members that had a
-   selector different from the Swift name get `@objc(selector:with:)`. Prefer `@objcMembers` on a class whose members
-   are all public API.
-3. **Types keep the `CYL` prefix** (Objective-C has no namespaces, and the Swift names imported so far have it).
+1. **When the migration breaks an example, change the example.** A compile error or a test failure in an example
+   (`Example/`, `Example-Swift/`, the demo app, the `TagCollectionView` demo, their tests) is fixed in the example's
+   code first. The core never keeps an old name, an implicitly unwrapped optional, an Objective-C-style signature, an
+   `NSArray` / `NSDictionary` type, a factory method or any other construct only because an example uses it.
+2. **No compatibility work for the examples.** Where an example needs no change, nothing is added for compatibility;
+   where it does, the example changes. Never lower the quality of the core's Swift code to fit an example's usage.
+3. **The Swift API may change to become idiomatic.** Names, argument labels, optionality (`T?` / `T` instead of the
+   imported `T!`), value types and Swift collections follow the guidelines. `scripts/swift-api-check.sh` reports every
+   change against `scripts/swift-api-baseline.json`; a change is accepted when this standard asks for it, listed in
+   `docs/Swift-Migration.md` ("Swift API changes"), and the baseline is refreshed (`--baseline`) in the same commit.
+   A change the standard does not ask for is a bug.
+4. **Objective-C names** (`@objc(CYLName)`, `@objc(selector:)`) are kept where the core's own Objective-C tests, XIB
+   `customClass` entries, selectors or key-value coding need them; nothing else is exposed to Objective-C only for
+   compatibility. The core's own tests are not examples: keep them passing, and update them with the API.
+5. **Types keep the `CYL` prefix** (Objective-C has no namespaces, and the Swift names imported so far have it).
    Swift-only helpers (`private` / `fileprivate` / `internal`) do not need the prefix.
-4. **Categories become extensions** with `@objc` members; a category method's Objective-C name keeps the `cyl_`
-   prefix (`@objc(cyl_setWidth:)`), and its Swift name is the one imported before (see `cyl-swift` for the underscore
-   rule). A new Swift-facing name follows the Swift API Design Guidelines.
-5. **`NS_TYPED_ENUM` string constants** become `struct … : RawRepresentable, Hashable` (or the `extension
+6. **Categories become extensions**; a member that Objective-C code of the core still calls keeps its `cyl_`
+   Objective-C name (`@objc(cyl_setWidth:)`). Swift names follow the Swift API Design Guidelines (`cyl-swift` for the
+   underscore rule).
+7. **`NS_TYPED_ENUM` string constants** become `struct … : RawRepresentable, Hashable` (or the `extension
    NSNotification.Name` form) with `static let` members, and `@objc` global constants where Objective-C used them.
    `NS_ENUM` becomes `@objc public enum …: Int` with the same raw values; `NS_OPTIONS` becomes an `OptionSet`
    (plus `@objc` access where Objective-C needs it). `NS_ERROR_ENUM` keeps its error domain and codes.
-6. **Initializers:** an Objective-C designated initializer becomes a designated `init`; a factory method imported as
+8. **Initializers:** an Objective-C designated initializer becomes a designated `init`; a factory method imported as
    an initializer stays one (`convenience init`); `NS_UNAVAILABLE` becomes `@available(*, unavailable)`.
-7. **Nib and storyboard names, accessibility identifiers, localization keys and resource names stay unchanged**
+9. **Nib and storyboard names, accessibility identifiers, localization keys and resource names stay unchanged**
    (tests and XIBs depend on them). A class created from a XIB keeps `@objc(CYLName)` so the XIB's `customClass` still
    resolves (also set `customModule` when the XIB is edited).
 
@@ -60,9 +66,10 @@ The migration changes the language, not the API.
   class that was public in Objective-C is `open`, as Objective-C classes could be subclassed, unless it is marked
   final in its documentation); `public` for the rest of the API; `internal` (implicit) or `private` for everything
   else. `final` on internal classes.
-- **Optionals instead of nullability:** `nullable` → `T?`, `nonnull` → `T`. A property declared `null_resettable` or
-  imported as `T!` keeps `T!`. No force unwraps except for `T!` API kept for compatibility, `@IBOutlet`s and resources
-  shipped in the pod's bundle (with a message: `guard let … else { preconditionFailure("…") }`).
+- **Optionals instead of nullability:** `nullable` → `T?`, `nonnull` → `T`; an Objective-C property without
+  nullability (imported as `T!`) gets the type it really has (`T` when it always has a value, `T?` otherwise), not
+  `T!`. `T!` only for `@IBOutlet`s. No force unwraps except for resources shipped in the pod's bundle (with a message:
+  `guard let … else { preconditionFailure("…") }`).
 - **Value types where Objective-C used immutable models only internally**; public models that Objective-C callers use
   stay `NSObject` classes (with `NSCopying` when the Objective-C class had it).
 - **Errors:** Objective-C `NSError **` methods become `throws` (the imported Swift form already was); errors are the
@@ -110,7 +117,8 @@ The migration changes the language, not the API.
 
 ## 7. Verification after every migration commit
 
-1. `scripts/swift-api-check.sh`: no Swift API breakage.
+1. `scripts/swift-api-check.sh`: every reported change is one this standard asks for, listed in
+   `docs/Swift-Migration.md`, with the baseline refreshed; the examples are updated to the new API.
 2. `scripts/unit-tests.sh menu`, `tag`, `example` and `swift`: every suite passes (the core's Objective-C tests
    import the module with `@import CollectionViewClassifyMenu;`).
 3. `scripts/library-warnings.sh`: no new warnings.
