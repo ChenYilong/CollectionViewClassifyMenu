@@ -392,6 +392,9 @@ open class CYLTagButton @JvmOverloads constructor(
     private fun place(view: View, frame: CYLRect) {
         val width = maxOf(0, px(frame.maxX) - px(frame.x))
         val height = maxOf(0, px(frame.maxY) - px(frame.y))
+        // Children are measured UNSPECIFIED in onMeasure; a view laid out narrower than that keeps its old text layout
+        // and is clipped (PR #17). Measuring it at its frame lets the title's maxLines = 1 + ellipsize = END end it with
+        // "…", and gives an animation view (Rive) its real size.
         view.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
         view.layout(px(frame.x), px(frame.y), px(frame.x) + width, px(frame.y) + height)
     }
