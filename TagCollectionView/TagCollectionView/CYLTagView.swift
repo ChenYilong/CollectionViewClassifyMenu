@@ -113,10 +113,9 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
                 var items: [CYLTagModel] = []
                 for item in 0..<source.menuNumberOfItems(inSection: section) {
                     let title = source.menuTitleForItem(at: IndexPath(item: item, section: section))
-                    if let model = CYLTagModel(title: title) {
-                        model.updateSize(for: traitCollection)
-                        items.append(model)
-                    }
+                    let model = CYLTagModel(title: title)
+                    model.updateSize(for: traitCollection)
+                    items.append(model)
                 }
                 group.items = items
                 groups.add(group)

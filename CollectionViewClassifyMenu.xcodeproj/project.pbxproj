@@ -53,15 +53,13 @@
 		9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+CYLCollectionCellStyle.swift"; sourceTree = "<group>"; };
 		9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLCollectionViewCell.swift"; sourceTree = "<group>"; };
 		9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterHeaderView.swift"; sourceTree = "<group>"; };
-		9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
-		9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLIndexPathButton.m; sourceTree = "<group>"; };
+		9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLIndexPathButton.swift"; sourceTree = "<group>"; };
 		9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLRightImageButton.swift"; sourceTree = "<group>"; };
 		9A09E2CD1BC7AFF00060C116 /* CYLMultipleFilterController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLMultipleFilterController.swift"; sourceTree = "<group>"; };
 		9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterBaseController.swift"; sourceTree = "<group>"; };
 		9A09E2D01BC7AFF00060C116 /* CYLFilterBaseController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLFilterBaseController.xib; sourceTree = "<group>"; };
 		9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+CYLBlur.swift"; sourceTree = "<group>"; };
-		9A09E2D51BC7AFF00060C116 /* UIView+CYLGeneral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+CYLGeneral.h"; sourceTree = "<group>"; };
-		9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+CYLGeneral.m"; sourceTree = "<group>"; };
+		9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+CYLGeneral.swift"; sourceTree = "<group>"; };
 		9A09E2D91BC7AFF00060C116 /* CYLFilterParamsTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterParamsTool.swift"; sourceTree = "<group>"; };
 		9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLMultipleFilterHeaderView.swift"; sourceTree = "<group>"; };
 		9A09E2DD1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLMultipleFilterHeaderView.xib; sourceTree = "<group>"; };
@@ -173,8 +171,7 @@
 			children = (
 				9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.swift */,
 				9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.swift */,
-				9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */,
-				9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.m */,
+				9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.swift */,
 				9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.swift */,
 			);
 			path = View;
@@ -213,8 +210,7 @@
 			isa = PBXGroup;
 			children = (
 				9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.swift */,
-				9A09E2D51BC7AFF00060C116 /* UIView+CYLGeneral.h */,
-				9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.m */,
+				9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.swift */,
 			);
 			path = Category;
 			sourceTree = "<group>";

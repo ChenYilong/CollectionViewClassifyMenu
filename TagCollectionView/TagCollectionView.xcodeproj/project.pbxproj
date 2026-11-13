@@ -12,6 +12,7 @@
 		41C689521C574FDE007E0D89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 41C689511C574FDE007E0D89 /* Assets.xcassets */; };
 		41C689551C574FDE007E0D89 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 41C689531C574FDE007E0D89 /* LaunchScreen.storyboard */; };
 		41C689601C574FDE007E0D89 /* CYLTagCollectionViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C6895F1C574FDE007E0D89 /* CYLTagCollectionViewTests.m */; };
+		C7A6B2010000000000000002 /* CYLTagGroupRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A6B2010000000000000001 /* CYLTagGroupRowTests.swift */; };
 		7B13E6C0A045469C8360BCD2 /* libPods-TagCollectionView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6231CAA67969300C32680786 /* libPods-TagCollectionView.a */; };
 		E137FD46C7736707057546DC /* libPods-TagCollectionViewTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1452BBB6AC6F1F34F2BE97AF /* libPods-TagCollectionViewTests.a */; };
 /* End PBXBuildFile section */
@@ -39,14 +40,14 @@
 		41C689561C574FDE007E0D89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		41C6895B1C574FDE007E0D89 /* TagCollectionViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TagCollectionViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		41C6895F1C574FDE007E0D89 /* CYLTagCollectionViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTagCollectionViewTests.m; sourceTree = "<group>"; };
+		C7A6B2010000000000000001 /* CYLTagGroupRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTagGroupRowTests.swift; sourceTree = "<group>"; };
 		41C689611C574FDE007E0D89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		41C6896D1C575A64007E0D89 /* CYLTagHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagHeaderCell.swift"; sourceTree = "<group>"; };
 		41C6896E1C575A64007E0D89 /* CYLTagHeaderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagHeaderCell.xib; sourceTree = "<group>"; };
 		41C689721C575AA1007E0D89 /* CYLTagCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagCell.swift"; sourceTree = "<group>"; };
 		41C689731C575AA1007E0D89 /* CYLTagCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagCell.xib; sourceTree = "<group>"; };
 		41C689771C575B12007E0D89 /* CYLTagGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagGroup.swift"; sourceTree = "<group>"; };
-		41C689791C575B1A007E0D89 /* CYLTagModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagModel.h; sourceTree = "<group>"; };
-		41C6897A1C575B1A007E0D89 /* CYLTagModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagModel.m; sourceTree = "<group>"; };
+		41C6897A1C575B1A007E0D89 /* CYLTagModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagModel.swift"; sourceTree = "<group>"; };
 		41C689801C575B6D007E0D89 /* CYLTagView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagView.xib; sourceTree = "<group>"; };
 		5E98BE20A7F6D80ACAF5AF12 /* Pods-TagCollectionViewTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TagCollectionViewTests.debug.xcconfig"; path = "Target Support Files/Pods-TagCollectionViewTests/Pods-TagCollectionViewTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6231CAA67969300C32680786 /* libPods-TagCollectionView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TagCollectionView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -121,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				41C6895F1C574FDE007E0D89 /* CYLTagCollectionViewTests.m */,
+				C7A6B2010000000000000001 /* CYLTagGroupRowTests.swift */,
 				41C689611C574FDE007E0D89 /* Info.plist */,
 			);
 			path = TagCollectionViewTests;
@@ -141,8 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				41C689771C575B12007E0D89 /* CYLTagGroup.swift */,
-				41C689791C575B1A007E0D89 /* CYLTagModel.h */,
-				41C6897A1C575B1A007E0D89 /* CYLTagModel.m */,
+				41C6897A1C575B1A007E0D89 /* CYLTagModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -345,6 +346,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				41C689601C574FDE007E0D89 /* CYLTagCollectionViewTests.m in Sources */,
+				C7A6B2010000000000000002 /* CYLTagGroupRowTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
