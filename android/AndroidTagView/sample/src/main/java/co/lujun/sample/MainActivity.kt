@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         val list5 = ArrayList<String>()
         list5.add("Custom Red Color")
         list5.add("Custom Blue Color")
-        // Tag layout options (upstream issues #19, #79, #101, #105, #68): wrap, elevation, a drawable, cross spacing.
+        // Tag layout options (upstream issues #19, #79, #101, #105, #68, #70, #119): wrap, elevation, drawables, cross.
         val list6 = listOf("Starred", "A long tag that wraps onto a second line instead of leaving the container", "End")
 
         mTagContainerLayout1 = findViewById(R.id.tagcontainerLayout1)
@@ -172,7 +172,10 @@ class MainActivity : AppCompatActivity() {
         colors.add(col2)
 
         mTagcontainerLayout5.setTags(list5, colors)
+        // Delete icon: a drawable instead of the drawn cross (issues #70 / #118), none on the last tag (issue #119).
+        mTagContainerLayout6.setCrossDrawable(android.R.drawable.ic_delete)
         mTagContainerLayout6.setTags(list6)
+        mTagContainerLayout6.setTagCrossEnabled(list6.size - 1, false)
         mTagContainerLayout6.getTagView(0).apply {
             setTagDrawablePadding(resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 8)
             setTagDrawables(androidx.core.content.ContextCompat.getDrawable(context, android.R.drawable.btn_star_big_on), null, null, null)

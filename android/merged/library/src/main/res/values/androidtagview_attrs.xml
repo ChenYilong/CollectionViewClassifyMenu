@@ -66,6 +66,8 @@
         <attr name="tag_enable_cross" format="boolean" />
         <!-- Issue #105: extra space between the text and the cross. -->
         <attr name="tag_cross_spacing" format="dimension" />
+        <!-- Issues #70 / #118: a drawable drawn as the cross (delete icon) instead of the lines. -->
+        <attr name="tag_cross_drawable" format="reference" />
         <!-- Issue #19: text of a tag wider than the container wraps (default: ellipsis). -->
         <attr name="tag_text_wrap" format="boolean" />
         <!-- Issue #79: the elevation (shadow) of each tag. -->
