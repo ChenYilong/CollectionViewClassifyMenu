@@ -213,6 +213,11 @@ open class TagView : View {
 
     private var mCrossLineWidth = 0f
 
+    /**
+     * Issues #70 / #118: a drawable drawn in the cross's square instead of the two lines; null draws the lines.
+     */
+    private var mCrossDrawable: Drawable? = null
+
     private var unSupportedClipPath = false
 
     private val mLongClickHandle = Runnable {
@@ -509,27 +514,33 @@ open class TagView : View {
         }
     }
 
+    /**
+     * The area the cross (or its drawable) is drawn in: the square as tall as a one-line tag, at the end (the start in
+     * RTL), inset by the cross padding. Issue #111: the padding was allowed up to half the square, which shrank the
+     * cross to a point and left an empty space; it now keeps the cross at least a third of the square.
+     */
+    internal fun crossBounds(): RectF {
+        val side = mAccessorySize.toFloat()
+        val padding = min(mCrossAreaPadding, side / 3f)
+        val top = (height - side) / 2f
+        val left = if (mTextDirection == View.TEXT_DIRECTION_RTL) 0f else width - side
+        return RectF(left + padding, top + padding, left + side - padding, top + side - padding)
+    }
+
     private fun drawCross(canvas: Canvas) {
         if (isEnableCross()) {
-            // The cross is a square as tall as a one-line tag, centred vertically (a wrapped tag is taller).
-            val side = mAccessorySize
-            mCrossAreaPadding = if (mCrossAreaPadding > side / 2) (side / 2).toFloat() else mCrossAreaPadding
-            val top = (height - side) / 2
-            val rtl = mTextDirection == View.TEXT_DIRECTION_RTL
-            val ltX = if (rtl) mCrossAreaPadding.toInt() else (width - side + mCrossAreaPadding).toInt()
-            val ltY = top + mCrossAreaPadding.toInt()
-            val lbX = ltX
-            val lbY = top + (side - mCrossAreaPadding).toInt()
-            val rtX = if (rtl) (side - mCrossAreaPadding).toInt() else (width - mCrossAreaPadding).toInt()
-            val rtY = ltY
-            val rbX = rtX
-            val rbY = lbY
-
+            val bounds = crossBounds()
+            val drawable = mCrossDrawable
+            if (drawable != null) {
+                drawable.setBounds(bounds.left.roundToInt(), bounds.top.roundToInt(), bounds.right.roundToInt(), bounds.bottom.roundToInt())
+                drawable.draw(canvas)
+                return
+            }
             mPaint.style = Paint.Style.STROKE
             mPaint.color = mCrossColor
             mPaint.strokeWidth = mCrossLineWidth
-            canvas.drawLine(ltX.toFloat(), ltY.toFloat(), rbX.toFloat(), rbY.toFloat(), mPaint)
-            canvas.drawLine(lbX.toFloat(), lbY.toFloat(), rtX.toFloat(), rtY.toFloat(), mPaint)
+            canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.bottom, mPaint)
+            canvas.drawLine(bounds.left, bounds.bottom, bounds.right, bounds.top, mPaint)
         }
     }
 
@@ -796,9 +807,27 @@ open class TagView : View {
 
     fun isEnableCross(): Boolean = mEnableCross
 
+    /**
+     * Shows or hides this tag's cross (delete icon). Issue #119: one tag can differ from the container's setting,
+     * for example an "+ Add" tag without a cross; the tag is measured and drawn again at once.
+     */
     fun setEnableCross(mEnableCross: Boolean) {
-        this.mEnableCross = mEnableCross
+        if (this.mEnableCross != mEnableCross) {
+            this.mEnableCross = mEnableCross
+            requestLayout()
+            invalidate()
+        }
     }
+
+    /**
+     * A drawable for the cross (delete icon) instead of the two drawn lines (issues #70 / #118); null restores them.
+     */
+    fun setCrossDrawable(drawable: Drawable?) {
+        mCrossDrawable = drawable
+        invalidate()
+    }
+
+    fun getCrossDrawable(): Drawable? = mCrossDrawable
 
     fun getCrossAreaWidth(): Float = mCrossAreaWidth
 

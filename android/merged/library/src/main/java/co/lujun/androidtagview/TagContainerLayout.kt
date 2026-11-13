@@ -282,6 +282,12 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** The padding of the cross area(default 10dp) */
     private var mCrossAreaPadding = 10.0f
 
+    /**
+     * Issues #70 / #118: the resource of a drawable drawn as every tag's cross (delete icon); 0 draws the lines.
+     */
+    @DrawableRes
+    private var mCrossDrawableRes = 0
+
     /** The cross icon color(default Color.BLACK) */
     private var mCrossColor = Color.BLACK
 
@@ -340,6 +346,7 @@ open class TagContainerLayout @JvmOverloads constructor(
         mEnableCross = attributes.getBoolean(R.styleable.AndroidTagView_tag_enable_cross, mEnableCross)
         mCrossAreaWidth = attributes.getDimension(R.styleable.AndroidTagView_tag_cross_width, dp2px(context, mCrossAreaWidth))
         mCrossAreaPadding = attributes.getDimension(R.styleable.AndroidTagView_tag_cross_area_padding, dp2px(context, mCrossAreaPadding))
+        mCrossDrawableRes = attributes.getResourceId(R.styleable.AndroidTagView_tag_cross_drawable, mCrossDrawableRes)
         mCrossColor = attributes.getColor(R.styleable.AndroidTagView_tag_cross_color, mCrossColor)
         mCrossLineWidth = attributes.getDimension(R.styleable.AndroidTagView_tag_cross_line_width, dp2px(context, mCrossLineWidth))
         mTagSupportLettersRTL = attributes.getBoolean(R.styleable.AndroidTagView_tag_support_letters_rlt, mTagSupportLettersRTL)
@@ -724,6 +731,7 @@ open class TagContainerLayout @JvmOverloads constructor(
         tagView.setCrossAreaWidth(mCrossAreaWidth)
         tagView.setCrossAreaPadding(mCrossAreaPadding)
         tagView.setCrossColor(mCrossColor)
+        tagView.setCrossDrawable(if (mCrossDrawableRes != 0) androidx.core.content.ContextCompat.getDrawable(context, mCrossDrawableRes) else null)
         tagView.setCrossLineWidth(mCrossLineWidth)
         tagView.setTagSupportLettersRTL(mTagSupportLettersRTL)
         tagView.setBackgroundResource(mTagBackgroundResource)
@@ -1405,6 +1413,28 @@ open class TagContainerLayout @JvmOverloads constructor(
     }
 
     fun getTagElevation(): Float = mTagElevation
+
+    /**
+     * The drawable resource of every tag's cross (delete icon) instead of the drawn lines (issues #70 / #118); 0
+     * restores the lines. Applies to the tags shown and to tags added afterwards.
+     */
+    fun setCrossDrawable(@DrawableRes resId: Int) {
+        mCrossDrawableRes = resId
+        for (view in mChildViews) {
+            (view as TagView).setCrossDrawable(if (resId != 0) androidx.core.content.ContextCompat.getDrawable(context, resId) else null)
+        }
+    }
+
+    @DrawableRes
+    fun getCrossDrawable(): Int = mCrossDrawableRes
+
+    /**
+     * Shows or hides the cross (delete icon) of one tag (issue #119), for example none on an "+ Add" tag while the
+     * others keep theirs. `tag_enable_cross` / [setEnableCross] set it for every tag added afterwards (issue #78).
+     */
+    fun setTagCrossEnabled(position: Int, enabled: Boolean) {
+        getTagView(position).setEnableCross(enabled)
+    }
 
     fun getTagView(position: Int): TagView {
         if (position < 0 || position >= mChildViews.size) {
