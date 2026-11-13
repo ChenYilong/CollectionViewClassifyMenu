@@ -103,8 +103,13 @@ open class TagContainerLayout @JvmOverloads constructor(
     private var mScrollLastY = 0f
     private var mScrollingContent = false
 
-    /** The max length for TagView(default max length 23) */
-    private var mTagMaxLength = 23
+    /**
+     * The maximum number of characters of a tag's text; 0 (the default) means no limit. The default was 23, which
+     * shortened a long text before its line was chosen, so it stayed after other tags as "Welcome to use Andro…"
+     * instead of starting a new line where it fits in full (the iOS strategy: the width of the whole text decides
+     * the line; only a text wider than a line is shortened, to the line's width).
+     */
+    private var mTagMaxLength = 0
 
     /** TagView Border width(default 0.5dp) */
     private var mTagBorderWidth = 0.5f
@@ -1152,9 +1157,12 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** Get TagContainerLayout's max lines */
     fun getMaxLines(): Int = mMaxLines
 
-    /** Set the TagView text max length(must greater or equal to 3). */
+    /**
+     * Set the TagView text max length (at least 3); 0 or less removes the limit (the default), so the tag's width,
+     * at most the container's, decides its line and shortens it only when it is wider than a line.
+     */
     fun setTagMaxLength(maxLength: Int) {
-        mTagMaxLength = if (maxLength < TAG_MIN_LENGTH) TAG_MIN_LENGTH else maxLength
+        mTagMaxLength = if (maxLength <= 0) 0 else maxOf(TAG_MIN_LENGTH, maxLength)
     }
 
     /** Get TagView max length. */

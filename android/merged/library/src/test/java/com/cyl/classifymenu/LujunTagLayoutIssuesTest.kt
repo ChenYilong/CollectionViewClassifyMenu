@@ -74,6 +74,39 @@ class LujunTagLayoutIssuesTest {
     }
 
     @Test
+    fun longTagStartsANewLineInsteadOfBeingShortened() {
+        // Android bug (docs/android.md, 2026-11-13): "Welcome to use AndroidTagView!" stayed after "Html", shortened
+        // to 23 characters, although a line of its own shows it in full. iOS strategy: the whole text's width decides.
+        val welcome = "Welcome to use AndroidTagView!"
+        val probe = container("Html", welcome).apply { measureAndLayout(4000, MeasureSpec.EXACTLY) }
+        val html = probe.getTagView(0).measuredWidth
+        val full = probe.getTagView(1).measuredWidth
+        // Wide enough for the welcome tag alone, too narrow for both on one line.
+        val width = probe.paddingLeft + probe.paddingRight + full + html / 2
+        val view = container("Html", welcome)
+        view.measureAndLayout(width, MeasureSpec.EXACTLY)
+        val tag = view.getTagView(1)
+        assertEquals(welcome, tag.getDisplayedText())
+        assertTrue(tag.top > view.getTagView(0).top)
+        assertEquals(view.getTagView(0).left, tag.left)
+    }
+
+    @Test
+    fun tagWiderThanALineStartsANewLineThenIsShortened() {
+        // Wider than a whole line: it starts a new line as its first tag, and only then ends with an ellipsis.
+        val view = container("Html", longText) { setTagMaxLength(0) }
+        view.measureAndLayout(400, MeasureSpec.EXACTLY)
+        val tag = view.getTagView(1)
+        assertTrue(tag.top > view.getTagView(0).top)
+        assertEquals(view.getTagView(0).left, tag.left)
+        assertTrue(tag.getDisplayedText().endsWith("…"))
+        // An explicit maximum length still shortens the text.
+        val limited = container("Welcome to use AndroidTagView!") { setTagMaxLength(10) }
+        limited.measureAndLayout(4000, MeasureSpec.EXACTLY)
+        assertEquals("Welcome...", limited.getTagView(0).getDisplayedText())
+    }
+
+    @Test
     fun longTagTextWrapsWhenAsked() {
         // #19: the text of a tag wider than the container wraps onto more lines.
         val single = container("Short").apply { measureAndLayout(300, MeasureSpec.EXACTLY) }.getTagView(0)
