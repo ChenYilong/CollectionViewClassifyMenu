@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mTagContainerLayout3: TagContainerLayout
     private lateinit var mTagContainerLayout4: TagContainerLayout
     private lateinit var mTagcontainerLayout5: TagContainerLayout
+    private lateinit var mTagContainerLayout6: TagContainerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,12 +88,15 @@ class MainActivity : AppCompatActivity() {
         val list5 = ArrayList<String>()
         list5.add("Custom Red Color")
         list5.add("Custom Blue Color")
+        // Tag layout options (upstream issues #19, #79, #101, #105, #68): wrap, elevation, a drawable, cross spacing.
+        val list6 = listOf("Starred", "A long tag that wraps onto a second line instead of leaving the container", "End")
 
         mTagContainerLayout1 = findViewById(R.id.tagcontainerLayout1)
         mTagContainerLayout2 = findViewById(R.id.tagcontainerLayout2)
         mTagContainerLayout3 = findViewById(R.id.tagcontainerLayout3)
         mTagContainerLayout4 = findViewById(R.id.tagcontainerLayout4)
         mTagcontainerLayout5 = findViewById(R.id.tagcontainerLayout5)
+        mTagContainerLayout6 = findViewById(R.id.tagcontainerLayout6)
 
         mTagContainerLayout1.setDefaultImageDrawableID(R.drawable.yellow_avatar)
 
@@ -168,6 +172,11 @@ class MainActivity : AppCompatActivity() {
         colors.add(col2)
 
         mTagcontainerLayout5.setTags(list5, colors)
+        mTagContainerLayout6.setTags(list6)
+        mTagContainerLayout6.getTagView(0).apply {
+            setTagDrawablePadding(resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 8)
+            setTagDrawables(androidx.core.content.ContextCompat.getDrawable(context, android.R.drawable.btn_star_big_on), null, null, null)
+        }
         val text = findViewById<EditText>(R.id.text_tag)
         val btnAddTag = findViewById<Button>(R.id.btn_add_tag)
         btnAddTag.setOnClickListener {
