@@ -122,7 +122,7 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
         self.view.layoutIfNeeded()
         let screen = view.cyl_capture(withWidth: collectionView.bounds.width)
         // 生成高斯模糊背景 / Generate a Gaussian-blurred background.
-        let blur = screen?.cyl_blurredImage(withRadius: 25, iterations: 10, tintColor: nil)
+        let blur = screen?.cylBlurred(radius: 25, iterations: 10)
         view.addSubview(self.view)
         blurImageView.image = blur
         moveSubviewsOut()

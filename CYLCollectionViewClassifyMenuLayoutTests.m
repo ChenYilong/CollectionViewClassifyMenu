@@ -267,7 +267,6 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     CYLMultipleFilterController *filterController = [[CYLMultipleFilterController alloc] init];
     filterController.menuDataSource = filterSource;
     [filterController loadViewIfNeeded];
-    CYLFilterParamsTool *filter = [filterController valueForKey:@"filterParamsTool"];
     window.rootViewController = filterController;
     UICollectionView *filterCollection = [filterController valueForKey:@"collectionView"];
     filterCollection.frame = CGRectMake(0, 0, 320, 240);
@@ -281,7 +280,7 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     [filterCollection layoutIfNeeded];
     XCTAssertNotNil([filterCollection cellForItemAtIndexPath:selection]);
     [filterCollection.delegate collectionView:filterCollection didSelectItemAtIndexPath:selection];
-    XCTAssertTrue([filter.filterParamsArray[1][1] boolValue]);
+    XCTAssertTrue([[filterController selectedIndexPaths] containsObject:selection]);
     [self scrollAndCheck:filterCollection fixture:fixture buttonKey:@"titleButton"];
     [filterCollection scrollToItemAtIndexPath:selection atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
     [filterCollection layoutIfNeeded];

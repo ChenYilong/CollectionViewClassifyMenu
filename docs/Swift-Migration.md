@@ -87,6 +87,14 @@ and the core's tests are updated in the same commit.
 | 4 | `isDraggable`, `isGroupHidden`, `tagViews`, `setPercentPosition(x:y:)` | Objective-C accessors dropped; `setPercentX(_:percentY:)` → `setPercentPosition(x:y:)` | guidelines |
 | 4 | the dot's long-press accessibility action | shown while there is a delegate (it was: while the delegate implemented `groupViewDidLongPress:`, which `CYLImageTagView` always does) | Swift protocols with defaults cannot be asked which methods they implement |
 | 4 | `CYLImageTagView` handlers, `groupConfiguration`, `removeTagGroup(at:)` | `UInt` → `Int`; `@objc` removed | Swift indexes; no Objective-C users |
+| 5 | `CYLFilterParamsTool`, `kMultipleFilterSetting`, `kMultipleFilterSettingModified` | removed; `CYLMultipleFilterController` keeps `[[String]]` titles and `[[Bool]]` selection privately | legacy `NSCoding` storage and a Documents file name nothing used; the core's test checks `selectedIndexPaths()` instead |
+| 5 | `UIButton.cyl_generalStyle()` / `cyl_homeStyle()` / `cyl_redStyle()` / `cyl_chengNiStyle()` | → `cylApply(_: CYLCollectionCellButtonStyle)` (`.general`, `.home`, `.red`, `.chengNi`) and `UIButton.cylImage(filledWith:)` | one method with a style; Swift names without underscores |
+| 5 | `UIImage.cyl_blurredImage(withRadius:iterations:tintColor:)` | → `cylBlurred(radius:iterations:tintColor:)`, non-optional result, `Int` iterations | Swift names; returns the image itself when it cannot blur |
+| 5 | `CYLTagGroup.itemArr` (`[Any]!`), `.width` / `.height` (`Float`), `.groupName` (`String!`), `firstRowCellCount(forContentWidth:)` (`UInt`), `.cellsCountArrayPerRowInSections` | → `items: [CYLTagModel]`, `CGFloat`, `String`, `Int`, `cellCountsPerRow: [Int]`; Objective-C names kept for the component's tests; `invalidateRowCounts()` added | typed, idiomatic |
+| 5 | `CYLTagGroup.firstRowCount` | removed | computed once and never read |
+| 5 | `kTagCollectionViewCellsHorizonMargin` and the four `kTagCollectionViewTo…Margin` globals | → `CYLTagView.cellSpacing`, `CYLTagView.sectionInset` | no globals, typo gone |
+| 5 | `CYLFilterCollectionCell.titleButton` | `T!` → `let … : T` | always present |
+| 5 | `init()` of `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`, `CYLRightImageButton`; `CYLRightImageButton.init(type:)` | removed | created with `init(frame:)` / nibs |
 
 Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
 index) and its tests (`direction.next`, `value(of: .linesProgress)`).
@@ -105,13 +113,14 @@ lines) in the pod's source patterns.
 | 2026-11-13 | step 2 (the six roots and `CYLMenuKeys`) | 63 | 17.1 |
 | 2026-11-13 | step 3 (cells, headers, filter base; idiomatic API) | 53 | 30.3 |
 | 2026-11-13 | step 4 (`CYLImageTagGroupView`) | 51 | 32.9 |
+| 2026-11-13 | step 5 (filter views, styles, blur, `CYLTagGroup`) | 37 | 51.3 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 47 left (steps 2–4) |
-| `TagCollectionView/TagCollectionView` | 10 | in progress: 4 left (models: `CYLTagModel`, `CYLTagGroup`) |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 35 left (steps 2–5) |
+| `TagCollectionView/TagCollectionView` | 10 | in progress: 2 left (`CYLTagModel`) |
 
 ## Swift skills installed (requirement 2)
 
@@ -189,9 +198,17 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 
 | 2026-11-13 | step 4 | `CYLImageTagGroupView` (2 files, 1,152 lines) | 51 | 32.9 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
+| 2026-11-13 | step 5 | `CYLRightImageButton`, `UIButton+CYLCollectionCellStyle`, `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`, `UIImage+CYLBlur`, `CYLFilterParamsTool` (removed), `CYLTagGroup` (14 files) | 37 | 51.3 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+Step 5's first test run stalled: another session tested CYLTabBarController on the same simulator at the same time; the
+stuck run of this repository was stopped and the suites run again.
+
 Note on `1e1df5a` (a docs commit): it also took the staged deletion of `CYLImageTagGroupView.h/.m` without the
 Swift file, so that one commit does not build; step 4's commit, right after it, does. Published history is not
 rewritten.
+
+Examples updated in step 5: the demo app's Filter tab no longer migrates selections archived by versions before the
+user-defaults storage (`CYLFilterParamsTool` archives); its test checks the validation of stored selections instead.
 
 Baseline of the test suites (2026-11-13, clean worktree at `79b521f`, before any Swift): menu 30/30, tag 6/6, swift
 19/19, example 79/80. The failing example test, `CYLSearchCategoryScenarioTests
