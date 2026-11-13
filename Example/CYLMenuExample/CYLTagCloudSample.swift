@@ -17,7 +17,7 @@ enum CYLTagCloudSampleData {
     static let colors = ["#00BFFF", "#E91E63", "#F44336", "#9C27B0", "#673AB7"]
 
     static func color(_ index: Int) -> UIColor? {
-        CYLMenuColorFromString(colors[index])
+        UIColor.cylMenuColor(from: colors[index])
     }
 
     /// The tags of MainActivity's onCreate, in order. Corner radii are android pixels divided by 3 (xxhdpi points).
@@ -52,8 +52,8 @@ enum CYLTagCloudSampleData {
         tags.append(custom)
         let detail = CYLTag(title: CYLExampleLocalizedString("详情标签"))
         detail.textColor = .white
-        detail.backgroundColor = CYLMenuColorFromString("#DDDDDD")
-        detail.highlightedBackgroundColor = CYLMenuColorFromString("#555555")
+        detail.backgroundColor = UIColor.cylMenuColor(from: "#DDDDDD")
+        detail.highlightedBackgroundColor = UIColor.cylMenuColor(from: "#555555")
         detail.cornerRadius = 20 / 3
         detail.textSize = 14
         detail.borderWidth = 1

@@ -98,6 +98,15 @@ and the core's tests are updated in the same commit.
 | 6 | `CYLIndexPathButton.cyl_imageTitleSpacing` / `.cyl_titleLeadingInset` | → `imageTitleSpacing` / `titleLeadingInset` (Objective-C names `cyl_…` kept for the core's tests) | Swift names without underscores |
 | 6 | `UIView (CYLGeneral)`: 21 frame, border, layer, target and capture helpers and the `LINE_COLOR…` macros | removed from the API; the three the core uses are internal (`cylAddLineLayer(frame:color:)`, `cylAddTapTarget(_:action:)`, `cylSnapshot(width:)`); frames are set directly | unused public API; plain UIKit is clearer |
 | 6 | `CYLTagModel` | `+modelWithTitle:` → `init(title:)` (non-failable; Objective-C `-initWithTitle:`); `title: String`; `width` / `height`: `Float` → `CGFloat` (`@objc dynamic`, so subclasses can override the getters); `titleFont(for:)` / `updateSize(for:)` take `UITraitCollection?` | typed, idiomatic |
+| 7 | `CYLTagListView` | `UInt` counts and indexes → `Int` (`defaultVisibleRows`, `maximumNumberOfRows`, `numberOfRows(inSection:)`, `insertTag(_:at:)`, `removeTag(at:)`…); `style`, `titleStyle`, `foldControl`: `T!` → `T` (setting copies; no `nil` reset); `init(fold:content:)` → `init(foldPosition:content:)`; `init(foldControl:title:titleImage:titlePosition:)` with defaults replaces the two-title variants; `defaultTitleStyle()` → class property `defaultTitleStyle`; `setTags(withTitles:colors:)` has `colors: = []`; `configuration(withContentsOfFile:)` → `configuration(contentsOfFile:)`. Objective-C names kept for the core's test: `-initWithFoldControl:`, `title`, `defaultVisibleRows`, `menuDataSource`, `-reloadMenuData`, `titleView`; KVC `collectionView` (tests' `CYLTagListProbe`) | Swift integers, non-optional values, labels |
+| 7 | `CYLTag` | a final Swift class (not `NSObject`, typed `copy()`); one `init(identifier: = 0, title:, backgroundColor: = nil)` and `init(identifier: = 0, title:, backgroundColorHex:)` replace six initializers; `textSize`, `cornerRadius`, `borderWidth`, `deleteIndicatorSize`: `CGFloat?` (`nil` = the list's value) replace the sentinel `CYLTagUseListValue` (removed); `colors` non-optional; `badgeImage(withText:color:diameter:)` → `badgeImage(text:color:diameter:)`; `style(withBaseStyle:)` → `style(basedOn:)` | optionals instead of a sentinel, default arguments |
+| 7 | `CYLTagDataSource` | `UInt` indexes → `Int`; `init(tags: = [])`; `baseStyle: CYLMenuStyle` (not `T!`) | Swift integers |
+| 7 | configuration keys (90 `CYLTagListView…`, `CYLTagSection…`, `CYLTagItem…`, `CYLMenuStyle…`, `CYLTagAppearance…`, `CYLMenuFoldControlKey…` globals) | namespaced: `CYLTagListKey.sections`, `CYLTagSectionKey.items`, `CYLTagItemKey.title`, `CYLMenuStyleKey.normal`, `CYLTagAppearanceKey.cornerRadius`, `CYLMenuFoldControlKey.position`… (same string values) | no global constants; discoverable by type |
+| 7 | `CYLMenuColorFromString()`, `CYLMenuAnimationURLWithOptions()` | → `UIColor.cylMenuColor(from:)`, `URL.cylAddingAnimationOptions(_:)` (non-optional URL; `[:]` returns the URL) | extensions instead of global functions |
+| 7 | `CYLMenuConfigurationError` | an `NS_ERROR_ENUM` → a Swift `struct` (`CustomNSError`, `LocalizedError`) with the same domain `CYLMenuConfigurationErrorDomain`, `Code` raw values and a `message` | Swift error |
+| 7 | accessibility identifiers (`CYLTagListTitleAccessibilityIdentifier`…, 6 globals) | `CYLTagListAccessibilityIdentifier.title`, `.foldControl`, `.item`, `.createItem`, `.moreButton`, `.deleteButton` (same strings); the core's Objective-C test compares the strings | namespaced constants |
+| 7 | `CYLTagListCell`, `CYLTagCreateCell`, `CYLTagFoldCell`, `CYLTagFoldButton` | `deletable` → `isDeletable`; `configure(withTitle:…selected:enabled:)` → `configure(title:…isSelected:isEnabled:)`; `additionalAccessibilityActions: [UIAccessibilityCustomAction]` (not optional); `plusImage()` → `plusImage`; `style(with:)` → `outlinedStyle(from:)`; `configure(withName:style:enabled:)` → `configure(name:style:isEnabled:)`; `CYLTagFoldCell.configure(with:…)` → `configure(foldControl:…)`; KVC `button` / `foldButton` kept `@objc` | Swift names |
+| 7 | `CYLMenuStyle (CYLConfiguration)`, `CYLMenuFoldControl (CYLConfiguration)`, `CYLTagAppearance (CYLConfiguration)` | Swift extensions; `CYLMenuFoldControl(configuration:)` is a failable `init?(configuration: Any)` (a `CYLMenuFoldControl` is assigned directly instead) | extensions |
 
 Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
 index) and its tests (`direction.next`, `value(of: .linesProgress)`).
@@ -118,12 +127,13 @@ lines) in the pod's source patterns.
 | 2026-11-13 | step 4 (`CYLImageTagGroupView`) | 51 | 32.9 |
 | 2026-11-13 | step 5 (filter views, styles, blur, `CYLTagGroup`) | 37 | 51.3 |
 | 2026-11-13 | step 6 (`CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel`) | 31 | 59.2 |
+| 2026-11-14 | step 7 (`CYLTag`, `CYLTagListView` + configuration, the tag cells and fold button, accessibility identifiers) | 16 | 78.9 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 31 left (steps 2–6): the TagList module, the shared tools |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 16 left (steps 2–7): `CYLMenuFoldControl`, `CYLMenuStyle`, `CYLTagAppearance`, `CYLTagColors`, `CYLTagButton`, the shared tools |
 | `TagCollectionView/TagCollectionView` | 10 | DONE (step 6): 0 left |
 
 ## Swift skills installed (requirement 2)
@@ -158,7 +168,8 @@ headers still in the umbrella without any glue, while Objective-C calling Swift 
    `CYLImageTagGroupView`, `CYLTagCell`, `CYLTagHeaderCell`, `CYLTagGroup`…
 3. Then their dependencies, down to the shared leaves (`CYLMenuResources`, `CYLParameterConfiguration`,
    `CYLMenuDataSource`, `CYLCollectionViewLeftAlignedLayout`), which go last.
-4. `CYLTag` and `CYLTagListView` (+ `CYLConfiguration`) import each other: they migrate in one commit.
+4. `CYLTag` and `CYLTagListView` (+ `CYLConfiguration`) import each other: they migrate in one commit (step 7, with
+   the cells and the accessibility header they alone import).
 
 ## Transition files
 
@@ -205,6 +216,20 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | 2026-11-13 | step 5 | `CYLRightImageButton`, `UIButton+CYLCollectionCellStyle`, `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`, `UIImage+CYLBlur`, `CYLFilterParamsTool` (removed), `CYLTagGroup` (14 files) | 37 | 51.3 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
 | 2026-11-13 | step 6 | `CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel` (6 files) | 31 | 59.2 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+| 2026-11-14 | step 7 | `CYLTag`, `CYLTagListView`, `CYLTagListView+CYLConfiguration`, `CYLTagListCell`, `CYLTagCreateCell`, `CYLTagFoldCell`, `CYLTagFoldButton`, `CYLTagListAccessibility` (15 files, 4,770 lines of Objective-C) | 16 | 78.9 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
+
+Step 7 notes: the first swift run failed 2 title tests: Swift does not run a property's `didSet` when an initializer
+of the declaring class sets it, so `init(foldControl:title:…)` never updated the title view; it now sets the properties
+through a method. The tests ran on the iPhone 17 Pro simulator of iOS 27.0 (`scripts/simulator-id.sh` now also takes a
+simulator ID): `xcodebuild` of Xcode 27.2 rejects the iOS 27.2 runtime's simulators as destinations, and the tests need
+to run outside the command sandbox (the test runner's socket). The example suite's former failure
+(`CYLSearchCategoryScenarioTests`) passes now. the fold position rename (`footer`, `headerLeading`, `headerTrailing`, `tail`,
+`docs/component-architecture.md`) moves to step 8 with `CYLMenuFoldControl`, which defines the enum. The core's
+Objective-C test compares the accessibility identifiers as strings (`"CYLTagListItem"`, `"CYLTagListFoldControl"`):
+the Swift constants are not visible to Objective-C. Examples updated: the configuration keys and helpers (12 files),
+`removeTag(at:)` with an `Int` (`CYLTagContainerSample`), `defaultTitleStyle`, `configuration(contentsOfFile:)`,
+`style(basedOn:)`, `badgeImage(text:…)`, `cylAddingAnimationOptions(_:)`.
 
 Step 6 moved one core test to Swift: Objective-C cannot subclass a Swift class, and
 `testRowCalculationIsLinearAndInvalidatedWhenItemsChange` counts a tag's width reads through a subclass of

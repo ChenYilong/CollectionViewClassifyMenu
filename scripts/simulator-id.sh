@@ -12,6 +12,6 @@ def version(runtime):
     return [int(part) for part in runtime.rsplit("iOS-", 1)[-1].split("-") if part.isdigit()]
 for runtime in sorted((r for r in devices if "iOS" in r), key=version, reverse=True):
     for device in devices[runtime]:
-        if (name and device["name"] == name) or (not name and device["name"].startswith("iPhone")):
+        if (name and name in (device["name"], device["udid"])) or (not name and device["name"].startswith("iPhone")):
             print(device["udid"]); sys.exit(0)
 sys.exit(1)' "${1:-}" || { echo "No iPhone simulator${1:+ named $1}" >&2; xcrun simctl list devices available >&2; exit 1; }

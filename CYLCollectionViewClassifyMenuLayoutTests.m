@@ -435,9 +435,10 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     while (stack.count > 0) {
         UIView *view = stack.lastObject;
         [stack removeLastObject];
-        if ([view.accessibilityIdentifier isEqualToString:CYLTagListItemAccessibilityIdentifier]) {
+        // The identifiers of CYLTagListAccessibilityIdentifier (Swift only), which never change.
+        if ([view.accessibilityIdentifier isEqualToString:@"CYLTagListItem"]) {
             [items addObject:view];
-        } else if ([view.accessibilityIdentifier isEqualToString:CYLTagListFoldControlAccessibilityIdentifier] && !view.hidden) {
+        } else if ([view.accessibilityIdentifier isEqualToString:@"CYLTagListFoldControl"] && !view.hidden) {
             foldControl = view;
         }
         [stack addObjectsFromArray:view.subviews];

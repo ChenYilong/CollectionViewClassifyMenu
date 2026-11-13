@@ -16,19 +16,18 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
 
     func testAnimationOptionsAreEncodedAsCYLTabBarControllerDoes() {
         let file = URL(fileURLWithPath: "/tmp/icons.riv")
-        XCTAssertNil(CYLMenuAnimationURLWithOptions(nil, ["artboard": "CHAT"]))
-        XCTAssertEqual(CYLMenuAnimationURLWithOptions(file, nil), file)
-        let url = CYLMenuAnimationURLWithOptions(file, ["stateMachine": "State Machine 1", "artboard": "A&B", "duration": 2])
-        XCTAssertEqual(url?.path, file.path)
-        XCTAssertEqual(url?.fragment, "artboard=A%26B&duration=2&stateMachine=State%20Machine%201", "Sorted, percent-encoded")
+        XCTAssertEqual(file.cylAddingAnimationOptions([:]), file)
+        let url = file.cylAddingAnimationOptions(["stateMachine": "State Machine 1", "artboard": "A&B", "duration": 2])
+        XCTAssertEqual(url.path, file.path)
+        XCTAssertEqual(url.fragment, "artboard=A%26B&duration=2&stateMachine=State%20Machine%201", "Sorted, percent-encoded")
 
         let items: [[String: Any]] = [
-            [CYLTagItemTitle: "a", CYLTagItemAnimation: "CYLMenuExample.bundle/Animations/Rive/icons.riv",
-             CYLTagItemAnimationOptions: ["artboard": "CHAT", "input": "active"]],
-            [CYLTagItemTitle: "b", CYLTagItemAnimation: "CYLMenuExample.bundle/Animations/Rive/icons.riv#artboard=USER"],
+            [CYLTagItemKey.title: "a", CYLTagItemKey.animation: "CYLMenuExample.bundle/Animations/Rive/icons.riv",
+             CYLTagItemKey.animationOptions: ["artboard": "CHAT", "input": "active"]],
+            [CYLTagItemKey.title: "b", CYLTagItemKey.animation: "CYLMenuExample.bundle/Animations/Rive/icons.riv#artboard=USER"],
         ]
-        let sections: [[String: Any]] = [[CYLTagSectionItems: items]]
-        let view = CYLTagListView(configuration: [CYLTagListViewSections: sections])
+        let sections: [[String: Any]] = [[CYLTagSectionKey.items: items]]
+        let view = CYLTagListView(configuration: [CYLTagListKey.sections: sections])
         let first = view.menuDataSource?.menuAnimationURLForItem?(at: ip(0, 0))
         let second = view.menuDataSource?.menuAnimationURLForItem?(at: ip(1, 0))
         XCTAssertEqual(first?.fragment, "artboard=CHAT&input=active")

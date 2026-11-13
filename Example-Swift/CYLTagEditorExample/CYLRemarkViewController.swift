@@ -58,7 +58,7 @@ final class CYLRemarkViewController: UIViewController {
         // view): secondary color, regular weight, the chevron after the text.
         tagsView.title = CYLTagEditorLocalizedString("标签")
         tagsView.titleImage = UIImage(systemName: "chevron.right")
-        let titleStyle = CYLTagListView.defaultTitleStyle()
+        let titleStyle = CYLTagListView.defaultTitleStyle
         for state in [UIControl.State.normal, .selected, .disabled] {
             titleStyle.appearance(for: state).font = .preferredFont(forTextStyle: .subheadline)
             titleStyle.appearance(for: state).textColor = .secondaryLabel
