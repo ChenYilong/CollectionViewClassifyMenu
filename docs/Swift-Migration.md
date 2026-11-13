@@ -65,6 +65,21 @@ and the core's tests are updated in the same commit.
 
 | Step | Declaration | Change | Reason |
 | --- | --- | --- | --- |
+| 3 | `CYLCollectionViewCell.button`, `CYLFilterHeaderView.titleButton` / `.moreButton` | `T!` → `let … : T` | always present; read-only |
+| 3 | `CYLCollectionViewCell.section` / `.row` | `UInt` → `Int` | Swift uses `Int` for indexes |
+| 3 | `CYLTagCell.model`, `CYLTagHeaderCell.group` | `T!` → `T?` | nil before configuration |
+| 3 | `CYLFilterBaseController.delegate`, `CYLFilterHeaderView.delegate`, `CYLTagHeaderCell.delegate` | `T!` → `T?` | weak references |
+| 3 | `CYLFilterControllerDelegate`, `CYLFilterHeaderViewDelegate`, `CYLTagHeaderCellDelegate` | `@objc` protocols → Swift `AnyObject` protocols; `filterControllerDidComplete(_:)` required | only Swift adopts them |
+| 3 | `filterHeaderViewDidTapMoreButton(_: Any!)` | → `filterHeaderView(_:didTapMoreButton:)` | names the sender and the button |
+| 3 | `headerViewDidTapNameView(_:index:)` | → `tagHeaderCell(_:didToggleGroupInSection:)` | says what happened |
+| 3 | `CYLFilterBaseController.show(in:)`, `confirmButtonClicked(_:)`, `restoreButtonClicked(_:)` | `UIView!` → `UIView`, `Any!` → `Any?` | nullability |
+| 3 | `kCollectionViewToTopMargin` / `Left` / `Right` / `Bottomt` (globals) | → `CYLFilterBaseController.sectionInset` | one value, no globals, typo gone |
+| 3 | `CYLFilterHeaderViewHeigt` (global) | → `CYLFilterHeaderView.defaultHeight` | typo, no globals |
+| 3 | `CYLFilterBaseController.itemButtonClicked(_:)`, `.dataSource`, `.settingArray`; `CYLFilterHeaderView.moreButtonTapped(_:)` | removed | unused (an empty hook, never-read storage, a private action) |
+| 3 | `init()` of `CYLCollectionViewCell`, `CYLFilterHeaderView`, `CYLTagCell`, `CYLTagHeaderCell` | removed | collection views create them with `init(frame:)` / nibs |
+
+Examples updated in step 3: the demo app's `CYLFilterDemoViewController` (`filterControllerDidComplete(_:)` takes a
+non-optional controller; the bar button calls `initLeftBarButtonItem()` instead of the delegate method with nil).
 
 ## Score
 
@@ -75,13 +90,14 @@ lines) in the pod's source patterns.
 | --- | --- | --- | --- |
 | 2026-11-12 | baseline | 76 | 0 |
 | 2026-11-13 | step 2 (the six roots and `CYLMenuKeys`) | 63 | 17.1 |
+| 2026-11-13 | step 3 (cells, headers, filter base; idiomatic API) | 53 | 30.3 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 55 left (step 2: the roots) |
-| `TagCollectionView/TagCollectionView` | 10 | in progress: 8 left (`CYLTagView` done) |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 49 left (steps 2–3) |
+| `TagCollectionView/TagCollectionView` | 10 | in progress: 4 left (models: `CYLTagModel`, `CYLTagGroup`) |
 
 ## Swift skills installed (requirement 2)
 
@@ -154,6 +170,8 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-13 | `79b521f` | (standard, skills, API check) | 76 | 0 | baseline | baseline run |
 | 2026-11-13 | step 2 | the roots: `NSArray+CYLLog`, `NSDictionary+CYLLog`, `CYLMultipleFilterController`, `CYLClassifyMenuViewController` (+ `CYLMenuKeys.h`), `CYLImageTagView`, `CYLTagView` (13 files) | 63 | 17.1 | unchanged | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+| 2026-11-13 | step 3 | `CYLCollectionViewCell`, `CYLFilterHeaderView`, `CYLFilterBaseController`, `CYLTagCell`, `CYLTagHeaderCell` (10 files), first step under "core quality first" | 53 | 30.3 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
 Baseline of the test suites (2026-11-13, clean worktree at `79b521f`, before any Swift): menu 30/30, tag 6/6, swift
 19/19, example 79/80. The failing example test, `CYLSearchCategoryScenarioTests

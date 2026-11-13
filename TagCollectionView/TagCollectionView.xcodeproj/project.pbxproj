@@ -40,11 +40,9 @@
 		41C6895B1C574FDE007E0D89 /* TagCollectionViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TagCollectionViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		41C6895F1C574FDE007E0D89 /* CYLTagCollectionViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTagCollectionViewTests.m; sourceTree = "<group>"; };
 		41C689611C574FDE007E0D89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		41C6896C1C575A64007E0D89 /* CYLTagHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagHeaderCell.h; sourceTree = "<group>"; };
-		41C6896D1C575A64007E0D89 /* CYLTagHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagHeaderCell.m; sourceTree = "<group>"; };
+		41C6896D1C575A64007E0D89 /* CYLTagHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagHeaderCell.swift"; sourceTree = "<group>"; };
 		41C6896E1C575A64007E0D89 /* CYLTagHeaderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagHeaderCell.xib; sourceTree = "<group>"; };
-		41C689711C575AA1007E0D89 /* CYLTagCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagCell.h; sourceTree = "<group>"; };
-		41C689721C575AA1007E0D89 /* CYLTagCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagCell.m; sourceTree = "<group>"; };
+		41C689721C575AA1007E0D89 /* CYLTagCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagCell.swift"; sourceTree = "<group>"; };
 		41C689731C575AA1007E0D89 /* CYLTagCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagCell.xib; sourceTree = "<group>"; };
 		41C689761C575B12007E0D89 /* CYLTagGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagGroup.h; sourceTree = "<group>"; };
 		41C689771C575B12007E0D89 /* CYLTagGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagGroup.m; sourceTree = "<group>"; };
@@ -132,11 +130,9 @@
 		41C6896A1C575A49007E0D89 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				41C6896C1C575A64007E0D89 /* CYLTagHeaderCell.h */,
-				41C6896D1C575A64007E0D89 /* CYLTagHeaderCell.m */,
+				41C6896D1C575A64007E0D89 /* CYLTagHeaderCell.swift */,
 				41C6896E1C575A64007E0D89 /* CYLTagHeaderCell.xib */,
-				41C689711C575AA1007E0D89 /* CYLTagCell.h */,
-				41C689721C575AA1007E0D89 /* CYLTagCell.m */,
+				41C689721C575AA1007E0D89 /* CYLTagCell.swift */,
 				41C689731C575AA1007E0D89 /* CYLTagCell.xib */,
 			);
 			path = Views;

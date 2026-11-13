@@ -327,7 +327,7 @@ final class CYLFilterDemoViewController: UIViewController {
         let filter = filterController
         filter.reloadMenuData()
         menu(filter, didConfirmSelectedItems: filter.selectedIndexPaths() ?? [])
-        filterControllerDidComplete(nil)
+        initLeftBarButtonItem()
     }
 
     /// The filter slides in from the left over the whole screen, tab bar included.
@@ -401,7 +401,7 @@ final class CYLFilterDemoViewController: UIViewController {
 
 extension CYLFilterDemoViewController: CYLFilterControllerDelegate, CYLMenuDelegate {
 
-    func filterControllerDidComplete(_ controller: CYLFilterBaseController?) {
+    func filterControllerDidComplete(_ controller: CYLFilterBaseController) {
         initLeftBarButtonItem()
     }
 

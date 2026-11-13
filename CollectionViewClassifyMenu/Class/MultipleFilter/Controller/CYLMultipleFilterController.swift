@@ -155,12 +155,12 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
 
     // MARK: - Actions
 
-    open override func confirmButtonClicked(_ sender: Any!) {
+    open override func confirmButtonClicked(_ sender: Any?) {
         menuDelegate?.menu?(self, didConfirmSelectedItems: selectedIndexPaths())
         super.confirmButtonClicked(sender)
     }
 
-    open override func restoreButtonClicked(_ sender: Any!) {
+    open override func restoreButtonClicked(_ sender: Any?) {
         reloadMenuData()
         confirmButtonClicked(sender)
     }
@@ -286,8 +286,7 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     }
 
     private func limitedCellWidth(_ cellWidth: CGFloat) -> CGFloat {
-        let limitWidth = max(0, collectionView.bounds.width - CGFloat(kCollectionViewToLeftMargin)
-                                - CGFloat(kCollectionViewToRightMargin))
+        let limitWidth = max(0, collectionView.bounds.width - Self.sectionInset.left - Self.sectionInset.right)
         return min(cellWidth + 16, limitWidth)
     }
 }

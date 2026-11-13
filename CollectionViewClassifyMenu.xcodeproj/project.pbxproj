@@ -52,17 +52,14 @@
 		9A09E2BA1BC7AFF00060C116 /* CYLClassifyMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLClassifyMenuViewController.swift"; sourceTree = "<group>"; };
 		9A09E2BF1BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+CYLCollectionCellStyle.h"; sourceTree = "<group>"; };
 		9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+CYLCollectionCellStyle.m"; sourceTree = "<group>"; };
-		9A09E2C21BC7AFF00060C116 /* CYLCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLCollectionViewCell.h; sourceTree = "<group>"; };
-		9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLCollectionViewCell.m; sourceTree = "<group>"; };
-		9A09E2C41BC7AFF00060C116 /* CYLFilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterHeaderView.h; sourceTree = "<group>"; };
-		9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterHeaderView.m; sourceTree = "<group>"; };
+		9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLCollectionViewCell.swift"; sourceTree = "<group>"; };
+		9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterHeaderView.swift"; sourceTree = "<group>"; };
 		9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
 		9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLIndexPathButton.m; sourceTree = "<group>"; };
 		9A09E2C81BC7AFF00060C116 /* CYLRightImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLRightImageButton.h; sourceTree = "<group>"; };
 		9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLRightImageButton.m; sourceTree = "<group>"; };
 		9A09E2CD1BC7AFF00060C116 /* CYLMultipleFilterController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLMultipleFilterController.swift"; sourceTree = "<group>"; };
-		9A09E2CE1BC7AFF00060C116 /* CYLFilterBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterBaseController.h; sourceTree = "<group>"; };
-		9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterBaseController.m; sourceTree = "<group>"; };
+		9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterBaseController.swift"; sourceTree = "<group>"; };
 		9A09E2D01BC7AFF00060C116 /* CYLFilterBaseController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLFilterBaseController.xib; sourceTree = "<group>"; };
 		9A09E2D31BC7AFF00060C116 /* UIImage+CYLBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYLBlur.h"; sourceTree = "<group>"; };
 		9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CYLBlur.m"; sourceTree = "<group>"; };
@@ -181,10 +178,8 @@
 		9A09E2C11BC7AFF00060C116 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2C21BC7AFF00060C116 /* CYLCollectionViewCell.h */,
-				9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.m */,
-				9A09E2C41BC7AFF00060C116 /* CYLFilterHeaderView.h */,
-				9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.m */,
+				9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.swift */,
+				9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.swift */,
 				9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */,
 				9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.m */,
 				9A09E2C81BC7AFF00060C116 /* CYLRightImageButton.h */,
@@ -207,8 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				9A09E2CD1BC7AFF00060C116 /* CYLMultipleFilterController.swift */,
-				9A09E2CE1BC7AFF00060C116 /* CYLFilterBaseController.h */,
-				9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.m */,
+				9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.swift */,
 				9A09E2D01BC7AFF00060C116 /* CYLFilterBaseController.xib */,
 			);
 			path = Controller;
