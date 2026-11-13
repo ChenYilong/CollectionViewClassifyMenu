@@ -69,7 +69,7 @@ open class CYLFilterHeaderView: UICollectionReusableView {
         addSubview(separator)
         backgroundColor = .white
 
-        titleButton.cyl_titleLeadingInset = 16
+        titleButton.titleLeadingInset = 16
         titleButton.contentHorizontalAlignment = .left
         titleButton.frame = CGRect(x: 16, y: 0, width: Metric.titleButtonWidth, height: bounds.height)
         titleButton.titleLabel?.textAlignment = .left

@@ -29,7 +29,7 @@ open class CYLMultipleFilterHeaderView: UICollectionReusableView {
     open override func awakeFromNib() {
         super.awakeFromNib()
         let lineColor = UIColor(red: 146 / 255, green: 175 / 255, blue: 164 / 255, alpha: 1)
-        separator = titleLabel.cyl_addSubLayer(withFrame: .zero, color: lineColor.cgColor)
+        separator = titleLabel.cylAddLineLayer(frame: .zero, color: lineColor)
         titleLabel.textColor = UIColor(white: 0, alpha: 0.5)
     }
 

@@ -82,13 +82,13 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
         super.viewDidLoad()
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         isPanelVisible = true
-        let color = UIColor.lightGray.cgColor
+        let color = UIColor.lightGray
         // Localized from CYLClassifyMenuResources.bundle; the XIB titles are placeholders.
         restoreButton.setTitle(CYLMenuLocalizedString("CYLFilterReset"), for: .normal)
         okButton.setTitle(CYLMenuLocalizedString("CYLFilterConfirm"), for: .normal)
-        restoreTopLine = restoreButton.cyl_addSubLayer(withFrame: .zero, color: color)
-        okTopLine = okButton.cyl_addSubLayer(withFrame: .zero, color: color)
-        okLeadingLine = okButton.cyl_addSubLayer(withFrame: .zero, color: color)
+        restoreTopLine = restoreButton.cylAddLineLayer(frame: .zero, color: color)
+        okTopLine = okButton.cylAddLineLayer(frame: .zero, color: color)
+        okLeadingLine = okButton.cylAddLineLayer(frame: .zero, color: color)
         contentView.backgroundColor = .black
         collectionView.showsVerticalScrollIndicator = false
         collectionView.delegate = self
@@ -98,7 +98,7 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
         collectionView.register(UINib(nibName: "CYLMultipleFilterHeaderView", bundle: CYLMenuResources.bundle()),
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "CYLMultipleFilterHeaderView")
-        contentView.cyl_setTarget(self, action: #selector(hide))
+        contentView.cylAddTapTarget(self, action: #selector(hide))
     }
 
     open override func viewDidLayoutSubviews() {
@@ -120,9 +120,9 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
         // 屏幕截图 / Capture the host view.
         self.view.frame = view.bounds
         self.view.layoutIfNeeded()
-        let screen = view.cyl_capture(withWidth: collectionView.bounds.width)
+        let screen = view.cylSnapshot(width: collectionView.bounds.width)
         // 生成高斯模糊背景 / Generate a Gaussian-blurred background.
-        let blur = screen?.cylBlurred(radius: 25, iterations: 10)
+        let blur = screen.cylBlurred(radius: 25, iterations: 10)
         view.addSubview(self.view)
         blurImageView.image = blur
         moveSubviewsOut()
@@ -195,18 +195,18 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
 
     private func moveSubviewsOut() {
         isPanelVisible = false
-        collectionView.cyl_setX(-collectionView.cyl_width())
-        restoreButton.cyl_setX(-restoreButton.cyl_width())
-        blurImageView.cyl_setX(-blurImageView.cyl_width())
-        okButton.cyl_setX(-okButton.cyl_width())
+        collectionView.frame.origin.x = -collectionView.frame.width
+        restoreButton.frame.origin.x = -restoreButton.frame.width
+        blurImageView.frame.origin.x = -blurImageView.frame.width
+        okButton.frame.origin.x = -okButton.frame.width
     }
 
     private func moveSubviewsIn() {
         isPanelVisible = true
-        collectionView.cyl_setX(0)
-        restoreButton.cyl_setX(0)
-        blurImageView.cyl_setX(0)
-        okButton.cyl_setX(restoreButton.cyl_width())
+        collectionView.frame.origin.x = 0
+        restoreButton.frame.origin.x = 0
+        blurImageView.frame.origin.x = 0
+        okButton.frame.origin.x = restoreButton.frame.width
     }
 
     @objc private func hide() {

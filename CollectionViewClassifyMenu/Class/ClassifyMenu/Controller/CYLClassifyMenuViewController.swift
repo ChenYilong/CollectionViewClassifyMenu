@@ -310,10 +310,10 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
         let text = item[kDataSourceCellTextKey] as? String
         if let image = image(for: item) {
             button.setImage(image, for: .normal)
-            button.cyl_imageTitleSpacing = Metric.itemButtonImageToTextMargin
+            button.imageTitleSpacing = Metric.itemButtonImageToTextMargin
         } else {
             button.setImage(nil, for: .normal)
-            button.cyl_imageTitleSpacing = 0
+            button.imageTitleSpacing = 0
         }
         button.titleLabel?.font = tagFont()
         button.setTitle(text, for: .normal)

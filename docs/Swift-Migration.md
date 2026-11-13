@@ -95,6 +95,9 @@ and the core's tests are updated in the same commit.
 | 5 | `kTagCollectionViewCellsHorizonMargin` and the four `kTagCollectionViewTo…Margin` globals | → `CYLTagView.cellSpacing`, `CYLTagView.sectionInset` | no globals, typo gone |
 | 5 | `CYLFilterCollectionCell.titleButton` | `T!` → `let … : T` | always present |
 | 5 | `init()` of `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`, `CYLRightImageButton`; `CYLRightImageButton.init(type:)` | removed | created with `init(frame:)` / nibs |
+| 6 | `CYLIndexPathButton.cyl_imageTitleSpacing` / `.cyl_titleLeadingInset` | → `imageTitleSpacing` / `titleLeadingInset` (Objective-C names `cyl_…` kept for the core's tests) | Swift names without underscores |
+| 6 | `UIView (CYLGeneral)`: 21 frame, border, layer, target and capture helpers and the `LINE_COLOR…` macros | removed from the API; the three the core uses are internal (`cylAddLineLayer(frame:color:)`, `cylAddTapTarget(_:action:)`, `cylSnapshot(width:)`); frames are set directly | unused public API; plain UIKit is clearer |
+| 6 | `CYLTagModel` | `+modelWithTitle:` → `init(title:)` (non-failable; Objective-C `-initWithTitle:`); `title: String`; `width` / `height`: `Float` → `CGFloat` (`@objc dynamic`, so subclasses can override the getters); `titleFont(for:)` / `updateSize(for:)` take `UITraitCollection?` | typed, idiomatic |
 
 Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
 index) and its tests (`direction.next`, `value(of: .linesProgress)`).
@@ -114,13 +117,14 @@ lines) in the pod's source patterns.
 | 2026-11-13 | step 3 (cells, headers, filter base; idiomatic API) | 53 | 30.3 |
 | 2026-11-13 | step 4 (`CYLImageTagGroupView`) | 51 | 32.9 |
 | 2026-11-13 | step 5 (filter views, styles, blur, `CYLTagGroup`) | 37 | 51.3 |
+| 2026-11-13 | step 6 (`CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel`) | 31 | {round((1-31/76)*100,1)} |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 35 left (steps 2–5) |
-| `TagCollectionView/TagCollectionView` | 10 | in progress: 2 left (`CYLTagModel`) |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 31 left (steps 2–6): the TagList module, the shared tools |
+| `TagCollectionView/TagCollectionView` | 10 | DONE (step 6): 0 left |
 
 ## Swift skills installed (requirement 2)
 
@@ -199,6 +203,13 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | 2026-11-13 | step 4 | `CYLImageTagGroupView` (2 files, 1,152 lines) | 51 | 32.9 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
 | 2026-11-13 | step 5 | `CYLRightImageButton`, `UIButton+CYLCollectionCellStyle`, `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`, `UIImage+CYLBlur`, `CYLFilterParamsTool` (removed), `CYLTagGroup` (14 files) | 37 | 51.3 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+| 2026-11-13 | step 6 | `CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel` (6 files) | 31 | {round((1-31/76)*100,1)} | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+Step 6 moved one core test to Swift: Objective-C cannot subclass a Swift class, and
+`testRowCalculationIsLinearAndInvalidatedWhenItemsChange` counts a tag's width reads through a subclass of
+`CYLTagModel`; it is now `TagCollectionView/TagCollectionViewTests/CYLTagGroupRowTests.swift` (the other tag tests stay
+in Objective-C).
 
 Step 5's first test run stalled: another session tested CYLTabBarController on the same simulator at the same time; the
 stuck run of this repository was stopped and the suites run again.

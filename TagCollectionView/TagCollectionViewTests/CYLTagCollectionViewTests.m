@@ -9,16 +9,6 @@
 #import <XCTest/XCTest.h>
 @import CollectionViewClassifyMenu;
 
-@interface CYLCountingTagModel : CYLTagModel
-@property (nonatomic, assign) NSUInteger widthReads;
-@end
-
-@implementation CYLCountingTagModel
-- (float)width {
-    self.widthReads++;
-    return [super width];
-}
-@end
 
 @interface CYLTagTestSource : NSObject <CYLMenuDataSource, CYLMenuDelegate>
 @property (nonatomic, copy) NSArray<NSString *> *titles;
@@ -64,10 +54,10 @@
 - (void)testLongEmojiTagsFitAndCollapsedRowTracksWidth {
     CYLTagView *view = [CYLTagView tagView];
     CYLTagGroup *group = [[CYLTagGroup alloc] init];
-    group.itemArr = @[[CYLTagModel modelWithTitle:@"短标签 😀"],
-                      [CYLTagModel modelWithTitle:@"稍长的标签 🎉"],
-                      [CYLTagModel modelWithTitle:@"一个非常非常非常非常非常非常非常长的标签 🧪🚀"],
-                      [CYLTagModel modelWithTitle:@"另一个长标签 🌟"]];
+    group.itemArr = @[[[CYLTagModel alloc] initWithTitle:@"短标签 😀"],
+                      [[CYLTagModel alloc] initWithTitle:@"稍长的标签 🎉"],
+                      [[CYLTagModel alloc] initWithTitle:@"一个非常非常非常非常非常非常非常长的标签 🧪🚀"],
+                      [[CYLTagModel alloc] initWithTitle:@"另一个长标签 🌟"]];
     view.groups = [NSMutableArray arrayWithObject:group];
 
     UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 600)];
@@ -109,27 +99,6 @@
     XCTAssertEqual([group firstRowCellCountForContentWidth:0], 1);
 }
 
-- (void)testRowCalculationIsLinearAndInvalidatedWhenItemsChange {
-    CYLCountingTagModel *model = [[CYLCountingTagModel alloc] init];
-    model.title = @"长标签 😀";
-    NSMutableArray *items = [NSMutableArray array];
-    for (NSUInteger i = 0; i < 1200; i++) {
-        [items addObject:model];
-    }
-    CYLTagGroup *group = [[CYLTagGroup alloc] init];
-    group.itemArr = items;
-    model.widthReads = 0;
-    NSArray *rows = group.cellsCountArrayPerRowInSections;
-    NSUInteger total = 0;
-    for (NSNumber *count in rows) {
-        total += count.unsignedIntegerValue;
-    }
-    XCTAssertEqual(total, items.count);
-    XCTAssertEqual(model.widthReads, items.count);
-    group.itemArr = @[[CYLTagModel modelWithTitle:@"替换后的数据 🌟"]];
-    XCTAssertEqualObjects(group.cellsCountArrayPerRowInSections, (@[@1]));
-}
-
 - (void)testProgrammaticViewUsesExternalDataAndDelegate {
     CYLTagTestSource *source = [[CYLTagTestSource alloc] init];
     source.titles = @[@"External item 😀", @"Another item 🌟"];
@@ -158,7 +127,7 @@
 - (void)testTagViewScalesWithAccessibilityTextSize {
     UITraitCollection *large = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge];
     UITraitCollection *standard = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge];
-    CYLTagModel *model = [CYLTagModel modelWithTitle:@"一个非常非常长的标签 🧪🚀"];
+    CYLTagModel *model = [[CYLTagModel alloc] initWithTitle:@"一个非常非常长的标签 🧪🚀"];
     [model updateSizeForTraitCollection:standard];
     CGFloat standardWidth = model.width;
     XCTAssertEqualWithAccuracy(model.height, 35, 0.01);
