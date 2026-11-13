@@ -142,7 +142,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
 
     // MARK: - CYLTagHeaderCellDelegate
 
-    open func headerViewDidTapNameView(_ headerCell: CYLTagHeaderCell!, index idx: Int) {
+    open func tagHeaderCell(_ headerCell: CYLTagHeaderCell, didToggleGroupInSection section: Int) {
         collectionView.reloadData()
     }
 

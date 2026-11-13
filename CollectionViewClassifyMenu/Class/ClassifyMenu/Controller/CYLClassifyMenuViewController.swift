@@ -302,9 +302,10 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
     open func collectionView(_ collectionView: UICollectionView,
                              cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let reused = collectionView.dequeueReusableCell(withReuseIdentifier: Self.cellIdentifier, for: indexPath)
-        guard let cell = reused as? CYLCollectionViewCell, let button = cell.button else {
+        guard let cell = reused as? CYLCollectionViewCell else {
             return reused
         }
+        let button = cell.button
         let item = items(of: dataSource[indexPath.section])[indexPath.row]
         let text = item[kDataSourceCellTextKey] as? String
         if let image = image(for: item) {
@@ -361,10 +362,7 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
 
     // MARK: - CYLFilterHeaderViewDelegate
 
-    open func filterHeaderViewDidTapMoreButton(_ sender: Any!) {
-        guard let sender = sender as? UIButton else {
-            return
-        }
+    open func filterHeaderView(_ headerView: CYLFilterHeaderView, didTapMoreButton sender: UIButton) {
         sender.isSelected.toggle()
         if sender.isSelected {
             expandSectionArray.add(NSNumber(value: sender.tag))
@@ -551,8 +549,8 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
 
     private func updateSelection(of cell: CYLCollectionViewCell, at indexPath: IndexPath) {
         let selected = selectedIndexPath == indexPath
-        cell.button?.isSelected = selected
-        cell.button?.accessibilityTraits = selected ? [.button, .selected] : .button
+        cell.button.isSelected = selected
+        cell.button.accessibilityTraits = selected ? [.button, .selected] : .button
     }
 
     private func cellsInPerRow(items: [NSDictionary]) -> [Int] {
