@@ -117,7 +117,7 @@ lines) in the pod's source patterns.
 | 2026-11-13 | step 3 (cells, headers, filter base; idiomatic API) | 53 | 30.3 |
 | 2026-11-13 | step 4 (`CYLImageTagGroupView`) | 51 | 32.9 |
 | 2026-11-13 | step 5 (filter views, styles, blur, `CYLTagGroup`) | 37 | 51.3 |
-| 2026-11-13 | step 6 (`CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel`) | 31 | {round((1-31/76)*100,1)} |
+| 2026-11-13 | step 6 (`CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel`) | 31 | 59.2 |
 
 ## Progress
 
@@ -204,7 +204,7 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 
 | 2026-11-13 | step 5 | `CYLRightImageButton`, `UIButton+CYLCollectionCellStyle`, `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`, `UIImage+CYLBlur`, `CYLFilterParamsTool` (removed), `CYLTagGroup` (14 files) | 37 | 51.3 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
-| 2026-11-13 | step 6 | `CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel` (6 files) | 31 | {round((1-31/76)*100,1)} | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+| 2026-11-13 | step 6 | `CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel` (6 files) | 31 | 59.2 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
 Step 6 moved one core test to Swift: Objective-C cannot subclass a Swift class, and
 `testRowCalculationIsLinearAndInvalidatedWhenItemsChange` counts a tag's width reads through a subclass of
