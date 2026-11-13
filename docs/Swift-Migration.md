@@ -5,8 +5,9 @@ The core library (the CocoaPods pod's sources: `CollectionViewClassifyMenu/Class
 
 ## Task log
 
-- **Status:** TODO (logged 2026-11-12, branch `feat/android-kotlin`). Not started: earlier tasks run first, in the order
-  they were given (Android steps 5 and 6 in `docs/android.md`).
+- **Status:** in progress (started 2026-11-13, branch `feat/android-kotlin`). Requirements 1 and 2 done: the
+  standard is `docs/Swift-Coding-Standard.md` (AGENTS.md, `docs/instructions.md` and `.agents/skills/cyl-swift/`
+  point to it), and three Swift skills are installed (below). Requirement 3 (the translation) runs module by module.
 - **Scope:** iOS only, mainly the core code of this project. Third-party libraries are out of scope. Change the
   example code only when necessary.
 - **Requirements:**
@@ -49,3 +50,34 @@ lines) in the pod's source patterns.
 | --- | --- | --- |
 | `CollectionViewClassifyMenu/Class` | 66 | TODO |
 | `TagCollectionView/TagCollectionView` | 10 | TODO |
+
+## Swift skills installed (requirement 2)
+
+Copied unmodified into `.agents/skills/`, each with its `LICENSE` and a `SOURCE.md` (repository, path, commit):
+
+| Skill | Source | License | Use |
+| --- | --- | --- | --- |
+| `swift-api-design-guidelines-skill` | [Erikote04/Swift-API-Design-Guidelines-Agent-Skill](https://github.com/Erikote04/Swift-API-Design-Guidelines-Agent-Skill) `36cdc1b` | MIT | names, labels, comments |
+| `migration-patterns` | [rshankras/claude-code-apple-skills](https://github.com/rshankras/claude-code-apple-skills) `skills/ios/migration-patterns` `f958982` | MIT | `objc-to-swift.md` |
+| `swift-concurrency` | [AvdLee/Swift-Concurrency-Agent-Skill](https://github.com/AvdLee/Swift-Concurrency-Agent-Skill) `3b1580d` | MIT | `@MainActor`, Sendable |
+
+Not taken: arustydev's `convert-objc-swift` (AGPL-3.0, which would bind this repository's license).
+
+## API check
+
+`scripts/swift-api-check.sh` builds the pod, dumps its API with `swift-api-digester` and compares it with
+`scripts/swift-api-baseline.json`, dumped from the Objective-C core on 2026-11-13 (40 classes, 617 functions and
+properties; the module map is flattened because the digester skips CocoaPods' per-header submodules). It must report
+no breakage after every migration commit.
+
+## Order
+
+Leaves first, so that every Swift file only depends on Swift or on Objective-C headers still in the umbrella:
+
+1. `Other/Category` and `Other/Tool` (logging categories, keys, parameters, resources, data source protocol).
+2. `Other/Lib/CYLCollectionViewLeftAlignedLayout`.
+3. `ClassifyMenu/View` and `ClassifyMenu/Other`, then `CYLClassifyMenuViewController`.
+4. `MultipleFilter` (views, categories, params tool, controllers).
+5. `TagCollectionView/TagCollectionView` (models, cells, `CYLTagView`).
+6. `ImageTag`.
+7. `TagList` (appearance, colors, style, tag, buttons, cells, fold control, `CYLTagListView` and its configuration).

@@ -75,9 +75,17 @@ verify the behavior and update the applicable documentation.
 - Every iOS example is written in Swift, tests included: `Example/CYLMenuExample`,
   `Example-Swift/CYLTagEditorExample`, the demo app of
   `CollectionViewClassifyMenu.xcodeproj` (module `CYLClassifyMenuDemo`) and the
-  `TagCollectionView` demo. Never add Objective-C example code. Only the core
-  library (the pod's sources) and its own tests stay in Objective-C.
-- The core library stays in Objective-C. When an example calls an Objective-C API
+  `TagCollectionView` demo. Never add Objective-C example code. The core library
+  (the pod's sources) is moving from Objective-C to Swift (next item); its own
+  tests stay in Objective-C until the migration says otherwise.
+- **The core moves to Swift** (since 2026-11-12): the pod's sources are translated
+  file by file, following `docs/Swift-Coding-Standard.md` and the Swift skills it
+  lists (`swift-api-design-guidelines-skill`, `migration-patterns`,
+  `swift-concurrency`, `cyl-swift`). The Swift API callers see and the
+  Objective-C names stay the same (`@objc(CYLName)`, `@objc(selector:)`);
+  `scripts/swift-api-check.sh` must report no API breakage after every commit.
+  Progress and score (no Objective-C file left = 100): `docs/Swift-Migration.md`.
+- Until a part of the core is Swift: when an example calls an Objective-C API
   that reads badly in Swift, fix it in the core, never with workarounds in the
   example: the Swift API Design Guidelines decide (`NS_SWIFT_NAME`, nullability,
   lightweight generics, `NS_ENUM`/`NS_OPTIONS`/`NS_TYPED_ENUM` string constants,

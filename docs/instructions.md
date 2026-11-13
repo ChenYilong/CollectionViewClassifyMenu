@@ -21,3 +21,6 @@
 - Example demo rules (English rule, AGENTS.md "Example demo rules"): `example-demo-rules.md` holds the rules for what
   the examples of every platform demonstrate; animation screens offer Play all (restart from progress 0), a speed
   slider and a loop switch that combine and act in real time.
+- Swift (English rule, AGENTS.md "Swift examples and a Swift-friendly core"): `Swift-Coding-Standard.md` is the Swift
+  coding standard (compatibility of the Swift and Objective-C API, files, language, concurrency, comments,
+  verification); `Swift-Migration.md` logs the core's migration to Swift with its score after every commit.
