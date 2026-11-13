@@ -19,7 +19,10 @@ The controls combine: the speed applies to Play all and to looping alike, and ev
 on animations already playing, without restarting the screen. When an animation engine cannot do one of these
 (a speed or a loop setting), change the core library so that it can: add the API to the core (and to
 CYLTabBarController's animation engine when the engine itself lacks it), never work around it in the example. The
-controls are accessible (labels, values, Dynamic Type / font scaling) and localized through the example's lookup.
+controls are accessible (labels, values, Dynamic Type / font scaling; VoiceOver / TalkBack read, for example, "Speed,
+1.5 times" and "Loop, on") and localized through the example's lookup. The animated icons come from
+CYLTabBarController's `CYLTabBarItemAnimationFactory`; the same rule, with its library-side notes, is in
+CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback controls in the animation examples").
 
 ## TODO (2026-11-13): speed slider and loop switch in every animation example
 
@@ -30,7 +33,9 @@ controls are accessible (labels, values, Dynamic Type / font scaling) and locali
   (4) the three combine and change playback in real time; (5) change the core when needed to support it; (6) every
   example layer: iOS, Android, React Native, Flutter, Mini Program, HarmonyOS; (7) record the rule in English in the
   instructions documents and reference this document from the related skills.
-- **Status:** TODO (rule recorded; not implemented yet).
+- **Status:** TODO (rule recorded; not implemented yet). Recorded twice in parallel on 2026-11-13 (this document and
+  `example-animation-controls.md` from another session's branch `docs/animation-playback-controls`); merged here,
+  and that file now points to this one.
 
 The screen of the request (Android, merged example, Menu tab → Animated icons; the user's screenshot, 2026-11-13):
 
@@ -38,8 +43,8 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 
 | Platform | Example screen(s) | Status |
 | --- | --- | --- |
-| iOS | `Example/CYLMenuExample` animation screens (Animated icons, Styles) | TODO |
-| Android | `android/merged/example` Menu tab: Animated icons, Styles | TODO |
+| iOS | Animated icons, `Example/CYLMenuExample/CYLTagAnimationDemoViewController.swift`; Styles | TODO |
+| Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt`; Styles | TODO |
 | React Native | cross-platform example (animated tags) | TODO |
 | Flutter | cross-platform example (animated tags) | TODO |
 | Mini Program | example (when added) | TODO |

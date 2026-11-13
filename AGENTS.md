@@ -190,7 +190,8 @@ verify the behavior and update the applicable documentation.
   that combine and act in real time: **Play all** (restart every animation from progress 0, once), a **speed slider**
   and a **loop switch**. Change the core library (and CYLTabBarController's animation engine) when an engine lacks
   the speed or loop API; never work around it in the example. Details, status per platform and the TODO:
-  `docs/example-demo-rules.md`.
+  `docs/example-demo-rules.md`. The same rule, with the library-side notes, is in CYLTabBarController's
+  `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback controls in the animation examples").
 
 ## Search bars
 
