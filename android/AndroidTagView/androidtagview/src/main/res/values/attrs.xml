@@ -17,6 +17,9 @@
             <enum name="left" value="3" />
             <enum name="center" value="17" />
             <enum name="right" value="5" />
+            <!-- Issue #68: start and end follow the layout direction. -->
+            <enum name="start" value="8388611" />
+            <enum name="end" value="8388613" />
         </attr>
 
         <attr name="tag_border_width" format="dimension" />
@@ -61,6 +64,12 @@
         <attr name="tag_ripple_duration" format="integer" />
 
         <attr name="tag_enable_cross" format="boolean" />
+        <!-- Issue #105: extra space between the text and the cross. -->
+        <attr name="tag_cross_spacing" format="dimension" />
+        <!-- Issue #19: text of a tag wider than the container wraps (default: ellipsis). -->
+        <attr name="tag_text_wrap" format="boolean" />
+        <!-- Issue #79: the elevation (shadow) of each tag. -->
+        <attr name="tag_elevation" format="dimension" />
         <attr name="tag_cross_width" format="dimension" />
         <attr name="tag_cross_color" format="color" />
         <attr name="tag_cross_line_width" format="dimension" />

@@ -198,6 +198,46 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** The distance between baseline and descent(default 2.75dp) */
     private var mTagBdDistance = 2.75f
 
+    /**
+     * Issue #104: false (the default) centres tag text on its font metrics; true when the distance is set in XML or
+     * code, which keeps the old formula.
+     */
+    private var mTagBdDistanceSet = false
+
+    /**
+     * Issue #19: a tag wider than the container wraps its text (default: shortened with an ellipsis).
+     */
+    private var mTagTextWrap = false
+
+    /**
+     * Issue #105: extra space between a tag's text and its cross, in pixels.
+     */
+    private var mTagCrossSpacing = 0
+
+    /**
+     * Issue #79: the elevation of each tag, in pixels (its shadow follows the rounded corners).
+     */
+    private var mTagElevation = 0f
+
+    /**
+     * The width of the widest line of tags, measured in [getChildLines] (issues #17 / #100: wrap_content).
+     */
+    private var mWidestLine = 0
+
+    /**
+     * The height of each line: that of its tallest tag (a tag whose text wraps is taller, issue #19).
+     */
+    private var mLineHeights = IntArray(0)
+
+    /**
+     * The height of the first [lines] lines with the intervals between them, without padding.
+     */
+    private fun linesHeight(lines: Int): Int {
+        val count = min(lines, mLineHeights.size)
+        if (count <= 0) return 0
+        return (0 until count).sumOf { mLineHeights[it] } + mVerticalInterval * (count - 1)
+    }
+
     /** OnTagClickListener for TagView */
     private var mOnTagClickListener: TagView.OnTagClickListener? = null
 
@@ -250,7 +290,11 @@ open class TagContainerLayout @JvmOverloads constructor(
         mHorizontalInterval = attributes.getDimension(R.styleable.AndroidTagView_horizontal_interval, dp2px(context, DEFAULT_INTERVAL)).toInt()
         mBorderWidth = attributes.getDimension(R.styleable.AndroidTagView_container_border_width, dp2px(context, mBorderWidth))
         mBorderRadius = attributes.getDimension(R.styleable.AndroidTagView_container_border_radius, dp2px(context, mBorderRadius))
+        mTagBdDistanceSet = attributes.hasValue(R.styleable.AndroidTagView_tag_bd_distance)
         mTagBdDistance = attributes.getDimension(R.styleable.AndroidTagView_tag_bd_distance, dp2px(context, mTagBdDistance))
+        mTagTextWrap = attributes.getBoolean(R.styleable.AndroidTagView_tag_text_wrap, mTagTextWrap)
+        mTagCrossSpacing = attributes.getDimensionPixelSize(R.styleable.AndroidTagView_tag_cross_spacing, mTagCrossSpacing)
+        mTagElevation = attributes.getDimension(R.styleable.AndroidTagView_tag_elevation, mTagElevation)
         mBorderColor = attributes.getColor(R.styleable.AndroidTagView_container_border_color, mBorderColor)
         mBackgroundColor = attributes.getColor(R.styleable.AndroidTagView_container_background_color, mBackgroundColor)
         mDragEnable = attributes.getBoolean(R.styleable.AndroidTagView_container_enable_drag, false)
@@ -312,22 +356,39 @@ open class TagContainerLayout @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
+        val widthSpecMode = MeasureSpec.getMode(widthMeasureSpec)
+        val widthSpecSize = MeasureSpec.getSize(widthMeasureSpec)
+        // Issues #19 / #60 / #66: a tag is never wider than the container (it was cut off at the edge, cross and
+        // border included); its text is shortened or wrapped instead. A single line scrolls, so it has no limit.
+        val tagMaxWidth = if (widthSpecMode != MeasureSpec.UNSPECIFIED && !mSingleLine) {
+            max(1, widthSpecSize - paddingLeft - paddingRight)
+        } else 0
+        for (i in 0 until childCount) (getChildAt(i) as? TagView)?.setTagMaxWidth(tagMaxWidth)
         measureChildren(widthMeasureSpec, heightMeasureSpec)
         val childCount = childCount
         val lines = if (childCount == 0) 0 else getChildLines(childCount)
-        val widthSpecSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSpecSize = MeasureSpec.getSize(heightMeasureSpec)
         val heightSpecMode = MeasureSpec.getMode(heightMeasureSpec)
 
-        // Single line in a HorizontalScrollView (unspecified width): as wide as the tags (#42 / #106 / #115).
         var width = widthSpecSize
-        if (mSingleLine && MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED && childCount > 0) {
+        if (mSingleLine && widthSpecMode == MeasureSpec.UNSPECIFIED && childCount > 0) {
+            // Single line in a HorizontalScrollView (unspecified width): as wide as the tags (#42 / #106 / #115).
             width = paddingLeft + paddingRight + (0 until childCount).sumOf { getChildAt(it).measuredWidth } + mHorizontalInterval * (childCount - 1)
+        } else if (widthSpecMode == MeasureSpec.AT_MOST && childCount > 0) {
+            // Issues #17 / #100: wrap_content is as wide as the widest line of tags, not the whole parent.
+            width = min(widthSpecSize, paddingLeft + paddingRight + mWidestLine)
         }
+        // Issue #34: android:minWidth / android:minHeight are honoured.
+        width = max(width, suggestedMinimumWidth)
         if (childCount == 0) {
-            setMeasuredDimension(0, 0)
+            val emptyWidth = if (widthSpecMode == MeasureSpec.EXACTLY) widthSpecSize else suggestedMinimumWidth
+            val emptyHeight = if (heightSpecMode == MeasureSpec.EXACTLY) heightSpecSize else suggestedMinimumHeight
+            setMeasuredDimension(emptyWidth, emptyHeight)
         } else if (heightSpecMode == MeasureSpec.AT_MOST || heightSpecMode == MeasureSpec.UNSPECIFIED) {
-            setMeasuredDimension(width, (mVerticalInterval + mChildHeight) * lines - mVerticalInterval + paddingTop + paddingBottom)
+            var height = linesHeight(lines) + paddingTop + paddingBottom
+            height = max(height, suggestedMinimumHeight)
+            if (heightSpecMode == MeasureSpec.AT_MOST) height = min(height, heightSpecSize)
+            setMeasuredDimension(width, height)
         } else {
             setMeasuredDimension(width, heightSpecSize)
         }
@@ -350,28 +411,30 @@ open class TagContainerLayout @JvmOverloads constructor(
         var sPos = 0
         mViewPos = IntArray(childCount * 2)
         mViewLines = IntArray(childCount)
+        // Issue #68: START and END follow the layout direction (right to left in RTL locales).
+        val horizontalGravity = Gravity.getAbsoluteGravity(mGravity, layoutDirection) and Gravity.HORIZONTAL_GRAVITY_MASK
 
         for (i in 0 until childCount) {
             val childView = getChildAt(i)
             if (childView.visibility != GONE) {
                 val width = childView.measuredWidth
-                if (mGravity == Gravity.RIGHT) {
-                    if (!mSingleLine && curRight - width < paddingLeft) {
+                if (horizontalGravity == Gravity.RIGHT) {
+                    if (!mSingleLine && curRight < measuredWidth - paddingRight && curRight - width < paddingLeft) {
                         curRight = measuredWidth - paddingRight
-                        curTop += mChildHeight + mVerticalInterval
+                        curTop += max(1, mChildHeight + mVerticalInterval)
                     }
                     mViewPos[i * 2] = curRight - width
                     mViewPos[i * 2 + 1] = curTop
                     curRight -= width + mHorizontalInterval
-                } else if (mGravity == Gravity.CENTER) {
-                    if (!mSingleLine && curLeft + width - paddingLeft > availableW) {
+                } else if (horizontalGravity == Gravity.CENTER_HORIZONTAL) {
+                    if (!mSingleLine && curLeft > paddingLeft && curLeft + width - paddingLeft > availableW) {
                         val leftW = measuredWidth - mViewPos[(i - 1) * 2] - getChildAt(i - 1).measuredWidth - paddingRight
                         for (j in sPos until i) {
                             mViewPos[j * 2] = mViewPos[j * 2] + leftW / 2
                         }
                         sPos = i
                         curLeft = paddingLeft
-                        curTop += mChildHeight + mVerticalInterval
+                        curTop += max(1, mChildHeight + mVerticalInterval)
                     }
                     mViewPos[i * 2] = curLeft
                     mViewPos[i * 2 + 1] = curTop
@@ -384,9 +447,9 @@ open class TagContainerLayout @JvmOverloads constructor(
                         }
                     }
                 } else {
-                    if (!mSingleLine && curLeft + width - paddingLeft > availableW) {
+                    if (!mSingleLine && curLeft > paddingLeft && curLeft + width - paddingLeft > availableW) {
                         curLeft = paddingLeft
-                        curTop += mChildHeight + mVerticalInterval
+                        curTop += max(1, mChildHeight + mVerticalInterval)
                     }
                     mViewPos[i * 2] = curLeft
                     mViewPos[i * 2 + 1] = curTop
@@ -402,10 +465,21 @@ open class TagContainerLayout @JvmOverloads constructor(
             mViewLines[i] = line
         }
 
+        // Each line is as tall as its tallest tag, and each tag is centred in its line (issue #19: a tag whose text
+        // wraps is taller than the others).
+        val lineCount = if (childCount == 0) 0 else mViewLines[childCount - 1] + 1
+        val heights = IntArray(lineCount)
+        for (i in 0 until childCount) heights[mViewLines[i]] = max(heights[mViewLines[i]], getChildAt(i).measuredHeight)
+        mLineHeights = heights
+        val lineTops = IntArray(lineCount)
+        for (l in 1 until lineCount) lineTops[l] = lineTops[l - 1] + heights[l - 1] + mVerticalInterval
+
         // layout all child views
         for (i in 0 until mViewPos.size / 2) {
             val childView = getChildAt(i)
-            childView.layout(mViewPos[i * 2], mViewPos[i * 2 + 1], mViewPos[i * 2] + childView.measuredWidth, mViewPos[i * 2 + 1] + mChildHeight)
+            val line = mViewLines[i]
+            val top = paddingTop + lineTops[line] + (heights[line] - childView.measuredHeight) / 2
+            childView.layout(mViewPos[i * 2], top, mViewPos[i * 2] + childView.measuredWidth, top + childView.measuredHeight)
         }
     }
 
@@ -446,7 +520,7 @@ open class TagContainerLayout @JvmOverloads constructor(
      * The height of every line, padding included (the content scrolls when it is taller than the view: #58 / #63).
      */
     private fun contentHeight(): Int =
-        if (mTotalLines == 0) 0 else (mVerticalInterval + mChildHeight) * mTotalLines - mVerticalInterval + paddingTop + paddingBottom
+        if (mTotalLines == 0) 0 else linesHeight(mTotalLines) + paddingTop + paddingBottom
 
     private fun maxContentScroll(): Int = max(0, contentHeight() - height)
 
@@ -523,17 +597,27 @@ open class TagContainerLayout @JvmOverloads constructor(
         val availableW = measuredWidth - paddingLeft - paddingRight
         var lines = 1
         var curLineW = 0
+        var widest = 0
+        val heights = ArrayList<Int>()
+        var lineHeight = 0
         for (i in 0 until childCount) {
             val childView = getChildAt(i)
             val dis = childView.measuredWidth + mHorizontalInterval
             val height = childView.measuredHeight
             mChildHeight = if (i == 0) height else min(mChildHeight, height)
-            curLineW += dis
-            if (!mSingleLine && curLineW - mHorizontalInterval > availableW) {
+            if (!mSingleLine && curLineW > 0 && curLineW + dis - mHorizontalInterval > availableW) {
                 lines++
-                curLineW = dis
+                widest = max(widest, curLineW - mHorizontalInterval)
+                heights.add(lineHeight)
+                curLineW = 0
+                lineHeight = 0
             }
+            curLineW += dis
+            lineHeight = max(lineHeight, height)
         }
+        heights.add(lineHeight)
+        mLineHeights = heights.toIntArray()
+        mWidestLine = max(widest, curLineW - mHorizontalInterval)
         mTotalLines = lines
         // Issue #74: the height is that of the lines the tags need, at most `mMaxLines` (it was always mMaxLines).
         return if (mMaxLines <= 0) lines else min(lines, mMaxLines)
@@ -619,7 +703,12 @@ open class TagContainerLayout @JvmOverloads constructor(
         tagView.setVerticalPadding(mTagVerticalPadding)
         tagView.setIsViewClickable(isTagViewClickable)
         tagView.setIsViewSelectable(isTagViewSelectable)
-        tagView.setBdDistance(mTagBdDistance)
+        tagView.setBdDistance(if (mTagBdDistanceSet) mTagBdDistance else null)
+        tagView.setTextWrap(mTagTextWrap)
+        tagView.setCrossSpacing(mTagCrossSpacing)
+        tagView.elevation = mTagElevation
+        // A shadow reaches past the tag; the padding must not cut it off (issue #79).
+        if (mTagElevation > 0) clipToPadding = false
         tagView.setOnTagClickListener(mOnTagClickListener)
         tagView.setRippleAlpha(mRippleAlpha)
         tagView.setRippleColor(mRippleColor)
@@ -764,6 +853,7 @@ open class TagContainerLayout @JvmOverloads constructor(
 
     /** Set TagView text baseline and descent distance. */
     fun setTagBdDistance(tagBdDistance: Float) {
+        mTagBdDistanceSet = true
         mTagBdDistance = dp2px(context, tagBdDistance)
     }
 
@@ -1032,6 +1122,7 @@ open class TagContainerLayout @JvmOverloads constructor(
     /** Set container layout gravity. */
     fun setGravity(gravity: Int) {
         mGravity = gravity
+        requestLayout()
     }
 
     /** Get TagContainerLayout ViewDragHelper sensitivity. */
@@ -1277,6 +1368,34 @@ open class TagContainerLayout @JvmOverloads constructor(
     }
 
     /** Get TagView in specified position. */
+    /**
+     * Wraps the text of a tag wider than the container instead of shortening it with an ellipsis (issue #19).
+     * Applies to tags added afterwards.
+     */
+    fun setTagTextWrap(wrap: Boolean) {
+        mTagTextWrap = wrap
+    }
+
+    fun isTagTextWrap(): Boolean = mTagTextWrap
+
+    /**
+     * Extra space between a tag's text and its cross, in pixels (issue #105). Applies to tags added afterwards.
+     */
+    fun setTagCrossSpacing(spacing: Int) {
+        mTagCrossSpacing = spacing
+    }
+
+    fun getTagCrossSpacing(): Int = mTagCrossSpacing
+
+    /**
+     * The elevation of each tag, in pixels (issue #79). Applies to tags added afterwards.
+     */
+    fun setTagElevation(elevation: Float) {
+        mTagElevation = elevation
+    }
+
+    fun getTagElevation(): Float = mTagElevation
+
     fun getTagView(position: Int): TagView {
         if (position < 0 || position >= mChildViews.size) {
             throw RuntimeException("Illegal position!")

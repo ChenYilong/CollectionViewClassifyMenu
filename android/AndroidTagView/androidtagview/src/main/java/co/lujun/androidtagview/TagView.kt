@@ -24,19 +24,25 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.BitmapShader
 import android.graphics.Canvas
+import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Region
 import android.graphics.Shader
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.os.Build
+import android.text.StaticLayout
+import android.text.TextPaint
 import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewOutlineProvider
 import androidx.customview.widget.ViewDragHelper
 import co.lujun.androidtagview.Utils.dp2px
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -117,8 +123,44 @@ open class TagView : View {
     /** Text direction (support: TEXT_DIRECTION_RTL & TEXT_DIRECTION_LTR, default TEXT_DIRECTION_LTR) */
     private var mTextDirection = View.TEXT_DIRECTION_LTR
 
-    /** The distance between baseline and descent */
-    private var bdDistance = 0f
+    /**
+     * The distance between baseline and descent. Issue #104: null (the default) centres the text on its font
+     * metrics; a value set by the caller keeps the old formula, which left the text about 2 dp low.
+     */
+    private var bdDistance: Float? = null
+
+    /**
+     * The widest the tag may be, in pixels (0: no limit). The container sets its own width, so a long tag, with or
+     * without a cross, is never cut off at the container's edge (issues #60 / #66).
+     */
+    private var mMaxWidth = 0
+
+    /**
+     * Issue #19: text wider than the maximum width wraps onto more lines instead of being shortened with an ellipsis.
+     */
+    private var mTextWrap = false
+
+    private var mTextLayout: StaticLayout? = null
+    private var mDrawText: String = ""
+    private var mTextW = 0f
+    private var mTextH = 0f
+
+    /**
+     * The side of the square of the image and the cross: the height of a one-line tag.
+     */
+    private var mAccessorySize = 0
+
+    /**
+     * Issue #105: extra space between the text and the cross, in pixels.
+     */
+    private var mCrossSpacing = 0
+
+    /**
+     * Issue #101: drawables at the start, top, end and bottom of the text, each a square as tall as the text.
+     */
+    private val mDrawables = arrayOfNulls<Drawable>(4)
+
+    private var mDrawablePadding = 0
 
     /** Whether to support 'letters show with RTL (eg: Android to diordnA)' style (default false) */
     private var mTagSupportLettersRTL = false
@@ -208,12 +250,22 @@ open class TagView : View {
         val touchSlop = android.view.ViewConfiguration.get(context).scaledTouchSlop
         mMoveSlop = maxOf(mMoveSlop, touchSlop)
         mSlopThreshold = maxOf(mSlopThreshold, touchSlop)
+        // Issue #79: a rounded outline, so an elevation casts a shadow of the tag's shape.
+        outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setRoundRect(0, 0, view.width, view.height, mBorderRadius)
+                // A translucent background casts a lighter shadow (it showed through as a dark band).
+                val alpha = android.graphics.Color.alpha(mBackgroundColor) / 255f
+                outline.alpha = alpha * alpha
+            }
+        }
     }
 
     private fun onDealText() {
         mAbstractText = if (!TextUtils.isEmpty(mOriginText)) {
-            if (mOriginText.length <= mTagMaxLength) mOriginText
-            else mOriginText.substring(0, mTagMaxLength - 3) + "..."
+            // A tag made without a container has no maximum length (0); substring(0, -3) crashed.
+            if (mTagMaxLength <= 0 || mOriginText.length <= mTagMaxLength) mOriginText
+            else mOriginText.substring(0, max(0, mTagMaxLength - 3)) + "..."
         } else {
             ""
         }
@@ -231,11 +283,41 @@ open class TagView : View {
         }
     }
 
+    private fun drawableSize(): Int = ceil(fontH).toInt()
+
+    private fun drawableSpace(index: Int): Int = if (mDrawables[index] != null) drawableSize() + mDrawablePadding else 0
+
+    private fun accessoriesWidth(): Int =
+        (if (isEnableCross()) mAccessorySize + mCrossSpacing else 0) + (if (isEnableImage()) mAccessorySize else 0)
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val height = mVerticalPadding * 2 + fontH.toInt()
-        val width = max(mMinWidth, mHorizontalPadding * 2 + fontW.toInt() + (if (isEnableCross()) height else 0) + (if (isEnableImage()) height else 0))
-        mCrossAreaWidth = min(max(mCrossAreaWidth, height.toFloat()), width.toFloat())
+        mAccessorySize = mVerticalPadding * 2 + fontH.toInt()
+        val fixedW = mHorizontalPadding * 2 + drawableSpace(0) + drawableSpace(2) + accessoriesWidth()
+        mDrawText = mAbstractText
+        mTextLayout = null
+        mTextW = fontW
+        mTextH = fontH
+        if (mMaxWidth > 0 && fixedW + ceil(fontW) > mMaxWidth) {
+            val available = max(1, mMaxWidth - fixedW)
+            val textPaint = TextPaint(mPaint).apply { style = Paint.Style.FILL }
+            if (mTextWrap) {
+                val layout = StaticLayout.Builder.obtain(mAbstractText, 0, mAbstractText.length, textPaint, available)
+                    .setIncludePad(false).build()
+                mTextLayout = layout
+                mTextW = (0 until layout.lineCount).maxOf { layout.getLineWidth(it) }
+                mTextH = layout.height.toFloat()
+            } else {
+                val ellipsis = "\u2026"
+                val fit = mPaint.breakText(mAbstractText, true, max(0f, available - mPaint.measureText(ellipsis)), null)
+                mDrawText = mAbstractText.substring(0, fit).trimEnd() + ellipsis
+                mTextW = mPaint.measureText(mDrawText)
+            }
+        }
+        val height = max(max(mAccessorySize, suggestedMinimumHeight),
+            mVerticalPadding * 2 + ceil(mTextH).toInt() + drawableSpace(1) + drawableSpace(3))
+        var width = max(mMinWidth, fixedW + ceil(mTextW).toInt())
+        if (mMaxWidth > 0) width = min(width, max(mMaxWidth, mMinWidth))
+        mCrossAreaWidth = min(max(mCrossAreaWidth, mAccessorySize.toFloat()), width.toFloat())
         setMeasuredDimension(width, height)
     }
 
@@ -263,27 +345,37 @@ open class TagView : View {
         mPaint.style = Paint.Style.FILL
         mPaint.color = if (getIsViewSelected()) mSelectedTextColor ?: mTextColor else mTextColor
 
-        if (mTextDirection == View.TEXT_DIRECTION_RTL) {
-            if (mTagSupportLettersRTL) {
-                var tmpX = (if (isEnableCross()) width + height else width) / 2 + fontW / 2
-                for (c in mAbstractText.toCharArray()) {
+        val rtl = mTextDirection == View.TEXT_DIRECTION_RTL
+        val leftAccessory = (if (isEnableImage()) mAccessorySize else 0) +
+            (if (rtl && isEnableCross()) mAccessorySize + mCrossSpacing else 0)
+        val rightAccessory = if (!rtl && isEnableCross()) mAccessorySize + mCrossSpacing else 0
+        val startSpace = drawableSpace(0)
+        val blockW = startSpace + mTextW + drawableSpace(2)
+        val textLeft = leftAccessory + (width - leftAccessory - rightAccessory - blockW) / 2f + startSpace
+        val blockH = drawableSpace(1) + mTextH + drawableSpace(3)
+        val textTop = (height - blockH) / 2f + drawableSpace(1)
+        drawDrawables(canvas, textLeft, textTop)
+
+        val layout = mTextLayout
+        if (layout != null) {
+            layout.paint.color = mPaint.color
+            canvas.save()
+            canvas.translate(textLeft, textTop)
+            layout.draw(canvas)
+            canvas.restore()
+        } else {
+            val fontMetrics = mPaint.fontMetrics
+            val baseline = bdDistance?.let { textTop + fontH - it } ?: (textTop - fontMetrics.ascent)
+            if (rtl && mTagSupportLettersRTL) {
+                var tmpX = textLeft + mTextW
+                for (c in mDrawText.toCharArray()) {
                     val sc = c.toString()
                     tmpX -= mPaint.measureText(sc)
-                    canvas.drawText(sc, tmpX, height / 2 + fontH / 2 - bdDistance, mPaint)
+                    canvas.drawText(sc, tmpX, baseline, mPaint)
                 }
             } else {
-                canvas.drawText(
-                    mAbstractText,
-                    (if (isEnableCross()) width + fontW else width.toFloat()) / 2 - fontW / 2,
-                    height / 2 + fontH / 2 - bdDistance, mPaint
-                )
+                canvas.drawText(mDrawText, textLeft, baseline, mPaint)
             }
-        } else {
-            canvas.drawText(
-                mAbstractText,
-                (if (isEnableCross()) width - height else width) / 2 - fontW / 2 + (if (isEnableImage()) height / 2 else 0),
-                height / 2 + fontH / 2 - bdDistance, mPaint
-            )
         }
 
         // draw cross
@@ -386,31 +478,52 @@ open class TagView : View {
         return event.x >= width - mCrossAreaWidth
     }
 
+    private fun drawDrawables(canvas: Canvas, textLeft: Float, textTop: Float) {
+        val size = drawableSize()
+        val centerX = textLeft + mTextW / 2
+        val centerY = textTop + mTextH / 2
+        val lefts = floatArrayOf(textLeft - mDrawablePadding - size, centerX - size / 2f, textLeft + mTextW + mDrawablePadding, centerX - size / 2f)
+        val tops = floatArrayOf(centerY - size / 2f, textTop - mDrawablePadding - size, centerY - size / 2f, textTop + mTextH + mDrawablePadding)
+        for (i in 0 until 4) {
+            val drawable = mDrawables[i] ?: continue
+            val l = lefts[i].roundToInt()
+            val t = tops[i].roundToInt()
+            drawable.setBounds(l, t, l + size, t + size)
+            drawable.draw(canvas)
+        }
+    }
+
     private fun drawImage(canvas: Canvas) {
         val image = mBitmapImage
         if (isEnableImage() && image != null) {
-            val scaledImageBitmap = Bitmap.createScaledBitmap(image, (height - mBorderWidth).roundToInt(), (height - mBorderWidth).roundToInt(), false)
-
+            val side = (mAccessorySize - mBorderWidth * 2).roundToInt().coerceAtLeast(1)
+            val scaledImageBitmap = Bitmap.createScaledBitmap(image, side, side, false)
+            val top = (height - mAccessorySize) / 2f
             val paint = Paint()
             paint.isAntiAlias = true
-            paint.shader = BitmapShader(scaledImageBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-            val rect = RectF(mBorderWidth, mBorderWidth, height - mBorderWidth, height - mBorderWidth)
+            val rect = RectF(mBorderWidth, top + mBorderWidth, mBorderWidth + side, top + mBorderWidth + side)
+            val shader = BitmapShader(scaledImageBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+            shader.setLocalMatrix(android.graphics.Matrix().apply { setTranslate(rect.left, rect.top) })
+            paint.shader = shader
             canvas.drawRoundRect(rect, rect.height() / 2, rect.height() / 2, paint)
         }
     }
 
     private fun drawCross(canvas: Canvas) {
         if (isEnableCross()) {
-            mCrossAreaPadding = if (mCrossAreaPadding > height / 2) (height / 2).toFloat() else mCrossAreaPadding
+            // The cross is a square as tall as a one-line tag, centred vertically (a wrapped tag is taller).
+            val side = mAccessorySize
+            mCrossAreaPadding = if (mCrossAreaPadding > side / 2) (side / 2).toFloat() else mCrossAreaPadding
+            val top = (height - side) / 2
             val rtl = mTextDirection == View.TEXT_DIRECTION_RTL
-            val ltX = if (rtl) mCrossAreaPadding.toInt() else (width - height + mCrossAreaPadding).toInt()
-            val ltY = mCrossAreaPadding.toInt()
-            val lbX = if (rtl) mCrossAreaPadding.toInt() else (width - height + mCrossAreaPadding).toInt()
-            val lbY = (height - mCrossAreaPadding).toInt()
-            val rtX = if (rtl) (height - mCrossAreaPadding).toInt() else (width - mCrossAreaPadding).toInt()
-            val rtY = mCrossAreaPadding.toInt()
-            val rbX = if (rtl) (height - mCrossAreaPadding).toInt() else (width - mCrossAreaPadding).toInt()
-            val rbY = (height - mCrossAreaPadding).toInt()
+            val ltX = if (rtl) mCrossAreaPadding.toInt() else (width - side + mCrossAreaPadding).toInt()
+            val ltY = top + mCrossAreaPadding.toInt()
+            val lbX = ltX
+            val lbY = top + (side - mCrossAreaPadding).toInt()
+            val rtX = if (rtl) (side - mCrossAreaPadding).toInt() else (width - mCrossAreaPadding).toInt()
+            val rtY = ltY
+            val rbX = rtX
+            val rbY = lbY
 
             mPaint.style = Paint.Style.STROKE
             mPaint.color = mCrossColor
@@ -483,6 +596,7 @@ open class TagView : View {
 
     fun setTagBackgroundColor(color: Int) {
         mBackgroundColor = color
+        invalidateOutline()
         // Issue #20: a change after the tag is shown (per tag, through getTagView) is drawn at once.
         postInvalidate()
     }
@@ -527,6 +641,75 @@ open class TagView : View {
 
     fun setBorderRadius(radius: Float) {
         mBorderRadius = radius
+        invalidateOutline()
+    }
+
+    /**
+     * The widest the tag may be, in pixels; 0 removes the limit. Longer text is shortened with an ellipsis, or
+     * wrapped when [setTextWrap] is on (issues #19 / #60 / #66). The container sets it to its own content width.
+     */
+    fun setTagMaxWidth(width: Int) {
+        if (mMaxWidth != width) {
+            mMaxWidth = width
+            requestLayout()
+        }
+    }
+
+    fun getTagMaxWidth(): Int = mMaxWidth
+
+    /**
+     * Wraps text wider than the maximum width onto more lines instead of shortening it (issue #19).
+     */
+    fun setTextWrap(wrap: Boolean) {
+        mTextWrap = wrap
+        requestLayout()
+    }
+
+    fun isTextWrap(): Boolean = mTextWrap
+
+    /**
+     * The number of text lines drawn: more than 1 only when the text wraps.
+     */
+    fun getTextLineCount(): Int = mTextLayout?.lineCount ?: 1
+
+    /**
+     * The text drawn, which ends with an ellipsis when it was shortened to fit the maximum width.
+     */
+    fun getDisplayedText(): String = mDrawText
+
+    /**
+     * Extra space between the text and the cross, in pixels (issue #105).
+     */
+    fun setCrossSpacing(spacing: Int) {
+        mCrossSpacing = spacing
+        requestLayout()
+    }
+
+    fun getCrossSpacing(): Int = mCrossSpacing
+
+    /**
+     * Drawables around the text (issue #101), each drawn as a square as tall as the text; null removes one.
+     */
+    fun setTagDrawables(start: Drawable?, top: Drawable?, end: Drawable?, bottom: Drawable?) {
+        mDrawables[0] = start
+        mDrawables[1] = top
+        mDrawables[2] = end
+        mDrawables[3] = bottom
+        requestLayout()
+        invalidate()
+    }
+
+    /**
+     * The drawables around the text: start, top, end, bottom.
+     */
+    fun getTagDrawables(): Array<Drawable?> = mDrawables.copyOf()
+
+    /**
+     * The space between the text and its drawables, in pixels (issue #101).
+     */
+    fun setTagDrawablePadding(padding: Int) {
+        mDrawablePadding = padding
+        requestLayout()
     }
 
     fun setTextSize(size: Float) {
@@ -600,8 +783,13 @@ open class TagView : View {
         this.mRippleDuration = mRippleDuration
     }
 
-    fun setBdDistance(bdDistance: Float) {
+    /**
+     * The distance between the baseline and the bottom of the text; null (the default) centres the text on its
+     * font metrics (issue #104).
+     */
+    fun setBdDistance(bdDistance: Float?) {
         this.bdDistance = bdDistance
+        invalidate()
     }
 
     fun isEnableImage(): Boolean = mBitmapImage != null && mTextDirection != View.TEXT_DIRECTION_RTL

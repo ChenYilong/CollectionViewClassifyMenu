@@ -131,6 +131,25 @@
                 app:tag_clickable="false"
                 app:tag_theme="random"
                 app:vertical_interval="10dp" />
+
+            <co.lujun.androidtagview.TagContainerLayout
+                android:id="@+id/tagcontainerLayout6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                app:container_enable_drag="false"
+                app:container_gravity="end"
+                app:horizontal_interval="10dp"
+                app:tag_cross_spacing="8dp"
+                app:tag_elevation="4dp"
+                app:tag_enable_cross="true"
+                app:tag_max_length="100"
+                app:tag_background_color="#FFE0F7FA"
+                app:tag_border_color="#FF4DD0E1"
+                app:tag_text_color="#FF006064"
+                app:tag_text_wrap="true"
+                app:vertical_interval="10dp" />
         </LinearLayout>
 
     </ScrollView>
