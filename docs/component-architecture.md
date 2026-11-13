@@ -76,8 +76,9 @@ persistence in the demos.
   `"headerRight"` accepted as aliases of the leading / trailing names (as `"topleft"` / `"topright"` are today); the
   old strings (`"bottom"`, `"topLeading"`, `"topTrailing"`, `"inline"`) are dropped, and the example JSON files are
   updated.
-- **When:** with the Swift migration of `TagList` (the enum's file, `CYLMenuFoldControl`, migrates there, so the names
-  change once, in Swift), together with the Android port in the same commit.
+- **When:** with the Swift migration of `CYLMenuFoldControl`, the enum's file (step 8 of `docs/Swift-Migration.md`;
+  step 7 moved `CYLTagListView` and kept the old case names, so the names change once, in Swift), together with the
+  Android port in the same commit.
 - **Status:** TODO.
 - **Prompt (verbatim, 2026-11-13, with the Android recent searches and the review filter screenshots):**
 

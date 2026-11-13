@@ -113,7 +113,7 @@ final class CYLFoldStylesViewController: UIViewController {
 
     /// The title look of a demo: the core's default (bold headline) with the demo's color and icon placement.
     static func titleStyle(for demo: Demo) -> CYLMenuStyle {
-        let style = CYLTagListView.defaultTitleStyle()
+        let style = CYLTagListView.defaultTitleStyle
         if let color = demo.titleColor {
             for state in [UIControl.State.normal, .selected, .disabled] {
                 style.appearance(for: state).textColor = color

@@ -115,7 +115,7 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
         XCTAssertEqual(tags.numberOfItems(inSection: 0), visible + 1)
         let fold = tags.cell(at: ip(visible, 0))
         XCTAssertTrue(fold is CYLTagFoldCell, "The chevron is the last tag")
-        XCTAssertEqual(fold?.accessibilityIdentifier, CYLTagListFoldControlAccessibilityIdentifier)
+        XCTAssertEqual(fold?.accessibilityIdentifier, CYLTagListAccessibilityIdentifier.foldControl)
         XCTAssertTrue(fold?.accessibilityTraits.contains(.button) ?? false)
         XCTAssertEqual(fold?.accessibilityLabel, "分组 0 更多")
         XCTAssertTrue((fold as? CYLTagFoldCell)?.foldButton.foldControl?.usesDefaultImage ?? false, "The bundle's chevron")

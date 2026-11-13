@@ -289,21 +289,21 @@ pod 'CYLTabBarController/Lottie'   # 或 /PAG、/Rive、/GIF
 未链接动效引擎或文件无法加载时显示静态图标。
 
 动效库读取的选项（例如 Rive 文件的画板与状态机）写在 URL 中，编码方式与 CYLTabBarController 的
-`CYLTabBarAnimationURLWithOptions()` 相同：在代码中用 `CYLMenuAnimationURLWithOptions()`，在字典或配置文件中用
-`CYLTagItemAnimationOptions`（`"animationOptions"`），或直接写在文件名后（`"icons.riv#artboard=CHAT"`）：
+`CYLTabBarAnimationURLWithOptions()` 相同：在代码中用 `URL.cylAddingAnimationOptions(_:)`，在字典或配置文件中用
+`CYLTagItemKey.animationOptions`（`"animationOptions"`），或直接写在文件名后（`"icons.riv#artboard=CHAT"`）：
 
-```objc
-item.animationURL = CYLMenuAnimationURLWithOptions(iconsURL, @{ @"artboard" : @"CHAT",
-                                                                @"stateMachine" : @"CHAT_Interactivity",
-                                                                @"input" : @"active" });
+```swift
+tag.animationURL = iconsURL.cylAddingAnimationOptions(["artboard": "CHAT",
+                                                       "stateMachine": "CHAT_Interactivity",
+                                                       "input": "active"])
 ```
 
 未选中时动效默认停在第一帧（与 CYLTabBarController 的 Tab 图标相同）；第一帧为空的文件可以停在其他帧：
 `-menuAnimationRestingProgressForItemAtIndexPath:`、`CYLTagButton.animationRestingProgress` 或字典中的
-`CYLTagItemAnimationRestingProgress`（0...1，例如 `@1` 为最后一帧）。
+`CYLTagItemKey.animationRestingProgress`（0...1，例如 `1` 为最后一帧）。
 
-每个分组可以有自己的外观：`-menuStyleForSection:` 或字典中的 `CYLTagSectionStyle`（覆盖在列表样式之上的
-`CYLMenuStyle…` 键），例如白色线条的 Rive 图标（CYLTabBarController 深色 TabBar 用的 `icons.riv`）放在深色标签上。
+每个分组可以有自己的外观：`-menuStyleForSection:` 或字典中的 `CYLTagSectionKey.style`（覆盖在列表样式之上的
+`CYLMenuStyleKey` 键），例如白色线条的 Rive 图标（CYLTabBarController 深色 TabBar 用的 `icons.riv`）放在深色标签上。
 颜色、字体、边框、图标颜色、图文布局按分组设置；高度、间距与内边距始终使用列表的样式。`-scrollToSection:animated:`
 滚动到某个分组。
 
@@ -324,20 +324,20 @@ CYLTableViewPlaceHolder 的 [PR #22](https://github.com/ChenYilong/CYLTableViewP
 
 #### 字典与配置文件初始化 / Map and configuration file
 
-与 CYLTabBarController 的 `-initWithConfiguration:`、`-initWithConfigurationFile:error:` 相同：
+与 CYLTabBarController 的 `init(configuration:)`、`init(configurationFile:)` 相同（键在 `CYLTagListKey`、
+`CYLTagSectionKey`、`CYLTagItemKey`、`CYLMenuStyleKey`、`CYLTagAppearanceKey`、`CYLMenuFoldControlKey` 中）：
 
-```objc
-CYLTagListView *tags = [[CYLTagListView alloc] initWithConfiguration:@{
-    CYLTagListViewSelectionMode : @"multiple",
-    CYLTagListViewFoldStyle : @"footerChevron",
-    CYLTagListViewStyle : @{ CYLMenuStyleNormal : @{ CYLTagAppearanceCornerRadius : @0 } },
-    CYLTagListViewSections : @[ @{ CYLTagSectionTitle : @"Tabs",
-                                   CYLTagSectionItems : @[ @{ CYLTagItemTitle : @"Home",
-                                                              CYLTagItemImage : @"system:house",
-                                                              CYLTagItemAnimation : @"tab_home.json" } ] } ],
-}];
-NSError *error = nil;
-CYLTagListView *fromFile = [CYLTagListView tagListViewWithConfigurationFile:@"tags.json" error:&error];
+```swift
+let tags = CYLTagListView(configuration: [
+    CYLTagListKey.selectionMode: "multiple",
+    CYLTagListKey.foldStyle: "footerChevron",
+    CYLTagListKey.style: [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 0]],
+    CYLTagListKey.sections: [[CYLTagSectionKey.title: "Tabs",
+                              CYLTagSectionKey.items: [[CYLTagItemKey.title: "Home",
+                                                        CYLTagItemKey.image: "system:house",
+                                                        CYLTagItemKey.animation: "tab_home.json"]]]],
+])
+let fromFile = try CYLTagListView(configurationFile: "tags.json")
 ```
 
 文件中的值都可以写成字符串（颜色 "#RRGGBB"、图片 "system:star"、内边距 "{t, l, b, r}" 或数组、枚举名称等），
@@ -390,9 +390,9 @@ tagListView.tagDeleteHandler = { index, tag in print("deleted", index, tag.title
 - 四边内边距 / Per-side padding：`CYLTagAppearance.contentInsets`（默认 {5, 10, 5, 10}，`margin` 是左右两边）、
   `CYLMenuStyle.tagContentInsets`；Interface Builder 中可设置 `lineSpacing`、`interitemSpacing`、`tagContentInsetTop/Left/Bottom/Right`。
 - 每个标签可以有自己的字号，行高随之变化 / A tag with a larger text is taller than the others in its row.
-- 配置键 / Keys：`CYLTagListViewTags`、`CYLTagItemDeletable`、`CYLTagItemIdentifier`、`CYLTagItemStyle`、
-  `CYLMenuStyleHighlightedBackgroundColor`、`CYLMenuStyleTagContentInsets`、`CYLMenuStyleDeleteIndicator…`、
-  `CYLTagAppearanceContentInsets`、`CYLTagAppearanceBackgroundImage`；`CYLMenuColorFromString()`。
+- 配置键 / Keys：`CYLTagListKey.tags`、`CYLTagItemKey.deletable`、`.identifier`、`.style`、
+  `CYLMenuStyleKey.highlightedBackgroundColor`、`.tagContentInsets`、`.deleteIndicator…`、
+  `CYLTagAppearanceKey.contentInsets`、`.backgroundImage`；`UIColor.cylMenuColor(from:)`。
 
 示例 / Demo：「样式」Tab → 标签云（`CYLTagCloudDemoViewController`）。
 

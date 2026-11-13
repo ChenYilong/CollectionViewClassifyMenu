@@ -60,7 +60,7 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
             XCTAssertGreaterThan(hotButton.imageView.frame.minX, hotButton.titleLabel.frame.minX, "Title on the left, icon on the right")
         }
         XCTAssertEqual(discover.cell(at: ip(hot, 0))?.accessibilityValue, "热门", "VoiceOver reads the icon's label as the value")
-        let more = try XCTUnwrap(screen.discoverList.views(withIdentifier: CYLTagListMoreButtonAccessibilityIdentifier).first as? UIButton)
+        let more = try XCTUnwrap(screen.discoverList.views(withIdentifier: CYLTagListAccessibilityIdentifier.moreButton).first as? UIButton)
         XCTAssertFalse(more.isHidden)
         XCTAssertNotNil(more.currentImage, "The bundle's cyl_more icon")
         XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_more"))

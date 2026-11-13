@@ -27,17 +27,17 @@ final class CYLTagEditorAccessibilityTests: CYLTagEditorTestCase {
         XCTAssertTrue(editor.titleLabel.accessibilityTraits.contains(.header))
         let tags = editor.tagListView.probe
         let collection = tags.collectionView
-        let family = collection.view(withIdentifier: CYLTagListItemAccessibilityIdentifier, label: "家人")
+        let family = collection.view(withIdentifier: CYLTagListAccessibilityIdentifier.item, label: "家人")
         XCTAssertNotNil(family, "Tags are found by their label")
         XCTAssertTrue(family?.isAccessibilityElement ?? false)
         XCTAssertTrue(family?.accessibilityTraits.contains(.button) ?? false)
         XCTAssertTrue(family?.accessibilityTraits.contains(.selected) ?? false, "A selected tag says so")
-        let photography = collection.view(withIdentifier: CYLTagListItemAccessibilityIdentifier, label: "摄影")
+        let photography = collection.view(withIdentifier: CYLTagListAccessibilityIdentifier.item, label: "摄影")
         XCTAssertFalse(photography?.accessibilityTraits.contains(.selected) ?? true)
         // "+ 新建标签" has its own identifier and reads as a button, never as a selected tag.
         editor.tagListView.scrollToItem(at: IndexPath(item: 7, section: 1), animated: false)
         tags.layOut()
-        let create = collection.views(withIdentifier: CYLTagCreateItemAccessibilityIdentifier).first
+        let create = collection.views(withIdentifier: CYLTagListAccessibilityIdentifier.createItem).first
         XCTAssertEqual(create?.accessibilityLabel, "新建标签")
         XCTAssertEqual(create?.accessibilityTraits, .button)
         // In 管理 mode VoiceOver explains that a tap deletes the tag.
@@ -48,7 +48,7 @@ final class CYLTagEditorAccessibilityTests: CYLTagEditorTestCase {
         XCTAssertNil(editor.menuAccessibilityHintForItem(at: IndexPath(item: 0, section: 0)), "最近使用 is not managed")
         editor.tagListView.scrollToItem(at: IndexPath(item: 0, section: 1), animated: false)
         tags.layOut()
-        let managed = collection.views(withIdentifier: CYLTagListItemAccessibilityIdentifier)
+        let managed = collection.views(withIdentifier: CYLTagListAccessibilityIdentifier.item)
             .first { $0.accessibilityLabel == "家人" && $0.accessibilityHint != nil }
         XCTAssertEqual(managed?.accessibilityHint, "轻点两下删除此标签", "The core applies the data source's hint to the cell")
         captureScreen(named: "test-swift-tag-editor-managing")
@@ -57,7 +57,7 @@ final class CYLTagEditorAccessibilityTests: CYLTagEditorTestCase {
     func testRemarkTitleIsAHeaderThatOpensTheEditor() {
         let remark = CYLRemarkViewController(store: CYLTagStore.bundled(), tags: [])
         showInNavigation(remark, size: CYLTestScreen.tall)
-        let title = remark.tagsView.views(withIdentifier: CYLTagListTitleAccessibilityIdentifier).first
+        let title = remark.tagsView.views(withIdentifier: CYLTagListAccessibilityIdentifier.title).first
         XCTAssertTrue(title === remark.tagsView.titleView)
         XCTAssertEqual(title?.accessibilityLabel, "标签")
         XCTAssertTrue(title?.isAccessibilityElement ?? false)
@@ -70,7 +70,7 @@ final class CYLTagEditorAccessibilityTests: CYLTagEditorTestCase {
     func testFoldStylesTitlesAndFoldControlsAreLabelled() throws {
         let styles = try showFoldStyles()
         for list in styles.tagListViews {
-            let title = list.views(withIdentifier: CYLTagListTitleAccessibilityIdentifier).first
+            let title = list.views(withIdentifier: CYLTagListAccessibilityIdentifier.title).first
             XCTAssertNotNil(title)
             guard let title, !title.isHidden else { continue }
             XCTAssertTrue(title.isAccessibilityElement, "Every visible title has a label")
@@ -79,7 +79,7 @@ final class CYLTagEditorAccessibilityTests: CYLTagEditorTestCase {
         }
         let iconOnly = styles.tagListViews.first { $0.title == nil && $0.titleImage != nil }
         XCTAssertEqual(iconOnly?.titleView.accessibilityLabel, "标题：仅图标", "An icon-only title needs a label of its own")
-        let folds = styles.tagListViews.flatMap { $0.views(withIdentifier: CYLTagListFoldControlAccessibilityIdentifier) }
+        let folds = styles.tagListViews.flatMap { $0.views(withIdentifier: CYLTagListAccessibilityIdentifier.foldControl) }
             .filter { !$0.isHidden && $0.window != nil }
         XCTAssertFalse(folds.isEmpty, "Fold controls are found by identifier")
         for fold in folds {

@@ -23,8 +23,8 @@ enum CYLTagContainerSampleData {
     /// {backgroundColor, tagBorderColor, tagTextColor, tagSelectedBackgroundColor} of list5.
     static func colors5() -> [CYLTagColors] {
         ["#ff0000", "#0000ff"].map {
-            CYLTagColors(backgroundColor: CYLMenuColorFromString($0), borderColor: .black, textColor: .white,
-                         selectedBackgroundColor: CYLMenuColorFromString("#999999"))
+            CYLTagColors(backgroundColor: UIColor.cylMenuColor(from: $0), borderColor: .black, textColor: .white,
+                         selectedBackgroundColor: UIColor.cylMenuColor(from: "#999999"))
         }
     }
 
@@ -236,7 +236,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("删除"), style: .destructive) { [weak self] _ in
             guard let first = self?.containers.first, position < first.tags.count else { return }
-            first.removeTag(at: UInt(position))
+            first.removeTag(at: position)
             self?.view.setNeedsLayout()
         })
         alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("取消"), style: .cancel))

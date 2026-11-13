@@ -40,40 +40,40 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
     /// The dictionary of the map example.
     static func mapConfiguration() -> [String: Any] {
         // In code, values keep their types (UIColor, NSValue, NSURL...); strings work too.
-        let normal: [String: Any] = [CYLTagAppearanceIconColor: UIColor.systemIndigo,
-                                     CYLTagAppearanceBorderColor: UIColor.systemIndigo,
-                                     CYLTagAppearanceBorderWidth: 1,
-                                     CYLTagAppearanceCornerRadius: 8]
-        let selected: [String: Any] = [CYLTagAppearanceBackgroundColor: UIColor.systemIndigo,
-                                       CYLTagAppearanceBorderColor: UIColor.systemIndigo,
-                                       CYLTagAppearanceIconColor: UIColor.white,
-                                       CYLTagAppearanceCornerRadius: 8]
+        let normal: [String: Any] = [CYLTagAppearanceKey.iconColor: UIColor.systemIndigo,
+                                     CYLTagAppearanceKey.borderColor: UIColor.systemIndigo,
+                                     CYLTagAppearanceKey.borderWidth: 1,
+                                     CYLTagAppearanceKey.cornerRadius: 8]
+        let selected: [String: Any] = [CYLTagAppearanceKey.backgroundColor: UIColor.systemIndigo,
+                                       CYLTagAppearanceKey.borderColor: UIColor.systemIndigo,
+                                       CYLTagAppearanceKey.iconColor: UIColor.white,
+                                       CYLTagAppearanceKey.cornerRadius: 8]
         let style: [String: Any] = [
-            CYLMenuStyleImageSize: NSValue(cgSize: CGSize(width: 20, height: 20)),
-            CYLMenuStyleImageTitleSpacing: 4,
-            CYLMenuStyleItemHeight: 36,
-            CYLMenuStyleLayoutCentered: true,
-            CYLMenuStyleNormal: normal,
-            CYLMenuStyleSelected: selected,
+            CYLMenuStyleKey.imageSize: NSValue(cgSize: CGSize(width: 20, height: 20)),
+            CYLMenuStyleKey.imageTitleSpacing: 4,
+            CYLMenuStyleKey.itemHeight: 36,
+            CYLMenuStyleKey.layoutCentered: true,
+            CYLMenuStyleKey.normal: normal,
+            CYLMenuStyleKey.selected: selected,
         ]
         let items: [Any] = [
-            [CYLTagItemTitle: "Lottie", CYLTagItemAnimation: animationValue("Lottie/tab_me_animate.json")] as [String: Any],
-            [CYLTagItemTitle: "GIF", CYLTagItemAnimation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
-            [CYLTagItemTitle: "Rive", CYLTagItemAnimation: animationValue("Rive/menu_button.riv")] as [String: Any],
-            [CYLTagItemImage: "system:heart", CYLTagItemSelectedImage: "system:heart.fill"] as [String: Any],
+            [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json")] as [String: Any],
+            [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
+            [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv")] as [String: Any],
+            [CYLTagItemKey.image: "system:heart", CYLTagItemKey.selectedImage: "system:heart.fill"] as [String: Any],
             "Text only",
         ]
         let section: [String: Any] = [
-            CYLTagSectionTitle: CYLExampleLocalizedString("字典（map）初始化"),
-            CYLTagSectionItems: items,
+            CYLTagSectionKey.title: CYLExampleLocalizedString("字典（map）初始化"),
+            CYLTagSectionKey.items: items,
         ]
         return [
-            CYLTagListViewSelectionMode: CYLMenuSelectionMode.multiple.rawValue,
-            CYLTagListViewFoldControl: CYLMenuFoldControl(position: .none, content: .icon),
-            CYLTagListViewScrollEnabled: false,
-            CYLTagListViewSelectedItems: [NSIndexPath(item: 1, section: 0)],
-            CYLTagListViewStyle: style,
-            CYLTagListViewSections: [section],
+            CYLTagListKey.selectionMode: CYLMenuSelectionMode.multiple.rawValue,
+            CYLTagListKey.foldControl: CYLMenuFoldControl(position: .none, content: .icon),
+            CYLTagListKey.scrollEnabled: false,
+            CYLTagListKey.selectedItems: [NSIndexPath(item: 1, section: 0)],
+            CYLTagListKey.style: style,
+            CYLTagListKey.sections: [section],
         ]
     }
 

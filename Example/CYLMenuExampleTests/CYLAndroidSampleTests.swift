@@ -228,7 +228,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(row.midX, fourth.bounds.width / 2, accuracy: 1)
         XCTAssertEqual(fourth.style.rippleDuration, 2)
         let fifth = containers[4]
-        XCTAssertEqual(fifth.tagButton(at: ip(0, 0))?.layer.backgroundColor, CYLMenuColorFromString("#ff0000")?.cgColor)
+        XCTAssertEqual(fifth.tagButton(at: ip(0, 0))?.layer.backgroundColor, UIColor.cylMenuColor(from: "#ff0000")?.cgColor)
         XCTAssertFalse(fifth.allowsTapping)
     }
 
@@ -323,6 +323,6 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         style.reversesTitleCharacters = true
         style.maximumTitleLength = 0
         XCTAssertEqual(style.displayedTitle(forTitle: "你好"), "好你")
-        XCTAssertEqual(CYLTag.badgeImage(withText: "热", color: .red, diameter: 16).size, CGSize(width: 16, height: 16))
+        XCTAssertEqual(CYLTag.badgeImage(text: "热", color: .red, diameter: 16).size, CGSize(width: 16, height: 16))
     }
 }
