@@ -1,0 +1,2 @@
+[CYLExampleLayout] screen=editor top=CYLTagEditorViewController tags=["Family", "College Classmates", "Book Club"]
+[CYLExampleLayout] editor sections=Recent(3),My Tags(48) selected=["Family", "College Classmates", "Book Club"] query= done=true tagList={{0, 130}, {402, 511}} contentHeight=1064.0 selectedIndexPaths=4
