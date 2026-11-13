@@ -206,8 +206,8 @@ final class CYLAndroidSampleAccessibilityTests: CYLMenuExampleTestCase {
 
         // Activating a tag turns it, and the hint stays on the new view.
         let before = imageView.tagGroups[0].tags[0].direction
-        group.delegate?.groupView?(group, didTapTagAt: 0)
-        XCTAssertEqual(imageView.tagGroups[0].tags[0].direction, CYLImageTagDirectionNext(before))
+        group.delegate?.groupView(group, didTapTagAt: 0)
+        XCTAssertEqual(imageView.tagGroups[0].tags[0].direction, before.next)
         XCTAssertEqual(group.tagViews[0].accessibilityHint, "轻点两下改变方向")
 
         // The delete action asks first, as the long press does.

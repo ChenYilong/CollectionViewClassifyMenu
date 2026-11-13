@@ -41,14 +41,14 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * The picture's image view.
      */
-    @objc open var imageView: UIImageView {
+    open var imageView: UIImageView {
         picture
     }
 
     /**
      * The picture.
      */
-    @objc open var image: UIImage? {
+    open var image: UIImage? {
         get {
             imageView.image
         }
@@ -61,7 +61,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * The groups, kept up to date while editing (getTagGroupModels). Setting it replaces them (setTagList).
      */
-    @objc open var tagGroups: [CYLImageTagGroup] {
+    open var tagGroups: [CYLImageTagGroup] {
         get {
             groups
         }
@@ -76,7 +76,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * The group views, in the order of `tagGroups`.
      */
-    @objc open var groupViews: [CYLImageTagGroupView] {
+    open var groupViews: [CYLImageTagGroupView] {
         views
     }
 
@@ -84,12 +84,11 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
      * Edit mode (setEditMode): groups can be dragged, a tap on a tag turns it to the next direction, no ripples.
      * NO by default: groups show a ripple and toggle with an animation.
      */
-    @objc(editing)
     open var isEditing: Bool {
-        @objc(isEditing) get {
+        get {
             editingStorage
         }
-        @objc(setEditing:) set {
+        set {
             editingStorage = newValue
             setNeedsLayout()
             for view in views {
@@ -103,14 +102,14 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * Configures each group view after it is made (radii, colors, line lengths).
      */
-    @objc open var groupConfiguration: ((CYLImageTagGroupView, UInt) -> Void)?
+    open var groupConfiguration: ((CYLImageTagGroupView, Int) -> Void)?
 
     // MARK: Events
 
     /**
      * A tap on the picture outside the tags (the sample toggles the tags).
      */
-    @objc open var imageTapHandler: (() -> Void)? {
+    open var imageTapHandler: (() -> Void)? {
         didSet {
             updatePictureAccessibility()
         }
@@ -119,22 +118,22 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * A tap on the circle of the group at this index.
      */
-    @objc open var circleTapHandler: ((UInt) -> Void)?
+    open var circleTapHandler: ((Int) -> Void)?
 
     /**
      * After the turn of the tag while editing.
      */
-    @objc open var tagTapHandler: ((UInt, UInt, CYLImageTag) -> Void)?
+    open var tagTapHandler: ((Int, Int, CYLImageTag) -> Void)?
 
     /**
      * A long press on the group at this index.
      */
-    @objc open var longPressHandler: ((UInt) -> Void)?
+    open var longPressHandler: ((Int) -> Void)?
 
     /**
      * The group at this index was dragged to a new position (relative to the picture).
      */
-    @objc open var dragHandler: ((UInt, CGPoint) -> Void)?
+    open var dragHandler: ((Int, CGPoint) -> Void)?
 
     // MARK: Accessibility
 
@@ -144,7 +143,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
      * Set the hint here, such as "轻点两下显示或隐藏标签". In edit mode the tags get the hint "轻点两下改变方向"
      * (`CYLImageTagTurnHint`) and the groups the 上移 / 下移 / 左移 / 右移 actions.
      */
-    @objc open var imageAccessibilityHint: String? {
+    open var imageAccessibilityHint: String? {
         didSet {
             updatePictureAccessibility()
         }
@@ -154,7 +153,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
      * The name of every group's long-press custom action (CYLImageTagGroupView.longPressAccessibilityActionName), such
      * as "删除标签组" in edit mode. nil: "长按".
      */
-    @objc open var longPressAccessibilityActionName: String? {
+    open var longPressAccessibilityActionName: String? {
         didSet {
             for view in views {
                 view.longPressAccessibilityActionName = longPressAccessibilityActionName
@@ -200,10 +199,8 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * Adds a copy of the group and its view on top of the others.
      */
-    @objc open func addTagGroup(_ group: CYLImageTagGroup) {
-        guard let model = group.copy() as? CYLImageTagGroup else {
-            return
-        }
+    open func addTagGroup(_ group: CYLImageTagGroup) {
+        let model = group.copy()
         let view = CYLImageTagGroupView(frame: bounds)
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.delegate = self
@@ -214,7 +211,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
         applyAccessibility(to: view)
         groups.append(model)
         views.append(view)
-        groupConfiguration?(view, UInt(views.count - 1))
+        groupConfiguration?(view, views.count - 1)
         addSubview(view)
         setNeedsLayout()
     }
@@ -222,10 +219,8 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * Removes the group at this index and its view; an index past the end does nothing.
      */
-    @objc(removeTagGroupAtIndex:)
-    open func removeTagGroup(at index: UInt) {
-        let index = Int(index)
-        guard index < views.count else {
+    open func removeTagGroup(at index: Int) {
+        guard views.indices.contains(index) else {
             return
         }
         views[index].removeFromSuperview()
@@ -236,7 +231,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * Removes every group and its view.
      */
-    @objc open func removeAllTagGroups() {
+    open func removeAllTagGroups() {
         for view in views {
             view.removeFromSuperview()
         }
@@ -247,7 +242,6 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
     /**
      * Shows hidden groups and hides shown ones, animated (excuteTagsAnimation).
      */
-    @objc(toggleTagGroupsAnimated:)
     open func toggleTagGroups(animated: Bool) {
         for view in views {
             if view.isGroupHidden {
@@ -317,7 +311,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
 
     open func groupViewDidTapCircle(_ groupView: CYLImageTagGroupView) {
         if let index = views.firstIndex(of: groupView) {
-            circleTapHandler?(UInt(index))
+            circleTapHandler?(index)
         }
     }
 
@@ -328,19 +322,19 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
         let tag = groups[index].tags[tagIndex]
         if isEditing {
             // The sample's onTagClicked: the next direction.
-            tag.direction = CYLImageTagDirectionNext(tag.direction)
+            tag.direction = tag.direction.next
             groupView.tags = groups[index].tags
             // The tag views were remade: keep VoiceOver on the turned tag.
             if tagIndex < groupView.tagViews.count {
                 UIAccessibility.post(notification: .layoutChanged, argument: groupView.tagViews[tagIndex])
             }
         }
-        tagTapHandler?(UInt(index), UInt(tagIndex), tag)
+        tagTapHandler?(index, tagIndex, tag)
     }
 
     open func groupViewDidLongPress(_ groupView: CYLImageTagGroupView) {
         if let index = views.firstIndex(of: groupView) {
-            longPressHandler?(UInt(index))
+            longPressHandler?(index)
         }
     }
 
@@ -349,7 +343,7 @@ open class CYLImageTagView: UIView, CYLImageTagGroupViewDelegate {
             return
         }
         groups[index].percentPosition = percentPosition
-        dragHandler?(UInt(index), percentPosition)
+        dragHandler?(index, percentPosition)
     }
 
     // MARK: - Private

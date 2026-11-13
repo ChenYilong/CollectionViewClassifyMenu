@@ -77,6 +77,19 @@ and the core's tests are updated in the same commit.
 | 3 | `CYLFilterHeaderViewHeigt` (global) | → `CYLFilterHeaderView.defaultHeight` | typo, no globals |
 | 3 | `CYLFilterBaseController.itemButtonClicked(_:)`, `.dataSource`, `.settingArray`; `CYLFilterHeaderView.moreButtonTapped(_:)` | removed | unused (an empty hook, never-read storage, a private action) |
 | 3 | `init()` of `CYLCollectionViewCell`, `CYLFilterHeaderView`, `CYLTagCell`, `CYLTagHeaderCell` | removed | collection views create them with `init(frame:)` / nibs |
+| 4 | `CYLImageTagDirection` | `NS_ENUM` → Swift `enum: Int, CaseIterable` (same cases and raw values) | Swift-only type |
+| 4 | `CYLImageTagDirectionNext(_:)` (global function) | → `CYLImageTagDirection.next` | a property of the enum |
+| 4 | `CYLImageTag`, `CYLImageTagGroup` | `NSObject` + `NSCopying` → Swift `final class`, `copy()` returns the type; `init(title:direction:link:userInfo:)` | no Objective-C users; typed copies |
+| 4 | `CYLImageTagGroup.defaultDirections(forTagCount:)` | `UInt` → `Int`, `[NSNumber]` → `[CYLImageTagDirection]` | typed result |
+| 4 | `CYLImageTagGroupDefault…`, `CYLImageTagGroupMaximumTagCount` (globals) | → `CYLImageTagGroupView.defaultCircleRadius` … `.maximumTagCount` (`Int`) | no globals |
+| 4 | `CYLImageTagGroupKey…` strings and `animateValue(forKey:values:duration:completion:)` | → `CYLImageTagGroupView.AnimatableValue` and `animate(_:values:duration:completion:)` with `[CGFloat]`; `value(of:)` | typed keys, no key-value coding |
+| 4 | `CYLImageTagItem`, data source, delegate | `@objc` protocols → Swift protocols (`CYLImageTagItem: UIView`); the delegate's methods have empty defaults; `numberOfTags(in:)`, `groupView(_:viewForTagAt:)` | Swift-only; guidelines |
+| 4 | `isDraggable`, `isGroupHidden`, `tagViews`, `setPercentPosition(x:y:)` | Objective-C accessors dropped; `setPercentX(_:percentY:)` → `setPercentPosition(x:y:)` | guidelines |
+| 4 | the dot's long-press accessibility action | shown while there is a delegate (it was: while the delegate implemented `groupViewDidLongPress:`, which `CYLImageTagView` always does) | Swift protocols with defaults cannot be asked which methods they implement |
+| 4 | `CYLImageTagView` handlers, `groupConfiguration`, `removeTagGroup(at:)` | `UInt` → `Int`; `@objc` removed | Swift indexes; no Objective-C users |
+
+Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
+index) and its tests (`direction.next`, `value(of: .linesProgress)`).
 
 Examples updated in step 3: the demo app's `CYLFilterDemoViewController` (`filterControllerDidComplete(_:)` takes a
 non-optional controller; the bar button calls `initLeftBarButtonItem()` instead of the delegate method with nil).
@@ -91,12 +104,13 @@ lines) in the pod's source patterns.
 | 2026-11-12 | baseline | 76 | 0 |
 | 2026-11-13 | step 2 (the six roots and `CYLMenuKeys`) | 63 | 17.1 |
 | 2026-11-13 | step 3 (cells, headers, filter base; idiomatic API) | 53 | 30.3 |
+| 2026-11-13 | step 4 (`CYLImageTagGroupView`) | 51 | 32.9 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 49 left (steps 2–3) |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 47 left (steps 2–4) |
 | `TagCollectionView/TagCollectionView` | 10 | in progress: 4 left (models: `CYLTagModel`, `CYLTagGroup`) |
 
 ## Swift skills installed (requirement 2)
@@ -172,6 +186,12 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | 2026-11-13 | step 2 | the roots: `NSArray+CYLLog`, `NSDictionary+CYLLog`, `CYLMultipleFilterController`, `CYLClassifyMenuViewController` (+ `CYLMenuKeys.h`), `CYLImageTagView`, `CYLTagView` (13 files) | 63 | 17.1 | unchanged | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
 | 2026-11-13 | step 3 | `CYLCollectionViewCell`, `CYLFilterHeaderView`, `CYLFilterBaseController`, `CYLTagCell`, `CYLTagHeaderCell` (10 files), first step under "core quality first" | 53 | 30.3 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+| 2026-11-13 | step 4 | `CYLImageTagGroupView` (2 files, 1,152 lines) | 51 | 32.9 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+Note on `1e1df5a` (a docs commit): it also took the staged deletion of `CYLImageTagGroupView.h/.m` without the
+Swift file, so that one commit does not build; step 4's commit, right after it, does. Published history is not
+rewritten.
 
 Baseline of the test suites (2026-11-13, clean worktree at `79b521f`, before any Swift): menu 30/30, tag 6/6, swift
 19/19, example 79/80. The failing example test, `CYLSearchCategoryScenarioTests
