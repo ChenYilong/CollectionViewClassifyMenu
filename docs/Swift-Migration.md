@@ -43,13 +43,14 @@ lines) in the pod's source patterns.
 | Date | Commit | Objective-C files left | Score |
 | --- | --- | --- | --- |
 | 2026-11-12 | baseline | 76 | 0 |
+| 2026-11-13 | step 2 (the six roots and `CYLMenuKeys`) | 63 | 17.1 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | TODO |
-| `TagCollectionView/TagCollectionView` | 10 | TODO |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 55 left (step 2: the roots) |
+| `TagCollectionView/TagCollectionView` | 10 | in progress: 8 left (`CYLTagView` done) |
 
 ## Swift skills installed (requirement 2)
 
@@ -72,12 +73,74 @@ no breakage after every migration commit.
 
 ## Order
 
-Leaves first, so that every Swift file only depends on Swift or on Objective-C headers still in the umbrella:
+Top-down: a file migrates once no Objective-C file left in the core imports it. Swift calls the Objective-C
+headers still in the umbrella without any glue, while Objective-C calling Swift would need the generated
+`-Swift.h` and `@objc`-only APIs (no macros, no inline functions), so the dependency direction decides the order
+(the import graph of 2026-11-13):
 
-1. `Other/Category` and `Other/Tool` (logging categories, keys, parameters, resources, data source protocol).
-2. `Other/Lib/CYLCollectionViewLeftAlignedLayout`.
-3. `ClassifyMenu/View` and `ClassifyMenu/Other`, then `CYLClassifyMenuViewController`.
-4. `MultipleFilter` (views, categories, params tool, controllers).
-5. `TagCollectionView/TagCollectionView` (models, cells, `CYLTagView`).
-6. `ImageTag`.
-7. `TagList` (appearance, colors, style, tag, buttons, cells, fold control, `CYLTagListView` and its configuration).
+1. Roots, imported by no other core file: `NSArray+CYLLog`, `NSDictionary+CYLLog`, `CYLMultipleFilterController`,
+   `CYLClassifyMenuViewController`, `CYLImageTagView`, `CYLTagView`.
+2. What they alone import: `CYLFilterBaseController`, `CYLCollectionViewCell`, `CYLFilterHeaderView`,
+   `CYLImageTagGroupView`, `CYLTagCell`, `CYLTagHeaderCell`, `CYLTagGroup`…
+3. Then their dependencies, down to the shared leaves (`CYLMenuResources`, `CYLParameterConfiguration`,
+   `CYLMenuDataSource`, `CYLCollectionViewLeftAlignedLayout`), which go last.
+4. `CYLTag` and `CYLTagListView` (+ `CYLConfiguration`) import each other: they migrate in one commit.
+
+## Transition files
+
+- `CollectionViewClassifyMenu/Class/CollectionViewClassifyMenu.h`: the generated `CollectionViewClassifyMenu-Swift.h`
+  of a mixed module imports `<CollectionViewClassifyMenu/CollectionViewClassifyMenu.h>` as the underlying module's
+  umbrella header, but CocoaPods generates `CollectionViewClassifyMenu-umbrella.h`; without this forwarding header
+  every client of the pod failed to scan the module (2026-11-13, all four test suites). It goes with the last
+  Objective-C header and is not counted in the score.
+
+## Objective-C API changes
+
+- `kDataSourceSectionKey`, `kDataSourceCellTextKey`, `kDataSourceCellPictureKey`: Swift global constants now (the
+  Swift API is unchanged), which Objective-C cannot see; Objective-C reads `CYLMenuKeys.dataSourceSectionKey`,
+  `.dataSourceCellTextKey` and `.dataSourceCellPictureKey`. The only Objective-C caller was the core's own test
+  (`CYLCollectionViewClassifyMenuLayoutTests.m`), updated.
+- Private state the core's Objective-C tests read through key-value coding keeps its names and Foundation types as
+  `@objc private` members (`CYLClassifyMenuViewController`: `dataSource`, `expandSectionArray`, `collectionView`,
+  `firstRowCellCountArray`, `collectionHeaderMoreBtnHideBoolArray`, `rowsCountPerSection`,
+  `cellsCountArrayPerRowInSections`; `CYLMultipleFilterController`: `filterParamsTool`).
+
+## API check details
+
+The baseline is the Objective-C core's API. Once the module has Swift, `swift-api-digester` dumps only the Swift
+declarations of a mixed module, so the check dumps the two parts separately (a copy of the framework without the Swift
+module for the Objective-C part, `-swift-only` for the Swift part), merges them and compares the merged dump with the
+baseline (`-input-paths`). Differences that come from dumping Swift instead of Objective-C are filtered: conformances
+inherited from UIKit / Foundation (a Swift dump does not repeat them), `@preconcurrency` (added to UIKit subclasses),
+Clang's builtin type aliases, and Objective-C names (a Swift-only dump does not record them). The Objective-C names are
+checked instead against the generated `CollectionViewClassifyMenu-Swift.h`: every class, protocol and selector of a
+migrated type must be there (inherited initializers excepted). Verified on 2026-11-13 by renaming
+`reloadMenuData()`: the check reported the Swift rename and the missing `reloadMenuData` selector.
+
+## Steps
+
+| Date | Commit | Files migrated | Objective-C files left | Score | API check | Tests |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-13 | `79b521f` | (standard, skills, API check) | 76 | 0 | baseline | baseline run |
+| 2026-11-13 | step 2 | the roots: `NSArray+CYLLog`, `NSDictionary+CYLLog`, `CYLMultipleFilterController`, `CYLClassifyMenuViewController` (+ `CYLMenuKeys.h`), `CYLImageTagView`, `CYLTagView` (13 files) | 63 | 17.1 | unchanged | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
+
+Baseline of the test suites (2026-11-13, clean worktree at `79b521f`, before any Swift): menu 30/30, tag 6/6, swift
+19/19, example 79/80. The failing example test, `CYLSearchCategoryScenarioTests
+testSearchCategoriesUseABottomTabBarAndFillTheSearchBar` (the nested tab bar's frame is zero), fails before the
+migration too; it is not caused by it and is tracked separately.
+
+Lessons of step 2, applied from now on:
+
+- A `UIView` / `UIViewController` subclass that declares its own designated initializers loses the inherited `init()`;
+  add `public convenience init()` calling `init(frame: .zero)` / `init(nibName: nil, bundle: nil)`, which is what
+  Objective-C's `-init` did.
+- Objective-C messages to nil were no-ops: views created in `viewDidLoad` are optionals with optional chaining, so a
+  property set before the view exists still does nothing instead of crashing.
+- Private state and private methods the core's Objective-C tests reach (key-value coding, selectors) keep their names
+  as `@objc private` members.
+- `pod install` reorders the example projects' `project.pbxproj`; restore them and apply only
+  `scripts/swift-migrate-pbxproj.py`.
+
+Helpers: `scripts/swift-api-show.py <Type>` prints a type's API from the baseline (names, types, open, Objective-C
+names) to match; `scripts/swift-migrate-pbxproj.py [--project …] <Name>…` turns a migrated file's references in the
+projects that list core files into `.swift`.

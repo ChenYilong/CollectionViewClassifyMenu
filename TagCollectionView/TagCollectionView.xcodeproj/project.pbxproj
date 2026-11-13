@@ -33,8 +33,7 @@
 		23B7DFC0650B7B4D062084B0 /* Pods-TagCollectionViewTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TagCollectionViewTests.release.xcconfig"; path = "Target Support Files/Pods-TagCollectionViewTests/Pods-TagCollectionViewTests.release.xcconfig"; sourceTree = "<group>"; };
 		337E7AB9D4CAB5BA29414016 /* Pods-TagCollectionView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TagCollectionView.release.xcconfig"; path = "Target Support Files/Pods-TagCollectionView/Pods-TagCollectionView.release.xcconfig"; sourceTree = "<group>"; };
 		41C689421C574FDE007E0D89 /* TagCollectionView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TagCollectionView.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		41C6894B1C574FDE007E0D89 /* CYLTagView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLTagView.h; sourceTree = "<group>"; };
-		41C6894C1C574FDE007E0D89 /* CYLTagView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTagView.m; sourceTree = "<group>"; };
+		41C6894C1C574FDE007E0D89 /* CYLTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagView.swift"; sourceTree = "<group>"; };
 		41C689511C574FDE007E0D89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		41C689541C574FDE007E0D89 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		41C689561C574FDE007E0D89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -102,8 +101,7 @@
 			children = (
 				41C6896B1C575A4D007E0D89 /* Model */,
 				41C6896A1C575A49007E0D89 /* Views */,
-				41C6894B1C574FDE007E0D89 /* CYLTagView.h */,
-				41C6894C1C574FDE007E0D89 /* CYLTagView.m */,
+				41C6894C1C574FDE007E0D89 /* CYLTagView.swift */,
 				41C689801C575B6D007E0D89 /* CYLTagView.xib */,
 				4137FD011C901D7B00642710 /* CYLTagDemoAppDelegate.swift */,
 				4137FD031C901D7B00642710 /* CYLTagDemoViewController.swift */,

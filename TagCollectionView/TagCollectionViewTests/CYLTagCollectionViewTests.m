@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "CYLTagView.h"
+@import CollectionViewClassifyMenu;
 
 @interface CYLCountingTagModel : CYLTagModel
 @property (nonatomic, assign) NSUInteger widthReads;
