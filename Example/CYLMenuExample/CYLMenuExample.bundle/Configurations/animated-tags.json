@@ -1,7 +1,7 @@
 {
   "selectionMode": "single",
   "allowsEmptySelection": false,
-  "foldControl": { "position": "bottom", "content": "iconAndTitle" },
+  "foldControl": { "position": "footer", "content": "iconAndTitle" },
   "defaultVisibleRows": 2,
   "scrollEnabled": false,
   "selectedItems": ["0-0"],

@@ -136,7 +136,7 @@ final class CYLReviewFilterScenarioTests: CYLMenuExampleTestCase {
         guard let chevron = tags.footerFoldButton(inSection: 0) else {
             return XCTFail("The footer has a fold control")
         }
-        XCTAssertEqual(filter.foldControl.position, .bottom)
+        XCTAssertEqual(filter.foldControl.position, .footer)
         XCTAssertEqual(filter.foldControl.content, .icon, "Taobao: the chevron alone")
         XCTAssertTrue(chevron.imageView.transform.isIdentity, "Points down while folded")
         let foldedHeight = filter.frame.height

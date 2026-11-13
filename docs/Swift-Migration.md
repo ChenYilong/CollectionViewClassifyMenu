@@ -107,6 +107,8 @@ and the core's tests are updated in the same commit.
 | 7 | accessibility identifiers (`CYLTagListTitleAccessibilityIdentifier`…, 6 globals) | `CYLTagListAccessibilityIdentifier.title`, `.foldControl`, `.item`, `.createItem`, `.moreButton`, `.deleteButton` (same strings); the core's Objective-C test compares the strings | namespaced constants |
 | 7 | `CYLTagListCell`, `CYLTagCreateCell`, `CYLTagFoldCell`, `CYLTagFoldButton` | `deletable` → `isDeletable`; `configure(withTitle:…selected:enabled:)` → `configure(title:…isSelected:isEnabled:)`; `additionalAccessibilityActions: [UIAccessibilityCustomAction]` (not optional); `plusImage()` → `plusImage`; `style(with:)` → `outlinedStyle(from:)`; `configure(withName:style:enabled:)` → `configure(name:style:isEnabled:)`; `CYLTagFoldCell.configure(with:…)` → `configure(foldControl:…)`; KVC `button` / `foldButton` kept `@objc` | Swift names |
 | 7 | `CYLMenuStyle (CYLConfiguration)`, `CYLMenuFoldControl (CYLConfiguration)`, `CYLTagAppearance (CYLConfiguration)` | Swift extensions; `CYLMenuFoldControl(configuration:)` is a failable `init?(configuration: Any)` (a `CYLMenuFoldControl` is assigned directly instead) | extensions |
+| 8 | `CYLMenuFoldControlPosition` | cases renamed (`docs/component-architecture.md`): `.bottom` → `.footer`, `.topTrailing` → `.headerTrailing`, `.topLeading` → `.headerLeading`, `.inline` → `.tail` (Objective-C `CYLMenuFoldControlPositionFooter`…; Kotlin `FOOTER`, `HEADER_TRAILING`, `HEADER_LEADING`, `TAIL`, `NONE`); configuration strings `"footer"`, `"headerTrailing"` (`"headerRight"`), `"headerLeading"` (`"headerLeft"`), `"tail"`, the old strings dropped | names of the collection view's parts; leading / trailing hold in right-to-left layouts |
+| 8 | `CYLMenuFoldControl` | `+foldControlWithPosition:content:` / `+noFoldControl` → `init(position: = .none, content: = .icon)` (Objective-C `-initWithPosition:content:`, used by the core's test); `title`, `collapseTitle`, `image`: `T!` → `T` (the defaults are returned until a value is set) | one initializer with defaults |
 
 Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
 index) and its tests (`direction.next`, `value(of: .linesProgress)`).
@@ -128,12 +130,13 @@ lines) in the pod's source patterns.
 | 2026-11-13 | step 5 (filter views, styles, blur, `CYLTagGroup`) | 37 | 51.3 |
 | 2026-11-13 | step 6 (`CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel`) | 31 | 59.2 |
 | 2026-11-14 | step 7 (`CYLTag`, `CYLTagListView` + configuration, the tag cells and fold button, accessibility identifiers) | 16 | 78.9 |
+| 2026-11-14 | step 8 (`CYLMenuFoldControl`, with the fold position rename) | 14 | 81.6 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 16 left (steps 2–7): `CYLMenuFoldControl`, `CYLMenuStyle`, `CYLTagAppearance`, `CYLTagColors`, `CYLTagButton`, the shared tools |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 14 left (steps 2–8): `CYLMenuStyle`, `CYLTagAppearance`, `CYLTagColors`, `CYLTagButton`, the shared tools |
 | `TagCollectionView/TagCollectionView` | 10 | DONE (step 6): 0 left |
 
 ## Swift skills installed (requirement 2)
@@ -218,6 +221,8 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | 2026-11-13 | step 6 | `CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel` (6 files) | 31 | 59.2 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
 | 2026-11-14 | step 7 | `CYLTag`, `CYLTagListView`, `CYLTagListView+CYLConfiguration`, `CYLTagListCell`, `CYLTagCreateCell`, `CYLTagFoldCell`, `CYLTagFoldButton`, `CYLTagListAccessibility` (15 files, 4,770 lines of Objective-C) | 16 | 78.9 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
+
+| 2026-11-14 | step 8 | `CYLMenuFoldControl` (2 files) and the fold position rename on iOS and Android | 14 | 81.6 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80; Android library tests and example build pass |
 
 Step 7 notes: the first swift run failed 2 title tests: Swift does not run a property's `didSet` when an initializer
 of the declaring class sets it, so `init(foldControl:title:…)` never updated the title view; it now sets the properties

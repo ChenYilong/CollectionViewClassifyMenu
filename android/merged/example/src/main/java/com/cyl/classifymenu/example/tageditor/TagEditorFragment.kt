@@ -492,9 +492,9 @@ class CYLFoldStylesView(context: Context, val data: CYLTagData) : ScrollView(con
 
     fun demos(): List<Demo> {
         fun s(key: String) = CYLTagEditorLocalizedString(context, key)
-        val bottom = CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom
-        val trailing = CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopTrailing
-        val leading = CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopLeading
+        val bottom = CYLMenuFoldControlPosition.FOOTER
+        val trailing = CYLMenuFoldControlPosition.HEADER_TRAILING
+        val leading = CYLMenuFoldControlPosition.HEADER_LEADING
         val icon = CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon
         val both = CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
         val text = CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle

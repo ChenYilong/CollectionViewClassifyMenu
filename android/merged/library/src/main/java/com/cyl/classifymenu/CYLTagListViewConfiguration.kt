@@ -653,7 +653,7 @@ fun CYLMenuFoldControl.Companion.foldControlWithConfiguration(configuration: Any
     val control = CYLMenuFoldControl.noFoldControl()
     if (configuration is String || configuration is Number) {
         control.applyConfiguration(mapOf(CYLMenuFoldControlKeyPosition to configuration), context)
-        control.content = if (control.position == CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom)
+        control.content = if (control.position == CYLMenuFoldControlPosition.FOOTER)
             CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon else CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
         return control
     }
@@ -667,13 +667,13 @@ fun CYLMenuFoldControl.Companion.foldControlWithConfiguration(configuration: Any
  */
 fun CYLMenuFoldControl.applyConfiguration(configuration: Map<String, Any?>, context: Context? = null) {
     configuration[CYLMenuFoldControlKeyPosition]?.let {
-        position = enumValue(it, mapOf("none" to CYLMenuFoldControlPosition.CYLMenuFoldControlPositionNone,
-            "bottom" to CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom,
-            "toptrailing" to CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopTrailing,
-            "topright" to CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopTrailing,
-            "topleading" to CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopLeading,
-            "topleft" to CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopLeading,
-            "inline" to CYLMenuFoldControlPosition.CYLMenuFoldControlPositionInline), CYLMenuFoldControlPosition.values(), position)
+        position = enumValue(it, mapOf("none" to CYLMenuFoldControlPosition.NONE,
+            "footer" to CYLMenuFoldControlPosition.FOOTER,
+            "headertrailing" to CYLMenuFoldControlPosition.HEADER_TRAILING,
+            "headerright" to CYLMenuFoldControlPosition.HEADER_TRAILING,
+            "headerleading" to CYLMenuFoldControlPosition.HEADER_LEADING,
+            "headerleft" to CYLMenuFoldControlPosition.HEADER_LEADING,
+            "tail" to CYLMenuFoldControlPosition.TAIL), CYLMenuFoldControlPosition.values(), position)
     }
     configuration[CYLMenuFoldControlKeyContent]?.let {
         content = enumValue(it, mapOf("iconandtitle" to CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,

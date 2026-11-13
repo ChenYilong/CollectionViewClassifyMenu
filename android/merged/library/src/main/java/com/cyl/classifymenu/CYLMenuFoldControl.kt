@@ -4,11 +4,11 @@ import android.graphics.drawable.Drawable
 
 /** `CYLMenuFoldControlPosition`: where a section's fold control sits. */
 enum class CYLMenuFoldControlPosition {
-    CYLMenuFoldControlPositionNone,
-    CYLMenuFoldControlPositionBottom,
-    CYLMenuFoldControlPositionTopTrailing,
-    CYLMenuFoldControlPositionTopLeading,
-    CYLMenuFoldControlPositionInline,
+    NONE,
+    FOOTER,
+    HEADER_TRAILING,
+    HEADER_LEADING,
+    TAIL,
 }
 
 /** `CYLMenuFoldControlContent`: what a fold control shows. */
@@ -24,7 +24,7 @@ enum class CYLMenuFoldControlContent {
  */
 class CYLMenuFoldControl {
 
-    var position: CYLMenuFoldControlPosition = CYLMenuFoldControlPosition.CYLMenuFoldControlPositionNone
+    var position: CYLMenuFoldControlPosition = CYLMenuFoldControlPosition.NONE
     var content: CYLMenuFoldControlContent = CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
     private var _title: String? = null
     private var _collapseTitle: String? = null
@@ -95,6 +95,6 @@ class CYLMenuFoldControl {
 
         /** `+noFoldControl`: no control, the section shows every item. */
         @JvmStatic
-        fun noFoldControl() = foldControlWithPosition(CYLMenuFoldControlPosition.CYLMenuFoldControlPositionNone, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
+        fun noFoldControl() = foldControlWithPosition(CYLMenuFoldControlPosition.NONE, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
     }
 }

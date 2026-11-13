@@ -3,7 +3,7 @@
 //  CYLMenuExample
 //
 //  搜索历史与发现：a search app's search page. "最近搜索" is a CYLTagListView whose fold control is a tag cell
-//  (CYLMenuFoldControlPositionInline: the chevron after the last visible tag, then after the last tag); "发现" is a
+//  (CYLMenuFoldControlPosition.tail: the chevron after the last visible tag, then after the last tag); "发现" is a
 //  grid of two plain titles per row (CYLMenuStyle.gridStyle(itemsPerRow:)), long titles truncated, a "热" icon after a
 //  title (title on the left, icon on the right: CYLTagImagePlacementTrailing, CYLTagContentAlignmentLeading), and
 //  the core's More button, here refreshing the topics at random. The data comes from search-discover.json; this
@@ -112,7 +112,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
     var searchField: UITextField { searchBar.textField }
     let cameraButton = UIButton(type: .system)
     let searchButton = UIButton(type: .system)
-    let recentList = CYLTagListView(foldControl: CYLMenuFoldControl(position: .inline, content: .icon))
+    let recentList = CYLTagListView(foldControl: CYLMenuFoldControl(position: .tail, content: .icon))
     let discoverList = CYLTagListView()
     let hintLabel = UILabel()
     let micButton = UIButton(type: .system)

@@ -13,7 +13,7 @@
   "defaultVisibleRows": 1,
   "scrollEnabled": false,
   "foldControl": {
-    "position": "bottom",
+    "position": "footer",
     "content": "iconAndTitle"
   },
   "style": {
