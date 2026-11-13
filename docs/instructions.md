@@ -18,3 +18,6 @@
   these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
   of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each
   fix until 100; a translation not started yet waits until the score reaches 60.
+- Animation examples (English rule, AGENTS.md "Animation examples: playback controls"): every page that shows
+  animations offers Play all (from progress 0), a speed slider and a loop switch, combined and applied live, on every
+  platform; see `example-animation-controls.md`.

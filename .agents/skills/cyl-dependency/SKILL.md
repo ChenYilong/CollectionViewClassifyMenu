@@ -111,3 +111,7 @@ screen) is integrated the same way:
 | `Example-Swift/CYLTagEditorExample` root (`CYLTagEditorAppDelegate`) | no | no: built in code |
 
 These predate the rule; migrate a tab bar when it is next changed (or when asked), keeping its screenshots and tests.
+
+## Animation examples: playback controls (TODO, 2026-11-13)
+
+Every example page that shows animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback strategy applied live (accessibility labels and values included); verify all three on the page. Change the core when an example needs it. Rule, pages and status: [docs/example-animation-controls.md](../../../docs/example-animation-controls.md).

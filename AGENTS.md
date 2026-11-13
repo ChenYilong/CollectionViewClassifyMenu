@@ -396,3 +396,10 @@ AGENTS.md, newest commit) and adapted to this project:
 - Keep all issues in `docs/issue-progress.md`, including non-UI issues.
 - After each issue-fix commit, add its URL and reassess the score. Explain
   unverified scenarios and why a score is below 100.
+
+## Animation examples: playback controls (TODO, 2026-11-13)
+
+- Every example page that shows animations (the animated tag icons, any Lottie, PAG, Rive or GIF demo), on every
+  platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined
+  into one playback strategy applied live, with accessibility labels and values. Change the core when an example
+  needs it. Rule, pages and status: [docs/example-animation-controls.md](docs/example-animation-controls.md).
