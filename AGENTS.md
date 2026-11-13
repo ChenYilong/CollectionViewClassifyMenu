@@ -183,6 +183,15 @@ verify the behavior and update the applicable documentation.
   decides so for a file without a license (`house.riv`, 2026-11-12). Record the change and both SHA-256
   values in that README (`Animations/Rive/README.md`: `truck.riv`, `house.riv`).
 
+## Example demo rules
+
+- **Animation playback controls.** Every example screen that shows animations (Lottie, PAG, Rive, GIF, symbol
+  effects), on every platform (iOS, Android, React Native, Flutter, Mini Program, HarmonyOS), offers three controls
+  that combine and act in real time: **Play all** (restart every animation from progress 0, once), a **speed slider**
+  and a **loop switch**. Change the core library (and CYLTabBarController's animation engine) when an engine lacks
+  the speed or loop API; never work around it in the example. Details, status per platform and the TODO:
+  `docs/example-demo-rules.md`.
+
 ## Search bars
 
 - A search bar never covers any view, at any time: not the view controller's view, not a sibling, not a background

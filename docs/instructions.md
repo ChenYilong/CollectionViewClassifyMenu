@@ -18,3 +18,6 @@
   these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
   of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each
   fix until 100; a translation not started yet waits until the score reaches 60.
+- Example demo rules (English rule, AGENTS.md "Example demo rules"): `example-demo-rules.md` holds the rules for what
+  the examples of every platform demonstrate; animation screens offer Play all (restart from progress 0), a speed
+  slider and a loop switch that combine and act in real time.

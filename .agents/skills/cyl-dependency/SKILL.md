@@ -111,3 +111,10 @@ screen) is integrated the same way:
 | `Example-Swift/CYLTagEditorExample` root (`CYLTagEditorAppDelegate`) | no | no: built in code |
 
 These predate the rule; migrate a tab bar when it is next changed (or when asked), keeping its screenshots and tests.
+
+## Example animation playback controls
+
+Every example screen that shows animations, on every platform, offers Play all (restart from progress 0), a speed
+slider and a loop switch that combine and change playback in real time. When the animation engine (the core's
+animated icons or CYLTabBarController's `CYLTabBarItemAnimationFactory`) lacks a speed or loop API, add it there,
+not in the example. Rule, platform status and TODO: `docs/example-demo-rules.md` (AGENTS.md "Example demo rules").
