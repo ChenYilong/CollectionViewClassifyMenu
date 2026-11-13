@@ -24,14 +24,14 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         // Every position and content.
         let made = styles.tagListViews.prefix(demos.count)
         XCTAssertEqual(made.map { $0.foldControl.position }, demos.map { $0.foldControl.position })
-        XCTAssertEqual(Set(made.map { $0.foldControl.position }), [.bottom, .topTrailing, .topLeading])
+        XCTAssertEqual(Set(made.map { $0.foldControl.position }), [.footer, .headerTrailing, .headerLeading])
         XCTAssertEqual(Set(made.map { $0.foldControl.content }), [.icon, .iconAndTitle, .title])
         XCTAssertEqual(made.first?.foldStyle, .footerChevron, "foldControl sets foldStyle")
         XCTAssertEqual(made.first?.title, "底部箭头（淘宝评价筛选）")
         XCTAssertTrue(made.allSatisfy { $0.title != nil || $0.titleImage != nil }, "Every demo sets the encapsulated title")
         // From the files: JSON, plist, YAML and XML.
         let files = Array(styles.tagListViews.suffix(4))
-        XCTAssertEqual(files.map { $0.foldControl.position }, [.bottom, .topTrailing, .topLeading, .bottom])
+        XCTAssertEqual(files.map { $0.foldControl.position }, [.footer, .headerTrailing, .headerLeading, .footer])
         XCTAssertEqual(files.map { $0.foldControl.content }, [.iconAndTitle, .title, .icon, .title])
         XCTAssertEqual(files[3].titlePosition, .topCenter)
         XCTAssertTrue(files.allSatisfy { $0.titleImage != nil }, "titleImage from every file")
@@ -119,18 +119,18 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
     }
 
     func testCoreFoldControlDefaultsAreLocalized() {
-        let control = CYLMenuFoldControl(position: .bottom, content: .iconAndTitle)
+        let control = CYLMenuFoldControl(position: .footer, content: .iconAndTitle)
         XCTAssertEqual(control.title, "更多")
         XCTAssertEqual(control.collapseTitle, "收起")
         XCTAssertTrue(control.usesDefaultImage)
         XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_fold_chevron"), "The chevron is in the core bundle")
         XCTAssertEqual(control.title(whenExpanded: false), "更多")
         XCTAssertNil(control.title(whenExpanded: true), "Icon and title: only the icon when expanded")
-        XCTAssertEqual(CYLMenuFoldControl(position: .topTrailing, content: .title).title(whenExpanded: true), "收起")
+        XCTAssertEqual(CYLMenuFoldControl(position: .headerTrailing, content: .title).title(whenExpanded: true), "收起")
         XCTAssertEqual(CYLTagCreateCell.title(forName: ""), "新建标签")
         XCTAssertEqual(CYLTagCreateCell.title(forName: "ios"), "新建标签：ios")
         CYLTagEditorLocalization.preferredLanguage = "en"
-        XCTAssertEqual(CYLMenuFoldControl(position: .bottom, content: .iconAndTitle).title, "More")
+        XCTAssertEqual(CYLMenuFoldControl(position: .footer, content: .iconAndTitle).title, "More")
         XCTAssertEqual(CYLTagCreateCell.title(forName: "ios"), "New tag: ios")
         CYLTagEditorLocalization.preferredLanguage = "zh-Hant"
         XCTAssertEqual(CYLTagCreateCell.title(forName: ""), "新增標籤")

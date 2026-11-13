@@ -61,7 +61,7 @@ open class CYLTagFoldButton: CYLTagButton {
     }
 
     /**
-     * The inline fold control (`CYLMenuFoldControlPosition.inline`): the same content as
+     * The inline fold control (`CYLMenuFoldControlPosition.tail`): the same content as
      * `applyFoldControl(_:color:expanded:animated:)`, drawn like the tags of `itemStyle` (its normal look, outlined),
      * so it reads as the last tag; its icon and title take the control's color, else `itemStyle.foldControlColor`,
      * like the other fold controls. An icon-only control is a circle.

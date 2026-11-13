@@ -49,12 +49,12 @@ class CYLTagListConfigurationTest {
 
     @Test
     fun foldControlFromAPositionNameOrADictionary() {
-        val bottom = CYLMenuFoldControl.foldControlWithConfiguration("bottom")!!
-        assertEquals(CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom, bottom.position)
+        val bottom = CYLMenuFoldControl.foldControlWithConfiguration("footer")!!
+        assertEquals(CYLMenuFoldControlPosition.FOOTER, bottom.position)
         assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon, bottom.content)
-        val custom = CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "topLeft",
+        val custom = CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "headerLeft",
             CYLMenuFoldControlKeyTitle to "More", CYLMenuFoldControlKeyRotatesImage to false))!!
-        assertEquals(CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopLeading, custom.position)
+        assertEquals(CYLMenuFoldControlPosition.HEADER_LEADING, custom.position)
         assertEquals("More", custom.title)
         assertEquals(false, custom.rotatesImageWhenExpanded)
         assertNull(CYLMenuFoldControl.foldControlWithConfiguration(listOf(1)))
@@ -71,7 +71,7 @@ class CYLTagListConfigurationTest {
     fun listAppliesSectionsSelectionAndFolding() {
         val list = CYLTagListView.tagListViewWithConfiguration(context, mapOf(
             CYLTagListViewSelectionMode to "multiple",
-            CYLTagListViewFoldControl to "bottom",
+            CYLTagListViewFoldControl to "footer",
             CYLTagListViewDefaultVisibleRows to 1,
             CYLTagListViewTitle to "Filters",
             CYLTagListViewSections to listOf(

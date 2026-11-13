@@ -76,7 +76,7 @@ public enum CYLTagListKey {
     public static let selectedItems = "selectedItems"
 
     /**
-     * A `CYLMenuFoldControl`, a position name ("bottom", "topTrailing"…), or a dictionary of `CYLMenuFoldControlKey`
+     * A `CYLMenuFoldControl`, a position name ("footer", "headerTrailing"…), or a dictionary of `CYLMenuFoldControlKey`
      * keys. Applied after `foldStyle`.
      */
     public static let foldControl = "foldControl"
@@ -115,8 +115,8 @@ public enum CYLTagListKey {
 public enum CYLMenuFoldControlKey {
 
     /**
-     * A `CYLMenuFoldControlPosition` raw value, or "none", "bottom", "topTrailing" ("topRight"), "topLeading"
-     * ("topLeft"), "inline" (a tag cell among the tags).
+     * A `CYLMenuFoldControlPosition` raw value, or "none", "footer", "headerTrailing" ("headerRight"), "headerLeading"
+     * ("headerLeft"), "tail" (the last item of the tags).
      */
     public static let position = "position"
 
@@ -961,18 +961,18 @@ extension CYLMenuFoldControl {
 
     /**
      * A fold control from a dictionary of `CYLMenuFoldControlKey` keys, or from a position name or raw value alone
-     * (with the content that suits it: an icon below, an icon and a title in the header); `nil` for anything else.
+     * (with the content that suits it: an icon in the footer, an icon and a title elsewhere); `nil` for anything else.
      */
     public convenience init?(configuration: Any) {
         guard configuration is [String: Any] || configuration is String || configuration is NSNumber else {
             return nil
         }
-        self.init(position: .none, content: .icon)
+        self.init()
         if let dictionary = configuration as? [String: Any] {
             applyConfiguration(dictionary)
         } else {
             applyConfiguration([CYLMenuFoldControlKey.position: configuration])
-            content = position == .bottom ? .icon : .iconAndTitle
+            content = position == .footer ? .icon : .iconAndTitle
         }
     }
 
@@ -983,12 +983,12 @@ extension CYLMenuFoldControl {
         typealias Value = CYLConfigurationValue
         let baseURL = Value.baseURL(of: configuration)
         let positions = ["none": CYLMenuFoldControlPosition.none.rawValue,
-                         "bottom": CYLMenuFoldControlPosition.bottom.rawValue,
-                         "toptrailing": CYLMenuFoldControlPosition.topTrailing.rawValue,
-                         "topright": CYLMenuFoldControlPosition.topTrailing.rawValue,
-                         "topleading": CYLMenuFoldControlPosition.topLeading.rawValue,
-                         "topleft": CYLMenuFoldControlPosition.topLeading.rawValue,
-                         "inline": CYLMenuFoldControlPosition.inline.rawValue]
+                         "footer": CYLMenuFoldControlPosition.footer.rawValue,
+                         "headertrailing": CYLMenuFoldControlPosition.headerTrailing.rawValue,
+                         "headerright": CYLMenuFoldControlPosition.headerTrailing.rawValue,
+                         "headerleading": CYLMenuFoldControlPosition.headerLeading.rawValue,
+                         "headerleft": CYLMenuFoldControlPosition.headerLeading.rawValue,
+                         "tail": CYLMenuFoldControlPosition.tail.rawValue]
         if let raw = Value.rawValue(configuration[CYLMenuFoldControlKey.position], names: positions),
            let position = CYLMenuFoldControlPosition(rawValue: raw) {
             self.position = position

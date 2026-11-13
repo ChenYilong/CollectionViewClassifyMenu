@@ -415,8 +415,8 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
 - (void)testTagListViewsHaveStableAccessibilityIdentifiers {
     CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
     source.sections = @[@[@"All", @"One", @"Two", @"Three", @"Four", @"Five", @"Six", @"Seven", @"Eight", @"Nine"]];
-    CYLMenuFoldControl *fold = [CYLMenuFoldControl foldControlWithPosition:CYLMenuFoldControlPositionBottom
-                                                               content:CYLMenuFoldControlContentIcon];
+    CYLMenuFoldControl *fold = [[CYLMenuFoldControl alloc] initWithPosition:CYLMenuFoldControlPositionFooter
+                                                                    content:CYLMenuFoldControlContentIcon];
     CYLTagListView *list = [[CYLTagListView alloc] initWithFoldControl:fold];
     list.frame = CGRectMake(0, 0, 200, 400);
     list.title = @"Tags";

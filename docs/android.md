@@ -254,6 +254,17 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 > 合并所有处于open 状态的pr到本分支，或者本地所有未提交的代码到本分支 continue
 > 合并所有处于open 状态的pr到本分支，合并后close pr，或者本地所有未提交的代码到本分支 。仅保留一个pr，一个活跃分支为本分支 continue
 
+## DONE (2026-11-14): fold control positions renamed, as on iOS
+
+- **Context:** the decision recorded in `docs/component-architecture.md` ("rename the fold control positions"):
+  `none`, `footer`, `headerLeading`, `headerTrailing`, `tail`, implemented on iOS and Android in the same commit
+  (step 8 of `docs/Swift-Migration.md`).
+- **Result:** `CYLMenuFoldControlPosition.NONE`, `FOOTER`, `HEADER_TRAILING`, `HEADER_LEADING`, `TAIL` (were
+  `CYLMenuFoldControlPositionNone`, `…Bottom`, `…TopTrailing`, `…TopLeading`, `…Inline`); configuration strings
+  `"footer"`, `"headerTrailing"` / `"headerRight"`, `"headerLeading"` / `"headerLeft"`, `"tail"`; the library, its tests,
+  the example screens and `api-map.json` updated. `scripts/gradle.sh merged :library:testDebugUnitTest
+  :example:compileDebugKotlin`: BUILD SUCCESSFUL.
+
 ## Score history
 
 Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out of 100; one row per change of

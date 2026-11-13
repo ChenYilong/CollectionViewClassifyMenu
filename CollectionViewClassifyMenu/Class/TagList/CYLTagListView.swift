@@ -214,7 +214,7 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
 // MARK: - Footer
 
 /**
- * The fold control below a section (`CYLMenuFoldControlPosition.bottom`), centered.
+ * The fold control below a section (`CYLMenuFoldControlPosition.footer`), centered.
  */
 private final class CYLTagListFooterView: UICollectionReusableView {
 
@@ -347,7 +347,7 @@ open class CYLTagListView: UIView {
 
     /**
      * The fold control of a foldable section (more rows than `defaultVisibleRows`): where it is and what it shows.
-     * Default: none. Setting copies it and also sets `foldStyle` (bottom: `.footerChevron`, top: `.headerButton`,
+     * Default: none. Setting copies it and also sets `foldStyle` (footer: `.footerChevron`, header: `.headerButton`,
      * none: `.none`, or `.truncate` when `foldStyle` was `.truncate`).
      */
     open var foldControl: CYLMenuFoldControl {
@@ -357,18 +357,16 @@ open class CYLTagListView: UIView {
         set {
             foldControlStorage = newValue.cylCopy()
             switch foldControlStorage.position {
-            case .bottom:
+            case .footer:
                 foldStyleStorage = .footerChevron
-            case .topTrailing, .topLeading:
+            case .headerTrailing, .headerLeading:
                 foldStyleStorage = .headerButton
             case .none:
                 if foldStyleStorage != .truncate {
                     foldStyleStorage = .none
                 }
-            case .inline:
+            case .tail:
                 // No legacy fold style matches a fold control among the tags.
-                foldStyleStorage = .none
-            @unknown default:
                 foldStyleStorage = .none
             }
             reloadLayout()
@@ -387,11 +385,11 @@ open class CYLTagListView: UIView {
             foldStyleStorage = newValue
             switch newValue {
             case .headerButton:
-                foldControlStorage = CYLMenuFoldControl(position: .topTrailing, content: .title)
+                foldControlStorage = CYLMenuFoldControl(position: .headerTrailing, content: .title)
             case .footerChevron:
-                foldControlStorage = CYLMenuFoldControl(position: .bottom, content: .icon)
+                foldControlStorage = CYLMenuFoldControl(position: .footer, content: .icon)
             case .none, .truncate:
-                foldControlStorage = CYLMenuFoldControl.no()
+                foldControlStorage = CYLMenuFoldControl()
             }
             reloadLayout()
         }
@@ -768,7 +766,7 @@ open class CYLTagListView: UIView {
     @objc private let collectionView: UICollectionView
     private var styleStorage = CYLMenuStyle()
     private var titleStyleStorage = CYLMenuStyle()
-    private var foldControlStorage = CYLMenuFoldControl.no()
+    private var foldControlStorage = CYLMenuFoldControl()
     private var foldStyleStorage: CYLMenuFoldStyle = .none
     private var titles: [[String]] = []
     private var itemWidths: [[CGFloat]] = []
@@ -1595,15 +1593,15 @@ private extension CYLTagListView {
     }
 
     var foldControlIsInHeader: Bool {
-        foldControl.position == .topTrailing || foldControl.position == .topLeading
+        foldControl.position == .headerTrailing || foldControl.position == .headerLeading
     }
 
     var foldControlIsInFooter: Bool {
-        foldControl.position == .bottom
+        foldControl.position == .footer
     }
 
     var foldControlIsInline: Bool {
-        foldControl.position == .inline
+        foldControl.position == .tail
     }
 
     /**
@@ -1902,9 +1900,9 @@ private extension CYLTagListView {
         let titled = foldControl.position != .none
         let action: String
         if isSectionExpanded(section) {
-            action = titled ? foldControl.collapseTitle ?? style.collapseTitle : style.collapseTitle
+            action = titled ? foldControl.collapseTitle : style.collapseTitle
         } else {
-            action = titled ? foldControl.title ?? style.expandTitle : style.expandTitle
+            action = titled ? foldControl.title : style.expandTitle
         }
         let title = menuDataSource?.menuTitle(forSection: section) ?? ""
         return title.isEmpty ? action : "\(title) \(action)"
@@ -2292,7 +2290,7 @@ extension CYLTagListView: UICollectionViewDataSource {
         header.accessoryView = source?.menuAccessoryView?(forSection: section)
         let showsFoldButton = foldControlIsInHeader && canFoldSection(section)
         header.foldButton.isHidden = !showsFoldButton
-        header.foldAtLeadingEdge = foldControl.position == .topLeading
+        header.foldAtLeadingEdge = foldControl.position == .headerLeading
         if showsFoldButton {
             let expanded = isSectionExpanded(section)
             configureFoldButton(header.foldButton, section: section, expanded: expanded, animated: false)

@@ -9,7 +9,7 @@
     <defaultVisibleRows>1</defaultVisibleRows>
     <scrollEnabled>false</scrollEnabled>
     <foldControl>
-        <position>bottom</position>
+        <position>footer</position>
         <content>title</content>
     </foldControl>
     <style>

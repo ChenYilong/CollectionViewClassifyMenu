@@ -141,7 +141,7 @@ class CYLReviewListScreen(private val context: Context, private val initialFilte
     CYLMenuScreen, CYLMenuDelegate, CYLMenuScreenLifecycle {
     private val store = CYLReviewStore.shared(context)
     override val title: CharSequence = CYLExampleLocalizedString(context, "评价(%lu)", store.reviews.size)
-    val filterView = CYLTagListView(context, CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon))
+    val filterView = CYLTagListView(context, CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.FOOTER, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon))
     var mode: CYLReviewFilteringMode = mode
         private set
     var query: CYLReviewQuerying = query(mode)

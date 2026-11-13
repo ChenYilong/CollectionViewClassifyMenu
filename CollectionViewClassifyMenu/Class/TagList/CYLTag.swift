@@ -545,16 +545,3 @@ extension CYLMenuStyle {
         return copy
     }
 }
-
-extension CYLMenuFoldControl {
-
-    /**
-     * A typed copy (`NSCopying` returns `Any`).
-     */
-    func cylCopy() -> CYLMenuFoldControl {
-        guard let copy = copy() as? CYLMenuFoldControl else {
-            preconditionFailure("CYLMenuFoldControl copies itself")
-        }
-        return copy
-    }
-}

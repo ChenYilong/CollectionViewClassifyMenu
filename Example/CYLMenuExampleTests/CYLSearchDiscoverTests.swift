@@ -44,7 +44,7 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
         let visible = screen.recentList.numberOfVisibleItems(inSection: 0)
         XCTAssertLessThan(visible, screen.recentSource.searches.count)
         XCTAssertTrue(recent.cell(at: ip(visible, 0)) is CYLTagFoldCell)
-        XCTAssertEqual(screen.recentList.foldControl.position, .inline)
+        XCTAssertEqual(screen.recentList.foldControl.position, .tail)
         XCTAssertEqual(screen.recentSource.clearButton.accessibilityLabel, "清空最近搜索")
         XCTAssertFalse(screen.recentSource.clearButton.isHidden)
         // 发现: two per row, the 热 icon after a hot title, the core's More button.

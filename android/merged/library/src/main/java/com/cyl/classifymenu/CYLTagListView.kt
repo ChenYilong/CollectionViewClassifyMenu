@@ -197,12 +197,12 @@ open class CYLTagListView @JvmOverloads constructor(
         set(value) {
             _foldControl = (value ?: CYLMenuFoldControl.noFoldControl()).copy()
             _foldStyle = when (_foldControl.position) {
-                CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom -> CYLMenuFoldStyle.CYLMenuFoldStyleFooterChevron
-                CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopTrailing,
-                CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopLeading -> CYLMenuFoldStyle.CYLMenuFoldStyleHeaderButton
-                CYLMenuFoldControlPosition.CYLMenuFoldControlPositionNone ->
+                CYLMenuFoldControlPosition.FOOTER -> CYLMenuFoldStyle.CYLMenuFoldStyleFooterChevron
+                CYLMenuFoldControlPosition.HEADER_TRAILING,
+                CYLMenuFoldControlPosition.HEADER_LEADING -> CYLMenuFoldStyle.CYLMenuFoldStyleHeaderButton
+                CYLMenuFoldControlPosition.NONE ->
                     if (_foldStyle == CYLMenuFoldStyle.CYLMenuFoldStyleTruncate) _foldStyle else CYLMenuFoldStyle.CYLMenuFoldStyleNone
-                CYLMenuFoldControlPosition.CYLMenuFoldControlPositionInline -> CYLMenuFoldStyle.CYLMenuFoldStyleNone
+                CYLMenuFoldControlPosition.TAIL -> CYLMenuFoldStyle.CYLMenuFoldStyleNone
             }
             reloadLayout()
         }
@@ -213,9 +213,9 @@ open class CYLTagListView @JvmOverloads constructor(
             _foldStyle = value
             _foldControl = when (value) {
                 CYLMenuFoldStyle.CYLMenuFoldStyleHeaderButton -> CYLMenuFoldControl.foldControlWithPosition(
-                    CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopTrailing, CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle)
+                    CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle)
                 CYLMenuFoldStyle.CYLMenuFoldStyleFooterChevron -> CYLMenuFoldControl.foldControlWithPosition(
-                    CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
+                    CYLMenuFoldControlPosition.FOOTER, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
                 else -> CYLMenuFoldControl.noFoldControl()
             }
             reloadLayout()
@@ -369,12 +369,12 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun itemHeight(): Float = CYLTagButton.heightForStyle(listStyle)
 
-    private fun foldIsInHeader(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopTrailing ||
-        _foldControl.position == CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopLeading
+    private fun foldIsInHeader(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.HEADER_TRAILING ||
+        _foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING
 
-    private fun foldIsInFooter(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.CYLMenuFoldControlPositionBottom
+    private fun foldIsInFooter(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.FOOTER
 
-    private fun foldIsInline(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.CYLMenuFoldControlPositionInline
+    private fun foldIsInline(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.TAIL
 
     private fun showsInlineFoldCell(section: Int): Boolean = foldIsInline() && canFoldSection(section)
 
@@ -962,7 +962,7 @@ open class CYLTagListView @JvmOverloads constructor(
     // MARK: Folding
 
     private fun canFoldRowCount(rowCount: Int): Boolean {
-        val folds = _foldStyle == CYLMenuFoldStyle.CYLMenuFoldStyleTruncate || _foldControl.position != CYLMenuFoldControlPosition.CYLMenuFoldControlPositionNone
+        val folds = _foldStyle == CYLMenuFoldStyle.CYLMenuFoldStyleTruncate || _foldControl.position != CYLMenuFoldControlPosition.NONE
         return folds && defaultVisibleRows > 0 && rowCount > defaultVisibleRows
     }
 
@@ -1018,7 +1018,7 @@ open class CYLTagListView @JvmOverloads constructor(
     }
 
     private fun foldAccessibilityLabel(section: Int): String {
-        val titled = _foldControl.position != CYLMenuFoldControlPosition.CYLMenuFoldControlPositionNone
+        val titled = _foldControl.position != CYLMenuFoldControlPosition.NONE
         val action = if (isSectionExpanded(section)) (if (titled) _foldControl.collapseTitle else listStyle.collapseTitle)
         else (if (titled) _foldControl.title else listStyle.expandTitle)
         val title = menuDataSource?.menuTitleForSection(section).orEmpty()
@@ -1374,7 +1374,7 @@ open class CYLTagListView @JvmOverloads constructor(
             if (foldButton.visibility == VISIBLE) {
                 val size = CYLSize(min(foldSize.width, width / 2), min(foldSize.height, height))
                 val y = floor((height - size.height) / 2)
-                if (_foldControl.position == CYLMenuFoldControlPosition.CYLMenuFoldControlPositionTopLeading) {
+                if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) {
                     place(foldButton, CYLRect(leading - 6, y, size.width, size.height))
                     leading += size.width - 6 + 4
                 } else {

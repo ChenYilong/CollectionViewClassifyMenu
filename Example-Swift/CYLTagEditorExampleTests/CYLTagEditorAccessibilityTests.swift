@@ -90,7 +90,7 @@ final class CYLTagEditorAccessibilityTests: CYLTagEditorTestCase {
     }
 
     func testIconOnlyTitleWithoutALabelIsDecorative() {
-        let list = CYLTagListView(foldControl: CYLMenuFoldControl(position: .bottom, content: .icon), title: nil,
+        let list = CYLTagListView(foldControl: CYLMenuFoldControl(position: .footer, content: .icon), title: nil,
                                   titleImage: UIImage(systemName: "tag.circle"), titlePosition: .topLeading)
         if list.titleImage?.accessibilityLabel == nil {
             XCTAssertFalse(list.titleView.isAccessibilityElement, "Hidden from VoiceOver rather than read as an empty element")

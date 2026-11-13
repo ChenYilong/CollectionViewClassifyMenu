@@ -276,11 +276,11 @@ counterpart. The score history is in [android.md](android.md).
 | `CYLTagTitleFontForTraitCollection` (CYLParameterConfiguration.h) | function | `CYLTagTitleFontForTraitCollection` |
 | `CYLTagTitleFont` (CYLParameterConfiguration.h) | macro | `CYLTagTitleFont` |
 | `CYLMenuFoldControlPosition` (CYLMenuFoldControl.h) | enum | `com.cyl.classifymenu.CYLMenuFoldControlPosition` |
-| `CYLMenuFoldControlPositionNone` (CYLMenuFoldControl.h) | enum value | `CYLMenuFoldControlPositionNone` |
-| `CYLMenuFoldControlPositionBottom` (CYLMenuFoldControl.h) | enum value | `CYLMenuFoldControlPositionBottom` |
-| `CYLMenuFoldControlPositionTopTrailing` (CYLMenuFoldControl.h) | enum value | `CYLMenuFoldControlPositionTopTrailing` |
-| `CYLMenuFoldControlPositionTopLeading` (CYLMenuFoldControl.h) | enum value | `CYLMenuFoldControlPositionTopLeading` |
-| `CYLMenuFoldControlPositionInline` (CYLMenuFoldControl.h) | enum value | `CYLMenuFoldControlPositionInline` |
+| `CYLMenuFoldControlPositionNone` (CYLMenuFoldControl.swift) | enum value | `CYLMenuFoldControlPosition.NONE` |
+| `CYLMenuFoldControlPositionFooter` (CYLMenuFoldControl.swift) | enum value | `CYLMenuFoldControlPosition.FOOTER` |
+| `CYLMenuFoldControlPositionHeaderTrailing` (CYLMenuFoldControl.swift) | enum value | `CYLMenuFoldControlPosition.HEADER_TRAILING` |
+| `CYLMenuFoldControlPositionHeaderLeading` (CYLMenuFoldControl.swift) | enum value | `CYLMenuFoldControlPosition.HEADER_LEADING` |
+| `CYLMenuFoldControlPositionTail` (CYLMenuFoldControl.swift) | enum value | `CYLMenuFoldControlPosition.TAIL` |
 | `CYLMenuFoldControlContent` (CYLMenuFoldControl.h) | enum | `com.cyl.classifymenu.CYLMenuFoldControlContent` |
 | `CYLMenuFoldControlContentIconAndTitle` (CYLMenuFoldControl.h) | enum value | `CYLMenuFoldControlContentIconAndTitle` |
 | `CYLMenuFoldControlContentTitle` (CYLMenuFoldControl.h) | enum value | `CYLMenuFoldControlContentTitle` |

@@ -213,7 +213,7 @@ class CYLTagConfigurationScreen(private val context: Context) : CYLMenuScreen, C
             )
             return mapOf(
                 CYLTagListViewSelectionMode to CYLMenuSelectionMode.CYLMenuSelectionModeMultiple,
-                CYLTagListViewFoldControl to CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.CYLMenuFoldControlPositionNone, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon),
+                CYLTagListViewFoldControl to CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.NONE, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon),
                 CYLTagListViewScrollEnabled to false,
                 CYLTagListViewSelectedItems to listOf(CYLIndexPath(1, 0)),
                 CYLTagListViewStyle to style,

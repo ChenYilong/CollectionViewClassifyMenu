@@ -2,7 +2,7 @@
 //  CYLTagFoldCell.swift
 //  CollectionViewClassifyMenu
 //
-//  The inline fold control of CYLTagListView (CYLMenuFoldControlPosition.inline): a cell among the tags, after the
+//  The inline fold control of CYLTagListView (CYLMenuFoldControlPosition.tail): a cell among the tags, after the
 //  last visible one, drawn like a tag.
 //  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
 //

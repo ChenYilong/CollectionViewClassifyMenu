@@ -161,7 +161,7 @@ class CYLSearchDiscoverScreen(private val context: Context, private val navigato
     val discoverSource = CYLDiscoverSource(context)
     var random: Random = Random.Default
     val searchField = EditText(context)
-    val recentList = CYLTagListView(context, CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.CYLMenuFoldControlPositionInline, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon))
+    val recentList = CYLTagListView(context, CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.TAIL, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon))
     val discoverList = CYLTagListView(context)
     val hintLabel = TextView(context)
     val micButton = ImageButton(context)
