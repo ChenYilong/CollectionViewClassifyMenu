@@ -194,6 +194,47 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
   the translated code and score after each fix until 100. TagViewGroup is reimplemented (GPL-3.0): read its pull
   requests and issues as behavior only, copy no code.
 
+## TODO (2026-11-13): Android bug: a long tag is shortened instead of starting a new line (Container tab)
+
+- **Context:** in the merged example's Container tab (first container), the tag "Welcome to use AndroidTagView!" is
+  drawn as "Welcome to use Andro…" after "Html" on the same line, although on a line of its own it would show in
+  full (the same for "你好，这是一个TAG。你好，这是一个TAG。"). Bug of the Android core (`co.lujun.androidtagview`).
+- **Expected (the iOS strategy, `CYLTagListView` -cyl_widthsForContentWidth: and the left-aligned layout):** a tag
+  is as wide as its whole text, at most one line's width. When it does not fit in the space left on the current
+  line, it starts a new line. When it is wider than a whole line, it still starts a new line, as the first tag of
+  that line, and only then is its text shortened with an ellipsis to the line's width. A tag never stays after
+  other tags in a shortened form when a new line would show more of it.
+- **Kept:** one line of text per tag by default; wrapping only when the caller asks for it (`tag_text_wrap`). An
+  explicit maximum length (`tag_max_length` set by the caller) still shortens the text with an ellipsis.
+- **Cause:** the default character limit (23, `tag_max_length` unset) shortened every longer text before the line
+  was chosen, so the shortened tag fitted after "Html".
+- **Fix:** the default is no character limit; the width of the whole text decides the line; a tag wider than a
+  line starts a new line and is shortened to the line's width.
+- **Status:** TODO.
+- **User prompt (verbatim, 2026-11-13, with the Container tab screenshot):**
+
+> 全英文记录：图中演示，tag含有welcome字样的cell应该另外新起一行以保证文字能够最大可能展示完整而非使用省略符号。标记为android端bug，标记todo参考iOS端实现策略，换行策略，修复core核心层面代码以修复该bug，找到android端相关文档标记TODO。
+
+> 还是保留默认一样的逻辑，如非用户指定接口允许换行还是一行。允许超出一行的所限制的允许最大输入，末尾显示省略号是可以接受的。本次主要修复的是。在一行的限制下，明知本cell在追加到已经存在的cell后面无法完全显示，或者单独的cell即使占据一行也无法显示的情况下依然不换行占据第一个cell，而是选择追加到已经存在的cell后面，导致更多内容被设置为省略号。参考我刚刚的描述，重新执行下面的指令：全英文记录：图中演示，tag含有welcome字样的cell应该另外新起一行以保证文字能够最大可能展示完整而非使用省略符号。标记为android端bug，标记todo参考iOS端实现策略，换行策略，修复core核心层面代码以修复该bug，找到android端相关文档标记TODO。
+
+- **English:** keep the default: one line per tag unless the caller enables wrapping; an ellipsis at the end is
+  acceptable for text longer than one line allows. The bug: within the one-line limit, a tag that cannot be shown in
+  full after the tags already on the line, or that cannot be shown in full even on a line of its own, is appended
+  after the existing tags instead of starting a new line as its first tag, so more of its text becomes an ellipsis.
+  The "Welcome" tag in the screenshot must start a new line to show as much text as possible. Android bug; follow
+  the iOS line-break strategy; fix it in the core; mark it TODO in the Android document.
+
+## TODO (2026-11-13): merge the open pull requests into this branch, keep one pull request
+
+- **Context / requirements:** merge every open pull request of this repository into `feat/android-kotlin` and
+  close it after merging; commit local uncommitted work to this branch; keep one pull request (#16) and one active
+  branch (`feat/android-kotlin`).
+- **Status:** TODO.
+- **User prompt (verbatim, 2026-11-13):**
+
+> 合并所有处于open 状态的pr到本分支，或者本地所有未提交的代码到本分支 continue
+> 合并所有处于open 状态的pr到本分支，合并后close pr，或者本地所有未提交的代码到本分支 。仅保留一个pr，一个活跃分支为本分支 continue
+
 ## Score history
 
 Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out of 100; one row per change of
