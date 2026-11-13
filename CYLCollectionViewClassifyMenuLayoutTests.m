@@ -16,8 +16,8 @@ static NSArray<NSDictionary *> *CYLTestDataSource(void) {
 static NSArray<NSString *> *CYLTestAllTags(void) {
     NSMutableArray *tags = [NSMutableArray array];
     for (NSDictionary *section in CYLTestDataSource()) {
-        for (NSDictionary *item in section[kDataSourceSectionKey]) {
-            [tags addObject:item[kDataSourceCellTextKey]];
+        for (NSDictionary *item in section[CYLMenuKeys.dataSourceSectionKey]) {
+            [tags addObject:item[CYLMenuKeys.dataSourceCellTextKey]];
         }
     }
     return tags;
@@ -105,8 +105,8 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     NSUInteger index = 0;
     for (NSDictionary *section in source) {
         NSMutableArray *titles = [NSMutableArray array];
-        for (NSDictionary *item in section[kDataSourceSectionKey]) {
-            NSString *title = item[kDataSourceCellTextKey];
+        for (NSDictionary *item in section[CYLMenuKeys.dataSourceSectionKey]) {
+            NSString *title = item[CYLMenuKeys.dataSourceCellTextKey];
             XCTAssertNotNil(title);
             [titles addObject:[title stringByAppendingString:index++ % 2 ? @" 🍜 长文字示例" : @" 🧑‍🍳✨ 很长的测试标签包含多个 emoji"]];
         }
@@ -219,14 +219,14 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
         NSMutableDictionary *section = [original mutableCopy];
         NSMutableArray *items = [NSMutableArray array];
         NSMutableArray *titles = [NSMutableArray array];
-        for (NSDictionary *originalItem in original[kDataSourceSectionKey]) {
+        for (NSDictionary *originalItem in original[CYLMenuKeys.dataSourceSectionKey]) {
             NSMutableDictionary *item = [originalItem mutableCopy];
-            NSString *title = [item[kDataSourceCellTextKey] stringByAppendingString:@" 🧑‍🍳✨ 更长的测试标签"];
-            item[kDataSourceCellTextKey] = title;
+            NSString *title = [item[CYLMenuKeys.dataSourceCellTextKey] stringByAppendingString:@" 🧑‍🍳✨ 更长的测试标签"];
+            item[CYLMenuKeys.dataSourceCellTextKey] = title;
             [items addObject:item];
             [titles addObject:title];
         }
-        section[kDataSourceSectionKey] = items;
+        section[CYLMenuKeys.dataSourceSectionKey] = items;
         [menuData addObject:section];
         [menuTitles addObject:titles];
         [expanded addObject:@(expanded.count)];
@@ -298,12 +298,12 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     for (NSDictionary *original in source) {
         NSMutableDictionary *section = [original mutableCopy];
         NSMutableArray *items = [NSMutableArray array];
-        for (NSDictionary *originalItem in original[kDataSourceSectionKey]) {
+        for (NSDictionary *originalItem in original[CYLMenuKeys.dataSourceSectionKey]) {
             NSMutableDictionary *item = [originalItem mutableCopy];
-            item[kDataSourceCellTextKey] = [item[kDataSourceCellTextKey] stringByAppendingString:@" 🍜✨ 较长的标签"];
+            item[CYLMenuKeys.dataSourceCellTextKey] = [item[CYLMenuKeys.dataSourceCellTextKey] stringByAppendingString:@" 🍜✨ 较长的标签"];
             [items addObject:item];
         }
-        section[kDataSourceSectionKey] = items;
+        section[CYLMenuKeys.dataSourceSectionKey] = items;
         [menuData addObject:section];
     }
     UIViewController *menu = [[NSClassFromString(@"CYLClassifyMenuViewController") alloc] init];
@@ -322,7 +322,7 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     for (NSInteger section = 0; section < menuData.count; section++) {
         CGFloat used = 0;
         NSUInteger expected = 0;
-        NSArray *items = menuData[section][kDataSourceSectionKey];
+        NSArray *items = menuData[section][CYLMenuKeys.dataSourceSectionKey];
         for (NSInteger item = 0; item < items.count; item++) {
             NSIndexPath *path = [NSIndexPath indexPathForItem:item inSection:section];
             CGFloat width = [delegate collectionView:collectionView layout:collectionView.collectionViewLayout sizeForItemAtIndexPath:path].width;
