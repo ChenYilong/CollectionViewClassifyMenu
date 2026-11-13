@@ -44,8 +44,7 @@
 		41C6896E1C575A64007E0D89 /* CYLTagHeaderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagHeaderCell.xib; sourceTree = "<group>"; };
 		41C689721C575AA1007E0D89 /* CYLTagCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagCell.swift"; sourceTree = "<group>"; };
 		41C689731C575AA1007E0D89 /* CYLTagCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagCell.xib; sourceTree = "<group>"; };
-		41C689761C575B12007E0D89 /* CYLTagGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagGroup.h; sourceTree = "<group>"; };
-		41C689771C575B12007E0D89 /* CYLTagGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagGroup.m; sourceTree = "<group>"; };
+		41C689771C575B12007E0D89 /* CYLTagGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagGroup.swift"; sourceTree = "<group>"; };
 		41C689791C575B1A007E0D89 /* CYLTagModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTagModel.h; sourceTree = "<group>"; };
 		41C6897A1C575B1A007E0D89 /* CYLTagModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTagModel.m; sourceTree = "<group>"; };
 		41C689801C575B6D007E0D89 /* CYLTagView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagView.xib; sourceTree = "<group>"; };
@@ -141,8 +140,7 @@
 		41C6896B1C575A4D007E0D89 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				41C689761C575B12007E0D89 /* CYLTagGroup.h */,
-				41C689771C575B12007E0D89 /* CYLTagGroup.m */,
+				41C689771C575B12007E0D89 /* CYLTagGroup.swift */,
 				41C689791C575B1A007E0D89 /* CYLTagModel.h */,
 				41C6897A1C575B1A007E0D89 /* CYLTagModel.m */,
 			);

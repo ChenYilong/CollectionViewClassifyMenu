@@ -29,19 +29,15 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
      */
     @objc open weak var menuDelegate: CYLMenuDelegate!
 
-    private var filterParamsToolStorage: CYLFilterParamsTool?
+    /**
+     * The items' titles, per section.
+     */
+    private var titles: [[String]] = []
 
     /**
-     * The sections' titles and the selection; @objc so the core's Objective-C tests can read it (key-value coding).
+     * Whether each item is selected, per section (the same shape as `titles`).
      */
-    @objc private var filterParamsTool: CYLFilterParamsTool {
-        if let filterParamsToolStorage {
-            return filterParamsToolStorage
-        }
-        let tool = CYLFilterParamsTool()
-        filterParamsToolStorage = tool
-        return tool
-    }
+    private var selection: [[Bool]] = []
 
     // MARK: - Life cycle
 
@@ -68,27 +64,27 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
      * selected.
      */
     @objc open func reloadMenuData() {
-        let sections = NSMutableArray()
-        let selected = NSMutableArray()
+        var titles: [[String]] = []
+        var selection: [[Bool]] = []
         if let source = menuDataSource {
             let hasExclusive = source.responds(to: #selector(CYLMenuDataSource.menuItemIsExclusive(at:)))
             for section in 0..<source.numberOfSectionsInMenu() {
-                let items = NSMutableArray()
-                let states = NSMutableArray()
+                var items: [String] = []
+                var states: [Bool] = []
                 var selectedExclusive = false
                 for item in 0..<source.menuNumberOfItems(inSection: section) {
                     let indexPath = IndexPath(item: item, section: section)
-                    items.add(source.menuTitleForItem(at: indexPath))
+                    items.append(source.menuTitleForItem(at: indexPath))
                     let exclusive = hasExclusive && source.menuItemIsExclusive?(at: indexPath) == true
-                    states.add(NSNumber(value: exclusive && !selectedExclusive))
+                    states.append(exclusive && !selectedExclusive)
                     selectedExclusive = selectedExclusive || exclusive
                 }
-                sections.add(items)
-                selected.add(states)
+                titles.append(items)
+                selection.append(states)
             }
         }
-        filterParamsTool.dataSources = sections as? [Any]
-        filterParamsTool.filterParamsArray = selected
+        self.titles = titles
+        self.selection = selection
         if isViewLoaded {
             collectionView.reloadData()
         }
@@ -99,13 +95,9 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
      */
     @discardableResult
     @objc open func selectedIndexPaths() -> [IndexPath]! {
-        var paths: [IndexPath] = []
-        for case let (sectionIndex, section as NSArray) in (filterParamsTool.filterParamsArray ?? []).enumerated() {
-            for case let (item, value as NSNumber) in section.enumerated() where value.boolValue {
-                paths.append(IndexPath(item: item, section: sectionIndex))
-            }
+        selection.enumerated().flatMap { section, states in
+            states.indices.filter { states[$0] }.map { IndexPath(item: $0, section: section) }
         }
-        return paths
     }
 
     /**
@@ -116,14 +108,12 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     @objc open func setSelectedIndexPaths(_ indexPaths: [IndexPath]!) {
         loadViewIfNeeded()
         let indexPaths = indexPaths ?? []
-        let dataSources = filterParamsTool.dataSources ?? []
         let source = menuDataSource
         let hasExclusive = source?.responds(to: #selector(CYLMenuDataSource.menuItemIsExclusive(at:))) == true
         var exclusiveSections = IndexSet()
         var otherSections = IndexSet()
         for path in indexPaths {
-            guard path.section < dataSources.count, let items = dataSources[path.section] as? NSArray,
-                  path.item < items.count else {
+            guard titles.indices.contains(path.section), titles[path.section].indices.contains(path.item) else {
                 NSException(name: .invalidArgumentException, reason: "Invalid menu selection: \(path)", userInfo: nil)
                     .raise()
                 return
@@ -141,14 +131,9 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
                 otherSections.insert(path.section)
             }
         }
-        let settings = filterParamsTool.filterParamsArray ?? NSMutableArray()
-        for case let section as NSMutableArray in settings {
-            for index in 0..<section.count {
-                section[index] = NSNumber(value: false)
-            }
-        }
+        selection = selection.map { Array(repeating: false, count: $0.count) }
         for path in indexPaths {
-            (settings[path.section] as? NSMutableArray)?[path.item] = NSNumber(value: true)
+            selection[path.section][path.item] = true
         }
         collectionView.reloadData()
     }
@@ -168,11 +153,11 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     // MARK: - UICollectionViewDataSource
 
     open func numberOfSections(in collectionView: UICollectionView) -> Int {
-        filterParamsTool.dataSources?.count ?? 0
+        titles.count
     }
 
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        (filterParamsTool.dataSources?[section] as? NSArray)?.count ?? 0
+        titles.indices.contains(section) ? titles[section].count : 0
     }
 
     open func collectionView(_ collectionView: UICollectionView,
@@ -191,9 +176,10 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     open func collectionView(_ collectionView: UICollectionView,
                              cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let reused = collectionView.dequeueReusableCell(withReuseIdentifier: "CYLFilterCollectionCell", for: indexPath)
-        guard let cell = reused as? CYLFilterCollectionCell, let button = cell.titleButton else {
+        guard let cell = reused as? CYLFilterCollectionCell else {
             return reused
         }
+        let button = cell.titleButton
         let text = title(at: indexPath)
         button.setTitle(text, for: .normal)
         button.setTitle(text, for: .selected)
@@ -212,31 +198,30 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
 
     @objc(collectionView:didSelectItemAtIndexPath:)
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let setting = filterParamsTool.filterParamsArray?[indexPath.section] as? NSMutableArray else {
+        guard selection.indices.contains(indexPath.section) else {
             return
         }
+        var setting = selection[indexPath.section]
         let source = menuDataSource
         let hasExclusive = source?.responds(to: #selector(CYLMenuDataSource.menuItemIsExclusive(at:))) == true
         func isExclusive(_ item: Int) -> Bool {
             hasExclusive && source?.menuItemIsExclusive?(at: IndexPath(item: item, section: indexPath.section)) == true
         }
-        let wasSelected = (setting[indexPath.item] as? NSNumber)?.boolValue ?? false
         if isExclusive(indexPath.item) {
-            for item in 0..<setting.count {
-                setting[item] = NSNumber(value: item == indexPath.item)
-            }
+            setting = setting.indices.map { $0 == indexPath.item }
         } else {
-            setting[indexPath.item] = NSNumber(value: !wasSelected)
-            for item in 0..<setting.count where isExclusive(item) {
-                setting[item] = NSNumber(value: false)
+            setting[indexPath.item].toggle()
+            for item in setting.indices where isExclusive(item) {
+                setting[item] = false
             }
-            if hasExclusive && !setting.contains(NSNumber(value: true)) {
+            if hasExclusive && !setting.contains(true) {
                 // Nothing left selected: fall back to the section's first exclusive item ("All").
-                if let first = (0..<setting.count).first(where: isExclusive) {
-                    setting[first] = NSNumber(value: true)
+                if let first = setting.indices.first(where: isExclusive) {
+                    setting[first] = true
                 }
             }
         }
+        selection[indexPath.section] = setting
         self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
         menuDelegate?.menu?(self, didSelectItemAt: indexPath)
     }
@@ -273,12 +258,13 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     // MARK: - Private
 
     private func title(at indexPath: IndexPath) -> String {
-        ((filterParamsTool.dataSources?[indexPath.section] as? NSArray)?[indexPath.row] as? String) ?? ""
+        titles.indices.contains(indexPath.section) && titles[indexPath.section].indices.contains(indexPath.row)
+            ? titles[indexPath.section][indexPath.row] : ""
     }
 
     private func isSelected(at indexPath: IndexPath) -> Bool {
-        let section = filterParamsTool.filterParamsArray?[indexPath.section] as? NSArray
-        return (section?[indexPath.row] as? NSNumber)?.boolValue ?? false
+        selection.indices.contains(indexPath.section) && selection[indexPath.section].indices.contains(indexPath.row)
+            && selection[indexPath.section][indexPath.row]
     }
 
     private func tagFont() -> UIFont {

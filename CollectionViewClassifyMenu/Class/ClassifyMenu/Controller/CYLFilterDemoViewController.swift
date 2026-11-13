@@ -4,8 +4,7 @@
 //
 //  The demo app's Filter tab: the multiple-choice filter (CYLMultipleFilterController) behind the left bar button,
 //  sliding in from the left over most of the screen; the selected regions and dishes query the shared example
-//  database (CYLDemoPlaces, the same SQLite file as the Android example), shown with the SQL and the rows. The selection is stored in the user defaults; selections
-//  archived by older versions (CYLFilterParamsTool) are migrated once. The plus button's page, CYLDemoAboutViewController,
+//  database (CYLDemoPlaces, the same SQLite file as the Android example), shown with the SQL and the rows. The selection is stored in the user defaults. The plus button's page, CYLDemoAboutViewController,
 //  is here too.
 //
 
@@ -143,7 +142,7 @@ final class CYLFilterDemoViewController: UIViewController {
         controller.menuDelegate = self
         controller.loadViewIfNeeded()
         storedFilterController = controller
-        if let stored = UserDefaults.standard.array(forKey: Self.filterSelectionKey) ?? legacyFilterSelection() {
+        if let stored = UserDefaults.standard.array(forKey: Self.filterSelectionKey) {
             if let paths = validatedSelection(stored) {
                 controller.setSelectedIndexPaths(paths)
             } else {
@@ -151,70 +150,6 @@ final class CYLFilterDemoViewController: UIViewController {
             }
         }
         return controller
-    }
-
-    func legacyFilterSelection() -> [Any]? {
-        guard let filename = CYLFilterParamsTool().filename, FileManager.default.fileExists(atPath: filename) else {
-            return nil
-        }
-        let data: Data
-        do {
-            data = try Data(contentsOf: URL(fileURLWithPath: filename))
-        } catch {
-            NSLog("Cannot read existing demo filter settings: %@", error.localizedDescription)
-            return nil
-        }
-        guard let result = selection(fromLegacyArchiveData: data) else {
-            return nil
-        }
-        UserDefaults.standard.set(result, forKey: Self.filterSelectionKey)
-        return result
-    }
-
-    /// The [section, item] pairs of the selected items of a legacy CYLFilterParamsTool archive, nil when it cannot
-    /// be read or does not match the filter's sections and items.
-    func selection(fromLegacyArchiveData data: Data) -> [[Int]]? {
-        let archive: Any?
-        do {
-            let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
-            // Legacy archives were written without secure coding.
-            unarchiver.requiresSecureCoding = false
-            archive = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey)
-            unarchiver.finishDecoding()
-        } catch {
-            NSLog("Cannot decode existing demo filter settings: %@", error.localizedDescription)
-            return nil
-        }
-        guard let tool = archive as? CYLFilterParamsTool else {
-            NSLog("Cannot migrate existing demo filter settings: unexpected archive type")
-            return nil
-        }
-        guard let filterSource, let sections = tool.filterParamsArray as? [Any],
-              sections.count == filterSource.numberOfSectionsInMenu() else {
-            NSLog("Cannot migrate existing demo filter settings: section count changed.")
-            return nil
-        }
-        var result: [[Int]] = []
-        for (section, value) in sections.enumerated() {
-            guard let states = value as? [Any], states.count == filterSource.menuNumberOfItems(inSection: section) else {
-                NSLog("Cannot migrate existing demo filter settings: item count changed in section %ld.", section)
-                return nil
-            }
-            for (item, state) in states.enumerated() {
-                guard let number = state as? NSNumber else {
-                    NSLog("Cannot migrate existing demo filter settings: invalid item state.")
-                    return nil
-                }
-                if number.boolValue {
-                    result.append([section, item])
-                }
-            }
-        }
-        guard validatedSelection(result) != nil else {
-            NSLog("Cannot migrate existing demo filter settings: conflicting selection.")
-            return nil
-        }
-        return result
     }
 
     /// The index paths of stored [section, item] pairs, nil when one is malformed, out of range, or conflicts

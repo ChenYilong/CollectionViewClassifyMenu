@@ -15,6 +15,16 @@ import UIKit
 @objc(CYLTagView)
 open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CYLTagHeaderCellDelegate {
 
+    /**
+     * The insets of every group's tags.
+     */
+    @objc public static let sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 10, right: 16)
+
+    /**
+     * The horizontal space between two tags of a row.
+     */
+    @objc public static let cellSpacing: CGFloat = 12
+
     private static let tagCellIdentifier = "CellIdentifier"
     private static let headerCellIdentifier = "HeaderViewCellIdentifier"
 
@@ -108,12 +118,12 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
                         items.append(model)
                     }
                 }
-                group.itemArr = items
+                group.items = items
                 groups.add(group)
             }
         }
         for case let group as CYLTagGroup in groups {
-            group.width = Float(collectionView.bounds.width)
+            group.width = collectionView.bounds.width
         }
         self.groups = groups
         collectionView.reloadData()
@@ -127,7 +137,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
         if width != lastCollectionWidth {
             lastCollectionWidth = width
             for case let group as CYLTagGroup in groups ?? [] {
-                group.width = Float(width)
+                group.width = width
             }
             collectionView.reloadData()
         }
@@ -156,9 +166,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
         guard let group = group(at: section) else {
             return 0
         }
-        let count = group.isOpened ? (group.itemArr?.count ?? 0)
-                                   : Int(group.firstRowCellCount(forContentWidth: contentWidth(of: collectionView)))
-        return count
+        return group.isOpened ? group.items.count : group.firstRowCellCount(forContentWidth: contentWidth(of: collectionView))
     }
 
     open func collectionView(_ collectionView: UICollectionView,
@@ -205,7 +213,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     open func collectionView(_ collectionView: UICollectionView,
                              layout collectionViewLayout: UICollectionViewLayout,
                              minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        CGFloat(kTagCollectionViewCellsHorizonMargin)
+        Self.cellSpacing
     }
 
     open func collectionView(_ collectionView: UICollectionView,
@@ -214,14 +222,13 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
         guard isShowHeader, let group = group(at: section) else {
             return .zero
         }
-        return CGSize(width: contentWidth(of: collectionView), height: CGFloat(group.height))
+        return CGSize(width: contentWidth(of: collectionView), height: group.height)
     }
 
     open func collectionView(_ collectionView: UICollectionView,
                              layout collectionViewLayout: UICollectionViewLayout,
                              insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: CGFloat(kTagCollectionViewToTopMargin), left: CGFloat(kTagCollectionViewToLeftMargin),
-                     bottom: CGFloat(kTagCollectionViewToBottomtMargin), right: CGFloat(kTagCollectionViewToRightMargin))
+        Self.sectionInset
     }
 
     // MARK: - Private
@@ -251,11 +258,10 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
      */
     private func updateTagSizes() {
         for case let group as CYLTagGroup in groups ?? [] {
-            for case let model as CYLTagModel in group.itemArr ?? [] {
+            for model in group.items {
                 model.updateSize(for: traitCollection)
             }
-            // Re-assigning invalidates the group's cached row counts.
-            group.itemArr = group.itemArr
+            group.invalidateRowCounts()
         }
         collectionView.collectionViewLayout.invalidateLayout()
         collectionView.reloadData()
@@ -269,14 +275,13 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     }
 
     private func model(at indexPath: IndexPath) -> CYLTagModel? {
-        guard let items = group(at: indexPath.section)?.itemArr, indexPath.row < items.count else {
+        guard let items = group(at: indexPath.section)?.items, items.indices.contains(indexPath.row) else {
             return nil
         }
-        return items[indexPath.row] as? CYLTagModel
+        return items[indexPath.row]
     }
 
     private func contentWidth(of collectionView: UICollectionView) -> CGFloat {
-        max(0, collectionView.bounds.width - CGFloat(kTagCollectionViewToLeftMargin)
-               - CGFloat(kTagCollectionViewToRightMargin))
+        max(0, collectionView.bounds.width - Self.sectionInset.left - Self.sectionInset.right)
     }
 }

@@ -50,28 +50,22 @@
 		7419754AC50CEEE7B0F88DE4 /* Pods-CollectionViewClassifyMenu.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenu.debug.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenu/Pods-CollectionViewClassifyMenu.debug.xcconfig"; sourceTree = "<group>"; };
 		8255833E02347CE0E51C652D /* libPods-CollectionViewClassifyMenu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CollectionViewClassifyMenu.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A09E2BA1BC7AFF00060C116 /* CYLClassifyMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLClassifyMenuViewController.swift"; sourceTree = "<group>"; };
-		9A09E2BF1BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+CYLCollectionCellStyle.h"; sourceTree = "<group>"; };
-		9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+CYLCollectionCellStyle.m"; sourceTree = "<group>"; };
+		9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+CYLCollectionCellStyle.swift"; sourceTree = "<group>"; };
 		9A09E2C31BC7AFF00060C116 /* CYLCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLCollectionViewCell.swift"; sourceTree = "<group>"; };
 		9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterHeaderView.swift"; sourceTree = "<group>"; };
 		9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLIndexPathButton.h; sourceTree = "<group>"; };
 		9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLIndexPathButton.m; sourceTree = "<group>"; };
-		9A09E2C81BC7AFF00060C116 /* CYLRightImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLRightImageButton.h; sourceTree = "<group>"; };
-		9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLRightImageButton.m; sourceTree = "<group>"; };
+		9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLRightImageButton.swift"; sourceTree = "<group>"; };
 		9A09E2CD1BC7AFF00060C116 /* CYLMultipleFilterController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLMultipleFilterController.swift"; sourceTree = "<group>"; };
 		9A09E2CF1BC7AFF00060C116 /* CYLFilterBaseController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterBaseController.swift"; sourceTree = "<group>"; };
 		9A09E2D01BC7AFF00060C116 /* CYLFilterBaseController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLFilterBaseController.xib; sourceTree = "<group>"; };
-		9A09E2D31BC7AFF00060C116 /* UIImage+CYLBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYLBlur.h"; sourceTree = "<group>"; };
-		9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CYLBlur.m"; sourceTree = "<group>"; };
+		9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+CYLBlur.swift"; sourceTree = "<group>"; };
 		9A09E2D51BC7AFF00060C116 /* UIView+CYLGeneral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+CYLGeneral.h"; sourceTree = "<group>"; };
 		9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+CYLGeneral.m"; sourceTree = "<group>"; };
-		9A09E2D81BC7AFF00060C116 /* CYLFilterParamsTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterParamsTool.h; sourceTree = "<group>"; };
-		9A09E2D91BC7AFF00060C116 /* CYLFilterParamsTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterParamsTool.m; sourceTree = "<group>"; };
-		9A09E2DB1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMultipleFilterHeaderView.h; sourceTree = "<group>"; };
-		9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMultipleFilterHeaderView.m; sourceTree = "<group>"; };
+		9A09E2D91BC7AFF00060C116 /* CYLFilterParamsTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterParamsTool.swift"; sourceTree = "<group>"; };
+		9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLMultipleFilterHeaderView.swift"; sourceTree = "<group>"; };
 		9A09E2DD1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLMultipleFilterHeaderView.xib; sourceTree = "<group>"; };
-		9A09E2DE1BC7AFF00060C116 /* CYLFilterCollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLFilterCollectionCell.h; sourceTree = "<group>"; };
-		9A09E2DF1BC7AFF00060C116 /* CYLFilterCollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLFilterCollectionCell.m; sourceTree = "<group>"; };
+		9A09E2DF1BC7AFF00060C116 /* CYLFilterCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLFilterCollectionCell.swift"; sourceTree = "<group>"; };
 		9A09E2E31BC7AFF00060C116 /* NSArray+CYLLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSArray+CYLLog.swift"; sourceTree = "<group>"; };
 		9A09E2E51BC7AFF00060C116 /* NSDictionary+CYLLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDictionary+CYLLog.swift"; sourceTree = "<group>"; };
 		9A09E2E61BC7AFF00060C116 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
@@ -169,8 +163,7 @@
 		9A09E2BE1BC7AFF00060C116 /* Category */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2BF1BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.h */,
-				9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.m */,
+				9A09E2C01BC7AFF00060C116 /* UIButton+CYLCollectionCellStyle.swift */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -182,8 +175,7 @@
 				9A09E2C51BC7AFF00060C116 /* CYLFilterHeaderView.swift */,
 				9A09E2C61BC7AFF00060C116 /* CYLIndexPathButton.h */,
 				9A09E2C71BC7AFF00060C116 /* CYLIndexPathButton.m */,
-				9A09E2C81BC7AFF00060C116 /* CYLRightImageButton.h */,
-				9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.m */,
+				9A09E2C91BC7AFF00060C116 /* CYLRightImageButton.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -220,8 +212,7 @@
 		9A09E2D21BC7AFF00060C116 /* Category */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2D31BC7AFF00060C116 /* UIImage+CYLBlur.h */,
-				9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.m */,
+				9A09E2D41BC7AFF00060C116 /* UIImage+CYLBlur.swift */,
 				9A09E2D51BC7AFF00060C116 /* UIView+CYLGeneral.h */,
 				9A09E2D61BC7AFF00060C116 /* UIView+CYLGeneral.m */,
 			);
@@ -231,8 +222,7 @@
 		9A09E2D71BC7AFF00060C116 /* Tool */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2D81BC7AFF00060C116 /* CYLFilterParamsTool.h */,
-				9A09E2D91BC7AFF00060C116 /* CYLFilterParamsTool.m */,
+				9A09E2D91BC7AFF00060C116 /* CYLFilterParamsTool.swift */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -240,11 +230,9 @@
 		9A09E2DA1BC7AFF00060C116 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2DB1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.h */,
-				9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.m */,
+				9A09E2DC1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.swift */,
 				9A09E2DD1BC7AFF00060C116 /* CYLMultipleFilterHeaderView.xib */,
-				9A09E2DE1BC7AFF00060C116 /* CYLFilterCollectionCell.h */,
-				9A09E2DF1BC7AFF00060C116 /* CYLFilterCollectionCell.m */,
+				9A09E2DF1BC7AFF00060C116 /* CYLFilterCollectionCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";

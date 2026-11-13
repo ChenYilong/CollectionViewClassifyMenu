@@ -95,7 +95,7 @@
             UICollectionViewLayoutAttributes *attributes =
                 [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
             XCTAssertNotNil(attributes);
-            XCTAssertLessThanOrEqual(CGRectGetMaxX(attributes.frame), width - kTagCollectionViewToRightMargin + 0.5);
+            XCTAssertLessThanOrEqual(CGRectGetMaxX(attributes.frame), width - CYLTagView.sectionInset.right + 0.5);
             for (UICollectionViewLayoutAttributes *previous in items) {
                 XCTAssertFalse(CGRectIntersectsRect(attributes.frame, previous.frame));
             }
@@ -197,7 +197,7 @@
             [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
         XCTAssertNotNil(attributes);
         XCTAssertGreaterThan(CGRectGetHeight(attributes.frame), 35);
-        XCTAssertLessThanOrEqual(CGRectGetMaxX(attributes.frame), 240 - kTagCollectionViewToRightMargin + 0.5);
+        XCTAssertLessThanOrEqual(CGRectGetMaxX(attributes.frame), 240 - CYLTagView.sectionInset.right + 0.5);
         for (UICollectionViewLayoutAttributes *previous in items) {
             XCTAssertFalse(CGRectIntersectsRect(attributes.frame, previous.frame));
         }

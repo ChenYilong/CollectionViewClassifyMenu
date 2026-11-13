@@ -47,6 +47,6 @@ open class CYLCollectionViewCell: UICollectionViewCell {
         button.frame = contentView.bounds
         button.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         contentView.addSubview(button)
-        button.cyl_chengNiStyle()
+        button.cylApply(.chengNi)
     }
 }

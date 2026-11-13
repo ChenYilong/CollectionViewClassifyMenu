@@ -28,20 +28,13 @@ private final class CYLDemoTestMenuSource: NSObject, CYLMenuDataSource {
 
 final class CYLClassifyMenuDemoTests: XCTestCase {
 
-    func testLegacyFilterSelectionMigrationValidatesArchivedStates() throws {
+    func testStoredFilterSelectionIsValidated() {
         let source = CYLDemoTestMenuSource(sections: [["All", "One"], ["All", "Two"]])
         let controller = CYLFilterDemoViewController()
         controller.filterSource = source
-        let legacy = CYLFilterParamsTool()
-        legacy.filterParamsArray = NSMutableArray(array: [NSMutableArray(array: [0, 1]), NSMutableArray(array: [1, 0])])
-        var archive = try NSKeyedArchiver.archivedData(withRootObject: legacy, requiringSecureCoding: false)
-        XCTAssertEqual(controller.selection(fromLegacyArchiveData: archive), [[0, 1], [1, 0]])
-        XCTAssertNil(controller.selection(fromLegacyArchiveData: Data("invalid".utf8)))
+        XCTAssertNotNil(controller.validatedSelection([[0, 1], [1, 0]]))
         XCTAssertNil(controller.validatedSelection([[-1, 0]]))
         XCTAssertNil(controller.validatedSelection([[0, 0], [0, 1]]))
-        (legacy.filterParamsArray[0] as! NSMutableArray)[1] = "bad"
-        archive = try NSKeyedArchiver.archivedData(withRootObject: legacy, requiringSecureCoding: false)
-        XCTAssertNil(controller.selection(fromLegacyArchiveData: archive))
     }
 
     /// The two features have a tab each (Classify, Filter); the plus button's page is About.
