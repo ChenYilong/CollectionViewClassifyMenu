@@ -216,3 +216,14 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   Still TODO: step 3 (the Android view, Kotlin `com.cyl:classifymenu`), step 4 (the classify menu screen over
   `cyl_places.sqlite`), step 5 (tests on both platforms; a real slider instead of the speed steps).
+
+### TODO (2026-11-15): the React Native example inside CYLTabBarController's React Native component
+
+- **Requirement:** the example app's shell is CYLTabBarController's own React Native component
+  (`react-native-cyltabbar`, `CrossPlatform/` of its newest commit), not a plain React Native screen: the tag list demo
+  and (later) the classify menu are its tab pages, as the iOS and Flutter examples use CYLTabBarController.
+- **Prompt (verbatim):**
+
+  > RN的example 层也应使用 CYLTabBarController 的RN组件 作为Example层展示使用
+
+  English: the React Native example layer should also use CYLTabBarController's React Native component as its shell.
