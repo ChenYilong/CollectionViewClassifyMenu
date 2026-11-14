@@ -58,7 +58,7 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         let largeFont = view.style.titleFont(for: .normal, traitCollection: large)
         let base = view.style.normalAppearance.font.pointSize
         XCTAssertGreaterThan(largeFont.pointSize, base)
-        XCTAssertLessThanOrEqual(largeFont.pointSize, base * CYLMaximumFontScale + 0.01)
+        XCTAssertLessThanOrEqual(largeFont.pointSize, base * CYLTagMetrics.maximumFontScale + 0.01)
         let fixed = view.style.copy() as! CYLMenuStyle
         fixed.adjustsFontForContentSizeCategory = false
         XCTAssertEqual(fixed.titleFont(for: .normal, traitCollection: large).pointSize, base, accuracy: 0.01)

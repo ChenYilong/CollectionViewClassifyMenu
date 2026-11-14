@@ -986,7 +986,7 @@ open class CYLImageTagGroupView: UIView {
             return title?.isEmpty == false ? title : nil
         }
         let list = ListFormatter()
-        list.locale = Locale(identifier: CYLMenuResources.currentLanguage())
+        list.locale = Locale(identifier: CYLMenuResources.currentLanguage)
         let joined = list.string(from: titles) ?? ""
         circleAccessibilityElement.accessibilityLabel = String(format: CYLMenuLocalizedString("CYLImageTagGroup"), joined)
 

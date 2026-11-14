@@ -73,7 +73,7 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
      * A panel loaded from CYLFilterBaseController.xib in the component's bundle (also Objective-C's `-init`).
      */
     @objc public convenience init() {
-        self.init(nibName: "CYLFilterBaseController", bundle: CYLMenuResources.bundle())
+        self.init(nibName: "CYLFilterBaseController", bundle: CYLMenuResources.bundle)
     }
 
     // MARK: - Life cycle
@@ -95,7 +95,7 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
         collectionView.collectionViewLayout = CYLCollectionViewLeftAlignedLayout()
         collectionView.contentInset = UIEdgeInsets(top: 15, left: 0, bottom: 0, right: 0)
         collectionView.register(CYLFilterCollectionCell.self, forCellWithReuseIdentifier: "CYLFilterCollectionCell")
-        collectionView.register(UINib(nibName: "CYLMultipleFilterHeaderView", bundle: CYLMenuResources.bundle()),
+        collectionView.register(UINib(nibName: "CYLMultipleFilterHeaderView", bundle: CYLMenuResources.bundle),
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "CYLMultipleFilterHeaderView")
         contentView.cylAddTapTarget(self, action: #selector(hide))

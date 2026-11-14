@@ -103,8 +103,9 @@ final class CYLTagButtonTests: XCTestCase {
         XCTAssertEqual(appearance.borderWidth, 0)
         XCTAssertEqual(appearance.margin, 0)
         appearance.backgroundColor = .red
-        appearance.backgroundColor = nil
-        XCTAssertEqual(appearance.backgroundColor, UIColor.white, "null_resettable")
+        appearance.reset()
+        XCTAssertEqual(appearance.backgroundColor, CYLTagAppearance.defaultBackgroundColor, "reset restores the default")
+        XCTAssertEqual(CYLTagAppearance.defaultBackgroundColor, UIColor.white)
         appearance.reset()
         XCTAssertEqual(appearance.margin, 10)
 

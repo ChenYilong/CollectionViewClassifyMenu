@@ -51,7 +51,7 @@ open class CYLTagModel: NSObject {
      */
     @objc(titleFontForTraitCollection:)
     open class func titleFont(for traitCollection: UITraitCollection?) -> UIFont {
-        CYLScaledSystemFont(titleFontSize, traitCollection)
+        CYLTagMetrics.scaledSystemFont(ofSize: titleFontSize, traitCollection: traitCollection)
     }
 
     /**
@@ -63,6 +63,6 @@ open class CYLTagModel: NSObject {
         let font = Self.titleFont(for: traitCollection)
         let size = (title as NSString).size(withAttributes: [.font: font])
         width = ceil(size.width) + Self.horizontalPadding
-        height = CYLTagHeightForFont(font, Self.minimumHeight)
+        height = CYLTagMetrics.tagHeight(for: font, minimumHeight: Self.minimumHeight)
     }
 }

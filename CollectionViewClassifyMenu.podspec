@@ -14,8 +14,8 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.source_files = [
-    'CollectionViewClassifyMenu/Class/**/*.{h,m,swift}',
-    'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.{h,m,swift}'
+    'CollectionViewClassifyMenu/Class/**/*.swift',
+    'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.swift'
   ]
   # The demo apps' Swift files live next to the core's sources; the patterns above match Swift files (the core moves to
   # Swift), so they are excluded by name, with AppleDouble files.

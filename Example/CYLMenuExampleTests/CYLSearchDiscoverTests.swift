@@ -63,7 +63,7 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
         let more = try XCTUnwrap(screen.discoverList.views(withIdentifier: CYLTagListAccessibilityIdentifier.moreButton).first as? UIButton)
         XCTAssertFalse(more.isHidden)
         XCTAssertNotNil(more.currentImage, "The bundle's cyl_more icon")
-        XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_more"))
+        XCTAssertNotNil(CYLMenuResources.image(named: "cyl_more"))
         XCTAssertEqual(more.accessibilityLabel, "换一批", "VoiceOver says what the More button does")
         XCTAssertEqual(more.largeContentTitle, "换一批")
         // Every tag says what a tap does; the hint's sparkles are not read.

@@ -32,8 +32,8 @@ open class CYLRightImageButton: UIButton {
         titleLabel?.font = .systemFont(ofSize: 12)
         setTitleColor(.black, for: .normal)
         setTitleColor(.black, for: .selected)
-        setImage(CYLMenuResources.imageNamed("home_btn_more_normal"), for: .normal)
-        setImage(CYLMenuResources.imageNamed("home_btn_more_selected"), for: .selected)
+        setImage(CYLMenuResources.image(named: "home_btn_more_normal"), for: .normal)
+        setImage(CYLMenuResources.image(named: "home_btn_more_selected"), for: .selected)
     }
 
     /**

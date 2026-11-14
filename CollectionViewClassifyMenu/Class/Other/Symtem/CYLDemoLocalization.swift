@@ -4,7 +4,7 @@
 //
 //  The lookup of the demo app of CollectionViewClassifyMenu.xcodeproj (not part of the pod): its strings live in
 //  CYLClassifyMenuDemo.bundle (<language>.lproj/Localizable.strings), keyed by the Chinese source text, never in
-//  the core's CYLClassifyMenuResources.bundle. The language follows the core's (CYLMenuResources.currentLanguage()),
+//  the core's CYLClassifyMenuResources.bundle. The language follows the core's (CYLMenuResources.currentLanguage),
 //  so the demo and the component always agree. Use it for every user-facing string of the demo app, as
 //  CYLMenuLocalizedString does for the core bundle.
 //
@@ -18,7 +18,7 @@ enum CYLDemoLocalization {
 
     /// The .lproj of the current language, else English.
     static var languageBundle: Bundle? {
-        for language in [CYLMenuResources.currentLanguage(), "en"] {
+        for language in [CYLMenuResources.currentLanguage, "en"] {
             if let path = bundle?.path(forResource: language, ofType: "lproj"), let lproj = Bundle(path: path) {
                 return lproj
             }

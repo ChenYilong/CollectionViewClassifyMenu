@@ -77,8 +77,8 @@ open class CYLFilterHeaderView: UICollectionReusableView {
         titleButton.setTitleColor(.black, for: .selected)
         addSubview(titleButton)
 
-        moreButton.setImage(CYLMenuResources.imageNamed("home_btn_more_normal"), for: .normal)
-        moreButton.setImage(CYLMenuResources.imageNamed("home_btn_more_selected"), for: .selected)
+        moreButton.setImage(CYLMenuResources.image(named: "home_btn_more_normal"), for: .normal)
+        moreButton.setImage(CYLMenuResources.image(named: "home_btn_more_selected"), for: .selected)
         moreButton.setTitleColor(.black, for: .normal)
         moreButton.setTitleColor(.black, for: .selected)
         moreButton.setTitle(CYLMenuLocalizedString("CYLMenuExpand"), for: .normal)

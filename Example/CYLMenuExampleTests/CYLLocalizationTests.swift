@@ -13,9 +13,9 @@ import CollectionViewClassifyMenu
 final class CYLLocalizationTests: CYLMenuExampleTestCase {
 
     func testComponentStringsComeFromOneBundleInEveryLanguage() {
-        let bundle = CYLMenuResources.bundle()
+        let bundle = CYLMenuResources.bundle
         XCTAssertEqual(bundle.bundleURL.lastPathComponent, "CYLClassifyMenuResources.bundle")
-        let languages = CYLMenuResources.availableLanguages()
+        let languages = CYLMenuResources.availableLanguages
         XCTAssertEqual(languages, ["en", "zh-Hans", "zh-Hant"])
         func keys(_ language: String) -> Set<String> {
             let table = bundle.path(forResource: "CYLClassifyMenu", ofType: "strings", inDirectory: nil, forLocalization: language)
@@ -34,10 +34,10 @@ final class CYLLocalizationTests: CYLMenuExampleTestCase {
         XCTAssertEqual(CYLMenuResources.localizedString(forKey: "NoSuchKey"), "NoSuchKey")
 
         CYLMenuResources.preferredLanguage = "en"
-        XCTAssertEqual(CYLMenuResources.currentLanguage(), "en")
+        XCTAssertEqual(CYLMenuResources.currentLanguage, "en")
         XCTAssertEqual(CYLMenuStyle().expandTitle, "More")
         CYLMenuResources.preferredLanguage = "zh-Hant-TW"
-        XCTAssertEqual(CYLMenuResources.currentLanguage(), "zh-Hant", "Regional variants match their language")
+        XCTAssertEqual(CYLMenuResources.currentLanguage, "zh-Hant", "Regional variants match their language")
         XCTAssertEqual(CYLMenuStyle().collapseTitle, "收合")
     }
 

@@ -530,18 +530,3 @@ open class CYLTagDataSource: NSObject, CYLMenuDataSource {
         indexPath.section == 0 && storedTags.indices.contains(indexPath.item) ? storedTags[indexPath.item] : nil
     }
 }
-
-// MARK: - Copies of the Objective-C models
-
-extension CYLMenuStyle {
-
-    /**
-     * A typed copy (`NSCopying` returns `Any`).
-     */
-    func cylCopy() -> CYLMenuStyle {
-        guard let copy = copy() as? CYLMenuStyle else {
-            preconditionFailure("CYLMenuStyle copies itself")
-        }
-        return copy
-    }
-}

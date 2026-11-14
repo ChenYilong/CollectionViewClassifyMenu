@@ -123,7 +123,7 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         XCTAssertEqual(control.title, "更多")
         XCTAssertEqual(control.collapseTitle, "收起")
         XCTAssertTrue(control.usesDefaultImage)
-        XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_fold_chevron"), "The chevron is in the core bundle")
+        XCTAssertNotNil(CYLMenuResources.image(named: "cyl_fold_chevron"), "The chevron is in the core bundle")
         XCTAssertEqual(control.title(whenExpanded: false), "更多")
         XCTAssertNil(control.title(whenExpanded: true), "Icon and title: only the icon when expanded")
         XCTAssertEqual(CYLMenuFoldControl(position: .headerTrailing, content: .title).title(whenExpanded: true), "收起")

@@ -234,7 +234,7 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
                              sizeForItemAt indexPath: IndexPath) -> CGSize {
         let font = tagFont()
         let size = (title(at: indexPath) as NSString).size(withAttributes: [.font: font])
-        return CGSize(width: limitedCellWidth(ceil(size.width)), height: CYLTagHeightForFont(font, 30))
+        return CGSize(width: limitedCellWidth(ceil(size.width)), height: CYLTagMetrics.tagHeight(for: font, minimumHeight: 30))
     }
 
     @objc(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)
@@ -268,7 +268,7 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     }
 
     private func tagFont() -> UIFont {
-        CYLTagTitleFontForTraitCollection(collectionView?.traitCollection ?? traitCollection)
+        CYLTagMetrics.titleFont(for: collectionView?.traitCollection ?? traitCollection)
     }
 
     private func limitedCellWidth(_ cellWidth: CGFloat) -> CGFloat {
