@@ -95,6 +95,8 @@ tags: [issues, ui, cocoapods, progress]
   framework: the generated `CYLTabBarController-Swift.h` is read before the Objective-C declarations it needs. The fix
   belongs in CYLTabBarController (its Swift header imports or forward declarations, or the umbrella order), not here;
   another session was committing there on 2026-11-14, so nothing was changed in that repository.
+  Retried with `182b8ef` (23:41, "tab bar host view in Swift (step 36)"): the same errors ("cannot find protocol declaration for
+  `CYLTabBarItemAnimationPlayableView` / `CYLTabBarItemAnimationViewProviding`"); that session was still committing.
 - DONE（验证，2026-11-14）：`Example/CYLMenuExample` 的 `CYLMenuLinkageViewController` 导航栏按钮在 iOS 26+ 没有被 Liquid Glass 气泡遮住：
   左上角筛选按钮的图标（漏斗，已修改时带红点）与右上角“重置”均可见，无需 `hidesSharedBackground`。截图：iOS，iPhone 17 Pro 模拟器，
   iOS 27.0，Xcode 27.2，macOS 27.3，提交 `ff14821`，2026-11-14 21:42 NZDT（`plus-menu-filtered`，英文）：
