@@ -1,7 +1,7 @@
 # cyl_tag_list
 
 Flutter wrapper of the native `CYLTagListView` of CollectionViewClassifyMenu: the same tag list, folding, selection and
-animated icons on iOS (the Swift pod) and, later, Android (the Kotlin port in `android/merged`).
+animated icons on iOS (the Swift pod) and Android (the Kotlin port in `android/merged`).
 
 ```dart
 final controller = CylTagListController();
@@ -31,7 +31,7 @@ controller.playAll();     // from progress 0
   asset on the device.
 - `CylTagListController` holds the playback controls of `docs/example-demo-rules.md` (Play all, speed, loop) and
   `state()`, which reads what the native list holds.
-- Status: iOS works (see the example and `integration_test`); Android is not implemented yet.
+- Status: iOS and Android pass the integration test; Android shows no icons yet (see docs/cross-platform.md).
 
 ## iOS
 
@@ -46,3 +46,10 @@ cd example
 flutter build ios --simulator --no-codesign --dart-define=CYL_AUTOPLAY=true   # 2x, loop and Play all after start
 flutter test integration_test/tag_list_test.dart -d <simulator id>
 ```
+
+## Android
+
+The plugin depends on `com.cyl:classifymenu:0.1.0`, the Kotlin library of `android/merged`, from a local Maven folder:
+publish it first with `android/scripts/gradle.sh merged :library:publishReleasePublicationToBuildRepository`, and point
+`cyl.classifymenu.repo` (in `example/android/gradle.properties`) at the `library/build/repo` folder when the build runs from
+another directory. Then `flutter test integration_test/tag_list_test.dart -d <emulator>`.
