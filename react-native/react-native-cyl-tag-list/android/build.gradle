@@ -31,6 +31,13 @@ android {
   }
 }
 
+repositories {
+  // The Kotlin CYLTagListView: CollectionViewClassifyMenu's Maven artifact, published by
+  // `android/scripts/gradle.sh merged :library:publishReleasePublicationToBuildRepository` (folder: cyl.classifymenu.repo).
+  maven { url = uri(project.findProperty("cyl.classifymenu.repo") ?: "${projectDir}/../../../android/merged/library/build/repo") }
+}
+
 dependencies {
   implementation "com.facebook.react:react-android"
+  implementation "com.cyl:classifymenu:0.1.0"
 }

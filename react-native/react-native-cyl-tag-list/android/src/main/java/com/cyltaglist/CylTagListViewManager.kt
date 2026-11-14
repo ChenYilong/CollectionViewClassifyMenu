@@ -1,39 +1,39 @@
 package com.cyltaglist
 
-import android.graphics.Color
+import com.facebook.react.common.MapBuilder
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewManagerDelegate
-import com.facebook.react.uimanager.annotations.ReactProp
-import com.facebook.react.viewmanagers.CylTagListViewManagerInterface
 import com.facebook.react.viewmanagers.CylTagListViewManagerDelegate
+import com.facebook.react.viewmanagers.CylTagListViewManagerInterface
 
+/**
+ * The manager of the Fabric view CylTagListView: props, the playAll command and the direct events.
+ */
 @ReactModule(name = CylTagListViewManager.NAME)
-class CylTagListViewManager : SimpleViewManager<CylTagListView>(),
-  CylTagListViewManagerInterface<CylTagListView> {
-  private val mDelegate: ViewManagerDelegate<CylTagListView>
+class CylTagListViewManager : SimpleViewManager<CylTagListView>(), CylTagListViewManagerInterface<CylTagListView> {
+  private val delegate = CylTagListViewManagerDelegate(this)
 
-  init {
-    mDelegate = CylTagListViewManagerDelegate(this)
-  }
+  override fun getDelegate(): ViewManagerDelegate<CylTagListView> = delegate
 
-  override fun getDelegate(): ViewManagerDelegate<CylTagListView>? {
-    return mDelegate
-  }
+  override fun getName() = NAME
 
-  override fun getName(): String {
-    return NAME
-  }
+  override fun createViewInstance(context: ThemedReactContext) = CylTagListView(context)
 
-  public override fun createViewInstance(context: ThemedReactContext): CylTagListView {
-    return CylTagListView(context)
-  }
+  override fun setConfiguration(view: CylTagListView, value: String?) = view.setConfiguration(value)
 
-  @ReactProp(name = "color")
-  override fun setColor(view: CylTagListView?, color: Int?) {
-    view?.setBackgroundColor(color ?: Color.TRANSPARENT)
-  }
+  override fun setAnimationSpeed(view: CylTagListView, value: Float) = view.setAnimationSpeed(value)
+
+  override fun setAnimationLoops(view: CylTagListView, value: Boolean) = view.setAnimationLoops(value)
+
+  override fun playAll(view: CylTagListView) = view.playAll()
+
+  override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> = MapBuilder.of(
+    "topTagTap", MapBuilder.of("registrationName", "onTagTap"),
+    "topSelectionChange", MapBuilder.of("registrationName", "onSelectionChange"),
+    "topContentHeightChange", MapBuilder.of("registrationName", "onContentHeightChange"),
+  )
 
   companion object {
     const val NAME = "CylTagListView"
