@@ -93,7 +93,8 @@ open class CYLTagButton @JvmOverloads constructor(
         get() = field ?: CYLMenuStyle.defaultStyle()
         set(value) {
             field = (value ?: CYLMenuStyle.defaultStyle()).copy()
-            if (animationView != null && animationViewSize != animationSize()) reloadAnimationView() else updateAnimationState()
+            // Only the speed otherwise: an animation that is playing goes on.
+            if (animationView != null && animationViewSize != animationSize()) reloadAnimationView() else applyAnimationSpeed()
             updateAppearance()
         }
 
@@ -160,13 +161,73 @@ open class CYLTagButton @JvmOverloads constructor(
     /** `isHighlighted`: pressed. */
     val isHighlighted: Boolean get() = isPressed
 
-    /** Plays the animated icon once (not with Remove animations / Reduce Motion). */
+    /**
+     * `animationSpeed`: the playback speed of the animated icon, applied at once, also to an animation that is playing.
+     * null (the default) uses `style.animationSpeed`. Players without a speed ignore it.
+     */
+    var animationSpeed: Float? = null
+        set(value) {
+            field = value
+            applyAnimationSpeed()
+        }
+
+    /**
+     * `animationLoops`: true repeats the animated icon after `playAnimation()` until it is false, the selection changes
+     * or the file changes; false (the default) plays once. Turning it off lets the pass in progress finish. The engine's
+     * players have no loop mode, so the tag starts the animation again when the player's `progress` reaches the end;
+     * a player that does not report its progress plays once.
+     */
+    var animationLoops: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value && isPlaying) startLoopCheck() else if (!value) stopLoopCheck()
+        }
+
+    /** True from `playAnimation()` until the state is set again (selection, a new file). */
+    private var isPlaying = false
+    private val loopCheck = object : Runnable {
+        override fun run() {
+            val player = animationPlayer
+            if (!animationLoops || !isPlaying || player == null || !isAttachedToWindow) return
+            val progress = CYLTagAnimationEngine.getFloat(player, "getProgress") ?: return
+            if (progress >= LOOP_END_PROGRESS) CYLTagAnimationEngine.call(player, "play")
+            postDelayed(this, LOOP_CHECK_INTERVAL_MS)
+        }
+    }
+
+    private fun startLoopCheck() {
+        removeCallbacks(loopCheck)
+        postDelayed(loopCheck, LOOP_CHECK_INTERVAL_MS)
+    }
+
+    private fun stopLoopCheck() {
+        removeCallbacks(loopCheck)
+    }
+
+    private fun applyAnimationSpeed() {
+        val speed = animationSpeed ?: currentStyle.animationSpeed
+        CYLTagAnimationEngine.setFloat(animationPlayer, "setAnimationSpeed", if (speed > 0) speed else 1f)
+    }
+
+    override fun onDetachedFromWindow() {
+        stopLoopCheck()
+        super.onDetachedFromWindow()
+    }
+
+    /**
+     * Plays the animated icon from its start (not with Remove animations / Reduce Motion); with `animationLoops`, it
+     * repeats.
+     */
     fun playAnimation() {
         if (CYLAccessibility.isReduceMotionEnabled(context)) {
             updateAnimationState()
             return
         }
+        applyAnimationSpeed()
         CYLTagAnimationEngine.call(animationPlayer, "play")
+        isPlaying = animationPlayer != null
+        if (animationLoops && isPlaying) startLoopCheck()
     }
 
     private fun animationSize(): CYLSize {
@@ -200,8 +261,10 @@ open class CYLTagButton @JvmOverloads constructor(
     }
 
     private fun updateAnimationState() {
+        isPlaying = false
+        stopLoopCheck()
         val player = animationPlayer ?: return
-        CYLTagAnimationEngine.setFloat(player, "setAnimationSpeed", if (currentStyle.animationSpeed > 0) currentStyle.animationSpeed else 1f)
+        applyAnimationSpeed()
         if (isSelected) {
             CYLTagAnimationEngine.call(player, "showLastFrame")
         } else {
@@ -423,6 +486,10 @@ open class CYLTagButton @JvmOverloads constructor(
         /** The line height of `font`, dp (`UIFont.lineHeight`). */
         internal fun fontLineHeight(font: CYLFont): Float = lineHeight(paintFor(font))
 
+        private const val LOOP_CHECK_INTERVAL_MS = 50L
+        /** The progress from which a looping animation counts as finished and starts again. */
+        private const val LOOP_END_PROGRESS = 0.995f
+
         /** `+isAnimationEngineAvailable`: CYLTabBarController's animation engine is linked. */
         @JvmStatic
         fun isAnimationEngineAvailable(): Boolean = CYLTagAnimationEngine.isAvailable
@@ -571,6 +638,16 @@ internal object CYLTagAnimationEngine {
             target.javaClass.getMethod(name).invoke(target)
         } catch (error: Throwable) {
             // The player has no such method.
+        }
+    }
+
+    /** A Float getter of the player (`getProgress`), or null when it has none. */
+    fun getFloat(target: Any?, name: String): Float? {
+        target ?: return null
+        return try {
+            (target.javaClass.getMethod(name).invoke(target) as? Number)?.toFloat()
+        } catch (error: Throwable) {
+            null
         }
     }
 

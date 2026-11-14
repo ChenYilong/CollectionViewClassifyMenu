@@ -33,7 +33,8 @@ CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback contro
   (4) the three combine and change playback in real time; (5) change the core when needed to support it; (6) every
   example layer: iOS, Android, React Native, Flutter, Mini Program, HarmonyOS; (7) record the rule in English in the
   instructions documents and reference this document from the related skills.
-- **Status:** TODO (rule recorded; not implemented yet). Recorded twice in parallel on 2026-11-13 (this document and
+- **Status:** iOS and Android DONE (2026-11-14); React Native, Flutter, Mini Program and HarmonyOS have no example
+  in this repository yet. Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
   `example-animation-controls.md` from another session's branch `docs/animation-playback-controls`); merged here,
   and that file now points to this one.
 
@@ -43,12 +44,50 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 
 | Platform | Example screen(s) | Status |
 | --- | --- | --- |
-| iOS | Animated icons, `Example/CYLMenuExample/CYLTagAnimationDemoViewController.swift`; Styles | TODO |
-| Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt`; Styles | TODO |
+| iOS | Animated icons, `Example/CYLMenuExample/CYLTagAnimationDemoViewController.swift` | DONE (2026-11-14, below) |
+| Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | DONE (2026-11-14, below) |
 | React Native | cross-platform example (animated tags) | TODO |
 | Flutter | cross-platform example (animated tags) | TODO |
 | Mini Program | example (when added) | TODO |
 | HarmonyOS | example (when added) | TODO |
+
+### iOS: DONE (2026-11-14)
+
+- **Core** (`CYLTagButton`, `CYLTagListView`): `animationSpeed` (an override of `style.animationSpeed` applied at once,
+  also to an animation that is playing, without reloading the list), `animationLoops` and
+  `CYLTagListView.playAllAnimations()` (every animated icon on screen from progress 0). Setting a style no longer
+  resets a playing animation. Looping uses the player's own `loops` when it has one (CYLTabBarController from
+  `dc04439`); with the pinned `0e69250`, which has none, the core starts the animation again when the player's
+  `progress` reaches the end (Lottie, PAG).
+- **Limits:** Rive and GIF players expose neither `loops` nor `progress` at `0e69250`, so they play once; PAG has no
+  playback speed. Both go away with a newer CYLTabBarController, whose pin is blocked (`issue-progress.md`, the
+  framework build).
+- **Example:** the Animated icons screen has a speed slider (0.25× to 4× in steps of 0.25, the value next to it), a
+  loop switch and Play all; they replace the "1x" bar button. VoiceOver reads "Speed, 2 times" and "Loop, on";
+  strings in the example's bundle (en, zh-Hans, zh-Hant). Styles is a list of style parameters (one row sets
+  `style.animationSpeed`), not a playback screen: unchanged.
+- **Evidence:** `CYLAnimatedIconTests` (the slider's steps and clamping, the labels, loop and speed on the tags on
+  screen, the style untouched); the example suite, 80 tests, 0 failures. Screenshot: iOS, iPhone 17 Pro simulator,
+  iOS 27.0, Xcode 27.2 (iOS 27.2 SDK), macOS 27.3, this commit, 2026-11-14 15:23 NZDT; 2×, Loop on, the Lottie icons
+  playing:
+
+  <img src="assets/ios-animation-playback-controls.png" width="360" alt="iOS: speed slider at 2x, loop switch on, Play all">
+
+### Android: DONE (2026-11-14)
+
+- **Core** (`CYLTagButton.kt`, `CYLTagListView.kt`): the same three APIs as iOS, `animationSpeed`, `animationLoops`
+  and `playAllAnimations()`. The engine's players (CYLTabBarController `4639a0c`) have a speed and a progress but no
+  loop mode, so the tag starts the animation again when the player's progress reaches the end; a player without a
+  progress plays once.
+- **Example:** the Animated icons screen (Menu tab) has a speed `SeekBar` (0.25× to 4× in steps of 0.25, the value next
+  to it), a loop `Switch` and Play all; they replace the "1x" button. TalkBack reads "Speed, 2 times" and "Loop"; the
+  strings are the iOS example's (the Android example reads its string tables).
+- **Evidence:** `animationSpeedAndLoopsReachEveryTagWithoutReplacingTheStyle` in the library's unit tests;
+  `scripts/gradle.sh merged :library:testDebugUnitTest :example:assembleDebug`: BUILD SUCCESSFUL. Screenshot:
+  Android 15 (API 35) emulator `CYL_API35_test`, 1080 × 2400, macOS 27.3, this commit, 2026-11-14 15:31 NZDT; 2×, Loop
+  on, the icons playing:
+
+  <img src="assets/android-animation-playback-controls.png" width="360" alt="Android: speed slider at 2x, loop switch on, Play all">
 
 - **User prompt (verbatim, 2026-11-13):**
 

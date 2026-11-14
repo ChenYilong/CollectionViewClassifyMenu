@@ -5,7 +5,10 @@ import android.graphics.Color
 import android.util.TypedValue
 import android.view.View
 import android.widget.Button
+import kotlin.math.roundToInt
 import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.TextView
 import com.cyl.classifymenu.CYLAppTintColor
 import com.cyl.classifymenu.CYLIndexPath
@@ -52,11 +55,17 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
     override val title: CharSequence = CYLExampleLocalizedString(context, "动效图标")
     val tagListView: CYLTagListView = CYLTagListView.tagListViewWithConfiguration(context, configuration(context))
     val statusLabel = TextView(context)
-    private val speedButton = Button(context)
+    val speedSlider = SeekBar(context)
+    val speedLabel = TextView(context)
+    val loopSwitch = Switch(context)
     private val d = context.resources.displayMetrics.density
     override val view: View
 
     companion object {
+        const val SPEED_MIN = 0.25f
+        const val SPEED_MAX = 4f
+        const val SPEED_STEP = 0.25f
+
         fun sectionIdentifiers() = listOf("lottie", "lottie-images", "lottie-green", "pag", "rive", "rive-icons", "gif", "images")
 
         private fun animation(path: String) = "CYLMenuExample.bundle/Animations/$path"
@@ -147,34 +156,98 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
             setOnClickListener { action() }
         }
-        barButton(speedButton, "1x") { changeSpeed() }
-        val play = barButton(Button(context), CYLExampleLocalizedString(context, "全部播放")) { playSelectedAnimations() }
+        val play = barButton(Button(context), CYLExampleLocalizedString(context, "全部播放")) { playAllAnimations() }
+        play.contentDescription = CYLExampleLocalizedString(context, "全部播放")
+        fun caption(text: String) = TextView(context).apply {
+            this.text = text
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            setTextColor(Color.BLACK)
+            // The control next to it reads the title: not a separate element for TalkBack.
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        speedSlider.apply {
+            max = ((SPEED_MAX - SPEED_MIN) / SPEED_STEP).toInt()
+            progress = ((1f - SPEED_MIN) / SPEED_STEP).toInt()
+            contentDescription = CYLExampleLocalizedString(context, "倍速")
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) = speedChanged()
+                override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+            })
+        }
+        speedLabel.apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            setTextColor(Color.BLACK)
+            minWidth = (48 * d).toInt()
+            gravity = android.view.Gravity.END
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        loopSwitch.apply {
+            contentDescription = CYLExampleLocalizedString(context, "循环播放")
+            setOnCheckedChangeListener { _, _ -> loopChanged() }
+        }
         view = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Color.WHITE)
+            addView(statusLabel, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                setMargins((16 * d).toInt(), (8 * d).toInt(), (16 * d).toInt(), 0)
+            })
+            // Playback controls (docs/example-demo-rules.md): the speed slider with its value, then the loop switch and Play all.
             addView(LinearLayout(context).apply {
                 gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding((16 * d).toInt(), (4 * d).toInt(), (4 * d).toInt(), 0)
-                addView(statusLabel, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-                addView(speedButton)
+                setPadding((16 * d).toInt(), (4 * d).toInt(), (16 * d).toInt(), 0)
+                addView(caption(CYLExampleLocalizedString(context, "倍速")))
+                addView(speedSlider, LinearLayout.LayoutParams(0, (48 * d).toInt(), 1f))
+                addView(speedLabel)
+            })
+            addView(LinearLayout(context).apply {
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding((16 * d).toInt(), 0, (4 * d).toInt(), 0)
+                addView(caption(CYLExampleLocalizedString(context, "循环播放")), LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+                addView(loopSwitch, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, (48 * d).toInt()))
                 addView(play)
             })
             addView(tagListView, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         }
+        speedChanged()
     }
 
-    fun playSelectedAnimations() {
-        tagListView.selectedIndexPaths.forEach { tagListView.tagButtonAtIndexPath(it)?.playAnimation() }
+    /** The current speed: a multiple of SPEED_STEP between SPEED_MIN and SPEED_MAX. */
+    val speed: Float get() = SPEED_MIN + speedSlider.progress * SPEED_STEP
+
+    /** Sets the speed as the slider does (clamped): every animated icon changes at once. */
+    fun setSpeed(speed: Float) {
+        speedSlider.progress = ((speed.coerceIn(SPEED_MIN, SPEED_MAX) - SPEED_MIN) / SPEED_STEP).roundToInt()
+        speedChanged()
     }
 
-    fun changeSpeed() {
-        val style: CYLMenuStyle = tagListView.style?.copy() ?: CYLMenuStyle()
-        val speeds = listOf(1f, 2f, 0.5f)
-        val next = speeds.indexOf(style.animationSpeed).let { if (it < 0) 0 else it + 1 }
-        style.animationSpeed = speeds[next % speeds.size]
-        tagListView.style = style
-        speedButton.text = (if (style.animationSpeed % 1f == 0f) style.animationSpeed.toInt().toString() else style.animationSpeed.toString()) + "x"
-        playSelectedAnimations()
+    /** Sets looping as the switch does. */
+    fun setLoops(loops: Boolean) {
+        loopSwitch.isChecked = loops
+    }
+
+    /** Plays every animated icon from progress 0, as the "全部播放" button does; with the loop switch on, they repeat. */
+    fun playAllAnimations() {
+        tagListView.playAllAnimations()
+    }
+
+    private fun speedChanged() {
+        tagListView.animationSpeed = speed
+        val value = if (speed % 1f == 0f) speed.toInt().toString() else speed.toString()
+        speedLabel.text = "$value×"
+        // TalkBack: "Speed, 1.5 times".
+        val spoken = CYLExampleLocalizedString(context, "%@ 倍", value)
+        if (android.os.Build.VERSION.SDK_INT >= 30) {
+            speedSlider.stateDescription = spoken
+        } else {
+            speedSlider.contentDescription = CYLExampleLocalizedString(context, "倍速") + ", " + spoken
+        }
+    }
+
+    /** On: the icons start playing and repeat. Off: the pass in progress finishes and they stop. */
+    private fun loopChanged() {
+        tagListView.animationLoops = loopSwitch.isChecked
+        if (loopSwitch.isChecked) playAllAnimations()
     }
 
     fun scrollToSectionIdentifier(identifier: String) {

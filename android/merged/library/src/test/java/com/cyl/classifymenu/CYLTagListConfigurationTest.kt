@@ -48,6 +48,26 @@ class CYLTagListConfigurationTest {
     }
 
     @Test
+    fun animationSpeedAndLoopsReachEveryTagWithoutReplacingTheStyle() {
+        val list = CYLTagListView.tagListViewWithConfiguration(context, mapOf(
+            CYLTagListViewSections to listOf(mapOf(CYLTagSectionTitle to "A", CYLTagSectionItems to listOf("One", "Two")))))
+        list.measure(android.view.View.MeasureSpec.makeMeasureSpec(600, android.view.View.MeasureSpec.EXACTLY),
+            android.view.View.MeasureSpec.makeMeasureSpec(400, android.view.View.MeasureSpec.EXACTLY))
+        list.layout(0, 0, 600, 400)
+        val style = list.style
+        list.animationSpeed = 2.5f
+        list.animationLoops = true
+        val first = list.tagButtonAtIndexPath(CYLIndexPath(0, 0))!!
+        val second = list.tagButtonAtIndexPath(CYLIndexPath(1, 0))!!
+        assertEquals(2.5f, first.animationSpeed)
+        assertEquals(true, second.animationLoops)
+        assertEquals(style?.animationSpeed, list.style?.animationSpeed)
+        list.playAllAnimations()
+        list.animationLoops = false
+        assertEquals(false, first.animationLoops)
+    }
+
+    @Test
     fun foldControlFromAPositionNameOrADictionary() {
         val bottom = CYLMenuFoldControl.foldControlWithConfiguration("footer")!!
         assertEquals(CYLMenuFoldControlPosition.FOOTER, bottom.position)

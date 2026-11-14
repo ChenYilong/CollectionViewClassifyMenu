@@ -605,6 +605,36 @@ open class CYLTagListView: UIView {
         }
     }
 
+    // MARK: Animated icons
+
+    /**
+     * The playback speed of every animated icon, applied at once, also to animations that are playing, without
+     * reloading the list. `nil` (the default) uses each tag's `style.animationSpeed`.
+     */
+    open var animationSpeed: CGFloat? {
+        didSet {
+            forEachVisibleTagButton { $0.animationSpeed = animationSpeed }
+        }
+    }
+
+    /**
+     * True repeats the animated icons after they start playing (a tap, `playAllAnimations()`) until it is set to
+     * false; false (the default) plays them once (`CYLTagButton.animationLoops`).
+     */
+    open var animationLoops = false {
+        didSet {
+            forEachVisibleTagButton { $0.animationLoops = animationLoops }
+        }
+    }
+
+    /**
+     * Plays the animated icon of every tag on screen from its start (progress 0), whatever its selection.
+     */
+    open func playAllAnimations() {
+        collectionView.layoutIfNeeded()
+        forEachVisibleTagButton { $0.playAnimation() }
+    }
+
     // MARK: Tags (android-tagview's TagView)
 
     /**
@@ -2006,6 +2036,12 @@ private extension CYLTagListView {
 
 private extension CYLTagListView {
 
+    func forEachVisibleTagButton(_ body: (CYLTagButton) -> Void) {
+        for case let cell as CYLTagListCell in collectionView.visibleCells {
+            body(cell.button)
+        }
+    }
+
     @objc func refreshVisibleCells() {
         for indexPath in collectionView.indexPathsForVisibleItems {
             if let cell = collectionView.cellForItem(at: indexPath) {
@@ -2040,6 +2076,8 @@ private extension CYLTagListView {
                        selectedImage: selectedImage(at: indexPath), animationURL: animationURL(at: indexPath),
                        style: style(forItemAt: indexPath), isSelected: selection.contains(indexPath), isEnabled: enabled)
         cell.button.animationRestingProgress = animationRestingProgress(at: indexPath)
+        cell.button.animationSpeed = animationSpeed
+        cell.button.animationLoops = animationLoops
         let deletable = isDeletable(at: indexPath) && enabled
         cell.isDeletable = deletable
         cell.deleteHandler = deletable ? { [weak self] in

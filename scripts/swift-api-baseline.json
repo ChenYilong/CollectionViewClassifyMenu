@@ -28,7 +28,7 @@
         ],
         "declKind": "Var",
         "usr": "c:@CollectionViewClassifyMenuVersionNumber",
-        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.lv4hf2/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:14:26",
+        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.Ze9pQh/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:14:26",
         "moduleName": "CollectionViewClassifyMenu",
         "hasStorage": true
       },
@@ -45,7 +45,7 @@
         ],
         "declKind": "Var",
         "usr": "c:@CollectionViewClassifyMenuVersionString",
-        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.lv4hf2/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:15:39",
+        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.Ze9pQh/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:15:39",
         "moduleName": "CollectionViewClassifyMenu",
         "isLet": true,
         "hasStorage": true
@@ -30581,6 +30581,174 @@
           },
           {
             "kind": "Var",
+            "name": "animationSpeed",
+            "printedName": "animationSpeed",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:26CollectionViewClassifyMenu12CYLTagButtonC14animationSpeed14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s26CollectionViewClassifyMenu12CYLTagButtonC14animationSpeed12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "CollectionViewClassifyMenu",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "Preconcurrency",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu12CYLTagButtonC14animationSpeed14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s26CollectionViewClassifyMenu12CYLTagButtonC14animationSpeed12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu12CYLTagButtonC14animationSpeed14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s26CollectionViewClassifyMenu12CYLTagButtonC14animationSpeed12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "set"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "animationLoops",
+            "printedName": "animationLoops",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:26CollectionViewClassifyMenu12CYLTagButtonC14animationLoopsSbvp",
+            "mangledName": "$s26CollectionViewClassifyMenu12CYLTagButtonC14animationLoopsSbvp",
+            "moduleName": "CollectionViewClassifyMenu",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "Preconcurrency",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu12CYLTagButtonC14animationLoopsSbvg",
+                "mangledName": "$s26CollectionViewClassifyMenu12CYLTagButtonC14animationLoopsSbvg",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu12CYLTagButtonC14animationLoopsSbvs",
+                "mangledName": "$s26CollectionViewClassifyMenu12CYLTagButtonC14animationLoopsSbvs",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "set"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
             "name": "animationView",
             "printedName": "animationView",
             "children": [
@@ -39403,6 +39571,196 @@
                 "accessorKind": "set"
               }
             ]
+          },
+          {
+            "kind": "Var",
+            "name": "animationSpeed",
+            "printedName": "animationSpeed",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:26CollectionViewClassifyMenu010CYLTagListB0C14animationSpeed14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s26CollectionViewClassifyMenu010CYLTagListB0C14animationSpeed12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "CollectionViewClassifyMenu",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "Preconcurrency",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu010CYLTagListB0C14animationSpeed14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s26CollectionViewClassifyMenu010CYLTagListB0C14animationSpeed12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu010CYLTagListB0C14animationSpeed14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s26CollectionViewClassifyMenu010CYLTagListB0C14animationSpeed12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "set"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "animationLoops",
+            "printedName": "animationLoops",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:26CollectionViewClassifyMenu010CYLTagListB0C14animationLoopsSbvp",
+            "mangledName": "$s26CollectionViewClassifyMenu010CYLTagListB0C14animationLoopsSbvp",
+            "moduleName": "CollectionViewClassifyMenu",
+            "isOpen": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "Preconcurrency",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu010CYLTagListB0C14animationLoopsSbvg",
+                "mangledName": "$s26CollectionViewClassifyMenu010CYLTagListB0C14animationLoopsSbvg",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:26CollectionViewClassifyMenu010CYLTagListB0C14animationLoopsSbvs",
+                "mangledName": "$s26CollectionViewClassifyMenu010CYLTagListB0C14animationLoopsSbvs",
+                "moduleName": "CollectionViewClassifyMenu",
+                "implicit": true,
+                "isOpen": true,
+                "accessorKind": "set"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "playAllAnimations",
+            "printedName": "playAllAnimations()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:26CollectionViewClassifyMenu010CYLTagListB0C17playAllAnimationsyyF",
+            "mangledName": "$s26CollectionViewClassifyMenu010CYLTagListB0C17playAllAnimationsyyF",
+            "moduleName": "CollectionViewClassifyMenu",
+            "isOpen": true,
+            "declAttributes": [
+              "Preconcurrency",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
           },
           {
             "kind": "Var",
