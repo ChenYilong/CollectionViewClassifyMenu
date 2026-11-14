@@ -105,7 +105,7 @@ final class CYLExampleDatabaseTests: CYLMenuExampleTestCase {
         XCTAssertTrue(button?.isSelected ?? false, "The selected tag is highlighted (core: selectedIndexPath)")
         XCTAssertTrue(button?.accessibilityTraits.contains(.selected) ?? false)
         // The results are the menu's footer, below the tags, in the scroll view.
-        let footer: UIView = menu.menuFooterView
+        let footer = try XCTUnwrap(menu.menuFooterView)
         XCTAssertGreaterThanOrEqual(footer.frame.minY, tags.collectionView.frame.maxY - 0.5)
         XCTAssertGreaterThan(footer.frame.height, 40)
         let scroll = footer.superview as? UIScrollView

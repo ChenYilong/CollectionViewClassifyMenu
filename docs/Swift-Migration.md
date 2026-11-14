@@ -47,7 +47,7 @@ The core library (the CocoaPods pod's sources: `CollectionViewClassifyMenu/Class
 - **Consequence:** the API check becomes a report: an API change the standard asks for (idiomatic names, `T?` / `T`
   instead of `T!`, Swift collections and value types) is allowed, listed under "Swift API changes" below, with the
   baseline refreshed. The files migrated in step 2 kept the Objective-C shapes (`T!`, `NSMutableArray`, factory
-  methods); they are cleaned up to the standard in a later step (TODO).
+  methods); their public API was cleaned up to the standard on 2026-11-14 (below, step 11); the private key-value state the core's Objective-C tests read (`NSArray`, `NSMutableArray`) stays.
 - **Status:** rule recorded (2026-11-13); applied from step 3 on.
 - **Prompt (verbatim):**
 
@@ -118,6 +118,7 @@ and the core's tests are updated in the same commit.
 | 10 | `CYLTagAppearance` | a final Swift class (not `NSObject`, typed `copy()`); `backgroundColor`, `textColor`, `font`: `T!` → `T` with public defaults (`CYLTagAppearance.defaultBackgroundColor`, `.defaultTextColor`, `.defaultFont`) instead of "set nil to restore"; `CYLTagCornerRadiusSquare` a Swift constant | non-optional values |
 | 10 | `CYLMenuResources` | `bundle()`, `availableLanguages()`, `currentLanguage()` → static properties; `imageNamed(_:)` → `image(named:)`; Objective-C selectors kept for the core's tests (`+imageNamed:`, `+localizedStringForKey:`…); the macros `CYLMenuLocalizedString(key, comment)` / `CYLMenuImage(name)` and the C function `CYLMenuLocalizedStringForKey` are gone: the core's lookup is the Swift function `CYLMenuLocalizedString(_:)` | no macros in Swift |
 | 10 | `CYLParameterConfiguration.h` | the inline functions and macros → `CYLTagMetrics` (an `@objc` type for the core's tests): `CYLTagTitleFontForTraitCollection` → `titleFont(for:)`, `CYLTagHeightForFont` → `tagHeight(for:minimumHeight:)`, `CYLScaledSystemFont` → `scaledSystemFont(ofSize:traitCollection:)`, `CYLMaximumFontScale` / `CYLTagTitleFontSize` → `maximumFontScale` / `titleFontSize`; `CYLAppTintColor` and `CYLTagTitleFont` (unused outside) are private | callable from Swift and Objective-C |
+| 11 | step 2 cleanup: `CYLClassifyMenuViewController`, `CYLMultipleFilterController`, `CYLTagView` | `menuDataSource`, `menuDelegate`, `menuHeaderView`, `menuFooterView`, `selectedIndexPath`: `T!` → `T?`; `CYLMultipleFilterController.selectedIndexPaths()` returns `[IndexPath]` and `setSelectedIndexPaths(_:)` takes `[IndexPath]` (not `!`); `CYLTagView.groups`: `NSMutableArray!` → `[CYLTagGroup]` | no `T!` in the public API (the standard) |
 
 Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
 index) and its tests (`direction.next`, `value(of: .linesProgress)`).
@@ -238,6 +239,8 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | 2026-11-14 | step 9 | `CYLMenuDataSource.h`, `CYLTagColors`, `CYLTagButton`, `CYLCollectionViewLeftAlignedLayout` (7 files) | 7 | 90.8 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
 
 | 2026-11-14 | step 10 | `CYLMenuStyle`, `CYLTagAppearance`, `CYLMenuResources`, `CYLParameterConfiguration.h` (7 files) and the forwarding header `CollectionViewClassifyMenu.h` | 0 | 100 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
+
+| 2026-11-14 | step 11 | cleanup of the step 2 files' public API (no `T!`, `[CYLTagGroup]`) | 0 | 100 | listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
 
 Step 10 notes: no Objective-C source is left in the pod; the podspec's `source_files` patterns are `*.swift`, and the
 transition file `CollectionViewClassifyMenu/Class/CollectionViewClassifyMenu.h` is removed with the last header. The core's

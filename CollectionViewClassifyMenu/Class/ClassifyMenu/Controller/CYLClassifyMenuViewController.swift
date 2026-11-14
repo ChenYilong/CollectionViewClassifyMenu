@@ -39,24 +39,24 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
     /**
      * The menu's sections and tags.
      */
-    @objc open weak var menuDataSource: CYLMenuDataSource!
+    @objc open weak var menuDataSource: CYLMenuDataSource?
 
     /**
      * Receives the taps on tags.
      */
-    @objc open weak var menuDelegate: CYLMenuDelegate!
+    @objc open weak var menuDelegate: CYLMenuDelegate?
 
     /**
      * A view above the tags, in the same scroll view.
      */
-    @objc open var menuHeaderView: UIView!
+    @objc open var menuHeaderView: UIView?
 
     /**
      * A view below the tags, in the same scroll view, e.g. the results of the selected tag. It is as
      * wide as the menu; its height is its Auto Layout fitting height (or its frame height without
      * constraints). Call -updateMenuLayout after its content changes.
      */
-    @objc open var menuFooterView: UIView! {
+    @objc open var menuFooterView: UIView? {
         willSet {
             if menuFooterView !== newValue {
                 menuFooterView?.removeFromSuperview()
@@ -71,7 +71,7 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
      * The tag shown as selected (single choice), or nil. Taps are reported to the menu delegate and do
      * not change it: set it from -menu:didSelectItemAtIndexPath:.
      */
-    @objc open var selectedIndexPath: IndexPath! {
+    @objc open var selectedIndexPath: IndexPath? {
         didSet {
             guard isViewLoaded else {
                 return

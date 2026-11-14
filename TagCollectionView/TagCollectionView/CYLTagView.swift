@@ -52,12 +52,12 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     /**
      * 总数据group / All data groups (`CYLTagGroup`).
      */
-    @objc open var groups: NSMutableArray!
+    @objc open var groups: [CYLTagGroup] = []
 
     /**
      * The groups and their tags.
      */
-    @objc open weak var menuDataSource: CYLMenuDataSource!
+    @objc open weak var menuDataSource: CYLMenuDataSource?
 
     /**
      * Receives the taps on tags.
@@ -104,7 +104,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
      * Reads the groups and their tags from the data source again.
      */
     @objc open func reloadMenuData() {
-        let groups = NSMutableArray()
+        var groups: [CYLTagGroup] = []
         if let source = menuDataSource {
             for section in 0..<source.numberOfSectionsInMenu() {
                 let group = CYLTagGroup()
@@ -118,10 +118,10 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
                     items.append(model)
                 }
                 group.items = items
-                groups.add(group)
+                groups.append(group)
             }
         }
-        for case let group as CYLTagGroup in groups {
+        for group in groups {
             group.width = collectionView.bounds.width
         }
         self.groups = groups
@@ -135,7 +135,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
         let width = collectionView.bounds.width
         if width != lastCollectionWidth {
             lastCollectionWidth = width
-            for case let group as CYLTagGroup in groups ?? [] {
+            for group in groups {
                 group.width = width
             }
             collectionView.reloadData()
@@ -158,7 +158,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     // MARK: - UICollectionViewDataSource
 
     open func numberOfSections(in collectionView: UICollectionView) -> Int {
-        groups?.count ?? 0
+        groups.count
     }
 
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -256,7 +256,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
      * Re-measures every tag for the current text size and reloads the layout.
      */
     private func updateTagSizes() {
-        for case let group as CYLTagGroup in groups ?? [] {
+        for group in groups {
             for model in group.items {
                 model.updateSize(for: traitCollection)
             }
@@ -267,10 +267,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     }
 
     private func group(at section: Int) -> CYLTagGroup? {
-        guard let groups, section < groups.count else {
-            return nil
-        }
-        return groups[section] as? CYLTagGroup
+        groups.indices.contains(section) ? groups[section] : nil
     }
 
     private func model(at indexPath: IndexPath) -> CYLTagModel? {

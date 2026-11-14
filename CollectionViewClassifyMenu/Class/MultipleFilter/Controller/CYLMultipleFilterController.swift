@@ -22,12 +22,12 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     /**
      * The menu's sections and items.
      */
-    @objc open weak var menuDataSource: CYLMenuDataSource!
+    @objc open weak var menuDataSource: CYLMenuDataSource?
 
     /**
      * Receives taps, the confirmed selection and selection changes.
      */
-    @objc open weak var menuDelegate: CYLMenuDelegate!
+    @objc open weak var menuDelegate: CYLMenuDelegate?
 
     /**
      * The items' titles, per section.
@@ -94,7 +94,7 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
      * The selected items, section by section.
      */
     @discardableResult
-    @objc open func selectedIndexPaths() -> [IndexPath]! {
+    @objc open func selectedIndexPaths() -> [IndexPath] {
         selection.enumerated().flatMap { section, states in
             states.indices.filter { states[$0] }.map { IndexPath(item: $0, section: section) }
         }
@@ -105,9 +105,8 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
      * exclusive item would share its section with another selected item; validate before calling it from Swift,
      * which cannot catch the exception.
      */
-    @objc open func setSelectedIndexPaths(_ indexPaths: [IndexPath]!) {
+    @objc open func setSelectedIndexPaths(_ indexPaths: [IndexPath]) {
         loadViewIfNeeded()
-        let indexPaths = indexPaths ?? []
         let source = menuDataSource
         let hasExclusive = source?.responds(to: #selector(CYLMenuDataSource.menuItemIsExclusive(at:))) == true
         var exclusiveSections = IndexSet()

@@ -28,7 +28,7 @@
         ],
         "declKind": "Var",
         "usr": "c:@CollectionViewClassifyMenuVersionNumber",
-        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.Ze9pQh/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:14:26",
+        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.pdBQtk/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:14:26",
         "moduleName": "CollectionViewClassifyMenu",
         "hasStorage": true
       },
@@ -45,7 +45,7 @@
         ],
         "declKind": "Var",
         "usr": "c:@CollectionViewClassifyMenuVersionString",
-        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.Ze9pQh/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:15:39",
+        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.pdBQtk/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:15:39",
         "moduleName": "CollectionViewClassifyMenu",
         "isLet": true,
         "hasStorage": true
@@ -744,7 +744,7 @@
               {
                 "kind": "TypeNominal",
                 "name": "WeakStorage",
-                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!"
+                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?"
               }
             ],
             "declKind": "Var",
@@ -770,8 +770,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -806,8 +806,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -840,7 +840,7 @@
               {
                 "kind": "TypeNominal",
                 "name": "WeakStorage",
-                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)!"
+                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)?"
               }
             ],
             "declKind": "Var",
@@ -866,8 +866,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -902,8 +902,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -935,8 +935,8 @@
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "ImplicitlyUnwrappedOptional",
-                "printedName": "UIKit.UIView!",
+                "name": "Optional",
+                "printedName": "UIKit.UIView?",
                 "children": [
                   {
                     "kind": "TypeNominal",
@@ -969,8 +969,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "UIKit.UIView!",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIView?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -1005,8 +1005,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "UIKit.UIView!",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIView?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -1038,8 +1038,8 @@
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "ImplicitlyUnwrappedOptional",
-                "printedName": "UIKit.UIView!",
+                "name": "Optional",
+                "printedName": "UIKit.UIView?",
                 "children": [
                   {
                     "kind": "TypeNominal",
@@ -1072,8 +1072,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "UIKit.UIView!",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIView?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -1108,8 +1108,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "UIKit.UIView!",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIView?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -1141,8 +1141,8 @@
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "ImplicitlyUnwrappedOptional",
-                "printedName": "Foundation.IndexPath!",
+                "name": "Optional",
+                "printedName": "Foundation.IndexPath?",
                 "children": [
                   {
                     "kind": "TypeNominal",
@@ -1175,8 +1175,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "Foundation.IndexPath!",
+                    "name": "Optional",
+                    "printedName": "Foundation.IndexPath?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -1211,8 +1211,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "Foundation.IndexPath!",
+                    "name": "Optional",
+                    "printedName": "Foundation.IndexPath?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -23478,7 +23478,7 @@
               {
                 "kind": "TypeNominal",
                 "name": "WeakStorage",
-                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!"
+                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?"
               }
             ],
             "declKind": "Var",
@@ -23504,8 +23504,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -23540,8 +23540,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -23574,7 +23574,7 @@
               {
                 "kind": "TypeNominal",
                 "name": "WeakStorage",
-                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)!"
+                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)?"
               }
             ],
             "declKind": "Var",
@@ -23600,8 +23600,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -23636,8 +23636,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDelegate)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -23742,30 +23742,22 @@
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "ImplicitlyUnwrappedOptional",
-                "printedName": "[Foundation.IndexPath]!",
+                "name": "Array",
+                "printedName": "[Foundation.IndexPath]",
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "Array",
-                    "printedName": "[Foundation.IndexPath]",
-                    "children": [
-                      {
-                        "kind": "TypeNominal",
-                        "name": "IndexPath",
-                        "printedName": "Foundation.IndexPath",
-                        "usr": "s:10Foundation9IndexPathV"
-                      }
-                    ],
-                    "usr": "s:Sa"
+                    "name": "IndexPath",
+                    "printedName": "Foundation.IndexPath",
+                    "usr": "s:10Foundation9IndexPathV"
                   }
                 ],
-                "usr": "s:Sq"
+                "usr": "s:Sa"
               }
             ],
             "declKind": "Func",
             "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLMultipleFilterController(im)selectedIndexPaths",
-            "mangledName": "$s26CollectionViewClassifyMenu27CYLMultipleFilterControllerC18selectedIndexPathsSay10Foundation0I4PathVGSgyF",
+            "mangledName": "$s26CollectionViewClassifyMenu27CYLMultipleFilterControllerC18selectedIndexPathsSay10Foundation0I4PathVGyF",
             "moduleName": "CollectionViewClassifyMenu",
             "isOpen": true,
             "declAttributes": [
@@ -23788,30 +23780,22 @@
               },
               {
                 "kind": "TypeNominal",
-                "name": "ImplicitlyUnwrappedOptional",
-                "printedName": "[Foundation.IndexPath]!",
+                "name": "Array",
+                "printedName": "[Foundation.IndexPath]",
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "Array",
-                    "printedName": "[Foundation.IndexPath]",
-                    "children": [
-                      {
-                        "kind": "TypeNominal",
-                        "name": "IndexPath",
-                        "printedName": "Foundation.IndexPath",
-                        "usr": "s:10Foundation9IndexPathV"
-                      }
-                    ],
-                    "usr": "s:Sa"
+                    "name": "IndexPath",
+                    "printedName": "Foundation.IndexPath",
+                    "usr": "s:10Foundation9IndexPathV"
                   }
                 ],
-                "usr": "s:Sq"
+                "usr": "s:Sa"
               }
             ],
             "declKind": "Func",
             "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLMultipleFilterController(im)setSelectedIndexPaths:",
-            "mangledName": "$s26CollectionViewClassifyMenu27CYLMultipleFilterControllerC21setSelectedIndexPathsyySay10Foundation0J4PathVGSgF",
+            "mangledName": "$s26CollectionViewClassifyMenu27CYLMultipleFilterControllerC21setSelectedIndexPathsyySay10Foundation0J4PathVGF",
             "moduleName": "CollectionViewClassifyMenu",
             "isOpen": true,
             "declAttributes": [
@@ -49463,22 +49447,22 @@
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "ImplicitlyUnwrappedOptional",
-                "printedName": "Foundation.NSMutableArray!",
+                "name": "Array",
+                "printedName": "[CollectionViewClassifyMenu.CYLTagGroup]",
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "NSMutableArray",
-                    "printedName": "Foundation.NSMutableArray",
-                    "usr": "c:objc(cs)NSMutableArray"
+                    "name": "CYLTagGroup",
+                    "printedName": "CollectionViewClassifyMenu.CYLTagGroup",
+                    "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLTagGroup"
                   }
                 ],
-                "usr": "s:Sq"
+                "usr": "s:Sa"
               }
             ],
             "declKind": "Var",
             "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLTagView(py)groups",
-            "mangledName": "$s26CollectionViewClassifyMenu06CYLTagB0C6groupsSo14NSMutableArrayCSgvp",
+            "mangledName": "$s26CollectionViewClassifyMenu06CYLTagB0C6groupsSayAA0E5GroupCGvp",
             "moduleName": "CollectionViewClassifyMenu",
             "isOpen": true,
             "declAttributes": [
@@ -49497,22 +49481,22 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "Foundation.NSMutableArray!",
+                    "name": "Array",
+                    "printedName": "[CollectionViewClassifyMenu.CYLTagGroup]",
                     "children": [
                       {
                         "kind": "TypeNominal",
-                        "name": "NSMutableArray",
-                        "printedName": "Foundation.NSMutableArray",
-                        "usr": "c:objc(cs)NSMutableArray"
+                        "name": "CYLTagGroup",
+                        "printedName": "CollectionViewClassifyMenu.CYLTagGroup",
+                        "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLTagGroup"
                       }
                     ],
-                    "usr": "s:Sq"
+                    "usr": "s:Sa"
                   }
                 ],
                 "declKind": "Accessor",
                 "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLTagView(im)groups",
-                "mangledName": "$s26CollectionViewClassifyMenu06CYLTagB0C6groupsSo14NSMutableArrayCSgvg",
+                "mangledName": "$s26CollectionViewClassifyMenu06CYLTagB0C6groupsSayAA0E5GroupCGvg",
                 "moduleName": "CollectionViewClassifyMenu",
                 "implicit": true,
                 "isOpen": true,
@@ -49533,22 +49517,22 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "Foundation.NSMutableArray!",
+                    "name": "Array",
+                    "printedName": "[CollectionViewClassifyMenu.CYLTagGroup]",
                     "children": [
                       {
                         "kind": "TypeNominal",
-                        "name": "NSMutableArray",
-                        "printedName": "Foundation.NSMutableArray",
-                        "usr": "c:objc(cs)NSMutableArray"
+                        "name": "CYLTagGroup",
+                        "printedName": "CollectionViewClassifyMenu.CYLTagGroup",
+                        "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLTagGroup"
                       }
                     ],
-                    "usr": "s:Sq"
+                    "usr": "s:Sa"
                   }
                 ],
                 "declKind": "Accessor",
                 "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLTagView(im)setGroups:",
-                "mangledName": "$s26CollectionViewClassifyMenu06CYLTagB0C6groupsSo14NSMutableArrayCSgvs",
+                "mangledName": "$s26CollectionViewClassifyMenu06CYLTagB0C6groupsSayAA0E5GroupCGvs",
                 "moduleName": "CollectionViewClassifyMenu",
                 "implicit": true,
                 "isOpen": true,
@@ -49567,7 +49551,7 @@
               {
                 "kind": "TypeNominal",
                 "name": "WeakStorage",
-                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!"
+                "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?"
               }
             ],
             "declKind": "Var",
@@ -49593,8 +49577,8 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -49629,8 +49613,8 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ImplicitlyUnwrappedOptional",
-                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)!",
+                    "name": "Optional",
+                    "printedName": "(any CollectionViewClassifyMenu.CYLMenuDataSource)?",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -50957,7 +50941,7 @@
         ],
         "declKind": "Class",
         "usr": "c:objc(cs)UIColor",
-        "location": "/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIColor.h:31:12",
+        "location": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIColor.h:31:12",
         "moduleName": "UIKit",
         "isOpen": true,
         "intro_iOS": "2.0",
@@ -51299,7 +51283,7 @@
         ],
         "declKind": "Class",
         "usr": "c:objc(cs)NSArray",
-        "location": "/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSArray.h:97:12",
+        "location": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSArray.h:97:12",
         "moduleName": "Foundation",
         "isOpen": true,
         "objc_name": "NSArray",
@@ -51489,7 +51473,7 @@
         ],
         "declKind": "Class",
         "usr": "c:objc(cs)NSDictionary",
-        "location": "/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSDictionary.h:97:12",
+        "location": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSDictionary.h:97:12",
         "moduleName": "Foundation",
         "isOpen": true,
         "objc_name": "NSDictionary",
@@ -51716,7 +51700,7 @@
         ],
         "declKind": "Class",
         "usr": "c:objc(cs)UIButton",
-        "location": "/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIButton.h:49:12",
+        "location": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIButton.h:49:12",
         "moduleName": "UIKit",
         "isOpen": true,
         "intro_iOS": "2.0",
@@ -51864,7 +51848,7 @@
         ],
         "declKind": "Class",
         "usr": "c:objc(cs)UIImage",
-        "location": "/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIImage.h:77:12",
+        "location": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIImage.h:77:12",
         "moduleName": "UIKit",
         "isOpen": true,
         "intro_iOS": "2.0",
