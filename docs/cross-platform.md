@@ -266,7 +266,7 @@ Program) show the same screens with the same data and look the same as iOS, whic
   Still TODO: step 4 (the Classify page over `cyl_places.sqlite`), step 5 (automated tests; iOS taps need a tap tool).
 - **Step 4 DONE (2026-11-15): the Classify page** (`example/src/ClassifyPage.tsx`, `PlacesDatabase.ts`), ported from the
   Flutter page:
-  - **Data:** the shared `cyl_places.sqlite` through `@op-engineering/op-sqlite` 15.x. It is copied once from the app bundle
+  - **Data:** the shared `cyl_places.sqlite` through `@op-engineering/op-sqlite` 19.0.5. It is copied once from the app bundle
     (iOS) or `assets/custom` (Android).
   - **Menu:** one section per category, single choice, folded to one row.
   - **Filter sheet:** regions and dishes, each led by an exclusive 全部, then 确定. The same SQL as iOS (`tag = ? AND region IN (…) AND tag IN (…)`,
