@@ -72,6 +72,13 @@ using namespace facebook::react;
   [super updateProps:props oldProps:oldProps];
 }
 
+- (void)updateEventEmitter:(EventEmitter::Shared const &)eventEmitter
+{
+  [super updateEventEmitter:eventEmitter];
+  // The first layout can come before the event emitter: its height event was dropped, so send it again.
+  [_view resendContentHeight];
+}
+
 - (void)handleCommand:(const NSString *)commandName args:(const NSArray *)args
 {
   RCTCylTagListViewHandleCommand(self, commandName, args);
