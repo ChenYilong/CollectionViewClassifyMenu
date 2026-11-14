@@ -34,7 +34,7 @@ CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback contro
   example layer: iOS, Android, React Native, Flutter, Mini Program, HarmonyOS; (7) record the rule in English in the
   instructions documents and reference this document from the related skills.
 - **Status:** iOS and Android DONE (2026-11-14); Flutter: iOS and Android DONE (`flutter/cyl_tag_list`); React Native,
-  HarmonyOS has no example in this repository yet; Mini Program: implemented in `CrossPlatform/wechat-miniprogram`, not yet run (2026-11-15). Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
+  HarmonyOS has no example in this repository yet; Mini Program: DONE in WeChat DevTools (`CrossPlatform/wechat-miniprogram`, 2026-11-15). Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
   `example-animation-controls.md` from another session's branch `docs/animation-playback-controls`); merged here,
   and that file now points to this one.
 
@@ -48,7 +48,7 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 | Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | DONE (2026-11-14, below) |
 | React Native | cross-platform example (animated tags) | TODO |
 | Flutter | `flutter/cyl_tag_list/example`, Animated icons | iOS and Android DONE (animations play, `cross-platform.md`) |
-| Mini Program | `CrossPlatform/wechat-miniprogram`, Animated icons | Implemented (Play all, speed slider, Loop switch through lottie-miniprogram); not yet run in WeChat DevTools (`cross-platform.md`) |
+| Mini Program | `CrossPlatform/wechat-miniprogram`, Animated icons | DONE in WeChat DevTools (2026-11-15; Play all, speed slider, Loop switch through lottie-miniprogram; `cross-platform.md`) |
 | HarmonyOS | example (when added) | TODO |
 
 ### iOS: DONE (2026-11-14)

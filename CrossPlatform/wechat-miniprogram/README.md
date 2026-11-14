@@ -45,7 +45,8 @@ wechat-miniprogram/
 
 ## Run
 
-1. `npm install` in this folder.
+1. `npm install` in this folder. WeChat DevTools rejects `touristappid`: put your AppID in a git-ignored
+   `project.private.config.json` (`{"appid": "wx…"}`).
 2. Open this folder in WeChat DevTools (or `wechatide -c <client> project_import --project <this folder>`).
 3. Tools → Build npm (构建 npm), or `wechatide -c <client> build_npm --project <this folder>`.
 4. Compile. Compile conditions for screenshots: `pages/tags/tags?autoplay=1` (2×, loop, Play all) and

@@ -283,8 +283,30 @@ Program) show the same screens with the same data and look the same as iOS, whic
   with the multiple filter and saved selections), the component and the data export; `npm test` (node --test) passes
   17 tests: the 83 places in database order, 吃喝玩逛, the statement and its placeholders, best rated first
   (日式拉面 · 北京 ★5.0 ¥93, as on iOS and Android), the selection rules, folding, the saved selections.
-- **Still TODO:** (1) compile, Build npm and run in WeChat DevTools (`wechatide` skill: `project_import`, `build_npm`,
-  automation of the two tabs) and labeled screenshots (`instructions.md`); (2) measure the tag cells against iOS
+- **Step 2 DONE (2026-11-15): runs in WeChat DevTools.** Driven by the `wechatide` CLI (skill 0.3.11, DevTools
+  2.02.2609250, base library 3.18.0, simulator iPhone, Windows 11): `project_import`, `open_project_window`,
+  `build_npm` (lottie-miniprogram, no warnings), `simulator_open_page`, `automation_*`, `simulator_screenshot`.
+  DevTools rejects `touristappid` (`APPID_ERROR`), so the AppID is set locally in the git-ignored
+  `project.private.config.json`. Checked on the running app:
+  - Animated icons: the four Lottie icons render; with `?autoplay=1` (2×, Loop on, Play all) two screenshots differ
+    only inside the Lottie rows (x 25…227, y 265…321 of 363 × 785), so the animations play; the Tags section folds at
+    3 rows with the tail control.
+  - Classify menu: 吃喝玩逛 folded to one row each (更多 ▾); the filter button (a real tap) opens the sheet
+    (地区过滤 / 菜品过滤, 全部 selected); 广州 + 确定 (a real tap) gives `… WHERE tag = ? AND region IN (?) …` and
+    川菜 · 广州 ★4.8 ¥173, 1 place, as in the Flutter example; after `reLaunch` without a query both selections come
+    back (`0-1`, `1-0,0-3`); ↺ (a real tap) resets to 全部 · 83.
+  - Limit of the automation, not of the component: `automation_element_action` cannot reach elements inside a custom
+    component (`#filterList >>> .cyl-item` resolves to the host), so the 广州 tap called the component's tap handler
+    through `automation_evaluate`; the console has no errors (only lottie-miniprogram's own warnings: a deprecated
+    `wx.getSystemInfoSync`, dynamic canvas creation).
+  - The launch query of `wechatide simulator_open_page` passes through `wechatide.cmd`, so on Windows escape `&` as
+    `^&`; the page decodes URL-encoded values.
+
+  <img src="assets/miniprogram-animated-icons.png" width="260" alt="Mini Program in WeChat DevTools: Animated icons, speed 2x, loop on, Lottie icons playing">
+  <img src="assets/miniprogram-filter-sheet.png" width="260" alt="Mini Program in WeChat DevTools: the filter sheet, 地区过滤 and 菜品过滤 with 全部 selected">
+  <img src="assets/miniprogram-classify-filter.png" width="260" alt="Mini Program in WeChat DevTools: 川菜 in 广州, 1 place">
+
+- **Still TODO:** (1) DONE above; a real-device preview (`auto_preview`) is not done yet; (2) measure the tag cells against iOS
   (left spacing, section "the tag cells look the same as iOS"); (3) a real AppID for phone preview (the project uses
   `touristappid`); (4) the shell: CYLTabBarController has no Mini Program component yet, so the example uses the
   native `tabBar`.
