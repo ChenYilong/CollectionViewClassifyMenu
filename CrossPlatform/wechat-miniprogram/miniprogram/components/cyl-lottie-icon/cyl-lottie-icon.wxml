@@ -1,0 +1,1 @@
+<canvas type="2d" class="cyl-lottie-canvas" style="width: {{size}}px; height: {{size}}px;" aria-hidden="true"></canvas>

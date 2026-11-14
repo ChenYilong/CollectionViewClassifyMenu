@@ -247,3 +247,35 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/react-native-ios-cyltabbar-shell.png" width="300" alt="React Native on iOS: CYLTabBarController's React Native tab bar with the raised Post button around the native tag list">
 
   Still TODO: Android (both components), tap checks of Post / Classify, and tests.
+
+## TODO (2026-11-15): the WeChat Mini Program example
+
+- **Context:** the Mini Program is the next platform of this document (iOS, Android, React Native, Flutter, HarmonyOS,
+  Mini Program). The repository had no Mini Program code; the documents mention it only as a platform of the rules
+  (`example-demo-rules.md`: playback controls; `instructions.md`: screenshots labeled with the platform; the
+  `cyl-upstream` / `cyl-verify` skills).
+- **Location:** `CrossPlatform/wechat-miniprogram` (new `CrossPlatform/` folder, the layout of CYLTabBarController's
+  `CrossPlatform/`; Flutter and React Native keep their top-level folders).
+- **Design:** a Mini Program cannot host the native view, so the component `cyl-tag-list` ports the core's
+  `CYLTagListView` from the same configuration dictionary (selection rules of `handleTap(at:)`, exclusive items,
+  `defaultVisibleRows` folding measured from the rendered cells, 更多 / 收起). A Mini Program has no SQLite, so
+  `scripts/export-miniprogram-data.py` exports the rows of the shared `cyl_places.sqlite` to a module (`--check` keeps
+  it in step) and `utils/places-db.js` runs the iOS example's statement on them. Lottie icons play through
+  `lottie-miniprogram` with speed, loop and Play all. Details: `CrossPlatform/wechat-miniprogram/README.md`.
+- **Step 1 DONE (2026-11-15):** the project (two bottom tabs: Animated icons with the playback controls, Classify menu
+  with the multiple filter and saved selections), the component and the data export; `npm test` (node --test) passes
+  17 tests: the 83 places in database order, 吃喝玩逛, the statement and its placeholders, best rated first
+  (日式拉面 · 北京 ★5.0 ¥93, as on iOS and Android), the selection rules, folding, the saved selections.
+- **Still TODO:** (1) compile, Build npm and run in WeChat DevTools (`wechatide` skill: `project_import`, `build_npm`,
+  automation of the two tabs) and labeled screenshots (`instructions.md`); (2) measure the tag cells against iOS
+  (left spacing, section "the tag cells look the same as iOS"); (3) a real AppID for phone preview (the project uses
+  `touristappid`); (4) the shell: CYLTabBarController has no Mini Program component yet, so the example uses the
+  native `tabBar`.
+- **Prompt (verbatim):**
+
+  > 修复 Class 文件夹下资源文件名太长 导致 git 相关操作失败的问题。 资源文件 关键词搜 leftBarButton continue
+  > 。基于新分支 开始下微信小程序开发。找到docs里面任何提及微信小程序的信息开始开发。找到crossplatorm 相关文件夹，没有就新建，新建或者更微信小程序开发。微信小程序开发者工具Skills ，根据文档
+
+  English: fix the git failures caused by the over-long resource file names under `Class` (search "leftBarButton");
+  then, on the new branch, start the WeChat Mini Program development from whatever the docs say about it, in the
+  cross-platform folder (create it when missing), using the WeChat DevTools skill.

@@ -1,0 +1,2 @@
+:host { display: inline-block; line-height: 0; }
+.cyl-lottie-canvas { display: block; }

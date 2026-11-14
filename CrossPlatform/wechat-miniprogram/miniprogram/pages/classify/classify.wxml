@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="toolbar">
+    <text class="toolbar-title">Classify menu</text>
+    <view class="toolbar-actions">
+      <view class="icon-button" bindtap="resetConditions" aria-role="button" aria-label="重置筛选条件">↺</view>
+      <view class="icon-button {{filtered ? 'icon-active' : ''}}" bindtap="openFilter" aria-role="button" aria-label="筛选">⛉</view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="menu">
+    <cyl-tag-list id="classify" configuration="{{configuration}}" bind:tagtap="onTagTap" />
+  </scroll-view>
+
+  <view class="summary">
+    <text class="summary-text" id="placesSummary">{{summary}}</text>
+    <text class="sql" user-select>{{sql}}</text>
+  </view>
+
+  <view wx:if="{{!places.length}}" class="empty" id="noPlaces">没有符合条件的地点，换个条件试试</view>
+  <scroll-view scroll-y class="places">
+    <view wx:for="{{places}}" wx:key="id" class="place">
+      <view class="place-main">
+        <text class="place-name">{{item.name}}</text>
+        <text class="place-region">{{item.region}}</text>
+      </view>
+      <text class="place-score">★ {{item.ratingText}} · ¥{{item.price}}</text>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{filterVisible}}" class="mask" bindtap="closeFilter" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <scroll-view scroll-y class="sheet-list">
+        <cyl-tag-list configuration="{{filterConfiguration}}" bind:selectionchange="onFilterChange" />
+      </scroll-view>
+      <button class="confirm" id="confirmFilter" bindtap="confirmFilter">确定</button>
+    </view>
+  </view>
+</view>

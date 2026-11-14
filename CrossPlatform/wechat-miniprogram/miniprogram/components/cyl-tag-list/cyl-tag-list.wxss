@@ -1,0 +1,20 @@
+/* The layout of the core's CYLTagListView: 16 px insets, 10 px between cells; a cell centers its icon and title with
+   5 px between them (imageTitleSpacing), as CYLIndexPathButton does (docs/cross-platform.md, tag cells). */
+:host { display: block; }
+.cyl-tag-list { padding: 8px 16px; box-sizing: border-box; }
+.cyl-section + .cyl-section { margin-top: 12px; }
+.cyl-header { display: flex; align-items: center; justify-content: space-between; min-height: 32px; }
+.cyl-header-title { font-size: 15px; font-weight: 600; color: #333; }
+.cyl-fold-header { display: flex; align-items: center; font-size: 13px; color: #888; padding: 4px 0 4px 12px; }
+.cyl-items { display: flex; flex-wrap: wrap; margin: 4px -5px 0; }
+.cyl-item {
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  margin: 5px; padding: 0 8px; border-style: solid; font-size: 14px; white-space: nowrap; max-width: calc(100% - 10px);
+}
+.cyl-icon { margin-right: 5px; flex: none; }
+.cyl-glyph { line-height: 1; }
+.cyl-title { overflow: hidden; text-overflow: ellipsis; }
+.cyl-disabled { opacity: 0.4; }
+.cyl-fold-tail { color: #888; }
+.cyl-fold-arrow { display: inline-block; margin-left: 2px; transition: transform 0.2s; }
+.cyl-up { transform: rotate(180deg); }

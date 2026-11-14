@@ -1,0 +1,22 @@
+.page { display: flex; flex-direction: column; height: 100vh; background: #fff; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; }
+.toolbar-title { font-size: 20px; font-weight: 600; }
+.toolbar-actions { display: flex; }
+.icon-button { width: 40px; height: 40px; line-height: 40px; text-align: center; font-size: 22px; color: #555; }
+.icon-active { color: #2AB9A0; }
+/* As tall as the tags, at most half the page; beyond that the menu scrolls itself. */
+.menu { max-height: 50vh; flex: none; }
+.summary { padding: 8px 16px 4px; border-top: 1px solid #eee; }
+.summary-text { display: block; font-size: 14px; font-weight: 600; color: #333; }
+.sql { display: block; margin-top: 4px; font-size: 11px; color: #999; font-family: Menlo, monospace; }
+.empty { padding: 24px; text-align: center; color: #999; font-size: 14px; }
+.places { flex: 1; min-height: 0; }
+.place { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; }
+.place-main { display: flex; flex-direction: column; }
+.place-name { font-size: 14px; color: #333; }
+.place-region { font-size: 12px; color: #888; margin-top: 2px; }
+.place-score { font-size: 13px; color: #555; }
+.mask { position: fixed; inset: 0; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); display: flex; align-items: flex-end; z-index: 10; }
+.sheet { width: 100%; height: 60vh; background: #fff; border-radius: 12px 12px 0 0; display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); }
+.sheet-list { flex: 1; min-height: 0; }
+.confirm { margin: 16px; background: #2AB9A0; color: #fff; }

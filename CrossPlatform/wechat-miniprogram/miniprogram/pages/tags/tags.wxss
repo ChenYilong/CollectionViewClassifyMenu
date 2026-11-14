@@ -1,0 +1,11 @@
+.page { display: flex; flex-direction: column; height: 100vh; background: #fff; }
+.toolbar { padding: 8px 16px; }
+.toolbar-title { font-size: 20px; font-weight: 600; }
+.controls { padding: 0 16px; }
+.row { display: flex; align-items: center; min-height: 44px; }
+.label { width: 48px; font-size: 15px; color: #333; }
+.slider { flex: 1; margin: 0 12px; }
+.value { width: 44px; text-align: right; font-size: 15px; color: #333; }
+.play { margin-left: auto; background: #2AB9A0; color: #fff; }
+.list { flex: 1; min-height: 0; }
+.last-tap { padding: 8px 16px; font-size: 13px; color: #888; border-top: 1px solid #eee; }
