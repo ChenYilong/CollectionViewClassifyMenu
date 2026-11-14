@@ -67,6 +67,16 @@ Program) show the same screens with the same data and look the same as iOS, whic
   is wider than `-sizeWithAttributes:` (Apple Color Emoji / PingFang metrics), and `UIButton` centers within that
   label; Android measures with Noto. Next: log the iOS title label's frame in a test, then decide whether the core
   should size cells from the label's intrinsic width on both platforms.
+  Update 2026-11-14: the core's formula is the same on both platforms (`CYLClassifyMenuViewController.cellWidth(for:)`:
+  `ceil(text width) + 38` with an image, `+ 19` without; Android's `CYLClassifyMenuViewController` mirrors it), so the
+  6 pt width difference can only come from the two text measurements (Apple Color Emoji and PingFang against Noto): a
+  font-metric difference, not a layout bug, and sizing from the label's intrinsic width would not remove it. The 10 pt
+  against 4.6 dp image-to-title gap is not explained yet: `CYLIndexPathButton` moves the image half of the spacing (2.5)
+  left and the title half right of UIButton's adjacent layout, so a 5 pt gap is expected; the remaining 5 pt is probably
+  transparent padding inside the `home_btn_shrink` image, which the Android drawable may not have. A measurement test in
+  a bare window failed (the menu shows no cells there); the next step is to log the cell, image view and title label
+  frames from a screenshot-run screen (`CYLExampleAppDelegate`'s `-CYLExampleScreen` hook), and to compare the image
+  asset's alpha bounds with the Android drawable's.
 - **Context:** with the same parameters, the Android classify menu's tag cells differ from iOS: an image sits at the
   cell's left edge on Android, while iOS centers image and title together, so the left padding equals the right one
   (`assets/request-android-cell-left-spacing.png`, `assets/request-ios-cell-reference.png`,
