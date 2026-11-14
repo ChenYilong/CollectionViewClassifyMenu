@@ -20,6 +20,11 @@ Page({
     filtered: false,
   },
 
+  onShow() {
+    // The custom tab bar (CYLTabBarController's cyl-tab-bar) selects the tab of this page.
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().syncWithRoute(this.route);
+  },
+
   onLoad(options) {
     this.categories = db.categories();
     this.tags = db.tags();
@@ -61,10 +66,17 @@ Page({
       filterVisible: true,
       filterConfiguration: state.filterConfiguration(this.tags, this.filterItems),
     });
+    this.setTabBarHidden(true);
   },
 
   closeFilter() {
     this.setData({ filterVisible: false });
+    this.setTabBarHidden(false);
+  },
+
+  /** The sheet covers the tab bar's area, so the bar hides while it is open (its 确定 stays reachable). */
+  setTabBarHidden(hidden) {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setHidden(hidden);
   },
 
   onFilterChange(event) {
@@ -76,6 +88,7 @@ Page({
     this.filterItems = this.pendingFilter;
     selections.save(selections.FILTER_SCENARIO, this.filterItems);
     this.setData({ filterVisible: false });
+    this.setTabBarHidden(false);
     this.runQuery();
   },
 

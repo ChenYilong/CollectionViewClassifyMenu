@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/tags/tags",
+    "pages/post/post",
     "pages/classify/classify"
   ],
   "window": {
@@ -10,13 +11,23 @@
     "backgroundColor": "#ffffff"
   },
   "tabBar": {
-    "color": "#8a8a8a",
+    "custom": true,
+    "color": "#8E8E93",
     "selectedColor": "#2AB9A0",
     "backgroundColor": "#ffffff",
-    "borderStyle": "black",
     "list": [
-      { "pagePath": "pages/tags/tags", "text": "Animated icons" },
-      { "pagePath": "pages/classify/classify", "text": "Classify menu" }
+      {
+        "pagePath": "pages/tags/tags",
+        "text": "Tags"
+      },
+      {
+        "pagePath": "pages/post/post",
+        "text": "Post"
+      },
+      {
+        "pagePath": "pages/classify/classify",
+        "text": "Classify"
+      }
     ]
   },
   "style": "v2",
