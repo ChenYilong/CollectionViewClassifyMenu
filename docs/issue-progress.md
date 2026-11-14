@@ -195,3 +195,16 @@ tags: [issues, ui, cocoapods, progress]
   `placeholderLabel`）。
 - 布局：图片标签的标签组在最大字号下不再相互覆盖，`CYLImageTagView` 只移动显示位置（`displayOffset`），
   不改数据；见 [tagviewgroup-api.md](tagviewgroup-api.md)。
+
+## TODO (2026-11-15): asset names too long for git
+
+- **Context:** the two filter icons of the core's `Images.xcassets` (`CollectionViewClassifyMenu/Class/Other/Symtem/`)
+  repeat a 70-character name in the image set folder and in each file, so their paths reach 231 characters. git fails on
+  them where paths are limited (Windows `MAX_PATH` 260 with the clone's own path in front, `core.longpaths` off).
+- **Requirement:** shorten the resource names and update every reference (core, Example, docs).
+- **Prompt (verbatim):**
+
+  > 修复 Class 文件夹下资源文件名太长 导致 git 相关操作失败的问题。 资源文件 关键词搜 leftBarButton continue
+
+  English: fix the resource file names under the Class folder that are so long that git operations fail; search the
+  resources for the keyword leftBarButton.
