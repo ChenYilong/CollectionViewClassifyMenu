@@ -45,6 +45,13 @@ public final class CylTagListBridge: UIView {
         tagList?.animationLoops = loops
     }
 
+    /// Sends the content height again, even when it did not change: an event sent before the Fabric view had its event
+    /// emitter was dropped.
+    @objc public func resendContentHeight() {
+        sentHeight = -1
+        sendContentHeight()
+    }
+
     @objc public func playAll() {
         tagList?.playAllAnimations()
     }

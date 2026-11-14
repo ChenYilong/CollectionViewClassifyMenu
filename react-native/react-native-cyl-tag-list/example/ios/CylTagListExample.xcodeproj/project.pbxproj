@@ -15,10 +15,22 @@
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
 		7E7B06DF6F4065B663F006EC /* cyl_places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 35531EB0A089D2B86050EAD4 /* cyl_places.sqlite */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		DAFD18745F85DE7790A9C534 /* CylTagListExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D38A7EFE322AE5A79689A9 /* CylTagListExampleUITests.swift */; };
 		EBC76EA92FF7B201E7BC7F92 /* tab_message_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 668801FCC462A35FF381D23D /* tab_message_animate.json */; };
 		F461572AD868AF140C59FCD4 /* tab_me_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = FC60366E534EBA18D17887B8 /* tab_me_animate.json */; };
+		F6C50C17A579043E64C3A1FF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B5F354A9A85AC00AA2664E /* Foundation.framework */; };
 		FEFF8E0BABE6EAE91787B428 /* Pods_CylTagListExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 573766517D75068B61FB97A6 /* Pods_CylTagListExample.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8BC1ABA4732499ACE1E62DB3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
+			remoteInfo = CylTagListExample;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		13B07F961A680F5B00A75B9A /* CylTagListExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CylTagListExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -29,12 +41,15 @@
 		3B4392A12AC88292D35C810B /* Pods-CylTagListExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CylTagListExample.debug.xcconfig"; path = "Target Support Files/Pods-CylTagListExample/Pods-CylTagListExample.debug.xcconfig"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-CylTagListExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CylTagListExample.release.xcconfig"; path = "Target Support Files/Pods-CylTagListExample/Pods-CylTagListExample.release.xcconfig"; sourceTree = "<group>"; };
 		573766517D75068B61FB97A6 /* Pods_CylTagListExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CylTagListExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		63B5F354A9A85AC00AA2664E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		65B508A24967FE77682B0D5D /* tab_search_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_search_animate.json; path = CylTagListExample/Animations/tab_search_animate.json; sourceTree = "<group>"; };
 		668801FCC462A35FF381D23D /* tab_message_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_message_animate.json; path = CylTagListExample/Animations/tab_message_animate.json; sourceTree = "<group>"; };
+		69D38A7EFE322AE5A79689A9 /* CylTagListExampleUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CylTagListExampleUITests.swift; sourceTree = "<group>"; };
 		71C51F8F957659CE08E6ECAD /* tab_home_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_home_animate.json; path = CylTagListExample/Animations/tab_home_animate.json; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CylTagListExample/AppDelegate.swift; sourceTree = "<group>"; };
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = CylTagListExample/SceneDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = CylTagListExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C2A797556F6EDFE7E27F8302 /* CylTagListExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CylTagListExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FC60366E534EBA18D17887B8 /* tab_me_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_me_animate.json; path = CylTagListExample/Animations/tab_me_animate.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -45,6 +60,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				FEFF8E0BABE6EAE91787B428 /* Pods_CylTagListExample.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A08DE872C487A994348B450 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6C50C17A579043E64C3A1FF /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +97,7 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				573766517D75068B61FB97A6 /* Pods_CylTagListExample.framework */,
+				F68DD4E7A0043B6E1128497C /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -93,6 +117,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				94272A65930CB9AED43E0EBC /* CylTagListExampleUITests */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -103,8 +128,18 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* CylTagListExample.app */,
+				C2A797556F6EDFE7E27F8302 /* CylTagListExampleUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		94272A65930CB9AED43E0EBC /* CylTagListExampleUITests */ = {
+			isa = PBXGroup;
+			children = (
+				69D38A7EFE322AE5A79689A9 /* CylTagListExampleUITests.swift */,
+			);
+			name = CylTagListExampleUITests;
+			path = CylTagListExampleUITests;
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -114,6 +149,14 @@
 				5709B34CF0A7D63546082F79 /* Pods-CylTagListExample.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		F68DD4E7A0043B6E1128497C /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				63B5F354A9A85AC00AA2664E /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -139,6 +182,24 @@
 			productName = CylTagListExample;
 			productReference = 13B07F961A680F5B00A75B9A /* CylTagListExample.app */;
 			productType = "com.apple.product-type.application";
+		};
+		5F6ED4AFACBD914DB91FEAE1 /* CylTagListExampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E27B0375B77960A05D4A3AFB /* Build configuration list for PBXNativeTarget "CylTagListExampleUITests" */;
+			buildPhases = (
+				A866AA40D687361C41DAAB85 /* Sources */,
+				7A08DE872C487A994348B450 /* Frameworks */,
+				D5E10235CD0FB21C902B0066 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2E7CE05F9F64207917A5D0A7 /* PBXTargetDependency */,
+			);
+			name = CylTagListExampleUITests;
+			productName = CylTagListExampleUITests;
+			productReference = C2A797556F6EDFE7E27F8302 /* CylTagListExampleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -167,6 +228,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* CylTagListExample */,
+				5F6ED4AFACBD914DB91FEAE1 /* CylTagListExampleUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -184,6 +246,13 @@
 				6448B7D26CF37DFC8499C74C /* tab_search_animate.json in Resources */,
 				28A87DC6CA5C60B8F141C0BE /* PrivacyInfo.xcprivacy in Resources */,
 				7E7B06DF6F4065B663F006EC /* cyl_places.sqlite in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D5E10235CD0FB21C902B0066 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,7 +343,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A866AA40D687361C41DAAB85 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAFD18745F85DE7790A9C534 /* CylTagListExampleUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2E7CE05F9F64207917A5D0A7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CylTagListExample;
+			target = 13B07F861A680F5B00A75B9A /* CylTagListExample */;
+			targetProxy = 8BC1ABA4732499ACE1E62DB3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
@@ -537,6 +623,37 @@
 			};
 			name = Release;
 		};
+		DAAE11123A00F91C3FD4884C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				PRODUCT_BUNDLE_IDENTIFIER = cyltaglist.example.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CylTagListExample;
+			};
+			name = Debug;
+		};
+		ECF76964CC8F6FD3EC5EA67B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				PRODUCT_BUNDLE_IDENTIFIER = cyltaglist.example.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CylTagListExample;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -554,6 +671,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E27B0375B77960A05D4A3AFB /* Build configuration list for PBXNativeTarget "CylTagListExampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ECF76964CC8F6FD3EC5EA67B /* Release */,
+				DAAE11123A00F91C3FD4884C /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

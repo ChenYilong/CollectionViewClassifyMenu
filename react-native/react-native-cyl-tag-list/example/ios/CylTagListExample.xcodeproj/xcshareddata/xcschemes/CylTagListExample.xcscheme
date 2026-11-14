@@ -38,6 +38,16 @@
                ReferencedContainer = "container:CylTagListExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5F6ED4AFACBD914DB91FEAE1"
+               BuildableName = "CylTagListExampleUITests.xctest"
+               BlueprintName = "CylTagListExampleUITests"
+               ReferencedContainer = "container:CylTagListExample.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

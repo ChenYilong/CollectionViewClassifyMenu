@@ -63,18 +63,27 @@ export class PlacesDatabase {
    * first: the statement of the iOS example's `CYLMenuLinkageViewController.query(forTag:regions:dishes:)`.
    */
   async places(tag: string | null, regions: string[], dishes: string[]): Promise<Row[]> {
-    const conditions: string[] = [];
-    const args: unknown[] = [];
-    if (tag != null) {
-      conditions.push('tag = ?');
-      args.push(tag);
-    }
-    for (const [column, values] of [['region', regions], ['tag', dishes]] as const) {
-      if (values.length === 0) continue;
-      conditions.push(`${column} IN (${values.map(() => '?').join(', ')})`);
-      args.push(...values);
-    }
-    const where = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : '';
-    return this.rows(`SELECT name, region, rating, price FROM places${where} ORDER BY rating DESC, id`, args);
+    const query = placesQuery(tag, regions, dishes);
+    return this.rows(query.sql, query.args);
   }
+}
+
+/**
+ * The statement of the iOS example's `CYLMenuLinkageViewController.query(forTag:regions:dishes:)`: the places of a tag
+ * (every tag when null) in the regions with one of the dishes (every one when empty), best rated first; values bound.
+ */
+export function placesQuery(tag: string | null, regions: string[], dishes: string[]): { sql: string; args: string[] } {
+  const conditions: string[] = [];
+  const args: string[] = [];
+  if (tag != null) {
+    conditions.push('tag = ?');
+    args.push(tag);
+  }
+  for (const [column, values] of [['region', regions], ['tag', dishes]] as const) {
+    if (values.length === 0) continue;
+    conditions.push(`${column} IN (${values.map(() => '?').join(', ')})`);
+    args.push(...values);
+  }
+  const where = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : '';
+  return { sql: `SELECT name, region, rating, price FROM places${where} ORDER BY rating DESC, id`, args };
 }
