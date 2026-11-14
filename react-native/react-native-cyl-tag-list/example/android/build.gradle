@@ -19,3 +19,20 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// The Kotlin CYLTagListView (com.cyl:classifymenu), published to a local Maven folder by CollectionViewClassifyMenu's
+// `android/scripts/gradle.sh merged :library:publishReleasePublicationToBuildRepository`; -Pcyl.classifymenu.repo=<folder>
+// points elsewhere (a build mirror).
+allprojects {
+    repositories {
+        maven { url = uri(rootProject.findProperty("cyl.classifymenu.repo") ?: "${rootDir}/../../../../android/merged/library/build/repo") }
+    }
+}
+
+// react-native-cyltabbar compiles CYLTabBarController's Kotlin sources (Example-Android) from the checkout of
+// scripts/fetch-cyltabbar.sh; its default path assumes the CYLTabBarController repository around it.
+subprojects { project ->
+    if (project.name == "react-native-cyltabbar") {
+        project.ext.cylAndroidRoot = "${rootDir}/../../.deps/CYLTabBarController/Example-Android"
+    }
+}

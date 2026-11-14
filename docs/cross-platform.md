@@ -247,3 +247,20 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/react-native-ios-cyltabbar-shell.png" width="300" alt="React Native on iOS: CYLTabBarController's React Native tab bar with the raised Post button around the native tag list">
 
   Still TODO: Android (both components), tap checks of Post / Classify, and tests.
+- **Step 3 DONE (2026-11-15, Android):** the Kotlin Fabric view `CylTagListView` (`android/src/main/java/com/cyltaglist`)
+  is a `FrameLayout` around the Kotlin `CYLTagListView` (`com.cyl:classifymenu:0.1.0`, the Maven folder of
+  `cyl.classifymenu.repo`). It lays out the native list itself, because React Native lays out only its own views, and it sends
+  the same events as iOS. `asset:<name>` is `file:///android_asset/<name>`. In the example, `react-native-cyltabbar` compiles
+  CYLTabBarController's Kotlin sources from the `.deps` checkout (`cylAndroidRoot` in `example/android/build.gradle`), with
+  Lottie 6.6.2. The tab icons are vector drawables `cyl_tab_tag` / `cyl_tab_classify`, because Android has no SF Symbols and the
+  tab bar maps `system:tag` to a drawable named `tag`. Evidence (Android 15 / API 35 emulator `CYL_API35_arm64`, React Native
+  0.88.0, release APK, base commit `1b54d42`, CYLTabBarController `460ed89f`, 2026-11-15). Taps by adb, top to bottom:
+  1. first launch;
+  2. 2x speed, Loop on, Home tapped (the selection event reached JavaScript: "Selected: Home");
+  3. the Post page:
+
+  <img src="assets/react-native-android-tab-bar.png" width="300" alt="React Native on Android: native tag list in CYLTabBarController's tab bar">
+  <img src="assets/react-native-android-controls.png" width="300" alt="React Native on Android: speed 2x, loop on, Home selected">
+  <img src="assets/react-native-android-plus-page.png" width="300" alt="React Native on Android: the raised Post button's own page">
+
+  Still TODO: step 4 (the Classify page over `cyl_places.sqlite`), step 5 (automated tests; iOS taps need a tap tool).

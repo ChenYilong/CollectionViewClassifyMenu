@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { CYLTabBar, type CYLTabBarItem, type CYLTabBarPlusButton } from 'react-native-cyltabbar';
 import TagListPage from './TagListPage';
 import { t } from './i18n';
@@ -8,9 +8,16 @@ import { t } from './i18n';
  * The example's shell is CYLTabBarController's React Native component, as the iOS and Flutter examples use
  * CYLTabBarController: each tab is a page of the tag list demos.
  */
+// SF Symbols on iOS; on Android, vector drawables of the example (res/drawable/cyl_tab_*.xml).
+const icon = (symbol: string, drawable: string) => (Platform.OS === 'ios' ? symbol : drawable);
 const ITEMS: CYLTabBarItem[] = [
-  { title: t('Tags'), image: 'system:tag', selectedImage: 'system:tag.fill', identifier: 'tags' },
-  { title: t('Classify'), image: 'system:square.grid.2x2', selectedImage: 'system:square.grid.2x2.fill', identifier: 'classify' },
+  { title: t('Tags'), image: icon('system:tag', 'cyl_tab_tag'), selectedImage: icon('system:tag.fill', 'cyl_tab_tag'), identifier: 'tags' },
+  {
+    title: t('Classify'),
+    image: icon('system:square.grid.2x2', 'cyl_tab_classify'),
+    selectedImage: icon('system:square.grid.2x2.fill', 'cyl_tab_classify'),
+    identifier: 'classify',
+  },
 ];
 
 // The raised plus button with a page of its own (CYLTabBarController's example: CYLPlusButtonSubclass).
