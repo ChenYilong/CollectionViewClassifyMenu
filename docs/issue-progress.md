@@ -86,8 +86,11 @@ tags: [issues, ui, cocoapods, progress]
   `CYLTabBarLoginStateDidChangeNotification`, and `CYLSettingsDemoRows+Pages.swift:470/476` has an ambiguous
   `cyl_showBadgeValue(_:animationType:)`. The pins stay (`53766de` root, `0e69250` examples); still TODO, to fix in
   CYLTabBarController.
-- TODO（验证）：`Example/CYLMenuExample` 的 `CYLMenuLinkageViewController` 导航栏按钮在 iOS 26+ 是否同样被 Liquid Glass 气泡遮住
-  （演示 app 已用 `hidesSharedBackground` 修复）；需在模拟器截图确认。
+- DONE（验证，2026-11-14）：`Example/CYLMenuExample` 的 `CYLMenuLinkageViewController` 导航栏按钮在 iOS 26+ 没有被 Liquid Glass 气泡遮住：
+  左上角筛选按钮的图标（漏斗，已修改时带红点）与右上角“重置”均可见，无需 `hidesSharedBackground`。截图：iOS，iPhone 17 Pro 模拟器，
+  iOS 27.0，Xcode 27.2，macOS 27.3，提交 `ff14821`，2026-11-14 21:42 NZDT（`plus-menu-filtered`，英文）：
+
+  <img src="assets/ios-example-menu-linkage-filter-button.png" width="300" alt="Menu linkage: the filter button is visible next to the title">
 
 - DONE（两个功能分到不同 tabbaritem，2026-11-12，`feat/android-kotlin`）：
   - Android：Classify 与 Filter 两个 tab（`d12f101`，截图见 [android.md](android.md)）。
