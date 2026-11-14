@@ -64,6 +64,11 @@ Page({
     lastTap: '',
   },
 
+  onShow() {
+    // The custom tab bar (CYLTabBarController's cyl-tab-bar) selects the tab of this page.
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().syncWithRoute(this.route);
+  },
+
   onLoad(options) {
     // `?autoplay=1` (a compile condition) applies 2x, loop and Play all after a second, for screenshots.
     if (options && options.autoplay) {

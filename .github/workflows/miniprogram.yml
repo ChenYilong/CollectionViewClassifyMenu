@@ -35,6 +35,11 @@ jobs:
           node-version: 22
       - name: Data check
         run: python3 scripts/export-miniprogram-data.py --check
+      # [EN] CYLTabBarController's tab bar component at the pinned commit, so its configuration reader checks the example's tab bar.
+      # [CN] 按固定 commit 安装 CYLTabBarController 的 TabBar 组件，用它的配置读取器检查示例的 TabBar。
+      - name: CYLTabBarController component
+        working-directory: CrossPlatform/wechat-miniprogram
+        run: node scripts/fetch-cyltabbar.js && node scripts/fetch-cyltabbar.js --check
       - name: Unit tests
         working-directory: CrossPlatform/wechat-miniprogram
         run: npm test

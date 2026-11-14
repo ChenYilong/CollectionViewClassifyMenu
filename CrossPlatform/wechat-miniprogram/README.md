@@ -1,7 +1,9 @@
 # WeChat Mini Program example
 
 The Mini Program example of CollectionViewClassifyMenu: the same screens and data as the iOS, Android and Flutter
-examples (`docs/cross-platform.md`), with iOS as the reference.
+examples (`docs/cross-platform.md`), with iOS as the reference. Its shell is CYLTabBarController's Mini Program
+tab bar (`cyl-tab-bar` of `cyl-tabbar-miniprogram`): the tabs Tags and Classify and the raised Post button with a page of
+its own, as the iOS, Flutter and React Native examples use CYLTabBarController.
 
 | Tab | What it shows |
 | --- | --- |
@@ -14,9 +16,12 @@ examples (`docs/cross-platform.md`), with iOS as the reference.
 wechat-miniprogram/
 ├── project.config.json          appid "touristappid" (tourist mode); set your own AppID to preview on a phone
 ├── package.json                 lottie-miniprogram; `npm test` runs the unit tests
+├── scripts/fetch-cyltabbar.js   installs CYLTabBarController's cyl-tabbar-miniprogram at the pinned commit (git-ignored)
 ├── test/                        node --test: the model, the statement, the saved selections
 └── miniprogram/
-    ├── app.json                 two tabs (bottom tab bar)
+    ├── app.json                 custom tab bar: Tags, Post (raised plus button), Classify
+    ├── custom-tab-bar/          cyl-tab-bar with the example's configuration (configuration.js)
+    ├── images/tab/              tab icons and the Post button images
     ├── components/
     │   ├── cyl-tag-list/        the port of the core's CYLTagListView (model.js has no wx calls)
     │   └── cyl-lottie-icon/     one Lottie icon on a 2d canvas, with speed / loops / play()
@@ -45,7 +50,8 @@ wechat-miniprogram/
 
 ## Run
 
-1. `npm install` in this folder. WeChat DevTools rejects `touristappid`: put your AppID in a git-ignored
+1. `npm install` and `node scripts/fetch-cyltabbar.js` in this folder (the second checks CYLTabBarController out at
+   the pinned commit into `.deps/` and copies its tab bar to `miniprogram/cyl_components/`). WeChat DevTools rejects `touristappid`: put an AppID (CYLTabBarController's examples use `wx5e29c9d33906f074`) in a git-ignored
    `project.private.config.json` (`{"appid": "wx…"}`).
 2. Open this folder in WeChat DevTools (or `wechatide -c <client> project_import --project <this folder>`).
 3. Tools → Build npm (构建 npm), or `wechatide -c <client> build_npm --project <this folder>`.

@@ -7,5 +7,5 @@
 .slider { flex: 1; margin: 0 12px; }
 .value { width: 44px; text-align: right; font-size: 15px; color: #333; }
 .play { margin-left: auto; background: #2AB9A0; color: #fff; }
-.list { flex: 1; min-height: 0; }
+.list { flex: 1; min-height: 0; padding-bottom: 24px; box-sizing: border-box; }
 .last-tap { padding: 8px 16px; font-size: 13px; color: #888; border-top: 1px solid #eee; }

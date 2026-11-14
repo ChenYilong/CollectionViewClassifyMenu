@@ -11,6 +11,8 @@
 .sql { display: block; margin-top: 4px; font-size: 11px; color: #999; font-family: Menlo, monospace; }
 .empty { padding: 24px; text-align: center; color: #999; font-size: 14px; }
 .places { flex: 1; min-height: 0; }
+/* Room under the last row for the raised Post button of the tab bar. */
+.place:last-child { margin-bottom: 24px; }
 .place { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; }
 .place-main { display: flex; flex-direction: column; }
 .place-name { font-size: 14px; color: #333; }

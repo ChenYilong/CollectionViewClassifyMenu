@@ -338,8 +338,26 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
 - **Still TODO:** (1) DONE above; a real-device preview (`auto_preview`) is not done yet; (2) measure the tag cells against iOS
   (left spacing, section "the tag cells look the same as iOS"); (3) a real AppID for phone preview (the project uses
-  `touristappid`); (4) the shell: CYLTabBarController has no Mini Program component yet, so the example uses the
-  native `tabBar`.
+  `touristappid`); (4) the shell: DONE (below).
+- **Shell DONE (2026-11-15): CYLTabBarController's Mini Program tab bar.** The example's shell is `cyl-tab-bar` of
+  CYLTabBarController's `cyl-tabbar-miniprogram` (`CrossPlatform/wechat-miniprogram-cyltabbar`, pinned at `460ed89f`, the
+  React Native example's pin), as the iOS, Flutter and React Native examples use CYLTabBarController: a custom tab bar
+  (`app.json` `"custom": true`, `miniprogram/custom-tab-bar/`) with the tabs Tags and Classify and the raised Post button
+  with a page of its own between them (`CYLPlusButtonCenterYOffset` -14, the React Native example's `post_normal` /
+  `post_highlight` images; drawn PNG tab icons, as a Mini Program has no SF Symbols). The package is not on npm, so
+  `node scripts/fetch-cyltabbar.js` checks CYLTabBarController out into `.deps/` (sparse, git-ignored) and copies its `src/`
+  to `miniprogram/cyl_components/` (git-ignored; outside `miniprogram_npm`, which Build npm rewrites); `--check` keeps it
+  at the pin, and CI runs both. The filter sheet hides the bar while it is open (`cyl_setTabBarHidden`), which otherwise
+  covered 确定. The example uses CYLTabBarController's AppID `wx5e29c9d33906f074` (技术清谈), set in the git-ignored
+  `project.private.config.json`. Test: `tab-bar-configuration.test.js` reads the example's configuration through
+  CYLTabBarController's own reader (Tags, Classify, the Post button with a page); `npm test`: 21 tests pass. In WeChat
+  DevTools: `switchTab` to each page selects its tab (`selectedIdentifier` tags / classify / post), the tab bar's
+  `select` event switches pages, the sheet opens and confirms with real taps and no console errors.
+
+  <img src="assets/miniprogram-cyltabbar-tags.png" width="240" alt="Mini Program: Tags tab in CYLTabBarController's tab bar with the raised Post button">
+  <img src="assets/miniprogram-cyltabbar-post.png" width="240" alt="Mini Program: the Post button's own page, Post selected">
+  <img src="assets/miniprogram-cyltabbar-classify.png" width="240" alt="Mini Program: Classify tab selected">
+
 - **Prompt (verbatim):**
 
   > 修复 Class 文件夹下资源文件名太长 导致 git 相关操作失败的问题。 资源文件 关键词搜 leftBarButton continue
@@ -348,3 +366,4 @@ Program) show the same screens with the same data and look the same as iOS, whic
   English: fix the git failures caused by the over-long resource file names under `Class` (search "leftBarButton");
   then, on the new branch, start the WeChat Mini Program development from whatever the docs say about it, in the
   cross-platform folder (create it when missing), using the WeChat DevTools skill.
+  Then (shell): "running on the CYLTabBarController AppID wx5e29c9d33906f074 continue".

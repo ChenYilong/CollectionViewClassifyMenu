@@ -1,3 +1,5 @@
 node_modules/
 miniprogram/miniprogram_npm/
 project.private.config.json
+.deps/
+miniprogram/cyl_components/
