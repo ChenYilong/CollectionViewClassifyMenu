@@ -46,7 +46,7 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 | --- | --- | --- |
 | iOS | Animated icons, `Example/CYLMenuExample/CYLTagAnimationDemoViewController.swift` | DONE (2026-11-14, below) |
 | Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | DONE (2026-11-14, below) |
-| React Native | cross-platform example (animated tags) | TODO |
+| React Native | `react-native/react-native-cyl-tag-list/example`, Tags tab | iOS and Android DONE (2026-11-15: Play all command, speed steps 0.25x–4x, Loop switch; `cross-platform.md`, `scripts/e2e-android.sh` and the iOS UI test check the speed) |
 | Flutter | `flutter/cyl_tag_list/example`, Animated icons | iOS and Android DONE (animations play, `cross-platform.md`) |
 | Mini Program | example (when added) | TODO |
 | HarmonyOS | example (when added) | TODO |

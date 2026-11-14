@@ -3,10 +3,11 @@
 The examples of this project on every platform (iOS, Android, and later React Native, Flutter, HarmonyOS, Mini
 Program) show the same screens with the same data and look the same as iOS, which is the reference.
 
-## TODO (2026-11-12): one shared local database for every platform
+## DONE (2026-11-15): one shared local database for every platform
 
-- **Status:** iOS demo app, `Example/CYLMenuExample` and Android DONE; React Native and Flutter have no example in this
-  repository yet (they bundle the same file when added).
+- **Status:** iOS demo app, `Example/CYLMenuExample` and Android DONE (2026-11-12). Flutter DONE (2026-11-15: the asset
+  `cyl_places.sqlite`, through sqflite) and React Native DONE (2026-11-15: the app bundle / `assets/custom`, through op-sqlite).
+  Both run the iOS statement, sections below. Every platform lists 1 place for 川菜 + 广州.
 - **The database:** `Example-Shared/Database/cyl_places.sqlite` (table `places`: id, name, category, tag, region,
   rating, price; 83 rows), made from `data.json` by `scripts/generate-places-db.py`; `--check` fails when the
   committed file no longer matches the data. Every platform opens this one file read-only and builds the same SQL
@@ -38,10 +39,11 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   > 这个android实现，同步到iOS端实现，共用share 同一个本地数据库 ，保持演示的一致性。相同要求，其他平台也使用同一个数据库。包括RN flutter。将该要求写进跨端相关文档，标注TODO continue
 
-## TODO (2026-11-12): the tag cells look the same as iOS on every platform
+## DONE (2026-11-15): the tag cells look the same as iOS on every platform
 
 - **Status:** Android left spacing DONE; the iOS icon-to-title gap fixed 2026-11-14; the remaining 6 pt width difference is
-  font metrics (inherent); React Native and Flutter have no example in this repository yet.
+  font metrics (inherent). Flutter and React Native host the native list (Swift on iOS, Kotlin on Android), so their cells
+  are the native cells; their screenshots below match each platform's native example.
 - **Cause (core):** Android `CYLIndexPathButton` put the image as a compound drawable at the padding edge and
   centered only the text, so the image touched the cell's left edge. iOS `UIButton` centers image and title together,
   then `CYLIndexPathButton -layoutSubviews` moves the image `cyl_imageTitleSpacing / 2` left and the title the same
