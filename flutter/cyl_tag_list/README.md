@@ -31,7 +31,7 @@ controller.playAll();     // from progress 0
   asset on the device.
 - `CylTagListController` holds the playback controls of `docs/example-demo-rules.md` (Play all, speed, loop) and
   `state()`, which reads what the native list holds.
-- Status: iOS and Android pass the integration test; Android shows no icons yet (see docs/cross-platform.md).
+- Status: iOS and Android pass the integration test and play the animated icons (see docs/cross-platform.md).
 
 ## iOS
 
@@ -53,3 +53,7 @@ The plugin depends on `com.cyl:classifymenu:0.1.0`, the Kotlin library of `andro
 publish it first with `android/scripts/gradle.sh merged :library:publishReleasePublicationToBuildRepository`, and point
 `cyl.classifymenu.repo` (in `example/android/gradle.properties`) at the `library/build/repo` folder when the build runs from
 another directory. Then `flutter test integration_test/tag_list_test.dart -d <emulator>`.
+
+For the animated (Lottie) icons on Android, also build CYLTabBarController's engine with
+`android/scripts/gradle.sh merged :Example-Android:cyltabbar:assembleRelease :Example-Android:tabpages:jar` and set
+`cyl.tabbar.libs` in `example/android/gradle.properties` to a folder holding `cyltabbar-release.aar` and `tabpages-*.jar`.

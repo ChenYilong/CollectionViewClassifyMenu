@@ -126,8 +126,14 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   SF Symbol tags: DONE (2026-11-15 00:58): Android has no SF Symbols, so the example ships stand-in vector drawables
   `cyl_system_<name>` (`example/android/app/src/main/res/drawable`) and keeps them through release resource shrinking
-  (`res/raw/cyl_keep.xml`, because the library looks them up by name). Still TODO: the Lottie row has no icons (the
-  CYLTabBarController Android animation engine is not linked into this example).
+  (`res/raw/cyl_keep.xml`, because the library looks them up by name). Lottie row: DONE (2026-11-15 07:23, emulator `CYL_API35_arm64`,
+  release APK): the example links CYLTabBarController's Android engine (`cyltabbar-release.aar` and `tabpages-*.jar`
+  of `Example-Android` at the commit of `android/merged/gradle.properties`, built through the merged build; folder set
+  by `cyl.tabbar.libs`) with Lottie 6.6.2, and keeps the classes the library finds by reflection through R8
+  (`example/android/app/proguard-rules.pro`). Two frames 0.35 s apart after Play all (the Home icon is animating):
+
+  <img src="assets/flutter-android-lottie-frame1.png" width="400" alt="Lottie row, frame 1 after Play all">
+  <img src="assets/flutter-android-lottie-frame2.png" width="400" alt="Lottie row, frame 2 after Play all">
   Fold: DONE, not a bug (2026-11-15): the section folds only when it needs more than `defaultVisibleRows` (3) rows
   (`CYLTagListView.kt`, `canFoldRowCount`); on the 1080 px wide emulator the ten tags fit in exactly 3 rows (screenshot
   above), so there is no tail control, while the wider iOS tags need a fourth row and fold. A debug APK launched without `flutter run` stays on the
