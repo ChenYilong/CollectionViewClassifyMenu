@@ -183,3 +183,21 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/flutter-android-filter-sheet.png" width="260" alt="Flutter on Android 15: the filter sheet, 上海 picked">
   <img src="assets/flutter-android-classify-filter.png" width="260" alt="Flutter on Android 15: 川菜 in 广州, 1 place">
   <img src="assets/flutter-ios-classify-filter.png" width="260" alt="Flutter on iOS 27.0: 川菜 in 广州, 1 place">
+
+## TODO (2026-11-15): the React Native example
+
+- **Context:** the Flutter example passes on iOS and Android (above), so React Native is next (the order of this document).
+- **Requirements:** a React Native component `react-native/react-native-cyl-tag-list` (Fabric native view) that hosts the native
+  `CYLTagListView` (Swift on iOS, Kotlin `com.cyl:classifymenu` on Android), built from the same configuration dictionary as the
+  Flutter plugin; playback controls (Play all, speed slider, loop switch, `example-demo-rules.md`); `onTap`, `onSelectionChanged`,
+  `onContentHeightChanged`; an example app with the same screens as Flutter (animated tag list, classify menu with the multiple
+  filter over the shared `cyl_places.sqlite`, saved selections); tests and labeled screenshots on the iOS 27.0 simulator and the
+  Android 15 emulator; the same layout as iOS (left spacing, section above).
+- **Steps:** 1. scaffold the library and the example (create-react-native-library, the layout of CYLTabBarController's
+  `react-native-cyltabbar`); 2. iOS view; 3. Android view; 4. the classify menu screen; 5. tests and screenshots.
+- **Prompt (verbatim):**
+
+  > 根据Memory 以及本地Memory文档，尝试继续完成对于 CollectionViewClassifyMenu文件夹 我们未结束的任务，然后遍历所有文档，找到关键词TODO 完成所有TODO工作。重点查看CollectionViewClassifyMenu文件夹相关文档的TODO
+
+  English: continue the unfinished tasks of the CollectionViewClassifyMenu folder from memory and the local notes, then find
+  every TODO in the documents and finish it, the documents of this folder first. Then: "continue".
