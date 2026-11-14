@@ -34,6 +34,8 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // The tag list finds CYLTabBarController's animation engine and Lottie by reflection.
+            proguardFiles("proguard-rules.pro")
         }
     }
 }
@@ -46,4 +48,17 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+// CYLTabBarController's Android animation engine (Example-Android/cyltabbar and tabpages at the commit of
+// android/merged/gradle.properties), which CYLTagListView finds at run time to play the Lottie icons. Build it with
+// android/scripts/gradle.sh merged :Example-Android:cyltabbar:assembleRelease :Example-Android:tabpages:jar and point
+// cyl.tabbar.libs (gradle.properties) at a folder holding cyltabbar-release.aar and tabpages-*.jar.
+val cylTabBarLibs = providers.gradleProperty("cyl.tabbar.libs").orNull
+dependencies {
+    if (cylTabBarLibs != null) {
+        implementation(fileTree(cylTabBarLibs) { include("*.aar", "*.jar") })
+        implementation("com.airbnb.android:lottie:6.6.2")
+        implementation("androidx.fragment:fragment-ktx:1.8.5")
+    }
 }
