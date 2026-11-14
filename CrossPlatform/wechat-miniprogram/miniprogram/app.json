@@ -1,0 +1,25 @@
+{
+  "pages": [
+    "pages/tags/tags",
+    "pages/classify/classify"
+  ],
+  "window": {
+    "navigationBarTitleText": "CYLTagListView",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#ffffff"
+  },
+  "tabBar": {
+    "color": "#8a8a8a",
+    "selectedColor": "#2AB9A0",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/tags/tags", "text": "Animated icons" },
+      { "pagePath": "pages/classify/classify", "text": "Classify menu" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

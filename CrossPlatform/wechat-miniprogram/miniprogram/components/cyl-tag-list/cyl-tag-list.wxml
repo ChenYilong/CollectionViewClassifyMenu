@@ -1,0 +1,35 @@
+<view class="cyl-tag-list">
+  <view wx:for="{{sections}}" wx:for-item="section" wx:key="index" class="cyl-section">
+    <view wx:if="{{section.title || (section.canFold && foldPosition === 'headerTrailing')}}" class="cyl-header">
+      <text class="cyl-header-title">{{section.title}}</text>
+      <view wx:if="{{section.canFold && foldPosition === 'headerTrailing'}}" class="cyl-fold-header"
+            data-section="{{section.index}}" bindtap="onFoldTap"
+            aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
+        <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">⌄</text>
+      </view>
+    </view>
+    <view class="cyl-items">
+      <block wx:for="{{section.items}}" wx:key="key">
+        <view wx:if="{{!item.hidden}}"
+              class="cyl-item cyl-item-s{{section.index}} {{item.enabled ? '' : 'cyl-disabled'}}"
+              style="{{item.style}}" data-key="{{item.key}}" bindtap="onItemTap"
+              aria-role="button" aria-label="{{item.title}}" aria-selected="{{item.selected}}">
+          <cyl-lottie-icon wx:if="{{item.animation}}" id="lottie-{{item.key}}" class="cyl-icon"
+                           animation="{{item.animation}}" size="{{imageSize}}"
+                           speed="{{animationSpeed}}" loops="{{animationLoops}}" />
+          <text wx:elif="{{item.glyph}}" class="cyl-icon cyl-glyph" style="font-size: {{imageSize}}px;">{{item.glyph}}</text>
+          <image wx:elif="{{item.image}}" class="cyl-icon" src="{{item.image}}" mode="aspectFit"
+                 style="width: {{imageSize}}px; height: {{imageSize}}px;" />
+          <text class="cyl-title">{{item.title}}</text>
+        </view>
+      </block>
+      <view wx:if="{{section.canFold && foldPosition === 'tail'}}" class="cyl-item cyl-fold-tail"
+            style="{{tailStyle}}" data-section="{{section.index}}" bindtap="onFoldTap"
+            aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
+        <text wx:if="{{foldContent !== 'icon'}}" class="cyl-title">{{section.foldTitle}}</text>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">⌄</text>
+      </view>
+    </view>
+  </view>
+</view>

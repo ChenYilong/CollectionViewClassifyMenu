@@ -1,0 +1,26 @@
+<view class="page">
+  <view class="toolbar"><text class="toolbar-title">Animated icons</text></view>
+
+  <view class="controls">
+    <view class="row">
+      <text class="label">Speed</text>
+      <slider class="slider" min="{{minSpeed}}" max="{{maxSpeed}}" step="0.25" value="{{speed}}"
+              activeColor="#2AB9A0" block-size="20"
+              bindchanging="onSpeedChanging" bindchange="onSpeedChanging"
+              aria-label="Speed, {{speedText}}" />
+      <text class="value" aria-hidden="true">{{speedText}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Loop</text>
+      <switch checked="{{loops}}" color="#2AB9A0" bindchange="onLoopChange" aria-label="Loop, {{loops ? 'on' : 'off'}}" />
+      <button class="play" size="mini" bindtap="playAll">Play all</button>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="list">
+    <cyl-tag-list id="tags" configuration="{{configuration}}"
+                  animation-speed="{{speed}}" animation-loops="{{loops}}" bind:tagtap="onTagTap" />
+  </scroll-view>
+
+  <view wx:if="{{lastTap}}" class="last-tap">{{lastTap}}</view>
+</view>
