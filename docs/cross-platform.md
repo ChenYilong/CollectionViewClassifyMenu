@@ -40,7 +40,8 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
 ## TODO (2026-11-12): the tag cells look the same as iOS on every platform
 
-- **Status:** Android left spacing DONE (this commit); residual gap and React Native / Flutter TODO.
+- **Status:** Android left spacing DONE; the iOS icon-to-title gap fixed 2026-11-14; the remaining 6 pt width difference is
+  font metrics (inherent); React Native and Flutter have no example in this repository yet.
 - **Cause (core):** Android `CYLIndexPathButton` put the image as a compound drawable at the padding edge and
   centered only the text, so the image touched the cell's left edge. iOS `UIButton` centers image and title together,
   then `CYLIndexPathButton -layoutSubviews` moves the image `cyl_imageTitleSpacing / 2` left and the title the same
@@ -62,21 +63,25 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   <img src="assets/tag-cell-ios-android-compare.png" width="600" alt="Tag cell: iOS, Android before, Android after">
 
-- **Residual (TODO):** iOS cells are about 6 pt wider and the iOS gap between image and title is about 10 pt against
+- **Residual (analyzed below):** iOS cells are about 6 pt wider and the iOS gap between image and title is about 10 pt against
   4.6 dp, although both use text width + 38 and a spacing of 5. Both come from text measurement: the iOS title label
   is wider than `-sizeWithAttributes:` (Apple Color Emoji / PingFang metrics), and `UIButton` centers within that
   label; Android measures with Noto. Next: log the iOS title label's frame in a test, then decide whether the core
   should size cells from the label's intrinsic width on both platforms.
-  Update 2026-11-14: the core's formula is the same on both platforms (`CYLClassifyMenuViewController.cellWidth(for:)`:
-  `ceil(text width) + 38` with an image, `+ 19` without; Android's `itemWidth()` in `CYLClassifyMenu.kt` is the same), so the
-  6 pt width difference can only come from the two text measurements (Apple Color Emoji and PingFang against Noto): a
-  font-metric difference, not a layout bug, and sizing from the label's intrinsic width would not remove it. The 10 pt
-  against 4.6 dp image-to-title gap is not explained yet: `CYLIndexPathButton` moves the image half of the spacing (2.5)
-  left and the title half right of UIButton's adjacent layout, so a 5 pt gap is expected; the remaining 5 pt is probably
-  transparent padding inside the `home_btn_shrink` image, which the Android drawable may not have. A measurement test in
-  a bare window failed (the menu shows no cells there); the next step is to log the cell, image view and title label
-  frames from a screenshot-run screen (`CYLExampleAppDelegate`'s `-CYLExampleScreen` hook), and to compare the image
-  asset's alpha bounds with the Android drawable's.
+  Update 2026-11-14 (measured, iOS 27.0 simulator, @3x): the core's formula is the same on both platforms
+  (`CYLClassifyMenuViewController.cellWidth(for:)`: `ceil(text width) + 38` with an image, `+ 19` without; Android's
+  `itemWidth()` in `CYLClassifyMenu.kt` is the same), so the 6 pt width difference comes only from the two text
+  measurements (Apple Color Emoji and PingFang against Noto): a font-metric difference, not a layout bug.
+  The gap between the icon and the title was a real iOS bug, now fixed: in the cell `云南味道 扩展文字😀✨` (216 pt) the
+  image view was at x = 6 and the title label at x = 32, so the gap was 10 pt instead of `imageTitleSpacing` (5 pt) and
+  the side padding 6 pt; `CYLIndexPathButton` moved the frames by half the spacing after `layoutSubviews()`, and UIButton
+  keeps those frames between passes, so the move was applied again on every pass. It now overrides
+  `imageRect(forContentRect:)` and `titleRect(forContentRect:)`, which UIButton asks for on every pass. Measured after
+  the fix: image x = 8.5, title x = 29.5, gap 5.0, padding 8.5 on both sides, equal to Android's 4.6 dp gap and 8.8 / 9.9
+  paddings within the font difference. Regression test: `CYLExampleDatabaseTests.testPortedClassifyMenuDemoQueriesTheDatabase`
+  (gap 5, centered; it fails before the fix). A button on its own in a test window did not reproduce the accumulation, so
+  the ObjC test `testButtonsPlaceImageAndTitleWithoutDeprecatedInsets` only checks that frames repeat.
+  Left: the width difference is inherent to the platforms' fonts; React Native and Flutter have no example here yet.
 - **Context:** with the same parameters, the Android classify menu's tag cells differ from iOS: an image sits at the
   cell's left edge on Android, while iOS centers image and title together, so the left padding equals the right one
   (`assets/request-android-cell-left-spacing.png`, `assets/request-ios-cell-reference.png`,

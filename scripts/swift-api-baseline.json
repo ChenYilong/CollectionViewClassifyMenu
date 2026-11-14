@@ -28,7 +28,7 @@
         ],
         "declKind": "Var",
         "usr": "c:@CollectionViewClassifyMenuVersionNumber",
-        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.pdBQtk/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:14:26",
+        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.iYCWme/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:14:26",
         "moduleName": "CollectionViewClassifyMenu",
         "hasStorage": true
       },
@@ -45,7 +45,7 @@
         ],
         "declKind": "Var",
         "usr": "c:@CollectionViewClassifyMenuVersionString",
-        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.pdBQtk/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:15:39",
+        "location": "/var/folders/2w/wgnctp1932z76770l8lrrrbm0000gn/T//cyl-swift-api.iYCWme/objc/CollectionViewClassifyMenu.framework/Headers/CollectionViewClassifyMenu-umbrella.h:15:39",
         "moduleName": "CollectionViewClassifyMenu",
         "isLet": true,
         "hasStorage": true
@@ -14163,22 +14163,63 @@
           },
           {
             "kind": "Function",
-            "name": "layoutSubviews",
-            "printedName": "layoutSubviews()",
+            "name": "imageRect",
+            "printedName": "imageRect(forContentRect:)",
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "Void",
-                "printedName": "()"
+                "name": "CGRect",
+                "printedName": "CoreFoundation.CGRect",
+                "usr": "c:@S@CGRect"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CGRect",
+                "printedName": "CoreFoundation.CGRect",
+                "usr": "c:@S@CGRect"
               }
             ],
             "declKind": "Func",
-            "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLIndexPathButton(im)layoutSubviews",
-            "mangledName": "$s26CollectionViewClassifyMenu18CYLIndexPathButtonC14layoutSubviewsyyF",
+            "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLIndexPathButton(im)imageRectForContentRect:",
+            "mangledName": "$s26CollectionViewClassifyMenu18CYLIndexPathButtonC9imageRect010forContentI0So6CGRectVAG_tF",
             "moduleName": "CollectionViewClassifyMenu",
             "overriding": true,
             "isOpen": true,
-            "objc_name": "layoutSubviews",
+            "objc_name": "imageRectForContentRect:",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Preconcurrency",
+              "Override",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "titleRect",
+            "printedName": "titleRect(forContentRect:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CGRect",
+                "printedName": "CoreFoundation.CGRect",
+                "usr": "c:@S@CGRect"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CGRect",
+                "printedName": "CoreFoundation.CGRect",
+                "usr": "c:@S@CGRect"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@M@CollectionViewClassifyMenu@objc(cs)CYLIndexPathButton(im)titleRectForContentRect:",
+            "mangledName": "$s26CollectionViewClassifyMenu18CYLIndexPathButtonC9titleRect010forContentI0So6CGRectVAG_tF",
+            "moduleName": "CollectionViewClassifyMenu",
+            "overriding": true,
+            "isOpen": true,
+            "objc_name": "titleRectForContentRect:",
             "declAttributes": [
               "Dynamic",
               "ObjC",
