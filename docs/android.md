@@ -145,7 +145,7 @@ Android chapter.
 
 Cross-platform rules (one shared database, the same look as iOS): [cross-platform.md](cross-platform.md).
 
-## TODO (2026-11-12): replace the wording of the Tags tab and remove its keywords everywhere
+## DONE (2026-11-12, logged as TODO the same day): replace the wording of the Tags tab and remove its keywords everywhere
 
 - **Status:** DONE (this commit).
 - **Context:** the Tags tab (the TagCollectionView demo) showed sample data copied from the iOS demo, with an
