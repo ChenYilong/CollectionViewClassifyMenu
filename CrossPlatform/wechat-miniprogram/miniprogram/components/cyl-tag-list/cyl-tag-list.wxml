@@ -6,7 +6,7 @@
             data-section="{{section.index}}" bindtap="onFoldTap"
             aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
         <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
-        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">⌄</text>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
       </view>
     </view>
     <view class="cyl-items">
@@ -28,7 +28,7 @@
             style="{{tailStyle}}" data-section="{{section.index}}" bindtap="onFoldTap"
             aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
         <text wx:if="{{foldContent !== 'icon'}}" class="cyl-title">{{section.foldTitle}}</text>
-        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">⌄</text>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
       </view>
     </view>
   </view>

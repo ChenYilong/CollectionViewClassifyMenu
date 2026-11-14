@@ -2,8 +2,8 @@
   <view class="toolbar">
     <text class="toolbar-title">Classify menu</text>
     <view class="toolbar-actions">
-      <view class="icon-button" bindtap="resetConditions" aria-role="button" aria-label="重置筛选条件">↺</view>
-      <view class="icon-button {{filtered ? 'icon-active' : ''}}" bindtap="openFilter" aria-role="button" aria-label="筛选">⛉</view>
+      <view id="resetConditions" class="icon-button" bindtap="resetConditions" aria-role="button" aria-label="重置筛选条件">↺</view>
+      <view id="openFilter" class="icon-button {{filtered ? 'icon-active' : ''}}" bindtap="openFilter" aria-role="button" aria-label="筛选">⛉</view>
     </view>
   </view>
 
@@ -30,7 +30,7 @@
   <view wx:if="{{filterVisible}}" class="mask" bindtap="closeFilter" catchtouchmove="noop">
     <view class="sheet" catchtap="noop">
       <scroll-view scroll-y class="sheet-list">
-        <cyl-tag-list configuration="{{filterConfiguration}}" bind:selectionchange="onFilterChange" />
+        <cyl-tag-list id="filterList" configuration="{{filterConfiguration}}" bind:selectionchange="onFilterChange" />
       </scroll-view>
       <button class="confirm" id="confirmFilter" bindtap="confirmFilter">确定</button>
     </view>

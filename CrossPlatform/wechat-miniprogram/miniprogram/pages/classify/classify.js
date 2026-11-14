@@ -24,8 +24,9 @@ Page({
     this.categories = db.categories();
     this.tags = db.tags();
     // `?select=0-1&filter=0-3,1-0` (a compile condition in WeChat DevTools) selects at launch, for screenshots.
-    const launchSelect = options && options.select;
-    const launchFilter = options && options.filter;
+    // WeChat DevTools passes the values URL-encoded ("0-3%2C1-0").
+    const launchSelect = options && options.select && decodeURIComponent(options.select);
+    const launchFilter = options && options.filter && decodeURIComponent(options.filter);
     this.classifyItems = launchSelect ? [launchSelect]
       : (selections.load(selections.CLASSIFY_SCENARIO) || []);
     const filter = launchFilter ? launchFilter.split(',') : selections.load(selections.FILTER_SCENARIO);
