@@ -109,6 +109,12 @@ internal class CylTagListPlatformView(
 
     override fun menuDidChangeContentHeight(menu: Any, height: Float) = sendContentHeight()
 
+    override fun menuDidChangeSelectedItems(menu: Any, indexPaths: List<CYLIndexPath>) {
+        val source = tagList.menuDataSource
+        val items = indexPaths.map { mapOf("section" to it.section, "item" to it.item, "title" to source?.menuTitleForItemAtIndexPath(it).orEmpty()) }
+        channel.invokeMethod("onSelectionChanged", items)
+    }
+
     override fun menuDidSelectItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {
         val title = tagList.menuDataSource?.menuTitleForItemAtIndexPath(indexPath).orEmpty()
         channel.invokeMethod("onTap", mapOf("section" to indexPath.section, "item" to indexPath.item, "title" to title))
