@@ -138,12 +138,12 @@ Program) show the same screens with the same data and look the same as iOS, whic
   (`CYLTagListView.kt`, `canFoldRowCount`); on the 1080 px wide emulator the ten tags fit in exactly 3 rows (screenshot
   above), so there is no tail control, while the wider iOS tags need a fourth row and fold. A debug APK launched without `flutter run` stays on the
   splash screen; the release APK runs.
-- **Limits and next steps (TODO):** (1) the Android differences above; (2) the Flutter example has one screen (the
+- **Limits and next steps (TODO):** (1) the Android differences above; (2) DONE 2026-11-15: the classify menu tab (see below); still the multiple filter (the
   animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) the shared database
   (`cyl_places.sqlite`) is not used by this example yet; (4) Swift Package Manager is not supported (the plugin needs the
   pod); (5) the Dart tests only run on the iOS simulator.
 
-## TODO (2026-11-15): the Flutter example's classify menu on the shared database
+## DONE (2026-11-15): the Flutter example's classify menu on the shared database
 
 - **Context:** the Flutter example (`flutter/cyl_tag_list/example`) has one screen (Animated icons). The iOS and
   Android examples also have the menu linkage screen: a classify menu (single choice, the tags of `places`, folded per
@@ -153,3 +153,20 @@ Program) show the same screens with the same data and look the same as iOS, whic
   a test and screenshots on iOS and Android.
 - **Prompt (verbatim):** "根据Memory 以及本地Memory文档，尝试继续完成对于 CollectionViewClassifyMenu文件夹 我们未结束的任务，然后遍历所有文档，找到关键词TODO 完成所有TODO工作。重点查看CollectionViewClassifyMenu文件夹相关文档的TODO" (EN: continue the unfinished work of this folder from memory, find
   every TODO in the documents and finish it, focusing on this folder), followed by "continue".
+- **Result:** a second bottom tab "Classify menu" (`example/lib/classify_menu_page.dart`): sqflite opens the bundled copy
+  of `cyl_places.sqlite` (`example/assets/`, the same file as `Example-Shared/Database/`), one section per category
+  (吃喝玩逛, tags in database order, folded to one row with a More control), single choice; the selected tag lists its
+  places (rating first), tapping it again lists all 83. The plugin gained `onContentHeightChanged` / `sizesToContent`
+  and `CylTagListController.contentHeight()`: both platforms send `heightThatFitsWidth` when the view's width changes
+  and when the list folds or unfolds (iOS through a container view, because key-value observing of bounds does not
+  see Flutter's frame changes), and the page sizes the list to it, at most half the page.
+- **Tests:** `integration_test/classify_menu_test.dart` (83 places, categories 吃喝玩逛, a tag filters) and
+  `tag_list_test.dart` pass on the iPhone 17 Pro simulator (iOS 27.0) and the Android 15 emulator (API 35).
+- **Screenshots** (Flutter 3.47.9, after commit `bd270bb`, 2026-11-15; 川菜 selected, iOS via
+  `--dart-define=CYL_TAB=1 --dart-define=CYL_SELECT=0-1`, Android tapped by accessibility bounds with 逛 expanded):
+
+  <img src="assets/flutter-ios-classify-menu.png" width="300" alt="Flutter on iOS 27.0: classify menu, 川菜 selected, 3 places">
+  <img src="assets/flutter-android-classify-menu.png" width="300" alt="Flutter on Android 15: classify menu, 川菜 selected, 逛 expanded">
+
+- **Still TODO:** the multiple filter (regions and dishes, ANDed with the tag) of the iOS menu linkage screen, and saving
+  the selection in the database.

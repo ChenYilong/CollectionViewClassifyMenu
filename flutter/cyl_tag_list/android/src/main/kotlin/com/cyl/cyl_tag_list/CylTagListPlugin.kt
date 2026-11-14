@@ -54,6 +54,22 @@ internal class CylTagListPlatformView(
         tagList = CYLTagListView.tagListViewWithConfiguration(context, resolved(configuration))
         tagList.menuDelegate = this
         channel.setMethodCallHandler(this)
+        // The height for the width Flutter gives the view, sent whenever that width changes (Dart may size the view
+        // to it, so the view's own height says nothing).
+        tagList.addOnLayoutChangeListener { view, left, _, right, _, oldLeft, _, oldRight, _ ->
+            if (right - left != oldRight - oldLeft) sendContentHeight()
+        }
+    }
+
+    private var sentHeight = -1.0
+
+    private fun sendContentHeight() {
+        val width = tagList.width / tagList.resources.displayMetrics.density
+        if (width <= 0) return
+        val height = tagList.heightThatFitsWidth(width).toDouble()
+        if (kotlin.math.abs(height - sentHeight) < 0.5) return
+        sentHeight = height
+        channel.invokeMethod("onContentHeight", height)
     }
 
     override fun getView(): View = tagList
@@ -71,6 +87,10 @@ internal class CylTagListPlatformView(
                 @Suppress("UNCHECKED_CAST")
                 (call.arguments as? Map<String, Any?>)?.let { tagList.applyConfiguration(resolved(it)) }
             }
+            "contentHeight" -> {
+                result.success(tagList.heightThatFitsWidth(tagList.width / tagList.resources.displayMetrics.density).toDouble())
+                return
+            }
             "state" -> {
                 val source = tagList.menuDataSource
                 val tagCount = (0 until (source?.numberOfSectionsInMenu() ?: 0)).sumOf { source?.menuNumberOfItemsInSection(it) ?: 0 }
@@ -86,6 +106,8 @@ internal class CylTagListPlatformView(
         }
         result.success(null)
     }
+
+    override fun menuDidChangeContentHeight(menu: Any, height: Float) = sendContentHeight()
 
     override fun menuDidSelectItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {
         val title = tagList.menuDataSource?.menuTitleForItemAtIndexPath(indexPath).orEmpty()

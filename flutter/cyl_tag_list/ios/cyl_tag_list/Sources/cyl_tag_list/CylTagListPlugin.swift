@@ -41,17 +41,42 @@ final class CylTagListPlatformView: NSObject, FlutterPlatformView, CYLMenuDelega
         self.registrar = registrar
         let configuration = (arguments as? [String: Any])?["configuration"] as? [String: Any] ?? [:]
         tagList = CYLTagListView(configuration: Self.resolvingAssets(in: configuration, registrar: registrar))
-        tagList.frame = frame
+        container.frame = frame
         channel = FlutterMethodChannel(name: "\(CylTagListPlugin.viewType)/\(viewId)", binaryMessenger: registrar.messenger())
         super.init()
         tagList.menuDelegate = self
+        // The height for the width Flutter gives the view, sent whenever that width changes (Dart may size the view
+        // to it, so the view's own height says nothing). Key-value observing of bounds does not see Flutter's frame
+        // changes, so a container reports its layout.
+        container.addSubview(tagList)
+        tagList.frame = container.bounds
+        tagList.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        container.onWidthChange = { [weak self] in
+            self?.sendContentHeight()
+        }
         channel.setMethodCallHandler { [weak self] call, result in
             self?.handle(call, result: result)
         }
     }
 
+    private let container = CylTagListContainerView()
+    private var sentHeight: CGFloat = -1
+
+    private func sendContentHeight() {
+        let width = tagList.bounds.width
+        guard width > 0 else {
+            return
+        }
+        let height = tagList.heightThatFitsWidth(width)
+        guard abs(height - sentHeight) >= 0.5 else {
+            return
+        }
+        sentHeight = height
+        channel.invokeMethod("onContentHeight", arguments: Double(height))
+    }
+
     func view() -> UIView {
-        tagList
+        container
     }
 
     private func handle(_ call: FlutterMethodCall, result: FlutterResult) {
@@ -71,6 +96,9 @@ final class CylTagListPlatformView: NSObject, FlutterPlatformView, CYLMenuDelega
             }
             result(state)
             return
+        case "contentHeight":
+            result(Double(tagList.heightThatFitsWidth(tagList.bounds.width)))
+            return
         case "applyConfiguration":
             if let configuration = call.arguments as? [String: Any] {
                 tagList.applyConfiguration(Self.resolvingAssets(in: configuration, registrar: registrar))
@@ -83,6 +111,10 @@ final class CylTagListPlatformView: NSObject, FlutterPlatformView, CYLMenuDelega
     }
 
     // MARK: CYLMenuDelegate
+
+    func menu(_ menu: Any, didChangeContentHeight height: CGFloat) {
+        sendContentHeight()
+    }
 
     func menu(_ menu: Any, didSelectItemAt indexPath: IndexPath) {
         let title = tagList.menuDataSource?.menuTitleForItem(at: indexPath) ?? ""
@@ -109,5 +141,20 @@ final class CylTagListPlatformView: NSObject, FlutterPlatformView, CYLMenuDelega
         default:
             return value
         }
+    }
+}
+
+/** The platform view's root: holds the list and reports each change of its width after layout. */
+final class CylTagListContainerView: UIView {
+    var onWidthChange: (() -> Void)?
+    private var lastWidth: CGFloat = -1
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard bounds.width != lastWidth else {
+            return
+        }
+        lastWidth = bounds.width
+        onWidthChange?()
     }
 }

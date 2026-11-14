@@ -35,6 +35,9 @@ class CylTagListController {
   Future<void> applyConfiguration(Map<String, Object?> configuration) => _invoke('applyConfiguration', configuration);
 
   /// What the native list holds now: `speed` (null while the style's own speed is used), `loops` and `tagCount`.
+  /// The native list's content height in logical pixels (0 before its first layout).
+  Future<double> contentHeight() async => (await _channel?.invokeMethod<num>('contentHeight'))?.toDouble() ?? 0;
+
   Future<Map<String, Object?>> state() async {
     final result = await _channel?.invokeMapMethod<String, Object?>('state');
     return result ?? const <String, Object?>{};
@@ -58,11 +61,26 @@ class CylTagTap {
 /// ("multiple", "#07C160", "system:house"); a string "asset:" followed by a Flutter asset key is replaced by the asset's file path
 /// on the device (animations, images).
 class CylTagListView extends StatefulWidget {
-  const CylTagListView({super.key, required this.configuration, this.controller, this.onTap});
+  const CylTagListView({
+    super.key,
+    required this.configuration,
+    this.controller,
+    this.onTap,
+    this.onContentHeightChanged,
+    this.sizesToContent = false,
+  });
 
   final Map<String, Object?> configuration;
   final CylTagListController? controller;
   final ValueChanged<CylTagTap>? onTap;
+
+  /// Called with the native list's content height (logical pixels) whenever it changes: after layout, a fold or
+  /// unfold, or a new configuration.
+  final ValueChanged<double>? onContentHeightChanged;
+
+  /// True makes the view as tall as the native list's content (it follows folds and unfolds), for a list placed in
+  /// a column above other content; false (default) fills the height its parent gives it and scrolls inside.
+  final bool sizesToContent;
 
   @override
   State<CylTagListView> createState() => _CylTagListViewState();
@@ -70,6 +88,7 @@ class CylTagListView extends StatefulWidget {
 
 class _CylTagListViewState extends State<CylTagListView> {
   MethodChannel? _channel;
+  double? _contentHeight;
 
   @override
   void dispose() {
@@ -86,6 +105,12 @@ class _CylTagListViewState extends State<CylTagListView> {
   }
 
   Future<void> _onCall(MethodCall call) async {
+    if (call.method == 'onContentHeight' && call.arguments is num) {
+      final height = (call.arguments as num).toDouble();
+      if (widget.sizesToContent && mounted) setState(() => _contentHeight = height);
+      widget.onContentHeightChanged?.call(height);
+      return;
+    }
     if (call.method == 'onTap' && call.arguments is Map) {
       final arguments = call.arguments as Map;
       widget.onTap?.call(CylTagTap(
@@ -98,6 +123,12 @@ class _CylTagListViewState extends State<CylTagListView> {
 
   @override
   Widget build(BuildContext context) {
+    final view = _platformView();
+    // Height 1 until the native list reports its content height (it needs a width to lay out first).
+    return widget.sizesToContent ? SizedBox(height: _contentHeight ?? 1, child: view) : view;
+  }
+
+  Widget _platformView() {
     final creationParams = <String, Object?>{'configuration': widget.configuration};
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
