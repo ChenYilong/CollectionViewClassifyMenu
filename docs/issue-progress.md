@@ -88,6 +88,13 @@ tags: [issues, ui, cocoapods, progress]
   CYLTabBarController.
   Retried with `dc04439` and `2a12582` (the newest on 2026-11-14 22:46): the same `CYLTabBarItemAnimationPlayableView`
   error in `CYLTabBarController-Swift.h`; nothing to change here until CYLTabBarController builds as a framework.
+  Diagnosis (read-only, 2026-11-14, `2a12582`): the podspec lists `CYLTabBarItemAnimationPlayableView.h` as a public header
+  of the `CYLTabBarItemAnimation` subspec, and the built framework's `Headers/` and `CYLTabBarController-umbrella.h`
+  (line 27) contain it, so it is not missing. The errors ("no type or protocol named", and "cannot define category for
+  undefined class 'CYLTabBar'" in `CYLTabBar+CYLTabBarControllerExtention.h`) are an include-order problem of the mixed
+  framework: the generated `CYLTabBarController-Swift.h` is read before the Objective-C declarations it needs. The fix
+  belongs in CYLTabBarController (its Swift header imports or forward declarations, or the umbrella order), not here;
+  another session was committing there on 2026-11-14, so nothing was changed in that repository.
 - DONE（验证，2026-11-14）：`Example/CYLMenuExample` 的 `CYLMenuLinkageViewController` 导航栏按钮在 iOS 26+ 没有被 Liquid Glass 气泡遮住：
   左上角筛选按钮的图标（漏斗，已修改时带红点）与右上角“重置”均可见，无需 `hidesSharedBackground`。截图：iOS，iPhone 17 Pro 模拟器，
   iOS 27.0，Xcode 27.2，macOS 27.3，提交 `ff14821`，2026-11-14 21:42 NZDT（`plus-menu-filtered`，英文）：
