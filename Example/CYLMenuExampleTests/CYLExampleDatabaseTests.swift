@@ -22,6 +22,14 @@ final class CYLExampleDatabaseTests: CYLMenuExampleTestCase {
         XCTAssertEqual(database.count(ofTable: "reviews"), CYLReviewStore.shared().reviews.count)
         XCTAssertGreaterThan(database.count(ofTable: "review_keywords"), 0)
         XCTAssertGreaterThan(database.count(ofTable: "places"), 40)
+        // The rows are the shared database's (docs/cross-platform.md): the same on every platform.
+        XCTAssertNotNil(CYLExampleDatabase.sharedDatabaseURL, "cyl_places.sqlite is bundled")
+        XCTAssertEqual(database.count(ofTable: "places"), 83)
+        let first = try database.rows(forSQL: "SELECT name, region, rating, price FROM places ORDER BY rating DESC, id LIMIT 1").first
+        XCTAssertEqual(first?["name"] as? String, "日式拉面 · 北京")
+        XCTAssertEqual((first?["price"] as? NSNumber)?.intValue, 93)
+        let review = try database.rows(forSQL: "SELECT text FROM reviews WHERE id = 0").first
+        XCTAssertEqual(review?["text"] as? String, CYLReviewStore.shared().reviews.first?.text, "The reviews of CYLReviewStore, in order")
         let counts = try database.rows(forSQL: "SELECT COUNT(DISTINCT tag) AS n, COUNT(DISTINCT region) AS r, COUNT(DISTINCT category) AS c FROM places").first
         XCTAssertEqual((counts?["c"] as? NSNumber)?.intValue, 4, "吃喝玩逛 of data.json")
         XCTAssertEqual((counts?["r"] as? NSNumber)?.intValue, 4, "The filter's regions")

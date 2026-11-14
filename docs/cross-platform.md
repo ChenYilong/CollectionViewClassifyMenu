@@ -5,7 +5,8 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
 ## TODO (2026-11-12): one shared local database for every platform
 
-- **Status:** iOS demo app and Android DONE (this commit); `Example/CYLMenuExample`, React Native and Flutter TODO.
+- **Status:** iOS demo app, `Example/CYLMenuExample` and Android DONE; React Native and Flutter have no example in this
+  repository yet (they bundle the same file when added).
 - **The database:** `Example-Shared/Database/cyl_places.sqlite` (table `places`: id, name, category, tag, region,
   rating, price; 83 rows), made from `data.json` by `scripts/generate-places-db.py`; `--check` fails when the
   committed file no longer matches the data. Every platform opens this one file read-only and builds the same SQL
@@ -17,8 +18,11 @@ Program) show the same screens with the same data and look the same as iOS, whic
   - The file also holds the menu example's reviews (tables `reviews`, `review_keywords`, the 10 reviews of
     `CYLReviewStore.mockReviews()` in the same order and schema): the Android Menu tab reads them, and its database
     mode runs the iOS example's SQL on them (2026-11-12).
-  - Next (TODO): `Example/CYLMenuExample`'s `CYLExampleDatabase` still fills its own `places` and `reviews` tables at
-    run time; read the shared file instead (attach it). React Native and Flutter examples, when added, bundle the same file.
+  - `Example/CYLMenuExample` (DONE 2026-11-14): the file is a bundle resource (project reference
+    `Example-Shared/Database/cyl_places.sqlite`); `CYLExampleDatabase` attaches it and copies its `reviews`,
+    `review_keywords` and `places` rows into its own writable database (which also holds the saved selections), instead
+    of filling the tables at run time. Test: `testExampleDatabaseHoldsTheDemoData` (83 places, first 日式拉面 · 北京, 93;
+    the reviews in `CYLReviewStore` order); the example suite, 80 tests, 0 failures.
 - **Evidence:** both show `SELECT name, category, tag, region, rating, price FROM places ORDER BY rating DESC, id` →
   83 of 83, first 日式拉面 · 北京 ★5.0 ¥93 (`assets/ios-demo-filter-tab.png`, `assets/android-filter-results.png`);
   `scripts/unit-tests.sh menu` 30 tests, 0 failures (the Filter test reads the bundled file).

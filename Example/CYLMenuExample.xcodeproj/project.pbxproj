@@ -13,6 +13,7 @@
 		07BF735A51B5864C52BCBCBA /* CYLScreenshotCapturing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FAB4A478457DBA65F03A60A /* CYLScreenshotCapturing.swift */; };
 		0A169BB600AB3F13C2FFB8A1 /* CYLTagCloudSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E8DABBA3215F5D3566A9E0 /* CYLTagCloudSample.swift */; };
 		0CA8FA5DC284C2D9D247254F /* pag-ios in Resources */ = {isa = PBXBuildFile; fileRef = BB7F96C76ED83BB97B6AC9F1 /* pag-ios */; };
+		C7DB5A1E00000000000000A2 /* cyl_places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = C7DB5A1E00000000000000A1 /* cyl_places.sqlite */; };
 		121A997B0DED01158F518FB9 /* CYLTagConfigurationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */; };
 		15C61D1F142B19F72F304E61 /* CYLExampleLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18C5C1CE2BB110BBC6B9D78 /* CYLExampleLocalization.swift */; };
 		1F5ADF0DCFBE2B164FA15132 /* CYLConditionWaiting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39A05DED9378FD0740AE48E /* CYLConditionWaiting.swift */; };
@@ -126,6 +127,7 @@
 		B90128FDEA2B2ED95A2F556D /* CYLTagListInspecting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListInspecting.swift; sourceTree = "<group>"; };
 		B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLMenuExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9D81B34178128DAE01A26C2 /* CYLImageTagSample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLImageTagSample.swift; sourceTree = "<group>"; };
+		C7DB5A1E00000000000000A1 /* cyl_places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = cyl_places.sqlite; path = "../Example-Shared/Database/cyl_places.sqlite"; sourceTree = SOURCE_ROOT; };
 		BB7F96C76ED83BB97B6AC9F1 /* pag-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "pag-ios"; path = "../Example-Shared/PAGResources/pag-ios"; sourceTree = SOURCE_ROOT; };
 		BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchHomeViewController.swift; sourceTree = "<group>"; };
 		C52CB3F20E9D8404E1462172 /* CYLMenuFixtures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLMenuFixtures.swift; sourceTree = "<group>"; };
@@ -217,6 +219,7 @@
 				37CFFB3065F967B06D412EEA /* Pods */,
 				17D4474801E7FB00E1C94899 /* Frameworks */,
 				BB7F96C76ED83BB97B6AC9F1 /* pag-ios */,
+				C7DB5A1E00000000000000A1 /* cyl_places.sqlite */,
 				E446029BCAEBE071AE6DF6EA /* Shared */,
 			);
 			sourceTree = "<group>";
@@ -394,6 +397,7 @@
 				066A913BADBFE2E9A0D0A0BF /* Assets.xcassets in Resources */,
 				BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */,
 				0CA8FA5DC284C2D9D247254F /* pag-ios in Resources */,
+				C7DB5A1E00000000000000A2 /* cyl_places.sqlite in Resources */,
 				84C3EECF84D97F850FE2FACC /* data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
