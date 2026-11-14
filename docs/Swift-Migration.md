@@ -242,6 +242,12 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 
 | 2026-11-14 | step 11 | cleanup of the step 2 files' public API (no `T!`, `[CYLTagGroup]`) | 0 | 100 | listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
 
+Verification after step 10 (2026-11-14): `pod lib lint CollectionViewClassifyMenu.podspec` passes ("passed validation").
+`scripts/library-warnings.sh` fails before reaching this core: CYLTabBarController's own files
+(`UIViewController+CYLThemeSettings.m` and the framework header `CYLTabBarController-Swift.h`, the
+`CYLTabBarItemAnimationPlayableView` problem of `issue-progress.md`) do not compile as a framework; the core's own
+compile has no warnings (`build/swift-api-check.log`). Status: waits for CYLTabBarController.
+
 Step 10 notes: no Objective-C source is left in the pod; the podspec's `source_files` patterns are `*.swift`, and the
 transition file `CollectionViewClassifyMenu/Class/CollectionViewClassifyMenu.h` is removed with the last header. The core's
 Objective-C tests call `CYLMenuResources` and `CYLTagMetrics` through their `@objc` selectors. The localization rule
