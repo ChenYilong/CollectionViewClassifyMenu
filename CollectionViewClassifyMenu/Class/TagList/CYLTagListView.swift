@@ -1475,8 +1475,8 @@ private extension CYLTagListView {
         if let cached = themeStyles[indexPath], cached.base === baseStyle {
             return cached.style
         }
-        let seed = UInt(max(0, indexPath.item + indexPath.section * 7))
-        let style = CYLTagColors(for: colorTheme, seed: seed)?.styleByApplying(to: baseStyle) ?? baseStyle
+        let seed = indexPath.item + indexPath.section * 7
+        let style = CYLTagColors(theme: colorTheme, seed: seed)?.styleByApplying(to: baseStyle) ?? baseStyle
         themeStyles[indexPath] = (baseStyle, style)
         return style
     }
@@ -1514,8 +1514,8 @@ private extension CYLTagListView {
         backgroundColor = styleStorage.backgroundColor
         collectionView.backgroundColor = styleStorage.backgroundColor
         if let layout = collectionView.collectionViewLayout as? CYLCollectionViewLeftAlignedLayout,
-           layout.rowAlignment != styleStorage.rowAlignment.rawValue {
-            layout.rowAlignment = styleStorage.rowAlignment.rawValue
+           layout.rowAlignment != styleStorage.rowAlignment {
+            layout.rowAlignment = styleStorage.rowAlignment
             layout.invalidateLayout()
         }
         themeStyles.removeAll()

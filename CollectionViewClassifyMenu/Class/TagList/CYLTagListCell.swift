@@ -86,7 +86,8 @@ open class CYLTagListCell: UICollectionViewCell {
      * too.
      */
     open func showRipple(at point: CGPoint) {
-        guard let style = button.style, let rippleColor = style.rippleColor, !UIAccessibility.isReduceMotionEnabled else {
+        let style = button.style
+        guard let rippleColor = style.rippleColor, !UIAccessibility.isReduceMotionEnabled else {
             return
         }
         // AndroidTagView's ripple: a circle from the touch point to the farthest corner, fading out.

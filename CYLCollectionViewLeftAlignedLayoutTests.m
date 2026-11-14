@@ -321,7 +321,7 @@ static NSArray<NSValue *> *CYLSizes(NSUInteger count, CGSize (^size)(NSUInteger 
     fixture.sizes = @[CYLSizes(30, ^CGSize(NSUInteger i) { return CGSizeMake(30 + (i * 53) % 200, 24 + (i % 3) * 18); })];
     for (NSNumber *alignment in @[@0, @1, @2]) {
         CYLCollectionViewLeftAlignedLayout *layout = [[CYLCollectionViewLeftAlignedLayout alloc] init];
-        layout.rowAlignment = alignment.integerValue;
+        layout.rowAlignment = (CYLTagRowAlignment)alignment.integerValue;
         UICollectionView *collectionView = [self collectionViewWithLayout:layout fixture:fixture width:375];
         if (alignment.integerValue == 0) {
             [self assertLeftAligned:collectionView fixture:fixture];

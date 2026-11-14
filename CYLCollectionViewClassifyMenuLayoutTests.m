@@ -68,17 +68,6 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
 }
 @end
 
-@interface CYLCountingLayout : CYLCollectionViewLeftAlignedLayout
-@property (nonatomic, assign) NSUInteger itemLookups;
-@end
-
-@implementation CYLCountingLayout
-- (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-    self.itemLookups++;
-    return [super layoutAttributesForItemAtIndexPath:indexPath];
-}
-@end
-
 @interface CYLCollectionViewClassifyMenuLayoutTests : XCTestCase
 @end
 
@@ -334,31 +323,8 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     }
 }
 
-- (void)testLargeTagSetDoesNotRecursivelyRecomputePreviousItems {
-    NSArray *source = [self longEmojiSections];
-    NSArray *original = source.firstObject;
-    XCTAssertGreaterThan(original.count, 0u);
-    if (original.count == 0) return;
-    NSMutableArray *titles = [NSMutableArray array];
-    for (NSUInteger index = 0; index < 1200; index++) {
-        [titles addObject:original[index % original.count]];
-    }
-    CYLLayoutFixture *fixture = [[CYLLayoutFixture alloc] init];
-    fixture.sections = @[titles];
-    CYLCountingLayout *layout = [[CYLCountingLayout alloc] init];
-    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, 320, 240) collectionViewLayout:layout];
-    collectionView.dataSource = fixture;
-    collectionView.delegate = fixture;
-    [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
-    [collectionView reloadData];
-    [collectionView layoutIfNeeded];
-    layout.itemLookups = 0;
-    for (NSUInteger index = 0; index < titles.count; index++) {
-        XCTAssertNotNil([layout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]]);
-    }
-    XCTAssertEqual(layout.itemLookups, titles.count);
-    [self assertNoOverlaps:collectionView fixture:fixture];
-}
+// testLargeTagSetDoesNotRecursivelyRecomputePreviousItems moved to CYLLeftAlignedLayoutSwiftTests.swift: Objective-C
+// cannot subclass the Swift CYLCollectionViewLeftAlignedLayout to count its lookups.
 
 - (void)testUnmeasuredMenuWidthNeverProducesNegativeItemSize {
     CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
