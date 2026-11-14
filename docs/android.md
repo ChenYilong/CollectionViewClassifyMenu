@@ -112,7 +112,7 @@ Android chapter.
   drawable of the same name, as Lottie on iOS loads images by name. (3) CYLTabBarController, deselecting a Rive tag
   whose state machine has no "active" input crashed on rive-android's render thread: fixed upstream in
   [CYLTabBarController PR #790](https://github.com/ChenYilong/CYLTabBarController/pull/790) (`4639a0c`, test
-  `CYLRiveInputsTest`), and the Android pin moved to that commit. TODO: the iOS Podfile pins (root `Podfile` at
+  `CYLRiveInputsTest`), and the Android pin moved to that commit. DONE (2026-11-15, all three iOS Podfiles pin CYLTabBarController `117be52c`, issue-progress.md); was TODO: the iOS Podfile pins (root `Podfile` at
   `53766de`; `Example/` and `Example-Swift/` at `0e69250`, see issue-progress.md) are not moved to `4639a0c` in this
   Android-only task. The plus page (the iOS example's plus button page, a fifth row "Filters" in the Menu home, since
   the merged app's plus button belongs to the TagViewGroup editor) is DONE: the query scenarios list (the review
