@@ -110,6 +110,9 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    // The animation library of CYLTabBarController's engine (react-native-cyltabbar compiles the engine): the tag list's
+    // Lottie row plays through it.
+    implementation("com.airbnb.android:lottie:6.6.2")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
