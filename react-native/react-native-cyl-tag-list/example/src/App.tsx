@@ -1,87 +1,72 @@
-import { useRef, useState } from 'react';
-import { Button, SafeAreaView, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import Slider from './Slider';
-import { CylTagListView, type CylTagListHandle } from 'react-native-cyl-tag-list';
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { CYLTabBar, type CYLTabBarItem, type CYLTabBarPlusButton } from 'react-native-cyltabbar';
+import TagListPage from './TagListPage';
+import { t } from './i18n';
 
-const item = (title: string, image?: string) => ({ title, image });
-// Lottie files of CYLTabBarController's tab icons, in the app bundle: the engine plays them.
-const animated = (title: string, file: string) => ({ title, animation: `asset:${file}` });
+/**
+ * The example's shell is CYLTabBarController's React Native component, as the iOS and Flutter examples use
+ * CYLTabBarController: each tab is a page of the tag list demos.
+ */
+const ITEMS: CYLTabBarItem[] = [
+  { title: t('Tags'), image: 'system:tag', selectedImage: 'system:tag.fill', identifier: 'tags' },
+  { title: t('Classify'), image: 'system:square.grid.2x2', selectedImage: 'system:square.grid.2x2.fill', identifier: 'classify' },
+];
 
-const configuration = {
-  selectionMode: 'multiple',
-  defaultVisibleRows: 3,
-  foldControl: { position: 'tail', content: 'icon' },
-  style: {
-    itemHeight: 36,
-    imageSize: '{18, 18}',
-    normal: { cornerRadius: 0, borderColor: '#D1D1D6', borderWidth: 1 },
-    selected: { cornerRadius: 0, backgroundColor: '#E6F8F5', textColor: '#2AB9A0', borderColor: '#2AB9A0' },
-  },
-  sections: [
-    {
-      title: 'Lottie · pod CYLTabBarController/Lottie',
-      items: [
-        animated('Home', 'tab_home_animate.json'),
-        animated('Messages', 'tab_message_animate.json'),
-        animated('Search', 'tab_search_animate.json'),
-        animated('Me', 'tab_me_animate.json'),
-      ],
-    },
-    {
-      title: 'Tags',
-      items: [
-        item('Home', 'system:house'),
-        item('Search', 'system:magnifyingglass'),
-        item('Messages', 'system:message'),
-        item('Profile', 'system:person'),
-        item('Favorites', 'system:star'),
-        item('Settings', 'system:gearshape'),
-        item('Camera', 'system:camera'),
-        item('Music', 'system:music.note'),
-        item('Maps', 'system:map'),
-        item('Calendar', 'system:calendar'),
-      ],
-    },
-  ],
+// The raised plus button with a page of its own (CYLTabBarController's example: CYLPlusButtonSubclass).
+const PLUS_BUTTON: CYLTabBarPlusButton = {
+  title: t('Post'),
+  image: require('./assets/post_normal.png'),
+  selectedImage: require('./assets/post_highlight.png'),
+  titleFont: 9.5,
+  index: 1,
+  size: [55, 80],
+  imageSize: [55, 55],
+  centerYOffset: -14,
+  alignsTitle: true,
+  identifier: 'plus',
+  pageIdentifier: 'plus',
 };
 
 export default function App() {
-  const list = useRef<CylTagListHandle>(null);
-  const [speed, setSpeed] = useState(1);
-  const [loops, setLoops] = useState(false);
-  const [height, setHeight] = useState(1);
-  const [status, setStatus] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [plusSelected, setPlusSelected] = useState(false);
+  let page;
+  if (plusSelected) {
+    page = <Placeholder testID="plusPage" text={t('The plus button page')} />;
+  } else if (selectedIndex === 1) {
+    page = <Placeholder testID="classifyPage" text={t('Classify')} />;
+  } else {
+    page = <TagListPage />;
+  }
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <CylTagListView
-          ref={list}
-          testID="tagList"
-          style={{ height }}
-          configuration={configuration}
-          animationSpeed={speed}
-          animationLoops={loops}
-          onContentHeightChange={setHeight}
-          onTagTap={(tag) => setStatus(`Tapped ${tag.title}`)}
-          onSelectionChange={(items) => setStatus(`Selected: ${items.map((i) => i.title).join(', ')}`)}
-        />
-        <View style={styles.controls}>
-          <Text testID="speedLabel">Speed {speed.toFixed(2)}x</Text>
-          <Slider value={speed} onChange={setSpeed} />
-          <View style={styles.row}>
-            <Text>Loop</Text>
-            <Switch testID="loopSwitch" value={loops} onValueChange={setLoops} />
-          </View>
-          <Button testID="playAll" title="Play all" onPress={() => list.current?.playAll()} />
-          <Text testID="status">{status}</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <View style={styles.page}>{page}</View>
+      <CYLTabBar
+        style={styles.tabBar}
+        items={ITEMS}
+        plusButton={PLUS_BUTTON}
+        selectedIndex={plusSelected ? -1 : selectedIndex}
+        onTabSelect={(index) => {
+          setPlusSelected(index < 0);
+          if (index >= 0) setSelectedIndex(index);
+        }}
+      />
+    </View>
+  );
+}
+
+function Placeholder({ text, testID }: { text: string; testID: string }) {
+  return (
+    <View testID={testID} style={styles.placeholder}>
+      <Text>{text}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  controls: { padding: 16, gap: 8 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  page: { flex: 1, paddingTop: 60 },
+  tabBar: { position: 'absolute', left: 0, right: 0, bottom: 0 },
+  placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

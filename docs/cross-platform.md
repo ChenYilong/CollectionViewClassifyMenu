@@ -217,7 +217,7 @@ Program) show the same screens with the same data and look the same as iOS, whic
   Still TODO: step 3 (the Android view, Kotlin `com.cyl:classifymenu`), step 4 (the classify menu screen over
   `cyl_places.sqlite`), step 5 (tests on both platforms; a real slider instead of the speed steps).
 
-### TODO (2026-11-15): the React Native example inside CYLTabBarController's React Native component
+### DONE for iOS (2026-11-15): the React Native example inside CYLTabBarController's React Native component
 
 - **Requirement:** the example app's shell is CYLTabBarController's own React Native component
   (`react-native-cyltabbar`, `CrossPlatform/` of its newest commit), not a plain React Native screen: the tag list demo
@@ -227,3 +227,23 @@ Program) show the same screens with the same data and look the same as iOS, whic
   > RN的example 层也应使用 CYLTabBarController 的RN组件 作为Example层展示使用
 
   English: the React Native example layer should also use CYLTabBarController's React Native component as its shell.
+- **Result (iOS):** the example's shell is `CYLTabBar` of `react-native-cyltabbar`: tabs Tags (the tag list demo) and
+  Classify (placeholder until step 4), and the raised Post plus button with a page of its own (`pageIdentifier`,
+  `centerYOffset: -14`, CYLTabBarController's `post_normal` / `post_highlight` images). The component is not on npm, so
+  `react-native/react-native-cyl-tag-list/scripts/fetch-cyltabbar.sh` checks out CYLTabBarController at the pinned commit
+  into `.deps/` (git-ignored); `example/package.json` links it and `metro.config.js` resolves it to its `src/index.tsx`.
+  The pod pin in `example/ios/Podfile` is the same commit.
+- **Fix in CYLTabBarController** ([`460ed89f`](https://github.com/ChenYilong/CYLTabBarController/commit/460ed89f192db37d5b347cf72b5ee63ecdc11854),
+  `feat/cross-platform-components`): every Objective-C++ file that imported both its Objective-C headers and
+  `CYLTabBarController-Swift.h` failed to compile. The Swift header declares the `@_cdecl` functions `noexcept` and with plain
+  `NSArray` / `NSDictionary` parameters (14 functions, such as `CYLLocalizedString` and `CYLBadgeAccessibilityDescription`).
+  The fix adds `CYL_NOEXCEPT` to those declarations and drops the lightweight generics of three animation-file functions.
+  React Native's `.mm` files include both headers, so `react-native-cyltabbar` could not build at `c7f59bc` or `53766de`.
+  Defining `SWIFT_NOEXCEPT` empty in the Podfile does not help, because the generated header defines it without checking
+  whether it is already defined.
+- **Evidence** (iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2, React Native 0.88.0, CYLTabBarController `460ed89f`,
+  2026-11-15): Release build, first launch:
+
+  <img src="assets/react-native-ios-cyltabbar-shell.png" width="300" alt="React Native on iOS: CYLTabBarController's React Native tab bar with the raised Post button around the native tag list">
+
+  Still TODO: Android (both components), tap checks of Post / Classify, and tests.
