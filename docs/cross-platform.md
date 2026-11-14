@@ -264,6 +264,36 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/react-native-android-plus-page.png" width="300" alt="React Native on Android: the raised Post button's own page">
 
   Still TODO: step 4 (the Classify page over `cyl_places.sqlite`), step 5 (automated tests; iOS taps need a tap tool).
+- **Step 4 DONE (2026-11-15): the Classify page** (`example/src/ClassifyPage.tsx`, `PlacesDatabase.ts`), ported from the
+  Flutter page:
+  - **Data:** the shared `cyl_places.sqlite` through `@op-engineering/op-sqlite` 19.0.5. It is copied once from the app bundle
+    (iOS) or `assets/custom` (Android).
+  - **Menu:** one section per category, single choice, folded to one row.
+  - **Filter sheet:** regions and dishes, each led by an exclusive 全部, then 确定. The same SQL as iOS (`tag = ? AND region IN (…) AND tag IN (…)`,
+    ordered by rating DESC, id).
+  - **Saving:** the `selections` table saves both selections (`menu.classify`, `menu.filter`), and ↺ resets them.
+  - **Page:** a summary line and an empty state.
+  - **Launch arguments (iOS):** `-CYLTab 1 -CYLSelect 0-1 -CYLFilter 0-3,1-0` for screenshots without taps.
+  - **Two fixes:**
+    - **Android filter sheet:** the list in the sheet was blank, with its cells at 0 × 0. The list sets its content width
+      during a layout pass and asks to be measured again; the request stopped at the Fabric view, and `measure()` skips a
+      view without the flag. `CylTagListView.kt` now marks the subtree with `forceLayout()` before each of up to three
+      measure and layout passes, which also run when the size changes.
+    - **Filter glyph:** the funnel glyph is missing from Android's fonts, so the filter button is the word Filter
+      (with ● while filtering).
+  - **Evidence** (Android 15 / API 35 emulator `CYL_API35_arm64`, release APK; iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2;
+    React Native 0.88.0; base commit `59c55cd`; 2026-11-15). Taps by adb on Android, top to bottom:
+    1. every place (83);
+    2. 川菜 tapped, then the filter sheet with 广州;
+    3. after 确定 and a force-stop, the app relaunched with 川菜 · 广州 restored (1 place, as on iOS and Flutter);
+    4. iOS with the same conditions from launch arguments:
+
+  <img src="assets/react-native-android-classify.png" width="300" alt="React Native on Android: the classify menu and all 83 places">
+  <img src="assets/react-native-android-filter-sheet.png" width="300" alt="React Native on Android: the filter sheet with 广州 selected">
+  <img src="assets/react-native-android-classify-filter.png" width="300" alt="React Native on Android: 川菜 · 广州 restored after relaunch, 1 place">
+  <img src="assets/react-native-ios-classify-filter.png" width="300" alt="React Native on iOS: 川菜 · 广州, 1 place">
+
+  Still TODO: step 5 (automated tests on both platforms; iOS taps need a tap tool).
 
 ## TODO (2026-11-15): the WeChat Mini Program example
 

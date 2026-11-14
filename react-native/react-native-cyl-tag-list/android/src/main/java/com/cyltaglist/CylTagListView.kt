@@ -73,12 +73,37 @@ class CylTagListView(context: Context) : FrameLayout(context), CYLMenuDelegate {
   }
 
   private val measureAndLayout = Runnable {
-    measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
-    layout(left, top, right, bottom)
+    // The list sets its content width during a layout pass and asks to be measured again. That request stops at this
+    // view (still in its own layout), and measure() skips a view without the flag, so the cells kept a size of 0. Mark
+    // the subtree and repeat while the list asks for more (a few passes).
+    var passes = 0
+    do {
+      forceLayoutTree(this)
+      measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+      layout(left, top, right, bottom)
+      passes++
+    } while (passes < 3 && needsLayout(this))
+    // Laid out outside a traversal (React Native does not lay out native children): draw the new frames.
+    invalidateTree(this)
   }
+
+  private fun forceLayoutTree(view: android.view.View) {
+    view.forceLayout()
+    if (view is android.view.ViewGroup) for (i in 0 until view.childCount) forceLayoutTree(view.getChildAt(i))
+  }
+
+  private fun invalidateTree(view: android.view.View) {
+    view.invalidate()
+    if (view is android.view.ViewGroup) for (i in 0 until view.childCount) invalidateTree(view.getChildAt(i))
+  }
+
+  private fun needsLayout(view: android.view.View): Boolean =
+    view.isLayoutRequested || (view is android.view.ViewGroup && (0 until view.childCount).any { needsLayout(view.getChildAt(it)) })
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
+    // React Native sets the size with layout(), which does not measure the native list for it.
+    post(measureAndLayout)
     if (w != oldw) sendContentHeight()
   }
 
