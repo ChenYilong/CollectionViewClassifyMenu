@@ -116,6 +116,14 @@ final class CylTagListPlatformView: NSObject, FlutterPlatformView, CYLMenuDelega
         sendContentHeight()
     }
 
+    func menu(_ menu: Any, didChangeSelectedItems indexPaths: [IndexPath]) {
+        let source = tagList.menuDataSource
+        let items = indexPaths.map { indexPath -> [String: Any] in
+            ["section": indexPath.section, "item": indexPath.item, "title": source?.menuTitleForItem(at: indexPath) ?? ""]
+        }
+        channel.invokeMethod("onSelectionChanged", arguments: items)
+    }
+
     func menu(_ menu: Any, didSelectItemAt indexPath: IndexPath) {
         let title = tagList.menuDataSource?.menuTitleForItem(at: indexPath) ?? ""
         channel.invokeMethod("onTap", arguments: ["section": indexPath.section, "item": indexPath.item, "title": title])

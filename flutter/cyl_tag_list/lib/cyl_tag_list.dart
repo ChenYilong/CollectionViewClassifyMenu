@@ -67,6 +67,7 @@ class CylTagListView extends StatefulWidget {
     this.controller,
     this.onTap,
     this.onContentHeightChanged,
+    this.onSelectionChanged,
     this.sizesToContent = false,
   });
 
@@ -77,6 +78,10 @@ class CylTagListView extends StatefulWidget {
   /// Called with the native list's content height (logical pixels) whenever it changes: after layout, a fold or
   /// unfold, or a new configuration.
   final ValueChanged<double>? onContentHeightChanged;
+
+  /// Called with every selected tag, in order, whenever the selection changes (a tap that selects or deselects, an
+  /// exclusive item clearing its section).
+  final ValueChanged<List<CylTagTap>>? onSelectionChanged;
 
   /// True makes the view as tall as the native list's content (it follows folds and unfolds), for a list placed in
   /// a column above other content; false (default) fills the height its parent gives it and scrolls inside.
@@ -109,6 +114,13 @@ class _CylTagListViewState extends State<CylTagListView> {
       final height = (call.arguments as num).toDouble();
       if (widget.sizesToContent && mounted) setState(() => _contentHeight = height);
       widget.onContentHeightChanged?.call(height);
+      return;
+    }
+    if (call.method == 'onSelectionChanged' && call.arguments is List) {
+      widget.onSelectionChanged?.call([
+        for (final item in (call.arguments as List).cast<Map>())
+          CylTagTap(section: item['section'] as int, item: item['item'] as int, title: item['title'] as String),
+      ]);
       return;
     }
     if (call.method == 'onTap' && call.arguments is Map) {

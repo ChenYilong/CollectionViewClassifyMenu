@@ -138,7 +138,7 @@ Program) show the same screens with the same data and look the same as iOS, whic
   (`CYLTagListView.kt`, `canFoldRowCount`); on the 1080 px wide emulator the ten tags fit in exactly 3 rows (screenshot
   above), so there is no tail control, while the wider iOS tags need a fourth row and fold. A debug APK launched without `flutter run` stays on the
   splash screen; the release APK runs.
-- **Limits and next steps (TODO):** (1) the Android differences above; (2) DONE 2026-11-15: the classify menu tab (see below); still the multiple filter (the
+- **Limits and next steps (TODO):** (1) the Android differences above; (2) DONE 2026-11-15: the classify menu tab and the multiple filter (see below; formerly: the
   animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) the shared database
   (`cyl_places.sqlite`) is not used by this example yet; (4) Swift Package Manager is not supported (the plugin needs the
   pod); (5) the Dart tests only run on the iOS simulator.
@@ -168,5 +168,18 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/flutter-ios-classify-menu.png" width="300" alt="Flutter on iOS 27.0: classify menu, 川菜 selected, 3 places">
   <img src="assets/flutter-android-classify-menu.png" width="300" alt="Flutter on Android 15: classify menu, 川菜 selected, 逛 expanded">
 
-- **Still TODO:** the multiple filter (regions and dishes, ANDed with the tag) of the iOS menu linkage screen, and saving
-  the selection in the database.
+- **Multiple filter and saved selections: DONE (2026-11-15).** The filter button opens a sheet with a native
+  multiple-choice list (地区过滤: 全部 + the four regions; 菜品过滤: 全部 + every tag; 全部 exclusive) and 确定; the
+  regions and dishes are ANDed with the tag in the iOS example's statement (`tag = ? AND region IN (…) AND tag IN (…)`).
+  Both selections are saved in a `selections` table of the app's copy of the database (scenarios `menu.classify` and
+  `menu.filter`, as on iOS) and restored at launch; ↺ (重置筛选条件) clears them; no match shows
+  "没有符合条件的地点，换个条件试试". The plugin gained `onSelectionChanged` (every selected tag, from
+  `menu(_:didChangeSelectedItems:)` / `menuDidChangeSelectedItems`). Tests: `classify_menu_test.dart` (statement,
+  saved selections, filter sheet) and `tag_list_test.dart` pass on iOS 27.0 and Android 15.
+  Screenshots (after commit `5c05cde`, 2026-11-15 08:03): Android, the sheet with 上海 picked (tapped by accessibility
+  bounds), and 川菜 · 广州 after relaunch (restored) and refiltering; iOS 27.0 with
+  `--dart-define=CYL_TAB=1 --dart-define=CYL_SELECT=0-1 --dart-define=CYL_FILTER=0-3,1-0`:
+
+  <img src="assets/flutter-android-filter-sheet.png" width="260" alt="Flutter on Android 15: the filter sheet, 上海 picked">
+  <img src="assets/flutter-android-classify-filter.png" width="260" alt="Flutter on Android 15: 川菜 in 广州, 1 place">
+  <img src="assets/flutter-ios-classify-filter.png" width="260" alt="Flutter on iOS 27.0: 川菜 in 广州, 1 place">
