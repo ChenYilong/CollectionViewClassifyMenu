@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { CYLTabBar, type CYLTabBarItem, type CYLTabBarPlusButton } from 'react-native-cyltabbar';
 import TagListPage from './TagListPage';
+import ClassifyPage from './ClassifyPage';
 import { t } from './i18n';
+import { launchTab } from './launchOptions';
 
 /**
  * The example's shell is CYLTabBarController's React Native component, as the iOS and Flutter examples use
@@ -36,13 +38,13 @@ const PLUS_BUTTON: CYLTabBarPlusButton = {
 };
 
 export default function App() {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(Number(launchTab ?? 0));
   const [plusSelected, setPlusSelected] = useState(false);
   let page;
   if (plusSelected) {
     page = <Placeholder testID="plusPage" text={t('The plus button page')} />;
   } else if (selectedIndex === 1) {
-    page = <Placeholder testID="classifyPage" text={t('Classify')} />;
+    page = <ClassifyPage />;
   } else {
     page = <TagListPage />;
   }
