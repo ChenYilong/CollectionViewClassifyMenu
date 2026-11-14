@@ -142,3 +142,14 @@ Program) show the same screens with the same data and look the same as iOS, whic
   animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) the shared database
   (`cyl_places.sqlite`) is not used by this example yet; (4) Swift Package Manager is not supported (the plugin needs the
   pod); (5) the Dart tests only run on the iOS simulator.
+
+## TODO (2026-11-15): the Flutter example's classify menu on the shared database
+
+- **Context:** the Flutter example (`flutter/cyl_tag_list/example`) has one screen (Animated icons). The iOS and
+  Android examples also have the menu linkage screen: a classify menu (single choice, the tags of `places`, folded per
+  category) whose selection filters the places of `Example-Shared/Database/cyl_places.sqlite`, shown below it.
+- **Requirements:** a second tab "Classify menu" in the Flutter example, reading the same bundled `cyl_places.sqlite`
+  (sqflite), sections = the categories 吃喝玩逛, single selection, tapping a tag lists its places (name, region, rating);
+  a test and screenshots on iOS and Android.
+- **Prompt (verbatim):** "根据Memory 以及本地Memory文档，尝试继续完成对于 CollectionViewClassifyMenu文件夹 我们未结束的任务，然后遍历所有文档，找到关键词TODO 完成所有TODO工作。重点查看CollectionViewClassifyMenu文件夹相关文档的TODO" (EN: continue the unfinished work of this folder from memory, find
+  every TODO in the documents and finish it, focusing on this folder), followed by "continue".
