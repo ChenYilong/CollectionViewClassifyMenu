@@ -98,3 +98,26 @@ Program) show the same screens with the same data and look the same as iOS, whic
   > 你刚刚实现的android中 该example中 tag cell 左侧间距有问题。优先从core层面找原因修复。因为右侧间距正确。continue
 
   > 像素级对比iOS与Android端 tag cell实现UI差别。尤其注意左侧间距，android端异常。优先从core层面对比两者实现差别，因为初始化参数都是一样的情况下，显示也应保持一致。同样要求其他端与iOS端保持一致，包括RN flutter。写入跨端相关文档，标记todo。
+
+## DONE for iOS (2026-11-14), TODO for Android: the Flutter example
+
+- **Status:** the Flutter plugin `flutter/cyl_tag_list` wraps the native `CYLTagListView`; iOS works, Android is TODO.
+  React Native follows once the Flutter version passes on both platforms (the order of `android.md`, HarmonyOS TODO).
+- **Design:** the same approach as CYLTabBarController's Flutter component: Flutter does not redraw the tag list, a platform
+  view hosts the native one, built from the configuration dictionary the core already accepts (`CYLTagListView(configuration:)`;
+  a value `asset:<key>` becomes the file path of a Flutter asset). A method channel per view carries the playback controls
+  (`playAll`, `setSpeed`, `setLoops`), `applyConfiguration` and `state`; taps come back as `onTap`. The playback controls of
+  `example-demo-rules.md` are Dart widgets (a `Slider` from 0.25x to 4x, a `Switch`, a Play all button).
+- **iOS evidence** (iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2, Flutter 3.47.9, CYLTabBarController `53766de`, 2026-11-15
+  00:3x NZDT): `flutter analyze` has no issues; `integration_test/tag_list_test.dart` passes (the native list holds the 14
+  tags, the slider sets the native speed in steps of 0.25, the Loop switch sets the native flag and Play all is accepted);
+  with `--dart-define=CYL_AUTOPLAY=true` (2x, loop, Play all) two screenshots 0.35 s apart differ only in the Lottie row
+  (pixels x 85…1039, y 813…853 of 1206 × 2622), so the animations play inside Flutter:
+
+  <img src="assets/flutter-ios-animated-tag-list.png" width="300" alt="Flutter on iOS: the native tag list with Lottie icons, speed 2x, loop on">
+
+- **Limits and next steps (TODO):** (1) Android: a Kotlin platform view over `android/merged`'s `CYLTagListView`, the
+  Gradle dependency on that library, an emulator test and a screenshot; (2) the Flutter example has one screen (the
+  animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) the shared database
+  (`cyl_places.sqlite`) is not used by this example yet; (4) Swift Package Manager is not supported (the plugin needs the
+  pod); (5) the Dart tests only run on the iOS simulator.
