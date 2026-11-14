@@ -96,7 +96,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
         mapTagListView.menuDelegate = self
         self.mapTagListView = mapTagListView
 
-        eventLabel = caption(withText: CYLTagButton.isAnimationEngineAvailable()
+        eventLabel = caption(withText: CYLTagButton.isAnimationEngineAvailable
                              ? CYLExampleLocalizedString("动效引擎：CYLTabBarItemAnimationFactory 已链接")
                              : CYLExampleLocalizedString("动效引擎未链接：显示静态图标"))
 

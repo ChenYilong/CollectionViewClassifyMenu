@@ -109,6 +109,10 @@ and the core's tests are updated in the same commit.
 | 7 | `CYLMenuStyle (CYLConfiguration)`, `CYLMenuFoldControl (CYLConfiguration)`, `CYLTagAppearance (CYLConfiguration)` | Swift extensions; `CYLMenuFoldControl(configuration:)` is a failable `init?(configuration: Any)` (a `CYLMenuFoldControl` is assigned directly instead) | extensions |
 | 8 | `CYLMenuFoldControlPosition` | cases renamed (`docs/component-architecture.md`): `.bottom` → `.footer`, `.topTrailing` → `.headerTrailing`, `.topLeading` → `.headerLeading`, `.inline` → `.tail` (Objective-C `CYLMenuFoldControlPositionFooter`…; Kotlin `FOOTER`, `HEADER_TRAILING`, `HEADER_LEADING`, `TAIL`, `NONE`); configuration strings `"footer"`, `"headerTrailing"` (`"headerRight"`), `"headerLeading"` (`"headerLeft"`), `"tail"`, the old strings dropped | names of the collection view's parts; leading / trailing hold in right-to-left layouts |
 | 8 | `CYLMenuFoldControl` | `+foldControlWithPosition:content:` / `+noFoldControl` → `init(position: = .none, content: = .icon)` (Objective-C `-initWithPosition:content:`, used by the core's test); `title`, `collapseTitle`, `image`: `T!` → `T` (the defaults are returned until a value is set) | one initializer with defaults |
+| 9 | `CYLMenuDataSource`, `CYLMenuDelegate` | Swift `@objc` protocols with the same Swift names and Objective-C selectors (optional methods, `responds(to:)` checks and the core's Objective-C test source keep working); `CYLMenuItemType` an `@objc` enum | protocols of the core in Swift |
+| 9 | `CYLTagColors` | a Swift `struct` (`Equatable`) instead of an `NSObject`: `init(backgroundColor: = nil, …)`; `init(for:seed: UInt)` → `init?(theme:seed: Int)`; `CYLTagColorsBackgroundAlpha` / `…BorderAlpha` → `CYLTagColors.backgroundAlpha` / `.borderAlpha`; `random()` returns `CYLTagColors` | a value type for four colors |
+| 9 | `CYLTagButton` | `style: CYLMenuStyle` (not `T!`); `isAnimationEngineAvailable()` → static property; `width(forTitle:iconSize:style:traitCollection:)` folded into `width(forTitle:iconSize:showsDeleteIndicator: = false, …)`; `animationPlayer: AnyObject?`; CYLTabBarController's animation engine stays a runtime lookup in one private type | non-optional style, default arguments |
+| 9 | `CYLCollectionViewLeftAlignedLayout` | `rowAlignment: Int` → `CYLTagRowAlignment`; Objective-C names `CYLCollectionViewLeftAlignedLayout` and `UICollectionViewDelegateLeftAlignedLayout` kept for the layout's Objective-C tests | a typed alignment |
 
 Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
 index) and its tests (`direction.next`, `value(of: .linesProgress)`).
@@ -131,12 +135,13 @@ lines) in the pod's source patterns.
 | 2026-11-13 | step 6 (`CYLIndexPathButton`, `UIView+CYLGeneral`, `CYLTagModel`) | 31 | 59.2 |
 | 2026-11-14 | step 7 (`CYLTag`, `CYLTagListView` + configuration, the tag cells and fold button, accessibility identifiers) | 16 | 78.9 |
 | 2026-11-14 | step 8 (`CYLMenuFoldControl`, with the fold position rename) | 14 | 81.6 |
+| 2026-11-14 | step 9 (`CYLMenuDataSource`, `CYLTagColors`, `CYLTagButton`, `CYLCollectionViewLeftAlignedLayout`) | 7 | 90.8 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 14 left (steps 2–8): `CYLMenuStyle`, `CYLTagAppearance`, `CYLTagColors`, `CYLTagButton`, the shared tools |
+| `CollectionViewClassifyMenu/Class` | 66 | in progress: 7 left (steps 2–9): `CYLMenuStyle`, `CYLTagAppearance`, `CYLMenuResources`, `CYLParameterConfiguration.h` |
 | `TagCollectionView/TagCollectionView` | 10 | DONE (step 6): 0 left |
 
 ## Swift skills installed (requirement 2)
@@ -223,6 +228,13 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | 2026-11-14 | step 7 | `CYLTag`, `CYLTagListView`, `CYLTagListView+CYLConfiguration`, `CYLTagListCell`, `CYLTagCreateCell`, `CYLTagFoldCell`, `CYLTagFoldButton`, `CYLTagListAccessibility` (15 files, 4,770 lines of Objective-C) | 16 | 78.9 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
 
 | 2026-11-14 | step 8 | `CYLMenuFoldControl` (2 files) and the fold position rename on iOS and Android | 14 | 81.6 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80; Android library tests and example build pass |
+
+| 2026-11-14 | step 9 | `CYLMenuDataSource.h`, `CYLTagColors`, `CYLTagButton`, `CYLCollectionViewLeftAlignedLayout` (7 files) | 7 | 90.8 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
+
+Step 9 notes: `testLargeTagSetDoesNotRecursivelyRecomputePreviousItems` moved to `CYLLeftAlignedLayoutSwiftTests.swift`
+(Objective-C cannot subclass the Swift layout to count its lookups). `scripts/simulator-id.sh` prints a given UDID
+without asking `simctl`, which hung for minutes while other jobs used the simulator service; one `pod install` of the
+menu suite also hung with no network activity and was stopped and run again.
 
 Step 7 notes: the first swift run failed 2 title tests: Swift does not run a property's `didSet` when an initializer
 of the declaring class sets it, so `init(foldControl:title:…)` never updated the title view; it now sets the properties

@@ -38,7 +38,7 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
     }
 
     func testAnimatedIconsUseCYLTabBarControllerAnimationEngine() {
-        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable(), "CYLTabBarController/CYLTabBarItemAnimation is linked")
+        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable, "CYLTabBarController/CYLTabBarItemAnimation is linked")
         let resources = Bundle.main.resourceURL!
         let files = [
             "GIF": "CYLMenuExample.bundle/Animations/GIF/tab_star.gif",

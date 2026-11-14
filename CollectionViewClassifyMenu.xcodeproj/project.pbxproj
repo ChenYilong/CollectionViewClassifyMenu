@@ -67,8 +67,7 @@
 		9A09E2E31BC7AFF00060C116 /* NSArray+CYLLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSArray+CYLLog.swift"; sourceTree = "<group>"; };
 		9A09E2E51BC7AFF00060C116 /* NSDictionary+CYLLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDictionary+CYLLog.swift"; sourceTree = "<group>"; };
 		9A09E2E61BC7AFF00060C116 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
-		9A09E2E91BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLCollectionViewLeftAlignedLayout.h; sourceTree = "<group>"; };
-		9A09E2EA1BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLCollectionViewLeftAlignedLayout.m; sourceTree = "<group>"; };
+		9A09E2EA1BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLCollectionViewLeftAlignedLayout.swift"; sourceTree = "<group>"; };
 		9A09E2EF1BC7AFF00060C116 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		C774DFC249ECAFF98B816588 /* cyl_places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = cyl_places.sqlite; path = "Example-Shared/Database/cyl_places.sqlite"; sourceTree = SOURCE_ROOT; };
 		9A0DE1100000000000000001 /* CYLClassifyMenuDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CYLClassifyMenuDemo.bundle; sourceTree = "<group>"; };
@@ -265,8 +264,7 @@
 		9A09E2E81BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout */ = {
 			isa = PBXGroup;
 			children = (
-				9A09E2E91BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.h */,
-				9A09E2EA1BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.m */,
+				9A09E2EA1BC7AFF00060C116 /* CYLCollectionViewLeftAlignedLayout.swift */,
 			);
 			path = CYLCollectionViewLeftAlignedLayout;
 			sourceTree = "<group>";

@@ -139,7 +139,7 @@ final class CYLTagAnimationDemoViewController: UIViewController {
         statusLabel.font = .preferredFont(forTextStyle: .footnote)
         statusLabel.adjustsFontForContentSizeCategory = true
         statusLabel.textColor = .secondaryLabel
-        statusLabel.text = CYLTagButton.isAnimationEngineAvailable()
+        statusLabel.text = CYLTagButton.isAnimationEngineAvailable
             ? CYLExampleLocalizedString("动效引擎：CYLTabBarItemAnimationFactory 已链接")
             : CYLExampleLocalizedString("动效引擎未链接：显示静态图标")
         statusLabel.translatesAutoresizingMaskIntoConstraints = false

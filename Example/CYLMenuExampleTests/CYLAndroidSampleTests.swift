@@ -243,13 +243,13 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         // Themes: a pure theme colors every tag the same; random picks a palette color per item, the same every time.
         list.colorTheme = .pureTeal
         list.probe.layOut()
-        let teal = CYLTagColors(for: .pureTeal, seed: 0)
+        let teal = CYLTagColors(theme: .pureTeal, seed: 0)
         XCTAssertEqual(list.tagButton(at: ip(0, 0))?.layer.backgroundColor, teal?.backgroundColor?.cgColor)
         list.colorTheme = .random
         list.probe.layOut()
-        XCTAssertEqual(list.tagButton(at: ip(1, 0))?.layer.backgroundColor, CYLTagColors(for: .random, seed: 1)?.backgroundColor?.cgColor)
+        XCTAssertEqual(list.tagButton(at: ip(1, 0))?.layer.backgroundColor, CYLTagColors(theme: .random, seed: 1)?.backgroundColor?.cgColor)
         XCTAssertEqual(CYLTagColors.paletteHexByName["TEAL"], "009688")
-        XCTAssertNil(CYLTagColors(for: .none, seed: 0))
+        XCTAssertNil(CYLTagColors(theme: .none, seed: 0))
 
         // Rows: at most one; tapping off; programmatic selection in mode none.
         list.maximumNumberOfRows = 1
