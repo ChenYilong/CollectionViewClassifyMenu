@@ -30,6 +30,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # [EN] Long paths break checkouts on Windows (260-character limit), so every tracked path stays at most 160 characters.
+      # [CN] 路径过长会导致 Windows 上 checkout 失败（260 字符上限），所有受版本控制的路径保持在 160 字符以内。
+      - name: Path length
+        run: bash scripts/check-path-length.sh 160
       - id: diff
         name: Code changed?
         env:
