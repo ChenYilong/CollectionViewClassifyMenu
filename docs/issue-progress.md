@@ -196,7 +196,7 @@ tags: [issues, ui, cocoapods, progress]
 - 布局：图片标签的标签组在最大字号下不再相互覆盖，`CYLImageTagView` 只移动显示位置（`displayOffset`），
   不改数据；见 [tagviewgroup-api.md](tagviewgroup-api.md)。
 
-## TODO (2026-11-15): asset names too long for git
+## DONE (2026-11-15): asset names too long for git
 
 - **Context:** the two filter icons of the core's `Images.xcassets` (`CollectionViewClassifyMenu/Class/Other/Symtem/`)
   repeat a 70-character name in the image set folder and in each file, so their paths reach 231 characters. git fails on
@@ -208,3 +208,13 @@ tags: [issues, ui, cocoapods, progress]
 
   English: fix the resource file names under the Class folder that are so long that git operations fail; search the
   resources for the keyword leftBarButton.
+- **Result:** `navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_{normal,modified}` became
+  `cyl_filter_{normal,modified}` (image set folders, the @2X/@3X files and `Contents.json`), and the two callers were
+  updated (`CYLFilterDemoViewController.swift`, `Example/CYLMenuExample/CYLMenuLinkageViewController.swift`). The longest
+  path under `Class/` went from 231 characters to about 100; the longest tracked path in the repository is now 182 (an Example tab icon).
+  The entry above (2026-11-12, the icon not showing) keeps the old names as history.
+- **Evidence:** the core demo builds (iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2). Its `CYLClassifyMenuResources.bundle/Assets.car`
+  holds `cyl_filter_normal` and `cyl_filter_modified` (`assetutil --info`), and the `CollectionViewClassifyMenuTests` suite
+  passes (30 tests). `CYLExampleDatabaseTests` checks that both icons load and that the filter button shows one. That
+  Example suite does not build yet because of the blocked CYLTabBarController framework build (missing
+  `CYLTabBarItemAnimati…` types in its Swift header), which this change does not touch.
