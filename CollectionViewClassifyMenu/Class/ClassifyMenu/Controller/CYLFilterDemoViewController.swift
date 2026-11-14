@@ -241,8 +241,8 @@ final class CYLFilterDemoViewController: UIViewController {
     func initLeftBarButtonItem() {
         let modified = (filterController.selectedIndexPaths() ?? []).contains { $0.item != 0 }
         let name = modified
-            ? "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_modified"
-            : "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_normal"
+            ? "nav_filter_modified"
+            : "nav_filter_normal"
         let image = CYLMenuResources.image(named: name)?.withRenderingMode(.alwaysOriginal)
         let item = UIBarButtonItem(image: image, style: .done, target: self, action: #selector(leftBarButtonClicked(_:)))
         item.accessibilityLabel = CYLDemoLocalizedString("筛选条件")

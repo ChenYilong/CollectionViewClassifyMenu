@@ -120,8 +120,8 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
 
     private func updateFilterButton() {
         let modified = !selectedRegions.isEmpty || !selectedDishes.isEmpty
-        let name = modified ? "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_modified"
-                            : "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_normal"
+        let name = modified ? "nav_filter_modified"
+                            : "nav_filter_normal"
         let image = CYLMenuResources.image(named: name)?.withRenderingMode(.alwaysOriginal)
         let item = UIBarButtonItem(image: image, style: .done, target: self, action: #selector(showFilter))
         item.accessibilityLabel = CYLExampleLocalizedString("多选筛选")
