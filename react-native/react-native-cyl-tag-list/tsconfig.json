@@ -2,7 +2,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-cyl-tag-list": ["./src/index"]
+      "react-native-cyl-tag-list": ["./src/index"],
+      "react-native-cyltabbar": ["./.deps/CYLTabBarController/CrossPlatform/react-native-cyltabbar/src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
@@ -27,5 +28,6 @@
     "strict": true,
     "target": "ESNext",
     "verbatimModuleSyntax": true
-  }
+  },
+  "exclude": ["node_modules", "lib", ".deps"]
 }

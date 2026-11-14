@@ -13,6 +13,14 @@ const zh: Record<string, string> = {
   'Tapped': '点击',
   'Selected': '已选',
   'The plus button page': '加号按钮的页面',
+  'Classify menu': '分类菜单',
+  'Regions': '地区过滤',
+  'Dishes': '菜品过滤',
+  'All': '全部',
+  'OK': '确定',
+  'Reset': '重置筛选条件',
+  'Filter': '筛选',
+  'No places match; try other conditions': '没有符合条件的地点，换个条件试试',
 };
 
 function locale(): string {
