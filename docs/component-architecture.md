@@ -49,7 +49,7 @@ persistence in the demos.
 `Example/` 通过 Podfile 以本地路径集成核心库，用这些接口实现 README 的两个场景；
 `CYLExampleMenuSource` 演示宿主如何把自己的模型转成数据源。
 
-## TODO (2026-11-13): rename the fold control positions (`CYLMenuFoldControlPosition`)
+## DONE (2026-11-14, logged as TODO 2026-11-13): rename the fold control positions (`CYLMenuFoldControlPosition`)
 
 - **Context:** the fold control's place is named by geometry today (`Bottom`, `TopTrailing`, `TopLeading`,
   `Inline`). The maintainer proposes names taken from the collection view's own parts: the control that is always the

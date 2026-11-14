@@ -35,6 +35,23 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+- TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):
+  - Context: the Swift core migration reached 100 (`250507c`). The user asks to continue the unfinished work of this
+    folder from the memories, then to go through every document, find the keyword TODO and finish the work, above all
+    in this project's documents.
+  - Open items found on 2026-11-14 (oldest instruction first), each tracked in its own entry:
+    1. CYLTabBarController pins of `Example/` and `Example-Swift/` (this list, below).
+    2. Liquid Glass check of `CYLMenuLinkageViewController`'s bar buttons (this list, below).
+    3. Device check of the accessibility actions (this list, below): needs a physical device.
+    4. `Example/CYLMenuExample` reads the shared database ([cross-platform.md](cross-platform.md)).
+    5. Residual width difference of the tag cells between iOS and Android ([cross-platform.md](cross-platform.md)).
+    6. HarmonyOS NEXT ([android.md](android.md)).
+    7. Speed slider and loop switch in the animation examples ([example-demo-rules.md](example-demo-rules.md)).
+    8. Swift migration follow-ups: the step 2 files, `library-warnings.sh`, `pod lib lint`
+       ([Swift-Migration.md](Swift-Migration.md)).
+  - Prompt (verbatim):
+    > 根据Memory 以及本地Memory文档，尝试继续完成对于 CollectionViewClassifyMenu文件夹 我们未结束的任务，然后遍历所有文档，找到关键词TODO 完成所有TODO工作。重点查看CollectionViewClassifyMenu文件夹相关文档的TODO
+
 - DONE（Android 标签文字被单元格边缘截断，2026-11-12，`fix/android-tag-title-ellipsis`）/ DONE (Android tag titles cut at the
   cell edge): CYLSearchViewController's Android Discover page (`CYLTagListView`, `gridStyleWithNumberOfItemsPerRow(2)`)
   shows long titles cut mid-letter at the cell's edge, with no gap and no "…" (iOS ends them with "…"). Cause:
@@ -132,7 +149,7 @@ tags: [issues, ui, cocoapods, progress]
   target 改为 `master`，删除已完全包含在当前分支中的 `claude/intelligent-curie-1etnx5` 与 `clean-oc`；保留默认分支 `master`
   与 CI 截图分支 `ci-screenshots`。用户提示词原文：
   > 将所有处于open状态的分支的target branch指向本分支，当前分支，全部合并仅仅保留当前分支，处理冲突后合并，继续以上未完成的任务。
-- TODO：Core 转 Swift，见 [Swift-Migration.md](Swift-Migration.md)；Android 与跨端适配鸿蒙 NEXT，见 [android.md](android.md)。
+- DONE（2026-11-14，`250507c`，100 分）：Core 转 Swift，见 [Swift-Migration.md](Swift-Migration.md)。TODO：Android 与跨端适配鸿蒙 NEXT，见 [android.md](android.md)。
 
 - DONE（`feat/android-kotlin`）：`CYLCollectionViewLeftAlignedLayout` 合并上游 mokagio/UICollectionViewLeftAlignedLayout 的
   PR #37、#31、#25、#20，并处理上游全部 issue（25 / 25，满分）；逐项表格与测试见
