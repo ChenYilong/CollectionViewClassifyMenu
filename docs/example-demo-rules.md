@@ -33,8 +33,8 @@ CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback contro
   (4) the three combine and change playback in real time; (5) change the core when needed to support it; (6) every
   example layer: iOS, Android, React Native, Flutter, Mini Program, HarmonyOS; (7) record the rule in English in the
   instructions documents and reference this document from the related skills.
-- **Status:** iOS and Android DONE (2026-11-14); React Native, Flutter, Mini Program and HarmonyOS have no example
-  in this repository yet. Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
+- **Status:** iOS and Android DONE (2026-11-14); Flutter: iOS DONE, Android TODO (`flutter/cyl_tag_list`); React Native,
+  Mini Program and HarmonyOS have no example in this repository yet. Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
   `example-animation-controls.md` from another session's branch `docs/animation-playback-controls`); merged here,
   and that file now points to this one.
 
@@ -47,7 +47,7 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 | iOS | Animated icons, `Example/CYLMenuExample/CYLTagAnimationDemoViewController.swift` | DONE (2026-11-14, below) |
 | Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | DONE (2026-11-14, below) |
 | React Native | cross-platform example (animated tags) | TODO |
-| Flutter | cross-platform example (animated tags) | TODO |
+| Flutter | `flutter/cyl_tag_list/example`, Animated icons | iOS DONE (2026-11-14, `cross-platform.md`); Android TODO |
 | Mini Program | example (when added) | TODO |
 | HarmonyOS | example (when added) | TODO |
 
