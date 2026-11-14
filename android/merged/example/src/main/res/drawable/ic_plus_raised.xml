@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The raised plus button: an opaque circle in the app tint (CYLAppTintColor) with a white plus, so nothing under the
+     part above the tab bar shows through. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="52dp" android:height="52dp" android:viewportWidth="52" android:viewportHeight="52">
+    <path android:fillColor="#FF2AB9A0" android:pathData="M26,1a25,25 0,1 0,0.01 0z"/>
+    <path android:fillColor="#FFFFFFFF" android:pathData="M24,14h4v10h10v4H28v10h-4V28H14v-4h10z"/>
+</vector>

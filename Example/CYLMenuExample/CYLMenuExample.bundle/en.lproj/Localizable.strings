@@ -278,3 +278,7 @@
 "拖动：%@" = "drag: %@";
 "长按" = "long click";
 "将删除这个标签！" = "You will delete this tag!";
+"倍速" = "Speed";
+"循环播放" = "Loop";
+"%@ 倍" = "%@ times";
+"从头播放屏幕上的全部动效" = "Plays every animation on screen from the start";

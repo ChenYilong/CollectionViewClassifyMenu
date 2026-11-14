@@ -72,7 +72,7 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
         XCTAssertNotNil(fold, "The fold control is a tag view (CYLTagFoldButton)")
         XCTAssertFalse(fold?.isHidden ?? true)
         XCTAssertEqual(fold?.title, view.style.expandTitle)
-        XCTAssertEqual(view.foldControl.position, .topTrailing, "foldStyle sets foldControl")
+        XCTAssertEqual(view.foldControl.position, .headerTrailing, "foldStyle sets foldControl")
         fold?.sendActions(for: .touchUpInside)
         XCTAssertTrue(view.isSectionExpanded(0))
         XCTAssertFalse(view.isSectionExpanded(1))
@@ -101,7 +101,7 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
         let view = showTagList(source, width: 320)
         let delegate = CYLRecordingMenuDelegate()
         view.menuDelegate = delegate
-        view.foldControl = CYLMenuFoldControl(position: .inline, content: .icon)
+        view.foldControl = CYLMenuFoldControl(position: .tail, content: .icon)
         view.defaultVisibleRows = 2
         view.reloadMenuData()
         view.layoutIfNeeded()
@@ -115,7 +115,7 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
         XCTAssertEqual(tags.numberOfItems(inSection: 0), visible + 1)
         let fold = tags.cell(at: ip(visible, 0))
         XCTAssertTrue(fold is CYLTagFoldCell, "The chevron is the last tag")
-        XCTAssertEqual(fold?.accessibilityIdentifier, CYLTagListFoldControlAccessibilityIdentifier)
+        XCTAssertEqual(fold?.accessibilityIdentifier, CYLTagListAccessibilityIdentifier.foldControl)
         XCTAssertTrue(fold?.accessibilityTraits.contains(.button) ?? false)
         XCTAssertEqual(fold?.accessibilityLabel, "分组 0 更多")
         XCTAssertTrue((fold as? CYLTagFoldCell)?.foldButton.foldControl?.usesDefaultImage ?? false, "The bundle's chevron")
@@ -145,7 +145,7 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
     func testInlineFoldCellIsHiddenWhenEverythingFits() {
         let source = CYLMenuFixtures.source(itemCount: 2, sections: 1)
         let view = showTagList(source, width: 390)
-        view.foldControl = CYLMenuFoldControl(position: .inline, content: .icon)
+        view.foldControl = CYLMenuFoldControl(position: .tail, content: .icon)
         view.defaultVisibleRows = 2
         view.reloadMenuData()
         view.layoutIfNeeded()

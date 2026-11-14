@@ -67,8 +67,36 @@ also committed to the `ci-screenshots` branch under `<branch>/<commit>/`).
 Download them, look at each screen and show them to the user. If they are
 missing, fix the CI so it produces them; if that is impossible, explain why.
 
+## Screenshots (build, CI/CD and local)
+
+The same rules as AGENTS.md, "CI/CD and Example screenshots":
+
+- **Screenshots: where they go.** Every screenshot, from CI/CD and from local builds alike, is saved in the
+  Git repository and shown in the related document in `docs/` (images in `docs/assets/`); when no document fits,
+  create one (the default is `docs/screenshots.md`). At the right moment, when you judge that the result looks as
+  expected, update `README.md` with the newest images, in the matching section (create it if missing).
+- **Screenshots: labels.** Every screenshot shown in `docs/` or `README.md` is labeled with:
+  - the platform it ran on: iOS, Android, Flutter, React Native, HarmonyOS or Mini Program;
+  - the environment: the operating system version, the simulator / emulator version, and the platform's SDK version
+    (iOS, Android, Flutter, React Native, HarmonyOS or Mini Program SDK);
+  - this repository's version number or commit URL;
+  - the current time (when it was taken).
+- **Screenshots: quality.** Use clear original images; never downscale or recompress them.
+- **Screenshots: key moments.** Update the README images at key moments: for example when a `TODO` keyword or a
+  `Linux` keyword can be removed, when a pull request can be merged, or when you judge the result as expected, with
+  no bug and no open issue.
+- **Screenshots: crop to the detail.** Screenshots in `README.md` show the key details, cropped; do not use
+  full-screen captures unless necessary. Prefer one stitched image that shows several key details.
+- **Screenshots: stitching layout.** Stitch in this order of preference: (1) stacked vertically, top to bottom, which
+  reads best on a phone; (2) two columns, several rows; (3) last resort, side by side in one row, at most three
+  columns per row. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
+
 ## Closing the task
 
 When the verification is done, mark the task's `TODO` entry in `docs/` done (AGENTS.md, "Task log in docs/") and
 add the evidence: commits, test counts per suite, CI run and screenshots. An entry stays `TODO` while any step is
 unverified, with the reason.
+
+## Animation examples: playback controls (iOS and Android done 2026-11-14)
+
+Every example page that shows animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback strategy applied live (accessibility labels and values included); verify all three on the page. Change the core when an example needs it. Rule, pages and status: [docs/example-demo-rules.md](../../../docs/example-demo-rules.md).

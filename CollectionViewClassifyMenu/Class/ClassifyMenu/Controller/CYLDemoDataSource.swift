@@ -74,11 +74,11 @@ final class CYLDemoDataSource: NSObject, CYLMenuDataSource {
 
     func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
         let hasImage = items(inSection: indexPath.section)[indexPath.item][kDataSourceCellPictureKey] != nil
-        return hasImage ? CYLMenuResources.imageNamed("home_btn_shrink") : nil
+        return hasImage ? CYLMenuResources.image(named: "home_btn_shrink") : nil
     }
 
     func menuImage(forSection section: Int) -> UIImage? {
-        hasExclusiveFirstItem ? nil : CYLMenuResources.imageNamed("home_btn_cosmetic")
+        hasExclusiveFirstItem ? nil : CYLMenuResources.image(named: "home_btn_cosmetic")
     }
 
     func menuItemIsExclusive(at indexPath: IndexPath) -> Bool {

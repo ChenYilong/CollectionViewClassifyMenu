@@ -243,8 +243,10 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
             guard let navigation = selectTab(withRootClass: CYLTagAnimationDemoViewController.self, in: tabs),
                   let demo = navigation.viewControllers.first as? CYLTagAnimationDemoViewController else { return }
             if screen == "animations-speed" {
+                // The playback controls: 2× and looping, every icon playing.
                 demo.loadViewIfNeeded()
-                demo.changeSpeed()
+                demo.setSpeed(2)
+                demo.setLoops(true)
             } else if screen == "animations-rive" {
                 // PAG, Rive and icons.riv on dark tags, below the first screen.
                 DispatchQueue.main.async {

@@ -26,7 +26,7 @@ echo "$LATEST"
 if [ "${1:-}" = "--check" ]; then
   SHA=${LATEST%% *}
   STATUS=0
-  for PODFILE in "$ROOT"/Example/Podfile "$ROOT"/Example-Swift/Podfile; do
+  for PODFILE in "$ROOT"/Podfile "$ROOT"/Example/Podfile "$ROOT"/Example-Swift/Podfile; do
     [ -f "$PODFILE" ] || continue
     if grep -q "CYLTabBarController" "$PODFILE" && ! grep -q ":commit => '$SHA'" "$PODFILE"; then
       echo "warning: ${PODFILE#"$ROOT"/} does not pin CYLTabBarController at $SHA"

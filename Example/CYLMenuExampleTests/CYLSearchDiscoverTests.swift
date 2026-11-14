@@ -44,7 +44,7 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
         let visible = screen.recentList.numberOfVisibleItems(inSection: 0)
         XCTAssertLessThan(visible, screen.recentSource.searches.count)
         XCTAssertTrue(recent.cell(at: ip(visible, 0)) is CYLTagFoldCell)
-        XCTAssertEqual(screen.recentList.foldControl.position, .inline)
+        XCTAssertEqual(screen.recentList.foldControl.position, .tail)
         XCTAssertEqual(screen.recentSource.clearButton.accessibilityLabel, "清空最近搜索")
         XCTAssertFalse(screen.recentSource.clearButton.isHidden)
         // 发现: two per row, the 热 icon after a hot title, the core's More button.
@@ -60,10 +60,10 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
             XCTAssertGreaterThan(hotButton.imageView.frame.minX, hotButton.titleLabel.frame.minX, "Title on the left, icon on the right")
         }
         XCTAssertEqual(discover.cell(at: ip(hot, 0))?.accessibilityValue, "热门", "VoiceOver reads the icon's label as the value")
-        let more = try XCTUnwrap(screen.discoverList.views(withIdentifier: CYLTagListMoreButtonAccessibilityIdentifier).first as? UIButton)
+        let more = try XCTUnwrap(screen.discoverList.views(withIdentifier: CYLTagListAccessibilityIdentifier.moreButton).first as? UIButton)
         XCTAssertFalse(more.isHidden)
         XCTAssertNotNil(more.currentImage, "The bundle's cyl_more icon")
-        XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_more"))
+        XCTAssertNotNil(CYLMenuResources.image(named: "cyl_more"))
         XCTAssertEqual(more.accessibilityLabel, "换一批", "VoiceOver says what the More button does")
         XCTAssertEqual(more.largeContentTitle, "换一批")
         // Every tag says what a tap does; the hint's sparkles are not read.

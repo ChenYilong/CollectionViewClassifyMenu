@@ -1,0 +1,5 @@
+<resources>
+    <string name="about_title">About</string>
+    <string name="app_name">ClassifyMenu Android</string>
+    <string name="about_text">This app merges three Android tag libraries, all in Kotlin, into one library (android/merged/library), and shows each sample in a tab of a CYLTabBarController built from a configuration file.\n\n• TagView: kaedea/android-tagview (b546a5f), Apache License 2.0, transcribed to Kotlin. Copyright (c) kaedea.\n\n• TagContainer: whilu/AndroidTagView (75a3bba), Apache License 2.0, transcribed to Kotlin. Copyright 2015 lujun.\n\n• TagViewGroup: the public API of shellljx/TagViewGroup (befcd9b), reimplemented in Kotlin; no code copied (the original is GPL-3.0).\n\n• The plus button (New) opens the TagViewGroup editor.\n\nThe tab bar: CYLTabBarController for Android, checked out by commit (android/merged/gradle.properties).</string>
+</resources>

@@ -139,7 +139,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertFalse(group.isGroupHidden)
         XCTAssertEqual(group.linesProgress, 1)
         group.linesProgress = 0.5
-        XCTAssertEqual(group.value(forKey: CYLImageTagGroupKeyLinesProgress) as? CGFloat, 0.5)
+        XCTAssertEqual(group.value(of: .linesProgress), 0.5)
     }
 
     func testImageTagSampleEditAndList() {
@@ -160,15 +160,15 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         captureScreen(named: "test-sample-image-tag-edit")
 
         // A tap on a tag turns it (TagImageView.onTagClicked); a drag moves the group.
-        group.delegate?.groupView?(group, didTapTagAt: 0)
+        group.delegate?.groupView(group, didTapTagAt: 0)
         XCTAssertEqual(imageView.tagGroups[0].tags[0].direction, .rightTopStraight)
-        group.delegate?.groupView?(group, didDragToPercentPosition: CGPoint(x: 0.2, y: 0.7))
+        group.delegate?.groupView(group, didDragToPercentPosition: CGPoint(x: 0.2, y: 0.7))
         XCTAssertEqual(imageView.tagGroups[0].percentPosition, CGPoint(x: 0.2, y: 0.7))
         edit.save()
         XCTAssertTrue(saved)
         XCTAssertEqual(CYLImageTagSampleData.tagGroups.count, 1)
         XCTAssertEqual(CYLImageTagSampleData.tagGroups[0].tags.first?.title, "上衣")
-        XCTAssertEqual(CYLImageTagDirectionNext(.rightBottomStraight), .leftCenter)
+        XCTAssertEqual(CYLImageTagDirection.rightBottomStraight.next, .leftCenter)
 
         CYLImageTagSampleData.tagGroups = CYLImageTagSampleData.initialGroups()
         let list = CYLImageTagListViewController()
@@ -228,7 +228,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(row.midX, fourth.bounds.width / 2, accuracy: 1)
         XCTAssertEqual(fourth.style.rippleDuration, 2)
         let fifth = containers[4]
-        XCTAssertEqual(fifth.tagButton(at: ip(0, 0))?.layer.backgroundColor, CYLMenuColorFromString("#ff0000")?.cgColor)
+        XCTAssertEqual(fifth.tagButton(at: ip(0, 0))?.layer.backgroundColor, UIColor.cylMenuColor(from: "#ff0000")?.cgColor)
         XCTAssertFalse(fifth.allowsTapping)
     }
 
@@ -243,13 +243,13 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         // Themes: a pure theme colors every tag the same; random picks a palette color per item, the same every time.
         list.colorTheme = .pureTeal
         list.probe.layOut()
-        let teal = CYLTagColors(for: .pureTeal, seed: 0)
+        let teal = CYLTagColors(theme: .pureTeal, seed: 0)
         XCTAssertEqual(list.tagButton(at: ip(0, 0))?.layer.backgroundColor, teal?.backgroundColor?.cgColor)
         list.colorTheme = .random
         list.probe.layOut()
-        XCTAssertEqual(list.tagButton(at: ip(1, 0))?.layer.backgroundColor, CYLTagColors(for: .random, seed: 1)?.backgroundColor?.cgColor)
+        XCTAssertEqual(list.tagButton(at: ip(1, 0))?.layer.backgroundColor, CYLTagColors(theme: .random, seed: 1)?.backgroundColor?.cgColor)
         XCTAssertEqual(CYLTagColors.paletteHexByName["TEAL"], "009688")
-        XCTAssertNil(CYLTagColors(for: .none, seed: 0))
+        XCTAssertNil(CYLTagColors(theme: .none, seed: 0))
 
         // Rows: at most one; tapping off; programmatic selection in mode none.
         list.maximumNumberOfRows = 1
@@ -323,6 +323,6 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         style.reversesTitleCharacters = true
         style.maximumTitleLength = 0
         XCTAssertEqual(style.displayedTitle(forTitle: "你好"), "好你")
-        XCTAssertEqual(CYLTag.badgeImage(withText: "热", color: .red, diameter: 16).size, CGSize(width: 16, height: 16))
+        XCTAssertEqual(CYLTag.badgeImage(text: "热", color: .red, diameter: 16).size, CGSize(width: 16, height: 16))
     }
 }

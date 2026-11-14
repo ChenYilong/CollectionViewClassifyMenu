@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- A tag added with its own colors keeps them when the theme changes (issue #77). -->
+    <item name="androidtagview_own_colors" type="id" />
+</resources>

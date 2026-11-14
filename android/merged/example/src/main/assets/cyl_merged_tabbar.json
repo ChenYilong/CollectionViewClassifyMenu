@@ -1,0 +1,31 @@
+{
+  "CYLTabBarControllerContext": "CYLClassifyMenuMerged",
+  "CYLTabBarControllerTitlePositionAdjustment": "{0, -2}",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    { "CYLTabBarItemTitle": "TagView", "CYLTabBarItemImage": "system:tag", "CYLTabBarItemIdentifier": "kaede",
+      "CYLTabBarItemPageIdentifier": "kaede" },
+    { "CYLTabBarItemTitle": "Container", "CYLTabBarItemImage": "system:square.grid.2x2", "CYLTabBarItemIdentifier": "lujun",
+      "CYLTabBarItemPageIdentifier": "lujun" },
+    { "CYLTabBarItemTitle": "ViewGroup", "CYLTabBarItemImage": "system:photo", "CYLTabBarItemIdentifier": "licrafter",
+      "CYLTabBarItemPageIdentifier": "licrafter" },
+    { "CYLTabBarItemTitle": "Classify", "CYLTabBarItemImage": "system:list.bullet.rectangle", "CYLTabBarItemIdentifier": "classify",
+      "CYLTabBarItemPageIdentifier": "classify" },
+    { "CYLTabBarItemTitle": "Filter", "CYLTabBarItemImage": "system:line.3.horizontal.decrease.circle", "CYLTabBarItemIdentifier": "filter",
+      "CYLTabBarItemPageIdentifier": "filter" },
+    { "CYLTabBarItemTitle": "Tags", "CYLTabBarItemImage": "system:tag.square", "CYLTabBarItemIdentifier": "tagcollection",
+      "CYLTabBarItemPageIdentifier": "tagcollection" },
+    { "CYLTabBarItemTitle": "Editor", "CYLTabBarItemImage": "system:tag.circle", "CYLTabBarItemIdentifier": "editor",
+      "CYLTabBarItemPageIdentifier": "editor" },
+    { "CYLTabBarItemTitle": "Menu", "CYLTabBarItemImage": "system:cart", "CYLTabBarItemIdentifier": "menu",
+      "CYLTabBarItemPageIdentifier": "menu" },
+    { "CYLTabBarItemTitle": "About", "CYLTabBarItemImage": "system:info.circle", "CYLTabBarItemIdentifier": "about",
+      "CYLTabBarItemPageIdentifier": "about" }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "New",
+    "CYLTabBarItemImage": "system:plus.circle.fill",
+    "CYLTabBarItemIdentifier": "plus",
+    "CYLTabBarItemPageIdentifier": "plus",
+    "CYLPlusButtonImageSize": "{52, 52}"
+  }
+}

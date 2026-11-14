@@ -49,6 +49,51 @@ persistence in the demos.
 `Example/` 通过 Podfile 以本地路径集成核心库，用这些接口实现 README 的两个场景；
 `CYLExampleMenuSource` 演示宿主如何把自己的模型转成数据源。
 
+## DONE (2026-11-14, logged as TODO 2026-11-13): rename the fold control positions (`CYLMenuFoldControlPosition`)
+
+- **Context:** the fold control's place is named by geometry today (`Bottom`, `TopTrailing`, `TopLeading`,
+  `Inline`). The maintainer proposes names taken from the collection view's own parts: the control that is always the
+  last item of the tags (folded or expanded, as in the Android recent searches and the review filter screenshots)
+  is the `tail`; below the section, the `footer`; in the header's top right / top left corner, `headerRight` /
+  `headerLeft`. The core is not released and not on `master`, so the names may change (no compatibility kept,
+  AGENTS.md "Core quality first, examples last").
+- **Requirements:** compare the current and the proposed names in a table, judge which is easier to understand,
+  pick one set and implement it (iOS core, Android port, examples, configuration strings, README, docs).
+
+| Today | Proposed | What it is | Assessment | Chosen |
+| --- | --- | --- | --- | --- |
+| `none` | (unchanged) | no fold control, every row shown | clear | `none` |
+| `bottom` | `footer` | centered below the section | **proposed is better**: it names the collection view's section footer, where the control is a supplementary view, and pairs with "header…"; "bottom" could mean the bottom of the whole list | `footer` |
+| `topTrailing` | `headerRight` | at the end of the section header | **mixed**: "header" is better than "top" (it says which view holds it); "right" is wrong in right-to-left languages, where the code puts it on the left (the header layout follows the leading edge, `foldAtLeadingEdge`), and UIKit / Android name such edges leading / trailing (start / end) | `headerTrailing` |
+| `topLeading` | `headerLeft` | before the section title in the header | same as above | `headerLeading` |
+| `inline` | `tail` | a tag cell that is always the last item, folded or expanded | **proposed is better**: "inline" only says it sits among the tags, "tail" says where (the end of the items, as `byTruncatingTail` is the end of a text); `lastItem` was considered and is longer without being clearer in a list of positions | `tail` |
+
+- **Decision:** `none`, `footer`, `headerLeading`, `headerTrailing`, `tail`: the proposal's structure-based names,
+  with leading / trailing instead of left / right so that they stay true in right-to-left layouts. Swift:
+  `CYLMenuFoldControlPosition.footer` … `.tail`; Objective-C while the file is not migrated:
+  `CYLMenuFoldControlPositionFooter` …; Kotlin: `FOOTER`, `HEADER_LEADING`, `HEADER_TRAILING`, `TAIL`.
+- **Configuration strings:** `"footer"`, `"headerLeading"`, `"headerTrailing"`, `"tail"`; `"headerLeft"` /
+  `"headerRight"` accepted as aliases of the leading / trailing names (as `"topleft"` / `"topright"` are today); the
+  old strings (`"bottom"`, `"topLeading"`, `"topTrailing"`, `"inline"`) are dropped, and the example JSON files are
+  updated.
+- **When:** with the Swift migration of `CYLMenuFoldControl`, the enum's file (step 8 of `docs/Swift-Migration.md`;
+  step 7 moved `CYLTagListView` and kept the old case names, so the names change once, in Swift), together with the
+  Android port in the same commit.
+- **Status:** DONE (step 8 of `docs/Swift-Migration.md`): iOS `CYLMenuFoldControlPosition.none / .footer /
+  .headerTrailing / .headerLeading / .tail` (Objective-C `CYLMenuFoldControlPositionFooter`…), Kotlin `NONE`, `FOOTER`,
+  `HEADER_TRAILING`, `HEADER_LEADING`, `TAIL`; configuration strings `"footer"`, `"headerLeading"`, `"headerTrailing"`,
+  `"tail"` (aliases `"headerLeft"`, `"headerRight"`) on both platforms; the example JSON, plist, YAML and XML files,
+  the examples, tests, README and this document updated.
+- **Prompt (verbatim, 2026-11-13, with the Android recent searches and the review filter screenshots):**
+
+  > 我想到一个很好的，定义折叠功能按钮位置的枚举定义。如果是截图中tag list ，collectionView总是最后一个按钮是折叠按钮。无论折叠还是不折叠都是最后一个是折叠或者展开按钮。那么我们可以成为tail ，底部用 footer . 顶部 右上角  headerright 顶部 左上角 。headerleft。评估我现在的命名与现在代码的实现相比哪一个更容易理解。在合适的文档中记入TODO，在文档中列出表格 旧有的那现有的对比，选一个实现。该core代码还没发布不在master分支，命名可修改
+
+- **Prompt (English):** a better enum for the fold button's position: in a tag list like the screenshots, the last
+  item of the collection view is always the fold button, folded or not, so call it `tail`; below, `footer`; top right,
+  `headerRight`; top left, `headerLeft`. Judge whether my names or the current ones are easier to understand; record a
+  TODO in a suitable document with a table comparing the old and the proposed names, and pick one to implement. The
+  core is not released and not on `master`, so the names may change.
+
 ## 截图 / Screenshots
 
 CI 截图（`Example screenshots`，提交 `22370a8`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：

@@ -52,7 +52,7 @@ final class CYLTagEditorTests: CYLTagEditorTestCase {
         let button = tags.tagButton(at: createItem)
         XCTAssertEqual(button?.title, "新建标签")
         XCTAssertNotNil(button?.image)
-        XCTAssertNotNil(CYLMenuResources.imageNamed("cyl_tag_plus"), "The plus icon is in the core bundle")
+        XCTAssertNotNil(CYLMenuResources.image(named: "cyl_tag_plus"), "The plus icon is in the core bundle")
         XCTAssertEqual(button?.layer.borderWidth, 1, "Drawn outlined")
         XCTAssertFalse(cell?.accessibilityTraits.contains(.selected) ?? true)
         XCTAssertTrue(tags.collectionView.bounds.intersects(tags.cell(at: createItem)?.frame ?? .zero), "Scrolled to the last item")

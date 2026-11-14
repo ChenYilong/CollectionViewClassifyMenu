@@ -317,7 +317,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         var url = Bundle.main.resourceURL?.appendingPathComponent(names[index % names.count])
         if library == "rive" {
             // The state machines CYLTabBarController's Rive example plays for these files.
-            url = CYLMenuAnimationURLWithOptions(url, index % 2 == 0
+            url = url?.cylAddingAnimationOptions(index % 2 == 0
                 ? ["stateMachine": "State Machine 1"]
                 : ["stateMachine": "State Machine", "input": "isOpen", "duration": "0"])
         }

@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+    <me.kaede.tagview.TagView
+            android:id="@+id/tagview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:lineMargin="5dp"
+            app:tagMargin="3dp"
+            app:textPaddingBottom="3dp"
+            app:textPaddingLeft="10dp"
+            app:textPaddingRight="10dp"
+            app:textPaddingTop="3dp">
+    </me.kaede.tagview.TagView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
+
+        <EditText
+                android:id="@+id/edit_tag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="INPUT TAG TEXT"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp">
+
+            <TextView
+                    android:id="@+id/tv_add"
+                    android:layout_marginRight="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_tagview"
+                    android:ellipsize="marquee"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:text="ADD A TAG"/>
+            <TextView
+                    android:id="@+id/tv_start_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_tagview"
+                    android:ellipsize="marquee"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:visibility="gone"
+                    android:textColor="#FFFFFF"
+                    android:text="Activity Result"/>
+            <TextView
+                    android:id="@+id/tv_recyclerview_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_tagview"
+                    android:ellipsize="marquee"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:text="RECYCLER VIEW"/>
+
+            <TextView
+                    android:id="@+id/tv_list_activity"
+                    android:layout_marginLeft="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_tagview"
+                    android:ellipsize="marquee"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:text="LIST VIEW"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

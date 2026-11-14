@@ -50,19 +50,19 @@ pass data and style values and handle taps. Verified by `CYLAndroidSampleTests`.
 | --- | --- |
 | `new TagView(Context)` | `CYLTagListView()` (`-init`, `-initWithFrame:`) |
 | `new TagView(Context, AttributeSet)` (XML layout) | Interface Builder: `init(coder:)` with the `IBInspectable` properties below |
-| `new TagView(Context, AttributeSet, int defStyle)` | `init(configuration:)` (`-initWithConfiguration:`), a style through `CYLTagListViewStyle` |
-| `new TagView(Context, AttributeSet, int defStyle, int defStyleRes)` | `init(configurationFile:)` (`-initWithConfigurationFile:error:`): JSON, plist, YAML… |
+| `new TagView(Context, AttributeSet, int defStyle)` | `init(configuration:)`, a style through `CYLTagListKey.style` |
+| `new TagView(Context, AttributeSet, int defStyle, int defStyleRes)` | `init(configurationFile:)`: JSON, plist, YAML… |
 | XML `app:lineMargin` | IB `lineSpacing`; key `CYLMenuStyleLineSpacing` |
 | XML `app:tagMargin` | IB `interitemSpacing`; key `CYLMenuStyleInteritemSpacing` |
 | XML `app:textPaddingLeft` | IB `tagContentInsetLeft`; key `CYLMenuStyleTagContentInsets` |
 | XML `app:textPaddingRight` | IB `tagContentInsetRight` |
 | XML `app:textPaddingTop` | IB `tagContentInsetTop` |
 | XML `app:textPaddingBottom` | IB `tagContentInsetBottom` |
-| `addTag(Tag)` | `addTag(_:)` (`-addTag:`) |
-| `addTags(String[])` | `addTags(withTitles:)` (`-addTagsWithTitles:`) |
-| `addTags(List<Tag>)` | `addTags(_:)` (`-addTags:`); key `CYLTagListViewTags` |
+| `addTag(Tag)` | `addTag(_:)` |
+| `addTags(String[])` | `addTags(withTitles:)` |
+| `addTags(List<Tag>)` | `addTags(_:)`; key `CYLTagListKey.tags` |
 | `getTags()` | `tags` |
-| `remove(int position)` | `removeTag(at:)` (`-removeTagAtIndex:`) |
+| `remove(int position)` | `removeTag(at:)` |
 | `removeAllTags()` | `removeAllTags()` |
 | `getLineMargin()` / `setLineMargin(float)` | `lineSpacing` (also `style.lineSpacing`) |
 | `getTagMargin()` / `setTagMargin(float)` | `interitemSpacing` (also `style.interitemSpacing`) |
@@ -91,13 +91,13 @@ pass data and style values and handle taps. Verified by `CYLAndroidSampleTests`.
 | `new Tag(int id, String text)` | `CYLTag(identifier:title:)` |
 | `new Tag(int id, String text, int color)` | `CYLTag(identifier:title:backgroundColor:)` |
 | `new Tag(int id, String text, String color)` | `CYLTag(identifier:title:backgroundColorHex:)` |
-| `id` | `identifier`; key `CYLTagItemIdentifier` |
+| `id` | `identifier`; key `CYLTagItemKey.identifier` |
 | `text` | `title` |
 | `tagTextColor` | `textColor` |
 | `tagTextSize` | `textSize` (or `font`); a larger text makes the tag taller |
 | `layoutColor` | `backgroundColor` |
 | `layoutColorPress` | `highlightedBackgroundColor`; `CYLMenuStyle.highlightedBackgroundColor` |
-| `isDeletable` | `isDeletable`; data source `menuItemIsDeletable(at:)`; key `CYLTagItemDeletable` |
+| `isDeletable` | `isDeletable`; data source `menuItemIsDeletable(at:)`; key `CYLTagItemKey.deletable` |
 | `deleteIndicatorColor` | `deleteIndicatorColor`; `CYLMenuStyle.deleteIndicatorColor` |
 | `deleteIndicatorSize` | `deleteIndicatorSize`; `CYLMenuStyle.deleteIndicatorFont` |
 | `radius` | `cornerRadius` (0 is a capsule) |

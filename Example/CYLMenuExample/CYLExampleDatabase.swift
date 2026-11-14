@@ -224,51 +224,34 @@ final class CYLExampleDatabase: NSObject {
         }
     }
 
+    /// The shared database of every platform's example (docs/cross-platform.md), bundled with the app:
+    /// Example-Shared/Database/cyl_places.sqlite, made from data.json by scripts/generate-places-db.py.
+    static var sharedDatabaseURL: URL? {
+        Bundle.main.url(forResource: "cyl_places", withExtension: "sqlite")
+    }
+
+    /// Copies the reviews and the places of the shared database (the same rows the Android example and the demo app
+    /// read), so that every platform shows the same data. This database stays writable for the saved selections.
     private func fillTables() throws {
+        guard let shared = Self.sharedDatabaseURL else {
+            throw NSError(domain: CYLExampleDatabaseErrorDomain, code: Int(SQLITE_CANTOPEN),
+                          userInfo: [NSLocalizedDescriptionKey: "cyl_places.sqlite is not in the app bundle"])
+        }
+        // ATTACH and DETACH cannot run inside a transaction.
+        try executeSQL("ATTACH DATABASE ? AS shared", arguments: [shared.path])
         var fillError: Error?
         let ok = inTransaction { database in
             do {
-                // Scenario 1: the reviews, with their position in CYLReviewStore as id.
-                for (index, review) in CYLReviewStore.shared().reviews.enumerated() {
-                    try database.executeSQL("INSERT INTO reviews VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                                            arguments: [NSNumber(value: index), review.user, review.text, review.date, review.sku,
-                                                        NSNumber(value: review.rating.rawValue), NSNumber(value: review.hasPhoto),
-                                                        NSNumber(value: review.hasFollowUp)])
-                    for keyword in review.keywords {
-                        try database.executeSQL("INSERT INTO review_keywords VALUES (?, ?)", arguments: [NSNumber(value: index), keyword])
-                    }
-                }
-                // The classify menu demo: every tag of data.json (CYLDBManager, from the original app), in
-                // some of the regions of its filter.
-                let regions = CYLDemoDataSource.regions()
-                var placeID = 0
-                var tagIndex = 0
-                for category in CYLDBManager.dataSource() {
-                    let type = category["Type"] as? String ?? ""
-                    let items = category[kDataSourceSectionKey] as? [[String: Any]] ?? []
-                    for item in items {
-                        let tag = item[kDataSourceCellTextKey] as? String ?? ""
-                        for (region, regionName) in regions.enumerated() {
-                            if (tagIndex + region) % 3 == 2 {
-                                continue
-                            }
-                            let rating = 3.5 + Double((tagIndex * 7 + region * 3) % 16) / 10.0
-                            let price = 30 + ((tagIndex * 37 + region * 53) % 270)
-                            let name = "\(CYLDemoDataSource.shortTitle(forTitle: tag)) · \(CYLDemoDataSource.shortTitle(forTitle: regionName))"
-                            try database.executeSQL("INSERT INTO places VALUES (?, ?, ?, ?, ?, ?, ?)",
-                                                    arguments: [NSNumber(value: placeID), name, type, tag, regionName,
-                                                                NSNumber(value: rating), NSNumber(value: price)])
-                            placeID += 1
-                        }
-                        tagIndex += 1
-                    }
-                }
+                try database.executeSQL("INSERT INTO reviews SELECT id, user, text, date, sku, rating, has_photo, has_follow_up FROM shared.reviews")
+                try database.executeSQL("INSERT INTO review_keywords SELECT review_id, keyword FROM shared.review_keywords")
+                try database.executeSQL("INSERT INTO places SELECT id, name, category, tag, region, rating, price FROM shared.places")
                 return true
             } catch {
                 fillError = error
                 return false
             }
         }
+        try executeSQL("DETACH DATABASE shared")
         if !ok {
             throw fillError ?? lastError()
         }

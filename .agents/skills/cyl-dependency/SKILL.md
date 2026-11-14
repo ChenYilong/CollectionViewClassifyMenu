@@ -94,6 +94,13 @@ screen) is integrated the same way:
    `CYLTabBarItemAccessibilityHint`).
 5. The other tab bar rules still apply (AGENTS.md, "Tab bars"): at the bottom, `hidesBottomBarWhenPushed` on
    pushes, `navigationItem.title` instead of `title`.
+6. **Raised plus button**: whenever an example integrates a PlusButton to demonstrate it, always prefer the raised
+   ("bulging") plus button effect: the top of the plus button extends beyond the top edge of the tab bar. In the
+   configuration's `CYLTabBarControllerPlusButton` dictionary, set `CYLPlusButtonCenterYOffset` to a negative value
+   (or `CYLPlusButtonCenterYMultiplier` below 0.5) so the button's top is above the tab bar; in code, return it from
+   `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` / `+multiplierOfTabBarHeight:` (`CYLPlusButtonSubclassing`).
+   Check that the raised part still receives taps and is not clipped, and show it in the example's screenshots. A
+   flat plus button (its top inside the tab bar) needs a request.
 
 ### Status of the examples
 
@@ -104,3 +111,10 @@ screen) is integrated the same way:
 | `Example-Swift/CYLTagEditorExample` root (`CYLTagEditorAppDelegate`) | no | no: built in code |
 
 These predate the rule; migrate a tab bar when it is next changed (or when asked), keeping its screenshots and tests.
+
+## Example animation playback controls
+
+Every example screen that shows animations, on every platform, offers Play all (restart from progress 0), a speed
+slider and a loop switch that combine and change playback in real time. When the animation engine (the core's
+animated icons or CYLTabBarController's `CYLTabBarItemAnimationFactory`) lacks a speed or loop API, add it there,
+not in the example. Rule, platform status and TODO: `docs/example-demo-rules.md` (AGENTS.md "Example demo rules").

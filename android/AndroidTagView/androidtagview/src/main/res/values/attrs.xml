@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AndroidTagView">
+        <attr name="vertical_interval" format="dimension" />
+        <attr name="horizontal_interval" format="dimension" />
+
+        <attr name="container_border_width" format="dimension" />
+        <attr name="container_border_radius" format="dimension" />
+        <attr name="container_border_color" format="color" />
+        <attr name="container_background_color" format="color" />
+        <attr name="container_enable_drag" format="boolean" />
+        <attr name="container_drag_sensitivity" format="float" />
+        <attr name="container_max_lines" format="integer" />
+        <!-- Every tag on one line (issues #42 / #106 / #115); put the container in a HorizontalScrollView to scroll. -->
+        <attr name="container_single_line" format="boolean" />
+        <attr name="container_gravity" format="enum">
+            <enum name="left" value="3" />
+            <enum name="center" value="17" />
+            <enum name="right" value="5" />
+            <!-- Issue #68: start and end follow the layout direction. -->
+            <enum name="start" value="8388611" />
+            <enum name="end" value="8388613" />
+        </attr>
+
+        <attr name="tag_border_width" format="dimension" />
+        <attr name="tag_corner_radius" format="dimension" />
+        <attr name="tag_horizontal_padding" format="dimension" />
+        <attr name="tag_vertical_padding" format="dimension" />
+        <attr name="tag_text_size" format="dimension" />
+        <attr name="tag_bd_distance" format="dimension" />
+        <attr name="tag_text_color" format="color" />
+        <attr name="tag_border_color" format="color" />
+        <attr name="tag_background_color" format="color" />
+        <attr name="tag_max_length" format="integer" />
+        <attr name="tag_clickable" format="boolean" />
+        <attr name="tag_selectable" format="boolean" />
+        <attr name="tag_theme" format="enum">
+            <enum name="none" value="-1" />
+            <enum name="random" value="0" />
+            <enum name="pure_cyan" value="1" />
+            <enum name="pure_teal" value="2" />
+        </attr>
+        <!-- whilu/AndroidTagView PR #110: the tags' font family (e.g. sans-serif-medium) and text style. -->
+        <attr name="tag_text_font_family" format="string" />
+        <attr name="tag_text_style" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+            <enum name="bold_italic" value="3" />
+        </attr>
+        <!-- Selection and sizes (AndroidTagView issues #6, #12, #29, #73, #75, #114, #123). -->
+        <attr name="tag_selected_background_color" format="color" />
+        <attr name="tag_selected_text_color" format="color" />
+        <attr name="tag_min_width" format="dimension" />
+        <attr name="tag_select_on_click" format="boolean" />
+        <attr name="container_single_selection" format="boolean" />
+        <attr name="tag_text_direction" format="enum" >
+            <enum name="ltr" value="3" />
+            <enum name="rtl" value="4" />
+        </attr>
+
+        <attr name="tag_ripple_color" format="color" />
+        <attr name="tag_ripple_alpha" format="integer" />
+        <attr name="tag_ripple_duration" format="integer" />
+
+        <attr name="tag_enable_cross" format="boolean" />
+        <!-- Issue #105: extra space between the text and the cross. -->
+        <attr name="tag_cross_spacing" format="dimension" />
+        <!-- Issues #70 / #118: a drawable drawn as the cross (delete icon) instead of the lines. -->
+        <attr name="tag_cross_drawable" format="reference" />
+        <!-- Issue #19: text of a tag wider than the container wraps (default: ellipsis). -->
+        <attr name="tag_text_wrap" format="boolean" />
+        <!-- Issue #79: the elevation (shadow) of each tag. -->
+        <attr name="tag_elevation" format="dimension" />
+        <attr name="tag_cross_width" format="dimension" />
+        <attr name="tag_cross_color" format="color" />
+        <attr name="tag_cross_line_width" format="dimension" />
+        <attr name="tag_cross_area_padding" format="dimension" />
+        <attr name="tag_support_letters_rlt" format="boolean" />
+        <attr name="tag_background" format="reference" />
+    </declare-styleable>
+</resources>

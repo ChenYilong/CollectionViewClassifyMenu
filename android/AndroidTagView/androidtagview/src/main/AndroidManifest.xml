@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Issue #67: a library declares no <application> attributes, which clashed with the app's in the manifest merger. -->
+<manifest />

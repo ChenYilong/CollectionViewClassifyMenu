@@ -75,9 +75,25 @@ verify the behavior and update the applicable documentation.
 - Every iOS example is written in Swift, tests included: `Example/CYLMenuExample`,
   `Example-Swift/CYLTagEditorExample`, the demo app of
   `CollectionViewClassifyMenu.xcodeproj` (module `CYLClassifyMenuDemo`) and the
-  `TagCollectionView` demo. Never add Objective-C example code. Only the core
-  library (the pod's sources) and its own tests stay in Objective-C.
-- The core library stays in Objective-C. When an example calls an Objective-C API
+  `TagCollectionView` demo. Never add Objective-C example code. The core library
+  (the pod's sources) is moving from Objective-C to Swift (next item); its own
+  tests stay in Objective-C until the migration says otherwise.
+- **The core moves to Swift** (since 2026-11-12): the pod's sources are translated
+  file by file, following `docs/Swift-Coding-Standard.md` and the Swift skills it
+  lists (`swift-api-design-guidelines-skill`, `migration-patterns`,
+  `swift-concurrency`, `cyl-swift`). Progress and score (no Objective-C file
+  left = 100): `docs/Swift-Migration.md`.
+- **Core quality first, examples last (2026-11-13).** When the migration breaks
+  an example (a compile error or a test), change the example's code first: the
+  examples have the lowest weight in the project, and no compatibility is kept
+  for them. Change example code freely so that the core's Swift code carries no
+  baggage: never lower the core's Swift quality to fit an example's usage; the
+  Swift coding standard (`docs/Swift-Coding-Standard.md`) decides. The Swift API
+  may become idiomatic; `scripts/swift-api-check.sh` reports each change, which
+  is listed in `docs/Swift-Migration.md` with the baseline refreshed.
+  Objective-C names stay only where the core's own Objective-C tests, XIBs,
+  selectors or key-value coding need them.
+- Until a part of the core is Swift: when an example calls an Objective-C API
   that reads badly in Swift, fix it in the core, never with workarounds in the
   example: the Swift API Design Guidelines decide (`NS_SWIFT_NAME`, nullability,
   lightweight generics, `NS_ENUM`/`NS_OPTIONS`/`NS_TYPED_ENUM` string constants,
@@ -161,6 +177,12 @@ verify the behavior and update the applicable documentation.
   `CYLTabBarPageRegistry`, and a `CYLTabBarControllerContext` of its own per
   tab bar. Build a tab bar in code, or leave out the plus button, only when a
   request asks for it. Details: `.agents/skills/cyl-dependency/`.
+- Raised plus button: whenever an example integrates a PlusButton to demonstrate it, always prefer the raised
+  ("bulging") plus button effect. Raised means the top of the plus button extends beyond the top edge of the tab
+  bar. In a configuration file, raise it with `CYLPlusButtonCenterYOffset` (a negative offset) or
+  `CYLPlusButtonCenterYMultiplier`; in code, with `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` /
+  `+multiplierOfTabBarHeight:` of `CYLPlusButtonSubclassing`. A flat plus button needs a request. Details:
+  `.agents/skills/cyl-dependency/`.
 - The core library does not depend on CYLTabBarController: it finds the
   animation engine (`CYLTabBarItemAnimationFactory`) and the configuration
   parser (`CYLTabBarConfigurationParser`) at runtime, because the published
@@ -176,6 +198,16 @@ verify the behavior and update the applicable documentation.
   setting its alpha to 0, and nothing else, when the license allows modification, or when the maintainer
   decides so for a file without a license (`house.riv`, 2026-11-12). Record the change and both SHA-256
   values in that README (`Animations/Rive/README.md`: `truck.riv`, `house.riv`).
+
+## Example demo rules
+
+- **Animation playback controls.** Every example screen that shows animations (Lottie, PAG, Rive, GIF, symbol
+  effects), on every platform (iOS, Android, React Native, Flutter, Mini Program, HarmonyOS), offers three controls
+  that combine and act in real time: **Play all** (restart every animation from progress 0, once), a **speed slider**
+  and a **loop switch**. Change the core library (and CYLTabBarController's animation engine) when an engine lacks
+  the speed or loop API; never work around it in the example. Details, status per platform and the TODO:
+  `docs/example-demo-rules.md`. The same rule, with the library-side notes, is in CYLTabBarController's
+  `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback controls in the animation examples").
 
 ## Search bars
 
@@ -207,7 +239,8 @@ verify the behavior and update the applicable documentation.
 - Example strings belong to an Example-level bundle
   (`Example/CYLMenuExample/CYLMenuExample.bundle`), never to the core bundle.
 - Always look strings up through a macro that maps keys to its bundle:
-  `CYLMenuLocalizedString` for the core (Swift: `CYLMenuLocalizedString(_:)`), and
+  `CYLMenuLocalizedString(_:)` for the core (a Swift function since the core moved to Swift; Objective-C:
+  `+[CYLMenuResources localizedStringForKey:]`), and
   one Swift function per example (`CYLExampleLocalizedString`,
   `CYLTagEditorLocalizedString`, `CYLDemoLocalizedString`). Do not call
   `NSLocalizedString` or read a bundle directly.
@@ -219,14 +252,14 @@ verify the behavior and update the applicable documentation.
   - The core has its own lookup macro that reads the localized files inside the
     core's resource bundle. The bundle's form, name and folder name may differ
     per platform, but it is always a folder or package; on iOS it is a
-    `.bundle` folder (`CYLClassifyMenuResources.bundle`, macro
-    `CYLMenuLocalizedString`).
+    `.bundle` folder (`CYLClassifyMenuResources.bundle`, lookup
+    `CYLMenuLocalizedString(_:)`: the core is Swift, which has no macros, so the
+    function takes the macro's role, as in the examples).
   - Every example has its own lookup that reads the example's localized files
     from the example-level bundle. The examples are Swift, which has no macros,
     so each uses one global function in that role: `CYLExampleLocalizedString`
     (`Example/CYLMenuExample`), `CYLTagEditorLocalizedString` (`Example-Swift`),
-    `CYLDemoLocalizedString` (the demo app). A core macro also needs a function
-    Swift can call.
+    `CYLDemoLocalizedString` (the demo app).
   - A project passes only if it has at least two different lookup macros (or
     Swift functions), one per level, each reading a different bundle: the core
     one and at least one example's. No code reads a bundle or calls
@@ -304,6 +337,26 @@ AGENTS.md, newest commit) and adapted to this project:
   produced. If that is still not possible, explain the exact reason (for
   example the runner, the simulator or artifact download) to the user.
 
+- **Screenshots: where they go.** Every screenshot, from CI/CD and from local builds alike, is saved in the
+  Git repository and shown in the related document in `docs/` (images in `docs/assets/`); when no document fits,
+  create one (the default is `docs/screenshots.md`). At the right moment, when you judge that the result looks as
+  expected, update `README.md` with the newest images, in the matching section (create it if missing).
+- **Screenshots: labels.** Every screenshot shown in `docs/` or `README.md` is labeled with:
+  - the platform it ran on: iOS, Android, Flutter, React Native, HarmonyOS or Mini Program;
+  - the environment: the operating system version, the simulator / emulator version, and the platform's SDK version
+    (iOS, Android, Flutter, React Native, HarmonyOS or Mini Program SDK);
+  - this repository's version number or commit URL;
+  - the current time (when it was taken).
+- **Screenshots: quality.** Use clear original images; never downscale or recompress them.
+- **Screenshots: key moments.** Update the README images at key moments: for example when a `TODO` keyword or a
+  `Linux` keyword can be removed, when a pull request can be merged, or when you judge the result as expected, with
+  no bug and no open issue.
+- **Screenshots: crop to the detail.** Screenshots in `README.md` show the key details, cropped; do not use
+  full-screen captures unless necessary. Prefer one stitched image that shows several key details.
+- **Screenshots: stitching layout.** Stitch in this order of preference: (1) stacked vertically, top to bottom, which
+  reads best on a phone; (2) two columns, several rows; (3) last resort, side by side in one row, at most three
+  columns per row. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
+
 ## Documentation assets
 
 - Images and other attachments of a Markdown file go into an `assets/` folder
@@ -346,6 +399,24 @@ AGENTS.md, newest commit) and adapted to this project:
   `master`.
 - Opening is automatic; merging still follows the rules of the repository and the user's approval.
 - Details: `.agents/skills/cyl-commit/`. The same rule is in the vault's root `instructions.md` (section 15).
+
+## Upstream projects (translations and ports)
+
+- **Upstream projects used for translation.** When a document of this project links to a GitHub repository of
+  another project, and that repository is the source of a translation or port (for example the projects ported to
+  Kotlin in `android/`), do not translate only its default branch:
+  1. **Pull requests.** Visit the upstream's open pull requests and bring them in. If the translation has not started,
+     merge the open pull requests into the source first; if it is already done, translate each open pull request's
+     change and merge it into our port.
+  2. **Issues.** List the upstream's open issues in a table in the related document in `docs/` (create one when none
+     fits): column 1 the issue link, column 2 its description, column 3 the fix status (`TODO` by default). Find each
+     issue's counterpart in our code and try to fix it.
+  3. **Score.** 100 means every listed issue is resolved. Give a score after each fixed issue and continue until 100.
+  4. **Order.** For a translation not started yet: merge the open pull requests, fix issues until the score reaches
+     60, translate, then fix the remaining issues up to 100. For a finished translation: translate and merge the open
+     pull requests, then fix the issues on the translated code up to 100.
+  5. The same rule applies to every platform (iOS, Android, Flutter, React Native, HarmonyOS, Mini Program).
+  Details: `.agents/skills/cyl-upstream/`. The same rule is in the vault's root `instructions.md` (section 17).
 
 ## Issue progress
 

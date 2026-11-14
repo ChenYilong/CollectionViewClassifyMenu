@@ -16,19 +16,18 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
 
     func testAnimationOptionsAreEncodedAsCYLTabBarControllerDoes() {
         let file = URL(fileURLWithPath: "/tmp/icons.riv")
-        XCTAssertNil(CYLMenuAnimationURLWithOptions(nil, ["artboard": "CHAT"]))
-        XCTAssertEqual(CYLMenuAnimationURLWithOptions(file, nil), file)
-        let url = CYLMenuAnimationURLWithOptions(file, ["stateMachine": "State Machine 1", "artboard": "A&B", "duration": 2])
-        XCTAssertEqual(url?.path, file.path)
-        XCTAssertEqual(url?.fragment, "artboard=A%26B&duration=2&stateMachine=State%20Machine%201", "Sorted, percent-encoded")
+        XCTAssertEqual(file.cylAddingAnimationOptions([:]), file)
+        let url = file.cylAddingAnimationOptions(["stateMachine": "State Machine 1", "artboard": "A&B", "duration": 2])
+        XCTAssertEqual(url.path, file.path)
+        XCTAssertEqual(url.fragment, "artboard=A%26B&duration=2&stateMachine=State%20Machine%201", "Sorted, percent-encoded")
 
         let items: [[String: Any]] = [
-            [CYLTagItemTitle: "a", CYLTagItemAnimation: "CYLMenuExample.bundle/Animations/Rive/icons.riv",
-             CYLTagItemAnimationOptions: ["artboard": "CHAT", "input": "active"]],
-            [CYLTagItemTitle: "b", CYLTagItemAnimation: "CYLMenuExample.bundle/Animations/Rive/icons.riv#artboard=USER"],
+            [CYLTagItemKey.title: "a", CYLTagItemKey.animation: "CYLMenuExample.bundle/Animations/Rive/icons.riv",
+             CYLTagItemKey.animationOptions: ["artboard": "CHAT", "input": "active"]],
+            [CYLTagItemKey.title: "b", CYLTagItemKey.animation: "CYLMenuExample.bundle/Animations/Rive/icons.riv#artboard=USER"],
         ]
-        let sections: [[String: Any]] = [[CYLTagSectionItems: items]]
-        let view = CYLTagListView(configuration: [CYLTagListViewSections: sections])
+        let sections: [[String: Any]] = [[CYLTagSectionKey.items: items]]
+        let view = CYLTagListView(configuration: [CYLTagListKey.sections: sections])
         let first = view.menuDataSource?.menuAnimationURLForItem?(at: ip(0, 0))
         let second = view.menuDataSource?.menuAnimationURLForItem?(at: ip(1, 0))
         XCTAssertEqual(first?.fragment, "artboard=CHAT&input=active")
@@ -39,7 +38,7 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
     }
 
     func testAnimatedIconsUseCYLTabBarControllerAnimationEngine() {
-        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable(), "CYLTabBarController/CYLTabBarItemAnimation is linked")
+        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable, "CYLTabBarController/CYLTabBarItemAnimation is linked")
         let resources = Bundle.main.resourceURL!
         let files = [
             "GIF": "CYLMenuExample.bundle/Animations/GIF/tab_star.gif",
@@ -96,10 +95,25 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
                 XCTAssertNotNil(button?.animationView, "\(sections[section]) animated by CYLTabBarController's engine")
             }
         }
-        demo.playSelectedAnimations()
-        demo.changeSpeed()
-        XCTAssertEqual(list.style.animationSpeed, 2, accuracy: 0.01)
-        XCTAssertEqual(demo.navigationItem.leftBarButtonItem?.title, "2x")
+        // The playback controls: Play all, the speed slider and the loop switch act on the list at once.
+        demo.playAllAnimations()
+        demo.setSpeed(1.6)
+        XCTAssertEqual(list.animationSpeed ?? 0, 1.5, accuracy: 0.01, "The slider moves in steps of 0.25")
+        XCTAssertEqual(demo.speedLabel.text, "1.5×")
+        XCTAssertEqual(demo.speedSlider.accessibilityLabel, CYLExampleLocalizedString("倍速"))
+        XCTAssertEqual(demo.speedSlider.accessibilityValue, CYLExampleLocalizedString("%@ 倍", "1.5"))
+        demo.setSpeed(100)
+        XCTAssertEqual(list.animationSpeed ?? 0, 4, accuracy: 0.01, "Clamped to the slider's range")
+        XCTAssertEqual(list.style.animationSpeed, 1, accuracy: 0.01, "The style is not replaced: the list is not reloaded")
+        demo.setLoops(true)
+        XCTAssertTrue(list.animationLoops)
+        let visible = tags.collectionView.visibleCells.compactMap { ($0 as? CYLTagListCell)?.button }
+        XCTAssertFalse(visible.isEmpty)
+        XCTAssertTrue(visible.allSatisfy { $0.animationLoops && $0.animationSpeed == 4 }, "Applied to the tags on screen")
+        demo.setLoops(false)
+        XCTAssertTrue(visible.allSatisfy { !$0.animationLoops })
+        XCTAssertEqual(demo.loopSwitch.accessibilityLabel, CYLExampleLocalizedString("循环播放"))
+        XCTAssertNil(demo.navigationItem.leftBarButtonItem, "The speed button is replaced by the slider")
         tags.tap(item: 1, section: 4)
         XCTAssertTrue(list.selectedIndexPaths.contains(ip(1, 4)))
         XCTAssertFalse(list.selectedIndexPaths.contains(ip(0, 4)), "One selected tag per section")

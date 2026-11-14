@@ -9,21 +9,28 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '15.0'
   s.source       = { :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :tag => s.version.to_s }
   s.requires_arc = true
+  # The core moves from Objective-C to Swift (docs/Swift-Migration.md); both languages build in one module meanwhile.
+  s.swift_version = '5.9'
   s.static_framework = true
 
   s.source_files = [
-    'CollectionViewClassifyMenu/Class/**/*.{h,m}',
-    'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.{h,m}'
+    'CollectionViewClassifyMenu/Class/**/*.swift',
+    'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.swift'
   ]
-  # The demo app's code (CYLMainViewController, CYLDemoDataSource, CYLDBManager, CYLAppDelegate…) is Swift and
-  # not matched by the patterns above; only AppleDouble files need excluding.
+  # The demo apps' Swift files live next to the core's sources; the patterns above match Swift files (the core moves to
+  # Swift), so they are excluded by name, with AppleDouble files.
   s.exclude_files = [
-    '**/._*'
+    '**/._*',
+    'CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/{CYLDemoDataSource,CYLFilterDemoViewController,CYLMainViewController}.swift',
+    'CollectionViewClassifyMenu/Class/Other/Symtem/{CYLAppDelegate,CYLDemoLocalization}.swift',
+    'CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.swift',
+    'TagCollectionView/TagCollectionView/{CYLTagDemoAppDelegate,CYLTagDemoViewController}.swift'
   ]
   s.resource_bundles = { 'CYLClassifyMenuResources' => [
     'CollectionViewClassifyMenu/Class/MultipleFilter/**/*.xib',
     'CollectionViewClassifyMenu/Class/Other/Symtem/Images.xcassets',
     'CollectionViewClassifyMenu/Resources/Localization/*.lproj',
+    'CollectionViewClassifyMenu/Resources/Privacy/PrivacyInfo.xcprivacy',
     'TagCollectionView/TagCollectionView/CYLTagView.xib',
     'TagCollectionView/TagCollectionView/Views/*.xib'
   ] }

@@ -22,6 +22,14 @@ final class CYLExampleDatabaseTests: CYLMenuExampleTestCase {
         XCTAssertEqual(database.count(ofTable: "reviews"), CYLReviewStore.shared().reviews.count)
         XCTAssertGreaterThan(database.count(ofTable: "review_keywords"), 0)
         XCTAssertGreaterThan(database.count(ofTable: "places"), 40)
+        // The rows are the shared database's (docs/cross-platform.md): the same on every platform.
+        XCTAssertNotNil(CYLExampleDatabase.sharedDatabaseURL, "cyl_places.sqlite is bundled")
+        XCTAssertEqual(database.count(ofTable: "places"), 83)
+        let first = try database.rows(forSQL: "SELECT name, region, rating, price FROM places ORDER BY rating DESC, id LIMIT 1").first
+        XCTAssertEqual(first?["name"] as? String, "日式拉面 · 北京")
+        XCTAssertEqual((first?["price"] as? NSNumber)?.intValue, 93)
+        let review = try database.rows(forSQL: "SELECT text FROM reviews WHERE id = 0").first
+        XCTAssertEqual(review?["text"] as? String, CYLReviewStore.shared().reviews.first?.text, "The reviews of CYLReviewStore, in order")
         let counts = try database.rows(forSQL: "SELECT COUNT(DISTINCT tag) AS n, COUNT(DISTINCT region) AS r, COUNT(DISTINCT category) AS c FROM places").first
         XCTAssertEqual((counts?["c"] as? NSNumber)?.intValue, 4, "吃喝玩逛 of data.json")
         XCTAssertEqual((counts?["r"] as? NSNumber)?.intValue, 4, "The filter's regions")
@@ -96,8 +104,14 @@ final class CYLExampleDatabaseTests: CYLMenuExampleTestCase {
         let button = tags.cell(at: sichuan)?.value(forKey: "button") as? UIButton
         XCTAssertTrue(button?.isSelected ?? false, "The selected tag is highlighted (core: selectedIndexPath)")
         XCTAssertTrue(button?.accessibilityTraits.contains(.selected) ?? false)
+        // The icon and the title of a tag cell are `imageTitleSpacing` (5 pt) apart, centered in the cell: they were 10 pt
+        // apart because each layout pass moved them again (docs/cross-platform.md).
+        let imageFrame = try XCTUnwrap(button?.imageView?.frame)
+        let titleFrame = try XCTUnwrap(button?.titleLabel?.frame)
+        XCTAssertEqual(titleFrame.minX - imageFrame.maxX, 5, accuracy: 0.5)
+        XCTAssertEqual(imageFrame.minX, (button?.bounds.width ?? 0) - titleFrame.maxX, accuracy: 1, "Centered: the same padding on both sides")
         // The results are the menu's footer, below the tags, in the scroll view.
-        let footer: UIView = menu.menuFooterView
+        let footer = try XCTUnwrap(menu.menuFooterView)
         XCTAssertGreaterThanOrEqual(footer.frame.minY, tags.collectionView.frame.maxY - 0.5)
         XCTAssertGreaterThan(footer.frame.height, 40)
         let scroll = footer.superview as? UIScrollView
