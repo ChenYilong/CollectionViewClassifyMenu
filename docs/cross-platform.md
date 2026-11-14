@@ -201,3 +201,18 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   English: continue the unfinished tasks of the CollectionViewClassifyMenu folder from memory and the local notes, then find
   every TODO in the documents and finish it, the documents of this folder first. Then: "continue".
+- **Step 1–2 DONE (2026-11-15, iOS):** `react-native/react-native-cyl-tag-list` (create-react-native-library 0.64, Fabric
+  view, React Native 0.88.0). The JS view takes the configuration object (sent as JSON), `animationSpeed` (0 = each
+  animation's own), `animationLoops`, the `playAll` command (`ref.playAll()`), and reports `onTagTap`,
+  `onSelectionChange` and `onContentHeightChange`. On iOS a Swift view `CylTagListBridge` owns the core's
+  `CYLTagListView` (its delegate is a private object, so the generated Objective-C header does not import the core) and
+  `CylTagListView.mm` forwards props, events and the command. `asset:<name>` is a file of the app bundle (the example
+  bundles CYLTabBarController's four Lottie tab icons). Codegen of React Native 0.88 rejects arrays of objects in events
+  ("Unable to determine event type"), so the selection travels as `itemsJSON`. Build: `USE_FRAMEWORKS=static pod install`,
+  Release, in the mirror `/tmp/xpr/rn` (exFAT). Evidence (iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2, React Native
+  0.88.0, base commit `7e3e696`, 2026-11-15): the list sizes itself to its content (Lottie row, ten SF Symbol tags, tail fold):
+
+  <img src="assets/react-native-ios-tag-list.png" width="300" alt="React Native on iOS: the native tag list, speed steps, Loop switch and Play all">
+
+  Still TODO: step 3 (the Android view, Kotlin `com.cyl:classifymenu`), step 4 (the classify menu screen over
+  `cyl_places.sqlite`), step 5 (tests on both platforms; a real slider instead of the speed steps).
