@@ -1,6 +1,8 @@
 import 'package:cyl_tag_list/cyl_tag_list.dart';
 import 'package:flutter/material.dart';
 
+import 'classify_menu_page.dart';
+
 void main() => runApp(const ExampleApp());
 
 class ExampleApp extends StatelessWidget {
@@ -11,7 +13,35 @@ class ExampleApp extends StatelessWidget {
     return MaterialApp(
       title: 'CYLTagListView',
       theme: ThemeData(colorSchemeSeed: const Color(0xFF2AB9A0), useMaterial3: true),
-      home: const TagListPage(),
+      home: const HomePage(),
+    );
+  }
+}
+
+/// The example's screens, one bottom tab each (tab bars stay at the bottom, AGENTS.md).
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  /// `--dart-define=CYL_TAB=1` opens the second tab at launch, for screenshots.
+  int _index = const int.fromEnvironment('CYL_TAB');
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(index: _index, children: const [TagListPage(), ClassifyMenuPage()]),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (index) => setState(() => _index = index),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.animation), label: 'Animated icons'),
+          NavigationDestination(icon: Icon(Icons.category_outlined), label: 'Classify menu'),
+        ],
+      ),
     );
   }
 }
