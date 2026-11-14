@@ -184,7 +184,7 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/flutter-android-classify-filter.png" width="260" alt="Flutter on Android 15: 川菜 in 广州, 1 place">
   <img src="assets/flutter-ios-classify-filter.png" width="260" alt="Flutter on iOS 27.0: 川菜 in 广州, 1 place">
 
-## TODO (2026-11-15): the React Native example
+## DONE (2026-11-15): the React Native example
 
 - **Context:** the Flutter example passes on iOS and Android (above), so React Native is next (the order of this document).
 - **Requirements:** a React Native component `react-native/react-native-cyl-tag-list` (Fabric native view) that hosts the native
@@ -294,3 +294,33 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/react-native-ios-classify-filter.png" width="300" alt="React Native on iOS: 川菜 · 广州, 1 place">
 
   Still TODO: step 5 (automated tests on both platforms; iOS taps need a tap tool).
+- **Step 5 DONE (2026-11-15): tests.** Commands (in `react-native/react-native-cyl-tag-list`):
+  - **Jest, `yarn jest`:** the wrapper (configuration sent as JSON, playback props, the three events unwrapped, `playAll` on
+    the native view); 3 tests pass.
+  - **Jest, `cd example && yarn jest`:** `placesQuery` is the iOS example's statement with bound values; 3 tests pass.
+  - **Android end to end, `scripts/e2e-android.sh [serial] [apk]`:** uiautomator finds the elements by text or accessibility
+    label, never by coordinates. It checks 2x, a tag tap reaching JavaScript, 83 places, 川菜 (3), 川菜 + 广州 (1), the
+    conditions restored after a force-stop, and reset (83). PASS on the Android 15 / API 35 emulator `CYL_API35_arm64`;
+    shellcheck is clean.
+  - **iOS UI test, `xcodebuild test -workspace example/ios/CylTagListExample.xcworkspace -scheme CylTagListExample -only-testing:CylTagListExampleUITests`:**
+    the new `CylTagListExampleUITests` target. It finds the tags by the core's identifier `CYLTagListItem` and the tab bar
+    and page buttons by label, and runs the same flow through a relaunch. TEST SUCCEEDED on the iPhone 17 Pro simulator,
+    iOS 27.0, Xcode 27.2, in 36 s.
+  - **Bug the iOS test found:** reaching the Classify tab by a tap left its menu 1 pt tall, so its tags were hidden (the
+    screenshots above came from launch arguments and did not show it). Probable cause: the first layout sent the height
+    event before Fabric gave the view its event emitter, so the event was lost, and the view had already recorded the height
+    as sent. Fix: `CylTagListView.mm` overrides `updateEventEmitter:` and sends the height again
+    (`CylTagListBridge.resendContentHeight()`).
+  - **Evidence** (base commit `a30e086`, React Native 0.88.0, 2026-11-15). The iOS UI test's filter sheet, then the Android end-to-end
+    result:
+
+  <img src="assets/react-native-ios-uitest-filter-sheet.png" width="300" alt="React Native on iOS, UI test: the filter sheet with 广州">
+  <img src="assets/react-native-android-e2e-classify-filter.png" width="300" alt="React Native on Android, end-to-end script: 川菜 · 广州, 1 place">
+
+- **Result:** the React Native example covers the same screens as iOS, Android and Flutter, on both platforms:
+  - the animated tag list with Play all, speed and loop;
+  - the classify menu with the multiple filter over the shared database;
+  - the saved selections;
+  - all inside CYLTabBarController's React Native tab bar.
+
+  Not covered: a physical device; Detox or another end-to-end framework (the two scripts above stand in for one).
