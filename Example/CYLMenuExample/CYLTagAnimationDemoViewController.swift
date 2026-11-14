@@ -14,6 +14,15 @@ final class CYLTagAnimationDemoViewController: UIViewController {
     private(set) var tagListView: CYLTagListView!
     private(set) var statusLabel: UILabel!
 
+    /// Playback controls (docs/example-demo-rules.md): they combine and act at once, also on animations that are playing.
+    private(set) var playAllButton: UIButton!
+    private(set) var speedSlider: UISlider!
+    private(set) var speedLabel: UILabel!
+    private(set) var loopSwitch: UISwitch!
+
+    static let speedRange: ClosedRange<Float> = 0.25...4
+    static let speedStep: Float = 0.25
+
     /// Section titles, one per library, in order.
     static func sectionIdentifiers() -> [String] {
         ["lottie", "lottie-images", "lottie-green", "pag", "rive", "rive-icons", "gif", "images"]
@@ -130,9 +139,6 @@ final class CYLTagAnimationDemoViewController: UIViewController {
         // navigationItem, not title: a view controller's title would replace its tab's title.
         navigationItem.title = CYLExampleLocalizedString("动效图标")
         view.backgroundColor = .systemBackground
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: CYLExampleLocalizedString("全部播放"), style: .plain,
-                                                            target: self, action: #selector(playSelectedAnimations))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "1x", style: .plain, target: self, action: #selector(changeSpeed))
 
         let statusLabel = UILabel()
         statusLabel.numberOfLines = 0
@@ -146,6 +152,9 @@ final class CYLTagAnimationDemoViewController: UIViewController {
         view.addSubview(statusLabel)
         self.statusLabel = statusLabel
 
+        let controls = makePlaybackControls()
+        view.addSubview(controls)
+
         let tagListView = CYLTagListView(configuration: Self.configuration())
         tagListView.translatesAutoresizingMaskIntoConstraints = false
         tagListView.menuDelegate = self
@@ -156,7 +165,10 @@ final class CYLTagAnimationDemoViewController: UIViewController {
             statusLabel.topAnchor.constraint(equalTo: safe.topAnchor, constant: 8),
             statusLabel.leadingAnchor.constraint(equalTo: safe.leadingAnchor, constant: 16),
             statusLabel.trailingAnchor.constraint(equalTo: safe.trailingAnchor, constant: -16),
-            tagListView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 4),
+            controls.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 8),
+            controls.leadingAnchor.constraint(equalTo: safe.leadingAnchor, constant: 16),
+            controls.trailingAnchor.constraint(equalTo: safe.trailingAnchor, constant: -16),
+            tagListView.topAnchor.constraint(equalTo: controls.bottomAnchor, constant: 4),
             tagListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tagListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tagListView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -167,23 +179,107 @@ final class CYLTagAnimationDemoViewController: UIViewController {
         tagListView.value(forKey: "collectionView") as! UICollectionView
     }
 
-    /// Plays the animated icon of every selected tag, as the "全部播放" button does.
-    @objc func playSelectedAnimations() {
-        collectionView.layoutIfNeeded()
-        for indexPath in tagListView.selectedIndexPaths {
-            (collectionView.cellForItem(at: indexPath) as? CYLTagListCell)?.button.playAnimation()
-        }
+    /// Play all, the speed slider with its value and the loop switch, stacked so that they grow with Dynamic Type.
+    private func makePlaybackControls() -> UIView {
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = CYLExampleLocalizedString("全部播放")
+        configuration.image = UIImage(systemName: "play.fill")
+        configuration.imagePadding = 6
+        let playAllButton = UIButton(configuration: configuration)
+        playAllButton.titleLabel?.adjustsFontForContentSizeCategory = true
+        playAllButton.accessibilityHint = CYLExampleLocalizedString("从头播放屏幕上的全部动效")
+        playAllButton.addTarget(self, action: #selector(playAllAnimations), for: .touchUpInside)
+        self.playAllButton = playAllButton
+
+        let speedTitle = Self.caption(CYLExampleLocalizedString("倍速"))
+        // The slider reads the title and the value: the two labels are not separate elements.
+        speedTitle.isAccessibilityElement = false
+        let speedSlider = UISlider()
+        speedSlider.minimumValue = Self.speedRange.lowerBound
+        speedSlider.maximumValue = Self.speedRange.upperBound
+        speedSlider.value = 1
+        speedSlider.accessibilityLabel = CYLExampleLocalizedString("倍速")
+        speedSlider.addTarget(self, action: #selector(speedSliderChanged), for: .valueChanged)
+        self.speedSlider = speedSlider
+        let speedLabel = Self.caption("")
+        speedLabel.isAccessibilityElement = false
+        speedLabel.textAlignment = .right
+        speedLabel.font = UIFontMetrics(forTextStyle: .subheadline)
+            .scaledFont(for: .monospacedDigitSystemFont(ofSize: 15, weight: .regular))
+        speedLabel.setContentHuggingPriority(.required, for: .horizontal)
+        speedLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        self.speedLabel = speedLabel
+        let speedRow = UIStackView(arrangedSubviews: [speedTitle, speedSlider, speedLabel])
+        speedRow.spacing = 10
+        speedRow.alignment = .center
+
+        let loopTitle = Self.caption(CYLExampleLocalizedString("循环播放"))
+        loopTitle.isAccessibilityElement = false
+        let loopSwitch = UISwitch()
+        loopSwitch.accessibilityLabel = CYLExampleLocalizedString("循环播放")
+        loopSwitch.addTarget(self, action: #selector(loopSwitchChanged), for: .valueChanged)
+        self.loopSwitch = loopSwitch
+        let loopRow = UIStackView(arrangedSubviews: [loopTitle, UIView(), loopSwitch, playAllButton])
+        loopRow.spacing = 10
+        loopRow.alignment = .center
+
+        let controls = UIStackView(arrangedSubviews: [speedRow, loopRow])
+        controls.axis = .vertical
+        controls.spacing = 8
+        controls.translatesAutoresizingMaskIntoConstraints = false
+        updateSpeedLabel()
+        return controls
     }
 
-    /// Cycles the animation speed (1x, 2x, 0.5x), as the speed button does.
-    @objc func changeSpeed() {
-        let style = tagListView.style.copy() as! CYLMenuStyle
-        let speeds: [CGFloat] = [1, 2, 0.5]
-        let next = speeds.firstIndex(of: style.animationSpeed).map { $0 + 1 } ?? 0
-        style.animationSpeed = speeds[next % speeds.count]
-        tagListView.style = style
-        navigationItem.leftBarButtonItem?.title = String(format: "%gx", Double(style.animationSpeed))
-        playSelectedAnimations()
+    private static func caption(_ text: String) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.font = .preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
+        return label
+    }
+
+    /// The current speed, a multiple of `speedStep`.
+    var speed: CGFloat {
+        CGFloat((speedSlider.value / Self.speedStep).rounded() * Self.speedStep)
+    }
+
+    /// Sets the speed as the slider does (clamped to `speedRange`): every animated icon changes at once.
+    func setSpeed(_ speed: CGFloat) {
+        speedSlider.value = min(max(Float(speed), Self.speedRange.lowerBound), Self.speedRange.upperBound)
+        speedSliderChanged()
+    }
+
+    /// Sets looping as the switch does.
+    func setLoops(_ loops: Bool) {
+        loopSwitch.isOn = loops
+        loopSwitchChanged()
+    }
+
+    private func updateSpeedLabel() {
+        let value = String(format: "%g", Double(speed))
+        speedLabel.text = "\(value)×"
+        speedSlider.accessibilityValue = CYLExampleLocalizedString("%@ 倍", value)
+    }
+
+    /// Plays every animated icon on screen from progress 0, as the "全部播放" button does; with the loop switch on,
+    /// they repeat until it is turned off.
+    @objc func playAllAnimations() {
+        tagListView.playAllAnimations()
+    }
+
+    @objc private func speedSliderChanged() {
+        speedSlider.value = Float(speed)
+        tagListView.animationSpeed = speed
+        updateSpeedLabel()
+    }
+
+    /// On: the icons start playing and repeat. Off: the pass in progress finishes and they stop.
+    @objc private func loopSwitchChanged() {
+        tagListView.animationLoops = loopSwitch.isOn
+        if loopSwitch.isOn {
+            playAllAnimations()
+        }
     }
 
     /// Scrolls the tags to a section of sectionIdentifiers() (e.g. "pag").

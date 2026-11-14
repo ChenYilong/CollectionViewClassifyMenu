@@ -58,6 +58,27 @@ private enum CYLTagAnimationEngine {
         }
     }
 
+    /**
+     * The player's `progress` (0...1) when it has one (Lottie, PAG); `nil` otherwise (Rive, GIF).
+     */
+    static func progress(of player: AnyObject?) -> CGFloat? {
+        guard let player = player as? NSObject, player.responds(to: NSSelectorFromString("progress")) else {
+            return nil
+        }
+        return (player.value(forKey: "progress") as? NSNumber).map { CGFloat($0.doubleValue) }
+    }
+
+    /**
+     * Sets the player's own `loops` (CYLTabBarController since `dc04439`); false when the player has none.
+     */
+    static func setLoops(_ loops: Bool, of player: AnyObject?) -> Bool {
+        guard let player = player as? NSObject, player.responds(to: NSSelectorFromString("setLoops:")) else {
+            return false
+        }
+        player.setValue(loops, forKey: "loops")
+        return true
+    }
+
     static func set(_ value: CGFloat, forKey key: String, of player: AnyObject?) {
         let setter = NSSelectorFromString("set" + key.prefix(1).uppercased() + key.dropFirst() + ":")
         if let player = player as? NSObject, player.responds(to: setter) {
@@ -74,6 +95,11 @@ open class CYLTagButton: UIControl {
 
     private static let states: [UIControl.State] = [.normal, .selected, .disabled]
     private static let disabledAnimationAlpha: CGFloat = 0.4
+    private static let loopCheckInterval: TimeInterval = 0.05
+    /**
+     * The progress from which a looping animation counts as finished and starts again.
+     */
+    private static let loopEndProgress: CGFloat = 0.995
 
     /**
      * The icon.
@@ -144,6 +170,36 @@ open class CYLTagButton: UIControl {
     }
 
     /**
+     * The playback speed of the animated icon, applied at once, also to an animation that is playing. `nil` (the
+     * default) uses `style.animationSpeed`. Players without a speed (PAG) ignore it.
+     */
+    open var animationSpeed: CGFloat? {
+        didSet {
+            applyAnimationSpeed()
+        }
+    }
+
+    /**
+     * True repeats the animated icon after `playAnimation()` until it is set to false, a change of selection or a new
+     * file; false (the default) plays once. Turning it off lets the pass in progress finish. It uses the player's own
+     * `loops` when it has one, and otherwise starts the animation again when its `progress` reaches the end; players
+     * with neither (Rive, GIF at CYLTabBarController `0e69250`) play once.
+     */
+    open var animationLoops = false {
+        didSet {
+            guard oldValue != animationLoops else {
+                return
+            }
+            let usesPlayerLoops = CYLTagAnimationEngine.setLoops(animationLoops, of: animationPlayer)
+            if !animationLoops || usesPlayerLoops {
+                stopLoopTimer()
+            } else if isPlaying {
+                startLoopTimer()
+            }
+        }
+    }
+
+    /**
      * The animation view in the icon slot, or `nil`.
      */
     open private(set) var animationView: UIView?
@@ -184,7 +240,8 @@ open class CYLTagButton: UIControl {
             if animationView != nil && animationViewSize != animationSize {
                 reloadAnimationView()
             } else {
-                updateAnimationState()
+                // Only the speed: an animation that is playing goes on.
+                applyAnimationSpeed()
             }
             updateAppearance()
         }
@@ -199,6 +256,11 @@ open class CYLTagButton: UIControl {
 
     private var styleStorage = CYLMenuStyle()
     private var animationViewSize: CGSize = .zero
+    /**
+     * True from `playAnimation()` until the state is set again (selection, a new file).
+     */
+    private var isPlaying = false
+    private var loopTimer: Timer?
     private let backgroundImageView = UIImageView()
     /**
      * The cross of `CYLMenuStyle.deleteIndicatorLineWidth`.
@@ -246,7 +308,16 @@ open class CYLTagButton: UIControl {
             updateAnimationState()
             return
         }
+        applyAnimationSpeed()
         CYLTagAnimationEngine.send("play", to: animationPlayer)
+        isPlaying = animationPlayer != nil
+        if animationLoops && isPlaying && !CYLTagAnimationEngine.setLoops(true, of: animationPlayer) {
+            startLoopTimer()
+        }
+    }
+
+    deinit {
+        loopTimer?.invalidate()
     }
 
     // MARK: - Measurement
@@ -550,8 +621,9 @@ open class CYLTagButton: UIControl {
      */
     private func updateAnimationState() {
         let player = animationPlayer
-        CYLTagAnimationEngine.set(styleStorage.animationSpeed > 0 ? styleStorage.animationSpeed : 1,
-                                  forKey: "animationSpeed", of: player)
+        isPlaying = false
+        stopLoopTimer()
+        applyAnimationSpeed()
         if isSelected {
             CYLTagAnimationEngine.send("showLastFrame", to: player)
         } else {
@@ -561,6 +633,36 @@ open class CYLTagButton: UIControl {
                 CYLTagAnimationEngine.set(resting, forKey: "progress", of: player)
             }
         }
+    }
+
+    private func applyAnimationSpeed() {
+        let speed = animationSpeed ?? styleStorage.animationSpeed
+        CYLTagAnimationEngine.set(speed > 0 ? speed : 1, forKey: "animationSpeed", of: animationPlayer)
+    }
+
+    /**
+     * For players without `loops`: starts the animation again when its progress reaches the end.
+     */
+    private func startLoopTimer() {
+        guard loopTimer == nil, CYLTagAnimationEngine.progress(of: animationPlayer) != nil else {
+            return
+        }
+        let timer = Timer(timeInterval: Self.loopCheckInterval, repeats: true) { [weak self] timer in
+            guard let self, self.animationLoops, self.isPlaying, let player = self.animationPlayer else {
+                timer.invalidate()
+                return
+            }
+            if let progress = CYLTagAnimationEngine.progress(of: player), progress >= Self.loopEndProgress {
+                CYLTagAnimationEngine.send("play", to: player)
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        loopTimer = timer
+    }
+
+    private func stopLoopTimer() {
+        loopTimer?.invalidate()
+        loopTimer = nil
     }
 
     private func updateAppearance() {

@@ -736,6 +736,33 @@ open class CYLTagListView @JvmOverloads constructor(
     /** `-tagButtonAtIndexPath:`: the button of a visible tag, or null. */
     fun tagButtonAtIndexPath(indexPath: CYLIndexPath): CYLTagButton? = content.cellAt(indexPath)?.button
 
+    // MARK: Animated icons
+
+    /**
+     * `animationSpeed`: the playback speed of every animated icon, applied at once, also to animations that are
+     * playing, without reloading the list. null (the default) uses each tag's `style.animationSpeed`.
+     */
+    var animationSpeed: Float? = null
+        set(value) {
+            field = value
+            content.forEachTagButton { it.animationSpeed = value }
+        }
+
+    /**
+     * `animationLoops`: true repeats the animated icons after they start playing (a tap, `playAllAnimations()`) until
+     * it is false; false (the default) plays them once.
+     */
+    var animationLoops: Boolean = false
+        set(value) {
+            field = value
+            content.forEachTagButton { it.animationLoops = value }
+        }
+
+    /** `-playAllAnimations`: plays the animated icon of every tag from its start (progress 0), whatever its selection. */
+    fun playAllAnimations() {
+        content.forEachTagButton { it.playAnimation() }
+    }
+
     // MARK: Long press and reordering
 
     var tagLongPressHandler: ((index: Int, tag: CYLTag) -> Unit)? = null
@@ -1062,6 +1089,8 @@ open class CYLTagListView @JvmOverloads constructor(
         cell.configureWithTitle(titles[indexPath.section][indexPath.item], imageAt(indexPath), selectedImageAt(indexPath),
             animationURLAt(indexPath), styleForItem(indexPath), indexPath in selection, isEnabledAt(indexPath))
         cell.button.animationRestingProgress = restingProgressAt(indexPath)
+        cell.button.animationSpeed = animationSpeed
+        cell.button.animationLoops = animationLoops
         val deletable = isDeletableAt(indexPath) && isEnabledAt(indexPath)
         cell.deletable = deletable
         cell.deleteHandler = if (deletable) ({ deleteItemAtIndexPath(indexPath) }) else null
@@ -1101,6 +1130,10 @@ open class CYLTagListView @JvmOverloads constructor(
         private var dragMoved = false
 
         fun cellAt(indexPath: CYLIndexPath): CYLTagListCell? = cells[indexPath]
+
+        fun forEachTagButton(body: (CYLTagButton) -> Unit) {
+            for (cell in cells.values) body(cell.button)
+        }
 
         fun frameOf(indexPath: CYLIndexPath): CYLRect? = cells[indexPath]?.let { frames[it] }
 

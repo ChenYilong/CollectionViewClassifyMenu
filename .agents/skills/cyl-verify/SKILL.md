@@ -97,6 +97,6 @@ When the verification is done, mark the task's `TODO` entry in `docs/` done (AGE
 add the evidence: commits, test counts per suite, CI run and screenshots. An entry stays `TODO` while any step is
 unverified, with the reason.
 
-## Animation examples: playback controls (TODO, 2026-11-13)
+## Animation examples: playback controls (iOS and Android done 2026-11-14)
 
 Every example page that shows animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback strategy applied live (accessibility labels and values included); verify all three on the page. Change the core when an example needs it. Rule, pages and status: [docs/example-demo-rules.md](../../../docs/example-demo-rules.md).
