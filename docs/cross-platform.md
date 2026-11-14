@@ -124,9 +124,11 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   <img src="assets/flutter-android-tag-list.png" width="300" alt="Flutter on Android: the native Kotlin tag list and the playback controls">
 
-  Differences from iOS seen there (TODO): no icons (Android has no SF Symbols, the library maps `system:<name>` to the app's
-  `cyl_system_<name>` drawables, and the CYLTabBarController Android animation engine is not linked into this example),
-  and the fourth row is not folded behind the tail control. A debug APK launched without `flutter run` stays on the
+  SF Symbol tags: DONE (2026-11-15 00:58): Android has no SF Symbols, so the example ships stand-in vector drawables
+  `cyl_system_<name>` (`example/android/app/src/main/res/drawable`) and keeps them through release resource shrinking
+  (`res/raw/cyl_keep.xml`, because the library looks them up by name). Still TODO: the Lottie row has no icons (the
+  CYLTabBarController Android animation engine is not linked into this example), and the fourth row is not folded
+  behind the tail control. A debug APK launched without `flutter run` stays on the
   splash screen; the release APK runs.
 - **Limits and next steps (TODO):** (1) the Android differences above; (2) the Flutter example has one screen (the
   animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) the shared database
