@@ -440,6 +440,16 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertEqualWithAccuracy(CGRectGetMinX(button.imageView.frame), CGRectGetMinX(plainImage) - 2.5, 0.5);
     XCTAssertEqualWithAccuracy(CGRectGetMinX(button.titleLabel.frame), CGRectGetMinX(plainTitle) + 2.5, 0.5);
     XCTAssertLessThanOrEqual(CGRectGetMaxX(button.titleLabel.frame), CGRectGetWidth(button.bounds));
+    // Every layout pass gives the same frames (the cell-level check of the gap is in CYLExampleDatabaseTests).
+    CGRect firstImage = button.imageView.frame;
+    CGRect firstTitle = button.titleLabel.frame;
+    for (NSInteger pass = 0; pass < 3; pass++) {
+        [button setNeedsLayout];
+        [button layoutIfNeeded];
+    }
+    XCTAssertTrue(CGRectEqualToRect(button.imageView.frame, firstImage), @"%@ vs %@", NSStringFromCGRect(button.imageView.frame), NSStringFromCGRect(firstImage));
+    XCTAssertTrue(CGRectEqualToRect(button.titleLabel.frame, firstTitle));
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(button.titleLabel.frame) - CGRectGetMaxX(button.imageView.frame), 5, 0.5);
 
     CYLFilterHeaderView *header = [[CYLFilterHeaderView alloc] initWithFrame:CGRectMake(0, 0, 320, 38)];
     header.moreButton.hidden = NO;

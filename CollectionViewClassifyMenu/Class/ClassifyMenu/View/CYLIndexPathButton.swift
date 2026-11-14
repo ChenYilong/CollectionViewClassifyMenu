@@ -49,19 +49,38 @@ open class CYLIndexPathButton: UIButton {
         }
     }
 
-    open override func layoutSubviews() {
-        super.layoutSubviews()
-        let hasTitle = currentTitle?.isEmpty == false
-        var titleOffset = titleLeadingInset
-        if imageTitleSpacing > 0, currentImage != nil, hasTitle, let imageView {
-            imageView.frame.origin.x -= imageTitleSpacing / 2
-            titleOffset += imageTitleSpacing / 2
+    /**
+     * Where UIButton puts the image: moved half of `imageTitleSpacing` to the leading side when the button shows an
+     * image and a title. UIButton asks for the rect on every layout pass and uses the answer as it is, so the move is
+     * applied once however often the button lays out (moving the frames after `layoutSubviews()` added up: the gap was
+     * twice the spacing after the second pass).
+     */
+    open override func imageRect(forContentRect contentRect: CGRect) -> CGRect {
+        var rect = super.imageRect(forContentRect: contentRect)
+        if showsImageAndTitleWithSpacing {
+            rect.origin.x -= imageTitleSpacing / 2
         }
-        if titleOffset != 0, hasTitle, let titleLabel {
-            var titleFrame = titleLabel.frame
-            titleFrame.origin.x += titleOffset
-            titleFrame.size.width = max(0, min(titleFrame.width, bounds.width - titleFrame.minX))
-            titleLabel.frame = titleFrame
+        return rect
+    }
+
+    /**
+     * Where UIButton puts the title: moved half of `imageTitleSpacing` to the trailing side next to an image, and by
+     * `titleLeadingInset`; never past the button's trailing edge.
+     */
+    open override func titleRect(forContentRect contentRect: CGRect) -> CGRect {
+        var rect = super.titleRect(forContentRect: contentRect)
+        var offset = titleLeadingInset
+        if showsImageAndTitleWithSpacing {
+            offset += imageTitleSpacing / 2
         }
+        if offset != 0, currentTitle?.isEmpty == false {
+            rect.origin.x += offset
+            rect.size.width = max(0, min(rect.width, bounds.width - rect.minX))
+        }
+        return rect
+    }
+
+    private var showsImageAndTitleWithSpacing: Bool {
+        imageTitleSpacing > 0 && currentImage != nil && currentTitle?.isEmpty == false
     }
 }
