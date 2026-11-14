@@ -5,7 +5,8 @@ The core library (the CocoaPods pod's sources: `CollectionViewClassifyMenu/Class
 
 ## Task log
 
-- **Status:** in progress (started 2026-11-13, branch `feat/android-kotlin`). Requirements 1 and 2 done: the
+- **Status:** DONE (2026-11-14, step 10; score 100: no Objective-C file left in the pod). Started 2026-11-13, branch
+  `feat/android-kotlin`. Requirements 1 and 2 done: the
   standard is `docs/Swift-Coding-Standard.md` (AGENTS.md, `docs/instructions.md` and `.agents/skills/cyl-swift/`
   point to it), and three Swift skills are installed (below). Requirement 3 (the translation) runs module by module.
 - **Scope:** iOS only, mainly the core code of this project. Third-party libraries are out of scope. Change the
@@ -113,6 +114,10 @@ and the core's tests are updated in the same commit.
 | 9 | `CYLTagColors` | a Swift `struct` (`Equatable`) instead of an `NSObject`: `init(backgroundColor: = nil, …)`; `init(for:seed: UInt)` → `init?(theme:seed: Int)`; `CYLTagColorsBackgroundAlpha` / `…BorderAlpha` → `CYLTagColors.backgroundAlpha` / `.borderAlpha`; `random()` returns `CYLTagColors` | a value type for four colors |
 | 9 | `CYLTagButton` | `style: CYLMenuStyle` (not `T!`); `isAnimationEngineAvailable()` → static property; `width(forTitle:iconSize:style:traitCollection:)` folded into `width(forTitle:iconSize:showsDeleteIndicator: = false, …)`; `animationPlayer: AnyObject?`; CYLTabBarController's animation engine stays a runtime lookup in one private type | non-optional style, default arguments |
 | 9 | `CYLCollectionViewLeftAlignedLayout` | `rowAlignment: Int` → `CYLTagRowAlignment`; Objective-C names `CYLCollectionViewLeftAlignedLayout` and `UICollectionViewDelegateLeftAlignedLayout` kept for the layout's Objective-C tests | a typed alignment |
+| 10 | `CYLMenuStyle` | `+defaultStyle` → `init()` (`CYLMenuStyle()`); presets `tagCloud()`, `tagContainer()`, `gridStyle(itemsPerRow: Int)`; `numberOfItemsPerRow`, `maximumTitleLength`: `UInt` → `Int`; `setTitleTextAttributes(nil, for:)` restores the appearance defaults | Swift initializer, Swift integers |
+| 10 | `CYLTagAppearance` | a final Swift class (not `NSObject`, typed `copy()`); `backgroundColor`, `textColor`, `font`: `T!` → `T` with public defaults (`CYLTagAppearance.defaultBackgroundColor`, `.defaultTextColor`, `.defaultFont`) instead of "set nil to restore"; `CYLTagCornerRadiusSquare` a Swift constant | non-optional values |
+| 10 | `CYLMenuResources` | `bundle()`, `availableLanguages()`, `currentLanguage()` → static properties; `imageNamed(_:)` → `image(named:)`; Objective-C selectors kept for the core's tests (`+imageNamed:`, `+localizedStringForKey:`…); the macros `CYLMenuLocalizedString(key, comment)` / `CYLMenuImage(name)` and the C function `CYLMenuLocalizedStringForKey` are gone: the core's lookup is the Swift function `CYLMenuLocalizedString(_:)` | no macros in Swift |
+| 10 | `CYLParameterConfiguration.h` | the inline functions and macros → `CYLTagMetrics` (an `@objc` type for the core's tests): `CYLTagTitleFontForTraitCollection` → `titleFont(for:)`, `CYLTagHeightForFont` → `tagHeight(for:minimumHeight:)`, `CYLScaledSystemFont` → `scaledSystemFont(ofSize:traitCollection:)`, `CYLMaximumFontScale` / `CYLTagTitleFontSize` → `maximumFontScale` / `titleFontSize`; `CYLAppTintColor` and `CYLTagTitleFont` (unused outside) are private | callable from Swift and Objective-C |
 
 Examples updated in step 4: `Example/CYLMenuExample/CYLImageTagSample.swift` (typed default directions, `Int` group
 index) and its tests (`direction.next`, `value(of: .linesProgress)`).
@@ -136,12 +141,13 @@ lines) in the pod's source patterns.
 | 2026-11-14 | step 7 (`CYLTag`, `CYLTagListView` + configuration, the tag cells and fold button, accessibility identifiers) | 16 | 78.9 |
 | 2026-11-14 | step 8 (`CYLMenuFoldControl`, with the fold position rename) | 14 | 81.6 |
 | 2026-11-14 | step 9 (`CYLMenuDataSource`, `CYLTagColors`, `CYLTagButton`, `CYLCollectionViewLeftAlignedLayout`) | 7 | 90.8 |
+| 2026-11-14 | step 10 (`CYLMenuStyle`, `CYLTagAppearance`, `CYLMenuResources`, `CYLParameterConfiguration.h`; the forwarding header removed) | 0 | 100 |
 
 ## Progress
 
 | Module | Files | Status |
 | --- | --- | --- |
-| `CollectionViewClassifyMenu/Class` | 66 | in progress: 7 left (steps 2–9): `CYLMenuStyle`, `CYLTagAppearance`, `CYLMenuResources`, `CYLParameterConfiguration.h` |
+| `CollectionViewClassifyMenu/Class` | 66 | DONE (step 10): 0 left; the pod is Swift only (`source_files` `*.swift`) |
 | `TagCollectionView/TagCollectionView` | 10 | DONE (step 6): 0 left |
 
 ## Swift skills installed (requirement 2)
@@ -181,7 +187,7 @@ headers still in the umbrella without any glue, while Objective-C calling Swift 
 
 ## Transition files
 
-- `CollectionViewClassifyMenu/Class/CollectionViewClassifyMenu.h`: the generated `CollectionViewClassifyMenu-Swift.h`
+- (removed in step 10 with the last Objective-C header) `CollectionViewClassifyMenu/Class/CollectionViewClassifyMenu.h`: the generated `CollectionViewClassifyMenu-Swift.h`
   of a mixed module imports `<CollectionViewClassifyMenu/CollectionViewClassifyMenu.h>` as the underlying module's
   umbrella header, but CocoaPods generates `CollectionViewClassifyMenu-umbrella.h`; without this forwarding header
   every client of the pod failed to scan the module (2026-11-13, all four test suites). It goes with the last
@@ -230,6 +236,13 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 | 2026-11-14 | step 8 | `CYLMenuFoldControl` (2 files) and the fold position rename on iOS and Android | 14 | 81.6 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80; Android library tests and example build pass |
 
 | 2026-11-14 | step 9 | `CYLMenuDataSource.h`, `CYLTagColors`, `CYLTagButton`, `CYLCollectionViewLeftAlignedLayout` (7 files) | 7 | 90.8 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
+
+| 2026-11-14 | step 10 | `CYLMenuStyle`, `CYLTagAppearance`, `CYLMenuResources`, `CYLParameterConfiguration.h` (7 files) and the forwarding header `CollectionViewClassifyMenu.h` | 0 | 100 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 80/80 |
+
+Step 10 notes: no Objective-C source is left in the pod; the podspec's `source_files` patterns are `*.swift`, and the
+transition file `CollectionViewClassifyMenu/Class/CollectionViewClassifyMenu.h` is removed with the last header. The core's
+Objective-C tests call `CYLMenuResources` and `CYLTagMetrics` through their `@objc` selectors. The localization rule
+(AGENTS.md, `cyl-localization`) now names the Swift function `CYLMenuLocalizedString(_:)` as the core's lookup.
 
 Step 9 notes: `testLargeTagSetDoesNotRecursivelyRecomputePreviousItems` moved to `CYLLeftAlignedLayoutSwiftTests.swift`
 (Objective-C cannot subclass the Swift layout to count its lookups). `scripts/simulator-id.sh` prints a given UDID

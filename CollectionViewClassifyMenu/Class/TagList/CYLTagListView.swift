@@ -2306,7 +2306,7 @@ extension CYLTagListView: UICollectionViewDataSource {
         let showsMore = showsMoreButton(inSection: section)
         header.moreButton.isHidden = !showsMore
         if showsMore {
-            let image = style.moreButtonImage ?? CYLMenuResources.imageNamed("cyl_more") ?? UIImage(systemName: "ellipsis")
+            let image = style.moreButtonImage ?? CYLMenuResources.image(named: "cyl_more") ?? UIImage(systemName: "ellipsis")
             header.moreButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
             header.moreButton.tintColor = style.moreButtonColor
             var label = source?.menuAccessibilityLabelForMoreButton?(inSection: section) ?? ""

@@ -20,7 +20,7 @@ open class CYLTagCreateCell: CYLTagListCell {
      * The plus icon of the core bundle (a template image, drawn in the icon color).
      */
     public static var plusImage: UIImage {
-        CYLMenuResources.imageNamed("cyl_tag_plus") ?? UIImage(systemName: "plus") ?? UIImage()
+        CYLMenuResources.image(named: "cyl_tag_plus") ?? UIImage(systemName: "plus") ?? UIImage()
     }
 
     /**

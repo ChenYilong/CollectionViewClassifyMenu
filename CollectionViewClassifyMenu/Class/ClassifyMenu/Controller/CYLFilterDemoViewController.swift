@@ -243,7 +243,7 @@ final class CYLFilterDemoViewController: UIViewController {
         let name = modified
             ? "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_modified"
             : "navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_normal"
-        let image = CYLMenuResources.imageNamed(name)?.withRenderingMode(.alwaysOriginal)
+        let image = CYLMenuResources.image(named: name)?.withRenderingMode(.alwaysOriginal)
         let item = UIBarButtonItem(image: image, style: .done, target: self, action: #selector(leftBarButtonClicked(_:)))
         item.accessibilityLabel = CYLDemoLocalizedString("筛选条件")
         Self.removeGlassBubble(from: item)

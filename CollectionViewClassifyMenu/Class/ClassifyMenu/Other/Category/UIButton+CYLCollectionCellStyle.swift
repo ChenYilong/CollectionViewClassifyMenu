@@ -43,7 +43,7 @@ public extension UIButton {
             layer.borderWidth = 1
             layer.masksToBounds = true
         case .home:
-            titleLabel?.font = CYLTagTitleFontForTraitCollection(nil)
+            titleLabel?.font = CYLTagMetrics.titleFont(for: nil)
             setTitleColor(green, for: .normal)
             setTitleColor(green.withAlphaComponent(0.7), for: .selected)
             setTitleColor(.white, for: .highlighted)
@@ -51,7 +51,7 @@ public extension UIButton {
             layer.borderColor = green.cgColor
         case .red:
             let red = UIColor(red: 160 / 255, green: 15 / 255, blue: 85 / 255, alpha: 1)
-            titleLabel?.font = CYLTagTitleFontForTraitCollection(nil)
+            titleLabel?.font = CYLTagMetrics.titleFont(for: nil)
             setTitleColor(red, for: .normal)
             setTitleColor(.white, for: .highlighted)
             setBackgroundImage(Self.cylImage(filledWith: green), for: .highlighted)
@@ -61,10 +61,10 @@ public extension UIButton {
             layer.masksToBounds = true
             let mint = UIColor(red: 230 / 255, green: 255 / 255, blue: 244 / 255, alpha: 1)
             setBackgroundImage(Self.cylImage(filledWith: mint), for: .normal)
-            titleLabel?.font = CYLTagTitleFontForTraitCollection(nil)
+            titleLabel?.font = CYLTagMetrics.titleFont(for: nil)
             setTitleColor(UIColor(red: 42 / 255, green: 185 / 255, blue: 160 / 255, alpha: 1), for: .normal)
             setTitleColor(.white, for: .highlighted)
-            let highlighted = CYLMenuResources.imageNamed("tag_btn_background_highlighted")
+            let highlighted = CYLMenuResources.image(named: "tag_btn_background_highlighted")
             setBackgroundImage(highlighted, for: .highlighted)
             setTitleColor(.white, for: .selected)
             setTitleColor(.white, for: [.selected, .highlighted])

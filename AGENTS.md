@@ -239,7 +239,8 @@ verify the behavior and update the applicable documentation.
 - Example strings belong to an Example-level bundle
   (`Example/CYLMenuExample/CYLMenuExample.bundle`), never to the core bundle.
 - Always look strings up through a macro that maps keys to its bundle:
-  `CYLMenuLocalizedString` for the core (Swift: `CYLMenuLocalizedString(_:)`), and
+  `CYLMenuLocalizedString(_:)` for the core (a Swift function since the core moved to Swift; Objective-C:
+  `+[CYLMenuResources localizedStringForKey:]`), and
   one Swift function per example (`CYLExampleLocalizedString`,
   `CYLTagEditorLocalizedString`, `CYLDemoLocalizedString`). Do not call
   `NSLocalizedString` or read a bundle directly.
@@ -251,14 +252,14 @@ verify the behavior and update the applicable documentation.
   - The core has its own lookup macro that reads the localized files inside the
     core's resource bundle. The bundle's form, name and folder name may differ
     per platform, but it is always a folder or package; on iOS it is a
-    `.bundle` folder (`CYLClassifyMenuResources.bundle`, macro
-    `CYLMenuLocalizedString`).
+    `.bundle` folder (`CYLClassifyMenuResources.bundle`, lookup
+    `CYLMenuLocalizedString(_:)`: the core is Swift, which has no macros, so the
+    function takes the macro's role, as in the examples).
   - Every example has its own lookup that reads the example's localized files
     from the example-level bundle. The examples are Swift, which has no macros,
     so each uses one global function in that role: `CYLExampleLocalizedString`
     (`Example/CYLMenuExample`), `CYLTagEditorLocalizedString` (`Example-Swift`),
-    `CYLDemoLocalizedString` (the demo app). A core macro also needs a function
-    Swift can call.
+    `CYLDemoLocalizedString` (the demo app).
   - A project passes only if it has at least two different lookup macros (or
     Swift functions), one per level, each reading a different bundle: the core
     one and at least one example's. No code reads a bundle or calls

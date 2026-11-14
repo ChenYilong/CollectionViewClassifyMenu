@@ -107,7 +107,7 @@ open class CYLMenuFoldControl: NSObject, NSCopying {
      */
     open var image: UIImage {
         get {
-            customImage ?? CYLMenuResources.imageNamed("cyl_fold_chevron") ?? UIImage(systemName: "chevron.down") ?? UIImage()
+            customImage ?? CYLMenuResources.image(named: "cyl_fold_chevron") ?? UIImage(systemName: "chevron.down") ?? UIImage()
         }
         set {
             customImage = newValue

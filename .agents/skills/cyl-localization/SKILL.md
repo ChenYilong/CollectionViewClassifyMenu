@@ -69,7 +69,7 @@ commit over every branch, see `cyl-dependency`; its core lookup is `CYLLocalized
 
 ```sh
 # Exactly the lookups below, one per level; no other bundle reads or NSLocalizedString calls.
-grep -rn "define CYLMenuLocalizedString\|func CYLExampleLocalizedString\|func CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
+grep -rn "func CYLMenuLocalizedString\|func CYLExampleLocalizedString\|func CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
   CollectionViewClassifyMenu Example Example-Swift
 grep -rn "NSLocalizedString(" CollectionViewClassifyMenu Example Example-Swift --include=*.m --include=*.swift
 ```
@@ -81,6 +81,12 @@ grep -rn "NSLocalizedString(" CollectionViewClassifyMenu Example Example-Swift -
 `CYLMenuLocalizedString(_:)` (`NS_SWIFT_NAME`). Both read the same bundle; tests check both
 (`testCoreLookupIsCallableFromSwift`, `testCoreAndDemoLookupsReadTheirOwnBundles`). Core images go through
 `CYLMenuImage(name)`, never `[UIImage imageNamed:]` or the bundle.
+
+Since the core moved to Swift (2026-11-14, step 10 of `docs/Swift-Migration.md`) the macros and the C function are
+gone: the core's lookup is the Swift function `CYLMenuLocalizedString(_:)` (in `CYLMenuResources.swift`), images go
+through `CYLMenuResources.image(named:)`, and Objective-C (the core's tests) calls
+`+[CYLMenuResources localizedStringForKey:]` and `+imageNamed:`. The check above looks for
+`func CYLMenuLocalizedString` instead of `define CYLMenuLocalizedString`.
 
 ## No user-facing text in code
 

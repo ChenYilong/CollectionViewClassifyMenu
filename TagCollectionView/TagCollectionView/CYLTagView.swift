@@ -71,7 +71,7 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     @discardableResult
     @objc(tagView)
     open class func makeTagView() -> Self! {
-        UINib(nibName: "CYLTagView", bundle: CYLMenuResources.bundle())
+        UINib(nibName: "CYLTagView", bundle: CYLMenuResources.bundle)
             .instantiate(withOwner: nil, options: nil).first as? Self
     }
 
@@ -239,9 +239,9 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
 
     private func setupCollectionView() {
         collectionView.collectionViewLayout = CYLCollectionViewLeftAlignedLayout()
-        collectionView.register(UINib(nibName: "CYLTagCell", bundle: CYLMenuResources.bundle()),
+        collectionView.register(UINib(nibName: "CYLTagCell", bundle: CYLMenuResources.bundle),
                                 forCellWithReuseIdentifier: Self.tagCellIdentifier)
-        collectionView.register(UINib(nibName: "CYLTagHeaderCell", bundle: CYLMenuResources.bundle()),
+        collectionView.register(UINib(nibName: "CYLTagHeaderCell", bundle: CYLMenuResources.bundle),
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: Self.headerCellIdentifier)
         collectionView.contentInset = UIEdgeInsets(top: 35, left: 0, bottom: 0, right: 0)

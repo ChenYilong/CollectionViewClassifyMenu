@@ -455,7 +455,7 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
             return image
         }
         if let name = picture as? String, !name.isEmpty {
-            return CYLMenuResources.imageNamed("home_btn_shrink")
+            return CYLMenuResources.image(named: "home_btn_shrink")
         }
         return nil
     }
@@ -576,11 +576,11 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
     }
 
     private func tagFont() -> UIFont {
-        CYLTagTitleFontForTraitCollection(collectionView?.traitCollection ?? traitCollection)
+        CYLTagMetrics.titleFont(for: collectionView?.traitCollection ?? traitCollection)
     }
 
     private func cellHeight() -> CGFloat {
-        CYLTagHeightForFont(tagFont(), Metric.cellHeight)
+        CYLTagMetrics.tagHeight(for: tagFont(), minimumHeight: Metric.cellHeight)
     }
 
     private func cellWidth(for item: NSDictionary) -> CGFloat {

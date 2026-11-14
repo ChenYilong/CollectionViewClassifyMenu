@@ -1027,21 +1027,21 @@ extension CYLMenuFoldControl {
 extension CYLTagAppearance {
 
     /**
-     * Applies a dictionary of `CYLTagAppearanceKey` keys; missing keys keep their values, a key whose value is not a
-     * color, font or image clears it.
+     * Applies a dictionary of `CYLTagAppearanceKey` keys; missing keys keep their values; a key whose value is not a
+     * color, font or image restores the default (or clears an optional one).
      */
     public func applyConfiguration(_ configuration: [String: Any]) {
         typealias Value = CYLConfigurationValue
         typealias Key = CYLTagAppearanceKey
         let baseURL = Value.baseURL(of: configuration)
         if let value = configuration[Key.backgroundColor] {
-            backgroundColor = Value.color(value)
+            backgroundColor = Value.color(value) ?? CYLTagAppearance.defaultBackgroundColor
         }
         if let value = configuration[Key.textColor] {
-            textColor = Value.color(value)
+            textColor = Value.color(value) ?? CYLTagAppearance.defaultTextColor
         }
         if let value = configuration[Key.font] {
-            font = Value.font(value)
+            font = Value.font(value) ?? CYLTagAppearance.defaultFont
         }
         if let value = configuration[Key.iconColor] {
             iconColor = Value.color(value)
@@ -1098,7 +1098,7 @@ extension CYLMenuStyle {
             itemHeight = value
         }
         if let value = Value.number(configuration[Key.numberOfItemsPerRow]) {
-            numberOfItemsPerRow = UInt(max(0, value.intValue))
+            numberOfItemsPerRow = max(0, value.intValue)
         }
         if let value = Value.double(configuration[Key.interitemSpacing]) {
             interitemSpacing = value

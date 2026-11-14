@@ -76,7 +76,6 @@
 		9A3295EB1AB7D3880035EFAA /* CollectionViewClassifyMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CollectionViewClassifyMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A3296091AB7D3880035EFAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A32960A1AB7D3880035EFAA /* CollectionViewClassifyMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewClassifyMenuTests.m; sourceTree = "<group>"; };
-		9ACA68C11C3C3E8100CDB987 /* CYLParameterConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLParameterConfiguration.h; sourceTree = "<group>"; };
 		B215DA974F97C8F30036021D /* libPods-CollectionViewClassifyMenuTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CollectionViewClassifyMenuTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E15AD8B793C1220BD3475A73 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		F11F86F0C1B8AEB5D44F8BE3 /* Pods-CollectionViewClassifyMenuTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CollectionViewClassifyMenuTests.release.xcconfig"; path = "Target Support Files/Pods-CollectionViewClassifyMenuTests/Pods-CollectionViewClassifyMenuTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -286,7 +285,6 @@
 		9A09E2F31BC7AFF00060C116 /* Tool */ = {
 			isa = PBXGroup;
 			children = (
-				9ACA68C11C3C3E8100CDB987 /* CYLParameterConfiguration.h */,
 				9A0DE1200000000000000005 /* CYLDBManager.swift */,
 			);
 			path = Tool;

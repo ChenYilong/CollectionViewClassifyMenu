@@ -370,10 +370,10 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     NSString *saved = CYLMenuResources.preferredLanguage;
     CYLMenuResources.preferredLanguage = @"en";
     // Two lookups, two bundles: the core's and the demo app's.
-    XCTAssertEqualObjects(CYLMenuLocalizedString(@"CYLMenuNewTag", nil), @"New Tag");
-    XCTAssertEqualObjects(CYLMenuLocalizedStringForKey(@"CYLMenuNewTag"), @"New Tag");
-    XCTAssertEqualObjects(CYLMenuLocalizedString(@"重置筛选条件", nil), @"重置筛选条件", @"Demo strings are not in the core bundle");
-    XCTAssertNotNil(CYLMenuImage(@"cyl_tag_plus"));
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"CYLMenuNewTag"], @"New Tag");
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"CYLMenuNewTag" language:@"en"], @"New Tag");
+    XCTAssertEqualObjects([CYLMenuResources localizedStringForKey:@"重置筛选条件"], @"重置筛选条件", @"Demo strings are not in the core bundle");
+    XCTAssertNotNil([CYLMenuResources imageNamed:@"cyl_tag_plus"]);
     // The demo app's lookup over its own bundle: testDemoLookupReadsItsOwnBundle (CYLClassifyMenuDemoTests.swift).
     CYLMenuResources.preferredLanguage = saved;
 }
@@ -480,12 +480,12 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     UIContentSizeCategory category = UIContentSizeCategoryAccessibilityExtraExtraExtraLarge;
     UITraitCollection *large = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:category];
     UITraitCollection *standard = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge];
-    UIFont *standardFont = CYLTagTitleFontForTraitCollection(standard);
-    UIFont *largeFont = CYLTagTitleFontForTraitCollection(large);
-    XCTAssertEqualWithAccuracy(standardFont.pointSize, CYLTagTitleFontSize, 0.01);
+    UIFont *standardFont = [CYLTagMetrics titleFontForTraitCollection:standard];
+    UIFont *largeFont = [CYLTagMetrics titleFontForTraitCollection:large];
+    XCTAssertEqualWithAccuracy(standardFont.pointSize, CYLTagMetrics.titleFontSize, 0.01);
     XCTAssertGreaterThan(largeFont.pointSize, standardFont.pointSize);
-    XCTAssertLessThanOrEqual(largeFont.pointSize, CYLTagTitleFontSize * CYLMaximumFontScale + 0.01);
-    XCTAssertGreaterThan(CYLTagHeightForFont(largeFont, 30), 30);
+    XCTAssertLessThanOrEqual(largeFont.pointSize, CYLTagMetrics.titleFontSize * CYLTagMetrics.maximumFontScale + 0.01);
+    XCTAssertGreaterThan([CYLTagMetrics tagHeightForFont:largeFont minimumHeight:30], 30);
 
     CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
     source.sections = [self longEmojiSections];
@@ -503,7 +503,7 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
         [self assertNoOverlaps:collection fixture:fixture];
         UICollectionViewLayoutAttributes *first =
             [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-        XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), CYLTagHeightForFont(largeFont, 30), 0.5);
+        XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), [CYLTagMetrics tagHeightForFont:largeFont minimumHeight:30], 0.5);
         // Give the collection a fixed viewport, as the other controller tests do,
         // so scrolling exercises cell reuse.
         collection.frame = CGRectMake(0, 0, width.doubleValue, 240);
@@ -549,7 +549,7 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
         [self assertNoOverlaps:collection fixture:fixture];
         UICollectionViewLayoutAttributes *first =
             [collection.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-        XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), CYLTagHeightForFont(largeFont, 30), 0.5);
+        XCTAssertEqualWithAccuracy(CGRectGetHeight(first.frame), [CYLTagMetrics tagHeightForFont:largeFont minimumHeight:30], 0.5);
         collection.frame = CGRectMake(0, 0, panelWidth, 240);
         [collection layoutIfNeeded];
         [self scrollAndCheck:collection fixture:fixture buttonKey:@"titleButton"];
