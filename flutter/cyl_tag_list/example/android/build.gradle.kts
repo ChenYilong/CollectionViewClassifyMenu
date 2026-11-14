@@ -2,6 +2,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // The Kotlin CYLTagListView the plugin wraps (android/merged/library, see the plugin's README.md).
+        maven { url = uri(providers.gradleProperty("cyl.classifymenu.repo").getOrElse("${rootDir}/../../../../android/merged/library/build/repo")) }
     }
 }
 

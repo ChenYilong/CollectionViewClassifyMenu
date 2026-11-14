@@ -18,6 +18,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // The Kotlin CYLTagListView (android/merged/library), published by
+        // android/scripts/gradle.sh merged :library:publishReleasePublicationToBuildRepository (see README.md).
+        maven { url = uri(providers.gradleProperty("cyl.classifymenu.repo").getOrElse("${projectDir}/../../../android/merged/library/build/repo")) }
     }
 }
 
@@ -72,6 +75,5 @@ kotlin {
 }
 
 dependencies {
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.mockito:mockito-core:5.0.0")
+    implementation("com.cyl:classifymenu:0.1.0")
 }
