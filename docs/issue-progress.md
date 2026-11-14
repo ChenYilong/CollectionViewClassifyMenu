@@ -73,14 +73,14 @@ tags: [issues, ui, cocoapods, progress]
 - DONE（资源文件名过长导致 git 操作失败，2026-11-15）：`Class/Other/Symtem/Images.xcassets` 中的
   `navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_{normal,modified}` 图片路径长达 229 字符，克隆到
   OneDrive 等深层目录（约 88 字符）后超过 Windows 260 字符上限，`git checkout` / `git worktree add` 报 "Filename too long"。
-  修复：资源改名为 `nav_filter_normal` / `nav_filter_modified`（`CYLFilterDemoViewController.swift`、
-  `CYLMenuLinkageViewController.swift` 同步修改）；`Example/CYLMenuExample` 中三个 `gray_tabbar_*_animation_lottie_placeholder`
-  的 PNG 文件名缩短为 `home@2x.png` 等（asset 名不变）。新增 `scripts/check-path-length.sh`（默认上限 160 字符），iOS CI 的
-  Changes job 运行它。最长路径现为 150 字符以内。用户提示词原文：
+  修复：资源改名为 `cyl_filter_normal` / `cyl_filter_modified`（`59c55cd`，见下方英文条目）；在此基础上
+  （`feat/android-kotlin-b`），`Example/CYLMenuExample` 中三个 `gray_tabbar_*_animation_lottie_placeholder` 的 PNG 文件名
+  缩短为 `home@2x.png` 等（asset 名不变；原最长 182 字符，在 OneDrive 路径下仍超 260），并新增 `scripts/check-path-length.sh`
+  （默认上限 160 字符），iOS CI 的 Changes job 运行它。最长路径现为 150 字符以内。用户提示词原文：
   > 修复 Class 文件夹下资源文件名太长 导致 git 相关操作失败的问题。 资源文件 关键词搜 leftBarButton continue
 
 - DONE（iOS 演示 app 左上角筛选 icon 不显示，2026-11-12）：资源本身存在（`navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_normal`，
-  现名 `nav_filter_normal` / `_modified`，核心 bundle 的 Images.xcassets）；原因是 iOS 26+ 导航栏按钮自带浅色 Liquid Glass 气泡，白色 icon 被白色气泡遮住
+  现名 `cyl_filter_normal` / `_modified`，核心 bundle 的 Images.xcassets）；原因是 iOS 26+ 导航栏按钮自带浅色 Liquid Glass 气泡，白色 icon 被白色气泡遮住
   （`assets/request-ios-filter-icon-missing.png`）。修复：`CYLFilterDemoViewController.removeGlassBubble(from:)` 设 `hidesSharedBackground`（`34a86bc`），
   截图 `assets/ios-demo-filter-tab.png` 中 icon 与“重置筛选条件”均可见。无需从 Android 复制资源（Android 的
   `classify_filter_*.png` 本来就是从 iOS 复制的）。用户提示词原文：
@@ -204,3 +204,26 @@ tags: [issues, ui, cocoapods, progress]
   `placeholderLabel`）。
 - 布局：图片标签的标签组在最大字号下不再相互覆盖，`CYLImageTagView` 只移动显示位置（`displayOffset`），
   不改数据；见 [tagviewgroup-api.md](tagviewgroup-api.md)。
+
+## DONE (2026-11-15): asset names too long for git
+
+- **Context:** the two filter icons of the core's `Images.xcassets` (`CollectionViewClassifyMenu/Class/Other/Symtem/`)
+  repeat a 70-character name in the image set folder and in each file, so their paths reach 231 characters. git fails on
+  them where paths are limited (Windows `MAX_PATH` 260 with the clone's own path in front, `core.longpaths` off).
+- **Requirement:** shorten the resource names and update every reference (core, Example, docs).
+- **Prompt (verbatim):**
+
+  > 修复 Class 文件夹下资源文件名太长 导致 git 相关操作失败的问题。 资源文件 关键词搜 leftBarButton continue
+
+  English: fix the resource file names under the Class folder that are so long that git operations fail; search the
+  resources for the keyword leftBarButton.
+- **Result:** `navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_{normal,modified}` became
+  `cyl_filter_{normal,modified}` (image set folders, the @2X/@3X files and `Contents.json`), and the two callers were
+  updated (`CYLFilterDemoViewController.swift`, `Example/CYLMenuExample/CYLMenuLinkageViewController.swift`). The longest
+  path under `Class/` went from 231 characters to about 100; the longest tracked path in the repository is now 182 (an Example tab icon).
+  The entry above (2026-11-12, the icon not showing) keeps the old names as history.
+- **Evidence:** the core demo builds (iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2). Its `CYLClassifyMenuResources.bundle/Assets.car`
+  holds `cyl_filter_normal` and `cyl_filter_modified` (`assetutil --info`), and the `CollectionViewClassifyMenuTests` suite
+  passes (30 tests). `CYLExampleDatabaseTests` checks that both icons load and that the filter button shows one. That
+  Example suite does not build yet because of the blocked CYLTabBarController framework build (missing
+  `CYLTabBarItemAnimati…` types in its Swift header), which this change does not touch.

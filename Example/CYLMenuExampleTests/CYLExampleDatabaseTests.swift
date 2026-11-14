@@ -90,6 +90,10 @@ final class CYLExampleDatabaseTests: CYLMenuExampleTestCase {
         XCTAssertEqual(menu.results.count, places, "Every condition is 全部 at first")
         XCTAssertNil(menu.selectedIndexPath)
         XCTAssertFalse(menu.lastQuery.sql.contains("WHERE"))
+        // The filter icons of the core's asset catalog (short names: the long ones broke git, docs/issue-progress.md).
+        XCTAssertNotNil(CYLMenuResources.image(named: "cyl_filter_normal"))
+        XCTAssertNotNil(CYLMenuResources.image(named: "cyl_filter_modified"))
+        XCTAssertNotNil(menu.navigationItem.leftBarButtonItem?.image, "The filter button shows its icon")
 
         // Classify menu (single choice): a tag, highlighted, and only its places.
         let sichuan = ip(1, 0)
