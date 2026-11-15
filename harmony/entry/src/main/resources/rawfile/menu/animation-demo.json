@@ -9,7 +9,9 @@
   "4-0",
   "5-0",
   "6-0",
-  "7-0"
+  "7-0",
+  "8-0",
+  "9-0"
  ],
  "style": {
   "imageSize": "{28, 28}",
@@ -236,6 +238,56 @@
       "stateMachine": "USER_Interactivity",
       "input": "active"
      }
+    }
+   ]
+  },
+  {
+   "title": "SVGA · pod 'CYLTabBarController/SVGA'",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:svga/tab_home.svga"
+    },
+    {
+     "title": "搜索",
+     "animation": "asset:svga/tab_search.svga"
+    },
+    {
+     "title": "消息",
+     "animation": "asset:svga/tab_chat.svga"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:svga/tab_profile.svga"
+    }
+   ]
+  },
+  {
+   "title": "SVGA · 深色标签",
+   "style": {
+    "normal": {
+     "backgroundColor": "#17203A",
+     "textColor": "#FFFFFF",
+     "borderColor": "#17203A"
+    },
+    "selected": {
+     "backgroundColor": "#3A4E8C",
+     "textColor": "#FFFFFF",
+     "borderColor": "#6792FF"
+    }
+   },
+   "items": [
+    {
+     "title": "动态",
+     "animation": "asset:svga/tab_activity.svga"
+    },
+    {
+     "title": "列表",
+     "animation": "asset:svga/tab_list.svga"
+    },
+    {
+     "title": "首页",
+     "animation": "asset:svga/tab_home.svga"
     }
    ]
   },

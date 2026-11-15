@@ -13,8 +13,9 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import {
   CYLAnimationEngine, CYLAnimationPlayer, CYLAnimationSource, CYLGIFPlayer, CYLLottiePlayer, CYLPAGPlayer,
-  CYLRivePlayer
+  CYLRivePlayer, CYLSVGAPlayer
 } from './CYLAnimationPlayer';
+import { CYLSVGAMovie, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform } from './svga/CYLSVGAMovie';
 
 let riveInitialized: boolean = false;
 
@@ -206,6 +207,153 @@ struct CYLGIFIconView {
   }
 }
 
+/**
+ * SVGA: the movie decoded by `CYLSVGAMovie`, each frame drawn on a Canvas. Bitmap sprites with alpha, layout,
+ * transform and clip path, and vector shapes (path, rectangle, ellipse with fill and stroke) are drawn; mattes
+ * (`matteKey`) and audio are not.
+ */
+@Component
+struct CYLSVGAIconView {
+  source: CYLAnimationSource = new CYLAnimationSource();
+  @Prop iconWidth: number = 0;
+  @Prop iconHeight: number = 0;
+  onPlayer?: (player: CYLAnimationPlayer) => void;
+  private settings: RenderingContextSettings = new RenderingContextSettings(true);
+  private context: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
+  private movie?: CYLSVGAMovie;
+  private bitmaps: Map<string, image.PixelMap> = new Map<string, image.PixelMap>();
+  private frame: number = 0;
+  private canvasReady: boolean = false;
+
+  aboutToAppear(): void {
+    const bytes = this.source.rawFileContent(CYLUIContext.hostContext(this.getUIContext()));
+    if (bytes === undefined) {
+      return;
+    }
+    let movie: CYLSVGAMovie;
+    try {
+      movie = CYLSVGAMovie.decode(bytes);
+    } catch (error) {
+      console.error(`[CYLClassifyMenu] SVGA ${this.source.path}: ${error}`);
+      return;
+    }
+    const keys: string[] = Array.from(movie.images.keys());
+    const decodes: Promise<void>[] = keys.map((key: string): Promise<void> => {
+      const data = movie.images.get(key) ?? new Uint8Array(0);
+      const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
+      const imageSource = image.createImageSource(buffer);
+      return imageSource.createPixelMap().then((pixelMap: image.PixelMap) => {
+        this.bitmaps.set(key, pixelMap);
+        imageSource.release();
+      }).catch(() => {
+        imageSource.release();
+      });
+    });
+    Promise.all(decodes).then(() => {
+      this.movie = movie;
+      const player = new CYLSVGAPlayer(this.source, movie);
+      player.onFrame = (index: number) => {
+        this.frame = index;
+        this.draw();
+      };
+      this.draw();
+      this.onPlayer?.(player);
+    });
+  }
+
+  aboutToDisappear(): void {
+    this.bitmaps.forEach((pixelMap: image.PixelMap) => {
+      pixelMap.release();
+    });
+    this.bitmaps.clear();
+  }
+
+  private applyTransform(t: CYLSVGATransform | undefined): void {
+    if (t !== undefined) {
+      this.context.transform(t.a, t.b, t.c, t.d, t.tx, t.ty);
+    }
+  }
+
+  private drawShape(shape: CYLSVGAShape): void {
+    const ctx = this.context;
+    const path = shape.type === CYLSVGAShapeType.SHAPE ? new Path2D(shape.d) : new Path2D();
+    if (shape.type === CYLSVGAShapeType.RECT) {
+      path.rect(shape.rect.x, shape.rect.y, shape.rect.width, shape.rect.height);
+    } else if (shape.type === CYLSVGAShapeType.ELLIPSE) {
+      path.ellipse(shape.rect.x, shape.rect.y, shape.rect.width, shape.rect.height, 0, 0, Math.PI * 2);
+    }
+    ctx.save();
+    this.applyTransform(shape.transform);
+    if (shape.fill !== '') {
+      ctx.fillStyle = shape.fill;
+      ctx.fill(path);
+    }
+    if (shape.stroke !== '' && shape.strokeWidth > 0) {
+      ctx.strokeStyle = shape.stroke;
+      ctx.lineWidth = shape.strokeWidth;
+      ctx.lineCap = shape.lineCap as CanvasLineCap;
+      ctx.lineJoin = shape.lineJoin as CanvasLineJoin;
+      if (shape.miterLimit > 0) {
+        ctx.miterLimit = shape.miterLimit;
+      }
+      ctx.setLineDash(shape.lineDash);
+      ctx.stroke(path);
+    }
+    ctx.restore();
+  }
+
+  /** Draws the current frame, scaled to fit the icon (aspect fit, centered). */
+  private draw(): void {
+    const movie = this.movie;
+    if (movie === undefined || !this.canvasReady) {
+      return;
+    }
+    const ctx = this.context;
+    const width = this.iconWidth;
+    const height = this.iconHeight;
+    ctx.resetTransform();
+    ctx.clearRect(0, 0, width, height);
+    if (movie.viewBoxWidth <= 0 || movie.viewBoxHeight <= 0) {
+      return;
+    }
+    const scale = Math.min(width / movie.viewBoxWidth, height / movie.viewBoxHeight);
+    const x = (width - movie.viewBoxWidth * scale) / 2;
+    const y = (height - movie.viewBoxHeight * scale) / 2;
+    for (const sprite of movie.sprites) {
+      const frame = this.frame < sprite.frames.length ? sprite.frames[this.frame] : undefined;
+      if (frame === undefined || frame.alpha <= 0 || sprite.imageKey.endsWith('.matte')) {
+        continue;
+      }
+      ctx.save();
+      ctx.setTransform(scale, 0, 0, scale, x, y);
+      this.applyTransform(frame.transform);
+      ctx.globalAlpha = Math.min(1, frame.alpha);
+      if (frame.clipPath !== '') {
+        ctx.clip(new Path2D(frame.clipPath));
+      }
+      const bitmap = this.bitmaps.get(sprite.imageKey);
+      if (bitmap !== undefined) {
+        ctx.drawImage(bitmap, frame.layout.x, frame.layout.y, frame.layout.width, frame.layout.height);
+      }
+      for (const shape of frame.shapes) {
+        this.drawShape(shape);
+      }
+      ctx.restore();
+    }
+  }
+
+  build() {
+    Canvas(this.context)
+      .width(this.iconWidth)
+      .height(this.iconHeight)
+      .onReady(() => {
+        this.canvasReady = true;
+        this.draw();
+      })
+      .accessibilityLevel('no')
+  }
+}
+
 @Component
 export struct CYLAnimatedIcon {
   @Prop source: string = '';
@@ -283,6 +431,11 @@ export struct CYLAnimatedIcon {
         })
       } else if (this.parsed.engine === CYLAnimationEngine.RIVE) {
         CYLRiveIconView({
+          source: this.parsed, iconWidth: this.iconSize, iconHeight: this.resolvedHeight(),
+          onPlayer: (p: CYLAnimationPlayer) => this.ready(p)
+        })
+      } else if (this.parsed.engine === CYLAnimationEngine.SVGA) {
+        CYLSVGAIconView({
           source: this.parsed, iconWidth: this.iconSize, iconHeight: this.resolvedHeight(),
           onPlayer: (p: CYLAnimationPlayer) => this.ready(p)
         })

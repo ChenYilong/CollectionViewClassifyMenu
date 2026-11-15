@@ -1,7 +1,8 @@
 /**
  * The players behind a tag's animated icon, one per engine, chosen by the file's extension as CYLTabBarController's
  * `CYLTabBarItemAnimationFactory` does on iOS: `.json` Lottie (@ohos/lottie), `.pag` PAG (@tencent/libpag), `.riv`
- * Rive (@ohos/rive), `.gif` GIF (frames decoded by ImageKit). The value is `asset:<rawfile path>` (or Lottie JSON
+ * Rive (@ohos/rive), `.gif` GIF (frames decoded by ImageKit), `.svga` SVGA (decoded by the library, drawn on a
+ * Canvas). The value is `asset:<rawfile path>` (or Lottie JSON
  * text); options (`cylAddingAnimationOptions`) follow `#` as "name=value&…".
  *
  * What each engine can do (the rest is a no-op, reported by `supportsSpeed` / `supportsLoops` / `supportsProgress`):
@@ -9,6 +10,7 @@
  * - PAG: speed, loop, play from the start, any progress: libpag has no playback speed on HarmonyOS, so the player
  *   drives the progress itself (`setProgress` + `flush` on a timer).
  * - GIF: speed, loop, play from the start, any progress (the player shows the decoded frames on its own timer).
+ * - SVGA: speed, loop, play from the start, any progress (2.x files; the player draws the frame for its own timer).
  * - Rive: play from the start (reset, then the state machine's trigger / boolean input, or the animation), loop for
  *   a linear animation (`Loop.LOOP`); @ohos/rive exposes no playback speed and no progress for a state machine.
  */
@@ -16,13 +18,15 @@ import { AnimationItem } from '@ohos/lottie';
 import { PAGViewController } from '@tencent/libpag';
 import { Loop, Direction, RiveAnimationView } from '@ohos/rive';
 import { image } from '@kit.ImageKit';
+import { CYLSVGAMovie } from './svga/CYLSVGAMovie';
 
 /** The engine that plays an animation file. */
 export enum CYLAnimationEngine {
   LOTTIE = 'lottie',
   PAG = 'pag',
   RIVE = 'rive',
-  GIF = 'gif'
+  GIF = 'gif',
+  SVGA = 'svga'
 }
 
 /** An animation value split into its rawfile path (or inline JSON) and its options. */
@@ -105,12 +109,15 @@ export function cylAnimationEngine(url: string): CYLAnimationEngine {
   if (path.endsWith('.gif')) {
     return CYLAnimationEngine.GIF;
   }
+  if (path.endsWith('.svga')) {
+    return CYLAnimationEngine.SVGA;
+  }
   return CYLAnimationEngine.LOTTIE;
 }
 
 /**
  * `CYLTagButton.animationView` on HarmonyOS: the live player of an animated icon, a handle to the engine's view or
- * controller (`lottieItem`, `pagController`, `riveView`, `gifFrames`).
+ * controller (`lottieItem`, `pagController`, `riveView`, `gifFrames`, `svgaMovie`).
  */
 export class CYLAnimationPlayer {
   readonly engine: CYLAnimationEngine;
@@ -390,6 +397,40 @@ export class CYLGIFPlayer extends CYLTimedPlayer {
     this.gifFrames.forEach((f: image.PixelMap) => {
       f.release();
     });
+  }
+}
+
+/** SVGA: the decoded movie, its frame drawn by the icon's canvas (`onFrame`). */
+export class CYLSVGAPlayer extends CYLTimedPlayer {
+  readonly svgaMovie: CYLSVGAMovie;
+  private shownIndex: number = -1;
+  onFrame?: (index: number) => void;
+
+  constructor(source: CYLAnimationSource, movie: CYLSVGAMovie) {
+    super(CYLAnimationEngine.SVGA, source);
+    this.svgaMovie = movie;
+  }
+
+  protected get durationMs(): number {
+    return this.svgaMovie.durationMs;
+  }
+
+  /** The frame shown now. */
+  get frameIndex(): number {
+    return this.svgaMovie.frameIndex(this.progressValue);
+  }
+
+  protected render(): void {
+    const index = this.frameIndex;
+    if (index >= 0 && index !== this.shownIndex) {
+      this.shownIndex = index;
+      this.onFrame?.(index);
+    }
+  }
+
+  destroy(): void {
+    super.destroy();
+    this.onFrame = undefined;
   }
 }
 

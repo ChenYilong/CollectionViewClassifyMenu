@@ -45,7 +45,7 @@ tags: [issues, ui, cocoapods, progress]
   `animationOptions`). Add SVGA (`.svga`): pin a CYLTabBarController commit that has the SVGA animator
   (`scripts/cyl-tabbar-latest-commit.sh`), register it like the others, and keep `animationSpeed`, `animationLoops`,
   Play all, resting progress and the selected last frame working (state honestly what the SVGA player cannot do).
-  Ports: Android (`android/merged`), Flutter, React Native, HarmonyOS (`harmony/classifymenu`, an ohpm SVGA player),
+  Ports: Android (`android/merged`), Flutter, React Native, HarmonyOS (`harmony/classifymenu`, its own SVGA 2.x decoder and player, done 2026-11-16, see `harmony-verification.md` D5),
   Mini Program (`CrossPlatform/wechat-miniprogram`, a CYLTabBarController SVGA package if it has one).
 - **Example, 1:1 with Rive:** every place that shows Rive gets the same scene for SVGA:
   - the Animated icons screen (`CYLTagAnimationDemoViewController`: the Rive sections, e.g. `rive`, `rive-icons`)
