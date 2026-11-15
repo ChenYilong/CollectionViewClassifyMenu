@@ -1,11 +1,22 @@
 {
   "pages": [
-    "pages/tags/tags",
-    "pages/post/post",
-    "pages/classify/classify"
+    "pages/product/product",
+    "pages/search-home/search-home",
+    "pages/scenarios/scenarios",
+    "pages/styles/styles",
+    "pages/animations/animations",
+    "pages/reviews/reviews",
+    "pages/search-category/search-category",
+    "pages/search-discover/search-discover",
+    "pages/classify/classify",
+    "pages/configuration/configuration",
+    "pages/tag-cloud/tag-cloud",
+    "pages/sample-tag-cloud/sample-tag-cloud",
+    "pages/sample-image-tag/sample-image-tag",
+    "pages/sample-tag-container/sample-tag-container"
   ],
   "window": {
-    "navigationBarTitleText": "CYLTagListView",
+    "navigationBarTitleText": "CYLMenuExample",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#ffffff"
@@ -13,20 +24,28 @@
   "tabBar": {
     "custom": true,
     "color": "#8E8E93",
-    "selectedColor": "#2AB9A0",
+    "selectedColor": "#007AFF",
     "backgroundColor": "#ffffff",
     "list": [
       {
-        "pagePath": "pages/tags/tags",
-        "text": "Tags"
+        "pagePath": "pages/product/product",
+        "text": "product"
       },
       {
-        "pagePath": "pages/post/post",
-        "text": "Post"
+        "pagePath": "pages/search-home/search-home",
+        "text": "search-home"
       },
       {
-        "pagePath": "pages/classify/classify",
-        "text": "Classify"
+        "pagePath": "pages/scenarios/scenarios",
+        "text": "scenarios"
+      },
+      {
+        "pagePath": "pages/styles/styles",
+        "text": "styles"
+      },
+      {
+        "pagePath": "pages/animations/animations",
+        "text": "animations"
       }
     ]
   },

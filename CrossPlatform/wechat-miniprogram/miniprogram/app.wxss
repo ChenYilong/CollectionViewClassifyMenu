@@ -1,1 +1,38 @@
-page { background: #ffffff; color: #333333; font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif; }
+/* The example's shared look, after UIKit's defaults, so the pages match the iOS example (the reference):
+   systemGroupedBackground, inset grouped tables (UITableView.Style.insetGrouped), list cells
+   (UIListContentConfiguration .cell / .valueCell), section headers and footers, systemBlue tint. */
+page {
+  --ios-blue: #007AFF;
+  --ios-orange: #FF9500;
+  --ios-label: #000000;
+  --ios-secondary-label: rgba(60, 60, 67, 0.6);
+  --ios-separator: rgba(60, 60, 67, 0.29);
+  --ios-grouped-background: #F2F2F7;
+  --ios-cell-background: #FFFFFF;
+  background: #ffffff;
+  color: var(--ios-label);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 17px;
+}
+
+/* A page whose content is an inset grouped table. */
+.ios-grouped { min-height: 100vh; background: var(--ios-grouped-background); padding-bottom: 96px; box-sizing: border-box; }
+.ios-section { margin: 0 16px; }
+.ios-section-header { padding: 22px 20px 7px; font-size: 13px; color: var(--ios-secondary-label); text-transform: uppercase; }
+.ios-section-footer { padding: 7px 20px 0; font-size: 13px; line-height: 1.38; color: var(--ios-secondary-label); }
+.ios-group { background: var(--ios-cell-background); border-radius: 10px; overflow: hidden; }
+.ios-cell { position: relative; display: flex; align-items: center; min-height: 44px; padding: 0 16px; box-sizing: border-box; }
+.ios-cell-hover { background: #D1D1D6; }
+.ios-cell + .ios-cell::before {
+  content: ''; position: absolute; top: 0; right: 0; left: 16px; height: 1px; transform: scaleY(0.5);
+  background: var(--ios-separator);
+}
+.ios-cell-with-image + .ios-cell::before, .ios-cell-with-image + .ios-cell-with-image::before { left: 56px; }
+.ios-cell-image { width: 24px; height: 24px; margin-right: 16px; flex: none; }
+.ios-cell-text { flex: 1; padding: 11px 0; font-size: 17px; line-height: 22px; }
+.ios-cell-mono { font-family: Menlo, "SF Mono", monospace; font-size: 15px; }
+.ios-cell-detail { margin-left: 8px; font-size: 17px; color: var(--ios-secondary-label); }
+.ios-chevron {
+  width: 8px; height: 8px; margin-left: 12px; flex: none; transform: rotate(45deg);
+  border-top: 2px solid #C4C4C7; border-right: 2px solid #C4C4C7;
+}

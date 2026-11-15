@@ -9,7 +9,7 @@ const { CONFIGURATION, pagePath, identifierForRoute } = require('./configuration
 Component({
   data: {
     configuration: CONFIGURATION,
-    selectedIdentifier: 'tags',
+    selectedIdentifier: 'product',
   },
 
   methods: {

@@ -14,6 +14,7 @@ A Mini Program has no SQLite and can `require` only JavaScript, so it reads the 
 """
 import json
 import pathlib
+import re
 import sqlite3
 import sys
 
@@ -42,8 +43,53 @@ def lottie_modules():
         yield f"lottie/{name}.js", HEADER.format(source=path.relative_to(ROOT).as_posix()) + f"module.exports = {body};\n"
 
 
+STRINGS = ROOT / "Example/CYLMenuExample/CYLMenuExample.bundle"
+STRING_LINE = re.compile(r'^\s*"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)"\s*;', re.M)
+
+
+def unescape(text):
+    return json.loads(f'"{text}"')
+
+
+def strings_module():
+    """
+    The iOS example's strings (CYLMenuExample.bundle/<language>.lproj/Localizable.strings, keyed by the Chinese
+    source text), for the Mini Program's t() (miniprogram/utils/i18n.js), the counterpart of CYLExampleLocalizedString.
+    """
+    tables = {}
+    for path in sorted(STRINGS.glob("*.lproj/Localizable.strings")):
+        language = path.parent.name[: -len(".lproj")]
+        text = path.read_text(encoding="utf-8")
+        text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+        tables[language] = {unescape(k): unescape(v) for k, v in STRING_LINE.findall(text)}
+    body = json.dumps(tables, ensure_ascii=False, indent=1, sort_keys=True)
+    source = STRINGS.relative_to(ROOT).as_posix() + "/*.lproj/Localizable.strings"
+    return HEADER.format(source=source) + f"module.exports = {body};\n"
+
+
+def reviews_module():
+    """
+    The menu example's reviews of the shared database (tables reviews, review_keywords; CYLReviewStore.mockReviews()
+    in the same order): [{id, user, text, date, sku, rating (0 good, 1 neutral, 2 bad), hasPhoto, hasFollowUp,
+    keywords}].
+    """
+    db = sqlite3.connect(f"file:{DATABASE}?mode=ro", uri=True)
+    rows = db.execute("SELECT id, user, text, date, sku, rating, has_photo, has_follow_up FROM reviews ORDER BY id").fetchall()
+    keywords = {}
+    for review_id, keyword in db.execute("SELECT review_id, keyword FROM review_keywords ORDER BY rowid"):
+        keywords.setdefault(review_id, []).append(keyword)
+    db.close()
+    lines = [json.dumps({"id": r[0], "user": r[1], "text": r[2], "date": r[3], "sku": r[4], "rating": r[5],
+                         "hasPhoto": bool(r[6]), "hasFollowUp": bool(r[7]), "keywords": keywords.get(r[0], [])},
+                        ensure_ascii=False) for r in rows]
+    source = DATABASE.relative_to(ROOT).as_posix()
+    return HEADER.format(source=source) + "module.exports = [\n  " + ",\n  ".join(lines) + "\n];\n"
+
+
 def modules():
     yield "places.js", places_module()
+    yield "reviews.js", reviews_module()
+    yield "strings.js", strings_module()
     yield from lottie_modules()
 
 
