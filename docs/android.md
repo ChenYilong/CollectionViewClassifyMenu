@@ -164,7 +164,40 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
 ## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
-- **Status:** TODO. Not started: the earlier tasks run first, in the order they were given. When React Native or
+- **Status:** TODO, started 2026-11-15 (the earlier tasks are done). Tools found on this Mac: DevEco Studio with the
+  HarmonyOS 6.0.1 SDK (API 21), `hdc`, hvigor and the Mate 70 Pro emulator (unsigned HAPs install). Not installed:
+  the OpenHarmony fork of Flutter (`gitcode.com/openharmony-tpc/flutter_flutter`, reachable). Plan, in order:
+  1. `harmony/` library (HAR, ArkTS): a port of `CYLTagListView` with the same JSON configuration as the Flutter and
+     React Native components; unit tests; an example HAP with the Tags and Classify tabs, run on the emulator.
+  2. Flutter: install the OpenHarmony fork, add an `ohos` platform to `flutter/cyl_tag_list` that hosts the HAR as a
+     platform view; run the example's integration tests on the emulator.
+  3. React Native: only after step 2 passes (React Native for OpenHarmony, `react-native-openharmony`).
+- **Step 1: DONE (2026-11-15).** `harmony/` (build mirror `/tmp/xpr/harmony`; the exFAT volume breaks builds):
+  - `classifymenu` (HAR, ArkTS): `CYLTagListView` reads the shared JSON configuration (`selectionMode`,
+    `defaultVisibleRows`, `style.normal` / `style.selected`, `sections`, `selected`, `exclusive` items such as 全部);
+    left-aligned tags that wrap, a long tag starts a new line and is shortened only to a line's width; fold control
+    per section; single and multiple selection; `onTagTap`, `onSelectionChange`; ids `CYLTagListItem-<s>-<i>`.
+  - `entry` (example, bundle `com.cyl.classifymenu.example`): bottom tabs Tags and Classify. Classify reads the shared
+    `cyl_places.sqlite` (83 places, copied from rawfile once; `relationalStore`), the classify menu (single), a Filter
+    sheet (regions, dishes, each led by an exclusive 全部), Reset, the summary line and the places; selections saved
+    in the database (`menu.classify`, `menu.filter`), like the React Native example.
+  - Build: `DEVECO_SDK_HOME=/Applications/DevEco-Studio.app/Contents/sdk` and DevEco's node running
+    `tools/hvigor/bin/hvigorw.js assembleHap --no-daemon` (unsigned HAP); tests `hvigorw.js test -p module=entry`.
+  - **Evidence:** local unit tests (hypium, `entry/src/test/LocalUnit.test.ets`): `Tests run: 5, Failure: 0, Pass: 5`.
+    On the emulator: unfold, select Home ("Tapped Home"), Classify 83 places → 川菜 3 → filter 广州 1 place.
+  - **Not yet:** animated icons and the playback controls (`example-demo-rules.md`; needs a Lottie player for
+    ArkTS, `@ohos/lottie`); UI tests (`uitest`) as a script.
+  - **Screenshots:** HarmonyOS 6.0.1 SDK (API 21), Mate 70 Pro emulator `6.0.0.112(SP3DEVC00E112R4P11)`, DevEco
+    Studio hvigor 6.21.2, macOS 27.3, branch `feat/android-kotlin` at the commit that adds them, 2026-11-15 09:48 NZDT.
+    Top to bottom: Tags unfolded with Home selected; Classify with 川菜 and the 广州 filter; the Filter sheet.
+
+  <img src="assets/harmonyos-tags.jpeg" width="360" alt="HarmonyOS: Tags tab, unfolded, Home selected">
+
+  <img src="assets/harmonyos-classify-filtered.jpeg" width="360" alt="HarmonyOS: Classify, 川菜 and 广州, 1 place">
+
+  <img src="assets/harmonyos-filter.jpeg" width="360" alt="HarmonyOS: Filter sheet with regions and dishes">
+
+  Earlier note: When React Native or
   Flutter examples are added, show the classify menu and the multiple filter in tabs of their own, as the iOS and
   Android examples do (request of 2026-11-12, `issue-progress.md`).
 - **Context:** the Android library and example (`android/merged`) and the cross-platform components (Flutter and React
