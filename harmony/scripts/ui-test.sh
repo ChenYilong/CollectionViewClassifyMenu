@@ -2,11 +2,15 @@
 # Builds the example and its instrumented test (entry/src/ohosTest), installs both on the running emulator and runs
 # the UI tests. Usage: scripts/ui-test.sh [project dir, default: harmony/]. Needs DevEco Studio and a booted emulator.
 set -eu
-DEVECO=${DEVECO:-/Applications/DevEco-Studio.app/Contents}
+if [ -z "${DEVECO:-}" ]; then
+  if [ -d "/c/Program Files/Huawei/DevEco Studio" ]; then DEVECO="/c/Program Files/Huawei/DevEco Studio"
+  else DEVECO=/Applications/DevEco-Studio.app/Contents; fi
+fi
+export JAVA_HOME="$DEVECO/jbr"
 PROJECT=${1:-$(cd "$(dirname "$0")/.." && pwd)}
 HDC="$DEVECO/sdk/default/openharmony/toolchains/hdc"
 export DEVECO_SDK_HOME="$DEVECO/sdk"
-export PATH="$DEVECO/tools/node/bin:$DEVECO/tools/ohpm/bin:$PATH"
+export PATH="$DEVECO/jbr/bin:$DEVECO/tools/node:$DEVECO/tools/node/bin:$DEVECO/tools/ohpm/bin:$PATH"
 BUNDLE=com.cyl.classifymenu.example
 
 cd "$PROJECT"
