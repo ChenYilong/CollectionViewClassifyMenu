@@ -6,4 +6,4 @@ export {
   CYLImageTagRippleView, CYLImageTagGroupViewDataSource, CYLImageTagGroupViewDelegate,
   CYLImageTagGroupViewAnimatableValue, CYLImageTagGroupView, CYLImageTagGroupViewComponent
 } from './CYLImageTagGroupView';
-export { CYLImageTagView, CYLImageTagViewComponent } from './CYLImageTagView';
+export { CYLImageTagView, CYLImageTagViewComponent, CYLImageTagImageView } from './CYLImageTagView';

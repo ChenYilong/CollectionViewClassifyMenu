@@ -8,6 +8,11 @@ import { MeasureText } from '@kit.ArkUI';
 import { fileIo } from '@kit.CoreFileKit';
 import { util } from '@kit.ArkTS';
 import { CYLIndexPath } from './CYLTagListModel';
+import {
+  CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
+} from './CYLTagListSupplementaryView';
+import { CYLTagButton, CYLTagButtonPart } from '../tagviews/CYLTagButton';
+import { CYLTagListCell } from '../tagviews/CYLTagListCell';
 import { CYLMenuDataSource, CYLMenuDefaults, CYLMenuDelegate, CYLMenuItemType } from '../core/CYLMenuDataSource';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
@@ -395,6 +400,14 @@ export class CYLTagListState {
   private scrollHandler?: (offset: number, animated: boolean) => void;
   private playTokenStorage: number = 0;
   private itemPlayCounts: Map<string, number> = new Map<string, number>();
+  private cells: Map<string, CYLTagListCell> = new Map<string, CYLTagListCell>();
+  private headerViews: Map<number, CYLTagListSupplementaryView> = new Map<number, CYLTagListSupplementaryView>();
+  private footerViews: Map<number, CYLTagListSupplementaryView> = new Map<number, CYLTagListSupplementaryView>();
+  private titleButton: CYLTagButton = new CYLTagButton();
+  private shownItems: Set<string> = new Set<string>();
+  private shownHeaders: Set<number> = new Set<number>();
+  private shownFooters: Set<number> = new Set<number>();
+  private viewGenerationStorage: number = 0;
 
   /**
    * `init(foldControl:)` and `init(foldControl:title:titleImage:titlePosition:)`: a tag list with its fold control
@@ -456,6 +469,102 @@ export class CYLTagListState {
     return this.playTokenStorage + (this.itemPlayCounts.get(key(indexPath.section, indexPath.item)) ?? 0);
   }
 
+  // MARK: Views (the objects the list view draws from)
+
+  /**
+   * `titleView`: the `CYLTagButton` that draws the title (every public API of `CYLTagButton`, e.g. an animated
+   * icon with `animationURL`). The list sets its title, icon and style from `title`, `titleImage` and `titleStyle`;
+   * other changes to it are drawn at once.
+   */
+  get titleView(): CYLTagButton {
+    return this.titleButton;
+  }
+
+  /** `titleLabel`: the title's label (`titleView.titleLabel`), as last laid out. */
+  get titleLabel(): CYLTagButtonPart {
+    return this.titleButton.titleLabel;
+  }
+
+  /**
+   * `tagButton(at:)`: the tag view of a shown item (the `CYLTagButton` the list draws), or undefined when the item is
+   * not shown. The list configures it when the item's data, state or style changes; changes made in between are
+   * drawn at once.
+   */
+  tagButton(indexPath: CYLIndexPath): CYLTagButton | undefined {
+    return this.cellForItemAt(indexPath)?.button;
+  }
+
+  /** `collectionView(_:cellForItemAt:)`: the cell of a shown item (`CYLTagListCell`), or undefined. */
+  cellForItemAt(indexPath: CYLIndexPath): CYLTagListCell | undefined {
+    const k = key(indexPath.section, indexPath.item);
+    return this.shownItems.has(k) ? this.cells.get(k) : undefined;
+  }
+
+  /**
+   * `collectionView(_:viewForSupplementaryElementOfKind:at:)`: the header (`CYLTagListElementKindSectionHeader`) or
+   * footer (`CYLTagListElementKindSectionFooter`) of a shown section, or undefined.
+   */
+  viewForSupplementaryElementOfKind(kind: string, indexPath: CYLIndexPath): CYLTagListSupplementaryView | undefined {
+    if (kind === CYLTagListElementKindSectionHeader) {
+      return this.shownHeaders.has(indexPath.section) ? this.headerViews.get(indexPath.section) : undefined;
+    }
+    if (kind === CYLTagListElementKindSectionFooter) {
+      return this.shownFooters.has(indexPath.section) ? this.footerViews.get(indexPath.section) : undefined;
+    }
+    return undefined;
+  }
+
+  /** Changes when the data or the style is reloaded: the views are configured again. */
+  get viewGeneration(): number {
+    return this.viewGenerationStorage;
+  }
+
+  /** For the list view: the cell of an item it draws (made on first use), kept until the item goes away. */
+  dequeueCell(indexPath: CYLIndexPath): CYLTagListCell {
+    const k = key(indexPath.section, indexPath.item);
+    let cell = this.cells.get(k);
+    if (cell === undefined) {
+      cell = new CYLTagListCell();
+      this.cells.set(k, cell);
+    }
+    return cell;
+  }
+
+  /** For the list view: the header or footer of a section it draws. */
+  dequeueSupplementaryView(kind: string, section: number): CYLTagListSupplementaryView {
+    const views = kind === CYLTagListElementKindSectionFooter ? this.footerViews : this.headerViews;
+    let view = views.get(section);
+    if (view === undefined) {
+      view = new CYLTagListSupplementaryView(kind);
+      view.section = section;
+      view.setDisplayHandler(() => this.setNeedsDisplay());
+      views.set(section, view);
+    }
+    return view;
+  }
+
+  /** For the list view: what it draws now (the other cells and views are dropped). */
+  setShownViews(items: CYLIndexPath[], headers: number[], footers: number[]): void {
+    this.shownItems = new Set<string>(items.map((p: CYLIndexPath) => key(p.section, p.item)));
+    this.shownHeaders = new Set<number>(headers);
+    this.shownFooters = new Set<number>(footers);
+    Array.from(this.cells.keys()).forEach((k: string) => {
+      if (!this.shownItems.has(k)) {
+        this.cells.delete(k);
+      }
+    });
+    Array.from(this.headerViews.keys()).forEach((section: number) => {
+      if (!this.shownHeaders.has(section)) {
+        this.headerViews.delete(section);
+      }
+    });
+    Array.from(this.footerViews.keys()).forEach((section: number) => {
+      if (!this.shownFooters.has(section)) {
+        this.footerViews.delete(section);
+      }
+    });
+  }
+
   private setNeedsDisplay(): void {
     this.changeListener?.();
   }
@@ -469,6 +578,7 @@ export class CYLTagListState {
 
   set style(value: CYLMenuStyle) {
     this.styleStorage = value.copy();
+    this.viewGenerationStorage += 1;
     if (this.tagDataSourceStorage !== undefined) {
       this.tagDataSourceStorage.baseStyle = this.styleStorage;
     }
@@ -899,6 +1009,7 @@ export class CYLTagListState {
 
   /** Reads everything from the data source again; selections and expanded sections still in range are kept. */
   reloadMenuData(): void {
+    this.viewGenerationStorage += 1;
     const source = this.menuDataSource;
     if (this.tagDataSourceStorage !== undefined && source === this.tagDataSourceStorage) {
       this.tagDataSourceStorage.invalidateStyles();
