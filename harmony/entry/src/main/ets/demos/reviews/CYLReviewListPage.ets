@@ -230,6 +230,7 @@ export struct CYLReviewListPage {
       Row({ space: 6 }) {
         if (this.loading) {
           LoadingProgress().width(20).height(20)
+            .accessibilityText(CYLExampleLocalizedString('加载中…'))
         }
         Text(this.status)
           .fontSize(13)
@@ -246,6 +247,7 @@ export struct CYLReviewListPage {
             ListItem() {
               Row({ space: 12 }) {
                 Image($r('app.media.a_person_circle')).width(28).height(28).fillColor('#007AFF')
+                  .accessibilityLevel('no')
                 Column({ space: 2 }) {
                   Text(review.user).fontSize(17).fontColor('#000000')
                   Text(`${review.text}\n${review.date} ${review.sku}`).fontSize(15).fontColor('#993C3C43')

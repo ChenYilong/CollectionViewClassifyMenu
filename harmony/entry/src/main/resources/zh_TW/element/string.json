@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "CYLClassifyMenu 範例"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "CYLClassifyMenu 範例"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "CYLMenuExample"
+    },
+    {
+      "name": "tab_home",
+      "value": "首頁"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "同城"
+    },
+    {
+      "name": "tab_messages",
+      "value": "訊息"
+    },
+    {
+      "name": "tab_me",
+      "value": "我的"
+    }
+  ]
+}

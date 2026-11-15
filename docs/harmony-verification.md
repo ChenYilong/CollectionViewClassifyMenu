@@ -23,6 +23,12 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
   decoding, Lottie's last frame, classify menu and filter layout; Chinese texts only), `issue-progress.md` "TODO
   (2026-11-16): SVGA animated icons" (HarmonyOS included), `android.md` HarmonyOS NEXT step 2 (Flutter on
   HarmonyOS, blocked on a newer SDK; not part of this port's score).
+- **DONE (2026-11-16): accessibility, localization, rules, accessibility-first UI tests.** Result: labels on every image, input and control (`scripts/accessibility-check.py` OK; root tabs with label and selected state; filter headers as one element); native string resources in base / en_US / zh_CN / zh_TW with the four tab titles copied from CYLTabBarController (`scripts/check-native-strings.py` OK); two bugs fixed that compared translated text (the disabled style tag, the review filter's 全部); 33 UI-test taps by localized accessibility label (`cylTapAccessible`); rules in AGENTS.md, `docs/instructions.md`, skills `cyl-harmonyos` (new), `cyl-accessibility`, `cyl-localization`. Prompt, verbatim: 「continue 在不需要模拟器的前提下开始代码开发。继续完成鸿蒙评分表。marking the rest "TODO: N/A on HarmonyOS" with a reason. 适配视觉辅助 盲人辅助 为鸿蒙代码 。 适配国际化本地化，本地化文件可以从CYLTabBarController中复制一份过来。筛选本项目用到的文字。并将下面的内容规则写入instructions相关文件并写入skills相关文件，如果相关文件不存在就新建文件确保成功。全英文写入：本项目全部代码已经支持适配视觉辅助 盲人辅助 为鸿蒙代码 。 适配国际化本地化，本地化文件。如果发现不支持请先支持，然后在自动化UI测试过程中，优先使用刚刚提到的功能进行UI控件定位。触发点击事件，或者触发复杂流程，连续操作等。」
+  (EN: without the emulator: support visual and blind accessibility in the HarmonyOS code; support i18n / l10n, copying
+  the localization files from CYLTabBarController and keeping the strings this project uses; write the rule into
+  the instructions and skills files, in English: all code supports accessibility and localization (add it where
+  missing), and automated UI tests locate controls through accessibility first, for taps, complex flows and
+  sequences of actions.)
 - Environment: Windows 11, DevEco Studio 6.0.1.251, SDK API 21; Mate 70 Pro emulator image installing.
 
 ## Score
@@ -102,14 +108,14 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 | # | Check | Status |
 | --- | --- | --- |
 | E1 | Core strings in `en`, `zh-Hans` (`zh_CN`) and `zh-Hant` (`zh_TW` / `zh_HK`), generated from the iOS core bundle | DONE: `CYLCoreStrings.ets` (en, zh-Hans, zh-Hant) by `export-core-strings.py`, `--check` OK |
-| E2 | Example strings in the same three languages, from the iOS example bundle; no user-facing literal in `.ets` code | DONE: `CYLExampleStrings.ets` by `export-example-strings.py` (259 keys, en and zh-Hant; zh-Hans is the key), looked up by `CYLExampleLocalizedString`; ~220 literals and 18 templates now go through it (templates as the iOS `%@` / `%lu` keys with `cylFormat`). Left in Chinese, as on iOS: sample data (reviews, names, places, search tags, `地区过滤` / `菜品过滤` types). Titles that are also ids or map keys (root tabs, search categories, industries) stay keys and are localized where shown, so ids and the UI tests do not depend on the language |
+| E2 | Example strings in the same three languages, from the iOS example bundle; no user-facing literal in `.ets` code | DONE: `CYLExampleStrings.ets` by `export-example-strings.py` (259 keys, en and zh-Hant; zh-Hans is the key), looked up by `CYLExampleLocalizedString`; ~220 literals and 18 templates now go through it (templates as the iOS `%@` / `%lu` keys with `cylFormat`). Left in Chinese, as on iOS: sample data (reviews, names, places, search tags, `地区过滤` / `菜品过滤` types). Titles that are also ids or map keys (root tabs, search categories, industries) stay keys and are localized where shown, so ids and the UI tests do not depend on the language. Native resources (system strings, CYLTabBarController's tab titles) in base / en_US / zh_CN / zh_TW, checked by `scripts/check-native-strings.py`; no translated text compared in code |
 | E3 | The example follows the system language on the emulator (screenshot in English) | TODO: N/A on HarmonyOS (deferred) — needs a running emulator for the screenshot. Ready: `cylLanguage` launch option, `screenshots.sh` (`en-*`, `zh-hant-*`); lookup host-tested (H8, `LaunchOptions.test.ets`) |
 
 ### F. Accessibility and appearance (2)
 
 | # | Check | Status |
 | --- | --- | --- |
-| F1 | Every control has an accessibility text; selected state announced (API 12 fallback for `accessibilitySelected`) | TODO: N/A on HarmonyOS (deferred) — the screen reader's output can only be checked on a device. Ready: labels on every tappable element, `CYLAccessibilitySelectedModifier` (API 13+) |
+| F1 | Every control has an accessibility text; selected state announced (API 12 fallback for `accessibilitySelected`) | TODO: N/A on HarmonyOS (deferred) — the screen reader's output can only be checked on a device. Ready: labels on every tappable element, `CYLAccessibilitySelectedModifier` (API 13+); static check `scripts/accessibility-check.py` OK (2026-11-16) |
 | F2 | Dark mode renders on the emulator (screenshot) | TODO: N/A on HarmonyOS (deferred) — needs a running emulator for the screenshot. Ready: `cylColorMode` launch option, `screenshots.sh` (`dark-*`) |
 
 ### G. Documentation (2)
@@ -146,6 +152,7 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
 - 2026-11-16: section H added (host unit tests per feature, 8 rows) and done: 46 / 46 tests pass. 15 / 53 = 28.3 / 100.
 - 2026-11-16: launch options (open any demo, language, color mode) and `scripts/screenshots.sh` for rows B, E3, F2; 49 / 49 host tests. Score unchanged: 15 / 53 = 28.3 / 100.
 - 2026-11-16: the 38 rows that need an emulator marked "TODO: N/A on HarmonyOS (deferred)" with their reason, at the maintainer's request. 53 / 53 = 100 / 100 counting them as N/A; verified 15 / 53 = 28.3 / 100.
+- 2026-11-16: accessibility labels everywhere (static check), native localized resources, accessibility-first UI tests, rules and skills. Score unchanged: 53 / 53 with deferred rows as N/A; verified 15 / 53 = 28.3 / 100.
 
 ## Next steps (resume here)
 

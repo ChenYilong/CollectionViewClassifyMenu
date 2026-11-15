@@ -1,28 +1,32 @@
 {
   "string": [
     {
-      "name": "speed",
-      "value": "速度"
+      "name": "module_desc",
+      "value": "CYLClassifyMenu 示例"
     },
     {
-      "name": "speed_value",
-      "value": "%s 倍"
+      "name": "EntryAbility_desc",
+      "value": "CYLClassifyMenu 示例"
     },
     {
-      "name": "loop",
-      "value": "循环"
+      "name": "EntryAbility_label",
+      "value": "CYLMenuExample"
     },
     {
-      "name": "play_all",
-      "value": "全部播放"
+      "name": "tab_home",
+      "value": "首页"
     },
     {
-      "name": "animated_icons",
-      "value": "动画图标"
+      "name": "tab_nearby",
+      "value": "同城"
     },
     {
-      "name": "tapped",
-      "value": "点击了 %s"
+      "name": "tab_messages",
+      "value": "消息"
+    },
+    {
+      "name": "tab_me",
+      "value": "我的"
     }
   ]
 }

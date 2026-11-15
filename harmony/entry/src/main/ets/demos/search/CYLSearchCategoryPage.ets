@@ -129,7 +129,9 @@ export struct CYLSearchCategoryPage {
   searchBar() {
     Row({ space: 6 }) {
       Image($r('app.media.a_magnifyingglass')).width(15).height(15)
+        .accessibilityLevel('no')
       TextInput({ placeholder: CYLExampleLocalizedString(PLACEHOLDERS[this.category]), text: this.searchText })
+        .accessibilityText(CYLExampleLocalizedString(PLACEHOLDERS[this.category]))
         .fontSize(16)
         .placeholderColor('#993C3C43')
         .backgroundColor(Color.Transparent)
@@ -210,6 +212,7 @@ export struct CYLSearchCategoryPage {
   tabBar(index: number) {
     Column({ space: 2 }) {
       Image(this.category === index ? SELECTED_ICONS[index] : ICONS[index])
+        .accessibilityLevel('no')
         .width(24)
         .height(24)
         .fillColor(this.category === index ? '#007AFF' : '#8E8E93')

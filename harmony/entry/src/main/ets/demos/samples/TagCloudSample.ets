@@ -372,6 +372,7 @@ export struct CYLHotSearchPage {
         Row({ space: 6 }) {
           SymbolGlyph($r('sys.symbol.magnifyingglass')).fontSize(16).fontColor([CYLColor.white(0.6)])
           TextInput({ placeholder: CYLExampleLocalizedString('主播昵称/直播间ID/神曲名'), text: this.text })
+            .accessibilityText(CYLExampleLocalizedString('主播昵称/直播间ID/神曲名'))
             .placeholderColor(CYLColor.white(0.6))
             .backgroundColor(Color.Transparent)
             .padding(0)

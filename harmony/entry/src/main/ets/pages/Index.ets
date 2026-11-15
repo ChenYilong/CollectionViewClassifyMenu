@@ -1,3 +1,4 @@
+import { CYLAccessibilitySelectedModifier } from '@cyl/classifymenu';
 import { CYLExampleLocalizedString } from '../data/CYLExampleLocalization';
 import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
 import { CYLDemoNav } from '../demos/DemoNav';
@@ -75,6 +76,7 @@ struct Index {
     if (index === PLUS_INDEX) {
       Column() {
         Image(TABS[index].image).width(36).height(36)
+          .accessibilityLevel('no')
       }
       .justifyContent(FlexAlign.Center)
       .width('100%')
@@ -85,6 +87,7 @@ struct Index {
     } else {
       Column({ space: 2 }) {
         Image(this.tab === index ? TABS[index].selectedImage : TABS[index].image)
+          .accessibilityLevel('no')
           .width(26)
           .height(26)
           .fillColor(this.tab === index ? '#007AFF' : '#8E8E93')
@@ -97,6 +100,9 @@ struct Index {
       .width('100%')
       .height('100%')
       .id(`tab-${TABS[index].title}`)
+      .accessibilityGroup(true)
+      .accessibilityText(CYLExampleLocalizedString(TABS[index].title))
+      .attributeModifier(new CYLAccessibilitySelectedModifier(this.tab === index))
     }
   }
 

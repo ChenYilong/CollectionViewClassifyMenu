@@ -34,3 +34,9 @@
   example one to one: the same screens, texts, data and behaviors (table 2); (3) the internal implementation is
   migrated from the Android Kotlin sources (`android/merged/library`, `android/merged/example`) to ArkTS, Swift
   deciding where they differ. Remove one TODO per finished feature and score after each, until 100.
+- HarmonyOS accessibility, localization and accessibility-first UI tests (English rule, AGENTS.md "HarmonyOS:
+  accessibility, localization and accessibility-first UI tests"; skill `.agents/skills/cyl-harmonyos/`): all code,
+  the HarmonyOS code included, supports visual accessibility, screen readers, internationalization and localization
+  with localization files; add the support first where it is missing. Automated UI tests locate controls through
+  accessibility first (localized label, then description, then id) for taps, complex flows and sequences of
+  actions.
