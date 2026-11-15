@@ -228,6 +228,8 @@ def render(rows, mapping):
         "**Score: %d / %d = %.1f / 100** (API %d / %d, demos %d / %d). Both tables are scored together: every TODO removed"
         % (done, total, score, api_done, len(rows), demo_done, len(demos)),
         "is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.",
+        "A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);",
+        "it counts as aligned and states its reason.",
         "",
         "## Table 1: iOS public API",
         "",
