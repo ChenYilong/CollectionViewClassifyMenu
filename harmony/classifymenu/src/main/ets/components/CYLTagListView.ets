@@ -1,18 +1,10 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { CYLMenuLocalizedString } from './CYLMenuResources';
-import { CYLLottieIcon } from './CYLLottieIcon';
-=======
-=======
 import { CYLUIContext } from '../core/CYLUIContext';
->>>>>>> d2e3a1d (fix(harmony): 🐛 ArkTS warnings 92 → 1 (score 9.1))
 import { CYLAnimatedIcon } from './CYLAnimatedIcon';
 import {
   CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
 } from './CYLTagListSupplementaryView';
 import { CYLTagButtonComponent } from '../tagviews/CYLTagButton';
 import { CYLTagListCell, CYLTagListCellComponent } from '../tagviews/CYLTagListCell';
->>>>>>> 7c7c1f3 (feat(harmony): four animation engines, the animation screen, view handles (score 100))
 import { CYLIndexPath, CYLTagListController, CYLTagTap } from './CYLTagListModel';
 import {
   CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState
@@ -646,58 +638,6 @@ export struct CYLTagListView {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .flexShrink(1)
     }
-<<<<<<< HEAD
-    .backgroundColor(this.stateOf(section, item).backgroundColor)
-    .borderColor(this.stateOf(section, item).borderColor)
-    .borderWidth(this.stateOf(section, item).borderWidth)
-    .borderRadius(this.stateOf(section, item).cornerRadius)
-    .height(this.config.style.itemHeight)
-    .padding({ left: 12, right: 12 })
-    .constraintSize({ maxWidth: '100%' })
-    .margin({ right: this.config.style.spacing, bottom: this.config.style.spacing })
-    .id(`CYLTagListItem-${section}-${item}`)
-    .accessibilityGroup(true)
-    .accessibilityText(tag.title)
-    .accessibilitySelected(this.selectedKeys.includes(`${section}-${item}`))
-    .accessibilityDescription(this.config.selectionMode === 'none' ? '' : this.text('cyl_menu_tag_hint'))
-      .onClick(() => this.tap(section, item, tag))
-  }
-
-  /** A string of the core's resources (CYLMenuLocalizedString). */
-  private text(key: string): string {
-    return CYLMenuLocalizedString(getContext(this), key);
-  }
-
-  private stateOf(section: number, item: number): CYLTagStateStyle {
-    return this.selectedKeys.includes(`${section}-${item}`) ? this.config.style.selected : this.config.style.normal;
-  }
-
-  build() {
-    Column() {
-      ForEach(this.config.sections, (section: CYLTagListSectionView, index: number) => {
-        Column() {
-          if (section.title !== undefined) {
-            Row() {
-              Text(section.title).fontSize(15).fontWeight(FontWeight.Medium).layoutWeight(1)
-              if (this.config.defaultVisibleRows > 0) {
-                Text(this.expanded[index] ? '▲' : '▼')
-                  .fontSize(14)
-                  .padding(8)
-                  .constraintSize({ minWidth: 44, minHeight: 44 })
-                  .textAlign(TextAlign.Center)
-                  .id(`CYLTagListFold-${index}`)
-                  // "<section> More / Less", as the iOS fold control ("<section> 更多/收起"); localized, never literal.
-                  .accessibilityText(`${section.title} ${this.text(this.expanded[index] ? 'cyl_menu_collapse' : 'cyl_menu_expand')}`)
-                  .accessibilityDescription(this.text(this.expanded[index] ? 'cyl_menu_collapse_hint' : 'cyl_menu_expand_hint'))
-                  .onClick(() => this.toggleFold(index))
-              }
-            }.width('100%').margin({ top: 12, bottom: 8 })
-          }
-          Flex({ wrap: FlexWrap.Wrap }) {
-            ForEach(section.items, (tag: CYLTagItem, item: number) => {
-              this.tagButton(index, item, tag)
-            }, (tag: CYLTagItem, item: number) => `${index}-${item}-${tag.title}`)
-=======
     if (r.imageTrailing) {
       this.icon(r)
     }
@@ -850,7 +790,6 @@ export struct CYLTagListView {
             if (h.showsFold && !h.foldLeading) {
               this.foldButton(h.fold)
             }
->>>>>>> 9be3571 (feat(harmony): CYLTagListView with configuration, and the image tag views (score 74.8))
           }
           .width('100%')
           .height(h.height)

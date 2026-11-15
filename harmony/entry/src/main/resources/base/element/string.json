@@ -2,17 +2,6 @@
   "string": [
     {
       "name": "module_desc",
-<<<<<<< HEAD
-      "value": "CollectionViewClassifyMenu example"
-    },
-    {
-      "name": "EntryAbility_desc",
-      "value": "CollectionViewClassifyMenu example"
-    },
-    {
-      "name": "EntryAbility_label",
-      "value": "ClassifyMenu"
-=======
       "value": "CYLClassifyMenu example"
     },
     {
@@ -22,7 +11,6 @@
     {
       "name": "EntryAbility_label",
       "value": "CYLMenuExample"
->>>>>>> 04d17f6 (feat(harmony): ✨ example strings in en, zh-Hans and zh-Hant (score 13.6))
     },
     {
       "name": "tab_home",
@@ -37,109 +25,8 @@
       "value": "Messages"
     },
     {
-<<<<<<< HEAD
-      "name": "play_all",
-      "value": "Play all"
-    },
-    {
-      "name": "animated_icons",
-      "value": "Animated icons"
-    },
-    {
-      "name": "tapped",
-      "value": "Tapped %s"
-    },
-    {
-      "name": "tab_home",
-      "value": "Home"
-    },
-    {
-      "name": "tab_messages",
-      "value": "Messages"
-    },
-    {
       "name": "tab_me",
       "value": "Me"
-    },
-    {
-      "name": "tab_search",
-      "value": "Search"
-    },
-    {
-      "name": "tab_tags",
-      "value": "Tags"
-    },
-    {
-      "name": "tab_classify",
-      "value": "Classify"
-    },
-    {
-      "name": "section_lottie",
-      "value": "Lottie"
-    },
-    {
-      "name": "section_tags",
-      "value": "Tags"
-    },
-    {
-      "name": "classify_title",
-      "value": "Classify"
-    },
-    {
-      "name": "reset",
-      "value": "Reset"
-    },
-    {
-      "name": "reset_hint",
-      "value": "Clears the category and the filter"
-    },
-    {
-      "name": "filter",
-      "value": "Filter"
-    },
-    {
-      "name": "filter_modified",
-      "value": "Filter, conditions set"
-    },
-    {
-      "name": "filter_ok",
-      "value": "OK"
-    },
-    {
-      "name": "no_places",
-      "value": "No places match"
-    },
-    {
-      "name": "places_count",
-      "value": "%d places"
-    },
-    {
-      "name": "all",
-      "value": "All"
-    },
-    {
-      "name": "regions",
-      "value": "Regions"
-    },
-    {
-      "name": "dishes",
-      "value": "Dishes"
-    },
-    {
-      "name": "place_rating",
-      "value": "Rating %1$s, %2$d yuan"
-    },
-    {
-      "name": "tab_post",
-      "value": "Post"
-    },
-    {
-      "name": "plus_page",
-      "value": "The plus button page"
-=======
-      "name": "tab_me",
-      "value": "Me"
->>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
     }
   ]
 }

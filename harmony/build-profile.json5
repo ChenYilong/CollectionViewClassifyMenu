@@ -26,10 +26,6 @@
   },
   "modules": [
     {
-      "name": "cyltabbar",
-      "srcPath": "./.deps/CYLTabBarController/CrossPlatform/harmonyos-cyltabbar/cyltabbar"
-    },
-    {
       "name": "classifymenu",
       "srcPath": "./classifymenu"
     },

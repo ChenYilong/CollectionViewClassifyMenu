@@ -179,6 +179,10 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
   emoji icons are gone.
 - **Evidence:** `assembleHap` of the example and of its UI-test HAP: BUILD SUCCESSFUL; unit tests `Tests run: 6, Pass:
   6`; `scripts/harmonyos-l10n-check.py`: OK. Not run on the emulator (this round has no emulator), so no new screenshot.
+- **Branch sync (2026-11-16):** this change was made on `feat/android-kotlin`'s two-tab ArkTS example. `feat/harmony`
+  (PR #20) replaced that example with the 22-demo port (ArkUI `Tabs`: Shell, Menu, Samples), so the sync keeps its
+  `harmony/` folder as it is. TODO: CYLTabBarController's tab bar in that example (configuration file, raised Post
+  button, `harmony/scripts/fetch-cyltabbar.sh` of `83d18b9` as the starting point), agreed with its owner first.
 
 ## DONE (2026-11-16): HarmonyOS score sheet, accessibility and localization
 
