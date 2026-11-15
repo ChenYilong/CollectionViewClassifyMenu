@@ -10,13 +10,15 @@
     "enhance": true,
     "postcss": true,
     "minified": true,
-    "urlCheck": true,
-    "packNpmManually": true,
-    "packNpmRelationList": [
-      { "packageJsonPath": "./package.json", "miniprogramNpmDistDir": "./miniprogram/" }
-    ]
+    "urlCheck": true
   },
-  "packOptions": { "ignore": [], "include": [] },
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
   "condition": {},
-  "editorSetting": { "tabIndent": "insertSpaces", "tabSize": 2 }
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
 }

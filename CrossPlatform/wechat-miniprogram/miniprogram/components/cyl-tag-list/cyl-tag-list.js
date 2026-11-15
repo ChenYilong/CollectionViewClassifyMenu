@@ -3,75 +3,51 @@
  * as `CYLTagListView(configuration:)`, the Flutter plugin and the React Native component (model.js). A Mini Program
  * cannot host the native iOS / Android view, so this component draws the list itself with the same rules.
  *
- * Properties: `configuration`, `animationSpeed` (1 = each animation's own), `animationLoops`.
- * Methods (through `selectComponent`): `playAll()`, `selectedItems()`, `contentHeight()`.
- * Events: `tagtap` {section, item, title, selected}, `selectionchange` {keys, items: [{section, item, title}]},
- * `contentheightchange` {height}.
+ * Properties: `configuration`, `animationSpeed` (0, the default, uses each section's `style.animationSpeed`; above 0
+ * overrides it, as `CYLTagListView.animationSpeed`), `animationLoops`.
+ * Methods (through `selectComponent`): `playAll()`, `playItems(keys)`, `selectedItems()`, `contentHeight()`,
+ * `cellMetrics()`.
+ * Events: `tagtap` {section, item, title, selected, sectionTitle}, `selectionchange` {keys, items: [{section, item,
+ * title}]}, `contentheightchange` {height}.
+ * Animated icons (Lottie, GIF) come from cyl-lottie-icon; PAG and Rive engines are not linked (animations.js).
  */
 const model = require('./model.js');
+const animations = require('./animations.js');
+const i18n = require('../../utils/i18n.js');
 
-/**
- * Stand-ins for SF Symbols (`system:<name>`), which a Mini Program does not have, as the Android example ships
- * stand-in drawables.
- */
-const SYSTEM_GLYPHS = {
-  house: '🏠', magnifyingglass: '🔍', message: '💬', person: '👤', star: '⭐', gearshape: '⚙️',
-  camera: '📷', 'music.note': '🎵', map: '🗺️', calendar: '📅',
-};
-
-/**
- * A tag's box: border-box, so the border lies inside the content insets as on iOS, and the width is the title, the
- * icon and the spacing plus the left and right insets (CYLTagButton.width(forTitle:iconSize:style:)).
- */
-function cellStyle(style, selected) {
-  const s = selected ? style.selected : style.normal;
-  const border = s.borderWidth != null ? s.borderWidth : 1;
-  const inset = style.contentInsets;
-  return [
-    `height: ${style.itemHeight}px`,
-    `padding: 0 ${Math.max(0, inset.right - border)}px 0 ${Math.max(0, inset.left - border)}px`,
-    `margin: 0 ${style.interitemSpacing}px ${style.lineSpacing}px 0`,
-    `font-size: ${style.fontSize}px`,
-    `border-radius: ${s.cornerRadius}px`,
-    `border-width: ${border}px`,
-    `border-color: ${s.borderColor}`,
-    `color: ${s.textColor}`,
-    `background-color: ${s.backgroundColor}`,
-  ].join('; ');
+/** The core's localized fold titles (CYLMenuExpand / CYLMenuCollapse) when the string tables have them. */
+function foldTitle(control, expanded) {
+  if (expanded && control.collapseTitle) return control.collapseTitle;
+  if (!expanded && control.title) return control.title;
+  if (typeof i18n.tc === 'function') {
+    const k = expanded ? 'CYLMenuCollapse' : 'CYLMenuExpand';
+    const text = i18n.tc(k);
+    if (text && text !== k) return text;
+  }
+  return model.foldTitle(expanded);
 }
 
-/**
- * The list's padding (sectionInsets; the last line's spacing is taken off the bottom), the negative trailing margin
- * that absorbs the last tag's spacing, the header (headerHeight, headerFont) and the icon-title spacing.
- */
-function layoutStyles(style) {
-  const i = style.sectionInsets;
-  return {
-    listStyle: `padding: ${i.top}px ${i.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${i.left}px`,
-    itemsStyle: `margin-right: -${style.interitemSpacing}px`,
-    headerStyle: `height: ${style.headerHeight}px; font-size: ${style.headerFontSize}px`,
-    iconSpacing: style.imageTitleSpacing,
-  };
+function pixelRatio() {
+  try {
+    return (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 2;
+  } catch (error) {
+    return 2;
+  }
 }
 
 Component({
   properties: {
     configuration: { type: Object, value: {}, observer: 'rebuild' },
-    animationSpeed: { type: Number, value: 1 },
+    animationSpeed: { type: Number, value: 0 },
     animationLoops: { type: Boolean, value: false },
   },
 
   data: {
     sections: [],
-    imageSize: 18,
     foldPosition: 'none',
     foldContent: 'title',
-    tailStyle: '',
-    listStyle: '',
-    itemsStyle: '',
-    headerStyle: '',
-    iconSpacing: 4,
-    glyphSize: 13,
+    foldColor: '#808080',
+    backgroundStyle: '',
   },
 
   lifetimes: {
@@ -90,7 +66,7 @@ Component({
 
   methods: {
     rebuild() {
-      this.model = model.normalize(this.data.configuration);
+      this.model = model.normalize(this.data.configuration, { pixelRatio: pixelRatio() });
       this.selection = this.model.selectedItems.slice();
       this.rows = null;
       this.expanded = this.expanded || {};
@@ -101,41 +77,52 @@ Component({
     render(remeasure) {
       const m = this.model;
       const sections = m.sections.map((section) => {
+        const style = section.style;
         const rows = this.rows && this.rows[section.index];
         const expanded = !!this.expanded[section.index];
         const fold = rows && !remeasure ? model.foldState(m, rows, expanded) : { canFold: false, visible: [] };
+        const layout = model.sectionLayout(style);
+        const tailStyle = model.tagLayout(style, { title: 'x', enabled: true }, 'normal', { kind: 'none' },
+          style.interitemSpacing, style.lineSpacing).cellStyle;
         return {
           index: section.index,
           title: section.title,
+          showsHeader: m.showsSectionHeaders && section.title !== '',
           canFold: fold.canFold,
           expanded,
-          foldTitle: model.foldTitle(expanded),
+          foldTitle: foldTitle(m.foldControl, expanded),
+          tailStyle,
+          ...layout,
           items: section.items.map((item, i) => {
             const selected = this.selection.includes(item.key);
-            const system = /^system:(.+)$/.exec(item.image);
+            const state = model.stateOf(item, selected);
+            const resolved = animations.resolve(item.animation);
+            const icon = model.iconContent(item, state, style, resolved);
+            const tag = model.tagLayout(style, item, state, icon, style.interitemSpacing, style.lineSpacing);
             return {
               key: item.key,
               title: item.title,
-              animation: item.animation,
-              glyph: system ? (SYSTEM_GLYPHS[system[1]] || '•') : '',
-              image: system ? '' : item.image,
+              animation: resolved ? item.animation : '',
+              resting: item.animationRestingProgress,
+              styleSpeed: style.animationSpeed,
+              iconKind: icon.kind,
+              iconSrc: icon.src,
+              glyph: icon.glyph,
               enabled: item.enabled,
               selected,
               hidden: fold.visible.length ? !fold.visible[i] : false,
-              style: cellStyle(m.style, selected),
+              sizers: model.sizerFonts(style, state),
+              ...tag,
             };
           }),
         };
       });
       this.setData({
         sections,
-        imageSize: m.style.imageSize,
-        // An emoji is about 1.35 times as wide as its font size; this keeps it inside the icon slot.
-        glyphSize: Math.floor(m.style.imageSize * 0.74),
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
-        tailStyle: cellStyle(m.style, false),
-        ...layoutStyles(m.style),
+        foldColor: m.foldControl.color || m.style.foldControlColor,
+        backgroundStyle: `background-color: ${m.style.backgroundColor}`,
       }, () => {
         if (remeasure) this.measure();
         else this.reportHeight();
@@ -144,10 +131,6 @@ Component({
 
     /** Measures the top of every item to find the rows, then folds the sections that need more rows. */
     measure() {
-      if (this.model.defaultVisibleRows <= 0) {
-        this.reportHeight();
-        return;
-      }
       const query = this.createSelectorQuery();
       this.model.sections.forEach((section) => {
         query.selectAll(`.cyl-item-s${section.index}`).boundingClientRect();
@@ -158,6 +141,10 @@ Component({
         const titles = results.pop() || [];
         const cells = results.flat();
         this.metrics = cells.map((cell, i) => ({ cell, title: titles[i] }));
+        if (this.model.defaultVisibleRows <= 0) {
+          this.reportHeight();
+          return;
+        }
         this.rows = results.map((rects) => model.rowsFromTops((rects || []).map((r) => r.top)));
         this.render(false);
       });
@@ -174,17 +161,20 @@ Component({
     onItemTap(event) {
       const k = event.currentTarget.dataset.key;
       const item = model.itemAt(this.model, k);
+      if (!item || !item.enabled) return;
       const result = model.tap(this.model, this.selection, k);
-      if (result.selected && item.animation) {
-        // A tapped tag plays its animated icon, as a tapped tab does (the core's handleTap).
-        const icon = this.selectComponent(`#lottie-${k}`);
-        if (icon) icon.play();
-      }
       if (result.changed) {
         this.selection = result.selectedItems;
         this.render(false);
       }
-      this.triggerEvent('tagtap', { section: item.section, item: item.item, title: item.title, selected: result.selected });
+      if (result.selected) {
+        // A tapped tag plays its animated icon, as a tapped tab does (the core's handleTap), after its state is set.
+        wx.nextTick(() => this.playItems([k]));
+      }
+      const section = this.model.sections[item.section];
+      this.triggerEvent('tagtap', {
+        section: item.section, item: item.item, title: item.title, selected: result.selected, sectionTitle: section.title,
+      });
       if (result.changed) this.triggerEvent('selectionchange', this.selectionPayload());
     },
 
@@ -230,13 +220,17 @@ Component({
       }));
     },
 
-    /** Restarts every animated icon on the list from progress 0 (Play all). */
-    playAll() {
-      this.model.sections.forEach((section) => section.items.forEach((item) => {
-        if (!item.animation) return;
-        const icon = this.selectComponent(`#lottie-${item.key}`);
+    /** Plays the animated icons of these items from progress 0 (`CYLTagButton.playAnimation()`). */
+    playItems(keys) {
+      (keys || []).forEach((k) => {
+        const icon = this.selectComponent(`#anim-${k}`);
         if (icon) icon.play();
-      }));
+      });
+    },
+
+    /** Restarts every animated icon on the list from progress 0 (Play all, `playAllAnimations()`). */
+    playAll() {
+      this.playItems(this.model.sections.flatMap((section) => section.items.map((item) => item.key)));
     },
   },
 });

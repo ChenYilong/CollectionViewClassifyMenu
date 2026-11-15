@@ -412,3 +412,36 @@ Program) show the same screens with the same data and look the same as iOS, whic
   then, on the new branch, start the WeChat Mini Program development from whatever the docs say about it, in the
   cross-platform folder (create it when missing), using the WeChat DevTools skill.
   Then (shell): "running on the CYLTabBarController AppID wx5e29c9d33906f074 continue".
+
+### DONE (2026-11-15): the Mini Program example is a 1:1 port of the iOS example
+
+- **Prompt (verbatim):** "小程序example层要一比一复刻 continue" (EN: the Mini Program example layer must be a 1:1 copy).
+- **Structure:** the iOS example's root tab bar (`makeRootTabBarController`: 场景一：评价筛选, 场景二：搜索分类, the orange
+  plus button opening 查询筛选, 样式, 动效) in CYLTabBarController's `cyl-tab-bar`, and one page per iOS screen (20 pages; the
+  table in `CrossPlatform/wechat-miniprogram/README.md`). Every string is the iOS example's (`CYLMenuExample.bundle`) or
+  the core's (`CYLClassifyMenu.strings`) through `t()` / `tc()`, in Simplified Chinese, Traditional Chinese and English.
+- **Data:** the shared `cyl_places.sqlite` (places, the reviews and their keywords), `data.json` (the classify menu), the
+  iOS bundle's search discover JSON, animation resources and configuration file, each exported by a script with `--check`.
+  The statements are the iOS ones (`CYLMenuLinkageViewController.query`, `CYLReviewQuery`), shown with their values
+  (`displayString()`); the plus-menu-filtered case gives the iOS screenshot's row (川菜 · 深圳 ★3.5 ¥226).
+- **Components:** `cyl-tag-list` reads the core's style keys and defaults (`CYLMenuStyle`, appearances per state);
+  `cyl-tag-cloud` and `cyl-tag-image` port the core's android-tagview list and image tag views; animated icons use
+  CYLTabBarController's `cyl-lottie-miniprogram` (its lottie-miniprogram fork: the npm 1.0.12 loaded the base64 image
+  assets of the "image assets and placeholders" Lottie files but never drew them) and `<image>` for GIF.
+- **Verified in WeChat DevTools** (base library 3.18.0, 2026-11-15): all 20 pages open with no console error; real taps
+  on the scenario rows, 重置, the filter button, a filter tag and 确认筛选 (20 places in 广州); the 动效 tab matches
+  `assets/ios-animation-playback-controls.png` section for section. `npm test`: 103 tests. Package: about 1.2 MB of the
+  2 MB main package. A `*` selector in one WXSS file stopped every page from compiling (fixed; WXSS has no `*`).
+- **Deviations a Mini Program imposes:** drawn stand-ins for SF Symbols; no SQLite (the statements run on exported rows);
+  custom navigation bars where iOS has bar buttons or a title view (the classify filter button and 重置, the reviews
+  segmented control, the search fields), placed before WeChat's capsule menu; no PAG or Rive engine (about 0.8 and
+  0.7 MB, beyond the main package), so those tags degrade as iOS does without the engines; GIFs ignore the speed slider;
+  no VoiceOver announcements or custom actions; UIMenu and three-field alerts become action sheets or page overlays.
+  The automation of WeChat DevTools cannot tap inside custom components, so taps on tags were checked through the
+  components' handlers and the unit tests.
+  <img src="assets/miniprogram-1to1-scenarios.png" width="240" alt="Mini Program: 查询筛选, the plus button's page">
+  <img src="assets/miniprogram-1to1-menu-linkage.png" width="240" alt="Mini Program: 菜单选择 · 数据库联动, 20 places in 广州">
+  <img src="assets/miniprogram-1to1-animations.png" width="240" alt="Mini Program: 动效, the iOS animation sections">
+
+- **Still TODO:** a phone preview; pixel comparisons with iOS screenshots on a Mac; the `cyl-tag-cloud` property
+  warnings (null for unset options).

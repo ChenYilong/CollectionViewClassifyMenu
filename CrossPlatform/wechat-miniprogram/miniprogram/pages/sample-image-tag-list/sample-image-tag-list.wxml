@@ -1,0 +1,9 @@
+<view class="table">
+  <view wx:for="{{rows}}" wx:key="row" class="cell">
+    <cyl-tag-image id="tag-image-{{item.row}}" style="width: 100vw; height: 100vw;" image="{{item.picture.src}}"
+                   image-label="{{item.picture.label}}" image-hint="{{hint}}" tag-groups="{{item.groups}}"
+                   data-row="{{item.row}}" bind:imagetap="onImageTap" bind:circletap="onCircleTap"
+                   bind:tagtap="onTagTap" bind:longpress="onLongPress" />
+  </view>
+  <cyl-sample-toast id="toast" />
+</view>

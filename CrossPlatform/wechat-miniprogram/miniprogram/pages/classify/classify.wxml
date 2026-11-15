@@ -1,38 +1,79 @@
-<view class="page">
-  <view class="toolbar">
-    <text class="toolbar-title">Classify menu</text>
-    <view class="toolbar-actions">
-      <view id="resetConditions" class="icon-button" bindtap="resetConditions" aria-role="button" aria-label="重置筛选条件">↺</view>
-      <view id="openFilter" class="icon-button {{filtered ? 'icon-active' : ''}}" bindtap="openFilter" aria-role="button" aria-label="筛选">⛉</view>
+<view class="nav" style="padding-top: {{nav.statusBar}}px;">
+  <view class="nav-bar" style="height: {{nav.height}}px;">
+    <view id="openFilter" class="nav-filter" style="left: {{nav.sideInset}}px;" bindtap="showFilter"
+          aria-role="button" aria-label="{{filterLabel}}" aria-value="{{filterValue}}">
+      <image class="nav-filter-image" mode="aspectFit"
+             src="{{filterModified ? '/images/core/cyl_filter_modified.png' : '/images/core/cyl_filter_normal.png'}}" />
     </view>
+    <view class="nav-title" style="left: {{nav.sideInset + 52}}px; right: {{nav.rightInset + 76}}px;"><text class="nav-title-text">{{title}}</text></view>
+    <view id="resetConditions" class="nav-reset" style="right: {{nav.rightInset}}px;" hover-class="nav-reset-hover"
+          bindtap="resetConditions" aria-role="button">{{resetTitle}}</view>
+  </view>
+</view>
+
+<scroll-view scroll-y class="menu" style="top: {{nav.statusBar + nav.height}}px;">
+  <view class="hint">
+    <text class="hint-line">{{hint[0]}}</text>
+    <text class="hint-line">{{hint[1]}}</text>
   </view>
 
-  <scroll-view scroll-y class="menu">
-    <cyl-tag-list id="classify" configuration="{{configuration}}" bind:tagtap="onTagTap" />
-  </scroll-view>
-
-  <view class="summary">
-    <text class="summary-text" id="placesSummary">{{summary}}</text>
-    <text class="sql" user-select>{{sql}}</text>
-  </view>
-
-  <view wx:if="{{!places.length}}" class="empty" id="noPlaces">没有符合条件的地点，换个条件试试</view>
-  <scroll-view scroll-y class="places">
-    <view wx:for="{{places}}" wx:key="id" class="place">
-      <view class="place-main">
-        <text class="place-name">{{item.name}}</text>
-        <text class="place-region">{{item.region}}</text>
+  <view class="sections">
+    <view wx:for="{{sections}}" wx:for-item="section" wx:key="index" class="section">
+      <view class="header">
+        <view class="header-title" aria-role="heading">
+          <image class="header-image" src="/images/core/home_btn_cosmetic.png" mode="aspectFit" />
+          <text>{{section.title}}</text>
+        </view>
+        <view wx:if="{{section.canFold}}" class="more" data-section="{{section.index}}" bindtap="onMoreTap"
+              aria-role="button" aria-label="{{section.moreTitle}}" aria-describedby="{{section.title}}">
+          <text>{{section.moreTitle}}</text>
+          <image class="more-image" mode="aspectFit"
+                 src="{{section.expanded ? '/images/core/home_btn_more_selected.png' : '/images/core/home_btn_more_normal.png'}}" />
+        </view>
+        <view class="header-separator" />
       </view>
-      <text class="place-score">★ {{item.ratingText}} · ¥{{item.price}}</text>
+      <view class="cells">
+        <block wx:for="{{section.items}}" wx:key="key">
+          <view wx:if="{{!item.hidden}}" class="cell cell-s{{section.index}} {{item.selected ? 'cell-selected' : ''}} {{item.picture ? 'cell-picture' : ''}}"
+                hover-class="cell-highlighted" data-key="{{item.key}}" bindtap="onCellTap"
+                aria-role="button" aria-label="{{item.title}}" aria-selected="{{item.selected}}">
+            <image wx:if="{{item.picture}}" class="cell-image" src="/images/core/home_btn_shrink.png" mode="aspectFit" />
+            <text class="cell-title">{{item.title}}</text>
+          </view>
+        </block>
+      </view>
     </view>
-  </scroll-view>
+  </view>
 
-  <view wx:if="{{filterVisible}}" class="mask" bindtap="closeFilter" catchtouchmove="noop">
-    <view class="sheet" catchtap="noop">
-      <scroll-view scroll-y class="sheet-list">
-        <cyl-tag-list id="filterList" configuration="{{filterConfiguration}}" bind:selectionchange="onFilterChange" />
-      </scroll-view>
-      <button class="confirm" id="confirmFilter" bindtap="confirmFilter">确定</button>
+  <view class="footer">
+    <text class="status" user-select>{{status}}</text>
+    <view class="results">
+      <view wx:if="{{empty}}" class="result"><text class="result-title">{{empty}}</text></view>
+      <view wx:for="{{rows}}" wx:key="id" class="result" aria-label="{{item.title}} {{item.detail}}">
+        <text class="result-title">{{item.title}}</text>
+        <text class="result-detail">{{item.detail}}</text>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<view wx:if="{{panelVisible}}" class="panel-root" catchtouchmove="noop">
+  <view class="dim {{panelShown ? 'dim-shown' : ''}}" />
+  <view class="panel {{panelShown ? 'panel-shown' : ''}}" style="padding-top: {{nav.statusBar}}px;">
+    <scroll-view scroll-y class="panel-list">
+      <view wx:for="{{panelSections}}" wx:for-item="section" wx:key="index" class="panel-section">
+        <view class="panel-header"><text>{{section.title}}</text></view>
+        <view class="panel-cells">
+          <view wx:for="{{section.items}}" wx:key="key" id="filter-{{item.key}}"
+                class="panel-cell {{item.selected ? 'panel-cell-selected' : ''}}"
+                data-section="{{section.index}}" data-item="{{index}}" bindtap="onPanelTap"
+                aria-role="button" aria-label="{{item.title}}" aria-selected="{{item.selected}}">{{item.title}}</view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="panel-buttons">
+      <view id="filterReset" class="panel-button" hover-class="panel-button-hover" bindtap="resetFilter">{{resetPanel}}</view>
+      <view id="confirmFilter" class="panel-button panel-button-ok" hover-class="panel-button-hover" bindtap="confirmFilter">{{confirmPanel}}</view>
     </view>
   </view>
 </view>

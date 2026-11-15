@@ -1,11 +1,19 @@
-.page { display: flex; flex-direction: column; height: 100vh; background: #fff; }
-.toolbar { padding: 8px 16px; }
-.toolbar-title { font-size: 20px; font-weight: 600; }
-.controls { padding: 0 16px; }
-.row { display: flex; align-items: center; min-height: 44px; }
-.label { width: 48px; font-size: 15px; color: #333; }
-.slider { flex: 1; margin: 0 12px; }
-.value { width: 44px; text-align: right; font-size: 15px; color: #333; }
-.play { margin-left: auto; background: #2AB9A0; color: #fff; }
-.list { flex: 1; min-height: 0; padding-bottom: 24px; box-sizing: border-box; }
-.last-tap { padding: 8px 16px; font-size: 13px; color: #888; border-top: 1px solid #eee; }
+/* The status label (footnote, secondary, 8 pt from the top, 16 pt insets), the controls (two rows 8 pt apart:
+   倍速 + slider + monospaced value; 循环播放, the switch and the filled Play all button), then the tags 4 pt below. */
+.page { display: flex; flex-direction: column; height: 100vh; background: #ffffff; }
+.status { flex: none; margin: 8px 16px 0; font-size: 13px; line-height: 18px; color: var(--ios-secondary-label); }
+.controls { flex: none; margin: 8px 16px 0; }
+.row { display: flex; align-items: center; min-height: 36px; }
+.row + .row { margin-top: 8px; }
+.caption { flex: none; font-size: 15px; color: var(--ios-label); }
+.slider { flex: 1; margin: 0 10px 0 20px; }
+.speed-value { flex: none; min-width: 44px; text-align: right; font-size: 15px; font-variant-numeric: tabular-nums; }
+.spacer { flex: 1; }
+.play-all {
+  display: flex; align-items: center; margin-left: 10px; padding: 7px 14px; border-radius: 18px;
+  background: var(--ios-blue); color: #ffffff; font-size: 17px; line-height: 22px;
+}
+.play-all-hover { opacity: 0.7; }
+.play-icon { width: 17px; height: 17px; margin-right: 6px; }
+.list { flex: 1; height: 0; margin-top: 4px; }
+.tab-bar-space { height: 96px; }

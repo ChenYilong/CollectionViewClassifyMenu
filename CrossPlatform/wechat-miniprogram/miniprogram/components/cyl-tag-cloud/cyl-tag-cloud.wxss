@@ -1,0 +1,34 @@
+/* The core's CYLTagListView with CYLTagButton tags; the numbers (insets, spacing, colors, radii) are set inline from
+   the style (model.js). A tag: [delete indicator (leading)] [icon] [title] [delete indicator (trailing)], centered. */
+:host { display: block; }
+.cyl-tc { overflow: hidden; box-sizing: border-box; font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif; }
+.cyl-tc-header { display: flex; align-items: center; box-sizing: border-box; }
+.cyl-tc-header-indicator { flex: none; margin-right: 8px; }
+.cyl-tc-header-title { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cyl-tc-items { display: flex; flex-wrap: wrap; align-items: center; }
+.cyl-tc-item {
+  position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box; max-width: 100%; white-space: nowrap; background-size: 100% 100%;
+  background-repeat: no-repeat; transition: transform 0.15s;
+}
+.cyl-tc-disabled { pointer-events: auto; }
+.cyl-tc-title { position: relative; min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; line-height: 1.1934; }
+.cyl-tc-icon { position: relative; flex: none; }
+.cyl-tc-badge {
+  position: relative; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  color: #FFFFFF; font-weight: bold; line-height: 1;
+}
+.cyl-tc-delete { position: relative; flex: none; align-self: stretch; display: flex; align-items: center; }
+.cyl-tc-delete-text { line-height: 1.1934; }
+.cyl-tc-cross { position: relative; align-self: stretch; }
+.cyl-tc-cross-line { position: absolute; left: 50%; top: 50%; }
+.cyl-tc-cross-a { transform: translate(-50%, -50%) rotate(45deg); }
+.cyl-tc-cross-b { transform: translate(-50%, -50%) rotate(-45deg); }
+.cyl-tc-ripple {
+  position: absolute; border-radius: 50%; pointer-events: none; opacity: 0;
+  animation-name: cyl-tc-ripple; animation-timing-function: ease-out; animation-fill-mode: forwards;
+}
+@keyframes cyl-tc-ripple {
+  from { transform: scale(0.05); opacity: 1; }
+  to { transform: scale(1); opacity: 0; }
+}

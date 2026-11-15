@@ -1,0 +1,12 @@
+/* CYLAndroidSample.toast: subheadline white text, centered, on white 0.2 at 0.85, radius 18, padding 9 × 18, at
+   most the view's width minus 48, 48 pt above the safe area. */
+.cyl-toast-wrap {
+  position: fixed; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom) + 48px); z-index: 1000;
+  display: flex; justify-content: center; pointer-events: none;
+}
+.cyl-toast {
+  max-width: calc(100% - 48px); box-sizing: border-box; padding: 9px 18px; border-radius: 18px;
+  background: rgba(51, 51, 51, 0.85); color: #FFFFFF; font-size: 15px; line-height: 20px; text-align: center;
+  white-space: pre-wrap; word-break: break-word; opacity: 1; transition: opacity 0.25s;
+}
+.cyl-toast-fading { opacity: 0; }

@@ -18,7 +18,7 @@ page {
 /* A page whose content is an inset grouped table. */
 .ios-grouped { min-height: 100vh; background: var(--ios-grouped-background); padding-bottom: 96px; box-sizing: border-box; }
 .ios-section { margin: 0 16px; }
-.ios-section-header { padding: 22px 20px 7px; font-size: 13px; color: var(--ios-secondary-label); text-transform: uppercase; }
+.ios-section-header { padding: 22px 20px 7px; font-size: 13px; color: var(--ios-secondary-label); }
 .ios-section-footer { padding: 7px 20px 0; font-size: 13px; line-height: 1.38; color: var(--ios-secondary-label); }
 .ios-group { background: var(--ios-cell-background); border-radius: 10px; overflow: hidden; }
 .ios-cell { position: relative; display: flex; align-items: center; min-height: 44px; padding: 0 16px; box-sizing: border-box; }

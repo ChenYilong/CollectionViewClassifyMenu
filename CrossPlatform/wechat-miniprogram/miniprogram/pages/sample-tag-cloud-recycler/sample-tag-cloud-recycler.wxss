@@ -1,0 +1,10 @@
+/* A plain UITableView: default cells (17 pt text, 44 pt high, 16 pt margins) with separators inset 16 pt. */
+page { background: #FFFFFF; }
+.table { background: #FFFFFF; padding-bottom: env(safe-area-inset-bottom); }
+.cell { position: relative; }
+.cell::after {
+  content: ''; position: absolute; left: 16px; right: 0; bottom: 0; height: 1px; transform: scaleY(0.5);
+  background: rgba(60, 60, 67, 0.29);
+}
+.text-cell { display: flex; align-items: center; min-height: 44px; padding: 0 16px; }
+.text { font-size: 17px; line-height: 22px; color: #000000; }

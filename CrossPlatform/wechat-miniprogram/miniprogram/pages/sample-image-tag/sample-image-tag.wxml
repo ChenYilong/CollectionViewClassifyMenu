@@ -1,1 +1,13 @@
-<view class="placeholder">{{title}}</view>
+<view class="page">
+  <cyl-tag-image id="tag-image" class="picture" style="width: 100vw; height: 100vw;" image="{{picture.src}}" image-label="{{picture.label}}"
+                 image-hint="{{hint}}" tag-groups="{{groups}}"
+                 bind:imagetap="onImageTap" bind:circletap="onCircleTap" bind:tagtap="onTagTap"
+                 bind:longpress="onLongPress" />
+  <view class="buttons">
+    <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{pink}};"
+          id="sample.createTags" bindtap="openEdit" aria-role="button" aria-label="{{createTitle}}">{{createTitle}}</view>
+    <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{pink}};"
+          id="sample.tagList" bindtap="openList" aria-role="button" aria-label="{{listTitle}}">{{listTitle}}</view>
+  </view>
+  <cyl-sample-toast id="toast" />
+</view>

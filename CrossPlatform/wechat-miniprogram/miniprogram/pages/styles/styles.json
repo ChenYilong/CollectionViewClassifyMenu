@@ -1,4 +1,7 @@
 {
-  "navigationBarTitleText": "样式",
-  "usingComponents": {}
+  "navigationBarTitleText": "标签样式",
+  "disableScroll": true,
+  "usingComponents": {
+    "cyl-tag-list": "../../components/cyl-tag-list/cyl-tag-list"
+  }
 }
