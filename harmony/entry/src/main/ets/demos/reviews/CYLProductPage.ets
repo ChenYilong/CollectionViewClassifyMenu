@@ -1,3 +1,5 @@
+import { cylFormat } from '../samples/SampleSupport';
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * 场景一（商品页）：只展示两行评价关键词的预览，点击进入评价页 (iOS CYLProductViewController, the root of the first tab).
  */
@@ -42,7 +44,7 @@ export struct CYLProductPage {
         this.previewHeight = height;
       }
     };
-    view.menuDataSource = new CYLExampleMenuSource([new CYLExampleMenuSection('关键词', items)]);
+    view.menuDataSource = new CYLExampleMenuSource([new CYLExampleMenuSection(CYLExampleLocalizedString('关键词'), items)]);
     view.reloadMenuData();
   }
 
@@ -54,7 +56,7 @@ export struct CYLProductPage {
 
   build() {
     Column() {
-      CYLDemoBar({ title: '宝贝详情', showsBack: false })
+      CYLDemoBar({ title: CYLExampleLocalizedString('宝贝详情'), showsBack: false })
       Scroll() {
         Column({ space: 1 }) {
           Column({ space: 8 }) {
@@ -68,12 +70,12 @@ export struct CYLProductPage {
           .backgroundColor('#FFFFFF')
 
           Column({ space: 6 }) {
-            Text(`宝贝评价(${this.store.reviews.length})`).fontSize(15).fontColor('#000000')
+            Text(cylFormat(CYLExampleLocalizedString('宝贝评价(%lu)'), this.store.reviews.length)).fontSize(15).fontColor('#000000')
             CYLTagListView({ tagList: this.previewView }).height(this.previewHeight).id('productPreview')
             ForEach(this.store.reviews.slice(0, 2), (review: CYLReview) => {
               Text(`${review.user}\n${review.text}`).fontSize(13).fontColor('#993C3C43')
             }, (review: CYLReview) => review.user)
-            Button('查看更多评价', { type: ButtonType.Normal })
+            Button(CYLExampleLocalizedString('查看更多评价'), { type: ButtonType.Normal })
               .fontSize(17)
               .fontColor('#007AFF')
               .backgroundColor(Color.Transparent)

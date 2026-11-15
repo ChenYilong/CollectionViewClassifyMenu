@@ -96,8 +96,8 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 
 | # | Check | Status |
 | --- | --- | --- |
-| E1 | Core strings in `en`, `zh-Hans` (`zh_CN`) and `zh-Hant` (`zh_TW` / `zh_HK`), generated from the iOS core bundle | TODO |
-| E2 | Example strings in the same three languages, from the iOS example bundle; no user-facing literal in `.ets` code | TODO |
+| E1 | Core strings in `en`, `zh-Hans` (`zh_CN`) and `zh-Hant` (`zh_TW` / `zh_HK`), generated from the iOS core bundle | DONE: `CYLCoreStrings.ets` (en, zh-Hans, zh-Hant) by `export-core-strings.py`, `--check` OK |
+| E2 | Example strings in the same three languages, from the iOS example bundle; no user-facing literal in `.ets` code | DONE: `CYLExampleStrings.ets` by `export-example-strings.py` (259 keys, en and zh-Hant; zh-Hans is the key), looked up by `CYLExampleLocalizedString`; ~220 literals and 18 templates now go through it (templates as the iOS `%@` / `%lu` keys with `cylFormat`). Left in Chinese, as on iOS: sample data (reviews, names, places, search tags, `地区过滤` / `菜品过滤` types). Titles that are also ids or map keys (root tabs, search categories, industries) stay keys and are localized where shown, so ids and the UI tests do not depend on the language |
 | E3 | The example follows the system language on the emulator (screenshot in English) | TODO |
 
 ### F. Accessibility and appearance (2)
@@ -118,16 +118,10 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 
 - 2026-11-16: standard created. 2 / 44 = 4.5 / 100.
 - 2026-11-16: A3 (test HAP builds), A4 (ArkTS warnings 92 → 1, the documented API 12 fallback). 4 / 44 = 9.1 / 100.
+- 2026-11-16: E1 (already done by the parity work), E2 (example localization). 6 / 44 = 13.6 / 100.
 
 ## Next steps (resume here)
 
-- E2, in progress (2026-11-16): the example has 410 distinct Chinese literals (scan: `py -3 C:\w\scan_han.py .`);
-  about 200 are sample data (reviews, names, places), which iOS also leaves untranslated. Plan: add
-  `harmony/scripts/export-example-strings.py`, which generates `CYLExampleStrings.ets` from
-  `Example/CYLMenuExample/CYLMenuExample.bundle/*.lproj/Localizable.strings` (iOS keys are the Chinese text; formats
-  use `%@` / `%ld`). Then add `CYLExampleLocalizedString(key)` (language matching as in `CYLMenuResources`), wrap
-  every key literal, and turn the template strings into the iOS format keys through `cylFormat`. Keep `.id()` values
-  language-independent, because the UI tests depend on them.
 - When the emulator is up: `harmony/scripts/ui-test.sh` (set `DEVECO` to the Windows path), then B1–B22
   screenshots, C, D, F2.
 - D5 (SVGA): no ohpm SVGA package exists (`@ohos/svgaplayer` and others return 404). It needs an ArkTS player

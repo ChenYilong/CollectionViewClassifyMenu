@@ -1,3 +1,5 @@
+import { cylFormat } from '../samples/SampleSupport';
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * 场景二（搜索页）：内嵌的分类 TabBar（位于底部）切换「找人/动态/八卦/职位」，每个 Tab 是一个标签页；职位页左侧是职位分类，
  * 分组右侧是宿主提供的行业选择按钮 (iOS CYLSearchCategoryViewController and CYLSearchCategoryPageViewController).
@@ -41,7 +43,7 @@ export const JOB_KEYWORDS: Map<string, string[]> = new Map<string, string[]>([
 ]);
 
 export function searchSections(category: CYLSearchCategory): CYLExampleMenuSection[] {
-  const s = (title: string, titles: string[]) => CYLExampleMenuSection.withTitles(title, titles);
+  const s = (title: string, titles: string[]) => CYLExampleMenuSection.withTitles(CYLExampleLocalizedString(title), titles);
   switch (category) {
     case CYLSearchCategory.people:
       return [s('认识同行', ['百度研发', '腾讯工程师', '搜狗开发', '腾讯开发', '搜狗研究员']),
@@ -108,7 +110,7 @@ export struct CYLSearchCategoryPage {
     let sections: CYLExampleMenuSection[];
     if (category === CYLSearchCategory.jobs) {
       const name = JOB_CATEGORIES[this.jobCategoryIndex];
-      sections = [CYLExampleMenuSection.withTitles('热搜职位关键词:', JOB_KEYWORDS.get(name) ?? [])];
+      sections = [CYLExampleMenuSection.withTitles(CYLExampleLocalizedString('热搜职位关键词:'), JOB_KEYWORDS.get(name) ?? [])];
     } else {
       sections = searchSections(category);
     }
@@ -127,7 +129,7 @@ export struct CYLSearchCategoryPage {
   searchBar() {
     Row({ space: 6 }) {
       Image($r('app.media.a_magnifyingglass')).width(15).height(15)
-      TextInput({ placeholder: PLACEHOLDERS[this.category], text: this.searchText })
+      TextInput({ placeholder: CYLExampleLocalizedString(PLACEHOLDERS[this.category]), text: this.searchText })
         .fontSize(16)
         .placeholderColor('#993C3C43')
         .backgroundColor(Color.Transparent)
@@ -147,15 +149,15 @@ export struct CYLSearchCategoryPage {
 
   @Builder
   industryButton() {
-    Text(`行业: ${this.industry} ▾`)
+    Text(cylFormat(CYLExampleLocalizedString('行业: %@ ▾'), CYLExampleLocalizedString(this.industry)))
       .fontSize(13)
       .fontColor('#007AFF')
       .height(32)
       .id('industryButton')
-      .accessibilityText(`行业 ${this.industry}`)
-      .accessibilityDescription('选择行业')
+      .accessibilityText(cylFormat(CYLExampleLocalizedString('行业 %@'), CYLExampleLocalizedString(this.industry)))
+      .accessibilityDescription(CYLExampleLocalizedString('选择行业'))
       .bindMenu(INDUSTRIES.map((industry: string): MenuElement => ({
-        value: (industry === this.industry ? '✓ ' : '') + industry,
+        value: (industry === this.industry ? '✓ ' : '') + CYLExampleLocalizedString(industry),
         action: () => {
           this.industry = industry;
         }
@@ -170,7 +172,7 @@ export struct CYLSearchCategoryPage {
         List() {
           ForEach(JOB_CATEGORIES, (name: string, row: number) => {
             ListItem() {
-              Text(name)
+              Text(CYLExampleLocalizedString(name))
                 .fontSize(15)
                 .maxLines(2)
                 .minFontSize(10.5)
@@ -211,7 +213,7 @@ export struct CYLSearchCategoryPage {
         .width(24)
         .height(24)
         .fillColor(this.category === index ? '#007AFF' : '#8E8E93')
-      Text(TITLES[index]).fontSize(10).fontColor(this.category === index ? '#007AFF' : '#8E8E93')
+      Text(CYLExampleLocalizedString(TITLES[index])).fontSize(10).fontColor(this.category === index ? '#007AFF' : '#8E8E93')
     }
     .id(`searchTab-${TITLES[index]}`)
   }
@@ -225,7 +227,7 @@ export struct CYLSearchCategoryPage {
           .fontColor('#007AFF')
           .width(36)
           .textAlign(TextAlign.Center)
-          .accessibilityText('返回')
+          .accessibilityText(CYLExampleLocalizedString('返回'))
           .id('CYLSearchCategoryBack')
           .onClick(() => CYLDemoNav.pop())
         this.searchBar()

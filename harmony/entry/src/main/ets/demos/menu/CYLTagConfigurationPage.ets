@@ -1,3 +1,5 @@
+import { cylFormat } from '../samples/SampleSupport';
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLTagConfigurationDemoViewController` (配置初始化): the two ways to create a tag list (after CYLTabBarController's
@@ -35,7 +37,7 @@ function caption(text: string, id: string) {
 export struct CYLTagConfigurationPage {
   @State fileHeight: number = 0;
   @State mapHeight: number = 0;
-  @State event: string = '动效引擎：CYLTabBarItemAnimationFactory 已链接';
+  @State event: string = CYLExampleLocalizedString('动效引擎：CYLTabBarItemAnimationFactory 已链接');
   private fileTagList?: CYLTagListState;
   private configurationError: string = '';
   private mapTagList: CYLTagListState = CYLTagListState.withConfiguration(mapConfiguration(CYLUIContext.hostContext()));
@@ -53,7 +55,7 @@ export struct CYLTagConfigurationPage {
       }
       list.menuDelegate = {
         menuDidSelectItem: (menu: Object, indexPath: CYLIndexPath) => {
-          this.event = `点击「${list.menuDataSource?.menuTitleForItem(indexPath) ?? ''}」`;
+          this.event = cylFormat(CYLExampleLocalizedString('点击「%@」'), list.menuDataSource?.menuTitleForItem(indexPath) ?? '');
         },
         menuDidChangeContentHeight: (menu: Object, height: number) => {
           if (index === 0) {
@@ -68,16 +70,16 @@ export struct CYLTagConfigurationPage {
 
   build() {
     Column() {
-      CYLDemoBar({ title: '配置初始化', showsBack: true })
+      CYLDemoBar({ title: CYLExampleLocalizedString('配置初始化'), showsBack: true })
       Scroll() {
         Column({ space: 8 }) {
-          caption(`配置文件初始化：${CONFIGURATION_FILE_PATH}`, 'configurationFileTitle')
+          caption(cylFormat(CYLExampleLocalizedString('配置文件初始化：%@'), CONFIGURATION_FILE_PATH), 'configurationFileTitle')
           if (this.fileTagList !== undefined) {
             CYLTagListView({ tagList: this.fileTagList }).height(this.fileHeight).id('configurationFileList')
           } else {
             caption(this.configurationError, 'configurationError')
           }
-          caption('字典（map）初始化：-initWithConfiguration:', 'configurationMapTitle')
+          caption(CYLExampleLocalizedString('字典（map）初始化：-initWithConfiguration:'), 'configurationMapTitle')
           CYLTagListView({ tagList: this.mapTagList }).height(this.mapHeight).id('configurationMapList')
           caption(this.event, 'configurationEvent')
         }
