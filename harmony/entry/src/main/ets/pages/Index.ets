@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { common } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarController } from 'cyltabbar';
@@ -17,28 +18,51 @@ const FILTER = 'menu.filter';
 
 function key(p: CYLIndexPath): string {
   return `${p.section}-${p.item}`;
+=======
+import { CYLDemoNav } from '../demos/DemoNav';
+import { SHELL_ROUTES } from '../demos/shell/ShellRoutes';
+import { MENU_ROUTES } from '../demos/menu/MenuRoutes';
+import { SAMPLE_ROUTES } from '../demos/samples/SampleRoutes';
+
+@Builder
+function missingBuilder(param: Object) {
+  Text('').fontColor('#8E8E93')
+>>>>>>> c69f327 (feat(harmony): the iOS example's screens on HarmonyOS (score 98.4))
 }
 
-function path(k: string): CYLIndexPath {
-  const parts = k.split('-');
-  return { section: Number(parts[0]), item: Number(parts[1]) };
+/** The builder of a route, from any group's map. */
+function routeBuilder(name: string): WrappedBuilder<[Object]> {
+  return SHELL_ROUTES.get(name) ?? MENU_ROUTES.get(name) ?? SAMPLE_ROUTES.get(name) ?? wrapBuilder(missingBuilder);
 }
 
-function selectedJSON(keys: string[]): CYLIndexPath[] {
-  return keys.map(path);
-}
-
-interface ItemJSON {
+interface RootTab {
   title: string;
-  exclusive?: boolean;
-  animation?: string;
+  route: string;
+  image: Resource;
+  selectedImage: Resource;
 }
 
-interface SectionJSON {
-  title: string;
-  items: ItemJSON[];
-}
+/**
+ * The app's root tab bar (iOS CYLExampleAppDelegate.makeRootTabBarController): 场景一：评价筛选, 场景二：搜索分类,
+ * the plus button in the middle (the filter scenarios, CYLQueryScenariosViewController), 样式 and 动效. Every tab's root
+ * screen pushes onto one Navigation, whose pushed screens cover the tab bar (hidesBottomBarWhenPushed).
+ */
+const TABS: RootTab[] = [
+  { title: '场景一：评价筛选', route: 'CYLProductViewController', image: $r('app.media.a_cart'),
+    selectedImage: $r('app.media.a_cart_fill') },
+  { title: '场景二：搜索分类', route: 'CYLSearchHomeViewController', image: $r('app.media.a_magnifyingglass_circle'),
+    selectedImage: $r('app.media.a_magnifyingglass_circle_fill') },
+  // The plus button (CYLExamplePlusButton): an image only, its title read by the screen reader.
+  { title: '查询筛选', route: 'CYLQueryScenariosViewController', image: $r('app.media.a_plus_circle_fill'),
+    selectedImage: $r('app.media.a_plus_circle_fill') },
+  { title: '样式', route: 'CYLTagStyleDemoViewController', image: $r('app.media.a_paintbrush'),
+    selectedImage: $r('app.media.a_paintbrush_fill') },
+  { title: '动效', route: 'CYLTagAnimationDemoViewController', image: $r('app.media.a_sparkles'),
+    selectedImage: $r('app.media.a_sparkles_selected') }
+];
+const PLUS_INDEX: number = 2;
 
+<<<<<<< HEAD
 interface CornerJSON {
   cornerRadius: number;
 }
@@ -195,88 +219,56 @@ struct TagsPage {
       ]
     };
     return JSON.stringify(config);
-  }
-
-  private speedText(): string {
-    return `${this.speed}×`;
-  }
-
-  build() {
-    Column() {
-      Text($r('app.string.animated_icons')).fontSize(24).fontWeight(FontWeight.Bold).padding(16).width('100%')
-        .accessibilityRole(AccessibilityRoleType.TITLE_BAR)
-      Row() {
-        Text($r('app.string.speed')).accessibilityLevel('no')
-        Slider({ value: this.speed, min: 0.25, max: 4, step: 0.25 })
-          .layoutWeight(1)
-          .id('speedSlider')
-          .accessibilityText($r('app.string.speed'))
-          .accessibilityDescription(getContext(this).resourceManager.getStringByNameSync('speed_value')
-            .replace('%s', `${this.speed}`))
-          .onChange((value: number) => this.speed = Math.round(value * 4) / 4)
-        Text(this.speedText()).id('speedValue').accessibilityLevel('no')
-      }.width('100%').padding({ left: 16, right: 16 })
-      Row({ space: 8 }) {
-        Text($r('app.string.loop')).layoutWeight(1).accessibilityLevel('no')
-        Toggle({ type: ToggleType.Switch, isOn: this.loops })
-          .id('loopSwitch')
-          .accessibilityText($r('app.string.loop'))
-          .onChange((isOn: boolean) => {
-            this.loops = isOn;
-            if (isOn) {
-              this.controller.playAll();
-            }
-          })
-        Button($r('app.string.play_all')).id('playAll').onClick(() => this.controller.playAll())
-      }.width('100%').padding({ left: 16, right: 16, bottom: 8 })
-      if (this.lastTap !== '') {
-        Text(this.lastTap).padding({ left: 16, right: 16 }).width('100%').id('lastTap')
-      }
-      Scroll() {
-        CYLTagListView({
-          configuration: this.configuration(),
-          animationSpeed: this.speed,
-          animationLoops: this.loops,
-          controller: this.controller,
-          onTagTap: (tap: CYLTagTap) => this.lastTap = getContext(this).resourceManager
-            .getStringByNameSync('tapped').replace('%s', tap.title)
-        })
-      }.layoutWeight(1).align(Alignment.Top)
-    }.height('100%').alignItems(HorizontalAlign.Start)
-  }
-}
-
-/**
- * The classify menu (single choice) and the multiple filter of the iOS example's menu linkage screen: the selected tag
- * and the filter's regions and dishes select the places listed below, best rated first, saved in the database.
- */
+=======
+@Entry
 @Component
-struct ClassifyPage {
-  @State categories: string[] = [];
-  @State categoryTags: string[][] = [];
-  @State dishes: string[] = [];
-  @State classify: string[] = [];
-  @State filter: string[] = [];
-  @State draft: string[] = [];
-  @State places: Place[] = [];
-  @State showFilter: boolean = false;
-  private db?: PlacesDatabase;
+struct Index {
+  @State tab: number = 0;
+  private stack: NavPathStack = CYLDemoNav.stack;
 
-  async aboutToAppear(): Promise<void> {
-    this.db = await PlacesDatabase.open(getContext(this) as common.UIAbilityContext);
-    const categories = await this.db.categories();
-    this.categories = Array.from(categories.keys());
-    this.categoryTags = this.categories.map((c) => categories.get(c) ?? []);
-    this.dishes = await this.db.tags();
-    this.classify = (await this.db.savedSelection(CLASSIFY)) ?? [];
-    this.filter = (await this.db.savedSelection(FILTER)) ?? [];
-    await this.reload();
+  @Builder
+  destination(name: string, param: Object) {
+    NavDestination() {
+      routeBuilder(name).builder(param)
+    }
+    .hideTitleBar(true)
+>>>>>>> c69f327 (feat(harmony): the iOS example's screens on HarmonyOS (score 98.4))
   }
 
-  private selectedTag(): string | null {
-    if (this.classify.length === 0) {
-      return null;
+  @Builder
+  rootPage(route: string) {
+    routeBuilder(route).builder(new Object())
+  }
+
+  @Builder
+  tabBar(index: number) {
+    if (index === PLUS_INDEX) {
+      Column() {
+        Image(TABS[index].image).width(36).height(36)
+      }
+      .justifyContent(FlexAlign.Center)
+      .width('100%')
+      .height('100%')
+      .id('tab-plus')
+      .accessibilityText('查询筛选')
+      .accessibilityDescription('按场景分组的筛选演示')
+    } else {
+      Column({ space: 2 }) {
+        Image(this.tab === index ? TABS[index].selectedImage : TABS[index].image)
+          .width(26)
+          .height(26)
+          .fillColor(this.tab === index ? '#007AFF' : '#8E8E93')
+        Text(TABS[index].title)
+          .fontSize(10)
+          .maxLines(1)
+          .fontColor(this.tab === index ? '#007AFF' : '#8E8E93')
+      }
+      .justifyContent(FlexAlign.Center)
+      .width('100%')
+      .height('100%')
+      .id(`tab-${TABS[index].title}`)
     }
+<<<<<<< HEAD
     const p = path(this.classify[0]);
     return this.categoryTags[p.section]?.[p.item] ?? null;
   }
@@ -395,5 +387,28 @@ struct ClassifyPage {
     .id('classifyPage')
     .height('100%')
     .bindSheet($$this.showFilter, this.filterSheet(), { height: SheetSize.LARGE, title: { title: $r('app.string.filter') } })
+=======
+  }
+
+  build() {
+    Navigation(this.stack) {
+      Tabs({ barPosition: BarPosition.End, index: this.tab }) {
+        ForEach(TABS, (tab: RootTab, index: number) => {
+          TabContent() {
+            this.rootPage(tab.route)
+          }.tabBar(this.tabBar(index))
+        }, (tab: RootTab) => tab.route)
+      }
+      .scrollable(false)
+      .animationDuration(0)
+      .barHeight(56)
+      .barBackgroundColor('#F9F9F9')
+      .onChange((index: number) => this.tab = index)
+    }
+    .mode(NavigationMode.Stack)
+    .hideTitleBar(true)
+    .hideToolBar(true)
+    .navDestination(this.destination)
+>>>>>>> c69f327 (feat(harmony): the iOS example's screens on HarmonyOS (score 98.4))
   }
 }
