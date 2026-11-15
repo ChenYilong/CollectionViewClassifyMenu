@@ -1,3 +1,5 @@
+import { image } from '@kit.ImageKit';
+
 /**
  * The ArkTS forms of the UIKit value types the iOS API uses. Lengths are vp and font sizes fp, as points on iOS.
  * Colors are '#AARRGGBB' strings, which ArkUI takes as a ResourceColor.
@@ -179,3 +181,6 @@ export class CYLColor {
     return '#' + channel(alpha) + digits.toUpperCase();
   }
 }
+
+/** `UIImage`: a resource, a path, or a drawn pixel map (a badge). */
+export type CYLImage = ResourceStr | image.PixelMap;
