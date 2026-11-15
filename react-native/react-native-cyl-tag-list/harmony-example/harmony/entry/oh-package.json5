@@ -1,0 +1,10 @@
+{
+  "license": "ISC",
+  "devDependencies": {},
+  "name": "entry",
+  "description": "example description",
+  "version": "1.0.0",
+  "dependencies": {
+    "@cyl/classifymenu": "file:../../../../../harmony/classifymenu"
+  }
+}
