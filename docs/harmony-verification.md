@@ -29,7 +29,7 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
 
 **Score: see the tables; recomputed at every change.** Full marks = every row `DONE` / `N/A`.
 
-### A. Build and code quality (4)
+### A. Build and code quality (5)
 
 | # | Check | Status | Evidence |
 | --- | --- | --- | --- |
@@ -37,6 +37,7 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
 | A2 | `harmony/scripts/build.sh`: the `entry` HAP builds | DONE | BUILD SUCCESSFUL, 2026-11-16 |
 | A3 | The instrumented test HAP (`entry@ohosTest`) builds | DONE | BUILD SUCCESSFUL, 2026-11-16 |
 | A4 | No ArkTS warning in our sources (library and example; third-party packages excluded) | DONE | 92 → 1. Model code measures through `CYLUIContext` (the components' `UIContext`: `getMeasureUtils()`, `px2vp`); `UIContext.animateTo`, `getPromptAction()`, `showAlertDialog`; `CYLAccessibilitySelectedModifier` sets `accessibilitySelected` only on API 13+; database calls in try/catch; unique back-button ids. The one left: `getContext()` in `CYLUIContext.hostContext`, the API 12–17 fallback (its replacement `UIContext.getHostContext()` exists from API 18, used there) |
+| A5 | Local unit tests (`entry/src/test`) pass on this computer, no device: `harmony/scripts/unit-test.sh` (hvigor `test`) | DONE | 15 / 15 on 2026-11-16: tag list (6), SVGA decoder (5: engine by extension, movie params, images, sprites, frames with alpha / layout / transform / clip path / shapes / KEEP, progress → frame, SVGA 1.x and damaged files rejected), localization (4: language choice, iOS strings, `%@` / `%lu` formats, core in three languages); plus `scripts/svga-decoder-test.sh` on the six real `.svga` files |
 
 ### B. Every demo runs on the emulator, screenshot next to iOS (22)
 
@@ -121,6 +122,7 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 - 2026-11-16: E1 (already done by the parity work), E2 (example localization). 6 / 44 = 13.6 / 100.
 - 2026-11-16: UI tests written for C2–C6 (`QueryScenarios`, `StylesAndAnimations`, `Samples` test files, shared `TestSupport`); they count only after a passing emulator run. Accessibility: tappable rows, menu buttons and tag buttons are one labeled element each (F1 waits for an emulator check). The emulator image (HarmonyOS 6.0.1, API 21, x86) is downloaded, but no emulator instance exists yet. Score unchanged: 6 / 44 = 13.6 / 100.
 - 2026-11-16: SVGA engine in the library and the SVGA scenes in the example (D5 waits for the emulator). Score unchanged: 6 / 44 = 13.6 / 100.
+- 2026-11-16: A5 added to the standard (local unit tests on the host, 45 rows) and done: 15 / 15. 7 / 45 = 15.6 / 100.
 
 ## Next steps (resume here)
 
