@@ -91,7 +91,8 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   `CYLTabBarConfiguration.plusButtonWithConfiguration` reads `CYLTabBarControllerPlusButton` (`CYLTabBarItemImage`,
   `CYLTabBarItemSelectedImage`, `CYLTabBarItemTitle`, `CYLPlusButtonIndexInTabBar`, `CYLPlusButtonCenterYOffset`,
   `CYLPlusButtonImageSize`, `CYLPlusButtonAlignsTitle`, `CYLTabBarItemIdentifier`, `CYLTabBarItemPageIdentifier`:
-  selectable) into `result.plusButton`. `harmony-example` pins `08073a4` (`setup.sh`) and its Post button now lives
+  selectable) into `result.plusButton`. PR #796 was squash-merged into `feat/harmonyos-component` as `6c941e9`
+  (same library files as `08073a4`); `harmony-example` pins `6c941e9` (`setup.sh`) and its Post button now lives
   in `rawfile/cyl_tabbar_configuration.json`; the plus button code in `Index.ets` is gone. Emulator (same environment
   as below, 2026-11-16 04:56): the raised button from the file selects the Post page (screenshot below, retaken; the
   page's text is now localized too).
