@@ -1,8 +1,8 @@
 /*
  * Index.ets
  * The example's shell on HarmonyOS: CYLTabBarController's HarmonyOS library (cyltabbar) shows the tab bar, built from
- * rawfile/cyl_tabbar_configuration.json (Tags, Classify) with the raised Post plus button, which selects a page of its
- * own. Each page is a React Native surface (index.js: Tags, Classify, Post) of one React Native instance.
+ * rawfile/cyl_tabbar_configuration.json: Tags, Classify and the raised Post plus button
+ * (CYLTabBarControllerPlusButton), which selects a page of its own. Each page is a React Native surface (index.js: Tags, Classify, Post) of one React Native instance.
  */
 import {
   ComponentBuilderContext,
@@ -15,7 +15,6 @@ import {
   buildRNComponentForTag
 } from '@rnoh/react-native-openharmony';
 import {
-  CYLPlusButton,
   CYLTabBarConfiguration,
   CYLTabBarConfigurationResult,
   CYLTabBarController
@@ -43,26 +42,17 @@ const TAB_IMAGES: Record<string, Resource> = {
   'cyl_tab_tag_selected': $r('app.media.cyl_tab_tag_selected'),
   'cyl_tab_classify': $r('app.media.cyl_tab_classify'),
   'cyl_tab_classify_selected': $r('app.media.cyl_tab_classify_selected'),
+  'post_normal': $r('app.media.post_normal'),
+  'post_highlight': $r('app.media.post_highlight'),
 };
 
-/** The tab titles, localized (base, zh_CN), by tab identifier. */
-const TAB_TITLES: Record<string, Resource> = { 'tags': $r('app.string.tags'), 'classify': $r('app.string.classify') };
+/** The tab and plus button titles, localized (base, zh_CN), by identifier. */
+const TAB_TITLES: Record<string, Resource> = {
+  'tags': $r('app.string.tags'), 'classify': $r('app.string.classify'), 'plus': $r('app.string.post')
+};
 
 /** The React Native app of each page, by tab identifier (the plus button's is "plus"). */
 const APP_KEYS: Record<string, string> = { 'tags': 'Tags', 'classify': 'Classify', 'plus': 'Post' };
-
-/** The raised plus button with a page of its own (the React Native example's PLUS_BUTTON). */
-const PLUS_BUTTON: CYLPlusButton = {
-  image: $r('app.media.post_normal'),
-  selectedImage: $r('app.media.post_highlight'),
-  title: $r('app.string.post'),
-  index: 1,
-  centerYOffset: -14,
-  imageSize: 55,
-  alignsTitle: true,
-  identifier: 'plus',
-  selectable: true,
-};
 
 @Entry
 @Component
@@ -90,6 +80,9 @@ struct Index {
           item.title = title;
         }
       });
+      if (tabs.plusButton !== undefined) {
+        tabs.plusButton.title = TAB_TITLES[tabs.plusButton.identifier ?? ''] ?? tabs.plusButton.title;
+      }
       this.tabs = tabs;
     } catch (error) {
       this.errorText = `${(error as Error).message}`;
@@ -140,7 +133,8 @@ struct Index {
       if (this.tabs !== undefined) {
         CYLTabBarController({
           tabBarItemsAttributes: this.tabs.items,
-          plusButton: PLUS_BUTTON,
+          // The raised plus button of the configuration (CYLTabBarControllerPlusButton): a page of its own.
+          plusButton: this.tabs.plusButton,
           selectedIndex: $selectedIndex,
           tintColor: this.tabs.tintColor ?? '#007AFF',
           tabBarBackgroundColor: this.tabs.backgroundColor ?? '#F8F8F8',

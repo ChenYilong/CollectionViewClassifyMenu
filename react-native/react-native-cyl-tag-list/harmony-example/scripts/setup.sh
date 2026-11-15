@@ -9,9 +9,10 @@ LIB="$HERE/.."
 REPO="$LIB/../.."
 cd "$HERE"
 
-# CYLTabBarController's HarmonyOS library at the newest commit that has it (CrossPlatform/harmonyos-cyltabbar exists
-# only on feat/harmonyos-component so far; the iOS Podfiles pin the newest commit over every branch the same way).
-CYL_TAB_BAR_COMMIT=548892a76fd5788b292bf5259188895895108744
+# CYLTabBarController's HarmonyOS library at the newest commit that has what the example needs: the plus button read
+# from the configuration (CYLTabBarController PR #796, branch feat/harmonyos-plus-button-configuration, into
+# feat/harmonyos-component; CrossPlatform/harmonyos-cyltabbar is on no other branch yet).
+CYL_TAB_BAR_COMMIT=08073a46084e1694ad9344050e2d5c06c3e6ce10
 if [ ! -d .deps/CYLTabBarController ]; then
   mkdir -p .deps
   git clone -q --filter=blob:none --no-checkout https://github.com/ChenYilong/CYLTabBarController.git .deps/CYLTabBarController

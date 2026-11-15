@@ -77,7 +77,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   Classify and the tab bar: DONE later the same day (section "CYLTabBarController's tab bar in the React Native
   HarmonyOS example").
 
-## TODO (2026-11-16): the plus button from the configuration file on HarmonyOS
+## DONE (2026-11-16): the plus button from the configuration file on HarmonyOS
 
 - **Context:** CYLTabBarController's HarmonyOS configuration parser (`CYLTabBarConfiguration.ets`, `548892a`) reads
   the tabs but not `CYLTabBarControllerPlusButton`, so `harmony-example` sets the raised Post button in code.
@@ -85,6 +85,16 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   offset, page identifier) in CYLTabBarController (a branch off `feat/harmonyos-component` with a pull request into
   it, since another session owns that branch); then move the example's plus button into its configuration file.
 - **Prompt (verbatim):** "continue"
+- **Result:** CYLTabBarController `08073a4` ([PR #796](https://github.com/ChenYilong/CYLTabBarController/pull/796),
+  branch `feat/harmonyos-plus-button-configuration` into `feat/harmonyos-component`; that branch's owner confirmed
+  they were not editing `CYLTabBarConfiguration.ets`):
+  `CYLTabBarConfiguration.plusButtonWithConfiguration` reads `CYLTabBarControllerPlusButton` (`CYLTabBarItemImage`,
+  `CYLTabBarItemSelectedImage`, `CYLTabBarItemTitle`, `CYLPlusButtonIndexInTabBar`, `CYLPlusButtonCenterYOffset`,
+  `CYLPlusButtonImageSize`, `CYLPlusButtonAlignsTitle`, `CYLTabBarItemIdentifier`, `CYLTabBarItemPageIdentifier`:
+  selectable) into `result.plusButton`. `harmony-example` pins `08073a4` (`setup.sh`) and its Post button now lives
+  in `rawfile/cyl_tabbar_configuration.json`; the plus button code in `Index.ets` is gone. Emulator (same environment
+  as below, 2026-11-16 04:56): the raised button from the file selects the Post page (screenshot below, retaken; the
+  page's text is now localized too).
 
 ## DONE (2026-11-16): CYLTabBarController's tab bar in the React Native HarmonyOS example
 
@@ -107,7 +117,8 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **Classify:** the iOS/Android example's page, unchanged, through `@react-native-ohos/op-sqlite` 15.0.0 (Metro
   redirects `@op-engineering/op-sqlite`); its `moveAssetsDatabase` copies `databaseDir` onto itself, so
   `PlacesDatabase.ets` copies `cyl_places.sqlite` from rawfile first. 83 places.
-- **Gaps found:** the library's configuration parser reads tabs but not the plus button (set in code); the React
+- **Gaps found:** the library's configuration parser read tabs but not the plus button (set in code; DONE later, see
+  "the plus button from the configuration file on HarmonyOS"); the React
   Native pages' own strings stayed English on a Chinese device: fixed the same day, `i18n.ts` reads
   `I18nManager.getConstants().localeIdentifier` (RNOH's turbo module, which `NativeModules` does not reach), so
   Classify shows 分类菜单 / 筛选 / 全部 (screenshot below, retaken; `tsc --noEmit` passes for the iOS/Android example);
