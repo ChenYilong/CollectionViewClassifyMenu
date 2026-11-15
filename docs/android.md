@@ -162,9 +162,10 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
   > 替换截图中的文案，并全项目搜索图片中的关键词，从文档，代码，本地数据库中删除。并在文档中加入android相关文档中附带截图 标注为TODO continue
 
-## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
+## DONE (2026-11-16, logged as TODO 2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
-- **Status:** TODO, started 2026-11-15 (the earlier tasks are done). Tools found on this Mac: DevEco Studio with the
+- **Status:** DONE 2026-11-16: step 1 (ArkTS library and example), step 2 (Flutter) and step 3 (React Native),
+  details and evidence in `cross-platform.md` (TODO summary). Started 2026-11-15 (the earlier tasks were done). Tools found on this Mac: DevEco Studio with the
   HarmonyOS 6.0.1 SDK (API 21), `hdc`, hvigor and the Mate 70 Pro emulator (unsigned HAPs install). Not installed:
   the OpenHarmony fork of Flutter (`gitcode.com/openharmony-tpc/flutter_flutter`, reachable). Plan, in order:
   1. `harmony/` library (HAR, ArkTS): a port of `CYLTagListView` with the same JSON configuration as the Flutter and
@@ -214,7 +215,7 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
   <img src="assets/harmonyos-filter.jpeg" width="360" alt="HarmonyOS: Filter sheet with regions and dishes">
 
-- **Step 2: in progress (2026-11-15).** `flutter/cyl_tag_list_ohos` (OhosView + ArkTS platform view on
+- **Step 2: DONE (2026-11-16; the blocker below was worked around without the newer SDK, see `cross-platform.md`).** History (2026-11-15): `flutter/cyl_tag_list_ohos` (OhosView + ArkTS platform view on
   `harmony/classifymenu`, registered through `dartPluginClass`) and the `CylTagListView.platformViewBuilder` hook are
   written, not yet built. Blocker: Flutter `3.41.9+ohos-1.0.2`'s embedding needs a HarmonyOS SDK newer than the
   installed API 21 (`autoFillManager.AutoFillType` missing). Flutter `3.35.7+ohos-1.0.5` (`/tmp/xpr/fo35`) fails
