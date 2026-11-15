@@ -19,7 +19,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 0 / 807 = 0.0 / 100** (API 0 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
+**Score: 45 / 807 = 5.6 / 100** (API 45 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 
 ## Table 1: iOS public API
@@ -240,53 +240,53 @@ overrides left out.
 | `UICollectionViewDelegateLeftAlignedLayout` (CYLCollectionViewLeftAlignedLayout.swift) | TODO | protocol |
 | `CYLCollectionViewLeftAlignedLayout` (CYLCollectionViewLeftAlignedLayout.swift) | TODO | class |
 | `CYLCollectionViewLeftAlignedLayout.rowAlignment` (CYLCollectionViewLeftAlignedLayout.swift) | TODO | property |
-| `CYLMenuItemType` (CYLMenuDataSource.swift) | TODO | enum |
-| `CYLMenuItemType.tag` (CYLMenuDataSource.swift) | TODO | case |
-| `CYLMenuItemType.create` (CYLMenuDataSource.swift) | TODO | case |
-| `CYLMenuDataSource` (CYLMenuDataSource.swift) | TODO | protocol |
-| `CYLMenuDataSource.numberOfSectionsInMenu()` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuNumberOfItems(inSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuTitle(forSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuTitleForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuImageForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuSelectedImageForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuAnimationURLForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuAnimationRestingProgressForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
+| `CYLMenuItemType` (CYLMenuDataSource.swift) | `enum CYLMenuItemType` (core/CYLMenuDataSource.ets) | enum |
+| `CYLMenuItemType.tag` (CYLMenuDataSource.swift) | `CYLMenuItemType.tag` | case |
+| `CYLMenuItemType.create` (CYLMenuDataSource.swift) | `CYLMenuItemType.create` | case |
+| `CYLMenuDataSource` (CYLMenuDataSource.swift) | `interface CYLMenuDataSource` (+ `CYLMenuDefaults`) | protocol |
+| `CYLMenuDataSource.numberOfSectionsInMenu()` (CYLMenuDataSource.swift) | `numberOfSectionsInMenu()` | method |
+| `CYLMenuDataSource.menuNumberOfItems(inSection:)` (CYLMenuDataSource.swift) | `menuNumberOfItemsInSection(section)` | method |
+| `CYLMenuDataSource.menuTitle(forSection:)` (CYLMenuDataSource.swift) | `menuTitleForSection(section)` | method |
+| `CYLMenuDataSource.menuTitleForItem(at:)` (CYLMenuDataSource.swift) | `menuTitleForItem(indexPath)` | method |
+| `CYLMenuDataSource.menuImageForItem(at:)` (CYLMenuDataSource.swift) | `menuImageForItem?` | method |
+| `CYLMenuDataSource.menuSelectedImageForItem(at:)` (CYLMenuDataSource.swift) | `menuSelectedImageForItem?` | method |
+| `CYLMenuDataSource.menuAnimationURLForItem(at:)` (CYLMenuDataSource.swift) | `menuAnimationURLForItem?` | method |
+| `CYLMenuDataSource.menuAnimationRestingProgressForItem(at:)` (CYLMenuDataSource.swift) | `menuAnimationRestingProgressForItem?` | method |
 | `CYLMenuDataSource.menuStyle(forSection:)` (CYLMenuDataSource.swift) | TODO | method |
 | `CYLMenuDataSource.menuStyleForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuImage(forSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuAccessoryView(forSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuItemIsEnabled(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuItemIsExclusive(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuItemIsSelectable(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuItemType(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuAccessibilityHintForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuShowsMoreButton(inSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuAccessibilityLabelForMoreButton(inSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuItemIsDeletable(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuRemoveItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuMoveItem(at:to:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate` (CYLMenuDataSource.swift) | TODO | protocol |
-| `CYLMenuDelegate.menu(_:shouldSelectItemAt:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didSelectItemAt:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didRequestNewItemWithName:at:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didDeselectItemAt:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didChangeSelectedItems:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didConfirmSelectedItems:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didChangeExpanded:inSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didChangeContentHeight:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didTapMoreButtonInSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didDeleteItemAt:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didLongPressItemAt:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` (CYLMenuDataSource.swift) | TODO | method |
-| `kDataSourceSectionKey` (CYLMenuKeys.swift) | TODO | property |
-| `kDataSourceCellTextKey` (CYLMenuKeys.swift) | TODO | property |
-| `kDataSourceCellPictureKey` (CYLMenuKeys.swift) | TODO | property |
-| `CYLMenuKeys` (CYLMenuKeys.swift) | TODO | class |
-| `CYLMenuKeys.static dataSourceSectionKey` (CYLMenuKeys.swift) | TODO | property |
-| `CYLMenuKeys.static dataSourceCellTextKey` (CYLMenuKeys.swift) | TODO | property |
-| `CYLMenuKeys.static dataSourceCellPictureKey` (CYLMenuKeys.swift) | TODO | property |
+| `CYLMenuDataSource.menuImage(forSection:)` (CYLMenuDataSource.swift) | `menuImageForSection?` | method |
+| `CYLMenuDataSource.menuAccessoryView(forSection:)` (CYLMenuDataSource.swift) | `menuAccessoryViewForSection?` (CustomBuilder) | method |
+| `CYLMenuDataSource.menuItemIsEnabled(at:)` (CYLMenuDataSource.swift) | `menuItemIsEnabled?` | method |
+| `CYLMenuDataSource.menuItemIsExclusive(at:)` (CYLMenuDataSource.swift) | `menuItemIsExclusive?` | method |
+| `CYLMenuDataSource.menuItemIsSelectable(at:)` (CYLMenuDataSource.swift) | `menuItemIsSelectable?` | method |
+| `CYLMenuDataSource.menuItemType(at:)` (CYLMenuDataSource.swift) | `menuItemType?` | method |
+| `CYLMenuDataSource.menuAccessibilityHintForItem(at:)` (CYLMenuDataSource.swift) | `menuAccessibilityHintForItem?` | method |
+| `CYLMenuDataSource.menuShowsMoreButton(inSection:)` (CYLMenuDataSource.swift) | `menuShowsMoreButtonInSection?` | method |
+| `CYLMenuDataSource.menuAccessibilityLabelForMoreButton(inSection:)` (CYLMenuDataSource.swift) | `menuAccessibilityLabelForMoreButtonInSection?` | method |
+| `CYLMenuDataSource.menuItemIsDeletable(at:)` (CYLMenuDataSource.swift) | `menuItemIsDeletable?` | method |
+| `CYLMenuDataSource.menuRemoveItem(at:)` (CYLMenuDataSource.swift) | `menuRemoveItem?` | method |
+| `CYLMenuDataSource.menuMoveItem(at:to:)` (CYLMenuDataSource.swift) | `menuMoveItem?` | method |
+| `CYLMenuDelegate` (CYLMenuDataSource.swift) | `interface CYLMenuDelegate` | protocol |
+| `CYLMenuDelegate.menu(_:shouldSelectItemAt:)` (CYLMenuDataSource.swift) | `menuShouldSelectItem?` | method |
+| `CYLMenuDelegate.menu(_:didSelectItemAt:)` (CYLMenuDataSource.swift) | `menuDidSelectItem?` | method |
+| `CYLMenuDelegate.menu(_:didRequestNewItemWithName:at:)` (CYLMenuDataSource.swift) | `menuDidRequestNewItemWithName?` | method |
+| `CYLMenuDelegate.menu(_:didDeselectItemAt:)` (CYLMenuDataSource.swift) | `menuDidDeselectItem?` | method |
+| `CYLMenuDelegate.menu(_:didChangeSelectedItems:)` (CYLMenuDataSource.swift) | `menuDidChangeSelectedItems?` | method |
+| `CYLMenuDelegate.menu(_:didConfirmSelectedItems:)` (CYLMenuDataSource.swift) | `menuDidConfirmSelectedItems?` | method |
+| `CYLMenuDelegate.menu(_:didChangeExpanded:inSection:)` (CYLMenuDataSource.swift) | `menuDidChangeExpanded?` | method |
+| `CYLMenuDelegate.menu(_:didChangeContentHeight:)` (CYLMenuDataSource.swift) | `menuDidChangeContentHeight?` | method |
+| `CYLMenuDelegate.menu(_:didTapMoreButtonInSection:)` (CYLMenuDataSource.swift) | `menuDidTapMoreButtonInSection?` | method |
+| `CYLMenuDelegate.menu(_:didDeleteItemAt:)` (CYLMenuDataSource.swift) | `menuDidDeleteItem?` | method |
+| `CYLMenuDelegate.menu(_:didLongPressItemAt:)` (CYLMenuDataSource.swift) | `menuDidLongPressItem?` | method |
+| `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` (CYLMenuDataSource.swift) | `menuDidMoveItem?` | method |
+| `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` (CYLMenuDataSource.swift) | `menuDidBeginDraggingSelectedItem?` | method |
+| `kDataSourceSectionKey` (CYLMenuKeys.swift) | `kDataSourceSectionKey` (core/CYLMenuKeys.ets) | property |
+| `kDataSourceCellTextKey` (CYLMenuKeys.swift) | `kDataSourceCellTextKey` | property |
+| `kDataSourceCellPictureKey` (CYLMenuKeys.swift) | `kDataSourceCellPictureKey` | property |
+| `CYLMenuKeys` (CYLMenuKeys.swift) | `class CYLMenuKeys` | class |
+| `CYLMenuKeys.static dataSourceSectionKey` (CYLMenuKeys.swift) | `CYLMenuKeys.dataSourceSectionKey` | property |
+| `CYLMenuKeys.static dataSourceCellTextKey` (CYLMenuKeys.swift) | `CYLMenuKeys.dataSourceCellTextKey` | property |
+| `CYLMenuKeys.static dataSourceCellPictureKey` (CYLMenuKeys.swift) | `CYLMenuKeys.dataSourceCellPictureKey` | property |
 | `CYLMenuLocalizedString(_:)` (CYLMenuResources.swift) | TODO | method |
 | `CYLMenuResources` (CYLMenuResources.swift) | TODO | class |
 | `CYLMenuResources.static bundle` (CYLMenuResources.swift) | TODO | property |
@@ -847,3 +847,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 ## Score history
 
 - 2026-11-16: tables created, every row TODO.
+- 2026-11-16: feature 1, the menu data source, delegate and keys (core/CYLMenuDataSource.ets, CYLMenuKeys.ets). Score 45 / 807 = 5.6.
