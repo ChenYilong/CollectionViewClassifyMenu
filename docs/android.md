@@ -162,6 +162,15 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
   > 替换截图中的文案，并全项目搜索图片中的关键词，从文档，代码，本地数据库中删除。并在文档中加入android相关文档中附带截图 标注为TODO continue
 
+## TODO (2026-11-16): CYLTabBarController's tab bar in the ArkTS example
+
+- **Context:** `harmony/entry` uses ArkUI `Tabs` with emoji icons; AGENTS.md wants every example's tab bar from
+  CYLTabBarController, made from a configuration file, with a raised plus button that selects a page of its own (the
+  React Native HarmonyOS shell already does it).
+- **Requirements:** CYLTabBarController's HarmonyOS library (pinned commit, fetched by a script), tabs and plus
+  button from `rawfile/cyl_tabbar_configuration.json`, the Post page, localized titles, accessibility; no emulator.
+- **Prompt (verbatim):** "continue"
+
 ## DONE (2026-11-16): HarmonyOS score sheet, accessibility and localization
 
 - **Context:** the HarmonyOS port (`harmony/classifymenu`, `harmony/entry`, the Flutter and React Native HarmonyOS
