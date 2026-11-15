@@ -1,13 +1,14 @@
 import { i18n } from '@kit.LocalizationKit';
 import { CYL_EXAMPLE_STRINGS } from './CYLExampleStrings';
+import { CYLLaunchOptions } from './CYLLaunchOptions';
 
 /**
  * The language of the example's strings: zh-Hant for Traditional Chinese (zh-Hant, zh-TW, zh-HK, zh-MO), zh-Hans
  * for other Chinese, en otherwise; as iOS picks among the example bundle's `.lproj` folders.
  */
 export function cylExampleLanguage(system?: string): string {
-  let language = system ?? '';
-  if (system === undefined) {
+  let language = system ?? CYLLaunchOptions.language;
+  if (language === '') {
     try {
       language = i18n.System.getSystemLanguage();
     } catch (error) {
