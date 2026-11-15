@@ -667,6 +667,7 @@ export struct CYLTagButtonComponent {
         this.button.isHighlighted = false;
       }
     })
+    .accessibilityGroup(true)
     .onClick(() => this.onTagClick?.())
   }
 }

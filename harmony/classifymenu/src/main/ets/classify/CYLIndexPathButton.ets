@@ -243,6 +243,8 @@ export struct CYLIndexPathButtonView {
     .backgroundColor(this.button.backgroundColorFor(this.button.stateFlags(this.pressed)))
     .visibility(this.button.isHidden ? Visibility.Hidden : Visibility.Visible)
     .hitTestBehavior(this.button.isUserInteractionEnabled ? HitTestMode.Default : HitTestMode.Transparent)
+    .accessibilityGroup(true)
+    .accessibilityText(this.button.titleFor(this.button.stateFlags(this.pressed)) ?? '')
     .accessibilityDescription(this.button.accessibilityHint ?? '')
     .onTouch((event: TouchEvent) => {
       if (!this.button.isUserInteractionEnabled) {
