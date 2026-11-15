@@ -1,0 +1,41 @@
+/* UIKit's look: a default (translucent white) navigation bar holding the search bar, systemBackground pages, the
+   job sidebar in secondarySystemBackground with the selected row in systemBackground. */
+page { background: #FFFFFF; }
+
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+  background: rgba(249, 249, 249, 0.94); border-bottom: 1rpx solid rgba(0, 0, 0, 0.15);
+}
+.nav-bar { display: flex; align-items: center; box-sizing: border-box; }
+.nav-back { flex: none; width: 36px; height: 44px; display: flex; align-items: center; justify-content: center; margin-left: 4px; }
+.nav-back-hover { opacity: 0.4; }
+.nav-back-image { width: 22px; height: 22px; }
+
+/* CYLSearchBarView: a rounded tertiarySystemFill field with the magnifier, 36 pt high (44 minus the insets 4 + 4). */
+.search-field {
+  flex: 1; min-width: 0; height: 36px; display: flex; align-items: center; padding: 0 8px;
+  border-radius: 10px; background: rgba(118, 118, 128, 0.12); box-sizing: border-box;
+}
+.search-icon { flex: none; width: 18px; height: 18px; margin-right: 6px; }
+.search-input { flex: 1; min-width: 0; height: 36px; font-size: 17px; color: #000000; }
+.search-placeholder { color: rgba(60, 60, 67, 0.6); }
+
+.pages { position: fixed; left: 0; right: 0; bottom: calc(50px + env(safe-area-inset-bottom)); }
+.page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+.page-hidden { display: none; }
+
+.header { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+.header-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.industry-button { flex: none; margin-left: 8px; padding: 4px 0; font-size: 13px; color: #007AFF; white-space: nowrap; }
+.industry-button-hover { opacity: 0.4; }
+
+.jobs { display: flex; }
+.jobs.page-hidden { display: none; }
+.sidebar { flex: none; width: 90px; height: 100%; background: #F2F2F7; }
+.sidebar-row { height: 50px; display: flex; align-items: center; justify-content: center; padding: 0 4px; box-sizing: border-box; }
+.sidebar-row-selected { background: #FFFFFF; }
+.sidebar-text {
+  font-size: 15px; line-height: 18px; text-align: center; color: #000000;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word;
+}
+.job-tags { flex: 1; min-width: 0; height: 100%; }

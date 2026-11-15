@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "配置初始化",
+  "usingComponents": {
+    "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
+    "cyl-lottie-icon": "/components/cyl-lottie-icon/cyl-lottie-icon"
+  }
+}

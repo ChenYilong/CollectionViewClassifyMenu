@@ -1,0 +1,27 @@
+/* CYLImageTagView: the picture (aspect fill, clipped) under its groups. A group: the ripple, the lines (1 pt white),
+   the ring (r 8, black 0x30) and the dot (r 4, white), the tags (CYLImageTagLabel: white 13 pt text with a black
+   glow of radius 3.5, 12 × 4 padding, wrapping when wider than the room beside the dot). */
+:host { display: block; position: relative; overflow: hidden; }
+.cyl-it { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.cyl-it-picture { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+.cyl-it-group { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+.cyl-it-hidden { display: none; }
+.cyl-it-line { position: absolute; transform-origin: 0 50%; }
+.cyl-it-ring, .cyl-it-dot { position: absolute; border-radius: 50%; }
+.cyl-it-hit { position: absolute; border-radius: 50%; pointer-events: auto; }
+.cyl-it-label {
+  position: absolute; box-sizing: border-box; padding: 4px 12px; color: #FFFFFF; font-size: 13px; line-height: 15.5px;
+  text-shadow: 0 0 3.5px #000000, 0 0 3.5px #000000; word-break: break-word; pointer-events: auto;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+.cyl-it-label-center { pointer-events: none; }
+.cyl-it-measure { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; }
+.cyl-it-measure-label { position: relative; display: table; white-space: normal; }
+.cyl-it-ripple {
+  position: absolute; border-radius: 50%; background: #FFFFFF; opacity: 0; pointer-events: none;
+  animation: cyl-it-ripple 1s linear infinite;
+}
+@keyframes cyl-it-ripple {
+  from { transform: scale(0); opacity: 0.392; }
+  to { transform: scale(1); opacity: 0; }
+}

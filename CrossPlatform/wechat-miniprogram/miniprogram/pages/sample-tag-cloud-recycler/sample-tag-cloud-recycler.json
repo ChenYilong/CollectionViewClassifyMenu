@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "RecyclerView 示例",
+  "usingComponents": {
+    "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud"
+  }
+}

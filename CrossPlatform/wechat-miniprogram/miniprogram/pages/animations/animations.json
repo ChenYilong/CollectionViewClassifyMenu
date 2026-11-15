@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "动效图标",
+  "usingComponents": {
+    "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
+    "cyl-lottie-icon": "/components/cyl-lottie-icon/cyl-lottie-icon"
+  }
+}

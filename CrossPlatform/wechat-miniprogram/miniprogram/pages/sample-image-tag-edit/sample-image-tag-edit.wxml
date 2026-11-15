@@ -1,0 +1,31 @@
+<view class="page">
+  <cyl-tag-image id="tag-image" style="width: 100vw; height: 100vw;" image="{{picture.src}}"
+                 image-label="{{picture.label}}" editing="{{true}}"
+                 bind:circletap="onCircleTap" bind:longpress="onLongPress" />
+  <text class="info">{{info}}</text>
+  <view class="buttons">
+    <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{pink}};"
+          id="sample.create" bindtap="showCreateDialog" aria-role="button" aria-label="{{createTitle}}">{{createTitle}}</view>
+    <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{pink}};"
+          id="sample.save" bindtap="save" aria-role="button" aria-label="{{saveTitle}}">{{saveTitle}}</view>
+  </view>
+  <cyl-sample-toast id="toast" />
+
+  <!-- UIAlertController (.alert) with three text fields: a Mini Program modal has one field at most. -->
+  <view wx:if="{{dialog}}" class="alert-dim" catchtouchmove="noop">
+    <view class="alert" aria-role="dialog" aria-label="{{dialog.title}}">
+      <view class="alert-title">{{dialog.title}}</view>
+      <view class="alert-fields">
+        <input wx:for="{{dialog.fields}}" wx:key="index" class="alert-field" placeholder="{{item.placeholder}}"
+               placeholder-class="alert-placeholder" aria-label="{{item.placeholder}}" value="{{item.value}}"
+               data-index="{{index}}" bindinput="onDialogInput" focus="{{index === 0}}" />
+      </view>
+      <view class="alert-actions">
+        <view class="alert-action alert-cancel" hover-class="alert-action-hover" bindtap="onDialogCancel"
+              aria-role="button" aria-label="{{dialog.cancel}}">{{dialog.cancel}}</view>
+        <view class="alert-action" hover-class="alert-action-hover" bindtap="onDialogConfirm"
+              aria-role="button" aria-label="{{dialog.ok}}">{{dialog.ok}}</view>
+      </view>
+    </view>
+  </view>
+</view>

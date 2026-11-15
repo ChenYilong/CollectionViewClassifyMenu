@@ -1,0 +1,14 @@
+/* CYLProductViewController: systemGroupedBackground; a vertical stack (spacing 1) of the product card (white,
+   insets 12 / 16, spacing 8) and the review block (white, top 8, sides 16, spacing 6). */
+page { background: var(--ios-grouped-background); }
+.product { min-height: 100vh; padding-bottom: 96px; box-sizing: border-box; background: var(--ios-grouped-background); }
+.card { display: flex; flex-direction: column; padding: 12px 16px; background: #FFFFFF; }
+.name { font-size: 16px; line-height: 21px; color: #000000; }
+.price { margin-top: 8px; font-size: 22px; line-height: 27px; font-weight: bold; color: #FF4F00; }
+.review-block { display: flex; flex-direction: column; margin-top: 1px; padding: 8px 16px 0; background: #FFFFFF; }
+.review-title { font-size: 15px; line-height: 20px; color: #000000; }
+.preview { margin-top: 6px; }
+.review { margin-top: 6px; font-size: 13px; line-height: 17px; color: var(--ios-secondary-label); white-space: pre-wrap; }
+/* UIButton(type: .system), 44 high: systemBlue title, dimmed while pressed. */
+.more { margin-top: 6px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--ios-blue); }
+.more-hover { opacity: 0.2; }

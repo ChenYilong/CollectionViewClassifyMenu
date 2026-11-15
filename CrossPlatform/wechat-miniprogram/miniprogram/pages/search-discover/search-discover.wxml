@@ -1,0 +1,111 @@
+<view class="screen">
+  <!-- The search bar replaces the navigation bar: back, then the white capsule with the camera and 搜索 inside. -->
+  <view class="top" style="padding-top: {{top.statusBar + 8}}px; padding-right: {{top.rightInset}}px;">
+    <view class="back" hover-class="pressed" bindtap="goBack" aria-role="button" aria-label="{{labels.back}}">
+      <image class="back-image" src="/images/search/chevron-left.svg" mode="aspectFit" />
+    </view>
+    <view class="search-bar">
+      <input id="CYLSearchDiscoverField" class="search-input" value="{{fieldText}}" placeholder="{{placeholder}}"
+             placeholder-class="search-placeholder" confirm-type="search" aria-label="{{labels.search}}"
+             bindinput="onFieldInput" bindconfirm="onSearchConfirm" />
+      <view class="camera" hover-class="pressed" bindtap="searchByImage" aria-role="button" aria-label="{{labels.camera}}">
+        <image class="camera-image" src="/images/search/camera-viewfinder.svg" mode="aspectFit" />
+      </view>
+      <view class="divider" aria-hidden="true" />
+      <view id="CYLSearchDiscoverSearchButton" class="search-button" hover-class="pressed" bindtap="searchTapped"
+            aria-role="button" aria-label="{{labels.search}}">{{labels.search}}</view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="content" enhanced bounces>
+    <!-- The results of the last search (搜索, the keyboard's search key, a recent search or a topic), or the empty
+         placeholder; clearing the field shows 最近搜索 and 发现 again. -->
+    <view wx:if="{{resultsShown}}" class="section results" id="searchResults">
+      <view class="header">
+        <text class="header-title" aria-role="heading">{{resultTexts.title}}</text>
+      </view>
+      <text class="results-summary">{{resultTexts.summary}}</text>
+      <view wx:for="{{results}}" wx:key="title" class="result" hover-class="topic-pressed" data-title="{{item.title}}"
+            bindtap="onResultTap" aria-role="button" aria-label="{{item.hot ? item.title + ', ' + labels.hotValue : item.title}}">
+        <image class="result-icon" src="/images/search/magnifyingglass.svg" mode="aspectFit" aria-hidden="true" />
+        <text class="result-title">{{item.title}}</text>
+        <image wx:if="{{item.hot}}" class="topic-hot" src="{{hot.src}}" mode="aspectFit"
+               style="width: {{hot.width}}px; height: {{hot.height}}px;" aria-hidden="true" />
+      </view>
+      <view wx:if="{{!results.length}}" class="empty" id="searchEmpty">
+        <image class="empty-image" src="/images/search/magnifyingglass.svg" mode="aspectFit" aria-hidden="true" />
+        <text class="empty-title">{{resultTexts.emptyTitle}}</text>
+        <text class="empty-hint">{{resultTexts.emptyHint}}</text>
+      </view>
+    </view>
+
+    <block wx:if="{{!resultsShown}}">
+    <!-- 最近搜索: no section at all once cleared. -->
+    <view wx:if="{{searches.length}}" class="section recent">
+      <view class="header">
+        <text class="header-title" aria-role="heading">{{labels.recentTitle}}</text>
+        <view id="clearRecentSearches" class="clear" hover-class="pressed" bindtap="clearRecentSearches"
+              aria-role="button" aria-label="{{labels.clear}}">
+          <image class="clear-image" src="/images/search/trash.svg" mode="aspectFit" />
+        </view>
+      </view>
+      <view class="recent-body">
+        <view wx:for="{{recentRows}}" wx:for-item="row" wx:key="key" class="recent-row">
+          <block wx:for="{{row.cells}}" wx:for-item="cell" wx:key="key">
+            <view wx:if="{{cell.fold}}" id="recentFold" class="recent-tag recent-fold" hover-class="tag-pressed"
+                  bindtap="toggleRecent" aria-role="button" aria-label="{{labels.recentTitle}} {{foldTitle}}">
+              <image class="fold-image {{recentExpanded ? 'fold-image-up' : ''}}" src="/images/search/fold-chevron.png" mode="aspectFit" />
+            </view>
+            <view wx:else class="recent-tag" hover-class="tag-pressed" style="max-width: {{contentWidth}}px;"
+                  data-item="{{cell.item}}" bindtap="onRecentTap" aria-role="button" aria-label="{{cell.title}}">
+              <text class="recent-title">{{cell.title}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+      <!-- Every tag at its own width (title + margins, at most the content width), measured for the fold. -->
+      <view class="recent-measure" style="width: {{contentWidth}}px;" aria-hidden="true">
+        <view wx:for="{{searches}}" wx:key="*this" class="recent-tag recent-measure-tag" style="max-width: {{contentWidth}}px;">
+          <text class="recent-title">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 发现: two plain titles per row, the More button at the header's trailing edge. -->
+    <view class="section discover">
+      <view class="header">
+        <text class="header-title" aria-role="heading">{{labels.discoverTitle}}</text>
+        <view id="refreshDiscover" class="more" hover-class="pressed" bindtap="refreshDiscover"
+              aria-role="button" aria-label="{{labels.refresh}}">
+          <image class="more-image" src="/images/search/more.png" mode="aspectFit" />
+        </view>
+      </view>
+      <view class="discover-body">
+        <view wx:for="{{discoverRows}}" wx:for-item="row" wx:key="key" class="discover-row">
+          <view wx:for="{{row.cells}}" wx:for-item="cell" wx:key="index" class="topic" hover-class="topic-pressed"
+                style="width: {{gridItemWidth}}px;" data-index="{{cell.index}}" bindtap="onTopicTap"
+                aria-role="button" aria-label="{{cell.hot ? cell.title + ', ' + labels.hotValue : cell.title}}">
+            <text class="topic-title">{{cell.title}}</text>
+            <image wx:if="{{cell.hot}}" class="topic-hot" src="{{hot.src}}" mode="aspectFit"
+                   style="width: {{hot.width}}px; height: {{hot.height}}px;" aria-hidden="true" />
+          </view>
+        </view>
+      </view>
+    </view>
+    </block>
+  </scroll-view>
+
+  <!-- The hint and the mic button on the light curved area. -->
+  <view class="ask">
+    <view class="ask-background" aria-hidden="true">
+      <image class="ask-arc" src="/images/search/ask-arc.svg" mode="scaleToFill" />
+      <view class="ask-fill" />
+    </view>
+    <text class="hint" aria-label="{{hintLabel}}">{{hint}}</text>
+    <view id="CYLSearchDiscoverMicButton" class="mic" hover-class="mic-pressed"
+          bindtouchstart="onMicTouchStart" bindtouchend="onMicTouchEnd" bindtouchcancel="onMicTouchEnd"
+          aria-role="button" aria-label="{{labels.mic}}">
+      <image class="mic-image" src="/images/search/mic-fill.svg" mode="aspectFit" />
+    </view>
+  </view>
+</view>

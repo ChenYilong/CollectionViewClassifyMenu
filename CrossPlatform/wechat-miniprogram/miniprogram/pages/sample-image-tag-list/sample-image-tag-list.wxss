@@ -1,0 +1,4 @@
+/* A plain table without separators: each cell a square picture with 4 pt above and below. */
+page { background: #FFFFFF; }
+.table { background: #FFFFFF; padding-bottom: env(safe-area-inset-bottom); }
+.cell { padding: 4px 0; }

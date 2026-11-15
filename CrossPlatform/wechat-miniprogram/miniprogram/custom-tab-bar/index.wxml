@@ -1,0 +1,7 @@
+<cyl-tab-bar
+  id="cyl-tab-bar"
+  configuration="{{configuration}}"
+  image-base-path="/images"
+  selected-identifier="{{selectedIdentifier}}"
+  bind:select="onSelect"
+/>

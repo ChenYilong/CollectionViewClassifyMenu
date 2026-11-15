@@ -1,0 +1,8 @@
+<view class="table">
+  <view wx:for="{{texts}}" wx:key="index" class="cell text-cell">
+    <text class="text">{{item}}</text>
+  </view>
+  <view class="cell">
+    <cyl-tag-cloud tags="{{footerTags}}" list-style="{{style}}" />
+  </view>
+</view>

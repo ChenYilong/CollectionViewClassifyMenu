@@ -1,0 +1,31 @@
+{
+  "description": "CollectionViewClassifyMenu WeChat Mini Program example",
+  "miniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "projectname": "cyl-tag-list-miniprogram",
+  "appid": "touristappid",
+  "libVersion": "3.6.0",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": true,
+    "packNpmManually": true,
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./miniprogram/"
+      }
+    ]
+  },
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "condition": {},
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+}

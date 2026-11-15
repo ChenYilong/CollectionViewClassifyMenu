@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "图片标签",
+  "usingComponents": {
+    "cyl-tag-image": "cyl-tag-list-miniprogram/cyl-tag-image/cyl-tag-image",
+    "cyl-sample-toast": "/components/cyl-sample-toast/cyl-sample-toast"
+  }
+}

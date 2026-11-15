@@ -1,0 +1,35 @@
+<view class="page">
+  <!-- The status and the controls stay at the top (sticky) while the page itself scrolls the tags: no nested
+       scroll-view, so every animated icon's canvas moves with its tag (the icons drifted inside a scroll-view). -->
+  <view class="header">
+  <view class="status">{{status}}</view>
+
+  <view class="controls">
+    <view class="row">
+      <text class="caption" aria-hidden="true">{{speedTitle}}</text>
+      <slider class="slider" min="{{minSpeed}}" max="{{maxSpeed}}" step="{{speedStep}}" value="{{controls.speed}}"
+              activeColor="#007AFF" backgroundColor="#E5E5EA" block-size="28" block-color="#FFFFFF"
+              bindchanging="onSpeedChanging" bindchange="onSpeedChanging" id="speed-slider"
+              aria-label="{{controls.speedAccessibility}}" />
+      <text class="speed-value" aria-hidden="true">{{controls.speedText}}</text>
+    </view>
+    <view class="row">
+      <text class="caption" aria-hidden="true">{{loopTitle}}</text>
+      <view class="spacer" />
+      <switch checked="{{controls.loops}}" color="#34C759" bindchange="onLoopChange" id="loop-switch"
+              aria-label="{{controls.loopAccessibility}}" />
+      <view class="play-all" hover-class="play-all-hover" bindtap="playAll" id="play-all"
+            aria-role="button" aria-label="{{playAllTitle}}, {{playAllHint}}">
+        <image class="play-icon" src="{{playIcon}}" mode="aspectFit" aria-hidden="true" />
+        <text>{{playAllTitle}}</text>
+      </view>
+    </view>
+  </view>
+  </view>
+
+  <view class="list">
+    <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" id="tags" configuration="{{configuration}}"
+                  animation-speed="{{controls.speed}}" animation-loops="{{controls.loops}}" bind:tagtap="onTagTap" />
+    <view class="tab-bar-space" />
+  </view>
+</view>
