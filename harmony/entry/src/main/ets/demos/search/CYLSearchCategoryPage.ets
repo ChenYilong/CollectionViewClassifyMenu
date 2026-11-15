@@ -226,7 +226,7 @@ export struct CYLSearchCategoryPage {
           .width(36)
           .textAlign(TextAlign.Center)
           .accessibilityText('返回')
-          .id('CYLDemoBarBack')
+          .id('CYLSearchCategoryBack')
           .onClick(() => CYLDemoNav.pop())
         this.searchBar()
       }

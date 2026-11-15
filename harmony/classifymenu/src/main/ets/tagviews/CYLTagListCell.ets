@@ -1,3 +1,4 @@
+import { CYLAccessibilitySelectedModifier } from '../core/CYLAccessibilitySelected';
 /**
  * The cell of the tag list (iOS CYLTagListCell.swift; Android CYLTagListCell.kt): one `CYLTagButton` (the tag view);
  * the cell is the accessibility element, a button whose label is the tag's title. It shows the style's touch ripple
@@ -152,7 +153,7 @@ export struct CYLTagListCellComponent {
     this.rippleScale = 0.05;
     this.rippleOpacity = ripple.alpha;
     this.rippleVisible = true;
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ripple.duration * 1000,
       curve: Curve.EaseOut,
       onFinish: () => {
@@ -198,7 +199,7 @@ export struct CYLTagListCellComponent {
     .accessibilityGroup(true)
     .accessibilityText(this.cell.accessibilityLabel)
     .accessibilityDescription(this.cell.accessibilityHint ?? '')
-    .accessibilitySelected(this.cell.accessibilitySelected)
+    .attributeModifier(new CYLAccessibilitySelectedModifier(this.cell.accessibilitySelected))
     .onTouch((event: TouchEvent) => {
       if (event.type === TouchType.Down) {
         this.cell.isHighlighted = this.cell.accessibilityEnabled;

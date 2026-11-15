@@ -1,3 +1,4 @@
+import { CYLAccessibilitySelectedModifier } from '../core/CYLAccessibilitySelected';
 /**
  * iOS `CYLCollectionViewCell.swift`, migrated from Android `CYLClassifyMenu.kt`: a tag cell of the classify menu, one
  * `CYLIndexPathButton` in the `chengNi` look that fills the cell.
@@ -31,6 +32,6 @@ export struct CYLCollectionViewCellView {
     }
     .width('100%')
     .height('100%')
-    .accessibilitySelected(this.cell.button.isSelected)
+    .attributeModifier(new CYLAccessibilitySelectedModifier(this.cell.button.isSelected))
   }
 }

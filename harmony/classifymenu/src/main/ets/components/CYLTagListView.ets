@@ -1,3 +1,4 @@
+import { CYLUIContext } from '../core/CYLUIContext';
 import { CYLAnimatedIcon } from './CYLAnimatedIcon';
 import {
   CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
@@ -192,6 +193,7 @@ export struct CYLTagListView {
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    CYLUIContext.remember(this.getUIContext());
     if (this.tagList !== undefined) {
       this.model = this.tagList;
     }

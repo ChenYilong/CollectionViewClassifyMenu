@@ -795,7 +795,7 @@ export struct CYLImageTagGroupViewComponent {
     }
     this.rippleScale = 0;
     this.rippleOpacity = ripple.startAlpha;
-    animateTo({ duration: 1000, iterations: -1, curve: Curve.Linear }, () => {
+    this.getUIContext().animateTo({ duration: 1000, iterations: -1, curve: Curve.Linear }, () => {
       this.rippleScale = 1;
       this.rippleOpacity = 0;
     });

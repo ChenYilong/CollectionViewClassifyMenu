@@ -1,3 +1,4 @@
+import { CYLUIContext } from './CYLUIContext';
 /**
  * The tag models of the TagCollectionView demo, as iOS `CYLTagModel.swift` and `CYLTagGroup.swift`: a title sized
  * with the 17 pt system font (plus 50 vp of padding), and a group of them laid out in rows of `CYLTagView`'s width.
@@ -52,8 +53,8 @@ export class CYLTagModel {
   /** Measures the title: its width plus the padding, and the tag height of the font. */
   updateSize(fontScale: number = 1): void {
     const font = CYLTagModel.titleFont(fontScale);
-    const widthPx = Number(MeasureText.measureText({ textContent: this.storedTitle, fontSize: `${font.size}fp` }));
-    this.storedWidth = Math.ceil(px2vp(widthPx)) + HORIZONTAL_PADDING;
+    const width = CYLUIContext.measureTextWidth({ textContent: this.storedTitle, fontSize: `${font.size}fp` }, font.size);
+    this.storedWidth = Math.ceil(width) + HORIZONTAL_PADDING;
     this.storedHeight = CYLTagMetrics.tagHeight(font, MINIMUM_HEIGHT);
   }
 }

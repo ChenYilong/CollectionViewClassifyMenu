@@ -199,7 +199,7 @@ export struct CYLTagContainerSamplePage {
 
   /** onTagLongClick: "You will delete this tag!". */
   confirmDelete(position: number): void {
-    AlertDialog.show({
+    this.getUIContext().showAlertDialog({
       title: '长按',
       message: '将删除这个标签！',
       primaryButton: { value: '删除', fontColor: Color.Red, action: () => {

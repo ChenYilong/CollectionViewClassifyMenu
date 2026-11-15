@@ -1,3 +1,4 @@
+import { hilog } from '@kit.PerformanceAnalysisKit';
 /**
  * Mock reviews and the filters shown above them (场景一：淘宝评价筛选), as iOS CYLReviewStore.swift, and the three ways
  * to apply the selected filters (iOS CYLReviewQuery.swift): in memory, through a simulated server, and as SQL on the
@@ -290,13 +291,18 @@ export class CYLDatabaseReviewQuery implements CYLReviewQuerying {
   }
 
   private async openStore(): Promise<relationalStore.RdbStore> {
-    if (CYLDatabaseReviewQuery.store === undefined) {
-      // Copies cyl_places.sqlite from rawfile on first use.
-      await PlacesDatabase.open(this.context);
-      CYLDatabaseReviewQuery.store = await relationalStore.getRdbStore(this.context,
-        { name: 'cyl_places.sqlite', securityLevel: relationalStore.SecurityLevel.S1 });
+    try {
+      if (CYLDatabaseReviewQuery.store === undefined) {
+        // Copies cyl_places.sqlite from rawfile on first use.
+        await PlacesDatabase.open(this.context);
+        CYLDatabaseReviewQuery.store = await relationalStore.getRdbStore(this.context,
+          { name: 'cyl_places.sqlite', securityLevel: relationalStore.SecurityLevel.S1 });
+      }
+      return CYLDatabaseReviewQuery.store;
+    } catch (error) {
+      hilog.error(0x0000, 'CYLReviewStore', '%{public}s', JSON.stringify(error));
+      throw error as Error;
     }
-    return CYLDatabaseReviewQuery.store;
   }
 
   fetchReviewsMatching(filters: CYLReviewFilter[], completion: CYLReviewQueryCompletion): void {
