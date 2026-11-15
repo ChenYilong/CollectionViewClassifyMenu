@@ -147,7 +147,43 @@ Component({
         }
         this.rows = results.map((rects) => model.rowsFromTops((rects || []).map((r) => r.top)));
         this.render(false);
+        this.reportFoldState();
       });
+    },
+
+    /**
+     * `foldchange` {sections: [{section, canFold, expanded}]} after a measurement or a fold change, so a page knows
+     * whether a section folds (the core's fold state) without reading the component's data.
+     */
+    reportFoldState() {
+      if (!this.rows) return;
+      const sections = this.model.sections.map((section) => ({
+        section: section.index,
+        canFold: model.foldState(this.model, this.rows[section.index] || [], false).canFold,
+        expanded: !!this.expanded[section.index],
+      }));
+      this.triggerEvent('foldchange', { sections });
+    },
+
+    /** Expands or folds a section, as a tap on its fold control (the core's `setExpanded(_:forSection:animated:)`). */
+    setExpanded(section, expanded) {
+      if (!!this.expanded[section] === !!expanded) return;
+      this.expanded[section] = !!expanded;
+      this.render(false);
+      this.reportFoldState();
+    },
+
+    isSectionExpanded(section) {
+      return !!this.expanded[section];
+    },
+
+    /**
+     * Selects exactly `keys` ("<section>-<item>") without rebuilding or measuring again (the core's selection from
+     * code: `selectItem(at:)` / `selectedIndexPaths`); no event is sent, as on iOS.
+     */
+    setSelectedItems(keys) {
+      this.selection = model.sanitizeSelection(keys || [], this.model.sections);
+      this.render(false);
     },
 
     reportHeight() {
@@ -182,6 +218,7 @@ Component({
       const section = Number(event.currentTarget.dataset.section);
       this.expanded[section] = !this.expanded[section];
       this.render(false);
+      this.reportFoldState();
     },
 
     selectionPayload() {

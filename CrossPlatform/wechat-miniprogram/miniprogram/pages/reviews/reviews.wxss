@@ -23,13 +23,6 @@ page { background: #FFFFFF; height: 100%; }
 
 /* cyl-tag-list puts lineSpacing (10) under the last row; reviewFilterStyle's bottom inset is 6. */
 .filter { flex: none; margin-bottom: -4px; }
-
-/* The footer fold control (CYLTagListFooterView, 28 high): chevron.down, turned 180° when expanded. */
-.fold { flex: none; height: 28px; display: flex; align-items: center; justify-content: center; }
-.fold-chevron {
-  width: 7px; height: 7px; margin-top: -4px; transform: rotate(45deg); transition: transform 0.25s;
-  border-style: solid; border-width: 0 1.5px 1.5px 0;
-}
 .fold-chevron-up { transform: rotate(225deg); margin-top: 4px; }
 
 .status {

@@ -1,4 +1,5 @@
 <scroll-view class="scroll" scroll-y="{{!reordering}}">
+  <block wx:if="{{containers.length}}">
   <view class="stack">
     <cyl-tag-cloud id="container-0" class="container" tags="{{containers[0].tags}}" list-style="{{containers[0].style}}"
                    color-theme="{{containers[0].options.colorTheme}}" allows-tapping="{{containers[0].options.allowsTapping}}"
@@ -42,5 +43,6 @@
                    container-border-color="{{containers[4].options.containerBorderColor}}"
                    container-corner-radius="{{containers[4].options.containerCornerRadius}}" />
   </view>
+  </block>
   <cyl-sample-toast id="toast" />
 </scroll-view>
