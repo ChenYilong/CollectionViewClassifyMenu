@@ -136,3 +136,4 @@ __pycache__/
 # macOS AppleDouble metadata written on external volumes: never commit
 ._*
 *.base
+.swiftpm/
