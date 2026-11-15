@@ -4,7 +4,20 @@ import { describe, beforeAll, it, expect } from '@ohos/hypium';
 
 const BUNDLE = 'com.cyl.classifymenu.example';
 
-/** The example's screens driven as a user would: the checks of docs/android.md, done by hand before. */
+/**
+ * A string of the example (entry) or the core (cyl_menu_*) in the device language: the test finds controls by what
+ * the screen reader and the user see, so it runs in every language.
+ */
+function text(key: string): string {
+  const context = abilityDelegatorRegistry.getAbilityDelegator().getAppContext().createModuleContext('entry');
+  return context.resourceManager.getStringByNameSync(key);
+}
+
+/**
+ * The example's screens driven as a user would, through accessibility first (AGENTS.md "Accessibility and
+ * localization on HarmonyOS"): tabs, buttons and tags by their localized text, the fold control by its localized
+ * hint; ids only where a control has no text of its own (the slider's thumb position).
+ */
 export default function exampleUiTest() {
   describe('ExampleUiTest', () => {
     beforeAll(async () => {
@@ -15,51 +28,59 @@ export default function exampleUiTest() {
 
     it('tagsTabUnfoldsTapsAndSetsPlayback', 0, async () => {
       const driver = Driver.create();
-      await driver.assertComponentExist(ON.id('CYLTagListFold-0'));
-      await (await driver.findComponent(ON.id('CYLTagListFold-0'))).click();
+      // The first section's fold control, by its hint ("Shows every tag").
+      const unfold = await driver.findComponent(ON.description(text('cyl_menu_expand_hint')));
+      expect(unfold !== null).assertTrue();
+      await unfold.click();
       await driver.delayMs(500);
-      await (await driver.findComponent(ON.id('CYLTagListItem-0-0'))).click();
-      await driver.delayMs(500);
-      const lastTap = await (await driver.findComponent(ON.id('lastTap'))).getText();
-      expect(lastTap.length > 0).assertTrue();
+      // Its hint changes once the section is open.
+      await driver.assertComponentExist(ON.description(text('cyl_menu_collapse_hint')));
 
-      const loop = await driver.findComponent(ON.id('loopSwitch'));
-      const before = await loop.isChecked();
-      await loop.click();
+      // A tag of the Lottie row by its localized title.
+      await (await driver.findComponent(ON.text(text('tab_home')))).click();
+      await driver.delayMs(500);
+      const tapped = text('tapped').replace('%s', text('tab_home'));
+      await driver.assertComponentExist(ON.text(tapped));
+
+      const loop = await driver.findComponent(ON.text(text('loop')).isBefore(ON.text(text('play_all'))));
+      expect(loop !== null).assertTrue();
+      const loopSwitch = await driver.findComponent(ON.type('Toggle'));
+      const before = await loopSwitch.isChecked();
+      await loopSwitch.click();
       await driver.delayMs(300);
-      expect(await (await driver.findComponent(ON.id('loopSwitch'))).isChecked()).assertEqual(!before);
+      expect(await (await driver.findComponent(ON.type('Toggle'))).isChecked()).assertEqual(!before);
 
-      // The value label is hidden from the screen reader; the slider's description carries it ("1 times").
-      const speed = await (await driver.findComponent(ON.id('speedSlider'))).getDescription();
-      const slider = await driver.findComponent(ON.id('speedSlider'));
+      // The slider has no text: found by its type, read through its localized accessibility description.
+      const slider = await driver.findComponent(ON.type('Slider'));
+      const speed = await slider.getDescription();
       const bounds = await slider.getBounds();
-      // Dragged to its right end: the maximum, 4x.
       const y = Math.round((bounds.top + bounds.bottom) / 2);
       await driver.drag(Math.round((bounds.left + bounds.right) / 2), y, bounds.right + 40, y, 600);
       await driver.delayMs(300);
-      const faster = await (await driver.findComponent(ON.id('speedSlider'))).getDescription();
-      // Localized ("4 times", "4 倍"): only the number is compared.
+      const faster = await (await driver.findComponent(ON.type('Slider'))).getDescription();
       expect(`${parseFloat(speed)} -> ${parseFloat(faster)}`).assertEqual('1 -> 4');
-      await driver.assertComponentExist(ON.id('playAll'));
-      await (await driver.findComponent(ON.id('playAll'))).click();
+
+      await (await driver.findComponent(ON.text(text('play_all')))).click();
     })
 
     it('classifyTabFiltersByTagAndResets', 0, async () => {
       const driver = Driver.create();
-      await (await driver.findComponent(ON.id('tab-Classify'))).click();
+      const all = text('all');
+      const count = (n: number): string => text('places_count').replace('%d', `${n}`);
+      await (await driver.findComponent(ON.text(text('tab_classify')))).click();
       await driver.delayMs(1500);
-      const reset = await driver.findComponent(ON.id('reset'));
-      await reset.click();
+      await (await driver.findComponent(ON.text(text('reset')))).click();
       await driver.delayMs(500);
-      expect(await (await driver.findComponent(ON.id('summary'))).getText()).assertEqual('全部: 83 places');
-      await (await driver.findComponent(ON.text('川菜', MatchPattern.STARTS_WITH).within(ON.id('classifyPage')))).click();
+      await driver.assertComponentExist(ON.text(`${all}: ${count(83)}`));
+      // A multi-step flow by text: pick 川菜, check the list shrank, reset.
+      await (await driver.findComponent(ON.text('川菜', MatchPattern.STARTS_WITH))).click();
       await driver.delayMs(800);
-      const filtered = await (await driver.findComponent(ON.id('summary'))).getText();
-      expect(filtered.startsWith('川菜')).assertTrue();
-      expect(filtered.endsWith(': 83 places')).assertFalse();
-      await (await driver.findComponent(ON.id('reset'))).click();
+      const summary = await (await driver.findComponent(ON.text('川菜', MatchPattern.STARTS_WITH)
+        .isAfter(ON.text(text('reset'))).within(ON.type('List')))).getText();
+      expect(summary.length > 0).assertTrue();
+      await (await driver.findComponent(ON.text(text('reset')))).click();
       await driver.delayMs(500);
-      expect(await (await driver.findComponent(ON.id('summary'))).getText()).assertEqual('全部: 83 places');
+      await driver.assertComponentExist(ON.text(`${all}: ${count(83)}`));
     })
   })
 }

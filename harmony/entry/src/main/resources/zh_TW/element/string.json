@@ -1,0 +1,108 @@
+{
+  "string": [
+    {
+      "name": "speed",
+      "value": "速度"
+    },
+    {
+      "name": "speed_value",
+      "value": "%s 倍"
+    },
+    {
+      "name": "loop",
+      "value": "循環"
+    },
+    {
+      "name": "play_all",
+      "value": "全部播放"
+    },
+    {
+      "name": "animated_icons",
+      "value": "動畫圖示"
+    },
+    {
+      "name": "tapped",
+      "value": "點了 %s"
+    },
+    {
+      "name": "tab_home",
+      "value": "首頁"
+    },
+    {
+      "name": "tab_messages",
+      "value": "訊息"
+    },
+    {
+      "name": "tab_me",
+      "value": "我的"
+    },
+    {
+      "name": "tab_search",
+      "value": "搜尋"
+    },
+    {
+      "name": "tab_tags",
+      "value": "標籤"
+    },
+    {
+      "name": "tab_classify",
+      "value": "分類"
+    },
+    {
+      "name": "section_lottie",
+      "value": "Lottie"
+    },
+    {
+      "name": "section_tags",
+      "value": "標籤"
+    },
+    {
+      "name": "classify_title",
+      "value": "分類"
+    },
+    {
+      "name": "reset",
+      "value": "重設"
+    },
+    {
+      "name": "reset_hint",
+      "value": "清除分類與篩選條件"
+    },
+    {
+      "name": "filter",
+      "value": "篩選"
+    },
+    {
+      "name": "filter_modified",
+      "value": "篩選，已設定條件"
+    },
+    {
+      "name": "filter_ok",
+      "value": "確定"
+    },
+    {
+      "name": "no_places",
+      "value": "沒有符合條件的地點"
+    },
+    {
+      "name": "places_count",
+      "value": "%d 個地點"
+    },
+    {
+      "name": "all",
+      "value": "全部"
+    },
+    {
+      "name": "regions",
+      "value": "地區"
+    },
+    {
+      "name": "dishes",
+      "value": "菜品"
+    },
+    {
+      "name": "place_rating",
+      "value": "評分 %1$s，%2$d 元"
+    }
+  ]
+}

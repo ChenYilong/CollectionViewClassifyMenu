@@ -48,7 +48,7 @@ const TAB_IMAGES: Record<string, Resource> = {
 
 /** The tab and plus button titles, localized (base, zh_CN), by identifier. */
 const TAB_TITLES: Record<string, Resource> = {
-  'tags': $r('app.string.tags'), 'classify': $r('app.string.classify'), 'plus': $r('app.string.post')
+  'tags': $r('app.string.tab_tags'), 'classify': $r('app.string.tab_classify'), 'plus': $r('app.string.tab_post')
 };
 
 /** The React Native app of each page, by tab identifier (the plus button's is "plus"). */

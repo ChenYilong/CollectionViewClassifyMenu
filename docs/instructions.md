@@ -27,3 +27,7 @@
 - Swift migration priority (English rule, AGENTS.md "Core quality first, examples last"): example compile errors and
   test failures caused by the migration are fixed in the example code first; the examples have the lowest weight and
   get no compatibility work; the core's Swift code follows `Swift-Coding-Standard.md` with no baggage kept for them.
+- Accessibility and localization on HarmonyOS (English rule, AGENTS.md "Accessibility and localization on HarmonyOS
+  (and every platform)"): all code supports screen readers, visual assistance and localization through resource
+  files; add support first where it is missing; automated UI tests locate controls, tap and run multi-step flows
+  through accessibility and localized text first. The HarmonyOS score sheet is `harmonyos-api.md`.
