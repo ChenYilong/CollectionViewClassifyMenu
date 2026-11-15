@@ -33,8 +33,8 @@ CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback contro
   (4) the three combine and change playback in real time; (5) change the core when needed to support it; (6) every
   example layer: iOS, Android, React Native, Flutter, Mini Program, HarmonyOS; (7) record the rule in English in the
   instructions documents and reference this document from the related skills.
-- **Status:** iOS and Android DONE (2026-11-14); Flutter: iOS and Android DONE (`flutter/cyl_tag_list`); React Native,
-  HarmonyOS: `harmony/entry` without animated icons yet; Mini Program: DONE in WeChat DevTools (`CrossPlatform/wechat-miniprogram`, 2026-11-15). Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
+- **Status:** iOS and Android DONE (2026-11-14); Flutter: iOS and Android DONE (`flutter/cyl_tag_list`); React Native
+  and HarmonyOS DONE (2026-11-15); Mini Program: DONE in WeChat DevTools (`CrossPlatform/wechat-miniprogram`, 2026-11-15). Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
   `example-animation-controls.md` from another session's branch `docs/animation-playback-controls`); merged here,
   and that file now points to this one.
 
@@ -48,8 +48,8 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 | Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | DONE (2026-11-14, below) |
 | React Native | `react-native/react-native-cyl-tag-list/example`, Tags tab | iOS and Android DONE (2026-11-15: Play all command, speed steps 0.25x–4x, Loop switch; `cross-platform.md`, `scripts/e2e-android.sh` and the iOS UI test check the speed) |
 | Flutter | `flutter/cyl_tag_list/example`, Animated icons | iOS and Android DONE (animations play, `cross-platform.md`) |
-| Mini Program | `CrossPlatform/wechat-miniprogram/miniprogram/pages/animations` (动效, the iOS screen 1:1) | DONE in WeChat DevTools (2026-11-15; Play all, speed slider, Loop switch; Lottie through CYLTabBarController's cyl-lottie-miniprogram, GIF; no PAG / Rive engine; `cross-platform.md`). TODO bugs: icons drift after scrolling while playing (Loop on); Rive icons do not show (`cross-platform.md`) |
-| HarmonyOS | `harmony/entry` (Tags, Classify; 2026-11-15) | TODO: no animated icons yet (needs a Lottie player for ArkTS) |
+| Mini Program | `CrossPlatform/wechat-miniprogram/miniprogram/pages/animations` (动效, the iOS screen 1:1) | DONE in WeChat DevTools (2026-11-15; Play all, speed slider, Loop switch; Lottie, Rive, PAG and GIF through CYLTabBarController's cyl-lottie / cyl-rive / cyl-pag; `cross-platform.md`) |
+| HarmonyOS | `harmony/entry`, Tags tab | DONE (2026-11-15: `@ohos/lottie` icons in the core, speed slider 0.25x–4x, Loop switch, Play all; `android.md`) |
 
 ### iOS: DONE (2026-11-14)
 
