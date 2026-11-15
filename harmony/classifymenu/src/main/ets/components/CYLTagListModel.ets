@@ -11,6 +11,8 @@ export interface CYLIndexPath {
 export interface CYLTagItem {
   title: string;
   image?: string;
+  /** A Lottie animation shown before the title: `asset:<path>` (a rawfile of the app) or the JSON text. */
+  animation?: string;
   /** An item that clears the other selected items of its section (the "全部" of a filter). */
   exclusive?: boolean;
 }
@@ -32,6 +34,8 @@ export interface CYLTagStyle {
   itemHeight: number;
   fontSize: number;
   spacing: number;
+  /** The side of an animated icon, in vp (`imageSize` "{w, h}" of the shared configuration: its width). */
+  imageSize: number;
   normal: CYLTagStateStyle;
   selected: CYLTagStateStyle;
 }
@@ -79,6 +83,31 @@ const SELECTED: CYLTagStateStyle = {
   textColor: '#2AB9A0', backgroundColor: '#E6F8F5', borderColor: '#2AB9A0', borderWidth: 1, cornerRadius: 4
 };
 
+function imageSide(value: Object | undefined): number {
+  if (typeof value === 'number') {
+    return value as number;
+  }
+  const match = typeof value === 'string' ? (value as string).match(/[\d.]+/) : null;
+  return match !== null ? Number(match[0]) : 18;
+}
+
+/**
+ * Plays the animated icons of a `CYLTagListView` again; pass it as the view's `controller`.
+ */
+export class CYLTagListController {
+  private handler?: () => void;
+
+  /** Called by the view it is passed to. */
+  attach(handler: () => void): void {
+    this.handler = handler;
+  }
+
+  /** Plays every animated icon of the list from progress 0. */
+  playAll(): void {
+    this.handler?.();
+  }
+}
+
 /** Reads a configuration from its JSON text or object; unknown keys are ignored, missing ones take defaults. */
 export function parseConfiguration(json: string | Record<string, Object>): CYLTagListConfiguration {
   const raw: Record<string, Object> = typeof json === 'string' ? JSON.parse(json) as Record<string, Object> : json;
@@ -90,6 +119,7 @@ export function parseConfiguration(json: string | Record<string, Object>): CYLTa
     items: ((section['items'] ?? []) as Record<string, Object>[]).map((item): CYLTagItem => ({
       title: str(item['title'], ''),
       image: item['image'] as string | undefined,
+      animation: item['animation'] as string | undefined,
       exclusive: item['exclusive'] === true
     }))
   }));
@@ -105,6 +135,7 @@ export function parseConfiguration(json: string | Record<string, Object>): CYLTa
       itemHeight: num(style['itemHeight'], 32),
       fontSize: num(style['fontSize'], 14),
       spacing: num(style['spacing'], 8),
+      imageSize: imageSide(style['imageSize']),
       normal: normal,
       selected: stateStyle(style['selected'] as Record<string, Object> | undefined, SELECTED)
     }

@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit';
-import { CYLIndexPath, CYLTagListView, CYLTagTap } from '@cyl/classifymenu';
+import { CYLIndexPath, CYLTagListController, CYLTagListView, CYLTagTap } from '@cyl/classifymenu';
 import { Place, PlacesDatabase, REGIONS } from '../data/PlacesDatabase';
 
 const CLASSIFY = 'menu.classify';
@@ -22,6 +22,7 @@ function selectedJSON(keys: string[]): CYLIndexPath[] {
 interface ItemJSON {
   title: string;
   exclusive?: boolean;
+  animation?: string;
 }
 
 interface SectionJSON {
@@ -35,6 +36,7 @@ interface CornerJSON {
 
 interface StyleJSON {
   itemHeight: number;
+  imageSize?: string;
   normal: CornerJSON;
   selected: CornerJSON;
 }
@@ -79,33 +81,83 @@ struct Index {
   }
 }
 
-/** A tag list from one configuration: multiple selection, two rows folded. */
+/**
+ * A tag list from one configuration (multiple selection, two rows folded) with the Lottie icons of CYLTagListView and
+ * the playback controls of docs/example-demo-rules.md: Play all, a speed slider (0.25x to 4x) and a loop switch, which
+ * combine and act at once.
+ */
 @Component
 struct TagsPage {
   @State lastTap: string = '';
+  @State speed: number = 1;
+  @State loops: boolean = false;
+  private controller: CYLTagListController = new CYLTagListController();
 
   private configuration(): string {
     const titles = ['Home', 'Search', 'Messages', 'Profile', 'Favorites', 'Settings', 'Camera', 'Music', 'Maps',
       'Calendar', 'A long tag that starts a new line', '你好，这是一个TAG。'];
+    const animated = (title: string, file: string): ItemJSON => ({ title: title, animation: `asset:${file}` });
     const config: ConfigJSON = {
       selectionMode: 'multiple',
       defaultVisibleRows: 2,
-      style: { itemHeight: 36, normal: { cornerRadius: 0 }, selected: { cornerRadius: 0 } },
-      sections: [{ title: 'Tags', items: items(titles) }]
+      style: { itemHeight: 36, imageSize: '{18, 18}', normal: { cornerRadius: 0 }, selected: { cornerRadius: 0 } },
+      sections: [
+        {
+          title: 'Lottie',
+          items: [animated('Home', 'tab_home_animate.json'), animated('Messages', 'tab_message_animate.json'),
+            animated('Search', 'tab_search_animate.json'), animated('Me', 'tab_me_animate.json')]
+        },
+        { title: 'Tags', items: items(titles) }
+      ]
     };
     return JSON.stringify(config);
   }
 
+  private speedText(): string {
+    return `${this.speed}×`;
+  }
+
   build() {
     Column() {
-      Text('Tags').fontSize(24).fontWeight(FontWeight.Bold).padding(16).width('100%')
-      CYLTagListView({
-        configuration: this.configuration(),
-        onTagTap: (tap: CYLTagTap) => this.lastTap = `Tapped ${tap.title}`
-      })
+      Text($r('app.string.animated_icons')).fontSize(24).fontWeight(FontWeight.Bold).padding(16).width('100%')
+        .accessibilityRole(AccessibilityRoleType.TITLE_BAR)
+      Row() {
+        Text($r('app.string.speed')).accessibilityLevel('no')
+        Slider({ value: this.speed, min: 0.25, max: 4, step: 0.25 })
+          .layoutWeight(1)
+          .id('speedSlider')
+          .accessibilityText($r('app.string.speed'))
+          .accessibilityDescription(getContext(this).resourceManager.getStringByNameSync('speed_value')
+            .replace('%s', `${this.speed}`))
+          .onChange((value: number) => this.speed = Math.round(value * 4) / 4)
+        Text(this.speedText()).id('speedValue').accessibilityLevel('no')
+      }.width('100%').padding({ left: 16, right: 16 })
+      Row({ space: 8 }) {
+        Text($r('app.string.loop')).layoutWeight(1).accessibilityLevel('no')
+        Toggle({ type: ToggleType.Switch, isOn: this.loops })
+          .id('loopSwitch')
+          .accessibilityText($r('app.string.loop'))
+          .onChange((isOn: boolean) => {
+            this.loops = isOn;
+            if (isOn) {
+              this.controller.playAll();
+            }
+          })
+        Button($r('app.string.play_all')).id('playAll').onClick(() => this.controller.playAll())
+      }.width('100%').padding({ left: 16, right: 16, bottom: 8 })
       if (this.lastTap !== '') {
-        Text(this.lastTap).padding(16).width('100%').id('lastTap')
+        Text(this.lastTap).padding({ left: 16, right: 16 }).width('100%').id('lastTap')
       }
+      Scroll() {
+        CYLTagListView({
+          configuration: this.configuration(),
+          animationSpeed: this.speed,
+          animationLoops: this.loops,
+          controller: this.controller,
+          onTagTap: (tap: CYLTagTap) => this.lastTap = getContext(this).resourceManager
+            .getStringByNameSync('tapped').replace('%s', tap.title)
+        })
+      }.layoutWeight(1).align(Alignment.Top)
     }.height('100%').alignItems(HorizontalAlign.Start)
   }
 }
