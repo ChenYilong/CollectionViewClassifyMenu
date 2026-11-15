@@ -17,7 +17,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 | `cross-platform.md`, tag cells: React Native and Flutter look the same as iOS ("no example here yet") | DONE: both host the native list (Swift / Kotlin), so their cells are the native cells; screenshots in the sections below |
 | `cross-platform.md`, React Native "Still TODO" notes (Android view, Classify page, tests) | DONE (stale notes): steps 3, 4 and 5 are DONE further down in the same section |
 | `android.md`, HarmonyOS step 2: Flutter on HarmonyOS NEXT | DONE (2026-11-16, below): both integration tests pass on the HarmonyOS emulator (`All tests passed!`), sharp text, Lottie icons, Play all / speed / Loop reach the ArkTS list, Classify on the shared database (83 places) |
-| `android.md`, HarmonyOS step 3: React Native on HarmonyOS NEXT (after Flutter) | TODO |
+| `android.md`, HarmonyOS step 3: React Native on HarmonyOS NEXT (after Flutter) | DONE (2026-11-16, below): `react-native/react-native-cyl-tag-list/harmony-example` (RNOH 0.86.1) shows the native ArkTS list with Lottie icons; speed, Loop and selection events checked on the emulator |
 | `example-demo-rules.md`, playback controls in the Mini Program example | DONE (another session, 2026-11-15): `CrossPlatform/wechat-miniprogram`, pages/animations, Play all, speed slider, Loop switch |
 
 - **Flutter on HarmonyOS, progress (2026-11-16):** the example builds (`flutter build hap --debug`, Flutter
@@ -58,8 +58,24 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **English:** find the cross-platform documents and the Android, React Native and Flutter TODOs in them; summarize them
   in a table, column 1 the item found, column 2 `TODO` by default; remove one `TODO` for each item done; no `TODO`
   left is full marks; keep going until full marks.
-- **Score:** 7 / 8 = 87 (2026-11-16: five rows were done already, their notes stale; SwiftPM added; Flutter on
-  HarmonyOS). Left: React Native on HarmonyOS.
+- **Score:** 8 / 8 = 100 (2026-11-16: five rows were done already, their notes stale; SwiftPM added; Flutter and
+  React Native on HarmonyOS).
+- **React Native on HarmonyOS (2026-11-16):** RNOH 0.86.1 needs React Native 0.86.3 (the iOS/Android example is on
+  0.88), so `harmony-example/` is a small app of its own from RNOH's template that reuses the example's Tags page
+  (`scripts/setup.sh` copies it, the library and the Lottie rawfiles in, then runs `codegen-harmony` and
+  `bundle-harmony`). `CylTagListView` is an ArkTS component (`CylTagListRNView.ets`) over the core's
+  `CYLTagListView`: props from the descriptor's raw props (the generated props selector returned them empty), events
+  (`tagTap`, `selectionChange`, `contentHeightChange`) and the `playAll` command through the generated classes. Found
+  on the way: the template's `MetroJSBundleProvider` reached another app's Metro server on the host, so the app loads
+  only its bundled JS; Metro needs Node 20+ (DevEco's is 18); RNOH calls a WebSocket API of API 26 behind a run-time
+  check, so `setup.sh` casts it to compile on API 21. On the emulator (HarmonyOS 6.0.1 SDK API 21, Mate 70 Pro
+  `6.0.0.112(SP3DEVC00E112R4P11)`, macOS 27.3, 2026-11-16 12:55 emulator time): tap Home → "Selected: Home", 2x →
+  "Speed 2.00x", Loop on; two screenshots 0.2 s apart differ (the icons animate):
+
+  <img src="assets/react-native-harmonyos-tags.jpeg" width="360" alt="React Native on HarmonyOS: native tag list, 2x, Loop on, Home selected">
+
+  Not ported: the Classify tab (its SQLite library, op-sqlite, has no HarmonyOS version) and the
+  `react-native-cyltabbar` tab bar (iOS/Android only).
 
 ## DONE (2026-11-15): one shared local database for every platform
 
