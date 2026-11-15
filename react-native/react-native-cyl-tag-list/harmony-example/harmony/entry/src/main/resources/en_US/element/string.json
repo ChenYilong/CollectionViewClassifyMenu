@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "tab_post",
+      "value": "Post"
+    },
+    {
+      "name": "tab_tags",
+      "value": "Tags"
+    },
+    {
+      "name": "tab_classify",
+      "value": "Classify"
+    }
+  ]
+}

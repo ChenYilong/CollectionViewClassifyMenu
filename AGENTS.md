@@ -323,6 +323,9 @@ AGENTS.md, newest commit) and adapted to this project:
   in code.
 - If something is found that does not support accessibility or localization, add the support first, then go on
   with the task.
+- The same rule covers the cross-platform HarmonyOS shells (`flutter/cyl_tag_list_ohos`,
+  `react-native/react-native-cyl-tag-list/harmony-example`, whose strings are its own native resources and whose tab
+  bar is CYLTabBarController's), and visual assistance includes touch targets of at least 44 vp.
 - Automated UI tests locate controls through accessibility first: by the localized accessibility label
   (`ON.text(CYLExampleLocalizedString(key))`), then its description, and only then by an id
   (`cylFindAccessible` / `cylTapAccessible` in `harmony/entry/src/ohosTest/ets/test/TestSupport.ets`). This applies to
