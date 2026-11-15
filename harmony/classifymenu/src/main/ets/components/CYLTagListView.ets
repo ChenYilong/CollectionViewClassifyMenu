@@ -76,6 +76,7 @@ class CYLSectionRender {
   moreImage?: ResourceStr;
   moreColor: string = CYLColor.GRAY;
   moreLabel: string = '';
+  accessory?: WrappedBuilder<[number]>;
 }
 
 function imageKey(image: CYLImage | undefined): string {
@@ -387,9 +388,10 @@ export struct CYLTagListView {
     h.moreImage = style.moreButtonImage ?? CYLMenuResources.image('cyl_more');
     h.moreColor = style.moreButtonColor;
     h.moreLabel = m.moreButtonAccessibilityLabel(frame.section);
+    h.accessory = m.menuDataSource?.menuAccessoryViewForSection?.(frame.section);
     h.key = ['h', h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, h.textColor, h.inset,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
-      h.fold.key, h.showsMore, h.moreColor, h.moreLabel].join('|');
+      h.fold.key, h.showsMore, h.moreColor, h.moreLabel, h.accessory !== undefined].join('|');
     return h;
   }
 
@@ -712,6 +714,14 @@ export struct CYLTagListView {
                 .id(`CYLTagListMore-${h.section}`)
                 .accessibilityText(h.moreLabel)
                 .onClick(() => this.model.tapMoreButton(h.section))
+            }
+            if (h.accessory !== undefined) {
+              Row() {
+                h.accessory.builder(h.section)
+              }
+              .constraintSize({ maxWidth: '50%' })
+              .height('100%')
+              .alignItems(VerticalAlign.Center)
             }
             if (h.showsFold && !h.foldLeading) {
               this.foldButton(h.fold)
