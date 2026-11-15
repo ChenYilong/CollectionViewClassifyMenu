@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "versions": [
+      [
+        "Target",
+        "HarmonyOS 5.0.0 (API 12): `compatibleSdkVersion` and `targetSdkVersion` `5.0.0(12)`, `runtimeOS` HarmonyOS (`harmony/build-profile.json5`)"
+      ],
+      [
+        "Build SDK",
+        "HarmonyOS 6.0.1 (API 21, `6.0.1.112`), DevEco Studio `6.0.1.251`, hvigor and `hdc` of that SDK"
+      ],
+      [
+        "Run",
+        "Mate 70 Pro emulator `6.0.0.112(SP3DEVC00E112R4P11)` (HarmonyOS 6.0.0)"
+      ],
+      [
+        "Language",
+        "ArkTS, ArkUI declarative UI; the core is a HAR module (`harmony/classifymenu`), the example a HAP (`harmony/entry`)"
+      ]
+    ]
+  },
+  "api": {},
+  "demos": [
+    {
+      "ios": "Root tab bar (CYLExampleAppDelegate.makeRootTabBarController)",
+      "shows": "场景一：评价筛选, 场景二：搜索分类, the plus button (查询筛选), 样式, 动效",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLProductViewController",
+      "shows": "宝贝详情: the product, 宝贝评价(10), the keyword preview, 查看更多评价",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLReviewListViewController",
+      "shows": "The review filter (multiple choice, 全部 exclusive, folded, footer chevron); memory / network / database modes; the review cells",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLSearchHomeViewController",
+      "shows": "脉脉搜索 and the search field button",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLSearchCategoryViewController",
+      "shows": "The search page with its own category tab bar (找人/动态/八卦/职位)",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLSearchCategoryPageViewController",
+      "shows": "One category page: the 职位 sidebar and 行业 menu",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLSearchDiscoverViewController",
+      "shows": "最近搜索 folded to two rows with the chevron as the last tag, 发现 two per row, 换一批",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLQueryScenariosViewController",
+      "shows": "查询筛选: the filter demos by scenario and the database's row counts",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLMenuLinkageViewController",
+      "shows": "菜单选择 · 数据库联动: the classify menu, the multiple filter panel, the SQL and the rows; saved selections",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagStyleDemoViewController",
+      "shows": "The preview and the style actions with their values",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagAnimationDemoViewController",
+      "shows": "The animation sections, speed slider (0.25×–4×), loop switch, Play all",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagConfigurationDemoViewController",
+      "shows": "The list from the iOS JSON file and from a dictionary",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagCloudDemoViewController",
+      "shows": "The tag cloud built in code and from a configuration",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagCloudSampleViewController",
+      "shows": "The android-tagview sample: 25 tags, add a tag",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagCloudSubViewController",
+      "shows": "The sample's result page",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagCloudListViewController",
+      "shows": "The sample's list view",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagCloudRecyclerViewController",
+      "shows": "The sample's RecyclerView page",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLHotSearchViewController",
+      "shows": "The sample's hot search",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLImageTagSampleViewController",
+      "shows": "Tags on a picture: tag groups",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLImageTagEditViewController",
+      "shows": "Edit image tags: drag, turn, delete, 创建, 保存",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLImageTagListViewController",
+      "shows": "The image tag list",
+      "harmony": ""
+    },
+    {
+      "ios": "CYLTagContainerSampleViewController",
+      "shows": "The five AndroidTagView containers",
+      "harmony": ""
+    }
+  ],
+  "history": [
+    "2026-11-16: tables created, every row TODO."
+  ]
+}
