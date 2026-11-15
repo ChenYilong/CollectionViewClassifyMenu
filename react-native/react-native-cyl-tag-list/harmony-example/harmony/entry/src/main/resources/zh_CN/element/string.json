@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "post",
+      "value": "发布"
+    },
+    {
+      "name": "tags",
+      "value": "标签"
+    },
+    {
+      "name": "classify",
+      "value": "分类"
+    }
+  ]
+}
