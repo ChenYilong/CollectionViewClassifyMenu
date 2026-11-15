@@ -20,20 +20,5 @@ Flutter and React Native examples.
 | `tab_message_animate.json` | `740dce5ae56b9b45902ca58e739e212724541d40dbb666f949a9e363402116db` |
 | `tab_search_animate.json` | `81080fc0dc59c37d23b0c59c03a8fe42d63c8c29a93a5facc74c7d75fc345d37` |
 
-<<<<<<< HEAD
-## Tab bar (CYLTabBarController)
-
-The example's tab bar is CYLTabBarController's HarmonyOS library (`cyltabbar`), built from
-`entry/src/main/resources/rawfile/cyl_tabbar_configuration.json` (Tags, Classify and the raised Post plus button with a
-page of its own). Fetch the library at its pinned commit once before building (it goes to `.deps/`, ignored):
-
-```sh
-sh scripts/fetch-cyltabbar.sh
-```
-
-Fetch it outside an exFAT/network volume if git complains about `._pack-*.idx` files (macOS metadata); the build
-mirror under `/tmp` is fine.
-=======
 `entry/src/main/resources/rawfile/svga/*.svga` are unmodified copies of CYLTabBarController's SVGA tab icons; source,
 license (Apache License 2.0, via kongpf8848/Animation) and SHA-256 in `entry/src/main/resources/rawfile/svga/NOTICE.md`.
->>>>>>> 8a2f641 (feat(harmony): ✨ SVGA animated icons, decoded by the library)

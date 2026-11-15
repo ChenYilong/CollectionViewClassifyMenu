@@ -21,102 +21,12 @@
       "value": "同城"
     },
     {
-<<<<<<< HEAD
-      "name": "tapped",
-      "value": "点击了 %s"
-    },
-    {
-      "name": "tab_home",
-      "value": "首页"
-    },
-    {
-=======
->>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
       "name": "tab_messages",
       "value": "消息"
     },
     {
       "name": "tab_me",
       "value": "我的"
-<<<<<<< HEAD
-    },
-    {
-      "name": "tab_search",
-      "value": "搜索"
-    },
-    {
-      "name": "tab_tags",
-      "value": "标签"
-    },
-    {
-      "name": "tab_classify",
-      "value": "分类"
-    },
-    {
-      "name": "section_lottie",
-      "value": "Lottie"
-    },
-    {
-      "name": "section_tags",
-      "value": "标签"
-    },
-    {
-      "name": "classify_title",
-      "value": "分类"
-    },
-    {
-      "name": "reset",
-      "value": "重置"
-    },
-    {
-      "name": "reset_hint",
-      "value": "清除分类与筛选条件"
-    },
-    {
-      "name": "filter",
-      "value": "筛选"
-    },
-    {
-      "name": "filter_modified",
-      "value": "筛选，已设置条件"
-    },
-    {
-      "name": "filter_ok",
-      "value": "确定"
-    },
-    {
-      "name": "no_places",
-      "value": "没有符合条件的地点"
-    },
-    {
-      "name": "places_count",
-      "value": "%d 个地点"
-    },
-    {
-      "name": "all",
-      "value": "全部"
-    },
-    {
-      "name": "regions",
-      "value": "地区"
-    },
-    {
-      "name": "dishes",
-      "value": "菜品"
-    },
-    {
-      "name": "place_rating",
-      "value": "评分 %1$s，%2$d 元"
-    },
-    {
-      "name": "tab_post",
-      "value": "发布"
-    },
-    {
-      "name": "plus_page",
-      "value": "加号按钮的页面"
-=======
->>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
     }
   ]
 }
