@@ -1,0 +1,48 @@
+// swift-tools-version: 5.9
+//
+//  Package.swift
+//  CollectionViewClassifyMenu
+//
+//  The core library as a Swift package: the sources and resources of CollectionViewClassifyMenu.podspec under
+//  CollectionViewClassifyMenu/, without the demo app's files. The resources are the package's bundle (Bundle.module),
+//  which CYLMenuResources.bundle returns under SwiftPM. TagCollectionView's CYLTagView is CocoaPods only for now.
+//
+
+import PackageDescription
+
+let package = Package(
+    name: "CollectionViewClassifyMenu",
+    defaultLocalization: "en",
+    platforms: [
+        .iOS(.v15)
+    ],
+    products: [
+        .library(name: "CollectionViewClassifyMenu", targets: ["CollectionViewClassifyMenu"])
+    ],
+    targets: [
+        .target(
+            name: "CollectionViewClassifyMenu",
+            path: "CollectionViewClassifyMenu",
+            exclude: [
+                "Class/ClassifyMenu/Controller/CYLDemoDataSource.swift",
+                "Class/ClassifyMenu/Controller/CYLFilterDemoViewController.swift",
+                "Class/ClassifyMenu/Controller/CYLMainViewController.swift",
+                "Class/Other/Symtem/CYLAppDelegate.swift",
+                "Class/Other/Symtem/CYLDemoLocalization.swift",
+                "Class/Other/Symtem/CYLClassifyMenuDemo.bundle",
+                "Class/Other/Symtem/Base.lproj",
+                "Class/Other/Symtem/Info.plist",
+                "Class/Other/Tool/CYLDBManager.swift",
+                "Class/Other/data.json"
+            ],
+            resources: [
+                .process("Resources/Localization"),
+                .copy("Resources/Privacy/PrivacyInfo.xcprivacy")
+            ],
+            linkerSettings: [
+                .linkedFramework("UIKit"),
+                .linkedFramework("Accelerate")
+            ]
+        )
+    ]
+)
