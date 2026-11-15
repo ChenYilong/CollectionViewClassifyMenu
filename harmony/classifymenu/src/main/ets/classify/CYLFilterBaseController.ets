@@ -1,3 +1,4 @@
+import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * iOS `CYLFilterBaseController.swift` (and its XIB), migrated from Android `CYLMultipleFilter.kt`: the base of the
  * filter panels: a list that slides in from the leading edge over a blurred, dimmed host, leaving 50 vp of it visible,
@@ -177,6 +178,7 @@ export struct CYLFilterPanelView {
   }
 
   aboutToAppear(): void {
+    CYLUIContext.remember(this.getUIContext());
     this.removeListener = this.controller.addListener(() => {
       this.showing = this.controller.isShowing;
     });

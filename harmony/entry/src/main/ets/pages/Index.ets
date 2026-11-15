@@ -1,3 +1,4 @@
+import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
 import { CYLDemoNav } from '../demos/DemoNav';
 import { SHELL_ROUTES } from '../demos/shell/ShellRoutes';
 import { MENU_ROUTES } from '../demos/menu/MenuRoutes';
@@ -45,6 +46,10 @@ const PLUS_INDEX: number = 2;
 struct Index {
   @State tab: number = 0;
   private stack: NavPathStack = CYLDemoNav.stack;
+
+  aboutToAppear(): void {
+    CYLExampleUIContext.context = this.getUIContext();
+  }
 
   @Builder
   destination(name: string, param: Object) {

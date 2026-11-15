@@ -1,3 +1,4 @@
+import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLTagConfigurationDemoViewController` (配置初始化): the two ways to create a tag list (after CYLTabBarController's
  * -initWithConfiguration: and -initWithConfigurationFile:error:): a configuration file (JSON, a rawfile of the app)
@@ -37,11 +38,11 @@ export struct CYLTagConfigurationPage {
   @State event: string = '动效引擎：CYLTabBarItemAnimationFactory 已链接';
   private fileTagList?: CYLTagListState;
   private configurationError: string = '';
-  private mapTagList: CYLTagListState = CYLTagListState.withConfiguration(mapConfiguration(getContext()));
+  private mapTagList: CYLTagListState = CYLTagListState.withConfiguration(mapConfiguration(CYLUIContext.hostContext()));
 
   aboutToAppear(): void {
     try {
-      this.fileTagList = CYLTagListState.withConfigurationFile(CONFIGURATION_FILE_PATH, getContext(this));
+      this.fileTagList = CYLTagListState.withConfigurationFile(CONFIGURATION_FILE_PATH, CYLUIContext.hostContext(this.getUIContext()));
     } catch (e) {
       this.configurationError = (e as Error).message ?? '?';
     }

@@ -1,3 +1,4 @@
+import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * CYLTagCloudSample.swift — kaedea/android-tagview's sample: MainActivity ("TagView Sample"), SubActivity (Activity
  * Result), ListViewActivity, RecyclerViewActivity, and the hot search screen of its README (YY). The library does the
@@ -140,7 +141,7 @@ export struct CYLTagCloudSamplePage {
       .id('sample.github')
       .onClick(() => {
         const want: Want = { action: 'ohos.want.action.viewData', uri: 'https://github.com/kaedea/' };
-        (getContext(this) as common.UIAbilityContext).startAbility(want).catch(() => {
+        CYLUIContext.hostContext(this.getUIContext()).startAbility(want).catch(() => {
         });
       })
   }

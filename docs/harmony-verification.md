@@ -35,8 +35,8 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
 | --- | --- | --- | --- |
 | A1 | `harmony/scripts/build.sh`: the `classifymenu` HAR builds | DONE | BUILD SUCCESSFUL, 2026-11-16 |
 | A2 | `harmony/scripts/build.sh`: the `entry` HAP builds | DONE | BUILD SUCCESSFUL, 2026-11-16 |
-| A3 | The instrumented test HAP (`entry@ohosTest`) builds | TODO | |
-| A4 | No ArkTS warning in our sources (library and example; third-party packages excluded) | TODO | 92 warnings on 2026-11-16 (deprecated `getContext`, `px2vp`, `measureText`, `animateTo`, `showToast`, `showDialog`, `show`; `accessibilitySelected` above API 12; unhandled exceptions) |
+| A3 | The instrumented test HAP (`entry@ohosTest`) builds | DONE | BUILD SUCCESSFUL, 2026-11-16 |
+| A4 | No ArkTS warning in our sources (library and example; third-party packages excluded) | DONE | 92 → 1. Model code measures through `CYLUIContext` (the components' `UIContext`: `getMeasureUtils()`, `px2vp`); `UIContext.animateTo`, `getPromptAction()`, `showAlertDialog`; `CYLAccessibilitySelectedModifier` sets `accessibilitySelected` only on API 13+; database calls in try/catch; unique back-button ids. The one left: `getContext()` in `CYLUIContext.hostContext`, the API 12–17 fallback (its replacement `UIContext.getHostContext()` exists from API 18, used there) |
 
 ### B. Every demo runs on the emulator, screenshot next to iOS (22)
 
@@ -117,3 +117,4 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 ## Score history
 
 - 2026-11-16: standard created. 2 / 44 = 4.5 / 100.
+- 2026-11-16: A3 (test HAP builds), A4 (ArkTS warnings 92 → 1, the documented API 12 fallback). 4 / 44 = 9.1 / 100.

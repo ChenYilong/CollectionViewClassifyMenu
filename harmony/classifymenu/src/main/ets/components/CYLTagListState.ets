@@ -1,3 +1,4 @@
+import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * The model and controller of a `CYLTagListView`, as iOS `CYLTagListView.swift` without its UIKit views: the data
  * source and delegate, the style, selection, folding, measurement and row layout, the title, the android-tagview tag
@@ -86,8 +87,8 @@ function measureWithArkUI(text: string, font: CYLFont): number {
     return 0;
   }
   try {
-    const px = Number(MeasureText.measureText({ textContent: text, fontSize: `${font.size}fp`, fontWeight: font.weight }));
-    return px2vp(px);
+    return CYLUIContext.measureTextWidth({ textContent: text, fontSize: `${font.size}fp`, fontWeight: font.weight },
+      font.size, font.weight);
   } catch (e) {
     // Without a UI context (a unit test): an estimate of half an em per character.
     return Array.from(text).length * font.size * 0.5;

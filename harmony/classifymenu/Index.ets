@@ -44,3 +44,5 @@ export { CYLAnimatedIcon } from './src/main/ets/components/CYLAnimatedIcon';
 export {
   CYLTagListSupplementaryView, CYLTagListElementKindSectionHeader, CYLTagListElementKindSectionFooter
 } from './src/main/ets/components/CYLTagListSupplementaryView';
+export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
+export { CYLUIContext } from './src/main/ets/core/CYLUIContext';

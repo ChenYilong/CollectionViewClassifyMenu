@@ -3,7 +3,6 @@
  * (tail position); "发现" is a grid of two plain titles per row, a "热" icon after a title, and the core's More button
  * refreshing the topics at random.
  */
-import { promptAction } from '@kit.ArkUI';
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuSelectionMode, CYLMenuStyle, CYLSize,
@@ -196,7 +195,10 @@ export struct CYLSearchDiscoverPage {
 
   /** The camera button: not part of this demo, which says so instead of ignoring the tap. */
   searchByImage(): void {
-    promptAction.showDialog({ title: '以图搜索', message: '演示中暂不支持以图搜索。', buttons: [{ text: '好', color: '#007AFF' }] });
+    this.getUIContext().getPromptAction().showDialog({ title: '以图搜索', message: '演示中暂不支持以图搜索。', buttons: [{ text: '好', color: '#007AFF' }] })
+      .catch(() => {
+        // The dialog was dismissed or could not be shown; nothing to undo.
+      });
   }
 
   build() {
@@ -210,7 +212,7 @@ export struct CYLSearchDiscoverPage {
             .objectFit(ImageFit.Contain)
             .padding(6)
             .accessibilityText('返回')
-            .id('CYLDemoBarBack')
+            .id('CYLSearchDiscoverBack')
             .onClick(() => CYLDemoNav.pop())
           Row({ space: 6 }) {
             TextInput({ placeholder: this.placeholder, text: this.searchText })

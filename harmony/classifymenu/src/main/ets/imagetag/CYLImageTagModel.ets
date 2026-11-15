@@ -1,3 +1,4 @@
+import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * The models and the geometry of the image tags (iOS CYLImageTagGroupView.swift; Android CYLImageTagGroupView.kt).
  * Geometry after shellljx/TagViewGroup (TagGroupUtils, Apache License 2.0). Lengths are vp.
@@ -168,14 +169,14 @@ export class CYLImageTagLabel implements CYLImageTagItem {
     let textWidth = 0;
     let textHeight = 0;
     try {
-      const size: SizeOptions = MeasureText.measureTextSize({
+      const size: Size = CYLUIContext.measureTextSize({
         textContent: this.text,
         fontSize: this.fontSize,
         fontWeight: this.fontWeight,
         constraintWidth: maximum
-      });
-      textWidth = px2vp(Number(size.width ?? 0));
-      textHeight = px2vp(Number(size.height ?? 0));
+      }, this.fontSize, this.fontWeight, maximum);
+      textWidth = size.width;
+      textHeight = size.height;
     } catch (error) {
       textWidth = this.text.length * this.fontSize;
       textHeight = this.fontSize * 1.2;
