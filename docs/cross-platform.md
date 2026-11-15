@@ -99,7 +99,9 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   redirects `@op-engineering/op-sqlite`); its `moveAssetsDatabase` copies `databaseDir` onto itself, so
   `PlacesDatabase.ets` copies `cyl_places.sqlite` from rawfile first. 83 places.
 - **Gaps found:** the library's configuration parser reads tabs but not the plus button (set in code); the React
-  Native pages' own strings stay English on a Chinese device (`i18n.ts` does not detect the HarmonyOS locale);
+  Native pages' own strings stayed English on a Chinese device: fixed the same day, `i18n.ts` reads
+  `I18nManager.getConstants().localeIdentifier` (RNOH's turbo module, which `NativeModules` does not reach), so
+  Classify shows 分类菜单 / 筛选 / 全部 (screenshot below, retaken; `tsc --noEmit` passes for the iOS/Android example);
   autolinking adds op-sqlite to `harmony/oh-package.json5` during the build, so that file is committed with it.
 - **Fixed on the way:** `6bf3bae` had left out `harmony/entry/src` (the `src/` ignore pattern of the copied JS pages
   matched it); the patterns are anchored now (`98a97f5`).
