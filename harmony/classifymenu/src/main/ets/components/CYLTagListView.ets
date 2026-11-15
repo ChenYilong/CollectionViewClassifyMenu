@@ -1,3 +1,4 @@
+import { CYLMenuLocalizedString } from './CYLMenuResources';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLIndexPath, CYLTagItem, CYLTagListConfiguration, CYLTagListController, CYLTagSelection, CYLTagStateStyle, CYLTagTap,
   foldedHeight, parseConfiguration } from './CYLTagListModel';
@@ -85,7 +86,13 @@ export struct CYLTagListView {
     .accessibilityGroup(true)
     .accessibilityText(tag.title)
     .accessibilitySelected(this.selectedKeys.includes(`${section}-${item}`))
+    .accessibilityDescription(this.config.selectionMode === 'none' ? '' : this.text('cyl_menu_tag_hint'))
       .onClick(() => this.tap(section, item, tag))
+  }
+
+  /** A string of the core's resources (CYLMenuLocalizedString). */
+  private text(key: string): string {
+    return CYLMenuLocalizedString(getContext(this), key);
   }
 
   private stateOf(section: number, item: number): CYLTagStateStyle {
@@ -103,8 +110,12 @@ export struct CYLTagListView {
                 Text(this.expanded[index] ? '▲' : '▼')
                   .fontSize(14)
                   .padding(8)
+                  .constraintSize({ minWidth: 44, minHeight: 44 })
+                  .textAlign(TextAlign.Center)
                   .id(`CYLTagListFold-${index}`)
-                  .accessibilityText(this.expanded[index] ? 'Fold' : 'Unfold')
+                  // "<section> More / Less", as the iOS fold control ("<section> 更多/收起"); localized, never literal.
+                  .accessibilityText(`${section.title} ${this.text(this.expanded[index] ? 'cyl_menu_collapse' : 'cyl_menu_expand')}`)
+                  .accessibilityDescription(this.text(this.expanded[index] ? 'cyl_menu_collapse_hint' : 'cyl_menu_expand_hint'))
                   .onClick(() => this.toggleFold(index))
               }
             }.width('100%').margin({ top: 12, bottom: 8 })

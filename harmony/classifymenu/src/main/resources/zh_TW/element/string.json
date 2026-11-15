@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_menu_expand",
+      "value": "更多"
+    },
+    {
+      "name": "cyl_menu_collapse",
+      "value": "收合"
+    },
+    {
+      "name": "cyl_menu_expand_hint",
+      "value": "顯示全部標籤"
+    },
+    {
+      "name": "cyl_menu_collapse_hint",
+      "value": "顯示較少標籤"
+    },
+    {
+      "name": "cyl_menu_title",
+      "value": "分類"
+    },
+    {
+      "name": "cyl_menu_tag_hint",
+      "value": "點兩下以選取或取消選取"
+    },
+    {
+      "name": "cyl_menu_selected",
+      "value": "已選"
+    }
+  ]
+}

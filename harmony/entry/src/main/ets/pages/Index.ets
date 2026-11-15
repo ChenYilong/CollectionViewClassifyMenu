@@ -3,8 +3,15 @@ import { CYLIndexPath, CYLTagListController, CYLTagListView, CYLTagTap } from '@
 import { Place, PlacesDatabase, REGIONS } from '../data/PlacesDatabase';
 
 const CLASSIFY = 'menu.classify';
+
+/**
+ * The example's lookup (its own string resources; the core has CYLMenuLocalizedString): every user-facing string goes
+ * through it or $r, never a literal.
+ */
+function t(component: Object, key: string): string {
+  return getContext(component).resourceManager.getStringByNameSync(key);
+}
 const FILTER = 'menu.filter';
-const ALL = '全部';
 
 function key(p: CYLIndexPath): string {
   return `${p.section}-${p.item}`;
@@ -60,22 +67,27 @@ struct Index {
   @State tab: number = 0;
 
   @Builder
-  tabBar(title: string, symbol: string, index: number) {
+  tabBar(title: Resource, identifier: string, symbol: string, index: number) {
     Column() {
-      Text(symbol).fontSize(22)
+      Text(symbol).fontSize(22).accessibilityLevel('no')
       Text(title).fontSize(11).fontColor(this.tab === index ? '#2AB9A0' : '#8E8E93')
-    }.id(`tab-${title}`)
+    }
+    .id(`tab-${identifier}`)
+    // One element per tab for the screen reader: its title, and whether it is the selected one.
+    .accessibilityGroup(true)
+    .accessibilityText(title)
+    .accessibilitySelected(this.tab === index)
   }
 
   build() {
     Tabs({ barPosition: BarPosition.End, index: this.tab }) {
       TabContent() {
         TagsPage()
-      }.tabBar(this.tabBar('Tags', '🏷️', 0))
+      }.tabBar(this.tabBar($r('app.string.tab_tags'), 'Tags', '🏷️', 0))
 
       TabContent() {
         ClassifyPage()
-      }.tabBar(this.tabBar('Classify', '🗂️', 1))
+      }.tabBar(this.tabBar($r('app.string.tab_classify'), 'Classify', '🗂️', 1))
     }
     .onChange((index: number) => this.tab = index)
   }
@@ -103,11 +115,13 @@ struct TagsPage {
       style: { itemHeight: 36, imageSize: '{18, 18}', normal: { cornerRadius: 0 }, selected: { cornerRadius: 0 } },
       sections: [
         {
-          title: 'Lottie',
-          items: [animated('Home', 'tab_home_animate.json'), animated('Messages', 'tab_message_animate.json'),
-            animated('Search', 'tab_search_animate.json'), animated('Me', 'tab_me_animate.json')]
+          title: t(this, 'section_lottie'),
+          items: [animated(t(this, 'tab_home'), 'tab_home_animate.json'),
+            animated(t(this, 'tab_messages'), 'tab_message_animate.json'),
+            animated(t(this, 'tab_search'), 'tab_search_animate.json'), animated(t(this, 'tab_me'), 'tab_me_animate.json')]
         },
-        { title: 'Tags', items: items(titles) }
+        // Sample data, as the iOS example's tag titles: not localized.
+        { title: t(this, 'section_tags'), items: items(titles) }
       ]
     };
     return JSON.stringify(config);
@@ -219,20 +233,20 @@ struct ClassifyPage {
   }
 
   private filterJSON(): string {
-    const all: ItemJSON = { title: ALL, exclusive: true };
+    const all: ItemJSON = { title: t(this, 'all'), exclusive: true };
     const section = (title: string, titles: string[]): SectionJSON => ({ title: title, items: [all].concat(items(titles)) });
     const config: ConfigJSON = {
       selectionMode: 'multiple',
       selected: selectedJSON(this.draft),
-      sections: [section('Regions', REGIONS), section('Dishes', this.dishes)]
+      sections: [section(t(this, 'regions'), REGIONS), section(t(this, 'dishes'), this.dishes)]
     };
     return JSON.stringify(config);
   }
 
   private summary(): string {
-    const parts: string[] = [this.selectedTag() ?? ALL];
+    const parts: string[] = [this.selectedTag() ?? t(this, 'all')];
     parts.push(...this.filterTitles(0, REGIONS), ...this.filterTitles(1, this.dishes));
-    return `${parts.join(' · ')}: ${this.places.length} places`;
+    return `${parts.join(' · ')}: ${t(this, 'places_count').replace('%d', `${this.places.length}`)}`;
   }
 
   @Builder
@@ -244,7 +258,7 @@ struct ClassifyPage {
           onSelectionChange: (selected: CYLIndexPath[]) => this.draft = selected.map(key)
         })
       }.layoutWeight(1)
-      Button('OK').id('filterOK').width('90%').margin(16).onClick(() => {
+      Button($r('app.string.filter_ok')).id('filterOK').width('90%').margin(16).onClick(() => {
         this.filter = this.draft;
         this.showFilter = false;
         this.reload();
@@ -255,13 +269,20 @@ struct ClassifyPage {
   build() {
     Column() {
       Row() {
-        Text('Reset').fontColor('#2AB9A0').id('reset').onClick(() => {
+        Text($r('app.string.reset')).fontColor('#2AB9A0').id('reset')
+          .constraintSize({ minHeight: 44 })
+          .accessibilityDescription($r('app.string.reset_hint'))
+          .onClick(() => {
           this.classify = [];
           this.filter = [];
           this.reload();
         })
-        Text('Classify').fontSize(18).fontWeight(FontWeight.Bold).layoutWeight(1).textAlign(TextAlign.Center)
-        Text(this.filter.length > 0 ? 'Filter ●' : 'Filter').fontColor('#2AB9A0').id('filter').onClick(() => {
+        Text($r('app.string.classify_title')).fontSize(18).fontWeight(FontWeight.Bold).layoutWeight(1).textAlign(TextAlign.Center)
+        Text(this.filter.length > 0 ? `${t(this, 'filter')} ●` : t(this, 'filter')).fontColor('#2AB9A0').id('filter')
+          .constraintSize({ minHeight: 44 })
+          // The dot is visual only: the screen reader says that conditions are set.
+          .accessibilityText(this.filter.length > 0 ? $r('app.string.filter_modified') : $r('app.string.filter'))
+          .onClick(() => {
           this.draft = this.filter;
           this.showFilter = true;
         })
@@ -281,7 +302,7 @@ struct ClassifyPage {
         }
         if (this.places.length === 0) {
           ListItem() {
-            Text('No places match').padding(16).id('empty')
+            Text($r('app.string.no_places')).padding(16).id('empty')
           }
         }
         ForEach(this.places, (place: Place) => {
@@ -293,12 +314,16 @@ struct ClassifyPage {
               }.alignItems(HorizontalAlign.Start).layoutWeight(1)
               Text(`★ ${place.rating.toFixed(1)} · ¥${place.price}`).fontSize(13)
             }.padding({ left: 16, right: 16, top: 8, bottom: 8 })
+            // One element per place: name, region, then the rating and price in words (not "★" and "¥").
+            .accessibilityGroup(true)
+            .accessibilityText(`${place.name}, ${place.region}, ${t(this, 'place_rating')
+              .replace('%1$s', place.rating.toFixed(1)).replace('%2$d', `${place.price}`)}`)
           }
         }, (place: Place) => `${place.name}-${place.region}`)
       }.layoutWeight(1)
     }
     .id('classifyPage')
     .height('100%')
-    .bindSheet($$this.showFilter, this.filterSheet(), { height: SheetSize.LARGE, title: { title: 'Filter' } })
+    .bindSheet($$this.showFilter, this.filterSheet(), { height: SheetSize.LARGE, title: { title: $r('app.string.filter') } })
   }
 }

@@ -13,15 +13,15 @@
       "value": "template"
     },
     {
-      "name": "post",
+      "name": "tab_post",
       "value": "Post"
     },
     {
-      "name": "tags",
+      "name": "tab_tags",
       "value": "Tags"
     },
     {
-      "name": "classify",
+      "name": "tab_classify",
       "value": "Classify"
     }
   ]

@@ -2,15 +2,15 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "CollectionViewClassifyMenu example"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "CollectionViewClassifyMenu example"
     },
     {
       "name": "EntryAbility_label",
-      "value": "label"
+      "value": "ClassifyMenu"
     },
     {
       "name": "speed",
@@ -35,6 +35,86 @@
     {
       "name": "tapped",
       "value": "Tapped %s"
+    },
+    {
+      "name": "tab_home",
+      "value": "Home"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Messages"
+    },
+    {
+      "name": "tab_me",
+      "value": "Me"
+    },
+    {
+      "name": "tab_search",
+      "value": "Search"
+    },
+    {
+      "name": "tab_tags",
+      "value": "Tags"
+    },
+    {
+      "name": "tab_classify",
+      "value": "Classify"
+    },
+    {
+      "name": "section_lottie",
+      "value": "Lottie"
+    },
+    {
+      "name": "section_tags",
+      "value": "Tags"
+    },
+    {
+      "name": "classify_title",
+      "value": "Classify"
+    },
+    {
+      "name": "reset",
+      "value": "Reset"
+    },
+    {
+      "name": "reset_hint",
+      "value": "Clears the category and the filter"
+    },
+    {
+      "name": "filter",
+      "value": "Filter"
+    },
+    {
+      "name": "filter_modified",
+      "value": "Filter, conditions set"
+    },
+    {
+      "name": "filter_ok",
+      "value": "OK"
+    },
+    {
+      "name": "no_places",
+      "value": "No places match"
+    },
+    {
+      "name": "places_count",
+      "value": "%d places"
+    },
+    {
+      "name": "all",
+      "value": "All"
+    },
+    {
+      "name": "regions",
+      "value": "Regions"
+    },
+    {
+      "name": "dishes",
+      "value": "Dishes"
+    },
+    {
+      "name": "place_rating",
+      "value": "Rating %1$s, %2$d yuan"
     }
   ]
 }
