@@ -11,20 +11,20 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 
 | Found (document, item) | Status |
 | --- | --- |
-| `cross-platform.md`, Flutter limit (3): the example does not use the shared database `cyl_places.sqlite` | TODO |
-| `cross-platform.md`, Flutter limit (5): the Dart tests only run on the iOS simulator | TODO |
+| `cross-platform.md`, Flutter limit (3): the example does not use the shared database `cyl_places.sqlite` | DONE (stale note): the Classify menu tab reads the bundled `cyl_places.sqlite` (section "the Flutter example's classify menu on the shared database", `classify_menu_test.dart`: 83 places) |
+| `cross-platform.md`, Flutter limit (5): the Dart tests only run on the iOS simulator | DONE (stale note): `tag_list_test.dart` and `classify_menu_test.dart` pass on iOS 27.0 and the Android 15 emulator (same section) |
 | `cross-platform.md`, Flutter limit (4): Swift Package Manager is not supported (the plugin needs the pod) | TODO |
-| `cross-platform.md`, tag cells: React Native and Flutter look the same as iOS ("no example here yet") | TODO |
-| `cross-platform.md`, React Native "Still TODO" notes (Android view, Classify page, tests) | TODO |
+| `cross-platform.md`, tag cells: React Native and Flutter look the same as iOS ("no example here yet") | DONE: both host the native list (Swift / Kotlin), so their cells are the native cells; screenshots in the sections below |
+| `cross-platform.md`, React Native "Still TODO" notes (Android view, Classify page, tests) | DONE (stale notes): steps 3, 4 and 5 are DONE further down in the same section |
 | `android.md`, HarmonyOS step 2: Flutter on HarmonyOS NEXT | TODO |
 | `android.md`, HarmonyOS step 3: React Native on HarmonyOS NEXT (after Flutter) | TODO |
-| `example-demo-rules.md`, playback controls in the Mini Program example | TODO |
+| `example-demo-rules.md`, playback controls in the Mini Program example | DONE (another session, 2026-11-15): `CrossPlatform/wechat-miniprogram`, pages/animations, Play all, speed slider, Loop switch |
 
 - **Prompt (verbatim, 2026-11-16):** "找到跨端，相关文档，找到以下android端 rn端 flutter端，的TODO事项，汇总成表格第一列为找到的内容，第二列默认TODO，每每完成一项就删除一个TODO 没有TODO视为满分一直完成到满分。"
 - **English:** find the cross-platform documents and the Android, React Native and Flutter TODOs in them; summarize them
   in a table, column 1 the item found, column 2 `TODO` by default; remove one `TODO` for each item done; no `TODO`
   left is full marks; keep going until full marks.
-- **Score:** 0 / 8 = 0.
+- **Score:** 5 / 8 = 62 (2026-11-16: five rows were done already; their notes were stale).
 
 ## DONE (2026-11-15): one shared local database for every platform
 
@@ -164,9 +164,9 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   above), so there is no tail control, while the wider iOS tags need a fourth row and fold. A debug APK launched without `flutter run` stays on the
   splash screen; the release APK runs.
 - **Limits and next steps (TODO):** (1) the Android differences above; (2) DONE 2026-11-15: the classify menu tab and the multiple filter (see below; formerly: the
-  animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) the shared database
-  (`cyl_places.sqlite`) is not used by this example yet; (4) Swift Package Manager is not supported (the plugin needs the
-  pod); (5) the Dart tests only run on the iOS simulator.
+  animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) DONE: the shared database
+  (`cyl_places.sqlite`) is used by the Classify menu tab; (4) Swift Package Manager is not supported (the plugin needs the
+  pod); (5) DONE: the Dart tests run on the iOS simulator and the Android emulator.
 
 ## DONE (2026-11-15): the Flutter example's classify menu on the shared database
 
