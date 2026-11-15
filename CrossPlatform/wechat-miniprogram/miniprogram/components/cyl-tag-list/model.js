@@ -7,9 +7,22 @@
  * An item is addressed by its key "<section>-<item>", the format of `selectedItems` on every platform.
  */
 
+/**
+ * The core's defaults (`CYLMenuStyle`, `CYLTagAppearance`): tag content insets {5, 10, 5, 10} with the border inside,
+ * 4 between icon and title, 14 × 14 icons, 30 high tags, 10 between tags and lines, section insets {10, 16, 10, 16},
+ * 36 high section headers with a 14 pt regular title, 14 pt tag titles.
+ */
 const DEFAULT_STYLE = {
-  itemHeight: 32,
-  imageSize: 18,
+  itemHeight: 30,
+  imageSize: 14,
+  imageTitleSpacing: 4,
+  interitemSpacing: 10,
+  lineSpacing: 10,
+  headerHeight: 36,
+  headerFontSize: 14,
+  fontSize: 14,
+  sectionInsets: { top: 10, left: 16, bottom: 10, right: 16 },
+  contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
   normal: { cornerRadius: 16, borderColor: '#D1D1D6', borderWidth: 1, textColor: '#333333', backgroundColor: '#FFFFFF' },
   selected: { cornerRadius: 16, borderColor: '#2AB9A0', borderWidth: 1, textColor: '#2AB9A0', backgroundColor: '#E6F8F5' },
 };
@@ -35,10 +48,42 @@ function imageSize(value) {
   return match ? Number(match[1]) : DEFAULT_STYLE.imageSize;
 }
 
+/** "{top, left, bottom, right}" (the core's UIEdgeInsets string), [t, l, b, r] or {top, left, bottom, right}. */
+function insets(value, fallback) {
+  let numbers = null;
+  if (Array.isArray(value)) numbers = value.map(Number);
+  else if (typeof value === 'string') numbers = (value.match(/-?[\d.]+/g) || []).map(Number);
+  else if (value && typeof value === 'object') return { ...fallback, ...value };
+  if (!numbers || numbers.length !== 4 || numbers.some(Number.isNaN)) return { ...fallback };
+  const [top, left, bottom, right] = numbers;
+  return { top, left, bottom, right };
+}
+
+/** A font size from a number or the core's font description ({size: 14} or "14"). */
+function fontSize(value, fallback) {
+  if (typeof value === 'number') return value;
+  if (value && typeof value === 'object' && Number(value.size)) return Number(value.size);
+  const n = parseFloat(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function number(value, fallback) {
+  const n = Number(value);
+  return value != null && Number.isFinite(n) ? n : fallback;
+}
+
 function mergeStyle(style = {}) {
   return {
     itemHeight: style.itemHeight || DEFAULT_STYLE.itemHeight,
-    imageSize: imageSize(style.imageSize),
+    imageSize: style.imageSize != null ? imageSize(style.imageSize) : DEFAULT_STYLE.imageSize,
+    imageTitleSpacing: number(style.imageTitleSpacing, DEFAULT_STYLE.imageTitleSpacing),
+    interitemSpacing: number(style.interitemSpacing, DEFAULT_STYLE.interitemSpacing),
+    lineSpacing: number(style.lineSpacing, DEFAULT_STYLE.lineSpacing),
+    headerHeight: number(style.headerHeight, DEFAULT_STYLE.headerHeight),
+    headerFontSize: fontSize(style.headerFont, DEFAULT_STYLE.headerFontSize),
+    fontSize: fontSize(style.font, DEFAULT_STYLE.fontSize),
+    sectionInsets: insets(style.sectionInsets, DEFAULT_STYLE.sectionInsets),
+    contentInsets: insets(style.tagContentInsets, DEFAULT_STYLE.contentInsets),
     normal: { ...DEFAULT_STYLE.normal, ...(style.normal || {}) },
     selected: { ...DEFAULT_STYLE.selected, ...(style.selected || {}) },
   };
@@ -162,5 +207,5 @@ function foldTitle(expanded) {
 
 module.exports = {
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE,
-  key, parseKey, imageSize, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
+  key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
 };

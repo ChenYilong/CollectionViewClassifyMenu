@@ -19,16 +19,39 @@ const SYSTEM_GLYPHS = {
   camera: '📷', 'music.note': '🎵', map: '🗺️', calendar: '📅',
 };
 
+/**
+ * A tag's box: border-box, so the border lies inside the content insets as on iOS, and the width is the title, the
+ * icon and the spacing plus the left and right insets (CYLTagButton.width(forTitle:iconSize:style:)).
+ */
 function cellStyle(style, selected) {
   const s = selected ? style.selected : style.normal;
+  const border = s.borderWidth != null ? s.borderWidth : 1;
+  const inset = style.contentInsets;
   return [
     `height: ${style.itemHeight}px`,
+    `padding: 0 ${Math.max(0, inset.right - border)}px 0 ${Math.max(0, inset.left - border)}px`,
+    `margin: 0 ${style.interitemSpacing}px ${style.lineSpacing}px 0`,
+    `font-size: ${style.fontSize}px`,
     `border-radius: ${s.cornerRadius}px`,
-    `border-width: ${s.borderWidth != null ? s.borderWidth : 1}px`,
+    `border-width: ${border}px`,
     `border-color: ${s.borderColor}`,
     `color: ${s.textColor}`,
     `background-color: ${s.backgroundColor}`,
   ].join('; ');
+}
+
+/**
+ * The list's padding (sectionInsets; the last line's spacing is taken off the bottom), the negative trailing margin
+ * that absorbs the last tag's spacing, the header (headerHeight, headerFont) and the icon-title spacing.
+ */
+function layoutStyles(style) {
+  const i = style.sectionInsets;
+  return {
+    listStyle: `padding: ${i.top}px ${i.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${i.left}px`,
+    itemsStyle: `margin-right: -${style.interitemSpacing}px`,
+    headerStyle: `height: ${style.headerHeight}px; font-size: ${style.headerFontSize}px`,
+    iconSpacing: style.imageTitleSpacing,
+  };
 }
 
 Component({
@@ -44,6 +67,11 @@ Component({
     foldPosition: 'none',
     foldContent: 'title',
     tailStyle: '',
+    listStyle: '',
+    itemsStyle: '',
+    headerStyle: '',
+    iconSpacing: 4,
+    glyphSize: 13,
   },
 
   lifetimes: {
@@ -102,9 +130,12 @@ Component({
       this.setData({
         sections,
         imageSize: m.style.imageSize,
+        // An emoji is about 1.35 times as wide as its font size; this keeps it inside the icon slot.
+        glyphSize: Math.floor(m.style.imageSize * 0.74),
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
         tailStyle: cellStyle(m.style, false),
+        ...layoutStyles(m.style),
       }, () => {
         if (remeasure) this.measure();
         else this.reportHeight();
@@ -121,7 +152,12 @@ Component({
       this.model.sections.forEach((section) => {
         query.selectAll(`.cyl-item-s${section.index}`).boundingClientRect();
       });
+      // Every tag's title, in the same order (the fold control is not shown while measuring).
+      query.selectAll('.cyl-title').boundingClientRect();
       query.exec((results) => {
+        const titles = results.pop() || [];
+        const cells = results.flat();
+        this.metrics = cells.map((cell, i) => ({ cell, title: titles[i] }));
         this.rows = results.map((rects) => model.rowsFromTops((rects || []).map((r) => r.top)));
         this.render(false);
       });
@@ -175,6 +211,23 @@ Component({
 
     contentHeight() {
       return this.height || 0;
+    },
+
+    /**
+     * The tag and title frames of the last measurement (every tag shown), for layout checks against the core:
+     * [{key, title, width, height, titleWidth, left, right}], left and right being the title's distance to the tag's edges.
+     */
+    cellMetrics() {
+      const keys = this.model.sections.flatMap((section) => section.items.map((item) => [item.key, item.title]));
+      return (this.metrics || []).map(({ cell, title }, i) => ({
+        key: keys[i] && keys[i][0],
+        title: keys[i] && keys[i][1],
+        width: cell.width,
+        height: cell.height,
+        titleWidth: title ? title.width : 0,
+        left: title ? title.left - cell.left : 0,
+        right: title ? cell.right - title.right : 0,
+      }));
     },
 
     /** Restarts every animated icon on the list from progress 0 (Play all). */
