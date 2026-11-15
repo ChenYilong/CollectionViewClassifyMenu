@@ -87,6 +87,18 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   plus button with a page of its own); the pages are the example's React Native pages (Tags, Classify, Post), Classify
   on the shared database through the OpenHarmony port of op-sqlite.
 - **Prompt (verbatim):** "use cyltabbarcontroller to do tabbar show and tabbar item"
+- **Progress (2026-11-16, interrupted by the usage limit):** in the build mirror `/tmp/xpr/rnoh/app` (not committed
+  yet): `index.js` registers one app per tab (`Tags`, `Classify`, `Post`), `App.tsx` exports them, the Classify page,
+  `PlacesDatabase.ts` and `launchOptions.ts` are copied, `@react-native-ohos/op-sqlite@15.0.0` is installed (listed
+  for RN 0.82, so linking with 0.86 is unverified), and CYLTabBarController is fetched at `548892a` (the newest commit
+  that has `CrossPlatform/harmonyos-cyltabbar`; the newest overall, `c632022`, does not). Findings: the library's
+  configuration parser reads tabs but not the plus button (set it in code: `CYLPlusButton`, `selectable`, negative
+  `centerYOffset`); the op-sqlite port's `moveAssetsDatabase` copies `databaseDir` onto itself, so ArkTS must copy
+  `cyl_places.sqlite` from rawfile into `databaseDir` before React Native starts. Next: `Index.ets` (one
+  `createAndRegisterRNInstance` + `runJSBundle`, `CYLTabBarController` from `rawfile/cyl_tabbar_configuration.json`,
+  each page an `RNSurface` with `ManagedSurfaceConfig { appKey }`), SVG tab icons from the Android vectors
+  (`cyl_tab_tag`, `cyl_tab_classify`) and `post_*.png`, `setup.sh` (fetch the pin, copy the pages and database),
+  build, emulator check, screenshots.
 
 ## DONE (2026-11-15): one shared local database for every platform
 
