@@ -119,6 +119,7 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 - 2026-11-16: standard created. 2 / 44 = 4.5 / 100.
 - 2026-11-16: A3 (test HAP builds), A4 (ArkTS warnings 92 → 1, the documented API 12 fallback). 4 / 44 = 9.1 / 100.
 - 2026-11-16: E1 (already done by the parity work), E2 (example localization). 6 / 44 = 13.6 / 100.
+- 2026-11-16: UI tests written for C2–C6 (`QueryScenarios`, `StylesAndAnimations`, `Samples` test files, shared `TestSupport`); they count only after a passing emulator run. Accessibility: tappable rows, menu buttons and tag buttons are one labeled element each (F1 waits for an emulator check). The emulator image (HarmonyOS 6.0.1, API 21, x86) is downloaded, but no emulator instance exists yet. Score unchanged: 6 / 44 = 13.6 / 100.
 
 ## Next steps (resume here)
 
