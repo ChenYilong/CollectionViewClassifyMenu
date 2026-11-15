@@ -200,8 +200,10 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 - **Step 2: in progress (2026-11-15).** `flutter/cyl_tag_list_ohos` (OhosView + ArkTS platform view on
   `harmony/classifymenu`, registered through `dartPluginClass`) and the `CylTagListView.platformViewBuilder` hook are
   written, not yet built. Blocker: Flutter `3.41.9+ohos-1.0.2`'s embedding needs a HarmonyOS SDK newer than the
-  installed API 21 (`autoFillManager.AutoFillType` missing). Next: try Flutter `3.35.7+ohos-1.0.5` (downloaded to
-  `/tmp/xpr/fo35`; needs the Dart minimum at 3.9), else install a newer SDK in DevEco Studio. Mirror `/tmp/xpr/flo`;
+  installed API 21 (`autoFillManager.AutoFillType` missing). Flutter `3.35.7+ohos-1.0.5` (`/tmp/xpr/fo35`) fails
+  the same way (2026-11-15): the installed SDK declares only the API 12 autofill types, and both embeddings target
+  `26.0.0`. DevEco Studio has no command-line SDK manager, so the newer HarmonyOS SDK (API 22+ / 26) must be
+  installed in its SDK Manager by hand; then rebuild with `flutter build hap --debug` in the mirror. Mirror `/tmp/xpr/flo`;
   sqflite on HarmonyOS through `openharmony-sig/flutter_sqflite` `br_v2.4.2_ohos` in a mirror-only
   `pubspec_overrides.yaml`.
   Earlier note: When React Native or
