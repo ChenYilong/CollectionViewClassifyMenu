@@ -33,8 +33,8 @@ CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback contro
   (4) the three combine and change playback in real time; (5) change the core when needed to support it; (6) every
   example layer: iOS, Android, React Native, Flutter, Mini Program, HarmonyOS; (7) record the rule in English in the
   instructions documents and reference this document from the related skills.
-- **Status:** iOS and Android DONE (2026-11-14); Flutter: iOS and Android DONE (`flutter/cyl_tag_list`); React Native,
-  Mini Program and HarmonyOS have no example in this repository yet. Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
+- **Status:** iOS and Android DONE (2026-11-14); Flutter: iOS and Android DONE (`flutter/cyl_tag_list`); React Native
+  and HarmonyOS DONE (2026-11-15); Mini Program has no example in this repository yet. Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
   `example-animation-controls.md` from another session's branch `docs/animation-playback-controls`); merged here,
   and that file now points to this one.
 
@@ -49,7 +49,7 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 | React Native | `react-native/react-native-cyl-tag-list/example`, Tags tab | iOS and Android DONE (2026-11-15: Play all command, speed steps 0.25x–4x, Loop switch; `cross-platform.md`, `scripts/e2e-android.sh` and the iOS UI test check the speed) |
 | Flutter | `flutter/cyl_tag_list/example`, Animated icons | iOS and Android DONE (animations play, `cross-platform.md`) |
 | Mini Program | example (when added) | TODO |
-| HarmonyOS | `harmony/entry` (Tags, Classify; 2026-11-15) | TODO: no animated icons yet (needs a Lottie player for ArkTS) |
+| HarmonyOS | `harmony/entry`, Tags tab | DONE (2026-11-15: `@ohos/lottie` icons in the core, speed slider 0.25x–4x, Loop switch, Play all; `android.md`) |
 
 ### iOS: DONE (2026-11-14)
 

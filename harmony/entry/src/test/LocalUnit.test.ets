@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { CYLTagSection, CYLTagSelection, foldedHeight, parseConfiguration } from '@cyl/classifymenu';
+import { CYLTagListController, CYLTagSection, CYLTagSelection, foldedHeight, parseConfiguration } from '@cyl/classifymenu';
 import { placesQuery } from '../main/ets/data/PlacesDatabase';
 
 export default function localUnitTest() {
@@ -43,6 +43,21 @@ export default function localUnitTest() {
       s.toggle({ section: 0, item: 1 });
       expect(s.isSelected({ section: 0, item: 0 })).assertFalse();
       expect(new CYLTagSelection('none', sections).toggle({ section: 0, item: 1 })).assertFalse();
+    });
+
+    it('readsAnimationsAndPlaysAll', 0, () => {
+      const config = parseConfiguration('{"style":{"imageSize":"{24, 24}"},"sections":[{"items":[' +
+        '{"title":"Home","animation":"asset:assets/tab_home_animate.json"},{"title":"x"}]}]}');
+      expect(config.style.imageSize).assertEqual(24);
+      expect(config.sections[0].items[0].animation).assertEqual('asset:assets/tab_home_animate.json');
+      expect(config.sections[0].items[1].animation).assertUndefined();
+      expect(parseConfiguration('{}').style.imageSize).assertEqual(18);
+      let plays = 0;
+      const controller = new CYLTagListController();
+      controller.playAll();
+      controller.attach(() => plays++);
+      controller.playAll();
+      expect(plays).assertEqual(1);
     });
 
     it('foldsToRows', 0, () => {

@@ -1,4 +1,5 @@
-import { CYLIndexPath, CYLTagItem, CYLTagListConfiguration, CYLTagSelection, CYLTagStateStyle, CYLTagTap,
+import { CYLLottieIcon } from './CYLLottieIcon';
+import { CYLIndexPath, CYLTagItem, CYLTagListConfiguration, CYLTagListController, CYLTagSelection, CYLTagStateStyle, CYLTagTap,
   foldedHeight, parseConfiguration } from './CYLTagListModel';
 
 /**
@@ -9,6 +10,13 @@ import { CYLIndexPath, CYLTagItem, CYLTagListConfiguration, CYLTagSelection, CYL
 export struct CYLTagListView {
   /** The configuration, as JSON text; a new value reloads the list. */
   @Prop @Watch('reload') configuration: string = '{}';
+  /** The playback speed of the animated icons (1 is the file's own speed). */
+  @Prop animationSpeed: number = 1;
+  /** Repeats the animated icons; false plays them once. */
+  @Prop animationLoops: boolean = false;
+  /** Plays the animated icons again (`playAll()`). */
+  controller?: CYLTagListController;
+  @State private playToken: number = 0;
   onTagTap?: (tap: CYLTagTap) => void;
   onSelectionChange?: (selected: CYLIndexPath[]) => void;
   @State private config: CYLTagListConfiguration = parseConfiguration('{}');
@@ -17,6 +25,7 @@ export struct CYLTagListView {
   private selection: CYLTagSelection = new CYLTagSelection('none', []);
 
   aboutToAppear(): void {
+    this.controller?.attach(() => this.playToken++);
     this.reload();
   }
 
@@ -47,22 +56,35 @@ export struct CYLTagListView {
 
   @Builder
   tagButton(section: number, item: number, tag: CYLTagItem) {
-    Text(tag.title)
-      .fontSize(this.config.style.fontSize)
-      .fontColor(this.stateOf(section, item).textColor)
-      .backgroundColor(this.stateOf(section, item).backgroundColor)
-      .borderColor(this.stateOf(section, item).borderColor)
-      .borderWidth(this.stateOf(section, item).borderWidth)
-      .borderRadius(this.stateOf(section, item).cornerRadius)
-      .height(this.config.style.itemHeight)
-      .padding({ left: 12, right: 12 })
-      .maxLines(1)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .constraintSize({ maxWidth: '100%' })
-      .margin({ right: this.config.style.spacing, bottom: this.config.style.spacing })
-      .id(`CYLTagListItem-${section}-${item}`)
-      .accessibilityText(tag.title)
-      .accessibilitySelected(this.selectedKeys.includes(`${section}-${item}`))
+    Row({ space: 5 }) {
+      if (tag.animation !== undefined) {
+        CYLLottieIcon({
+          source: tag.animation,
+          iconSize: this.config.style.imageSize,
+          speed: this.animationSpeed,
+          loops: this.animationLoops,
+          playToken: this.playToken
+        })
+      }
+      Text(tag.title)
+        .fontSize(this.config.style.fontSize)
+        .fontColor(this.stateOf(section, item).textColor)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .flexShrink(1)
+    }
+    .backgroundColor(this.stateOf(section, item).backgroundColor)
+    .borderColor(this.stateOf(section, item).borderColor)
+    .borderWidth(this.stateOf(section, item).borderWidth)
+    .borderRadius(this.stateOf(section, item).cornerRadius)
+    .height(this.config.style.itemHeight)
+    .padding({ left: 12, right: 12 })
+    .constraintSize({ maxWidth: '100%' })
+    .margin({ right: this.config.style.spacing, bottom: this.config.style.spacing })
+    .id(`CYLTagListItem-${section}-${item}`)
+    .accessibilityGroup(true)
+    .accessibilityText(tag.title)
+    .accessibilitySelected(this.selectedKeys.includes(`${section}-${item}`))
       .onClick(() => this.tap(section, item, tag))
   }
 
