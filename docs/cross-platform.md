@@ -466,5 +466,5 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/miniprogram-1to1-menu-linkage.png" width="240" alt="Mini Program: 菜单选择 · 数据库联动, 20 places in 广州">
   <img src="assets/miniprogram-1to1-animations.png" width="240" alt="Mini Program: 动效, the iOS animation sections">
 
-- **Still TODO:** a phone preview; pixel comparisons with iOS screenshots on a Mac; the `cyl-tag-cloud` property
-  warnings (null for unset options).
+- **Phone preview (2026-11-15):** `wechatide auto_preview` pushed the build (978,336 bytes, one package) to the developer's WeChat; checking it on the phone is left to the developer. **Still TODO:** pixel comparisons with iOS screenshots on a Mac. DONE: the `cyl-tag-cloud` property
+  warnings (null for unset options; the tag container sample now passes defaults).
