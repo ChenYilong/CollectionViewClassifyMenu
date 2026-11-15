@@ -136,7 +136,7 @@ export default function exampleUiTest() {
       await (await driver.findComponent(ON.id('jobCategory-1'))).click();
       await driver.delayMs(500);
       await driver.assertComponentExist(ON.text('自动化测试'));
-      await (await driver.findComponent(ON.id('CYLDemoBarBack'))).click();
+      await (await driver.findComponent(ON.id('CYLSearchCategoryBack'))).click();
       await driver.delayMs(800);
 >>>>>>> c69f327 (feat(harmony): the iOS example's screens on HarmonyOS (score 98.4))
     })

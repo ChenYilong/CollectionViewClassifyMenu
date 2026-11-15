@@ -1,3 +1,4 @@
+import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * iOS `CYLMultipleFilterController.swift`, migrated from Android `CYLMultipleFilter.kt`: a side panel with a
  * multiple-choice filter: the sections and items come from `menuDataSource`; taps, the confirmation and the selection
@@ -324,6 +325,7 @@ export struct CYLMultipleFilterView {
   private removeListener?: () => void;
 
   aboutToAppear(): void {
+    CYLUIContext.remember(this.getUIContext());
     this.removeListener = this.controller.addListener(() => this.relayout());
   }
 

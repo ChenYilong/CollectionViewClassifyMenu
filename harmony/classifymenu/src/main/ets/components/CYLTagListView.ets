@@ -1,7 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { CYLMenuLocalizedString } from './CYLMenuResources';
 import { CYLLottieIcon } from './CYLLottieIcon';
 =======
+=======
+import { CYLUIContext } from '../core/CYLUIContext';
+>>>>>>> d2e3a1d (fix(harmony): 🐛 ArkTS warnings 92 → 1 (score 9.1))
 import { CYLAnimatedIcon } from './CYLAnimatedIcon';
 import {
   CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
@@ -197,6 +201,7 @@ export struct CYLTagListView {
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    CYLUIContext.remember(this.getUIContext());
     if (this.tagList !== undefined) {
       this.model = this.tagList;
     }

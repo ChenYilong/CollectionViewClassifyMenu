@@ -1,3 +1,5 @@
+import { CYLUIContext } from '@cyl/classifymenu';
+import { CYLAccessibilitySelectedModifier } from '@cyl/classifymenu';
 /**
  * 场景一（评价页）：多选评价筛选，折叠为两行，旋转箭头展开/收起；每次选择后按全部所选条件（AND）刷新下方评价列表。
  * 内存筛选、网络筛选与数据库筛选（SQLite）是三种场景，通过顶部开关切换 (iOS CYLReviewListViewController).
@@ -127,7 +129,7 @@ export struct CYLReviewListPage {
       return new CYLNetworkReviewQuery();
     }
     if (mode === CYLReviewFilteringMode.database) {
-      return new CYLDatabaseReviewQuery(getContext(this) as common.UIAbilityContext);
+      return new CYLDatabaseReviewQuery(CYLUIContext.hostContext(this.getUIContext()));
     }
     return new CYLMemoryReviewQuery();
   }
@@ -200,7 +202,7 @@ export struct CYLReviewListPage {
           .backgroundColor(this.mode === index ? '#FFFFFF' : Color.Transparent)
           .shadow(this.mode === index ? { radius: 2, color: '#26000000', offsetY: 1 } : { radius: 0 })
           .id(`reviewMode-${index}`)
-          .accessibilitySelected(this.mode === index)
+          .attributeModifier(new CYLAccessibilitySelectedModifier(this.mode === index))
           .onClick(() => {
             if (this.mode !== index) {
               this.setMode(index);

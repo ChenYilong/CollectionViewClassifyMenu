@@ -1,3 +1,4 @@
+import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * The animated icon of a tag (iOS: the view of `CYLTabBarItemAnimationFactory`): the engine is chosen by the file's
  * extension (`CYLAnimationEngine`). The icon applies `speed` and `loops` at once, also while playing, plays from
@@ -56,7 +57,7 @@ struct CYLLottieIconView {
   private context2D: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
 
   private load(): void {
-    const context = getContext(this);
+    const context = CYLUIContext.hostContext(this.getUIContext());
     const data = lottieData(context, this.source);
     if (data === undefined) {
       return;
@@ -108,7 +109,7 @@ struct CYLPAGIconView {
   @State controller: PAGViewController = new PAGViewController();
 
   aboutToAppear(): void {
-    const context = getContext(this);
+    const context = CYLUIContext.hostContext(this.getUIContext());
     const file = PAGFile.LoadFromAssets(context.resourceManager, this.source.existingRawFilePath(context));
     if (file === null) {
       return;
@@ -140,7 +141,7 @@ struct CYLRiveIconView {
     Stack() {
       if (this.available) {
         RiveAnimationView({
-          riveResource: `@rawfile/${this.source.existingRawFilePath(getContext(this))}`,
+          riveResource: `@rawfile/${this.source.existingRawFilePath(CYLUIContext.hostContext(this.getUIContext()))}`,
           riveArtboard: this.source.options.get('artboard') ?? '',
           riveStateMachine: this.source.options.get('stateMachine') ?? '',
           riveAnimation: this.source.options.get('animation') ?? '',
@@ -170,7 +171,7 @@ struct CYLGIFIconView {
   @State frame: image.PixelMap | undefined = undefined;
 
   aboutToAppear(): void {
-    const bytes = this.source.rawFileContent(getContext(this));
+    const bytes = this.source.rawFileContent(CYLUIContext.hostContext(this.getUIContext()));
     if (bytes === undefined) {
       return;
     }

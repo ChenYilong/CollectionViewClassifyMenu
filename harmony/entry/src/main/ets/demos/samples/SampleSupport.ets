@@ -2,7 +2,6 @@
  * CYLAndroidSampleSupport.swift: what the three Android sample ports share — a toast (Android's Toast), the samples'
  * filled buttons, the text fields with a bottom line, and the pictures of the TagViewGroup sample (drawn, as on iOS).
  */
-import { promptAction } from '@kit.ArkUI';
 import { image } from '@kit.ImageKit';
 
 /** `String(format:)` for the %ld / %@ placeholders of the example's strings. */
@@ -15,10 +14,15 @@ export function cylFormat(format: string, ...args: (string | number)[]): string 
   });
 }
 
+/** The example's UI context, kept by the root page (`pages/Index`) for toasts outside a component. */
+export class CYLExampleUIContext {
+  static context?: UIContext;
+}
+
 /** Android's Toast.LENGTH_SHORT: a message at the bottom for two seconds. */
 export function cylToast(text: string): void {
   try {
-    promptAction.showToast({ message: text, duration: 2000, bottom: 48 });
+    CYLExampleUIContext.context?.getPromptAction().showToast({ message: text, duration: 2000, bottom: 48 });
   } catch (e) {
     // No UI context (tests).
   }

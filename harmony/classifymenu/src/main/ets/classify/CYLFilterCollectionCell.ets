@@ -1,3 +1,4 @@
+import { CYLAccessibilitySelectedModifier } from '../core/CYLAccessibilitySelected';
 /**
  * iOS `CYLFilterCollectionCell.swift` and `CYLMultipleFilterHeaderView.swift`, migrated from Android
  * `CYLMultipleFilter.kt`: a tag of the multiple-choice filter (a button that fills the cell and shows the selection;
@@ -41,8 +42,8 @@ export struct CYLFilterCollectionCellView {
           .onComplete((event) => {
             if (event !== undefined) {
               // `resizableImage(withCapInsets:)` with half the image on each side.
-              const vertical = Math.floor(px2vp(event.height) / 2);
-              const horizontal = Math.floor(px2vp(event.width) / 2);
+              const vertical = Math.floor(this.getUIContext().px2vp(event.height) / 2);
+              const horizontal = Math.floor(this.getUIContext().px2vp(event.width) / 2);
               this.slice = { top: vertical, left: horizontal, bottom: vertical, right: horizontal };
             }
           })
@@ -58,7 +59,7 @@ export struct CYLFilterCollectionCellView {
     .height('100%')
     .accessibilityGroup(true)
     .accessibilityText(this.cell.titleButton.currentTitle ?? '')
-    .accessibilitySelected(this.cell.titleButton.isSelected)
+    .attributeModifier(new CYLAccessibilitySelectedModifier(this.cell.titleButton.isSelected))
     .onClick(() => {
       if (this.onTap !== undefined) {
         this.onTap(this.cell);

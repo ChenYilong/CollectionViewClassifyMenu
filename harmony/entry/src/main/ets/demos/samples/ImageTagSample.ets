@@ -106,7 +106,7 @@ export struct CYLImageTagEditPage {
   }
 
   confirmDelete(index: number): void {
-    AlertDialog.show({
+    this.getUIContext().showAlertDialog({
       title: '删除标签组',
       message: '你确定要删除该标签组吗？',
       primaryButton: { value: '取消', action: () => {

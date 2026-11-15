@@ -1,3 +1,4 @@
+import { CYLUIContext } from './CYLUIContext';
 /**
  * A tag of a tag list built from models, as iOS `CYLTag.swift`: `CYLTag` (a title with its own look) and
  * `CYLTagDataSource` (a one-section data source of tags, caching each tag's style over its `baseStyle`).
@@ -172,7 +173,7 @@ export class CYLTag {
 
   /** A filled circle of `color`, `diameter` vp wide, with `text` in bold white at 60 % of the diameter. */
   static badgeImage(text: string, color: string, diameter: number): image.PixelMap {
-    const side = Math.max(1, Math.round(vp2px(Math.max(1, diameter))));
+    const side = Math.max(1, Math.round(CYLUIContext.vp2px(Math.max(1, diameter))));
     const canvas = new OffscreenCanvas(side, side);
     const context = canvas.getContext('2d');
     context.fillStyle = color;

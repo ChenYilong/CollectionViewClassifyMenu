@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { common } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarController } from 'cyltabbar';
@@ -19,6 +20,9 @@ const FILTER = 'menu.filter';
 function key(p: CYLIndexPath): string {
   return `${p.section}-${p.item}`;
 =======
+=======
+import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
+>>>>>>> d2e3a1d (fix(harmony): 🐛 ArkTS warnings 92 → 1 (score 9.1))
 import { CYLDemoNav } from '../demos/DemoNav';
 import { SHELL_ROUTES } from '../demos/shell/ShellRoutes';
 import { MENU_ROUTES } from '../demos/menu/MenuRoutes';
@@ -225,6 +229,10 @@ struct TagsPage {
 struct Index {
   @State tab: number = 0;
   private stack: NavPathStack = CYLDemoNav.stack;
+
+  aboutToAppear(): void {
+    CYLExampleUIContext.context = this.getUIContext();
+  }
 
   @Builder
   destination(name: string, param: Object) {

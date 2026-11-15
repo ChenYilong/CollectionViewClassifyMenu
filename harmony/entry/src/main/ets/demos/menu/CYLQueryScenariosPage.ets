@@ -1,3 +1,4 @@
+import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLQueryScenariosViewController`: the plus button's page (查询筛选), an inset grouped table of the filter demos by
  * scenario, then the database's tables with their row counts. A row pushes its demo.
@@ -119,7 +120,7 @@ export struct CYLQueryScenariosPage {
   /** viewWillAppear: the selections saved by the demos change the database section. */
   private async reloadCounts(): Promise<void> {
     try {
-      const db = await CYLExampleDatabase.shared(getContext(this) as common.UIAbilityContext);
+      const db = await CYLExampleDatabase.shared(CYLUIContext.hostContext(this.getUIContext()));
       const counts: string[] = [];
       for (const table of TABLES) {
         counts.push(`${await db.count(table)} 行`);
