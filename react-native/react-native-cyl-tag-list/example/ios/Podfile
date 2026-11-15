@@ -20,7 +20,7 @@ target 'CylTagListExample' do
   pod 'CollectionViewClassifyMenu', :path => '../../../..'
   # The animation engine the tags play Lottie files with (found at run time; the core does not depend on it).
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                  :commit => '460ed89f192db37d5b347cf72b5ee63ecdc11854' }
+                  :commit => '117be52cfc28109465d52544820f10cc3f00ba89' }
   pod 'CYLTabBarController', cyl_tab_bar
   pod 'CYLTabBarController/Lottie', cyl_tab_bar
 
