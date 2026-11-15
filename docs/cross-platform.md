@@ -13,7 +13,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 | --- | --- |
 | `cross-platform.md`, Flutter limit (3): the example does not use the shared database `cyl_places.sqlite` | DONE (stale note): the Classify menu tab reads the bundled `cyl_places.sqlite` (section "the Flutter example's classify menu on the shared database", `classify_menu_test.dart`: 83 places) |
 | `cross-platform.md`, Flutter limit (5): the Dart tests only run on the iOS simulator | DONE (stale note): `tag_list_test.dart` and `classify_menu_test.dart` pass on iOS 27.0 and the Android 15 emulator (same section) |
-| `cross-platform.md`, Flutter limit (4): Swift Package Manager is not supported (the plugin needs the pod) | TODO |
+| `cross-platform.md`, Flutter limit (4): Swift Package Manager is not supported (the plugin needs the pod) | DONE (2026-11-16): root `Package.swift` (the core; `CYLMenuResources.bundle` returns `Bundle.module` under SwiftPM) and `flutter/cyl_tag_list/ios/cyl_tag_list/Package.swift`; with `enable-swift-package-manager` and the core pod removed from the Podfile, the example builds (the app holds `CollectionViewClassifyMenu_CollectionViewClassifyMenu.bundle`) and `flutter test integration_test` passes on the iPhone 17 Pro simulator: `All tests passed!` (2 tests). The example stays on CocoaPods by default; `CYLTagView` (TagCollectionView) is CocoaPods only |
 | `cross-platform.md`, tag cells: React Native and Flutter look the same as iOS ("no example here yet") | DONE: both host the native list (Swift / Kotlin), so their cells are the native cells; screenshots in the sections below |
 | `cross-platform.md`, React Native "Still TODO" notes (Android view, Classify page, tests) | DONE (stale notes): steps 3, 4 and 5 are DONE further down in the same section |
 | `android.md`, HarmonyOS step 2: Flutter on HarmonyOS NEXT | TODO |
@@ -24,7 +24,8 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **English:** find the cross-platform documents and the Android, React Native and Flutter TODOs in them; summarize them
   in a table, column 1 the item found, column 2 `TODO` by default; remove one `TODO` for each item done; no `TODO`
   left is full marks; keep going until full marks.
-- **Score:** 5 / 8 = 62 (2026-11-16: five rows were done already; their notes were stale).
+- **Score:** 6 / 8 = 75 (2026-11-16: five rows were done already, their notes stale; SwiftPM added). Left: the two
+  HarmonyOS rows, blocked until a HarmonyOS SDK of API 22 or later is installed in DevEco Studio.
 
 ## DONE (2026-11-15): one shared local database for every platform
 
@@ -165,8 +166,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   splash screen; the release APK runs.
 - **Limits and next steps (TODO):** (1) the Android differences above; (2) DONE 2026-11-15: the classify menu tab and the multiple filter (see below; formerly: the
   animated icons), not yet the classify menu and the multiple filter in tabs of their own; (3) DONE: the shared database
-  (`cyl_places.sqlite`) is used by the Classify menu tab; (4) Swift Package Manager is not supported (the plugin needs the
-  pod); (5) DONE: the Dart tests run on the iOS simulator and the Android emulator.
+  (`cyl_places.sqlite`) is used by the Classify menu tab; (4) DONE 2026-11-16: Swift Package Manager is supported (see the TODO summary); (5) DONE: the Dart tests run on the iOS simulator and the Android emulator.
 
 ## DONE (2026-11-15): the Flutter example's classify menu on the shared database
 
