@@ -1,3 +1,4 @@
+import { hilog } from '@kit.PerformanceAnalysisKit';
 /**
  * Shared parts of group B's screens: the example database (`CYLExampleDatabase`: places, row counts, saved
  * selections), the original demo's data sources (`CYLDemoDataSource`), a plain host data source
@@ -79,37 +80,47 @@ export class CYLExampleDatabase {
 
   /** The rows of a table ("selections": every saved index path, as the iOS table has one row per path). */
   async count(table: string): Promise<number> {
-    if (table === 'selections') {
-      const set = await this.store.querySql('SELECT items FROM selections');
-      let total = 0;
-      while (set.goToNextRow()) {
-        const items = set.getString(set.getColumnIndex('items'));
-        total += items === '' ? 0 : items.split(',').length;
+    try {
+      if (table === 'selections') {
+        const set = await this.store.querySql('SELECT items FROM selections');
+        let total = 0;
+        while (set.goToNextRow()) {
+          const items = set.getString(set.getColumnIndex('items'));
+          total += items === '' ? 0 : items.split(',').length;
+        }
+        set.close();
+        return total;
       }
+      const set = await this.store.querySql(`SELECT COUNT(*) AS n FROM ${table}`);
+      const n = set.goToFirstRow() ? set.getLong(set.getColumnIndex('n')) : 0;
       set.close();
-      return total;
+      return n;
+    } catch (error) {
+      hilog.error(0x0000, 'CYLExampleDatabase', '%{public}s', JSON.stringify(error));
+      throw error as Error;
     }
-    const set = await this.store.querySql(`SELECT COUNT(*) AS n FROM ${table}`);
-    const n = set.goToFirstRow() ? set.getLong(set.getColumnIndex('n')) : 0;
-    set.close();
-    return n;
   }
 
   async rows(query: CYLExampleSQLQuery): Promise<CYLPlaceRow[]> {
-    const set = await this.store.querySql(query.sql, query.args);
-    const result: CYLPlaceRow[] = [];
-    while (set.goToNextRow()) {
-      result.push({
-        name: set.getString(set.getColumnIndex('name')),
-        category: set.getString(set.getColumnIndex('category')),
-        tag: set.getString(set.getColumnIndex('tag')),
-        region: set.getString(set.getColumnIndex('region')),
-        rating: set.getDouble(set.getColumnIndex('rating')),
-        price: set.getLong(set.getColumnIndex('price'))
-      });
+    try {
+      const set = await this.store.querySql(query.sql, query.args);
+      const result: CYLPlaceRow[] = [];
+      while (set.goToNextRow()) {
+        result.push({
+          name: set.getString(set.getColumnIndex('name')),
+          category: set.getString(set.getColumnIndex('category')),
+          tag: set.getString(set.getColumnIndex('tag')),
+          region: set.getString(set.getColumnIndex('region')),
+          rating: set.getDouble(set.getColumnIndex('rating')),
+          price: set.getLong(set.getColumnIndex('price'))
+        });
+      }
+      set.close();
+      return result;
+    } catch (error) {
+      hilog.error(0x0000, 'CYLExampleDatabase', '%{public}s', JSON.stringify(error));
+      throw error as Error;
     }
-    set.close();
-    return result;
   }
 
   async savedSelection(scenario: string): Promise<CYLIndexPath[] | null> {

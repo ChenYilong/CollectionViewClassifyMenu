@@ -1,3 +1,4 @@
+import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLTagAnimationDemoViewController` (动效图标): the animations and images of CYLTabBarController's examples, one
  * section per library, created from a dictionary (map) configuration; a tap plays the tag's icon. The playback
@@ -111,7 +112,7 @@ export struct CYLTagAnimationPage {
   @State status: string = '动效引擎：CYLTabBarItemAnimationFactory 已链接';
   @State speed: number = 1;
   @State loops: boolean = false;
-  private tagList: CYLTagListState = animationDemoTagList(getContext());
+  private tagList: CYLTagListState = animationDemoTagList(CYLUIContext.hostContext());
   private controller: CYLTagListController = new CYLTagListController();
 
   aboutToAppear(): void {

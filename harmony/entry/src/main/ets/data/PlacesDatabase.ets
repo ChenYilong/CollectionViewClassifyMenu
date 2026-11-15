@@ -1,3 +1,4 @@
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { relationalStore } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { fileIo } from '@kit.CoreFileKit';
@@ -54,30 +55,40 @@ export class PlacesDatabase {
   }
 
   static async open(context: common.UIAbilityContext): Promise<PlacesDatabase> {
-    const folder = `${context.databaseDir}/rdb`;
-    const path = `${folder}/${NAME}`;
-    if (!fileIo.accessSync(path)) {
-      if (!fileIo.accessSync(folder)) {
-        fileIo.mkdirSync(folder, true);
+    try {
+      const folder = `${context.databaseDir}/rdb`;
+      const path = `${folder}/${NAME}`;
+      if (!fileIo.accessSync(path)) {
+        if (!fileIo.accessSync(folder)) {
+          fileIo.mkdirSync(folder, true);
+        }
+        const bytes = context.resourceManager.getRawFileContentSync(NAME);
+        const file = fileIo.openSync(path, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY);
+        fileIo.writeSync(file.fd, bytes.buffer);
+        fileIo.closeSync(file);
       }
-      const bytes = context.resourceManager.getRawFileContentSync(NAME);
-      const file = fileIo.openSync(path, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY);
-      fileIo.writeSync(file.fd, bytes.buffer);
-      fileIo.closeSync(file);
+      const store = await relationalStore.getRdbStore(context, { name: NAME, securityLevel: relationalStore.SecurityLevel.S1 });
+      await store.executeSql('CREATE TABLE IF NOT EXISTS selections (scenario TEXT PRIMARY KEY, items TEXT NOT NULL)');
+      return new PlacesDatabase(store);
+    } catch (error) {
+      hilog.error(0x0000, 'PlacesDatabase', '%{public}s', JSON.stringify(error));
+      throw error as Error;
     }
-    const store = await relationalStore.getRdbStore(context, { name: NAME, securityLevel: relationalStore.SecurityLevel.S1 });
-    await store.executeSql('CREATE TABLE IF NOT EXISTS selections (scenario TEXT PRIMARY KEY, items TEXT NOT NULL)');
-    return new PlacesDatabase(store);
   }
 
   private async strings(sql: string, column: string, args: string[] = []): Promise<string[]> {
-    const set = await this.store.querySql(sql, args);
-    const result: string[] = [];
-    while (set.goToNextRow()) {
-      result.push(set.getString(set.getColumnIndex(column)));
+    try {
+      const set = await this.store.querySql(sql, args);
+      const result: string[] = [];
+      while (set.goToNextRow()) {
+        result.push(set.getString(set.getColumnIndex(column)));
+      }
+      set.close();
+      return result;
+    } catch (error) {
+      hilog.error(0x0000, 'PlacesDatabase', '%{public}s', JSON.stringify(error));
+      throw error as Error;
     }
-    set.close();
-    return result;
   }
 
   /** Every tag, in database order (the filter's dishes). */
@@ -87,16 +98,21 @@ export class PlacesDatabase {
 
   /** The categories (吃喝玩逛) in the order of their first place, each with its tags in order. */
   async categories(): Promise<Map<string, string[]>> {
-    const set = await this.store.querySql('SELECT category, tag FROM places GROUP BY category, tag ORDER BY MIN(id)');
-    const result = new Map<string, string[]>();
-    while (set.goToNextRow()) {
-      const category = set.getString(set.getColumnIndex('category'));
-      const tags = result.get(category) ?? [];
-      tags.push(set.getString(set.getColumnIndex('tag')));
-      result.set(category, tags);
+    try {
+      const set = await this.store.querySql('SELECT category, tag FROM places GROUP BY category, tag ORDER BY MIN(id)');
+      const result = new Map<string, string[]>();
+      while (set.goToNextRow()) {
+        const category = set.getString(set.getColumnIndex('category'));
+        const tags = result.get(category) ?? [];
+        tags.push(set.getString(set.getColumnIndex('tag')));
+        result.set(category, tags);
+      }
+      set.close();
+      return result;
+    } catch (error) {
+      hilog.error(0x0000, 'PlacesDatabase', '%{public}s', JSON.stringify(error));
+      throw error as Error;
     }
-    set.close();
-    return result;
   }
 
   /** The saved "section-item" selection of a scenario, or null when none was saved. */
@@ -109,22 +125,32 @@ export class PlacesDatabase {
   }
 
   async saveSelection(scenario: string, items: string[]): Promise<void> {
-    await this.store.executeSql('INSERT OR REPLACE INTO selections (scenario, items) VALUES (?, ?)', [scenario, items.join(',')]);
+    try {
+      await this.store.executeSql('INSERT OR REPLACE INTO selections (scenario, items) VALUES (?, ?)', [scenario, items.join(',')]);
+    } catch (error) {
+      hilog.error(0x0000, 'PlacesDatabase', '%{public}s', JSON.stringify(error));
+      throw error as Error;
+    }
   }
 
   async places(tag: string | null, regions: string[], dishes: string[]): Promise<Place[]> {
-    const query = placesQuery(tag, regions, dishes);
-    const set = await this.store.querySql(query.sql, query.args);
-    const result: Place[] = [];
-    while (set.goToNextRow()) {
-      result.push({
-        name: set.getString(set.getColumnIndex('name')),
-        region: set.getString(set.getColumnIndex('region')),
-        rating: set.getDouble(set.getColumnIndex('rating')),
-        price: set.getLong(set.getColumnIndex('price'))
-      });
+    try {
+      const query = placesQuery(tag, regions, dishes);
+      const set = await this.store.querySql(query.sql, query.args);
+      const result: Place[] = [];
+      while (set.goToNextRow()) {
+        result.push({
+          name: set.getString(set.getColumnIndex('name')),
+          region: set.getString(set.getColumnIndex('region')),
+          rating: set.getDouble(set.getColumnIndex('rating')),
+          price: set.getLong(set.getColumnIndex('price'))
+        });
+      }
+      set.close();
+      return result;
+    } catch (error) {
+      hilog.error(0x0000, 'PlacesDatabase', '%{public}s', JSON.stringify(error));
+      throw error as Error;
     }
-    set.close();
-    return result;
   }
 }

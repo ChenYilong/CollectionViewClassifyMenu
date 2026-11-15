@@ -1,3 +1,4 @@
+import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * iOS `CYLClassifyMenuViewController.swift`, migrated from Android `CYLClassifyMenu.kt`: a single-choice classify
  * menu: sections of tags from `menuDataSource`, each folded to `defaultVisibleRows` rows with a "more" button, an
@@ -425,6 +426,7 @@ export struct CYLClassifyMenuView {
   private removeListener?: () => void;
 
   aboutToAppear(): void {
+    CYLUIContext.remember(this.getUIContext());
     this.removeListener = this.controller.addListener(() => this.relayout());
   }
 

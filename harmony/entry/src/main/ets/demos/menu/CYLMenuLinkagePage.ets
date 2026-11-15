@@ -1,3 +1,4 @@
+import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLMenuLinkageViewController` (分类菜单 + 多选筛选 · 数据库联动): the original app's classify menu (single choice)
  * and its multiple-choice filter (regions and dishes) drive one SQL query on the example database's `places`. Both
@@ -164,7 +165,7 @@ export struct CYLMenuLinkagePage {
   }
 
   private async load(): Promise<void> {
-    this.db = await CYLExampleDatabase.shared(getContext(this) as common.UIAbilityContext);
+    this.db = await CYLExampleDatabase.shared(CYLUIContext.hostContext(this.getUIContext()));
     await this.restoreSavedSelection();
   }
 
