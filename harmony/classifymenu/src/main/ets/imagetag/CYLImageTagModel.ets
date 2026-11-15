@@ -391,6 +391,9 @@ export class CYLImageTagGeometry {
       if (length <= remaining) {
         result.push(b);
         remaining -= length;
+        if (remaining <= 0) {
+          break;
+        }
       } else {
         const f = length > 0 ? remaining / length : 0;
         result.push(new CYLPoint(a.x + (b.x - a.x) * f, a.y + (b.y - a.y) * f));

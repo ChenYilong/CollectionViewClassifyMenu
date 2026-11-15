@@ -37,7 +37,7 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
 | A2 | `harmony/scripts/build.sh`: the `entry` HAP builds | DONE | BUILD SUCCESSFUL, 2026-11-16 |
 | A3 | The instrumented test HAP (`entry@ohosTest`) builds | DONE | BUILD SUCCESSFUL, 2026-11-16 |
 | A4 | No ArkTS warning in our sources (library and example; third-party packages excluded) | DONE | 92 → 1. Model code measures through `CYLUIContext` (the components' `UIContext`: `getMeasureUtils()`, `px2vp`); `UIContext.animateTo`, `getPromptAction()`, `showAlertDialog`; `CYLAccessibilitySelectedModifier` sets `accessibilitySelected` only on API 13+; database calls in try/catch; unique back-button ids. The one left: `getContext()` in `CYLUIContext.hostContext`, the API 12–17 fallback (its replacement `UIContext.getHostContext()` exists from API 18, used there) |
-| A5 | Local unit tests (`entry/src/test`) pass on this computer, no device: `harmony/scripts/unit-test.sh` (hvigor `test`) | DONE | 15 / 15 on 2026-11-16: tag list (6), SVGA decoder (5: engine by extension, movie params, images, sprites, frames with alpha / layout / transform / clip path / shapes / KEEP, progress → frame, SVGA 1.x and damaged files rejected), localization (4: language choice, iOS strings, `%@` / `%lu` formats, core in three languages); plus `scripts/svga-decoder-test.sh` on the six real `.svga` files |
+| A5 | Local unit tests (`entry/src/test`) pass on this computer, no device: `harmony/scripts/unit-test.sh` (hvigor `test`) | DONE | 46 / 46 on 2026-11-16 (section H lists them by feature); 15 / 15 when added: tag list (6), SVGA decoder (5: engine by extension, movie params, images, sprites, frames with alpha / layout / transform / clip path / shapes / KEEP, progress → frame, SVGA 1.x and damaged files rejected), localization (4: language choice, iOS strings, `%@` / `%lu` formats, core in three languages); plus `scripts/svga-decoder-test.sh` on the six real `.svga` files |
 
 ### B. Every demo runs on the emulator, screenshot next to iOS (22)
 
@@ -115,6 +115,22 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 | G1 | `screenshots.md` and `cross-platform.md` list the HarmonyOS screenshots of every demo | TODO |
 | G2 | `harmony.md`, `cross-platform.md` and `README.md` state the verified state (no "compile only" left) | TODO |
 
+### H. Host unit tests per library feature (8)
+
+One row per feature of the port (the features of [harmony.md](harmony.md)'s score history). `DONE` = tests of the
+feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no device).
+
+| # | Feature | Status | Tests |
+| --- | --- | --- | --- |
+| H1 | Menu data source, delegate, keys | DONE | `ClassifyAndFilter.test.ets` (a `CYLMenuDataSource` with exclusive items drives both menus; delegate taps and confirmations) |
+| H2 | Style: `CYLMenuStyle`, colors, fonts | DONE | `StyleAndModels.test.ets` (color strings as iOS, states kept apart, deep copy, title length / reversal, font scale and its limit, named styles) |
+| H3 | Tag models: `CYLTag`, `CYLTagModel`, `CYLTagGroup`, theme colors | DONE | `StyleAndModels.test.ets` |
+| H4 | `CYLTagListState`: tags API, selection modes, layout, reordering, configuration | DONE | `TagListState.test.ets` (8), `ImageTagAndPlayer.test.ets` (JSON configuration), `LocalUnit.test.ets` (6) |
+| H5 | Image tags: directions, geometry, partial lines, separation, title lists | DONE | `ImageTagAndPlayer.test.ets` (6; found and fixed: `partialLine` added a zero-length point when the progress ended on a corner) |
+| H6 | Classify menu and multiple filter | DONE | `ClassifyAndFilter.test.ets` (6: folding to the default rows, layout inside the width, exclusive "全部", fallback, confirm / restore, conflicting selections rejected) |
+| H7 | Animation players (timed player: progress, last frame, speed, loop, play from 0) | DONE | `ImageTagAndPlayer.test.ets` (`CYLSVGAPlayer`, the timed player shared with GIF and PAG) |
+| H8 | SVGA decoder and localization | DONE | `SVGADecoder.test.ets` (5), `Localization.test.ets` (4), `scripts/svga-decoder-test.sh` |
+
 ## Score history
 
 - 2026-11-16: standard created. 2 / 44 = 4.5 / 100.
@@ -123,6 +139,7 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 - 2026-11-16: UI tests written for C2–C6 (`QueryScenarios`, `StylesAndAnimations`, `Samples` test files, shared `TestSupport`); they count only after a passing emulator run. Accessibility: tappable rows, menu buttons and tag buttons are one labeled element each (F1 waits for an emulator check). The emulator image (HarmonyOS 6.0.1, API 21, x86) is downloaded, but no emulator instance exists yet. Score unchanged: 6 / 44 = 13.6 / 100.
 - 2026-11-16: SVGA engine in the library and the SVGA scenes in the example (D5 waits for the emulator). Score unchanged: 6 / 44 = 13.6 / 100.
 - 2026-11-16: A5 added to the standard (local unit tests on the host, 45 rows) and done: 15 / 15. 7 / 45 = 15.6 / 100.
+- 2026-11-16: section H added (host unit tests per feature, 8 rows) and done: 46 / 46 tests pass. 15 / 53 = 28.3 / 100.
 
 ## Next steps (resume here)
 
