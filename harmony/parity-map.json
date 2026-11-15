@@ -19,7 +19,53 @@
       ]
     ]
   },
-  "api": {},
+  "api": {
+    "kDataSourceSectionKey": "`kDataSourceSectionKey` (core/CYLMenuKeys.ets)",
+    "kDataSourceCellTextKey": "`kDataSourceCellTextKey`",
+    "kDataSourceCellPictureKey": "`kDataSourceCellPictureKey`",
+    "CYLMenuKeys": "`class CYLMenuKeys`",
+    "CYLMenuKeys.static dataSourceSectionKey": "`CYLMenuKeys.dataSourceSectionKey`",
+    "CYLMenuKeys.static dataSourceCellTextKey": "`CYLMenuKeys.dataSourceCellTextKey`",
+    "CYLMenuKeys.static dataSourceCellPictureKey": "`CYLMenuKeys.dataSourceCellPictureKey`",
+    "CYLMenuItemType": "`enum CYLMenuItemType` (core/CYLMenuDataSource.ets)",
+    "CYLMenuItemType.tag": "`CYLMenuItemType.tag`",
+    "CYLMenuItemType.create": "`CYLMenuItemType.create`",
+    "CYLMenuDataSource": "`interface CYLMenuDataSource` (+ `CYLMenuDefaults`)",
+    "CYLMenuDataSource.numberOfSectionsInMenu()": "`numberOfSectionsInMenu()`",
+    "CYLMenuDataSource.menuNumberOfItems(inSection:)": "`menuNumberOfItemsInSection(section)`",
+    "CYLMenuDataSource.menuTitle(forSection:)": "`menuTitleForSection(section)`",
+    "CYLMenuDataSource.menuTitleForItem(at:)": "`menuTitleForItem(indexPath)`",
+    "CYLMenuDataSource.menuImageForItem(at:)": "`menuImageForItem?`",
+    "CYLMenuDataSource.menuSelectedImageForItem(at:)": "`menuSelectedImageForItem?`",
+    "CYLMenuDataSource.menuAnimationURLForItem(at:)": "`menuAnimationURLForItem?`",
+    "CYLMenuDataSource.menuAnimationRestingProgressForItem(at:)": "`menuAnimationRestingProgressForItem?`",
+    "CYLMenuDataSource.menuImage(forSection:)": "`menuImageForSection?`",
+    "CYLMenuDataSource.menuAccessoryView(forSection:)": "`menuAccessoryViewForSection?` (CustomBuilder)",
+    "CYLMenuDataSource.menuItemIsEnabled(at:)": "`menuItemIsEnabled?`",
+    "CYLMenuDataSource.menuItemIsExclusive(at:)": "`menuItemIsExclusive?`",
+    "CYLMenuDataSource.menuItemIsSelectable(at:)": "`menuItemIsSelectable?`",
+    "CYLMenuDataSource.menuItemType(at:)": "`menuItemType?`",
+    "CYLMenuDataSource.menuAccessibilityHintForItem(at:)": "`menuAccessibilityHintForItem?`",
+    "CYLMenuDataSource.menuShowsMoreButton(inSection:)": "`menuShowsMoreButtonInSection?`",
+    "CYLMenuDataSource.menuAccessibilityLabelForMoreButton(inSection:)": "`menuAccessibilityLabelForMoreButtonInSection?`",
+    "CYLMenuDataSource.menuItemIsDeletable(at:)": "`menuItemIsDeletable?`",
+    "CYLMenuDataSource.menuRemoveItem(at:)": "`menuRemoveItem?`",
+    "CYLMenuDataSource.menuMoveItem(at:to:)": "`menuMoveItem?`",
+    "CYLMenuDelegate": "`interface CYLMenuDelegate`",
+    "CYLMenuDelegate.menu(_:shouldSelectItemAt:)": "`menuShouldSelectItem?`",
+    "CYLMenuDelegate.menu(_:didSelectItemAt:)": "`menuDidSelectItem?`",
+    "CYLMenuDelegate.menu(_:didRequestNewItemWithName:at:)": "`menuDidRequestNewItemWithName?`",
+    "CYLMenuDelegate.menu(_:didDeselectItemAt:)": "`menuDidDeselectItem?`",
+    "CYLMenuDelegate.menu(_:didChangeSelectedItems:)": "`menuDidChangeSelectedItems?`",
+    "CYLMenuDelegate.menu(_:didConfirmSelectedItems:)": "`menuDidConfirmSelectedItems?`",
+    "CYLMenuDelegate.menu(_:didChangeExpanded:inSection:)": "`menuDidChangeExpanded?`",
+    "CYLMenuDelegate.menu(_:didChangeContentHeight:)": "`menuDidChangeContentHeight?`",
+    "CYLMenuDelegate.menu(_:didTapMoreButtonInSection:)": "`menuDidTapMoreButtonInSection?`",
+    "CYLMenuDelegate.menu(_:didDeleteItemAt:)": "`menuDidDeleteItem?`",
+    "CYLMenuDelegate.menu(_:didLongPressItemAt:)": "`menuDidLongPressItem?`",
+    "CYLMenuDelegate.menu(_:didMoveItemAt:to:)": "`menuDidMoveItem?`",
+    "CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)": "`menuDidBeginDraggingSelectedItem?`"
+  },
   "demos": [
     {
       "ios": "Root tab bar (CYLExampleAppDelegate.makeRootTabBarController)",
@@ -133,6 +179,7 @@
     }
   ],
   "history": [
-    "2026-11-16: tables created, every row TODO."
+    "2026-11-16: tables created, every row TODO.",
+    "2026-11-16: feature 1, the menu data source, delegate and keys (core/CYLMenuDataSource.ets, CYLMenuKeys.ets). Score 45 / 807 = 5.6."
   ]
 }
