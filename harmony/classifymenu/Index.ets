@@ -36,3 +36,11 @@ export {
 export * from './src/main/ets/imagetag/ImageTagIndex';
 export * from './src/main/ets/classify/ClassifyIndex';
 export * from './src/main/ets/tagviews/TagViewsIndex';
+export {
+  CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, CYLLottiePlayer, CYLPAGPlayer, CYLGIFPlayer, CYLRivePlayer,
+  cylAnimationEngine
+} from './src/main/ets/components/CYLAnimationPlayer';
+export { CYLAnimatedIcon } from './src/main/ets/components/CYLAnimatedIcon';
+export {
+  CYLTagListSupplementaryView, CYLTagListElementKindSectionHeader, CYLTagListElementKindSectionFooter
+} from './src/main/ets/components/CYLTagListSupplementaryView';

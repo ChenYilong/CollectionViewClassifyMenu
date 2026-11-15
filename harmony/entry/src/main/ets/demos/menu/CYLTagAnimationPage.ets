@@ -4,8 +4,9 @@
  * controls of docs/example-demo-rules.md: Play all (全部播放), a speed slider (0.25x to 4x, steps of 0.25, the value next
  * to it) and a loop switch (循环播放); they combine and act at once, also on icons that are playing.
  *
- * HarmonyOS: the core plays Lottie (@ohos/lottie). PAG and Rive have no HarmonyOS engine: those tags show their
- * titles. The GIF files are shown as images (ArkUI's Image animates GIFs itself, outside the playback controls).
+ * HarmonyOS: the core picks the engine by the file's extension: Lottie (@ohos/lottie), PAG (@tencent/libpag), Rive
+ * (@ohos/rive), GIF (frames decoded by ImageKit). The files are rawfiles (pag/, rive/, gif/), with the same Rive
+ * options and PAG resting progress as iOS. Rive has no playback speed on HarmonyOS (`CYLRivePlayer`).
  */
 import {
   CYLConfiguration, CYLImage, CYLIndexPath, CYLMenuDataSource, CYLMenuStyle,
@@ -25,15 +26,11 @@ export const ANIMATION_SECTION_IDENTIFIERS: string[] =
 /** The configuration (map) the tag list is created with (rawfile menu/animation-demo.json; Lottie files are rawfiles). */
 const CONFIGURATION_PATH: string = 'menu/animation-demo.json';
 
-/** Images by "section-item": the Lottie placeholders, the GIFs and the static tab images (resources need $r). */
+/** Images by "section-item": the Lottie placeholders and the static tab images (resources need $r). */
 const IMAGES: Map<string, CYLImage> = new Map<string, CYLImage>([
   ['1-0', $r('app.media.b_gray_tabbar_home_placeholder')],
   ['1-1', $r('app.media.b_gray_tabbar_message_placeholder')],
   ['1-2', $r('app.media.b_gray_tabbar_me_placeholder')],
-  ['6-0', $r('app.media.b_tab_fire')],
-  ['6-1', $r('app.media.b_tab_rocket')],
-  ['6-2', $r('app.media.b_tab_star')],
-  ['6-3', $r('app.media.b_cyl_tab_sample_animated')],
   ['7-0', $r('app.media.b_home_normal')],
   ['7-1', $r('app.media.b_fishpond_normal')],
   ['7-2', $r('app.media.b_post_normal')],
@@ -59,6 +56,7 @@ class CYLAnimationDemoSource implements CYLMenuDataSource {
   menuImageForItem?: (indexPath: CYLIndexPath) => CYLImage | undefined;
   menuSelectedImageForItem?: (indexPath: CYLIndexPath) => CYLImage | undefined;
   menuAnimationURLForItem?: (indexPath: CYLIndexPath) => string | undefined;
+  menuAnimationRestingProgressForItem?: (indexPath: CYLIndexPath) => number | undefined;
   menuStyleForSection?: (section: number) => CYLMenuStyle | undefined;
 
   constructor(base: CYLMenuDataSource) {
@@ -66,6 +64,7 @@ class CYLAnimationDemoSource implements CYLMenuDataSource {
     this.menuImageForItem = (p: CYLIndexPath) => IMAGES.get(pathKey(p)) ?? base.menuImageForItem?.(p);
     this.menuSelectedImageForItem = (p: CYLIndexPath) => SELECTED_IMAGES.get(pathKey(p)) ?? base.menuSelectedImageForItem?.(p);
     this.menuAnimationURLForItem = (p: CYLIndexPath) => base.menuAnimationURLForItem?.(p);
+    this.menuAnimationRestingProgressForItem = (p: CYLIndexPath) => base.menuAnimationRestingProgressForItem?.(p);
     this.menuStyleForSection = (s: number) => base.menuStyleForSection?.(s);
   }
 

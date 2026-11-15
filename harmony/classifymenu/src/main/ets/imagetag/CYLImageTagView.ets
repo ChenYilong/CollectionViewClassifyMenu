@@ -11,6 +11,70 @@ import { CYLImageTagGroupView, CYLImageTagGroupViewComponent, CYLImageTagGroupVi
 
 const GROUP_SPACING: number = 4;
 
+/**
+ * `CYLImageTagView.imageView` (iOS `UIImageView`): the picture as the component draws it, its image, content mode
+ * and accessibility. Changes are drawn at once.
+ */
+export class CYLImageTagImageView {
+  private imageStorage?: CYLImage;
+  private contentModeStorage: ImageFit = ImageFit.Cover;
+  private labelStorage?: string;
+  private hintStorage?: string;
+  private hiddenStorage: boolean = false;
+  private changeHandler?: () => void;
+
+  /** Called by the `CYLImageTagView` that owns it. */
+  setChangeHandler(handler: () => void): void {
+    this.changeHandler = handler;
+  }
+
+  get image(): CYLImage | undefined {
+    return this.imageStorage;
+  }
+
+  set image(value: CYLImage | undefined) {
+    this.imageStorage = value;
+    this.changeHandler?.();
+  }
+
+  /** `contentMode`: `ImageFit.Cover` (aspect fill, the default), `ImageFit.Contain`… */
+  get contentMode(): ImageFit {
+    return this.contentModeStorage;
+  }
+
+  set contentMode(value: ImageFit) {
+    this.contentModeStorage = value;
+    this.changeHandler?.();
+  }
+
+  get accessibilityLabel(): string | undefined {
+    return this.labelStorage;
+  }
+
+  set accessibilityLabel(value: string | undefined) {
+    this.labelStorage = value;
+    this.changeHandler?.();
+  }
+
+  get accessibilityHint(): string | undefined {
+    return this.hintStorage;
+  }
+
+  set accessibilityHint(value: string | undefined) {
+    this.hintStorage = value;
+    this.changeHandler?.();
+  }
+
+  get isHidden(): boolean {
+    return this.hiddenStorage;
+  }
+
+  set isHidden(value: boolean) {
+    this.hiddenStorage = value;
+    this.changeHandler?.();
+  }
+}
+
 @Observed
 export class CYLImageTagView implements CYLImageTagGroupViewDelegate {
   /** Bumped on every change the component draws. */
@@ -19,7 +83,8 @@ export class CYLImageTagView implements CYLImageTagGroupViewDelegate {
   private groups: CYLImageTagGroup[] = [];
   private views: CYLImageTagGroupView[] = [];
   private editingValue: boolean = false;
-  private imageValue?: CYLImage;
+  /** The picture's image view (`imageView`). */
+  readonly imageView: CYLImageTagImageView = new CYLImageTagImageView();
   private longPressNameValue?: string;
   private width: number = 0;
   private height: number = 0;
@@ -36,23 +101,42 @@ export class CYLImageTagView implements CYLImageTagGroupViewDelegate {
   longPressHandler?: (index: number) => void;
   /** The group at this index was dragged to a new position (relative to the picture). */
   dragHandler?: (index: number, percentPosition: CYLPoint) => void;
-  /** The picture's screen reader hint, such as "轻点两下显示或隐藏标签". */
-  imageAccessibilityHint?: string;
-  /** The picture's screen reader label; undefined: "图片" (core string `CYLImageTagPicture`). */
-  imageAccessibilityLabel?: string;
 
   /** `init()`: an empty view. */
   constructor() {
+    this.imageView.setChangeHandler(() => {
+      this.revision++;
+    });
   }
 
-  /** The picture. */
+  /** The picture's screen reader hint, such as "轻点两下显示或隐藏标签" (`imageView.accessibilityHint`). */
+  get imageAccessibilityHint(): string | undefined {
+    return this.imageView.accessibilityHint;
+  }
+
+  set imageAccessibilityHint(value: string | undefined) {
+    this.imageView.accessibilityHint = value;
+  }
+
+  /**
+   * The picture's screen reader label (`imageView.accessibilityLabel`); undefined: "图片" (core string
+   * `CYLImageTagPicture`).
+   */
+  get imageAccessibilityLabel(): string | undefined {
+    return this.imageView.accessibilityLabel;
+  }
+
+  set imageAccessibilityLabel(value: string | undefined) {
+    this.imageView.accessibilityLabel = value;
+  }
+
+  /** The picture (`imageView.image`). */
   get image(): CYLImage | undefined {
-    return this.imageValue;
+    return this.imageView.image;
   }
 
   set image(value: CYLImage | undefined) {
-    this.imageValue = value;
-    this.revision++;
+    this.imageView.image = value;
   }
 
   /** The groups, kept up to date while editing (getTagGroupModels). Setting it replaces them (setTagList). */
@@ -255,15 +339,21 @@ export class CYLImageTagView implements CYLImageTagGroupViewDelegate {
 export struct CYLImageTagViewComponent {
   @ObjectLink tagView: CYLImageTagView;
 
+  /** `imageView`, read through `revision` so that every attribute follows its changes. */
+  private picture(): CYLImageTagImageView {
+    return this.tagView.revision >= 0 ? this.tagView.imageView : this.tagView.imageView;
+  }
+
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
-      Image(this.tagView.image ?? '')
-        .objectFit(ImageFit.Cover)
+      Image(this.picture().image ?? '')
+        .objectFit(this.picture().contentMode)
+        .visibility(this.picture().isHidden ? Visibility.Hidden : Visibility.Visible)
         .width('100%')
         .height('100%')
         .id('CYLImageTagPicture')
-        .accessibilityText(this.tagView.pictureAccessibilityLabel)
-        .accessibilityDescription(this.tagView.imageAccessibilityHint ?? '')
+        .accessibilityText(this.picture() !== undefined ? this.tagView.pictureAccessibilityLabel : '')
+        .accessibilityDescription(this.picture().accessibilityHint ?? '')
         .onClick(() => this.tagView.handleImageTap())
       if (this.tagView.revision >= 0) {
         ForEach(this.tagView.groupViews, (group: CYLImageTagGroupView) => {
