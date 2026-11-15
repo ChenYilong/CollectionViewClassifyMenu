@@ -17,6 +17,7 @@ export struct CYLSearchHomePage {
       Column({ space: 12 }) {
         Row({ space: 8 }) {
           Image($r('app.media.a_magnifyingglass')).width(17).height(17)
+            .accessibilityLevel('no')
           Text(CYLExampleLocalizedString('搜人名,职位,公司...')).fontSize(17).fontColor('#993C3C43')
         }
         .width('100%')

@@ -40,7 +40,10 @@
   with localization files; add the support first where it is missing. Automated UI tests locate controls through
   accessibility first (localized label, then description, then id) for taps, complex flows and sequences of
   actions.
+<<<<<<< HEAD
 - Accessibility and localization on HarmonyOS (English rule, AGENTS.md "Accessibility and localization on HarmonyOS
   (and every platform)"): all code supports screen readers, visual assistance and localization through resource
   files; add support first where it is missing; automated UI tests locate controls, tap and run multi-step flows
   through accessibility and localized text first. The HarmonyOS parity sheet is `harmony.md`.
+=======
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)

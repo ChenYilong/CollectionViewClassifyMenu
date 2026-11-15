@@ -137,6 +137,7 @@ export struct CYLQueryScenariosPage {
   scenarioRow(scenario: CYLQueryScenario, last: boolean) {
     Row({ space: 12 }) {
       Image(scenarioSymbol(scenario)).width(24).height(24).objectFit(ImageFit.Contain).fillColor(CYLSystemColor.blue)
+        .accessibilityLevel('no')
       Text(scenarioTitle(scenario)).fontSize(17).fontColor(CYLSystemColor.label).layoutWeight(1)
       Text('›').fontSize(22).fontColor('#C4C4C7')
     }

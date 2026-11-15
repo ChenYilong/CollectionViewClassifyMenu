@@ -65,6 +65,7 @@ branch, see `cyl-dependency`). General practice: the copied `ios-accessibility`,
 
 A change that adds a control or a text without accessibility is not done.
 
+<<<<<<< HEAD
 ## Accessibility on HarmonyOS and in UI tests
 
 Same rule as AGENTS.md "Accessibility and localization on HarmonyOS (and every platform)":
@@ -86,3 +87,15 @@ Same rule as AGENTS.md "Accessibility and localization on HarmonyOS (and every p
   (a slider's thumb), and file the missing label as a bug.
 - **Checks:** `python3 scripts/harmonyos-l10n-check.py` (the same keys in every locale, no literal text in ArkTS);
   the HarmonyOS score sheet `docs/harmonyos-api.md` (`python3 scripts/harmonyos-api.py`).
+=======
+## HarmonyOS
+
+- Every control has `accessibilityText` (localized), a description when useful, and its selected state through
+  `CYLAccessibilitySelectedModifier` (API 13+). Rows and buttons of several views are one element
+  (`accessibilityGroup(true)`); icons beside a label are `accessibilityLevel('no')`; text fields are labeled like
+  their placeholder.
+- Check: `harmony/scripts/accessibility-check.py`. A finding is fixed before the task goes on.
+- UI tests find controls by their localized accessibility label first (`cylFindAccessible`, `cylTapAccessible` in
+  `harmony/entry/src/ohosTest/ets/test/TestSupport.ets`), for taps, flows and sequences of actions; ids only as a
+  fallback. Rule: AGENTS.md "HarmonyOS: accessibility, localization and accessibility-first UI tests".
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)

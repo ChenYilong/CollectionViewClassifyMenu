@@ -25,18 +25,19 @@
 >>>>>>> 04d17f6 (feat(harmony): ✨ example strings in en, zh-Hans and zh-Hant (score 13.6))
     },
     {
-      "name": "speed",
-      "value": "Speed"
+      "name": "tab_home",
+      "value": "Home"
     },
     {
-      "name": "speed_value",
-      "value": "%s times"
+      "name": "tab_nearby",
+      "value": "Nearby"
     },
     {
-      "name": "loop",
-      "value": "Loop"
+      "name": "tab_messages",
+      "value": "Messages"
     },
     {
+<<<<<<< HEAD
       "name": "play_all",
       "value": "Play all"
     },
@@ -135,6 +136,10 @@
     {
       "name": "plus_page",
       "value": "The plus button page"
+=======
+      "name": "tab_me",
+      "value": "Me"
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
     }
   ]
 }
