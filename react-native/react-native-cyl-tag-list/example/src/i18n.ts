@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { I18nManager, NativeModules, Platform } from 'react-native';
 
 /**
  * The example's strings (the example-level table; the core and CYLTabBarController keep their own).
@@ -26,7 +26,9 @@ const zh: Record<string, string> = {
 function locale(): string {
   const settings = NativeModules.SettingsManager?.settings;
   const ios = settings?.AppleLocale ?? settings?.AppleLanguages?.[0];
-  return (Platform.OS === 'ios' ? ios : NativeModules.I18nManager?.localeIdentifier) ?? 'en';
+  // Android and HarmonyOS (React Native for OpenHarmony: a turbo module that NativeModules does not reach).
+  const other = I18nManager.getConstants?.()?.localeIdentifier ?? NativeModules.I18nManager?.localeIdentifier;
+  return (Platform.OS === 'ios' ? ios : other) ?? 'en';
 }
 
 const table = locale().startsWith('zh') ? zh : {};
