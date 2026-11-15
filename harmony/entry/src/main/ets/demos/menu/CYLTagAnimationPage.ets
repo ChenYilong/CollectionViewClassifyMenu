@@ -1,3 +1,5 @@
+import { cylFormat } from '../samples/SampleSupport';
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLTagAnimationDemoViewController` (动效图标): the animations and images of CYLTabBarController's examples, one
@@ -109,7 +111,7 @@ export function clampedSpeed(value: number): number {
 export struct CYLTagAnimationPage {
   /** Root of the 动效 tab: no back button. */
   showsBack: boolean = false;
-  @State status: string = '动效引擎：CYLTabBarItemAnimationFactory 已链接';
+  @State status: string = CYLExampleLocalizedString('动效引擎：CYLTabBarItemAnimationFactory 已链接');
   @State speed: number = 1;
   @State loops: boolean = false;
   private tagList: CYLTagListState = animationDemoTagList(CYLUIContext.hostContext());
@@ -121,7 +123,7 @@ export struct CYLTagAnimationPage {
         const source = this.tagList.menuDataSource;
         const section = source?.menuTitleForSection(indexPath.section) ?? '';
         const title = source?.menuTitleForItem(indexPath) ?? '';
-        this.status = `点击「${section} · ${title}」`;
+        this.status = cylFormat(CYLExampleLocalizedString('点击「%@」'), `${section} · ${title}`);
       }
     };
   }
@@ -138,7 +140,7 @@ export struct CYLTagAnimationPage {
 
   build() {
     Column() {
-      CYLDemoBar({ title: '动效图标', showsBack: this.showsBack })
+      CYLDemoBar({ title: CYLExampleLocalizedString('动效图标'), showsBack: this.showsBack })
       Text(this.status)
         .fontSize(13)
         .fontColor(CYLSystemColor.secondaryLabel)
@@ -147,23 +149,23 @@ export struct CYLTagAnimationPage {
         .id('animationStatus')
       Column({ space: 8 }) {
         Row({ space: 10 }) {
-          Text('倍速').fontSize(15).accessibilityLevel('no')
+          Text(CYLExampleLocalizedString('倍速')).fontSize(15).accessibilityLevel('no')
           Slider({ value: this.speed, min: SPEED_MIN, max: SPEED_MAX, step: SPEED_STEP })
             .layoutWeight(1)
             .id('speedSlider')
-            .accessibilityText('倍速')
-            .accessibilityDescription(`${this.speedValue()} 倍`)
+            .accessibilityText(CYLExampleLocalizedString('倍速'))
+            .accessibilityDescription(cylFormat(CYLExampleLocalizedString('%@ 倍'), this.speedValue()))
             .onChange((value: number) => this.speed = clampedSpeed(value))
           Text(`${this.speedValue()}×`).fontSize(15).fontFeature('"tnum" on').textAlign(TextAlign.End)
             .id('speedValue').accessibilityLevel('no')
         }
         .width('100%')
         Row({ space: 10 }) {
-          Text('循环播放').fontSize(15).accessibilityLevel('no')
+          Text(CYLExampleLocalizedString('循环播放')).fontSize(15).accessibilityLevel('no')
           Blank()
           Toggle({ type: ToggleType.Switch, isOn: this.loops })
             .id('loopSwitch')
-            .accessibilityText('循环播放')
+            .accessibilityText(CYLExampleLocalizedString('循环播放'))
             .onChange((isOn: boolean) => {
               this.loops = isOn;
               if (isOn) {
@@ -173,13 +175,13 @@ export struct CYLTagAnimationPage {
           Button() {
             Row({ space: 6 }) {
               Text('▶').fontSize(13).fontColor(Color.White)
-              Text('全部播放').fontSize(15).fontColor(Color.White)
+              Text(CYLExampleLocalizedString('全部播放')).fontSize(15).fontColor(Color.White)
             }.padding({ left: 14, right: 14 })
           }
           .height(34)
           .backgroundColor(CYLSystemColor.blue)
-          .accessibilityText('全部播放')
-          .accessibilityDescription('从头播放屏幕上的全部动效')
+          .accessibilityText(CYLExampleLocalizedString('全部播放'))
+          .accessibilityDescription(CYLExampleLocalizedString('从头播放屏幕上的全部动效'))
           .id('playAll')
           .onClick(() => this.playAllAnimations())
         }

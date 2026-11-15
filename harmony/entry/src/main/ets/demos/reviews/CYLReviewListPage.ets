@@ -1,3 +1,5 @@
+import { cylFormat } from '../samples/SampleSupport';
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import { CYLUIContext } from '@cyl/classifymenu';
 import { CYLAccessibilitySelectedModifier } from '@cyl/classifymenu';
 /**
@@ -44,7 +46,7 @@ export function reviewFilterStyle(): CYLMenuStyle {
   return style;
 }
 
-const MODES: string[] = ['内存筛选', '网络筛选', '数据库筛选'];
+const MODES: string[] = ['内存筛选', CYLExampleLocalizedString('网络筛选'), CYLExampleLocalizedString('数据库筛选')];
 
 /** The pushed screen's parameter: the preselected filter (0 is "全部") and 'memory', 'network' or 'database'. */
 export interface CYLReviewListParam {
@@ -81,7 +83,7 @@ export struct CYLReviewListPage {
       item.isExclusive = filter.identifier === 'all';
       return item;
     });
-    this.source = new CYLExampleMenuSource([new CYLExampleMenuSection('评价', items)]);
+    this.source = new CYLExampleMenuSource([new CYLExampleMenuSection(CYLExampleLocalizedString('评价'), items)]);
     const view = this.filterView;
     view.style = reviewFilterStyle();
     view.selectionMode = CYLMenuSelectionMode.multiple;
@@ -99,17 +101,17 @@ export struct CYLReviewListPage {
     if (index >= view.numberOfVisibleItems(0)) {
       view.setExpanded(true, 0, false);
     }
-    this.lastEvent = `点击「${this.source.item(selected).title}」`;
+    this.lastEvent = cylFormat(CYLExampleLocalizedString('点击「%@」'), this.source.item(selected).title);
     this.refreshReviews();
   }
 
   private delegate(): CYLMenuDelegate {
     return {
       menuDidSelectItem: (menu: Object, indexPath: CYLIndexPath) => {
-        this.lastEvent = `点击「${this.source.item(indexPath).title}」`;
+        this.lastEvent = cylFormat(CYLExampleLocalizedString('点击「%@」'), this.source.item(indexPath).title);
       },
       menuDidDeselectItem: (menu: Object, indexPath: CYLIndexPath) => {
-        this.lastEvent = `取消「${this.source.item(indexPath).title}」`;
+        this.lastEvent = cylFormat(CYLExampleLocalizedString('取消「%@」'), this.source.item(indexPath).title);
       },
       menuDidChangeSelectedItems: (menu: Object, indexPaths: CYLIndexPath[]) => {
         if (indexPaths.length === 0) {
@@ -168,21 +170,21 @@ export struct CYLReviewListPage {
 
   private updateStatus(): void {
     const names = this.selectedFilters.map((f: CYLReviewFilter) => f.name);
-    const selection = names.length === 0 ? '全部' : names.join('、');
-    const lines: string[] = [`${this.lastEvent} · 已选：${selection}`];
+    const selection = names.length === 0 ? '全部' : names.join(CYLExampleLocalizedString('、'));
+    const lines: string[] = [`${this.lastEvent} · ${cylFormat(CYLExampleLocalizedString('已选：%@'), selection)}`];
     const count = this.visibleReviews.length;
     if (this.mode === CYLReviewFilteringMode.network) {
       const network = this.query as CYLNetworkReviewQuery;
       const url = network.lastRequestURL ?? '';
       const path = url.replace('https://api.example.com', '');
-      lines.push(`网络筛选：向服务器发送条件 · GET ${decodeURIComponent(path)}`);
-      lines.push(network.isLoading ? '加载中…' : `服务器返回 ${count} 条`);
+      lines.push(`${CYLExampleLocalizedString('网络筛选：向服务器发送条件')} · GET ${decodeURIComponent(path)}`);
+      lines.push(network.isLoading ? CYLExampleLocalizedString('加载中…') : cylFormat(CYLExampleLocalizedString('服务器返回 %lu 条'), count));
     } else if (this.mode === CYLReviewFilteringMode.database) {
       const database = this.query as CYLDatabaseReviewQuery;
-      lines.push(`数据库筛选：条件生成 SQL，在 SQLite 中查询 · 匹配 ${count} 条`);
+      lines.push(`${CYLExampleLocalizedString('数据库筛选：条件生成 SQL，在 SQLite 中查询')} · ${cylFormat(CYLExampleLocalizedString('匹配 %lu 条'), count)}`);
       lines.push(database.lastQuery?.displayString() ?? '');
     } else {
-      lines.push(`内存筛选：在已加载的评价中立即匹配 · 匹配 ${count} 条`);
+      lines.push(`${CYLExampleLocalizedString('内存筛选：在已加载的评价中立即匹配')} · ${cylFormat(CYLExampleLocalizedString('匹配 %lu 条'), count)}`);
     }
     this.status = lines.join('\n');
   }
@@ -219,7 +221,7 @@ export struct CYLReviewListPage {
   build() {
     Column() {
       // A pushed screen: the segmented control is the navigation item's title view.
-      CYLDemoBar({ title: `评价(${this.store.reviews.length})`, hasTitleView: true, titleView: () => {
+      CYLDemoBar({ title: cylFormat(CYLExampleLocalizedString('评价(%lu)'), this.store.reviews.length), hasTitleView: true, titleView: () => {
         this.modeControl()
       } })
       CYLTagListView({ tagList: this.filterView })
@@ -260,7 +262,7 @@ export struct CYLReviewListPage {
         .opacity(this.loading ? 0.5 : 1)
         .id('reviewList')
         if (this.visibleReviews.length === 0 && !this.loading) {
-          Text('没有匹配的评价').fontColor('#993C3C43').id('reviewEmpty')
+          Text(CYLExampleLocalizedString('没有匹配的评价')).fontColor('#993C3C43').id('reviewEmpty')
         }
       }
       .layoutWeight(1)

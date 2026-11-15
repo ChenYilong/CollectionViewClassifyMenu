@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * `CYLTagStyleDemoViewController` (标签样式): a tag preview on top; each row of the table below changes one style
  * parameter at once (after CYLTabBarController's CYLFlatDesignTabBarDemoViewController), or opens another demo.
@@ -28,43 +29,43 @@ const ACTIONS: string[][] = [
   ['reset']
 ];
 
-const SECTION_TITLES: string[] = ['标题与图标（参照 CYLFlatDesignTabBarItem）', '背景、边框与圆角（参照 CYLBadgeView）',
-  '动效图标（CYLTabBarController 动效引擎）', 'Android 标签库示例（Swift 复刻）', '其它'];
+const SECTION_TITLES: string[] = ['标题与图标（参照 CYLFlatDesignTabBarItem）', CYLExampleLocalizedString('背景、边框与圆角（参照 CYLBadgeView）'),
+  CYLExampleLocalizedString('动效图标（CYLTabBarController 动效引擎）'), CYLExampleLocalizedString('Android 标签库示例（Swift 复刻）'), CYLExampleLocalizedString('其它')];
 
 const ACTION_TITLES: Map<string, string> = new Map<string, string>([
-  ['iconColor.normal', '设置 iconColor（normal）'],
-  ['iconColor.selected', '设置 iconColor（selected）'],
-  ['titleColor.normal', '设置文字颜色 titleTextAttributes（normal）'],
-  ['titleColor.selected', '设置文字颜色 titleTextAttributes（selected）'],
-  ['font', '设置字体 NSFontAttributeName'],
-  ['imageTitleSpacing', '设置 icon 与文字间距 imageTitleSpacing'],
-  ['imageSize', '设置 icon 大小 imageSize'],
-  ['imageInsets', '设置 imageInsets'],
-  ['titlePositionAdjustment', '设置 titlePositionAdjustment'],
-  ['imagePositionAdjustment', '设置 imagePositionAdjustment'],
-  ['content.iconAndTitle', '显示 icon + title'],
-  ['content.iconOnly', '只显示 icon'],
-  ['content.titleOnly', '只显示 title'],
-  ['layoutCentered', '切换 layoutCentered（只有 icon 或 title 时居中）'],
-  ['selectedImage', '切换选中图片 selectedImage'],
-  ['backgroundColor.normal', '设置背景色 backgroundColor（normal）'],
-  ['backgroundColor.selected', '设置背景色 backgroundColor（selected）'],
-  ['borderColor', '设置边框颜色 borderColor'],
-  ['borderWidth', '设置边框宽度 borderWidth'],
-  ['cornerRadius', '设置圆角 cornerRadius（0 为胶囊）'],
-  ['margin', '设置内边距 margin'],
-  ['animation.lottie', 'Lottie 动效图标'],
-  ['animation.pag', 'PAG 动效图标'],
-  ['animation.rive', 'Rive 动效图标'],
-  ['animation.gif', 'GIF 动效图标'],
-  ['animation.off', '关闭动效（静态图标）'],
-  ['animationSpeed', '设置动效速度 animationSpeed'],
-  ['configuration', '配置文件 / 字典（map）初始化'],
-  ['tagCloud', '标签云：android-tagview 的初始化方式'],
-  ['sample.tagCloud', 'android-tagview 示例（Swift 版）'],
-  ['sample.imageTag', 'TagViewGroup 示例：图片标签'],
-  ['sample.tagContainer', 'AndroidTagView 示例：标签容器'],
-  ['reset', '重置 reset']
+  ['iconColor.normal', CYLExampleLocalizedString('设置 iconColor（normal）')],
+  ['iconColor.selected', CYLExampleLocalizedString('设置 iconColor（selected）')],
+  ['titleColor.normal', CYLExampleLocalizedString('设置文字颜色 titleTextAttributes（normal）')],
+  ['titleColor.selected', CYLExampleLocalizedString('设置文字颜色 titleTextAttributes（selected）')],
+  ['font', CYLExampleLocalizedString('设置字体 NSFontAttributeName')],
+  ['imageTitleSpacing', CYLExampleLocalizedString('设置 icon 与文字间距 imageTitleSpacing')],
+  ['imageSize', CYLExampleLocalizedString('设置 icon 大小 imageSize')],
+  ['imageInsets', CYLExampleLocalizedString('设置 imageInsets')],
+  ['titlePositionAdjustment', CYLExampleLocalizedString('设置 titlePositionAdjustment')],
+  ['imagePositionAdjustment', CYLExampleLocalizedString('设置 imagePositionAdjustment')],
+  ['content.iconAndTitle', CYLExampleLocalizedString('显示 icon + title')],
+  ['content.iconOnly', CYLExampleLocalizedString('只显示 icon')],
+  ['content.titleOnly', CYLExampleLocalizedString('只显示 title')],
+  ['layoutCentered', CYLExampleLocalizedString('切换 layoutCentered（只有 icon 或 title 时居中）')],
+  ['selectedImage', CYLExampleLocalizedString('切换选中图片 selectedImage')],
+  ['backgroundColor.normal', CYLExampleLocalizedString('设置背景色 backgroundColor（normal）')],
+  ['backgroundColor.selected', CYLExampleLocalizedString('设置背景色 backgroundColor（selected）')],
+  ['borderColor', CYLExampleLocalizedString('设置边框颜色 borderColor')],
+  ['borderWidth', CYLExampleLocalizedString('设置边框宽度 borderWidth')],
+  ['cornerRadius', CYLExampleLocalizedString('设置圆角 cornerRadius（0 为胶囊）')],
+  ['margin', CYLExampleLocalizedString('设置内边距 margin')],
+  ['animation.lottie', CYLExampleLocalizedString('Lottie 动效图标')],
+  ['animation.pag', CYLExampleLocalizedString('PAG 动效图标')],
+  ['animation.rive', CYLExampleLocalizedString('Rive 动效图标')],
+  ['animation.gif', CYLExampleLocalizedString('GIF 动效图标')],
+  ['animation.off', CYLExampleLocalizedString('关闭动效（静态图标）')],
+  ['animationSpeed', CYLExampleLocalizedString('设置动效速度 animationSpeed')],
+  ['configuration', CYLExampleLocalizedString('配置文件 / 字典（map）初始化')],
+  ['tagCloud', CYLExampleLocalizedString('标签云：android-tagview 的初始化方式')],
+  ['sample.tagCloud', CYLExampleLocalizedString('android-tagview 示例（Swift 版）')],
+  ['sample.imageTag', CYLExampleLocalizedString('TagViewGroup 示例：图片标签')],
+  ['sample.tagContainer', CYLExampleLocalizedString('AndroidTagView 示例：标签容器')],
+  ['reset', CYLExampleLocalizedString('重置 reset')]
 ]);
 
 /** The rows that open another screen, by route (the iOS class name). */
@@ -115,12 +116,12 @@ interface CYLStyleSample {
 }
 
 const SAMPLES: CYLStyleSample[] = [
-  { title: '首页', image: $r('app.media.b_home_normal'), selectedImage: $r('app.media.b_home_highlight') },
-  { title: '同城', image: $r('sys.media.ohos_ic_public_location'), selectedImage: $r('app.media.b_fishpond_highlight') },
-  { title: '消息', image: $r('app.media.b_message_normal'), selectedImage: $r('app.media.b_message_highlight') },
-  { title: '我的', image: $r('app.media.b_account_normal'), selectedImage: $r('app.media.b_account_highlight') },
-  { title: '一个很长很长的标签标题', image: $r('sys.media.ohos_ic_public_ok'), selectedImage: $r('sys.media.ohos_ic_public_ok_filled') },
-  { title: '已禁用', image: $r('sys.media.ohos_ic_public_cancel'), selectedImage: $r('sys.media.ohos_ic_public_cancel') }
+  { title: CYLExampleLocalizedString('首页'), image: $r('app.media.b_home_normal'), selectedImage: $r('app.media.b_home_highlight') },
+  { title: CYLExampleLocalizedString('同城'), image: $r('sys.media.ohos_ic_public_location'), selectedImage: $r('app.media.b_fishpond_highlight') },
+  { title: CYLExampleLocalizedString('消息'), image: $r('app.media.b_message_normal'), selectedImage: $r('app.media.b_message_highlight') },
+  { title: CYLExampleLocalizedString('我的'), image: $r('app.media.b_account_normal'), selectedImage: $r('app.media.b_account_highlight') },
+  { title: CYLExampleLocalizedString('一个很长很长的标签标题'), image: $r('sys.media.ohos_ic_public_ok'), selectedImage: $r('sys.media.ohos_ic_public_ok_filled') },
+  { title: CYLExampleLocalizedString('已禁用'), image: $r('sys.media.ohos_ic_public_cancel'), selectedImage: $r('sys.media.ohos_ic_public_cancel') }
 ];
 
 /** The animated icons; the HarmonyOS core plays Lottie only (PAG, Rive and GIF show the static icons). */
@@ -390,7 +391,7 @@ export struct CYLTagStylePage {
 
   build() {
     Column() {
-      CYLDemoBar({ title: '标签样式', showsBack: this.showsBack })
+      CYLDemoBar({ title: CYLExampleLocalizedString('标签样式'), showsBack: this.showsBack })
       CYLTagListView({ tagList: this.tagList, controller: this.controller })
         .height(this.previewHeight)
         .id('styleTagList')

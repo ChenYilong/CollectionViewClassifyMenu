@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * CYLTagContainerSample.swift — whilu/AndroidTagView's sample (MainActivity and content_main.xml): five tag
  * containers, each with the attributes of the sample's XML, and "add tag". The library draws and lays out everything;
@@ -103,10 +104,10 @@ export struct CYLTagContainerSamplePage {
     first.setTagsWithTitles(CYLTagContainerSampleData.list1);
     setAllDeletable(first);
     first.tagClickHandler = (position: number, tag: CYLTag) =>
-      cylToast(cylFormat('点击位置：%ld，文字：%@', position, tag.title));
+      cylToast(cylFormat(CYLExampleLocalizedString('点击位置：%ld，文字：%@'), position, tag.title));
     first.tagLongPressHandler = (position: number) => this.confirmDelete(position);
-    first.longPressAccessibilityActionName = '删除';
-    first.tagDeleteHandler = (position: number) => cylToast(cylFormat('点了标签的叉！位置 = %ld', position));
+    first.longPressAccessibilityActionName = CYLExampleLocalizedString('删除');
+    first.tagDeleteHandler = (position: number) => cylToast(cylFormat(CYLExampleLocalizedString('点了标签的叉！位置 = %ld'), position));
 
     // tagcontainerLayout2: transparent, a 4 vp #3300ff00 border, square, drag, not clickable, random colors.
     const second = makeContainer((list: CYLTagListState, style: CYLMenuStyle) => {
@@ -152,18 +153,18 @@ export struct CYLTagContainerSamplePage {
       const selected = third.selectedIndexPaths.map((p: CYLIndexPath) => p.item);
       // Deselect all when an unselected tag is tapped while others are selected; otherwise show the toast.
       if (selected.length === 0 || selected.includes(position)) {
-        cylToast(cylFormat('点击位置：%ld，文字：%@', position, tag.title));
+        cylToast(cylFormat(CYLExampleLocalizedString('点击位置：%ld，文字：%@'), position, tag.title));
       } else {
         third.deselectAllItems();
       }
     };
     third.tagLongPressHandler = (position: number) => {
       third.toggleSelection({ section: 0, item: position });
-      cylToast(cylFormat('已选位置：%@',
+      cylToast(cylFormat(CYLExampleLocalizedString('已选位置：%@'),
         third.selectedIndexPaths.map((p: CYLIndexPath) => `${p.item}`).join(', ')));
     };
-    third.longPressAccessibilityActionName = '选择或取消选择';
-    third.selectedTagDragHandler = (index: number, tag: CYLTag) => cylToast(cylFormat('拖动：%@', tag.title));
+    third.longPressAccessibilityActionName = CYLExampleLocalizedString('选择或取消选择');
+    third.selectedTagDragHandler = (index: number, tag: CYLTag) => cylToast(cylFormat(CYLExampleLocalizedString('拖动：%@'), tag.title));
 
     // tagcontainerLayout4: centered, clickable, a 2 s black ripple at alpha 47, pure teal.
     const fourth = makeContainer((list: CYLTagListState, style: CYLMenuStyle) => {
@@ -178,7 +179,7 @@ export struct CYLTagContainerSamplePage {
     });
     fourth.setTagsWithTitles(CYLTagContainerSampleData.list4);
     fourth.tagClickHandler = (position: number, tag: CYLTag) =>
-      cylToast(cylFormat('点击位置：%ld，文字：%@', position, tag.title));
+      cylToast(cylFormat(CYLExampleLocalizedString('点击位置：%ld，文字：%@'), position, tag.title));
 
     // tagcontainerLayout5: a 4 vp square border, not clickable, random theme, but custom colors per tag.
     const fifth = makeContainer((list: CYLTagListState, style: CYLMenuStyle) => {
@@ -200,39 +201,39 @@ export struct CYLTagContainerSamplePage {
   /** onTagLongClick: "You will delete this tag!". */
   confirmDelete(position: number): void {
     this.getUIContext().showAlertDialog({
-      title: '长按',
-      message: '将删除这个标签！',
-      primaryButton: { value: '删除', fontColor: Color.Red, action: () => {
+      title: CYLExampleLocalizedString('长按'),
+      message: CYLExampleLocalizedString('将删除这个标签！'),
+      primaryButton: { value: CYLExampleLocalizedString('删除'), fontColor: Color.Red, action: () => {
         const first = this.containers[0];
         if (position < first.tags.length) {
           first.removeTag(position);
         }
       } },
-      secondaryButton: { value: '取消', action: () => {
+      secondaryButton: { value: CYLExampleLocalizedString('取消'), action: () => {
       } }
     });
   }
 
   build() {
     Column() {
-      CYLDemoBar({ title: '标签容器示例' })
+      CYLDemoBar({ title: CYLExampleLocalizedString('标签容器示例') })
       Scroll() {
         Column() {
           CYLTagListView({ tagList: this.containers[0] })
           Row({ space: 12 }) {
             Stack({ alignContent: Alignment.Bottom }) {
-              TextInput({ placeholder: '新标签', text: this.text })
+              TextInput({ placeholder: CYLExampleLocalizedString('新标签'), text: this.text })
                 .backgroundColor(Color.Transparent)
                 .borderRadius(0)
                 .padding({ left: 0, right: 0 })
                 .height(44)
-                .accessibilityText('新标签')
+                .accessibilityText(CYLExampleLocalizedString('新标签'))
                 .id('sample.newTag')
                 .onChange((value: string) => this.text = value)
               Column().width('100%').height(1).backgroundColor(SYSTEM_TEAL)
             }
             .layoutWeight(1)
-            CYLSampleButton({ title: '添加', identifier: 'sample.add', color: SYSTEM_GRAY, action: () => this.addTag() })
+            CYLSampleButton({ title: CYLExampleLocalizedString('添加'), identifier: 'sample.add', color: SYSTEM_GRAY, action: () => this.addTag() })
               .layoutWeight(1)
           }
           .margin({ top: 12 })

@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { common } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarController } from 'cyltabbar';
@@ -21,6 +22,9 @@ function key(p: CYLIndexPath): string {
   return `${p.section}-${p.item}`;
 =======
 =======
+=======
+import { CYLExampleLocalizedString } from '../data/CYLExampleLocalization';
+>>>>>>> 04d17f6 (feat(harmony): ✨ example strings in en, zh-Hans and zh-Hant (score 13.6))
 import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
 >>>>>>> d2e3a1d (fix(harmony): 🐛 ArkTS warnings 92 → 1 (score 9.1))
 import { CYLDemoNav } from '../demos/DemoNav';
@@ -258,15 +262,15 @@ struct Index {
       .width('100%')
       .height('100%')
       .id('tab-plus')
-      .accessibilityText('查询筛选')
-      .accessibilityDescription('按场景分组的筛选演示')
+      .accessibilityText(CYLExampleLocalizedString('查询筛选'))
+      .accessibilityDescription(CYLExampleLocalizedString('按场景分组的筛选演示'))
     } else {
       Column({ space: 2 }) {
         Image(this.tab === index ? TABS[index].selectedImage : TABS[index].image)
           .width(26)
           .height(26)
           .fillColor(this.tab === index ? '#007AFF' : '#8E8E93')
-        Text(TABS[index].title)
+        Text(CYLExampleLocalizedString(TABS[index].title))
           .fontSize(10)
           .maxLines(1)
           .fontColor(this.tab === index ? '#007AFF' : '#8E8E93')

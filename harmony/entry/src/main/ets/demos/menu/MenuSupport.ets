@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 /**
  * Shared parts of group B's screens: the example database (`CYLExampleDatabase`: places, row counts, saved
@@ -165,7 +166,7 @@ export class CYLDemoDataSource implements CYLMenuDataSource {
   }
 
   static filterDataSource(): CYLDemoDataSource {
-    const all: CYLDemoItem = { title: '全部', picture: false };
+    const all: CYLDemoItem = { title: CYLExampleLocalizedString('全部'), picture: false };
     const plain = (title: string): CYLDemoItem => ({ title: title, picture: false });
     const foods: CYLDemoItem[] = [all].concat(CYLDemoDataSource.allTags().map(plain));
     const regions: CYLDemoItem[] = [all].concat(CYLDemoDataSource.regions().map(plain));

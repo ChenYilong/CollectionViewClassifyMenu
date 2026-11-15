@@ -1,3 +1,5 @@
+import { CYLExampleLocalizedString } from '../../../main/ets/data/CYLExampleLocalization';
+import { cylFormat } from '../../../main/ets/demos/samples/SampleSupport';
 import { abilityDelegatorRegistry, Driver, MatchPattern, ON } from '@kit.TestKit';
 import { Want } from '@kit.AbilityKit';
 import { describe, beforeAll, it, expect } from '@ohos/hypium';
@@ -72,8 +74,12 @@ export default function exampleUiTest() {
       await driver.assertComponentExist(ON.id('tab-plus'));
       await driver.assertComponentExist(ON.id('tab-样式'));
       await driver.assertComponentExist(ON.id('tab-动效'));
+<<<<<<< HEAD
       await driver.assertComponentExist(ON.text('宝贝详情'));
 >>>>>>> c69f327 (feat(harmony): the iOS example's screens on HarmonyOS (score 98.4))
+=======
+      await driver.assertComponentExist(ON.text(CYLExampleLocalizedString('宝贝详情')));
+>>>>>>> 04d17f6 (feat(harmony): ✨ example strings in en, zh-Hans and zh-Hant (score 13.6))
     })
 
     it('productKeywordOpensFilteredReviews', 0, async () => {
@@ -101,22 +107,22 @@ export default function exampleUiTest() {
         .click();
       await driver.delayMs(1000);
       const status = await (await driver.findComponent(ON.id('reviewStatus'))).getText();
-      expect(status.includes('已选：质量不错')).assertTrue();
-      expect(status.includes('匹配 5 条')).assertTrue();
+      expect(status.includes(cylFormat(CYLExampleLocalizedString('已选：%@'), '质量不错'))).assertTrue();
+      expect(status.includes(cylFormat(CYLExampleLocalizedString('匹配 %lu 条'), 5))).assertTrue();
 
       // Network filtering answers after the simulated delay.
       await (await driver.findComponent(ON.id('reviewMode-1'))).click();
       await driver.delayMs(1200);
       const network = await (await driver.findComponent(ON.id('reviewStatus'))).getText();
       expect(network.includes('GET /reviews?filter=keyword:质量不错')).assertTrue();
-      expect(network.includes('服务器返回 5 条')).assertTrue();
+      expect(network.includes(cylFormat(CYLExampleLocalizedString('服务器返回 %lu 条'), 5))).assertTrue();
 
       // Database filtering runs the SQL on the shared database.
       await (await driver.findComponent(ON.id('reviewMode-2'))).click();
       await driver.delayMs(1500);
       const database = await (await driver.findComponent(ON.id('reviewStatus'))).getText();
       expect(database.includes('k.keyword = \'质量不错\'')).assertTrue();
-      expect(database.includes('匹配 5 条')).assertTrue();
+      expect(database.includes(cylFormat(CYLExampleLocalizedString('匹配 %lu 条'), 5))).assertTrue();
       await (await driver.findComponent(ON.id('CYLDemoBarBack'))).click();
       await driver.delayMs(800);
     })

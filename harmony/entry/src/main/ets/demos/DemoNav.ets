@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../data/CYLExampleLocalization';
 /**
  * The example's navigation: one Navigation (pages/Index.ets) whose NavPathStack pushes the iOS screens by route name
  * (the iOS class name). The route maps (SHELL_ROUTES, MENU_ROUTES, SAMPLE_ROUTES) give each route a builder of its
@@ -61,7 +62,7 @@ export struct CYLDemoBar {
           .height(CYL_DEMO_BAR_HEIGHT)
           .textAlign(TextAlign.Center)
           .position({ x: 0, y: 0 })
-          .accessibilityText('返回')
+          .accessibilityText(CYLExampleLocalizedString('返回'))
           .id('CYLDemoBarBack')
           .onClick(() => CYLDemoNav.pop())
       }

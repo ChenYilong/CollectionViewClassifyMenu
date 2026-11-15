@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * CYLImageTagSample.swift — shellljx/TagViewGroup's sample: MainActivity (a picture with two tag groups; a tap toggles
  * them), TagEditActivity (create, drag, turn and delete groups, then save) and TagListActivity (30 pictures). The
@@ -44,23 +45,23 @@ export struct CYLImageTagSamplePage {
     view.imageAccessibilityLabel = CYLSamplePicture.label(0);
     view.tagGroups = CYLImageTagSampleData.tagGroups;
     view.imageTapHandler = () => view.toggleTagGroups(true);
-    view.imageAccessibilityHint = '轻点两下显示或隐藏标签';
-    view.circleTapHandler = () => cylToast('点击中心圆');
-    view.tagTapHandler = (group: number, index: number, tag: CYLImageTag) => cylToast(cylFormat('点击标签：%@', tag.title));
-    view.longPressHandler = () => cylToast('点击中心圆');
+    view.imageAccessibilityHint = CYLExampleLocalizedString('轻点两下显示或隐藏标签');
+    view.circleTapHandler = () => cylToast(CYLExampleLocalizedString('点击中心圆'));
+    view.tagTapHandler = (group: number, index: number, tag: CYLImageTag) => cylToast(cylFormat(CYLExampleLocalizedString('点击标签：%@'), tag.title));
+    view.longPressHandler = () => cylToast(CYLExampleLocalizedString('点击中心圆'));
   }
 
   build() {
     Column() {
-      CYLDemoBar({ title: '图片标签' })
+      CYLDemoBar({ title: CYLExampleLocalizedString('图片标签') })
       CYLImageTagViewComponent({ tagView: this.tagView }).width('100%').aspectRatio(1)
       Row({ space: 8 }) {
-        CYLSampleButton({ title: '创建标签', identifier: 'sample.createTags', color: SYSTEM_PINK, action: () => {
+        CYLSampleButton({ title: CYLExampleLocalizedString('创建标签'), identifier: 'sample.createTags', color: SYSTEM_PINK, action: () => {
           CYLDemoNav.push('CYLImageTagEditViewController', new CYLImageTagEditParam(() => {
             this.tagView.tagGroups = CYLImageTagSampleData.tagGroups;
           }));
         } }).layoutWeight(1)
-        CYLSampleButton({ title: '标签列表', identifier: 'sample.tagList', color: SYSTEM_PINK,
+        CYLSampleButton({ title: CYLExampleLocalizedString('标签列表'), identifier: 'sample.tagList', color: SYSTEM_PINK,
           action: () => CYLDemoNav.push('CYLImageTagListViewController') }).layoutWeight(1)
       }
       .padding({ left: 16, right: 16, top: 16 })
@@ -93,9 +94,9 @@ export struct CYLImageTagEditPage {
     view.image = CYLSamplePicture.picture(0);
     view.imageAccessibilityLabel = CYLSamplePicture.label(0);
     view.isEditing = true;
-    view.circleTapHandler = () => cylToast('点击中心圆');
+    view.circleTapHandler = () => cylToast(CYLExampleLocalizedString('点击中心圆'));
     view.longPressHandler = (index: number) => this.confirmDelete(index);
-    view.longPressAccessibilityActionName = '删除标签组';
+    view.longPressAccessibilityActionName = CYLExampleLocalizedString('删除标签组');
   }
 
   createGroup(names: string[]): void {
@@ -107,11 +108,11 @@ export struct CYLImageTagEditPage {
 
   confirmDelete(index: number): void {
     this.getUIContext().showAlertDialog({
-      title: '删除标签组',
-      message: '你确定要删除该标签组吗？',
-      primaryButton: { value: '取消', action: () => {
+      title: CYLExampleLocalizedString('删除标签组'),
+      message: CYLExampleLocalizedString('你确定要删除该标签组吗？'),
+      primaryButton: { value: CYLExampleLocalizedString('取消'), action: () => {
       } },
-      secondaryButton: { value: '确定', fontColor: Color.Red, action: () => this.tagView.removeTagGroup(index) }
+      secondaryButton: { value: CYLExampleLocalizedString('确定'), fontColor: Color.Red, action: () => this.tagView.removeTagGroup(index) }
     });
   }
 
@@ -124,10 +125,10 @@ export struct CYLImageTagEditPage {
   @Builder
   createDialog() {
     Column({ space: 12 }) {
-      Text('创建标签').fontSize(17).fontWeight(FontWeight.Medium)
+      Text(CYLExampleLocalizedString('创建标签')).fontSize(17).fontWeight(FontWeight.Medium)
       ForEach([0, 1, 2], (i: number) => {
-        TextInput({ placeholder: cylFormat('标签 %ld', i + 1), text: this.names[i] })
-          .accessibilityText(cylFormat('标签 %ld', i + 1))
+        TextInput({ placeholder: cylFormat(CYLExampleLocalizedString('标签 %ld'), i + 1), text: this.names[i] })
+          .accessibilityText(cylFormat(CYLExampleLocalizedString('标签 %ld'), i + 1))
           .id(`sample.tagName${i + 1}`)
           .onChange((value: string) => {
             const copy = this.names.slice();
@@ -136,9 +137,9 @@ export struct CYLImageTagEditPage {
           })
       }, (i: number) => `${i}`)
       Row() {
-        Button('取消', { type: ButtonType.Normal }).backgroundColor(Color.Transparent).fontColor('#007AFF')
+        Button(CYLExampleLocalizedString('取消'), { type: ButtonType.Normal }).backgroundColor(Color.Transparent).fontColor('#007AFF')
           .layoutWeight(1).onClick(() => this.showsCreate = false)
-        Button('确定', { type: ButtonType.Normal }).backgroundColor(Color.Transparent).fontColor('#007AFF')
+        Button(CYLExampleLocalizedString('确定'), { type: ButtonType.Normal }).backgroundColor(Color.Transparent).fontColor('#007AFF')
           .layoutWeight(1).id('sample.createOK').onClick(() => {
             this.showsCreate = false;
             this.createGroup(this.names);
@@ -154,19 +155,19 @@ export struct CYLImageTagEditPage {
   build() {
     Stack() {
       Column() {
-        CYLDemoBar({ title: '创建标签' })
+        CYLDemoBar({ title: CYLExampleLocalizedString('创建标签') })
         CYLImageTagViewComponent({ tagView: this.tagView }).width('100%').aspectRatio(1)
-        Text('1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除')
+        Text(CYLExampleLocalizedString('1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除'))
           .fontSize(13)
           .fontColor(SECONDARY_LABEL)
           .width('100%')
           .padding({ left: 16, right: 16, top: 12 })
         Row({ space: 8 }) {
-          CYLSampleButton({ title: '创建', identifier: 'sample.create', color: SYSTEM_PINK, action: () => {
+          CYLSampleButton({ title: CYLExampleLocalizedString('创建'), identifier: 'sample.create', color: SYSTEM_PINK, action: () => {
             this.names = ['', '', ''];
             this.showsCreate = true;
           } }).layoutWeight(1)
-          CYLSampleButton({ title: '保存', identifier: 'sample.save', color: SYSTEM_PINK,
+          CYLSampleButton({ title: CYLExampleLocalizedString('保存'), identifier: 'sample.save', color: SYSTEM_PINK,
             action: () => this.save() }).layoutWeight(1)
         }
         .padding({ left: 16, right: 16, top: 12 })
@@ -202,18 +203,18 @@ export struct CYLImageTagListPage {
       view.imageAccessibilityLabel = CYLSamplePicture.label(row % 3);
       view.tagGroups = groups.length === 0 ? [] : [groups[row % groups.length].copy()];
       view.imageTapHandler = () => view.toggleTagGroups(true);
-      view.imageAccessibilityHint = '轻点两下显示或隐藏标签';
-      view.circleTapHandler = () => cylToast('点击中心圆');
-      view.longPressHandler = () => cylToast('点击中心圆');
+      view.imageAccessibilityHint = CYLExampleLocalizedString('轻点两下显示或隐藏标签');
+      view.circleTapHandler = () => cylToast(CYLExampleLocalizedString('点击中心圆'));
+      view.longPressHandler = () => cylToast(CYLExampleLocalizedString('点击中心圆'));
       view.tagTapHandler = (group: number, index: number, tag: CYLImageTag) =>
-        cylToast(cylFormat('点击标签：%@', tag.title));
+        cylToast(cylFormat(CYLExampleLocalizedString('点击标签：%@'), tag.title));
       this.views.push(view);
     }
   }
 
   build() {
     Column() {
-      CYLDemoBar({ title: '标签列表' })
+      CYLDemoBar({ title: CYLExampleLocalizedString('标签列表') })
       List() {
         ForEach(this.views, (view: CYLImageTagView, row: number) => {
           ListItem() {

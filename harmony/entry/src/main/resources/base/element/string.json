@@ -2,6 +2,7 @@
   "string": [
     {
       "name": "module_desc",
+<<<<<<< HEAD
       "value": "CollectionViewClassifyMenu example"
     },
     {
@@ -11,6 +12,17 @@
     {
       "name": "EntryAbility_label",
       "value": "ClassifyMenu"
+=======
+      "value": "CYLClassifyMenu example"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "CYLClassifyMenu example"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "CYLMenuExample"
+>>>>>>> 04d17f6 (feat(harmony): ✨ example strings in en, zh-Hans and zh-Hant (score 13.6))
     },
     {
       "name": "speed",
