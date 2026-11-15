@@ -74,10 +74,10 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 
   <img src="assets/react-native-harmonyos-tags.jpeg" width="360" alt="React Native on HarmonyOS: native tag list, 2x, Loop on, Home selected">
 
-  Not ported: the Classify tab (its SQLite library, op-sqlite, has no HarmonyOS version) and the
-  `react-native-cyltabbar` tab bar (iOS/Android only).
+  Classify and the tab bar: DONE later the same day (section "CYLTabBarController's tab bar in the React Native
+  HarmonyOS example").
 
-## TODO (2026-11-16): CYLTabBarController's tab bar in the React Native HarmonyOS example
+## DONE (2026-11-16): CYLTabBarController's tab bar in the React Native HarmonyOS example
 
 - **Context:** `react-native/react-native-cyl-tag-list/harmony-example` shows only the Tags page, with no tab bar; the
   iOS/Android example uses `react-native-cyltabbar` (Tags, Classify, a raised Post plus button), which has no
@@ -87,18 +87,30 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   plus button with a page of its own); the pages are the example's React Native pages (Tags, Classify, Post), Classify
   on the shared database through the OpenHarmony port of op-sqlite.
 - **Prompt (verbatim):** "use cyltabbarcontroller to do tabbar show and tabbar item"
-- **Progress (2026-11-16, interrupted by the usage limit):** in the build mirror `/tmp/xpr/rnoh/app` (not committed
-  yet): `index.js` registers one app per tab (`Tags`, `Classify`, `Post`), `App.tsx` exports them, the Classify page,
-  `PlacesDatabase.ts` and `launchOptions.ts` are copied, `@react-native-ohos/op-sqlite@15.0.0` is installed (listed
-  for RN 0.82, so linking with 0.86 is unverified), and CYLTabBarController is fetched at `548892a` (the newest commit
-  that has `CrossPlatform/harmonyos-cyltabbar`; the newest overall, `c632022`, does not). Findings: the library's
-  configuration parser reads tabs but not the plus button (set it in code: `CYLPlusButton`, `selectable`, negative
-  `centerYOffset`); the op-sqlite port's `moveAssetsDatabase` copies `databaseDir` onto itself, so ArkTS must copy
-  `cyl_places.sqlite` from rawfile into `databaseDir` before React Native starts. Next: `Index.ets` (one
-  `createAndRegisterRNInstance` + `runJSBundle`, `CYLTabBarController` from `rawfile/cyl_tabbar_configuration.json`,
-  each page an `RNSurface` with `ManagedSurfaceConfig { appKey }`), SVG tab icons from the Android vectors
-  (`cyl_tab_tag`, `cyl_tab_classify`) and `post_*.png`, `setup.sh` (fetch the pin, copy the pages and database),
-  build, emulator check, screenshots.
+- **Result:** `harmony-example/harmony/entry/src/main/ets/pages/Index.ets` builds `CYLTabBarController` (HarmonyOS
+  library `cyltabbar`, CYLTabBarController `548892a`, the newest commit that has `CrossPlatform/harmonyos-cyltabbar`;
+  the newest overall, `c632022`, does not; `setup.sh` fetches it into `.deps/`) from
+  `rawfile/cyl_tabbar_configuration.json` (Tags, Classify; icons: the Android example's vectors as SVG; titles from
+  the `base` / `zh_CN` string resources) with the raised Post plus button (`CYLPlusButton`, `centerYOffset: -14`,
+  `selectable`: a page of its own). One React Native instance runs the bundled JS; each page is an `RNSurface`
+  (`index.js` registers `Tags`, `Classify`, `Post`). The tab bar sits above the system gesture bar
+  (`TYPE_NAVIGATION_INDICATOR` inset).
+- **Classify:** the iOS/Android example's page, unchanged, through `@react-native-ohos/op-sqlite` 15.0.0 (Metro
+  redirects `@op-engineering/op-sqlite`); its `moveAssetsDatabase` copies `databaseDir` onto itself, so
+  `PlacesDatabase.ets` copies `cyl_places.sqlite` from rawfile first. 83 places.
+- **Gaps found:** the library's configuration parser reads tabs but not the plus button (set in code); the React
+  Native pages' own strings stay English on a Chinese device (`i18n.ts` does not detect the HarmonyOS locale);
+  autolinking adds op-sqlite to `harmony/oh-package.json5` during the build, so that file is committed with it.
+- **Fixed on the way:** `6bf3bae` had left out `harmony/entry/src` (the `src/` ignore pattern of the copied JS pages
+  matched it); the patterns are anchored now (`98a97f5`).
+- **Evidence:** emulator (HarmonyOS 6.0.1 SDK API 21, Mate 70 Pro `6.0.0.112(SP3DEVC00E112R4P11)`, RNOH 0.86.1,
+  macOS 27.3, `98a97f5`, 2026-11-16 04:01 emulator time): Tags selected at launch; tapping 分类 shows Classify with 83
+  places; the plus button selects the Post page. A build from a clean `git archive` of `98a97f5` (setup.sh, ohpm,
+  hvigor) succeeds. Top to bottom: Tags, Classify, Post:
+
+  <img src="assets/react-native-harmonyos-cyltabbar-tags.jpeg" width="360" alt="React Native on HarmonyOS, CYLTabBarController: Tags">
+  <img src="assets/react-native-harmonyos-cyltabbar-classify.jpeg" width="360" alt="React Native on HarmonyOS, CYLTabBarController: Classify, 83 places">
+  <img src="assets/react-native-harmonyos-cyltabbar-post.jpeg" width="360" alt="React Native on HarmonyOS, CYLTabBarController: the Post page of the plus button">
 
 ## DONE (2026-11-15): one shared local database for every platform
 
