@@ -41,6 +41,21 @@ Check the last commit:
 git log -1 --format=%B | grep -qxF 'By @ChenYilong <luohanchenyilong@163.com>' && echo ok || echo "missing author line"
 ```
 
+## git cz style, English only
+
+Every commit is written in the `git cz` (commitizen, cz-emoji)
+  style: the subject is `<type>(<optional scope>): <emoji> <summary>`, with the type one of `feat`, `fix`, `docs`,
+  `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore` or `revert` (for example `feat: ✨ …`, `fix(harmony): 🐛
+  …`), followed by a body and the author line. The whole message (subject, body and trailers) is in English: no
+  Chinese characters, and no other non-English text, are allowed anywhere in a commit message. Write a user's
+  non-English prompt only in the task log in `docs/` (quoted verbatim there), never in a commit. Check:
+  `scripts/check-commit-message.sh [range]`.
+
+```sh
+scripts/check-commit-message.sh                    # the last commit
+scripts/check-commit-message.sh origin/master..HEAD   # every commit of the branch
+```
+
 ## Before every commit
 
 1. `scripts/cyl-tabbar-latest-commit.sh --check` (see `cyl-dependency`); update the pins and anything copied from

@@ -35,6 +35,21 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### DONE (2026-11-16, logged as TODO the same day): commit messages in git cz style, English only
+
+- **Context:** the commit rule (AGENTS.md "Code and naming", `.agents/skills/cyl-commit/`) asked for English
+  Conventional Commits with emoji but never named `git cz`, and did not forbid Chinese text in messages.
+- **Requirements:** find the commit rule (create it if missing), look for `git cz` (none found), and add in English:
+  commits in `git cz` style, entirely in English, no Chinese characters; write it into the instructions documents and
+  the skills.
+- **Prompt (verbatim):** "写入instructions相关文件以及skills，找到commit规范，如果没找到就新建，寻找关键字 git cz，如果没有就新建，如果有就追加以下规则：全英文写入： git cz 风格提交，全英文commit 不允许出现中午。 continue"
+- **Prompt (English):** write into the instructions files and skills: find the commit convention (create it if not
+  found), look for the keyword `git cz` (create it if absent, append if present), and add in English: `git cz` style
+  commits, English-only commit messages, no Chinese allowed. ("中午" in the prompt is a typo of "中文", Chinese.)
+- **Result:** the rule "Commit messages: git cz style, English only" in AGENTS.md (Code and naming),
+  `.agents/skills/cyl-commit/SKILL.md` (new section), `docs/instructions.md` and `harmony/instructions.md`, all
+  appended; `scripts/check-commit-message.sh` checks the subject format, the author line and CJK characters.
+
 ### TODO (2026-11-16): SVGA animated icons (CYLTabBarController added SVGA)
 
 - **Prompt (verbatim):** "找到本项目相关文档，加入TODO：cyltabbar 现已增加svga动效，更新core代码以支持该动效，要求example层一比一复刻rive相关演示。只要rive有的演示场景 svga也要有。"
