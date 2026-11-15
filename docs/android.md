@@ -164,7 +164,15 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
 ## TODO (2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
-- **Status:** TODO. Not started: the earlier tasks run first, in the order they were given. When React Native or
+- **Status:** TODO, started 2026-11-15 (the earlier tasks are done). Tools found on this Mac: DevEco Studio with the
+  HarmonyOS 6.0.1 SDK (API 21), `hdc`, hvigor and the Mate 70 Pro emulator (unsigned HAPs install). Not installed:
+  the OpenHarmony fork of Flutter (`gitcode.com/openharmony-tpc/flutter_flutter`, reachable). Plan, in order:
+  1. `harmony/` library (HAR, ArkTS): a port of `CYLTagListView` with the same JSON configuration as the Flutter and
+     React Native components; unit tests; an example HAP with the Tags and Classify tabs, run on the emulator.
+  2. Flutter: install the OpenHarmony fork, add an `ohos` platform to `flutter/cyl_tag_list` that hosts the HAR as a
+     platform view; run the example's integration tests on the emulator.
+  3. React Native: only after step 2 passes (React Native for OpenHarmony, `react-native-openharmony`).
+  Earlier note: When React Native or
   Flutter examples are added, show the classify menu and the multiple filter in tabs of their own, as the iOS and
   Android examples do (request of 2026-11-12, `issue-progress.md`).
 - **Context:** the Android library and example (`android/merged`) and the cross-platform components (Flutter and React
