@@ -468,3 +468,31 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
 - **Phone preview (2026-11-15):** `wechatide auto_preview` pushed the build (978,336 bytes, one package) to the developer's WeChat; checking it on the phone is left to the developer. **Still TODO:** pixel comparisons with iOS screenshots on a Mac. DONE: the `cyl-tag-cloud` property
   warnings (null for unset options; the tag container sample now passes defaults).
+
+### TODO (2026-11-15): Mini Program bugs in the 动效 (Animations) tab
+
+- **Prompt (verbatim):**
+
+  > 文档中记录bug 标记todo tabbar item中的Animations 每当播放动画时 尤其是打开loop开关，滚动上下之后，icon 会漂移，标记bug。同时rive动画图标无法显示
+
+  English: record these bugs in the documents, marked TODO: in the Animations tab, whenever animations play, above all
+  with the Loop switch on, the icons drift after scrolling up and down; and the Rive animated icons do not show.
+- **BUG 1 (TODO): animated icons drift after scrolling while they play.** Reported on the Animations tab
+  (`pages/animations`, iOS `CYLTagAnimationDemoViewController`): play the animations (Play all), especially with Loop
+  on, then scroll the list up and down: the icons move away from their tags. Expected, as on iOS: every icon stays in
+  its tag while it plays and while the list scrolls. Leads to check:
+  - each animated icon is a `cyl-lottie-icon` placed with `position: absolute; left: 0; top: 0` inside its tag
+    (`components/cyl-tag-list/cyl-tag-list.wxml`) and draws on a `<canvas type="2d">` inside the page's `scroll-view`;
+  - with Loop on the canvases redraw every frame (lottie's `requestAnimationFrame` of the latest canvas, in
+    CYLTabBarController's `cyl-lottie-miniprogram`), so a canvas that lags its tag during scrolling shows the most;
+  - reproduce on a phone (the build pushed with `auto_preview`) and in WeChat DevTools, compare the canvas's
+    `boundingClientRect` with its tag's while scrolling, and try the canvas in normal flow (no absolute position).
+- **BUG 2 (TODO): the Rive animated icons do not show.** The Rive section (and the Rive tags of 样式 and the
+  configuration demo) shows titles only, while iOS shows the Rive icons. Cause: the Mini Program links no Rive engine
+  (`components/cyl-tag-list/animations.js`, `ENGINES = { …, rive: false }`): CYLTabBarController's
+  `cyl-rive-miniprogram` (the Rive runtime plus its WebAssembly, about 0.7 MB) was left out to keep the 2 MB main
+  package, and a tag whose engine is missing falls back to its image, or to its title when it has none. Fix to do:
+  link `cyl-rive-miniprogram` (install it with `scripts/fetch-cyltabbar.js`, register its component, copy
+  `rive.wasm.br` where the package expects it, set `rive: true`), within the size limit (the package is 978 KB
+  now; move heavy resources to a subpackage if needed); the same applies to PAG.
+- **Status:** recorded, not fixed.
