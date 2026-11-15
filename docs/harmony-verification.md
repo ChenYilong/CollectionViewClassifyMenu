@@ -140,10 +140,13 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
 - 2026-11-16: SVGA engine in the library and the SVGA scenes in the example (D5 waits for the emulator). Score unchanged: 6 / 44 = 13.6 / 100.
 - 2026-11-16: A5 added to the standard (local unit tests on the host, 45 rows) and done: 15 / 15. 7 / 45 = 15.6 / 100.
 - 2026-11-16: section H added (host unit tests per feature, 8 rows) and done: 46 / 46 tests pass. 15 / 53 = 28.3 / 100.
+- 2026-11-16: launch options (open any demo, language, color mode) and `scripts/screenshots.sh` for rows B, E3, F2; 49 / 49 host tests. Score unchanged: 15 / 53 = 28.3 / 100.
 
 ## Next steps (resume here)
 
-- When the emulator is up: `harmony/scripts/ui-test.sh` (set `DEVECO` to the Windows path), then B1–B22
-  screenshots, C, D, F2.
+- When the emulator is up: `harmony/scripts/ui-test.sh` (rows C), then `harmony/scripts/screenshots.sh`: it opens
+  every demo through the launch options (`CYLLaunchOptions`: `cylScreen`, `cylScreenParam`, `cylLanguage`,
+  `cylColorMode`) and saves `docs/assets/harmonyos-<name>.jpeg` for B1–B22, English and Traditional Chinese (E3)
+  and dark mode (F2). Look at each one against the iOS screenshot before marking its row.
 - D5 (SVGA): check `svga` / `svga-dark` on the 动效 tab and `style-animation.svga` on the emulator (play, speed, loop,
   last frame when selected).
