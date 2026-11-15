@@ -3,8 +3,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { t, setLanguage } = require('../miniprogram/utils/i18n.js');
-const model = require('../miniprogram/components/cyl-tag-list/model.js');
-const animations = require('../miniprogram/components/cyl-tag-list/animations.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/model.js');
+const animations = require('../miniprogram/utils/tag-animations.js');
 const styles = require('../miniprogram/pages/styles/demo.js');
 const animationDemo = require('../miniprogram/pages/animations/demo.js');
 const configurationDemo = require('../miniprogram/pages/configuration/demo.js');

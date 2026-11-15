@@ -2,7 +2,7 @@
  * whilu/AndroidTagView's sample data and the five containers of content_main.xml, as CYLTagContainerSample.swift
  * (CYLTagContainerSampleData and makeContainer). No `wx` calls.
  */
-const model = require('../../components/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
 
 const LIST1 = ['Java', 'C++', 'Python', 'Swift', '你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。',
   'PHP', 'JavaScript', 'Html', 'Welcome to use AndroidTagView!'];

@@ -3,6 +3,7 @@
   "navigationStyle": "custom",
   "disableScroll": true,
   "usingComponents": {
-    "cyl-tag-list": "../../components/cyl-tag-list/cyl-tag-list"
+    "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
+    "cyl-lottie-icon": "/components/cyl-lottie-icon/cyl-lottie-icon"
   }
 }

@@ -1,7 +1,7 @@
 // The cyl-tag-list model: configuration, selection rules of CYLTagListView.handleTap(at:) and folding (node --test).
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const model = require('../miniprogram/components/cyl-tag-list/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/model.js');
 
 function configuration(selectionMode, extra = {}) {
   return {

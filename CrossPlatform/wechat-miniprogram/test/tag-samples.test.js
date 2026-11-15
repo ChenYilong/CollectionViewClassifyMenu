@@ -5,14 +5,22 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const i18n = require('../miniprogram/utils/i18n.js');
-const model = require('../miniprogram/components/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
 const demo = require('../miniprogram/pages/tag-cloud/data.js');
 const cloud = require('../miniprogram/pages/sample-tag-cloud/data.js');
 const container = require('../miniprogram/pages/sample-tag-container/data.js');
 const sample = require('../miniprogram/utils/android-sample.js');
-const { coreString, joinList } = require('../miniprogram/utils/cyl-core-strings.js');
+const { coreString, joinList } = require('cyl-tag-list-miniprogram/core-strings.js');
 
 const ROOT = path.join(__dirname, '..', 'miniprogram');
+const PACKAGE = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
+const NPM_NAME = 'cyl-tag-list-miniprogram/';
+
+/** A usingComponents path: the library's from its package, the example's from miniprogram/. */
+function componentFile(component) {
+  if (component.startsWith(NPM_NAME)) return path.join(PACKAGE, `${component.slice(NPM_NAME.length)}.js`);
+  return path.join(ROOT, `${component}.js`);
+}
 
 test('the tag cloud demo: seven continents, the detailed tag and four styled tags; the map list', () => {
   i18n.setLanguage('zh_CN');
@@ -136,7 +144,7 @@ test('every page of the area has its four files and uses t() for its title', () 
     }
     const json = JSON.parse(fs.readFileSync(path.join(ROOT, 'pages', page, `${page}.json`), 'utf8'));
     for (const component of Object.values(json.usingComponents || {})) {
-      assert.ok(fs.existsSync(path.join(ROOT, `${component}.js`)), component);
+      assert.ok(fs.existsSync(componentFile(component)), component);
     }
   }
 });

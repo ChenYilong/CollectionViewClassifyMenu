@@ -1,5 +1,5 @@
 <view class="page">
-  <cyl-tag-list id="preview" class="preview" configuration="{{configuration}}" bind:selectionchange="onSelectionChange" />
+  <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" id="preview" class="preview" configuration="{{configuration}}" bind:selectionchange="onSelectionChange" />
   <view class="separator" />
   <scroll-view scroll-y class="table">
     <view class="ios-grouped table-content">

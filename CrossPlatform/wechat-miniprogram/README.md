@@ -31,30 +31,32 @@ the 2 MB main package, no VoiceOver announcements) are listed per screen in `doc
 ```
 wechat-miniprogram/
 ├── project.config.json          appid "touristappid"; set an AppID in the git-ignored project.private.config.json
-├── package.json                 `npm test` runs the unit tests (no dependencies)
+├── package.json                 `npm test` runs the unit tests; depends on the library below (file:)
+├── packages/
+│   └── cyl-tag-list-miniprogram/ the npm library: cyl-tag-list, cyl-tag-cloud, cyl-tag-image, locale.js, the core
+│                                strings (miniprogram_dist; README.md for install and use)
 ├── scripts/
 │   ├── fetch-cyltabbar.js       installs CYLTabBarController's cyl-tabbar-miniprogram and cyl-lottie-miniprogram (its
 │   │                            lottie-miniprogram fork, which draws image assets) at the pinned commit (git-ignored)
 │   ├── export-search-data.py    the search discover JSON and images of the iOS bundle
 │   ├── export-animations.py     the iOS example's Lottie / GIF resources and configuration file
-│   └── draw-sample-images.py    the samples' pictures
+│   ├── draw-sample-images.py    the samples' pictures
+│   └── verify-package.js        npm pack the library, check the tarball, install it for Build npm
 ├── test/                        node --test: models, queries, pages and components without wx
 └── miniprogram/
     ├── app.json / app.wxss      the pages; UIKit-like shared styles (inset grouped tables)
     ├── custom-tab-bar/          cyl-tab-bar with the root tab bar's configuration (configuration.js)
     ├── components/
-    │   ├── cyl-tag-list/        the port of the core's CYLTagListView (model.js, symbols.js, animations.js: no wx);
-│   │                        events tagtap, selectionchange, contentheightchange, foldchange; methods playAll,
-│   │                        playItems, setExpanded, setSelectedItems, selectedItems, contentHeight, cellMetrics
-    │   ├── cyl-lottie-icon/     one animated icon: Lottie on a 2d canvas, or a GIF
-    │   ├── cyl-tag-cloud/       the core's tag list used the android-tagview way (CYLTag, AndroidTagView options)
-    │   ├── cyl-tag-image/       the core's image tag and tag group views
+    │   ├── cyl-lottie-icon/     one animated icon (Lottie, Rive, PAG, GIF), given to cyl-tag-list as
+    │   │                        generic:cyl-animation-icon
     │   └── cyl-sample-toast/    the samples' toast
+    ├── miniprogram_npm/         git-ignored: Build npm's copy of cyl-tag-list-miniprogram
     ├── data/                    generated: places, reviews, data.json, the iOS and core strings, animations, search
     ├── images/                  core, tab, symbols, reviews, search, styles and samples images
     ├── pages/                   one folder per iOS screen (the table above)
     ├── styles/                  shared sample styles
-    └── utils/                   i18n.js (t, tc), places-db.js, selections.js, android-sample.js, cyl-core-strings.js
+    └── utils/                   i18n.js (t, tc), tag-animations.js (the engines, registered with the library),
+                                 places-db.js, selections.js, android-sample.js
 ```
 
 ## Run
@@ -63,12 +65,14 @@ wechat-miniprogram/
    `.deps/` and copies its tab bar and its Lottie fork to `miniprogram/cyl_components/`. WeChat DevTools rejects
    `touristappid`: put an AppID (CYLTabBarController's examples use `wx5e29c9d33906f074`) in a git-ignored
    `project.private.config.json` (`{"appid": "wx…"}`).
-2. Open this folder in WeChat DevTools (or `wechatide -c <client> project_import --project <this folder>`).
-3. Compile (no Build npm step). Launch options for screenshots, like the iOS example's `-CYLExampleScreen`:
+2. `npm install` in this folder (links `cyl-tag-list-miniprogram` from `packages/`).
+3. Open this folder in WeChat DevTools (or `wechatide -c <client> project_import --project <this folder>`).
+4. Tools → Build npm (工具 → 构建 npm; `wechatide -c <client> build_npm --project <this folder>`), then compile. Launch options for screenshots, like the iOS example's `-CYLExampleScreen`:
    `pages/animations/animations?autoplay=1`, `pages/classify/classify?select=0-1&filter=0-2,0-4,1-2,1-3`
    (plus-menu-filtered), `pages/reviews/reviews?mode=database&select=1,4` (plus-reviews-db),
    `pages/search-discover/search-discover?seed=2026` (plus-discover-refreshed).
 
-Checks: `npm test` (Node 18+); from the repository root `python3 scripts/export-miniprogram-data.py --check`; in this
+Checks: `npm test` (Node 18+, after `npm install`); `npm run verify-package` packs the library as npm publishes it
+and installs the tarball (run Build npm afterwards; `node scripts/verify-package.js --restore` relinks); from the repository root `python3 scripts/export-miniprogram-data.py --check`; in this
 folder `python3 scripts/export-search-data.py --check` and `python3 scripts/export-animations.py --check` (Pillow).
 WXSS has no `*` selector: one in any file stops every page from compiling.

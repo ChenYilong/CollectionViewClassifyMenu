@@ -12,7 +12,7 @@
  * `restingProgress`. It takes the playback controls of docs/example-demo-rules.md: `speed`, `loops` and `play()`
  * (from progress 0), acting at once on an animation that is playing. A GIF in an <image> has no playback speed.
  */
-const animations = require('../cyl-tag-list/animations.js');
+const animations = require('../../utils/tag-animations.js');
 
 /** CYLTabBarController's cyl-rive (installed by scripts/fetch-cyltabbar.js) loads its WebAssembly from here. */
 const RIVE_WASM = '/cyl_components/cyl-rive-miniprogram/rive/rive.wasm.br';

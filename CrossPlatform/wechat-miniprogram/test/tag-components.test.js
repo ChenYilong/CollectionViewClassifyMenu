@@ -7,6 +7,8 @@ const path = require('node:path');
 const i18n = require('../miniprogram/utils/i18n.js');
 
 const ROOT = path.join(__dirname, '..', 'miniprogram');
+// The tag list library (cyl-tag-list-miniprogram), as WeChat DevTools' Build npm installs it.
+const PACKAGE = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
 
 /** Sets `path` ("a.b[2].c") in `target`, as setData does. */
 function setPath(target, keyPath, value) {
@@ -71,8 +73,8 @@ function tap(index, extra = {}) {
 
 test('cyl-tag-cloud: taps, deletions and the tag methods', () => {
   i18n.setLanguage('zh_CN');
-  const model = require('../miniprogram/components/cyl-tag-cloud/model.js');
-  const list = mountComponent(path.join(ROOT, 'components/cyl-tag-cloud/cyl-tag-cloud.js'), {
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
     tags: [model.makeTag('A'), model.makeTag('B', { isDeletable: true }), model.makeTag('C')],
     listStyle: model.tagCloudStyle(),
   });
@@ -96,9 +98,9 @@ test('cyl-tag-cloud: taps, deletions and the tag methods', () => {
 });
 
 test('cyl-tag-cloud: a long press selects (in none mode) or reorders, and reports when it did not move', () => {
-  const model = require('../miniprogram/components/cyl-tag-cloud/model.js');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
   const rects = [0, 1, 2].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
-  const list = mountComponent(path.join(ROOT, 'components/cyl-tag-cloud/cyl-tag-cloud.js'), {
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
     tags: ['a', 'b', 'c'].map((title) => model.makeTag(title)),
     listStyle: model.tagContainerStyle(),
     allowsReordering: true,
@@ -127,10 +129,10 @@ test('cyl-tag-cloud: a long press selects (in none mode) or reorders, and report
 });
 
 test('cyl-tag-image: measures, lays out, turns tags while editing, drags and toggles', async () => {
-  const model = require('../miniprogram/components/cyl-tag-image/model.js');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-image/model.js');
   const data = require('../miniprogram/pages/sample-image-tag/data.js');
   data.reset();
-  const view = mountComponent(path.join(ROOT, 'components/cyl-tag-image/cyl-tag-image.js'), {
+  const view = mountComponent(path.join(PACKAGE, 'cyl-tag-image/cyl-tag-image.js'), {
     tagGroups: data.getTagGroups(),
     image: '/images/samples/picture-0.jpg',
   }, (selector) => {

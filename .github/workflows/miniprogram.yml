@@ -52,6 +52,15 @@ jobs:
         run: |
           python3 ../../scripts/fetch-animation-resources.py PAGResources
           node scripts/fetch-cyltabbar.js && node scripts/fetch-cyltabbar.js --check
+      # [EN] The tag list library (packages/cyl-tag-list-miniprogram), linked by npm install; npm pack must ship exactly its files.
+      # [CN] 标签库（packages/cyl-tag-list-miniprogram）由 npm install 链接；npm pack 的包必须正好包含它的文件。
       - name: Unit tests
         working-directory: CrossPlatform/wechat-miniprogram
-        run: npm test
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+      - name: npm package
+        working-directory: CrossPlatform/wechat-miniprogram
+        run: |
+          node scripts/verify-package.js
+          npm test

@@ -2,7 +2,7 @@
  * The sample's DataRepo (CYLImageTagSampleData): the groups in memory, shared by the three screens (图片标签,
  * 创建标签, 标签列表), and TagEditDialog.createTagGroup. No `wx` calls.
  */
-const model = require('../../components/cyl-tag-image/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-image/model.js');
 
 function initialGroups() {
   return [

@@ -2,9 +2,9 @@
 // CYLMenuStyle / CYLTagAppearance / CYLTagButton (node --test).
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const model = require('../miniprogram/components/cyl-tag-list/model.js');
-const symbols = require('../miniprogram/components/cyl-tag-list/symbols.js');
-const animations = require('../miniprogram/components/cyl-tag-list/animations.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/model.js');
+const symbols = require('cyl-tag-list-miniprogram/cyl-tag-list/symbols.js');
+const animations = require('../miniprogram/utils/tag-animations.js');
 
 test('the default style is CYLMenuStyle(): hairline gray borders, green selection with white titles, gray disabled tags', () => {
   const s = model.normalize({}, { pixelRatio: 3 }).style;

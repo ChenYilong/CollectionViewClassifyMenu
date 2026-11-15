@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const list = require('../miniprogram/pages/reviews/list.js');
 const preview = require('../miniprogram/pages/product/preview.js');
-const model = require('../miniprogram/components/cyl-tag-list/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/model.js');
 
 test('the filter configuration: multiple choice, 全部 exclusive, empty filters disabled, two rows', () => {
   const configuration = list.filterConfiguration(['0-0'], false);
