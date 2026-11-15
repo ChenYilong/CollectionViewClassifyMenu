@@ -20,3 +20,17 @@ export { CYLTag, CYLTagDataSource } from './src/main/ets/core/CYLTag';
 export {
   CYLTagModel, CYLTagGroup, CYLTagViewSectionInset, CYLTagViewCellSpacing, CYLTagDefaultListWidth
 } from './src/main/ets/core/CYLTagModel';
+export {
+  CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent
+} from './src/main/ets/core/CYLMenuFoldControl';
+export {
+  CYLConfiguration, CYLTagListKey, CYLMenuFoldControlKey, CYLTagSectionKey, CYLTagItemKey, CYLMenuStyleKey,
+  CYLTagAppearanceKey, CYLMenuConfigurationError, CYLMenuConfigurationErrorCode, CYLConfigurationValue,
+  CYLMenuConfiguration, cylAddingAnimationOptions
+} from './src/main/ets/core/CYLTagListConfiguration';
+export {
+  CYLTagListState, CYLMenuSelectionMode, CYLMenuTitlePosition, CYLMenuFoldStyle, CYLTagButtonMetrics,
+  CYLTagFoldMetrics, CYLTagCreateItem, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListConfigurationSource,
+  CYLTextMeasurer
+} from './src/main/ets/components/CYLTagListState';
+export * from './src/main/ets/imagetag/ImageTagIndex';
