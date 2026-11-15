@@ -48,7 +48,7 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
 | Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | DONE (2026-11-14, below) |
 | React Native | `react-native/react-native-cyl-tag-list/example`, Tags tab | iOS and Android DONE (2026-11-15: Play all command, speed steps 0.25x–4x, Loop switch; `cross-platform.md`, `scripts/e2e-android.sh` and the iOS UI test check the speed) |
 | Flutter | `flutter/cyl_tag_list/example`, Animated icons | iOS and Android DONE (animations play, `cross-platform.md`) |
-| Mini Program | `CrossPlatform/wechat-miniprogram/miniprogram/pages/animations` (动效, the iOS screen 1:1) | DONE in WeChat DevTools (2026-11-15; Play all, speed slider, Loop switch; Lottie through CYLTabBarController's cyl-lottie-miniprogram, GIF; no PAG / Rive engine; `cross-platform.md`) |
+| Mini Program | `CrossPlatform/wechat-miniprogram/miniprogram/pages/animations` (动效, the iOS screen 1:1) | DONE in WeChat DevTools (2026-11-15; Play all, speed slider, Loop switch; Lottie through CYLTabBarController's cyl-lottie-miniprogram, GIF; no PAG / Rive engine; `cross-platform.md`). TODO bugs: icons drift after scrolling while playing (Loop on); Rive icons do not show (`cross-platform.md`) |
 | HarmonyOS | `harmony/entry` (Tags, Classify; 2026-11-15) | TODO: no animated icons yet (needs a Lottie player for ArkTS) |
 
 ### iOS: DONE (2026-11-14)
