@@ -1,304 +1,112 @@
-import { common } from '@kit.AbilityKit';
-import { CYLIndexPath, CYLTagListController, CYLTagListView, CYLTagTap } from '@cyl/classifymenu';
-import { Place, PlacesDatabase, REGIONS } from '../data/PlacesDatabase';
+import { CYLDemoNav } from '../demos/DemoNav';
+import { SHELL_ROUTES } from '../demos/shell/ShellRoutes';
+import { MENU_ROUTES } from '../demos/menu/MenuRoutes';
+import { SAMPLE_ROUTES } from '../demos/samples/SampleRoutes';
 
-const CLASSIFY = 'menu.classify';
-const FILTER = 'menu.filter';
-const ALL = '全部';
-
-function key(p: CYLIndexPath): string {
-  return `${p.section}-${p.item}`;
+@Builder
+function missingBuilder(param: Object) {
+  Text('').fontColor('#8E8E93')
 }
 
-function path(k: string): CYLIndexPath {
-  const parts = k.split('-');
-  return { section: Number(parts[0]), item: Number(parts[1]) };
+/** The builder of a route, from any group's map. */
+function routeBuilder(name: string): WrappedBuilder<[Object]> {
+  return SHELL_ROUTES.get(name) ?? MENU_ROUTES.get(name) ?? SAMPLE_ROUTES.get(name) ?? wrapBuilder(missingBuilder);
 }
 
-function selectedJSON(keys: string[]): CYLIndexPath[] {
-  return keys.map(path);
-}
-
-interface ItemJSON {
+interface RootTab {
   title: string;
-  exclusive?: boolean;
-  animation?: string;
+  route: string;
+  image: Resource;
+  selectedImage: Resource;
 }
 
-interface SectionJSON {
-  title: string;
-  items: ItemJSON[];
-}
+/**
+ * The app's root tab bar (iOS CYLExampleAppDelegate.makeRootTabBarController): 场景一：评价筛选, 场景二：搜索分类,
+ * the plus button in the middle (the filter scenarios, CYLQueryScenariosViewController), 样式 and 动效. Every tab's root
+ * screen pushes onto one Navigation, whose pushed screens cover the tab bar (hidesBottomBarWhenPushed).
+ */
+const TABS: RootTab[] = [
+  { title: '场景一：评价筛选', route: 'CYLProductViewController', image: $r('app.media.a_cart'),
+    selectedImage: $r('app.media.a_cart_fill') },
+  { title: '场景二：搜索分类', route: 'CYLSearchHomeViewController', image: $r('app.media.a_magnifyingglass_circle'),
+    selectedImage: $r('app.media.a_magnifyingglass_circle_fill') },
+  // The plus button (CYLExamplePlusButton): an image only, its title read by the screen reader.
+  { title: '查询筛选', route: 'CYLQueryScenariosViewController', image: $r('app.media.a_plus_circle_fill'),
+    selectedImage: $r('app.media.a_plus_circle_fill') },
+  { title: '样式', route: 'CYLTagStyleDemoViewController', image: $r('app.media.a_paintbrush'),
+    selectedImage: $r('app.media.a_paintbrush_fill') },
+  { title: '动效', route: 'CYLTagAnimationDemoViewController', image: $r('app.media.a_sparkles'),
+    selectedImage: $r('app.media.a_sparkles_selected') }
+];
+const PLUS_INDEX: number = 2;
 
-interface CornerJSON {
-  cornerRadius: number;
-}
-
-interface StyleJSON {
-  itemHeight: number;
-  imageSize?: string;
-  normal: CornerJSON;
-  selected: CornerJSON;
-}
-
-interface ConfigJSON {
-  selectionMode: string;
-  defaultVisibleRows?: number;
-  selected?: CYLIndexPath[];
-  style?: StyleJSON;
-  sections: SectionJSON[];
-}
-
-function items(titles: string[]): ItemJSON[] {
-  return titles.map((t): ItemJSON => ({ title: t }));
-}
-
-/** The example's screens, one bottom tab each (tab bars stay at the bottom, AGENTS.md). */
 @Entry
 @Component
 struct Index {
   @State tab: number = 0;
+  private stack: NavPathStack = CYLDemoNav.stack;
 
   @Builder
-  tabBar(title: string, symbol: string, index: number) {
-    Column() {
-      Text(symbol).fontSize(22)
-      Text(title).fontSize(11).fontColor(this.tab === index ? '#2AB9A0' : '#8E8E93')
-    }.id(`tab-${title}`)
-  }
-
-  build() {
-    Tabs({ barPosition: BarPosition.End, index: this.tab }) {
-      TabContent() {
-        TagsPage()
-      }.tabBar(this.tabBar('Tags', '🏷️', 0))
-
-      TabContent() {
-        ClassifyPage()
-      }.tabBar(this.tabBar('Classify', '🗂️', 1))
+  destination(name: string, param: Object) {
+    NavDestination() {
+      routeBuilder(name).builder(param)
     }
-    .onChange((index: number) => this.tab = index)
-  }
-}
-
-/**
- * A tag list from one configuration (multiple selection, two rows folded) with the Lottie icons of CYLTagListView and
- * the playback controls of docs/example-demo-rules.md: Play all, a speed slider (0.25x to 4x) and a loop switch, which
- * combine and act at once.
- */
-@Component
-struct TagsPage {
-  @State lastTap: string = '';
-  @State speed: number = 1;
-  @State loops: boolean = false;
-  private controller: CYLTagListController = new CYLTagListController();
-
-  private configuration(): string {
-    const titles = ['Home', 'Search', 'Messages', 'Profile', 'Favorites', 'Settings', 'Camera', 'Music', 'Maps',
-      'Calendar', 'A long tag that starts a new line', '你好，这是一个TAG。'];
-    const animated = (title: string, file: string): ItemJSON => ({ title: title, animation: `asset:${file}` });
-    const config: ConfigJSON = {
-      selectionMode: 'multiple',
-      defaultVisibleRows: 2,
-      style: { itemHeight: 36, imageSize: '{18, 18}', normal: { cornerRadius: 0 }, selected: { cornerRadius: 0 } },
-      sections: [
-        {
-          title: 'Lottie',
-          items: [animated('Home', 'tab_home_animate.json'), animated('Messages', 'tab_message_animate.json'),
-            animated('Search', 'tab_search_animate.json'), animated('Me', 'tab_me_animate.json')]
-        },
-        { title: 'Tags', items: items(titles) }
-      ]
-    };
-    return JSON.stringify(config);
+    .hideTitleBar(true)
   }
 
-  private speedText(): string {
-    return `${this.speed}×`;
+  @Builder
+  rootPage(route: string) {
+    routeBuilder(route).builder(new Object())
   }
 
-  build() {
-    Column() {
-      Text($r('app.string.animated_icons')).fontSize(24).fontWeight(FontWeight.Bold).padding(16).width('100%')
-        .accessibilityRole(AccessibilityRoleType.TITLE_BAR)
-      Row() {
-        Text($r('app.string.speed')).accessibilityLevel('no')
-        Slider({ value: this.speed, min: 0.25, max: 4, step: 0.25 })
-          .layoutWeight(1)
-          .id('speedSlider')
-          .accessibilityText($r('app.string.speed'))
-          .accessibilityDescription(getContext(this).resourceManager.getStringByNameSync('speed_value')
-            .replace('%s', `${this.speed}`))
-          .onChange((value: number) => this.speed = Math.round(value * 4) / 4)
-        Text(this.speedText()).id('speedValue').accessibilityLevel('no')
-      }.width('100%').padding({ left: 16, right: 16 })
-      Row({ space: 8 }) {
-        Text($r('app.string.loop')).layoutWeight(1).accessibilityLevel('no')
-        Toggle({ type: ToggleType.Switch, isOn: this.loops })
-          .id('loopSwitch')
-          .accessibilityText($r('app.string.loop'))
-          .onChange((isOn: boolean) => {
-            this.loops = isOn;
-            if (isOn) {
-              this.controller.playAll();
-            }
-          })
-        Button($r('app.string.play_all')).id('playAll').onClick(() => this.controller.playAll())
-      }.width('100%').padding({ left: 16, right: 16, bottom: 8 })
-      if (this.lastTap !== '') {
-        Text(this.lastTap).padding({ left: 16, right: 16 }).width('100%').id('lastTap')
+  @Builder
+  tabBar(index: number) {
+    if (index === PLUS_INDEX) {
+      Column() {
+        Image(TABS[index].image).width(36).height(36)
       }
-      Scroll() {
-        CYLTagListView({
-          configuration: this.configuration(),
-          animationSpeed: this.speed,
-          animationLoops: this.loops,
-          controller: this.controller,
-          onTagTap: (tap: CYLTagTap) => this.lastTap = getContext(this).resourceManager
-            .getStringByNameSync('tapped').replace('%s', tap.title)
-        })
-      }.layoutWeight(1).align(Alignment.Top)
-    }.height('100%').alignItems(HorizontalAlign.Start)
-  }
-}
-
-/**
- * The classify menu (single choice) and the multiple filter of the iOS example's menu linkage screen: the selected tag
- * and the filter's regions and dishes select the places listed below, best rated first, saved in the database.
- */
-@Component
-struct ClassifyPage {
-  @State categories: string[] = [];
-  @State categoryTags: string[][] = [];
-  @State dishes: string[] = [];
-  @State classify: string[] = [];
-  @State filter: string[] = [];
-  @State draft: string[] = [];
-  @State places: Place[] = [];
-  @State showFilter: boolean = false;
-  private db?: PlacesDatabase;
-
-  async aboutToAppear(): Promise<void> {
-    this.db = await PlacesDatabase.open(getContext(this) as common.UIAbilityContext);
-    const categories = await this.db.categories();
-    this.categories = Array.from(categories.keys());
-    this.categoryTags = this.categories.map((c) => categories.get(c) ?? []);
-    this.dishes = await this.db.tags();
-    this.classify = (await this.db.savedSelection(CLASSIFY)) ?? [];
-    this.filter = (await this.db.savedSelection(FILTER)) ?? [];
-    await this.reload();
-  }
-
-  private selectedTag(): string | null {
-    if (this.classify.length === 0) {
-      return null;
+      .justifyContent(FlexAlign.Center)
+      .width('100%')
+      .height('100%')
+      .id('tab-plus')
+      .accessibilityText('查询筛选')
+      .accessibilityDescription('按场景分组的筛选演示')
+    } else {
+      Column({ space: 2 }) {
+        Image(this.tab === index ? TABS[index].selectedImage : TABS[index].image)
+          .width(26)
+          .height(26)
+          .fillColor(this.tab === index ? '#007AFF' : '#8E8E93')
+        Text(TABS[index].title)
+          .fontSize(10)
+          .maxLines(1)
+          .fontColor(this.tab === index ? '#007AFF' : '#8E8E93')
+      }
+      .justifyContent(FlexAlign.Center)
+      .width('100%')
+      .height('100%')
+      .id(`tab-${TABS[index].title}`)
     }
-    const p = path(this.classify[0]);
-    return this.categoryTags[p.section]?.[p.item] ?? null;
-  }
-
-  private filterTitles(section: number, titles: string[]): string[] {
-    return this.filter.map(path).filter((p) => p.section === section && p.item > 0).map((p) => titles[p.item - 1]);
-  }
-
-  private async reload(): Promise<void> {
-    await this.db?.saveSelection(CLASSIFY, this.classify);
-    await this.db?.saveSelection(FILTER, this.filter);
-    this.places = (await this.db?.places(this.selectedTag(), this.filterTitles(0, REGIONS),
-      this.filterTitles(1, this.dishes))) ?? [];
-  }
-
-  private classifyJSON(): string {
-    const config: ConfigJSON = {
-      selectionMode: 'single',
-      defaultVisibleRows: 2,
-      selected: selectedJSON(this.classify),
-      sections: this.categories.map((c, i): SectionJSON => ({ title: c, items: items(this.categoryTags[i]) }))
-    };
-    return JSON.stringify(config);
-  }
-
-  private filterJSON(): string {
-    const all: ItemJSON = { title: ALL, exclusive: true };
-    const section = (title: string, titles: string[]): SectionJSON => ({ title: title, items: [all].concat(items(titles)) });
-    const config: ConfigJSON = {
-      selectionMode: 'multiple',
-      selected: selectedJSON(this.draft),
-      sections: [section('Regions', REGIONS), section('Dishes', this.dishes)]
-    };
-    return JSON.stringify(config);
-  }
-
-  private summary(): string {
-    const parts: string[] = [this.selectedTag() ?? ALL];
-    parts.push(...this.filterTitles(0, REGIONS), ...this.filterTitles(1, this.dishes));
-    return `${parts.join(' · ')}: ${this.places.length} places`;
-  }
-
-  @Builder
-  filterSheet() {
-    Column() {
-      Scroll() {
-        CYLTagListView({
-          configuration: this.filterJSON(),
-          onSelectionChange: (selected: CYLIndexPath[]) => this.draft = selected.map(key)
-        })
-      }.layoutWeight(1)
-      Button('OK').id('filterOK').width('90%').margin(16).onClick(() => {
-        this.filter = this.draft;
-        this.showFilter = false;
-        this.reload();
-      })
-    }.height('100%')
   }
 
   build() {
-    Column() {
-      Row() {
-        Text('Reset').fontColor('#2AB9A0').id('reset').onClick(() => {
-          this.classify = [];
-          this.filter = [];
-          this.reload();
-        })
-        Text('Classify').fontSize(18).fontWeight(FontWeight.Bold).layoutWeight(1).textAlign(TextAlign.Center)
-        Text(this.filter.length > 0 ? 'Filter ●' : 'Filter').fontColor('#2AB9A0').id('filter').onClick(() => {
-          this.draft = this.filter;
-          this.showFilter = true;
-        })
-      }.width('100%').padding(16)
-      List() {
-        ListItem() {
-          CYLTagListView({
-            configuration: this.classifyJSON(),
-            onSelectionChange: (selected: CYLIndexPath[]) => {
-              this.classify = selected.map(key);
-              this.reload();
-            }
-          })
-        }
-        ListItem() {
-          Text(this.summary()).fontSize(13).fontColor('#8E8E93').padding(16).id('summary')
-        }
-        if (this.places.length === 0) {
-          ListItem() {
-            Text('No places match').padding(16).id('empty')
-          }
-        }
-        ForEach(this.places, (place: Place) => {
-          ListItem() {
-            Row() {
-              Column() {
-                Text(place.name).fontSize(15)
-                Text(place.region).fontSize(12).fontColor('#8E8E93')
-              }.alignItems(HorizontalAlign.Start).layoutWeight(1)
-              Text(`★ ${place.rating.toFixed(1)} · ¥${place.price}`).fontSize(13)
-            }.padding({ left: 16, right: 16, top: 8, bottom: 8 })
-          }
-        }, (place: Place) => `${place.name}-${place.region}`)
-      }.layoutWeight(1)
+    Navigation(this.stack) {
+      Tabs({ barPosition: BarPosition.End, index: this.tab }) {
+        ForEach(TABS, (tab: RootTab, index: number) => {
+          TabContent() {
+            this.rootPage(tab.route)
+          }.tabBar(this.tabBar(index))
+        }, (tab: RootTab) => tab.route)
+      }
+      .scrollable(false)
+      .animationDuration(0)
+      .barHeight(56)
+      .barBackgroundColor('#F9F9F9')
+      .onChange((index: number) => this.tab = index)
     }
-    .id('classifyPage')
-    .height('100%')
-    .bindSheet($$this.showFilter, this.filterSheet(), { height: SheetSize.LARGE, title: { title: 'Filter' } })
+    .mode(NavigationMode.Stack)
+    .hideTitleBar(true)
+    .hideToolBar(true)
+    .navDestination(this.destination)
   }
 }

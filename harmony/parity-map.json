@@ -801,52 +801,52 @@
     {
       "ios": "Root tab bar (CYLExampleAppDelegate.makeRootTabBarController)",
       "shows": "场景一：评价筛选, 场景二：搜索分类, the plus button (查询筛选), 样式, 动效",
-      "harmony": ""
+      "harmony": "`pages/Index.ets` Index: 场景一：评价筛选, 场景二：搜索分类, plus button, 样式, 动效"
     },
     {
       "ios": "CYLProductViewController",
       "shows": "宝贝详情: the product, 宝贝评价(10), the keyword preview, 查看更多评价",
-      "harmony": ""
+      "harmony": "`demos/reviews/CYLProductPage` (tab 1 root)"
     },
     {
       "ios": "CYLReviewListViewController",
       "shows": "The review filter (multiple choice, 全部 exclusive, folded, footer chevron); memory / network / database modes; the review cells",
-      "harmony": ""
+      "harmony": "`demos/reviews/CYLReviewListPage` (memory / network 0.6 s / database on cyl_places.sqlite)"
     },
     {
       "ios": "CYLSearchHomeViewController",
       "shows": "脉脉搜索 and the search field button",
-      "harmony": ""
+      "harmony": "`demos/search/CYLSearchHomePage` (tab 2 root)"
     },
     {
       "ios": "CYLSearchCategoryViewController",
       "shows": "The search page with its own category tab bar (找人/动态/八卦/职位)",
-      "harmony": ""
+      "harmony": "`demos/search/CYLSearchCategoryPage` (category tab bar, 职位 sidebar, 行业 menu)"
     },
     {
       "ios": "CYLSearchCategoryPageViewController",
       "shows": "One category page: the 职位 sidebar and 行业 menu",
-      "harmony": ""
+      "harmony": "`CYLSearchCategoryPage.page()` (each category tab)"
     },
     {
       "ios": "CYLSearchDiscoverViewController",
       "shows": "最近搜索 folded to two rows with the chevron as the last tag, 发现 two per row, 换一批",
-      "harmony": ""
+      "harmony": "`demos/search/CYLSearchDiscoverPage` (最近搜索, 发现, 换一批)"
     },
     {
       "ios": "CYLQueryScenariosViewController",
       "shows": "查询筛选: the filter demos by scenario and the database's row counts",
-      "harmony": ""
+      "harmony": "`demos/menu/CYLQueryScenariosPage` (plus button)"
     },
     {
       "ios": "CYLMenuLinkageViewController",
       "shows": "菜单选择 · 数据库联动: the classify menu, the multiple filter panel, the SQL and the rows; saved selections",
-      "harmony": ""
+      "harmony": "`demos/menu/CYLMenuLinkagePage` (classify menu, multiple filter, SQL, saved selections)"
     },
     {
       "ios": "CYLTagStyleDemoViewController",
       "shows": "The preview and the style actions with their values",
-      "harmony": ""
+      "harmony": "`demos/menu/CYLTagStylePage` (样式 tab)"
     },
     {
       "ios": "CYLTagAnimationDemoViewController",
@@ -856,57 +856,57 @@
     {
       "ios": "CYLTagConfigurationDemoViewController",
       "shows": "The list from the iOS JSON file and from a dictionary",
-      "harmony": ""
+      "harmony": "`demos/menu/CYLTagConfigurationPage` (JSON file and map configurations)"
     },
     {
       "ios": "CYLTagCloudDemoViewController",
       "shows": "The tag cloud built in code and from a configuration",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLTagCloudDemoPage`"
     },
     {
       "ios": "CYLTagCloudSampleViewController",
       "shows": "The android-tagview sample: 25 tags, add a tag",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLTagCloudSamplePage`"
     },
     {
       "ios": "CYLTagCloudSubViewController",
       "shows": "The sample's result page",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLTagCloudSubPage`"
     },
     {
       "ios": "CYLTagCloudListViewController",
       "shows": "The sample's list view",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLTagCloudListPage`"
     },
     {
       "ios": "CYLTagCloudRecyclerViewController",
       "shows": "The sample's RecyclerView page",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLTagCloudRecyclerPage`"
     },
     {
       "ios": "CYLHotSearchViewController",
       "shows": "The sample's hot search",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLHotSearchPage`"
     },
     {
       "ios": "CYLImageTagSampleViewController",
       "shows": "Tags on a picture: tag groups",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLImageTagSamplePage`"
     },
     {
       "ios": "CYLImageTagEditViewController",
       "shows": "Edit image tags: drag, turn, delete, 创建, 保存",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLImageTagEditPage`"
     },
     {
       "ios": "CYLImageTagListViewController",
       "shows": "The image tag list",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLImageTagListPage`"
     },
     {
       "ios": "CYLTagContainerSampleViewController",
       "shows": "The five AndroidTagView containers",
-      "harmony": ""
+      "harmony": "`demos/samples/CYLTagContainerSamplePage`"
     }
   ],
   "history": [
@@ -916,6 +916,7 @@
     "2026-11-16: feature 3, the tag models: CYLTag, CYLTagDataSource (badge images drawn on an OffscreenCanvas), CYLTagModel, CYLTagGroup, CYLMenuColorFromString. Score 250 / 807 = 31.0.",
     "2026-11-16: features 4 and 5, CYLTagListView (CYLTagListState with selection, folding, layout, tags API, configuration, fold control) and the image tag views (CYLImageTagView, CYLImageTagGroupView, geometry). Compile only: no emulator on this machine. Score 604 / 807 = 74.8.",
     "2026-11-16: features 6 and 7, the classify menu and multiple filter (classify/) and the tag button, tag view and cells (tagviews/). Compile only. Score 758 / 807 = 93.9.",
-    "2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7."
+    "2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7.",
+    "2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3."
   ]
 }

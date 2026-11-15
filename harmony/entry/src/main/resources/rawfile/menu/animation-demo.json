@@ -1,0 +1,216 @@
+{
+ "selectionMode": "single",
+ "allowsEmptySelection": false,
+ "selectedItems": [
+  "0-0",
+  "1-0",
+  "2-0",
+  "3-0",
+  "4-0",
+  "5-0",
+  "6-0",
+  "7-0"
+ ],
+ "style": {
+  "imageSize": "{28, 28}",
+  "imageTitleSpacing": 6,
+  "itemHeight": 44,
+  "layoutCentered": true,
+  "sectionInsets": [
+   6,
+   16,
+   14,
+   16
+  ],
+  "normal": {
+   "cornerRadius": 0,
+   "margin": 12,
+   "borderColor": "#D1D1D6",
+   "borderWidth": 1
+  },
+  "selected": {
+   "cornerRadius": 0,
+   "margin": 12,
+   "backgroundColor": "#FFF1E6",
+   "textColor": "#FF6A00",
+   "borderColor": "#FF6A00",
+   "borderWidth": 1
+  }
+ },
+ "sections": [
+  {
+   "title": "Lottie · pod 'CYLTabBarController/Lottie'",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:tab_home_animate.json"
+    },
+    {
+     "title": "消息",
+     "animation": "asset:tab_message_animate.json"
+    },
+    {
+     "title": "搜索",
+     "animation": "asset:tab_search_animate.json"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:tab_me_animate.json"
+    }
+   ]
+  },
+  {
+   "title": "Lottie（带图片资源与占位图）",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:b_gray_tabbar_home_animation.json"
+    },
+    {
+     "title": "消息",
+     "animation": "asset:b_gray_tabbar_message_animation.json"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:b_gray_tabbar_me_animation.json"
+    }
+   ]
+  },
+  {
+   "title": "Lottie（绿色主题）",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:b_green_lottie_tab_home.json"
+    },
+    {
+     "title": "资讯",
+     "animation": "asset:b_green_lottie_tab_news.json"
+    },
+    {
+     "title": "发现",
+     "animation": "asset:b_green_lottie_tab_discover.json"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:b_green_lottie_tab_mine.json"
+    }
+   ]
+  },
+  {
+   "title": "PAG · pod 'CYLTabBarController/PAG'",
+   "items": [
+    {
+     "title": "首页"
+    },
+    {
+     "title": "健康"
+    },
+    {
+     "title": "动态"
+    },
+    {
+     "title": "我的"
+    },
+    {
+     "title": "动效一"
+    },
+    {
+     "title": "动效二"
+    }
+   ]
+  },
+  {
+   "title": "Rive · pod 'CYLTabBarController/Rive'",
+   "items": [
+    {
+     "title": "首页"
+    },
+    {
+     "title": "完成"
+    },
+    {
+     "title": "菜单"
+    },
+    {
+     "title": "按钮"
+    },
+    {
+     "title": "形状"
+    },
+    {
+     "title": "卡车"
+    }
+   ]
+  },
+  {
+   "title": "Rive · icons.riv（深色标签）",
+   "style": {
+    "normal": {
+     "backgroundColor": "#17203A",
+     "textColor": "#FFFFFF",
+     "borderColor": "#17203A"
+    },
+    "selected": {
+     "backgroundColor": "#3A4E8C",
+     "textColor": "#FFFFFF",
+     "borderColor": "#6792FF"
+    }
+   },
+   "items": [
+    {
+     "title": "聊天"
+    },
+    {
+     "title": "搜索"
+    },
+    {
+     "title": "计时"
+    },
+    {
+     "title": "提醒"
+    },
+    {
+     "title": "我的"
+    }
+   ]
+  },
+  {
+   "title": "GIF · pod 'CYLTabBarController/GIF'",
+   "items": [
+    {
+     "title": "火焰"
+    },
+    {
+     "title": "火箭"
+    },
+    {
+     "title": "星星"
+    },
+    {
+     "title": "示例"
+    }
+   ]
+  },
+  {
+   "title": "静态图片（CYLTabBarController Example）",
+   "items": [
+    {
+     "title": "首页"
+    },
+    {
+     "title": "同城"
+    },
+    {
+     "title": "发布"
+    },
+    {
+     "title": "消息"
+    },
+    {
+     "title": "我的"
+    }
+   ]
+  }
+ ]
+}

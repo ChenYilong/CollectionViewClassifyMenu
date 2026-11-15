@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 772 / 807 = 95.7 / 100** (API 772 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
+**Score: 793 / 807 = 98.3 / 100** (API 772 / 785, demos 21 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -824,28 +824,28 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 
 | iOS demo | HarmonyOS (`harmony/entry`) | What it shows |
 | --- | --- | --- |
-| `Root tab bar (CYLExampleAppDelegate.makeRootTabBarController)` | TODO | 场景一：评价筛选, 场景二：搜索分类, the plus button (查询筛选), 样式, 动效 |
-| `CYLProductViewController` | TODO | 宝贝详情: the product, 宝贝评价(10), the keyword preview, 查看更多评价 |
-| `CYLReviewListViewController` | TODO | The review filter (multiple choice, 全部 exclusive, folded, footer chevron); memory / network / database modes; the review cells |
-| `CYLSearchHomeViewController` | TODO | 脉脉搜索 and the search field button |
-| `CYLSearchCategoryViewController` | TODO | The search page with its own category tab bar (找人/动态/八卦/职位) |
-| `CYLSearchCategoryPageViewController` | TODO | One category page: the 职位 sidebar and 行业 menu |
-| `CYLSearchDiscoverViewController` | TODO | 最近搜索 folded to two rows with the chevron as the last tag, 发现 two per row, 换一批 |
-| `CYLQueryScenariosViewController` | TODO | 查询筛选: the filter demos by scenario and the database's row counts |
-| `CYLMenuLinkageViewController` | TODO | 菜单选择 · 数据库联动: the classify menu, the multiple filter panel, the SQL and the rows; saved selections |
-| `CYLTagStyleDemoViewController` | TODO | The preview and the style actions with their values |
+| `Root tab bar (CYLExampleAppDelegate.makeRootTabBarController)` | `pages/Index.ets` Index: 场景一：评价筛选, 场景二：搜索分类, plus button, 样式, 动效 | 场景一：评价筛选, 场景二：搜索分类, the plus button (查询筛选), 样式, 动效 |
+| `CYLProductViewController` | `demos/reviews/CYLProductPage` (tab 1 root) | 宝贝详情: the product, 宝贝评价(10), the keyword preview, 查看更多评价 |
+| `CYLReviewListViewController` | `demos/reviews/CYLReviewListPage` (memory / network 0.6 s / database on cyl_places.sqlite) | The review filter (multiple choice, 全部 exclusive, folded, footer chevron); memory / network / database modes; the review cells |
+| `CYLSearchHomeViewController` | `demos/search/CYLSearchHomePage` (tab 2 root) | 脉脉搜索 and the search field button |
+| `CYLSearchCategoryViewController` | `demos/search/CYLSearchCategoryPage` (category tab bar, 职位 sidebar, 行业 menu) | The search page with its own category tab bar (找人/动态/八卦/职位) |
+| `CYLSearchCategoryPageViewController` | `CYLSearchCategoryPage.page()` (each category tab) | One category page: the 职位 sidebar and 行业 menu |
+| `CYLSearchDiscoverViewController` | `demos/search/CYLSearchDiscoverPage` (最近搜索, 发现, 换一批) | 最近搜索 folded to two rows with the chevron as the last tag, 发现 two per row, 换一批 |
+| `CYLQueryScenariosViewController` | `demos/menu/CYLQueryScenariosPage` (plus button) | 查询筛选: the filter demos by scenario and the database's row counts |
+| `CYLMenuLinkageViewController` | `demos/menu/CYLMenuLinkagePage` (classify menu, multiple filter, SQL, saved selections) | 菜单选择 · 数据库联动: the classify menu, the multiple filter panel, the SQL and the rows; saved selections |
+| `CYLTagStyleDemoViewController` | `demos/menu/CYLTagStylePage` (样式 tab) | The preview and the style actions with their values |
 | `CYLTagAnimationDemoViewController` | TODO | The animation sections, speed slider (0.25×–4×), loop switch, Play all |
-| `CYLTagConfigurationDemoViewController` | TODO | The list from the iOS JSON file and from a dictionary |
-| `CYLTagCloudDemoViewController` | TODO | The tag cloud built in code and from a configuration |
-| `CYLTagCloudSampleViewController` | TODO | The android-tagview sample: 25 tags, add a tag |
-| `CYLTagCloudSubViewController` | TODO | The sample's result page |
-| `CYLTagCloudListViewController` | TODO | The sample's list view |
-| `CYLTagCloudRecyclerViewController` | TODO | The sample's RecyclerView page |
-| `CYLHotSearchViewController` | TODO | The sample's hot search |
-| `CYLImageTagSampleViewController` | TODO | Tags on a picture: tag groups |
-| `CYLImageTagEditViewController` | TODO | Edit image tags: drag, turn, delete, 创建, 保存 |
-| `CYLImageTagListViewController` | TODO | The image tag list |
-| `CYLTagContainerSampleViewController` | TODO | The five AndroidTagView containers |
+| `CYLTagConfigurationDemoViewController` | `demos/menu/CYLTagConfigurationPage` (JSON file and map configurations) | The list from the iOS JSON file and from a dictionary |
+| `CYLTagCloudDemoViewController` | `demos/samples/CYLTagCloudDemoPage` | The tag cloud built in code and from a configuration |
+| `CYLTagCloudSampleViewController` | `demos/samples/CYLTagCloudSamplePage` | The android-tagview sample: 25 tags, add a tag |
+| `CYLTagCloudSubViewController` | `demos/samples/CYLTagCloudSubPage` | The sample's result page |
+| `CYLTagCloudListViewController` | `demos/samples/CYLTagCloudListPage` | The sample's list view |
+| `CYLTagCloudRecyclerViewController` | `demos/samples/CYLTagCloudRecyclerPage` | The sample's RecyclerView page |
+| `CYLHotSearchViewController` | `demos/samples/CYLHotSearchPage` | The sample's hot search |
+| `CYLImageTagSampleViewController` | `demos/samples/CYLImageTagSamplePage` | Tags on a picture: tag groups |
+| `CYLImageTagEditViewController` | `demos/samples/CYLImageTagEditPage` | Edit image tags: drag, turn, delete, 创建, 保存 |
+| `CYLImageTagListViewController` | `demos/samples/CYLImageTagListPage` | The image tag list |
+| `CYLTagContainerSampleViewController` | `demos/samples/CYLTagContainerSamplePage` | The five AndroidTagView containers |
 
 ## Score history
 
@@ -856,3 +856,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: features 4 and 5, CYLTagListView (CYLTagListState with selection, folding, layout, tags API, configuration, fold control) and the image tag views (CYLImageTagView, CYLImageTagGroupView, geometry). Compile only: no emulator on this machine. Score 604 / 807 = 74.8.
 - 2026-11-16: features 6 and 7, the classify menu and multiple filter (classify/) and the tag button, tag view and cells (tagviews/). Compile only. Score 758 / 807 = 93.9.
 - 2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7.
+- 2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3.
