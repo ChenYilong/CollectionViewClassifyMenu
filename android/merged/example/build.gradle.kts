@@ -5,6 +5,11 @@ plugins {
 }
 
 android {
+    lint {
+        // lifecycle's NonNullableMutableLiveDataDetector crashes this Android Gradle Plugin's lint
+        // (IncompatibleClassChangeError in visitCallExpression), which failed every release build (lintVitalAnalyzeRelease).
+        disable += "NullSafeMutableLiveData"
+    }
     // The shared example database of every platform (Example-Shared/Database/cyl_places.sqlite, docs/cross-platform.md).
     sourceSets["main"].assets.srcDir("../../../Example-Shared/Database")
     // The iOS examples' bundles (strings, data, animations), each under its own folder: see copyExampleBundles.

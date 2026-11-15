@@ -327,6 +327,29 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   Not covered: a physical device; Detox or another end-to-end framework (the two scripts above stand in for one).
 
+## DONE (2026-11-15): every CYLTabBarController pin at its newest commit `117be52c`
+
+- **Why:** AGENTS.md pins CYLTabBarController by its newest commit everywhere. `117be52c` fixes its framework build
+  (issue-progress.md).
+- **Moved:**
+  - the React Native example (`example/ios/Podfile`, `scripts/fetch-cyltabbar.sh`) from `460ed89f`;
+  - the Flutter example (`example/ios/Podfile`) from `53766de`;
+  - the Android merged build (`android/merged/gradle.properties`, which also feeds the engine `.aar` of the Flutter and
+    React Native Android examples) from `4639a0c`.
+- **Lint fix:** the merged example's release build failed in lint, because lifecycle's `NonNullableMutableLiveDataDetector`
+  crashes this Android Gradle Plugin's lint with `IncompatibleClassChangeError`. It fails the same way at the old pin, so
+  the crash was already there. `android/merged/example/build.gradle.kts` disables that one check
+  (`NullSafeMutableLiveData`).
+- **Evidence** (iPhone 17 Pro simulator, iOS 27.0; Android 15 / API 35 emulator `CYL_API35_arm64`; 2026-11-15):
+
+  | Example | Check | Result |
+  |---|---|---|
+  | React Native, iOS | UI test | passed (33 s) |
+  | React Native, Android | `scripts/e2e-android.sh` | PASS |
+  | Flutter, iOS | `flutter test integration_test` | All tests passed (2) |
+  | Flutter, Android | `flutter test integration_test`, with the engine rebuilt at `117be52c` | All tests passed (2) |
+  | Android merged | `:library:testDebugUnitTest` | 78 tests, 0 failures |
+  | Android merged | `:example:assembleRelease`, lint included | BUILD SUCCESSFUL |
 ## TODO (2026-11-15): the WeChat Mini Program example
 
 - **Context:** the Mini Program is the next platform of this document (iOS, Android, React Native, Flutter, HarmonyOS,
@@ -385,7 +408,7 @@ Program) show the same screens with the same data and look the same as iOS, whic
   A pixel comparison with an iOS screenshot needs a Mac (not available on this machine).
 
 - **Shell DONE (2026-11-15): CYLTabBarController's Mini Program tab bar.** The example's shell is `cyl-tab-bar` of
-  CYLTabBarController's `cyl-tabbar-miniprogram` (`CrossPlatform/wechat-miniprogram-cyltabbar`, pinned at `460ed89f`, the
+  CYLTabBarController's `cyl-tabbar-miniprogram` (`CrossPlatform/wechat-miniprogram-cyltabbar`, pinned at `117be52c` (first `460ed89f`; the Mini Program packages are the same at both), the
   React Native example's pin), as the iOS, Flutter and React Native examples use CYLTabBarController: a custom tab bar
   (`app.json` `"custom": true`, `miniprogram/custom-tab-bar/`) with the tabs Tags and Classify and the raised Post button
   with a page of its own between them (`CYLPlusButtonCenterYOffset` -14, the React Native example's `post_normal` /
