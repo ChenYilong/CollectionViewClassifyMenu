@@ -19,7 +19,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 175 / 807 = 21.7 / 100** (API 175 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
+**Score: 250 / 807 = 31.0 / 100** (API 250 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 
 ## Table 1: iOS public API
@@ -402,64 +402,64 @@ overrides left out.
 | `CYLMenuStyle.deleteIndicatorFont(for:traitCollection:)` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorFontFor(state, fontScale, boldText)` | method |
 | `CYLMenuStyle.headerFont(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.headerFontFor(fontScale, boldText)` | method |
 | `CYLMenuStyle.copy(with:)` (CYLMenuStyle.swift) | `CYLMenuStyle.copy()` | method |
-| `CYLTag` (CYLTag.swift) | TODO | class |
-| `CYLTag.identifier` (CYLTag.swift) | TODO | property |
-| `CYLTag.title` (CYLTag.swift) | TODO | property |
-| `CYLTag.image` (CYLTag.swift) | TODO | property |
-| `CYLTag.selectedImage` (CYLTag.swift) | TODO | property |
-| `CYLTag.animationURL` (CYLTag.swift) | TODO | property |
-| `CYLTag.isEnabled` (CYLTag.swift) | TODO | property |
-| `CYLTag.isDeletable` (CYLTag.swift) | TODO | property |
-| `CYLTag.badgeText` (CYLTag.swift) | TODO | property |
-| `CYLTag.badgeColor` (CYLTag.swift) | TODO | property |
-| `CYLTag.badgeAccessibilityLabel` (CYLTag.swift) | TODO | property |
-| `CYLTag.userInfo` (CYLTag.swift) | TODO | property |
-| `CYLTag.style` (CYLTag.swift) | TODO | property |
-| `CYLTag.textColor` (CYLTag.swift) | TODO | property |
-| `CYLTag.font` (CYLTag.swift) | TODO | property |
-| `CYLTag.textSize` (CYLTag.swift) | TODO | property |
-| `CYLTag.backgroundColor` (CYLTag.swift) | TODO | property |
-| `CYLTag.highlightedBackgroundColor` (CYLTag.swift) | TODO | property |
-| `CYLTag.selectedBackgroundColor` (CYLTag.swift) | TODO | property |
-| `CYLTag.backgroundImage` (CYLTag.swift) | TODO | property |
-| `CYLTag.cornerRadius` (CYLTag.swift) | TODO | property |
-| `CYLTag.borderWidth` (CYLTag.swift) | TODO | property |
-| `CYLTag.borderColor` (CYLTag.swift) | TODO | property |
-| `CYLTag.deleteIndicatorTitle` (CYLTag.swift) | TODO | property |
-| `CYLTag.deleteIndicatorColor` (CYLTag.swift) | TODO | property |
-| `CYLTag.deleteIndicatorSize` (CYLTag.swift) | TODO | property |
-| `CYLTag.init(identifier:title:backgroundColor:)` (CYLTag.swift) | TODO | init |
-| `CYLTag.init(identifier:title:backgroundColorHex:)` (CYLTag.swift) | TODO | init |
-| `CYLTag.colors` (CYLTag.swift) | TODO | property |
-| `CYLTag.hasCustomStyle` (CYLTag.swift) | TODO | property |
-| `CYLTag.style(basedOn:)` (CYLTag.swift) | TODO | method |
-| `CYLTag.copy()` (CYLTag.swift) | TODO | method |
-| `CYLTag.static badgeImage(text:color:diameter:)` (CYLTag.swift) | TODO | method |
-| `CYLTag.description` (CYLTag.swift) | TODO | property |
-| `CYLTagDataSource` (CYLTag.swift) | TODO | class |
-| `CYLTagDataSource.tags` (CYLTag.swift) | TODO | property |
-| `CYLTagDataSource.sectionTitle` (CYLTag.swift) | TODO | property |
-| `CYLTagDataSource.baseStyle` (CYLTag.swift) | TODO | property |
-| `CYLTagDataSource.init(tags:)` (CYLTag.swift) | TODO | init |
-| `CYLTagDataSource.addTag(_:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.addTags(_:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.insertTag(_:at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.removeTag(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.removeAllTags()` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.moveTag(at:to:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.invalidateStyles()` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.numberOfSectionsInMenu()` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuNumberOfItems(inSection:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuTitle(forSection:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuTitleForItem(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuImageForItem(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuSelectedImageForItem(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuAnimationURLForItem(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuItemIsEnabled(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuItemIsDeletable(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuRemoveItem(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuMoveItem(at:to:)` (CYLTag.swift) | TODO | method |
-| `CYLTagDataSource.menuStyleForItem(at:)` (CYLTag.swift) | TODO | method |
+| `CYLTag` (CYLTag.swift) | `class CYLTag` (core/CYLTag.ets) | class |
+| `CYLTag.identifier` (CYLTag.swift) | `CYLTag.identifier` | property |
+| `CYLTag.title` (CYLTag.swift) | `CYLTag.title` | property |
+| `CYLTag.image` (CYLTag.swift) | `CYLTag.image` | property |
+| `CYLTag.selectedImage` (CYLTag.swift) | `CYLTag.selectedImage` | property |
+| `CYLTag.animationURL` (CYLTag.swift) | `CYLTag.animationURL` | property |
+| `CYLTag.isEnabled` (CYLTag.swift) | `CYLTag.isEnabled` | property |
+| `CYLTag.isDeletable` (CYLTag.swift) | `CYLTag.isDeletable` | property |
+| `CYLTag.badgeText` (CYLTag.swift) | `CYLTag.badgeText` | property |
+| `CYLTag.badgeColor` (CYLTag.swift) | `CYLTag.badgeColor` | property |
+| `CYLTag.badgeAccessibilityLabel` (CYLTag.swift) | `CYLTag.badgeAccessibilityLabel` | property |
+| `CYLTag.userInfo` (CYLTag.swift) | `CYLTag.userInfo` | property |
+| `CYLTag.style` (CYLTag.swift) | `CYLTag.style` | property |
+| `CYLTag.textColor` (CYLTag.swift) | `CYLTag.textColor` | property |
+| `CYLTag.font` (CYLTag.swift) | `CYLTag.font` | property |
+| `CYLTag.textSize` (CYLTag.swift) | `CYLTag.textSize` | property |
+| `CYLTag.backgroundColor` (CYLTag.swift) | `CYLTag.backgroundColor` | property |
+| `CYLTag.highlightedBackgroundColor` (CYLTag.swift) | `CYLTag.highlightedBackgroundColor` | property |
+| `CYLTag.selectedBackgroundColor` (CYLTag.swift) | `CYLTag.selectedBackgroundColor` | property |
+| `CYLTag.backgroundImage` (CYLTag.swift) | `CYLTag.backgroundImage` | property |
+| `CYLTag.cornerRadius` (CYLTag.swift) | `CYLTag.cornerRadius` | property |
+| `CYLTag.borderWidth` (CYLTag.swift) | `CYLTag.borderWidth` | property |
+| `CYLTag.borderColor` (CYLTag.swift) | `CYLTag.borderColor` | property |
+| `CYLTag.deleteIndicatorTitle` (CYLTag.swift) | `CYLTag.deleteIndicatorTitle` | property |
+| `CYLTag.deleteIndicatorColor` (CYLTag.swift) | `CYLTag.deleteIndicatorColor` | property |
+| `CYLTag.deleteIndicatorSize` (CYLTag.swift) | `CYLTag.deleteIndicatorSize` | property |
+| `CYLTag.init(identifier:title:backgroundColor:)` (CYLTag.swift) | `new CYLTag(identifier, title, backgroundColor)` | init |
+| `CYLTag.init(identifier:title:backgroundColorHex:)` (CYLTag.swift) | `CYLTag.withHex(identifier, title, hex)` | init |
+| `CYLTag.colors` (CYLTag.swift) | `CYLTag.colors` | property |
+| `CYLTag.hasCustomStyle` (CYLTag.swift) | `CYLTag.hasCustomStyle` | property |
+| `CYLTag.style(basedOn:)` (CYLTag.swift) | `styleBasedOn(baseStyle)` | method |
+| `CYLTag.copy()` (CYLTag.swift) | `copy()` | method |
+| `CYLTag.static badgeImage(text:color:diameter:)` (CYLTag.swift) | `CYLTag.badgeImage(text, color, diameter)` (an OffscreenCanvas PixelMap) | method |
+| `CYLTag.description` (CYLTag.swift) | `CYLTag.description` | property |
+| `CYLTagDataSource` (CYLTag.swift) | `class CYLTagDataSource implements CYLMenuDataSource` | class |
+| `CYLTagDataSource.tags` (CYLTag.swift) | `CYLTagDataSource.tags` | property |
+| `CYLTagDataSource.sectionTitle` (CYLTag.swift) | `CYLTagDataSource.sectionTitle` | property |
+| `CYLTagDataSource.baseStyle` (CYLTag.swift) | `CYLTagDataSource.baseStyle` | property |
+| `CYLTagDataSource.init(tags:)` (CYLTag.swift) | `new CYLTagDataSource(tags)` | init |
+| `CYLTagDataSource.addTag(_:)` (CYLTag.swift) | `addTag(tag)` | method |
+| `CYLTagDataSource.addTags(_:)` (CYLTag.swift) | `addTags(tags)` | method |
+| `CYLTagDataSource.insertTag(_:at:)` (CYLTag.swift) | `insertTag(tag, index)` | method |
+| `CYLTagDataSource.removeTag(at:)` (CYLTag.swift) | `removeTag(index)` | method |
+| `CYLTagDataSource.removeAllTags()` (CYLTag.swift) | `removeAllTags()` | method |
+| `CYLTagDataSource.moveTag(at:to:)` (CYLTag.swift) | `moveTag(from, to)` | method |
+| `CYLTagDataSource.invalidateStyles()` (CYLTag.swift) | `invalidateStyles()` | method |
+| `CYLTagDataSource.numberOfSectionsInMenu()` (CYLTag.swift) | `numberOfSectionsInMenu()` | method |
+| `CYLTagDataSource.menuNumberOfItems(inSection:)` (CYLTag.swift) | `menuNumberOfItemsInSection(section)` | method |
+| `CYLTagDataSource.menuTitle(forSection:)` (CYLTag.swift) | `menuTitleForSection(section)` | method |
+| `CYLTagDataSource.menuTitleForItem(at:)` (CYLTag.swift) | `menuTitleForItem(indexPath)` | method |
+| `CYLTagDataSource.menuImageForItem(at:)` (CYLTag.swift) | `menuImageForItem (badge drawn)` | method |
+| `CYLTagDataSource.menuSelectedImageForItem(at:)` (CYLTag.swift) | `menuSelectedImageForItem` | method |
+| `CYLTagDataSource.menuAnimationURLForItem(at:)` (CYLTag.swift) | `menuAnimationURLForItem` | method |
+| `CYLTagDataSource.menuItemIsEnabled(at:)` (CYLTag.swift) | `menuItemIsEnabled` | method |
+| `CYLTagDataSource.menuItemIsDeletable(at:)` (CYLTag.swift) | `menuItemIsDeletable` | method |
+| `CYLTagDataSource.menuRemoveItem(at:)` (CYLTag.swift) | `menuRemoveItem` | method |
+| `CYLTagDataSource.menuMoveItem(at:to:)` (CYLTag.swift) | `menuMoveItem` | method |
+| `CYLTagDataSource.menuStyleForItem(at:)` (CYLTag.swift) | `menuStyleForItem (cached)` | method |
 | `CYLTagCornerRadiusSquare` (CYLTagAppearance.swift) | `CYLTagCornerRadiusSquare` | property |
 | `CYLTagAppearance` (CYLTagAppearance.swift) | `class CYLTagAppearance` (core/CYLTagAppearance.ets) | class |
 | `CYLTagAppearance.static defaultBackgroundColor` (CYLTagAppearance.swift) | `CYLTagAppearance.defaultBackgroundColor` (static) | property |
@@ -790,23 +790,23 @@ overrides left out.
 | `CYLTagView.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLTagView.swift) | TODO | method |
 | `CYLTagView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagView.swift) | TODO | method |
 | `CYLTagView.collectionView(_:layout:insetForSectionAt:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagGroup` (CYLTagGroup.swift) | TODO | class |
-| `CYLTagGroup.groupName` (CYLTagGroup.swift) | TODO | property |
-| `CYLTagGroup.width` (CYLTagGroup.swift) | TODO | property |
-| `CYLTagGroup.height` (CYLTagGroup.swift) | TODO | property |
-| `CYLTagGroup.isOpened` (CYLTagGroup.swift) | TODO | property |
-| `CYLTagGroup.section` (CYLTagGroup.swift) | TODO | property |
-| `CYLTagGroup.items` (CYLTagGroup.swift) | TODO | property |
-| `CYLTagGroup.cellCountsPerRow` (CYLTagGroup.swift) | TODO | property |
-| `CYLTagGroup.invalidateRowCounts()` (CYLTagGroup.swift) | TODO | method |
-| `CYLTagGroup.firstRowCellCount(forContentWidth:)` (CYLTagGroup.swift) | TODO | method |
-| `CYLTagModel` (CYLTagModel.swift) | TODO | class |
-| `CYLTagModel.title` (CYLTagModel.swift) | TODO | property |
-| `CYLTagModel.width` (CYLTagModel.swift) | TODO | property |
-| `CYLTagModel.height` (CYLTagModel.swift) | TODO | property |
-| `CYLTagModel.init(title:)` (CYLTagModel.swift) | TODO | init |
-| `CYLTagModel.static titleFont(for:)` (CYLTagModel.swift) | TODO | method |
-| `CYLTagModel.updateSize(for:)` (CYLTagModel.swift) | TODO | method |
+| `CYLTagGroup` (CYLTagGroup.swift) | `class CYLTagGroup` (core/CYLTagModel.ets) | class |
+| `CYLTagGroup.groupName` (CYLTagGroup.swift) | `CYLTagGroup.groupName` | property |
+| `CYLTagGroup.width` (CYLTagGroup.swift) | `CYLTagGroup.width` | property |
+| `CYLTagGroup.height` (CYLTagGroup.swift) | `CYLTagGroup.height` | property |
+| `CYLTagGroup.isOpened` (CYLTagGroup.swift) | `CYLTagGroup.isOpened` | property |
+| `CYLTagGroup.section` (CYLTagGroup.swift) | `CYLTagGroup.section` | property |
+| `CYLTagGroup.items` (CYLTagGroup.swift) | `CYLTagGroup.items` | property |
+| `CYLTagGroup.cellCountsPerRow` (CYLTagGroup.swift) | `CYLTagGroup.cellCountsPerRow` | property |
+| `CYLTagGroup.invalidateRowCounts()` (CYLTagGroup.swift) | `invalidateRowCounts()` | method |
+| `CYLTagGroup.firstRowCellCount(forContentWidth:)` (CYLTagGroup.swift) | `firstRowCellCount(contentWidth)` | method |
+| `CYLTagModel` (CYLTagModel.swift) | `class CYLTagModel` (core/CYLTagModel.ets) | class |
+| `CYLTagModel.title` (CYLTagModel.swift) | `CYLTagModel.title` | property |
+| `CYLTagModel.width` (CYLTagModel.swift) | `CYLTagModel.width` | property |
+| `CYLTagModel.height` (CYLTagModel.swift) | `CYLTagModel.height` | property |
+| `CYLTagModel.init(title:)` (CYLTagModel.swift) | `new CYLTagModel(title)` | init |
+| `CYLTagModel.static titleFont(for:)` (CYLTagModel.swift) | `CYLTagModel.titleFont(fontScale)` | method |
+| `CYLTagModel.updateSize(for:)` (CYLTagModel.swift) | `updateSize(fontScale)` (MeasureText) | method |
 | `CYLTagCell` (CYLTagCell.swift) | TODO | class |
 | `CYLTagCell.model` (CYLTagCell.swift) | TODO | property |
 | `CYLTagHeaderCellDelegate` (CYLTagHeaderCell.swift) | TODO | protocol |
@@ -849,3 +849,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: tables created, every row TODO.
 - 2026-11-16: feature 1, the menu data source, delegate and keys (core/CYLMenuDataSource.ets, CYLMenuKeys.ets). Score 45 / 807 = 5.6.
 - 2026-11-16: feature 2, the style: value types, CYLTagAppearance, CYLMenuStyle, CYLTagColors, CYLTagMetrics, CYLMenuResources (core strings generated by harmony/scripts/export-core-strings.py, the pod's images in the HAR's media). Score 175 / 807 = 21.7.
+- 2026-11-16: feature 3, the tag models: CYLTag, CYLTagDataSource (badge images drawn on an OffscreenCanvas), CYLTagModel, CYLTagGroup, CYLMenuColorFromString. Score 250 / 807 = 31.0.

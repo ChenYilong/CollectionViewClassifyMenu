@@ -5,6 +5,7 @@
  */
 import { CYLIndexPath } from '../components/CYLTagListModel';
 import { CYLMenuStyle } from './CYLMenuStyle';
+import { CYLImage } from './CYLTypes';
 
 /** What an item of a tag list is: a tag (the default), or "+ 新建标签", which asks for a name. */
 export enum CYLMenuItemType {
@@ -20,9 +21,9 @@ export interface CYLMenuDataSource {
   menuTitleForItem(indexPath: CYLIndexPath): string;
 
   /** An image shown before the title (a resource or a path). */
-  menuImageForItem?: (indexPath: CYLIndexPath) => ResourceStr | undefined;
+  menuImageForItem?: (indexPath: CYLIndexPath) => CYLImage | undefined;
   /** The image of a selected item. */
-  menuSelectedImageForItem?: (indexPath: CYLIndexPath) => ResourceStr | undefined;
+  menuSelectedImageForItem?: (indexPath: CYLIndexPath) => CYLImage | undefined;
   /** A Lottie animation played as the item's icon: `asset:<rawfile path>` or the JSON text. */
   menuAnimationURLForItem?: (indexPath: CYLIndexPath) => string | undefined;
   /** The progress (0...1) the animation rests at while not selected. */
@@ -32,7 +33,7 @@ export interface CYLMenuDataSource {
   /** The style of one item (its section's style when undefined). */
   menuStyleForItem?: (indexPath: CYLIndexPath) => CYLMenuStyle | undefined;
   /** The icon of a section header. */
-  menuImageForSection?: (section: number) => ResourceStr | undefined;
+  menuImageForSection?: (section: number) => CYLImage | undefined;
   /** A view at the trailing end of a section header. */
   menuAccessoryViewForSection?: (section: number) => CustomBuilder | undefined;
   menuItemIsEnabled?: (indexPath: CYLIndexPath) => boolean;
