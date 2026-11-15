@@ -1,0 +1,11 @@
+{
+  "name": "cyl_tag_list_ohos",
+  "version": "0.1.0",
+  "description": "HarmonyOS NEXT implementation of the cyl_tag_list Flutter plugin.",
+  "main": "index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "@cyl/classifymenu": "file:../../../harmony/classifymenu"
+  }
+}
