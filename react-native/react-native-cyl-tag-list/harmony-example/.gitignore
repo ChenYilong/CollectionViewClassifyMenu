@@ -89,8 +89,12 @@ hvigor/hvigor-wrapper.js
 
 
 # Copied in by scripts/setup.sh
-specs/
-src/
-harmony/entry/src/main/resources/rawfile/
+/specs/
+/src/
+harmony/entry/src/main/resources/rawfile/bundle.harmony.js
+harmony/entry/src/main/resources/rawfile/tab_*.json
+harmony/entry/src/main/resources/rawfile/cyl_places.sqlite
+harmony/entry/src/main/resources/rawfile/assets/
+.deps/
 harmony/entry/src/main/cpp/generated/
 harmony/entry/src/main/ets/generated/

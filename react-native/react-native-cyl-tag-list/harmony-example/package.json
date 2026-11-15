@@ -12,9 +12,10 @@
     "codegen": "react-native codegen-harmony --no-safety-check --cpp-output-path ./harmony/entry/src/main/cpp/generated --ets-output-path ./harmony/entry/src/main/ets/generated"
   },
   "dependencies": {
+    "@react-native-oh/react-native-harmony": "0.86.1",
+    "@react-native-ohos/op-sqlite": "^15.0.0",
     "react": "19.2.3",
-    "react-native": "0.86.3",
-    "@react-native-oh/react-native-harmony": "0.86.1"
+    "react-native": "0.86.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

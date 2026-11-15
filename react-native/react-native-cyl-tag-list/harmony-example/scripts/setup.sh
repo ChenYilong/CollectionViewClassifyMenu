@@ -1,12 +1,24 @@
 #!/bin/sh
-# Prepares the React Native for OpenHarmony example: copies in what is shared with the iOS/Android example (the
-# library, the Tags page, the Lottie files), runs RNOH's codegen and bundles the JS. Then build harmony/ with hvigor.
+# Prepares the React Native for OpenHarmony example: fetches CYLTabBarController's HarmonyOS library (the tab bar) at
+# its pinned commit, copies in what is shared with the iOS/Android example (the library, the Tags and Classify pages,
+# the Lottie files, the shared database), runs RNOH's codegen and bundles the JS. Then build harmony/ with hvigor.
 # Usage (from harmony-example/): npm install --legacy-peer-deps && sh scripts/setup.sh. Metro needs Node 20+.
 set -eu
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 LIB="$HERE/.."
 REPO="$LIB/../.."
 cd "$HERE"
+
+# CYLTabBarController's HarmonyOS library at the newest commit that has it (CrossPlatform/harmonyos-cyltabbar exists
+# only on feat/harmonyos-component so far; the iOS Podfiles pin the newest commit over every branch the same way).
+CYL_TAB_BAR_COMMIT=548892a76fd5788b292bf5259188895895108744
+if [ ! -d .deps/CYLTabBarController ]; then
+  mkdir -p .deps
+  git clone -q --filter=blob:none --no-checkout https://github.com/ChenYilong/CYLTabBarController.git .deps/CYLTabBarController
+  git -C .deps/CYLTabBarController sparse-checkout set --no-cone CrossPlatform/harmonyos-cyltabbar/cyltabbar
+fi
+git -C .deps/CYLTabBarController fetch -q origin "$CYL_TAB_BAR_COMMIT" 2>/dev/null || true
+git -C .deps/CYLTabBarController checkout -q "$CYL_TAB_BAR_COMMIT"
 
 # The library, as an npm package would install it (its spec drives codegen).
 rm -rf node_modules/react-native-cyl-tag-list
@@ -17,12 +29,15 @@ printf '{"name":"react-native-cyl-tag-list","version":"0.1.0","main":"src/index.
   > node_modules/react-native-cyl-tag-list/package.json
 cp "$LIB/src/CylTagListViewNativeComponent.ts" specs/
 
-# The Tags page of the iOS/Android example, unchanged.
-for f in TagListPage.tsx Slider.tsx i18n.ts; do cp "$LIB/example/src/$f" src/; done
+# The pages of the iOS/Android example, unchanged.
+for f in TagListPage.tsx Slider.tsx i18n.ts ClassifyPage.tsx PlacesDatabase.ts launchOptions.ts; do
+  cp "$LIB/example/src/$f" src/
+done
 
-# The Lottie files the tags play (rawfiles, as in harmony/entry).
+# The Lottie files the tags play (rawfiles, as in harmony/entry) and the shared database of the Classify page.
 mkdir -p harmony/entry/src/main/resources/rawfile
 cp "$REPO"/harmony/entry/src/main/resources/rawfile/tab_*.json harmony/entry/src/main/resources/rawfile/
+cp "$REPO/Example-Shared/Database/cyl_places.sqlite" harmony/entry/src/main/resources/rawfile/
 
 npx react-native codegen-harmony --no-safety-check \
   --cpp-output-path ./harmony/entry/src/main/cpp/generated --ets-output-path ./harmony/entry/src/main/ets/generated
