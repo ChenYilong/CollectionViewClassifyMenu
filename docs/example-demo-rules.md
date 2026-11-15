@@ -100,3 +100,10 @@ The screen of the request (Android, merged example, Menu tab → Animated icons;
   changing the core when needed. Mark it as a TODO; the screenshot's page (Animated icons) is an example where it
   applies. The requirement covers every example layer: iOS, Android, cross-platform React Native and Flutter, Mini
   Program and HarmonyOS.
+
+## TODO (2026-11-16): SVGA wherever Rive is shown
+
+CYLTabBarController added SVGA animations. Every example scene that demonstrates Rive (Animated icons sections,
+the Styles animation choice, configuration and menu data, screenshot launch screens, tests) gets the same scene with
+SVGA, on every platform, with the same playback controls (Play all, speed, loop). Details and the core work:
+`issue-progress.md`, "TODO (2026-11-16): SVGA animated icons".
