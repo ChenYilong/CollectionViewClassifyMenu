@@ -19,10 +19,24 @@ class PlacesDatabase {
     await Directory(p.dirname(file)).create(recursive: true);
     // Copied once, so the saved selections survive a relaunch.
     if (!File(file).existsSync()) await File(file).writeAsBytes(data.buffer.asUint8List(), flush: true);
-    final db = await openDatabase(file);
+    var db = await openDatabase(file);
+    if (!await _hasPlaces(db)) {
+      // The OpenHarmony port of sqflite keeps the file where relationalStore puts it, not at `file`: copy the
+      // bundled database to the file SQLite really opened, then open it again.
+      final opened = (await db.rawQuery('PRAGMA database_list')).first['file'] as String;
+      await db.close();
+      for (final suffix in ['-wal', '-shm']) {
+        if (File('$opened$suffix').existsSync()) File('$opened$suffix').deleteSync();
+      }
+      await File(opened).writeAsBytes(data.buffer.asUint8List(), flush: true);
+      db = await openDatabase(file);
+    }
     await db.execute('CREATE TABLE IF NOT EXISTS selections (scenario TEXT PRIMARY KEY, items TEXT NOT NULL)');
     return PlacesDatabase._(db);
   }
+
+  static Future<bool> _hasPlaces(Database db) async =>
+      (await db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'places'")).isNotEmpty;
 
   /// The filter's regions (the iOS example's `CYLDemoDataSource.regions()`).
   static const List<String> regions = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳'];

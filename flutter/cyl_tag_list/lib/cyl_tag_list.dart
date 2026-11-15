@@ -34,13 +34,17 @@ class CylTagListController {
   /// Applies a configuration map to the existing list; keys that are missing keep their values.
   Future<void> applyConfiguration(Map<String, Object?> configuration) => _invoke('applyConfiguration', configuration);
 
-  /// What the native list holds now: `speed` (null while the style's own speed is used), `loops` and `tagCount`.
   /// The native list's content height in logical pixels (0 before its first layout).
   Future<double> contentHeight() async => (await _channel?.invokeMethod<num>('contentHeight'))?.toDouble() ?? 0;
 
+  /// What the native list holds now: `speed` (null while the style's own speed is used), `loops` and `tagCount`.
   Future<Map<String, Object?>> state() async {
     final result = await _channel?.invokeMapMethod<String, Object?>('state');
-    return result ?? const <String, Object?>{};
+    if (result == null) return const <String, Object?>{};
+    // A double on every platform: ArkTS has one number type, so HarmonyOS sends 4 for 4.0.
+    final speed = result['speed'];
+    if (speed is num) result['speed'] = speed.toDouble();
+    return result;
   }
 
   Future<void> _invoke(String method, [Object? arguments]) async {

@@ -13,7 +13,7 @@ import {
 } from '@ohos/flutter_ohos';
 import { Params } from '@ohos/flutter_ohos/src/main/ets/plugin/platform/PlatformView';
 import { common } from '@kit.AbilityKit';
-import { CYLIndexPath, CYLTagListView, CYLTagTap, parseConfiguration } from '@cyl/classifymenu';
+import { CYLIndexPath, CYLTagListController, CYLTagListView, CYLTagTap, parseConfiguration } from '@cyl/classifymenu';
 
 const VIEW_TYPE = 'com.cyl.cyl_tag_list/view';
 
@@ -56,6 +56,10 @@ class CylTagListViewFactory extends PlatformViewFactory {
 export class CylTagListPlatformView extends PlatformView implements MethodCallHandler {
   configuration: string;
   contentHeight: number = 0;
+  /** The playback controls of docs/example-demo-rules.md; null speed is the configuration's own. */
+  speed: number | null = null;
+  loops: boolean = false;
+  controller: CYLTagListController = new CYLTagListController();
   private channel: MethodChannel;
 
   constructor(messenger: BinaryMessenger, viewId: number, configuration: string) {
@@ -82,15 +86,21 @@ export class CylTagListPlatformView extends PlatformView implements MethodCallHa
         const state = new Map<string, Object | null>();
         let tagCount = 0;
         parseConfiguration(this.configuration).sections.forEach((section) => tagCount += section.items.length);
-        state.set('speed', null);
-        state.set('loops', false);
+        state.set('speed', this.speed);
+        state.set('loops', this.loops);
         state.set('tagCount', tagCount);
         result.success(state);
         break;
       case 'playAll':
+        this.controller.playAll();
+        result.success(null);
+        break;
       case 'setSpeed':
+        this.speed = call.args as number;
+        result.success(null);
+        break;
       case 'setLoops':
-        // The ArkTS list has no animated icons yet (docs/android.md, HarmonyOS): accepted, nothing to play.
+        this.loops = call.args as boolean;
         result.success(null);
         break;
       default:
@@ -132,15 +142,26 @@ struct CylTagListHost {
   @ObjectLink view: CylTagListPlatformView;
 
   build() {
-    Column() {
-      CYLTagListView({
-        configuration: this.view.configuration,
-        onTagTap: (tap: CYLTagTap) => this.view.sendTap(tap),
-        onSelectionChange: (selected: CYLIndexPath[]) => this.view.sendSelection(selected)
-      })
+    // The root fills the platform view: Flutter draws the root's surface into the view's whole rectangle, so a root
+    // only as tall as its content was stretched. The content scrolls inside; its own height is reported.
+    Scroll() {
+      Column() {
+        CYLTagListView({
+          configuration: this.view.configuration,
+          animationSpeed: this.view.speed ?? 1,
+          animationLoops: this.view.loops,
+          controller: this.view.controller,
+          onTagTap: (tap: CYLTagTap) => this.view.sendTap(tap),
+          onSelectionChange: (selected: CYLIndexPath[]) => this.view.sendSelection(selected)
+        })
+      }
+      .width('100%')
+      .onAreaChange((_old: Area, area: Area) => this.view.sendContentHeight(Number(area.height)))
     }
     .width('100%')
-    .onAreaChange((_old: Area, area: Area) => this.view.sendContentHeight(Number(area.height)))
+    .height('100%')
+    .align(Alignment.Top)
+    .scrollBar(BarState.Off)
   }
 }
 
