@@ -9,7 +9,7 @@ test('the filter configuration: multiple choice, 全部 exclusive, empty filters
   const configuration = list.filterConfiguration(['0-0'], false);
   assert.equal(configuration.selectionMode, 'multiple');
   assert.equal(configuration.defaultVisibleRows, 2);
-  assert.equal(list.filterConfiguration(['0-0'], true).defaultVisibleRows, 0);
+  assert.equal(configuration.foldControl.position, 'footer');
   const items = configuration.sections[0].items;
   assert.equal(items.length, 12);
   assert.deepEqual(items.filter((i) => i.exclusive).map((i) => i.title), ['全部']);

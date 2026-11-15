@@ -15,14 +15,10 @@
     </view>
   </view>
 
-  <!-- The filter: multiple choice, folded to two rows, the chevron alone below the tags. -->
+  <!-- The filter: multiple choice, folded to two rows, the footer chevron (the component's) alone below the tags. -->
   <cyl-tag-list id="review-filter" class="filter" configuration="{{configuration}}"
                 bindtagtap="onTagTap" bindselectionchange="onSelectionChange"
-                bindcontentheightchange="onContentHeightChange" />
-  <view wx:if="{{canFold}}" class="fold" bindtap="onFoldTap" id="review-filter-fold"
-        aria-role="button" aria-label="{{foldLabel}}">
-    <view class="fold-chevron {{expanded ? 'fold-chevron-up' : ''}}" style="border-color: {{foldColor}};" />
-  </view>
+                bindfoldchange="onFoldChange" />
 
   <!-- The status: a spinner while the server answers, the last tap, the selection, the mode and its count. -->
   <view class="status">

@@ -43,7 +43,7 @@
           data-section="{{section.index}}" bindtap="onFoldTap"
           aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
       <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
-      <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
+      <view wx:if="{{foldContent !== 'title'}}" class="cyl-footer-chevron {{section.expanded ? 'cyl-footer-chevron-up' : ''}}" />
     </view>
   </view>
 </view>

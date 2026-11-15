@@ -43,7 +43,9 @@ wechat-miniprogram/
     ├── app.json / app.wxss      the pages; UIKit-like shared styles (inset grouped tables)
     ├── custom-tab-bar/          cyl-tab-bar with the root tab bar's configuration (configuration.js)
     ├── components/
-    │   ├── cyl-tag-list/        the port of the core's CYLTagListView (model.js, symbols.js, animations.js: no wx)
+    │   ├── cyl-tag-list/        the port of the core's CYLTagListView (model.js, symbols.js, animations.js: no wx);
+│   │                        events tagtap, selectionchange, contentheightchange, foldchange; methods playAll,
+│   │                        playItems, setExpanded, setSelectedItems, selectedItems, contentHeight, cellMetrics
     │   ├── cyl-lottie-icon/     one animated icon: Lottie on a 2d canvas, or a GIF
     │   ├── cyl-tag-cloud/       the core's tag list used the android-tagview way (CYLTag, AndroidTagView options)
     │   ├── cyl-tag-image/       the core's image tag and tag group views

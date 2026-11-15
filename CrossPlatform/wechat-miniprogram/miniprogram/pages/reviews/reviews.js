@@ -24,10 +24,6 @@ Page({
     segments: [],
     modeIndex: 0,
     configuration: {},
-    canFold: false,
-    expanded: false,
-    foldLabel: '',
-    foldColor: list.FOLD_CONTROL_COLOR,
     status: '',
     loading: false,
     rows: [],
@@ -47,7 +43,6 @@ Page({
     this.expanded = false;
     this.launchExpanded = options.expanded === '1' || options.expanded === 'true';
     this.foldMeasured = false;
-    this.canFold = false;
     this.initialFilterIndex = list.initialIndex(options.filter);
     this.selection = [`0-${this.initialFilterIndex}`];
     this.selectedFilters = [];
@@ -58,10 +53,8 @@ Page({
       modeIndex: queries.modeIndex(this.mode),
       emptyText: t('没有匹配的评价'),
       backLabel: this.backLabel(),
-      expanded: false,
-      foldLabel: list.foldAccessibilityLabel(false),
     });
-    this.applyConfiguration(false);
+    this.applyConfiguration();
     this.refreshReviews();
     const indexes = list.parseIndexes(options.select);
     if (indexes.length) this.selectFilterIndexes(indexes);
@@ -107,35 +100,33 @@ Page({
 
   // MARK: Fold
 
-  /** Sets the filter's configuration with the current selection (cyl-tag-list rebuilds from it). */
-  applyConfiguration(expanded) {
-    this.setData({ configuration: list.filterConfiguration(this.selection, expanded) });
+  /** Sets the filter's configuration once (cyl-tag-list builds and measures from it). */
+  applyConfiguration() {
+    this.setData({ configuration: list.filterConfiguration(this.selection) });
   },
 
-  onContentHeightChange() {
-    if (this.expanded) return;
+  /** The list's selection without a rebuild (the component's setSelectedItems, the core's selection from code). */
+  showSelection() {
+    const component = this.selectComponent('#review-filter');
+    if (component) component.setSelectedItems(this.selection);
+    else this.applyConfiguration();
+  },
+
+  /**
+   * The component reports whether the filter folds (its footer chevron shows then); on the first report it expands
+   * when `expanded=1` asks for it or the preselected chip is folded away (a hidden preselected chip would confuse).
+   */
+  onFoldChange(event) {
+    const state = event.detail.sections[0];
+    if (!state) return;
+    this.expanded = state.expanded;
+    if (this.foldMeasured) return;
+    this.foldMeasured = true;
+    if (!state.canFold) return;
     const component = this.selectComponent('#review-filter');
     const section = component && component.data.sections && component.data.sections[0];
-    if (!section) return;
-    // Read while folded (defaultVisibleRows 2): the component's measurement says whether it needs more rows.
-    this.canFold = !!section.canFold;
-    if (this.data.canFold !== this.canFold) this.setData({ canFold: this.canFold });
-    if (!this.foldMeasured) {
-      this.foldMeasured = true;
-      const item = section.items[this.initialFilterIndex];
-      // A preselected chip hidden by folding would be confusing, so show it.
-      if (this.canFold && (this.launchExpanded || (item && item.hidden))) this.setExpanded(true);
-    }
-  },
-
-  setExpanded(expanded) {
-    this.expanded = expanded;
-    this.setData({ expanded, foldLabel: list.foldAccessibilityLabel(expanded), canFold: this.canFold || expanded });
-    this.applyConfiguration(expanded);
-  },
-
-  onFoldTap() {
-    this.setExpanded(!this.expanded);
+    const item = section && section.items[this.initialFilterIndex];
+    if (this.launchExpanded || (item && item.hidden)) component.setExpanded(0, true);
   },
 
   // MARK: Mode
@@ -163,7 +154,7 @@ Page({
       this.selection = list.selectItem(this.selection, index);
       this.lastEvent = t('点击「%@」', store.title(store.filters[index]));
     });
-    this.applyConfiguration(this.expanded);
+    this.showSelection();
     this.refreshReviews();
   },
 
@@ -181,7 +172,7 @@ Page({
     if (!this.selection.length) {
       // Nothing selected means no condition: show "全部" as selected.
       this.selection = list.selectItem([], 0);
-      this.applyConfiguration(this.expanded);
+      this.showSelection();
     }
     this.refreshReviews();
   },

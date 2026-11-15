@@ -47,15 +47,16 @@ function filterItems() {
 /**
  * The filter list's configuration: multiple choice, no section header (showsSectionHeaders = false), folded to two
  * rows; `expanded` shows every row. The fold control (the chevron below the tags, CYLMenuFoldControl(position:
- * .footer, content: .icon)) is drawn by the page, as cyl-tag-list has no footer position.
+ * .footer, content: .icon)) is the component's footer fold control in FOLD_CONTROL_COLOR; the page expands it with
+ * setExpanded() and selects with setSelectedItems(), so the list is built and measured once.
  */
-function filterConfiguration(selection, expanded) {
+function filterConfiguration(selection) {
   return {
     selectionMode: 'multiple',
     allowsEmptySelection: true,
     selectedItems: selection.slice(),
-    defaultVisibleRows: expanded ? 0 : 2,
-    foldControl: { position: 'none', content: 'icon' },
+    defaultVisibleRows: 2,
+    foldControl: { position: 'footer', content: 'icon', color: FOLD_CONTROL_COLOR },
     style: reviewFilterStyle(),
     sections: [{ title: '', items: filterItems() }],
   };

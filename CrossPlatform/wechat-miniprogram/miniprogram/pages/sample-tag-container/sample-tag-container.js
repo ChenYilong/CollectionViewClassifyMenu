@@ -12,13 +12,22 @@ const { COLORS } = require('../../utils/android-sample.js');
 const model = require('../../components/cyl-tag-cloud/model.js');
 const data = require('./data.js');
 
+/** The cyl-tag-cloud options a container leaves unset, so the component never receives undefined (XML defaults). */
+const DEFAULT_OPTIONS = {
+  colorTheme: 'none', defaultTagImage: '', containerBorderWidth: 0, containerBorderColor: '', containerCornerRadius: 0,
+};
+
+function withDefaultOptions(container) {
+  return { ...container, tags: container.tags || [], style: container.style || {}, options: { ...DEFAULT_OPTIONS, ...(container.options || {}) } };
+}
+
 Page({
   data: { containers: [], text: '', fieldLabel: '', addTitle: '', gray: COLORS.systemGray, reordering: false },
 
   onLoad() {
     wx.setNavigationBarTitle({ title: t('标签容器示例') });
     this.setData({
-      containers: data.containers(),
+      containers: data.containers().map(withDefaultOptions),
       fieldLabel: t('新标签'),
       addTitle: t('添加'),
     });

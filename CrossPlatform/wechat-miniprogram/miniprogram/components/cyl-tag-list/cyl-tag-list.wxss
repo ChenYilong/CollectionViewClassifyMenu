@@ -22,6 +22,12 @@
 .cyl-title, .cyl-sizer { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cyl-sizer { visibility: hidden; height: 0; }
 .cyl-fold-tail { justify-content: center; }
-.cyl-fold-footer { display: flex; align-items: center; justify-content: center; height: 30px; font-size: 13px; }
+/* CYLTagListFooterView: 28 pt high, chevron.down in the fold color, turned 180° when expanded. */
+.cyl-fold-footer { display: flex; align-items: center; justify-content: center; height: 28px; font-size: 13px; }
+.cyl-footer-chevron {
+  width: 8px; height: 8px; margin-top: -5px; transform: rotate(45deg); transition: transform 0.25s;
+  border-style: solid; border-color: currentColor; border-width: 0 1.6px 1.6px 0;
+}
+.cyl-footer-chevron-up { transform: rotate(225deg); margin-top: 5px; }
 .cyl-fold-arrow { display: inline-block; margin-left: 2px; transition: transform 0.2s; }
 .cyl-up { transform: rotate(180deg); }
