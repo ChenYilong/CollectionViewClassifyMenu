@@ -284,7 +284,7 @@ def main():
         print("OK: docs/harmony.md matches the Swift core and harmony/parity-map.json.")
         return 0
     DOC.write_text(text, encoding="utf-8", newline="\n")
-    print(text.split("\n## Score\n")[1].split("\n")[2])
+    print(next(line for line in text.split("\n") if line.startswith("**Score")).split(". Both")[0])
     return 0
 
 

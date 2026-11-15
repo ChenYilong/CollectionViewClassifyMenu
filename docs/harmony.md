@@ -19,7 +19,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 45 / 807 = 5.6 / 100** (API 45 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
+**Score: 175 / 807 = 21.7 / 100** (API 175 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 
 ## Table 1: iOS public API
@@ -252,8 +252,8 @@ overrides left out.
 | `CYLMenuDataSource.menuSelectedImageForItem(at:)` (CYLMenuDataSource.swift) | `menuSelectedImageForItem?` | method |
 | `CYLMenuDataSource.menuAnimationURLForItem(at:)` (CYLMenuDataSource.swift) | `menuAnimationURLForItem?` | method |
 | `CYLMenuDataSource.menuAnimationRestingProgressForItem(at:)` (CYLMenuDataSource.swift) | `menuAnimationRestingProgressForItem?` | method |
-| `CYLMenuDataSource.menuStyle(forSection:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDataSource.menuStyleForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
+| `CYLMenuDataSource.menuStyle(forSection:)` (CYLMenuDataSource.swift) | `menuStyleForSection?` | method |
+| `CYLMenuDataSource.menuStyleForItem(at:)` (CYLMenuDataSource.swift) | `menuStyleForItem?` | method |
 | `CYLMenuDataSource.menuImage(forSection:)` (CYLMenuDataSource.swift) | `menuImageForSection?` | method |
 | `CYLMenuDataSource.menuAccessoryView(forSection:)` (CYLMenuDataSource.swift) | `menuAccessoryViewForSection?` (CustomBuilder) | method |
 | `CYLMenuDataSource.menuItemIsEnabled(at:)` (CYLMenuDataSource.swift) | `menuItemIsEnabled?` | method |
@@ -287,21 +287,21 @@ overrides left out.
 | `CYLMenuKeys.static dataSourceSectionKey` (CYLMenuKeys.swift) | `CYLMenuKeys.dataSourceSectionKey` | property |
 | `CYLMenuKeys.static dataSourceCellTextKey` (CYLMenuKeys.swift) | `CYLMenuKeys.dataSourceCellTextKey` | property |
 | `CYLMenuKeys.static dataSourceCellPictureKey` (CYLMenuKeys.swift) | `CYLMenuKeys.dataSourceCellPictureKey` | property |
-| `CYLMenuLocalizedString(_:)` (CYLMenuResources.swift) | TODO | method |
-| `CYLMenuResources` (CYLMenuResources.swift) | TODO | class |
-| `CYLMenuResources.static bundle` (CYLMenuResources.swift) | TODO | property |
-| `CYLMenuResources.static image(named:)` (CYLMenuResources.swift) | TODO | method |
-| `CYLMenuResources.static availableLanguages` (CYLMenuResources.swift) | TODO | property |
-| `CYLMenuResources.static preferredLanguage` (CYLMenuResources.swift) | TODO | property |
-| `CYLMenuResources.static currentLanguage` (CYLMenuResources.swift) | TODO | property |
-| `CYLMenuResources.static localizedString(forKey:)` (CYLMenuResources.swift) | TODO | method |
-| `CYLMenuResources.static localizedString(forKey:language:)` (CYLMenuResources.swift) | TODO | method |
-| `CYLTagMetrics` (CYLTagMetrics.swift) | TODO | class |
-| `CYLTagMetrics.static maximumFontScale` (CYLTagMetrics.swift) | TODO | property |
-| `CYLTagMetrics.static titleFontSize` (CYLTagMetrics.swift) | TODO | property |
-| `CYLTagMetrics.static scaledSystemFont(ofSize:traitCollection:)` (CYLTagMetrics.swift) | TODO | method |
-| `CYLTagMetrics.static tagHeight(for:minimumHeight:)` (CYLTagMetrics.swift) | TODO | method |
-| `CYLTagMetrics.static titleFont(for:)` (CYLTagMetrics.swift) | TODO | method |
+| `CYLMenuLocalizedString(_:)` (CYLMenuResources.swift) | `CYLMenuLocalizedString(key)` (core/CYLMenuResources.ets) | method |
+| `CYLMenuResources` (CYLMenuResources.swift) | `class CYLMenuResources` | class |
+| `CYLMenuResources.static bundle` (CYLMenuResources.swift) | `CYLMenuResources.bundle` | property |
+| `CYLMenuResources.static image(named:)` (CYLMenuResources.swift) | `CYLMenuResources.image(name) (the HAR's media)` | method |
+| `CYLMenuResources.static availableLanguages` (CYLMenuResources.swift) | `CYLMenuResources.availableLanguages` | property |
+| `CYLMenuResources.static preferredLanguage` (CYLMenuResources.swift) | `CYLMenuResources.preferredLanguage` | property |
+| `CYLMenuResources.static currentLanguage` (CYLMenuResources.swift) | `CYLMenuResources.currentLanguage` | property |
+| `CYLMenuResources.static localizedString(forKey:)` (CYLMenuResources.swift) | `CYLMenuResources.localizedString(key)` | method |
+| `CYLMenuResources.static localizedString(forKey:language:)` (CYLMenuResources.swift) | `CYLMenuResources.localizedString(key, language)` | method |
+| `CYLTagMetrics` (CYLTagMetrics.swift) | `class CYLTagMetrics` (core/CYLTagMetrics.ets) | class |
+| `CYLTagMetrics.static maximumFontScale` (CYLTagMetrics.swift) | `CYLTagMetrics.maximumFontScale` | property |
+| `CYLTagMetrics.static titleFontSize` (CYLTagMetrics.swift) | `CYLTagMetrics.titleFontSize` | property |
+| `CYLTagMetrics.static scaledSystemFont(ofSize:traitCollection:)` (CYLTagMetrics.swift) | `CYLTagMetrics.scaledSystemFont(size, fontScale)` | method |
+| `CYLTagMetrics.static tagHeight(for:minimumHeight:)` (CYLTagMetrics.swift) | `CYLTagMetrics.tagHeight(font, minimumHeight)` | method |
+| `CYLTagMetrics.static titleFont(for:)` (CYLTagMetrics.swift) | `CYLTagMetrics.titleFont(fontScale)` | method |
 | `CYLMenuFoldControlPosition` (CYLMenuFoldControl.swift) | TODO | enum |
 | `CYLMenuFoldControlPosition.none` (CYLMenuFoldControl.swift) | TODO | case |
 | `CYLMenuFoldControlPosition.footer` (CYLMenuFoldControl.swift) | TODO | case |
@@ -327,81 +327,81 @@ overrides left out.
 | `CYLMenuFoldControl.showsTitle(whenExpanded:)` (CYLMenuFoldControl.swift) | TODO | method |
 | `CYLMenuFoldControl.title(whenExpanded:)` (CYLMenuFoldControl.swift) | TODO | method |
 | `CYLMenuFoldControl.copy(with:)` (CYLMenuFoldControl.swift) | TODO | method |
-| `CYLTagImagePlacement` (CYLMenuStyle.swift) | TODO | enum |
-| `CYLTagImagePlacement.leading` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagImagePlacement.trailing` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagContentAlignment` (CYLMenuStyle.swift) | TODO | enum |
-| `CYLTagContentAlignment.center` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagContentAlignment.leading` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagRowAlignment` (CYLMenuStyle.swift) | TODO | enum |
-| `CYLTagRowAlignment.leading` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagRowAlignment.center` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagRowAlignment.trailing` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagDeleteIndicatorPlacement` (CYLMenuStyle.swift) | TODO | enum |
-| `CYLTagDeleteIndicatorPlacement.trailing` (CYLMenuStyle.swift) | TODO | case |
-| `CYLTagDeleteIndicatorPlacement.leading` (CYLMenuStyle.swift) | TODO | case |
-| `CYLMenuStyle` (CYLMenuStyle.swift) | TODO | class |
-| `CYLMenuStyle.normalAppearance` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.selectedAppearance` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.disabledAppearance` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.highlightedBackgroundColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.tagContentInsets` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.deleteIndicatorTitle` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.deleteIndicatorColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.deleteIndicatorFont` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.deleteIndicatorLineWidth` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.deleteIndicatorWidth` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.deleteIndicatorPadding` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.deleteIndicatorPlacement` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.rippleColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.rippleAlpha` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.rippleDuration` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.maximumTitleLength` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.reversesTitleCharacters` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.rowAlignment` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.headerIndicatorColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.headerIndicatorSize` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.imageCornerRadius` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.imageTitleSpacing` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.imageSize` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.imageInsets` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.titlePositionAdjustment` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.imagePositionAdjustment` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.imagePlacement` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.layoutCentered` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.contentAlignment` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.animationSize` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.animationSpeed` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.adjustsFontForContentSizeCategory` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.itemHeight` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.numberOfItemsPerRow` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.interitemSpacing` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.lineSpacing` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.sectionInsets` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.backgroundColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.headerHeight` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.headerFont` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.headerTextColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.headerHorizontalInset` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.foldControlColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.expandTitle` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.foldChevronImage` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.collapseTitle` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.moreButtonImage` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.moreButtonColor` (CYLMenuStyle.swift) | TODO | property |
-| `CYLMenuStyle.static tagCloud()` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.static tagContainer()` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.static gridStyle(itemsPerRow:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.appearance(for:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.setTitleTextAttributes(_:for:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.titleTextAttributes(for:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.setIconColor(_:for:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.iconColor(for:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.displayedTitle(forTitle:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.titleFont(for:traitCollection:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.deleteIndicatorFont(for:traitCollection:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.headerFont(for:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.copy(with:)` (CYLMenuStyle.swift) | TODO | method |
+| `CYLTagImagePlacement` (CYLMenuStyle.swift) | `enum CYLTagImagePlacement` | enum |
+| `CYLTagImagePlacement.leading` (CYLMenuStyle.swift) | `CYLTagImagePlacement.leading` | case |
+| `CYLTagImagePlacement.trailing` (CYLMenuStyle.swift) | `CYLTagImagePlacement.trailing` | case |
+| `CYLTagContentAlignment` (CYLMenuStyle.swift) | `enum CYLTagContentAlignment` | enum |
+| `CYLTagContentAlignment.center` (CYLMenuStyle.swift) | `CYLTagContentAlignment.center` | case |
+| `CYLTagContentAlignment.leading` (CYLMenuStyle.swift) | `CYLTagContentAlignment.leading` | case |
+| `CYLTagRowAlignment` (CYLMenuStyle.swift) | `enum CYLTagRowAlignment` | enum |
+| `CYLTagRowAlignment.leading` (CYLMenuStyle.swift) | `CYLTagRowAlignment.leading` | case |
+| `CYLTagRowAlignment.center` (CYLMenuStyle.swift) | `CYLTagRowAlignment.center` | case |
+| `CYLTagRowAlignment.trailing` (CYLMenuStyle.swift) | `CYLTagRowAlignment.trailing` | case |
+| `CYLTagDeleteIndicatorPlacement` (CYLMenuStyle.swift) | `enum CYLTagDeleteIndicatorPlacement` | enum |
+| `CYLTagDeleteIndicatorPlacement.trailing` (CYLMenuStyle.swift) | `CYLTagDeleteIndicatorPlacement.trailing` | case |
+| `CYLTagDeleteIndicatorPlacement.leading` (CYLMenuStyle.swift) | `CYLTagDeleteIndicatorPlacement.leading` | case |
+| `CYLMenuStyle` (CYLMenuStyle.swift) | `class CYLMenuStyle` (core/CYLMenuStyle.ets) | class |
+| `CYLMenuStyle.normalAppearance` (CYLMenuStyle.swift) | `CYLMenuStyle.normalAppearance` | property |
+| `CYLMenuStyle.selectedAppearance` (CYLMenuStyle.swift) | `CYLMenuStyle.selectedAppearance` | property |
+| `CYLMenuStyle.disabledAppearance` (CYLMenuStyle.swift) | `CYLMenuStyle.disabledAppearance` | property |
+| `CYLMenuStyle.highlightedBackgroundColor` (CYLMenuStyle.swift) | `CYLMenuStyle.highlightedBackgroundColor` | property |
+| `CYLMenuStyle.tagContentInsets` (CYLMenuStyle.swift) | `CYLMenuStyle.tagContentInsets` | property |
+| `CYLMenuStyle.deleteIndicatorTitle` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorTitle` | property |
+| `CYLMenuStyle.deleteIndicatorColor` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorColor` | property |
+| `CYLMenuStyle.deleteIndicatorFont` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorFont` | property |
+| `CYLMenuStyle.deleteIndicatorLineWidth` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorLineWidth` | property |
+| `CYLMenuStyle.deleteIndicatorWidth` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorWidth` | property |
+| `CYLMenuStyle.deleteIndicatorPadding` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorPadding` | property |
+| `CYLMenuStyle.deleteIndicatorPlacement` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorPlacement` | property |
+| `CYLMenuStyle.rippleColor` (CYLMenuStyle.swift) | `CYLMenuStyle.rippleColor` | property |
+| `CYLMenuStyle.rippleAlpha` (CYLMenuStyle.swift) | `CYLMenuStyle.rippleAlpha` | property |
+| `CYLMenuStyle.rippleDuration` (CYLMenuStyle.swift) | `CYLMenuStyle.rippleDuration` | property |
+| `CYLMenuStyle.maximumTitleLength` (CYLMenuStyle.swift) | `CYLMenuStyle.maximumTitleLength` | property |
+| `CYLMenuStyle.reversesTitleCharacters` (CYLMenuStyle.swift) | `CYLMenuStyle.reversesTitleCharacters` | property |
+| `CYLMenuStyle.rowAlignment` (CYLMenuStyle.swift) | `CYLMenuStyle.rowAlignment` | property |
+| `CYLMenuStyle.headerIndicatorColor` (CYLMenuStyle.swift) | `CYLMenuStyle.headerIndicatorColor` | property |
+| `CYLMenuStyle.headerIndicatorSize` (CYLMenuStyle.swift) | `CYLMenuStyle.headerIndicatorSize` | property |
+| `CYLMenuStyle.imageCornerRadius` (CYLMenuStyle.swift) | `CYLMenuStyle.imageCornerRadius` | property |
+| `CYLMenuStyle.imageTitleSpacing` (CYLMenuStyle.swift) | `CYLMenuStyle.imageTitleSpacing` | property |
+| `CYLMenuStyle.imageSize` (CYLMenuStyle.swift) | `CYLMenuStyle.imageSize` | property |
+| `CYLMenuStyle.imageInsets` (CYLMenuStyle.swift) | `CYLMenuStyle.imageInsets` | property |
+| `CYLMenuStyle.titlePositionAdjustment` (CYLMenuStyle.swift) | `CYLMenuStyle.titlePositionAdjustment` | property |
+| `CYLMenuStyle.imagePositionAdjustment` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePositionAdjustment` | property |
+| `CYLMenuStyle.imagePlacement` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePlacement` | property |
+| `CYLMenuStyle.layoutCentered` (CYLMenuStyle.swift) | `CYLMenuStyle.layoutCentered` | property |
+| `CYLMenuStyle.contentAlignment` (CYLMenuStyle.swift) | `CYLMenuStyle.contentAlignment` | property |
+| `CYLMenuStyle.animationSize` (CYLMenuStyle.swift) | `CYLMenuStyle.animationSize` | property |
+| `CYLMenuStyle.animationSpeed` (CYLMenuStyle.swift) | `CYLMenuStyle.animationSpeed` | property |
+| `CYLMenuStyle.adjustsFontForContentSizeCategory` (CYLMenuStyle.swift) | `CYLMenuStyle.adjustsFontForContentSizeCategory` | property |
+| `CYLMenuStyle.itemHeight` (CYLMenuStyle.swift) | `CYLMenuStyle.itemHeight` | property |
+| `CYLMenuStyle.numberOfItemsPerRow` (CYLMenuStyle.swift) | `CYLMenuStyle.numberOfItemsPerRow` | property |
+| `CYLMenuStyle.interitemSpacing` (CYLMenuStyle.swift) | `CYLMenuStyle.interitemSpacing` | property |
+| `CYLMenuStyle.lineSpacing` (CYLMenuStyle.swift) | `CYLMenuStyle.lineSpacing` | property |
+| `CYLMenuStyle.sectionInsets` (CYLMenuStyle.swift) | `CYLMenuStyle.sectionInsets` | property |
+| `CYLMenuStyle.backgroundColor` (CYLMenuStyle.swift) | `CYLMenuStyle.backgroundColor` | property |
+| `CYLMenuStyle.headerHeight` (CYLMenuStyle.swift) | `CYLMenuStyle.headerHeight` | property |
+| `CYLMenuStyle.headerFont` (CYLMenuStyle.swift) | `CYLMenuStyle.headerFont` | property |
+| `CYLMenuStyle.headerTextColor` (CYLMenuStyle.swift) | `CYLMenuStyle.headerTextColor` | property |
+| `CYLMenuStyle.headerHorizontalInset` (CYLMenuStyle.swift) | `CYLMenuStyle.headerHorizontalInset` | property |
+| `CYLMenuStyle.foldControlColor` (CYLMenuStyle.swift) | `CYLMenuStyle.foldControlColor` | property |
+| `CYLMenuStyle.expandTitle` (CYLMenuStyle.swift) | `CYLMenuStyle.expandTitle` | property |
+| `CYLMenuStyle.foldChevronImage` (CYLMenuStyle.swift) | `CYLMenuStyle.foldChevronImage` | property |
+| `CYLMenuStyle.collapseTitle` (CYLMenuStyle.swift) | `CYLMenuStyle.collapseTitle` | property |
+| `CYLMenuStyle.moreButtonImage` (CYLMenuStyle.swift) | `CYLMenuStyle.moreButtonImage` | property |
+| `CYLMenuStyle.moreButtonColor` (CYLMenuStyle.swift) | `CYLMenuStyle.moreButtonColor` | property |
+| `CYLMenuStyle.static tagCloud()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagCloud()` | method |
+| `CYLMenuStyle.static tagContainer()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagContainer()` | method |
+| `CYLMenuStyle.static gridStyle(itemsPerRow:)` (CYLMenuStyle.swift) | `CYLMenuStyle.static gridStyle(itemsPerRow)` | method |
+| `CYLMenuStyle.appearance(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.appearance(state)` | method |
+| `CYLMenuStyle.setTitleTextAttributes(_:for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.setTitleTextAttributes(font, textColor, state)` | method |
+| `CYLMenuStyle.titleTextAttributes(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.titleTextAttributes(state)` | method |
+| `CYLMenuStyle.setIconColor(_:for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.setIconColor(color, state)` | method |
+| `CYLMenuStyle.iconColor(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.iconColor(state)` | method |
+| `CYLMenuStyle.displayedTitle(forTitle:)` (CYLMenuStyle.swift) | `CYLMenuStyle.displayedTitle(title)` | method |
+| `CYLMenuStyle.titleFont(for:traitCollection:)` (CYLMenuStyle.swift) | `CYLMenuStyle.titleFont(state, fontScale, boldText)` | method |
+| `CYLMenuStyle.deleteIndicatorFont(for:traitCollection:)` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorFontFor(state, fontScale, boldText)` | method |
+| `CYLMenuStyle.headerFont(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.headerFontFor(fontScale, boldText)` | method |
+| `CYLMenuStyle.copy(with:)` (CYLMenuStyle.swift) | `CYLMenuStyle.copy()` | method |
 | `CYLTag` (CYLTag.swift) | TODO | class |
 | `CYLTag.identifier` (CYLTag.swift) | TODO | property |
 | `CYLTag.title` (CYLTag.swift) | TODO | property |
@@ -460,24 +460,24 @@ overrides left out.
 | `CYLTagDataSource.menuRemoveItem(at:)` (CYLTag.swift) | TODO | method |
 | `CYLTagDataSource.menuMoveItem(at:to:)` (CYLTag.swift) | TODO | method |
 | `CYLTagDataSource.menuStyleForItem(at:)` (CYLTag.swift) | TODO | method |
-| `CYLTagCornerRadiusSquare` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance` (CYLTagAppearance.swift) | TODO | class |
-| `CYLTagAppearance.static defaultBackgroundColor` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.static defaultTextColor` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.static defaultFont` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.backgroundColor` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.textColor` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.font` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.iconColor` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.cornerRadius` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.borderColor` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.borderWidth` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.contentInsets` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.margin` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.backgroundImage` (CYLTagAppearance.swift) | TODO | property |
-| `CYLTagAppearance.init()` (CYLTagAppearance.swift) | TODO | init |
-| `CYLTagAppearance.reset()` (CYLTagAppearance.swift) | TODO | method |
-| `CYLTagAppearance.copy()` (CYLTagAppearance.swift) | TODO | method |
+| `CYLTagCornerRadiusSquare` (CYLTagAppearance.swift) | `CYLTagCornerRadiusSquare` | property |
+| `CYLTagAppearance` (CYLTagAppearance.swift) | `class CYLTagAppearance` (core/CYLTagAppearance.ets) | class |
+| `CYLTagAppearance.static defaultBackgroundColor` (CYLTagAppearance.swift) | `CYLTagAppearance.defaultBackgroundColor` (static) | property |
+| `CYLTagAppearance.static defaultTextColor` (CYLTagAppearance.swift) | `CYLTagAppearance.defaultTextColor` (static) | property |
+| `CYLTagAppearance.static defaultFont` (CYLTagAppearance.swift) | `CYLTagAppearance.defaultFont` (static) | property |
+| `CYLTagAppearance.backgroundColor` (CYLTagAppearance.swift) | `CYLTagAppearance.backgroundColor` | property |
+| `CYLTagAppearance.textColor` (CYLTagAppearance.swift) | `CYLTagAppearance.textColor` | property |
+| `CYLTagAppearance.font` (CYLTagAppearance.swift) | `CYLTagAppearance.font` | property |
+| `CYLTagAppearance.iconColor` (CYLTagAppearance.swift) | `CYLTagAppearance.iconColor` | property |
+| `CYLTagAppearance.cornerRadius` (CYLTagAppearance.swift) | `CYLTagAppearance.cornerRadius` | property |
+| `CYLTagAppearance.borderColor` (CYLTagAppearance.swift) | `CYLTagAppearance.borderColor` | property |
+| `CYLTagAppearance.borderWidth` (CYLTagAppearance.swift) | `CYLTagAppearance.borderWidth` | property |
+| `CYLTagAppearance.contentInsets` (CYLTagAppearance.swift) | `CYLTagAppearance.contentInsets` | property |
+| `CYLTagAppearance.margin` (CYLTagAppearance.swift) | `CYLTagAppearance.margin` | property |
+| `CYLTagAppearance.backgroundImage` (CYLTagAppearance.swift) | `CYLTagAppearance.backgroundImage` | property |
+| `CYLTagAppearance.init()` (CYLTagAppearance.swift) | `new CYLTagAppearance()` | init |
+| `CYLTagAppearance.reset()` (CYLTagAppearance.swift) | `reset()` | method |
+| `CYLTagAppearance.copy()` (CYLTagAppearance.swift) | `copy()` | method |
 | `CYLTagButton` (CYLTagButton.swift) | TODO | class |
 | `CYLTagButton.imageView` (CYLTagButton.swift) | TODO | property |
 | `CYLTagButton.titleLabel` (CYLTagButton.swift) | TODO | property |
@@ -501,26 +501,26 @@ overrides left out.
 | `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | TODO | method |
 | `CYLTagButton.static iconSize(for:animated:style:)` (CYLTagButton.swift) | TODO | method |
 | `CYLTagButton.static height(for:traitCollection:)` (CYLTagButton.swift) | TODO | method |
-| `CYLTagColorTheme` (CYLTagColors.swift) | TODO | enum |
-| `CYLTagColorTheme.none` (CYLTagColors.swift) | TODO | case |
-| `CYLTagColorTheme.random` (CYLTagColors.swift) | TODO | case |
-| `CYLTagColorTheme.pureCyan` (CYLTagColors.swift) | TODO | case |
-| `CYLTagColorTheme.pureTeal` (CYLTagColors.swift) | TODO | case |
-| `CYLTagColors` (CYLTagColors.swift) | TODO | struct |
-| `CYLTagColors.static backgroundAlpha` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.static borderAlpha` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.static paletteHexByName` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.static gray666666` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.static gray727272` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.backgroundColor` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.borderColor` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.textColor` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.selectedBackgroundColor` (CYLTagColors.swift) | TODO | property |
-| `CYLTagColors.init(backgroundColor:borderColor:textColor:selectedBackgroundColor:)` (CYLTagColors.swift) | TODO | init |
-| `CYLTagColors.init(paletteHex:textColor:selectedBackgroundColor:)` (CYLTagColors.swift) | TODO | init |
-| `CYLTagColors.init?(theme:seed:)` (CYLTagColors.swift) | TODO | init |
-| `CYLTagColors.static random()` (CYLTagColors.swift) | TODO | method |
-| `CYLTagColors.styleByApplying(to:)` (CYLTagColors.swift) | TODO | method |
+| `CYLTagColorTheme` (CYLTagColors.swift) | `enum CYLTagColorTheme` | enum |
+| `CYLTagColorTheme.none` (CYLTagColors.swift) | `CYLTagColorTheme.none` | case |
+| `CYLTagColorTheme.random` (CYLTagColors.swift) | `CYLTagColorTheme.random` | case |
+| `CYLTagColorTheme.pureCyan` (CYLTagColors.swift) | `CYLTagColorTheme.pureCyan` | case |
+| `CYLTagColorTheme.pureTeal` (CYLTagColors.swift) | `CYLTagColorTheme.pureTeal` | case |
+| `CYLTagColors` (CYLTagColors.swift) | `class CYLTagColors` (core/CYLTagColors.ets) | struct |
+| `CYLTagColors.static backgroundAlpha` (CYLTagColors.swift) | `CYLTagColors.backgroundAlpha` | property |
+| `CYLTagColors.static borderAlpha` (CYLTagColors.swift) | `CYLTagColors.borderAlpha` | property |
+| `CYLTagColors.static paletteHexByName` (CYLTagColors.swift) | `CYLTagColors.paletteHexByName` | property |
+| `CYLTagColors.static gray666666` (CYLTagColors.swift) | `CYLTagColors.gray666666` | property |
+| `CYLTagColors.static gray727272` (CYLTagColors.swift) | `CYLTagColors.gray727272` | property |
+| `CYLTagColors.backgroundColor` (CYLTagColors.swift) | `CYLTagColors.backgroundColor` | property |
+| `CYLTagColors.borderColor` (CYLTagColors.swift) | `CYLTagColors.borderColor` | property |
+| `CYLTagColors.textColor` (CYLTagColors.swift) | `CYLTagColors.textColor` | property |
+| `CYLTagColors.selectedBackgroundColor` (CYLTagColors.swift) | `CYLTagColors.selectedBackgroundColor` | property |
+| `CYLTagColors.init(backgroundColor:borderColor:textColor:selectedBackgroundColor:)` (CYLTagColors.swift) | `new CYLTagColors(background, border, text, selectedBackground)` | init |
+| `CYLTagColors.init(paletteHex:textColor:selectedBackgroundColor:)` (CYLTagColors.swift) | `CYLTagColors.fromPaletteHex(hex, text, selectedBackground)` | init |
+| `CYLTagColors.init?(theme:seed:)` (CYLTagColors.swift) | `CYLTagColors.fromTheme(theme, seed)` | init |
+| `CYLTagColors.static random()` (CYLTagColors.swift) | `CYLTagColors.random()` | method |
+| `CYLTagColors.styleByApplying(to:)` (CYLTagColors.swift) | `styleByApplying(style)` | method |
 | `CYLTagCreateCell` (CYLTagCreateCell.swift) | TODO | class |
 | `CYLTagCreateCell.static plusImage` (CYLTagCreateCell.swift) | TODO | property |
 | `CYLTagCreateCell.static title(forName:)` (CYLTagCreateCell.swift) | TODO | method |
@@ -848,3 +848,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 
 - 2026-11-16: tables created, every row TODO.
 - 2026-11-16: feature 1, the menu data source, delegate and keys (core/CYLMenuDataSource.ets, CYLMenuKeys.ets). Score 45 / 807 = 5.6.
+- 2026-11-16: feature 2, the style: value types, CYLTagAppearance, CYLMenuStyle, CYLTagColors, CYLTagMetrics, CYLMenuResources (core strings generated by harmony/scripts/export-core-strings.py, the pod's images in the HAR's media). Score 175 / 807 = 21.7.
