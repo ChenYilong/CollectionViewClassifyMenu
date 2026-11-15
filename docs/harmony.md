@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 793 / 807 = 98.3 / 100** (API 772 / 785, demos 21 / 22). Both tables are scored together: every TODO removed
+**Score: 799 / 807 = 99.0 / 100** (API 778 / 785, demos 21 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -166,10 +166,10 @@ overrides left out.
 | `CYLImageTagGroupView.hideAnimation` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.hideAnimation` | property |
 | `CYLImageTagGroupView.delegate` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.delegate` | property |
 | `CYLImageTagGroupView.isDraggable` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.isDraggable` | property |
-| `CYLImageTagGroupView.circleAccessibilityElement` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.longPressAccessibilityActionName` (CYLImageTagGroupView.swift) | TODO | property |
+| `CYLImageTagGroupView.circleAccessibilityElement` (CYLImageTagGroupView.swift) | the dot's accessibility node in `CYLImageTagGroupViewComponent` (`accessibilityText` = `circleAccessibilityLabel`, activating it taps the dot) | property |
+| `CYLImageTagGroupView.longPressAccessibilityActionName` (CYLImageTagGroupView.swift) | N/A: ArkUI (through API 21) has no custom accessibility actions, only ACCESSIBILITY_CLICK (onAccessibilityActionIntercept), so there is no long-press action to name | property |
 | `CYLImageTagGroupView.tagAccessibilityHint` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagAccessibilityHint` | property |
-| `CYLImageTagGroupView.accessibilityMoveStep` (CYLImageTagGroupView.swift) | TODO | property |
+| `CYLImageTagGroupView.accessibilityMoveStep` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.accessibilityMoveStep` (used by `accessibilityMove(dx, dy)`) | property |
 | `CYLImageTagGroupView.init?(coder:)` (CYLImageTagGroupView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagGroupView.setPercentPosition(x:y:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.setPercentPosition` | method |
 | `CYLImageTagGroupView.reloadData()` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.reloadData` | method |
@@ -192,7 +192,7 @@ overrides left out.
 | `CYLImageTagView.longPressHandler` (CYLImageTagView.swift) | `CYLImageTagView.longPressHandler` | property |
 | `CYLImageTagView.dragHandler` (CYLImageTagView.swift) | `CYLImageTagView.dragHandler` | property |
 | `CYLImageTagView.imageAccessibilityHint` (CYLImageTagView.swift) | `CYLImageTagView.imageAccessibilityHint` | property |
-| `CYLImageTagView.longPressAccessibilityActionName` (CYLImageTagView.swift) | TODO | property |
+| `CYLImageTagView.longPressAccessibilityActionName` (CYLImageTagView.swift) | N/A: no custom accessibility actions in ArkUI (through API 21) | property |
 | `CYLImageTagView.init()` (CYLImageTagView.swift) | `new CYLImageTagView()` | init |
 | `CYLImageTagView.init?(coder:)` (CYLImageTagView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagView.addTagGroup(_:)` (CYLImageTagView.swift) | `CYLImageTagView.addTagGroup` | method |
@@ -553,7 +553,7 @@ overrides left out.
 | `CYLTagListCell.appliedStyle` (CYLTagListCell.swift) | `CYLTagListCell.appliedStyle` | property |
 | `CYLTagListCell.isDeletable` (CYLTagListCell.swift) | `CYLTagListCell.isDeletable` | property |
 | `CYLTagListCell.deleteHandler` (CYLTagListCell.swift) | `CYLTagListCell.deleteHandler` | property |
-| `CYLTagListCell.additionalAccessibilityActions` (CYLTagListCell.swift) | TODO | property |
+| `CYLTagListCell.additionalAccessibilityActions` (CYLTagListCell.swift) | N/A: no custom accessibility actions in ArkUI (through API 21) | property |
 | `CYLTagListCell.init?(coder:)` (CYLTagListCell.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagListCell.showRipple(at:)` (CYLTagListCell.swift) | `showRipple(point)` | method |
 | `CYLTagListCell.configure(title:image:selectedImage:animationURL:style:isSelected:isEnabled:)` (CYLTagListCell.swift) | `configure(title, image, selectedImage, animationURL, style, isSelected, isEnabled)` | method |
@@ -717,7 +717,7 @@ overrides left out.
 | `CYLTagListView.defaultTagImage` (CYLTagListView.swift) | `CYLTagListState.defaultTagImage` | property |
 | `CYLTagListView.removesItemsOnDelete` (CYLTagListView.swift) | `CYLTagListState.removesItemsOnDelete` | property |
 | `CYLTagListView.tagLongPressHandler` (CYLTagListView.swift) | `CYLTagListState.tagLongPressHandler` | property |
-| `CYLTagListView.longPressAccessibilityActionName` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListView.longPressAccessibilityActionName` (CYLTagListView.swift) | N/A: no custom accessibility actions in ArkUI (through API 21) | property |
 | `CYLTagListView.allowsReordering` (CYLTagListView.swift) | `CYLTagListState.allowsReordering` | property |
 | `CYLTagListView.reorderingSensitivity` (CYLTagListView.swift) | `CYLTagListState.reorderingSensitivity` | property |
 | `CYLTagListView.isReordering` (CYLTagListView.swift) | `CYLTagListState.isReordering` | property |
@@ -857,3 +857,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: features 6 and 7, the classify menu and multiple filter (classify/) and the tag button, tag view and cells (tagviews/). Compile only. Score 758 / 807 = 93.9.
 - 2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7.
 - 2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3.
+- 2026-11-16: four accessibility-action rows N/A (ArkUI through API 21 has only ACCESSIBILITY_CLICK); the image tag dot's accessibility node and move step mapped. Score 799 / 807 = 99.0.
