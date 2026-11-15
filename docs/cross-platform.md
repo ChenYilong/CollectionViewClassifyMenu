@@ -497,10 +497,10 @@ Program) show the same screens with the same data and look the same as iOS, whic
   now; move heavy resources to a subpackage if needed); the same applies to PAG.
 - **Status (2026-11-15):** BUG 2 FIXED and seen in WeChat DevTools: Rive is linked (`cyl-rive-miniprogram` installed by
   `scripts/fetch-cyltabbar.js`, the .riv files exported as `data/animations/rive/*.riv.bin`, the tags' animationOptions
-  passed in the path's fragment); both Rive sections draw their icons. BUG 1: fix applied, NOT verified yet (DevTools
-  did not reopen the project): Lottie icons now play in CYLTabBarController's `cyl-lottie` (in DevTools an image of
+  passed in the path's fragment); both Rive sections draw their icons. BUG 1: FIXED, seen in WeChat DevTools (Loop on, Play all,
+  four scrolls while every icon loops: Lottie, PAG and Rive icons stay in their tags): Lottie icons now play in CYLTabBarController's `cyl-lottie` (in DevTools an image of
   the canvas, as `cyl-rive`, which did not drift), and the Animations page scrolls the page itself with a sticky
-  header instead of a nested `scroll-view`. TODO: check on a phone and in DevTools (Loop on, Play all, scroll).
+  header instead of a nested `scroll-view`. Left: the same check on a phone.
 
 ### Mini Program bugs (2026-11-15): search results, tab bar selection, transparent tags
 
@@ -538,3 +538,20 @@ Program) show the same screens with the same data and look the same as iOS, whic
 
   <img src="assets/miniprogram-search-empty-placeholder.png" width="220" alt="Mini Program: no results, the placeholder">
   <img src="assets/miniprogram-search-discover-opaque-tags.png" width="220" alt="Mini Program: recent searches with an opaque fill">
+
+### Mini Program bug (2026-11-15): PAG animations do not show
+
+- **Prompt (verbatim):** "新增bug 记录，pag 动画显示异常。请解决后继续" (EN: record a new bug: the PAG animations display
+  wrongly; fix it, then continue).
+- **Cause:** the PAG tags (the 动效 tab's PAG section, the PAG choice of 样式, the configuration demo) showed titles only:
+  no PAG engine was linked, because libpag (about 0.96 MB with its WebAssembly) did not fit the 2 MB main package next
+  to Rive, and the PAG files are not in the repository (iOS fetches them too).
+- **Fix, DONE:** CYLTabBarController's `cyl-pag-miniprogram` (libpag 4.5.85) and the PAG files go to the `engines`
+  code subpackage (`app.json` `subpackages`, preloaded for 动效 and 样式 by `preloadRule`); the icon component uses
+  `cyl-pag` through async subpackage loading (`componentPlaceholder`: a view until it arrives). The files come from
+  `scripts/fetch-animation-resources.py PAGResources` (pinned, SHA-256 checked, as for iOS) and
+  `scripts/fetch-cyltabbar.js` copies them as `engines/pag/*.pag.bin` (git-ignored); the registry lists the pinned names
+  of `pag-resources.json`; CI fetches them before `--check`. Seen in WeChat DevTools: the PAG section matches
+  `assets/ios-animation-playback-controls.png` (Home, Health, Posts, Me, 动效一, 动效二), playing and looping.
+
+  <img src="assets/miniprogram-animations-pag-rive-loop.png" width="240" alt="Mini Program: Lottie, PAG and Rive icons looping, in their tags after scrolling">

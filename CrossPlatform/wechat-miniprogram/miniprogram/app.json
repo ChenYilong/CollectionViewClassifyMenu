@@ -57,5 +57,28 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "subpackages": [
+    {
+      "root": "engines",
+      "name": "engines",
+      "pages": [
+        "index/index"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/animations/animations": {
+      "network": "all",
+      "packages": [
+        "engines"
+      ]
+    },
+    "pages/styles/styles": {
+      "network": "all",
+      "packages": [
+        "engines"
+      ]
+    }
+  }
 }
