@@ -65,6 +65,13 @@ verify the behavior and update the applicable documentation.
   Details and the check: `.agents/skills/cyl-comments/`.
 - Use English Conventional Commit messages, such as `fix: 🐛 ...` and
   `docs: 📝 ...`.
+- **Commit messages: git cz style, English only.** Every commit is written in the `git cz` (commitizen, cz-emoji)
+  style: the subject is `<type>(<optional scope>): <emoji> <summary>`, with the type one of `feat`, `fix`, `docs`,
+  `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore` or `revert` (for example `feat: ✨ …`, `fix(harmony): 🐛
+  …`), followed by a body and the author line. The whole message (subject, body and trailers) is in English: no
+  Chinese characters, and no other non-English text, are allowed anywhere in a commit message. Write a user's
+  non-English prompt only in the task log in `docs/` (quoted verbatim there), never in a commit. Check:
+  `scripts/check-commit-message.sh [range]`.
 - Every commit message's description (the body) must contain the author line
   `By @ChenYilong <luohanchenyilong@163.com>`, exactly as written, on its own
   line after the description and before any trailers. Details:

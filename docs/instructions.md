@@ -44,3 +44,6 @@
   (and every platform)"): all code supports screen readers, visual assistance and localization through resource
   files; add support first where it is missing; automated UI tests locate controls, tap and run multi-step flows
   through accessibility and localized text first. The HarmonyOS parity sheet is `harmony.md`.
+- Commit messages (English rule, AGENTS.md "Commit messages: git cz style, English only"; skill
+  `.agents/skills/cyl-commit/`): `git cz` style (`<type>(<scope>): <emoji> <summary>`), the whole message in English, no
+  Chinese characters; a non-English prompt is quoted only in the task log here, never in a commit.
