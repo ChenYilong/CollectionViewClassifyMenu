@@ -142,6 +142,14 @@ def outputs():
     for path in sorted((BUNDLE / "Animations/Rive").glob("*.riv")):
         files[OUT / f"rive/{path.name}.bin"] = path.read_bytes()
         rives[f"Rive/{path.name}"] = {"engine": "rive", "src": f"/data/animations/rive/{path.name}.bin"}
+    # PAG files: fetched (not in the repository) and copied to the engines subpackage by scripts/fetch-cyltabbar.js;
+    # the registry lists the pinned names of Example-Shared/PAGResources/pag-resources.json.
+    manifest = json.loads((ROOT / "Example-Shared/PAGResources/pag-resources.json").read_text(encoding="utf-8"))
+    pags = {}
+    for entry in manifest["files"]:
+        name = pathlib.PurePosixPath(entry.get("file") or entry["path"]).name
+        if name.endswith(".pag"):
+            pags[f"pag-ios/{name}"] = {"engine": "pag", "src": f"/engines/pag/{name}.bin"}
     configuration = BUNDLE / "Configurations/animated-tags.json"
     files[OUT / "Configurations/animated-tags.json"] = configuration.read_bytes()
     for name in TAB_IMAGES:
@@ -157,7 +165,7 @@ def outputs():
              "module.exports = {"]
     for key, (engine, loader) in registry.items():
         lines.append(f"  {json.dumps(key)}: {{ engine: '{engine}', data: () => {loader} }},")
-    for key, entry in list(gifs.items()) + list(rives.items()):
+    for key, entry in list(gifs.items()) + list(rives.items()) + list(pags.items()):
         lines.append(f"  {json.dumps(key)}: {json.dumps(entry, ensure_ascii=False)},")
     lines.append("};")
     files[OUT / "index.js"] = ("\n".join(lines) + "\n").encode("utf-8")

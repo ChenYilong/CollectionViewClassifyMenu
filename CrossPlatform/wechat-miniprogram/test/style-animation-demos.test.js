@@ -142,12 +142,12 @@ test('animations: eight sections in the iOS order, single choice, the first tag 
   assert.equal(m.style.imageSize, 28);
   assert.equal(m.sections[5].style.normal.backgroundColor, '#17203A');
   assert.equal(m.sections[3].items[5].animationRestingProgress, 1);
-  // Every Lottie, GIF and Rive file of the screen is in the package; PAG tags fall back to their (missing) images.
+  // Every Lottie, GIF, Rive and PAG file of the screen resolves (PAG to the engines subpackage).
   m.sections.forEach((section) => section.items.forEach((item) => {
     if (!item.animation) return;
     const engine = model.animationEngine(item.animation);
     const resolved = animations.resolve(item.animation);
-    if (engine === 'lottie' || engine === 'gif' || engine === 'rive') assert.ok(resolved, item.animation);
+    if (['lottie', 'gif', 'rive', 'pag'].includes(engine)) assert.ok(resolved, item.animation);
     else assert.equal(resolved, null);
   }));
   for (const item of m.sections[7].items) {
@@ -186,7 +186,7 @@ test('configuration: the file is read as the core reads it, and the map configur
   assert.equal(m.sections[0].items[5].enabled, false);
   assert.equal(animations.resolve(m.sections[0].items[0].animation).engine, 'lottie');
   assert.equal(animations.resolve(m.sections[0].items[3].animation).engine, 'gif');
-  assert.equal(animations.resolve(m.sections[0].items[1].animation), null);
+  assert.equal(animations.resolve(m.sections[0].items[1].animation).entry.src, '/engines/pag/0.pag.bin');
   assert.equal(configurationDemo.readConfiguration(() => { throw new Error('x'); }).error,
     'No configuration file at CYLMenuExample.bundle/Configurations/animated-tags.json');
   assert.match(configurationDemo.readConfiguration(() => '[1]').error, /does not hold a dictionary/);

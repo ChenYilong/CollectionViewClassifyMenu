@@ -29,4 +29,10 @@ module.exports = {
   "Rive/menu_button.riv": {"engine": "rive", "src": "/data/animations/rive/menu_button.riv.bin"},
   "Rive/shapes.riv": {"engine": "rive", "src": "/data/animations/rive/shapes.riv.bin"},
   "Rive/truck.riv": {"engine": "rive", "src": "/data/animations/rive/truck.riv.bin"},
+  "pag-ios/0.pag": {"engine": "pag", "src": "/engines/pag/0.pag.bin"},
+  "pag-ios/1.pag": {"engine": "pag", "src": "/engines/pag/1.pag.bin"},
+  "pag-ios/tab_home.pag": {"engine": "pag", "src": "/engines/pag/tab_home.pag.bin"},
+  "pag-ios/tab_health.pag": {"engine": "pag", "src": "/engines/pag/tab_health.pag.bin"},
+  "pag-ios/tab_me.pag": {"engine": "pag", "src": "/engines/pag/tab_me.pag.bin"},
+  "pag-ios/tab_moments.pag": {"engine": "pag", "src": "/engines/pag/tab_moments.pag.bin"},
 };

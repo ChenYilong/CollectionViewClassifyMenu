@@ -17,6 +17,9 @@ const animations = require('../cyl-tag-list/animations.js');
 /** CYLTabBarController's cyl-rive (installed by scripts/fetch-cyltabbar.js) loads its WebAssembly from here. */
 const RIVE_WASM = '/cyl_components/cyl-rive-miniprogram/rive/rive.wasm.br';
 
+/** cyl-pag (in the "engines" subpackage, scripts/fetch-cyltabbar.js) loads libpag's WebAssembly from here. */
+const PAG_WASM = '/engines/cyl-pag-miniprogram/libpag/libpag.wasm.br';
+
 /** The options cyl-rive reads from the path's fragment ("#stateMachine=…&input=…"); iOS's "legacy" plays the default. */
 const RIVE_OPTIONS = ['artboard', 'stateMachine', 'animation', 'input', 'triggerInput', 'active', 'trigger', 'duration', 'color'];
 
@@ -46,7 +49,10 @@ Component({
     options: { type: null, value: null, observer: 'reload' },
   },
 
-  data: { engine: '', gifSrc: '', boxHeight: 18, lottieData: null, rivePath: '', wasmPath: RIVE_WASM },
+  data: {
+    engine: '', gifSrc: '', boxHeight: 18, lottieData: null, rivePath: '', wasmPath: RIVE_WASM,
+    pagPath: '', pagWasmPath: PAG_WASM,
+  },
 
   lifetimes: {
     ready() {
@@ -76,8 +82,9 @@ Component({
       // cyl-lottie keeps a reference to the data and changes it while playing, so every icon gets its own copy.
       if (engine === 'lottie') next.lottieData = JSON.parse(JSON.stringify(this.entry.data()));
       if (engine === 'rive') next.rivePath = rivePath(this.entry.src, this.data.options);
+      if (engine === 'pag') next.pagPath = this.entry.src;
       this.setData(next, () => {
-        if (engine === 'lottie') return; // ready when cyl-lottie sends `ready`
+        if (engine === 'lottie' || engine === 'pag') return; // ready when cyl-lottie / cyl-pag sends `ready`
         if (engine === 'rive') {
           this.loaded = true;
           if (this.pendingPlay) this.play();
@@ -100,6 +107,12 @@ Component({
       this.playing = false;
     },
 
+    onPagReady() {
+      this.loaded = true;
+      this.rest();
+      if (this.pendingPlay) this.play();
+    },
+
     /** The frame of the current state: the last one while selected, else the resting progress. */
     rest() {
       this.playing = false;
@@ -107,6 +120,13 @@ Component({
       if (this.data.engine === 'gif' && this.entry) {
         const resting = this.data.selected || this.data.restingProgress >= 1 ? this.entry.last : this.entry.first;
         this.setData({ gifSrc: resting });
+        return;
+      }
+      if (this.data.engine === 'pag' && this.loaded) {
+        // cyl-pag shows its resting frame (first / last); a resting progress between them is set as a progress.
+        const pag = this.selectComponent('#pag');
+        const progress = this.data.selected ? 1 : Math.min(1, Math.max(0, this.data.restingProgress));
+        if (pag && typeof pag.cyl_setProgress === 'function') pag.cyl_setProgress(progress);
         return;
       }
       if (this.data.engine !== 'lottie' || !this.loaded) return;
@@ -138,7 +158,7 @@ Component({
         this.playGif();
         return;
       }
-      const player = this.selectComponent(this.data.engine === 'rive' ? '#rive' : '#lottie');
+      const player = this.selectComponent(`#${this.data.engine}`);
       if (!player) return;
       this.playing = true;
       player.cyl_playFromStart();
