@@ -2,8 +2,8 @@
 /**
  * The animated icons of the iOS example (CYLMenuExample.bundle/Animations), by the path the iOS example uses
  * ("Lottie/tab_home_animate.json"). A Lottie entry loads its data on first use (`data()`); a GIF entry has
- * the file, its first and last frames and the duration of one pass in milliseconds. PAG and Rive files are
- * not here: their engines are not in the package (cyl-tag-list/engines.js).
+ * the file, its first and last frames and the duration of one pass in milliseconds; a Rive entry has its
+ * .riv.bin file. PAG files are not here: their engine is not in the package (cyl-tag-list/animations.js).
  */
 module.exports = {
   "Lottie/tab_home_animate.json": { engine: 'lottie', data: () => require('../lottie/home.js') },
@@ -21,4 +21,12 @@ module.exports = {
   "GIF/tab_rocket.gif": {"engine": "gif", "src": "/data/animations/gif/tab_rocket.gif", "first": "/data/animations/gif/tab_rocket.first.png", "last": "/data/animations/gif/tab_rocket.last.png", "width": 96, "height": 96, "duration": 600, "frames": 20},
   "GIF/tab_star.gif": {"engine": "gif", "src": "/data/animations/gif/tab_star.gif", "first": "/data/animations/gif/tab_star.first.png", "last": "/data/animations/gif/tab_star.last.png", "width": 96, "height": 96, "duration": 2190, "frames": 73},
   "GIF/cyl_tab_sample_animated.gif": {"engine": "gif", "src": "/data/animations/gif/cyl_tab_sample_animated.gif", "first": "/data/animations/gif/cyl_tab_sample_animated.first.png", "last": "/data/animations/gif/cyl_tab_sample_animated.last.png", "width": 48, "height": 48, "duration": 1000, "frames": 10},
+  "Rive/button.riv": {"engine": "rive", "src": "/data/animations/rive/button.riv.bin"},
+  "Rive/check.riv": {"engine": "rive", "src": "/data/animations/rive/check.riv.bin"},
+  "Rive/confetti.riv": {"engine": "rive", "src": "/data/animations/rive/confetti.riv.bin"},
+  "Rive/house.riv": {"engine": "rive", "src": "/data/animations/rive/house.riv.bin"},
+  "Rive/icons.riv": {"engine": "rive", "src": "/data/animations/rive/icons.riv.bin"},
+  "Rive/menu_button.riv": {"engine": "rive", "src": "/data/animations/rive/menu_button.riv.bin"},
+  "Rive/shapes.riv": {"engine": "rive", "src": "/data/animations/rive/shapes.riv.bin"},
+  "Rive/truck.riv": {"engine": "rive", "src": "/data/animations/rive/truck.riv.bin"},
 };

@@ -122,12 +122,12 @@ test('animations resolve by engine and file, and a missing engine or file falls 
   assert.equal(model.resolveAnimation('Rive/b.riv', registry, { gif: true, rive: false }), null);
   assert.equal(model.resolveAnimation('GIF/missing.gif', registry, { gif: true }), null);
   assert.equal(model.resolveAnimation('asset:home', {}, { lottie: true }, { home: {} }).engine, 'lottie');
-  // The package's engines: Lottie and GIF linked, PAG and Rive not.
+  // The package's engines: Lottie, GIF and Rive linked, PAG not.
   assert.equal(animations.isAnimationEngineAvailable, true);
   assert.equal(animations.resolve('CYLMenuExample.bundle/Animations/Lottie/green_lottie_tab_home.json').engine, 'lottie');
   assert.equal(animations.resolve('../Animations/GIF/tab_star.gif').entry.last, '/data/animations/gif/tab_star.last.png');
   assert.equal(animations.resolve('pag-ios/0.pag'), null);
-  assert.equal(animations.resolve('CYLMenuExample.bundle/Animations/Rive/house.riv'), null);
+  assert.equal(animations.resolve('CYLMenuExample.bundle/Animations/Rive/house.riv').entry.src, '/data/animations/rive/house.riv.bin');
   const gray = animations.resolve('Lottie/gray_tabbar_home_animation.json').entry.data();
   assert.ok(gray.assets.filter((a) => a.p).every((a) => a.e === 1 && a.p.startsWith('data:image/png;base64,')));
 });

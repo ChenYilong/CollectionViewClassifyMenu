@@ -18,7 +18,7 @@
               aria-role="button" aria-label="{{item.title}}" aria-selected="{{item.selected}}" aria-disabled="{{!item.enabled}}">
           <view wx:if="{{item.iconKind !== 'none'}}" class="cyl-icon-slot" style="{{item.slotStyle}}">
             <cyl-lottie-icon wx:if="{{item.iconKind === 'animation'}}" id="anim-{{item.key}}" class="cyl-icon" style="position: absolute; left: 0; top: 0;"
-                             animation="{{item.animation}}" size="{{item.iconWidth}}" height="{{item.iconHeight}}"
+                             animation="{{item.animation}}" options="{{item.animationOptions}}" size="{{item.iconWidth}}" height="{{item.iconHeight}}"
                              speed="{{animationSpeed > 0 ? animationSpeed : item.styleSpeed}}" loops="{{animationLoops}}"
                              selected="{{item.selected}}" resting-progress="{{item.resting}}" disabled="{{!item.enabled}}" />
             <text wx:elif="{{item.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{item.iconStyle}}; font-size: {{item.glyphSize}}px;">{{item.glyph}}</text>

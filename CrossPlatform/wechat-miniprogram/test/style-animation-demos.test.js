@@ -102,8 +102,8 @@ test('styles: content, selected images and animations change the preview items; 
   styles.performAction(state, 'animation.rive');
   items = styles.configuration(state, t).sections[0].items;
   assert.deepEqual(items[1].animationOptions, { stateMachine: 'State Machine', input: 'isOpen', duration: '0' });
-  // Rive is not linked: the tags show their SF Symbols, as iOS without the Rive subspec.
-  assert.equal(animations.resolve(items[0].animation), null);
+  // Rive is linked (CYLTabBarController's cyl-rive): the tags play the exported .riv.bin files.
+  assert.equal(animations.resolve(items[0].animation).engine, 'rive');
   styles.performAction(state, 'selectedImage');
   assert.equal(styles.configuration(state, t).sections[0].items[0].selectedImage, undefined);
   state.selection = ['0-2'];
@@ -142,12 +142,12 @@ test('animations: eight sections in the iOS order, single choice, the first tag 
   assert.equal(m.style.imageSize, 28);
   assert.equal(m.sections[5].style.normal.backgroundColor, '#17203A');
   assert.equal(m.sections[3].items[5].animationRestingProgress, 1);
-  // Every Lottie and GIF file of the screen is in the package; PAG and Rive tags fall back to their (missing) images.
+  // Every Lottie, GIF and Rive file of the screen is in the package; PAG tags fall back to their (missing) images.
   m.sections.forEach((section) => section.items.forEach((item) => {
     if (!item.animation) return;
     const engine = model.animationEngine(item.animation);
     const resolved = animations.resolve(item.animation);
-    if (engine === 'lottie' || engine === 'gif') assert.ok(resolved, item.animation);
+    if (engine === 'lottie' || engine === 'gif' || engine === 'rive') assert.ok(resolved, item.animation);
     else assert.equal(resolved, null);
   }));
   for (const item of m.sections[7].items) {

@@ -137,6 +137,11 @@ def outputs():
             "last": f"/data/animations/gif/{stem}.last.png",
             **meta,
         }
+    # Rive files as *.riv.bin (a code package leaves out .riv files), played by CYLTabBarController's cyl-rive.
+    rives = {}
+    for path in sorted((BUNDLE / "Animations/Rive").glob("*.riv")):
+        files[OUT / f"rive/{path.name}.bin"] = path.read_bytes()
+        rives[f"Rive/{path.name}"] = {"engine": "rive", "src": f"/data/animations/rive/{path.name}.bin"}
     configuration = BUNDLE / "Configurations/animated-tags.json"
     files[OUT / "Configurations/animated-tags.json"] = configuration.read_bytes()
     for name in TAB_IMAGES:
@@ -146,13 +151,13 @@ def outputs():
              "/**",
              " * The animated icons of the iOS example (CYLMenuExample.bundle/Animations), by the path the iOS example uses",
              " * (\"Lottie/tab_home_animate.json\"). A Lottie entry loads its data on first use (`data()`); a GIF entry has",
-             " * the file, its first and last frames and the duration of one pass in milliseconds. PAG and Rive files are",
-             " * not here: their engines are not in the package (cyl-tag-list/engines.js).",
+             " * the file, its first and last frames and the duration of one pass in milliseconds; a Rive entry has its",
+             " * .riv.bin file. PAG files are not here: their engine is not in the package (cyl-tag-list/animations.js).",
              " */",
              "module.exports = {"]
     for key, (engine, loader) in registry.items():
         lines.append(f"  {json.dumps(key)}: {{ engine: '{engine}', data: () => {loader} }},")
-    for key, entry in gifs.items():
+    for key, entry in list(gifs.items()) + list(rives.items()):
         lines.append(f"  {json.dumps(key)}: {json.dumps(entry, ensure_ascii=False)},")
     lines.append("};")
     files[OUT / "index.js"] = ("\n".join(lines) + "\n").encode("utf-8")
