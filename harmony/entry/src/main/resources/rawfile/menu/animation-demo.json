@@ -101,22 +101,29 @@
    "title": "PAG · pod 'CYLTabBarController/PAG'",
    "items": [
     {
-     "title": "首页"
+     "title": "首页",
+     "animation": "asset:pag/tab_home.pag"
     },
     {
-     "title": "健康"
+     "title": "健康",
+     "animation": "asset:pag/tab_health.pag"
     },
     {
-     "title": "动态"
+     "title": "动态",
+     "animation": "asset:pag/tab_moments.pag"
     },
     {
-     "title": "我的"
+     "title": "我的",
+     "animation": "asset:pag/tab_me.pag"
     },
     {
-     "title": "动效一"
+     "title": "动效一",
+     "animation": "asset:pag/0.pag"
     },
     {
-     "title": "动效二"
+     "title": "动效二",
+     "animation": "asset:pag/1.pag",
+     "animationRestingProgress": 1
     }
    ]
   },
@@ -124,22 +131,49 @@
    "title": "Rive · pod 'CYLTabBarController/Rive'",
    "items": [
     {
-     "title": "首页"
+     "title": "首页",
+     "animation": "asset:rive/house.riv",
+     "animationOptions": {
+      "stateMachine": "State Machine 1"
+     }
     },
     {
-     "title": "完成"
+     "title": "完成",
+     "animation": "asset:rive/check.riv",
+     "animationOptions": {
+      "stateMachine": "State Machine 1",
+      "triggerInput": "Check"
+     }
     },
     {
-     "title": "菜单"
+     "title": "菜单",
+     "animation": "asset:rive/menu_button.riv",
+     "animationOptions": {
+      "stateMachine": "State Machine",
+      "input": "isOpen",
+      "duration": "0"
+     }
     },
     {
-     "title": "按钮"
+     "title": "按钮",
+     "animation": "asset:rive/button.riv",
+     "animationOptions": {
+      "animation": "active"
+     }
     },
     {
-     "title": "形状"
+     "title": "形状",
+     "animation": "asset:rive/shapes.riv",
+     "animationOptions": {
+      "legacy": "1"
+     }
     },
     {
-     "title": "卡车"
+     "title": "卡车",
+     "animation": "asset:rive/truck.riv",
+     "animationOptions": {
+      "legacy": "1"
+     }
     }
    ]
   },
@@ -159,19 +193,49 @@
    },
    "items": [
     {
-     "title": "聊天"
+     "title": "聊天",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "CHAT",
+      "stateMachine": "CHAT_Interactivity",
+      "input": "active"
+     }
     },
     {
-     "title": "搜索"
+     "title": "搜索",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "SEARCH",
+      "stateMachine": "SEARCH_Interactivity",
+      "input": "active"
+     }
     },
     {
-     "title": "计时"
+     "title": "计时",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "TIMER",
+      "stateMachine": "TIMER_Interactivity",
+      "input": "active"
+     }
     },
     {
-     "title": "提醒"
+     "title": "提醒",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "BELL",
+      "stateMachine": "BELL_Interactivity",
+      "input": "active"
+     }
     },
     {
-     "title": "我的"
+     "title": "我的",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "USER",
+      "stateMachine": "USER_Interactivity",
+      "input": "active"
+     }
     }
    ]
   },
@@ -179,16 +243,20 @@
    "title": "GIF · pod 'CYLTabBarController/GIF'",
    "items": [
     {
-     "title": "火焰"
+     "title": "火焰",
+     "animation": "asset:gif/tab_fire.gif"
     },
     {
-     "title": "火箭"
+     "title": "火箭",
+     "animation": "asset:gif/tab_rocket.gif"
     },
     {
-     "title": "星星"
+     "title": "星星",
+     "animation": "asset:gif/tab_star.gif"
     },
     {
-     "title": "示例"
+     "title": "示例",
+     "animation": "asset:gif/cyl_tab_sample_animated.gif"
     }
    ]
   },

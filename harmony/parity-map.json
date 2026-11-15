@@ -801,7 +801,14 @@
     "CYLTagListView.longPressAccessibilityActionName": "N/A: no custom accessibility actions in ArkUI (through API 21)",
     "CYLTagListCell.additionalAccessibilityActions": "N/A: no custom accessibility actions in ArkUI (through API 21)",
     "CYLImageTagGroupView.circleAccessibilityElement": "the dot's accessibility node in `CYLImageTagGroupViewComponent` (`accessibilityText` = `circleAccessibilityLabel`, activating it taps the dot)",
-    "CYLImageTagGroupView.accessibilityMoveStep": "`CYLImageTagGroupView.accessibilityMoveStep` (used by `accessibilityMove(dx, dy)`)"
+    "CYLImageTagGroupView.accessibilityMoveStep": "`CYLImageTagGroupView.accessibilityMoveStep` (used by `accessibilityMove(dx, dy)`)",
+    "CYLTagListView.titleView": "`CYLTagListState.titleView` (the CYLTagButton the list draws its title with)",
+    "CYLTagListView.titleLabel": "`CYLTagListState.titleLabel` (titleView.titleLabel)",
+    "CYLTagListView.tagButton(at:)": "`CYLTagListState.tagButton(indexPath)`",
+    "CYLTagListView.collectionView(_:cellForItemAt:)": "`CYLTagListState.cellForItemAt(indexPath)` (the rendered CYLTagListCell)",
+    "CYLTagListView.collectionView(_:viewForSupplementaryElementOfKind:at:)": "`CYLTagListState.viewForSupplementaryElementOfKind(kind, indexPath)` (CYLTagListSupplementaryView)",
+    "CYLImageTagView.imageView": "`CYLImageTagView.imageView` (CYLImageTagImageView drawn by the component)",
+    "CYLTagButton.animationView": "`CYLTagButton.animationView` (the live CYLAnimationPlayer: Lottie, PAG, Rive or GIF)"
   },
   "demos": [
     {
@@ -857,7 +864,7 @@
     {
       "ios": "CYLTagAnimationDemoViewController",
       "shows": "The animation sections, speed slider (0.25×–4×), loop switch, Play all",
-      "harmony": ""
+      "harmony": "`demos/menu/CYLTagAnimationPage` (Lottie, PAG, Rive, GIF through the library's CYLAnimationPlayer; speed slider, loop switch, Play all; Rive without speed, as the engine has none)"
     },
     {
       "ios": "CYLTagConfigurationDemoViewController",
@@ -924,6 +931,7 @@
     "2026-11-16: features 6 and 7, the classify menu and multiple filter (classify/) and the tag button, tag view and cells (tagviews/). Compile only. Score 758 / 807 = 93.9.",
     "2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7.",
     "2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3.",
-    "2026-11-16: four accessibility-action rows N/A (ArkUI through API 21 has only ACCESSIBILITY_CLICK); the image tag dot's accessibility node and move step mapped. Score 799 / 807 = 99.0."
+    "2026-11-16: four accessibility-action rows N/A (ArkUI through API 21 has only ACCESSIBILITY_CLICK); the image tag dot's accessibility node and move step mapped. Score 799 / 807 = 99.0.",
+    "2026-11-16: feature 9, animated icons with Lottie (@ohos/lottie 2.0.38), PAG (@tencent/libpag 4.4.31, the newest for API 12), Rive (@ohos/rive 1.0.4) and GIF (ImageKit frames on our timer), the animation screen, and the view handles (titleView, titleLabel, tagButton(at:), cells, supplementary views, imageView, animationView). Full marks: no TODO left. Compile only; device checks pending. Score 807 / 807 = 100.0."
   ]
 }
