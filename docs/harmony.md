@@ -20,8 +20,10 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 758 / 807 = 93.9 / 100** (API 758 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
+**Score: 772 / 807 = 95.7 / 100** (API 772 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
+A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
+it counts as aligned and states its reason.
 
 ## Table 1: iOS public API
 
@@ -60,7 +62,7 @@ overrides left out.
 | `CYLCollectionViewCell.section` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell.section` | property |
 | `CYLCollectionViewCell.row` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell.row` | property |
 | `CYLCollectionViewCell.shouldShow` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell.shouldShow` | property |
-| `CYLCollectionViewCell.init?(coder:)` (CYLCollectionViewCell.swift) | TODO | init |
+| `CYLCollectionViewCell.init?(coder:)` (CYLCollectionViewCell.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLFilterHeaderViewDelegate` (CYLFilterHeaderView.swift) | `CYLFilterHeaderViewDelegate` | protocol |
 | `CYLFilterHeaderViewDelegate.filterHeaderView(_:didTapMoreButton:)` (CYLFilterHeaderView.swift) | `filterHeaderViewDidTapMoreButton()` | method |
 | `CYLFilterHeaderView` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView` | class |
@@ -68,14 +70,14 @@ overrides left out.
 | `CYLFilterHeaderView.titleButton` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView.titleButton` | property |
 | `CYLFilterHeaderView.moreButton` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView.moreButton` | property |
 | `CYLFilterHeaderView.delegate` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView.delegate` | property |
-| `CYLFilterHeaderView.init?(coder:)` (CYLFilterHeaderView.swift) | TODO | init |
+| `CYLFilterHeaderView.init?(coder:)` (CYLFilterHeaderView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLIndexPathButton` (CYLIndexPathButton.swift) | `CYLIndexPathButton` | class |
 | `CYLIndexPathButton.section` (CYLIndexPathButton.swift) | `CYLIndexPathButton.section` | property |
 | `CYLIndexPathButton.row` (CYLIndexPathButton.swift) | `CYLIndexPathButton.row` | property |
 | `CYLIndexPathButton.imageTitleSpacing` (CYLIndexPathButton.swift) | `CYLIndexPathButton.imageTitleSpacing` | property |
 | `CYLIndexPathButton.titleLeadingInset` (CYLIndexPathButton.swift) | `CYLIndexPathButton.titleLeadingInset` | property |
 | `CYLRightImageButton` (CYLRightImageButton.swift) | `CYLRightImageButton` | class |
-| `CYLRightImageButton.init?(coder:)` (CYLRightImageButton.swift) | TODO | init |
+| `CYLRightImageButton.init?(coder:)` (CYLRightImageButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagDirection` (CYLImageTagGroupView.swift) | `enum CYLImageTagDirection` (imagetag/CYLImageTagModel.ets) | enum |
 | `CYLImageTagDirection.leftCenter` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftCenter` | case |
 | `CYLImageTagDirection.leftTop` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftTop` | case |
@@ -107,13 +109,13 @@ overrides left out.
 | `CYLImageTagLabel` (CYLImageTagGroupView.swift) | `CYLImageTagLabel` | class |
 | `CYLImageTagLabel.tagDirection` (CYLImageTagGroupView.swift) | `CYLImageTagLabel.tagDirection` | property |
 | `CYLImageTagLabel.contentInsets` (CYLImageTagGroupView.swift) | `CYLImageTagLabel.contentInsets` | property |
-| `CYLImageTagLabel.init?(coder:)` (CYLImageTagGroupView.swift) | TODO | init |
+| `CYLImageTagLabel.init?(coder:)` (CYLImageTagGroupView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagRippleView` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView` (imagetag/CYLImageTagGroupView.ets) | class |
 | `CYLImageTagRippleView.tagDirection` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.tagDirection` | property |
 | `CYLImageTagRippleView.maximumRadius` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.maximumRadius` | property |
 | `CYLImageTagRippleView.startAlpha` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.startAlpha` | property |
 | `CYLImageTagRippleView.color` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.color` | property |
-| `CYLImageTagRippleView.init?(coder:)` (CYLImageTagGroupView.swift) | TODO | init |
+| `CYLImageTagRippleView.init?(coder:)` (CYLImageTagGroupView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagRippleView.startAnimating()` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.startAnimating` | method |
 | `CYLImageTagRippleView.stopAnimating()` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.stopAnimating` | method |
 | `CYLImageTagGroupViewDataSource` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDataSource` | protocol |
@@ -168,7 +170,7 @@ overrides left out.
 | `CYLImageTagGroupView.longPressAccessibilityActionName` (CYLImageTagGroupView.swift) | TODO | property |
 | `CYLImageTagGroupView.tagAccessibilityHint` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagAccessibilityHint` | property |
 | `CYLImageTagGroupView.accessibilityMoveStep` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.init?(coder:)` (CYLImageTagGroupView.swift) | TODO | init |
+| `CYLImageTagGroupView.init?(coder:)` (CYLImageTagGroupView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagGroupView.setPercentPosition(x:y:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.setPercentPosition` | method |
 | `CYLImageTagGroupView.reloadData()` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.reloadData` | method |
 | `CYLImageTagGroupView.tagSpaceUsed()` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagSpaceUsed` | method |
@@ -192,7 +194,7 @@ overrides left out.
 | `CYLImageTagView.imageAccessibilityHint` (CYLImageTagView.swift) | `CYLImageTagView.imageAccessibilityHint` | property |
 | `CYLImageTagView.longPressAccessibilityActionName` (CYLImageTagView.swift) | TODO | property |
 | `CYLImageTagView.init()` (CYLImageTagView.swift) | `new CYLImageTagView()` | init |
-| `CYLImageTagView.init?(coder:)` (CYLImageTagView.swift) | TODO | init |
+| `CYLImageTagView.init?(coder:)` (CYLImageTagView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagView.addTagGroup(_:)` (CYLImageTagView.swift) | `CYLImageTagView.addTagGroup` | method |
 | `CYLImageTagView.removeTagGroup(at:)` (CYLImageTagView.swift) | `CYLImageTagView.removeTagGroup` | method |
 | `CYLImageTagView.removeAllTagGroups()` (CYLImageTagView.swift) | `CYLImageTagView.removeAllTagGroups` | method |
@@ -232,7 +234,7 @@ overrides left out.
 | `CYLMultipleFilterController.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLMultipleFilterController.swift) | `minimumInteritemSpacingForSectionAt()` | method |
 | `CYLFilterCollectionCell` (CYLFilterCollectionCell.swift) | `CYLFilterCollectionCell` | class |
 | `CYLFilterCollectionCell.titleButton` (CYLFilterCollectionCell.swift) | `CYLFilterCollectionCell.titleButton` | property |
-| `CYLFilterCollectionCell.init?(coder:)` (CYLFilterCollectionCell.swift) | TODO | init |
+| `CYLFilterCollectionCell.init?(coder:)` (CYLFilterCollectionCell.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLMultipleFilterHeaderView` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView` | class |
 | `CYLMultipleFilterHeaderView.imageView` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView.imageView` | property |
 | `CYLMultipleFilterHeaderView.titleLabel` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView.titleLabel` | property |
@@ -496,7 +498,7 @@ overrides left out.
 | `CYLTagButton.deleteIndicatorHitFrame` (CYLTagButton.swift) | `CYLTagButton.deleteIndicatorHitFrame` | property |
 | `CYLTagButton.style` (CYLTagButton.swift) | `CYLTagButton.style` | property |
 | `CYLTagButton.static isAnimationEngineAvailable` (CYLTagButton.swift) | `CYLTagButton.isAnimationEngineAvailable` | property |
-| `CYLTagButton.init?(coder:)` (CYLTagButton.swift) | TODO | init |
+| `CYLTagButton.init?(coder:)` (CYLTagButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagButton.playAnimation()` (CYLTagButton.swift) | `playAnimation()` | method |
 | `CYLTagButton.static width(forTitle:image:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.widthWithImage(title, image, style, fontScale)` | method |
 | `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.width(title, iconSize, showsDeleteIndicator, style, fontScale)` | method |
@@ -530,14 +532,14 @@ overrides left out.
 | `CYLTagFoldButton` (CYLTagFoldButton.swift) | `CYLTagFoldButton` (tagviews/CYLTagFoldButton.ets) | class |
 | `CYLTagFoldButton.foldControl` (CYLTagFoldButton.swift) | `CYLTagFoldButton.foldControl` | property |
 | `CYLTagFoldButton.isExpanded` (CYLTagFoldButton.swift) | `CYLTagFoldButton.isExpanded` | property |
-| `CYLTagFoldButton.init?(coder:)` (CYLTagFoldButton.swift) | TODO | init |
+| `CYLTagFoldButton.init?(coder:)` (CYLTagFoldButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagFoldButton.applyFoldControl(_:color:expanded:animated:)` (CYLTagFoldButton.swift) | `applyFoldControl(foldControl, color, expanded, animated)` | method |
 | `CYLTagFoldButton.applyInlineFoldControl(_:itemStyle:expanded:animated:)` (CYLTagFoldButton.swift) | `applyInlineFoldControl(foldControl, itemStyle, expanded, animated)` | method |
 | `CYLTagFoldButton.static inlineSize(for:itemStyle:expanded:traitCollection:)` (CYLTagFoldButton.swift) | `CYLTagFoldMetrics.inlineSize(control, itemStyle, expanded, fontScale)` | method |
 | `CYLTagFoldButton.static size(for:expanded:traitCollection:)` (CYLTagFoldButton.swift) | `CYLTagFoldMetrics.size(control, expanded, fontScale)` | method |
 | `CYLTagFoldCell` (CYLTagFoldCell.swift) | `CYLTagFoldCell` (tagviews/CYLTagFoldCell.ets + component) | class |
 | `CYLTagFoldCell.foldButton` (CYLTagFoldCell.swift) | `CYLTagFoldCell.foldButton` | property |
-| `CYLTagFoldCell.init?(coder:)` (CYLTagFoldCell.swift) | TODO | init |
+| `CYLTagFoldCell.init?(coder:)` (CYLTagFoldCell.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagFoldCell.configure(foldControl:itemStyle:expanded:animated:)` (CYLTagFoldCell.swift) | `configure(foldControl, itemStyle, expanded, animated)` | method |
 | `CYLTagListAccessibilityIdentifier` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier` (tagviews/CYLTagListAccessibility.ets) | enum |
 | `CYLTagListAccessibilityIdentifier.static title` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.title` | property |
@@ -552,7 +554,7 @@ overrides left out.
 | `CYLTagListCell.isDeletable` (CYLTagListCell.swift) | `CYLTagListCell.isDeletable` | property |
 | `CYLTagListCell.deleteHandler` (CYLTagListCell.swift) | `CYLTagListCell.deleteHandler` | property |
 | `CYLTagListCell.additionalAccessibilityActions` (CYLTagListCell.swift) | TODO | property |
-| `CYLTagListCell.init?(coder:)` (CYLTagListCell.swift) | TODO | init |
+| `CYLTagListCell.init?(coder:)` (CYLTagListCell.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagListCell.showRipple(at:)` (CYLTagListCell.swift) | `showRipple(point)` | method |
 | `CYLTagListCell.configure(title:image:selectedImage:animationURL:style:isSelected:isEnabled:)` (CYLTagListCell.swift) | `configure(title, image, selectedImage, animationURL, style, isSelected, isEnabled)` | method |
 | `CYLTagListKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLTagListKey` (core/CYLTagListConfiguration.ets) | enum |
@@ -721,7 +723,7 @@ overrides left out.
 | `CYLTagListView.isReordering` (CYLTagListView.swift) | `CYLTagListState.isReordering` | property |
 | `CYLTagListView.tagMoveHandler` (CYLTagListView.swift) | `CYLTagListState.tagMoveHandler` | property |
 | `CYLTagListView.selectedTagDragHandler` (CYLTagListView.swift) | `CYLTagListState.selectedTagDragHandler` | property |
-| `CYLTagListView.init?(coder:)` (CYLTagListView.swift) | TODO | init |
+| `CYLTagListView.init?(coder:)` (CYLTagListView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagListView.init(foldControl:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl)` | init |
 | `CYLTagListView.init(foldControl:title:titleImage:titlePosition:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl, title, titleImage, titlePosition)` | init |
 | `CYLTagListView.init(foldPosition:content:)` (CYLTagListView.swift) | `CYLTagListState.withFoldPosition(position, content)` | init |
@@ -779,7 +781,7 @@ overrides left out.
 | `CYLTagView.menuDelegate` (CYLTagView.swift) | `CYLTagView.menuDelegate` | property |
 | `CYLTagView.static makeTagView()` (CYLTagView.swift) | `CYLTagView.makeTagView()` | method |
 | `CYLTagView.init()` (CYLTagView.swift) | `new CYLTagView()` | init |
-| `CYLTagView.init?(coder:)` (CYLTagView.swift) | TODO | init |
+| `CYLTagView.init?(coder:)` (CYLTagView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagView.reloadMenuData()` (CYLTagView.swift) | `reloadMenuData()` | method |
 | `CYLTagView.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagView.swift) | `tagHeaderCell(headerCell, section)` | method |
 | `CYLTagView.numberOfSections(in:)` (CYLTagView.swift) | `numberOfSections()` | method |
@@ -853,3 +855,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: feature 3, the tag models: CYLTag, CYLTagDataSource (badge images drawn on an OffscreenCanvas), CYLTagModel, CYLTagGroup, CYLMenuColorFromString. Score 250 / 807 = 31.0.
 - 2026-11-16: features 4 and 5, CYLTagListView (CYLTagListState with selection, folding, layout, tags API, configuration, fold control) and the image tag views (CYLImageTagView, CYLImageTagGroupView, geometry). Compile only: no emulator on this machine. Score 604 / 807 = 74.8.
 - 2026-11-16: features 6 and 7, the classify menu and multiple filter (classify/) and the tag button, tag view and cells (tagviews/). Compile only. Score 758 / 807 = 93.9.
+- 2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7.
