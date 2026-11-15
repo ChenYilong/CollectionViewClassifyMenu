@@ -162,6 +162,26 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
   > 替换截图中的文案，并全项目搜索图片中的关键词，从文档，代码，本地数据库中删除。并在文档中加入android相关文档中附带截图 标注为TODO continue
 
+## TODO (2026-11-16): HarmonyOS score sheet, accessibility and localization
+
+- **Context:** the HarmonyOS port (`harmony/classifymenu`, `harmony/entry`, the Flutter and React Native HarmonyOS
+  shells) has no score sheet of the iOS API; its strings are partly literals in code; screen-reader support is
+  partial. The emulator is not to be used for this round.
+- **Requirements:** (1) a HarmonyOS score sheet for this project: every public iOS core symbol with its ArkTS
+  counterpart, the rest marked "TODO: N/A on HarmonyOS" with a reason; (2) accessibility (screen reader, visual
+  assistance) in all HarmonyOS code; (3) internationalization and localization through resource files (copied from
+  CYLTabBarController's format, filtered to the texts this project uses); (4) record in English, in the instructions
+  documents and the related skills (create them if missing): all code supports accessibility and localization; add it
+  first where missing; automated UI tests locate controls, tap and run multi-step flows through accessibility first.
+- **Prompt (verbatim):** "continue 在不需要模拟器的前提下开始代码开发。继续完成鸿蒙评分表。marking the rest "TODO: N/A on HarmonyOS" with a reason. 适配视觉辅助 盲人辅助 为鸿蒙代码 。 适配国际化本地化，本地化文件可以从CYLTabBarController中复制一份过来。筛选本项目用到的文字。并将下面的内容规则写入instructions相关文件并写入skills相关文件，如果相关文件不存在就新建文件确保成功。全英文写入：本项目全部代码已经支持适配视觉辅助 盲人辅助 为鸿蒙代码 。 适配国际化本地化，本地化文件。如果发现不支持请先支持，然后在自动化UI测试过程中，优先使用刚刚提到的功能进行UI控件定位。触发点击事件，或者触发复杂流程，连续操作等。"
+- **Prompt (English):** continue, starting code development without the emulator: continue the HarmonyOS score sheet,
+  marking the rest "TODO: N/A on HarmonyOS" with a reason; add visual and screen-reader accessibility to the HarmonyOS
+  code; add internationalization and localization (localization files may be copied from CYLTabBarController, keeping
+  the texts this project uses); write the rule above in English into the instructions and skills files, creating them
+  if missing.
+- **Decision (user, 2026-11-16):** a new score sheet for this project (not CYLTabBarController's
+  `HarmonyOS-Parity.md`, which another session owns).
+
 ## DONE (2026-11-16, logged as TODO 2026-11-12): HarmonyOS NEXT support for Android and the cross-platform components
 
 - **Status:** DONE 2026-11-16: step 1 (ArkTS library and example), step 2 (Flutter) and step 3 (React Native),
