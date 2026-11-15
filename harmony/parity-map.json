@@ -795,7 +795,13 @@
     "CYLTagFoldCell.init?(coder:)": "N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code",
     "CYLTagListCell.init?(coder:)": "N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code",
     "CYLTagListView.init?(coder:)": "N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code",
-    "CYLTagView.init?(coder:)": "N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code"
+    "CYLTagView.init?(coder:)": "N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code",
+    "CYLImageTagGroupView.longPressAccessibilityActionName": "N/A: ArkUI (through API 21) has no custom accessibility actions, only ACCESSIBILITY_CLICK (onAccessibilityActionIntercept), so there is no long-press action to name",
+    "CYLImageTagView.longPressAccessibilityActionName": "N/A: no custom accessibility actions in ArkUI (through API 21)",
+    "CYLTagListView.longPressAccessibilityActionName": "N/A: no custom accessibility actions in ArkUI (through API 21)",
+    "CYLTagListCell.additionalAccessibilityActions": "N/A: no custom accessibility actions in ArkUI (through API 21)",
+    "CYLImageTagGroupView.circleAccessibilityElement": "the dot's accessibility node in `CYLImageTagGroupViewComponent` (`accessibilityText` = `circleAccessibilityLabel`, activating it taps the dot)",
+    "CYLImageTagGroupView.accessibilityMoveStep": "`CYLImageTagGroupView.accessibilityMoveStep` (used by `accessibilityMove(dx, dy)`)"
   },
   "demos": [
     {
@@ -917,6 +923,7 @@
     "2026-11-16: features 4 and 5, CYLTagListView (CYLTagListState with selection, folding, layout, tags API, configuration, fold control) and the image tag views (CYLImageTagView, CYLImageTagGroupView, geometry). Compile only: no emulator on this machine. Score 604 / 807 = 74.8.",
     "2026-11-16: features 6 and 7, the classify menu and multiple filter (classify/) and the tag button, tag view and cells (tagviews/). Compile only. Score 758 / 807 = 93.9.",
     "2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7.",
-    "2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3."
+    "2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3.",
+    "2026-11-16: four accessibility-action rows N/A (ArkUI through API 21 has only ACCESSIBILITY_CLICK); the image tag dot's accessibility node and move step mapped. Score 799 / 807 = 99.0."
   ]
 }
