@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "speed",
+      "value": "速度"
+    },
+    {
+      "name": "speed_value",
+      "value": "%s 倍"
+    },
+    {
+      "name": "loop",
+      "value": "循环"
+    },
+    {
+      "name": "play_all",
+      "value": "全部播放"
+    },
+    {
+      "name": "animated_icons",
+      "value": "动画图标"
+    },
+    {
+      "name": "tapped",
+      "value": "点击了 %s"
+    }
+  ]
+}

@@ -11,6 +11,30 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "speed",
+      "value": "Speed"
+    },
+    {
+      "name": "speed_value",
+      "value": "%s times"
+    },
+    {
+      "name": "loop",
+      "value": "Loop"
+    },
+    {
+      "name": "play_all",
+      "value": "Play all"
+    },
+    {
+      "name": "animated_icons",
+      "value": "Animated icons"
+    },
+    {
+      "name": "tapped",
+      "value": "Tapped %s"
     }
   ]
 }

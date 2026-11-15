@@ -185,8 +185,25 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
     `tools/hvigor/bin/hvigorw.js assembleHap --no-daemon` (unsigned HAP); tests `hvigorw.js test -p module=entry`.
   - **Evidence:** local unit tests (hypium, `entry/src/test/LocalUnit.test.ets`): `Tests run: 5, Failure: 0, Pass: 5`.
     On the emulator: unfold, select Home ("Tapped Home"), Classify 83 places → 川菜 3 → filter 广州 1 place.
-  - **Not yet:** animated icons and the playback controls (`example-demo-rules.md`; needs a Lottie player for
-    ArkTS, `@ohos/lottie`); UI tests (`uitest`) as a script.
+  - **Animated icons: DONE (2026-11-15).** The core draws an item's `animation` (`asset:<file>`, a rawfile; or JSON
+    text) with `@ohos/lottie` 2.0.38 (`CYLLottieIcon`), sized by `style.imageSize`; `animationSpeed`,
+    `animationLoops` and `CYLTagListController.playAll()` (from progress 0) act at once on icons that are playing.
+    The Tags tab has the speed slider (0.25x–4x, step 0.25, value shown), the Loop switch and Play all, labeled for
+    the screen reader and localized (`base`, `zh_CN` string resources). Unit tests: `Tests run: 6, Pass: 6`. On the
+    emulator: 2×, Loop on, two consecutive screenshots differ (the icons play). Screenshot (same environment as
+    below, 2026-11-15 05:53 emulator time):
+
+    <img src="assets/harmonyos-animation-playback-controls.jpeg" width="360" alt="HarmonyOS: speed 2x, loop on, Lottie icons">
+
+  - **UI tests as a script: DONE (2026-11-16).** `harmony/scripts/ui-test.sh` builds the example and its
+    instrumented test, installs both on the running emulator and runs `aa test`; it fails unless every test passes.
+    `entry/src/ohosTest/ets/test/ExampleUi.test.ets` (`@kit.TestKit` `Driver`, by id and text, no coordinates
+    except the slider's drag): unfold, tap a tag ("Tapped …"), loop switch toggles, slider dragged to 4× (read from
+    its localized accessibility description), Play all; Classify: Reset → `全部: 83 places`, 川菜 filters, Reset →
+    83 again. Found while writing it: the speed label is hidden from the screen reader, so tests read the slider's
+    description; tag ids repeat across tabs, so the Classify page has the id `classifyPage`. Result on the emulator
+    (same environment as below): `Tests run: 3, Failure: 0, Error: 0, Pass: 3`.
+    Original TODO prompt (verbatim): "continue".
   - **Screenshots:** HarmonyOS 6.0.1 SDK (API 21), Mate 70 Pro emulator `6.0.0.112(SP3DEVC00E112R4P11)`, DevEco
     Studio hvigor 6.21.2, macOS 27.3, branch `feat/android-kotlin` at the commit that adds them, 2026-11-15 09:48 NZDT.
     Top to bottom: Tags unfolded with Home selected; Classify with 川菜 and the 广州 filter; the Filter sheet.
