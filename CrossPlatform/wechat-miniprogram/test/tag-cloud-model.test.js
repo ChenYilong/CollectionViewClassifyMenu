@@ -16,7 +16,7 @@ test('colors are read as UIColor.cylMenuColor(from:) reads them (#RRGGBBAA is re
 
 test('CYLMenuStyle() has gray bordered tags, a green selection, 30 pt tags', () => {
   const style = model.defaultStyle();
-  assert.equal(style.normal.backgroundColor, '#FFFFFF');
+  assert.equal(style.normal.backgroundColor, '#F2F2F7');
   assert.equal(style.normal.textColor, 'rgb(64, 64, 64)');
   assert.equal(style.normal.cornerRadius, 3);
   assert.equal(style.selected.backgroundColor, 'rgb(42, 185, 160)');

@@ -108,7 +108,7 @@ function industryButton(industry) {
  * 13 pt white 0.6 (the headers are drawn by the page: see the page's notes).
  */
 function maimaiStyle() {
-  const look = { cornerRadius: 2, borderColor: '#CCCCCC', borderWidth: 1, textColor: '#595959', backgroundColor: '#FFFFFF' };
+  const look = { cornerRadius: 2, borderColor: '#CCCCCC', borderWidth: 1, textColor: '#595959', backgroundColor: '#F2F2F7' };
   return {
     font: 14,
     itemHeight: 32,

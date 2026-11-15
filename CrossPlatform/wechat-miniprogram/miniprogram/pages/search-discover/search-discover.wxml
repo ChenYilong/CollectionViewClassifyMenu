@@ -18,6 +18,28 @@
   </view>
 
   <scroll-view scroll-y class="content" enhanced bounces>
+    <!-- The results of the last search (搜索, the keyboard's search key, a recent search or a topic), or the empty
+         placeholder; clearing the field shows 最近搜索 and 发现 again. -->
+    <view wx:if="{{resultsShown}}" class="section results" id="searchResults">
+      <view class="header">
+        <text class="header-title" aria-role="heading">{{resultTexts.title}}</text>
+      </view>
+      <text class="results-summary">{{resultTexts.summary}}</text>
+      <view wx:for="{{results}}" wx:key="title" class="result" hover-class="topic-pressed" data-title="{{item.title}}"
+            bindtap="onResultTap" aria-role="button" aria-label="{{item.hot ? item.title + ', ' + labels.hotValue : item.title}}">
+        <image class="result-icon" src="/images/search/magnifyingglass.svg" mode="aspectFit" aria-hidden="true" />
+        <text class="result-title">{{item.title}}</text>
+        <image wx:if="{{item.hot}}" class="topic-hot" src="{{hot.src}}" mode="aspectFit"
+               style="width: {{hot.width}}px; height: {{hot.height}}px;" aria-hidden="true" />
+      </view>
+      <view wx:if="{{!results.length}}" class="empty" id="searchEmpty">
+        <image class="empty-image" src="/images/search/magnifyingglass.svg" mode="aspectFit" aria-hidden="true" />
+        <text class="empty-title">{{resultTexts.emptyTitle}}</text>
+        <text class="empty-hint">{{resultTexts.emptyHint}}</text>
+      </view>
+    </view>
+
+    <block wx:if="{{!resultsShown}}">
     <!-- 最近搜索: no section at all once cleared. -->
     <view wx:if="{{searches.length}}" class="section recent">
       <view class="header">
@@ -70,6 +92,7 @@
         </view>
       </view>
     </view>
+    </block>
   </scroll-view>
 
   <!-- The hint and the mic button on the light curved area. -->
