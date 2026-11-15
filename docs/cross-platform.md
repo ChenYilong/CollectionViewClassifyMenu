@@ -77,6 +77,15 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   Classify and the tab bar: DONE later the same day (section "CYLTabBarController's tab bar in the React Native
   HarmonyOS example").
 
+## TODO (2026-11-16): the plus button from the configuration file on HarmonyOS
+
+- **Context:** CYLTabBarController's HarmonyOS configuration parser (`CYLTabBarConfiguration.ets`, `548892a`) reads
+  the tabs but not `CYLTabBarControllerPlusButton`, so `harmony-example` sets the raised Post button in code.
+- **Requirements:** parse the plus button keys the iOS library reads (image, selected image, title, index, centerY
+  offset, page identifier) in CYLTabBarController (a branch off `feat/harmonyos-component` with a pull request into
+  it, since another session owns that branch); then move the example's plus button into its configuration file.
+- **Prompt (verbatim):** "continue"
+
 ## DONE (2026-11-16): CYLTabBarController's tab bar in the React Native HarmonyOS example
 
 - **Context:** `react-native/react-native-cyl-tag-list/harmony-example` shows only the Tags page, with no tab bar; the
