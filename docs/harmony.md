@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 250 / 807 = 31.0 / 100** (API 250 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
+**Score: 604 / 807 = 74.8 / 100** (API 604 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 
 ## Table 1: iOS public API
@@ -76,131 +76,131 @@ overrides left out.
 | `CYLIndexPathButton.titleLeadingInset` (CYLIndexPathButton.swift) | TODO | property |
 | `CYLRightImageButton` (CYLRightImageButton.swift) | TODO | class |
 | `CYLRightImageButton.init?(coder:)` (CYLRightImageButton.swift) | TODO | init |
-| `CYLImageTagDirection` (CYLImageTagGroupView.swift) | TODO | enum |
-| `CYLImageTagDirection.leftCenter` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.leftTop` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.leftTopStraight` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.leftBottom` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.leftBottomStraight` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.rightCenter` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.rightTop` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.rightTopStraight` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.rightBottom` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.rightBottomStraight` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.center` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagDirection.next` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTag` (CYLImageTagGroupView.swift) | TODO | class |
-| `CYLImageTag.title` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTag.direction` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTag.link` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTag.userInfo` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTag.init(title:direction:link:userInfo:)` (CYLImageTagGroupView.swift) | TODO | init |
-| `CYLImageTag.copy()` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroup` (CYLImageTagGroupView.swift) | TODO | class |
-| `CYLImageTagGroup.tags` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroup.percentPosition` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroup.init(tags:percentPosition:)` (CYLImageTagGroupView.swift) | TODO | init |
-| `CYLImageTagGroup.static defaultDirections(forTagCount:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroup.copy()` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagItem` (CYLImageTagGroupView.swift) | TODO | protocol |
-| `CYLImageTagItem.tagDirection` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagLabel` (CYLImageTagGroupView.swift) | TODO | class |
-| `CYLImageTagLabel.tagDirection` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagLabel.contentInsets` (CYLImageTagGroupView.swift) | TODO | property |
+| `CYLImageTagDirection` (CYLImageTagGroupView.swift) | `enum CYLImageTagDirection` (imagetag/CYLImageTagModel.ets) | enum |
+| `CYLImageTagDirection.leftCenter` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftCenter` | case |
+| `CYLImageTagDirection.leftTop` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftTop` | case |
+| `CYLImageTagDirection.leftTopStraight` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftTopStraight` | case |
+| `CYLImageTagDirection.leftBottom` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftBottom` | case |
+| `CYLImageTagDirection.leftBottomStraight` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftBottomStraight` | case |
+| `CYLImageTagDirection.rightCenter` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.rightCenter` | case |
+| `CYLImageTagDirection.rightTop` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.rightTop` | case |
+| `CYLImageTagDirection.rightTopStraight` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.rightTopStraight` | case |
+| `CYLImageTagDirection.rightBottom` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.rightBottom` | case |
+| `CYLImageTagDirection.rightBottomStraight` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.rightBottomStraight` | case |
+| `CYLImageTagDirection.center` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.center` | case |
+| `CYLImageTagDirection.next` (CYLImageTagGroupView.swift) | `CYLImageTagDirections.next(direction)` | property |
+| `CYLImageTag` (CYLImageTagGroupView.swift) | `CYLImageTag` (imagetag/CYLImageTagModel.ets) | class |
+| `CYLImageTag.title` (CYLImageTagGroupView.swift) | `CYLImageTag.title` | property |
+| `CYLImageTag.direction` (CYLImageTagGroupView.swift) | `CYLImageTag.direction` | property |
+| `CYLImageTag.link` (CYLImageTagGroupView.swift) | `CYLImageTag.link` | property |
+| `CYLImageTag.userInfo` (CYLImageTagGroupView.swift) | `CYLImageTag.userInfo` | property |
+| `CYLImageTag.init(title:direction:link:userInfo:)` (CYLImageTagGroupView.swift) | `new CYLImageTag(title, direction, link, userInfo)` | init |
+| `CYLImageTag.copy()` (CYLImageTagGroupView.swift) | `CYLImageTag.copy` | method |
+| `CYLImageTagGroup` (CYLImageTagGroupView.swift) | `CYLImageTagGroup` | class |
+| `CYLImageTagGroup.tags` (CYLImageTagGroupView.swift) | `CYLImageTagGroup.tags` | property |
+| `CYLImageTagGroup.percentPosition` (CYLImageTagGroupView.swift) | `CYLImageTagGroup.percentPosition` | property |
+| `CYLImageTagGroup.init(tags:percentPosition:)` (CYLImageTagGroupView.swift) | `new CYLImageTagGroup(tags, percentPosition)` | init |
+| `CYLImageTagGroup.static defaultDirections(forTagCount:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroup.defaultDirections(count)` | method |
+| `CYLImageTagGroup.copy()` (CYLImageTagGroupView.swift) | `CYLImageTagGroup.copy` | method |
+| `CYLImageTagItem` (CYLImageTagGroupView.swift) | `CYLImageTagItem` | protocol |
+| `CYLImageTagItem.tagDirection` (CYLImageTagGroupView.swift) | `CYLImageTagItem.tagDirection` | property |
+| `CYLImageTagLabel` (CYLImageTagGroupView.swift) | `CYLImageTagLabel` | class |
+| `CYLImageTagLabel.tagDirection` (CYLImageTagGroupView.swift) | `CYLImageTagLabel.tagDirection` | property |
+| `CYLImageTagLabel.contentInsets` (CYLImageTagGroupView.swift) | `CYLImageTagLabel.contentInsets` | property |
 | `CYLImageTagLabel.init?(coder:)` (CYLImageTagGroupView.swift) | TODO | init |
-| `CYLImageTagRippleView` (CYLImageTagGroupView.swift) | TODO | class |
-| `CYLImageTagRippleView.tagDirection` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagRippleView.maximumRadius` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagRippleView.startAlpha` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagRippleView.color` (CYLImageTagGroupView.swift) | TODO | property |
+| `CYLImageTagRippleView` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView` (imagetag/CYLImageTagGroupView.ets) | class |
+| `CYLImageTagRippleView.tagDirection` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.tagDirection` | property |
+| `CYLImageTagRippleView.maximumRadius` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.maximumRadius` | property |
+| `CYLImageTagRippleView.startAlpha` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.startAlpha` | property |
+| `CYLImageTagRippleView.color` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.color` | property |
 | `CYLImageTagRippleView.init?(coder:)` (CYLImageTagGroupView.swift) | TODO | init |
-| `CYLImageTagRippleView.startAnimating()` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagRippleView.stopAnimating()` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupViewDataSource` (CYLImageTagGroupView.swift) | TODO | protocol |
-| `CYLImageTagGroupViewDataSource.numberOfTags(in:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupViewDataSource.groupView(_:viewForTagAt:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupViewDelegate` (CYLImageTagGroupView.swift) | TODO | protocol |
-| `CYLImageTagGroupViewDelegate.groupViewDidTapCircle(_:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupViewDelegate.groupView(_:didTapTagAt:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupViewDelegate.groupViewDidLongPress(_:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupViewDelegate.groupView(_:didDragToPercentPosition:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView` (CYLImageTagGroupView.swift) | TODO | class |
-| `CYLImageTagGroupView.static defaultCircleRadius` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.static defaultCircleInnerRadius` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.static defaultVerticalDistance` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.static defaultTiltDistance` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.static defaultLineWidth` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.static maximumTagCount` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.static defaultRippleMaxRadius` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.AnimatableValue` (CYLImageTagGroupView.swift) | TODO | enum |
-| `CYLImageTagGroupView.AnimatableValue.circleRadius` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagGroupView.AnimatableValue.circleInnerRadius` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagGroupView.AnimatableValue.linesProgress` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagGroupView.AnimatableValue.tagAlpha` (CYLImageTagGroupView.swift) | TODO | case |
-| `CYLImageTagGroupView.circleRadius` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.circleInnerRadius` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.lineWidth` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.verticalDistance` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.tiltDistance` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.circleColor` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.circleInnerColor` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.lineColor` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.percentPosition` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.centerPoint` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.displayOffset` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.occupiedFrame` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.tags` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.dataSource` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.tagViews` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.tagLabelConfiguration` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.showsRipple` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.rippleMaxRadius` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.rippleAlpha` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.rippleView` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.linesProgress` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.tagAlpha` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.isGroupHidden` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.showAnimation` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.hideAnimation` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.delegate` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.isDraggable` (CYLImageTagGroupView.swift) | TODO | property |
+| `CYLImageTagRippleView.startAnimating()` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.startAnimating` | method |
+| `CYLImageTagRippleView.stopAnimating()` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.stopAnimating` | method |
+| `CYLImageTagGroupViewDataSource` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDataSource` | protocol |
+| `CYLImageTagGroupViewDataSource.numberOfTags(in:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDataSource.numberOfTags` | method |
+| `CYLImageTagGroupViewDataSource.groupView(_:viewForTagAt:)` (CYLImageTagGroupView.swift) | `viewForTagAt` | method |
+| `CYLImageTagGroupViewDelegate` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDelegate` | protocol |
+| `CYLImageTagGroupViewDelegate.groupViewDidTapCircle(_:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDelegate.groupViewDidTapCircle` | method |
+| `CYLImageTagGroupViewDelegate.groupView(_:didTapTagAt:)` (CYLImageTagGroupView.swift) | `didTapTagAt` | method |
+| `CYLImageTagGroupViewDelegate.groupViewDidLongPress(_:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDelegate.groupViewDidLongPress` | method |
+| `CYLImageTagGroupViewDelegate.groupView(_:didDragToPercentPosition:)` (CYLImageTagGroupView.swift) | `didDragToPercentPosition` | method |
+| `CYLImageTagGroupView` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView` (imagetag/CYLImageTagGroupView.ets (+ CYLImageTagGroupViewComponent)) | class |
+| `CYLImageTagGroupView.static defaultCircleRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.defaultCircleRadius` | property |
+| `CYLImageTagGroupView.static defaultCircleInnerRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.defaultCircleInnerRadius` | property |
+| `CYLImageTagGroupView.static defaultVerticalDistance` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.defaultVerticalDistance` | property |
+| `CYLImageTagGroupView.static defaultTiltDistance` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.defaultTiltDistance` | property |
+| `CYLImageTagGroupView.static defaultLineWidth` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.defaultLineWidth` | property |
+| `CYLImageTagGroupView.static maximumTagCount` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.maximumTagCount` | property |
+| `CYLImageTagGroupView.static defaultRippleMaxRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.defaultRippleMaxRadius` | property |
+| `CYLImageTagGroupView.AnimatableValue` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewAnimatableValue` | enum |
+| `CYLImageTagGroupView.AnimatableValue.circleRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewAnimatableValue.circleRadius` | case |
+| `CYLImageTagGroupView.AnimatableValue.circleInnerRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewAnimatableValue.circleInnerRadius` | case |
+| `CYLImageTagGroupView.AnimatableValue.linesProgress` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewAnimatableValue.linesProgress` | case |
+| `CYLImageTagGroupView.AnimatableValue.tagAlpha` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewAnimatableValue.tagAlpha` | case |
+| `CYLImageTagGroupView.circleRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.circleRadius` | property |
+| `CYLImageTagGroupView.circleInnerRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.circleInnerRadius` | property |
+| `CYLImageTagGroupView.lineWidth` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.lineWidth` | property |
+| `CYLImageTagGroupView.verticalDistance` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.verticalDistance` | property |
+| `CYLImageTagGroupView.tiltDistance` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tiltDistance` | property |
+| `CYLImageTagGroupView.circleColor` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.circleColor` | property |
+| `CYLImageTagGroupView.circleInnerColor` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.circleInnerColor` | property |
+| `CYLImageTagGroupView.lineColor` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.lineColor` | property |
+| `CYLImageTagGroupView.percentPosition` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.percentPosition` | property |
+| `CYLImageTagGroupView.centerPoint` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.centerPoint` | property |
+| `CYLImageTagGroupView.displayOffset` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.displayOffset` | property |
+| `CYLImageTagGroupView.occupiedFrame` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.occupiedFrame` | property |
+| `CYLImageTagGroupView.tags` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tags` | property |
+| `CYLImageTagGroupView.dataSource` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.dataSource` | property |
+| `CYLImageTagGroupView.tagViews` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagViews` | property |
+| `CYLImageTagGroupView.tagLabelConfiguration` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagLabelConfiguration` | property |
+| `CYLImageTagGroupView.showsRipple` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.showsRipple` | property |
+| `CYLImageTagGroupView.rippleMaxRadius` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.rippleMaxRadius` | property |
+| `CYLImageTagGroupView.rippleAlpha` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.rippleAlpha` | property |
+| `CYLImageTagGroupView.rippleView` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.rippleView` | property |
+| `CYLImageTagGroupView.linesProgress` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.linesProgress` | property |
+| `CYLImageTagGroupView.tagAlpha` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagAlpha` | property |
+| `CYLImageTagGroupView.isGroupHidden` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.isGroupHidden` | property |
+| `CYLImageTagGroupView.showAnimation` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.showAnimation` | property |
+| `CYLImageTagGroupView.hideAnimation` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.hideAnimation` | property |
+| `CYLImageTagGroupView.delegate` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.delegate` | property |
+| `CYLImageTagGroupView.isDraggable` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.isDraggable` | property |
 | `CYLImageTagGroupView.circleAccessibilityElement` (CYLImageTagGroupView.swift) | TODO | property |
 | `CYLImageTagGroupView.longPressAccessibilityActionName` (CYLImageTagGroupView.swift) | TODO | property |
-| `CYLImageTagGroupView.tagAccessibilityHint` (CYLImageTagGroupView.swift) | TODO | property |
+| `CYLImageTagGroupView.tagAccessibilityHint` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagAccessibilityHint` | property |
 | `CYLImageTagGroupView.accessibilityMoveStep` (CYLImageTagGroupView.swift) | TODO | property |
 | `CYLImageTagGroupView.init?(coder:)` (CYLImageTagGroupView.swift) | TODO | init |
-| `CYLImageTagGroupView.setPercentPosition(x:y:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView.reloadData()` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView.tagSpaceUsed()` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView.originForTag(of:direction:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView.value(of:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView.animate(_:values:duration:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView.show(animated:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagGroupView.hide(animated:)` (CYLImageTagGroupView.swift) | TODO | method |
-| `CYLImageTagView` (CYLImageTagView.swift) | TODO | class |
+| `CYLImageTagGroupView.setPercentPosition(x:y:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.setPercentPosition` | method |
+| `CYLImageTagGroupView.reloadData()` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.reloadData` | method |
+| `CYLImageTagGroupView.tagSpaceUsed()` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.tagSpaceUsed` | method |
+| `CYLImageTagGroupView.originForTag(of:direction:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.originForTag` | method |
+| `CYLImageTagGroupView.value(of:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.value` | method |
+| `CYLImageTagGroupView.animate(_:values:duration:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.animate` | method |
+| `CYLImageTagGroupView.show(animated:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.show` | method |
+| `CYLImageTagGroupView.hide(animated:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.hide` | method |
+| `CYLImageTagView` (CYLImageTagView.swift) | `CYLImageTagView` (imagetag/CYLImageTagView.ets (+ CYLImageTagViewComponent)) | class |
 | `CYLImageTagView.imageView` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.image` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.tagGroups` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.groupViews` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.isEditing` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.groupConfiguration` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.imageTapHandler` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.circleTapHandler` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.tagTapHandler` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.longPressHandler` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.dragHandler` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.imageAccessibilityHint` (CYLImageTagView.swift) | TODO | property |
+| `CYLImageTagView.image` (CYLImageTagView.swift) | `CYLImageTagView.image` | property |
+| `CYLImageTagView.tagGroups` (CYLImageTagView.swift) | `CYLImageTagView.tagGroups` | property |
+| `CYLImageTagView.groupViews` (CYLImageTagView.swift) | `CYLImageTagView.groupViews` | property |
+| `CYLImageTagView.isEditing` (CYLImageTagView.swift) | `CYLImageTagView.isEditing` | property |
+| `CYLImageTagView.groupConfiguration` (CYLImageTagView.swift) | `CYLImageTagView.groupConfiguration` | property |
+| `CYLImageTagView.imageTapHandler` (CYLImageTagView.swift) | `CYLImageTagView.imageTapHandler` | property |
+| `CYLImageTagView.circleTapHandler` (CYLImageTagView.swift) | `CYLImageTagView.circleTapHandler` | property |
+| `CYLImageTagView.tagTapHandler` (CYLImageTagView.swift) | `CYLImageTagView.tagTapHandler` | property |
+| `CYLImageTagView.longPressHandler` (CYLImageTagView.swift) | `CYLImageTagView.longPressHandler` | property |
+| `CYLImageTagView.dragHandler` (CYLImageTagView.swift) | `CYLImageTagView.dragHandler` | property |
+| `CYLImageTagView.imageAccessibilityHint` (CYLImageTagView.swift) | `CYLImageTagView.imageAccessibilityHint` | property |
 | `CYLImageTagView.longPressAccessibilityActionName` (CYLImageTagView.swift) | TODO | property |
-| `CYLImageTagView.init()` (CYLImageTagView.swift) | TODO | init |
+| `CYLImageTagView.init()` (CYLImageTagView.swift) | `new CYLImageTagView()` | init |
 | `CYLImageTagView.init?(coder:)` (CYLImageTagView.swift) | TODO | init |
-| `CYLImageTagView.addTagGroup(_:)` (CYLImageTagView.swift) | TODO | method |
-| `CYLImageTagView.removeTagGroup(at:)` (CYLImageTagView.swift) | TODO | method |
-| `CYLImageTagView.removeAllTagGroups()` (CYLImageTagView.swift) | TODO | method |
-| `CYLImageTagView.toggleTagGroups(animated:)` (CYLImageTagView.swift) | TODO | method |
-| `CYLImageTagView.groupViewDidTapCircle(_:)` (CYLImageTagView.swift) | TODO | method |
-| `CYLImageTagView.groupView(_:didTapTagAt:)` (CYLImageTagView.swift) | TODO | method |
-| `CYLImageTagView.groupViewDidLongPress(_:)` (CYLImageTagView.swift) | TODO | method |
-| `CYLImageTagView.groupView(_:didDragToPercentPosition:)` (CYLImageTagView.swift) | TODO | method |
+| `CYLImageTagView.addTagGroup(_:)` (CYLImageTagView.swift) | `CYLImageTagView.addTagGroup` | method |
+| `CYLImageTagView.removeTagGroup(at:)` (CYLImageTagView.swift) | `CYLImageTagView.removeTagGroup` | method |
+| `CYLImageTagView.removeAllTagGroups()` (CYLImageTagView.swift) | `CYLImageTagView.removeAllTagGroups` | method |
+| `CYLImageTagView.toggleTagGroups(animated:)` (CYLImageTagView.swift) | `CYLImageTagView.toggleTagGroups` | method |
+| `CYLImageTagView.groupViewDidTapCircle(_:)` (CYLImageTagView.swift) | `CYLImageTagView.groupViewDidTapCircle` | method |
+| `CYLImageTagView.groupView(_:didTapTagAt:)` (CYLImageTagView.swift) | `didTapTagAt` | method |
+| `CYLImageTagView.groupViewDidLongPress(_:)` (CYLImageTagView.swift) | `CYLImageTagView.groupViewDidLongPress` | method |
+| `CYLImageTagView.groupView(_:didDragToPercentPosition:)` (CYLImageTagView.swift) | `didDragToPercentPosition` | method |
 | `CYLFilterControllerDelegate` (CYLFilterBaseController.swift) | TODO | protocol |
 | `CYLFilterControllerDelegate.filterControllerDidComplete(_:)` (CYLFilterBaseController.swift) | TODO | method |
 | `CYLFilterBaseController` (CYLFilterBaseController.swift) | TODO | class |
@@ -303,31 +303,31 @@ overrides left out.
 | `CYLTagMetrics.static scaledSystemFont(ofSize:traitCollection:)` (CYLTagMetrics.swift) | `CYLTagMetrics.scaledSystemFont(size, fontScale)` | method |
 | `CYLTagMetrics.static tagHeight(for:minimumHeight:)` (CYLTagMetrics.swift) | `CYLTagMetrics.tagHeight(font, minimumHeight)` | method |
 | `CYLTagMetrics.static titleFont(for:)` (CYLTagMetrics.swift) | `CYLTagMetrics.titleFont(fontScale)` | method |
-| `CYLMenuFoldControlPosition` (CYLMenuFoldControl.swift) | TODO | enum |
-| `CYLMenuFoldControlPosition.none` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControlPosition.footer` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControlPosition.headerTrailing` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControlPosition.headerLeading` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControlPosition.tail` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControlContent` (CYLMenuFoldControl.swift) | TODO | enum |
-| `CYLMenuFoldControlContent.iconAndTitle` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControlContent.title` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControlContent.icon` (CYLMenuFoldControl.swift) | TODO | case |
-| `CYLMenuFoldControl` (CYLMenuFoldControl.swift) | TODO | class |
-| `CYLMenuFoldControl.position` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.content` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.title` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.collapseTitle` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.image` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.usesDefaultImage` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.color` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.font` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.rotatesImageWhenExpanded` (CYLMenuFoldControl.swift) | TODO | property |
-| `CYLMenuFoldControl.init(position:content:)` (CYLMenuFoldControl.swift) | TODO | init |
-| `CYLMenuFoldControl.showsImage(whenExpanded:)` (CYLMenuFoldControl.swift) | TODO | method |
-| `CYLMenuFoldControl.showsTitle(whenExpanded:)` (CYLMenuFoldControl.swift) | TODO | method |
-| `CYLMenuFoldControl.title(whenExpanded:)` (CYLMenuFoldControl.swift) | TODO | method |
-| `CYLMenuFoldControl.copy(with:)` (CYLMenuFoldControl.swift) | TODO | method |
+| `CYLMenuFoldControlPosition` (CYLMenuFoldControl.swift) | `enum CYLMenuFoldControlPosition` (core/CYLMenuFoldControl.ets) | enum |
+| `CYLMenuFoldControlPosition.none` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlPosition.none` | case |
+| `CYLMenuFoldControlPosition.footer` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlPosition.footer` | case |
+| `CYLMenuFoldControlPosition.headerTrailing` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlPosition.headerTrailing` | case |
+| `CYLMenuFoldControlPosition.headerLeading` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlPosition.headerLeading` | case |
+| `CYLMenuFoldControlPosition.tail` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlPosition.tail` | case |
+| `CYLMenuFoldControlContent` (CYLMenuFoldControl.swift) | `enum CYLMenuFoldControlContent` | enum |
+| `CYLMenuFoldControlContent.iconAndTitle` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlContent.iconAndTitle` | case |
+| `CYLMenuFoldControlContent.title` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlContent.title` | case |
+| `CYLMenuFoldControlContent.icon` (CYLMenuFoldControl.swift) | `CYLMenuFoldControlContent.icon` | case |
+| `CYLMenuFoldControl` (CYLMenuFoldControl.swift) | `class CYLMenuFoldControl` | class |
+| `CYLMenuFoldControl.position` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.position` | property |
+| `CYLMenuFoldControl.content` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.content` | property |
+| `CYLMenuFoldControl.title` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.title` | property |
+| `CYLMenuFoldControl.collapseTitle` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.collapseTitle` | property |
+| `CYLMenuFoldControl.image` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.image` | property |
+| `CYLMenuFoldControl.usesDefaultImage` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.usesDefaultImage` | property |
+| `CYLMenuFoldControl.color` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.color` | property |
+| `CYLMenuFoldControl.font` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.font` | property |
+| `CYLMenuFoldControl.rotatesImageWhenExpanded` (CYLMenuFoldControl.swift) | `CYLMenuFoldControl.rotatesImageWhenExpanded` | property |
+| `CYLMenuFoldControl.init(position:content:)` (CYLMenuFoldControl.swift) | `new CYLMenuFoldControl(position, content)` | init |
+| `CYLMenuFoldControl.showsImage(whenExpanded:)` (CYLMenuFoldControl.swift) | `showsImage(expanded)` | method |
+| `CYLMenuFoldControl.showsTitle(whenExpanded:)` (CYLMenuFoldControl.swift) | `showsTitle(expanded)` | method |
+| `CYLMenuFoldControl.title(whenExpanded:)` (CYLMenuFoldControl.swift) | `titleWhenExpanded(expanded)` | method |
+| `CYLMenuFoldControl.copy(with:)` (CYLMenuFoldControl.swift) | `copy()` | method |
 | `CYLTagImagePlacement` (CYLMenuStyle.swift) | `enum CYLTagImagePlacement` | enum |
 | `CYLTagImagePlacement.leading` (CYLMenuStyle.swift) | `CYLTagImagePlacement.leading` | case |
 | `CYLTagImagePlacement.trailing` (CYLMenuStyle.swift) | `CYLTagImagePlacement.trailing` | case |
@@ -523,9 +523,9 @@ overrides left out.
 | `CYLTagColors.static random()` (CYLTagColors.swift) | `CYLTagColors.random()` | method |
 | `CYLTagColors.styleByApplying(to:)` (CYLTagColors.swift) | `styleByApplying(style)` | method |
 | `CYLTagCreateCell` (CYLTagCreateCell.swift) | TODO | class |
-| `CYLTagCreateCell.static plusImage` (CYLTagCreateCell.swift) | TODO | property |
-| `CYLTagCreateCell.static title(forName:)` (CYLTagCreateCell.swift) | TODO | method |
-| `CYLTagCreateCell.static outlinedStyle(from:)` (CYLTagCreateCell.swift) | TODO | method |
+| `CYLTagCreateCell.static plusImage` (CYLTagCreateCell.swift) | `CYLTagCreateItem.plusImage` | property |
+| `CYLTagCreateCell.static title(forName:)` (CYLTagCreateCell.swift) | `CYLTagCreateItem.title(name)` | method |
+| `CYLTagCreateCell.static outlinedStyle(from:)` (CYLTagCreateCell.swift) | `CYLTagCreateItem.outlinedStyle(style)` | method |
 | `CYLTagCreateCell.configure(name:style:isEnabled:)` (CYLTagCreateCell.swift) | TODO | method |
 | `CYLTagFoldButton` (CYLTagFoldButton.swift) | TODO | class |
 | `CYLTagFoldButton.foldControl` (CYLTagFoldButton.swift) | TODO | property |
@@ -533,8 +533,8 @@ overrides left out.
 | `CYLTagFoldButton.init?(coder:)` (CYLTagFoldButton.swift) | TODO | init |
 | `CYLTagFoldButton.applyFoldControl(_:color:expanded:animated:)` (CYLTagFoldButton.swift) | TODO | method |
 | `CYLTagFoldButton.applyInlineFoldControl(_:itemStyle:expanded:animated:)` (CYLTagFoldButton.swift) | TODO | method |
-| `CYLTagFoldButton.static inlineSize(for:itemStyle:expanded:traitCollection:)` (CYLTagFoldButton.swift) | TODO | method |
-| `CYLTagFoldButton.static size(for:expanded:traitCollection:)` (CYLTagFoldButton.swift) | TODO | method |
+| `CYLTagFoldButton.static inlineSize(for:itemStyle:expanded:traitCollection:)` (CYLTagFoldButton.swift) | `CYLTagFoldMetrics.inlineSize(control, itemStyle, expanded, fontScale)` | method |
+| `CYLTagFoldButton.static size(for:expanded:traitCollection:)` (CYLTagFoldButton.swift) | `CYLTagFoldMetrics.size(control, expanded, fontScale)` | method |
 | `CYLTagFoldCell` (CYLTagFoldCell.swift) | TODO | class |
 | `CYLTagFoldCell.foldButton` (CYLTagFoldCell.swift) | TODO | property |
 | `CYLTagFoldCell.init?(coder:)` (CYLTagFoldCell.swift) | TODO | init |
@@ -555,221 +555,221 @@ overrides left out.
 | `CYLTagListCell.init?(coder:)` (CYLTagListCell.swift) | TODO | init |
 | `CYLTagListCell.showRipple(at:)` (CYLTagListCell.swift) | TODO | method |
 | `CYLTagListCell.configure(title:image:selectedImage:animationURL:style:isSelected:isEnabled:)` (CYLTagListCell.swift) | TODO | method |
-| `CYLTagListKey` (CYLTagListView+CYLConfiguration.swift) | TODO | enum |
-| `CYLTagListKey.static sections` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static style` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static selectionMode` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static foldStyle` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static allowsEmptySelection` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static showsSectionHeaders` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static scrollEnabled` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static defaultVisibleRows` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static selectedItems` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static foldControl` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static title` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static titlePosition` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static titleImage` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static titleStyle` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListKey.static tags` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey` (CYLTagListView+CYLConfiguration.swift) | TODO | enum |
-| `CYLMenuFoldControlKey.static position` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey.static content` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey.static title` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey.static collapseTitle` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey.static image` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey.static color` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey.static font` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuFoldControlKey.static rotatesImage` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagSectionKey` (CYLTagListView+CYLConfiguration.swift) | TODO | enum |
-| `CYLTagSectionKey.static title` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagSectionKey.static image` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagSectionKey.static items` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagSectionKey.static style` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey` (CYLTagListView+CYLConfiguration.swift) | TODO | enum |
-| `CYLTagItemKey.static title` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static image` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static selectedImage` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static animation` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static animationOptions` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static animationRestingProgress` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static enabled` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static exclusive` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static type` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static deletable` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static identifier` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagItemKey.static style` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey` (CYLTagListView+CYLConfiguration.swift) | TODO | enum |
-| `CYLMenuStyleKey.static normal` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static selected` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static disabled` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static imageTitleSpacing` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static itemHeight` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static numberOfItemsPerRow` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static interitemSpacing` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static lineSpacing` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static headerHeight` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static animationSpeed` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static imageSize` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static animationSize` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static imageInsets` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static sectionInsets` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static titlePositionAdjustment` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static imagePositionAdjustment` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static layoutCentered` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static imagePlacement` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static contentAlignment` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static adjustsFontForContentSizeCategory` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static backgroundColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static headerTextColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static foldControlColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static headerFont` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static highlightedBackgroundColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static tagContentInsets` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static deleteIndicatorTitle` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static deleteIndicatorColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuStyleKey.static deleteIndicatorFont` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey` (CYLTagListView+CYLConfiguration.swift) | TODO | enum |
-| `CYLTagAppearanceKey.static backgroundColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static textColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static font` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static iconColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static cornerRadius` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static borderColor` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static borderWidth` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static margin` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static contentInsets` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagAppearanceKey.static backgroundImage` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuConfigurationError` (CYLTagListView+CYLConfiguration.swift) | TODO | struct |
-| `CYLMenuConfigurationError.Code` (CYLTagListView+CYLConfiguration.swift) | TODO | enum |
-| `CYLMenuConfigurationError.Code.fileNotFound` (CYLTagListView+CYLConfiguration.swift) | TODO | case |
-| `CYLMenuConfigurationError.Code.invalidContents` (CYLTagListView+CYLConfiguration.swift) | TODO | case |
-| `CYLMenuConfigurationError.Code.unsupportedFormat` (CYLTagListView+CYLConfiguration.swift) | TODO | case |
-| `CYLMenuConfigurationError.static errorDomain` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuConfigurationError.code` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuConfigurationError.message` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuConfigurationError.errorCode` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuConfigurationError.errorUserInfo` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLMenuConfigurationError.errorDescription` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `UIColor.static cylMenuColor(from:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `URL.cylAddingAnimationOptions(_:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `CYLMenuFoldControl.init?(configuration:)` (CYLTagListView+CYLConfiguration.swift) | TODO | init |
-| `CYLMenuFoldControl.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `CYLTagAppearance.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `CYLMenuStyle.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | TODO | init |
-| `CYLMenuStyle.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `CYLTag.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | TODO | init |
-| `CYLTagListView.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | TODO | init |
-| `CYLTagListView.init(configurationFile:)` (CYLTagListView+CYLConfiguration.swift) | TODO | init |
-| `CYLTagListView.configurationDataSource` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
-| `CYLTagListView.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `CYLTagListView.static configuration(contentsOfFile:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `CYLMenuSelectionMode` (CYLTagListView.swift) | TODO | enum |
-| `CYLMenuSelectionMode.none` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuSelectionMode.single` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuSelectionMode.multiple` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuTitlePosition` (CYLTagListView.swift) | TODO | enum |
-| `CYLMenuTitlePosition.topLeading` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuTitlePosition.topCenter` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuFoldStyle` (CYLTagListView.swift) | TODO | enum |
-| `CYLMenuFoldStyle.none` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuFoldStyle.headerButton` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuFoldStyle.footerChevron` (CYLTagListView.swift) | TODO | case |
-| `CYLMenuFoldStyle.truncate` (CYLTagListView.swift) | TODO | case |
-| `CYLTagListView` (CYLTagListView.swift) | TODO | class |
-| `CYLTagListView.menuDataSource` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.menuDelegate` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.style` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.selectionMode` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.allowsEmptySelection` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.showsSectionHeaders` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.foldControl` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.foldStyle` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.defaultVisibleRows` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.title` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.titleImage` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.titlePosition` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.titleStyle` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLTagListKey` (core/CYLTagListConfiguration.ets) | enum |
+| `CYLTagListKey.static sections` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.sections` | property |
+| `CYLTagListKey.static style` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.style` | property |
+| `CYLTagListKey.static selectionMode` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.selectionMode` | property |
+| `CYLTagListKey.static foldStyle` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.foldStyle` | property |
+| `CYLTagListKey.static allowsEmptySelection` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.allowsEmptySelection` | property |
+| `CYLTagListKey.static showsSectionHeaders` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.showsSectionHeaders` | property |
+| `CYLTagListKey.static scrollEnabled` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.scrollEnabled` | property |
+| `CYLTagListKey.static defaultVisibleRows` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.defaultVisibleRows` | property |
+| `CYLTagListKey.static selectedItems` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.selectedItems` | property |
+| `CYLTagListKey.static foldControl` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.foldControl` | property |
+| `CYLTagListKey.static title` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.title` | property |
+| `CYLTagListKey.static titlePosition` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.titlePosition` | property |
+| `CYLTagListKey.static titleImage` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.titleImage` | property |
+| `CYLTagListKey.static titleStyle` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.titleStyle` | property |
+| `CYLTagListKey.static tags` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.tags` | property |
+| `CYLMenuFoldControlKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLMenuFoldControlKey` (core/CYLTagListConfiguration.ets) | enum |
+| `CYLMenuFoldControlKey.static position` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.position` | property |
+| `CYLMenuFoldControlKey.static content` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.content` | property |
+| `CYLMenuFoldControlKey.static title` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.title` | property |
+| `CYLMenuFoldControlKey.static collapseTitle` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.collapseTitle` | property |
+| `CYLMenuFoldControlKey.static image` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.image` | property |
+| `CYLMenuFoldControlKey.static color` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.color` | property |
+| `CYLMenuFoldControlKey.static font` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.font` | property |
+| `CYLMenuFoldControlKey.static rotatesImage` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuFoldControlKey.rotatesImage` | property |
+| `CYLTagSectionKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLTagSectionKey` (core/CYLTagListConfiguration.ets) | enum |
+| `CYLTagSectionKey.static title` (CYLTagListView+CYLConfiguration.swift) | `CYLTagSectionKey.title` | property |
+| `CYLTagSectionKey.static image` (CYLTagListView+CYLConfiguration.swift) | `CYLTagSectionKey.image` | property |
+| `CYLTagSectionKey.static items` (CYLTagListView+CYLConfiguration.swift) | `CYLTagSectionKey.items` | property |
+| `CYLTagSectionKey.static style` (CYLTagListView+CYLConfiguration.swift) | `CYLTagSectionKey.style` | property |
+| `CYLTagItemKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLTagItemKey` (core/CYLTagListConfiguration.ets) | enum |
+| `CYLTagItemKey.static title` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.title` | property |
+| `CYLTagItemKey.static image` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.image` | property |
+| `CYLTagItemKey.static selectedImage` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.selectedImage` | property |
+| `CYLTagItemKey.static animation` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.animation` | property |
+| `CYLTagItemKey.static animationOptions` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.animationOptions` | property |
+| `CYLTagItemKey.static animationRestingProgress` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.animationRestingProgress` | property |
+| `CYLTagItemKey.static enabled` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.enabled` | property |
+| `CYLTagItemKey.static exclusive` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.exclusive` | property |
+| `CYLTagItemKey.static type` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.type` | property |
+| `CYLTagItemKey.static deletable` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.deletable` | property |
+| `CYLTagItemKey.static identifier` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.identifier` | property |
+| `CYLTagItemKey.static style` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.style` | property |
+| `CYLMenuStyleKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLMenuStyleKey` (core/CYLTagListConfiguration.ets) | enum |
+| `CYLMenuStyleKey.static normal` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.normal` | property |
+| `CYLMenuStyleKey.static selected` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.selected` | property |
+| `CYLMenuStyleKey.static disabled` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.disabled` | property |
+| `CYLMenuStyleKey.static imageTitleSpacing` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.imageTitleSpacing` | property |
+| `CYLMenuStyleKey.static itemHeight` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.itemHeight` | property |
+| `CYLMenuStyleKey.static numberOfItemsPerRow` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.numberOfItemsPerRow` | property |
+| `CYLMenuStyleKey.static interitemSpacing` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.interitemSpacing` | property |
+| `CYLMenuStyleKey.static lineSpacing` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.lineSpacing` | property |
+| `CYLMenuStyleKey.static headerHeight` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.headerHeight` | property |
+| `CYLMenuStyleKey.static animationSpeed` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.animationSpeed` | property |
+| `CYLMenuStyleKey.static imageSize` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.imageSize` | property |
+| `CYLMenuStyleKey.static animationSize` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.animationSize` | property |
+| `CYLMenuStyleKey.static imageInsets` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.imageInsets` | property |
+| `CYLMenuStyleKey.static sectionInsets` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.sectionInsets` | property |
+| `CYLMenuStyleKey.static titlePositionAdjustment` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.titlePositionAdjustment` | property |
+| `CYLMenuStyleKey.static imagePositionAdjustment` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.imagePositionAdjustment` | property |
+| `CYLMenuStyleKey.static layoutCentered` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.layoutCentered` | property |
+| `CYLMenuStyleKey.static imagePlacement` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.imagePlacement` | property |
+| `CYLMenuStyleKey.static contentAlignment` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.contentAlignment` | property |
+| `CYLMenuStyleKey.static adjustsFontForContentSizeCategory` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.adjustsFontForContentSizeCategory` | property |
+| `CYLMenuStyleKey.static backgroundColor` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.backgroundColor` | property |
+| `CYLMenuStyleKey.static headerTextColor` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.headerTextColor` | property |
+| `CYLMenuStyleKey.static foldControlColor` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.foldControlColor` | property |
+| `CYLMenuStyleKey.static headerFont` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.headerFont` | property |
+| `CYLMenuStyleKey.static highlightedBackgroundColor` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.highlightedBackgroundColor` | property |
+| `CYLMenuStyleKey.static tagContentInsets` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.tagContentInsets` | property |
+| `CYLMenuStyleKey.static deleteIndicatorTitle` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.deleteIndicatorTitle` | property |
+| `CYLMenuStyleKey.static deleteIndicatorColor` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.deleteIndicatorColor` | property |
+| `CYLMenuStyleKey.static deleteIndicatorFont` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.deleteIndicatorFont` | property |
+| `CYLTagAppearanceKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLTagAppearanceKey` (core/CYLTagListConfiguration.ets) | enum |
+| `CYLTagAppearanceKey.static backgroundColor` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.backgroundColor` | property |
+| `CYLTagAppearanceKey.static textColor` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.textColor` | property |
+| `CYLTagAppearanceKey.static font` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.font` | property |
+| `CYLTagAppearanceKey.static iconColor` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.iconColor` | property |
+| `CYLTagAppearanceKey.static cornerRadius` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.cornerRadius` | property |
+| `CYLTagAppearanceKey.static borderColor` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.borderColor` | property |
+| `CYLTagAppearanceKey.static borderWidth` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.borderWidth` | property |
+| `CYLTagAppearanceKey.static margin` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.margin` | property |
+| `CYLTagAppearanceKey.static contentInsets` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.contentInsets` | property |
+| `CYLTagAppearanceKey.static backgroundImage` (CYLTagListView+CYLConfiguration.swift) | `CYLTagAppearanceKey.backgroundImage` | property |
+| `CYLMenuConfigurationError` (CYLTagListView+CYLConfiguration.swift) | `class CYLMenuConfigurationError` | struct |
+| `CYLMenuConfigurationError.Code` (CYLTagListView+CYLConfiguration.swift) | `enum CYLMenuConfigurationErrorCode` | enum |
+| `CYLMenuConfigurationError.Code.fileNotFound` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationErrorCode.fileNotFound` | case |
+| `CYLMenuConfigurationError.Code.invalidContents` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationErrorCode.invalidContents` | case |
+| `CYLMenuConfigurationError.Code.unsupportedFormat` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationErrorCode.unsupportedFormat` | case |
+| `CYLMenuConfigurationError.static errorDomain` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationError.errorDomain` | property |
+| `CYLMenuConfigurationError.code` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationError.code` | property |
+| `CYLMenuConfigurationError.message` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationError.message` | property |
+| `CYLMenuConfigurationError.errorCode` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationError.errorCode` | property |
+| `CYLMenuConfigurationError.errorUserInfo` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationError.errorUserInfo` | property |
+| `CYLMenuConfigurationError.errorDescription` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfigurationError.errorDescription` | property |
+| `UIColor.static cylMenuColor(from:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuColorFromString(value)` (core/CYLMenuColor.ets) | method |
+| `URL.cylAddingAnimationOptions(_:)` (CYLTagListView+CYLConfiguration.swift) | `cylAddingAnimationOptions(animation, options)` (core/CYLTagListConfiguration.ets) | method |
+| `CYLMenuFoldControl.init?(configuration:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfiguration.foldControl(configuration)` | init |
+| `CYLMenuFoldControl.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfiguration.applyToFoldControl(control, configuration)` | method |
+| `CYLTagAppearance.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfiguration.applyToAppearance(appearance, configuration)` | method |
+| `CYLMenuStyle.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfiguration.style(configuration)` | init |
+| `CYLMenuStyle.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfiguration.applyToStyle(style, configuration)` | method |
+| `CYLTag.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfiguration.tag(configuration)` | init |
+| `CYLTagListView.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.withConfiguration(configuration)` | init |
+| `CYLTagListView.init(configurationFile:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.withConfigurationFile(filePath, context)` (JSON) | init |
+| `CYLTagListView.configurationDataSource` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.configurationDataSource` | property |
+| `CYLTagListView.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.applyConfiguration(configuration)` | method |
+| `CYLTagListView.static configuration(contentsOfFile:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.configurationContentsOfFile(filePath, context)` | method |
+| `CYLMenuSelectionMode` (CYLTagListView.swift) | `enum CYLMenuSelectionMode` (components/CYLTagListState.ets) | enum |
+| `CYLMenuSelectionMode.none` (CYLTagListView.swift) | `CYLMenuSelectionMode.none` | case |
+| `CYLMenuSelectionMode.single` (CYLTagListView.swift) | `CYLMenuSelectionMode.single` | case |
+| `CYLMenuSelectionMode.multiple` (CYLTagListView.swift) | `CYLMenuSelectionMode.multiple` | case |
+| `CYLMenuTitlePosition` (CYLTagListView.swift) | `enum CYLMenuTitlePosition` | enum |
+| `CYLMenuTitlePosition.topLeading` (CYLTagListView.swift) | `CYLMenuTitlePosition.topLeading` | case |
+| `CYLMenuTitlePosition.topCenter` (CYLTagListView.swift) | `CYLMenuTitlePosition.topCenter` | case |
+| `CYLMenuFoldStyle` (CYLTagListView.swift) | `enum CYLMenuFoldStyle` | enum |
+| `CYLMenuFoldStyle.none` (CYLTagListView.swift) | `CYLMenuFoldStyle.none` | case |
+| `CYLMenuFoldStyle.headerButton` (CYLTagListView.swift) | `CYLMenuFoldStyle.headerButton` | case |
+| `CYLMenuFoldStyle.footerChevron` (CYLTagListView.swift) | `CYLMenuFoldStyle.footerChevron` | case |
+| `CYLMenuFoldStyle.truncate` (CYLTagListView.swift) | `CYLMenuFoldStyle.truncate` | case |
+| `CYLTagListView` (CYLTagListView.swift) | `@Component CYLTagListView` (components/CYLTagListView.ets) drawing `CYLTagListState` | class |
+| `CYLTagListView.menuDataSource` (CYLTagListView.swift) | `CYLTagListState.menuDataSource` | property |
+| `CYLTagListView.menuDelegate` (CYLTagListView.swift) | `CYLTagListState.menuDelegate` | property |
+| `CYLTagListView.style` (CYLTagListView.swift) | `CYLTagListState.style` | property |
+| `CYLTagListView.selectionMode` (CYLTagListView.swift) | `CYLTagListState.selectionMode` | property |
+| `CYLTagListView.allowsEmptySelection` (CYLTagListView.swift) | `CYLTagListState.allowsEmptySelection` | property |
+| `CYLTagListView.showsSectionHeaders` (CYLTagListView.swift) | `CYLTagListState.showsSectionHeaders` | property |
+| `CYLTagListView.foldControl` (CYLTagListView.swift) | `CYLTagListState.foldControl` | property |
+| `CYLTagListView.foldStyle` (CYLTagListView.swift) | `CYLTagListState.foldStyle` | property |
+| `CYLTagListView.defaultVisibleRows` (CYLTagListView.swift) | `CYLTagListState.defaultVisibleRows` | property |
+| `CYLTagListView.title` (CYLTagListView.swift) | `CYLTagListState.title` | property |
+| `CYLTagListView.titleImage` (CYLTagListView.swift) | `CYLTagListState.titleImage` | property |
+| `CYLTagListView.titlePosition` (CYLTagListView.swift) | `CYLTagListState.titlePosition` | property |
+| `CYLTagListView.titleStyle` (CYLTagListView.swift) | `CYLTagListState.titleStyle` | property |
 | `CYLTagListView.titleView` (CYLTagListView.swift) | TODO | property |
 | `CYLTagListView.titleLabel` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.static defaultTitleStyle` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.isScrollEnabled` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.contentHeight` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.lineSpacing` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.interitemSpacing` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagContentInsets` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagContentInsetTop` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagContentInsetLeft` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagContentInsetBottom` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagContentInsetRight` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.animationSpeed` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.animationLoops` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.playAllAnimations()` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.tagClickHandler` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagDeleteHandler` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.containerBorderWidth` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.containerBorderColor` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.containerCornerRadius` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.maximumNumberOfRows` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.colorTheme` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.allowsTapping` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.defaultTagImage` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.removesItemsOnDelete` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagLongPressHandler` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListView.static defaultTitleStyle` (CYLTagListView.swift) | `CYLTagListState.defaultTitleStyle()` | property |
+| `CYLTagListView.isScrollEnabled` (CYLTagListView.swift) | `CYLTagListState.isScrollEnabled` | property |
+| `CYLTagListView.contentHeight` (CYLTagListView.swift) | `CYLTagListState.contentHeight` | property |
+| `CYLTagListView.lineSpacing` (CYLTagListView.swift) | `CYLTagListState.lineSpacing` | property |
+| `CYLTagListView.interitemSpacing` (CYLTagListView.swift) | `CYLTagListState.interitemSpacing` | property |
+| `CYLTagListView.tagContentInsets` (CYLTagListView.swift) | `CYLTagListState.tagContentInsets` | property |
+| `CYLTagListView.tagContentInsetTop` (CYLTagListView.swift) | `CYLTagListState.tagContentInsetTop` | property |
+| `CYLTagListView.tagContentInsetLeft` (CYLTagListView.swift) | `CYLTagListState.tagContentInsetLeft` | property |
+| `CYLTagListView.tagContentInsetBottom` (CYLTagListView.swift) | `CYLTagListState.tagContentInsetBottom` | property |
+| `CYLTagListView.tagContentInsetRight` (CYLTagListView.swift) | `CYLTagListState.tagContentInsetRight` | property |
+| `CYLTagListView.animationSpeed` (CYLTagListView.swift) | `CYLTagListState.animationSpeed` | property |
+| `CYLTagListView.animationLoops` (CYLTagListView.swift) | `CYLTagListState.animationLoops` | property |
+| `CYLTagListView.playAllAnimations()` (CYLTagListView.swift) | `CYLTagListState.playAllAnimations()` | method |
+| `CYLTagListView.tagClickHandler` (CYLTagListView.swift) | `CYLTagListState.tagClickHandler` | property |
+| `CYLTagListView.tagDeleteHandler` (CYLTagListView.swift) | `CYLTagListState.tagDeleteHandler` | property |
+| `CYLTagListView.containerBorderWidth` (CYLTagListView.swift) | `CYLTagListState.containerBorderWidth` | property |
+| `CYLTagListView.containerBorderColor` (CYLTagListView.swift) | `CYLTagListState.containerBorderColor` | property |
+| `CYLTagListView.containerCornerRadius` (CYLTagListView.swift) | `CYLTagListState.containerCornerRadius` | property |
+| `CYLTagListView.maximumNumberOfRows` (CYLTagListView.swift) | `CYLTagListState.maximumNumberOfRows` | property |
+| `CYLTagListView.colorTheme` (CYLTagListView.swift) | `CYLTagListState.colorTheme` | property |
+| `CYLTagListView.allowsTapping` (CYLTagListView.swift) | `CYLTagListState.allowsTapping` | property |
+| `CYLTagListView.defaultTagImage` (CYLTagListView.swift) | `CYLTagListState.defaultTagImage` | property |
+| `CYLTagListView.removesItemsOnDelete` (CYLTagListView.swift) | `CYLTagListState.removesItemsOnDelete` | property |
+| `CYLTagListView.tagLongPressHandler` (CYLTagListView.swift) | `CYLTagListState.tagLongPressHandler` | property |
 | `CYLTagListView.longPressAccessibilityActionName` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.allowsReordering` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.reorderingSensitivity` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.isReordering` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tagMoveHandler` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.selectedTagDragHandler` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListView.allowsReordering` (CYLTagListView.swift) | `CYLTagListState.allowsReordering` | property |
+| `CYLTagListView.reorderingSensitivity` (CYLTagListView.swift) | `CYLTagListState.reorderingSensitivity` | property |
+| `CYLTagListView.isReordering` (CYLTagListView.swift) | `CYLTagListState.isReordering` | property |
+| `CYLTagListView.tagMoveHandler` (CYLTagListView.swift) | `CYLTagListState.tagMoveHandler` | property |
+| `CYLTagListView.selectedTagDragHandler` (CYLTagListView.swift) | `CYLTagListState.selectedTagDragHandler` | property |
 | `CYLTagListView.init?(coder:)` (CYLTagListView.swift) | TODO | init |
-| `CYLTagListView.init(foldControl:)` (CYLTagListView.swift) | TODO | init |
-| `CYLTagListView.init(foldControl:title:titleImage:titlePosition:)` (CYLTagListView.swift) | TODO | init |
-| `CYLTagListView.init(foldPosition:content:)` (CYLTagListView.swift) | TODO | init |
-| `CYLTagListView.reloadMenuData()` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.heightThatFitsWidth(_:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.tagDataSource` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.tags` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.addTag(_:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.addTags(_:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.addTags(withTitles:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.addTag(withTitle:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.insertTag(_:at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.insertTag(withTitle:at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.removeTag(at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.removeTags(at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.removeAllTags()` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.replaceTags(_:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.setTags(withTitles:colors:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.deleteItem(at:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.init(foldControl:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl)` | init |
+| `CYLTagListView.init(foldControl:title:titleImage:titlePosition:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl, title, titleImage, titlePosition)` | init |
+| `CYLTagListView.init(foldPosition:content:)` (CYLTagListView.swift) | `CYLTagListState.withFoldPosition(position, content)` | init |
+| `CYLTagListView.reloadMenuData()` (CYLTagListView.swift) | `reloadMenuData()` | method |
+| `CYLTagListView.heightThatFitsWidth(_:)` (CYLTagListView.swift) | `heightThatFitsWidth(width)` | method |
+| `CYLTagListView.tagDataSource` (CYLTagListView.swift) | `CYLTagListState.tagDataSource` | property |
+| `CYLTagListView.tags` (CYLTagListView.swift) | `CYLTagListState.tags` | property |
+| `CYLTagListView.addTag(_:)` (CYLTagListView.swift) | `addTag(tag)` | method |
+| `CYLTagListView.addTags(_:)` (CYLTagListView.swift) | `addTags(tags)` | method |
+| `CYLTagListView.addTags(withTitles:)` (CYLTagListView.swift) | `addTagsWithTitles(titles)` | method |
+| `CYLTagListView.addTag(withTitle:)` (CYLTagListView.swift) | `addTagWithTitle(title)` | method |
+| `CYLTagListView.insertTag(_:at:)` (CYLTagListView.swift) | `insertTag(tag, index)` | method |
+| `CYLTagListView.insertTag(withTitle:at:)` (CYLTagListView.swift) | `insertTagWithTitle(title, index)` | method |
+| `CYLTagListView.removeTag(at:)` (CYLTagListView.swift) | `removeTag(index)` | method |
+| `CYLTagListView.removeTags(at:)` (CYLTagListView.swift) | `removeTags(indexes)` | method |
+| `CYLTagListView.removeAllTags()` (CYLTagListView.swift) | `removeAllTags()` | method |
+| `CYLTagListView.replaceTags(_:)` (CYLTagListView.swift) | `replaceTags(tags)` | method |
+| `CYLTagListView.setTags(withTitles:colors:)` (CYLTagListView.swift) | `setTagsWithTitles(titles, colors)` | method |
+| `CYLTagListView.deleteItem(at:)` (CYLTagListView.swift) | `deleteItem(indexPath)` | method |
 | `CYLTagListView.tagButton(at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.selectedIndexPaths` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.selectedTitles` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.selectItem(at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.deselectItem(at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.deselectAllItems()` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.toggleSelection(at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.isSectionExpanded(_:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.setExpanded(_:forSection:animated:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.canFoldSection(_:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.numberOfRows(inSection:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.numberOfVisibleItems(inSection:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.scroll(toSection:animated:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.scrollToItem(at:animated:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.numberOfSections(in:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:numberOfItemsInSection:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.selectedIndexPaths` (CYLTagListView.swift) | `CYLTagListState.selectedIndexPaths` | property |
+| `CYLTagListView.selectedTitles` (CYLTagListView.swift) | `CYLTagListState.selectedTitles` | property |
+| `CYLTagListView.selectItem(at:)` (CYLTagListView.swift) | `selectItem(indexPath)` | method |
+| `CYLTagListView.deselectItem(at:)` (CYLTagListView.swift) | `deselectItem(indexPath)` | method |
+| `CYLTagListView.deselectAllItems()` (CYLTagListView.swift) | `deselectAllItems()` | method |
+| `CYLTagListView.toggleSelection(at:)` (CYLTagListView.swift) | `toggleSelection(indexPath)` | method |
+| `CYLTagListView.isSectionExpanded(_:)` (CYLTagListView.swift) | `isSectionExpanded(section)` | method |
+| `CYLTagListView.setExpanded(_:forSection:animated:)` (CYLTagListView.swift) | `setExpanded(expanded, section, animated)` | method |
+| `CYLTagListView.canFoldSection(_:)` (CYLTagListView.swift) | `canFoldSection(section)` | method |
+| `CYLTagListView.numberOfRows(inSection:)` (CYLTagListView.swift) | `numberOfRows(section)` | method |
+| `CYLTagListView.numberOfVisibleItems(inSection:)` (CYLTagListView.swift) | `numberOfVisibleItems(section)` | method |
+| `CYLTagListView.scroll(toSection:animated:)` (CYLTagListView.swift) | `scrollToSection(section, animated)` | method |
+| `CYLTagListView.scrollToItem(at:animated:)` (CYLTagListView.swift) | `scrollToItem(indexPath, animated)` | method |
+| `CYLTagListView.numberOfSections(in:)` (CYLTagListView.swift) | `CYLTagListState.numberOfSections()` | method |
+| `CYLTagListView.collectionView(_:numberOfItemsInSection:)` (CYLTagListView.swift) | `CYLTagListState.numberOfDisplayedItems(section)` | method |
 | `CYLTagListView.collectionView(_:cellForItemAt:)` (CYLTagListView.swift) | TODO | method |
 | `CYLTagListView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:canMoveItemAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:moveItemAt:to:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:didSelectItemAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:shouldHighlightItemAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:targetIndexPathForMoveOfItemFromOriginalIndexPath:atCurrentIndexPath:toProposedIndexPath:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:layout:sizeForItemAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:layout:insetForSectionAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:layout:minimumLineSpacingForSectionAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:layout:referenceSizeForFooterInSection:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.collectionView(_:canMoveItemAt:)` (CYLTagListView.swift) | `CYLTagListState.canMoveItem(indexPath)` | method |
+| `CYLTagListView.collectionView(_:moveItemAt:to:)` (CYLTagListView.swift) | `CYLTagListState.moveItem(source, destination)` | method |
+| `CYLTagListView.collectionView(_:didSelectItemAt:)` (CYLTagListView.swift) | `CYLTagListState.tapItem(indexPath)` | method |
+| `CYLTagListView.collectionView(_:shouldHighlightItemAt:)` (CYLTagListView.swift) | `CYLTagListState.shouldHighlightItem(indexPath)` | method |
+| `CYLTagListView.collectionView(_:targetIndexPathForMoveOfItemFromOriginalIndexPath:atCurrentIndexPath:toProposedIndexPath:)` (CYLTagListView.swift) | `CYLTagListState.targetIndexPathForMove(original, proposed)` | method |
+| `CYLTagListView.collectionView(_:layout:sizeForItemAt:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (item sizes) | method |
+| `CYLTagListView.collectionView(_:layout:insetForSectionAt:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (section insets) | method |
+| `CYLTagListView.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (item spacing) | method |
+| `CYLTagListView.collectionView(_:layout:minimumLineSpacingForSectionAt:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (line spacing) | method |
+| `CYLTagListView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (header frames) | method |
+| `CYLTagListView.collectionView(_:layout:referenceSizeForFooterInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (footer frames) | method |
 | `CYLTagView` (CYLTagView.swift) | TODO | class |
 | `CYLTagView.static sectionInset` (CYLTagView.swift) | TODO | property |
 | `CYLTagView.static cellSpacing` (CYLTagView.swift) | TODO | property |
@@ -851,3 +851,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: feature 1, the menu data source, delegate and keys (core/CYLMenuDataSource.ets, CYLMenuKeys.ets). Score 45 / 807 = 5.6.
 - 2026-11-16: feature 2, the style: value types, CYLTagAppearance, CYLMenuStyle, CYLTagColors, CYLTagMetrics, CYLMenuResources (core strings generated by harmony/scripts/export-core-strings.py, the pod's images in the HAR's media). Score 175 / 807 = 21.7.
 - 2026-11-16: feature 3, the tag models: CYLTag, CYLTagDataSource (badge images drawn on an OffscreenCanvas), CYLTagModel, CYLTagGroup, CYLMenuColorFromString. Score 250 / 807 = 31.0.
+- 2026-11-16: features 4 and 5, CYLTagListView (CYLTagListState with selection, folding, layout, tags API, configuration, fold control) and the image tag views (CYLImageTagView, CYLImageTagGroupView, geometry). Compile only: no emulator on this machine. Score 604 / 807 = 74.8.
