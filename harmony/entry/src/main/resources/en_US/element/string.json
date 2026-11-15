@@ -115,6 +115,14 @@
     {
       "name": "place_rating",
       "value": "Rating %1$s, %2$d yuan"
+    },
+    {
+      "name": "tab_post",
+      "value": "Post"
+    },
+    {
+      "name": "plus_page",
+      "value": "The plus button page"
     }
   ]
 }

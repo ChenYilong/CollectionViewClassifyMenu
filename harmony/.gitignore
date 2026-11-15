@@ -4,3 +4,4 @@ build/
 .test/
 .idea/
 local.properties
+.deps/

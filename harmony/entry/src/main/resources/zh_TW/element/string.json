@@ -103,6 +103,14 @@
     {
       "name": "place_rating",
       "value": "評分 %1$s，%2$d 元"
+    },
+    {
+      "name": "tab_post",
+      "value": "發佈"
+    },
+    {
+      "name": "plus_page",
+      "value": "加號按鈕的頁面"
     }
   ]
 }
