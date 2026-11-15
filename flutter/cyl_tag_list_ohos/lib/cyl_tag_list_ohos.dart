@@ -15,9 +15,20 @@ class CylTagListOhos {
     CylTagListView.platformViewBuilder = (viewType, creationParams, onCreated) => OhosView(
           viewType: viewType,
           // The ArkTS list reads the configuration as JSON text, the format of the React Native component.
-          creationParams: <String, Object?>{'configurationJSON': jsonEncode(creationParams['configuration'])},
+          creationParams: <String, Object?>{'configurationJSON': jsonEncode(_rawfilePaths(creationParams['configuration']))},
           creationParamsCodec: const StandardMessageCodec(),
           onPlatformViewCreated: onCreated,
         );
+  }
+
+  /// Flutter's assets are the rawfiles under `flutter_assets/` on HarmonyOS: `asset:<key>` becomes
+  /// `asset:flutter_assets/<key>`, which the ArkTS list reads (the iOS and Android plugins map it to a file path).
+  static Object? _rawfilePaths(Object? value) {
+    if (value is String && value.startsWith('asset:') && !value.startsWith('asset:flutter_assets/')) {
+      return 'asset:flutter_assets/${value.substring('asset:'.length)}';
+    }
+    if (value is Map) return value.map((key, item) => MapEntry(key, _rawfilePaths(item)));
+    if (value is List) return value.map(_rawfilePaths).toList();
+    return value;
   }
 }

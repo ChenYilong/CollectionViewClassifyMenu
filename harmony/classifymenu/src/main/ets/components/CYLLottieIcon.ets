@@ -2,14 +2,25 @@ import lottie, { AnimationItem } from '@ohos/lottie';
 import { util } from '@kit.ArkTS';
 
 /**
- * Reads the Lottie JSON of an item's `animation` value: `asset:<path>` is a rawfile of the app (the last path
- * component, as the Flutter and React Native examples write `asset:assets/<file>`); any other value is JSON text.
+ * Reads the Lottie JSON of an item's `animation` value: `asset:<path>` is a rawfile of the app, at that path
+ * (Flutter: `flutter_assets/<key>`) or else by its last path component; any other value is JSON text.
  */
+function rawFile(context: Context, path: string): Uint8Array | undefined {
+  try {
+    return path.length > 0 ? context.resourceManager.getRawFileContentSync(path) : undefined;
+  } catch (error) {
+    return undefined;
+  }
+}
+
 function animationData(context: Context, source: string): Object | undefined {
   try {
     if (source.startsWith('asset:')) {
-      const name = source.substring('asset:'.length).split('/').pop() ?? '';
-      const bytes = context.resourceManager.getRawFileContentSync(name);
+      const path = source.substring('asset:'.length);
+      const bytes = rawFile(context, path) ?? rawFile(context, path.split('/').pop() ?? '');
+      if (bytes === undefined) {
+        return undefined;
+      }
       const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
       return JSON.parse(text) as Object;
     }
