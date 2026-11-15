@@ -611,7 +611,7 @@ Program) show the same screens with the same data and look the same as iOS, whic
   accessibility-action rows N/A, each with its reason) and 22 / 22 demos. Built on Windows with
   `harmony/scripts/build.sh` (HAR and HAP, two BUILD SUCCESSFUL); engines: `@ohos/lottie` 2.0.38,
   `@tencent/libpag` 4.4.31 (newest for API 12), `@ohos/rive` 1.0.4, GIF through ImageKit.
-- **TODO: run it.** Nothing has run on a device or emulator yet (no emulator image on this machine). To do on the
+- **TODO: run it** (full-marks standard and score: [harmony-verification.md](harmony-verification.md)). Nothing has run on a device or emulator yet (no emulator image on this machine). To do on the
   Mate 70 Pro emulator: `harmony/scripts/ui-test.sh`, screenshots of every screen next to iOS
   (`screenshots.md`), and the checks the ports listed: Rive state-machine options, PAG loading from a rawfile
   folder, GIF decoding, Lottie's last frame on first load, the classify menu and filter panel layout. Known
