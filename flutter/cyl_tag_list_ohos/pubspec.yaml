@@ -1,0 +1,22 @@
+name: cyl_tag_list_ohos
+description: HarmonyOS NEXT implementation of cyl_tag_list, hosting the ArkTS CYLTagListView of harmony/classifymenu.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+  flutter: '>=3.3.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cyl_tag_list:
+    path: ../cyl_tag_list
+
+flutter:
+  plugin:
+    implements: cyl_tag_list
+    platforms:
+      ohos:
+        pluginClass: CylTagListOhosPlugin
+        dartPluginClass: CylTagListOhos
