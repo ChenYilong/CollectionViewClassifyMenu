@@ -51,6 +51,7 @@ export struct CYLRightImageButtonView {
         .flexShrink(1)
       if (this.button.currentImage !== undefined) {
         Image(this.button.currentImage)
+          .accessibilityLevel('no')
       }
     }
     .width('100%')

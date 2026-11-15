@@ -13,28 +13,20 @@
       "value": "CYLMenuExample"
     },
     {
-      "name": "speed",
-      "value": "Speed"
+      "name": "tab_home",
+      "value": "Home"
     },
     {
-      "name": "speed_value",
-      "value": "%s times"
+      "name": "tab_nearby",
+      "value": "Nearby"
     },
     {
-      "name": "loop",
-      "value": "Loop"
+      "name": "tab_messages",
+      "value": "Messages"
     },
     {
-      "name": "play_all",
-      "value": "Play all"
-    },
-    {
-      "name": "animated_icons",
-      "value": "Animated icons"
-    },
-    {
-      "name": "tapped",
-      "value": "Tapped %s"
+      "name": "tab_me",
+      "value": "Me"
     }
   ]
 }

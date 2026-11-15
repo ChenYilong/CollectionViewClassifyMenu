@@ -138,7 +138,7 @@ export class CYLReviewStore {
 
   /** "好评(3)"; "全部" has no count. */
   titleFor(filter: CYLReviewFilter): string {
-    if (filter.name === '全部') {
+    if (filter.name === CYLExampleLocalizedString('全部')) {
       return filter.name;
     }
     return `${filter.name}(${this.reviewsMatching(filter).length})`;

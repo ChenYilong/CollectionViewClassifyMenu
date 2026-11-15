@@ -306,6 +306,33 @@ AGENTS.md, newest commit) and adapted to this project:
   `ios-accessibility`, `uikit-accessibility-auditor` and `accessibility-audit`
   skills).
 
+## HarmonyOS: accessibility, localization and accessibility-first UI tests
+
+- All code of this project supports visual accessibility and screen readers (blind users), the HarmonyOS code
+  included (`harmony/classifymenu`, the library; `harmony/entry`, the example): every control and every piece of
+  text is an accessibility element with a meaningful, localized label (`accessibilityText`), a description when it
+  helps (`accessibilityDescription`), and its selected state (`CYLAccessibilitySelectedModifier`, API 13 and later;
+  the library targets API 12). A tappable row or button made of several views is one element
+  (`accessibilityGroup(true)`); an icon beside its label is decorative (`accessibilityLevel('no')`); a text field is
+  labeled like its placeholder. Text sizes are `fp`, so they follow the system font size.
+- All code supports internationalization and localization, with localization files: the HarmonyOS example's strings
+  come from the iOS example bundle (`harmony/scripts/export-example-strings.py`, looked up with
+  `CYLExampleLocalizedString`), the core's from the iOS core bundle (`CYLMenuLocalizedString`), and the strings the
+  system shows (app name, ability label) and the tab titles copied from CYLTabBarController's HarmonyOS example are
+  native resources (`resources/base|en_US|zh_CN|zh_TW/element/string.json`). Compare keys, never translated text,
+  in code.
+- If something is found that does not support accessibility or localization, add the support first, then go on
+  with the task.
+- Automated UI tests locate controls through accessibility first: by the localized accessibility label
+  (`ON.text(CYLExampleLocalizedString(key))`), then its description, and only then by an id
+  (`cylFindAccessible` / `cylTapAccessible` in `harmony/entry/src/ohosTest/ets/test/TestSupport.ets`). This applies to
+  taps, to complex flows and to sequences of actions. An id alone is only for controls without a distinctive label
+  (rows of generated data). A control a test cannot find by its label is an accessibility bug: fix the label.
+- Checks: `harmony/scripts/accessibility-check.py` (every image, input and control has a label or is marked
+  decorative), `harmony/scripts/check-native-strings.py` (native string files complete and equal to the iOS strings),
+  `harmony/scripts/unit-test.sh`. Details: `.agents/skills/cyl-harmonyos/`, `.agents/skills/cyl-accessibility/`,
+  `.agents/skills/cyl-localization/`.
+
 ## CI/CD and Example screenshots
 
 - CI follows CYLTabBarController's `.github/workflows/ios.yml`; the scripts

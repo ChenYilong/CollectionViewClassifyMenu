@@ -282,6 +282,7 @@ export struct CYLSearchDiscoverPage {
       // The light curved area behind the mic button.
       Column() {
         Image($r('app.media.a_ask_arc')).width('100%').height(40).objectFit(ImageFit.Fill)
+          .accessibilityLevel('no')
         Column().width('100%').layoutWeight(1).backgroundColor('#F2F2F7')
       }
       .width('100%')
