@@ -35,6 +35,31 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-16): SVGA animated icons (CYLTabBarController added SVGA)
+
+- **Prompt (verbatim):** "找到本项目相关文档，加入TODO：cyltabbar 现已增加svga动效，更新core代码以支持该动效，要求example层一比一复刻rive相关演示。只要rive有的演示场景 svga也要有。"
+  (EN: CYLTabBarController now has SVGA animations. Update the core to support them; in the examples, mirror the
+  Rive demos one to one: every demo scene that has Rive also gets SVGA.)
+- **Core:** the core plays animated icons through CYLTabBarController's `CYLTabBarItemAnimationFactory` (Lottie, PAG,
+  Rive, GIF; `CYLTagButton`, `menuAnimationURLForItem(at:)`, the configuration's `animation` /
+  `animationOptions`). Add SVGA (`.svga`): pin a CYLTabBarController commit that has the SVGA animator
+  (`scripts/cyl-tabbar-latest-commit.sh`), register it like the others, and keep `animationSpeed`, `animationLoops`,
+  Play all, resting progress and the selected last frame working (state honestly what the SVGA player cannot do).
+  Ports: Android (`android/merged`), Flutter, React Native, HarmonyOS (`harmony/classifymenu`, an ohpm SVGA player),
+  Mini Program (`CrossPlatform/wechat-miniprogram`, a CYLTabBarController SVGA package if it has one).
+- **Example, 1:1 with Rive:** every place that shows Rive gets the same scene for SVGA:
+  - the Animated icons screen (`CYLTagAnimationDemoViewController`: the Rive sections, e.g. `rive`, `rive-icons`)
+    gets matching SVGA sections;
+  - the Styles screen (`CYLTagStyleDemoViewController`: the Rive animation choice, `style-rive`) gets an SVGA choice;
+  - the configuration demo, the menu source and data (`CYLExampleMenuSource`, `CYLTagConfigurationDemoViewController`,
+    `CYLMenuLinkageViewController`, `CYLReviewQuery`) wherever they list Rive files;
+  - launch screens for screenshots (`CYLExampleAppDelegate`: `animations-rive`, `style-rive`) get `animations-svga`,
+    `style-svga`;
+  - tests (`CYLAnimatedIconTests`, `CYLTagStyleDemoTests`, `CYLReviewFilterScenarioTests`) cover SVGA as they cover
+    Rive;
+  - then the same on every platform's example (`example-demo-rules.md`), with screenshots (`screenshots.md`).
+- **Status:** TODO.
+
 - TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):
   - Context: the Swift core migration reached 100 (`250507c`). The user asks to continue the unfinished work of this
     folder from the memories, then to go through every document, find the keyword TODO and finish the work, above all
