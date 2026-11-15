@@ -34,9 +34,13 @@ public final class CYLMenuResources: NSObject {
     private static var storedPreferredLanguage: String?
 
     /**
-     * The bundle, next to the component's code (CocoaPods resources) or in the main bundle.
+     * The bundle: the package's resources under Swift Package Manager; otherwise next to the component's code
+     * (CocoaPods resources) or in the main bundle.
      */
     @objc public static let bundle: Bundle = {
+        #if SWIFT_PACKAGE
+        return Bundle.module
+        #else
         let containing = Bundle(for: CYLMenuResources.self)
         let url = containing.url(forResource: bundleName, withExtension: "bundle")
             ?? Bundle.main.url(forResource: bundleName, withExtension: "bundle")
@@ -44,6 +48,7 @@ public final class CYLMenuResources: NSObject {
             preconditionFailure("CYLClassifyMenuResources.bundle is missing. Install the component's CocoaPods resources.")
         }
         return bundle
+        #endif
     }()
 
     private override init() {
