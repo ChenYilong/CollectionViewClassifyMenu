@@ -26,4 +26,10 @@ function save(scenario, items, storage = defaultStorage()) {
   storage.set(PREFIX + scenario, items.join(','));
 }
 
-module.exports = { CLASSIFY_SCENARIO, FILTER_SCENARIO, load, save };
+/** Every scenario with a saved selection (the rows of the selections table). */
+function savedScenarios(storage = defaultStorage(), keys = null) {
+  const all = keys || (typeof wx !== 'undefined' ? wx.getStorageInfoSync().keys : []);
+  return all.filter((k) => k.startsWith(PREFIX) && typeof storage.get(k) === 'string').map((k) => k.slice(PREFIX.length));
+}
+
+module.exports = { CLASSIFY_SCENARIO, FILTER_SCENARIO, PREFIX, load, save, savedScenarios };
