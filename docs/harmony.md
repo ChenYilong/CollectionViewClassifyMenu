@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 799 / 807 = 99.0 / 100** (API 778 / 785, demos 21 / 22). Both tables are scored together: every TODO removed
+**Score: 807 / 807 = 100.0 / 100** (API 785 / 785, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -180,7 +180,7 @@ overrides left out.
 | `CYLImageTagGroupView.show(animated:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.show` | method |
 | `CYLImageTagGroupView.hide(animated:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupView.hide` | method |
 | `CYLImageTagView` (CYLImageTagView.swift) | `CYLImageTagView` (imagetag/CYLImageTagView.ets (+ CYLImageTagViewComponent)) | class |
-| `CYLImageTagView.imageView` (CYLImageTagView.swift) | TODO | property |
+| `CYLImageTagView.imageView` (CYLImageTagView.swift) | `CYLImageTagView.imageView` (CYLImageTagImageView drawn by the component) | property |
 | `CYLImageTagView.image` (CYLImageTagView.swift) | `CYLImageTagView.image` | property |
 | `CYLImageTagView.tagGroups` (CYLImageTagView.swift) | `CYLImageTagView.tagGroups` | property |
 | `CYLImageTagView.groupViews` (CYLImageTagView.swift) | `CYLImageTagView.groupViews` | property |
@@ -492,7 +492,7 @@ overrides left out.
 | `CYLTagButton.animationRestingProgress` (CYLTagButton.swift) | `CYLTagButton.animationRestingProgress` | property |
 | `CYLTagButton.animationSpeed` (CYLTagButton.swift) | `CYLTagButton.animationSpeed` | property |
 | `CYLTagButton.animationLoops` (CYLTagButton.swift) | `CYLTagButton.animationLoops` | property |
-| `CYLTagButton.animationView` (CYLTagButton.swift) | TODO | property |
+| `CYLTagButton.animationView` (CYLTagButton.swift) | `CYLTagButton.animationView` (the live CYLAnimationPlayer: Lottie, PAG, Rive or GIF) | property |
 | `CYLTagButton.animationPlayer` (CYLTagButton.swift) | `CYLTagButton.animationPlayer` | property |
 | `CYLTagButton.showsDeleteIndicator` (CYLTagButton.swift) | `CYLTagButton.showsDeleteIndicator` | property |
 | `CYLTagButton.deleteIndicatorHitFrame` (CYLTagButton.swift) | `CYLTagButton.deleteIndicatorHitFrame` | property |
@@ -691,8 +691,8 @@ overrides left out.
 | `CYLTagListView.titleImage` (CYLTagListView.swift) | `CYLTagListState.titleImage` | property |
 | `CYLTagListView.titlePosition` (CYLTagListView.swift) | `CYLTagListState.titlePosition` | property |
 | `CYLTagListView.titleStyle` (CYLTagListView.swift) | `CYLTagListState.titleStyle` | property |
-| `CYLTagListView.titleView` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.titleLabel` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListView.titleView` (CYLTagListView.swift) | `CYLTagListState.titleView` (the CYLTagButton the list draws its title with) | property |
+| `CYLTagListView.titleLabel` (CYLTagListView.swift) | `CYLTagListState.titleLabel` (titleView.titleLabel) | property |
 | `CYLTagListView.static defaultTitleStyle` (CYLTagListView.swift) | `CYLTagListState.defaultTitleStyle()` | property |
 | `CYLTagListView.isScrollEnabled` (CYLTagListView.swift) | `CYLTagListState.isScrollEnabled` | property |
 | `CYLTagListView.contentHeight` (CYLTagListView.swift) | `CYLTagListState.contentHeight` | property |
@@ -743,7 +743,7 @@ overrides left out.
 | `CYLTagListView.replaceTags(_:)` (CYLTagListView.swift) | `replaceTags(tags)` | method |
 | `CYLTagListView.setTags(withTitles:colors:)` (CYLTagListView.swift) | `setTagsWithTitles(titles, colors)` | method |
 | `CYLTagListView.deleteItem(at:)` (CYLTagListView.swift) | `deleteItem(indexPath)` | method |
-| `CYLTagListView.tagButton(at:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.tagButton(at:)` (CYLTagListView.swift) | `CYLTagListState.tagButton(indexPath)` | method |
 | `CYLTagListView.selectedIndexPaths` (CYLTagListView.swift) | `CYLTagListState.selectedIndexPaths` | property |
 | `CYLTagListView.selectedTitles` (CYLTagListView.swift) | `CYLTagListState.selectedTitles` | property |
 | `CYLTagListView.selectItem(at:)` (CYLTagListView.swift) | `selectItem(indexPath)` | method |
@@ -759,8 +759,8 @@ overrides left out.
 | `CYLTagListView.scrollToItem(at:animated:)` (CYLTagListView.swift) | `scrollToItem(indexPath, animated)` | method |
 | `CYLTagListView.numberOfSections(in:)` (CYLTagListView.swift) | `CYLTagListState.numberOfSections()` | method |
 | `CYLTagListView.collectionView(_:numberOfItemsInSection:)` (CYLTagListView.swift) | `CYLTagListState.numberOfDisplayedItems(section)` | method |
-| `CYLTagListView.collectionView(_:cellForItemAt:)` (CYLTagListView.swift) | TODO | method |
-| `CYLTagListView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.collectionView(_:cellForItemAt:)` (CYLTagListView.swift) | `CYLTagListState.cellForItemAt(indexPath)` (the rendered CYLTagListCell) | method |
+| `CYLTagListView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagListView.swift) | `CYLTagListState.viewForSupplementaryElementOfKind(kind, indexPath)` (CYLTagListSupplementaryView) | method |
 | `CYLTagListView.collectionView(_:canMoveItemAt:)` (CYLTagListView.swift) | `CYLTagListState.canMoveItem(indexPath)` | method |
 | `CYLTagListView.collectionView(_:moveItemAt:to:)` (CYLTagListView.swift) | `CYLTagListState.moveItem(source, destination)` | method |
 | `CYLTagListView.collectionView(_:didSelectItemAt:)` (CYLTagListView.swift) | `CYLTagListState.tapItem(indexPath)` | method |
@@ -834,7 +834,7 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 | `CYLQueryScenariosViewController` | `demos/menu/CYLQueryScenariosPage` (plus button) | 查询筛选: the filter demos by scenario and the database's row counts |
 | `CYLMenuLinkageViewController` | `demos/menu/CYLMenuLinkagePage` (classify menu, multiple filter, SQL, saved selections) | 菜单选择 · 数据库联动: the classify menu, the multiple filter panel, the SQL and the rows; saved selections |
 | `CYLTagStyleDemoViewController` | `demos/menu/CYLTagStylePage` (样式 tab) | The preview and the style actions with their values |
-| `CYLTagAnimationDemoViewController` | TODO | The animation sections, speed slider (0.25×–4×), loop switch, Play all |
+| `CYLTagAnimationDemoViewController` | `demos/menu/CYLTagAnimationPage` (Lottie, PAG, Rive, GIF through the library's CYLAnimationPlayer; speed slider, loop switch, Play all; Rive without speed, as the engine has none) | The animation sections, speed slider (0.25×–4×), loop switch, Play all |
 | `CYLTagConfigurationDemoViewController` | `demos/menu/CYLTagConfigurationPage` (JSON file and map configurations) | The list from the iOS JSON file and from a dictionary |
 | `CYLTagCloudDemoViewController` | `demos/samples/CYLTagCloudDemoPage` | The tag cloud built in code and from a configuration |
 | `CYLTagCloudSampleViewController` | `demos/samples/CYLTagCloudSamplePage` | The android-tagview sample: 25 tags, add a tag |
@@ -858,3 +858,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: the 13 `init?(coder:)` rows marked N/A (no Interface Builder decoding on HarmonyOS); an N/A row counts as aligned, with its reason in the table. Score 772 / 807 = 95.7.
 - 2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3.
 - 2026-11-16: four accessibility-action rows N/A (ArkUI through API 21 has only ACCESSIBILITY_CLICK); the image tag dot's accessibility node and move step mapped. Score 799 / 807 = 99.0.
+- 2026-11-16: feature 9, animated icons with Lottie (@ohos/lottie 2.0.38), PAG (@tencent/libpag 4.4.31, the newest for API 12), Rive (@ohos/rive 1.0.4) and GIF (ImageKit frames on our timer), the animation screen, and the view handles (titleView, titleLabel, tagButton(at:), cells, supplementary views, imageView, animationView). Full marks: no TODO left. Compile only; device checks pending. Score 807 / 807 = 100.0.

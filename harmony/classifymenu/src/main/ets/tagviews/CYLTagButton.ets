@@ -1,12 +1,12 @@
 /**
  * One tag (iOS CYLTagButton.swift; Android CYLTagButton.kt): an icon and a title side by side (the icon after the
  * title with `imagePlacement`), in a box drawn from the style's appearance for the current state, with an optional
- * delete indicator and an optional animated (Lottie) icon.
+ * delete indicator and an optional animated icon (Lottie, PAG, Rive or GIF, by the file's extension).
  *
  * `CYLTagButton` holds the state, the layout and the API (as the iOS class); `CYLTagButtonComponent` draws it.
  */
-import lottie, { AnimationItem } from '@ohos/lottie';
-import { util } from '@kit.ArkTS';
+import { CYLAnimatedIcon } from '../components/CYLAnimatedIcon';
+import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import { CYLTagButtonMetrics } from '../components/CYLTagListState';
 import { CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement } from '../core/CYLMenuStyle';
 import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
@@ -57,7 +57,9 @@ export class CYLTagButton {
   private enabledValue: boolean = true;
   private highlightedValue: boolean = false;
   private hitFrame: CYLRect = new CYLRect();
-  private player?: AnimationItem;
+  private player?: CYLAnimationPlayer;
+  /** Called on every change the component draws (the tag list re-renders from the button). */
+  changeHandler?: () => void;
   private boundsWidth: number = 0;
   private boundsHeight: number = 0;
   /** Bumped by `playAnimation()`. */
@@ -115,8 +117,8 @@ export class CYLTagButton {
   }
 
   /**
-   * Animated icon (Lottie JSON: `asset:<rawfile>` or JSON text). Without it, or when the file cannot be loaded,
-   * `image` is shown.
+   * Animated icon: `asset:<rawfile>` (`.json` Lottie, `.pag` PAG, `.riv` Rive, `.gif` GIF; options after `#`) or
+   * Lottie JSON text. Without it, `image` is shown.
    */
   get animationURL(): string | undefined {
     return this.animationURLValue;
@@ -163,12 +165,21 @@ export class CYLTagButton {
     }
     this.animationLoopsValue = value;
     if (this.player !== undefined) {
-      this.player.loop = value;
+      this.player.loops = value;
     }
+    this.changed();
   }
 
-  /** The Lottie player of the animated icon (play, stop, frames), or undefined. */
-  get animationPlayer(): AnimationItem | undefined {
+  /**
+   * `animationView`: the live player of the animated icon (the engine's view or controller: `lottieItem`,
+   * `pagController`, `riveView`, `gifFrames`), or undefined while there is none (no `animationURL`, not drawn yet).
+   */
+  get animationView(): CYLAnimationPlayer | undefined {
+    return this.player;
+  }
+
+  /** The player of the animated icon (`animationView`). */
+  get animationPlayer(): CYLAnimationPlayer | undefined {
     return this.player;
   }
 
@@ -240,7 +251,7 @@ export class CYLTagButton {
     this.updateAppearance();
   }
 
-  /** The animation engine (@ohos/lottie) is a dependency of the HAR, so it is always there. */
+  /** The engines (@ohos/lottie, @tencent/libpag, @ohos/rive; GIF through ImageKit) are dependencies of the HAR. */
   static get isAnimationEngineAvailable(): boolean {
     return true;
   }
@@ -249,11 +260,11 @@ export class CYLTagButton {
   playAnimation(): void {
     this.applyAnimationSpeed();
     if (this.player !== undefined) {
-      this.player.loop = this.animationLoopsValue;
-      this.player.goToAndPlay(0, true);
+      this.player.loops = this.animationLoopsValue;
+      this.player.play();
     }
     this.playToken++;
-    this.revision++;
+    this.changed();
   }
 
   // MARK: - Measurement
@@ -296,7 +307,7 @@ export class CYLTagButton {
     this.boundsWidth = width;
     this.boundsHeight = height;
     this.layoutSubviews();
-    this.revision++;
+    this.changed();
   }
 
   get bounds(): CYLRect {
@@ -304,12 +315,26 @@ export class CYLTagButton {
   }
 
   /** Called by the component once the animated icon is loaded (or undefined when it is gone). */
-  setAnimationPlayer(player: AnimationItem | undefined): void {
+  setAnimationPlayer(player: CYLAnimationPlayer | undefined): void {
     this.player = player;
     if (player !== undefined) {
-      player.loop = this.animationLoopsValue;
-      this.updateAnimationState();
+      player.loops = this.animationLoopsValue;
+      if (this.pendingPlay) {
+        this.pendingPlay = false;
+        this.applyAnimationSpeed();
+        player.play();
+      } else {
+        this.updateAnimationState();
+      }
     }
+  }
+
+  /** Plays once the animated icon is loaded (a tap made it again). */
+  pendingPlay: boolean = false;
+
+  private changed(): void {
+    this.revision++;
+    this.changeHandler?.();
   }
 
   // MARK: - Private
@@ -468,17 +493,16 @@ export class CYLTagButton {
     if (player === undefined) {
       return;
     }
-    const last = Math.max(0, player.totalFrames - 1);
-    if (this.selectedValue) {
-      player.goToAndStop(last, true);
-    } else {
-      const resting = Math.min(1, Math.max(0, this.restingProgressValue));
-      player.goToAndStop(resting * last, true);
+    if (player.isPlaying) {
+      return;
     }
+    player.stopAtProgress(this.selectedValue ? 1 : Math.min(1, Math.max(0, this.restingProgressValue)));
   }
 
   private applyAnimationSpeed(): void {
-    this.player?.setSpeed(this.resolvedAnimationSpeed);
+    if (this.player !== undefined) {
+      this.player.speed = this.resolvedAnimationSpeed;
+    }
   }
 
   protected updateAppearance(): void {
@@ -518,64 +542,7 @@ export class CYLTagButton {
     this.borderColor = borderColor ?? CYLColor.CLEAR;
     this.borderWidth = borderColor !== undefined ? appearance.borderWidth : 0;
     this.layoutSubviews();
-    this.revision++;
-  }
-}
-
-/** Reads the Lottie JSON of an animation value: `asset:<path>` is a rawfile of the app; any other value is JSON text. */
-function animationData(context: Context, source: string): Object | undefined {
-  try {
-    if (source.startsWith('asset:')) {
-      const name = source.substring('asset:'.length).split('/').pop() ?? '';
-      const bytes = context.resourceManager.getRawFileContentSync(name);
-      return JSON.parse(util.TextDecoder.create('utf-8').decodeToString(bytes)) as Object;
-    }
-    return JSON.parse(source) as Object;
-  } catch (e) {
-    return undefined;
-  }
-}
-
-/** The animated icon of a tag: a Lottie animation on a canvas, whose player the tag drives. */
-@Component
-struct CYLTagButtonAnimationIcon {
-  source: string = '';
-  button?: CYLTagButton;
-  @Prop iconWidth: number = 0;
-  @Prop iconHeight: number = 0;
-  private settings: RenderingContextSettings = new RenderingContextSettings(true);
-  private context2D: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
-  private item?: AnimationItem;
-
-  private load(): void {
-    const data = animationData(getContext(this), this.source);
-    if (data === undefined) {
-      return;
-    }
-    this.item = lottie.loadAnimation({
-      container: this.context2D,
-      renderer: 'canvas',
-      loop: false,
-      autoplay: false,
-      animationData: data
-    });
-    this.button?.setAnimationPlayer(this.item);
-  }
-
-  aboutToDisappear(): void {
-    if (this.button?.animationPlayer === this.item) {
-      this.button?.setAnimationPlayer(undefined);
-    }
-    this.item?.destroy();
-    this.item = undefined;
-  }
-
-  build() {
-    Canvas(this.context2D)
-      .width(this.iconWidth)
-      .height(this.iconHeight)
-      .accessibilityLevel('no')
-      .onReady(() => this.load())
+    this.changed();
   }
 }
 
@@ -595,53 +562,74 @@ export struct CYLTagButtonComponent {
     return p.frame;
   }
 
+  // The parts are plain objects: reading `revision` first makes every attribute update when the button changes.
+  private tl(): CYLTagButtonPart {
+    return this.button.revision >= 0 ? this.button.titleLabel : this.button.titleLabel;
+  }
+
+  private iv(): CYLTagButtonPart {
+    return this.button.revision >= 0 ? this.button.imageView : this.button.imageView;
+  }
+
+  private dl(): CYLTagButtonPart {
+    return this.button.revision >= 0 ? this.button.deleteIndicatorLabel : this.button.deleteIndicatorLabel;
+  }
+
+  private af(): CYLRect {
+    return this.button.revision >= 0 ? this.button.animationFrame : this.button.animationFrame;
+  }
+
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
-      if (this.button.revision >= 0 && !this.button.titleLabel.isHidden) {
-        Text(this.button.titleLabel.text ?? '')
-          .fontSize(this.button.titleLabel.font.size)
-          .fontWeight(this.button.titleLabel.font.weight)
-          .fontColor(this.button.titleLabel.textColor)
+      if (this.button.revision >= 0 && !this.tl().isHidden) {
+        Text(this.tl().text ?? '')
+          .fontSize(this.tl().font.size)
+          .fontWeight(this.tl().font.weight)
+          .fontColor(this.tl().textColor)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .width(this.part(this.button.titleLabel).width)
-          .height(this.part(this.button.titleLabel).height)
-          .position({ x: this.part(this.button.titleLabel).x, y: this.part(this.button.titleLabel).y })
+          .width(this.part(this.tl()).width)
+          .height(this.part(this.tl()).height)
+          .position({ x: this.part(this.tl()).x, y: this.part(this.tl()).y })
       }
-      if (!this.button.imageView.isHidden && this.button.imageView.image !== undefined) {
-        Image(this.button.imageView.image)
-          .width(this.part(this.button.imageView).width > 0 ? this.part(this.button.imageView).width : undefined)
-          .height(this.part(this.button.imageView).height > 0 ? this.part(this.button.imageView).height : undefined)
-          .position({ x: this.part(this.button.imageView).x, y: this.part(this.button.imageView).y })
-          .fillColor(this.button.imageView.tintColor)
-          .objectFit(this.button.imageView.cornerRadius > 0 ? ImageFit.Cover : ImageFit.Contain)
-          .borderRadius(this.button.imageView.cornerRadius)
-          .clip(this.button.imageView.cornerRadius > 0)
-          .rotate({ angle: this.button.imageView.rotation })
+      if (!this.iv().isHidden && this.iv().image !== undefined) {
+        Image(this.iv().image)
+          .width(this.part(this.iv()).width > 0 ? this.part(this.iv()).width : undefined)
+          .height(this.part(this.iv()).height > 0 ? this.part(this.iv()).height : undefined)
+          .position({ x: this.part(this.iv()).x, y: this.part(this.iv()).y })
+          .fillColor(this.iv().tintColor)
+          .objectFit(this.iv().cornerRadius > 0 ? ImageFit.Cover : ImageFit.Contain)
+          .borderRadius(this.iv().cornerRadius)
+          .clip(this.iv().cornerRadius > 0)
+          .rotate({ angle: this.iv().rotation })
           .animation({ duration: this.button.imageRotationDuration })
           .accessibilityLevel('no')
       }
       if (this.button.animationURL !== undefined) {
         ForEach([this.button.animationViewToken], (token: number) => {
-          CYLTagButtonAnimationIcon({
+          CYLAnimatedIcon({
             source: this.button.animationURL ?? '',
-            button: this.button,
-            iconWidth: this.button.animationFrame.width,
-            iconHeight: this.button.animationFrame.height
+            iconSize: this.af().width,
+            iconHeight: this.af().height,
+            onPlayer: (player: CYLAnimationPlayer | undefined) => {
+              if (player !== undefined || this.button.animationPlayer !== undefined) {
+                this.button.setAnimationPlayer(player);
+              }
+            }
           })
-            .position({ x: this.button.animationFrame.x, y: this.button.animationFrame.y })
+            .position({ x: this.af().x, y: this.af().y })
             .opacity(this.button.animationOpacity)
         }, (token: number) => `${token}`)
       }
-      if (!this.button.deleteIndicatorLabel.isHidden) {
-        Text(this.button.deleteIndicatorLabel.text ?? '')
-          .fontSize(this.button.deleteIndicatorLabel.font.size)
-          .fontWeight(this.button.deleteIndicatorLabel.font.weight)
-          .fontColor(this.button.deleteIndicatorLabel.textColor)
+      if (!this.dl().isHidden) {
+        Text(this.dl().text ?? '')
+          .fontSize(this.dl().font.size)
+          .fontWeight(this.dl().font.weight)
+          .fontColor(this.dl().textColor)
           .textAlign(TextAlign.Center)
-          .width(this.part(this.button.deleteIndicatorLabel).width)
-          .height(this.part(this.button.deleteIndicatorLabel).height)
-          .position({ x: this.part(this.button.deleteIndicatorLabel).x, y: this.part(this.button.deleteIndicatorLabel).y })
+          .width(this.part(this.dl()).width)
+          .height(this.part(this.dl()).height)
+          .position({ x: this.part(this.dl()).x, y: this.part(this.dl()).y })
           .accessibilityLevel('no')
       }
       if (this.button.showsCross) {

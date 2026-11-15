@@ -38,13 +38,19 @@ export * from './src/main/ets/classify/ClassifyIndex';
 export * from './src/main/ets/tagviews/TagViewsIndex';
 export {
   CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, CYLLottiePlayer, CYLPAGPlayer, CYLGIFPlayer, CYLRivePlayer,
+<<<<<<< HEAD
   CYLSVGAPlayer,
+=======
+>>>>>>> 7c7c1f3 (feat(harmony): four animation engines, the animation screen, view handles (score 100))
   cylAnimationEngine
 } from './src/main/ets/components/CYLAnimationPlayer';
 export { CYLAnimatedIcon } from './src/main/ets/components/CYLAnimatedIcon';
 export {
   CYLTagListSupplementaryView, CYLTagListElementKindSectionHeader, CYLTagListElementKindSectionFooter
 } from './src/main/ets/components/CYLTagListSupplementaryView';
+<<<<<<< HEAD
 export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
 export { CYLUIContext } from './src/main/ets/core/CYLUIContext';
 export { CYLSVGAMovie, CYLSVGASprite, CYLSVGAFrame, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform, CYLSVGARect } from './src/main/ets/components/svga/CYLSVGAMovie';
+=======
+>>>>>>> 7c7c1f3 (feat(harmony): four animation engines, the animation screen, view handles (score 100))

@@ -1,5 +1,14 @@
+<<<<<<< HEAD
 import { CYLMenuLocalizedString } from './CYLMenuResources';
 import { CYLLottieIcon } from './CYLLottieIcon';
+=======
+import { CYLAnimatedIcon } from './CYLAnimatedIcon';
+import {
+  CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
+} from './CYLTagListSupplementaryView';
+import { CYLTagButtonComponent } from '../tagviews/CYLTagButton';
+import { CYLTagListCell, CYLTagListCellComponent } from '../tagviews/CYLTagListCell';
+>>>>>>> 7c7c1f3 (feat(harmony): four animation engines, the animation screen, view handles (score 100))
 import { CYLIndexPath, CYLTagListController, CYLTagTap } from './CYLTagListModel';
 import {
   CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState
@@ -51,6 +60,8 @@ class CYLTagRenderItem {
   speed: number = 1;
   accessibilityText: string = '';
   accessibilityHint: string = '';
+  /** A tag: the cell it is drawn from (`CYLTagListState.cellForItemAt`). */
+  cell?: CYLTagListCell;
 }
 
 /** A section header or footer, resolved for one render. */
@@ -177,6 +188,12 @@ export struct CYLTagListView {
   @State private dragY: number = 0;
   @State private longPressDuration: number = 500;
   private model: CYLTagListState = new CYLTagListState();
+  /** Per item: `playTokenForItem - playToken` last seen (a tap raises it: the icon plays). */
+  private seenItemPlays: Map<string, number> = new Map<string, number>();
+  private seenPlayToken: number = 0;
+  private cellInputs: Map<string, string> = new Map<string, string>();
+  private titleInputs: string = '';
+  private titleStyleApplied?: CYLMenuStyle;
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
@@ -235,6 +252,18 @@ export struct CYLTagListView {
         footers.push(this.footer(frame, titleHeight));
       }
     });
+    m.setShownViews(items.filter((r: CYLTagRenderItem) => r.cell !== undefined)
+      .map((r: CYLTagRenderItem): CYLIndexPath => ({ section: r.section, item: r.item })),
+      headers.map((h: CYLSectionRender) => h.section), footers.map((f: CYLSectionRender) => f.section));
+    if (m.playToken !== this.seenPlayToken) {
+      // `playAllAnimations()`: every shown animated icon from progress 0.
+      this.seenPlayToken = m.playToken;
+      items.forEach((r: CYLTagRenderItem) => {
+        if (r.cell !== undefined && r.animation !== undefined) {
+          this.playButton(r.cell);
+        }
+      });
+    }
     this.items = items;
     this.headers = headers;
     this.footers = footers;
@@ -317,8 +346,54 @@ export struct CYLTagListView {
     r.speed = m.animationSpeedForItem(p);
     r.accessibilityText = m.titleForItem(p);
     r.accessibilityHint = m.accessibilityHintForItem(p) ?? '';
-    this.finishKey(r, `t${m.playTokenForItem(p) - m.playToken}`);
+    r.cell = this.configureCell(p, style, selected, enabled, r.deletable);
+    // The cell redraws itself (it is observed): the key only places it.
+    r.key = ['t', r.section, r.item, r.x, r.y, r.width, r.height, r.enabled].join('|');
     return r;
+  }
+
+  /** Plays a tag's animated icon from the start (or once it is loaded). */
+  private playButton(cell: CYLTagListCell): void {
+    if (cell.button.animationPlayer === undefined) {
+      cell.button.pendingPlay = true;
+    }
+    cell.button.playAnimation();
+  }
+
+  /**
+   * `collectionView(_:cellForItemAt:)`: the state's cell for the item, configured again only when what it shows
+   * changes (data, state, style, a reload), so that changes made to it in between stay drawn.
+   */
+  private configureCell(p: CYLIndexPath, style: CYLMenuStyle, selected: boolean, enabled: boolean,
+    deletable: boolean): CYLTagListCell {
+    const m = this.model;
+    const cell = m.dequeueCell(p);
+    const k = pathKey(p);
+    const title = m.titleForItem(p);
+    const image = m.imageForItem(p);
+    const selectedImage = m.selectedImageForItem(p);
+    const animation = m.animationURLForItem(p);
+    const resting = m.animationRestingProgressForItem(p);
+    const inputs = [m.viewGeneration, title, imageKey(image), imageKey(selectedImage), animation ?? '', selected,
+      enabled, deletable, m.fontScale, resting].join('|');
+    if (this.cellInputs.get(k) !== inputs || cell.appliedStyle !== style) {
+      this.cellInputs.set(k, inputs);
+      cell.button.fontScale = m.fontScale;
+      cell.button.animationRestingProgress = resting;
+      cell.configure(title, image, selectedImage, animation, style, selected, enabled);
+      cell.isDeletable = deletable;
+      cell.accessibilityHint = m.accessibilityHintForItem(p);
+    }
+    cell.deleteHandler = () => m.deleteItem(p);
+    cell.button.animationSpeed = m.animationSpeed;
+    cell.button.animationLoops = m.animationLoops;
+    const plays = m.playTokenForItem(p) - m.playToken;
+    const seen = this.seenItemPlays.get(k);
+    this.seenItemPlays.set(k, plays);
+    if (seen !== undefined && plays > seen && animation !== undefined) {
+      this.playButton(cell);
+    }
+    return cell;
   }
 
   /** A fold control drawn as a borderless tag (`CYLTagFoldButton`). */
@@ -364,38 +439,81 @@ export struct CYLTagListView {
   private header(frame: CYLTagListSectionFrame, titleHeight: number): CYLSectionRender {
     const m = this.model;
     const style = m.style;
+    const view = this.configureHeader(frame.section);
     const h = new CYLSectionRender();
     h.section = frame.section;
     h.y = frame.y + titleHeight;
     h.height = frame.headerHeight;
-    h.showsTitle = m.showsSectionHeaders;
-    h.title = m.menuDataSource?.menuTitleForSection(frame.section) ?? '';
-    const font = style.headerFontFor(m.fontScale);
-    h.fontSize = font.size;
-    h.fontWeight = font.weight;
-    h.textColor = style.headerTextColor;
-    h.inset = style.headerHorizontalInset;
-    h.indicatorColor = style.headerIndicatorColor;
-    h.indicatorWidth = style.headerIndicatorSize.width;
-    h.indicatorHeight = style.headerIndicatorSize.height;
-    h.icon = m.menuDataSource?.menuImageForSection?.(frame.section);
-    h.showsFold = m.showsHeaderFoldControl(frame.section);
-    h.foldLeading = m.foldControl.position === CYLMenuFoldControlPosition.headerLeading;
+    h.showsTitle = !view.titleLabel.isHidden;
+    h.title = view.titleLabel.text ?? '';
+    h.fontSize = view.titleLabel.font.size;
+    h.fontWeight = view.titleLabel.font.weight;
+    h.textColor = view.titleLabel.textColor;
+    h.inset = view.horizontalInset;
+    h.indicatorColor = view.indicatorColor;
+    h.indicatorWidth = view.indicatorWidth;
+    h.indicatorHeight = view.indicatorHeight;
+    h.icon = view.iconView.isHidden ? undefined : view.iconView.image;
+    h.showsFold = view.showsFoldButton;
+    h.foldLeading = view.foldAtLeadingEdge;
     if (h.showsFold) {
       h.fold = this.sectionFold(frame);
     }
-    h.showsMore = m.showsMoreButton(frame.section);
-    h.moreImage = style.moreButtonImage ?? CYLMenuResources.image('cyl_more');
-    h.moreColor = style.moreButtonColor;
-    h.moreLabel = m.moreButtonAccessibilityLabel(frame.section);
-    h.accessory = m.menuDataSource?.menuAccessoryViewForSection?.(frame.section);
+    h.showsMore = view.showsMoreButton;
+    h.moreImage = view.moreImage;
+    h.moreColor = view.moreColor;
+    h.moreLabel = view.moreAccessibilityLabel;
+    h.accessory = view.accessoryView;
     h.key = ['h', h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, h.textColor, h.inset,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
       h.fold.key, h.showsMore, h.moreColor, h.moreLabel, h.accessory !== undefined].join('|');
     return h;
   }
 
+  /**
+   * `collectionView(_:viewForSupplementaryElementOfKind:at:)` for a header (`configureHeader`): configured again only
+   * when its inputs change, so that changes made to it (then `setNeedsDisplay()`) stay drawn.
+   */
+  private configureHeader(section: number): CYLTagListSupplementaryView {
+    const m = this.model;
+    const style = m.style;
+    const view = m.dequeueSupplementaryView(CYLTagListElementKindSectionHeader, section);
+    const title = m.menuDataSource?.menuTitleForSection(section) ?? '';
+    const icon = m.menuDataSource?.menuImageForSection?.(section);
+    const accessory = m.menuDataSource?.menuAccessoryViewForSection?.(section);
+    const inputs = [m.viewGeneration, m.showsSectionHeaders, title, imageKey(icon), m.fontScale,
+      m.showsHeaderFoldControl(section), m.foldControl.position, m.showsMoreButton(section),
+      m.moreButtonAccessibilityLabel(section), accessory !== undefined].join('|');
+    if (view.configuredInputs === inputs) {
+      return view;
+    }
+    view.configuredInputs = inputs;
+    view.section = section;
+    view.horizontalInset = style.headerHorizontalInset;
+    view.indicatorColor = style.headerIndicatorColor;
+    view.indicatorWidth = style.headerIndicatorSize.width;
+    view.indicatorHeight = style.headerIndicatorSize.height;
+    view.titleLabel.text = title;
+    view.titleLabel.font = style.headerFontFor(m.fontScale);
+    view.titleLabel.textColor = style.headerTextColor;
+    view.iconView.image = icon;
+    // Section titles hidden: the header only holds the fold control.
+    view.titleLabel.isHidden = !m.showsSectionHeaders;
+    view.iconView.isHidden = !m.showsSectionHeaders || icon === undefined;
+    view.accessoryView = accessory;
+    view.showsFoldButton = m.showsHeaderFoldControl(section);
+    view.foldAtLeadingEdge = m.foldControl.position === CYLMenuFoldControlPosition.headerLeading;
+    view.showsMoreButton = m.showsMoreButton(section);
+    view.moreImage = style.moreButtonImage ?? CYLMenuResources.image('cyl_more');
+    view.moreColor = style.moreButtonColor;
+    view.moreAccessibilityLabel = m.moreButtonAccessibilityLabel(section);
+    return view;
+  }
+
   private footer(frame: CYLTagListSectionFrame, titleHeight: number): CYLSectionRender {
+    const view = this.model.dequeueSupplementaryView(CYLTagListElementKindSectionFooter, frame.section);
+    view.section = frame.section;
+    view.showsFoldButton = true;
     const f = new CYLSectionRender();
     f.section = frame.section;
     f.y = frame.y + frame.height - frame.footerHeight + titleHeight;
@@ -409,6 +527,19 @@ export struct CYLTagListView {
   private title(): CYLTagRenderItem {
     const m = this.model;
     const frame = m.titleFrame();
+    // `titleView`: configured from title, titleImage and titleStyle when they change; drawn by CYLTagButtonComponent.
+    const titleView = m.titleView;
+    const inputs = [m.viewGeneration, m.title ?? '', imageKey(m.titleImage), m.fontScale].join('|');
+    if (inputs !== this.titleInputs || this.titleStyleApplied !== m.titleStyle) {
+      this.titleInputs = inputs;
+      titleView.fontScale = m.fontScale;
+      if (this.titleStyleApplied !== m.titleStyle) {
+        titleView.style = m.titleStyle;
+        this.titleStyleApplied = m.titleStyle;
+      }
+      titleView.title = m.title;
+      titleView.image = m.titleImage;
+    }
     const r = new CYLTagRenderItem();
     this.applyStyle(r, m.titleStyle, CYLControlState.NORMAL);
     r.title = m.titleStyle.displayedTitle(m.title);
@@ -462,9 +593,10 @@ export struct CYLTagListView {
   @Builder
   icon(r: CYLTagRenderItem) {
     if (r.animation !== undefined) {
-      CYLLottieIcon({
+      CYLAnimatedIcon({
         source: r.animation,
         iconSize: r.iconWidth,
+        iconHeight: r.iconHeight,
         speed: r.speed,
         loops: this.loops,
         playToken: this.playToken
@@ -613,13 +745,11 @@ export struct CYLTagListView {
 
   @Builder
   titleView(r: CYLTagRenderItem) {
-    Row({ space: r.spacing }) {
-      this.content(r)
+    Stack() {
+      CYLTagButtonComponent({ button: this.model.titleView, tagWidth: r.width, tagHeight: r.height, interactive: false })
     }
     .width(r.width)
     .height(r.height)
-    .padding({ left: r.paddingLeft, right: r.paddingRight })
-    .justifyContent(FlexAlign.Center)
     .position({ x: r.x, y: r.y })
     .id('CYLTagListTitle')
     .accessibilityGroup(true)
@@ -628,34 +758,23 @@ export struct CYLTagListView {
 
   @Builder
   tagButton(r: CYLTagRenderItem) {
-    Row({ space: r.spacing }) {
-      this.content(r)
+    Stack() {
+      if (r.cell !== undefined) {
+        CYLTagListCellComponent({
+          cell: r.cell,
+          cellWidth: r.width,
+          cellHeight: r.height,
+          onCellClick: () => this.tap(r)
+        })
+      }
     }
     .width(r.width)
     .height(r.height)
-    .padding({ left: r.paddingLeft, right: r.paddingRight })
-    .justifyContent(r.alignLeading ? FlexAlign.Start : FlexAlign.Center)
-    .backgroundColor(this.itemBackground(r))
-    .backgroundImage(r.backgroundImage)
-    .backgroundImageSize(ImageSize.Cover)
-    .border({ width: r.borderWidth, color: r.borderColor, radius: r.cornerRadius })
     .position({ x: r.x, y: r.y })
     .opacity(r.enabled ? 1 : 0.6)
     .translate({ x: this.draggedKey === r.key ? this.dragX : 0, y: this.draggedKey === r.key ? this.dragY : 0 })
     .zIndex(this.draggedKey === r.key ? 1 : 0)
     .id(`CYLTagListItem-${r.section}-${r.item}`)
-    .accessibilityGroup(true)
-    .accessibilityText(r.accessibilityText)
-    .accessibilityDescription(r.accessibilityHint)
-    .accessibilitySelected(r.selected)
-    .onTouch((event: TouchEvent) => {
-      if (event.type === TouchType.Down && this.model.shouldHighlightItem({ section: r.section, item: r.item })) {
-        this.pressedKey = r.key;
-      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-        this.pressedKey = '';
-      }
-    })
-    .onClick(() => this.tap(r))
     .gesture(GestureGroup(GestureMode.Sequence,
       LongPressGesture({ duration: this.longPressDuration })
         .onAction(() => {
