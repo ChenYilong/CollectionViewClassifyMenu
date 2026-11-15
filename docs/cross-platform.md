@@ -366,9 +366,22 @@ Program) show the same screens with the same data and look the same as iOS, whic
   <img src="assets/miniprogram-filter-sheet.png" width="260" alt="Mini Program in WeChat DevTools: the filter sheet, 地区过滤 and 菜品过滤 with 全部 selected">
   <img src="assets/miniprogram-classify-filter.png" width="260" alt="Mini Program in WeChat DevTools: 川菜 in 广州, 1 place">
 
-- **Still TODO:** (1) DONE above; a real-device preview (`auto_preview`) is not done yet; (2) measure the tag cells against iOS
-  (left spacing, section "the tag cells look the same as iOS"); (3) a real AppID for phone preview (the project uses
+- **Still TODO:** (1) DONE above; a real-device preview (`auto_preview`) is not done yet; (2) the tag cells against iOS: DONE (below); (3) a real AppID for phone preview (the project uses
   `touristappid`); (4) the shell: DONE (below).
+- **Tag cells measured against the core (2026-11-15).** The port now takes the core's defaults and keys
+  (`CYLMenuStyle` / `CYLTagAppearance`: `tagContentInsets` {5, 10, 5, 10} with the border inside, `imageTitleSpacing` 4,
+  `imageSize` 14, `itemHeight` 30, `interitemSpacing` / `lineSpacing` 10, `sectionInsets` {10, 16, 10, 16} per section,
+  `headerHeight` 36 with a 14 pt regular title; before: 8 px padding plus the border, spacing 5, bold 15 px headers).
+  Measured in WeChat DevTools from the component's own layout pass (`cellMetrics()`, iPhone simulator, base library 3.18.0):
+  - every Classify tag (31): title 10.00 px from both edges, width = title width + 20, as
+    `CYLTagButton.width(forTitle:iconSize:style:)` (content + left and right insets); the core rounds the title width up
+    (`ceil`) and CSS does not, so a Mini Program tag can be up to 1 px narrower (text measurement, as between iOS and Android);
+  - every tag with an icon (14, Lottie and stand-in): title 32.00 px from the left (10 + 18 icon + 4) and 10.00 px from
+    the right: icon and title centered together with the left padding equal to the right one, the iOS layout of
+    `CYLIndexPathButton` (section "the tag cells look the same as iOS"). The emoji stand-ins first measured 38.72 px, because
+    an emoji at an 18 px font is about 24.7 px wide; they now sit in the 18 × 18 icon slot.
+  A pixel comparison with an iOS screenshot needs a Mac (not available on this machine).
+
 - **Shell DONE (2026-11-15): CYLTabBarController's Mini Program tab bar.** The example's shell is `cyl-tab-bar` of
   CYLTabBarController's `cyl-tabbar-miniprogram` (`CrossPlatform/wechat-miniprogram-cyltabbar`, pinned at `460ed89f`, the
   React Native example's pin), as the iOS, Flutter and React Native examples use CYLTabBarController: a custom tab bar

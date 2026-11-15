@@ -69,3 +69,20 @@ test('rows come from the measured tops, and a section folds only when it needs m
   assert.equal(model.foldTitle(false), '更多');
   assert.equal(model.foldTitle(true), '收起');
 });
+
+test('the style falls back to the core defaults (CYLMenuStyle, CYLTagAppearance) and reads the same keys', () => {
+  const d = model.normalize({}).style;
+  assert.deepEqual(
+    [d.itemHeight, d.imageSize, d.imageTitleSpacing, d.interitemSpacing, d.lineSpacing, d.headerHeight, d.fontSize],
+    [30, 14, 4, 10, 10, 36, 14],
+  );
+  assert.deepEqual(d.sectionInsets, { top: 10, left: 16, bottom: 10, right: 16 });
+  assert.deepEqual(d.contentInsets, { top: 5, left: 10, bottom: 5, right: 10 });
+  const s = model.normalize({ style: {
+    itemHeight: 36, imageSize: '{18, 18}', imageTitleSpacing: 6, sectionInsets: '{0, 8, 4, 8}',
+    tagContentInsets: [2, 12, 2, 12], font: { size: 15 },
+  } }).style;
+  assert.deepEqual([s.itemHeight, s.imageSize, s.imageTitleSpacing, s.fontSize], [36, 18, 6, 15]);
+  assert.deepEqual(s.sectionInsets, { top: 0, left: 8, bottom: 4, right: 8 });
+  assert.deepEqual(s.contentInsets, { top: 2, left: 12, bottom: 2, right: 12 });
+});
