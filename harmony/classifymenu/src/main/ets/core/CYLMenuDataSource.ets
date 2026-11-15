@@ -4,6 +4,7 @@
  * `CYLMenuDefaults` gives the iOS default of each (the value when a data source does not implement it).
  */
 import { CYLIndexPath } from '../components/CYLTagListModel';
+import { CYLMenuStyle } from './CYLMenuStyle';
 
 /** What an item of a tag list is: a tag (the default), or "+ 新建标签", which asks for a name. */
 export enum CYLMenuItemType {
@@ -26,6 +27,10 @@ export interface CYLMenuDataSource {
   menuAnimationURLForItem?: (indexPath: CYLIndexPath) => string | undefined;
   /** The progress (0...1) the animation rests at while not selected. */
   menuAnimationRestingProgressForItem?: (indexPath: CYLIndexPath) => number | undefined;
+  /** The style of a section (the list's style when undefined). */
+  menuStyleForSection?: (section: number) => CYLMenuStyle | undefined;
+  /** The style of one item (its section's style when undefined). */
+  menuStyleForItem?: (indexPath: CYLIndexPath) => CYLMenuStyle | undefined;
   /** The icon of a section header. */
   menuImageForSection?: (section: number) => ResourceStr | undefined;
   /** A view at the trailing end of a section header. */
