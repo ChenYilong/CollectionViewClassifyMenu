@@ -19,6 +19,9 @@ Page({
   data: {
     top: { statusBar: 20, rightInset: 96 },
     labels: {},
+    resultsShown: false,
+    results: [],
+    resultTexts: {},
     fieldText: '',
     placeholder: '',
     searches: [],
@@ -143,7 +146,12 @@ Page({
   search(text) {
     const result = model.search(this.data.searches, text);
     if (!result) return;
-    this.setData({ fieldText: result.query, searches: result.searches });
+    // Besides recording the query, show what it finds in the page's data, or the empty placeholder.
+    const results = model.searchResults(this.discoverData, result.query);
+    this.setData({
+      fieldText: result.query, searches: result.searches,
+      resultsShown: true, results, resultTexts: model.resultTexts(result.query, results),
+    });
     this.reloadLists();
   },
 
@@ -158,7 +166,14 @@ Page({
   },
 
   onFieldInput(event) {
-    this.setData({ fieldText: event.detail.value });
+    const fieldText = event.detail.value;
+    // An empty field leaves the results: 最近搜索 and 发现 come back.
+    this.setData(fieldText.trim() ? { fieldText } : { fieldText, resultsShown: false, results: [] });
+    if (!fieldText.trim()) this.reloadLists();
+  },
+
+  onResultTap(event) {
+    this.search(event.currentTarget.dataset.title);
   },
 
   clearRecentSearches() {

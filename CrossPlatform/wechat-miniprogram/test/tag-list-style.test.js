@@ -74,7 +74,7 @@ test('a section style applies over the list style; plain values are item titles;
   assert.equal(m.sections[1].style.normal.backgroundColor, '#17203A');
   assert.equal(m.sections[1].style.itemHeight, 44);
   assert.equal(m.sections[1].style.selected.textColor, '#FF6A00');
-  assert.equal(m.sections[0].style.normal.backgroundColor, '#FFFFFF');
+  assert.equal(m.sections[0].style.normal.backgroundColor, '#F2F2F7');
   assert.deepEqual(m.selectedItems, ['1-0', '0-1']);
   assert.equal(m.showsSectionHeaders, true);
   assert.equal(model.normalize({ showsSectionHeaders: false }).showsSectionHeaders, false);
@@ -172,4 +172,13 @@ test('coderString writes sizes, offsets and insets as NSCoder.string(for:)', () 
   assert.equal(model.coderString({ width: 16, height: 16 }), '{16, 16}');
   assert.equal(model.coderString({ horizontal: 0, vertical: -4 }), '{0, -4}');
   assert.equal(model.coderString({ top: 0, left: 0, bottom: 0, right: 0 }), '{0, 0, 0, 0}');
+});
+
+test('a tag background is never transparent: the default is systemGray6, and clear falls back to it', () => {
+  assert.equal(model.normalize({}).style.normal.backgroundColor, '#F2F2F7');
+  assert.equal(model.normalize({}).style.disabled.backgroundColor, '#F2F2F7');
+  for (const clear of ['clear', 'transparent', '#00000000', 'clearColor']) {
+    assert.equal(model.mergeStyle({ normal: { backgroundColor: clear } }).normal.backgroundColor, '#F2F2F7', clear);
+  }
+  assert.equal(model.mergeStyle({ normal: { backgroundColor: '#FF0000' } }).normal.backgroundColor, '#FF0000');
 });

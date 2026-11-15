@@ -348,9 +348,66 @@ function foldTitle(expanded, lang = language()) {
   return expanded ? table.collapse : table.expand;
 }
 
+// MARK: - Search results
+
+/**
+ * The strings of the results view, which the iOS example does not have (its search only records the query): keyed by
+ * the Chinese text, as the bundle's strings.
+ */
+const RESULT_STRINGS = {
+  en: {
+    '搜索结果': 'Results',
+    '“%@” · %lu 条结果': '“%@” · %lu results',
+    '没有找到“%@”的相关结果': 'No results for “%@”',
+    '换个关键词试试，或者看看下面的发现': 'Try another keyword, or clear the search to browse Discover',
+  },
+  'zh-Hant': {
+    '搜索结果': '搜尋結果',
+    '“%@” · %lu 条结果': '「%@」 · %lu 條結果',
+    '没有找到“%@”的相关结果': '沒有找到「%@」的相關結果',
+    '换个关键词试试，或者看看下面的发现': '換個關鍵詞試試，或清除搜尋看看發現',
+  },
+};
+
+function resultString(key, lang = language(), ...args) {
+  const table = RESULT_STRINGS[lang] || {};
+  return i18n.format(table[key] || key, args);
+}
+
+/**
+ * The results of a search in the page's data: every discover topic and every sample search of the JSON file whose
+ * title contains the query, ignoring case and surrounding spaces, topics first (their hot mark kept), each title once.
+ * The user's own recent searches are not results (the query itself would always be found).
+ * @returns {{title: string, hot: boolean, kind: 'topic'|'recent'}[]}
+ */
+function searchResults(data, text) {
+  const query = String(text || '').trim().toLowerCase();
+  if (!query) return [];
+  const seen = new Set();
+  const results = [];
+  const add = (title, hot, kind) => {
+    if (!title || seen.has(title) || !title.toLowerCase().includes(query)) return;
+    seen.add(title);
+    results.push({ title, hot, kind });
+  };
+  (data.discover || []).forEach((topic) => add(topic.title, topic.icon === 'hot', 'topic'));
+  (data.recentSearches || []).forEach((value) => add(value, false, 'recent'));
+  return results;
+}
+
+/** The texts of the results view for a query and its results. */
+function resultTexts(query, results, lang = language()) {
+  return {
+    title: resultString('搜索结果', lang),
+    summary: resultString('“%@” · %lu 条结果', lang, query, results.length),
+    emptyTitle: resultString('没有找到“%@”的相关结果', lang, query),
+    emptyHint: resultString('换个关键词试试，或者看看下面的发现', lang),
+  };
+}
+
 module.exports = {
   SeededRandomNumberGenerator, SystemRandomNumberGenerator, nextBelow, shuffled, sameTopic, u64Hex,
-  EMPTY, bundled, initialTopics, randomTopics, search, searchText, placeholder, hotIcon,
+  EMPTY, bundled, initialTopics, randomTopics, search, searchText, placeholder, hotIcon, searchResults, resultTexts,
   RECENT_STYLE, DISCOVER_STYLE, HEADER, foldCellWidth, flowRows, foldedVisibleCount, recentLayout,
   gridItemWidth, gridRows, foldTitle,
 };

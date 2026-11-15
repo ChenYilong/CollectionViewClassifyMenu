@@ -501,3 +501,40 @@ Program) show the same screens with the same data and look the same as iOS, whic
   did not reopen the project): Lottie icons now play in CYLTabBarController's `cyl-lottie` (in DevTools an image of
   the canvas, as `cyl-rive`, which did not drift), and the Animations page scrolls the page itself with a sticky
   header instead of a nested `scroll-view`. TODO: check on a phone and in DevTools (Loop on, Play all, scroll).
+
+### Mini Program bugs (2026-11-15): search results, tab bar selection, transparent tags
+
+- **Prompt (verbatim):**
+
+  > 新增三个bug到 docs文档，第一个输入搜索，点开搜索按钮 不仅要更新搜索被选项，还要显示点击搜索后应该展示的搜索结果，如果搜索结果为空应该展示空的占位图。tabbar item点击事件异常 有时候 页面切换了，但tabbaritem没更新。图中都有tag的背景色都不能是透明。修改tag 默认背景色禁止透明色。continue
+
+  English: add three bugs to the docs: (1) typing a search and tapping 搜索 must not only update the recent searches but
+  also show the search results, and an empty placeholder when there are none; (2) the tab bar item tap is unreliable:
+  sometimes the page changes but the tab bar item does not; (3) no tag in the screenshots may have a transparent
+  background: change the tags' default background so that it is never transparent.
+
+  <img src="assets/request-miniprogram-search-discover-transparent-tags.png" width="220" alt="Request: search discover after 搜索, white tags, no results">
+  <img src="assets/request-miniprogram-tab-bar-out-of-sync.png" width="220" alt="Request: 脉脉搜索 shown while the 样式 tab is selected">
+  <img src="assets/request-miniprogram-review-filter-tags.jpg" width="300" alt="Request: the review filter tags">
+
+- **BUG 1, DONE: search results and the empty placeholder** (`pages/search-discover`). 搜索, the keyboard's search
+  key, a recent search or a topic now also shows the results: the discover topics and sample searches of the page's
+  JSON (the current language) containing the query, ignoring case; the user's own recent searches are not results
+  (the query would always find itself). No match shows the placeholder (a magnifying glass, 没有找到“%@”的相关结果, a
+  hint); clearing the field shows 最近搜索 and 发现 again. iOS records the query only, so these strings are the
+  Mini Program's (en, zh-Hant in `discover-model.js`). Checked in WeChat DevTools (English): typed "test" + a real tap
+  on 搜索 lists "VoiceOver test checklist"; "咖啡" shows the placeholder. Test: `search-discover.test.js`.
+- **BUG 2, DONE: the tab bar item did not follow the page.** Every tab page has its own custom tab bar; a tap selects
+  inside `cyl-tab-bar` without changing the wrapper's `selectedIdentifier`, and `syncWithRoute` skipped the update
+  when that stale value already named the page, so a bar whose tab had been tapped kept the tapped tab after coming
+  back (the screenshot: 脉脉搜索 with 样式 selected). `syncWithRoute` now always calls `cyl_selectIdentifier`, and a
+  failed `switchTab` selects the current page's tab again. Checked in DevTools: 样式 selected on search-home's bar,
+  switch to 样式 and back: the bar shows 搜索分类.
+- **BUG 3, DONE: tag backgrounds are never transparent.** `cyl-tag-list`'s default normal and disabled backgrounds
+  are UIKit's systemGray6 `#F2F2F7` instead of white (white tags on the white list looked transparent), and a
+  configured clear / transparent / zero-alpha background falls back to it (`opaqueBackground`); `cyl-tag-cloud`'s
+  default, the search discover pills and the search page's tags too. The review filter keeps its own `#F5F5F5`
+  (`reviewFilterStyle`), opaque. Tests: `tag-list-style.test.js`, `tag-cloud-model.test.js`.
+
+  <img src="assets/miniprogram-search-empty-placeholder.png" width="220" alt="Mini Program: no results, the placeholder">
+  <img src="assets/miniprogram-search-discover-opaque-tags.png" width="220" alt="Mini Program: recent searches with an opaque fill">

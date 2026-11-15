@@ -38,7 +38,7 @@ page { background: #FFFFFF; }
 .recent-row + .recent-row { margin-top: 12px; }
 .recent-tag {
   flex: none; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 13px;
-  border: 1px solid rgba(60, 60, 67, 0.29); border-radius: 18px; background: #FFFFFF; box-sizing: border-box;
+  border: 1px solid rgba(60, 60, 67, 0.29); border-radius: 18px; background: #F2F2F7; box-sizing: border-box;
   white-space: nowrap;
 }
 .recent-row .recent-tag + .recent-tag { margin-left: 12px; }
@@ -71,3 +71,13 @@ page { background: #FFFFFF; }
 }
 .mic-pressed { background: #F2F2F7; }
 .mic-image { width: 26px; height: 26px; }
+
+/* The search results: rows with a magnifying glass, the summary under the header, and the empty placeholder. */
+.results-summary { display: block; margin: 0 16px 8px; font-size: 13px; color: rgba(60, 60, 67, 0.6); }
+.result { display: flex; align-items: center; min-height: 44px; padding: 0 16px; }
+.result-icon { width: 18px; height: 18px; margin-right: 12px; opacity: 0.5; flex: none; }
+.result-title { flex: 1; font-size: 16px; color: #000000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.empty { display: flex; flex-direction: column; align-items: center; padding: 56px 32px; text-align: center; }
+.empty-image { width: 64px; height: 64px; opacity: 0.25; margin-bottom: 16px; }
+.empty-title { font-size: 17px; font-weight: 600; color: #000000; }
+.empty-hint { margin-top: 8px; font-size: 14px; line-height: 20px; color: rgba(60, 60, 67, 0.6); }

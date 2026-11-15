@@ -136,10 +136,24 @@ function insets(value, fallback) {
 /** UIColor(white: 0.25) and the other gray levels of the core's defaults. */
 const DEFAULT_TEXT_COLOR = '#404040';
 const APP_TINT_COLOR = '#2AB9A0';
+/**
+ * A tag's background is never transparent (nor white on the white list, which looks the same): the default fill is
+ * UIKit's systemGray6, and a configured clear / transparent / zero-alpha background falls back to it.
+ */
+const DEFAULT_TAG_BACKGROUND = '#F2F2F7';
+
+/** The color, or the default tag fill when it is missing, invalid or fully transparent. */
+function opaqueBackground(value) {
+  const text = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  const parsed = text === 'transparent' ? null : color(value);
+  if (!parsed) return DEFAULT_TAG_BACKGROUND;
+  const alpha = /^rgba\([^)]*,\s*([\d.]+)\s*\)$/i.exec(parsed);
+  return alpha && Number(alpha[1]) === 0 ? DEFAULT_TAG_BACKGROUND : parsed;
+}
 
 function defaultAppearance(hairline) {
   return {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: DEFAULT_TAG_BACKGROUND,
     textColor: DEFAULT_TEXT_COLOR,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
@@ -214,7 +228,7 @@ const APPEARANCE_STATES = ['normal', 'selected', 'disabled'];
 /** `CYLTagAppearance.applyConfiguration(_:)`: missing keys keep their values; an invalid color restores the default. */
 function applyAppearance(appearance, configuration) {
   const has = (k) => Object.prototype.hasOwnProperty.call(configuration, k);
-  if (has('backgroundColor')) appearance.backgroundColor = color(configuration.backgroundColor) || '#FFFFFF';
+  if (has('backgroundColor')) appearance.backgroundColor = opaqueBackground(configuration.backgroundColor);
   if (has('textColor')) appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
   if (has('font')) appearance.font = fontValue(configuration.font) || { size: 14, weight: 'regular', italic: false };
   if (has('iconColor')) appearance.iconColor = color(configuration.iconColor);
@@ -666,7 +680,7 @@ function coderString(value) {
 
 module.exports = {
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
-  key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
+  DEFAULT_TAG_BACKGROUND, opaqueBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, stateOf, iconColor, tagHeight, cornerRadius,
   iconContent, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,

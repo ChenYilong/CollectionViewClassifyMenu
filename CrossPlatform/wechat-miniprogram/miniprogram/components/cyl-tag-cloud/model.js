@@ -80,7 +80,7 @@ const HAIRLINE = 0.5;
 /** CYLTagAppearance's defaults. */
 function appearance() {
   return {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F2F2F7', // never transparent nor white on the white list: systemGray6
     textColor: white(0.25),
     fontSize: 14,
     iconColor: null,

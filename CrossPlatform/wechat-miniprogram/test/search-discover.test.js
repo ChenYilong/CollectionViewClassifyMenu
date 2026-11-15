@@ -157,3 +157,16 @@ test('the discover grid has two titles per row, each as wide as the other', () =
   assert.deepEqual(rows[0][0], { index: 0, title: '春季露营装备清单', hot: true });
   assert.equal(rows[0][1].hot, false);
 });
+
+test('a search shows what it finds in the page data, and nothing for an unknown query (the empty placeholder)', () => {
+  const m = require('../miniprogram/pages/search-discover/discover-model.js');
+  const data = m.bundled('zh-Hans');
+  assert.deepEqual(m.searchResults(data, '  咖啡 ').map((r) => r.title), ['手冲咖啡入门']);
+  assert.deepEqual(m.searchResults(data, 'SWIFT').map((r) => r.title), ['swift 并发', 'SwiftUI 动画']);
+  assert.equal(m.searchResults(data, '春季')[0].hot, true);
+  assert.deepEqual(m.searchResults(data, 'test'), []);
+  assert.deepEqual(m.searchResults(data, '   '), []);
+  const texts = m.resultTexts('test', [], 'en');
+  assert.equal(texts.emptyTitle, 'No results for “test”');
+  assert.equal(m.resultTexts('咖啡', [{}], 'zh-Hans').summary, '“咖啡” · 1 条结果');
+});
