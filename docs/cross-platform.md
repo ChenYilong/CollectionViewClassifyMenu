@@ -77,6 +77,17 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   Not ported: the Classify tab (its SQLite library, op-sqlite, has no HarmonyOS version) and the
   `react-native-cyltabbar` tab bar (iOS/Android only).
 
+## TODO (2026-11-16): CYLTabBarController's tab bar in the React Native HarmonyOS example
+
+- **Context:** `react-native/react-native-cyl-tag-list/harmony-example` shows only the Tags page, with no tab bar; the
+  iOS/Android example uses `react-native-cyltabbar` (Tags, Classify, a raised Post plus button), which has no
+  HarmonyOS version. CYLTabBarController has a HarmonyOS library (`CrossPlatform/harmonyos-cyltabbar/cyltabbar`, branch
+  `feat/harmonyos-component`, newest commit `548892a`).
+- **Requirements:** the tab bar and its items come from CYLTabBarController (AGENTS.md: a configuration file, a raised
+  plus button with a page of its own); the pages are the example's React Native pages (Tags, Classify, Post), Classify
+  on the shared database through the OpenHarmony port of op-sqlite.
+- **Prompt (verbatim):** "use cyltabbarcontroller to do tabbar show and tabbar item"
+
 ## DONE (2026-11-15): one shared local database for every platform
 
 - **Status:** iOS demo app, `Example/CYLMenuExample` and Android DONE (2026-11-12). Flutter DONE (2026-11-15: the asset
