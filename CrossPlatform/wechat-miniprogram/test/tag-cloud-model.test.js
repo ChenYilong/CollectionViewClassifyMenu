@@ -2,7 +2,7 @@
 // CYLTagButton metrics and CYLTagListView's rows and selection (node --test).
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const model = require('../miniprogram/components/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
 
 test('colors are read as UIColor.cylMenuColor(from:) reads them (#RRGGBBAA is red, green, blue, alpha)', () => {
   assert.equal(model.color('#00BFFF'), 'rgb(0, 191, 255)');

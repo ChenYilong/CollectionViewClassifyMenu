@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const i18n = require('../miniprogram/utils/i18n.js');
 const model = require('../miniprogram/pages/search-category/search-category-model.js');
-const tagModel = require('../miniprogram/components/cyl-tag-list/model.js');
+const tagModel = require('cyl-tag-list-miniprogram/cyl-tag-list/model.js');
 
 test.beforeEach(() => i18n.setLanguage('zh_CN'));
 

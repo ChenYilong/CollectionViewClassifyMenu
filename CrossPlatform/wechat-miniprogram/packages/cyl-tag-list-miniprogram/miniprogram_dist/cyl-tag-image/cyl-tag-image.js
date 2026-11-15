@@ -12,7 +12,7 @@
  * tag} (after the turn while editing), `longpress` {index}, `drag` {index, percentPosition}.
  */
 const model = require('./model.js');
-const { coreString, joinList } = require('../../utils/cyl-core-strings.js');
+const { coreString, joinList } = require('../core-strings.js');
 
 const FRAME_INTERVAL = 16;
 

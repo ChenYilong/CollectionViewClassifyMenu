@@ -5,7 +5,7 @@
  * use the animation engines (Lottie and GIF here; PAG and Rive are not linked, so those tags show their images).
  */
 const { t } = require('../../utils/i18n.js');
-const animations = require('../../components/cyl-tag-list/animations.js');
+const animations = require('../../utils/tag-animations.js');
 const demo = require('./demo.js');
 
 Page({

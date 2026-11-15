@@ -4,7 +4,7 @@
  * CYLTagAppearanceKey keys), applied to the preview as `tagListView.style = style` is on iOS; the values the table
  * shows are read from the effective style (model.mergeStyle), as iOS reads them from the CYLMenuStyle.
  */
-const model = require('../../components/cyl-tag-list/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/model.js');
 
 /** Identifiers of the actions, in table order. */
 const ACTION_IDENTIFIERS = [

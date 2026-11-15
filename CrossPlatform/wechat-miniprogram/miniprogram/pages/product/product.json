@@ -3,6 +3,7 @@
   "navigationBarBackgroundColor": "#F2F2F7",
   "backgroundColor": "#F2F2F7",
   "usingComponents": {
-    "cyl-tag-list": "../../components/cyl-tag-list/cyl-tag-list"
+    "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
+    "cyl-lottie-icon": "/components/cyl-lottie-icon/cyl-lottie-icon"
   }
 }

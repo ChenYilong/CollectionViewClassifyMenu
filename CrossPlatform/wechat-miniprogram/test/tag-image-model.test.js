@@ -2,7 +2,7 @@
 // and CYLImageTagView's group separation; the sample's repository (node --test).
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const model = require('../miniprogram/components/cyl-tag-image/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-image/model.js');
 const data = require('../miniprogram/pages/sample-image-tag/data.js');
 
 test('a tap turns a tag to the next of the ten line directions', () => {

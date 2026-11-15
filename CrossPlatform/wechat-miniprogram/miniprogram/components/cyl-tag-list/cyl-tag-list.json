@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "cyl-lottie-icon": "../cyl-lottie-icon/cyl-lottie-icon"
-  }
-}

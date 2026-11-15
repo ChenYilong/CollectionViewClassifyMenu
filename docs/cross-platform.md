@@ -568,4 +568,32 @@ Program) show the same screens with the same data and look the same as iOS, whic
   WeChat DevTools' Build npm (`wechatide build_npm`), and check the example's pages use the built package from
   `miniprogram_npm`; (3) publish with `npm publish` after `npm login` (the maintainer runs `! npm login` first);
   (4) README with install, Build npm and usage.
-- **Status:** TODO.
+- **Steps 1, 2 and 4 DONE (2026-11-16); step 3 (publish) TODO.**
+  - **Package:** `CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram` (0.1.0, MIT like
+    `react-native-cyl-tag-list`): `miniprogram_dist/` holds `cyl-tag-list` (model, symbols, animations),
+    `cyl-tag-cloud`, `cyl-tag-image`, `locale.js` (the language and `tc()`), `core-strings.js`, `core-tables.js`
+    (now written there by `scripts/export-miniprogram-data.py`) and `index.js`; `"miniprogram": "miniprogram_dist"`,
+    and `exports` maps `cyl-tag-list-miniprogram/<file>` to the same files under Node, so the unit tests and the Mini
+    Program require the same paths.
+  - **Engines stay in the app, deviating from requirement (1):** the package links no animation engine.
+    CYLTabBarController's cyl-lottie / cyl-rive / cyl-pag are not on npm, and cyl-pag must live in the example's
+    `engines` subpackage for the 2 MB main package. Instead, `animations.js` takes the app's files and engines through
+    `configure({registry, assets, engines})`, done by the example's `utils/tag-animations.js` from `app.js`, and
+    `cyl-tag-list` declares the abstract node `cyl-animation-icon` (`componentGenerics`, default: an empty slot). The
+    example's pages pass `generic:cyl-animation-icon="cyl-lottie-icon"`, and `components/cyl-lottie-icon` stays in
+    the example.
+  - **Example:** depends on the package with `file:packages/cyl-tag-list-miniprogram` (the example's own package is
+    now `cyl-tag-list-miniprogram-example`). `project.config.json` sets `packNpmManually` with `packNpmRelationList`
+    (`./package.json` → `./miniprogram/`), and `miniprogram_npm/` stays git-ignored. Every page and test requires
+    `cyl-tag-list-miniprogram/...`, and `utils/i18n.js` reads the language from the library's `locale.js`, so the
+    tags and the example agree.
+  - **Verified:** `node scripts/verify-package.js` runs `npm pack` (`cyl-tag-list-miniprogram-0.1.0.tgz`, 26 files,
+    42 193 bytes), checks the tarball holds exactly `package.json`, `README.md` and `miniprogram_dist/`, then installs
+    the tarball (a copy, not the link) and compares every file with its source. WeChat DevTools' Build npm
+    (`wechatide build_npm`) then built `miniprogram_npm/cyl-tag-list-miniprogram` (24 files, no warnings, 1.4 s). On
+    the simulator, these pages render from it: Animations (engine "linked", Lottie and PAG icons through the
+    generic), TagViewGroup (image tags) and TagView Sample (tag cloud). The console shows no errors. `npm test`: 105
+    pass, both with the link and with the installed tarball. CI (`miniprogram.yml`) now runs `npm install` and
+    `verify-package.js`.
+  - **Publish (TODO):** the maintainer runs `! npm login`, then `npm publish` in `packages/cyl-tag-list-miniprogram`
+    (`npm whoami` on 2026-11-16: not logged in).

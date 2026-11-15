@@ -1,9 +1,13 @@
 {
-  "name": "cyl-tag-list-miniprogram",
+  "name": "cyl-tag-list-miniprogram-example",
   "version": "0.1.0",
   "private": true,
   "description": "WeChat Mini Program example of CollectionViewClassifyMenu: the tag list, the classify menu and the multiple filter",
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "verify-package": "node scripts/verify-package.js"
+  },
+  "dependencies": {
+    "cyl-tag-list-miniprogram": "file:packages/cyl-tag-list-miniprogram"
   }
 }

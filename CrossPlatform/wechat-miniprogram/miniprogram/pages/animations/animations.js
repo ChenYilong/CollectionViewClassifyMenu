@@ -8,8 +8,8 @@
  * their tags show only their titles, as on iOS without those subspecs.
  */
 const i18n = require('../../utils/i18n.js');
-const animations = require('../../components/cyl-tag-list/animations.js');
-const symbols = require('../../components/cyl-tag-list/symbols.js');
+const animations = require('../../utils/tag-animations.js');
+const symbols = require('cyl-tag-list-miniprogram/cyl-tag-list/symbols.js');
 const demo = require('./demo.js');
 
 const { t } = i18n;

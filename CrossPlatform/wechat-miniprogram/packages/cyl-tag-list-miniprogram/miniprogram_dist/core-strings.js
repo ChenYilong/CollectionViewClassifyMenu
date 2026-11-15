@@ -1,9 +1,9 @@
 /**
  * The core library's own strings (CollectionViewClassifyMenu/Resources/Localization/*.lproj/CYLClassifyMenu.strings),
  * read by `CYLMenuLocalizedString` in the core: the accessibility names of the tag views and the image tag view. They
- * follow the example's language (utils/i18n.js). No `wx` calls.
+ * follow the language of locale.js. No `wx` calls.
  */
-const i18n = require('./i18n.js');
+const locale = require('./locale.js');
 
 const TABLES = {
   'zh-Hans': {
@@ -53,7 +53,7 @@ const TABLES = {
 /** The list separator of `ListFormatter` for the current language ("A, B and C" / "A、B和C"). */
 function joinList(items) {
   const list = items.filter((item) => item);
-  const language = i18n.language();
+  const language = locale.language();
   if (list.length <= 1) return list.join('');
   if (language === 'en') {
     if (list.length === 2) return `${list[0]} and ${list[1]}`;
@@ -64,9 +64,9 @@ function joinList(items) {
 
 /** The core string `key` in the current language, with `args` filled in. */
 function coreString(key, ...args) {
-  const table = TABLES[i18n.language()] || TABLES['zh-Hans'];
+  const table = TABLES[locale.language()] || TABLES['zh-Hans'];
   const text = table[key] || TABLES['zh-Hans'][key] || key;
-  return args.length ? i18n.format(text, args) : text;
+  return args.length ? locale.format(text, args) : text;
 }
 
 module.exports = { coreString, joinList, TABLES };

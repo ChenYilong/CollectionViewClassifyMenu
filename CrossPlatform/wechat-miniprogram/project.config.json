@@ -10,7 +10,14 @@
     "enhance": true,
     "postcss": true,
     "minified": true,
-    "urlCheck": true
+    "urlCheck": true,
+    "packNpmManually": true,
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./miniprogram/"
+      }
+    ]
   },
   "packOptions": {
     "ignore": [],

@@ -9,19 +9,20 @@
  * `cellMetrics()`.
  * Events: `tagtap` {section, item, title, selected, sectionTitle}, `selectionchange` {keys, items: [{section, item,
  * title}]}, `contentheightchange` {height}.
- * Animated icons (Lottie, GIF) come from cyl-lottie-icon; PAG and Rive engines are not linked (animations.js).
+ * Animated icons come from the app's `cyl-animation-icon` (generic:cyl-animation-icon="…") and the files and engines it
+ * registers with animations.js `configure()`; without them a tag shows its symbol or image.
  */
 const model = require('./model.js');
 const animations = require('./animations.js');
-const i18n = require('../../utils/i18n.js');
+const locale = require('../locale.js');
 
 /** The core's localized fold titles (CYLMenuExpand / CYLMenuCollapse) when the string tables have them. */
 function foldTitle(control, expanded) {
   if (expanded && control.collapseTitle) return control.collapseTitle;
   if (!expanded && control.title) return control.title;
-  if (typeof i18n.tc === 'function') {
+  if (typeof locale.tc === 'function') {
     const k = expanded ? 'CYLMenuCollapse' : 'CYLMenuExpand';
-    const text = i18n.tc(k);
+    const text = locale.tc(k);
     if (text && text !== k) return text;
   }
   return model.foldTitle(expanded);

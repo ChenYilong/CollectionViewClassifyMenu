@@ -6,7 +6,7 @@
 const { t } = require('../../utils/i18n.js');
 const { COLORS } = require('../../utils/android-sample.js');
 const data = require('./data.js');
-const model = require('../../components/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
 
 const GITHUB_URL = 'https://github.com/kaedea/';
 

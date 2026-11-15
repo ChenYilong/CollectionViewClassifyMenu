@@ -15,7 +15,7 @@
  * (selectedTagDragHandler), `reorderingchange` {reordering}, `contentchange` after the tags changed.
  */
 const model = require('./model.js');
-const { coreString } = require('../../utils/cyl-core-strings.js');
+const { coreString } = require('../core-strings.js');
 
 /** How far a press moves before it counts as a drag rather than a long press (`dragThreshold`). */
 const DRAG_THRESHOLD = 8;

@@ -8,7 +8,7 @@
 const { t, tc } = require('../../utils/i18n.js');
 const selections = require('../../utils/selections.js');
 const state = require('./menu-linkage.js');
-const { rowsFromTops } = require('../../components/cyl-tag-list/model.js');
+const { rowsFromTops } = require('cyl-tag-list-miniprogram/cyl-tag-list/model.js');
 
 const VISIBLE_ROWS = 2; // defaultVisibleRows
 

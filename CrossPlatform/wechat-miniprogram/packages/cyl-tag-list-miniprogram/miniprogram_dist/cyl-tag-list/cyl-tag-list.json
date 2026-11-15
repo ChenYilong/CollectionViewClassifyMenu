@@ -1,0 +1,9 @@
+{
+  "component": true,
+  "usingComponents": {},
+  "componentGenerics": {
+    "cyl-animation-icon": {
+      "default": "../cyl-animation-icon/cyl-animation-icon"
+    }
+  }
+}
