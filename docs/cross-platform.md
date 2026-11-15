@@ -555,3 +555,17 @@ Program) show the same screens with the same data and look the same as iOS, whic
   `assets/ios-animation-playback-controls.png` (Home, Health, Posts, Me, 动效一, 动效二), playing and looping.
 
   <img src="assets/miniprogram-animations-pag-rive-loop.png" width="240" alt="Mini Program: Lottie, PAG and Rive icons looping, in their tags after scrolling">
+
+### TODO (2026-11-15): the Mini Program tag list as an npm library (cyl- prefix)
+
+- **Prompt (verbatim):** "在跨端相关文档中标记TODO：小程序封装成库 cyl- 开头的小程序库，用 npm 打包加「构建 npm」实际验证过。提醒我的话先运行 ! npm login。"
+  (EN: mark a TODO in the cross-platform documents: package the Mini Program as a library named with the cyl- prefix,
+  packed with npm and actually verified with WeChat DevTools' "Build npm"; remind the user to run `npm login` first.)
+- **Requirements:** (1) a Mini Program npm package with the `cyl-` prefix (e.g. `cyl-tag-list-miniprogram`, like
+  CYLTabBarController's `cyl-tabbar-miniprogram`) holding `components/cyl-tag-list` (model, symbols, animations,
+  `cyl-lottie-icon`), `cyl-tag-cloud` and `cyl-tag-image`, with a `miniprogram` field and the Lottie / Rive / PAG
+  engines as dependencies or optional packages; (2) `npm pack`, then install the tarball in the example and run
+  WeChat DevTools' Build npm (`wechatide build_npm`), and check the example's pages use the built package from
+  `miniprogram_npm`; (3) publish with `npm publish` after `npm login` (the maintainer runs `! npm login` first);
+  (4) README with install, Build npm and usage.
+- **Status:** TODO.
