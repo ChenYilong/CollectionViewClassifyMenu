@@ -278,7 +278,7 @@ def main():
         return 1
     text = render(rows, mapping)
     if "--check" in args:
-        if not DOC.exists() or DOC.read_text(encoding="utf-8") != text:
+        if not DOC.exists() or DOC.read_text(encoding="utf-8").replace("\r\n", "\n") != text:
             print("docs/harmony.md is out of date (run harmony/scripts/harmony_parity.py)")
             return 1
         print("OK: docs/harmony.md matches the Swift core and harmony/parity-map.json.")
