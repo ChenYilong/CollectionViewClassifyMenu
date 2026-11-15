@@ -297,6 +297,7 @@ struct ClassifyPage {
         }, (place: Place) => `${place.name}-${place.region}`)
       }.layoutWeight(1)
     }
+    .id('classifyPage')
     .height('100%')
     .bindSheet($$this.showFilter, this.filterSheet(), { height: SheetSize.LARGE, title: { title: 'Filter' } })
   }
