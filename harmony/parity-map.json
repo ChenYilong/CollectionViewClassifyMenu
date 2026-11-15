@@ -16,6 +16,10 @@
       [
         "Language",
         "ArkTS, ArkUI declarative UI; the core is a HAR module (`harmony/classifymenu`), the example a HAP (`harmony/entry`)"
+      ],
+      [
+        "Principles",
+        "API: the iOS core one to one; example: the iOS example one to one (screens, texts, data, behaviors); internal implementation: migrated from the Android Kotlin sources (`android/merged`), Swift deciding where they differ (`instructions.md`)"
       ]
     ]
   },
