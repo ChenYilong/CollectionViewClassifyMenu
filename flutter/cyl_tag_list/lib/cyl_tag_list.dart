@@ -87,6 +87,11 @@ class CylTagListView extends StatefulWidget {
   /// a column above other content; false (default) fills the height its parent gives it and scrolls inside.
   final bool sizesToContent;
 
+  /// Builds the native view on a platform this package does not know (HarmonyOS: package `cyl_tag_list_ohos` sets it
+  /// at startup); receives the view type, the creation parameters and the callback that attaches the method channel.
+  static Widget Function(String viewType, Map<String, Object?> creationParams, void Function(int id) onCreated)?
+      platformViewBuilder;
+
   @override
   State<CylTagListView> createState() => _CylTagListViewState();
 }
@@ -158,7 +163,9 @@ class _CylTagListViewState extends State<CylTagListView> {
           onPlatformViewCreated: _onCreated,
         );
       default:
-        return const Center(child: Text('CylTagListView supports iOS and Android'));
+        final builder = CylTagListView.platformViewBuilder;
+        if (builder != null) return builder(_viewType, creationParams, _onCreated);
+        return const Center(child: Text('CylTagListView supports iOS, Android and HarmonyOS'));
     }
   }
 }

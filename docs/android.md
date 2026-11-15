@@ -197,6 +197,13 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
   <img src="assets/harmonyos-filter.jpeg" width="360" alt="HarmonyOS: Filter sheet with regions and dishes">
 
+- **Step 2: in progress (2026-11-15).** `flutter/cyl_tag_list_ohos` (OhosView + ArkTS platform view on
+  `harmony/classifymenu`, registered through `dartPluginClass`) and the `CylTagListView.platformViewBuilder` hook are
+  written, not yet built. Blocker: Flutter `3.41.9+ohos-1.0.2`'s embedding needs a HarmonyOS SDK newer than the
+  installed API 21 (`autoFillManager.AutoFillType` missing). Next: try Flutter `3.35.7+ohos-1.0.5` (downloaded to
+  `/tmp/xpr/fo35`; needs the Dart minimum at 3.9), else install a newer SDK in DevEco Studio. Mirror `/tmp/xpr/flo`;
+  sqflite on HarmonyOS through `openharmony-sig/flutter_sqflite` `br_v2.4.2_ohos` in a mirror-only
+  `pubspec_overrides.yaml`.
   Earlier note: When React Native or
   Flutter examples are added, show the classify menu and the multiple filter in tabs of their own, as the iOS and
   Android examples do (request of 2026-11-12, `issue-progress.md`).
