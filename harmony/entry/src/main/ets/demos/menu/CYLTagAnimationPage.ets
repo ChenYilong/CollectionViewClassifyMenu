@@ -8,7 +8,8 @@ import { CYLUIContext } from '@cyl/classifymenu';
  * to it) and a loop switch (循环播放); they combine and act at once, also on icons that are playing.
  *
  * HarmonyOS: the core picks the engine by the file's extension: Lottie (@ohos/lottie), PAG (@tencent/libpag), Rive
- * (@ohos/rive), GIF (frames decoded by ImageKit). The files are rawfiles (pag/, rive/, gif/), with the same Rive
+ * (@ohos/rive), SVGA (decoded by the library), GIF (frames decoded by ImageKit). The files are rawfiles (pag/, rive/,
+ * svga/, gif/); every Rive scene has an SVGA twin (svga, svga-dark), with the same Rive
  * options and PAG resting progress as iOS. Rive has no playback speed on HarmonyOS (`CYLRivePlayer`).
  */
 import {
@@ -24,7 +25,7 @@ export const SPEED_STEP: number = 0.25;
 
 /** Section identifiers, one per library, in order. */
 export const ANIMATION_SECTION_IDENTIFIERS: string[] =
-  ['lottie', 'lottie-images', 'lottie-green', 'pag', 'rive', 'rive-icons', 'gif', 'images'];
+  ['lottie', 'lottie-images', 'lottie-green', 'pag', 'rive', 'rive-icons', 'svga', 'svga-dark', 'gif', 'images'];
 
 /** The configuration (map) the tag list is created with (rawfile menu/animation-demo.json; Lottie files are rawfiles). */
 const CONFIGURATION_PATH: string = 'menu/animation-demo.json';
@@ -34,19 +35,19 @@ const IMAGES: Map<string, CYLImage> = new Map<string, CYLImage>([
   ['1-0', $r('app.media.b_gray_tabbar_home_placeholder')],
   ['1-1', $r('app.media.b_gray_tabbar_message_placeholder')],
   ['1-2', $r('app.media.b_gray_tabbar_me_placeholder')],
-  ['7-0', $r('app.media.b_home_normal')],
-  ['7-1', $r('app.media.b_fishpond_normal')],
-  ['7-2', $r('app.media.b_post_normal')],
-  ['7-3', $r('app.media.b_message_normal')],
-  ['7-4', $r('app.media.b_account_normal')]
+  ['9-0', $r('app.media.b_home_normal')],
+  ['9-1', $r('app.media.b_fishpond_normal')],
+  ['9-2', $r('app.media.b_post_normal')],
+  ['9-3', $r('app.media.b_message_normal')],
+  ['9-4', $r('app.media.b_account_normal')]
 ]);
 
 const SELECTED_IMAGES: Map<string, CYLImage> = new Map<string, CYLImage>([
-  ['7-0', $r('app.media.b_home_highlight')],
-  ['7-1', $r('app.media.b_fishpond_highlight')],
-  ['7-2', $r('app.media.b_post_highlight')],
-  ['7-3', $r('app.media.b_message_highlight')],
-  ['7-4', $r('app.media.b_account_highlight')]
+  ['9-0', $r('app.media.b_home_highlight')],
+  ['9-1', $r('app.media.b_fishpond_highlight')],
+  ['9-2', $r('app.media.b_post_highlight')],
+  ['9-3', $r('app.media.b_message_highlight')],
+  ['9-4', $r('app.media.b_account_highlight')]
 ]);
 
 function pathKey(p: CYLIndexPath): string {

@@ -39,9 +39,13 @@ export * from './src/main/ets/tagviews/TagViewsIndex';
 export {
   CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, CYLLottiePlayer, CYLPAGPlayer, CYLGIFPlayer, CYLRivePlayer,
 <<<<<<< HEAD
+<<<<<<< HEAD
   CYLSVGAPlayer,
 =======
 >>>>>>> 7c7c1f3 (feat(harmony): four animation engines, the animation screen, view handles (score 100))
+=======
+  CYLSVGAPlayer,
+>>>>>>> 8a2f641 (feat(harmony): ✨ SVGA animated icons, decoded by the library)
   cylAnimationEngine
 } from './src/main/ets/components/CYLAnimationPlayer';
 export { CYLAnimatedIcon } from './src/main/ets/components/CYLAnimatedIcon';
@@ -53,9 +57,12 @@ export {
 export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
 export { CYLUIContext } from './src/main/ets/core/CYLUIContext';
 export { CYLSVGAMovie, CYLSVGASprite, CYLSVGAFrame, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform, CYLSVGARect } from './src/main/ets/components/svga/CYLSVGAMovie';
+<<<<<<< HEAD
 =======
 >>>>>>> 7c7c1f3 (feat(harmony): four animation engines, the animation screen, view handles (score 100))
 =======
 export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
 export { CYLUIContext } from './src/main/ets/core/CYLUIContext';
 >>>>>>> d2e3a1d (fix(harmony): 🐛 ArkTS warnings 92 → 1 (score 9.1))
+=======
+>>>>>>> 8a2f641 (feat(harmony): ✨ SVGA animated icons, decoded by the library)
