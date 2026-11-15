@@ -10,9 +10,9 @@ REPO="$LIB/../.."
 cd "$HERE"
 
 # CYLTabBarController's HarmonyOS library at the newest commit that has what the example needs: the plus button read
-# from the configuration (CYLTabBarController PR #796, merged into feat/harmonyos-component as 6c941e9;
-# CrossPlatform/harmonyos-cyltabbar is on no other branch yet).
-CYL_TAB_BAR_COMMIT=6c941e999de48cab898271fa4db5fca3ee4918d9
+# from the configuration (PR #796) plus that branch's accessibility and localization (the head of
+# feat/harmonyos-component; CrossPlatform/harmonyos-cyltabbar is on no other branch yet).
+CYL_TAB_BAR_COMMIT=19cbf801f9b7c7f2a571aacaf6eaea9ad1ff9a5e
 if [ ! -d .deps/CYLTabBarController ]; then
   mkdir -p .deps
   git clone -q --filter=blob:none --no-checkout https://github.com/ChenYilong/CYLTabBarController.git .deps/CYLTabBarController
