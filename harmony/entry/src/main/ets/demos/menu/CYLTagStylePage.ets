@@ -23,7 +23,7 @@ const ACTIONS: string[][] = [
     'imageTitleSpacing', 'imageSize', 'imageInsets', 'titlePositionAdjustment', 'imagePositionAdjustment',
     'content.iconAndTitle', 'content.iconOnly', 'content.titleOnly', 'layoutCentered', 'selectedImage'],
   ['backgroundColor.normal', 'backgroundColor.selected', 'borderColor', 'borderWidth', 'cornerRadius', 'margin'],
-  ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.gif', 'animation.off', 'animationSpeed',
+  ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.svga', 'animation.gif', 'animation.off', 'animationSpeed',
     'configuration', 'tagCloud'],
   ['sample.tagCloud', 'sample.imageTag', 'sample.tagContainer'],
   ['reset']
@@ -57,6 +57,7 @@ const ACTION_TITLES: Map<string, string> = new Map<string, string>([
   ['animation.lottie', CYLExampleLocalizedString('Lottie 动效图标')],
   ['animation.pag', CYLExampleLocalizedString('PAG 动效图标')],
   ['animation.rive', CYLExampleLocalizedString('Rive 动效图标')],
+  ['animation.svga', CYLExampleLocalizedString('SVGA 动效图标')],
   ['animation.gif', CYLExampleLocalizedString('GIF 动效图标')],
   ['animation.off', CYLExampleLocalizedString('关闭动效（静态图标）')],
   ['animationSpeed', CYLExampleLocalizedString('设置动效速度 animationSpeed')],
@@ -124,9 +125,10 @@ const SAMPLES: CYLStyleSample[] = [
   { title: CYLExampleLocalizedString('已禁用'), image: $r('sys.media.ohos_ic_public_cancel'), selectedImage: $r('sys.media.ohos_ic_public_cancel') }
 ];
 
-/** The animated icons; the HarmonyOS core plays Lottie only (PAG, Rive and GIF show the static icons). */
+/** The animated icons by library; PAG, Rive and GIF keep the static icons here (their scenes are on the 动效 tab). */
 const ANIMATION_FILES: Map<string, string[]> = new Map<string, string[]>([
-  ['lottie', ['asset:tab_home_animate.json', 'asset:tab_me_animate.json']]
+  ['lottie', ['asset:tab_home_animate.json', 'asset:tab_me_animate.json']],
+  ['svga', ['asset:svga/tab_home.svga', 'asset:svga/tab_chat.svga', 'asset:svga/tab_profile.svga']]
 ]);
 
 export function demoStyle(): CYLMenuStyle {
@@ -152,7 +154,7 @@ export struct CYLTagStylePage {
   private controller: CYLTagListController = new CYLTagListController();
   private style: CYLMenuStyle = demoStyle();
   private content: CYLTagStyleDemoContent = CYLTagStyleDemoContent.iconAndTitle;
-  /** "lottie", "gif", "pag", "rive", or undefined for static icons. */
+  /** "lottie", "gif", "pag", "rive", "svga", or undefined for static icons. */
   private animationLibrary: string | undefined = undefined;
   private usesSelectedImage: boolean = true;
   /** How many times each action ran, to cycle through its values. */
@@ -271,6 +273,7 @@ export struct CYLTagStylePage {
       case 'animation.lottie':
       case 'animation.pag':
       case 'animation.rive':
+      case 'animation.svga':
       case 'animation.gif':
       case 'animation.off': {
         const library = identifier.substring('animation.'.length);

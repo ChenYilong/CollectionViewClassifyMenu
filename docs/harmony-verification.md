@@ -90,7 +90,7 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 | D2 | PAG (`@tencent/libpag`) | loads from the rawfile folder, plays, speed, loop | TODO |
 | D3 | Rive (`@ohos/rive`) | plays, state-machine options, loop; no speed (engine limit, stated in the page) | TODO |
 | D4 | GIF (ImageKit frames) | decodes, plays, speed, loop | TODO |
-| D5 | SVGA | the SVGA scenes mirror the Rive scenes (`issue-progress.md`, SVGA TODO) | TODO |
+| D5 | SVGA | the SVGA scenes mirror the Rive scenes (`issue-progress.md`, SVGA TODO) | TODO (code done, device check pending): no ohpm SVGA player exists, so the library decodes SVGA 2.x itself (`components/svga/`: `CYLInflate` (RFC 1950/1951), `CYLSVGAMovie` (protobuf `MovieEntity`), drawn by `CYLSVGAIconView` on a Canvas: bitmaps with alpha, layout, transform, clip path; path / rect / ellipse shapes; no mattes or audio) and plays it with `CYLSVGAPlayer` (speed, loop, Play all, resting progress, last frame). `scripts/svga-decoder-test.sh`: all six example files inflate byte for byte as zlib and decode (frames, sprites, PNG bitmaps). Example: sections `svga` and `svga-dark` beside `rive` and `rive-icons` on the 动效 tab, and an SVGA choice beside Rive on the 样式 tab |
 
 ### E. Localization (3)
 
@@ -120,10 +120,11 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 - 2026-11-16: A3 (test HAP builds), A4 (ArkTS warnings 92 → 1, the documented API 12 fallback). 4 / 44 = 9.1 / 100.
 - 2026-11-16: E1 (already done by the parity work), E2 (example localization). 6 / 44 = 13.6 / 100.
 - 2026-11-16: UI tests written for C2–C6 (`QueryScenarios`, `StylesAndAnimations`, `Samples` test files, shared `TestSupport`); they count only after a passing emulator run. Accessibility: tappable rows, menu buttons and tag buttons are one labeled element each (F1 waits for an emulator check). The emulator image (HarmonyOS 6.0.1, API 21, x86) is downloaded, but no emulator instance exists yet. Score unchanged: 6 / 44 = 13.6 / 100.
+- 2026-11-16: SVGA engine in the library and the SVGA scenes in the example (D5 waits for the emulator). Score unchanged: 6 / 44 = 13.6 / 100.
 
 ## Next steps (resume here)
 
 - When the emulator is up: `harmony/scripts/ui-test.sh` (set `DEVECO` to the Windows path), then B1–B22
   screenshots, C, D, F2.
-- D5 (SVGA): no ohpm SVGA package exists (`@ohos/svgaplayer` and others return 404). It needs an ArkTS player
-  (zlib + protobuf + Canvas), after the iOS core has SVGA.
+- D5 (SVGA): check `svga` / `svga-dark` on the 动效 tab and `style-animation.svga` on the emulator (play, speed, loop,
+  last frame when selected).

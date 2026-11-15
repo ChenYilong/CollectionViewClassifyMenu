@@ -38,6 +38,7 @@ export * from './src/main/ets/classify/ClassifyIndex';
 export * from './src/main/ets/tagviews/TagViewsIndex';
 export {
   CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, CYLLottiePlayer, CYLPAGPlayer, CYLGIFPlayer, CYLRivePlayer,
+  CYLSVGAPlayer,
   cylAnimationEngine
 } from './src/main/ets/components/CYLAnimationPlayer';
 export { CYLAnimatedIcon } from './src/main/ets/components/CYLAnimatedIcon';
@@ -46,3 +47,4 @@ export {
 } from './src/main/ets/components/CYLTagListSupplementaryView';
 export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
 export { CYLUIContext } from './src/main/ets/core/CYLUIContext';
+export { CYLSVGAMovie, CYLSVGASprite, CYLSVGAFrame, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform, CYLSVGARect } from './src/main/ets/components/svga/CYLSVGAMovie';
