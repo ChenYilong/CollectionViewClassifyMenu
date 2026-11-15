@@ -35,6 +35,7 @@ export struct CYLFilterCollectionCellView {
     Stack() {
       if (this.cell.titleButton.backgroundImageFor(this.cell.titleButton.stateFlags()) !== undefined) {
         Image(this.cell.titleButton.backgroundImageFor(this.cell.titleButton.stateFlags()))
+          .accessibilityLevel('no')
           .width('100%')
           .height('100%')
           .objectFit(ImageFit.Fill)
@@ -95,6 +96,7 @@ export struct CYLMultipleFilterHeaderViewComponent {
     Stack({ alignContent: Alignment.TopStart }) {
       if (this.header.imageView !== undefined) {
         Image(this.header.imageView)
+          .accessibilityLevel('no')
           .objectFit(ImageFit.None)
           .position({ x: IMAGE_X, y: 0 })
           .width(IMAGE_SIZE)
@@ -116,5 +118,7 @@ export struct CYLMultipleFilterHeaderViewComponent {
     }
     .width(this.viewWidth)
     .height(CYLMultipleFilterHeaderView.height)
+    .accessibilityGroup(true)
+    .accessibilityText(this.header.titleLabel)
   }
 }

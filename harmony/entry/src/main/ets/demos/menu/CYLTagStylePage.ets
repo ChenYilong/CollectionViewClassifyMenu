@@ -1,3 +1,4 @@
+import { CYLUIContext } from '@cyl/classifymenu';
 import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * `CYLTagStyleDemoViewController` (标签样式): a tag preview on top; each row of the table below changes one style
@@ -109,20 +110,26 @@ function offsetString(o: CYLOffset): string {
   return `{${o.horizontal}, ${o.vertical}}`;
 }
 
-/** Title key, icon and selected icon of the preview's tags (SF Symbols in iOS; the nearest HarmonyOS images). */
+/**
+ * Title, icon and selected icon of the preview's tags (SF Symbols in iOS; the nearest HarmonyOS images). The tab
+ * titles are the native string resources copied from CYLTabBarController's HarmonyOS example (`app.string.tab_*`);
+ * the others are example strings.
+ */
 interface CYLStyleSample {
   title: string;
+  titleResource?: Resource;
   image: CYLImage;
   selectedImage: CYLImage;
+  disabled?: boolean;
 }
 
 const SAMPLES: CYLStyleSample[] = [
-  { title: CYLExampleLocalizedString('首页'), image: $r('app.media.b_home_normal'), selectedImage: $r('app.media.b_home_highlight') },
-  { title: CYLExampleLocalizedString('同城'), image: $r('sys.media.ohos_ic_public_location'), selectedImage: $r('app.media.b_fishpond_highlight') },
-  { title: CYLExampleLocalizedString('消息'), image: $r('app.media.b_message_normal'), selectedImage: $r('app.media.b_message_highlight') },
-  { title: CYLExampleLocalizedString('我的'), image: $r('app.media.b_account_normal'), selectedImage: $r('app.media.b_account_highlight') },
+  { title: CYLExampleLocalizedString('首页'), titleResource: $r('app.string.tab_home'), image: $r('app.media.b_home_normal'), selectedImage: $r('app.media.b_home_highlight') },
+  { title: CYLExampleLocalizedString('同城'), titleResource: $r('app.string.tab_nearby'), image: $r('sys.media.ohos_ic_public_location'), selectedImage: $r('app.media.b_fishpond_highlight') },
+  { title: CYLExampleLocalizedString('消息'), titleResource: $r('app.string.tab_messages'), image: $r('app.media.b_message_normal'), selectedImage: $r('app.media.b_message_highlight') },
+  { title: CYLExampleLocalizedString('我的'), titleResource: $r('app.string.tab_me'), image: $r('app.media.b_account_normal'), selectedImage: $r('app.media.b_account_highlight') },
   { title: CYLExampleLocalizedString('一个很长很长的标签标题'), image: $r('sys.media.ohos_ic_public_ok'), selectedImage: $r('sys.media.ohos_ic_public_ok_filled') },
-  { title: CYLExampleLocalizedString('已禁用'), image: $r('sys.media.ohos_ic_public_cancel'), selectedImage: $r('sys.media.ohos_ic_public_cancel') }
+  { title: CYLExampleLocalizedString('已禁用'), disabled: true, image: $r('sys.media.ohos_ic_public_cancel'), selectedImage: $r('sys.media.ohos_ic_public_cancel') }
 ];
 
 /** The animated icons by library; PAG, Rive and GIF keep the static icons here (their scenes are on the 动效 tab). */
@@ -350,10 +357,10 @@ export struct CYLTagStylePage {
     const iconOnly = this.content === CYLTagStyleDemoContent.iconOnly;
     const titleOnly = this.content === CYLTagStyleDemoContent.titleOnly;
     for (const sample of SAMPLES) {
-      const item = new CYLExampleMenuItem(iconOnly ? '' : sample.title);
+      const item = new CYLExampleMenuItem(iconOnly ? '' : this.sampleTitle(sample));
       item.image = titleOnly ? undefined : sample.image;
       item.selectedImage = (titleOnly || !this.usesSelectedImage) ? undefined : sample.selectedImage;
-      item.isEnabled = sample.title !== '已禁用';
+      item.isEnabled = sample.disabled !== true;
       if (this.animationLibrary !== undefined && item.isEnabled && !titleOnly) {
         item.animationURL = this.animationURL(items.length);
       }
@@ -370,6 +377,18 @@ export struct CYLTagStylePage {
   animationURL(index: number): string | undefined {
     const names = this.animationLibrary !== undefined ? ANIMATION_FILES.get(this.animationLibrary) : undefined;
     return names !== undefined && names.length > 0 ? names[index % names.length] : undefined;
+  }
+
+  /** A sample's title: its native string resource in the current language when it has one. */
+  private sampleTitle(sample: CYLStyleSample): string {
+    if (sample.titleResource === undefined) {
+      return sample.title;
+    }
+    try {
+      return CYLUIContext.hostContext(this.getUIContext()).resourceManager.getStringSync(sample.titleResource.id);
+    } catch (error) {
+      return sample.title;
+    }
   }
 
   applyStyle(): void {

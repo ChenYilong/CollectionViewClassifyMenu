@@ -2,6 +2,7 @@
   "string": [
     {
       "name": "module_desc",
+<<<<<<< HEAD
       "value": "CollectionViewClassifyMenu example"
     },
     {
@@ -35,18 +36,37 @@
     {
       "name": "tapped",
       "value": "Tapped %s"
+=======
+      "value": "CYLClassifyMenu example"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "CYLClassifyMenu example"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "CYLMenuExample"
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
     },
     {
       "name": "tab_home",
       "value": "Home"
     },
     {
+<<<<<<< HEAD
+=======
+      "name": "tab_nearby",
+      "value": "Nearby"
+    },
+    {
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
       "name": "tab_messages",
       "value": "Messages"
     },
     {
       "name": "tab_me",
       "value": "Me"
+<<<<<<< HEAD
     },
     {
       "name": "tab_search",
@@ -126,3 +146,8 @@
     }
   ]
 }
+=======
+    }
+  ]
+}
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)

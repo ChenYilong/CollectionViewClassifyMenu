@@ -1,6 +1,7 @@
 {
   "string": [
     {
+<<<<<<< HEAD
       "name": "speed",
       "value": "速度"
     },
@@ -23,18 +24,38 @@
     {
       "name": "tapped",
       "value": "點了 %s"
+=======
+      "name": "module_desc",
+      "value": "CYLClassifyMenu 範例"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "CYLClassifyMenu 範例"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "CYLMenuExample"
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
     },
     {
       "name": "tab_home",
       "value": "首頁"
     },
     {
+<<<<<<< HEAD
+=======
+      "name": "tab_nearby",
+      "value": "同城"
+    },
+    {
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
       "name": "tab_messages",
       "value": "訊息"
     },
     {
       "name": "tab_me",
       "value": "我的"
+<<<<<<< HEAD
     },
     {
       "name": "tab_search",
@@ -114,3 +135,8 @@
     }
   ]
 }
+=======
+    }
+  ]
+}
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)

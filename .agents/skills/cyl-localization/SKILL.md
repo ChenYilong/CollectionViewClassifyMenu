@@ -116,6 +116,7 @@ PY
   keeps its sample sections ("全部", "地区过滤", "菜品过滤") as Chinese sample data; so does the `TagCollectionView`
   demo's tag data. Localize them through a lookup both apps can reach if they become real UI text.
 
+<<<<<<< HEAD
 ## Localization on HarmonyOS
 
 Same rule as AGENTS.md "Accessibility and localization on HarmonyOS (and every platform)":
@@ -137,3 +138,17 @@ Same rule as AGENTS.md "Accessibility and localization on HarmonyOS (and every p
   (a slider's thumb), and file the missing label as a bug.
 - **Checks:** `python3 scripts/harmonyos-l10n-check.py` (the same keys in every locale, no literal text in ArkTS);
   the HarmonyOS score sheet `docs/harmonyos-api.md` (`python3 scripts/harmonyos-api.py`).
+=======
+## HarmonyOS
+
+- Example strings: generated from the iOS example bundle (`harmony/scripts/export-example-strings.py`, `--check`),
+  looked up with `CYLExampleLocalizedString(key)`; formats use the iOS keys with `cylFormat` (`%@`, `%ld`, `%lu`).
+- Core strings: `harmony/scripts/export-core-strings.py`, `CYLMenuLocalizedString`.
+- Native resources (`harmony/entry/src/main/resources/{base,en_US,zh_CN,zh_TW}/element/string.json`,
+  `harmony/AppScope/resources/base`): the strings the system shows, and the tab titles copied from
+  CYLTabBarController's HarmonyOS example (only the ones this project uses: `tab_home`, `tab_nearby`, `tab_messages`,
+  `tab_me`). Check: `harmony/scripts/check-native-strings.py`.
+- Compare keys or flags in code, never translated text (`sample.disabled`, not `title !== '已禁用'`).
+- Launch options for checks in another language: `cylLanguage` (`en`, `zh-Hans`, `zh-Hant`), see
+  `harmony/scripts/screenshots.sh`.
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)

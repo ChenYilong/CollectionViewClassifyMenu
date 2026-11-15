@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { common } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarController } from 'cyltabbar';
@@ -23,6 +24,9 @@ function key(p: CYLIndexPath): string {
 =======
 =======
 =======
+=======
+import { CYLAccessibilitySelectedModifier } from '@cyl/classifymenu';
+>>>>>>> 5a2bff0 (feat(harmony): ♿ accessibility, native localized resources and accessibility-first UI tests)
 import { CYLExampleLocalizedString } from '../data/CYLExampleLocalization';
 >>>>>>> 04d17f6 (feat(harmony): ✨ example strings in en, zh-Hans and zh-Hant (score 13.6))
 import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
@@ -262,6 +266,7 @@ struct Index {
     if (index === PLUS_INDEX) {
       Column() {
         Image(TABS[index].image).width(36).height(36)
+          .accessibilityLevel('no')
       }
       .justifyContent(FlexAlign.Center)
       .width('100%')
@@ -272,6 +277,7 @@ struct Index {
     } else {
       Column({ space: 2 }) {
         Image(this.tab === index ? TABS[index].selectedImage : TABS[index].image)
+          .accessibilityLevel('no')
           .width(26)
           .height(26)
           .fillColor(this.tab === index ? '#007AFF' : '#8E8E93')
@@ -284,6 +290,9 @@ struct Index {
       .width('100%')
       .height('100%')
       .id(`tab-${TABS[index].title}`)
+      .accessibilityGroup(true)
+      .accessibilityText(CYLExampleLocalizedString(TABS[index].title))
+      .attributeModifier(new CYLAccessibilitySelectedModifier(this.tab === index))
     }
 <<<<<<< HEAD
     const p = path(this.classify[0]);

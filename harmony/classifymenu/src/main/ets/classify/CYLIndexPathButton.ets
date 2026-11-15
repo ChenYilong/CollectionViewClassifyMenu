@@ -215,6 +215,7 @@ export struct CYLIndexPathButtonView {
     }) {
       if (this.button.backgroundImageFor(this.button.stateFlags(this.pressed)) !== undefined) {
         Image(this.button.backgroundImageFor(this.button.stateFlags(this.pressed)))
+          .accessibilityLevel('no')
           .width('100%')
           .height('100%')
           .objectFit(ImageFit.Fill)
@@ -222,6 +223,7 @@ export struct CYLIndexPathButtonView {
       Row() {
         if (this.button.imageFor(this.button.stateFlags(this.pressed)) !== undefined) {
           Image(this.button.imageFor(this.button.stateFlags(this.pressed))).offset({ x: this.button.imageOffsetX })
+            .accessibilityLevel('no')
         }
         if (this.button.titleFor(this.button.stateFlags(this.pressed)) !== undefined) {
           Text(this.button.titleFor(this.button.stateFlags(this.pressed)))

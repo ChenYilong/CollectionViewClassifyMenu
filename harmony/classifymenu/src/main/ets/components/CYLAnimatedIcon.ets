@@ -196,6 +196,7 @@ struct CYLGIFIconView {
     Stack() {
       if (this.frame !== undefined) {
         Image(this.frame)
+          .accessibilityLevel('no')
           .width(this.iconWidth)
           .height(this.iconHeight)
           .objectFit(ImageFit.Contain)
