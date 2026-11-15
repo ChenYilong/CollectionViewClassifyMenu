@@ -3,6 +3,29 @@
 The examples of this project on every platform (iOS, Android, and later React Native, Flutter, HarmonyOS, Mini
 Program) show the same screens with the same data and look the same as iOS, which is the reference.
 
+## TODO summary: Android, React Native and Flutter (2026-11-16)
+
+Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `android.md`, `example-demo-rules.md`,
+`issue-progress.md`). Column 2 starts as `TODO`; when an item is done, its `TODO` is replaced by the result. Score:
+100 when no `TODO` is left (score = done / total × 100).
+
+| Found (document, item) | Status |
+| --- | --- |
+| `cross-platform.md`, Flutter limit (3): the example does not use the shared database `cyl_places.sqlite` | TODO |
+| `cross-platform.md`, Flutter limit (5): the Dart tests only run on the iOS simulator | TODO |
+| `cross-platform.md`, Flutter limit (4): Swift Package Manager is not supported (the plugin needs the pod) | TODO |
+| `cross-platform.md`, tag cells: React Native and Flutter look the same as iOS ("no example here yet") | TODO |
+| `cross-platform.md`, React Native "Still TODO" notes (Android view, Classify page, tests) | TODO |
+| `android.md`, HarmonyOS step 2: Flutter on HarmonyOS NEXT | TODO |
+| `android.md`, HarmonyOS step 3: React Native on HarmonyOS NEXT (after Flutter) | TODO |
+| `example-demo-rules.md`, playback controls in the Mini Program example | TODO |
+
+- **Prompt (verbatim, 2026-11-16):** "找到跨端，相关文档，找到以下android端 rn端 flutter端，的TODO事项，汇总成表格第一列为找到的内容，第二列默认TODO，每每完成一项就删除一个TODO 没有TODO视为满分一直完成到满分。"
+- **English:** find the cross-platform documents and the Android, React Native and Flutter TODOs in them; summarize them
+  in a table, column 1 the item found, column 2 `TODO` by default; remove one `TODO` for each item done; no `TODO`
+  left is full marks; keep going until full marks.
+- **Score:** 0 / 8 = 0.
+
 ## DONE (2026-11-15): one shared local database for every platform
 
 - **Status:** iOS demo app, `Example/CYLMenuExample` and Android DONE (2026-11-12). Flutter DONE (2026-11-15: the asset
