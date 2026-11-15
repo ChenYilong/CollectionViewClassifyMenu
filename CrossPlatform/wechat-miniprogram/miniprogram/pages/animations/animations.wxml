@@ -1,4 +1,7 @@
 <view class="page">
+  <!-- The status and the controls stay at the top (sticky) while the page itself scrolls the tags: no nested
+       scroll-view, so every animated icon's canvas moves with its tag (the icons drifted inside a scroll-view). -->
+  <view class="header">
   <view class="status">{{status}}</view>
 
   <view class="controls">
@@ -22,10 +25,11 @@
       </view>
     </view>
   </view>
+  </view>
 
-  <scroll-view scroll-y class="list">
+  <view class="list">
     <cyl-tag-list id="tags" configuration="{{configuration}}"
                   animation-speed="{{controls.speed}}" animation-loops="{{controls.loops}}" bind:tagtap="onTagTap" />
     <view class="tab-bar-space" />
-  </scroll-view>
+  </view>
 </view>

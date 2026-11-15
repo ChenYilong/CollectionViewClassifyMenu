@@ -1,6 +1,7 @@
 /* The status label (footnote, secondary, 8 pt from the top, 16 pt insets), the controls (two rows 8 pt apart:
    倍速 + slider + monospaced value; 循环播放, the switch and the filled Play all button), then the tags 4 pt below. */
-.page { display: flex; flex-direction: column; height: 100vh; background: #ffffff; }
+.page { min-height: 100vh; background: #ffffff; }
+.header { position: sticky; top: 0; z-index: 2; padding-bottom: 4px; background: #ffffff; }
 .status { flex: none; margin: 8px 16px 0; font-size: 13px; line-height: 18px; color: var(--ios-secondary-label); }
 .controls { flex: none; margin: 8px 16px 0; }
 .row { display: flex; align-items: center; min-height: 36px; }
@@ -15,5 +16,5 @@
 }
 .play-all-hover { opacity: 0.7; }
 .play-icon { width: 17px; height: 17px; margin-right: 6px; }
-.list { flex: 1; height: 0; margin-top: 4px; }
+.list { }
 .tab-bar-space { height: 96px; }

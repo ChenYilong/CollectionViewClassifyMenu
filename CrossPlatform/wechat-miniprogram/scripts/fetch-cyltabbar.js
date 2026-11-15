@@ -31,6 +31,9 @@ const CHECKOUT = path.join(ROOT, '.deps', 'CYLTabBarController');
 const PACKAGES = [
   { name: 'cyl-tabbar-miniprogram', folder: 'CrossPlatform/wechat-miniprogram-cyltabbar' },
   { name: 'cyl-lottie-miniprogram', folder: 'CrossPlatform/lottie-miniprogram' },
+  // cyl-rive on @rive-app/canvas-advanced; its WebAssembly (rive/rive.wasm.br, 573 KB) is loaded from here with
+  // cyl-rive's `wasmPath` (cyl_components is in the code package, unlike miniprogram_npm).
+  { name: 'cyl-rive-miniprogram', folder: 'CrossPlatform/rive-miniprogram' },
 ];
 
 function target(pkg) {

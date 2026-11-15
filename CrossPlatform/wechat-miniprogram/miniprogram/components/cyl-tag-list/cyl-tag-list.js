@@ -103,6 +103,7 @@ Component({
               key: item.key,
               title: item.title,
               animation: resolved ? item.animation : '',
+              animationOptions: item.animationOptions || null,
               resting: item.animationRestingProgress,
               styleSpeed: style.animationSpeed,
               iconKind: icon.kind,

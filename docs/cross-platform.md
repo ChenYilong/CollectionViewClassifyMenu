@@ -495,4 +495,9 @@ Program) show the same screens with the same data and look the same as iOS, whic
   link `cyl-rive-miniprogram` (install it with `scripts/fetch-cyltabbar.js`, register its component, copy
   `rive.wasm.br` where the package expects it, set `rive: true`), within the size limit (the package is 978 KB
   now; move heavy resources to a subpackage if needed); the same applies to PAG.
-- **Status:** recorded, not fixed.
+- **Status (2026-11-15):** BUG 2 FIXED and seen in WeChat DevTools: Rive is linked (`cyl-rive-miniprogram` installed by
+  `scripts/fetch-cyltabbar.js`, the .riv files exported as `data/animations/rive/*.riv.bin`, the tags' animationOptions
+  passed in the path's fragment); both Rive sections draw their icons. BUG 1: fix applied, NOT verified yet (DevTools
+  did not reopen the project): Lottie icons now play in CYLTabBarController's `cyl-lottie` (in DevTools an image of
+  the canvas, as `cyl-rive`, which did not drift), and the Animations page scrolls the page itself with a sticky
+  header instead of a nested `scroll-view`. TODO: check on a phone and in DevTools (Loop on, Play all, scroll).
