@@ -1,0 +1,49 @@
+<view class="cyl-tag-list" style="{{backgroundStyle}}">
+  <view wx:for="{{sections}}" wx:for-item="section" wx:key="index" class="cyl-section" style="{{section.backgroundStyle}}">
+    <view wx:if="{{section.showsHeader || (section.canFold && foldPosition === 'headerTrailing')}}" class="cyl-header" style="{{section.headerStyle}}">
+      <text class="cyl-header-title">{{section.showsHeader ? section.title : ''}}</text>
+      <view wx:if="{{section.canFold && foldPosition === 'headerTrailing'}}" class="cyl-fold-header" style="color: {{foldColor}};"
+            data-section="{{section.index}}" bindtap="onFoldTap"
+            aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
+        <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
+      </view>
+    </view>
+    <view class="cyl-section-body" style="{{section.listStyle}}">
+    <view class="cyl-items" style="{{section.itemsStyle}}">
+      <block wx:for="{{section.items}}" wx:key="key">
+        <view wx:if="{{!item.hidden}}"
+              class="cyl-item cyl-item-s{{section.index}}"
+              style="{{item.cellStyle}}" data-key="{{item.key}}" bindtap="onItemTap"
+              aria-role="button" aria-label="{{item.title}}" aria-selected="{{item.selected}}" aria-disabled="{{!item.enabled}}">
+          <view wx:if="{{item.iconKind !== 'none'}}" class="cyl-icon-slot" style="{{item.slotStyle}}">
+            <cyl-animation-icon wx:if="{{item.iconKind === 'animation'}}" id="anim-{{item.key}}" class="cyl-icon" style="position: absolute; left: 0; top: 0;"
+                             animation="{{item.animation}}" options="{{item.animationOptions}}" size="{{item.iconWidth}}" height="{{item.iconHeight}}"
+                             speed="{{animationSpeed > 0 ? animationSpeed : item.styleSpeed}}" loops="{{animationLoops}}"
+                             selected="{{item.selected}}" resting-progress="{{item.resting}}" disabled="{{!item.enabled}}" />
+            <text wx:elif="{{item.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{item.iconStyle}}; font-size: {{item.glyphSize}}px;">{{item.glyph}}</text>
+            <image wx:else class="cyl-icon" src="{{item.iconSrc}}" mode="aspectFit" style="{{item.iconStyle}}" />
+          </view>
+          <view wx:if="{{item.spacerStyle}}" class="cyl-spacer" style="{{item.spacerStyle}}" />
+          <view wx:if="{{item.showsTitle}}" class="cyl-title-box" style="{{item.titleStyle}}">
+            <text class="cyl-title">{{item.title}}</text>
+            <text wx:for="{{item.sizers}}" wx:for-item="sizer" wx:key="*this" class="cyl-sizer" style="{{sizer}}" aria-hidden="true">{{item.title}}</text>
+          </view>
+        </view>
+      </block>
+      <view wx:if="{{section.canFold && foldPosition === 'tail'}}" class="cyl-item cyl-fold-tail"
+            style="{{section.tailStyle}}; color: {{foldColor}};" data-section="{{section.index}}" bindtap="onFoldTap"
+            aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
+        <text wx:if="{{foldContent !== 'icon'}}" class="cyl-fold-title">{{section.foldTitle}}</text>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
+      </view>
+    </view>
+    </view>
+    <view wx:if="{{section.canFold && foldPosition === 'footer'}}" class="cyl-fold-footer" style="color: {{foldColor}};"
+          data-section="{{section.index}}" bindtap="onFoldTap"
+          aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
+      <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
+      <view wx:if="{{foldContent !== 'title'}}" class="cyl-footer-chevron {{section.expanded ? 'cyl-footer-chevron-up' : ''}}" />
+    </view>
+  </view>
+</view>

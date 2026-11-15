@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "标签容器示例",
+  "navigationBarBackgroundColor": "#FAFAFA",
+  "backgroundColor": "#FAFAFA",
+  "disableScroll": true,
+  "usingComponents": {
+    "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud",
+    "cyl-sample-toast": "/components/cyl-sample-toast/cyl-sample-toast"
+  }
+}

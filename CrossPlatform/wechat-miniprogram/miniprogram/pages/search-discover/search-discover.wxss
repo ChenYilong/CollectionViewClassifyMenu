@@ -1,0 +1,83 @@
+/* The iOS screen in points (CYLSearchDiscoverViewController: recentStyle(), discoverStyle(), layOut()). */
+page { background: #FFFFFF; }
+.screen { position: relative; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background: #FFFFFF; }
+.pressed { opacity: 0.4; }
+
+/* Back (32 × 44, 6 from the leading edge), 2 pt, the search bar (46 pt, corner radius 22, a 1 pt separator border and
+   a soft shadow, no magnifier), 14 pt from the trailing edge (here: from WeChat's capsule menu). */
+.top { flex: none; display: flex; align-items: center; padding-left: 6px; box-sizing: border-box; }
+.back { flex: none; width: 32px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.back-image { width: 22px; height: 22px; }
+.search-bar {
+  flex: 1; min-width: 0; height: 46px; margin-left: 2px; display: flex; align-items: center; padding: 0 12px 0 16px;
+  border-radius: 22px; border: 1px solid rgba(60, 60, 67, 0.29); background: #FFFFFF; box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.search-input { flex: 1; min-width: 0; height: 44px; font-size: 16px; color: #000000; }
+.search-placeholder { color: rgba(60, 60, 67, 0.3); }
+.camera { flex: none; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+.camera-image { width: 24px; height: 24px; }
+.divider { flex: none; width: 1px; height: 18px; margin: 0 8px; background: rgba(60, 60, 67, 0.29); }
+.search-button { flex: none; font-size: 17px; font-weight: 600; color: #000000; white-space: nowrap; }
+
+/* The lists scroll between the search bar (10 below it) and the hint (8 above it); 4 between the lists. */
+.content { flex: 1; min-height: 0; height: 0; margin-top: 10px; margin-bottom: 8px; }
+.section { position: relative; }
+.section + .section { margin-top: 4px; }
+.header { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; box-sizing: border-box; }
+.header-title { font-size: 20px; font-weight: bold; color: #000000; }
+.clear { flex: none; width: 32px; height: 44px; margin-right: -6px; display: flex; align-items: center; justify-content: center; }
+.clear-image { width: 22px; height: 22px; }
+/* The More button: a 44 pt touch target whose 22 pt icon lines up with the trailing inset. */
+.more { flex: none; width: 44px; height: 44px; margin-right: -11px; display: flex; align-items: center; justify-content: center; }
+.more-image { width: 22px; height: 22px; }
+
+/* 最近搜索: white capsules with a 1 pt separator border, 14 pt margins, 17 pt titles, 36 pt high, 12 apart. */
+.recent-body { padding: 4px 16px 24px; }
+.recent-row { display: flex; flex-wrap: nowrap; }
+.recent-row + .recent-row { margin-top: 12px; }
+.recent-tag {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 13px;
+  border: 1px solid rgba(60, 60, 67, 0.29); border-radius: 18px; background: #F2F2F7; box-sizing: border-box;
+  white-space: nowrap;
+}
+.recent-row .recent-tag + .recent-tag { margin-left: 12px; }
+.tag-pressed { background: #E5E5EA; }
+.recent-title { font-size: 17px; color: #000000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fold-image { width: 16px; height: 16px; transition: transform 0.2s; }
+.fold-image-up { transform: rotate(180deg); }
+.recent-measure { position: absolute; left: 0; top: 0; visibility: hidden; display: flex; flex-wrap: wrap; align-items: flex-start; pointer-events: none; }
+
+/* 发现: two per row (24 apart), 36 pt high, 16 between rows, 17 pt medium titles truncated, the hot icon after the title. */
+.discover-body { padding: 4px 16px 16px; }
+.discover-row { display: flex; }
+.discover-row + .discover-row { margin-top: 16px; }
+.topic { flex: none; height: 36px; display: flex; align-items: center; justify-content: flex-start; overflow: hidden; }
+.topic + .topic { margin-left: 24px; }
+.topic-pressed { opacity: 0.5; }
+.topic-title { flex: 0 1 auto; min-width: 0; font-size: 17px; font-weight: 500; color: #000000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topic-hot { flex: none; margin-left: 6px; }
+
+/* The hint (title3 20 pt, secondaryLabel, centered) 20 above the mic button (68 × 52, 16 above the safe area's bottom);
+   the curved secondarySystemBackground area starts 22 above the mic button. */
+.ask { position: relative; flex: none; display: flex; flex-direction: column; align-items: center; padding: 0 16px calc(16px + env(safe-area-inset-bottom)); }
+.ask-background { position: absolute; left: 0; right: 0; bottom: 0; height: calc(90px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; }
+.ask-arc { flex: none; width: 100%; height: 40px; display: block; }
+.ask-fill { flex: 1; background: #F2F2F7; }
+.hint { position: relative; font-size: 20px; line-height: 25px; color: rgba(60, 60, 67, 0.6); text-align: center; }
+.mic {
+  position: relative; width: 68px; height: 52px; margin-top: 20px; border-radius: 26px; background: #FFFFFF;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.mic-pressed { background: #F2F2F7; }
+.mic-image { width: 26px; height: 26px; }
+
+/* The search results: rows with a magnifying glass, the summary under the header, and the empty placeholder. */
+.results-summary { display: block; margin: 0 16px 8px; font-size: 13px; color: rgba(60, 60, 67, 0.6); }
+.result { display: flex; align-items: center; min-height: 44px; padding: 0 16px; }
+.result-icon { width: 18px; height: 18px; margin-right: 12px; opacity: 0.5; flex: none; }
+.result-title { flex: 1; font-size: 16px; color: #000000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.empty { display: flex; flex-direction: column; align-items: center; padding: 56px 32px; text-align: center; }
+.empty-image { width: 64px; height: 64px; opacity: 0.25; margin-bottom: 16px; }
+.empty-title { font-size: 17px; font-weight: 600; color: #000000; }
+.empty-hint { margin-top: 8px; font-size: 14px; line-height: 20px; color: rgba(60, 60, 67, 0.6); }

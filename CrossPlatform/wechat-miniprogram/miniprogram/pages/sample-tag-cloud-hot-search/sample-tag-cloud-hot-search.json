@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#FFFFFF",
+  "usingComponents": {
+    "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud",
+    "cyl-sample-toast": "/components/cyl-sample-toast/cyl-sample-toast"
+  }
+}

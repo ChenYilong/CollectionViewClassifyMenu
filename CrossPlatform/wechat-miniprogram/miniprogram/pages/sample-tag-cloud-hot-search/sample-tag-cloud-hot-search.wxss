@@ -1,0 +1,21 @@
+/* White; orange behind the status bar (and WeChat's menu button) and the search bar: a field on light orange with a
+   4 pt radius, a gray magnifying glass and placeholder, a white 取消. */
+page { background: #FFFFFF; }
+.page { min-height: 100vh; background: #FFFFFF; }
+.search-bar { display: flex; align-items: center; padding: 8px 0 8px 16px; }
+.field {
+  flex: 1; display: flex; align-items: center; height: 36px; padding: 0 8px; border-radius: 4px;
+  background: rgb(252, 232, 209);
+}
+.field-input { flex: 1; height: 36px; font-size: 17px; color: #000000; }
+.field-placeholder { color: #999999; }
+.search-icon { position: relative; flex: none; width: 16px; height: 16px; margin-right: 6px; }
+.search-icon-circle {
+  position: absolute; left: 1px; top: 1px; width: 9px; height: 9px; border: 2px solid #999999; border-radius: 50%;
+}
+.search-icon-handle {
+  position: absolute; left: 11px; top: 11px; width: 6px; height: 2px; background: #999999; transform: rotate(45deg);
+  transform-origin: 0 50%;
+}
+.cancel { flex: none; padding: 0 16px; line-height: 36px; font-size: 17px; color: #FFFFFF; }
+.cancel-hover { opacity: 0.4; }

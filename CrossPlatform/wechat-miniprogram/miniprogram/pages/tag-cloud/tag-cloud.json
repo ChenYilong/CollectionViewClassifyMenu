@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "标签云（android-tagview）",
+  "navigationBarBackgroundColor": "#F2F2F7",
+  "backgroundColor": "#F2F2F7",
+  "usingComponents": {
+    "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud"
+  }
+}

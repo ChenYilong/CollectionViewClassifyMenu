@@ -1,0 +1,11 @@
+{
+  "component": true,
+  "usingComponents": {
+    "cyl-lottie": "/cyl_components/cyl-lottie-miniprogram/cyl-lottie/index",
+    "cyl-rive": "/cyl_components/cyl-rive-miniprogram/cyl-rive/index",
+    "cyl-pag": "/engines/cyl-pag-miniprogram/cyl-pag/index"
+  },
+  "componentPlaceholder": {
+    "cyl-pag": "view"
+  }
+}

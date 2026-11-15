@@ -350,3 +350,250 @@ Program) show the same screens with the same data and look the same as iOS, whic
   | Flutter, Android | `flutter test integration_test`, with the engine rebuilt at `117be52c` | All tests passed (2) |
   | Android merged | `:library:testDebugUnitTest` | 78 tests, 0 failures |
   | Android merged | `:example:assembleRelease`, lint included | BUILD SUCCESSFUL |
+## TODO (2026-11-15): the WeChat Mini Program example
+
+- **Context:** the Mini Program is the next platform of this document (iOS, Android, React Native, Flutter, HarmonyOS,
+  Mini Program). The repository had no Mini Program code; the documents mention it only as a platform of the rules
+  (`example-demo-rules.md`: playback controls; `instructions.md`: screenshots labeled with the platform; the
+  `cyl-upstream` / `cyl-verify` skills).
+- **Location:** `CrossPlatform/wechat-miniprogram` (new `CrossPlatform/` folder, the layout of CYLTabBarController's
+  `CrossPlatform/`; Flutter and React Native keep their top-level folders).
+- **Design:** a Mini Program cannot host the native view, so the component `cyl-tag-list` ports the core's
+  `CYLTagListView` from the same configuration dictionary (selection rules of `handleTap(at:)`, exclusive items,
+  `defaultVisibleRows` folding measured from the rendered cells, 更多 / 收起). A Mini Program has no SQLite, so
+  `scripts/export-miniprogram-data.py` exports the rows of the shared `cyl_places.sqlite` to a module (`--check` keeps
+  it in step) and `utils/places-db.js` runs the iOS example's statement on them. Lottie icons play through
+  `lottie-miniprogram` with speed, loop and Play all. Details: `CrossPlatform/wechat-miniprogram/README.md`.
+- **Step 1 DONE (2026-11-15):** the project (two bottom tabs: Animated icons with the playback controls, Classify menu
+  with the multiple filter and saved selections), the component and the data export; `npm test` (node --test) passes
+  17 tests: the 83 places in database order, 吃喝玩逛, the statement and its placeholders, best rated first
+  (日式拉面 · 北京 ★5.0 ¥93, as on iOS and Android), the selection rules, folding, the saved selections.
+- **Step 2 DONE (2026-11-15): runs in WeChat DevTools.** Driven by the `wechatide` CLI (skill 0.3.11, DevTools
+  2.02.2609250, base library 3.18.0, simulator iPhone, Windows 11): `project_import`, `open_project_window`,
+  `build_npm` (lottie-miniprogram, no warnings), `simulator_open_page`, `automation_*`, `simulator_screenshot`.
+  DevTools rejects `touristappid` (`APPID_ERROR`), so the AppID is set locally in the git-ignored
+  `project.private.config.json`. Checked on the running app:
+  - Animated icons: the four Lottie icons render; with `?autoplay=1` (2×, Loop on, Play all) two screenshots differ
+    only inside the Lottie rows (x 25…227, y 265…321 of 363 × 785), so the animations play; the Tags section folds at
+    3 rows with the tail control.
+  - Classify menu: 吃喝玩逛 folded to one row each (更多 ▾); the filter button (a real tap) opens the sheet
+    (地区过滤 / 菜品过滤, 全部 selected); 广州 + 确定 (a real tap) gives `… WHERE tag = ? AND region IN (?) …` and
+    川菜 · 广州 ★4.8 ¥173, 1 place, as in the Flutter example; after `reLaunch` without a query both selections come
+    back (`0-1`, `1-0,0-3`); ↺ (a real tap) resets to 全部 · 83.
+  - Limit of the automation, not of the component: `automation_element_action` cannot reach elements inside a custom
+    component (`#filterList >>> .cyl-item` resolves to the host), so the 广州 tap called the component's tap handler
+    through `automation_evaluate`; the console has no errors (only lottie-miniprogram's own warnings: a deprecated
+    `wx.getSystemInfoSync`, dynamic canvas creation).
+  - The launch query of `wechatide simulator_open_page` passes through `wechatide.cmd`, so on Windows escape `&` as
+    `^&`; the page decodes URL-encoded values.
+
+  <img src="assets/miniprogram-animated-icons.png" width="260" alt="Mini Program in WeChat DevTools: Animated icons, speed 2x, loop on, Lottie icons playing">
+  <img src="assets/miniprogram-filter-sheet.png" width="260" alt="Mini Program in WeChat DevTools: the filter sheet, 地区过滤 and 菜品过滤 with 全部 selected">
+  <img src="assets/miniprogram-classify-filter.png" width="260" alt="Mini Program in WeChat DevTools: 川菜 in 广州, 1 place">
+
+- **Still TODO:** (1) DONE above; a real-device preview (`auto_preview`) is not done yet; (2) the tag cells against iOS: DONE (below); (3) a real AppID for phone preview (the project uses
+  `touristappid`); (4) the shell: DONE (below).
+- **Tag cells measured against the core (2026-11-15).** The port now takes the core's defaults and keys
+  (`CYLMenuStyle` / `CYLTagAppearance`: `tagContentInsets` {5, 10, 5, 10} with the border inside, `imageTitleSpacing` 4,
+  `imageSize` 14, `itemHeight` 30, `interitemSpacing` / `lineSpacing` 10, `sectionInsets` {10, 16, 10, 16} per section,
+  `headerHeight` 36 with a 14 pt regular title; before: 8 px padding plus the border, spacing 5, bold 15 px headers).
+  Measured in WeChat DevTools from the component's own layout pass (`cellMetrics()`, iPhone simulator, base library 3.18.0):
+  - every Classify tag (31): title 10.00 px from both edges, width = title width + 20, as
+    `CYLTagButton.width(forTitle:iconSize:style:)` (content + left and right insets); the core rounds the title width up
+    (`ceil`) and CSS does not, so a Mini Program tag can be up to 1 px narrower (text measurement, as between iOS and Android);
+  - every tag with an icon (14, Lottie and stand-in): title 32.00 px from the left (10 + 18 icon + 4) and 10.00 px from
+    the right: icon and title centered together with the left padding equal to the right one, the iOS layout of
+    `CYLIndexPathButton` (section "the tag cells look the same as iOS"). The emoji stand-ins first measured 38.72 px, because
+    an emoji at an 18 px font is about 24.7 px wide; they now sit in the 18 × 18 icon slot.
+  A pixel comparison with an iOS screenshot needs a Mac (not available on this machine).
+
+- **Shell DONE (2026-11-15): CYLTabBarController's Mini Program tab bar.** The example's shell is `cyl-tab-bar` of
+  CYLTabBarController's `cyl-tabbar-miniprogram` (`CrossPlatform/wechat-miniprogram-cyltabbar`, pinned at `117be52c` (first `460ed89f`; the Mini Program packages are the same at both), the
+  React Native example's pin), as the iOS, Flutter and React Native examples use CYLTabBarController: a custom tab bar
+  (`app.json` `"custom": true`, `miniprogram/custom-tab-bar/`) with the tabs Tags and Classify and the raised Post button
+  with a page of its own between them (`CYLPlusButtonCenterYOffset` -14, the React Native example's `post_normal` /
+  `post_highlight` images; drawn PNG tab icons, as a Mini Program has no SF Symbols). The package is not on npm, so
+  `node scripts/fetch-cyltabbar.js` checks CYLTabBarController out into `.deps/` (sparse, git-ignored) and copies its `src/`
+  to `miniprogram/cyl_components/` (git-ignored; outside `miniprogram_npm`, which Build npm rewrites); `--check` keeps it
+  at the pin, and CI runs both. The filter sheet hides the bar while it is open (`cyl_setTabBarHidden`), which otherwise
+  covered 确定. The example uses CYLTabBarController's AppID `wx5e29c9d33906f074` (技术清谈), set in the git-ignored
+  `project.private.config.json`. Test: `tab-bar-configuration.test.js` reads the example's configuration through
+  CYLTabBarController's own reader (Tags, Classify, the Post button with a page); `npm test`: 21 tests pass. In WeChat
+  DevTools: `switchTab` to each page selects its tab (`selectedIdentifier` tags / classify / post), the tab bar's
+  `select` event switches pages, the sheet opens and confirms with real taps and no console errors.
+
+  <img src="assets/miniprogram-cyltabbar-tags.png" width="240" alt="Mini Program: Tags tab in CYLTabBarController's tab bar with the raised Post button">
+  <img src="assets/miniprogram-cyltabbar-post.png" width="240" alt="Mini Program: the Post button's own page, Post selected">
+  <img src="assets/miniprogram-cyltabbar-classify.png" width="240" alt="Mini Program: Classify tab selected">
+
+- **Prompt (verbatim):**
+
+  > 修复 Class 文件夹下资源文件名太长 导致 git 相关操作失败的问题。 资源文件 关键词搜 leftBarButton continue
+  > 。基于新分支 开始下微信小程序开发。找到docs里面任何提及微信小程序的信息开始开发。找到crossplatorm 相关文件夹，没有就新建，新建或者更微信小程序开发。微信小程序开发者工具Skills ，根据文档
+
+  English: fix the git failures caused by the over-long resource file names under `Class` (search "leftBarButton");
+  then, on the new branch, start the WeChat Mini Program development from whatever the docs say about it, in the
+  cross-platform folder (create it when missing), using the WeChat DevTools skill.
+  Then (shell): "running on the CYLTabBarController AppID wx5e29c9d33906f074 continue".
+
+### DONE (2026-11-15): the Mini Program example is a 1:1 port of the iOS example
+
+- **Prompt (verbatim):** "小程序example层要一比一复刻 continue" (EN: the Mini Program example layer must be a 1:1 copy).
+- **Structure:** the iOS example's root tab bar (`makeRootTabBarController`: 场景一：评价筛选, 场景二：搜索分类, the orange
+  plus button opening 查询筛选, 样式, 动效) in CYLTabBarController's `cyl-tab-bar`, and one page per iOS screen (20 pages; the
+  table in `CrossPlatform/wechat-miniprogram/README.md`). Every string is the iOS example's (`CYLMenuExample.bundle`) or
+  the core's (`CYLClassifyMenu.strings`) through `t()` / `tc()`, in Simplified Chinese, Traditional Chinese and English.
+- **Data:** the shared `cyl_places.sqlite` (places, the reviews and their keywords), `data.json` (the classify menu), the
+  iOS bundle's search discover JSON, animation resources and configuration file, each exported by a script with `--check`.
+  The statements are the iOS ones (`CYLMenuLinkageViewController.query`, `CYLReviewQuery`), shown with their values
+  (`displayString()`); the plus-menu-filtered case gives the iOS screenshot's row (川菜 · 深圳 ★3.5 ¥226).
+- **Components:** `cyl-tag-list` reads the core's style keys and defaults (`CYLMenuStyle`, appearances per state);
+  `cyl-tag-cloud` and `cyl-tag-image` port the core's android-tagview list and image tag views; animated icons use
+  CYLTabBarController's `cyl-lottie-miniprogram` (its lottie-miniprogram fork: the npm 1.0.12 loaded the base64 image
+  assets of the "image assets and placeholders" Lottie files but never drew them) and `<image>` for GIF.
+- **Verified in WeChat DevTools** (base library 3.18.0, 2026-11-15): all 20 pages open with no console error; real taps
+  on the scenario rows, 重置, the filter button, a filter tag and 确认筛选 (20 places in 广州); the 动效 tab matches
+  `assets/ios-animation-playback-controls.png` section for section. `npm test`: 103 tests. Package: about 1.2 MB of the
+  2 MB main package. A `*` selector in one WXSS file stopped every page from compiling (fixed; WXSS has no `*`).
+- **Deviations a Mini Program imposes:** drawn stand-ins for SF Symbols; no SQLite (the statements run on exported rows);
+  custom navigation bars where iOS has bar buttons or a title view (the classify filter button and 重置, the reviews
+  segmented control, the search fields), placed before WeChat's capsule menu; no PAG or Rive engine (about 0.8 and
+  0.7 MB, beyond the main package), so those tags degrade as iOS does without the engines; GIFs ignore the speed slider;
+  no VoiceOver announcements or custom actions; UIMenu and three-field alerts become action sheets or page overlays.
+  The automation of WeChat DevTools cannot tap inside custom components, so taps on tags were checked through the
+  components' handlers and the unit tests.
+  <img src="assets/miniprogram-1to1-scenarios.png" width="240" alt="Mini Program: 查询筛选, the plus button's page">
+  <img src="assets/miniprogram-1to1-menu-linkage.png" width="240" alt="Mini Program: 菜单选择 · 数据库联动, 20 places in 广州">
+  <img src="assets/miniprogram-1to1-animations.png" width="240" alt="Mini Program: 动效, the iOS animation sections">
+
+- **Phone preview (2026-11-15):** `wechatide auto_preview` pushed the build (978,336 bytes, one package) to the developer's WeChat; checking it on the phone is left to the developer. **Still TODO:** pixel comparisons with iOS screenshots on a Mac. DONE: the `cyl-tag-cloud` property
+  warnings (null for unset options; the tag container sample now passes defaults).
+
+### TODO (2026-11-15): Mini Program bugs in the 动效 (Animations) tab
+
+- **Prompt (verbatim):**
+
+  > 文档中记录bug 标记todo tabbar item中的Animations 每当播放动画时 尤其是打开loop开关，滚动上下之后，icon 会漂移，标记bug。同时rive动画图标无法显示
+
+  English: record these bugs in the documents, marked TODO: in the Animations tab, whenever animations play, above all
+  with the Loop switch on, the icons drift after scrolling up and down; and the Rive animated icons do not show.
+- **BUG 1 (TODO): animated icons drift after scrolling while they play.** Reported on the Animations tab
+  (`pages/animations`, iOS `CYLTagAnimationDemoViewController`): play the animations (Play all), especially with Loop
+  on, then scroll the list up and down: the icons move away from their tags. Expected, as on iOS: every icon stays in
+  its tag while it plays and while the list scrolls. Leads to check:
+  - each animated icon is a `cyl-lottie-icon` placed with `position: absolute; left: 0; top: 0` inside its tag
+    (`components/cyl-tag-list/cyl-tag-list.wxml`) and draws on a `<canvas type="2d">` inside the page's `scroll-view`;
+  - with Loop on the canvases redraw every frame (lottie's `requestAnimationFrame` of the latest canvas, in
+    CYLTabBarController's `cyl-lottie-miniprogram`), so a canvas that lags its tag during scrolling shows the most;
+  - reproduce on a phone (the build pushed with `auto_preview`) and in WeChat DevTools, compare the canvas's
+    `boundingClientRect` with its tag's while scrolling, and try the canvas in normal flow (no absolute position).
+- **BUG 2 (TODO): the Rive animated icons do not show.** The Rive section (and the Rive tags of 样式 and the
+  configuration demo) shows titles only, while iOS shows the Rive icons. Cause: the Mini Program links no Rive engine
+  (`components/cyl-tag-list/animations.js`, `ENGINES = { …, rive: false }`): CYLTabBarController's
+  `cyl-rive-miniprogram` (the Rive runtime plus its WebAssembly, about 0.7 MB) was left out to keep the 2 MB main
+  package, and a tag whose engine is missing falls back to its image, or to its title when it has none. Fix to do:
+  link `cyl-rive-miniprogram` (install it with `scripts/fetch-cyltabbar.js`, register its component, copy
+  `rive.wasm.br` where the package expects it, set `rive: true`), within the size limit (the package is 978 KB
+  now; move heavy resources to a subpackage if needed); the same applies to PAG.
+- **Status (2026-11-15):** BUG 2 FIXED and seen in WeChat DevTools: Rive is linked (`cyl-rive-miniprogram` installed by
+  `scripts/fetch-cyltabbar.js`, the .riv files exported as `data/animations/rive/*.riv.bin`, the tags' animationOptions
+  passed in the path's fragment); both Rive sections draw their icons. BUG 1: FIXED, seen in WeChat DevTools (Loop on, Play all,
+  four scrolls while every icon loops: Lottie, PAG and Rive icons stay in their tags): Lottie icons now play in CYLTabBarController's `cyl-lottie` (in DevTools an image of
+  the canvas, as `cyl-rive`, which did not drift), and the Animations page scrolls the page itself with a sticky
+  header instead of a nested `scroll-view`. Left: the same check on a phone.
+
+### Mini Program bugs (2026-11-15): search results, tab bar selection, transparent tags
+
+- **Prompt (verbatim):**
+
+  > 新增三个bug到 docs文档，第一个输入搜索，点开搜索按钮 不仅要更新搜索被选项，还要显示点击搜索后应该展示的搜索结果，如果搜索结果为空应该展示空的占位图。tabbar item点击事件异常 有时候 页面切换了，但tabbaritem没更新。图中都有tag的背景色都不能是透明。修改tag 默认背景色禁止透明色。continue
+
+  English: add three bugs to the docs: (1) typing a search and tapping 搜索 must not only update the recent searches but
+  also show the search results, and an empty placeholder when there are none; (2) the tab bar item tap is unreliable:
+  sometimes the page changes but the tab bar item does not; (3) no tag in the screenshots may have a transparent
+  background: change the tags' default background so that it is never transparent.
+
+  <img src="assets/request-miniprogram-search-discover-transparent-tags.png" width="220" alt="Request: search discover after 搜索, white tags, no results">
+  <img src="assets/request-miniprogram-tab-bar-out-of-sync.png" width="220" alt="Request: 脉脉搜索 shown while the 样式 tab is selected">
+  <img src="assets/request-miniprogram-review-filter-tags.jpg" width="300" alt="Request: the review filter tags">
+
+- **BUG 1, DONE: search results and the empty placeholder** (`pages/search-discover`). 搜索, the keyboard's search
+  key, a recent search or a topic now also shows the results: the discover topics and sample searches of the page's
+  JSON (the current language) containing the query, ignoring case; the user's own recent searches are not results
+  (the query would always find itself). No match shows the placeholder (a magnifying glass, 没有找到“%@”的相关结果, a
+  hint); clearing the field shows 最近搜索 and 发现 again. iOS records the query only, so these strings are the
+  Mini Program's (en, zh-Hant in `discover-model.js`). Checked in WeChat DevTools (English): typed "test" + a real tap
+  on 搜索 lists "VoiceOver test checklist"; "咖啡" shows the placeholder. Test: `search-discover.test.js`.
+- **BUG 2, DONE: the tab bar item did not follow the page.** Every tab page has its own custom tab bar; a tap selects
+  inside `cyl-tab-bar` without changing the wrapper's `selectedIdentifier`, and `syncWithRoute` skipped the update
+  when that stale value already named the page, so a bar whose tab had been tapped kept the tapped tab after coming
+  back (the screenshot: 脉脉搜索 with 样式 selected). `syncWithRoute` now always calls `cyl_selectIdentifier`, and a
+  failed `switchTab` selects the current page's tab again. Checked in DevTools: 样式 selected on search-home's bar,
+  switch to 样式 and back: the bar shows 搜索分类.
+- **BUG 3, DONE: tag backgrounds are never transparent.** `cyl-tag-list`'s default normal and disabled backgrounds
+  are UIKit's systemGray6 `#F2F2F7` instead of white (white tags on the white list looked transparent), and a
+  configured clear / transparent / zero-alpha background falls back to it (`opaqueBackground`); `cyl-tag-cloud`'s
+  default, the search discover pills and the search page's tags too. The review filter keeps its own `#F5F5F5`
+  (`reviewFilterStyle`), opaque. Tests: `tag-list-style.test.js`, `tag-cloud-model.test.js`.
+
+  <img src="assets/miniprogram-search-empty-placeholder.png" width="220" alt="Mini Program: no results, the placeholder">
+  <img src="assets/miniprogram-search-discover-opaque-tags.png" width="220" alt="Mini Program: recent searches with an opaque fill">
+
+### Mini Program bug (2026-11-15): PAG animations do not show
+
+- **Prompt (verbatim):** "新增bug 记录，pag 动画显示异常。请解决后继续" (EN: record a new bug: the PAG animations display
+  wrongly; fix it, then continue).
+- **Cause:** the PAG tags (the 动效 tab's PAG section, the PAG choice of 样式, the configuration demo) showed titles only:
+  no PAG engine was linked, because libpag (about 0.96 MB with its WebAssembly) did not fit the 2 MB main package next
+  to Rive, and the PAG files are not in the repository (iOS fetches them too).
+- **Fix, DONE:** CYLTabBarController's `cyl-pag-miniprogram` (libpag 4.5.85) and the PAG files go to the `engines`
+  code subpackage (`app.json` `subpackages`, preloaded for 动效 and 样式 by `preloadRule`); the icon component uses
+  `cyl-pag` through async subpackage loading (`componentPlaceholder`: a view until it arrives). The files come from
+  `scripts/fetch-animation-resources.py PAGResources` (pinned, SHA-256 checked, as for iOS) and
+  `scripts/fetch-cyltabbar.js` copies them as `engines/pag/*.pag.bin` (git-ignored); the registry lists the pinned names
+  of `pag-resources.json`; CI fetches them before `--check`. Seen in WeChat DevTools: the PAG section matches
+  `assets/ios-animation-playback-controls.png` (Home, Health, Posts, Me, 动效一, 动效二), playing and looping.
+
+  <img src="assets/miniprogram-animations-pag-rive-loop.png" width="240" alt="Mini Program: Lottie, PAG and Rive icons looping, in their tags after scrolling">
+
+### TODO (2026-11-15): the Mini Program tag list as an npm library (cyl- prefix)
+
+- **Prompt (verbatim):** "在跨端相关文档中标记TODO：小程序封装成库 cyl- 开头的小程序库，用 npm 打包加「构建 npm」实际验证过。提醒我的话先运行 ! npm login。"
+  (EN: mark a TODO in the cross-platform documents: package the Mini Program as a library named with the cyl- prefix,
+  packed with npm and actually verified with WeChat DevTools' "Build npm"; remind the user to run `npm login` first.)
+- **Requirements:** (1) a Mini Program npm package with the `cyl-` prefix (e.g. `cyl-tag-list-miniprogram`, like
+  CYLTabBarController's `cyl-tabbar-miniprogram`) holding `components/cyl-tag-list` (model, symbols, animations,
+  `cyl-lottie-icon`), `cyl-tag-cloud` and `cyl-tag-image`, with a `miniprogram` field and the Lottie / Rive / PAG
+  engines as dependencies or optional packages; (2) `npm pack`, then install the tarball in the example and run
+  WeChat DevTools' Build npm (`wechatide build_npm`), and check the example's pages use the built package from
+  `miniprogram_npm`; (3) publish with `npm publish` after `npm login` (the maintainer runs `! npm login` first);
+  (4) README with install, Build npm and usage.
+- **Steps 1, 2 and 4 DONE (2026-11-16); step 3 (publish) TODO.**
+  - **Package:** `CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram` (0.1.0, MIT like
+    `react-native-cyl-tag-list`): `miniprogram_dist/` holds `cyl-tag-list` (model, symbols, animations),
+    `cyl-tag-cloud`, `cyl-tag-image`, `locale.js` (the language and `tc()`), `core-strings.js`, `core-tables.js`
+    (now written there by `scripts/export-miniprogram-data.py`) and `index.js`; `"miniprogram": "miniprogram_dist"`,
+    and `exports` maps `cyl-tag-list-miniprogram/<file>` to the same files under Node, so the unit tests and the Mini
+    Program require the same paths.
+  - **Engines stay in the app, deviating from requirement (1):** the package links no animation engine.
+    CYLTabBarController's cyl-lottie / cyl-rive / cyl-pag are not on npm, and cyl-pag must live in the example's
+    `engines` subpackage for the 2 MB main package. Instead, `animations.js` takes the app's files and engines through
+    `configure({registry, assets, engines})`, done by the example's `utils/tag-animations.js` from `app.js`, and
+    `cyl-tag-list` declares the abstract node `cyl-animation-icon` (`componentGenerics`, default: an empty slot). The
+    example's pages pass `generic:cyl-animation-icon="cyl-lottie-icon"`, and `components/cyl-lottie-icon` stays in
+    the example.
+  - **Example:** depends on the package with `file:packages/cyl-tag-list-miniprogram` (the example's own package is
+    now `cyl-tag-list-miniprogram-example`). `project.config.json` sets `packNpmManually` with `packNpmRelationList`
+    (`./package.json` → `./miniprogram/`), and `miniprogram_npm/` stays git-ignored. Every page and test requires
+    `cyl-tag-list-miniprogram/...`, and `utils/i18n.js` reads the language from the library's `locale.js`, so the
+    tags and the example agree.
+  - **Verified:** `node scripts/verify-package.js` runs `npm pack` (`cyl-tag-list-miniprogram-0.1.0.tgz`, 26 files,
+    42 193 bytes), checks the tarball holds exactly `package.json`, `README.md` and `miniprogram_dist/`, then installs
+    the tarball (a copy, not the link) and compares every file with its source. WeChat DevTools' Build npm
+    (`wechatide build_npm`) then built `miniprogram_npm/cyl-tag-list-miniprogram` (24 files, no warnings, 1.4 s). On
+    the simulator, these pages render from it: Animations (engine "linked", Lottie and PAG icons through the
+    generic), TagViewGroup (image tags) and TagView Sample (tag cloud). The console shows no errors. `npm test`: 105
+    pass, both with the link and with the installed tarball. CI (`miniprogram.yml`) now runs `npm install` and
+    `verify-package.js`.
+  - **Publish (TODO):** the maintainer runs `! npm login`, then `npm publish` in `packages/cyl-tag-list-miniprogram`
+    (`npm whoami` on 2026-11-16: not logged in).

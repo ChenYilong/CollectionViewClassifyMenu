@@ -1,0 +1,23 @@
+<view class="cyl-it" bindtap="onImageTap">
+  <image class="cyl-it-picture" src="{{image}}" mode="aspectFill" aria-role="img" aria-label="{{pictureLabel}}" />
+  <view wx:for="{{groups}}" wx:for-item="group" wx:for-index="groupIndex" wx:key="key"
+        class="cyl-it-group {{group.hidden ? 'cyl-it-hidden' : ''}}">
+    <view wx:if="{{group.ripple}}" class="cyl-it-ripple" style="{{group.ripple}}" />
+    <view wx:for="{{group.lines}}" wx:for-item="line" wx:key="key" class="cyl-it-line" style="{{line.style}}" />
+    <view class="cyl-it-ring" style="{{group.ring}}" />
+    <view class="cyl-it-dot" style="{{group.inner}}" />
+    <view class="cyl-it-hit" style="{{group.hit}}" data-group="{{groupIndex}}"
+          catchtap="onCircleTap" bindlongpress="onLongPress" bindtouchstart="onTouchStart"
+          bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindtouchcancel="onTouchEnd"
+          aria-role="button" aria-label="{{group.label}}" />
+    <view wx:for="{{group.tags}}" wx:for-item="tag" wx:key="index"
+          class="cyl-it-label {{tag.center ? 'cyl-it-label-center' : ''}}" style="{{tag.style}}"
+          data-group="{{groupIndex}}" data-tag="{{tag.index}}" catchtap="onTagTap" bindlongpress="onLongPress"
+          bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindtouchcancel="onTouchEnd"
+          aria-role="button" aria-label="{{editing ? tag.title + ', ' + turnHint : tag.title}}">{{tag.title}}</view>
+  </view>
+  <view class="cyl-it-measure" aria-hidden="true">
+    <view wx:for="{{measureTitles}}" wx:key="*this" class="cyl-it-label cyl-it-measure-label"
+          style="max-width: {{labelMaxWidth}}px;">{{item}}</view>
+  </view>
+</view>

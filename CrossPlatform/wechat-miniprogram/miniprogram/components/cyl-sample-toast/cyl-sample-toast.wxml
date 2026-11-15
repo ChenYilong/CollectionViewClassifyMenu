@@ -1,0 +1,4 @@
+<view wx:if="{{visible}}" class="cyl-toast-wrap">
+  <view class="cyl-toast {{fading ? 'cyl-toast-fading' : ''}}" id="CYLAndroidSampleToast" aria-role="alert"
+        aria-label="{{text}}">{{text}}</view>
+</view>

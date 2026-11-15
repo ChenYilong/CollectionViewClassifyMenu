@@ -1,0 +1,8 @@
+/* A plain UITableView: white cells with separators inset 16 pt. */
+page { background: #FFFFFF; }
+.table { background: #FFFFFF; padding-bottom: env(safe-area-inset-bottom); }
+.cell { position: relative; }
+.cell::after {
+  content: ''; position: absolute; left: 16px; right: 0; bottom: 0; height: 1px; transform: scaleY(0.5);
+  background: rgba(60, 60, 67, 0.29);
+}

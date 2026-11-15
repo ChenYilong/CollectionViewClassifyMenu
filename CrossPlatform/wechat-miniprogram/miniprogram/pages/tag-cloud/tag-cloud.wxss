@@ -1,0 +1,6 @@
+/* systemGroupedBackground; a vertical stack 12 pt below the top, 8 pt apart: footnote captions in the secondary
+   label color inset by 16 pt, the lists full width. */
+page { background: var(--ios-grouped-background, #F2F2F7); }
+.tag-cloud-page { min-height: 100vh; background: #F2F2F7; padding-top: 12px; box-sizing: border-box; }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.caption { display: block; padding: 0 16px; font-size: 13px; line-height: 18px; color: rgba(60, 60, 67, 0.6); white-space: pre-wrap; }

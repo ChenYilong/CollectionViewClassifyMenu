@@ -1,0 +1,15 @@
+<view class="page">
+  <view class="bar-background" style="height: {{top}}px; background-color: {{orange}};" />
+  <view class="search-bar" style="background-color: {{orange}};">
+    <view class="field">
+      <view class="search-icon" aria-hidden="true"><view class="search-icon-circle" /><view class="search-icon-handle" /></view>
+      <input class="field-input" placeholder="{{placeholder}}" placeholder-class="field-placeholder" value="{{text}}"
+             focus="{{focus}}" confirm-type="search" bindinput="onInput" bindconfirm="onConfirm"
+             aria-label="{{placeholder}}" />
+    </view>
+    <view class="cancel" hover-class="cancel-hover" bindtap="cancel" aria-role="button" aria-label="{{cancelTitle}}">{{cancelTitle}}</view>
+  </view>
+  <cyl-tag-cloud id="hot-list" tags="{{tags}}" list-style="{{style}}" shows-section-headers="{{true}}"
+                 section-title="{{sectionTitle}}" bind:tagtap="onTagTap" />
+  <cyl-sample-toast id="toast" />
+</view>
