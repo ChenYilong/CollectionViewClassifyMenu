@@ -118,3 +118,17 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 
 - 2026-11-16: standard created. 2 / 44 = 4.5 / 100.
 - 2026-11-16: A3 (test HAP builds), A4 (ArkTS warnings 92 → 1, the documented API 12 fallback). 4 / 44 = 9.1 / 100.
+
+## Next steps (resume here)
+
+- E2, in progress (2026-11-16): the example has 410 distinct Chinese literals (scan: `py -3 C:\w\scan_han.py .`);
+  about 200 are sample data (reviews, names, places), which iOS also leaves untranslated. Plan: add
+  `harmony/scripts/export-example-strings.py`, which generates `CYLExampleStrings.ets` from
+  `Example/CYLMenuExample/CYLMenuExample.bundle/*.lproj/Localizable.strings` (iOS keys are the Chinese text; formats
+  use `%@` / `%ld`). Then add `CYLExampleLocalizedString(key)` (language matching as in `CYLMenuResources`), wrap
+  every key literal, and turn the template strings into the iOS format keys through `cylFormat`. Keep `.id()` values
+  language-independent, because the UI tests depend on them.
+- When the emulator is up: `harmony/scripts/ui-test.sh` (set `DEVECO` to the Windows path), then B1–B22
+  screenshots, C, D, F2.
+- D5 (SVGA): no ohpm SVGA package exists (`@ohos/svgaplayer` and others return 404). It needs an ArkTS player
+  (zlib + protobuf + Canvas), after the iOS core has SVGA.
