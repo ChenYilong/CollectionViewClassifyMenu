@@ -34,6 +34,7 @@ export {
   CYLTextMeasurer
 } from './src/main/ets/components/CYLTagListState';
 export * from './src/main/ets/imagetag/ImageTagIndex';
+<<<<<<< HEAD
 export * from './src/main/ets/classify/ClassifyIndex';
 export * from './src/main/ets/tagviews/TagViewsIndex';
 export {
@@ -48,3 +49,5 @@ export {
 export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
 export { CYLUIContext } from './src/main/ets/core/CYLUIContext';
 export { CYLSVGAMovie, CYLSVGASprite, CYLSVGAFrame, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform, CYLSVGARect } from './src/main/ets/components/svga/CYLSVGAMovie';
+=======
+>>>>>>> 9be3571 (feat(harmony): CYLTagListView with configuration, and the image tag views (score 74.8))
