@@ -34,8 +34,11 @@ export interface CYLMenuDataSource {
   menuStyleForItem?: (indexPath: CYLIndexPath) => CYLMenuStyle | undefined;
   /** The icon of a section header. */
   menuImageForSection?: (section: number) => CYLImage | undefined;
-  /** A view at the trailing end of a section header. */
-  menuAccessoryViewForSection?: (section: number) => CustomBuilder | undefined;
+  /**
+   * A view at the trailing end of a section header, left of a trailing fold control, at most half the header's
+   * width (a builder that takes the section; ArkTS passes builders as WrappedBuilder).
+   */
+  menuAccessoryViewForSection?: (section: number) => WrappedBuilder<[number]> | undefined;
   menuItemIsEnabled?: (indexPath: CYLIndexPath) => boolean;
   /** An item that clears the other selected items of its section (the "全部" of a filter). */
   menuItemIsExclusive?: (indexPath: CYLIndexPath) => boolean;
