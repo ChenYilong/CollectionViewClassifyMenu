@@ -1,21 +1,27 @@
-/* The layout of the core's CYLTagListView (CYLMenuStyle defaults, overridable by the configuration's style): per
-   section a header (headerHeight 36, 14 pt regular title, headerHorizontalInset 16), then the tags inside
-   sectionInsets {10, 16, 10, 16} with interitemSpacing and lineSpacing 10; a tag centers its icon and title with
-   imageTitleSpacing 4 between them. The numbers are set inline from the style (cyl-tag-list.js). */
+/* The layout of the core's CYLTagListView and CYLTagButton (CYLMenuStyle defaults, overridable by the configuration's
+   style): per section a header (headerHeight 36, gray 14 pt title, headerHorizontalInset 16), then the tags inside
+   sectionInsets with interitemSpacing and lineSpacing; a tag centers its icon slot and title with imageTitleSpacing
+   between them. The numbers and colors are set inline from the style (model.js tagLayout / sectionLayout). */
 :host { display: block; }
-.cyl-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; box-sizing: border-box; }
-.cyl-header-title { font-weight: normal; color: #333; }
-.cyl-fold-header { display: flex; align-items: center; font-size: 13px; color: #888; padding: 4px 0 4px 12px; }
+.cyl-header { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+.cyl-header-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cyl-fold-header { display: flex; align-items: center; font-size: 13px; padding: 4px 0 4px 12px; }
 .cyl-items { display: flex; flex-wrap: wrap; }
 .cyl-item {
-  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
-  border-style: solid; white-space: nowrap; max-width: 100%;
+  display: inline-flex; align-items: center; box-sizing: border-box; border-style: solid; white-space: nowrap;
+  max-width: 100%; overflow: hidden;
 }
-.cyl-icon { flex: none; }
-/* An emoji stand-in takes the icon slot (imageSize × imageSize) like an image; its glyph is drawn inside it. */
-.cyl-glyph { display: inline-flex; align-items: center; justify-content: center; line-height: 1; overflow: visible; }
-.cyl-title { overflow: hidden; text-overflow: ellipsis; }
-.cyl-disabled { opacity: 0.4; }
-.cyl-fold-tail { color: #888; }
+.cyl-item:active { opacity: 0.85; }
+.cyl-icon-slot { position: relative; flex: none; }
+.cyl-icon { position: absolute; left: 0; top: 0; display: block; }
+/* An emoji stand-in takes the icon's frame like an image; its glyph is drawn inside it. */
+.cyl-glyph { display: flex; align-items: center; justify-content: center; line-height: 1; overflow: visible; }
+.cyl-spacer { flex: none; height: 1px; }
+/* The title and, hidden, the title in the fonts of the other states: the tag is as wide as its widest state. */
+.cyl-title-box { position: relative; display: inline-grid; min-width: 0; overflow: hidden; }
+.cyl-title, .cyl-sizer { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cyl-sizer { visibility: hidden; height: 0; }
+.cyl-fold-tail { justify-content: center; }
+.cyl-fold-footer { display: flex; align-items: center; justify-content: center; height: 30px; font-size: 13px; }
 .cyl-fold-arrow { display: inline-block; margin-left: 2px; transition: transform 0.2s; }
 .cyl-up { transform: rotate(180deg); }

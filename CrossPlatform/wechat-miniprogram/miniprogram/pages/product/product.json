@@ -1,4 +1,8 @@
 {
   "navigationBarTitleText": "宝贝详情",
-  "usingComponents": {}
+  "navigationBarBackgroundColor": "#F2F2F7",
+  "backgroundColor": "#F2F2F7",
+  "usingComponents": {
+    "cyl-tag-list": "../../components/cyl-tag-list/cyl-tag-list"
+  }
 }

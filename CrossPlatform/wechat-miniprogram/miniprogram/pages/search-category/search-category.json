@@ -1,4 +1,10 @@
 {
-  "navigationBarTitleText": "搜索",
-  "usingComponents": {}
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#FFFFFF",
+  "disableScroll": true,
+  "usingComponents": {
+    "cyl-tag-list": "/components/cyl-tag-list/cyl-tag-list",
+    "cyl-tab-bar": "/cyl_components/cyl-tabbar-miniprogram/cyl-tab-bar/index"
+  }
 }

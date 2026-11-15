@@ -1,0 +1,14 @@
+/* What the Android sample ports share (CYLAndroidSampleSupport.swift): the filled buttons (UIButton.Configuration
+   .filled(), corner style small, body text that wraps, white title) and the text fields with a systemTeal bottom
+   line (Android's EditText), 44 pt high. */
+.sample-button {
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 34px;
+  padding: 7px 12px; border-radius: 6px; color: #FFFFFF; font-size: 17px; line-height: 20px; text-align: center;
+  word-break: break-word;
+}
+.sample-button-hover { opacity: 0.6; }
+.sample-field {
+  box-sizing: border-box; height: 44px; min-height: 44px; border-bottom: 1px solid #30B0C7; font-size: 17px;
+  color: #000000; background: transparent;
+}
+.sample-field-placeholder { color: rgba(60, 60, 67, 0.3); }

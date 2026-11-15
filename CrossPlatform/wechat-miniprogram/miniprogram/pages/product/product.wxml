@@ -1,1 +1,16 @@
-<view class="placeholder">{{title}}</view>
+<view class="product">
+  <!-- The product card: name and price. -->
+  <view class="card">
+    <text class="name">{{name}}</text>
+    <text class="price">{{price}}</text>
+  </view>
+
+  <!-- The review block: title, the keyword preview, two reviews, 查看更多评价. -->
+  <view class="review-block">
+    <text class="review-title">{{reviewTitle}}</text>
+    <cyl-tag-list id="product-preview" class="preview" configuration="{{configuration}}" bindtagtap="onKeywordTap" />
+    <text wx:for="{{reviews}}" wx:key="id" class="review">{{item.text}}</text>
+    <view class="more" hover-class="more-hover" bindtap="moreTapped" id="product-more"
+          aria-role="button" aria-label="{{moreTitle}}">{{moreTitle}}</view>
+  </view>
+</view>

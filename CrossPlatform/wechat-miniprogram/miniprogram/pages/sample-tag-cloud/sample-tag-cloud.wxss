@@ -1,1 +1,19 @@
-.placeholder { padding: 40px 16px; text-align: center; color: #8E8E93; }
+@import "../../styles/android-sample.wxss";
+
+/* White 0.93; the tags take the room above the controls (8 pt below the top, 8 pt above the controls), the controls
+   16 pt from the sides and 8 pt above the safe area, 8 pt apart, two equal buttons per row. */
+page { background: #EDEDED; }
+.page { display: flex; flex-direction: column; height: 100vh; background: #EDEDED; }
+.bar { display: flex; justify-content: flex-end; flex: none; padding: 0 8px; }
+.bar-button {
+  min-width: 44px; height: 32px; line-height: 32px; text-align: center; color: #007AFF; font-size: 17px;
+  font-family: Menlo, "SF Mono", monospace;
+}
+.bar-button-hover { opacity: 0.4; }
+.tags { flex: 1; min-height: 0; }
+.controls {
+  flex: none; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;
+  padding: 0 16px calc(8px + env(safe-area-inset-bottom));
+}
+.row { display: flex; gap: 8px; }
+.row .sample-button { flex: 1; }

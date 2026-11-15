@@ -1,2 +1,5 @@
 :host { display: inline-block; line-height: 0; }
-.cyl-lottie-canvas { display: block; }
+.cyl-animation-box { position: relative; }
+.cyl-lottie-canvas, .cyl-gif { display: block; }
+/* CYLTagButton.disabledAnimationAlpha */
+.cyl-animation-disabled { opacity: 0.4; }

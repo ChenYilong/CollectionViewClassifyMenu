@@ -1,1 +1,11 @@
-<view class="placeholder">{{title}}</view>
+<!-- A vertical stack (spacing 12) 16 pt below the safe area's top, 16 pt from its sides. -->
+<view class="home">
+  <view class="stack">
+    <view id="searchButton" class="search-button" hover-class="search-button-hover" bindtap="openSearch"
+          aria-role="button" aria-label="{{searchTitle}}">
+      <image class="search-button-image" src="/images/search/magnifyingglass.svg" mode="aspectFit" aria-hidden="true" />
+      <text class="search-button-title">{{searchTitle}}</text>
+    </view>
+    <text class="hint">{{hint}}</text>
+  </view>
+</view>

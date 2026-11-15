@@ -13,7 +13,13 @@
     "pages/tag-cloud/tag-cloud",
     "pages/sample-tag-cloud/sample-tag-cloud",
     "pages/sample-image-tag/sample-image-tag",
-    "pages/sample-tag-container/sample-tag-container"
+    "pages/sample-tag-container/sample-tag-container",
+    "pages/sample-tag-cloud-sub/sample-tag-cloud-sub",
+    "pages/sample-tag-cloud-list/sample-tag-cloud-list",
+    "pages/sample-tag-cloud-recycler/sample-tag-cloud-recycler",
+    "pages/sample-tag-cloud-hot-search/sample-tag-cloud-hot-search",
+    "pages/sample-image-tag-edit/sample-image-tag-edit",
+    "pages/sample-image-tag-list/sample-image-tag-list"
   ],
   "window": {
     "navigationBarTitleText": "CYLMenuExample",

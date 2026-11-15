@@ -1,1 +1,8 @@
-<view class="placeholder">{{title}}</view>
+<view class="page">
+  <view class="caption">{{fileTitle}}</view>
+  <cyl-tag-list wx:if="{{fileConfiguration}}" id="file" configuration="{{fileConfiguration}}" bind:tagtap="onTagTap" />
+  <view wx:else class="caption">{{fileError || '?'}}</view>
+  <view class="caption">{{mapTitle}}</view>
+  <cyl-tag-list id="map" configuration="{{mapConfiguration}}" bind:tagtap="onTagTap" />
+  <view class="caption" id="event">{{event}}</view>
+</view>

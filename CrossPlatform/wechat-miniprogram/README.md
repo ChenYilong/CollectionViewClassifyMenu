@@ -1,62 +1,72 @@
 # WeChat Mini Program example
 
-The Mini Program example of CollectionViewClassifyMenu: the same screens and data as the iOS, Android and Flutter
-examples (`docs/cross-platform.md`), with iOS as the reference. Its shell is CYLTabBarController's Mini Program
-tab bar (`cyl-tab-bar` of `cyl-tabbar-miniprogram`): the tabs Tags and Classify and the raised Post button with a page of
-its own, as the iOS, Flutter and React Native examples use CYLTabBarController.
+The Mini Program example of CollectionViewClassifyMenu, a 1:1 port of the iOS example (`Example/CYLMenuExample`,
+the reference, `docs/cross-platform.md`): the same screens, texts (the iOS example's and the core's string tables),
+data and behaviors. Its shell is CYLTabBarController's Mini Program tab bar (`cyl-tab-bar` of
+`cyl-tabbar-miniprogram`) set up as the iOS example's `makeRootTabBarController()`.
 
-| Tab | What it shows |
-| --- | --- |
-| Animated icons | `cyl-tag-list` with CYLTabBarController's four Lottie tab icons and ten symbol tags, and the playback controls of `docs/example-demo-rules.md`: Play all, a speed slider (0.25× to 4×, steps of 0.25) and a Loop switch |
-| Classify menu | The menu linkage screen: one section per category (吃喝玩逛, single choice, folded to one row with 更多 / 收起); the selected tag lists its places (rating first); the filter sheet (地区过滤 / 菜品过滤, each led by an exclusive 全部, 确定); ↺ resets; both selections are saved and restored |
+| iOS screen | Page | What it shows |
+| --- | --- | --- |
+| Root tab bar | `custom-tab-bar/` | 场景一：评价筛选, 场景二：搜索分类, the orange plus button (查询筛选), 样式, 动效 |
+| CYLProductViewController | `pages/product` (tab) | 宝贝详情: the product, 宝贝评价(10), the keyword preview, 查看更多评价 |
+| CYLReviewListViewController | `pages/reviews` | The review filter (multiple choice, 全部 exclusive, folded, footer chevron), memory / network (simulated, 0.6 s) / database modes with the request or the SQL, the review cells |
+| CYLSearchHomeViewController | `pages/search-home` (tab) | 脉脉搜索 and the search field button |
+| CYLSearchCategoryViewController | `pages/search-category` | The search page with its own category tab bar (找人/动态/八卦/职位, `cyl-tab-bar`), the 职位 sidebar and 行业 menu |
+| CYLQueryScenariosViewController | `pages/scenarios` (plus button) | 查询筛选: the filter demos by scenario and the database's row counts |
+| CYLMenuLinkageViewController | `pages/classify` | 菜单选择 · 数据库联动: the core's classify menu look (data.json, two rows, 更多 / 收起), the multiple filter panel from the left (返回默认 / 确认筛选), the conditions, the SQL and the rows; saved selections |
+| CYLSearchDiscoverViewController | `pages/search-discover` | 最近搜索 folded to two rows with the chevron as the last tag, 发现 two per row, 换一批 (seedable) |
+| CYLTagStyleDemoViewController | `pages/styles` (tab) | The preview and the 33 style actions with their values |
+| CYLTagAnimationDemoViewController | `pages/animations` (tab) | The eight animation sections, speed slider (0.25×–4×), loop switch, Play all (`docs/example-demo-rules.md`) |
+| CYLTagConfigurationDemoViewController | `pages/configuration` | The list from the iOS JSON file and from a dictionary |
+| CYLTagCloudDemoViewController | `pages/tag-cloud` | The tag cloud built in code and from a configuration |
+| CYLTagCloudSample (+ sub-screens) | `pages/sample-tag-cloud*` | The android-tagview sample: 25 tags, add, result page, list, RecyclerView, hot search |
+| CYLImageTagSample (+ sub-screens) | `pages/sample-image-tag*` | Tags on a picture: groups, edit (drag, turn, delete, 创建, 保存), the list |
+| CYLTagContainerSample | `pages/sample-tag-container` | The five AndroidTagView containers |
+
+Deviations that a Mini Program imposes (no SF Symbols, no SQLite, no UIKit bar buttons, no PAG/Rive engines within
+the 2 MB main package, no VoiceOver announcements) are listed per screen in `docs/cross-platform.md`.
 
 ## Layout
 
 ```
 wechat-miniprogram/
-├── project.config.json          appid "touristappid" (tourist mode); set your own AppID to preview on a phone
-├── package.json                 lottie-miniprogram; `npm test` runs the unit tests
-├── scripts/fetch-cyltabbar.js   installs CYLTabBarController's cyl-tabbar-miniprogram at the pinned commit (git-ignored)
-├── test/                        node --test: the model, the statement, the saved selections
+├── project.config.json          appid "touristappid"; set an AppID in the git-ignored project.private.config.json
+├── package.json                 `npm test` runs the unit tests (no dependencies)
+├── scripts/
+│   ├── fetch-cyltabbar.js       installs CYLTabBarController's cyl-tabbar-miniprogram and cyl-lottie-miniprogram (its
+│   │                            lottie-miniprogram fork, which draws image assets) at the pinned commit (git-ignored)
+│   ├── export-search-data.py    the search discover JSON and images of the iOS bundle
+│   ├── export-animations.py     the iOS example's Lottie / GIF resources and configuration file
+│   └── draw-sample-images.py    the samples' pictures
+├── test/                        node --test: models, queries, pages and components without wx
 └── miniprogram/
-    ├── app.json                 custom tab bar: Tags, Post (raised plus button), Classify
-    ├── custom-tab-bar/          cyl-tab-bar with the example's configuration (configuration.js)
-    ├── images/tab/              tab icons and the Post button images
+    ├── app.json / app.wxss      the pages; UIKit-like shared styles (inset grouped tables)
+    ├── custom-tab-bar/          cyl-tab-bar with the root tab bar's configuration (configuration.js)
     ├── components/
-    │   ├── cyl-tag-list/        the port of the core's CYLTagListView (model.js has no wx calls)
-    │   └── cyl-lottie-icon/     one Lottie icon on a 2d canvas, with speed / loops / play()
-    ├── data/                    generated by scripts/export-miniprogram-data.py: places.js, lottie/*.js
-    ├── pages/tags/              Animated icons
-    ├── pages/classify/          Classify menu (filter.js holds the page state without wx)
-    └── utils/                   places-db.js (the statement), selections.js (saved selections)
+    │   ├── cyl-tag-list/        the port of the core's CYLTagListView (model.js, symbols.js, animations.js: no wx)
+    │   ├── cyl-lottie-icon/     one animated icon: Lottie on a 2d canvas, or a GIF
+    │   ├── cyl-tag-cloud/       the core's tag list used the android-tagview way (CYLTag, AndroidTagView options)
+    │   ├── cyl-tag-image/       the core's image tag and tag group views
+    │   └── cyl-sample-toast/    the samples' toast
+    ├── data/                    generated: places, reviews, data.json, the iOS and core strings, animations, search
+    ├── images/                  core, tab, symbols, reviews, search, styles and samples images
+    ├── pages/                   one folder per iOS screen (the table above)
+    ├── styles/                  shared sample styles
+    └── utils/                   i18n.js (t, tc), places-db.js, selections.js, android-sample.js, cyl-core-strings.js
 ```
-
-## How it maps to the other platforms
-
-- **The component.** A Mini Program cannot host the native iOS or Android view (Flutter and React Native do), so
-  `cyl-tag-list` draws the list itself, from the same configuration dictionary as `CYLTagListView(configuration:)`
-  (`selectionMode`, `allowsEmptySelection`, `selectedItems` as `"<section>-<item>"`, `defaultVisibleRows`,
-  `foldControl`, `style`, `sections` with `exclusive` items). The selection rules are those of
-  `CYLTagListView.handleTap(at:)`; a section folds only when it needs more rows than `defaultVisibleRows`, measured
-  from the rendered cells. Events: `tagtap`, `selectionchange`, `contentheightchange`; methods: `playAll()`,
-  `selectedItems()`, `contentHeight()`.
-- **The database.** A Mini Program has no SQLite, so `scripts/export-miniprogram-data.py` exports the rows of the
-  one shared `Example-Shared/Database/cyl_places.sqlite` to `data/places.js` (`--check` fails when it is stale), and
-  `utils/places-db.js` runs the iOS example's statement (`tag = ? AND region IN (…) AND tag IN (…)`,
-  `ORDER BY rating DESC, id`) on them; the page shows the SQL text. Saved selections use local storage, one key per
-  scenario (`menu.classify`, `menu.filter`), in place of the `selections` table.
-- **Icons.** SF Symbols (`system:<name>`) become emoji stand-ins, as the Android example ships stand-in drawables.
-  Lottie files play through `lottie-miniprogram` (`setSpeed`, `loop`, `goToAndPlay(0)`).
 
 ## Run
 
-1. `npm install` and `node scripts/fetch-cyltabbar.js` in this folder (the second checks CYLTabBarController out at
-   the pinned commit into `.deps/` and copies its tab bar to `miniprogram/cyl_components/`). WeChat DevTools rejects `touristappid`: put an AppID (CYLTabBarController's examples use `wx5e29c9d33906f074`) in a git-ignored
+1. `node scripts/fetch-cyltabbar.js` in this folder: it checks CYLTabBarController out at the pinned commit into
+   `.deps/` and copies its tab bar and its Lottie fork to `miniprogram/cyl_components/`. WeChat DevTools rejects
+   `touristappid`: put an AppID (CYLTabBarController's examples use `wx5e29c9d33906f074`) in a git-ignored
    `project.private.config.json` (`{"appid": "wx…"}`).
 2. Open this folder in WeChat DevTools (or `wechatide -c <client> project_import --project <this folder>`).
-3. Tools → Build npm (构建 npm), or `wechatide -c <client> build_npm --project <this folder>`.
-4. Compile. Compile conditions for screenshots: `pages/tags/tags?autoplay=1` (2×, loop, Play all) and
-   `pages/classify/classify?select=0-1&filter=0-3,1-0`.
+3. Compile (no Build npm step). Launch options for screenshots, like the iOS example's `-CYLExampleScreen`:
+   `pages/animations/animations?autoplay=1`, `pages/classify/classify?select=0-1&filter=0-2,0-4,1-2,1-3`
+   (plus-menu-filtered), `pages/reviews/reviews?mode=database&select=1,4` (plus-reviews-db),
+   `pages/search-discover/search-discover?seed=2026` (plus-discover-refreshed).
 
-Unit tests: `npm test` (Node 18+). Data check: `python3 scripts/export-miniprogram-data.py --check` from the
-repository root.
+Checks: `npm test` (Node 18+); from the repository root `python3 scripts/export-miniprogram-data.py --check`; in this
+folder `python3 scripts/export-search-data.py --check` and `python3 scripts/export-animations.py --check` (Pillow).
+WXSS has no `*` selector: one in any file stops every page from compiling.

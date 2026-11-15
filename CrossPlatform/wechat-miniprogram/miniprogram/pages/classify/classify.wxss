@@ -1,24 +1,69 @@
-.page { display: flex; flex-direction: column; height: 100vh; background: #fff; }
-.toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; }
-.toolbar-title { font-size: 20px; font-weight: 600; }
-.toolbar-actions { display: flex; }
-.icon-button { width: 40px; height: 40px; line-height: 40px; text-align: center; font-size: 22px; color: #555; }
-.icon-active { color: #2AB9A0; }
-/* As tall as the tags, at most half the page; beyond that the menu scrolls itself. */
-.menu { max-height: 50vh; flex: none; }
-.summary { padding: 8px 16px 4px; border-top: 1px solid #eee; }
-.summary-text { display: block; font-size: 14px; font-weight: 600; color: #333; }
-.sql { display: block; margin-top: 4px; font-size: 11px; color: #999; font-family: Menlo, monospace; }
-.empty { padding: 24px; text-align: center; color: #999; font-size: 14px; }
-.places { flex: 1; min-height: 0; }
-/* Room under the last row for the raised Post button of the tab bar. */
-.place:last-child { margin-bottom: 24px; }
-.place { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; }
-.place-main { display: flex; flex-direction: column; }
-.place-name { font-size: 14px; color: #333; }
-.place-region { font-size: 12px; color: #888; margin-top: 2px; }
-.place-score { font-size: 13px; color: #555; }
-.mask { position: fixed; inset: 0; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); display: flex; align-items: flex-end; z-index: 10; }
-.sheet { width: 100%; height: 60vh; background: #fff; border-radius: 12px 12px 0 0; display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); }
-.sheet-list { flex: 1; min-height: 0; }
-.confirm { margin: 16px; background: #2AB9A0; color: #fff; }
+/* 1:1 with the iOS example's menu linkage screen: CYLClassifyMenuViewController (background rgb(252,252,252),
+   CYLFilterHeaderView 38 pt with a 0.5 pt rgb(188,188,188) line inset 16, tags in the .chengNi look: radius 13, mint
+   rgb(230,255,244), teal rgb(42,185,160) text, selected/highlighted rgb(0,198,180) with white text, 16 pt titles,
+   30 pt high, 12 pt apart, insets 12/16/10/16), the footer (secondarySystemBackground, footnote status, rows of body +
+   footnote), and CYLMultipleFilterController (a panel 50 pt narrower than the screen, rgb(244,244,244), 38 pt headers
+   with a rgb(146,175,164) line, tags 50 pt from the left in btn_slide_* (border and fill rgb(77,130,110), title
+   rgb(96,147,130)), 44 pt 返回默认 | 确认筛选 with lightGray hairlines, a 0.35 black dim). */
+page { background: rgb(252, 252, 252); }
+
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 5; background: rgba(249, 249, 249, 0.94); }
+.nav-bar { position: relative; display: flex; align-items: center; justify-content: center; }
+.nav-title { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 600; }
+.nav-title-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* iOS 26 draws a .done bar button item as a prominent glass circle: systemBlue behind the white funnel. */
+.nav-filter { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 22px; background: #007AFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); }
+.nav-filter-image { width: 30px; height: 30px; }
+/* A plain bar button item in a glass capsule. */
+.nav-reset { position: absolute; top: 50%; transform: translateY(-50%); height: 36px; line-height: 36px; padding: 0 14px; border-radius: 18px; background: #fff; border: 1px solid rgba(60, 60, 67, 0.12); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); font-size: 17px; color: #000; }
+.nav-reset-hover { opacity: 0.4; }
+
+.menu { position: fixed; left: 0; right: 0; bottom: 0; }
+.hint { display: flex; flex-direction: column; justify-content: center; height: 52px; padding: 0 8px; background: #fff; }
+.hint-line { font-size: 12px; line-height: 15px; color: rgba(60, 60, 67, 0.6); white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+
+.header { position: relative; display: flex; align-items: center; justify-content: space-between; height: 38px; background: #fff; }
+.header-title { display: flex; align-items: center; margin-left: 16px; font-size: 18px; color: #000; }
+.header-image { width: 22px; height: 22px; margin-right: 16px; }
+.more { display: flex; align-items: center; justify-content: flex-end; width: 72px; margin-right: 16px; font-size: 15px; color: #000; }
+.more-image { width: 12px; height: 12px; margin-left: 6px; }
+.header-separator { position: absolute; left: 16px; right: 16px; bottom: 0; height: 1px; transform: scaleY(0.5); background: rgb(188, 188, 188); }
+.cells { display: flex; flex-wrap: wrap; padding: 12px 4px 0 16px; }
+.cell {
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; height: 30px;
+  margin: 0 12px 10px 0; padding: 0 9.5px; border-radius: 13px; background: rgb(230, 255, 244);
+  color: rgb(42, 185, 160); font-size: 16px; white-space: nowrap; max-width: calc(100% - 12px);
+}
+.cell-picture { padding: 0 8.5px; }
+.cell-selected, .cell-highlighted { background: rgba(0, 198, 180, 0.95); color: #fff; }
+.cell-image { width: 16px; height: 16px; margin-right: 5px; flex: none; }
+.cell-title { overflow: hidden; text-overflow: ellipsis; }
+
+.footer { padding: 10px 16px 120px; background: #F2F2F7; }
+.status { display: block; font-size: 13px; line-height: 18px; color: rgba(60, 60, 67, 0.6); white-space: pre-wrap; word-break: break-all; }
+.results { margin-top: 8px; display: flex; flex-direction: column; gap: 1px; background: rgba(60, 60, 67, 0.29); }
+.result { display: flex; flex-direction: column; background: #fff; }
+.result-title { font-size: 17px; line-height: 22px; color: #000; }
+.result-detail { font-size: 13px; line-height: 18px; color: rgba(60, 60, 67, 0.6); }
+
+.panel-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 20; }
+.dim { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; opacity: 0; transition: opacity 0.3s; }
+.dim-shown { opacity: 0.35; }
+.panel {
+  position: absolute; top: 0; left: 0; bottom: 0; width: calc(100% - 50px); display: flex; flex-direction: column;
+  box-sizing: border-box; background: rgb(244, 244, 244); transform: translateX(-100%); transition: transform 0.3s;
+}
+.panel-shown { transform: translateX(0); }
+.panel-list { flex: 1; min-height: 0; }
+.panel-header { height: 38px; display: flex; align-items: center; margin-left: 50px; border-bottom: 1px solid rgb(146, 175, 164); font-size: 16px; color: rgba(0, 0, 0, 0.5); }
+.panel-cells { display: flex; flex-wrap: wrap; padding: 12px 5px 15px 50px; }
+.panel-cell {
+  box-sizing: border-box; height: 30px; line-height: 28px; margin: 0 12px 10px 0; padding: 0 8px; border: 1px solid rgb(77, 130, 110);
+  border-radius: 4px; color: rgb(96, 147, 130); font-size: 16px; white-space: nowrap; max-width: calc(100% - 12px);
+  overflow: hidden; text-overflow: ellipsis;
+}
+.panel-cell-selected { background: rgb(77, 130, 110); color: #fff; }
+.panel-buttons { display: flex; height: 44px; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #D3D3D3; }
+.panel-button { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 17px; color: #000; }
+.panel-button-ok { border-left: 1px solid #D3D3D3; }
+.panel-button-hover { background: rgba(0, 0, 0, 0.06); }

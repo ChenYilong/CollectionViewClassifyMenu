@@ -9,6 +9,9 @@ on:
     paths:
       - 'CrossPlatform/wechat-miniprogram/**'
       - 'Example-Shared/Database/**'
+      - 'Example/CYLMenuExample/CYLMenuExample.bundle/**'
+      - 'CollectionViewClassifyMenu/Resources/Localization/**'
+      - 'CollectionViewClassifyMenu/Class/Other/data.json'
       - 'flutter/cyl_tag_list/example/assets/**'
       - 'scripts/export-miniprogram-data.py'
       - '.github/workflows/miniprogram.yml'
@@ -17,6 +20,9 @@ on:
     paths:
       - 'CrossPlatform/wechat-miniprogram/**'
       - 'Example-Shared/Database/**'
+      - 'Example/CYLMenuExample/CYLMenuExample.bundle/**'
+      - 'CollectionViewClassifyMenu/Resources/Localization/**'
+      - 'CollectionViewClassifyMenu/Class/Other/data.json'
       - 'scripts/export-miniprogram-data.py'
   workflow_dispatch:
 
@@ -34,7 +40,11 @@ jobs:
         with:
           node-version: 22
       - name: Data check
-        run: python3 scripts/export-miniprogram-data.py --check
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 scripts/export-miniprogram-data.py --check
+          python3 CrossPlatform/wechat-miniprogram/scripts/export-search-data.py --check
+          python3 CrossPlatform/wechat-miniprogram/scripts/export-animations.py --check
       # [EN] CYLTabBarController's tab bar component at the pinned commit, so its configuration reader checks the example's tab bar.
       # [CN] 按固定 commit 安装 CYLTabBarController 的 TabBar 组件，用它的配置读取器检查示例的 TabBar。
       - name: CYLTabBarController component

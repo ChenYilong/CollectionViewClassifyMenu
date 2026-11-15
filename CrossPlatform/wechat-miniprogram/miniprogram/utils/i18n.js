@@ -63,4 +63,17 @@ function t(key, ...args) {
   return args.length ? format(text, args) : text;
 }
 
-module.exports = { t, setLanguage, language, tableFor, format };
+const CORE_TABLES = require('../data/core-strings.js');
+
+/**
+ * The core library's string for an identifier (CYLClassifyMenu.strings, e.g. "CYLMenuExpand" → 更多), as
+ * `CYLMenuLocalizedString`; the Chinese (zh-Hans) one when the language has none.
+ */
+function tc(key, ...args) {
+  const table = CORE_TABLES[language()] || {};
+  const fallback = (CORE_TABLES['zh-Hans'] || {})[key];
+  const text = table[key] != null ? table[key] : (fallback != null ? fallback : key);
+  return args.length ? format(text, args) : text;
+}
+
+module.exports = { t, tc, setLanguage, language, tableFor, format };

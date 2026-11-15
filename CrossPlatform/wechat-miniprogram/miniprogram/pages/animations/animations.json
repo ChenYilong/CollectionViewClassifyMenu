@@ -1,5 +1,6 @@
 {
-  "navigationBarTitleText": "Animated icons",
+  "navigationBarTitleText": "动效图标",
+  "disableScroll": true,
   "usingComponents": {
     "cyl-tag-list": "../../components/cyl-tag-list/cyl-tag-list"
   }

@@ -5,8 +5,5 @@
   "description": "WeChat Mini Program example of CollectionViewClassifyMenu: the tag list, the classify menu and the multiple filter",
   "scripts": {
     "test": "node --test test/*.test.js"
-  },
-  "dependencies": {
-    "lottie-miniprogram": "1.0.12"
   }
 }

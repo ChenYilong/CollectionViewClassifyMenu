@@ -1,4 +1,6 @@
 {
-  "navigationBarTitleText": "配置文件",
-  "usingComponents": {}
+  "navigationBarTitleText": "配置初始化",
+  "usingComponents": {
+    "cyl-tag-list": "../../components/cyl-tag-list/cyl-tag-list"
+  }
 }

@@ -1,1 +1,5 @@
-.placeholder { padding: 40px 16px; text-align: center; color: #8E8E93; }
+/* systemGroupedBackground; a vertical stack 8 pt apart, 12 pt below the top; captions in footnote, secondary label
+   color, inset by 16 pt to line up with the tags; the tag lists keep their white background (CYLMenuStyle). */
+.page { min-height: 100vh; padding-top: 12px; box-sizing: border-box; background: var(--ios-grouped-background); }
+.page { display: flex; flex-direction: column; gap: 8px; }
+.caption { padding: 0 16px; font-size: 13px; line-height: 18px; color: var(--ios-secondary-label); word-break: break-all; }

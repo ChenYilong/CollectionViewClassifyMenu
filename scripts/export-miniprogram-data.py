@@ -86,8 +86,43 @@ def reviews_module():
     return HEADER.format(source=source) + "module.exports = [\n  " + ",\n  ".join(lines) + "\n];\n"
 
 
+CORE_STRINGS = ROOT / "CollectionViewClassifyMenu/Resources/Localization"
+
+
+def core_strings_module():
+    """
+    The core library's strings (CYLClassifyMenu.strings, keyed by identifiers such as CYLMenuExpand), for tc() in
+    miniprogram/utils/i18n.js, the counterpart of CYLMenuLocalizedString.
+    """
+    tables = {}
+    for path in sorted(CORE_STRINGS.glob("*.lproj/CYLClassifyMenu.strings")):
+        text = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+        tables[path.parent.name[: -len(".lproj")]] = {unescape(k): unescape(v) for k, v in STRING_LINE.findall(text)}
+    body = json.dumps(tables, ensure_ascii=False, indent=1, sort_keys=True)
+    source = CORE_STRINGS.relative_to(ROOT).as_posix() + "/*.lproj/CYLClassifyMenu.strings"
+    return HEADER.format(source=source) + f"module.exports = {body};\n"
+
+
+CLASSIFY_DATA = ROOT / "CollectionViewClassifyMenu/Class/Other/data.json"
+
+
+def classify_menu_module():
+    """
+    The classify menu's data (data.json, CYLDBManager.dataSource()): [{title, items: [{title, picture}]}], picture
+    being whether the tag shows the star image (home_btn_shrink), as CYLDemoDataSource.classifyDataSource() reads it.
+    data.json is not strict JSON (trailing commas), so they are dropped first.
+    """
+    text = re.sub(r",(\s*[}\]])", r"\1", CLASSIFY_DATA.read_text(encoding="utf-8"))
+    sections = [{"title": s["Type"], "items": [{"title": i["Item_Title"], "picture": bool(i.get("Picture"))}
+                                               for i in s["Items"]]} for s in json.loads(text)]
+    body = json.dumps(sections, ensure_ascii=False, indent=1)
+    return HEADER.format(source=CLASSIFY_DATA.relative_to(ROOT).as_posix()) + f"module.exports = {body};\n"
+
+
 def modules():
     yield "places.js", places_module()
+    yield "classify-menu.js", classify_menu_module()
+    yield "core-strings.js", core_strings_module()
     yield "reviews.js", reviews_module()
     yield "strings.js", strings_module()
     yield from lottie_modules()

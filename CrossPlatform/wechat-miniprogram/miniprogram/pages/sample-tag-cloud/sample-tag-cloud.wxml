@@ -1,1 +1,33 @@
-<view class="placeholder">{{title}}</view>
+<view class="page">
+  <view class="bar">
+    <view class="bar-button" hover-class="bar-button-hover" bindtap="openGitHub" id="sample.github"
+          aria-role="button" aria-label="{{githubLabel}}"><text decode="{{true}}">&lt;/&gt;</text></view>
+  </view>
+  <scroll-view class="tags" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation>
+    <cyl-tag-cloud id="tag-list" tags="{{tags}}" list-style="{{style}}"
+                   bind:tagtap="onTagTap" bind:tagdelete="onTagDelete" />
+  </scroll-view>
+  <view class="controls">
+    <input class="sample-field" placeholder-class="sample-field-placeholder" placeholder="{{placeholder}}"
+           aria-label="{{fieldLabel}}" value="{{text}}" bindinput="onInput" confirm-type="done" />
+    <view class="row">
+      <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{blue}};"
+            id="sample.addTag" bindtap="addTag" aria-role="button" aria-label="{{titles.addTag}}">{{titles.addTag}}</view>
+      <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{blue}};"
+            id="sample.activityResult" bindtap="openActivityResult" aria-role="button"
+            aria-label="{{titles.activityResult}}">{{titles.activityResult}}</view>
+    </view>
+    <view class="row">
+      <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{blue}};"
+            id="sample.listView" bindtap="openListView" aria-role="button" aria-label="{{titles.listView}}">{{titles.listView}}</view>
+      <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{blue}};"
+            id="sample.recyclerView" bindtap="openRecyclerView" aria-role="button"
+            aria-label="{{titles.recyclerView}}">{{titles.recyclerView}}</view>
+    </view>
+    <view class="row">
+      <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{orange}};"
+            id="sample.hotSearch" bindtap="openHotSearch" aria-role="button" aria-label="{{titles.hotSearch}}">{{titles.hotSearch}}</view>
+    </view>
+  </view>
+  <cyl-sample-toast id="toast" />
+</view>

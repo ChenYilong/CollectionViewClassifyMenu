@@ -1,0 +1,42 @@
+<view class="cyl-tc" style="{{list.rootStyle}}">
+  <view wx:if="{{showsSectionHeaders}}" class="cyl-tc-header" style="{{list.headerStyle}}">
+    <view wx:if="{{list.headerIndicatorStyle}}" class="cyl-tc-header-indicator" style="{{list.headerIndicatorStyle}}" />
+    <text class="cyl-tc-header-title" aria-role="heading">{{sectionTitle}}</text>
+  </view>
+  <view class="cyl-tc-body" style="{{list.bodyStyle}}">
+    <view class="cyl-tc-items" style="{{list.itemsStyle}}">
+      <view wx:for="{{items}}" wx:key="key" id="cyl-tc-item-{{index}}"
+            class="cyl-tc-item {{item.enabled ? '' : 'cyl-tc-disabled'}}" style="{{item.style}}"
+            data-index="{{index}}" bindtap="onTap" bindlongpress="onLongPress"
+            bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"
+            bindtouchcancel="onTouchCancel"
+            aria-role="button" aria-label="{{item.accessibilityLabel}}" aria-selected="{{item.selected}}"
+            aria-disabled="{{!item.enabled}}">
+        <view wx:for="{{ripples['k' + item.key]}}" wx:for-item="ripple" wx:key="id" class="cyl-tc-ripple" style="{{ripple.style}}" />
+        <block wx:if="{{item.deleteFirst}}">
+          <view class="cyl-tc-delete cyl-tc-delete-leading" style="{{item.deleteIndicator.style}}" data-index="{{index}}"
+                catchtap="onDelete" catchtouchstart="noop" catchlongpress="noop" aria-role="button" aria-label="{{deleteLabel}}">
+            <view wx:if="{{item.deleteIndicator.cross}}" class="cyl-tc-cross" style="{{item.deleteIndicator.boxStyle}}">
+              <view class="cyl-tc-cross-line cyl-tc-cross-a" style="{{item.deleteIndicator.lineStyle}}" />
+              <view class="cyl-tc-cross-line cyl-tc-cross-b" style="{{item.deleteIndicator.lineStyle}}" />
+            </view>
+            <text wx:else class="cyl-tc-delete-text" style="{{item.deleteIndicator.boxStyle}}">{{item.deleteIndicator.text}}</text>
+          </view>
+        </block>
+        <image wx:if="{{item.icon.image}}" class="cyl-tc-icon" src="{{item.icon.image}}" mode="{{item.icon.mode}}"
+               style="{{item.icon.style}}" aria-hidden="true" />
+        <view wx:elif="{{item.icon.badge}}" class="cyl-tc-badge" style="{{item.icon.style}}" aria-hidden="true">{{item.icon.badge}}</view>
+        <text wx:if="{{item.hasTitle}}" class="cyl-tc-title" style="{{item.titleStyle}}">{{item.title}}</text>
+        <view wx:if="{{item.deleteIndicator && !item.deleteFirst}}" class="cyl-tc-delete" style="{{item.deleteIndicator.style}}"
+              data-index="{{index}}" catchtap="onDelete" catchtouchstart="noop" catchlongpress="noop"
+              aria-role="button" aria-label="{{deleteLabel}}">
+          <view wx:if="{{item.deleteIndicator.cross}}" class="cyl-tc-cross" style="{{item.deleteIndicator.boxStyle}}">
+            <view class="cyl-tc-cross-line cyl-tc-cross-a" style="{{item.deleteIndicator.lineStyle}}" />
+            <view class="cyl-tc-cross-line cyl-tc-cross-b" style="{{item.deleteIndicator.lineStyle}}" />
+          </view>
+          <text wx:else class="cyl-tc-delete-text" style="{{item.deleteIndicator.boxStyle}}">{{item.deleteIndicator.text}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

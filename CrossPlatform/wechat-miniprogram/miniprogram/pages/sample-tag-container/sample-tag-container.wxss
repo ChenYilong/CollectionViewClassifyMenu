@@ -1,1 +1,12 @@
-.placeholder { padding: 40px 16px; text-align: center; color: #8E8E93; }
+@import "../../styles/android-sample.wxss";
+
+/* White 0.98; a scrolling stack 16 pt from every edge: the first container, the add row (a field and a gray button,
+   equal widths, 12 pt apart), the second container 12 pt apart, then the others 20 pt apart. */
+page { background: #FAFAFA; }
+.scroll { height: 100vh; background: #FAFAFA; }
+.stack { display: flex; flex-direction: column; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+.container { display: block; }
+.stack > .container + .add-row, .stack > .add-row + .container { margin-top: 12px; }
+.spaced { margin-top: 20px; }
+.add-row { display: flex; align-items: center; gap: 12px; }
+.add-row .sample-field, .add-row .sample-button { flex: 1; min-width: 0; }
