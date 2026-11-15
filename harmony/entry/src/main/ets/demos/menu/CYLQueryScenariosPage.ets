@@ -144,6 +144,7 @@ export struct CYLQueryScenariosPage {
     .constraintSize({ minHeight: 44 })
     .padding({ left: 16, right: 16, top: 10, bottom: 10 })
     .border({ width: { bottom: last ? 0 : 0.5 }, color: CYLSystemColor.separator })
+    .accessibilityGroup(true)
     .id(`scenario-${scenario}`)
     .onClick(() => openScenario(scenario))
   }
