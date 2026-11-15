@@ -1,4 +1,6 @@
 import { common } from '@kit.AbilityKit';
+import { window } from '@kit.ArkUI';
+import { CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarController } from 'cyltabbar';
 import { CYLIndexPath, CYLTagListController, CYLTagListView, CYLTagTap } from '@cyl/classifymenu';
 import { Place, PlacesDatabase, REGIONS } from '../data/PlacesDatabase';
 
@@ -60,36 +62,104 @@ function items(titles: string[]): ItemJSON[] {
   return titles.map((t): ItemJSON => ({ title: t }));
 }
 
-/** The example's screens, one bottom tab each (tab bars stay at the bottom, AGENTS.md). */
+/** The tab images of the configuration (HarmonyOS has no SF Symbols): the Android example's vectors as SVG. */
+const TAB_IMAGES: Record<string, Resource> = {
+  'cyl_tab_tag': $r('app.media.cyl_tab_tag'),
+  'cyl_tab_tag_selected': $r('app.media.cyl_tab_tag_selected'),
+  'cyl_tab_classify': $r('app.media.cyl_tab_classify'),
+  'cyl_tab_classify_selected': $r('app.media.cyl_tab_classify_selected'),
+  'post_normal': $r('app.media.post_normal'),
+  'post_highlight': $r('app.media.post_highlight'),
+};
+
+/** The tab and plus button titles, localized, by identifier (the configuration file keeps the English ones). */
+const TAB_TITLES: Record<string, Resource> = {
+  'tags': $r('app.string.tab_tags'), 'classify': $r('app.string.tab_classify'), 'plus': $r('app.string.tab_post')
+};
+
+/**
+ * The example's shell: CYLTabBarController's HarmonyOS library (cyltabbar, scripts/fetch-cyltabbar.sh) shows the tab
+ * bar from rawfile/cyl_tabbar_configuration.json: Tags, Classify and the raised Post plus button
+ * (CYLTabBarControllerPlusButton), which selects a page of its own. Tab bars stay at the bottom (AGENTS.md).
+ */
 @Entry
 @Component
 struct Index {
-  @State tab: number = 0;
+  @State selectedIndex: number = 0;
+  @State tabs?: CYLTabBarConfigurationResult = undefined;
+  @State errorText: string = '';
+  /** The system gesture bar's height (vp): the tab bar stays above it. */
+  @State bottomInset: number = 0;
+
+  aboutToAppear(): void {
+    CYLTabBarConfiguration.imageResolver = (name: string) => TAB_IMAGES[name];
+    try {
+      const configuration = CYLTabBarConfiguration.configurationWithRawFile(getContext(this),
+        'cyl_tabbar_configuration.json');
+      const tabs = CYLTabBarConfiguration.resultWithConfiguration(configuration, '1.0.0', false);
+      tabs.items.forEach((item) => {
+        item.title = TAB_TITLES[item.identifier ?? ''] ?? item.title;
+      });
+      if (tabs.plusButton !== undefined) {
+        tabs.plusButton.title = TAB_TITLES[tabs.plusButton.identifier ?? ''] ?? tabs.plusButton.title;
+      }
+      this.tabs = tabs;
+    } catch (error) {
+      this.errorText = `${(error as Error).message}`;
+    }
+    window.getLastWindow(getContext(this)).then((win: window.Window) => {
+      this.bottomInset = px2vp(win.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR).bottomRect.height);
+    });
+  }
 
   @Builder
-  tabBar(title: Resource, identifier: string, symbol: string, index: number) {
-    Column() {
-      Text(symbol).fontSize(22).accessibilityLevel('no')
-      Text(title).fontSize(11).fontColor(this.tab === index ? '#2AB9A0' : '#8E8E93')
+  page(index: number, identifier: string) {
+    if (identifier === 'tags') {
+      TagsPage()
+    } else if (identifier === 'classify') {
+      ClassifyPage()
+    } else {
+      PostPage()
     }
-    .id(`tab-${identifier}`)
-    // One element per tab for the screen reader: its title, and whether it is the selected one.
-    .accessibilityGroup(true)
-    .accessibilityText(title)
-    .accessibilitySelected(this.tab === index)
   }
 
   build() {
-    Tabs({ barPosition: BarPosition.End, index: this.tab }) {
-      TabContent() {
-        TagsPage()
-      }.tabBar(this.tabBar($r('app.string.tab_tags'), 'Tags', '🏷️', 0))
-
-      TabContent() {
-        ClassifyPage()
-      }.tabBar(this.tabBar($r('app.string.tab_classify'), 'Classify', '🗂️', 1))
+    Column() {
+      if (this.tabs !== undefined) {
+        CYLTabBarController({
+          tabBarItemsAttributes: this.tabs.items,
+          plusButton: this.tabs.plusButton,
+          selectedIndex: $selectedIndex,
+          tintColor: this.tabs.tintColor ?? '#007AFF',
+          tabBarBackgroundColor: this.tabs.backgroundColor ?? '#F8F8F8',
+          titlePositionAdjustment: this.tabs.titlePositionAdjustment,
+          pageBuilder: (index: number, identifier: string) => {
+            this.page(index, identifier)
+          },
+        })
+      } else {
+        Text(this.errorText).fontColor(Color.Red).margin(16).id('cyl-config-error')
+      }
     }
-    .onChange((index: number) => this.tab = index)
+    .width('100%')
+    .height('100%')
+    .padding({ bottom: this.bottomInset })
+    .backgroundColor('#F8F8F8')
+  }
+}
+
+/** The page of the raised plus button (the other examples' "The plus button page"). */
+@Component
+struct PostPage {
+  build() {
+    Column() {
+      Text($r('app.string.plus_page')).fontSize(17)
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+    .backgroundColor(Color.White)
+    .id('plusPage')
   }
 }
 

@@ -5,6 +5,9 @@
   "main": "",
   "author": "",
   "license": "",
-  "dependencies": { "@cyl/classifymenu": "file:../classifymenu" }
+  "dependencies": {
+    "@cyl/classifymenu": "file:../classifymenu",
+    "cyltabbar": "file:../.deps/CYLTabBarController/CrossPlatform/harmonyos-cyltabbar/cyltabbar"
+  }
 }
 
