@@ -27,7 +27,20 @@
 - Swift migration priority (English rule, AGENTS.md "Core quality first, examples last"): example compile errors and
   test failures caused by the migration are fixed in the example code first; the examples have the lowest weight and
   get no compatibility work; the core's Swift code follows `Swift-Coding-Standard.md` with no baggage kept for them.
+- HarmonyOS port (English rule, 2026-11-16, the user's prompt verbatim: "写入instructions相关文档，鸿蒙系统版本，原则如下：API对标iOS端，example对标iOS端。需要一比一复刻。内部实现对标android 内的Kotlin 源码实现迁移到鸿蒙端。"):
+  `harmony.md` is the HarmonyOS document. Versions: target HarmonyOS 5.0.0 (API 12), built with the HarmonyOS
+  6.0.1 SDK (API 21) and DevEco Studio 6.0.1, run on the Mate 70 Pro emulator (HarmonyOS 6.0.0). Principles:
+  (1) the public API matches the iOS core one to one (table 1 of `harmony.md`); (2) the example matches the iOS
+  example one to one: the same screens, texts, data and behaviors (table 2); (3) the internal implementation is
+  migrated from the Android Kotlin sources (`android/merged/library`, `android/merged/example`) to ArkTS, Swift
+  deciding where they differ. Remove one TODO per finished feature and score after each, until 100.
+- HarmonyOS accessibility, localization and accessibility-first UI tests (English rule, AGENTS.md "HarmonyOS:
+  accessibility, localization and accessibility-first UI tests"; skill `.agents/skills/cyl-harmonyos/`): all code,
+  the HarmonyOS code included, supports visual accessibility, screen readers, internationalization and localization
+  with localization files; add the support first where it is missing. Automated UI tests locate controls through
+  accessibility first (localized label, then description, then id) for taps, complex flows and sequences of
+  actions.
 - Accessibility and localization on HarmonyOS (English rule, AGENTS.md "Accessibility and localization on HarmonyOS
   (and every platform)"): all code supports screen readers, visual assistance and localization through resource
   files; add support first where it is missing; automated UI tests locate controls, tap and run multi-step flows
-  through accessibility and localized text first. The HarmonyOS score sheet is `harmonyos-api.md`.
+  through accessibility and localized text first. The HarmonyOS parity sheet is `harmony.md`.

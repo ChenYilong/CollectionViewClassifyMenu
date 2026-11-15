@@ -16,6 +16,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 - **Build SDK:** HarmonyOS 6.0.1 (API 21, `6.0.1.112`), DevEco Studio `6.0.1.251`, hvigor and `hdc` of that SDK
 - **Run:** Mate 70 Pro emulator `6.0.0.112(SP3DEVC00E112R4P11)` (HarmonyOS 6.0.0)
 - **Language:** ArkTS, ArkUI declarative UI; the core is a HAR module (`harmony/classifymenu`), the example a HAP (`harmony/entry`)
+- **Principles:** API: the iOS core one to one; example: the iOS example one to one (screens, texts, data, behaviors); internal implementation: migrated from the Android Kotlin sources (`android/merged`), Swift deciding where they differ (`instructions.md`)
 
 ## Score
 
