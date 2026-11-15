@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * 搜索历史与发现 (iOS CYLSearchDiscoverViewController): "最近搜索" is a tag list whose fold control is a tag cell
  * (tail position); "发现" is a grid of two plain titles per row, a "热" icon after a title, and the core's More button
@@ -26,14 +27,14 @@ class CYLRecentSearchSource implements CYLMenuDataSource {
   }
 
   menuTitleForSection(section: number): string {
-    return '最近搜索';
+    return CYLExampleLocalizedString('最近搜索');
   }
 
   menuTitleForItem(indexPath: CYLIndexPath): string {
     return this.searches[indexPath.item];
   }
 
-  menuAccessibilityHintForItem: (indexPath: CYLIndexPath) => string | undefined = () => '轻点两下搜索';
+  menuAccessibilityHintForItem: (indexPath: CYLIndexPath) => string | undefined = () => CYLExampleLocalizedString('轻点两下搜索');
 }
 
 /** The discover topics, one section with the core's More button. */
@@ -49,7 +50,7 @@ class CYLDiscoverSource implements CYLMenuDataSource {
   }
 
   menuTitleForSection(section: number): string {
-    return '发现';
+    return CYLExampleLocalizedString('发现');
   }
 
   menuTitleForItem(indexPath: CYLIndexPath): string {
@@ -58,9 +59,9 @@ class CYLDiscoverSource implements CYLMenuDataSource {
 
   menuImageForItem: (indexPath: CYLIndexPath) => CYLImage | undefined =
     (indexPath: CYLIndexPath) => this.topics[indexPath.item].icon === 'hot' ? $r('app.media.a_discover_hot') : undefined;
-  menuAccessibilityHintForItem: (indexPath: CYLIndexPath) => string | undefined = () => '轻点两下搜索';
+  menuAccessibilityHintForItem: (indexPath: CYLIndexPath) => string | undefined = () => CYLExampleLocalizedString('轻点两下搜索');
   menuShowsMoreButtonInSection: (section: number) => boolean = () => true;
-  menuAccessibilityLabelForMoreButtonInSection: (section: number) => string | undefined = () => '换一批';
+  menuAccessibilityLabelForMoreButtonInSection: (section: number) => string | undefined = () => CYLExampleLocalizedString('换一批');
 }
 
 function applyHeaderLook(style: CYLMenuStyle): void {
@@ -110,8 +111,8 @@ export function discoverStyle(): CYLMenuStyle {
 @Component
 export struct CYLSearchDiscoverPage {
   @State searchText: string = '';
-  @State placeholder: string = '搜索';
-  @State hint: string = '按住提问，有问必答';
+  @State placeholder: string = CYLExampleLocalizedString('搜索');
+  @State hint: string = CYLExampleLocalizedString('按住提问，有问必答');
   @State recentHeight: number = 150;
   @State discoverHeight: number = 200;
   @State hasRecent: boolean = true;
@@ -158,7 +159,7 @@ export struct CYLSearchDiscoverPage {
 
   /** Shows the current data; the search field's placeholder is the first discover topic. */
   reloadLists(): void {
-    this.placeholder = this.discoverSource.topics.length > 0 ? this.discoverSource.topics[0].title : '搜索';
+    this.placeholder = this.discoverSource.topics.length > 0 ? this.discoverSource.topics[0].title : CYLExampleLocalizedString('搜索');
     this.hasRecent = this.recentSource.searches.length > 0;
     this.recentList.reloadMenuData();
     this.discoverList.reloadMenuData();
@@ -195,7 +196,7 @@ export struct CYLSearchDiscoverPage {
 
   /** The camera button: not part of this demo, which says so instead of ignoring the tap. */
   searchByImage(): void {
-    this.getUIContext().getPromptAction().showDialog({ title: '以图搜索', message: '演示中暂不支持以图搜索。', buttons: [{ text: '好', color: '#007AFF' }] })
+    this.getUIContext().getPromptAction().showDialog({ title: CYLExampleLocalizedString('以图搜索'), message: CYLExampleLocalizedString('演示中暂不支持以图搜索。'), buttons: [{ text: CYLExampleLocalizedString('好'), color: '#007AFF' }] })
       .catch(() => {
         // The dialog was dismissed or could not be shown; nothing to undo.
       });
@@ -211,7 +212,7 @@ export struct CYLSearchDiscoverPage {
             .height(44)
             .objectFit(ImageFit.Contain)
             .padding(6)
-            .accessibilityText('返回')
+            .accessibilityText(CYLExampleLocalizedString('返回'))
             .id('CYLSearchDiscoverBack')
             .onClick(() => CYLDemoNav.pop())
           Row({ space: 6 }) {
@@ -220,7 +221,7 @@ export struct CYLSearchDiscoverPage {
               .backgroundColor(Color.Transparent)
               .layoutWeight(1)
               .enterKeyType(EnterKeyType.Search)
-              .accessibilityText('搜索')
+              .accessibilityText(CYLExampleLocalizedString('搜索'))
               .id('CYLSearchDiscoverField')
               .onChange((value: string) => this.searchText = value)
               .onSubmit(() => this.searchTapped())
@@ -228,11 +229,11 @@ export struct CYLSearchDiscoverPage {
               .width(36)
               .height(36)
               .padding(8)
-              .accessibilityText('以图搜索')
+              .accessibilityText(CYLExampleLocalizedString('以图搜索'))
               .id('CYLSearchDiscoverCamera')
               .onClick(() => this.searchByImage())
             Divider().vertical(true).height(18).color(SEPARATOR)
-            Text('搜索')
+            Text(CYLExampleLocalizedString('搜索'))
               .fontSize(17)
               .fontWeight(FontWeight.Medium)
               .fontColor('#000000')
@@ -261,7 +262,7 @@ export struct CYLSearchDiscoverPage {
                   .height(44)
                   .padding(12)
                   .margin({ right: 4 })
-                  .accessibilityText('清空最近搜索')
+                  .accessibilityText(CYLExampleLocalizedString('清空最近搜索'))
                   .id('clearRecentSearches')
                   .onClick(() => this.clearRecentSearches())
               }
@@ -301,13 +302,13 @@ export struct CYLSearchDiscoverPage {
           .backgroundColor('#FFFFFF')
           .borderRadius(26)
           .shadow({ radius: 8, color: '#14000000', offsetY: 2 })
-          .accessibilityText('按住提问')
-          .accessibilityDescription('按住说出问题，松开发送')
+          .accessibilityText(CYLExampleLocalizedString('按住提问'))
+          .accessibilityDescription(CYLExampleLocalizedString('按住说出问题，松开发送'))
           .id('CYLSearchDiscoverMicButton')
           .gesture(LongPressGesture({ duration: 200 })
-            .onAction(() => this.hint = '正在聆听…')
-            .onActionEnd(() => this.hint = '按住提问，有问必答')
-            .onActionCancel(() => this.hint = '按住提问，有问必答'))
+            .onAction(() => this.hint = CYLExampleLocalizedString('正在聆听…'))
+            .onActionEnd(() => this.hint = CYLExampleLocalizedString('按住提问，有问必答'))
+            .onActionCancel(() => this.hint = CYLExampleLocalizedString('按住提问，有问必答')))
       }
       .padding({ left: 16, right: 16, bottom: 16 })
     }

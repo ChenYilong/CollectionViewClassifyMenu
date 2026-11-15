@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * CYLTagCloudDemoViewController.swift — 标签云：android-tagview 的初始化方式。先创建 CYLTagListState，设置行距、标签间距与
  * 内边距，再 addTagsWithTitles / addTag 添加 CYLTag；点击与删除用 tagClickHandler、tagDeleteHandler 监听。下方是同样的
@@ -27,20 +28,20 @@ export class CYLTagCloudDemoData {
 
   /** Deletable, a larger text, a background image, a delete icon. */
   static styledTags(): CYLTag[] {
-    const blue = CYLTag.withHex(0, '可删除', '#00BFFF');
+    const blue = CYLTag.withHex(0, CYLExampleLocalizedString('可删除'), '#00BFFF');
     blue.textColor = CYLColor.WHITE;
     blue.borderWidth = 0;
     blue.isDeletable = true;
     blue.highlightedBackgroundColor = CYLColor.rgb(0, 0.5, 0.7);
-    const large = new CYLTag(0, '大字号', '#FFFF9500');
+    const large = new CYLTag(0, CYLExampleLocalizedString('大字号'), '#FFFF9500');
     large.textColor = CYLColor.WHITE;
     large.textSize = 22;
     large.borderWidth = 0;
-    const picture = new CYLTag(0, '背景图');
+    const picture = new CYLTag(0, CYLExampleLocalizedString('背景图'));
     picture.backgroundImage = $r('app.media.c_tag_gradient');
     picture.textColor = CYLColor.WHITE;
     picture.borderWidth = 0;
-    const custom = new CYLTag(0, '自定义删除', '#FFFF2D55');
+    const custom = new CYLTag(0, CYLExampleLocalizedString('自定义删除'), '#FFFF2D55');
     custom.textColor = CYLColor.WHITE;
     custom.borderWidth = 0;
     custom.isDeletable = true;
@@ -62,7 +63,7 @@ export class CYLTagCloudDemoData {
 
 @Component
 export struct CYLTagCloudDemoPage {
-  @State eventText: string = '点击标签，或点 × 删除';
+  @State eventText: string = CYLExampleLocalizedString('点击标签，或点 × 删除');
   private codeList: CYLTagListState = new CYLTagListState();
   private mapList: CYLTagListState = new CYLTagListState();
 
@@ -77,13 +78,13 @@ export struct CYLTagCloudDemoPage {
     list.addTag(CYLTagCloudDemoData.detailedTag());
     list.addTags(CYLTagCloudDemoData.styledTags());
     list.tagClickHandler = (index: number, tag: CYLTag) => {
-      this.eventText = cylFormat('点击第 %ld 个「%@」', index, tag.title);
+      this.eventText = cylFormat(CYLExampleLocalizedString('点击第 %ld 个「%@」'), index, tag.title);
     };
     list.tagDeleteHandler = (index: number, tag: CYLTag) => {
-      this.eventText = cylFormat('删除第 %ld 个「%@」', index, tag.title);
+      this.eventText = cylFormat(CYLExampleLocalizedString('删除第 %ld 个「%@」'), index, tag.title);
     };
     this.mapList.tagDeleteHandler = (index: number, tag: CYLTag) => {
-      this.eventText = cylFormat('删除第 %ld 个「%@」', index, tag.title);
+      this.eventText = cylFormat(CYLExampleLocalizedString('删除第 %ld 个「%@」'), index, tag.title);
     };
   }
 
@@ -99,12 +100,12 @@ export struct CYLTagCloudDemoPage {
 
   build() {
     Column() {
-      CYLDemoBar({ title: '标签云（android-tagview）' })
+      CYLDemoBar({ title: CYLExampleLocalizedString('标签云（android-tagview）') })
       Scroll() {
         Column({ space: 8 }) {
-          this.caption('代码初始化：addTags(withTitles:)、addTag(_:)', 'tagCloud.codeCaption')
+          this.caption(CYLExampleLocalizedString('代码初始化：addTags(withTitles:)、addTag(_:)'), 'tagCloud.codeCaption')
           CYLTagListView({ tagList: this.codeList })
-          this.caption('字典初始化：CYLTagListKey.tags', 'tagCloud.mapCaption')
+          this.caption(CYLExampleLocalizedString('字典初始化：CYLTagListViewTags').replace('CYLTagListViewTags', 'CYLTagListKey.tags'), 'tagCloud.mapCaption')
           CYLTagListView({ tagList: this.mapList, configuration: CYLTagCloudDemoData.mapConfiguration() })
           this.caption(this.eventText, 'tagCloud.event')
         }
