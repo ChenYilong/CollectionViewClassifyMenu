@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 604 / 807 = 74.8 / 100** (API 604 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
+**Score: 758 / 807 = 93.9 / 100** (API 758 / 785, demos 0 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 
 ## Table 1: iOS public API
@@ -30,51 +30,51 @@ overrides left out.
 
 | iOS (Swift, file) | HarmonyOS (ArkTS, `harmony/classifymenu`) | Kind |
 | --- | --- | --- |
-| `CYLClassifyMenuViewController` (CYLClassifyMenuViewController.swift) | TODO | class |
-| `CYLClassifyMenuViewController.menuDataSource` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `CYLClassifyMenuViewController.menuDelegate` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `CYLClassifyMenuViewController.menuHeaderView` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `CYLClassifyMenuViewController.menuFooterView` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `CYLClassifyMenuViewController.selectedIndexPath` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `CYLClassifyMenuViewController.defaultVisibleRows` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `CYLClassifyMenuViewController.init()` (CYLClassifyMenuViewController.swift) | TODO | init |
-| `CYLClassifyMenuViewController.reloadMenuData()` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.updateMenuLayout()` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.numberOfSections(in:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:numberOfItemsInSection:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:cellForItemAt:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:didSelectItemAt:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.filterHeaderView(_:didTapMoreButton:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:layout:sizeForItemAt:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.collectionView(_:layout:insetForSectionAt:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLCollectionCellButtonStyle` (UIButton+CYLCollectionCellStyle.swift) | TODO | enum |
-| `CYLCollectionCellButtonStyle.general` (UIButton+CYLCollectionCellStyle.swift) | TODO | case |
-| `CYLCollectionCellButtonStyle.home` (UIButton+CYLCollectionCellStyle.swift) | TODO | case |
-| `CYLCollectionCellButtonStyle.red` (UIButton+CYLCollectionCellStyle.swift) | TODO | case |
-| `CYLCollectionCellButtonStyle.chengNi` (UIButton+CYLCollectionCellStyle.swift) | TODO | case |
-| `CYLCollectionViewCell` (CYLCollectionViewCell.swift) | TODO | class |
-| `CYLCollectionViewCell.button` (CYLCollectionViewCell.swift) | TODO | property |
-| `CYLCollectionViewCell.section` (CYLCollectionViewCell.swift) | TODO | property |
-| `CYLCollectionViewCell.row` (CYLCollectionViewCell.swift) | TODO | property |
-| `CYLCollectionViewCell.shouldShow` (CYLCollectionViewCell.swift) | TODO | property |
+| `CYLClassifyMenuViewController` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController` (classify/, rendered by CYLClassifyMenuView) | class |
+| `CYLClassifyMenuViewController.menuDataSource` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.menuDataSource` | property |
+| `CYLClassifyMenuViewController.menuDelegate` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.menuDelegate` | property |
+| `CYLClassifyMenuViewController.menuHeaderView` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.menuHeaderView` | property |
+| `CYLClassifyMenuViewController.menuFooterView` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.menuFooterView` | property |
+| `CYLClassifyMenuViewController.selectedIndexPath` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.selectedIndexPath` | property |
+| `CYLClassifyMenuViewController.defaultVisibleRows` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.defaultVisibleRows` | property |
+| `CYLClassifyMenuViewController.init()` (CYLClassifyMenuViewController.swift) | `new CYLClassifyMenuViewController()` | init |
+| `CYLClassifyMenuViewController.reloadMenuData()` (CYLClassifyMenuViewController.swift) | `reloadMenuData()` | method |
+| `CYLClassifyMenuViewController.updateMenuLayout()` (CYLClassifyMenuViewController.swift) | `updateMenuLayout()` | method |
+| `CYLClassifyMenuViewController.numberOfSections(in:)` (CYLClassifyMenuViewController.swift) | `numberOfSections()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:numberOfItemsInSection:)` (CYLClassifyMenuViewController.swift) | `numberOfItemsInSection()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:cellForItemAt:)` (CYLClassifyMenuViewController.swift) | `cellForItemAt()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLClassifyMenuViewController.swift) | `viewForSupplementaryElementOfKind()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:didSelectItemAt:)` (CYLClassifyMenuViewController.swift) | `didSelectItemAt()` | method |
+| `CYLClassifyMenuViewController.filterHeaderView(_:didTapMoreButton:)` (CYLClassifyMenuViewController.swift) | `filterHeaderViewDidTapMoreButton()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:layout:sizeForItemAt:)` (CYLClassifyMenuViewController.swift) | `sizeForItemAt()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLClassifyMenuViewController.swift) | `minimumInteritemSpacingForSectionAt()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLClassifyMenuViewController.swift) | `referenceSizeForHeaderInSection()` | method |
+| `CYLClassifyMenuViewController.collectionView(_:layout:insetForSectionAt:)` (CYLClassifyMenuViewController.swift) | `insetForSectionAt()` | method |
+| `CYLCollectionCellButtonStyle` (UIButton+CYLCollectionCellStyle.swift) | `enum CYLCollectionCellButtonStyle` (classify/CYLIndexPathButton.ets) | enum |
+| `CYLCollectionCellButtonStyle.general` (UIButton+CYLCollectionCellStyle.swift) | `CYLCollectionCellButtonStyle.general` | case |
+| `CYLCollectionCellButtonStyle.home` (UIButton+CYLCollectionCellStyle.swift) | `CYLCollectionCellButtonStyle.home` | case |
+| `CYLCollectionCellButtonStyle.red` (UIButton+CYLCollectionCellStyle.swift) | `CYLCollectionCellButtonStyle.red` | case |
+| `CYLCollectionCellButtonStyle.chengNi` (UIButton+CYLCollectionCellStyle.swift) | `CYLCollectionCellButtonStyle.chengNi` | case |
+| `CYLCollectionViewCell` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell` (classify/) | class |
+| `CYLCollectionViewCell.button` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell.button` | property |
+| `CYLCollectionViewCell.section` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell.section` | property |
+| `CYLCollectionViewCell.row` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell.row` | property |
+| `CYLCollectionViewCell.shouldShow` (CYLCollectionViewCell.swift) | `CYLCollectionViewCell.shouldShow` | property |
 | `CYLCollectionViewCell.init?(coder:)` (CYLCollectionViewCell.swift) | TODO | init |
-| `CYLFilterHeaderViewDelegate` (CYLFilterHeaderView.swift) | TODO | protocol |
-| `CYLFilterHeaderViewDelegate.filterHeaderView(_:didTapMoreButton:)` (CYLFilterHeaderView.swift) | TODO | method |
-| `CYLFilterHeaderView` (CYLFilterHeaderView.swift) | TODO | class |
-| `CYLFilterHeaderView.static defaultHeight` (CYLFilterHeaderView.swift) | TODO | property |
-| `CYLFilterHeaderView.titleButton` (CYLFilterHeaderView.swift) | TODO | property |
-| `CYLFilterHeaderView.moreButton` (CYLFilterHeaderView.swift) | TODO | property |
-| `CYLFilterHeaderView.delegate` (CYLFilterHeaderView.swift) | TODO | property |
+| `CYLFilterHeaderViewDelegate` (CYLFilterHeaderView.swift) | `CYLFilterHeaderViewDelegate` | protocol |
+| `CYLFilterHeaderViewDelegate.filterHeaderView(_:didTapMoreButton:)` (CYLFilterHeaderView.swift) | `filterHeaderViewDidTapMoreButton()` | method |
+| `CYLFilterHeaderView` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView` | class |
+| `CYLFilterHeaderView.static defaultHeight` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView.defaultHeight` | property |
+| `CYLFilterHeaderView.titleButton` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView.titleButton` | property |
+| `CYLFilterHeaderView.moreButton` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView.moreButton` | property |
+| `CYLFilterHeaderView.delegate` (CYLFilterHeaderView.swift) | `CYLFilterHeaderView.delegate` | property |
 | `CYLFilterHeaderView.init?(coder:)` (CYLFilterHeaderView.swift) | TODO | init |
-| `CYLIndexPathButton` (CYLIndexPathButton.swift) | TODO | class |
-| `CYLIndexPathButton.section` (CYLIndexPathButton.swift) | TODO | property |
-| `CYLIndexPathButton.row` (CYLIndexPathButton.swift) | TODO | property |
-| `CYLIndexPathButton.imageTitleSpacing` (CYLIndexPathButton.swift) | TODO | property |
-| `CYLIndexPathButton.titleLeadingInset` (CYLIndexPathButton.swift) | TODO | property |
-| `CYLRightImageButton` (CYLRightImageButton.swift) | TODO | class |
+| `CYLIndexPathButton` (CYLIndexPathButton.swift) | `CYLIndexPathButton` | class |
+| `CYLIndexPathButton.section` (CYLIndexPathButton.swift) | `CYLIndexPathButton.section` | property |
+| `CYLIndexPathButton.row` (CYLIndexPathButton.swift) | `CYLIndexPathButton.row` | property |
+| `CYLIndexPathButton.imageTitleSpacing` (CYLIndexPathButton.swift) | `CYLIndexPathButton.imageTitleSpacing` | property |
+| `CYLIndexPathButton.titleLeadingInset` (CYLIndexPathButton.swift) | `CYLIndexPathButton.titleLeadingInset` | property |
+| `CYLRightImageButton` (CYLRightImageButton.swift) | `CYLRightImageButton` | class |
 | `CYLRightImageButton.init?(coder:)` (CYLRightImageButton.swift) | TODO | init |
 | `CYLImageTagDirection` (CYLImageTagGroupView.swift) | `enum CYLImageTagDirection` (imagetag/CYLImageTagModel.ets) | enum |
 | `CYLImageTagDirection.leftCenter` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftCenter` | case |
@@ -201,46 +201,46 @@ overrides left out.
 | `CYLImageTagView.groupView(_:didTapTagAt:)` (CYLImageTagView.swift) | `didTapTagAt` | method |
 | `CYLImageTagView.groupViewDidLongPress(_:)` (CYLImageTagView.swift) | `CYLImageTagView.groupViewDidLongPress` | method |
 | `CYLImageTagView.groupView(_:didDragToPercentPosition:)` (CYLImageTagView.swift) | `didDragToPercentPosition` | method |
-| `CYLFilterControllerDelegate` (CYLFilterBaseController.swift) | TODO | protocol |
-| `CYLFilterControllerDelegate.filterControllerDidComplete(_:)` (CYLFilterBaseController.swift) | TODO | method |
-| `CYLFilterBaseController` (CYLFilterBaseController.swift) | TODO | class |
-| `CYLFilterBaseController.static sectionInset` (CYLFilterBaseController.swift) | TODO | property |
-| `CYLFilterBaseController.collectionView` (CYLFilterBaseController.swift) | TODO | property |
-| `CYLFilterBaseController.contentView` (CYLFilterBaseController.swift) | TODO | property |
-| `CYLFilterBaseController.restoreButton` (CYLFilterBaseController.swift) | TODO | property |
-| `CYLFilterBaseController.okButton` (CYLFilterBaseController.swift) | TODO | property |
-| `CYLFilterBaseController.delegate` (CYLFilterBaseController.swift) | TODO | property |
-| `CYLFilterBaseController.init()` (CYLFilterBaseController.swift) | TODO | init |
-| `CYLFilterBaseController.show(in:)` (CYLFilterBaseController.swift) | TODO | method |
-| `CYLFilterBaseController.confirmButtonClicked(_:)` (CYLFilterBaseController.swift) | TODO | method |
-| `CYLFilterBaseController.restoreButtonClicked(_:)` (CYLFilterBaseController.swift) | TODO | method |
-| `CYLFilterBaseController.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLFilterBaseController.swift) | TODO | method |
-| `CYLFilterBaseController.collectionView(_:layout:insetForSectionAt:)` (CYLFilterBaseController.swift) | TODO | method |
-| `CYLMultipleFilterController` (CYLMultipleFilterController.swift) | TODO | class |
-| `CYLMultipleFilterController.menuDataSource` (CYLMultipleFilterController.swift) | TODO | property |
-| `CYLMultipleFilterController.menuDelegate` (CYLMultipleFilterController.swift) | TODO | property |
-| `CYLMultipleFilterController.refreshFilterParams()` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.reloadMenuData()` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.selectedIndexPaths()` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.setSelectedIndexPaths(_:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.numberOfSections(in:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.collectionView(_:numberOfItemsInSection:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.collectionView(_:cellForItemAt:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.collectionView(_:didSelectItemAt:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.collectionView(_:layout:sizeForItemAt:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLMultipleFilterController.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLMultipleFilterController.swift) | TODO | method |
-| `CYLFilterCollectionCell` (CYLFilterCollectionCell.swift) | TODO | class |
-| `CYLFilterCollectionCell.titleButton` (CYLFilterCollectionCell.swift) | TODO | property |
+| `CYLFilterControllerDelegate` (CYLFilterBaseController.swift) | `CYLFilterControllerDelegate` | protocol |
+| `CYLFilterControllerDelegate.filterControllerDidComplete(_:)` (CYLFilterBaseController.swift) | `filterControllerDidComplete()` | method |
+| `CYLFilterBaseController` (CYLFilterBaseController.swift) | `CYLFilterBaseController` | class |
+| `CYLFilterBaseController.static sectionInset` (CYLFilterBaseController.swift) | `CYLFilterBaseController.sectionInset` | property |
+| `CYLFilterBaseController.collectionView` (CYLFilterBaseController.swift) | `CYLFilterBaseController.collectionView` | property |
+| `CYLFilterBaseController.contentView` (CYLFilterBaseController.swift) | `CYLFilterBaseController.contentView` | property |
+| `CYLFilterBaseController.restoreButton` (CYLFilterBaseController.swift) | `CYLFilterBaseController.restoreButton` | property |
+| `CYLFilterBaseController.okButton` (CYLFilterBaseController.swift) | `CYLFilterBaseController.okButton` | property |
+| `CYLFilterBaseController.delegate` (CYLFilterBaseController.swift) | `CYLFilterBaseController.delegate` | property |
+| `CYLFilterBaseController.init()` (CYLFilterBaseController.swift) | `new CYLFilterBaseController()` | init |
+| `CYLFilterBaseController.show(in:)` (CYLFilterBaseController.swift) | `show()` (CYLMultipleFilterView in a Stack) | method |
+| `CYLFilterBaseController.confirmButtonClicked(_:)` (CYLFilterBaseController.swift) | `confirmButtonClicked()` | method |
+| `CYLFilterBaseController.restoreButtonClicked(_:)` (CYLFilterBaseController.swift) | `restoreButtonClicked()` | method |
+| `CYLFilterBaseController.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLFilterBaseController.swift) | `referenceSizeForHeaderInSection()` | method |
+| `CYLFilterBaseController.collectionView(_:layout:insetForSectionAt:)` (CYLFilterBaseController.swift) | `insetForSectionAt()` | method |
+| `CYLMultipleFilterController` (CYLMultipleFilterController.swift) | `CYLMultipleFilterController` | class |
+| `CYLMultipleFilterController.menuDataSource` (CYLMultipleFilterController.swift) | `CYLMultipleFilterController.menuDataSource` | property |
+| `CYLMultipleFilterController.menuDelegate` (CYLMultipleFilterController.swift) | `CYLMultipleFilterController.menuDelegate` | property |
+| `CYLMultipleFilterController.refreshFilterParams()` (CYLMultipleFilterController.swift) | `refreshFilterParams()` | method |
+| `CYLMultipleFilterController.reloadMenuData()` (CYLMultipleFilterController.swift) | `reloadMenuData()` | method |
+| `CYLMultipleFilterController.selectedIndexPaths()` (CYLMultipleFilterController.swift) | `selectedIndexPaths()` | method |
+| `CYLMultipleFilterController.setSelectedIndexPaths(_:)` (CYLMultipleFilterController.swift) | `setSelectedIndexPaths()` | method |
+| `CYLMultipleFilterController.numberOfSections(in:)` (CYLMultipleFilterController.swift) | `numberOfSections()` | method |
+| `CYLMultipleFilterController.collectionView(_:numberOfItemsInSection:)` (CYLMultipleFilterController.swift) | `numberOfItemsInSection()` | method |
+| `CYLMultipleFilterController.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLMultipleFilterController.swift) | `viewForSupplementaryElementOfKind()` | method |
+| `CYLMultipleFilterController.collectionView(_:cellForItemAt:)` (CYLMultipleFilterController.swift) | `cellForItemAt()` | method |
+| `CYLMultipleFilterController.collectionView(_:didSelectItemAt:)` (CYLMultipleFilterController.swift) | `didSelectItemAt()` | method |
+| `CYLMultipleFilterController.collectionView(_:layout:sizeForItemAt:)` (CYLMultipleFilterController.swift) | `sizeForItemAt()` | method |
+| `CYLMultipleFilterController.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLMultipleFilterController.swift) | `minimumInteritemSpacingForSectionAt()` | method |
+| `CYLFilterCollectionCell` (CYLFilterCollectionCell.swift) | `CYLFilterCollectionCell` | class |
+| `CYLFilterCollectionCell.titleButton` (CYLFilterCollectionCell.swift) | `CYLFilterCollectionCell.titleButton` | property |
 | `CYLFilterCollectionCell.init?(coder:)` (CYLFilterCollectionCell.swift) | TODO | init |
-| `CYLMultipleFilterHeaderView` (CYLMultipleFilterHeaderView.swift) | TODO | class |
-| `CYLMultipleFilterHeaderView.imageView` (CYLMultipleFilterHeaderView.swift) | TODO | property |
-| `CYLMultipleFilterHeaderView.titleLabel` (CYLMultipleFilterHeaderView.swift) | TODO | property |
-| `NSArray.cyl_description(withLocale:)` (NSArray+CYLLog.swift) | TODO | method |
-| `NSDictionary.cyl_description(withLocale:)` (NSDictionary+CYLLog.swift) | TODO | method |
-| `UICollectionViewDelegateLeftAlignedLayout` (CYLCollectionViewLeftAlignedLayout.swift) | TODO | protocol |
-| `CYLCollectionViewLeftAlignedLayout` (CYLCollectionViewLeftAlignedLayout.swift) | TODO | class |
-| `CYLCollectionViewLeftAlignedLayout.rowAlignment` (CYLCollectionViewLeftAlignedLayout.swift) | TODO | property |
+| `CYLMultipleFilterHeaderView` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView` | class |
+| `CYLMultipleFilterHeaderView.imageView` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView.imageView` | property |
+| `CYLMultipleFilterHeaderView.titleLabel` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView.titleLabel` | property |
+| `NSArray.cyl_description(withLocale:)` (NSArray+CYLLog.swift) | `cylArrayDescriptionWithLocale()` (classify/CYLLog.ets) | method |
+| `NSDictionary.cyl_description(withLocale:)` (NSDictionary+CYLLog.swift) | `cylDictionaryDescriptionWithLocale()` | method |
+| `UICollectionViewDelegateLeftAlignedLayout` (CYLCollectionViewLeftAlignedLayout.swift) | `interface UICollectionViewDelegateLeftAlignedLayout` | protocol |
+| `CYLCollectionViewLeftAlignedLayout` (CYLCollectionViewLeftAlignedLayout.swift) | `CYLCollectionViewLeftAlignedLayout` | class |
+| `CYLCollectionViewLeftAlignedLayout.rowAlignment` (CYLCollectionViewLeftAlignedLayout.swift) | `CYLCollectionViewLeftAlignedLayout.rowAlignment` | property |
 | `CYLMenuItemType` (CYLMenuDataSource.swift) | `enum CYLMenuItemType` (core/CYLMenuDataSource.ets) | enum |
 | `CYLMenuItemType.tag` (CYLMenuDataSource.swift) | `CYLMenuItemType.tag` | case |
 | `CYLMenuItemType.create` (CYLMenuDataSource.swift) | `CYLMenuItemType.create` | case |
@@ -479,29 +479,29 @@ overrides left out.
 | `CYLTagAppearance.init()` (CYLTagAppearance.swift) | `new CYLTagAppearance()` | init |
 | `CYLTagAppearance.reset()` (CYLTagAppearance.swift) | `reset()` | method |
 | `CYLTagAppearance.copy()` (CYLTagAppearance.swift) | `copy()` | method |
-| `CYLTagButton` (CYLTagButton.swift) | TODO | class |
-| `CYLTagButton.imageView` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.titleLabel` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.deleteIndicatorLabel` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.title` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.image` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.selectedImage` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.animationURL` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.animationRestingProgress` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.animationSpeed` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.animationLoops` (CYLTagButton.swift) | TODO | property |
+| `CYLTagButton` (CYLTagButton.swift) | `CYLTagButton` (tagviews/CYLTagButton.ets + CYLTagButtonComponent) | class |
+| `CYLTagButton.imageView` (CYLTagButton.swift) | `CYLTagButton.imageView` | property |
+| `CYLTagButton.titleLabel` (CYLTagButton.swift) | `CYLTagButton.titleLabel` | property |
+| `CYLTagButton.deleteIndicatorLabel` (CYLTagButton.swift) | `CYLTagButton.deleteIndicatorLabel` | property |
+| `CYLTagButton.title` (CYLTagButton.swift) | `CYLTagButton.title` | property |
+| `CYLTagButton.image` (CYLTagButton.swift) | `CYLTagButton.image` | property |
+| `CYLTagButton.selectedImage` (CYLTagButton.swift) | `CYLTagButton.selectedImage` | property |
+| `CYLTagButton.animationURL` (CYLTagButton.swift) | `CYLTagButton.animationURL` | property |
+| `CYLTagButton.animationRestingProgress` (CYLTagButton.swift) | `CYLTagButton.animationRestingProgress` | property |
+| `CYLTagButton.animationSpeed` (CYLTagButton.swift) | `CYLTagButton.animationSpeed` | property |
+| `CYLTagButton.animationLoops` (CYLTagButton.swift) | `CYLTagButton.animationLoops` | property |
 | `CYLTagButton.animationView` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.animationPlayer` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.showsDeleteIndicator` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.deleteIndicatorHitFrame` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.style` (CYLTagButton.swift) | TODO | property |
-| `CYLTagButton.static isAnimationEngineAvailable` (CYLTagButton.swift) | TODO | property |
+| `CYLTagButton.animationPlayer` (CYLTagButton.swift) | `CYLTagButton.animationPlayer` | property |
+| `CYLTagButton.showsDeleteIndicator` (CYLTagButton.swift) | `CYLTagButton.showsDeleteIndicator` | property |
+| `CYLTagButton.deleteIndicatorHitFrame` (CYLTagButton.swift) | `CYLTagButton.deleteIndicatorHitFrame` | property |
+| `CYLTagButton.style` (CYLTagButton.swift) | `CYLTagButton.style` | property |
+| `CYLTagButton.static isAnimationEngineAvailable` (CYLTagButton.swift) | `CYLTagButton.isAnimationEngineAvailable` | property |
 | `CYLTagButton.init?(coder:)` (CYLTagButton.swift) | TODO | init |
-| `CYLTagButton.playAnimation()` (CYLTagButton.swift) | TODO | method |
-| `CYLTagButton.static width(forTitle:image:style:traitCollection:)` (CYLTagButton.swift) | TODO | method |
-| `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | TODO | method |
-| `CYLTagButton.static iconSize(for:animated:style:)` (CYLTagButton.swift) | TODO | method |
-| `CYLTagButton.static height(for:traitCollection:)` (CYLTagButton.swift) | TODO | method |
+| `CYLTagButton.playAnimation()` (CYLTagButton.swift) | `playAnimation()` | method |
+| `CYLTagButton.static width(forTitle:image:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.widthWithImage(title, image, style, fontScale)` | method |
+| `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.width(title, iconSize, showsDeleteIndicator, style, fontScale)` | method |
+| `CYLTagButton.static iconSize(for:animated:style:)` (CYLTagButton.swift) | `CYLTagButton.iconSize(image, animated, style)` | method |
+| `CYLTagButton.static height(for:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.height(style, fontScale)` | method |
 | `CYLTagColorTheme` (CYLTagColors.swift) | `enum CYLTagColorTheme` | enum |
 | `CYLTagColorTheme.none` (CYLTagColors.swift) | `CYLTagColorTheme.none` | case |
 | `CYLTagColorTheme.random` (CYLTagColors.swift) | `CYLTagColorTheme.random` | case |
@@ -522,39 +522,39 @@ overrides left out.
 | `CYLTagColors.init?(theme:seed:)` (CYLTagColors.swift) | `CYLTagColors.fromTheme(theme, seed)` | init |
 | `CYLTagColors.static random()` (CYLTagColors.swift) | `CYLTagColors.random()` | method |
 | `CYLTagColors.styleByApplying(to:)` (CYLTagColors.swift) | `styleByApplying(style)` | method |
-| `CYLTagCreateCell` (CYLTagCreateCell.swift) | TODO | class |
+| `CYLTagCreateCell` (CYLTagCreateCell.swift) | `CYLTagCreateCell` (tagviews/CYLTagCreateCell.ets) | class |
 | `CYLTagCreateCell.static plusImage` (CYLTagCreateCell.swift) | `CYLTagCreateItem.plusImage` | property |
 | `CYLTagCreateCell.static title(forName:)` (CYLTagCreateCell.swift) | `CYLTagCreateItem.title(name)` | method |
 | `CYLTagCreateCell.static outlinedStyle(from:)` (CYLTagCreateCell.swift) | `CYLTagCreateItem.outlinedStyle(style)` | method |
-| `CYLTagCreateCell.configure(name:style:isEnabled:)` (CYLTagCreateCell.swift) | TODO | method |
-| `CYLTagFoldButton` (CYLTagFoldButton.swift) | TODO | class |
-| `CYLTagFoldButton.foldControl` (CYLTagFoldButton.swift) | TODO | property |
-| `CYLTagFoldButton.isExpanded` (CYLTagFoldButton.swift) | TODO | property |
+| `CYLTagCreateCell.configure(name:style:isEnabled:)` (CYLTagCreateCell.swift) | `configureCreate(name, style, isEnabled)` | method |
+| `CYLTagFoldButton` (CYLTagFoldButton.swift) | `CYLTagFoldButton` (tagviews/CYLTagFoldButton.ets) | class |
+| `CYLTagFoldButton.foldControl` (CYLTagFoldButton.swift) | `CYLTagFoldButton.foldControl` | property |
+| `CYLTagFoldButton.isExpanded` (CYLTagFoldButton.swift) | `CYLTagFoldButton.isExpanded` | property |
 | `CYLTagFoldButton.init?(coder:)` (CYLTagFoldButton.swift) | TODO | init |
-| `CYLTagFoldButton.applyFoldControl(_:color:expanded:animated:)` (CYLTagFoldButton.swift) | TODO | method |
-| `CYLTagFoldButton.applyInlineFoldControl(_:itemStyle:expanded:animated:)` (CYLTagFoldButton.swift) | TODO | method |
+| `CYLTagFoldButton.applyFoldControl(_:color:expanded:animated:)` (CYLTagFoldButton.swift) | `applyFoldControl(foldControl, color, expanded, animated)` | method |
+| `CYLTagFoldButton.applyInlineFoldControl(_:itemStyle:expanded:animated:)` (CYLTagFoldButton.swift) | `applyInlineFoldControl(foldControl, itemStyle, expanded, animated)` | method |
 | `CYLTagFoldButton.static inlineSize(for:itemStyle:expanded:traitCollection:)` (CYLTagFoldButton.swift) | `CYLTagFoldMetrics.inlineSize(control, itemStyle, expanded, fontScale)` | method |
 | `CYLTagFoldButton.static size(for:expanded:traitCollection:)` (CYLTagFoldButton.swift) | `CYLTagFoldMetrics.size(control, expanded, fontScale)` | method |
-| `CYLTagFoldCell` (CYLTagFoldCell.swift) | TODO | class |
-| `CYLTagFoldCell.foldButton` (CYLTagFoldCell.swift) | TODO | property |
+| `CYLTagFoldCell` (CYLTagFoldCell.swift) | `CYLTagFoldCell` (tagviews/CYLTagFoldCell.ets + component) | class |
+| `CYLTagFoldCell.foldButton` (CYLTagFoldCell.swift) | `CYLTagFoldCell.foldButton` | property |
 | `CYLTagFoldCell.init?(coder:)` (CYLTagFoldCell.swift) | TODO | init |
-| `CYLTagFoldCell.configure(foldControl:itemStyle:expanded:animated:)` (CYLTagFoldCell.swift) | TODO | method |
-| `CYLTagListAccessibilityIdentifier` (CYLTagListAccessibility.swift) | TODO | enum |
-| `CYLTagListAccessibilityIdentifier.static title` (CYLTagListAccessibility.swift) | TODO | property |
-| `CYLTagListAccessibilityIdentifier.static foldControl` (CYLTagListAccessibility.swift) | TODO | property |
-| `CYLTagListAccessibilityIdentifier.static item` (CYLTagListAccessibility.swift) | TODO | property |
-| `CYLTagListAccessibilityIdentifier.static createItem` (CYLTagListAccessibility.swift) | TODO | property |
-| `CYLTagListAccessibilityIdentifier.static moreButton` (CYLTagListAccessibility.swift) | TODO | property |
-| `CYLTagListAccessibilityIdentifier.static deleteButton` (CYLTagListAccessibility.swift) | TODO | property |
-| `CYLTagListCell` (CYLTagListCell.swift) | TODO | class |
-| `CYLTagListCell.button` (CYLTagListCell.swift) | TODO | property |
-| `CYLTagListCell.appliedStyle` (CYLTagListCell.swift) | TODO | property |
-| `CYLTagListCell.isDeletable` (CYLTagListCell.swift) | TODO | property |
-| `CYLTagListCell.deleteHandler` (CYLTagListCell.swift) | TODO | property |
+| `CYLTagFoldCell.configure(foldControl:itemStyle:expanded:animated:)` (CYLTagFoldCell.swift) | `configure(foldControl, itemStyle, expanded, animated)` | method |
+| `CYLTagListAccessibilityIdentifier` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier` (tagviews/CYLTagListAccessibility.ets) | enum |
+| `CYLTagListAccessibilityIdentifier.static title` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.title` | property |
+| `CYLTagListAccessibilityIdentifier.static foldControl` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.foldControl` | property |
+| `CYLTagListAccessibilityIdentifier.static item` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.item` | property |
+| `CYLTagListAccessibilityIdentifier.static createItem` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.createItem` | property |
+| `CYLTagListAccessibilityIdentifier.static moreButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.moreButton` | property |
+| `CYLTagListAccessibilityIdentifier.static deleteButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.deleteButton` | property |
+| `CYLTagListCell` (CYLTagListCell.swift) | `CYLTagListCell` (tagviews/CYLTagListCell.ets + component) | class |
+| `CYLTagListCell.button` (CYLTagListCell.swift) | `CYLTagListCell.button` | property |
+| `CYLTagListCell.appliedStyle` (CYLTagListCell.swift) | `CYLTagListCell.appliedStyle` | property |
+| `CYLTagListCell.isDeletable` (CYLTagListCell.swift) | `CYLTagListCell.isDeletable` | property |
+| `CYLTagListCell.deleteHandler` (CYLTagListCell.swift) | `CYLTagListCell.deleteHandler` | property |
 | `CYLTagListCell.additionalAccessibilityActions` (CYLTagListCell.swift) | TODO | property |
 | `CYLTagListCell.init?(coder:)` (CYLTagListCell.swift) | TODO | init |
-| `CYLTagListCell.showRipple(at:)` (CYLTagListCell.swift) | TODO | method |
-| `CYLTagListCell.configure(title:image:selectedImage:animationURL:style:isSelected:isEnabled:)` (CYLTagListCell.swift) | TODO | method |
+| `CYLTagListCell.showRipple(at:)` (CYLTagListCell.swift) | `showRipple(point)` | method |
+| `CYLTagListCell.configure(title:image:selectedImage:animationURL:style:isSelected:isEnabled:)` (CYLTagListCell.swift) | `configure(title, image, selectedImage, animationURL, style, isSelected, isEnabled)` | method |
 | `CYLTagListKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLTagListKey` (core/CYLTagListConfiguration.ets) | enum |
 | `CYLTagListKey.static sections` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.sections` | property |
 | `CYLTagListKey.static style` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.style` | property |
@@ -770,27 +770,27 @@ overrides left out.
 | `CYLTagListView.collectionView(_:layout:minimumLineSpacingForSectionAt:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (line spacing) | method |
 | `CYLTagListView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (header frames) | method |
 | `CYLTagListView.collectionView(_:layout:referenceSizeForFooterInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (footer frames) | method |
-| `CYLTagView` (CYLTagView.swift) | TODO | class |
-| `CYLTagView.static sectionInset` (CYLTagView.swift) | TODO | property |
-| `CYLTagView.static cellSpacing` (CYLTagView.swift) | TODO | property |
-| `CYLTagView.isShowHeader` (CYLTagView.swift) | TODO | property |
-| `CYLTagView.groups` (CYLTagView.swift) | TODO | property |
-| `CYLTagView.menuDataSource` (CYLTagView.swift) | TODO | property |
-| `CYLTagView.menuDelegate` (CYLTagView.swift) | TODO | property |
-| `CYLTagView.static makeTagView()` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.init()` (CYLTagView.swift) | TODO | init |
+| `CYLTagView` (CYLTagView.swift) | `CYLTagView` (tagviews/CYLTagView.ets + CYLTagViewComponent) | class |
+| `CYLTagView.static sectionInset` (CYLTagView.swift) | `CYLTagView.sectionInset` | property |
+| `CYLTagView.static cellSpacing` (CYLTagView.swift) | `CYLTagView.cellSpacing` | property |
+| `CYLTagView.isShowHeader` (CYLTagView.swift) | `CYLTagView.isShowHeader` | property |
+| `CYLTagView.groups` (CYLTagView.swift) | `CYLTagView.groups` | property |
+| `CYLTagView.menuDataSource` (CYLTagView.swift) | `CYLTagView.menuDataSource` | property |
+| `CYLTagView.menuDelegate` (CYLTagView.swift) | `CYLTagView.menuDelegate` | property |
+| `CYLTagView.static makeTagView()` (CYLTagView.swift) | `CYLTagView.makeTagView()` | method |
+| `CYLTagView.init()` (CYLTagView.swift) | `new CYLTagView()` | init |
 | `CYLTagView.init?(coder:)` (CYLTagView.swift) | TODO | init |
-| `CYLTagView.reloadMenuData()` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.numberOfSections(in:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:numberOfItemsInSection:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:cellForItemAt:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:didSelectItemAt:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:layout:sizeForItemAt:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagView.swift) | TODO | method |
-| `CYLTagView.collectionView(_:layout:insetForSectionAt:)` (CYLTagView.swift) | TODO | method |
+| `CYLTagView.reloadMenuData()` (CYLTagView.swift) | `reloadMenuData()` | method |
+| `CYLTagView.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagView.swift) | `tagHeaderCell(headerCell, section)` | method |
+| `CYLTagView.numberOfSections(in:)` (CYLTagView.swift) | `numberOfSections()` | method |
+| `CYLTagView.collectionView(_:numberOfItemsInSection:)` (CYLTagView.swift) | `numberOfItemsInSection(section)` | method |
+| `CYLTagView.collectionView(_:cellForItemAt:)` (CYLTagView.swift) | `cellForItemAt(indexPath)` | method |
+| `CYLTagView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagView.swift) | `viewForSupplementaryElementOfKind(kind, indexPath)` | method |
+| `CYLTagView.collectionView(_:didSelectItemAt:)` (CYLTagView.swift) | `didSelectItemAt(indexPath)` | method |
+| `CYLTagView.collectionView(_:layout:sizeForItemAt:)` (CYLTagView.swift) | `sizeForItemAt(indexPath)` | method |
+| `CYLTagView.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLTagView.swift) | `minimumInteritemSpacingForSectionAt(section)` | method |
+| `CYLTagView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagView.swift) | `referenceSizeForHeaderInSection(section)` | method |
+| `CYLTagView.collectionView(_:layout:insetForSectionAt:)` (CYLTagView.swift) | `insetForSectionAt(section)` | method |
 | `CYLTagGroup` (CYLTagGroup.swift) | `class CYLTagGroup` (core/CYLTagModel.ets) | class |
 | `CYLTagGroup.groupName` (CYLTagGroup.swift) | `CYLTagGroup.groupName` | property |
 | `CYLTagGroup.width` (CYLTagGroup.swift) | `CYLTagGroup.width` | property |
@@ -808,13 +808,13 @@ overrides left out.
 | `CYLTagModel.init(title:)` (CYLTagModel.swift) | `new CYLTagModel(title)` | init |
 | `CYLTagModel.static titleFont(for:)` (CYLTagModel.swift) | `CYLTagModel.titleFont(fontScale)` | method |
 | `CYLTagModel.updateSize(for:)` (CYLTagModel.swift) | `updateSize(fontScale)` (MeasureText) | method |
-| `CYLTagCell` (CYLTagCell.swift) | TODO | class |
-| `CYLTagCell.model` (CYLTagCell.swift) | TODO | property |
-| `CYLTagHeaderCellDelegate` (CYLTagHeaderCell.swift) | TODO | protocol |
-| `CYLTagHeaderCellDelegate.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagHeaderCell.swift) | TODO | method |
-| `CYLTagHeaderCell` (CYLTagHeaderCell.swift) | TODO | class |
-| `CYLTagHeaderCell.group` (CYLTagHeaderCell.swift) | TODO | property |
-| `CYLTagHeaderCell.delegate` (CYLTagHeaderCell.swift) | TODO | property |
+| `CYLTagCell` (CYLTagCell.swift) | `CYLTagCell` (tagviews/CYLTagView.ets) | class |
+| `CYLTagCell.model` (CYLTagCell.swift) | `CYLTagCell.model` | property |
+| `CYLTagHeaderCellDelegate` (CYLTagHeaderCell.swift) | `interface CYLTagHeaderCellDelegate` | protocol |
+| `CYLTagHeaderCellDelegate.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagHeaderCell.swift) | `tagHeaderCell(headerCell, section)` | method |
+| `CYLTagHeaderCell` (CYLTagHeaderCell.swift) | `CYLTagHeaderCell` (tagviews/CYLTagView.ets) | class |
+| `CYLTagHeaderCell.group` (CYLTagHeaderCell.swift) | `CYLTagHeaderCell.group` | property |
+| `CYLTagHeaderCell.delegate` (CYLTagHeaderCell.swift) | `CYLTagHeaderCell.delegate` | property |
 
 ## Table 2: iOS example demos
 
@@ -852,3 +852,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: feature 2, the style: value types, CYLTagAppearance, CYLMenuStyle, CYLTagColors, CYLTagMetrics, CYLMenuResources (core strings generated by harmony/scripts/export-core-strings.py, the pod's images in the HAR's media). Score 175 / 807 = 21.7.
 - 2026-11-16: feature 3, the tag models: CYLTag, CYLTagDataSource (badge images drawn on an OffscreenCanvas), CYLTagModel, CYLTagGroup, CYLMenuColorFromString. Score 250 / 807 = 31.0.
 - 2026-11-16: features 4 and 5, CYLTagListView (CYLTagListState with selection, folding, layout, tags API, configuration, fold control) and the image tag views (CYLImageTagView, CYLImageTagGroupView, geometry). Compile only: no emulator on this machine. Score 604 / 807 = 74.8.
+- 2026-11-16: features 6 and 7, the classify menu and multiple filter (classify/) and the tag button, tag view and cells (tagviews/). Compile only. Score 758 / 807 = 93.9.

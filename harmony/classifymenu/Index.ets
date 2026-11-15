@@ -34,3 +34,5 @@ export {
   CYLTextMeasurer
 } from './src/main/ets/components/CYLTagListState';
 export * from './src/main/ets/imagetag/ImageTagIndex';
+export * from './src/main/ets/classify/ClassifyIndex';
+export * from './src/main/ets/tagviews/TagViewsIndex';
