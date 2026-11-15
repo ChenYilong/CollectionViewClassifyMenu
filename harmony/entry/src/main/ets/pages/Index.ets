@@ -28,6 +28,7 @@ import { CYLExampleLocalizedString } from '../data/CYLExampleLocalization';
 import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
 >>>>>>> d2e3a1d (fix(harmony): 🐛 ArkTS warnings 92 → 1 (score 9.1))
 import { CYLDemoNav } from '../demos/DemoNav';
+import { CYLLaunchOptions } from '../data/CYLLaunchOptions';
 import { SHELL_ROUTES } from '../demos/shell/ShellRoutes';
 import { MENU_ROUTES } from '../demos/menu/MenuRoutes';
 import { SAMPLE_ROUTES } from '../demos/samples/SampleRoutes';
@@ -236,6 +237,10 @@ struct Index {
 
   aboutToAppear(): void {
     CYLExampleUIContext.context = this.getUIContext();
+    const screen = CYLLaunchOptions.takeScreen();
+    if (screen !== '') {
+      setTimeout(() => CYLDemoNav.push(screen, CYLLaunchOptions.screenParam ?? new Object()), 300);
+    }
   }
 
   @Builder
