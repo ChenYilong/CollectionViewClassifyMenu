@@ -5,3 +5,12 @@ export {
 } from './src/main/ets/components/CYLTagListModel';
 export { kDataSourceSectionKey, kDataSourceCellTextKey, kDataSourceCellPictureKey, CYLMenuKeys } from './src/main/ets/core/CYLMenuKeys';
 export { CYLMenuItemType, CYLMenuDataSource, CYLMenuDelegate, CYLMenuDefaults } from './src/main/ets/core/CYLMenuDataSource';
+export { CYLEdgeInsets, CYLSize, CYLOffset, CYLPoint, CYLRect, CYLFont, CYLControlState, CYLColor } from './src/main/ets/core/CYLTypes';
+export { CYLTagMetrics } from './src/main/ets/core/CYLTagMetrics';
+export { CYLTagAppearance, CYLTagCornerRadiusSquare } from './src/main/ets/core/CYLTagAppearance';
+export { CYLMenuResources, CYLMenuLocalizedString } from './src/main/ets/core/CYLMenuResources';
+export {
+  CYLMenuStyle, CYLTagImagePlacement, CYLTagContentAlignment, CYLTagRowAlignment, CYLTagDeleteIndicatorPlacement,
+  CYLTitleTextAttributes
+} from './src/main/ets/core/CYLMenuStyle';
+export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';
