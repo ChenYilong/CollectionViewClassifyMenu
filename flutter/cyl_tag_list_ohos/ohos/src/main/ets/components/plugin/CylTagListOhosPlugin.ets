@@ -7,11 +7,11 @@ import {
   MethodCallHandler,
   MethodChannel,
   MethodResult,
-  Params,
   PlatformView,
   PlatformViewFactory,
   StandardMessageCodec
 } from '@ohos/flutter_ohos';
+import { Params } from '@ohos/flutter_ohos/src/main/ets/plugin/platform/PlatformView';
 import { common } from '@kit.AbilityKit';
 import { CYLIndexPath, CYLTagListView, CYLTagTap, parseConfiguration } from '@cyl/classifymenu';
 
