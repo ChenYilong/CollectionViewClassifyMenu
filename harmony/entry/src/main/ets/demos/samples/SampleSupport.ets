@@ -1,13 +1,14 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * CYLAndroidSampleSupport.swift: what the three Android sample ports share — a toast (Android's Toast), the samples'
  * filled buttons, the text fields with a bottom line, and the pictures of the TagViewGroup sample (drawn, as on iOS).
  */
 import { image } from '@kit.ImageKit';
 
-/** `String(format:)` for the %ld / %@ placeholders of the example's strings. */
+/** `String(format:)` for the %ld / %lu / %@ placeholders of the example's strings. */
 export function cylFormat(format: string, ...args: (string | number)[]): string {
   let index = 0;
-  return format.replace(new RegExp('%(ld|@|d)', 'g'), (): string => {
+  return format.replace(new RegExp('%(lu|ld|@|d)', 'g'), (): string => {
     const value = index < args.length ? args[index] : '';
     index++;
     return `${value}`;
@@ -75,9 +76,9 @@ class CYLPicturePalette {
 }
 
 const PALETTES: CYLPicturePalette[] = [
-  new CYLPicturePalette('rgb(140,107,84)', 'rgb(217,194,168)', '👞', '鞋子图片'),
-  new CYLPicturePalette('rgb(64,89,128)', 'rgb(179,204,230)', '👜', '包图片'),
-  new CYLPicturePalette('rgb(77,115,89)', 'rgb(199,224,191)', '👕', '衣服图片'),
+  new CYLPicturePalette('rgb(140,107,84)', 'rgb(217,194,168)', '👞', CYLExampleLocalizedString('鞋子图片')),
+  new CYLPicturePalette('rgb(64,89,128)', 'rgb(179,204,230)', '👜', CYLExampleLocalizedString('包图片')),
+  new CYLPicturePalette('rgb(77,115,89)', 'rgb(199,224,191)', '👕', CYLExampleLocalizedString('衣服图片')),
 ];
 
 export class CYLSamplePicture {

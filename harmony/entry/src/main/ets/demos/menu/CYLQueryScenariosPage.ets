@@ -1,3 +1,5 @@
+import { cylFormat } from '../samples/SampleSupport';
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLQueryScenariosViewController`: the plus button's page (查询筛选), an inset grouped table of the filter demos by
@@ -31,18 +33,18 @@ interface CYLScenarioSection {
 
 const SECTIONS: CYLScenarioSection[] = [
   {
-    header: '场景：查询参数设置（多选）',
-    footer: '淘宝评价默认显示全部；条件太多时，由用户多选输入筛选条件，标签列表就是为此而做。每次选择后按全部条件（AND）刷新列表。',
+    header: CYLExampleLocalizedString('场景：查询参数设置（多选）'),
+    footer: CYLExampleLocalizedString('淘宝评价默认显示全部；条件太多时，由用户多选输入筛选条件，标签列表就是为此而做。每次选择后按全部条件（AND）刷新列表。'),
     scenarios: [CYLQueryScenario.reviewsDatabase, CYLQueryScenario.reviewsMemory, CYLQueryScenario.reviewsNetwork]
   },
   {
-    header: '场景：菜单选择（移植原 Demo）',
-    footer: '原 Demo 只实现了筛选界面，没有筛选数据；现在每次选择都会生成 SQL、查询数据库并显示结果，选择也保存在数据库中。',
+    header: CYLExampleLocalizedString('场景：菜单选择（移植原 Demo）'),
+    footer: CYLExampleLocalizedString('原 Demo 只实现了筛选界面，没有筛选数据；现在每次选择都会生成 SQL、查询数据库并显示结果，选择也保存在数据库中。'),
     scenarios: [CYLQueryScenario.menuLinkage]
   },
   {
-    header: '场景：搜索历史与发现',
-    footer: '最近搜索折叠为两行，箭头是最后一个标签；发现每行两个，超出部分显示省略号，右上角的更多按钮随机刷新。数据来自本地 JSON。',
+    header: CYLExampleLocalizedString('场景：搜索历史与发现'),
+    footer: CYLExampleLocalizedString('最近搜索折叠为两行，箭头是最后一个标签；发现每行两个，超出部分显示省略号，右上角的更多按钮随机刷新。数据来自本地 JSON。'),
     scenarios: [CYLQueryScenario.searchDiscover]
   }
 ];
@@ -52,15 +54,15 @@ const TABLES: string[] = ['reviews', 'places', 'selections'];
 export function scenarioTitle(scenario: CYLQueryScenario): string {
   switch (scenario) {
     case CYLQueryScenario.reviewsDatabase:
-      return '评价筛选 · 数据库（SQLite）';
+      return CYLExampleLocalizedString('评价筛选 · 数据库（SQLite）');
     case CYLQueryScenario.reviewsMemory:
-      return '评价筛选 · 内存';
+      return CYLExampleLocalizedString('评价筛选 · 内存');
     case CYLQueryScenario.reviewsNetwork:
-      return '评价筛选 · 网络';
+      return CYLExampleLocalizedString('评价筛选 · 网络');
     case CYLQueryScenario.menuLinkage:
-      return '分类菜单 + 多选筛选 · 数据库联动';
+      return CYLExampleLocalizedString('分类菜单 + 多选筛选 · 数据库联动');
     default:
-      return '最近搜索 + 发现';
+      return CYLExampleLocalizedString('最近搜索 + 发现');
   }
 }
 
@@ -123,7 +125,7 @@ export struct CYLQueryScenariosPage {
       const db = await CYLExampleDatabase.shared(CYLUIContext.hostContext(this.getUIContext()));
       const counts: string[] = [];
       for (const table of TABLES) {
-        counts.push(`${await db.count(table)} 行`);
+        counts.push(cylFormat(CYLExampleLocalizedString('%ld 行'), await db.count(table)));
       }
       this.counts = counts;
     } catch (e) {
@@ -160,7 +162,7 @@ export struct CYLQueryScenariosPage {
 
   build() {
     Column() {
-      CYLDemoBar({ title: '查询筛选', showsBack: this.showsBack })
+      CYLDemoBar({ title: CYLExampleLocalizedString('查询筛选'), showsBack: this.showsBack })
       Scroll() {
         Column() {
           ForEach(SECTIONS, (section: CYLScenarioSection) => {
@@ -175,7 +177,7 @@ export struct CYLQueryScenariosPage {
             .margin({ left: 16, right: 16 })
             cylSectionFooter(section.footer)
           }, (section: CYLScenarioSection) => section.header)
-          cylSectionHeader('数据库（SQLite）')
+          cylSectionHeader(CYLExampleLocalizedString('数据库（SQLite）'))
           Column() {
             ForEach([0, 1, 2], (index: number) => {
               this.tableRow(index)
@@ -184,7 +186,7 @@ export struct CYLQueryScenariosPage {
           .backgroundColor(Color.White)
           .borderRadius(10)
           .margin({ left: 16, right: 16 })
-          cylSectionFooter('每次启动时由 App 内的数据重新生成，selections 表保留各演示最后确认的条件。')
+          cylSectionFooter(CYLExampleLocalizedString('每次启动时由 App 内的数据重新生成，selections 表保留各演示最后确认的条件。'))
         }
         .padding({ bottom: 24 })
       }

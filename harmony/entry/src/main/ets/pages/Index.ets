@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../data/CYLExampleLocalization';
 import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
 import { CYLDemoNav } from '../demos/DemoNav';
 import { SHELL_ROUTES } from '../demos/shell/ShellRoutes';
@@ -74,15 +75,15 @@ struct Index {
       .width('100%')
       .height('100%')
       .id('tab-plus')
-      .accessibilityText('查询筛选')
-      .accessibilityDescription('按场景分组的筛选演示')
+      .accessibilityText(CYLExampleLocalizedString('查询筛选'))
+      .accessibilityDescription(CYLExampleLocalizedString('按场景分组的筛选演示'))
     } else {
       Column({ space: 2 }) {
         Image(this.tab === index ? TABS[index].selectedImage : TABS[index].image)
           .width(26)
           .height(26)
           .fillColor(this.tab === index ? '#007AFF' : '#8E8E93')
-        Text(TABS[index].title)
+        Text(CYLExampleLocalizedString(TABS[index].title))
           .fontSize(10)
           .maxLines(1)
           .fontColor(this.tab === index ? '#007AFF' : '#8E8E93')

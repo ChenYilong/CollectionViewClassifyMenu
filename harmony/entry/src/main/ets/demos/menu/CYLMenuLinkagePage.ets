@@ -1,3 +1,5 @@
+import { cylFormat } from '../samples/SampleSupport';
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import { CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLMenuLinkageViewController` (分类菜单 + 多选筛选 · 数据库联动): the original app's classify menu (single choice)
@@ -59,7 +61,7 @@ class CYLLinkageResults {
 
 @Builder
 function linkageHeader() {
-  Text(`  点按分类标签（单选），左上角按钮多选地区与菜品\n  每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果`)
+  Text(`  ${CYLExampleLocalizedString('点按分类标签（单选），左上角按钮多选地区与菜品')}\n  ${CYLExampleLocalizedString('每次选择 → 生成 SQL → SQLite 查询 → 刷新下方结果')}`)
     .fontSize(12)
     .maxLines(2)
     .minFontSize(9)
@@ -262,16 +264,16 @@ export struct CYLMenuLinkagePage {
       console.error(`[CYLMenuExample] ${query.sql}: ${JSON.stringify(e)}`);
     }
     this.updateFilterButton();
-    const all = '全部';
+    const all = CYLExampleLocalizedString('全部');
     const names = (values: string[]): string =>
-    values.length === 0 ? all : values.map((v: string) => CYLDemoDataSource.shortTitle(v)).join('、');
+    values.length === 0 ? all : values.map((v: string) => CYLDemoDataSource.shortTitle(v)).join(CYLExampleLocalizedString('、'));
     const tag = this.selectedTag !== undefined ? CYLDemoDataSource.shortTitle(this.selectedTag) : all;
     const status = [
-      `分类：${tag} · 地区：${names(this.selectedRegions)} · 菜品：${names(this.selectedDishes)}`,
+      cylFormat(CYLExampleLocalizedString('分类：%@ · 地区：%@ · 菜品：%@'), tag, names(this.selectedRegions), names(this.selectedDishes)),
       query.displayString(),
-      `SQLite 返回 ${results.length} 条（共 ${total} 家）`
+      cylFormat(CYLExampleLocalizedString('SQLite 返回 %lu 条（共 %ld 家）'), results.length, total)
     ].join('\n');
-    const empty: CYLLinkageRow = { title: '没有符合条件的商家', detail: '' };
+    const empty: CYLLinkageRow = { title: CYLExampleLocalizedString('没有符合条件的商家'), detail: '' };
     const rows: CYLLinkageRow[] = results.length === 0 ? [empty] :
     results.map((row: CYLPlaceRow): CYLLinkageRow => ({
       title: row.name,
@@ -286,18 +288,18 @@ export struct CYLMenuLinkagePage {
       Column() {
         // The navigation bar: the filter button replaces the back button (leftBarButtonItem), 重置 on the right.
         Stack() {
-          Text('菜单选择 · 数据库联动').fontSize(17).fontWeight(FontWeight.Medium).maxLines(1)
+          Text(CYLExampleLocalizedString('菜单选择 · 数据库联动')).fontSize(17).fontWeight(FontWeight.Medium).maxLines(1)
             .padding({ left: 64, right: 64 }).textOverflow({ overflow: TextOverflow.Ellipsis })
           Image(CYLMenuResources.image(this.filterModified ? 'cyl_filter_modified' : 'cyl_filter_normal'))
             .width(22)
             .height(22)
             .objectFit(ImageFit.Contain)
             .position({ x: 14, y: (CYL_DEMO_BAR_HEIGHT - 22) / 2 })
-            .accessibilityText('多选筛选')
-            .accessibilityDescription(this.filterModified ? '已修改' : '')
+            .accessibilityText(CYLExampleLocalizedString('多选筛选'))
+            .accessibilityDescription(this.filterModified ? CYLExampleLocalizedString('已修改') : '')
             .id('menuLinkageFilter')
             .onClick(() => this.showFilter())
-          Text('重置')
+          Text(CYLExampleLocalizedString('重置'))
             .fontSize(17)
             .fontColor(CYLSystemColor.blue)
             .height(CYL_DEMO_BAR_HEIGHT)

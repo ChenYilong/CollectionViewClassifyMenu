@@ -2,15 +2,15 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "CYLClassifyMenu example"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "CYLClassifyMenu example"
     },
     {
       "name": "EntryAbility_label",
-      "value": "label"
+      "value": "CYLMenuExample"
     },
     {
       "name": "speed",

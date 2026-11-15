@@ -1,3 +1,4 @@
+import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 /**
  * Mock reviews and the filters shown above them (场景一：淘宝评价筛选), as iOS CYLReviewStore.swift, and the three ways
@@ -107,14 +108,14 @@ export class CYLReviewStore {
   static makeFilters(): CYLReviewFilter[] {
     const orange = '#FF731A';
     const filters: CYLReviewFilter[] = [
-      makeFilter('全部', undefined, orange, false, () => true),
-      makeFilter('好评', $r('app.media.a_thumbsup'), orange, false, (r: CYLReview) => r.rating === CYLReviewRating.good),
-      makeFilter('中评', $r('app.media.a_hand_raised'), orange, false,
+      makeFilter(CYLExampleLocalizedString('全部'), undefined, orange, false, () => true),
+      makeFilter(CYLExampleLocalizedString('好评'), $r('app.media.a_thumbsup'), orange, false, (r: CYLReview) => r.rating === CYLReviewRating.good),
+      makeFilter(CYLExampleLocalizedString('中评'), $r('app.media.a_hand_raised'), orange, false,
         (r: CYLReview) => r.rating === CYLReviewRating.neutral),
-      makeFilter('差评', $r('app.media.a_thumbsdown'), '#8E8E93', false,
+      makeFilter(CYLExampleLocalizedString('差评'), $r('app.media.a_thumbsdown'), '#8E8E93', false,
         (r: CYLReview) => r.rating === CYLReviewRating.bad),
-      makeFilter('有图', undefined, orange, false, (r: CYLReview) => r.hasPhoto),
-      makeFilter('追加', undefined, orange, false, (r: CYLReview) => r.hasFollowUp)
+      makeFilter(CYLExampleLocalizedString('有图'), undefined, orange, false, (r: CYLReview) => r.hasPhoto),
+      makeFilter(CYLExampleLocalizedString('追加'), undefined, orange, false, (r: CYLReview) => r.hasFollowUp)
     ];
     ['手机套不错', '质量不错', '态度不错', '划算', '颜色不错', '背面细节一般'].forEach((keyword: string) => {
       filters.push(makeFilter(keyword, undefined, orange, true, (r: CYLReview) => r.keywords.includes(keyword)));
