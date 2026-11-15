@@ -16,7 +16,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 | `cross-platform.md`, Flutter limit (4): Swift Package Manager is not supported (the plugin needs the pod) | DONE (2026-11-16): root `Package.swift` (the core; `CYLMenuResources.bundle` returns `Bundle.module` under SwiftPM) and `flutter/cyl_tag_list/ios/cyl_tag_list/Package.swift`; with `enable-swift-package-manager` and the core pod removed from the Podfile, the example builds (the app holds `CollectionViewClassifyMenu_CollectionViewClassifyMenu.bundle`) and `flutter test integration_test` passes on the iPhone 17 Pro simulator: `All tests passed!` (2 tests). The example stays on CocoaPods by default; `CYLTagView` (TagCollectionView) is CocoaPods only |
 | `cross-platform.md`, tag cells: React Native and Flutter look the same as iOS ("no example here yet") | DONE: both host the native list (Swift / Kotlin), so their cells are the native cells; screenshots in the sections below |
 | `cross-platform.md`, React Native "Still TODO" notes (Android view, Classify page, tests) | DONE (stale notes): steps 3, 4 and 5 are DONE further down in the same section |
-| `android.md`, HarmonyOS step 2: Flutter on HarmonyOS NEXT | TODO: runs (2026-11-16, below); left: blurry, squashed tag text and no Lottie icons |
+| `android.md`, HarmonyOS step 2: Flutter on HarmonyOS NEXT | DONE (2026-11-16, below): both integration tests pass on the HarmonyOS emulator (`All tests passed!`), sharp text, Lottie icons, Play all / speed / Loop reach the ArkTS list, Classify on the shared database (83 places) |
 | `android.md`, HarmonyOS step 3: React Native on HarmonyOS NEXT (after Flutter) | TODO |
 | `example-demo-rules.md`, playback controls in the Mini Program example | DONE (another session, 2026-11-15): `CrossPlatform/wechat-miniprogram`, pages/animations, Play all, speed slider, Loop switch |
 
@@ -34,14 +34,32 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   `EmbeddingNodeController.ets` and `FlutterManager.ets` (`(0 as ESObject)`, `(mainWindow as ESObject)`). The
   generated `example/ohos` project (not in the repository) lists `harmony/classifymenu` as a module and a dependency.
   Fixed in the plugin: `Params` is imported from `@ohos/flutter_ohos/src/main/ets/plugin/platform/PlatformView`.
-  Left: the tag text is squashed and blurry (the platform view texture's scale), and the `asset:` Lottie icons are
-  missing (Flutter assets are not rawfiles).
+  Fixed after the first run (same day):
+  1. **Squashed, blurry text:** the plugin's ArkTS root was only as tall as its content, and the platform view
+     draws the root's surface into its whole Flutter rectangle; the root now fills the view (`Scroll`, content
+     height still reported).
+  2. **No Lottie icons:** Flutter assets are rawfiles under `flutter_assets/`; the Dart plugin maps
+     `asset:<key>` to `asset:flutter_assets/<key>`, and the core reads an `asset:` value as a full rawfile path first
+     (then by its last component, as before).
+  3. **Playback controls:** `playAll`, `setSpeed`, `setLoops` and `state` now drive the core's
+     `CYLTagListController`, `animationSpeed` and `animationLoops` (they were no-ops).
+  4. **Shared database:** the OpenHarmony sqflite port stores the file where `relationalStore` puts it, so the
+     copied `cyl_places.sqlite` was not the file it opened (`no such table: places`); the example copies the bundled
+     database to the file SQLite reports (`PRAGMA database_list`) when `places` is missing.
+  5. **Speed type:** ArkTS has one number type, so `state()` returned `4` for `4.0`; the Dart controller returns a
+     double on every platform.
+  Tests: `flutter test integration_test -d 127.0.0.1:5557` (the mirror's Flutter tool accepts unsigned HAPs when
+  `CYL_ALLOW_UNSIGNED=1`, a two-line mirror-only patch of `hvigor.dart` and `project.dart`):
+  `classify_menu_test.dart` and `tag_list_test.dart`, `All tests passed!`. Screenshots (12:05 and 12:14 emulator
+  time):
+
+  <img src="assets/flutter-harmonyos-classify-menu.jpeg" width="360" alt="Flutter on HarmonyOS: Classify menu, 83 places">
 - **Prompt (verbatim, 2026-11-16):** "找到跨端，相关文档，找到以下android端 rn端 flutter端，的TODO事项，汇总成表格第一列为找到的内容，第二列默认TODO，每每完成一项就删除一个TODO 没有TODO视为满分一直完成到满分。"
 - **English:** find the cross-platform documents and the Android, React Native and Flutter TODOs in them; summarize them
   in a table, column 1 the item found, column 2 `TODO` by default; remove one `TODO` for each item done; no `TODO`
   left is full marks; keep going until full marks.
-- **Score:** 6 / 8 = 75 (2026-11-16: five rows were done already, their notes stale; SwiftPM added). Left: the two
-  HarmonyOS rows, blocked until a HarmonyOS SDK of API 22 or later is installed in DevEco Studio.
+- **Score:** 7 / 8 = 87 (2026-11-16: five rows were done already, their notes stale; SwiftPM added; Flutter on
+  HarmonyOS). Left: React Native on HarmonyOS.
 
 ## DONE (2026-11-15): one shared local database for every platform
 
