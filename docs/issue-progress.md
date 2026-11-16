@@ -35,6 +35,15 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-16): more HarmonyOS pushed-page screenshots
+
+- **Context:** `screenshots.md` has six pushed pages; more screens open further pages (query scenarios, review
+  filters, tag clouds, image tags). The owner's next fix (`c6a8a5c`: plus and filter buttons, Rive pooling) is not
+  pushed yet, so this run uses `7c4c294`.
+- **Requirements:** run the HarmonyOS example on the emulator, open the next (pushed) pages, add their screenshots to
+  the docs.
+- **Prompt (verbatim):** "run our HarmonyOS version code on an emulator and push next page update more screenshot in docs"
+
 ### DONE (2026-11-16): emulator pushed pages, script rule, SVGA alignment, PR sync
 
 - **Context:** the HarmonyOS screenshots so far show each demo's first page only; zsh word splitting broke inline
