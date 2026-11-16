@@ -59,6 +59,7 @@ dependencies {
     if (cylTabBarLibs != null) {
         implementation(fileTree(cylTabBarLibs) { include("*.aar", "*.jar") })
         implementation("com.airbnb.android:lottie:6.6.2")
+        implementation("app.rive:rive-android:10.3.0")
         implementation("androidx.fragment:fragment-ktx:1.8.5")
     }
 }

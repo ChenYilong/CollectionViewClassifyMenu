@@ -10,6 +10,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		28A87DC6CA5C60B8F141C0BE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		4DE3191221D1CC1EC2C571FB /* tab_home_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 71C51F8F957659CE08E6ECAD /* tab_home_animate.json */; };
+		BC947EC7D21414CA9DBBDF94 /* menu_button.riv in Resources */ = {isa = PBXBuildFile; fileRef = 2F28B4115E8A13CE3B2C2022 /* menu_button.riv */; };
+		114698A19C15008159BFAFFB /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = E4D6331C72359F338C3D808C /* check.riv */; };
+		3A4136A1EC97867766CEFF11 /* house.riv in Resources */ = {isa = PBXBuildFile; fileRef = 96A27AEBDAC061142652C293 /* house.riv */; };
 		6448B7D26CF37DFC8499C74C /* tab_search_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 65B508A24967FE77682B0D5D /* tab_search_animate.json */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
@@ -45,6 +48,9 @@
 		65B508A24967FE77682B0D5D /* tab_search_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_search_animate.json; path = CylTagListExample/Animations/tab_search_animate.json; sourceTree = "<group>"; };
 		668801FCC462A35FF381D23D /* tab_message_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_message_animate.json; path = CylTagListExample/Animations/tab_message_animate.json; sourceTree = "<group>"; };
 		69D38A7EFE322AE5A79689A9 /* CylTagListExampleUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CylTagListExampleUITests.swift; sourceTree = "<group>"; };
+		96A27AEBDAC061142652C293 /* house.riv */ = {isa = PBXFileReference; includeInIndex = 1; name = house.riv; path = CylTagListExample/Animations/house.riv; sourceTree = "<group>"; };
+		E4D6331C72359F338C3D808C /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; name = check.riv; path = CylTagListExample/Animations/check.riv; sourceTree = "<group>"; };
+		2F28B4115E8A13CE3B2C2022 /* menu_button.riv */ = {isa = PBXFileReference; includeInIndex = 1; name = menu_button.riv; path = CylTagListExample/Animations/menu_button.riv; sourceTree = "<group>"; };
 		71C51F8F957659CE08E6ECAD /* tab_home_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_home_animate.json; path = CylTagListExample/Animations/tab_home_animate.json; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CylTagListExample/AppDelegate.swift; sourceTree = "<group>"; };
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = CylTagListExample/SceneDelegate.swift; sourceTree = "<group>"; };
@@ -84,6 +90,9 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				71C51F8F957659CE08E6ECAD /* tab_home_animate.json */,
+				2F28B4115E8A13CE3B2C2022 /* menu_button.riv */,
+				E4D6331C72359F338C3D808C /* check.riv */,
+				96A27AEBDAC061142652C293 /* house.riv */,
 				FC60366E534EBA18D17887B8 /* tab_me_animate.json */,
 				668801FCC462A35FF381D23D /* tab_message_animate.json */,
 				65B508A24967FE77682B0D5D /* tab_search_animate.json */,
@@ -241,6 +250,9 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				4DE3191221D1CC1EC2C571FB /* tab_home_animate.json in Resources */,
+				BC947EC7D21414CA9DBBDF94 /* menu_button.riv in Resources */,
+				114698A19C15008159BFAFFB /* check.riv in Resources */,
+				3A4136A1EC97867766CEFF11 /* house.riv in Resources */,
 				F461572AD868AF140C59FCD4 /* tab_me_animate.json in Resources */,
 				EBC76EA92FF7B201E7BC7F92 /* tab_message_animate.json in Resources */,
 				6448B7D26CF37DFC8499C74C /* tab_search_animate.json in Resources */,

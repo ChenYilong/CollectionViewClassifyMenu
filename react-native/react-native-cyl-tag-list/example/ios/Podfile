@@ -23,6 +23,7 @@ target 'CylTagListExample' do
                   :commit => '117be52cfc28109465d52544820f10cc3f00ba89' }
   pod 'CYLTabBarController', cyl_tab_bar
   pod 'CYLTabBarController/Lottie', cyl_tab_bar
+  pod 'CYLTabBarController/Rive', cyl_tab_bar
 
   use_react_native!(
     :path => config[:reactNativePath],

@@ -113,6 +113,7 @@ dependencies {
     // The animation library of CYLTabBarController's engine (react-native-cyltabbar compiles the engine): the tag list's
     // Lottie row plays through it.
     implementation("com.airbnb.android:lottie:6.6.2")
+    implementation("app.rive:rive-android:10.3.0")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
