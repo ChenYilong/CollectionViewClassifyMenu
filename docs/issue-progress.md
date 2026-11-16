@@ -455,3 +455,12 @@ tags: [issues, ui, cocoapods, progress]
 - TODO Y3 (fail): the menu linkage filter icon measures 2.45:1 against the bar (darkest pixel rgb 140,140,142); WCAG non-text minimum is 3:1 (`assets/harmonyos-menu-linkage.jpeg`).
 - Rive icons on `3417e7e` (12:13, `assets/harmonyos-animation-3417e7e-rive-section.jpeg`): all 11 Rive tags draw their icon (首页, 完成, 菜单, 形状, 卡车, 聊天, 搜索, 计时, 提醒, 我的); 按钮 shows only a small arc, its resting first frame. The empty icon areas were only in `3e02c5f`, where Rive was switched off.
 - TODO: PAG 健康 shows only a faint ring at rest; check that its first frame is meant to be that light.
+
+### DONE (2026-11-16): retest `32cbe81` (Y2, Y3, Z2, Z3)
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `32cbe81`, 12:19–12:22.
+- Y2 pass: the selected 好评 chip shows a white thumbs-up (`assets/harmonyos-32cbe81-retest.jpeg`, y2).
+- Y3 pass: the filter icon measures 3.68:1 on the screenshot (darkest pixel rgb 109,109,111), above the 3:1 minimum.
+- Z2 pass: scrolled tags are clipped below the controls in light and dark.
+- Z3 pass: the tag list area is dark in dark mode (`assets/harmonyos-32cbe81-animation-dark.jpeg`).
+- TODO: in dark mode the navigation bar ("动效图标") stays light.
+- TODO (seen once, not reproduced in three more runs): on the first dark launch right after installing, the tags drew as blank rectangles and the app froze (`appfreeze` THREAD_BLOCK_6S, main thread in `PipelineContext::AddWindowStateChangedCallback` ← `FrameNode::InitializePatternAndContext`).
