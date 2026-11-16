@@ -204,7 +204,9 @@ was not run here.
 | E1 | `screenshots.sh animations` / `en-animations` / `dark-animations` open the first tab (宝贝详情), not the animations tab; the shot is taken before the tab icons and review tags load (`assets/harmonyos-verify-sheet-8.jpeg`, `-24`) | TODO need 模拟器截图验证: fixed: a launch route that is a root tab (动效, 样式, the two scenarios) selects that tab instead of pushing it (`pages/Index.ets` `open`; a relaunch goes through AppStorage `cylLaunchScreen`) |
 | E2 | `dark-root`: launched with `cylColorMode dark`, the product page and tab bar stay light; only the status bar is dark (`assets/harmonyos-verify-sheet-24.jpeg`) | TODO: open, not fixed: the example's screens use fixed light colors in every color mode (S2); only the animation page follows dark mode (Z3, Z4, Z6). Dark mode for the root, product page and tab bar is a separate task |
 | E3 | `screenshots.sh root`: the first shot after install shows the launcher, the app had not appeared yet (`assets/harmonyos-verify-sheet-0.jpeg`) | TODO need 模拟器截图验证: fixed: `screenshots.sh` waits, up to 10 s more, until the app's window is listed by WindowManagerService before each shot |
-| E4 | English animation screen: the section titles "Lottie（带图片资源与占位图）", "Lottie（绿色主题）" stay Chinese (`assets/harmonyos-verify-a2f8561.jpeg`, en-animations) | TODO need 模拟器截图验证: fixed: the screen's section titles also go through the example's strings, where both have English and zh-Hant |
+| E4 | English animation screen: the section titles "Lottie（带图片资源与占位图）", "Lottie（绿色主题）" stay Chinese (`assets/harmonyos-verify-a2f8561.jpeg`, en-animations) | DONE (emulator, `2baf415`, `assets/harmonyos-verify-e4.jpeg`) |
+| E5 | English animation screen: the tag titles stay Chinese (首页, 消息, 我的, 资讯, 发现, 健康, 动态), `assets/harmonyos-verify-e4.jpeg` | TODO |
+| E6 | `screenshots.sh` `WAIT=8` is too short for the animation screen: at 8 s the tags are empty boxes with no titles; at 20 s they are drawn (`assets/harmonyos-en-animations.jpeg` vs `assets/harmonyos-verify-e4.jpeg`) | TODO |
 
 Not checked in this run (other apps): R1–R3 (React Native), F1–F3 (Flutter), T1–T12, D1–D4, N1–N4, X2 (CYLTabBarController's HarmonyOS example).
 
