@@ -464,3 +464,9 @@ tags: [issues, ui, cocoapods, progress]
 - Z3 pass: the tag list area is dark in dark mode (`assets/harmonyos-32cbe81-animation-dark.jpeg`).
 - TODO: in dark mode the navigation bar ("动效图标") stays light.
 - TODO (seen once, not reproduced in three more runs): on the first dark launch right after installing, the tags drew as blank rectangles and the app froze (`appfreeze` THREAD_BLOCK_6S, main thread in `PipelineContext::AddWindowStateChangedCallback` ← `FrameNode::InitializePatternAndContext`).
+
+### DONE (2026-11-16): retest Z4 on `9c8048a`
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), 12:25, `assets/harmonyos-9c8048a-animation-dark-light.jpeg` (left dark, right light).
+- Z4 pass: the navigation bar is dark with a white title in dark mode, light with a black title in light mode.
+- Z5: the first dark launch right after installing ran without a freeze or fault log this time.
+- TODO: in dark mode the caption "动效引擎：CYLTabBarItemAnimationFactory 已链接" is very dim gray on black.
