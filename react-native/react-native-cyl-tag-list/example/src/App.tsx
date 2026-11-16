@@ -27,7 +27,8 @@ const PLUS_BUTTON: CYLTabBarPlusButton = {
   title: t('Post'),
   image: require('./assets/post_normal.png'),
   selectedImage: require('./assets/post_highlight.png'),
-  titleFont: 9.5,
+  // The tab titles' size, so the plus button's title sits on their baseline.
+  titleFont: 10,
   index: 1,
   size: [55, 80],
   imageSize: [55, 55],
@@ -42,7 +43,14 @@ export default function App() {
   const [plusSelected, setPlusSelected] = useState(false);
   let page;
   if (plusSelected) {
-    page = <Placeholder testID="plusPage" text={t('The plus button page')} />;
+    page = (
+      <Placeholder
+        testID="plusPage"
+        title={t('Post')}
+        text={t('The plus button page')}
+        detail={t('The raised plus button has a page of its own (pageIdentifier: plus); tap a tab to go back')}
+      />
+    );
   } else if (selectedIndex === 1) {
     page = <ClassifyPage />;
   } else {
@@ -65,10 +73,14 @@ export default function App() {
   );
 }
 
-function Placeholder({ text, testID }: { text: string; testID: string }) {
+function Placeholder({ title, text, detail, testID }: { title: string; text: string; detail: string; testID: string }) {
   return (
     <View testID={testID} style={styles.placeholder}>
-      <Text>{text}</Text>
+      <Text accessibilityRole="header" style={styles.placeholderTitle}>
+        {title}
+      </Text>
+      <Text style={styles.placeholderText}>{text}</Text>
+      <Text style={styles.placeholderDetail}>{detail}</Text>
     </View>
   );
 }
@@ -77,5 +89,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   page: { flex: 1, paddingTop: 60 },
   tabBar: { position: 'absolute', left: 0, right: 0, bottom: 0 },
-  placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
+  placeholderTitle: { fontSize: 22, fontWeight: '600', marginBottom: 12 },
+  placeholderText: { fontSize: 16, marginBottom: 8 },
+  placeholderDetail: { fontSize: 14, color: '#6B6B70', textAlign: 'center' },
 });
