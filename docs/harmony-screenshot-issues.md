@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 72 / 73 = 99 / 100** (open: E2).
+**Score: 73 / 73 = 100 / 100** (no plain `TODO` left).
 
 ## Task log
 
@@ -202,7 +202,7 @@ was not run here.
 | # | Issue | Status |
 |---|---|---|
 | E1 | `screenshots.sh animations` / `en-animations` / `dark-animations` open the first tab (宝贝详情), not the animations tab; the shot is taken before the tab icons and review tags load (`assets/harmonyos-verify-sheet-8.jpeg`, `-24`) | TODO need 模拟器截图验证: fixed: a launch route that is a root tab (动效, 样式, the two scenarios) selects that tab instead of pushing it (`pages/Index.ets` `open`; a relaunch goes through AppStorage `cylLaunchScreen`) |
-| E2 | `dark-root`: launched with `cylColorMode dark`, the product page and tab bar stay light; only the status bar is dark (`assets/harmonyos-verify-sheet-24.jpeg`) | TODO: open, not fixed: the example's screens use fixed light colors in every color mode (S2); only the animation page follows dark mode (Z3, Z4, Z6). Dark mode for the root, product page and tab bar is a separate task |
+| E2 | `dark-root`: launched with `cylColorMode dark`, the product page and tab bar stay light; only the status bar is dark (`assets/harmonyos-verify-sheet-24.jpeg`) | TODO need 模拟器截图验证: fixed: the root product page (bar, background, cells, texts, review preview) and the tab bar use color resources with dark variants (`cyl_grouped_background`, `cyl_cell_background`, `cyl_secondary_text`, `cyl_bar_background`). The other pushed example screens keep their fixed light colors |
 | E3 | `screenshots.sh root`: the first shot after install shows the launcher, the app had not appeared yet (`assets/harmonyos-verify-sheet-0.jpeg`) | TODO need 模拟器截图验证: fixed: `screenshots.sh` waits, up to 10 s more, until the app's window is listed by WindowManagerService before each shot |
 | E4 | English animation screen: the section titles "Lottie（带图片资源与占位图）", "Lottie（绿色主题）" stay Chinese (`assets/harmonyos-verify-a2f8561.jpeg`, en-animations) | DONE (emulator, `2baf415`, `assets/harmonyos-verify-e4.jpeg`) |
 | E5 | English animation screen: the tag titles stay Chinese (首页, 消息, 我的, 资讯, 发现, 健康, 动态), `assets/harmonyos-verify-e4.jpeg` | DONE (emulator, `a065745`, `assets/harmonyos-en-animations.jpeg`) |

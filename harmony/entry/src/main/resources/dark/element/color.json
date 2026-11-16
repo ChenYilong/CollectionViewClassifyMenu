@@ -19,6 +19,18 @@
     {
       "name": "cyl_animation_secondary_label",
       "value": "#AEAEB2"
+    },
+    {
+      "name": "cyl_grouped_background",
+      "value": "#000000"
+    },
+    {
+      "name": "cyl_cell_background",
+      "value": "#1C1C1E"
+    },
+    {
+      "name": "cyl_secondary_text",
+      "value": "#99EBEBF5"
     }
   ]
 }
