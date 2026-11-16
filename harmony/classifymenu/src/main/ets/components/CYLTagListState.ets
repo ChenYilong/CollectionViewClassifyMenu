@@ -1890,7 +1890,11 @@ export class CYLTagListState {
     this.rows = this.rowsFor(this.itemWidths, available);
   }
 
-  private invalidateMeasurements(): void {
+  /**
+   * Drops the cached item sizes, so the next layout measures again (the view calls it once it has a UI context,
+   * replacing sizes estimated before).
+   */
+  invalidateMeasurements(): void {
     this.measuredWidth = -1;
     this.reloadLayout();
   }

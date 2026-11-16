@@ -23,6 +23,13 @@ export class CYLUIContext {
   }
 
   /**
+   * Whether a UI context has been remembered (measurements before it use the canvas fallback).
+   */
+  static get hasContext(): boolean {
+    return CYLUIContext.context !== undefined;
+  }
+
+  /**
    * The context of the ability that shows `ui` (or the remembered UI context): `getHostContext()` from API 18, the
    * global `getContext()` on API 12 to 17, where the replacement does not exist yet.
    */
@@ -75,7 +82,10 @@ export class CYLUIContext {
    */
   static measureTextWidth(options: MeasureOptions, fontSize: number, fontWeight: number | FontWeight | string = 400): number {
     if (CYLUIContext.context !== undefined) {
-      return CYLUIContext.context.px2vp(Number(CYLUIContext.context.getMeasureUtils().measureText(options)));
+      const width = CYLUIContext.context.px2vp(Number(CYLUIContext.context.getMeasureUtils().measureText(options)));
+      if (Number.isFinite(width) && width > 0) {
+        return width;
+      }
     }
     return CYLUIContext.canvasSize(String(options.textContent), fontSize, fontWeight, 0).width;
   }
@@ -95,22 +105,33 @@ export class CYLUIContext {
     return CYLUIContext.canvasSize(String(options.textContent), fontSize, fontWeight, constraintWidth);
   }
 
+  /**
+   * The size of `text` on an offscreen canvas, in vp: the font in physical pixels (a canvas font does not take `vp`),
+   * divided back by the density. Never 0 or NaN for a non-empty text: an estimate of 0.6 em per character instead, so
+   * a tag measured before any UI context exists is never laid out with no width.
+   */
   private static canvasSize(text: string, fontSize: number, fontWeight: number | FontWeight | string,
     constraintWidth: number): Size {
     const lineHeight = fontSize * 1.2;
+    const estimate = Array.from(text).length * fontSize * 0.6;
+    let width = estimate;
     try {
+      const density = CYLUIContext.density();
       const canvas = new OffscreenCanvas(1, 1);
       const context = canvas.getContext('2d');
       const weight = typeof fontWeight === 'number' ? `${fontWeight}` : 'normal';
-      context.font = `${weight} ${fontSize}vp sans-serif`;
-      const width = context.measureText(text).width;
-      if (constraintWidth > 0 && width > constraintWidth) {
-        return { width: constraintWidth, height: Math.ceil(width / constraintWidth) * lineHeight };
+      context.font = `${weight} ${Math.round(fontSize * density)}px sans-serif`;
+      const measured = context.measureText(text).width / density;
+      if (Number.isFinite(measured) && (measured > 0 || text.length === 0)) {
+        width = measured;
       }
-      return { width: width, height: lineHeight };
     } catch (error) {
-      const width = Array.from(text).length * fontSize * 0.5;
-      return { width: width, height: lineHeight };
+      width = estimate;
     }
+    if (constraintWidth > 0 && width > constraintWidth) {
+      return { width: constraintWidth, height: Math.ceil(width / constraintWidth) * lineHeight };
+    }
+    return { width: width, height: lineHeight };
   }
+
 }

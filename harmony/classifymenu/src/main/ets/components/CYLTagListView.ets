@@ -193,9 +193,14 @@ export struct CYLTagListView {
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    const hadContext = CYLUIContext.hasContext;
     CYLUIContext.remember(this.getUIContext());
     if (this.tagList !== undefined) {
       this.model = this.tagList;
+    }
+    if (!hadContext) {
+      // A state built before any view appeared (a page's field) was measured without a UI context: measure again.
+      this.model.invalidateMeasurements();
     }
     this.model.attach(() => this.refresh(), (offset: number, animated: boolean) => {
       this.scroller.scrollTo({ xOffset: 0, yOffset: offset, animation: animated });
