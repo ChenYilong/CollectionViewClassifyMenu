@@ -82,3 +82,19 @@ Every time a branch is created, open its pull request automatically; never ask f
    (`gh pr list --head <new-branch> --state all`), reuse it instead of opening another one.
 
 Opening is automatic; merging follows the repository's rules and the user's approval.
+
+### Pull request before every commit
+
+- **A branch with commits always has an open pull request.** Never create a branch and keep committing to it
+  without a pull request: the commits of a branch without one are ignored (nobody reviews or merges them).
+- **Before every commit, check the branch's pull request** (`bash scripts/check-branch-pr.sh`). If the branch has no
+  open pull request (none yet, or the previous one was closed or merged), open a new one before committing.
+- **Target (base) of a new pull request:** the branch of the pull request that was active (open) before the new branch
+  was created, preferred; only when there is none, `master` (or `main`).
+- **More than two open pull requests: stop and ask the user** whether to create a new branch and pull request or to keep
+  committing on the current branch. More than two open branches make merging hard and leave no sensible target branch
+  for each.
+
+```sh
+bash scripts/check-branch-pr.sh   # 0: commit; 1: open a PR first; 2: more than two open PRs, ask the user
+```

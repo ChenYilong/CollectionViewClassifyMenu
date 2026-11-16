@@ -448,6 +448,15 @@ AGENTS.md, newest commit) and adapted to this project:
 - Target (base) branch: the branch the new one was created from (its source branch), preferred; otherwise `main` or
   `master`.
 - Opening is automatic; merging still follows the rules of the repository and the user's approval.
+- **A branch with commits always has an open pull request.** Never create a branch and keep committing to it
+  without a pull request: the commits of a branch without one are ignored (nobody reviews or merges them).
+- **Before every commit, check the branch's pull request** (`bash scripts/check-branch-pr.sh`). If the branch has no
+  open pull request (none yet, or the previous one was closed or merged), open a new one before committing.
+- **Target (base) of a new pull request:** the branch of the pull request that was active (open) before the new branch
+  was created, preferred; only when there is none, `master` (or `main`).
+- **More than two open pull requests: stop and ask the user** whether to create a new branch and pull request or to keep
+  committing on the current branch. More than two open branches make merging hard and leave no sensible target branch
+  for each.
 - Details: `.agents/skills/cyl-commit/`. The same rule is in the vault's root `instructions.md` (section 15).
 
 ## Upstream projects (translations and ports)

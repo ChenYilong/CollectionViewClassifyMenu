@@ -9,3 +9,5 @@
   only"; `scripts/check-commit-message.sh`).
 - Run scripts with bash (`bash harmony/scripts/<name>.sh`), never by pasting their commands into zsh; keep `hdc -t
   <target>` in a wrapper script or a bash array (AGENTS.md "Running scripts").
+- Before every commit: `bash scripts/check-branch-pr.sh` (an open pull request for the branch; ask the user when more
+  than two are open; AGENTS.md "Branches and pull requests").
