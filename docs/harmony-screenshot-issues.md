@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 66 / 66 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 67 / 67 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -184,6 +184,7 @@ was not run here.
 | Z3 | Animation screen: launched with `cylColorMode dark`, the page stays light (only the status bar is dark) | TODO need 模拟器截图验证: fixed: the page background and its labels use color resources with dark variants (`cyl_animation_background` / `cyl_animation_label`) instead of fixed white / black Retest: the list area stayed white; the list background is now clear. |
 | Z4 | Animation screen in dark mode: the nav bar ("动效图标") stays light | TODO need 模拟器截图验证: fixed: `CYLDemoBar(followsColorMode: true)` uses color resources with dark variants on this page |
 | Z5 | Once, first dark launch after install: blank tags and an app freeze (THREAD_BLOCK_6S in PipelineContext::AddWindowStateChangedCallback); not reproduced in three runs | TODO need 模拟器截图验证: recorded; the stack is inside ArkUI node creation, with no frame from the port, so no code change; to watch in the next runs |
+| Z6 | Animation screen in dark mode: the caption "动效引擎：… 已链接" is dim gray on black | TODO need 模拟器截图验证: fixed: a color resource, #6E6E73 light / #AEAEB2 dark |
 
 ## Score history
 

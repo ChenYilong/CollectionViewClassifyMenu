@@ -147,7 +147,8 @@ export struct CYLTagAnimationPage {
         .zIndex(1)
       Text(this.status)
         .fontSize(13)
-        .fontColor(CYLSystemColor.secondaryLabel)
+        // Gray in light mode, light gray in dark mode: the fixed secondary label was dim on black.
+        .fontColor($r('app.color.cyl_animation_secondary_label'))
         .width('100%')
         .padding({ left: 16, right: 16, top: 8 })
         .backgroundColor($r('app.color.cyl_animation_background'))
