@@ -82,7 +82,7 @@ import UIKit
 @objc(CYLMenuStyle)
 open class CYLMenuStyle: NSObject, NSCopying {
 
-    private static let appTintColor = UIColor(red: 42 / 255, green: 185 / 255, blue: 160 / 255, alpha: 1)
+    private static let appTintColor = UIColor.cylAppTint
     private static let defaultDeleteIndicatorTitle = "\u{00D7}"
 
     // MARK: Tag box and text, per state (CYLBadgeAppearance)
@@ -662,4 +662,13 @@ extension CYLMenuStyle {
         }
         return copy
     }
+}
+
+public extension UIColor {
+
+    /**
+     * The library's tint color (42, 185, 160): selected tags and the classify menu's titles (Android `CYLColor.APP_TINT`).
+     */
+    @objc(cyl_appTintColor)
+    static let cylAppTint = UIColor(red: 42 / 255, green: 185 / 255, blue: 160 / 255, alpha: 1)
 }

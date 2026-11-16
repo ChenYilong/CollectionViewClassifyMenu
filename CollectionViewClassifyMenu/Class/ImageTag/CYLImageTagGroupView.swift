@@ -298,6 +298,13 @@ open class CYLImageTagRippleView: UIView, CYLImageTagItem {
     open func stopAnimating() {
         circleLayer.removeAnimation(forKey: "ripple")
     }
+
+    /**
+     * Whether the ripple is pulsing (Android `isAnimating`).
+     */
+    open var isAnimating: Bool {
+        circleLayer.animation(forKey: "ripple") != nil
+    }
 }
 
 // MARK: - Data source and delegate

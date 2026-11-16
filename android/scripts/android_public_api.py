@@ -79,6 +79,22 @@ def ios_names():
                 continue
             for m in re.finditer(r"\b(?:class|struct|enum|protocol|func|var|let|case)\s+`?(\w+)", path.read_text(encoding="utf-8")):
                 names.add(m.group(1))
+        # The Objective-C headers (most of the iOS core): classes, protocols, properties, enum cases, constants and the
+        # first part of each method selector (`-setSectionExpanded:animated:` -> setSectionExpanded).
+        for path in d.rglob("*.h"):
+            if path.name.startswith("._"):
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for m in re.finditer(r"@(?:interface|protocol)\s+(\w+)", text):
+                names.add(m.group(1))
+            for m in re.finditer(r"@property\s*(?:\([^)]*\))?[^;]*?\b(\w+)\s*(?:(?:NS|API|UI)_\w+(?:\([^)]*\))?\s*)*;", text):
+                names.add(m.group(1))
+            for m in re.finditer(r"^\s*[-+]\s*\([^)]*\)\s*(\w+)", text, re.M):
+                names.add(m.group(1))
+            for m in re.finditer(r"\b(?:extern|FOUNDATION_EXPORT|UIKIT_EXTERN)\b[^;]*?\b(\w+)\s*;", text):
+                names.add(m.group(1))
+            for m in re.finditer(r"^\s*((?:CYL|k)\w+)\s*(?:=|,|NS_SWIFT|$)", text, re.M):
+                names.add(m.group(1))
     return names
 
 

@@ -11,7 +11,7 @@ Every public symbol of the Android core (`android/merged/library`, Kotlin) and i
 from the Kotlin sources, `android/merged/api-map.json` (the reverse table, [android-api.md](android-api.md)) and
 `android/merged/ios-map.json` (hand-made entries); do not edit the table by hand. A row without a counterpart is `TODO`.
 
-**Score: 546 / 611 with an iOS counterpart = 89.4 / 100.** Full marks when no row is `TODO`; 0 when every
+**Score: 611 / 611 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
 row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same
 logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100.
 
@@ -22,8 +22,8 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLIndexPathButton.row` | property, `CYLClassifyMenu.kt:36` | `CYLIndexPathButton.row` |
 | `CYLIndexPathButton.cyl_imageTitleSpacing` | property, `CYLClassifyMenu.kt:41` | `CYLIndexPathButton.cyl_imageTitleSpacing` |
 | `CYLIndexPathButton.cyl_titleLeadingInset` | property, `CYLClassifyMenu.kt:51` | `CYLIndexPathButton.cyl_titleLeadingInset` |
-| `CYLIndexPathButton.setImage` | method, `CYLClassifyMenu.kt:83` | TODO |
-| `CYLIndexPathButton.currentImage` | read-only property, `CYLClassifyMenu.kt:92` | TODO |
+| `CYLIndexPathButton.setImage` | method, `CYLClassifyMenu.kt:83` | `UIButton.setImage(_:for: .normal)` (`CYLIndexPathButton` is a `UIButton`) |
+| `CYLIndexPathButton.currentImage` | read-only property, `CYLClassifyMenu.kt:92` | `UIButton.currentImage` |
 | `CYLRightImageButton` | class, `CYLClassifyMenu.kt:138` | `CYLRightImageButton` |
 | `CYLCollectionViewCell` | class, `CYLClassifyMenu.kt:175` | `CYLCollectionViewCell` |
 | `CYLCollectionViewCell.button` | read-only property, `CYLClassifyMenu.kt:176` | `CYLCollectionViewCell.button` |
@@ -48,12 +48,12 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLClassifyMenuViewController.menuTitle` | read-only property, `CYLClassifyMenu.kt:315` | `menuTitle` (same name in the iOS core) |
 | `CYLClassifyMenuViewController.reloadMenuData` | method, `CYLClassifyMenu.kt:372` | `CYLClassifyMenuViewController -reloadMenuData` |
 | `CYLClassifyMenuViewController.updateMenuLayout` | method, `CYLClassifyMenu.kt:381` | `CYLClassifyMenuViewController -updateMenuLayout` |
-| `CYLClassifyMenuViewController.numberOfVisibleItemsInSection` | method, `CYLClassifyMenu.kt:389` | TODO |
+| `CYLClassifyMenuViewController.numberOfVisibleItemsInSection` | method, `CYLClassifyMenu.kt:389` | `CYLClassifyMenuViewController.numberOfVisibleItems(inSection:)` (`-numberOfVisibleItemsInSection:`) |
 | `CYLClassifyMenuViewController.isSectionExpanded` | method, `CYLClassifyMenu.kt:394` | `isSectionExpanded` (same name in the iOS core) |
-| `CYLClassifyMenuViewController.setSectionExpanded` | method, `CYLClassifyMenu.kt:399` | TODO |
+| `CYLClassifyMenuViewController.setSectionExpanded` | method, `CYLClassifyMenu.kt:399` | `CYLClassifyMenuViewController.setSection(_:expanded:)` (`-setSection:expanded:`; the More button calls it) |
 | `CYLCollectionViewLeftAlignedLayout` | class, `CYLCollectionViewLeftAlignedLayout.kt:10` | `CYLCollectionViewLeftAlignedLayout` |
 | `CYLCollectionViewLeftAlignedLayout.rowAlignment` | property, `CYLCollectionViewLeftAlignedLayout.kt:13` | `CYLCollectionViewLeftAlignedLayout.rowAlignment` |
-| `CYLCollectionViewLeftAlignedLayout.frames` | method, `CYLCollectionViewLeftAlignedLayout.kt:19` | TODO |
+| `CYLCollectionViewLeftAlignedLayout.frames` | method, `CYLCollectionViewLeftAlignedLayout.kt:19` | `CYLCollectionViewLeftAlignedLayout.layoutAttributesForElements(in:)` (UIKit computes the frames; Android's helper returns them for its own list view) |
 | `UICollectionViewDelegateLeftAlignedLayout` | interface, `CYLCollectionViewLeftAlignedLayout.kt:62` | `UICollectionViewDelegateLeftAlignedLayout` |
 | `cyl_setWidth` | method, `CYLGeneralExtensions.kt:31` | `UIView (CYLGeneral) -cyl_setWidth:` |
 | `cyl_setHeight` | method, `CYLGeneralExtensions.kt:36` | `UIView (CYLGeneral) -cyl_setHeight:` |
@@ -78,7 +78,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `cyl_captureWithWidth` | method, `CYLGeneralExtensions.kt:166` | `UIView (CYLGeneral) -cyl_captureWithWidth:` |
 | `cyl_blurredImageWithRadius` | method, `CYLGeneralExtensions.kt:178` | `UIImage (CYLBlur) -cyl_blurredImageWithRadius:iterations:tintColor:` |
 | `List` | method, `CYLGeneralExtensions.kt:237` | `List` (same name in the iOS core) |
-| `Map` | method, `CYLGeneralExtensions.kt:246` | TODO |
+| `Map` | method, `CYLGeneralExtensions.kt:246` | `NSDictionary.cyl_descriptionWithLocale(_:)` (`NSDictionary+CYLLog.swift`; the Android row is the `Map<*, *>.cyl_descriptionWithLocale` extension) |
 | `cyl_generalStyle` | method, `CYLGeneralExtensions.kt:275` | `UIButton (CYLCollectionCellStyle) -cyl_generalStyle` |
 | `cyl_homeStyle` | method, `CYLGeneralExtensions.kt:288` | `UIButton (CYLCollectionCellStyle) -cyl_homeStyle` |
 | `cyl_redStyle` | method, `CYLGeneralExtensions.kt:302` | `UIButton (CYLCollectionCellStyle) -cyl_redStyle` |
@@ -123,16 +123,16 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLImageTagRippleView.color` | property, `CYLImageTagGroupView.kt:225` | `CYLImageTagRippleView.color` |
 | `CYLImageTagRippleView.startAnimating` | method, `CYLImageTagGroupView.kt:258` | `CYLImageTagRippleView -startAnimating` |
 | `CYLImageTagRippleView.stopAnimating` | method, `CYLImageTagGroupView.kt:276` | `CYLImageTagRippleView -stopAnimating` |
-| `CYLImageTagRippleView.isAnimating` | read-only property, `CYLImageTagGroupView.kt:286` | TODO |
+| `CYLImageTagRippleView.isAnimating` | read-only property, `CYLImageTagGroupView.kt:286` | `isAnimating` (same name in the iOS core) |
 | `CYLImageTagGroupViewDataSource` | interface, `CYLImageTagGroupView.kt:299` | `CYLImageTagGroupViewDataSource` |
 | `CYLImageTagGroupViewDataSource.numberOfTagsInGroupView` | method, `CYLImageTagGroupView.kt:303` | `CYLImageTagGroupViewDataSource -numberOfTagsInGroupView:` |
 | `CYLImageTagGroupViewDataSource.groupViewViewForTagAtIndex` | method, `CYLImageTagGroupView.kt:308` | `CYLImageTagGroupViewDataSource -groupView:viewForTagAtIndex:` |
 | `CYLImageTagGroupViewDelegate` | interface, `CYLImageTagGroupView.kt:314` | `CYLImageTagGroupViewDelegate` |
 | `CYLImageTagGroupViewDelegate.groupViewDidTapCircle` | method, `CYLImageTagGroupView.kt:318` | `groupViewDidTapCircle` (same name in the iOS core) |
-| `CYLImageTagGroupViewDelegate.groupViewDidTapTagAtIndex` | method, `CYLImageTagGroupView.kt:323` | TODO |
+| `CYLImageTagGroupViewDelegate.groupViewDidTapTagAtIndex` | method, `CYLImageTagGroupView.kt:323` | `CYLImageTagGroupViewDelegate.groupView(_:didTapTagAt:)` |
 | `CYLImageTagGroupViewDelegate.groupViewDidLongPress` | method, `CYLImageTagGroupView.kt:328` | `groupViewDidLongPress` (same name in the iOS core) |
-| `CYLImageTagGroupViewDelegate.groupViewDidDragToPercentPosition` | method, `CYLImageTagGroupView.kt:333` | TODO |
-| `CYLImageTagGroupViewDelegate.handlesLongPress` | method, `CYLImageTagGroupView.kt:338` | TODO |
+| `CYLImageTagGroupViewDelegate.groupViewDidDragToPercentPosition` | method, `CYLImageTagGroupView.kt:333` | `CYLImageTagGroupViewDelegate.groupView(_:didDragToPercentPosition:)` |
+| `CYLImageTagGroupViewDelegate.handlesLongPress` | method, `CYLImageTagGroupView.kt:338` | `CYLImageTagGroupViewDelegate.groupViewDidLongPress(_:)` (a Swift protocol method with a default; Android needs a flag instead of `respondsToSelector:`) |
 | `CYLImageTagGroupView` | class, `CYLImageTagGroupView.kt:347` | `CYLImageTagGroupView` |
 | `CYLImageTagGroupView.circleRadius` | property, `CYLImageTagGroupView.kt:352` | `CYLImageTagGroupView.circleRadius` |
 | `CYLImageTagGroupView.circleInnerRadius` | property, `CYLImageTagGroupView.kt:354` | `CYLImageTagGroupView.circleInnerRadius` |
@@ -174,9 +174,9 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLImageTagGroupView.accessibilityMoveStep` | property, `CYLImageTagGroupView.kt:681` | `CYLImageTagGroupView.accessibilityMoveStep` |
 | `CYLImageTagGroupView.tagSpaceUsed` | method, `CYLImageTagGroupView.kt:774` | `CYLImageTagGroupView -tagSpaceUsed` |
 | `CYLImageTagGroupView.originForTagOfSize` | method, `CYLImageTagGroupView.kt:779` | `CYLImageTagGroupView -originForTagOfSize:direction:` |
-| `CYLImageTagGroupView.layoutGroup` | method, `CYLImageTagGroupView.kt:812` | TODO |
-| `CYLImageTagGroupView.frameOfTagView` | method, `CYLImageTagGroupView.kt:846` | TODO |
-| `CYLImageTagGroupView.pointInside` | method, `CYLImageTagGroupView.kt:907` | TODO |
+| `CYLImageTagGroupView.layoutGroup` | method, `CYLImageTagGroupView.kt:812` | `UIView.layoutIfNeeded()` on the group view |
+| `CYLImageTagGroupView.frameOfTagView` | method, `CYLImageTagGroupView.kt:846` | `UIView.frame` of the tag view (after `layoutIfNeeded()`) |
+| `CYLImageTagGroupView.pointInside` | method, `CYLImageTagGroupView.kt:907` | `CYLImageTagGroupView.point(inside:with:)` (only the dot and the tags take touches) |
 | `CYLImageTagView` | class, `CYLImageTagView.kt:18` | `CYLImageTagView` |
 | `CYLImageTagView.imageView` | read-only property, `CYLImageTagView.kt:25` | `CYLImageTagView.imageView` |
 | `CYLImageTagView.image` | property, `CYLImageTagView.kt:44` | `CYLImageTagView.image` |
@@ -221,7 +221,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuDataSource.menuItemIsDeletableAtIndexPath` | method, `CYLMenuDataSource.kt:35` | `CYLMenuDataSource -menuItemIsDeletableAtIndexPath:` |
 | `CYLMenuDataSource.menuRemoveItemAtIndexPath` | method, `CYLMenuDataSource.kt:36` | `CYLMenuDataSource -menuRemoveItemAtIndexPath:` |
 | `CYLMenuDataSource.menuMoveItemAtIndexPath` | method, `CYLMenuDataSource.kt:39` | `CYLMenuDataSource -menuMoveItemAtIndexPath:toIndexPath:` |
-| `CYLMenuDataSource.supportsMovingItems` | method, `CYLMenuDataSource.kt:42` | TODO |
+| `CYLMenuDataSource.supportsMovingItems` | method, `CYLMenuDataSource.kt:42` | `responds(to: #selector(CYLMenuDataSource.menuMoveItem(at:to:)))` (optional Objective-C method; `CYLTagListView` checks it) |
 | `CYLMenuDelegate` | interface, `CYLMenuDataSource.kt:49` | `CYLMenuDelegate` |
 | `CYLMenuDelegate.menuShouldSelectItemAtIndexPath` | method, `CYLMenuDataSource.kt:50` | `CYLMenuDelegate -menu:shouldSelectItemAtIndexPath:` |
 | `CYLMenuDelegate.menuDidSelectItemAtIndexPath` | method, `CYLMenuDataSource.kt:51` | `CYLMenuDelegate -menu:didSelectItemAtIndexPath:` |
@@ -236,7 +236,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuDelegate.menuDidLongPressItemAtIndexPath` | method, `CYLMenuDataSource.kt:60` | `CYLMenuDelegate -menu:didLongPressItemAtIndexPath:` |
 | `CYLMenuDelegate.menuDidMoveItemAtIndexPath` | method, `CYLMenuDataSource.kt:61` | `CYLMenuDelegate -menu:didMoveItemAtIndexPath:toIndexPath:` |
 | `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath` | method, `CYLMenuDataSource.kt:62` | `CYLMenuDelegate -menu:didBeginDraggingSelectedItemAtIndexPath:` |
-| `CYLMenuDelegate.handlesLongPress` | method, `CYLMenuDataSource.kt:65` | TODO |
+| `CYLMenuDelegate.handlesLongPress` | method, `CYLMenuDataSource.kt:65` | `responds(to: #selector(CYLMenuDelegate.menu(_:didLongPressItemAt:)))` (optional Objective-C method; `CYLTagListView` checks it) |
 | `CYLMenuFoldControlPosition` | class, `CYLMenuFoldControl.kt:6` | `CYLMenuFoldControlPosition` |
 | `CYLMenuFoldControlPosition.NONE` | enum case, `CYLMenuFoldControl.kt:7` | `CYLMenuFoldControlPositionNone` |
 | `CYLMenuFoldControlPosition.FOOTER` | enum case, `CYLMenuFoldControl.kt:8` | `CYLMenuFoldControlPositionFooter` |
@@ -261,8 +261,8 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuFoldControl.showsTitleWhenExpanded` | method, `CYLMenuFoldControl.kt:58` | `CYLMenuFoldControl -showsTitleWhenExpanded:` |
 | `CYLMenuFoldControl.titleWhenExpanded` | method, `CYLMenuFoldControl.kt:64` | `CYLMenuFoldControl -titleWhenExpanded:` |
 | `CYLMenuFoldControl.copy` | method, `CYLMenuFoldControl.kt:70` | `copy` (same name in the iOS core) |
-| `CYLMenuIconDrawable` | class, `CYLMenuIcons.kt:17` | TODO |
-| `CYLMenuIconDrawable.Kind` | class, `CYLMenuIcons.kt:19` | TODO |
+| `CYLMenuIconDrawable` | class, `CYLMenuIcons.kt:17` | the bundle images `cyl_fold_chevron`, `cyl_tag_plus`, `cyl_more` (`CYLMenuResources.image(named:)`, SF Symbol fallback); Android draws them |
+| `CYLMenuIconDrawable.Kind` | class, `CYLMenuIcons.kt:19` | the image names above: `cyl_fold_chevron` (CHEVRON_DOWN), `cyl_tag_plus` (PLUS), `cyl_more` (ELLIPSIS) |
 | `kDataSourceSectionKey` | read-only property, `CYLMenuKeys.kt:6` | `kDataSourceSectionKey` |
 | `kDataSourceCellTextKey` | read-only property, `CYLMenuKeys.kt:7` | `kDataSourceCellTextKey` |
 | `kDataSourceCellPictureKey` | read-only property, `CYLMenuKeys.kt:8` | `kDataSourceCellPictureKey` |
@@ -348,7 +348,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLFilterParamsTool.filterParamsDictionary` | property, `CYLMultipleFilter.kt:63` | `CYLFilterParamsTool.filterParamsDictionary` |
 | `CYLFilterParamsTool.filterParamsContentDictionary` | property, `CYLMultipleFilter.kt:73` | `CYLFilterParamsTool.filterParamsContentDictionary` |
 | `CYLFilterParamsTool.filename` | property, `CYLMultipleFilter.kt:83` | `CYLFilterParamsTool.filename` |
-| `CYLFilterParamsTool.filesDir` | property, `CYLMultipleFilter.kt:90` | TODO |
+| `CYLFilterParamsTool.filesDir` | property, `CYLMultipleFilter.kt:90` | N/A on iOS: `CYLFilterParamsTool` was removed in the Swift migration (`70dcc816`); `CYLMultipleFilterController` keeps its state (`selectedIndexPaths()` / `setSelectedIndexPaths(_:)`) |
 | `CYLFilterCollectionCell` | class, `CYLMultipleFilter.kt:135` | `CYLFilterCollectionCell` |
 | `CYLFilterCollectionCell.titleButton` | read-only property, `CYLMultipleFilter.kt:136` | `CYLFilterCollectionCell.titleButton` |
 | `CYLMultipleFilterHeaderView` | class, `CYLMultipleFilter.kt:162` | `CYLMultipleFilterHeaderView` |
@@ -369,7 +369,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLFilterBaseController.itemButtonClicked` | method, `CYLMultipleFilter.kt:374` | `CYLFilterBaseController -itemButtonClicked:` |
 | `CYLFilterBaseController.confirmButtonClicked` | method, `CYLMultipleFilter.kt:379` | `CYLFilterBaseController -confirmButtonClicked:` |
 | `CYLFilterBaseController.restoreButtonClicked` | method, `CYLMultipleFilter.kt:386` | `CYLFilterBaseController -restoreButtonClicked:` |
-| `CYLFilterBaseController.isShowing` | read-only property, `CYLMultipleFilter.kt:391` | TODO |
+| `CYLFilterBaseController.isShowing` | read-only property, `CYLMultipleFilter.kt:391` | `isShowing` (same name in the iOS core) |
 | `CYLMultipleFilterController` | class, `CYLMultipleFilter.kt:399` | `CYLMultipleFilterController` |
 | `CYLMultipleFilterController.menuDataSource` | property, `CYLMultipleFilter.kt:400` | `CYLMultipleFilterController.menuDataSource` |
 | `CYLMultipleFilterController.menuDelegate` | property, `CYLMultipleFilter.kt:401` | `CYLMultipleFilterController.menuDelegate` |
@@ -377,10 +377,10 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMultipleFilterController.reloadMenuData` | method, `CYLMultipleFilter.kt:423` | `CYLMultipleFilterController -reloadMenuData` |
 | `CYLMultipleFilterController.selectedIndexPaths` | method, `CYLMultipleFilter.kt:449` | `CYLMultipleFilterController -selectedIndexPaths` |
 | `CYLMultipleFilterController.setSelectedIndexPaths` | method, `CYLMultipleFilter.kt:456` | `CYLMultipleFilterController -setSelectedIndexPaths:` |
-| `CYLMultipleFilterController.selectItemAtIndexPath` | method, `CYLMultipleFilter.kt:486` | TODO |
+| `CYLMultipleFilterController.selectItemAtIndexPath` | method, `CYLMultipleFilter.kt:486` | `CYLMultipleFilterController.collectionView(_:didSelectItemAt:)` (a tap) |
 | `CYLAppTintColor` | read-only property, `CYLParameterConfiguration.kt:12` | `CYLAppTintColor` |
-| `CYLMaximumFontScale` | read-only property, `CYLParameterConfiguration.kt:15` | TODO |
-| `CYLTagTitleFontSize` | read-only property, `CYLParameterConfiguration.kt:18` | TODO |
+| `CYLMaximumFontScale` | read-only property, `CYLParameterConfiguration.kt:15` | `CYLTagMetrics.maximumFontScale` |
+| `CYLTagTitleFontSize` | read-only property, `CYLParameterConfiguration.kt:18` | `CYLTagMetrics.titleFontSize` |
 | `CYLScaledSystemFont` | method, `CYLParameterConfiguration.kt:24` | `CYLScaledSystemFont` |
 | `CYLTagHeightForFont` | method, `CYLParameterConfiguration.kt:28` | `CYLTagHeightForFont` |
 | `CYLTagTitleFontForTraitCollection` | method, `CYLParameterConfiguration.kt:31` | `CYLTagTitleFontForTraitCollection` |
@@ -389,9 +389,9 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTag` | class, `CYLTag.kt:23` | `CYLTag` |
 | `identifier` | property, `CYLTag.kt:24` | `CYLTag.identifier` |
 | `backgroundColor` | property, `CYLTag.kt:26` | `CYLMenuStyle.backgroundColor` |
-| `CYLBadgeDrawable` | class, `CYLTag.kt:182` | TODO |
-| `CYLOriginalImageDrawable` | class, `CYLTag.kt:189` | TODO |
-| `cyl_imageWithRenderingModeAlwaysOriginal` | method, `CYLTag.kt:195` | TODO |
+| `CYLBadgeDrawable` | class, `CYLTag.kt:182` | `UIImage` with `accessibilityLabel` (`CYLTag.swift` badge images) |
+| `CYLOriginalImageDrawable` | class, `CYLTag.kt:189` | `UIImage.withRenderingMode(.alwaysOriginal)` |
+| `cyl_imageWithRenderingModeAlwaysOriginal` | method, `CYLTag.kt:195` | `UIImage.withRenderingMode(.alwaysOriginal)` (`-imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal`) |
 | `CYLTagDataSource` | class, `CYLTag.kt:201` | `CYLTagDataSource` |
 | `CYLTagDataSource.tags` | property, `CYLTag.kt:208` | `CYLTagDataSource.tags` |
 | `CYLTagDataSource.sectionTitle` | property, `CYLTag.kt:215` | `CYLTagDataSource.sectionTitle` |
@@ -416,13 +416,13 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagAppearance.contentInsets` | property, `CYLTagAppearance.kt:52` | `CYLTagAppearance.contentInsets` |
 | `CYLTagAppearance.backgroundImage` | property, `CYLTagAppearance.kt:55` | `CYLTagAppearance.backgroundImage` |
 | `CYLTagAppearance.reset` | method, `CYLTagAppearance.kt:58` | `CYLTagAppearance -reset` |
-| `CYLTagAppearance.resetBackgroundColor` | method, `CYLTagAppearance.kt:71` | TODO |
-| `CYLTagAppearance.resetTextColor` | method, `CYLTagAppearance.kt:74` | TODO |
-| `CYLTagAppearance.resetFont` | method, `CYLTagAppearance.kt:77` | TODO |
+| `CYLTagAppearance.resetBackgroundColor` | method, `CYLTagAppearance.kt:71` | `resetBackgroundColor` (same name in the iOS core) |
+| `CYLTagAppearance.resetTextColor` | method, `CYLTagAppearance.kt:74` | `resetTextColor` (same name in the iOS core) |
+| `CYLTagAppearance.resetFont` | method, `CYLTagAppearance.kt:77` | `resetFont` (same name in the iOS core) |
 | `CYLTagButton` | class, `CYLTagButton.kt:33` | `CYLTagButton` |
-| `CYLAccessibility` | object, `CYLTagButton.kt:668` | TODO |
-| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:671` | TODO |
-| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:676` | TODO |
+| `CYLAccessibility` | object, `CYLTagButton.kt:668` | `UIAccessibility` (UIKit) |
+| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:671` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
+| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:676` | `UIAccessibility.isDarkerSystemColorsEnabled` (`UIAccessibilityDarkerSystemColorsEnabled()`) |
 | `CYLTagColorTheme` | class, `CYLTagColors.kt:7` | `CYLTagColorTheme` |
 | `CYLTagColorTheme.CYLTagColorThemeNone` | enum case, `CYLTagColors.kt:8` | `CYLTagColorThemeNone` (same name in the iOS core) |
 | `CYLTagColorTheme.CYLTagColorThemeRandom` | enum case, `CYLTagColors.kt:9` | `CYLTagColorThemeRandom` (same name in the iOS core) |
@@ -451,16 +451,16 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagCreateItemAccessibilityIdentifier` | read-only property, `CYLTagListAccessibility.kt:18` | `CYLTagCreateItemAccessibilityIdentifier` |
 | `CYLTagListMoreButtonAccessibilityIdentifier` | read-only property, `CYLTagListAccessibility.kt:21` | `CYLTagListMoreButtonAccessibilityIdentifier` |
 | `CYLTagListDeleteAccessibilityIdentifier` | read-only property, `CYLTagListAccessibility.kt:24` | `CYLTagListDeleteAccessibilityIdentifier` |
-| `CYLAccessibilityAction` | class, `CYLTagListAccessibility.kt:29` | TODO |
-| `cyl_accessibilityIdentifier` | property, `CYLTagListAccessibility.kt:32` | TODO |
-| `cyl_viewsWithAccessibilityIdentifier` | method, `CYLTagListAccessibility.kt:37` | TODO |
+| `CYLAccessibilityAction` | class, `CYLTagListAccessibility.kt:29` | `UIAccessibilityCustomAction` |
+| `cyl_accessibilityIdentifier` | property, `CYLTagListAccessibility.kt:32` | `UIAccessibilityIdentification.accessibilityIdentifier` |
+| `cyl_viewsWithAccessibilityIdentifier` | method, `CYLTagListAccessibility.kt:37` | `cyl_viewsWithAccessibilityIdentifier` (same name in the iOS core) |
 | `CYLTagListCell` | class, `CYLTagListCell.kt:23` | `CYLTagListCell` |
 | `CYLTagListCell.button` | read-only property, `CYLTagListCell.kt:25` | `CYLTagListCell.button` |
 | `CYLTagListCell.appliedStyle` | property, `CYLTagListCell.kt:43` | `CYLTagListCell.appliedStyle` |
 | `CYLTagListCell.deletable` | property, `CYLTagListCell.kt:45` | `CYLTagListCell.deletable` |
 | `CYLTagListCell.deleteHandler` | property, `CYLTagListCell.kt:54` | `deleteHandler` (same name in the iOS core) |
 | `CYLTagListCell.additionalAccessibilityActions` | property, `CYLTagListCell.kt:56` | `CYLTagListCell.additionalAccessibilityActions` |
-| `CYLTagListCell.accessibilityHint` | property, `CYLTagListCell.kt:75` | TODO |
+| `CYLTagListCell.accessibilityHint` | property, `CYLTagListCell.kt:75` | `UIView.accessibilityHint` of the cell |
 | `CYLTagListCell.showRippleAtPoint` | method, `CYLTagListCell.kt:107` | `CYLTagListCell -showRippleAtPoint:` |
 | `CYLTagListCell.prepareForReuse` | method, `CYLTagListCell.kt:155` | `prepareForReuse` (same name in the iOS core) |
 | `CYLTagListCell.configureWithTitle` | method, `CYLTagListCell.kt:162` | `CYLTagListCell -configureWithTitle:image:selectedImage:animationURL:style:selected:enabled:` |
@@ -551,7 +551,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuConfigurationError.CYLMenuConfigurationErrorFileNotFound` | enum case, `CYLTagListViewConfiguration.kt:348` | `CYLMenuConfigurationErrorFileNotFound` (same name in the iOS core) |
 | `CYLMenuConfigurationError.CYLMenuConfigurationErrorInvalidContents` | enum case, `CYLTagListViewConfiguration.kt:349` | `CYLMenuConfigurationErrorInvalidContents` (same name in the iOS core) |
 | `CYLMenuConfigurationError.CYLMenuConfigurationErrorUnsupportedFormat` | enum case, `CYLTagListViewConfiguration.kt:350` | `CYLMenuConfigurationErrorUnsupportedFormat` (same name in the iOS core) |
-| `CYLMenuConfigurationException` | class, `CYLTagListViewConfiguration.kt:356` | TODO |
+| `CYLMenuConfigurationException` | class, `CYLTagListViewConfiguration.kt:356` | `CYLMenuConfigurationError` thrown as `NSError` (domain `CYLMenuConfigurationErrorDomain`) |
 | `CYLMenuAnimationURLWithOptions` | method, `CYLTagListViewConfiguration.kt:461` | `CYLMenuAnimationURLWithOptions` |
 | `sections` | property, `CYLTagListViewConfiguration.kt:573` | `sections` (same name in the iOS core) |
 | `baseURL` | read-only property, `CYLTagListViewConfiguration.kt:574` | `baseURL` (same name in the iOS core) |
@@ -566,11 +566,11 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `tagListViewWithConfiguration` | method, `CYLTagListViewConfiguration.kt:798` | `CYLTagListView (CYLConfiguration) +tagListViewWithConfiguration:` |
 | `applyConfiguration` | method, `CYLTagListViewConfiguration.kt:805` | `CYLTagListView (CYLConfiguration) -applyConfiguration:` |
 | `configurationWithContentsOfFile` | method, `CYLTagListViewConfiguration.kt:871` | `CYLTagListView (CYLConfiguration) +configurationWithContentsOfFile:error:` |
-| `kTagCollectionViewCellsHorizonMargin` | read-only property, `CYLTagView.kt:26` | TODO |
-| `kTagCollectionViewToLeftMargin` | read-only property, `CYLTagView.kt:30` | TODO |
-| `kTagCollectionViewToTopMargin` | read-only property, `CYLTagView.kt:34` | TODO |
-| `kTagCollectionViewToRightMargin` | read-only property, `CYLTagView.kt:38` | TODO |
-| `kTagCollectionViewToBottomtMargin` | read-only property, `CYLTagView.kt:42` | TODO |
+| `kTagCollectionViewCellsHorizonMargin` | read-only property, `CYLTagView.kt:26` | `kTagCollectionViewCellsHorizonMargin` (same name in the iOS core) |
+| `kTagCollectionViewToLeftMargin` | read-only property, `CYLTagView.kt:30` | `kTagCollectionViewToLeftMargin` (same name in the iOS core) |
+| `kTagCollectionViewToTopMargin` | read-only property, `CYLTagView.kt:34` | `kTagCollectionViewToTopMargin` (same name in the iOS core) |
+| `kTagCollectionViewToRightMargin` | read-only property, `CYLTagView.kt:38` | `kTagCollectionViewToRightMargin` (same name in the iOS core) |
+| `kTagCollectionViewToBottomtMargin` | read-only property, `CYLTagView.kt:42` | `kTagCollectionViewToBottomtMargin` (same name in the iOS core) |
 | `CYLTagModel` | class, `CYLTagView.kt:48` | `CYLTagModel` |
 | `CYLTagModel.title` | property, `CYLTagView.kt:52` | `CYLTagModel.title` |
 | `CYLTagModel.width` | property, `CYLTagView.kt:58` | `CYLTagModel.width` |
@@ -602,29 +602,29 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagView.menuDataSource` | property, `CYLTagView.kt:323` | `CYLTagView.menuDataSource` |
 | `CYLTagView.menuDelegate` | property, `CYLTagView.kt:324` | `CYLTagView.menuDelegate` |
 | `CYLTagView.reloadMenuData` | method, `CYLTagView.kt:344` | `CYLTagView -reloadMenuData` |
-| `CYLTagView.numberOfVisibleItemsInSection` | method, `CYLTagView.kt:373` | TODO |
-| `CYLEdgeInsets` | class, `CYLTypes.kt:9` | TODO |
-| `CYLSize` | class, `CYLTypes.kt:20` | TODO |
-| `CYLOffset` | class, `CYLTypes.kt:31` | TODO |
-| `CYLPoint` | class, `CYLTypes.kt:42` | TODO |
-| `CYLRect` | class, `CYLTypes.kt:47` | TODO |
-| `CYLRect.maxX` | read-only property, `CYLTypes.kt:48` | TODO |
-| `CYLRect.maxY` | read-only property, `CYLTypes.kt:49` | TODO |
-| `CYLRect.intersects` | method, `CYLTypes.kt:51` | TODO |
-| `CYLIndexPath` | class, `CYLTypes.kt:57` | TODO |
-| `CYLFont` | class, `CYLTypes.kt:69` | TODO |
-| `CYLFont.isBold` | read-only property, `CYLTypes.kt:70` | TODO |
+| `CYLTagView.numberOfVisibleItemsInSection` | method, `CYLTagView.kt:373` | `CYLTagView.numberOfVisibleItems(inSection:)` (`-numberOfVisibleItemsInSection:`) |
+| `CYLEdgeInsets` | class, `CYLTypes.kt:9` | `UIEdgeInsets` (UIKit; Android stand-in) |
+| `CYLSize` | class, `CYLTypes.kt:20` | `CGSize` (Core Graphics; Android stand-in) |
+| `CYLOffset` | class, `CYLTypes.kt:31` | `UIOffset` (UIKit; Android stand-in) |
+| `CYLPoint` | class, `CYLTypes.kt:42` | `CGPoint` (Core Graphics; Android stand-in) |
+| `CYLRect` | class, `CYLTypes.kt:47` | `CGRect` (Core Graphics; Android stand-in) |
+| `CYLRect.maxX` | read-only property, `CYLTypes.kt:48` | `CGRect.maxX` (`CGRectGetMaxX`) |
+| `CYLRect.maxY` | read-only property, `CYLTypes.kt:49` | `CGRect.maxY` (`CGRectGetMaxY`) |
+| `CYLRect.intersects` | method, `CYLTypes.kt:51` | `CGRect.intersects(_:)` (`CGRectIntersectsRect`) |
+| `CYLIndexPath` | class, `CYLTypes.kt:57` | `IndexPath` / `NSIndexPath` (`item`, `section`; Android stand-in) |
+| `CYLFont` | class, `CYLTypes.kt:69` | `UIFont` (UIKit; Android stand-in) |
+| `CYLFont.isBold` | read-only property, `CYLTypes.kt:70` | `UIFont.fontDescriptor.symbolicTraits.contains(.traitBold)` |
 | `CYLFont.bold` | method, `CYLTypes.kt:73` | `bold` (same name in the iOS core) |
-| `CYLFont.withSize` | method, `CYLTypes.kt:75` | TODO |
-| `CYLControlState` | object, `CYLTypes.kt:91` | TODO |
-| `CYLControlState.NORMAL` | read-only property, `CYLTypes.kt:92` | TODO |
-| `CYLControlState.HIGHLIGHTED` | read-only property, `CYLTypes.kt:93` | TODO |
-| `CYLControlState.DISABLED` | read-only property, `CYLTypes.kt:94` | TODO |
-| `CYLControlState.SELECTED` | read-only property, `CYLTypes.kt:95` | TODO |
-| `CYLColor` | object, `CYLTypes.kt:101` | TODO |
-| `CYLColor.white` | method, `CYLTypes.kt:104` | TODO |
+| `CYLFont.withSize` | method, `CYLTypes.kt:75` | `UIFont.withSize(_:)` (`-fontWithSize:`) |
+| `CYLControlState` | object, `CYLTypes.kt:91` | `UIControl.State` (`UIControlState`; Android stand-in) |
+| `CYLControlState.NORMAL` | read-only property, `CYLTypes.kt:92` | `UIControl.State.normal` |
+| `CYLControlState.HIGHLIGHTED` | read-only property, `CYLTypes.kt:93` | `UIControl.State.highlighted` |
+| `CYLControlState.DISABLED` | read-only property, `CYLTypes.kt:94` | `UIControl.State.disabled` |
+| `CYLControlState.SELECTED` | read-only property, `CYLTypes.kt:95` | `UIControl.State.selected` |
+| `CYLColor` | object, `CYLTypes.kt:101` | `UIColor` (UIKit; Android stand-in: colors as ARGB ints) |
+| `CYLColor.white` | method, `CYLTypes.kt:104` | `UIColor(white:alpha:)` (`+colorWithWhite:alpha:`) |
 | `CYLColor.rgb` | method, `CYLTypes.kt:111` | `rgb` (same name in the iOS core) |
-| `CYLColor.withAlpha` | method, `CYLTypes.kt:118` | TODO |
-| `CYLColor.fromHex` | method, `CYLTypes.kt:122` | TODO |
-| `CYLColor.APP_TINT` | read-only property, `CYLTypes.kt:130` | TODO |
-| `CYLColor.CLEAR` | read-only property, `CYLTypes.kt:133` | TODO |
+| `CYLColor.withAlpha` | method, `CYLTypes.kt:118` | `UIColor.withAlphaComponent(_:)` (`-colorWithAlphaComponent:`) |
+| `CYLColor.fromHex` | method, `CYLTypes.kt:122` | `UIColor.cylMenuColor(from:)` (`CYLTagListView+CYLConfiguration.swift`: "RRGGBB", "#RRGGBB" or a color name) |
+| `CYLColor.APP_TINT` | read-only property, `CYLTypes.kt:130` | `UIColor.cylAppTint` (`+[UIColor cyl_appTintColor]`) |
+| `CYLColor.CLEAR` | read-only property, `CYLTypes.kt:133` | `UIColor.clear` (`+clearColor`) |
