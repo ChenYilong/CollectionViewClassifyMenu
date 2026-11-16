@@ -3,6 +3,14 @@
     {
       "name": "start_window_background",
       "value": "#000000"
+    },
+    {
+      "name": "cyl_animation_label",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "cyl_animation_background",
+      "value": "#000000"
     }
   ]
 }
