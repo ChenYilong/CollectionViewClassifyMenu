@@ -82,7 +82,10 @@ struct Index {
       .width('100%')
       .height('100%')
       .id('tab-plus')
+      // One element read as "查询筛选" (an image-only item has no text of its own), selecting its tab on a tap.
+      .accessibilityGroup(true)
       .accessibilityText(CYLExampleLocalizedString('查询筛选'))
+      .onClick(() => this.tab = PLUS_INDEX)
       .accessibilityDescription(CYLExampleLocalizedString('按场景分组的筛选演示'))
     } else {
       Column({ space: 2 }) {

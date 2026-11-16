@@ -1,3 +1,4 @@
+import { display } from '@kit.ArkUI';
 import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * iOS `CYLFilterBaseController.swift` (and its XIB), migrated from Android `CYLMultipleFilter.kt`: the base of the
@@ -206,7 +207,16 @@ export struct CYLFilterPanelView {
   }
 
   private panelWidth(): number {
-    return Math.max(0, this.hostWidth - HOST_VISIBLE_WIDTH);
+    // Before the host has been measured (the panel opened right away), the display's width, never a 0-wide panel.
+    let width = this.hostWidth;
+    if (width <= 0) {
+      try {
+        width = this.getUIContext().px2vp(display.getDefaultDisplaySync().width);
+      } catch (error) {
+        width = 0;
+      }
+    }
+    return Math.max(0, width - HOST_VISIBLE_WIDTH);
   }
 
   build() {

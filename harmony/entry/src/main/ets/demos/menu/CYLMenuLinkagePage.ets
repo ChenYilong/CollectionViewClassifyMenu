@@ -295,8 +295,11 @@ export struct CYLMenuLinkagePage {
             .height(22)
             .objectFit(ImageFit.Contain)
             .position({ x: 14, y: (CYL_DEMO_BAR_HEIGHT - 22) / 2 })
+            // An image is not an accessibility element by default: expose it, and give it a 44 vp touch target.
+            .accessibilityLevel('yes')
             .accessibilityText(CYLExampleLocalizedString('多选筛选'))
-            .accessibilityDescription(this.filterModified ? CYLExampleLocalizedString('已修改') : '')
+            .accessibilityDescription(this.filterModified ? CYLExampleLocalizedString('已修改') : CYLExampleLocalizedString('多选筛选'))
+            .responseRegion({ x: -11, y: -11, width: 44, height: 44 })
             .id('menuLinkageFilter')
             .onClick(() => this.showFilter())
           Text(CYLExampleLocalizedString('重置'))
