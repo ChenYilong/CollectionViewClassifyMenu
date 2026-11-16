@@ -50,3 +50,7 @@
 - Running scripts (English rule, AGENTS.md "Running scripts"; skill `.agents/skills/cyl-verify/`): Run scripts with bash,
   not the interactive shell (zsh does not split `$var` into words, so a command or a list in a variable breaks);
   use `bash script.sh` or `bash <<'EOF'`, and wrapper scripts or bash arrays for commands with arguments.
+- Pull requests (English rule, AGENTS.md "Branches and pull requests"; skill `.agents/skills/cyl-commit/`): a branch
+  with commits always has an open pull request; before every commit run `bash scripts/check-branch-pr.sh` and open
+  one if missing (base: the previously active PR's branch, else `master`); more than two open pull requests: ask the
+  user before creating another branch.
