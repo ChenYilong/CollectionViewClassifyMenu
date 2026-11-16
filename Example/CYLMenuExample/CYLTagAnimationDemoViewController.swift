@@ -2,7 +2,7 @@
 //  CYLTagAnimationDemoViewController.swift
 //  CYLMenuExample
 //
-//  动效图标演示：CYLTabBarController Example 中的动效与图片资源（Lottie、PAG、Rive、GIF、静态图片），
+//  动效图标演示：CYLTabBarController Example 中的动效与图片资源（Lottie、PAG、Rive、SVGA、GIF、静态图片），
 //  每个分组一种动效库，点击标签播放，与 CYLTabBarController 的 Tab 图标相同。用字典（map）初始化。
 //
 
@@ -25,7 +25,7 @@ final class CYLTagAnimationDemoViewController: UIViewController {
 
     /// Section titles, one per library, in order.
     static func sectionIdentifiers() -> [String] {
-        ["lottie", "lottie-images", "lottie-green", "pag", "rive", "rive-icons", "gif", "images"]
+        ["lottie", "lottie-images", "lottie-green", "pag", "rive", "rive-icons", "svga", "svga-dark", "gif", "images"]
     }
 
     /// A file of CYLMenuExample.bundle/Animations (copied from CYLTabBarController's examples).
@@ -100,6 +100,24 @@ final class CYLTagAnimationDemoViewController: UIViewController {
                 item("计时", rive: "icons", options: ["artboard": "TIMER", "stateMachine": "TIMER_Interactivity", "input": "active"]),
                 item("提醒", rive: "icons", options: ["artboard": "BELL", "stateMachine": "BELL_Interactivity", "input": "active"]),
                 item("我的", rive: "icons", options: ["artboard": "USER", "stateMachine": "USER_Interactivity", "input": "active"])]])
+        // SVGA, one for one with the two Rive sections (CYLTabBarController's Example-Rive shows SVGA after Rive): the
+        // tab icons of its SVGAAssets, then the other files on the same dark tags as icons.riv. SVGA plays once at the
+        // file's own speed: CYLTabBarController's SVGA player has no speed, loops or progress (as Rive).
+        sections.append([CYLTagSectionKey.title: "SVGA · pod 'CYLTabBarController/SVGA'", CYLTagSectionKey.items: [
+                item("首页", animation: animation("SVGA/tab_home.svga"), image: nil),
+                item("搜索", animation: animation("SVGA/tab_search.svga"), image: nil),
+                item("消息", animation: animation("SVGA/tab_chat.svga"), image: nil),
+                item("我的", animation: animation("SVGA/tab_profile.svga"), image: nil)]])
+        sections.append([CYLTagSectionKey.title: CYLExampleLocalizedString("SVGA · 深色标签"),
+             CYLTagSectionKey.style: [
+                CYLMenuStyleKey.normal: [CYLTagAppearanceKey.backgroundColor: "#17203A", CYLTagAppearanceKey.textColor: "#FFFFFF",
+                                     CYLTagAppearanceKey.borderColor: "#17203A"],
+                CYLMenuStyleKey.selected: [CYLTagAppearanceKey.backgroundColor: "#3A4E8C", CYLTagAppearanceKey.textColor: "#FFFFFF",
+                                       CYLTagAppearanceKey.borderColor: "#6792FF"]],
+             CYLTagSectionKey.items: [
+                item("动态", animation: animation("SVGA/tab_activity.svga"), image: nil),
+                item("列表", animation: animation("SVGA/tab_list.svga"), image: nil),
+                item("首页", animation: animation("SVGA/tab_home.svga"), image: nil)]])
         sections.append([CYLTagSectionKey.title: "GIF · pod 'CYLTabBarController/GIF'", CYLTagSectionKey.items: [
                 item("火焰", animation: animation("GIF/tab_fire.gif"), image: nil),
                 item("火箭", animation: animation("GIF/tab_rocket.gif"), image: nil),

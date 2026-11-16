@@ -176,7 +176,7 @@ New APIs / 新增接口:
 | `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
 | `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也可单独使用 |
 | `-menuSelectedImageForItemAtIndexPath:` | 选中态图标 |
-| `-menuAnimationURLForItemAtIndexPath:`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / GIF 动效图标（CYLTabBarController 动效引擎） |
+| `-menuAnimationURLForItemAtIndexPath:`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF 动效图标（CYLTabBarController 动效引擎） |
 | `-initWithConfiguration:`, `+tagListViewWithConfigurationFile:error:`, `+styleWithConfiguration:` | 字典（map）与配置文件初始化 |
 | `selectionMode`, `allowsEmptySelection` | 无选择 / 单选 / 多选（支持互斥项“全部”） |
 | `foldStyle`, `defaultVisibleRows` | 标题“更多”按钮、底部箭头或仅截断预览 |
@@ -461,7 +461,7 @@ configuration file, gives each example a tab, and raises the plus button above t
 | Classify · Filter | iOS 演示 App：单选分类菜单、多选筛选（从左侧滑入），查询共享的 SQLite 数据库 / the iOS demo app's classify menu and multiple-choice filter, querying the shared SQLite database |
 | Tags | TagCollectionView 示例 / the TagCollectionView demo |
 | Editor | `Example-Swift` 的标签编辑器与折叠样式 / the tag editor and fold styles of `Example-Swift` |
-| Menu | `Example/CYLMenuExample` 全部场景：评价筛选（内存 / 网络 / 数据库）、搜索分类、样式、动效（Lottie / PAG / Rive / GIF）、查询筛选（菜单联动、最近搜索与发现、标签云、配置初始化） / every scenario of `Example/CYLMenuExample` |
+| Menu | `Example/CYLMenuExample` 全部场景：评价筛选（内存 / 网络 / 数据库）、搜索分类、样式、动效（Lottie / PAG / Rive / SVGA / GIF）、查询筛选（菜单联动、最近搜索与发现、标签云、配置初始化） / every scenario of `Example/CYLMenuExample` |
 | New（PlusButton） | TagViewGroup 的编辑页 / TagViewGroup's editor |
 
 ```sh

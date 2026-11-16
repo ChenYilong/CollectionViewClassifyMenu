@@ -4,7 +4,7 @@
 //
 //  标签的两种初始化方式（参照 CYLTabBarController 的 -initWithConfiguration: 与
 //  -initWithConfigurationFile:error:）：配置文件（JSON）与字典（map）。图标使用
-//  CYLTabBarController 的动效引擎（Lottie、PAG、Rive、GIF）。
+//  CYLTabBarController 的动效引擎（Lottie、PAG、Rive、SVGA、GIF）。
 //
 
 import UIKit
@@ -60,6 +60,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
             [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json")] as [String: Any],
             [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
             [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv")] as [String: Any],
+            [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga")] as [String: Any],
             [CYLTagItemKey.image: "system:heart", CYLTagItemKey.selectedImage: "system:heart.fill"] as [String: Any],
             "Text only",
         ]

@@ -107,3 +107,8 @@ CYLTabBarController added SVGA animations. Every example scene that demonstrates
 the Styles animation choice, configuration and menu data, screenshot launch screens, tests) gets the same scene with
 SVGA, on every platform, with the same playback controls (Play all, speed, loop). Details and the core work:
 `issue-progress.md`, "TODO (2026-11-16): SVGA animated icons".
+
+Status: iOS done (2026-11-16): the Animated icons sections `svga` and `svga-dark`, the Styles action `animation.svga`, the
+configuration file and dictionary demos, the launch screens `animations-svga` and `style-svga`, and the tests. SVGA, like
+Rive, plays once at its own speed: CYLTabBarController's SVGA player has no speed or loop API yet. HarmonyOS: done.
+Android, Flutter, React Native, Mini Program: TODO.

@@ -45,6 +45,7 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
             "Lottie": "CYLMenuExample.bundle/Animations/Lottie/tab_home_animate.json",
             "PAG": "pag-ios/0.pag",
             "Rive": "CYLMenuExample.bundle/Animations/Rive/check.riv",
+            "SVGA": "CYLMenuExample.bundle/Animations/SVGA/tab_home.svga",
         ]
         for (library, path) in files {
             let url = resources.appendingPathComponent(path)
@@ -173,6 +174,43 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
             let path = (Bundle.main.resourcePath ?? "") + "/pag-ios/\(name).pag"
             XCTAssertTrue(FileManager.default.fileExists(atPath: path), "CYLTabBarController's PAG tab icon \(name)")
         }
+    }
+
+    /**
+     * SVGA, one for one with Rive: a section of CYLTabBarController's SVGA tab icons and one on the same dark tags as
+     * icons.riv; every file is in the app and gets a view from the SVGA animator.
+     */
+    func testSVGASectionsMirrorTheRiveSections() {
+        let demo = CYLTagAnimationDemoViewController()
+        showInNavigation(demo)
+        demo.view.layoutIfNeeded()
+        let list: CYLTagListView = demo.tagListView
+        let tags = list.probe
+        let source = list.menuDataSource
+        let sections = CYLTagAnimationDemoViewController.sectionIdentifiers()
+        guard let svga = sections.firstIndex(of: "svga"), let svgaDark = sections.firstIndex(of: "svga-dark"),
+              let riveIcons = sections.firstIndex(of: "rive-icons") else {
+            return XCTFail("SVGA sections in \(sections)")
+        }
+        XCTAssertEqual(svga, riveIcons + 1, "SVGA follows Rive")
+        XCTAssertEqual(source?.numberOfSectionsInMenu(), sections.count)
+        XCTAssertNil(source?.menuStyle?(forSection: svga), "The list's style")
+        let dark = source?.menuStyle?(forSection: svgaDark)
+        XCTAssertTrue(dark?.normalAppearance.backgroundColor.cgColor == source?.menuStyle?(forSection: riveIcons)?
+            .normalAppearance.backgroundColor.cgColor, "The dark tags of icons.riv")
+        for section in [svga, svgaDark] {
+            let count = source?.menuNumberOfItems(inSection: section) ?? 0
+            XCTAssertGreaterThan(count, 0)
+            list.scroll(toSection: section, animated: false)
+            tags.layOut()
+            for item in 0..<count {
+                let url = source?.menuAnimationURLForItem?(at: ip(item, section))
+                XCTAssertEqual(url?.pathExtension, "svga")
+                XCTAssertTrue(FileManager.default.fileExists(atPath: url?.path ?? ""), "\(String(describing: url))")
+                XCTAssertNotNil(tags.tagButton(at: ip(item, section))?.animationView, "SVGA view for \(url?.lastPathComponent ?? "")")
+            }
+        }
+        captureScreen(named: "test-animation-svga-sections")
     }
 
     /**

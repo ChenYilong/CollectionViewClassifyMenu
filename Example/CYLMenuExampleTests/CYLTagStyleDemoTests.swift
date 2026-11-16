@@ -50,7 +50,7 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         let demo = CYLTagStyleDemoViewController()
         let navigation = showInNavigation(demo)
         let tags = demo.tagListView.probe
-        for library in ["lottie", "gif", "pag", "rive"] {
+        for library in ["lottie", "gif", "pag", "rive", "svga"] {
             demo.performAction("animation." + library)
             tags.layOut()
             XCTAssertEqual(demo.animationLibrary, library)
