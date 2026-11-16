@@ -1,10 +1,11 @@
+import { resourceManager } from '@kit.LocalizationKit';
 import { cylFormat } from '../samples/SampleSupport';
 import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
  * 场景一（商品页）：只展示两行评价关键词的预览，点击进入评价页 (iOS CYLProductViewController, the root of the first tab).
  */
 import {
-  CYLColor, CYLEdgeInsets, CYLIndexPath, CYLMenuFoldStyle, CYLMenuSelectionMode, CYLTagListState, CYLTagListView
+  CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLIndexPath, CYLTagAppearance, CYLMenuFoldStyle, CYLMenuSelectionMode, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
 import { CYLExampleMenuItem, CYLExampleMenuSection, CYLExampleMenuSource } from '../shell/CYLExampleMenuSource';
@@ -31,6 +32,22 @@ export struct CYLProductPage {
     style.sectionInsets = new CYLEdgeInsets(4, 0, 12, 0);
     const view = this.previewView;
     style.backgroundColor = CYLColor.CLEAR; // the cell's color shows through, light or dark
+    // Dark chips in dark mode (the root page follows the color mode, E2): the light gray chips stayed light on black.
+    let dark = false;
+    try {
+      dark = this.getUIContext().getHostContext()?.resourceManager.getConfigurationSync().colorMode ===
+        resourceManager.ColorMode.DARK;
+    } catch (error) {
+      dark = false;
+    }
+    if (dark) {
+      [style.normalAppearance, style.disabledAppearance].forEach((a: CYLTagAppearance) => {
+        a.backgroundColor = CYLColor.white(0.17);
+        a.borderColor = CYLColor.white(0.28);
+      });
+      style.setTitleTextAttributes(CYLFont.systemFont(12), CYLColor.white(0.85), CYLControlState.NORMAL);
+      style.setTitleTextAttributes(CYLFont.systemFont(12), CYLColor.white(0.45), CYLControlState.DISABLED);
+    }
     view.style = style;
     view.selectionMode = CYLMenuSelectionMode.none;
     view.showsSectionHeaders = false;
