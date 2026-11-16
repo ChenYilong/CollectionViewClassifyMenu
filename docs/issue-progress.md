@@ -35,6 +35,19 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-16): HarmonyOS bug: the menu linkage filter icon is nearly invisible
+
+- **Bug:** HarmonyOS example, page "菜单选择 · 数据库联动" (`CYLMenuLinkagePage`): the filter button at the top left of the
+  title bar (image `menuLinkageFilter`, bounds [49,175][126,252] px) is drawn almost the color of the bar. Measured on
+  `docs/assets/harmonyos-push-query-menu-linkage.jpeg` (2026-11-16 10:36 emulator time): darkest icon pixel
+  rgb(249, 249, 249) on a background of luminance 0.958, a contrast of **1.01 : 1**; WCAG 2.1 (1.4.11, non-text
+  contrast) asks for at least 3 : 1. "重置" (Reset) on the same bar measures 4.73 : 1. Users with normal or low vision
+  cannot see the control that opens the regions and dishes filter.
+- **Expected:** the filter icon in the iOS example's tint (the core's `cyl_filter_normal` / `cyl_filter_modified`
+  images, gray when no filter is set, highlighted when one is), at 3 : 1 or more.
+- **Owner:** the HarmonyOS port's session (winCollectionViewClassifyMenu); reported 2026-11-16.
+- **Prompt (verbatim):** "flag the filter icon"
+
 ### DONE (2026-11-16, logged as TODO the same day): commit and push after every answer on a feature branch
 
 - **Context:** the pull-request rule of the previous request (`7e11ae6`) is repeated, with one addition: after every
