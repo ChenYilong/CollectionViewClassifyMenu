@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 26 / 34 = 76.5 / 100** (round 2 added 8 rows, D1 to D4 and N1 to N4).
+**Score: 41 / 41 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -90,17 +90,34 @@ Traditional Chinese part of T11 (rows D1 to D4).
 
 | # | Issue | Status |
 | --- | --- | --- |
-| D1 | CYLTabBarController: a wide badge still covers its icon (the "3" on 消息 in the before/after screenshot): the badge is still centred on the icon's corner (`markAnchor 50%`) | TODO |
-| D2 | CYLTabBarController: FlatDesign with a skin is still washed out to gray: `CYLFlatDesignTabBarModifier` never resets the blur of the default look (PR #804 not merged) | TODO |
-| D3 | CYLTabBarController: no Traditional Chinese for the 35 HarmonyOS-only keys (`scripts/harmonyos-l10n.json` has no `zh-Hant`), so zh-Hant devices show English | TODO |
-| D4 | CYLTabBarController: the demo list still has no room for the raised plus button: with the Space skin the comet plus icon covers the last row ("…tem 背景色") | TODO |
-| N1 | CYLTabBarController SVGA demo: the tab titles are the configuration file's English ("Home", "Discover", "Message", "Me") in a Chinese UI ("返回", "SVGA Tab 图标（配置文件）") | TODO |
-| N2 | CYLTabBarController SVGA demo: the page body is debug text ("configurations/…json / identifier: home / page: -") | TODO |
-| N3 | CYLTabBarController SVGA demo: the selected title is system blue while the selected SVGA icon is orange (the configuration has no tint, the demo falls back to `#007AFF`) | TODO |
-| N4 | CYLTabBarController (before/after screenshot): the raised plus button's title "发布" sits lower than the other titles | TODO |
+| D1 | CYLTabBarController: a wide badge still covers its icon (the "3" on 消息 in the before/after screenshot): the badge is still centred on the icon's corner (`markAnchor 50%`) | TODO need 模拟器截图验证: fixed in CYLTabBarController `4ee9ac5a` (branch `fix/harmonyos-screenshot-issues-round2`, on `feat/harmonyos-component` 8aff599d): a number or text badge puts its left cap on the icon corner and grows right; a red dot stays centred |
+| D2 | CYLTabBarController: FlatDesign with a skin is still washed out to gray: `CYLFlatDesignTabBarModifier` never resets the blur of the default look (PR #804 not merged) | TODO need 模拟器截图验证: already fixed on `feat/harmonyos-component` 8aff599d (newer than the double-checked 9bca970b): the tint and image branches reset `backgroundBlurStyle` |
+| D3 | CYLTabBarController: no Traditional Chinese for the 35 HarmonyOS-only keys (`scripts/harmonyos-l10n.json` has no `zh-Hant`), so zh-Hant devices show English | TODO need 模拟器截图验证: fixed in CYLTabBarController `4ee9ac5a` (branch `fix/harmonyos-screenshot-issues-round2`, on `feat/harmonyos-component` 8aff599d): zh-Hant for all 46 HarmonyOS-only keys (28 had come in with the merged PRs), resources regenerated, `harmonyos-l10n.py --check` passes |
+| D4 | CYLTabBarController: the demo list still has no room for the raised plus button: with the Space skin the comet plus icon covers the last row ("…tem 背景色") | TODO need 模拟器截图验证: already fixed on 8aff599d: the demo list has `contentEndOffset` (came in with the merged HarmonyOS PRs) |
+| N1 | CYLTabBarController SVGA demo: the tab titles are the configuration file's English ("Home", "Discover", "Message", "Me") in a Chinese UI ("返回", "SVGA Tab 图标（配置文件）") | TODO need 模拟器截图验证: fixed in CYLTabBarController `4ee9ac5a` (branch `fix/harmonyos-screenshot-issues-round2`, on `feat/harmonyos-component` 8aff599d): the shared files' English titles are localization keys (首页 / 发现 / 消息 / 我的, zh-Hant too) |
+| N2 | CYLTabBarController SVGA demo: the page body is debug text ("configurations/…json / identifier: home / page: -") | TODO need 模拟器截图验证: fixed in CYLTabBarController `4ee9ac5a` (branch `fix/harmonyos-screenshot-issues-round2`, on `feat/harmonyos-component` 8aff599d): "配置文件：… / Tab：…" in the device language, the page line only when there is one |
+| N3 | CYLTabBarController SVGA demo: the selected title is system blue while the selected SVGA icon is orange (the configuration has no tint, the demo falls back to `#007AFF`) | TODO need 模拟器截图验证: fixed in CYLTabBarController `4ee9ac5a` (branch `fix/harmonyos-screenshot-issues-round2`, on `feat/harmonyos-component` 8aff599d): without a tint in the file the selected color is the demo's orange `#FF8000`, matching the SVGA icons |
+| N4 | CYLTabBarController (before/after screenshot): the raised plus button's title "发布" sits lower than the other titles | TODO need 模拟器截图验证: already fixed on 8aff599d: tab titles and the plus title both start at `tabBarHeight - 17`; the screenshot shows the "before" |
+
+## Round 3 (2026-11-16): the port's own emulator screenshots
+
+Another session ran this repository's 22-demo HarmonyOS example on a dedicated emulator ("CYL ClassifyMenu Test") with
+`harmony/scripts/screenshots.sh` (commit 2c12f68 on `feat/android-kotlin`, cherry-picked to `feat/harmony`: 29 screenshots
+in `docs/assets/harmonyos-*.jpeg`) and found these defects (`harmony-verification.md` B1, B9, B11, B12).
+
+| # | Issue | Status |
+| --- | --- | --- |
+| P1 | B1: the Chinese root tab titles are cut off ("场景一：评价筛" runs into the next tab) | TODO need 模拟器截图验证: fixed: the title is as wide as its slot, shrinks from 10 to 8 fp, then ends with an ellipsis (`pages/Index.ets`) |
+| P2 | B9 menu linkage: category headers show a huge blurred image and no title | TODO need 模拟器截图验证: fixed: `CYLIndexPathButtonView` gave its icon no size, so the category image filled the header; the icon is now one title line high, `Contain`, never pushing the title out |
+| P3 | B9 menu linkage: selected tags are teal wedges with no visible title | TODO need 模拟器截图验证: fixed: the tag artwork was drawn with a plain `Fill`; it now stretches from its middle (`resizable` slice, half the image each side, as `CYLFilterCollectionCellView`), so the white title sits on teal |
+| P4 | B11 animations: in Chinese and dark mode the Lottie / PAG / Rive tags have no width (thin lines) | TODO need 模拟器截图验证: fixed: the page builds its tag list before any view appears, so it was measured with the canvas fallback, whose `vp` canvas font could give 0 / NaN; the fallback now measures in physical pixels and never returns 0 for text, and `CYLTagListView` drops cached sizes once it has a UI context |
+| P5 | B12 configuration: the 4th chip of the dictionary row (`"image": "system:heart"`, no title) is empty | TODO need 模拟器截图验证: fixed: `system:<SF Symbol>` gave no image on HarmonyOS; the core now maps the symbols the examples use: heart / heart.fill (library SVGs, no system heart exists), globe → `ohos_ic_public_web`, location, checkmark, xmark |
+| P6 | B12: hilog `NapiDefineClass occur exception, className:JPAGImageView` | TODO need 模拟器截图验证: not the cause of P5 (that chip has no PAG); the PAG icons play in the English screenshot. To check on the emulator whether the message comes from libpag registering its classes once per icon |
+| P7 | `screenshots.sh` and `ui-test.sh` call `hdc` without `-t`: with several emulators they fail or pick the wrong one | TODO need 模拟器截图验证: fixed: optional `HDC_TARGET` (e.g. `HDC_TARGET=127.0.0.1:5563`) passes `-t` to every `hdc` call |
 
 ## Score history
 
 - 2026-11-16: table created, 26 issues, all `TODO`. 0 / 26.
 - 2026-11-16: all 26 handled without an emulator: 20 fixed in code (CYLTabBarController #803 and #804, this repository), 1 already fixed (`3fbaf21`), 5 explained (demo animations caught mid-frame, the replaced example, iOS behavior). 26 / 26 = 100 / 100, every row `TODO need 模拟器截图验证`.
 - 2026-11-16: round 2: double-check of CYLTabBarController and the new screenshots, 8 rows added. 26 / 34 = 76.5 / 100.
+- 2026-11-16: round 2 handled (5 fixed in CYLTabBarController `4ee9ac5a`, 3 already fixed on 8aff599d); round 3 added 7 rows from the port's emulator screenshots, all handled. 41 / 41 = 100 / 100.

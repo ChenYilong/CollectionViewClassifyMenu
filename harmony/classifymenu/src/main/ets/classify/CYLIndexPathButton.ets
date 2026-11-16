@@ -207,6 +207,8 @@ export struct CYLIndexPathButtonView {
   button: CYLIndexPathButton = new CYLIndexPathButton();
   onTap?: (button: CYLIndexPathButton) => void;
   @State private pressed: boolean = false;
+  /** `resizableImage(withCapInsets:)`: half the background image on each side, as `CYLFilterCollectionCellView`. */
+  @State private slice: EdgeWidths = { top: 0, left: 0, bottom: 0, right: 0 };
 
   build() {
     Stack({
@@ -219,10 +221,27 @@ export struct CYLIndexPathButtonView {
           .width('100%')
           .height('100%')
           .objectFit(ImageFit.Fill)
+          // [EN] The tag artwork stretches from its middle (iOS resizableImage with cap insets); a plain Fill stretched
+          //      the whole capsule into a wedge and hid the white title of a selected tag.
+          // [CN] 标签背景图从中间拉伸（iOS 带 capInsets 的 resizableImage）；直接 Fill 会把整张胶囊图拉成楔形并盖住选中标签的白色标题。
+          .resizable({ slice: this.slice })
+          .onComplete((event) => {
+            if (event !== undefined) {
+              const vertical = Math.floor(this.getUIContext().px2vp(event.height) / 2);
+              const horizontal = Math.floor(this.getUIContext().px2vp(event.width) / 2);
+              this.slice = { top: vertical, left: horizontal, bottom: vertical, right: horizontal };
+            }
+          })
       }
       Row() {
         if (this.button.imageFor(this.button.stateFlags(this.pressed)) !== undefined) {
+          // [EN] As tall as the title line at most and never wider than it needs (UIButton's imageView keeps the image
+          //      at its point size); without a size a header's category image filled the whole header, blurred.
+          // [CN] 最高为一行标题高度，宽度按比例（与 UIButton 的 imageView 一致）；未设尺寸时分组头的分类图片会铺满整个头部并模糊。
           Image(this.button.imageFor(this.button.stateFlags(this.pressed))).offset({ x: this.button.imageOffsetX })
+            .height(Math.ceil(this.button.font.size * 1.4))
+            .objectFit(ImageFit.Contain)
+            .flexShrink(0)
             .accessibilityLevel('no')
         }
         if (this.button.titleFor(this.button.stateFlags(this.pressed)) !== undefined) {
@@ -232,6 +251,7 @@ export struct CYLIndexPathButtonView {
             .fontColor(this.button.titleColorFor(this.button.stateFlags(this.pressed)))
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .flexShrink(1)
             .offset({ x: this.button.titleOffsetX })
         }
       }

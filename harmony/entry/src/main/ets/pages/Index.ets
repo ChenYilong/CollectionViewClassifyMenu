@@ -91,9 +91,17 @@ struct Index {
           .width(26)
           .height(26)
           .fillColor(this.tab === index ? '#007AFF' : '#8E8E93')
+        // [EN] Long titles ("场景一：评价筛选") stay inside their slot: they shrink down to 8 fp, then end with an ellipsis
+        //      (UITabBarItem truncates too); before, they ran into the next tab. [CN] 长标题保持在自己的位置内：先缩小到 8 fp，再以省略号结尾。
         Text(CYLExampleLocalizedString(TABS[index].title))
           .fontSize(10)
+          .maxFontSize(10)
+          .minFontSize(8)
           .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .padding({ left: 2, right: 2 })
           .fontColor(this.tab === index ? '#007AFF' : '#8E8E93')
       }
       .justifyContent(FlexAlign.Center)
