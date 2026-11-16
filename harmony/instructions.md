@@ -7,3 +7,5 @@
   `harmony/scripts/unit-test.sh`; parity: `docs/harmony.md`.
 - Commits: `git cz` style, English only, no Chinese characters (AGENTS.md "Commit messages: git cz style, English
   only"; `scripts/check-commit-message.sh`).
+- Run scripts with bash (`bash harmony/scripts/<name>.sh`), never by pasting their commands into zsh; keep `hdc -t
+  <target>` in a wrapper script or a bash array (AGENTS.md "Running scripts").

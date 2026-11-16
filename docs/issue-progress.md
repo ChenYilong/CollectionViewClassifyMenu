@@ -35,6 +35,26 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-16): emulator pushed pages, script rule, SVGA alignment, PR sync
+
+- **Context:** the HarmonyOS screenshots so far show each demo's first page only; zsh word splitting broke inline
+  measurements; the SVGA demo's icon and title are not centered with each other; the two open PRs (#20
+  `feat/harmony`, #16 `feat/android-kotlin`) drifted again.
+- **Requirements:** (1) run the HarmonyOS example on the emulator, open the pushed (next) pages and add their
+  screenshots to the docs; (2) write in English into the instructions and skills, in a script-execution section
+  (created if missing): prefer bash to run scripts, to avoid zsh's word-splitting errors; (3) fix the SVGA demo so
+  icon and title are centered with each other; (4) cherry-pick between all open PRs so their code stays in sync.
+- **Prompt (verbatim):** "run our HarmonyOS version code on an emulator and push next page update more screenshot in docs
+  写入instructions相关文件，skills相关指令，找到脚本执行的相关章节，没有的话就新建，保证写入成功：全英文写入：优先使用bash 执行脚本 避免以下错误zsh doesn't split $box into words either. Running the same measurement as a bash script.
+  SVGA demo runs incorrectly icon and title not align center with each other
+  将所有处于open状态的pr 互相cherry pick 保持所有pr保持代码同步"
+- **Prompt (English):** run our HarmonyOS code on an emulator, push the next pages and add more screenshots to the docs;
+  write into the instructions files and skills, in the script-execution section (create it if missing, make sure it is
+  written), in English: prefer bash to run scripts, to avoid the error "zsh doesn't split $box into words either.
+  Running the same measurement as a bash script."; the SVGA demo runs incorrectly: icon and title are not centered with
+  each other; cherry-pick between all open PRs so every PR keeps the same code.
+- **Status:** (2) DONE, see AGENTS.md "Running scripts"; (1), (3), (4) in progress.
+
 ### DONE (2026-11-16, logged as TODO the same day): commit messages in git cz style, English only
 
 - **Context:** the commit rule (AGENTS.md "Code and naming", `.agents/skills/cyl-commit/`) asked for English

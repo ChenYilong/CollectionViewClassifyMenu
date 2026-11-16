@@ -47,3 +47,6 @@
 - Commit messages (English rule, AGENTS.md "Commit messages: git cz style, English only"; skill
   `.agents/skills/cyl-commit/`): `git cz` style (`<type>(<scope>): <emoji> <summary>`), the whole message in English, no
   Chinese characters; a non-English prompt is quoted only in the task log here, never in a commit.
+- Running scripts (English rule, AGENTS.md "Running scripts"; skill `.agents/skills/cyl-verify/`): Run scripts with bash,
+  not the interactive shell (zsh does not split `$var` into words, so a command or a list in a variable breaks);
+  use `bash script.sh` or `bash <<'EOF'`, and wrapper scripts or bash arrays for commands with arguments.
