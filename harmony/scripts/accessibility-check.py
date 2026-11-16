@@ -23,7 +23,7 @@ def findings():
                     continue
                 end = n
                 depth = head.count('{') - head.count('}')
-                while end + 1 < len(lines) and (lines[end + 1].lstrip().startswith('.') or depth > 0):
+                while end + 1 < len(lines) and (lines[end + 1].lstrip().startswith(('.', '//')) or depth > 0):
                     end += 1
                     depth += lines[end].count('{') - lines[end].count('}')
                 chain = '\n'.join(lines[n:end + 1])

@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 41 / 41 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 46 / 46 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -115,9 +115,23 @@ in `docs/assets/harmonyos-*.jpeg`) and found these defects (`harmony-verificatio
 | P6 | B12: hilog `NapiDefineClass occur exception, className:JPAGImageView` | TODO need 模拟器截图验证: not the cause of P5 (that chip has no PAG); the PAG icons play in the English screenshot. To check on the emulator whether the message comes from libpag registering its classes once per icon |
 | P7 | `screenshots.sh` and `ui-test.sh` call `hdc` without `-t`: with several emulators they fail or pick the wrong one | TODO need 模拟器截图验证: fixed: optional `HDC_TARGET` (e.g. `HDC_TARGET=127.0.0.1:5563`) passes `-t` to every `hdc` call |
 
+## Round 4 (2026-11-16): pushed pages driven by text on the emulator
+
+Found by the other session while driving the pushed pages by text and accessibility text (f85d2ab, cherry-picked as
+fbb78eb: six pushed-page screenshots, notes in `docs/screenshots.md`).
+
+| # | Issue | Status |
+| --- | --- | --- |
+| Q1 | The plus button (`tab-plus`) exposes no accessibility text, only its description; tapping it leaves the product page showing | TODO need 模拟器截图验证: fixed: the item is one accessibility element (`accessibilityGroup`) read as "查询筛选", and a tap selects its tab (`onClick` sets the Tabs index) |
+| Q2 | Menu linkage: the filter button (image `menuLinkageFilter`) has no text or description; tapping it opens no panel | TODO need 模拟器截图验证: fixed: the image is exposed (`accessibilityLevel('yes')`, text and description), with a 44 vp touch target; the panel's width falls back to the display's when its host is not measured yet (a 0-wide panel looked like no panel) |
+| Q3 | Review list (memory): tapping "好评" does not change the selection (全部 stays, 10 matches) | TODO need 模拟器截图验证: no code change: the chips are labeled with their count ("好评(3)"), so a tap found by the exact text "好评" does not hit the chip; the selection logic (multiple choice, exclusive 全部) is the tested one (`ClassifyAndFilter` host tests). To check by tapping "好评(3)" |
+| Q4 | Search tab: tapping "找人" in the hint line opens nothing | TODO need 模拟器截图验证: not a defect: "找人" is part of the hint sentence "按分类浏览热门标签：找人、动态、八卦、职位", plain text as on iOS; the categories are tabs inside 搜索分类 |
+| Q5 | Crash: the animated icons screen crashes within seconds (`libohos_rive.so`: `EGLWorkerImpl::destroy` → `eglDestroySurface`, a null pointer while a Rive view is disposed) | TODO need 模拟器截图验证: mitigated: @ohos/rive 1.0.4 (the newest) crashes when a Rive view is disposed; a tag list rebuilds an item on every layout, selection or speed change (its key holds them), which disposed Rive views many times a second. Rive views are now pooled (`CYLRiveNodePool`: built once in a `BuilderNode`, shown through a `NodeContainer`, returned detached instead of disposed), so the crashing path is no longer taken |
+
 ## Score history
 
 - 2026-11-16: table created, 26 issues, all `TODO`. 0 / 26.
 - 2026-11-16: all 26 handled without an emulator: 20 fixed in code (CYLTabBarController #803 and #804, this repository), 1 already fixed (`3fbaf21`), 5 explained (demo animations caught mid-frame, the replaced example, iOS behavior). 26 / 26 = 100 / 100, every row `TODO need 模拟器截图验证`.
 - 2026-11-16: round 2: double-check of CYLTabBarController and the new screenshots, 8 rows added. 26 / 34 = 76.5 / 100.
 - 2026-11-16: round 2 handled (5 fixed in CYLTabBarController `4ee9ac5a`, 3 already fixed on 8aff599d); round 3 added 7 rows from the port's emulator screenshots, all handled. 41 / 41 = 100 / 100.
+- 2026-11-16: round 4 added 5 rows from the pushed pages (Q1 to Q5), all handled. 46 / 46 = 100 / 100.
