@@ -108,6 +108,38 @@ verify the behavior and update the applicable documentation.
   defect was example-only). Mention that document in the issue's row of its
   progress table.
 
+## Parity tables and the score loop
+
+- When a feature set must be compared with another platform, another
+  component or an upstream project (for example the Android core against the
+  iOS core), keep a three-column table in the most related document in
+  `docs/` (insert it when the document exists, create the document when it does
+  not): column 1 is the source API or feature, column 2 its description,
+  column 3 the counterpart API or feature, `TODO` by default.
+- Score: full marks (100) when column 3 has no `TODO`, 0 when every row is
+  `TODO`, proportional in between (rows with a counterpart / all rows x 100).
+  Write the score above the table and keep a score history.
+- Loop until 100:
+  1. Search the existing code for every `TODO` row and fill in the matching
+     API or feature (a platform type maps to the platform's own type, e.g. an
+     Android `CYLRect` to iOS `CGRect`).
+  2. Score.
+  3. Work through the remaining `TODO` rows one by one: implement the missing
+     API or feature, and replace the `TODO` with the implementation.
+  4. Score again, and repeat from step 1.
+- Implement in the core first (AGENTS.md "Fix issues in the core first"): same
+  logic, names and behavior as the source platform, so both cores stay
+  consistent; then show the usage in the example, ported one for one from the
+  source platform's example (for example drag to reorder, or a tag with an
+  icon, a title and an always-shown delete icon whose deletion updates the data
+  source and relayouts the list).
+- At 100, make the reverse table (column 1 the other platform's API) with its
+  own score, and run the same loop.
+- Generated tables (for example `docs/android-ios-api.md` from
+  `android/scripts/android_public_api.py`, `docs/android-api.md` from
+  `android/scripts/ios_public_api.py`) are never edited by hand: change the
+  maps or the code, then regenerate.
+
 ## Swift examples and a Swift-friendly core
 
 - Every iOS example is written in Swift, tests included: `Example/CYLMenuExample`,
