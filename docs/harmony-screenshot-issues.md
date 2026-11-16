@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 70 / 71 = 99 / 100** (open: E2).
+**Score: 72 / 73 = 99 / 100** (open: E2).
 
 ## Task log
 
@@ -205,8 +205,8 @@ was not run here.
 | E2 | `dark-root`: launched with `cylColorMode dark`, the product page and tab bar stay light; only the status bar is dark (`assets/harmonyos-verify-sheet-24.jpeg`) | TODO: open, not fixed: the example's screens use fixed light colors in every color mode (S2); only the animation page follows dark mode (Z3, Z4, Z6). Dark mode for the root, product page and tab bar is a separate task |
 | E3 | `screenshots.sh root`: the first shot after install shows the launcher, the app had not appeared yet (`assets/harmonyos-verify-sheet-0.jpeg`) | TODO need 模拟器截图验证: fixed: `screenshots.sh` waits, up to 10 s more, until the app's window is listed by WindowManagerService before each shot |
 | E4 | English animation screen: the section titles "Lottie（带图片资源与占位图）", "Lottie（绿色主题）" stay Chinese (`assets/harmonyos-verify-a2f8561.jpeg`, en-animations) | DONE (emulator, `2baf415`, `assets/harmonyos-verify-e4.jpeg`) |
-| E5 | English animation screen: the tag titles stay Chinese (首页, 消息, 我的, 资讯, 发现, 健康, 动态), `assets/harmonyos-verify-e4.jpeg` | TODO |
-| E6 | `screenshots.sh` `WAIT=8` is too short for the animation screen: at 8 s the tags are empty boxes with no titles; at 20 s they are drawn (`assets/harmonyos-en-animations.jpeg` vs `assets/harmonyos-verify-e4.jpeg`) | TODO |
+| E5 | English animation screen: the tag titles stay Chinese (首页, 消息, 我的, 资讯, 发现, 健康, 动态), `assets/harmonyos-verify-e4.jpeg` | TODO need 模拟器截图验证: fixed: the screen's tag titles also go through the example's strings (and "列表" was added) |
+| E6 | `screenshots.sh` `WAIT=8` is too short for the animation screen: at 8 s the tags are empty boxes with no titles; at 20 s they are drawn (`assets/harmonyos-en-animations.jpeg` vs `assets/harmonyos-verify-e4.jpeg`) | TODO need 模拟器截图验证: fixed: for the animation screen `screenshots.sh` waits until the layout has a tag cell (`CYLTagListItem-0-0`, up to 20 s), then 2 s for the icons |
 
 Not checked in this run (other apps): R1–R3 (React Native), F1–F3 (Flutter), T1–T12, D1–D4, N1–N4, X2 (CYLTabBarController's HarmonyOS example).
 

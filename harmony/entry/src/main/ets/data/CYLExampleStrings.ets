@@ -4,6 +4,7 @@
 /** The example's strings by language, then key (the Simplified Chinese text). */
 export const CYL_EXAMPLE_STRINGS: Record<string, Record<string, string>> = {
   "en": {
+    "列表": "List",
     "%@ 倍": "%@ times",
     "%ld 行": "%ld rows",
     "1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除": "1. Tap Create to make a tag group\n2. Drag a group to move it\n3. Tap a tag to turn it\n4. Tap the dot for a message\n5. Long-press a group to delete it",
@@ -273,6 +274,7 @@ export const CYL_EXAMPLE_STRINGS: Record<string, Record<string, string>> = {
     "循环播放": "循环播放",
   },
   "zh-Hant": {
+    "列表": "列表",
     "%@ 倍": "%@ 倍",
     "%ld 行": "%ld 行",
     "1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除": "1. 點擊建立按鈕開始建立標籤組\n2. 按住標籤組滑動，調整位置\n3. 點擊單個標籤，調整該標籤的方向\n4. 點擊中心圓彈出提示\n5. 長按標籤組刪除",

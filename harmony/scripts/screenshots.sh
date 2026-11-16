@@ -78,6 +78,16 @@ echo "$SCREENS" | while IFS='|' read -r name route param language mode; do
     $HDC shell "hidumper -s WindowManagerService -a '-a'" 2>/dev/null | grep -q "$BUNDLE" && break
     sleep 1
   done
+  # The animation screen draws its tags (and their icons) late: at WAIT=8 the shot had empty boxes. Wait until the
+  # layout has a tag title cell, up to 20 s, then 2 s more for the icons.
+  if [ "$route" = "CYLTagAnimationDemoViewController" ]; then
+    for _ in $(seq 1 20); do
+      $HDC shell "uitest dumpLayout -p /data/local/tmp/cyl-layout.json" >/dev/null 2>&1
+      $HDC shell "cat /data/local/tmp/cyl-layout.json" 2>/dev/null | grep -q "CYLTagListItem-0-0" && break
+      sleep 1
+    done
+    sleep 2
+  fi
   $HDC shell "snapshot_display -f /data/local/tmp/cyl-shot.jpeg" >/dev/null
   $HDC file recv /data/local/tmp/cyl-shot.jpeg "$OUT/harmonyos-$name.jpeg" >/dev/null
   echo "harmonyos-$name.jpeg"
