@@ -277,7 +277,11 @@ export struct CYLMenuLinkagePage {
     const rows: CYLLinkageRow[] = results.length === 0 ? [empty] :
     results.map((row: CYLPlaceRow): CYLLinkageRow => ({
       title: row.name,
-      detail: `${row.category} · ${CYLDemoDataSource.shortTitle(row.tag)} · ${CYLDemoDataSource.shortTitle(row.region)} · ★${row.rating.toFixed(1)} · ¥${row.price}`
+      // The dish and the region only when the name does not already say them ("日式拉面 · 北京" repeated both).
+      detail: [row.category, CYLDemoDataSource.shortTitle(row.tag), CYLDemoDataSource.shortTitle(row.region)]
+        .filter((part: string, index: number) => index === 0 || !row.name.includes(part))
+        .concat([`★${row.rating.toFixed(1)}`, `¥${row.price}`])
+        .join(' · ')
     }));
     CYLLinkageResults.update(status, rows);
     this.menu.updateMenuLayout();

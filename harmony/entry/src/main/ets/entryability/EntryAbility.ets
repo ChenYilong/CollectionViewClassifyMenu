@@ -19,8 +19,8 @@ export default class EntryAbility extends UIAbility {
     this.applyLaunchOptions();
     const screen = CYLLaunchOptions.takeScreen();
     if (screen !== '') {
-      CYLDemoNav.stack.clear(false);
-      CYLDemoNav.push(screen, CYLLaunchOptions.screenParam ?? new Object());
+      // The root page opens it: a tab's route selects the tab, any other route is pushed.
+      AppStorage.setOrCreate('cylLaunchScreen', screen);
     }
   }
 
