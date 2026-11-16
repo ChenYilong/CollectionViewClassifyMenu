@@ -480,6 +480,7 @@ tags: [issues, ui, cocoapods, progress]
 - TODO: Rive on a real HarmonyOS device still uses `RendererType.Rive` and has not been tested.
 - Z6 pass (`8529951`, 12:29): the caption is readable in dark mode (`assets/harmonyos-8529951-animation-dark.jpeg`).
 
-### TODO (2026-11-16, `feat/harmony`): verify the "TODO need 模拟器截图验证" rows on the emulator
+### DONE (2026-11-16, `feat/harmony`): verify the "TODO need 模拟器截图验证" rows on the emulator (ClassifyMenu rows)
 - Prompt (verbatim): "fix TODO need 模拟器截图验证" (with the other session's request: verify every such row of `docs/harmony-screenshot-issues.md` against the head, DONE with commit and screenshot, list the rows still wrong).
 - Plan: build the head, run `harmony/scripts/screenshots.sh` in light and dark on emulator `CYL ClassifyMenu Test` (127.0.0.1:5563), check each ClassifyMenu row (C, P, Q, S, V, W, X1, Y, Z); then the React Native / Flutter HarmonyOS rows (R, F) and the CYLTabBarController HarmonyOS example rows (T, D, N, X2).
+- Result: 34 ClassifyMenu rows DONE with screenshots; C5 and P1 still wrong; C7, P3, P6, V3 not judged; new E1–E3 (screenshot routes, dark root). R, F, T, D, N, X2 not checked (other apps).
