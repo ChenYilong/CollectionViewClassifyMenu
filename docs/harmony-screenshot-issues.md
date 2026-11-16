@@ -184,7 +184,7 @@ was not run here.
 | Z4 | Animation screen in dark mode: the nav bar ("动效图标") stays light | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: `CYLDemoBar(followsColorMode: true)` uses color resources with dark variants on this page |
 | Z5 | Once, first dark launch after install: blank tags and an app freeze (THREAD_BLOCK_6S in PipelineContext::AddWindowStateChangedCallback); not reproduced in three runs | DONE (emulator, `30f18b4`, `assets/harmonyos-verify-z5-e2.jpeg`): fresh install, six openings (light, dark, English, twice each) with a scroll, no freeze or fault log |
 | Z6 | Animation screen in dark mode: the caption "动效引擎：… 已链接" is dim gray on black | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: a color resource, #6E6E73 light / #AEAEB2 dark |
-| E7 | Root page in dark mode: the review tag chips stay light gray | TODO need 模拟器截图验证: fixed: in dark mode the product page's review chips are dark gray with light titles (the color mode is read when the page appears; the selected chip stays orange) |
+| E7 | Root page in dark mode: the review tag chips stay light gray | DONE (emulator, `2b5a9bc`, `assets/harmonyos-verify-e7.jpeg`): dark gray chips with light titles in dark mode; light mode unchanged |
 
 ## Score history
 
