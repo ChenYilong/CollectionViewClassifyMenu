@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 56 / 56 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 58 / 58 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -165,6 +165,17 @@ controls read "更多 ⌄". Still wrong:
 | W2 | Opening the animation screen in dark mode and scrolling crashed the emulator host twice (Emulator.log "MinidumpCB") | TODO need 模拟器截图验证: the pool kept every Rive view's EGL surface alive; reverted with W1. Rive churn is reduced instead: animated icons are created only once the list knows its width (the width-0 pass created Rive views only to dispose them at once), and a Rive item's key leaves out the speed (@ohos/rive has none), so the slider no longer rebuilds Rive items. @ohos/rive's dispose crash itself stays a library bug |
 | W3 | The menu-linkage filter panel looks greyed and blurred, as if under the dimming layer | TODO need 模拟器截图验证: fixed: the panel had no tint of its own, so its `backdropBlur` showed the dimming layer through it; it now has a light frosted tint (`#E6FFFFFF`), as iOS's blurred capture |
 | W4 | The plus button exposes no accessibility *text* in `dumpLayout`, so `ON.text("查询筛选")` cannot find it | TODO need 模拟器截图验证: not a defect: UiTest's text is a component's own text content; an image-only item's `accessibilityText` ("查询筛选", read by the screen reader since Q1) is not it. `cylFindAccessible` falls back to the id `tab-plus` |
+
+## Round 8 (2026-11-16): double-check and newest screenshots
+
+Verified on the emulator by CYLTabBarController's screenshots: N1 / N2 (localized SVGA demo titles and page), N3 (orange
+selected title), T1 ("NEW" on one line). The local machine has no emulator instance (hdc lists no device), so the code
+was not run here.
+
+| # | Issue | Status |
+| --- | --- | --- |
+| X1 | Search discover: the recent-searches fold control is a square box while the tags are capsules | TODO need 模拟器截图验证: fixed: the inline fold cell drew its raw corner radius (0 = square); it now uses the tags' rule (0 = capsule) |
+| X2 | CYLTabBarController: long navigation titles ("推入到系统 UITabBarController（另一个加号按钮）") wrap to two lines | TODO need 模拟器截图验证: fixed on CYLTabBarController branch `fix/harmonyos-nav-title`: page titles are one line with an ellipsis |
 
 ## Score history
 
