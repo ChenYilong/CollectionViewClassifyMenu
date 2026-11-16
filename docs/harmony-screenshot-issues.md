@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 75 / 75 = 100 / 100** (no plain `TODO` left).
+**Score: 76 / 76 = 100 / 100** (no plain `TODO` left).
 
 ## Task log
 
@@ -186,7 +186,7 @@ was not run here.
 | Z6 | Animation screen in dark mode: the caption "动效引擎：… 已链接" is dim gray on black | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: a color resource, #6E6E73 light / #AEAEB2 dark |
 | E7 | Root page in dark mode: the review tag chips stay light gray | DONE (emulator, `2b5a9bc`, `assets/harmonyos-verify-e7.jpeg`): dark gray chips with light titles in dark mode; light mode unchanged |
 | E8 | English review list: the segment "内存筛选" and the chip "手机套不错(3)" stay Chinese (`assets/harmonyos-verify-p3-v3.jpeg`, right) | DONE (emulator, `049980e`, `assets/harmonyos-verify-e8.jpeg`): English segment and chips; "Nice case(3)" filters to 3 in memory, network and SQLite |
-| E9 | CYLTabBarController with #809 + #810: the home navigation title "首页" is no longer centered (left of center in the flat and Liquid Glass bars), `assets/harmonyos-verify-cyltabbar-810.jpeg` | TODO |
+| E9 | CYLTabBarController with #809 + #810: the home navigation title "首页" is no longer centered (left of center in the flat and Liquid Glass bars), `assets/harmonyos-verify-cyltabbar-810.jpeg` | DONE (not a defect: measured in `assets/harmonyos-verify-cyltabbar-810.jpeg`, "首页" is centred on the screen (centre about 372 of a 747 px panel; 1865 of 1494–2240). It looks left of centre because the 扁平样式 / 液态玻璃 buttons sit next to it on the left, with only 换肤 on the right; `cylNavTitlePadding` centres the title when 48 vp are free. #809 does not change the home page (only six other pages' titles)) |
 
 ## Score history
 
