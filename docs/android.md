@@ -426,6 +426,8 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | batch D | The classify menu and the multiple filter: `CYLClassifyMenuViewController` and `CYLFilterBaseController` / `CYLMultipleFilterController` as Fragments, `CYLFilterHeaderView`, `CYLCollectionViewCell`, `CYLIndexPathButton`, `CYLRightImageButton`, `CYLFilterParamsTool`, `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`; the categories as extension functions (`View` frame helpers, border, corners, overlay layers, capture; `Bitmap.cyl_blurredImageWithRadius`; `List` / `Map` descriptions; `TextView` button styles); the iOS images copied into the resource bundle; 27 unit tests | 678 / 678 | 100.0 |
 | correction | The table missed the pod's other source pattern, `TagCollectionView/TagCollectionView` (`CYLTagView`, `CYLTagGroup`, `CYLTagModel`, `CYLTagCell`, `CYLTagHeaderCell`): 31 more symbols | 678 / 709 | 95.6 |
 | TagCollectionView | Those five classes in Kotlin (`CYLTagView.kt`); the TagCollectionView demo is the merged example's Tags tab; 29 unit tests | 709 / 709 | 100.0 |
+| `07cc52b` | Android -> iOS table ([android-ios-api.md](android-ios-api.md)): 89.4 -> 611 / 611; new iOS core APIs (section expansion and visible counts, ripple and panel state, appearance resets, app tint, `kTagCollectionView*`, accessibility identifier lookup) | 611 / 611 (Android -> iOS) | 100.0 |
+| `56174a3` | `ios_public_api.py` reads the Swift sources (the Objective-C headers were deleted by the Swift migration, so the old 709 / 709 was stale): 585 / 731 = 80.0; renamed symbols mapped (old Objective-C keys kept as aliases), protocol conformance left out | 731 / 731 | 100.0 |
 
 ## Screenshots: Classify and Filter tabs (iOS demo app on Android)
 
@@ -464,8 +466,6 @@ table as the iOS example's menu linkage. The plus button is raised (its top abov
 | Menu tab, tag cloud: in code (continents, detailed tag, styled tags) and from CYLTagListViewTags; "Asia" tapped | <img src="assets/android-menu-tag-cloud.png" width="300" alt="Tag cloud"> |
 | Menu tab, configuration: from animated-tags.json (Lottie, PAG, Rive, GIF, symbol, disabled) and from a dictionary | <img src="assets/android-menu-configuration.png" width="300" alt="Configuration"> |
 | Filter tab after Apply: the icon shows a set filter; region IN (北京) AND tag IN (川菜), 1 of 83 places | <img src="assets/android-filter-results.png" width="360" alt="Filter results from SQLite"> |
-| `07cc52b` | Android -> iOS table ([android-ios-api.md](android-ios-api.md)): 89.4 -> 611 / 611; new iOS core APIs (section expansion and visible counts, ripple and panel state, appearance resets, app tint, `kTagCollectionView*`, accessibility identifier lookup) | 611 / 611 (Android -> iOS) | 100.0 |
-| this change | `ios_public_api.py` reads the Swift sources (the Objective-C headers were deleted by the Swift migration, so the old 709 / 709 was stale): 585 / 731 = 80.0; renamed symbols mapped (old Objective-C keys kept as aliases), protocol conformance left out | 731 / 731 | 100.0 |
 
 ## Screenshots
 
