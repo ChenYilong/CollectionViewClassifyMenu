@@ -26,6 +26,8 @@ export function reviewFilterStyle(): CYLMenuStyle {
   const font = CYLFont.systemFont(12);
   style.setTitleTextAttributes(font, CYLColor.white(0.3), CYLControlState.NORMAL);
   style.setTitleTextAttributes(font, CYLColor.WHITE, CYLControlState.SELECTED);
+  // The icon follows the title on the orange selected chip (an orange icon on orange was invisible).
+  style.setIconColor(CYLColor.WHITE, CYLControlState.SELECTED);
   style.setTitleTextAttributes(font, CYLColor.white(0.7), CYLControlState.DISABLED);
   style.imageSize = new CYLSize(13, 13);
   style.imageTitleSpacing = 3;
