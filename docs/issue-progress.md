@@ -35,7 +35,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-16): more HarmonyOS pushed-page screenshots
+### DONE (2026-11-16): more HarmonyOS pushed-page screenshots
 
 - **Context:** `screenshots.md` has six pushed pages; more screens open further pages (query scenarios, review
   filters, tag clouds, image tags). The owner's next fix (`c6a8a5c`: plus and filter buttons, Rive pooling) is not
@@ -43,6 +43,8 @@ tags: [issues, ui, cocoapods, progress]
 - **Requirements:** run the HarmonyOS example on the emulator, open the next (pushed) pages, add their screenshots to
   the docs.
 - **Prompt (verbatim):** "run our HarmonyOS version code on an emulator and push next page update more screenshot in docs"
+- **Result:** six more pushed pages in `screenshots.md` (query scenarios ×3, image-tag create, tag-cloud RecyclerView and
+  sub-page; 12 pushed pages in all); the review filter "好评(9)" still does not filter (reported to the port's owner).
 
 ### DONE (2026-11-16): emulator pushed pages, script rule, SVGA alignment, PR sync
 
