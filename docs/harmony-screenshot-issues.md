@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 26 / 26 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 26 / 34 = 76.5 / 100** (round 2 added 8 rows, D1 to D4 and N1 to N4).
 
 ## Task log
 
@@ -76,7 +76,31 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 | F2 | Flutter: the result summary "全部 · 全部 · 全部 · 83" has no labels (iOS: "分类：… · 地区：… · 菜品：…"), and is Chinese in an English screen ("Classify menu", "Animated icons") | TODO need 模拟器截图验证: fixed: labelled summary from the iOS strings ("Category: All · Regions: All · Dishes: All · 83 matches"), and every text of the example localized (`lib/strings.dart`, generated from the iOS bundle by `tool/export_strings.py`) |
 | F3 | Flutter: no tag is shown as selected in the classify menu although the results are for "全部" | TODO need 模拟器截图验证: not a defect: as on iOS, nothing is selected until a tag is tapped; the summary now says so ("Category: All") |
 
+## Round 2 (2026-11-16 afternoon): double-check and new screenshots
+
+Double-check of CYLTabBarController's latest `feat/harmonyos-component` (`9bca970b`), and the screenshots added since
+round 1: `harmonyos-flatdesign-tint-fixed.png` (47f87739), `harmonyos-port-svga-demo-page.png`,
+`harmonyos-port-svga-demo-row.png`, `harmonyos-port-svga-demo-taps.png` (11bd1102),
+`harmonyos-svga-icon-title-alignment-before-after.png` (1aea05d1). Prompt of this round: the same as round 1, starting
+with 「CYLTabBarController fixed their issues please doublecheck。」.
+
+Double-check result on `9bca970b`: T1 fixed (measured width, one line); T4 fixed another way (the icon box sizes to
+its icon, the title top at `tabBarHeight - 17` like the plus title); T6, T12 fixed; still open: T3, T8, T10, and the
+Traditional Chinese part of T11 (rows D1 to D4).
+
+| # | Issue | Status |
+| --- | --- | --- |
+| D1 | CYLTabBarController: a wide badge still covers its icon (the "3" on 消息 in the before/after screenshot): the badge is still centred on the icon's corner (`markAnchor 50%`) | TODO |
+| D2 | CYLTabBarController: FlatDesign with a skin is still washed out to gray: `CYLFlatDesignTabBarModifier` never resets the blur of the default look (PR #804 not merged) | TODO |
+| D3 | CYLTabBarController: no Traditional Chinese for the 35 HarmonyOS-only keys (`scripts/harmonyos-l10n.json` has no `zh-Hant`), so zh-Hant devices show English | TODO |
+| D4 | CYLTabBarController: the demo list still has no room for the raised plus button: with the Space skin the comet plus icon covers the last row ("…tem 背景色") | TODO |
+| N1 | CYLTabBarController SVGA demo: the tab titles are the configuration file's English ("Home", "Discover", "Message", "Me") in a Chinese UI ("返回", "SVGA Tab 图标（配置文件）") | TODO |
+| N2 | CYLTabBarController SVGA demo: the page body is debug text ("configurations/…json / identifier: home / page: -") | TODO |
+| N3 | CYLTabBarController SVGA demo: the selected title is system blue while the selected SVGA icon is orange (the configuration has no tint, the demo falls back to `#007AFF`) | TODO |
+| N4 | CYLTabBarController (before/after screenshot): the raised plus button's title "发布" sits lower than the other titles | TODO |
+
 ## Score history
 
 - 2026-11-16: table created, 26 issues, all `TODO`. 0 / 26.
 - 2026-11-16: all 26 handled without an emulator: 20 fixed in code (CYLTabBarController #803 and #804, this repository), 1 already fixed (`3fbaf21`), 5 explained (demo animations caught mid-frame, the replaced example, iOS behavior). 26 / 26 = 100 / 100, every row `TODO need 模拟器截图验证`.
+- 2026-11-16: round 2: double-check of CYLTabBarController and the new screenshots, 8 rows added. 26 / 34 = 76.5 / 100.
