@@ -372,6 +372,36 @@ struct CYLSVGAIconView {
   }
 }
 
+/**
+ * Animated icons are created one at a time, CREATE_INTERVAL ms apart: the animation screen created all of them in one
+ * frame, decoding every GIF / SVGA / PAG / image on the main thread at once, and froze (appfreeze THREAD_BLOCK_6S in
+ * ImageSourceNapi::Constructor; issue Z5).
+ */
+const CREATE_INTERVAL: number = 50;
+const createQueue: (() => void)[] = [];
+let createTimer: number = -1;
+
+function enqueueCreate(create: () => void): void {
+  createQueue.push(create);
+  if (createTimer < 0) {
+    createTimer = setInterval(() => {
+      const next = createQueue.shift();
+      next?.();
+      if (createQueue.length === 0) {
+        clearInterval(createTimer);
+        createTimer = -1;
+      }
+    }, CREATE_INTERVAL);
+  }
+}
+
+function dequeueCreate(create: () => void): void {
+  const index = createQueue.indexOf(create);
+  if (index >= 0) {
+    createQueue.splice(index, 1);
+  }
+}
+
 @Component
 export struct CYLAnimatedIcon {
   @Prop source: string = '';
@@ -392,9 +422,18 @@ export struct CYLAnimatedIcon {
 
   aboutToAppear(): void {
     this.parsed = CYLAnimationSource.parse(this.source);
+    enqueueCreate(this.create);
   }
 
+  /** Its turn in the creation queue (see CREATE_INTERVAL). */
+  @State private created: boolean = false;
+  private create: () => void = () => {
+    this.created = true;
+  };
+
+
   aboutToDisappear(): void {
+    dequeueCreate(this.create);
     const player = this.player;
     this.player = undefined;
     if (player !== undefined) {
@@ -442,7 +481,9 @@ export struct CYLAnimatedIcon {
 
   build() {
     Stack() {
-      if (this.parsed.engine === CYLAnimationEngine.PAG) {
+      if (!this.created) {
+        // Waiting for its turn: the icon's place stays empty.
+      } else if (this.parsed.engine === CYLAnimationEngine.PAG) {
         CYLPAGIconView({
           source: this.parsed, iconWidth: this.iconSize, iconHeight: this.resolvedHeight(),
           onPlayer: (p: CYLAnimationPlayer) => this.ready(p)
