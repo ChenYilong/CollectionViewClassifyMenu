@@ -17,6 +17,13 @@ import {
 } from './CYLAnimationPlayer';
 import { CYLSVGAMovie, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform } from './svga/CYLSVGAMovie';
 
+/**
+ * Rive views are off on HarmonyOS until @ohos/rive is fixed: disposing one calls eglDestroySurface on a native window
+ * ArkUI already destroyed, which crashed the animation screen on every opening (issue Z1). A Rive item keeps its place
+ * and title, without the animation. Set to true to try a fixed @ohos/rive.
+ */
+export const CYL_RIVE_ENABLED: boolean = false;
+
 let riveInitialized: boolean = false;
 
 function ensureRive(): boolean {
@@ -136,7 +143,7 @@ struct CYLRiveIconView {
   @Prop iconWidth: number = 0;
   @Prop iconHeight: number = 0;
   onPlayer?: (player: CYLAnimationPlayer) => void;
-  private available: boolean = ensureRive();
+  private available: boolean = CYL_RIVE_ENABLED && ensureRive();
 
   build() {
     Stack() {
