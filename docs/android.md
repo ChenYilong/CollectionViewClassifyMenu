@@ -162,6 +162,24 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 
   > 替换截图中的文案，并全项目搜索图片中的关键词，从文档，代码，本地数据库中删除。并在文档中加入android相关文档中附带截图 标注为TODO continue
 
+## DONE (2026-11-16): the HarmonyOS example on an emulator, screenshots in the docs
+
+- **Context:** the 22-demo HarmonyOS example (`harmony/entry`, from `feat/harmony`) had never run on an emulator; its
+  verification rows B1–B22 were deferred. The shared emulator (`127.0.0.1:5557`) is used by other sessions.
+- **Requirements:** a new emulator of our own; run the HarmonyOS code; update the screenshots in the docs.
+- **Prompts (verbatim):** "run our HarmonyOS version code on an emulator and update screenshot in docs", then
+  "新开模拟器run our HarmonyOS version code on an emulator and update screenshot in docs" (English: open a new
+  emulator, run our HarmonyOS code on it and update the screenshots in the docs).
+- **Result:** a new emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.1 image; created like `CYL
+  TabBar Test`; a first boot from overlays copied off a running emulator hit a kernel panic, so the disks were made
+  fresh). `harmony/scripts/build.sh`, then `harmony/scripts/screenshots.sh` (hdc pinned to the new emulator): 29
+  screenshots in `docs/assets/harmonyos-*.jpeg`, listed in [screenshots.md](screenshots.md) with labels;
+  [harmony-verification.md](harmony-verification.md): 20 rows DONE (B2–B8, B10, B13–B22, F2, G1), verified 15 → 35 /
+  53.
+- **Defects found (TODO, in harmony-verification.md):** B1 Chinese tab titles cut off; B9 menu linkage headers and
+  tags render as stretched images; B11 animated tags missing in Chinese and dark mode (English works); B12 the PAG
+  chip of the dictionary row is empty (`JPAGImageView` fails to load).
+
 ## DONE (2026-11-16): CYLTabBarController's tab bar in the ArkTS example
 
 - **Context:** `harmony/entry` uses ArkUI `Tabs` with emoji icons; AGENTS.md wants every example's tab bar from
