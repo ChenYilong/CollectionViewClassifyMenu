@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 69 / 70 = 99 / 100** (open: E2).
+**Score: 71 / 72 = 99 / 100** (open: E2).
 
 ## Task log
 
@@ -184,6 +184,7 @@ was not run here.
 | Z4 | Animation screen in dark mode: the nav bar ("动效图标") stays light | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: `CYLDemoBar(followsColorMode: true)` uses color resources with dark variants on this page |
 | Z5 | Once, first dark launch after install: blank tags and an app freeze (THREAD_BLOCK_6S in PipelineContext::AddWindowStateChangedCallback); not reproduced in three runs | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: recorded; the stack is inside ArkUI node creation, with no frame from the port, so no code change; to watch in the next runs |
 | Z6 | Animation screen in dark mode: the caption "动效引擎：… 已链接" is dim gray on black | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: a color resource, #6E6E73 light / #AEAEB2 dark |
+| E4 | Animation screen in English: two section titles stay Chinese ("Lottie（带图片资源与占位图）", "Lottie（绿色主题）") | TODO need 模拟器截图验证: fixed: the screen's section titles also go through the example's strings, where both have English and zh-Hant |
 
 ## Score history
 
