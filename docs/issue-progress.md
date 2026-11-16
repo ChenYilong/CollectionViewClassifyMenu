@@ -35,7 +35,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-16): retest the HarmonyOS fixes on the emulator
+### DONE (2026-11-16): retest the HarmonyOS fixes on the emulator
 
 - **Context:** the port's owner pushed `95bebc1` (Rive dispose crash, plus tab and filter button), `849c2d8` (tags laid out
   1 vp wide, dark-mode text) and `5dc703b` (tag taps, fold chevrons) on `feat/harmony` (now the only branch).
@@ -43,6 +43,11 @@ tags: [issues, ui, cocoapods, progress]
   filter button and fold chevrons, the tag taps (hilog domain CYLTagList); update the screenshots and the verification
   rows; push to `feat/harmony`.
 - **Prompt (verbatim):** "continue"
+- **Result:** fixed: tag taps (product tag opens the filtered review list, "好评(9)" filters to 9, hot-search and
+  search-category tags fill the search field; hilog `CYLTagList: tap gesture`), the plus tab (opens "查询筛选"), the
+  menu-linkage fold controls ("更多 ⌄"). Still wrong: the filter panel opens under a gray dimming layer; the plus button
+  still exposes only a description, no accessibility text; B11 regressed (light-mode animated tags are empty boxes);
+  opening the animation screen in dark mode or scrolling it crashed the emulator host twice. Reported to the owner.
 
 ### DONE (2026-11-16): more HarmonyOS pushed-page screenshots
 

@@ -34,7 +34,7 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
 ## Score
 
 **Score: 52 / 53 = 98.1 / 100 with the deferred rows counted as N/A (1 row has a defect found on the emulator:
-B11, dark mode and the Rive crash); verified on a device or the computer: 38 / 53 = 71.7 / 100.** Full marks = every row `DONE` / `N/A`. The 16 rows marked "TODO: N/A on HarmonyOS (deferred)" are not
+B11, a regression after `849c2d8` and emulator crashes); verified on a device or the computer: 38 / 53 = 71.7 / 100.** Full marks = every row `DONE` / `N/A`. The 16 rows marked "TODO: N/A on HarmonyOS (deferred)" are not
 impossible on HarmonyOS: they need a run on the emulator that has not happened yet (marked N/A at the maintainer's
 request, 2026-11-16; the dedicated emulator `CYL ClassifyMenu Test` exists since then). Each one turns back into a check when an emulator runs (`ui-test.sh`,
 `screenshots.sh`); 38 rows are verified: A1–A5 and H1–H8 on the computer, E1–E2, and B1–B10, B12–B22, F2 and G1 on the emulator
@@ -67,7 +67,7 @@ iOS demo (texts, data, taps), screenshot `docs/assets/harmonyos-<demo>.png` link
 | B8 | `CYLQueryScenariosPage` | DONE (2026-11-16): renders on the emulator, screenshot [query-scenarios](assets/harmonyos-query-scenarios.jpeg) |
 | B9 | `CYLMenuLinkagePage` | DONE (2026-11-16, after `d6adba3`): headers show their icon and title, tags render normally, 83 results, screenshot [menu-linkage](assets/harmonyos-menu-linkage.jpeg) |
 | B10 | `CYLTagStylePage` | DONE (2026-11-16): renders on the emulator, screenshot [styles](assets/harmonyos-styles.jpeg), [zh-hant-styles](assets/harmonyos-zh-hant-styles.jpeg) |
-| B11 | `CYLTagAnimationPage` | TODO (2026-11-16, after `d6adba3`): light mode renders every animated tag in Chinese and English ([animations](assets/harmonyos-animations.jpeg), [en-animations](assets/harmonyos-en-animations.jpeg)); in dark mode the rows are still empty and the speed and loop labels are invisible ([dark-animations](assets/harmonyos-dark-animations.jpeg)); the screen also crashes on the emulator in `libohos_rive.so` (null pointer while a Rive view disposes its EGL surface, @ohos/rive 1.0.4, the newest) |
+| B11 | `CYLTagAnimationPage` | TODO (2026-11-16, after `849c2d8`, regression): in light mode the animated tags are now empty boxes without icons or titles ([animations](assets/harmonyos-animations.jpeg); they rendered before); opening the screen in dark mode, or scrolling it, crashed the emulator host twice (Emulator minidump; no app fault log left); earlier app crashes were in `libohos_rive.so` |
 | B12 | `CYLTagConfigurationPage` | DONE (2026-11-16, after `d6adba3`): the icon-only item shows its heart, screenshot [configuration](assets/harmonyos-configuration.jpeg) |
 | B13 | `CYLTagCloudDemoPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud](assets/harmonyos-tag-cloud.jpeg) |
 | B14 | `CYLTagCloudSamplePage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-sample](assets/harmonyos-tag-cloud-sample.jpeg) |
@@ -167,3 +167,4 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
   last frame when selected).
 - 2026-11-16 (emulator run, `b1d3724`): screenshots of every demo on a new dedicated emulator (`harmony/scripts/screenshots.sh`): B2–B8, B10, B13–B22, F2 and G1 DONE; B1, B9, B11 and B12 found defects (TODO, reasons in their rows). Verified: 35 / 53 = 66.0 / 100; 16 rows still deferred, 4 rows with a defect to fix.
 - 2026-11-16 (emulator rerun after `d6adba3`): B1, B9 and B12 DONE; B11 still TODO (dark mode, Rive crash). Verified: 38 / 53 = 71.7 / 100.
+- 2026-11-16 (emulator rerun after `95bebc1`, `849c2d8`, `5dc703b`): tag taps, the plus tab and the menu-linkage fold controls work; the filter panel opens under a dimming layer; B11 regressed (empty tags) and the animation screen crashed the emulator host twice.
