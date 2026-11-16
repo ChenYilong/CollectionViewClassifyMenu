@@ -33,11 +33,12 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
 
 ## Score
 
-**Score: 53 / 53 = 100 / 100 with the deferred rows counted as N/A; verified on a device or the computer: 15 / 53
-= 28.3 / 100.** Full marks = every row `DONE` / `N/A`. The 38 rows marked "TODO: N/A on HarmonyOS (deferred)" are not
-impossible on HarmonyOS: they need a running emulator, which this machine does not have yet (marked N/A at the
-maintainer's request, 2026-11-16). Each one turns back into a check when an emulator runs (`ui-test.sh`,
-`screenshots.sh`); until then 15 rows are verified: A1–A5 and H1–H8 on the computer, E1–E2.
+**Score: 49 / 53 = 92.5 / 100 with the deferred rows counted as N/A (4 rows have a defect found on the emulator:
+B1, B9, B11, B12); verified on a device or the computer: 35 / 53 = 66.0 / 100.** Full marks = every row `DONE` / `N/A`. The 16 rows marked "TODO: N/A on HarmonyOS (deferred)" are not
+impossible on HarmonyOS: they need a run on the emulator that has not happened yet (marked N/A at the maintainer's
+request, 2026-11-16; the dedicated emulator `CYL ClassifyMenu Test` exists since then). Each one turns back into a check when an emulator runs (`ui-test.sh`,
+`screenshots.sh`); 35 rows are verified: A1–A5 and H1–H8 on the computer, E1–E2, and B2–B8, B10, B13–B22, F2 and G1 on the emulator
+(2026-11-16).
 
 ### A. Build and code quality (5)
 
@@ -56,28 +57,28 @@ iOS demo (texts, data, taps), screenshot `docs/assets/harmonyos-<demo>.png` link
 
 | # | Demo (HarmonyOS page) | Status |
 | --- | --- | --- |
-| B1 | Root tab bar (`pages/Index`) | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B2 | `CYLProductPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B3 | `CYLReviewListPage` (memory, network, database) | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B4 | `CYLSearchHomePage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B5 | `CYLSearchCategoryPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B6 | `CYLSearchCategoryPage.page()` (each category tab) | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B7 | `CYLSearchDiscoverPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B8 | `CYLQueryScenariosPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B9 | `CYLMenuLinkagePage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B10 | `CYLTagStylePage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B11 | `CYLTagAnimationPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B12 | `CYLTagConfigurationPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B13 | `CYLTagCloudDemoPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B14 | `CYLTagCloudSamplePage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B15 | `CYLTagCloudSubPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B16 | `CYLTagCloudListPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B17 | `CYLTagCloudRecyclerPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B18 | `CYLHotSearchPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B19 | `CYLImageTagSamplePage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B20 | `CYLImageTagEditPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B21 | `CYLImageTagListPage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
-| B22 | `CYLTagContainerSamplePage` | TODO: N/A on HarmonyOS (deferred) — needs a running emulator, none on this machine (the image is installed, no emulator instance created). Ready: `scripts/screenshots.sh` opens this screen by launch option; code compiled and the screen's logic host-tested (section H) |
+| B1 | Root tab bar (`pages/Index`) | TODO (2026-11-16, emulator run): the screen renders, but the Chinese tab titles are cut off ("场景一：评价筛", "场景二：搜索分"); English fits; screenshot [root](assets/harmonyos-root.jpeg), [en-root](assets/harmonyos-en-root.jpeg), [dark-root](assets/harmonyos-dark-root.jpeg) |
+| B2 | `CYLProductPage` | DONE (2026-11-16): renders on the emulator, screenshot [product](assets/harmonyos-product.jpeg) |
+| B3 | `CYLReviewListPage` (memory, network, database) | DONE (2026-11-16): renders on the emulator, screenshot [reviews-memory](assets/harmonyos-reviews-memory.jpeg), [reviews-network](assets/harmonyos-reviews-network.jpeg), [reviews-database](assets/harmonyos-reviews-database.jpeg) |
+| B4 | `CYLSearchHomePage` | DONE (2026-11-16): renders on the emulator, screenshot [search-home](assets/harmonyos-search-home.jpeg) |
+| B5 | `CYLSearchCategoryPage` | DONE (2026-11-16): renders on the emulator, screenshot [search-category](assets/harmonyos-search-category.jpeg) |
+| B6 | `CYLSearchCategoryPage.page()` (each category tab) | DONE (2026-11-16): renders on the emulator, screenshot [search-category-page](assets/harmonyos-search-category-page.jpeg) |
+| B7 | `CYLSearchDiscoverPage` | DONE (2026-11-16): renders on the emulator, screenshot [search-discover](assets/harmonyos-search-discover.jpeg) |
+| B8 | `CYLQueryScenariosPage` | DONE (2026-11-16): renders on the emulator, screenshot [query-scenarios](assets/harmonyos-query-scenarios.jpeg) |
+| B9 | `CYLMenuLinkagePage` | TODO (2026-11-16, emulator run): the category headers (吃喝玩逛) render as large blurred, stretched images instead of their titles, and several tags as teal wedges; the SQL and the 83 results are right; screenshot [menu-linkage](assets/harmonyos-menu-linkage.jpeg) |
+| B10 | `CYLTagStylePage` | DONE (2026-11-16): renders on the emulator, screenshot [styles](assets/harmonyos-styles.jpeg), [zh-hant-styles](assets/harmonyos-zh-hant-styles.jpeg) |
+| B11 | `CYLTagAnimationPage` | TODO (2026-11-16, emulator run): in Chinese (and dark mode) the Lottie, PAG and Rive rows show no tags, only empty rows; in English every animated tag renders; screenshot [animations](assets/harmonyos-animations.jpeg), [en-animations](assets/harmonyos-en-animations.jpeg), [dark-animations](assets/harmonyos-dark-animations.jpeg) |
+| B12 | `CYLTagConfigurationPage` | TODO (2026-11-16, emulator run): renders, but the fourth chip of the dictionary row is empty; the log shows `NapiDefineClass occur exception, className:JPAGImageView` (PAG); screenshot [configuration](assets/harmonyos-configuration.jpeg) |
+| B13 | `CYLTagCloudDemoPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud](assets/harmonyos-tag-cloud.jpeg) |
+| B14 | `CYLTagCloudSamplePage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-sample](assets/harmonyos-tag-cloud-sample.jpeg) |
+| B15 | `CYLTagCloudSubPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-sub](assets/harmonyos-tag-cloud-sub.jpeg) |
+| B16 | `CYLTagCloudListPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-list](assets/harmonyos-tag-cloud-list.jpeg) |
+| B17 | `CYLTagCloudRecyclerPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-recycler](assets/harmonyos-tag-cloud-recycler.jpeg) |
+| B18 | `CYLHotSearchPage` | DONE (2026-11-16): renders on the emulator, screenshot [hot-search](assets/harmonyos-hot-search.jpeg) |
+| B19 | `CYLImageTagSamplePage` | DONE (2026-11-16): renders on the emulator, screenshot [image-tag-sample](assets/harmonyos-image-tag-sample.jpeg) |
+| B20 | `CYLImageTagEditPage` | DONE (2026-11-16): renders on the emulator, screenshot [image-tag-edit](assets/harmonyos-image-tag-edit.jpeg) |
+| B21 | `CYLImageTagListPage` | DONE (2026-11-16): renders on the emulator, screenshot [image-tag-list](assets/harmonyos-image-tag-list.jpeg) |
+| B22 | `CYLTagContainerSamplePage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-container](assets/harmonyos-tag-container.jpeg) |
 
 ### C. UI tests (6)
 
@@ -116,13 +117,13 @@ views by accessibility text or id; `DONE` = written and passing in `harmony/scri
 | # | Check | Status |
 | --- | --- | --- |
 | F1 | Every control has an accessibility text; selected state announced (API 12 fallback for `accessibilitySelected`) | TODO: N/A on HarmonyOS (deferred) — the screen reader's output can only be checked on a device. Ready: labels on every tappable element, `CYLAccessibilitySelectedModifier` (API 13+); static check `scripts/accessibility-check.py` OK (2026-11-16) |
-| F2 | Dark mode renders on the emulator (screenshot) | TODO: N/A on HarmonyOS (deferred) — needs a running emulator for the screenshot. Ready: `cylColorMode` launch option, `screenshots.sh` (`dark-*`) |
+| F2 | Dark mode renders on the emulator (screenshot) | DONE (2026-11-16): dark mode renders, screenshot [dark-root](assets/harmonyos-dark-root.jpeg) (dark-animations shares B11's defect) |
 
 ### G. Documentation (2)
 
 | # | Check | Status |
 | --- | --- | --- |
-| G1 | `screenshots.md` and `cross-platform.md` list the HarmonyOS screenshots of every demo | TODO: N/A on HarmonyOS (deferred) — documents the screenshots and verified state of rows B–F, which need the emulator first |
+| G1 | `screenshots.md` and `cross-platform.md` list the HarmonyOS screenshots of every demo | DONE (2026-11-16): [screenshots.md](screenshots.md) lists the 29 HarmonyOS screenshots |
 | G2 | `harmony.md`, `cross-platform.md` and `README.md` state the verified state (no "compile only" left) | TODO: N/A on HarmonyOS (deferred) — documents the screenshots and verified state of rows B–F, which need the emulator first |
 
 ### H. Host unit tests per library feature (8)
@@ -162,3 +163,4 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
   and dark mode (F2). Look at each one against the iOS screenshot before marking its row.
 - D5 (SVGA): check `svga` / `svga-dark` on the 动效 tab and `style-animation.svga` on the emulator (play, speed, loop,
   last frame when selected).
+- 2026-11-16 (emulator run, `b1d3724`): screenshots of every demo on a new dedicated emulator (`harmony/scripts/screenshots.sh`): B2–B8, B10, B13–B22, F2 and G1 DONE; B1, B9, B11 and B12 found defects (TODO, reasons in their rows). Verified: 35 / 53 = 66.0 / 100; 16 rows still deferred, 4 rows with a defect to fix.
