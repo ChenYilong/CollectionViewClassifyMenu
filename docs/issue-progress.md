@@ -35,7 +35,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-16): emulator pushed pages, script rule, SVGA alignment, PR sync
+### DONE (2026-11-16): emulator pushed pages, script rule, SVGA alignment, PR sync
 
 - **Context:** the HarmonyOS screenshots so far show each demo's first page only; zsh word splitting broke inline
   measurements; the SVGA demo's icon and title are not centered with each other; the two open PRs (#20
@@ -60,7 +60,10 @@ tags: [issues, ui, cocoapods, progress]
   the emulator (`libohos_rive.so`, null pointer when a Rive view disposes its EGL surface; @ohos/rive 1.0.4 is the
   newest). (3) DONE, no change needed here: the misaligned SVGA screenshots the user saw are CYLTabBarController's
   docs (its HarmonyOS SVGA demo, handled there: `1aea05d`, `0d7d25b`); in this project every SVGA tag's icon and title
-  centers are within 1 px, padding equal (42 px each side), measured on the emulator. (4) in progress.
+  centers are within 1 px, padding equal (42 px each side), measured on the emulator. (4) DONE: the open PRs' branches
+  (#20 `feat/harmony`, #16 `feat/android-kotlin`) cherry-picked each other's new commits (5 one way, 2 the other) and
+  now hold the same tree; build OK, host tests 49/49, accessibility and native-string checks OK. The owner's defect
+  fix `d6adba3` was checked on the emulator: B1, B9, B12 fixed; B11 dark mode and the Rive crash remain.
 
 ### DONE (2026-11-16, logged as TODO the same day): commit messages in git cz style, English only
 
