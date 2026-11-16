@@ -53,7 +53,14 @@ tags: [issues, ui, cocoapods, progress]
   written), in English: prefer bash to run scripts, to avoid the error "zsh doesn't split $box into words either.
   Running the same measurement as a bash script."; the SVGA demo runs incorrectly: icon and title are not centered with
   each other; cherry-pick between all open PRs so every PR keeps the same code.
-- **Status:** (2) DONE, see AGENTS.md "Running scripts"; (1), (3), (4) in progress.
+- **Status:** (2) DONE, see AGENTS.md "Running scripts" (`6081884`). (1) DONE: six pushed pages in
+  `screenshots.md` (HarmonyOS: pushed pages), driven by text and accessibility text; four taps changed nothing (plus
+  button, menu-linkage filter button, review filter "Good", search category "People") and two controls have no
+  accessibility text (plus button, filter button): reported to the port's owner. The animation screen also crashes on
+  the emulator (`libohos_rive.so`, null pointer when a Rive view disposes its EGL surface; @ohos/rive 1.0.4 is the
+  newest). (3) DONE, no change needed here: the misaligned SVGA screenshots the user saw are CYLTabBarController's
+  docs (its HarmonyOS SVGA demo, handled there: `1aea05d`, `0d7d25b`); in this project every SVGA tag's icon and title
+  centers are within 1 px, padding equal (42 px each side), measured on the emulator. (4) in progress.
 
 ### DONE (2026-11-16, logged as TODO the same day): commit messages in git cz style, English only
 
