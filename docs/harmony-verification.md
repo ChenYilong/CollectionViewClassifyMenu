@@ -33,11 +33,11 @@ screenshot in `docs/assets/`, or a passing `harmony/scripts/ui-test.sh` run); co
 
 ## Score
 
-**Score: 49 / 53 = 92.5 / 100 with the deferred rows counted as N/A (4 rows have a defect found on the emulator:
-B1, B9, B11, B12); verified on a device or the computer: 35 / 53 = 66.0 / 100.** Full marks = every row `DONE` / `N/A`. The 16 rows marked "TODO: N/A on HarmonyOS (deferred)" are not
+**Score: 52 / 53 = 98.1 / 100 with the deferred rows counted as N/A (1 row has a defect found on the emulator:
+B11, dark mode and the Rive crash); verified on a device or the computer: 38 / 53 = 71.7 / 100.** Full marks = every row `DONE` / `N/A`. The 16 rows marked "TODO: N/A on HarmonyOS (deferred)" are not
 impossible on HarmonyOS: they need a run on the emulator that has not happened yet (marked N/A at the maintainer's
 request, 2026-11-16; the dedicated emulator `CYL ClassifyMenu Test` exists since then). Each one turns back into a check when an emulator runs (`ui-test.sh`,
-`screenshots.sh`); 35 rows are verified: A1–A5 and H1–H8 on the computer, E1–E2, and B2–B8, B10, B13–B22, F2 and G1 on the emulator
+`screenshots.sh`); 38 rows are verified: A1–A5 and H1–H8 on the computer, E1–E2, and B1–B10, B12–B22, F2 and G1 on the emulator
 (2026-11-16).
 
 ### A. Build and code quality (5)
@@ -57,7 +57,7 @@ iOS demo (texts, data, taps), screenshot `docs/assets/harmonyos-<demo>.png` link
 
 | # | Demo (HarmonyOS page) | Status |
 | --- | --- | --- |
-| B1 | Root tab bar (`pages/Index`) | TODO (2026-11-16, emulator run): the screen renders, but the Chinese tab titles are cut off ("场景一：评价筛", "场景二：搜索分"); English fits; screenshot [root](assets/harmonyos-root.jpeg), [en-root](assets/harmonyos-en-root.jpeg), [dark-root](assets/harmonyos-dark-root.jpeg) |
+| B1 | Root tab bar (`pages/Index`) | DONE (2026-11-16, after `d6adba3`): the Chinese tab titles fit ("场景一：评价筛选", "场景二：搜索分类"), screenshot [root](assets/harmonyos-root.jpeg), [en-root](assets/harmonyos-en-root.jpeg), [dark-root](assets/harmonyos-dark-root.jpeg) |
 | B2 | `CYLProductPage` | DONE (2026-11-16): renders on the emulator, screenshot [product](assets/harmonyos-product.jpeg) |
 | B3 | `CYLReviewListPage` (memory, network, database) | DONE (2026-11-16): renders on the emulator, screenshot [reviews-memory](assets/harmonyos-reviews-memory.jpeg), [reviews-network](assets/harmonyos-reviews-network.jpeg), [reviews-database](assets/harmonyos-reviews-database.jpeg) |
 | B4 | `CYLSearchHomePage` | DONE (2026-11-16): renders on the emulator, screenshot [search-home](assets/harmonyos-search-home.jpeg) |
@@ -65,10 +65,10 @@ iOS demo (texts, data, taps), screenshot `docs/assets/harmonyos-<demo>.png` link
 | B6 | `CYLSearchCategoryPage.page()` (each category tab) | DONE (2026-11-16): renders on the emulator, screenshot [search-category-page](assets/harmonyos-search-category-page.jpeg) |
 | B7 | `CYLSearchDiscoverPage` | DONE (2026-11-16): renders on the emulator, screenshot [search-discover](assets/harmonyos-search-discover.jpeg) |
 | B8 | `CYLQueryScenariosPage` | DONE (2026-11-16): renders on the emulator, screenshot [query-scenarios](assets/harmonyos-query-scenarios.jpeg) |
-| B9 | `CYLMenuLinkagePage` | TODO (2026-11-16, emulator run): the category headers (吃喝玩逛) render as large blurred, stretched images instead of their titles, and several tags as teal wedges; the SQL and the 83 results are right; screenshot [menu-linkage](assets/harmonyos-menu-linkage.jpeg) |
+| B9 | `CYLMenuLinkagePage` | DONE (2026-11-16, after `d6adba3`): headers show their icon and title, tags render normally, 83 results, screenshot [menu-linkage](assets/harmonyos-menu-linkage.jpeg) |
 | B10 | `CYLTagStylePage` | DONE (2026-11-16): renders on the emulator, screenshot [styles](assets/harmonyos-styles.jpeg), [zh-hant-styles](assets/harmonyos-zh-hant-styles.jpeg) |
-| B11 | `CYLTagAnimationPage` | TODO (2026-11-16, emulator run): in Chinese (and dark mode) the Lottie, PAG and Rive rows show no tags, only empty rows; in English every animated tag renders; screenshot [animations](assets/harmonyos-animations.jpeg), [en-animations](assets/harmonyos-en-animations.jpeg), [dark-animations](assets/harmonyos-dark-animations.jpeg) |
-| B12 | `CYLTagConfigurationPage` | TODO (2026-11-16, emulator run): renders, but the fourth chip of the dictionary row is empty; the log shows `NapiDefineClass occur exception, className:JPAGImageView` (PAG); screenshot [configuration](assets/harmonyos-configuration.jpeg) |
+| B11 | `CYLTagAnimationPage` | TODO (2026-11-16, after `d6adba3`): light mode renders every animated tag in Chinese and English ([animations](assets/harmonyos-animations.jpeg), [en-animations](assets/harmonyos-en-animations.jpeg)); in dark mode the rows are still empty and the speed and loop labels are invisible ([dark-animations](assets/harmonyos-dark-animations.jpeg)); the screen also crashes on the emulator in `libohos_rive.so` (null pointer while a Rive view disposes its EGL surface, @ohos/rive 1.0.4, the newest) |
+| B12 | `CYLTagConfigurationPage` | DONE (2026-11-16, after `d6adba3`): the icon-only item shows its heart, screenshot [configuration](assets/harmonyos-configuration.jpeg) |
 | B13 | `CYLTagCloudDemoPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud](assets/harmonyos-tag-cloud.jpeg) |
 | B14 | `CYLTagCloudSamplePage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-sample](assets/harmonyos-tag-cloud-sample.jpeg) |
 | B15 | `CYLTagCloudSubPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-sub](assets/harmonyos-tag-cloud-sub.jpeg) |
@@ -166,3 +166,4 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
 - D5 (SVGA): check `svga` / `svga-dark` on the 动效 tab and `style-animation.svga` on the emulator (play, speed, loop,
   last frame when selected).
 - 2026-11-16 (emulator run, `b1d3724`): screenshots of every demo on a new dedicated emulator (`harmony/scripts/screenshots.sh`): B2–B8, B10, B13–B22, F2 and G1 DONE; B1, B9, B11 and B12 found defects (TODO, reasons in their rows). Verified: 35 / 53 = 66.0 / 100; 16 rows still deferred, 4 rows with a defect to fix.
+- 2026-11-16 (emulator rerun after `d6adba3`): B1, B9 and B12 DONE; B11 still TODO (dark mode, Rive crash). Verified: 38 / 53 = 71.7 / 100.
