@@ -155,6 +155,8 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
 - 2026-11-16: the 38 rows that need an emulator marked "TODO: N/A on HarmonyOS (deferred)" with their reason, at the maintainer's request. 53 / 53 = 100 / 100 counting them as N/A; verified 15 / 53 = 28.3 / 100.
 - 2026-11-16: accessibility labels everywhere (static check), native localized resources, accessibility-first UI tests, rules and skills. Score unchanged: 53 / 53 with deferred rows as N/A; verified 15 / 53 = 28.3 / 100.
 
+- 2026-11-16: B1, B9, B11, B12 defects fixed without the emulator (`harmony-screenshot-issues.md` P1 to P7); their rows stay open until the next screenshot run.
+
 ## Next steps (resume here)
 
 - When the emulator is up: `harmony/scripts/ui-test.sh` (rows C), then `harmony/scripts/screenshots.sh`: it opens

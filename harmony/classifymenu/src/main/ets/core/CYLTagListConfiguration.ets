@@ -174,6 +174,17 @@ export class CYLMenuConfigurationError extends Error {
 // MARK: - Values
 
 /** Reads configuration values: the types of code, or the strings of a file. */
+/** SF Symbols of the shared configurations and their nearest HarmonyOS system icons. */
+const SF_SYMBOL_IMAGES: Map<string, Resource> = new Map<string, Resource>([
+  // HarmonyOS has no heart icon: the library's own, drawn as the SF Symbols (outline and filled, tinted like any icon).
+  ['heart', $r('app.media.cyl_symbol_heart')],
+  ['heart.fill', $r('app.media.cyl_symbol_heart_fill')],
+  ['globe', $r('sys.media.ohos_ic_public_web')],
+  ['location', $r('sys.media.ohos_ic_public_location')],
+  ['checkmark', $r('sys.media.ohos_ic_public_ok')],
+  ['xmark', $r('sys.media.ohos_ic_public_cancel')],
+]);
+
 export class CYLConfigurationValue {
   static number(value: Object | undefined | null): number | undefined {
     if (typeof value === 'number') {
@@ -315,7 +326,8 @@ export class CYLConfigurationValue {
 
   /**
    * An image: a `CYLImage` value, a core image name ("cyl_more"), or any other string as a path, a URL or a
-   * resource string. "system:<SF Symbol>" has no HarmonyOS counterpart and gives undefined.
+   * resource string. "system:<SF Symbol>": the nearest HarmonyOS system icon for the symbols the examples use
+   * (an icon-only item would otherwise be an empty chip), undefined for the others.
    */
   static image(value: Object | undefined | null): CYLImage | undefined {
     if (value === undefined || value === null) {
@@ -326,8 +338,11 @@ export class CYLConfigurationValue {
         value as CYLImage : undefined;
     }
     const s = value as string;
-    if (s.length === 0 || s.startsWith('system:')) {
+    if (s.length === 0) {
       return undefined;
+    }
+    if (s.startsWith('system:')) {
+      return SF_SYMBOL_IMAGES.get(s.substring('system:'.length));
     }
     return CYLMenuResources.image(s) ?? s;
   }
