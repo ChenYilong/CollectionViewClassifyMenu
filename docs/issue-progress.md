@@ -432,3 +432,7 @@ tags: [issues, ui, cocoapods, progress]
   passes (30 tests). `CYLExampleDatabaseTests` checks that both icons load and that the filter button shows one. That
   Example suite does not build yet because of the blocked CYLTabBarController framework build (missing
   `CYLTabBarItemAnimati…` types in its Swift header), which this change does not touch.
+
+### DONE (2026-11-16): audit for the "private getter returns undefined" crash
+- Prompted by another project's crash (`this.hud is undefined`: a private getter in a page struct returned `undefined`; Back failed the same way in `leave()`).
+- Result for `harmony/` (102 `.ets` files): no getters inside any `@Component` struct; no `this.x!` assertions or `x!:` fields; every field dereferenced in `aboutToDisappear` / `onBackPress` / `onPageHide` / `leave` is initialized at declaration or is a required `@ObjectLink` (`CYLFilterBaseController.controller`, `CYLImageTagGroupView.group`, `CYLTagListView.model`, `CYLAnimatedIcon.bitmaps`, `CYLTagListCell.cell`). Toasts and dialogs go through `getUIContext()` or `CYLExampleUIContext.context?`. No change needed.
