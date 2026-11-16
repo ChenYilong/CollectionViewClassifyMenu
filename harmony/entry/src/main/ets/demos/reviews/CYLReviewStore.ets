@@ -34,6 +34,8 @@ export class CYLReviewFilter {
   /** An SF Symbol stand-in (a glyph) and its color. */
   image?: Resource;
   imageColor: string = '#FF731A';
+  /** The icon on the selected (orange) chip: a white copy of `image`. */
+  selectedImage: Resource | undefined = undefined;
   isKeyword: boolean = false;
   matches: (review: CYLReview) => boolean = () => true;
 }
@@ -56,7 +58,7 @@ const IDENTIFIERS: Map<string, string> = new Map<string, string>([
   ['全部', 'all'], ['好评', 'good'], ['中评', 'neutral'], ['差评', 'bad'], ['有图', 'photo'], ['追加', 'followup']
 ]);
 
-function makeFilter(name: string, image: Resource | undefined, color: string, keyword: boolean,
+function makeFilter(name: string, image: Resource | undefined, selectedImage: Resource | undefined, color: string, keyword: boolean,
   matches: (r: CYLReview) => boolean): CYLReviewFilter {
   const f = new CYLReviewFilter();
   f.identifier = keyword ? 'keyword:' + name : (IDENTIFIERS.get(name) ?? name);
@@ -64,6 +66,7 @@ function makeFilter(name: string, image: Resource | undefined, color: string, ke
   f.isKeyword = keyword;
   f.matches = matches;
   f.image = image;
+  f.selectedImage = selectedImage;
   f.imageColor = color;
   return f;
 }
@@ -108,17 +111,17 @@ export class CYLReviewStore {
   static makeFilters(): CYLReviewFilter[] {
     const orange = '#FF731A';
     const filters: CYLReviewFilter[] = [
-      makeFilter(CYLExampleLocalizedString('全部'), undefined, orange, false, () => true),
-      makeFilter(CYLExampleLocalizedString('好评'), $r('app.media.a_thumbsup'), orange, false, (r: CYLReview) => r.rating === CYLReviewRating.good),
-      makeFilter(CYLExampleLocalizedString('中评'), $r('app.media.a_hand_raised'), orange, false,
+      makeFilter(CYLExampleLocalizedString('全部'), undefined, undefined, orange, false, () => true),
+      makeFilter(CYLExampleLocalizedString('好评'), $r('app.media.a_thumbsup'), $r('app.media.a_thumbsup_selected'), orange, false, (r: CYLReview) => r.rating === CYLReviewRating.good),
+      makeFilter(CYLExampleLocalizedString('中评'), $r('app.media.a_hand_raised'), $r('app.media.a_hand_raised_selected'), orange, false,
         (r: CYLReview) => r.rating === CYLReviewRating.neutral),
-      makeFilter(CYLExampleLocalizedString('差评'), $r('app.media.a_thumbsdown'), '#8E8E93', false,
+      makeFilter(CYLExampleLocalizedString('差评'), $r('app.media.a_thumbsdown'), $r('app.media.a_thumbsdown_selected'), '#8E8E93', false,
         (r: CYLReview) => r.rating === CYLReviewRating.bad),
-      makeFilter(CYLExampleLocalizedString('有图'), undefined, orange, false, (r: CYLReview) => r.hasPhoto),
-      makeFilter(CYLExampleLocalizedString('追加'), undefined, orange, false, (r: CYLReview) => r.hasFollowUp)
+      makeFilter(CYLExampleLocalizedString('有图'), undefined, undefined, orange, false, (r: CYLReview) => r.hasPhoto),
+      makeFilter(CYLExampleLocalizedString('追加'), undefined, undefined, orange, false, (r: CYLReview) => r.hasFollowUp)
     ];
     ['手机套不错', '质量不错', '态度不错', '划算', '颜色不错', '背面细节一般'].forEach((keyword: string) => {
-      filters.push(makeFilter(keyword, undefined, orange, true, (r: CYLReview) => r.keywords.includes(keyword)));
+      filters.push(makeFilter(keyword, undefined, undefined, orange, true, (r: CYLReview) => r.keywords.includes(keyword)));
     });
     return filters;
   }

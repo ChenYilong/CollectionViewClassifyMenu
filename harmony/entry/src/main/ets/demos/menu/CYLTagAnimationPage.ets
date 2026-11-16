@@ -1,6 +1,6 @@
 import { cylFormat } from '../samples/SampleSupport';
 import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
-import { CYLUIContext } from '@cyl/classifymenu';
+import { CYLColor, CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLTagAnimationDemoViewController` (动效图标): the animations and images of CYLTabBarController's examples, one
  * section per library, created from a dictionary (map) configuration; a tap plays the tag's icon. The playback
@@ -100,6 +100,8 @@ export function animationDemoTagList(context: Context): CYLTagListState {
     tagList.reloadMenuData();
     tagList.selectedIndexPaths = selection;
   }
+  // Clear, so the page background (light or dark) shows through: the list's white stayed white in dark mode.
+  tagList.style.backgroundColor = CYLColor.CLEAR;
   return tagList;
 }
 
@@ -142,11 +144,14 @@ export struct CYLTagAnimationPage {
   build() {
     Column() {
       CYLDemoBar({ title: CYLExampleLocalizedString('动效图标'), showsBack: this.showsBack })
+        .zIndex(1)
       Text(this.status)
         .fontSize(13)
         .fontColor(CYLSystemColor.secondaryLabel)
         .width('100%')
         .padding({ left: 16, right: 16, top: 8 })
+        .backgroundColor($r('app.color.cyl_animation_background'))
+        .zIndex(1)
         .id('animationStatus')
       Column({ space: 8 }) {
         Row({ space: 10 }) {
@@ -192,6 +197,8 @@ export struct CYLTagAnimationPage {
         .width('100%')
       }
       .padding({ left: 16, right: 16, top: 8 })
+      .backgroundColor($r('app.color.cyl_animation_background'))
+      .zIndex(1)
       CYLTagListView({
         tagList: this.tagList,
         animationSpeed: this.speed,
@@ -200,6 +207,9 @@ export struct CYLTagAnimationPage {
       })
         .layoutWeight(1)
         .margin({ top: 4 })
+        // Clipped, and below the header: scrolled tags drew over the status bar and the title.
+        .clip(true)
+        .zIndex(0)
         .id('animationTagList')
     }
     .width('100%')
