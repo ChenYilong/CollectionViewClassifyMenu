@@ -71,6 +71,27 @@ def mapped_from_api_map():
     return found
 
 
+def mapped_from_swift_symbols():
+    """Kotlin symbols ('Owner.name' or 'name') with the current Swift symbol that maps to them, from the same pairs as
+    the iOS -> Android table (ios_public_api.py): the iOS column names what the Swift core declares now, not the
+    Objective-C selector an api-map.json key may still carry from before the Swift migration."""
+    import ios_public_api
+    mapping = json.loads(API_MAP.read_text(encoding="utf-8"))
+    kotlin = ios_public_api.kotlin_names()
+    found = {}
+    for row in ios_public_api.symbols(ROOT):
+        cell = ios_public_api.counterpart(row, mapping, kotlin)
+        if not cell:
+            continue
+        for part in re.split(r"[,;/]| and ", cell):
+            part = part.strip().split("(")[0].replace("com.cyl.classifymenu.", "").strip()
+            if part:
+                swift = row[5] if len(row) > 5 else row[3]
+                found.setdefault(part, swift)
+                found.setdefault(part.split(".")[-1], swift)
+    return found
+
+
 def ios_names():
     names = set()
     for d in IOS_DIRS:
@@ -107,6 +128,7 @@ def swift_case(owner, name):
 def build():
     symbols = kotlin_symbols()
     api_map = mapped_from_api_map()
+    swift_map = mapped_from_swift_symbols()
     hand = json.loads(IOS_MAP.read_text(encoding="utf-8")) if IOS_MAP.exists() else {}
     ios = ios_names()
     rows, done = [], 0
@@ -114,8 +136,13 @@ def build():
         key = f"{owner}.{name}" if owner else name
         if key in hand:
             counterpart = hand[key]
-        elif key in api_map:
-            counterpart = f"`{api_map[key]}`"
+        elif key in swift_map:
+            counterpart = f"`{swift_map[key]}`"
+        elif name in swift_map and re.match(r"^(CYL|k)[A-Z]", name):
+            # A global name (an enum value that Kotlin nests under its type, a constant): unique across the core.
+            counterpart = f"`{swift_map[name]}`"
+        # api-map.json keys alone no longer count: 155 of them still name Objective-C selectors that the Swift
+        # migration renamed or removed (CYLFilterParamsTool…), so a match must come from a current Swift symbol.
         elif name in ios or swift_case(owner, name) in ios:
             counterpart = f"`{name}` (same name in the iOS core)"
         else:

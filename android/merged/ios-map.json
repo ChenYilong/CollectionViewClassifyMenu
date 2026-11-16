@@ -52,5 +52,18 @@
  "cyl_accessibilityIdentifier": "`UIAccessibilityIdentification.accessibilityIdentifier`",
  "CYLTagListCell.accessibilityHint": "`UIView.accessibilityHint` of the cell",
  "CYLMenuConfigurationException": "`CYLMenuConfigurationError` thrown as `NSError` (domain `CYLMenuConfigurationErrorDomain`)",
- "CYLColor.APP_TINT": "`UIColor.cylAppTint` (`+[UIColor cyl_appTintColor]`)"
+ "CYLColor.APP_TINT": "`UIColor.cylAppTint` (`+[UIColor cyl_appTintColor]`)",
+ "CYLImageTagGroupView.animateValueForKey": "`CYLImageTagGroupView.animate(_:values:duration:completion:)` (the key is the `AnimatableValue` case)",
+ "CYLMenuColorFromString": "`UIColor.cylMenuColor(from:)`",
+ "CYLMenuLocalizedStringForKey": "`CYLMenuLocalizedString(_:)`",
+ "CYLMenuImage": "`CYLMenuResources.image(named:)`",
+ "CYLAppTintColor": "`UIColor.cylAppTint`",
+ "CYLTagTitleFont": "`CYLTagMetrics.titleFont(for: nil)`",
+ "CYLTagUseListValue": "`nil` of `CYLTag.textSize`, `cornerRadius`, `borderWidth`, `deleteIndicatorSize` (optional lengths; Android uses -1)",
+ "CYLTagListCell.configureWithTitle": "`CYLTagListCell.configure(title:image:selectedImage:animationURL:style:isSelected:isEnabled:)`",
+ "CYLMenuFoldControlKeyPosition": "`CYLMenuFoldControlKey.position`",
+ "CYLMenuFoldControlKeyContent": "`CYLMenuFoldControlKey.content`",
+ "foldControlWithConfiguration": "`CYLMenuFoldControl(configuration:)`",
+ "styleWithConfiguration": "`CYLMenuStyle(configuration:)`",
+ "tagWithConfiguration": "`CYLTag(configuration:)`"
 }

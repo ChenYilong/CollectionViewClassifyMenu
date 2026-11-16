@@ -35,7 +35,7 @@ target 'Runner' do
   # Package.swift); a CollectionViewClassifyMenu pod as well would link it twice (3666 duplicate symbols).
   # The animation engine the tags play Lottie files with (found at run time; the core does not depend on it).
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                  :commit => '117be52cfc28109465d52544820f10cc3f00ba89' }
+                  :commit => 'cfddcce5bb8ba157ce3ca4b0191a67af350e46b3' }
   pod 'CYLTabBarController', cyl_tab_bar
   pod 'CYLTabBarController/Lottie', cyl_tab_bar
   pod 'CYLTabBarController/Rive', cyl_tab_bar

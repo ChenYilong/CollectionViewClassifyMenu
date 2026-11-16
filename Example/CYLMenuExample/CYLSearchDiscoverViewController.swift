@@ -220,8 +220,8 @@ final class CYLSearchDiscoverViewController: UIViewController {
         let border = contrast ? UIColor.label : UIColor.separator
         searchBar.fieldBorderColor = border
         searchBar.fieldBorderWidth = contrast ? 2 : 1
-        micButton.layer.borderColor = border.resolvedColor(with: traitCollection).cgColor
-        micButton.layer.borderWidth = contrast ? 2 : 0
+        // The core's border helper (UIView+CYLGeneral, Android cyl_setBorderWidth) resolves the color for the traits.
+        micButton.cylSetBorderWidth(contrast ? 2 : 0, color: border)
     }
 
     /**

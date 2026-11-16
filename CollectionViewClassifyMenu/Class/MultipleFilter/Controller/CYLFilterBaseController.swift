@@ -56,6 +56,11 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
     @IBOutlet private weak var blurImageView: UIImageView!
 
     /**
+     * Free-form settings of a subclass (Android `CYLFilterBaseController.settingArray`).
+     */
+    @objc open var settingArray: [Any] = []
+
+    /**
      * Told when the panel closes after Apply or Reset.
      */
     public weak var delegate: CYLFilterControllerDelegate?
