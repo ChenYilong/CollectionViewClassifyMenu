@@ -260,7 +260,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuFoldControl.showsImageWhenExpanded` | method, `CYLMenuFoldControl.kt:56` | `CYLMenuFoldControl -showsImageWhenExpanded:` |
 | `CYLMenuFoldControl.showsTitleWhenExpanded` | method, `CYLMenuFoldControl.kt:58` | `CYLMenuFoldControl -showsTitleWhenExpanded:` |
 | `CYLMenuFoldControl.titleWhenExpanded` | method, `CYLMenuFoldControl.kt:64` | `CYLMenuFoldControl -titleWhenExpanded:` |
-| `CYLMenuFoldControl.copy` | method, `CYLMenuFoldControl.kt:70` | `copy` (same name in the iOS core) |
+| `CYLMenuFoldControl.copy` | method, `CYLMenuFoldControl.kt:70` | `CYLMenuFoldControl -copyWith:` |
 | `CYLMenuIconDrawable` | class, `CYLMenuIcons.kt:17` | the bundle images `cyl_fold_chevron`, `cyl_tag_plus`, `cyl_more` (`CYLMenuResources.image(named:)`, SF Symbol fallback); Android draws them |
 | `CYLMenuIconDrawable.Kind` | class, `CYLMenuIcons.kt:19` | the image names above: `cyl_fold_chevron` (CHEVRON_DOWN), `cyl_tag_plus` (PLUS), `cyl_more` (ELLIPSIS) |
 | `kDataSourceSectionKey` | read-only property, `CYLMenuKeys.kt:6` | `kDataSourceSectionKey` |
@@ -339,7 +339,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuStyle.titleFontForState` | method, `CYLMenuStyle.kt:186` | `CYLMenuStyle -titleFontForState:traitCollection:` |
 | `CYLMenuStyle.deleteIndicatorFontForState` | method, `CYLMenuStyle.kt:191` | `CYLMenuStyle -deleteIndicatorFontForState:traitCollection:` |
 | `CYLMenuStyle.headerFontForTraitCollection` | method, `CYLMenuStyle.kt:196` | `CYLMenuStyle -headerFontForTraitCollection:` |
-| `CYLMenuStyle.copy` | method, `CYLMenuStyle.kt:199` | `copy` (same name in the iOS core) |
+| `CYLMenuStyle.copy` | method, `CYLMenuStyle.kt:199` | `CYLMenuStyle -copyWith:` |
 | `kMultipleFilterSetting` | read-only property, `CYLMultipleFilter.kt:32` | `kMultipleFilterSetting` |
 | `kMultipleFilterSettingModified` | read-only property, `CYLMultipleFilter.kt:37` | `kMultipleFilterSettingModified` |
 | `CYLFilterParamsTool` | class, `CYLMultipleFilter.kt:43` | `CYLFilterParamsTool` |
@@ -416,9 +416,9 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagAppearance.contentInsets` | property, `CYLTagAppearance.kt:52` | `CYLTagAppearance.contentInsets` |
 | `CYLTagAppearance.backgroundImage` | property, `CYLTagAppearance.kt:55` | `CYLTagAppearance.backgroundImage` |
 | `CYLTagAppearance.reset` | method, `CYLTagAppearance.kt:58` | `CYLTagAppearance -reset` |
-| `CYLTagAppearance.resetBackgroundColor` | method, `CYLTagAppearance.kt:71` | `resetBackgroundColor` (same name in the iOS core) |
-| `CYLTagAppearance.resetTextColor` | method, `CYLTagAppearance.kt:74` | `resetTextColor` (same name in the iOS core) |
-| `CYLTagAppearance.resetFont` | method, `CYLTagAppearance.kt:77` | `resetFont` (same name in the iOS core) |
+| `CYLTagAppearance.resetBackgroundColor` | method, `CYLTagAppearance.kt:71` | `CYLTagAppearance.defaultBackgroundColor` |
+| `CYLTagAppearance.resetTextColor` | method, `CYLTagAppearance.kt:74` | `CYLTagAppearance.defaultTextColor` |
+| `CYLTagAppearance.resetFont` | method, `CYLTagAppearance.kt:77` | `CYLTagAppearance.defaultFont` |
 | `CYLTagButton` | class, `CYLTagButton.kt:33` | `CYLTagButton` |
 | `CYLAccessibility` | object, `CYLTagButton.kt:668` | `UIAccessibility` (UIKit) |
 | `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:671` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
@@ -453,7 +453,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagListDeleteAccessibilityIdentifier` | read-only property, `CYLTagListAccessibility.kt:24` | `CYLTagListDeleteAccessibilityIdentifier` |
 | `CYLAccessibilityAction` | class, `CYLTagListAccessibility.kt:29` | `UIAccessibilityCustomAction` |
 | `cyl_accessibilityIdentifier` | property, `CYLTagListAccessibility.kt:32` | `UIAccessibilityIdentification.accessibilityIdentifier` |
-| `cyl_viewsWithAccessibilityIdentifier` | method, `CYLTagListAccessibility.kt:37` | `cyl_viewsWithAccessibilityIdentifier` (same name in the iOS core) |
+| `cyl_viewsWithAccessibilityIdentifier` | method, `CYLTagListAccessibility.kt:37` | `UIView (CYLGeneral) -cyl_viewsWithAccessibilityIdentifier:` |
 | `CYLTagListCell` | class, `CYLTagListCell.kt:23` | `CYLTagListCell` |
 | `CYLTagListCell.button` | read-only property, `CYLTagListCell.kt:25` | `CYLTagListCell.button` |
 | `CYLTagListCell.appliedStyle` | property, `CYLTagListCell.kt:43` | `CYLTagListCell.appliedStyle` |
@@ -547,10 +547,10 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagAppearanceContentInsets` | read-only property, `CYLTagListViewConfiguration.kt:333` | `CYLTagAppearanceContentInsets` |
 | `CYLTagAppearanceBackgroundImage` | read-only property, `CYLTagListViewConfiguration.kt:337` | `CYLTagAppearanceBackgroundImage` |
 | `CYLMenuConfigurationErrorDomain` | read-only property, `CYLTagListViewConfiguration.kt:342` | `CYLMenuConfigurationErrorDomain` |
-| `CYLMenuConfigurationError` | class, `CYLTagListViewConfiguration.kt:347` | `CYLMenuConfigurationError` (same name in the iOS core) |
-| `CYLMenuConfigurationError.CYLMenuConfigurationErrorFileNotFound` | enum case, `CYLTagListViewConfiguration.kt:348` | `CYLMenuConfigurationErrorFileNotFound` (same name in the iOS core) |
-| `CYLMenuConfigurationError.CYLMenuConfigurationErrorInvalidContents` | enum case, `CYLTagListViewConfiguration.kt:349` | `CYLMenuConfigurationErrorInvalidContents` (same name in the iOS core) |
-| `CYLMenuConfigurationError.CYLMenuConfigurationErrorUnsupportedFormat` | enum case, `CYLTagListViewConfiguration.kt:350` | `CYLMenuConfigurationErrorUnsupportedFormat` (same name in the iOS core) |
+| `CYLMenuConfigurationError` | class, `CYLTagListViewConfiguration.kt:347` | `Code` |
+| `CYLMenuConfigurationError.CYLMenuConfigurationErrorFileNotFound` | enum case, `CYLTagListViewConfiguration.kt:348` | `Code.fileNotFound` |
+| `CYLMenuConfigurationError.CYLMenuConfigurationErrorInvalidContents` | enum case, `CYLTagListViewConfiguration.kt:349` | `Code.invalidContents` |
+| `CYLMenuConfigurationError.CYLMenuConfigurationErrorUnsupportedFormat` | enum case, `CYLTagListViewConfiguration.kt:350` | `Code.unsupportedFormat` |
 | `CYLMenuConfigurationException` | class, `CYLTagListViewConfiguration.kt:356` | `CYLMenuConfigurationError` thrown as `NSError` (domain `CYLMenuConfigurationErrorDomain`) |
 | `CYLMenuAnimationURLWithOptions` | method, `CYLTagListViewConfiguration.kt:461` | `CYLMenuAnimationURLWithOptions` |
 | `sections` | property, `CYLTagListViewConfiguration.kt:573` | `sections` (same name in the iOS core) |
@@ -566,9 +566,9 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `tagListViewWithConfiguration` | method, `CYLTagListViewConfiguration.kt:798` | `CYLTagListView (CYLConfiguration) +tagListViewWithConfiguration:` |
 | `applyConfiguration` | method, `CYLTagListViewConfiguration.kt:805` | `CYLTagListView (CYLConfiguration) -applyConfiguration:` |
 | `configurationWithContentsOfFile` | method, `CYLTagListViewConfiguration.kt:871` | `CYLTagListView (CYLConfiguration) +configurationWithContentsOfFile:error:` |
-| `kTagCollectionViewCellsHorizonMargin` | read-only property, `CYLTagView.kt:26` | `kTagCollectionViewCellsHorizonMargin` (same name in the iOS core) |
+| `kTagCollectionViewCellsHorizonMargin` | read-only property, `CYLTagView.kt:26` | `CYLTagView.cellSpacing` |
 | `kTagCollectionViewToLeftMargin` | read-only property, `CYLTagView.kt:30` | `kTagCollectionViewToLeftMargin` (same name in the iOS core) |
-| `kTagCollectionViewToTopMargin` | read-only property, `CYLTagView.kt:34` | `kTagCollectionViewToTopMargin` (same name in the iOS core) |
+| `kTagCollectionViewToTopMargin` | read-only property, `CYLTagView.kt:34` | `CYLTagView.sectionInset` |
 | `kTagCollectionViewToRightMargin` | read-only property, `CYLTagView.kt:38` | `kTagCollectionViewToRightMargin` (same name in the iOS core) |
 | `kTagCollectionViewToBottomtMargin` | read-only property, `CYLTagView.kt:42` | `kTagCollectionViewToBottomtMargin` (same name in the iOS core) |
 | `CYLTagModel` | class, `CYLTagView.kt:48` | `CYLTagModel` |
