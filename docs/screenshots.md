@@ -78,3 +78,14 @@ Second batch (2026-11-16 15:07–15:09): the review filter, retried with its rea
 "全部" (All) selected with 10 matches (reported, TODO). Taps on a product review tag ("质量不错(5)"), a hot-search tag
 ("小西瓜"), a search-category tag ("腾讯工程师") and the tag-cloud "可删除" (Deletable) tag showed no new page; whether
 the iOS example opens one there is not checked yet.
+
+### Pushed pages after the port's fixes (2026-11-16 10:26–10:31 emulator time)
+
+| Screenshot | Platform | Environment | Commit | Taken |
+| --- | --- | --- | --- | --- |
+| <img src="assets/harmonyos-push-plus-page.jpeg" width="300" alt="HarmonyOS plus-page"> root → the plus button: its page "查询筛选" (Query filter), after `95bebc1` | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
+| <img src="assets/harmonyos-push-product-tag.jpeg" width="300" alt="HarmonyOS product-tag"> product → review tag "质量不错(5)": the review list filtered to it, 5 matches (after `5dc703b`, as iOS) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
+| <img src="assets/harmonyos-push-reviews-good.jpeg" width="300" alt="HarmonyOS reviews-good"> review list → "好评(9)" (Good): 9 matches (after `5dc703b`) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
+| <img src="assets/harmonyos-push-hot-search-tag.jpeg" width="300" alt="HarmonyOS hot-search-tag"> hot search → "小西瓜": the search field takes the tag (after `5dc703b`) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
+| <img src="assets/harmonyos-push-search-category-tag.jpeg" width="300" alt="HarmonyOS search-category-tag"> search category → "腾讯工程师": the search field takes the tag (after `5dc703b`) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
+| <img src="assets/harmonyos-push-menu-filter-sheet.jpeg" width="300" alt="HarmonyOS menu-filter-sheet"> menu linkage → filter button: the regions and dishes panel opens (after `95bebc1`), but under a gray dimming layer, so it looks blurred (TODO) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
