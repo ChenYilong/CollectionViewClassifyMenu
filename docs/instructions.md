@@ -56,3 +56,4 @@
   user before creating another branch.
 - Commit and push (English rule, AGENTS.md "Branches and pull requests"): at the end of every answer, on any branch
   other than `master` / `main`, commit and push without asking (after `bash scripts/check-branch-pr.sh`).
+- Fix issues in the core first (AGENTS.md "Fix issues in the core first"): the core is the code published to a package registry (CocoaPods, Maven / Gradle, npm, pub.dev, ohpm); an example-layer fix is the worst option; when the core cannot fix a core defect, ask the user first and say why; record every example-layer fix and its reason in `docs/example-layer-fixes.md`.
