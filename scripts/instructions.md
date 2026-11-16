@@ -13,3 +13,4 @@ tags: [scripts, cocoapods]
   `example-screenshots.sh` and `simulator-id.sh`. Keep them POSIX `sh` and clean under `shellcheck`.
 - `example-screenshots.sh` runs in every build CI run; keep it producing one PNG per Example screen.
 - `publish-screenshots.sh` copies them to the `ci-screenshots` branch, because artifact storage hosts change between runs.
+- Fix issues in the core first (AGENTS.md "Fix issues in the core first"): the core is the code published to a package registry (CocoaPods, Maven / Gradle, npm, pub.dev, ohpm); an example-layer fix is the worst option; when the core cannot fix a core defect, ask the user first and say why; record every example-layer fix and its reason in `docs/example-layer-fixes.md`.

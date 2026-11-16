@@ -77,6 +77,37 @@ verify the behavior and update the applicable documentation.
   line after the description and before any trailers. Details:
   `.agents/skills/cyl-commit/`.
 
+## Fix issues in the core first
+
+- The core is the code this repository publishes to a package registry: the
+  CocoaPods pod and Swift package (`CollectionViewClassifyMenu/`), the Android
+  library on Maven / Gradle (`android/merged/library`,
+  `android/AndroidTagView/androidtagview`), the npm package
+  `react-native-cyl-tag-list` (its `src/`, `android/`, `ios/`, not `example/`
+  or `harmony-example/`), the pub.dev plugins (`flutter/cyl_tag_list`,
+  `flutter/cyl_tag_list_ohos`, not their `example/`), the ohpm HAR
+  (`harmony/classifymenu`, not `harmony/entry`) and the mini program npm
+  packages (`CrossPlatform/wechat-miniprogram/packages`). Everything
+  else (example apps, demo pages, demo data, screenshot scripts) is the example
+  layer.
+- When an issue or bug is reported, even one seen only in an example screen or
+  screenshot, fix it in the core first, so that every app using the library, and
+  every similar case, is fixed and the same problem cannot come back elsewhere.
+  Look for the core cause before touching the example: a wrong default, a
+  missing option, a measurement or layout rule, a missing localization or
+  accessibility hook, a color that does not follow the color mode.
+- A fix in the example layer is the worst option. Use it only when the defect
+  really is in example code or example data (a demo string, a demo page's own
+  layout, a screenshot script), or when the core cannot fix it.
+- When a core defect cannot be fixed in the core, stop and ask the user before
+  fixing it in the example, and say why the core cannot fix it (for example: a
+  third-party library's bug, a platform limitation, an API the core must keep
+  for compatibility).
+- Record every example-layer fix in `docs/example-layer-fixes.md`: the issue,
+  the files changed, and why it could not be solved in the core (or why the
+  defect was example-only). Mention that document in the issue's row of its
+  progress table.
+
 ## Swift examples and a Swift-friendly core
 
 - Every iOS example is written in Swift, tests included: `Example/CYLMenuExample`,

@@ -13,6 +13,23 @@ automated UI tests, locate controls through these features first (the localized 
 accessibility description, then an id), to tap, to drive complex flows and to chain actions. Source: AGENTS.md
 "HarmonyOS: accessibility, localization and accessibility-first UI tests".
 
+## Fix issues in the core first
+
+- The core is the code published to a package registry: the CocoaPods pod / Swift package, the Maven / Gradle
+  libraries (`android/merged/library`, `android/AndroidTagView/androidtagview`), the npm package
+  `react-native-cyl-tag-list` (not its examples), the pub.dev plugins (not their `example/`), the ohpm HAR
+  `harmony/classifymenu` (not `harmony/entry`) and the mini program packages. Everything else is the example layer.
+- Fix every issue or bug in the core first, even one seen only in an example screenshot, so that every app using the
+  library and every similar case is fixed. Look for the core cause (a default, a missing option, a layout or
+  measurement rule, a missing localization or accessibility hook, a color that ignores the color mode) before
+  touching the example.
+- An example-layer fix is the worst option: only for a defect that really is in example code or data (a demo string,
+  a demo page's own layout, a screenshot script), or when the core cannot fix it.
+- When a core defect cannot be fixed in the core: ask the user first and say why (a third-party bug, a platform
+  limitation, an API kept for compatibility).
+- Record every example-layer fix in `docs/example-layer-fixes.md` (issue, files, why not in the core) and mention it in
+  the issue's progress-table row. Full rule: AGENTS.md "Fix issues in the core first".
+
 ## Accessibility
 
 - `accessibilityText` (localized) on every control; `accessibilityDescription` when it helps;
