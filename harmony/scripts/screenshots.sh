@@ -10,13 +10,16 @@ if [ -z "${DEVECO:-}" ]; then
 fi
 PROJECT=$(cd "$(dirname "$0")/.." && pwd)
 OUT="$PROJECT/../docs/assets"
-HDC="$DEVECO/sdk/default/openharmony/toolchains/hdc"
+HDC_BIN="$DEVECO/sdk/default/openharmony/toolchains/hdc"
+# HDC_TARGET: the device to use when several run (hdc list targets), e.g. 127.0.0.1:5563.
+hdc() { if [ -n "${HDC_TARGET:-}" ]; then "$HDC_BIN" -t "$HDC_TARGET" "$@"; else "$HDC_BIN" "$@"; fi; }
+HDC=hdc
 BUNDLE=com.cyl.classifymenu.example
 WAIT=${WAIT:-3}
 
 if [ -z "${SKIP_INSTALL:-}" ]; then
   sh "$PROJECT/scripts/build.sh" >/dev/null
-  "$HDC" install -r "$PROJECT/entry/build/default/outputs/default/entry-default-unsigned.hap"
+  $HDC install -r "$PROJECT/entry/build/default/outputs/default/entry-default-unsigned.hap"
 fi
 mkdir -p "$OUT"
 
@@ -66,10 +69,10 @@ echo "$SCREENS" | while IFS='|' read -r name route param language mode; do
   [ -n "$param" ] && args="$args --ps cylScreenParam '$param'"
   [ -n "$language" ] && args="$args --ps cylLanguage $language"
   [ -n "$mode" ] && args="$args --ps cylColorMode $mode"
-  "$HDC" shell "aa force-stop $BUNDLE" >/dev/null
-  "$HDC" shell "aa start -b $BUNDLE -a EntryAbility$args" >/dev/null
+  $HDC shell "aa force-stop $BUNDLE" >/dev/null
+  $HDC shell "aa start -b $BUNDLE -a EntryAbility$args" >/dev/null
   sleep "$WAIT"
-  "$HDC" shell "snapshot_display -f /data/local/tmp/cyl-shot.jpeg" >/dev/null
-  "$HDC" file recv /data/local/tmp/cyl-shot.jpeg "$OUT/harmonyos-$name.jpeg" >/dev/null
+  $HDC shell "snapshot_display -f /data/local/tmp/cyl-shot.jpeg" >/dev/null
+  $HDC file recv /data/local/tmp/cyl-shot.jpeg "$OUT/harmonyos-$name.jpeg" >/dev/null
   echo "harmonyos-$name.jpeg"
 done
