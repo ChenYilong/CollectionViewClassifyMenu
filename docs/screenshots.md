@@ -49,3 +49,21 @@ defect are TODO in [harmony-verification.md](harmony-verification.md) (B1, B9, B
 | <img src="assets/harmonyos-image-tag-edit.jpeg" width="300" alt="HarmonyOS image-tag-edit"> `image-tag-edit` | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, 6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), DevEco Studio 6.0.1 hvigor, macOS 27.3 | `b1d3724` | 2026-11-16 14:36–14:41 NZDT |
 | <img src="assets/harmonyos-image-tag-list.jpeg" width="300" alt="HarmonyOS image-tag-list"> `image-tag-list` | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, 6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), DevEco Studio 6.0.1 hvigor, macOS 27.3 | `b1d3724` | 2026-11-16 14:36–14:41 NZDT |
 | <img src="assets/harmonyos-tag-container.jpeg" width="300" alt="HarmonyOS tag-container"> `tag-container` | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, 6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), DevEco Studio 6.0.1 hvigor, macOS 27.3 | `b1d3724` | 2026-11-16 14:36–14:41 NZDT |
+
+## HarmonyOS: pushed pages (2026-11-16)
+
+Reached by tapping controls found by their text or accessibility text (AGENTS.md, accessibility-first UI driving), from
+the root tab bar or a demo opened by launch option. Stacked top to bottom.
+
+| Screenshot | Platform | Environment | Commit | Taken |
+| --- | --- | --- | --- | --- |
+| <img src="assets/harmonyos-push-reviews-all.jpeg" width="300" alt="HarmonyOS reviews-all"> root → "查看更多评价" (See all reviews): the review list, memory mode | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `6081884` | 2026-11-16 14:55–14:57 NZDT |
+| <img src="assets/harmonyos-push-search-tab.jpeg" width="300" alt="HarmonyOS search-tab"> root → tab "场景二：搜索分类" (Scenario 2) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `6081884` | 2026-11-16 14:55–14:57 NZDT |
+| <img src="assets/harmonyos-push-styles-tab.jpeg" width="300" alt="HarmonyOS styles-tab"> root → tab "样式" (Styles) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `6081884` | 2026-11-16 14:55–14:57 NZDT |
+| <img src="assets/harmonyos-push-animations-tab.jpeg" width="300" alt="HarmonyOS animations-tab"> root → tab "动效" (Animations): the animated tags render in Chinese on this route | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `6081884` | 2026-11-16 14:55–14:57 NZDT |
+| <img src="assets/harmonyos-push-image-tag-list.jpeg" width="300" alt="HarmonyOS image-tag-list"> image tag sample → "标签列表" (Tag list) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `6081884` | 2026-11-16 14:55–14:57 NZDT |
+| <img src="assets/harmonyos-push-tag-cloud-list-view.jpeg" width="300" alt="HarmonyOS tag-cloud-list-view"> tag cloud sample → "列表视图" (List view) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `6081884` | 2026-11-16 14:55–14:57 NZDT |
+
+Not documented as pages, because the tap changed nothing on screen (reported to the port's owner, TODO): the plus
+button (it exposes no accessibility text, only a description), the menu-linkage filter button (an image with neither
+text nor description), the review filter "好评" (Good) and the search category "找人" (People).
