@@ -436,3 +436,11 @@ tags: [issues, ui, cocoapods, progress]
 ### DONE (2026-11-16): audit for the "private getter returns undefined" crash
 - Prompted by another project's crash (`this.hud is undefined`: a private getter in a page struct returned `undefined`; Back failed the same way in `leave()`).
 - Result for `harmony/` (102 `.ets` files): no getters inside any `@Component` struct; no `this.x!` assertions or `x!:` fields; every field dereferenced in `aboutToDisappear` / `onBackPress` / `onPageHide` / `leave` is initialized at declaration or is a required `@ObjectLink` (`CYLFilterBaseController.controller`, `CYLImageTagGroupView.group`, `CYLTagListView.model`, `CYLAnimatedIcon.bitmaps`, `CYLTagListCell.cell`). Toasts and dialogs go through `getUIContext()` or `CYLExampleUIContext.context?`. No change needed.
+
+### DONE (2026-11-16): retest the animation screen with Rive off (`3e02c5f`)
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `3e02c5f`, 12:03–12:04.
+- Opened, scrolled three screens down and back, then Back: light and dark, app alive, no new fault log. The Rive crash is gone.
+- New defects (screenshot `assets/harmonyos-animation-3e02c5f-light-dark-scroll.jpeg`, left to right: light top, light scrolled, dark top, dark scrolled):
+  - TODO: scrolled content draws over the status bar and the navigation title ("动效图标"); the list is not clipped under the header.
+  - TODO: `--ps cylColorMode dark` leaves the page light (only the status bar turns dark); dark mode needs the system setting or the option needs fixing.
+  - Expected: Rive tags show an empty icon area.
