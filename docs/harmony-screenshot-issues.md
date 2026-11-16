@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 67 / 67 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 69 / 70 = 99 / 100** (open: E2).
 
 ## Task log
 
@@ -60,9 +60,9 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 | C2 | Old example: English UI ("Filter", "Regions", "Dishes", "OK", "Tapped Home") mixed with Chinese headers and items ("吃", "全部") in one screen | DONE (emulator, `70ad109`, `assets/harmonyos-verify-sheet-*.jpeg`):: the old example was replaced by the port, whose screens are localized (`CYLExampleLocalizedString`, `docs/harmony-verification.md` E2) |
 | C3 | Old example: "广州: 1 places": no singular / plural ("1 place") | DONE (emulator, `70ad109`, `assets/harmonyos-verify-sheet-*.jpeg`):: the old example was replaced; the port says "SQLite returned %lu (of %ld places)" / "%lu matches" from the iOS strings |
 | C4 | A fold arrow is shown on sections that have nothing to fold (every section of the classify menu and the Lottie section, with one row) | DONE (emulator, `70ad109`, `assets/harmonyos-verify-sheet-*.jpeg`):: not in the port: its fold control shows only when a section can fold (`CYLTagListState.canFoldSection`) |
-| C5 | Result rows repeat the region: title "川菜 · 广州", subtitle "广州" (HarmonyOS, Flutter) | TODO need 模拟器截图验证: Flutter fixed (the subtitle no longer repeats the region already in the name); the HarmonyOS port's rows do not repeat it Emulator check (`70ad109`): still wrong: the result row repeats the region ("日式拉面 · 北京" over "吃 · 日式拉面 · 北京 · ★5.0"), `assets/harmonyos-verify-sheet-8.jpeg` (menu-linkage). |
+| C5 | Result rows repeat the region: title "川菜 · 广州", subtitle "广州" (HarmonyOS, Flutter) | TODO need 模拟器截图验证: Flutter fixed (the subtitle no longer repeats the region already in the name); the HarmonyOS port's rows do not repeat it Emulator check (`70ad109`): still wrong: the result row repeats the region ("日式拉面 · 北京" over "吃 · 日式拉面 · 北京 · ★5.0"), `assets/harmonyos-verify-sheet-8.jpeg` (menu-linkage). TODO need 模拟器截图验证: fixed again: the detail line leaves out the dish and the region when the name already says them ("日式拉面 · 北京" → "吃 · ★5.0 · ¥…"). |
 | C6 | Filter sheet: the default selection ("全部" in each section) is not shown as selected | DONE (emulator, `70ad109`, `assets/harmonyos-verify-interactive.jpeg`):: the port's filter selects each section's first exclusive item ("全部") when it loads (`CYLMultipleFilterController.reloadMenuData`) |
-| C7 | Filter sheet: the last row is cut off at the bottom, with no space above the OK button | TODO need 模拟器截图验证: fixed: the filter panel's scroll content has 16 vp below the last row (`CYLFilterBaseController`) Emulator check (`70ad109`): not judged: the filter panel scrolls behind its button bar; the last row ("西餐") is half under the bar at rest, `assets/harmonyos-verify-interactive.jpeg`. |
+| C7 | Filter sheet: the last row is cut off at the bottom, with no space above the OK button | TODO need 模拟器截图验证: fixed: the filter panel's scroll content has 16 vp below the last row (`CYLFilterBaseController`) Emulator check (`70ad109`): not judged: the filter panel scrolls behind its button bar; the last row ("西餐") is half under the bar at rest, `assets/harmonyos-verify-interactive.jpeg`. TODO need 模拟器截图验证: fixed: the panel's Scroll clips to its area and the Reset / OK bar draws above it, so no row sits under the bar. |
 | C8 | Animated icons screen: the title "动画图标" and the controls are Chinese while the tags are English (one screen, two languages) | DONE (emulator, `70ad109`, `assets/harmonyos-verify-sheet-*.jpeg`):: the old example was replaced; the port's animated icons screen is localized |
 
 ### React Native and Flutter examples on HarmonyOS (this repository)
@@ -107,7 +107,7 @@ in `docs/assets/harmonyos-*.jpeg`) and found these defects (`harmony-verificatio
 
 | # | Issue | Status |
 | --- | --- | --- |
-| P1 | B1: the Chinese root tab titles are cut off ("场景一：评价筛" runs into the next tab) | TODO need 模拟器截图验证: fixed: the title is as wide as its slot, shrinks from 10 to 8 fp, then ends with an ellipsis (`pages/Index.ets`) Emulator check (`70ad109`): still wrong: the titles no longer clip, but at 8 fp "场景一：评价筛选" and "场景二：搜索分类" run into each other with no gap, `assets/harmonyos-verify-interactive.jpeg` (root2). |
+| P1 | B1: the Chinese root tab titles are cut off ("场景一：评价筛" runs into the next tab) | TODO need 模拟器截图验证: fixed: the title is as wide as its slot, shrinks from 10 to 8 fp, then ends with an ellipsis (`pages/Index.ets`) Emulator check (`70ad109`): still wrong: the titles no longer clip, but at 8 fp "场景一：评价筛选" and "场景二：搜索分类" run into each other with no gap, `assets/harmonyos-verify-interactive.jpeg` (root2). TODO need 模拟器截图验证: fixed again: each title has 4 vp of padding on both sides (8 vp between neighbours instead of 4). |
 | P2 | B9 menu linkage: category headers show a huge blurred image and no title | DONE (emulator, `70ad109`, `assets/harmonyos-verify-sheet-*.jpeg`):: fixed: `CYLIndexPathButtonView` gave its icon no size, so the category image filled the header; the icon is now one title line high, `Contain`, never pushing the title out |
 | P3 | B9 menu linkage: selected tags are teal wedges with no visible title | TODO need 模拟器截图验证: fixed: the tag artwork was drawn with a plain `Fill`; it now stretches from its middle (`resizable` slice, half the image each side, as `CYLFilterCollectionCellView`), so the white title sits on teal Emulator check (`70ad109`): not judged: no tag was selected on the menu linkage screen during the run. |
 | P4 | B11 animations: in Chinese and dark mode the Lottie / PAG / Rive tags have no width (thin lines) | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: the page builds its tag list before any view appears, so it was measured with the canvas fallback, whose `vp` canvas font could give 0 / NaN; the fallback now measures in physical pixels and never returns 0 for text, and `CYLTagListView` drops cached sizes once it has a UI context |
@@ -201,9 +201,9 @@ was not run here.
 
 | # | Issue | Status |
 |---|---|---|
-| E1 | `screenshots.sh animations` / `en-animations` / `dark-animations` open the first tab (宝贝详情), not the animations tab; the shot is taken before the tab icons and review tags load (`assets/harmonyos-verify-sheet-8.jpeg`, `-24`) | TODO |
-| E2 | `dark-root`: launched with `cylColorMode dark`, the product page and tab bar stay light; only the status bar is dark (`assets/harmonyos-verify-sheet-24.jpeg`) | TODO |
-| E3 | `screenshots.sh root`: the first shot after install shows the launcher, the app had not appeared yet (`assets/harmonyos-verify-sheet-0.jpeg`) | TODO |
+| E1 | `screenshots.sh animations` / `en-animations` / `dark-animations` open the first tab (宝贝详情), not the animations tab; the shot is taken before the tab icons and review tags load (`assets/harmonyos-verify-sheet-8.jpeg`, `-24`) | TODO need 模拟器截图验证: fixed: a launch route that is a root tab (动效, 样式, the two scenarios) selects that tab instead of pushing it (`pages/Index.ets` `open`; a relaunch goes through AppStorage `cylLaunchScreen`) |
+| E2 | `dark-root`: launched with `cylColorMode dark`, the product page and tab bar stay light; only the status bar is dark (`assets/harmonyos-verify-sheet-24.jpeg`) | TODO: open, not fixed: the example's screens use fixed light colors in every color mode (S2); only the animation page follows dark mode (Z3, Z4, Z6). Dark mode for the root, product page and tab bar is a separate task |
+| E3 | `screenshots.sh root`: the first shot after install shows the launcher, the app had not appeared yet (`assets/harmonyos-verify-sheet-0.jpeg`) | TODO need 模拟器截图验证: fixed: `screenshots.sh` waits, up to 10 s more, until the app's window is listed by WindowManagerService before each shot |
 
 Not checked in this run (other apps): R1–R3 (React Native), F1–F3 (Flutter), T1–T12, D1–D4, N1–N4, X2 (CYLTabBarController's HarmonyOS example).
 

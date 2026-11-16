@@ -240,6 +240,8 @@ export struct CYLFilterPanelView {
           }
           .layoutWeight(1)
           .width('100%')
+          // Clipped to its area: the rows drew past it, so the last one sat half under the Reset / OK bar.
+          .clip(true)
           .align(Alignment.Top)
           .scrollBar(this.controller.collectionView.showsVerticalScrollIndicator ? BarState.Auto : BarState.Off)
           Row() {
@@ -264,6 +266,7 @@ export struct CYLFilterPanelView {
           }
           .width('100%')
           .height(BOTTOM_BUTTON_HEIGHT)
+          .zIndex(1)
         }
         .width(this.panelWidth())
         .height('100%')

@@ -72,6 +72,12 @@ echo "$SCREENS" | while IFS='|' read -r name route param language mode; do
   $HDC shell "aa force-stop $BUNDLE" >/dev/null
   $HDC shell "aa start -b $BUNDLE -a EntryAbility$args" >/dev/null
   sleep "$WAIT"
+  # The first launch after an install is slower (the app was still starting, so the shot showed the launcher): wait
+  # until the app's window is in front, up to 10 more seconds.
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    $HDC shell "hidumper -s WindowManagerService -a '-a'" 2>/dev/null | grep -q "$BUNDLE" && break
+    sleep 1
+  done
   $HDC shell "snapshot_display -f /data/local/tmp/cyl-shot.jpeg" >/dev/null
   $HDC file recv /data/local/tmp/cyl-shot.jpeg "$OUT/harmonyos-$name.jpeg" >/dev/null
   echo "harmonyos-$name.jpeg"

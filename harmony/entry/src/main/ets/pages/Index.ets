@@ -48,13 +48,37 @@ const PLUS_INDEX: number = 2;
 @Component
 struct Index {
   @State tab: number = 0;
+  /** A launch route set by EntryAbility.onNewWant (a relaunch while the app runs); see `open`. */
+  @StorageProp('cylLaunchScreen') @Watch('launchScreenChanged') launchScreen: string = '';
   private stack: NavPathStack = CYLDemoNav.stack;
+
+  /**
+   * Opens a launch route: a root tab's route selects that tab (pushing it opened nothing, so screenshots.sh's
+   * animations shots showed the first tab); any other route is pushed.
+   */
+  private open(screen: string): void {
+    // Not the plus tab: it opens its page on top (Q1), as the push does.
+    const index = TABS.findIndex((t: RootTab, i: number) => t.route === screen && i !== 2);
+    if (index >= 0) {
+      this.stack.clear(false);
+      this.tab = index;
+      return;
+    }
+    setTimeout(() => CYLDemoNav.push(screen, CYLLaunchOptions.screenParam ?? new Object()), 300);
+  }
+
+  launchScreenChanged(): void {
+    if (this.launchScreen !== '') {
+      this.open(this.launchScreen);
+      AppStorage.setOrCreate('cylLaunchScreen', '');
+    }
+  }
 
   aboutToAppear(): void {
     CYLExampleUIContext.context = this.getUIContext();
     const screen = CYLLaunchOptions.takeScreen();
     if (screen !== '') {
-      setTimeout(() => CYLDemoNav.push(screen, CYLLaunchOptions.screenParam ?? new Object()), 300);
+      this.open(screen);
     }
   }
 
@@ -104,7 +128,7 @@ struct Index {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .textAlign(TextAlign.Center)
           .width('100%')
-          .padding({ left: 2, right: 2 })
+          .padding({ left: 4, right: 4 }) // at least 8 vp between neighbouring titles (2 + 2 let them touch)
           .fontColor(this.tab === index ? '#007AFF' : '#8E8E93')
       }
       .justifyContent(FlexAlign.Center)
