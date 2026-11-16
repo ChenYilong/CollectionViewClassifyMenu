@@ -35,6 +35,18 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-16): HarmonyOS bug: fold arrows of the menu linkage page drawn at the wrong size
+
+- **Bug:** HarmonyOS example, the page titled "菜单选择 · 数据库联动" (Menu selection · database linkage,
+  `CYLMenuLinkagePage`): the section fold arrows (⌄) are drawn far too large, about a quarter of the screen width, in
+  `docs/assets/harmonyos-push-query-menu-linkage.jpeg` (2026-11-16 10:08 emulator time, before `5dc703b`).
+- **Found so far:** the port's owner sized the fold chevron in `5dc703b`; `harmonyos-menu-linkage.jpeg` (10:25, after it)
+  shows normal arrows beside "更多" (More). To do: retake the same page through the query-scenarios flow, replace the
+  screenshot, mark the bug fixed or keep it open.
+- **Prompt (verbatim):** "标记bug ： 鸿蒙系统，example 页面： 搜索一下关键词“菜单选择 数据库联动 ” 含有该字符串的页面截图 中的箭头 尺寸异常。"
+- **Prompt (English):** mark a bug: HarmonyOS, example page: search for the keyword "菜单选择 数据库联动"; in the
+  screenshots of the page that contains it, the arrows have an abnormal size.
+
 ### DONE (2026-11-16): retest the HarmonyOS fixes on the emulator
 
 - **Context:** the port's owner pushed `95bebc1` (Rive dispose crash, plus tab and filter button), `849c2d8` (tags laid out
