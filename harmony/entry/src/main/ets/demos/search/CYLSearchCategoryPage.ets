@@ -175,6 +175,7 @@ export struct CYLSearchCategoryPage {
           ForEach(JOB_CATEGORIES, (name: string, row: number) => {
             ListItem() {
               Text(CYLExampleLocalizedString(name))
+                .fontColor('#000000') // the label color on the example's light backgrounds, also in dark mode
                 .fontSize(15)
                 .maxLines(2)
                 .minFontSize(10.5)

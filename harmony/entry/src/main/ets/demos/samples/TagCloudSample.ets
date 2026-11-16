@@ -266,6 +266,7 @@ export struct CYLTagCloudRecyclerPage {
         ForEach(this.texts, (text: string, row: number) => {
           ListItem() {
             Text(text).fontSize(17).height(44).padding({ left: 16, right: 16 }).width('100%')
+              .fontColor('#000000') // the label color on the example's light backgrounds, also in dark mode
           }
         }, (text: string, row: number) => `${row}`)
         ListItem() {

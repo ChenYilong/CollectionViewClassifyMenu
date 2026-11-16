@@ -117,6 +117,24 @@ export default function tagListStateTest() {
       expect(checked).assertEqual(8);
     });
 
+    it('neverLaysTagsOutWithNoWidth', 0, () => {
+      // Regression (B11): laid out before its width was known, every tag was clamped to width 0 (a hairline).
+      const list = new CYLTagListState();
+      list.addTagsWithTitles(['首页', '消息', '搜索']);
+      const early = list.layoutSections();
+      expect(early[0].items.length).assertEqual(3);
+      // The tag's own width: its padding alone is wider than 20 vp (the bug gave 1 vp).
+      early[0].items.forEach((frame: CYLTagListItemFrame) => {
+        expect(frame.width > 20).assertTrue();
+      });
+      // The real width measures again and keeps every tag inside it.
+      list.setLayoutWidth(320);
+      list.layoutSections()[0].items.forEach((frame: CYLTagListItemFrame) => {
+        expect(frame.width > 20).assertTrue();
+        expect(frame.x + frame.width <= 320 + 0.5).assertTrue();
+      });
+    });
+
     it('movesAnItem', 0, () => {
       const list = new CYLTagListState();
       list.addTagsWithTitles(['a', 'b', 'c']);

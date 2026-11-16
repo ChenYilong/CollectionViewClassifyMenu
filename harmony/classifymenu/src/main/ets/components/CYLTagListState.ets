@@ -1817,7 +1817,8 @@ export class CYLTagListState {
         const iconSize = CYLTagButtonMetrics.iconSize(this.imageForItem(p), this.animationURLForItem(p) !== undefined,
           itemStyle);
         const width = CYLTagButtonMetrics.width(title, iconSize, this.isDeletable(p), itemStyle, this.fontScale);
-        return Math.min(width, contentWidth);
+        // Before the list knows its width (0), a tag keeps its own width: clamping to 0 drew every tag as a hairline.
+        return contentWidth > 0 ? Math.min(width, contentWidth) : width;
       });
     });
   }
@@ -1883,7 +1884,8 @@ export class CYLTagListState {
     if (width === this.measuredWidth) {
       return;
     }
-    this.measuredWidth = width;
+    // A pass without a known width is not kept: the real width always measures again.
+    this.measuredWidth = width > 0 ? width : -1;
     const available = this.contentWidth(width);
     this.itemWidths = this.widths(available);
     this.itemHeights = this.measureItemHeights();
