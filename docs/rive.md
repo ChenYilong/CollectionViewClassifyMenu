@@ -29,3 +29,9 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 
 - TODO: run the animation screen on a real HarmonyOS device (GPU renderer).
 - TODO: decide whether the Flutter and React Native iOS / Android examples should link Rive (`CYLTabBarController/Rive`, rive-android) so `.riv` tags animate there too.
+
+## TODO (2026-11-16, `feat/harmony`): link Rive in the Flutter and React Native iOS / Android examples
+
+- Prompt (verbatim): "加上 Rive" (answer to: link Rive in Flutter and React Native on iOS and Android so `.riv` tags animate there too).
+- Requirements: (1) iOS: `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile` and `react-native/react-native-cyl-tag-list/example/ios/Podfile`; (2) Android: `app.rive:rive-android:10.3.0` in both example apps; (3) a Rive section of `.riv` tags (from `harmony/entry/src/main/resources/rawfile/rive`, with `LICENSE-rive-ios.txt`) in `flutter/cyl_tag_list/example/lib/main.dart` and `react-native/react-native-cyl-tag-list/example/src/TagListPage.tsx`; (4) run on the iOS simulator and the Android emulator, screenshots in `docs/assets`; (5) update the table above.
+- Context: both examples link only `CYLTabBarController/Lottie` (iOS) and Lottie 6.6.2 (Android); a tag whose engine is missing shows its static image.
