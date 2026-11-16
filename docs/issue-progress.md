@@ -47,6 +47,29 @@ tags: [issues, ui, cocoapods, progress]
 - **Prompt (verbatim, abridged pasted report):** "使用鸿蒙模拟器处理 复现 以下rive动效 crash bug continue do The Rive crash is only made less likely; the bug is inside @ohos/rive. • The animation screen after the pool revert, in light mode, dark mode and with scrolling, still needs an emulator run. • I hadn't finished reviewing these screenshots: …"
 - **Prompt (English):** use the HarmonyOS emulator to reproduce and handle the Rive animation crash below; continue with
   the remaining emulator checks.
+- **Reproduced (2026-11-16, emulator `CYL ClassifyMenu Test`, build of `548039d`):** opening the animation screen crashes
+  the app every time, by launch option and through the 动效 tab alike, in light and dark mode, about 6–10 s after it
+  appears, before any scrolling: `cppcrash` on thread `Rive`, `SIGSEGV` at 0x158 in `NativeWindowDisconnect` ←
+  `eglDestroySurface` ← `ohos_rive::EGLWorkerImpl::destroy` ← `Renderer::DisposeOnWorkerThread`. Twice more the emulator
+  host itself crashed (Emulator minidump) while the screen was open.
+- **Cause, part 1 (the port, triggers it on every opening):** `CYLTagListView` keys each tag by its whole render state
+  (`finishKey`: x, y, width, height, font, colors, icon size, …). The first layouts change those values, so `ForEach`
+  destroys and rebuilds every tag: logged with a probe in `CYLRiveIconView`, 11 Rive views appear, 11 more appear about
+  2 s later, then the first 11 disappear.
+- **Cause, part 2 (the library, @ohos/rive 1.0.4, the newest):** when a `RiveAnimationView` goes away, ArkUI destroys its
+  XComponent surface at once (`onSurfaceDestroyed`), but the library disposes its renderer later, on its worker thread,
+  and calls `eglDestroySurface` on a surface whose native window is already gone. Any disposal of a Rive view can crash.
+- **Tried from the port, did not help (local builds, not committed):** calling the renderer's public `stop()`,
+  `destroySurface()` and then `stopThread()` from `CYLRiveIconView.aboutToDisappear` (it runs about 15 ms before
+  `onSurfaceDestroyed`): the late dispose still crashes the same way.
+- **Fix options (decision for the port's owner):** (1) stable `ForEach` keys for tags (section + item + content), with
+  position and size passed as observed state instead of being part of the key, so relayouts update tags in place and
+  never dispose Rive views while the screen is shown; this removes the crash in normal use, leaving disposal on leaving
+  the screen; (2) keep each Rive view alive for the app's lifetime (a pool that does not break the list's layout, unlike
+  `95bebc1`); (3) until @ohos/rive is fixed, show each Rive item's SVGA twin on HarmonyOS (every Rive scene already has
+  one); (4) report the dispose order to @ohos/rive (openharmony-tpc `ohos_rive`).
+- **Status:** reproduced and explained; not fixed. The other emulator checks of this task (filter button tint, Y1, Y2)
+  wait for the next run, since the emulator host crashed during this one.
 
 ### TODO (2026-11-16): HarmonyOS bug: the menu linkage filter icon is nearly invisible
 
