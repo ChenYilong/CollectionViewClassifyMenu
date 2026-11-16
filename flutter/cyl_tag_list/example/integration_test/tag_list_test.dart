@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:cyl_tag_list_example/main.dart';
+import 'package:cyl_tag_list_example/strings.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +37,7 @@ void main() {
     state = await controller.state();
     expect(state['loops'], true);
 
-    await tester.tap(find.text('Play all'));
+    await tester.tap(find.text(cylString('全部播放')));
     await tester.pump();
     await tester.tap(find.byType(Switch));
     await tester.pump();

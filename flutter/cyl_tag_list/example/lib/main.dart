@@ -1,6 +1,8 @@
 import 'package:cyl_tag_list/cyl_tag_list.dart';
 import 'package:flutter/material.dart';
 
+import 'strings.dart';
+
 import 'classify_menu_page.dart';
 
 void main() => runApp(const ExampleApp());
@@ -12,6 +14,8 @@ class ExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CYLTagListView',
+      // Screenshots show the app, not the debug ribbon.
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(colorSchemeSeed: const Color(0xFF2AB9A0), useMaterial3: true),
       home: const HomePage(),
     );
@@ -37,9 +41,9 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (index) => setState(() => _index = index),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.animation), label: 'Animated icons'),
-          NavigationDestination(icon: Icon(Icons.category_outlined), label: 'Classify menu'),
+        destinations: [
+          NavigationDestination(icon: const Icon(Icons.animation), label: cylString('动效图标')),
+          NavigationDestination(icon: const Icon(Icons.category_outlined), label: cylString('菜单')),
         ],
       ),
     );
@@ -135,7 +139,7 @@ class _TagListPageState extends State<TagListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Animated icons')),
+      appBar: AppBar(title: Text(cylString('动效图标'))),
       body: SafeArea(
         child: Column(
           children: [
@@ -145,10 +149,10 @@ class _TagListPageState extends State<TagListPage> {
                 children: [
                   Row(
                     children: [
-                      const Text('Speed'),
+                      Text(cylString('倍速')),
                       Expanded(
                         child: Semantics(
-                          label: 'Speed',
+                          label: cylString('倍速'),
                           value: _speedText,
                           child: Slider(
                             value: _speed,
@@ -167,7 +171,7 @@ class _TagListPageState extends State<TagListPage> {
                   ),
                   Row(
                     children: [
-                      const Expanded(child: Text('Loop')),
+                      Expanded(child: Text(cylString('循环播放'))),
                       Switch(
                         value: _loops,
                         onChanged: (value) {
@@ -180,7 +184,7 @@ class _TagListPageState extends State<TagListPage> {
                       FilledButton.icon(
                         onPressed: _controller.playAll,
                         icon: const Icon(Icons.play_arrow),
-                        label: const Text('Play all'),
+                        label: Text(cylString('全部播放')),
                       ),
                     ],
                   ),
@@ -192,7 +196,7 @@ class _TagListPageState extends State<TagListPage> {
               child: CylTagListView(
                 configuration: _configuration(),
                 controller: _controller,
-                onTap: (tap) => setState(() => _lastTap = 'Tapped ${tap.title}'),
+                onTap: (tap) => setState(() => _lastTap = cylString('点击「%@」', [tap.title])),
               ),
             ),
           ],

@@ -225,7 +225,8 @@ export struct CYLFilterPanelView {
               this.content()
             }
             .width('100%')
-            .padding({ top: this.controller.collectionView.contentInsetTop })
+            // [EN] Space below the last row too, so it is never cut by the Reset / OK bar. [CN] 最后一行下方同样留白，不被重置 / 确定栏截断。
+            .padding({ top: this.controller.collectionView.contentInsetTop, bottom: 16 })
           }
           .layoutWeight(1)
           .width('100%')

@@ -259,7 +259,7 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
     emulator: 2×, Loop on, two consecutive screenshots differ (the icons play). Screenshot (same environment as
     below, 2026-11-15 05:53 emulator time):
 
-    <img src="assets/harmonyos-animation-playback-controls.jpeg" width="360" alt="HarmonyOS: speed 2x, loop on, Lottie icons">
+    <img src="assets/harmonyos-animation-playback-controls.jpeg" width="360" alt="Earlier HarmonyOS example (replaced by the port): speed 2x, loop on, Lottie icons">
 
   - **UI tests as a script: DONE (2026-11-16).** `harmony/scripts/ui-test.sh` builds the example and its
     instrumented test, installs both on the running emulator and runs `aa test`; it fails unless every test passes.
@@ -270,15 +270,19 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
     description; tag ids repeat across tabs, so the Classify page has the id `classifyPage`. Result on the emulator
     (same environment as below): `Tests run: 3, Failure: 0, Error: 0, Pass: 3`.
     Original TODO prompt (verbatim): "continue".
+  - **Note (2026-11-16):** the screenshots in this step (and the playback-controls one above) show the **earlier
+    two-tab HarmonyOS example** (Tags / Classify), which the 22-demo port replaced (`harmony.md`). They are kept as
+    the history of step 1; the current example's screenshots come from `harmony/scripts/screenshots.sh`
+    (`docs/harmony-verification.md` rows B, `docs/harmony-screenshot-issues.md` C1).
   - **Screenshots:** HarmonyOS 6.0.1 SDK (API 21), Mate 70 Pro emulator `6.0.0.112(SP3DEVC00E112R4P11)`, DevEco
     Studio hvigor 6.21.2, macOS 27.3, branch `feat/android-kotlin` at the commit that adds them, 2026-11-15 09:48 NZDT.
     Top to bottom: Tags unfolded with Home selected; Classify with 川菜 and the 广州 filter; the Filter sheet.
 
-  <img src="assets/harmonyos-tags.jpeg" width="360" alt="HarmonyOS: Tags tab, unfolded, Home selected">
+  <img src="assets/harmonyos-tags.jpeg" width="360" alt="Earlier HarmonyOS example (replaced by the port): Tags tab, unfolded, Home selected">
 
-  <img src="assets/harmonyos-classify-filtered.jpeg" width="360" alt="HarmonyOS: Classify, 川菜 and 广州, 1 place">
+  <img src="assets/harmonyos-classify-filtered.jpeg" width="360" alt="Earlier HarmonyOS example (replaced by the port): Classify, 川菜 and 广州, 1 place">
 
-  <img src="assets/harmonyos-filter.jpeg" width="360" alt="HarmonyOS: Filter sheet with regions and dishes">
+  <img src="assets/harmonyos-filter.jpeg" width="360" alt="Earlier HarmonyOS example (replaced by the port): Filter sheet with regions and dishes">
 
 - **Step 2: DONE (2026-11-16; the blocker below was worked around without the newer SDK, see `cross-platform.md`).** History (2026-11-15): `flutter/cyl_tag_list_ohos` (OhosView + ArkTS platform view on
   `harmony/classifymenu`, registered through `dartPluginClass`) and the `CylTagListView.platformViewBuilder` hook are
