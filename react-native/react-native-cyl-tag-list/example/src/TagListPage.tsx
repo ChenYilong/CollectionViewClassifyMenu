@@ -29,6 +29,14 @@ const configuration = {
       ],
     },
     {
+      title: 'Rive · pod CYLTabBarController/Rive',
+      items: [
+        animated('Home', 'house.riv'),
+        animated('Done', 'check.riv'),
+        animated('Menu', 'menu_button.riv'),
+      ],
+    },
+    {
       title: 'Tags',
       items: [
         item('Home', 'system:house'),

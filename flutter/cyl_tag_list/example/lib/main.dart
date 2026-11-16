@@ -116,6 +116,14 @@ class _TagListPageState extends State<TagListPage> {
           ],
         },
         {
+          'title': 'Rive · pod CYLTabBarController/Rive',
+          'items': [
+            animated('Home', 'rive/house.riv'),
+            animated('Done', 'rive/check.riv'),
+            animated('Menu', 'rive/menu_button.riv'),
+          ],
+        },
+        {
           'title': 'Tags',
           'items': [
             item('Home', 'system:house'),
