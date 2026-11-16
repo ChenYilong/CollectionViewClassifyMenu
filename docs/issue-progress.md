@@ -35,6 +35,19 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-16): reproduce and handle the Rive crash on the HarmonyOS emulator
+
+- **Context:** the HarmonyOS animation screen crashed in `libohos_rive.so` (`EGLWorkerImpl::destroy` →
+  `eglDestroySurface` → `NativeWindowDisconnect`, null pointer) when a Rive view is disposed; the Rive pool was reverted
+  (`cb52204`); the owner's fixes since then (filter button tint `548039d`, badges and review chip `bf7ed6a`, fold
+  capsule `789573b`) were never seen on a device.
+- **Requirements:** on the emulator, reproduce the Rive crash, find its cause and handle it; run the animation screen in
+  light mode, dark mode and with scrolling; check the filter button, the hot-search badges (Y1) and the selected review
+  chip (Y2); update the screenshots and docs.
+- **Prompt (verbatim, abridged pasted report):** "使用鸿蒙模拟器处理 复现 以下rive动效 crash bug continue do The Rive crash is only made less likely; the bug is inside @ohos/rive. • The animation screen after the pool revert, in light mode, dark mode and with scrolling, still needs an emulator run. • I hadn't finished reviewing these screenshots: …"
+- **Prompt (English):** use the HarmonyOS emulator to reproduce and handle the Rive animation crash below; continue with
+  the remaining emulator checks.
+
 ### TODO (2026-11-16): HarmonyOS bug: the menu linkage filter icon is nearly invisible
 
 - **Bug:** HarmonyOS example, page "菜单选择 · 数据库联动" (`CYLMenuLinkagePage`): the filter button at the top left of the
