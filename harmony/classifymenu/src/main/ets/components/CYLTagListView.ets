@@ -1,3 +1,4 @@
+import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { CYLUIContext } from '../core/CYLUIContext';
 import { CYLAnimatedIcon } from './CYLAnimatedIcon';
@@ -568,6 +569,18 @@ export struct CYLTagListView {
     return r;
   }
 
+  /**
+   * The corner radius a tag draws (CYLTagButton's rule): 0 is a capsule (half the height), CYLTagCornerRadiusSquare is
+   * square, anything else at most half the height. The inline fold cell uses it too, so it has the tags' shape.
+   */
+  private tagCornerRadius(r: CYLTagRenderItem): number {
+    const radius = r.cornerRadius;
+    if (radius <= 0) {
+      return r.height / 2;
+    }
+    return radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, r.height / 2);
+  }
+
   private tap(r: CYLTagRenderItem): void {
     const m = this.model;
     hilog.info(0x0000, 'CYLTagList', 'tap %{public}d-%{public}d enabled %{public}s', r.section, r.item,
@@ -702,7 +715,7 @@ export struct CYLTagListView {
     .padding({ left: r.paddingLeft, right: r.paddingRight })
     .justifyContent(FlexAlign.Center)
     .backgroundColor(r.backgroundColor)
-    .border({ width: r.borderWidth, color: r.borderColor, radius: r.cornerRadius })
+    .border({ width: r.borderWidth, color: r.borderColor, radius: this.tagCornerRadius(r) })
     .position({ x: r.x, y: r.y })
     .id(`CYLTagListFold-${r.section}`)
     .accessibilityGroup(true)
