@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 61 / 61 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 62 / 62 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -179,6 +179,7 @@ was not run here.
 | Y1 | Hot search: the "神" / "热" glyphs inside the round badges are tiny and unreadable | TODO need 模拟器截图验证: fixed: `CYLTag.badgeImage` set a px font on a vp canvas, so the glyph was a density-fraction of the circle; the font is vp now |
 | Y2 | Review chips: the selected "好评(9)" chip's thumbs-up icon is orange on orange (invisible) | TODO need 模拟器截图验证: fixed: the selected icon color is white, as the title |
 | Y3 | Menu linkage: the filter button image is nearly invisible (1.01:1 on the bar; reported by the other session, B9) | TODO need 模拟器截图验证: fixed: the image is tinted as on iOS, gray #8E8E93 (3.1:1) with no filter, system blue with one |
+| Z1 | The animation screen crashes on every opening, 6 to 10 s in (thread Rive, eglDestroySurface on a dead window; reproduced by the other session on 548039d) | TODO need 模拟器截图验证: the trigger fixed: every relayout changed each tag's ForEach key (it held x / y / size), so all Rive views were disposed and rebuilt. A Rive item's key now leaves out its frame, which is read from observed state, so relayouts update it in place. Disposal on leaving the screen is still @ohos/rive's bug |
 
 ## Score history
 
