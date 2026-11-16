@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 71 / 72 = 99 / 100** (open: E2).
+**Score: 70 / 71 = 99 / 100** (open: E2).
 
 ## Task log
 
@@ -184,7 +184,6 @@ was not run here.
 | Z4 | Animation screen in dark mode: the nav bar ("动效图标") stays light | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: `CYLDemoBar(followsColorMode: true)` uses color resources with dark variants on this page |
 | Z5 | Once, first dark launch after install: blank tags and an app freeze (THREAD_BLOCK_6S in PipelineContext::AddWindowStateChangedCallback); not reproduced in three runs | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: recorded; the stack is inside ArkUI node creation, with no frame from the port, so no code change; to watch in the next runs |
 | Z6 | Animation screen in dark mode: the caption "动效引擎：… 已链接" is dim gray on black | DONE (emulator, `70ad109`, `assets/harmonyos-9c8048a-animation-dark-light.jpeg`, `assets/harmonyos-8529951-animation-dark.jpeg`):: fixed: a color resource, #6E6E73 light / #AEAEB2 dark |
-| E4 | Animation screen in English: two section titles stay Chinese ("Lottie（带图片资源与占位图）", "Lottie（绿色主题）") | TODO need 模拟器截图验证: fixed: the screen's section titles also go through the example's strings, where both have English and zh-Hant |
 
 ## Score history
 
@@ -205,7 +204,7 @@ was not run here.
 | E1 | `screenshots.sh animations` / `en-animations` / `dark-animations` open the first tab (宝贝详情), not the animations tab; the shot is taken before the tab icons and review tags load (`assets/harmonyos-verify-sheet-8.jpeg`, `-24`) | TODO need 模拟器截图验证: fixed: a launch route that is a root tab (动效, 样式, the two scenarios) selects that tab instead of pushing it (`pages/Index.ets` `open`; a relaunch goes through AppStorage `cylLaunchScreen`) |
 | E2 | `dark-root`: launched with `cylColorMode dark`, the product page and tab bar stay light; only the status bar is dark (`assets/harmonyos-verify-sheet-24.jpeg`) | TODO: open, not fixed: the example's screens use fixed light colors in every color mode (S2); only the animation page follows dark mode (Z3, Z4, Z6). Dark mode for the root, product page and tab bar is a separate task |
 | E3 | `screenshots.sh root`: the first shot after install shows the launcher, the app had not appeared yet (`assets/harmonyos-verify-sheet-0.jpeg`) | TODO need 模拟器截图验证: fixed: `screenshots.sh` waits, up to 10 s more, until the app's window is listed by WindowManagerService before each shot |
-| E4 | English animation screen: the section titles "Lottie（带图片资源与占位图）", "Lottie（绿色主题）" stay Chinese (`assets/harmonyos-verify-a2f8561.jpeg`, en-animations) | TODO |
+| E4 | English animation screen: the section titles "Lottie（带图片资源与占位图）", "Lottie（绿色主题）" stay Chinese (`assets/harmonyos-verify-a2f8561.jpeg`, en-animations) | TODO need 模拟器截图验证: fixed: the screen's section titles also go through the example's strings, where both have English and zh-Hant |
 
 Not checked in this run (other apps): R1–R3 (React Native), F1–F3 (Flutter), T1–T12, D1–D4, N1–N4, X2 (CYLTabBarController's HarmonyOS example).
 
