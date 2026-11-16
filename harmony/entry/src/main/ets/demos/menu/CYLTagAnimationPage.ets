@@ -81,7 +81,9 @@ class CYLAnimationDemoSource implements CYLMenuDataSource {
   }
 
   menuTitleForSection(section: number): string {
-    return this.base.menuTitleForSection(section);
+    // Also the example's strings: two section titles of animation-demo.json ("Lottie（绿色主题）", …) are only there,
+    // so they stayed Chinese in English.
+    return CYLExampleLocalizedString(this.base.menuTitleForSection(section));
   }
 
   menuTitleForItem(indexPath: CYLIndexPath): string {
