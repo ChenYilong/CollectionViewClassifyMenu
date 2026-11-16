@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import 'strings.dart';
+
 /// The places of the shared database (`Example-Shared/Database/cyl_places.sqlite`, the same rows on every platform,
 /// docs/cross-platform.md), copied from the app's assets on first use.
 class PlacesDatabase {
@@ -266,8 +268,10 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
   }
 
   String get _summary {
-    String names(List<String> values) => values.isEmpty ? '全部' : values.join('、');
-    return '${selectedTag ?? '全部'} · ${names(selectedRegions)} · ${names(selectedDishes)} · ${_places.length}';
+    // As the iOS example: labelled, "All" in the device language, then the number of matches.
+    String names(List<String> values) => values.isEmpty ? cylString('全部') : values.join('、');
+    final conditions = cylString('分类：%@ · 地区：%@ · 菜品：%@', [selectedTag ?? cylString('全部'), names(selectedRegions), names(selectedDishes)]);
+    return '$conditions · ${cylString('匹配 %lu 条', [_places.length])}';
   }
 
   @override
@@ -276,17 +280,17 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
     final filtered = selectedRegions.isNotEmpty || selectedDishes.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Classify menu'),
+        title: Text(cylString('菜单选择 · 数据库联动')),
         actions: [
           IconButton(
             key: const Key('resetConditions'),
-            tooltip: '重置筛选条件',
+            tooltip: cylString('重置'),
             onPressed: _database == null ? null : resetConditions,
             icon: const Icon(Icons.restart_alt),
           ),
           IconButton(
             key: const Key('openFilter'),
-            tooltip: '筛选',
+            tooltip: cylString('多选筛选'),
             onPressed: _database == null ? null : _showFilter,
             icon: Icon(filtered ? Icons.filter_alt : Icons.filter_alt_outlined),
           ),
@@ -317,9 +321,9 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
                   ),
                 ),
                 if (_places.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Text('没有符合条件的地点，换个条件试试', key: Key('noPlaces')),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(cylString('没有符合条件的商家'), key: const Key('noPlaces')),
                   ),
                 Expanded(
                   child: ListView.builder(
@@ -328,8 +332,8 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
                       final place = _places[index];
                       return ListTile(
                         dense: true,
+                        // The name already says its region ("日式拉面 · 北京"): the subtitle does not repeat it.
                         title: Text(place['name'] as String),
-                        subtitle: Text(place['region'] as String),
                         trailing: Text('★ ${(place['rating'] as num).toStringAsFixed(1)} · ¥${place['price']}'),
                       );
                     },
