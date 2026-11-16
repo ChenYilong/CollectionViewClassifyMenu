@@ -12,8 +12,8 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 | HarmonyOS (ArkTS) | `@ohos/rive` (`RiveAnimationView`) | `1.0.4` | `harmony/classifymenu/oh-package.json5`; `CYLAnimatedIcon.ets` | Emulator: `RendererType.Canvas`; device: `RendererType.Rive` (`cylRiveRendererType()`, `3417e7e`) | Crash fixed on the emulator (`e82b503`, `3417e7e`); real device untested. Switch: `CYL_RIVE_ENABLED` |
 | Flutter on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `flutter/cyl_tag_list_ohos/ohos/oh-package.json5` → `file:../../../harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
 | React Native on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `react-native/react-native-cyl-tag-list/harmony-example/harmony/entry/oh-package.json5` → `file:` `harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
-| Flutter on iOS / Android | Not linked / 未接入 | — | The example Podfile has `CYLTabBarController/Lottie` but no `/Rive`; the Android plugin has no rive-android | — | `.riv` tags show their static image (the animation is ignored when the engine is not linked) |
-| React Native on iOS / Android | Not linked / 未接入 | — | Same as Flutter: no `CYLTabBarController/Rive`, no rive-android | — | `.riv` tags show their static image |
+| Flutter on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile`; rive-android in `example/android/app/build.gradle.kts` (with `cyl.tabbar.libs`); `.riv` files in `example/assets/rive` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row (Home, Done, Menu) is in `example/lib/main.dart`. Not yet run on a simulator / emulator |
+| React Native on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `example/ios/Podfile`; rive-android in `example/android/app/build.gradle`; `.riv` files in the iOS app bundle (`Animations/`, in the Xcode project) and Android `assets/` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row is in `example/src/TagListPage.tsx`. Not yet run on a simulator / emulator |
 | WeChat mini program / 微信小程序 | `@rive-app/canvas-advanced` (WebAssembly, 573 KB) wrapped as `cyl-rive-miniprogram` | `2.39.1` | CYLTabBarController `CrossPlatform/rive-miniprogram`, copied into `cyl_components` by `scripts/fetch-cyltabbar.js` | Canvas 2D | Linked (`engines.rive: true` in `utils/tag-animations.js`); not affected |
 
 ## The HarmonyOS crash / 鸿蒙崩溃
@@ -28,7 +28,8 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 ## Open / 待办
 
 - TODO: run the animation screen on a real HarmonyOS device (GPU renderer).
-- TODO: decide whether the Flutter and React Native iOS / Android examples should link Rive (`CYLTabBarController/Rive`, rive-android) so `.riv` tags animate there too.
+- Done (decided "加上 Rive"): the Flutter and React Native iOS / Android examples link Rive (`13bcb84`).
+- TODO need 模拟器截图验证: run the Rive row of the Flutter and React Native examples on the iOS simulator (a Mac) and the Android emulator; screenshots in `docs/assets`. This Windows machine has no Mac, no adb and no Android emulator.
 
 ## TODO (2026-11-16, `feat/harmony`): link Rive in the Flutter and React Native iOS / Android examples
 
