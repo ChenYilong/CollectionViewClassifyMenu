@@ -153,7 +153,7 @@ struct Index {
       .scrollable(false)
       .animationDuration(0)
       .barHeight(56)
-      .barBackgroundColor('#F9F9F9')
+      .barBackgroundColor($r('app.color.cyl_bar_background')) // dark in dark mode (E2)
       .onChange((index: number) => this.tab = index)
     }
     .mode(NavigationMode.Stack)
