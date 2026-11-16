@@ -40,3 +40,19 @@ extension UIView {
         }
     }
 }
+
+public extension UIView {
+
+    /**
+     * This view and its descendants whose `accessibilityIdentifier` is `identifier`, depth first (Android
+     * `cyl_viewsWithAccessibilityIdentifier`), for tests and tools.
+     */
+    @objc(cyl_viewsWithAccessibilityIdentifier:)
+    func cyl_viewsWithAccessibilityIdentifier(_ identifier: String) -> [UIView] {
+        var found: [UIView] = accessibilityIdentifier == identifier ? [self] : []
+        for subview in subviews {
+            found += subview.cyl_viewsWithAccessibilityIdentifier(identifier)
+        }
+        return found
+    }
+}

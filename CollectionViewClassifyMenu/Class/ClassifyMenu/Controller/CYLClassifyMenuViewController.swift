@@ -9,6 +9,17 @@
 
 import UIKit
 
+/// The space between the classify menu's tags, points (Objective-C and Android `kTagCollectionViewCellsHorizonMargin`).
+public let kTagCollectionViewCellsHorizonMargin: CGFloat = 12
+/// The classify menu's leading inset, points (`kTagCollectionViewToLeftMargin`).
+public let kTagCollectionViewToLeftMargin: CGFloat = 16
+/// The classify menu's top inset, points (`kTagCollectionViewToTopMargin`).
+public let kTagCollectionViewToTopMargin: CGFloat = 12
+/// The classify menu's trailing inset, points (`kTagCollectionViewToRightMargin`).
+public let kTagCollectionViewToRightMargin: CGFloat = 16
+/// The classify menu's bottom inset, points (`kTagCollectionViewToBottomtMargin`, the original spelling).
+public let kTagCollectionViewToBottomtMargin: CGFloat = 10
+
 /**
  * A single-choice classify menu: sections of tags from `menuDataSource`, each folded to `defaultVisibleRows` rows
  * with a "more" button, an optional header above and footer below the tags in one scroll view. Taps are reported to
@@ -20,13 +31,13 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
 
     private enum Metric {
         static let headerToCollectionViewMargin: CGFloat = 0
-        static let cellsHorizontalMargin: CGFloat = 12
+        static let cellsHorizontalMargin: CGFloat = kTagCollectionViewCellsHorizonMargin
         static let cellHeight: CGFloat = 30
         static let itemButtonImageToTextMargin: CGFloat = 5
-        static let collectionViewToLeftMargin: CGFloat = 16
-        static let collectionViewToTopMargin: CGFloat = 12
-        static let collectionViewToRightMargin: CGFloat = 16
-        static let collectionViewToBottomMargin: CGFloat = 10
+        static let collectionViewToLeftMargin: CGFloat = kTagCollectionViewToLeftMargin
+        static let collectionViewToTopMargin: CGFloat = kTagCollectionViewToTopMargin
+        static let collectionViewToRightMargin: CGFloat = kTagCollectionViewToRightMargin
+        static let collectionViewToBottomMargin: CGFloat = kTagCollectionViewToBottomtMargin
         static let cellButtonCenterToBorderMargin: CGFloat = 19
     }
 
@@ -293,10 +304,7 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
     }
 
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if expandSectionArray.contains(NSNumber(value: section)) {
-            return items(of: dataSource[section]).count
-        }
-        return (firstRowCellCountArray[section] as? NSNumber)?.intValue ?? 0
+        numberOfVisibleItems(inSection: section)
     }
 
     open func collectionView(_ collectionView: UICollectionView,
@@ -364,13 +372,46 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
 
     open func filterHeaderView(_ headerView: CYLFilterHeaderView, didTapMoreButton sender: UIButton) {
         sender.isSelected.toggle()
-        if sender.isSelected {
-            expandSectionArray.add(NSNumber(value: sender.tag))
-        } else {
-            expandSectionArray.remove(NSNumber(value: sender.tag))
+        setSection(sender.tag, expanded: sender.isSelected)
+    }
+
+    // MARK: - Sections (Android `numberOfVisibleItemsInSection` / `setSectionExpanded`)
+
+    /**
+     * The number of items a section shows now: its first row, or all of its items when it is expanded.
+     */
+    @objc(numberOfVisibleItemsInSection:)
+    open func numberOfVisibleItems(inSection section: Int) -> Int {
+        guard section >= 0, section < dataSource.count else {
+            return 0
         }
-        self.collectionView?.performBatchUpdates({ [weak self] in
-            self?.collectionView?.reloadSections(IndexSet(integer: sender.tag))
+        if expandSectionArray.contains(NSNumber(value: section)) {
+            return items(of: dataSource[section]).count
+        }
+        return (firstRowCellCountArray[section] as? NSNumber)?.intValue ?? 0
+    }
+
+    /**
+     * Expands or folds a section, as its More button does, and resizes the menu.
+     */
+    @objc(setSection:expanded:)
+    open func setSection(_ section: Int, expanded: Bool) {
+        guard section >= 0, section < dataSource.count else {
+            return
+        }
+        let key = NSNumber(value: section)
+        if expanded {
+            if !expandSectionArray.contains(key) {
+                expandSectionArray.add(key)
+            }
+        } else {
+            expandSectionArray.remove(key)
+        }
+        guard let collectionView = self.collectionView else {
+            return
+        }
+        collectionView.performBatchUpdates({
+            collectionView.reloadSections(IndexSet(integer: section))
         }, completion: { [weak self] _ in
             self?.updateViewHeight()
         })

@@ -114,6 +114,13 @@ open class CYLFilterBaseController: UIViewController, UICollectionViewDelegateFl
     // MARK: - Showing and hiding
 
     /**
+     * Whether the panel is on screen: shown with `show(in:)` and not dismissed yet (Android `isShowing`).
+     */
+    @objc open var isShowing: Bool {
+        isViewLoaded && view.superview != nil
+    }
+
+    /**
      * Shows the panel over `view`: captures it, blurs the capture behind the panel and slides the panel in.
      */
     open func show(in view: UIView) {

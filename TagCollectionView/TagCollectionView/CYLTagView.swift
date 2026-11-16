@@ -162,6 +162,15 @@ open class CYLTagView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     }
 
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        numberOfVisibleItems(inSection: section)
+    }
+
+    /**
+     * The number of tags a section shows now: its first row, or all of them when it is opened (Android
+     * `numberOfVisibleItemsInSection`).
+     */
+    @objc(numberOfVisibleItemsInSection:)
+    open func numberOfVisibleItems(inSection section: Int) -> Int {
         guard let group = group(at: section) else {
             return 0
         }

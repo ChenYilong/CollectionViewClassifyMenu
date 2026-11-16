@@ -55,6 +55,27 @@ public final class CYLTagAppearance {
     public var font = CYLTagAppearance.defaultFont
 
     /**
+     * Resets `backgroundColor` to `defaultBackgroundColor` (Android `resetBackgroundColor`).
+     */
+    public func resetBackgroundColor() {
+        backgroundColor = Self.defaultBackgroundColor
+    }
+
+    /**
+     * Resets `textColor` to `defaultTextColor` (Android `resetTextColor`).
+     */
+    public func resetTextColor() {
+        textColor = Self.defaultTextColor
+    }
+
+    /**
+     * Resets `font` to `defaultFont` (Android `resetFont`).
+     */
+    public func resetFont() {
+        font = Self.defaultFont
+    }
+
+    /**
      * Tint of template icons (like `UITabBarItemStateAppearance.iconColor`). `nil` (the default) uses `textColor`.
      * Icons rendered as original keep their colors.
      */
