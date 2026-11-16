@@ -190,6 +190,8 @@ export struct CYLTagListView {
    * at once, and creating Rive views in it only to dispose them a moment later hit @ohos/rive's dispose crash.
    */
   @State private widthKnown: boolean = false;
+  /** Each item's current frame by key (x, y, width, height); see `finishKey`. */
+  @State private frames: Map<string, number[]> = new Map<string, number[]>();
   private model: CYLTagListState = new CYLTagListState();
   /** Per item: `playTokenForItem - playToken` last seen (a tap raises it: the icon plays). */
   private seenItemPlays: Map<string, number> = new Map<string, number>();
@@ -274,6 +276,9 @@ export struct CYLTagListView {
         }
       });
     }
+    const frames = new Map<string, number[]>();
+    items.forEach((it: CYLTagRenderItem) => frames.set(it.key, [it.x, it.y, it.width, it.height]));
+    this.frames = frames;
     this.items = items;
     this.headers = headers;
     this.footers = footers;
@@ -311,7 +316,12 @@ export struct CYLTagListView {
   }
 
   private finishKey(r: CYLTagRenderItem, extra: string): void {
-    r.key = [extra, r.section, r.item, r.x, r.y, r.width, r.height, r.title, r.fontSize, r.fontWeight, r.textColor,
+    const rive = (r.animation ?? '').split('#')[0].toLowerCase().endsWith('.riv');
+    // A Rive item's key leaves out its frame: the first relayouts move every tag, and a key change destroyed and rebuilt
+    // the item, disposing its Rive view, which crashes in @ohos/rive (eglDestroySurface on a dead window). Its frame is
+    // read from `frames` instead, so a relayout updates it in place.
+    r.key = [extra, r.section, r.item, rive ? 'riv' : r.x, rive ? '' : r.y, rive ? '' : r.width, rive ? '' : r.height,
+      r.title, r.fontSize, r.fontWeight, r.textColor,
       r.backgroundColor, r.highlightedBackgroundColor ?? '', r.borderColor, r.borderWidth, r.cornerRadius,
       r.paddingLeft, r.paddingRight, imageKey(r.image), r.animation ?? '', r.iconWidth, r.iconHeight, r.iconColor,
       r.iconRotation, r.imageTrailing, r.alignLeading, r.spacing, r.selected, r.enabled, r.deletable, r.deleteTitle,
@@ -581,6 +591,26 @@ export struct CYLTagListView {
     return radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, r.height / 2);
   }
 
+  private frameOf(r: CYLTagRenderItem): number[] {
+    return this.frames.get(r.key) ?? [r.x, r.y, r.width, r.height];
+  }
+
+  private fx(r: CYLTagRenderItem): number {
+    return this.frameOf(r)[0];
+  }
+
+  private fy(r: CYLTagRenderItem): number {
+    return this.frameOf(r)[1];
+  }
+
+  private fw(r: CYLTagRenderItem): number {
+    return this.frameOf(r)[2];
+  }
+
+  private fh(r: CYLTagRenderItem): number {
+    return this.frameOf(r)[3];
+  }
+
   private tap(r: CYLTagRenderItem): void {
     const m = this.model;
     hilog.info(0x0000, 'CYLTagList', 'tap %{public}d-%{public}d enabled %{public}s', r.section, r.item,
@@ -743,8 +773,8 @@ export struct CYLTagListView {
       if (r.cell !== undefined) {
         CYLTagListCellComponent({
           cell: r.cell,
-          cellWidth: r.width,
-          cellHeight: r.height,
+          cellWidth: this.fw(r),
+          cellHeight: this.fh(r),
           onCellClick: () => {
             hilog.info(0x0000, 'CYLTagList', 'cell click %{public}d-%{public}d', r.section, r.item);
             this.tap(r);
@@ -752,9 +782,9 @@ export struct CYLTagListView {
         })
       }
     }
-    .width(r.width)
-    .height(r.height)
-    .position({ x: r.x, y: r.y })
+    .width(this.fw(r))
+    .height(this.fh(r))
+    .position({ x: this.fx(r), y: this.fy(r) })
     .opacity(r.enabled ? 1 : 0.6)
     .translate({ x: this.draggedKey === r.key ? this.dragX : 0, y: this.draggedKey === r.key ? this.dragY : 0 })
     .zIndex(this.draggedKey === r.key ? 1 : 0)
