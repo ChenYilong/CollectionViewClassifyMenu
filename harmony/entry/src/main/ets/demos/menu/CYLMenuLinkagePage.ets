@@ -296,11 +296,11 @@ export struct CYLMenuLinkagePage {
             .height(22)
             .objectFit(ImageFit.Contain)
             // Tinted as on iOS: the core's template images are near-white (1.01:1 on the bar). Each pixel takes the
-            // tint scaled by its own alpha (unit-independent matrix), gray #8E8E93 (3.1:1) with no filter, system blue
+            // tint scaled by its own alpha (unit-independent matrix), gray #6E6E73 (4.6:1) with no filter, system blue
             // (4:1) with one.
             .colorFilter(this.filterModified
               ? [0, 0, 0, 0 / 255, 0, 0, 0, 0, 122 / 255, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0]
-              : [0, 0, 0, 142 / 255, 0, 0, 0, 0, 142 / 255, 0, 0, 0, 0, 147 / 255, 0, 0, 0, 0, 1, 0])
+              : [0, 0, 0, 110 / 255, 0, 0, 0, 0, 110 / 255, 0, 0, 0, 0, 115 / 255, 0, 0, 0, 0, 1, 0])
             .position({ x: 14, y: (CYL_DEMO_BAR_HEIGHT - 22) / 2 })
             // An image is not an accessibility element by default: expose it, and give it a 44 vp touch target.
             .accessibilityLevel('yes')
