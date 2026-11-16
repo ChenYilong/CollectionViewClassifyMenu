@@ -68,6 +68,7 @@ tags: [issues, ui, cocoapods, progress]
   the screen; (2) keep each Rive view alive for the app's lifetime (a pool that does not break the list's layout, unlike
   `95bebc1`); (3) until @ohos/rive is fixed, show each Rive item's SVGA twin on HarmonyOS (every Rive scene already has
   one); (4) report the dispose order to @ohos/rive (openharmony-tpc `ohos_rive`).
+- **Retest of `e82b503` (stable ForEach keys), 2026-11-16:** still crashes on every opening, light and dark: probe logs 22 Rive views created and 11 disposed, same `eglDestroySurface` stack. A second rebuild path remains (`CYLTagButton` recreates the icon through `animationViewToken`); also skipping the reload on a style size change (local build) did not stop it. Owner's fallback: switch Rive items off on HarmonyOS.
 - **Status:** reproduced and explained; not fixed. The other emulator checks of this task (filter button tint, Y1, Y2)
   wait for the next run, since the emulator host crashed during this one.
 
