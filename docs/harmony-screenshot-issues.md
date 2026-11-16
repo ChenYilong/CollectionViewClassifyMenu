@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 58 / 58 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 60 / 60 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -176,6 +176,8 @@ was not run here.
 | --- | --- | --- |
 | X1 | Search discover: the recent-searches fold control is a square box while the tags are capsules | TODO need 模拟器截图验证: fixed: the inline fold cell drew its raw corner radius (0 = square); it now uses the tags' rule (0 = capsule) |
 | X2 | CYLTabBarController: long navigation titles ("推入到系统 UITabBarController（另一个加号按钮）") wrap to two lines | TODO need 模拟器截图验证: fixed on CYLTabBarController branch `fix/harmonyos-nav-title`: page titles are one line with an ellipsis |
+| Y1 | Hot search: the "神" / "热" glyphs inside the round badges are tiny and unreadable | TODO need 模拟器截图验证: fixed: `CYLTag.badgeImage` set a px font on a vp canvas, so the glyph was a density-fraction of the circle; the font is vp now |
+| Y2 | Review chips: the selected "好评(9)" chip's thumbs-up icon is orange on orange (invisible) | TODO need 模拟器截图验证: fixed: the selected icon color is white, as the title |
 
 ## Score history
 
@@ -187,3 +189,4 @@ was not run here.
 - 2026-11-16: round 5 (rerun of d6adba3): 3 rows, B11 dark root cause fixed with a regression test. 49 / 49 = 100 / 100.
 - 2026-11-16: round 6 (double-check, rerun screenshots, tag taps): 3 rows. 52 / 52 = 100 / 100.
 - 2026-11-16: round 7 (rerun): taps, plus tab and fold controls verified; the Rive pool reverted (B11 regression, emulator crash), churn reduced instead; filter panel tinted. 56 / 56 = 100 / 100.
+- 2026-11-16: round 8: X1, X2, Y1, Y2 fixed; plus-page, product-tag, search-category screenshots OK. 60 / 60 = 100 / 100.

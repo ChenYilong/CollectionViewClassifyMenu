@@ -181,7 +181,9 @@ export class CYLTag {
     context.arc(side / 2, side / 2, side / 2, 0, Math.PI * 2);
     context.fill();
     context.fillStyle = '#FFFFFFFF';
-    context.font = `bold ${Math.round(side * 0.6)}px sans-serif`;
+    // Canvas coordinates are vp (its default unit), so the font is too: a px font drew the glyph a density-fraction
+    // of the circle (unreadable "神" / "热" in the hot-search badges).
+    context.font = `bold ${Math.round(side * 0.6)}vp sans-serif`;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.fillText(text, side / 2, side / 2);
