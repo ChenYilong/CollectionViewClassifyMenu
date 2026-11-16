@@ -4,6 +4,13 @@
 /** The example's strings by language, then key (the Simplified Chinese text). */
 export const CYL_EXAMPLE_STRINGS: Record<string, Record<string, string>> = {
   "en": {
+    "内存筛选": "In memory",
+    "手机套不错": "Nice case",
+    "质量不错": "Good quality",
+    "态度不错": "Friendly seller",
+    "划算": "Good value",
+    "颜色不错": "Nice color",
+    "背面细节一般": "Back details so-so",
     "列表": "List",
     "%@ 倍": "%@ times",
     "%ld 行": "%ld rows",
@@ -44,7 +51,6 @@ export const CYL_EXAMPLE_STRINGS: Record<string, Record<string, string>> = {
     "关键词": "Keywords",
     "关闭动效（静态图标）": "No animation (static icons)",
     "其它": "Other",
-    "内存筛选": "In memory",
     "内存筛选：在已加载的评价中立即匹配": "In memory: matched instantly in the loaded reviews",
     "分类菜单 + 多选筛选 · 数据库联动": "Classify menu + multiple filter · database",
     "分类：%@ · 地区：%@ · 菜品：%@": "Category: %@ · Regions: %@ · Dishes: %@",
@@ -274,6 +280,13 @@ export const CYL_EXAMPLE_STRINGS: Record<string, Record<string, string>> = {
     "循环播放": "循环播放",
   },
   "zh-Hant": {
+    "内存筛选": "記憶體篩選",
+    "手机套不错": "手機套不錯",
+    "质量不错": "質量不錯",
+    "态度不错": "態度不錯",
+    "划算": "划算",
+    "颜色不错": "顏色不錯",
+    "背面细节一般": "背面細節一般",
     "列表": "列表",
     "%@ 倍": "%@ 倍",
     "%ld 行": "%ld 行",
@@ -314,7 +327,6 @@ export const CYL_EXAMPLE_STRINGS: Record<string, Record<string, string>> = {
     "关键词": "關鍵詞",
     "关闭动效（静态图标）": "關閉動效（靜態圖示）",
     "其它": "其他",
-    "内存筛选": "記憶體篩選",
     "内存筛选：在已加载的评价中立即匹配": "記憶體篩選：在已載入的評價中立即比對",
     "分类菜单 + 多选筛选 · 数据库联动": "分類選單 + 多選篩選 · 資料庫連動",
     "分类：%@ · 地区：%@ · 菜品：%@": "分類：%@ · 地區：%@ · 菜品：%@",

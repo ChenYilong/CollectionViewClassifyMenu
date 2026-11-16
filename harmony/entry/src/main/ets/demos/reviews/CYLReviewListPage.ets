@@ -48,7 +48,7 @@ export function reviewFilterStyle(): CYLMenuStyle {
   return style;
 }
 
-const MODES: string[] = ['内存筛选', CYLExampleLocalizedString('网络筛选'), CYLExampleLocalizedString('数据库筛选')];
+const MODES: string[] = [CYLExampleLocalizedString('内存筛选'), CYLExampleLocalizedString('网络筛选'), CYLExampleLocalizedString('数据库筛选')];
 
 /** The pushed screen's parameter: the preselected filter (0 is "全部") and 'memory', 'network' or 'database'. */
 export interface CYLReviewListParam {

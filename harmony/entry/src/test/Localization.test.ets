@@ -20,8 +20,11 @@ export default function localizationTest() {
       expect(CYLExampleLocalizedString('宝贝详情', 'zh-Hans')).assertEqual('宝贝详情');
       expect(CYLExampleLocalizedString('SVGA 动效图标', 'en')).assertEqual('SVGA animated icons');
       expect(CYLExampleLocalizedString('SVGA 动效图标', 'zh-Hant')).assertEqual('SVGA 動效圖示');
-      // A key without a translation (sample data) stays as it is.
-      expect(CYLExampleLocalizedString('质量不错', 'en')).assertEqual('质量不错');
+      // A key without a translation (sample data: a masked user name) stays as it is.
+      expect(CYLExampleLocalizedString('雨**4', 'en')).assertEqual('雨**4');
+      // The review keyword chips are translated (E8).
+      expect(CYLExampleLocalizedString('质量不错', 'en')).assertEqual('Good quality');
+      expect(CYLExampleLocalizedString('内存筛选', 'en')).assertEqual('In memory');
     });
 
     it('formatsTheIOSPlaceholders', 0, () => {

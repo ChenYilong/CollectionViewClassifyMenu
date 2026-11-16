@@ -121,7 +121,11 @@ export class CYLReviewStore {
       makeFilter(CYLExampleLocalizedString('追加'), undefined, undefined, orange, false, (r: CYLReview) => r.hasFollowUp)
     ];
     ['手机套不错', '质量不错', '态度不错', '划算', '颜色不错', '背面细节一般'].forEach((keyword: string) => {
-      filters.push(makeFilter(keyword, undefined, undefined, orange, true, (r: CYLReview) => r.keywords.includes(keyword)));
+      // The chip shows the keyword in the app's language; the match keeps the data's keyword.
+      const filter = makeFilter(CYLExampleLocalizedString(keyword), undefined, undefined, orange, true,
+        (r: CYLReview) => r.keywords.includes(keyword));
+      filter.identifier = 'keyword:' + keyword;
+      filters.push(filter);
     });
     return filters;
   }
@@ -284,7 +288,7 @@ export class CYLDatabaseReviewQuery implements CYLReviewQuerying {
         conditions.push('r.has_follow_up = 1');
       } else if (f.isKeyword) {
         conditions.push('EXISTS (SELECT 1 FROM review_keywords k WHERE k.review_id = r.id AND k.keyword = ?)');
-        args.push(f.name);
+        args.push(f.identifier.substring('keyword:'.length)); // the data's keyword, not the shown (translated) name
       }
     });
     let sql = 'SELECT r.id FROM reviews r';
