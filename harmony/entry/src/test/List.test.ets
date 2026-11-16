@@ -6,6 +6,7 @@ import classifyAndFilterTest from './ClassifyAndFilter.test';
 import imageTagAndPlayerTest from './ImageTagAndPlayer.test';
 import styleAndModelsTest from './StyleAndModels.test';
 import launchOptionsTest from './LaunchOptions.test';
+import reviewFilterTapTest from './ReviewFilterTap.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -16,4 +17,5 @@ export default function testsuite() {
   imageTagAndPlayerTest();
   styleAndModelsTest();
   launchOptionsTest();
+  reviewFilterTapTest();
 }

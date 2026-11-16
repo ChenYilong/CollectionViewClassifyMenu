@@ -50,7 +50,11 @@ export struct CYLRightImageButtonView {
         .maxLines(1)
         .flexShrink(1)
       if (this.button.currentImage !== undefined) {
+        // One title line high, kept in proportion: unsized, the chevron image was drawn at its natural pixel size.
         Image(this.button.currentImage)
+          .height(Math.ceil(this.button.font.size * 1.2))
+          .objectFit(ImageFit.Contain)
+          .flexShrink(0)
           .accessibilityLevel('no')
       }
     }
