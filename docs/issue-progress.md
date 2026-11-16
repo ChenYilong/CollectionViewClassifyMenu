@@ -470,3 +470,12 @@ tags: [issues, ui, cocoapods, progress]
 - Z4 pass: the navigation bar is dark with a white title in dark mode, light with a black title in light mode.
 - Z5: the first dark launch right after installing ran without a freeze or fault log this time.
 - TODO: in dark mode the caption "动效引擎：CYLTabBarItemAnimationFactory 已链接" is very dim gray on black.
+
+### DONE (2026-11-16): Rive crash fix compared with CYLTableViewPlaceHolder; checked on every platform
+- Prompt (verbatim): "CYLTabBarController andCollectionViewClassifyMenu文件夹CYLTableViewPlaceHolder 文件夹has Writing the Rive tab icon component.please learn from it update our 鸿蒙os core component library to fix crash on 鸿蒙os。please learn from it double check this is also fixed on other platform like iOS Android rect native and flutter 微信小程序"
+- CYLTableViewPlaceHolder (`CrossPlatform/harmonyos-cylplaceholder/.../CYLRivePlaceholderItemAnimator.ets`, branch `feat/android-refresh-port-followup`) picks `RendererType.Canvas` when `deviceInfo.productModel === 'emulator'`, else `RendererType.Rive`. CYLTabBarController has no ArkTS Rive component on any branch.
+- HarmonyOS core: `harmony/classifymenu/.../CYLAnimatedIcon.ets` already does the same since `3417e7e` (`cylRiveRendererType()`, `CYL_RIVE_ENABLED` switch), plus stable tag keys (`e82b503`). Verified on the emulator: no crash on open, scroll, Back, light and dark (entries above).
+- Flutter on HarmonyOS (`flutter/cyl_tag_list_ohos/ohos/oh-package.json5`) and the React Native HarmonyOS example (`react-native/react-native-cyl-tag-list/harmony-example/harmony/entry/oh-package.json5`) link `file:` to `harmony/classifymenu`, so they build the same fixed component.
+- iOS, Android, React Native (iOS and Android hosts), Flutter (iOS and Android) and the WeChat mini program draw Rive through CYLTabBarController's engines (rive-ios, rive-android, cyl-rive-miniprogram WebAssembly). The crash was specific to @ohos/rive 1.0.4 (dispose after the XComponent surface is gone) and to the HarmonyOS emulator's GPU; neither runtime is used there. Not re-run on those platforms in this task.
+- TODO: Rive on a real HarmonyOS device still uses `RendererType.Rive` and has not been tested.
+- Z6 pass (`8529951`, 12:29): the caption is readable in dark mode (`assets/harmonyos-8529951-animation-dark.jpeg`).
