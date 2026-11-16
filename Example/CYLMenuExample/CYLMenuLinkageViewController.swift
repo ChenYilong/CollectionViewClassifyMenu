@@ -177,7 +177,16 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
         selectedIndexPath = nil
         selectedTag = nil
         database.saveSelection([], forScenario: CYLMenuLinkageClassifyScenario)
-        let all = (0..<filterSource.numberOfSectionsInMenu()).map { IndexPath(item: 0, section: $0) }
+        // The core's filter state (CYLFilterParamsTool, as on Android): the first item of every section, "全部".
+        let tool = CYLFilterParamsTool()
+        tool.dataSources = (0..<filterSource.numberOfSectionsInMenu()).map { section in
+            (0..<filterSource.menuNumberOfItems(inSection: section)).map {
+                filterSource.menuTitleForItem(at: IndexPath(item: $0, section: section))
+            }
+        }
+        let all = tool.filterParamsArray.enumerated().flatMap { section, flags in
+            flags.enumerated().compactMap { item, selected in selected ? IndexPath(item: item, section: section) : nil }
+        }
         confirmFilterSelection(all)
     }
 

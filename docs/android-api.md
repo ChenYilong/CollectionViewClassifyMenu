@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 731 / 731 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 761 / 761 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -187,6 +187,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLFilterBaseController.contentView` | property, `CYLFilterBaseController.swift` | `CYLFilterBaseController.contentView` |
 | `CYLFilterBaseController.restoreButton` | property, `CYLFilterBaseController.swift` | `CYLFilterBaseController.restoreButton` |
 | `CYLFilterBaseController.okButton` | property, `CYLFilterBaseController.swift` | `CYLFilterBaseController.okButton` |
+| `CYLFilterBaseController.settingArray` | property, `CYLFilterBaseController.swift` | `CYLFilterBaseController.settingArray` |
 | `CYLFilterBaseController.delegate` | property, `CYLFilterBaseController.swift` | `CYLFilterBaseController.delegate` |
 | `CYLFilterBaseController -init` | method, `CYLFilterBaseController.swift` | `CYLFilterBaseController() (a Fragment)` |
 | `CYLFilterBaseController.isShowing` | property, `CYLFilterBaseController.swift` | `CYLFilterBaseController.isShowing (same name in the Android core)` |
@@ -200,9 +201,38 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMultipleFilterController -reloadMenuData` | method, `CYLMultipleFilterController.swift` | `CYLMultipleFilterController.reloadMenuData` |
 | `CYLMultipleFilterController -selectedIndexPaths` | method, `CYLMultipleFilterController.swift` | `CYLMultipleFilterController.selectedIndexPaths` |
 | `CYLMultipleFilterController -setSelectedIndexPaths:` | method, `CYLMultipleFilterController.swift` | `CYLMultipleFilterController.setSelectedIndexPaths` |
+| `kMultipleFilterSetting` | constant, `CYLFilterParamsTool.swift` | `kMultipleFilterSetting` |
+| `kMultipleFilterSettingModified` | constant, `CYLFilterParamsTool.swift` | `kMultipleFilterSettingModified` |
+| `CYLFilterParamsTool` | class, `CYLFilterParamsTool.swift` | `com.cyl.classifymenu.CYLFilterParamsTool` |
+| `CYLFilterParamsTool.dataSources` | property, `CYLFilterParamsTool.swift` | `CYLFilterParamsTool.dataSources` |
+| `CYLFilterParamsTool.filterParamsArray` | property, `CYLFilterParamsTool.swift` | `CYLFilterParamsTool.filterParamsArray` |
+| `CYLFilterParamsTool.filterParamsDictionary` | property, `CYLFilterParamsTool.swift` | `CYLFilterParamsTool.filterParamsDictionary` |
+| `CYLFilterParamsTool.filterParamsContentDictionary` | property, `CYLFilterParamsTool.swift` | `CYLFilterParamsTool.filterParamsContentDictionary` |
+| `CYLFilterParamsTool.filename` | property, `CYLFilterParamsTool.swift` | `CYLFilterParamsTool.filename` |
 | `UIImage (CYLBlur)` | category, `UIImage+CYLBlur.swift` | `extension functions on Bitmap` |
 | `UIImage (CYLBlur) -cylBlurredWithRadius:iterations:tintColor:` | method, `UIImage+CYLBlur.swift` | `Bitmap.cyl_blurredImageWithRadius` |
 | `UIView (CYLGeneral)` | category, `UIView+CYLGeneral.swift` | `extension functions on View` |
+| `UIView (CYLGeneral) -cylSetWidth:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setWidth` |
+| `UIView (CYLGeneral) -cylSetHeight:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setHeight` |
+| `UIView (CYLGeneral) -cylSetX:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setX` |
+| `UIView (CYLGeneral) -cylSetY:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setY` |
+| `UIView (CYLGeneral) -cylSetSize:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setSize` |
+| `UIView (CYLGeneral).cylHeight` | property, `UIView+CYLGeneral.swift` | `View.cyl_height` |
+| `UIView (CYLGeneral).cylWidth` | property, `UIView+CYLGeneral.swift` | `View.cyl_width` |
+| `UIView (CYLGeneral).cylX` | property, `UIView+CYLGeneral.swift` | `View.cyl_x` |
+| `UIView (CYLGeneral).cylY` | property, `UIView+CYLGeneral.swift` | `View.cyl_y` |
+| `UIView (CYLGeneral).cylMaxY` | property, `UIView+CYLGeneral.swift` | `View.cyl_maxY` |
+| `UIView (CYLGeneral).cylMaxX` | property, `UIView+CYLGeneral.swift` | `View.cyl_maxX` |
+| `UIView (CYLGeneral) -cylHorizontalCenterWithWidth:` | method, `UIView+CYLGeneral.swift` | `View.cyl_horizontalCenterWithWidth` |
+| `UIView (CYLGeneral) -cylVerticalCenterWithHeight:` | method, `UIView+CYLGeneral.swift` | `View.cyl_verticalCenterWithHeight` |
+| `UIView (CYLGeneral) -cylVerticalCenterInSuperview` | method, `UIView+CYLGeneral.swift` | `View.cyl_verticalCenterInSuperView` |
+| `UIView (CYLGeneral) -cylHorizontalCenterInSuperview` | method, `UIView+CYLGeneral.swift` | `View.cyl_horizontalCenterInSuperView` |
+| `UIView (CYLGeneral) -cylSetBorderWidth:color:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setBorderWidth` |
+| `UIView (CYLGeneral) -cylSetCornerRadius:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setCornerRadius` |
+| `UIView (CYLGeneral) -cylAddLineLayerWithFrame:color:` | method, `UIView+CYLGeneral.swift` | `View.cyl_addSubLayerWithFrame` |
+| `UIView (CYLGeneral) -cylAddTapTarget:action:` | method, `UIView+CYLGeneral.swift` | `View.cyl_setTarget` |
+| `UIView (CYLGeneral) -cylSnapshotWithWidth:` | method, `UIView+CYLGeneral.swift` | `View.cyl_captureWithWidth` |
+| `UIView (CYLGeneral) -cylSnapshot` | method, `UIView+CYLGeneral.swift` | `View.cyl_capture` |
 | `UIView (CYLGeneral) -cyl_viewsWithAccessibilityIdentifier:` | method, `UIView+CYLGeneral.swift` | `View.cyl_viewsWithAccessibilityIdentifier` |
 | `CYLFilterCollectionCell` | class, `CYLFilterCollectionCell.swift` | `com.cyl.classifymenu.CYLFilterCollectionCell` |
 | `CYLFilterCollectionCell.titleButton` | property, `CYLFilterCollectionCell.swift` | `CYLFilterCollectionCell.titleButton` |

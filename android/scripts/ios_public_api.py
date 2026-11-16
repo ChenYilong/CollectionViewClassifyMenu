@@ -184,7 +184,11 @@ def symbols(root):
                         alts = [f"{owner} {sign}{legacy}", f"{owner} {sign}{name}"]
                         if base != owner:
                             alts += [f"{base} {sign}{sel}", f"{base} {sign}{legacy}"]
-                        found.append((rel, owner, "method", f"{owner} {sign}{sel}", alts))
+                        # The Swift call as a Swift caller writes it (`setPercentPosition(x:y:)`), next to the
+                        # Objective-C selector that api-map.json keys use.
+                        labels = "".join(w[0] + ":" for w in param_words(params))
+                        swift = f"{base}({labels})" if not fm else f"{base}.{name}({labels})"
+                        found.append((rel, owner, "method", f"{owner} {sign}{sel}", alts, swift))
                 elif vm:
                     name = vm.group(1)
                     if owner is None:
