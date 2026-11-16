@@ -35,6 +35,18 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### DONE (2026-11-16, logged as TODO the same day): commit and push after every answer on a feature branch
+
+- **Context:** the pull-request rule of the previous request (`7e11ae6`) is repeated, with one addition: after every
+  question-and-answer turn, commit and push on any branch that is not `master` / `main`, without asking.
+- **Prompt (verbatim):** "写入instructions相关文件，skills相关指令，找到commit 的相关章节，没有的话就新建，保证写入成功：全英文写入：创建分支后有任何commit必须提交pr。不允许只新建分支，持续向该分支commit代码，但不创建pr。因为不创建pr会导致该分支上的所有commit代码全部被忽略。 commit前必须检查该分支pr是否处于open状态，如果不处于open状态必须新建pr。target 目标优先设置为 在创建pr前的活跃pr，如果没有才设置为master分支。如果open状态的pr已经超过两个，那么就要慎重，你需要询问我，是否新建分支创建pr还是保持在本分支继续提交。因为超过两个分支会导致代码合并困难，无法合理分配分支的目标分支。一次问答结束后，只要当前分支不是master main，则必须commit 必须push ，无须询问，因为代码总是在分支上，并不会push 到master main分支。非常安全。无须担心push后的任何风险。"
+- **Prompt (English, the new part):** after each question-and-answer turn, as long as the current branch is not master or
+  main, commit and push, without asking: the code is always on a branch and is never pushed to master / main, so it is
+  safe and a push carries no risk to worry about.
+- **Result:** the pull-request part was already in place (`7e11ae6`); appended "Commit and push at the end of every
+  answer" to AGENTS.md and the cyl-commit skill ("Branches and pull requests"), `docs/instructions.md` and
+  `harmony/instructions.md`. Checked before this commit: one open pull request, #20 `feat/harmony` → `master`.
+
 ### DONE (2026-11-16, logged as TODO the same day): an open pull request for every branch with commits
 
 - **Context:** the branch rule opened a pull request when a branch was created, but did not require one before each

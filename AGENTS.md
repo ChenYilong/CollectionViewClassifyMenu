@@ -457,6 +457,11 @@ AGENTS.md, newest commit) and adapted to this project:
 - **More than two open pull requests: stop and ask the user** whether to create a new branch and pull request or to keep
   committing on the current branch. More than two open branches make merging hard and leave no sensible target branch
   for each.
+- **Commit and push at the end of every answer, without asking, on any branch other than `master` / `main`.** When
+  a question-and-answer turn ends and the current branch is not `master` or `main`, commit the work (following the
+  checks above: an open pull request, `bash scripts/check-branch-pr.sh`) and push it. This is safe: the code is always
+  on a branch, never pushed to `master` / `main`, so a push carries no risk that needs a question first. Never push to
+  `master` / `main` this way.
 - Details: `.agents/skills/cyl-commit/`. The same rule is in the vault's root `instructions.md` (section 15).
 
 ## Upstream projects (translations and ports)

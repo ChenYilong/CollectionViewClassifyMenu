@@ -11,3 +11,4 @@
   <target>` in a wrapper script or a bash array (AGENTS.md "Running scripts").
 - Before every commit: `bash scripts/check-branch-pr.sh` (an open pull request for the branch; ask the user when more
   than two are open; AGENTS.md "Branches and pull requests").
+- At the end of every answer, on a branch other than `master` / `main`: commit and push without asking.
