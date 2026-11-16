@@ -444,3 +444,12 @@ tags: [issues, ui, cocoapods, progress]
   - TODO: scrolled content draws over the status bar and the navigation title ("动效图标"); the list is not clipped under the header.
   - TODO: `--ps cylColorMode dark` leaves the page light (only the status bar turns dark); dark mode needs the system setting or the option needs fixing.
   - Expected: Rive tags show an empty icon area.
+
+### DONE (2026-11-16): retest `3417e7e` (Rive canvas renderer) and Y1–Y3
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `3417e7e`, 12:10–12:12.
+- Animation screen: open, scroll, wait 10 s, Back, in light and dark: app alive, no new fault log; Rive icons draw (canvas renderer). Screenshot `assets/harmonyos-animation-3417e7e-light-dark-scroll.jpeg`.
+- TODO Z2 (not fixed): scrolled tags still draw over the status bar and the "动效图标" title.
+- TODO Z3 (partly fixed): in dark mode only the header block turns dark; the tag list area stays white.
+- Y1 pass: the 神 / 热 badge glyphs on the hot-search tags are white on their circles and readable (`assets/harmonyos-hot-search.jpeg`).
+- TODO Y2 (fail): the selected 好评 chip's thumbs-up icon is orange on the orange chip, nearly invisible; not white (`assets/harmonyos-reviews-memory-good-selected.jpeg`).
+- TODO Y3 (fail): the menu linkage filter icon measures 2.45:1 against the bar (darkest pixel rgb 140,140,142); WCAG non-text minimum is 3:1 (`assets/harmonyos-menu-linkage.jpeg`).
