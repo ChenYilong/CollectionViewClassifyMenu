@@ -31,8 +31,8 @@ target 'Runner' do
   use_frameworks! :linkage => :static
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  # The native tag list the plugin wraps: this repository's pod.
-  pod 'CollectionViewClassifyMenu', :path => '../../../..'
+  # The native tag list the plugin wraps comes through Swift Package Manager (flutter/cyl_tag_list/ios/cyl_tag_list/
+  # Package.swift); a CollectionViewClassifyMenu pod as well would link it twice (3666 duplicate symbols).
   # The animation engine the tags play Lottie files with (found at run time; the core does not depend on it).
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
                   :commit => '117be52cfc28109465d52544820f10cc3f00ba89' }

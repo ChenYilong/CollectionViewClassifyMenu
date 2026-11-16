@@ -36,3 +36,10 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 - Prompt (verbatim): "加上 Rive" (answer to: link Rive in Flutter and React Native on iOS and Android so `.riv` tags animate there too).
 - Requirements: (1) iOS: `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile` and `react-native/react-native-cyl-tag-list/example/ios/Podfile`; (2) Android: `app.rive:rive-android:10.3.0` in both example apps; (3) a Rive section of `.riv` tags (from `harmony/entry/src/main/resources/rawfile/rive`, with `LICENSE-rive-ios.txt`) in `flutter/cyl_tag_list/example/lib/main.dart` and `react-native/react-native-cyl-tag-list/example/src/TagListPage.tsx`; (4) run on the iOS simulator and the Android emulator, screenshots in `docs/assets`; (5) update the table above.
 - Context: both examples link only `CYLTabBarController/Lottie` (iOS) and Lottie 6.6.2 (Android); a tag whose engine is missing shows its static image.
+- Progress (18:11): `13bcb84` adds the Rive pods, rive-android and the Rive sections. The Flutter iOS example did not link
+  before this task: its Xcode project uses Swift Package Manager for the core while the Podfile also pulled the
+  `CollectionViewClassifyMenu` pod (3666 duplicate symbols); the Podfile now keeps only CYLTabBarController's pods.
+  It builds and runs on the iPhone 17 Pro simulator (iOS 27.2, `CYL ClassifyMenu iOS`), RiveRuntime 6.29.0 is embedded
+  and the three `.riv` files are in `flutter_assets`, but the Rive tags show no icon (`assets/flutter-ios-rive-section-13bcb84.png`);
+  the native iOS example draws the same files (`../assets/rive-tags-transparent-background.png`). Not yet run: Flutter
+  Android, React Native iOS and Android.
