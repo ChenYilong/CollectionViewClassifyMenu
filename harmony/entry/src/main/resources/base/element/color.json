@@ -15,6 +15,10 @@
     {
       "name": "cyl_bar_background",
       "value": "#F9F9F9"
+    },
+    {
+      "name": "cyl_animation_secondary_label",
+      "value": "#6E6E73"
     }
   ]
 }
