@@ -98,3 +98,11 @@ Opening is automatic; merging follows the repository's rules and the user's appr
 ```sh
 bash scripts/check-branch-pr.sh   # 0: commit; 1: open a PR first; 2: more than two open PRs, ask the user
 ```
+
+### Commit and push after every answer
+
+- **Commit and push at the end of every answer, without asking, on any branch other than `master` / `main`.** When
+  a question-and-answer turn ends and the current branch is not `master` or `main`, commit the work (following the
+  checks above: an open pull request, `bash scripts/check-branch-pr.sh`) and push it. This is safe: the code is always
+  on a branch, never pushed to `master` / `main`, so a push carries no risk that needs a question first. Never push to
+  `master` / `main` this way.

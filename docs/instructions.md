@@ -54,3 +54,5 @@
   with commits always has an open pull request; before every commit run `bash scripts/check-branch-pr.sh` and open
   one if missing (base: the previously active PR's branch, else `master`); more than two open pull requests: ask the
   user before creating another branch.
+- Commit and push (English rule, AGENTS.md "Branches and pull requests"): at the end of every answer, on any branch
+  other than `master` / `main`, commit and push without asking (after `bash scripts/check-branch-pr.sh`).
