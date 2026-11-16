@@ -35,6 +35,15 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-16): retest the HarmonyOS fixes on the emulator
+
+- **Context:** the port's owner pushed `95bebc1` (Rive dispose crash, plus tab and filter button), `849c2d8` (tags laid out
+  1 vp wide, dark-mode text) and `5dc703b` (tag taps, fold chevrons) on `feat/harmony` (now the only branch).
+- **Requirements:** rerun on the dedicated emulator: animations (Chinese, dark, scrolling), the plus tab, the menu-linkage
+  filter button and fold chevrons, the tag taps (hilog domain CYLTagList); update the screenshots and the verification
+  rows; push to `feat/harmony`.
+- **Prompt (verbatim):** "continue"
+
 ### DONE (2026-11-16): more HarmonyOS pushed-page screenshots
 
 - **Context:** `screenshots.md` has six pushed pages; more screens open further pages (query scenarios, review
