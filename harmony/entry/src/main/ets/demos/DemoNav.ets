@@ -33,6 +33,8 @@ export struct CYLDemoBar {
   @Prop title: string = '';
   /** Shows the back button (pushed screens). */
   @Prop showsBack: boolean = true;
+  /** Dark in dark mode (color resources); the other pages keep their fixed light bar. */
+  @Prop followsColorMode: boolean = false;
   /** Replaces the title (a navigationItem.titleView). */
   @BuilderParam titleView: () => void = emptyBuilder;
   hasTitleView: boolean = false;
@@ -48,7 +50,7 @@ export struct CYLDemoBar {
         Text(this.title)
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
-          .fontColor('#000000')
+          .fontColor(this.followsColorMode ? $r('app.color.cyl_animation_label') : '#000000')
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .padding({ left: 56, right: 56 })
@@ -72,7 +74,7 @@ export struct CYLDemoBar {
     }
     .width('100%')
     .height(CYL_DEMO_BAR_HEIGHT)
-    .backgroundColor('#F9F9F9')
+    .backgroundColor(this.followsColorMode ? $r('app.color.cyl_bar_background') : '#F9F9F9')
     .border({ width: { bottom: 0.5 }, color: '#33000000' })
   }
 }

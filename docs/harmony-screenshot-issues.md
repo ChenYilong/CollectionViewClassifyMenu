@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 64 / 64 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 66 / 66 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -182,6 +182,8 @@ was not run here.
 | Z1 | The animation screen crashes on every opening, 6 to 10 s in (thread Rive, eglDestroySurface on a dead window; reproduced by the other session on 548039d) | TODO need 模拟器截图验证: the trigger fixed: every relayout changed each tag's ForEach key (it held x / y / size), so all Rive views were disposed and rebuilt. A Rive item's key now leaves out its frame, which is read from observed state, so relayouts update it in place. Disposal on leaving the screen is still @ohos/rive's bug. Retest of e82b503 still crashed (a second rebuild path), so Rive views are switched off on HarmonyOS (`CYL_RIVE_ENABLED = false`): Rive tags keep their place and title, without the animation, until @ohos/rive is fixed. Then switched back on with the cause found (tip from CYLTableViewPlaceHolder): on the emulator, Rive draws with `RendererType.Canvas` instead of the GPU renderer whose EGL surfaces crashed; devices keep the GPU renderer |
 | Z2 | Animation screen: scrolled tags draw over the status bar and the "动效图标" title | TODO need 模拟器截图验证: fixed: the tag list's Scroll clips to its bounds Retest of 3417e7e still overlapped: the page now also clips the list and draws the bar, status and controls above it (zIndex 1, opaque). |
 | Z3 | Animation screen: launched with `cylColorMode dark`, the page stays light (only the status bar is dark) | TODO need 模拟器截图验证: fixed: the page background and its labels use color resources with dark variants (`cyl_animation_background` / `cyl_animation_label`) instead of fixed white / black Retest: the list area stayed white; the list background is now clear. |
+| Z4 | Animation screen in dark mode: the nav bar ("动效图标") stays light | TODO need 模拟器截图验证: fixed: `CYLDemoBar(followsColorMode: true)` uses color resources with dark variants on this page |
+| Z5 | Once, first dark launch after install: blank tags and an app freeze (THREAD_BLOCK_6S in PipelineContext::AddWindowStateChangedCallback); not reproduced in three runs | TODO need 模拟器截图验证: recorded; the stack is inside ArkUI node creation, with no frame from the port, so no code change; to watch in the next runs |
 
 ## Score history
 

@@ -143,7 +143,7 @@ export struct CYLTagAnimationPage {
 
   build() {
     Column() {
-      CYLDemoBar({ title: CYLExampleLocalizedString('动效图标'), showsBack: this.showsBack })
+      CYLDemoBar({ title: CYLExampleLocalizedString('动效图标'), showsBack: this.showsBack, followsColorMode: true })
         .zIndex(1)
       Text(this.status)
         .fontSize(13)
