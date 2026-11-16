@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 46 / 46 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 49 / 49 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -128,6 +128,18 @@ fbb78eb: six pushed-page screenshots, notes in `docs/screenshots.md`).
 | Q4 | Search tab: tapping "找人" in the hint line opens nothing | TODO need 模拟器截图验证: not a defect: "找人" is part of the hint sentence "按分类浏览热门标签：找人、动态、八卦、职位", plain text as on iOS; the categories are tabs inside 搜索分类 |
 | Q5 | Crash: the animated icons screen crashes within seconds (`libohos_rive.so`: `EGLWorkerImpl::destroy` → `eglDestroySurface`, a null pointer while a Rive view is disposed) | TODO need 模拟器截图验证: mitigated: @ohos/rive 1.0.4 (the newest) crashes when a Rive view is disposed; a tag list rebuilds an item on every layout, selection or speed change (its key holds them), which disposed Rive views many times a second. Rive views are now pooled (`CYLRiveNodePool`: built once in a `BuilderNode`, shown through a `NodeContainer`, returned detached instead of disposed), so the crashing path is no longer taken |
 
+## Round 5 (2026-11-16): emulator rerun of d6adba3
+
+The other session reran d6adba3 on its emulator (8d7641c): B1, B9 and B12 are fixed (DONE with fresh screenshots in
+`harmony-verification.md`); B11 is still open in dark mode (`harmonyos-dark-animations.jpeg`), and the Rive crash
+recurred (that build did not have the pool of Q5, which came later in c6a8a5c / 39996ea).
+
+| # | Issue | Status |
+| --- | --- | --- |
+| S1 | B11 dark: the Lottie / PAG / Rive tags are hairlines again | TODO need 模拟器截图验证: fixed, root cause found: `CYLTagListState.widths()` clamped every tag to the content width, which is 0 before the list knows its width, and that pass was cached; tags were laid out 1 vp wide. A tag now keeps its own width while the width is unknown, and a pass at width 0 is never cached. Host regression test `neverLaysTagsOutWithNoWidth` (fails on the old code: 49 / 50; passes: 50 / 50) |
+| S2 | B11 dark: the speed and loop labels and the speed value are invisible | TODO need 模拟器截图验证: fixed: seven `Text`s of the example had no color, so they turned white in dark mode on the example's fixed light backgrounds; they use the label color like every other text |
+| S3 | The Rive crash recurred on d6adba3 | TODO need 模拟器截图验证: that build had no Rive pool yet; Q5's pool (Rive views never disposed) is in 39996ea |
+
 ## Score history
 
 - 2026-11-16: table created, 26 issues, all `TODO`. 0 / 26.
@@ -135,3 +147,4 @@ fbb78eb: six pushed-page screenshots, notes in `docs/screenshots.md`).
 - 2026-11-16: round 2: double-check of CYLTabBarController and the new screenshots, 8 rows added. 26 / 34 = 76.5 / 100.
 - 2026-11-16: round 2 handled (5 fixed in CYLTabBarController `4ee9ac5a`, 3 already fixed on 8aff599d); round 3 added 7 rows from the port's emulator screenshots, all handled. 41 / 41 = 100 / 100.
 - 2026-11-16: round 4 added 5 rows from the pushed pages (Q1 to Q5), all handled. 46 / 46 = 100 / 100.
+- 2026-11-16: round 5 (rerun of d6adba3): 3 rows, B11 dark root cause fixed with a regression test. 49 / 49 = 100 / 100.

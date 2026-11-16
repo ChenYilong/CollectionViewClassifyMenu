@@ -289,6 +289,7 @@ export struct CYLMenuLinkagePage {
         // The navigation bar: the filter button replaces the back button (leftBarButtonItem), 重置 on the right.
         Stack() {
           Text(CYLExampleLocalizedString('菜单选择 · 数据库联动')).fontSize(17).fontWeight(FontWeight.Medium).maxLines(1)
+            .fontColor('#000000') // the label color on the example's light backgrounds, also in dark mode
             .padding({ left: 64, right: 64 }).textOverflow({ overflow: TextOverflow.Ellipsis })
           Image(CYLMenuResources.image(this.filterModified ? 'cyl_filter_modified' : 'cyl_filter_normal'))
             .width(22)

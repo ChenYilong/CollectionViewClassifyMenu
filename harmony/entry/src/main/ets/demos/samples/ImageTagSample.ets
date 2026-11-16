@@ -126,6 +126,7 @@ export struct CYLImageTagEditPage {
   createDialog() {
     Column({ space: 12 }) {
       Text(CYLExampleLocalizedString('创建标签')).fontSize(17).fontWeight(FontWeight.Medium)
+        .fontColor('#000000') // the label color on the example's light backgrounds, also in dark mode
       ForEach([0, 1, 2], (i: number) => {
         TextInput({ placeholder: cylFormat(CYLExampleLocalizedString('标签 %ld'), i + 1), text: this.names[i] })
           .accessibilityText(cylFormat(CYLExampleLocalizedString('标签 %ld'), i + 1))
