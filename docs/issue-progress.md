@@ -220,7 +220,21 @@ tags: [issues, ui, cocoapods, progress]
   - tests (`CYLAnimatedIconTests`, `CYLTagStyleDemoTests`, `CYLReviewFilterScenarioTests`) cover SVGA as they cover
     Rive;
   - then the same on every platform's example (`example-demo-rules.md`), with screenshots (`screenshots.md`).
-- **Status:** TODO.
+- **Status:** TODO (iOS done, other platforms open).
+- **iOS (2026-11-16, `feat/harmony`): done in the iOS example; CI has to confirm it.** The core needed no new API: it gets
+  animated icons from CYLTabBarController's `CYLTabBarItemAnimationFactory`, which picks the animator by file extension,
+  so `.svga` plays once `pod 'CYLTabBarController/SVGA'` is linked (CYLTabBarController pinned at `cfddcce`, which has
+  `CYLSVGATabBarItemAnimator` and SVGAPlayerLite). The core's doc comments now name `.svga`. In the Example, one for one with
+  Rive: `Animations/SVGA/` (CYLTabBarController's six SVGA tab icons, unchanged, source and license in its README); the
+  Animated icons screen gets two sections, `svga` (home, search, chat, profile) and `svga-dark` (on icons.riv's dark tags);
+  the Styles screen gets the action `animation.svga`; `animated-tags.json` and the dictionary demo each get an SVGA tag;
+  new launch screens `animations-svga` and `style-svga` in `scripts/example-screenshots.sh`; tests
+  `CYLAnimatedIconTests.testSVGASectionsMirrorTheRiveSections`, plus SVGA in the engine test and the Styles test. New
+  string `"列表"` (en, zh-Hant). Limit, stated honestly: like Rive, CYLTabBarController's SVGA player has no
+  `animationSpeed`, `loops` or `progress`, so SVGA icons play once at the file's own speed. The speed slider and the loop
+  switch do not change them. That needs CYLTabBarController's view player to expose them (SVGAPlayer has `loops`), not
+  an example workaround. Not compiled here (Linux, no Xcode). Other platforms: HarmonyOS done (D5); Android, Flutter,
+  React Native and Mini Program are still TODO.
 
 - TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):
   - Context: the Swift core migration reached 100 (`250507c`). The user asks to continue the unfinished work of this

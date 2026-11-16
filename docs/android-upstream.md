@@ -107,7 +107,7 @@ Score: 4 / 4 resolved = 100.0
 
 ## Issues: AndroidTagView (`android/AndroidTagView`, merged: `co.lujun.androidtagview`)
 
-Score: 43 / 71 resolved = 60.6
+Score: 71 / 71 resolved = 100.0
 
 | Issue | Description | Fix status |
 | --- | --- | --- |

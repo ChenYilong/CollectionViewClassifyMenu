@@ -205,7 +205,7 @@ public enum CYLTagItemKey {
 
     /**
      * A `URL`, or a URL string, a file path or a file name (in the main bundle, or next to the configuration file): a
-     * Lottie .json, .pag, .riv or .gif animated icon.
+     * Lottie .json, .pag, .riv, .svga or .gif animated icon.
      */
     public static let animation = "animation"
 

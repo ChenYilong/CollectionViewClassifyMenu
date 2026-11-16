@@ -48,7 +48,7 @@ public final class CYLTag {
     public var selectedImage: UIImage?
 
     /**
-     * An animated icon (Lottie .json, .pag, .riv, .gif), as `menuAnimationURLForItem(at:)`.
+     * An animated icon (Lottie .json, .pag, .riv, .svga, .gif), as `menuAnimationURLForItem(at:)`.
      */
     public var animationURL: URL?
 

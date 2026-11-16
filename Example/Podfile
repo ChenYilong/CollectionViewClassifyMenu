@@ -24,6 +24,8 @@ target 'CYLMenuExample' do
   pod 'CYLTabBarController/Lottie', CYL_TAB_BAR
   pod 'CYLTabBarController/PAG', CYL_TAB_BAR
   pod 'CYLTabBarController/Rive', CYL_TAB_BAR
+  # SVGA icons (SVGAPlayerLite), shown wherever Rive is, as CYLTabBarController's Example-Rive does.
+  pod 'CYLTabBarController/SVGA', CYL_TAB_BAR
   pod 'CYLTabBarController/GIF', CYL_TAB_BAR
   pod 'CYLSearchViewController', CYL_SEARCH
 

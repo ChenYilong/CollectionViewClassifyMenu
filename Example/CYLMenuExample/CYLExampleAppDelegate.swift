@@ -234,6 +234,7 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
                 "style-lottie": ["animation.lottie"],
                 "style-pag": ["animation.pag"],
                 "style-rive": ["animation.rive"],
+                "style-svga": ["animation.svga"],
                 "style-gif": ["animation.gif"],
             ]
             for action in actions[screen] ?? [] {
@@ -251,6 +252,11 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
                 // PAG, Rive and icons.riv on dark tags, below the first screen.
                 DispatchQueue.main.async {
                     demo.scroll(toSectionIdentifier: "pag")
+                }
+            } else if screen == "animations-svga" {
+                // The two SVGA sections, below Rive.
+                DispatchQueue.main.async {
+                    demo.scroll(toSectionIdentifier: "svga")
                 }
             }
         } else if screen == "config" {

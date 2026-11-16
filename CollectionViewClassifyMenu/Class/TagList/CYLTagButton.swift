@@ -59,7 +59,7 @@ private enum CYLTagAnimationEngine {
     }
 
     /**
-     * The player's `progress` (0...1) when it has one (Lottie, PAG); `nil` otherwise (Rive, GIF).
+     * The player's `progress` (0...1) when it has one (Lottie, PAG); `nil` otherwise (Rive, SVGA, GIF).
      */
     static func progress(of player: AnyObject?) -> CGFloat? {
         guard let player = player as? NSObject, player.responds(to: NSSelectorFromString("progress")) else {
@@ -144,7 +144,7 @@ open class CYLTagButton: UIControl {
     }
 
     /**
-     * Animated icon file (Lottie .json, .pag, .riv, .gif…). The view comes from CYLTabBarController's animation engine
+     * Animated icon file (Lottie .json, .pag, .riv, .svga, .gif…). The view comes from CYLTabBarController's animation engine
      * (`CYLTabBarItemAnimationFactory`), found at runtime as CYLTabBarController's own Core does: add the library's
      * subspec to the app, e.g. `pod 'CYLTabBarController/Lottie'`. Without it, or when the file cannot be loaded,
      * `image` is shown.
@@ -183,7 +183,7 @@ open class CYLTagButton: UIControl {
      * True repeats the animated icon after `playAnimation()` until it is set to false, a change of selection or a new
      * file; false (the default) plays once. Turning it off lets the pass in progress finish. It uses the player's own
      * `loops` when it has one, and otherwise starts the animation again when its `progress` reaches the end; players
-     * with neither (Rive, GIF at CYLTabBarController `0e69250`) play once.
+     * with neither (Rive, SVGA, GIF at CYLTabBarController `cfddcce`) play once.
      */
     open var animationLoops = false {
         didSet {

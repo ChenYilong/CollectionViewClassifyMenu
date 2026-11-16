@@ -25,7 +25,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
     /// The style being edited; applied to the preview after every action.
     private(set) var style: CYLMenuStyle = CYLTagStyleDemoViewController.demoStyle()
     private(set) var content: CYLTagStyleDemoContent = .iconAndTitle
-    /// "lottie", "gif", "pag", "rive", or nil for static icons.
+    /// "lottie", "gif", "pag", "rive", "svga", or nil for static icons.
     private(set) var animationLibrary: String?
     private(set) var usesSelectedImage = true
     private var menuSource: CYLExampleMenuSource?
@@ -42,7 +42,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
              "imageTitleSpacing", "imageSize", "imageInsets", "titlePositionAdjustment", "imagePositionAdjustment",
              "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"],
             ["backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"],
-            ["animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
+            ["animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
             ["sample.tagCloud", "sample.imageTag", "sample.tagContainer"],
             ["reset"],
         ]
@@ -82,6 +82,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         "animation.lottie": "Lottie 动效图标",
         "animation.pag": "PAG 动效图标",
         "animation.rive": "Rive 动效图标",
+        "animation.svga": "SVGA 动效图标",
         "animation.gif": "GIF 动效图标",
         "animation.off": "关闭动效（静态图标）",
         "animationSpeed": "设置动效速度 animationSpeed",
@@ -188,7 +189,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
             for appearance in appearances {
                 appearance.margin = margin
             }
-        case "animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off":
+        case "animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off":
             let library = String(identifier.dropFirst("animation.".count))
             animationLibrary = library == "off" ? nil : library
             reloadItems()
@@ -304,7 +305,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         tagListView.selectedIndexPaths = selection.isEmpty ? [IndexPath(item: 0, section: 0)] : selection
     }
 
-    /// The demo's animated icons, from CYLTabBarController's examples (Lottie, GIF, Rive) and
+    /// The demo's animated icons, from CYLTabBarController's examples (Lottie, GIF, Rive, SVGA) and
     /// libpag/pag-ios (PAG, downloaded by `pod install`).
     func animationURL(forIndex index: Int) -> URL? {
         let files: [String: [String]] = [
@@ -312,6 +313,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
             "gif": ["CYLMenuExample.bundle/Animations/GIF/tab_star.gif", "CYLMenuExample.bundle/Animations/GIF/cyl_tab_sample_animated.gif"],
             "pag": ["pag-ios/0.pag", "pag-ios/1.pag"],
             "rive": ["CYLMenuExample.bundle/Animations/Rive/house.riv", "CYLMenuExample.bundle/Animations/Rive/menu_button.riv"],
+            "svga": ["CYLMenuExample.bundle/Animations/SVGA/tab_home.svga", "CYLMenuExample.bundle/Animations/SVGA/tab_profile.svga"],
         ]
         guard let library = animationLibrary, let names = files[library], !names.isEmpty else { return nil }
         var url = Bundle.main.resourceURL?.appendingPathComponent(names[index % names.count])

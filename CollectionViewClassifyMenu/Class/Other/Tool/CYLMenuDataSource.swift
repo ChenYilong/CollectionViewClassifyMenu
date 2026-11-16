@@ -64,7 +64,7 @@ import UIKit
     optional func menuSelectedImageForItem(at indexPath: IndexPath) -> UIImage?
 
     /**
-     * Animated icon (a Lottie .json, .pag, .riv or .gif file), played like a CYLTabBarController tab icon: it plays
+     * Animated icon (a Lottie .json, .pag, .riv, .svga or .gif file), played like a CYLTabBarController tab icon: it plays
      * when a tap selects the item. Needs the library's CYLTabBarController subspec in the app (e.g.
      * `pod 'CYLTabBarController/Lottie'`); without it the image is shown.
      */
