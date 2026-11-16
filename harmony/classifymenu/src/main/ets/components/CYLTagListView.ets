@@ -892,6 +892,8 @@ export struct CYLTagListView {
       .height(this.contentHeight)
     }
     .width('100%')
+    // Clipped to its bounds: scrolled tags (positioned children) drew over the status bar and the page title.
+    .clip(true)
     .scrollable(this.scrollEnabled ? ScrollDirection.Vertical : ScrollDirection.None)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.None)

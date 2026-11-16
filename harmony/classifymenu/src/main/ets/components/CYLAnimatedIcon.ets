@@ -7,7 +7,8 @@ import { CYLUIContext } from '../core/CYLUIContext';
  */
 import lottie, { AnimationItem } from '@ohos/lottie';
 import { PAGFile, PAGView, PAGViewController } from '@tencent/libpag';
-import { initializeRive, RiveAnimationView } from '@ohos/rive';
+import { initializeRive, RendererType, RiveAnimationView } from '@ohos/rive';
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
@@ -18,11 +19,19 @@ import {
 import { CYLSVGAMovie, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform } from './svga/CYLSVGAMovie';
 
 /**
- * Rive views are off on HarmonyOS until @ohos/rive is fixed: disposing one calls eglDestroySurface on a native window
- * ArkUI already destroyed, which crashed the animation screen on every opening (issue Z1). A Rive item keeps its place
- * and title, without the animation. Set to true to try a fixed @ohos/rive.
+ * Whether Rive views are created. Kept as a switch: set to false to leave Rive items without animation if @ohos/rive
+ * crashes again (issue Z1).
  */
-export const CYL_RIVE_ENABLED: boolean = false;
+export const CYL_RIVE_ENABLED: boolean = true;
+
+/**
+ * The emulator draws Rive with the Canvas renderer: @ohos/rive's default GPU renderer (one EGL surface per view) stalled
+ * the emulator's GPU thread and crashed in eglDestroySurface on dispose (issue Z1; the same fix worked in
+ * CYLTableViewPlaceHolder). Real devices keep the GPU renderer.
+ */
+function cylRiveRendererType(): RendererType {
+  return deviceInfo.productModel === 'emulator' ? RendererType.Canvas : RendererType.Rive;
+}
 
 let riveInitialized: boolean = false;
 
@@ -155,6 +164,7 @@ struct CYLRiveIconView {
           riveAnimation: this.source.options.get('animation') ?? '',
           riveAutoPlay: false,
           riveFit: 'contain',
+          rendererType: cylRiveRendererType(),
           touchPassThrough: true,
           onReady: (view: RiveAnimationView) => {
             this.onPlayer?.(new CYLRivePlayer(this.source, view));

@@ -151,7 +151,7 @@ export struct CYLTagAnimationPage {
       Column({ space: 8 }) {
         Row({ space: 10 }) {
           Text(CYLExampleLocalizedString('倍速')).fontSize(15).accessibilityLevel('no')
-            .fontColor('#000000') // the label color on the example's light backgrounds, also in dark mode
+            .fontColor($r('app.color.cyl_animation_label')) // black, white in dark mode (resources/dark)
           Slider({ value: this.speed, min: SPEED_MIN, max: SPEED_MAX, step: SPEED_STEP })
             .layoutWeight(1)
             .id('speedSlider')
@@ -159,13 +159,13 @@ export struct CYLTagAnimationPage {
             .accessibilityDescription(cylFormat(CYLExampleLocalizedString('%@ 倍'), this.speedValue()))
             .onChange((value: number) => this.speed = clampedSpeed(value))
           Text(`${this.speedValue()}×`).fontSize(15).fontFeature('"tnum" on').textAlign(TextAlign.End)
-            .fontColor('#000000') // the label color on the example's light backgrounds, also in dark mode
+            .fontColor($r('app.color.cyl_animation_label')) // black, white in dark mode (resources/dark)
             .id('speedValue').accessibilityLevel('no')
         }
         .width('100%')
         Row({ space: 10 }) {
           Text(CYLExampleLocalizedString('循环播放')).fontSize(15).accessibilityLevel('no')
-            .fontColor('#000000') // the label color on the example's light backgrounds, also in dark mode
+            .fontColor($r('app.color.cyl_animation_label')) // black, white in dark mode (resources/dark)
           Blank()
           Toggle({ type: ToggleType.Switch, isOn: this.loops })
             .id('loopSwitch')
@@ -204,7 +204,8 @@ export struct CYLTagAnimationPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Color.White)
+    // Follows the color mode (also `cylColorMode`): a fixed white kept the page light in dark mode.
+    .backgroundColor($r('app.color.cyl_animation_background'))
     .id('CYLTagAnimationDemoViewController')
   }
 }
