@@ -343,6 +343,19 @@ AGENTS.md, newest commit) and adapted to this project:
   `harmony/scripts/unit-test.sh`. Details: `.agents/skills/cyl-harmonyos/`, `.agents/skills/cyl-accessibility/`,
   `.agents/skills/cyl-localization/`.
 
+## Running scripts
+
+- **Run scripts with bash, not the interactive shell.** Shell scripts and multi-line command sequences run in bash:
+  `bash path/to/script.sh`, or `bash <<'EOF' … EOF` (or `bash -c '…'`) for an inline sequence; new scripts start with
+  `#!/usr/bin/env bash` (a POSIX `#!/bin/sh` script is run with `sh` or `bash`, never sourced into zsh). The
+  interactive shell on macOS is zsh, which behaves differently: it does not split an unquoted `$var` into words
+  (`box="10 20 30 40"; set -- $box` gives one argument, so a measurement over `$box` silently reads one value), a
+  variable holding a command with its arguments (`hdc="hdc -t 127.0.0.1:5563"; $hdc shell …`) fails with "no such
+  file or directory", and a glob that matches nothing aborts the whole command. The error this rule prevents: "zsh
+  doesn't split $box into words either. Running the same measurement as a bash script." Keep a command with
+  arguments in a wrapper script or a bash array (`hdc=(hdc -t 127.0.0.1:5563); "${hdc[@]}" shell …`), never in a
+  string variable.
+
 ## CI/CD and Example screenshots
 
 - CI follows CYLTabBarController's `.github/workflows/ios.yml`; the scripts
