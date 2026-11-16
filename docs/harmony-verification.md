@@ -68,7 +68,7 @@ iOS demo (texts, data, taps), screenshot `docs/assets/harmonyos-<demo>.png` link
 | B8 | `CYLQueryScenariosPage` | DONE (2026-11-16): renders on the emulator, screenshot [query-scenarios](assets/harmonyos-query-scenarios.jpeg) |
 | B9 | `CYLMenuLinkagePage` | TODO (2026-11-16): fixed after `d6adba3`: headers show their icon and title, tags render normally, 83 results, screenshot [menu-linkage](assets/harmonyos-menu-linkage.jpeg); TODO: the filter icon in the title bar is nearly invisible (contrast 1.01 : 1, WCAG asks 3 : 1; `issue-progress.md`) |
 | B10 | `CYLTagStylePage` | DONE (2026-11-16): renders on the emulator, screenshot [styles](assets/harmonyos-styles.jpeg), [zh-hant-styles](assets/harmonyos-zh-hant-styles.jpeg) |
-| B11 | `CYLTagAnimationPage` | TODO (2026-11-16, after `849c2d8`, regression): in light mode the animated tags are now empty boxes without icons or titles ([animations](assets/harmonyos-animations.jpeg); they rendered before); opening the screen in dark mode, or scrolling it, crashed the emulator host twice (Emulator minidump; no app fault log left); earlier app crashes were in `libohos_rive.so` |
+| B11 | `CYLTagAnimationPage` | TODO (2026-11-16, build `548039d`): the screen crashes the app every time it opens (light and dark, 6–10 s after it appears): the tag list rebuilds every tag on its first relayouts (`ForEach` keys hold the layout), and disposing a Rive view crashes inside @ohos/rive 1.0.4 (`eglDestroySurface` on a destroyed native window); details and fix options in `issue-progress.md` |
 | B12 | `CYLTagConfigurationPage` | DONE (2026-11-16, after `d6adba3`): the icon-only item shows its heart, screenshot [configuration](assets/harmonyos-configuration.jpeg) |
 | B13 | `CYLTagCloudDemoPage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud](assets/harmonyos-tag-cloud.jpeg) |
 | B14 | `CYLTagCloudSamplePage` | DONE (2026-11-16): renders on the emulator, screenshot [tag-cloud-sample](assets/harmonyos-tag-cloud-sample.jpeg) |
@@ -170,3 +170,4 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
 - 2026-11-16 (emulator rerun after `d6adba3`): B1, B9 and B12 DONE; B11 still TODO (dark mode, Rive crash). Verified: 38 / 53 = 71.7 / 100.
 - 2026-11-16 (emulator rerun after `95bebc1`, `849c2d8`, `5dc703b`): tag taps, the plus tab and the menu-linkage fold controls work; the filter panel opens under a dimming layer; B11 regressed (empty tags) and the animation screen crashed the emulator host twice.
 - 2026-11-16: B9 reopened: the filter icon is nearly invisible (contrast 1.01 : 1). Verified: 37 / 53 = 69.8 / 100.
+- 2026-11-16 (Rive crash reproduced on the emulator, build `548039d`): B11 crashes on every opening; cause and fix options in `issue-progress.md`.
