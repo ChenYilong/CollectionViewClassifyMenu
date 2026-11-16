@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 52 / 52 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 56 / 56 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -126,7 +126,7 @@ fbb78eb: six pushed-page screenshots, notes in `docs/screenshots.md`).
 | Q2 | Menu linkage: the filter button (image `menuLinkageFilter`) has no text or description; tapping it opens no panel | TODO need 模拟器截图验证: fixed: the image is exposed (`accessibilityLevel('yes')`, text and description), with a 44 vp touch target; the panel's width falls back to the display's when its host is not measured yet (a 0-wide panel looked like no panel) |
 | Q3 | Review list (memory): tapping "好评" does not change the selection (全部 stays, 10 matches) | TODO need 模拟器截图验证: no code change: the chips are labeled with their count ("好评(3)"), so a tap found by the exact text "好评" does not hit the chip; the selection logic (multiple choice, exclusive 全部) is the tested one (`ClassifyAndFilter` host tests). To check by tapping "好评(3)" |
 | Q4 | Search tab: tapping "找人" in the hint line opens nothing | TODO need 模拟器截图验证: not a defect: "找人" is part of the hint sentence "按分类浏览热门标签：找人、动态、八卦、职位", plain text as on iOS; the categories are tabs inside 搜索分类 |
-| Q5 | Crash: the animated icons screen crashes within seconds (`libohos_rive.so`: `EGLWorkerImpl::destroy` → `eglDestroySurface`, a null pointer while a Rive view is disposed) | TODO need 模拟器截图验证: mitigated: @ohos/rive 1.0.4 (the newest) crashes when a Rive view is disposed; a tag list rebuilds an item on every layout, selection or speed change (its key holds them), which disposed Rive views many times a second. Rive views are now pooled (`CYLRiveNodePool`: built once in a `BuilderNode`, shown through a `NodeContainer`, returned detached instead of disposed), so the crashing path is no longer taken |
+| Q5 | Crash: the animated icons screen crashes within seconds (`libohos_rive.so`: `EGLWorkerImpl::destroy` → `eglDestroySurface`, a null pointer while a Rive view is disposed) | TODO need 模拟器截图验证: mitigated (pool reverted in round 7, W1 / W2): @ohos/rive 1.0.4 (the newest) crashes when a Rive view is disposed; a tag list rebuilds an item on every layout, selection or speed change (its key holds them), which disposed Rive views many times a second. Rive views are now pooled (`CYLRiveNodePool`: built once in a `BuilderNode`, shown through a `NodeContainer`, returned detached instead of disposed), so the crashing path is no longer taken |
 
 ## Round 5 (2026-11-16): emulator rerun of d6adba3
 
@@ -153,6 +153,19 @@ on the emulator. New:
 | V2 | Taps on tags do nothing on the emulator: the review chip "好评(9)" leaves 全部 selected (10 matches); product review tags ("质量不错(5)"), hot-search, search-category and tag-cloud tags open nothing | TODO need 模拟器截图验证: the selection logic is right (new host test `ReviewFilterTap`: a tap on "好评(9)" replaces the exclusive 全部); the tap did not reach it. Each tag item now takes a physical tap with a `priorityGesture(TapGesture)` on its container, once, ahead of the views inside it (the cell's `onClick` stays for screen readers), and both paths log to hilog (domain `CYLTagList`: "tap gesture", "cell click", "tap") so the next run shows the delivery. The product page's tags opening the review list is the iOS behavior (`productKeywordOpensFilteredReviews`), so those are the same defect, not parity gaps |
 | V3 | Review list status: "已选：全部" is not localized | TODO need 模拟器截图验证: fixed: `CYLExampleLocalizedString('全部')` |
 
+## Round 7 (2026-11-16): rerun of 95bebc1 / 849c2d8 / 5dc703b
+
+The other session's rerun (f333383, "Pushed pages after the port's fixes"): V2 tag taps work (hilog "CYLTagList: tap
+gesture 0-8 / tap 0-8 enabled true"; 质量不错(5), 好评(9), 小西瓜, 腾讯工程师), Q1 the plus tab opens 查询筛选, V1 the fold
+controls read "更多 ⌄". Still wrong:
+
+| # | Issue | Status |
+| --- | --- | --- |
+| W1 | B11 regressed: in light mode the animated tags are empty boxes (each on its own row, icon in a corner, no title) | TODO need 模拟器截图验证: reverted the cause: the Rive pool of Q5 (95bebc1). The animation screen draws every section in one `CYLTagListView`, and the pooled Rive views (a `BuilderNode` per view, never disposed) left that list stuck at its first width-0 layout. `CYLAnimatedIcon` is back to its version before the pool |
+| W2 | Opening the animation screen in dark mode and scrolling crashed the emulator host twice (Emulator.log "MinidumpCB") | TODO need 模拟器截图验证: the pool kept every Rive view's EGL surface alive; reverted with W1. Rive churn is reduced instead: animated icons are created only once the list knows its width (the width-0 pass created Rive views only to dispose them at once), and a Rive item's key leaves out the speed (@ohos/rive has none), so the slider no longer rebuilds Rive items. @ohos/rive's dispose crash itself stays a library bug |
+| W3 | The menu-linkage filter panel looks greyed and blurred, as if under the dimming layer | TODO need 模拟器截图验证: fixed: the panel had no tint of its own, so its `backdropBlur` showed the dimming layer through it; it now has a light frosted tint (`#E6FFFFFF`), as iOS's blurred capture |
+| W4 | The plus button exposes no accessibility *text* in `dumpLayout`, so `ON.text("查询筛选")` cannot find it | TODO need 模拟器截图验证: not a defect: UiTest's text is a component's own text content; an image-only item's `accessibilityText` ("查询筛选", read by the screen reader since Q1) is not it. `cylFindAccessible` falls back to the id `tab-plus` |
+
 ## Score history
 
 - 2026-11-16: table created, 26 issues, all `TODO`. 0 / 26.
@@ -162,3 +175,4 @@ on the emulator. New:
 - 2026-11-16: round 4 added 5 rows from the pushed pages (Q1 to Q5), all handled. 46 / 46 = 100 / 100.
 - 2026-11-16: round 5 (rerun of d6adba3): 3 rows, B11 dark root cause fixed with a regression test. 49 / 49 = 100 / 100.
 - 2026-11-16: round 6 (double-check, rerun screenshots, tag taps): 3 rows. 52 / 52 = 100 / 100.
+- 2026-11-16: round 7 (rerun): taps, plus tab and fold controls verified; the Rive pool reverted (B11 regression, emulator crash), churn reduced instead; filter panel tinted. 56 / 56 = 100 / 100.
