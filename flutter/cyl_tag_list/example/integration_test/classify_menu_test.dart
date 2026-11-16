@@ -4,6 +4,10 @@ import 'package:cyl_tag_list_example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:cyl_tag_list_example/strings.dart';
+
+/// The summary with nothing chosen: every place of the shared database.
+final allPlaces = '${cylString('分类：%@ · 地区：%@ · 菜品：%@', [cylString('全部'), cylString('全部'), cylString('全部')])} · ${cylString('匹配 %lu 条', [83])}';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -42,12 +46,12 @@ void main() {
 
     await tester.pumpWidget(const ExampleApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Classify menu').last);
+    await tester.tap(find.text(cylString('菜单')).last);
     await waitFor(tester, find.byKey(const Key('resetConditions')));
     await tester.pump(const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const Key('resetConditions')));
-    await waitFor(tester, find.text('全部 · 全部 · 全部 · 83'));
-    expect(find.text('全部 · 全部 · 全部 · 83'), findsOneWidget);
+    await waitFor(tester, find.text(allPlaces));
+    expect(find.text(allPlaces), findsOneWidget);
     expect(find.byType(CylTagListView, skipOffstage: false), findsNWidgets(2), reason: 'both tabs keep their native list');
 
     // The filter sheet: a native multiple-choice list and 确定, which keeps the conditions when nothing changed.
@@ -56,6 +60,6 @@ void main() {
     expect(find.byType(CylTagListView, skipOffstage: false), findsNWidgets(3));
     await tester.tap(find.byKey(const Key('confirmFilter')));
     await tester.pumpAndSettle();
-    expect(find.text('全部 · 全部 · 全部 · 83'), findsOneWidget);
+    expect(find.text(allPlaces), findsOneWidget);
   });
 }
