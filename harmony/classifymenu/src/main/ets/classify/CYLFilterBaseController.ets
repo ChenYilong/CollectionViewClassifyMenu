@@ -268,6 +268,9 @@ export struct CYLFilterPanelView {
         .width(this.panelWidth())
         .height('100%')
         .backdropBlur(BLUR_RADIUS)
+        // A light frosted panel, as iOS's blurred capture: without a tint of its own the panel showed the dimming layer
+        // through its blur, so its tags and title looked greyed out under a mask.
+        .backgroundColor('#E6FFFFFF')
         .offset({ x: this.panelOffset })
       }
     }

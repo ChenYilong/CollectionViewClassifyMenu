@@ -184,6 +184,11 @@ export struct CYLTagListView {
   @State private dragX: number = 0;
   @State private dragY: number = 0;
   @State private longPressDuration: number = 500;
+  /**
+   * Whether the list knows its width. Animated icons are created only then: the first pass (width 0) is laid out again
+   * at once, and creating Rive views in it only to dispose them a moment later hit @ohos/rive's dispose crash.
+   */
+  @State private widthKnown: boolean = false;
   private model: CYLTagListState = new CYLTagListState();
   /** Per item: `playTokenForItem - playToken` last seen (a tap raises it: the icon plays). */
   private seenItemPlays: Map<string, number> = new Map<string, number>();
@@ -238,6 +243,7 @@ export struct CYLTagListView {
   /** Resolves everything the list shows from its state. */
   private refresh(): void {
     const m = this.model;
+    this.widthKnown = m.width > 0;
     const style = m.style;
     const titleHeight = m.titleHeight();
     const sections = m.layoutSections();
@@ -308,7 +314,10 @@ export struct CYLTagListView {
       r.backgroundColor, r.highlightedBackgroundColor ?? '', r.borderColor, r.borderWidth, r.cornerRadius,
       r.paddingLeft, r.paddingRight, imageKey(r.image), r.animation ?? '', r.iconWidth, r.iconHeight, r.iconColor,
       r.iconRotation, r.imageTrailing, r.alignLeading, r.spacing, r.selected, r.enabled, r.deletable, r.deleteTitle,
-      r.deleteColor, r.deleteLeading, r.speed, r.accessibilityText, r.accessibilityHint].join('|');
+      r.deleteColor, r.deleteLeading,
+      // @ohos/rive has no speed: a Rive item keeps its key (and its view) while the speed slider moves.
+      (r.animation ?? '').split('#')[0].toLowerCase().endsWith('.riv') ? '' : r.speed,
+      r.accessibilityText, r.accessibilityHint].join('|');
   }
 
   private tagItem(cell: CYLTagListItemFrame, titleHeight: number): CYLTagRenderItem {
@@ -597,7 +606,13 @@ export struct CYLTagListView {
 
   @Builder
   icon(r: CYLTagRenderItem) {
-    if (r.animation !== undefined) {
+    if (r.animation !== undefined && !this.widthKnown) {
+      // The icon's place, empty until the width is known (see `widthKnown`).
+      Column()
+        .width(r.iconWidth > 0 ? r.iconWidth : undefined)
+        .height(r.iconHeight > 0 ? r.iconHeight : undefined)
+        .accessibilityLevel('no')
+    } else if (r.animation !== undefined) {
       CYLAnimatedIcon({
         source: r.animation,
         iconSize: r.iconWidth,

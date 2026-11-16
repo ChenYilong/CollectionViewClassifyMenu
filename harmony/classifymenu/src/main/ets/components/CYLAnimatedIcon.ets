@@ -8,7 +8,6 @@ import { CYLUIContext } from '../core/CYLUIContext';
 import lottie, { AnimationItem } from '@ohos/lottie';
 import { PAGFile, PAGView, PAGViewController } from '@tencent/libpag';
 import { initializeRive, RiveAnimationView } from '@ohos/rive';
-import { CYLRiveNodeController, CYLRiveNodeParams } from './CYLRiveNodePool';
 import { image } from '@kit.ImageKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
@@ -138,35 +137,22 @@ struct CYLRiveIconView {
   @Prop iconHeight: number = 0;
   onPlayer?: (player: CYLAnimationPlayer) => void;
   private available: boolean = ensureRive();
-  private controller?: CYLRiveNodeController;
-
-  aboutToAppear(): void {
-    if (!this.available) {
-      return;
-    }
-    const params = new CYLRiveNodeParams();
-    params.resource = `@rawfile/${this.source.existingRawFilePath(CYLUIContext.hostContext(this.getUIContext()))}`;
-    params.artboard = this.source.options.get('artboard') ?? '';
-    params.stateMachine = this.source.options.get('stateMachine') ?? '';
-    params.animation = this.source.options.get('animation') ?? '';
-    params.width = this.iconWidth;
-    params.height = this.iconHeight;
-    // A pooled view (see CYLRiveNodePool): created once, never disposed, so @ohos/rive's dispose crash cannot happen.
-    this.controller = new CYLRiveNodeController(params, (view: RiveAnimationView) => {
-      this.onPlayer?.(new CYLRivePlayer(this.source, view));
-    });
-  }
-
-  aboutToDisappear(): void {
-    this.controller?.release();
-  }
 
   build() {
     Stack() {
-      if (this.controller !== undefined) {
-        NodeContainer(this.controller)
-          .width(this.iconWidth)
-          .height(this.iconHeight)
+      if (this.available) {
+        RiveAnimationView({
+          riveResource: `@rawfile/${this.source.existingRawFilePath(CYLUIContext.hostContext(this.getUIContext()))}`,
+          riveArtboard: this.source.options.get('artboard') ?? '',
+          riveStateMachine: this.source.options.get('stateMachine') ?? '',
+          riveAnimation: this.source.options.get('animation') ?? '',
+          riveAutoPlay: false,
+          riveFit: 'contain',
+          touchPassThrough: true,
+          onReady: (view: RiveAnimationView) => {
+            this.onPlayer?.(new CYLRivePlayer(this.source, view));
+          }
+        })
       }
     }
     .width(this.iconWidth)
