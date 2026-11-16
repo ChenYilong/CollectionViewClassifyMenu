@@ -170,7 +170,7 @@ export struct CYLReviewListPage {
 
   private updateStatus(): void {
     const names = this.selectedFilters.map((f: CYLReviewFilter) => f.name);
-    const selection = names.length === 0 ? '全部' : names.join(CYLExampleLocalizedString('、'));
+    const selection = names.length === 0 ? CYLExampleLocalizedString('全部') : names.join(CYLExampleLocalizedString('、'));
     const lines: string[] = [`${this.lastEvent} · ${cylFormat(CYLExampleLocalizedString('已选：%@'), selection)}`];
     const count = this.visibleReviews.length;
     if (this.mode === CYLReviewFilteringMode.network) {

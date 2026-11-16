@@ -1,3 +1,4 @@
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { CYLUIContext } from '../core/CYLUIContext';
 import { CYLAnimatedIcon } from './CYLAnimatedIcon';
 import {
@@ -560,6 +561,8 @@ export struct CYLTagListView {
 
   private tap(r: CYLTagRenderItem): void {
     const m = this.model;
+    hilog.info(0x0000, 'CYLTagList', 'tap %{public}d-%{public}d enabled %{public}s', r.section, r.item,
+      `${m.isEnabled({ section: r.section, item: r.item })}`);
     const p: CYLIndexPath = { section: r.section, item: r.item };
     if (r.isFoldCell) {
       m.tapItem(p);
@@ -714,7 +717,10 @@ export struct CYLTagListView {
           cell: r.cell,
           cellWidth: r.width,
           cellHeight: r.height,
-          onCellClick: () => this.tap(r)
+          onCellClick: () => {
+            hilog.info(0x0000, 'CYLTagList', 'cell click %{public}d-%{public}d', r.section, r.item);
+            this.tap(r);
+          }
         })
       }
     }
@@ -725,6 +731,12 @@ export struct CYLTagListView {
     .translate({ x: this.draggedKey === r.key ? this.dragX : 0, y: this.draggedKey === r.key ? this.dragY : 0 })
     .zIndex(this.draggedKey === r.key ? 1 : 0)
     .id(`CYLTagListItem-${r.section}-${r.item}`)
+    // A physical tap is taken here, once, ahead of the views inside the item (their layout changes with the
+    // selection); the cell's own onClick stays for screen readers, which activate without gestures.
+    .priorityGesture(TapGesture().onAction(() => {
+      hilog.info(0x0000, 'CYLTagList', 'tap gesture %{public}d-%{public}d', r.section, r.item);
+      this.tap(r);
+    }))
     .gesture(GestureGroup(GestureMode.Sequence,
       LongPressGesture({ duration: this.longPressDuration })
         .onAction(() => {

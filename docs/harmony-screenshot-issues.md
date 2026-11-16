@@ -17,7 +17,7 @@ Every problem seen in the HarmonyOS emulator screenshots, in this repository and
 - **Full marks: no plain `TODO` left**, every row fixed and waiting for the maintainer's screenshot run.
 - Score = rows not `TODO` / all rows.
 
-**Score: 49 / 49 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
+**Score: 52 / 52 = 100 / 100** (no plain `TODO` left; every row waits for the maintainer's emulator screenshots).
 
 ## Task log
 
@@ -140,6 +140,19 @@ recurred (that build did not have the pool of Q5, which came later in c6a8a5c / 
 | S2 | B11 dark: the speed and loop labels and the speed value are invisible | TODO need 模拟器截图验证: fixed: seven `Text`s of the example had no color, so they turned white in dark mode on the example's fixed light backgrounds; they use the label color like every other text |
 | S3 | The Rive crash recurred on d6adba3 | TODO need 模拟器截图验证: that build had no Rive pool yet; Q5's pool (Rive views never disposed) is in 39996ea |
 
+## Round 6 (2026-11-16): fresh rerun screenshots and tag taps
+
+Double-check requested again (「CYLTabBarController fixed their issues please doublecheck。…」): CYLTabBarController PR
+#806 (D1, D3, N1 to N3) is merged into `feat/harmonyos-component`; no new CYLTabBarController screenshots since round 2.
+This repository's rerun (8d7641c) confirms P1 (tab titles), P2 / P3 (menu-linkage headers and tags) and P5 (heart chip)
+on the emulator. New:
+
+| # | Issue | Status |
+| --- | --- | --- |
+| V1 | Menu linkage: the fold chevrons at the right of each header are huge and blurred | TODO need 模拟器截图验证: fixed: `CYLRightImageButtonView` drew its image at its natural size (the same defect as P2); it is now one title line high, `Contain` |
+| V2 | Taps on tags do nothing on the emulator: the review chip "好评(9)" leaves 全部 selected (10 matches); product review tags ("质量不错(5)"), hot-search, search-category and tag-cloud tags open nothing | TODO need 模拟器截图验证: the selection logic is right (new host test `ReviewFilterTap`: a tap on "好评(9)" replaces the exclusive 全部); the tap did not reach it. Each tag item now takes a physical tap with a `priorityGesture(TapGesture)` on its container, once, ahead of the views inside it (the cell's `onClick` stays for screen readers), and both paths log to hilog (domain `CYLTagList`: "tap gesture", "cell click", "tap") so the next run shows the delivery. The product page's tags opening the review list is the iOS behavior (`productKeywordOpensFilteredReviews`), so those are the same defect, not parity gaps |
+| V3 | Review list status: "已选：全部" is not localized | TODO need 模拟器截图验证: fixed: `CYLExampleLocalizedString('全部')` |
+
 ## Score history
 
 - 2026-11-16: table created, 26 issues, all `TODO`. 0 / 26.
@@ -148,3 +161,4 @@ recurred (that build did not have the pool of Q5, which came later in c6a8a5c / 
 - 2026-11-16: round 2 handled (5 fixed in CYLTabBarController `4ee9ac5a`, 3 already fixed on 8aff599d); round 3 added 7 rows from the port's emulator screenshots, all handled. 41 / 41 = 100 / 100.
 - 2026-11-16: round 4 added 5 rows from the pushed pages (Q1 to Q5), all handled. 46 / 46 = 100 / 100.
 - 2026-11-16: round 5 (rerun of d6adba3): 3 rows, B11 dark root cause fixed with a regression test. 49 / 49 = 100 / 100.
+- 2026-11-16: round 6 (double-check, rerun screenshots, tag taps): 3 rows. 52 / 52 = 100 / 100.
