@@ -87,7 +87,8 @@ class CYLAnimationDemoSource implements CYLMenuDataSource {
   }
 
   menuTitleForItem(indexPath: CYLIndexPath): string {
-    return this.base.menuTitleForItem(indexPath);
+    // The tag titles too (首页, 消息, …): they are in the example's strings, not the core's.
+    return CYLExampleLocalizedString(this.base.menuTitleForItem(indexPath));
   }
 }
 
