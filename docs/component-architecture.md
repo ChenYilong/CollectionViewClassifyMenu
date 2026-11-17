@@ -473,4 +473,7 @@ started run completes and the next one tests the newest commit.
   Artifact storage is blocked from the cloud sessions, so the branch is the only way to read the images there.
 - **Requirements**: fix the screenshot publishing; also add a screenshot job to CYLSearchViewController's CI.
 - **Prompt (verbatim)**: "to fix the screenshot publishing in ClassifyMenu and add a screenshot job to CYLSearchViewController's CI"
-- **Status**: started.
+- **Status**: fixed, pending CI. `ios.yml` passes `SCREENSHOT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}`
+  and `scripts/publish-screenshots.sh` names the folder after it (`SHA="${SCREENSHOT_SHA:-$GITHUB_SHA}"`), so a pull
+  request run publishes to `ci-screenshots/<branch>/<head commit>/`. The images still show the merge commit's code,
+  which for a branch without conflicts is the branch head plus the base. shellcheck and actionlint pass.

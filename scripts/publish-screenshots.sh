@@ -11,8 +11,12 @@ cd "$(dirname "$0")/.."
 : "${GITHUB_REPOSITORY:?run in GitHub Actions}" "${GITHUB_SHA:?}"
 # [EN] The branch of a pull request, else the pushed ref. [CN] PR 的分支，否则为推送的 ref。
 REF_NAME="${SCREENSHOT_REF:-${GITHUB_REF_NAME:?}}"
+# [EN] The commit the screenshots belong to: a pull request's head commit (SCREENSHOT_SHA), else GITHUB_SHA. On
+#      pull_request runs GITHUB_SHA is the temporary merge commit, which matches no commit of the branch.
+# [CN] 截图所属的提交：PR 的 head 提交（SCREENSHOT_SHA），否则为 GITHUB_SHA（PR 运行中它是临时合并提交）。
+SHA="${SCREENSHOT_SHA:-$GITHUB_SHA}"
 BRANCH=ci-screenshots
-DIR="$(printf '%s' "$REF_NAME" | tr '/' '-')/$(printf '%s' "$GITHUB_SHA" | cut -c1-7)"
+DIR="$(printf '%s' "$REF_NAME" | tr '/' '-')/$(printf '%s' "$SHA" | cut -c1-7)"
 SOURCE="$PWD/build/screenshots"
 ls "$SOURCE"/*.png > /dev/null
 
@@ -33,7 +37,7 @@ cp "$SOURCE"/*.png "$WORK/repo/$DIR/"
 # [EN] Layout reports, when the app wrote them. [CN] App 输出的布局报告（如有）。
 find "$SOURCE" -name '*.log' -exec cp {} "$WORK/repo/$DIR/" \;
 git -C "$WORK/repo" add -A
-git -C "$WORK/repo" commit --quiet -m "Example screenshots for $REF_NAME@$(printf '%s' "$GITHUB_SHA" | cut -c1-7)" || true
+git -C "$WORK/repo" commit --quiet -m "Example screenshots for $REF_NAME@$(printf '%s' "$SHA" | cut -c1-7)" || true
 for ATTEMPT in 1 2 3; do
   if git -C "$WORK/repo" push --quiet "$REMOTE" "HEAD:$BRANCH"; then break; fi
   echo "Push failed (attempt $ATTEMPT), rebasing"
