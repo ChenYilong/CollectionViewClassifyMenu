@@ -236,6 +236,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **iOS at pins `074285a6` (2026-11-18, `19e1e4a`)**: `pod install` resolves `074285a6` in the four iOS projects;
   `6a9ede85..074285a6` changes only the mini program's `cyl-rive`, its test and a doc (no iOS source), so the iOS results
   at `6a9ede85` (152 tests pass, every Rive tag replays) stand without a re-run.
+- **Mini program and Android pins at `6f93ae6b` (2026-11-18)**: `fetch-cyltabbar.js`, the test, the vendored `COMMIT`
+  files and `android/merged/gradle.properties`; `074285a6..6f93ae6b` changes HarmonyOS, Flutter, iOS demo resources and
+  docs only (no Android source, no cyl-animated-item / cyl-animation-placeholder change: the re-vendor touched only the
+  `COMMIT` files), so the Android results stand; mini program `npm test` 141 / 141.
 - **Row 17 on Windows (2026-11-18, `deb3af5`)**: blocked, the x86_64 emulator cannot install the arm64-only Rive and
   PAG native libraries (see row 17); score stays 88. Next: run the check on an arm64 emulator or device.
 - **Row 17 on the Mac (2026-11-18, `474a8cc`)**: DONE, score 92. The Mac emulator was connected all along, as
