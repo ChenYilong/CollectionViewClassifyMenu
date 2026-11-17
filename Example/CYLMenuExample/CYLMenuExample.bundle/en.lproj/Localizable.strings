@@ -285,3 +285,9 @@
 "循环播放" = "Loop";
 "%@ 倍" = "%@ times";
 "从头播放屏幕上的全部动效" = "Plays every animation on screen from the start";
+
+/* Animated icons: the engines CYLTabBarItemAnimatorRegistry reports (registered, missing, conflicts). */
+"动效引擎" = "Animation engines";
+"%@ 已接入" = "%@ registered";
+"%@ 未接入：添加 pod 'CYLAnimatedItem/%@'" = "%@ missing: add pod 'CYLAnimatedItem/%@'";
+"动效引擎冲突：%@" = "Engine conflict: %@";

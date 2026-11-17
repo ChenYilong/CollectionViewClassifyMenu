@@ -2,6 +2,8 @@
 module.exports = {
  "en": {
   "%@ 倍": "%@ times",
+  "%@ 已接入": "%@ registered",
+  "%@ 未接入：添加 pod 'CYLAnimatedItem/%@'": "%@ missing: add pod 'CYLAnimatedItem/%@'",
   "%ld 行": "%ld rows",
   "1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除": "1. Tap Create to make a tag group\n2. Drag a group to move it\n3. Tap a tag to turn it\n4. Tap the dot for a message\n5. Long-press a group to delete it",
   "Android 标签库示例（Swift 复刻）": "Android tag library samples, in Swift",
@@ -61,6 +63,8 @@ module.exports = {
   "动效二": "Animation 2",
   "动效图标": "Animated icons",
   "动效图标（CYLTabBarController 动效引擎）": "Animated icons (CYLTabBarController animation engine)",
+  "动效引擎": "Animation engines",
+  "动效引擎冲突：%@": "Engine conflict: %@",
   "动效引擎未链接：显示静态图标": "Animation engine not linked: static icons",
   "动效引擎：CYLTabBarItemAnimationFactory 已链接": "Animation engine: CYLTabBarItemAnimationFactory is linked",
   "包图片": "Picture of a bag",
@@ -272,6 +276,8 @@ module.exports = {
  },
  "zh-Hant": {
   "%@ 倍": "%@ 倍",
+  "%@ 已接入": "%@ 已接入",
+  "%@ 未接入：添加 pod 'CYLAnimatedItem/%@'": "%@ 未接入：新增 pod 'CYLAnimatedItem/%@'",
   "%ld 行": "%ld 行",
   "1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除": "1. 點擊建立按鈕開始建立標籤組\n2. 按住標籤組滑動，調整位置\n3. 點擊單個標籤，調整該標籤的方向\n4. 點擊中心圓彈出提示\n5. 長按標籤組刪除",
   "Android 标签库示例（Swift 复刻）": "Android 標籤庫範例（Swift 復刻）",
@@ -331,6 +337,8 @@ module.exports = {
   "动效二": "動效二",
   "动效图标": "動效圖示",
   "动效图标（CYLTabBarController 动效引擎）": "動效圖示（CYLTabBarController 動效引擎）",
+  "动效引擎": "動效引擎",
+  "动效引擎冲突：%@": "動效引擎衝突：%@",
   "动效引擎未链接：显示静态图标": "動效引擎未連結：顯示靜態圖示",
   "动效引擎：CYLTabBarItemAnimationFactory 已链接": "動效引擎：CYLTabBarItemAnimationFactory 已連結",
   "包图片": "包圖片",

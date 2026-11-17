@@ -10,6 +10,7 @@ import CryptoKit
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 @testable import CYLMenuExample
 
 final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
@@ -35,6 +36,33 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: first?.path ?? ""))
         XCTAssertTrue(FileManager.default.fileExists(atPath: second?.path ?? ""))
         XCTAssertNotNil(UIImage(named: "img_tab_home_0"), "Lottie image assets are found by name, as in CYLTabBarController's Example")
+    }
+
+    /**
+     * The five engines this example links (CYLAnimatedItem/LottieObjectiveC, PAG, Rive, SVGA, GIF) registered themselves
+     * (CYLTabBarItemAnimatorRegistry), with no conflict, and the Animated icons screen lists each one as registered.
+     */
+    func testEveryLinkedEngineIsRegisteredAndListed() {
+        let known = CYLAnimationKnownTypes()
+        XCTAssertEqual(known, ["Lottie", "PAG", "Rive", "SVGA", "GIF"])
+        for type in known {
+            XCTAssertTrue(CYLTabBarItemAnimatorRegistry.isAnimatorRegistered(withIdentifier: type), "\(type) engine registered")
+        }
+        XCTAssertTrue(CYLTabBarItemAnimatorRegistry.missingKnownIdentifiers().isEmpty)
+        XCTAssertTrue(CYLTabBarItemAnimatorRegistry.conflictDescriptions().isEmpty,
+                      CYLTabBarItemAnimatorRegistry.conflictDescriptions().joined(separator: "; "))
+        XCTAssertFalse(CYLTabBarItemAnimatorRegistry.registrationReport().isEmpty)
+
+        let demo = CYLTagAnimationDemoViewController()
+        showInNavigation(demo)
+        demo.view.layoutIfNeeded()
+        let status = demo.statusLabel.text ?? ""
+        for type in known {
+            XCTAssertTrue(status.contains("✅ " + CYLExampleLocalizedString("%@ 已接入", type)), "\(type) in: \(status)")
+        }
+        XCTAssertFalse(status.contains("➖"), status)
+        XCTAssertEqual(CYLTagAnimationDemoViewController.engineReportLines().count, known.count + 1, "A title and one line per engine")
+        captureScreen(named: "test-animation-engine-report")
     }
 
     func testAnimatedIconsUseCYLTabBarControllerAnimationEngine() {
