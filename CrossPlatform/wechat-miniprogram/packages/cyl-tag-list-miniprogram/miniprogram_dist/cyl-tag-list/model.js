@@ -143,6 +143,19 @@ const APP_TINT_COLOR = '#2AB9A0';
  */
 const DEFAULT_TAG_BACKGROUND = '#F2F2F7';
 
+/**
+ * A background that may be transparent (style key `allowsTransparentBackground`): `transparent`, `clear` and zero alpha
+ * are kept as `transparent`; a missing or invalid color is still the default tag fill.
+ */
+function tagBackground(value) {
+  const text = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  if (text === 'transparent') return 'transparent';
+  const parsed = color(value);
+  if (!parsed) return DEFAULT_TAG_BACKGROUND;
+  const alpha = /^rgba\([^)]*,\s*([\d.]+)\s*\)$/i.exec(parsed);
+  return alpha && Number(alpha[1]) === 0 ? 'transparent' : parsed;
+}
+
 /** The color, or the default tag fill when it is missing, invalid or fully transparent. */
 function opaqueBackground(value) {
   const text = typeof value === 'string' ? value.trim().toLowerCase() : '';
@@ -205,6 +218,7 @@ function defaultStyle(pixelRatio = 2) {
     headerFont: { size: 14, weight: 'regular', italic: false },
     headerHorizontalInset: 16,
     highlightedBackgroundColor: null,
+    allowsTransparentBackground: false,
   });
 }
 
@@ -226,10 +240,17 @@ function copyStyle(style) {
 
 const APPEARANCE_STATES = ['normal', 'selected', 'disabled'];
 
-/** `CYLTagAppearance.applyConfiguration(_:)`: missing keys keep their values; an invalid color restores the default. */
-function applyAppearance(appearance, configuration) {
+/**
+ * `CYLTagAppearance.applyConfiguration(_:)`: missing keys keep their values; an invalid color restores the default. A
+ * transparent background becomes the default fill unless `allowsTransparent` (a tag on its own, such as a search bar
+ * item, may be transparent; a tag in a list may not).
+ */
+function applyAppearance(appearance, configuration, allowsTransparent = false) {
   const has = (k) => Object.prototype.hasOwnProperty.call(configuration, k);
-  if (has('backgroundColor')) appearance.backgroundColor = opaqueBackground(configuration.backgroundColor);
+  if (has('backgroundColor')) {
+    appearance.backgroundColor = allowsTransparent ? tagBackground(configuration.backgroundColor)
+      : opaqueBackground(configuration.backgroundColor);
+  }
   if (has('textColor')) appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
   if (has('font')) appearance.font = fontValue(configuration.font) || { size: 14, weight: 'regular', italic: false };
   if (has('iconColor')) appearance.iconColor = color(configuration.iconColor);
@@ -254,14 +275,17 @@ function applyAppearance(appearance, configuration) {
  * the style keys (imageTitleSpacing, itemHeight, itemsPerRow, interitemSpacing, lineSpacing, headerHeight,
  * animationSpeed, layoutCentered, imagePlacement, contentAlignment, imageSize, animationSize, imageInsets,
  * sectionInsets, titlePositionAdjustment, imagePositionAdjustment, backgroundColor, headerTextColor, foldControlColor,
- * headerFont, highlightedBackgroundColor, tagContentInsets). `font` at the style level (an older key of this
+ * headerFont, highlightedBackgroundColor, tagContentInsets). `allowsTransparentBackground` (false by default) keeps a
+ * `transparent` / `clear` / zero-alpha tag background instead of the default fill, read before the appearances. `font` at the style level (an older key of this
  * component) sets the font of every state.
  */
 function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   const style = copyStyle(base);
   const c = configuration || {};
+  const transparent = boolValue(c.allowsTransparentBackground);
+  if (transparent !== null) style.allowsTransparentBackground = transparent;
   APPEARANCE_STATES.forEach((state) => {
-    if (c[state] && typeof c[state] === 'object') applyAppearance(style[state], c[state]);
+    if (c[state] && typeof c[state] === 'object') applyAppearance(style[state], c[state], style.allowsTransparentBackground);
   });
   if (c.font != null) {
     const font = fontValue(c.font);
@@ -782,7 +806,7 @@ function coderString(value) {
 
 module.exports = {
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
-  DEFAULT_TAG_BACKGROUND, opaqueBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
+  DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,

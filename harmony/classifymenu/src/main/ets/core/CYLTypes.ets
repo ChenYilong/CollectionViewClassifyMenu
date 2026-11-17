@@ -2,10 +2,14 @@ import { image } from '@kit.ImageKit';
 
 /**
  * The ArkTS forms of the UIKit value types the iOS API uses. Lengths are vp and font sizes fp, as points on iOS.
- * Colors are '#AARRGGBB' strings, which ArkUI takes as a ResourceColor.
+ * Colors are '#AARRGGBB' strings, which ArkUI takes as a ResourceColor; the tag's colors (`CYLTagAppearance`,
+ * `CYLTagButton`) also take any other `ResourceColor`, such as a theme color (`$r('sys.color.font_primary')`) that
+ * follows the color mode.
  */
 
-/** `UIEdgeInsets`. */
+/**
+ * `UIEdgeInsets`.
+ */
 export class CYLEdgeInsets {
   static readonly ZERO: CYLEdgeInsets = new CYLEdgeInsets(0, 0, 0, 0);
   readonly top: number;
@@ -26,7 +30,9 @@ export class CYLEdgeInsets {
   }
 }
 
-/** `CGSize`. */
+/**
+ * `CGSize`.
+ */
 export class CYLSize {
   static readonly ZERO: CYLSize = new CYLSize(0, 0);
   readonly width: number;
@@ -38,7 +44,9 @@ export class CYLSize {
   }
 }
 
-/** `UIOffset`. */
+/**
+ * `UIOffset`.
+ */
 export class CYLOffset {
   static readonly ZERO: CYLOffset = new CYLOffset(0, 0);
   readonly horizontal: number;
@@ -50,7 +58,9 @@ export class CYLOffset {
   }
 }
 
-/** `CGPoint`. */
+/**
+ * `CGPoint`.
+ */
 export class CYLPoint {
   readonly x: number;
   readonly y: number;
@@ -61,7 +71,9 @@ export class CYLPoint {
   }
 }
 
-/** `CGRect`. */
+/**
+ * `CGRect`.
+ */
 export class CYLRect {
   readonly x: number;
   readonly y: number;
@@ -88,7 +100,9 @@ export class CYLRect {
   }
 }
 
-/** `UIFont`: a size in fp and a weight. */
+/**
+ * `UIFont`: a size in fp and a weight.
+ */
 export class CYLFont {
   readonly size: number;
   readonly weight: FontWeight;
@@ -102,7 +116,9 @@ export class CYLFont {
     return this.weight === FontWeight.Bold || this.weight === FontWeight.Bolder;
   }
 
-  /** The same font in bold (Bold Text). */
+  /**
+   * The same font in bold (Bold Text).
+   */
   bold(): CYLFont {
     return this.isBold ? this : new CYLFont(this.size, FontWeight.Bold);
   }
@@ -111,18 +127,24 @@ export class CYLFont {
     return new CYLFont(size, this.weight);
   }
 
-  /** `UIFont.systemFont(ofSize:)`. */
+  /**
+   * `UIFont.systemFont(ofSize:)`.
+   */
   static systemFont(size: number): CYLFont {
     return new CYLFont(size, FontWeight.Normal);
   }
 
-  /** `UIFont.boldSystemFont(ofSize:)`. */
+  /**
+   * `UIFont.boldSystemFont(ofSize:)`.
+   */
   static boldSystemFont(size: number): CYLFont {
     return new CYLFont(size, FontWeight.Bold);
   }
 }
 
-/** `UIControl.State`: bit flags, `NORMAL` being none of them. */
+/**
+ * `UIControl.State`: bit flags, `NORMAL` being none of them.
+ */
 export class CYLControlState {
   static readonly NORMAL: number = 0;
   static readonly HIGHLIGHTED: number = 1;
@@ -139,37 +161,51 @@ function channel(value: number): string {
   return hexByte(Math.min(1, Math.max(0, value)) * 255);
 }
 
-/** Colors as '#AARRGGBB', the ArkTS form of `UIColor`. */
+/**
+ * Colors as '#AARRGGBB', the ArkTS form of `UIColor`.
+ */
 export class CYLColor {
-  /** `CYLAppTintColor` (42, 185, 160). */
+  /**
+   * `CYLAppTintColor` (42, 185, 160).
+   */
   static readonly APP_TINT: string = '#FF2AB9A0';
   static readonly CLEAR: string = '#00000000';
   static readonly WHITE: string = '#FFFFFFFF';
   static readonly BLACK: string = '#FF000000';
   static readonly GRAY: string = '#FF808080';
 
-  /** `UIColor(white:alpha:)`. */
+  /**
+   * `UIColor(white:alpha:)`.
+   */
   static white(white: number, alpha: number = 1): string {
     return '#' + channel(alpha) + channel(white) + channel(white) + channel(white);
   }
 
-  /** `UIColor(red:green:blue:alpha:)` with components 0...1. */
+  /**
+   * `UIColor(red:green:blue:alpha:)` with components 0...1.
+   */
   static rgb(red: number, green: number, blue: number, alpha: number = 1): string {
     return '#' + channel(alpha) + channel(red) + channel(green) + channel(blue);
   }
 
-  /** Bytes 0...255. */
+  /**
+   * Bytes 0...255.
+   */
   static argb(alpha: number, red: number, green: number, blue: number): string {
     return '#' + hexByte(alpha) + hexByte(red) + hexByte(green) + hexByte(blue);
   }
 
-  /** `withAlphaComponent(_:)` of a '#AARRGGBB' or '#RRGGBB' color. */
+  /**
+   * `withAlphaComponent(_:)` of a '#AARRGGBB' or '#RRGGBB' color.
+   */
   static withAlpha(color: string, alpha: number): string {
     const hex = color.replace('#', '');
     return '#' + channel(alpha) + hex.substring(hex.length - 6).toUpperCase();
   }
 
-  /** A "RRGGBB" or "#RRGGBB" hex string with `alpha`, or undefined when it does not parse. */
+  /**
+   * A "RRGGBB" or "#RRGGBB" hex string with `alpha`, or undefined when it does not parse.
+   */
   static fromHex(hex: string | undefined, alpha: number = 1): string | undefined {
     if (hex === undefined) {
       return undefined;
@@ -182,5 +218,42 @@ export class CYLColor {
   }
 }
 
-/** `UIImage`: a resource, a path, or a drawn pixel map (a badge). */
+/**
+ * `UIImage`: a resource, a path, or a drawn pixel map (a badge).
+ */
 export type CYLImage = ResourceStr | image.PixelMap;
+
+/**
+ * `ResourceType.SYMBOL`: the type of a system symbol resource (`$r('sys.symbol.camera')`), a HarmonyOS Symbol glyph.
+ */
+export const CYLResourceTypeSymbol: number = 40000;
+
+/**
+ * Whether `image` is a system symbol (`$r('sys.symbol.camera')`): `SymbolGlyph` draws it, tinted with its font color;
+ * an `Image` does not draw it. Pixel images, rawfiles, paths and pixel maps are not symbols.
+ */
+export function CYLImageIsSymbol(image: CYLImage | undefined): boolean {
+  if (image === undefined || typeof image === 'string') {
+    return false;
+  }
+  const resource = image as Resource;
+  return resource.type === CYLResourceTypeSymbol;
+}
+
+/**
+ * A text that tells two colors apart, for render keys: the string itself, a number (a `Color` or ARGB value), or a
+ * resource's id; '' for undefined.
+ */
+export function CYLColorKey(color: ResourceColor | undefined): string {
+  if (color === undefined) {
+    return '';
+  }
+  if (typeof color === 'string') {
+    return color as string;
+  }
+  if (typeof color === 'number') {
+    return `n${color as number}`;
+  }
+  const resource = color as Resource;
+  return `r${resource.id}`;
+}

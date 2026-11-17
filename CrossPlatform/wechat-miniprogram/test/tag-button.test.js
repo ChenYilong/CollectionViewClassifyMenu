@@ -75,3 +75,28 @@ test('tagButtonView: the tag at its own height, the badge and a label that reads
   assert.match(iconOnly.cellStyle, /color: #B3B3B3/, 'disabled');
   locale.setLanguage('zh-Hans');
 });
+
+test('allowsTransparentBackground keeps a transparent tag (a search bar item); a tag list keeps its opaque fill', () => {
+  const list = model.mergeStyle({ normal: { backgroundColor: 'transparent' }, selected: { backgroundColor: '#FFFFFF00' } });
+  assert.equal(list.allowsTransparentBackground, false);
+  assert.equal(list.normal.backgroundColor, model.DEFAULT_TAG_BACKGROUND, 'the tag list default is unchanged');
+  assert.equal(list.selected.backgroundColor, model.DEFAULT_TAG_BACKGROUND);
+  const clear = model.mergeStyle({
+    allowsTransparentBackground: true,
+    normal: { backgroundColor: 'transparent', borderWidth: 0 },
+    selected: { backgroundColor: 'clear' },
+    disabled: { backgroundColor: '#FF000000' },
+  });
+  assert.equal(clear.allowsTransparentBackground, true);
+  assert.equal(clear.normal.backgroundColor, 'transparent');
+  assert.equal(clear.selected.backgroundColor, 'transparent');
+  assert.equal(clear.disabled.backgroundColor, 'transparent', 'zero alpha is transparent');
+  assert.equal(model.mergeStyle({ allowsTransparentBackground: true, normal: { backgroundColor: '#E5E5EA' } })
+    .normal.backgroundColor, '#E5E5EA', 'an opaque color is kept');
+  assert.equal(model.mergeStyle({ allowsTransparentBackground: true, normal: { backgroundColor: 'nope' } })
+    .normal.backgroundColor, model.DEFAULT_TAG_BACKGROUND, 'an invalid color is still the default fill');
+  const view = model.tagButtonView({
+    title: 'Search', tagStyle: { allowsTransparentBackground: 'true', normal: { backgroundColor: 'transparent', borderWidth: 0 } },
+  }, null, 2);
+  assert.match(view.cellStyle, /background-color: transparent/);
+});

@@ -7,7 +7,8 @@
  *
  * Properties (the iOS names): `title`, `image`, `selectedImage`, `animationURL`, `animationOptions`,
  * `animationRestingProgress`, `animationSpeed` (0 uses the style's), `animationLoops`, `badgeValue` (null hides the
- * badge, '' shows a dot), `badgeColor` (system red by default), `selected`, `enabled`, `tagStyle`.
+ * badge, '' shows a dot), `badgeColor` (system red by default), `selected`, `enabled`, `tagStyle` (with
+ * `allowsTransparentBackground: true` a `transparent` background is kept, for a tag on a colored surface).
  * Methods (through `selectComponent`): `playAnimation()`, `intrinsicSize()`.
  * Events: `tagtap` {title, selected}.
  */

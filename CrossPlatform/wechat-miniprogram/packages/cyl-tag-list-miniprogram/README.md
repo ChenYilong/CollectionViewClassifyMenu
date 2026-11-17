@@ -34,10 +34,15 @@ Then in WeChat DevTools: **Tools → Build npm** (工具 → 构建 npm). It cop
 icon or an animated icon before, after, above or below a title (`tagStyle.imagePlacement`: `leading`, `trailing`,
 `top`, `bottom`), in a `CYLMenuStyle` box (`tagStyle` takes the keys of a configuration's style), with a badge
 (`badge-value`: `null` hides it, `''` shows a dot, any other text a capsule; `badge-color`, system red by default).
+A tag's background is never transparent by default (a clear tag on a white list looks like plain text, so `transparent`
+and zero alpha become the default fill); a tag on its own that sits on a colored surface, such as a search bar item,
+sets `allowsTransparentBackground: true` in its `tagStyle` to keep `transparent`.
 
 ```xml
 <!-- buttonStyle: { imagePlacement: 'top', imageSize: '{24, 24}' } in the page's data -->
 <cyl-tag-button title="Messages" image="system:message" badge-value="3" tag-style="{{buttonStyle}}" bind:tagtap="onTap" />
+<!-- clearStyle: { allowsTransparentBackground: true, normal: { backgroundColor: 'transparent', borderWidth: 0 } } -->
+<cyl-tag-button image="system:camera" tag-style="{{clearStyle}}" />
 ```
 
 The models are plain JavaScript (no `wx` calls), e.g. `require('cyl-tag-list-miniprogram/cyl-tag-list/model.js')`.
