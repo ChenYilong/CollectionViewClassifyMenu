@@ -57,6 +57,7 @@ capture() {
 
   OLD_IFS=$IFS
   IFS=','
+  FIRST=1
   for SCREEN in $LIST; do
     IFS=$OLD_IFS
     # [EN] Screens without "@<language>" are taken in Simplified Chinese, the language of the scenarios;
@@ -79,6 +80,13 @@ capture() {
         continue
       fi
       sleep 8
+      # [EN] The first launch after installing is slower: at 8 s the screen can still show the previous app's last frame
+      #      (seen: product@zh-Hans captured the animations screen of the run before). Wait longer for it.
+      # [CN] 安装后的首次启动较慢：8 秒时屏幕可能仍是上一个 App 的最后一帧（曾见 product@zh-Hans 截到上一轮的动效页）。首次多等一会。
+      if [ "$FIRST" = 1 ]; then
+        sleep 10
+        FIRST=0
+      fi
       # [EN] Still running? A crash leaves the home screen behind: report it and launch once more.
       # [CN] 仍在运行？崩溃后会回到主屏幕：报告并重新启动一次。
       if xcrun simctl spawn "$DEVICE_ID" launchctl list | grep -q "UIKitApplication:$BUNDLE_ID"; then

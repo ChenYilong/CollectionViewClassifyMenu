@@ -12,6 +12,74 @@ SDK version, repository version or commit URL, time taken; clear originals; stit
 | <img src="assets/ios-demo-filter-panel.png" width="300" alt="iOS demo filter panel"> Filter tab: the panel slides in from the left over most of the screen; Reset / Apply above the home indicator | iOS | as above | as above | 2026-11-12 19:20 NZDT |
 | <img src="assets/android-filter-panel.png" width="300" alt="Android filter panel"> Android Filter tab (details in [android.md](android.md)) | Android | Android 15 (API 35) emulator `CYL_API35_arm64`, compileSdk 35 | `d12f101` | 2026-11-12 18:35 NZDT |
 
+## iOS: every example screen (2026-11-17)
+
+- **Platform:** iOS, `Example/CYLMenuExample` (Swift) and the pure Swift `Example-Swift/CYLTagEditorExample` (`swift-*`).
+- **Environment:** macOS 27.3, Xcode 27.2, simulator "CYL ClassifyMenu iOS" (iPhone 17 Pro, iOS 27.2), clean status bar.
+- **Commit:** `333b349` (`feat/harmony`), CYLTabBarController / CYLAnimatedItem pinned at `57a527e`.
+- **Taken:** 2026-11-17 22:30–22:55 NZDT with `scripts/example-screenshots.sh "CYL ClassifyMenu iOS"` (one launch per
+  screen, `-CYLExampleScreen <screen>`); `product@zh-Hans` retaken at 22:53 (the first capture showed the previous app's
+  last frame, fixed in the script).
+- **Checked:** every animated icon draws (Lottie, PAG, Rive, SVGA, GIF), English and Traditional Chinese screens are
+  translated, `style-title-uncentered` is the title-only style (no icons by design).
+
+| Screen | Screenshot |
+|:---|:---|
+| `animations-rive@zh-Hans` | <img src="assets/ios-1117/animations-rive@zh-Hans.png" width="200" alt="iOS animations-rive@zh-Hans"> |
+| `animations-speed@zh-Hans` | <img src="assets/ios-1117/animations-speed@zh-Hans.png" width="200" alt="iOS animations-speed@zh-Hans"> |
+| `animations-svga@zh-Hans` | <img src="assets/ios-1117/animations-svga@zh-Hans.png" width="200" alt="iOS animations-svga@zh-Hans"> |
+| `animations@en` | <img src="assets/ios-1117/animations@en.png" width="200" alt="iOS animations@en"> |
+| `animations@zh-Hans` | <img src="assets/ios-1117/animations@zh-Hans.png" width="200" alt="iOS animations@zh-Hans"> |
+| `config@zh-Hans` | <img src="assets/ios-1117/config@zh-Hans.png" width="200" alt="iOS config@zh-Hans"> |
+| `plus-discover-expanded@en` | <img src="assets/ios-1117/plus-discover-expanded@en.png" width="200" alt="iOS plus-discover-expanded@en"> |
+| `plus-discover-expanded@zh-Hans` | <img src="assets/ios-1117/plus-discover-expanded@zh-Hans.png" width="200" alt="iOS plus-discover-expanded@zh-Hans"> |
+| `plus-discover-refreshed@zh-Hans` | <img src="assets/ios-1117/plus-discover-refreshed@zh-Hans.png" width="200" alt="iOS plus-discover-refreshed@zh-Hans"> |
+| `plus-discover@en` | <img src="assets/ios-1117/plus-discover@en.png" width="200" alt="iOS plus-discover@en"> |
+| `plus-discover@zh-Hans` | <img src="assets/ios-1117/plus-discover@zh-Hans.png" width="200" alt="iOS plus-discover@zh-Hans"> |
+| `plus-discover@zh-Hant` | <img src="assets/ios-1117/plus-discover@zh-Hant.png" width="200" alt="iOS plus-discover@zh-Hant"> |
+| `plus-menu-filtered@en` | <img src="assets/ios-1117/plus-menu-filtered@en.png" width="200" alt="iOS plus-menu-filtered@en"> |
+| `plus-menu-filtered@zh-Hans` | <img src="assets/ios-1117/plus-menu-filtered@zh-Hans.png" width="200" alt="iOS plus-menu-filtered@zh-Hans"> |
+| `plus-menu@zh-Hans` | <img src="assets/ios-1117/plus-menu@zh-Hans.png" width="200" alt="iOS plus-menu@zh-Hans"> |
+| `plus-reviews-db@zh-Hans` | <img src="assets/ios-1117/plus-reviews-db@zh-Hans.png" width="200" alt="iOS plus-reviews-db@zh-Hans"> |
+| `plus@en` | <img src="assets/ios-1117/plus@en.png" width="200" alt="iOS plus@en"> |
+| `plus@zh-Hans` | <img src="assets/ios-1117/plus@zh-Hans.png" width="200" alt="iOS plus@zh-Hans"> |
+| `product@en` | <img src="assets/ios-1117/product@en.png" width="200" alt="iOS product@en"> |
+| `product@zh-Hans` | <img src="assets/ios-1117/product@zh-Hans.png" width="200" alt="iOS product@zh-Hans"> |
+| `reviews-expanded@en` | <img src="assets/ios-1117/reviews-expanded@en.png" width="200" alt="iOS reviews-expanded@en"> |
+| `reviews-expanded@zh-Hans` | <img src="assets/ios-1117/reviews-expanded@zh-Hans.png" width="200" alt="iOS reviews-expanded@zh-Hans"> |
+| `reviews-multi@zh-Hans` | <img src="assets/ios-1117/reviews-multi@zh-Hans.png" width="200" alt="iOS reviews-multi@zh-Hans"> |
+| `reviews-network@zh-Hans` | <img src="assets/ios-1117/reviews-network@zh-Hans.png" width="200" alt="iOS reviews-network@zh-Hans"> |
+| `reviews@zh-Hans` | <img src="assets/ios-1117/reviews@zh-Hans.png" width="200" alt="iOS reviews@zh-Hans"> |
+| `search-gossip@zh-Hans` | <img src="assets/ios-1117/search-gossip@zh-Hans.png" width="200" alt="iOS search-gossip@zh-Hans"> |
+| `search-home@zh-Hans` | <img src="assets/ios-1117/search-home@zh-Hans.png" width="200" alt="iOS search-home@zh-Hans"> |
+| `search-jobs@en` | <img src="assets/ios-1117/search-jobs@en.png" width="200" alt="iOS search-jobs@en"> |
+| `search-jobs@zh-Hans` | <img src="assets/ios-1117/search-jobs@zh-Hans.png" width="200" alt="iOS search-jobs@zh-Hans"> |
+| `search@zh-Hans` | <img src="assets/ios-1117/search@zh-Hans.png" width="200" alt="iOS search@zh-Hans"> |
+| `search@zh-Hant` | <img src="assets/ios-1117/search@zh-Hant.png" width="200" alt="iOS search@zh-Hant"> |
+| `style-custom@zh-Hans` | <img src="assets/ios-1117/style-custom@zh-Hans.png" width="200" alt="iOS style-custom@zh-Hans"> |
+| `style-gif@zh-Hans` | <img src="assets/ios-1117/style-gif@zh-Hans.png" width="200" alt="iOS style-gif@zh-Hans"> |
+| `style-icon-only@zh-Hans` | <img src="assets/ios-1117/style-icon-only@zh-Hans.png" width="200" alt="iOS style-icon-only@zh-Hans"> |
+| `style-lottie@zh-Hans` | <img src="assets/ios-1117/style-lottie@zh-Hans.png" width="200" alt="iOS style-lottie@zh-Hans"> |
+| `style-pag@zh-Hans` | <img src="assets/ios-1117/style-pag@zh-Hans.png" width="200" alt="iOS style-pag@zh-Hans"> |
+| `style-rive@zh-Hans` | <img src="assets/ios-1117/style-rive@zh-Hans.png" width="200" alt="iOS style-rive@zh-Hans"> |
+| `style-svga@zh-Hans` | <img src="assets/ios-1117/style-svga@zh-Hans.png" width="200" alt="iOS style-svga@zh-Hans"> |
+| `style-title-uncentered@zh-Hans` | <img src="assets/ios-1117/style-title-uncentered@zh-Hans.png" width="200" alt="iOS style-title-uncentered@zh-Hans"> |
+| `style@en` | <img src="assets/ios-1117/style@en.png" width="200" alt="iOS style@en"> |
+| `style@zh-Hans` | <img src="assets/ios-1117/style@zh-Hans.png" width="200" alt="iOS style@zh-Hans"> |
+| `swift-editor-bottom@zh-Hans` | <img src="assets/ios-1117/swift-editor-bottom@zh-Hans.png" width="200" alt="iOS swift-editor-bottom@zh-Hans"> |
+| `swift-editor-created@zh-Hans` | <img src="assets/ios-1117/swift-editor-created@zh-Hans.png" width="200" alt="iOS swift-editor-created@zh-Hans"> |
+| `swift-editor-new@zh-Hans` | <img src="assets/ios-1117/swift-editor-new@zh-Hans.png" width="200" alt="iOS swift-editor-new@zh-Hans"> |
+| `swift-editor-search@en` | <img src="assets/ios-1117/swift-editor-search@en.png" width="200" alt="iOS swift-editor-search@en"> |
+| `swift-editor-search@zh-Hans` | <img src="assets/ios-1117/swift-editor-search@zh-Hans.png" width="200" alt="iOS swift-editor-search@zh-Hans"> |
+| `swift-editor@en` | <img src="assets/ios-1117/swift-editor@en.png" width="200" alt="iOS swift-editor@en"> |
+| `swift-editor@zh-Hans` | <img src="assets/ios-1117/swift-editor@zh-Hans.png" width="200" alt="iOS swift-editor@zh-Hans"> |
+| `swift-remark@zh-Hans` | <img src="assets/ios-1117/swift-remark@zh-Hans.png" width="200" alt="iOS swift-remark@zh-Hans"> |
+| `swift-styles-config@en` | <img src="assets/ios-1117/swift-styles-config@en.png" width="200" alt="iOS swift-styles-config@en"> |
+| `swift-styles-config@zh-Hans` | <img src="assets/ios-1117/swift-styles-config@zh-Hans.png" width="200" alt="iOS swift-styles-config@zh-Hans"> |
+| `swift-styles-expanded@zh-Hans` | <img src="assets/ios-1117/swift-styles-expanded@zh-Hans.png" width="200" alt="iOS swift-styles-expanded@zh-Hans"> |
+| `swift-styles@en` | <img src="assets/ios-1117/swift-styles@en.png" width="200" alt="iOS swift-styles@en"> |
+| `swift-styles@zh-Hans` | <img src="assets/ios-1117/swift-styles@zh-Hans.png" width="200" alt="iOS swift-styles@zh-Hans"> |
+
 ## iOS: SVGA animated icons (2026-11-17)
 
 SVGA wherever Rive is shown (`example-demo-rules.md`, "SVGA wherever Rive is shown"): the Animated icons screen's two
