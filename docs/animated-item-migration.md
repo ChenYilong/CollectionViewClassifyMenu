@@ -124,6 +124,14 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    `Sun Rotate` (40 s, loop). Nothing moves unless `Rooms` changes, and `cyl-rive` drives only boolean inputs and triggers,
    so this is a missing number-input option (or `animation=Demo Mode` in the example's options), not a rendering problem.
    Sent to the Mac-CYLTabBarController session. No Rive message in the console.
+   **All pins at `8d2bbbc6`** (the newest CYLTabBarController commit: Rive replay / loop fixes for iOS `1f8fd27d`,
+   Android `e4789e74`, HarmonyOS `7a7748a0`, mini program `4e8fe675`). Windows: Android core unit tests and the local
+   publish pass, the React Native APK (x86_64) builds, the Flutter integration tests pass (2 of 2), mini program
+   `npm test` 138 and React Native Jest 3 pass. React Native example on the Android emulator, loop on, Play all, 8 frames
+   over 12 s (`assets/react-native-android-rive-b20-after-8d2bbbc6.png`, against
+   `react-native-android-rive-b20-frames.png` before): Done loops (loading dots, then the green arc, again), Menu goes
+   from its menu icon to x and back, Home now changes between frames (it never moved before). iOS `pod install` and the
+   simulator check at this pin: the Mac session.
    **iOS run (2026-11-18, Mac session, `689096f`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
    Pro, iOS 27.2), pins `fe5c3ae`, English, launched with `-CYLExampleScreen animations-rive-loop` (new: scrolls to the
    Rive section, loop on, Play all); frames 4–14 s after Play all (`assets/ios-rive-b20-frames.jpeg`, first frame
