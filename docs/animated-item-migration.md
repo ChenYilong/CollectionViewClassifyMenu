@@ -60,7 +60,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 | 22 | Android source builds compile `:cylanimateditem` | Flutter, React Native (Android) | Done | Mac, 2026-11-18 at `0f1897c`: `flutter build apk --debug` (Flutter 3.47.9) and the React Native example's `gradlew :app:assembleDebug` (JDK 17) build against `com.cyl:classifymenu` + `cyltabbarcontroller-animateditem` from the merged library's `build/repo`; both APKs contain `com.cyl.classifymenu.CYLTagButton` and `CYLAnimatedItemView`. Fixed on the way: `publishAnimatedItemToBuildRepository` deleted `com/cyl/classifymenu` from `build/repo` (Gradle removes a copy task's stale outputs on its first run), so the hosts could not resolve the library; it now runs before the library's publication |
 | 23 | License notice in every published package | All | Done | `scripts/check-licenses.sh` OK (vendored `cyl-animated-item` / `cylanimateditem` keep their LICENSE) |
 | 24 | Pins: newest CYLTabBarController commit, by `:commit` | All | Done | `57a527e` everywhere; `scripts/cyl-tabbar-latest-commit.sh` now lists PR #815's tip (unmerged, CI only warns): move to its merge commit |
-| 25 | No regression: Play all, speed, loop on every animation screen | All | Done (iOS, Android) | docs/example-demo-rules.md; mini program GIF waits for row 19 |
+| 25 | No regression: Play all, speed, loop on every animation screen | All | Done (iOS, Android) | docs/example-demo-rules.md; mini program GIF waits for row 19; **mini program Rive section TODO (bug B20, below)**: some Rive tags play once, then neither loop nor Play all plays them |
 
 ## TODO (in order)
 
@@ -82,6 +82,23 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
      (before) and `assets/harmonyos-y2-fixed-white-icon.jpeg` (after).
    - Mini program `cyl-animated-item`: an embedded size (no 44 px minimum height or padding) and engine views that keep to
      the icon box; tracked as row 19 / CYLTabBarController PR #815 (`assets/miniprogram-devtools-tags-after-fix.jpg`).
+6. **TODO, bug B20: Rive tags in the mini program play once, then stay static** (reported by the owner, 2026-11-18;
+   recorded in CYLTabBarController `docs/Animated-Item.md` B20, [PR #820](https://github.com/ChenYilong/CYLTabBarController/pull/820)).
+   Where: the mini program's Animations page (`pages/animations/animations`), section "Rive · pod 'CYLTabBarController/Rive'".
+   Seen: with loop on, some Rive tags play once and never repeat; after that, Play all does not play them either.
+   Screenshot: TODO. The section is below the fold and WeChat DevTools' `automation_*` tools (needed to scroll) do not
+   connect from this machine's CLI (they ask for `wechatide auth`); `simulator_screenshot` covers only the viewport.
+   Cause, read in `cyl-rive`'s `cyl_playFromStart` (to confirm in DevTools), per tag of `pages/animations/demo.js`:
+   - 首页 `house` (state machine, no input): there is nothing to set and a state machine is never restarted, so it
+     plays once on load and Play all does nothing; 形状 `shapes` / 卡车 `truck` (`legacy`, an option `cyl-rive` does not
+     read) take the same path when the file has a state machine;
+   - 菜单 `menu_button` (`input: isOpen`, `duration: 0`): 0 keeps the input on; it turns true once and never back to
+     false, so the next Play all sets true again and nothing changes;
+   - 完成 `check` (`triggerInput: Check`): fired on each play, but no loop path;
+   - 按钮 `button` (linear animation `active`): `time = 0` on play; repeats only if the file's own loop type does.
+   Fix in CYLTabBarController's `cyl-rive` (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated
+   item"), not in the example: restart a state machine without input (a new `StateMachineInstance`), turn a held input
+   off before setting it again, give triggers and linear animations a loop; then update the pins.
 
 ## TODO (2026-11-17, macOS 27 + Xcode 27, `feat/harmony`): rows 12 and 13 on a Mac, simulator screenshots, bugs
 
