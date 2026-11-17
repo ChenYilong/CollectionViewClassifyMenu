@@ -20,7 +20,7 @@ target 'CylTagListExample' do
   pod 'CollectionViewClassifyMenu', :path => '../../../..'
   # The animation engine the tags play Lottie files with (found at run time; the core does not depend on it).
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                  :commit => 'c8132d26f92f114f3ace4edc929e6e7dbd35bcdb' }
+                  :commit => '4635ef7bb7dde43679b36c99774654d857e060cc' }
   pod 'CYLTabBarController', cyl_tab_bar
   # Static libraries: CYLAnimatedItem's module map must reach this target (DEFINES_MODULE in its podspec alone does not
   # make the app's Swift compiler load the module; CI b4d0e51, docs/issue-progress.md).
