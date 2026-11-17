@@ -2,7 +2,8 @@
 
 Screenshots from CI/CD and local builds that have no feature document of their own. Images live in `assets/`.
 Rules: AGENTS.md, "CI/CD and Example screenshots" (labels: platform, OS version, simulator / emulator version, platform
-SDK version, repository version or commit URL, time taken; clear originals; stitched vertically first).
+SDK version, repository version or commit URL, time taken; clear originals). Stitching (2026-11-18): portrait, two
+columns, header, panel captions and footer in their own bands (AGENTS.md; `.agents/skills/cyl-screenshots/SKILL.md`).
 
 | Screenshot | Platform | Environment | Commit | Taken |
 | --- | --- | --- | --- | --- |
@@ -176,3 +177,22 @@ the iOS example opens one there is not checked yet.
 | <img src="assets/harmonyos-push-hot-search-tag.jpeg" width="300" alt="HarmonyOS hot-search-tag"> hot search → "小西瓜": the search field takes the tag (after `5dc703b`) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
 | <img src="assets/harmonyos-push-search-category-tag.jpeg" width="300" alt="HarmonyOS search-category-tag"> search category → "腾讯工程师": the search field takes the tag (after `5dc703b`) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
 | <img src="assets/harmonyos-push-menu-filter-sheet.jpeg" width="300" alt="HarmonyOS menu-filter-sheet"> menu linkage → filter button: the regions and dishes panel opens (after `95bebc1`), but under a gray dimming layer, so it looks blurred (TODO) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `bb9e562` | 2026-11-16 15:26–15:31 NZDT |
+
+## TODO (2026-11-18, `feat/harmony`): screenshot stitching rules (layout, header, footer, labels)
+
+- **Prompt (verbatim)**: "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入：找到截图相关规范，如果没有就新建保证写入成功，截图除了 优先选用竖版排列风格。优先两列，多行。且给拼接好的图增加header，footer，header，footer不能与截图区域重叠 覆盖，标注关键信息：关键信息也是英文，测试模拟器平台，模拟器系统版本，操作系统版本，ide 版本，以及测试目的等等。以附带的截图为例。提取截图的附带信息以及风格 完善我的描述规则。"
+- **English**: find this project's instruction files and skill files (create them if missing) and write, in English only,
+  the screenshot rules (create them if missing): stitched screenshots prefer a portrait layout, two columns and
+  several rows; every stitched image gets a header and a footer that never overlap or cover the screenshot areas; they
+  carry the key information in English: the simulator platform, the simulator OS version, the host OS version, the IDE
+  version, the test purpose and so on. Use the attached screenshot (`assets/ios-rive-rest.png`) as the example: extract
+  its information and style and complete the rules.
+- **Plan**: AGENTS.md (the screenshot rules), docs/instructions.md, scripts/instructions.md, a new skill
+  `.agents/skills/cyl-screenshots/SKILL.md` (linked from `cyl-verify`), and `scripts/stitch-screenshots.swift`, which
+  lays the images out by these rules; redo the example with it.
+- **Result (2026-11-18)**: DONE. Rules appended to AGENTS.md ("Screenshots: stitching layout, update", "Screenshots:
+  header and footer"), `instructions.md` (this folder), `../scripts/instructions.md`; new skill
+  `.agents/skills/cyl-screenshots/SKILL.md`, linked from `cyl-verify`; new tool `../scripts/stitch-screenshots.swift`.
+  Example redone by the rules:
+
+  ![iOS Rive icons rest until played, then play and loop: 2 x 2 grid with header and footer](assets/ios-rive-rest-then-play-grid.png)
