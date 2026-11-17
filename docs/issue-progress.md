@@ -315,6 +315,8 @@ tags: [issues, ui, cocoapods, progress]
   - Mini program: style key `allowsTransparentBackground` (false by default) keeps a `transparent` / `clear` /
     zero-alpha tag background (`tagBackground`); without it `opaqueBackground` still gives the default fill, so tag
     lists are unchanged. Documented in the package README and `cyl-tag-button.js`.
+  - Mini program `cyl-tag-button`: `accessibilityLabel` (what the screen reader reads first, else the title; an
+    icon-only search bar item reads its label), test in `test/tag-button.test.js`.
   - Tests: HarmonyOS `TagButton.test.ets` + 3 (`drawsSystemSymbolsAndTakesThemeColors`,
     `growsToItsMinimumSizeAndCentersTheIcon`, `takesTheBadgeMetrics`); mini program `test/tag-button.test.js` + 1.
     Run here: `npm test` (109 pass, 1 skipped), `harmony/scripts/accessibility-check.py` (the one finding is an
