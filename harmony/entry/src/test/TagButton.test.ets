@@ -85,7 +85,8 @@ export default function tagButtonTest() {
       const symbol = $r('sys.symbol.camera');
       expect(CYLImageIsSymbol(symbol)).assertTrue();
       expect(CYLImageIsSymbol('icon.png')).assertFalse();
-      expect(CYLImageIsSymbol($rawfile('icon.png'))).assertFalse();
+      // A rawfile that exists ($rawfile is resolved at compile time; 'icon.png' did not exist and broke the test build).
+      expect(CYLImageIsSymbol($rawfile('img_tab_home_0.png'))).assertFalse();
       expect(CYLImageIsSymbol(undefined)).assertFalse();
       const tint = $r('sys.color.font_primary');
       const style = new CYLMenuStyle();

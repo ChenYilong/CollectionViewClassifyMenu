@@ -1,6 +1,6 @@
 import { cylFormat } from '../samples/SampleSupport';
 import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
-import { CYLUIContext } from '@cyl/classifymenu';
+import { CYLColor, CYLUIContext } from '@cyl/classifymenu';
 /**
  * `CYLMenuLinkageViewController` (分类菜单 + 多选筛选 · 数据库联动): the original app's classify menu (single choice)
  * and its multiple-choice filter (regions and dishes) drive one SQL query on the example database's `places`. Both
@@ -299,12 +299,9 @@ export struct CYLMenuLinkagePage {
             .width(22)
             .height(22)
             .objectFit(ImageFit.Contain)
-            // Tinted as on iOS: the core's template images are near-white (1.01:1 on the bar). Each pixel takes the
-            // tint scaled by its own alpha (unit-independent matrix), gray #6E6E73 (4.6:1) with no filter, system blue
-            // (4:1) with one.
-            .colorFilter(this.filterModified
-              ? [0, 0, 0, 0 / 255, 0, 0, 0, 0, 122 / 255, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0]
-              : [0, 0, 0, 110 / 255, 0, 0, 0, 0, 110 / 255, 0, 0, 0, 0, 115 / 255, 0, 0, 0, 0, 1, 0])
+            // Tinted as on iOS (the core's template images are near-white, 1.01:1 on the bar): gray #6E6E73 (4.6:1) with
+            // no filter, system blue (4:1) with one, through the core's alpha-preserving `CYLColor.tintFilter`.
+            .colorFilter(CYLColor.tintFilter(this.filterModified ? '#FF007AFF' : '#FF6E6E73'))
             .position({ x: 14, y: (CYL_DEMO_BAR_HEIGHT - 22) / 2 })
             // An image is not an accessibility element by default: expose it, and give it a 44 vp touch target.
             .accessibilityLevel('yes')

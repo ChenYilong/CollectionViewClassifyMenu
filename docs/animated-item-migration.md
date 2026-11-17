@@ -23,7 +23,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 
 ## Score
 
-**Score: 72** (18 of 25 rows done; a row counts only when it is done and verified as far as this environment allows).
+**Score: 72** (18 of 25 rows done, row 17 half done; a row counts only when it is done and verified as far as this environment allows).
 
 | Date | Score | Note |
 |:---|:---|:---|
@@ -49,7 +49,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 | 14 | `CYLTagButton` subclasses `CYLAnimatedItemView`, `onItemStateChanged`, `accessoryPlacement` | Android | Done | `android/merged/library/.../CYLTagButton.kt:44`, `:261`, `:364` |
 | 15 | Depend on `cyltabbarcontroller-animateditem`, `:cylanimateditem` substitution by commit | Android | Done | `library/build.gradle.kts:41`, `settings.gradle.kts:69` |
 | 16 | Tag button on `CYLAnimatedItemView` (`cylanimateditem`, `file:` at the pinned commit) | HarmonyOS | Done (code) | `1a8a80b` (other session): vendored `harmony/cylanimateditem`, engines moved to the example |
-| 17 | HarmonyOS build and device check | HarmonyOS | TODO | no DevEco Studio / `hvigorw` here (`harmony/README.md`) |
+| 17 | HarmonyOS build and device check | HarmonyOS | Done (build, host tests); device check TODO | Windows with DevEco Studio 6.0.1 (2026-11-17, after `1a8a80b`): `harmony/scripts/build.sh` OK, `unit-test.sh` 58 / 58, `accessibility-check.py` OK, `check-native-strings.py` OK, `harmony_parity.py --check` OK (the 12 `CYLTagButton` members inherited from `CYLAnimatedItemView` removed from `parity-map.json`; the test's missing `$rawfile('icon.png')` fixed). The emulator check waits for disk space (the emulator needs about 20 GB free) |
 | 18 | Tags on `cyl-animated-item` (copied at the pinned commit), engines as abstract nodes | Mini Program | Done | `62fce9b` (other session); `npm test` |
 | 19 | GIF stills and one-pass play, `embedded`, `autoplay` in the mini program tags | Mini Program | TODO (upstream merge) | needs CYLTabBarController [PR #815](https://github.com/ChenYilong/CYLTabBarController/pull/815) (this session: `fe1978e0`, `3602ae67`, `ca6219a9`, `b51ac0ae`, `dc142479`; `npm test` 36); at `57a527e` a GIF tag loops with no stills and Play all cannot restart it |
 | 20 | WeChat DevTools / device check | Mini Program | TODO | WeChat DevTools cannot run here |
@@ -68,5 +68,5 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    agreed to be done by the CollectionViewClassifyMenu/CYLSearchViewController session).
 3. **SwiftPM** (row 11): when CYLTabBarController ships a `CYLAnimatedItem` product, depend on it instead of
    `CYLTabBarController` in `Package.swift`.
-4. **Toolchain checks not possible here**: HarmonyOS build (row 17), WeChat DevTools (row 20), Flutter and React Native
-   Android builds (row 22).
+4. **Toolchain checks**: HarmonyOS build and host tests done on Windows (row 17); its emulator check, WeChat DevTools
+   (row 20) and the Flutter and React Native Android builds (row 22, no Flutter / Java / Gradle on that machine) remain.

@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 811 / 849 = 95.5 / 100** (API 789 / 827, demos 22 / 22). Both tables are scored together: every TODO removed
+**Score: 799 / 838 = 95.3 / 100** (API 777 / 816, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -510,21 +510,10 @@ overrides left out.
 | `CYLTagAppearance.reset()` (CYLTagAppearance.swift) | `reset()` | method |
 | `CYLTagAppearance.copy()` (CYLTagAppearance.swift) | `copy()` | method |
 | `CYLTagButton` (CYLTagButton.swift) | `CYLTagButton` (tagviews/CYLTagButton.ets + CYLTagButtonComponent) | class |
-| `CYLTagButton.imageView` (CYLTagButton.swift) | `CYLTagButton.imageView` | property |
-| `CYLTagButton.titleLabel` (CYLTagButton.swift) | `CYLTagButton.titleLabel` | property |
 | `CYLTagButton.deleteIndicatorLabel` (CYLTagButton.swift) | `CYLTagButton.deleteIndicatorLabel` | property |
 | `CYLTagButton.badgeLabel` (CYLTagButton.swift) | `CYLTagButton.badgeLabel` (a CYLTagButtonPart; the badge color is its tintColor) | property |
 | `CYLTagButton.badgeValue` (CYLTagButton.swift) | `CYLTagButton.badgeValue` | property |
 | `CYLTagButton.badgeColor` (CYLTagButton.swift) | `CYLTagButton.badgeColor` (`CYLTagBadgeDefaultColor` by default) | property |
-| `CYLTagButton.title` (CYLTagButton.swift) | `CYLTagButton.title` | property |
-| `CYLTagButton.image` (CYLTagButton.swift) | `CYLTagButton.image` | property |
-| `CYLTagButton.selectedImage` (CYLTagButton.swift) | `CYLTagButton.selectedImage` | property |
-| `CYLTagButton.animationURL` (CYLTagButton.swift) | `CYLTagButton.animationURL` | property |
-| `CYLTagButton.animationRestingProgress` (CYLTagButton.swift) | `CYLTagButton.animationRestingProgress` | property |
-| `CYLTagButton.animationSpeed` (CYLTagButton.swift) | `CYLTagButton.animationSpeed` | property |
-| `CYLTagButton.animationLoops` (CYLTagButton.swift) | `CYLTagButton.animationLoops` | property |
-| `CYLTagButton.animationView` (CYLTagButton.swift) | `CYLTagButton.animationView` (the live CYLAnimationPlayer: Lottie, PAG, Rive or GIF) | property |
-| `CYLTagButton.animationPlayer` (CYLTagButton.swift) | `CYLTagButton.animationPlayer` | property |
 | `CYLTagButton.showsDeleteIndicator` (CYLTagButton.swift) | `CYLTagButton.showsDeleteIndicator` | property |
 | `CYLTagButton.deleteIndicatorHitFrame` (CYLTagButton.swift) | `CYLTagButton.deleteIndicatorHitFrame` | property |
 | `CYLTagButton.style` (CYLTagButton.swift) | `CYLTagButton.style` | property |
@@ -532,7 +521,7 @@ overrides left out.
 | `CYLTagButton.init?(coder:)` (CYLTagButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagButton.init(title:image:)` (CYLTagButton.swift) | `new CYLTagButton(title, image)` | init |
 | `CYLTagButton.init(title:image:animationURL:)` (CYLTagButton.swift) | `new CYLTagButton(title, image, animationURL)` | init |
-| `CYLTagButton.playAnimation()` (CYLTagButton.swift) | `playAnimation()` | method |
+| `CYLTagButton.resetAnimationSpeed()` (CYLTagButton.swift) | TODO | method |
 | `CYLTagButton.static width(forTitle:image:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.widthWithImage(title, image, style, fontScale)` | method |
 | `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.width(title, iconSize, showsDeleteIndicator, style, fontScale)` | method |
 | `CYLTagButton.static iconSize(for:animated:style:)` (CYLTagButton.swift) | `CYLTagButton.iconSize(image, animated, style)` | method |
@@ -876,7 +865,7 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 | `CYLQueryScenariosViewController` | `demos/menu/CYLQueryScenariosPage` (plus button) | 查询筛选: the filter demos by scenario and the database's row counts |
 | `CYLMenuLinkageViewController` | `demos/menu/CYLMenuLinkagePage` (classify menu, multiple filter, SQL, saved selections) | 菜单选择 · 数据库联动: the classify menu, the multiple filter panel, the SQL and the rows; saved selections |
 | `CYLTagStyleDemoViewController` | `demos/menu/CYLTagStylePage` (样式 tab) | The preview and the style actions with their values |
-| `CYLTagAnimationDemoViewController` | `demos/menu/CYLTagAnimationPage` (Lottie, PAG, Rive, GIF through the library's CYLAnimationPlayer; speed slider, loop switch, Play all; Rive without speed, as the engine has none) | The animation sections, speed slider (0.25×–4×), loop switch, Play all |
+| `CYLTagAnimationDemoViewController` | `demos/menu/CYLTagAnimationPage` (Lottie, PAG, Rive, GIF and SVGA through CYLTabBarController's CYLAnimatedItemView, with the engines and players the example registers in entry/src/main/ets/animation; speed slider, loop switch, Play all; Rive without speed, as the engine has none) | The animation sections, speed slider (0.25×–4×), loop switch, Play all |
 | `CYLTagConfigurationDemoViewController` | `demos/menu/CYLTagConfigurationPage` (JSON file and map configurations) | The list from the iOS JSON file and from a dictionary |
 | `CYLTagCloudDemoViewController` | `demos/samples/CYLTagCloudDemoPage` | The tag cloud built in code and from a configuration |
 | `CYLTagCloudSampleViewController` | `demos/samples/CYLTagCloudSamplePage` | The android-tagview sample: 25 tags, add a tag |
@@ -901,4 +890,4 @@ Every screen of the iOS example (`Example/CYLMenuExample`), in the order of the 
 - 2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3.
 - 2026-11-16: four accessibility-action rows N/A (ArkUI through API 21 has only ACCESSIBILITY_CLICK); the image tag dot's accessibility node and move step mapped. Score 799 / 807 = 99.0.
 - 2026-11-16: feature 9, animated icons with Lottie (@ohos/lottie 2.0.38), PAG (@tencent/libpag 4.4.31, the newest for API 12), Rive (@ohos/rive 1.0.4) and GIF (ImageKit frames on our timer), the animation screen, and the view handles (titleView, titleLabel, tagButton(at:), cells, supplementary views, imageView, animationView). Full marks: no TODO left. Compile only; device checks pending. Score 807 / 807 = 100.0.
-- 2026-11-17: `CYLTagButton` for standalone use in other libraries (CYLSearchViewController's search bar items): system symbols drawn with `SymbolGlyph` (`CYLImageIsSymbol`), `ResourceColor` colors in `CYLTagAppearance`, `CYLMenuStyle` and `CYLTagButton` (theme colors follow the color mode; `CYLColorKey` for render keys), `minimumSize`, badge metrics, and `CYLTagButtonHost` for ArkUI V2 parents. Animation versions: lottie 2.0.38, libpag 4.4.31 (4.5.102 needs API 15), rive 1.0.4; apps that also use `cylplaceholder` use ohpm `overrides`. Details: `issue-progress.md`. Score unchanged (HarmonyOS additions).
+- 2026-11-17: the animated icon moved onto CYLTabBarController's CYLAnimatedItemView (module cylanimateditem, vendored at commit 57a527e); the library depends on no animation library, the example registers Lottie, PAG, Rive, SVGA and GIF. Same rows, new counterparts. Compile only. Score 807 / 807 = 100.0.
