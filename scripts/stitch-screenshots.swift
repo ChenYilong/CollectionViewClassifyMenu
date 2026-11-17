@@ -111,7 +111,7 @@ for (i, (caption, _)) in panels.enumerated() {
 }
 NSGraphicsContext.restoreGraphicsState()
 // The header and footer go into the PNG as an iTXt chunk with the keyword "Description" (UTF-8, starting with
-// "cyl-stitch-screenshots"), which scripts/check-screenshots.py reads before a commit and in CI. ImageIO's
+// "cyl-stitch-screenshots"), which scripts/check-screenshots.py reads before a commit. ImageIO's
 // kCGImagePropertyPNGDescription is not used: on macOS 27 it is written into XMP, not into a text chunk, so the
 // check (Pillow's `image.info["Description"]`) did not find it.
 let description = (["cyl-stitch-screenshots"] + header + footer).joined(separator: "\n")
