@@ -33,7 +33,8 @@ class MainActivity : AppCompatActivity() {
         registerPages()
         val controller = CYLTabBarController.tabBarControllerWithConfigurationFile(this, CONFIGURATION_FILE)
         tabBarController = controller
-        // One tab per example (more than fit side by side on a phone): the tabs scroll (Android only).
+        // Seven tabs: CYLTabBarController shows four and "More" past five, as iOS does; the configuration key
+        // CYLTabBarControllerShowsAllTabs (Android only) keeps every tab in the bar, and they scroll (Android only).
         controller.tabBar.cyl_scrollMode = CYLTabBarScrollMode.Scrollable
         setContentView(controller.view)
     }
