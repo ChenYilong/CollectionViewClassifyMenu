@@ -360,3 +360,20 @@ declarations, so Objective-C callers see no change.
   - Remaining: CI build and the unit tests; screenshots of the classify menu and the multiple filter on Android to
     compare with iOS.
 - **Pin `d875dd1`** (2026-11-17): the #788 tip and newest commit (`5ff6021` guide, `ab29a84` late-failure fallback and remote GIF downloads, `d875dd1` remote PAG downloads); `DEFINES_MODULE` kept.
+
+## TODO (2026-11-17): the guide re-read at `57a527e`: CYLAnimatedItem on HarmonyOS and the mini program
+
+- **Context**: CYLTabBarController `842aef8` adds the component on HarmonyOS (ohpm module
+  `CrossPlatform/harmonyos-cyltabbar/cylanimateditem`, `CYLAnimatedItemView`, engines registered by the app with
+  `CYLAnimatedItemEngines.register(...)` and an `animationBuilder`, no animation library in the module) and on the WeChat
+  mini program (`src/cyl-animated-item` in cyl-tabbar-miniprogram, engines as abstract nodes `cyl-lottie-view` and its
+  siblings, GIF through `<image>`). Unpublished: taken by commit (HarmonyOS `file:` or a copy of the folder at the pinned
+  commit; mini program `github:ChenYilong/CYLTabBarController#<sha>` or a copy of `src/cyl-animated-item`). `57a527e`
+  fixes the iOS umbrella header (animator headers) and an accessory test. Pins move to `57a527e`.
+- **Requirements**: re-read the guide and adjust; import unreleased components by commit; do not block progress; the core
+  depends on no animation engine, only the examples add engines; every platform.
+- **Prompt (verbatim)**: "我已经更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
+- **Prompt (English)**: "I updated the document, latest address …/docs/Animated-Item.md; some descriptions changed. Please read it
+  again and adjust."
+- **Status**: started. Pins `57a527e`; HarmonyOS and mini program migrations next (not buildable here: no DevEco, no WeChat
+  DevTools).
