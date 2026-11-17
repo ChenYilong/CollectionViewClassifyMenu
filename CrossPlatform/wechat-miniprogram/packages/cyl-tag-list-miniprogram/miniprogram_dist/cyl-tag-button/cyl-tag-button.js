@@ -12,7 +12,8 @@
  * `animationRestingProgress`, `animationSpeed` (0 uses the style's), `animationLoops`, `badgeValue` (null hides the
  * badge, '' shows a dot), `badgeColor` (system red by default), `accessibilityLabel` (what the screen reader reads first;
  * '' reads the title), `selected`, `enabled`, `gifFirstFrame` / `gifLastFrame` (a GIF's stills, PNG: it rests on them
- * and plays one pass of `gifDuration` ms, 1000 by default), `autoplay` (false: the animation rests until played),
+ * and plays one pass of `gifDuration` ms, 1000 by default), `autoplay` (true: plays once when the file is ready;
+ * by default the icon rests until it is played, as on iOS),
  * `embedded` (cyl-animated-item's layout inside a control), `tagStyle` (with
  * `allowsTransparentBackground: true` a `transparent` background is kept, for a tag on a colored surface).
  * Methods (through `selectComponent`): `playAnimation()`, `intrinsicSize()`.
@@ -49,7 +50,7 @@ Component({
     gifFirstFrame: { type: String, value: '', observer: 'render' },
     gifLastFrame: { type: String, value: '', observer: 'render' },
     gifDuration: { type: Number, value: 0, observer: 'render' },
-    autoplay: { type: Boolean, value: true, observer: 'render' },
+    autoplay: { type: Boolean, value: false, observer: 'render' },
     embedded: { type: Boolean, value: false },
   },
 

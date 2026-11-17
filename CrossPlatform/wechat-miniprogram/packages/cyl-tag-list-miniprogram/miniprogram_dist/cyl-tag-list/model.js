@@ -415,11 +415,12 @@ function normalize(configuration = {}, options = {}) {
         exclusive: boolValue(item.exclusive) === true,
         enabled: boolValue(item.enabled) !== false,
         // A GIF's stills (PNG) and the length of one pass (ms): with stills it rests on them and plays one pass on
-        // Play all; autoplay false keeps any animation at rest until it is played (cyl-animated-item).
+        // Play all. An icon rests (its resting frame) until it is tapped or played, as CYLTagButton on iOS and the
+        // tab icons of CYLTabBarController (docs/Animated-Item.md); autoplay true plays it once when its file is ready.
         gifFirstFrame: typeof item.gifFirstFrame === 'string' ? item.gifFirstFrame : '',
         gifLastFrame: typeof item.gifLastFrame === 'string' ? item.gifLastFrame : '',
         gifDuration: numberValue(item.gifDuration) > 0 ? numberValue(item.gifDuration) : 0,
-        autoplay: boolValue(item.autoplay) !== false,
+        autoplay: boolValue(item.autoplay) === true,
       };
     }),
   }));
@@ -731,7 +732,7 @@ function animatedIcon(item, state, style, url) {
     gifFirstFrame: item.gifFirstFrame || '',
     gifLastFrame: item.gifLastFrame || '',
     gifDuration: item.gifDuration > 0 ? item.gifDuration : 1000,
-    autoplay: item.autoplay !== false,
+    autoplay: item.autoplay === true,
   };
 }
 
@@ -823,7 +824,7 @@ function tagButtonView(props, animationUrl, pixelRatio = 2) {
     gifFirstFrame: props.gifFirstFrame || '',
     gifLastFrame: props.gifLastFrame || '',
     gifDuration: Number(props.gifDuration) > 0 ? Number(props.gifDuration) : 0,
-    autoplay: props.autoplay !== false,
+    autoplay: props.autoplay === true,
   };
   const state = stateOf(item, !!props.selected);
   const icon = iconContent(item, state, style, animationUrl);

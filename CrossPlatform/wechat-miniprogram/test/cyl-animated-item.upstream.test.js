@@ -189,3 +189,22 @@ test('cyl-animated-item: the same file after a failure is a retry and resets the
   observer.call(item, 'https://x/a.json', null, '')
   assert.equal(item.data.animationFailed, false, 'a retry clears the failure')
 })
+
+test('title color, font size and line count', () => {
+  const { cylAnimatedItemModel: model } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-animated-item/cyl_animated_item_model')
+  const plain = model({ title: 'A' })
+  assert.equal(plain.titleStyle, '')
+  assert.equal(plain.titleLinesClass, '')
+  const styled = model({ title: 'A', titleColor: '#FF0000', titleFontSize: 17, titleLines: 2 })
+  assert.equal(styled.titleStyle, 'color: #FF0000;font-size: 17px;-webkit-line-clamp: 2;')
+  assert.equal(styled.titleLinesClass, 'cyl-animated-item-title-wrap cyl-animated-item-title-clamp')
+  assert.equal(model({ title: 'A', titleLines: 0 }).titleLinesClass, 'cyl-animated-item-title-wrap')
+  assert.equal(model({ title: 'A', titleLines: -3 }).titleLinesClass, '')
+})
+
+test('title line height and spacing; spacing follows the axis', () => {
+  const { cylAnimatedItemModel: model } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-animated-item/cyl_animated_item_model')
+  assert.equal(model({ title: 'A', titleSpacing: -1 }).titleStyle, '')
+  assert.equal(model({ title: 'A', axis: 'vertical', titleLineHeight: 22, titleSpacing: 12 }).titleStyle, 'line-height: 22px;margin-top: 12px;')
+  assert.equal(model({ title: 'A', axis: 'horizontal', titleSpacing: 0 }).titleStyle, 'margin-left: 0px;')
+})
