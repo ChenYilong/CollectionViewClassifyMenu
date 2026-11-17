@@ -238,6 +238,16 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **iOS at pins `074285a6` (2026-11-18, `19e1e4a`)**: `pod install` resolves `074285a6` in the four iOS projects;
   `6a9ede85..074285a6` changes only the mini program's `cyl-rive`, its test and a doc (no iOS source), so the iOS results
   at `6a9ede85` (152 tests pass, every Rive tag replays) stand without a re-run.
+- **TODO (bug, 2026-11-18, Android at `dcbfdec6`): Rive Menu plays once, then never again.** Android example
+  (`android/merged`, emulator-5556 API 37), 动效 page: at rest after opening every Rive tag is still (Home, Done, Menu,
+  Button, Shapes, Truck, the five icons.riv tags: 0 changed pixels over 4 frame pairs, the rest-until-played change
+  works). Loop on: every Rive tag moves (Done 312-332, Shapes 285-775, Truck 22-113, Chat 487-762, Search 796-955, Timer
+  129-146, Alerts 267-801, Me 784-981, Button 106-242, Home 14-18) except **Menu: 0 in 16 frame pairs**; the first play
+  turns X into the hamburger, then a second tap and every loop pass change nothing. At `6a9ede85` Menu looped on Android
+  (B20). Cause, upstream CYLTabBarController `ef1d0313` (`CYLRiveTabBarItemAnimationView`): the file is paused 100 ms
+  after load and resumed with `play(…, settleInitialState = false)` on the first play; after that the `isOpen` false /
+  true toggles no longer replay it. Fix belongs in CYLTabBarController (reported to its Mac session). Evidence:
+  `docs/assets/android-rive-menu-stuck-dcbfdec6.png`. Android library tests 86 / 86, example builds.
 - **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
   `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
   tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still
