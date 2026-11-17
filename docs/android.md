@@ -22,7 +22,8 @@ library merged from them, its API table against the iOS core, and the Android po
   (the configuration key of `CYLTabBarController.cyl_showsAllTabs`); the tabs still scroll
   (`cyl_scrollMode = Scrollable`, which also shows every tab). `gradle.properties` pins CYLTabBarController to
   `0c35409e96d81b01150088ec0930f0b9a45204d3`, the newest commit over every branch (`scripts/cyl-tabbar-latest-commit.sh`).
-  Evidence: `gradle :example:assembleDebug` passes against that commit (Linux container, 2026-11-17); the example has no
+  Merged into `feat/harmony` (pull request 21, 2026-11-17), where every pin then moved to `b5a02862` (docs only).
+  Evidence: `gradle :example:assembleDebug` passes against both commits (Linux container, 2026-11-17); the example has no
   unit tests, and the configuration key is covered by CYLTabBarController's `CYLTabBarMoreTest`. **TODO**: an emulator screenshot of the
   seven tabs (no Android emulator in the Linux container).
 

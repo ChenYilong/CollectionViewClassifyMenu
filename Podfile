@@ -4,7 +4,7 @@ project 'CollectionViewClassifyMenu.xcodeproj'
 # The demo app's tab bar (AGENTS.md, "CYLTabBarController reference and dependency"): CYLTabBarController at its
 # newest commit, as in Example/Podfile; the core library does not depend on it.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => '0c35409e96d81b01150088ec0930f0b9a45204d3' }
+                :commit => 'b5a0286248dc3feb160e84ce4670fe97d1d042ce' }
 
 target 'CollectionViewClassifyMenu' do
   pod 'CollectionViewClassifyMenu', :path => '.'
