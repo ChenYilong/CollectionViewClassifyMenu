@@ -50,19 +50,19 @@ tags: [issues, ui, cocoapods, progress]
   `META-INF/androidtagview/{LICENSE,NOTICE}` (Apache-2.0); MIT `LICENSE` for npm (React Native), both pub.dev packages
   (the Flutter "TODO" placeholder replaced) and their HAR, the ohpm HAR (module root and `rawfile`), the mini program
   package (root, listed in `files`, expected by `verify-package.js`). Check: `scripts/check-licenses.sh` (passes,
-  shellcheck clean); mini program `verify-package.js` and `npm test` 111/111 pass.
+  shellcheck clean); mini program `verify-package.js` and `npm test` 111/111 pass. Not built here: the iOS bundle,
+  the AAR and the HAR (CI and the platform toolchains).
   2026-11-17, after re-reading CYLTabBarController's guide (tip `ec12a9d`, its `docs/License-Notices.md`): the mini
   program package also carries `miniprogram_dist/LICENSE`, as CYLTabBarController's mini program component folders
   do (the earlier worry about WeChat file types did not hold).
   Pins: d0c82cb had moved every CYLTabBarController pin from `fbd05d5` to the newest `ec12a9d`, which dropped the
   unmerged PR #814 (`fix/lottie-unplayable-file`: the Lottie animator makes no view for a file Lottie cannot play) and
   would fail `testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` again (reported by the CYLSearchViewController
-  session). Owner's decision (asked, 2026-11-17): "Back to fbd05d5 until #814"; the pins are `fbd05d5` again, the
-  exception is in AGENTS.md ("CYLTabBarController reference and dependency").
-  The owner merged PR #814 into #788 (`9a54e26`, 2026-11-17), so the exception is gone (`6ee254c`) and the pins follow
-  the newest commit over every branch again: `47aec88` (`fix/lottie-unplayable-file`, 05:25 UTC, on top of the fix:
-  a report of registered and missing animation engines, no API change to `CYLAnimatedItemView` or the podspecs). Not built here: the iOS bundle, the
-  AAR and the HAR (CI and the platform toolchains).
+  session). Owner's decision (asked, 2026-11-17): "Back to fbd05d5 until #814" (`4622434`). The owner then merged
+  #814 into #788 (`9a54e26`); the other session pinned that merge (`6ee254c`) while `a9169da` moved the pins to
+  `47aec88` (newest by timestamp, on the already-merged branch `fix/lottie-unplayable-file`, without #788's license
+  and guide commits). Owner's decision (asked, 2026-11-17): "9a54e26, the #788 merge": `a9169da` is reverted, the pins
+  are `9a54e26` like CYLSearchViewController's, and AGENTS.md says an already-merged pull request branch does not count.
 - Found: the packages disagree (iOS podspec "All rights reserved", npm / ohpm / mini program "MIT", Flutter LICENSE a
   "TODO" placeholder, the AndroidTagView port Apache-2.0 from its upstream, the merged Android library none).
 
