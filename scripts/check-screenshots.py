@@ -16,10 +16,10 @@ scripts/screenshot-check-exempt.txt (one glob per line).
 """
 import fnmatch
 import os
+import struct
 import subprocess
 import sys
-
-from PIL import Image
+import zlib
 
 MARKER = 'cyl-stitch-screenshots'
 HEADER_FIELDS = ('Purpose:', 'Platform:', 'Host:', 'IDE:')
@@ -27,6 +27,8 @@ FOOTER_FIELDS = ('Result:', 'Versions:', 'Taken:')
 IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.gif', '.webp')
 ROOT = subprocess.run(['git', 'rev-parse', '--show-toplevel'], capture_output=True, text=True).stdout.strip() or '.'
 EXEMPT_FILE = os.path.join(ROOT, 'scripts', 'screenshot-check-exempt.txt')
+PNG_SIGNATURE = bytes([0x89]) + b'PNG' + bytes([0x0D, 0x0A, 0x1A, 0x0A])
+NUL = bytes([0])
 
 
 def changed_files(argv):
@@ -46,11 +48,40 @@ def exempt_patterns():
         return [line.split('#', 1)[0].strip() for line in handle if line.split('#', 1)[0].strip()]
 
 
+def png_text(path, keyword):
+    """The text of a PNG's tEXt / zTXt / iTXt chunk named `keyword`, anywhere in the file ('' when none). Standard
+    library only, so the check runs on any Python 3 (macOS's system python3 has no Pillow)."""
+    with open(path, 'rb') as handle:
+        data = handle.read()
+    if data[:8] != PNG_SIGNATURE:
+        return ''
+    offset = 8
+    while offset + 8 <= len(data):
+        length, kind = struct.unpack('>I4s', data[offset:offset + 8])
+        body = data[offset + 8:offset + 8 + length]
+        offset += 12 + length
+        if kind not in (b'tEXt', b'zTXt', b'iTXt'):
+            if kind == b'IEND':
+                break
+            continue
+        name, _, rest = body.partition(NUL)
+        if name.decode('latin-1') != keyword:
+            continue
+        if kind == b'tEXt':
+            return rest.decode('latin-1')
+        if kind == b'zTXt':
+            return zlib.decompress(rest[1:]).decode('latin-1')
+        # iTXt: compression flag, method, language NUL, translated keyword NUL, text.
+        compressed, rest = rest[0], rest[2:]
+        rest = rest.split(NUL, 2)[2]
+        return (zlib.decompress(rest) if compressed else rest).decode('utf-8')
+    return ''
+
+
 def problems(path):
     if not path.lower().endswith('.png'):
         return ['not a PNG: stitch it with scripts/stitch-screenshots.py (it writes PNG)']
-    with Image.open(os.path.join(ROOT, path)) as image:
-        description = image.info.get('Description', '')
+    description = png_text(os.path.join(ROOT, path), 'Description')
     if not description.startswith(MARKER):
         return ['no label: not made by scripts/stitch-screenshots.py / .swift (no "cyl-stitch-screenshots" description)']
     missing = [field for field in HEADER_FIELDS + FOOTER_FIELDS if field not in description]

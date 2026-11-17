@@ -29,7 +29,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install pillow
       - name: Check the screenshots this pull request adds or changes
         # [EN] Images committed before the check existed are not checked: the range starts at the commit that added it,
         #      when that commit is newer than the base. [CN] 检查加入之前提交的图片不在检查范围内：范围从加入检查的提交开始（若它比基准更新）。
