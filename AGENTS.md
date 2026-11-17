@@ -604,6 +604,27 @@ AGENTS.md, newest commit) and adapted to this project:
   `docs/assets/ios-rive-rest-one-column.png` (two cropped panels); two columns,
   `docs/assets/ios-rive-rest-then-play-grid.png` (four full screens).
 
+- **Screenshots: enforced (2026-11-18).** Prompt (verbatim): "检查为什么没有应用新增的截图Label规范，并强化该策略保证以后截图必须遵循该规范，避免再出现该问题。" Why
+  they were missed (Windows session, four images committed 09:54-11:03: `miniprogram-devtools-gif-stills-play-all.png`,
+  `miniprogram-devtools-rive-rest-until-played-dcbfdec6.png`, `android-rive-menu-stuck-dcbfdec6.png`,
+  `android-rive-menu-stuck-ad3dca0e.png`): (1) the header / footer rules were committed by another session at 11:06 and
+  11:10, while that session ran; instructions are read once at session start and nothing told it to read them again;
+  (2) the older rules ("labels", 2026-11-12: platform, environment, repository version, time; "quality": no scaling)
+  were broken too, because on Windows there was no stitch tool (the Swift one needs macOS) and the images were composed
+  by hand (PIL): downscaled, captions only, no environment, commit or time; (3) nothing checked an image before it was
+  committed. All four are restitched. So:
+  - **Re-read before every screenshot.** Before taking or stitching a screenshot, `git pull` and read
+    `.agents/skills/cyl-screenshots/SKILL.md` again: the rules can change while a session runs.
+  - **Only the stitch tools make a screenshot for `docs/` or `README.md`:** `scripts/stitch-screenshots.py` (any host,
+    Python with Pillow) or `scripts/stitch-screenshots.swift` (macOS), same arguments. Never compose, crop-and-paste,
+    annotate or resize an image by hand or with an ad-hoc script. A single raw screen is stitched too (one panel).
+  - **The tools refuse an incomplete label:** the header needs `Purpose:`, `Platform:`, `Host:` and `IDE:`, the footer
+    `Result:`, `Versions:` and `Taken:`, every panel a caption. They write the label into the PNG.
+  - **Checked before every commit and in CI:** `scripts/check-screenshots.py` (run by `bash scripts/check-branch-pr.sh`,
+    exit 3 when a staged screenshot has no label) and the workflow `.github/workflows/screenshot-labels.yml`. A failing
+    check is fixed by restitching, never by skipping it. Only images that are not screenshots or that a script
+    regenerates as a set go into `scripts/screenshot-check-exempt.txt`, with the reason.
+
 ## Documentation assets
 
 - Images and other attachments of a Markdown file go into an `assets/` folder

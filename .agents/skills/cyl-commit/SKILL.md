@@ -121,7 +121,8 @@ Opening is automatic; merging follows the repository's rules and the user's appr
   for each.
 
 ```sh
-bash scripts/check-branch-pr.sh   # 0: commit; 1: open a PR first; 2: more than two open PRs, ask the user
+bash scripts/check-branch-pr.sh   # 0: commit; 1: open a PR first; 2: more than two open PRs, ask the user;
+                                  # 3: a staged screenshot is not stitched and labeled (restitch it)
 ```
 
 ### Commit and push after every answer
