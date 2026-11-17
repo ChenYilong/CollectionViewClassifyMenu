@@ -65,7 +65,11 @@ import UIKit
 /**
  * The fold control of a `CYLTagListView`: its position, content, titles, icon, color and font.
  */
+// @objcMembers: Objective-C callers (CYLSearchViewController's tests and apps) read and set every property, not only
+// the initializer; without it `position` and `content` were invisible to Objective-C (CI on CYLSearchViewController
+// e7d9655: "property 'position' not found on object of type 'CYLMenuFoldControl *'").
 @objc(CYLMenuFoldControl)
+@objcMembers
 open class CYLMenuFoldControl: NSObject, NSCopying {
 
     /**
