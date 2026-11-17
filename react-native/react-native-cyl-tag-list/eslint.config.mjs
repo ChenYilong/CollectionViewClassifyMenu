@@ -24,6 +24,8 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['node_modules/', 'lib/', 'example/dist/'],
+    // .deps/ is CYLTabBarController's checkout and harmony-example/ has its own dependencies and HarmonyOS build tree
+    // (scripts/setup.sh copies example/src into it); linting them made eslint run for minutes.
+    ignores: ['node_modules/', 'lib/', 'example/dist/', '.deps/', 'harmony-example/', '**/build/', 'example/ios/Pods/'],
   },
 ]);

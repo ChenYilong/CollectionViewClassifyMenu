@@ -13,7 +13,8 @@ const zh: Record<string, string> = {
   'Tapped': '点击',
   'Selected': '已选',
   'The plus button page': '加号按钮的页面',
-  'The raised plus button has a page of its own (pageIdentifier: plus); tap a tab to go back': '凸起的加号按钮有自己的页面（pageIdentifier: plus）；点击任意 Tab 返回',
+  'The raised plus button has a page of its own (pageIdentifier: plus); tap a tab to go back':
+    '凸起的加号按钮有自己的页面（pageIdentifier: plus）；点击任意 Tab 返回',
   'Classify menu': '分类菜单',
   'Regions': '地区过滤',
   'Dishes': '菜品过滤',

@@ -30,11 +30,7 @@ const configuration = {
     },
     {
       title: 'Rive · pod CYLTabBarController/Rive',
-      items: [
-        animated('Home', 'house.riv'),
-        animated('Done', 'check.riv'),
-        animated('Menu', 'menu_button.riv'),
-      ],
+      items: [animated('Home', 'house.riv'), animated('Done', 'check.riv'), animated('Menu', 'menu_button.riv')],
     },
     {
       title: 'Tags',
@@ -75,7 +71,9 @@ export default function TagListPage() {
           onSelectionChange={(items) => setStatus(`${t('Selected')}: ${items.map((i) => i.title).join(', ')}`)}
         />
         <View style={styles.controls}>
-          <Text testID="speedLabel">{t('Speed')} {speed.toFixed(2)}x</Text>
+          <Text testID="speedLabel">
+            {t('Speed')} {speed.toFixed(2)}x
+          </Text>
           <Slider value={speed} onChange={setSpeed} />
           <View style={styles.row}>
             <Text>{t('Loop')}</Text>

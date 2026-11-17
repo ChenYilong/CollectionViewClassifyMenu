@@ -134,7 +134,9 @@
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "es5",
-    "useTabs": false
+    "useTabs": false,
+    "printWidth": 120,
+    "endOfLine": "auto"
   },
   "jest": {
     "preset": "@react-native/jest-preset",
