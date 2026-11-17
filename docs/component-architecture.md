@@ -463,3 +463,14 @@ started run completes and the next one tests the newest commit.
   TODO: the screenshots of these runs did not reach the `ci-screenshots` branch (no `feat-harmony/<sha>/` folder for
   `f8301a4`, `698260e`, `8794487`), and artifact storage is not reachable from the cloud sessions; check the publish
   step for pull request runs.
+
+## TODO (2026-11-17): CI screenshots reach the ci-screenshots branch under the branch commit
+
+- **Context**: the "Example screenshots" job of `ios.yml` publishes with `scripts/publish-screenshots.sh`, but no
+  `ci-screenshots/feat-harmony/<sha>/` folder existed for `f8301a4`, `698260e` or `8794487`. The log of the `698260e` run
+  says "Published 54 screenshots to ci-screenshots/feat-harmony/531cfa3": on `pull_request` runs `GITHUB_SHA` is the
+  temporary merge commit (`refs/pull/N/merge`), not the branch commit, so the folder name matches no commit of the branch.
+  Artifact storage is blocked from the cloud sessions, so the branch is the only way to read the images there.
+- **Requirements**: fix the screenshot publishing; also add a screenshot job to CYLSearchViewController's CI.
+- **Prompt (verbatim)**: "to fix the screenshot publishing in ClassifyMenu and add a screenshot job to CYLSearchViewController's CI"
+- **Status**: started.
