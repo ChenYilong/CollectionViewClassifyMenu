@@ -269,3 +269,19 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   Windows session (asked by message), as do the Android, HarmonyOS and mini program pins.
 - **Result (2026-11-18)**: DONE, score 100. Row 11 Done (above); row 19 Done by the Windows session (`eaddb56`). Pins at
   `6f93ae6b` on every platform (iOS here; mini program and Android `557b91d`).
+
+## Rive icons rest until played (2026-11-18, iOS, `feat/harmony`)
+
+- **Request** (Mac-CYLTabBarController session): CYLTabBarController `ef1d0313` makes every Rive icon rest on its first
+  frame until it is played; recheck the Rive section (Shapes and Truck above all) and that Home, Done, Menu and Button
+  still play and loop.
+- **iOS result** at CYLTabBarController `dcbfdec6` (iOS pins moved from `6f93ae6b`; between them only
+  `CYLRiveLegacyTabBarItemAnimationView.swift` and `CYLRiveTabBarItemAnimationView.swift` change), iPhone 17 Pro
+  simulator, iOS 27.2, Xcode 27.2:
+  - At rest (`-CYLExampleScreen animations-rive`, no play): 0 changed pixels in all six Rive icons over 11 s. Shapes
+    and Truck now rest (at `074285a6` Shapes was caught mid-animation). Done and Menu rest on the same frames as before.
+    ![iOS Rive at rest](assets/ios-rive-rest.png)
+  - Play all with Loop on (`animations-rive-loop`): every icon keeps changing, frames up to 17 s apart (changed pixels
+    per frame: Home 143-557, Done 341-695, Menu up to 577, Button up to 117, Shapes 431-809, Truck 20-113).
+    ![iOS Rive play and loop](assets/ios-rive-play-loop.png)
+  - Example tests 92 / 0.
