@@ -61,6 +61,8 @@ export class CYLFilterBaseController {
 
   /** Whether the panel is on screen (added to the host). */
   isShowing: boolean = false;
+  /** `settingArray`: free-form settings of the filter, kept for the caller (empty by default). */
+  settingArray: Object[] = [];
   /** True while the side panel is slid in. */
   isPanelVisible: boolean = false;
 

@@ -22,6 +22,24 @@ export class CYLRightImageButton {
   normalImage: Resource | undefined = CYLMenuResources.image('home_btn_more_normal');
   selectedImage: Resource | undefined = CYLMenuResources.image('home_btn_more_selected');
 
+  /** `expandTitle`: the title while not selected (the section is folded); `normalTitle`. */
+  get expandTitle(): string {
+    return this.normalTitle;
+  }
+
+  set expandTitle(value: string) {
+    this.normalTitle = value;
+  }
+
+  /** `collapseTitle`: the title while selected (the section is expanded); `selectedTitle`. */
+  get collapseTitle(): string {
+    return this.selectedTitle;
+  }
+
+  set collapseTitle(value: string) {
+    this.selectedTitle = value;
+  }
+
   /** Never highlighted: the button toggles between its normal and selected looks only. */
   get isHighlighted(): boolean {
     return false;

@@ -3,9 +3,9 @@
  * the touch ripple, titles, rows, icons, layout spacing, section headers, fold controls and the More button. Lengths
  * are vp, font sizes fp, colors '#AARRGGBB'. `copy()` is NSCopying.
  */
-import { CYLTagAppearance } from './CYLTagAppearance';
+import { CYLTagAppearance, CYLTagCornerRadiusSquare } from './CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLOffset, CYLSize } from './CYLTypes';
-import { CYLMenuLocalizedString } from './CYLMenuResources';
+import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
 
 /**
@@ -352,6 +352,108 @@ export class CYLMenuStyle {
   /**
    * android-tagview's look: blue square tags, white text, 5 vp spacing.
    */
+  /** The tags' base look of the classify menu and the filter (iOS `compactTagStyle()`). */
+  private static compactTagStyle(): CYLMenuStyle {
+    const style = new CYLMenuStyle();
+    const font = CYLFont.systemFont(CYLTagMetrics.titleFontSize);
+    style.appearances().forEach((appearance: CYLTagAppearance) => {
+      appearance.font = font;
+      appearance.borderWidth = 0;
+      appearance.contentInsets = new CYLEdgeInsets(0, 4, 0, 4);
+    });
+    style.imageTitleSpacing = 5;
+    style.imageSize = new CYLSize(16, 16);
+    style.itemHeight = 30;
+    style.backgroundColor = CYLColor.CLEAR;
+    return style;
+  }
+
+  /**
+   * `classifyMenuTag(_:)`: a tag of `CYLClassifyMenuViewController` in one of its looks, by the raw value of
+   * `CYLCollectionCellButtonStyle` (0 general, 1 home, 2 red, 3 chengNi, the default: a light green capsule that takes the
+   * app's tint while selected or pressed).
+   */
+  static classifyMenuTag(look: number = 3): CYLMenuStyle {
+    const style = CYLMenuStyle.compactTagStyle();
+    const green = CYLColor.argb(255, 18, 133, 117);
+    const selected = style.appearance(CYLControlState.SELECTED);
+    if (look === 0) {
+      style.appearances().forEach((appearance: CYLTagAppearance) => {
+        appearance.cornerRadius = 5;
+        appearance.backgroundColor = CYLColor.WHITE;
+        appearance.borderWidth = 1;
+        appearance.borderColor = CYLColor.BLACK;
+      });
+    } else if (look === 1) {
+      style.appearances().forEach((appearance: CYLTagAppearance) => {
+        appearance.textColor = green;
+        appearance.borderColor = green;
+      });
+      selected.textColor = CYLColor.withAlpha(green, 0.7);
+      style.highlightedBackgroundColor = green;
+    } else if (look === 2) {
+      const red = CYLColor.argb(255, 160, 15, 85);
+      style.appearances().forEach((appearance: CYLTagAppearance) => {
+        appearance.textColor = red;
+        appearance.borderColor = red;
+      });
+      style.highlightedBackgroundColor = green;
+    } else {
+      style.appearances().forEach((appearance: CYLTagAppearance) => {
+        appearance.cornerRadius = 13;
+        appearance.backgroundColor = CYLColor.argb(255, 230, 255, 244);
+        appearance.textColor = CYLColor.APP_TINT;
+      });
+      selected.backgroundColor = CYLColor.APP_TINT;
+      selected.backgroundImage = CYLMenuResources.image('tag_btn_background_highlighted');
+      selected.textColor = CYLColor.WHITE;
+      style.highlightedBackgroundColor = CYLColor.APP_TINT;
+    }
+    return style;
+  }
+
+  /**
+   * `filterTag()`: a tag of the multiple-choice filter: the filter's slide images as the normal and selected
+   * backgrounds, green titles that turn white when selected.
+   */
+  static filterTag(): CYLMenuStyle {
+    const style = CYLMenuStyle.compactTagStyle();
+    style.appearances().forEach((appearance: CYLTagAppearance) => {
+      appearance.backgroundColor = CYLColor.CLEAR;
+      appearance.cornerRadius = CYLTagCornerRadiusSquare;
+    });
+    const normal = style.appearance(CYLControlState.NORMAL);
+    normal.backgroundImage = CYLMenuResources.image('btn_slide_normal');
+    normal.textColor = CYLColor.argb(255, 96, 147, 130);
+    const selected = style.appearance(CYLControlState.SELECTED);
+    selected.backgroundImage = CYLMenuResources.image('btn_slide_selected');
+    selected.textColor = CYLColor.WHITE;
+    return style;
+  }
+
+  /**
+   * `sectionTitle(fontSize:textColor:leadingInset:)`: a header's section title: no background or border, the content at
+   * the leading edge after `leadingInset`, an icon 4 vp before the title.
+   */
+  static sectionTitle(fontSize: number = 15, textColor: ResourceColor = CYLColor.BLACK, leadingInset: number = 0): CYLMenuStyle {
+    const style = new CYLMenuStyle();
+    style.appearances().forEach((appearance: CYLTagAppearance) => {
+      appearance.backgroundColor = CYLColor.CLEAR;
+      appearance.borderWidth = 0;
+      appearance.borderColor = undefined;
+      appearance.cornerRadius = CYLTagCornerRadiusSquare;
+      appearance.textColor = textColor;
+      appearance.font = CYLFont.systemFont(fontSize);
+      appearance.contentInsets = new CYLEdgeInsets(0, leadingInset, 0, 0);
+    });
+    style.contentAlignment = CYLTagContentAlignment.leading;
+    style.imageSize = new CYLSize(16, 16);
+    style.imageTitleSpacing = 4;
+    style.itemHeight = 0;
+    style.backgroundColor = CYLColor.CLEAR;
+    return style;
+  }
+
   static tagCloud(): CYLMenuStyle {
     const style = new CYLMenuStyle();
     const blue = CYLColor.argb(255, 0, 0xBF, 0xFF);

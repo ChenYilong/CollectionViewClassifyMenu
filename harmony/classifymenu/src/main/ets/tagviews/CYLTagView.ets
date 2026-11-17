@@ -189,6 +189,11 @@ export class CYLTagView implements CYLTagHeaderCellDelegate {
     return this.groups.length;
   }
 
+  /** `numberOfVisibleItems(inSection:)`: the tags a section shows now (Android `numberOfVisibleItemsInSection`). */
+  numberOfVisibleItems(section: number): number {
+    return this.numberOfItemsInSection(section);
+  }
+
   numberOfItemsInSection(section: number): number {
     const group = this.group(section);
     if (group === undefined) {

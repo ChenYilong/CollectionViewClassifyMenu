@@ -12,8 +12,11 @@ export {
 } from './CYLFilterHeaderView';
 export {
   CYLClassifyMenuViewController, CYLClassifyMenuView, CYLClassifyMenuLayout, CYLClassifyMenuHeaderFrame,
-  CYLClassifyMenuCellFrame, CYLElementKindSectionHeader
+  CYLClassifyMenuCellFrame, CYLElementKindSectionHeader, kTagCollectionViewCellsHorizonMargin,
+  kTagCollectionViewToLeftMargin, kTagCollectionViewToTopMargin, kTagCollectionViewToRightMargin,
+  kTagCollectionViewToBottomtMargin
 } from './CYLClassifyMenuViewController';
+export { CYLFilterParamsTool, kMultipleFilterSetting, kMultipleFilterSettingModified } from './CYLFilterParamsTool';
 export {
   CYLFilterCollectionCell, CYLFilterCollectionCellView, CYLMultipleFilterHeaderView,
   CYLMultipleFilterHeaderViewComponent
