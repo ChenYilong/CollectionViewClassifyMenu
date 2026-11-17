@@ -159,11 +159,11 @@ test('animatedIcon: the static image under the animation, a glyph stays text, on
   const style = model.mergeStyle({ normal: { iconColor: '#007AFF' } });
   const item = { image: '/a.png', selectedImage: '/b.png', enabled: true };
   assert.deepEqual(model.animatedIcon(item, 'normal', style, 'Lottie/c.json'),
-    { iconKind: 'animation', glyph: '', animationUrl: 'Lottie/c.json', iconSrc: '/a.png', iconEnabled: true });
+    { iconKind: 'animation', glyph: '', animationUrl: 'Lottie/c.json', iconSrc: '/a.png', iconEnabled: true, gifFirstFrame: '', gifLastFrame: '', gifDuration: 1000, autoplay: true });
   assert.equal(model.animatedIcon(item, 'selected', style, 'Lottie/c.json').iconSrc, '/b.png');
   assert.equal(model.animatedIcon({ ...item, enabled: false }, 'disabled', style, 'Lottie/c.json').iconEnabled, false);
   assert.deepEqual(model.animatedIcon({ ...item, enabled: false }, 'disabled', style, ''),
-    { iconKind: 'image', glyph: '', animationUrl: '', iconSrc: '/a.png', iconEnabled: true });
+    { iconKind: 'image', glyph: '', animationUrl: '', iconSrc: '/a.png', iconEnabled: true, gifFirstFrame: '', gifLastFrame: '', gifDuration: 1000, autoplay: true });
   assert.equal(model.animatedIcon({ image: 'system:gearshape' }, 'normal', style, '').iconKind, 'glyph');
   const tag = model.tagLayout(model.mergeStyle({ animationSize: '{30, 20}' }), { title: 'x', enabled: true }, 'normal',
     { kind: 'animation' }, 0, 0);

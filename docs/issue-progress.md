@@ -35,6 +35,24 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-18, `feat/harmony`): mini program cyl-tag-button warnings and GIF options (migration row 19)
+
+- Prompt (relayed by Mac-CYLTableViewPlaceHolder, verbatim): "continue fix TODO". Requests from the
+  CYLSearchViewController session: (1) bug: every cyl-tag-button logs 8 warnings ("[Component] property animationUrl /
+  image ... expected <String> but get null", "iconSize / speed ... expected <Number> but got non-number"), because
+  `data: { view: {} }` draws cyl-animated-item before `render()` (`view.iconKind` undefined is `!== 'none'`); screenshot:
+  CYLSearchViewController `docs/assets/miniprogram-devtools-20261118-examples-at-6a9ede85.jpg`; (2) forward
+  cyl-animated-item's `gif-first-frame`, `gif-last-frame`, `gif-duration`, `autoplay`, `embedded` from cyl-tag-button.
+- Acceptance criteria: 100 = warnings gone (initial `view` hides the icon; 25), cyl-tag-button forwards the five options
+  (20), cyl-tag-list items take the GIF options with registry defaults (20), Play all / `playAnimation()` play a GIF one
+  pass through cyl-animated-item (20), tests and a WeChat DevTools check with a screenshot (15). Pass: 60.
+- Result: **95/100**. All five parts are in the library (`cyl-tag-button.js` / `.wxml`, `cyl-tag-list.js` / `.wxml`,
+  `model.js`, `animations.js` `gif()` / `gifOptions()`); `npm test` 141 / 141; DevTools: the GIF tags rest on their stills
+  and play one pass of their own duration on Play all, no type warnings on the 动效 page
+  (`docs/assets/miniprogram-devtools-gif-stills-play-all.png`). -5: the example has no page with a standalone
+  cyl-tag-button, so the warning fix is verified by a test (the initial data) and not in DevTools; the
+  CYLSearchViewController session re-checks it after pinning.
+
 ### Done (2026-11-18, `feat/harmony`): task-start rules in the instructions and skills
 
 - Prompt (verbatim): "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入：找到开始任务先标注todo写入文档的相关描述没有就新建该规则，如果有就插入以下规则：开始任务前总是在任务顶部标注TODO 以及当前分支，并找到合适的文档将任务写进docs文档以及验收评分标准什么是满分，什么什么是及格，不达到及格不允许中断任务，一直打分到及格为止。并标注为什么打不到满分，并将缺失的分数以TODO的形式打印在会话结束末端。并更新任务开始时写入的文档。看看 check other sessions first read their task ，第一步看看有没有session在编辑相同分支，如果没有就继续，如果有继续坚持任务是否重复。usually marked as TODO at top of 会话， 遇到 emulator stays hung until it's restarted,  please tell the other sessions first, then restart it. 遇到模拟器打不开的情况优先使用重启策略。无须询问是否重启直接命令行执行重启。"

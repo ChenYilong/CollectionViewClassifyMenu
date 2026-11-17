@@ -11,14 +11,15 @@
  * Properties (the iOS names): `title`, `image`, `selectedImage`, `animationURL`, `animationOptions`,
  * `animationRestingProgress`, `animationSpeed` (0 uses the style's), `animationLoops`, `badgeValue` (null hides the
  * badge, '' shows a dot), `badgeColor` (system red by default), `accessibilityLabel` (what the screen reader reads first;
- * '' reads the title), `selected`, `enabled`, `tagStyle` (with
+ * '' reads the title), `selected`, `enabled`, `gifFirstFrame` / `gifLastFrame` (a GIF's stills, PNG: it rests on them
+ * and plays one pass of `gifDuration` ms, 1000 by default), `autoplay` (false: the animation rests until played),
+ * `embedded` (cyl-animated-item's layout inside a control), `tagStyle` (with
  * `allowsTransparentBackground: true` a `transparent` background is kept, for a tag on a colored surface).
  * Methods (through `selectComponent`): `playAnimation()`, `intrinsicSize()`.
  * Events: `tagtap` {title, selected}.
  */
 const model = require('../cyl-tag-list/model.js');
 const animations = require('../cyl-tag-list/animations.js');
-const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
 
 function pixelRatio() {
   try {
@@ -45,9 +46,15 @@ Component({
     selected: { type: Boolean, value: false, observer: 'render' },
     enabled: { type: Boolean, value: true, observer: 'render' },
     tagStyle: { type: Object, value: {}, observer: 'render' },
+    gifFirstFrame: { type: String, value: '', observer: 'render' },
+    gifLastFrame: { type: String, value: '', observer: 'render' },
+    gifDuration: { type: Number, value: 0, observer: 'render' },
+    autoplay: { type: Boolean, value: true, observer: 'render' },
+    embedded: { type: Boolean, value: false },
   },
 
-  data: { view: {} },
+  // No icon until render() has run: an empty view drew cyl-animated-item with undefined properties (type warnings).
+  data: { view: { iconKind: 'none' } },
 
   lifetimes: {
     attached() {
@@ -58,21 +65,16 @@ Component({
   methods: {
     render() {
       const url = animations.url(this.data.animationURL, this.data.animationOptions, this.data.animationRestingProgress);
-      this.setData({ view: model.tagButtonView(this.data, url, pixelRatio()) });
+      const props = { ...this.data, ...animations.gifOptions(this.data.animationURL, this.data) };
+      this.setData({ view: model.tagButtonView(props, url, pixelRatio()) });
     },
 
     /** Plays the animated icon from progress 0 (`CYLTagButton.playAnimation()`). */
     playAnimation() {
       const url = this.data.view.animationUrl;
       const item = url && this.selectComponent('#cyl-tag-button-animation');
-      if (!item) return;
-      if (cylAnimatedItemType(url) === 'gif') {
-        // A GIF, drawn by <image>, starts again when its file is set again.
-        this.setData({ 'view.animationUrl': '' }, () => this.setData({ 'view.animationUrl': url }));
-        return;
-      }
-      const engine = item.selectComponent('.cyl-animated-item-animation');
-      if (engine && typeof engine.cyl_playFromStart === 'function') engine.cyl_playFromStart();
+      // cyl-animated-item plays it: the engine from progress 0, a GIF again from its first frame (one pass with stills).
+      if (item && typeof item.playAnimation === 'function') item.playAnimation();
     },
 
     /** `intrinsicContentSize`: {height} (the width follows the content: the tag is an inline flex box). */

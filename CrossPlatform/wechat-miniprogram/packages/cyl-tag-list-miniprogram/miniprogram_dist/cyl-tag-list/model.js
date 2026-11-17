@@ -388,7 +388,7 @@ function foldControlValue(value) {
  * the core), showsSectionHeaders (true), defaultVisibleRows (0 = never fold), foldControl ({position: "none" |
  * "headerTrailing" | "tail" | "footer", content: "title" | "icon" | "iconAndTitle"}), style and sections ([{title,
  * style, items: [{title, image, selectedImage, animation, animationOptions, animationRestingProgress, exclusive,
- * enabled}] }], a plain value being an item's title). `options.pixelRatio` sets the hairline of the default borders.
+ * enabled, gifFirstFrame, gifLastFrame, gifDuration, autoplay}] }], a plain value being an item's title). `options.pixelRatio` sets the hairline of the default borders.
  */
 function normalize(configuration = {}, options = {}) {
   const c = configuration || {};
@@ -414,6 +414,12 @@ function normalize(configuration = {}, options = {}) {
         animationRestingProgress: resting === null ? 0 : Math.min(1, Math.max(0, resting)),
         exclusive: boolValue(item.exclusive) === true,
         enabled: boolValue(item.enabled) !== false,
+        // A GIF's stills (PNG) and the length of one pass (ms): with stills it rests on them and plays one pass on
+        // Play all; autoplay false keeps any animation at rest until it is played (cyl-animated-item).
+        gifFirstFrame: typeof item.gifFirstFrame === 'string' ? item.gifFirstFrame : '',
+        gifLastFrame: typeof item.gifLastFrame === 'string' ? item.gifLastFrame : '',
+        gifDuration: numberValue(item.gifDuration) > 0 ? numberValue(item.gifDuration) : 0,
+        autoplay: boolValue(item.autoplay) !== false,
       };
     }),
   }));
@@ -722,6 +728,10 @@ function animatedIcon(item, state, style, url) {
     animationUrl: icon.kind === 'animation' ? url : '',
     iconSrc: still.kind === 'image' ? still.src : '',
     iconEnabled: icon.kind === 'animation' ? item.enabled !== false : true,
+    gifFirstFrame: item.gifFirstFrame || '',
+    gifLastFrame: item.gifLastFrame || '',
+    gifDuration: item.gifDuration > 0 ? item.gifDuration : 1000,
+    autoplay: item.autoplay !== false,
   };
 }
 
@@ -810,6 +820,10 @@ function tagButtonView(props, animationUrl, pixelRatio = 2) {
     image: props.image || '',
     selectedImage: props.selectedImage || '',
     enabled: props.enabled !== false,
+    gifFirstFrame: props.gifFirstFrame || '',
+    gifLastFrame: props.gifLastFrame || '',
+    gifDuration: Number(props.gifDuration) > 0 ? Number(props.gifDuration) : 0,
+    autoplay: props.autoplay !== false,
   };
   const state = stateOf(item, !!props.selected);
   const icon = iconContent(item, state, style, animationUrl);

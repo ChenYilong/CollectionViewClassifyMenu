@@ -107,3 +107,51 @@ test('accessibilityLabel replaces the title in what the screen reader reads (an 
   assert.equal(view.accessibilityLabel, 'Camera, 2');
   assert.equal(model.tagButtonView({ title: 'Search' }, null, 2).accessibilityLabel, 'Search');
 });
+
+test('GIF stills, the pass length and autoplay reach cyl-animated-item (tag list items and cyl-tag-button)', () => {
+  const m = model.normalize({ sections: [{ items: [
+    { title: 'Gift', animation: 'gift.gif', gifFirstFrame: 'gift-first.png', gifLastFrame: 'gift-last.png', gifDuration: '1600', autoplay: false },
+    { title: 'Plain', animation: 'plain.gif' },
+  ] }] });
+  const [gift, plain] = m.sections[0].items;
+  const style = model.mergeStyle({});
+  const icon = model.animatedIcon(gift, 'normal', style, 'gift.gif');
+  assert.equal(icon.gifFirstFrame, 'gift-first.png');
+  assert.equal(icon.gifLastFrame, 'gift-last.png');
+  assert.equal(icon.gifDuration, 1600);
+  assert.equal(icon.autoplay, false);
+  const defaults = model.animatedIcon(plain, 'normal', style, 'plain.gif');
+  assert.deepEqual([defaults.gifFirstFrame, defaults.gifLastFrame, defaults.gifDuration, defaults.autoplay], ['', '', 1000, true],
+    'without stills a GIF keeps playing, as before');
+  const view = model.tagButtonView({ title: 'Gift', gifFirstFrame: 'a.png', gifLastFrame: 'b.png', gifDuration: 800, autoplay: false }, 'gift.gif', 2);
+  assert.deepEqual([view.gifFirstFrame, view.gifLastFrame, view.gifDuration, view.autoplay], ['a.png', 'b.png', 800, false]);
+});
+
+test('cyl-tag-button draws no animated item before its first render, and forwards the GIF options', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const dir = path.dirname(require.resolve('cyl-tag-list-miniprogram/cyl-tag-button/cyl-tag-button.js'));
+  const js = fs.readFileSync(path.join(dir, 'cyl-tag-button.js'), 'utf8');
+  assert.match(js, /data: \{ view: \{ iconKind: 'none' \} \}/, 'the template hides the icon slot until render()');
+  const wxml = fs.readFileSync(path.join(dir, 'cyl-tag-button.wxml'), 'utf8');
+  for (const attr of ['gif-first-frame', 'gif-last-frame', 'gif-duration', 'autoplay', 'embedded']) {
+    assert.match(wxml, new RegExp(`${attr}="`), attr);
+  }
+  const list = fs.readFileSync(path.join(dir, '..', 'cyl-tag-list', 'cyl-tag-list.wxml'), 'utf8');
+  for (const attr of ['gif-first-frame', 'gif-last-frame', 'gif-duration', 'autoplay']) assert.match(list, new RegExp(`${attr}="`), attr);
+});
+
+test('a registered GIF gives its stills and duration to the tags that use it; a tag\'s own values win', () => {
+  const animations = require('cyl-tag-list-miniprogram/cyl-tag-list/animations.js');
+  const before = animations.registry;
+  animations.configure({ registry: { 'GIF/tab_star.gif': { engine: 'gif', src: '/g/tab_star.gif', first: '/g/tab_star.first.png', last: '/g/tab_star.last.png', duration: 2190 } } });
+  try {
+    assert.deepEqual(animations.gifOptions('CYLMenuExample.bundle/Animations/GIF/tab_star.gif'),
+      { gifFirstFrame: '/g/tab_star.first.png', gifLastFrame: '/g/tab_star.last.png', gifDuration: 2190 });
+    assert.deepEqual(animations.gifOptions('GIF/tab_star.gif', { gifFirstFrame: '/mine.png', gifDuration: 500 }),
+      { gifFirstFrame: '/mine.png', gifLastFrame: '/g/tab_star.last.png', gifDuration: 500 });
+    assert.deepEqual(animations.gifOptions('Lottie/x.json'), { gifFirstFrame: '', gifLastFrame: '', gifDuration: 0 });
+  } finally {
+    animations.configure({ registry: before });
+  }
+});
