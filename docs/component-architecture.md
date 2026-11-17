@@ -377,3 +377,26 @@ declarations, so Objective-C callers see no change.
   again and adjust."
 - **Status**: started. Pins `57a527e`; HarmonyOS and mini program migrations next (not buildable here: no DevEco, no WeChat
   DevTools).
+- **HarmonyOS done** (`1a8a80b`, not compiled here: no DevEco): `harmony/classifymenu`'s `CYLTagButton` draws its icon
+  (animation, static image, placeholder) with `CYLAnimatedItemView` through `CYLTagAnimatedIcon` (ArkTS structs cannot
+  subclass). The component is vendored unmodified at `57a527e` in `harmony/cylanimateditem` (README with commit, source,
+  license), registered in `harmony/build-profile.json5`, depended on with `file:../cylanimateditem`. The library dropped
+  `@ohos/lottie`, `@tencent/libpag` and `@ohos/rive`; the example adds them and registers Lottie, PAG, Rive, SVGA and GIF
+  (`cylRegisterExampleAnimationEngines()` in `EntryAbility.onCreate`); the players and the SVGA decoder moved to the
+  example. Public API kept (`animationView`, `animationPlayer`, `playAnimation()`, speed, loops, resting progress);
+  `CYLAnimatedIcon` and the per-engine players left the library.
+- **Mini program done** (`62fce9b`, `npm test` 126/126, the packed tarball too; not run in WeChat DevTools):
+  `cyl-tag-list` and `cyl-tag-button` draw every icon through `cyl-animated-item`, vendored at `57a527e` into
+  `miniprogram_dist/` by `scripts/fetch-cyltabbar.js` (with `cyl-animation-placeholder`, LICENSE and COMMIT files;
+  `--check` compares them); engines come from the app through `generic:cyl-lottie-view` / `-pag-` / `-rive-` / `-svga-`;
+  the library's `cyl-animation-icon`, the `engines` option and `isAnimationEngineAvailable` are gone.
+- **TODO**:
+  1. Upstream gaps in `cyl-animated-item` (asked of the CYLTabBarController session, core first): GIF drawn with a plain
+     `<image>` (no resting/last frame, speed or loop: a step back on the "Play all / speed / loop" example rule) and
+     always-on autoplay. HarmonyOS `CYLAnimatedItemView`: square icon only, no pixel map or symbol as the static image,
+     type by file extension (no inline Lottie JSON), 4 vp padding and a 44 vp minimum height (centred and clipped by the
+     tag; check on a device).
+  2. The React Native and Flutter HarmonyOS shells (`react-native/.../harmony-example`, `flutter/cyl_tag_list_ohos`) build
+     `harmony/classifymenu` from source: they need the `cylanimateditem` module and their own engine registration.
+  3. Publishing `@cyl/classifymenu` to ohpm needs `cylanimateditem` published first (`file:` dependency).
+  4. Build and run: ArkTS compile, HarmonyOS tests and an emulator run; the mini program in WeChat DevTools.
