@@ -9,6 +9,7 @@
  */
 const symbols = require('./symbols.js');
 const locale = require('../locale.js');
+const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
 
@@ -518,14 +519,13 @@ function foldTitle(expanded) {
 
 /** Folders the iOS examples put before an animation file's path, and file name extensions of each engine. */
 const ANIMATION_PREFIXES = [/^\/+/, /^(\.\.\/)+/, /^CYLMenuExample\.bundle\//, /^Animations\//];
-const ENGINES = { json: 'lottie', lottie: 'lottie', gif: 'gif', pag: 'pag', riv: 'rive' };
 
 /** The engine of an animation file by its extension ("lottie", "gif", "pag", "rive"), or ''. */
 function animationEngine(animation) {
   if (/^asset:/.test(animation || '')) return 'lottie';
-  const path = String(animation || '').split('#')[0].split('?')[0];
-  const match = /\.([a-z0-9]+)$/i.exec(path);
-  return match ? ENGINES[match[1].toLowerCase()] || '' : '';
+  // CYLTabBarController's cyl-animated-item decides the type (one list for both: it knows SVGA and skips a trailing
+  // ".bin", the name a mini program package needs for SVGA / PAG / Rive files); the private table here had no SVGA.
+  return cylAnimatedItemType(animation);
 }
 
 /** "../Animations/Lottie/x.json", "CYLMenuExample.bundle/Animations/Lottie/x.json" → "Lottie/x.json". */

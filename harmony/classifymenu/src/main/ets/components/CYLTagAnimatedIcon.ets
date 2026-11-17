@@ -1,6 +1,6 @@
 /**
  * A tag's animated icon on CYLTabBarController's shared icon + title component, `CYLAnimatedItemView` (module
- * `cylanimateditem`, vendored at commit 57a527e in `harmony/cylanimateditem`). ArkTS structs cannot subclass, so the
+ * `cylanimateditem`, vendored at commit c8132d2 in `harmony/cylanimateditem`). ArkTS structs cannot subclass, so the
  * tag wraps the component instead of subclassing it as iOS and Android do: `CYLTagAnimatedIcon` draws the icon slot of
  * a `CYLTagButton` with it, and the display priority (the animation once loaded; the static image while it loads and
  * after it fails; the placeholder only without a static image), the failure fallbacks and the debug warning for a type
