@@ -18,7 +18,7 @@
  */
 const model = require('../cyl-tag-list/model.js');
 const animations = require('../cyl-tag-list/animations.js');
-const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model.js');
+const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
 
 function pixelRatio() {
   try {
