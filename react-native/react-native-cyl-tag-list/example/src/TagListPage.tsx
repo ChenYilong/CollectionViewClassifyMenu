@@ -33,8 +33,15 @@ const configuration = {
       items: [
         // Rive state machines and inputs, as on the other platforms: without them the player drives the default input
         // "active", which these files do not have, so nothing plays.
-        { ...animated('Home', 'house.riv'), animationOptions: { stateMachine: 'State Machine 1' } },
-        { ...animated('Done', 'check.riv'), animationOptions: { stateMachine: 'State Machine 1', triggerInput: 'Check' } },
+        {
+          ...animated('Home', 'house.riv'),
+          // house.riv moves when its number input Rooms changes (Android: not supported yet, CYLTabBarController B20).
+          animationOptions: { stateMachine: 'State Machine 1', numberInput: 'Rooms', values: '3,4,5,6' },
+        },
+        {
+          ...animated('Done', 'check.riv'),
+          animationOptions: { stateMachine: 'State Machine 1', triggerInput: 'Check' },
+        },
         {
           ...animated('Menu', 'menu_button.riv'),
           animationOptions: { stateMachine: 'State Machine', input: 'isOpen', duration: '0' },

@@ -26,7 +26,9 @@ const RIVE_WASM = '/cyl_components/cyl-rive-miniprogram/rive/rive.wasm.br';
 const PAG_WASM = '/engines/cyl-pag-miniprogram/libpag/libpag.wasm.br';
 
 /** The options cyl-rive reads from the path's fragment ("#stateMachine=…&input=…"); iOS's "legacy" plays the default. */
-const RIVE_OPTIONS = ['artboard', 'stateMachine', 'animation', 'input', 'triggerInput', 'active', 'trigger', 'duration', 'color'];
+// Keep equal to cyl-rive's CYL_OPTION_NAMES (cyl_rive_options.js; not exported yet, asked of CYLTabBarController).
+const RIVE_OPTIONS = ['artboard', 'stateMachine', 'animation', 'input', 'triggerInput', 'active', 'trigger', 'duration', 'color',
+  'numberInput', 'number', 'values'];
 
 function rivePath(src, parameters) {
   const pairs = RIVE_OPTIONS.filter((key) => parameters[key] != null && parameters[key] !== '')
