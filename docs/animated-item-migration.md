@@ -325,3 +325,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   held input on slow devices), `d733c80e` (opt-in `tint` option for Rive tab icons). Move the iOS pins, pod install,
   run the four iOS suites, re-check that the Rive tags rest until played and then play and loop (stitched, labeled
   screenshot), and ask the Windows session to move Android and the mini program to the same commit.
+- **Result (2026-11-18)**: DONE. iOS pins at CYLTabBarController `70064275` (Package.swift, Podfiles, React Native and
+  Flutter examples); every platform at `70064275` (Android and mini program: `e7f80fa`). iPhone 17 Pro simulator, iOS
+  27.2, Xcode 27.2, macOS 27.3: menu 32, tag 6, example 92, swift 22 tests, 0 failures. Rive: at rest 0 changed pixels
+  in all six icons over 21 s; with Loop on all six keep changing (Menu changes in 6 of 11 frame pairs 12-15 s apart, its
+  1 s toggle aliasing with the captures, so it loops; the Android-only stop is fixed by `f84c1073`).
+
+  ![iOS Rive icons rest until played, then loop, at CYLTabBarController 70064275](assets/ios-rive-rest-play-70064275.png)
