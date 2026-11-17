@@ -595,6 +595,14 @@ AGENTS.md, newest commit) and adapted to this project:
     simulator, Xcode, dependency commit, branch, date and purpose; a red bold caption above each panel in its own
     band; but no host OS, everything crammed into the header, one column, a panel cut through the Shapes row) and its
     redo by these rules, `docs/assets/ios-rive-rest-then-play-grid.png`.
+- **Screenshots: columns, update (2026-11-18, later).** Prompt (verbatim): "更新截图规则，优选一列多行 如果一列拼接后长度超过普通手机的一屏幕 则两列多行" This replaces the column order of the update above:
+  one column first, panels top to bottom; when the one-column image (header and footer included) would be longer
+  than one screen of an ordinary phone, i.e. taller than 19.5:9 (height > 2.17 x width, the shape of an iPhone 17 Pro
+  screen, 1206 x 2622 px), use two columns and several rows, filled left to right, then top to bottom. Never more
+  than two columns.
+  `scripts/stitch-screenshots.swift` chooses this way by default (`--columns auto`). Examples: one column,
+  `docs/assets/ios-rive-rest-one-column.png` (two cropped panels); two columns,
+  `docs/assets/ios-rive-rest-then-play-grid.png` (four full screens).
 
 ## Documentation assets
 

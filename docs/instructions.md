@@ -21,6 +21,10 @@
   simulator OS version, `Host:` OS version, `IDE:` version), a caption above each panel and a footer (`Result:`,
   `Versions:`, `Taken:`), each in its own band, never overlapping a panel; English only. Tool:
   `scripts/stitch-screenshots.swift`. Example: `assets/ios-rive-rest-then-play-grid.png`.
+- Screenshot columns, update (2026-11-18, later; AGENTS.md "Screenshots: columns, update"): one column first, panels
+  top to bottom; two columns and several rows only when the one-column image would be taller than one phone screen
+  (height > 2.17 x width, 19.5:9). Examples: `assets/ios-rive-rest-one-column.png`,
+  `assets/ios-rive-rest-then-play-grid.png`.
 - Upstream projects (English rule, AGENTS.md "Upstream projects (translations and ports)"): when a project linked in
   these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
   of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each

@@ -18,3 +18,5 @@ tags: [scripts, cocoapods]
 - `stitch-screenshots.swift` (2026-11-18) stitches screenshots by AGENTS.md "Screenshots: stitching layout, update" and
   "Screenshots: header and footer": portrait, two columns, a header, a caption per panel and a footer in their own
   bands, original pixels. Usage is at the top of the file; checklist in `.agents/skills/cyl-screenshots/SKILL.md`.
+- `stitch-screenshots.swift --columns auto` (the default, 2026-11-18): one column, or two when the one-column image
+  would be taller than a phone screen (height > 2.17 x width); `--columns 1` or `2` forces it.

@@ -1,22 +1,24 @@
-// Usage: swift scripts/stitch-screenshots.swift --out <file.png> [--columns 2] [--crop x,y,w,h]
+// Usage: swift scripts/stitch-screenshots.swift --out <file.png> [--columns auto|1|2] [--crop x,y,w,h]
 //            --header <line> [--header <line> ...] --footer <line> [--footer <line> ...]
 //            "<caption>::<image>" ["<caption>::<image>" ...]
 //
-// Stitches screenshots by the rules of AGENTS.md ("Screenshots: stitching layout", "Screenshots: header and footer"):
-// a portrait image, two columns by default and as many rows as needed, filled left to right, top to bottom; a header
-// band above the grid, a footer band below it and a caption band above every panel. No text is drawn on a screenshot:
+// Stitches screenshots by the rules of AGENTS.md ("Screenshots: stitching layout, update", "Screenshots: header and
+// footer"): one column first, panels top to bottom; two columns (filled left to right, then top to bottom) when the
+// one-column image would be longer than one phone screen, i.e. taller than 19.5:9 (height > 2.17 x width, the shape
+// of an iPhone 17 Pro screen, 1206 x 2622 px). `--columns auto` (the default) applies this; 1 or 2 forces it. A header
+// band above the panels, a footer band below them and a caption band above every panel. No text is drawn on a screenshot:
 // every band has its own space. The panels keep their original pixels (no scaling); `--crop` (pixels, top-left origin)
 // cuts the same rectangle out of every image, so crop to whole elements. Output: PNG.
 import AppKit
 
-var out = "", columns = 2, crop: CGRect? = nil
+var out = "", columns = 0, crop: CGRect? = nil  // columns 0: auto
 var header: [String] = [], footer: [String] = [], panels: [(String, String)] = []
 var args = Array(CommandLine.arguments.dropFirst())
 while !args.isEmpty {
     let a = args.removeFirst()
     switch a {
     case "--out": out = args.removeFirst()
-    case "--columns": columns = max(1, Int(args.removeFirst()) ?? 2)
+    case "--columns": columns = min(2, max(0, Int(args.removeFirst()) ?? 0))
     case "--header": header.append(args.removeFirst())
     case "--footer": footer.append(args.removeFirst())
     case "--crop":
@@ -39,24 +41,37 @@ let images: [NSBitmapImageRep] = panels.map {
     return rep
 }
 let cell = crop?.size ?? CGSize(width: images.map(\.pixelsWide).max()!, height: images.map(\.pixelsHigh).max()!)
-let cols = min(columns, panels.count), rows = (panels.count + cols - 1) / cols
-let margin: CGFloat = 24, gap: CGFloat = 24, width = margin * 2 + cell.width * CGFloat(cols) + gap * CGFloat(cols - 1)
-
 let red = NSColor(srgbRed: 1, green: 0.231, blue: 0.188, alpha: 1)  // #FF3B30, iOS system red
-// Text scales with the image, so it stays readable next to full-resolution panels (1206 px wide for an iPhone 17 Pro).
-let headerFont = NSFont.boldSystemFont(ofSize: max(28, (width / 55).rounded()))
-let captionFont = NSFont.boldSystemFont(ofSize: max(24, (cell.width / 32).rounded()))
-let footerFont = NSFont.systemFont(ofSize: max(22, (width / 70).rounded()))
+let margin: CGFloat = 24, gap: CGFloat = 24, phoneScreen: CGFloat = 19.5 / 9
 func height(_ text: String, _ font: NSFont, _ w: CGFloat) -> CGFloat {
     ceil((text as NSString).boundingRect(with: NSSize(width: w, height: 10_000), options: [.usesLineFragmentOrigin],
                                          attributes: [.font: font]).height)
 }
 let headerText = header.joined(separator: "\n"), footerText = footer.joined(separator: "\n")
-let headerH = height(headerText, headerFont, width - margin * 2) + margin * 2
-let footerH = height(footerText, footerFont, width - margin * 2) + margin * 2
-let captionH = panels.map { height($0.0, captionFont, cell.width) }.max()! + 12
+struct Layout {
+    let cols: Int, rows: Int, width: CGFloat, total: CGFloat, headerH: CGFloat, footerH: CGFloat, captionH: CGFloat
+    let headerFont: NSFont, captionFont: NSFont, footerFont: NSFont
+}
+func layout(_ columns: Int) -> Layout {
+    let cols = min(columns, panels.count), rows = (panels.count + cols - 1) / cols
+    let width = margin * 2 + cell.width * CGFloat(cols) + gap * CGFloat(cols - 1)
+    // Text scales with the image, so it stays readable next to full-resolution panels (1206 px wide for an iPhone 17 Pro).
+    let headerFont = NSFont.boldSystemFont(ofSize: max(28, (width / 55).rounded()))
+    let captionFont = NSFont.boldSystemFont(ofSize: max(24, (cell.width / 32).rounded()))
+    let footerFont = NSFont.systemFont(ofSize: max(22, (width / 70).rounded()))
+    let headerH = height(headerText, headerFont, width - margin * 2) + margin * 2
+    let footerH = height(footerText, footerFont, width - margin * 2) + margin * 2
+    let captionH = panels.map { height($0.0, captionFont, cell.width) }.max()! + 12
+    let total = headerH + CGFloat(rows) * (captionH + cell.height) + CGFloat(rows - 1) * gap + footerH
+    return Layout(cols: cols, rows: rows, width: width, total: total, headerH: headerH, footerH: footerH,
+                  captionH: captionH, headerFont: headerFont, captionFont: captionFont, footerFont: footerFont)
+}
+let one = layout(1)
+let chosen = columns == 0 ? (one.total > one.width * phoneScreen ? layout(2) : one) : layout(columns)
+let cols = chosen.cols, rows = chosen.rows, width = chosen.width, total = chosen.total
+let headerH = chosen.headerH, footerH = chosen.footerH, captionH = chosen.captionH
+let headerFont = chosen.headerFont, captionFont = chosen.captionFont, footerFont = chosen.footerFont
 let rowH = captionH + cell.height
-let total = headerH + CGFloat(rows) * rowH + CGFloat(rows - 1) * gap + footerH
 
 let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(width), pixelsHigh: Int(total), bitsPerSample: 8,
                            samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
