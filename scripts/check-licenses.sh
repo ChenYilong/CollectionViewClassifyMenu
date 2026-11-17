@@ -49,6 +49,16 @@ for file in android/merged/library/src/main/resources/META-INF/classifymenu/LICE
   [ -f "$file" ] && ! grep -q 'Apache License' "$file" && fail "$file is not the Apache License"
 done
 
+# CYLTabBarController's cyl-animated-item, vendored by commit into the mini program package: its own MIT license next to it.
+for folder in cyl-animated-item cyl-animation-placeholder; do
+  file="CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/miniprogram_dist/$folder/LICENSE"
+  if [ ! -f "$file" ]; then
+    fail "$file is missing"
+  elif ! grep -q 'CYLTabBarController' "$file" || ! grep -q 'Permission is hereby granted' "$file"; then
+    fail "$file is not CYLTabBarController's MIT license"
+  fi
+done
+
 # No placeholder anywhere in a published package's license.
 if grep -l 'TODO: Add your license' "${mit_files[@]}" LICENSE 2>/dev/null; then
   fail "a license file is a placeholder"

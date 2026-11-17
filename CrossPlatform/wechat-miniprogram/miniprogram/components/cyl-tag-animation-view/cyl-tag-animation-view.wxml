@@ -1,0 +1,13 @@
+<!-- Fills the icon frame cyl-animated-item gives it; decorative (the tag carries the label). -->
+<view class="cyl-animation-box" aria-hidden="true">
+  <cyl-lottie wx:if="{{engine === 'lottie'}}" id="lottie" class="cyl-engine" animation-data="{{lottieData}}" autoplay="{{false}}"
+              loop="{{loop}}" speed="{{speed > 0 ? speed : 1}}" resting-frame="{{restingFrame}}"
+              bind:ready="onEngineReady" bind:error="onEngineError" />
+  <cyl-rive wx:elif="{{engine === 'rive'}}" id="rive" class="cyl-engine" path="{{rivePath}}" autoplay="{{false}}" loop="{{loop}}"
+            speed="{{speed > 0 ? speed : 1}}" resting-frame="{{restingFrame}}" wasm-path="{{wasmPath}}"
+            bind:ready="onEngineReady" bind:error="onEngineError" />
+  <!-- cyl-pag lives in the "engines" subpackage, loaded asynchronously: a plain view stands in until it arrives. -->
+  <cyl-pag wx:elif="{{engine === 'pag'}}" id="pag" class="cyl-engine" path="{{pagPath}}" autoplay="{{false}}" loop="{{loop}}"
+           speed="{{speed > 0 ? speed : 1}}" resting-frame="{{restingFrame}}" wasm-path="{{pagWasmPath}}"
+           bind:ready="onEngineReady" bind:error="onEngineError" />
+</view>

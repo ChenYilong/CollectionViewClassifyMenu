@@ -105,24 +105,25 @@ test('icons: the selected image while selected, SF Symbols tinted as SVG, emoji 
   assert.equal(model.iconContent(item, 'selected', style, null).src, symbols.symbolURI('house.fill', '#FFFFFF'));
   assert.equal(model.iconContent({ image: 'system:gearshape' }, 'normal', style, null).glyph, '⚙️');
   assert.equal(model.iconContent({ image: '/images/a.png' }, 'normal', style, null).src, '/images/a.png');
-  assert.equal(model.iconContent({ image: 'system:house' }, 'normal', style, { engine: 'lottie' }).kind, 'animation');
+  assert.equal(model.iconContent({ image: 'system:house' }, 'normal', style, 'Lottie/c.json').kind, 'animation');
   assert.equal(model.iconContent({}, 'normal', style, null).kind, 'none');
   const svg = Buffer.from(symbols.symbolURI('star', '#FF9500').split(',')[1], 'base64').toString('ascii');
   assert.match(svg, /stroke="#FF9500"/);
   assert.equal(symbols.base64('ab'), Buffer.from('ab').toString('base64'));
 });
 
-test('animations resolve by engine and file, and a missing engine or file falls back to the image (reloadAnimationView)', () => {
+test('animations resolve by file, with no engine check: the app\'s engine component reports what it cannot play', () => {
   assert.equal(model.animationEngine('pag-ios/0.pag'), 'pag');
   assert.equal(model.animationEngine('x/house.riv#artboard=A'), 'rive');
   assert.equal(model.animationKey('../Animations/Lottie/tab_home_animate.json'), 'Lottie/tab_home_animate.json');
   assert.equal(model.animationKey('CYLMenuExample.bundle/Animations/GIF/tab_star.gif'), 'GIF/tab_star.gif');
-  const registry = { 'GIF/a.gif': { engine: 'gif' }, 'Rive/b.riv': { engine: 'rive' } };
-  assert.equal(model.resolveAnimation('Animations/GIF/a.gif', registry, { gif: true }).engine, 'gif');
-  assert.equal(model.resolveAnimation('Rive/b.riv', registry, { gif: true, rive: false }), null);
-  assert.equal(model.resolveAnimation('GIF/missing.gif', registry, { gif: true }), null);
-  assert.equal(model.resolveAnimation('asset:home', {}, { lottie: true }, { home: {} }).engine, 'lottie');
-  // The package's engines: Lottie, GIF, Rive and PAG (in the engines subpackage) linked.
+  const registry = { 'GIF/a.gif': { engine: 'gif', src: '/gif/a.gif' }, 'Rive/b.riv': { engine: 'rive', src: '/rive/b.riv.bin' } };
+  assert.equal(model.resolveAnimation('Animations/GIF/a.gif', registry).engine, 'gif');
+  assert.equal(model.resolveAnimation('Rive/b.riv', registry).engine, 'rive', 'no engine flag: the library links none');
+  assert.equal(model.resolveAnimation('GIF/missing.gif', registry), null);
+  assert.equal(model.resolveAnimation('asset:home', {}, { home: {} }).engine, 'lottie');
+  assert.equal(model.resolveAnimation('asset:home.json#restingProgress=1', {}, { home: {} }).key, 'asset:home');
+  // The example's engines (components/cyl-tag-animation-view, <image> for GIF) and files.
   assert.equal(animations.isAnimationEngineAvailable, true);
   assert.equal(animations.resolve('CYLMenuExample.bundle/Animations/Lottie/green_lottie_tab_home.json').engine, 'lottie');
   assert.equal(animations.resolve('../Animations/GIF/tab_star.gif').entry.last, '/data/animations/gif/tab_star.last.png');
@@ -130,6 +131,43 @@ test('animations resolve by engine and file, and a missing engine or file falls 
   assert.equal(animations.resolve('CYLMenuExample.bundle/Animations/Rive/house.riv').entry.src, '/data/animations/rive/house.riv.bin');
   const gray = animations.resolve('Lottie/gray_tabbar_home_animation.json').entry.data();
   assert.ok(gray.assets.filter((a) => a.p).every((a) => a.e === 1 && a.p.startsWith('data:image/png;base64,')));
+});
+
+test('animationURL: what cyl-animated-item plays, typed by its extension; options and resting progress after "#"', () => {
+  const { cylAnimatedItemType } = require('cyl-tag-list-miniprogram/cyl-animated-item/cyl_animated_item_model.js');
+  const registry = {
+    'GIF/a.gif': { engine: 'gif', src: '/gif/a.gif' },
+    'Rive/b.riv': { engine: 'rive', src: '/rive/b.riv.bin' },
+    'Lottie/c.json': { engine: 'lottie', data: () => ({}) },
+  };
+  assert.equal(model.animationURL('CYLMenuExample.bundle/Animations/GIF/a.gif', registry), '/gif/a.gif', 'a GIF is drawn by <image>');
+  assert.equal(model.animationURL('GIF/a.gif', registry, {}, { input: 'x' }, 1), '/gif/a.gif', 'no fragment on an image');
+  assert.equal(model.animationURL('../Animations/Lottie/c.json', registry), 'Lottie/c.json');
+  const rive = model.animationURL('Rive/b.riv', registry, {}, { stateMachine: 'State Machine', input: '', duration: '0' }, 0.5);
+  assert.equal(rive, 'Rive/b.riv#stateMachine=State%20Machine&duration=0&restingProgress=0.5');
+  assert.equal(cylAnimatedItemType(rive), 'rive');
+  assert.deepEqual(model.animationParameters(rive), { stateMachine: 'State Machine', duration: '0', restingProgress: '0.5' });
+  assert.equal(model.animationURL('asset:home', {}, { home: {} }), 'asset:home.json');
+  assert.equal(cylAnimatedItemType('asset:home.json'), 'lottie');
+  assert.equal(model.animationURL('GIF/missing.gif', registry), '', 'no file, no animation: the tag shows its image');
+  assert.equal(model.animationURL('/assets/own.json', registry), '/assets/own.json', 'an absolute path is the app\'s own file');
+  assert.equal(model.animationURL('https://example.com/a.riv#artboard=A', registry), 'https://example.com/a.riv');
+  assert.equal(model.animationURL('', registry), '');
+});
+
+test('animatedIcon: the static image under the animation, a glyph stays text, only an animation is dimmed', () => {
+  const style = model.mergeStyle({ normal: { iconColor: '#007AFF' } });
+  const item = { image: '/a.png', selectedImage: '/b.png', enabled: true };
+  assert.deepEqual(model.animatedIcon(item, 'normal', style, 'Lottie/c.json'),
+    { iconKind: 'animation', glyph: '', animationUrl: 'Lottie/c.json', iconSrc: '/a.png', iconEnabled: true });
+  assert.equal(model.animatedIcon(item, 'selected', style, 'Lottie/c.json').iconSrc, '/b.png');
+  assert.equal(model.animatedIcon({ ...item, enabled: false }, 'disabled', style, 'Lottie/c.json').iconEnabled, false);
+  assert.deepEqual(model.animatedIcon({ ...item, enabled: false }, 'disabled', style, ''),
+    { iconKind: 'image', glyph: '', animationUrl: '', iconSrc: '/a.png', iconEnabled: true });
+  assert.equal(model.animatedIcon({ image: 'system:gearshape' }, 'normal', style, '').iconKind, 'glyph');
+  const tag = model.tagLayout(model.mergeStyle({ animationSize: '{30, 20}' }), { title: 'x', enabled: true }, 'normal',
+    { kind: 'animation' }, 0, 0);
+  assert.equal(tag.iconSize, 20, 'cyl-animated-item draws a square: the largest that fits the frame');
 });
 
 test('tag layout: capsule for corner radius 0, insets with the border inside, imageInsets shrink the icon from the top left', () => {

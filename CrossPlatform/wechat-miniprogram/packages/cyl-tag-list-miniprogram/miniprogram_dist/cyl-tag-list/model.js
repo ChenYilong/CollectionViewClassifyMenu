@@ -536,22 +536,62 @@ function animationKey(animation) {
 }
 
 /**
- * The animation a tag plays, as `CYLTagButton.reloadAnimationView()` makes it: its engine must be linked
- * (`engines[name]` true) and the file must exist (in `registry`, or in the older `assets` of "asset:<name>");
- * otherwise null, and the tag shows its image, as on iOS when CYLTabBarItemAnimationFactory has no animator for the file.
+ * The registered file of a tag's animation (`registry` by its path without the iOS folders, or the older `assets` of
+ * "asset:<name>"), or null. No engine is checked here: the library links none, and the app's engine component (an
+ * abstract node of cyl-animated-item) reports `error` when it cannot play the file, which shows the image instead.
  * @returns {{engine: string, key: string, entry: object}|null}
  */
-function resolveAnimation(animation, registry = {}, engines = {}, assets = {}) {
+function resolveAnimation(animation, registry = {}, assets = {}) {
   if (!animation) return null;
-  const asset = /^asset:(.+)$/.exec(animation);
+  const asset = /^asset:([^#?]+?)(?:\.json)?(?:[#?].*)?$/.exec(animation);
   if (asset) {
-    return engines.lottie && assets[asset[1]] ? { engine: 'lottie', key: animation, entry: { engine: 'lottie', data: () => assets[asset[1]] } } : null;
+    const data = assets[asset[1]];
+    return data ? { engine: 'lottie', key: `asset:${asset[1]}`, entry: { engine: 'lottie', data: () => data } } : null;
   }
   const engine = animationEngine(animation);
-  if (!engine || !engines[engine]) return null;
+  if (!engine) return null;
   const k = animationKey(animation);
   const entry = registry[k];
   return entry && entry.engine === engine ? { engine, key: k, entry } : null;
+}
+
+/** True for a path the app can load as it is: an absolute package path or a URL ("/assets/a.json", "https://…"). */
+function isLoadablePath(animation) {
+  return /^\/[^/]/.test(animation) || /^[a-z][a-z0-9+.-]*:\/\//i.test(animation);
+}
+
+/**
+ * The `animation-url` cyl-animated-item plays for a tag (CYLTabBarController's shared icon + title component): the
+ * registered file's path ("Lottie/x.json", "Rive/house.riv", "pag-ios/0.pag", "asset:<name>.json", which the app's
+ * engine component resolves), a GIF's own file (drawn by `<image>`), or an absolute path or URL as it is; '' when there is
+ * no such file. The tag's `animationOptions` (Rive's stateMachine, input …) and a `restingProgress` above 0 follow
+ * after "#" as "key=value&…", which cyl-animated-item ignores when it finds the type.
+ */
+function animationURL(animation, registry = {}, assets = {}, options = null, restingProgress = 0) {
+  if (!animation) return '';
+  const resolved = resolveAnimation(animation, registry, assets);
+  let base = '';
+  if (resolved && resolved.engine === 'gif') return resolved.entry.src || '';
+  if (resolved) base = resolved.key.startsWith('asset:') ? `${resolved.key}.json` : resolved.key;
+  else if (isLoadablePath(animation) && animationEngine(animation)) base = String(animation).split('#')[0];
+  if (!base) return '';
+  if (animationEngine(base) === 'gif') return base;
+  const parameters = { ...(options || {}) };
+  if (Number(restingProgress) > 0) parameters.restingProgress = Math.min(1, Number(restingProgress));
+  const pairs = Object.keys(parameters).filter((name) => parameters[name] != null && parameters[name] !== '')
+    .map((name) => `${name}=${encodeURIComponent(parameters[name])}`);
+  return pairs.length ? `${base}#${pairs.join('&')}` : base;
+}
+
+/** The parameters after "#" of an `animationURL` ({stateMachine: 'State Machine', restingProgress: '1'}), for engines. */
+function animationParameters(url) {
+  const hash = String(url || '').indexOf('#');
+  if (hash < 0) return {};
+  return String(url).slice(hash + 1).split('&').filter(Boolean).reduce((parameters, pair) => {
+    const [name, value = ''] = pair.split('=');
+    parameters[decodeURIComponent(name)] = decodeURIComponent(value);
+    return parameters;
+  }, {});
 }
 
 // MARK: - One tag (CYLTagButton)
@@ -651,7 +691,7 @@ function fontCSS(font) {
 }
 
 /**
- * What the icon slot of a tag shows in a state: the animation (its engine linked and its file present), else the
+ * What the icon slot of a tag shows in a state: the animation (a file to play, `animationURL`), else the
  * state's image (the selected image while selected, as CYLFlatDesignTabBarItem.selectedImage), an SF Symbol stand-in
  * tinted with the state's icon color, or nothing.
  * @returns {{kind: 'animation'|'image'|'glyph'|'none', src: string, glyph: string}}
@@ -665,6 +705,24 @@ function iconContent(item, state, style, animation) {
   const uri = symbols.symbolURI(system[1], iconColor(style, state));
   if (uri) return { kind: 'image', src: uri, glyph: '' };
   return { kind: 'glyph', src: '', glyph: symbols.glyph(system[1]) };
+}
+
+/**
+ * What CYLTabBarController's cyl-animated-item draws in a tag's icon slot (the library has no animation code of its
+ * own): `animationUrl` (`animationURL`, '' for none), `iconSrc`, the static image it shows until the engine is ready and
+ * after it fails (the state's image, or a tinted symbol), and `iconEnabled` (an animation is dimmed while the tag is
+ * disabled, an image keeps the state's colors). A symbol without an image (`iconKind` 'glyph') is drawn as text.
+ */
+function animatedIcon(item, state, style, url) {
+  const icon = iconContent(item, state, style, url);
+  const still = icon.kind === 'animation' ? iconContent(item, state, style, null) : icon;
+  return {
+    iconKind: icon.kind,
+    glyph: icon.glyph,
+    animationUrl: icon.kind === 'animation' ? url : '',
+    iconSrc: still.kind === 'image' ? still.src : '',
+    iconEnabled: icon.kind === 'animation' ? item.enabled !== false : true,
+  };
 }
 
 /**
@@ -727,6 +785,8 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
       : '',
     iconWidth: Math.max(0, slot.width - ii.left - ii.right),
     iconHeight: Math.max(0, slot.height - ii.top - ii.bottom),
+    // cyl-animated-item draws a square icon: the largest square of the icon frame, centered in it.
+    iconSize: Math.max(0, Math.min(slot.width - ii.left - ii.right, slot.height - ii.top - ii.bottom)),
     // Only the size changes; x and y stay, as CYLFlatDesignTabBarItem.imageInsets.
     iconStyle: `width: ${Math.max(0, slot.width - ii.left - ii.right)}px; height: ${Math.max(0, slot.height - ii.top - ii.bottom)}px`,
     glyphSize: Math.floor(Math.min(slot.width, slot.height) * 0.74),
@@ -739,11 +799,11 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
 /**
  * The view data of the standalone `cyl-tag-button` (the core's `CYLTagButton` on its own): `props` holds the iOS names
  * (title, image, selectedImage, animationSpeed, badgeValue, badgeColor, accessibilityLabel, selected, enabled, tagStyle),
- * `animation` the resolved animated icon (or null). The tag is `tagLayout` at its own height (`tagHeightForTitle`: no
+ * `animationUrl` the file cyl-animated-item plays (`animationURL`, '' for none). The tag is `tagLayout` at its own height (`tagHeightForTitle`: no
  * room for a missing icon or title), with the badge and an accessibility label that reads `accessibilityLabel` (else the
  * title), then the badge.
  */
-function tagButtonView(props, animation, pixelRatio = 2) {
+function tagButtonView(props, animationUrl, pixelRatio = 2) {
   const style = mergeStyle((props && props.tagStyle) || {}, defaultStyle(pixelRatio));
   const item = {
     title: String(props.title || ''),
@@ -752,7 +812,7 @@ function tagButtonView(props, animation, pixelRatio = 2) {
     enabled: props.enabled !== false,
   };
   const state = stateOf(item, !!props.selected);
-  const icon = iconContent(item, state, style, animation);
+  const icon = iconContent(item, state, style, animationUrl);
   const animated = icon.kind === 'animation';
   const slot = animated && (style.animationSizeWH.width > 0 || style.animationSizeWH.height > 0)
     ? style.animationSizeWH : style.imageSizeWH;
@@ -762,10 +822,8 @@ function tagButtonView(props, animation, pixelRatio = 2) {
   return {
     ...tag,
     ...badge,
+    ...animatedIcon(item, state, style, animationUrl),
     title: item.title,
-    iconKind: icon.kind,
-    iconSrc: icon.src,
-    glyph: icon.glyph,
     speed: props.animationSpeed > 0 ? props.animationSpeed : style.animationSpeed,
     accessibilityLabel: [props.accessibilityLabel || item.title, badge.badgeAccessibilityValue].filter(Boolean).join(', '),
   };
@@ -809,7 +867,7 @@ module.exports = {
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
-  foldControlValue, animationEngine, animationKey, resolveAnimation, stateOf, iconColor, tagHeight, cornerRadius,
+  foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
-  iconContent, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
+  iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
 };

@@ -4,8 +4,8 @@
  * Play all; they combine and act at once on animations that are playing), then the tag list made from one
  * configuration (map): one section per animation library (Lottie, PAG, Rive, GIF) and CYLTabBarController's static
  * tab images, single choice per section, the first tag of each selected. A tapped tag plays its icon and the status
- * shows 点击「section · title」. PAG and Rive engines are not linked in the Mini Program (cyl-tag-list/animations.js):
- * their tags show only their titles, as on iOS without those subspecs.
+ * shows 点击「section · title」. Every icon is CYLTabBarController's cyl-animated-item (inside cyl-tag-list); the engines
+ * are components/cyl-tag-animation-view, given as the abstract nodes cyl-lottie-view, cyl-rive-view and cyl-pag-view.
  */
 const i18n = require('../../utils/i18n.js');
 const animations = require('../../utils/tag-animations.js');

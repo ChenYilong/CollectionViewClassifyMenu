@@ -7,12 +7,16 @@
  *   2. copies each package's mini program folder (its "miniprogram" field, else miniprogram_dist) to
  *      miniprogram/cyl_components/<name>/, or miniprogram/<root>/<name>/ for a subpackage (git-ignored);
  *   3. copies the PAG files of the demos (fetched by scripts/fetch-animation-resources.py PAGResources) to
- *      miniprogram/engines/pag/*.pag.bin (git-ignored).
+ *      miniprogram/engines/pag/*.pag.bin (git-ignored);
+ *   4. vendors CYLTabBarController's shared icon + title component, cyl-animated-item (and the default of its abstract
+ *      nodes, cyl-animation-placeholder), into the library package cyl-tag-list-miniprogram (committed: the library
+ *      ships it, docs/Animated-Item.md at COMMIT: "the mini program ... copies src/cyl-animated-item"), each folder with
+ *      the component's LICENSE and a COMMIT file, and its model tests into test/ with the require path rewritten.
  *
  * The packages are copied outside miniprogram_npm because WeChat DevTools' "Build npm" rewrites that folder.
  *
  *   node scripts/fetch-cyltabbar.js           install
- *   node scripts/fetch-cyltabbar.js --check   exit 1 when an installed copy differs from the pinned commit
+ *   node scripts/fetch-cyltabbar.js --check   exit 1 when an installed or vendored copy differs from the pinned commit
  */
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -45,6 +49,58 @@ const PACKAGES = [
 const PAG_SOURCE = path.resolve(ROOT, '..', '..', 'Example-Shared', 'PAGResources', 'pag-ios');
 const PAG_TARGET = path.join(ROOT, 'miniprogram', 'engines', 'pag');
 const PAG_HINT = 'run python3 scripts/fetch-animation-resources.py PAGResources from the repository root';
+
+/**
+ * cyl-animated-item, vendored into the library: the library draws every tag icon (static image or animation) through it
+ * and links no animation engine; the app gives the engines through the abstract nodes cyl-lottie-view, cyl-pag-view,
+ * cyl-rive-view and cyl-svga-view (GIF is drawn by <image>). Unpublished upstream, so it is taken by commit.
+ */
+const LIBRARY = path.join(ROOT, 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
+const VENDORED_SOURCE = 'CrossPlatform/wechat-miniprogram-cyltabbar';
+const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder'];
+const VENDORED_TEST = {
+  from: 'test/cyl_animated_item.test.js',
+  to: path.join(ROOT, 'test', 'cyl-animated-item.upstream.test.js'),
+  rewrite: (text) => text.split("'../src/cyl-animated-item/").join("'../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-animated-item/"),
+};
+
+/** Every vendored file: {target path, expected content}. */
+function vendoredFiles() {
+  const base = path.join(CHECKOUT, VENDORED_SOURCE);
+  const license = fs.readFileSync(path.join(base, 'src', 'LICENSE'));
+  const entries = VENDORED.flatMap((folder) => {
+    const source = path.join(base, 'src', folder);
+    return files(source).map((file) => ({ target: path.join(LIBRARY, folder, file), content: fs.readFileSync(path.join(source, file)) }))
+      .concat([
+        { target: path.join(LIBRARY, folder, 'LICENSE'), content: license },
+        { target: path.join(LIBRARY, folder, 'COMMIT'), content: Buffer.from(`${COMMIT}\n`) },
+      ]);
+  });
+  const test = fs.readFileSync(path.join(base, VENDORED_TEST.from), 'utf8');
+  return entries.concat([{ target: VENDORED_TEST.to, content: Buffer.from(VENDORED_TEST.rewrite(test)) }]);
+}
+
+function vendoredDifferences() {
+  const expected = vendoredFiles();
+  const stale = expected.filter((entry) => !fs.existsSync(entry.target) || !fs.readFileSync(entry.target).equals(entry.content))
+    .map((entry) => entry.target);
+  const targets = expected.map((entry) => entry.target);
+  const extra = VENDORED.flatMap((folder) => {
+    const folderPath = path.join(LIBRARY, folder);
+    return fs.existsSync(folderPath) ? files(folderPath).map((file) => path.join(folderPath, file)) : [];
+  }).filter((file) => !targets.includes(file));
+  return stale.concat(extra).map((file) => path.relative(ROOT, file));
+}
+
+function vendor() {
+  VENDORED.forEach((folder) => fs.rmSync(path.join(LIBRARY, folder), { recursive: true, force: true }));
+  const entries = vendoredFiles();
+  entries.forEach((entry) => {
+    fs.mkdirSync(path.dirname(entry.target), { recursive: true });
+    fs.writeFileSync(entry.target, entry.content);
+  });
+  console.log(`${VENDORED.join(', ')} at ${COMMIT.slice(0, 8)} -> ${path.relative(ROOT, LIBRARY)} (${entries.length} files)`);
+}
 
 function target(pkg) {
   return path.join(ROOT, 'miniprogram', pkg.root || 'cyl_components', pkg.name);
@@ -126,12 +182,12 @@ function main() {
       console.error(`CYLTabBarController is not checked out at ${COMMIT.slice(0, 8)}: run node scripts/fetch-cyltabbar.js`);
       process.exit(1);
     }
-    const stale = PACKAGES.flatMap(differences).concat(pagDifferences());
+    const stale = PACKAGES.flatMap(differences).concat(vendoredDifferences(), pagDifferences());
     if (stale.length) {
       console.error(`Out of date: ${stale.join(', ')} (run node scripts/fetch-cyltabbar.js)`);
       process.exit(1);
     }
-    console.log(`OK: ${PACKAGES.map((pkg) => pkg.name).join(', ')} at ${COMMIT.slice(0, 8)}, and the PAG files`);
+    console.log(`OK: ${PACKAGES.map((pkg) => pkg.name).join(', ')} and the vendored ${VENDORED.join(', ')} at ${COMMIT.slice(0, 8)}, and the PAG files`);
     return;
   }
   checkout();
@@ -145,6 +201,7 @@ function main() {
     fs.writeFileSync(path.join(target(pkg), 'COMMIT'), `${COMMIT}\n`);
     console.log(`${pkg.name} at ${git('rev-parse', '--short', 'HEAD')} -> ${path.relative(ROOT, target(pkg))}`);
   });
+  vendor();
   copyPagFiles();
 }
 

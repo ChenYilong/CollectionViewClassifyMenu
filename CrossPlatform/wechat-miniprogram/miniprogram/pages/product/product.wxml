@@ -8,7 +8,7 @@
   <!-- The review block: title, the keyword preview, two reviews, 查看更多评价. -->
   <view class="review-block">
     <text class="review-title">{{reviewTitle}}</text>
-    <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" id="product-preview" class="preview" configuration="{{configuration}}" bindtagtap="onKeywordTap" />
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" id="product-preview" class="preview" configuration="{{configuration}}" bindtagtap="onKeywordTap" />
     <text wx:for="{{reviews}}" wx:key="id" class="review">{{item.text}}</text>
     <view class="more" hover-class="more-hover" bindtap="moreTapped" id="product-more"
           aria-role="button" aria-label="{{moreTitle}}">{{moreTitle}}</view>

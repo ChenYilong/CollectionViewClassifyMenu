@@ -34,10 +34,12 @@ wechat-miniprogram/
 ├── package.json                 `npm test` runs the unit tests; depends on the library below (file:)
 ├── packages/
 │   └── cyl-tag-list-miniprogram/ the npm library: cyl-tag-list, cyl-tag-cloud, cyl-tag-image, locale.js, the core
-│                                strings (miniprogram_dist; README.md for install and use)
+│                                strings (miniprogram_dist; README.md for install and use); tag icons are drawn by
+│                                CYLTabBarController's cyl-animated-item, vendored at the pinned commit
 ├── scripts/
 │   ├── fetch-cyltabbar.js       installs CYLTabBarController's cyl-tabbar-miniprogram and cyl-lottie-miniprogram (its
-│   │                            lottie-miniprogram fork, which draws image assets) at the pinned commit (git-ignored)
+│   │                            lottie-miniprogram fork, which draws image assets) at the pinned commit (git-ignored),
+│   │                            and vendors its cyl-animated-item into the library (committed; --check compares)
 │   ├── export-search-data.py    the search discover JSON and images of the iOS bundle
 │   ├── export-animations.py     the iOS example's Lottie / GIF resources and configuration file
 │   ├── draw-sample-images.py    the samples' pictures
@@ -47,15 +49,15 @@ wechat-miniprogram/
     ├── app.json / app.wxss      the pages; UIKit-like shared styles (inset grouped tables)
     ├── custom-tab-bar/          cyl-tab-bar with the root tab bar's configuration (configuration.js)
     ├── components/
-    │   ├── cyl-lottie-icon/     one animated icon (Lottie, Rive, PAG, GIF), given to cyl-tag-list as
-    │   │                        generic:cyl-animation-icon
+    │   ├── cyl-tag-animation-view/ the engine component (Lottie, Rive, PAG) given to cyl-tag-list as the abstract
+    │   │                        nodes cyl-lottie-view, cyl-rive-view and cyl-pag-view of cyl-animated-item
     │   └── cyl-sample-toast/    the samples' toast
     ├── miniprogram_npm/         git-ignored: Build npm's copy of cyl-tag-list-miniprogram
     ├── data/                    generated: places, reviews, data.json, the iOS and core strings, animations, search
     ├── images/                  core, tab, symbols, reviews, search, styles and samples images
     ├── pages/                   one folder per iOS screen (the table above)
     ├── styles/                  shared sample styles
-    └── utils/                   i18n.js (t, tc), tag-animations.js (the engines, registered with the library),
+    └── utils/                   i18n.js (t, tc), tag-animations.js (the animation files, registered with the library),
                                  places-db.js, selections.js, android-sample.js
 ```
 
