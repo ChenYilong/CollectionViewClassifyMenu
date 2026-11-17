@@ -287,7 +287,8 @@ verify the behavior and update the applicable documentation.
   (`CYLClassifyMenuResources.bundle`) contains `LICENSE`. The same rule applies to every platform: an Android
   library's Java resources (`META-INF/<artifact>/LICENSE`, inside the AAR), an npm package's root (listed in
   `files`), a pub.dev package's root, an ohpm HAR's module root and its `resources/rawfile`, a mini program npm
-  package's root (not `miniprogram_dist`: a WeChat code package accepts only certain file types).
+  package's root and its component folder `miniprogram_dist` (copied into `miniprogram_npm` when DevTools builds npm),
+  as CYLTabBarController's `docs/License-Notices.md` does.
 - The manifest declares the same license: podspec `s.license` (with `:file`), `Package.swift` resources, Maven POM
   `licenses`, `package.json` / `oh-package.json5` `license`, the pub.dev package's `LICENSE`.
 - Ported or copied third-party code keeps its upstream license and notice next to it (for example the Apache-2.0

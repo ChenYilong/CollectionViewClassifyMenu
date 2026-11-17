@@ -24,6 +24,7 @@ mit_files=(
   harmony/classifymenu/LICENSE
   harmony/classifymenu/src/main/resources/rawfile/LICENSE
   CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/LICENSE
+  CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/miniprogram_dist/LICENSE
 )
 [ -f LICENSE ] || fail "LICENSE is missing at the repository root"
 grep -q '^MIT License$' LICENSE || fail "LICENSE is not the MIT License"
