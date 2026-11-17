@@ -58,7 +58,10 @@ tags: [issues, ui, cocoapods, progress]
   unmerged PR #814 (`fix/lottie-unplayable-file`: the Lottie animator makes no view for a file Lottie cannot play) and
   would fail `testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` again (reported by the CYLSearchViewController
   session). Owner's decision (asked, 2026-11-17): "Back to fbd05d5 until #814"; the pins are `fbd05d5` again, the
-  exception is in AGENTS.md ("CYLTabBarController reference and dependency"). Not built here: the iOS bundle, the
+  exception is in AGENTS.md ("CYLTabBarController reference and dependency").
+  The owner merged PR #814 into #788 (`9a54e26`, 2026-11-17), so the exception is gone (`6ee254c`) and the pins follow
+  the newest commit over every branch again: `47aec88` (`fix/lottie-unplayable-file`, 05:25 UTC, on top of the fix:
+  a report of registered and missing animation engines, no API change to `CYLAnimatedItemView` or the podspecs). Not built here: the iOS bundle, the
   AAR and the HAR (CI and the platform toolchains).
 - Found: the packages disagree (iOS podspec "All rights reserved", npm / ohpm / mini program "MIT", Flutter LICENSE a
   "TODO" placeholder, the AndroidTagView port Apache-2.0 from its upstream, the merged Android library none).
