@@ -293,3 +293,16 @@ declarations, so Objective-C callers see no change.
 - **Pin `0a63bed`** (2026-11-17): the #788 tip and the newest commit on any branch: the engine report (`1e53d7a`,
   formerly `47aec88`) and license notices on top of the #814 merge `9a54e26`. Both #814 fixes are kept
   (`DEFINES_MODULE`, `CYLTabBarItemAnimationURLMayBeLottie`).
+
+## DONE (2026-11-17): the guide re-read at `0a63bed`
+
+- **Prompt (verbatim)**: "我已经更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
+- **Prompt (English)**: "I updated the document, latest address …/docs/Animated-Item.md; some descriptions changed. Please read
+  it again and adjust."
+- **What changed**: the guide records both bugs this repository's CI found on `7183711` as fixed in CYLTabBarController's
+  core: `CYLAnimatedItem.podspec` defines its module ("no app needs modular headers for it"), and the Lottie animator
+  takes only a Lottie document (`CYLTabBarItemAnimationURLMayBeLottie()`); failure case (4) now says a picture or a
+  broken local file makes no Lottie view; the entry waits for a re-test here.
+- **Adjusted**: the `:modular_headers => true` workaround is removed from the root and TagCollectionView Podfiles (the
+  core fix replaces it, as the core-first rule asks). `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay`
+  is the re-test: unchanged, expected to pass on `0a63bed`. Pending CI.
