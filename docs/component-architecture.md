@@ -444,3 +444,8 @@ started run completes and the next one tests the newest commit.
   mini program component was re-fetched (`fetch-cyltabbar.js`, `npm test` 130/130); the HarmonyOS module is unchanged
   upstream (README pin updated). Pending CI: the menu job decides whether the demo-app workarounds (`27c0394` modular
   headers, `880d9b1` demo import) can go.
+- **Core fix for Objective-C callers** (2026-11-17): CYLSearchViewController's example tests failed to compile on its
+  `e7d9655` with "property 'position' not found on object of type 'CYLMenuFoldControl *'": the Swift translation of
+  `CYLMenuFoldControl` exposed only its initializer to Objective-C. The class is now `@objcMembers`, so every property
+  and method is visible from Objective-C; the Swift API is unchanged. Not built here (no Xcode; `swift-api-check.sh`
+  needs it); CI is the check.
