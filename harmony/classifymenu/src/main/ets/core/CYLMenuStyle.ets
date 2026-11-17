@@ -8,7 +8,9 @@ import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLOffset, CYLSize }
 import { CYLMenuLocalizedString } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
 
-/** The icon before or after the title, or above (`top`) or below (`bottom`) it, both centered. */
+/**
+ * The icon before or after the title, or above (`top`) or below (`bottom`) it, both centered.
+ */
 export enum CYLTagImagePlacement {
   leading = 0,
   trailing = 1,
@@ -16,37 +18,49 @@ export enum CYLTagImagePlacement {
   bottom = 3
 }
 
-/** True for `top` and `bottom`: the icon and the title are stacked. */
+/**
+ * True for `top` and `bottom`: the icon and the title are stacked.
+ */
 export function CYLTagImagePlacementIsVertical(placement: CYLTagImagePlacement): boolean {
   return placement === CYLTagImagePlacement.top || placement === CYLTagImagePlacement.bottom;
 }
 
-/** The icon and title centered in the tag, or at its leading edge. */
+/**
+ * The icon and title centered in the tag, or at its leading edge.
+ */
 export enum CYLTagContentAlignment {
   center = 0,
   leading = 1
 }
 
-/** Where a row of tags sits in the list's width. */
+/**
+ * Where a row of tags sits in the list's width.
+ */
 export enum CYLTagRowAlignment {
   leading = 0,
   center = 1,
   trailing = 2
 }
 
-/** The delete indicator after or before the title. */
+/**
+ * The delete indicator after or before the title.
+ */
 export enum CYLTagDeleteIndicatorPlacement {
   trailing = 0,
   leading = 1
 }
 
-/** The font and text color of a state (`titleTextAttributes(for:)`). */
+/**
+ * The font and text color of a state (`titleTextAttributes(for:)`).
+ */
 export interface CYLTitleTextAttributes {
   font: CYLFont;
-  textColor: string;
+  textColor: ResourceColor;
 }
 
-/** A tag border of one physical pixel (iOS: 1 / screen scale). */
+/**
+ * A tag border of one physical pixel (iOS: 1 / screen scale).
+ */
 const HAIRLINE: number = 0.5;
 
 export class CYLMenuStyle {
@@ -55,10 +69,10 @@ export class CYLMenuStyle {
   private storedDisabled: CYLTagAppearance = new CYLTagAppearance();
   private storedDeleteIndicatorTitle: string = '×';
 
-  highlightedBackgroundColor?: string;
+  highlightedBackgroundColor?: ResourceColor;
 
   // The delete indicator
-  deleteIndicatorColor?: string;
+  deleteIndicatorColor?: ResourceColor;
   deleteIndicatorFont?: CYLFont;
   deleteIndicatorLineWidth: number = 0;
   deleteIndicatorWidth: number = 0;
@@ -68,7 +82,9 @@ export class CYLMenuStyle {
   // The touch ripple
   rippleColor?: string;
   rippleAlpha: number = 0.2;
-  /** Seconds. */
+  /**
+   * Seconds.
+   */
   rippleDuration: number = 1;
 
   // Titles
@@ -116,7 +132,9 @@ export class CYLMenuStyle {
 
   // The More button
   moreButtonImage?: ResourceStr;
-  /** `UIColor.secondaryLabel` in its light appearance. */
+  /**
+   * `UIColor.secondaryLabel` in its light appearance.
+   */
   moreButtonColor: string = CYLColor.argb(153, 60, 60, 67);
 
   constructor() {
@@ -143,7 +161,9 @@ export class CYLMenuStyle {
     return this.storedDisabled;
   }
 
-  /** The text of the delete indicator; an empty string restores "×". */
+  /**
+   * The text of the delete indicator; an empty string restores "×".
+   */
   get deleteIndicatorTitle(): string {
     return this.storedDeleteIndicatorTitle;
   }
@@ -152,7 +172,9 @@ export class CYLMenuStyle {
     this.storedDeleteIndicatorTitle = value.length > 0 ? value : '×';
   }
 
-  /** The content insets of every state; reads the normal state's. */
+  /**
+   * The content insets of every state; reads the normal state's.
+   */
   get tagContentInsets(): CYLEdgeInsets {
     return this.storedNormal.contentInsets;
   }
@@ -165,7 +187,9 @@ export class CYLMenuStyle {
     return [this.storedNormal, this.storedSelected, this.storedDisabled];
   }
 
-  /** The appearance of `state`: disabled wins over selected, which wins over normal. */
+  /**
+   * The appearance of `state`: disabled wins over selected, which wins over normal.
+   */
   appearance(state: number): CYLTagAppearance {
     if ((state & CYLControlState.DISABLED) !== 0) {
       return this.storedDisabled;
@@ -176,8 +200,10 @@ export class CYLMenuStyle {
     return this.storedNormal;
   }
 
-  /** Sets the font and text color of `state`; undefined restores the default. */
-  setTitleTextAttributes(font: CYLFont | undefined, textColor: string | undefined, state: number): void {
+  /**
+   * Sets the font and text color of `state`; undefined restores the default.
+   */
+  setTitleTextAttributes(font: CYLFont | undefined, textColor: ResourceColor | undefined, state: number): void {
     const appearance = this.appearance(state);
     if (font !== undefined) {
       appearance.font = font;
@@ -191,19 +217,23 @@ export class CYLMenuStyle {
     }
   }
 
-  /** The font and text color of `state`. */
+  /**
+   * The font and text color of `state`.
+   */
   titleTextAttributes(state: number): CYLTitleTextAttributes {
     const appearance = this.appearance(state);
     const attributes: CYLTitleTextAttributes = { font: appearance.font, textColor: appearance.textColor };
     return attributes;
   }
 
-  setIconColor(iconColor: string | undefined, state: number): void {
+  setIconColor(iconColor: ResourceColor | undefined, state: number): void {
     this.appearance(state).iconColor = iconColor;
   }
 
-  /** The icon color of `state`, else its text color. */
-  iconColor(state: number): string {
+  /**
+   * The icon color of `state`, else its text color.
+   */
+  iconColor(state: number): ResourceColor {
     const appearance = this.appearance(state);
     return appearance.iconColor ?? appearance.textColor;
   }
@@ -224,7 +254,9 @@ export class CYLMenuStyle {
     return text;
   }
 
-  /** `font` as the views draw it: bold with Bold Text, scaled by `fontScale` when adjusting for the font size. */
+  /**
+   * `font` as the views draw it: bold with Bold Text, scaled by `fontScale` when adjusting for the font size.
+   */
   private scaledFont(font: CYLFont, fontScale: number, boldText: boolean): CYLFont {
     const result = boldText ? font.bold() : font;
     if (!this.adjustsFontForContentSizeCategory) {
@@ -233,23 +265,31 @@ export class CYLMenuStyle {
     return result.withSize(result.size * Math.min(Math.max(fontScale, 0), CYLTagMetrics.maximumFontScale));
   }
 
-  /** The title font of `state` at the system font scale `fontScale` (the trait collection on iOS). */
+  /**
+   * The title font of `state` at the system font scale `fontScale` (the trait collection on iOS).
+   */
   titleFont(state: number, fontScale: number = 1, boldText: boolean = false): CYLFont {
     return this.scaledFont(this.appearance(state).font, fontScale, boldText);
   }
 
-  /** `deleteIndicatorFont`, else the title font. */
+  /**
+   * `deleteIndicatorFont`, else the title font.
+   */
   deleteIndicatorFontFor(state: number, fontScale: number = 1, boldText: boolean = false): CYLFont {
     return this.deleteIndicatorFont !== undefined ? this.scaledFont(this.deleteIndicatorFont, fontScale, boldText) :
     this.titleFont(state, fontScale, boldText);
   }
 
-  /** The header font at `fontScale`. */
+  /**
+   * The header font at `fontScale`.
+   */
   headerFontFor(fontScale: number = 1, boldText: boolean = false): CYLFont {
     return this.scaledFont(this.headerFont, fontScale, boldText);
   }
 
-  /** NSCopying. */
+  /**
+   * NSCopying.
+   */
   copy(): CYLMenuStyle {
     const c = new CYLMenuStyle();
     c.storedNormal = this.storedNormal.copy();
@@ -302,12 +342,16 @@ export class CYLMenuStyle {
     return c;
   }
 
-  /** The default style. */
+  /**
+   * The default style.
+   */
   static defaultStyle(): CYLMenuStyle {
     return new CYLMenuStyle();
   }
 
-  /** android-tagview's look: blue square tags, white text, 5 vp spacing. */
+  /**
+   * android-tagview's look: blue square tags, white text, 5 vp spacing.
+   */
   static tagCloud(): CYLMenuStyle {
     const style = new CYLMenuStyle();
     const blue = CYLColor.argb(255, 0, 0xBF, 0xFF);
@@ -329,7 +373,9 @@ export class CYLMenuStyle {
     return style;
   }
 
-  /** AndroidTagView's look: translucent red capsules, gray text, 23 characters at most. */
+  /**
+   * AndroidTagView's look: translucent red capsules, gray text, 23 characters at most.
+   */
   static tagContainer(): CYLMenuStyle {
     const style = new CYLMenuStyle();
     const gray = CYLColor.argb(255, 0x66, 0x66, 0x66);
@@ -357,7 +403,9 @@ export class CYLMenuStyle {
     return style;
   }
 
-  /** Borderless items in `itemsPerRow` columns, the icon after the title. */
+  /**
+   * Borderless items in `itemsPerRow` columns, the icon after the title.
+   */
   static gridStyle(itemsPerRow: number): CYLMenuStyle {
     const style = new CYLMenuStyle();
     style.numberOfItemsPerRow = Math.max(1, itemsPerRow);

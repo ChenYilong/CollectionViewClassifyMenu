@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import {
-  CYLFont, CYLMenuLocalizedString, CYLMenuStyle, CYLSize, CYLTagBadgeDefaultColor, CYLTagButton, CYLTagButtonMetrics,
-  CYLTagImagePlacement, CYLTextMeasurer
+  CYLColorKey, CYLControlState, CYLEdgeInsets, CYLFont, CYLImageIsSymbol, CYLMenuLocalizedString, CYLMenuStyle,
+  CYLOffset, CYLSize, CYLTagBadgeDefaultColor, CYLTagButton, CYLTagButtonMetrics, CYLTagImagePlacement, CYLTextMeasurer
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -79,6 +79,69 @@ export default function tagButtonTest() {
       expect(button.accessibilityLabel).assertEqual('Messages');
       button.badgeColor = undefined;
       expect(button.badgeColor).assertEqual(CYLTagBadgeDefaultColor);
+    });
+
+    it('drawsSystemSymbolsAndTakesThemeColors', 0, () => {
+      const symbol = $r('sys.symbol.camera');
+      expect(CYLImageIsSymbol(symbol)).assertTrue();
+      expect(CYLImageIsSymbol('icon.png')).assertFalse();
+      expect(CYLImageIsSymbol($rawfile('icon.png'))).assertFalse();
+      expect(CYLImageIsSymbol(undefined)).assertFalse();
+      const tint = $r('sys.color.font_primary');
+      const style = new CYLMenuStyle();
+      style.imageSize = new CYLSize(20, 20);
+      [CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED].forEach((state: number) => {
+        const appearance = style.appearance(state);
+        appearance.textColor = tint;
+        appearance.backgroundColor = Color.Transparent;
+        appearance.borderColor = undefined;
+        style.setIconColor(tint, state);
+      });
+      const button = new CYLTagButton(undefined, symbol);
+      button.style = style;
+      button.setBounds(36, 36);
+      expect(button.imageView.image === symbol).assertTrue();
+      expect(CYLColorKey(button.imageView.tintColor)).assertEqual(CYLColorKey(tint));
+      expect(button.backgroundColor === Color.Transparent).assertTrue();
+      expect(button.borderWidth).assertEqual(0);
+      button.badgeColor = $r('sys.color.warning');
+      expect(CYLColorKey(button.badgeColor)).assertEqual(CYLColorKey($r('sys.color.warning')));
+    });
+
+    it('growsToItsMinimumSizeAndCentersTheIcon', 0, () => {
+      const style = new CYLMenuStyle();
+      style.imageSize = new CYLSize(20, 20);
+      style.itemHeight = 0;
+      [CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED].forEach((state: number) => {
+        style.appearance(state).contentInsets = new CYLEdgeInsets(0, 0, 0, 0);
+      });
+      const button = new CYLTagButton(undefined, 'icon.png');
+      button.style = style;
+      expect(button.intrinsicSize().width).assertEqual(20);
+      button.minimumSize = new CYLSize(36, 36);
+      expect(button.intrinsicSize().width).assertEqual(36);
+      expect(button.intrinsicSize().height).assertEqual(36);
+      button.setBounds(36, 36);
+      expect(button.imageView.frame.x).assertEqual(8);
+      expect(button.imageView.frame.y).assertEqual(8);
+    });
+
+    it('takesTheBadgeMetrics', 0, () => {
+      const button = new CYLTagButton('Messages', 'icon.png');
+      button.setBounds(120, 40);
+      button.badgeValue = '1';
+      button.badgeMinimumSize = new CYLSize(20, 20);
+      expect(button.badgeLabel.frame.height).assertEqual(20);
+      expect(button.badgeLabel.frame.width).assertEqual(20);
+      const x = button.badgeLabel.frame.x;
+      button.badgePositionAdjustment = new CYLOffset(-3, 0);
+      expect(button.badgeLabel.frame.x).assertEqual(x - 3);
+      button.badgeContentInsets = new CYLEdgeInsets(0, 12, 0, 12);
+      expect(button.badgeLabel.frame.width).assertEqual(10 + 24);
+      button.badgeTextColor = '#FF000000';
+      expect(button.badgeLabel.textColor).assertEqual('#FF000000');
+      button.badgeFont = CYLFont.systemFont(9);
+      expect(button.badgeLabel.font.size).assertEqual(9);
     });
   });
 }

@@ -4,7 +4,9 @@
  */
 import { CYLColor, CYLEdgeInsets, CYLFont } from './CYLTypes';
 
-/** A corner radius that draws square corners (0 means "the list's value"). */
+/**
+ * A corner radius that draws square corners (0 means "the list's value").
+ */
 export const CYLTagCornerRadiusSquare: number = 0.001;
 
 function sanitized(value: number): number {
@@ -16,29 +18,41 @@ export class CYLTagAppearance {
   static readonly defaultTextColor: string = CYLColor.white(0.25);
   static readonly defaultFont: CYLFont = CYLFont.systemFont(14);
 
-  private storedBackgroundColor?: string;
-  private storedTextColor?: string;
+  private storedBackgroundColor?: ResourceColor;
+  private storedTextColor?: ResourceColor;
   private storedFont?: CYLFont;
   private storedCornerRadius: number = 3;
   private storedBorderWidth: number = 0;
   private storedContentInsets: CYLEdgeInsets = new CYLEdgeInsets(5, 10, 5, 10);
-  iconColor?: string;
-  borderColor?: string;
+  /**
+   * The icon tint; undefined uses `textColor`. Any `ResourceColor`, a theme color included.
+   */
+  iconColor?: ResourceColor;
+  /**
+   * The border; undefined draws none. Any `ResourceColor`.
+   */
+  borderColor?: ResourceColor;
   backgroundImage?: ResourceStr;
 
-  get backgroundColor(): string {
+  /**
+   * The box; any `ResourceColor` (a '#AARRGGBB' string, a `Color`, a theme resource that follows the color mode).
+   */
+  get backgroundColor(): ResourceColor {
     return this.storedBackgroundColor ?? CYLTagAppearance.defaultBackgroundColor;
   }
 
-  set backgroundColor(value: string) {
+  set backgroundColor(value: ResourceColor) {
     this.storedBackgroundColor = value;
   }
 
-  get textColor(): string {
+  /**
+   * The title; any `ResourceColor`.
+   */
+  get textColor(): ResourceColor {
     return this.storedTextColor ?? CYLTagAppearance.defaultTextColor;
   }
 
-  set textColor(value: string) {
+  set textColor(value: ResourceColor) {
     this.storedTextColor = value;
   }
 
@@ -87,7 +101,9 @@ export class CYLTagAppearance {
       sanitized(value.bottom), sanitized(value.right));
   }
 
-  /** The larger of the left and right content insets; setting it sets both. */
+  /**
+   * The larger of the left and right content insets; setting it sets both.
+   */
   get margin(): number {
     return Math.max(this.storedContentInsets.left, this.storedContentInsets.right);
   }
@@ -98,7 +114,9 @@ export class CYLTagAppearance {
     this.storedContentInsets = new CYLEdgeInsets(insets.top, m, insets.bottom, m);
   }
 
-  /** Restores every value to its default. */
+  /**
+   * Restores every value to its default.
+   */
   reset(): void {
     this.storedBackgroundColor = undefined;
     this.storedTextColor = undefined;
@@ -111,7 +129,9 @@ export class CYLTagAppearance {
     this.backgroundImage = undefined;
   }
 
-  /** NSCopying. */
+  /**
+   * NSCopying.
+   */
   copy(): CYLTagAppearance {
     const result = new CYLTagAppearance();
     result.storedBackgroundColor = this.storedBackgroundColor;

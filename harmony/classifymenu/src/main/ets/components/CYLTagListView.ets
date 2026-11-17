@@ -15,7 +15,7 @@ import { CYLMenuFoldControl, CYLMenuFoldControlPosition } from '../core/CYLMenuF
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import { CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement } from '../core/CYLMenuStyle';
 import { CYLConfiguration, CYLConfigurationValue } from '../core/CYLTagListConfiguration';
-import { CYLColor, CYLControlState, CYLImage, CYLSize } from '../core/CYLTypes';
+import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLSize } from '../core/CYLTypes';
 
 /** What a tag (or a fold control, or the title) shows, resolved from the list's state for one render. */
 class CYLTagRenderItem {
@@ -30,11 +30,11 @@ class CYLTagRenderItem {
   title: string = '';
   fontSize: number = 14;
   fontWeight: FontWeight = FontWeight.Normal;
-  textColor: string = CYLColor.BLACK;
-  backgroundColor: string = CYLColor.CLEAR;
-  highlightedBackgroundColor?: string;
+  textColor: ResourceColor = CYLColor.BLACK;
+  backgroundColor: ResourceColor = CYLColor.CLEAR;
+  highlightedBackgroundColor?: ResourceColor;
   backgroundImage?: ResourceStr;
-  borderColor: string = CYLColor.CLEAR;
+  borderColor: ResourceColor = CYLColor.CLEAR;
   borderWidth: number = 0;
   cornerRadius: number = 0;
   paddingLeft: number = 0;
@@ -43,7 +43,7 @@ class CYLTagRenderItem {
   animation?: string;
   iconWidth: number = 0;
   iconHeight: number = 0;
-  iconColor: string = CYLColor.BLACK;
+  iconColor: ResourceColor = CYLColor.BLACK;
   iconRotation: number = 0;
   imageTrailing: boolean = false;
   alignLeading: boolean = false;
@@ -52,7 +52,7 @@ class CYLTagRenderItem {
   enabled: boolean = true;
   deletable: boolean = false;
   deleteTitle: string = '×';
-  deleteColor: string = CYLColor.BLACK;
+  deleteColor: ResourceColor = CYLColor.BLACK;
   deleteFontSize: number = 14;
   deleteLeading: boolean = false;
   speed: number = 1;
@@ -72,7 +72,7 @@ class CYLSectionRender {
   title: string = '';
   fontSize: number = 14;
   fontWeight: FontWeight = FontWeight.Normal;
-  textColor: string = CYLColor.GRAY;
+  textColor: ResourceColor = CYLColor.GRAY;
   inset: number = 16;
   indicatorColor?: string;
   indicatorWidth: number = 3;
@@ -321,11 +321,13 @@ export struct CYLTagListView {
     // the item, disposing its Rive view, which crashes in @ohos/rive (eglDestroySurface on a dead window). Its frame is
     // read from `frames` instead, so a relayout updates it in place.
     r.key = [extra, r.section, r.item, rive ? 'riv' : r.x, rive ? '' : r.y, rive ? '' : r.width, rive ? '' : r.height,
-      r.title, r.fontSize, r.fontWeight, r.textColor,
-      r.backgroundColor, r.highlightedBackgroundColor ?? '', r.borderColor, r.borderWidth, r.cornerRadius,
-      r.paddingLeft, r.paddingRight, imageKey(r.image), r.animation ?? '', r.iconWidth, r.iconHeight, r.iconColor,
+      r.title, r.fontSize, r.fontWeight, CYLColorKey(r.textColor),
+      CYLColorKey(r.backgroundColor), CYLColorKey(r.highlightedBackgroundColor), CYLColorKey(r.borderColor),
+      r.borderWidth, r.cornerRadius,
+      r.paddingLeft, r.paddingRight, imageKey(r.image), r.animation ?? '', r.iconWidth, r.iconHeight,
+      CYLColorKey(r.iconColor),
       r.iconRotation, r.imageTrailing, r.alignLeading, r.spacing, r.selected, r.enabled, r.deletable, r.deleteTitle,
-      r.deleteColor, r.deleteLeading,
+      CYLColorKey(r.deleteColor), r.deleteLeading,
       // @ohos/rive has no speed: a Rive item keeps its key (and its view) while the speed slider moves.
       (r.animation ?? '').split('#')[0].toLowerCase().endsWith('.riv') ? '' : r.speed,
       r.accessibilityText, r.accessibilityHint].join('|');
@@ -487,7 +489,8 @@ export struct CYLTagListView {
     h.moreColor = view.moreColor;
     h.moreLabel = view.moreAccessibilityLabel;
     h.accessory = view.accessoryView;
-    h.key = ['h', h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, h.textColor, h.inset,
+    h.key = ['h', h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
+      h.inset,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
       h.fold.key, h.showsMore, h.moreColor, h.moreLabel, h.accessory !== undefined].join('|');
     return h;
@@ -712,7 +715,7 @@ export struct CYLTagListView {
     }
   }
 
-  private itemBackground(r: CYLTagRenderItem): string {
+  private itemBackground(r: CYLTagRenderItem): ResourceColor {
     return this.pressedKey === r.key && r.highlightedBackgroundColor !== undefined ? r.highlightedBackgroundColor :
     r.backgroundColor;
   }

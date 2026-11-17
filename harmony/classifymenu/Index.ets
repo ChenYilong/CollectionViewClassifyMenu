@@ -14,7 +14,7 @@ export {
   CYLTagDeleteIndicatorPlacement, CYLTitleTextAttributes
 } from './src/main/ets/core/CYLMenuStyle';
 export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';
-export { CYLImage } from './src/main/ets/core/CYLTypes';
+export { CYLImage, CYLImageIsSymbol, CYLResourceTypeSymbol, CYLColorKey } from './src/main/ets/core/CYLTypes';
 export { CYLMenuColorFromString } from './src/main/ets/core/CYLMenuColor';
 export { CYLTag, CYLTagDataSource } from './src/main/ets/core/CYLTag';
 export {

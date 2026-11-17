@@ -264,7 +264,7 @@ tags: [issues, ui, cocoapods, progress]
   block; it does not simulate a tap (the tap path is private), so the call from `handleTap` is checked only by
   reading it.
 
-### TODO (2026-11-17, `feat/harmony`): `CYLTagButton` draws a search bar item on HarmonyOS and in the mini program
+### DONE (2026-11-17, `feat/harmony`, logged as TODO in `f30a2b1`): `CYLTagButton` draws a search bar item on HarmonyOS and in the mini program
 
 - Prompt (relayed by the CYLSearchViewController session, same user goal as the entry below): every icon + title /
   animated icon of CYLSearchViewController must be this repository's `CYLTagButton`; iOS and Android are done there.
@@ -286,7 +286,41 @@ tags: [issues, ui, cocoapods, progress]
   4. the animation library versions aligned with `cylplaceholder`, so one app can depend on both;
   5. mini program `cyl-tag-button`: a transparent background possible, the tag list defaults unchanged;
   6. tests (mini program `npm test`, the Linux checks), docs, this entry done.
-- Status: started.
+- Result:
+  - HarmonyOS symbols: `CYLImageIsSymbol(image)` (a `Resource` of type `CYLResourceTypeSymbol`, 40000, the
+    `ResourceType.SYMBOL` of `$r('sys.symbol.…')`); `CYLTagButtonComponent` draws such an icon with `SymbolGlyph`
+    (font size the icon slot's smaller side, 16 vp without a slot; `fontColor([iconColor])` per state) and every other
+    image with `Image` as before.
+  - HarmonyOS colors: `CYLTagAppearance.backgroundColor` / `textColor` / `iconColor` / `borderColor`,
+    `CYLMenuStyle.highlightedBackgroundColor` / `deleteIndicatorColor` / `setTitleTextAttributes` / `setIconColor` /
+    `iconColor(state)` / `CYLTitleTextAttributes.textColor`, `CYLTagButtonPart.textColor` / `tintColor`,
+    `CYLTagButton.backgroundColor` / `borderColor` / `crossColor` / `badgeColor` take `ResourceColor` (strings still
+    work: a string is a `ResourceColor`). `CYLTagListView` keys its render items with `CYLColorKey` (a resource's id).
+  - HarmonyOS standalone use: `CYLTagButton.minimumSize` (a touch target; the content is centered in it) and the badge
+    metrics `badgeTextColor`, `badgeFont`, `badgeMinimumSize`, `badgeContentInsets`, `badgePositionAdjustment` (iOS and
+    Android reach them through a subclass, which ArkTS components cannot override).
+  - HarmonyOS V2: `CYLTagButtonHost`, a V1 `@Component` that holds the button as `@State` and links it to
+    `CYLTagButtonComponent`, placed inside a `@ComponentV2` (the bridge CYLSearchViewController's `CYLSearchView`
+    already uses for CYLTableViewPlaceHolder's V1 placeholders, `CYLSearchPlaceholderHost`).
+  - Animation versions: `@ohos/lottie` stays 2.0.38 (newer than `cylplaceholder`'s 2.0.28 and fine on API 12);
+    `@tencent/libpag` stays 4.4.31: the newer 4.5.102 of `cylplaceholder` needs API 15 (CYLTableViewPlaceHolder
+    `docs/HarmonyOS.md`), above this library's minimum, API 12 (`compatibleSdkVersion` 5.0.0(12)); `@ohos/rive` 1.0.4
+    on both. An app that depends on both libraries (API 15 or later) picks one version of each with ohpm `overrides`
+    in its project `oh-package.json5`: `@ohos/lottie` 2.0.38, `@tencent/libpag` 4.5.102 (CYLSearchViewController does).
+    TODO: `cylplaceholder` moves to `@ohos/lottie` 2.0.38 (its own session); this library moves to libpag 4.5.102 when
+    its minimum reaches API 15.
+  - Mini program: style key `allowsTransparentBackground` (false by default) keeps a `transparent` / `clear` /
+    zero-alpha tag background (`tagBackground`); without it `opaqueBackground` still gives the default fill, so tag
+    lists are unchanged. Documented in the package README and `cyl-tag-button.js`.
+  - Tests: HarmonyOS `TagButton.test.ets` + 3 (`drawsSystemSymbolsAndTakesThemeColors`,
+    `growsToItsMinimumSizeAndCentersTheIcon`, `takesTheBadgeMetrics`); mini program `test/tag-button.test.js` + 1.
+    Run here: `npm test` (109 pass, 1 skipped), `harmony/scripts/accessibility-check.py` (the one finding is an
+    existing demo image, unchanged), `harmony/scripts/harmony_parity.py` (811 / 849, unchanged: the new members are
+    HarmonyOS additions, not iOS symbols).
+  - Unverified (Linux, no DevEco Studio): the ArkTS code is not compiled and the local unit tests are not run
+    (`harmony/scripts/unit-test.sh`); a symbol icon, a theme color in dark mode and `CYLTagButtonHost` inside a V2
+    parent are not seen on an emulator; `ResourceType.SYMBOL` = 40000 is taken from the ArkUI engine, not checked
+    against the SDK here. The `oh-package-lock.json5` files are unchanged (no dependency version changed).
 
 ### DONE (2026-11-17, `feat/harmony`, logged as TODO in `1e43253`): `CYLTagButton` as the one icon + title + animated icon component
 
