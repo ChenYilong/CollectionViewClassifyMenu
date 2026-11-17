@@ -144,11 +144,6 @@ jobs:
           restore-keys: pods-${{ runner.os }}-${{ matrix.suite }}-
       - name: xcodebuild test
         if: needs.changes.outputs.code == 'true'
-        # TODO (docs/animated-item-migration.md, row 12): the menu suite's static-library demo fails with "cannot inherit
-        # from class 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded". This
-        # flag makes the compiler name the declaration it cannot load; remove it once the cause is fixed.
-        env:
-          CYL_SWIFT_EXTRA_FLAGS: ${{ matrix.suite == 'menu' && '-Xfrontend -disable-deserialization-recovery' || '' }}
         run: scripts/unit-tests.sh "${{ matrix.suite }}"
       - name: Summary
         if: always() && needs.changes.outputs.code == 'true'
