@@ -652,6 +652,13 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     [tags addTagsWithTitles:@[@"Swift", @"Kotlin"]];
     [tags addTagWithTitle:@"ArkTS"];
     [tags insertTagWithTitle:@"Objective-C" atIndex:0];
+    __block NSString *tappedTitle = nil;
+    tags.tagClickHandler = ^(NSInteger index, NSString *title) {
+        tappedTitle = title;
+    };
+    XCTAssertNotNil(tags.tagClickHandler, @"Objective-C's route of tagClickHandler: index and title");
+    tags.tagClickHandler(1, @"Swift");
+    XCTAssertEqualObjects(tappedTitle, @"Swift");
     XCTAssertEqual([tags.menuDataSource menuNumberOfItemsInSection:0], 4);
     XCTAssertEqualObjects([tags.menuDataSource menuTitleForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]],
                           @"Objective-C");

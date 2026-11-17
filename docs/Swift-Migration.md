@@ -219,6 +219,10 @@ headers still in the umbrella without any glue, while Objective-C calling Swift 
   (Objective-C only, marked unavailable in Swift; the factories return `CYLTagListView`, not the subclass).
   Test: `testTagListViewAPIIsVisibleToObjectiveC`
   (`CYLCollectionViewClassifyMenuLayoutTests.m`).
+- `CYLTagListView.tagClickHandler` (2026-11-17): Objective-C's `tagClickHandler` is a block of the index and the title
+  (`void (^)(NSInteger, NSString *)`, Swift-unavailable `objcTagClickHandler`), called for the same taps as the Swift
+  `tagClickHandler` (whose `CYLTag` Objective-C cannot see), right after it. The `CYLTag` handlers listed above other
+  than this one stay Swift-only.
 
 ## API check details
 

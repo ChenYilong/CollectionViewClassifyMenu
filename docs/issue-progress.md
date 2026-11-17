@@ -212,6 +212,24 @@ tags: [issues, ui, cocoapods, progress]
   `Swift-Migration.md`, "Objective-C API changes". The other repository can move its pin to the commit that adds
   this.
 
+### DONE (2026-11-17, `feat/harmony`): an Objective-C route for `CYLTagListView.tagClickHandler`
+
+- Prompt (verbatim): "CollectionViewClassifyMenu updated continue"
+- Context: CYLSearchViewController (branch `feat/harmonyos-parity`) moves its pin to this repository's newest commit.
+  Its React Native iOS wrapper (`CrossPlatform/react-native-cylsearch/ios/CylsearchTagListView.mm`, Objective-C++, as
+  Fabric requires) reports every tap of a tag with `tagClickHandler`, as its Android wrapper does. Since `477323d`
+  every Objective-C-representable member is `@objc`, but `tagClickHandler` takes a `CYLTag`, which Objective-C cannot
+  see, so it stayed Swift-only. `menu:didSelectItemAtIndexPath:` is no substitute: it is not called when a selected
+  tag is tapped again in `.single` mode, while `tagClickHandler` is called for every accepted tap.
+- Requirements: an Objective-C route for the handler, called for exactly the taps `tagClickHandler` sees, with the
+  index and the title; the Swift API unchanged; an Objective-C test.
+- Result: `objcTagClickHandler` (`@objc(tagClickHandler)`, unavailable in Swift) in `CYLTagListView.swift`, called in
+  `handleTap(at:)` right after `tagClickHandler` with `tag.title`; `testTagListViewAPIIsVisibleToObjectiveC` sets and
+  calls it from Objective-C; `Swift-Migration.md`, "Objective-C API changes". Tables: iOS -> Android 767 / 767,
+  Android -> iOS 733 / 733. Not compiled here (Linux, no Xcode); CI builds and tests it. The test sets and calls the
+  block; it does not simulate a tap (the tap path is private), so the call from `handleTap` is checked only by
+  reading it.
+
 ### TODO (2026-11-16): SVGA animated icons (CYLTabBarController added SVGA)
 
 - **Prompt (verbatim):** "找到本项目相关文档，加入TODO：cyltabbar 现已增加svga动效，更新core代码以支持该动效，要求example层一比一复刻rive相关演示。只要rive有的演示场景 svga也要有。"
