@@ -27,6 +27,7 @@ import {
 } from '../core/CYLMenuStyle';
 import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
 import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
+import { CYLUIContext } from '../core/CYLUIContext';
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLImageIsSymbol, CYLOffset, CYLRect, CYLSize
 } from '../core/CYLTypes';
@@ -899,6 +900,14 @@ export struct CYLTagButtonComponent {
   interactive: boolean = true;
   onTagClick?: () => void;
 
+  /**
+   * A tag drawn on its own (no tag list or controller around it) still measures its title with the window's text
+   * metrics: without them the width came from an estimate, far too narrow for CJK titles ("SVG…").
+   */
+  aboutToAppear(): void {
+    CYLUIContext.remember(this.getUIContext());
+  }
+
   private part(p: CYLTagButtonPart): CYLRect {
     return p.frame;
   }
@@ -1060,7 +1069,8 @@ export struct CYLTagButtonComponent {
     .accessibilityGroup(true)
     .accessibilityText(this.button.accessibilityLabel ?? '')
     .accessibilityDescription(this.button.accessibilityValue ?? '')
-    .onClick(() => this.onTagClick?.())
+    // No click handler without onTagClick: a parent that handles the tap itself (a row around the tag) receives it.
+    .onClick(this.onTagClick === undefined ? undefined : () => this.onTagClick?.())
   }
 }
 
