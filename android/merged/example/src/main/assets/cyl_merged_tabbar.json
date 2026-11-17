@@ -1,6 +1,7 @@
 {
   "CYLTabBarControllerContext": "CYLClassifyMenuMerged",
   "CYLTabBarControllerTitlePositionAdjustment": "{0, -2}",
+  "CYLTabBarControllerShowsAllTabs": true,
   "CYLTabBarControllerTabBarItemsAttributes": [
     { "CYLTabBarItemTitle": "TagView", "CYLTabBarItemImage": "system:tag", "CYLTabBarItemIdentifier": "kaede",
       "CYLTabBarItemPageIdentifier": "kaede" },
