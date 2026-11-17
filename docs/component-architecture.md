@@ -428,3 +428,10 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
 
 The item-by-item progress, the score (72 at `d979073`) and the remaining TODOs of the CYLAnimatedItem migration are kept in
 [animated-item-migration.md](animated-item-migration.md).
+
+## Concurrency: a started run finishes (2026-11-17)
+
+`ios.yml` uses `cancel-in-progress: false`. Several sessions push to the same branch within minutes; with
+`cancel-in-progress: true` every push cancelled the running iOS run, and on 2026-11-17 no iOS run finished for more
+than two hours. GitHub keeps at most one pending run per concurrency group and replaces it with the newest push, so a
+started run completes and the next one tests the newest commit.

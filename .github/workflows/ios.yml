@@ -13,9 +13,12 @@ on:
 permissions:
   contents: read
 
+# A started run always finishes: several sessions push to the same branch within minutes, and cancelling the running
+# run on every push left no iOS run finished for hours (2026-11-17). GitHub keeps at most one pending run per group and
+# replaces it with the newest push, so the queue stays one run deep.
 concurrency:
   group: ios-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   # [EN] A pull request that only changes docs (docs/, *.md, *.gif) skips the macOS steps; the jobs still report success.
