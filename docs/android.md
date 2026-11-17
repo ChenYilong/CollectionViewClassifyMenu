@@ -434,6 +434,22 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | this commit | Android -> iOS: the Kotlin parser read classes with a multi-line primary constructor (`CYLTag`, …) as one-liners and skipped their members: 128 rows found, 6 misattributed rows gone; new iOS `CYLTag.resetColors()` | 733 / 733 (Android -> iOS) | 100.0 |
 | this commit | iOS -> Android with `CYLTag.resetColors()` | 762 / 762 | 100.0 |
 
+## DONE (2026-11-17, `feat/harmony`): every tab of the merged example stays in the bar after CYLTabBarController's "More"
+
+- Prompt (verbatim): "continue fix todo • There's no CollectionViewClassifyMenu example under Example-Android, so I didn't add an opt-in there. The Android example is on the feat/android-kotlin-b branch. Fetching it. merge to current branch"
+- Context: CYLTabBarController `0c35409` (pinned since `f77cd48`) gives Android UIKit's "More" tab past five view
+  controllers, with the Android-only opt-out `cyl_showsAllTabs` (configuration key `CYLTabBarControllerShowsAllTabs`).
+  This project's Android example is `android/merged/example` (not `Example-Android`, which is CYLTabBarController's).
+  Its tab bar has nine tabs.
+- Merge: `origin/feat/android-kotlin-b` (`b133525`) is already contained in `feat/harmony` (0 commits ahead), so
+  there is nothing to merge.
+- Result: the example's tab bar is scrollable (`cyl_scrollMode = Scrollable`), which upstream already exempts from
+  "More". The configuration file `example/src/main/assets/cyl_merged_tabbar.json` now also sets
+  `"CYLTabBarControllerShowsAllTabs": true`, so the nine tabs stay in the bar whatever the scroll mode.
+- Evidence: the JSON parses with the key read at the top level, as `CYLTabBarController.cyl_applyConfiguration` reads
+  it at `0c35409`. Not built here (no Android SDK in this container, and no Android CI job). It needs a Gradle build and
+  an emulator screenshot on a Mac.
+
 ## Screenshots: Classify and Filter tabs (iOS demo app on Android)
 
 The iOS demo app's two features have a tab each (one feature per tab item), both linked to the local SQLite `places`
