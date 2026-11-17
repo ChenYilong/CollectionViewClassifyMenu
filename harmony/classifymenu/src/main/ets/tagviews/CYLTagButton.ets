@@ -466,13 +466,16 @@ export class CYLTagButton {
   }
 
   /**
-   * Plays the animated icon from the start, as a tab icon plays when the tab is tapped.
+   * Plays the animated icon from the start, as a tab icon plays when the tab is tapped; called before the icon is
+   * loaded (a tag shown for the first time), it plays once the icon is loaded.
    */
   playAnimation(): void {
     this.applyAnimationSpeed();
     if (this.player !== undefined) {
       this.player.loops = this.animationLoopsValue;
       this.player.play();
+    } else if (this.animationURLValue !== undefined) {
+      this.pendingPlay = true;
     }
     this.playToken++;
     this.changed();

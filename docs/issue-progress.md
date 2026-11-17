@@ -299,6 +299,9 @@ tags: [issues, ui, cocoapods, progress]
   - HarmonyOS standalone use: `CYLTagButton.minimumSize` (a touch target; the content is centered in it) and the badge
     metrics `badgeTextColor`, `badgeFont`, `badgeMinimumSize`, `badgeContentInsets`, `badgePositionAdjustment` (iOS and
     Android reach them through a subclass, which ArkTS components cannot override).
+  - HarmonyOS `playAnimation()` before the animated icon is loaded (a tag shown for the first time, such as the SVGA
+    demo of CYLSearchViewController, which plays once when shown) now plays it once it is loaded (`pendingPlay`), as
+    iOS does.
   - HarmonyOS V2: `CYLTagButtonHost`, a V1 `@Component` that holds the button as `@State` and links it to
     `CYLTagButtonComponent`, placed inside a `@ComponentV2` (the bridge CYLSearchViewController's `CYLSearchView`
     already uses for CYLTableViewPlaceHolder's V1 placeholders, `CYLSearchPlaceholderHost`).
