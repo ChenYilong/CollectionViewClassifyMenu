@@ -449,3 +449,11 @@ started run completes and the next one tests the newest commit.
   `CYLMenuFoldControl` exposed only its initializer to Objective-C. The class is now `@objcMembers`, so every property
   and method is visible from Objective-C; the Swift API is unchanged. Not built here (no Xcode; `swift-api-check.sh`
   needs it); CI is the check.
+- **Workarounds removed** (2026-11-17 17:55 UTC): the static-library menu suite passes since CYLTabBarController
+  `83a8ff8` (its public headers `@import CYLAnimatedItem;`; the cause was "CYLAnimatedItemView expected in
+  'CYLAnimatedItem' but found in 'CYLTabBarController'", found with `-disable-deserialization-recovery`). Run
+  44092883295 on `f8301a4` is fully green. Removed here: `:modular_headers => true` on `CYLAnimatedItem` in the root,
+  TagCollectionView and React Native example Podfiles (`27c0394`), and the menu suite's diagnostic flag in `ios.yml`
+  (`32b210e`; `CYL_SWIFT_EXTRA_FLAGS` stays available in `scripts/unit-tests.sh`). If the menu suite fails again
+  without modular headers, restore them. The demo's `import CYLAnimatedItem` (`880d9b1`) is the other session's to
+  remove.
