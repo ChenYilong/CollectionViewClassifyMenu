@@ -400,3 +400,20 @@ declarations, so Objective-C callers see no change.
      `harmony/classifymenu` from source: they need the `cylanimateditem` module and their own engine registration.
   3. Publishing `@cyl/classifymenu` to ohpm needs `cylanimateditem` published first (`file:` dependency).
   4. Build and run: ArkTS compile, HarmonyOS tests and an emulator run; the mini program in WeChat DevTools.
+
+## DONE (2026-11-17): upstream `cyl-animated-item` playback for the mini program tags (CYLTabBarController PR #815)
+
+- **Context**: the owner chose "Extend upstream, then migrate (Recommended)": add playback, a resting progress, GIF stills
+  and data-module sources to CYLTabBarController's mini program `cyl-animated-item`, pin it by commit, then move the tags
+  onto it with no demo regression.
+- **Result upstream**: [CYLTabBarController PR #815](https://github.com/ChenYilong/CYLTabBarController/pull/815)
+  (branch `feat/animated-item-miniprogram-playback`, into `feat/cross-platform-components`): `fe1978e0` (`animationData`,
+  `autoplay`, `restingProgress`, `gifFirstFrame` / `gifLastFrame` / `gifDuration`, `playAnimation()` /
+  `restartAnimation()` / `stopAnimation()`), `3602ae67` (`riveWasmPath` / `pagWasmPath`; cyl-rive and cyl-pag treat an
+  empty `wasm-path` as their default), `ca6219a9` (`animationType`, for `.riv.bin` / `.pag.bin`), `b51ac0ae` (`embedded`:
+  no padding, 44 px minimum or accessibility role inside a tag). `npm test` there: 36 pass.
+- **Migration here**: the other session pushed the same migration first (`62fce9b`, vendored at `57a527e`, the engines
+  behind the example's `components/cyl-tag-animation-view`), so this session's copy was not committed (a patch is kept
+  in its scratchpad). Left (handed to that session): at `57a527e` a GIF tag loops with no stills and Play all cannot
+  restart it; once #815 is merged, move the pins to its merge commit and pass `gif-first-frame` / `gif-last-frame` /
+  `gif-duration` (and `embedded`) to the vendored component.
