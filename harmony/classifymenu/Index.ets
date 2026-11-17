@@ -44,7 +44,7 @@ export {
   cylTagAnimatedIconOuterWidth, cylTagAnimatedIconOuterHeight
 } from './src/main/ets/components/CYLTagAnimatedIcon';
 /**
- * CYLTabBarController's shared animated icon + title component (module `cylanimateditem`, vendored at commit c8132d2):
+ * CYLTabBarController's shared animated icon + title component (module `cylanimateditem`, vendored at commit 4635ef7):
  * an app registers the animation types it plays with `CYLAnimatedItemEngines.register(type)`.
  */
 export {
