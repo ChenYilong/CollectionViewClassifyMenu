@@ -20,8 +20,8 @@ if [ "$count" -gt 2 ]; then
   exit 2
 fi
 echo "OK: $branch has an open pull request; $count open in all."
-# Screenshots: python3 (macOS, Linux) or py (Windows), with Pillow.
-python=python3; command -v python3 >/dev/null 2>&1 && python3 -c 'import PIL' 2>/dev/null || python=py
+# Screenshots: any Python 3, standard library only (python3 on macOS and Linux, py on Windows).
+python=python3; python3 -c 'import sys' >/dev/null 2>&1 || python=py
 if ! "$python" "$(git rev-parse --show-toplevel)/scripts/check-screenshots.py"; then
   exit 3
 fi
