@@ -285,3 +285,8 @@ declarations, so Objective-C callers see no change.
   longer makes a view for a file Lottie cannot play. Every pin moves from `1f0fcce` to `fbd05d5`. The
   `:modular_headers => true` workarounds stay until CI confirms the module, then go. Pending CI.
 
+- **PR #814 merged** (2026-11-17): the owner merged CYLTabBarController PR #814 into `feat/cross-platform-components`
+  (PR #788, merge `9a54e26`), so every pin moves from `fbd05d5` to `9a54e26` and the AGENTS.md exception goes. The
+  newer `47aec88` ("report registered and missing animation engines", 05:25 UTC) is on the merged PR's branch
+  `fix/lottie-unplayable-file`, not in #788, and lacks the license notices: not pinned until it is merged into #788.
+  The `:modular_headers => true` workarounds stay until CI on this pin passes (`9a54e26` sets `DEFINES_MODULE`).
