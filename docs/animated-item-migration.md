@@ -105,3 +105,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Screenshots (2026-11-17, `333b349`)**: all 54 iOS example screens in [screenshots.md](screenshots.md) ("iOS: every example
   screen"), `assets/ios-1117/`. Bug fixed: `scripts/example-screenshots.sh` captured the previous app's last frame for the
   first screen of a run (`product@zh-Hans` showed the animations screen); it now waits 10 s more for the first launch.
+
+## TODO (2026-11-17, `feat/harmony`): raise the migration score from 80
+
+- **Prompt (verbatim)**: "fix The migration score stays at 80 / 100."
+- **Plan**: rows this Mac can close: 17 (HarmonyOS check on the emulator `CYL ClassifyMenu Test`), 22 (Flutter and React
+  Native Android builds with their toolchains); 19 if CYLTabBarController PR #815 is merged; 11 and 12 depend on upstream
+  (SwiftPM product) and CI (Xcode 26).
