@@ -484,9 +484,11 @@ private fun fileURL(context: Context?, value: Any?, baseURL: Uri?): Uri? {
         val file = fileURL(context, string.substring(0, hash), baseURL) ?: return null
         return file.buildUpon().encodedFragment(string.substring(hash + 1)).build()
     }
+    // An absolute file path first: `File.isAbsolute`, not a leading "/", so a drive path ("C:\...", the unit tests on
+    // Windows) is a file too and not an asset name or a one-letter URI scheme (CYLTabBarController B1).
+    if (File(string).isAbsolute) return Uri.fromFile(File(string))
     val parsed = Uri.parse(string)
     if ((parsed.scheme?.length ?: 0) > 1) return parsed
-    if (string.startsWith("/")) return Uri.fromFile(File(string))
     if (baseURL != null) {
         val candidate = normalized(baseURL.buildUpon().appendEncodedPath(string).build())
         if (exists(context, candidate)) return candidate
