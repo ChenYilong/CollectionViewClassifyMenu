@@ -42,6 +42,7 @@ set +e
   -scheme "$SCHEME" \
   -destination "id=$DEVICE_ID" \
   -derivedDataPath "$DERIVED_DATA" \
+  ${CYL_SWIFT_EXTRA_FLAGS:+"OTHER_SWIFT_FLAGS=\$(inherited) $CYL_SWIFT_EXTRA_FLAGS"} \
   CODE_SIGNING_ALLOWED=NO) > "$LOG" 2>&1
 STATUS=$?
 set -e
@@ -50,6 +51,10 @@ grep -E "^Test Case .*(passed|failed)|error: -\[|Executed [0-9]+ tests|\*\* TEST
 if [ "$STATUS" -ne 0 ]; then
   echo "xcodebuild test failed ($STATUS). Errors and last lines:"
   grep -nE "(error|fatal error):" "$LOG" | sort -u | head -n 60 || true
+  # [EN] With CYL_SWIFT_EXTRA_FLAGS=-Xfrontend -disable-deserialization-recovery the compiler names the declaration it
+  #      cannot load (a cross-reference into another module) instead of "members that could not be loaded".
+  # [CN] 设置 CYL_SWIFT_EXTRA_FLAGS 后，编译器会给出无法加载的跨模块引用。
+  grep -nE -A3 "[Cc]ross-reference|could not deserialize|xref|Could not find|deserializ" "$LOG" | head -n 80 || true
   tail -n 40 "$LOG"
 fi
 echo "Test screenshots: $(find "$SCREENSHOTS" -name '*.png' | wc -l | tr -d ' ') in $SCREENSHOTS"
