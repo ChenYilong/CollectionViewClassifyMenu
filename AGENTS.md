@@ -225,6 +225,14 @@ verify the behavior and update the applicable documentation.
   sorts by committer date; `--check` fails when a Podfile pins another commit).
   When it changed, update every pin and anything copied from CYLTabBarController
   in the same commit, after checking what changed in between.
+- Exception (owner's decision, 2026-11-17): the pins stay at `fbd05d5`
+  (branch `fix/lottie-unplayable-file`, CYLTabBarController PR #814) until #814
+  is merged into the newest branch, even when a newer commit exists: #814 stops
+  the Lottie animator from making a view for a file Lottie cannot play, which
+  `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay`
+  checks (CYLSearchViewController pins the same commit). The pin check warns
+  meanwhile; once #814 is merged, move every pin to the newest commit again and
+  remove this exception.
 - Search bars in the examples are CYLSearchViewController's `CYLSearchBarView`
   (the sibling `../CYLSearchViewController` repository, unreleased, no API
   compatibility to keep). Change it there as the examples need, commit and
