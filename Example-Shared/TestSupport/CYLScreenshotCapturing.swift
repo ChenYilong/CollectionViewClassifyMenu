@@ -31,6 +31,10 @@ extension CYLScreenshotCapturing where Self: XCTestCase {
     @discardableResult
     func captureScreenshot(of view: UIView, named name: String) -> UIImage {
         view.layoutIfNeeded()
+        // Animated icons (Lottie, PAG, Rive, SVGA, GIF) load and draw their first frame asynchronously: without a short
+        // run of the main run loop the picture shows the icons' empty places, although the app draws them.
+        RunLoop.main.run(until: Date().addingTimeInterval(0.5))
+        view.layoutIfNeeded()
         let format = UIGraphicsImageRendererFormat.preferred()
         let image = UIGraphicsImageRenderer(bounds: view.bounds, format: format).image { _ in
             view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
