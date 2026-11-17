@@ -241,3 +241,21 @@ declarations, so Objective-C callers see no change.
   `scripts/swift-api-baseline.json`); (2) the Android build and Robolectric tests (`android/scripts/gradle.sh merged
   :library:testDebugUnitTest :example:assembleDebug`) and the `build/repo` copy of `cylanimateditem`; (3) the example
   screenshots of the animated tags (Lottie, PAG, Rive, SVGA, GIF) against the previous ones.
+
+## TODO (2026-11-17): CYLAnimatedItem is its own pod and module
+
+- **Context**: branch `feat/harmony` (PR #20). CYLTabBarController's guide
+  ([docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md))
+  was updated at `1f0fcce` (`c53d2899`): the component is now the pod and module `CYLAnimatedItem`
+  (`CYLAnimatedItem.podspec`, subspecs `Core`, `Engine`, `LottieObjectiveC`, `Lottie`, `LottieSwift`, `PAG`,
+  `PAGEnterprise`, `Rive`, `SVGA`, `GIF`), with no dependency on CYLTabBarController; Swift writes
+  `import CYLAnimatedItem`, Objective-C `@import CYLAnimatedItem;`; Android's engine classes moved to
+  `com.cyl.animateditem` (type aliases stay in `com.cyl.tabbar`). Until it is on the trunk, every Podfile names
+  `pod 'CYLAnimatedItem'` by `:git` + `:commit`.
+- **Requirements**: re-read the updated guide and adjust: the core depends on `CYLAnimatedItem` (no engine), imports
+  it instead of CYLTabBarController; the examples add `CYLAnimatedItem/<Type>` engines; pins move to `1f0fcce`; lint
+  includes both podspecs; Android imports the new package.
+- **Prompt (verbatim)**: "更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
+- **Prompt (English)**: "The document was updated, latest address …/docs/Animated-Item.md; some descriptions changed. Please
+  read it again and adjust."
+- **Status**: started.
