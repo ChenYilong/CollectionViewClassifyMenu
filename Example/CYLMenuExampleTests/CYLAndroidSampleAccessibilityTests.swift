@@ -176,7 +176,8 @@ final class CYLAndroidSampleAccessibilityTests: CYLMenuExampleTestCase {
 
         // Activating the picture toggles the groups, as a tap does; hidden groups have no elements.
         XCTAssertTrue(picture.accessibilityActivate())
-        runMainLoop(for: UIAccessibility.isReduceMotionEnabled ? 0.05 : 1.2)
+        // The hide animation (the dot's bounce, then a 0.4 s fade) ends later on a busy CI simulator: wait for it.
+        waitUntil { group.isGroupHidden }
         XCTAssertTrue(group.isGroupHidden)
         XCTAssertEqual((group.accessibilityElements ?? []).count, 0)
         imageView.toggleTagGroups(animated: false)

@@ -266,3 +266,18 @@ declarations, so Objective-C callers see no change.
   commit; Android imports `CYLTabBarItemAnimationViewMaking` from `com.cyl.animateditem`. Not built here (no Xcode,
   no Android SDK). TODO: CI on the commit; the Objective-C redeclarations of `d3efc5f` can go once Objective-C tests
   `@import CYLAnimatedItem;` (kept for now: the owner rejected importing the tab bar, and they work).
+- **CI on `7183711`** (run 44017316252): three failures.
+  1. "Unit tests (menu)": the demo app could not load `CYLClassifyMenuViewController`'s members. The root Podfile
+     builds static libraries, and `CYLAnimatedItem.podspec` does not set `DEFINES_MODULE`, so the module
+     `CYLTagButton` imports did not exist there. Fix: `:modular_headers => true` on the pod in the root and
+     TagCollectionView Podfiles (the other Podfiles use frameworks). Upstream suggestion: `DEFINES_MODULE` in
+     `CYLAnimatedItem.podspec`.
+  2. `CYLAndroidSampleAccessibilityTests.testPictureAndTagGroupsAreAccessibilityElements`: the groups were not hidden
+     after a fixed 1.2 s wait (the image tag code does not use `CYLTagButton`). The test now waits for the condition.
+  3. **TODO, upstream**: `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` fails for a file
+     with an unknown extension. CYLTabBarController's Lottie animator takes every file no other animator takes
+     (`canAnimateFileAtURL:` returns `URL != nil`), and its Objective-C player returns a `LOTAnimationView` even when
+     the file is not an animation, so the static image is hidden instead of shown. The guide lists the Lottie
+     Objective-C load callback as TODO 2. The fix belongs in CYLTabBarController (return no view when the
+     composition does not load); the test is kept as written.
+
