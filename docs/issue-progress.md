@@ -197,6 +197,21 @@ tags: [issues, ui, cocoapods, progress]
   `.agents/skills/cyl-commit/SKILL.md` (new section), `docs/instructions.md` and `harmony/instructions.md`, all
   appended; `scripts/check-commit-message.sh` checks the subject format, the author line and CJK characters.
 
+### Done (2026-11-17, `feat/harmony`): CYLTagListView members visible to Objective-C
+
+- Prompt (verbatim): "Fix others report issue Still open: the pin bump. This repo still uses the old Nov 12 version of CollectionViewClassifyMenu. Moving to the new one is still blocked: at 652e084, most CYLTagListView members still aren't visible to Objective-C, and our React Native iOS wrapper needs them. The fix is to mark those members @objc in that repo, which I now have access to. Do you want me to do that next?"
+- Context: another repository pins the Nov 12 pod and calls `CYLTagListView` from an Objective-C(++) React Native
+  wrapper. Since the Swift migration, 177 of the view's 182 public members have no `@objc`, so the generated
+  `CollectionViewClassifyMenu-Swift.h` does not declare them. This repository's own React Native wrapper is not
+  affected (it goes through a Swift bridge).
+- Requirements: expose every Objective-C-representable public member of `CYLTagListView` (properties, methods,
+  initializers, the configuration API) with conventional Objective-C names; keep the Swift names; give members whose
+  types Objective-C cannot see (`CYLTag`, `CYLTagColors`, `CGFloat?`) an Objective-C route; prove it with an
+  Objective-C test in the core's tests.
+- Status: done in the core (not compiled here: Linux, no Xcode; CI builds and tests it). Result and details:
+  `Swift-Migration.md`, "Objective-C API changes". The other repository can move its pin to the commit that adds
+  this.
+
 ### TODO (2026-11-16): SVGA animated icons (CYLTabBarController added SVGA)
 
 - **Prompt (verbatim):** "找到本项目相关文档，加入TODO：cyltabbar 现已增加svga动效，更新core代码以支持该动效，要求example层一比一复刻rive相关演示。只要rive有的演示场景 svga也要有。"
