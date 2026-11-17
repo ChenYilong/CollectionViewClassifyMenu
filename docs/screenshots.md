@@ -2,8 +2,8 @@
 
 Screenshots from CI/CD and local builds that have no feature document of their own. Images live in `assets/`.
 Rules: AGENTS.md, "CI/CD and Example screenshots" (labels: platform, OS version, simulator / emulator version, platform
-SDK version, repository version or commit URL, time taken; clear originals). Stitching (2026-11-18): portrait, two
-columns, header, panel captions and footer in their own bands (AGENTS.md; `.agents/skills/cyl-screenshots/SKILL.md`).
+SDK version, repository version or commit URL, time taken; clear originals). Stitching (2026-11-18): one column, two
+when taller than a phone screen; header, panel captions and footer in their own bands (AGENTS.md; `.agents/skills/cyl-screenshots/SKILL.md`).
 
 | Screenshot | Platform | Environment | Commit | Taken |
 | --- | --- | --- | --- | --- |
@@ -204,3 +204,8 @@ the iOS example opens one there is not checked yet.
   than one screen of an ordinary phone, use two columns with several rows.
 - **Plan**: append the update to AGENTS.md, `instructions.md`, `../scripts/instructions.md` and the `cyl-screenshots`
   skill; `scripts/stitch-screenshots.swift` picks the columns by this rule by default (`--columns auto`).
+- **Result (2026-11-18)**: DONE. AGENTS.md "Screenshots: columns, update", `instructions.md`, `../scripts/instructions.md`
+  and the `cyl-screenshots` skill updated; `scripts/stitch-screenshots.swift` chooses one or two columns by the rule
+  (`--columns auto`, the default). One column (two cropped panels, 1148 x 1081 px):
+
+  ![iOS Rive icons at rest, one column with header and footer](assets/ios-rive-rest-one-column.png)
