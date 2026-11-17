@@ -88,14 +88,23 @@ afterEvaluate {
 // publishes that module of the pinned CYLTabBarController (the included build's `staging` repository) and copies it
 // next to the library.
 val cylTabBarBuild = gradle.includedBuilds.firstOrNull { File(it.projectDir, "cylanimateditem").isDirectory }
-val publishAnimatedItemToBuildRepository by tasks.registering(Copy::class) {
+// A plain task that copies in its action, not a `Copy` task: a `Copy` task declares build/repo as its output, and on its
+// first run after a clean Gradle removes that folder's "stale" files first, which deleted the library's own artifact
+// (com.cyl:classifymenu) published just before, so the React Native and Flutter hosts could not resolve it.
+val publishAnimatedItemToBuildRepository by tasks.registering {
+    val repo = layout.buildDirectory.dir("repo")
+    val staging = cylTabBarBuild?.let { File(it.projectDir, "build/staging-deploy") }
     if (cylTabBarBuild != null) {
         dependsOn(cylTabBarBuild.task(":cylanimateditem:publishReleasePublicationToStagingRepository"))
-        from(File(cylTabBarBuild.projectDir, "build/staging-deploy")) {
-            include("io/github/chenyilong/cyltabbarcontroller-animateditem/**")
+    }
+    doLast {
+        if (staging != null) {
+            copy {
+                from(staging) { include("io/github/chenyilong/cyltabbarcontroller-animateditem/**") }
+                into(repo)
+            }
         }
     }
-    into(layout.buildDirectory.dir("repo"))
 }
 tasks.matching { it.name == "publishReleasePublicationToBuildRepository" }.configureEach {
     finalizedBy(publishAnimatedItemToBuildRepository)
