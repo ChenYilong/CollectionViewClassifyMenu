@@ -56,7 +56,8 @@ function configuration(t = (s) => s) {
     { title: t('动效二'), animation: 'pag-ios/1.pag', animationRestingProgress: 1 }] });
   // The options CYLTabBarController's Rive examples use for each file.
   sections.push({ title: "Rive · pod 'CYLTabBarController/Rive'", items: [
-    rive('首页', 'house', { stateMachine: 'State Machine 1' }),
+    // house.riv moves only when its number input Rooms changes: each play sets the next of `values` (CYLTabBarController B20).
+    rive('首页', 'house', { stateMachine: 'State Machine 1', numberInput: 'Rooms', values: '3,4,5,6' }),
     rive('完成', 'check', { stateMachine: 'State Machine 1', triggerInput: 'Check' }),
     rive('菜单', 'menu_button', { stateMachine: 'State Machine', input: 'isOpen', duration: '0' }),
     rive('按钮', 'button', { animation: 'active' }),

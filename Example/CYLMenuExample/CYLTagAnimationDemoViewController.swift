@@ -98,7 +98,7 @@ final class CYLTagAnimationDemoViewController: UIViewController {
         // The options CYLTabBarController's Rive examples use for each file (Example-SwiftUI-Rive): a Rive icon needs its
         // state machine and input (or animation), given with CYLTagItemKey.animationOptions. icons.riv follows, on dark tags.
         sections.append([CYLTagSectionKey.title: "Rive · pod 'CYLTabBarController/Rive'", CYLTagSectionKey.items: [
-                item("首页", rive: "house", options: ["stateMachine": "State Machine 1"]),
+                item("首页", rive: "house", options: ["stateMachine": "State Machine 1", "numberInput": "Rooms", "values": "3,4,5,6"]),
                 item("完成", rive: "check", options: ["stateMachine": "State Machine 1", "triggerInput": "Check"]),
                 item("菜单", rive: "menu_button", options: ["stateMachine": "State Machine", "input": "isOpen", "duration": "0"]),
                 item("按钮", rive: "button", options: ["animation": "active"]),
