@@ -35,6 +35,12 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Open (2026-11-17): CYLAnimatedItem migration, score 72
+
+- Progress against CYLTabBarController's `docs/Animated-Item.md`, item by item, and the TODOs (iOS CI and the static-library
+  demo app, SwiftPM product, PR #815 merge for the mini program GIF stills, HarmonyOS / WeChat DevTools / Flutter and React
+  Native Android builds): [animated-item-migration.md](animated-item-migration.md).
+
 ### Done (2026-11-17, `feat/harmony`): CYLAnimatedItem module in static-library Podfiles, again
 
 - Prompt (verbatim): "continue fix todo还没发布的组件尝试使用commit方式导入。不要阻碍进度"
