@@ -55,6 +55,20 @@ afterEvaluate {
                 groupId = "com.cyl"
                 artifactId = "classifymenu"
                 version = "0.1.0"
+                // The AAR carries META-INF/classifymenu/LICENSE, NOTICE and LICENSE-APACHE-2.0 (AGENTS.md, "License in
+                // every published package"): MIT, with Apache-2.0 for the translated AndroidTagView and android-tagview.
+                pom {
+                    licenses {
+                        license {
+                            name.set("The MIT License")
+                            url.set("https://opensource.org/licenses/MIT")
+                        }
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                }
             }
         }
         repositories {

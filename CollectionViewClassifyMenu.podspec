@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version      = '0.1.0'
   s.summary      = 'Collection view menus with collapsible and multiple-choice filters for iOS.'
   s.homepage     = 'https://github.com/ChenYilong/CollectionViewClassifyMenu'
-  s.license      = { :type => 'Copyright', :text => 'Copyright (c) ChenYilong. All rights reserved. See individual source files for their copyright notices.' }
+  s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { 'ChenYilong' => 'luohanchenyilong@163.com' }
   s.social_media_url = 'http://weibo.com/luohanchenyilong/'
   s.platform     = :ios, '15.0'
@@ -31,6 +31,8 @@ Pod::Spec.new do |s|
     'CollectionViewClassifyMenu/Class/Other/Symtem/Images.xcassets',
     'CollectionViewClassifyMenu/Resources/Localization/*.lproj',
     'CollectionViewClassifyMenu/Resources/Privacy/PrivacyInfo.xcprivacy',
+    # The license and the third-party notices ship inside the bundle (AGENTS.md, "License in every published package").
+    'CollectionViewClassifyMenu/Resources/License/*',
     'TagCollectionView/TagCollectionView/CYLTagView.xib',
     'TagCollectionView/TagCollectionView/Views/*.xib'
   ] }

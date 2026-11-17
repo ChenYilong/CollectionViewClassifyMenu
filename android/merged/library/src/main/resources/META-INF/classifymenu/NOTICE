@@ -1,0 +1,14 @@
+com.cyl:classifymenu (CollectionViewClassifyMenu for Android)
+Copyright (c) 2015-2026 ChenYilong. Licensed under the MIT License (LICENSE).
+
+This library contains code translated to Kotlin and modified from the following projects, licensed under the
+Apache License, Version 2.0 (LICENSE-APACHE-2.0). Every translated file keeps its original notice and states that it
+was changed.
+
+- AndroidTagView (package co.lujun.androidtagview): Copyright 2015 lujun.
+  https://github.com/whilu/AndroidTagView
+- android-tagview (package me.kaede.tagview): Copyright (c) kaedea.
+  https://github.com/kaedea/android-tagview
+
+TagViewGroup (package com.licrafter.tagview) is not a translation: only the names of its public API were used and
+the behavior was written anew, so none of its GPL-3.0 code is included.

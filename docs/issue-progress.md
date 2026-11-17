@@ -35,6 +35,26 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-17, `feat/harmony`): every published package ships its license
+
+- Prompt (verbatim): "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入：所有需要发布到外部仓库的代码，包括但不限于 cocoapods graddle npm maven等等 必须包含协议声明，如果已经有内置包文件夹就放进去，如果没有就新建，确保写入成功。以iOS为例，内置包bundle文件应包含协议文件。此操作适用于所有平台。"
+- Requirements: write the rule, in English, into the instructions (AGENTS.md) and a skill (create them when missing):
+  every package published to an external registry (CocoaPods, Gradle / Maven, npm, pub.dev, ohpm, the mini program
+  npm packages…) contains a license declaration; when the package has a built-in resource container (iOS: the
+  resource bundle) the license file goes into it, otherwise one is created; every platform.
+- Decision (asked, 2026-11-17): MIT for this repository's own code; third-party code keeps its license.
+- Result: the rule is in AGENTS.md ("License in every published package") and the new skill
+  `.agents/skills/cyl-license/`. Files: `LICENSE` (MIT) and `THIRD-PARTY-NOTICES.md` at the root and in the iOS bundle
+  (`CollectionViewClassifyMenu/Resources/License/`, podspec `s.license` MIT with `:file`, `s.resource_bundles`, SwiftPM
+  `.copy`); Android `META-INF/classifymenu/{LICENSE,NOTICE,LICENSE-APACHE-2.0}` (POM MIT + Apache-2.0) and
+  `META-INF/androidtagview/{LICENSE,NOTICE}` (Apache-2.0); MIT `LICENSE` for npm (React Native), both pub.dev packages
+  (the Flutter "TODO" placeholder replaced) and their HAR, the ohpm HAR (module root and `rawfile`), the mini program
+  package (root, listed in `files`, expected by `verify-package.js`). Check: `scripts/check-licenses.sh` (passes,
+  shellcheck clean); mini program `verify-package.js` and `npm test` 111/111 pass. Not built here: the iOS bundle, the
+  AAR and the HAR (CI and the platform toolchains).
+- Found: the packages disagree (iOS podspec "All rights reserved", npm / ohpm / mini program "MIT", Flutter LICENSE a
+  "TODO" placeholder, the AndroidTagView port Apache-2.0 from its upstream, the merged Android library none).
+
 ### TODO (2026-11-16): reproduce and handle the Rive crash on the HarmonyOS emulator
 
 - **Context:** the HarmonyOS animation screen crashed in `libohos_rive.so` (`EGLWorkerImpl::destroy` →
