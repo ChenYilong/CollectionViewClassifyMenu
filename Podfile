@@ -13,7 +13,9 @@ CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController
 target 'CollectionViewClassifyMenu' do
   pod 'CollectionViewClassifyMenu', :path => '.'
   pod 'CYLTabBarController', CYL_TAB_BAR
-  pod 'CYLAnimatedItem', CYL_ANIMATED_ITEM
+  # Modular headers: CYLAnimatedItem is Objective-C and its podspec does not set DEFINES_MODULE, and this Podfile builds
+  # static libraries, so without them the module that CYLTagButton imports does not exist for the targets here.
+  pod 'CYLAnimatedItem', CYL_ANIMATED_ITEM.merge(:modular_headers => true)
 
   target 'CollectionViewClassifyMenuTests' do
     inherit! :search_paths
