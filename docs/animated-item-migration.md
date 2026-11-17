@@ -108,6 +108,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    (`menu_button.riv`, `isOpen` held by `duration: 0`) plays once, then stays at x. iOS: the same code paths (legacy
    returns without an input; `duration: 0` holds the boolean), not run here (no Mac); asked of the Mac session. Flutter's
    example passes no Rive options (it plays each file's first linear animation): to check. Fix: CYLTabBarController B20.
+   **Mini program after CYLTabBarController's `cyl-rive` fix `39778645`** (pin moved to `6f44f26f` in
+   `scripts/fetch-cyltabbar.js`; `npm test` 138 pass; WeChat DevTools, Animations page `?autoplay=1` (2x, loop on),
+   8 frames over 15 s, `assets/miniprogram-devtools-rive-b20-after-39778645.png` and `-page.jpg`; changed pixels per
+   icon between frames): Shapes, Truck and the `icons.riv` dark tags (Chat, Search, Timer, Alerts, Me) change in
+   almost every frame; Menu replays (caught mid-transition); **Home (`house.riv`), Done (`check.riv`) and Button
+   (`button.riv`) still show 0 changed pixels in all 8 frames**. No Rive error in the console. Still TODO for those three
+   (or a replay shorter than the 2 s capture interval for Done); reported to the Mac-CYLTabBarController session.
    **iOS run (2026-11-18, Mac session, `689096f`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
    Pro, iOS 27.2), pins `fe5c3ae`, English, launched with `-CYLExampleScreen animations-rive-loop` (new: scrolls to the
    Rive section, loop on, Play all); frames 4–14 s after Play all (`assets/ios-rive-b20-frames.jpeg`, first frame
