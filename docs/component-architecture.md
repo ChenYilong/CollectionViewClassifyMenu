@@ -280,4 +280,8 @@ declarations, so Objective-C callers see no change.
      the file is not an animation, so the static image is hidden instead of shown. The guide lists the Lottie
      Objective-C load callback as TODO 2. The fix belongs in CYLTabBarController (return no view when the
      composition does not load); the test is kept as written.
+- **Upstream fixes pinned** (2026-11-17): CYLTabBarController `fbd05d5` (branch `fix/lottie-unplayable-file`, PR #814,
+  the newest commit on any branch) sets `DEFINES_MODULE` in `CYLAnimatedItem.podspec`, and its Lottie animator no
+  longer makes a view for a file Lottie cannot play. Every pin moves from `1f0fcce` to `fbd05d5`. The
+  `:modular_headers => true` workarounds stay until CI confirms the module, then go. Pending CI.
 
