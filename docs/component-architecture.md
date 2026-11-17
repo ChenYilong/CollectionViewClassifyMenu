@@ -152,32 +152,9 @@ declarations, so Objective-C callers see no change.
 
 ## 动效组件改造进度 / Progress against CYLTabBarController's Animated-Item.md
 
-- **TODO (2026-11-17)**: keep this table current; the entries below it are the detailed task logs.
-- **Prompt (verbatim)**: "告诉我 你遵循文档改造的进度，并在本仓库合适地方标注进度以及todo。这个文档是与动效组件相关的。告诉我 你遵循文档改造的进度https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md"
-- **Prompt (English)**: "Tell me how far you have followed the document, and mark the progress and the TODOs in a suitable
-  place in this repository. The document is about the animated component."
-- **Guide**: [docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md),
-  read at CYLTabBarController `e3ebc242` (2026-11-17 07:00 UTC). Pinned here: `57a527e` (`CYL_TAB_BAR` and
-  `CYL_ANIMATED_ITEM` in the Podfiles), which has the same component code as `e3ebc242` (that commit only changes docs).
-- **Score**: 9 of the 14 rows below are done in code = **64 / 100**. Nothing in this table was compiled in the Linux
-  container (no Xcode, no Android SDK, no DevEco Studio, no WeChat DevTools); CI is the build check.
-
-| 文档要求 / Guide requirement | 状态 / Status | 证据或 TODO / Evidence or TODO |
-|:---|:---|:---|
-| iOS `CYLTagButton` subclasses `CYLAnimatedItemView`; `CYLTagAnimationEngine` deleted | DONE | `1813025`, `CollectionViewClassifyMenu/Class/TagList/CYLTagButton.swift` |
-| Core depends on the pod `CYLAnimatedItem` (`Core`, no engine), never on CYLTabBarController; `import CYLAnimatedItem` (re-exported) | DONE | podspec `s.dependency 'CYLAnimatedItem'`; `@_exported import CYLAnimatedItem` (`b4d0e51` follow-up) |
-| Examples add the engines (`CYLAnimatedItem/<Type>`); the core has none | DONE | example Podfiles; HarmonyOS and mini program examples register their engines |
-| Unreleased pods by `:git` + `:commit` (never a version) | DONE | `CYL_TAB_BAR` / `CYL_ANIMATED_ITEM` = `57a527e`; `scripts/cyl-tabbar-latest-commit.sh --check` |
-| Display priority, failure cases, URL loading: from the base class, not reimplemented | DONE | `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` (upstream Lottie fix `fbd05d5`, PR #814) |
-| Android `CYLTagButton` on `com.cyl.animateditem.CYLAnimatedItemView` | DONE | `android/merged/library/.../CYLTagButton.kt`; substitution to `:cylanimateditem` in `android/merged/settings.gradle.kts` |
-| Android menu buttons and filter header on `CYLTagButton` | DONE, CI pending | `cadbe53` (`CYLIndexPathButton`, `CYLRightImageButton`, `CYLMultipleFilterHeaderView`) |
-| HarmonyOS tags draw their icon with `CYLAnimatedItemView` | DONE, not compiled | `1a8a80b`; component vendored at `57a527e` in `harmony/cylanimateditem` |
-| Mini program tags on `cyl-animated-item` | DONE, not run in DevTools | `62fce9b`; vendored by `scripts/fetch-cyltabbar.js`; `npm test` 126 / 126 |
-| iOS CI green on the pin (pod lib lint, unit tests, demo builds) | TODO | last known: `pod lib lint` passed on `b4d0e51`; "Unit tests (menu)" fix (`@_exported import`) waits for a green run |
-| Mini program GIF stills, Play all / speed / loop through the component | TODO, upstream | CYLTabBarController PR #815 (`gifFirstFrame` / `gifLastFrame` / `gifDuration`, `restartAnimation()`, `embedded`); once merged: pin its merge commit and pass the new properties |
-| HarmonyOS gaps in `CYLAnimatedItemView` (square icon only, no pixel map / symbol image, type by extension only) | TODO, upstream | ask CYLTabBarController (core first); check on a device |
-| React Native and Flutter HarmonyOS shells build `cylanimateditem` and register engines | TODO | `react-native/.../harmony-example`, `flutter/cyl_tag_list_ohos` |
-| Publishing: `CYLAnimatedItem` (trunk), `cylanimateditem` (ohpm), the mini program package before this repo's packages | TODO, blocked | waits for CYLTabBarController's release; until then every platform takes them by commit |
+The progress table, score and TODO list against CYLTabBarController's
+[docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)
+are kept in one place: [animated-item-migration.md](animated-item-migration.md). The entries below are the detailed task logs.
 
 ## DONE (2026-11-17): CYLTagButton subclasses CYLTabBarController's CYLAnimatedItemView; no animation engine in the core
 
