@@ -118,9 +118,14 @@ class _TagListPageState extends State<TagListPage> {
         {
           'title': 'Rive · pod CYLTabBarController/Rive',
           'items': [
-            animated('Home', 'rive/house.riv'),
-            animated('Done', 'rive/check.riv'),
-            animated('Menu', 'rive/menu_button.riv'),
+            // Rive state machines and inputs, as on the other platforms: without them the player drives the default
+            // input "active", which these files do not have, so nothing plays.
+            {...animated('Home', 'rive/house.riv'), 'animationOptions': {'stateMachine': 'State Machine 1'}},
+            {...animated('Done', 'rive/check.riv'), 'animationOptions': {'stateMachine': 'State Machine 1', 'triggerInput': 'Check'}},
+            {
+              ...animated('Menu', 'rive/menu_button.riv'),
+              'animationOptions': {'stateMachine': 'State Machine', 'input': 'isOpen', 'duration': '0'},
+            },
           ],
         },
         {

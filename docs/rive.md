@@ -43,3 +43,17 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
   and the three `.riv` files are in `flutter_assets`, but the Rive tags show no icon (`assets/flutter-ios-rive-section-13bcb84.png`);
   the native iOS example draws the same files (`../assets/rive-tags-transparent-background.png`). Not yet run: Flutter
   Android, React Native iOS and Android.
+
+## Bug fixed (2026-11-18): Rive tags in the React Native and Flutter examples played once or never
+
+- Reported by the maintainer through the CYLTabBarController session: Rive icons in "Rive · pod 'CYLTabBarController/Rive'"
+  play once and stop; on React Native some never play.
+- Cause here: the React Native (`example/src/TagListPage.tsx`) and Flutter (`example/lib/main.dart`) examples listed
+  `house.riv`, `check.riv` and `menu_button.riv` without the `animationOptions` the other platforms pass, so the player
+  drove the default input `active`, which these files do not have.
+- Fix: `house` `{stateMachine: 'State Machine 1'}`, `check` `{stateMachine: 'State Machine 1', triggerInput: 'Check'}`,
+  `menu_button` `{stateMachine: 'State Machine', input: 'isOpen', duration: '0'}`, as in
+  `harmony/entry/src/main/resources/rawfile/menu/animation-demo.json`. Checked: `tsc --noEmit` and `flutter analyze`
+  clean; not yet run on a simulator.
+- Still TODO upstream (CYLTabBarController, recorded in its `docs/WeChat-Mini-Program.md`): looping and replaying Rive
+  icons (no state machine restart, triggers never loop, a held input cannot replay).
