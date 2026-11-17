@@ -31,6 +31,22 @@
     {
       "name": "cyl_secondary_text",
       "value": "#993C3C43"
+    },
+    {
+      "name": "cyl_chip_background",
+      "value": "#FFF5F5F5"
+    },
+    {
+      "name": "cyl_chip_border",
+      "value": "#FFE0E0E0"
+    },
+    {
+      "name": "cyl_chip_text",
+      "value": "#FF4C4C4C"
+    },
+    {
+      "name": "cyl_chip_text_disabled",
+      "value": "#FFB2B2B2"
     }
   ]
 }
