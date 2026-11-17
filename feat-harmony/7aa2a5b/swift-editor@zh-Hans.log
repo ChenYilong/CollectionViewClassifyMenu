@@ -1,0 +1,2 @@
+[CYLExampleLayout] screen=editor top=CYLTagEditorViewController tags=["家人", "大学同学", "读书会"]
+[CYLExampleLayout] editor sections=最近使用(3),我的标签(48) selected=["家人", "大学同学", "读书会"] query= done=true tagList={{0, 130}, {402, 511}} contentHeight=728.0 selectedIndexPaths=4
