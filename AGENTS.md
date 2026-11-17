@@ -225,10 +225,15 @@ verify the behavior and update the applicable documentation.
   sorts by committer date; `--check` fails when a Podfile pins another commit).
   When it changed, update every pin and anything copied from CYLTabBarController
   in the same commit, after checking what changed in between.
+- A pull request branch that is already merged into the newest branch does not
+  count, even when it gets a newer commit afterwards (owner's decision,
+  2026-11-17): pin the newest branch's tip, and move once that newer commit is
+  merged there. CollectionViewClassifyMenu and CYLSearchViewController pin the
+  same commit.
 - Note (2026-11-17): from `4622434` to the next pin the pins stayed at `fbd05d5`
   (CYLTabBarController PR #814) because the newest branch lacked it; the owner
   merged #814 into `feat/cross-platform-components` (PR #788, `9a54e26`), so the
-  pins follow the newest commit again (over every branch, as the rule above says).
+  pins follow the newest commit of that branch again.
 - Search bars in the examples are CYLSearchViewController's `CYLSearchBarView`
   (the sibling `../CYLSearchViewController` repository, unreleased, no API
   compatibility to keep). Change it there as the examples need, commit and
