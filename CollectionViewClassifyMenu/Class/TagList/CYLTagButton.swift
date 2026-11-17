@@ -262,6 +262,77 @@ open class CYLTagButton: CYLAnimatedItemView {
         updateAppearance()
     }
 
+    // MARK: - Inherited members for Objective-C
+
+    // [EN] Redeclared so that they are in this module's generated Objective-C header: an Objective-C file that imports only
+    //      CollectionViewClassifyMenu does not see CYLAnimatedItemView's own declarations (Clang shows a module's
+    //      declarations only to a file that imports that module), and must not need to import CYLTabBarController.
+    //      Each one only forwards to CYLAnimatedItemView.
+    // [CN] 重新声明，使其出现在本模块生成的 Objective-C 头文件中：只导入 CollectionViewClassifyMenu 的 Objective-C 文件看不到
+    //      CYLAnimatedItemView 自己的声明（Clang 只向导入了该模块的文件展示其声明），而它不应需要导入 CYLTabBarController。每个成员只转发给
+    //      CYLAnimatedItemView。
+
+    /**
+     * The animation file the icon plays (any file of CYLTabBarController's animation engine), or nil.
+     */
+    open override var animationURL: URL? {
+        get { super.animationURL }
+        set { super.animationURL = newValue }
+    }
+
+    /**
+     * Whether the animation repeats.
+     */
+    open override var animationLoops: Bool {
+        get { super.animationLoops }
+        set { super.animationLoops = newValue }
+    }
+
+    /**
+     * The view playing `animationURL`, while ready; always nil without an animation engine.
+     */
+    open override var animationView: UIView? { super.animationView }
+
+    /**
+     * The icon's image view (the static image, else the placeholder, until the animation shows).
+     */
+    open override var imageView: UIImageView { super.imageView }
+
+    /**
+     * The title label.
+     */
+    open override var titleLabel: UILabel { super.titleLabel }
+
+    /**
+     * The accessory beside the content (the delete indicator).
+     */
+    open override var accessoryView: UIView? {
+        get { super.accessoryView }
+        set { super.accessoryView = newValue }
+    }
+
+    /**
+     * Shown when there is no static image and `animationURL` cannot play; nil restores the default placeholder.
+     */
+    open override var placeholderImage: UIImage! {
+        get { super.placeholderImage }
+        set { super.placeholderImage = newValue }
+    }
+
+    /**
+     * Plays the animation again from its first frame.
+     */
+    open override func restartAnimation() {
+        super.restartAnimation()
+    }
+
+    /**
+     * Stops the animation and goes back to its resting frame.
+     */
+    open override func stopAnimation() {
+        super.stopAnimation()
+    }
+
     // MARK: - Animation
 
     /**
