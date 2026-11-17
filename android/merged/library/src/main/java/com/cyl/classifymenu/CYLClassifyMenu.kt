@@ -7,12 +7,10 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -24,156 +22,143 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
- * `CYLIndexPathButton`: a button that knows its item (section, row), with spacing between its image and title and
- * an inset before the title (dp). It lays its image and title out as the iOS button does: centered gravity centers
- * image and title together (`UIControlContentHorizontalAlignmentCenter`), start gravity puts them at the leading edge;
- * then the image moves `cyl_imageTitleSpacing / 2` toward the leading edge and the title the same toward the trailing
- * edge, plus `cyl_titleLeadingInset`. So with the same parameters the padding before the image equals the padding
- * after the title, as on iOS.
+ * `CYLIndexPathButton`: a tag that knows the item it shows (`section`, `row`): a `CYLTagButton`, as on iOS, drawn from
+ * its `style` (for example `CYLMenuStyle.classifyMenuTag()`, `CYLMenuStyle.filterTag()` or
+ * `CYLMenuStyle.sectionTitle()`), with `title`, `image` and `animationURL`. The icon, the title, the animated icon, its
+ * placeholder and its fallbacks are `CYLTagButton`'s (and `CYLAnimatedItemView`'s). TalkBack reads it as one button
+ * labeled with the title as shown, with its selected state.
  */
-open class CYLIndexPathButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : Button(context, attrs) {
+open class CYLIndexPathButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : CYLTagButton(context, attrs) {
+
+    /**
+     * The section of the item the button shows.
+     */
     var section: Int = 0
+
+    /**
+     * The row (item) of the item the button shows.
+     */
     var row: Int = 0
 
     /**
-     * The space between the image and the title, dp.
+     * The space between the image and the title, dp: `style.imageTitleSpacing`.
      */
-    var cyl_imageTitleSpacing: Float = 0f
-        set(value) {
-            if (field == value) return
-            field = value
-            requestLayout()
+    var cyl_imageTitleSpacing: Float
+        get() = style!!.imageTitleSpacing
+        set(value) = changeStyle { it.imageTitleSpacing = value }
+
+    /**
+     * The space before the content (the icon, or the title alone), dp: the leading content inset of every state of
+     * `style`, as `CYLMenuStyle.sectionTitle(leadingInset = …)` sets it.
+     */
+    var cyl_titleLeadingInset: Float
+        get() = style!!.normalAppearance.contentInsets.left
+        set(value) = changeStyle { copy ->
+            for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
+                val appearance = copy.appearanceForState(state)
+                appearance.contentInsets = appearance.contentInsets.copy(left = value)
+            }
         }
 
     /**
-     * Extra space before the title, dp.
+     * The horizontal gravity of the icon and title: `Gravity.CENTER_HORIZONTAL` (or `Gravity.CENTER`) centers them
+     * (`style.contentAlignment` center), any other value puts them at the leading edge. The content is always centered
+     * vertically.
      */
-    var cyl_titleLeadingInset: Float = 0f
-        set(value) {
-            if (field == value) return
-            field = value
-            requestLayout()
+    var gravity: Int
+        get() {
+            val centered = style!!.contentAlignment == CYLTagContentAlignment.CYLTagContentAlignmentCenter
+            return if (centered) Gravity.CENTER else Gravity.CENTER_VERTICAL or Gravity.START
+        }
+        set(value) = changeStyle {
+            val centered = (value and Gravity.HORIZONTAL_GRAVITY_MASK) == Gravity.CENTER_HORIZONTAL
+            it.contentAlignment = if (centered) CYLTagContentAlignment.CYLTagContentAlignmentCenter else CYLTagContentAlignment.CYLTagContentAlignmentLeading
         }
 
     /**
-     * The horizontal gravity the caller asked for (null: centered, the iOS default); the button itself always uses
-     * start gravity with computed padding.
+     * `currentImage`: the static icon of the current state, `selectedImage` while selected (when set), else `image`.
      */
-    private var requestedHorizontalGravity: Int? = null
-
-    init {
-        isAllCaps = false
-        minHeight = 0
-        minimumHeight = 0
-        minWidth = 0
-        minimumWidth = 0
-        setPadding(0, 0, 0, 0)
-        stateListAnimator = null
-        maxLines = 1
-    }
-
-    override fun setGravity(gravity: Int) {
-        requestedHorizontalGravity = gravity and android.view.Gravity.HORIZONTAL_GRAVITY_MASK
-        super.setGravity((gravity and android.view.Gravity.VERTICAL_GRAVITY_MASK).let { if (it == 0) Gravity.CENTER_VERTICAL else it } or Gravity.START)
-    }
+    val currentImage: Drawable?
+        get() = if (isSelected && selectedImage != null) selectedImage else image
 
     /**
-     * `setImage:forState:` for the normal state: the image before the title.
+     * Changes a copy of `style` and sets it, so the tag lays itself out again.
      */
-    fun setImage(image: Drawable?) {
-        image?.setBounds(0, 0, image.intrinsicWidth, image.intrinsicHeight)
-        setCompoundDrawablesRelative(image, null, null, null)
-        requestLayout()
-    }
-
-    /**
-     * `currentImage`.
-     */
-    val currentImage: Drawable? get() = compoundDrawablesRelative[0]
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        cyl_layoutContent(right - left)
-        super.onLayout(changed, left, top, right, bottom)
-    }
-
-    override fun onTextChanged(text: CharSequence?, start: Int, lengthBefore: Int, lengthAfter: Int) {
-        super.onTextChanged(text, start, lengthBefore, lengthAfter)
-        requestLayout()
-    }
-
-    /**
-     * `-layoutSubviews` of the iOS button: the padding before the image (or the title) and the gap between them.
-     */
-    private fun cyl_layoutContent(width: Int) {
-        val density = resources.displayMetrics.density
-        val image = currentImage
-        val hasTitle = !text.isNullOrEmpty()
-        val imageWidth = image?.bounds?.width() ?: 0
-        val titleWidth = if (hasTitle) paint.measureText(text.toString()) else 0f
-        val inset = cyl_titleLeadingInset * density
-        val halfSpacing = if (image != null && hasTitle && cyl_imageTitleSpacing > 0) cyl_imageTitleSpacing * density / 2 else 0f
-        val centered = (requestedHorizontalGravity ?: Gravity.CENTER_HORIZONTAL) == Gravity.CENTER_HORIZONTAL
-        // The content's leading edge before the iOS adjustments: centered, or at the start.
-        val contentStart = if (centered) (width - imageWidth - titleWidth) / 2 else 0f
-        val start: Float
-        val gap: Float
-        if (image != null) {
-            start = contentStart - halfSpacing
-            gap = 2 * halfSpacing + if (hasTitle) inset else 0f
-        } else {
-            start = contentStart + if (hasTitle) inset else 0f
-            gap = 0f
-        }
-        val startPx = kotlin.math.max(0, start.roundToInt())
-        val gapPx = kotlin.math.max(0, gap.roundToInt())
-        if (paddingStart != startPx || paddingEnd != 0) setPaddingRelative(startPx, paddingTop, 0, paddingBottom)
-        if (compoundDrawablePadding != gapPx) compoundDrawablePadding = gapPx
+    private fun changeStyle(change: (CYLMenuStyle) -> Unit) {
+        val copy = style!!.copy()
+        change(copy)
+        style = copy
     }
 }
 
 /**
- * `CYLRightImageButton`: the "Expand / Collapse" button of a section header: the title, then the arrow image after
- * it (7 dp apart); selected means expanded. It never shows a pressed state, as on iOS.
+ * `CYLRightImageButton`: the "more" button of a menu section: a `CYLTagButton`, as on iOS, showing `expandTitle` or,
+ * while selected (the section is expanded), `collapseTitle`, with the arrow after the title (7 dp apart); it never
+ * shows a pressed state. TalkBack reads it as one button labeled with the current title.
  */
-class CYLRightImageButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : Button(context, attrs) {
+open class CYLRightImageButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : CYLTagButton(context, attrs) {
+
+    /**
+     * False until the button is set up: `CYLTagButton` may call the state hooks while it is being built.
+     */
+    private var setUp = false
+
+    /**
+     * The title while not selected (the section is folded); "Expand", localized, by default.
+     */
+    var expandTitle: String = CYLMenuLocalizedString("CYLMenuExpand", "Expand a menu section")
+        set(value) {
+            field = value
+            updateTitle()
+        }
+
+    /**
+     * The title while selected (the section is expanded); "Collapse", localized, by default.
+     */
+    var collapseTitle: String = CYLMenuLocalizedString("CYLMenuCollapse", "Collapse a menu section")
+        set(value) {
+            field = value
+            updateTitle()
+        }
+
     init {
-        isAllCaps = false
-        background = null
-        minHeight = 0
-        minimumHeight = 0
-        minWidth = 0
-        minimumWidth = 0
-        setPadding(0, 0, 0, 0)
-        stateListAnimator = null
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-        setTextColor(Color.BLACK)
-        compoundDrawablePadding = (7 * resources.displayMetrics.density).roundToInt()
-        gravity = Gravity.CENTER
-        update()
+        style = CYLMenuStyle.sectionTitle(fontSize = 12f).apply {
+            contentAlignment = CYLTagContentAlignment.CYLTagContentAlignmentCenter
+            imagePlacement = CYLTagImagePlacement.CYLTagImagePlacementTrailing
+            imageTitleSpacing = 7f
+        }
+        // The arrows keep their own colors, as the bundle images do on iOS.
+        image = CYLMenuImage("home_btn_more_normal")?.cyl_imageWithRenderingModeAlwaysOriginal()
+        selectedImage = CYLMenuImage("home_btn_more_selected")?.cyl_imageWithRenderingModeAlwaysOriginal()
+        setUp = true
+        updateTitle()
     }
 
     override fun setSelected(selected: Boolean) {
         super.setSelected(selected)
-        update()
+        updateTitle()
     }
 
+    /**
+     * Never pressed: the button toggles between its normal and selected looks only.
+     */
     override fun setPressed(pressed: Boolean) {
         super.setPressed(false)
     }
 
-    private fun update() {
-        text = CYLMenuLocalizedString(if (isSelected) "CYLMenuCollapse" else "CYLMenuExpand", "Expand or collapse a menu section")
-        val image = CYLMenuImage(if (isSelected) "home_btn_more_selected" else "home_btn_more_normal")
-        image?.setBounds(0, 0, image.intrinsicWidth, image.intrinsicHeight)
-        setCompoundDrawablesRelative(null, null, image, null)
+    private fun updateTitle() {
+        if (!setUp) return
+        val text = if (isSelected) collapseTitle else expandTitle
+        if (title?.toString() != text) title = text
     }
 }
 
 /**
- * `CYLCollectionViewCell`: the classify menu's cell: a `CYLIndexPathButton` filling it, in `cyl_chengNiStyle`.
+ * `CYLCollectionViewCell`: the classify menu's cell: a `CYLIndexPathButton` filling it, in
+ * `CYLMenuStyle.classifyMenuTag(CYLCollectionCellButtonStyle.chengNi)`.
  */
 class CYLCollectionViewCell @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
-    val button: CYLIndexPathButton = CYLIndexPathButton(context).apply { cyl_chengNiStyle() }
+    val button: CYLIndexPathButton = CYLIndexPathButton(context).apply { cylApply(CYLCollectionCellButtonStyle.chengNi) }
     var section: Int = 0
     var row: Int = 0
     var shouldShow: Boolean = true
@@ -205,14 +190,19 @@ const val CYLFilterHeaderViewHeigt = 38f
 class CYLFilterHeaderView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : ViewGroup(context, attrs) {
     private val density: Float get() = resources.displayMetrics.density
 
+    /**
+     * The section's title (and image): a `CYLTagButton` in `CYLMenuStyle.sectionTitle(leadingInset = 16f)`, read by
+     * TalkBack as a heading, not a control.
+     */
     val titleButton: CYLIndexPathButton = CYLIndexPathButton(context).apply {
-        background = null
-        cyl_titleLeadingInset = 16f
-        gravity = Gravity.CENTER_VERTICAL or Gravity.START
-        setTextColor(Color.BLACK)
+        style = CYLMenuStyle.sectionTitle(leadingInset = 16f)
+        isClickable = false
         ViewCompat.setAccessibilityHeading(this, true)
     }
 
+    /**
+     * Expands or folds the section (a `CYLTagButton`); hidden by default.
+     */
     val moreButton: CYLRightImageButton = CYLRightImageButton(context).apply {
         visibility = GONE
     }
@@ -464,26 +454,24 @@ open class CYLClassifyMenuViewController : Fragment() {
             sections.forEachIndexed { section, (title, items) ->
                 val header = CYLFilterHeaderView(context)
                 header.delegate = this
-                header.titleButton.text = title
-                header.titleButton.setImage(menuDataSource?.menuImageForSection(section))
+                // CYLTagButtons: their styles set the fonts, the colors and the icon spacing. The data source's images
+                // keep their own colors, as on iOS.
+                header.titleButton.title = title
+                header.titleButton.image = menuDataSource?.menuImageForSection(section)?.cyl_imageWithRenderingModeAlwaysOriginal()
                 header.titleButton.section = section
                 header.moreButton.tag = section
                 header.moreButton.visibility = if (folds(section)) VISIBLE else GONE
                 header.moreButton.isSelected = section in expandedSections
-                header.moreButton.contentDescription = "${header.moreButton.text}, $title"
+                // TalkBack reads the button's title, then the section it folds (the iOS accessibilityHint).
+                CYLAccessibilityNode.apply(header.moreButton, true, null, title, emptyList())
                 headers.add(header)
                 addView(header)
                 for (item in 0 until visibleCount(section)) {
                     val indexPath = CYLIndexPath(item, section)
                     val cell = CYLCollectionViewCell(context)
                     val (text, image) = items[item]
-                    cell.button.text = text
-                    cell.button.setImage(image)
-                    cell.button.cyl_imageTitleSpacing = if (image != null) 5f else 0f
-                    val f = font()
-                    cell.button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, f.size)
-                    cell.button.typeface = f.typeface
-                    cell.button.gravity = Gravity.CENTER
+                    cell.button.title = text
+                    cell.button.image = image?.cyl_imageWithRenderingModeAlwaysOriginal()
                     cell.button.section = section
                     cell.button.row = item
                     cell.section = section

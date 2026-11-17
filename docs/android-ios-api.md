@@ -11,46 +11,48 @@ Every public symbol of the Android core (`android/merged/library`, Kotlin) and i
 from the Kotlin sources, `android/merged/api-map.json` (the reverse table, [android-api.md](android-api.md)) and
 `android/merged/ios-map.json` (hand-made entries); do not edit the table by hand. A row without a counterpart is `TODO`.
 
-**Score: 731 / 731 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
+**Score: 736 / 736 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
 row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same
 logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100.
 
 | Android API | Description | iOS API |
 |---|---|---|
-| `CYLIndexPathButton` | class, `CYLClassifyMenu.kt:34` | `CYLIndexPathButton` |
-| `CYLIndexPathButton.section` | property, `CYLClassifyMenu.kt:35` | `CYLIndexPathButton.section` |
-| `CYLIndexPathButton.row` | property, `CYLClassifyMenu.kt:36` | `CYLIndexPathButton.row` |
-| `CYLIndexPathButton.cyl_imageTitleSpacing` | property, `CYLClassifyMenu.kt:41` | `CYLIndexPathButton.style.imageTitleSpacing` (a `CYLTagButton` since 2026-11-17; `CYLMenuStyle.classifyMenuTag()` sets 5) |
-| `CYLIndexPathButton.cyl_titleLeadingInset` | property, `CYLClassifyMenu.kt:51` | `CYLMenuStyle.sectionTitle(leadingInset:)` (the leading content inset of a `CYLTagButton`'s style) |
-| `CYLIndexPathButton.setImage` | method, `CYLClassifyMenu.kt:83` | `UIButton.setImage(_:for: .normal)` (`CYLIndexPathButton` is a `UIButton`) |
-| `CYLIndexPathButton.currentImage` | read-only property, `CYLClassifyMenu.kt:92` | `UIButton.currentImage` |
-| `CYLRightImageButton` | class, `CYLClassifyMenu.kt:138` | `CYLRightImageButton` |
-| `CYLCollectionViewCell` | class, `CYLClassifyMenu.kt:175` | `CYLCollectionViewCell` |
-| `CYLCollectionViewCell.button` | read-only property, `CYLClassifyMenu.kt:176` | `CYLCollectionViewCell.button` |
-| `CYLCollectionViewCell.section` | property, `CYLClassifyMenu.kt:177` | `CYLCollectionViewCell.section` |
-| `CYLCollectionViewCell.row` | property, `CYLClassifyMenu.kt:178` | `CYLCollectionViewCell.row` |
-| `CYLCollectionViewCell.shouldShow` | property, `CYLClassifyMenu.kt:179` | `CYLCollectionViewCell.shouldShow` |
-| `CYLFilterHeaderViewDelegate` | interface, `CYLClassifyMenu.kt:189` | `CYLFilterHeaderViewDelegate` |
-| `CYLFilterHeaderViewDelegate.filterHeaderViewDidTapMoreButton` | method, `CYLClassifyMenu.kt:193` | `CYLFilterHeaderViewDelegate.filterHeaderView(_:didTapMoreButton:)` |
-| `CYLFilterHeaderViewHeigt` | read-only property, `CYLClassifyMenu.kt:199` | `CYLFilterHeaderView.defaultHeight` |
-| `CYLFilterHeaderView` | class, `CYLClassifyMenu.kt:205` | `CYLFilterHeaderView` |
-| `CYLFilterHeaderView.titleButton` | read-only property, `CYLClassifyMenu.kt:208` | `CYLFilterHeaderView.titleButton` |
-| `CYLFilterHeaderView.moreButton` | read-only property, `CYLClassifyMenu.kt:216` | `CYLFilterHeaderView.moreButton` |
-| `CYLFilterHeaderView.delegate` | property, `CYLClassifyMenu.kt:220` | `CYLFilterHeaderView.delegate` |
-| `CYLFilterHeaderView.moreButtonTapped` | method, `CYLClassifyMenu.kt:235` | `moreButtonTapped` (same name in the iOS core) |
-| `CYLClassifyMenuViewController` | class, `CYLClassifyMenu.kt:270` | `CYLClassifyMenuViewController` |
-| `CYLClassifyMenuViewController.menuDataSource` | property, `CYLClassifyMenu.kt:271` | `CYLClassifyMenuViewController.menuDataSource` |
-| `CYLClassifyMenuViewController.menuDelegate` | property, `CYLClassifyMenu.kt:272` | `CYLClassifyMenuViewController.menuDelegate` |
-| `CYLClassifyMenuViewController.menuHeaderView` | property, `CYLClassifyMenu.kt:277` | `CYLClassifyMenuViewController.menuHeaderView` |
-| `CYLClassifyMenuViewController.menuFooterView` | property, `CYLClassifyMenu.kt:286` | `CYLClassifyMenuViewController.menuFooterView` |
-| `CYLClassifyMenuViewController.selectedIndexPath` | property, `CYLClassifyMenu.kt:296` | `CYLClassifyMenuViewController.selectedIndexPath` |
-| `CYLClassifyMenuViewController.defaultVisibleRows` | property, `CYLClassifyMenu.kt:305` | `CYLClassifyMenuViewController.defaultVisibleRows` |
-| `CYLClassifyMenuViewController.menuTitle` | read-only property, `CYLClassifyMenu.kt:315` | `menuTitle` (same name in the iOS core) |
-| `CYLClassifyMenuViewController.reloadMenuData` | method, `CYLClassifyMenu.kt:372` | `CYLClassifyMenuViewController.reloadMenuData()` |
-| `CYLClassifyMenuViewController.updateMenuLayout` | method, `CYLClassifyMenu.kt:381` | `CYLClassifyMenuViewController.updateMenuLayout()` |
-| `CYLClassifyMenuViewController.numberOfVisibleItemsInSection` | method, `CYLClassifyMenu.kt:389` | `CYLClassifyMenuViewController.numberOfVisibleItems(inSection:)` (`-numberOfVisibleItemsInSection:`) |
-| `CYLClassifyMenuViewController.isSectionExpanded` | method, `CYLClassifyMenu.kt:394` | `isSectionExpanded` (same name in the iOS core) |
-| `CYLClassifyMenuViewController.setSectionExpanded` | method, `CYLClassifyMenu.kt:399` | `CYLClassifyMenuViewController.setSection(_:expanded:)` (`-setSection:expanded:`; the More button calls it) |
+| `CYLIndexPathButton` | class, `CYLClassifyMenu.kt:31` | `CYLIndexPathButton` |
+| `CYLIndexPathButton.section` | property, `CYLClassifyMenu.kt:36` | `CYLIndexPathButton.section` |
+| `CYLIndexPathButton.row` | property, `CYLClassifyMenu.kt:41` | `CYLIndexPathButton.row` |
+| `CYLIndexPathButton.cyl_imageTitleSpacing` | property, `CYLClassifyMenu.kt:46` | `CYLIndexPathButton.style.imageTitleSpacing` (a `CYLTagButton` since 2026-11-17; `CYLMenuStyle.classifyMenuTag()` sets 5) |
+| `CYLIndexPathButton.cyl_titleLeadingInset` | property, `CYLClassifyMenu.kt:54` | `CYLMenuStyle.sectionTitle(leadingInset:)` (the leading content inset of a `CYLTagButton`'s style) |
+| `CYLIndexPathButton.gravity` | property, `CYLClassifyMenu.kt:68` | `CYLMenuStyle.contentAlignment` (the style of a `CYLTagButton`) |
+| `CYLIndexPathButton.currentImage` | read-only property, `CYLClassifyMenu.kt:81` | `CYLTagButton.image` / `selectedImage` (`CYLIndexPathButton` is a `CYLTagButton`) |
+| `CYLRightImageButton` | class, `CYLClassifyMenu.kt:99` | `CYLRightImageButton` |
+| `CYLRightImageButton.expandTitle` | property, `CYLClassifyMenu.kt:109` | `CYLRightImageButton.expandTitle` |
+| `CYLRightImageButton.collapseTitle` | property, `CYLClassifyMenu.kt:118` | `CYLRightImageButton.collapseTitle` |
+| `CYLCollectionViewCell` | class, `CYLClassifyMenu.kt:160` | `CYLCollectionViewCell` |
+| `CYLCollectionViewCell.button` | read-only property, `CYLClassifyMenu.kt:161` | `CYLCollectionViewCell.button` |
+| `CYLCollectionViewCell.section` | property, `CYLClassifyMenu.kt:162` | `CYLCollectionViewCell.section` |
+| `CYLCollectionViewCell.row` | property, `CYLClassifyMenu.kt:163` | `CYLCollectionViewCell.row` |
+| `CYLCollectionViewCell.shouldShow` | property, `CYLClassifyMenu.kt:164` | `CYLCollectionViewCell.shouldShow` |
+| `CYLFilterHeaderViewDelegate` | interface, `CYLClassifyMenu.kt:174` | `CYLFilterHeaderViewDelegate` |
+| `CYLFilterHeaderViewDelegate.filterHeaderViewDidTapMoreButton` | method, `CYLClassifyMenu.kt:178` | `CYLFilterHeaderViewDelegate.filterHeaderView(_:didTapMoreButton:)` |
+| `CYLFilterHeaderViewHeigt` | read-only property, `CYLClassifyMenu.kt:184` | `CYLFilterHeaderView.defaultHeight` |
+| `CYLFilterHeaderView` | class, `CYLClassifyMenu.kt:190` | `CYLFilterHeaderView` |
+| `CYLFilterHeaderView.titleButton` | read-only property, `CYLClassifyMenu.kt:197` | `CYLFilterHeaderView.titleButton` |
+| `CYLFilterHeaderView.moreButton` | read-only property, `CYLClassifyMenu.kt:206` | `CYLFilterHeaderView.moreButton` |
+| `CYLFilterHeaderView.delegate` | property, `CYLClassifyMenu.kt:210` | `CYLFilterHeaderView.delegate` |
+| `CYLFilterHeaderView.moreButtonTapped` | method, `CYLClassifyMenu.kt:225` | `moreButtonTapped` (same name in the iOS core) |
+| `CYLClassifyMenuViewController` | class, `CYLClassifyMenu.kt:260` | `CYLClassifyMenuViewController` |
+| `CYLClassifyMenuViewController.menuDataSource` | property, `CYLClassifyMenu.kt:261` | `CYLClassifyMenuViewController.menuDataSource` |
+| `CYLClassifyMenuViewController.menuDelegate` | property, `CYLClassifyMenu.kt:262` | `CYLClassifyMenuViewController.menuDelegate` |
+| `CYLClassifyMenuViewController.menuHeaderView` | property, `CYLClassifyMenu.kt:267` | `CYLClassifyMenuViewController.menuHeaderView` |
+| `CYLClassifyMenuViewController.menuFooterView` | property, `CYLClassifyMenu.kt:276` | `CYLClassifyMenuViewController.menuFooterView` |
+| `CYLClassifyMenuViewController.selectedIndexPath` | property, `CYLClassifyMenu.kt:286` | `CYLClassifyMenuViewController.selectedIndexPath` |
+| `CYLClassifyMenuViewController.defaultVisibleRows` | property, `CYLClassifyMenu.kt:295` | `CYLClassifyMenuViewController.defaultVisibleRows` |
+| `CYLClassifyMenuViewController.menuTitle` | read-only property, `CYLClassifyMenu.kt:305` | `menuTitle` (same name in the iOS core) |
+| `CYLClassifyMenuViewController.reloadMenuData` | method, `CYLClassifyMenu.kt:362` | `CYLClassifyMenuViewController.reloadMenuData()` |
+| `CYLClassifyMenuViewController.updateMenuLayout` | method, `CYLClassifyMenu.kt:371` | `CYLClassifyMenuViewController.updateMenuLayout()` |
+| `CYLClassifyMenuViewController.numberOfVisibleItemsInSection` | method, `CYLClassifyMenu.kt:379` | `CYLClassifyMenuViewController.numberOfVisibleItems(inSection:)` (`-numberOfVisibleItemsInSection:`) |
+| `CYLClassifyMenuViewController.isSectionExpanded` | method, `CYLClassifyMenu.kt:384` | `isSectionExpanded` (same name in the iOS core) |
+| `CYLClassifyMenuViewController.setSectionExpanded` | method, `CYLClassifyMenu.kt:389` | `CYLClassifyMenuViewController.setSection(_:expanded:)` (`-setSection:expanded:`; the More button calls it) |
 | `CYLCollectionViewLeftAlignedLayout` | class, `CYLCollectionViewLeftAlignedLayout.kt:10` | `CYLCollectionViewLeftAlignedLayout` |
 | `CYLCollectionViewLeftAlignedLayout.rowAlignment` | property, `CYLCollectionViewLeftAlignedLayout.kt:13` | `CYLCollectionViewLeftAlignedLayout.rowAlignment` |
 | `CYLCollectionViewLeftAlignedLayout.frames` | method, `CYLCollectionViewLeftAlignedLayout.kt:19` | `CYLCollectionViewLeftAlignedLayout.layoutAttributesForElements(in:)` (UIKit computes the frames; Android's helper returns them for its own list view) |
@@ -79,10 +81,12 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `cyl_blurredImageWithRadius` | method, `CYLGeneralExtensions.kt:178` | `UIImage.cylBlurred(radius:iterations:tintColor:)` |
 | `List` | method, `CYLGeneralExtensions.kt:237` | `List` (same name in the iOS core) |
 | `Map` | method, `CYLGeneralExtensions.kt:246` | `NSDictionary.cyl_descriptionWithLocale(_:)` (`NSDictionary+CYLLog.swift`; the Android row is the `Map<*, *>.cyl_descriptionWithLocale` extension) |
-| `cyl_generalStyle` | method, `CYLGeneralExtensions.kt:275` | `CYLCollectionCellButtonStyle` |
-| `cyl_homeStyle` | method, `CYLGeneralExtensions.kt:288` | `CYLCollectionCellButtonStyle` |
-| `cyl_redStyle` | method, `CYLGeneralExtensions.kt:302` | `CYLCollectionCellButtonStyle` |
-| `cyl_chengNiStyle` | method, `CYLGeneralExtensions.kt:318` | `CYLCollectionCellButtonStyle` |
+| `CYLCollectionCellButtonStyle` | class, `CYLGeneralExtensions.kt:257` | `CYLCollectionCellButtonStyle` |
+| `cylApply` | method, `CYLGeneralExtensions.kt:283` | `CYLTagButton.cylApply(_:)` |
+| `cyl_generalStyle` | method, `CYLGeneralExtensions.kt:310` | `UIButton.cylApply(_:)` |
+| `cyl_homeStyle` | method, `CYLGeneralExtensions.kt:323` | `CYLCollectionCellButtonStyle` |
+| `cyl_redStyle` | method, `CYLGeneralExtensions.kt:337` | `CYLCollectionCellButtonStyle` |
+| `cyl_chengNiStyle` | method, `CYLGeneralExtensions.kt:353` | `UIButton.cylApply(_:)` |
 | `CYLImageTagDirection` | class, `CYLImageTagGroupView.kt:30` | `CYLImageTagDirection` |
 | `CYLImageTagDirection.CYLImageTagDirectionLeftCenter` | enum case, `CYLImageTagGroupView.kt:31` | `CYLImageTagDirection.leftCenter` |
 | `CYLImageTagDirection.CYLImageTagDirectionLeftTop` | enum case, `CYLImageTagGroupView.kt:32` | `CYLImageTagDirection.leftTop` |
@@ -342,44 +346,45 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuStyle.deleteIndicatorFontForState` | method, `CYLMenuStyle.kt:199` | `CYLMenuStyle.deleteIndicatorFont(for:traitCollection:)` |
 | `CYLMenuStyle.headerFontForTraitCollection` | method, `CYLMenuStyle.kt:204` | `CYLMenuStyle.headerFont(for:)` |
 | `CYLMenuStyle.copy` | method, `CYLMenuStyle.kt:207` | `CYLMenuStyle.copy(with:)` |
-| `kMultipleFilterSetting` | read-only property, `CYLMultipleFilter.kt:32` | `kMultipleFilterSetting` |
-| `kMultipleFilterSettingModified` | read-only property, `CYLMultipleFilter.kt:37` | `kMultipleFilterSettingModified` |
-| `CYLFilterParamsTool` | class, `CYLMultipleFilter.kt:43` | `CYLFilterParamsTool` |
-| `CYLFilterParamsTool.dataSources` | property, `CYLMultipleFilter.kt:47` | `CYLFilterParamsTool.dataSources` |
-| `CYLFilterParamsTool.filterParamsArray` | property, `CYLMultipleFilter.kt:54` | `CYLFilterParamsTool.filterParamsArray` |
-| `CYLFilterParamsTool.filterParamsDictionary` | property, `CYLMultipleFilter.kt:63` | `CYLFilterParamsTool.filterParamsDictionary` |
-| `CYLFilterParamsTool.filterParamsContentDictionary` | property, `CYLMultipleFilter.kt:73` | `CYLFilterParamsTool.filterParamsContentDictionary` |
-| `CYLFilterParamsTool.filename` | property, `CYLMultipleFilter.kt:83` | `CYLFilterParamsTool.filename` |
-| `CYLFilterParamsTool.filesDir` | property, `CYLMultipleFilter.kt:90` | N/A on iOS: `CYLFilterParamsTool` was removed in the Swift migration (`70dcc816`); `CYLMultipleFilterController` keeps its state (`selectedIndexPaths()` / `setSelectedIndexPaths(_:)`) |
+| `kMultipleFilterSetting` | read-only property, `CYLMultipleFilter.kt:31` | `kMultipleFilterSetting` |
+| `kMultipleFilterSettingModified` | read-only property, `CYLMultipleFilter.kt:36` | `kMultipleFilterSettingModified` |
+| `CYLFilterParamsTool` | class, `CYLMultipleFilter.kt:42` | `CYLFilterParamsTool` |
+| `CYLFilterParamsTool.dataSources` | property, `CYLMultipleFilter.kt:46` | `CYLFilterParamsTool.dataSources` |
+| `CYLFilterParamsTool.filterParamsArray` | property, `CYLMultipleFilter.kt:53` | `CYLFilterParamsTool.filterParamsArray` |
+| `CYLFilterParamsTool.filterParamsDictionary` | property, `CYLMultipleFilter.kt:62` | `CYLFilterParamsTool.filterParamsDictionary` |
+| `CYLFilterParamsTool.filterParamsContentDictionary` | property, `CYLMultipleFilter.kt:72` | `CYLFilterParamsTool.filterParamsContentDictionary` |
+| `CYLFilterParamsTool.filename` | property, `CYLMultipleFilter.kt:82` | `CYLFilterParamsTool.filename` |
+| `CYLFilterParamsTool.filesDir` | property, `CYLMultipleFilter.kt:89` | N/A on iOS: `CYLFilterParamsTool` was removed in the Swift migration (`70dcc816`); `CYLMultipleFilterController` keeps its state (`selectedIndexPaths()` / `setSelectedIndexPaths(_:)`) |
 | `CYLFilterCollectionCell` | class, `CYLMultipleFilter.kt:135` | `CYLFilterCollectionCell` |
 | `CYLFilterCollectionCell.titleButton` | read-only property, `CYLMultipleFilter.kt:136` | `CYLFilterCollectionCell.titleButton` |
-| `CYLMultipleFilterHeaderView` | class, `CYLMultipleFilter.kt:162` | `CYLMultipleFilterHeaderView` |
-| `CYLMultipleFilterHeaderView.imageView` | read-only property, `CYLMultipleFilter.kt:164` | `imageView` (same name in the iOS core) |
-| `CYLMultipleFilterHeaderView.titleLabel` | read-only property, `CYLMultipleFilter.kt:165` | `titleLabel` (same name in the iOS core) |
-| `CYLFilterControllerDelegate` | interface, `CYLMultipleFilter.kt:202` | `CYLFilterControllerDelegate` |
-| `CYLFilterControllerDelegate.filterControllerDidComplete` | method, `CYLMultipleFilter.kt:206` | `CYLFilterControllerDelegate.filterControllerDidComplete(_:)` |
-| `CYLFilterBaseController` | class, `CYLMultipleFilter.kt:214` | `CYLFilterBaseController` |
-| `CYLFilterBaseController.collectionView` | property, `CYLMultipleFilter.kt:218` | `CYLFilterBaseController.collectionView` |
-| `CYLFilterBaseController.contentView` | property, `CYLMultipleFilter.kt:224` | `CYLFilterBaseController.contentView` |
-| `CYLFilterBaseController.restoreButton` | property, `CYLMultipleFilter.kt:227` | `CYLFilterBaseController.restoreButton` |
-| `CYLFilterBaseController.okButton` | property, `CYLMultipleFilter.kt:230` | `CYLFilterBaseController.okButton` |
-| `CYLFilterBaseController.dataSource` | property, `CYLMultipleFilter.kt:236` | `dataSource` (same name in the iOS core) |
-| `CYLFilterBaseController.settingArray` | property, `CYLMultipleFilter.kt:241` | `CYLFilterBaseController.settingArray` |
-| `CYLFilterBaseController.delegate` | property, `CYLMultipleFilter.kt:243` | `CYLFilterBaseController.delegate` |
-| `CYLFilterBaseController.showInView` | method, `CYLMultipleFilter.kt:322` | `CYLFilterBaseController.show(in:)` |
-| `CYLFilterBaseController.hide` | method, `CYLMultipleFilter.kt:369` | `hide` (same name in the iOS core) |
-| `CYLFilterBaseController.itemButtonClicked` | method, `CYLMultipleFilter.kt:374` | `itemButtonClicked` (same name in the iOS core) |
-| `CYLFilterBaseController.confirmButtonClicked` | method, `CYLMultipleFilter.kt:379` | `CYLFilterBaseController.confirmButtonClicked(_:)` |
-| `CYLFilterBaseController.restoreButtonClicked` | method, `CYLMultipleFilter.kt:386` | `CYLFilterBaseController.restoreButtonClicked(_:)` |
-| `CYLFilterBaseController.isShowing` | read-only property, `CYLMultipleFilter.kt:391` | `CYLFilterBaseController.isShowing` |
-| `CYLMultipleFilterController` | class, `CYLMultipleFilter.kt:399` | `CYLMultipleFilterController` |
-| `CYLMultipleFilterController.menuDataSource` | property, `CYLMultipleFilter.kt:400` | `CYLMultipleFilterController.menuDataSource` |
-| `CYLMultipleFilterController.menuDelegate` | property, `CYLMultipleFilter.kt:401` | `CYLMultipleFilterController.menuDelegate` |
-| `CYLMultipleFilterController.refreshFilterParams` | method, `CYLMultipleFilter.kt:416` | `CYLMultipleFilterController.refreshFilterParams()` |
-| `CYLMultipleFilterController.reloadMenuData` | method, `CYLMultipleFilter.kt:423` | `CYLMultipleFilterController.reloadMenuData()` |
-| `CYLMultipleFilterController.selectedIndexPaths` | method, `CYLMultipleFilter.kt:449` | `CYLMultipleFilterController.selectedIndexPaths()` |
-| `CYLMultipleFilterController.setSelectedIndexPaths` | method, `CYLMultipleFilter.kt:456` | `CYLMultipleFilterController.setSelectedIndexPaths(_:)` |
-| `CYLMultipleFilterController.selectItemAtIndexPath` | method, `CYLMultipleFilter.kt:486` | `CYLMultipleFilterController.collectionView(_:didSelectItemAt:)` (a tap) |
+| `CYLMultipleFilterHeaderView` | class, `CYLMultipleFilter.kt:155` | `CYLMultipleFilterHeaderView` |
+| `CYLMultipleFilterHeaderView.titleButton` | read-only property, `CYLMultipleFilter.kt:162` | `CYLMultipleFilterHeaderView.titleButton` |
+| `CYLMultipleFilterHeaderView.imageView` | read-only property, `CYLMultipleFilter.kt:183` | `titleButton.imageView` (`CYLTagButton.imageView`) |
+| `CYLMultipleFilterHeaderView.titleLabel` | read-only property, `CYLMultipleFilter.kt:188` | `titleButton.titleLabel` (`CYLTagButton.titleLabel`) |
+| `CYLFilterControllerDelegate` | interface, `CYLMultipleFilter.kt:226` | `CYLFilterControllerDelegate` |
+| `CYLFilterControllerDelegate.filterControllerDidComplete` | method, `CYLMultipleFilter.kt:230` | `CYLFilterControllerDelegate.filterControllerDidComplete(_:)` |
+| `CYLFilterBaseController` | class, `CYLMultipleFilter.kt:238` | `CYLFilterBaseController` |
+| `CYLFilterBaseController.collectionView` | property, `CYLMultipleFilter.kt:242` | `CYLFilterBaseController.collectionView` |
+| `CYLFilterBaseController.contentView` | property, `CYLMultipleFilter.kt:248` | `CYLFilterBaseController.contentView` |
+| `CYLFilterBaseController.restoreButton` | property, `CYLMultipleFilter.kt:251` | `CYLFilterBaseController.restoreButton` |
+| `CYLFilterBaseController.okButton` | property, `CYLMultipleFilter.kt:254` | `CYLFilterBaseController.okButton` |
+| `CYLFilterBaseController.dataSource` | property, `CYLMultipleFilter.kt:260` | `dataSource` (same name in the iOS core) |
+| `CYLFilterBaseController.settingArray` | property, `CYLMultipleFilter.kt:265` | `CYLFilterBaseController.settingArray` |
+| `CYLFilterBaseController.delegate` | property, `CYLMultipleFilter.kt:267` | `CYLFilterBaseController.delegate` |
+| `CYLFilterBaseController.showInView` | method, `CYLMultipleFilter.kt:346` | `CYLFilterBaseController.show(in:)` |
+| `CYLFilterBaseController.hide` | method, `CYLMultipleFilter.kt:393` | `hide` (same name in the iOS core) |
+| `CYLFilterBaseController.itemButtonClicked` | method, `CYLMultipleFilter.kt:398` | `itemButtonClicked` (same name in the iOS core) |
+| `CYLFilterBaseController.confirmButtonClicked` | method, `CYLMultipleFilter.kt:403` | `CYLFilterBaseController.confirmButtonClicked(_:)` |
+| `CYLFilterBaseController.restoreButtonClicked` | method, `CYLMultipleFilter.kt:410` | `CYLFilterBaseController.restoreButtonClicked(_:)` |
+| `CYLFilterBaseController.isShowing` | read-only property, `CYLMultipleFilter.kt:415` | `CYLFilterBaseController.isShowing` |
+| `CYLMultipleFilterController` | class, `CYLMultipleFilter.kt:423` | `CYLMultipleFilterController` |
+| `CYLMultipleFilterController.menuDataSource` | property, `CYLMultipleFilter.kt:424` | `CYLMultipleFilterController.menuDataSource` |
+| `CYLMultipleFilterController.menuDelegate` | property, `CYLMultipleFilter.kt:425` | `CYLMultipleFilterController.menuDelegate` |
+| `CYLMultipleFilterController.refreshFilterParams` | method, `CYLMultipleFilter.kt:440` | `CYLMultipleFilterController.refreshFilterParams()` |
+| `CYLMultipleFilterController.reloadMenuData` | method, `CYLMultipleFilter.kt:447` | `CYLMultipleFilterController.reloadMenuData()` |
+| `CYLMultipleFilterController.selectedIndexPaths` | method, `CYLMultipleFilter.kt:473` | `CYLMultipleFilterController.selectedIndexPaths()` |
+| `CYLMultipleFilterController.setSelectedIndexPaths` | method, `CYLMultipleFilter.kt:480` | `CYLMultipleFilterController.setSelectedIndexPaths(_:)` |
+| `CYLMultipleFilterController.selectItemAtIndexPath` | method, `CYLMultipleFilter.kt:510` | `CYLMultipleFilterController.collectionView(_:didSelectItemAt:)` (a tap) |
 | `CYLAppTintColor` | read-only property, `CYLParameterConfiguration.kt:12` | `UIColor.cylAppTint` |
 | `CYLMaximumFontScale` | read-only property, `CYLParameterConfiguration.kt:15` | `CYLTagMetrics.maximumFontScale` |
 | `CYLTagTitleFontSize` | read-only property, `CYLParameterConfiguration.kt:18` | `CYLTagMetrics.titleFontSize` |
@@ -463,9 +468,9 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagButton.isHighlighted` | read-only property, `CYLTagButton.kt:266` | `isHighlighted` (same name in the iOS core) |
 | `CYLTagButton.badgeFrame` | property, `CYLTagButton.kt:526` | `CYLTagButton.badgeLabel.frame` |
 | `CYLTagBadgeDefaultColor` | read-only property, `CYLTagButton.kt:718` | `UIColor.systemRed` (the default `CYLTagButton.badgeColor`) |
-| `CYLAccessibility` | object, `CYLTagButton.kt:767` | `UIAccessibility` (UIKit) |
-| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:770` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
-| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:775` | `UIAccessibility.isDarkerSystemColorsEnabled` (`UIAccessibilityDarkerSystemColorsEnabled()`) |
+| `CYLAccessibility` | object, `CYLTagButton.kt:766` | `UIAccessibility` (UIKit) |
+| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:769` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
+| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:774` | `UIAccessibility.isDarkerSystemColorsEnabled` (`UIAccessibilityDarkerSystemColorsEnabled()`) |
 | `CYLTagColorTheme` | class, `CYLTagColors.kt:7` | `CYLTagColorTheme` |
 | `CYLTagColorTheme.CYLTagColorThemeNone` | enum case, `CYLTagColors.kt:8` | `CYLTagColorThemeNone` |
 | `CYLTagColorTheme.CYLTagColorThemeRandom` | enum case, `CYLTagColors.kt:9` | `CYLTagColorThemeRandom` |

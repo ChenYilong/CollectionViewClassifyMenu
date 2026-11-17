@@ -107,6 +107,33 @@ class CYLClassifyMenuTest {
     }
 
     @Test
+    fun menuButtonsAndFilterHeaderUseTagButtons() {
+        val activity = activity()
+        val more = CYLRightImageButton(activity)
+        assertEquals(CYLMenuLocalizedString("CYLMenuExpand"), more.title.toString())
+        more.isSelected = true
+        assertEquals(more.collapseTitle, more.title.toString())
+        more.collapseTitle = "Less"
+        assertEquals("Less", more.title.toString())
+        assertEquals("Less", more.contentDescription.toString())
+        more.isPressed = true
+        assertFalse("never pressed", more.isPressed)
+        val button = CYLIndexPathButton(activity)
+        button.cyl_imageTitleSpacing = 9f
+        assertEquals(9f, button.style!!.imageTitleSpacing, 0f)
+        button.cyl_titleLeadingInset = 16f
+        assertEquals(16f, button.style!!.selectedAppearance.contentInsets.left, 0f)
+        button.gravity = android.view.Gravity.START
+        assertEquals(CYLTagContentAlignment.CYLTagContentAlignmentLeading, button.style!!.contentAlignment)
+        button.title = "Tag"
+        assertEquals("Tag", button.contentDescription.toString())
+        val header = CYLMultipleFilterHeaderView(activity)
+        header.titleButton.title = "Region"
+        assertEquals("Region", header.titleLabel.text.toString())
+        assertTrue(androidx.core.view.ViewCompat.isAccessibilityHeading(header.titleButton))
+    }
+
+    @Test
     fun multipleFilterKeepsExclusiveItemsAlone() {
         val activity = activity()
         val container = FrameLayout(activity)

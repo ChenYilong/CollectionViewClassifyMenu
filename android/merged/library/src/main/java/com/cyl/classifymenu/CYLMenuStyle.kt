@@ -315,6 +315,117 @@ class CYLMenuStyle {
             return style
         }
 
+        /**
+         * `+classifyMenuTag:`: a tag of `CYLClassifyMenuViewController`, in one of the looks its tag buttons have had
+         * (`CYLCollectionCellButtonStyle`; `chengNi`, the default, is a light green capsule that takes the app's tint
+         * while selected or pressed). The tags' title font (`CYLTagTitleFontSize`, scaled like every tag), the icon 5 dp
+         * before the title, a 4 dp margin at both ends.
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun classifyMenuTag(look: CYLCollectionCellButtonStyle = CYLCollectionCellButtonStyle.chengNi): CYLMenuStyle {
+            val style = compactTagStyle()
+            val green = Color.rgb(18, 133, 117)
+            when (look) {
+                CYLCollectionCellButtonStyle.general -> for (appearance in style.appearances()) {
+                    appearance.cornerRadius = 5f
+                    appearance.backgroundColor = Color.WHITE
+                    appearance.borderWidth = 1f
+                    appearance.borderColor = Color.BLACK
+                }
+                CYLCollectionCellButtonStyle.home -> {
+                    for (appearance in style.appearances()) {
+                        appearance.textColor = green
+                        appearance.borderColor = green
+                    }
+                    style.selectedAppearance.textColor = CYLColor.withAlpha(green, 0.7f)
+                    style.highlightedBackgroundColor = green
+                }
+                CYLCollectionCellButtonStyle.red -> {
+                    val red = Color.rgb(160, 15, 85)
+                    for (appearance in style.appearances()) {
+                        appearance.textColor = red
+                        appearance.borderColor = red
+                    }
+                    style.highlightedBackgroundColor = green
+                }
+                CYLCollectionCellButtonStyle.chengNi -> {
+                    val mint = Color.rgb(230, 255, 244)
+                    for (appearance in style.appearances()) {
+                        appearance.cornerRadius = 13f
+                        appearance.backgroundColor = mint
+                        appearance.textColor = CYLAppTintColor
+                    }
+                    style.selectedAppearance.backgroundColor = CYLAppTintColor
+                    style.selectedAppearance.backgroundImage = CYLMenuImage("tag_btn_background_highlighted")
+                    style.selectedAppearance.textColor = Color.WHITE
+                    style.highlightedBackgroundColor = CYLAppTintColor
+                }
+            }
+            return style
+        }
+
+        /**
+         * `+filterTag`: a tag of the multiple-choice filter (`CYLMultipleFilterController`): the filter's stretchable
+         * slide images as the normal and selected backgrounds, green titles that turn white when selected.
+         */
+        @JvmStatic
+        fun filterTag(): CYLMenuStyle {
+            val style = compactTagStyle()
+            for (appearance in style.appearances()) {
+                appearance.backgroundColor = CYLColor.CLEAR
+                appearance.cornerRadius = CYLTagCornerRadiusSquare
+            }
+            style.normalAppearance.backgroundImage = CYLStretchableDrawable.named("btn_slide_normal")
+            style.normalAppearance.textColor = Color.rgb(96, 147, 130)
+            style.selectedAppearance.backgroundImage = CYLStretchableDrawable.named("btn_slide_selected")
+            style.selectedAppearance.textColor = Color.WHITE
+            return style
+        }
+
+        /**
+         * `+sectionTitleWithFontSize:textColor:leadingInset:`: a section title of a header: no background and no border,
+         * the content at the leading edge after `leadingInset` (dp), an icon 4 dp before the title, in `fontSize` (sp).
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun sectionTitle(fontSize: Float = 15f, textColor: Int = Color.BLACK, leadingInset: Float = 0f): CYLMenuStyle {
+            val style = defaultStyle()
+            for (appearance in style.appearances()) {
+                appearance.backgroundColor = CYLColor.CLEAR
+                appearance.borderWidth = 0f
+                appearance.borderColor = null
+                appearance.cornerRadius = CYLTagCornerRadiusSquare
+                appearance.textColor = textColor
+                appearance.font = CYLFont.systemFont(fontSize)
+                appearance.contentInsets = CYLEdgeInsets(0f, leadingInset, 0f, 0f)
+            }
+            style.contentAlignment = CYLTagContentAlignment.CYLTagContentAlignmentLeading
+            style.imageSize = CYLSize(16f, 16f)
+            style.imageTitleSpacing = 4f
+            style.itemHeight = 0f
+            style.backgroundColor = CYLColor.CLEAR
+            return style
+        }
+
+        /**
+         * The tags of the classify menu and the multiple filter: the tags' title font, small end margins, no border.
+         */
+        private fun compactTagStyle(): CYLMenuStyle {
+            val style = defaultStyle()
+            val font = CYLFont.systemFont(CYLTagTitleFontSize)
+            for (appearance in style.appearances()) {
+                appearance.font = font
+                appearance.borderWidth = 0f
+                appearance.contentInsets = CYLEdgeInsets(0f, 4f, 0f, 4f)
+            }
+            style.imageTitleSpacing = 5f
+            style.imageSize = CYLSize(16f, 16f)
+            style.itemHeight = 30f
+            style.backgroundColor = CYLColor.CLEAR
+            return style
+        }
+
         /** `+gridStyleWithNumberOfItemsPerRow:`: borderless items in `numberOfItemsPerRow` columns, icon after title. */
         @JvmStatic
         fun gridStyleWithNumberOfItemsPerRow(numberOfItemsPerRow: Int): CYLMenuStyle {

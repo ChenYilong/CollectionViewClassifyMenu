@@ -249,6 +249,41 @@ fun Map<*, *>.cyl_descriptionWithLocale(locale: Any?): String = buildString {
     append("}")
 }
 
+/**
+ * `CYLCollectionCellButtonStyle`: the looks of a classify-menu tag (`CYLTagButton.cylApply`,
+ * `CYLMenuStyle.classifyMenuTag`; for a plain `TextView`, `cyl_generalStyle` / `cyl_homeStyle` / `cyl_redStyle` /
+ * `cyl_chengNiStyle`).
+ */
+enum class CYLCollectionCellButtonStyle {
+    /**
+     * White with a 1 dp border and 5 dp corners.
+     */
+    general,
+
+    /**
+     * Green text and border; filled green while pressed.
+     */
+    home,
+
+    /**
+     * Red text and border; filled green while pressed.
+     */
+    red,
+
+    /**
+     * A light green capsule; the app's tint while selected or pressed (the menu's default).
+     */
+    chengNi,
+}
+
+/**
+ * `-[CYLTagButton cylApply:]`: applies one of the classify menu's tag looks: `style` becomes
+ * `CYLMenuStyle.classifyMenuTag(look)`.
+ */
+fun CYLTagButton.cylApply(look: CYLCollectionCellButtonStyle) {
+    style = CYLMenuStyle.classifyMenuTag(look)
+}
+
 // `UIButton (CYLCollectionCellStyle)`: the button styles of the classify menu, on any TextView (an Android Button is one).
 
 private val CYLHomeGreen = Color.rgb(18, 133, 117)

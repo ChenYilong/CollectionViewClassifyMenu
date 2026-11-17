@@ -328,4 +328,34 @@ declarations, so Objective-C callers see no change.
 - **Prompt (verbatim)**: "continue fix todo还没发布的组件尝试使用commit方式导入。不要阻碍进度"
 - **Prompt (English)**: "Continue fixing the TODOs. Try to import components that are not released yet by commit. Do not
   block progress."
-- **Status**: started.
+- **Status** (2026-11-17): code changed, **not compiled here; CI is the check** (no Android SDK in this container).
+  - `CYLIndexPathButton` (`CYLClassifyMenu.kt`) now subclasses `CYLTagButton` (was `Button`). Kept: `section`, `row`,
+    `cyl_imageTitleSpacing` (now `style.imageTitleSpacing`), `cyl_titleLeadingInset` (now the leading content inset
+    of every state of `style`), `currentImage` (`selectedImage` while selected, else `image`), and a new `gravity`
+    property (horizontal gravity mapped to `style.contentAlignment`). Removed: `setImage(Drawable?)` (its JVM signature
+    clashes with `CYLTagButton.image`'s setter; callers use `image = …`) and the hand-made layout (`onLayout`,
+    `onTextChanged`, padding math): the icon, title, animation, placeholder and fallbacks are `CYLTagButton`'s.
+  - `CYLRightImageButton` now subclasses `CYLTagButton` (was `Button`, now `open` as on iOS): style
+    `CYLMenuStyle.sectionTitle(fontSize = 12f)` with the arrow after the title 7 dp apart, `image` / `selectedImage`
+    the bundle arrows (kept in their own colors), new `expandTitle` / `collapseTitle` (the iOS properties), never
+    pressed.
+  - `CYLMultipleFilterHeaderView` (`CYLMultipleFilter.kt`) shows its title in `titleButton: CYLTagButton` (a
+    `CYLIndexPathButton`, `CYLMenuStyle.sectionTitle(16f, 50 % black)`, 24 dp icon, title at 50 dp with or without the
+    icon, a TalkBack heading reported as text, not a button). `imageView` and `titleLabel` stay as read-only accessors
+    of `titleButton.imageView` / `titleButton.titleLabel`.
+  - Core additions, ported from iOS: `CYLMenuStyle.classifyMenuTag(look)`, `CYLMenuStyle.filterTag()`,
+    `CYLMenuStyle.sectionTitle(fontSize, textColor, leadingInset)`, the enum `CYLCollectionCellButtonStyle`
+    (`general`, `home`, `red`, `chengNi`) and `CYLTagButton.cylApply(look)` (`CYLGeneralExtensions.kt`; the
+    `TextView.cyl_*Style` functions stay for plain text views).
+  - Callers changed: `CYLCollectionViewCell` (`cylApply(chengNi)` instead of `cyl_chengNiStyle()`),
+    `CYLFilterHeaderView` (`titleButton` in `sectionTitle(leadingInset = 16f)`, not clickable, heading),
+    `CYLClassifyMenuViewController` (`title` / `image` instead of `text` / `setImage` / font / gravity calls; data
+    source images wrapped with `cyl_imageWithRenderingModeAlwaysOriginal()` so they keep their colors as on iOS; the
+    More button's section name is its accessibility hint), `CYLFilterCollectionCell` (`CYLMenuStyle.filterTag()`
+    instead of a state-list background and text colors), `CYLMultipleFilterController` (`titleButton.title`). The
+    example and the androidTest folder had no callers. New Robolectric test
+    `CYLClassifyMenuTest.menuButtonsAndFilterHeaderUseTagButtons`.
+  - Parity tables regenerated from the maps (`android/merged/api-map.json`, `ios-map.json`):
+    `docs/android-api.md` 784 to 791 / 792 (99.9), `docs/android-ios-api.md` 736 / 736 (100).
+  - Remaining: CI build and the unit tests; screenshots of the classify menu and the multiple filter on Android to
+    compare with iOS.

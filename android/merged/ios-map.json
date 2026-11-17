@@ -22,8 +22,7 @@
  "CYLColor.fromHex": "`UIColor.cylMenuColor(from:)` (`CYLTagListView+CYLConfiguration.swift`: \"RRGGBB\", \"#RRGGBB\" or a color name)",
  "CYLColor.CLEAR": "`UIColor.clear` (`+clearColor`)",
  "Map": "`NSDictionary.cyl_descriptionWithLocale(_:)` (`NSDictionary+CYLLog.swift`; the Android row is the `Map<*, *>.cyl_descriptionWithLocale` extension)",
- "CYLIndexPathButton.setImage": "`UIButton.setImage(_:for: .normal)` (`CYLIndexPathButton` is a `UIButton`)",
- "CYLIndexPathButton.currentImage": "`UIButton.currentImage`",
+ "CYLIndexPathButton.currentImage": "`CYLTagButton.image` / `selectedImage` (`CYLIndexPathButton` is a `CYLTagButton`)",
  "CYLClassifyMenuViewController.numberOfVisibleItemsInSection": "`CYLClassifyMenuViewController.numberOfVisibleItems(inSection:)` (`-numberOfVisibleItemsInSection:`)",
  "CYLClassifyMenuViewController.setSectionExpanded": "`CYLClassifyMenuViewController.setSection(_:expanded:)` (`-setSection:expanded:`; the More button calls it)",
  "CYLTagView.numberOfVisibleItemsInSection": "`CYLTagView.numberOfVisibleItems(inSection:)` (`-numberOfVisibleItemsInSection:`)",
@@ -70,5 +69,8 @@
  "CYLIndexPathButton.cyl_titleLeadingInset": "`CYLMenuStyle.sectionTitle(leadingInset:)` (the leading content inset of a `CYLTagButton`'s style)",
  "CYLTagImagePlacement.isVertical": "`imagePlacement == .top || imagePlacement == .bottom` (`CYLTagImagePlacement.cylIsVertical`, internal to the Swift core)",
  "CYLTagButton.badgeFrame": "`CYLTagButton.badgeLabel.frame`",
- "CYLTagBadgeDefaultColor": "`UIColor.systemRed` (the default `CYLTagButton.badgeColor`)"
+ "CYLTagBadgeDefaultColor": "`UIColor.systemRed` (the default `CYLTagButton.badgeColor`)",
+ "CYLIndexPathButton.gravity": "`CYLMenuStyle.contentAlignment` (the style of a `CYLTagButton`)",
+ "CYLMultipleFilterHeaderView.imageView": "`titleButton.imageView` (`CYLTagButton.imageView`)",
+ "CYLMultipleFilterHeaderView.titleLabel": "`titleButton.titleLabel` (`CYLTagButton.titleLabel`)"
 }
