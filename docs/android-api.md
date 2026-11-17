@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 770 / 778 with an Android counterpart = 99.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 784 / 792 with an Android counterpart = 99.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -490,28 +490,17 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagAppearance -reset` | method, `CYLTagAppearance.swift` | `CYLTagAppearance.reset` |
 | `CYLTagAppearance -copy` | method, `CYLTagAppearance.swift` | `CYLTagAppearance.clone (Cloneable)` |
 | `CYLTagButton` | class, `CYLTagButton.swift` | `com.cyl.classifymenu.CYLTagButton` |
-| `CYLTagButton.imageView` | property, `CYLTagButton.swift` | `CYLTagButton.imageView` |
-| `CYLTagButton.titleLabel` | property, `CYLTagButton.swift` | `CYLTagButton.titleLabel` |
 | `CYLTagButton.deleteIndicatorLabel` | property, `CYLTagButton.swift` | `CYLTagButton.deleteIndicatorLabel` |
 | `CYLTagButton.badgeLabel` | property, `CYLTagButton.swift` | `CYLTagButton.badgeLabel (same name in the Android core)` |
 | `CYLTagButton.badgeValue` | property, `CYLTagButton.swift` | `CYLTagButton.badgeValue (same name in the Android core)` |
 | `CYLTagButton.badgeColor` | property, `CYLTagButton.swift` | `CYLTagButton.badgeColor (same name in the Android core)` |
-| `CYLTagButton.title` | property, `CYLTagButton.swift` | `CYLTagButton.title` |
-| `CYLTagButton.image` | property, `CYLTagButton.swift` | `CYLTagButton.image` |
-| `CYLTagButton.selectedImage` | property, `CYLTagButton.swift` | `CYLTagButton.selectedImage` |
-| `CYLTagButton.animationURL` | property, `CYLTagButton.swift` | `CYLTagButton.animationURL` |
-| `CYLTagButton.animationRestingProgress` | property, `CYLTagButton.swift` | `CYLTagButton.animationRestingProgress` |
-| `CYLTagButton.animationSpeed` | property, `CYLTagButton.swift` | `CYLTagButton.animationSpeed` |
-| `CYLTagButton.animationLoops` | property, `CYLTagButton.swift` | `CYLTagButton.animationLoops` |
-| `CYLTagButton.animationView` | property, `CYLTagButton.swift` | `CYLTagButton.animationView` |
-| `CYLTagButton.animationPlayer` | property, `CYLTagButton.swift` | `CYLTagButton.animationPlayer` |
 | `CYLTagButton.showsDeleteIndicator` | property, `CYLTagButton.swift` | `CYLTagButton.showsDeleteIndicator` |
 | `CYLTagButton.deleteIndicatorHitFrame` | property, `CYLTagButton.swift` | `CYLTagButton.deleteIndicatorHitFrame` |
 | `CYLTagButton.style` | property, `CYLTagButton.swift` | `CYLTagButton.style` |
 | `CYLTagButton.isAnimationEngineAvailable` | property, `CYLTagButton.swift` | `CYLTagButton.isAnimationEngineAvailable` |
 | `CYLTagButton -initWithTitle:image:` | method, `CYLTagButton.swift` | `CYLTagButton(context, title, image)` |
 | `CYLTagButton -initWithTitle:image:animationURL:` | method, `CYLTagButton.swift` | `CYLTagButton(context, title, image, animationURL)` |
-| `CYLTagButton -playAnimation` | method, `CYLTagButton.swift` | `CYLTagButton.playAnimation` |
+| `CYLTagButton -resetAnimationSpeed` | method, `CYLTagButton.swift` | `CYLTagButton.resetAnimationSpeed (same name in the Android core)` |
 | `CYLTagButton +iconSizeFor:animated:style:` | method, `CYLTagButton.swift` | `CYLTagButton.iconSizeForImage` |
 | `CYLTagButton +heightFor:traitCollection:` | method, `CYLTagButton.swift` | `CYLTagButton.heightForStyle` |
 | `CYLTagColorTheme` | enum, `CYLTagColors.swift` | `com.cyl.classifymenu.CYLTagColorTheme` |
@@ -797,3 +786,28 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagHeaderCell` | class, `CYLTagHeaderCell.swift` | `com.cyl.classifymenu.CYLTagHeaderCell` |
 | `CYLTagHeaderCell.group` | property, `CYLTagHeaderCell.swift` | `CYLTagHeaderCell.group` |
 | `CYLTagHeaderCell.delegate` | property, `CYLTagHeaderCell.swift` | `CYLTagHeaderCell.delegate` |
+| `CYLTagButton.imageView` | property, `CYLAnimatedItemView.h` | `CYLTagButton.imageView (CYLAnimatedItemView.iconView)` |
+| `CYLTagButton.titleLabel` | property, `CYLAnimatedItemView.h` | `CYLTagButton.titleLabel (CYLAnimatedItemView.titleView)` |
+| `CYLTagButton.title` | property, `CYLAnimatedItemView.h` | `CYLTagButton.title (CYLAnimatedItemView)` |
+| `CYLTagButton.image` | property, `CYLAnimatedItemView.h` | `CYLTagButton.image (CYLAnimatedItemView)` |
+| `CYLTagButton.selectedImage` | property, `CYLAnimatedItemView.h` | `CYLTagButton.selectedImage (CYLAnimatedItemView)` |
+| `CYLTagButton.placeholderImage` | property, `CYLAnimatedItemView.h` | `CYLTagButton.placeholderImage (CYLAnimatedItemView)` |
+| `CYLTagButton.animationURL` | property, `CYLAnimatedItemView.h` | `CYLTagButton.animationURL (CYLAnimatedItemView)` |
+| `CYLTagButton.animationSpeed` | property, `CYLAnimatedItemView.h` | `CYLTagButton.animationSpeed (CYLAnimatedItemView)` |
+| `CYLTagButton.animationLoops` | property, `CYLAnimatedItemView.h` | `CYLTagButton.animationLoops (CYLAnimatedItemView)` |
+| `CYLTagButton.animationRestingProgress` | property, `CYLAnimatedItemView.h` | `CYLTagButton.animationRestingProgress (CYLAnimatedItemView)` |
+| `CYLTagButton.animationReady` | property, `CYLAnimatedItemView.h` | `CYLTagButton.isAnimationReady (CYLAnimatedItemView)` |
+| `CYLTagButton.animationView` | property, `CYLAnimatedItemView.h` | `CYLTagButton.animationView (CYLAnimatedItemView)` |
+| `CYLTagButton.delegate` | property, `CYLAnimatedItemView.h` | `CYLTagButton.gestureListener (CYLAnimatedItemView, CYLAnimatedItemGestureListener)` |
+| `CYLTagButton.axis` | property, `CYLAnimatedItemView.h` | `CYLTagButton.axis (CYLAnimatedItemView)` |
+| `CYLTagButton.accessoryView` | property, `CYLAnimatedItemView.h` | `CYLTagButton.accessoryView (CYLAnimatedItemView)` |
+| `CYLTagButton.accessoryPlacement` | property, `CYLAnimatedItemView.h` | `CYLTagButton.accessoryPlacement (CYLAnimatedItemView)` |
+| `CYLTagButton.dragEnabled` | property, `CYLAnimatedItemView.h` | `CYLTagButton.isDragEnabled (CYLAnimatedItemView)` |
+| `CYLTagButton -playAnimation` | method, `CYLAnimatedItemView.h` | `CYLTagButton.playAnimation (CYLAnimatedItemView)` |
+| `CYLTagButton -restartAnimation` | method, `CYLAnimatedItemView.h` | `CYLTagButton.restartAnimation (CYLAnimatedItemView)` |
+| `CYLTagButton -stopAnimation` | method, `CYLAnimatedItemView.h` | `CYLTagButton.stopAnimation (CYLAnimatedItemView)` |
+| `CYLTagButton -showAnimationLastFrame` | method, `CYLAnimatedItemView.h` | `CYLTagButton.showAnimationLastFrame (CYLAnimatedItemView)` |
+| `CYLTagButton -reloadAnimation` | method, `CYLAnimatedItemView.h` | `CYLTagButton.reloadAnimation (CYLAnimatedItemView)` |
+| `CYLTagButton -itemStateDidChange` | method, `CYLAnimatedItemView.h` | `CYLTagButton.onItemStateChanged (CYLAnimatedItemView)` |
+| `CYLTagButton -itemAccessibilityLabel` | method, `CYLAnimatedItemView.h` | `CYLTagButton.accessibilityText (CYLAnimatedItemView)` |
+| `CYLTagButton -updateItemAccessibility` | method, `CYLAnimatedItemView.h` | `CYLTagButton.updateAccessibility (CYLAnimatedItemView)` |

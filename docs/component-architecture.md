@@ -150,7 +150,7 @@ declarations, so Objective-C callers see no change.
   `pod lib lint` 与库的构建/静态分析（有警告即失败）均已通过。
 - 历史 3.5 英寸设备不支持项目现有的 iOS 15 最低版本，因此不能在原设备上复验 #7。
 
-## TODO (2026-11-17): CYLTagButton subclasses CYLTabBarController's CYLAnimatedItemView; no animation engine in the core
+## DONE (2026-11-17): CYLTagButton subclasses CYLTabBarController's CYLAnimatedItemView; no animation engine in the core
 
 - **Context**: branch `feat/harmony` (PR #20). CYLTabBarController's guide
   [docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)
@@ -178,4 +178,58 @@ declarations, so Objective-C callers see no change.
   components."
 - **Guide link (user, 2026-11-17)**: link the guide on its branch, the newest address:
   <https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md>.
-- **Status**: logged; work starts.
+- **Status**: done in the commit after the task log `45101fb` (the row "CollectionViewClassifyMenu" of the guide's
+  "Downstream migration status" table points at `45101fb`); CYLTabBarController pinned at its branch tip `7511f7d`
+  (no code change since `35aa757`, the guide read there). Verification items below stay TODO.
+- **Result**:
+  - iOS: `CYLTagButton` subclasses `CYLAnimatedItemView` (`import CYLTabBarController`); `CYLTagAnimationEngine`, the own
+    icon / title / animation storage, the player and the loop timer are gone. Inherited: `title`, `image`,
+    `selectedImage`, `imageView`, `titleLabel`, `animationURL`, `animationSpeed` (now `CGFloat`; `resetAnimationSpeed()`
+    follows the style again, `CYLTagListView.animationSpeed = nil` calls it), `animationLoops`,
+    `animationRestingProgress`, `animationView`, `playAnimation()` / `restartAnimation()` / `stopAnimation()` /
+    `showAnimationLastFrame()`, `delegate`. Overridden hooks: `layoutContent(in:)` (the style's layout, the image view
+    under the animation view in the same frame), `contentSizeThatFits(_:)`, `itemStateDidChange()` (the appearance per
+    state), `itemAccessibilityLabel()`, `updateItemAccessibility()` (no-op: label, value and traits stay computed),
+    `reloadAnimation()` (the selection's frame), `playAnimation()` (Reduce Motion). `deleteIndicatorLabel` is the
+    `accessoryView` (set once; its tap reaches `animatedItemViewDidTapAccessory(_:)`; leading / trailing through
+    `accessoryPlacement`); `top` / `bottom` set `axis = .vertical`. The display priority, the failure fallbacks, the
+    placeholder and the URL loading are the base class's; a tag keeps the component placeholder (sized like its icon)
+    when it has an animation file and no static image, and a title-only tag shows none.
+    `isAnimationEngineAvailable` is `NSClassFromString("CYLTabBarItemAnimationFactory") != nil`; `animationPlayer` is
+    not referenced by the core (the base class declares it only with an engine). `animationPlayer` (public before) is
+    removed from `CYLTagButton`'s own API (docs/Swift-Migration.md, row 9).
+  - CocoaPods: podspec `s.dependency 'CYLTabBarController/CYLAnimatedItem'`; Example Podfile `CYLAnimatedItem` plus
+    `CYLAnimatedItemLottieObjectiveC`, `…PAG`, `…Rive`, `…SVGA`, `…GIF`; RN and Flutter example Podfiles
+    `CYLAnimatedItemLottieObjectiveC`, `…Rive`; Example-Swift and the root project no engine; TagCollectionView's Podfile
+    pins CYLTabBarController by commit (`CYLAnimatedItem`). `scripts/pod-lint.sh lib` lints with the pinned commit's
+    podspec (`--include-podspecs`), since no trunk release has the subspec.
+  - SwiftPM: `Package.swift` depends on CYLTabBarController by revision, product `CYLTabBarController` (its only
+    product, which also holds its tab bar and Lottie engine). TODO: switch to a `CYLAnimatedItem` product once
+    CYLTabBarController offers one; its SwiftPM build is not green upstream, and this repository's CI does not build
+    SwiftPM.
+  - Android: `CYLTagButton` subclasses `com.cyl.animateditem.CYLAnimatedItemView`; `api("io.github.chenyilong:
+    cyltabbarcontroller-animateditem:1.100.0")`, substituted by `project(":cylanimateditem")` of the pinned checkout in
+    `android/merged/settings.gradle.kts`; `animationURL` is the base class's `String?` (the cell passes
+    `Uri.toString()`; the convenience constructor still takes a `Uri`); `imageView` / `titleLabel` alias `iconView` /
+    `titleView`; `disabledAlpha = 1` (the style draws the disabled look); a non-clickable tag (a cell's) leaves touches
+    to its parent; the fold button's TalkBack text through `accessibilityText()`. Publishing the library to
+    `build/repo` also publishes the pinned `cylanimateditem` there, for the React Native and Flutter hosts. The core adds
+    no animation library; the example keeps Lottie, libpag and rive-android.
+  - HarmonyOS and the mini program: TODO, blocked upstream. CYLTabBarController has no `CYLAnimatedItem` component there
+    yet (the guide's TODO 3 and 4); no local copy is invented. When it ships, `harmony/classifymenu` and the mini program
+    `cyl-tag-button` move onto it the same way.
+  - Tests: Example-Swift `CYLTagButtonStaticImageTests` (no engine in that example: static image, placeholder only
+    without a static image, none for a title alone, playback does nothing, the accessory), Example
+    `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` (with the engines: a missing file and an
+    unknown type), the Objective-C standalone test (inherited members visible to Objective-C), Android
+    `CYLTagButtonStandaloneTest` (no library: static image and same layout, placeholder rule, the accessory's tap).
+  - Parity tables regenerated: iOS -> Android 784 / 792 = 99.0 (the 8 `TODO` rows predate this task), Android -> iOS
+    731 / 731 = 100; `ios_public_api.py` lists CYLTagButton's inherited `CYLAnimatedItemView` members, mapped in
+    `api-map.json`. Mini program `npm test`: 110 pass, 0 fail.
+- **TODO (verification)**: no Xcode, Android SDK or DevEco in this Linux container, so nothing was compiled: (1) `pod
+  install` and the iOS builds and tests (`scripts/unit-tests.sh`, `scripts/pod-lint.sh lib`) in CI, in particular the
+  Swift overrides of the Objective-C members (`title`, `image`, `selectedImage`, `animationSpeed`,
+  `animationRestingProgress`, `layoutContent(in:)`) and `scripts/swift-api-check.sh` (refresh
+  `scripts/swift-api-baseline.json`); (2) the Android build and Robolectric tests (`android/scripts/gradle.sh merged
+  :library:testDebugUnitTest :example:assembleDebug`) and the `build/repo` copy of `cylanimateditem`; (3) the example
+  screenshots of the animated tags (Lottie, PAG, Rive, SVGA, GIF) against the previous ones.

@@ -38,7 +38,7 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
     }
 
     func testAnimatedIconsUseCYLTabBarControllerAnimationEngine() {
-        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable, "CYLTabBarController/CYLTabBarItemAnimation is linked")
+        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable, "The example adds the CYLAnimatedItem engine subspecs")
         let resources = Bundle.main.resourceURL!
         let files = [
             "GIF": "CYLMenuExample.bundle/Animations/GIF/tab_star.gif",
@@ -54,7 +54,8 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
             button.animationURL = url
             button.layoutIfNeeded()
             XCTAssertNotNil(button.animationView, "\(library) view from CYLTabBarItemAnimationFactory")
-            XCTAssertNotNil(button.animationPlayer, "\(library) player")
+            // `animationPlayer` is declared only when an engine is linked: read it by key.
+            XCTAssertNotNil(button.value(forKey: "animationPlayer"), "\(library) player")
             XCTAssertTrue(button.imageView.isHidden, "\(library) takes the icon slot")
             let animationFrame = button.animationView?.frame ?? .zero
             XCTAssertEqual(animationFrame.size, button.style.imageSize, "\(library) \(NSCoder.string(for: animationFrame))")
@@ -159,7 +160,7 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
         let resting = tags.tagButton(at: ip(restingItem, pag))
         XCTAssertEqual(resting?.animationRestingProgress ?? 0, 1, accuracy: 0.001)
         XCTAssertFalse(resting?.isSelected ?? true)
-        let progress = ((resting?.animationPlayer as AnyObject?)?.value(forKey: "progress") as? NSNumber)?.doubleValue ?? 0
+        let progress = ((resting?.value(forKey: "animationPlayer") as AnyObject?)?.value(forKey: "progress") as? NSNumber)?.doubleValue ?? 0
         XCTAssertEqual(progress, 1, accuracy: 0.01, "Shows its last frame")
         // truck.riv (rive-app/rive-ios) replaced confetti.riv, which draws nothing at rest.
         let rive = sections.firstIndex(of: "rive") ?? 0

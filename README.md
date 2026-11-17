@@ -278,15 +278,35 @@ style.selectedAppearance.backgroundColor = UIColor.systemBlueColor;
 #### 动效图标 / Animated icons
 
 `-menuAnimationURLForItemAtIndexPath:`（或 `CYLTagButton.animationURL`）可以提供 Lottie（.json）、PAG（.pag）、
-Rive（.riv）、GIF 动效文件，播放方式与 CYLTabBarController 的 Tab 图标相同：点击选中时播放，选中时停在最后一帧，
-取消选中时回到第一帧（减弱动态效果时不播放）。动效视图与播放器来自 CYLTabBarController 的动效引擎
-（`CYLTabBarItemAnimationFactory`），组件在运行时查找，不依赖 CYLTabBarController；在 App 的 Podfile 中加入需要的动效库：
+Rive（.riv）、SVGA、GIF 动效文件，播放方式与 CYLTabBarController 的 Tab 图标相同：点击选中时播放，选中时停在最后一帧，
+取消选中时回到第一帧（减弱动态效果时不播放）。
+
+`CYLTagButton` is a subclass of CYLTabBarController's shared animated icon + title component, `CYLAnimatedItemView`
+([guide](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)).
+The pod depends on `CYLTabBarController/CYLAnimatedItem` only (static images, no tab bar, no animation engine); the
+app adds the engine of each file type it plays:
 
 ```ruby
-pod 'CYLTabBarController/Lottie'   # 或 /PAG、/Rive、/GIF
+cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :commit => '<sha>' }
+pod 'CYLTabBarController/CYLAnimatedItemLottieSwift', cyl_tab_bar   # or …LottieObjectiveC, …PAG, …PAGEnterprise, …Rive, …SVGA, …GIF
 ```
 
-未链接动效引擎或文件无法加载时显示静态图标。
+On Android the library depends on `io.github.chenyilong:cyltabbarcontroller-animateditem` (no animation library); the
+app adds Lottie, libpag, rive-android or SVGAPlayer. What a tag shows (CYLAnimatedItemView's rules, inherited):
+
+1. the animation, when it can play;
+2. otherwise the static `image` / `selectedImage` given to the tag, with the same layout as the image alone (no engine
+   or library, an unknown type, a missing, empty or corrupted file, a failed download), and while a remote file
+   downloads;
+3. the component's placeholder (`CYLAnimatedItemView.defaultPlaceholderImage`, sized like the tag's icon) only when
+   the tag has an animation file and no static image; a tag with a title and no icon never shows one.
+
+Without an engine the playback methods (`playAnimation()`, `restartAnimation()`, `stopAnimation()`) do nothing and
+`animationURL` is kept, so the same code animates once an engine subspec is added.
+
+Remote animation files are loaded by the engines, never by the tag: on iOS the Rive and SVGA engines read URLs, while
+Lottie (Swift, 4.x), PAG and GIF read local files only (a remote URL shows the static image, or the placeholder, at
+once; a CYLTabBarController TODO); on Android every engine reads URLs.
 
 动效库读取的选项（例如 Rive 文件的画板与状态机）写在 URL 中，编码方式与 CYLTabBarController 的
 `CYLTabBarAnimationURLWithOptions()` 相同：在代码中用 `URL.cylAddingAnimationOptions(_:)`，在字典或配置文件中用

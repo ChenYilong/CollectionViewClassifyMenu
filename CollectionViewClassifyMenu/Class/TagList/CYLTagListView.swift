@@ -614,7 +614,7 @@ open class CYLTagListView: UIView {
      */
     open var animationSpeed: CGFloat? {
         didSet {
-            forEachVisibleTagButton { $0.animationSpeed = animationSpeed }
+            forEachVisibleTagButton { $0.cylApplyListAnimationSpeed(animationSpeed) }
         }
     }
 
@@ -2161,7 +2161,7 @@ private extension CYLTagListView {
                        selectedImage: selectedImage(at: indexPath), animationURL: animationURL(at: indexPath),
                        style: style(forItemAt: indexPath), isSelected: selection.contains(indexPath), isEnabled: enabled)
         cell.button.animationRestingProgress = animationRestingProgress(at: indexPath)
-        cell.button.animationSpeed = animationSpeed
+        cell.button.cylApplyListAnimationSpeed(animationSpeed)
         cell.button.animationLoops = animationLoops
         let deletable = isDeletable(at: indexPath) && enabled
         cell.isDeletable = deletable
@@ -2543,5 +2543,19 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
                                referenceSizeForFooterInSection section: Int) -> CGSize {
         let showsControl = foldControlIsInFooter && canFoldSection(section)
         return showsControl ? CGSize(width: collectionView.bounds.width, height: footerHeight) : .zero
+    }
+}
+
+extension CYLTagButton {
+
+    /**
+     * The list's `animationSpeed`: a speed sets the tag's own, `nil` lets it follow its style again.
+     */
+    func cylApplyListAnimationSpeed(_ speed: CGFloat?) {
+        if let speed {
+            animationSpeed = speed
+        } else {
+            resetAnimationSpeed()
+        }
     }
 }

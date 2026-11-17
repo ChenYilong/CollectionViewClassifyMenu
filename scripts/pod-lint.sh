@@ -46,7 +46,22 @@ case "$command" in
     echo "Updated $PODSPEC: $version → $next. Commit and tag the release before pushing."
     ;;
   lib)
-    pod lib lint "$PODSPEC" --allow-warnings "$@"
+    # The podspec depends on CYLTabBarController/CYLAnimatedItem, which no CocoaPods release has yet: lint against the
+    # commit the Podfiles pin (CYL_TAB_BAR in Example/Podfile), with that commit's podspec sourced by :commit.
+    sha=$(sed -n "s/.*:commit => '\([0-9a-f]\{40\}\)'.*/\1/p" Example/Podfile | head -n 1)
+    if [ -z "$sha" ]; then
+      echo "error: no CYL_TAB_BAR commit in Example/Podfile" >&2
+      exit 1
+    fi
+    dir=$(mktemp -d "${TMPDIR:-/tmp}/cyl-pod-lint.XXXXXX")
+    trap 'rm -rf "$dir"' EXIT HUP INT TERM
+    curl -fsSL "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/$sha/CYLTabBarController.podspec" \
+      | sed "s/:tag => s\.version\.to_s/:commit => '$sha'/" > "$dir/CYLTabBarController.podspec"
+    grep -q ":commit => '$sha'" "$dir/CYLTabBarController.podspec" || {
+      echo "error: could not point CYLTabBarController.podspec at $sha" >&2
+      exit 1
+    }
+    pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$dir/CYLTabBarController.podspec" "$@"
     ;;
   push)
     if ! git ls-remote --exit-code --tags origin "refs/tags/$version" >/dev/null; then

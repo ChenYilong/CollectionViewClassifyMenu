@@ -303,7 +303,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         let button = list.tagButton(at: ip(0, 0))
         XCTAssertEqual(button?.layer.cornerRadius, 0)
         XCTAssertNotNil(button?.imageView.image)
-        XCTAssertTrue(button?.deleteIndicatorLabel.isHidden ?? false, "a drawn cross instead of the ×")
+        XCTAssertNil(button?.deleteIndicatorLabel.text, "a drawn cross instead of the × (the empty accessory stays tappable)")
         let cross = button?.layer.sublayers?.compactMap { $0 as? CAShapeLayer }.first { $0.path != nil && !$0.isHidden }
         XCTAssertNotNil(cross)
         let cell = list.probe.cell(at: ip(0, 0)) as? CYLTagListCell

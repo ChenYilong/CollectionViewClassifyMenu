@@ -53,7 +53,10 @@ flutter {
 // CYLTabBarController's Android animation engine (Example-Android/cyltabbar and tabpages at the commit of
 // android/merged/gradle.properties), which CYLTagListView finds at run time to play the Lottie icons. Build it with
 // android/scripts/gradle.sh merged :Example-Android:cyltabbar:assembleRelease :Example-Android:tabpages:jar and point
-// cyl.tabbar.libs (gradle.properties) at a folder holding cyltabbar-release.aar and tabpages-*.jar.
+// cyl.tabbar.libs (gradle.properties) at a folder holding cyltabbar-release.aar and tabpages-*.jar. cyltabbar's
+// dependency io.github.chenyilong:cyltabbarcontroller-animateditem (the animated icon + title component) is not in that
+// folder: it comes from cyl.classifymenu.repo, where publishing com.cyl:classifymenu copies it (do not add its aar
+// here as well, or its classes are duplicated).
 val cylTabBarLibs = providers.gradleProperty("cyl.tabbar.libs").orNull
 dependencies {
     if (cylTabBarLibs != null) {
