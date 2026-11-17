@@ -50,7 +50,10 @@ tags: [issues, ui, cocoapods, progress]
   `META-INF/androidtagview/{LICENSE,NOTICE}` (Apache-2.0); MIT `LICENSE` for npm (React Native), both pub.dev packages
   (the Flutter "TODO" placeholder replaced) and their HAR, the ohpm HAR (module root and `rawfile`), the mini program
   package (root, listed in `files`, expected by `verify-package.js`). Check: `scripts/check-licenses.sh` (passes,
-  shellcheck clean); mini program `verify-package.js` and `npm test` 111/111 pass. Not built here: the iOS bundle, the
+  shellcheck clean); mini program `verify-package.js` and `npm test` 111/111 pass.
+  2026-11-17, after re-reading CYLTabBarController's guide (tip `ec12a9d`, its `docs/License-Notices.md`): the mini
+  program package also carries `miniprogram_dist/LICENSE`, as CYLTabBarController's mini program component folders
+  do (the earlier worry about WeChat file types did not hold). Not built here: the iOS bundle, the
   AAR and the HAR (CI and the platform toolchains).
 - Found: the packages disagree (iOS podspec "All rights reserved", npm / ohpm / mini program "MIT", Flutter LICENSE a
   "TODO" placeholder, the AndroidTagView port Apache-2.0 from its upstream, the merged Android library none).

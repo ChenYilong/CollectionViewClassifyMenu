@@ -36,13 +36,14 @@ below has the same text. Third-party code keeps its own license and notice.
 | npm (React Native) | `react-native/react-native-cyl-tag-list` | `LICENSE` at the package root (npm always packs it) | `package.json` `"license": "MIT"` |
 | pub.dev (Flutter) | `flutter/cyl_tag_list`, `flutter/cyl_tag_list_ohos` | `LICENSE` at the package root (pub.dev requires it); `flutter/cyl_tag_list_ohos/ohos/LICENSE` for its HAR | the `LICENSE` file; `oh-package.json5` `"license": "MIT"` |
 | ohpm (HarmonyOS) | `harmony/classifymenu` | `LICENSE` at the module root and in `src/main/resources/rawfile/` | `oh-package.json5` `"license": "MIT"` |
-| npm (mini program) | `CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram` | `LICENSE` at the package root, listed in `files` (not in `miniprogram_dist`: a WeChat code package accepts only certain file types); `scripts/verify-package.js` expects it in the tarball | `package.json` `"license": "MIT"` |
+| npm (mini program) | `CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram` | `LICENSE` at the package root (listed in `files`) and in the component folder `miniprogram_dist/` (copied into `miniprogram_npm` when DevTools builds npm, as CYLTabBarController's mini program packages do); `scripts/verify-package.js` expects both in the tarball | `package.json` `"license": "MIT"` |
 
 Android puts each library's files under `META-INF/<artifact>/`, so two libraries in one app never collide on
 `META-INF/LICENSE`.
 
 A new published package, or a new registry, gets a row here, a line in `scripts/check-licenses.sh`, and follows the
-same rule.
+same rule. CYLTabBarController applies the same rule to its own packages (`docs/License-Notices.md`,
+`scripts/check-license-notices.py` there).
 
 ## Check
 
