@@ -1,8 +1,5 @@
 #import <XCTest/XCTest.h>
 @import CollectionViewClassifyMenu;
-// CYLTagButton's inherited members (animationURL, restartAnimation, stopAnimation…) are declared by
-// CYLTabBarController's CYLAnimatedItemView; Clang shows a module's declarations only to a file that imports it.
-@import CYLTabBarController;
 
 // Core tests: they use the demo data (data.json of the host app) but no demo code. The demo app's own tests
 // (CYLMainViewController, CYLDemoLocalizedString) are in CYLClassifyMenuDemoTests.swift.
