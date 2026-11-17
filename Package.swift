@@ -23,16 +23,16 @@ let package = Package(
         // CYLTagButton subclasses CYLTabBarController's CYLAnimatedItemView (the CocoaPods subspec
         // CYLTabBarController/CYLAnimatedItem; guide:
         // https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md),
-        // pinned to the same commit as the Podfiles. CYLTabBarController's Swift package has one product, which also
-        // contains its tab bar and its Lottie engine (SwiftPM cannot offer a Core-free variant there).
+        // pinned to the same commit as the Podfiles. Its Swift package's `CYLAnimatedItem` product is the component on
+        // its own (the view, its resources and the animation engine), without the tab bar.
         .package(url: "https://github.com/ChenYilong/CYLTabBarController.git",
-                 revision: "074285a66732e47a1783ed3926ac98a13a1c833f")
+                 revision: "6f93ae6bff445cbfefa9a66509dd7d723735c843")
     ],
     targets: [
         .target(
             name: "CollectionViewClassifyMenu",
             dependencies: [
-                .product(name: "CYLTabBarController", package: "CYLTabBarController")
+                .product(name: "CYLAnimatedItem", package: "CYLTabBarController")
             ],
             path: "CollectionViewClassifyMenu",
             exclude: [
