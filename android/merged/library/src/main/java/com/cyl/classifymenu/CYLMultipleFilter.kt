@@ -9,7 +9,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -129,23 +128,16 @@ internal class CYLStretchableDrawable(private val bitmap: android.graphics.Bitma
 }
 
 /**
- * `CYLFilterCollectionCell`: an item of the multiple filter: a button with the slide backgrounds (green title, white
- * when selected), not touchable itself (the cell is).
+ * `CYLFilterCollectionCell`: an item of the multiple filter: a tag (`CYLIndexPathButton`, a `CYLTagButton` in
+ * `CYLMenuStyle.filterTag()`: the slide backgrounds, a green title that turns white when selected) that fills the cell
+ * and shows the selection; the cell takes the touches and is the accessibility element.
  */
 class CYLFilterCollectionCell @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
     val titleButton: CYLIndexPathButton = CYLIndexPathButton(context).apply {
+        style = CYLMenuStyle.filterTag()
         isClickable = false
         isFocusable = false
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-        val font = CYLTagTitleFont
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, font.size)
-        gravity = Gravity.CENTER
-        background = android.graphics.drawable.StateListDrawable().apply {
-            CYLStretchableDrawable.named("btn_slide_selected")?.let { addState(intArrayOf(android.R.attr.state_selected), it) }
-            CYLStretchableDrawable.named("btn_slide_normal")?.let { addState(intArrayOf(), it) }
-        }
-        setTextColor(android.content.res.ColorStateList(arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf()),
-            intArrayOf(Color.WHITE, Color.rgb(96, 147, 130))))
     }
 
     init {
@@ -156,43 +148,75 @@ class CYLFilterCollectionCell @JvmOverloads constructor(context: Context, attrs:
 }
 
 /**
- * `CYLMultipleFilterHeaderView`: a section header of the multiple filter: an image at the leading edge and the title
- * (50 dp in, half-transparent black) above a green line.
+ * `CYLMultipleFilterHeaderView`: a section header of the multiple filter: the section's title (`titleButton`, a
+ * `CYLTagButton`, half-transparent black, 50 dp in), with an optional icon before it (6 dp in), above a green line.
+ * TalkBack reads the title as a heading.
  */
 class CYLMultipleFilterHeaderView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : ViewGroup(context, attrs) {
     private val density: Float get() = resources.displayMetrics.density
-    val imageView: ImageView = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER }
-    val titleLabel: TextView = TextView(context).apply {
-        setTextColor(Color.argb(128, 0, 0, 0))
-        gravity = Gravity.CENTER_VERTICAL
-        maxLines = 1
-        ellipsize = android.text.TextUtils.TruncateAt.END
+
+    /**
+     * The section's title, and its icon (`image`, or `animationURL`) when it has one: a `CYLTagButton` in a
+     * section-title style, read by TalkBack as a heading labeled with the title. Set the title with `titleButton.title`.
+     */
+    val titleButton: CYLTagButton = object : CYLIndexPathButton(context) {
+        override fun onInitializeAccessibilityNodeInfo(info: android.view.accessibility.AccessibilityNodeInfo) {
+            super.onInitializeAccessibilityNodeInfo(info)
+            // A heading, not a control (iOS: the header trait only).
+            info.className = TextView::class.java.name
+        }
+    }.apply {
+        style = CYLMenuStyle.sectionTitle(16f, Color.argb(128, 0, 0, 0)).apply {
+            imageSize = CYLSize(ICON_SIDE, ICON_SIDE)
+            // The icon in the leading 50 dp, the title at 50 dp with or without it.
+            imageTitleSpacing = TITLE_X - ICON_X - ICON_SIDE
+        }
+        isClickable = false
+        isFocusable = true
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         androidx.core.view.ViewCompat.setAccessibilityHeading(this, true)
     }
+
+    /**
+     * The icon of `titleButton` (its `imageView`); set it with `titleButton.image`.
+     */
+    val imageView: ImageView get() = titleButton.imageView
+
+    /**
+     * The label of `titleButton` (its `titleLabel`); set the text with `titleButton.title`.
+     */
+    val titleLabel: TextView get() = titleButton.titleLabel
+
     private val linePaint = Paint().apply { color = Color.rgb(146, 175, 164) }
 
     init {
         setWillNotDraw(false)
-        addView(imageView)
-        addView(titleLabel)
+        addView(titleButton)
     }
+
+    private fun titleX(): Float = if (titleButton.image == null && titleButton.animationURL == null) TITLE_X else ICON_X
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = (38 * density).roundToInt()
         setMeasuredDimension(width, height)
-        imageView.measure(MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
-        titleLabel.measure(MeasureSpec.makeMeasureSpec(max(0, width - (50 * density).roundToInt()), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+        val x = (titleX() * density).roundToInt()
+        titleButton.measure(MeasureSpec.makeMeasureSpec(max(0, width - x), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val x = (6 * density).roundToInt()
-        imageView.layout(x, 0, x + imageView.measuredWidth, b - t)
-        titleLabel.layout((50 * density).roundToInt(), 0, r - l, b - t)
+        val x = (titleX() * density).roundToInt()
+        titleButton.layout(x, 0, max(x, r - l), b - t)
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawRect(50 * density, height - max(1f, 0.5f * density), width.toFloat(), height.toFloat(), linePaint)
+        canvas.drawRect(TITLE_X * density, height - max(1f, 0.5f * density), width.toFloat(), height.toFloat(), linePaint)
+    }
+
+    private companion object {
+        const val TITLE_X = 50f
+        const val ICON_X = 6f
+        const val ICON_SIDE = 24f
     }
 }
 
@@ -514,17 +538,15 @@ open class CYLMultipleFilterController : CYLFilterBaseController() {
             removeAllViews()
             headers.clear()
             cells.clear()
-            val font = CYLTagTitleFontForTraitCollection(resources.configuration.fontScale)
             filterParamsTool.dataSources.forEachIndexed { section, items ->
                 val header = CYLMultipleFilterHeaderView(context)
-                header.titleLabel.text = menuDataSource?.menuTitleForSection(section)
+                header.titleButton.title = menuDataSource?.menuTitleForSection(section)
                 headers.add(header)
                 addView(header)
                 items.forEachIndexed { item, text ->
                     val indexPath = CYLIndexPath(item, section)
                     val cell = CYLFilterCollectionCell(context)
-                    cell.titleButton.text = text
-                    cell.titleButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, font.size)
+                    cell.titleButton.title = text
                     cell.titleButton.isSelected = filterParamsTool.filterParamsArray.getOrNull(section)?.getOrNull(item) == true
                     cell.titleButton.section = section
                     cell.titleButton.row = item
