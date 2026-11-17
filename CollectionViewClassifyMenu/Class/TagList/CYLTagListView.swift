@@ -658,6 +658,22 @@ open class CYLTagListView: UIView {
     open var tagClickHandler: ((Int, CYLTag) -> Void)?
 
     /**
+     * Objective-C's `tagClickHandler`: called for the same taps as `tagClickHandler`, right after it, with the tag's
+     * index and title (Swift uses `tagClickHandler`, whose `CYLTag` Objective-C cannot see).
+     */
+    @available(swift, obsoleted: 1, renamed: "tagClickHandler")
+    @objc(tagClickHandler)
+    open var objcTagClickHandler: ((Int, String) -> Void)? {
+        get { objcTagClickHandlerStorage }
+        set { objcTagClickHandlerStorage = newValue }
+    }
+
+    /**
+     * The handler behind `objcTagClickHandler`, which Swift code cannot name.
+     */
+    private var objcTagClickHandlerStorage: ((Int, String) -> Void)?
+
+    /**
      * Called after a tap on a tag's delete indicator removed it (android-tagview's OnTagDeleteListener), after the
      * menu delegate.
      */
@@ -2077,6 +2093,7 @@ private extension CYLTagListView {
         }
         if let tag = tag(at: indexPath) {
             tagClickHandler?(indexPath.item, tag)
+            objcTagClickHandlerStorage?(indexPath.item, tag.title)
         }
     }
 

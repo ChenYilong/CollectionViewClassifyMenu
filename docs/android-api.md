@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 766 / 766 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 767 / 767 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -701,6 +701,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView.animationLoops` | property, `CYLTagListView.swift` | `CYLTagListView.animationLoops` |
 | `CYLTagListView -playAllAnimations` | method, `CYLTagListView.swift` | `CYLTagListView.playAllAnimations` |
 | `CYLTagListView.tagClickHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagClickHandler` |
+| `CYLTagListView.objcTagClickHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagClickHandler` |
 | `CYLTagListView.tagDeleteHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagDeleteHandler` |
 | `CYLTagListView.containerBorderWidth` | property, `CYLTagListView.swift` | `CYLTagListView.containerBorderWidth` |
 | `CYLTagListView.containerBorderColor` | property, `CYLTagListView.swift` | `CYLTagListView.containerBorderColor` |
