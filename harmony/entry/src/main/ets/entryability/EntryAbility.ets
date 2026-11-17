@@ -4,11 +4,15 @@ import { window } from '@kit.ArkUI';
 import { CYLMenuResources } from '@cyl/classifymenu';
 import { CYLLaunchOptions } from '../data/CYLLaunchOptions';
 import { CYLDemoNav } from '../demos/DemoNav';
+import { cylRegisterExampleAnimationEngines } from '../animation/CYLExampleAnimationViews';
 
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    // The library plays no animation by itself: the example registers the engines it bundles (Lottie, PAG, Rive, SVGA,
+    // GIF) and the views that play them, before any tag is shown.
+    cylRegisterExampleAnimationEngines();
     CYLLaunchOptions.read(want);
     this.applyLaunchOptions();
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');

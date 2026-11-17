@@ -5,6 +5,11 @@
   "main": "",
   "author": "",
   "license": "",
-  "dependencies": { "@cyl/classifymenu": "file:../classifymenu" }
+  "dependencies": {
+    "@cyl/classifymenu": "file:../classifymenu",
+    "@ohos/lottie": "2.0.38",
+    "@tencent/libpag": "4.4.31",
+    "@ohos/rive": "1.0.4"
+  }
 }
 

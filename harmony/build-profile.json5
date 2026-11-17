@@ -30,6 +30,10 @@
       "srcPath": "./classifymenu"
     },
     {
+      "name": "cylanimateditem",
+      "srcPath": "./cylanimateditem"
+    },
+    {
       "name": "entry",
       "srcPath": "./entry",
       "targets": [

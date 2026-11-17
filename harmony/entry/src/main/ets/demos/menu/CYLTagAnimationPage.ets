@@ -7,8 +7,10 @@ import { CYLColor, CYLUIContext } from '@cyl/classifymenu';
  * controls of docs/example-demo-rules.md: Play all (全部播放), a speed slider (0.25x to 4x, steps of 0.25, the value next
  * to it) and a loop switch (循环播放); they combine and act at once, also on icons that are playing.
  *
- * HarmonyOS: the core picks the engine by the file's extension: Lottie (@ohos/lottie), PAG (@tencent/libpag), Rive
- * (@ohos/rive), SVGA (decoded by the library), GIF (frames decoded by ImageKit). The files are rawfiles (pag/, rive/,
+ * HarmonyOS: each tag's icon is CYLTabBarController's CYLAnimatedItemView; the library depends on no animation
+ * library, and the example registers the engines it bundles and their views (animation/CYLExampleAnimationViews.ets,
+ * called from EntryAbility), picked by the file's extension: Lottie (@ohos/lottie), PAG (@tencent/libpag), Rive
+ * (@ohos/rive), SVGA (decoded by the example), GIF (frames decoded by ImageKit). The files are rawfiles (pag/, rive/,
  * svga/, gif/); every Rive scene has an SVGA twin (svga, svga-dark), with the same Rive
  * options and PAG resting progress as iOS. Rive has no playback speed on HarmonyOS (`CYLRivePlayer`).
  */

@@ -1,8 +1,10 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
   CYLAnimationSource, CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
-  CYLImageTagMetrics, CYLImageTagPlacement, CYLPoint, CYLRect, CYLSize, CYLSVGAMovie, CYLSVGAPlayer, CYLTagListState
+  CYLImageTagMetrics, CYLImageTagPlacement, CYLPoint, CYLRect, CYLSize, CYLTagListState
 } from '@cyl/classifymenu';
+import { CYLSVGAPlayer } from '../main/ets/animation/CYLExampleAnimationPlayers';
+import { CYLSVGAMovie } from '../main/ets/animation/svga/CYLSVGAMovie';
 
 function movie(frames: number, fps: number): CYLSVGAMovie {
   const m = new CYLSVGAMovie();
