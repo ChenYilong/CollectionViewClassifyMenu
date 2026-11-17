@@ -697,4 +697,36 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     window.hidden = YES;
 }
 
+/*!
+ * CYLTagButton on its own (a search bar item, a placeholder's icon) from Objective-C: the convenience initializers,
+ * the badge, the icon above the title and the measurement, as the React Native wrappers (Objective-C++) call them.
+ */
+- (void)testTagButtonStandaloneAPIIsVisibleToObjectiveC {
+    UIImage *image = [UIImage systemImageNamed:@"house"];
+    CYLTagButton *button = [[CYLTagButton alloc] initWithTitle:@"Home" image:image];
+    XCTAssertEqualObjects(button.title, @"Home");
+    XCTAssertTrue(button.isAccessibilityElement);
+    XCTAssertTrue(CGSizeEqualToSize(button.bounds.size, button.intrinsicContentSize));
+    XCTAssertNil(button.badgeValue);
+    XCTAssertTrue(button.badgeLabel.hidden);
+    button.badgeValue = @"3";
+    button.badgeColor = UIColor.orangeColor;
+    [button layoutIfNeeded];
+    XCTAssertFalse(button.badgeLabel.hidden);
+    XCTAssertEqualObjects(button.badgeLabel.text, @"3");
+    XCTAssertEqualObjects(button.accessibilityValue, @"3");
+    button.badgeColor = nil;
+    XCTAssertEqualObjects(button.badgeColor, UIColor.systemRedColor);
+
+    NSURL *url = [NSURL fileURLWithPath:@"/no/such/file.json"];
+    CYLTagButton *animated = [[CYLTagButton alloc] initWithTitle:nil image:image animationURL:url];
+    XCTAssertEqualObjects(animated.animationURL, url);
+
+    XCTAssertEqual(CYLTagImagePlacementTop, 2);
+    XCTAssertEqual(CYLTagImagePlacementBottom, 3);
+    CGFloat height = [CYLTagButton heightForTitle:@"Home" iconSize:CGSizeMake(24, 40)
+                                            style:button.style traitCollection:nil];
+    XCTAssertGreaterThan(height, 40, @"The taller icon and the insets");
+}
+
 @end

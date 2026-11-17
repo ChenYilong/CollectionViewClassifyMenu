@@ -174,7 +174,7 @@ New APIs / 新增接口:
 | `CYLMenuStyle.foldChevronImage` | 底部折叠箭头图片，展开时旋转 180° |
 | `CYLMenuStyle` | 标题字体与颜色、图标颜色（按状态）、图标与文字间距、图标大小、位置偏移、`layoutCentered`、间距、高度、折叠文案；Dynamic Type |
 | `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
-| `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也可单独使用 |
+| `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也是唯一的「图标 + 标题 + 动效图标」组件，可单独使用：`init(title:image:)` / `init(title:image:animationURL:)`（Objective-C `-initWithTitle:image:` / `-initWithTitle:image:animationURL:`），按内容自适应大小（`intrinsicContentSize`）；角标 `badgeValue`（`nil` 隐藏、空字符串为小红点、其他文字为胶囊）与 `badgeColor`（默认 `systemRed`），位于图标（无图标时为标题）右上角，VoiceOver 读作标签的值；`CYLMenuStyle.imagePlacement = .top` / `.bottom` 图标在标题上方 / 下方；`height(forTitle:iconSize:style:traitCollection:)` 测量高度。Android、HarmonyOS、小程序（`cyl-tag-button`）同名 API |
 | `-menuSelectedImageForItemAtIndexPath:` | 选中态图标 |
 | `-menuAnimationURLForItemAtIndexPath:`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF 动效图标（CYLTabBarController 动效引擎） |
 | `-initWithConfiguration:`, `+tagListViewWithConfigurationFile:error:`, `+styleWithConfiguration:` | 字典（map）与配置文件初始化 |

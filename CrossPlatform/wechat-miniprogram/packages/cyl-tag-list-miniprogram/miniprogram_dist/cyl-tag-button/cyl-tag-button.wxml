@@ -1,0 +1,16 @@
+<view class="cyl-tag-button" style="{{view.cellStyle}}" bindtap="onTap"
+      aria-role="button" aria-label="{{view.accessibilityLabel}}" aria-selected="{{selected}}" aria-disabled="{{!enabled}}">
+  <view wx:if="{{view.iconKind !== 'none'}}" class="cyl-icon-slot" style="{{view.slotStyle}}">
+    <cyl-animation-icon wx:if="{{view.iconKind === 'animation'}}" id="cyl-tag-button-animation" class="cyl-icon"
+                        style="position: absolute; left: 0; top: 0;" animation="{{animationURL}}" options="{{animationOptions}}"
+                        size="{{view.iconWidth}}" height="{{view.iconHeight}}" speed="{{view.speed}}" loops="{{animationLoops}}"
+                        selected="{{selected}}" resting-progress="{{animationRestingProgress}}" disabled="{{!enabled}}" />
+    <text wx:elif="{{view.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{view.iconStyle}}; font-size: {{view.glyphSize}}px;">{{view.glyph}}</text>
+    <image wx:else class="cyl-icon" src="{{view.iconSrc}}" mode="aspectFit" style="{{view.iconStyle}}" />
+    <text wx:if="{{view.showsBadge}}" class="cyl-badge" style="{{view.badgeStyle}}" aria-hidden="true">{{view.badgeText}}</text>
+  </view>
+  <view wx:if="{{view.showsTitle}}" class="cyl-title-box" style="{{view.titleStyle}}">
+    <text class="cyl-title">{{view.title}}</text>
+    <text wx:if="{{view.showsBadge && view.iconKind === 'none'}}" class="cyl-badge" style="{{view.badgeStyle}}" aria-hidden="true">{{view.badgeText}}</text>
+  </view>
+</view>

@@ -142,4 +142,127 @@ final class CYLTagButtonTests: XCTestCase {
                              title.size(withAttributes: [.font: regularFont]).width,
                              "Measured with the bold font, so bold tags do not truncate")
     }
+
+    // MARK: - On its own: the icon above the title, the badge, the convenience initializers
+
+    func testTagButtonPutsTheIconAboveOrBelowTheTitle() {
+        let style = CYLMenuStyle()
+        style.imagePlacement = .top
+        style.imageSize = CGSize(width: 24, height: 24)
+        style.imageTitleSpacing = 4
+        XCTAssertEqual(CYLTagImagePlacement.top.rawValue, 2)
+        XCTAssertEqual(CYLTagImagePlacement.bottom.rawValue, 3)
+        XCTAssertEqual(CYLTagImagePlacement.trailing.rawValue, 1, "Existing raw values are kept")
+        let height = CYLTagButton.height(for: style, traitCollection: nil)
+        let font = style.titleFont(for: .normal, traitCollection: nil)
+        let insets = style.normalAppearance.contentInsets
+        XCTAssertGreaterThanOrEqual(height, 24 + 4 + ceil(font.lineHeight) + insets.top + insets.bottom,
+                                    "The icon slot and the spacing are part of the height")
+        let button = CYLMenuFixtures.tagButton(title: "消息", image: UIImage(systemName: "message"), style: style,
+                                               size: CGSize(width: 120, height: height))
+        let image = button.imageView.frame
+        let title = button.titleLabel.frame
+        XCTAssertEqual(title.minY - image.maxY, 4, accuracy: 0.5, "imageTitleSpacing between them")
+        XCTAssertEqual(image.midX, 60, accuracy: 1, "The icon is centered")
+        XCTAssertEqual(title.midX, 60, accuracy: 1, "The title is centered")
+        XCTAssertEqual(image.size, style.imageSize)
+        XCTAssertEqual(CYLTagButton.width(forTitle: "消息", iconSize: style.imageSize, style: style, traitCollection: nil),
+                       ceil(max(24, ceil(("消息" as NSString).size(withAttributes: [.font: font]).width))
+                            + insets.left + insets.right), accuracy: 1, "The wider of the two, not their sum")
+
+        style.imagePlacement = .bottom
+        button.style = style
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.imageView.frame.minY - button.titleLabel.frame.maxY, 4, accuracy: 0.5,
+                       "The icon below the title")
+    }
+
+    func testTagButtonIconOnlyAndTitleOnlyReserveNoSpacing() {
+        let style = CYLMenuStyle()
+        let insets = style.normalAppearance.contentInsets
+        let iconOnly = CYLTagButton(title: nil, image: UIImage(systemName: "house"))
+        XCTAssertEqual(iconOnly.intrinsicContentSize.width, style.imageSize.width + insets.left + insets.right,
+                       accuracy: 0.5, "No spacing for the missing title")
+        style.imagePlacement = .top
+        iconOnly.style = style
+        iconOnly.frame.size = iconOnly.intrinsicContentSize
+        iconOnly.layoutIfNeeded()
+        XCTAssertTrue(iconOnly.titleLabel.frame.isEmpty)
+        XCTAssertEqual(iconOnly.imageView.frame.midY, iconOnly.bounds.midY, accuracy: 1, "A lone icon is centered")
+        let titleOnly = CYLTagButton(title: "首页", image: nil)
+        titleOnly.style = style
+        titleOnly.frame.size = titleOnly.intrinsicContentSize
+        titleOnly.layoutIfNeeded()
+        XCTAssertTrue(titleOnly.imageView.frame.isEmpty)
+        XCTAssertEqual(titleOnly.titleLabel.frame.midY, titleOnly.bounds.midY, accuracy: 1, "A lone title is centered")
+        XCTAssertEqual(CYLTagButton.height(forTitle: "首页", iconSize: .zero, style: style, traitCollection: nil),
+                       max(style.itemHeight, ceil(style.titleFont(for: .normal, traitCollection: nil).lineHeight)
+                           + insets.top + insets.bottom), accuracy: 0.5, "No spacing for the missing icon")
+    }
+
+    func testTagButtonBadge() {
+        let button = CYLTagButton(title: "消息", image: UIImage(systemName: "message"))
+        button.frame.size = CGSize(width: 120, height: 40)
+        button.layoutIfNeeded()
+        XCTAssertNil(button.badgeValue)
+        XCTAssertTrue(button.badgeLabel.isHidden, "nil hides the badge")
+        XCTAssertNil(button.accessibilityValue)
+        XCTAssertEqual(button.badgeColor, .systemRed, "The default color")
+
+        button.badgeValue = ""
+        button.layoutIfNeeded()
+        XCTAssertFalse(button.badgeLabel.isHidden)
+        XCTAssertNil(button.badgeLabel.text, "A dot has no text")
+        XCTAssertEqual(button.badgeLabel.frame.size, CGSize(width: 8, height: 8))
+        let icon = button.imageView.frame
+        XCTAssertEqual(button.badgeLabel.frame.midX, icon.maxX, accuracy: 1, "At the icon's trailing edge")
+        XCTAssertEqual(button.badgeLabel.frame.midY, icon.minY, accuracy: 1, "At the icon's top edge")
+        XCTAssertEqual(button.accessibilityValue, CYLMenuLocalizedString("CYLTagBadgeDot"))
+        XCTAssertFalse(button.accessibilityValue?.isEmpty ?? true)
+
+        button.badgeValue = "99+"
+        button.badgeColor = .blue
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.badgeLabel.text, "99+")
+        XCTAssertEqual(button.badgeLabel.backgroundColor, .blue)
+        XCTAssertGreaterThan(button.badgeLabel.frame.width, button.badgeLabel.frame.height, "A capsule")
+        XCTAssertTrue(button.bounds.contains(button.badgeLabel.frame), "Kept inside the tag")
+        XCTAssertEqual(button.accessibilityValue, "99+")
+        button.accessibilityValue = "custom"
+        XCTAssertEqual(button.accessibilityValue, "custom", "A value that was set wins")
+        button.badgeColor = nil
+        XCTAssertEqual(button.badgeColor, .systemRed, "nil restores the default")
+
+        let titleOnly = CYLTagButton(title: "消息", image: nil)
+        titleOnly.badgeValue = "1"
+        titleOnly.layoutIfNeeded()
+        XCTAssertEqual(titleOnly.badgeLabel.frame.minX, min(titleOnly.titleLabel.frame.maxX
+                       - titleOnly.badgeLabel.frame.height / 2, titleOnly.bounds.width - titleOnly.badgeLabel.frame.width),
+                       accuracy: 1, "At the title's corner when there is no icon")
+    }
+
+    func testTagButtonConvenienceInitializers() {
+        let url = URL(fileURLWithPath: "/no/such/file.json")
+        let button = CYLTagButton(title: "首页", image: UIImage(systemName: "house"), animationURL: url)
+        XCTAssertEqual(button.title, "首页")
+        XCTAssertEqual(button.animationURL, url)
+        XCTAssertNil(button.animationView, "A missing file shows the image")
+        XCTAssertEqual(button.bounds.size, button.intrinsicContentSize, "Sized to fit")
+        XCTAssertEqual(button.sizeThatFits(.zero), button.intrinsicContentSize)
+        XCTAssertGreaterThan(button.intrinsicContentSize.width, 0)
+        XCTAssertTrue(button.isAccessibilityElement)
+        XCTAssertEqual(button.accessibilityLabel, "首页")
+        XCTAssertTrue(button.accessibilityTraits.contains(.button))
+        XCTAssertFalse(button.accessibilityTraits.contains(.selected))
+        button.isSelected = true
+        XCTAssertTrue(button.accessibilityTraits.contains(.selected))
+        button.isEnabled = false
+        XCTAssertTrue(button.accessibilityTraits.contains(.notEnabled))
+        let image = UIImage(systemName: "star")
+        image?.accessibilityLabel = "Favorites"
+        XCTAssertEqual(CYLTagButton(title: nil, image: image).accessibilityLabel, "Favorites",
+                       "An icon-only tag reads its icon's label")
+        XCTAssertFalse(CYLTagButton(frame: .zero).accessibilityTraits.contains(.selected),
+                       "A tag inside a list keeps the traits its host gives it")
+    }
 }

@@ -3,6 +3,7 @@ package com.cyl.classifymenu
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
@@ -16,6 +17,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.ImageView
 import android.widget.TextView
 import kotlin.math.ceil
@@ -26,9 +28,11 @@ import kotlin.math.roundToInt
 
 /**
  * `CYLTagButton`: one tag: an icon (or an animated icon from CYLTabBarController's animation engine, found at run
- * time), a title, an optional delete indicator (a title or a drawn cross), drawn in the style's appearance for its state
- * (normal, selected, disabled, pressed). Lengths are dp; `widthForTitle…` / `heightForStyle` measure a tag before it
- * exists.
+ * time) before, after, above or below a title, an optional delete indicator (a title or a drawn cross) and an optional
+ * badge, drawn in the style's appearance for its state (normal, selected, disabled, pressed). Lengths are dp;
+ * `widthForTitle…` / `heightForStyle` / `heightForTitle` measure a tag before it exists. It is also the one icon + title
+ * + animated icon component of the libraries built on this one (a search bar item, a placeholder's icon): use it on its
+ * own with `CYLTagButton(context, title, image)` or `CYLTagButton(context, title, image, animationURL)`.
  */
 open class CYLTagButton @JvmOverloads constructor(
     context: Context,
@@ -48,6 +52,18 @@ open class CYLTagButton @JvmOverloads constructor(
         visibility = GONE
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
+    /** `badgeLabel`: draws the badge (hidden while `badgeValue` is null), at the top trailing corner of the icon. */
+    val badgeLabel: TextView = TextView(context).apply {
+        gravity = Gravity.CENTER
+        includeFontPadding = false
+        maxLines = 1
+        setTextColor(Color.WHITE)
+        typeface = android.graphics.Typeface.DEFAULT_BOLD
+        setTextSize(TypedValue.COMPLEX_UNIT_DIP, BADGE_FONT_SIZE)
+        visibility = GONE
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
+    private val badgeBox = GradientDrawable()
     private val backgroundImageView = ImageView(context).apply {
         scaleType = ImageView.ScaleType.FIT_XY
         visibility = GONE
@@ -78,12 +94,50 @@ open class CYLTagButton @JvmOverloads constructor(
         addView(imageView)
         addView(titleLabel)
         addView(deleteIndicatorLabel)
+        badgeLabel.background = badgeBox
+        addView(badgeLabel)
         background = box
         clipToOutline = true
         setWillNotDraw(false)
         isClickable = true
         isFocusable = true
     }
+
+    /**
+     * `init(title:image:)`: a tag for use on its own (a search bar item, a toolbar button), drawn with the default style;
+     * it measures itself to fit its content (wrap_content).
+     */
+    constructor(context: Context, title: String?, image: Drawable?) : this(context, title, image, null)
+
+    /**
+     * `init(title:image:animationURL:)`: the same with an animated icon in the icon slot; `image` is shown while the
+     * engine is not linked or the file cannot be loaded.
+     */
+    constructor(context: Context, title: String?, image: Drawable?, animationURL: Uri?) : this(context, null as AttributeSet?) {
+        this.title = title
+        this.image = image
+        this.animationURL = animationURL
+    }
+
+    /**
+     * `badgeValue`, as `UITabBarItem.badgeValue`: null (the default) hides the badge, "" shows a dot, any other text
+     * ("3", "99+") a capsule with it, at the top trailing corner of the icon (of the title when there is no icon).
+     * TalkBack reads it after the title.
+     */
+    var badgeValue: String? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            updateAppearance()
+        }
+
+    /** `badgeColor`: the badge's background; null restores the default, system red (#FF3B30). The text is white. */
+    var badgeColor: Int? = CYLTagBadgeDefaultColor
+        get() = field ?: CYLTagBadgeDefaultColor
+        set(value) {
+            field = value ?: CYLTagBadgeDefaultColor
+            updateAppearance()
+        }
 
     private val density: Float get() = resources.displayMetrics.density
     private fun px(dp: Float): Int = (dp * density).roundToInt()
@@ -318,6 +372,10 @@ open class CYLTagButton @JvmOverloads constructor(
             borderWidth = max(1f, appearance.borderWidth)
         }
         box.setStroke(if (borderWidth > 0) max(1, (borderWidth * density).roundToInt()) else 0, borderColor ?: 0)
+        val badge = badgeValue
+        badgeLabel.visibility = if (badge == null) GONE else VISIBLE
+        badgeLabel.text = if (badge.isNullOrEmpty()) null else badge
+        badgeBox.setColor(badgeColor ?: CYLTagBadgeDefaultColor)
         requestLayout()
         invalidate()
     }
@@ -325,7 +383,8 @@ open class CYLTagButton @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val iconSize = if (animationView != null) animationSize() else iconSizeForImage(imageView.drawable, false, currentStyle)
         val width = px(widthForTitle(title, iconSize, showsDeleteIndicator, currentStyle))
-        val height = px(heightForStyle(currentStyle))
+        // Side by side: the style's height, as in a tag list; stacked: the icon, the spacing and the title.
+        val height = px(if (currentStyle.imagePlacement.isVertical) heightForTitle(title, iconSize, currentStyle) else heightForStyle(currentStyle))
         setMeasuredDimension(resolveSize(width, widthMeasureSpec), resolveSize(height, heightMeasureSpec))
         for (index in 0 until childCount) {
             getChildAt(index).measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
@@ -385,8 +444,24 @@ open class CYLTagButton @JvmOverloads constructor(
         val titleHeight = min(height, ceil(titleSize.height))
         var imageX = 0f
         var titleX = 0f
+        var imageY = centeredY(iconSize.height, contentTop, contentHeight, height)
+        var titleY = centeredY(titleHeight, contentTop, contentHeight, height)
         val leading = style.contentAlignment == CYLTagContentAlignment.CYLTagContentAlignmentLeading
-        if (showsImage && showsTitle) {
+        if (style.imagePlacement.isVertical) {
+            // Stacked: each centered (or at the leading margin), the group centered between the insets.
+            titleWidth = min(ceil(titleSize.width), max(0f, width - 2 * margin))
+            imageX = if (leading) margin else floor((width - iconSize.width) / 2)
+            titleX = if (leading) margin else floor((width - titleWidth) / 2)
+            val group = (if (showsImage) iconSize.height else 0f) + spacing + (if (showsTitle) titleHeight else 0f)
+            val top = centeredY(group, contentTop, contentHeight, height)
+            if (style.imagePlacement == CYLTagImagePlacement.CYLTagImagePlacementBottom) {
+                titleY = top
+                imageY = top + if (showsTitle) titleHeight + spacing else 0f
+            } else {
+                imageY = top
+                titleY = top + if (showsImage) iconSize.height + spacing else 0f
+            }
+        } else if (showsImage && showsTitle) {
             val group = iconSize.width + spacing + titleWidth
             val start = if (leading) margin else floor((width - group) / 2)
             if (style.imagePlacement == CYLTagImagePlacement.CYLTagImagePlacementTrailing) {
@@ -409,14 +484,14 @@ open class CYLTagButton @JvmOverloads constructor(
         }
         if (showsTitle) {
             place(titleLabel, CYLRect(titleX + style.titlePositionAdjustment.horizontal,
-                centeredY(titleHeight, contentTop, contentHeight, height) + style.titlePositionAdjustment.vertical, titleWidth, titleHeight))
+                titleY + style.titlePositionAdjustment.vertical, titleWidth, titleHeight))
         } else {
             place(titleLabel, CYLRect())
         }
         if (showsImage) {
             val insetsOfImage = style.imageInsets
             val frame = CYLRect(imageX + style.imagePositionAdjustment.horizontal,
-                centeredY(iconSize.height, contentTop, contentHeight, height) + style.imagePositionAdjustment.vertical,
+                imageY + style.imagePositionAdjustment.vertical,
                 max(0f, iconSize.width - insetsOfImage.left - insetsOfImage.right), max(0f, iconSize.height - insetsOfImage.top - insetsOfImage.bottom))
             if (animated) {
                 place(animationView!!, frame)
@@ -424,8 +499,11 @@ open class CYLTagButton @JvmOverloads constructor(
             } else {
                 place(imageView, frame)
             }
+            layOutBadge(frame, width + trailing - margin, height)
         } else {
             place(imageView, CYLRect())
+            val titleFrame = CYLRect(titleX + style.titlePositionAdjustment.horizontal, titleY + style.titlePositionAdjustment.vertical, titleWidth, titleHeight)
+            layOutBadge(if (showsTitle) titleFrame else CYLRect(insets.left, insets.top, width - 2 * margin, contentHeight), width + trailing - margin, height)
         }
         val imageRadius = style.imageCornerRadius
         imageView.clipToOutline = imageRadius > 0
@@ -441,6 +519,49 @@ open class CYLTagButton @JvmOverloads constructor(
         val corner = appearance.cornerRadius
         val radius = if (corner > 0) (if (corner <= CYLTagCornerRadiusSquare) 0f else min(corner, height / 2)) else height / 2
         box.cornerRadius = radius * density
+    }
+
+    /** `badgeFrame`: the badge's frame in this view, dp (`CYLRect()` while it is hidden). */
+    var badgeFrame: CYLRect = CYLRect()
+        private set
+
+    /**
+     * The badge at the top trailing corner of `anchor` (dp): the center of its leading cap on the corner, kept inside
+     * the tag (which clips its content).
+     */
+    private fun layOutBadge(anchor: CYLRect, boundsWidth: Float, boundsHeight: Float) {
+        val badge = badgeValue
+        if (badge == null) {
+            badgeFrame = CYLRect()
+            place(badgeLabel, badgeFrame)
+            return
+        }
+        val isDot = badge.isEmpty()
+        val font = CYLFont(BADGE_FONT_SIZE, android.graphics.Typeface.DEFAULT_BOLD)
+        val badgeHeight = if (isDot) BADGE_DOT_DIAMETER else max(BADGE_MINIMUM_HEIGHT, ceil(fontLineHeight(font)) + 2)
+        val badgeWidth = if (isDot) badgeHeight else max(badgeHeight, ceil(textWidth(badge, font)) + 2 * BADGE_PADDING)
+        val x = max(0f, min(anchor.maxX - badgeHeight / 2, boundsWidth - badgeWidth))
+        val y = max(0f, min(anchor.y - badgeHeight / 2, boundsHeight - badgeHeight))
+        badgeFrame = CYLRect(x, y, badgeWidth, badgeHeight)
+        badgeBox.cornerRadius = badgeHeight / 2 * density
+        place(badgeLabel, badgeFrame)
+        badgeLabel.bringToFront()
+    }
+
+    /** What TalkBack reads for the badge: its text, or "New" (localized) for a dot; null without a badge. */
+    private fun badgeAccessibilityValue(): String? {
+        val badge = badgeValue ?: return null
+        return if (badge.isEmpty()) CYLMenuLocalizedString("CYLTagBadgeDot", "A badge shown as a dot") else badge
+    }
+
+    /** The title (or the content description) and then the badge, as iOS reads the label and the value. */
+    override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
+        super.onInitializeAccessibilityNodeInfo(info)
+        val value = badgeAccessibilityValue() ?: return
+        val label = contentDescription?.toString()?.takeIf { it.isNotEmpty() }
+            ?: currentStyle.displayedTitleForTitle(title).takeIf { it.isNotEmpty() }
+            ?: (image as? CYLBadgeDrawable)?.accessibilityLabel
+        info.contentDescription = listOfNotNull(label, value).joinToString(", ")
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -487,6 +608,10 @@ open class CYLTagButton @JvmOverloads constructor(
         internal fun fontLineHeight(font: CYLFont): Float = lineHeight(paintFor(font))
 
         private const val LOOP_CHECK_INTERVAL_MS = 50L
+        private const val BADGE_DOT_DIAMETER = 8f
+        private const val BADGE_MINIMUM_HEIGHT = 16f
+        private const val BADGE_PADDING = 4f
+        private const val BADGE_FONT_SIZE = 11f
         /** The progress from which a looping animation counts as finished and starts again. */
         private const val LOOP_END_PROGRESS = 0.995f
 
@@ -533,7 +658,10 @@ open class CYLTagButton @JvmOverloads constructor(
                 val appearance = style.appearanceForState(state)
                 val titleWidth = if (text.isNotEmpty()) ceil(textWidth(text, style.titleFontForState(state))) else 0f
                 var content = titleWidth + iconSize.width
-                if (titleWidth > 0 && iconSize.width > 0) {
+                if (style.imagePlacement.isVertical) {
+                    // Stacked: the wider of the two.
+                    content = max(titleWidth, iconSize.width)
+                } else if (titleWidth > 0 && iconSize.width > 0) {
                     content += style.imageTitleSpacing
                 } else if (titleWidth > 0 && !style.layoutCentered && style.contentAlignment == CYLTagContentAlignment.CYLTagContentAlignmentCenter) {
                     content += style.imageSize.width + style.imageTitleSpacing
@@ -544,18 +672,48 @@ open class CYLTagButton @JvmOverloads constructor(
             return width
         }
 
-        /** `+heightForStyle:traitCollection:`: the item height, or the tallest state's text plus insets, dp. */
+        /**
+         * `+heightForStyle:traitCollection:`: the item height, or the tallest state's text plus insets, dp; with the icon
+         * above or below the title, also the icon slot and the spacing.
+         */
         @JvmStatic
         fun heightForStyle(style: CYLMenuStyle): Float {
+            val iconHeight = if (style.imagePlacement.isVertical) max(style.imageSize.height, style.animationSize.height) else 0f
+            val stacked = if (iconHeight > 0) iconHeight + style.imageTitleSpacing else 0f
             var height = style.itemHeight
             for (state in states) {
                 val insets = style.appearanceForState(state).contentInsets
-                height = max(height, ceil(fontLineHeight(style.titleFontForState(state))) + insets.top + insets.bottom)
+                height = max(height, ceil(fontLineHeight(style.titleFontForState(state))) + stacked + insets.top + insets.bottom)
+            }
+            return height
+        }
+
+        /**
+         * `+heightForTitle:iconSize:style:traitCollection:`: the height a tag needs for this title and an icon of
+         * `iconSize` (`CYLSize.ZERO` for none) in every state, dp: the taller of the two side by side, or both and the
+         * spacing when stacked; at least `style.itemHeight`.
+         */
+        @JvmStatic
+        fun heightForTitle(title: String?, iconSize: CYLSize, style: CYLMenuStyle): Float {
+            val hasTitle = style.displayedTitleForTitle(title).isNotEmpty()
+            var height = style.itemHeight
+            for (state in states) {
+                val insets = style.appearanceForState(state).contentInsets
+                val line = if (hasTitle) ceil(fontLineHeight(style.titleFontForState(state))) else 0f
+                val content = if (style.imagePlacement.isVertical) {
+                    line + iconSize.height + if (hasTitle && iconSize.height > 0) style.imageTitleSpacing else 0f
+                } else {
+                    max(line, iconSize.height)
+                }
+                height = max(height, ceil(content + insets.top + insets.bottom))
             }
             return height
         }
     }
 }
+
+/** `UIColor.systemRed`, the default `CYLTagButton.badgeColor`. */
+val CYLTagBadgeDefaultColor: Int = Color.rgb(255, 59, 48)
 
 /**
  * CYLTabBarController's animation engine, found at run time like `NSClassFromString(@"CYLTabBarItemAnimationFactory")`

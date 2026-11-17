@@ -67,5 +67,8 @@
  "styleWithConfiguration": "`CYLMenuStyle(configuration:)`",
  "tagWithConfiguration": "`CYLTag(configuration:)`",
  "CYLIndexPathButton.cyl_imageTitleSpacing": "`CYLIndexPathButton.style.imageTitleSpacing` (a `CYLTagButton` since 2026-11-17; `CYLMenuStyle.classifyMenuTag()` sets 5)",
- "CYLIndexPathButton.cyl_titleLeadingInset": "`CYLMenuStyle.sectionTitle(leadingInset:)` (the leading content inset of a `CYLTagButton`'s style)"
+ "CYLIndexPathButton.cyl_titleLeadingInset": "`CYLMenuStyle.sectionTitle(leadingInset:)` (the leading content inset of a `CYLTagButton`'s style)",
+ "CYLTagImagePlacement.isVertical": "`imagePlacement == .top || imagePlacement == .bottom` (`CYLTagImagePlacement.cylIsVertical`, internal to the Swift core)",
+ "CYLTagButton.badgeFrame": "`CYLTagButton.badgeLabel.frame`",
+ "CYLTagBadgeDefaultColor": "`UIColor.systemRed` (the default `CYLTagButton.badgeColor`)"
 }

@@ -1,4 +1,4 @@
-export { CYLTagButton, CYLTagButtonPart, CYLTagButtonComponent } from './CYLTagButton';
+export { CYLTagButton, CYLTagButtonPart, CYLTagButtonComponent, CYLTagBadgeDefaultColor } from './CYLTagButton';
 export { CYLTagFoldButton } from './CYLTagFoldButton';
 export { CYLTagListCell, CYLTagListCellComponent, CYLTagRipple } from './CYLTagListCell';
 export { CYLTagFoldCell, CYLTagFoldCellComponent } from './CYLTagFoldCell';

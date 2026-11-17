@@ -8,6 +8,7 @@
  * An item is addressed by its key "<section>-<item>", the format of `selectedItems` on every platform.
  */
 const symbols = require('./symbols.js');
+const locale = require('../locale.js');
 
 // MARK: - Values (CYLConfigurationValue)
 
@@ -283,6 +284,8 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   const placement = String(c.imagePlacement || '').toLowerCase();
   if (['trailing', 'right', '1'].includes(placement)) style.imagePlacement = 'trailing';
   if (['leading', 'left', '0'].includes(placement)) style.imagePlacement = 'leading';
+  if (['top', '2'].includes(placement)) style.imagePlacement = 'top';
+  if (['bottom', '3'].includes(placement)) style.imagePlacement = 'bottom';
   const alignment = String(c.contentAlignment || '').toLowerCase();
   if (['leading', 'left', '1'].includes(alignment)) style.contentAlignment = 'leading';
   if (['center', '0'].includes(alignment)) style.contentAlignment = 'center';
@@ -546,12 +549,71 @@ function lineHeight(size) {
   return Math.ceil(size * 1.194);
 }
 
-/** Tag height (`CYLTagButton.height(for:)`): itemHeight, or more for a line of the title font and the insets. */
+/** True for the placements 'top' and 'bottom' (`CYLTagImagePlacement.top` / `.bottom`): icon and title stacked. */
+function isVerticalPlacement(placement) {
+  return placement === 'top' || placement === 'bottom';
+}
+
+/**
+ * Tag height (`CYLTagButton.height(for:)`): itemHeight, or more for a line of the title font and the insets; with the
+ * icon above or below the title, also the icon slot and imageTitleSpacing.
+ */
 function tagHeight(style) {
+  const iconHeight = isVerticalPlacement(style.imagePlacement)
+    ? Math.max(style.imageSizeWH.height, style.animationSizeWH.height) : 0;
+  const stacked = iconHeight > 0 ? iconHeight + style.imageTitleSpacing : 0;
   return APPEARANCE_STATES.reduce((height, state) => {
     const { font, contentInsets } = style[state];
-    return Math.max(height, lineHeight(font.size) + contentInsets.top + contentInsets.bottom);
+    return Math.max(height, lineHeight(font.size) + stacked + contentInsets.top + contentInsets.bottom);
   }, style.itemHeight);
+}
+
+/**
+ * `CYLTagButton.height(forTitle:iconSize:style:traitCollection:)`: the height a tag needs for a title (or none) and an
+ * icon of `iconSize` ({width: 0, height: 0} for none): the taller of the two side by side, or both and the spacing
+ * when stacked; at least itemHeight.
+ */
+function tagHeightForTitle(style, title, iconSize) {
+  const hasTitle = String(title || '') !== '';
+  const icon = iconSize || { width: 0, height: 0 };
+  return APPEARANCE_STATES.reduce((height, state) => {
+    const { font, contentInsets } = style[state];
+    const line = hasTitle ? lineHeight(font.size) : 0;
+    const content = isVerticalPlacement(style.imagePlacement)
+      ? line + icon.height + (hasTitle && icon.height > 0 ? style.imageTitleSpacing : 0)
+      : Math.max(line, icon.height);
+    return Math.max(height, Math.ceil(content + contentInsets.top + contentInsets.bottom));
+  }, style.itemHeight);
+}
+
+/** The badge's color when none is given: UIColor.systemRed. */
+const BADGE_DEFAULT_COLOR = '#FF3B30';
+
+/**
+ * The badge of a tag (`CYLTagButton.badgeValue` / `badgeColor`): null or undefined hides it, '' is an 8 px dot, any
+ * other text a white bold 11 px capsule at least 16 px high, on `badgeColor` (system red by default). It sits on the
+ * top trailing corner of the icon slot (or of the title): the center of its leading cap on the corner.
+ * `badgeAccessibilityValue` is what a screen reader reads after the title: the text, or "New" (localized) for a dot.
+ */
+function badgeLayout(badgeValue, badgeColor) {
+  if (badgeValue === null || badgeValue === undefined) {
+    return { showsBadge: false, badgeText: '', badgeStyle: '', badgeAccessibilityValue: '' };
+  }
+  const text = String(badgeValue);
+  const dot = text === '';
+  const height = dot ? 8 : 16;
+  const fill = color(badgeColor) || BADGE_DEFAULT_COLOR;
+  const size = dot ? `width: ${height}px; height: ${height}px` : `min-width: ${height}px; height: ${height}px; padding: 0 4px`;
+  return {
+    showsBadge: true,
+    badgeText: dot ? '' : text,
+    badgeStyle: [
+      'position: absolute', `left: calc(100% - ${height / 2}px)`, `top: -${height / 2}px`, size, 'box-sizing: border-box',
+      `border-radius: ${height / 2}px`, `background-color: ${fill}`, 'color: #FFFFFF', 'font-size: 11px',
+      'font-weight: 700', `line-height: ${height}px`, 'text-align: center', 'white-space: nowrap',
+    ].join('; '),
+    badgeAccessibilityValue: dot ? locale.tc('CYLTagBadgeDot') : text,
+  };
 }
 
 /** Corner radius: 0 is automatic (a capsule, as for CYLBadgeAppearance); CYLTagCornerRadiusSquare (0.001) is square. */
@@ -588,10 +650,11 @@ function iconContent(item, state, style, animation) {
  * size from the top left; icon and title centered with imageTitleSpacing between them, a lone icon or title centered
  * with layoutCentered or kept in place (after an empty icon slot) without it; the position adjustments as offsets.
  * @param {boolean} showsAnimation whether the icon slot holds an animation
+ * @param {number} [fixedHeight] the tag's height; `tagHeight(style)` (every tag of a list as high) by default
  */
-function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing) {
+function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixedHeight) {
   const appearance = style[state];
-  const height = tagHeight(style);
+  const height = fixedHeight > 0 ? fixedHeight : tagHeight(style);
   const border = appearance.borderColor ? appearance.borderWidth : 0;
   const left = Math.max(...APPEARANCE_STATES.map((s) => style[s].contentInsets.left));
   const right = Math.max(...APPEARANCE_STATES.map((s) => style[s].contentInsets.right));
@@ -605,7 +668,10 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing) {
   // The title keeps its place after an empty icon slot when a lone title is not centered.
   const emptySlot = showsTitle && !showsImage && !style.layoutCentered && !leading
     ? style.imageSizeWH.width + style.imageTitleSpacing : 0;
-  const justify = leading || (!style.layoutCentered && !(showsImage && showsTitle)) ? 'flex-start' : 'center';
+  const vertical = isVerticalPlacement(style.imagePlacement);
+  // Stacked: the group centered from top to bottom, each part centered (or at the leading margin) across.
+  const justify = !vertical && (leading || (!style.layoutCentered && !(showsImage && showsTitle))) ? 'flex-start' : 'center';
+  const directions = { trailing: 'row-reverse', top: 'column', bottom: 'column-reverse' };
   const background = appearance.backgroundImage
     ? `background-image: url("${appearance.backgroundImage}"); background-size: 100% 100%`
     : '';
@@ -620,13 +686,15 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing) {
     `color: ${appearance.textColor}`,
     `background-color: ${appearance.backgroundColor}`,
     `justify-content: ${justify}`,
-    `flex-direction: ${style.imagePlacement === 'trailing' ? 'row-reverse' : 'row'}`,
+    `flex-direction: ${directions[style.imagePlacement] || 'row'}`,
+    vertical ? `align-items: ${leading ? 'flex-start' : 'center'}` : '',
     background,
   ].filter(Boolean).join('; ');
   const ii = style.imageInsets;
   const io = style.imagePositionAdjustment;
   const to = style.titlePositionAdjustment;
-  const gap = style.imagePlacement === 'trailing' ? 'margin-left' : 'margin-right';
+  const gaps = { trailing: 'margin-left', top: 'margin-bottom', bottom: 'margin-top' };
+  const gap = gaps[style.imagePlacement] || 'margin-right';
   return {
     height,
     cellStyle: cell,
@@ -638,9 +706,43 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing) {
     // Only the size changes; x and y stay, as CYLFlatDesignTabBarItem.imageInsets.
     iconStyle: `width: ${Math.max(0, slot.width - ii.left - ii.right)}px; height: ${Math.max(0, slot.height - ii.top - ii.bottom)}px`,
     glyphSize: Math.floor(Math.min(slot.width, slot.height) * 0.74),
-    spacerStyle: emptySlot ? `width: ${emptySlot}px` : '',
+    spacerStyle: emptySlot && !vertical ? `width: ${emptySlot}px` : '',
     titleStyle: `left: ${to.horizontal}px; top: ${to.vertical}px`,
     showsTitle,
+  };
+}
+
+/**
+ * The view data of the standalone `cyl-tag-button` (the core's `CYLTagButton` on its own): `props` holds the iOS names
+ * (title, image, selectedImage, animationSpeed, badgeValue, badgeColor, selected, enabled, tagStyle), `animation` the
+ * resolved animated icon (or null). The tag is `tagLayout` at its own height (`tagHeightForTitle`: no room for a missing
+ * icon or title), with the badge and an accessibility label that reads the title, then the badge.
+ */
+function tagButtonView(props, animation, pixelRatio = 2) {
+  const style = mergeStyle((props && props.tagStyle) || {}, defaultStyle(pixelRatio));
+  const item = {
+    title: String(props.title || ''),
+    image: props.image || '',
+    selectedImage: props.selectedImage || '',
+    enabled: props.enabled !== false,
+  };
+  const state = stateOf(item, !!props.selected);
+  const icon = iconContent(item, state, style, animation);
+  const animated = icon.kind === 'animation';
+  const slot = animated && (style.animationSizeWH.width > 0 || style.animationSizeWH.height > 0)
+    ? style.animationSizeWH : style.imageSizeWH;
+  const height = tagHeightForTitle(style, item.title, icon.kind === 'none' ? null : slot);
+  const tag = tagLayout(style, item, state, icon, 0, 0, height);
+  const badge = badgeLayout(props.badgeValue, props.badgeColor);
+  return {
+    ...tag,
+    ...badge,
+    title: item.title,
+    iconKind: icon.kind,
+    iconSrc: icon.src,
+    glyph: icon.glyph,
+    speed: props.animationSpeed > 0 ? props.animationSpeed : style.animationSpeed,
+    accessibilityLabel: [item.title, badge.badgeAccessibilityValue].filter(Boolean).join(', '),
   };
 }
 
@@ -683,5 +785,6 @@ module.exports = {
   DEFAULT_TAG_BACKGROUND, opaqueBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, stateOf, iconColor, tagHeight, cornerRadius,
+  isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
 };

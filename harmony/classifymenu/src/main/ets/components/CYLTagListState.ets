@@ -17,7 +17,9 @@ import { CYLTagListCell } from '../tagviews/CYLTagListCell';
 import { CYLMenuDataSource, CYLMenuDefaults, CYLMenuDelegate, CYLMenuItemType } from '../core/CYLMenuDataSource';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
-import { CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagRowAlignment } from '../core/CYLMenuStyle';
+import {
+  CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagRowAlignment
+} from '../core/CYLMenuStyle';
 import { CYLTag, CYLTagDataSource } from '../core/CYLTag';
 import { CYLTagAppearance } from '../core/CYLTagAppearance';
 import { CYLTagColors, CYLTagColorTheme } from '../core/CYLTagColors';
@@ -120,7 +122,10 @@ export class CYLTagButtonMetrics {
       const font = style.titleFont(state, fontScale);
       const titleWidth = displayed.length === 0 ? 0 : Math.ceil(CYLTagButtonMetrics.textMeasurer(displayed, font));
       let content = titleWidth + iconSize.width;
-      if (titleWidth > 0 && iconSize.width > 0) {
+      if (CYLTagImagePlacementIsVertical(style.imagePlacement)) {
+        // Stacked: the wider of the two.
+        content = Math.max(titleWidth, iconSize.width);
+      } else if (titleWidth > 0 && iconSize.width > 0) {
         content += style.imageTitleSpacing;
       } else if (titleWidth > 0 && !style.layoutCentered && style.contentAlignment === CYLTagContentAlignment.center) {
         content += style.imageSize.width + style.imageTitleSpacing;
@@ -154,13 +159,38 @@ export class CYLTagButtonMetrics {
     return CYLSize.ZERO;
   }
 
-  /** `style.itemHeight`, or more when a line of the title font plus the content insets needs it. */
+  /**
+   * `style.itemHeight`, or more when a line of the title font plus the content insets needs it; with the icon above or
+   * below the title, also the icon slot and the spacing.
+   */
   static height(style: CYLMenuStyle, fontScale: number = 1): number {
+    const iconHeight = CYLTagImagePlacementIsVertical(style.imagePlacement) ?
+      Math.max(style.imageSize.height, style.animationSize.height) : 0;
+    const stacked = iconHeight > 0 ? iconHeight + style.imageTitleSpacing : 0;
     let height = style.itemHeight;
     STATES.forEach((state: number) => {
       const insets = style.appearance(state).contentInsets;
       const font = style.titleFont(state, fontScale);
-      height = Math.max(height, Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + insets.top + insets.bottom);
+      height = Math.max(height, Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + stacked + insets.top + insets.bottom);
+    });
+    return height;
+  }
+
+  /**
+   * `height(forTitle:iconSize:style:traitCollection:)`: the height a tag needs for this title and an icon of `iconSize`
+   * in every state: the taller of the two side by side, or both and the spacing when stacked; at least `itemHeight`.
+   */
+  static heightForTitle(title: string | undefined, iconSize: CYLSize, style: CYLMenuStyle, fontScale: number = 1): number {
+    const hasTitle = style.displayedTitle(title).length > 0;
+    const vertical = CYLTagImagePlacementIsVertical(style.imagePlacement);
+    let height = style.itemHeight;
+    STATES.forEach((state: number) => {
+      const insets = style.appearance(state).contentInsets;
+      const line = hasTitle ? Math.ceil(CYLTagButtonMetrics.lineHeight(style.titleFont(state, fontScale))) : 0;
+      const content = vertical ?
+        line + iconSize.height + (hasTitle && iconSize.height > 0 ? style.imageTitleSpacing : 0) :
+        Math.max(line, iconSize.height);
+      height = Math.max(height, Math.ceil(content + insets.top + insets.bottom));
     });
     return height;
   }

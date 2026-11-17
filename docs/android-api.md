@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 763 / 771 with an Android counterpart = 99.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 770 / 778 with an Android counterpart = 99.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -334,6 +334,8 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagImagePlacement` | enum, `CYLMenuStyle.swift` | `com.cyl.classifymenu.CYLTagImagePlacement` |
 | `CYLTagImagePlacementLeading` | enum value, `CYLMenuStyle.swift` | `CYLTagImagePlacementLeading` |
 | `CYLTagImagePlacementTrailing` | enum value, `CYLMenuStyle.swift` | `CYLTagImagePlacementTrailing` |
+| `CYLTagImagePlacementTop` | enum value, `CYLMenuStyle.swift` | `CYLTagImagePlacementTop` |
+| `CYLTagImagePlacementBottom` | enum value, `CYLMenuStyle.swift` | `CYLTagImagePlacementBottom` |
 | `CYLTagContentAlignment` | enum, `CYLMenuStyle.swift` | `com.cyl.classifymenu.CYLTagContentAlignment` |
 | `CYLTagContentAlignmentCenter` | enum value, `CYLMenuStyle.swift` | `CYLTagContentAlignmentCenter` |
 | `CYLTagContentAlignmentLeading` | enum value, `CYLMenuStyle.swift` | `CYLTagContentAlignmentLeading` |
@@ -491,6 +493,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagButton.imageView` | property, `CYLTagButton.swift` | `CYLTagButton.imageView` |
 | `CYLTagButton.titleLabel` | property, `CYLTagButton.swift` | `CYLTagButton.titleLabel` |
 | `CYLTagButton.deleteIndicatorLabel` | property, `CYLTagButton.swift` | `CYLTagButton.deleteIndicatorLabel` |
+| `CYLTagButton.badgeLabel` | property, `CYLTagButton.swift` | `CYLTagButton.badgeLabel (same name in the Android core)` |
+| `CYLTagButton.badgeValue` | property, `CYLTagButton.swift` | `CYLTagButton.badgeValue (same name in the Android core)` |
+| `CYLTagButton.badgeColor` | property, `CYLTagButton.swift` | `CYLTagButton.badgeColor (same name in the Android core)` |
 | `CYLTagButton.title` | property, `CYLTagButton.swift` | `CYLTagButton.title` |
 | `CYLTagButton.image` | property, `CYLTagButton.swift` | `CYLTagButton.image` |
 | `CYLTagButton.selectedImage` | property, `CYLTagButton.swift` | `CYLTagButton.selectedImage` |
@@ -504,6 +509,8 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagButton.deleteIndicatorHitFrame` | property, `CYLTagButton.swift` | `CYLTagButton.deleteIndicatorHitFrame` |
 | `CYLTagButton.style` | property, `CYLTagButton.swift` | `CYLTagButton.style` |
 | `CYLTagButton.isAnimationEngineAvailable` | property, `CYLTagButton.swift` | `CYLTagButton.isAnimationEngineAvailable` |
+| `CYLTagButton -initWithTitle:image:` | method, `CYLTagButton.swift` | `CYLTagButton(context, title, image)` |
+| `CYLTagButton -initWithTitle:image:animationURL:` | method, `CYLTagButton.swift` | `CYLTagButton(context, title, image, animationURL)` |
 | `CYLTagButton -playAnimation` | method, `CYLTagButton.swift` | `CYLTagButton.playAnimation` |
 | `CYLTagButton +iconSizeFor:animated:style:` | method, `CYLTagButton.swift` | `CYLTagButton.iconSizeForImage` |
 | `CYLTagButton +heightFor:traitCollection:` | method, `CYLTagButton.swift` | `CYLTagButton.heightForStyle` |

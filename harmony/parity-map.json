@@ -668,8 +668,6 @@
     "CYLIndexPathButton": "`CYLIndexPathButton`",
     "CYLIndexPathButton.section": "`CYLIndexPathButton.section`",
     "CYLIndexPathButton.row": "`CYLIndexPathButton.row`",
-    "CYLIndexPathButton.imageTitleSpacing": "`CYLIndexPathButton.imageTitleSpacing`",
-    "CYLIndexPathButton.titleLeadingInset": "`CYLIndexPathButton.titleLeadingInset`",
     "CYLRightImageButton": "`CYLRightImageButton`",
     "CYLFilterControllerDelegate": "`CYLFilterControllerDelegate`",
     "CYLFilterControllerDelegate.filterControllerDidComplete(_:)": "`filterControllerDidComplete()`",
@@ -703,8 +701,6 @@
     "CYLFilterCollectionCell": "`CYLFilterCollectionCell`",
     "CYLFilterCollectionCell.titleButton": "`CYLFilterCollectionCell.titleButton`",
     "CYLMultipleFilterHeaderView": "`CYLMultipleFilterHeaderView`",
-    "CYLMultipleFilterHeaderView.imageView": "`CYLMultipleFilterHeaderView.imageView`",
-    "CYLMultipleFilterHeaderView.titleLabel": "`CYLMultipleFilterHeaderView.titleLabel`",
     "NSArray.cyl_description(withLocale:)": "`cylArrayDescriptionWithLocale()` (classify/CYLLog.ets)",
     "NSDictionary.cyl_description(withLocale:)": "`cylDictionaryDescriptionWithLocale()`",
     "UICollectionViewDelegateLeftAlignedLayout": "`interface UICollectionViewDelegateLeftAlignedLayout`",
@@ -808,7 +804,15 @@
     "CYLTagListView.collectionView(_:cellForItemAt:)": "`CYLTagListState.cellForItemAt(indexPath)` (the rendered CYLTagListCell)",
     "CYLTagListView.collectionView(_:viewForSupplementaryElementOfKind:at:)": "`CYLTagListState.viewForSupplementaryElementOfKind(kind, indexPath)` (CYLTagListSupplementaryView)",
     "CYLImageTagView.imageView": "`CYLImageTagView.imageView` (CYLImageTagImageView drawn by the component)",
-    "CYLTagButton.animationView": "`CYLTagButton.animationView` (the live CYLAnimationPlayer: Lottie, PAG, Rive or GIF)"
+    "CYLTagButton.animationView": "`CYLTagButton.animationView` (the live CYLAnimationPlayer: Lottie, PAG, Rive or GIF)",
+    "CYLTagImagePlacement.top": "`CYLTagImagePlacement.top`",
+    "CYLTagImagePlacement.bottom": "`CYLTagImagePlacement.bottom`",
+    "CYLTagButton.badgeLabel": "`CYLTagButton.badgeLabel` (a CYLTagButtonPart; the badge color is its tintColor)",
+    "CYLTagButton.badgeValue": "`CYLTagButton.badgeValue`",
+    "CYLTagButton.badgeColor": "`CYLTagButton.badgeColor` (`CYLTagBadgeDefaultColor` by default)",
+    "CYLTagButton.init(title:image:)": "`new CYLTagButton(title, image)`",
+    "CYLTagButton.init(title:image:animationURL:)": "`new CYLTagButton(title, image, animationURL)`",
+    "CYLTagButton.static height(forTitle:iconSize:style:traitCollection:)": "`CYLTagButton.heightForTitle(title, iconSize, style, fontScale)`"
   },
   "demos": [
     {

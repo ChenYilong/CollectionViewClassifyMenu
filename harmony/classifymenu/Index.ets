@@ -10,8 +10,8 @@ export { CYLTagMetrics } from './src/main/ets/core/CYLTagMetrics';
 export { CYLTagAppearance, CYLTagCornerRadiusSquare } from './src/main/ets/core/CYLTagAppearance';
 export { CYLMenuResources, CYLMenuLocalizedString } from './src/main/ets/core/CYLMenuResources';
 export {
-  CYLMenuStyle, CYLTagImagePlacement, CYLTagContentAlignment, CYLTagRowAlignment, CYLTagDeleteIndicatorPlacement,
-  CYLTitleTextAttributes
+  CYLMenuStyle, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagRowAlignment,
+  CYLTagDeleteIndicatorPlacement, CYLTitleTextAttributes
 } from './src/main/ets/core/CYLMenuStyle';
 export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';
 export { CYLImage } from './src/main/ets/core/CYLTypes';

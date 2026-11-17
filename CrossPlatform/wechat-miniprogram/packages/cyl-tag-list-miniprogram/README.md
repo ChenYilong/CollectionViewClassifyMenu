@@ -18,13 +18,26 @@ Then in WeChat DevTools: **Tools → Build npm** (工具 → 构建 npm). It cop
   "usingComponents": {
     "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
     "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud",
-    "cyl-tag-image": "cyl-tag-list-miniprogram/cyl-tag-image/cyl-tag-image"
+    "cyl-tag-image": "cyl-tag-list-miniprogram/cyl-tag-image/cyl-tag-image",
+    "cyl-tag-button": "cyl-tag-list-miniprogram/cyl-tag-button/cyl-tag-button"
   }
 }
 ```
 
 ```xml
 <cyl-tag-list configuration="{{configuration}}" bind:tagtap="onTagTap" />
+```
+
+### One tag on its own
+
+`cyl-tag-button` is the iOS `CYLTagButton` on its own (a search bar item, a toolbar button, a placeholder's icon): an
+icon or an animated icon before, after, above or below a title (`tagStyle.imagePlacement`: `leading`, `trailing`,
+`top`, `bottom`), in a `CYLMenuStyle` box (`tagStyle` takes the keys of a configuration's style), with a badge
+(`badge-value`: `null` hides it, `''` shows a dot, any other text a capsule; `badge-color`, system red by default).
+
+```xml
+<!-- buttonStyle: { imagePlacement: 'top', imageSize: '{24, 24}' } in the page's data -->
+<cyl-tag-button title="Messages" image="system:message" badge-value="3" tag-style="{{buttonStyle}}" bind:tagtap="onTap" />
 ```
 
 The models are plain JavaScript (no `wx` calls), e.g. `require('cyl-tag-list-miniprogram/cyl-tag-list/model.js')`.

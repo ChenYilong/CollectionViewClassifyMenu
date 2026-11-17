@@ -25,6 +25,7 @@ export const CYL_CORE_STRINGS: Record<string, Record<string, string>> = {
     "CYLMenuNewTagNamed": "New tag: %@",
     "CYLMenuTagMoved": "Moved to position %ld",
     "CYLMenuTitle": "Categories",
+    "CYLTagBadgeDot": "New",
   },
   "zh-Hans": {
     "CYLFilterConfirm": "确认筛选",
@@ -48,6 +49,7 @@ export const CYL_CORE_STRINGS: Record<string, Record<string, string>> = {
     "CYLMenuNewTagNamed": "新建标签：%@",
     "CYLMenuTagMoved": "已移到第 %ld 个",
     "CYLMenuTitle": "分类",
+    "CYLTagBadgeDot": "新",
   },
   "zh-Hant": {
     "CYLFilterConfirm": "確認篩選",
@@ -71,5 +73,6 @@ export const CYL_CORE_STRINGS: Record<string, Record<string, string>> = {
     "CYLMenuNewTagNamed": "新增標籤：%@",
     "CYLMenuTagMoved": "已移到第 %ld 個",
     "CYLMenuTitle": "分類",
+    "CYLTagBadgeDot": "新",
   },
 };

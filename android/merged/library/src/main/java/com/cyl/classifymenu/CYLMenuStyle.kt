@@ -6,8 +6,16 @@ import android.graphics.drawable.Drawable
 import kotlin.math.max
 import kotlin.math.min
 
-/** `CYLTagImagePlacement`: the icon before or after the title. */
-enum class CYLTagImagePlacement { CYLTagImagePlacementLeading, CYLTagImagePlacementTrailing }
+/**
+ * `CYLTagImagePlacement`: the icon before or after the title, or above (`Top`, raw value 2) or below (`Bottom`, 3) it,
+ * both centered.
+ */
+enum class CYLTagImagePlacement {
+    CYLTagImagePlacementLeading, CYLTagImagePlacementTrailing, CYLTagImagePlacementTop, CYLTagImagePlacementBottom;
+
+    /** True for `Top` and `Bottom`: the icon and the title are stacked. */
+    val isVertical: Boolean get() = this == CYLTagImagePlacementTop || this == CYLTagImagePlacementBottom
+}
 
 /** `CYLTagContentAlignment`: the icon and title centered in the tag, or at its leading edge. */
 enum class CYLTagContentAlignment { CYLTagContentAlignmentCenter, CYLTagContentAlignmentLeading }
