@@ -108,6 +108,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    (`menu_button.riv`, `isOpen` held by `duration: 0`) plays once, then stays at x. iOS: the same code paths (legacy
    returns without an input; `duration: 0` holds the boolean), not run here (no Mac); asked of the Mac session. Flutter's
    example passes no Rive options (it plays each file's first linear animation): to check. Fix: CYLTabBarController B20.
+   **iOS run (2026-11-18, Mac session, `689096f`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
+   Pro, iOS 27.2), pins `fe5c3ae`, English, launched with `-CYLExampleScreen animations-rive-loop` (new: scrolls to the
+   Rive section, loop on, Play all); frames 4–14 s after Play all (`assets/ios-rive-b20-frames.jpeg`, first frame
+   `assets/ios-rive-b20-play-all.png`): Shapes and Truck change every frame (they loop); Home (`house.riv`) never moves;
+   Done (`check.riv`) stays on the finished check; Menu (`menu_button.riv`) stays on ≡; Button stays on its small arc;
+   the icons.riv dark tags (Chat, Search, Timer, Alerts, Me) never move. Same result as Android.
 
 ## TODO (2026-11-17, macOS 27 + Xcode 27, `feat/harmony`): rows 12 and 13 on a Mac, simulator screenshots, bugs
 
