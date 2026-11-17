@@ -228,7 +228,7 @@ verify the behavior and update the applicable documentation.
 - Note (2026-11-17): from `4622434` to the next pin the pins stayed at `fbd05d5`
   (CYLTabBarController PR #814) because the newest branch lacked it; the owner
   merged #814 into `feat/cross-platform-components` (PR #788, `9a54e26`), so the
-  pins follow the newest commit of that branch again.
+  pins follow the newest commit again (over every branch, as the rule above says).
 - Search bars in the examples are CYLSearchViewController's `CYLSearchBarView`
   (the sibling `../CYLSearchViewController` repository, unreleased, no API
   compatibility to keep). Change it there as the examples need, commit and
