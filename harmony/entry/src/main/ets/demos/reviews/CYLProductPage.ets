@@ -1,4 +1,3 @@
-import { resourceManager } from '@kit.LocalizationKit';
 import { cylFormat } from '../samples/SampleSupport';
 import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 /**
@@ -32,22 +31,14 @@ export struct CYLProductPage {
     style.sectionInsets = new CYLEdgeInsets(4, 0, 12, 0);
     const view = this.previewView;
     style.backgroundColor = CYLColor.CLEAR; // the cell's color shows through, light or dark
-    // Dark chips in dark mode (the root page follows the color mode, E2): the light gray chips stayed light on black.
-    let dark = false;
-    try {
-      dark = this.getUIContext().getHostContext()?.resourceManager.getConfigurationSync().colorMode ===
-        resourceManager.ColorMode.DARK;
-    } catch (error) {
-      dark = false;
-    }
-    if (dark) {
-      [style.normalAppearance, style.disabledAppearance].forEach((a: CYLTagAppearance) => {
-        a.backgroundColor = CYLColor.white(0.17);
-        a.borderColor = CYLColor.white(0.28);
-      });
-      style.setTitleTextAttributes(CYLFont.systemFont(12), CYLColor.white(0.85), CYLControlState.NORMAL);
-      style.setTitleTextAttributes(CYLFont.systemFont(12), CYLColor.white(0.45), CYLControlState.DISABLED);
-    }
+    // Chip colors from resources with dark variants: the core takes `ResourceColor`, so the chips follow the color mode
+    // themselves, also when it changes while the page is open (they stayed light gray on the dark root page, E7).
+    [style.normalAppearance, style.disabledAppearance].forEach((a: CYLTagAppearance) => {
+      a.backgroundColor = $r('app.color.cyl_chip_background');
+      a.borderColor = $r('app.color.cyl_chip_border');
+    });
+    style.setTitleTextAttributes(CYLFont.systemFont(12), $r('app.color.cyl_chip_text'), CYLControlState.NORMAL);
+    style.setTitleTextAttributes(CYLFont.systemFont(12), $r('app.color.cyl_chip_text_disabled'), CYLControlState.DISABLED);
     view.style = style;
     view.selectionMode = CYLMenuSelectionMode.none;
     view.showsSectionHeaders = false;
