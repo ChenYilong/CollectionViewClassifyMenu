@@ -47,7 +47,9 @@ case "$command" in
     ;;
   lib)
     # The podspec depends on CYLTabBarController/CYLAnimatedItem, which no CocoaPods release has yet: lint against the
-    # commit the Podfiles pin (CYL_TAB_BAR in Example/Podfile), with that commit's podspec sourced by :commit.
+    # commit the Podfiles pin (CYL_TAB_BAR in Example/Podfile). `--include-podspecs` treats a podspec as a local pod
+    # rooted at its own folder, so that folder must be a checkout of the commit (sources and LICENSE), not a lone
+    # downloaded podspec.
     sha=$(sed -n "s/.*:commit => '\([0-9a-f]\{40\}\)'.*/\1/p" Example/Podfile | head -n 1)
     if [ -z "$sha" ]; then
       echo "error: no CYL_TAB_BAR commit in Example/Podfile" >&2
@@ -55,12 +57,9 @@ case "$command" in
     fi
     dir=$(mktemp -d "${TMPDIR:-/tmp}/cyl-pod-lint.XXXXXX")
     trap 'rm -rf "$dir"' EXIT HUP INT TERM
-    curl -fsSL "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/$sha/CYLTabBarController.podspec" \
-      | sed "s/:tag => s\.version\.to_s/:commit => '$sha'/" > "$dir/CYLTabBarController.podspec"
-    grep -q ":commit => '$sha'" "$dir/CYLTabBarController.podspec" || {
-      echo "error: could not point CYLTabBarController.podspec at $sha" >&2
-      exit 1
-    }
+    git -C "$dir" init --quiet
+    git -C "$dir" fetch --quiet --depth 1 https://github.com/ChenYilong/CYLTabBarController.git "$sha"
+    git -C "$dir" checkout --quiet --force FETCH_HEAD
     pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$dir/CYLTabBarController.podspec" "$@"
     ;;
   push)
