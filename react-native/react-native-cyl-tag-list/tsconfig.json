@@ -29,5 +29,5 @@
     "target": "ESNext",
     "verbatimModuleSyntax": true
   },
-  "exclude": ["node_modules", "lib", ".deps"]
+  "exclude": ["node_modules", "lib", ".deps", "harmony-example"]
 }

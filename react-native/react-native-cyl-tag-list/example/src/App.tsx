@@ -13,7 +13,12 @@ import { launchTab } from './launchOptions';
 // SF Symbols on iOS; on Android, vector drawables of the example (res/drawable/cyl_tab_*.xml).
 const icon = (symbol: string, drawable: string) => (Platform.OS === 'ios' ? symbol : drawable);
 const ITEMS: CYLTabBarItem[] = [
-  { title: t('Tags'), image: icon('system:tag', 'cyl_tab_tag'), selectedImage: icon('system:tag.fill', 'cyl_tab_tag'), identifier: 'tags' },
+  {
+    title: t('Tags'),
+    image: icon('system:tag', 'cyl_tab_tag'),
+    selectedImage: icon('system:tag.fill', 'cyl_tab_tag'),
+    identifier: 'tags',
+  },
   {
     title: t('Classify'),
     image: icon('system:square.grid.2x2', 'cyl_tab_classify'),

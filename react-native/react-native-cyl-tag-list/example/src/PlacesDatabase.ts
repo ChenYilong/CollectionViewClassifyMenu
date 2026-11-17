@@ -55,7 +55,10 @@ export class PlacesDatabase {
   }
 
   async saveSelection(scenario: string, items: string[]): Promise<void> {
-    await this.db.execute('INSERT OR REPLACE INTO selections (scenario, items) VALUES (?, ?)', [scenario, items.join(',')]);
+    await this.db.execute('INSERT OR REPLACE INTO selections (scenario, items) VALUES (?, ?)', [
+      scenario,
+      items.join(','),
+    ]);
   }
 
   /**
@@ -79,7 +82,10 @@ export function placesQuery(tag: string | null, regions: string[], dishes: strin
     conditions.push('tag = ?');
     args.push(tag);
   }
-  for (const [column, values] of [['region', regions], ['tag', dishes]] as const) {
+  for (const [column, values] of [
+    ['region', regions],
+    ['tag', dishes],
+  ] as const) {
     if (values.length === 0) continue;
     conditions.push(`${column} IN (${values.map(() => '?').join(', ')})`);
     args.push(...values);

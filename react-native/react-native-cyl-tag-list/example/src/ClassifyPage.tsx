@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Button, FlatList, Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import {
+  ActivityIndicator,
+  Button,
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { CylTagListView, type TagEvent } from 'react-native-cyl-tag-list';
 import { PlacesDatabase } from './PlacesDatabase';
 import { t } from './i18n';
@@ -109,7 +119,10 @@ export default function ClassifyPage() {
     defaultVisibleRows: 1,
     foldControl: { position: 'headerTrailing', content: 'iconAndTitle' },
     style: STYLE,
-    sections: categories.map(([category, items]) => ({ title: category, items: items.map((name) => ({ title: name })) })),
+    sections: categories.map(([category, items]) => ({
+      title: category,
+      items: items.map((name) => ({ title: name })),
+    })),
   };
   const filterConfiguration = {
     selectionMode: 'multiple',
@@ -132,7 +145,13 @@ export default function ClassifyPage() {
     <View testID="classifyPage" style={styles.container}>
       <View style={styles.toolbar}>
         <Text style={styles.heading}>{t('Classify menu')}</Text>
-        <Pressable testID="resetConditions" accessibilityRole="button" accessibilityLabel={t('Reset')} onPress={reset} style={styles.toolButton}>
+        <Pressable
+          testID="resetConditions"
+          accessibilityRole="button"
+          accessibilityLabel={t('Reset')}
+          onPress={reset}
+          style={styles.toolButton}
+        >
           <Text style={styles.toolText}>↺</Text>
         </Pressable>
         <Pressable
@@ -146,7 +165,9 @@ export default function ClassifyPage() {
           }}
           style={styles.toolButton}
         >
-          <Text style={[styles.filterText, filtered && styles.toolTextOn]}>{filtered ? `${t('Filter')} ●` : t('Filter')}</Text>
+          <Text style={[styles.filterText, filtered && styles.toolTextOn]}>
+            {filtered ? `${t('Filter')} ●` : t('Filter')}
+          </Text>
         </Pressable>
       </View>
       <CylTagListView
@@ -165,7 +186,11 @@ export default function ClassifyPage() {
         data={places}
         keyExtractor={(place, index) => `${place.name}-${index}`}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={<Text testID="noPlaces" style={styles.empty}>{t('No places match; try other conditions')}</Text>}
+        ListEmptyComponent={
+          <Text testID="noPlaces" style={styles.empty}>
+            {t('No places match; try other conditions')}
+          </Text>
+        }
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.rowText}>
@@ -215,5 +240,11 @@ const styles = StyleSheet.create({
   rowText: { flex: 1 },
   region: { color: '#8E8E93', fontSize: 12 },
   sheetBackdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.3)' },
-  sheet: { backgroundColor: '#fff', paddingBottom: 32, borderTopLeftRadius: 16, borderTopRightRadius: 16, overflow: 'hidden' },
+  sheet: {
+    backgroundColor: '#fff',
+    paddingBottom: 32,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    overflow: 'hidden',
+  },
 });
