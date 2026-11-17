@@ -33,7 +33,6 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
         static let headerToCollectionViewMargin: CGFloat = 0
         static let cellsHorizontalMargin: CGFloat = kTagCollectionViewCellsHorizonMargin
         static let cellHeight: CGFloat = 30
-        static let itemButtonImageToTextMargin: CGFloat = 5
         static let collectionViewToLeftMargin: CGFloat = kTagCollectionViewToLeftMargin
         static let collectionViewToTopMargin: CGFloat = kTagCollectionViewToTopMargin
         static let collectionViewToRightMargin: CGFloat = kTagCollectionViewToRightMargin
@@ -42,6 +41,9 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
     }
 
     private static let cellIdentifier = "CellIdentifier"
+    private static var tagStyle: CYLMenuStyle {
+        CYLMenuStyle.classifyMenuTag()
+    }
     private static let headerViewCellIdentifier = "HeaderViewCellIdentifier"
     private static let sectionTypeKey = "Type"
 
@@ -316,16 +318,9 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
         let button = cell.button
         let item = items(of: dataSource[indexPath.section])[indexPath.row]
         let text = item[kDataSourceCellTextKey] as? String
-        if let image = image(for: item) {
-            button.setImage(image, for: .normal)
-            button.imageTitleSpacing = Metric.itemButtonImageToTextMargin
-        } else {
-            button.setImage(nil, for: .normal)
-            button.imageTitleSpacing = 0
-        }
-        button.titleLabel?.font = tagFont()
-        button.setTitle(text, for: .normal)
-        button.setTitle(text, for: .selected)
+        // A CYLTagButton: its style (CYLMenuStyle.classifyMenuTag()) sets the font, the colors and the icon spacing.
+        button.image = image(for: item)
+        button.title = text
         button.addTarget(self, action: #selector(itemButtonClicked(_:)), for: .touchUpInside)
         button.section = indexPath.section
         button.row = indexPath.row
@@ -355,10 +350,8 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
         // The title is a heading, not a control; the fold button names its section.
         header.titleButton.accessibilityTraits = .header
         header.moreButton.accessibilityHint = sectionTitle
-        header.titleButton.setTitle(sectionTitle, for: .normal)
-        header.titleButton.setTitle(sectionTitle, for: .selected)
-        let sectionImage = menuDataSource?.menuImage?(forSection: section)
-        header.titleButton.setImage(sectionImage, for: .normal)
+        header.titleButton.title = sectionTitle
+        header.titleButton.image = menuDataSource?.menuImage?(forSection: section)
         return header
     }
 
@@ -370,7 +363,7 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
 
     // MARK: - CYLFilterHeaderViewDelegate
 
-    open func filterHeaderView(_ headerView: CYLFilterHeaderView, didTapMoreButton sender: UIButton) {
+    open func filterHeaderView(_ headerView: CYLFilterHeaderView, didTapMoreButton sender: CYLRightImageButton) {
         sender.isSelected.toggle()
         setSection(sender.tag, expanded: sender.isSelected)
     }
@@ -616,8 +609,12 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
         return cellCounts
     }
 
+    /**
+     * The tags' title font, as the tags draw it (`CYLMenuStyle.classifyMenuTag()`, Bold Text and Dynamic Type included),
+     * so a measured cell fits its title.
+     */
     private func tagFont() -> UIFont {
-        CYLTagMetrics.titleFont(for: collectionView?.traitCollection ?? traitCollection)
+        Self.tagStyle.titleFont(for: .normal, traitCollection: collectionView?.traitCollection ?? traitCollection)
     }
 
     private func cellHeight() -> CGFloat {

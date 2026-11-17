@@ -114,7 +114,7 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         leading.layOut()
         let headerFold = leading.headerFoldButton(inSection: 0)
         XCTAssertNotNil(headerFold)
-        XCTAssertLessThan(headerFold?.frame.minX ?? .infinity, leading.headerTitleLabel(inSection: 0)?.frame.minX ?? 0,
+        XCTAssertLessThan(headerFold?.frame.minX ?? .infinity, leading.headerTitleFrame(inSection: 0)?.minX ?? 0,
                           "At the leading edge, before the title")
     }
 

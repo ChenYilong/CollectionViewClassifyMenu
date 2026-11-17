@@ -8,16 +8,16 @@
 import UIKit
 
 /**
- * A tag of the multiple-choice filter: a button that fills the cell and shows the selection (the cell takes the
- * touches).
+ * A tag of the multiple-choice filter: a tag (`CYLTagButton` in `CYLMenuStyle.filterTag()`) that fills the cell and
+ * shows the selection; the cell takes the touches and is the accessibility element.
  */
 @objc(CYLFilterCollectionCell)
 open class CYLFilterCollectionCell: UICollectionViewCell {
 
     /**
-     * The tag's button. (Objective-C name kept: the core's tests read it by key.)
+     * The tag. (Objective-C name kept: the core's tests read it by key.)
      */
-    @objc public let titleButton = CYLIndexPathButton(type: .custom)
+    @objc public let titleButton = CYLIndexPathButton(frame: .zero)
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,20 +33,8 @@ open class CYLFilterCollectionCell: UICollectionViewCell {
         titleButton.frame = contentView.bounds
         titleButton.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         titleButton.isUserInteractionEnabled = false
-        titleButton.titleLabel?.font = CYLTagMetrics.titleFont(for: nil)
-        titleButton.setBackgroundImage(Self.stretchableImage(named: "btn_slide_normal"), for: .normal)
-        titleButton.setBackgroundImage(Self.stretchableImage(named: "btn_slide_selected"), for: .selected)
-        titleButton.setTitleColor(UIColor(red: 96 / 255, green: 147 / 255, blue: 130 / 255, alpha: 1), for: .normal)
-        titleButton.setTitleColor(.white, for: .selected)
+        titleButton.isAccessibilityElement = false
+        titleButton.style = CYLMenuStyle.filterTag()
         contentView.addSubview(titleButton)
-    }
-
-    private static func stretchableImage(named name: String) -> UIImage? {
-        guard let image = CYLMenuResources.image(named: name) else {
-            return nil
-        }
-        let insets = UIEdgeInsets(top: floor(image.size.height / 2), left: floor(image.size.width / 2),
-                                  bottom: floor(image.size.height / 2), right: floor(image.size.width / 2))
-        return image.resizableImage(withCapInsets: insets, resizingMode: .stretch)
     }
 }

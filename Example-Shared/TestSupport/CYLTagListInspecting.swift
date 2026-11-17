@@ -146,6 +146,17 @@ extension CYLTagListInspecting {
         CYLTagListProbe.subview("iconView", of: header(inSection: section))
     }
 
+    /**
+     * The frame of a section header's title in the header's coordinates (the title is a label inside the header's
+     * `CYLTagButton`).
+     */
+    func headerTitleFrame(inSection section: Int) -> CGRect? {
+        guard let header = header(inSection: section), let label = headerTitleLabel(inSection: section) else {
+            return nil
+        }
+        return label.convert(label.bounds, to: header)
+    }
+
     // MARK: Assertions
 
     /**

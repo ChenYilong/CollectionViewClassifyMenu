@@ -8,15 +8,16 @@
 import UIKit
 
 /**
- * A tag cell of `CYLClassifyMenuViewController`: one button that fills the cell.
+ * A tag cell of `CYLClassifyMenuViewController`: one tag (`CYLTagButton`) that fills the cell.
  */
 @objc(CYLCollectionViewCell)
 open class CYLCollectionViewCell: UICollectionViewCell {
 
     /**
-     * The tag's button, as large as the cell. (Objective-C name kept: the core's tests read it by key.)
+     * The tag, as large as the cell: a `CYLTagButton` in `CYLMenuStyle.classifyMenuTag()`. (Objective-C name kept: the
+     * core's tests read it by key.)
      */
-    @objc public let button = CYLIndexPathButton(type: .custom)
+    @objc public let button = CYLIndexPathButton(frame: .zero)
 
     /**
      * The section of the tag the cell shows.

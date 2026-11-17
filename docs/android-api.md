@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 767 / 767 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 763 / 771 with an Android counterpart = 99.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -44,6 +44,8 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `UIButton (CYLCollectionCellStyle)` | category, `UIButton+CYLCollectionCellStyle.swift` | `extension functions on TextView` |
 | `UIButton (CYLCollectionCellStyle) -cylApply:` | method, `UIButton+CYLCollectionCellStyle.swift` | `TextView.cyl_generalStyle / cyl_homeStyle / cyl_redStyle / cyl_chengNiStyle` |
 | `UIButton (CYLCollectionCellStyle) +cylImageWithFilledWith:` | method, `UIButton+CYLCollectionCellStyle.swift` | `android.graphics.drawable.ColorDrawable(color) (the styles use state-list colors)` |
+| `CYLTagButton (CYLCollectionCellStyle)` | category, `UIButton+CYLCollectionCellStyle.swift` | TODO |
+| `CYLTagButton (CYLCollectionCellStyle) -cylApply:` | method, `UIButton+CYLCollectionCellStyle.swift` | TODO |
 | `CYLCollectionViewCell` | class, `CYLCollectionViewCell.swift` | `com.cyl.classifymenu.CYLCollectionViewCell` |
 | `CYLCollectionViewCell.button` | property, `CYLCollectionViewCell.swift` | `CYLCollectionViewCell.button` |
 | `CYLCollectionViewCell.section` | property, `CYLCollectionViewCell.swift` | `CYLCollectionViewCell.section` |
@@ -59,9 +61,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLIndexPathButton` | class, `CYLIndexPathButton.swift` | `com.cyl.classifymenu.CYLIndexPathButton` |
 | `CYLIndexPathButton.section` | property, `CYLIndexPathButton.swift` | `CYLIndexPathButton.section` |
 | `CYLIndexPathButton.row` | property, `CYLIndexPathButton.swift` | `CYLIndexPathButton.row` |
-| `CYLIndexPathButton.imageTitleSpacing` | property, `CYLIndexPathButton.swift` | `CYLIndexPathButton.cyl_imageTitleSpacing` |
-| `CYLIndexPathButton.titleLeadingInset` | property, `CYLIndexPathButton.swift` | `CYLIndexPathButton.cyl_titleLeadingInset` |
 | `CYLRightImageButton` | class, `CYLRightImageButton.swift` | `com.cyl.classifymenu.CYLRightImageButton` |
+| `CYLRightImageButton.expandTitle` | property, `CYLRightImageButton.swift` | TODO |
+| `CYLRightImageButton.collapseTitle` | property, `CYLRightImageButton.swift` | TODO |
 | `CYLImageTagDirection` | enum, `CYLImageTagGroupView.swift` | `com.cyl.classifymenu.CYLImageTagDirection` |
 | `CYLImageTagDirection.leftCenter` | enum value, `CYLImageTagGroupView.swift` | `CYLImageTagDirectionLeftCenter` |
 | `CYLImageTagDirection.leftTop` | enum value, `CYLImageTagGroupView.swift` | `CYLImageTagDirectionLeftTop` |
@@ -237,8 +239,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLFilterCollectionCell` | class, `CYLFilterCollectionCell.swift` | `com.cyl.classifymenu.CYLFilterCollectionCell` |
 | `CYLFilterCollectionCell.titleButton` | property, `CYLFilterCollectionCell.swift` | `CYLFilterCollectionCell.titleButton` |
 | `CYLMultipleFilterHeaderView` | class, `CYLMultipleFilterHeaderView.swift` | `com.cyl.classifymenu.CYLMultipleFilterHeaderView` |
-| `CYLMultipleFilterHeaderView.imageView` | property, `CYLMultipleFilterHeaderView.swift` | `CYLMultipleFilterHeaderView.imageView` |
-| `CYLMultipleFilterHeaderView.titleLabel` | property, `CYLMultipleFilterHeaderView.swift` | `CYLMultipleFilterHeaderView.titleLabel` |
+| `CYLMultipleFilterHeaderView.titleButton` | property, `CYLMultipleFilterHeaderView.swift` | TODO |
 | `NSArray (CYLLog) -cyl_descriptionWithLocale:` | method, `NSArray+CYLLog.swift` | `List<*>.cyl_descriptionWithLocale` |
 | `NSDictionary (CYLLog) -cyl_descriptionWithLocale:` | method, `NSDictionary+CYLLog.swift` | `Map<*, *>.cyl_descriptionWithLocale` |
 | `UICollectionViewDelegateLeftAlignedLayout` | protocol, `CYLCollectionViewLeftAlignedLayout.swift` | `com.cyl.classifymenu.UICollectionViewDelegateLeftAlignedLayout` |
@@ -395,6 +396,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuStyle +tagCloud` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.tagCloudStyle` |
 | `CYLMenuStyle +tagContainer` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.tagContainerStyle` |
 | `CYLMenuStyle +gridStyleWithItemsPerRow:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.gridStyleWithNumberOfItemsPerRow` |
+| `CYLMenuStyle +classifyMenuTag:` | method, `CYLMenuStyle.swift` | TODO |
+| `CYLMenuStyle +filterTag` | method, `CYLMenuStyle.swift` | TODO |
+| `CYLMenuStyle +sectionTitleWithFontSize:textColor:leadingInset:` | method, `CYLMenuStyle.swift` | TODO |
 | `CYLMenuStyle -appearanceFor:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.appearanceForState` |
 | `CYLMenuStyle -setTitleTextAttributes:for:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.setTitleTextAttributes (same name in the Android core)` |
 | `CYLMenuStyle -titleTextAttributesFor:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.titleTextAttributesForState` |
