@@ -7,7 +7,7 @@ scripts/stitch-screenshots.py (any host) or scripts/stitch-screenshots.swift (ma
 into the PNG's "Description" text chunk, starting with "cyl-stitch-screenshots". This check reads it back.
 
     python3 scripts/check-screenshots.py                # the staged files (before a commit)
-    python3 scripts/check-screenshots.py --range A..B   # the files a range changes (CI: base..head)
+    python3 scripts/check-screenshots.py --range A..B   # the files a range changes (base..head)
     python3 scripts/check-screenshots.py FILE ...       # these files
 
 Exit 0: every image passes (or none changed); 1: at least one does not, with the reason and the fix.

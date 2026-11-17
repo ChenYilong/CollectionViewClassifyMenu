@@ -620,9 +620,10 @@ AGENTS.md, newest commit) and adapted to this project:
     annotate or resize an image by hand or with an ad-hoc script. A single raw screen is stitched too (one panel).
   - **The tools refuse an incomplete label:** the header needs `Purpose:`, `Platform:`, `Host:` and `IDE:`, the footer
     `Result:`, `Versions:` and `Taken:`, every panel a caption. They write the label into the PNG.
-  - **Checked before every commit and in CI:** `scripts/check-screenshots.py` (run by `bash scripts/check-branch-pr.sh`,
-    exit 3 when a staged screenshot has no label) and the workflow `.github/workflows/screenshot-labels.yml`. A failing
-    check is fixed by restitching, never by skipping it. Only images that are not screenshots or that a script
+  - **Checked before every commit:** `scripts/check-screenshots.py` (run by `bash scripts/check-branch-pr.sh`, exit 3
+    when a staged screenshot has no label). A failing check is fixed by restitching, never by skipping it. Not checked
+    in CI (2026-11-18, prompt verbatim: "Remove label CI screenshots from ci"; the workflow
+    `.github/workflows/screenshot-labels.yml` is removed, as in CYLTabBarController `70064275`). Only images that are not screenshots or that a script
     regenerates as a set go into `scripts/screenshot-check-exempt.txt`, with the reason.
 
 ## Documentation assets

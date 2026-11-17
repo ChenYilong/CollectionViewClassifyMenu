@@ -217,3 +217,6 @@ the iOS example opens one there is not checked yet.
 - **Plan**: delete `.github/workflows/screenshot-labels.yml`; keep the check before every commit
   (`scripts/check-branch-pr.sh` runs `scripts/check-screenshots.py`); update AGENTS.md and the comments that say "in
   CI". CYLTabBarController did the same (`70064275`).
+- **Result (2026-11-18)**: DONE. `.github/workflows/screenshot-labels.yml` removed; AGENTS.md "Checked before every
+  commit" and the comments of `scripts/stitch-screenshots.py`, `.swift` and `check-screenshots.py` no longer mention
+  CI. The check before every commit (`scripts/check-branch-pr.sh`) stays.

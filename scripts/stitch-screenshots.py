@@ -16,7 +16,7 @@ keep their original pixels (no scaling); --crop cuts the same rectangle out of e
 The label is required, not optional: the tool stops when the header lacks "Purpose:", "Platform:", "Host:" or "IDE:",
 when the footer lacks "Result:", "Versions:" or "Taken:", or when a panel has no caption. It writes the header and
 footer into the PNG (text chunk "Description", starting with "cyl-stitch-screenshots"), which
-scripts/check-screenshots.py checks before a commit and in CI.
+scripts/check-screenshots.py checks before a commit.
 """
 import argparse
 import sys
