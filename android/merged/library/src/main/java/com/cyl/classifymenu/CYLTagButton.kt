@@ -294,7 +294,7 @@ open class CYLTagButton @JvmOverloads constructor(
     }
 
     /** The animated item's size type (CYLTabBarController's `CYLSize`). */
-    private fun CYLSize.toAnimatedItemSize(): com.cyl.tabbar.CYLSize = com.cyl.tabbar.CYLSize(width, height)
+    private fun CYLSize.toAnimatedItemSize(): com.cyl.animateditem.CYLSize = com.cyl.animateditem.CYLSize(width, height)
 
     private fun animationSize(): CYLSize {
         val size = currentStyle.animationSize
