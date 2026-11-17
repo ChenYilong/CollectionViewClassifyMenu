@@ -9,6 +9,23 @@ tags: [android, kotlin, tagview, api-parity]
 This document tracks the Android work in `android/`: Kotlin transcriptions of three Android tag libraries, the
 library merged from them, its API table against the iOS core, and the Android ports of the iOS examples.
 
+## DONE (2026-11-16): seven tabs on Android: opt in to every tab after CYLTabBarController added "More"
+
+- **Context**: CYLTabBarController for Android now follows iOS (UIKit): with more than five view controllers (the
+  plus button with its own page counts as one), the bar shows four tabs (three with the plus page) and "More"
+  (CYLTabBarController commit `0c35409e`, its TODO A6 in `docs/Android-Library.md`). This example has seven tabs
+  (TagView, Container, ViewGroup, the plus button New, Classify, Filter, About) and should keep all of them in the
+  bar, through CYLTabBarController's new Android-only API.
+- **Prompt (verbatim)**: "continue fix todo • There's no CollectionViewClassifyMenu example under Example-Android, so
+  I didn't add an opt-in there."
+- **Result**: `android/merged/example/src/main/assets/cyl_merged_tabbar.json` sets `"CYLTabBarControllerShowsAllTabs": true`
+  (the configuration key of `CYLTabBarController.cyl_showsAllTabs`); the tabs still scroll
+  (`cyl_scrollMode = Scrollable`, which also shows every tab). `gradle.properties` pins CYLTabBarController to
+  `0c35409e96d81b01150088ec0930f0b9a45204d3`, the newest commit over every branch (`scripts/cyl-tabbar-latest-commit.sh`).
+  Evidence: `gradle :example:assembleDebug` passes against that commit (Linux container, 2026-11-17); the example has no
+  unit tests, and the configuration key is covered by CYLTabBarController's `CYLTabBarMoreTest`. **TODO**: an emulator screenshot of the
+  seven tabs (no Android emulator in the Linux container).
+
 ## DONE (2026-11-13, logged as TODO 2026-11-12): Kotlin ports, merged library, API parity with iOS, iOS examples on Android
 
 ### Context
