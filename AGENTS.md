@@ -568,6 +568,33 @@ AGENTS.md, newest commit) and adapted to this project:
 - **Screenshots: stitching layout.** Stitch in this order of preference: (1) stacked vertically, top to bottom, which
   reads best on a phone; (2) two columns, several rows; (3) last resort, side by side in one row, at most three
   columns per row. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
+- **Screenshots: stitching layout, update (2026-11-18).** Prompt (verbatim): "截图除了 优先选用竖版排列风格。优先两列，多行。且给拼接好的图增加header，footer，header，footer不能与截图区域重叠 覆盖，标注关键信息：关键信息也是英文，测试模拟器平台，模拟器系统版本，操作系统版本，ide 版本，以及测试目的等等。以附带的截图为例。提取截图的附带信息以及风格 完善我的描述规则。" This replaces the order above:
+  - The stitched image is portrait (taller than wide). Default: two columns and as many rows as needed, filled left
+    to right, then top to bottom, in step or time order. Use one column only for a single panel, or when two columns
+    would make the image wider than tall (wide crops). Never more than two columns.
+  - Every panel has the same size (the same crop rectangle), keeps its original pixels (no scaling) and shows whole
+    elements: never cut through a row of controls.
+  - Tool: `scripts/stitch-screenshots.swift`; details and checklist: `.agents/skills/cyl-screenshots/SKILL.md`.
+- **Screenshots: header and footer (2026-11-18).** Every stitched image has a header band above the panels, a footer
+  band below them and a caption band above each panel. No text is ever drawn on a screenshot; header, footer and
+  captions never overlap or cover a panel. White background; a thin gray rule under the header and above the footer.
+  All text is in English.
+  - Header (red `#FF3B30`, bold): line 1 `Purpose:` what the test checks and the expected result, with the commit of
+    the change under test; line 2 `Platform:` the simulator or emulator platform and device model, the simulator OS
+    version, then `| Host:` the host operating system version, then `| IDE:` the IDE version.
+  - Panel caption (red, bold, above the panel): step number, the state or action, the time offset from the first
+    panel, the screen or launch argument, the measurement when there is one.
+  - Footer (dark gray, regular): `Result:` the measured outcome (for example changed pixels); `Versions:` this
+    repository's branch and commit, the dependency commits (CYLTabBarController) and engine versions; `Taken:` the
+    local date and time with the time zone, then `| Stitched by` the script.
+  - Fields per platform: iOS: Simulator device, iOS version, Xcode version, macOS version. Android: emulator (AVD)
+    and API level, Android Studio or Gradle and JDK, host OS. HarmonyOS: emulator name, HarmonyOS version, DevEco
+    Studio version, host OS. Mini Program: WeChat DevTools version and base library version, host OS. Flutter and
+    React Native: the Flutter or React Native version plus the fields of the platform it ran on.
+  - Example and its lessons: `docs/assets/ios-rive-rest.png` (first version: one red bold header with the platform,
+    simulator, Xcode, dependency commit, branch, date and purpose; a red bold caption above each panel in its own
+    band; but no host OS, everything crammed into the header, one column, a panel cut through the Shapes row) and its
+    redo by these rules, `docs/assets/ios-rive-rest-then-play-grid.png`.
 
 ## Documentation assets
 

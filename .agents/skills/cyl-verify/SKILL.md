@@ -23,6 +23,8 @@ shellcheck scripts/*.sh
 
 `unit-tests.sh example|swift` also writes the screenshots the tests record (`CYLScreenshotCapturing`) to
 `build/test-screenshots/<suite>/`; look at them and copy the ones the README shows to `assets/test-*.png`.
+Stitch and label screenshots for `docs/` or the README with `.agents/skills/cyl-screenshots/SKILL.md`
+(portrait, two columns, header and footer with the purpose and the test environment).
 
 Apps built with the iOS 27 SDK (Xcode 27) must adopt the scene lifecycle, otherwise UIKit stops them at launch
 (`_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption`, "The test runner crashed before establishing

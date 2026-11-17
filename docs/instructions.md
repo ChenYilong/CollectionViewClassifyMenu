@@ -14,6 +14,13 @@
   simulator / emulator version, platform SDK version, repository version or commit URL and the time taken; clear
   originals; README images are cropped key details, stitched vertically first, then two columns, then at most three
   side by side. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
+- Screenshot stitching, update (2026-11-18, English rule, AGENTS.md "Screenshots: stitching layout, update" and
+  "Screenshots: header and footer"; checklist `.agents/skills/cyl-screenshots/SKILL.md`): portrait, two columns by
+  default and several rows (one column only for a single panel or wide crops, never more than two); same-size panels
+  of whole elements at original pixels; a header (red, bold: `Purpose:`; `Platform:` simulator platform and device,
+  simulator OS version, `Host:` OS version, `IDE:` version), a caption above each panel and a footer (`Result:`,
+  `Versions:`, `Taken:`), each in its own band, never overlapping a panel; English only. Tool:
+  `scripts/stitch-screenshots.swift`. Example: `assets/ios-rive-rest-then-play-grid.png`.
 - Upstream projects (English rule, AGENTS.md "Upstream projects (translations and ports)"): when a project linked in
   these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
   of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each
