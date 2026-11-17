@@ -248,7 +248,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   after load and resumed with `play(…, settleInitialState = false)` on the first play; after that the `isOpen` false /
   true toggles no longer replay it. Fix belongs in CYLTabBarController (reported to its Mac session). Evidence:
   `docs/assets/android-rive-menu-stuck-dcbfdec6.png`. Android library tests 86 / 86, example builds. iOS at `dcbfdec6` (Mac session): Menu keeps looping (Loop on after Play all, changed pixels 386 and 577 in frames
-  13 s and 17 s later), so the bug is Android only.
+  13 s and 17 s later), so the bug is Android only. **Re-run at `ad3dca0e` (2026-11-18)**, the upstream fix (resume only the named state machine, `play(name, …,
+  isStateMachine = true, settleInitialState = false)`; cylanimateditem 40 / 40 on a fake view): still failing. At rest every
+  tag is still; Loop on: every other Rive tag moves (Shapes 259-545, Search 82-1041, Alerts 331-926 …) and **Menu is 0 in 15
+  frame pairs**, the hamburger after the first play (`docs/assets/android-rive-menu-stuck-ad3dca0e.png`). Menu's options:
+  `stateMachine=State Machine`, `input=isOpen`, `duration=0`, so the named-machine resume path ran. Still TODO upstream.
 - **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
   `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
   tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still
