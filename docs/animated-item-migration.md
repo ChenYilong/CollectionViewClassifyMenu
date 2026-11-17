@@ -23,10 +23,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 
 ## Score
 
-**Score: 76** (19 of 25 rows done, row 17 half done; a row counts only when it is done and verified as far as this environment allows).
+**Score: 84** (21 of 25 rows done, row 17 half done; a row counts only when it is done and verified as far as this environment allows).
 
 | Date | Score | Note |
 |:---|:---|:---|
+| 2026-11-17 | 84 | Rows 12 and 13 verified on a Mac (library 0 warnings, 152 tests pass) |
 | 2026-11-17 | 76 | Row 20: WeChat DevTools check, the missing-tags bug fixed; row 17: HarmonyOS build and host tests |
 | 2026-11-17 | 72 | First assessment, at `d979073` (pins `57a527e`; CYLTabBarController PR #815 open) |
 
@@ -46,7 +47,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 | 10 | Several engines: the example reports which are linked (multi-engine section) | iOS | Done | `CYLTagAnimationDemoViewController.engineReportLines()` (`b4d0e51`), test `testEveryLinkedEngineIsRegisteredAndListed` |
 | 11 | Swift Package Manager: a separate `CYLAnimatedItem` product | iOS | TODO (upstream) | the guide's TODO 9: upstream SwiftPM still compiles the component into the `CYLTabBarController` product; owner's decision: "CocoaPods/Gradle now, SPM later" |
 | 12 | Static-library demo app (`CollectionViewClassifyMenu.xcodeproj`) compiles | iOS | TODO (upstream) | still "cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded" (run 44046809834 on `0e79c2c`, menu tests), after `@_exported import` (`b15b822`) and the demo's own `import CYLAnimatedItem` (`880d9b1`); the `use_frameworks!` example passes (`320c3eb`). Suspected cause, not verified (no Xcode here): CYLTabBarController's umbrella header at `57a527e` imports the quoted `"CYLAnimatedItem/CYLAnimatedItemView.h"` first, which resolves through `-I Pods/Headers/Public` with static libraries; reported to the CYLTabBarController session (prefer `<CYLAnimatedItem/CYLAnimatedItemView.h>`), then move the pins |
-| 13 | Full iOS CI green (menu, example, swift tests, screenshots) | iOS | TODO (CI) | `pod lib lint` and tag tests green; the rest was cancelled by later pushes (push freeze agreed until run 44037489477 ends) |
+| 13 | Full iOS CI green (menu, example, swift tests, screenshots) | iOS | Done (local Mac) | 2026-11-17 at `0583e1d`: menu 32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0 failures; engine report screenshot `assets/ios-animation-engine-report.png` (test), `assets/ios-animations-live.png` (app). CI run still to confirm |
 | 14 | `CYLTagButton` subclasses `CYLAnimatedItemView`, `onItemStateChanged`, `accessoryPlacement` | Android | Done | `android/merged/library/.../CYLTagButton.kt:44`, `:261`, `:364` |
 | 15 | Depend on `cyltabbarcontroller-animateditem`, `:cylanimateditem` substitution by commit | Android | Done | `library/build.gradle.kts:41`, `settings.gradle.kts:69` |
 | 16 | Tag button on `CYLAnimatedItemView` (`cylanimateditem`, `file:` at the pinned commit) | HarmonyOS | Done (code) | `1a8a80b` (other session): vendored `harmony/cylanimateditem`, engines moved to the example |
@@ -95,3 +96,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   commit since the test was added (`a2efda2`), so not a regression of the API parity work (`07cc52b`), and passes on an
   iPhone 17 Pro. `scripts/simulator-id.sh` picked "iPhone Duo" as the first iPhone of the newest runtime; it now prefers
   a regular "iPhone <number>" model. The tab bar placement on that form factor is TODO.
+- **Bug fixed (2026-11-17, `0583e1d`)**: the example's test screenshots showed empty places instead of the animated icons
+  (Lottie, PAG, Rive, SVGA, GIF), although the running app draws them (`assets/ios-animations-live.png`): the capture ran
+  before the icons' first frame was drawn. `CYLScreenshotCapturing.captureScreenshot` now runs the main run loop for 0.5 s
+  first (`assets/ios-animation-engine-report.png`). `CYLAnimatedIconTests` 8 / 0.
+- **Results (2026-11-17)**: row 12 Done, row 13 Done on the local Mac (menu 32, tag 6, example 92, swift 22 tests, 0
+  failures, on the "CYL ClassifyMenu iOS" iPhone 17 Pro simulator). Still TODO: the iPhone Duo tab bar placement (above).
