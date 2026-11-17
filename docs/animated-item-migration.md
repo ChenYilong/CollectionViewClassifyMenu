@@ -238,6 +238,15 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **iOS at pins `074285a6` (2026-11-18, `19e1e4a`)**: `pod install` resolves `074285a6` in the four iOS projects;
   `6a9ede85..074285a6` changes only the mini program's `cyl-rive`, its test and a doc (no iOS source), so the iOS results
   at `6a9ede85` (152 tests pass, every Rive tag replays) stand without a re-run.
+- **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
+  `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
+  tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still
+  ran from launch; they now default to `autoplay: false` (rest until tapped or played, as iOS `CYLTagButton`), `true`
+  plays once when ready. WeChat DevTools, fresh launch: Button, Shapes, Truck and the five icons.riv tags 0 changed
+  pixels over 5 frames (before: Shapes 80 / 59 / 65 / 56); Play all: Shapes 70 / 56 / 55, Chat 80, Search 100, Timer 22,
+  Alerts 54, Me 83, Truck 1 / 5 / 7, button.riv's time 0 -> 1 s; Loop on, every 250 ms: Menu `isOpen`
+  `11111100001110001110000111000111`, house Rooms 3 at rest then 5, 6, 3, 4, 5, 6; `npm test` 143 / 143;
+  `docs/assets/miniprogram-devtools-rive-rest-until-played-dcbfdec6.png`.
 - **Mini program and Android pins at `6f93ae6b` (2026-11-18)**: `fetch-cyltabbar.js`, the test, the vendored `COMMIT`
   files and `android/merged/gradle.properties`; `074285a6..6f93ae6b` changes HarmonyOS, Flutter, iOS demo resources and
   docs only (no Android source, no cyl-animated-item / cyl-animation-placeholder change: the re-vendor touched only the

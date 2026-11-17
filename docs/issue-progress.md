@@ -35,6 +35,18 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-18, `feat/harmony`): Rive tags rest until played in the mini program (CYLTabBarController `ff2e7a22`)
+
+- Request (Mac-CYLTabBarController session, for the owner's decision "every animated tab icon rests until it is played"):
+  run the WeChat DevTools check: Shapes and Truck still at launch; Play, Play all and loop still move every icon (Menu
+  `isOpen` off on each pass, house Rooms stepping).
+- Acceptance criteria: 100 = pins at the newest commit (10), Shapes and Truck still at launch (30), Play all moves the Rive
+  tags (25), loop: Menu `isOpen` and house Rooms (25), tests and evidence (10). Pass: 60.
+- Result: **95/100**. Pins at `dcbfdec6`; at `dcbfdec6` alone Shapes still ran (the tag list autoplayed once on load), so
+  the library now defaults tags to `autoplay: false`; then everything passes (numbers in
+  `animated-item-migration.md`). -5: Button's motion (a white bar) is too faint for the pixel check; its animation time
+  goes 0 -> 1 s on Play all.
+
 ### Done (2026-11-18, `feat/harmony`): mini program cyl-tag-button warnings and GIF options (migration row 19)
 
 - Prompt (relayed by Mac-CYLTableViewPlaceHolder, verbatim): "continue fix TODO". Requests from the

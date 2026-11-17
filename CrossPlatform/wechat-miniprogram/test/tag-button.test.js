@@ -110,7 +110,7 @@ test('accessibilityLabel replaces the title in what the screen reader reads (an 
 
 test('GIF stills, the pass length and autoplay reach cyl-animated-item (tag list items and cyl-tag-button)', () => {
   const m = model.normalize({ sections: [{ items: [
-    { title: 'Gift', animation: 'gift.gif', gifFirstFrame: 'gift-first.png', gifLastFrame: 'gift-last.png', gifDuration: '1600', autoplay: false },
+    { title: 'Gift', animation: 'gift.gif', gifFirstFrame: 'gift-first.png', gifLastFrame: 'gift-last.png', gifDuration: '1600', autoplay: true },
     { title: 'Plain', animation: 'plain.gif' },
   ] }] });
   const [gift, plain] = m.sections[0].items;
@@ -119,12 +119,12 @@ test('GIF stills, the pass length and autoplay reach cyl-animated-item (tag list
   assert.equal(icon.gifFirstFrame, 'gift-first.png');
   assert.equal(icon.gifLastFrame, 'gift-last.png');
   assert.equal(icon.gifDuration, 1600);
-  assert.equal(icon.autoplay, false);
+  assert.equal(icon.autoplay, true, 'autoplay true plays once when ready');
   const defaults = model.animatedIcon(plain, 'normal', style, 'plain.gif');
-  assert.deepEqual([defaults.gifFirstFrame, defaults.gifLastFrame, defaults.gifDuration, defaults.autoplay], ['', '', 1000, true],
-    'without stills a GIF keeps playing, as before');
-  const view = model.tagButtonView({ title: 'Gift', gifFirstFrame: 'a.png', gifLastFrame: 'b.png', gifDuration: 800, autoplay: false }, 'gift.gif', 2);
-  assert.deepEqual([view.gifFirstFrame, view.gifLastFrame, view.gifDuration, view.autoplay], ['a.png', 'b.png', 800, false]);
+  assert.deepEqual([defaults.gifFirstFrame, defaults.gifLastFrame, defaults.gifDuration, defaults.autoplay], ['', '', 1000, false],
+    'without stills a GIF keeps playing; an icon rests until played (autoplay false)');
+  const view = model.tagButtonView({ title: 'Gift', gifFirstFrame: 'a.png', gifLastFrame: 'b.png', gifDuration: 800, autoplay: true }, 'gift.gif', 2);
+  assert.deepEqual([view.gifFirstFrame, view.gifLastFrame, view.gifDuration, view.autoplay], ['a.png', 'b.png', 800, true]);
 });
 
 test('cyl-tag-button draws no animated item before its first render, and forwards the GIF options', () => {
