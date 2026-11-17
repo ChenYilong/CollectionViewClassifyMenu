@@ -104,7 +104,7 @@ tags: [issues, ui, cocoapods, progress]
 - Found: the packages disagree (iOS podspec "All rights reserved", npm / ohpm / mini program "MIT", Flutter LICENSE a
   "TODO" placeholder, the AndroidTagView port Apache-2.0 from its upstream, the merged Android library none).
 
-### TODO (2026-11-16): reproduce and handle the Rive crash on the HarmonyOS emulator
+### DONE (2026-11-16): reproduce and handle the Rive crash on the HarmonyOS emulator (Canvas renderer on the emulator, `3417e7e`; verified)
 
 - **Context:** the HarmonyOS animation screen crashed in `libohos_rive.so` (`EGLWorkerImpl::destroy` →
   `eglDestroySurface` → `NativeWindowDisconnect`, null pointer) when a Rive view is disposed; the Rive pool was reverted
@@ -141,7 +141,7 @@ tags: [issues, ui, cocoapods, progress]
 - **Status:** reproduced and explained; not fixed. The other emulator checks of this task (filter button tint, Y1, Y2)
   wait for the next run, since the emulator host crashed during this one.
 
-### TODO (2026-11-16): HarmonyOS bug: the menu linkage filter icon is nearly invisible
+### DONE (2026-11-16): HarmonyOS bug: the menu linkage filter icon is nearly invisible (Y3, verified)
 
 - **Bug:** HarmonyOS example, page "菜单选择 · 数据库联动" (`CYLMenuLinkagePage`): the filter button at the top left of the
   title bar (image `menuLinkageFilter`, bounds [49,175][126,252] px) is drawn almost the color of the bar. Measured on
@@ -719,11 +719,11 @@ tags: [issues, ui, cocoapods, progress]
 ### DONE (2026-11-16): retest `3417e7e` (Rive canvas renderer) and Y1–Y3
 - Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `3417e7e`, 12:10–12:12.
 - Animation screen: open, scroll, wait 10 s, Back, in light and dark: app alive, no new fault log; Rive icons draw (canvas renderer). Screenshot `assets/harmonyos-animation-3417e7e-light-dark-scroll.jpeg`.
-- TODO Z2 (not fixed): scrolled tags still draw over the status bar and the "动效图标" title.
-- TODO Z3 (partly fixed): in dark mode only the header block turns dark; the tag list area stays white.
+- DONE Z2 (`32cbe81`, verified on the emulator; core cause still open in `example-layer-fixes.md`): scrolled tags still draw over the status bar and the "动效图标" title.
+- DONE Z3 (`32cbe81`, verified on the emulator): in dark mode only the header block turns dark; the tag list area stays white.
 - Y1 pass: the 神 / 热 badge glyphs on the hot-search tags are white on their circles and readable (`assets/harmonyos-hot-search.jpeg`).
-- TODO Y2 (fail): the selected 好评 chip's thumbs-up icon is orange on the orange chip, nearly invisible; not white (`assets/harmonyos-reviews-memory-good-selected.jpeg`).
-- TODO Y3 (fail): the menu linkage filter icon measures 2.45:1 against the bar (darkest pixel rgb 140,140,142); WCAG non-text minimum is 3:1 (`assets/harmonyos-menu-linkage.jpeg`).
+- DONE Y2 (`32cbe81` verified; moved into the core in `64c6bc3`): the selected 好评 chip's thumbs-up icon is orange on the orange chip, nearly invisible; not white (`assets/harmonyos-reviews-memory-good-selected.jpeg`).
+- DONE Y3 (`32cbe81`, verified at 3.68:1): the menu linkage filter icon measures 2.45:1 against the bar (darkest pixel rgb 140,140,142); WCAG non-text minimum is 3:1 (`assets/harmonyos-menu-linkage.jpeg`).
 - Rive icons on `3417e7e` (12:13, `assets/harmonyos-animation-3417e7e-rive-section.jpeg`): all 11 Rive tags draw their icon (首页, 完成, 菜单, 形状, 卡车, 聊天, 搜索, 计时, 提醒, 我的); 按钮 shows only a small arc, its resting first frame. The empty icon areas were only in `3e02c5f`, where Rive was switched off.
 - TODO: PAG 健康 shows only a faint ring at rest; check that its first frame is meant to be that light.
 
@@ -733,14 +733,14 @@ tags: [issues, ui, cocoapods, progress]
 - Y3 pass: the filter icon measures 3.68:1 on the screenshot (darkest pixel rgb 109,109,111), above the 3:1 minimum.
 - Z2 pass: scrolled tags are clipped below the controls in light and dark.
 - Z3 pass: the tag list area is dark in dark mode (`assets/harmonyos-32cbe81-animation-dark.jpeg`).
-- TODO: in dark mode the navigation bar ("动效图标") stays light.
-- TODO (seen once, not reproduced in three more runs): on the first dark launch right after installing, the tags drew as blank rectangles and the app froze (`appfreeze` THREAD_BLOCK_6S, main thread in `PipelineContext::AddWindowStateChangedCallback` ← `FrameNode::InitializePatternAndContext`).
+- DONE (`9c8048a`, verified): in dark mode the navigation bar ("动效图标") stays light.
+- DONE (Z5: icons created one at a time, `9692e4b`; six openings without a freeze): on the first dark launch right after installing, the tags drew as blank rectangles and the app froze (`appfreeze` THREAD_BLOCK_6S, main thread in `PipelineContext::AddWindowStateChangedCallback` ← `FrameNode::InitializePatternAndContext`).
 
 ### DONE (2026-11-16): retest Z4 on `9c8048a`
 - Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), 12:25, `assets/harmonyos-9c8048a-animation-dark-light.jpeg` (left dark, right light).
 - Z4 pass: the navigation bar is dark with a white title in dark mode, light with a black title in light mode.
 - Z5: the first dark launch right after installing ran without a freeze or fault log this time.
-- TODO: in dark mode the caption "动效引擎：CYLTabBarItemAnimationFactory 已链接" is very dim gray on black.
+- DONE (`8529951`, verified): in dark mode the caption "动效引擎：CYLTabBarItemAnimationFactory 已链接" is very dim gray on black.
 
 ### DONE (2026-11-16): Rive crash fix compared with CYLTableViewPlaceHolder; checked on every platform
 - Prompt (verbatim): "CYLTabBarController andCollectionViewClassifyMenu文件夹CYLTableViewPlaceHolder 文件夹has Writing the Rive tab icon component.please learn from it update our 鸿蒙os core component library to fix crash on 鸿蒙os。please learn from it double check this is also fixed on other platform like iOS Android rect native and flutter 微信小程序"
