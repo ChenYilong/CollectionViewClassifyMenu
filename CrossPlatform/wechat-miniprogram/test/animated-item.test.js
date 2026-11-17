@@ -87,11 +87,11 @@ test('cyl-tag-list and cyl-tag-button use cyl-animated-item and forward its four
   });
 });
 
-test('cyl-tag-list: view data for cyl-animated-item, a tap plays through cyl_playFromStart, a GIF starts again', () => {
+test('cyl-tag-list: view data for cyl-animated-item, a tap and Play all play through its playAnimation()', () => {
   const played = [];
-  const engine = { cyl_playFromStart: () => played.push('lottie') };
-  const lottieItem = { data: { animationUrl: 'Lottie/tab_home_animate.json' }, selectComponent: (s) => (s === '.cyl-animated-item-animation' ? engine : null) };
-  const gifItem = { data: { animationUrl: '/data/animations/gif/tab_star.gif' }, selectComponent: () => null };
+  // cyl-animated-item's playAnimation() plays the engine from progress 0 or the GIF from its first frame (its own tests).
+  const lottieItem = { data: { animationUrl: 'Lottie/tab_home_animate.json' }, playAnimation: () => played.push('lottie') };
+  const gifItem = { data: { animationUrl: '/data/animations/gif/tab_star.gif' }, playAnimation: () => played.push('gif') };
   const { instance } = mount(installed('cyl-tag-list/cyl-tag-list.js'), {
     configuration: {
       selectionMode: 'single',
@@ -117,21 +117,16 @@ test('cyl-tag-list: view data for cyl-animated-item, a tap plays through cyl_pla
   assert.deepEqual(played, ['lottie']);
   assert.equal(instance.events.find((event) => event.name === 'tagtap').detail.title, 'Home');
 
-  instance.patches.length = 0;
   instance.playAll();
-  assert.deepEqual(played, ['lottie', 'lottie']);
-  const gifPatches = instance.patches.filter((patch) => 'sections[0].items[1].animationUrl' in patch)
-    .map((patch) => patch['sections[0].items[1].animationUrl']);
-  assert.deepEqual(gifPatches, ['', '/data/animations/gif/tab_star.gif'], 'the GIF is set again, from its first frame');
+  assert.deepEqual(played, ['lottie', 'lottie', 'gif'], 'Play all plays the GIF too (one pass when it has stills)');
 });
 
-test('cyl-tag-button: the icon through cyl-animated-item and playAnimation through the engine', () => {
+test('cyl-tag-button: the icon through cyl-animated-item and playAnimation through its playAnimation()', () => {
   const played = [];
-  const engine = { cyl_playFromStart: () => played.push(1) };
   const { instance } = mount(installed('cyl-tag-button/cyl-tag-button.js'), {
     title: 'House', image: '/images/house.png', animationURL: 'CYLMenuExample.bundle/Animations/Rive/house.riv',
     animationOptions: { stateMachine: 'State Machine' },
-  }, { '#cyl-tag-button-animation': { selectComponent: () => engine } });
+  }, { '#cyl-tag-button-animation': { playAnimation: () => played.push(1) } });
   instance.render();
   assert.equal(instance.data.view.animationUrl, 'Rive/house.riv#stateMachine=State%20Machine');
   assert.equal(instance.data.view.iconSrc, '/images/house.png');

@@ -26,7 +26,8 @@
                                  generic:cyl-rive-view="cyl-rive-view" generic:cyl-svga-view="cyl-svga-view"
                                  animation-url="{{item.animationUrl}}" image="{{item.iconSrc}}" icon-size="{{item.iconSize}}"
                                  speed="{{animationSpeed > 0 ? animationSpeed : item.styleSpeed}}" loop="{{animationLoops}}"
-                                 selected="{{item.selected}}" enabled="{{item.iconEnabled}}" />
+                                 selected="{{item.selected}}" enabled="{{item.iconEnabled}}"
+                                 gif-first-frame="{{item.gifFirstFrame}}" gif-last-frame="{{item.gifLastFrame}}" gif-duration="{{item.gifDuration}}" autoplay="{{item.autoplay}}" />
             </view>
           </view>
           <view wx:if="{{item.spacerStyle}}" class="cyl-spacer" style="{{item.spacerStyle}}" />

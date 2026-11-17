@@ -16,7 +16,6 @@
  */
 const model = require('./model.js');
 const animations = require('./animations.js');
-const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
 const locale = require('../locale.js');
 
 /** The core's localized fold titles (CYLMenuExpand / CYLMenuCollapse) when the string tables have them. */
@@ -104,7 +103,7 @@ Component({
             const selected = this.selection.includes(item.key);
             const state = model.stateOf(item, selected);
             const url = animations.url(item.animation, item.animationOptions, item.animationRestingProgress);
-            const icon = model.animatedIcon(item, state, style, url);
+            const icon = model.animatedIcon({ ...item, ...animations.gifOptions(item.animation, item) }, state, style, url);
             const tag = model.tagLayout(style, item, state, { kind: icon.iconKind }, style.interitemSpacing, style.lineSpacing);
             this.itemPaths[item.key] = `sections[${sectionPosition}].items[${i}]`;
             return {
@@ -262,28 +261,19 @@ Component({
     },
 
     /**
-     * Plays the animated icons of these items from progress 0 (`CYLTagButton.playAnimation()`): the engine component in
-     * the item's cyl-animated-item through the engine contract (`cyl_playFromStart`); a GIF, drawn by `<image>`, starts
-     * again when its file is set again.
+     * Plays the animated icons of these items from progress 0 (`CYLTagButton.playAnimation()`), through each item's
+     * cyl-animated-item `playAnimation()`: the engine from progress 0, a GIF from its first frame (one pass of
+     * `gifDuration` ms when the tag has stills), a file still loading once it is ready.
      */
     playItems(keys) {
       (keys || []).forEach((k) => {
         const item = this.selectComponent(`#anim-${k}`);
         const url = item && item.data && item.data.animationUrl;
         if (!url) return;
-        if (cylAnimatedItemType(url) === 'gif') {
-          this.restartGif(k, url);
-          return;
-        }
-        const engine = item.selectComponent('.cyl-animated-item-animation');
-        if (engine && typeof engine.cyl_playFromStart === 'function') engine.cyl_playFromStart();
+        // cyl-animated-item plays it: the engine from progress 0, a GIF again from its first frame (one pass with stills),
+        // a file still loading once it is ready.
+        if (typeof item.playAnimation === 'function') item.playAnimation();
       });
-    },
-
-    restartGif(k, url) {
-      const itemPath = this.itemPaths && this.itemPaths[k];
-      if (!itemPath) return;
-      this.setData({ [`${itemPath}.animationUrl`]: '' }, () => this.setData({ [`${itemPath}.animationUrl`]: url }));
     },
 
     /** Restarts every animated icon on the list from progress 0 (Play all, `playAllAnimations()`). */

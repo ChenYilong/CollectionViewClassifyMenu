@@ -8,7 +8,8 @@
                          generic:cyl-lottie-view="cyl-lottie-view" generic:cyl-pag-view="cyl-pag-view"
                          generic:cyl-rive-view="cyl-rive-view" generic:cyl-svga-view="cyl-svga-view"
                          animation-url="{{view.animationUrl}}" image="{{view.iconSrc}}" icon-size="{{view.iconSize}}"
-                         speed="{{view.speed}}" loop="{{animationLoops}}" selected="{{selected}}" enabled="{{view.iconEnabled}}" />
+                         speed="{{view.speed}}" loop="{{animationLoops}}" selected="{{selected}}" enabled="{{view.iconEnabled}}"
+                         gif-first-frame="{{view.gifFirstFrame}}" gif-last-frame="{{view.gifLastFrame}}" gif-duration="{{view.gifDuration}}" autoplay="{{view.autoplay}}" embedded="{{embedded}}" />
     </view>
     <text wx:if="{{view.showsBadge}}" class="cyl-badge" style="{{view.badgeStyle}}" aria-hidden="true">{{view.badgeText}}</text>
   </view>
