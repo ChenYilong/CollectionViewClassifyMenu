@@ -738,9 +738,10 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
 
 /**
  * The view data of the standalone `cyl-tag-button` (the core's `CYLTagButton` on its own): `props` holds the iOS names
- * (title, image, selectedImage, animationSpeed, badgeValue, badgeColor, selected, enabled, tagStyle), `animation` the
- * resolved animated icon (or null). The tag is `tagLayout` at its own height (`tagHeightForTitle`: no room for a missing
- * icon or title), with the badge and an accessibility label that reads the title, then the badge.
+ * (title, image, selectedImage, animationSpeed, badgeValue, badgeColor, accessibilityLabel, selected, enabled, tagStyle),
+ * `animation` the resolved animated icon (or null). The tag is `tagLayout` at its own height (`tagHeightForTitle`: no
+ * room for a missing icon or title), with the badge and an accessibility label that reads `accessibilityLabel` (else the
+ * title), then the badge.
  */
 function tagButtonView(props, animation, pixelRatio = 2) {
   const style = mergeStyle((props && props.tagStyle) || {}, defaultStyle(pixelRatio));
@@ -766,7 +767,7 @@ function tagButtonView(props, animation, pixelRatio = 2) {
     iconSrc: icon.src,
     glyph: icon.glyph,
     speed: props.animationSpeed > 0 ? props.animationSpeed : style.animationSpeed,
-    accessibilityLabel: [item.title, badge.badgeAccessibilityValue].filter(Boolean).join(', '),
+    accessibilityLabel: [props.accessibilityLabel || item.title, badge.badgeAccessibilityValue].filter(Boolean).join(', '),
   };
 }
 

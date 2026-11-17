@@ -100,3 +100,10 @@ test('allowsTransparentBackground keeps a transparent tag (a search bar item); a
   }, null, 2);
   assert.match(view.cellStyle, /background-color: transparent/);
 });
+
+test('accessibilityLabel replaces the title in what the screen reader reads (an icon-only search bar item)', () => {
+  locale.setLanguage('en');
+  const view = model.tagButtonView({ image: 'camera.svg', accessibilityLabel: 'Camera', badgeValue: '2' }, null, 2);
+  assert.equal(view.accessibilityLabel, 'Camera, 2');
+  assert.equal(model.tagButtonView({ title: 'Search' }, null, 2).accessibilityLabel, 'Search');
+});
