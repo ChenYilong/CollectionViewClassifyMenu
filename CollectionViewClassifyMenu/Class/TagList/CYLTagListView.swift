@@ -289,14 +289,14 @@ open class CYLTagListView: UIView {
     /**
      * Receives taps, selection changes, folding and size changes.
      */
-    open weak var menuDelegate: CYLMenuDelegate?
+    @objc open weak var menuDelegate: CYLMenuDelegate?
 
     // MARK: Appearance
 
     /**
      * Appearance. Setting copies the style; set it again after changing it.
      */
-    open var style: CYLMenuStyle {
+    @objc open var style: CYLMenuStyle {
         get {
             styleStorage
         }
@@ -311,7 +311,7 @@ open class CYLTagListView: UIView {
     /**
      * How taps select items; `.single` by default.
      */
-    open var selectionMode: CYLMenuSelectionMode = .single {
+    @objc open var selectionMode: CYLMenuSelectionMode = .single {
         didSet {
             switch selectionMode {
             case .none:
@@ -334,12 +334,12 @@ open class CYLTagListView: UIView {
     /**
      * When false, a tap never removes the last selected item of a section. True by default.
      */
-    open var allowsEmptySelection = true
+    @objc open var allowsEmptySelection = true
 
     /**
      * True by default. When false, sections are laid out back to back without titles.
      */
-    open var showsSectionHeaders = true {
+    @objc open var showsSectionHeaders = true {
         didSet {
             reloadLayout()
         }
@@ -350,7 +350,7 @@ open class CYLTagListView: UIView {
      * Default: none. Setting copies it and also sets `foldStyle` (footer: `.footerChevron`, header: `.headerButton`,
      * none: `.none`, or `.truncate` when `foldStyle` was `.truncate`).
      */
-    open var foldControl: CYLMenuFoldControl {
+    @objc open var foldControl: CYLMenuFoldControl {
         get {
             foldControlStorage
         }
@@ -377,7 +377,7 @@ open class CYLTagListView: UIView {
      * `.none` by default. Setting it also sets `foldControl`: `.headerButton` is a top trailing title ("更多"),
      * `.footerChevron` a bottom icon; `.none` and `.truncate` have none.
      */
-    open var foldStyle: CYLMenuFoldStyle {
+    @objc open var foldStyle: CYLMenuFoldStyle {
         get {
             foldStyleStorage
         }
@@ -422,7 +422,7 @@ open class CYLTagListView: UIView {
     /**
      * The title's icon, before the title (or after it with `titleStyle.imagePlacement`); `nil` for none.
      */
-    open var titleImage: UIImage? {
+    @objc open var titleImage: UIImage? {
         didSet {
             titleView.image = titleImage
             titleDidChange()
@@ -432,7 +432,7 @@ open class CYLTagListView: UIView {
     /**
      * Where the title is.
      */
-    open var titlePosition: CYLMenuTitlePosition = .topLeading {
+    @objc open var titlePosition: CYLMenuTitlePosition = .topLeading {
         didSet {
             setNeedsLayout()
         }
@@ -442,7 +442,7 @@ open class CYLTagListView: UIView {
      * The title's look (font, colors, icon size and color, spacing…). Default `defaultTitleStyle`: the bold headline
      * font in the label color, no box. Setting copies the style.
      */
-    open var titleStyle: CYLMenuStyle {
+    @objc open var titleStyle: CYLMenuStyle {
         get {
             titleStyleStorage
         }
@@ -462,7 +462,7 @@ open class CYLTagListView: UIView {
     /**
      * The title's label (`titleView.titleLabel`).
      */
-    open var titleLabel: UILabel {
+    @objc open var titleLabel: UILabel {
         titleView.titleLabel
     }
 
@@ -470,7 +470,7 @@ open class CYLTagListView: UIView {
      * The default title look: the headline font (bold, scaled with Dynamic Type) in the label color, an 18 pt icon in
      * the label color, no background or border.
      */
-    open class var defaultTitleStyle: CYLMenuStyle {
+    @objc open class var defaultTitleStyle: CYLMenuStyle {
         let style = CYLMenuStyle()
         let font = UIFont.preferredFont(forTextStyle: .headline)
         for state in [UIControl.State.normal, .selected, .disabled] {
@@ -497,7 +497,7 @@ open class CYLTagListView: UIView {
      * Turn off to embed the view in another scroll view and size it with `contentHeight` or Auto Layout's intrinsic
      * content size. True by default.
      */
-    open var isScrollEnabled: Bool {
+    @objc open var isScrollEnabled: Bool {
         get {
             collectionView.isScrollEnabled
         }
@@ -516,7 +516,7 @@ open class CYLTagListView: UIView {
      * Height needed to show the current content at the current width. Also reported as the intrinsic content height
      * and through `menu(_:didChangeContentHeight:)`.
      */
-    open private(set) var contentHeight: CGFloat = 0
+    @objc open private(set) var contentHeight: CGFloat = 0
 
     // MARK: Spacing (android-tagview's lineMargin, tagMargin and textPadding…)
 
@@ -548,7 +548,7 @@ open class CYLTagListView: UIView {
     /**
      * The space inside every tag (`style.tagContentInsets`, textPaddingTop / Left / Bottom / Right).
      */
-    open var tagContentInsets: UIEdgeInsets {
+    @objc open var tagContentInsets: UIEdgeInsets {
         get {
             style.tagContentInsets
         }
@@ -618,10 +618,25 @@ open class CYLTagListView: UIView {
     }
 
     /**
+     * `animationSpeed` for Objective-C, which cannot see an optional `CGFloat`: the speed as an `NSNumber`, or `nil`
+     * for each tag's `style.animationSpeed`. Objective-C calls it `animationSpeed`; Swift uses `animationSpeed`.
+     */
+    @available(swift, obsoleted: 1, renamed: "animationSpeed")
+    @objc(animationSpeed)
+    open var animationSpeedNumber: NSNumber? {
+        get {
+            animationSpeed.map { NSNumber(value: Double($0)) }
+        }
+        set {
+            animationSpeed = newValue.map { CGFloat($0.doubleValue) }
+        }
+    }
+
+    /**
      * True repeats the animated icons after they start playing (a tap, `playAllAnimations()`) until it is set to
      * false; false (the default) plays them once (`CYLTagButton.animationLoops`).
      */
-    open var animationLoops = false {
+    @objc open var animationLoops = false {
         didSet {
             forEachVisibleTagButton { $0.animationLoops = animationLoops }
         }
@@ -630,7 +645,7 @@ open class CYLTagListView: UIView {
     /**
      * Plays the animated icon of every tag on screen from its start (progress 0), whatever its selection.
      */
-    open func playAllAnimations() {
+    @objc open func playAllAnimations() {
         collectionView.layoutIfNeeded()
         forEachVisibleTagButton { $0.playAnimation() }
     }
@@ -653,7 +668,7 @@ open class CYLTagListView: UIView {
     /**
      * The list's own border width (container_border_width); 0 by default. The background is `style.backgroundColor`.
      */
-    open var containerBorderWidth: CGFloat = 0 {
+    @objc open var containerBorderWidth: CGFloat = 0 {
         didSet {
             containerBorderWidth = max(0, containerBorderWidth)
             layer.borderWidth = containerBorderWidth
@@ -663,7 +678,7 @@ open class CYLTagListView: UIView {
     /**
      * The list's own border color (container_border_color); `nil` by default.
      */
-    open var containerBorderColor: UIColor? {
+    @objc open var containerBorderColor: UIColor? {
         didSet {
             updateContainerBorderColor()
         }
@@ -672,7 +687,7 @@ open class CYLTagListView: UIView {
     /**
      * The list's own corner radius (container_border_radius); 0 by default.
      */
-    open var containerCornerRadius: CGFloat = 0 {
+    @objc open var containerCornerRadius: CGFloat = 0 {
         didSet {
             containerCornerRadius = max(0, containerCornerRadius)
             layer.cornerRadius = containerCornerRadius
@@ -684,7 +699,7 @@ open class CYLTagListView: UIView {
      * At most this many rows of each section (container_max_lines); 0 (the default) shows every row. Setting it sets
      * `foldStyle` to `.truncate` and `defaultVisibleRows` to it.
      */
-    open var maximumNumberOfRows: Int {
+    @objc open var maximumNumberOfRows: Int {
         get {
             foldStyle == .truncate ? defaultVisibleRows : 0
         }
@@ -702,7 +717,7 @@ open class CYLTagListView: UIView {
      * Colors every item that has no look of its own from a theme (tag_theme): `.none` (the default), random, pure cyan
      * or pure teal.
      */
-    open var colorTheme: CYLTagColorTheme = .none {
+    @objc open var colorTheme: CYLTagColorTheme = .none {
         didSet {
             themeStyles.removeAll()
             invalidateMeasurements()
@@ -713,18 +728,18 @@ open class CYLTagListView: UIView {
      * False ignores taps on tags: no highlight, no selection, no callbacks (tag_clickable). Long presses still work.
      * True by default.
      */
-    open var allowsTapping = true
+    @objc open var allowsTapping = true
 
     /**
      * The icon of every item without one of its own (setDefaultImageDrawableID), e.g. an avatar. `nil` by default.
      */
-    open var defaultTagImage: UIImage?
+    @objc open var defaultTagImage: UIImage?
 
     /**
      * False makes a tap on a delete indicator only report it (AndroidTagView's onTagCrossClick); the host removes the
      * item. True by default.
      */
-    open var removesItemsOnDelete = true
+    @objc open var removesItemsOnDelete = true
 
     // MARK: Long press and reordering
 
@@ -743,7 +758,7 @@ open class CYLTagListView: UIView {
      * "删除". `nil`: "长按" (core string `CYLMenuLongPress`). While `allowsReordering`, tags also get 前移 / 后移
      * actions, which move them like a drag and announce the new position.
      */
-    open var longPressAccessibilityActionName: String? {
+    @objc open var longPressAccessibilityActionName: String? {
         didSet {
             refreshVisibleCells()
         }
@@ -753,7 +768,7 @@ open class CYLTagListView: UIView {
      * A long press and a move reorders the items of a section (container_enable_drag). Needs a data source that
      * implements `menuMoveItem(at:to:)` (`CYLTagDataSource` does). False by default.
      */
-    open var allowsReordering = false {
+    @objc open var allowsReordering = false {
         didSet {
             updateLongPressDuration()
             refreshVisibleCells()
@@ -764,7 +779,7 @@ open class CYLTagListView: UIView {
      * How quickly a press starts reordering (container_drag_sensitivity): the press lasts 0.5 s divided by it; a value
      * that is not positive is 1. 1 by default.
      */
-    open var reorderingSensitivity: CGFloat = 1 {
+    @objc open var reorderingSensitivity: CGFloat = 1 {
         didSet {
             if reorderingSensitivity <= 0 {
                 reorderingSensitivity = 1
@@ -776,12 +791,12 @@ open class CYLTagListView: UIView {
     /**
      * Whether an item is being moved (getTagViewState).
      */
-    open private(set) var isReordering = false
+    @objc open private(set) var isReordering = false
 
     /**
      * One of `tags` moved (after `menu(_:didMoveItemAt:to:)`).
      */
-    open var tagMoveHandler: ((Int, Int) -> Void)?
+    @objc open var tagMoveHandler: ((Int, Int) -> Void)?
 
     /**
      * A selected tag started moving (onSelectedTagDrag), after `menu(_:didBeginDraggingSelectedItemAt:)`.
@@ -863,6 +878,7 @@ open class CYLTagListView: UIView {
      * A tag list with its fold control and title, and an icon before the title (either may be `nil`: icon only, title
      * only). The styles are fixed at creation; both can change later.
      */
+    @objc(initWithFoldControl:title:titleImage:titlePosition:)
     public convenience init(foldControl: CYLMenuFoldControl?, title: String?, titleImage: UIImage? = nil,
                             titlePosition: CYLMenuTitlePosition = .topLeading) {
         self.init(frame: .zero)
@@ -883,8 +899,31 @@ open class CYLTagListView: UIView {
     /**
      * A tag list with a fold control at this position showing this content.
      */
+    @objc(initWithFoldPosition:content:)
     public convenience init(foldPosition: CYLMenuFoldControlPosition, content: CYLMenuFoldControlContent) {
         self.init(foldControl: CYLMenuFoldControl(position: foldPosition, content: content))
+    }
+
+    /**
+     * Objective-C's `-initWithFoldControl:title:titlePosition:` of the Objective-C core, without an icon; Swift uses
+     * `init(foldControl:title:titleImage:titlePosition:)`.
+     */
+    @available(swift, obsoleted: 1, renamed: "init(foldControl:title:titleImage:titlePosition:)")
+    @objc(initWithFoldControl:title:titlePosition:)
+    public convenience init(objcFoldControl foldControl: CYLMenuFoldControl?, title: String?,
+                            titlePosition: CYLMenuTitlePosition) {
+        self.init(foldControl: foldControl, title: title, titleImage: nil, titlePosition: titlePosition)
+    }
+
+    /**
+     * Objective-C's `+tagListViewWithFoldPosition:content:` of the Objective-C core; Swift uses
+     * `init(foldPosition:content:)`.
+     */
+    @available(swift, obsoleted: 1, renamed: "init(foldPosition:content:)")
+    @objc(tagListViewWithFoldPosition:content:)
+    public class func objcTagListView(foldPosition: CYLMenuFoldControlPosition,
+                                      content: CYLMenuFoldControlContent) -> CYLTagListView {
+        CYLTagListView(foldPosition: foldPosition, content: content)
     }
 
     private func commonInit() {
@@ -949,6 +988,7 @@ open class CYLTagListView: UIView {
     /**
      * Height the content needs at `width` with the current data and fold state, without laying the view out.
      */
+    @objc(heightThatFitsWidth:)
     open func heightThatFitsWidth(_ width: CGFloat) -> CGFloat {
         let available = contentWidth(forWidth: width)
         let measured = width == measuredWidth
@@ -986,7 +1026,7 @@ open class CYLTagListView: UIView {
      * way android-tagview behaves, turns section headers off and sets `selectionMode` to `.none` (change them
      * afterwards to select tags). Every other API (styles, folding, selection, configuration) keeps working.
      */
-    open var tagDataSource: CYLTagDataSource {
+    @objc open var tagDataSource: CYLTagDataSource {
         if let tagDataSourceStorage {
             return tagDataSourceStorage
         }
@@ -1022,6 +1062,7 @@ open class CYLTagListView: UIView {
     /**
      * Tags with these titles and the list's look (android-tagview's addTags(String[])).
      */
+    @objc(addTagsWithTitles:)
     open func addTags(withTitles titles: [String]) {
         addTags(titles.map { CYLTag(title: $0) })
     }
@@ -1029,6 +1070,7 @@ open class CYLTagListView: UIView {
     /**
      * Adds a tag with this title.
      */
+    @objc(addTagWithTitle:)
     open func addTag(withTitle title: String) {
         addTag(CYLTag(title: title))
     }
@@ -1047,6 +1089,7 @@ open class CYLTagListView: UIView {
     /**
      * Inserts a tag with this title.
      */
+    @objc(insertTagWithTitle:atIndex:)
     open func insertTag(withTitle title: String, at index: Int) {
         insertTag(CYLTag(title: title), at: index)
     }
@@ -1055,6 +1098,7 @@ open class CYLTagListView: UIView {
      * Removes a tag (android-tagview's remove(position)); selections after it move up. Out-of-range indexes are
      * ignored.
      */
+    @objc(removeTagAtIndex:)
     open func removeTag(at index: Int) {
         let source = showTags()
         guard source.tags.indices.contains(index) else {
@@ -1068,6 +1112,7 @@ open class CYLTagListView: UIView {
     /**
      * Removes several tags (removeConsecutiveTags).
      */
+    @objc(removeTagsAtIndexes:)
     open func removeTags(at indexes: IndexSet) {
         let source = showTags()
         for index in indexes.reversed() where source.tags.indices.contains(index) {
@@ -1080,7 +1125,7 @@ open class CYLTagListView: UIView {
     /**
      * Removes every tag.
      */
-    open func removeAllTags() {
+    @objc open func removeAllTags() {
         showTags().removeAllTags()
         selection.removeAll()
         reloadMenuData()
@@ -1110,10 +1155,21 @@ open class CYLTagListView: UIView {
     }
 
     /**
+     * Objective-C's `-setTagsWithTitles:`: replaces the tags with tags of these titles and the list's look (Swift uses
+     * `setTags(withTitles:colors:)`, whose `CYLTagColors` Objective-C cannot see).
+     */
+    @available(swift, obsoleted: 1, renamed: "setTags(withTitles:colors:)")
+    @objc(setTagsWithTitles:)
+    open func objcSetTags(withTitles titles: [String]) {
+        setTags(withTitles: titles)
+    }
+
+    /**
      * Deletes a deletable item as a tap on its delete indicator does: the data source removes it
      * (`menuRemoveItem(at:)`), the list reloads and reports it. Does nothing for an item that is not deletable or not
      * enabled.
      */
+    @objc(deleteItemAtIndexPath:)
     open func deleteItem(at indexPath: IndexPath) {
         guard isValid(indexPath), isDeletable(at: indexPath), isEnabled(at: indexPath) else {
             return
@@ -1134,6 +1190,7 @@ open class CYLTagListView: UIView {
     /**
      * The tag view of a shown item (getTagView), or `nil` when it is not on screen.
      */
+    @objc(tagButtonAtIndexPath:)
     open func tagButton(at indexPath: IndexPath) -> CYLTagButton? {
         (collectionView.cellForItem(at: indexPath) as? CYLTagListCell)?.button
     }
@@ -1145,7 +1202,7 @@ open class CYLTagListView: UIView {
      * `NSInvalidArgumentException` for an item outside the menu (validate before setting it from Swift, which cannot
      * catch the exception).
      */
-    open var selectedIndexPaths: [IndexPath] {
+    @objc open var selectedIndexPaths: [IndexPath] {
         get {
             selection.sorted()
         }
@@ -1170,13 +1227,14 @@ open class CYLTagListView: UIView {
     /**
      * The titles of the selected items, in order (getSelectedTagViewText).
      */
-    open var selectedTitles: [String] {
+    @objc open var selectedTitles: [String] {
         selectedIndexPaths.map { menuDataSource?.menuTitleForItem(at: $0) ?? "" }
     }
 
     /**
      * Applies the selection rules of `selectionMode` without calling the delegate.
      */
+    @objc(selectItemAtIndexPath:)
     open func selectItem(at indexPath: IndexPath) {
         guard selectionMode != .none, isValid(indexPath), isSelectable(at: indexPath) else {
             return
@@ -1188,6 +1246,7 @@ open class CYLTagListView: UIView {
     /**
      * Deselects an item without calling the delegate.
      */
+    @objc(deselectItemAtIndexPath:)
     open func deselectItem(at indexPath: IndexPath) {
         selection.remove(indexPath)
         refreshVisibleCells()
@@ -1196,7 +1255,7 @@ open class CYLTagListView: UIView {
     /**
      * Deselects every item without calling the delegate.
      */
-    open func deselectAllItems() {
+    @objc open func deselectAllItems() {
         selection.removeAll()
         refreshVisibleCells()
     }
@@ -1205,6 +1264,7 @@ open class CYLTagListView: UIView {
      * Selects an unselected item or deselects a selected one (toggleSelectTagView). In `.none` mode, where taps never
      * select, it still selects (any number of items), as AndroidTagView's long press does.
      */
+    @objc(toggleSelectionOfItemAtIndexPath:)
     open func toggleSelection(at indexPath: IndexPath) {
         if selection.contains(indexPath) {
             deselectItem(at: indexPath)
@@ -1224,6 +1284,7 @@ open class CYLTagListView: UIView {
     /**
      * Whether a section is expanded.
      */
+    @objc(isSectionExpanded:)
     open func isSectionExpanded(_ section: Int) -> Bool {
         section >= 0 && expandedSections.contains(section)
     }
@@ -1231,6 +1292,7 @@ open class CYLTagListView: UIView {
     /**
      * Expands or collapses a section and calls `menu(_:didChangeExpanded:inSection:)`.
      */
+    @objc(setExpanded:forSection:animated:)
     open func setExpanded(_ expanded: Bool, forSection section: Int, animated: Bool) {
         guard titles.indices.contains(section), expanded != isSectionExpanded(section) else {
             return
@@ -1268,6 +1330,7 @@ open class CYLTagListView: UIView {
     /**
      * Whether the section has more rows than `defaultVisibleRows` and can fold.
      */
+    @objc(canFoldSection:)
     open func canFoldSection(_ section: Int) -> Bool {
         measureIfNeeded()
         return rows.indices.contains(section) && canFold(rowCount: rows[section].count)
@@ -1276,6 +1339,7 @@ open class CYLTagListView: UIView {
     /**
      * Number of rows the section's items occupy at the current width.
      */
+    @objc(numberOfRowsInSection:)
     open func numberOfRows(inSection section: Int) -> Int {
         measureIfNeeded()
         return rows.indices.contains(section) ? rows[section].count : 0
@@ -1284,6 +1348,7 @@ open class CYLTagListView: UIView {
     /**
      * Number of items currently shown in the section (fewer while collapsed).
      */
+    @objc(numberOfVisibleItemsInSection:)
     open func numberOfVisibleItems(inSection section: Int) -> Int {
         measureIfNeeded()
         guard titles.indices.contains(section) else {
@@ -1324,6 +1389,7 @@ open class CYLTagListView: UIView {
     /**
      * Scrolls so that the section (its header, or its first row) is at the top, as far as the content allows.
      */
+    @objc(scrollToSection:animated:)
     open func scroll(toSection section: Int, animated: Bool) {
         guard section >= 0, section < collectionView.numberOfSections else {
             return
@@ -1355,6 +1421,7 @@ open class CYLTagListView: UIView {
      * Scrolls so that the item is centered vertically, as far as the content allows (e.g. a tag just created, or the
      * last item). Does nothing for an item that is not shown (folded away).
      */
+    @objc(scrollToItemAtIndexPath:animated:)
     open func scrollToItem(at indexPath: IndexPath, animated: Bool) {
         guard isValid(indexPath), indexPath.item < numberOfVisibleItems(inSection: indexPath.section) else {
             return

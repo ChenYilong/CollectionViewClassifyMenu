@@ -1254,6 +1254,7 @@ extension CYLTagListView {
      * Creates a tag list from one dictionary holding everything (`CYLTagListKey`). The view keeps the data source it
      * builds from `CYLTagListKey.sections`.
      */
+    @objc(initWithConfiguration:)
     public convenience init(configuration: [String: Any]) {
         self.init(frame: .zero)
         applyConfiguration(configuration)
@@ -1262,21 +1263,42 @@ extension CYLTagListView {
     /**
      * Reads a configuration file (`configuration(contentsOfFile:)`) and creates a tag list from it.
      */
+    @objc(initWithConfigurationFile:error:)
     public convenience init(configurationFile filePath: String) throws {
         let configuration = try Self.configuration(contentsOfFile: filePath)
         self.init(configuration: configuration)
     }
 
     /**
+     * Objective-C's `+tagListViewWithConfiguration:` of the Objective-C core; Swift uses `init(configuration:)`.
+     */
+    @available(swift, obsoleted: 1, renamed: "init(configuration:)")
+    @objc(tagListViewWithConfiguration:)
+    public class func objcTagListView(configuration: [String: Any]) -> CYLTagListView {
+        CYLTagListView(configuration: configuration)
+    }
+
+    /**
+     * Objective-C's `+tagListViewWithConfigurationFile:error:` of the Objective-C core; Swift uses
+     * `init(configurationFile:)`.
+     */
+    @available(swift, obsoleted: 1, renamed: "init(configurationFile:)")
+    @objc(tagListViewWithConfigurationFile:error:)
+    public class func objcTagListView(configurationFile filePath: String) throws -> CYLTagListView {
+        try CYLTagListView(configurationFile: filePath)
+    }
+
+    /**
      * The data source built from `CYLTagListKey.sections`, or `nil`.
      */
-    public var configurationDataSource: CYLMenuDataSource? {
+    @objc public var configurationDataSource: CYLMenuDataSource? {
         objc_getAssociatedObject(self, &Self.configurationDataSourceKey) as? CYLMenuDataSource
     }
 
     /**
      * Applies a configuration to an existing view; keys that are missing keep their values.
      */
+    @objc(applyConfiguration:)
     public func applyConfiguration(_ configuration: [String: Any]) {
         typealias Value = CYLConfigurationValue
         typealias Key = CYLTagListKey
@@ -1380,6 +1402,7 @@ extension CYLTagListView {
      *
      * - Throws: `CYLMenuConfigurationError`, or the reader's error.
      */
+    @objc(configurationWithContentsOfFile:error:)
     public static func configuration(contentsOfFile filePath: String) throws -> [String: Any] {
         guard let url = CYLConfigurationValue.fileURL(filePath, baseURL: nil), url.isFileURL,
               FileManager.default.fileExists(atPath: url.path) else {

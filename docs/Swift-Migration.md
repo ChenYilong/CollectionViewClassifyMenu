@@ -204,6 +204,21 @@ headers still in the umbrella without any glue, while Objective-C calling Swift 
   `@objc private` members (`CYLClassifyMenuViewController`: `dataSource`, `expandSectionArray`, `collectionView`,
   `firstRowCellCountArray`, `collectionHeaderMoreBtnHideBoolArray`, `rowsCountPerSection`,
   `cellsCountArrayPerRowInSections`; `CYLMultipleFilterController`: `filterParamsTool`).
+- `CYLTagListView` (2026-11-17): the Swift migration had left 177 of its 182 public members without `@objc`, so
+  Objective-C callers (another repository's React Native wrapper) could not see them. Every Objective-C-representable
+  public member is now `@objc`, with conventional selectors (`-heightThatFitsWidth:`, `-selectItemAtIndexPath:`,
+  `-removeTagAtIndex:`, `-insertTagWithTitle:atIndex:`, `-scrollToSection:animated:`, `-initWithConfiguration:`,
+  `-initWithConfigurationFile:error:`, `-applyConfiguration:`, `+configurationWithContentsOfFile:error:`, …); the
+  Swift API is unchanged. `animationSpeed` (`CGFloat?`, not representable) is `animationSpeed` (`NSNumber`, nullable)
+  in Objective-C through `animationSpeedNumber`, which Swift cannot call. Members that take `CYLTag` (a Swift class)
+  or `CYLTagColors` (a struct) stay Swift-only (`tags`, `addTag(_:)`, `insertTag(_:at:)`, `replaceTags(_:)`,
+  `setTags(withTitles:colors:)`, the `CYLTag` handlers); Objective-C uses the title methods, `menuDataSource` /
+  `menuDelegate` and the configuration instead. The Objective-C core's selectors come back where the Swift name
+  differs: `-toggleSelectionOfItemAtIndexPath:`, `-initWithFoldControl:title:titlePosition:`, `-setTagsWithTitles:`,
+  `+tagListViewWithConfiguration:`, `+tagListViewWithConfigurationFile:error:` and `+tagListViewWithFoldPosition:content:`
+  (Objective-C only, marked unavailable in Swift; the factories return `CYLTagListView`, not the subclass).
+  Test: `testTagListViewAPIIsVisibleToObjectiveC`
+  (`CYLCollectionViewClassifyMenuLayoutTests.m`).
 
 ## API check details
 

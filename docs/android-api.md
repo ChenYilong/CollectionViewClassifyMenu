@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 762 / 762 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 766 / 766 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -652,10 +652,12 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuStyle (CYLConfiguration) -applyConfiguration:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyle.applyConfiguration` |
 | `CYLTag (CYLConfiguration) -initWithConfiguration:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTag from a configuration map (CYLTagListViewConfiguration.kt)` |
 | `CYLTagListView (CYLConfiguration) -initWithConfiguration:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.tagListViewWithConfiguration(context, configuration)` |
-| `CYLTagListView (CYLConfiguration) -initWithConfigurationFile:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.tagListViewWithConfigurationFile(context, filePath) (throws CYLMenuConfigurationException)` |
+| `CYLTagListView (CYLConfiguration) -initWithConfigurationFile:error:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.tagListViewWithConfigurationFile(context, filePath) (throws CYLMenuConfigurationException)` |
+| `CYLTagListView (CYLConfiguration) +tagListViewWithConfiguration:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.tagListViewWithConfiguration` |
+| `CYLTagListView (CYLConfiguration) +tagListViewWithConfigurationFile:error:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.tagListViewWithConfigurationFile` |
 | `CYLTagListView (CYLConfiguration).configurationDataSource` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.configurationDataSource` |
 | `CYLTagListView (CYLConfiguration) -applyConfiguration:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.applyConfiguration` |
-| `CYLTagListView (CYLConfiguration) +configurationWithContentsOfFile:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.configurationWithContentsOfFile` |
+| `CYLTagListView (CYLConfiguration) +configurationWithContentsOfFile:error:` | method, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView.configurationWithContentsOfFile` |
 | `CYLMenuSelectionMode` | enum, `CYLTagListView.swift` | `com.cyl.classifymenu.CYLMenuSelectionMode` |
 | `CYLMenuSelectionModeNone` | enum value, `CYLTagListView.swift` | `CYLMenuSelectionModeNone` |
 | `CYLMenuSelectionModeSingle` | enum value, `CYLTagListView.swift` | `CYLMenuSelectionModeSingle` |
@@ -695,6 +697,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView.tagContentInsetBottom` | property, `CYLTagListView.swift` | `CYLTagListView.tagContentInsetBottom` |
 | `CYLTagListView.tagContentInsetRight` | property, `CYLTagListView.swift` | `CYLTagListView.tagContentInsetRight` |
 | `CYLTagListView.animationSpeed` | property, `CYLTagListView.swift` | `CYLTagListView.animationSpeed` |
+| `CYLTagListView.animationSpeedNumber` | property, `CYLTagListView.swift` | `CYLTagListView.animationSpeed` |
 | `CYLTagListView.animationLoops` | property, `CYLTagListView.swift` | `CYLTagListView.animationLoops` |
 | `CYLTagListView -playAllAnimations` | method, `CYLTagListView.swift` | `CYLTagListView.playAllAnimations` |
 | `CYLTagListView.tagClickHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagClickHandler` |
@@ -725,27 +728,28 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView -addTagsWithTitles:` | method, `CYLTagListView.swift` | `CYLTagListView.addTagsWithTitles` |
 | `CYLTagListView -addTagWithTitle:` | method, `CYLTagListView.swift` | `CYLTagListView.addTagWithTitle` |
 | `CYLTagListView -insertTag:at:` | method, `CYLTagListView.swift` | `CYLTagListView.insertTag` |
-| `CYLTagListView -insertTagWithTitle:at:` | method, `CYLTagListView.swift` | `CYLTagListView.insertTagWithTitle` |
-| `CYLTagListView -removeTagAt:` | method, `CYLTagListView.swift` | `CYLTagListView.removeTagAtIndex` |
-| `CYLTagListView -removeTagsAt:` | method, `CYLTagListView.swift` | `CYLTagListView.removeTagsAtIndexes` |
+| `CYLTagListView -insertTagWithTitle:atIndex:` | method, `CYLTagListView.swift` | `CYLTagListView.insertTagWithTitle` |
+| `CYLTagListView -removeTagAtIndex:` | method, `CYLTagListView.swift` | `CYLTagListView.removeTagAtIndex` |
+| `CYLTagListView -removeTagsAtIndexes:` | method, `CYLTagListView.swift` | `CYLTagListView.removeTagsAtIndexes` |
 | `CYLTagListView -removeAllTags` | method, `CYLTagListView.swift` | `CYLTagListView.removeAllTags` |
 | `CYLTagListView -replaceTags:` | method, `CYLTagListView.swift` | `CYLTagListView.replaceTags` |
 | `CYLTagListView -setTagsWithTitles:colors:` | method, `CYLTagListView.swift` | `CYLTagListView.setTagsWithTitles` |
-| `CYLTagListView -deleteItemAt:` | method, `CYLTagListView.swift` | `CYLTagListView.deleteItemAtIndexPath` |
-| `CYLTagListView -tagButtonAt:` | method, `CYLTagListView.swift` | `CYLTagListView.tagButtonAtIndexPath` |
+| `CYLTagListView -setTagsWithTitles:` | method, `CYLTagListView.swift` | `CYLTagListView.setTagsWithTitles` |
+| `CYLTagListView -deleteItemAtIndexPath:` | method, `CYLTagListView.swift` | `CYLTagListView.deleteItemAtIndexPath` |
+| `CYLTagListView -tagButtonAtIndexPath:` | method, `CYLTagListView.swift` | `CYLTagListView.tagButtonAtIndexPath` |
 | `CYLTagListView.selectedIndexPaths` | property, `CYLTagListView.swift` | `CYLTagListView.selectedIndexPaths` |
 | `CYLTagListView.selectedTitles` | property, `CYLTagListView.swift` | `CYLTagListView.selectedTitles` |
-| `CYLTagListView -selectItemAt:` | method, `CYLTagListView.swift` | `CYLTagListView.selectItemAtIndexPath` |
-| `CYLTagListView -deselectItemAt:` | method, `CYLTagListView.swift` | `CYLTagListView.deselectItemAtIndexPath` |
+| `CYLTagListView -selectItemAtIndexPath:` | method, `CYLTagListView.swift` | `CYLTagListView.selectItemAtIndexPath` |
+| `CYLTagListView -deselectItemAtIndexPath:` | method, `CYLTagListView.swift` | `CYLTagListView.deselectItemAtIndexPath` |
 | `CYLTagListView -deselectAllItems` | method, `CYLTagListView.swift` | `CYLTagListView.deselectAllItems` |
-| `CYLTagListView -toggleSelectionAt:` | method, `CYLTagListView.swift` | `CYLTagListView.toggleSelectionOfItemAtIndexPath` |
+| `CYLTagListView -toggleSelectionOfItemAtIndexPath:` | method, `CYLTagListView.swift` | `CYLTagListView.toggleSelectionOfItemAtIndexPath` |
 | `CYLTagListView -isSectionExpanded:` | method, `CYLTagListView.swift` | `CYLTagListView.isSectionExpanded` |
 | `CYLTagListView -setExpanded:forSection:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.setExpanded` |
 | `CYLTagListView -canFoldSection:` | method, `CYLTagListView.swift` | `CYLTagListView.canFoldSection` |
 | `CYLTagListView -numberOfRowsInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.numberOfRowsInSection` |
 | `CYLTagListView -numberOfVisibleItemsInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.numberOfVisibleItemsInSection` |
 | `CYLTagListView -scrollToSection:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.scrollToSection` |
-| `CYLTagListView -scrollToItemAt:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.scrollToItemAtIndexPath` |
+| `CYLTagListView -scrollToItemAtIndexPath:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.scrollToItemAtIndexPath` |
 | `CYLTagView` | class, `CYLTagView.swift` | `com.cyl.classifymenu.CYLTagView` |
 | `CYLTagView.sectionInset` | property, `CYLTagView.swift` | `kTagCollectionViewToTopMargin / ToLeftMargin / ToBottomtMargin / ToRightMargin` |
 | `CYLTagView.cellSpacing` | property, `CYLTagView.swift` | `kTagCollectionViewCellsHorizonMargin` |

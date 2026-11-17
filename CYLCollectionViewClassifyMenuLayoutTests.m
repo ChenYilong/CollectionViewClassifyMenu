@@ -606,4 +606,81 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     window.hidden = YES;
 }
 
+
+/*!
+ * Objective-C callers (a React Native wrapper, for example) see the tag list's API, not only its Swift callers:
+ * the configuration, the playback options, measuring, folding, selection and the tags API.
+ */
+- (void)testTagListViewAPIIsVisibleToObjectiveC {
+    NSDictionary *configuration = @{
+        @"selectionMode": @"multiple",
+        @"sections": @[@{@"title": @"Cities", @"items": @[@"Beijing", @"Shanghai", @"Hangzhou"]}],
+    };
+    CYLTagListView *list = [[CYLTagListView alloc] initWithConfiguration:configuration];
+    XCTAssertNotNil(list.configurationDataSource);
+    XCTAssertEqual(list.selectionMode, CYLMenuSelectionModeMultiple);
+    list.frame = CGRectMake(0, 0, 320, 200);
+    UIWindow *window = [[UIWindow alloc] initWithFrame:list.frame];
+    [window addSubview:list];
+    [list layoutIfNeeded];
+    XCTAssertGreaterThan([list heightThatFitsWidth:320], 0);
+    XCTAssertGreaterThanOrEqual(list.contentHeight, 0);
+    NSInteger visible = [list numberOfVisibleItemsInSection:0];
+    XCTAssertTrue(visible > 0 && visible <= 3, @"%ld", (long)visible);
+    XCTAssertFalse([list isSectionExpanded:0]);
+    [list setExpanded:YES forSection:0 animated:NO];
+    XCTAssertTrue([list isSectionExpanded:0]);
+
+    list.animationSpeed = @2;
+    XCTAssertEqualObjects(list.animationSpeed, @2, @"An NSNumber in Objective-C");
+    list.animationSpeed = nil;
+    XCTAssertNil(list.animationSpeed, @"nil: each tag's style.animationSpeed");
+    list.animationLoops = YES;
+    [list playAllAnimations];
+
+    [list deselectAllItems];
+    [list selectItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]];
+    [list selectItemAtIndexPath:[NSIndexPath indexPathForItem:2 inSection:0]];
+    XCTAssertEqualObjects(list.selectedTitles, (@[@"Shanghai", @"Hangzhou"]));
+    [list deselectAllItems];
+    XCTAssertEqual(list.selectedIndexPaths.count, 0u);
+    [list applyConfiguration:@{@"selectionMode": @"single"}];
+    XCTAssertEqual(list.selectionMode, CYLMenuSelectionModeSingle);
+    XCTAssertNotNil([list tagButtonAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]);
+
+    CYLTagListView *tags = [[CYLTagListView alloc] initWithFrame:CGRectMake(0, 0, 320, 200)];
+    [tags addTagsWithTitles:@[@"Swift", @"Kotlin"]];
+    [tags addTagWithTitle:@"ArkTS"];
+    [tags insertTagWithTitle:@"Objective-C" atIndex:0];
+    XCTAssertEqual([tags.menuDataSource menuNumberOfItemsInSection:0], 4);
+    XCTAssertEqualObjects([tags.menuDataSource menuTitleForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]],
+                          @"Objective-C");
+    [tags removeTagAtIndex:0];
+    XCTAssertEqual([tags.menuDataSource menuNumberOfItemsInSection:0], 3);
+    [tags removeAllTags];
+    XCTAssertEqual([tags.menuDataSource menuNumberOfItemsInSection:0], 0);
+
+    [tags setTagsWithTitles:@[@"One", @"Two"]];
+    XCTAssertEqual([tags.menuDataSource menuNumberOfItemsInSection:0], 2);
+    tags.selectionMode = CYLMenuSelectionModeMultiple;
+    [tags toggleSelectionOfItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]];
+    XCTAssertEqualObjects(tags.selectedTitles, @[@"Two"]);
+
+    // The Objective-C core's factories and initializer, kept for its Objective-C callers.
+    XCTAssertNotNil([CYLTagListView tagListViewWithConfiguration:configuration].configurationDataSource);
+    XCTAssertNotNil([CYLTagListView tagListViewWithFoldPosition:CYLMenuFoldControlPositionFooter
+                                                        content:CYLMenuFoldControlContentIcon].foldControl);
+    CYLTagListView *titled = [[CYLTagListView alloc] initWithFoldControl:nil title:@"Tags"
+                                                           titlePosition:CYLMenuTitlePositionTopLeading];
+    XCTAssertEqualObjects(titled.title, @"Tags");
+    NSError *factoryError = nil;
+    XCTAssertNil([CYLTagListView tagListViewWithConfigurationFile:@"/no/such/tags.json" error:&factoryError]);
+    XCTAssertNotNil(factoryError);
+
+    NSError *error = nil;
+    XCTAssertNil([CYLTagListView configurationWithContentsOfFile:@"/no/such/tags.json" error:&error]);
+    XCTAssertEqualObjects(error.domain, @"CYLMenuConfigurationErrorDomain");
+    window.hidden = YES;
+}
+
 @end
