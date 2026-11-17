@@ -253,7 +253,7 @@ tags: [issues, ui, cocoapods, progress]
   - tests (`CYLAnimatedIconTests`, `CYLTagStyleDemoTests`, `CYLReviewFilterScenarioTests`) cover SVGA as they cover
     Rive;
   - then the same on every platform's example (`example-demo-rules.md`), with screenshots (`screenshots.md`).
-- **Status:** TODO (iOS done, other platforms open).
+- **Status:** TODO (iOS done and verified on CI, other platforms open).
 - **iOS (2026-11-16, `feat/harmony`): done in the iOS example; CI has to confirm it.** The core needed no new API: it gets
   animated icons from CYLTabBarController's `CYLTabBarItemAnimationFactory`, which picks the animator by file extension,
   so `.svga` plays once `pod 'CYLTabBarController/SVGA'` is linked (CYLTabBarController pinned at `cfddcce`, which has
@@ -267,7 +267,9 @@ tags: [issues, ui, cocoapods, progress]
   `animationSpeed`, `loops` or `progress`, so SVGA icons play once at the file's own speed. The speed slider and the loop
   switch do not change them. That needs CYLTabBarController's view player to expose them (SVGAPlayer has `loops`), not
   an example workaround. Not compiled here (Linux, no Xcode). CI on `ec52480`: `CYLTagConfigurationTests` still counted five tags in the dictionary demo
-  (the SVGA tag made six); the test now counts six and reads the image and string items from the end. Other platforms: HarmonyOS done (D5); Android, Flutter,
+  (the SVGA tag made six); the test now counts six and reads the image and string items from the end.
+  CI run 43992497583 on `a6cdd69`: all 9 iOS jobs passed; SVGA screenshots in `screenshots.md`
+  ("iOS: SVGA animated icons"). Other platforms: HarmonyOS done (D5); Android, Flutter,
   React Native and Mini Program are still TODO.
 
 - TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):

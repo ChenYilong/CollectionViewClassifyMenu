@@ -12,6 +12,25 @@ SDK version, repository version or commit URL, time taken; clear originals; stit
 | <img src="assets/ios-demo-filter-panel.png" width="300" alt="iOS demo filter panel"> Filter tab: the panel slides in from the left over most of the screen; Reset / Apply above the home indicator | iOS | as above | as above | 2026-11-12 19:20 NZDT |
 | <img src="assets/android-filter-panel.png" width="300" alt="Android filter panel"> Android Filter tab (details in [android.md](android.md)) | Android | Android 15 (API 35) emulator `CYL_API35_arm64`, compileSdk 35 | `d12f101` | 2026-11-12 18:35 NZDT |
 
+## iOS: SVGA animated icons (2026-11-17)
+
+SVGA wherever Rive is shown (`example-demo-rules.md`, "SVGA wherever Rive is shown"): the Animated icons screen's two
+SVGA sections (CYLTabBarController's SVGA tab icons, then on `icons.riv`'s dark tags) and the Styles screen with the
+SVGA action. Originals from the CI run, unchanged.
+
+- **Platform:** iOS (`Example/CYLMenuExample`, Swift).
+- **Environment:** GitHub Actions `macos-26-arm64`, Xcode 26.6, iPhone 17 Pro simulator (the iOS 26 runtime of that
+  Xcode); CYLTabBarController `b5a02862` with `pod 'CYLTabBarController/SVGA'` (SVGAPlayerLite).
+- **Repository:** [`a6cdd69`](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/a6cdd69), CI run
+  [43992497583](https://github.com/ChenYilong/CollectionViewClassifyMenu/actions/runs/43992497583) (all 9 jobs passed),
+  screenshots on `ci-screenshots` under `feat-harmony/2444bc8/`.
+- **Taken:** 2026-11-17 01:36 UTC.
+
+| Screen | Screenshot |
+| --- | --- |
+| Animated icons, `animations-svga`: "SVGA · pod 'CYLTabBarController/SVGA'" (首页 selected, 搜索, 消息, 我的) and "SVGA · 深色标签" (动态 selected, 列表, 首页) | <img src="assets/ios-animations-svga.png" width="300" alt="iOS Animated icons screen, SVGA sections"> |
+| Styles, `style-svga`: the preview tags with the SVGA icons (home and profile, alternating; the disabled tag dimmed) | <img src="assets/ios-style-svga.png" width="300" alt="iOS Styles screen with SVGA icons"> |
+
 ## HarmonyOS: every demo (2026-11-16)
 
 The 22-demo HarmonyOS example (`harmony/entry`) on a new dedicated emulator, taken by `harmony/scripts/screenshots.sh`
