@@ -253,6 +253,14 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
                 DispatchQueue.main.async {
                     demo.scroll(toSectionIdentifier: "pag")
                 }
+            } else if screen == "animations-rive-loop" {
+                // Bug B20: the Rive section with looping on after Play all, to watch whether the Rive tags replay.
+                demo.loadViewIfNeeded()
+                demo.setLoops(true)
+                DispatchQueue.main.async {
+                    demo.scroll(toSectionIdentifier: "rive")
+                    demo.playAllAnimations()
+                }
             } else if screen == "animations-svga" {
                 // The two SVGA sections, below Rive.
                 DispatchQueue.main.async {
