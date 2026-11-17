@@ -80,8 +80,6 @@ export struct CYLReviewListPage {
     const items: CYLExampleMenuItem[] = this.store.filters.map((filter: CYLReviewFilter) => {
       const item = new CYLExampleMenuItem(this.store.titleFor(filter));
       item.image = filter.image;
-      // White on the orange selected chip: the icons are colored PNGs, which a tint (fillColor) does not recolor.
-      item.selectedImage = filter.selectedImage;
       item.value = filter;
       item.isEnabled = this.store.reviewsMatching(filter).length > 0;
       item.isExclusive = filter.identifier === 'all';
