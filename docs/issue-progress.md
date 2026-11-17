@@ -264,6 +264,30 @@ tags: [issues, ui, cocoapods, progress]
   block; it does not simulate a tap (the tap path is private), so the call from `handleTap` is checked only by
   reading it.
 
+### TODO (2026-11-17, `feat/harmony`): `CYLTagButton` as the one icon + title + animated icon component
+
+- Prompt (relayed by the CYLSearchViewController session; the user's goal, quoted in that repository's task log):
+  every component that shows an icon with a title, or plays an animated icon, in CYLSearchViewController and its
+  sub-repositories must be the same component, this repository's `CYLTagButton` and its counterpart on each platform,
+  so that a new animation type is added in that one component only. The search bar items (an icon, a title, a badge
+  text with a badge color, tappable, selected and disabled states) and later CYLTableViewPlaceHolder's
+  `CYLPlaceholderView` animated icon (icon above the title, or icon only) are built on it.
+- Context: `CYLTagButton` (iOS `CollectionViewClassifyMenu/Class/TagList/CYLTagButton.swift`, Android
+  `android/merged/library/.../CYLTagButton.kt`, HarmonyOS `harmony/classifymenu/src/main/ets/tagviews/CYLTagButton.ets`,
+  mini program `cyl-tag-list` component) lays the icon and the title side by side and plays animated icons through
+  CYLTabBarController's `CYLTabBarItemAnimationFactory`, found at run time, with no per-format code.
+- Requirements (core first, every platform, the same names):
+  1. a badge: `badgeValue` (nil hides it, "" shows a dot) and `badgeColor` (default system red), at the top trailing
+     corner of the icon (of the title when there is no icon), with a localized accessibility value;
+  2. an icon above the title: `CYLTagImagePlacement.top` (and `bottom`), existing raw values kept, layout and
+     intrinsic size;
+  3. icon-only and title-only tags reserve no spacing for the missing part;
+  4. a convenience initializer for standalone use (`init(title:image:)`, `init(title:image:animationURL:)`), a
+     sensible default style outside a tag list;
+  5. every new iOS member `@objc`;
+  6. tests on each platform, parity tables regenerated at 100, docs updated.
+- Status: in progress.
+
 ### TODO (2026-11-16): SVGA animated icons (CYLTabBarController added SVGA)
 
 - **Prompt (verbatim):** "找到本项目相关文档，加入TODO：cyltabbar 现已增加svga动效，更新core代码以支持该动效，要求example层一比一复刻rive相关演示。只要rive有的演示场景 svga也要有。"
