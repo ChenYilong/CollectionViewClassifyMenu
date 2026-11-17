@@ -211,7 +211,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
     overrides: `title`, `image`, `selectedImage`, `animationSpeed`, `animationRestingProgress`, `playAnimation()`,
     `reloadAnimation()`). CI failed "Unit tests (menu)" on `1813025` without them; `f93974b` worked around it by importing
     CYLTabBarController in the test, which the owner rejected (2026-11-17, prompt verbatim: "Donot import tabbar and fix
-    it"); it is reverted and fixed in the core. TODO: confirm in iOS CI (not compiled on Linux).
+    it"); it is reverted and fixed in the core. DONE (2026-11-18): CI "Unit tests (menu)" passes without the import (run 44142400181 at `8794487`; also `f8301a4`).
   - CocoaPods: podspec `s.dependency 'CYLTabBarController/CYLAnimatedItem'`; Example Podfile `CYLAnimatedItem` plus
     `CYLAnimatedItemLottieObjectiveC`, `…PAG`, `…Rive`, `…SVGA`, `…GIF`; RN and Flutter example Podfiles
     `CYLAnimatedItemLottieObjectiveC`, `…Rive`; Example-Swift and the root project no engine; TagCollectionView's Podfile
