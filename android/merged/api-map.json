@@ -874,5 +874,6 @@
  "UIView (CYLGeneral) -cylAddLineLayerWithFrame:color:": "View.cyl_addSubLayerWithFrame",
  "UIView (CYLGeneral) -cylAddTapTarget:action:": "View.cyl_setTarget",
  "UIView (CYLGeneral) -cylSnapshotWithWidth:": "View.cyl_captureWithWidth",
- "UIView (CYLGeneral) -cylSnapshot": "View.cyl_capture"
+ "UIView (CYLGeneral) -cylSnapshot": "View.cyl_capture",
+ "CYLTag -resetColors": "CYLTag.resetColors"
 }

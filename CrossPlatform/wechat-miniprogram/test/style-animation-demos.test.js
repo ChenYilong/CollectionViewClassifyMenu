@@ -183,10 +183,14 @@ test('configuration: the file is read as the core reads it, and the map configur
   assert.equal(m.defaultVisibleRows, 2);
   assert.equal(m.style.selected.font.weight, 'semibold');
   assert.equal(m.style.headerTextColor, '#8E8E93');
-  assert.equal(m.sections[0].items[5].enabled, false);
-  assert.equal(animations.resolve(m.sections[0].items[0].animation).engine, 'lottie');
-  assert.equal(animations.resolve(m.sections[0].items[3].animation).engine, 'gif');
-  assert.equal(animations.resolve(m.sections[0].items[1].animation).entry.src, '/engines/pag/0.pag.bin');
+  // By title: the file gains tags as the iOS example does (SVGA after Rive).
+  const item = (title) => m.sections[0].items.find((i) => i.title === title);
+  assert.equal(item('Disabled').enabled, false);
+  assert.equal(animations.resolve(item('Lottie').animation).engine, 'lottie');
+  assert.equal(animations.resolve(item('GIF').animation).engine, 'gif');
+  assert.equal(animations.resolve(item('PAG').animation).entry.src, '/engines/pag/0.pag.bin');
+  // No SVGA engine in the Mini Program yet: the tag keeps its image.
+  assert.equal(item('SVGA').image, 'system:play.fill');
   assert.equal(configurationDemo.readConfiguration(() => { throw new Error('x'); }).error,
     'No configuration file at CYLMenuExample.bundle/Configurations/animated-tags.json');
   assert.match(configurationDemo.readConfiguration(() => '[1]').error, /does not hold a dictionary/);
