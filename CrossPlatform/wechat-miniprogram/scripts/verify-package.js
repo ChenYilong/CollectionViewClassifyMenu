@@ -3,7 +3,7 @@
  * Checks the tag list library (packages/cyl-tag-list-miniprogram) as npm publishes it:
  *
  *   1. `npm pack` writes the tarball to .deps/ (git-ignored);
- *   2. the tarball holds package.json, README.md and every file of miniprogram_dist, and nothing else;
+ *   2. the tarball holds package.json, README.md, LICENSE and every file of miniprogram_dist, and nothing else;
  *   3. `npm install --no-save` installs the tarball into node_modules (a copy, not the file: link), and every installed
  *      file equals its source, so WeChat DevTools' "Build npm" builds miniprogram_npm from what users get.
  *
@@ -45,7 +45,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const [packed] = JSON.parse(npm(['pack', '--json', '--pack-destination', OUT], PACKAGE));
 const tarball = path.join(OUT, packed.filename);
 
-const expected = ['package.json', 'README.md', ...filesUnder(path.join(PACKAGE, 'miniprogram_dist')).map((f) => `miniprogram_dist/${f}`)].sort();
+const expected = ['package.json', 'README.md', 'LICENSE', ...filesUnder(path.join(PACKAGE, 'miniprogram_dist')).map((f) => `miniprogram_dist/${f}`)].sort();
 const actual = packed.files.map((f) => f.path).sort();
 const missing = expected.filter((f) => !actual.includes(f));
 const extra = actual.filter((f) => !expected.includes(f));

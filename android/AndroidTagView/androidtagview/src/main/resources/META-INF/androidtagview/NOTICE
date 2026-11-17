@@ -1,0 +1,6 @@
+co.lujun:androidtagview (AndroidTagView, translated to Kotlin)
+Copyright 2015 lujun. https://github.com/whilu/AndroidTagView
+Licensed under the Apache License, Version 2.0 (LICENSE).
+
+Translated from Java to Kotlin and modified by ChenYilong (2026) for CollectionViewClassifyMenu; every file keeps the
+original notice and states that it was changed.

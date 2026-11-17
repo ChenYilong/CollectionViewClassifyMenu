@@ -277,6 +277,25 @@ verify the behavior and update the applicable documentation.
   and `scripts/pod-lint.sh lib` lints against a checkout of that commit.
 - Details: `.agents/skills/cyl-dependency/`.
 
+## License in every published package
+
+- **Every package published to an external registry contains its license declaration.** This covers, without
+  being limited to, CocoaPods, Swift Package Manager, Gradle / Maven, npm, pub.dev, ohpm and the mini program npm
+  packages, on every platform. The license file ships with the package, and the package manifest names it.
+- **The license goes into the package's built-in resource container**: when the package already has one, put the
+  license file in it; when it has none, create one. On iOS the core's resource bundle
+  (`CYLClassifyMenuResources.bundle`) contains `LICENSE`. The same rule applies to every platform: an Android
+  library's Java resources (`META-INF/<artifact>/LICENSE`, inside the AAR), an npm package's root (listed in
+  `files`), a pub.dev package's root, an ohpm HAR's module root and its `resources/rawfile`, a mini program npm
+  package's root (not `miniprogram_dist`: a WeChat code package accepts only certain file types).
+- The manifest declares the same license: podspec `s.license` (with `:file`), `Package.swift` resources, Maven POM
+  `licenses`, `package.json` / `oh-package.json5` `license`, the pub.dev package's `LICENSE`.
+- Ported or copied third-party code keeps its upstream license and notice next to it (for example the Apache-2.0
+  ports in `android/`); a package that contains it ships those notices too.
+- A package without its license file, or with a placeholder ("TODO: Add your license here"), is not ready to publish.
+- The license of this repository's own code is MIT (`LICENSE`, decided 2026-11-17). Check:
+  `bash scripts/check-licenses.sh`. Details and the per-platform locations: `.agents/skills/cyl-license/`.
+
 ## Bundled animation files
 
 - Keep copied animation files (Lottie, PAG, Rive, GIF) unmodified, with their source, commit, path and
