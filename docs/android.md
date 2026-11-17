@@ -9,12 +9,12 @@ tags: [android, kotlin, tagview, api-parity]
 This document tracks the Android work in `android/`: Kotlin transcriptions of three Android tag libraries, the
 library merged from them, its API table against the iOS core, and the Android ports of the iOS examples.
 
-## DONE (2026-11-16): seven tabs on Android: opt in to every tab after CYLTabBarController added "More"
+## DONE (2026-11-16): every tab on Android: opt in to every tab after CYLTabBarController added "More"
 
 - **Context**: CYLTabBarController for Android now follows iOS (UIKit): with more than five view controllers (the
   plus button with its own page counts as one), the bar shows four tabs (three with the plus page) and "More"
-  (CYLTabBarController commit `0c35409e`, its TODO A6 in `docs/Android-Library.md`). This example has seven tabs
-  (TagView, Container, ViewGroup, the plus button New, Classify, Filter, About) and should keep all of them in the
+  (CYLTabBarController commit `0c35409e`, its TODO A6 in `docs/Android-Library.md`). The report showed seven tabs; the merged example now has nine tabs and the plus button
+  and should keep every tab in the
   bar, through CYLTabBarController's new Android-only API.
 - **Prompt (verbatim)**: "continue fix todo • There's no CollectionViewClassifyMenu example under Example-Android, so
   I didn't add an opt-in there."
@@ -25,7 +25,7 @@ library merged from them, its API table against the iOS core, and the Android po
   Merged into `feat/harmony` (pull request 21, 2026-11-17), where every pin then moved to `b5a02862` (docs only).
   Evidence: `gradle :example:assembleDebug` passes against both commits (Linux container, 2026-11-17); the example has no
   unit tests, and the configuration key is covered by CYLTabBarController's `CYLTabBarMoreTest`. **TODO**: an emulator screenshot of the
-  seven tabs (no Android emulator in the Linux container).
+  whole bar (no Android emulator in the Linux container).
 
 ## DONE (2026-11-13, logged as TODO 2026-11-12): Kotlin ports, merged library, API parity with iOS, iOS examples on Android
 
@@ -451,6 +451,22 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | `a3c2e1f` | iOS -> Android, regenerated with the new Swift APIs | 761 / 761 | 100.0 |
 | this commit | Android -> iOS: the Kotlin parser read classes with a multi-line primary constructor (`CYLTag`, …) as one-liners and skipped their members: 128 rows found, 6 misattributed rows gone; new iOS `CYLTag.resetColors()` | 733 / 733 (Android -> iOS) | 100.0 |
 | this commit | iOS -> Android with `CYLTag.resetColors()` | 762 / 762 | 100.0 |
+
+## DONE (2026-11-17, `feat/harmony`): every tab of the merged example stays in the bar after CYLTabBarController's "More"
+
+- Prompt (verbatim): "continue fix todo • There's no CollectionViewClassifyMenu example under Example-Android, so I didn't add an opt-in there. The Android example is on the feat/android-kotlin-b branch. Fetching it. merge to current branch"
+- Context: CYLTabBarController `0c35409` (pinned since `f77cd48`) gives Android UIKit's "More" tab past five view
+  controllers, with the Android-only opt-out `cyl_showsAllTabs` (configuration key `CYLTabBarControllerShowsAllTabs`).
+  This project's Android example is `android/merged/example` (not `Example-Android`, which is CYLTabBarController's).
+  Its tab bar has nine tabs.
+- Merge: `origin/feat/android-kotlin-b` (`b133525`) is already contained in `feat/harmony` (0 commits ahead), so
+  there is nothing to merge.
+- Result: the example's tab bar is scrollable (`cyl_scrollMode = Scrollable`), which upstream already exempts from
+  "More". The configuration file `example/src/main/assets/cyl_merged_tabbar.json` now also sets
+  `"CYLTabBarControllerShowsAllTabs": true`, so the nine tabs stay in the bar whatever the scroll mode.
+- Evidence: the JSON parses with the key read at the top level, as `CYLTabBarController.cyl_applyConfiguration` reads
+  it at `0c35409`. Not built here (no Android SDK in this container, and no Android CI job). It needs a Gradle build and
+  an emulator screenshot on a Mac.
 
 ## Screenshots: Classify and Filter tabs (iOS demo app on Android)
 
