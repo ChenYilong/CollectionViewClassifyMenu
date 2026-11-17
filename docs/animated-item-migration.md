@@ -188,3 +188,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   PR #815's merge (`faf535e`); the mini program tags still have to pass `gif-first-frame` / `gif-last-frame` /
   `gif-duration`, `embedded`, `autoplay` (mini program code, coordinated with the Windows session). Rows 11 and 12 wait on
   upstream SwiftPM and on CI (Xcode 26).
+- **iOS at pins `eab038d5` (2026-11-18, `5f9b76e`)**: `pod install` resolves CYLTabBarController and CYLAnimatedItem at
+  `eab038d5` in the root, Example, Example-Swift and TagCollectionView projects (`Podfile.lock` is ignored by
+  `.gitignore`, nothing to commit); unit tests on the "CYL ClassifyMenu iOS" simulator: menu 32 / 0, tag 6 / 0, example
+  92 / 0, swift 22 / 0 failures.
