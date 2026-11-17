@@ -16,7 +16,7 @@
  */
 const model = require('./model.js');
 const animations = require('./animations.js');
-const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model.js');
+const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
 const locale = require('../locale.js');
 
 /** The core's localized fold titles (CYLMenuExpand / CYLMenuCollapse) when the string tables have them. */
