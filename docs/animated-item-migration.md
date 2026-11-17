@@ -102,3 +102,6 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   first (`assets/ios-animation-engine-report.png`). `CYLAnimatedIconTests` 8 / 0.
 - **Results (2026-11-17)**: row 13 Done on the local Mac; row 12 compiles with Xcode 27 locally but still fails in CI with Xcode 26 (menu 32, tag 6, example 92, swift 22 tests, 0
   failures, on the "CYL ClassifyMenu iOS" iPhone 17 Pro simulator). Still TODO: the iPhone Duo tab bar placement (above).
+- **Screenshots (2026-11-17, `333b349`)**: all 54 iOS example screens in [screenshots.md](screenshots.md) ("iOS: every example
+  screen"), `assets/ios-1117/`. Bug fixed: `scripts/example-screenshots.sh` captured the previous app's last frame for the
+  first screen of a run (`product@zh-Hans` showed the animations screen); it now waits 10 s more for the first launch.
