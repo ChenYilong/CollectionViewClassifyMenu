@@ -21,9 +21,12 @@ final class CYLTagConfigurationTests: XCTestCase {
         XCTAssertEqual(view.selectedIndexPaths, [ip(1, 0)])
         XCTAssertNotNil(view.configurationDataSource, "The view keeps the data source it built")
         XCTAssertTrue(view.menuDataSource === view.configurationDataSource)
-        XCTAssertEqual(view.menuDataSource?.menuNumberOfItems(inSection: 0), 5)
-        XCTAssertEqual(view.menuDataSource?.menuTitleForItem(at: ip(4, 0)), "Text only", "A string item is a title")
-        XCTAssertNotNil(view.menuDataSource?.menuImageForItem?(at: ip(3, 0)), "system: images are SF Symbols")
+        // Lottie, GIF, Rive, SVGA, then an image-only item and a string item, the last two items.
+        let count = view.menuDataSource?.menuNumberOfItems(inSection: 0) ?? 0
+        XCTAssertEqual(count, 6)
+        XCTAssertEqual(view.menuDataSource?.menuTitleForItem(at: ip(count - 1, 0)), "Text only", "A string item is a title")
+        XCTAssertNotNil(view.menuDataSource?.menuImageForItem?(at: ip(count - 2, 0)), "system: images are SF Symbols")
+        XCTAssertEqual(view.menuDataSource?.menuAnimationURLForItem?(at: ip(3, 0))?.pathExtension, "svga")
         XCTAssertEqual(view.style.imageSize, CGSize(width: 20, height: 20))
         XCTAssertEqual(view.style.normalAppearance.cornerRadius, 8)
         XCTAssertEqual(view.style.normalAppearance.iconColor, UIColor.systemIndigo)
