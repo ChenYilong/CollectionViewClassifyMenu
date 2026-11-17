@@ -21,7 +21,7 @@ import android.widget.TextView
 import com.cyl.animateditem.CYLAnimatedItemAccessoryPlacement
 import com.cyl.animateditem.CYLAnimatedItemAxis
 import com.cyl.animateditem.CYLAnimatedItemView
-import com.cyl.tabbar.CYLTabBarItemAnimationViewMaking
+import com.cyl.animateditem.CYLTabBarItemAnimationViewMaking
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max

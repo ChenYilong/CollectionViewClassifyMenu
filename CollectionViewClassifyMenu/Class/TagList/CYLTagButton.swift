@@ -2,19 +2,25 @@
 //  CYLTagButton.swift
 //  CollectionViewClassifyMenu
 //
-//  One tag: CYLTabBarController's shared animated icon + title component, CYLAnimatedItemView (subspec
-//  CYLTabBarController/CYLAnimatedItem, guide:
+//  One tag: CYLTabBarController's shared animated icon + title component, CYLAnimatedItemView (pod
+//  CYLAnimatedItem, module CYLAnimatedItem, guide:
 //  https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md), laid out
 //  as a tag: the icon before, after, above or below the title, in a box drawn from the style's appearance for the
 //  current state, with an optional delete indicator (the base class's accessory view) and an optional badge.
 //  CYLTagListView puts one in every cell; the libraries built on this one (a search bar item) subclass it. The icon,
 //  the title and the animated icon are the base class's: it plays any file of CYLTabBarController's animation engine
-//  once the app adds an engine subspec (CYLAnimatedItemLottieSwift, …PAG, …Rive, …SVGA, …GIF), and shows the static
+//  once the app adds an engine subspec (CYLAnimatedItem/LottieSwift, …/PAG, …/Rive, …/SVGA, …/GIF), and shows the static
 //  image (or its placeholder) otherwise. The core links no engine.
 //  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
 //
 
+// CocoaPods: the CYLAnimatedItem pod. Swift Package Manager still compiles the component into the CYLTabBarController
+// module (CYLTabBarController's docs/Animated-Item.md, TODO 9).
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#else
 import CYLTabBarController
+#endif
 import UIKit
 
 /**
@@ -173,7 +179,7 @@ open class CYLTagButton: CYLAnimatedItemView {
 
     /**
      * Whether an animation engine is in the app (CYLTabBarController's `CYLTabBarItemAnimationFactory`, brought by an
-     * engine subspec such as `CYLTabBarController/CYLAnimatedItemLottieSwift`). The core links none: without one, tags
+     * engine subspec such as `CYLAnimatedItem/LottieSwift`). The core links none: without one, tags
      * show their static images.
      */
     @objc public static var isAnimationEngineAvailable: Bool {

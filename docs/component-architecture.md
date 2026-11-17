@@ -258,4 +258,11 @@ declarations, so Objective-C callers see no change.
 - **Prompt (verbatim)**: "更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
 - **Prompt (English)**: "The document was updated, latest address …/docs/Animated-Item.md; some descriptions changed. Please
   read it again and adjust."
-- **Status**: started.
+- **Status**: iOS and Android adjusted, pending CI. The podspec depends on `CYLAnimatedItem` (default subspec `Core`,
+  no engine); `CYLTagButton.swift` imports `CYLAnimatedItem` (`CYLTabBarController` only where the module is missing,
+  that is Swift Package Manager, which still compiles the component into CYLTabBarController); every Podfile names
+  `pod 'CYLAnimatedItem'` by `CYL_ANIMATED_ITEM` (same commit) and the examples' engines are `CYLAnimatedItem/<Type>`;
+  pins `7511f7d` → `1f0fcce`; `scripts/pod-lint.sh lib` includes `CYLAnimatedItem.podspec` from a checkout of the
+  commit; Android imports `CYLTabBarItemAnimationViewMaking` from `com.cyl.animateditem`. Not built here (no Xcode,
+  no Android SDK). TODO: CI on the commit; the Objective-C redeclarations of `d3efc5f` can go once Objective-C tests
+  `@import CYLAnimatedItem;` (kept for now: the owner rejected importing the tab bar, and they work).
