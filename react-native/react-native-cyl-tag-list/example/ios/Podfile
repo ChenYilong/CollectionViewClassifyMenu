@@ -22,7 +22,9 @@ target 'CylTagListExample' do
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
                   :commit => '0a63bed5aab7d65551d7ef1f0c4f1708b541ddf7' }
   pod 'CYLTabBarController', cyl_tab_bar
-  pod 'CYLAnimatedItem', cyl_tab_bar
+  # Static libraries: CYLAnimatedItem's module map must reach this target (DEFINES_MODULE in its podspec alone does not
+  # make the app's Swift compiler load the module; CI b4d0e51, docs/issue-progress.md).
+  pod 'CYLAnimatedItem', cyl_tab_bar.merge(:modular_headers => true)
   # The animated icon engines the example plays; the core depends on the CYLAnimatedItem pod only.
   pod 'CYLAnimatedItem/LottieObjectiveC', cyl_tab_bar
   pod 'CYLAnimatedItem/Rive', cyl_tab_bar

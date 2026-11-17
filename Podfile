@@ -13,7 +13,9 @@ CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController
 target 'CollectionViewClassifyMenu' do
   pod 'CollectionViewClassifyMenu', :path => '.'
   pod 'CYLTabBarController', CYL_TAB_BAR
-  pod 'CYLAnimatedItem', CYL_ANIMATED_ITEM
+  # Static libraries: CYLAnimatedItem's module map must reach this target (DEFINES_MODULE in its podspec alone does not
+  # make the app's Swift compiler load the module; CI b4d0e51, docs/issue-progress.md).
+  pod 'CYLAnimatedItem', CYL_ANIMATED_ITEM.merge(:modular_headers => true)
 
   target 'CollectionViewClassifyMenuTests' do
     inherit! :search_paths

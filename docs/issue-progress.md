@@ -35,6 +35,23 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-17, `feat/harmony`): CYLAnimatedItem module in static-library Podfiles, again
+
+- Prompt (verbatim): "continue fix todo还没发布的组件尝试使用commit方式导入。不要阻碍进度"
+- Context: CI on `b4d0e51` (iOS run 44026180641): "Unit tests (menu)" fails to compile the demo app,
+  `CYLMainViewController.swift:17` "cannot inherit from class 'CYLClassifyMenuViewController' because it has
+  overridable members that could not be loaded", the same as `7183711`. `7fcc683` had added `:modular_headers => true`
+  for CYLAnimatedItem (its run was cancelled, never verified); `4171135` removed it, relying on the `DEFINES_MODULE`
+  that CYLTabBarController's `CYLAnimatedItem.podspec` sets again; `b4d0e51` shows that this is not enough for the app
+  target in a static-library Podfile.
+- Result: `pod 'CYLAnimatedItem', ….merge(:modular_headers => true)` in the Podfiles that build static libraries (root,
+  TagCollectionView, the React Native example without `USE_FRAMEWORKS`); Example, Example-Swift and the Flutter
+  example use frameworks. Unreleased components are taken by commit already (CYLTabBarController and CYLAnimatedItem
+  by `:git` + `:commit`, the Android `cyltabbarcontroller-animateditem` by the composite build's substitution, SwiftPM
+  by `revision:`); HarmonyOS and the mini program have no CYLAnimatedItem package upstream yet (checked at `5ff6021`),
+  so they keep their own implementation until one exists. Pins stay with the CYLSearchViewController session (newest
+  upstream `5ff6021` is docs only).
+
 ### Done (2026-11-17, `feat/harmony`): the Animated icons screen reports every animation engine
 
 - Prompt (verbatim): "我已经更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
