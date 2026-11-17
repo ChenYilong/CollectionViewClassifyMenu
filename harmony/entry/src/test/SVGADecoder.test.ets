@@ -1,7 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
-import {
-  CYLAnimationEngine, cylAnimationEngine, CYLSVGAMovie, CYLSVGAShapeType
-} from '@cyl/classifymenu';
+import { CYLAnimationEngine, cylAnimationEngine } from '@cyl/classifymenu';
+import { CYLSVGAMovie, CYLSVGAShapeType } from '../main/ets/animation/svga/CYLSVGAMovie';
 
 /** Protobuf writer for the test movies: varints, fixed32 floats and length-delimited fields. */
 class ProtoWriter {

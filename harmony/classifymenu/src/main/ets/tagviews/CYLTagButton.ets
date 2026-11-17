@@ -5,13 +5,22 @@
  * file's extension). It is also the one icon + title + animated icon component of the libraries built on this one (a
  * search bar item, a placeholder's icon): `new CYLTagButton(title, image, animationURL)` makes one for use on its own.
  *
+ * The animated icon is CYLTabBarController's shared component, `CYLAnimatedItemView` (`CYLTagAnimatedIcon`): iOS and
+ * Android subclass it, and ArkTS structs cannot subclass, so the tag wraps it in its icon slot and keeps its own
+ * layout, measuring, title, delete indicator and badge. The library depends on no animation library: the app registers
+ * the types it plays (`CYLAnimatedItemEngines.register(type)`) and the views that play them
+ * (`CYLTagAnimationBuilder.register(builder)`); a type nobody registered shows the static image, or the placeholder.
+ *
  * `CYLTagButton` holds the state, the layout and the API (as the iOS class); `CYLTagButtonComponent` draws it, and
  * `CYLTagButtonHost` draws it inside an ArkUI V2 (`@ComponentV2`) parent. The icon may be a pixel image, a rawfile, a
  * pixel map or a system symbol (`$r('sys.symbol.camera')`, drawn with `SymbolGlyph`); every color takes a
  * `ResourceColor`, so theme colors (`$r('sys.color.font_primary')`) follow the color mode.
  */
-import { CYLAnimatedIcon } from '../components/CYLAnimatedIcon';
+import { CYLAnimatedItemEngines } from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
+import {
+  CYLTagAnimatedIcon, cylTagAnimatedIconOuterHeight, cylTagAnimatedIconOuterWidth, cylTagAnimationImage
+} from '../components/CYLTagAnimatedIcon';
 import { CYLTagButtonMetrics } from '../components/CYLTagListState';
 import {
   CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical
@@ -143,6 +152,14 @@ export class CYLTagButton {
    * The animated icon's frame (when `animationURL` is set).
    */
   animationFrame: CYLRect = new CYLRect();
+  /**
+   * The static image under the animated icon while it loads and after it fails (`CYLAnimatedItemView.image`), or ''.
+   */
+  animationImage: ResourceStr = '';
+  /**
+   * The static image under the animated icon while selected (`CYLAnimatedItemView.selectedImage`), or ''.
+   */
+  animationSelectedImage: ResourceStr = '';
 
   /**
    * `init(frame:)` without arguments; `init(title:image:)` / `init(title:image:animationURL:)` with them: a tag for use
@@ -312,8 +329,10 @@ export class CYLTagButton {
   }
 
   /**
-   * Animated icon: `asset:<rawfile>` (`.json` Lottie, `.pag` PAG, `.riv` Rive, `.gif` GIF; options after `#`) or
-   * Lottie JSON text. Without it, `image` is shown.
+   * Animated icon: `asset:<rawfile>` (`.json` Lottie, `.pag` PAG, `.riv` Rive, `.gif` GIF, `.svga` SVGA; options after
+   * `#`), drawn by `CYLAnimatedItemView` with the view the app registered for its type. Without it, `image` is shown;
+   * with it, `image` (`selectedImage` while selected) shows while it loads, after it fails and when no engine of its
+   * type is registered (a pixel map or a symbol cannot: the component's placeholder shows instead).
    */
   get animationURL(): string | undefined {
     return this.animationURLValue;
@@ -372,8 +391,9 @@ export class CYLTagButton {
   }
 
   /**
-   * `animationView`: the live player of the animated icon (the engine's view or controller: `lottieItem`,
-   * `pagController`, `riveView`, `gifFrames`), or undefined while there is none (no `animationURL`, not drawn yet).
+   * `animationView`: the live player of the animated icon, the one the app's animation view handed over with
+   * `CYLTagAnimationContext.ready(player)` (the example's players expose `lottieItem`, `pagController`, `riveView`,
+   * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine).
    */
   get animationView(): CYLAnimationPlayer | undefined {
     return this.player;
@@ -459,10 +479,11 @@ export class CYLTagButton {
   }
 
   /**
-   * The engines (@ohos/lottie, @tencent/libpag, @ohos/rive; GIF through ImageKit) are dependencies of the HAR.
+   * Whether the app registered an animation engine (`CYLAnimatedItemEngines.register(type)`). The library depends on
+   * no animation library; the example registers Lottie, PAG, Rive, SVGA and GIF.
    */
   static get isAnimationEngineAvailable(): boolean {
-    return true;
+    return CYLAnimatedItemEngines.registeredTypes().length > 0;
   }
 
   /**
@@ -818,9 +839,11 @@ export class CYLTagButton {
     const animated = this.animationURLValue !== undefined;
     const icon = state === CYLControlState.SELECTED && this.selectedImageValue !== undefined ?
       this.selectedImageValue : this.imageValue;
-    // An animated icon takes the icon slot.
+    // An animated icon takes the icon slot: CYLAnimatedItemView draws the static image under it.
     this.imageView.image = animated ? undefined : icon;
     this.imageView.isHidden = animated || icon === undefined;
+    this.animationImage = animated ? cylTagAnimationImage(this.imageValue) : '';
+    this.animationSelectedImage = animated ? cylTagAnimationImage(this.selectedImageValue) : '';
     this.animationOpacity = state === CYLControlState.DISABLED ? DISABLED_ANIMATION_ALPHA : 1;
     this.imageView.tintColor = style.iconColor(state);
     this.titleLabel.text = style.displayedTitle(this.titleValue);
@@ -940,18 +963,27 @@ export struct CYLTagButtonComponent {
           .accessibilityLevel('no')
       }
       if (this.button.animationURL !== undefined) {
+        // CYLAnimatedItemView (in CYLTagAnimatedIcon) is larger than the icon (its padding and 44 vp minimum height):
+        // centered on the icon's frame, the tag clipping the transparent rest.
         ForEach([this.button.animationViewToken], (token: number) => {
-          CYLAnimatedIcon({
-            source: this.button.animationURL ?? '',
-            iconSize: this.af().width,
+          CYLTagAnimatedIcon({
+            animationURL: this.button.animationURL ?? '',
+            image: this.button.animationImage,
+            selectedImage: this.button.animationSelectedImage,
+            isSelected: this.button.isSelected,
+            iconWidth: this.af().width,
             iconHeight: this.af().height,
             onPlayer: (player: CYLAnimationPlayer | undefined) => {
               if (player !== undefined || this.button.animationPlayer !== undefined) {
                 this.button.setAnimationPlayer(player);
               }
-            }
+            },
+            onTap: () => this.onTagClick?.()
           })
-            .position({ x: this.af().x, y: this.af().y })
+            .position({
+              x: this.af().x + (this.af().width - cylTagAnimatedIconOuterWidth(this.af().width, this.af().height)) / 2,
+              y: this.af().y + (this.af().height - cylTagAnimatedIconOuterHeight(this.af().width, this.af().height)) / 2
+            })
             .opacity(this.button.animationOpacity)
         }, (token: number) => `${token}`)
       }

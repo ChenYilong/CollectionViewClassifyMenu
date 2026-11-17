@@ -1,7 +1,8 @@
 import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { CYLUIContext } from '../core/CYLUIContext';
-import { CYLAnimatedIcon } from './CYLAnimatedIcon';
+import { CYLAnimationPlayer } from './CYLAnimationPlayer';
+import { CYLTagAnimatedIcon, cylTagAnimationImage } from './CYLTagAnimatedIcon';
 import {
   CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
 } from './CYLTagListSupplementaryView';
@@ -659,14 +660,28 @@ export struct CYLTagListView {
         .height(r.iconHeight > 0 ? r.iconHeight : undefined)
         .accessibilityLevel('no')
     } else if (r.animation !== undefined) {
-      CYLAnimatedIcon({
-        source: r.animation,
-        iconSize: r.iconWidth,
-        iconHeight: r.iconHeight,
-        speed: r.speed,
-        loops: this.loops,
-        playToken: this.playToken
-      })
+      // CYLTabBarController's CYLAnimatedItemView, with the view the app registered for the file's type; it is larger
+      // than the icon (its padding and 44 vp minimum height), so it is centered in the icon's place and clipped.
+      Stack() {
+        CYLTagAnimatedIcon({
+          animationURL: r.animation,
+          image: cylTagAnimationImage(r.image),
+          isSelected: r.selected,
+          iconWidth: r.iconWidth,
+          iconHeight: r.iconHeight,
+          onPlayer: (player: CYLAnimationPlayer | undefined) => {
+            if (player !== undefined) {
+              player.speed = r.speed;
+              player.loops = this.loops;
+              player.stopAtProgress(r.selected ? 1 : 0);
+            }
+          }
+        })
+      }
+      .width(r.iconWidth)
+      .height(r.iconHeight > 0 ? r.iconHeight : r.iconWidth)
+      .clip(true)
+      .accessibilityLevel('no-hide-descendants')
     } else if (r.image !== undefined) {
       Image(r.image)
         .width(r.iconWidth > 0 ? r.iconWidth : undefined)

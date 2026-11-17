@@ -1,4 +1,4 @@
-// Checks the library's SVGA decoder (CYLInflate.ets, CYLSVGAMovie.ets: plain TypeScript logic) without a device:
+// Checks the example's SVGA decoder (CYLInflate.ets, CYLSVGAMovie.ets: plain TypeScript logic) without a device:
 // transpiles both with TypeScript, inflates every example .svga file and compares the result with Node's zlib, then
 // checks the decoded movies (frames per sprite, image keys, PNG bitmaps) and stored / fixed-Huffman deflate blocks.
 // Usage: node harmony/scripts/svga-decoder-test.js [path to the typescript package]
@@ -8,7 +8,7 @@ const path = require('path');
 const zlib = require('zlib');
 const ts = require(process.argv[2] || 'typescript');
 const root = path.resolve(__dirname, '..');
-const dir = path.join(root, 'classifymenu/src/main/ets/components/svga');
+const dir = path.join(root, 'entry/src/main/ets/animation/svga');
 const samples = path.join(root, 'entry/src/main/resources/rawfile/svga');
 const out = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cyl-svga-'));
 fs.mkdirSync(out, { recursive: true });
