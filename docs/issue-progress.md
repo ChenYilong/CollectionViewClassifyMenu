@@ -35,6 +35,21 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-17, `feat/harmony`): the Animated icons screen reports every animation engine
+
+- Prompt (verbatim): "我已经更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
+- Context: CYLTabBarController's guide (tip `0a63bed`) adds multi-engine management (`CYLTabBarItemAnimatorRegistry`
+  `+registeredIdentifiers`, `+isAnimatorRegisteredWithIdentifier:`, `+missingKnownIdentifiers`, `+conflictDescriptions`,
+  `+registrationReport`; `CYLAnimationKnownTypes()`, `CYLAnimationSubspecOfType()`) and a TODO for this repository:
+  show the report in the example that links the five engines, so the integrator sees each engine confirmed. The
+  CYLAnimatedItemView migration stays with the CYLSearchViewController session; this change is the example layer only
+  (that session was told).
+- Result: `CYLTagAnimationDemoViewController` lists the engines under "动效引擎" / "Animation engines": ✅ for each
+  registered engine, ➖ with the `pod 'CYLAnimatedItem/<subspec>'` line for a missing one, ⚠️ for each conflict
+  (`engineReportLines()`); strings in en and zh-Hant (zh-Hans: the keys), mini program `strings.js` regenerated. Test:
+  `CYLAnimatedIconTests.testEveryLinkedEngineIsRegisteredAndListed` (all five registered, none missing, no conflict,
+  each listed; screenshot `test-animation-engine-report`). Not compiled here (Linux, no Xcode): CI.
+
 ### Done (2026-11-17, `feat/harmony`): every published package ships its license
 
 - Prompt (verbatim): "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入：所有需要发布到外部仓库的代码，包括但不限于 cocoapods graddle npm maven等等 必须包含协议声明，如果已经有内置包文件夹就放进去，如果没有就新建，确保写入成功。以iOS为例，内置包bundle文件应包含协议文件。此操作适用于所有平台。"

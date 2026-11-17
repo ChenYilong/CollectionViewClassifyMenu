@@ -275,3 +275,9 @@
 "循环播放" = "循環播放";
 "%@ 倍" = "%@ 倍";
 "从头播放屏幕上的全部动效" = "從頭播放螢幕上的全部動效";
+
+/* Animated icons: the engines CYLTabBarItemAnimatorRegistry reports (registered, missing, conflicts). */
+"动效引擎" = "動效引擎";
+"%@ 已接入" = "%@ 已接入";
+"%@ 未接入：添加 pod 'CYLAnimatedItem/%@'" = "%@ 未接入：新增 pod 'CYLAnimatedItem/%@'";
+"动效引擎冲突：%@" = "動效引擎衝突：%@";

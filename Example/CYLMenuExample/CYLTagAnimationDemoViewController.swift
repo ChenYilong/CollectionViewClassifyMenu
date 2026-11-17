@@ -8,6 +8,7 @@
 
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 
 final class CYLTagAnimationDemoViewController: UIViewController {
 
@@ -26,6 +27,24 @@ final class CYLTagAnimationDemoViewController: UIViewController {
     /// Section titles, one per library, in order.
     static func sectionIdentifiers() -> [String] {
         ["lottie", "lottie-images", "lottie-green", "pag", "rive", "rive-icons", "svga", "svga-dark", "gif", "images"]
+    }
+
+    /// One line per animation engine CYLTabBarController knows: ✅ registered (its subspec is in the Podfile), ➖ missing
+    /// with the pod line that adds it, then ⚠️ for each conflict between registered engines (CYLTabBarItemAnimatorRegistry).
+    static func engineReportLines() -> [String] {
+        var lines = [CYLExampleLocalizedString("动效引擎")]
+        for type in CYLAnimationKnownTypes() {
+            if CYLTabBarItemAnimatorRegistry.isAnimatorRegistered(withIdentifier: type) {
+                lines.append("✅ " + CYLExampleLocalizedString("%@ 已接入", type))
+            } else {
+                let subspec = CYLAnimationSubspecOfType(type) ?? type
+                lines.append("➖ " + CYLExampleLocalizedString("%@ 未接入：添加 pod 'CYLAnimatedItem/%@'", type, subspec))
+            }
+        }
+        for conflict in CYLTabBarItemAnimatorRegistry.conflictDescriptions() {
+            lines.append("⚠️ " + CYLExampleLocalizedString("动效引擎冲突：%@", conflict))
+        }
+        return lines
     }
 
     /// A file of CYLMenuExample.bundle/Animations (copied from CYLTabBarController's examples).
@@ -163,8 +182,9 @@ final class CYLTagAnimationDemoViewController: UIViewController {
         statusLabel.font = .preferredFont(forTextStyle: .footnote)
         statusLabel.adjustsFontForContentSizeCategory = true
         statusLabel.textColor = .secondaryLabel
+        // Which engines are in (CYLTabBarItemAnimatorRegistry's report): the integrator sees each one confirmed.
         statusLabel.text = CYLTagButton.isAnimationEngineAvailable
-            ? CYLExampleLocalizedString("动效引擎：CYLTabBarItemAnimationFactory 已链接")
+            ? Self.engineReportLines().joined(separator: "\n")
             : CYLExampleLocalizedString("动效引擎未链接：显示静态图标")
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(statusLabel)
