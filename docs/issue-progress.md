@@ -44,11 +44,12 @@ tags: [issues, ui, cocoapods, progress]
 - Acceptance criteria: 100 = cause found and written down (15), a stitch tool for every host that refuses an
   incomplete label (25), a check before every commit (20) and in CI (15), the rules and skills updated (10), the four
   images restitched (15). Pass: 60.
-- Result: **85/100**. `scripts/stitch-screenshots.py` (new, any host) and `scripts/stitch-screenshots.swift` (now
+- Result: **95/100** (was 85; the Mac session compiled and fixed the Swift tool in `f9f0759`, its output passes the
+  check). `scripts/stitch-screenshots.py` (new, any host) and `scripts/stitch-screenshots.swift` (now
   refuses an incomplete label and writes it into the PNG), `scripts/check-screenshots.py` (new; run by
   `scripts/check-branch-pr.sh`, exit 3) and `.github/workflows/screenshot-labels.yml` (new); AGENTS.md "Screenshots:
   enforced", `cyl-screenshots` and `cyl-commit` updated; the four images restitched (header, captions, footer, original
-  pixels). -10: the Swift change is not compiled here (no macOS; asked the Mac session to run it); -5: older images
+  pixels). -5: older images
   committed before the check (for example `miniprogram-devtools-rive-house-number-input.png`, the
   `react-native-android-*` and `miniprogram-devtools-rive-b20-*` sets) are not restitched; the check only covers images
   added or changed from now on.
