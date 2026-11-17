@@ -306,3 +306,17 @@ declarations, so Objective-C callers see no change.
 - **Adjusted**: the `:modular_headers => true` workaround is removed from the root and TagCollectionView Podfiles (the
   core fix replaces it, as the core-first rule asks). `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay`
   is the re-test: unchanged, expected to pass on `0a63bed`. Pending CI.
+
+## TODO (2026-11-17): Android CYLIndexPathButton, CYLRightImageButton, CYLMultipleFilterHeaderView on CYLTagButton
+
+- **Context**: branch `feat/harmony` (PR #20). On iOS all three already use the one icon + title component:
+  `CYLIndexPathButton` and `CYLRightImageButton` subclass `CYLTagButton`, and `CYLMultipleFilterHeaderView` shows its
+  title in `titleButton`, a `CYLTagButton` (`docs/Swift-Migration.md`, row 12). On Android
+  (`android/merged/library`) they still extend `Button` / `ViewGroup` and draw their own icon and title, so a new
+  animation type would not reach them. Android SDK not available in this container: CI is the build check.
+- **Requirements**: continue the TODOs; do not block progress; same structure as iOS, so the shared
+  `CYLAnimatedItemView` engine reaches every icon + title view.
+- **Prompt (verbatim)**: "continue fix todo还没发布的组件尝试使用commit方式导入。不要阻碍进度"
+- **Prompt (English)**: "Continue fixing the TODOs. Try to import components that are not released yet by commit. Do not
+  block progress."
+- **Status**: started.
