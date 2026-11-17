@@ -359,3 +359,4 @@ declarations, so Objective-C callers see no change.
     `docs/android-api.md` 784 to 791 / 792 (99.9), `docs/android-ios-api.md` 736 / 736 (100).
   - Remaining: CI build and the unit tests; screenshots of the classify menu and the multiple filter on Android to
     compare with iOS.
+- **Pin `d875dd1`** (2026-11-17): the #788 tip and newest commit (`5ff6021` guide, `ab29a84` late-failure fallback and remote GIF downloads, `d875dd1` remote PAG downloads); `DEFINES_MODULE` kept.

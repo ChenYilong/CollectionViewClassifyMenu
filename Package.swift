@@ -26,7 +26,7 @@ let package = Package(
         // pinned to the same commit as the Podfiles. CYLTabBarController's Swift package has one product, which also
         // contains its tab bar and its Lottie engine (SwiftPM cannot offer a Core-free variant there).
         .package(url: "https://github.com/ChenYilong/CYLTabBarController.git",
-                 revision: "0a63bed5aab7d65551d7ef1f0c4f1708b541ddf7")
+                 revision: "d875dd12ff4dfeea33b71e112d697d0eb25c49f8")
     ],
     targets: [
         .target(
