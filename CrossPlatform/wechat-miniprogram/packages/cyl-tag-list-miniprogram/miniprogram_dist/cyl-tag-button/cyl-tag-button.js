@@ -36,7 +36,8 @@ Component({
     animationURL: { type: String, value: '', observer: 'render' },
     animationOptions: { type: null, value: null, observer: 'render' },
     animationRestingProgress: { type: Number, value: 0, observer: 'render' },
-    animationSpeed: { type: Number, value: 0, observer: 'render' },
+    // Any type (see cyl-tag-list): undefined or a non-number uses the style's speed, without a type warning.
+    animationSpeed: { type: null, value: 0, observer: 'render' },
     animationLoops: { type: Boolean, value: false, observer: 'render' },
     badgeValue: { type: null, value: null, observer: 'render' },
     badgeColor: { type: String, value: '', observer: 'render' },

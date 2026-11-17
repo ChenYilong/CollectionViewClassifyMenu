@@ -42,7 +42,9 @@ function pixelRatio() {
 Component({
   properties: {
     configuration: { type: Object, value: {}, observer: 'rebuild' },
-    animationSpeed: { type: Number, value: 0 },
+    // Any type, not Number: a page whose speed is not set yet (`{{controls.speed}}` of an empty object) passes undefined,
+    // which a Number property reports as a type warning; anything not above 0 uses the style's speed anyway.
+    animationSpeed: { type: null, value: 0 },
     animationLoops: { type: Boolean, value: false },
   },
 
