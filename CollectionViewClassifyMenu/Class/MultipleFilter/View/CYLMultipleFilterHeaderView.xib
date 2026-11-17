@@ -10,23 +10,6 @@
         <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CYLMultipleFilterHeaderView" id="BtE-pM-vjY" customClass="CYLMultipleFilterHeaderView">
             <rect key="frame" x="0.0" y="0.0" width="300" height="38"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <subviews>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="10000" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="问题类型过滤" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Xjo-FD-BkX">
-                    <rect key="frame" x="50" y="0.0" width="250" height="38"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="0Vj-bg-aOI">
-                    <rect key="frame" x="6" y="0.0" width="38" height="38"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                </imageView>
-            </subviews>
-            <connections>
-                <outlet property="imageView" destination="0Vj-bg-aOI" id="4vU-Eg-xuT"/>
-                <outlet property="titleLabel" destination="Xjo-FD-BkX" id="GhU-aO-LsZ"/>
-            </connections>
             <point key="canvasLocation" x="-486" y="178"/>
         </collectionReusableView>
     </objects>

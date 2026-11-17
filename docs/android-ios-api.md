@@ -20,8 +20,8 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLIndexPathButton` | class, `CYLClassifyMenu.kt:34` | `CYLIndexPathButton` |
 | `CYLIndexPathButton.section` | property, `CYLClassifyMenu.kt:35` | `CYLIndexPathButton.section` |
 | `CYLIndexPathButton.row` | property, `CYLClassifyMenu.kt:36` | `CYLIndexPathButton.row` |
-| `CYLIndexPathButton.cyl_imageTitleSpacing` | property, `CYLClassifyMenu.kt:41` | `CYLIndexPathButton.imageTitleSpacing` |
-| `CYLIndexPathButton.cyl_titleLeadingInset` | property, `CYLClassifyMenu.kt:51` | `CYLIndexPathButton.titleLeadingInset` |
+| `CYLIndexPathButton.cyl_imageTitleSpacing` | property, `CYLClassifyMenu.kt:41` | `CYLIndexPathButton.style.imageTitleSpacing` (a `CYLTagButton` since 2026-11-17; `CYLMenuStyle.classifyMenuTag()` sets 5) |
+| `CYLIndexPathButton.cyl_titleLeadingInset` | property, `CYLClassifyMenu.kt:51` | `CYLMenuStyle.sectionTitle(leadingInset:)` (the leading content inset of a `CYLTagButton`'s style) |
 | `CYLIndexPathButton.setImage` | method, `CYLClassifyMenu.kt:83` | `UIButton.setImage(_:for: .normal)` (`CYLIndexPathButton` is a `UIButton`) |
 | `CYLIndexPathButton.currentImage` | read-only property, `CYLClassifyMenu.kt:92` | `UIButton.currentImage` |
 | `CYLRightImageButton` | class, `CYLClassifyMenu.kt:138` | `CYLRightImageButton` |
@@ -352,8 +352,8 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLFilterCollectionCell` | class, `CYLMultipleFilter.kt:135` | `CYLFilterCollectionCell` |
 | `CYLFilterCollectionCell.titleButton` | read-only property, `CYLMultipleFilter.kt:136` | `CYLFilterCollectionCell.titleButton` |
 | `CYLMultipleFilterHeaderView` | class, `CYLMultipleFilter.kt:162` | `CYLMultipleFilterHeaderView` |
-| `CYLMultipleFilterHeaderView.imageView` | read-only property, `CYLMultipleFilter.kt:164` | `CYLMultipleFilterHeaderView.imageView` |
-| `CYLMultipleFilterHeaderView.titleLabel` | read-only property, `CYLMultipleFilter.kt:165` | `CYLMultipleFilterHeaderView.titleLabel` |
+| `CYLMultipleFilterHeaderView.imageView` | read-only property, `CYLMultipleFilter.kt:164` | `imageView` (same name in the iOS core) |
+| `CYLMultipleFilterHeaderView.titleLabel` | read-only property, `CYLMultipleFilter.kt:165` | `titleLabel` (same name in the iOS core) |
 | `CYLFilterControllerDelegate` | interface, `CYLMultipleFilter.kt:202` | `CYLFilterControllerDelegate` |
 | `CYLFilterControllerDelegate.filterControllerDidComplete` | method, `CYLMultipleFilter.kt:206` | `CYLFilterControllerDelegate.filterControllerDidComplete(_:)` |
 | `CYLFilterBaseController` | class, `CYLMultipleFilter.kt:214` | `CYLFilterBaseController` |

@@ -449,8 +449,10 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | correction | Android -> iOS: the generator stopped using the stale Objective-C keys of `api-map.json` and same-name matches of Objective-C spellings; iOS names now come from the Swift signatures | 568 / 611 (Android -> iOS) | 93.0 |
 | `a3c2e1f` | `UIView+CYLGeneral.swift` (Android `CYLGeneralExtensions.kt` frame, centering, border, corner, layer, tap and capture helpers), `CYLFilterParamsTool`, `CYLFilterBaseController.settingArray`, 13 hand mappings; tests `CYLGeneralHelpersTests` | 611 / 611 (Android -> iOS) | 100.0 |
 | `a3c2e1f` | iOS -> Android, regenerated with the new Swift APIs | 761 / 761 | 100.0 |
-| this commit | Android -> iOS: the Kotlin parser read classes with a multi-line primary constructor (`CYLTag`, …) as one-liners and skipped their members: 128 rows found, 6 misattributed rows gone; new iOS `CYLTag.resetColors()` | 733 / 733 (Android -> iOS) | 100.0 |
-| this commit | iOS -> Android with `CYLTag.resetColors()` | 762 / 762 | 100.0 |
+| `f77cd48` | Android -> iOS: the Kotlin parser read classes with a multi-line primary constructor (`CYLTag`, …) as one-liners and skipped their members: 128 rows found, 6 misattributed rows gone; new iOS `CYLTag.resetColors()` | 733 / 733 (Android -> iOS) | 100.0 |
+| `f77cd48` | iOS -> Android with `CYLTag.resetColors()` | 762 / 762 | 100.0 |
+| `477323d` | iOS -> Android: `CYLTagListView`'s Objective-C names and the old factories (Objective-C only) | 766 / 766 | 100.0 |
+| this commit | iOS -> Android: every iOS icon + title component is a `CYLTagButton`; its new looks and properties wait for the same refactor on Android | 763 / 771 | 99.0 |
 
 ## DONE (2026-11-17, `feat/harmony`): every tab of the merged example stays in the bar after CYLTabBarController's "More"
 

@@ -2,19 +2,37 @@
 //  CYLRightImageButton.swift
 //  CollectionViewClassifyMenu
 //
-//  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
+//  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md). A CYLTagButton since 2026-11-17, so the menu's
+//  "more" button draws its title and arrow with the same component as every tag (docs/issue-progress.md, "every icon +
+//  title component is CYLTagButton").
 //
 
 import UIKit
 
 /**
- * The "more" button of a menu section: its title ("更多" / "收起") with the arrow image on the right, never
- * highlighted.
+ * The "more" button of a menu section: a `CYLTagButton` showing `expandTitle` ("更多") or, while selected,
+ * `collapseTitle` ("收起"), with the arrow after the title; never highlighted.
  */
 @objc(CYLRightImageButton)
-open class CYLRightImageButton: UIButton {
+open class CYLRightImageButton: CYLTagButton {
 
-    private static let imageToTextMargin: CGFloat = 7
+    /**
+     * The title while not selected (the section is folded).
+     */
+    @objc open var expandTitle = CYLMenuLocalizedString("CYLMenuExpand") {
+        didSet {
+            updateTitle()
+        }
+    }
+
+    /**
+     * The title while selected (the section is expanded).
+     */
+    @objc open var collapseTitle = CYLMenuLocalizedString("CYLMenuCollapse") {
+        didSet {
+            updateTitle()
+        }
+    }
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,13 +45,22 @@ open class CYLRightImageButton: UIButton {
     }
 
     private func setUp() {
-        setTitle(CYLMenuLocalizedString("CYLMenuExpand"), for: .normal)
-        setTitle(CYLMenuLocalizedString("CYLMenuCollapse"), for: .selected)
-        titleLabel?.font = .systemFont(ofSize: 12)
-        setTitleColor(.black, for: .normal)
-        setTitleColor(.black, for: .selected)
-        setImage(CYLMenuResources.image(named: "home_btn_more_normal"), for: .normal)
-        setImage(CYLMenuResources.image(named: "home_btn_more_selected"), for: .selected)
+        let style = CYLMenuStyle.sectionTitle(fontSize: 12)
+        style.contentAlignment = .center
+        style.imagePlacement = .trailing
+        style.imageTitleSpacing = 7
+        self.style = style
+        image = CYLMenuResources.image(named: "home_btn_more_normal")
+        selectedImage = CYLMenuResources.image(named: "home_btn_more_selected")
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        updateTitle()
+    }
+
+    open override var isSelected: Bool {
+        didSet {
+            updateTitle()
+        }
     }
 
     /**
@@ -48,21 +75,19 @@ open class CYLRightImageButton: UIButton {
         }
     }
 
-    open override func layoutSubviews() {
-        super.layoutSubviews()
-        guard let imageView, let titleLabel, currentImage != nil, currentTitle?.isEmpty == false,
-              !imageView.frame.isEmpty, !titleLabel.frame.isEmpty else {
-            return
+    /**
+     * The title as shown, unless a label was set.
+     */
+    open override var accessibilityLabel: String? {
+        get {
+            super.accessibilityLabel ?? title
         }
-        var imageFrame = imageView.frame
-        var titleFrame = titleLabel.frame
-        let margin = Self.imageToTextMargin
-        let groupX = min(imageFrame.minX, titleFrame.minX) - margin / 2
-        titleFrame.origin.x = max(0, groupX)
-        let maxTitleWidth = bounds.width - imageFrame.width - margin - titleFrame.minX
-        titleFrame.size.width = max(0, min(titleFrame.width, maxTitleWidth))
-        imageFrame.origin.x = titleFrame.maxX + margin
-        titleLabel.frame = titleFrame
-        imageView.frame = imageFrame
+        set {
+            super.accessibilityLabel = newValue
+        }
+    }
+
+    private func updateTitle() {
+        title = isSelected ? collapseTitle : expandTitle
     }
 }

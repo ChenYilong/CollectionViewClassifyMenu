@@ -8,7 +8,8 @@
 import UIKit
 
 /**
- * The looks of a classify-menu tag button (`UIButton.cylApply(_:)`).
+ * The looks of a classify-menu tag (`CYLTagButton.cylApply(_:)`, `CYLMenuStyle.classifyMenuTag(_:)`; for a plain
+ * `UIButton`, `UIButton.cylApply(_:)`).
  */
 public enum CYLCollectionCellButtonStyle: CaseIterable, Sendable {
     /**
@@ -83,5 +84,15 @@ public extension UIButton {
             color.setFill()
             context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
         }
+    }
+}
+
+public extension CYLTagButton {
+
+    /**
+     * Applies one of the classify menu's tag looks: `style` becomes `CYLMenuStyle.classifyMenuTag(look)`.
+     */
+    func cylApply(_ look: CYLCollectionCellButtonStyle) {
+        style = CYLMenuStyle.classifyMenuTag(look)
     }
 }

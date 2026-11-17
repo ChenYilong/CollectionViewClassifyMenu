@@ -143,9 +143,10 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertGreaterThan(visible.count, 0u);
     for (NSIndexPath *indexPath in visible) {
         UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-        UIButton *button = [cell valueForKey:buttonKey];
+        CYLTagButton *button = [cell valueForKey:buttonKey];
         [cell layoutIfNeeded];
-        XCTAssertEqualObjects([button titleForState:UIControlStateNormal], fixture.sections[indexPath.section][indexPath.item]);
+        XCTAssertTrue([button isKindOfClass:[CYLTagButton class]], @"Every tag is a CYLTagButton");
+        XCTAssertEqualObjects(button.title, fixture.sections[indexPath.section][indexPath.item]);
         XCTAssertEqualWithAccuracy(CGRectGetWidth(button.frame), CGRectGetWidth(cell.contentView.bounds), 0.1);
         XCTAssertEqualWithAccuracy(CGRectGetHeight(button.frame), CGRectGetHeight(cell.contentView.bounds), 0.1);
     }
@@ -273,7 +274,7 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     [self scrollAndCheck:filterCollection fixture:fixture buttonKey:@"titleButton"];
     [filterCollection scrollToItemAtIndexPath:selection atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
     [filterCollection layoutIfNeeded];
-    UIButton *selectedButton = [[filterCollection cellForItemAtIndexPath:selection] valueForKey:@"titleButton"];
+    CYLTagButton *selectedButton = [[filterCollection cellForItemAtIndexPath:selection] valueForKey:@"titleButton"];
     XCTAssertNotNil(selectedButton);
     XCTAssertTrue(selectedButton.selected);
     window.hidden = YES;
@@ -427,20 +428,22 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     }
 }
 
-- (void)testButtonsPlaceImageAndTitleWithoutDeprecatedInsets {
-    CYLIndexPathButton *button = [CYLIndexPathButton buttonWithType:UIButtonTypeCustom];
+/*!
+ * The classify menu's tags, its header title and its "more" button are CYLTagButtons, so they place an icon and a
+ * title (and an animated icon) the way every tag does: the style's spacing, the same frames on every layout pass.
+ */
+- (void)testClassifyMenuButtonsAreTagButtons {
+    CYLCollectionViewCell *cell = [[CYLCollectionViewCell alloc] initWithFrame:CGRectMake(0, 0, 120, 30)];
+    CYLIndexPathButton *button = cell.button;
+    XCTAssertTrue([button isKindOfClass:[CYLTagButton class]]);
     button.frame = CGRectMake(0, 0, 120, 30);
-    [button setImage:[CYLMenuResources imageNamed:@"home_btn_shrink"] forState:UIControlStateNormal];
-    [button setTitle:@"Item 🌟" forState:UIControlStateNormal];
+    button.image = [CYLMenuResources imageNamed:@"home_btn_shrink"];
+    button.title = @"Item 🌟";
     [button layoutIfNeeded];
-    CGRect plainImage = button.imageView.frame;
-    CGRect plainTitle = button.titleLabel.frame;
-    button.cyl_imageTitleSpacing = 5;
-    [button layoutIfNeeded];
-    XCTAssertEqualWithAccuracy(CGRectGetMinX(button.imageView.frame), CGRectGetMinX(plainImage) - 2.5, 0.5);
-    XCTAssertEqualWithAccuracy(CGRectGetMinX(button.titleLabel.frame), CGRectGetMinX(plainTitle) + 2.5, 0.5);
+    XCTAssertEqualObjects(button.accessibilityLabel, @"Item 🌟");
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(button.titleLabel.frame) - CGRectGetMaxX(button.imageView.frame), 5, 0.5,
+                               @"CYLMenuStyle.classifyMenuTag()'s spacing");
     XCTAssertLessThanOrEqual(CGRectGetMaxX(button.titleLabel.frame), CGRectGetWidth(button.bounds));
-    // Every layout pass gives the same frames (the cell-level check of the gap is in CYLExampleDatabaseTests).
     CGRect firstImage = button.imageView.frame;
     CGRect firstTitle = button.titleLabel.frame;
     for (NSInteger pass = 0; pass < 3; pass++) {
@@ -449,21 +452,24 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     }
     XCTAssertTrue(CGRectEqualToRect(button.imageView.frame, firstImage), @"%@ vs %@", NSStringFromCGRect(button.imageView.frame), NSStringFromCGRect(firstImage));
     XCTAssertTrue(CGRectEqualToRect(button.titleLabel.frame, firstTitle));
-    XCTAssertEqualWithAccuracy(CGRectGetMinX(button.titleLabel.frame) - CGRectGetMaxX(button.imageView.frame), 5, 0.5);
 
     CYLFilterHeaderView *header = [[CYLFilterHeaderView alloc] initWithFrame:CGRectMake(0, 0, 320, 38)];
+    XCTAssertTrue([header.moreButton isKindOfClass:[CYLTagButton class]]);
     header.moreButton.hidden = NO;
-    [header.titleButton setTitle:@"Section" forState:UIControlStateNormal];
+    header.titleButton.title = @"Section";
     [header layoutIfNeeded];
     [header.titleButton layoutIfNeeded];
     [header.moreButton layoutIfNeeded];
     CGRect moreTitle = header.moreButton.titleLabel.frame;
     CGRect moreImage = header.moreButton.imageView.frame;
     XCTAssertGreaterThan(CGRectGetWidth(moreTitle), 0);
-    XCTAssertLessThanOrEqual(CGRectGetMaxX(moreTitle), CGRectGetMinX(moreImage));
+    XCTAssertLessThanOrEqual(CGRectGetMaxX(moreTitle), CGRectGetMinX(moreImage), @"The arrow after the title");
     XCTAssertLessThanOrEqual(CGRectGetMaxX(moreImage), CGRectGetWidth(header.moreButton.bounds) + 0.5);
-    XCTAssertEqualWithAccuracy(CGRectGetMinX(header.titleButton.titleLabel.frame),
-                               header.titleButton.cyl_titleLeadingInset, 0.5);
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(header.titleButton.titleLabel.frame), 16, 0.5, @"The title's leading inset");
+    NSString *expand = header.moreButton.title;
+    header.moreButton.selected = YES;
+    XCTAssertEqualObjects(header.moreButton.title, header.moreButton.collapseTitle);
+    XCTAssertNotEqualObjects(header.moreButton.title, expand);
 }
 
 - (UIViewController *)cyl_hostChild:(UIViewController *)child
@@ -521,7 +527,7 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
         [self scrollAndCheck:collection fixture:fixture buttonKey:@"button"];
         XCTAssertGreaterThan(collection.visibleCells.count, 0u);
         for (UICollectionViewCell *cell in collection.visibleCells) {
-            UIButton *button = [cell valueForKey:@"button"];
+            CYLTagButton *button = [cell valueForKey:@"button"];
             XCTAssertEqualWithAccuracy(button.titleLabel.font.pointSize, largeFont.pointSize, 0.01);
         }
         for (UICollectionReusableView *view in [collection visibleSupplementaryViewsOfKind:UICollectionElementKindSectionHeader]) {
@@ -565,9 +571,9 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
         [self scrollAndCheck:collection fixture:fixture buttonKey:@"titleButton"];
         for (UICollectionViewCell *cell in collection.visibleCells) {
             // VoiceOver: the filter cell is the element, labelled with its title.
-            UIButton *button = [cell valueForKey:@"titleButton"];
+            CYLTagButton *button = [cell valueForKey:@"titleButton"];
             XCTAssertTrue(cell.isAccessibilityElement);
-            XCTAssertEqualObjects(cell.accessibilityLabel, [button titleForState:UIControlStateNormal]);
+            XCTAssertEqualObjects(cell.accessibilityLabel, button.title);
             XCTAssertEqual((BOOL)(cell.accessibilityTraits & UIAccessibilityTraitSelected), button.selected);
         }
         [collection setContentOffset:CGPointMake(0, -collection.contentInset.top) animated:NO];
@@ -576,7 +582,8 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
         XCTAssertGreaterThan(headers.count, 0u);
         for (CYLMultipleFilterHeaderView *header in headers) {
             [header layoutIfNeeded];
-            XCTAssertLessThanOrEqual(CGRectGetMaxX(header.titleLabel.frame), CGRectGetWidth(header.bounds) + 0.5);
+            XCTAssertLessThanOrEqual(CGRectGetMaxX(header.titleButton.frame), CGRectGetWidth(header.bounds) + 0.5);
+            XCTAssertGreaterThan(header.titleButton.title.length, 0u);
         }
         window.hidden = YES;
     }

@@ -119,7 +119,7 @@ open class CYLTagButton: UIControl {
     /**
      * The title.
      */
-    open var title: String? {
+    @objc open var title: String? {
         didSet {
             updateAppearance()
         }
@@ -128,7 +128,7 @@ open class CYLTagButton: UIControl {
     /**
      * The icon.
      */
-    open var image: UIImage? {
+    @objc open var image: UIImage? {
         didSet {
             updateAppearance()
         }
@@ -137,7 +137,7 @@ open class CYLTagButton: UIControl {
     /**
      * Shown while selected; `nil` keeps `image` (as CYLFlatDesignTabBarItem.selectedImage).
      */
-    open var selectedImage: UIImage? {
+    @objc open var selectedImage: UIImage? {
         didSet {
             updateAppearance()
         }
@@ -149,7 +149,7 @@ open class CYLTagButton: UIControl {
      * subspec to the app, e.g. `pod 'CYLTabBarController/Lottie'`. Without it, or when the file cannot be loaded,
      * `image` is shown.
      */
-    open var animationURL: URL? {
+    @objc open var animationURL: URL? {
         didSet {
             if oldValue == animationURL && (animationView != nil || animationURL == nil) {
                 return
@@ -161,7 +161,7 @@ open class CYLTagButton: UIControl {
     /**
      * The frame (0...1) of the animated icon shown while not selected. Default 0, the first frame.
      */
-    open var animationRestingProgress: CGFloat = 0 {
+    @objc open var animationRestingProgress: CGFloat = 0 {
         didSet {
             if oldValue != animationRestingProgress {
                 updateAnimationState()
@@ -185,7 +185,7 @@ open class CYLTagButton: UIControl {
      * `loops` when it has one, and otherwise starts the animation again when its `progress` reaches the end; players
      * with neither (Rive, SVGA, GIF at CYLTabBarController `cfddcce`) play once.
      */
-    open var animationLoops = false {
+    @objc open var animationLoops = false {
         didSet {
             guard oldValue != animationLoops else {
                 return
@@ -214,7 +214,7 @@ open class CYLTagButton: UIControl {
      * android-tagview's deletable tags. False by default. `CYLTagListView` turns it on for deletable items and handles
      * taps on it.
      */
-    open var showsDeleteIndicator = false {
+    @objc open var showsDeleteIndicator = false {
         didSet {
             if oldValue != showsDeleteIndicator {
                 updateAppearance()
@@ -231,7 +231,7 @@ open class CYLTagButton: UIControl {
     /**
      * The style the tag is drawn with. Setting copies it; set it again after changing it.
      */
-    open var style: CYLMenuStyle {
+    @objc open var style: CYLMenuStyle {
         get {
             styleStorage
         }
@@ -302,7 +302,7 @@ open class CYLTagButton: UIControl {
     /**
      * Plays the animated icon from the start, as a tab icon plays when the tab is tapped.
      */
-    open func playAnimation() {
+    @objc open func playAnimation() {
         if UIAccessibility.isReduceMotionEnabled {
             // Reduce Motion: jump to the end state instead of playing.
             updateAnimationState()

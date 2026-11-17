@@ -67,8 +67,9 @@ import UIKit
 // MARK: - Header
 
 /**
- * A section header: an indicator bar, an icon, the title, an accessory view, the fold control and the More button.
- * The tests read `iconView`, `titleLabel` and `foldButton` by key-value coding (`CYLTagListProbe`).
+ * A section header: an indicator bar, the icon and the title (one `CYLTagButton`, `titleButton`), an accessory view,
+ * the fold control and the More button. The tests read `iconView`, `titleLabel` (the title button's own views) and
+ * `foldButton` by key-value coding (`CYLTagListProbe`).
  */
 private final class CYLTagListHeaderView: UICollectionReusableView {
 
@@ -78,8 +79,16 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
     static let moreButtonSize: CGFloat = 44
     static let iconSize: CGFloat = 16
 
-    @objc let iconView = UIImageView()
-    @objc let titleLabel = UILabel()
+    /**
+     * The section's icon and title: the same component as the tags, so a section icon can be anything a tag icon can.
+     */
+    @objc let titleButton = CYLTagButton(frame: .zero)
+    @objc var iconView: UIImageView {
+        titleButton.imageView
+    }
+    @objc var titleLabel: UILabel {
+        titleButton.titleLabel
+    }
     @objc let foldButton = CYLTagFoldButton(frame: .zero)
     /**
      * The More button (three dots) at the trailing edge, hidden unless the data source asks for it.
@@ -125,8 +134,8 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
     }
 
     private func commonInit() {
-        iconView.contentMode = .scaleAspectFit
-        titleLabel.accessibilityTraits = .header
+        titleButton.isUserInteractionEnabled = false
+        titleButton.titleLabel.accessibilityTraits = .header
         foldButton.addTarget(self, action: #selector(foldTapped), for: .touchUpInside)
         moreButton.isHidden = true
         moreButton.accessibilityIdentifier = CYLTagListAccessibilityIdentifier.moreButton
@@ -136,8 +145,7 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         moreButton.addTarget(self, action: #selector(moreTapped), for: .touchUpInside)
         indicatorView.isHidden = true
         addSubview(indicatorView)
-        addSubview(iconView)
-        addSubview(titleLabel)
+        addSubview(titleButton)
         addSubview(foldButton)
         addSubview(moreButton)
     }
@@ -192,14 +200,7 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
                                          width: indicatorSize.width, height: indicatorSize.height)
             x += indicatorSize.width + 8
         }
-        if iconView.image != nil {
-            iconView.frame = CGRect(x: x, y: floor((height - Self.iconSize) / 2), width: Self.iconSize,
-                                    height: Self.iconSize)
-            x += Self.iconSize + 8
-        } else {
-            iconView.frame = .zero
-        }
-        titleLabel.frame = CGRect(x: x, y: 0, width: max(0, trailing - x), height: height)
+        titleButton.frame = CGRect(x: x, y: 0, width: max(0, trailing - x), height: height)
     }
 
     @objc private func moreTapped() {
@@ -2398,6 +2399,21 @@ extension CYLTagListView: UICollectionViewDataSource {
         }
     }
 
+    /**
+     * The look of a section's icon and title: the style's header font and color, a 16 pt icon 8 pt before the title,
+     * at the leading edge.
+     */
+    private func headerTitleStyle() -> CYLMenuStyle {
+        let titleStyle = CYLMenuStyle.sectionTitle(textColor: style.headerTextColor)
+        for state in [UIControl.State.normal, .selected, .disabled] {
+            titleStyle.appearance(for: state).font = style.headerFont
+        }
+        titleStyle.adjustsFontForContentSizeCategory = style.adjustsFontForContentSizeCategory
+        titleStyle.imageSize = CGSize(width: CYLTagListHeaderView.iconSize, height: CYLTagListHeaderView.iconSize)
+        titleStyle.imageTitleSpacing = 8
+        return titleStyle
+    }
+
     private func configureHeader(_ header: CYLTagListHeaderView, section: Int) {
         let source = menuDataSource
         header.section = section
@@ -2405,10 +2421,9 @@ extension CYLTagListView: UICollectionViewDataSource {
         header.indicatorView.isHidden = style.headerIndicatorColor == nil
         header.indicatorView.backgroundColor = style.headerIndicatorColor
         header.indicatorSize = style.headerIndicatorSize
-        header.titleLabel.text = source?.menuTitle(forSection: section)
-        header.titleLabel.font = style.headerFont(for: traitCollection)
-        header.titleLabel.textColor = style.headerTextColor
-        header.iconView.image = source?.menuImage?(forSection: section)
+        header.titleButton.style = headerTitleStyle()
+        header.titleButton.title = source?.menuTitle(forSection: section)
+        header.titleButton.image = source?.menuImage?(forSection: section)
         header.accessoryView = source?.menuAccessoryView?(forSection: section)
         let showsFoldButton = foldControlIsInHeader && canFoldSection(section)
         header.foldButton.isHidden = !showsFoldButton
@@ -2419,8 +2434,7 @@ extension CYLTagListView: UICollectionViewDataSource {
             header.foldSize = foldSize(expanded: expanded)
         }
         // Section titles hidden: the header only holds the fold control.
-        header.titleLabel.isHidden = !showsSectionHeaders
-        header.iconView.isHidden = !showsSectionHeaders
+        header.titleButton.isHidden = !showsSectionHeaders
         header.foldHandler = { [weak self] tappedSection in
             self?.toggleSection(tappedSection)
         }

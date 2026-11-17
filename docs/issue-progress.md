@@ -197,6 +197,40 @@ tags: [issues, ui, cocoapods, progress]
   `.agents/skills/cyl-commit/SKILL.md` (new section), `docs/instructions.md` and `harmony/instructions.md`, all
   appended; `scripts/check-commit-message.sh` checks the subject format, the author line and CJK characters.
 
+### TODO (2026-11-17, `feat/harmony`): every icon + title component is CYLTagButton (iOS done, Android open)
+
+- Prompt (verbatim): "请确保本项目中所有具有如下特征的组件使用的是同一个组件，如果不是相关代码修改内部实现，以保证使用的是同一个组件，方便我重构该组件就可以把修改应用到所有组件上。我的需求是以后新增动效类型，仅需需要修改这个组件，所有需要使用动效展示的组件都可以支持新增动效，无须在第二个地方修改代码。" (followed by the link to `CYLTagButton.swift#L94` and its description).
+- Decision (asked, 2026-11-17): "Replace with CYLTagButton (Recommended)": the public `UIButton` subclasses are
+  replaced, a breaking change documented in `Swift-Migration.md`.
+- Inventory: animation already plays only in `CYLTagButton` (its private `CYLTagAnimationEngine` is the only caller
+  of CYLTabBarController's engine); tags, the list title and the fold control (`CYLTagFoldButton: CYLTagButton`) use
+  it; the examples build no icon + title views of their own. Not yet: `CYLTagListHeaderView` (section headers of
+  `CYLTagListView`, `UIImageView` + `UILabel`), `CYLMultipleFilterHeaderView` (XIB `UIImageView` + `UILabel`),
+  `CYLIndexPathButton` (`UIButton`: classify menu and filter tags, filter header title) and `CYLRightImageButton`
+  (`UIButton`: the classify menu's "更多").
+- Result (not compiled here: Linux, no Xcode; CI builds and tests it):
+  - `CYLIndexPathButton` and `CYLRightImageButton` are `CYLTagButton` subclasses (the names, `section` / `row` and the
+    key-value keys `button` / `titleButton` / `moreButton` kept). Their old `UIButton` looks are `CYLMenuStyle` looks:
+    `classifyMenuTag(_:)`, `filterTag()`, `sectionTitle(fontSize:textColor:leadingInset:)`. The classify menu and the
+    multiple filter measure their cells with the style's font (Bold Text and Dynamic Type included).
+  - `CYLTagListView`'s section header shows its icon and title with one `CYLTagButton` (`titleButton`; `iconView` /
+    `titleLabel` are that button's views, for the tests' key-value coding).
+  - `CYLMultipleFilterHeaderView`'s title is a `CYLTagButton` (`titleButton`); the XIB keeps only the view.
+  - Every icon + title component of the iOS core is now a `CYLTagButton` or holds one, and only `CYLTagButton` plays
+    animated icons: a new kind of animation is added in one place (CYLTabBarController's animator registry, which
+    `CYLTagButton` reads by file extension). Plain text action buttons (Search, Cancel, Manage, 展开/收起 of the
+    TagCollectionView demo) are not tags and stay `UIButton`s.
+  - Tests: `testClassifyMenuButtonsAreTagButtons` (Objective-C) replaces the `UIButton` inset test; the cell checks
+    assert every tag is a `CYLTagButton`; `CYLExampleDatabaseTests` and two header-frame tests updated
+    (`headerTitleFrame(inSection:)` in `CYLTagListInspecting`).
+  - Breaking changes: `Swift-Migration.md`, step 12.
+  - Parity: Android -> iOS 733 / 733 (the two removed spacing properties mapped to the style); iOS -> Android 763 / 771
+    = 99.0: the new looks, `expandTitle` / `collapseTitle`, `CYLMultipleFilterHeaderView.titleButton` and
+    `CYLTagButton.cylApply(_:)` have no Android counterpart yet, because Android's `CYLIndexPathButton`,
+    `CYLRightImageButton` and `CYLMultipleFilterHeaderView` are still `Button` / `ViewGroup`s. TODO: the same refactor
+    in `android/merged/library` (needs an Android build).
+- Status: iOS done; Android TODO.
+
 ### Done (2026-11-17, `feat/harmony`): CYLTagListView members visible to Objective-C
 
 - Prompt (verbatim): "Fix others report issue Still open: the pin bump. This repo still uses the old Nov 12 version of CollectionViewClassifyMenu. Moving to the new one is still blocked: at 652e084, most CYLTagListView members still aren't visible to Objective-C, and our React Native iOS wrapper needs them. The fix is to mark those members @objc in that repo, which I now have access to. Do you want me to do that next?"

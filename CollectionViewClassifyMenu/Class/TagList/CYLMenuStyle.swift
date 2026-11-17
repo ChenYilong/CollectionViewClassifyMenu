@@ -481,6 +481,124 @@ open class CYLMenuStyle: NSObject, NSCopying {
         return style
     }
 
+    // MARK: - Looks of the classify menu and the multiple filter
+
+    /**
+     * A tag of `CYLClassifyMenuViewController`, in one of the looks its tag buttons have had
+     * (`CYLCollectionCellButtonStyle`; `.chengNi`, the default, is a light green capsule that takes the app's tint while
+     * selected or pressed). The tags' title font (`CYLTagMetrics.titleFontSize`, scaled like every tag), the icon 5 pt
+     * before the title, a 4 pt margin at both ends.
+     */
+    open class func classifyMenuTag(_ look: CYLCollectionCellButtonStyle = .chengNi) -> Self {
+        let style = Self.compactTagStyle()
+        let green = UIColor(red: 18 / 255, green: 133 / 255, blue: 117 / 255, alpha: 1)
+        switch look {
+        case .general:
+            for appearance in style.allAppearances {
+                appearance.cornerRadius = 5
+                appearance.backgroundColor = .white
+                appearance.borderWidth = 1
+                appearance.borderColor = .black
+            }
+        case .home:
+            for appearance in style.allAppearances {
+                appearance.textColor = green
+                appearance.borderColor = green
+            }
+            style.selectedAppearance.textColor = green.withAlphaComponent(0.7)
+            style.highlightedBackgroundColor = green
+        case .red:
+            let red = UIColor(red: 160 / 255, green: 15 / 255, blue: 85 / 255, alpha: 1)
+            for appearance in style.allAppearances {
+                appearance.textColor = red
+                appearance.borderColor = red
+            }
+            style.highlightedBackgroundColor = green
+        case .chengNi:
+            let mint = UIColor(red: 230 / 255, green: 255 / 255, blue: 244 / 255, alpha: 1)
+            for appearance in style.allAppearances {
+                appearance.cornerRadius = 13
+                appearance.backgroundColor = mint
+                appearance.textColor = .cylAppTint
+            }
+            style.selectedAppearance.backgroundColor = .cylAppTint
+            style.selectedAppearance.backgroundImage = CYLMenuResources.image(named: "tag_btn_background_highlighted")
+            style.selectedAppearance.textColor = .white
+            style.highlightedBackgroundColor = .cylAppTint
+        }
+        return style
+    }
+
+    /**
+     * A tag of the multiple-choice filter (`CYLMultipleFilterController`): the filter's stretchable slide images as the
+     * normal and selected backgrounds, green titles that turn white when selected, in the tags' title font.
+     */
+    open class func filterTag() -> Self {
+        let style = Self.compactTagStyle()
+        for appearance in style.allAppearances {
+            appearance.backgroundColor = .clear
+            appearance.cornerRadius = CYLTagCornerRadiusSquare
+        }
+        style.normalAppearance.backgroundImage = Self.stretchableImage(named: "btn_slide_normal")
+        style.normalAppearance.textColor = UIColor(red: 96 / 255, green: 147 / 255, blue: 130 / 255, alpha: 1)
+        style.selectedAppearance.backgroundImage = Self.stretchableImage(named: "btn_slide_selected")
+        style.selectedAppearance.textColor = .white
+        return style
+    }
+
+    /**
+     * A section title of a header: no background and no border, the content at the leading edge after `leadingInset`,
+     * an icon 4 pt before the title, in `fontSize` and `textColor`.
+     */
+    open class func sectionTitle(fontSize: CGFloat = 15, textColor: UIColor = .black, leadingInset: CGFloat = 0) -> Self {
+        let style = Self()
+        for appearance in style.allAppearances {
+            appearance.backgroundColor = .clear
+            appearance.borderWidth = 0
+            appearance.borderColor = nil
+            appearance.cornerRadius = CYLTagCornerRadiusSquare
+            appearance.textColor = textColor
+            appearance.font = UIFont.systemFont(ofSize: fontSize)
+            appearance.contentInsets = UIEdgeInsets(top: 0, left: leadingInset, bottom: 0, right: 0)
+        }
+        style.contentAlignment = .leading
+        style.imageSize = CGSize(width: 16, height: 16)
+        style.imageTitleSpacing = 4
+        style.itemHeight = 0
+        style.backgroundColor = .clear
+        return style
+    }
+
+    /**
+     * The tags of the classify menu and the multiple filter: the tags' title font, small end margins, no border.
+     */
+    private class func compactTagStyle() -> Self {
+        let style = Self()
+        let font = UIFont.systemFont(ofSize: CYLTagMetrics.titleFontSize)
+        for appearance in style.allAppearances {
+            appearance.font = font
+            appearance.borderWidth = 0
+            appearance.contentInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
+        }
+        style.imageTitleSpacing = 5
+        style.imageSize = CGSize(width: 16, height: 16)
+        style.itemHeight = 30
+        style.backgroundColor = .clear
+        return style
+    }
+
+    /**
+     * A bundle image stretched from its center, for backgrounds of any size.
+     */
+    private static func stretchableImage(named name: String) -> UIImage? {
+        guard let image = CYLMenuResources.image(named: name) else {
+            return nil
+        }
+        let insets = UIEdgeInsets(top: floor(image.size.height / 2), left: floor(image.size.width / 2),
+                                  bottom: floor(image.size.height / 2), right: floor(image.size.width / 2))
+        return image.resizableImage(withCapInsets: insets, resizingMode: .stretch)
+    }
+
     // MARK: - Appearances
 
     /**

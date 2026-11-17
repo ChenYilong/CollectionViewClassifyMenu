@@ -165,7 +165,7 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
         if kind == UICollectionView.elementKindSectionHeader {
             let view = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind, withReuseIdentifier: "CYLMultipleFilterHeaderView", for: indexPath)
-            (view as? CYLMultipleFilterHeaderView)?.titleLabel.text = menuDataSource?.menuTitle(forSection: indexPath.section)
+            (view as? CYLMultipleFilterHeaderView)?.titleButton.title = menuDataSource?.menuTitle(forSection: indexPath.section)
             return view
         }
         // Only headers have a size, so UIKit never asks for another kind.
@@ -180,9 +180,8 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
         }
         let button = cell.titleButton
         let text = title(at: indexPath)
-        button.setTitle(text, for: .normal)
-        button.setTitle(text, for: .selected)
-        button.titleLabel?.font = tagFont()
+        // A CYLTagButton: its style (CYLMenuStyle.filterTag()) sets the font and the colors.
+        button.title = text
         button.isSelected = isSelected(at: indexPath)
         button.section = indexPath.section
         button.row = indexPath.row
@@ -266,8 +265,12 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
             && selection[indexPath.section][indexPath.row]
     }
 
+    /**
+     * The tags' title font, as the tags draw it (`CYLMenuStyle.filterTag()`, Bold Text and Dynamic Type included), so a
+     * measured cell fits its title.
+     */
     private func tagFont() -> UIFont {
-        CYLTagMetrics.titleFont(for: collectionView?.traitCollection ?? traitCollection)
+        CYLMenuStyle.filterTag().titleFont(for: .normal, traitCollection: collectionView?.traitCollection ?? traitCollection)
     }
 
     private func limitedCellWidth(_ cellWidth: CGFloat) -> CGFloat {

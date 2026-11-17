@@ -15,7 +15,7 @@ public protocol CYLFilterHeaderViewDelegate: AnyObject {
     /**
      * The "more" button of `headerView` was tapped; it is passed so the delegate can toggle its selection.
      */
-    func filterHeaderView(_ headerView: CYLFilterHeaderView, didTapMoreButton moreButton: UIButton)
+    func filterHeaderView(_ headerView: CYLFilterHeaderView, didTapMoreButton moreButton: CYLRightImageButton)
 }
 
 /**
@@ -35,15 +35,17 @@ open class CYLFilterHeaderView: UICollectionReusableView {
         static let moreButtonWidth: CGFloat = 72
         static let separatorHeight: CGFloat = 0.5
         static let separatorInset: CGFloat = 16
+        static let titleLeadingInset: CGFloat = 16
     }
 
     /**
-     * The section's title (and image). (Objective-C name kept for the core's tests.)
+     * The section's title (and image): a `CYLTagButton` in `CYLMenuStyle.sectionTitle(leadingInset: 16)`. (Objective-C
+     * name kept for the core's tests.)
      */
     @objc public let titleButton = CYLIndexPathButton(frame: .zero)
 
     /**
-     * Expands or folds the section; hidden by default. (Objective-C name kept for the core's tests.)
+     * Expands or folds the section (a `CYLTagButton`); hidden by default. (Objective-C name kept for the core's tests.)
      */
     @objc public let moreButton = CYLRightImageButton(frame: .zero)
 
@@ -69,21 +71,11 @@ open class CYLFilterHeaderView: UICollectionReusableView {
         addSubview(separator)
         backgroundColor = .white
 
-        titleButton.titleLeadingInset = 16
-        titleButton.contentHorizontalAlignment = .left
+        titleButton.style = CYLMenuStyle.sectionTitle(leadingInset: Metric.titleLeadingInset)
         titleButton.frame = CGRect(x: 16, y: 0, width: Metric.titleButtonWidth, height: bounds.height)
-        titleButton.titleLabel?.textAlignment = .left
-        titleButton.setTitleColor(.black, for: .normal)
-        titleButton.setTitleColor(.black, for: .selected)
         addSubview(titleButton)
 
-        moreButton.setImage(CYLMenuResources.image(named: "home_btn_more_normal"), for: .normal)
-        moreButton.setImage(CYLMenuResources.image(named: "home_btn_more_selected"), for: .selected)
-        moreButton.setTitleColor(.black, for: .normal)
-        moreButton.setTitleColor(.black, for: .selected)
-        moreButton.setTitle(CYLMenuLocalizedString("CYLMenuExpand"), for: .normal)
-        moreButton.setTitle(CYLMenuLocalizedString("CYLMenuCollapse"), for: .selected)
-        moreButton.titleLabel?.textAlignment = .right
+        // The title, arrow and their looks are CYLRightImageButton's own.
         moreButton.isHidden = true
         moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
         addSubview(moreButton)
