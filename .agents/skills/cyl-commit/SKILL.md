@@ -14,6 +14,8 @@ description: Commit message format for CollectionViewClassifyMenu (Conventional 
 3. Do the task. Commit the entry with the first commit of the task, so it survives an interruption.
 4. When the task is finished, mark the entry done and add the result and its evidence (commits, test counts,
    screenshots).
+5. The entry also holds the acceptance scoring criteria (full marks and pass), the score and why it is not full marks;
+   the missing points are printed as `TODO` at the end of the session. See `.agents/skills/cyl-task-start/`.
 
 ## Fix issues in the core first
 
