@@ -1,0 +1,72 @@
+# CYLAnimatedItem migration: progress against the guide
+
+The guide: CYLTabBarController's
+[docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)
+(branch `feat/cross-platform-components`, read at `e3ebc242`, 2026-11-17). It asks this repository to make its icon + title
+component, `CYLTagButton`, a subclass of the shared `CYLAnimatedItemView` (row "CollectionViewClassifyMenu" of "Migrating
+the four repositories"), with the core depending on `CYLAnimatedItem` and on no animation engine; only the examples add
+engines. Every icon + title view of this repository is already a `CYLTagButton` (`CYLIndexPathButton`,
+`CYLRightImageButton`, the section headers, the search bar items of CYLSearchViewController), so one class carries the
+migration on each platform.
+
+Related logs: [component-architecture.md](component-architecture.md) (the task entries, newest at the end),
+[issue-progress.md](issue-progress.md), [example-layer-fixes.md](example-layer-fixes.md).
+
+## Task log
+
+- **TODO → DONE (2026-11-17)**: report the progress against the guide and mark progress and TODOs in this repository.
+  - **Prompt (verbatim)**: "告诉我 你遵循文档改造的进度，并在本仓库合适地方标注进度以及todo。这个文档是与动效组件相关的。告诉我 你遵循文档改造的进度https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md"
+  - **Prompt (English)**: "Tell me your progress following the document's migration, and mark the progress and TODOs in a suitable place in
+    this repository. The document is about the animation component."
+  - **Result**: this document (the table, the score and the TODO list below), linked from `component-architecture.md` and
+    `issue-progress.md`.
+
+## Score
+
+**Score: 72** (18 of 25 rows done; a row counts only when it is done and verified as far as this environment allows).
+
+| Date | Score | Note |
+|:---|:---|:---|
+| 2026-11-17 | 72 | First assessment, at `d979073` (pins `57a527e`; CYLTabBarController PR #815 open) |
+
+## Progress by guide item
+
+| # | Guide item | Platform | Status | Evidence / what is left |
+|:---|:---|:---|:---|:---|
+| 1 | `CYLTagButton` subclasses `CYLAnimatedItemView` | iOS | Done | `CYLTagButton.swift:44` (`1813025`) |
+| 2 | Delete `CYLTagAnimationEngine` (run-time engine lookup) | iOS | Done | no occurrence left in the sources |
+| 3 | Icon, title and animation properties are the inherited ones | iOS | Done | `1813025`; Objective-C sees them through redeclarations (`d3efc5f`) |
+| 4 | Delete indicator → `accessoryView` / `accessoryPlacement` | iOS | Done | `CYLTagButton.swift:260`, `:320` |
+| 5 | Per-state look in `itemStateDidChange` | iOS | Done | `CYLTagButton.swift:578` |
+| 6 | Static measuring stays in the subclass (`width(forTitle:…)`) | iOS | Done | kept in `CYLTagButton` |
+| 7 | Podspec depends on `CYLAnimatedItem` only, no engine | iOS | Done | `CollectionViewClassifyMenu.podspec:46`; `pod lib lint` green (CI on `71562ca`) |
+| 8 | Examples add `CYLAnimatedItem/<Type>` by `:git` + `:commit` | iOS | Done | `Example/Podfile` (LottieObjectiveC, PAG, Rive, SVGA, GIF), `CYL_ANIMATED_ITEM` = `57a527e` |
+| 9 | `import CYLAnimatedItem`, never CYLTabBarController, in the core | iOS | Done | `CYLTagButton.swift:24` (`@_exported`; falls back to `CYLTabBarController` only under SwiftPM, row 11) |
+| 10 | Several engines: the example reports which are linked (multi-engine section) | iOS | Done | `CYLTagAnimationDemoViewController.engineReportLines()` (`b4d0e51`), test `testEveryLinkedEngineIsRegisteredAndListed` |
+| 11 | Swift Package Manager: a separate `CYLAnimatedItem` product | iOS | TODO (upstream) | the guide's TODO 9: upstream SwiftPM still compiles the component into the `CYLTabBarController` product; owner's decision: "CocoaPods/Gradle now, SPM later" |
+| 12 | Static-library demo app (`CollectionViewClassifyMenu.xcodeproj`) compiles | iOS | TODO (CI) | "overridable members that could not be loaded": `@_exported import` (`b15b822`) plus the demo's own `import CYLAnimatedItem` (`880d9b1`); the menu unit tests have not finished in CI since (run 44037489477 queued) |
+| 13 | Full iOS CI green (menu, example, swift tests, screenshots) | iOS | TODO (CI) | `pod lib lint` and tag tests green; the rest was cancelled by later pushes (push freeze agreed until run 44037489477 ends) |
+| 14 | `CYLTagButton` subclasses `CYLAnimatedItemView`, `onItemStateChanged`, `accessoryPlacement` | Android | Done | `android/merged/library/.../CYLTagButton.kt:44`, `:261`, `:364` |
+| 15 | Depend on `cyltabbarcontroller-animateditem`, `:cylanimateditem` substitution by commit | Android | Done | `library/build.gradle.kts:41`, `settings.gradle.kts:69` |
+| 16 | Tag button on `CYLAnimatedItemView` (`cylanimateditem`, `file:` at the pinned commit) | HarmonyOS | Done (code) | `1a8a80b` (other session): vendored `harmony/cylanimateditem`, engines moved to the example |
+| 17 | HarmonyOS build and device check | HarmonyOS | TODO | no DevEco Studio / `hvigorw` here (`harmony/README.md`) |
+| 18 | Tags on `cyl-animated-item` (copied at the pinned commit), engines as abstract nodes | Mini Program | Done | `62fce9b` (other session); `npm test` |
+| 19 | GIF stills and one-pass play, `embedded`, `autoplay` in the mini program tags | Mini Program | TODO (upstream merge) | needs CYLTabBarController [PR #815](https://github.com/ChenYilong/CYLTabBarController/pull/815) (this session: `fe1978e0`, `3602ae67`, `ca6219a9`, `b51ac0ae`, `dc142479`; `npm test` 36); at `57a527e` a GIF tag loops with no stills and Play all cannot restart it |
+| 20 | WeChat DevTools / device check | Mini Program | TODO | WeChat DevTools cannot run here |
+| 21 | Example Podfiles name `CYLAnimatedItem` (+ engines) | Flutter, React Native (iOS) | Done | `flutter/cyl_tag_list/example/ios/Podfile:40`, React Native example Podfile (`modular_headers`, `27c0394`) |
+| 22 | Android source builds compile `:cylanimateditem` | Flutter, React Native (Android) | TODO (verify) | they consume `com.cyl:classifymenu` from the merged library's local repository; a build with their toolchains is still to run |
+| 23 | License notice in every published package | All | Done | `scripts/check-licenses.sh` OK (vendored `cyl-animated-item` / `cylanimateditem` keep their LICENSE) |
+| 24 | Pins: newest CYLTabBarController commit, by `:commit` | All | Done | `57a527e` everywhere; `scripts/cyl-tabbar-latest-commit.sh` now lists PR #815's tip (unmerged, CI only warns): move to its merge commit |
+| 25 | No regression: Play all, speed, loop on every animation screen | All | Done (iOS, Android) | docs/example-demo-rules.md; mini program GIF waits for row 19 |
+
+## TODO (in order)
+
+1. **CI**: let run 44037489477 (`d979073`) finish (push freeze); then rows 12 and 13 (demo app, menu / example / swift
+   tests, screenshots of the engine report screen into `docs/assets/`).
+2. **Upstream merge of PR #815** (owner): then pins → the merge commit in this repository and CYLSearchViewController, and
+   the mini program tags pass `gif-first-frame` / `gif-last-frame` / `gif-duration`, `embedded`, `autoplay` (row 19;
+   agreed to be done by the CollectionViewClassifyMenu/CYLSearchViewController session).
+3. **SwiftPM** (row 11): when CYLTabBarController ships a `CYLAnimatedItem` product, depend on it instead of
+   `CYLTabBarController` in `Package.swift`.
+4. **Toolchain checks not possible here**: HarmonyOS build (row 17), WeChat DevTools (row 20), Flutter and React Native
+   Android builds (row 22).
