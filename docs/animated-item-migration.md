@@ -313,3 +313,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   build folder) and `915bddbd` (iOS GIF tab images rest until played; only `CYLTabBarController.m` changes for iOS,
   and this repository's tab bars use no GIF images). Menu 32, tag 6, example 92, swift 22 tests, 0 failures, iPhone 17
   Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3. All platforms at `ad3dca0e` (Android and mini program: `70a6426`).
+
+## TODO (2026-11-18, `feat/harmony`): re-check pins
+
+- **Prompt (verbatim)**: "re-check pins"
+- **English**: move the iOS pins to CYLTabBarController's newest commit and re-test.
+- **Plan**: newest is `70064275` (`scripts/cyl-tabbar-latest-commit.sh` over all branches; Android and mini program at
+  `f84c1073`, `bbe8ea7`). iOS changes since `ad3dca0e`: `dab6d91d` (Rive rest pauses the controller), `f84c1073` (Rive
+  held input on slow devices), `d733c80e` (opt-in `tint` option for Rive tab icons). Move the iOS pins, pod install,
+  run the four iOS suites, re-check that the Rive tags rest until played and then play and loop (stitched, labeled
+  screenshot), and ask the Windows session to move Android and the mini program to the same commit.
