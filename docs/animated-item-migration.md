@@ -140,6 +140,16 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    steps), `assets/miniprogram-devtools-rive-house-number-input.png`; mini program tests 138, React Native typecheck, lint and
    Jest 3, Flutter analyze pass. iOS: the Mac session. **B20 is done on iOS and the mini program; Android and HarmonyOS keep
    the number input as a CYLTabBarController TODO.**
+   **Pins at `6a9ede85`** (CYLTabBarController: Android and HarmonyOS `numberInput` / `values` `3f262501`, `cyl-rive`
+   exports `CYL_RIVE_OPTION_NAMES` `a10cdffc`; the mini program adapter now `require`s that list, the copy is gone).
+   Windows: Android core tests and publish, React Native APK (after cleaning the bridge module's stale Kotlin incremental
+   build: "Unresolved reference cyl_badgeCenterOffset" / "Cannot access internal class" came from the previous pin's
+   classes), Flutter integration tests 2 of 2, mini program 138, React Native Jest 3. React Native example on the Android
+   emulator, loop on, Play all, 12 s (`assets/react-native-android-rive-b20-after-6a9ede85.png`), changed pixels per icon:
+   Home [101, 93, 122, 64, 216, 102, 109] (the house changes as `Rooms` steps), Done [151, 38, 113, 163, 33, 134, 78],
+   Menu [205, 0, 209, 209, 0, 28, 28], Lottie loops. WeChat DevTools: Home [29, 16, 37, 51, 18, 40, 40], Done, Shapes,
+   Timer and Me move. **B20: done on iOS, Android (React Native, Flutter) and the mini program**; HarmonyOS builds
+   (CYLTabBarController), its emulator check is TODO there.
    **iOS run (2026-11-18, Mac session, `689096f`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
    Pro, iOS 27.2), pins `fe5c3ae`, English, launched with `-CYLExampleScreen animations-rive-loop` (new: scrolls to the
    Rive section, loop on, Play all); frames 4–14 s after Play all (`assets/ios-rive-b20-frames.jpeg`, first frame
