@@ -16,10 +16,15 @@
 
 // CocoaPods: the CYLAnimatedItem pod. Swift Package Manager still compiles the component into the CYLTabBarController
 // module (CYLTabBarController's docs/Animated-Item.md, TODO 9).
+// Re-exported, as CYLTabBarController re-exports it: CYLTagButton and its subclasses (CYLIndexPathButton,
+// CYLRightImageButton) are CYLAnimatedItemViews in this module's public API, so a client that imports only
+// CollectionViewClassifyMenu must load the base class's module too. Without the re-export an app target that never
+// imports CYLAnimatedItem itself failed with explicit modules: "cannot inherit from class
+// 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded" (CI on b4d0e51).
 #if canImport(CYLAnimatedItem)
-import CYLAnimatedItem
+@_exported import CYLAnimatedItem
 #else
-import CYLTabBarController
+@_exported import CYLTabBarController
 #endif
 import UIKit
 
