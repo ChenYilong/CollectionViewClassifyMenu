@@ -30,7 +30,16 @@ const configuration = {
     },
     {
       title: 'Rive · pod CYLTabBarController/Rive',
-      items: [animated('Home', 'house.riv'), animated('Done', 'check.riv'), animated('Menu', 'menu_button.riv')],
+      items: [
+        // Rive state machines and inputs, as on the other platforms: without them the player drives the default input
+        // "active", which these files do not have, so nothing plays.
+        { ...animated('Home', 'house.riv'), animationOptions: { stateMachine: 'State Machine 1' } },
+        { ...animated('Done', 'check.riv'), animationOptions: { stateMachine: 'State Machine 1', triggerInput: 'Check' } },
+        {
+          ...animated('Menu', 'menu_button.riv'),
+          animationOptions: { stateMachine: 'State Machine', input: 'isOpen', duration: '0' },
+        },
+      ],
     },
     {
       title: 'Tags',
