@@ -266,7 +266,8 @@ tags: [issues, ui, cocoapods, progress]
   string `"列表"` (en, zh-Hant). Limit, stated honestly: like Rive, CYLTabBarController's SVGA player has no
   `animationSpeed`, `loops` or `progress`, so SVGA icons play once at the file's own speed. The speed slider and the loop
   switch do not change them. That needs CYLTabBarController's view player to expose them (SVGAPlayer has `loops`), not
-  an example workaround. Not compiled here (Linux, no Xcode). Other platforms: HarmonyOS done (D5); Android, Flutter,
+  an example workaround. Not compiled here (Linux, no Xcode). CI on `ec52480`: `CYLTagConfigurationTests` still counted five tags in the dictionary demo
+  (the SVGA tag made six); the test now counts six and reads the image and string items from the end. Other platforms: HarmonyOS done (D5); Android, Flutter,
   React Native and Mini Program are still TODO.
 
 - TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):
