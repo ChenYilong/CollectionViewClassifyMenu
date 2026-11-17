@@ -110,11 +110,29 @@ for (i, (caption, _)) in panels.enumerated() {
              operation: .copy, fraction: 1, respectFlipped: false, hints: [.interpolation: NSImageInterpolation.none.rawValue])
 }
 NSGraphicsContext.restoreGraphicsState()
-// The header and footer go into the PNG ("Description", starting with "cyl-stitch-screenshots"), which
-// scripts/check-screenshots.py reads before a commit and in CI.
+// The header and footer go into the PNG as an iTXt chunk with the keyword "Description" (UTF-8, starting with
+// "cyl-stitch-screenshots"), which scripts/check-screenshots.py reads before a commit and in CI. ImageIO's
+// kCGImagePropertyPNGDescription is not used: on macOS 27 it is written into XMP, not into a text chunk, so the
+// check (Pillow's `image.info["Description"]`) did not find it.
 let description = (["cyl-stitch-screenshots"] + header + footer).joined(separator: "\n")
-let destination = CGImageDestinationCreateWithURL(URL(fileURLWithPath: out) as CFURL, "public.png" as CFString, 1, nil)!
-CGImageDestinationAddImage(destination, rep.cgImage!,
-                           [kCGImagePropertyPNGDictionary: [kCGImagePropertyPNGDescription: description]] as CFDictionary)
-precondition(CGImageDestinationFinalize(destination), "cannot write \(out)")
+func crc32(_ bytes: [UInt8]) -> UInt32 {
+    var crc: UInt32 = 0xFFFF_FFFF
+    for byte in bytes {
+        crc ^= UInt32(byte)
+        for _ in 0..<8 { crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB8_8320 : crc >> 1 }
+    }
+    return ~crc
+}
+func bigEndian(_ value: UInt32) -> [UInt8] { [24, 16, 8, 0].map { UInt8((value >> UInt32($0)) & 0xFF) } }
+var png = [UInt8](rep.representation(using: .png, properties: [:])!)
+// iTXt: keyword, NUL, compression flag 0, method 0, empty language tag, NUL, empty translated keyword, NUL, text.
+let body = [UInt8]("Description".utf8) + [0, 0, 0, 0, 0] + [UInt8](description.utf8)
+let typed = [UInt8]("iTXt".utf8) + body
+let chunk = bigEndian(UInt32(body.count)) + typed + bigEndian(crc32(typed))
+// Right after IHDR (8-byte signature + 25-byte IHDR chunk), before the image data: readers that stop at the first
+// IDAT (Pillow's Image.open before load()) still find it.
+let afterIHDR = 8 + 25
+precondition(Array(png[12..<16]) == [UInt8]("IHDR".utf8), "unexpected PNG layout")
+png.insert(contentsOf: chunk, at: afterIHDR)
+try! Data(png).write(to: URL(fileURLWithPath: out))
 print("\(out): \(Int(width)) x \(Int(total)) px, \(cols) columns x \(rows) rows")
