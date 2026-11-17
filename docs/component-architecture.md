@@ -290,3 +290,6 @@ declarations, so Objective-C callers see no change.
   newer `47aec88` ("report registered and missing animation engines", 05:25 UTC) is on the merged PR's branch
   `fix/lottie-unplayable-file`, not in #788, and lacks the license notices: not pinned until it is merged into #788.
   The `:modular_headers => true` workarounds stay until CI on this pin passes (`9a54e26` sets `DEFINES_MODULE`).
+- **Pin `0a63bed`** (2026-11-17): the #788 tip and the newest commit on any branch: the engine report (`1e53d7a`,
+  formerly `47aec88`) and license notices on top of the #814 merge `9a54e26`. Both #814 fixes are kept
+  (`DEFINES_MODULE`, `CYLTabBarItemAnimationURLMayBeLottie`).
