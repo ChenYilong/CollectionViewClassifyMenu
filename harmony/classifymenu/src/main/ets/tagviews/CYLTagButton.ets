@@ -971,8 +971,9 @@ export struct CYLTagButtonComponent {
           .position({ x: this.part(this.iv()).x, y: this.part(this.iv()).y })
           .fillColor(this.iv().tintColor)
           // Bitmaps too, when the style sets an icon color (see `tintsImage`): an orange PNG on an orange selected tag
-          // stayed orange and invisible (HarmonyOS issue Y2).
-          .colorFilter(this.iv().tintsImage ? CYLColor.tintFilter(this.iv().tintColor) : CYLColor.IDENTITY_FILTER)
+          // stayed orange and invisible (HarmonyOS issue Y2). A drawing color filter (`ColorFilter`) applies to every
+          // image source; the matrix form had no effect after `fillColor` on the emulator.
+          .colorFilter(new ColorFilter(this.iv().tintsImage ? CYLColor.tintFilter(this.iv().tintColor) : CYLColor.IDENTITY_FILTER))
           .objectFit(this.iv().cornerRadius > 0 ? ImageFit.Cover : ImageFit.Contain)
           .borderRadius(this.iv().cornerRadius)
           .clip(this.iv().cornerRadius > 0)

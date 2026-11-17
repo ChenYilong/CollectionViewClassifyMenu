@@ -30,6 +30,10 @@ accessibility description, then an id), to tap, to drive complex flows and to ch
 - Record every example-layer fix in `docs/example-layer-fixes.md` (issue, files, why not in the core) and mention it in
   the issue's progress-table row. Full rule: AGENTS.md "Fix issues in the core first".
 
+## Bugs: record, screenshot, fix upstream
+
+- Bugs (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated item"): record first, then screenshot, then fix; animation and icon + title bugs are fixed in CYLTabBarController's animated item component, not in the examples; a demo that needs more gets a new component API from CYLTabBarController.
+
 ## Accessibility
 
 - `accessibilityText` (localized) on every control; `accessibilityDescription` when it helps;
