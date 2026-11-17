@@ -264,6 +264,30 @@ tags: [issues, ui, cocoapods, progress]
   block; it does not simulate a tap (the tap path is private), so the call from `handleTap` is checked only by
   reading it.
 
+### TODO (2026-11-17, `feat/harmony`): `CYLTagButton` draws a search bar item on HarmonyOS and in the mini program
+
+- Prompt (relayed by the CYLSearchViewController session, same user goal as the entry below): every icon + title /
+  animated icon of CYLSearchViewController must be this repository's `CYLTagButton`; iOS and Android are done there.
+  What blocks HarmonyOS and the mini program (CYLSearchViewController `docs/animated-icon-component.md`, step 2) must
+  be fixed here, in the core, first.
+- Context: the HarmonyOS search bar items use system symbols (`$r('sys.symbol.camera')`, drawn with `SymbolGlyph`),
+  theme colors (`ResourceColor`, `$r('sys.color.font_primary')`) and an ArkUI V2 (`@ComponentV2`) parent; the ArkTS
+  `CYLTagButton` drew icons only with `Image`, took string colors, was a V1 `@Component` with an `@ObjectLink`, and
+  pinned `@ohos/lottie 2.0.38` / `@tencent/libpag 4.4.31` while CYLTableViewPlaceHolder's `cylplaceholder` pins
+  `2.0.28` / `4.5.102`. The mini program `cyl-tag-button` could not be transparent: `opaqueBackground` turns
+  `transparent` and alpha 0 into `#F2F2F7`.
+- Requirements:
+  1. HarmonyOS `CYLTagButton`: `sys.symbol` icons drawn with `SymbolGlyph` (the icon color per state as its font
+     color), `Image` kept for pixel images, rawfiles and pixel maps;
+  2. its colors (title, icon, background, border, badge) accept `ResourceColor` (theme resources that follow the
+     color mode), not only strings;
+  3. usable from an ArkUI V2 parent, following the V1 / V2 bridge already used by CYLSearchViewController (a V1 host
+     that holds the model as `@State`);
+  4. the animation library versions aligned with `cylplaceholder`, so one app can depend on both;
+  5. mini program `cyl-tag-button`: a transparent background possible, the tag list defaults unchanged;
+  6. tests (mini program `npm test`, the Linux checks), docs, this entry done.
+- Status: started.
+
 ### DONE (2026-11-17, `feat/harmony`, logged as TODO in `1e43253`): `CYLTagButton` as the one icon + title + animated icon component
 
 - Prompt (relayed by the CYLSearchViewController session; the user's goal, quoted in that repository's task log):
