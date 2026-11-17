@@ -35,6 +35,24 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-18, `feat/harmony`): the screenshot label rules are enforced
+
+- Prompt (verbatim): "检查为什么没有应用新增的截图Label规范，并强化该策略保证以后截图必须遵循该规范，避免再出现该问题。"
+- Cause: AGENTS.md "Screenshots: enforced" (the four Windows images of 09:54-11:03 predate the header / footer rules of
+  11:06 and 11:10, which no session was told to re-read; they also broke the older "labels" and "quality" rules
+  because there was no stitch tool on Windows and nothing checked an image before a commit).
+- Acceptance criteria: 100 = cause found and written down (15), a stitch tool for every host that refuses an
+  incomplete label (25), a check before every commit (20) and in CI (15), the rules and skills updated (10), the four
+  images restitched (15). Pass: 60.
+- Result: **85/100**. `scripts/stitch-screenshots.py` (new, any host) and `scripts/stitch-screenshots.swift` (now
+  refuses an incomplete label and writes it into the PNG), `scripts/check-screenshots.py` (new; run by
+  `scripts/check-branch-pr.sh`, exit 3) and `.github/workflows/screenshot-labels.yml` (new); AGENTS.md "Screenshots:
+  enforced", `cyl-screenshots` and `cyl-commit` updated; the four images restitched (header, captions, footer, original
+  pixels). -10: the Swift change is not compiled here (no macOS; asked the Mac session to run it); -5: older images
+  committed before the check (for example `miniprogram-devtools-rive-house-number-input.png`, the
+  `react-native-android-*` and `miniprogram-devtools-rive-b20-*` sets) are not restitched; the check only covers images
+  added or changed from now on.
+
 ### Done (2026-11-18, `feat/harmony`): Rive tags rest until played in the mini program (CYLTabBarController `ff2e7a22`)
 
 - Request (Mac-CYLTabBarController session, for the owner's decision "every animated tab icon rests until it is played"):

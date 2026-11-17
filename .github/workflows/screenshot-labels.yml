@@ -1,0 +1,41 @@
+# [EN] Every screenshot a pull request adds or changes in docs/assets/ or assets/ is stitched and labeled by the rules of
+#      AGENTS.md "CI/CD and Example screenshots" (header: Purpose, Platform, Host, IDE; a caption per panel; footer:
+#      Result, Versions, Taken), checked by scripts/check-screenshots.py.
+# [CN] 拉取请求在 docs/assets/ 或 assets/ 中新增或修改的每张截图都须按 AGENTS.md “CI/CD and Example screenshots” 的规则拼接并标注
+#      （页眉：Purpose、Platform、Host、IDE；每个面板一个标题；页脚：Result、Versions、Taken），由 scripts/check-screenshots.py 检查。
+name: Screenshot labels
+
+on:
+  pull_request:
+    paths:
+      - 'docs/assets/**'
+      - 'assets/**'
+      - 'scripts/check-screenshots.py'
+      - 'scripts/screenshot-check-exempt.txt'
+      - '.github/workflows/screenshot-labels.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Screenshots are stitched and labeled
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow
+      - name: Check the screenshots this pull request adds or changes
+        # [EN] Images committed before the check existed are not checked: the range starts at the commit that added it,
+        #      when that commit is newer than the base. [CN] 检查加入之前提交的图片不在检查范围内：范围从加入检查的提交开始（若它比基准更新）。
+        run: |
+          base="origin/${{ github.base_ref }}"
+          added=$(git log --diff-filter=A --format=%H -- scripts/check-screenshots.py | tail -1)
+          start=$(git merge-base "$base" HEAD)
+          if [ -n "$added" ] && ! git merge-base --is-ancestor "$added" "$start"; then start="$added^"; fi
+          python3 scripts/check-screenshots.py --range "$start..HEAD"

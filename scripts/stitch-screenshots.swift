@@ -1,4 +1,4 @@
-// Usage: swift scripts/stitch-screenshots.swift --out <file.png> [--columns auto|1|2] [--crop x,y,w,h]
+// Usage (macOS; on any host: scripts/stitch-screenshots.py, same arguments): swift scripts/stitch-screenshots.swift --out <file.png> [--columns auto|1|2] [--crop x,y,w,h]
 //            --header <line> [--header <line> ...] --footer <line> [--footer <line> ...]
 //            "<caption>::<image>" ["<caption>::<image>" ...]
 //
@@ -10,6 +10,7 @@
 // every band has its own space. The panels keep their original pixels (no scaling); `--crop` (pixels, top-left origin)
 // cuts the same rectangle out of every image, so crop to whole elements. Output: PNG.
 import AppKit
+import ImageIO
 
 var out = "", columns = 0, crop: CGRect? = nil  // columns 0: auto
 var header: [String] = [], footer: [String] = [], panels: [(String, String)] = []
@@ -33,6 +34,14 @@ while !args.isEmpty {
 }
 precondition(!out.isEmpty && !panels.isEmpty, "--out and at least one panel are required")
 precondition(!header.isEmpty && !footer.isEmpty, "a header and a footer are required")
+// The label is required (AGENTS.md "Screenshots: header and footer"); scripts/check-screenshots.py checks it again.
+for field in ["Purpose:", "Platform:", "Host:", "IDE:"] where !header.joined(separator: "\n").contains(field) {
+    fatalError("the header lacks \(field)")
+}
+for field in ["Result:", "Versions:", "Taken:"] where !footer.joined(separator: "\n").contains(field) {
+    fatalError("the footer lacks \(field)")
+}
+precondition(panels.allSatisfy { !$0.0.trimmingCharacters(in: .whitespaces).isEmpty }, "every panel needs a caption")
 
 let images: [NSBitmapImageRep] = panels.map {
     guard let rep = NSBitmapImageRep(data: try! Data(contentsOf: URL(fileURLWithPath: $0.1))) else {
@@ -101,5 +110,11 @@ for (i, (caption, _)) in panels.enumerated() {
              operation: .copy, fraction: 1, respectFlipped: false, hints: [.interpolation: NSImageInterpolation.none.rawValue])
 }
 NSGraphicsContext.restoreGraphicsState()
-try! rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: out))
+// The header and footer go into the PNG ("Description", starting with "cyl-stitch-screenshots"), which
+// scripts/check-screenshots.py reads before a commit and in CI.
+let description = (["cyl-stitch-screenshots"] + header + footer).joined(separator: "\n")
+let destination = CGImageDestinationCreateWithURL(URL(fileURLWithPath: out) as CFURL, "public.png" as CFString, 1, nil)!
+CGImageDestinationAddImage(destination, rep.cgImage!,
+                           [kCGImagePropertyPNGDictionary: [kCGImagePropertyPNGDescription: description]] as CFDictionary)
+precondition(CGImageDestinationFinalize(destination), "cannot write \(out)")
 print("\(out): \(Int(width)) x \(Int(total)) px, \(cols) columns x \(rows) rows")

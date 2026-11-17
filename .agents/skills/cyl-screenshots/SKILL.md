@@ -67,3 +67,4 @@ swift scripts/stitch-screenshots.swift --out docs/assets/<name>.png [--columns a
 3. Captions above every panel; footer: result, versions, time taken with time zone.
 4. Nothing overlaps a panel; all text in English; original pixels.
 5. Saved in `docs/assets/` (English, lowercase, hyphens), shown in the related document with a table row or caption.
+6. Made by `scripts/stitch-screenshots.py` / `.swift` (never by hand); `python3 scripts/check-screenshots.py` passes.
