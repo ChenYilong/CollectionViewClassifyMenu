@@ -252,7 +252,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   isStateMachine = true, settleInitialState = false)`; cylanimateditem 40 / 40 on a fake view): still failing. At rest every
   tag is still; Loop on: every other Rive tag moves (Shapes 259-545, Search 82-1041, Alerts 331-926 …) and **Menu is 0 in 15
   frame pairs**, the hamburger after the first play (`docs/assets/android-rive-menu-stuck-ad3dca0e.png`). Menu's options:
-  `stateMachine=State Machine`, `input=isOpen`, `duration=0`, so the named-machine resume path ran. Still TODO upstream.
+  `stateMachine=State Machine`, `input=isOpen`, `duration=0`, so the named-machine resume path ran. Still TODO upstream. **`dab6d91d` (2026-11-18)** (pause only the file controller): still 0 in 39 frame pairs
+  (about 12 s, loop every 1.5 s). Diagnostics on a local copy of the upstream checkout (restored afterwards): a log shows
+  `getController()` found and paused; with no pause at all Menu still stops, so the pause is not the cause here; with
+  `NEXT_FRAME_MS` raised from 50 to 300 ms Menu turns on every pass (227-521 changed pixels per pass). **Cause**: each
+  play sets `isOpen` false and, 50 ms later, true (`duration=0`); on this x86_64 emulator a rendered frame can take longer
+  than 50 ms, so the state machine never sees the false (the mini program's B20 had the same same-frame cause). Fix
+  belongs upstream: wait until the machine has advanced with the false (a frame callback) or a longer gap. Still TODO.
 - **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
   `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
   tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still
