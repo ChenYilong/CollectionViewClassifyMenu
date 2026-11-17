@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 761 / 761 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 762 / 762 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -435,6 +435,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTag -initWithIdentifier:title:backgroundColor:` | method, `CYLTag.swift` | `CYLTag(identifier, title, backgroundColor: Int?)` |
 | `CYLTag -initWithIdentifier:title:backgroundColorHex:` | method, `CYLTag.swift` | `CYLTag(identifier, title, backgroundColorHex: String?)` |
 | `CYLTag.colors` | property, `CYLTag.swift` | `CYLTag.colors` |
+| `CYLTag -resetColors` | method, `CYLTag.swift` | `CYLTag.resetColors` |
 | `CYLTag.hasCustomStyle` | property, `CYLTag.swift` | `CYLTag.hasCustomStyle` |
 | `CYLTag -styleWithBasedOn:` | method, `CYLTag.swift` | `CYLTag.styleWithBaseStyle` |
 | `CYLTag -copy` | method, `CYLTag.swift` | `CYLTag.copy` |

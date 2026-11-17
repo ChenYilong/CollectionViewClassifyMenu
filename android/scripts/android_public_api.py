@@ -36,9 +36,26 @@ def kotlin_symbols():
         stack = []  # (indent, name, is_enum)
         lines = path.read_text(encoding="utf-8").splitlines()
         depth = 0
+        # A class whose primary constructor spans several lines: (name, open parentheses) until the line that closes
+        # it. Its `val` / `var` parameters are the class's properties; a `{` on the closing line opens its body.
+        ctor = None
         for no, line in enumerate(lines, 1):
             stripped = line.strip()
             if stripped.startswith(("//", "*", "/*")):
+                continue
+            if ctor:
+                p = DECL.match(line)
+                if p and p.group(4) in ("val", "var") and not HIDDEN.search(line[:p.start(4)]) \
+                        and "override" not in p.group(3):
+                    out.append((path.name, ctor[0], p.group(5).strip("`"), p.group(4), no))
+                opened = ctor[1] + line.count("(") - line.count(")")
+                if opened > 0:
+                    ctor = (ctor[0], opened)
+                    continue
+                ctor = None
+                depth += line.count("{") - line.count("}")
+                if "{" not in line and stack:
+                    stack.pop()
                 continue
             while stack and depth < stack[-1][0]:
                 stack.pop()
@@ -55,7 +72,10 @@ def kotlin_symbols():
                 out.append((path.name, stack[-1][1], re.match(r"^\s+(\w+)", line).group(1), "entry", no))
             depth += line.count("{") - line.count("}")
             if m and m.group(4) in ("class", "interface", "object") and "{" not in line and stack and stack[-1][1] == m.group(5):
-                stack.pop()
+                if line.count("(") > line.count(")"):
+                    ctor = (m.group(5).strip("`"), line.count("(") - line.count(")"))
+                else:
+                    stack.pop()
     return out
 
 

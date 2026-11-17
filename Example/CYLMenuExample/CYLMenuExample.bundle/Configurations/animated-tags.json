@@ -22,7 +22,7 @@
         { "title": "PAG", "image": "system:play.circle", "animation": "pag-ios/0.pag" },
         { "title": "Rive", "image": "system:circle.hexagongrid", "animation": "../Animations/Rive/house.riv",
           "animationOptions": { "stateMachine": "State Machine 1" } },
-        { "title": "SVGA", "image": "system:film", "animation": "../Animations/SVGA/tab_search.svga" },
+        { "title": "SVGA", "image": "system:play.fill", "animation": "../Animations/SVGA/tab_search.svga" },
         { "title": "GIF", "image": "system:photo", "animation": "../Animations/GIF/tab_star.gif" },
         { "title": "SF Symbol", "image": "system:star", "selectedImage": "system:star.fill" },
         { "title": "Disabled", "image": "system:nosign", "enabled": false }

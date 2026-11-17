@@ -3,7 +3,8 @@
 //  CYLMenuExampleTests
 //
 //  The core's general helpers that match Android: the UIView frame, border, corner, layer, tap and capture helpers
-//  (UIView+CYLGeneral, Android CYLGeneralExtensions.kt) and the multiple filter's state (CYLFilterParamsTool).
+//  (UIView+CYLGeneral, Android CYLGeneralExtensions.kt), the multiple filter's state (CYLFilterParamsTool) and
+//  CYLTag.resetColors().
 //
 
 import XCTest
@@ -84,5 +85,18 @@ final class CYLGeneralHelpersTests: CYLMenuExampleTestCase {
         XCTAssertEqual(tool.filename, "custom")
         let filter = CYLMultipleFilterController()
         XCTAssertTrue(filter.settingArray.isEmpty, "Free-form settings of a subclass, empty by default")
+    }
+
+    func testTagResetColorsGoesBackToTheListStyle() {
+        let tag = CYLTag(title: "Swift", backgroundColor: .systemRed)
+        tag.colors = CYLTagColors(backgroundColor: .systemRed, borderColor: .black, textColor: .white,
+                                  selectedBackgroundColor: .systemBlue)
+        XCTAssertTrue(tag.hasCustomStyle)
+        tag.resetColors()
+        XCTAssertNil(tag.backgroundColor)
+        XCTAssertNil(tag.borderColor)
+        XCTAssertNil(tag.textColor)
+        XCTAssertNil(tag.selectedBackgroundColor)
+        XCTAssertFalse(tag.hasCustomStyle, "Drawn with the list's style again, as Android's resetColors()")
     }
 }

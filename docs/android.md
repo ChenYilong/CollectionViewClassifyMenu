@@ -429,8 +429,10 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | `07cc52b` | Android -> iOS table ([android-ios-api.md](android-ios-api.md)): 89.4 -> 611 / 611; new iOS core APIs (section expansion and visible counts, ripple and panel state, appearance resets, app tint, `kTagCollectionView*`, accessibility identifier lookup) | 611 / 611 (Android -> iOS) | 100.0 |
 | `56174a3` | `ios_public_api.py` reads the Swift sources (the Objective-C headers were deleted by the Swift migration, so the old 709 / 709 was stale): 585 / 731 = 80.0; renamed symbols mapped (old Objective-C keys kept as aliases), protocol conformance left out | 731 / 731 | 100.0 |
 | correction | Android -> iOS: the generator stopped using the stale Objective-C keys of `api-map.json` and same-name matches of Objective-C spellings; iOS names now come from the Swift signatures | 568 / 611 (Android -> iOS) | 93.0 |
-| this commit | `UIView+CYLGeneral.swift` (Android `CYLGeneralExtensions.kt` frame, centering, border, corner, layer, tap and capture helpers), `CYLFilterParamsTool`, `CYLFilterBaseController.settingArray`, 13 hand mappings; tests `CYLGeneralHelpersTests` | 611 / 611 (Android -> iOS) | 100.0 |
-| this commit | iOS -> Android, regenerated with the new Swift APIs | 761 / 761 | 100.0 |
+| `a3c2e1f` | `UIView+CYLGeneral.swift` (Android `CYLGeneralExtensions.kt` frame, centering, border, corner, layer, tap and capture helpers), `CYLFilterParamsTool`, `CYLFilterBaseController.settingArray`, 13 hand mappings; tests `CYLGeneralHelpersTests` | 611 / 611 (Android -> iOS) | 100.0 |
+| `a3c2e1f` | iOS -> Android, regenerated with the new Swift APIs | 761 / 761 | 100.0 |
+| this commit | Android -> iOS: the Kotlin parser read classes with a multi-line primary constructor (`CYLTag`, …) as one-liners and skipped their members: 128 rows found, 6 misattributed rows gone; new iOS `CYLTag.resetColors()` | 733 / 733 (Android -> iOS) | 100.0 |
+| this commit | iOS -> Android with `CYLTag.resetColors()` | 762 / 762 | 100.0 |
 
 ## Screenshots: Classify and Filter tabs (iOS demo app on Android)
 

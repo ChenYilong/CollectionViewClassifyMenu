@@ -207,6 +207,14 @@ public final class CYLTag {
     }
 
     /**
+     * Resets `colors`: the background, border, text and selected background colors go back to `nil`, so the tag
+     * draws them from the list's style again (Android `CYLTag.resetColors()`).
+     */
+    public func resetColors() {
+        colors = CYLTagColors()
+    }
+
+    /**
      * Whether any look property is set: false draws the tag with the base style itself.
      */
     public var hasCustomStyle: Bool {
