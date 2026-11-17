@@ -35,6 +35,19 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-18, `feat/harmony`): task-start rules in the instructions and skills
+
+- Prompt (verbatim): "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入：找到开始任务先标注todo写入文档的相关描述没有就新建该规则，如果有就插入以下规则：开始任务前总是在任务顶部标注TODO 以及当前分支，并找到合适的文档将任务写进docs文档以及验收评分标准什么是满分，什么什么是及格，不达到及格不允许中断任务，一直打分到及格为止。并标注为什么打不到满分，并将缺失的分数以TODO的形式打印在会话结束末端。并更新任务开始时写入的文档。看看 check other sessions first read their task ，第一步看看有没有session在编辑相同分支，如果没有就继续，如果有继续坚持任务是否重复。usually marked as TODO at top of 会话， 遇到 emulator stays hung until it's restarted,  please tell the other sessions first, then restart it. 遇到模拟器打不开的情况优先使用重启策略。无须询问是否重启直接命令行执行重启。"
+- Context: the instructions are `AGENTS.md` (`CLAUDE.md` imports it); the skills are in `.agents/skills/`. The existing
+  rule "Task log in docs/" (AGENTS.md, `cyl-commit`) records a task before it starts; it had no branch-at-top, score,
+  other-session or emulator rule. Other sessions checked: none is active on `feat/harmony` (the Mac
+  CollectionViewClassifyMenu session is idle).
+- Acceptance criteria: full marks 100 = AGENTS.md sections "Task start: TODO, branch, acceptance score" (30) and
+  "Shared emulators and simulators" (20), the new skill `.agents/skills/cyl-task-start/SKILL.md` (30), the
+  `cyl-commit` task-log step linking it (10), all in English, committed and pushed (10). Pass: 60.
+- Result: **100/100**. AGENTS.md has both sections; `.agents/skills/cyl-task-start/SKILL.md` is new; `cyl-commit`
+  step 5 links it; committed and pushed on `feat/harmony` (PR #20).
+
 ### Open (2026-11-17): CYLAnimatedItem migration, score 72
 
 - Progress against CYLTabBarController's `docs/Animated-Item.md`, item by item, and the TODOs (iOS CI and the static-library

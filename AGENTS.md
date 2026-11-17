@@ -14,6 +14,39 @@ verify the behavior and update the applicable documentation.
   screenshots). Purpose: if the work is interrupted, the context can be found again and the task resumed.
 - The same rule is in the vault's root `instructions.md` (section 16). Details: `.agents/skills/cyl-commit/`.
 
+## Task start: TODO, branch, acceptance score
+
+Details and checklist: `.agents/skills/cyl-task-start/SKILL.md`.
+
+- **Check other sessions first.** Before starting, list the other agent sessions and read their current tasks. Step
+  one: find out whether any session is editing the same branch (same repository and branch). If none is, continue.
+  If one is, check whether its task duplicates this one: if it does, do not repeat it (coordinate with that session,
+  or take a part it is not doing); if it does not, continue and avoid touching the same files at the same time.
+- **Mark the task at the top.** Before starting any task, write a `TODO` line at the very top of the session (the
+  first lines of the first reply) with the task and the current branch, for example
+  `TODO (branch feat/harmony): <task>`.
+- **Write the task into docs/.** Find the most suitable document in `docs/` (see "Task log in docs/") and write the
+  task there, together with its acceptance scoring criteria: what earns full marks (100) and what is a pass (the
+  passing score, 60 unless the task says otherwise), each criterion with its points.
+- **Score until it passes.** Score the work against those criteria. Below the passing score the task must not be
+  interrupted or handed back: keep working and scoring again until it passes.
+- **Explain the missing points.** Write the score, and why it is not full marks, into the document. At the end of
+  the session, print every missing point as a `TODO` (criterion, points, what is still needed) in the final lines of
+  the last reply.
+- **Update the document at the end.** Update the entry written when the task started: the final score, the reasons
+  for the missing points, the result and its evidence (commits, tests, screenshots).
+
+## Shared emulators and simulators
+
+- Emulators and simulators are shared with other sessions (for example the Android emulator `emulator-5556`).
+- **An emulator that stays hung until it is restarted** (package manager hangs, `adb` or `hdc` commands time out,
+  the screen stops updating): tell the other sessions first (one message to each session that may use it: which
+  emulator and that it is being restarted), then restart it, and tell them again when it is back.
+- **An emulator that will not open or boot: restart it first.** Restarting is the preferred fix. Do not ask whether
+  to restart; run the restart from the command line directly (Android: `adb -s <serial> reboot`, or kill and relaunch
+  the emulator with `-no-snapshot-load` if `adb` cannot reach it; HarmonyOS: restart the emulator from its command
+  line tool; iOS: `xcrun simctl shutdown <udid> && xcrun simctl boot <udid>`).
+
 ## Code and naming
 
 - Use the `CYL` prefix for project-specific Objective-C classes and protocols;
