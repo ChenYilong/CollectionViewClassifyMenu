@@ -106,6 +106,9 @@ val publishAnimatedItemToBuildRepository by tasks.registering {
         }
     }
 }
+// The copy runs first: on its first run Gradle deletes the "stale" files of its output folder, the shared build/repo, so
+// copying after the library's publication removed com/cyl/classifymenu (the Flutter and React Native hosts then could not
+// resolve com.cyl:classifymenu).
 tasks.matching { it.name == "publishReleasePublicationToBuildRepository" }.configureEach {
-    finalizedBy(publishAnimatedItemToBuildRepository)
+    dependsOn(publishAnimatedItemToBuildRepository)
 }
