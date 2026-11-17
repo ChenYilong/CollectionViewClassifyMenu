@@ -44,3 +44,6 @@
 "CYLImageTagMoveLeft" = "Move left";
 /* Moves a tag group right. */
 "CYLImageTagMoveRight" = "Move right";
+
+/* What VoiceOver reads for a CYLTagButton badge shown as a dot (badgeValue is an empty string). */
+"CYLTagBadgeDot" = "New";

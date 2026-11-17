@@ -8,10 +8,17 @@ import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLOffset, CYLSize }
 import { CYLMenuLocalizedString } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
 
-/** The icon before or after the title. */
+/** The icon before or after the title, or above (`top`) or below (`bottom`) it, both centered. */
 export enum CYLTagImagePlacement {
   leading = 0,
-  trailing = 1
+  trailing = 1,
+  top = 2,
+  bottom = 3
+}
+
+/** True for `top` and `bottom`: the icon and the title are stacked. */
+export function CYLTagImagePlacementIsVertical(placement: CYLTagImagePlacement): boolean {
+  return placement === CYLTagImagePlacement.top || placement === CYLTagImagePlacement.bottom;
 }
 
 /** The icon and title centered in the tag, or at its leading edge. */

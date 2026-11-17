@@ -875,5 +875,9 @@
  "UIView (CYLGeneral) -cylAddTapTarget:action:": "View.cyl_setTarget",
  "UIView (CYLGeneral) -cylSnapshotWithWidth:": "View.cyl_captureWithWidth",
  "UIView (CYLGeneral) -cylSnapshot": "View.cyl_capture",
- "CYLTag -resetColors": "CYLTag.resetColors"
+ "CYLTag -resetColors": "CYLTag.resetColors",
+ "CYLTagImagePlacementTop": "CYLTagImagePlacementTop",
+ "CYLTagImagePlacementBottom": "CYLTagImagePlacementBottom",
+ "CYLTagButton -initWithTitle:image:": "CYLTagButton(context, title, image)",
+ "CYLTagButton -initWithTitle:image:animationURL:": "CYLTagButton(context, title, image, animationURL)"
 }

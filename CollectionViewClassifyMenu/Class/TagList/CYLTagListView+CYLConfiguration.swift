@@ -344,7 +344,8 @@ public enum CYLMenuStyleKey {
     public static let layoutCentered = "layoutCentered"
 
     /**
-     * A `CYLTagImagePlacement` raw value, or "leading" (icon, then title) / "trailing" (title, then icon).
+     * A `CYLTagImagePlacement` raw value, or "leading" (icon, then title) / "trailing" (title, then icon) / "top" (icon
+     * above the title) / "bottom" (icon below the title).
      */
     public static let imagePlacement = "imagePlacement"
 
@@ -1117,7 +1118,8 @@ extension CYLMenuStyle {
         }
         let placements = ["leading": CYLTagImagePlacement.leading.rawValue, "left": CYLTagImagePlacement.leading.rawValue,
                           "trailing": CYLTagImagePlacement.trailing.rawValue,
-                          "right": CYLTagImagePlacement.trailing.rawValue]
+                          "right": CYLTagImagePlacement.trailing.rawValue,
+                          "top": CYLTagImagePlacement.top.rawValue, "bottom": CYLTagImagePlacement.bottom.rawValue]
         if let raw = Value.rawValue(configuration[Key.imagePlacement], names: placements),
            let placement = CYLTagImagePlacement(rawValue: raw) {
             imagePlacement = placement

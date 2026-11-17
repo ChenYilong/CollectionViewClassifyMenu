@@ -2,8 +2,10 @@
 //  CYLTagButton.swift
 //  CollectionViewClassifyMenu
 //
-//  One tag: CYLFlatDesignTabBarButton (CYLTabBarController) laid out horizontally, the icon before the title, in a box
-//  styled like a CYLBadgeView. CYLTagListView puts one in every cell; it can also be used on its own.
+//  One tag: CYLFlatDesignTabBarButton (CYLTabBarController) laid out horizontally, the icon before the title (or above
+//  it with CYLTagImagePlacementTop), in a box styled like a CYLBadgeView, with an optional badge. CYLTagListView puts one
+//  in every cell; it is also the one icon + title + animated icon component of the libraries built on this one (a
+//  search bar item, a placeholder's icon), so a new animation type is added here only (CYLTagAnimationEngine).
 //  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
 //
 
@@ -88,13 +90,21 @@ private enum CYLTagAnimationEngine {
 }
 
 /**
- * One tag: an icon and a title side by side (the icon after the title with `imagePlacement`), in a box drawn from the
- * style's appearance for the current state, with an optional delete indicator and an optional animated icon.
+ * One tag: an icon and a title side by side (the icon after, above or below the title with `imagePlacement`), in a box
+ * drawn from the style's appearance for the current state, with an optional delete indicator, an optional badge and an
+ * optional animated icon. Use it on its own with `init(title:image:)` or `init(title:image:animationURL:)`.
  */
 open class CYLTagButton: UIControl {
 
     private static let states: [UIControl.State] = [.normal, .selected, .disabled]
     private static let disabledAnimationAlpha: CGFloat = 0.4
+    /**
+     * The badge's size: a dot's diameter, the minimum height of a badge with text, its text's side padding.
+     */
+    private static let badgeDotDiameter: CGFloat = 8
+    private static let badgeMinimumHeight: CGFloat = 16
+    private static let badgePadding: CGFloat = 4
+    private static let badgeFontSize: CGFloat = 11
     private static let loopCheckInterval: TimeInterval = 0.05
     /**
      * The progress from which a looping animation counts as finished and starts again.
@@ -115,6 +125,37 @@ open class CYLTagButton: UIControl {
      * The label that draws the delete indicator (hidden unless `showsDeleteIndicator`).
      */
     public let deleteIndicatorLabel = UILabel()
+
+    /**
+     * The label that draws the badge (hidden while `badgeValue` is `nil`), at the top trailing corner of the icon.
+     */
+    @objc public let badgeLabel = UILabel()
+
+    /**
+     * The badge's text, as `UITabBarItem.badgeValue`: `nil` (the default) hides the badge, an empty string shows a dot,
+     * any other text ("3", "99+", "New") a capsule with it. It sits at the top trailing corner of the icon, or of the
+     * title when there is no icon, and VoiceOver reads it as the tag's value.
+     */
+    @objc open var badgeValue: String? {
+        didSet {
+            if oldValue != badgeValue {
+                updateAppearance()
+            }
+        }
+    }
+
+    /**
+     * The badge's background color. Setting `nil` restores the default, `UIColor.systemRed`; the text is white.
+     */
+    @objc open var badgeColor: UIColor? {
+        get {
+            badgeColorStorage
+        }
+        set {
+            badgeColorStorage = newValue ?? .systemRed
+            updateAppearance()
+        }
+    }
 
     /**
      * The title.
@@ -255,6 +296,12 @@ open class CYLTagButton: UIControl {
     }
 
     private var styleStorage = CYLMenuStyle()
+    private var badgeColorStorage: UIColor = .systemRed
+    /**
+     * True for a tag made with a convenience initializer: on its own, it is an accessibility element whose traits
+     * follow its state (selected, not enabled).
+     */
+    private var addsStateTraits = false
     private var animationViewSize: CGSize = .zero
     /**
      * True from `playAnimation()` until the state is set again (selection, a new file).
@@ -279,6 +326,31 @@ open class CYLTagButton: UIControl {
         commonInit()
     }
 
+    /**
+     * A tag for use on its own (a search bar item, a toolbar button): a title, an icon or both, sized to fit
+     * (`intrinsicContentSize`), drawn with the default style, an accessibility element with the button trait.
+     */
+    @objc(initWithTitle:image:)
+    public convenience init(title: String?, image: UIImage?) {
+        self.init(title: title, image: image, animationURL: nil)
+    }
+
+    /**
+     * The same with an animated icon (Lottie, PAG, Rive, SVGA, GIF…) in the icon slot; `image` is shown while the
+     * animation engine is not linked or the file cannot be loaded.
+     */
+    @objc(initWithTitle:image:animationURL:)
+    public convenience init(title: String?, image: UIImage?, animationURL: URL?) {
+        self.init(frame: .zero)
+        self.title = title
+        self.image = image
+        self.animationURL = animationURL
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        addsStateTraits = true
+        frame.size = intrinsicContentSize
+    }
+
     private func commonInit() {
         imageView.contentMode = .scaleAspectFit
         titleLabel.lineBreakMode = .byTruncatingTail
@@ -290,6 +362,12 @@ open class CYLTagButton: UIControl {
         addSubview(imageView)
         addSubview(titleLabel)
         addSubview(deleteIndicatorLabel)
+        badgeLabel.textAlignment = .center
+        badgeLabel.textColor = .white
+        badgeLabel.isHidden = true
+        badgeLabel.isAccessibilityElement = false
+        badgeLabel.layer.masksToBounds = true
+        addSubview(badgeLabel)
         crossLayer.fillColor = nil
         crossLayer.lineCap = .round
         layer.addSublayer(crossLayer)
@@ -345,7 +423,10 @@ open class CYLTagButton: UIControl {
             let font = style.titleFont(for: state, traitCollection: traitCollection)
             let titleWidth = displayed.isEmpty ? 0 : ceil((displayed as NSString).size(withAttributes: [.font: font]).width)
             var content = titleWidth + iconSize.width
-            if titleWidth > 0 && iconSize.width > 0 {
+            if style.imagePlacement.cylIsVertical {
+                // Stacked: the wider of the two.
+                content = max(titleWidth, iconSize.width)
+            } else if titleWidth > 0 && iconSize.width > 0 {
                 content += style.imageTitleSpacing
             } else if titleWidth > 0 && !style.layoutCentered && style.contentAlignment == .center {
                 // The title keeps its place after an empty icon slot.
@@ -372,17 +453,110 @@ open class CYLTagButton: UIControl {
 
     /**
      * Tag height: `style.itemHeight`, or more when a line of the title font plus the appearance's top and bottom
-     * content insets needs it.
+     * content insets needs it; with the icon above or below the title, also the icon slot and the spacing.
      */
     public static func height(for style: CYLMenuStyle, traitCollection: UITraitCollection?) -> CGFloat {
-        states.reduce(style.itemHeight) { height, state in
+        let iconHeight = style.imagePlacement.cylIsVertical ? max(style.imageSize.height, style.animationSize.height) : 0
+        return states.reduce(style.itemHeight) { height, state in
             let insets = style.appearance(for: state).contentInsets
             let font = style.titleFont(for: state, traitCollection: traitCollection)
-            return max(height, ceil(font.lineHeight) + insets.top + insets.bottom)
+            let stacked = iconHeight > 0 ? iconHeight + style.imageTitleSpacing : 0
+            return max(height, ceil(font.lineHeight) + stacked + insets.top + insets.bottom)
+        }
+    }
+
+    /**
+     * The height a tag needs for this title and an icon of `iconSize` (`.zero` for none) in every state: the tallest
+     * of the two side by side, or both and the spacing when the icon is above or below the title; at least
+     * `style.itemHeight`.
+     */
+    @objc(heightForTitle:iconSize:style:traitCollection:)
+    public static func height(forTitle title: String?, iconSize: CGSize, style: CYLMenuStyle,
+                              traitCollection: UITraitCollection?) -> CGFloat {
+        let hasTitle = !style.displayedTitle(forTitle: title).isEmpty
+        return states.reduce(style.itemHeight) { height, state in
+            let insets = style.appearance(for: state).contentInsets
+            let line = hasTitle ? ceil(style.titleFont(for: state, traitCollection: traitCollection).lineHeight) : 0
+            var content = max(line, iconSize.height)
+            if style.imagePlacement.cylIsVertical {
+                content = line + iconSize.height + (hasTitle && iconSize.height > 0 ? style.imageTitleSpacing : 0)
+            }
+            return max(height, ceil(content + insets.top + insets.bottom))
         }
     }
 
     // MARK: - Overrides
+
+    /**
+     * The size the tag needs for its title, icon (or animated icon), delete indicator and style, in every state.
+     */
+    open override var intrinsicContentSize: CGSize {
+        let icon = animationView != nil ? animationSize : Self.iconSize(for: image ?? selectedImage, style: styleStorage)
+        return CGSize(width: Self.width(forTitle: title, iconSize: icon, showsDeleteIndicator: showsDeleteIndicator,
+                                        style: styleStorage, traitCollection: traitCollection),
+                      height: Self.height(forTitle: title, iconSize: icon, style: styleStorage,
+                                          traitCollection: traitCollection))
+    }
+
+    open override func sizeThatFits(_ size: CGSize) -> CGSize {
+        intrinsicContentSize
+    }
+
+    /**
+     * The title (or the icon's `accessibilityLabel`) unless a label was set.
+     */
+    open override var accessibilityLabel: String? {
+        get {
+            if let label = super.accessibilityLabel {
+                return label
+            }
+            let displayed = styleStorage.displayedTitle(forTitle: title)
+            return displayed.isEmpty ? image?.accessibilityLabel : displayed
+        }
+        set {
+            super.accessibilityLabel = newValue
+        }
+    }
+
+    /**
+     * The badge unless a value was set: its text, or "New" (localized) for a dot.
+     */
+    open override var accessibilityValue: String? {
+        get {
+            if let value = super.accessibilityValue {
+                return value
+            }
+            guard let badgeValue else {
+                return nil
+            }
+            return badgeValue.isEmpty ? CYLMenuLocalizedString("CYLTagBadgeDot") : badgeValue
+        }
+        set {
+            super.accessibilityValue = newValue
+        }
+    }
+
+    /**
+     * For a tag made with a convenience initializer, the traits it was given plus selected and not enabled from its
+     * state.
+     */
+    open override var accessibilityTraits: UIAccessibilityTraits {
+        get {
+            var traits = super.accessibilityTraits
+            if addsStateTraits {
+                if isSelected {
+                    traits.insert(.selected)
+                }
+                if !isEnabled {
+                    traits.insert(.notEnabled)
+                }
+            }
+            return traits
+        }
+        set {
+            super.accessibilityTraits = newValue
+        }
+    }
 
     open override var isSelected: Bool {
         didSet {
@@ -443,8 +617,24 @@ open class CYLTagButton: UIControl {
 
         var imageX: CGFloat = 0
         var titleX: CGFloat = 0
+        var imageY = Self.centeredY(iconSize.height, contentTop: contentTop, contentHeight: contentHeight, height: height)
+        var titleY = Self.centeredY(titleHeight, contentTop: contentTop, contentHeight: contentHeight, height: height)
         let leading = style.contentAlignment == .leading
-        if showsImage && showsTitle {
+        if style.imagePlacement.cylIsVertical {
+            // Stacked: each centered (or at the leading margin), the group centered between the insets.
+            titleWidth = min(ceil(titleSize.width), max(0, width - 2 * margin))
+            imageX = leading ? margin : floor((width - iconSize.width) / 2)
+            titleX = leading ? margin : floor((width - titleWidth) / 2)
+            let group = (showsImage ? iconSize.height : 0) + spacing + (showsTitle ? titleHeight : 0)
+            let top = Self.centeredY(group, contentTop: contentTop, contentHeight: contentHeight, height: height)
+            if style.imagePlacement == .bottom {
+                titleY = top
+                imageY = top + (showsTitle ? titleHeight + spacing : 0)
+            } else {
+                imageY = top
+                titleY = top + (showsImage ? iconSize.height + spacing : 0)
+            }
+        } else if showsImage && showsTitle {
             let group = iconSize.width + spacing + titleWidth
             // Centered, or from the leading margin (the title truncated above, so the icon after it stays visible).
             let start = leading ? margin : floor((width - group) / 2)
@@ -470,16 +660,14 @@ open class CYLTagButton: UIControl {
 
         if showsTitle {
             titleLabel.frame = CGRect(x: titleX + style.titlePositionAdjustment.horizontal,
-                                      y: Self.centeredY(titleHeight, contentTop: contentTop, contentHeight: contentHeight,
-                                                        height: height) + style.titlePositionAdjustment.vertical,
+                                      y: titleY + style.titlePositionAdjustment.vertical,
                                       width: titleWidth, height: titleHeight)
         } else {
             titleLabel.frame = .zero
         }
         if showsImage {
             var frame = CGRect(x: imageX + style.imagePositionAdjustment.horizontal,
-                               y: Self.centeredY(iconSize.height, contentTop: contentTop, contentHeight: contentHeight,
-                                                 height: height) + style.imagePositionAdjustment.vertical,
+                               y: imageY + style.imagePositionAdjustment.vertical,
                                width: iconSize.width, height: iconSize.height)
             // Only the size changes; x and y stay, as CYLFlatDesignTabBarItem.imageInsets.
             let imageInsets = style.imageInsets
@@ -491,8 +679,10 @@ open class CYLTagButton: UIControl {
             } else {
                 placeImageView(frame)
             }
+            layOutBadge(anchor: frame)
         } else {
             placeImageView(.zero)
+            layOutBadge(anchor: showsTitle ? titleLabel.frame : bounds.inset(by: insets))
         }
         // 0 is automatic: a capsule, as for CYLBadgeAppearance.
         let radius = style.appearance(for: state).cornerRadius
@@ -595,6 +785,27 @@ open class CYLTagButton: UIControl {
         crossLayer.frame = bounds
         crossLayer.path = cross.cgPath
         return indicatorWidth + style.imageTitleSpacing
+    }
+
+    /**
+     * The badge at the top trailing corner of `anchor` (the icon, or the title): the center of its leading cap on the
+     * corner, kept inside the tag (which clips its content).
+     */
+    private func layOutBadge(anchor: CGRect) {
+        guard let badgeValue else {
+            badgeLabel.frame = .zero
+            return
+        }
+        let isDot = badgeValue.isEmpty
+        let lineHeight = ceil(badgeLabel.font.lineHeight)
+        let badgeHeight = isDot ? Self.badgeDotDiameter : max(Self.badgeMinimumHeight, lineHeight + 2)
+        let textWidth = isDot ? 0 : ceil((badgeValue as NSString).size(withAttributes: [.font: badgeLabel.font as Any]).width)
+        let badgeWidth = isDot ? badgeHeight : max(badgeHeight, textWidth + 2 * Self.badgePadding)
+        let x = max(0, min(anchor.maxX - badgeHeight / 2, bounds.width - badgeWidth))
+        let y = max(0, min(anchor.minY - badgeHeight / 2, bounds.height - badgeHeight))
+        badgeLabel.frame = CGRect(x: x, y: y, width: badgeWidth, height: badgeHeight)
+        badgeLabel.layer.cornerRadius = badgeHeight / 2
+        bringSubviewToFront(badgeLabel)
     }
 
     private func reloadAnimationView() {
@@ -710,6 +921,25 @@ open class CYLTagButton: UIControl {
         }
         layer.borderColor = borderColor?.cgColor
         layer.borderWidth = borderWidth
+        badgeLabel.isHidden = badgeValue == nil
+        badgeLabel.text = badgeValue?.isEmpty == false ? badgeValue : nil
+        badgeLabel.backgroundColor = badgeColorStorage
+        let badgeFont = UIFont.boldSystemFont(ofSize: Self.badgeFontSize)
+        badgeLabel.font = style.adjustsFontForContentSizeCategory
+            ? UIFontMetrics(forTextStyle: .caption2).scaledFont(for: badgeFont, maximumPointSize: 2 * Self.badgeFontSize,
+                                                                compatibleWith: traitCollection)
+            : badgeFont
+        invalidateIntrinsicContentSize()
         setNeedsLayout()
+    }
+}
+
+extension CYLTagImagePlacement {
+
+    /**
+     * True for `.top` and `.bottom`: the icon and the title are stacked.
+     */
+    var cylIsVertical: Bool {
+        self == .top || self == .bottom
     }
 }

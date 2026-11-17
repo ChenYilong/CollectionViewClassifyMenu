@@ -207,6 +207,13 @@ headers still in the umbrella without any glue, while Objective-C calling Swift 
   `@objc private` members (`CYLClassifyMenuViewController`: `dataSource`, `expandSectionArray`, `collectionView`,
   `firstRowCellCountArray`, `collectionHeaderMoreBtnHideBoolArray`, `rowsCountPerSection`,
   `cellsCountArrayPerRowInSections`; `CYLMultipleFilterController`: `filterParamsTool`).
+- `CYLTagButton` on its own (2026-11-17, additive): `-initWithTitle:image:`, `-initWithTitle:image:animationURL:`,
+  `badgeValue`, `badgeColor`, `badgeLabel`, `+heightForTitle:iconSize:style:traitCollection:` and the enum values
+  `CYLTagImagePlacementTop` (2) / `CYLTagImagePlacementBottom` (3) are visible to Objective-C;
+  `testTagButtonStandaloneAPIIsVisibleToObjectiveC` calls them. `intrinsicContentSize`, `sizeThatFits:`,
+  `accessibilityLabel` (the title by default), `accessibilityValue` (the badge by default) and `accessibilityTraits`
+  are overrides of the UIKit members. Details: `issue-progress.md`, "`CYLTagButton` as the one icon + title + animated
+  icon component".
 - `CYLTagListView` (2026-11-17): the Swift migration had left 177 of its 182 public members without `@objc`, so
   Objective-C callers (another repository's React Native wrapper) could not see them. Every Objective-C-representable
   public member is now `@objc`, with conventional selectors (`-heightThatFitsWidth:`, `-selectItemAtIndexPath:`,

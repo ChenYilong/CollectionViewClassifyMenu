@@ -579,7 +579,9 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   The statements are the iOS ones (`CYLMenuLinkageViewController.query`, `CYLReviewQuery`), shown with their values
   (`displayString()`); the plus-menu-filtered case gives the iOS screenshot's row (川菜 · 深圳 ★3.5 ¥226).
 - **Components:** `cyl-tag-list` reads the core's style keys and defaults (`CYLMenuStyle`, appearances per state);
-  `cyl-tag-cloud` and `cyl-tag-image` port the core's android-tagview list and image tag views; animated icons use
+  `cyl-tag-cloud` and `cyl-tag-image` port the core's android-tagview list and image tag views; `cyl-tag-button`
+  (2026-11-17) is `CYLTagButton` on its own (the icon above or below the title, the badge, `tagButtonView` in model.js,
+  not yet opened in WeChat DevTools); animated icons use
   CYLTabBarController's `cyl-lottie-miniprogram` (its lottie-miniprogram fork: the npm 1.0.12 loaded the base64 image
   assets of the "image assets and placeholders" Lottie files but never drew them) and `<image>` for GIF.
 - **Verified in WeChat DevTools** (base library 3.18.0, 2026-11-15): all 20 pages open with no console error; real taps

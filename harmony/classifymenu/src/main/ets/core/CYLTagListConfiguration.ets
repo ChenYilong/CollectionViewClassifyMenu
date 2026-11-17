@@ -415,7 +415,8 @@ const FOLD_CONTENTS: Map<string, number> = new Map<string, number>([
 
 const IMAGE_PLACEMENTS: Map<string, number> = new Map<string, number>([
   ['leading', CYLTagImagePlacement.leading], ['left', CYLTagImagePlacement.leading],
-  ['trailing', CYLTagImagePlacement.trailing], ['right', CYLTagImagePlacement.trailing]
+  ['trailing', CYLTagImagePlacement.trailing], ['right', CYLTagImagePlacement.trailing],
+  ['top', CYLTagImagePlacement.top], ['bottom', CYLTagImagePlacement.bottom]
 ]);
 
 const CONTENT_ALIGNMENTS: Map<string, number> = new Map<string, number>([
@@ -585,7 +586,8 @@ export class CYLMenuConfiguration {
       style.layoutCentered = layoutCentered;
     }
     const placement = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.imagePlacement], IMAGE_PLACEMENTS);
-    if (placement === CYLTagImagePlacement.leading || placement === CYLTagImagePlacement.trailing) {
+    if (placement === CYLTagImagePlacement.leading || placement === CYLTagImagePlacement.trailing ||
+      placement === CYLTagImagePlacement.top || placement === CYLTagImagePlacement.bottom) {
       style.imagePlacement = placement as CYLTagImagePlacement;
     }
     const alignment = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.contentAlignment], CONTENT_ALIGNMENTS);

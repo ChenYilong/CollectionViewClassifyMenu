@@ -1,18 +1,30 @@
 /**
- * One tag (iOS CYLTagButton.swift; Android CYLTagButton.kt): an icon and a title side by side (the icon after the
- * title with `imagePlacement`), in a box drawn from the style's appearance for the current state, with an optional
- * delete indicator and an optional animated icon (Lottie, PAG, Rive or GIF, by the file's extension).
+ * One tag (iOS CYLTagButton.swift; Android CYLTagButton.kt): an icon and a title side by side (the icon after, above or
+ * below the title with `imagePlacement`), in a box drawn from the style's appearance for the current state, with an
+ * optional delete indicator, an optional badge and an optional animated icon (Lottie, PAG, Rive, SVGA or GIF, by the
+ * file's extension). It is also the one icon + title + animated icon component of the libraries built on this one (a
+ * search bar item, a placeholder's icon): `new CYLTagButton(title, image, animationURL)` makes one for use on its own.
  *
  * `CYLTagButton` holds the state, the layout and the API (as the iOS class); `CYLTagButtonComponent` draws it.
  */
 import { CYLAnimatedIcon } from '../components/CYLAnimatedIcon';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import { CYLTagButtonMetrics } from '../components/CYLTagListState';
-import { CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement } from '../core/CYLMenuStyle';
+import {
+  CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical
+} from '../core/CYLMenuStyle';
+import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
 import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
 
 const DISABLED_ANIMATION_ALPHA: number = 0.4;
+/** The badge: a dot's diameter, the minimum height of a badge with text, its text's side padding and font size. */
+const BADGE_DOT_DIAMETER: number = 8;
+const BADGE_MINIMUM_HEIGHT: number = 16;
+const BADGE_PADDING: number = 4;
+const BADGE_FONT_SIZE: number = 11;
+/** `UIColor.systemRed`, the default `badgeColor`. */
+export const CYLTagBadgeDefaultColor: string = '#FF3B30';
 
 /**
  * A subview of the tag as last laid out (`imageView`, `titleLabel`, `deleteIndicatorLabel`): its frame in the tag's
@@ -41,6 +53,8 @@ export class CYLTagButton {
   readonly titleLabel: CYLTagButtonPart = new CYLTagButtonPart();
   /** The delete indicator (hidden unless `showsDeleteIndicator`, or while a cross is drawn). */
   readonly deleteIndicatorLabel: CYLTagButtonPart = new CYLTagButtonPart();
+  /** The badge (hidden while `badgeValue` is undefined), at the top trailing corner of the icon. */
+  readonly badgeLabel: CYLTagButtonPart = new CYLTagButtonPart();
   /** The system font scale (iOS: the trait collection's content size category). */
   fontScale: number = 1;
 
@@ -52,6 +66,9 @@ export class CYLTagButton {
   private animationSpeedValue?: number;
   private animationLoopsValue: boolean = false;
   private showsDeleteIndicatorValue: boolean = false;
+  private badgeValueStorage?: string;
+  private badgeColorStorage: string = CYLTagBadgeDefaultColor;
+  private accessibilityLabelStorage?: string;
   private styleStorage: CYLMenuStyle = new CYLMenuStyle();
   private selectedValue: boolean = false;
   private enabledValue: boolean = true;
@@ -82,8 +99,67 @@ export class CYLTagButton {
   /** The animated icon's frame (when `animationURL` is set). */
   animationFrame: CYLRect = new CYLRect();
 
-  constructor() {
+  /**
+   * `init(frame:)` without arguments; `init(title:image:)` / `init(title:image:animationURL:)` with them: a tag for use
+   * on its own (a search bar item, a toolbar button), drawn with the default style, sized to fit (`intrinsicSize()`).
+   */
+  constructor(title?: string, image?: CYLImage, animationURL?: string) {
+    this.titleValue = title;
+    this.imageValue = image;
+    this.animationURLValue = animationURL;
+    if (animationURL !== undefined) {
+      this.animationViewToken++;
+    }
     this.updateAppearance();
+  }
+
+  /**
+   * `badgeValue`, as `UITabBarItem.badgeValue`: undefined (the default) hides the badge, '' shows a dot, any other text
+   * ('3', '99+') a capsule with it, at the top trailing corner of the icon (of the title when there is no icon). The
+   * screen reader reads it as the tag's value (`accessibilityValue`).
+   */
+  get badgeValue(): string | undefined {
+    return this.badgeValueStorage;
+  }
+
+  set badgeValue(value: string | undefined) {
+    if (value !== this.badgeValueStorage) {
+      this.badgeValueStorage = value;
+      this.updateAppearance();
+    }
+  }
+
+  /** `badgeColor`: the badge's background; undefined restores the default, system red. The text is white. */
+  get badgeColor(): string | undefined {
+    return this.badgeColorStorage;
+  }
+
+  set badgeColor(value: string | undefined) {
+    this.badgeColorStorage = value ?? CYLTagBadgeDefaultColor;
+    this.updateAppearance();
+  }
+
+  /** What the screen reader reads first: the label that was set, else the title. */
+  get accessibilityLabel(): string | undefined {
+    if (this.accessibilityLabelStorage !== undefined) {
+      return this.accessibilityLabelStorage;
+    }
+    const displayed = this.styleStorage.displayedTitle(this.titleValue);
+    return displayed.length > 0 ? displayed : undefined;
+  }
+
+  set accessibilityLabel(value: string | undefined) {
+    this.accessibilityLabelStorage = value;
+    this.changed();
+  }
+
+  /** The badge as the screen reader reads it: its text, or "New" (localized) for a dot; undefined without a badge. */
+  get accessibilityValue(): string | undefined {
+    const badge = this.badgeValueStorage;
+    if (badge === undefined) {
+      return undefined;
+    }
+    return badge.length === 0 ? CYLMenuLocalizedString('CYLTagBadgeDot') : badge;
   }
 
   // MARK: - API
@@ -291,12 +367,17 @@ export class CYLTagButton {
     return CYLTagButtonMetrics.height(style, fontScale);
   }
 
-  /** The size the tag needs for its content (its width in every state and its height). */
+  /** `height(forTitle:iconSize:style:traitCollection:)`. */
+  static heightForTitle(title: string | undefined, iconSize: CYLSize, style: CYLMenuStyle, fontScale: number = 1): number {
+    return CYLTagButtonMetrics.heightForTitle(title, iconSize, style, fontScale);
+  }
+
+  /** `intrinsicContentSize`: the size the tag needs for its content (its width in every state and its height). */
   intrinsicSize(): CYLSize {
     const animated = this.animationURLValue !== undefined;
-    const icon = CYLTagButton.iconSize(this.imageValue, animated, this.styleStorage);
+    const icon = CYLTagButton.iconSize(this.imageValue ?? this.selectedImageValue, animated, this.styleStorage);
     return new CYLSize(CYLTagButton.width(this.titleValue, icon, this.showsDeleteIndicatorValue, this.styleStorage,
-      this.fontScale), CYLTagButton.height(this.styleStorage, this.fontScale));
+      this.fontScale), CYLTagButton.heightForTitle(this.titleValue, icon, this.styleStorage, this.fontScale));
   }
 
   /** The tag's size, from the component; lays the parts out again. */
@@ -392,8 +473,24 @@ export class CYLTagButton {
 
     let imageX = 0;
     let titleX = 0;
+    let imageY = CYLTagButton.centeredY(iconSize.height, contentTop, contentHeight, height);
+    let titleY = CYLTagButton.centeredY(titleHeight, contentTop, contentHeight, height);
     const leading = style.contentAlignment === CYLTagContentAlignment.leading;
-    if (showsImage && showsTitle) {
+    if (CYLTagImagePlacementIsVertical(style.imagePlacement)) {
+      // Stacked: each centered (or at the leading margin), the group centered between the insets.
+      titleWidth = Math.min(Math.ceil(measured), Math.max(0, width - 2 * margin));
+      imageX = leading ? margin : Math.floor((width - iconSize.width) / 2);
+      titleX = leading ? margin : Math.floor((width - titleWidth) / 2);
+      const group = (showsImage ? iconSize.height : 0) + spacing + (showsTitle ? titleHeight : 0);
+      const top = CYLTagButton.centeredY(group, contentTop, contentHeight, height);
+      if (style.imagePlacement === CYLTagImagePlacement.bottom) {
+        titleY = top;
+        imageY = top + (showsTitle ? titleHeight + spacing : 0);
+      } else {
+        imageY = top;
+        titleY = top + (showsImage ? iconSize.height + spacing : 0);
+      }
+    } else if (showsImage && showsTitle) {
       const group = iconSize.width + spacing + titleWidth;
       const start = leading ? margin : Math.floor((width - group) / 2);
       if (style.imagePlacement === CYLTagImagePlacement.trailing) {
@@ -417,14 +514,13 @@ export class CYLTagButton {
     }
 
     this.titleLabel.frame = showsTitle ? new CYLRect(titleX + style.titlePositionAdjustment.horizontal,
-      CYLTagButton.centeredY(titleHeight, contentTop, contentHeight, height) + style.titlePositionAdjustment.vertical,
-      titleWidth, titleHeight) : new CYLRect();
+      titleY + style.titlePositionAdjustment.vertical, titleWidth, titleHeight) : new CYLRect();
     this.titleLabel.isHidden = !showsTitle;
     if (showsImage) {
       const imageInsets = style.imageInsets;
       // Only the size changes; x and y stay, as CYLFlatDesignTabBarItem.imageInsets.
       const frame = new CYLRect(imageX + style.imagePositionAdjustment.horizontal,
-        CYLTagButton.centeredY(iconSize.height, contentTop, contentHeight, height) + style.imagePositionAdjustment.vertical,
+        imageY + style.imagePositionAdjustment.vertical,
         Math.max(0, iconSize.width - imageInsets.left - imageInsets.right),
         Math.max(0, iconSize.height - imageInsets.top - imageInsets.bottom));
       if (animated) {
@@ -433,8 +529,11 @@ export class CYLTagButton {
       } else {
         this.imageView.frame = frame;
       }
+      this.layOutBadge(frame);
     } else {
       this.imageView.frame = new CYLRect();
+      this.layOutBadge(showsTitle ? this.titleLabel.frame :
+        new CYLRect(insets.left, insets.top, Math.max(0, width - 2 * margin), contentHeight));
     }
     // 0 is automatic: a capsule, as for CYLBadgeAppearance.
     const radius = style.appearance(state).cornerRadius;
@@ -477,6 +576,28 @@ export class CYLTagButton {
     const minY = midY - side / 2;
     this.crossLines = [[minX, minY, minX + side, minY + side], [minX + side, minY, minX, minY + side]];
     return indicatorWidth + style.imageTitleSpacing;
+  }
+
+  /**
+   * The badge at the top trailing corner of `anchor` (the icon, or the title): the center of its leading cap on the
+   * corner, kept inside the tag (which clips its content).
+   */
+  private layOutBadge(anchor: CYLRect): void {
+    const badge = this.badgeValueStorage;
+    if (badge === undefined) {
+      this.badgeLabel.frame = new CYLRect();
+      return;
+    }
+    const isDot = badge.length === 0;
+    const font = this.badgeLabel.font;
+    const badgeHeight = isDot ? BADGE_DOT_DIAMETER :
+      Math.max(BADGE_MINIMUM_HEIGHT, Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + 2);
+    const textWidth = isDot ? 0 : Math.ceil(CYLTagButtonMetrics.textMeasurer(badge, font));
+    const badgeWidth = isDot ? badgeHeight : Math.max(badgeHeight, textWidth + 2 * BADGE_PADDING);
+    const x = Math.max(0, Math.min(anchor.maxX - badgeHeight / 2, this.boundsWidth - badgeWidth));
+    const y = Math.max(0, Math.min(anchor.y - badgeHeight / 2, this.boundsHeight - badgeHeight));
+    this.badgeLabel.frame = new CYLRect(x, y, badgeWidth, badgeHeight);
+    this.badgeLabel.cornerRadius = badgeHeight / 2;
   }
 
   private reloadAnimationView(): void {
@@ -541,6 +662,12 @@ export class CYLTagButton {
     const borderColor = appearance.borderColor;
     this.borderColor = borderColor ?? CYLColor.CLEAR;
     this.borderWidth = borderColor !== undefined ? appearance.borderWidth : 0;
+    const badge = this.badgeValueStorage;
+    this.badgeLabel.isHidden = badge === undefined;
+    this.badgeLabel.text = badge !== undefined && badge.length > 0 ? badge : undefined;
+    this.badgeLabel.font = new CYLFont(BADGE_FONT_SIZE * this.fontScale, FontWeight.Bold);
+    this.badgeLabel.textColor = CYLColor.WHITE;
+    this.badgeLabel.tintColor = this.badgeColorStorage;
     this.layoutSubviews();
     this.changed();
   }
@@ -573,6 +700,10 @@ export struct CYLTagButtonComponent {
 
   private dl(): CYLTagButtonPart {
     return this.button.revision >= 0 ? this.button.deleteIndicatorLabel : this.button.deleteIndicatorLabel;
+  }
+
+  private bl(): CYLTagButtonPart {
+    return this.button.revision >= 0 ? this.button.badgeLabel : this.button.badgeLabel;
   }
 
   private af(): CYLRect {
@@ -632,6 +763,21 @@ export struct CYLTagButtonComponent {
           .position({ x: this.part(this.dl()).x, y: this.part(this.dl()).y })
           .accessibilityLevel('no')
       }
+      if (!this.bl().isHidden) {
+        // The badge: white text on `badgeColor` (the part's tint), a capsule or a dot.
+        Text(this.bl().text ?? '')
+          .fontSize(this.bl().font.size)
+          .fontWeight(this.bl().font.weight)
+          .fontColor(this.bl().textColor)
+          .textAlign(TextAlign.Center)
+          .maxLines(1)
+          .backgroundColor(this.bl().tintColor)
+          .borderRadius(this.bl().cornerRadius)
+          .width(this.part(this.bl()).width)
+          .height(this.part(this.bl()).height)
+          .position({ x: this.part(this.bl()).x, y: this.part(this.bl()).y })
+          .accessibilityLevel('no')
+      }
       if (this.button.showsCross) {
         ForEach(this.button.crossLines, (line: number[]) => {
           Line()
@@ -668,6 +814,8 @@ export struct CYLTagButtonComponent {
       }
     })
     .accessibilityGroup(true)
+    .accessibilityText(this.button.accessibilityLabel ?? '')
+    .accessibilityDescription(this.button.accessibilityValue ?? '')
     .onClick(() => this.onTagClick?.())
   }
 }

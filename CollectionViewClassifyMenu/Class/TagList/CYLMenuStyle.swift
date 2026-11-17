@@ -25,6 +25,14 @@ import UIKit
      * Title, then icon, e.g. "更多 ⌄".
      */
     case trailing
+    /**
+     * The icon above the title, both centered, as a tab bar item or a placeholder (raw value 2).
+     */
+    case top
+    /**
+     * The icon below the title, both centered (raw value 3).
+     */
+    case bottom
 }
 
 /**
@@ -243,7 +251,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var imagePositionAdjustment: UIOffset = .zero
 
     /**
-     * The icon before (default) or after the title.
+     * The icon before (default) or after the title, or above (`.top`) or below (`.bottom`) it.
      */
     open var imagePlacement: CYLTagImagePlacement = .leading
 

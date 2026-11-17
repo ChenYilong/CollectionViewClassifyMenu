@@ -7,6 +7,7 @@ import imageTagAndPlayerTest from './ImageTagAndPlayer.test';
 import styleAndModelsTest from './StyleAndModels.test';
 import launchOptionsTest from './LaunchOptions.test';
 import reviewFilterTapTest from './ReviewFilterTap.test';
+import tagButtonTest from './TagButton.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -18,4 +19,5 @@ export default function testsuite() {
   styleAndModelsTest();
   launchOptionsTest();
   reviewFilterTapTest();
+  tagButtonTest();
 }

@@ -5,6 +5,7 @@
  *   "cyl-tag-list":  "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list"
  *   "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud"
  *   "cyl-tag-image": "cyl-tag-list-miniprogram/cyl-tag-image/cyl-tag-image"
+ *   "cyl-tag-button": "cyl-tag-list-miniprogram/cyl-tag-button/cyl-tag-button" (one tag on its own: icon, title, badge)
  *
  * This module gathers their models and settings for scripts.
  */

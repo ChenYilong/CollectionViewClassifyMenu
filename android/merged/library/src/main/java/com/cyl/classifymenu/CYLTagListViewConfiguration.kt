@@ -735,7 +735,8 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     configuration[CYLMenuStyleImagePlacement]?.let {
         imagePlacement = enumValue(it, mapOf("leading" to CYLTagImagePlacement.CYLTagImagePlacementLeading,
             "left" to CYLTagImagePlacement.CYLTagImagePlacementLeading, "trailing" to CYLTagImagePlacement.CYLTagImagePlacementTrailing,
-            "right" to CYLTagImagePlacement.CYLTagImagePlacementTrailing), CYLTagImagePlacement.values(), imagePlacement)
+            "right" to CYLTagImagePlacement.CYLTagImagePlacementTrailing, "top" to CYLTagImagePlacement.CYLTagImagePlacementTop,
+            "bottom" to CYLTagImagePlacement.CYLTagImagePlacementBottom), CYLTagImagePlacement.values(), imagePlacement)
     }
     configuration[CYLMenuStyleContentAlignment]?.let {
         contentAlignment = enumValue(it, mapOf("center" to CYLTagContentAlignment.CYLTagContentAlignmentCenter,

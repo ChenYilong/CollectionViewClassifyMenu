@@ -264,7 +264,7 @@ tags: [issues, ui, cocoapods, progress]
   block; it does not simulate a tap (the tap path is private), so the call from `handleTap` is checked only by
   reading it.
 
-### TODO (2026-11-17, `feat/harmony`): `CYLTagButton` as the one icon + title + animated icon component
+### DONE (2026-11-17, `feat/harmony`, logged as TODO in `1e43253`): `CYLTagButton` as the one icon + title + animated icon component
 
 - Prompt (relayed by the CYLSearchViewController session; the user's goal, quoted in that repository's task log):
   every component that shows an icon with a title, or plays an animated icon, in CYLSearchViewController and its
@@ -286,7 +286,38 @@ tags: [issues, ui, cocoapods, progress]
      sensible default style outside a tag list;
   5. every new iOS member `@objc`;
   6. tests on each platform, parity tables regenerated at 100, docs updated.
-- Status: in progress.
+- Result (the commit that marks this entry done):
+  - iOS (`CYLTagButton.swift`, `CYLMenuStyle.swift`): `badgeValue` / `badgeColor` / `badgeLabel` (a capsule or an 8 pt
+    dot, white bold 11 pt text scaled for Dynamic Type, on the icon's top trailing corner or the title's, kept inside the
+    tag), `CYLTagImagePlacement.top` (2) / `.bottom` (3) with the stacked layout, `width(forTitle:…)` (the wider of the
+    two) and `height(for:)` (the icon slot and the spacing added), the new
+    `height(forTitle:iconSize:style:traitCollection:)`, `intrinsicContentSize` / `sizeThatFits(_:)`,
+    `init(title:image:)` / `init(title:image:animationURL:)` (an accessibility element with the button trait whose
+    traits follow selected and disabled), `accessibilityLabel` (the title, else the icon's label) and
+    `accessibilityValue` (the badge; "New" localized for a dot, new core key `CYLTagBadgeDot` in en / zh-Hans /
+    zh-Hant) unless set; the configuration key `imagePlacement` reads "top" / "bottom". Every new member is `@objc`.
+  - Android (`CYLTagButton.kt`): `badgeValue`, `badgeColor` (`CYLTagBadgeDefaultColor`), `badgeLabel`, `badgeFrame`,
+    `CYLTagImagePlacementTop` / `Bottom` (`isVertical`), `heightForTitle`, `CYLTagButton(context, title, image)` /
+    `CYLTagButton(context, title, image, animationURL)`, TalkBack reads "title, badge". A stacked tag measures with
+    `heightForTitle`; a side-by-side one keeps `heightForStyle` (unchanged).
+  - HarmonyOS (`CYLTagButton.ets`, `CYLTagListState.ets`): `badgeValue`, `badgeColor` (`CYLTagBadgeDefaultColor`),
+    `badgeLabel`, `accessibilityLabel`, `accessibilityValue` (the component's `accessibilityText` /
+    `accessibilityDescription`), `CYLTagImagePlacement.top` / `.bottom` (`CYLTagImagePlacementIsVertical`),
+    `heightForTitle`, `new CYLTagButton(title, image, animationURL)`; `intrinsicSize()` uses `heightForTitle`.
+  - Mini program: the new `cyl-tag-button` component (iOS property names, `playAnimation()`, `tagtap`), model.js
+    `tagButtonView`, `badgeLayout`, `tagHeightForTitle`, `isVerticalPlacement`, `imagePlacement` "top" / "bottom" in
+    `cyl-tag-list` too (flex column).
+  - Tests: iOS `CYLTagButtonTests` (4 new tests) and `testTagButtonStandaloneAPIIsVisibleToObjectiveC`; Android
+    `CYLTagButtonStandaloneTest` (4); HarmonyOS `TagButton.test.ets` (3); mini program `test/tag-button.test.js` (4).
+    Run here: `npm test` (108 pass), `export-core-strings.py --check`, `check-native-strings.py`. Not compiled or run
+    here (Linux, no Xcode, Android SDK or DevEco): the Swift, Kotlin and ArkTS code and their tests; CI builds iOS.
+  - Tables: Android -> iOS 740 / 740 = 100; iOS -> Android 770 / 778 (the 8 TODO rows are the classify menu and filter
+    buttons of `d05b42e`, Android refactor still TODO there); `docs/harmony.md` 811 / 849 (the 38 TODO rows are iOS
+    symbols added since the last regeneration, none of this task's; four stale keys of `d05b42e` removed from
+    `harmony/parity-map.json`).
+- TODO left: open `cyl-tag-button` in WeChat DevTools; screenshots of a standalone tag with a badge on each platform;
+  the HarmonyOS fold controls (`CYLTagListView.content`) still lay a stacked placement out in a row; Android's
+  `CYLTagButton` has no `intrinsicContentSize` (it measures itself in `onMeasure`).
 
 ### TODO (2026-11-16): SVGA animated icons (CYLTabBarController added SVGA)
 

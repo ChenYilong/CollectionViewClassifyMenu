@@ -21,7 +21,8 @@ module.exports = {
   "CYLMenuNewTag": "New Tag",
   "CYLMenuNewTagNamed": "New tag: %@",
   "CYLMenuTagMoved": "Moved to position %ld",
-  "CYLMenuTitle": "Categories"
+  "CYLMenuTitle": "Categories",
+  "CYLTagBadgeDot": "New"
  },
  "zh-Hans": {
   "CYLFilterConfirm": "确认筛选",
@@ -44,7 +45,8 @@ module.exports = {
   "CYLMenuNewTag": "新建标签",
   "CYLMenuNewTagNamed": "新建标签：%@",
   "CYLMenuTagMoved": "已移到第 %ld 个",
-  "CYLMenuTitle": "分类"
+  "CYLMenuTitle": "分类",
+  "CYLTagBadgeDot": "新"
  },
  "zh-Hant": {
   "CYLFilterConfirm": "確認篩選",
@@ -67,6 +69,7 @@ module.exports = {
   "CYLMenuNewTag": "新增標籤",
   "CYLMenuNewTagNamed": "新增標籤：%@",
   "CYLMenuTagMoved": "已移到第 %ld 個",
-  "CYLMenuTitle": "分類"
+  "CYLMenuTitle": "分類",
+  "CYLTagBadgeDot": "新"
  }
 };
