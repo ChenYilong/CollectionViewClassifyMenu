@@ -8,6 +8,7 @@
 
 import XCTest
 import UIKit
+import CYLTabBarController
 import CollectionViewClassifyMenu
 @testable import CYLMenuExample
 
@@ -264,5 +265,33 @@ final class CYLTagButtonTests: XCTestCase {
                        "An icon-only tag reads its icon's label")
         XCTAssertFalse(CYLTagButton(frame: .zero).accessibilityTraits.contains(.selected),
                        "A tag inside a list keeps the traits its host gives it")
+    }
+
+    /**
+     * CYLAnimatedItemView's display priority, inherited (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md),
+     * with the engines this example adds: a file that cannot play shows the static image, the component's placeholder
+     * only without one, and a title alone never grows an icon.
+     */
+    func testTagButtonDisplayPriorityWhenTheAnimationCannotPlay() {
+        let missing = URL(fileURLWithPath: "/no/such/file.json")
+        let unknown = FileManager.default.temporaryDirectory.appendingPathComponent("cyl-tag.unknown-type")
+        try? Data("not an animation".utf8).write(to: unknown)
+        let image = UIImage(systemName: "house")
+        for url in [missing, unknown] {
+            let withImage = CYLTagButton(title: "首页", image: image, animationURL: url)
+            withImage.layoutIfNeeded()
+            XCTAssertNil(withImage.animationView, url.lastPathComponent)
+            XCTAssertTrue(withImage.imageView.image === image, "The static image wins over the placeholder")
+            XCTAssertFalse(withImage.imageView.isHidden)
+            let withoutImage = CYLTagButton(title: "首页", image: nil, animationURL: url)
+            withoutImage.layoutIfNeeded()
+            if CYLAnimatedItemView.defaultPlaceholderImage != nil {
+                XCTAssertNotNil(withoutImage.imageView.image, "No static image: the component's placeholder")
+            }
+            withoutImage.playAnimation()
+        }
+        let titleOnly = CYLTagButton(title: "首页", image: nil)
+        titleOnly.layoutIfNeeded()
+        XCTAssertNil(titleOnly.imageView.image, "A title without an icon never shows a placeholder")
     }
 }

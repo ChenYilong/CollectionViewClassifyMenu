@@ -78,10 +78,12 @@ in the project.
   reference semantics or KVC.
 - **Closures** replace blocks; escaping closures that capture `self` use `[weak self]`.
 - **Constants:** `static let` in the owning type; magic numbers get a name.
-- **Runtime lookups** that keep the core free of a dependency (CYLTabBarController's `CYLTabBarItemAnimationFactory`
-  and `CYLTabBarConfigurationParser`, found with `NSClassFromString` and selectors) stay runtime lookups, wrapped in
-  one small type with documented selectors.
-- **No new dependencies.** The core links UIKit and Accelerate only.
+- **Runtime lookups** that keep the core free of a dependency (CYLTabBarController's `CYLTabBarConfigurationParser`,
+  found with `NSClassFromString` and selectors) stay runtime lookups, wrapped in one small type with documented
+  selectors. The animation engine is no longer looked up: `CYLTagButton` subclasses `CYLAnimatedItemView`, which plays
+  animations only when an engine subspec is in the app.
+- **No new dependencies.** The core links UIKit, Accelerate and CYLTabBarController's `CYLAnimatedItem` component (no
+  engine, no tab bar).
 
 ## 4. Concurrency
 

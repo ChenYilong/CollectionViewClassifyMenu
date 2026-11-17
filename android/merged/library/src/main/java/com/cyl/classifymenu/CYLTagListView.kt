@@ -745,7 +745,7 @@ open class CYLTagListView @JvmOverloads constructor(
     var animationSpeed: Float? = null
         set(value) {
             field = value
-            content.forEachTagButton { it.animationSpeed = value }
+            content.forEachTagButton { it.cylApplyListAnimationSpeed(value) }
         }
 
     /**
@@ -1089,7 +1089,7 @@ open class CYLTagListView @JvmOverloads constructor(
         cell.configureWithTitle(titles[indexPath.section][indexPath.item], imageAt(indexPath), selectedImageAt(indexPath),
             animationURLAt(indexPath), styleForItem(indexPath), indexPath in selection, isEnabledAt(indexPath))
         cell.button.animationRestingProgress = restingProgressAt(indexPath)
-        cell.button.animationSpeed = animationSpeed
+        cell.button.cylApplyListAnimationSpeed(animationSpeed)
         cell.button.animationLoops = animationLoops
         val deletable = isDeletableAt(indexPath) && isEnabledAt(indexPath)
         cell.deletable = deletable
@@ -1477,4 +1477,9 @@ open class CYLTagListView @JvmOverloads constructor(
             foldButton.layout(px(x), px(y), px(x + size.width), px(y + size.height))
         }
     }
+}
+
+/** The list's `animationSpeed`: a speed sets the tag's own, null lets it follow its style again. */
+internal fun CYLTagButton.cylApplyListAnimationSpeed(speed: Float?) {
+    if (speed != null) animationSpeed = speed else resetAnimationSpeed()
 }

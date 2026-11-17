@@ -164,7 +164,7 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
             button.style = style
             appliedStyle = style
         }
-        button.animationURL = animationURL
+        button.animationURL = animationURL?.toString()
         button.title = title
         button.image = image
         button.selectedImage = selectedImage

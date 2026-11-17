@@ -253,10 +253,24 @@ verify the behavior and update the applicable documentation.
   `CYLPlusButtonCenterYMultiplier`; in code, with `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` /
   `+multiplierOfTabBarHeight:` of `CYLPlusButtonSubclassing`. A flat plus button needs a request. Details:
   `.agents/skills/cyl-dependency/`.
-- The core library does not depend on CYLTabBarController: it finds the
-  animation engine (`CYLTabBarItemAnimationFactory`) and the configuration
-  parser (`CYLTabBarConfigurationParser`) at runtime, because the published
-  CocoaPods release lacks them. Only the examples link it.
+- The core library depends on CYLTabBarController's shared animated icon + title
+  component only: `CYLTagButton` subclasses `CYLAnimatedItemView` (podspec
+  `s.dependency 'CYLTabBarController/CYLAnimatedItem'`, Swift package
+  `.product(name: "CYLTabBarController")`, Android
+  `io.github.chenyilong:cyltabbarcontroller-animateditem`, built from the pinned
+  commit through `substitute(...).using(project(":cylanimateditem"))`; guide:
+  <https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md>).
+  It never depends on an animation engine or library: only the examples add the
+  engine subspecs (`CYLTabBarController/CYLAnimatedItem<Type>`: `LottieSwift`,
+  `LottieObjectiveC`, `PAG`, `PAGEnterprise`, `Rive`, `SVGA`, `GIF`) and the
+  Android animation libraries (Lottie, libpag, rive-android, SVGAPlayer); without
+  them tags show their static images. The display priority, the failure
+  fallbacks, the placeholder and the URL loading are the base class's: never
+  reimplement them in a subclass. The configuration parser
+  (`CYLTabBarConfigurationParser`) is still found at runtime. Since
+  `CYLTabBarController/CYLAnimatedItem` is in no CocoaPods release yet, every
+  Podfile pins CYLTabBarController by commit and `scripts/pod-lint.sh lib`
+  lints against that commit's podspec.
 - Details: `.agents/skills/cyl-dependency/`.
 
 ## Bundled animation files

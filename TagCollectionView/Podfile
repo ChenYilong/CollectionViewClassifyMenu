@@ -1,8 +1,14 @@
 platform :ios, '15.0'
 project 'TagCollectionView.xcodeproj'
 
+# CollectionViewClassifyMenu depends on CYLTabBarController/CYLAnimatedItem, not in a CocoaPods release yet: by commit,
+# the same as the other Podfiles' CYL_TAB_BAR.
+CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
+                :commit => '7511f7db2c9ada0da015e4b4e0f4c1bb94df8f93' }
+
 target 'TagCollectionView' do
   pod 'CollectionViewClassifyMenu', :path => '..'
+  pod 'CYLTabBarController/CYLAnimatedItem', CYL_TAB_BAR
 
   target 'TagCollectionViewTests' do
     inherit! :search_paths

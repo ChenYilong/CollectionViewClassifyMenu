@@ -20,10 +20,11 @@ target 'CylTagListExample' do
   pod 'CollectionViewClassifyMenu', :path => '../../../..'
   # The animation engine the tags play Lottie files with (found at run time; the core does not depend on it).
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                  :commit => 'ffba28a2b44e6d36b1cede5e44e03218783668e3' }
+                  :commit => '7511f7db2c9ada0da015e4b4e0f4c1bb94df8f93' }
   pod 'CYLTabBarController', cyl_tab_bar
-  pod 'CYLTabBarController/Lottie', cyl_tab_bar
-  pod 'CYLTabBarController/Rive', cyl_tab_bar
+  # The animated icon engines the example plays; the core depends on CYLTabBarController/CYLAnimatedItem only.
+  pod 'CYLTabBarController/CYLAnimatedItemLottieObjectiveC', cyl_tab_bar
+  pod 'CYLTabBarController/CYLAnimatedItemRive', cyl_tab_bar
 
   use_react_native!(
     :path => config[:reactNativePath],

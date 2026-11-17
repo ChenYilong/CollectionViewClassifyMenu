@@ -8,7 +8,7 @@ project 'CYLMenuExample.xcodeproj'
 
 # The revision whose API the Example uses (feat/cross-platform-components); update together.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => 'ffba28a2b44e6d36b1cede5e44e03218783668e3' }
+                :commit => '7511f7db2c9ada0da015e4b4e0f4c1bb94df8f93' }
 
 # The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
 # revision whose API the Example uses (feat/search-bar-view); update together.
@@ -21,12 +21,16 @@ target 'CYLMenuExample' do
   pod 'CollectionViewClassifyMenu', :path => '..'
   pod 'CYLTabBarController', CYL_TAB_BAR
   # Animated tag icons, the same libraries and animators as CYLTabBarController's tab icons.
-  pod 'CYLTabBarController/Lottie', CYL_TAB_BAR
-  pod 'CYLTabBarController/PAG', CYL_TAB_BAR
-  pod 'CYLTabBarController/Rive', CYL_TAB_BAR
+  # The engines of the animated icons the example plays (tags, the tab bar): one CYLAnimatedItem engine subspec per file
+  # type (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
+  # The core (CollectionViewClassifyMenu) depends on CYLTabBarController/CYLAnimatedItem only and adds none.
+  pod 'CYLTabBarController/CYLAnimatedItem', CYL_TAB_BAR
+  pod 'CYLTabBarController/CYLAnimatedItemLottieObjectiveC', CYL_TAB_BAR
+  pod 'CYLTabBarController/CYLAnimatedItemPAG', CYL_TAB_BAR
+  pod 'CYLTabBarController/CYLAnimatedItemRive', CYL_TAB_BAR
   # SVGA icons (SVGAPlayerLite), shown wherever Rive is, as CYLTabBarController's Example-Rive does.
-  pod 'CYLTabBarController/SVGA', CYL_TAB_BAR
-  pod 'CYLTabBarController/GIF', CYL_TAB_BAR
+  pod 'CYLTabBarController/CYLAnimatedItemSVGA', CYL_TAB_BAR
+  pod 'CYLTabBarController/CYLAnimatedItemGIF', CYL_TAB_BAR
   pod 'CYLSearchViewController', CYL_SEARCH
 
   target 'CYLMenuExampleTests' do

@@ -33,6 +33,12 @@ android {
 }
 
 dependencies {
+    // CYLTagButton subclasses CYLTabBarController's CYLAnimatedItemView (module :cylanimateditem; guide:
+    // https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md), so it
+    // is part of the API. It holds the animation engine, which reaches Lottie, libpag, rive-android and SVGAPlayer by
+    // reflection: the core adds none of them; an app that plays animated icons adds the libraries it needs. The
+    // version is CYLTabBarController's (its podspec); settings.gradle.kts builds the pinned commit in its place.
+    api("io.github.chenyilong:cyltabbarcontroller-animateditem:1.100.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.recyclerview)
@@ -52,7 +58,8 @@ afterEvaluate {
             }
         }
         repositories {
-            // `publishReleasePublicationToBuildRepository` checks the artifact locally; a Maven Central (Sonatype)
+            // `publishReleasePublicationToBuildRepository` checks the artifact locally (the React Native and Flutter
+            // hosts read it from build/repo); a Maven Central (Sonatype)
             // repository with credentials is added here for a release.
             maven {
                 name = "build"
@@ -60,4 +67,22 @@ afterEvaluate {
             }
         }
     }
+}
+
+// The React Native and Flutter hosts resolve com.cyl:classifymenu from build/repo; its POM needs
+// io.github.chenyilong:cyltabbarcontroller-animateditem, which is not on Maven Central yet. Publishing the library also
+// publishes that module of the pinned CYLTabBarController (the included build's `staging` repository) and copies it
+// next to the library.
+val cylTabBarBuild = gradle.includedBuilds.firstOrNull { File(it.projectDir, "cylanimateditem").isDirectory }
+val publishAnimatedItemToBuildRepository by tasks.registering(Copy::class) {
+    if (cylTabBarBuild != null) {
+        dependsOn(cylTabBarBuild.task(":cylanimateditem:publishReleasePublicationToStagingRepository"))
+        from(File(cylTabBarBuild.projectDir, "build/staging-deploy")) {
+            include("io/github/chenyilong/cyltabbarcontroller-animateditem/**")
+        }
+    }
+    into(layout.buildDirectory.dir("repo"))
+}
+tasks.matching { it.name == "publishReleasePublicationToBuildRepository" }.configureEach {
+    finalizedBy(publishAnimatedItemToBuildRepository)
 }

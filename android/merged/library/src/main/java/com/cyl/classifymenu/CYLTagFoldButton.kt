@@ -18,6 +18,11 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
     var isExpanded: Boolean = false
         private set
 
+    /** What TalkBack reads: the fold control's title for its state (the base class's hook). */
+    private var foldAccessibilityText: CharSequence? = null
+
+    override fun accessibilityText(): CharSequence = foldAccessibilityText ?: super.accessibilityText()
+
     init {
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         cyl_accessibilityIdentifier = CYLTagListFoldControlAccessibilityIdentifier
@@ -38,7 +43,8 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
         this.style = style
         title = foldControl.titleWhenExpanded(expanded)
         image = if (foldControl.showsImageWhenExpanded(expanded)) foldControl.image else null
-        contentDescription = foldControl.titleWhenExpanded(expanded) ?: if (expanded) foldControl.collapseTitle else foldControl.title
+        foldAccessibilityText = foldControl.titleWhenExpanded(expanded) ?: if (expanded) foldControl.collapseTitle else foldControl.title
+        updateAccessibility()
         val rotation = if (expanded && foldControl.rotatesImageWhenExpanded) 180f - 0.0001f else 0f
         if (animated && !CYLAccessibility.isReduceMotionEnabled(context)) {
             imageView.animate().rotation(rotation).setDuration(250).start()

@@ -64,5 +64,8 @@ includeBuild(File(cylRoot, "Example-Android")) {
     dependencySubstitution {
         substitute(module("io.github.chenyilong:cyltabbarcontroller")).using(project(":cyltabbar"))
         substitute(module("io.github.chenyilong:cyltabbarcontroller-pages")).using(project(":tabpages"))
+        // The shared animated icon + title component CYLTagButton subclasses (CYLAnimatedItemView, the animation engine,
+        // no animation library): https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md
+        substitute(module("io.github.chenyilong:cyltabbarcontroller-animateditem")).using(project(":cylanimateditem"))
     }
 }

@@ -2,99 +2,35 @@
 //  CYLTagButton.swift
 //  CollectionViewClassifyMenu
 //
-//  One tag: CYLFlatDesignTabBarButton (CYLTabBarController) laid out horizontally, the icon before the title (or above
-//  it with CYLTagImagePlacementTop), in a box styled like a CYLBadgeView, with an optional badge. CYLTagListView puts one
-//  in every cell; it is also the one icon + title + animated icon component of the libraries built on this one (a
-//  search bar item, a placeholder's icon), so a new animation type is added here only (CYLTagAnimationEngine).
+//  One tag: CYLTabBarController's shared animated icon + title component, CYLAnimatedItemView (subspec
+//  CYLTabBarController/CYLAnimatedItem, guide:
+//  https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md), laid out
+//  as a tag: the icon before, after, above or below the title, in a box drawn from the style's appearance for the
+//  current state, with an optional delete indicator (the base class's accessory view) and an optional badge.
+//  CYLTagListView puts one in every cell; the libraries built on this one (a search bar item) subclass it. The icon,
+//  the title and the animated icon are the base class's: it plays any file of CYLTabBarController's animation engine
+//  once the app adds an engine subspec (CYLAnimatedItemLottieSwift, …PAG, …Rive, …SVGA, …GIF), and shows the static
+//  image (or its placeholder) otherwise. The core links no engine.
 //  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
 //
 
+import CYLTabBarController
 import UIKit
-
-/**
- * CYLTabBarController's animation engine, found at runtime so that the component does not depend on
- * CYLTabBarController; the libraries' animators register themselves with it, as for tab bar items.
- *
- * - `+[CYLTabBarItemAnimationFactory animationViewWithURL:size:contentMode:]` makes the view;
- * - `+[CYLTabBarItemAnimationFactory playerForView:]` returns its `CYLTabBarItemAnimationPlayer`, whose `play`,
- *   `showLastFrame`, `stop` and optional `animationSpeed` / `progress` the tag uses.
- */
-private enum CYLTagAnimationEngine {
-
-    typealias MakeView = @convention(c) (AnyObject, Selector, NSURL, CGSize, UIView.ContentMode) -> UIView?
-
-    static let makeViewSelector = NSSelectorFromString("animationViewWithURL:size:contentMode:")
-    static let playerSelector = NSSelectorFromString("playerForView:")
-
-    /**
-     * The factory class, when it is linked and answers both selectors.
-     */
-    static var factory: AnyClass? {
-        guard let factory = NSClassFromString("CYLTabBarItemAnimationFactory"),
-              class_getClassMethod(factory, makeViewSelector) != nil,
-              class_getClassMethod(factory, playerSelector) != nil else {
-            return nil
-        }
-        return factory
-    }
-
-    static func makeView(url: URL, size: CGSize) -> UIView? {
-        guard let factory, let method = class_getClassMethod(factory, makeViewSelector) else {
-            return nil
-        }
-        let make = unsafeBitCast(method_getImplementation(method), to: MakeView.self)
-        return make(factory as AnyObject, makeViewSelector, url as NSURL, size, .scaleAspectFit)
-    }
-
-    static func player(for view: UIView) -> AnyObject? {
-        guard let factory else {
-            return nil
-        }
-        return (factory as AnyObject).perform(playerSelector, with: view)?.takeUnretainedValue()
-    }
-
-    static func send(_ name: String, to player: AnyObject?) {
-        let selector = NSSelectorFromString(name)
-        if let player, player.responds(to: selector) {
-            _ = player.perform(selector)
-        }
-    }
-
-    /**
-     * The player's `progress` (0...1) when it has one (Lottie, PAG); `nil` otherwise (Rive, SVGA, GIF).
-     */
-    static func progress(of player: AnyObject?) -> CGFloat? {
-        guard let player = player as? NSObject, player.responds(to: NSSelectorFromString("progress")) else {
-            return nil
-        }
-        return (player.value(forKey: "progress") as? NSNumber).map { CGFloat($0.doubleValue) }
-    }
-
-    /**
-     * Sets the player's own `loops` (CYLTabBarController since `dc04439`); false when the player has none.
-     */
-    static func setLoops(_ loops: Bool, of player: AnyObject?) -> Bool {
-        guard let player = player as? NSObject, player.responds(to: NSSelectorFromString("setLoops:")) else {
-            return false
-        }
-        player.setValue(loops, forKey: "loops")
-        return true
-    }
-
-    static func set(_ value: CGFloat, forKey key: String, of player: AnyObject?) {
-        let setter = NSSelectorFromString("set" + key.prefix(1).uppercased() + key.dropFirst() + ":")
-        if let player = player as? NSObject, player.responds(to: setter) {
-            player.setValue(value, forKey: key)
-        }
-    }
-}
 
 /**
  * One tag: an icon and a title side by side (the icon after, above or below the title with `imagePlacement`), in a box
  * drawn from the style's appearance for the current state, with an optional delete indicator, an optional badge and an
  * optional animated icon. Use it on its own with `init(title:image:)` or `init(title:image:animationURL:)`.
+ *
+ * It is a `CYLAnimatedItemView`: `title`, `image`, `selectedImage`, `imageView`, `titleLabel`, `animationURL`,
+ * `animationSpeed`, `animationLoops`, `animationRestingProgress`, `animationView`, `playAnimation()`,
+ * `restartAnimation()`, `stopAnimation()`, the accessory (the delete indicator) and the gesture `delegate` are the base
+ * class's. So is the display priority: the animation when it can play; otherwise the static `image` /
+ * `selectedImage`; the component's placeholder only when there is no static image (a file that cannot play: no engine
+ * or library, an unknown type, a missing, empty or corrupted file, a failed download). A tag with a title and no icon
+ * never shows a placeholder. While a remote file downloads, the static image shows.
  */
-open class CYLTagButton: UIControl {
+open class CYLTagButton: CYLAnimatedItemView {
 
     private static let states: [UIControl.State] = [.normal, .selected, .disabled]
     private static let disabledAnimationAlpha: CGFloat = 0.4
@@ -105,26 +41,12 @@ open class CYLTagButton: UIControl {
     private static let badgeMinimumHeight: CGFloat = 16
     private static let badgePadding: CGFloat = 4
     private static let badgeFontSize: CGFloat = 11
-    private static let loopCheckInterval: TimeInterval = 0.05
-    /**
-     * The progress from which a looping animation counts as finished and starts again.
-     */
-    private static let loopEndProgress: CGFloat = 0.995
 
     /**
-     * The icon.
+     * The label that draws the delete indicator (hidden unless `showsDeleteIndicator`). It is the base class's
+     * `accessoryView`: a tap on it calls `CYLAnimatedItemViewDelegate.animatedItemViewDidTapAccessory(_:)`.
      */
-    @objc public let imageView = UIImageView()
-
-    /**
-     * The title.
-     */
-    @objc public let titleLabel = UILabel()
-
-    /**
-     * The label that draws the delete indicator (hidden unless `showsDeleteIndicator`).
-     */
-    public let deleteIndicatorLabel = UILabel()
+    @objc public let deleteIndicatorLabel = UILabel()
 
     /**
      * The label that draws the badge (hidden while `badgeValue` is `nil`), at the top trailing corner of the icon.
@@ -158,51 +80,37 @@ open class CYLTagButton: UIControl {
     }
 
     /**
-     * The title.
+     * The title (the base class's), shown through the style (`CYLMenuStyle.displayedTitle(forTitle:)`).
      */
-    @objc open var title: String? {
+    open override var title: String? {
         didSet {
             updateAppearance()
         }
     }
 
     /**
-     * The icon.
+     * The static icon (the base class's): shown until an animation is ready, whenever none can play, and while a
+     * remote file downloads.
      */
-    @objc open var image: UIImage? {
+    open override var image: UIImage? {
         didSet {
             updateAppearance()
         }
     }
 
     /**
-     * Shown while selected; `nil` keeps `image` (as CYLFlatDesignTabBarItem.selectedImage).
+     * Shown while selected (the base class's); `nil` keeps `image` (as CYLFlatDesignTabBarItem.selectedImage).
      */
-    @objc open var selectedImage: UIImage? {
+    open override var selectedImage: UIImage? {
         didSet {
             updateAppearance()
         }
     }
 
     /**
-     * Animated icon file (Lottie .json, .pag, .riv, .svga, .gif…). The view comes from CYLTabBarController's animation engine
-     * (`CYLTabBarItemAnimationFactory`), found at runtime as CYLTabBarController's own Core does: add the library's
-     * subspec to the app, e.g. `pod 'CYLTabBarController/Lottie'`. Without it, or when the file cannot be loaded,
-     * `image` is shown.
+     * The frame (0...1) of the animated icon shown while not selected (the base class's). Default 0, the first frame.
      */
-    @objc open var animationURL: URL? {
-        didSet {
-            if oldValue == animationURL && (animationView != nil || animationURL == nil) {
-                return
-            }
-            reloadAnimationView()
-        }
-    }
-
-    /**
-     * The frame (0...1) of the animated icon shown while not selected. Default 0, the first frame.
-     */
-    @objc open var animationRestingProgress: CGFloat = 0 {
+    open override var animationRestingProgress: CGFloat {
         didSet {
             if oldValue != animationRestingProgress {
                 updateAnimationState()
@@ -211,49 +119,21 @@ open class CYLTagButton: UIControl {
     }
 
     /**
-     * The playback speed of the animated icon, applied at once, also to an animation that is playing. `nil` (the
-     * default) uses `style.animationSpeed`. Players without a speed (PAG) ignore it.
+     * The playback speed of the animated icon (the base class's), applied at once, also to an animation that is
+     * playing. Until it is set, the tag follows `style.animationSpeed`; `resetAnimationSpeed()` goes back to it.
      */
-    open var animationSpeed: CGFloat? {
+    open override var animationSpeed: CGFloat {
         didSet {
-            applyAnimationSpeed()
-        }
-    }
-
-    /**
-     * True repeats the animated icon after `playAnimation()` until it is set to false, a change of selection or a new
-     * file; false (the default) plays once. Turning it off lets the pass in progress finish. It uses the player's own
-     * `loops` when it has one, and otherwise starts the animation again when its `progress` reaches the end; players
-     * with neither (Rive, SVGA, GIF at CYLTabBarController `cfddcce`) play once.
-     */
-    @objc open var animationLoops = false {
-        didSet {
-            guard oldValue != animationLoops else {
-                return
-            }
-            let usesPlayerLoops = CYLTagAnimationEngine.setLoops(animationLoops, of: animationPlayer)
-            if !animationLoops || usesPlayerLoops {
-                stopLoopTimer()
-            } else if isPlaying {
-                startLoopTimer()
+            if !isApplyingStyleAnimationSpeed {
+                followsStyleAnimationSpeed = false
             }
         }
     }
-
-    /**
-     * The animation view in the icon slot, or `nil`.
-     */
-    open private(set) var animationView: UIView?
-
-    /**
-     * Its `CYLTabBarItemAnimationPlayer` (play, showLastFrame, stop), whatever the library, or `nil`.
-     */
-    open private(set) var animationPlayer: AnyObject?
 
     /**
      * Shows the style's delete indicator ("×", `CYLMenuStyle.deleteIndicatorTitle`) after the title, as
      * android-tagview's deletable tags. False by default. `CYLTagListView` turns it on for deletable items and handles
-     * taps on it.
+     * taps on it; a tag on its own reports them to `delegate` (`animatedItemViewDidTapAccessory(_:)`).
      */
     @objc open var showsDeleteIndicator = false {
         didSet {
@@ -278,21 +158,26 @@ open class CYLTagButton: UIControl {
         }
         set {
             styleStorage = newValue.cylCopy()
-            if animationView != nil && animationViewSize != animationSize {
-                reloadAnimationView()
-            } else {
-                // Only the speed: an animation that is playing goes on.
-                applyAnimationSpeed()
+            applyStyleAnimationSpeed()
+            let axis: CYLAnimatedItemAxis = styleStorage.imagePlacement.cylIsVertical ? .vertical : .horizontal
+            if self.axis != axis {
+                self.axis = axis
+            }
+            if self.iconSize != animationSize {
+                // The base class makes the animation view at `iconSize`: a new size reloads it.
+                self.iconSize = animationSize
             }
             updateAppearance()
         }
     }
 
     /**
-     * Whether CYLTabBarController's animation engine is linked into the app.
+     * Whether an animation engine is in the app (CYLTabBarController's `CYLTabBarItemAnimationFactory`, brought by an
+     * engine subspec such as `CYLTabBarController/CYLAnimatedItemLottieSwift`). The core links none: without one, tags
+     * show their static images.
      */
-    public static var isAnimationEngineAvailable: Bool {
-        CYLTagAnimationEngine.factory != nil
+    @objc public static var isAnimationEngineAvailable: Bool {
+        NSClassFromString("CYLTabBarItemAnimationFactory") != nil
     }
 
     private var styleStorage = CYLMenuStyle()
@@ -302,12 +187,8 @@ open class CYLTagButton: UIControl {
      * follow its state (selected, not enabled).
      */
     private var addsStateTraits = false
-    private var animationViewSize: CGSize = .zero
-    /**
-     * True from `playAnimation()` until the state is set again (selection, a new file).
-     */
-    private var isPlaying = false
-    private var loopTimer: Timer?
+    private var followsStyleAnimationSpeed = true
+    private var isApplyingStyleAnimationSpeed = false
     private let backgroundImageView = UIImageView()
     /**
      * The cross of `CYLMenuStyle.deleteIndicatorLineWidth`.
@@ -336,8 +217,8 @@ open class CYLTagButton: UIControl {
     }
 
     /**
-     * The same with an animated icon (Lottie, PAG, Rive, SVGA, GIF…) in the icon slot; `image` is shown while the
-     * animation engine is not linked or the file cannot be loaded.
+     * The same with an animated icon (Lottie, PAG, Rive, SVGA, GIF…) in the icon slot; `image` is shown while no
+     * engine is in the app, while the file downloads, or when it cannot be played.
      */
     @objc(initWithTitle:image:animationURL:)
     public convenience init(title: String?, image: UIImage?, animationURL: URL?) {
@@ -352,16 +233,20 @@ open class CYLTagButton: UIControl {
     }
 
     private func commonInit() {
-        imageView.contentMode = .scaleAspectFit
+        // A tag in a list is not an accessibility element (its cell is); the convenience initializers make it one.
+        isAccessibilityElement = false
+        accessibilityTraits = []
+        accessibilityIdentifier = nil
+        // The style scales the fonts (`CYLMenuStyle.titleFont(for:traitCollection:)`) and places the title itself.
+        titleLabel.adjustsFontForContentSizeCategory = false
+        titleLabel.textAlignment = .natural
         titleLabel.lineBreakMode = .byTruncatingTail
         backgroundImageView.isHidden = true
+        insertSubview(backgroundImageView, at: 0)
         deleteIndicatorLabel.textAlignment = .center
         deleteIndicatorLabel.isHidden = true
-        deleteIndicatorLabel.isAccessibilityElement = false
-        addSubview(backgroundImageView)
-        addSubview(imageView)
-        addSubview(titleLabel)
-        addSubview(deleteIndicatorLabel)
+        // The accessory once: the base class adds its tap recognizer each time an accessory is set.
+        accessoryView = deleteIndicatorLabel
         badgeLabel.textAlignment = .center
         badgeLabel.textColor = .white
         badgeLabel.isHidden = true
@@ -372,30 +257,40 @@ open class CYLTagButton: UIControl {
         crossLayer.lineCap = .round
         layer.addSublayer(crossLayer)
         layer.masksToBounds = true
+        self.iconSize = animationSize
+        applyStyleAnimationSpeed()
         updateAppearance()
     }
 
     // MARK: - Animation
 
     /**
-     * Plays the animated icon from the start, as a tab icon plays when the tab is tapped.
+     * Plays the animated icon, as a tab icon plays when the tab is tapped; with Reduce Motion it shows the state's
+     * frame instead. Without an engine (or a file that cannot play) it does nothing.
      */
-    @objc open func playAnimation() {
+    open override func playAnimation() {
         if UIAccessibility.isReduceMotionEnabled {
-            // Reduce Motion: jump to the end state instead of playing.
             updateAnimationState()
             return
         }
-        applyAnimationSpeed()
-        CYLTagAnimationEngine.send("play", to: animationPlayer)
-        isPlaying = animationPlayer != nil
-        if animationLoops && isPlaying && !CYLTagAnimationEngine.setLoops(true, of: animationPlayer) {
-            startLoopTimer()
-        }
+        super.playAnimation()
     }
 
-    deinit {
-        loopTimer?.invalidate()
+    /**
+     * Builds the animation view again (a new file or size) and shows the state's frame.
+     */
+    open override func reloadAnimation() {
+        super.reloadAnimation()
+        updateAnimationState()
+        updateAppearance()
+    }
+
+    /**
+     * Goes back to `style.animationSpeed` after `animationSpeed` was set.
+     */
+    @objc open func resetAnimationSpeed() {
+        followsStyleAnimationSpeed = true
+        applyStyleAnimationSpeed()
     }
 
     // MARK: - Measurement
@@ -442,11 +337,16 @@ open class CYLTagButton: UIControl {
     }
 
     /**
-     * Size of the icon slot for an image, or for an animated icon when `animated` and the engine is linked.
+     * Size of the icon slot for an image, or for an animated icon when `animated` and an engine is in the app; an
+     * animated icon without an engine and without an image takes the size of the component's placeholder
+     * (`CYLAnimatedItemView.defaultPlaceholderImage`), which the tag then shows.
      */
     public static func iconSize(for image: UIImage?, animated: Bool, style: CYLMenuStyle) -> CGSize {
         if animated && isAnimationEngineAvailable {
             return style.animationSize == .zero ? style.imageSize : style.animationSize
+        }
+        if animated && image == nil {
+            return iconSize(for: CYLAnimatedItemView.defaultPlaceholderImage, style: style)
         }
         return iconSize(for: image, style: style)
     }
@@ -491,7 +391,8 @@ open class CYLTagButton: UIControl {
      * The size the tag needs for its title, icon (or animated icon), delete indicator and style, in every state.
      */
     open override var intrinsicContentSize: CGSize {
-        let icon = animationView != nil ? animationSize : Self.iconSize(for: image ?? selectedImage, style: styleStorage)
+        let icon = animationView != nil
+            ? animationSize : Self.iconSize(for: image ?? selectedImage ?? imageView.image, style: styleStorage)
         return CGSize(width: Self.width(forTitle: title, iconSize: icon, showsDeleteIndicator: showsDeleteIndicator,
                                         style: styleStorage, traitCollection: traitCollection),
                       height: Self.height(forTitle: title, iconSize: icon, style: styleStorage,
@@ -503,19 +404,41 @@ open class CYLTagButton: UIControl {
     }
 
     /**
+     * The content's size without the current appearance's content insets (the base class's measuring hook).
+     */
+    open override func contentSizeThatFits(_ size: CGSize) -> CGSize {
+        let insets = styleStorage.appearance(for: currentState).contentInsets
+        let size = intrinsicContentSize
+        return CGSize(width: max(0, size.width - insets.left - insets.right),
+                      height: max(0, size.height - insets.top - insets.bottom))
+    }
+
+    /**
      * The title (or the icon's `accessibilityLabel`) unless a label was set.
      */
     open override var accessibilityLabel: String? {
         get {
-            if let label = super.accessibilityLabel {
-                return label
-            }
-            let displayed = styleStorage.displayedTitle(forTitle: title)
-            return displayed.isEmpty ? image?.accessibilityLabel : displayed
+            super.accessibilityLabel ?? itemAccessibilityLabel()
         }
         set {
             super.accessibilityLabel = newValue
         }
+    }
+
+    /**
+     * The title as shown, or the icon's `accessibilityLabel` for an icon-only tag.
+     */
+    open override func itemAccessibilityLabel() -> String? {
+        let displayed = styleStorage.displayedTitle(forTitle: title)
+        return displayed.isEmpty ? image?.accessibilityLabel : displayed
+    }
+
+    /**
+     * The label, value and traits are computed when VoiceOver reads them (`accessibilityLabel`, `accessibilityValue`,
+     * `accessibilityTraits`), so a label or traits set by the app are kept.
+     */
+    open override func updateItemAccessibility() {
+        // Nothing to store: see the getters.
     }
 
     /**
@@ -567,16 +490,12 @@ open class CYLTagButton: UIControl {
         }
     }
 
-    open override var isEnabled: Bool {
-        didSet {
-            updateAppearance()
-        }
-    }
-
-    open override var isHighlighted: Bool {
-        didSet {
-            updateAppearance()
-        }
+    /**
+     * The look of the state (selected, highlighted, enabled), from the style's appearance.
+     */
+    open override func itemStateDidChange() {
+        super.itemStateDidChange()
+        updateAppearance()
     }
 
     open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -585,10 +504,11 @@ open class CYLTagButton: UIControl {
     }
 
     /**
-     * CYLFlatDesignTabBarButton's `_updateLayout`, with the icon and title side by side.
+     * CYLFlatDesignTabBarButton's `_updateLayout`, with the icon and title side by side (the base class's layout hook;
+     * the insets come from the style's appearance for the current state). The image view and the animation view share
+     * the icon frame: the base class shows the static image (or its placeholder) until the animation shows.
      */
-    open override func layoutSubviews() {
-        super.layoutSubviews()
+    open override func layoutContent(in rect: CGRect) {
         var width = bounds.width
         let height = bounds.height
         let style = styleStorage
@@ -673,12 +593,9 @@ open class CYLTagButton: UIControl {
             let imageInsets = style.imageInsets
             frame.size.width = max(0, frame.width - imageInsets.left - imageInsets.right)
             frame.size.height = max(0, frame.height - imageInsets.top - imageInsets.bottom)
-            if let animationView {
-                animationView.frame = frame
-                placeImageView(.zero)
-            } else {
-                placeImageView(frame)
-            }
+            // The animation view and, under it, the static image (shown until the animation shows).
+            animationView?.frame = frame
+            placeImageView(frame)
             layOutBadge(anchor: frame)
         } else {
             placeImageView(.zero)
@@ -808,82 +725,43 @@ open class CYLTagButton: UIControl {
         bringSubviewToFront(badgeLabel)
     }
 
-    private func reloadAnimationView() {
-        animationView?.removeFromSuperview()
-        animationView = nil
-        animationPlayer = nil
-        // A file that does not exist shows the image (some engines would create an empty view).
-        if let url = animationURL, !(url.isFileURL && !FileManager.default.fileExists(atPath: url.path)) {
-            let size = animationSize
-            if let view = CYLTagAnimationEngine.makeView(url: url, size: size) {
-                view.isUserInteractionEnabled = false
-                addSubview(view)
-                animationView = view
-                animationViewSize = size
-                animationPlayer = CYLTagAnimationEngine.player(for: view)
-            }
-        }
-        updateAnimationState()
-        updateAppearance()
-    }
 
-    /**
-     * Selected: the last frame (a selected tab's icon); otherwise the first frame, or the resting progress.
-     */
-    private func updateAnimationState() {
-        let player = animationPlayer
-        isPlaying = false
-        stopLoopTimer()
-        applyAnimationSpeed()
-        if isSelected {
-            CYLTagAnimationEngine.send("showLastFrame", to: player)
-        } else {
-            CYLTagAnimationEngine.send("stop", to: player)
-            let resting = min(1, max(0, animationRestingProgress))
-            if resting > 0 {
-                CYLTagAnimationEngine.set(resting, forKey: "progress", of: player)
-            }
-        }
-    }
-
-    private func applyAnimationSpeed() {
-        let speed = animationSpeed ?? styleStorage.animationSpeed
-        CYLTagAnimationEngine.set(speed > 0 ? speed : 1, forKey: "animationSpeed", of: animationPlayer)
-    }
-
-    /**
-     * For players without `loops`: starts the animation again when its progress reaches the end.
-     */
-    private func startLoopTimer() {
-        guard loopTimer == nil, CYLTagAnimationEngine.progress(of: animationPlayer) != nil else {
+    private func applyStyleAnimationSpeed() {
+        guard followsStyleAnimationSpeed else {
             return
         }
-        let timer = Timer(timeInterval: Self.loopCheckInterval, repeats: true) { [weak self] timer in
-            guard let self, self.animationLoops, self.isPlaying, let player = self.animationPlayer else {
-                timer.invalidate()
-                return
-            }
-            if let progress = CYLTagAnimationEngine.progress(of: player), progress >= Self.loopEndProgress {
-                CYLTagAnimationEngine.send("play", to: player)
-            }
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        loopTimer = timer
+        let speed = styleStorage.animationSpeed
+        isApplyingStyleAnimationSpeed = true
+        animationSpeed = speed > 0 ? speed : 1
+        isApplyingStyleAnimationSpeed = false
     }
 
-    private func stopLoopTimer() {
-        loopTimer?.invalidate()
-        loopTimer = nil
+    /**
+     * Selected: the last frame (a selected tab's icon); otherwise the resting progress (the first frame by default).
+     */
+    private func updateAnimationState() {
+        guard animationView != nil else {
+            return
+        }
+        if isSelected {
+            showAnimationLastFrame()
+        } else {
+            stopAnimation()
+        }
     }
 
     private func updateAppearance() {
         let style = styleStorage
         let state = currentState
         let appearance = style.appearance(for: state)
-        let icon = state == .selected && selectedImage != nil ? selectedImage : image
-        // An animated icon takes the icon slot.
-        imageView.image = animationView == nil ? icon : nil
-        imageView.isHidden = animationView != nil
+        // The base class chooses the icon (the image, the selected image or its placeholder) and hides it while the
+        // animation shows; only a disabled selected tag shows `image`, as before (disabled wins over selected).
+        if let shown = imageView.image, shown === image || shown === selectedImage {
+            let icon = state == .selected && selectedImage != nil ? selectedImage : image
+            if icon !== shown {
+                imageView.image = icon
+            }
+        }
         animationView?.alpha = state == .disabled ? Self.disabledAnimationAlpha : 1
         imageView.tintColor = style.iconColor(for: state)
         titleLabel.text = style.displayedTitle(forTitle: title)
@@ -898,8 +776,14 @@ open class CYLTagButton: UIControl {
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)
         let drawsCross = style.deleteIndicatorLineWidth > 0
-        deleteIndicatorLabel.isHidden = !showsDeleteIndicator || drawsCross
+        // Kept visible (and empty) under a drawn cross, so that a tap on it still reaches the accessory.
+        deleteIndicatorLabel.isHidden = !showsDeleteIndicator
         deleteIndicatorLabel.text = showsDeleteIndicator && !drawsCross ? style.deleteIndicatorTitle : nil
+        deleteIndicatorLabel.accessibilityLabel = showsDeleteIndicator ? CYLMenuLocalizedString("CYLMenuDeleteTag") : nil
+        let placement: CYLAnimatedItemAccessoryPlacement = style.deleteIndicatorPlacement == .leading ? .leading : .trailing
+        if accessoryPlacement != placement {
+            accessoryPlacement = placement
+        }
         crossLayer.isHidden = !showsDeleteIndicator || !drawsCross
         crossLayer.lineWidth = style.deleteIndicatorLineWidth
         crossLayer.strokeColor = (style.deleteIndicatorColor ?? appearance.textColor)?.cgColor

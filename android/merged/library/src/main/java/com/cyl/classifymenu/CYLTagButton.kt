@@ -6,20 +6,22 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.provider.Settings
-import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.ImageView
 import android.widget.TextView
+import com.cyl.animateditem.CYLAnimatedItemAccessoryPlacement
+import com.cyl.animateditem.CYLAnimatedItemAxis
+import com.cyl.animateditem.CYLAnimatedItemView
+import com.cyl.tabbar.CYLTabBarItemAnimationViewMaking
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -27,30 +29,37 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
- * `CYLTagButton`: one tag: an icon (or an animated icon from CYLTabBarController's animation engine, found at run
- * time) before, after, above or below a title, an optional delete indicator (a title or a drawn cross) and an optional
- * badge, drawn in the style's appearance for its state (normal, selected, disabled, pressed). Lengths are dp;
- * `widthForTitle…` / `heightForStyle` / `heightForTitle` measure a tag before it exists. It is also the one icon + title
- * + animated icon component of the libraries built on this one (a search bar item, a placeholder's icon): use it on its
- * own with `CYLTagButton(context, title, image)` or `CYLTagButton(context, title, image, animationURL)`.
+ * `CYLTagButton`: one tag, built on CYLTabBarController's shared animated icon + title component `CYLAnimatedItemView`
+ * (module `:cylanimateditem`, Maven `io.github.chenyilong:cyltabbarcontroller-animateditem`; guide:
+ * https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md): an icon
+ * (or an animated icon) before, after, above or below a title, an optional delete indicator (the base class's
+ * `accessoryView`, a title or a drawn cross) and an optional badge, drawn in the style's appearance for its state
+ * (normal, selected, disabled, pressed). The icon, the title, `animationURL`, the speed, the loops, the playback and the
+ * display priority are the base class's: the animation when it can play (its library is in the app: Lottie, libpag,
+ * rive-android, SVGAPlayer; GIF needs none); otherwise the static `image` / `selectedImage`; the component's placeholder
+ * only when there is no static image. A tag with a title and no icon never shows a placeholder. The core adds no
+ * animation library. Lengths are dp; `widthForTitle…` / `heightForStyle` / `heightForTitle` measure a tag before it
+ * exists. Use it on its own with `CYLTagButton(context, title, image)` or `CYLTagButton(context, title, image, animationURL)`.
  */
 open class CYLTagButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : ViewGroup(context, attrs) {
+) : CYLAnimatedItemView(context, attrs) {
 
-    val imageView: ImageView = ImageView(context).apply { scaleType = ImageView.ScaleType.FIT_CENTER }
-    val titleLabel: TextView = TextView(context).apply {
-        maxLines = 1
-        ellipsize = TextUtils.TruncateAt.END
-        includeFontPadding = false
-        gravity = Gravity.CENTER_VERTICAL
-    }
+    /** The icon: the base class's `iconView`. */
+    val imageView: ImageView get() = iconView
+
+    /** The title: the base class's `titleView`. */
+    val titleLabel: TextView get() = titleView
+
+    /**
+     * The delete indicator (a title, or empty under a drawn cross), shown while `showsDeleteIndicator`: the base
+     * class's `accessoryView`, so a tap on it calls `gestureListener.onAccessoryTapped`.
+     */
     val deleteIndicatorLabel: TextView = TextView(context).apply {
         gravity = Gravity.CENTER
         includeFontPadding = false
         visibility = GONE
-        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
     /** `badgeLabel`: draws the badge (hidden while `badgeValue` is null), at the top trailing corner of the icon. */
     val badgeLabel: TextView = TextView(context).apply {
@@ -75,25 +84,22 @@ open class CYLTagButton @JvmOverloads constructor(
     }
     private val crossPath = Path()
     private var drawsCross = false
-
-    /** The animated icon's view (CYLTabBarController's engine), or null. */
-    var animationView: View? = null
-        private set
-
-    /** The engine's player of `animationView`, or null. */
-    var animationPlayer: Any? = null
-        private set
-    private var animationViewSize = CYLSize.ZERO
+    /** False until this class's views exist: the base class calls the hooks while it is being built. */
+    private var ready = false
+    private var rawTitle: CharSequence? = null
+    private var followsStyleAnimationSpeed = true
 
     /** The delete indicator's touch area in this view, dp (`CGRectZero` when hidden). */
     var deleteIndicatorHitFrame: CYLRect = CYLRect()
         private set
 
     init {
-        addView(backgroundImageView)
-        addView(imageView)
-        addView(titleLabel)
-        addView(deleteIndicatorLabel)
+        addView(backgroundImageView, 0)
+        titleView.includeFontPadding = false
+        titleView.gravity = Gravity.CENTER_VERTICAL
+        // The disabled look comes from the style's appearance, not from the base class's alpha.
+        disabledAlpha = 1f
+        accessoryView = deleteIndicatorLabel
         badgeLabel.background = badgeBox
         addView(badgeLabel)
         background = box
@@ -101,6 +107,10 @@ open class CYLTagButton @JvmOverloads constructor(
         setWillNotDraw(false)
         isClickable = true
         isFocusable = true
+        ready = true
+        iconSizeDp = animationSize().toAnimatedItemSize()
+        applyStyleAnimationSpeed()
+        afterAnimationReload()
     }
 
     /**
@@ -111,12 +121,12 @@ open class CYLTagButton @JvmOverloads constructor(
 
     /**
      * `init(title:image:animationURL:)`: the same with an animated icon in the icon slot; `image` is shown while the
-     * engine is not linked or the file cannot be loaded.
+     * file's library is not in the app, while it downloads, or when it cannot be played.
      */
     constructor(context: Context, title: String?, image: Drawable?, animationURL: Uri?) : this(context, null as AttributeSet?) {
         this.title = title
         this.image = image
-        this.animationURL = animationURL
+        this.animationURL = animationURL?.toString()
     }
 
     /**
@@ -147,46 +157,86 @@ open class CYLTagButton @JvmOverloads constructor(
         get() = field ?: CYLMenuStyle.defaultStyle()
         set(value) {
             field = (value ?: CYLMenuStyle.defaultStyle()).copy()
-            // Only the speed otherwise: an animation that is playing goes on.
-            if (animationView != null && animationViewSize != animationSize()) reloadAnimationView() else applyAnimationSpeed()
+            applyStyleAnimationSpeed()
+            axis = if (currentStyle.imagePlacement.isVertical) CYLAnimatedItemAxis.Vertical else CYLAnimatedItemAxis.Horizontal
+            val size = animationSize().toAnimatedItemSize()
+            if (iconSizeDp != size) {
+                // The base class makes the animation view at `iconSizeDp`: a new size reloads it.
+                iconSizeDp = size
+                afterAnimationReload()
+            }
             updateAppearance()
         }
 
     private val currentStyle: CYLMenuStyle get() = style!!
 
-    var title: String? = null
+    /** The title (the base class's), shown through the style (`displayedTitleForTitle`). */
+    override var title: CharSequence?
+        get() = rawTitle
         set(value) {
-            field = value
+            rawTitle = value
+            super.title = value
             updateAppearance()
         }
 
-    var image: Drawable? = null
+    /** The static icon (the base class's): shown until an animation shows, whenever none can play, while it downloads. */
+    override var image: Drawable?
+        get() = super.image
         set(value) {
-            field = value
+            super.image = value
             updateAppearance()
         }
 
-    var selectedImage: Drawable? = null
+    /** Shown while selected (the base class's); null keeps `image`. */
+    override var selectedImage: Drawable?
+        get() = super.selectedImage
         set(value) {
-            field = value
+            super.selectedImage = value
             updateAppearance()
         }
 
-    /** An animation file for the engine (Lottie, PAG, Rive, GIF); ignored when the engine is not linked. */
-    var animationURL: Uri? = null
+    /** The animation file (the base class's): a path, `file://`, `file:///android_asset/…` or a remote URL. */
+    override var animationURL: String?
+        get() = super.animationURL
         set(value) {
-            if (field == value && (animationView != null || value == null)) return
-            field = value
-            reloadAnimationView()
+            val changed = value != super.animationURL
+            super.animationURL = value
+            if (changed) afterAnimationReload()
         }
 
-    /** Where an unselected animation rests, 0…1 (0: the first frame). */
-    var animationRestingProgress: Float = 0f
+    /** Where animation views come from (the base class's). */
+    override var animationSource: CYLTabBarItemAnimationViewMaking
+        get() = super.animationSource
         set(value) {
-            if (field == value) return
-            field = value
-            updateAnimationState()
+            super.animationSource = value
+            afterAnimationReload()
         }
+
+    /** Where an unselected animation rests, 0…1 (0: the first frame); the base class's. */
+    override var animationRestingProgress: Float
+        get() = super.animationRestingProgress
+        set(value) {
+            val changed = value != super.animationRestingProgress
+            super.animationRestingProgress = value
+            if (changed) updateAnimationState()
+        }
+
+    /**
+     * `animationSpeed` (the base class's), applied at once, also to an animation that is playing. Until it is set, the
+     * tag follows `style.animationSpeed`; `resetAnimationSpeed()` goes back to it.
+     */
+    override var animationSpeed: Float
+        get() = super.animationSpeed
+        set(value) {
+            followsStyleAnimationSpeed = false
+            super.animationSpeed = value
+        }
+
+    /** `-resetAnimationSpeed`: follows `style.animationSpeed` again after `animationSpeed` was set. */
+    fun resetAnimationSpeed() {
+        followsStyleAnimationSpeed = true
+        applyStyleAnimationSpeed()
+    }
 
     var showsDeleteIndicator: Boolean = false
         set(value) {
@@ -202,13 +252,13 @@ open class CYLTagButton @JvmOverloads constructor(
         updateAppearance()
     }
 
-    override fun setEnabled(enabled: Boolean) {
-        super.setEnabled(enabled)
+    override fun setPressed(pressed: Boolean) {
+        super.setPressed(pressed)
         updateAppearance()
     }
 
-    override fun setPressed(pressed: Boolean) {
-        super.setPressed(pressed)
+    /** The look of the state (selected, enabled), from the style's appearance (the base class's hook). */
+    override fun onItemStateChanged() {
         updateAppearance()
     }
 
@@ -216,116 +266,52 @@ open class CYLTagButton @JvmOverloads constructor(
     val isHighlighted: Boolean get() = isPressed
 
     /**
-     * `animationSpeed`: the playback speed of the animated icon, applied at once, also to an animation that is playing.
-     * null (the default) uses `style.animationSpeed`. Players without a speed ignore it.
+     * A tag that is not clickable (a list cell's, whose cell handles the touches) leaves the touches to its parent, as
+     * a plain non-clickable view does.
      */
-    var animationSpeed: Float? = null
-        set(value) {
-            field = value
-            applyAnimationSpeed()
-        }
-
-    /**
-     * `animationLoops`: true repeats the animated icon after `playAnimation()` until it is false, the selection changes
-     * or the file changes; false (the default) plays once. Turning it off lets the pass in progress finish. The engine's
-     * players have no loop mode, so the tag starts the animation again when the player's `progress` reaches the end;
-     * a player that does not report its progress plays once.
-     */
-    var animationLoops: Boolean = false
-        set(value) {
-            if (field == value) return
-            field = value
-            if (value && isPlaying) startLoopCheck() else if (!value) stopLoopCheck()
-        }
-
-    /** True from `playAnimation()` until the state is set again (selection, a new file). */
-    private var isPlaying = false
-    private val loopCheck = object : Runnable {
-        override fun run() {
-            val player = animationPlayer
-            if (!animationLoops || !isPlaying || player == null || !isAttachedToWindow) return
-            val progress = CYLTagAnimationEngine.getFloat(player, "getProgress") ?: return
-            if (progress >= LOOP_END_PROGRESS) CYLTagAnimationEngine.call(player, "play")
-            postDelayed(this, LOOP_CHECK_INTERVAL_MS)
-        }
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!isClickable && !isLongClickable) return false
+        return super.onTouchEvent(event)
     }
 
-    private fun startLoopCheck() {
-        removeCallbacks(loopCheck)
-        postDelayed(loopCheck, LOOP_CHECK_INTERVAL_MS)
-    }
-
-    private fun stopLoopCheck() {
-        removeCallbacks(loopCheck)
-    }
-
-    private fun applyAnimationSpeed() {
-        val speed = animationSpeed ?: currentStyle.animationSpeed
-        CYLTagAnimationEngine.setFloat(animationPlayer, "setAnimationSpeed", if (speed > 0) speed else 1f)
-    }
-
-    override fun onDetachedFromWindow() {
-        stopLoopCheck()
-        super.onDetachedFromWindow()
+    private fun applyStyleAnimationSpeed() {
+        if (!followsStyleAnimationSpeed) return
+        val speed = currentStyle.animationSpeed
+        super.animationSpeed = if (speed > 0) speed else 1f
     }
 
     /**
-     * Plays the animated icon from its start (not with Remove animations / Reduce Motion); with `animationLoops`, it
-     * repeats.
+     * Plays the animated icon (the base class's `playAnimation`), not with Remove animations / Reduce Motion, where it
+     * shows the state's frame; with `animationLoops`, it repeats. Without the file's library it does nothing.
      */
-    fun playAnimation() {
+    override fun playAnimation() {
         if (CYLAccessibility.isReduceMotionEnabled(context)) {
             updateAnimationState()
             return
         }
-        applyAnimationSpeed()
-        CYLTagAnimationEngine.call(animationPlayer, "play")
-        isPlaying = animationPlayer != null
-        if (animationLoops && isPlaying) startLoopCheck()
+        super.playAnimation()
     }
+
+    /** The animated item's size type (CYLTabBarController's `CYLSize`). */
+    private fun CYLSize.toAnimatedItemSize(): com.cyl.tabbar.CYLSize = com.cyl.tabbar.CYLSize(width, height)
 
     private fun animationSize(): CYLSize {
         val size = currentStyle.animationSize
         return if (size == CYLSize.ZERO) currentStyle.imageSize else size
     }
 
-    private fun reloadAnimationView() {
-        animationView?.let { removeView(it) }
-        animationView = null
-        animationPlayer = null
-        val url = animationURL
-        // A file URL whose file is gone shows the static image; an asset (file:///android_asset/…) is not on the
-        // file system, so it is never "missing" here (the engine opens it from the assets).
-        val missingFile = url != null && url.scheme == "file" && url.path?.let { !it.startsWith("/android_asset/") && !java.io.File(it).exists() } == true
-        if (url != null && !missingFile) {
-            val size = animationSize()
-            val view = CYLTagAnimationEngine.animationView(context, url.toString(), size)
-            if (view != null) {
-                CYLTagAnimationEngine.prepareLottieImages(context, view)
-                view.isClickable = false
-                view.isFocusable = false
-                addView(view)
-                animationView = view
-                animationViewSize = size
-                animationPlayer = CYLTagAnimationEngine.player(view)
-            }
-        }
+    /** After the base class built the animation view again: Lottie images, the state's frame, the look. */
+    private fun afterAnimationReload() {
+        if (!ready) return
+        animationView?.let { CYLTagLottieImages.prepare(context, it) }
         updateAnimationState()
         updateAppearance()
     }
 
     private fun updateAnimationState() {
-        isPlaying = false
-        stopLoopCheck()
-        val player = animationPlayer ?: return
-        applyAnimationSpeed()
-        if (isSelected) {
-            CYLTagAnimationEngine.call(player, "showLastFrame")
-        } else {
-            CYLTagAnimationEngine.call(player, "stop")
-            val resting = min(1f, max(0f, animationRestingProgress))
-            if (resting > 0) CYLTagAnimationEngine.setFloat(player, "setProgress", resting)
-        }
+        if (!ready || animationView == null) return
+        if (isSelected) showAnimationLastFrame() else stopAnimation()
     }
 
     private fun currentState(): Int = when {
@@ -334,18 +320,30 @@ open class CYLTagButton @JvmOverloads constructor(
         else -> CYLControlState.NORMAL
     }
 
+    /** What TalkBack reads (the base class's hook): the title as shown, or the icon's label for an icon-only tag. */
+    override fun accessibilityText(): CharSequence {
+        val displayed = currentStyle.displayedTitleForTitle(rawTitle?.toString())
+        return displayed.ifEmpty { (super.image as? CYLBadgeDrawable)?.accessibilityLabel ?: "" }
+    }
+
     private fun updateAppearance() {
+        if (!ready) return
         val style = currentStyle
         val state = currentState()
         val appearance = style.appearanceForState(state)
-        val icon = if (state == CYLControlState.SELECTED && selectedImage != null) selectedImage else image
-        imageView.setImageDrawable(if (animationView != null) null else icon)
-        imageView.visibility = if (animationView != null) GONE else VISIBLE
+        // The base class chooses the icon (the image, the selected image or its placeholder) and hides it while the
+        // animation shows; only a disabled selected tag shows `image` (disabled wins over selected).
+        val shown = iconView.drawable
+        if (shown != null && (shown === image || shown === selectedImage)) {
+            val icon = if (state == CYLControlState.SELECTED && selectedImage != null) selectedImage else image
+            if (icon !== shown) iconView.setImageDrawable(icon)
+        }
         animationView?.alpha = if (state == CYLControlState.DISABLED) 0.4f else 1f
         imageView.imageTintList = null
         imageView.setColorFilter(style.iconColorForState(state))
+        val icon = iconView.drawable
         if (icon is CYLBadgeDrawable || icon is CYLOriginalImageDrawable) imageView.clearColorFilter()
-        titleLabel.text = style.displayedTitleForTitle(title)
+        titleLabel.text = style.displayedTitleForTitle(rawTitle?.toString())
         val font = style.titleFontForState(state)
         titleLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, font.size)
         titleLabel.typeface = font.typeface
@@ -357,8 +355,13 @@ open class CYLTagButton @JvmOverloads constructor(
         backgroundImageView.setImageDrawable(appearance.backgroundImage)
         backgroundImageView.visibility = if (appearance.backgroundImage == null || highlighted) GONE else VISIBLE
         drawsCross = showsDeleteIndicator && style.deleteIndicatorLineWidth > 0
-        deleteIndicatorLabel.visibility = if (showsDeleteIndicator && !drawsCross) VISIBLE else GONE
+        // Kept visible (and empty) under a drawn cross, so that a tap on it still reaches the accessory.
+        deleteIndicatorLabel.visibility = if (showsDeleteIndicator) VISIBLE else GONE
         deleteIndicatorLabel.text = if (showsDeleteIndicator && !drawsCross) style.deleteIndicatorTitle else null
+        deleteIndicatorLabel.contentDescription = if (showsDeleteIndicator) CYLMenuLocalizedString("CYLMenuDeleteTag", "Deletes a tag") else null
+        val placement = if (style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading)
+            CYLAnimatedItemAccessoryPlacement.Leading else CYLAnimatedItemAccessoryPlacement.Trailing
+        if (accessoryPlacement != placement) accessoryPlacement = placement
         crossPaint.strokeWidth = style.deleteIndicatorLineWidth * density
         crossPaint.color = style.deleteIndicatorColor ?: appearance.textColor
         val deleteFont = style.deleteIndicatorFontForState(state)
@@ -376,15 +379,16 @@ open class CYLTagButton @JvmOverloads constructor(
         badgeLabel.visibility = if (badge == null) GONE else VISIBLE
         badgeLabel.text = if (badge.isNullOrEmpty()) null else badge
         badgeBox.setColor(badgeColor ?: CYLTagBadgeDefaultColor)
+        updateAccessibility()
         requestLayout()
         invalidate()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val iconSize = if (animationView != null) animationSize() else iconSizeForImage(imageView.drawable, false, currentStyle)
-        val width = px(widthForTitle(title, iconSize, showsDeleteIndicator, currentStyle))
+        val width = px(widthForTitle(rawTitle?.toString(), iconSize, showsDeleteIndicator, currentStyle))
         // Side by side: the style's height, as in a tag list; stacked: the icon, the spacing and the title.
-        val height = px(if (currentStyle.imagePlacement.isVertical) heightForTitle(title, iconSize, currentStyle) else heightForStyle(currentStyle))
+        val height = px(if (currentStyle.imagePlacement.isVertical) heightForTitle(rawTitle?.toString(), iconSize, currentStyle) else heightForStyle(currentStyle))
         setMeasuredDimension(resolveSize(width, widthMeasureSpec), resolveSize(height, heightMeasureSpec))
         for (index in 0 until childCount) {
             getChildAt(index).measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
@@ -493,12 +497,9 @@ open class CYLTagButton @JvmOverloads constructor(
             val frame = CYLRect(imageX + style.imagePositionAdjustment.horizontal,
                 imageY + style.imagePositionAdjustment.vertical,
                 max(0f, iconSize.width - insetsOfImage.left - insetsOfImage.right), max(0f, iconSize.height - insetsOfImage.top - insetsOfImage.bottom))
-            if (animated) {
-                place(animationView!!, frame)
-                place(imageView, CYLRect())
-            } else {
-                place(imageView, frame)
-            }
+            // The animation view and, under it, the static image (the base class shows it until the animation shows).
+            animationView?.let { place(it, frame) }
+            place(imageView, frame)
             layOutBadge(frame, width + trailing - margin, height)
         } else {
             place(imageView, CYLRect())
@@ -559,7 +560,7 @@ open class CYLTagButton @JvmOverloads constructor(
         super.onInitializeAccessibilityNodeInfo(info)
         val value = badgeAccessibilityValue() ?: return
         val label = contentDescription?.toString()?.takeIf { it.isNotEmpty() }
-            ?: currentStyle.displayedTitleForTitle(title).takeIf { it.isNotEmpty() }
+            ?: currentStyle.displayedTitleForTitle(rawTitle?.toString()).takeIf { it.isNotEmpty() }
             ?: (image as? CYLBadgeDrawable)?.accessibilityLabel
         info.contentDescription = listOfNotNull(label, value).joinToString(", ")
     }
@@ -607,17 +608,18 @@ open class CYLTagButton @JvmOverloads constructor(
         /** The line height of `font`, dp (`UIFont.lineHeight`). */
         internal fun fontLineHeight(font: CYLFont): Float = lineHeight(paintFor(font))
 
-        private const val LOOP_CHECK_INTERVAL_MS = 50L
         private const val BADGE_DOT_DIAMETER = 8f
         private const val BADGE_MINIMUM_HEIGHT = 16f
         private const val BADGE_PADDING = 4f
         private const val BADGE_FONT_SIZE = 11f
-        /** The progress from which a looping animation counts as finished and starts again. */
-        private const val LOOP_END_PROGRESS = 0.995f
 
-        /** `+isAnimationEngineAvailable`: CYLTabBarController's animation engine is linked. */
+        /**
+         * `+isAnimationEngineAvailable`: CYLTabBarController's animation engine is linked. It comes with the
+         * `cyltabbarcontroller-animateditem` dependency, so it always is; each file type plays once its library is in the
+         * app (Lottie, libpag, rive-android, SVGAPlayer; GIF needs none).
+         */
         @JvmStatic
-        fun isAnimationEngineAvailable(): Boolean = CYLTagAnimationEngine.isAvailable
+        fun isAnimationEngineAvailable(): Boolean = true
 
         private fun iconSize(image: Drawable?, style: CYLMenuStyle): CYLSize {
             if (image == null) return CYLSize.ZERO
@@ -715,40 +717,15 @@ open class CYLTagButton @JvmOverloads constructor(
 /** `UIColor.systemRed`, the default `CYLTagButton.badgeColor`. */
 val CYLTagBadgeDefaultColor: Int = Color.rgb(255, 59, 48)
 
+
 /**
- * CYLTabBarController's animation engine, found at run time like `NSClassFromString(@"CYLTabBarItemAnimationFactory")`
- * on iOS: the core does not depend on CYLTabBarController.
+ * Gives the Lottie views in an animation view an image delegate: the images of a Lottie file (its "assets" with a "p"
+ * file name) load from the app's drawable of the same name, as Lottie on iOS loads them by name from the app's assets.
+ * Without one, lottie-android throws when it draws an image layer ("You must set an images folder"). By reflection,
+ * because the core does not depend on lottie-android (only an app that plays Lottie files adds it).
  */
-internal object CYLTagAnimationEngine {
-    private val factory: Any? by lazy {
-        try {
-            Class.forName("com.cyl.tabbar.CYLTabBarItemAnimationFactory").getField("Companion").get(null)
-        } catch (error: Throwable) {
-            null
-        }
-    }
-
-    val isAvailable: Boolean get() = factory != null
-
-    fun animationView(context: Context, url: String, size: CYLSize): View? {
-        val factory = factory ?: return null
-        return try {
-            val sizeClass = Class.forName("com.cyl.tabbar.CYLSize")
-            val tabSize = sizeClass.getConstructor(Float::class.java, Float::class.java).newInstance(size.width, size.height)
-            val method = factory.javaClass.getMethod("animationViewWithURL", Context::class.java, String::class.java, sizeClass, ImageView.ScaleType::class.java)
-            method.invoke(factory, context, url, tabSize, ImageView.ScaleType.FIT_CENTER) as? View
-        } catch (error: Throwable) {
-            null
-        }
-    }
-
-    /**
-     * Gives the Lottie views in `view` an image delegate: the images of a Lottie file (its "assets" with a "p" file
-     * name) load from the app's drawable of the same name, as Lottie on iOS loads them by name from the app's assets.
-     * Without one, lottie-android throws when it draws an image layer ("You must set an images folder"). By reflection,
-     * because the core does not depend on lottie-android.
-     */
-    fun prepareLottieImages(context: Context, view: View) {
+internal object CYLTagLottieImages {
+    fun prepare(context: Context, view: View) {
         val lottieView = findView(view, "com.airbnb.lottie.LottieAnimationView") ?: return
         try {
             val delegateType = Class.forName("com.airbnb.lottie.ImageAssetDelegate")
@@ -779,43 +756,6 @@ internal object CYLTagAnimationEngine {
         }
         if (view is android.view.ViewGroup) for (index in 0 until view.childCount) findView(view.getChildAt(index), className)?.let { return it }
         return null
-    }
-
-    fun player(view: View): Any? {
-        val factory = factory ?: return null
-        return try {
-            factory.javaClass.getMethod("playerForView", View::class.java).invoke(factory, view)
-        } catch (error: Throwable) {
-            null
-        }
-    }
-
-    fun call(target: Any?, name: String) {
-        target ?: return
-        try {
-            target.javaClass.getMethod(name).invoke(target)
-        } catch (error: Throwable) {
-            // The player has no such method.
-        }
-    }
-
-    /** A Float getter of the player (`getProgress`), or null when it has none. */
-    fun getFloat(target: Any?, name: String): Float? {
-        target ?: return null
-        return try {
-            (target.javaClass.getMethod(name).invoke(target) as? Number)?.toFloat()
-        } catch (error: Throwable) {
-            null
-        }
-    }
-
-    fun setFloat(target: Any?, name: String, value: Float) {
-        target ?: return
-        try {
-            target.javaClass.getMethod(name, Float::class.java).invoke(target, value)
-        } catch (error: Throwable) {
-            // Optional on the player.
-        }
     }
 }
 

@@ -219,12 +219,39 @@ def symbols(root):
         return bool(uikit.match(selector)) or selector in protocol_selectors
 
     found = [row for row in found if not conformance(row)]
+    found += inherited_symbols()
     seen, unique = set(), []
     for row in found:
         if row[3] not in seen:
             seen.add(row[3])
             unique.append(row)
     return unique
+
+
+# CYLTagButton's API that its superclass declares: CYLTabBarController's CYLAnimatedItemView (subspec
+# CYLTabBarController/CYLAnimatedItem; guide:
+# https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md). The Swift
+# sources only override some of them, and overrides are not listed, so they are added here, in the header's file.
+ANIMATED_ITEM = "CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h"
+INHERITED = {
+    "CYLTagButton": {
+        "property": ["imageView", "titleLabel", "title", "image", "selectedImage", "placeholderImage", "animationURL",
+                     "animationSpeed", "animationLoops", "animationRestingProgress", "animationReady", "animationView",
+                     "delegate", "axis", "accessoryView", "accessoryPlacement", "dragEnabled"],
+        "method": ["playAnimation", "restartAnimation", "stopAnimation", "showAnimationLastFrame", "reloadAnimation",
+                   "itemStateDidChange", "itemAccessibilityLabel", "updateItemAccessibility"],
+    },
+}
+
+
+def inherited_symbols():
+    rows = []
+    for owner, kinds in INHERITED.items():
+        for name in kinds["property"]:
+            rows.append((ANIMATED_ITEM, owner, "property", f"{owner}.{name}", []))
+        for name in kinds["method"]:
+            rows.append((ANIMATED_ITEM, owner, "method", f"{owner} -{name}", [], f"{owner}.{name}()"))
+    return rows
 
 
 def kotlin_names():

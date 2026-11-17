@@ -11,7 +11,7 @@ Every public symbol of the Android core (`android/merged/library`, Kotlin) and i
 from the Kotlin sources, `android/merged/api-map.json` (the reverse table, [android-api.md](android-api.md)) and
 `android/merged/ios-map.json` (hand-made entries); do not edit the table by hand. A row without a counterpart is `TODO`.
 
-**Score: 740 / 740 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
+**Score: 731 / 731 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
 row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same
 logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100.
 
@@ -449,32 +449,23 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagAppearance.resetBackgroundColor` | method, `CYLTagAppearance.kt:71` | `CYLTagAppearance.defaultBackgroundColor` |
 | `CYLTagAppearance.resetTextColor` | method, `CYLTagAppearance.kt:74` | `CYLTagAppearance.defaultTextColor` |
 | `CYLTagAppearance.resetFont` | method, `CYLTagAppearance.kt:77` | `CYLTagAppearance.defaultFont` |
-| `CYLTagButton` | class, `CYLTagButton.kt:37` | `CYLTagButton` |
-| `CYLTagButton.imageView` | read-only property, `CYLTagButton.kt:42` | `CYLTagButton.imageView` |
-| `CYLTagButton.titleLabel` | read-only property, `CYLTagButton.kt:43` | `CYLTagButton.titleLabel` |
-| `CYLTagButton.deleteIndicatorLabel` | read-only property, `CYLTagButton.kt:49` | `CYLTagButton.deleteIndicatorLabel` |
-| `CYLTagButton.badgeLabel` | read-only property, `CYLTagButton.kt:56` | `CYLTagButton.badgeLabel` |
-| `CYLTagButton.animationView` | property, `CYLTagButton.kt:80` | `CYLTagButton.animationView` |
-| `CYLTagButton.animationPlayer` | property, `CYLTagButton.kt:84` | `CYLTagButton.animationPlayer` |
-| `CYLTagButton.deleteIndicatorHitFrame` | property, `CYLTagButton.kt:89` | `CYLTagButton.deleteIndicatorHitFrame` |
-| `CYLTagButton.badgeValue` | property, `CYLTagButton.kt:127` | `CYLTagButton.badgeValue` |
-| `CYLTagButton.badgeColor` | property, `CYLTagButton.kt:135` | `CYLTagButton.badgeColor` |
-| `CYLTagButton.style` | property, `CYLTagButton.kt:146` | `CYLTagButton.style` |
-| `CYLTagButton.title` | property, `CYLTagButton.kt:157` | `CYLTagButton.title` |
-| `CYLTagButton.image` | property, `CYLTagButton.kt:163` | `CYLTagButton.image` |
-| `CYLTagButton.selectedImage` | property, `CYLTagButton.kt:169` | `CYLTagButton.selectedImage` |
-| `CYLTagButton.animationURL` | property, `CYLTagButton.kt:176` | `CYLTagButton.animationURL` |
-| `CYLTagButton.animationRestingProgress` | property, `CYLTagButton.kt:184` | `CYLTagButton.animationRestingProgress` |
-| `CYLTagButton.showsDeleteIndicator` | property, `CYLTagButton.kt:191` | `CYLTagButton.showsDeleteIndicator` |
-| `CYLTagButton.isHighlighted` | read-only property, `CYLTagButton.kt:216` | `isHighlighted` (same name in the iOS core) |
-| `CYLTagButton.animationSpeed` | property, `CYLTagButton.kt:222` | `CYLTagButton.animationSpeed` |
-| `CYLTagButton.animationLoops` | property, `CYLTagButton.kt:234` | `CYLTagButton.animationLoops` |
-| `CYLTagButton.playAnimation` | method, `CYLTagButton.kt:276` | `CYLTagButton.playAnimation()` |
-| `CYLTagButton.badgeFrame` | property, `CYLTagButton.kt:525` | `CYLTagButton.badgeLabel.frame` |
-| `CYLTagBadgeDefaultColor` | read-only property, `CYLTagButton.kt:716` | `UIColor.systemRed` (the default `CYLTagButton.badgeColor`) |
-| `CYLAccessibility` | object, `CYLTagButton.kt:826` | `UIAccessibility` (UIKit) |
-| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:829` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
-| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:834` | `UIAccessibility.isDarkerSystemColorsEnabled` (`UIAccessibilityDarkerSystemColorsEnabled()`) |
+| `CYLTagButton` | class, `CYLTagButton.kt:44` | `CYLTagButton` |
+| `CYLTagButton.imageView` | read-only property, `CYLTagButton.kt:50` | `CYLTagButton.imageView` |
+| `CYLTagButton.titleLabel` | read-only property, `CYLTagButton.kt:53` | `CYLTagButton.titleLabel` |
+| `CYLTagButton.deleteIndicatorLabel` | read-only property, `CYLTagButton.kt:59` | `CYLTagButton.deleteIndicatorLabel` |
+| `CYLTagButton.badgeLabel` | read-only property, `CYLTagButton.kt:65` | `CYLTagButton.badgeLabel` |
+| `CYLTagButton.deleteIndicatorHitFrame` | property, `CYLTagButton.kt:93` | `CYLTagButton.deleteIndicatorHitFrame` |
+| `CYLTagButton.badgeValue` | property, `CYLTagButton.kt:137` | `CYLTagButton.badgeValue` |
+| `CYLTagButton.badgeColor` | property, `CYLTagButton.kt:145` | `CYLTagButton.badgeColor` |
+| `CYLTagButton.style` | property, `CYLTagButton.kt:156` | `CYLTagButton.style` |
+| `CYLTagButton.resetAnimationSpeed` | method, `CYLTagButton.kt:236` | `CYLTagButton.resetAnimationSpeed()` |
+| `CYLTagButton.showsDeleteIndicator` | property, `CYLTagButton.kt:241` | `CYLTagButton.showsDeleteIndicator` |
+| `CYLTagButton.isHighlighted` | read-only property, `CYLTagButton.kt:266` | `isHighlighted` (same name in the iOS core) |
+| `CYLTagButton.badgeFrame` | property, `CYLTagButton.kt:526` | `CYLTagButton.badgeLabel.frame` |
+| `CYLTagBadgeDefaultColor` | read-only property, `CYLTagButton.kt:718` | `UIColor.systemRed` (the default `CYLTagButton.badgeColor`) |
+| `CYLAccessibility` | object, `CYLTagButton.kt:767` | `UIAccessibility` (UIKit) |
+| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:770` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
+| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:775` | `UIAccessibility.isDarkerSystemColorsEnabled` (`UIAccessibilityDarkerSystemColorsEnabled()`) |
 | `CYLTagColorTheme` | class, `CYLTagColors.kt:7` | `CYLTagColorTheme` |
 | `CYLTagColorTheme.CYLTagColorThemeNone` | enum case, `CYLTagColors.kt:8` | `CYLTagColorThemeNone` |
 | `CYLTagColorTheme.CYLTagColorThemeRandom` | enum case, `CYLTagColors.kt:9` | `CYLTagColorThemeRandom` |
@@ -493,8 +484,8 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagFoldButton` | class, `CYLTagFoldButton.kt:13` | `CYLTagFoldButton` |
 | `CYLTagFoldButton.foldControl` | property, `CYLTagFoldButton.kt:15` | `CYLTagFoldButton.foldControl` |
 | `CYLTagFoldButton.isExpanded` | property, `CYLTagFoldButton.kt:18` | `CYLTagFoldButton.isExpanded` |
-| `CYLTagFoldButton.applyInlineFoldControl` | method, `CYLTagFoldButton.kt:27` | `applyInlineFoldControl` (same name in the iOS core) |
-| `CYLTagFoldButton.applyFoldControl` | method, `CYLTagFoldButton.kt:31` | `CYLTagFoldButton.applyFoldControl(_:color:expanded:animated:)` |
+| `CYLTagFoldButton.applyInlineFoldControl` | method, `CYLTagFoldButton.kt:32` | `applyInlineFoldControl` (same name in the iOS core) |
+| `CYLTagFoldButton.applyFoldControl` | method, `CYLTagFoldButton.kt:36` | `CYLTagFoldButton.applyFoldControl(_:color:expanded:animated:)` |
 | `CYLTagFoldCell` | class, `CYLTagFoldCell.kt:10` | `CYLTagFoldCell` |
 | `CYLTagFoldCell.foldButton` | read-only property, `CYLTagFoldCell.kt:12` | `CYLTagFoldCell.foldButton` |
 | `CYLTagFoldCell.configureWithFoldControl` | method, `CYLTagFoldCell.kt:36` | `CYLTagFoldCell.configure(foldControl:itemStyle:expanded:animated:)` |
