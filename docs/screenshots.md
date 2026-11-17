@@ -209,3 +209,11 @@ the iOS example opens one there is not checked yet.
   (`--columns auto`, the default). One column (two cropped panels, 1148 x 1081 px):
 
   ![iOS Rive icons at rest, one column with header and footer](assets/ios-rive-rest-one-column.png)
+
+## TODO (2026-11-18, `feat/harmony`): remove the screenshot label check from CI
+
+- **Prompt (verbatim)**: "Remove label CI screenshots from ci"
+- **English**: remove the screenshot label check from CI.
+- **Plan**: delete `.github/workflows/screenshot-labels.yml`; keep the check before every commit
+  (`scripts/check-branch-pr.sh` runs `scripts/check-screenshots.py`); update AGENTS.md and the comments that say "in
+  CI". CYLTabBarController did the same (`70064275`).
