@@ -203,12 +203,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   commit since the test was added (`a2efda2`), so not a regression of the API parity work (`07cc52b`), and passes on an
   iPhone 17 Pro. `scripts/simulator-id.sh` picked "iPhone Duo" as the first iPhone of the newest runtime; it now prefers
   a regular "iPhone <number>" model. The tab bar placement on that form factor is TODO, owned by CYLTabBarController.
-  Cause (2026-11-18): `-[CYLTabBarController setUpIPADForTabBar:]` (`CYLTabBarController.m:3963`) pins the bar to the
-  bottom (`mode = UITabBarControllerModeTabBar`, `traitOverrides.horizontalSizeClass = compact`) only when
-  `userInterfaceIdiom == UIUserInterfaceIdiomPad`. "iPhone Duo" is a phone idiom with a regular horizontal size class,
-  so UIKit's iOS 18+ floating tab bar puts it at the top. Fix in CYLTabBarController (check the size class, not only
-  the idiom); handed to the Mac-CYLTabBarController session. This repository's core has no tab bar, and the example
-  keeps its assertion ("Tab bars are always at the bottom").
+  Measured (2026-11-18, iPhone Duo B7499C73, iOS 27.2, the failing test with a temporary log): the bar is not at the
+  top but a vertical strip on the trailing edge, `CYLTabBar` frame (306, 0, 69, 609) in the screen's 375 x 609 view
+  (window 375 x 667, screen 466 x 678 @3x), idiom phone, horizontal size class compact, vertical regular for both the
+  tab bar controller and the window; `_UITabContainerView` visible. The test reads minY = 0 because the strip spans
+  the whole height. An earlier note here blamed a regular size class; that was wrong (CYLTabBarController `5e01014a`,
+  docs/Tab-Item-Positioning.md, measured the same). Fix in CYLTabBarController (its session); the example keeps its
+  assertion ("Tab bars are always at the bottom").
 - **Bug fixed (2026-11-17, `0583e1d`)**: the example's test screenshots showed empty places instead of the animated icons
   (Lottie, PAG, Rive, SVGA, GIF), although the running app draws them (`assets/ios-animations-live.png`): the capture ran
   before the icons' first frame was drawn. `CYLScreenshotCapturing.captureScreenshot` now runs the main run loop for 0.5 s
