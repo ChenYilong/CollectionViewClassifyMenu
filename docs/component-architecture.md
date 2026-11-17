@@ -307,6 +307,15 @@ declarations, so Objective-C callers see no change.
   core fix replaces it, as the core-first rule asks). `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay`
   is the re-test: unchanged, expected to pass on `0a63bed`. Pending CI.
 
+- **CI on `b4d0e51`** (run 44026180641): `pod lib lint` passes (first time since the migration). "Unit tests (menu)"
+  fails again with "cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable members that
+  could not be loaded", now with `CYLAnimatedItem.modulemap` on the command line (upstream `DEFINES_MODULE`, the
+  workaround removed in `4171135`). Cause: the demo app imports only CollectionViewClassifyMenu, whose public classes
+  are `CYLAnimatedItemView`s, and with explicit modules it did not load the base class's module (at `d3efc5f` the app
+  imported CYLTabBarController, which then held the component). Fix in the core: `CYLTagButton.swift` re-exports the
+  module (`@_exported import CYLAnimatedItem`, as CYLTabBarController does), so every client of the library loads it.
+  Pending CI.
+
 ## TODO (2026-11-17): Android CYLIndexPathButton, CYLRightImageButton, CYLMultipleFilterHeaderView on CYLTagButton
 
 - **Context**: branch `feat/harmony` (PR #20). On iOS all three already use the one icon + title component:
