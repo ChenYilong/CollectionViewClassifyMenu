@@ -446,3 +446,8 @@ declarations, so Objective-C callers see no change.
   in its scratchpad). Left (handed to that session): at `57a527e` a GIF tag loops with no stills and Play all cannot
   restart it; once #815 is merged, move the pins to its merge commit and pass `gif-first-frame` / `gif-last-frame` /
   `gif-duration` (and `embedded`) to the vendored component.
+
+## Progress against the guide (2026-11-17)
+
+The item-by-item progress, the score (72 at `d979073`) and the remaining TODOs of the CYLAnimatedItem migration are kept in
+[animated-item-migration.md](animated-item-migration.md).
