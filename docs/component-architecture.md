@@ -149,3 +149,33 @@ declarations, so Objective-C callers see no change.
   2026-11-11 的 CI（[ff35b27](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/ff35b27)，`macos-26`）中
   `pod lib lint` 与库的构建/静态分析（有警告即失败）均已通过。
 - 历史 3.5 英寸设备不支持项目现有的 iOS 15 最低版本，因此不能在原设备上复验 #7。
+
+## TODO (2026-11-17): CYLTagButton subclasses CYLTabBarController's CYLAnimatedItemView; no animation engine in the core
+
+- **Context**: branch `feat/harmony` (PR #20). CYLTabBarController's guide
+  [docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)
+  (read at the branch tip `35aa757`) ships the shared animated icon + title component `CYLAnimatedItem`: iOS subspec
+  `CYLTabBarController/CYLAnimatedItem` (CYLUtils only, static images, `CYL_ANIMATION_ENGINE_AVAILABLE` = 0 without an
+  engine) and one Core-free engine subspec per file type (`CYLAnimatedItemLottieSwift`, `…LottieObjectiveC`, `…PAG`,
+  `…PAGEnterprise`, `…Rive`, `…SVGA`, `…GIF`); Android module `:cylanimateditem`, Maven
+  `io.github.chenyilong:cyltabbarcontroller-animateditem`. Its migration row for this repository: `CYLTagButton`
+  subclasses `CYLAnimatedItemView`, `CYLTagAnimationEngine` and the own icon / title / animation storage go,
+  `deleteIndicatorLabel` becomes `accessoryView`, the per-state look goes to `itemStateDidChange` / `onItemStateChanged`,
+  the indicator's side to `accessoryPlacement`, the static measuring stays. The display priority (animation, then the
+  static image, then the component's placeholder only without a static image), the failure cases and the URL loading
+  rule are the base class's and are inherited. CYLSearchViewController's search bar items subclass `CYLTagButton` and
+  follow (its task log: `docs/animated-icon-component.md`).
+- **Requirements**:
+  1. Change the CocoaPods, Gradle / Maven and npm configuration as the guide says; the core depends on the component.
+  2. Rework the core so that it shows the same animations through it.
+  3. The core depends on no animation engine; animated icons show only when the example layer adds an engine.
+  4. The components concerned: the packaged animated icon + title core component, `CYLTagButton`.
+- **Prompt (verbatim)**: "https://github.com/ChenYilong/CYLTabBarController/blob/13e717c9/docs/Animated-Item.md 根据文档链接，根据该文档，修改cocoapods gradle maven npm等配置，要求更新core核心代码 ，依赖该新组件。改造core核心代码，要求实现同等动效效果。core核心代码不依赖于动效引擎，仅仅在example层引入动效引擎时才展示动效icon。涉及的组件为本仓库中已经封装好的动效icon加title的核心组件代码。"
+- **Prompt (English)**: "Following the linked document, change the CocoaPods, Gradle, Maven, npm and similar
+  configuration; update the core code to depend on the new component. Rework the core code to achieve the same
+  animation effects. The core code does not depend on the animation engine; animated icons show only when the example
+  layer adds the animation engine. The components concerned are this repository's packaged animated icon + title core
+  components."
+- **Guide link (user, 2026-11-17)**: link the guide on its branch, the newest address:
+  <https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md>.
+- **Status**: logged; work starts.
