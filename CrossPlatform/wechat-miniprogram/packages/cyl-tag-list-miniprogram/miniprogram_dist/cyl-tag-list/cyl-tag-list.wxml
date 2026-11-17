@@ -17,12 +17,17 @@
               style="{{item.cellStyle}}" data-key="{{item.key}}" bindtap="onItemTap"
               aria-role="button" aria-label="{{item.title}}" aria-selected="{{item.selected}}" aria-disabled="{{!item.enabled}}">
           <view wx:if="{{item.iconKind !== 'none'}}" class="cyl-icon-slot" style="{{item.slotStyle}}">
-            <cyl-animation-icon wx:if="{{item.iconKind === 'animation'}}" id="anim-{{item.key}}" class="cyl-icon" style="position: absolute; left: 0; top: 0;"
-                             animation="{{item.animation}}" options="{{item.animationOptions}}" size="{{item.iconWidth}}" height="{{item.iconHeight}}"
-                             speed="{{animationSpeed > 0 ? animationSpeed : item.styleSpeed}}" loops="{{animationLoops}}"
-                             selected="{{item.selected}}" resting-progress="{{item.resting}}" disabled="{{!item.enabled}}" />
-            <text wx:elif="{{item.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{item.iconStyle}}; font-size: {{item.glyphSize}}px;">{{item.glyph}}</text>
-            <image wx:else class="cyl-icon" src="{{item.iconSrc}}" mode="aspectFit" style="{{item.iconStyle}}" />
+            <text wx:if="{{item.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{item.iconStyle}}; font-size: {{item.glyphSize}}px;">{{item.glyph}}</text>
+            <!-- CYLTabBarController's cyl-animated-item draws the icon: the animation through the app's engine
+                 components (forwarded abstract nodes), else, and until the engine is ready, the static image. -->
+            <view wx:else class="cyl-icon" style="{{item.iconStyle}}" aria-hidden="true">
+              <cyl-animated-item id="anim-{{item.key}}" class="cyl-animated-icon"
+                                 generic:cyl-lottie-view="cyl-lottie-view" generic:cyl-pag-view="cyl-pag-view"
+                                 generic:cyl-rive-view="cyl-rive-view" generic:cyl-svga-view="cyl-svga-view"
+                                 animation-url="{{item.animationUrl}}" image="{{item.iconSrc}}" icon-size="{{item.iconSize}}"
+                                 speed="{{animationSpeed > 0 ? animationSpeed : item.styleSpeed}}" loop="{{animationLoops}}"
+                                 selected="{{item.selected}}" enabled="{{item.iconEnabled}}" />
+            </view>
           </view>
           <view wx:if="{{item.spacerStyle}}" class="cyl-spacer" style="{{item.spacerStyle}}" />
           <view wx:if="{{item.showsTitle}}" class="cyl-title-box" style="{{item.titleStyle}}">

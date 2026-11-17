@@ -1,8 +1,8 @@
 <view class="page">
   <view class="caption">{{fileTitle}}</view>
-  <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" wx:if="{{fileConfiguration}}" id="file" configuration="{{fileConfiguration}}" bind:tagtap="onTagTap" />
+  <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" wx:if="{{fileConfiguration}}" id="file" configuration="{{fileConfiguration}}" bind:tagtap="onTagTap" />
   <view wx:else class="caption">{{fileError || '?'}}</view>
   <view class="caption">{{mapTitle}}</view>
-  <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" id="map" configuration="{{mapConfiguration}}" bind:tagtap="onTagTap" />
+  <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" id="map" configuration="{{mapConfiguration}}" bind:tagtap="onTagTap" />
   <view class="caption" id="event">{{event}}</view>
 </view>

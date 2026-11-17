@@ -5,7 +5,7 @@
   "disableScroll": true,
   "usingComponents": {
     "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
-    "cyl-lottie-icon": "/components/cyl-lottie-icon/cyl-lottie-icon",
+    "cyl-tag-animation-view": "/components/cyl-tag-animation-view/cyl-tag-animation-view",
     "cyl-tab-bar": "/cyl_components/cyl-tabbar-miniprogram/cyl-tab-bar/index"
   }
 }

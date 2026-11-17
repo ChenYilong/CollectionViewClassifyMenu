@@ -1,1 +1,0 @@
-<view style="width: {{size}}px; height: {{height > 0 ? height : size}}px;" aria-hidden="true" />

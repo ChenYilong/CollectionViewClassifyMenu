@@ -22,7 +22,7 @@
             style="height: {{header.height}}px; font-size: {{header.fontSize}}px; color: {{header.color}}; padding: 0 {{header.horizontalInset}}px;">
         <text class="header-title">{{section.title}}</text>
       </view>
-      <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" configuration="{{section.configuration}}" bind:tagtap="onTagTap" />
+      <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" configuration="{{section.configuration}}" bind:tagtap="onTagTap" />
     </view>
   </scroll-view>
 
@@ -43,7 +43,7 @@
         <view id="industryButton" class="industry-button" hover-class="industry-button-hover" bindtap="showIndustryMenu"
               aria-role="button" aria-label="{{industryButton.accessibilityLabel}}">{{industryButton.title}}</view>
       </view>
-      <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" configuration="{{jobSection.configuration}}" bind:tagtap="onTagTap" />
+      <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" configuration="{{jobSection.configuration}}" bind:tagtap="onTagTap" />
     </scroll-view>
   </view>
 </view>

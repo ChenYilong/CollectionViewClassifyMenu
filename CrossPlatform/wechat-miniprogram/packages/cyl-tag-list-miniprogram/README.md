@@ -52,23 +52,41 @@ The models are plain JavaScript (no `wx` calls), e.g. `require('cyl-tag-list-min
 The tags' own strings (delete, more / less, image tag hints) follow WeChat's language, or the one set with
 `require('cyl-tag-list-miniprogram/locale.js').setLanguage('en')` (`zh-Hans`, `zh-Hant`, `en`).
 
-### Animated icons
+### Icons and animated icons
 
-The package links no animation engine. To play Lottie, Rive, PAG or GIF icons, register the files and engines your app
-ships, and hand cyl-tag-list the component that plays them as the abstract node `cyl-animation-icon`:
+Every tag icon (an image, a tinted symbol or an animation) is drawn by CYLTabBarController's shared icon + title
+component, `cyl-animated-item` (the `CYLAnimatedItemView` of iOS and Android), shipped in this package at
+`cyl-animated-item/` together with the default of its abstract nodes, `cyl-animation-placeholder/`. It is not on npm
+yet, so it is taken from CYLTabBarController at a pinned commit (`COMMIT` in each folder) with its MIT license
+(`LICENSE` in each folder); the example's `scripts/fetch-cyltabbar.js` updates and checks the copy.
+
+The package links no animation engine. An app that plays animations gives cyl-tag-list (or cyl-tag-button) its engine
+components through the abstract nodes `cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view` and `cyl-svga-view`, which
+are forwarded to cyl-animated-item; a GIF is drawn by `<image>` and needs none. An engine component takes `path`,
+`loop`, `speed`, `autoplay` and `resting-frame`, sends `ready` once it draws the file and `error` when it cannot, and
+has `cyl_playFromStart()` (played on a tap and by `playAll()` / `playItems()` / `playAnimation()`). Until `ready`, and
+after `error` or without an engine, the tag shows its image, or cyl-animated-item's placeholder without one.
+
+Register where the files are, so that a configuration can name them as the iOS example does:
 
 ```js
 // app.js
 require('cyl-tag-list-miniprogram/cyl-tag-list/animations.js').configure({
-  registry: { lottie: { /* key: { data() } */ }, gif: {}, rive: {}, pag: {} },
-  engines: { lottie: true },
+  registry: {
+    'Lottie/home.json': { engine: 'lottie', data: () => require('./data/home.js') },
+    'GIF/star.gif': { engine: 'gif', src: '/data/star.gif' },
+    'Rive/house.riv': { engine: 'rive', src: '/data/house.riv.bin' },
+  },
 });
 ```
 
 ```xml
-<cyl-tag-list generic:cyl-animation-icon="my-animation-icon" configuration="{{configuration}}" />
+<cyl-tag-list generic:cyl-lottie-view="my-lottie-view" generic:cyl-rive-view="my-rive-view"
+              configuration="{{configuration}}" />
 ```
 
-The icon component takes `animation`, `options`, `size`, `height`, `speed`, `loops`, `selected`, `restingProgress`,
-`disabled` and has a `play()` method. The example's `components/cyl-lottie-icon` plays all four engines with
-CYLTabBarController's cyl-lottie, cyl-rive and cyl-pag.
+The engine component gets the registered path (`Lottie/home.json`, `Rive/house.riv`), finds the file with
+`animations.resolve(path)`, and reads the tag's `animationOptions` and a `restingProgress` above 0 after `#`
+(`animations.parameters(path)`). A GIF gets its registered `src`; an absolute path or URL in a configuration is passed
+as it is. The example's `components/cyl-tag-animation-view` plays Lottie, Rive and PAG with CYLTabBarController's
+cyl-lottie, cyl-rive and cyl-pag.

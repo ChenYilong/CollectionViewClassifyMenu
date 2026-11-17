@@ -3,7 +3,10 @@
  * component (a search bar item, a toolbar button, a placeholder's icon): an icon (an image, a "system:<name>" symbol or
  * an animated icon) before, after, above or below a title, in the box of a `CYLMenuStyle` (the `tagStyle` dictionary,
  * the keys of a configuration's style), with an optional badge. The layout is cyl-tag-list's (model.js `tagLayout`),
- * so a new animation type is added in one place, the `cyl-animation-icon` generic and animations.js.
+ * and the icon is drawn by CYLTabBarController's cyl-animated-item (../cyl-animated-item, vendored by commit), so a new
+ * animation type is added in one place, that component. Animations play in the engine components the app gives as the
+ * abstract nodes `cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view` and `cyl-svga-view` (generic:cyl-lottie-view="…");
+ * a GIF is drawn by `<image>`.
  *
  * Properties (the iOS names): `title`, `image`, `selectedImage`, `animationURL`, `animationOptions`,
  * `animationRestingProgress`, `animationSpeed` (0 uses the style's), `animationLoops`, `badgeValue` (null hides the
@@ -15,6 +18,7 @@
  */
 const model = require('../cyl-tag-list/model.js');
 const animations = require('../cyl-tag-list/animations.js');
+const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model.js');
 
 function pixelRatio() {
   try {
@@ -52,13 +56,22 @@ Component({
 
   methods: {
     render() {
-      this.setData({ view: model.tagButtonView(this.data, animations.resolve(this.data.animationURL), pixelRatio()) });
+      const url = animations.url(this.data.animationURL, this.data.animationOptions, this.data.animationRestingProgress);
+      this.setData({ view: model.tagButtonView(this.data, url, pixelRatio()) });
     },
 
     /** Plays the animated icon from progress 0 (`CYLTagButton.playAnimation()`). */
     playAnimation() {
-      const icon = this.selectComponent('#cyl-tag-button-animation');
-      if (icon && typeof icon.play === 'function') icon.play();
+      const url = this.data.view.animationUrl;
+      const item = url && this.selectComponent('#cyl-tag-button-animation');
+      if (!item) return;
+      if (cylAnimatedItemType(url) === 'gif') {
+        // A GIF, drawn by <image>, starts again when its file is set again.
+        this.setData({ 'view.animationUrl': '' }, () => this.setData({ 'view.animationUrl': url }));
+        return;
+      }
+      const engine = item.selectComponent('.cyl-animated-item-animation');
+      if (engine && typeof engine.cyl_playFromStart === 'function') engine.cyl_playFromStart();
     },
 
     /** `intrinsicContentSize`: {height} (the width follows the content: the tag is an inline flex box). */

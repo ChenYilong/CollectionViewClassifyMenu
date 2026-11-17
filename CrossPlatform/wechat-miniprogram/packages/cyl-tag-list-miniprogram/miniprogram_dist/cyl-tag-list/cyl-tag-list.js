@@ -9,11 +9,14 @@
  * `cellMetrics()`.
  * Events: `tagtap` {section, item, title, selected, sectionTitle}, `selectionchange` {keys, items: [{section, item,
  * title}]}, `contentheightchange` {height}.
- * Animated icons come from the app's `cyl-animation-icon` (generic:cyl-animation-icon="…") and the files and engines it
- * registers with animations.js `configure()`; without them a tag shows its symbol or image.
+ * Every icon is drawn by CYLTabBarController's cyl-animated-item (../cyl-animated-item, vendored by commit). Animations
+ * play in the engine components the app gives as the abstract nodes `cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view`
+ * and `cyl-svga-view` (generic:cyl-lottie-view="…"; forwarded to cyl-animated-item), with the files the app registers
+ * with animations.js `configure()`; a GIF is drawn by `<image>`. Without an engine a tag shows its symbol or image.
  */
 const model = require('./model.js');
 const animations = require('./animations.js');
+const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model.js');
 const locale = require('../locale.js');
 
 /** The core's localized fold titles (CYLMenuExpand / CYLMenuCollapse) when the string tables have them. */
@@ -77,7 +80,8 @@ Component({
     /** Builds the view data; with `remeasure`, shows every item and measures the rows again. */
     render(remeasure) {
       const m = this.model;
-      const sections = m.sections.map((section) => {
+      this.itemPaths = {};
+      const sections = m.sections.map((section, sectionPosition) => {
         const style = section.style;
         const rows = this.rows && this.rows[section.index];
         const expanded = !!this.expanded[section.index];
@@ -97,19 +101,15 @@ Component({
           items: section.items.map((item, i) => {
             const selected = this.selection.includes(item.key);
             const state = model.stateOf(item, selected);
-            const resolved = animations.resolve(item.animation);
-            const icon = model.iconContent(item, state, style, resolved);
-            const tag = model.tagLayout(style, item, state, icon, style.interitemSpacing, style.lineSpacing);
+            const url = animations.url(item.animation, item.animationOptions, item.animationRestingProgress);
+            const icon = model.animatedIcon(item, state, style, url);
+            const tag = model.tagLayout(style, item, state, { kind: icon.iconKind }, style.interitemSpacing, style.lineSpacing);
+            this.itemPaths[item.key] = `sections[${sectionPosition}].items[${i}]`;
             return {
               key: item.key,
               title: item.title,
-              animation: resolved ? item.animation : '',
-              animationOptions: item.animationOptions || null,
-              resting: item.animationRestingProgress,
               styleSpeed: style.animationSpeed,
-              iconKind: icon.kind,
-              iconSrc: icon.src,
-              glyph: icon.glyph,
+              ...icon,
               enabled: item.enabled,
               selected,
               hidden: fold.visible.length ? !fold.visible[i] : false,
@@ -259,12 +259,29 @@ Component({
       }));
     },
 
-    /** Plays the animated icons of these items from progress 0 (`CYLTagButton.playAnimation()`). */
+    /**
+     * Plays the animated icons of these items from progress 0 (`CYLTagButton.playAnimation()`): the engine component in
+     * the item's cyl-animated-item through the engine contract (`cyl_playFromStart`); a GIF, drawn by `<image>`, starts
+     * again when its file is set again.
+     */
     playItems(keys) {
       (keys || []).forEach((k) => {
-        const icon = this.selectComponent(`#anim-${k}`);
-        if (icon) icon.play();
+        const item = this.selectComponent(`#anim-${k}`);
+        const url = item && item.data && item.data.animationUrl;
+        if (!url) return;
+        if (cylAnimatedItemType(url) === 'gif') {
+          this.restartGif(k, url);
+          return;
+        }
+        const engine = item.selectComponent('.cyl-animated-item-animation');
+        if (engine && typeof engine.cyl_playFromStart === 'function') engine.cyl_playFromStart();
       });
+    },
+
+    restartGif(k, url) {
+      const itemPath = this.itemPaths && this.itemPaths[k];
+      if (!itemPath) return;
+      this.setData({ [`${itemPath}.animationUrl`]: '' }, () => this.setData({ [`${itemPath}.animationUrl`]: url }));
     },
 
     /** Restarts every animated icon on the list from progress 0 (Play all, `playAllAnimations()`). */

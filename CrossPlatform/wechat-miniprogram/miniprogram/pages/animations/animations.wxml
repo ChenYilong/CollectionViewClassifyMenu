@@ -28,7 +28,7 @@
   </view>
 
   <view class="list">
-    <cyl-tag-list generic:cyl-animation-icon="cyl-lottie-icon" id="tags" configuration="{{configuration}}"
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" id="tags" configuration="{{configuration}}"
                   animation-speed="{{controls.speed}}" animation-loops="{{controls.loops}}" bind:tagtap="onTagTap" />
     <view class="tab-bar-space" />
   </view>
