@@ -196,3 +196,11 @@ the iOS example opens one there is not checked yet.
   Example redone by the rules:
 
   ![iOS Rive icons rest until played, then play and loop: 2 x 2 grid with header and footer](assets/ios-rive-rest-then-play-grid.png)
+
+## TODO (2026-11-18, `feat/harmony`): one column first, two columns when one column is taller than a phone screen
+
+- **Prompt (verbatim)**: "更新截图规则，优选一列多行 如果一列拼接后长度超过普通手机的一屏幕 则两列多行"
+- **English**: update the screenshot rules: prefer one column with several rows; if the one-column stitch is longer
+  than one screen of an ordinary phone, use two columns with several rows.
+- **Plan**: append the update to AGENTS.md, `instructions.md`, `../scripts/instructions.md` and the `cyl-screenshots`
+  skill; `scripts/stitch-screenshots.swift` picks the columns by this rule by default (`--columns auto`).
