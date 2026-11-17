@@ -146,6 +146,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    `assets/ios-rive-b20-play-all.png`): Shapes and Truck change every frame (they loop); Home (`house.riv`) never moves;
    Done (`check.riv`) stays on the finished check; Menu (`menu_button.riv`) stays on ≡; Button stays on its small arc;
    the icons.riv dark tags (Chat, Search, Timer, Alerts, Me) never move. Same result as Android.
+   **iOS after the fix (2026-11-18, Mac session, `45dd63a`, pins `eab038d5`)**: same setup and launch
+   (`animations-rive-loop`), six frames 2 s apart (`assets/ios-rive-b20-after-eab038d5.jpeg`, the Rive rows enlarged in
+   `assets/ios-rive-b20-after-eab038d5-row.png`): Done now loops (arc → full check → arc), Button changes between frames,
+   Shapes and Truck loop, and the dark Timer tag moves; Menu shows ≡ in all six frames (with `duration: 0` it may toggle
+   between frames 2 s apart, or not at all: to check with a screen recording); Home's house is too small at this size to
+   count the Rooms steps (1 → 2 → 3) seen on iOS 27.0 by the CYLTabBarController session.
 
 ## TODO (2026-11-17, macOS 27 + Xcode 27, `feat/harmony`): rows 12 and 13 on a Mac, simulator screenshots, bugs
 
