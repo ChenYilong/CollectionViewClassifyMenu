@@ -45,7 +45,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 | 9 | `import CYLAnimatedItem`, never CYLTabBarController, in the core | iOS | Done | `CYLTagButton.swift:24` (`@_exported`; falls back to `CYLTabBarController` only under SwiftPM, row 11) |
 | 10 | Several engines: the example reports which are linked (multi-engine section) | iOS | Done | `CYLTagAnimationDemoViewController.engineReportLines()` (`b4d0e51`), test `testEveryLinkedEngineIsRegisteredAndListed` |
 | 11 | Swift Package Manager: a separate `CYLAnimatedItem` product | iOS | TODO (upstream) | the guide's TODO 9: upstream SwiftPM still compiles the component into the `CYLTabBarController` product; owner's decision: "CocoaPods/Gradle now, SPM later" |
-| 12 | Static-library demo app (`CollectionViewClassifyMenu.xcodeproj`) compiles | iOS | TODO (CI) | "overridable members that could not be loaded": `@_exported import` (`b15b822`) plus the demo's own `import CYLAnimatedItem` (`880d9b1`); the menu unit tests have not finished in CI since (run 44037489477 queued) |
+| 12 | Static-library demo app (`CollectionViewClassifyMenu.xcodeproj`) compiles | iOS | TODO (upstream) | still "cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded" (run 44046809834 on `0e79c2c`, menu tests), after `@_exported import` (`b15b822`) and the demo's own `import CYLAnimatedItem` (`880d9b1`); the `use_frameworks!` example passes (`320c3eb`). Suspected cause, not verified (no Xcode here): CYLTabBarController's umbrella header at `57a527e` imports the quoted `"CYLAnimatedItem/CYLAnimatedItemView.h"` first, which resolves through `-I Pods/Headers/Public` with static libraries; reported to the CYLTabBarController session (prefer `<CYLAnimatedItem/CYLAnimatedItemView.h>`), then move the pins |
 | 13 | Full iOS CI green (menu, example, swift tests, screenshots) | iOS | TODO (CI) | `pod lib lint` and tag tests green; the rest was cancelled by later pushes (push freeze agreed until run 44037489477 ends) |
 | 14 | `CYLTagButton` subclasses `CYLAnimatedItemView`, `onItemStateChanged`, `accessoryPlacement` | Android | Done | `android/merged/library/.../CYLTagButton.kt:44`, `:261`, `:364` |
 | 15 | Depend on `cyltabbarcontroller-animateditem`, `:cylanimateditem` substitution by commit | Android | Done | `library/build.gradle.kts:41`, `settings.gradle.kts:69` |
@@ -62,7 +62,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 
 ## TODO (in order)
 
-1. **CI**: let run 44037489477 (`d979073`) finish (push freeze); then rows 12 and 13 (demo app, menu / example / swift
+1. **CI**: since `53e3ea7` a started iOS run always finishes (`cancel-in-progress: false`); row 12 waits for the upstream umbrella-header fix and a pin move; then rows 12 and 13 (demo app, menu / example / swift
    tests, screenshots of the engine report screen into `docs/assets/`).
 2. **Upstream merge of PR #815** (owner): then pins → the merge commit in this repository and CYLSearchViewController, and
    the mini program tags pass `gif-first-frame` / `gif-last-frame` / `gif-duration`, `embedded`, `autoplay` (row 19;
