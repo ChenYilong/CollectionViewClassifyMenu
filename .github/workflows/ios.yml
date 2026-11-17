@@ -193,6 +193,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SCREENSHOT_REF: ${{ github.head_ref || github.ref_name }}
+          SCREENSHOT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: scripts/publish-screenshots.sh
       - uses: actions/upload-artifact@v4
         # [EN] Screenshots are required (AGENTS.md); a failed upload must still be visible, so it is not ignored.
