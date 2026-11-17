@@ -16,13 +16,23 @@ import { CYLCollectionViewLeftAlignedLayout } from './CYLCollectionViewLeftAlign
 import { CYLFilterHeaderView, CYLFilterHeaderViewComponent, CYLFilterHeaderViewDelegate } from './CYLFilterHeaderView';
 import { CYLRightImageButton } from './CYLRightImageButton';
 
-const CELLS_HORIZONTAL_MARGIN: number = 12;
+/** The space between the classify menu's tags, vp (iOS / Android `kTagCollectionViewCellsHorizonMargin`). */
+export const kTagCollectionViewCellsHorizonMargin: number = 12;
+/** The classify menu's leading inset, vp (`kTagCollectionViewToLeftMargin`). */
+export const kTagCollectionViewToLeftMargin: number = 16;
+/** The classify menu's top inset, vp (`kTagCollectionViewToTopMargin`). */
+export const kTagCollectionViewToTopMargin: number = 12;
+/** The classify menu's trailing inset, vp (`kTagCollectionViewToRightMargin`). */
+export const kTagCollectionViewToRightMargin: number = 16;
+/** The classify menu's bottom inset, vp (`kTagCollectionViewToBottomtMargin`, the original spelling). */
+export const kTagCollectionViewToBottomtMargin: number = 10;
+const CELLS_HORIZONTAL_MARGIN: number = kTagCollectionViewCellsHorizonMargin;
 const CELL_HEIGHT: number = 30;
 const ITEM_BUTTON_IMAGE_TO_TEXT_MARGIN: number = 5;
-const COLLECTION_VIEW_TO_LEFT_MARGIN: number = 16;
-const COLLECTION_VIEW_TO_TOP_MARGIN: number = 12;
-const COLLECTION_VIEW_TO_RIGHT_MARGIN: number = 16;
-const COLLECTION_VIEW_TO_BOTTOM_MARGIN: number = 10;
+const COLLECTION_VIEW_TO_LEFT_MARGIN: number = kTagCollectionViewToLeftMargin;
+const COLLECTION_VIEW_TO_TOP_MARGIN: number = kTagCollectionViewToTopMargin;
+const COLLECTION_VIEW_TO_RIGHT_MARGIN: number = kTagCollectionViewToRightMargin;
+const COLLECTION_VIEW_TO_BOTTOM_MARGIN: number = kTagCollectionViewToBottomtMargin;
 const CELL_BUTTON_CENTER_TO_BORDER_MARGIN: number = 19;
 /** The collection view's `contentInset.top`. */
 const CONTENT_INSET_TOP: number = 15;
@@ -242,10 +252,28 @@ export class CYLClassifyMenuViewController implements CYLFilterHeaderViewDelegat
 
   filterHeaderViewDidTapMoreButton(headerView: CYLFilterHeaderView, moreButton: CYLRightImageButton): void {
     moreButton.isSelected = !moreButton.isSelected;
-    if (moreButton.isSelected) {
-      this.expandSectionArray.add(moreButton.tag);
+    this.setSection(moreButton.tag, moreButton.isSelected);
+  }
+
+  /**
+   * `numberOfVisibleItems(inSection:)`: the number of items a section shows now, its first row or, when expanded, all
+   * of them (Android `numberOfVisibleItemsInSection`).
+   */
+  numberOfVisibleItems(section: number): number {
+    return this.numberOfItemsInSection(section);
+  }
+
+  /**
+   * `setSection(_:expanded:)`: expands or folds a section, as its More button does (Android `setSectionExpanded`).
+   */
+  setSection(section: number, expanded: boolean): void {
+    if (section < 0 || section >= this.dataSource.length) {
+      return;
+    }
+    if (expanded) {
+      this.expandSectionArray.add(section);
     } else {
-      this.expandSectionArray.delete(moreButton.tag);
+      this.expandSectionArray.delete(section);
     }
     this.notify();
   }

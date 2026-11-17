@@ -8,6 +8,7 @@ import styleAndModelsTest from './StyleAndModels.test';
 import launchOptionsTest from './LaunchOptions.test';
 import reviewFilterTapTest from './ReviewFilterTap.test';
 import tagButtonTest from './TagButton.test';
+import androidParityTest from './AndroidParity.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -20,4 +21,5 @@ export default function testsuite() {
   launchOptionsTest();
   reviewFilterTapTest();
   tagButtonTest();
+  androidParityTest();
 }

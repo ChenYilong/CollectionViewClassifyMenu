@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 799 / 838 = 95.3 / 100** (API 777 / 816, demos 22 / 22). Both tables are scored together: every TODO removed
+**Score: 838 / 838 = 100.0 / 100** (API 816 / 816, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -32,11 +32,11 @@ overrides left out.
 
 | iOS (Swift, file) | HarmonyOS (ArkTS, `harmony/classifymenu`) | Kind |
 | --- | --- | --- |
-| `kTagCollectionViewCellsHorizonMargin` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `kTagCollectionViewToLeftMargin` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `kTagCollectionViewToTopMargin` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `kTagCollectionViewToRightMargin` (CYLClassifyMenuViewController.swift) | TODO | property |
-| `kTagCollectionViewToBottomtMargin` (CYLClassifyMenuViewController.swift) | TODO | property |
+| `kTagCollectionViewCellsHorizonMargin` (CYLClassifyMenuViewController.swift) | `kTagCollectionViewCellsHorizonMargin` (classify/CYLClassifyMenuViewController.ets) | property |
+| `kTagCollectionViewToLeftMargin` (CYLClassifyMenuViewController.swift) | `kTagCollectionViewToLeftMargin` | property |
+| `kTagCollectionViewToTopMargin` (CYLClassifyMenuViewController.swift) | `kTagCollectionViewToTopMargin` | property |
+| `kTagCollectionViewToRightMargin` (CYLClassifyMenuViewController.swift) | `kTagCollectionViewToRightMargin` | property |
+| `kTagCollectionViewToBottomtMargin` (CYLClassifyMenuViewController.swift) | `kTagCollectionViewToBottomtMargin` | property |
 | `CYLClassifyMenuViewController` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController` (classify/, rendered by CYLClassifyMenuView) | class |
 | `CYLClassifyMenuViewController.menuDataSource` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.menuDataSource` | property |
 | `CYLClassifyMenuViewController.menuDelegate` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.menuDelegate` | property |
@@ -53,8 +53,8 @@ overrides left out.
 | `CYLClassifyMenuViewController.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLClassifyMenuViewController.swift) | `viewForSupplementaryElementOfKind()` | method |
 | `CYLClassifyMenuViewController.collectionView(_:didSelectItemAt:)` (CYLClassifyMenuViewController.swift) | `didSelectItemAt()` | method |
 | `CYLClassifyMenuViewController.filterHeaderView(_:didTapMoreButton:)` (CYLClassifyMenuViewController.swift) | `filterHeaderViewDidTapMoreButton()` | method |
-| `CYLClassifyMenuViewController.numberOfVisibleItems(inSection:)` (CYLClassifyMenuViewController.swift) | TODO | method |
-| `CYLClassifyMenuViewController.setSection(_:expanded:)` (CYLClassifyMenuViewController.swift) | TODO | method |
+| `CYLClassifyMenuViewController.numberOfVisibleItems(inSection:)` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.numberOfVisibleItems(section)` | method |
+| `CYLClassifyMenuViewController.setSection(_:expanded:)` (CYLClassifyMenuViewController.swift) | `CYLClassifyMenuViewController.setSection(section, expanded)` (the More button calls it) | method |
 | `CYLClassifyMenuViewController.collectionView(_:layout:sizeForItemAt:)` (CYLClassifyMenuViewController.swift) | `sizeForItemAt()` | method |
 | `CYLClassifyMenuViewController.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLClassifyMenuViewController.swift) | `minimumInteritemSpacingForSectionAt()` | method |
 | `CYLClassifyMenuViewController.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLClassifyMenuViewController.swift) | `referenceSizeForHeaderInSection()` | method |
@@ -81,10 +81,10 @@ overrides left out.
 | `CYLIndexPathButton` (CYLIndexPathButton.swift) | `CYLIndexPathButton` | class |
 | `CYLIndexPathButton.section` (CYLIndexPathButton.swift) | `CYLIndexPathButton.section` | property |
 | `CYLIndexPathButton.row` (CYLIndexPathButton.swift) | `CYLIndexPathButton.row` | property |
-| `CYLIndexPathButton.init?(coder:)` (CYLIndexPathButton.swift) | TODO | init |
+| `CYLIndexPathButton.init?(coder:)` (CYLIndexPathButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLRightImageButton` (CYLRightImageButton.swift) | `CYLRightImageButton` | class |
-| `CYLRightImageButton.expandTitle` (CYLRightImageButton.swift) | TODO | property |
-| `CYLRightImageButton.collapseTitle` (CYLRightImageButton.swift) | TODO | property |
+| `CYLRightImageButton.expandTitle` (CYLRightImageButton.swift) | `CYLRightImageButton.expandTitle` (`normalTitle`) | property |
+| `CYLRightImageButton.collapseTitle` (CYLRightImageButton.swift) | `CYLRightImageButton.collapseTitle` (`selectedTitle`) | property |
 | `CYLRightImageButton.init?(coder:)` (CYLRightImageButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagDirection` (CYLImageTagGroupView.swift) | `enum CYLImageTagDirection` (imagetag/CYLImageTagModel.ets) | enum |
 | `CYLImageTagDirection.leftCenter` (CYLImageTagGroupView.swift) | `CYLImageTagDirection.leftCenter` | case |
@@ -126,7 +126,7 @@ overrides left out.
 | `CYLImageTagRippleView.init?(coder:)` (CYLImageTagGroupView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLImageTagRippleView.startAnimating()` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.startAnimating` | method |
 | `CYLImageTagRippleView.stopAnimating()` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.stopAnimating` | method |
-| `CYLImageTagRippleView.isAnimating` (CYLImageTagGroupView.swift) | TODO | property |
+| `CYLImageTagRippleView.isAnimating` (CYLImageTagGroupView.swift) | `CYLImageTagRippleView.isAnimating` (imagetag/CYLImageTagGroupView.ets) | property |
 | `CYLImageTagGroupViewDataSource` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDataSource` | protocol |
 | `CYLImageTagGroupViewDataSource.numberOfTags(in:)` (CYLImageTagGroupView.swift) | `CYLImageTagGroupViewDataSource.numberOfTags` | method |
 | `CYLImageTagGroupViewDataSource.groupView(_:viewForTagAt:)` (CYLImageTagGroupView.swift) | `viewForTagAt` | method |
@@ -220,10 +220,10 @@ overrides left out.
 | `CYLFilterBaseController.contentView` (CYLFilterBaseController.swift) | `CYLFilterBaseController.contentView` | property |
 | `CYLFilterBaseController.restoreButton` (CYLFilterBaseController.swift) | `CYLFilterBaseController.restoreButton` | property |
 | `CYLFilterBaseController.okButton` (CYLFilterBaseController.swift) | `CYLFilterBaseController.okButton` | property |
-| `CYLFilterBaseController.settingArray` (CYLFilterBaseController.swift) | TODO | property |
+| `CYLFilterBaseController.settingArray` (CYLFilterBaseController.swift) | `CYLFilterBaseController.settingArray` | property |
 | `CYLFilterBaseController.delegate` (CYLFilterBaseController.swift) | `CYLFilterBaseController.delegate` | property |
 | `CYLFilterBaseController.init()` (CYLFilterBaseController.swift) | `new CYLFilterBaseController()` | init |
-| `CYLFilterBaseController.isShowing` (CYLFilterBaseController.swift) | TODO | property |
+| `CYLFilterBaseController.isShowing` (CYLFilterBaseController.swift) | `CYLFilterBaseController.isShowing` | property |
 | `CYLFilterBaseController.show(in:)` (CYLFilterBaseController.swift) | `show()` (CYLMultipleFilterView in a Stack) | method |
 | `CYLFilterBaseController.confirmButtonClicked(_:)` (CYLFilterBaseController.swift) | `confirmButtonClicked()` | method |
 | `CYLFilterBaseController.restoreButtonClicked(_:)` (CYLFilterBaseController.swift) | `restoreButtonClicked()` | method |
@@ -243,20 +243,20 @@ overrides left out.
 | `CYLMultipleFilterController.collectionView(_:didSelectItemAt:)` (CYLMultipleFilterController.swift) | `didSelectItemAt()` | method |
 | `CYLMultipleFilterController.collectionView(_:layout:sizeForItemAt:)` (CYLMultipleFilterController.swift) | `sizeForItemAt()` | method |
 | `CYLMultipleFilterController.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLMultipleFilterController.swift) | `minimumInteritemSpacingForSectionAt()` | method |
-| `kMultipleFilterSetting` (CYLFilterParamsTool.swift) | TODO | property |
-| `kMultipleFilterSettingModified` (CYLFilterParamsTool.swift) | TODO | property |
-| `CYLFilterParamsTool` (CYLFilterParamsTool.swift) | TODO | class |
-| `CYLFilterParamsTool.dataSources` (CYLFilterParamsTool.swift) | TODO | property |
-| `CYLFilterParamsTool.filterParamsArray` (CYLFilterParamsTool.swift) | TODO | property |
-| `CYLFilterParamsTool.filterParamsDictionary` (CYLFilterParamsTool.swift) | TODO | property |
-| `CYLFilterParamsTool.filterParamsContentDictionary` (CYLFilterParamsTool.swift) | TODO | property |
-| `CYLFilterParamsTool.filename` (CYLFilterParamsTool.swift) | TODO | property |
+| `kMultipleFilterSetting` (CYLFilterParamsTool.swift) | `kMultipleFilterSetting` (classify/CYLFilterParamsTool.ets) | property |
+| `kMultipleFilterSettingModified` (CYLFilterParamsTool.swift) | `kMultipleFilterSettingModified` | property |
+| `CYLFilterParamsTool` (CYLFilterParamsTool.swift) | `class CYLFilterParamsTool` | class |
+| `CYLFilterParamsTool.dataSources` (CYLFilterParamsTool.swift) | `CYLFilterParamsTool.dataSources` | property |
+| `CYLFilterParamsTool.filterParamsArray` (CYLFilterParamsTool.swift) | `CYLFilterParamsTool.filterParamsArray` | property |
+| `CYLFilterParamsTool.filterParamsDictionary` (CYLFilterParamsTool.swift) | `CYLFilterParamsTool.filterParamsDictionary` | property |
+| `CYLFilterParamsTool.filterParamsContentDictionary` (CYLFilterParamsTool.swift) | `CYLFilterParamsTool.filterParamsContentDictionary` | property |
+| `CYLFilterParamsTool.filename` (CYLFilterParamsTool.swift) | `CYLFilterParamsTool.filename` (`<filesDir>/kMultipleFilterSetting`) | property |
 | `CYLFilterCollectionCell` (CYLFilterCollectionCell.swift) | `CYLFilterCollectionCell` | class |
 | `CYLFilterCollectionCell.titleButton` (CYLFilterCollectionCell.swift) | `CYLFilterCollectionCell.titleButton` | property |
 | `CYLFilterCollectionCell.init?(coder:)` (CYLFilterCollectionCell.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLMultipleFilterHeaderView` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView` | class |
-| `CYLMultipleFilterHeaderView.titleButton` (CYLMultipleFilterHeaderView.swift) | TODO | property |
-| `CYLMultipleFilterHeaderView.init?(coder:)` (CYLMultipleFilterHeaderView.swift) | TODO | init |
+| `CYLMultipleFilterHeaderView.titleButton` (CYLMultipleFilterHeaderView.swift) | `CYLMultipleFilterHeaderView.titleLabel` / `titleFontSize` / `titleColor` (the title drawn as text) | property |
+| `CYLMultipleFilterHeaderView.init?(coder:)` (CYLMultipleFilterHeaderView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `NSArray.cyl_description(withLocale:)` (NSArray+CYLLog.swift) | `cylArrayDescriptionWithLocale()` (classify/CYLLog.ets) | method |
 | `NSDictionary.cyl_description(withLocale:)` (NSDictionary+CYLLog.swift) | `cylDictionaryDescriptionWithLocale()` | method |
 | `UICollectionViewDelegateLeftAlignedLayout` (CYLCollectionViewLeftAlignedLayout.swift) | `interface UICollectionViewDelegateLeftAlignedLayout` | protocol |
@@ -416,9 +416,9 @@ overrides left out.
 | `CYLMenuStyle.static tagCloud()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagCloud()` | method |
 | `CYLMenuStyle.static tagContainer()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagContainer()` | method |
 | `CYLMenuStyle.static gridStyle(itemsPerRow:)` (CYLMenuStyle.swift) | `CYLMenuStyle.static gridStyle(itemsPerRow)` | method |
-| `CYLMenuStyle.static classifyMenuTag(_:)` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.static filterTag()` (CYLMenuStyle.swift) | TODO | method |
-| `CYLMenuStyle.static sectionTitle(fontSize:textColor:leadingInset:)` (CYLMenuStyle.swift) | TODO | method |
+| `CYLMenuStyle.static classifyMenuTag(_:)` (CYLMenuStyle.swift) | `CYLMenuStyle.classifyMenuTag(look)` (the `CYLCollectionCellButtonStyle` raw value) | method |
+| `CYLMenuStyle.static filterTag()` (CYLMenuStyle.swift) | `CYLMenuStyle.filterTag()` | method |
+| `CYLMenuStyle.static sectionTitle(fontSize:textColor:leadingInset:)` (CYLMenuStyle.swift) | `CYLMenuStyle.sectionTitle(fontSize, textColor, leadingInset)` | method |
 | `CYLMenuStyle.appearance(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.appearance(state)` | method |
 | `CYLMenuStyle.setTitleTextAttributes(_:for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.setTitleTextAttributes(font, textColor, state)` | method |
 | `CYLMenuStyle.titleTextAttributes(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.titleTextAttributes(state)` | method |
@@ -458,7 +458,7 @@ overrides left out.
 | `CYLTag.init(identifier:title:backgroundColor:)` (CYLTag.swift) | `new CYLTag(identifier, title, backgroundColor)` | init |
 | `CYLTag.init(identifier:title:backgroundColorHex:)` (CYLTag.swift) | `CYLTag.withHex(identifier, title, hex)` | init |
 | `CYLTag.colors` (CYLTag.swift) | `CYLTag.colors` | property |
-| `CYLTag.resetColors()` (CYLTag.swift) | TODO | method |
+| `CYLTag.resetColors()` (CYLTag.swift) | `CYLTag.resetColors()` | method |
 | `CYLTag.hasCustomStyle` (CYLTag.swift) | `CYLTag.hasCustomStyle` | property |
 | `CYLTag.style(basedOn:)` (CYLTag.swift) | `styleBasedOn(baseStyle)` | method |
 | `CYLTag.copy()` (CYLTag.swift) | `copy()` | method |
@@ -496,9 +496,9 @@ overrides left out.
 | `CYLTagAppearance.backgroundColor` (CYLTagAppearance.swift) | `CYLTagAppearance.backgroundColor` | property |
 | `CYLTagAppearance.textColor` (CYLTagAppearance.swift) | `CYLTagAppearance.textColor` | property |
 | `CYLTagAppearance.font` (CYLTagAppearance.swift) | `CYLTagAppearance.font` | property |
-| `CYLTagAppearance.resetBackgroundColor()` (CYLTagAppearance.swift) | TODO | method |
-| `CYLTagAppearance.resetTextColor()` (CYLTagAppearance.swift) | TODO | method |
-| `CYLTagAppearance.resetFont()` (CYLTagAppearance.swift) | TODO | method |
+| `CYLTagAppearance.resetBackgroundColor()` (CYLTagAppearance.swift) | `CYLTagAppearance.resetBackgroundColor()` | method |
+| `CYLTagAppearance.resetTextColor()` (CYLTagAppearance.swift) | `CYLTagAppearance.resetTextColor()` | method |
+| `CYLTagAppearance.resetFont()` (CYLTagAppearance.swift) | `CYLTagAppearance.resetFont()` | method |
 | `CYLTagAppearance.iconColor` (CYLTagAppearance.swift) | `CYLTagAppearance.iconColor` | property |
 | `CYLTagAppearance.cornerRadius` (CYLTagAppearance.swift) | `CYLTagAppearance.cornerRadius` | property |
 | `CYLTagAppearance.borderColor` (CYLTagAppearance.swift) | `CYLTagAppearance.borderColor` | property |
@@ -521,7 +521,7 @@ overrides left out.
 | `CYLTagButton.init?(coder:)` (CYLTagButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagButton.init(title:image:)` (CYLTagButton.swift) | `new CYLTagButton(title, image)` | init |
 | `CYLTagButton.init(title:image:animationURL:)` (CYLTagButton.swift) | `new CYLTagButton(title, image, animationURL)` | init |
-| `CYLTagButton.resetAnimationSpeed()` (CYLTagButton.swift) | TODO | method |
+| `CYLTagButton.resetAnimationSpeed()` (CYLTagButton.swift) | `CYLTagButton.resetAnimationSpeed()` | method |
 | `CYLTagButton.static width(forTitle:image:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.widthWithImage(title, image, style, fontScale)` | method |
 | `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.width(title, iconSize, showsDeleteIndicator, style, fontScale)` | method |
 | `CYLTagButton.static iconSize(for:animated:style:)` (CYLTagButton.swift) | `CYLTagButton.iconSize(image, animated, style)` | method |
@@ -685,8 +685,8 @@ overrides left out.
 | `CYLTag.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuConfiguration.tag(configuration)` | init |
 | `CYLTagListView.init(configuration:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.withConfiguration(configuration)` | init |
 | `CYLTagListView.init(configurationFile:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.withConfigurationFile(filePath, context)` (JSON) | init |
-| `CYLTagListView.static objcTagListView(configuration:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
-| `CYLTagListView.static objcTagListView(configurationFile:)` (CYLTagListView+CYLConfiguration.swift) | TODO | method |
+| `CYLTagListView.static objcTagListView(configuration:)` (CYLTagListView+CYLConfiguration.swift) | N/A: an Objective-C bridge of a Swift-only API (blocks / NSNumber / optional enums for Objective-C); ArkTS calls the Swift-style API directly | method |
+| `CYLTagListView.static objcTagListView(configurationFile:)` (CYLTagListView+CYLConfiguration.swift) | N/A: an Objective-C bridge of a Swift-only API (blocks / NSNumber / optional enums for Objective-C); ArkTS calls the Swift-style API directly | method |
 | `CYLTagListView.configurationDataSource` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.configurationDataSource` | property |
 | `CYLTagListView.applyConfiguration(_:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.applyConfiguration(configuration)` | method |
 | `CYLTagListView.static configuration(contentsOfFile:)` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListState.configurationContentsOfFile(filePath, context)` | method |
@@ -729,11 +729,11 @@ overrides left out.
 | `CYLTagListView.tagContentInsetBottom` (CYLTagListView.swift) | `CYLTagListState.tagContentInsetBottom` | property |
 | `CYLTagListView.tagContentInsetRight` (CYLTagListView.swift) | `CYLTagListState.tagContentInsetRight` | property |
 | `CYLTagListView.animationSpeed` (CYLTagListView.swift) | `CYLTagListState.animationSpeed` | property |
-| `CYLTagListView.animationSpeedNumber` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListView.animationSpeedNumber` (CYLTagListView.swift) | N/A: an Objective-C bridge of a Swift-only API (blocks / NSNumber / optional enums for Objective-C); ArkTS calls the Swift-style API directly | property |
 | `CYLTagListView.animationLoops` (CYLTagListView.swift) | `CYLTagListState.animationLoops` | property |
 | `CYLTagListView.playAllAnimations()` (CYLTagListView.swift) | `CYLTagListState.playAllAnimations()` | method |
 | `CYLTagListView.tagClickHandler` (CYLTagListView.swift) | `CYLTagListState.tagClickHandler` | property |
-| `CYLTagListView.objcTagClickHandler` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListView.objcTagClickHandler` (CYLTagListView.swift) | N/A: an Objective-C bridge of a Swift-only API (blocks / NSNumber / optional enums for Objective-C); ArkTS calls the Swift-style API directly | property |
 | `CYLTagListView.tagDeleteHandler` (CYLTagListView.swift) | `CYLTagListState.tagDeleteHandler` | property |
 | `CYLTagListView.containerBorderWidth` (CYLTagListView.swift) | `CYLTagListState.containerBorderWidth` | property |
 | `CYLTagListView.containerBorderColor` (CYLTagListView.swift) | `CYLTagListState.containerBorderColor` | property |
@@ -754,8 +754,8 @@ overrides left out.
 | `CYLTagListView.init(foldControl:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl)` | init |
 | `CYLTagListView.init(foldControl:title:titleImage:titlePosition:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl, title, titleImage, titlePosition)` | init |
 | `CYLTagListView.init(foldPosition:content:)` (CYLTagListView.swift) | `CYLTagListState.withFoldPosition(position, content)` | init |
-| `CYLTagListView.init(objcFoldControl:title:titlePosition:)` (CYLTagListView.swift) | TODO | init |
-| `CYLTagListView.static objcTagListView(foldPosition:content:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.init(objcFoldControl:title:titlePosition:)` (CYLTagListView.swift) | N/A: an Objective-C bridge of a Swift-only API (blocks / NSNumber / optional enums for Objective-C); ArkTS calls the Swift-style API directly | init |
+| `CYLTagListView.static objcTagListView(foldPosition:content:)` (CYLTagListView.swift) | N/A: an Objective-C bridge of a Swift-only API (blocks / NSNumber / optional enums for Objective-C); ArkTS calls the Swift-style API directly | method |
 | `CYLTagListView.reloadMenuData()` (CYLTagListView.swift) | `reloadMenuData()` | method |
 | `CYLTagListView.heightThatFitsWidth(_:)` (CYLTagListView.swift) | `heightThatFitsWidth(width)` | method |
 | `CYLTagListView.tagDataSource` (CYLTagListView.swift) | `CYLTagListState.tagDataSource` | property |
@@ -771,7 +771,7 @@ overrides left out.
 | `CYLTagListView.removeAllTags()` (CYLTagListView.swift) | `removeAllTags()` | method |
 | `CYLTagListView.replaceTags(_:)` (CYLTagListView.swift) | `replaceTags(tags)` | method |
 | `CYLTagListView.setTags(withTitles:colors:)` (CYLTagListView.swift) | `setTagsWithTitles(titles, colors)` | method |
-| `CYLTagListView.objcSetTags(withTitles:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.objcSetTags(withTitles:)` (CYLTagListView.swift) | N/A: an Objective-C bridge of a Swift-only API (blocks / NSNumber / optional enums for Objective-C); ArkTS calls the Swift-style API directly | method |
 | `CYLTagListView.deleteItem(at:)` (CYLTagListView.swift) | `deleteItem(indexPath)` | method |
 | `CYLTagListView.tagButton(at:)` (CYLTagListView.swift) | `CYLTagListState.tagButton(indexPath)` | method |
 | `CYLTagListView.selectedIndexPaths` (CYLTagListView.swift) | `CYLTagListState.selectedIndexPaths` | property |
@@ -816,7 +816,7 @@ overrides left out.
 | `CYLTagView.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagView.swift) | `tagHeaderCell(headerCell, section)` | method |
 | `CYLTagView.numberOfSections(in:)` (CYLTagView.swift) | `numberOfSections()` | method |
 | `CYLTagView.collectionView(_:numberOfItemsInSection:)` (CYLTagView.swift) | `numberOfItemsInSection(section)` | method |
-| `CYLTagView.numberOfVisibleItems(inSection:)` (CYLTagView.swift) | TODO | method |
+| `CYLTagView.numberOfVisibleItems(inSection:)` (CYLTagView.swift) | `CYLTagView.numberOfVisibleItems(section)` | method |
 | `CYLTagView.collectionView(_:cellForItemAt:)` (CYLTagView.swift) | `cellForItemAt(indexPath)` | method |
 | `CYLTagView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagView.swift) | `viewForSupplementaryElementOfKind(kind, indexPath)` | method |
 | `CYLTagView.collectionView(_:didSelectItemAt:)` (CYLTagView.swift) | `didSelectItemAt(indexPath)` | method |

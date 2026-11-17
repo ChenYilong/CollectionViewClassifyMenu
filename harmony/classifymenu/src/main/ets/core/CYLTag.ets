@@ -72,6 +72,11 @@ export class CYLTag {
     return new CYLTagColors(this.backgroundColor, this.borderColor, this.textColor, this.selectedBackgroundColor);
   }
 
+  /** `resetColors()`: the colors back to their defaults (the style's). */
+  resetColors(): void {
+    this.colors = new CYLTagColors();
+  }
+
   set colors(value: CYLTagColors) {
     this.backgroundColor = value.backgroundColor;
     this.borderColor = value.borderColor;

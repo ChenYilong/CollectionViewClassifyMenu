@@ -378,6 +378,11 @@ export class CYLTagButton {
     this.applyAnimationSpeed();
   }
 
+  /** `resetAnimationSpeed()`: follows `style.animationSpeed` again. */
+  resetAnimationSpeed(): void {
+    this.animationSpeed = undefined;
+  }
+
   /**
    * True repeats the animated icon after `playAnimation()`; false (the default) plays once.
    */
