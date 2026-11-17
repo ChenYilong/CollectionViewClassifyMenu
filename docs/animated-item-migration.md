@@ -300,3 +300,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
     per frame: Home 143-557, Done 341-695, Menu up to 577, Button up to 117, Shapes 431-809, Truck 20-113).
     ![iOS Rive play and loop](assets/ios-rive-play-loop.png)
   - Example tests 92 / 0.
+- **iOS pins at `ad3dca0e` (2026-11-18)**: CYLTabBarController `ad3dca0e` (Android / HarmonyOS Rive resume, Carthage
+  build folder) and `915bddbd` (iOS GIF tab images rest until played; only `CYLTabBarController.m` changes for iOS,
+  and this repository's tab bars use no GIF images). Menu 32, tag 6, example 92, swift 22 tests, 0 failures, iPhone 17
+  Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3. All platforms at `ad3dca0e` (Android and mini program: `70a6426`).
