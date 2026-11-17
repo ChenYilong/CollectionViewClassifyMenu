@@ -721,7 +721,7 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     NSURL *url = [NSURL fileURLWithPath:@"/no/such/file.json"];
     CYLTagButton *animated = [[CYLTagButton alloc] initWithTitle:nil image:image animationURL:url];
     XCTAssertEqualObjects(animated.animationURL, url);
-    // CYLAnimatedItemView's members, inherited and visible to Objective-C; no engine in this project's Podfile, so the
+    // CYLAnimatedItemView's members, inherited and redeclared by CYLTagButton, so only CollectionViewClassifyMenu is imported; no engine in this project's Podfile, so the
     // static image shows and the playback methods do nothing.
     XCTAssertNil(animated.animationView);
     XCTAssertEqual(animated.imageView.image, image, @"The static image, not the placeholder");

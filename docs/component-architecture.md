@@ -198,6 +198,14 @@ declarations, so Objective-C callers see no change.
     `isAnimationEngineAvailable` is `NSClassFromString("CYLTabBarItemAnimationFactory") != nil`; `animationPlayer` is
     not referenced by the core (the base class declares it only with an engine). `animationPlayer` (public before) is
     removed from `CYLTagButton`'s own API (docs/Swift-Migration.md, row 9).
+  - Objective-C callers import only `CollectionViewClassifyMenu`, never `CYLTabBarController`. Clang shows a module's
+    declarations only to a file that imports that module, so `CYLTagButton` redeclares (forwarding to the base class)
+    the inherited members Objective-C uses: `animationURL`, `animationLoops`, `animationView`, `imageView`,
+    `titleLabel`, `accessoryView`, `placeholderImage`, `restartAnimation()`, `stopAnimation()` (with the ones it already
+    overrides: `title`, `image`, `selectedImage`, `animationSpeed`, `animationRestingProgress`, `playAnimation()`,
+    `reloadAnimation()`). CI failed "Unit tests (menu)" on `1813025` without them; `f93974b` worked around it by importing
+    CYLTabBarController in the test, which the owner rejected (2026-11-17, prompt verbatim: "Donot import tabbar and fix
+    it"); it is reverted and fixed in the core. TODO: confirm in iOS CI (not compiled on Linux).
   - CocoaPods: podspec `s.dependency 'CYLTabBarController/CYLAnimatedItem'`; Example Podfile `CYLAnimatedItem` plus
     `CYLAnimatedItemLottieObjectiveC`, `…PAG`, `…Rive`, `…SVGA`, `…GIF`; RN and Flutter example Podfiles
     `CYLAnimatedItemLottieObjectiveC`, `…Rive`; Example-Swift and the root project no engine; TagCollectionView's Podfile
