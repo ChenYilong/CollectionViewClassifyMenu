@@ -12,6 +12,9 @@
 
 import UIKit
 import CollectionViewClassifyMenu
+// CYLClassifyMenuViewController's members use CYLTagButton, a CYLAnimatedItemView: this demo app (static libraries)
+// imports the base module itself so that it can load them (docs/example-layer-fixes.md).
+import CYLAnimatedItem
 
 @objc(CYLMainViewController)
 final class CYLMainViewController: CYLClassifyMenuViewController {
