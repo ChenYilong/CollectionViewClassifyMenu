@@ -241,3 +241,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `127.0.0.1:5559` (hdc gives it a free port; `5563` was wrong). The HAP installs on its arm64 image, every Rive tag
   draws and replays on a second Play All. Evidence: `assets/harmonyos-rive-b20-replay.png`,
   `assets/harmonyos-rive-section-arm64.jpeg`. Left: rows 11 (SwiftPM product) and 19 (upstream merge).
+
+## TODO (2026-11-18, `feat/harmony`): migration score from 92 to 100
+
+- **Prompt (verbatim)**: "My session: nothing new on feat/harmony since a1366b9; the score is still 92 fix to100"
+- **English**: raise the migration score from 92 to 100.
+- **Plan**: row 11: CYLTabBarController `12c1fabd` (newest, `scripts/cyl-tabbar-latest-commit.sh`) has the SwiftPM product
+  `CYLAnimatedItem` (`22282646`); depend on it instead of the `CYLTabBarController` product, move the iOS pins (Package.swift,
+  Podfiles, React Native and Flutter example Podfiles) to `12c1fabd`, build the package, pod install, run the iOS tests.
+  Row 19: PR #815 is merged (`faf535e0`) and inside the pin since `074285a6`; the mini program check belongs to the
+  Windows session (asked by message), as do the Android, HarmonyOS and mini program pins.
