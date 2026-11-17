@@ -253,24 +253,28 @@ verify the behavior and update the applicable documentation.
   `CYLPlusButtonCenterYMultiplier`; in code, with `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` /
   `+multiplierOfTabBarHeight:` of `CYLPlusButtonSubclassing`. A flat plus button needs a request. Details:
   `.agents/skills/cyl-dependency/`.
-- The core library depends on CYLTabBarController's shared animated icon + title
-  component only: `CYLTagButton` subclasses `CYLAnimatedItemView` (podspec
-  `s.dependency 'CYLTabBarController/CYLAnimatedItem'`, Swift package
-  `.product(name: "CYLTabBarController")`, Android
-  `io.github.chenyilong:cyltabbarcontroller-animateditem`, built from the pinned
-  commit through `substitute(...).using(project(":cylanimateditem"))`; guide:
+- The core library depends on the shared animated icon + title component only:
+  `CYLTagButton` subclasses `CYLAnimatedItemView`, from the pod and module
+  `CYLAnimatedItem` (`CYLAnimatedItem.podspec` in CYLTabBarController's
+  repository, no dependency on CYLTabBarController; podspec
+  `s.dependency 'CYLAnimatedItem'`, Swift `import CYLAnimatedItem`; Swift package
+  `.product(name: "CYLTabBarController")`, which still compiles the component
+  into that module; Android `io.github.chenyilong:cyltabbarcontroller-animateditem`,
+  package `com.cyl.animateditem`, built from the pinned commit through
+  `substitute(...).using(project(":cylanimateditem"))`; guide:
   <https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md>).
   It never depends on an animation engine or library: only the examples add the
-  engine subspecs (`CYLTabBarController/CYLAnimatedItem<Type>`: `LottieSwift`,
-  `LottieObjectiveC`, `PAG`, `PAGEnterprise`, `Rive`, `SVGA`, `GIF`) and the
-  Android animation libraries (Lottie, libpag, rive-android, SVGAPlayer); without
-  them tags show their static images. The display priority, the failure
-  fallbacks, the placeholder and the URL loading are the base class's: never
-  reimplement them in a subclass. The configuration parser
-  (`CYLTabBarConfigurationParser`) is still found at runtime. Since
-  `CYLTabBarController/CYLAnimatedItem` is in no CocoaPods release yet, every
-  Podfile pins CYLTabBarController by commit and `scripts/pod-lint.sh lib`
-  lints against that commit's podspec.
+  engine subspecs (`CYLAnimatedItem/<Type>`: `LottieSwift`, `LottieObjectiveC`,
+  `PAG`, `PAGEnterprise`, `Rive`, `SVGA`, `GIF`) and the Android animation
+  libraries (Lottie, libpag, rive-android, SVGAPlayer); without them tags show
+  their static images. The display priority, the failure fallbacks, the
+  placeholder and the URL loading are the base class's: never reimplement them
+  in a subclass. The configuration parser (`CYLTabBarConfigurationParser`) is
+  still found at runtime. Since `CYLAnimatedItem` is not on the CocoaPods trunk
+  yet, every Podfile names it by `:git` + `:commit` (`CYL_ANIMATED_ITEM`, the
+  same commit as `CYL_TAB_BAR`; a Podfile that uses CYLTabBarController names it
+  too, because CYLTabBarController's CYLUtils depends on `CYLAnimatedItem/Core`),
+  and `scripts/pod-lint.sh lib` lints against a checkout of that commit.
 - Details: `.agents/skills/cyl-dependency/`.
 
 ## Bundled animation files

@@ -38,9 +38,9 @@ Pod::Spec.new do |s|
   # CYLTagButton subclasses CYLTabBarController's shared animated icon + title component, CYLAnimatedItemView
   # (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md): the
   # component's core only, which brings CYLUtils and no tab bar. No animation engine: an app that plays animated icons
-  # adds the engine subspec of each file type (CYLTabBarController/CYLAnimatedItemLottieSwift, ...LottieObjectiveC,
+  # adds the engine subspec of each file type (CYLAnimatedItem/LottieSwift, .../LottieObjectiveC,
   # ...PAG, ...PAGEnterprise, ...Rive, ...SVGA, ...GIF); without one, tags show their static images. The subspec is
   # not in a CocoaPods release yet: Podfiles pin CYLTabBarController by commit (:git + :commit).
-  s.dependency 'CYLTabBarController/CYLAnimatedItem'
+  s.dependency 'CYLAnimatedItem'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 end
