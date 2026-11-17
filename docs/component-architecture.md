@@ -435,3 +435,12 @@ The item-by-item progress, the score (72 at `d979073`) and the remaining TODOs o
 `cancel-in-progress: true` every push cancelled the running iOS run, and on 2026-11-17 no iOS run finished for more
 than two hours. GitHub keeps at most one pending run per concurrency group and replaces it with the newest push, so a
 started run completes and the next one tests the newest commit.
+- **Pin `c8132d2`** (2026-11-17): CYLTabBarController `c8132d2`, the #788 tip and newest commit. It fixes the cause of the
+  static-library demo failure ("cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable
+  members that could not be loaded", still failing on `0e79c2c` with every workaround here): under CocoaPods
+  `CYLTabBarController.h/.m` now import `<CYLAnimatedItem/CYLAnimatedItemView.h>` by its module instead of the quoted
+  path, so `CYLAnimatedItemView` is declared once. Also brings the mini program `cyl-animated-item` reading `*.svga.bin`
+  and `animationType`, remote Lottie downloads on iOS and the FlatDesign tab button on `CYLAnimatedItemView`. The vendored
+  mini program component was re-fetched (`fetch-cyltabbar.js`, `npm test` 130/130); the HarmonyOS module is unchanged
+  upstream (README pin updated). Pending CI: the menu job decides whether the demo-app workarounds (`27c0394` modular
+  headers, `880d9b1` demo import) can go.
