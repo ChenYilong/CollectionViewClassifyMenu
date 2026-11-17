@@ -238,7 +238,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **iOS at pins `074285a6` (2026-11-18, `19e1e4a`)**: `pod install` resolves `074285a6` in the four iOS projects;
   `6a9ede85..074285a6` changes only the mini program's `cyl-rive`, its test and a doc (no iOS source), so the iOS results
   at `6a9ede85` (152 tests pass, every Rive tag replays) stand without a re-run.
-- **TODO (bug, 2026-11-18, Android at `dcbfdec6`): Rive Menu plays once, then never again.** Android example
+- **DONE (bug, 2026-11-18, Android at `dcbfdec6`, fixed in CYLTabBarController `f84c1073`): Rive Menu plays once, then never again.** Android example
   (`android/merged`, emulator-5556 API 37), 动效 page: at rest after opening every Rive tag is still (Home, Done, Menu,
   Button, Shapes, Truck, the five icons.riv tags: 0 changed pixels over 4 frame pairs, the rest-until-played change
   works). Loop on: every Rive tag moves (Done 312-332, Shapes 285-775, Truck 22-113, Chat 487-762, Search 796-955, Timer
@@ -258,7 +258,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `NEXT_FRAME_MS` raised from 50 to 300 ms Menu turns on every pass (227-521 changed pixels per pass). **Cause**: each
   play sets `isOpen` false and, 50 ms later, true (`duration=0`); on this x86_64 emulator a rendered frame can take longer
   than 50 ms, so the state machine never sees the false (the mini program's B20 had the same same-frame cause). Fix
-  belongs upstream: wait until the machine has advanced with the false (a frame callback) or a longer gap. Still TODO.
+  belongs upstream: wait until the machine has advanced with the false (a frame callback) or a longer gap. **Fixed at `f84c1073`** (a looped held input stays off for half a pass, 0.75 s;
+  otherwise 150 ms; the controller-only pause kept): at rest every Rive tag 0 changed pixels; Loop on, 30 frames back to
+  back: Menu changes in 27 of 29 pairs (27-486 px), every other Rive tag moves; mini program `npm test` 143 / 143;
+  `docs/assets/android-rive-menu-loops-f84c1073.png`.
 - **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
   `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
   tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still
