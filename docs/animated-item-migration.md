@@ -224,3 +224,6 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `eab038d5` in the root, Example, Example-Swift and TagCollectionView projects (`Podfile.lock` is ignored by
   `.gitignore`, nothing to commit); unit tests on the "CYL ClassifyMenu iOS" simulator: menu 32 / 0, tag 6 / 0, example
   92 / 0, swift 22 / 0 failures.
+- **iOS at pins `074285a6` (2026-11-18, `19e1e4a`)**: `pod install` resolves `074285a6` in the four iOS projects;
+  `6a9ede85..074285a6` changes only the mini program's `cyl-rive`, its test and a doc (no iOS source), so the iOS results
+  at `6a9ede85` (152 tests pass, every Rive tag replays) stand without a re-run.
