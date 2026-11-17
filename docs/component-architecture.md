@@ -457,3 +457,9 @@ started run completes and the next one tests the newest commit.
   (`32b210e`; `CYL_SWIFT_EXTRA_FLAGS` stays available in `scripts/unit-tests.sh`). If the menu suite fails again
   without modular headers, restore them. The demo's `import CYLAnimatedItem` (`880d9b1`) is the other session's to
   remove.
+- **Confirmed** (2026-11-17 19:33 UTC): run 44142400181 on `8794487` (no modular headers, no demo `import
+  CYLAnimatedItem`): menu, tag and example suites and `pod lib lint` pass. Library build, swift suite and Example
+  screenshots were cancelled while still queued (no runner was assigned, 0 steps; runner capacity, not the workflow).
+  TODO: the screenshots of these runs did not reach the `ci-screenshots` branch (no `feat-harmony/<sha>/` folder for
+  `f8301a4`, `698260e`, `8794487`), and artifact storage is not reachable from the cloud sessions; check the publish
+  step for pull request runs.
