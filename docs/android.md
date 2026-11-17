@@ -461,6 +461,8 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
   Its tab bar has nine tabs.
 - Merge: `origin/feat/android-kotlin-b` (`b133525`) is already contained in `feat/harmony` (0 commits ahead), so
   there is nothing to merge.
+- Duplicate: another session made the same change at the same time (`9719fb6`, the entry "every tab on Android" at
+  the top of this document); the merge `cf587a8` kept one key, and that entry is the main record.
 - Result: the example's tab bar is scrollable (`cyl_scrollMode = Scrollable`), which upstream already exempts from
   "More". The configuration file `example/src/main/assets/cyl_merged_tabbar.json` now also sets
   `"CYLTabBarControllerShowsAllTabs": true`, so the nine tabs stay in the bar whatever the scroll mode.
