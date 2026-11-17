@@ -152,6 +152,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    Shapes and Truck loop, and the dark Timer tag moves; Menu shows ≡ in all six frames (with `duration: 0` it may toggle
    between frames 2 s apart, or not at all: to check with a screen recording); Home's house is too small at this size to
    count the Rooms steps (1 → 2 → 3) seen on iOS 27.0 by the CYLTabBarController session.
+   **iOS pixel check (2026-11-18, `f8301a4`, pins `eab038d5`)**: 8 consecutive `simctl io screenshot` frames (each capture
+   takes about 11 s here), changed pixels (gray difference > 40) between consecutive frames per icon box: Home
+   `[574, 584, 844, 592, 328, 910, 499]`, Menu `[0, 453, 453, 0, 0, 0, 562]`, Done `[75, 763, 661, 200, 730, 550, 581]`
+   (`assets/ios-rive-b20-after-eab038d5-fast-row.png`: Menu caught morphing ≡ → x). All three move: on iOS every Rive tag
+   of the section now replays with loop on (Done, Menu, Home, Button, Shapes, Truck, Timer). B20 fixed on iOS at `eab038d5`.
 
 ## TODO (2026-11-17, macOS 27 + Xcode 27, `feat/harmony`): rows 12 and 13 on a Mac, simulator screenshots, bugs
 
