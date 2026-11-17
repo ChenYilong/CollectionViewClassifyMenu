@@ -80,3 +80,18 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
      (before) and `assets/harmonyos-y2-fixed-white-icon.jpeg` (after).
    - Mini program `cyl-animated-item`: an embedded size (no 44 px minimum height or padding) and engine views that keep to
      the icon box; tracked as row 19 / CYLTabBarController PR #815 (`assets/miniprogram-devtools-tags-after-fix.jpg`).
+
+## TODO (2026-11-17, macOS 27 + Xcode 27, `feat/harmony`): rows 12 and 13 on a Mac, simulator screenshots, bugs
+
+- **Prompt (verbatim)**: "运行模拟器 截图测试 更新文档 记录bug 修复bug  阅读CYLAnimatedItem 相关的集成文档，continue fix todo iOS端代码与测试"
+- **Prompt (English)**: "Run the simulator, take screenshots and test, update the docs, record bugs, fix bugs; read the
+  CYLAnimatedItem integration documents and continue fixing the iOS TODOs, code and tests."
+- **Plan**: row 12 (build `CollectionViewClassifyMenu.xcodeproj`'s demo app), row 13 (menu, tag, example, swift tests;
+  engine report screenshot into `docs/assets/`), record and fix what fails. CYLTabBarController's own iOS TODOs of the
+  guide are taken by other sessions (91: Lottie URLs and the CYLTabBarController podspec lint; fe: the CYLAnimatedItem
+  podspec lint and its demo screenshot; ba: FlatDesign item and SwiftPM / Carthage products).
+- **Bug found (2026-11-17)**: `CYLSearchCategoryScenarioTests.testSearchCategoriesUseABottomTabBarAndFillTheSearchBar`
+  fails only on the "iPhone Duo" simulator (iOS 27): the category tab bar is laid out at the top (y = 0). It fails at every
+  commit since the test was added (`a2efda2`), so not a regression of the API parity work (`07cc52b`), and passes on an
+  iPhone 17 Pro. `scripts/simulator-id.sh` picked "iPhone Duo" as the first iPhone of the newest runtime; it now prefers
+  a regular "iPhone <number>" model. The tab bar placement on that form factor is TODO.
