@@ -115,6 +115,15 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    almost every frame; Menu replays (caught mid-transition); **Home (`house.riv`), Done (`check.riv`) and Button
    (`button.riv`) still show 0 changed pixels in all 8 frames**. No Rive error in the console. Still TODO for those three
    (or a replay shorter than the 2 s capture interval for Done); reported to the Mac-CYLTabBarController session.
+   **Second pass `4e8fe675`** (pin moved; `npm test` 138 pass; same capture,
+   `assets/miniprogram-devtools-rive-b20-after-4e8fe675.png`): Done now loops (the circle draws again in most frames),
+   Menu goes from its menu icon to x and back, Shapes, Truck and the `icons.riv` tags loop. Button changes a few pixels only:
+   its runtime is mid-animation (`active`, 1 s, time 0.52 s), and the animation hardly shows at 20 px. Home still never
+   moves. Runtime state read in DevTools (every `cyl-rive` loaded, `playing: true`): `house.riv`'s `State Machine 1` has a
+   **number** input `Rooms` (value 3) and the animations `to 3` to `to 6` (0.47 s), `Demo Mode` (2.73 s, loop) and
+   `Sun Rotate` (40 s, loop). Nothing moves unless `Rooms` changes, and `cyl-rive` drives only boolean inputs and triggers,
+   so this is a missing number-input option (or `animation=Demo Mode` in the example's options), not a rendering problem.
+   Sent to the Mac-CYLTabBarController session. No Rive message in the console.
    **iOS run (2026-11-18, Mac session, `689096f`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
    Pro, iOS 27.2), pins `fe5c3ae`, English, launched with `-CYLExampleScreen animations-rive-loop` (new: scrolls to the
    Rive section, loop on, Play all); frames 4–14 s after Play all (`assets/ios-rive-b20-frames.jpeg`, first frame
