@@ -14,3 +14,4 @@ tags: [scripts, cocoapods]
 - `example-screenshots.sh` runs in every build CI run; keep it producing one PNG per Example screen.
 - `publish-screenshots.sh` copies them to the `ci-screenshots` branch, because artifact storage hosts change between runs.
 - Fix issues in the core first (AGENTS.md "Fix issues in the core first"): the core is the code published to a package registry (CocoaPods, Maven / Gradle, npm, pub.dev, ohpm); an example-layer fix is the worst option; when the core cannot fix a core defect, ask the user first and say why; record every example-layer fix and its reason in `docs/example-layer-fixes.md`.
+- Bugs (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated item"): record first, then screenshot, then fix; animation and icon + title bugs are fixed in CYLTabBarController's animated item component, not in the examples; a demo that needs more gets a new component API from CYLTabBarController.

@@ -77,6 +77,25 @@ verify the behavior and update the applicable documentation.
   line after the description and before any trailers. Details:
   `.agents/skills/cyl-commit/`.
 
+## Bugs: record, screenshot, fix in CYLTabBarController's animated item
+
+- For every bug: first record it (a `TODO` row in the related document in
+  `docs/`, with the steps and what was expected), then take a screenshot of it
+  (`docs/assets/`, linked from the row), then fix it, then take the screenshot
+  again and mark the row done with both images.
+- Animation and icon + title bugs are fixed in CYLTabBarController's shared
+  animated item component (`CYLAnimatedItem` / `CYLAnimatedItemView` on iOS,
+  `cylanimateditem` on Android and HarmonyOS, `cyl-animated-item` in the mini
+  program), not in this repository's examples. This repository only pins the
+  fixed commit (by `:commit` or the vendored copy) and adapts its own core
+  (`CYLTagButton`) to the component.
+- Avoid changing the examples. When a demo needs something the component does
+  not offer, CYLTabBarController adds that API to the component and the demo
+  uses it; record the request and the CYLTabBarController pull request.
+- A fix made here meanwhile (in this repository's core, never the example)
+  names the CYLTabBarController change that will replace it, as a `TODO` in
+  `docs/animated-item-migration.md`.
+
 ## Fix issues in the core first
 
 - The core is the code this repository publishes to a package registry: the

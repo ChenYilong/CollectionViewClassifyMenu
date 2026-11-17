@@ -14,3 +14,4 @@
   than two are open; AGENTS.md "Branches and pull requests").
 - At the end of every answer, on a branch other than `master` / `main`: commit and push without asking.
 - Parity tables and the score loop (AGENTS.md "Parity tables and the score loop"): source API | description | counterpart (`TODO` by default); 100 when no `TODO` is left, 0 when all are; loop: match existing code, score, implement the `TODO` rows in the core first and show them in the example, score again, until 100; then the reverse table.
+- Bugs (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated item"): record first, then screenshot, then fix; animation and icon + title bugs are fixed in CYLTabBarController's animated item component, not in the examples; a demo that needs more gets a new component API from CYLTabBarController.

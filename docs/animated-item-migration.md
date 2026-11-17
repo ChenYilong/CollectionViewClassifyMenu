@@ -71,3 +71,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    `CYLTabBarController` in `Package.swift`.
 4. **Toolchain checks**: HarmonyOS build and host tests done on Windows (row 17); its emulator check, WeChat DevTools
    (row 20) and the Flutter and React Native Android builds (row 22, no Flutter / Java / Gradle on that machine) remain.
+5. **CYLTabBarController component APIs requested** (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's
+   animated item"):
+   - HarmonyOS `CYLAnimatedItemView`: an icon color for static bitmap icons (an alpha-preserving `ColorFilter`, as iOS
+     template images). Meanwhile `CYLTagButton` (this repository's core) draws and tints its static icon itself
+     (`64c6bc3`, emulator-verified with the `ColorFilter` object); it moves to the component's API when it exists.
+     Bug record: Y2 in `harmony-screenshot-issues.md`, screenshots `assets/harmonyos-y2-retest-icon-still-orange.jpeg`
+     (before) and `assets/harmonyos-y2-fixed-white-icon.jpeg` (after).
+   - Mini program `cyl-animated-item`: an embedded size (no 44 px minimum height or padding) and engine views that keep to
+     the icon box; tracked as row 19 / CYLTabBarController PR #815 (`assets/miniprogram-devtools-tags-after-fix.jpg`).
