@@ -203,6 +203,27 @@ export class CYLColor {
     return '#' + channel(alpha) + hex.substring(hex.length - 6).toUpperCase();
   }
 
+  /** The color filter that leaves an image unchanged. */
+  static readonly IDENTITY_FILTER: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+
+  /**
+   * The color filter (`Image.colorFilter`) that paints every pixel of an image in `color`, keeping the pixel's alpha:
+   * the template rendering of iOS (`UIImage.withRenderingMode(.alwaysTemplate)` tinted by `tintColor`), for bitmaps,
+   * which `fillColor` does not recolor (it only colors SVG and symbol images). Each output channel is the color's
+   * component scaled by the pixel's alpha (a matrix without offsets, so it does not depend on the channel range).
+   */
+  static tintFilter(color: ResourceColor): number[] {
+    // A theme resource or a named color cannot be read here: the image keeps its colors.
+    if (typeof color !== 'string' || !new RegExp('^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$').test(color)) {
+      return CYLColor.IDENTITY_FILTER;
+    }
+    const hex = color.replace('#', '');
+    const argb = hex.length === 6 ? 'FF' + hex : hex.padStart(8, 'F');
+    const component = (index: number): number => parseInt(argb.substring(index, index + 2), 16) / 255;
+    const a = component(0);
+    return [0, 0, 0, component(2), 0, 0, 0, 0, component(4), 0, 0, 0, 0, component(6), 0, 0, 0, 0, a, 0];
+  }
+
   /**
    * A "RRGGBB" or "#RRGGBB" hex string with `alpha`, or undefined when it does not parse.
    */

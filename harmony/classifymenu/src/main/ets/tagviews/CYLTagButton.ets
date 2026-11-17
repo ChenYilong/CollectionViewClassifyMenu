@@ -60,6 +60,11 @@ export class CYLTagButtonPart {
   textColor: ResourceColor = CYLColor.BLACK;
   image?: CYLImage;
   tintColor: ResourceColor = CYLColor.BLACK;
+  /**
+   * Whether the style sets an icon color for the state (`CYLMenuStyle.setIconColor`): then bitmap icons are tinted
+   * too, as template images are on iOS; without one, a bitmap keeps its own colors (an original image).
+   */
+  tintsImage: boolean = false;
   cornerRadius: number = 0;
   /**
    * Degrees (the fold chevron's turn).
@@ -846,6 +851,7 @@ export class CYLTagButton {
     this.animationSelectedImage = animated ? cylTagAnimationImage(this.selectedImageValue) : '';
     this.animationOpacity = state === CYLControlState.DISABLED ? DISABLED_ANIMATION_ALPHA : 1;
     this.imageView.tintColor = style.iconColor(state);
+    this.imageView.tintsImage = style.appearance(state).iconColor !== undefined;
     this.titleLabel.text = style.displayedTitle(this.titleValue);
     this.titleLabel.font = style.titleFont(state, this.fontScale);
     this.titleLabel.textColor = appearance.textColor;
@@ -955,6 +961,9 @@ export struct CYLTagButtonComponent {
           .height(this.part(this.iv()).height > 0 ? this.part(this.iv()).height : undefined)
           .position({ x: this.part(this.iv()).x, y: this.part(this.iv()).y })
           .fillColor(this.iv().tintColor)
+          // Bitmaps too, when the style sets an icon color (see `tintsImage`): an orange PNG on an orange selected tag
+          // stayed orange and invisible (HarmonyOS issue Y2).
+          .colorFilter(this.iv().tintsImage ? CYLColor.tintFilter(this.iv().tintColor) : CYLColor.IDENTITY_FILTER)
           .objectFit(this.iv().cornerRadius > 0 ? ImageFit.Cover : ImageFit.Contain)
           .borderRadius(this.iv().cornerRadius)
           .clip(this.iv().cornerRadius > 0)

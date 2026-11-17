@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLControlState, CYLMenuColorFromString, CYLMenuStyle, CYLTag, CYLTagColors, CYLTagColorTheme, CYLTagGroup,
+  CYLColor, CYLControlState, CYLMenuColorFromString, CYLMenuStyle, CYLTag, CYLTagColors, CYLTagColorTheme, CYLTagGroup,
   CYLTagModel
 } from '@cyl/classifymenu';
 
@@ -17,6 +17,19 @@ export default function styleAndModelsTest() {
       expect(CYLMenuColorFromString('#GGGGGG')).assertEqual(undefined);
       expect(CYLMenuColorFromString(undefined)).assertEqual(undefined);
       expect(CYLMenuColorFromString('nonsenseColor')).assertEqual(undefined);
+    });
+
+    it('tintsBitmapIconsWithAnAlphaPreservingFilter', 0, () => {
+      // White: every pixel's color channels become its alpha, so the icon is white where it is opaque (Y2).
+      expect(JSON.stringify(CYLColor.tintFilter('#FFFFFFFF')))
+        .assertEqual(JSON.stringify([0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0]));
+      // '#RRGGBB' is opaque; no offsets, so the result does not depend on the channel range.
+      const orange = CYLColor.tintFilter('#FF5000');
+      expect(orange[3]).assertEqual(1);
+      expect(Math.round(orange[8] * 255)).assertEqual(0x50);
+      expect(orange[13]).assertEqual(0);
+      expect(orange[18]).assertEqual(1);
+      expect([orange[4], orange[9], orange[14], orange[19]].every((offset: number) => offset === 0)).assertTrue();
     });
 
     it('keepsStatesApartAndCopiesDeeply', 0, () => {
