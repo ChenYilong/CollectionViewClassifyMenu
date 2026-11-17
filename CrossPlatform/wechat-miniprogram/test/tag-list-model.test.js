@@ -86,3 +86,14 @@ test('the style falls back to the core defaults (CYLMenuStyle, CYLTagAppearance)
   assert.deepEqual(s.sectionInsets, { top: 0, left: 8, bottom: 4, right: 8 });
   assert.deepEqual(s.contentInsets, { top: 2, left: 12, bottom: 2, right: 12 });
 });
+
+test('animation types come from cyl-animated-item: SVGA, and *.bin files named by their real type', () => {
+  const { animationEngine, animationURL } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/model.js');
+  assert.equal(animationEngine('/assets/tab/svga/tab_activity.svga.bin'), 'svga');
+  assert.equal(animationEngine('tab.svga'), 'svga');
+  assert.equal(animationEngine('x.pag.bin'), 'pag');
+  assert.equal(animationEngine('Rive/house.riv#stateMachine=State%20Machine'), 'rive');
+  assert.equal(animationEngine('asset:home'), 'lottie');
+  // A loadable SVGA path reaches cyl-animated-item (it was '' and the icon slot was not drawn).
+  assert.equal(animationURL('/assets/tab/svga/tab_activity.svga.bin'), '/assets/tab/svga/tab_activity.svga.bin');
+});
