@@ -75,7 +75,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    animated item"):
    - HarmonyOS `CYLAnimatedItemView`: an icon color for static bitmap icons (an alpha-preserving `ColorFilter`, as iOS
      template images). Meanwhile `CYLTagButton` (this repository's core) draws and tints its static icon itself
-     (`64c6bc3`, emulator-verified with the `ColorFilter` object); it moves to the component's API when it exists.
+     (`64c6bc3`, emulator-verified with the `ColorFilter` object); it moves to the component's API once CYLTabBarController [PR #816](https://github.com/ChenYilong/CYLTabBarController/pull/816) (`CYLAnimatedItemView.iconColor`) is merged and the vendored `harmony/cylanimateditem` moves to that commit.
      Bug record: Y2 in `harmony-screenshot-issues.md`, screenshots `assets/harmonyos-y2-retest-icon-still-orange.jpeg`
      (before) and `assets/harmonyos-y2-fixed-white-icon.jpeg` (after).
    - Mini program `cyl-animated-item`: an embedded size (no 44 px minimum height or padding) and engine views that keep to
