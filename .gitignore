@@ -137,3 +137,6 @@ __pycache__/
 ._*
 *.base
 .swiftpm/
+
+# hvigor writes BuildProfile.ets into each HarmonyOS module on every build (classifymenu's is tracked from before).
+harmony/**/BuildProfile.ets
