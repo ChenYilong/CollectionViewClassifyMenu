@@ -464,7 +464,7 @@ started run completes and the next one tests the newest commit.
   `f8301a4`, `698260e`, `8794487`), and artifact storage is not reachable from the cloud sessions; check the publish
   step for pull request runs.
 
-## TODO (2026-11-17): CI screenshots reach the ci-screenshots branch under the branch commit
+## DONE (2026-11-17): CI screenshots reach the ci-screenshots branch under the branch commit
 
 - **Context**: the "Example screenshots" job of `ios.yml` publishes with `scripts/publish-screenshots.sh`, but no
   `ci-screenshots/feat-harmony/<sha>/` folder existed for `f8301a4`, `698260e` or `8794487`. The log of the `698260e` run
@@ -473,7 +473,6 @@ started run completes and the next one tests the newest commit.
   Artifact storage is blocked from the cloud sessions, so the branch is the only way to read the images there.
 - **Requirements**: fix the screenshot publishing; also add a screenshot job to CYLSearchViewController's CI.
 - **Prompt (verbatim)**: "to fix the screenshot publishing in ClassifyMenu and add a screenshot job to CYLSearchViewController's CI"
-- **Status**: fixed, pending CI. `ios.yml` passes `SCREENSHOT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}`
-  and `scripts/publish-screenshots.sh` names the folder after it (`SHA="${SCREENSHOT_SHA:-$GITHUB_SHA}"`), so a pull
-  request run publishes to `ci-screenshots/<branch>/<head commit>/`. The images still show the merge commit's code,
-  which for a branch without conflicts is the branch head plus the base. shellcheck and actionlint pass.
+- **Status**: done. `c4e8b413` passes the head commit (`SCREENSHOT_SHA`); the run for it published 54 screenshots to
+  `ci-screenshots/feat-harmony/c4e8b41/` (checked 2026-11-17 21:15 UTC; `animations@en.png` shows every engine registered
+  and the playback controls).
