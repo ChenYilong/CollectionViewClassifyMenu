@@ -150,6 +150,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    Menu [205, 0, 209, 209, 0, 28, 28], Lottie loops. WeChat DevTools: Home [29, 16, 37, 51, 18, 40, 40], Done, Shapes,
    Timer and Me move. **B20: done on iOS, Android (React Native, Flutter) and the mini program**; HarmonyOS builds
    (CYLTabBarController), its emulator check is TODO there.
+   **TODO (mini program Menu)**: in WeChat DevTools at `6a9ede85`, `menu_button.riv`'s `isOpen` read from the runtime every
+   250 ms for 6 s (loop on) stays true in all 24 samples, so Menu stays open and only wobbles (5 px per frame pair). Cause in
+   `cyl-rive`'s `cyl_playFromStart` (kind `input`, `duration: 0`): false, `advance(0)` and true run in one tick, and the
+   state machine gets no time in the false state to close. Sent to the Mac-CYLTabBarController session with a fix
+   suggestion (alternate the held value per loop pass); Android toggles correctly (React Native: menu icon, x, menu icon).
    **iOS run (2026-11-18, Mac session, `689096f`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
    Pro, iOS 27.2), pins `fe5c3ae`, English, launched with `-CYLExampleScreen animations-rive-loop` (new: scrolls to the
    Rive section, loop on, Play all); frames 4–14 s after Play all (`assets/ios-rive-b20-frames.jpeg`, first frame
