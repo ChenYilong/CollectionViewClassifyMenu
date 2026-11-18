@@ -35,6 +35,19 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-18, `feat/harmony`): Rive tint changes at CYLTabBarController `396d3fca` / `0505042f`
+
+- Prompt (relayed by winCYLTabBarController 鸿蒙开发, from the user): "the Rive tint interface is fixed, please
+  continue ... check whether moving the pin to 396d3fca changes any Rive tint result on your platforms, re-verify if
+  so, and keep every task at 100."
+- Acceptance criteria: 100 = pins at the newest commit (20), upstream diff read for our platforms (20), mini program
+  re-vendored and tested (20), Android built, tested and checked on the emulator (25), HarmonyOS module re-vendored
+  and built (15). Pass: 60.
+- Result: **100/100**. Pins at `0505042f` (mini program, Android, HarmonyOS module README); numbers in
+  `animated-item-migration.md`. No Rive tint result changes on our platforms. The check found a separate,
+  older upstream bug (Android Done / Menu rest frame varies between launches), which is recorded there as a TODO
+  and reported to CYLTabBarController.
+
 ### Done (2026-11-18, `feat/harmony`): the screenshot label rules are enforced
 
 - Prompt (verbatim): "检查为什么没有应用新增的截图Label规范，并强化该策略保证以后截图必须遵循该规范，避免再出现该问题。"
