@@ -42,6 +42,7 @@ target 'Runner' do
   # The animated icon engines the example plays; the core depends on the CYLAnimatedItem pod only.
   pod 'CYLAnimatedItem/LottieObjectiveC', cyl_tab_bar
   pod 'CYLAnimatedItem/Rive', cyl_tab_bar
+  pod 'CYLAnimatedItem/SVGA', cyl_tab_bar
   target 'RunnerTests' do
     inherit! :search_paths
   end

@@ -155,6 +155,17 @@ class _TagListPageState extends State<TagListPage> {
           ],
         },
         {
+          // SVGA, as the iOS example's svga section: it plays once at its own speed (CYLTabBarController's SVGA player
+          // has no speed or loop API yet).
+          'title': 'SVGA · pod CYLAnimatedItem/SVGA',
+          'items': [
+            animated('Home', 'svga/tab_home.svga'),
+            animated('Search', 'svga/tab_search.svga'),
+            animated('Messages', 'svga/tab_chat.svga'),
+            animated('Me', 'svga/tab_profile.svga'),
+          ],
+        },
+        {
           'title': 'Tags',
           'items': [
             item('Home', 'system:house'),
