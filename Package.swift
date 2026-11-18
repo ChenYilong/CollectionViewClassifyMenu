@@ -55,7 +55,9 @@ let package = Package(
             ],
             linkerSettings: [
                 .linkedFramework("UIKit"),
-                .linkedFramework("Accelerate")
+                .linkedFramework("Accelerate"),
+                // The tag list cache's database store (CYLTagListCachePolicyDatabase) uses the system SQLite.
+                .linkedLibrary("sqlite3")
             ]
         )
     ]

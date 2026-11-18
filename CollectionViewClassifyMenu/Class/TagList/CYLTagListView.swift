@@ -823,6 +823,134 @@ open class CYLTagListView: UIView {
      */
     open var selectedTagDragHandler: ((Int, CYLTag) -> Void)?
 
+    // MARK: Editing
+
+    /**
+     * Whether the list is in editing mode (`setEditing(_:animated:)`). While editing, the items of the editable sections
+     * (`menuSectionAllowsEditing(_:)`, every section by default) show the delete indicator and can be dragged to
+     * reorder; a tap no longer selects an item but still calls `menu(_:didSelectItemAt:)`, so the host can open the
+     * item; folded sections show every item; and `addItemView` appears below the last section. False by default.
+     */
+    @objc open private(set) var isEditing = false
+
+    /**
+     * Shows `addItemView` below the last section while editing. True by default.
+     */
+    @objc open var showsAddItemViewWhileEditing = true {
+        didSet {
+            updateAddItemView()
+        }
+    }
+
+    /**
+     * The "add tag" control shown while editing: a text field and an Add button. A submitted name is reported through
+     * `menu(_:didRequestNewItemWithName:at:)` with the index path after the last item of the first editable section.
+     */
+    @objc open private(set) lazy var addItemView: CYLTagListAddItemView = {
+        let view = CYLTagListAddItemView()
+        view.submitHandler = { [weak self] name in
+            self?.requestNewItem(named: name)
+        }
+        return view
+    }()
+
+    /// The bottom inset added to the collection view for `addItemView`.
+    private var addItemInset: CGFloat = 0
+
+    /**
+     * Where the list saves its editable sections after an edit (a drag, a delete or an added tag in editing mode), so
+     * the order survives a relaunch: `.none` (the default), a SQLite database, `NSUserDefaults` or a sandbox file. The
+     * host restores it when it builds its data (`cachedTitles(inSection:)`). Setting it makes `cache` the built-in
+     * store of the policy and `cacheName`.
+     */
+    @objc open var cachePolicy: CYLTagListCachePolicy = .none {
+        didSet {
+            cache = CYLTagListStore.cache(policy: cachePolicy, name: cacheName)
+        }
+    }
+
+    /**
+     * Separates the caches of different lists ("CYLTagListView" by default). Set it before `cachePolicy`, or set
+     * `cachePolicy` again after changing it.
+     */
+    @objc open var cacheName = "CYLTagListView" {
+        didSet {
+            cache = CYLTagListStore.cache(policy: cachePolicy, name: cacheName)
+        }
+    }
+
+    /**
+     * The store the list saves to: the built-in store of `cachePolicy`, or one of yours. nil: no cache.
+     */
+    @objc open var cache: CYLTagListCache?
+
+    /**
+     * The titles saved for `section` (its index), in order; nil when nothing was saved or there is no cache.
+     */
+    @objc(cachedTitlesInSection:)
+    open func cachedTitles(inSection section: Int) -> [String]? {
+        cache?.cachedTitles(forSection: cacheKey(forSection: section))
+    }
+
+    /**
+     * The key of `section` in the cache: the data source's `menuCacheKey(forSection:)`, else the section's index.
+     */
+    @objc(cacheKeyForSection:)
+    open func cacheKey(forSection section: Int) -> String {
+        menuDataSource?.menuCacheKey?(forSection: section) ?? String(section)
+    }
+
+    /**
+     * Saves the current titles of every editable section to `cache` (the list calls it after each edit).
+     */
+    @objc open func saveEditableSectionsToCache() {
+        guard let cache, let source = menuDataSource else {
+            return
+        }
+        for section in 0..<source.numberOfSectionsInMenu() where sectionAllowsEditing(section) {
+            let titles = (0..<source.menuNumberOfItems(inSection: section)).compactMap { item -> String? in
+                let indexPath = IndexPath(item: item, section: section)
+                return source.menuItemType?(at: indexPath) == .create ? nil : source.menuTitleForItem(at: indexPath)
+            }
+            cache.saveTitles(titles, forSection: cacheKey(forSection: section))
+        }
+    }
+
+    /**
+     * Enters or leaves editing mode: the delete indicators, reordering, the selection rules, folding and `addItemView`
+     * change together; then `menu(_:didChangeEditing:)` is called. The list itself does not move or open anything.
+     */
+    @objc(setEditing:animated:)
+    open func setEditing(_ editing: Bool, animated: Bool) {
+        guard editing != isEditing else {
+            return
+        }
+        isEditing = editing
+        if !editing {
+            addItemView.textField.resignFirstResponder()
+        }
+        updateLongPressDuration()
+        updateAddItemView()
+        let reload = {
+            self.reloadMenuData()
+        }
+        if animated && window != nil {
+            UIView.transition(with: self, duration: 0.25, options: [.transitionCrossDissolve, .allowUserInteraction],
+                              animations: reload)
+        } else {
+            reload()
+        }
+        menuDelegate?.menu?(self, didChangeEditing: editing)
+    }
+
+    /**
+     * Whether a section takes part in editing: the data source's `menuSectionAllowsEditing(_:)`, else true.
+     */
+    @objc(sectionAllowsEditing:)
+    open func sectionAllowsEditing(_ section: Int) -> Bool {
+        menuDataSource?.menuSectionAllowsEditing?(section) ?? true
+    }
+
     // MARK: Private state
 
     /**
@@ -1202,6 +1330,9 @@ open class CYLTagListView: UIView {
             UIAccessibility.post(notification: .layoutChanged, argument: nil)
         }
         menuDelegate?.menu?(self, didDeleteItemAt: indexPath)
+        if isEditing {
+            saveEditableSectionsToCache()
+        }
         if let deletedTag {
             tagDeleteHandler?(indexPath.item, deletedTag)
         }
@@ -1486,6 +1617,7 @@ open class CYLTagListView: UIView {
         if contentHeightNeedsUpdate {
             updateContentHeight()
         }
+        layoutAddItemView()
         laidOutSize = collectionView.bounds.size
         if !collectionView.isScrollEnabled {
             resetContentOffset()
@@ -1516,7 +1648,14 @@ private extension CYLTagListView {
     }
 
     func isDeletable(at indexPath: IndexPath) -> Bool {
-        itemType(at: indexPath) != .create && menuDataSource?.menuItemIsDeletable?(at: indexPath) == true
+        guard itemType(at: indexPath) != .create else {
+            return false
+        }
+        if isEditing && sectionAllowsEditing(indexPath.section) {
+            // Editing: every item of an editable section, unless the data source says otherwise.
+            return menuDataSource?.menuItemIsDeletable?(at: indexPath) ?? true
+        }
+        return menuDataSource?.menuItemIsDeletable?(at: indexPath) == true
     }
 
     func isExclusive(at indexPath: IndexPath) -> Bool {
@@ -1524,7 +1663,8 @@ private extension CYLTagListView {
     }
 
     func isSelectable(at indexPath: IndexPath) -> Bool {
-        itemType(at: indexPath) != .create && menuDataSource?.menuItemIsSelectable?(at: indexPath) != false
+        // Editing: a tap reports the item (`menu(_:didSelectItemAt:)`) without changing the selection.
+        !isEditing && itemType(at: indexPath) != .create && menuDataSource?.menuItemIsSelectable?(at: indexPath) != false
     }
 
     func itemType(at indexPath: IndexPath) -> CYLMenuItemType {
@@ -1696,7 +1836,7 @@ private extension CYLTagListView {
     }
 
     func updateLongPressDuration() {
-        longPressRecognizer.minimumPressDuration = allowsReordering
+        longPressRecognizer.minimumPressDuration = allowsReordering || isEditing
             ? Self.longPressDuration / reorderingSensitivity : Self.longPressDuration
     }
 }
@@ -1917,6 +2057,10 @@ private extension CYLTagListView {
 private extension CYLTagListView {
 
     func canFold(rowCount: Int) -> Bool {
+        // Editing shows every item, so each one can be deleted or dragged.
+        guard !isEditing else {
+            return false
+        }
         let folds = foldStyle == .truncate || foldControl.position != .none
         return folds && defaultVisibleRows > 0 && rowCount > defaultVisibleRows
     }
@@ -2238,11 +2382,13 @@ private extension CYLTagListView {
 private extension CYLTagListView {
 
     var canReorder: Bool {
-        allowsReordering && menuDataSource?.responds(to: #selector(CYLMenuDataSource.menuMoveItem(at:to:))) == true
+        (allowsReordering || isEditing)
+            && menuDataSource?.responds(to: #selector(CYLMenuDataSource.menuMoveItem(at:to:))) == true
     }
 
     func canMoveItem(at indexPath: IndexPath) -> Bool {
         canReorder && isValid(indexPath) && !isInlineFoldCell(at: indexPath)
+            && (allowsReordering || sectionAllowsEditing(indexPath.section)) && itemType(at: indexPath) != .create
     }
 
     /**
@@ -2395,6 +2541,8 @@ extension CYLTagListView: UICollectionViewDataSource {
             return IndexPath(item: item, section: indexPath.section)
         })
         menuDelegate?.menu?(self, didMoveItemAt: sourceIndexPath, to: destinationIndexPath)
+        // The new order survives a relaunch when the list has a cache.
+        saveEditableSectionsToCache()
         if let tagMoveHandler, let source = tagDataSourceStorage, menuDataSource === source {
             tagMoveHandler(from, to)
         }
@@ -2586,5 +2734,51 @@ extension CYLTagButton {
         } else {
             resetAnimationSpeed()
         }
+    }
+}
+
+// MARK: - Editing: the add control
+
+private extension CYLTagListView {
+
+    /// The first section that takes part in editing, if any.
+    var firstEditableSection: Int? {
+        titles.indices.first { sectionAllowsEditing($0) }
+    }
+
+    /// Shows or hides `addItemView` and reserves its space below the last section.
+    func updateAddItemView() {
+        let shows = isEditing && showsAddItemViewWhileEditing
+        if shows && addItemView.superview !== collectionView {
+            collectionView.addSubview(addItemView)
+        } else if !shows {
+            addItemView.removeFromSuperview()
+        }
+        let inset = shows ? addItemView.preferredHeight + style.sectionInsets.bottom : 0
+        if inset != addItemInset {
+            collectionView.contentInset.bottom += inset - addItemInset
+            addItemInset = inset
+        }
+        setNeedsLayout()
+        contentHeightNeedsUpdate = true
+    }
+
+    /// Places `addItemView` right below the sections, inside the collection view (it scrolls with the items).
+    func layoutAddItemView() {
+        guard addItemView.superview === collectionView else {
+            return
+        }
+        let insets = style.sectionInsets
+        let top = collectionView.collectionViewLayout.collectionViewContentSize.height
+        addItemView.frame = CGRect(x: insets.left, y: top, width: max(0, collectionView.bounds.width - insets.left - insets.right),
+                                   height: addItemView.preferredHeight)
+    }
+
+    /// A name submitted in `addItemView`: reported at the end of the first editable section.
+    func requestNewItem(named name: String) {
+        let section = firstEditableSection ?? 0
+        let item = titles.indices.contains(section) ? titles[section].count : 0
+        menuDelegate?.menu?(self, didRequestNewItemWithName: name, at: IndexPath(item: item, section: section))
+        saveEditableSectionsToCache()
     }
 }

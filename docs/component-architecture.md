@@ -495,3 +495,39 @@ started run completes and the next one tests the newest commit.
 - **Status**: done. `bbda97a1` passes the head commit (`SCREENSHOT_SHA`); the run for it published 54 screenshots to
   `ci-screenshots/feat-harmony/bbda97a/` (checked 2026-11-17 21:15 UTC; `animations@en.png` shows every engine registered
   and the playback controls).
+
+## DONE (2026-11-19; TODO 2026-11-19): CYLTagListView editing mode and tag list cache (iOS)
+
+- **Branch**: `feat/harmony`. Requested from the CYLSearchViewController session (Mac), for its contact tags example.
+- **Prompt (verbatim, from the user of that session)**: "为展示CYLPlaceholderView，为该example增加以下编辑功能，最近使用右侧加删除图标，修改我的标签section样式，为尾部tag折叠展开样式。点击管理后进入编辑模式tag 会显示删除按钮，底部会有增加tag按钮。编辑状态下允许拖动。点击删除按钮之外的tag区域可以跳转下一页面显示全部含有此标签的联系人全列表。模仿附件的样式。要求不跳转其他页面，仅仅修改taglist接口进入编辑状态。我推测你可能需要修改 CollectionView对应的库的代码，新增编辑样式接口。在调用编辑样式接口后，taglist样式会变动，在tag上显示删除icon，允许推动，还有显示新增tag的底部控件。修改CollectionView对应的库的代码后直接推送到CollectionView对应的库的代码，repin对应commit完成需求。"
+  (English: to show CYLPlaceholderView, add editing to that example: a delete icon right of "Recent", the "My Tags"
+  section folded with a trailing fold tag; "Manage" enters editing mode, where tags show a delete button, an add-tag
+  control appears at the bottom and tags can be dragged; a tap outside the delete button opens a page listing every
+  contact with that tag. Like the attached AndroidTagView demo. No page change for editing: only switch the tag list
+  into editing through its API, which you will need to add to this library: after calling it, the tags show a delete
+  icon, can be dragged, and an add-tag control shows at the bottom. Push the library change and re-pin it.)
+- **Requirements (this library, iOS)**: `CYLTagListView.isEditing` / `setEditing(_:animated:)`; while editing: delete
+  indicators on the items of editable sections, reordering, a tap reports `menu(_:didSelectItemAt:)` without selecting,
+  folded sections unfold, and `addItemView` (`CYLTagListAddItemView`: a text field and an Add button) shows below the
+  last section and reports through `menu(_:didRequestNewItemWithName:at:)`; data source `menuSectionAllowsEditing(_:)`,
+  delegate `menu(_:didChangeEditing:)`; localized strings (en, zh-Hans, zh-Hant); tests.
+- **Follow-up prompt (verbatim)**: "注意编辑模式，触发新的排序后，你可能需要加入缓存 或者数据库支持，为ClassifyMenu 增加类似本仓库的数据库 缓存实现。"
+  (English: after a new order in editing mode you may need a cache or a database: add to ClassifyMenu a database / cache
+  like CYLSearchViewController's.)
+- **Status**: DONE (2026-11-19). `CYLTagListView.isEditing` / `setEditing(_:animated:)`: while editing, the items of the
+  editable sections (`menuSectionAllowsEditing(_:)`) show the delete indicator (deletable unless `menuItemIsDeletable`
+  says no), can be dragged (`menuMoveItem(at:to:)`, also without `allowsReordering`), are not selected by a tap (the
+  delegate still gets `menu(_:didSelectItemAt:)`), folded sections show every item (`canFold` is false), and
+  `addItemView` (`CYLTagListAddItemView`: a text field and an Add button, `CYLMenuAddTag`, `CYLMenuAddTagPlaceholder`,
+  `CYLMenuTagAdded`) shows below the last section, inside the collection view (its height is in `contentHeight`), and
+  reports through `menu(_:didRequestNewItemWithName:at:)`; `menu(_:didChangeEditing:)`. Cache (the follow-up), as
+  CYLSearchViewController's suggestion cache: `CYLTagListCachePolicy` (none, database, userDefaults, sandboxFile),
+  protocol `CYLTagListCache`, store `CYLTagListStore` (SQLite in Application Support, `NSUserDefaults`, or a JSON
+  file; an emptied section is kept apart from a never-saved one); `CYLTagListView.cachePolicy`, `cacheName`, `cache`,
+  `cachedTitles(inSection:)`, `cacheKey(forSection:)` (data source `menuCacheKey(forSection:)`), and
+  `saveEditableSectionsToCache()`, called after a drag, an editing delete and an added tag. The podspec and
+  Package.swift link `sqlite3`. Tests `CYLTagListEditingTests` (5: indicators and the add control, taps and deletes,
+  unfolding and adding, reordering of editable sections, every cache policy); Example 103 of 103 on an iPhone 18 Pro
+  simulator (iOS 27.2). Android, HarmonyOS and mini program: the new public symbols are TODO rows in
+  `docs/android-api.md` (793 of 831) for the Windows session. Used by CYLSearchViewController's contact tags example
+  (Manage = `setEditing`, "My Tags" saved in the database).

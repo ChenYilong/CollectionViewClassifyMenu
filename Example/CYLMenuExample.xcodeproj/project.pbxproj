@@ -51,6 +51,7 @@
 		87DABFEE6994872E822CE037 /* CYLTagContainerSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26F405D043E50F76B52C417 /* CYLTagContainerSample.swift */; };
 		8E3FBEA3D1656F25900D6E6A /* CYLTagStyleDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A60CF0D32B70D57CE937DC8 /* CYLTagStyleDemoViewController.swift */; };
 		8EA32B4CA93024E7599B3F45 /* CYLTagListFoldingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB3543CBABA0EE86E689D85 /* CYLTagListFoldingTests.swift */; };
+		DE3C7931D4E28B1CD96FE6CB /* CYLTagListEditingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAECACB90B3A7D6EEF951283 /* CYLTagListEditingTests.swift */; };
 		90641626E7CCAB0F86EE47A2 /* CYLTagListAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */; };
 		99DE2046D4B9FF6F6A7E6A93 /* CYLTagStyleDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1F9CB554EA461136BA855B /* CYLTagStyleDemoTests.swift */; };
 		6D55AA55B2D935EA71D897C1 /* CYLTagReorderDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3408CE84B9E0C163168FDA /* CYLTagReorderDemoTests.swift */; };
@@ -143,6 +144,7 @@
 		D4BD14F01CB430BDEB40DE9D /* CYLReviewStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLReviewStore.swift; sourceTree = "<group>"; };
 		D821A5B66C4E846C5AD62163 /* CYLTagConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagConfigurationTests.swift; sourceTree = "<group>"; };
 		DAB3543CBABA0EE86E689D85 /* CYLTagListFoldingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListFoldingTests.swift; sourceTree = "<group>"; };
+		EAECACB90B3A7D6EEF951283 /* CYLTagListEditingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListEditingTests.swift; sourceTree = "<group>"; };
 		DF4F0ECB9D87E13E0D7FCA4D /* CYLAndroidSampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAndroidSampleTests.swift; sourceTree = "<group>"; };
 		E5301E6E88D89FFE6902B923 /* CYLExampleAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLExampleAppDelegate.swift; sourceTree = "<group>"; };
 		EAF5130865FE94D53B6E37BC /* Pods-CYLMenuExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLMenuExample.debug.xcconfig"; path = "Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				2B7C1CC64B409C0997A8F79F /* TestSupport */,
 				2E85A26D610A823A4D86D800 /* CYLTagListSelectionTests.swift */,
 				DAB3543CBABA0EE86E689D85 /* CYLTagListFoldingTests.swift */,
+				EAECACB90B3A7D6EEF951283 /* CYLTagListEditingTests.swift */,
 				3ED0DAFF475B5F3B3129285F /* CYLTagListLayoutTests.swift */,
 				0748AD44FAE907CE4F0410AF /* CYLTagButtonTests.swift */,
 				D821A5B66C4E846C5AD62163 /* CYLTagConfigurationTests.swift */,
@@ -542,6 +545,7 @@
 			files = (
 				87900C19F455D9F1AEBA1B0D /* CYLTagListSelectionTests.swift in Sources */,
 				8EA32B4CA93024E7599B3F45 /* CYLTagListFoldingTests.swift in Sources */,
+				DE3C7931D4E28B1CD96FE6CB /* CYLTagListEditingTests.swift in Sources */,
 				E1DFF22D5486FD1C598621B1 /* CYLTagListLayoutTests.swift in Sources */,
 				80911EB6FE48C5E0BF1C3FB1 /* CYLTagButtonTests.swift in Sources */,
 				36F6B935B4741FF150370A56 /* CYLTagConfigurationTests.swift in Sources */,

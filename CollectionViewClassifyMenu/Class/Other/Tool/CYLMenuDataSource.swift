@@ -177,6 +177,20 @@ import UIKit
      */
     @objc(menuMoveItemAtIndexPath:toIndexPath:)
     optional func menuMoveItem(at sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath)
+
+    /**
+     * Whether a section takes part in `CYLTagListView`'s editing mode (delete indicators, reordering); true when not
+     * implemented.
+     */
+    @objc(menuSectionAllowsEditing:)
+    optional func menuSectionAllowsEditing(_ section: Int) -> Bool
+
+    /**
+     * The key `CYLTagListView` saves a section's titles under in its cache (`cachePolicy`), stable when sections come
+     * and go (e.g. "mine"); the section's index when not implemented.
+     */
+    @objc(menuCacheKeyForSection:)
+    optional func menuCacheKey(forSection section: Int) -> String
 }
 
 /**
@@ -250,6 +264,12 @@ import UIKit
      */
     @objc(menu:didDeleteItemAtIndexPath:)
     optional func menu(_ menu: Any, didDeleteItemAt indexPath: IndexPath)
+
+    /**
+     * `CYLTagListView` entered (true) or left (false) editing mode (`setEditing(_:animated:)`).
+     */
+    @objc(menu:didChangeEditing:)
+    optional func menu(_ menu: Any, didChangeEditing editing: Bool)
 
     /**
      * A long press on an item that did not move it (AndroidTagView's onTagLongClick).

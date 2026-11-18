@@ -37,6 +37,8 @@ Pod::Spec.new do |s|
     'TagCollectionView/TagCollectionView/Views/*.xib'
   ] }
   s.frameworks = 'UIKit', 'Accelerate'
+  # The tag list cache's database store (CYLTagListCachePolicyDatabase) uses the system SQLite.
+  s.libraries = 'sqlite3'
   # CYLTagButton subclasses CYLTabBarController's shared animated icon + title component, CYLAnimatedItemView
   # (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md): the
   # component's core only, which brings CYLUtils and no tab bar. No animation engine: an app that plays animated icons
