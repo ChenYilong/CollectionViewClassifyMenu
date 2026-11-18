@@ -492,3 +492,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   it in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift package (`Package.resolved`
   revision `776b4635`) builds for the iOS Simulator; example suite 92 / 0 on iPhone 17 Pro `62B54974` (iOS 27.2,
   Xcode 27.2, macOS 27.3). Every platform is on `776b4635`.
+
+## DONE (2026-11-19, `feat/harmony`): Android, mini program and HarmonyOS pins to CYLTabBarController b376c278
+
+- `b376c278` logs B26 (Flutter hosts need Hybrid Composition for Rive on Android). Since `776b4635` the core also changed
+  the Android GIF decoder comments and view (`0791908c`), the HarmonyOS tint compositing ("source in", B25) and iOS tab
+  selection fixes. Moved: `android/merged/gradle.properties`, the mini program fetch script, test and vendored `COMMIT`
+  files (`node scripts/fetch-cyltabbar.js --check` OK), `harmony/cylanimateditem` (README and the re-vendored
+  `CYLAnimatedItemView.ets`). iOS pins (eight files, and the React Native fetch script tied to its Podfile): Mac session.

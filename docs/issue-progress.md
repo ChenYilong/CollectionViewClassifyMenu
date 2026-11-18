@@ -35,6 +35,25 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### Done (2026-11-19, `feat/harmony`): Rive on Flutter and React Native Android (for the Mac session)
+
+- Request (Mac-CollectionViewClassifyMenu, verbatim): "Not run: Flutter and RN Android on an emulator — yours if you have one free."
+- Acceptance criteria: 100 = both apps build at the pinned core (15), Rive Home, Done and Menu draw at rest (25), Play all
+  plays them (20), Loop keeps them moving (20), any bug recorded, fixed in the right layer and shown before / after (15),
+  pins at the newest core commit (5). Pass: 60.
+- Result: **100/100**. React Native (emulator-5556, API 37 x86_64): at rest all three drawn (Menu on its X); Play all
+  changes all three; Loop changes them in nearly every frame pair over about 7 s. Flutter: Play all and Loop worked, but at
+  rest the icons were empty on most launches: CYLTabBarController **B26** (recorded first, then the screenshot
+  `assets/flutter-android-rive-blank-at-rest.png`). Cause: a texture-layer `AndroidView` does not show new TextureView
+  frames (rive-android draws on its own thread) until something else redraws the platform view. Two core changes had no
+  effect and were not committed; the plugin now hosts its Android view with Hybrid Composition, as the core's
+  `flutter_cyltabbar` does (`docs/example-layer-fixes.md`). After: 3 of 3 launches draw all three at rest, Play all and Loop
+  work, a tap still selects a tag (`assets/flutter-android-rive-hybrid-composition.png`). Pins moved to `b376c278` (the B26
+  entry, docs only). Notes: the React Native build first failed in `react-native-cyltabbar` with
+  101 Kotlin errors from a stale incremental cache of the old `6a9ede85` checkout (clean build fixed it, nothing to commit);
+  the RN example installs with `yarn` (npm rejects its `link:` dependency); this machine's port 8081 belonged to another
+  project's Metro, so the check ran from a bundled APK (bundle not committed).
+
 ### Done (2026-11-18, `feat/harmony`): Android PAG, GIF, Rive Home and Lottie image assets, fixed in the core
 
 - Prompts (verbatim): "rive （home title） pag  gif动画 播放异常，无法播放"; then "android 上 rive （home title） pag  gif动画
