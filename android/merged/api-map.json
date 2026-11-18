@@ -893,6 +893,7 @@
  "CYLTagButton -itemStateDidChange": "CYLTagButton.onItemStateChanged (CYLAnimatedItemView)",
  "CYLTagButton -itemAccessibilityLabel": "CYLTagButton.accessibilityText (CYLAnimatedItemView)",
  "CYLTagButton -updateItemAccessibility": "CYLTagButton.updateAccessibility (CYLAnimatedItemView)",
+ "CYLTagButton (CYLCollectionCellStyle)": "extension function on CYLTagButton (CYLGeneralExtensions.kt)",
  "CYLTagButton (CYLCollectionCellStyle) -cylApply:": "CYLTagButton.cylApply",
  "CYLRightImageButton.expandTitle": "CYLRightImageButton.expandTitle",
  "CYLRightImageButton.collapseTitle": "CYLRightImageButton.collapseTitle",
