@@ -99,7 +99,9 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
                     item(context, "动效一", "pag-ios/0.pag"),
                     item(context, "动效二", "pag-ios/1.pag").apply { put(CYLTagItemAnimationRestingProgress, 1) })),
                 section("Rive · pod 'CYLTabBarController/Rive'", listOf(
-                    rive(context, "首页", "house", mapOf("stateMachine" to "State Machine 1")),
+                    // house.riv moves only when its number input Rooms changes: each play (every loop pass) sets the next
+                    // of `values` (CYLTabBarController 3f262501, as on the other platforms).
+                    rive(context, "首页", "house", mapOf("stateMachine" to "State Machine 1", "numberInput" to "Rooms", "values" to "3,4,5,6")),
                     rive(context, "完成", "check", mapOf("stateMachine" to "State Machine 1", "triggerInput" to "Check")),
                     rive(context, "菜单", "menu_button", mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0")),
                     rive(context, "按钮", "button", mapOf("animation" to "active")),
