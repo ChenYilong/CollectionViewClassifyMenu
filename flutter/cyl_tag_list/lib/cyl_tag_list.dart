@@ -5,6 +5,8 @@ library;
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -160,11 +162,31 @@ class _CylTagListViewState extends State<CylTagListView> {
           onPlatformViewCreated: _onCreated,
         );
       case TargetPlatform.android:
-        return AndroidView(
+        // Hybrid Composition, as CYLTabBarController's flutter_cyltabbar hosts its animation views: the tags' Rive icons
+        // are TextureViews (rive-android), and in a texture-layer platform view (AndroidView) their new frames reached
+        // the screen only when something else redrew the view, so the Rive icons stayed empty at rest
+        // (CYLTabBarController docs/Animated-Item.md B26).
+        return PlatformViewLink(
           viewType: _viewType,
-          creationParams: creationParams,
-          creationParamsCodec: const StandardMessageCodec(),
-          onPlatformViewCreated: _onCreated,
+          surfaceFactory: (context, controller) => AndroidViewSurface(
+            controller: controller as AndroidViewController,
+            gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+          ),
+          onCreatePlatformView: (params) {
+            final controller = PlatformViewsService.initExpensiveAndroidView(
+              id: params.id,
+              viewType: _viewType,
+              layoutDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
+              creationParams: creationParams,
+              creationParamsCodec: const StandardMessageCodec(),
+            );
+            controller
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..addOnPlatformViewCreatedListener(_onCreated)
+              ..create();
+            return controller;
+          },
         );
       default:
         final builder = CylTagListView.platformViewBuilder;

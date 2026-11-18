@@ -12,8 +12,8 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 | HarmonyOS (ArkTS) | `@ohos/rive` (`RiveAnimationView`) | `1.0.4` | `harmony/classifymenu/oh-package.json5`; `CYLAnimatedIcon.ets` | Emulator: `RendererType.Canvas`; device: `RendererType.Rive` (`cylRiveRendererType()`, `3417e7e`) | Crash fixed on the emulator (`e82b503`, `3417e7e`); real device untested. Switch: `CYL_RIVE_ENABLED` |
 | Flutter on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `flutter/cyl_tag_list_ohos/ohos/oh-package.json5` → `file:../../../harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
 | React Native on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `react-native/react-native-cyl-tag-list/harmony-example/harmony/entry/oh-package.json5` → `file:` `harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
-| Flutter on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile`; rive-android in `example/android/app/build.gradle.kts` (with `cyl.tabbar.libs`); `.riv` files in `example/assets/rive` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row (Home, Done, Menu) is in `example/lib/main.dart`. iOS simulator: draws and loops (2026-11-18, `assets/flutter-ios-rive-loop.png`); Android emulator not yet run here |
-| React Native on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `example/ios/Podfile`; rive-android in `example/android/app/build.gradle`; `.riv` files in the iOS app bundle (`Animations/`, in the Xcode project) and Android `assets/` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row is in `example/src/TagListPage.tsx`. iOS simulator: draws, plays and loops (2026-11-18, `assets/react-native-ios-rive-loop.png`); Android emulator not yet run here |
+| Flutter on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile`; rive-android in `example/android/app/build.gradle.kts` (with `cyl.tabbar.libs`); `.riv` files in `example/assets/rive` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row (Home, Done, Menu) is in `example/lib/main.dart`. iOS simulator: draws and loops (2026-11-18, `assets/flutter-ios-rive-loop.png`). Android emulator (2026-11-19, API 37 x86_64): draws at rest, plays and loops after the plugin moved to Hybrid Composition (CYLTabBarController B26; before, the icons were empty at rest), `assets/flutter-android-rive-hybrid-composition.png` |
+| React Native on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `example/ios/Podfile`; rive-android in `example/android/app/build.gradle`; `.riv` files in the iOS app bundle (`Animations/`, in the Xcode project) and Android `assets/` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row is in `example/src/TagListPage.tsx`. iOS simulator: draws, plays and loops (2026-11-18, `assets/react-native-ios-rive-loop.png`). Android emulator (2026-11-19, API 37 x86_64): draws at rest (Menu on its X), plays and loops |
 | WeChat mini program / 微信小程序 | `@rive-app/canvas-advanced` (WebAssembly, 573 KB) wrapped as `cyl-rive-miniprogram` | `2.39.1` | CYLTabBarController `CrossPlatform/rive-miniprogram`, copied into `cyl_components` by `scripts/fetch-cyltabbar.js` | Canvas 2D | Linked (`engines.rive: true` in `utils/tag-animations.js`); not affected |
 
 ## The HarmonyOS crash / 鸿蒙崩溃
@@ -109,3 +109,19 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 - **DONE (2026-11-19)**: all three steps pass on the iPhone 17 Pro simulator (iOS 27.2): the configuration file
   screen's Rive Home (`822c9055`), Flutter iOS (`fe1a5083`) and React Native iOS (this commit). Not run here: the Flutter
   and React Native Android examples on an emulator.
+- **DONE (2026-11-19), Android (Windows session): Flutter and React Native, the Rive tags draw, play and loop.**
+  - React Native Android (debug build with the JavaScript bundled in, emulator-5556): at rest Home, Done and Menu (on its X)
+    are drawn; Play all plays all three; with Loop on they keep changing.
+  - Flutter Android: Play all and Loop worked, but the icons were empty at rest on most launches (CYLTabBarController
+    B26). The tag list was a texture-layer `AndroidView`, which shows a TextureView's new frames (rive-android draws on its
+    own thread) only when something else redraws the platform view. Fix in the plugin (`lib/cyl_tag_list.dart`): Hybrid
+    Composition (`PlatformViewLink` + `initExpensiveAndroidView`), as the core's `flutter_cyltabbar`. After: 3 of 3 launches
+    draw all three at rest; Play all and Loop work; a tap still selects a tag.
+
+  ![Flutter Android Rive tags before the fix](assets/flutter-android-rive-blank-at-rest.png)
+
+  ![Flutter Android Rive tags with Hybrid Composition](assets/flutter-android-rive-hybrid-composition.png)
+
+  Platform: Android 17 (API 37) x86_64 emulator | Host: Windows 11 | IDE: none (Gradle 9.4.1, Flutter CLI);
+  CYLTabBarController `776b4635` (before) and `f610107c` (after; the pin `b376c278` adds no Android code), feat/harmony,
+  2026-11-19.
