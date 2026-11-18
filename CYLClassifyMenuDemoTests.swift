@@ -85,6 +85,69 @@ final class CYLClassifyMenuDemoTests: XCTestCase {
         XCTAssertFalse(toggle.accessibilityLabel?.isEmpty ?? true, "The switch has a label of its own")
     }
 
+    /**
+     * Issue #7: on a 3.5-inch screen (320 × 480 pt) the home page's header ran off the right edge. No 3.5-inch device
+     * runs iOS 15, so the whole home screen is laid out in a window of that size, at the default and the largest text
+     * size: the header, the menu's section headers and its tags stay on screen while it scrolls.
+     */
+    func testDemoHomeFitsA35InchScreen() throws {
+        for category in [UIContentSizeCategory.large, .accessibilityExtraExtraExtraLarge] {
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+            let parent = UIViewController()
+            window.rootViewController = parent
+            window.makeKeyAndVisible()
+            let demo = CYLMainViewController()
+            parent.addChild(demo)
+            demo.view.frame = parent.view.bounds
+            demo.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            parent.view.addSubview(demo.view)
+            demo.didMove(toParent: parent)
+            parent.setOverrideTraitCollection(UITraitCollection(preferredContentSizeCategory: category), forChild: demo)
+            demo.view.setNeedsLayout()
+            demo.view.layoutIfNeeded()
+
+            let title = try XCTUnwrap(demo.titleLabel)
+            let toggle = try XCTUnwrap(demo.rowsCountBydefaultSwitch)
+            let titleFrame = title.convert(title.bounds, to: window)
+            let toggleFrame = toggle.convert(toggle.bounds, to: window)
+            XCTAssertGreaterThanOrEqual(titleFrame.minX, 0, "\(category.rawValue)")
+            XCTAssertLessThanOrEqual(toggleFrame.maxX, 320.5, "\(category.rawValue): the header's switch is on screen")
+            XCTAssertLessThanOrEqual(titleFrame.maxX, toggleFrame.minX + 0.5, "\(category.rawValue)")
+
+            let collection = try XCTUnwrap(collectionView(in: demo.view))
+            XCTAssertGreaterThan(collection.numberOfSections, 0)
+            let maxY = max(0, collection.contentSize.height - collection.bounds.height)
+            var checkedHeaders = 0
+            for y in stride(from: 0, through: maxY, by: 120) {
+                collection.setContentOffset(CGPoint(x: 0, y: y), animated: false)
+                collection.layoutIfNeeded()
+                let headers = collection.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader)
+                for case let header as CYLFilterHeaderView in headers {
+                    checkedHeaders += 1
+                    let more = header.moreButton.convert(header.moreButton.bounds, to: window)
+                    let name = header.titleButton.convert(header.titleButton.bounds, to: window)
+                    XCTAssertGreaterThanOrEqual(name.minX, -0.5, "\(category.rawValue)")
+                    XCTAssertLessThanOrEqual(more.maxX, 320.5, "\(category.rawValue): the section header's button is on screen")
+                    XCTAssertLessThanOrEqual(name.maxX, more.minX + 0.5, "\(category.rawValue)")
+                }
+                for cell in collection.visibleCells {
+                    let frame = cell.convert(cell.bounds, to: window)
+                    XCTAssertGreaterThanOrEqual(frame.minX, -0.5, "\(category.rawValue)")
+                    XCTAssertLessThanOrEqual(frame.maxX, 320.5, "\(category.rawValue): a tag is on screen")
+                }
+            }
+            XCTAssertGreaterThan(checkedHeaders, 0, "\(category.rawValue)")
+            window.isHidden = true
+        }
+    }
+
+    private func collectionView(in view: UIView) -> UICollectionView? {
+        if let collection = view as? UICollectionView {
+            return collection
+        }
+        return view.subviews.lazy.compactMap { self.collectionView(in: $0) }.first
+    }
+
     func testDemoLookupReadsItsOwnBundle() {
         let saved = CYLMenuResources.preferredLanguage
         defer { CYLMenuResources.preferredLanguage = saved }

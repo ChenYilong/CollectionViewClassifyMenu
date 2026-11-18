@@ -346,4 +346,48 @@ static NSArray<NSValue *> *CYLSizes(NSUInteger count, CGSize (^size)(NSUInteger 
     XCTAssertEqualObjects(contents[@"NSPrivacyAccessedAPITypes"], @[]);
 }
 
+
+#pragma mark CollectionViewClassifyMenu issue #12: copies from every query, with self-sizing cells and after size changes
+
+/*!
+ * CollectionViewClassifyMenu issue #12 ("the flow layout subclass is modifying attributes returned by
+ * UICollectionViewFlowLayout without copying them"): with self-sizing cells and after each width change, changing the
+ * attributes returned by `layoutAttributesForElementsInRect:` or `layoutAttributesForItemAtIndexPath:` never reaches
+ * the layout, and the next query returns new objects with the layout's own frames.
+ */
+- (void)testEveryQueryReturnsCopiesWithSelfSizingCellsAndAfterWidthChanges {
+    CYLLeftAlignedFixture *fixture = [[CYLLeftAlignedFixture alloc] init];
+    fixture.usesDelegateSizes = NO;
+    fixture.sizes = @[CYLSizes(30, ^CGSize(NSUInteger i) { return CGSizeZero; })];
+    CYLCollectionViewLeftAlignedLayout *layout = [[CYLCollectionViewLeftAlignedLayout alloc] init];
+    layout.estimatedItemSize = CGSizeMake(50, 32);
+    UICollectionView *collectionView = [self collectionViewWithLayout:layout fixture:fixture width:320 cellClass:[CYLSelfSizingCell class]];
+    for (NSNumber *width in @[@320, @414, @240]) {
+        collectionView.frame = CGRectMake(0, 0, width.doubleValue, 480);
+        for (NSUInteger pass = 0; pass < 3; pass++) {
+            [collectionView layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+        }
+        NSArray<UICollectionViewLayoutAttributes *> *returned = [self cellAttributesIn:collectionView];
+        XCTAssertGreaterThan(returned.count, 0u);
+        NSMutableDictionary<NSIndexPath *, NSValue *> *frames = [NSMutableDictionary dictionary];
+        for (UICollectionViewLayoutAttributes *attributes in returned) {
+            frames[attributes.indexPath] = [NSValue valueWithCGRect:attributes.frame];
+            attributes.frame = CGRectMake(-500, -500, 1, 1);
+            attributes.alpha = 0;
+        }
+        for (UICollectionViewLayoutAttributes *attributes in [self cellAttributesIn:collectionView]) {
+            XCTAssertEqual([returned indexOfObjectIdenticalTo:attributes], NSNotFound, @"a new object at width %@", width);
+            XCTAssertTrue(CGRectEqualToRect(attributes.frame, frames[attributes.indexPath].CGRectValue),
+                          @"%@ at width %@: a caller's change leaked into the layout", attributes.indexPath, width);
+            XCTAssertEqualWithAccuracy(attributes.alpha, 1, 0.001);
+        }
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:7 inSection:0];
+        UICollectionViewLayoutAttributes *item = [layout layoutAttributesForItemAtIndexPath:indexPath];
+        item.frame = CGRectZero;
+        XCTAssertTrue(CGRectEqualToRect([layout layoutAttributesForItemAtIndexPath:indexPath].frame, frames[indexPath].CGRectValue));
+        [self assertLeftAligned:collectionView fixture:fixture];
+    }
+}
+
 @end
