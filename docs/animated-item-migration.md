@@ -387,3 +387,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   selection was already checked: the 八卦 tab switches the page); a horizontal bar keeps the bottom and "tags above the
   bar" checks. Example suite 92 / 0 on iPhone Duo `B7499C73` (iOS 27.2, the device that failed before) and 92 / 0 on
   iPhone 17 Pro `62B54974` (iOS 27.2), Xcode 27.2, macOS 27.3. This closes the iPhone Duo bug above.
+
+## TODO (2026-11-18, `feat/harmony`): iOS pins from d8f47b4d to CYLTabBarController 0505042f
+
+- **Request (relayed by winCYLTabBarController 鸿蒙开发, from the user, verbatim)**: "the Rive tint interface is fixed,
+  please continue. CYLTabBarController feat/cross-platform-components head is 396d3fca (0dc6d1c4 item appearance and tint
+  per state in CYLAnimatedItemView, d899816b FlatDesign Rive tint, 00ed70e6 badge and tint follow a swapped view). Please
+  move your pins from d8f47b4d if they fit. Continue the RN/Flutter Rive simulator run once the Mac load allows, and
+  anything else below 100."
+- **Plan**: the newest commit across all branches is `0505042f` (docs only after `396d3fca`); move the eight iOS pin
+  files, `pod install` in the four projects, build the Swift package, run the menu, tag, example and swift suites.
