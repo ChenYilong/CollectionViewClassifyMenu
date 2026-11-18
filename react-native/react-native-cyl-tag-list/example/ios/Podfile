@@ -28,8 +28,11 @@ target 'CylTagListExample' do
   # The animated icon engines the example plays; the core depends on the CYLAnimatedItem pod only.
   pod 'CYLAnimatedItem/LottieObjectiveC', cyl_tab_bar
   pod 'CYLAnimatedItem/Rive', cyl_tab_bar
+  pod 'CYLAnimatedItem/SVGA', cyl_tab_bar
   # CYLAnimatedItem is a Swift pod now; it imports lottie-ios, which has no module map as a static library.
   pod 'lottie-ios', :modular_headers => true
+  # The same for SVGAPlayerLite, which CYLAnimatedItem/SVGA imports.
+  pod 'SVGAPlayerLite', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],

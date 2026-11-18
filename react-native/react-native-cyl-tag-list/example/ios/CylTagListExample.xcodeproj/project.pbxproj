@@ -13,6 +13,10 @@
 		BC947EC7D21414CA9DBBDF94 /* menu_button.riv in Resources */ = {isa = PBXBuildFile; fileRef = 2F28B4115E8A13CE3B2C2022 /* menu_button.riv */; };
 		114698A19C15008159BFAFFB /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = E4D6331C72359F338C3D808C /* check.riv */; };
 		3A4136A1EC97867766CEFF11 /* house.riv in Resources */ = {isa = PBXBuildFile; fileRef = 96A27AEBDAC061142652C293 /* house.riv */; };
+		B0FFAF7A4BBD8D836F4CCE60 /* tab_profile.svga in Resources */ = {isa = PBXBuildFile; fileRef = 099FFA739B861504492860ED /* tab_profile.svga */; };
+		C405048E306639F9EFC0298D /* tab_chat.svga in Resources */ = {isa = PBXBuildFile; fileRef = F66CD30488C3ABCAF3EA106C /* tab_chat.svga */; };
+		B1FE73D339C833552095604A /* tab_search.svga in Resources */ = {isa = PBXBuildFile; fileRef = E237DA8B9DE362B88947EDA6 /* tab_search.svga */; };
+		8EF2FD602144F915D22C3999 /* tab_home.svga in Resources */ = {isa = PBXBuildFile; fileRef = F03C1F7654CF4A56B15E7499 /* tab_home.svga */; };
 		6448B7D26CF37DFC8499C74C /* tab_search_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 65B508A24967FE77682B0D5D /* tab_search_animate.json */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
@@ -49,6 +53,10 @@
 		668801FCC462A35FF381D23D /* tab_message_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_message_animate.json; path = CylTagListExample/Animations/tab_message_animate.json; sourceTree = "<group>"; };
 		69D38A7EFE322AE5A79689A9 /* CylTagListExampleUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CylTagListExampleUITests.swift; sourceTree = "<group>"; };
 		96A27AEBDAC061142652C293 /* house.riv */ = {isa = PBXFileReference; includeInIndex = 1; name = house.riv; path = CylTagListExample/Animations/house.riv; sourceTree = "<group>"; };
+		099FFA739B861504492860ED /* tab_profile.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_profile.svga; path = CylTagListExample/Animations/tab_profile.svga; sourceTree = "<group>"; };
+		F66CD30488C3ABCAF3EA106C /* tab_chat.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_chat.svga; path = CylTagListExample/Animations/tab_chat.svga; sourceTree = "<group>"; };
+		E237DA8B9DE362B88947EDA6 /* tab_search.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_search.svga; path = CylTagListExample/Animations/tab_search.svga; sourceTree = "<group>"; };
+		F03C1F7654CF4A56B15E7499 /* tab_home.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_home.svga; path = CylTagListExample/Animations/tab_home.svga; sourceTree = "<group>"; };
 		E4D6331C72359F338C3D808C /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; name = check.riv; path = CylTagListExample/Animations/check.riv; sourceTree = "<group>"; };
 		2F28B4115E8A13CE3B2C2022 /* menu_button.riv */ = {isa = PBXFileReference; includeInIndex = 1; name = menu_button.riv; path = CylTagListExample/Animations/menu_button.riv; sourceTree = "<group>"; };
 		71C51F8F957659CE08E6ECAD /* tab_home_animate.json */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_home_animate.json; path = CylTagListExample/Animations/tab_home_animate.json; sourceTree = "<group>"; };
@@ -93,6 +101,10 @@
 				2F28B4115E8A13CE3B2C2022 /* menu_button.riv */,
 				E4D6331C72359F338C3D808C /* check.riv */,
 				96A27AEBDAC061142652C293 /* house.riv */,
+				099FFA739B861504492860ED /* tab_profile.svga */,
+				F66CD30488C3ABCAF3EA106C /* tab_chat.svga */,
+				E237DA8B9DE362B88947EDA6 /* tab_search.svga */,
+				F03C1F7654CF4A56B15E7499 /* tab_home.svga */,
 				FC60366E534EBA18D17887B8 /* tab_me_animate.json */,
 				668801FCC462A35FF381D23D /* tab_message_animate.json */,
 				65B508A24967FE77682B0D5D /* tab_search_animate.json */,
@@ -253,6 +265,10 @@
 				BC947EC7D21414CA9DBBDF94 /* menu_button.riv in Resources */,
 				114698A19C15008159BFAFFB /* check.riv in Resources */,
 				3A4136A1EC97867766CEFF11 /* house.riv in Resources */,
+				B0FFAF7A4BBD8D836F4CCE60 /* tab_profile.svga in Resources */,
+				C405048E306639F9EFC0298D /* tab_chat.svga in Resources */,
+				B1FE73D339C833552095604A /* tab_search.svga in Resources */,
+				8EF2FD602144F915D22C3999 /* tab_home.svga in Resources */,
 				F461572AD868AF140C59FCD4 /* tab_me_animate.json in Resources */,
 				EBC76EA92FF7B201E7BC7F92 /* tab_message_animate.json in Resources */,
 				6448B7D26CF37DFC8499C74C /* tab_search_animate.json in Resources */,
