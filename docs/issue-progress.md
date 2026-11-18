@@ -978,3 +978,4 @@ tags: [issues, ui, cocoapods, progress]
   and step 0 of `.agents/skills/cyl-task-start/SKILL.md` (and its description); appended only (numstat: no lines
   removed except the skill's rewritten description line). `harmony/instructions.md` belongs to the Windows session:
   asked it to append the same rule (−10 until it confirms).
+- Update: the Windows session appended the rule to `harmony/instructions.md` (669dcfc1): **100/100**.
