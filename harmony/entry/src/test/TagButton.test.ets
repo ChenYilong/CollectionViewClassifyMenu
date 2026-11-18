@@ -46,6 +46,36 @@ export default function tagButtonTest() {
       expect(button.imageView.frame.y - button.titleLabel.frame.maxY).assertEqual(4);
     });
 
+    it('imageFillsTheTagHeightAtTheLeadingEdge', 0, () => {
+      // iOS testImageFillsTheTagHeightAtTheLeadingEdge: AndroidTagView's avatar, a circle as tall as the tag.
+      const style = new CYLMenuStyle();
+      style.imageSize = new CYLSize(24, 24);
+      style.imageTitleSpacing = 6;
+      style.imageFillsTagHeight = true;
+      const side = CYLTagButton.heightForTitle('Kotlin', new CYLSize(24, 24), style);
+      expect(side).assertEqual(CYLTagButton.heightForTitle('Kotlin', CYLSize.ZERO, style));
+      const right = style.normalAppearance.contentInsets.right;
+      expect(CYLTagButton.width('Kotlin', new CYLSize(24, 24), false, style)).assertEqual(side + 60 + 6 + right);
+      const button = new CYLTagButton('Kotlin', 'avatar.png');
+      button.style = style;
+      button.setBounds(CYLTagButton.width('Kotlin', new CYLSize(24, 24), false, style), side);
+      const image = button.imageView.frame;
+      expect(image.x).assertEqual(0);
+      expect(image.y).assertEqual(0);
+      expect(image.width).assertEqual(side);
+      expect(image.height).assertEqual(side);
+      expect(button.imageView.cornerRadius).assertEqual(side / 2);
+      expect(button.titleLabel.frame.x).assertEqual(side + 6);
+      expect(button.titleLabel.frame.width).assertEqual(60);
+      // Without an image the title keeps its usual place.
+      const plain = new CYLTagButton('Kotlin');
+      plain.style = style;
+      expect(CYLTagButton.width('Kotlin', CYLSize.ZERO, false, style))
+        .assertEqual(CYLTagButton.width('Kotlin', CYLSize.ZERO, false, new CYLMenuStyle()) + 0);
+      const copy = style.copy();
+      expect(copy.imageFillsTagHeight).assertTrue();
+    });
+
     it('reservesNoSpacingForAMissingPart', 0, () => {
       const style = new CYLMenuStyle();
       style.imagePlacement = CYLTagImagePlacement.top;

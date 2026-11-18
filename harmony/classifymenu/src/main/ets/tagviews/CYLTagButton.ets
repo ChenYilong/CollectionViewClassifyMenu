@@ -673,6 +673,10 @@ export class CYLTagButton {
     // With a zero `imageSize` iOS uses the image's own size, which ArkUI knows only once the image has loaded: the
     // icon slot is then empty and the image sizes itself (as in `CYLTagListView`).
     const iconSize = animated ? this.animationSize : CYLTagButtonMetrics.iconSize(this.imageView.image, false, style);
+    if (showsImage && style.fillsTagHeight(iconSize)) {
+      this.layOutTagHeightImage(showsTitle, titleText, margin, trailing, insets, animated);
+      return;
+    }
     const spacing = showsImage && showsTitle ? style.imageTitleSpacing : 0;
     const available = Math.max(0, width - 2 * margin - (showsImage ? iconSize.width + spacing : 0));
     const font = this.titleLabel.font;
@@ -746,6 +750,41 @@ export class CYLTagButton {
     }
     // 0 is automatic: a capsule, as for CYLBadgeAppearance.
     const radius = style.appearance(state).cornerRadius;
+    this.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, height / 2)) : height / 2;
+  }
+
+  /**
+   * `CYLMenuStyle.imageFillsTagHeight`: the image (or animated icon) a circle as tall as the tag at its leading edge,
+   * the title after it, from the leading margin; the delete indicator is already in place.
+   */
+  private layOutTagHeightImage(showsTitle: boolean, titleText: string, margin: number, trailing: number,
+    insets: CYLEdgeInsets, animated: boolean): void {
+    const style = this.styleStorage;
+    const height = this.boundsHeight;
+    const indicatorFirst = margin > insets.left;
+    const frame = new CYLRect(indicatorFirst ? margin - insets.left : 0, 0, height, height);
+    if (animated) {
+      this.animationFrame = frame;
+      this.imageView.frame = new CYLRect();
+    } else {
+      this.imageView.frame = frame;
+    }
+    this.imageView.cornerRadius = height / 2;
+    this.layOutBadge(frame);
+    this.titleLabel.isHidden = !showsTitle;
+    if (showsTitle) {
+      const x = frame.x + frame.width + style.imageTitleSpacing;
+      const font = this.titleLabel.font;
+      const titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.lineHeight(font)));
+      const contentHeight = Math.max(0, height - insets.top - insets.bottom);
+      const measured = Math.ceil(CYLTagButtonMetrics.textMeasurer(titleText, font));
+      this.titleLabel.frame = new CYLRect(x + style.titlePositionAdjustment.horizontal,
+        CYLTagButton.centeredY(titleHeight, insets.top, contentHeight, height) + style.titlePositionAdjustment.vertical,
+        Math.min(measured, Math.max(0, this.boundsWidth - trailing - x)), titleHeight);
+    } else {
+      this.titleLabel.frame = new CYLRect();
+    }
+    const radius = style.appearance(this.currentState).cornerRadius;
     this.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, height / 2)) : height / 2;
   }
 

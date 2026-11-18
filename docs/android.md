@@ -601,16 +601,11 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 - **Test (new):** `CYLTagReorderWidthTest` drags "Kotlin" onto "Go" in the iOS demo's ten tags (long press, ten move
   steps, drop). Every tag keeps its own title's width at each step, right after the drop and after the reload, and
   `tagMoveHandler` reports 1 → 9. Android library 87 / 0.
-- **DONE (2026-11-19, was the TODO "no `CYLTagListView` drag demo"), 100/100:** the Android example's Styles screen now
-  starts, as on iOS, with the section 拖拽排序（长按标签后拖动） and its row 拖拽标签重新排序, which opens
-  `CYLTagReorderScreen` (`CYLTagCloudScreens.kt`), the counterpart of `CYLTagReorderDemoViewController`: the same ten tags,
-  `allowsReordering`, the Pure Teal theme, the hint, the order below the list (`tagMoveHandler`) and Reset (a button; iOS
-  has a bar button, the Android screens have none). Example layer only, no core change; the strings are the iOS
-  example's. Emulator: long press on Kotlin, drag to Go, drop: every title stays whole while dragging and the order
-  reads Swift · ArkTS · Dart · TypeScript · Objective-C · Java · C++ · Rust · Go · Kotlin
-  (`assets/android-tag-drag-reorder.png`).
-
-  <img src="assets/android-tag-drag-reorder.png" width="360" alt="Android drag to reorder: before, while dragging, dropped">
+- **Withdrawn (2026-11-19), the TODO "no `CYLTagListView` drag demo" is closed as not needed:** `4e03f8a5` added
+  `CYLTagReorderScreen` (a Styles row copying iOS `CYLTagReorderDemoViewController`). The owner's reference for "the drag
+  example" is the Android Container tab (`LujunTagContainerFragment`), and iOS replaced its teal demo with a port of that
+  tab (`58b2f335`, entry below). The Android copy of the removed iOS demo is therefore reverted. Android's drag example
+  stays the Container tab (unchanged). The core's drag check stays `CYLTagReorderWidthTest`.
 
 ## DONE (2026-11-19, `feat/harmony`): the iOS drag-to-reorder example looks like the Android one, built on CYLAnimatedItemView
 

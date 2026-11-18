@@ -101,12 +101,35 @@ test('the color themes are ColorFactory\'s: random by position, pure cyan, pure 
 
 test('displayedTitle cuts after maximumTitleLength with "..." and reverses the characters', () => {
   const style = model.tagContainerStyle();
-  assert.equal(model.displayedTitle(style, 'Welcome to use AndroidTagView!'), 'Welcome to use AndroidT...');
+  assert.equal(model.displayedTitle(style, 'Welcome to use AndroidTagView!'), 'Welcome to use Andro...');
   assert.equal(model.displayedTitle(style, 'Java'), 'Java');
   style.maximumTitleLength = 18;
   style.reversesTitleCharacters = true;
   assert.equal(model.displayedTitle(style, 'Persian'), 'naisreP');
   assert.equal(model.displayedTitle(style, '你好'), '好你');
+  style.reversesTitleCharacters = false;
+  style.maximumTitleLength = 2;
+  assert.equal(model.displayedTitle(style, 'Swift'), '...');
+});
+
+test('a trailing row starts at the trailing edge with its first tag (container_gravity="right")', () => {
+  const style = model.tagCloudStyle();
+  style.rowAlignment = 'trailing';
+  assert.match(model.renderList(style).itemsStyle, /justify-content: flex-start; flex-direction: row-reverse/);
+  style.rowAlignment = 'center';
+  assert.match(model.renderList(style).itemsStyle, /justify-content: center$/);
+});
+
+test('imageFillsTagHeight draws the image as a circle as tall as the tag at its leading edge', () => {
+  const style = model.tagCloudStyle();
+  style.imageFillsTagHeight = true;
+  const tag = model.renderTag({ title: 'Kotlin', image: '/a.png' }, 0, { listStyle: style });
+  const side = model.tagHeight(style);
+  const insets = style.normal.contentInsets;
+  assert.equal(tag.icon.mode, 'aspectFill');
+  assert.match(tag.icon.style, new RegExp(`width: ${side}px; height: ${side}px; border-radius: ${side / 2}px`));
+  assert.match(tag.icon.style, new RegExp(`margin: -${insets.top}px .* -${insets.bottom}px -${insets.left}px`));
+  assert.equal(model.defaultStyle().imageFillsTagHeight, false);
 });
 
 test('a tag is as tall as itemHeight or a line of its font plus its insets; 0 is a capsule', () => {

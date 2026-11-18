@@ -117,6 +117,19 @@ export class CYLTagButtonMetrics {
     fontScale: number = 1): number {
     const displayed = style.displayedTitle(title);
     let width = 0;
+    if (style.fillsTagHeight(iconSize)) {
+      // The image is as wide as the tag is tall, from the leading edge; the title and the indicator follow it.
+      const side = CYLTagButtonMetrics.heightForTitle(title, CYLSize.ZERO, style, fontScale);
+      STATES.forEach((state: number) => {
+        const font = style.titleFont(state, fontScale);
+        const titleWidth = displayed.length === 0 ? 0 :
+          Math.ceil(CYLTagButtonMetrics.textMeasurer(displayed, font)) + style.imageTitleSpacing;
+        const indicator = showsDeleteIndicator ?
+          style.imageTitleSpacing + CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale) : 0;
+        width = Math.max(width, Math.ceil(side + titleWidth + indicator + style.appearance(state).contentInsets.right));
+      });
+      return width;
+    }
     STATES.forEach((state: number) => {
       const appearance = style.appearance(state);
       const font = style.titleFont(state, fontScale);
@@ -181,6 +194,10 @@ export class CYLTagButtonMetrics {
    * in every state: the taller of the two side by side, or both and the spacing when stacked; at least `itemHeight`.
    */
   static heightForTitle(title: string | undefined, iconSize: CYLSize, style: CYLMenuStyle, fontScale: number = 1): number {
+    // An image that fills the tag's height takes the height of the rest.
+    if (style.fillsTagHeight(iconSize)) {
+      iconSize = CYLSize.ZERO;
+    }
     const hasTitle = style.displayedTitle(title).length > 0;
     const vertical = CYLTagImagePlacementIsVertical(style.imagePlacement);
     let height = style.itemHeight;
@@ -2015,11 +2032,12 @@ export class CYLTagListState {
         let x = insets.left;
         if (style.rowAlignment === CYLTagRowAlignment.center) {
           x += Math.max(0, Math.floor((available - rowWidth) / 2));
-        } else if (style.rowAlignment === CYLTagRowAlignment.trailing) {
-          x += Math.max(0, available - rowWidth);
         }
+        const trailing = style.rowAlignment === CYLTagRowAlignment.trailing;
         rowCells.forEach((c: CYLTagListItemFrame) => {
-          c.x = x;
+          // Trailing (AndroidTagView's container_gravity="right", iOS since 58b2f335): the first tag at the trailing
+          // edge, each next one before it.
+          c.x = trailing ? insets.left + available - (x - insets.left) - c.width : x;
           c.y = rowY + Math.floor((rowHeight - c.height) / 2);
           x += c.width + spacing;
         });

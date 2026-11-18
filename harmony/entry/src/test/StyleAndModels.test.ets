@@ -48,8 +48,13 @@ export default function styleAndModelsTest() {
     it('shortensAndReversesTitles', 0, () => {
       const style = new CYLMenuStyle();
       expect(style.displayedTitle('abcdef')).assertEqual('abcdef');
-      style.maximumTitleLength = 3;
-      expect(style.displayedTitle('abcdef')).assertEqual('abc...');
+      // As AndroidTagView's tag_max_length (and iOS since 58b2f335): max - 3 characters and "...", max in all.
+      style.maximumTitleLength = 5;
+      expect(style.displayedTitle('abcdef')).assertEqual('ab...');
+      style.maximumTitleLength = 23;
+      expect(style.displayedTitle('Welcome to use AndroidTagView!')).assertEqual('Welcome to use Andro...');
+      style.maximumTitleLength = 2;
+      expect(style.displayedTitle('abcdef')).assertEqual('...');
       expect(style.displayedTitle(undefined)).assertEqual('');
       style.maximumTitleLength = 0;
       style.reversesTitleCharacters = true;

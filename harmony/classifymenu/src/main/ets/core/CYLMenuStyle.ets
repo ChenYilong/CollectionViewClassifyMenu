@@ -104,6 +104,12 @@ export class CYLMenuStyle {
   titlePositionAdjustment: CYLOffset = CYLOffset.ZERO;
   imagePositionAdjustment: CYLOffset = CYLOffset.ZERO;
   imagePlacement: CYLTagImagePlacement = CYLTagImagePlacement.leading;
+  /**
+   * True: a leading image (or animated icon) is a circle as tall as the tag, at its leading edge, and the title follows
+   * it (`imageSize`, `imageInsets` and the leading content inset do not apply to it); AndroidTagView's avatar. Default
+   * false.
+   */
+  imageFillsTagHeight: boolean = false;
   layoutCentered: boolean = true;
   contentAlignment: CYLTagContentAlignment = CYLTagContentAlignment.center;
   animationSize: CYLSize = CYLSize.ZERO;
@@ -233,20 +239,27 @@ export class CYLMenuStyle {
   /**
    * The icon color of `state`, else its text color.
    */
+  /** Whether an icon of this size is drawn by `imageFillsTagHeight` (a leading icon beside the title). */
+  fillsTagHeight(iconSize: CYLSize): boolean {
+    return this.imageFillsTagHeight && this.imagePlacement === CYLTagImagePlacement.leading &&
+      (iconSize.width !== 0 || iconSize.height !== 0);
+  }
+
   iconColor(state: number): ResourceColor {
     const appearance = this.appearance(state);
     return appearance.iconColor ?? appearance.textColor;
   }
 
   /**
-   * The title as the tag shows it: at most `maximumTitleLength` characters then "...", and reversed character by
+   * The title as the tag shows it: cut to `maximumTitleLength` characters, the last three being "..." (AndroidTagView's
+   * tag_max_length: 23 gives "Welcome to use Andro..."), and reversed character by
    * character when `reversesTitleCharacters`. Characters are Unicode code points (iOS counts grapheme clusters).
    */
   displayedTitle(title: string | undefined): string {
     let text = title ?? '';
     const characters = Array.from(text);
     if (this.maximumTitleLength > 0 && characters.length > this.maximumTitleLength) {
-      text = characters.slice(0, this.maximumTitleLength).join('') + '...';
+      text = characters.slice(0, Math.max(0, this.maximumTitleLength - 3)).join('') + '...';
     }
     if (this.reversesTitleCharacters && text.length > 1) {
       text = Array.from(text).reverse().join('');
@@ -312,6 +325,7 @@ export class CYLMenuStyle {
     c.headerIndicatorColor = this.headerIndicatorColor;
     c.headerIndicatorSize = this.headerIndicatorSize;
     c.imageCornerRadius = this.imageCornerRadius;
+    c.imageFillsTagHeight = this.imageFillsTagHeight;
     c.imageTitleSpacing = this.imageTitleSpacing;
     c.imageSize = this.imageSize;
     c.imageInsets = this.imageInsets;

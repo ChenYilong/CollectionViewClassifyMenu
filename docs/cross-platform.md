@@ -823,3 +823,25 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   default tab bar height (waits for CYLTabBarController), Android `CYLRightImageButton` / `CYLMultipleFilterHeaderView`
   on `CYLTagButton` and the Android drag demo (Windows session), checks on a real HarmonyOS device, a real iPhone
   (VoiceOver) and a phone (mini program BUG 1), and `npm publish` (needs the owner's npm login).
+
+### DONE (2026-11-19, `feat/harmony`, Windows session): HarmonyOS and the mini program follow the iOS `1d1f7904` tag rules, 100/100
+
+- **Context:** the Mac session's `1d1f7904` changed three things in the iOS core, all to match AndroidTagView: the new
+  `CYLMenuStyle.imageFillsTagHeight` (a leading image drawn as a circle as tall as the tag, at its leading edge);
+  `maximumTitleLength` now keeps `max − 3` characters plus "..." (23 gives "Welcome to use Andro...", where it used to keep
+  `max` plus "..."); `CYLTagRowAlignment.trailing` now starts each row at the trailing edge with its first tag
+  (`container_gravity="right"`), where it used to keep the left-to-right order and only align the row right. Android
+  already behaved so.
+- **HarmonyOS** (`harmony/classifymenu`): `CYLMenuStyle.imageFillsTagHeight` and `fillsTagHeight(iconSize)`;
+  `CYLTagButtonMetrics.width` / `heightForTitle` and `CYLTagButton.layOutTagHeightImage` as on iOS; `displayedTitle` keeps
+  `max − 3`; trailing rows mirrored in `CYLCollectionViewLeftAlignedLayout` and `CYLTagListState`. Host tests 63 / 63 (new
+  `imageFillsTheTagHeightAtTheLeadingEdge`, the truncation test updated), `harmony/scripts/build.sh` OK, `docs/harmony.md`
+  839 / 839.
+- **Mini program** (`cyl-tag-cloud`, the AndroidTagView port): `imageFillsTagHeight` (the icon as tall as the tag, over the
+  insets), `max − 3` truncation, trailing rows as `flex-direction: row-reverse`; the Container sample's first container
+  uses the avatar style, as iOS's `CYLTagContainerSample` does. `npm test` 147 pass; WeChat DevTools:
+
+  <img src="assets/miniprogram-container-android-parity.png" width="500" alt="Mini program Container sample: trailing rows, title cap, avatars as tall as the tag">
+
+- **Android drag demo withdrawn:** `CYLTagReorderScreen` (copy of the removed iOS `CYLTagReorderDemoViewController`) is
+  reverted; the drag example on every platform is the Container sample (`docs/android.md`).

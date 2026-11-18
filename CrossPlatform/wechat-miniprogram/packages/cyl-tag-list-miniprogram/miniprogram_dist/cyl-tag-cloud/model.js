@@ -118,6 +118,8 @@ function defaultStyle() {
     headerIndicatorColor: null,
     headerIndicatorSize: { width: 3, height: 16 },
     imageCornerRadius: 0,
+    // A leading image as a circle as tall as the tag, at its leading edge (AndroidTagView's avatar).
+    imageFillsTagHeight: false,
     imageTitleSpacing: 4,
     imageSize: 14,
     itemHeight: 30,
@@ -399,14 +401,17 @@ function styleForItem(tag, index, listStyle, theme = 'none') {
 
 // MARK: - Titles and metrics (CYLTagButton)
 
-/** `CYLMenuStyle.displayedTitle(forTitle:)`: cut to `maximumTitleLength` with "...", reversed when asked. */
+/**
+ * `CYLMenuStyle.displayedTitle(forTitle:)`: cut to `maximumTitleLength` characters, the last three being "..."
+ * (AndroidTagView's tag_max_length: 23 gives "Welcome to use Andro..."), reversed when asked.
+ */
 function displayedTitle(style, title) {
   let text = title == null ? '' : String(title);
   const max = style.maximumTitleLength;
   if (max > 0 && text.length > max) {
     // NSString lengths are UTF-16 units; a cut never splits a composed character (a surrogate pair).
-    let end = max;
-    const code = text.charCodeAt(end - 1);
+    let end = Math.max(0, max - 3);
+    const code = end > 0 ? text.charCodeAt(end - 1) : 0;
     if (code >= 0xD800 && code <= 0xDBFF) end += 1;
     text = `${text.slice(0, end)}...`;
   }
@@ -582,7 +587,18 @@ function renderTag(tag, index, context) {
   const title = displayedTitle(style, tag.title);
   // The spacing only between an icon and a title.
   const iconMargin = title.length > 0 ? `margin-right: ${px(spacing)}` : '';
-  if (image) {
+  if (image && style.imageFillsTagHeight) {
+    // `CYLMenuStyle.imageFillsTagHeight`: a circle as tall as the tag at its leading edge (after a leading delete
+    // indicator), reaching over the insets; the title follows it.
+    const deleteFirst = !!deleteIndicator && leading;
+    icon = {
+      image,
+      mode: 'aspectFill',
+      style: `width: ${px(height)}; height: ${px(height)}; border-radius: ${px(height / 2)}; `
+        + `margin: -${px(insets.top)} ${title.length > 0 ? px(spacing) : '0'} -${px(insets.bottom)} `
+        + `${deleteFirst ? '0' : `-${px(insets.left)}`}`,
+    };
+  } else if (image) {
     const imageRadius = style.imageCornerRadius > 0 ? Math.min(style.imageCornerRadius, imageSize / 2) : 0;
     icon = {
       image,
@@ -617,7 +633,9 @@ function renderTag(tag, index, context) {
   };
 }
 
-const ROW_ALIGNMENT = { leading: 'flex-start', center: 'center', trailing: 'flex-end' };
+// Trailing, as AndroidTagView's container_gravity="right" (and iOS since 1d1f7904): each row's first tag at the trailing
+// edge, the next ones before it, so the rows run reversed from the trailing edge.
+const ROW_ALIGNMENT = { leading: 'flex-start', center: 'center', trailing: 'flex-start; flex-direction: row-reverse' };
 
 /** The list's own render data: the background, the container border, the section insets and spacing, the header. */
 function renderList(listStyle, options = {}) {
