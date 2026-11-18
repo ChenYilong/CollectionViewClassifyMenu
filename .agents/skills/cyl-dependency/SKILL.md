@@ -44,7 +44,8 @@ The script fetches only the tip of every branch (`git fetch --depth=1 '+refs/hea
    `Example-Shared/PAGResources/pag-resources.json`, the animation and image resources of the examples, its rules
    referred to in `AGENTS.md`.
 3. Replace the hash in every Podfile (`Example/Podfile`, `Example-Swift/Podfile`) and update the copied files in
-   the same commit; run `--check`.
+   the same commit, and the `ref:` of `flutter_cyltabbar` in `flutter/cyl_tag_list/example/pubspec.yaml`; run
+   `--check`.
 4. Build and test the examples (`scripts/unit-tests.sh example`, `scripts/unit-tests.sh swift`) and look at the
    screenshots: a new CYLTabBarController commit can change the tab bars (for example, it cuts long titles next to
    the plus button).

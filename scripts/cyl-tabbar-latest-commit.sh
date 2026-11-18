@@ -33,5 +33,11 @@ if [ "${1:-}" = "--check" ]; then
       STATUS=1
     fi
   done
+  # [EN] The Flutter example's flutter_cyltabbar (a git dependency at the same commit). [CN] Flutter 示例的 flutter_cyltabbar（同一提交的 git 依赖）。
+  PUBSPEC="$ROOT/flutter/cyl_tag_list/example/pubspec.yaml"
+  if [ -f "$PUBSPEC" ] && grep -q "flutter_cyltabbar:" "$PUBSPEC" && ! grep -q "ref: $SHA" "$PUBSPEC"; then
+    echo "warning: ${PUBSPEC#"$ROOT"/} does not pin flutter_cyltabbar at $SHA"
+    STATUS=1
+  fi
   exit "$STATUS"
 fi
