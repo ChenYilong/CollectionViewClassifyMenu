@@ -4,6 +4,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
  * containers, each with the attributes of the sample's XML, and "add tag". The library draws and lays out everything;
  * this screen passes the data, the attribute values, and handles the taps.
  */
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import {
   CYLColor, CYLEdgeInsets, CYLIndexPath, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance, CYLTagColorTheme,
@@ -16,12 +17,22 @@ import { CYLSampleButton, SYSTEM_GRAY, SYSTEM_TEAL, cylFormat, cylToast } from '
 export class CYLTagContainerSampleData {
   static readonly list1: string[] = ['Java', 'C++', 'Python', 'Swift',
     '你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。', 'PHP', 'JavaScript', 'Html',
-    'Welcome to use AndroidTagView!'];
+    CYLTagContainerSampleData.welcomeTitle()];
   static readonly list2: string[] = ['China', 'USA', 'Austria', 'Japan', 'Sudan', 'Spain', 'UK', 'Germany', 'Niger',
     'Poland', 'Norway', 'Uruguay', 'Brazil'];
   static readonly list3: string[] = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام'];
   static readonly list4: string[] = ['Adele', 'Whitney Houston'];
   static readonly list5: string[] = ['Custom Red Color', 'Custom Blue Color'];
+
+  /**
+   * The last tag of list1: the running system, as the iOS sample ("Welcome to use iOS 27.2 CollectionViewClassifyMenu"),
+   * e.g. "Welcome to use HarmonyOS 6.0.0 CollectionViewClassifyMenu".
+   */
+  static welcomeTitle(): string {
+    const name = deviceInfo.distributionOSName || 'HarmonyOS';
+    const version = deviceInfo.distributionOSVersion || deviceInfo.displayVersion;
+    return `Welcome to use ${name} ${version} CollectionViewClassifyMenu`;
+  }
 
   /** {backgroundColor, tagBorderColor, tagTextColor, tagSelectedBackgroundColor} of list5. */
   static colors5(): CYLTagColors[] {

@@ -1025,6 +1025,20 @@ tags: [issues, ui, cocoapods, progress]
   `testTagContainerSample` checks the title, its cut form and that no tag names Android; affected Example tests pass
   (39). Screenshot: [ios-welcome-tag-os-version.png](assets/ios-welcome-tag-os-version.png). Score 70 / 100 until the
   Windows session reports Android, HarmonyOS and the mini program (−30).
+- Result, Android, HarmonyOS and the mini program (Windows session, 2026-11-19): **score 100 / 100.**
+  - Android `LujunTagContainerFragment.kt` and the vendored upstream sample `MainActivity.kt`: "Welcome to use Android
+    ${Build.VERSION.RELEASE} CollectionViewClassifyMenu". The emulator shows "Welcome to use Android 17 CollectionView…".
+    It is cut by the line width, not at 23 characters: Android's tag_max_length default is 0 since `c7101dca` (a long tag
+    starts a new line instead of being shortened). iOS, HarmonyOS and the mini program still cut that container at 23.
+    That difference is older than this task.
+  - HarmonyOS `CYLTagContainerSampleData.welcomeTitle()`: `deviceInfo.distributionOSName` + `distributionOSVersion`,
+    e.g. "Welcome to use HarmonyOS 6.0.0 CollectionViewClassifyMenu", shown cut as "Welcome to use Harmo...". Build OK.
+  - Mini program `sample-tag-container/data.js` `welcomeTitle()`: `system` of `wx.getDeviceInfo()` ("iOS 17.0",
+    "Android 14"); "Node" in node tests. New test with a fake `wx`; `npm test` 148 pass. WeChat DevTools simulates an iOS
+    device: "Welcome to use iOS 1...".
+  - The library comments and the unit tests that feed the old string to the truncation rule stay, as decided.
+
+  <img src="assets/welcome-tag-os-version-other-platforms.png" width="400" alt="Welcome tag with the running system on Android, HarmonyOS and the mini program">
 
 ### TODO (2026-11-19, `feat/harmony`): project-wide localization audit; rewrite b8c95591's message (owner's OK)
 
