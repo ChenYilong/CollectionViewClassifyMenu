@@ -281,7 +281,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `d8f47b4d`) changes iOS `CYLTabBarController.m`, Flutter and docs only (no Android, mini program or HarmonyOS
   source; `harmony/cylanimateditem` unchanged), so the Android results at `70064275` stand; mini program `npm test`
   143 / 143.
-- **DONE (bug, 2026-11-18, Android, fixed in CYLTabBarController `8d81583c` / `4f73209c`, pins at `4f73209c`; see `issue-progress.md`; evidence `docs/assets/android-pag-lottie-fixed-8d81583c.png`, `docs/assets/android-gif-rive-home-fixed-4f73209c.png`; open: Rive Menu toggles only once on x86_64): PAG, GIF and Rive Home do not play** (user report, verbatim: "rive （home title）
+- **DONE (bug, 2026-11-18, Android, fixed in CYLTabBarController `8d81583c` / `4f73209c`, pins at `4f73209c`; see `issue-progress.md`; evidence `docs/assets/android-pag-lottie-fixed-8d81583c.png`, `docs/assets/android-gif-rive-home-fixed-4f73209c.png`; Rive Menu loops at `776b4635`, `docs/assets/android-rive-menu-loops-776b4635.png`, pins at `776b4635`): PAG, GIF and Rive Home do not play** (user report, verbatim: "rive （home title）
   pag  gif动画 播放异常，无法播放"). Emulator-5556 (API 37, x86_64, host GPU), Animations page, Play all with Loop on;
   tags found by their labels (uiautomator), changed pixels per 0.6 s frame pair:
   - **PAG:** Home, Health, Me, Animation 1 and Animation 2 change 0 pixels. Posts changes 406 in the first pairs, then
