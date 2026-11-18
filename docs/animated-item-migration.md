@@ -281,6 +281,27 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `d8f47b4d`) changes iOS `CYLTabBarController.m`, Flutter and docs only (no Android, mini program or HarmonyOS
   source; `harmony/cylanimateditem` unchanged), so the Android results at `70064275` stand; mini program `npm test`
   143 / 143.
+- **Mini program, Android and HarmonyOS module at `0505042f` (2026-11-18, `feat/harmony`)**: the user asked every
+  session to check the Rive tint changes in CYLTabBarController `396d3fca` (`0dc6d1c4` item appearance, `d899816b`
+  FlatDesign Rive tint, `00ed70e6` badge and tint follow a swapped view); `0505042f` adds docs only. On our platforms:
+  the mini program's cyl-animated-item gains `titleFontWeight`, `titleDarkColor`, `userInterfaceStyle` and a theme
+  listener (no Rive tint change; the example sets none of them), re-vendored, `npm test` 145 / 145. Android
+  `cylanimateditem` gains `darkTint` and `viewModelInstance` / `darkViewModelInstance`, which only act in night mode
+  or when a dark instance is named. The example sets none of them, so light mode is unchanged. Android library tests
+  86 / 86. Emulator-5556: at rest 0 changed pixels in all 11 Rive tags; Loop on, every tag moves (Menu 294-472,
+  Done 116-338, Button 0-239 per pair). The Rive rows match the `f84c1073` capture except Done's rest angle, which
+  varied between launches before (see the TODO below). HarmonyOS: `harmony/cylanimateditem` re-vendored
+  (`CYLAnimatedItemView.ets`: B23 restart handler; our tags replay through `onPlayer`, so no change for them),
+  `assembleHap` builds; the x86_64 emulator cannot run the HAP (arm64-only Rive / PAG libraries, row 17). iOS pins:
+  Mac session (`0c198879`).
+- **TODO (bug, 2026-11-18, Android at `396d3fca`): Rive Done and Menu do not always rest on the same frame.** Four
+  launches of the same build, Animations page: three rest on the same frames, and in one Menu rests on its X (440
+  changed px) and Done's arc is further along (31 px). Earlier rest captures (`dab6d91d`, `ad3dca0e`, `f84c1073`)
+  also differ in Done's angle (20-273 px). Every other Rive tag rests the same way, and Play / loop still work. Likely
+  cause, upstream `CYLRiveTabBarItemAnimationView`: the file plays for a moment after load and is paused about 100 ms
+  later, so the rest frame depends on timing. It should seek to the first frame (or settle the state machine's
+  initial state) before pausing. The fix belongs in CYLTabBarController (reported to its Mac session). Evidence:
+  `docs/assets/android-rive-rest-frame-varies-396d3fca.png`.
 - **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
   `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
   tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still
