@@ -500,3 +500,15 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   selection fixes. Moved: `android/merged/gradle.properties`, the mini program fetch script, test and vendored `COMMIT`
   files (`node scripts/fetch-cyltabbar.js --check` OK), `harmony/cylanimateditem` (README and the re-vendored
   `CYLAnimatedItemView.ets`). iOS pins (eight files, and the React Native fetch script tied to its Podfile): Mac session.
+
+## TODO (2026-11-19, `feat/harmony`): iOS pins from 776b4635 to CYLTabBarController b376c278
+
+- **Request (from winCollectionViewClassifyMenu 文件夹, verbatim, pin part)**: "Pins: Android, the mini program and
+  harmony/cylanimateditem are now at CYLTabBarController b376c278ef13db0a03e433de35aa191fe151ba94, the newest commit.
+  Since 776b4635 it adds iOS Swift changes (CYLTabBar+CYLImplementation.swift and CYLTabBarController+CYLInteraction.swift,
+  from 5316873e "select the tab when a late touch loses its location") plus docs. Please move the eight iOS pin files and
+  react-native/react-native-cyl-tag-list/scripts/fetch-cyltabbar.sh (tied to its Podfile) there."
+- **Plan**: `b376c278` is the newest commit on every branch; on iOS it changes `CYLTabBarItemAnimationEngine.m`,
+  `CYLTabBar+CYLImplementation.swift`, `CYLTabBarController+CYLInteraction.swift` and
+  `UIControl+CYLTabBarControllerExtention.swift`. Move the eight pin files (`fetch-cyltabbar.sh` is one of them),
+  `pod install` x 4, build the Swift package, run the menu, tag, example and swift suites.
