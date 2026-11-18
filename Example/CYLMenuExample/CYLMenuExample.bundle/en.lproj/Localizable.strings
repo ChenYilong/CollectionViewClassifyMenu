@@ -298,3 +298,8 @@
 "当前顺序：%@" = "Order: %@";
 "拖拽排序（长按标签后拖动）" = "Drag to reorder (press and hold a tag, then drag)";
 "拖拽标签重新排序" = "Drag tags to reorder them";
+
+/* About the ported Android samples (CYLAndroidSamplesAboutViewController) */
+"关于" = "About";
+"关于：三个 Android 标签库的来源与许可" = "About: the three Android tag libraries, sources and licenses";
+"本页的三个示例是三个 Android 标签库的 Swift 复刻，用的都是本库的 iOS 核心（CYLTagListView、CYLImageTagGroupView）。\n\n• 标签云：kaedea/android-tagview（b546a5f），Apache License 2.0。Copyright (c) kaedea.\n\n• 标签容器：whilu/AndroidTagView（75a3bba），Apache License 2.0。Copyright 2015 lujun.\n\n• 图片标签：shellljx/TagViewGroup（befcd9b）的公开 API，重新实现，未复制代码（原项目为 GPL-3.0）。\n\nAndroid 版把这三个库合并为一个 Kotlin 库（android/merged/library），每个示例一个 Tab。" = "The three samples on this page are Swift ports of three Android tag libraries, built on this library's iOS core (CYLTagListView, CYLImageTagGroupView).\n\n• Tag cloud: kaedea/android-tagview (b546a5f), Apache License 2.0. Copyright (c) kaedea.\n\n• Tag container: whilu/AndroidTagView (75a3bba), Apache License 2.0. Copyright 2015 lujun.\n\n• Image tags: the public API of shellljx/TagViewGroup (befcd9b), reimplemented; no code copied (the original is GPL-3.0).\n\nOn Android the three libraries are merged into one Kotlin library (android/merged/library), one tab per sample.";
