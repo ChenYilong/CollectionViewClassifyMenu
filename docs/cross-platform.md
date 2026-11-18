@@ -800,3 +800,19 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   pixel scan: 2127 px before, 2208 px after):
 
   <img src="assets/flutter-android-tabbar-height.png" width="400" alt="Tab bar height on Android: Material 3 NavigationBar 80 dp vs CYLTabBar 49 dp">
+- **Blocked (2026-11-19):** waiting for CYLTabBarController. Its session queued the height change after its Swift
+  migration and asked to keep every pin at `b376c278` until it sends the commit.
+
+## TODO (2026-11-19, `feat/harmony`): every TODO below 100 to 100; Mini Program CI red since `a4517a3c`
+
+- **Context:** relayed by the "Mac-CYLSearchViewController文件夹" session to every session active today. A sweep of
+  docs/ on this branch found: (1) the Mini Program CI fails on every commit since `a4517a3c` with "Out of date (run
+  scripts/export-miniprogram-data.py): strings.js": the iOS drag-to-reorder demo added example strings that the
+  generated `miniprogram/data/strings.js` did not get; (2) stale TODO notes in `rive.md` and `component-architecture.md`
+  that later work already closed; (3) `android-api.md` 791 / 792: the row `CYLTagButton (CYLCollectionCellStyle)` has no
+  counterpart in `android/merged/api-map.json` (its method row does: `CYLTagButton.cylApply`).
+- **Requirements:** regenerate `strings.js` and turn the Mini Program CI green; mark the closed notes DONE with their
+  evidence; hand the Android row to the session that owns `android/` (Windows); write down what is blocked and why.
+- **Prompt (verbatim):** "向所有今天还在活跃session…继续完成TODO 完成评分不到100的任务，一直到满分为止"
+- **Prompt (English):** "To every session still active today: continue the TODOs; finish every task whose score is below
+  100, until it reaches full marks."
