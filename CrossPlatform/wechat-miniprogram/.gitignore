@@ -5,3 +5,4 @@ project.private.config.json
 miniprogram/cyl_components/
 miniprogram/engines/cyl-pag-miniprogram/
 miniprogram/engines/pag/
+miniprogram/engines/cyl-svga-miniprogram/

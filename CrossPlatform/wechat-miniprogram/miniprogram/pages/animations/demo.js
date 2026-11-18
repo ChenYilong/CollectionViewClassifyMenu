@@ -8,7 +8,7 @@ const SPEED_RANGE = [0.25, 4];
 const SPEED_STEP = 0.25;
 
 /** Section identifiers, one per library, in order. */
-const SECTION_IDENTIFIERS = ['lottie', 'lottie-images', 'lottie-green', 'pag', 'rive', 'rive-icons', 'gif', 'images'];
+const SECTION_IDENTIFIERS = ['lottie', 'lottie-images', 'lottie-green', 'pag', 'rive', 'rive-icons', 'svga', 'svga-dark', 'gif', 'images'];
 
 /** A file of CYLMenuExample.bundle/Animations (copied from CYLTabBarController's examples). */
 function animation(path) {
@@ -66,12 +66,13 @@ function configuration(t = (s) => s) {
     rive('卡车', 'truck', { legacy: '1' })] });
   // icons.riv, as on CYLTabBarController's dark Rive tab bar: its artboards are white strokes, so this section's tags
   // are dark (the section's style, over the list's style).
+  const darkTags = {
+    normal: { backgroundColor: '#17203A', textColor: '#FFFFFF', borderColor: '#17203A' },
+    selected: { backgroundColor: '#3A4E8C', textColor: '#FFFFFF', borderColor: '#6792FF' },
+  };
   sections.push({
     title: t('Rive · icons.riv（深色标签）'),
-    style: {
-      normal: { backgroundColor: '#17203A', textColor: '#FFFFFF', borderColor: '#17203A' },
-      selected: { backgroundColor: '#3A4E8C', textColor: '#FFFFFF', borderColor: '#6792FF' },
-    },
+    style: darkTags,
     items: [
       rive('聊天', 'icons', { artboard: 'CHAT', stateMachine: 'CHAT_Interactivity', input: 'active' }),
       rive('搜索', 'icons', { artboard: 'SEARCH', stateMachine: 'SEARCH_Interactivity', input: 'active' }),
@@ -79,6 +80,17 @@ function configuration(t = (s) => s) {
       rive('提醒', 'icons', { artboard: 'BELL', stateMachine: 'BELL_Interactivity', input: 'active' }),
       rive('我的', 'icons', { artboard: 'USER', stateMachine: 'USER_Interactivity', input: 'active' })],
   });
+  // SVGA wherever Rive is shown (docs/example-demo-rules.md): CYLTabBarController's SVGA tab icons, as on iOS and
+  // Android, played by its cyl-svga; the second section on the dark tags of icons.riv.
+  sections.push({ title: "SVGA · pod 'CYLTabBarController/SVGA'", items: [
+    item('首页', animation('SVGA/tab_home.svga')),
+    item('搜索', animation('SVGA/tab_search.svga')),
+    item('消息', animation('SVGA/tab_chat.svga')),
+    item('我的', animation('SVGA/tab_profile.svga'))] });
+  sections.push({ title: t('SVGA · 深色标签'), style: darkTags, items: [
+    item('动态', animation('SVGA/tab_activity.svga')),
+    item('列表', animation('SVGA/tab_list.svga')),
+    item('首页', animation('SVGA/tab_home.svga'))] });
   sections.push({ title: "GIF · pod 'CYLTabBarController/GIF'", items: [
     item('火焰', animation('GIF/tab_fire.gif')),
     item('火箭', animation('GIF/tab_rocket.gif')),

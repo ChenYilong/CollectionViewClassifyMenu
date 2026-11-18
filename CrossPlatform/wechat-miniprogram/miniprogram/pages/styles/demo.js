@@ -12,7 +12,7 @@ const ACTION_IDENTIFIERS = [
     'imageTitleSpacing', 'imageSize', 'imageInsets', 'titlePositionAdjustment', 'imagePositionAdjustment',
     'content.iconAndTitle', 'content.iconOnly', 'content.titleOnly', 'layoutCentered', 'selectedImage'],
   ['backgroundColor.normal', 'backgroundColor.selected', 'borderColor', 'borderWidth', 'cornerRadius', 'margin'],
-  ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.gif', 'animation.off', 'animationSpeed', 'configuration', 'tagCloud'],
+  ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.svga', 'animation.gif', 'animation.off', 'animationSpeed', 'configuration', 'tagCloud'],
   ['sample.tagCloud', 'sample.imageTag', 'sample.tagContainer'],
   ['reset'],
 ];
@@ -51,6 +51,7 @@ const ACTION_TITLES = {
   'animation.lottie': 'Lottie 动效图标',
   'animation.pag': 'PAG 动效图标',
   'animation.rive': 'Rive 动效图标',
+  'animation.svga': 'SVGA 动效图标',
   'animation.gif': 'GIF 动效图标',
   'animation.off': '关闭动效（静态图标）',
   animationSpeed: '设置动效速度 animationSpeed',
@@ -114,12 +115,13 @@ const SAMPLES = [
   ['已禁用', 'nosign', 'nosign'],
 ];
 
-/** The demo's animated icons, from CYLTabBarController's examples (Lottie, GIF, Rive) and libpag/pag-ios (PAG). */
+/** The demo's animated icons, from CYLTabBarController's examples (Lottie, GIF, Rive, SVGA) and libpag/pag-ios (PAG). */
 const ANIMATION_FILES = {
   lottie: ['CYLMenuExample.bundle/Animations/Lottie/tab_home_animate.json', 'CYLMenuExample.bundle/Animations/Lottie/tab_me_animate.json'],
   gif: ['CYLMenuExample.bundle/Animations/GIF/tab_star.gif', 'CYLMenuExample.bundle/Animations/GIF/cyl_tab_sample_animated.gif'],
   pag: ['pag-ios/0.pag', 'pag-ios/1.pag'],
   rive: ['CYLMenuExample.bundle/Animations/Rive/house.riv', 'CYLMenuExample.bundle/Animations/Rive/menu_button.riv'],
+  svga: ['CYLMenuExample.bundle/Animations/SVGA/tab_home.svga', 'CYLMenuExample.bundle/Animations/SVGA/tab_profile.svga'],
 };
 
 function createState() {
@@ -228,6 +230,7 @@ function performAction(state, identifier) {
     case 'animation.lottie':
     case 'animation.pag':
     case 'animation.rive':
+    case 'animation.svga':
     case 'animation.gif':
     case 'animation.off': {
       const library = identifier.slice('animation.'.length);

@@ -10,4 +10,8 @@
   <cyl-pag wx:elif="{{engine === 'pag'}}" id="pag" class="cyl-engine" path="{{pagPath}}" autoplay="{{false}}" loop="{{loop}}"
            speed="{{speed > 0 ? speed : 1}}" resting-frame="{{restingFrame}}" wasm-path="{{pagWasmPath}}"
            bind:ready="onEngineReady" bind:error="onEngineError" />
+  <!-- cyl-svga: the "engines" subpackage too. -->
+  <cyl-svga wx:elif="{{engine === 'svga'}}" id="svga" class="cyl-engine" path="{{svgaPath}}" autoplay="{{false}}" loop="{{loop}}"
+            speed="{{speed > 0 ? speed : 1}}" resting-frame="{{restingFrame}}"
+            bind:ready="onEngineReady" bind:error="onEngineError" />
 </view>

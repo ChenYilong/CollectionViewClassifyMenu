@@ -589,7 +589,7 @@ tags: [issues, ui, cocoapods, progress]
   the HarmonyOS fold controls (`CYLTagListView.content`) still lay a stacked placement out in a row; Android's
   `CYLTagButton` has no `intrinsicContentSize` (it measures itself in `onMeasure`).
 
-### TODO (2026-11-16): SVGA animated icons (CYLTabBarController added SVGA)
+### DONE (2026-11-16 → 2026-11-19): SVGA animated icons (CYLTabBarController added SVGA)
 
 - **Prompt (verbatim):** "找到本项目相关文档，加入TODO：cyltabbar 现已增加svga动效，更新core代码以支持该动效，要求example层一比一复刻rive相关演示。只要rive有的演示场景 svga也要有。"
   (EN: CYLTabBarController now has SVGA animations. Update the core to support them; in the examples, mirror the
@@ -612,7 +612,8 @@ tags: [issues, ui, cocoapods, progress]
   - tests (`CYLAnimatedIconTests`, `CYLTagStyleDemoTests`, `CYLReviewFilterScenarioTests`) cover SVGA as they cover
     Rive;
   - then the same on every platform's example (`example-demo-rules.md`), with screenshots (`screenshots.md`).
-- **Status:** TODO (iOS done and verified on CI, other platforms open).
+- **Status:** DONE on every platform, **100/100** (iOS on CI; HarmonyOS, Android, Flutter, React Native and the Mini
+  Program on simulators / emulators, entries below and in `example-demo-rules.md`).
 - **iOS (2026-11-16, `feat/harmony`): done in the iOS example; CI has to confirm it.** The core needed no new API: it gets
   animated icons from CYLTabBarController's `CYLTabBarItemAnimationFactory`, which picks the animator by file extension,
   so `.svga` plays once `pod 'CYLTabBarController/SVGA'` is linked (CYLTabBarController pinned at `cfddcce`, which has
@@ -630,7 +631,8 @@ tags: [issues, ui, cocoapods, progress]
   CI run 43992497583 on `a6cdd69`: all 9 iOS jobs passed; SVGA screenshots in `screenshots.md`
   ("iOS: SVGA animated icons"). Other platforms: HarmonyOS done (D5); Android done (2026-11-19,
   `example-demo-rules.md`, `assets/android-svga-animated-icons.png`); Flutter and React Native done on iOS (Mac session)
-  and Android (2026-11-19, `assets/flutter-rn-android-svga.png`); the Mini Program is still TODO.
+  and Android (2026-11-19, `assets/flutter-rn-android-svga.png`); the Mini Program done (2026-11-19, Windows session,
+  CYLTabBarController's `cyl-svga-miniprogram` in the "engines" subpackage, `assets/miniprogram-devtools-svga.png`).
 
 - TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):
   - Context: the Swift core migration reached 100 (`250507c`). The user asks to continue the unfinished work of this

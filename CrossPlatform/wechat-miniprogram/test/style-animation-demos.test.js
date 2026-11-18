@@ -16,9 +16,12 @@ test('styles: the table has the iOS sections and actions in order, with their lo
   const table = styles.table(styles.createState(), t);
   assert.equal(table.length, 5);
   assert.equal(table[0].header, 'Title and icon (as CYLFlatDesignTabBarItem)');
-  assert.deepEqual(table.map((s) => s.rows.length), [15, 6, 8, 3, 1]);
+  assert.deepEqual(table.map((s) => s.rows.length), [15, 6, 9, 3, 1]);
   assert.equal(table[0].rows[0].title, 'Set iconColor (normal)');
   assert.equal(table[4].rows[0].identifier, 'reset');
+  assert.deepEqual(table[2].rows.slice(0, 5).map((r) => r.identifier),
+    ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.svga', 'animation.gif']);
+  assert.equal(table[2].rows[3].title, 'SVGA animated icons');
   setLanguage('zh-Hans');
 });
 
@@ -104,6 +107,12 @@ test('styles: content, selected images and animations change the preview items; 
   assert.deepEqual(items[1].animationOptions, { stateMachine: 'State Machine', input: 'isOpen', duration: '0' });
   // Rive is linked (CYLTabBarController's cyl-rive): the tags play the exported .riv.bin files.
   assert.equal(animations.resolve(items[0].animation).engine, 'rive');
+  // SVGA (CYLTabBarController's cyl-svga, engines subpackage): the tags play the exported .svga.bin files.
+  styles.performAction(state, 'animation.svga');
+  items = styles.configuration(state, t).sections[0].items;
+  assert.deepEqual(items.slice(0, 2).map((i) => animations.resolve(i.animation).entry.src),
+    ['/engines/svga/tab_home.svga.bin', '/engines/svga/tab_profile.svga.bin']);
+  assert.equal(items[0].animationOptions, undefined);
   styles.performAction(state, 'selectedImage');
   assert.equal(styles.configuration(state, t).sections[0].items[0].selectedImage, undefined);
   state.selection = ['0-2'];
@@ -125,32 +134,36 @@ test('styles: the rows that open another screen navigate to their pages', () => 
   assert.deepEqual(styles.performAction(state, 'sample.tagContainer'), { navigate: '/pages/sample-tag-container/sample-tag-container' });
 });
 
-test('animations: eight sections in the iOS order, single choice, the first tag of each selected', () => {
+test('animations: ten sections in the iOS order, single choice, the first tag of each selected', () => {
   setLanguage('en');
   const configuration = animationDemo.configuration(t);
   assert.deepEqual(configuration.sections.map((s) => s.title), [
     "Lottie · pod 'CYLTabBarController/Lottie'", 'Lottie (image assets and placeholders)', 'Lottie (green theme)',
     "PAG · pod 'CYLTabBarController/PAG'", "Rive · pod 'CYLTabBarController/Rive'", 'Rive · icons.riv (dark tags)',
-    "GIF · pod 'CYLTabBarController/GIF'", 'Static images (CYLTabBarController Example)']);
-  assert.deepEqual(configuration.sections.map((s) => s.items.length), [4, 3, 4, 6, 6, 5, 4, 5]);
+    "SVGA · pod 'CYLTabBarController/SVGA'", 'SVGA · dark tags', "GIF · pod 'CYLTabBarController/GIF'", 'Static images (CYLTabBarController Example)']);
+  assert.deepEqual(configuration.sections.map((s) => s.items.length), [4, 3, 4, 6, 6, 5, 4, 3, 4, 5]);
   assert.deepEqual(configuration.sections[0].items.map((i) => i.title), ['Home', 'Messages', 'Search', 'Me']);
   setLanguage('zh-Hans');
   const m = model.normalize(configuration);
   assert.equal(m.selectionMode, 'single');
   assert.equal(m.allowsEmptySelection, false);
-  assert.deepEqual(m.selectedItems, ['0-0', '1-0', '2-0', '3-0', '4-0', '5-0', '6-0', '7-0']);
+  assert.deepEqual(m.selectedItems, ['0-0', '1-0', '2-0', '3-0', '4-0', '5-0', '6-0', '7-0', '8-0', '9-0']);
   assert.equal(m.style.imageSize, 28);
   assert.equal(m.sections[5].style.normal.backgroundColor, '#17203A');
+  assert.equal(m.sections[7].style.normal.backgroundColor, '#17203A');
   assert.equal(m.sections[3].items[5].animationRestingProgress, 1);
-  // Every Lottie, GIF, Rive and PAG file of the screen resolves (PAG to the engines subpackage).
+  assert.deepEqual(m.sections[6].items.map((i) => animations.resolve(i.animation).entry.src), [
+    '/engines/svga/tab_home.svga.bin', '/engines/svga/tab_search.svga.bin', '/engines/svga/tab_chat.svga.bin',
+    '/engines/svga/tab_profile.svga.bin']);
+  // Every Lottie, GIF, Rive, PAG and SVGA file of the screen resolves (PAG and SVGA to the engines subpackage).
   m.sections.forEach((section) => section.items.forEach((item) => {
     if (!item.animation) return;
     const engine = model.animationEngine(item.animation);
     const resolved = animations.resolve(item.animation);
-    if (['lottie', 'gif', 'rive', 'pag'].includes(engine)) assert.ok(resolved, item.animation);
+    if (['lottie', 'gif', 'rive', 'pag', 'svga'].includes(engine)) assert.ok(resolved, item.animation);
     else assert.equal(resolved, null);
   }));
-  for (const item of m.sections[7].items) {
+  for (const item of m.sections[9].items) {
     for (const image of [item.image, item.selectedImage]) {
       assert.ok(fs.existsSync(path.join(__dirname, '../miniprogram', image)), image);
     }
@@ -189,7 +202,8 @@ test('configuration: the file is read as the core reads it, and the map configur
   assert.equal(animations.resolve(item('Lottie').animation).engine, 'lottie');
   assert.equal(animations.resolve(item('GIF').animation).engine, 'gif');
   assert.equal(animations.resolve(item('PAG').animation).entry.src, '/engines/pag/0.pag.bin');
-  // No SVGA engine in the Mini Program yet: the tag keeps its image.
+  // SVGA plays in CYLTabBarController's cyl-svga (engines subpackage); the image stays as the fallback.
+  assert.equal(animations.resolve(item('SVGA').animation).entry.src, '/engines/svga/tab_search.svga.bin');
   assert.equal(item('SVGA').image, 'system:play.fill');
   assert.equal(configurationDemo.readConfiguration(() => { throw new Error('x'); }).error,
     'No configuration file at CYLMenuExample.bundle/Configurations/animated-tags.json');
@@ -197,7 +211,9 @@ test('configuration: the file is read as the core reads it, and the map configur
   const map = model.normalize(configurationDemo.mapConfiguration(t));
   assert.equal(map.selectionMode, 'multiple');
   assert.deepEqual(map.selectedItems, ['0-1']);
-  assert.equal(map.sections[0].items[4].title, 'Text only');
+  assert.equal(map.sections[0].items[3].title, 'SVGA');
+  assert.equal(animations.resolve(map.sections[0].items[3].animation).entry.src, '/engines/svga/tab_chat.svga.bin');
+  assert.equal(map.sections[0].items[5].title, 'Text only');
   assert.equal(map.style.normal.iconColor, '#5856D6');
   assert.equal(map.style.selected.textColor, '#FFFFFF');
   assert.equal(map.style.normal.cornerRadius, 8);

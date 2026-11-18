@@ -3,9 +3,11 @@
   "usingComponents": {
     "cyl-lottie": "/cyl_components/cyl-lottie-miniprogram/cyl-lottie/index",
     "cyl-rive": "/cyl_components/cyl-rive-miniprogram/cyl-rive/index",
-    "cyl-pag": "/engines/cyl-pag-miniprogram/cyl-pag/index"
+    "cyl-pag": "/engines/cyl-pag-miniprogram/cyl-pag/index",
+    "cyl-svga": "/engines/cyl-svga-miniprogram/cyl-svga/index"
   },
   "componentPlaceholder": {
-    "cyl-pag": "view"
+    "cyl-pag": "view",
+    "cyl-svga": "view"
   }
 }
