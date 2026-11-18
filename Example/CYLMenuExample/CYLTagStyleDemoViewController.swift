@@ -213,7 +213,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
             navigationController?.pushViewController(CYLTagCloudDemoViewController(), animated: true)
             return
         case "sample.reorder":
-            navigationController?.pushViewController(CYLTagReorderDemoViewController(), animated: true)
+            navigationController?.pushViewController(CYLTagContainerSampleViewController(), animated: true)
             return
         case "sample.tagCloud":
             navigationController?.pushViewController(CYLTagCloudSampleViewController(), animated: true)

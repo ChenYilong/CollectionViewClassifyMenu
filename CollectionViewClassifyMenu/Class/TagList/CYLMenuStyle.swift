@@ -63,7 +63,8 @@ import UIKit
      */
     case center
     /**
-     * From the trailing edge.
+     * From the trailing edge: each row's first tag at the trailing edge, the next ones before it (AndroidTagView's
+     * container_gravity="right").
      */
     case trailing
 }
@@ -191,7 +192,8 @@ open class CYLMenuStyle: NSObject, NSCopying {
     // MARK: Titles
 
     /**
-     * Titles longer than this many characters are cut and end with "..." (tag_max_length); 0 (the default) keeps them.
+     * Titles longer than this many characters are cut to this length, the last three being "..." (tag_max_length); 0 (the
+     * default) keeps them.
      */
     open var maximumTitleLength = 0
 
@@ -254,6 +256,12 @@ open class CYLMenuStyle: NSObject, NSCopying {
      * The icon before (default) or after the title, or above (`.top`) or below (`.bottom`) it.
      */
     open var imagePlacement: CYLTagImagePlacement = .leading
+
+    /**
+     * True: a leading image is a circle as tall as the tag, at its leading edge, and the title follows it
+     * (`imageSize`, `imageInsets` and the leading content inset do not apply to it); AndroidTagView's avatar. Default false.
+     */
+    open var imageFillsTagHeight = false
 
     /**
      * For a tag with only an icon or only a title: true (the default) centers it; false keeps it where it would be with
@@ -662,8 +670,10 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open func displayedTitle(forTitle title: String?) -> String {
         var text = title ?? ""
         if maximumTitleLength > 0 && (text as NSString).length > maximumTitleLength {
-            let range = (text as NSString).rangeOfComposedCharacterSequences(for: NSRange(location: 0, length: maximumTitleLength))
-            text = (text as NSString).substring(with: range) + "..."
+            // As AndroidTagView: the first `maximumTitleLength - 3` characters and "...", so the whole title is
+            // `maximumTitleLength` characters long.
+            let kept = NSRange(location: 0, length: max(0, maximumTitleLength - 3))
+            text = (text as NSString).substring(with: (text as NSString).rangeOfComposedCharacterSequences(for: kept)) + "..."
         }
         if reversesTitleCharacters && text.count > 1 {
             text = String(text.reversed())
@@ -714,6 +724,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.titlePositionAdjustment = titlePositionAdjustment
         copy.imagePositionAdjustment = imagePositionAdjustment
         copy.imagePlacement = imagePlacement
+        copy.imageFillsTagHeight = imageFillsTagHeight
         copy.layoutCentered = layoutCentered
         copy.animationSize = animationSize
         copy.animationSpeed = animationSpeed

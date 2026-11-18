@@ -394,6 +394,19 @@ open class CYLTagButton: CYLAnimatedItemView {
     public static func width(forTitle title: String?, iconSize: CGSize, showsDeleteIndicator: Bool = false,
                              style: CYLMenuStyle, traitCollection: UITraitCollection?) -> CGFloat {
         let displayed = style.displayedTitle(forTitle: title)
+        if style.fillsTagHeight(withIconSize: iconSize) {
+            // The image is as wide as the tag is tall, from the leading edge; the title and the indicator follow it.
+            let side = height(forTitle: title, iconSize: .zero, style: style, traitCollection: traitCollection)
+            return states.reduce(0) { width, state in
+                let font = style.titleFont(for: state, traitCollection: traitCollection)
+                let titleWidth = displayed.isEmpty ? 0
+                    : ceil((displayed as NSString).size(withAttributes: [.font: font]).width) + style.imageTitleSpacing
+                let delete = showsDeleteIndicator
+                    ? style.imageTitleSpacing + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
+                    : 0
+                return max(width, ceil(side + titleWidth + delete + style.appearance(for: state).contentInsets.right))
+            }
+        }
         var width: CGFloat = 0
         for state in states {
             let appearance = style.appearance(for: state)
@@ -456,6 +469,8 @@ open class CYLTagButton: CYLAnimatedItemView {
     public static func height(forTitle title: String?, iconSize: CGSize, style: CYLMenuStyle,
                               traitCollection: UITraitCollection?) -> CGFloat {
         let hasTitle = !style.displayedTitle(forTitle: title).isEmpty
+        // An image that fills the tag's height takes the height of the rest.
+        let iconSize = style.fillsTagHeight(withIconSize: iconSize) ? .zero : iconSize
         return states.reduce(style.itemHeight) { height, state in
             let insets = style.appearance(for: state).contentInsets
             let line = hasTitle ? ceil(style.titleFont(for: state, traitCollection: traitCollection).lineHeight) : 0
@@ -609,6 +624,10 @@ open class CYLTagButton: CYLAnimatedItemView {
         let showsImage = animated || imageView.image != nil
         let showsTitle = !(titleLabel.text ?? "").isEmpty
         let iconSize = animated ? animationSize : Self.iconSize(for: imageView.image, style: style)
+        if showsImage && style.fillsTagHeight(withIconSize: iconSize) {
+            layOutTagHeightImage(showsTitle: showsTitle, margin: margin, trailing: trailing, insets: insets)
+            return
+        }
         let spacing = showsImage && showsTitle ? style.imageTitleSpacing : 0
 
         let available = max(0, width - 2 * margin - (showsImage ? iconSize.width + spacing : 0))
@@ -738,6 +757,39 @@ open class CYLTagButton: CYLAnimatedItemView {
     /**
      * Bounds and center instead of frame, so that a transform (the fold chevron's 180° turn) is kept.
      */
+    /**
+     * `CYLMenuStyle.imageFillsTagHeight`: the image (or animated icon) a circle as tall as the tag at its leading edge,
+     * the title after it, from the leading margin; the delete indicator is already in place.
+     */
+    private func layOutTagHeightImage(showsTitle: Bool, margin: CGFloat, trailing: CGFloat, insets: UIEdgeInsets) {
+        let style = styleStorage
+        let height = bounds.height
+        let indicatorFirst = margin > insets.left
+        let imageX = indicatorFirst ? margin - insets.left : 0
+        let frame = CGRect(x: imageX, y: 0, width: height, height: height)
+        animationView?.frame = frame
+        placeImageView(frame)
+        imageView.layer.cornerRadius = height / 2
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        layOutBadge(anchor: frame)
+        if showsTitle {
+            let x = frame.maxX + style.imageTitleSpacing
+            let size = titleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: height))
+            let titleHeight = min(height, ceil(size.height))
+            let contentHeight = max(0, height - insets.top - insets.bottom)
+            titleLabel.frame = CGRect(
+                x: x + style.titlePositionAdjustment.horizontal,
+                y: Self.centeredY(titleHeight, contentTop: insets.top, contentHeight: contentHeight, height: height)
+                    + style.titlePositionAdjustment.vertical,
+                width: min(ceil(size.width), max(0, bounds.width - trailing - x)), height: titleHeight)
+        } else {
+            titleLabel.frame = .zero
+        }
+        let radius = style.appearance(for: currentState).cornerRadius
+        layer.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : min(radius, height / 2)) : height / 2
+    }
+
     private func placeImageView(_ frame: CGRect) {
         imageView.bounds = CGRect(origin: .zero, size: frame.size)
         imageView.center = CGPoint(x: frame.midX, y: frame.midY)
@@ -870,11 +922,14 @@ open class CYLTagButton: CYLAnimatedItemView {
         crossLayer.lineWidth = style.deleteIndicatorLineWidth
         crossLayer.strokeColor = (style.deleteIndicatorColor ?? appearance.textColor)?.cgColor
         let imageRadius = style.imageCornerRadius
-        imageView.layer.cornerRadius = imageRadius > 0
-            ? min(imageRadius, min(style.imageSize.width, style.imageSize.height) / 2) : 0
-        imageView.layer.masksToBounds = imageRadius > 0
-        if imageRadius > 0 {
-            imageView.contentMode = .scaleAspectFill
+        if !style.imageFillsTagHeight {
+            // (An image that fills the tag's height is a circle: layOutTagHeightImage rounds it.)
+            imageView.layer.cornerRadius = imageRadius > 0
+                ? min(imageRadius, min(style.imageSize.width, style.imageSize.height) / 2) : 0
+            imageView.layer.masksToBounds = imageRadius > 0
+            if imageRadius > 0 {
+                imageView.contentMode = .scaleAspectFill
+            }
         }
         deleteIndicatorLabel.font = style.deleteIndicatorFont(for: state, traitCollection: traitCollection)
         deleteIndicatorLabel.textColor = style.deleteIndicatorColor ?? appearance.textColor
@@ -907,5 +962,15 @@ extension CYLTagImagePlacement {
      */
     var cylIsVertical: Bool {
         self == .top || self == .bottom
+    }
+}
+
+extension CYLMenuStyle {
+
+    /**
+     * Whether an icon of this size is drawn by `imageFillsTagHeight` (a leading icon beside the title).
+     */
+    func fillsTagHeight(withIconSize iconSize: CGSize) -> Bool {
+        imageFillsTagHeight && imagePlacement == .leading && iconSize != .zero
     }
 }

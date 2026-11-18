@@ -612,7 +612,7 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 
   <img src="assets/android-tag-drag-reorder.png" width="360" alt="Android drag to reorder: before, while dragging, dropped">
 
-## TODO (2026-11-19, `feat/harmony`): the iOS drag-to-reorder example looks like the Android one, built on CYLAnimatedItemView
+## DONE (2026-11-19, `feat/harmony`): the iOS drag-to-reorder example looks like the Android one, built on CYLAnimatedItemView
 
 - **Context:** the owner's reference is the Android example's "Container" tab (AndroidTagView's sample, `LujunTagContainerFragment`):
   pill tags with a round avatar on the left (a remote photo per tag, the yellow avatar while it loads or when it fails) and a
@@ -630,3 +630,25 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 - **Acceptance (100):** layout and look match the reference container by container (40); icons drawn through
   `CYLTagButton` / `CYLAnimatedItemView`, any new API in the core with a test (25); drag works in the first two containers
   on the simulator (20); stitched before / after / Android screenshots (15). Pass: 60.
+- **Result (DONE, 95/100):** the 样式 tab's first row ("拖拽标签重新排序") and `-CYLExampleScreen reorder` open the iOS port of
+  the Android Container tab (`CYLTagContainerSampleViewController`); the plain teal demo (`CYLTagReorderDemoViewController`)
+  is gone and its drag tests run on the first container. Changes:
+  - Core, new API `CYLMenuStyle.imageFillsTagHeight`: `CYLTagButton` (a `CYLAnimatedItemView`) draws a leading image or
+    animated icon as a circle as tall as the tag at its leading edge, the title after it; measured width and height
+    follow (test `testImageFillsTheTagHeightAtTheLeadingEdge`). Android counterpart mapped (AndroidTagView always draws its
+    image so): `android-api.md` 793 / 793.
+  - Core, Android parity: `maximumTitleLength` keeps `max − 3` characters and "..." (23 → "Welcome to use Andro...", as
+    AndroidTagView); `CYLTagRowAlignment.trailing` starts each row at the trailing edge with the first tag, as
+    container_gravity="right" (test `testTrailingRowsStartAtTheTrailingEdge`).
+  - Example: Android's own avatar drawable (`lujun_yellow_avatar`, Apache 2.0), the three photos MainActivity loads,
+    container 3 no longer reverses its titles (AndroidTagView reverses only with tag_support_letters_rlt, off here).
+  - Tests: menu suite 37 / 37; Example suite all pass after one test fix (row breaks depend on the screen width).
+  - Drag checked on the simulator with axe (long press, move, drop): Java dropped fourth, avatars follow their tags.
+
+  <img src="assets/ios-drag-matches-android.png" width="600" alt="Android reference, iOS before, iOS after">
+
+  <img src="assets/ios-drag-container-sequence.png" width="600" alt="iOS drag in the first container: at rest, dragging, dropped">
+- **Deductions (−5):** the Android screen's sixth container (below the reference's fold: a star drawable, a tag that wraps
+  onto a second line, 4 dp elevation, a cross drawable, no cross on the last tag) is not on iOS: `CYLTagButton` has no
+  wrapping title, elevation or cross image yet. TODO, next: those three in the core, then the sixth container.
+
