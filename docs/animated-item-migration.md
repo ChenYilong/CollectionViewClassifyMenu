@@ -383,3 +383,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Plan**: where the tab bar is taller than wide (UIKit's floating bar), assert it is visible in the window and that a
   tab can be selected, instead of "at the bottom" and "tags end above the bar"; keep the bottom checks for a horizontal
   bar. Run the test on iPhone 17 Pro and iPhone Duo.
+- **DONE (2026-11-18)**: where the tab bar is taller than wide, the test asserts it is visible in the window (tab
+  selection was already checked: the 八卦 tab switches the page); a horizontal bar keeps the bottom and "tags above the
+  bar" checks. Example suite 92 / 0 on iPhone Duo `B7499C73` (iOS 27.2, the device that failed before) and 92 / 0 on
+  iPhone 17 Pro `62B54974` (iOS 27.2), Xcode 27.2, macOS 27.3. This closes the iPhone Duo bug above.
