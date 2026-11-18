@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 791 / 792 with an Android counterpart = 99.9 / 100.** Full marks when no row is `TODO`; 0
+**Score: 792 / 792 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -44,7 +44,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `UIButton (CYLCollectionCellStyle)` | category, `UIButton+CYLCollectionCellStyle.swift` | `extension functions on TextView` |
 | `UIButton (CYLCollectionCellStyle) -cylApply:` | method, `UIButton+CYLCollectionCellStyle.swift` | `TextView.cyl_generalStyle / cyl_homeStyle / cyl_redStyle / cyl_chengNiStyle` |
 | `UIButton (CYLCollectionCellStyle) +cylImageWithFilledWith:` | method, `UIButton+CYLCollectionCellStyle.swift` | `android.graphics.drawable.ColorDrawable(color) (the styles use state-list colors)` |
-| `CYLTagButton (CYLCollectionCellStyle)` | category, `UIButton+CYLCollectionCellStyle.swift` | TODO |
+| `CYLTagButton (CYLCollectionCellStyle)` | category, `UIButton+CYLCollectionCellStyle.swift` | `extension function on CYLTagButton (CYLGeneralExtensions.kt)` |
 | `CYLTagButton (CYLCollectionCellStyle) -cylApply:` | method, `UIButton+CYLCollectionCellStyle.swift` | `CYLTagButton.cylApply` |
 | `CYLCollectionViewCell` | class, `CYLCollectionViewCell.swift` | `com.cyl.classifymenu.CYLCollectionViewCell` |
 | `CYLCollectionViewCell.button` | property, `CYLCollectionViewCell.swift` | `CYLCollectionViewCell.button` |
