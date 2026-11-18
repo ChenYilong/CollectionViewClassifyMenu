@@ -82,8 +82,8 @@ Android chapter.
 ### Status
 
 - [x] Step 1: folders (`android/android-tagview`, `android/TagViewGroup`, `android/AndroidTagView`; `merged` next)
-- [x] Step 2 (2026-11-12): Kotlin transcriptions of android-tagview (`13ba988`) and AndroidTagView (`643ba99`),
-  the TagViewGroup API reimplementation (`b510e7d`). Each folder builds its sample (`assembleDebug`); the three
+- [x] Step 2 (2026-11-12): Kotlin transcriptions of android-tagview (`13ba988`) and AndroidTagView (`fe94752`),
+  the TagViewGroup API reimplementation (`d5972f7`). Each folder builds its sample (`assembleDebug`); the three
   samples run on the API 35 emulator (screenshots below). Samples opt out of Android 15's edge-to-edge
   enforcement (`values-v35`), as their original target SDKs never drew under the system bars.
 - [x] Step 3 (2026-11-12): `android/merged`. The `library` module keeps every public API of the three libraries in
@@ -218,7 +218,7 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 - **Branch sync (2026-11-16):** this change was made on `feat/android-kotlin`'s two-tab ArkTS example. `feat/harmony`
   (PR #20) replaced that example with the 22-demo port (ArkUI `Tabs`: Shell, Menu, Samples), so the sync keeps its
   `harmony/` folder as it is. TODO: CYLTabBarController's tab bar in that example (configuration file, raised Post
-  button, `harmony/scripts/fetch-cyltabbar.sh` of `83d18b9` as the starting point), agreed with its owner first.
+  button, `harmony/scripts/fetch-cyltabbar.sh` of `6e91317` as the starting point), agreed with its owner first.
 
 ## DONE (2026-11-16): HarmonyOS score sheet, accessibility and localization
 
@@ -377,12 +377,12 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
   line starts a new line and is shortened to the line's width.
 - **Status:** DONE. `TagContainerLayout` (standalone port and merged library): `tag_max_length` defaults to 0 (no
   limit; `setTagMaxLength(0)` removes a limit); the line-break and maximum-width logic of the tag layout round
-  (`71adee9`) then places a tag that does not fit after the others at the start of a new line. Tests
+  (`7d8a605`) then places a tag that does not fit after the others at the start of a new line. Tests
   `longTagStartsANewLineInsteadOfBeingShortened` and `tagWiderThanALineStartsANewLineThenIsShortened`; library tests
   69, 0 failures.
 - **Screenshot (before, top; after, bottom):** Android, merged example, Container tab, first container; macOS 27.3,
   Android Emulator `CYL_API35_arm64` (Android 15, API 35), compileSdk / targetSdk 35, AGP 8.7.3, Kotlin 2.0.21;
-  branch `feat/android-kotlin`, before at `71adee9`, after at the commit that adds this image
+  branch `feat/android-kotlin`, before at `7d8a605`, after at the commit that adds this image
   (`git log -- docs/assets/android-androidtagview-line-break-before-after.png`); taken 2026-11-13 11:56 and 14:14
   NZDT. "Welcome to use AndroidTagView!" now starts a new line in full; the Chinese tag, wider than a line, starts its
   own line and ends with "…" at the line's width.
@@ -406,10 +406,10 @@ Cross-platform rules (one shared database, the same look as iOS): [cross-platfor
 - **Context / requirements:** merge every open pull request of this repository into `feat/android-kotlin` and
   close it after merging; commit local uncommitted work to this branch; keep one pull request (#16) and one active
   branch (`feat/android-kotlin`).
-- **Status:** DONE. PR #17 (`fix/android-tag-title-ellipsis`, tag titles end with "…") merged in `d33907b`
+- **Status:** DONE. PR #17 (`fix/android-tag-title-ellipsis`, tag titles end with "…") merged in `50398af`
   (conflict in `CYLTagButton.place` resolved: children measured EXACTLY at their frame) and shown as merged; its
   remote branch deleted. Another session's branch `docs/animation-playback-controls` (the same animation controls
-  rule, written in parallel) merged in `8c81478` and folded into `docs/example-demo-rules.md`; its remote branch
+  rule, written in parallel) merged in `4d9e911` and folded into `docs/example-demo-rules.md`; its remote branch
   deleted. Open pull requests now: #16 only; remote branches: `master`, `feat/android-kotlin` and `ci-screenshots`
   (CI's screenshot storage, kept). The local branches of those two pull requests stay checked out in the other
   session's worktrees (git cannot delete a checked-out branch); their commits are all in this branch. No local
@@ -444,27 +444,27 @@ Aligned iOS symbols / all iOS symbols in [android-api.md](android-api.md), out o
 | batch D | The classify menu and the multiple filter: `CYLClassifyMenuViewController` and `CYLFilterBaseController` / `CYLMultipleFilterController` as Fragments, `CYLFilterHeaderView`, `CYLCollectionViewCell`, `CYLIndexPathButton`, `CYLRightImageButton`, `CYLFilterParamsTool`, `CYLFilterCollectionCell`, `CYLMultipleFilterHeaderView`; the categories as extension functions (`View` frame helpers, border, corners, overlay layers, capture; `Bitmap.cyl_blurredImageWithRadius`; `List` / `Map` descriptions; `TextView` button styles); the iOS images copied into the resource bundle; 27 unit tests | 678 / 678 | 100.0 |
 | correction | The table missed the pod's other source pattern, `TagCollectionView/TagCollectionView` (`CYLTagView`, `CYLTagGroup`, `CYLTagModel`, `CYLTagCell`, `CYLTagHeaderCell`): 31 more symbols | 678 / 709 | 95.6 |
 | TagCollectionView | Those five classes in Kotlin (`CYLTagView.kt`); the TagCollectionView demo is the merged example's Tags tab; 29 unit tests | 709 / 709 | 100.0 |
-| `07cc52b` | Android -> iOS table ([android-ios-api.md](android-ios-api.md)): 89.4 -> 611 / 611; new iOS core APIs (section expansion and visible counts, ripple and panel state, appearance resets, app tint, `kTagCollectionView*`, accessibility identifier lookup) | 611 / 611 (Android -> iOS) | 100.0 |
-| `56174a3` | `ios_public_api.py` reads the Swift sources (the Objective-C headers were deleted by the Swift migration, so the old 709 / 709 was stale): 585 / 731 = 80.0; renamed symbols mapped (old Objective-C keys kept as aliases), protocol conformance left out | 731 / 731 | 100.0 |
+| `8eb17db` | Android -> iOS table ([android-ios-api.md](android-ios-api.md)): 89.4 -> 611 / 611; new iOS core APIs (section expansion and visible counts, ripple and panel state, appearance resets, app tint, `kTagCollectionView*`, accessibility identifier lookup) | 611 / 611 (Android -> iOS) | 100.0 |
+| `5704ccc` | `ios_public_api.py` reads the Swift sources (the Objective-C headers were deleted by the Swift migration, so the old 709 / 709 was stale): 585 / 731 = 80.0; renamed symbols mapped (old Objective-C keys kept as aliases), protocol conformance left out | 731 / 731 | 100.0 |
 | correction | Android -> iOS: the generator stopped using the stale Objective-C keys of `api-map.json` and same-name matches of Objective-C spellings; iOS names now come from the Swift signatures | 568 / 611 (Android -> iOS) | 93.0 |
-| `a3c2e1f` | `UIView+CYLGeneral.swift` (Android `CYLGeneralExtensions.kt` frame, centering, border, corner, layer, tap and capture helpers), `CYLFilterParamsTool`, `CYLFilterBaseController.settingArray`, 13 hand mappings; tests `CYLGeneralHelpersTests` | 611 / 611 (Android -> iOS) | 100.0 |
-| `a3c2e1f` | iOS -> Android, regenerated with the new Swift APIs | 761 / 761 | 100.0 |
-| `f77cd48` | Android -> iOS: the Kotlin parser read classes with a multi-line primary constructor (`CYLTag`, …) as one-liners and skipped their members: 128 rows found, 6 misattributed rows gone; new iOS `CYLTag.resetColors()` | 733 / 733 (Android -> iOS) | 100.0 |
-| `f77cd48` | iOS -> Android with `CYLTag.resetColors()` | 762 / 762 | 100.0 |
-| `477323d` | iOS -> Android: `CYLTagListView`'s Objective-C names and the old factories (Objective-C only) | 766 / 766 | 100.0 |
+| `a6ecaf2` | `UIView+CYLGeneral.swift` (Android `CYLGeneralExtensions.kt` frame, centering, border, corner, layer, tap and capture helpers), `CYLFilterParamsTool`, `CYLFilterBaseController.settingArray`, 13 hand mappings; tests `CYLGeneralHelpersTests` | 611 / 611 (Android -> iOS) | 100.0 |
+| `a6ecaf2` | iOS -> Android, regenerated with the new Swift APIs | 761 / 761 | 100.0 |
+| `f15f12e` | Android -> iOS: the Kotlin parser read classes with a multi-line primary constructor (`CYLTag`, …) as one-liners and skipped their members: 128 rows found, 6 misattributed rows gone; new iOS `CYLTag.resetColors()` | 733 / 733 (Android -> iOS) | 100.0 |
+| `f15f12e` | iOS -> Android with `CYLTag.resetColors()` | 762 / 762 | 100.0 |
+| `81d1725` | iOS -> Android: `CYLTagListView`'s Objective-C names and the old factories (Objective-C only) | 766 / 766 | 100.0 |
 | this commit | iOS -> Android: every iOS icon + title component is a `CYLTagButton`; its new looks and properties wait for the same refactor on Android | 763 / 771 | 99.0 |
 
 ## DONE (2026-11-17, `feat/harmony`): every tab of the merged example stays in the bar after CYLTabBarController's "More"
 
 - Prompt (verbatim): "continue fix todo • There's no CollectionViewClassifyMenu example under Example-Android, so I didn't add an opt-in there. The Android example is on the feat/android-kotlin-b branch. Fetching it. merge to current branch"
-- Context: CYLTabBarController `0c35409` (pinned since `f77cd48`) gives Android UIKit's "More" tab past five view
+- Context: CYLTabBarController `0c35409` (pinned since `f15f12e`) gives Android UIKit's "More" tab past five view
   controllers, with the Android-only opt-out `cyl_showsAllTabs` (configuration key `CYLTabBarControllerShowsAllTabs`).
   This project's Android example is `android/merged/example` (not `Example-Android`, which is CYLTabBarController's).
   Its tab bar has nine tabs.
-- Merge: `origin/feat/android-kotlin-b` (`b133525`) is already contained in `feat/harmony` (0 commits ahead), so
+- Merge: `origin/feat/android-kotlin-b` (`d06df25`) is already contained in `feat/harmony` (0 commits ahead), so
   there is nothing to merge.
-- Duplicate: another session made the same change at the same time (`9719fb6`, the entry "every tab on Android" at
-  the top of this document); the merge `cf587a8` kept one key, and that entry is the main record.
+- Duplicate: another session made the same change at the same time (`fdcced0`, the entry "every tab on Android" at
+  the top of this document); the merge `73cbadd` kept one key, and that entry is the main record.
 - Result: the example's tab bar is scrollable (`cyl_scrollMode = Scrollable`), which upstream already exempts from
   "More". The configuration file `example/src/main/assets/cyl_merged_tabbar.json` now also sets
   `"CYLTabBarControllerShowsAllTabs": true`, so the nine tabs stay in the bar whatever the scroll mode.
@@ -557,10 +557,10 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
   |---|---|---|---|
   | `KaedeTagViewFragment` (`kaede`) + ListView / RecyclerView / Sub activities | kaedea/android-tagview | `CYLTagCloudSampleViewController` + list / recycler / sub screens | 样式 → Android 标签库示例 → android-tagview 示例 |
   | `LujunTagContainerFragment` (`lujun`), 5 containers, drag | whilu/AndroidTagView | `CYLTagContainerSampleViewController` | 样式 → Android 标签库示例 → AndroidTagView 示例 |
-  | Drag to reorder (first container of `lujun`) | whilu/AndroidTagView | **new** `CYLTagReorderDemoViewController` (`a4517a3c`) | 样式 → first row 拖拽标签重新排序 |
+  | Drag to reorder (first container of `lujun`) | whilu/AndroidTagView | **new** `CYLTagReorderDemoViewController` (`b1500779`) | 样式 → first row 拖拽标签重新排序 |
   | `LicrafterTagGroupFragment` (`licrafter`) + TagList activity | shellljx/TagViewGroup | `CYLImageTagSampleViewController`, `CYLImageTagListViewController` | 样式 → Android 标签库示例 → TagViewGroup 示例 |
   | `LicrafterTagEditFragment` (plus button `plus`) + `TagEditDialog` | shellljx/TagViewGroup | `CYLImageTagEditViewController` (创建标签 alert) | TagViewGroup 示例 → 编辑 |
-  | `AboutFragment` (`about`) | this app | **new** `CYLAndroidSamplesAboutViewController` (`daaf8f95`) | 样式 → Android 标签库示例 → 关于 |
+  | `AboutFragment` (`about`) | this app | **new** `CYLAndroidSamplesAboutViewController` (`55c2ea10`) | 样式 → Android 标签库示例 → 关于 |
   | `ClassifyMainFragment` (`classify`) | iOS menu linkage | `CYLMenuLinkageViewController` | plus button → query scenarios → 菜单联动 |
   | `FilterDemoFragment` (`filter`) | iOS menu linkage + multiple filter | `CYLMenuLinkageViewController` (filter button) | same |
   | `TagCollectionDemoFragment` (`tagcollection`) | iOS `TagCollectionView` app | `TagCollectionView/` | its own app |
@@ -570,13 +570,13 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 - **Why the drag demo was not seen:** it existed (`CYLTagContainerSample`, first container, `allowsReordering`) but sat
   near the bottom of the 样式 tab, inside AndroidTagView 示例. Now the 样式 tab's first section, 拖拽排序（长按标签后拖动）,
   opens a screen with only that: ten tags, a hint, the order below them, Reset (`-CYLExampleScreen reorder`).
-- **Core bug found and fixed (`a4517a3c`):** while a tag was dragged, every slot kept the width of the tag that had been
+- **Core bug found and fixed (`b1500779`):** while a tag was dragged, every slot kept the width of the tag that had been
   there, so moved titles were cut ("Kot…", "Ark…", "S…"); `CYLTagListView` now sizes each slot for the tag shown in it
   until the measurements follow the drop (`measuredIndexPath(for:)`; test
   `testSlotsTakeTheWidthsOfTheTagsShownInThemDuringADrag`).
 - **Tests:** example 96 / 0 (4 new), menu 32 / 0, tag 6 / 0, swift 22 / 0; a real drag on the simulator (axe: touch down,
   1 s hold, move, lift).
-- **Evidence** (iOS 27.2, iPhone 17 Pro simulator, macOS 27.3, Xcode 27.2 (27B52), `a4517a3c`, 2026-11-19 06:36 NZDT):
+- **Evidence** (iOS 27.2, iPhone 17 Pro simulator, macOS 27.3, Xcode 27.2 (27B52), `b1500779`, 2026-11-19 06:36 NZDT):
   where to find it, then the drag:
 
   <img src="assets/ios-style-tab-reorder-entry.png" width="360" alt="iOS 样式 tab: the drag-to-reorder row first">
@@ -589,9 +589,9 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
   maintainer's `npm login`); a VoiceOver / Switch Control check on a real device; the default tab bar height
   (`cross-platform.md`; CYLTabBarController).
 
-## DONE (2026-11-19, `feat/harmony`): does Android's drag cut titles like iOS did before `a4517a3c`?
+## DONE (2026-11-19, `feat/harmony`): does Android's drag cut titles like iOS did before `b1500779`?
 
-- **Task (from the Mac session's TODO audit, 248eaa1c):** iOS `a4517a3c` fixed tag titles cut ("Kot…") while a tag was
+- **Task (from the Mac session's TODO audit, 95c21906):** iOS `b1500779` fixed tag titles cut ("Kot…") while a tag was
   dragged. Check whether Android's drag has the same issue. Score: **100 / 100** (pass 60).
 - **Answer: no.** iOS showed the new order with the widths of the old one. Android's `CYLTagListView` drag translates
   only the dragged cell (the others stay where they are), and on the drop `moveItem` reloads the titles and the widths
@@ -601,7 +601,7 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 - **Test (new):** `CYLTagReorderWidthTest` drags "Kotlin" onto "Go" in the iOS demo's ten tags (long press, ten move
   steps, drop). Every tag keeps its own title's width at each step, right after the drop and after the reload, and
   `tagMoveHandler` reports 1 → 9. Android library 87 / 0.
-- **Withdrawn (2026-11-19), the TODO "no `CYLTagListView` drag demo" is closed as not needed:** `b8c95591` added
+- **Withdrawn (2026-11-19), the TODO "no `CYLTagListView` drag demo" is closed as not needed:** `4a1cc7aa` added
   `CYLTagReorderScreen` (a Styles row copying iOS `CYLTagReorderDemoViewController`). The owner's reference for "the drag
   example" is the Android Container tab (`LujunTagContainerFragment`), and iOS replaced its teal demo with a port of that
   tab (`58b2f335`, entry below). The Android copy of the removed iOS demo is therefore reverted. Android's drag example
@@ -614,7 +614,7 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
   drawn cross on the right, in a pale red rounded container; an add field with ADD TAG; a long list of colored country
   tags in a green-bordered box; right-to-left tags with a leading cross; centered tags; custom red and blue tags; and a sixth
   container (a star drawable, a long tag that wraps, a cross drawable, no cross on the last tag). Reference:
-  [android-tag-container-reference.png](assets/android-tag-container-reference.png). The iOS drag demo added in `a4517a3c`
+  [android-tag-container-reference.png](assets/android-tag-container-reference.png). The iOS drag demo added in `b1500779`
   (`CYLTagReorderDemoViewController`, ten teal tags) does not look like it.
 - **Requirements:** the iOS drag example matches the Android screen; every tag icon is drawn by the core's animated item
   component (`CYLTagButton`, a `CYLAnimatedItemView`); where the component cannot do what the screen needs, its API grows

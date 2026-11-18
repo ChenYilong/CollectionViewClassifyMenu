@@ -34,41 +34,41 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 | 2026-11-18 | 84 | Row 22: Flutter and React Native Android builds; the publish step no longer deletes the library |
 | 2026-11-17 | 80 | Row 13 verified on a Mac (library 0 warnings, 152 tests pass); row 12 compiles with Xcode 27 but not in CI (Xcode 26) |
 | 2026-11-17 | 76 | Row 20: WeChat DevTools check, the missing-tags bug fixed; row 17: HarmonyOS build and host tests |
-| 2026-11-17 | 72 | First assessment, at `d979073` (pins `57a527e`; CYLTabBarController PR #815 open) |
+| 2026-11-17 | 72 | First assessment, at `3b0d9ea` (pins `57a527e`; CYLTabBarController PR #815 open) |
 
 ## Progress by guide item
 
 | # | Guide item | Platform | Status | Evidence / what is left |
 |:---|:---|:---|:---|:---|
-| 1 | `CYLTagButton` subclasses `CYLAnimatedItemView` | iOS | Done | `CYLTagButton.swift:44` (`1813025`) |
+| 1 | `CYLTagButton` subclasses `CYLAnimatedItemView` | iOS | Done | `CYLTagButton.swift:44` (`9ecc535`) |
 | 2 | Delete `CYLTagAnimationEngine` (run-time engine lookup) | iOS | Done | no occurrence left in the sources |
-| 3 | Icon, title and animation properties are the inherited ones | iOS | Done | `1813025`; Objective-C sees them through redeclarations (`d3efc5f`) |
+| 3 | Icon, title and animation properties are the inherited ones | iOS | Done | `9ecc535`; Objective-C sees them through redeclarations (`082f753`) |
 | 4 | Delete indicator → `accessoryView` / `accessoryPlacement` | iOS | Done | `CYLTagButton.swift:260`, `:320` |
 | 5 | Per-state look in `itemStateDidChange` | iOS | Done | `CYLTagButton.swift:578` |
 | 6 | Static measuring stays in the subclass (`width(forTitle:…)`) | iOS | Done | kept in `CYLTagButton` |
-| 7 | Podspec depends on `CYLAnimatedItem` only, no engine | iOS | Done | `CollectionViewClassifyMenu.podspec:46`; `pod lib lint` green (CI on `71562ca`) |
+| 7 | Podspec depends on `CYLAnimatedItem` only, no engine | iOS | Done | `CollectionViewClassifyMenu.podspec:46`; `pod lib lint` green (CI on `e8819f3`) |
 | 8 | Examples add `CYLAnimatedItem/<Type>` by `:git` + `:commit` | iOS | Done | `Example/Podfile` (LottieObjectiveC, PAG, Rive, SVGA, GIF), `CYL_ANIMATED_ITEM` = `57a527e` |
 | 9 | `import CYLAnimatedItem`, never CYLTabBarController, in the core | iOS | Done | `CYLTagButton.swift:24` (`@_exported`; falls back to `CYLTabBarController` only under SwiftPM, row 11) |
-| 10 | Several engines: the example reports which are linked (multi-engine section) | iOS | Done | `CYLTagAnimationDemoViewController.engineReportLines()` (`b4d0e51`), test `testEveryLinkedEngineIsRegisteredAndListed` |
+| 10 | Several engines: the example reports which are linked (multi-engine section) | iOS | Done | `CYLTagAnimationDemoViewController.engineReportLines()` (`69db925`), test `testEveryLinkedEngineIsRegisteredAndListed` |
 | 11 | Swift Package Manager: a separate `CYLAnimatedItem` product | iOS | Done | CYLTabBarController `22282646` adds the SwiftPM product `CYLAnimatedItem` (targets `CYLAnimatedItem` + `CYLAnimatedItemSwift`, no tab bar); `Package.swift` depends on it at `6f93ae6b` (2026-11-18). `xcodebuild` of the package alone (generic iOS Simulator, Xcode 27.2): BUILD SUCCEEDED, products `CYLAnimatedItem.o`, `CYLAnimatedItemSwift.o` and their bundles, 0 files of the tab bar compiled; `CYLTagButton.swift` imports `CYLAnimatedItem` when it can (CocoaPods keeps `CYLTabBarController`). CocoaPods projects at `12c1fabd` (no iOS library change up to `6f93ae6b`): menu 32, tag 6, example 92, swift 22 tests, 0 failures, iPhone 17 Pro iOS 27.2 |
-| 12 | Static-library demo app (`CollectionViewClassifyMenu.xcodeproj`) compiles | iOS | Done | CI: the menu suite passes since CYLTabBarController `83a8ff8` (run 44092883295 on `f8301a4` fully green). Cause, found with deserialization recovery off (run 44071148862): "modularization issue on 'CYLAnimatedItemView' ... expected in 'CYLAnimatedItem' but found in 'CYLTabBarController'" (CYLTabBarController's module owned the component's header textually in static-library apps), fixed upstream. Workarounds removed: the Podfiles' `:modular_headers => true` and the CI diagnostic (`698260e`), the demo's own `import CYLAnimatedItem` (`880d9b1`, removed in the commit after `698260e`) |
-| 13 | Full iOS CI green (menu, example, swift tests, screenshots) | iOS | Done (local Mac) | 2026-11-17 at `0583e1d`: menu 32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0 failures; engine report screenshot `assets/ios-animation-engine-report.png` (test), `assets/ios-animations-live.png` (app). CI run still to confirm |
+| 12 | Static-library demo app (`CollectionViewClassifyMenu.xcodeproj`) compiles | iOS | Done | CI: the menu suite passes since CYLTabBarController `83a8ff8` (run 44092883295 on `65d2d4a` fully green). Cause, found with deserialization recovery off (run 44071148862): "modularization issue on 'CYLAnimatedItemView' ... expected in 'CYLAnimatedItem' but found in 'CYLTabBarController'" (CYLTabBarController's module owned the component's header textually in static-library apps), fixed upstream. Workarounds removed: the Podfiles' `:modular_headers => true` and the CI diagnostic (`348805e`), the demo's own `import CYLAnimatedItem` (`6931506`, removed in the commit after `348805e`) |
+| 13 | Full iOS CI green (menu, example, swift tests, screenshots) | iOS | Done (local Mac) | 2026-11-17 at `be2c323`: menu 32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0 failures; engine report screenshot `assets/ios-animation-engine-report.png` (test), `assets/ios-animations-live.png` (app). CI run still to confirm |
 | 14 | `CYLTagButton` subclasses `CYLAnimatedItemView`, `onItemStateChanged`, `accessoryPlacement` | Android | Done | `android/merged/library/.../CYLTagButton.kt:44`, `:261`, `:364` |
 | 15 | Depend on `cyltabbarcontroller-animateditem`, `:cylanimateditem` substitution by commit | Android | Done | `library/build.gradle.kts:41`, `settings.gradle.kts:69` |
-| 16 | Tag button on `CYLAnimatedItemView` (`cylanimateditem`, `file:` at the pinned commit) | HarmonyOS | Done (code) | `1a8a80b` (other session): vendored `harmony/cylanimateditem`, engines moved to the example |
-| 17 | HarmonyOS build and device check | HarmonyOS | Done (build, host tests, arm64 emulator check) | Windows with DevEco Studio 6.0.1 (2026-11-17, after `1a8a80b`): `harmony/scripts/build.sh` OK, `unit-test.sh` 58 / 58, `accessibility-check.py` OK, `check-native-strings.py` OK, `harmony_parity.py --check` OK (the 12 `CYLTagButton` members inherited from `CYLAnimatedItemView` removed from `parity-map.json`; the test's missing `$rawfile('icon.png')` fixed). The emulator check waits for disk space (the emulator needs about 20 GB free). **2026-11-18, Windows emulator 127.0.0.1:5555 (x86_64): blocked.** The HAP builds (`deb3af5`), but `hdc install` fails: "code:9568347 install parse native so failed ... the Abi type supported by the device does not match". The HAP's native libraries are arm64-v8a only (`libohos_rive.so` from `@ohos/rive` 1.0.4, the latest; `libpag.so` from `@tencent/libpag` 4.4.31), and the emulator's `const.product.cpu.abilist` is `x86_64`. Rive cannot run on an x86_64 emulator, so the B20 replay check needs an arm64 target: the Mac (Apple Silicon) emulator once hdc connects, or a device. **Mac arm64 emulator (2026-11-18, `474a8cc`)**: HarmonyOS 6 emulator "CYL ClassifyMenu Test" (`127.0.0.1:5559`, `const.product.cpu.abilist` arm64-v8a): `harmony/scripts/build.sh` OK, the unsigned HAP installs (the x86_64 Windows emulator rejects the arm64-only `libohos_rive.so` / `libpag.so`), all six Rive tags draw, and Play All tapped twice animates every Rive tag both times (B20 replay; changed pixels per 0.4 s frame, run 1 / run 2: house [819,281] / [336,62], check [1036,552,779] / [1042,781,259], menu [731,721,175] / [409,530,320], button [99,91] / [124], shape [848,456] / [704,475,955,619], truck [391,62] / [90,64]); ![HarmonyOS Rive replay](assets/harmonyos-rive-b20-replay.png) |
-| 18 | Tags on `cyl-animated-item` (copied at the pinned commit), engines as abstract nodes | Mini Program | Done | `62fce9b` (other session); `npm test` |
+| 16 | Tag button on `CYLAnimatedItemView` (`cylanimateditem`, `file:` at the pinned commit) | HarmonyOS | Done (code) | `222a58a` (other session): vendored `harmony/cylanimateditem`, engines moved to the example |
+| 17 | HarmonyOS build and device check | HarmonyOS | Done (build, host tests, arm64 emulator check) | Windows with DevEco Studio 6.0.1 (2026-11-17, after `222a58a`): `harmony/scripts/build.sh` OK, `unit-test.sh` 58 / 58, `accessibility-check.py` OK, `check-native-strings.py` OK, `harmony_parity.py --check` OK (the 12 `CYLTagButton` members inherited from `CYLAnimatedItemView` removed from `parity-map.json`; the test's missing `$rawfile('icon.png')` fixed). The emulator check waits for disk space (the emulator needs about 20 GB free). **2026-11-18, Windows emulator 127.0.0.1:5555 (x86_64): blocked.** The HAP builds (`59bb3cb`), but `hdc install` fails: "code:9568347 install parse native so failed ... the Abi type supported by the device does not match". The HAP's native libraries are arm64-v8a only (`libohos_rive.so` from `@ohos/rive` 1.0.4, the latest; `libpag.so` from `@tencent/libpag` 4.4.31), and the emulator's `const.product.cpu.abilist` is `x86_64`. Rive cannot run on an x86_64 emulator, so the B20 replay check needs an arm64 target: the Mac (Apple Silicon) emulator once hdc connects, or a device. **Mac arm64 emulator (2026-11-18, `c741a4e`)**: HarmonyOS 6 emulator "CYL ClassifyMenu Test" (`127.0.0.1:5559`, `const.product.cpu.abilist` arm64-v8a): `harmony/scripts/build.sh` OK, the unsigned HAP installs (the x86_64 Windows emulator rejects the arm64-only `libohos_rive.so` / `libpag.so`), all six Rive tags draw, and Play All tapped twice animates every Rive tag both times (B20 replay; changed pixels per 0.4 s frame, run 1 / run 2: house [819,281] / [336,62], check [1036,552,779] / [1042,781,259], menu [731,721,175] / [409,530,320], button [99,91] / [124], shape [848,456] / [704,475,955,619], truck [391,62] / [90,64]); ![HarmonyOS Rive replay](assets/harmonyos-rive-b20-replay.png) |
+| 18 | Tags on `cyl-animated-item` (copied at the pinned commit), engines as abstract nodes | Mini Program | Done | `b4c7460` (other session); `npm test` |
 | 19 | GIF stills and one-pass play, `embedded`, `autoplay` in the mini program tags | Mini Program | Done | PR #815 (`faf535e0`) is in the pins since `074285a6`; the library now forwards the options to cyl-animated-item: cyl-tag-list items take `gifFirstFrame`, `gifLastFrame`, `gifDuration`, `autoplay` (defaults from the app's registry entry `first` / `last` / `duration`), cyl-tag-button has the same properties plus `embedded`, and Play all / `playAnimation()` go through cyl-animated-item's `playAnimation()`. WeChat DevTools (2026-11-18): the four GIF tags rest on their stills; Play all, sampled at 0 / 300 / 800 / 1300 / 2600 ms: all playing at 300 ms, Rocket (600 ms) at rest by 800 ms, Fire (990 ms) and Sample (1000 ms) by 1300 ms, Star (2190 ms) by 2600 ms; no type warnings in the console; `npm test` 141 / 141; `docs/assets/miniprogram-devtools-gif-stills-play-all.png` |
 | 20 | WeChat DevTools / device check | Mini Program | Done (DevTools); two bugs found, one fixed | WeChat DevTools 2.02.2609250 on Windows (2026-11-17), Build npm OK. (1) **Fixed**: no tag list rendered anywhere (product, reviews, Animations): DevTools' unused-file filter (`ignoreDevUnusedFiles`) dropped `cyl-animated-item/cyl_animated_item_model.js` ("module … is not defined", then "Component is not found in path …/cyl-tag-list"); `cyl-tag-list.js` and `cyl-tag-button.js` required it as `…_model.js` while the component requires `./cyl_animated_item_model`; both now use the extension-less path and the tags render (`assets/miniprogram-devtools-tags-missing.png`, `assets/miniprogram-devtools-tags-after-fix.png`). (2) **Root cause found, fixed upstream**: the animated icons drew far past their 20 px slot because CYLTabBarController's engine components (`cyl-lottie`, `cyl-pag`, `cyl-rive`, `cyl-svga`) fixed their `:host` at 100 × 100 px; with only that changed to fill the box, every icon sits in its tag (`assets/miniprogram-devtools-engines-overflow.png` before, `assets/miniprogram-devtools-engines-fill-fixed.png` after; `embedded` was not needed). Fix: CYLTabBarController [PR #817](https://github.com/ChenYilong/CYLTabBarController/pull/817) (bug log B7); merged; fixed here by the pin to `4635ef7b` (DevTools, `assets/miniprogram-devtools-tags-4635ef7b.png`: every icon in its tag, no example change). (3) **Fixed here**: `cyl-tag-list/model.js` had its own engine table without SVGA, so an SVGA tag (`…svga.bin`) got no animation URL and no icon; it now asks `cyl-animated-item`'s `cylAnimatedItemType()` (found by the CYLSearchViewController session). Re-vendored `cyl-animated-item` at `7b764c73` (B6: `*.svga.bin`, `animationType`, data URI placeholder) |
-| 21 | Example Podfiles name `CYLAnimatedItem` (+ engines) | Flutter, React Native (iOS) | Done | `flutter/cyl_tag_list/example/ios/Podfile:40`, React Native example Podfile (`modular_headers`, `27c0394`) |
-| 22 | Android source builds compile `:cylanimateditem` | Flutter, React Native (Android) | Done | Mac, 2026-11-18 at `0f1897c`: `flutter build apk --debug` (Flutter 3.47.9) and the React Native example's `gradlew :app:assembleDebug` (JDK 17) build against `com.cyl:classifymenu` + `cyltabbarcontroller-animateditem` from the merged library's `build/repo`; both APKs contain `com.cyl.classifymenu.CYLTagButton` and `CYLAnimatedItemView`. Fixed on the way: `publishAnimatedItemToBuildRepository` deleted `com/cyl/classifymenu` from `build/repo` (Gradle removes a copy task's stale outputs on its first run), so the hosts could not resolve the library; it now runs before the library's publication |
+| 21 | Example Podfiles name `CYLAnimatedItem` (+ engines) | Flutter, React Native (iOS) | Done | `flutter/cyl_tag_list/example/ios/Podfile:40`, React Native example Podfile (`modular_headers`, `2de3039`) |
+| 22 | Android source builds compile `:cylanimateditem` | Flutter, React Native (Android) | Done | Mac, 2026-11-18 at `3e0e354`: `flutter build apk --debug` (Flutter 3.47.9) and the React Native example's `gradlew :app:assembleDebug` (JDK 17) build against `com.cyl:classifymenu` + `cyltabbarcontroller-animateditem` from the merged library's `build/repo`; both APKs contain `com.cyl.classifymenu.CYLTagButton` and `CYLAnimatedItemView`. Fixed on the way: `publishAnimatedItemToBuildRepository` deleted `com/cyl/classifymenu` from `build/repo` (Gradle removes a copy task's stale outputs on its first run), so the hosts could not resolve the library; it now runs before the library's publication |
 | 23 | License notice in every published package | All | Done | `scripts/check-licenses.sh` OK (vendored `cyl-animated-item` / `cylanimateditem` keep their LICENSE) |
 | 24 | Pins: newest CYLTabBarController commit, by `:commit` | All | Done | `57a527e` everywhere; `scripts/cyl-tabbar-latest-commit.sh` now lists PR #815's tip (unmerged, CI only warns): move to its merge commit |
 | 25 | No regression: Play all, speed, loop on every animation screen | All | Done (iOS, Android) | docs/example-demo-rules.md; mini program GIF waits for row 19; **mini program Rive section TODO (bug B20, below)**: some Rive tags play once, then neither loop nor Play all plays them; React Native (Android) too, some never play |
 
 ## TODO (in order)
 
-1. **CI**: since `53e3ea7` a started iOS run always finishes (`cancel-in-progress: false`); row 12 waits for the upstream umbrella-header fix and a pin move; then rows 12 and 13 (demo app, menu / example / swift
+1. **CI**: since `9095849` a started iOS run always finishes (`cancel-in-progress: false`); row 12 waits for the upstream umbrella-header fix and a pin move; then rows 12 and 13 (demo app, menu / example / swift
    tests, screenshots of the engine report screen into `docs/assets/`).
 2. **Upstream merge of PR #815** (owner): then pins → the merge commit in this repository and CYLSearchViewController, and
    the mini program tags pass `gif-first-frame` / `gif-last-frame` / `gif-duration`, `embedded`, `autoplay` (row 19;
@@ -81,7 +81,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    animated item"):
    - HarmonyOS `CYLAnimatedItemView`: an icon color for static bitmap icons (an alpha-preserving `ColorFilter`, as iOS
      template images). Meanwhile `CYLTagButton` (this repository's core) draws and tints its static icon itself
-     (`64c6bc3`, emulator-verified with the `ColorFilter` object); it moves to the component's API once CYLTabBarController [PR #816](https://github.com/ChenYilong/CYLTabBarController/pull/816) (`CYLAnimatedItemView.iconColor`) is merged and the vendored `harmony/cylanimateditem` moves to that commit.
+     (`20c3357`, emulator-verified with the `ColorFilter` object); it moves to the component's API once CYLTabBarController [PR #816](https://github.com/ChenYilong/CYLTabBarController/pull/816) (`CYLAnimatedItemView.iconColor`) is merged and the vendored `harmony/cylanimateditem` moves to that commit.
      Bug record: Y2 in `harmony-screenshot-issues.md`, screenshots `assets/harmonyos-y2-retest-icon-still-orange.jpeg`
      (before) and `assets/harmonyos-y2-fixed-white-icon.jpeg` (after).
    - Mini program `cyl-animated-item`: an embedded size (no 44 px minimum height or padding) and engine views that keep to
@@ -165,24 +165,24 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    [30, 17, 20, 36, 16, 42, 56], Done [30, 20, 22, 22, 20, 9, 0], Shapes, Search, Timer, Alerts and Me move
    (`assets/miniprogram-devtools-rive-b20-after-074285a6.png`); mini program tests 138. **B20 is done on iOS, Android
    (React Native, Flutter) and the mini program**; HarmonyOS: its emulator check is a CYLTabBarController TODO.
-   **iOS run (2026-11-18, Mac session, `689096f`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
+   **iOS run (2026-11-18, Mac session, `f0db697`)**: macOS 27.3, Xcode 27.2, "CYL ClassifyMenu iOS" simulator (iPhone 17
    Pro, iOS 27.2), pins `fe5c3ae`, English, launched with `-CYLExampleScreen animations-rive-loop` (new: scrolls to the
    Rive section, loop on, Play all); frames 4–14 s after Play all (`assets/ios-rive-b20-frames.png`, first frame
    `assets/ios-rive-b20-play-all.png`): Shapes and Truck change every frame (they loop); Home (`house.riv`) never moves;
    Done (`check.riv`) stays on the finished check; Menu (`menu_button.riv`) stays on ≡; Button stays on its small arc;
    the icons.riv dark tags (Chat, Search, Timer, Alerts, Me) never move. Same result as Android.
-   **iOS after the fix (2026-11-18, Mac session, `45dd63a`, pins `eab038d5`)**: same setup and launch
+   **iOS after the fix (2026-11-18, Mac session, `911c72d`, pins `eab038d5`)**: same setup and launch
    (`animations-rive-loop`), six frames 2 s apart (`assets/ios-rive-b20-after-eab038d5.png`, the Rive rows enlarged in
    `assets/ios-rive-b20-after-eab038d5-row.png`): Done now loops (arc → full check → arc), Button changes between frames,
    Shapes and Truck loop, and the dark Timer tag moves; Menu shows ≡ in all six frames (with `duration: 0` it may toggle
    between frames 2 s apart, or not at all: to check with a screen recording); Home's house is too small at this size to
    count the Rooms steps (1 → 2 → 3) seen on iOS 27.0 by the CYLTabBarController session.
-   **iOS pixel check (2026-11-18, `f8301a4`, pins `eab038d5`)**: 8 consecutive `simctl io screenshot` frames (each capture
+   **iOS pixel check (2026-11-18, `65d2d4a`, pins `eab038d5`)**: 8 consecutive `simctl io screenshot` frames (each capture
    takes about 11 s here), changed pixels (gray difference > 40) between consecutive frames per icon box: Home
    `[574, 584, 844, 592, 328, 910, 499]`, Menu `[0, 453, 453, 0, 0, 0, 562]`, Done `[75, 763, 661, 200, 730, 550, 581]`
    (`assets/ios-rive-b20-after-eab038d5-fast-row.png`: Menu caught morphing ≡ → x). All three move: on iOS every Rive tag
    of the section now replays with loop on (Done, Menu, Home, Button, Shapes, Truck, Timer). B20 fixed on iOS at `eab038d5`.
-   **iOS at pins `6a9ede85` (2026-11-18, `a3f2547`)**: `pod install` resolves `6a9ede85`; unit tests menu 32 / 0, tag 6 / 0,
+   **iOS at pins `6a9ede85` (2026-11-18, `e0c6785`)**: `pod install` resolves `6a9ede85`; unit tests menu 32 / 0, tag 6 / 0,
    example 92 / 0, swift 22 / 0. Pixel check (gray difference > 40 between consecutive `simctl` frames, about 11 s each):
    Home `[396, 344, 398, 377, 429, 691, 587]`, Done `[583, 700, 520, 460, 591, 142, 69]`, Button
    `[0, 11, 104, 105, 7, 12, 133]` (`assets/ios-rive-b20-after-6a9ede85-row.png`); Menu was `[0, 0, 0, 0, 0, 0, 0]` in that
@@ -200,7 +200,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   podspec lint and its demo screenshot; ba: FlatDesign item and SwiftPM / Carthage products).
 - **Bug found (2026-11-17)**: `CYLSearchCategoryScenarioTests.testSearchCategoriesUseABottomTabBarAndFillTheSearchBar`
   fails only on the "iPhone Duo" simulator (iOS 27): the category tab bar is laid out at the top (y = 0). It fails at every
-  commit since the test was added (`a2efda2`), so not a regression of the API parity work (`07cc52b`), and passes on an
+  commit since the test was added (`a2efda2`), so not a regression of the API parity work (`8eb17db`), and passes on an
   iPhone 17 Pro. `scripts/simulator-id.sh` picked "iPhone Duo" as the first iPhone of the newest runtime; it now prefers
   a regular "iPhone <number>" model. The tab bar placement on that form factor is TODO, owned by CYLTabBarController.
   Measured (2026-11-18, iPhone Duo B7499C73, iOS 27.2, the failing test with a temporary log): the bar is not at the
@@ -217,13 +217,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   pushed. The iOS 27.2 SDK has no public API to choose the bottom bar. Waiting on the owner's choice: (1) accept the
   floating bar there and test that it is visible, not at the bottom; (2) `CYLTabBar` draws its own buttons when UIKit
   goes floating; (3) a private-API switch. Until then the test keeps failing on iPhone Duo only.
-- **Bug fixed (2026-11-17, `0583e1d`)**: the example's test screenshots showed empty places instead of the animated icons
+- **Bug fixed (2026-11-17, `be2c323`)**: the example's test screenshots showed empty places instead of the animated icons
   (Lottie, PAG, Rive, SVGA, GIF), although the running app draws them (`assets/ios-animations-live.png`): the capture ran
   before the icons' first frame was drawn. `CYLScreenshotCapturing.captureScreenshot` now runs the main run loop for 0.5 s
   first (`assets/ios-animation-engine-report.png`). `CYLAnimatedIconTests` 8 / 0.
 - **Results (2026-11-17)**: row 13 Done on the local Mac; row 12 compiles with Xcode 27 locally but still fails in CI with Xcode 26 (menu 32, tag 6, example 92, swift 22 tests, 0
   failures, on the "CYL ClassifyMenu iOS" iPhone 17 Pro simulator). Still TODO: the iPhone Duo tab bar placement (above).
-- **Screenshots (2026-11-17, `333b349`)**: all 54 iOS example screens in [screenshots.md](screenshots.md) ("iOS: every example
+- **Screenshots (2026-11-17, `6f28226`)**: all 54 iOS example screens in [screenshots.md](screenshots.md) ("iOS: every example
   screen"), `assets/ios-1117/`. Bug fixed: `scripts/example-screenshots.sh` captured the previous app's last frame for the
   first screen of a run (`product@zh-Hans` showed the animations screen); it now waits 10 s more for the first launch.
 
@@ -233,16 +233,16 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Plan**: rows this Mac can close: 17 (HarmonyOS check on the emulator `CYL ClassifyMenu Test`), 22 (Flutter and React
   Native Android builds with their toolchains); 19 if CYLTabBarController PR #815 is merged; 11 and 12 depend on upstream
   (SwiftPM product) and CI (Xcode 26).
-- **Progress (2026-11-18, `0f1897c`)**: row 22 Done (score 84). Row 17: the emulator boots but hdc never connects
+- **Progress (2026-11-18, `3e0e354`)**: row 22 Done (score 84). Row 17: the emulator boots but hdc never connects
   (127.0.0.1:5563 refuses, `hw.hdc.port=notset`), so the device check is still TODO. Row 19: the pins (`fe5c3ae`) include
   PR #815's merge (`faf535e`); the mini program tags still have to pass `gif-first-frame` / `gif-last-frame` /
   `gif-duration`, `embedded`, `autoplay` (mini program code, coordinated with the Windows session). Rows 11 and 12 wait on
   upstream SwiftPM and on CI (Xcode 26).
-- **iOS at pins `eab038d5` (2026-11-18, `5f9b76e`)**: `pod install` resolves CYLTabBarController and CYLAnimatedItem at
+- **iOS at pins `eab038d5` (2026-11-18, `94496c1`)**: `pod install` resolves CYLTabBarController and CYLAnimatedItem at
   `eab038d5` in the root, Example, Example-Swift and TagCollectionView projects (`Podfile.lock` is ignored by
   `.gitignore`, nothing to commit); unit tests on the "CYL ClassifyMenu iOS" simulator: menu 32 / 0, tag 6 / 0, example
   92 / 0, swift 22 / 0 failures.
-- **iOS at pins `074285a6` (2026-11-18, `19e1e4a`)**: `pod install` resolves `074285a6` in the four iOS projects;
+- **iOS at pins `074285a6` (2026-11-18, `bb71a33`)**: `pod install` resolves `074285a6` in the four iOS projects;
   `6a9ede85..074285a6` changes only the mini program's `cyl-rive`, its test and a doc (no iOS source), so the iOS results
   at `6a9ede85` (152 tests pass, every Rive tag replays) stand without a re-run.
 - **DONE (bug, 2026-11-18, Android at `dcbfdec6`, fixed in CYLTabBarController `f84c1073`): Rive Menu plays once, then never again.** Android example
@@ -315,7 +315,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   varied between launches before (see the TODO below). HarmonyOS: `harmony/cylanimateditem` re-vendored
   (`CYLAnimatedItemView.ets`: B23 restart handler; our tags replay through `onPlayer`, so no change for them),
   `assembleHap` builds; the x86_64 emulator cannot run the HAP (arm64-only Rive / PAG libraries, row 17). iOS pins:
-  Mac session (`0c198879`).
+  Mac session (`5f0d2ece`).
 - **TODO (bug, 2026-11-18, Android at `396d3fca`): Rive Done and Menu do not always rest on the same frame.** Four
   launches of the same build, Animations page: three rest on the same frames, and in one Menu rests on its X (440
   changed px) and Done's arc is further along (31 px). Earlier rest captures (`dab6d91d`, `ad3dca0e`, `f84c1073`)
@@ -340,24 +340,24 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   files and `android/merged/gradle.properties`; `074285a6..6f93ae6b` changes HarmonyOS, Flutter, iOS demo resources and
   docs only (no Android source, no cyl-animated-item / cyl-animation-placeholder change: the re-vendor touched only the
   `COMMIT` files), so the Android results stand; mini program `npm test` 141 / 141.
-- **Row 17 on Windows (2026-11-18, `deb3af5`)**: blocked, the x86_64 emulator cannot install the arm64-only Rive and
+- **Row 17 on Windows (2026-11-18, `59bb3cb`)**: blocked, the x86_64 emulator cannot install the arm64-only Rive and
   PAG native libraries (see row 17); score stays 88. Next: run the check on an arm64 emulator or device.
-- **Row 17 on the Mac (2026-11-18, `474a8cc`)**: DONE, score 92. The Mac emulator was connected all along, as
+- **Row 17 on the Mac (2026-11-18, `c741a4e`)**: DONE, score 92. The Mac emulator was connected all along, as
   `127.0.0.1:5559` (hdc gives it a free port; `5563` was wrong). The HAP installs on its arm64 image, every Rive tag
   draws and replays on a second Play All. Evidence: `assets/harmonyos-rive-b20-replay.png`,
   `assets/harmonyos-rive-section-arm64.jpeg`. Left: rows 11 (SwiftPM product) and 19 (upstream merge).
 
 ## TODO (2026-11-18, `feat/harmony`): migration score from 92 to 100
 
-- **Prompt (verbatim)**: "My session: nothing new on feat/harmony since a1366b9; the score is still 92 fix to100"
+- **Prompt (verbatim)**: "My session: nothing new on feat/harmony since eba4b34; the score is still 92 fix to100"
 - **English**: raise the migration score from 92 to 100.
 - **Plan**: row 11: CYLTabBarController `12c1fabd` (newest, `scripts/cyl-tabbar-latest-commit.sh`) has the SwiftPM product
   `CYLAnimatedItem` (`22282646`); depend on it instead of the `CYLTabBarController` product, move the iOS pins (Package.swift,
   Podfiles, React Native and Flutter example Podfiles) to `12c1fabd`, build the package, pod install, run the iOS tests.
   Row 19: PR #815 is merged (`faf535e0`) and inside the pin since `074285a6`; the mini program check belongs to the
   Windows session (asked by message), as do the Android, HarmonyOS and mini program pins.
-- **Result (2026-11-18)**: DONE, score 100. Row 11 Done (above); row 19 Done by the Windows session (`eaddb56`). Pins at
-  `6f93ae6b` on every platform (iOS here; mini program and Android `557b91d`).
+- **Result (2026-11-18)**: DONE, score 100. Row 11 Done (above); row 19 Done by the Windows session (`0bccdef`). Pins at
+  `6f93ae6b` on every platform (iOS here; mini program and Android `c051790`).
 
 ## Rive icons rest until played (2026-11-18, iOS, `feat/harmony`)
 
@@ -377,19 +377,19 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **iOS pins at `ad3dca0e` (2026-11-18)**: CYLTabBarController `ad3dca0e` (Android / HarmonyOS Rive resume, Carthage
   build folder) and `915bddbd` (iOS GIF tab images rest until played; only `CYLTabBarController.m` changes for iOS,
   and this repository's tab bars use no GIF images). Menu 32, tag 6, example 92, swift 22 tests, 0 failures, iPhone 17
-  Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3. All platforms at `ad3dca0e` (Android and mini program: `70a6426`).
+  Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3. All platforms at `ad3dca0e` (Android and mini program: `2b3e2cd`).
 
 ## TODO (2026-11-18, `feat/harmony`): re-check pins
 
 - **Prompt (verbatim)**: "re-check pins"
 - **English**: move the iOS pins to CYLTabBarController's newest commit and re-test.
 - **Plan**: newest is `70064275` (`scripts/cyl-tabbar-latest-commit.sh` over all branches; Android and mini program at
-  `f84c1073`, `bbe8ea7`). iOS changes since `ad3dca0e`: `dab6d91d` (Rive rest pauses the controller), `f84c1073` (Rive
+  `f84c1073`, `1643c94`). iOS changes since `ad3dca0e`: `dab6d91d` (Rive rest pauses the controller), `f84c1073` (Rive
   held input on slow devices), `d733c80e` (opt-in `tint` option for Rive tab icons). Move the iOS pins, pod install,
   run the four iOS suites, re-check that the Rive tags rest until played and then play and loop (stitched, labeled
   screenshot), and ask the Windows session to move Android and the mini program to the same commit.
 - **Result (2026-11-18)**: DONE. iOS pins at CYLTabBarController `70064275` (Package.swift, Podfiles, React Native and
-  Flutter examples); every platform at `70064275` (Android and mini program: `e7f80fa`). iPhone 17 Pro simulator, iOS
+  Flutter examples); every platform at `70064275` (Android and mini program: `6b4a849`). iPhone 17 Pro simulator, iOS
   27.2, Xcode 27.2, macOS 27.3: menu 32, tag 6, example 92, swift 22 tests, 0 failures. Rive: at rest 0 changed pixels
   in all six icons over 21 s; with Loop on all six keep changing (Menu changes in 6 of 11 frame pairs 12-15 s apart, its
   1 s toggle aliasing with the captures, so it loops; the Android-only stop is fixed by `f84c1073`).
@@ -449,7 +449,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 ## TODO (2026-11-18, `feat/harmony`): iOS pins from 0505042f to CYLTabBarController 918da089; Rive Home options
 
 - **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
-  pins are at CYLTabBarController 918da089d7f6991a24b1fcbc40c150c7a503d4b5 (cvcm-b 115b270, pushed), the newest commit on
+  pins are at CYLTabBarController 918da089d7f6991a24b1fcbc40c150c7a503d4b5 (cvcm-b 3b697c9, pushed), the newest commit on
   feat/cross-platform-components. Please move the iOS pins there so every platform matches. The Android example's Rive
   Home also passes numberInput=Rooms now. If iOS Home barely moves either, check that the iOS example passes the same
   options."
@@ -468,7 +468,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 ## TODO (2026-11-18, `feat/harmony`): iOS pins from 918da089 to CYLTabBarController 4f73209c
 
 - **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
-  pins are at CYLTabBarController 4f73209c in cvcm-b 0ff2a1a (pushed). It's the newest commit on
+  pins are at CYLTabBarController 4f73209c in cvcm-b d9d99a1 (pushed). It's the newest commit on
   feat/cross-platform-components and adds Android-only fixes on top of 918da089: PAG uses PAGImageView, Lottie image
   assets keep their size, the Rive settle, and the GIF decoder. Please move the iOS pins to 4f73209c so every platform
   matches; no iOS source changed in 918da089..4f73209c."
@@ -483,7 +483,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 ## TODO (2026-11-18, `feat/harmony`): iOS pins from 4f73209c to CYLTabBarController 776b4635
 
 - **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
-  pins are at CYLTabBarController 776b4635 in cvcm-b fed57ae, pushed. It's the newest commit and changes only the
+  pins are at CYLTabBarController 776b4635 in cvcm-b 2953c10, pushed. It's the newest commit and changes only the
   Android Rive view since 4f73209c. Please move the iOS pins there so every platform matches."
 - **Plan**: checked: `776b4635` is the newest commit on every branch, and no `.m`, `.h`, `.swift`, podspec or
   Package.swift changed in `4f73209c..776b4635`. Move the eight pin files, `pod install` x 4, build the Swift package,
@@ -557,5 +557,5 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Update (2026-11-19): iOS pins from 4da6b760 to 5996fa96.** CYLTabBarController `5996fa96` (newest) makes
   `accessoryView` and `placeholderImage` open again after our report; no code change here. pod install in the four
   projects; menu 37 / 37, Example 98 / 98, Swift Example 22 / 22, TagCollectionView 6 / 6; `flutter build ios --simulator`
-  OK. With the Windows session's bundled copies at 5996fa96 (`a23a81f9`), every platform is at the same commit:
+  OK. With the Windows session's bundled copies at 5996fa96 (`ba13e99c`), every platform is at the same commit:
   **100/100**.

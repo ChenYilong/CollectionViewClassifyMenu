@@ -354,7 +354,7 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLFilterParamsTool.filterParamsDictionary` | property, `CYLMultipleFilter.kt:62` | `CYLFilterParamsTool.filterParamsDictionary` |
 | `CYLFilterParamsTool.filterParamsContentDictionary` | property, `CYLMultipleFilter.kt:72` | `CYLFilterParamsTool.filterParamsContentDictionary` |
 | `CYLFilterParamsTool.filename` | property, `CYLMultipleFilter.kt:82` | `CYLFilterParamsTool.filename` |
-| `CYLFilterParamsTool.filesDir` | property, `CYLMultipleFilter.kt:89` | N/A on iOS: `CYLFilterParamsTool` was removed in the Swift migration (`70dcc816`); `CYLMultipleFilterController` keeps its state (`selectedIndexPaths()` / `setSelectedIndexPaths(_:)`) |
+| `CYLFilterParamsTool.filesDir` | property, `CYLMultipleFilter.kt:89` | N/A on iOS: `CYLFilterParamsTool` was removed in the Swift migration (`53bdf4aa`); `CYLMultipleFilterController` keeps its state (`selectedIndexPaths()` / `setSelectedIndexPaths(_:)`) |
 | `CYLFilterCollectionCell` | class, `CYLMultipleFilter.kt:135` | `CYLFilterCollectionCell` |
 | `CYLFilterCollectionCell.titleButton` | read-only property, `CYLMultipleFilter.kt:136` | `CYLFilterCollectionCell.titleButton` |
 | `CYLMultipleFilterHeaderView` | class, `CYLMultipleFilter.kt:155` | `CYLMultipleFilterHeaderView` |

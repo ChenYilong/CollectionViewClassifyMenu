@@ -90,7 +90,7 @@ tags: [issues, ui, cocoapods, progress]
     on the frame clock. This emulator's app process sees animator duration scale 0, so a ValueAnimator jumped to its
     end.
   - **Rive rest / Loop** (`319ba8a4`, `3bd20b3c`, Mac session).
-- Rive Home: example configuration (`115b270`, `numberInput=Rooms`); the core already supported it.
+- Rive Home: example configuration (`3b697c9`, `numberInput=Rooms`); the core already supported it.
 - Pins: `4f73209c` (mini program, Android, HarmonyOS module).
 - Evidence: `docs/assets/android-pag-lottie-fixed-8d81583c.png` and `docs/assets/android-gif-rive-home-fixed-4f73209c.png`.
   - PAG Home 1174-1959 px per pair.
@@ -128,7 +128,7 @@ tags: [issues, ui, cocoapods, progress]
 - Acceptance criteria: 100 = cause found and written down (15), a stitch tool for every host that refuses an
   incomplete label (25), a check before every commit (20) and in CI (15), the rules and skills updated (10), the four
   images restitched (15). Pass: 60.
-- Result: **95/100** (was 85; the Mac session compiled and fixed the Swift tool in `f9f0759`, its output passes the
+- Result: **95/100** (was 85; the Mac session compiled and fixed the Swift tool in `0d48438`, its output passes the
   check). `scripts/stitch-screenshots.py` (new, any host) and `scripts/stitch-screenshots.swift` (now
   refuses an incomplete label and writes it into the PNG), `scripts/check-screenshots.py` (new; run by
   `scripts/check-branch-pr.sh`, exit 3) and `.github/workflows/screenshot-labels.yml` (new); AGENTS.md "Screenshots:
@@ -173,7 +173,7 @@ tags: [issues, ui, cocoapods, progress]
   (`docs/assets/miniprogram-devtools-gif-stills-play-all.png`). -5: the example has no page with a standalone
   cyl-tag-button, so the warning fix is verified by a test (the initial data) and not in DevTools; the
   CYLSearchViewController session re-checks it after pinning. That -5 is now closed: the CYLSearchViewController
-  session synced to `6295caf3` (cyl-animated-item `d8f47b4d`), ran `wx.reLaunch('/pages/examples/index')`, which shows a
+  session synced to `08ec93cf` (cyl-animated-item `d8f47b4d`), ran `wx.reLaunch('/pages/examples/index')`, which shows a
   standalone cyl-tag-button (SVGA header), and `get_simulator_console` printed 0 lines, with 0 matches for
   cyl-tag-button, iconKind or cyl-animated-item. Before the fix it printed 8 warnings. That session recorded it in
   rows 22-23 of its `docs/animated-icon-component.md`.
@@ -200,11 +200,11 @@ tags: [issues, ui, cocoapods, progress]
 ### Done (2026-11-17, `feat/harmony`): CYLAnimatedItem module in static-library Podfiles, again
 
 - Prompt (verbatim): "continue fix todo还没发布的组件尝试使用commit方式导入。不要阻碍进度"
-- Context: CI on `b4d0e51` (iOS run 44026180641): "Unit tests (menu)" fails to compile the demo app,
+- Context: CI on `69db925` (iOS run 44026180641): "Unit tests (menu)" fails to compile the demo app,
   `CYLMainViewController.swift:17` "cannot inherit from class 'CYLClassifyMenuViewController' because it has
-  overridable members that could not be loaded", the same as `7183711`. `7fcc683` had added `:modular_headers => true`
-  for CYLAnimatedItem (its run was cancelled, never verified); `4171135` removed it, relying on the `DEFINES_MODULE`
-  that CYLTabBarController's `CYLAnimatedItem.podspec` sets again; `b4d0e51` shows that this is not enough for the app
+  overridable members that could not be loaded", the same as `0b6917d`. `6dc9124` had added `:modular_headers => true`
+  for CYLAnimatedItem (its run was cancelled, never verified); `dd8c535` removed it, relying on the `DEFINES_MODULE`
+  that CYLTabBarController's `CYLAnimatedItem.podspec` sets again; `69db925` shows that this is not enough for the app
   target in a static-library Podfile.
 - Result: `pod 'CYLAnimatedItem', ….merge(:modular_headers => true)` in the Podfiles that build static libraries (root,
   TagCollectionView, the React Native example without `USE_FRAMEWORKS`); Example, Example-Swift and the Flutter
@@ -249,30 +249,30 @@ tags: [issues, ui, cocoapods, progress]
   2026-11-17, after re-reading CYLTabBarController's guide (tip `ec12a9d`, its `docs/License-Notices.md`): the mini
   program package also carries `miniprogram_dist/LICENSE`, as CYLTabBarController's mini program component folders
   do (the earlier worry about WeChat file types did not hold).
-  Pins: d0c82cb had moved every CYLTabBarController pin from `fbd05d5` to the newest `ec12a9d`, which dropped the
+  Pins: 45e297c had moved every CYLTabBarController pin from `fbd05d5` to the newest `ec12a9d`, which dropped the
   unmerged PR #814 (`fix/lottie-unplayable-file`: the Lottie animator makes no view for a file Lottie cannot play) and
   would fail `testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` again (reported by the CYLSearchViewController
-  session). Owner's decision (asked, 2026-11-17): "Back to fbd05d5 until #814" (`4622434`). The owner then merged
-  #814 into #788 (`9a54e26`); the other session pinned that merge (`6ee254c`) while `a9169da` moved the pins to
+  session). Owner's decision (asked, 2026-11-17): "Back to fbd05d5 until #814" (`e7ec145`). The owner then merged
+  #814 into #788 (`9a54e26`); the other session pinned that merge (`3885d3d`) while `4483c34` moved the pins to
   `47aec88` (newest by timestamp, on the already-merged branch `fix/lottie-unplayable-file`, without #788's license
-  and guide commits). Owner's decision (asked, 2026-11-17): "9a54e26, the #788 merge": `a9169da` is reverted, the pins
+  and guide commits). Owner's decision (asked, 2026-11-17): "9a54e26, the #788 merge": `4483c34` is reverted, the pins
   are `9a54e26` like CYLSearchViewController's, and AGENTS.md says an already-merged pull request branch does not count.
 - Found: the packages disagree (iOS podspec "All rights reserved", npm / ohpm / mini program "MIT", Flutter LICENSE a
   "TODO" placeholder, the AndroidTagView port Apache-2.0 from its upstream, the merged Android library none).
 
-### DONE (2026-11-16): reproduce and handle the Rive crash on the HarmonyOS emulator (Canvas renderer on the emulator, `3417e7e`; verified)
+### DONE (2026-11-16): reproduce and handle the Rive crash on the HarmonyOS emulator (Canvas renderer on the emulator, `6e8ba55`; verified)
 
 - **Context:** the HarmonyOS animation screen crashed in `libohos_rive.so` (`EGLWorkerImpl::destroy` →
   `eglDestroySurface` → `NativeWindowDisconnect`, null pointer) when a Rive view is disposed; the Rive pool was reverted
-  (`cb52204`); the owner's fixes since then (filter button tint `548039d`, badges and review chip `bf7ed6a`, fold
-  capsule `789573b`) were never seen on a device.
+  (`a546842`); the owner's fixes since then (filter button tint `44e5f70`, badges and review chip `088fd24`, fold
+  capsule `2756826`) were never seen on a device.
 - **Requirements:** on the emulator, reproduce the Rive crash, find its cause and handle it; run the animation screen in
   light mode, dark mode and with scrolling; check the filter button, the hot-search badges (Y1) and the selected review
   chip (Y2); update the screenshots and docs.
 - **Prompt (verbatim, abridged pasted report):** "使用鸿蒙模拟器处理 复现 以下rive动效 crash bug continue do The Rive crash is only made less likely; the bug is inside @ohos/rive. • The animation screen after the pool revert, in light mode, dark mode and with scrolling, still needs an emulator run. • I hadn't finished reviewing these screenshots: …"
 - **Prompt (English):** use the HarmonyOS emulator to reproduce and handle the Rive animation crash below; continue with
   the remaining emulator checks.
-- **Reproduced (2026-11-16, emulator `CYL ClassifyMenu Test`, build of `548039d`):** opening the animation screen crashes
+- **Reproduced (2026-11-16, emulator `CYL ClassifyMenu Test`, build of `44e5f70`):** opening the animation screen crashes
   the app every time, by launch option and through the 动效 tab alike, in light and dark mode, about 6–10 s after it
   appears, before any scrolling: `cppcrash` on thread `Rive`, `SIGSEGV` at 0x158 in `NativeWindowDisconnect` ←
   `eglDestroySurface` ← `ohos_rive::EGLWorkerImpl::destroy` ← `Renderer::DisposeOnWorkerThread`. Twice more the emulator
@@ -291,9 +291,9 @@ tags: [issues, ui, cocoapods, progress]
   position and size passed as observed state instead of being part of the key, so relayouts update tags in place and
   never dispose Rive views while the screen is shown; this removes the crash in normal use, leaving disposal on leaving
   the screen; (2) keep each Rive view alive for the app's lifetime (a pool that does not break the list's layout, unlike
-  `95bebc1`); (3) until @ohos/rive is fixed, show each Rive item's SVGA twin on HarmonyOS (every Rive scene already has
+  `53266fd`); (3) until @ohos/rive is fixed, show each Rive item's SVGA twin on HarmonyOS (every Rive scene already has
   one); (4) report the dispose order to @ohos/rive (openharmony-tpc `ohos_rive`).
-- **Retest of `e82b503` (stable ForEach keys), 2026-11-16:** still crashes on every opening, light and dark: probe logs 22 Rive views created and 11 disposed, same `eglDestroySurface` stack. A second rebuild path remains (`CYLTagButton` recreates the icon through `animationViewToken`); also skipping the reload on a style size change (local build) did not stop it. Owner's fallback: switch Rive items off on HarmonyOS.
+- **Retest of `bef419e` (stable ForEach keys), 2026-11-16:** still crashes on every opening, light and dark: probe logs 22 Rive views created and 11 disposed, same `eglDestroySurface` stack. A second rebuild path remains (`CYLTagButton` recreates the icon through `animationViewToken`); also skipping the reload on a style size change (local build) did not stop it. Owner's fallback: switch Rive items off on HarmonyOS.
 - **Status:** reproduced and explained; not fixed. The other emulator checks of this task (filter button tint, Y1, Y2)
   wait for the next run, since the emulator host crashed during this one.
 
@@ -312,13 +312,13 @@ tags: [issues, ui, cocoapods, progress]
 
 ### DONE (2026-11-16, logged as TODO the same day): commit and push after every answer on a feature branch
 
-- **Context:** the pull-request rule of the previous request (`7e11ae6`) is repeated, with one addition: after every
+- **Context:** the pull-request rule of the previous request (`638c72f`) is repeated, with one addition: after every
   question-and-answer turn, commit and push on any branch that is not `master` / `main`, without asking.
 - **Prompt (verbatim):** "写入instructions相关文件，skills相关指令，找到commit 的相关章节，没有的话就新建，保证写入成功：全英文写入：创建分支后有任何commit必须提交pr。不允许只新建分支，持续向该分支commit代码，但不创建pr。因为不创建pr会导致该分支上的所有commit代码全部被忽略。 commit前必须检查该分支pr是否处于open状态，如果不处于open状态必须新建pr。target 目标优先设置为 在创建pr前的活跃pr，如果没有才设置为master分支。如果open状态的pr已经超过两个，那么就要慎重，你需要询问我，是否新建分支创建pr还是保持在本分支继续提交。因为超过两个分支会导致代码合并困难，无法合理分配分支的目标分支。一次问答结束后，只要当前分支不是master main，则必须commit 必须push ，无须询问，因为代码总是在分支上，并不会push 到master main分支。非常安全。无须担心push后的任何风险。"
 - **Prompt (English, the new part):** after each question-and-answer turn, as long as the current branch is not master or
   main, commit and push, without asking: the code is always on a branch and is never pushed to master / main, so it is
   safe and a push carries no risk to worry about.
-- **Result:** the pull-request part was already in place (`7e11ae6`); appended "Commit and push at the end of every
+- **Result:** the pull-request part was already in place (`638c72f`); appended "Commit and push at the end of every
   answer" to AGENTS.md and the cyl-commit skill ("Branches and pull requests"), `docs/instructions.md` and
   `harmony/instructions.md`. Checked before this commit: one open pull request, #20 `feat/harmony` → `master`.
 
@@ -340,22 +340,22 @@ tags: [issues, ui, cocoapods, progress]
 
 - **Bug:** HarmonyOS example, the page titled "菜单选择 · 数据库联动" (Menu selection · database linkage,
   `CYLMenuLinkagePage`): the section fold arrows (⌄) are drawn far too large, about a quarter of the screen width, in
-  `docs/assets/harmonyos-push-query-menu-linkage.jpeg` (2026-11-16 10:08 emulator time, before `5dc703b`).
-- **Found so far:** the port's owner sized the fold chevron in `5dc703b`; `harmonyos-menu-linkage.jpeg` (10:25, after it)
+  `docs/assets/harmonyos-push-query-menu-linkage.jpeg` (2026-11-16 10:08 emulator time, before `38fc21d`).
+- **Found so far:** the port's owner sized the fold chevron in `38fc21d`; `harmonyos-menu-linkage.jpeg` (10:25, after it)
   shows normal arrows beside "更多" (More). To do: retake the same page through the query-scenarios flow, replace the
   screenshot, mark the bug fixed or keep it open.
 - **Prompt (verbatim):** "标记bug ： 鸿蒙系统，example 页面： 搜索一下关键词“菜单选择 数据库联动 ” 含有该字符串的页面截图 中的箭头 尺寸异常。"
 - **Prompt (English):** mark a bug: HarmonyOS, example page: search for the keyword "菜单选择 数据库联动"; in the
   screenshots of the page that contains it, the arrows have an abnormal size.
-- **Result:** fixed by the port's owner in `5dc703b` (fold chevron sized like the header icons). Verified on the emulator
+- **Result:** fixed by the port's owner in `38fc21d` (fold chevron sized like the header icons). Verified on the emulator
   `CYL ClassifyMenu Test` (2026-11-16 10:36 emulator time) through the same flow (query scenarios → "分类菜单 + 多选筛选"):
   the four fold arrows are 53 × 53 px (about 15 vp at density 3.5), one text line high beside "更多"; the old screenshot
   `harmonyos-push-query-menu-linkage.jpeg` is replaced. `harmonyos-menu-linkage.jpeg` (10:25) already showed the fix.
 
 ### DONE (2026-11-16): retest the HarmonyOS fixes on the emulator
 
-- **Context:** the port's owner pushed `95bebc1` (Rive dispose crash, plus tab and filter button), `849c2d8` (tags laid out
-  1 vp wide, dark-mode text) and `5dc703b` (tag taps, fold chevrons) on `feat/harmony` (now the only branch).
+- **Context:** the port's owner pushed `53266fd` (Rive dispose crash, plus tab and filter button), `e822118` (tags laid out
+  1 vp wide, dark-mode text) and `38fc21d` (tag taps, fold chevrons) on `feat/harmony` (now the only branch).
 - **Requirements:** rerun on the dedicated emulator: animations (Chinese, dark, scrolling), the plus tab, the menu-linkage
   filter button and fold chevrons, the tag taps (hilog domain CYLTagList); update the screenshots and the verification
   rows; push to `feat/harmony`.
@@ -370,7 +370,7 @@ tags: [issues, ui, cocoapods, progress]
 
 - **Context:** `screenshots.md` has six pushed pages; more screens open further pages (query scenarios, review
   filters, tag clouds, image tags). The owner's next fix (`c6a8a5c`: plus and filter buttons, Rive pooling) is not
-  pushed yet, so this run uses `7c4c294`.
+  pushed yet, so this run uses `0452691`.
 - **Requirements:** run the HarmonyOS example on the emulator, open the next (pushed) pages, add their screenshots to
   the docs.
 - **Prompt (verbatim):** "run our HarmonyOS version code on an emulator and push next page update more screenshot in docs"
@@ -395,7 +395,7 @@ tags: [issues, ui, cocoapods, progress]
   written), in English: prefer bash to run scripts, to avoid the error "zsh doesn't split $box into words either.
   Running the same measurement as a bash script."; the SVGA demo runs incorrectly: icon and title are not centered with
   each other; cherry-pick between all open PRs so every PR keeps the same code.
-- **Status:** (2) DONE, see AGENTS.md "Running scripts" (`6081884`). (1) DONE: six pushed pages in
+- **Status:** (2) DONE, see AGENTS.md "Running scripts" (`868db3e`). (1) DONE: six pushed pages in
   `screenshots.md` (HarmonyOS: pushed pages), driven by text and accessibility text; four taps changed nothing (plus
   button, menu-linkage filter button, review filter "Good", search category "People") and two controls have no
   accessibility text (plus button, filter button): reported to the port's owner. The animation screen also crashes on
@@ -405,7 +405,7 @@ tags: [issues, ui, cocoapods, progress]
   centers are within 1 px, padding equal (42 px each side), measured on the emulator. (4) DONE: the open PRs' branches
   (#20 `feat/harmony`, #16 `feat/android-kotlin`) cherry-picked each other's new commits (5 one way, 2 the other) and
   now hold the same tree; build OK, host tests 49/49, accessibility and native-string checks OK. The owner's defect
-  fix `d6adba3` was checked on the emulator: B1, B9, B12 fixed; B11 dark mode and the Rive crash remain.
+  fix `e1f3680` was checked on the emulator: B1, B9, B12 fixed; B11 dark mode and the Rive crash remain.
 
 ### DONE (2026-11-16, logged as TODO the same day): commit messages in git cz style, English only
 
@@ -454,20 +454,20 @@ tags: [issues, ui, cocoapods, progress]
     `CYLTagButton.cylApply(_:)` have no Android counterpart yet, because Android's `CYLIndexPathButton`,
     `CYLRightImageButton` and `CYLMultipleFilterHeaderView` are still `Button` / `ViewGroup`s. TODO: the same refactor
     in `android/merged/library` (needs an Android build).
-- Status: iOS done; Android done, **100/100**. Android (`cadbe530`, another session, not compiled there):
+- Status: iOS done; Android done, **100/100**. Android (`5bcf0c18`, another session, not compiled there):
   `CYLIndexPathButton` and `CYLRightImageButton` subclass `CYLTagButton`, `CYLMultipleFilterHeaderView` shows its title
   in `titleButton` (a `CYLTagButton`), with `CYLMenuStyle.classifyMenuTag` / `filterTag` / `sectionTitle`,
   `CYLTagButton.cylApply` and `expandTitle` / `collapseTitle`. Checked 2026-11-19 (Windows session): the library and the
   example build, Android library tests 87 / 0; on the emulator the classify menu's More / Less switches with the arrow
   after the title and the filter panel's section titles sit 50 dp in above their line
-  (`assets/android-menu-filter-tagbutton.png`); iOS -> Android API 792 / 792 (`c368c75e` mapped the last row, the
+  (`assets/android-menu-filter-tagbutton.png`); iOS -> Android API 792 / 792 (`9e9180d7` mapped the last row, the
   `CYLTagButton (CYLCollectionCellStyle)` category).
 
   <img src="assets/android-menu-filter-tagbutton.png" width="500" alt="Android: classify menu More / Less and filter section headers on CYLTagButton">
 
 ### Done (2026-11-17, `feat/harmony`): CYLTagListView members visible to Objective-C
 
-- Prompt (verbatim): "Fix others report issue Still open: the pin bump. This repo still uses the old Nov 12 version of CollectionViewClassifyMenu. Moving to the new one is still blocked: at 652e084, most CYLTagListView members still aren't visible to Objective-C, and our React Native iOS wrapper needs them. The fix is to mark those members @objc in that repo, which I now have access to. Do you want me to do that next?"
+- Prompt (verbatim): "Fix others report issue Still open: the pin bump. This repo still uses the old Nov 12 version of CollectionViewClassifyMenu. Moving to the new one is still blocked: at 36c91ba, most CYLTagListView members still aren't visible to Objective-C, and our React Native iOS wrapper needs them. The fix is to mark those members @objc in that repo, which I now have access to. Do you want me to do that next?"
 - Context: another repository pins the Nov 12 pod and calls `CYLTagListView` from an Objective-C(++) React Native
   wrapper. Since the Swift migration, 177 of the view's 182 public members have no `@objc`, so the generated
   `CollectionViewClassifyMenu-Swift.h` does not declare them. This repository's own React Native wrapper is not
@@ -485,7 +485,7 @@ tags: [issues, ui, cocoapods, progress]
 - Prompt (verbatim): "CollectionViewClassifyMenu updated continue"
 - Context: CYLSearchViewController (branch `feat/harmonyos-parity`) moves its pin to this repository's newest commit.
   Its React Native iOS wrapper (`CrossPlatform/react-native-cylsearch/ios/CylsearchTagListView.mm`, Objective-C++, as
-  Fabric requires) reports every tap of a tag with `tagClickHandler`, as its Android wrapper does. Since `477323d`
+  Fabric requires) reports every tap of a tag with `tagClickHandler`, as its Android wrapper does. Since `81d1725`
   every Objective-C-representable member is `@objc`, but `tagClickHandler` takes a `CYLTag`, which Objective-C cannot
   see, so it stayed Swift-only. `menu:didSelectItemAtIndexPath:` is no substitute: it is not called when a selected
   tag is tapped again in `.single` mode, while `tagClickHandler` is called for every accepted tap.
@@ -498,7 +498,7 @@ tags: [issues, ui, cocoapods, progress]
   block; it does not simulate a tap (the tap path is private), so the call from `handleTap` is checked only by
   reading it.
 
-### DONE (2026-11-17, `feat/harmony`, logged as TODO in `f30a2b1`): `CYLTagButton` draws a search bar item on HarmonyOS and in the mini program
+### DONE (2026-11-17, `feat/harmony`, logged as TODO in `2899a14`): `CYLTagButton` draws a search bar item on HarmonyOS and in the mini program
 
 - Prompt (relayed by the CYLSearchViewController session, same user goal as the entry below): every icon + title /
   animated icon of CYLSearchViewController must be this repository's `CYLTagButton`; iOS and Android are done there.
@@ -561,7 +561,7 @@ tags: [issues, ui, cocoapods, progress]
     parent are not seen on an emulator; `ResourceType.SYMBOL` = 40000 is taken from the ArkUI engine, not checked
     against the SDK here. The `oh-package-lock.json5` files are unchanged (no dependency version changed).
 
-### DONE (2026-11-17, `feat/harmony`, logged as TODO in `1e43253`): `CYLTagButton` as the one icon + title + animated icon component
+### DONE (2026-11-17, `feat/harmony`, logged as TODO in `be9f796`): `CYLTagButton` as the one icon + title + animated icon component
 
 - Prompt (relayed by the CYLSearchViewController session; the user's goal, quoted in that repository's task log):
   every component that shows an icon with a title, or plays an animated icon, in CYLSearchViewController and its
@@ -609,8 +609,8 @@ tags: [issues, ui, cocoapods, progress]
     Run here: `npm test` (108 pass), `export-core-strings.py --check`, `check-native-strings.py`. Not compiled or run
     here (Linux, no Xcode, Android SDK or DevEco): the Swift, Kotlin and ArkTS code and their tests; CI builds iOS.
   - Tables: Android -> iOS 740 / 740 = 100; iOS -> Android 770 / 778 (the 8 TODO rows are the classify menu and filter
-    buttons of `d05b42e`, Android refactor still TODO there); `docs/harmony.md` 811 / 849 (the 38 TODO rows are iOS
-    symbols added since the last regeneration, none of this task's; four stale keys of `d05b42e` removed from
+    buttons of `39fce57`, Android refactor still TODO there); `docs/harmony.md` 811 / 849 (the 38 TODO rows are iOS
+    symbols added since the last regeneration, none of this task's; four stale keys of `39fce57` removed from
     `harmony/parity-map.json`).
 - TODO left: open `cyl-tag-button` in WeChat DevTools; screenshots of a standalone tag with a badge on each platform;
   the HarmonyOS fold controls (`CYLTagListView.content`) still lay a stacked placement out in a row; Android's
@@ -653,16 +653,16 @@ tags: [issues, ui, cocoapods, progress]
   string `"列表"` (en, zh-Hant). Limit, stated honestly: like Rive, CYLTabBarController's SVGA player has no
   `animationSpeed`, `loops` or `progress`, so SVGA icons play once at the file's own speed. The speed slider and the loop
   switch do not change them. That needs CYLTabBarController's view player to expose them (SVGAPlayer has `loops`), not
-  an example workaround. Not compiled here (Linux, no Xcode). CI on `ec52480`: `CYLTagConfigurationTests` still counted five tags in the dictionary demo
+  an example workaround. Not compiled here (Linux, no Xcode). CI on `4b054c4`: `CYLTagConfigurationTests` still counted five tags in the dictionary demo
   (the SVGA tag made six); the test now counts six and reads the image and string items from the end.
-  CI run 43992497583 on `a6cdd69`: all 9 iOS jobs passed; SVGA screenshots in `screenshots.md`
+  CI run 43992497583 on `b27d340`: all 9 iOS jobs passed; SVGA screenshots in `screenshots.md`
   ("iOS: SVGA animated icons"). Other platforms: HarmonyOS done (D5); Android done (2026-11-19,
   `example-demo-rules.md`, `assets/android-svga-animated-icons.png`); Flutter and React Native done on iOS (Mac session)
   and Android (2026-11-19, `assets/flutter-rn-android-svga.png`); the Mini Program done (2026-11-19, Windows session,
   CYLTabBarController's `cyl-svga-miniprogram` in the "engines" subpackage, `assets/miniprogram-devtools-svga.png`).
 
 - TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):
-  - Context: the Swift core migration reached 100 (`250507c`). The user asks to continue the unfinished work of this
+  - Context: the Swift core migration reached 100 (`79f8e40`). The user asks to continue the unfinished work of this
     folder from the memories, then to go through every document, find the keyword TODO and finish the work, above all
     in this project's documents.
   - Open items found on 2026-11-14 (oldest instruction first), each tracked in its own entry:
@@ -699,7 +699,7 @@ tags: [issues, ui, cocoapods, progress]
 - DONE（资源文件名过长导致 git 操作失败，2026-11-15）：`Class/Other/Symtem/Images.xcassets` 中的
   `navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_{normal,modified}` 图片路径长达 229 字符，克隆到
   OneDrive 等深层目录（约 88 字符）后超过 Windows 260 字符上限，`git checkout` / `git worktree add` 报 "Filename too long"。
-  修复：资源改名为 `cyl_filter_normal` / `cyl_filter_modified`（`59c55cd`，见下方英文条目）；在此基础上
+  修复：资源改名为 `cyl_filter_normal` / `cyl_filter_modified`（`d19ee3b`，见下方英文条目）；在此基础上
   （`feat/android-kotlin-b`），`Example/CYLMenuExample` 中三个 `gray_tabbar_*_animation_lottie_placeholder` 的 PNG 文件名
   缩短为 `home@2x.png` 等（asset 名不变；原最长 182 字符，在 OneDrive 路径下仍超 260），并新增 `scripts/check-path-length.sh`
   （默认上限 160 字符），iOS CI 的 Changes job 运行它。最长路径现为 150 字符以内。用户提示词原文：
@@ -707,7 +707,7 @@ tags: [issues, ui, cocoapods, progress]
 
 - DONE（iOS 演示 app 左上角筛选 icon 不显示，2026-11-12）：资源本身存在（`navigationbar_leftBarButtonItem_itis_multiple_choice_filter_params_normal`，
   现名 `cyl_filter_normal` / `_modified`，核心 bundle 的 Images.xcassets）；原因是 iOS 26+ 导航栏按钮自带浅色 Liquid Glass 气泡，白色 icon 被白色气泡遮住
-  （`assets/request-ios-filter-icon-missing.png`）。修复：`CYLFilterDemoViewController.removeGlassBubble(from:)` 设 `hidesSharedBackground`（`34a86bc`），
+  （`assets/request-ios-filter-icon-missing.png`）。修复：`CYLFilterDemoViewController.removeGlassBubble(from:)` 设 `hidesSharedBackground`（`f4ec808`），
   截图 `assets/ios-demo-filter-tab.png` 中 icon 与“重置筛选条件”均可见。无需从 Android 复制资源（Android 的
   `classify_filter_*.png` 本来就是从 iOS 复制的）。用户提示词原文：
   > iOS端example左上角icon丢失，该资源在资源文件中就有，找不到去android端 copy一份。记录下iOS端相关文档，标注TODO continue
@@ -752,12 +752,12 @@ tags: [issues, ui, cocoapods, progress]
   (`noexcept` and generic types for Objective-C++) is in the same history.
 - DONE（验证，2026-11-14）：`Example/CYLMenuExample` 的 `CYLMenuLinkageViewController` 导航栏按钮在 iOS 26+ 没有被 Liquid Glass 气泡遮住：
   左上角筛选按钮的图标（漏斗，已修改时带红点）与右上角“重置”均可见，无需 `hidesSharedBackground`。截图：iOS，iPhone 17 Pro 模拟器，
-  iOS 27.0，Xcode 27.2，macOS 27.3，提交 `ff14821`，2026-11-14 21:42 NZDT（`plus-menu-filtered`，英文）：
+  iOS 27.0，Xcode 27.2，macOS 27.3，提交 `377a077`，2026-11-14 21:42 NZDT（`plus-menu-filtered`，英文）：
 
   <img src="assets/ios-example-menu-linkage-filter-button.png" width="300" alt="Menu linkage: the filter button is visible next to the title">
 
 - DONE（两个功能分到不同 tabbaritem，2026-11-12，`feat/android-kotlin`）：
-  - Android：Classify 与 Filter 两个 tab（`d12f101`，截图见 [android.md](android.md)）。
+  - Android：Classify 与 Filter 两个 tab（`3598332`，截图见 [android.md](android.md)）。
   - iOS 演示 app（`CollectionViewClassifyMenu.xcodeproj`）：改为 CYLTabBarController（配置文件 `CYLClassifyMenuDemo.bundle/<语言>.lproj/tabbar.json`，
     凸起加号页为“关于”），Classify（`CYLMainViewController`，只保留单选菜单）与 Filter（新 `CYLFilterDemoViewController`：左上按钮从左侧滑出、
     占大半屏，按地区/菜品列出 data.json 的 83 家商家）两个 tab；截图见 [screenshots.md](screenshots.md)。核心库同时修复：
@@ -817,11 +817,11 @@ tags: [issues, ui, cocoapods, progress]
   手机端阅读理解为纵向，与既有“截图自上而下”规则一致）。用户提示词原文：
   > continue in order. 找到instructions相关文件，以及skills相关文件，找到构建build ci cd章节。如果没有就新建，确保写入成功，全英文写入如下内容：所有截图，包括CI CD截图以及本地构建截图，全部保存在docs文件夹相关文档中，如果无相关文档就新建文档，保存图片到git仓库。并在合适的时机，你认为效果符合预期就更新最新图片到readme，找到相关章节如果没有就新建，并标注运行平台iOS android flutter reactnative 鸿蒙 小程序。运行环境 操作系统版本，模拟器版本，对应平台版本sdk版本（iOS android flutter reactnative 鸿蒙 小程序）本仓库版本号或commit地址。当前时间。截图使用清晰原图。
   > 追加截图细节，全英文：关键节点指的是比如可以删除todo关键词，或者Linux关键词，或者可以merge pr。或者你评估已经符合预期效果无bug 无issue。readme中展示的截取关键细节，如无必要不要全屏截取。最好是采用凭借格式展示多个关键细节。拼接截图，优先采用横向排布，方便手机端查看。其次是双列 多行拼接。最差是横向拼接。横向拼接一行最多三列。
-- DONE（分支合并，2026-11-12）：唯一 open 的 PR #16 即当前分支 `feat/android-kotlin`；合并 `master`（`ba8cd91`），PR #16 的
+- DONE（分支合并，2026-11-12）：唯一 open 的 PR #16 即当前分支 `feat/android-kotlin`；合并 `master`（`ae908d5`），PR #16 的
   target 改为 `master`，删除已完全包含在当前分支中的 `claude/intelligent-curie-1etnx5` 与 `clean-oc`；保留默认分支 `master`
   与 CI 截图分支 `ci-screenshots`。用户提示词原文：
   > 将所有处于open状态的分支的target branch指向本分支，当前分支，全部合并仅仅保留当前分支，处理冲突后合并，继续以上未完成的任务。
-- DONE（2026-11-14，`250507c`，100 分）：Core 转 Swift，见 [Swift-Migration.md](Swift-Migration.md)。TODO：Android 与跨端适配鸿蒙 NEXT，见 [android.md](android.md)。
+- DONE（2026-11-14，`79f8e40`，100 分）：Core 转 Swift，见 [Swift-Migration.md](Swift-Migration.md)。TODO：Android 与跨端适配鸿蒙 NEXT，见 [android.md](android.md)。
 
 - DONE（`feat/android-kotlin`）：`CYLCollectionViewLeftAlignedLayout` 合并上游 mokagio/UICollectionViewLeftAlignedLayout 的
   PR #37、#31、#25、#20，并处理上游全部 issue（25 / 25，满分）；逐项表格与测试见
@@ -876,48 +876,48 @@ tags: [issues, ui, cocoapods, progress]
 - Prompted by another project's crash (`this.hud is undefined`: a private getter in a page struct returned `undefined`; Back failed the same way in `leave()`).
 - Result for `harmony/` (102 `.ets` files): no getters inside any `@Component` struct; no `this.x!` assertions or `x!:` fields; every field dereferenced in `aboutToDisappear` / `onBackPress` / `onPageHide` / `leave` is initialized at declaration or is a required `@ObjectLink` (`CYLFilterBaseController.controller`, `CYLImageTagGroupView.group`, `CYLTagListView.model`, `CYLAnimatedIcon.bitmaps`, `CYLTagListCell.cell`). Toasts and dialogs go through `getUIContext()` or `CYLExampleUIContext.context?`. No change needed.
 
-### DONE (2026-11-16): retest the animation screen with Rive off (`3e02c5f`)
-- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `3e02c5f`, 12:03–12:04.
+### DONE (2026-11-16): retest the animation screen with Rive off (`c536862`)
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `c536862`, 12:03–12:04.
 - Opened, scrolled three screens down and back, then Back: light and dark, app alive, no new fault log. The Rive crash is gone.
-- New defects (screenshot `assets/harmonyos-animation-3e02c5f-light-dark-scroll.jpeg`, left to right: light top, light scrolled, dark top, dark scrolled):
+- New defects (screenshot `assets/harmonyos-animation-c536862-light-dark-scroll.jpeg`, left to right: light top, light scrolled, dark top, dark scrolled):
   - TODO: scrolled content draws over the status bar and the navigation title ("动效图标"); the list is not clipped under the header.
   - TODO: `--ps cylColorMode dark` leaves the page light (only the status bar turns dark); dark mode needs the system setting or the option needs fixing.
   - Expected: Rive tags show an empty icon area.
 
-### DONE (2026-11-16): retest `3417e7e` (Rive canvas renderer) and Y1–Y3
-- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `3417e7e`, 12:10–12:12.
-- Animation screen: open, scroll, wait 10 s, Back, in light and dark: app alive, no new fault log; Rive icons draw (canvas renderer). Screenshot `assets/harmonyos-animation-3417e7e-light-dark-scroll.jpeg`.
-- DONE Z2 (`32cbe81`, verified on the emulator; core cause still open in `example-layer-fixes.md`): scrolled tags still draw over the status bar and the "动效图标" title.
-- DONE Z3 (`32cbe81`, verified on the emulator): in dark mode only the header block turns dark; the tag list area stays white.
+### DONE (2026-11-16): retest `6e8ba55` (Rive canvas renderer) and Y1–Y3
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `6e8ba55`, 12:10–12:12.
+- Animation screen: open, scroll, wait 10 s, Back, in light and dark: app alive, no new fault log; Rive icons draw (canvas renderer). Screenshot `assets/harmonyos-animation-6e8ba55-light-dark-scroll.jpeg`.
+- DONE Z2 (`c70e82a`, verified on the emulator; core cause still open in `example-layer-fixes.md`): scrolled tags still draw over the status bar and the "动效图标" title.
+- DONE Z3 (`c70e82a`, verified on the emulator): in dark mode only the header block turns dark; the tag list area stays white.
 - Y1 pass: the 神 / 热 badge glyphs on the hot-search tags are white on their circles and readable (`assets/harmonyos-hot-search.jpeg`).
-- DONE Y2 (`32cbe81` verified; moved into the core in `64c6bc3`): the selected 好评 chip's thumbs-up icon is orange on the orange chip, nearly invisible; not white (`assets/harmonyos-reviews-memory-good-selected.jpeg`).
-- DONE Y3 (`32cbe81`, verified at 3.68:1): the menu linkage filter icon measures 2.45:1 against the bar (darkest pixel rgb 140,140,142); WCAG non-text minimum is 3:1 (`assets/harmonyos-menu-linkage.jpeg`).
-- Rive icons on `3417e7e` (12:13, `assets/harmonyos-animation-3417e7e-rive-section.jpeg`): all 11 Rive tags draw their icon (首页, 完成, 菜单, 形状, 卡车, 聊天, 搜索, 计时, 提醒, 我的); 按钮 shows only a small arc, its resting first frame. The empty icon areas were only in `3e02c5f`, where Rive was switched off.
+- DONE Y2 (`c70e82a` verified; moved into the core in `20c3357`): the selected 好评 chip's thumbs-up icon is orange on the orange chip, nearly invisible; not white (`assets/harmonyos-reviews-memory-good-selected.jpeg`).
+- DONE Y3 (`c70e82a`, verified at 3.68:1): the menu linkage filter icon measures 2.45:1 against the bar (darkest pixel rgb 140,140,142); WCAG non-text minimum is 3:1 (`assets/harmonyos-menu-linkage.jpeg`).
+- Rive icons on `6e8ba55` (12:13, `assets/harmonyos-animation-6e8ba55-rive-section.jpeg`): all 11 Rive tags draw their icon (首页, 完成, 菜单, 形状, 卡车, 聊天, 搜索, 计时, 提醒, 我的); 按钮 shows only a small arc, its resting first frame. The empty icon areas were only in `c536862`, where Rive was switched off.
 - TODO: PAG 健康 shows only a faint ring at rest; check that its first frame is meant to be that light.
 
-### DONE (2026-11-16): retest `32cbe81` (Y2, Y3, Z2, Z3)
-- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `32cbe81`, 12:19–12:22.
-- Y2 pass: the selected 好评 chip shows a white thumbs-up (`assets/harmonyos-32cbe81-retest.jpeg`, y2).
+### DONE (2026-11-16): retest `c70e82a` (Y2, Y3, Z2, Z3)
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), build of `c70e82a`, 12:19–12:22.
+- Y2 pass: the selected 好评 chip shows a white thumbs-up (`assets/harmonyos-c70e82a-retest.jpeg`, y2).
 - Y3 pass: the filter icon measures 3.68:1 on the screenshot (darkest pixel rgb 109,109,111), above the 3:1 minimum.
 - Z2 pass: scrolled tags are clipped below the controls in light and dark.
-- Z3 pass: the tag list area is dark in dark mode (`assets/harmonyos-32cbe81-animation-dark.jpeg`).
-- DONE (`9c8048a`, verified): in dark mode the navigation bar ("动效图标") stays light.
-- DONE (Z5: icons created one at a time, `9692e4b`; six openings without a freeze): on the first dark launch right after installing, the tags drew as blank rectangles and the app froze (`appfreeze` THREAD_BLOCK_6S, main thread in `PipelineContext::AddWindowStateChangedCallback` ← `FrameNode::InitializePatternAndContext`).
+- Z3 pass: the tag list area is dark in dark mode (`assets/harmonyos-c70e82a-animation-dark.jpeg`).
+- DONE (`535d96a`, verified): in dark mode the navigation bar ("动效图标") stays light.
+- DONE (Z5: icons created one at a time, `1c1c4bb`; six openings without a freeze): on the first dark launch right after installing, the tags drew as blank rectangles and the app froze (`appfreeze` THREAD_BLOCK_6S, main thread in `PipelineContext::AddWindowStateChangedCallback` ← `FrameNode::InitializePatternAndContext`).
 
-### DONE (2026-11-16): retest Z4 on `9c8048a`
-- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), 12:25, `assets/harmonyos-9c8048a-animation-dark-light.jpeg` (left dark, right light).
+### DONE (2026-11-16): retest Z4 on `535d96a`
+- Emulator `CYL ClassifyMenu Test` (Mate 70 Pro profile, HarmonyOS 6.0.0.112, API 21), 12:25, `assets/harmonyos-535d96a-animation-dark-light.jpeg` (left dark, right light).
 - Z4 pass: the navigation bar is dark with a white title in dark mode, light with a black title in light mode.
 - Z5: the first dark launch right after installing ran without a freeze or fault log this time.
-- DONE (`8529951`, verified): in dark mode the caption "动效引擎：CYLTabBarItemAnimationFactory 已链接" is very dim gray on black.
+- DONE (`1fa6c78`, verified): in dark mode the caption "动效引擎：CYLTabBarItemAnimationFactory 已链接" is very dim gray on black.
 
 ### DONE (2026-11-16): Rive crash fix compared with CYLTableViewPlaceHolder; checked on every platform
 - Prompt (verbatim): "CYLTabBarController andCollectionViewClassifyMenu文件夹CYLTableViewPlaceHolder 文件夹has Writing the Rive tab icon component.please learn from it update our 鸿蒙os core component library to fix crash on 鸿蒙os。please learn from it double check this is also fixed on other platform like iOS Android rect native and flutter 微信小程序"
 - CYLTableViewPlaceHolder (`CrossPlatform/harmonyos-cylplaceholder/.../CYLRivePlaceholderItemAnimator.ets`, branch `feat/android-refresh-port-followup`) picks `RendererType.Canvas` when `deviceInfo.productModel === 'emulator'`, else `RendererType.Rive`. CYLTabBarController has no ArkTS Rive component on any branch.
-- HarmonyOS core: `harmony/classifymenu/.../CYLAnimatedIcon.ets` already does the same since `3417e7e` (`cylRiveRendererType()`, `CYL_RIVE_ENABLED` switch), plus stable tag keys (`e82b503`). Verified on the emulator: no crash on open, scroll, Back, light and dark (entries above).
+- HarmonyOS core: `harmony/classifymenu/.../CYLAnimatedIcon.ets` already does the same since `6e8ba55` (`cylRiveRendererType()`, `CYL_RIVE_ENABLED` switch), plus stable tag keys (`bef419e`). Verified on the emulator: no crash on open, scroll, Back, light and dark (entries above).
 - Flutter on HarmonyOS (`flutter/cyl_tag_list_ohos/ohos/oh-package.json5`) and the React Native HarmonyOS example (`react-native/react-native-cyl-tag-list/harmony-example/harmony/entry/oh-package.json5`) link `file:` to `harmony/classifymenu`, so they build the same fixed component.
 - iOS, Android, React Native (iOS and Android hosts), Flutter (iOS and Android) and the WeChat mini program draw Rive through CYLTabBarController's engines (rive-ios, rive-android, cyl-rive-miniprogram WebAssembly). The crash was specific to @ohos/rive 1.0.4 (dispose after the XComponent surface is gone) and to the HarmonyOS emulator's GPU; neither runtime is used there. Not re-run on those platforms in this task.
 - TODO: Rive on a real HarmonyOS device still uses `RendererType.Rive` and has not been tested.
-- Z6 pass (`8529951`, 12:29): the caption is readable in dark mode (`assets/harmonyos-8529951-animation-dark.jpeg`).
+- Z6 pass (`1fa6c78`, 12:29): the caption is readable in dark mode (`assets/harmonyos-1fa6c78-animation-dark.jpeg`).
 
 ### DONE (2026-11-16, `feat/harmony`): verify the "TODO need 模拟器截图验证" rows on the emulator (ClassifyMenu rows)
 - Prompt (verbatim): "fix TODO need 模拟器截图验证" (with the other session's request: verify every such row of `docs/harmony-screenshot-issues.md` against the head, DONE with commit and screenshot, list the rows still wrong).
@@ -937,9 +937,9 @@ tags: [issues, ui, cocoapods, progress]
 - 2026-11-17 (winCollectionViewClassifyMenu session, prompt "开始处理todo"): Android -> iOS 89.4 -> 100 (611 / 611). The generator now also reads Objective-C headers; `android/merged/ios-map.json` (54 hand entries) maps the Android stand-ins to UIKit / Foundation (`CYLRect` -> `CGRect`, `CYLColor` -> `UIColor`, …) and renamed members; new iOS core APIs, same logic as Android: `CYLClassifyMenuViewController.numberOfVisibleItems(inSection:)` / `setSection(_:expanded:)` (the More button uses it), `CYLTagView.numberOfVisibleItems(inSection:)`, `CYLImageTagRippleView.isAnimating`, `CYLFilterBaseController.isShowing`, `CYLTagAppearance.resetBackgroundColor()` / `resetTextColor()` / `resetFont()`, `UIColor.cylAppTint`, the `kTagCollectionView*` constants, `UIView.cyl_viewsWithAccessibilityIdentifier(_:)`. Drag to reorder and icon + title + delete indicator already existed on iOS (`CYLTagContainerSample`: avatar, title, ×, `allowsReordering`, delete then `reloadMenuData()`). Not compiled: no Swift toolchain on Windows; needs an Xcode build on a Mac.
 - Done: the reverse generator `android/scripts/ios_public_api.py` reads the Swift sources (it failed on the deleted `CYLTagView.h`; the old 709 / 709 was stale). Real score 585 / 731 = 80.0, then 731 / 731 = 100 after mapping the renamed symbols (old Objective-C keys kept as aliases; 155 old keys name removed symbols, reported by the script). Both tables at 100: iOS -> Android 731 / 731, Android -> iOS 611 / 611.
 - 2026-11-16 (this session, branch `feat/harmony`): audit of the forward table found false matches: `android_public_api.py` still fell back to the stale Objective-C keys of `api-map.json` (155 removed symbols) and to same-name matches of Objective-C spellings. It now derives the iOS names from the current Swift symbols (`ios_public_api.symbols()` returns each method's Swift signature) and drops the stale fallback: honest score 568 / 611 = 93.0. Closed in the core, same logic as Android `CYLGeneralExtensions.kt`: `UIView+CYLGeneral.swift` (`cylSetWidth(_:)`…`cylSetSize(_:)`, `cylWidth`…`cylMaxX`, `cylHorizontalCenter(withWidth:)` / `cylVerticalCenter(withHeight:)` rounded up as Android, `cylVerticalCenterInSuperview()`, `cylHorizontalCenterInSuperview()`, `cylSetBorderWidth(_:color:)`, `cylSetCornerRadius(_:)`, `cylAddLineLayer(frame:color:)`, `cylAddTapTarget(_:action:)`, `cylSnapshot(width:)`, `cylSnapshot()`), new `CYLFilterParamsTool` (`kMultipleFilterSetting*`, default selection flags), `CYLFilterBaseController.settingArray`, plus 13 hand mappings in `ios-map.json`. Example usage: the search discover mic button border (`cylSetBorderWidth`), the menu linkage Reset (`CYLFilterParamsTool` default selection); tests `CYLGeneralHelpersTests`. Scores: Android -> iOS 611 / 611 = 100.0, iOS -> Android 761 / 761 = 100.0. Not compiled here (Linux container, no Xcode): CI builds and tests it.
-- 2026-11-16 (prompt "continue fix todo fix • Blocked on sub-repo access (7 rows): CYLTag.resetColors() is missing on iOS. It's a one-line addition. The multiple filter's state object, CYLFilterParamsTool (titles, settings, file saving) and settingArray. iOS deleted these during its Swift rewrite, but Android still has them. Someone has to decide in that repo whether iOS gets them back or Android drops them. To let me do this, add a permission rule allowing mcp__claude-code-remote__add_repo, or make the change yourself."): `CYLFilterParamsTool` and `settingArray` were already back on iOS (`a3c2e1f`). Added `CYLTag.resetColors()` (test `CYLGeneralHelpersTests.testTagResetColorsGoesBackToTheListStyle`). Found why the forward table had missed it: `android_public_api.py` dropped every class whose primary constructor spans several lines (`class CYLTag(` … `) {`), so its constructor properties were listed as top-level symbols (and matched to other classes) and its body was skipped. The parser now follows the constructor to its closing line: 611 -> 733 rows (128 members found, 6 misattributed rows gone), all with an iOS counterpart. Scores: Android -> iOS 733 / 733 = 100.0, iOS -> Android 762 / 762 = 100.0.
+- 2026-11-16 (prompt "continue fix todo fix • Blocked on sub-repo access (7 rows): CYLTag.resetColors() is missing on iOS. It's a one-line addition. The multiple filter's state object, CYLFilterParamsTool (titles, settings, file saving) and settingArray. iOS deleted these during its Swift rewrite, but Android still has them. Someone has to decide in that repo whether iOS gets them back or Android drops them. To let me do this, add a permission rule allowing mcp__claude-code-remote__add_repo, or make the change yourself."): `CYLFilterParamsTool` and `settingArray` were already back on iOS (`a6ecaf2`). Added `CYLTag.resetColors()` (test `CYLGeneralHelpersTests.testTagResetColorsGoesBackToTheListStyle`). Found why the forward table had missed it: `android_public_api.py` dropped every class whose primary constructor spans several lines (`class CYLTag(` … `) {`), so its constructor properties were listed as top-level symbols (and matched to other classes) and its body was skipped. The parser now follows the constructor to its closing line: 611 -> 733 rows (128 members found, 6 misattributed rows gone), all with an iOS counterpart. Scores: Android -> iOS 733 / 733 = 100.0, iOS -> Android 762 / 762 = 100.0.
 
-### Mac verification of the Android -> iOS API work (2026-11-17, `29ecc5f`, macOS 27 + Xcode 27)
+### Mac verification of the Android -> iOS API work (2026-11-17, `1840673`, macOS 27 + Xcode 27)
 - `scripts/library-warnings.sh`: library builds and analyzes with 0 warnings.
 - `scripts/unit-tests.sh`: menu 32 / 0 failures, tag 6 / 0, swift 22 / 0; example 91 tests, 1 failure.
 - TODO: `CYLSearchCategoryScenarioTests.testSearchCategoriesUseABottomTabBarAndFillTheSearchBar` fails: the tab bar's frame is at y = 0 (expected > 304.5, "Tab bars are always at the bottom") and the tags end at 586 (expected <= 0.5, "Tags end above the tab bar"). Not yet known whether this predates the API work.
@@ -953,7 +953,7 @@ tags: [issues, ui, cocoapods, progress]
   `CYLTagEditorLocalizedString`, `CYLDemoLocalizedString`), AGENTS.md "Internationalization and localization".
 - Prompt (verbatim): "排查国际化 本地化遗留问题 完全支持，fix 样式 issue"
 - Prompt (English): "Investigate leftover internationalization / localization problems until it is fully supported; fix
-  the 样式 issue." (The "样式" issue: the pushed commit 58b2f335 had Chinese in its message; rewritten as 020434f1 with
+  the 样式 issue." (The "样式" issue: the pushed commit 58b2f335 had Chinese in its message; rewritten as 25cb2ed0 with
   the owner's OK, `--force-with-lease`.)
 - Acceptance (100): every key a lookup is called with exists in every language of its bundle with the same format
   specifiers (25); no user-facing literal outside a lookup (25); every screen of the iOS examples shows no Chinese in
@@ -1002,7 +1002,7 @@ tags: [issues, ui, cocoapods, progress]
   and step 0 of `.agents/skills/cyl-task-start/SKILL.md` (and its description); appended only (numstat: no lines
   removed except the skill's rewritten description line). `harmony/instructions.md` belongs to the Windows session:
   asked it to append the same rule (−10 until it confirms).
-- Update: the Windows session appended the rule to `harmony/instructions.md` (e9abb559): **100/100**.
+- Update: the Windows session appended the rule to `harmony/instructions.md` (6d8deef3): **100/100**.
 
 ### TODO (2026-11-19, `feat/harmony`): "Welcome to use AndroidTagView!" names the platform's OS version and CollectionViewClassifyMenu
 
@@ -1028,7 +1028,7 @@ tags: [issues, ui, cocoapods, progress]
 - Result, Android, HarmonyOS and the mini program (Windows session, 2026-11-19): **score 100 / 100.**
   - Android `LujunTagContainerFragment.kt` and the vendored upstream sample `MainActivity.kt`: "Welcome to use Android
     ${Build.VERSION.RELEASE} CollectionViewClassifyMenu". The emulator shows "Welcome to use Android 17 CollectionView…".
-    It is cut by the line width, not at 23 characters: Android's tag_max_length default is 0 since `c7101dca` (a long tag
+    It is cut by the line width, not at 23 characters: Android's tag_max_length default is 0 since `b85e4743` (a long tag
     starts a new line instead of being shortened). iOS, HarmonyOS and the mini program still cut that container at 23.
     That difference is older than this task.
   - HarmonyOS `CYLTagContainerSampleData.welcomeTitle()`: `deviceInfo.distributionOSName` + `distributionOSVersion`,
@@ -1040,25 +1040,25 @@ tags: [issues, ui, cocoapods, progress]
 
   <img src="assets/welcome-tag-os-version-other-platforms.png" width="400" alt="Welcome tag with the running system on Android, HarmonyOS and the mini program">
 
-### TODO (2026-11-19, `feat/harmony`): project-wide localization audit; rewrite b8c95591's message (owner's OK)
+### TODO (2026-11-19, `feat/harmony`): project-wide localization audit; rewrite 4a1cc7aa's message (owner's OK)
 
 - Context: the iOS sweep above is done (core, demo app, both Examples). Left: the shared Flutter and React Native
   example code (Mac session: their iOS runs), Android, HarmonyOS and the mini program (Windows session, session roles
-  rule). Commit `b8c95591` (Windows session) has "拖拽排序" in its body; the owner now asks to fix it. 14 linear
+  rule). Commit `4a1cc7aa` (Windows session) has "拖拽排序" in its body; the owner now asks to fix it. 14 linear
   commits follow it; their hashes change; references to them in docs and commit messages are remapped.
   16 older commits (2026-11-12 to 11-16) also have Chinese in their messages; not part of this request.
-- Prompt (verbatim): "排查项目国际化 本地化适配，并fix Commit message: b8c95591, from the Windows session, has Chinese ("拖拽排序") in its body. Rewriting it means changing older history on the shared branch, so I'm leaving it unless you ask."
-- Prompt (English): "Audit the project's internationalization / localization, and fix commit b8c95591's message
+- Prompt (verbatim): "排查项目国际化 本地化适配，并fix Commit message: 4a1cc7aa, from the Windows session, has Chinese ("拖拽排序") in its body. Rewriting it means changing older history on the shared branch, so I'm leaving it unless you ask."
+- Prompt (English): "Audit the project's internationalization / localization, and fix commit 4a1cc7aa's message
   (Chinese in its body)."
-- Acceptance (100): b8c95591's message in English, pushed with `--force-with-lease`, later hashes remapped in docs and
+- Acceptance (100): 4a1cc7aa's message in English, pushed with `--force-with-lease`, later hashes remapped in docs and
   messages, the Windows session resynced (30); Flutter and React Native example strings localized with a check (35);
   Android, HarmonyOS and the mini program audited by the Windows session (35). Pass: 60.
-- Commit message rewrite (DONE): the old `4e03f8a5` is now `b8c95591` ("Styles starts with the drag-to-reorder row"),
+- Commit message rewrite (DONE): the old `4e03f8a5` is now `4a1cc7aa` ("Styles starts with the drag-to-reorder row"),
   replayed with `git commit-tree` on the same trees, authors and dates; the 15 later commits got new hashes (map:
-  4e03f8a5→b8c95591, 6e33af93→2a70241d, 8e21f7b0→170e3bb6, 1a64677c→ca8fce5a, 3f696cd5→699b5724, 1d1f7904→020434f1,
-  6e9973bf→185198ad, cc761c21→efabb11a, 669dcfc1→e9abb559, 3222912d→e438e1cb, be8a74e7→d7436d3b, f88f9406→8b57c329,
-  501fe58e→4e41816c, 8ccb2f8d→5031043b, 33802f5b→cb9d6528, 1950b703→3a09462d); hashes cited in later messages and in
-  the docs were remapped; `check-commit-message.sh b8c95591^..HEAD`: OK; tree of the new tip identical to the old one;
+  4e03f8a5→4a1cc7aa, 6e33af93→50d8bd30, 8e21f7b0→b25cb2e4, 1a64677c→28ba7bca, 3f696cd5→01e4ba26, 1d1f7904→25cb2ed0,
+  6e9973bf→9f51632f, cc761c21→85a95d1e, 669dcfc1→6d8deef3, 3222912d→843c20cd, be8a74e7→95744029, f88f9406→460a62ee,
+  501fe58e→4527b782, 8ccb2f8d→77f3c17b, 33802f5b→8fd20c97, 1950b703→90fb7aef); hashes cited in later messages and in
+  the docs were remapped; `check-commit-message.sh 4a1cc7aa^..HEAD`: OK; tree of the new tip identical to the old one;
   pushed with `--force-with-lease`.
 
 - Flutter and React Native (Mac session, shared example code): the classify page showed the shared data (dishes,
@@ -1078,7 +1078,7 @@ tags: [issues, ui, cocoapods, progress]
   mini program (Windows session) and the React Native app run (Mac session); (2) 16 older commits (2026-11-12 to
   11-16) with Chinese in their messages: 10 English messages with a few Chinese UI terms, 6 automatic commits whose
   message was a pasted Chinese prompt unrelated to their diff; rewriting them replays 536 commits (18 merges) from
-  `ed8b3b18`; an `archive/feat-harmony-before-message-rewrite` tag keeps the old hashes reachable (other repositories
+  `0a00b73f`; an `archive/feat-harmony-before-message-rewrite` tag keeps the old hashes reachable (other repositories
   pin commits in that range); (3) the Android Container tab's sixth container (a star drawable, a tag that wraps, 4 dp
   elevation, a cross drawable, no cross on the last tag) has no iOS counterpart.
 - Prompt (verbatim): "fix Open items haven't changed: the localization audit waits on the Windows session (65/100), 16 older commit messages still contain Chinese, and Android's sixth container has no iOS version."
@@ -1086,3 +1086,12 @@ tags: [issues, ui, cocoapods, progress]
   trees unchanged, hashes remapped in later messages and the docs, the archive tag pushed, other sessions told (30);
   the sixth container on iOS with the core APIs it needs (wrapping title, elevation, cross image, per-tag cross),
   tests and a screenshot next to Android (35). Pass: 60.
+- Commit messages (DONE, 30 / 30): the 16 messages are in English: 10 had a few Chinese UI terms, translated in place
+  ("全部" → All, "川菜" → Sichuan…); the 6 automatic commits of 2026-11-12, whose message was a pasted Chinese prompt
+  unrelated to the diff, got git cz subjects describing their diff and a note. Every commit from `0a00b73f` (formerly
+  `ed8b3b18`) to the tip not already on master (536, 18 merges) was replayed with `git commit-tree` on the same trees,
+  authors and dates; master's commits keep their hashes (the merge base stays `6537fbc6`, 538 commits only on the
+  branch, as before). Hashes cited in later messages (91 messages) and in the docs (458 references in 15 files) now name
+  the new commits. The tag `archive/feat-harmony-before-message-rewrite` (old tip `b7d5d289`) keeps every old hash
+  reachable for pins in other repositories (for example `75d53825` → `6315202e`, `697e9307` → `4cadb7c7`).
+  `check-commit-message.sh origin/master..HEAD`: no commit with Chinese. Pushed with `--force-with-lease`.

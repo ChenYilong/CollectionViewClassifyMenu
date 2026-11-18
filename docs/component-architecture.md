@@ -184,8 +184,8 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   components."
 - **Guide link (user, 2026-11-17)**: link the guide on its branch, the newest address:
   <https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md>.
-- **Status**: done in the commit after the task log `45101fb` (the row "CollectionViewClassifyMenu" of the guide's
-  "Downstream migration status" table points at `45101fb`); CYLTabBarController pinned at its branch tip `7511f7d`
+- **Status**: done in the commit after the task log `7a280fa` (the row "CollectionViewClassifyMenu" of the guide's
+  "Downstream migration status" table points at `7a280fa`); CYLTabBarController pinned at its branch tip `7511f7d`
   (no code change since `35aa757`, the guide read there). Verification items below stay TODO.
 - **Result**:
   - iOS: `CYLTagButton` subclasses `CYLAnimatedItemView` (`import CYLTabBarController`); `CYLTagAnimationEngine`, the own
@@ -209,9 +209,9 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
     the inherited members Objective-C uses: `animationURL`, `animationLoops`, `animationView`, `imageView`,
     `titleLabel`, `accessoryView`, `placeholderImage`, `restartAnimation()`, `stopAnimation()` (with the ones it already
     overrides: `title`, `image`, `selectedImage`, `animationSpeed`, `animationRestingProgress`, `playAnimation()`,
-    `reloadAnimation()`). CI failed "Unit tests (menu)" on `1813025` without them; `f93974b` worked around it by importing
+    `reloadAnimation()`). CI failed "Unit tests (menu)" on `9ecc535` without them; `e128fa8` worked around it by importing
     CYLTabBarController in the test, which the owner rejected (2026-11-17, prompt verbatim: "Donot import tabbar and fix
-    it"); it is reverted and fixed in the core. DONE (2026-11-18): CI "Unit tests (menu)" passes without the import (run 44142400181 at `8794487`; also `f8301a4`).
+    it"); it is reverted and fixed in the core. DONE (2026-11-18): CI "Unit tests (menu)" passes without the import (run 44142400181 at `e73850e`; also `65d2d4a`).
   - CocoaPods: podspec `s.dependency 'CYLTabBarController/CYLAnimatedItem'`; Example Podfile `CYLAnimatedItem` plus
     `CYLAnimatedItemLottieObjectiveC`, `…PAG`, `…Rive`, `…SVGA`, `…GIF`; RN and Flutter example Podfiles
     `CYLAnimatedItemLottieObjectiveC`, `…Rive`; Example-Swift and the root project no engine; TagCollectionView's Podfile
@@ -270,9 +270,9 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   `pod 'CYLAnimatedItem'` by `CYL_ANIMATED_ITEM` (same commit) and the examples' engines are `CYLAnimatedItem/<Type>`;
   pins `7511f7d` → `1f0fcce`; `scripts/pod-lint.sh lib` includes `CYLAnimatedItem.podspec` from a checkout of the
   commit; Android imports `CYLTabBarItemAnimationViewMaking` from `com.cyl.animateditem`. Not built here (no Xcode,
-  no Android SDK). TODO: CI on the commit; the Objective-C redeclarations of `d3efc5f` can go once Objective-C tests
+  no Android SDK). TODO: CI on the commit; the Objective-C redeclarations of `082f753` can go once Objective-C tests
   `@import CYLAnimatedItem;` (kept for now: the owner rejected importing the tab bar, and they work).
-- **CI on `7183711`** (run 44017316252): three failures.
+- **CI on `0b6917d`** (run 44017316252): three failures.
   1. "Unit tests (menu)": the demo app could not load `CYLClassifyMenuViewController`'s members. The root Podfile
      builds static libraries, and `CYLAnimatedItem.podspec` does not set `DEFINES_MODULE`, so the module
      `CYLTagButton` imports did not exist there. Fix: `:modular_headers => true` on the pod in the root and
@@ -300,7 +300,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   formerly `47aec88`) and license notices on top of the #814 merge `9a54e26`. Both #814 fixes are kept
   (`DEFINES_MODULE`, `CYLTabBarItemAnimationURLMayBeLottie`).
 
-- **Closed (2026-11-19):** the iOS CI (`pod lib lint` and the unit tests) passes at `1a80c275` with the pins at
+- **Closed (2026-11-19):** the iOS CI (`pod lib lint` and the unit tests) passes at `e4a69356` with the pins at
   CYLTabBarController `b376c278`; both upstream fixes (`DEFINES_MODULE`, the Lottie-only animator) are in every pin
   since `0a63bed`.
 
@@ -309,7 +309,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
 - **Prompt (verbatim)**: "我已经更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
 - **Prompt (English)**: "I updated the document, latest address …/docs/Animated-Item.md; some descriptions changed. Please read
   it again and adjust."
-- **What changed**: the guide records both bugs this repository's CI found on `7183711` as fixed in CYLTabBarController's
+- **What changed**: the guide records both bugs this repository's CI found on `0b6917d` as fixed in CYLTabBarController's
   core: `CYLAnimatedItem.podspec` defines its module ("no app needs modular headers for it"), and the Lottie animator
   takes only a Lottie document (`CYLTabBarItemAnimationURLMayBeLottie()`); failure case (4) now says a picture or a
   broken local file makes no Lottie view; the entry waits for a re-test here.
@@ -317,11 +317,11 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   core fix replaces it, as the core-first rule asks). `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay`
   is the re-test: unchanged, expected to pass on `0a63bed`. Pending CI.
 
-- **CI on `b4d0e51`** (run 44026180641): `pod lib lint` passes (first time since the migration). "Unit tests (menu)"
+- **CI on `69db925`** (run 44026180641): `pod lib lint` passes (first time since the migration). "Unit tests (menu)"
   fails again with "cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable members that
   could not be loaded", now with `CYLAnimatedItem.modulemap` on the command line (upstream `DEFINES_MODULE`, the
-  workaround removed in `4171135`). Cause: the demo app imports only CollectionViewClassifyMenu, whose public classes
-  are `CYLAnimatedItemView`s, and with explicit modules it did not load the base class's module (at `d3efc5f` the app
+  workaround removed in `dd8c535`). Cause: the demo app imports only CollectionViewClassifyMenu, whose public classes
+  are `CYLAnimatedItemView`s, and with explicit modules it did not load the base class's module (at `082f753` the app
   imported CYLTabBarController, which then held the component). Fix in the core: `CYLTagButton.swift` re-exports the
   module (`@_exported import CYLAnimatedItem`, as CYLTabBarController does), so every client of the library loads it.
   Pending CI.
@@ -369,8 +369,8 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
     `docs/android-api.md` 784 to 791 / 792 (99.9), `docs/android-ios-api.md` 736 / 736 (100).
   - Remaining: CI build and the unit tests; screenshots of the classify menu and the multiple filter on Android to
     compare with iOS. **Done 2026-11-19 (Windows session), 100/100:** the library and the example build, Android library
-    tests 87 / 0 at `c368c75e`; on the emulator the More / Less button and the filter section titles render as on iOS
-    (`assets/android-menu-filter-tagbutton.png`); `docs/android-api.md` 792 / 792 (`c368c75e` mapped the category row).
+    tests 87 / 0 at `9e9180d7`; on the emulator the More / Less button and the filter section titles render as on iOS
+    (`assets/android-menu-filter-tagbutton.png`); `docs/android-api.md` 792 / 792 (`9e9180d7` mapped the category row).
 - **Pin `d875dd1`** (2026-11-17): the #788 tip and newest commit (`5ff6021` guide, `ab29a84` late-failure fallback and remote GIF downloads, `d875dd1` remote PAG downloads); `DEFINES_MODULE` kept.
 
 ## 90/100 (2026-11-17, reviewed 2026-11-19): the guide re-read at `57a527e`: CYLAnimatedItem on HarmonyOS and the mini program
@@ -389,7 +389,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   again and adjust."
 - **Status**: started. Pins `57a527e`; HarmonyOS and mini program migrations next (not buildable here: no DevEco, no WeChat
   DevTools).
-- **HarmonyOS done** (`1a8a80b`, not compiled here: no DevEco): `harmony/classifymenu`'s `CYLTagButton` draws its icon
+- **HarmonyOS done** (`222a58a`, not compiled here: no DevEco): `harmony/classifymenu`'s `CYLTagButton` draws its icon
   (animation, static image, placeholder) with `CYLAnimatedItemView` through `CYLTagAnimatedIcon` (ArkTS structs cannot
   subclass). The component is vendored unmodified at `57a527e` in `harmony/cylanimateditem` (README with commit, source,
   license), registered in `harmony/build-profile.json5`, depended on with `file:../cylanimateditem`. The library dropped
@@ -397,7 +397,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   (`cylRegisterExampleAnimationEngines()` in `EntryAbility.onCreate`); the players and the SVGA decoder moved to the
   example. Public API kept (`animationView`, `animationPlayer`, `playAnimation()`, speed, loops, resting progress);
   `CYLAnimatedIcon` and the per-engine players left the library.
-- **Mini program done** (`62fce9b`, `npm test` 126/126, the packed tarball too; not run in WeChat DevTools):
+- **Mini program done** (`b4c7460`, `npm test` 126/126, the packed tarball too; not run in WeChat DevTools):
   `cyl-tag-list` and `cyl-tag-button` draw every icon through `cyl-animated-item`, vendored at `57a527e` into
   `miniprogram_dist/` by `scripts/fetch-cyltabbar.js` (with `cyl-animation-placeholder`, LICENSE and COMMIT files;
   `--check` compares them); engines come from the app through `generic:cyl-lottie-view` / `-pag-` / `-rive-` / `-svga-`;
@@ -415,7 +415,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
 - **Review (2026-11-19, Windows session): 90/100.**
   1. Done. The mini program gaps closed upstream (PR #815, `faf535e0`, in the pins since `074285a6`; GIF stills, one-pass
      play, `embedded`, `autoplay`: `animated-item-migration.md` row 19), and SVGA joined the engines on 2026-11-19
-     (`43fc242a`). HarmonyOS: built, host tests and emulator checks (row 17, `harmony-verification.md`).
+     (`bc4e4545`). HarmonyOS: built, host tests and emulator checks (row 17, `harmony-verification.md`).
   2. **Open.** The React Native HarmonyOS shell (`harmony-example/harmony/build-profile.json5`) lists `entry`,
      `cyltabbar` and `classifymenu` but not `cylanimateditem`, which `classifymenu` now depends on (`file:../cylanimateditem`).
      It also registers no engines, so its tags would show static images. Fix: add the module, register the example's
@@ -437,7 +437,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   `restartAnimation()` / `stopAnimation()`), `3602ae67` (`riveWasmPath` / `pagWasmPath`; cyl-rive and cyl-pag treat an
   empty `wasm-path` as their default), `ca6219a9` (`animationType`, for `.riv.bin` / `.pag.bin`), `b51ac0ae` (`embedded`:
   no padding, 44 px minimum or accessibility role inside a tag). `npm test` there: 36 pass.
-- **Migration here**: the other session pushed the same migration first (`62fce9b`, vendored at `57a527e`, the engines
+- **Migration here**: the other session pushed the same migration first (`b4c7460`, vendored at `57a527e`, the engines
   behind the example's `components/cyl-tag-animation-view`), so this session's copy was not committed (a patch is kept
   in its scratchpad). Left (handed to that session): at `57a527e` a GIF tag loops with no stills and Play all cannot
   restart it; once #815 is merged, move the pins to its merge commit and pass `gif-first-frame` / `gif-last-frame` /
@@ -445,7 +445,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
 
 ## Progress against the guide (2026-11-17)
 
-The item-by-item progress, the score (72 at `d979073`) and the remaining TODOs of the CYLAnimatedItem migration are kept in
+The item-by-item progress, the score (72 at `3b0d9ea`) and the remaining TODOs of the CYLAnimatedItem migration are kept in
 [animated-item-migration.md](animated-item-migration.md).
 
 ## Concurrency: a started run finishes (2026-11-17)
@@ -456,13 +456,13 @@ than two hours. GitHub keeps at most one pending run per concurrency group and r
 started run completes and the next one tests the newest commit.
 - **Pin `c8132d2`** (2026-11-17): CYLTabBarController `c8132d2`, the #788 tip and newest commit. It fixes the cause of the
   static-library demo failure ("cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable
-  members that could not be loaded", still failing on `0e79c2c` with every workaround here): under CocoaPods
+  members that could not be loaded", still failing on `438172c` with every workaround here): under CocoaPods
   `CYLTabBarController.h/.m` now import `<CYLAnimatedItem/CYLAnimatedItemView.h>` by its module instead of the quoted
   path, so `CYLAnimatedItemView` is declared once. Also brings the mini program `cyl-animated-item` reading `*.svga.bin`
   and `animationType`, remote Lottie downloads on iOS and the FlatDesign tab button on `CYLAnimatedItemView`. The vendored
   mini program component was re-fetched (`fetch-cyltabbar.js`, `npm test` 130/130); the HarmonyOS module is unchanged
-  upstream (README pin updated). Pending CI: the menu job decides whether the demo-app workarounds (`27c0394` modular
-  headers, `880d9b1` demo import) can go.
+  upstream (README pin updated). Pending CI: the menu job decides whether the demo-app workarounds (`2de3039` modular
+  headers, `6931506` demo import) can go.
 - **Core fix for Objective-C callers** (2026-11-17): CYLSearchViewController's example tests failed to compile on its
   `e7d9655` with "property 'position' not found on object of type 'CYLMenuFoldControl *'": the Swift translation of
   `CYLMenuFoldControl` exposed only its initializer to Objective-C. The class is now `@objcMembers`, so every property
@@ -471,27 +471,27 @@ started run completes and the next one tests the newest commit.
 - **Workarounds removed** (2026-11-17 17:55 UTC): the static-library menu suite passes since CYLTabBarController
   `83a8ff8` (its public headers `@import CYLAnimatedItem;`; the cause was "CYLAnimatedItemView expected in
   'CYLAnimatedItem' but found in 'CYLTabBarController'", found with `-disable-deserialization-recovery`). Run
-  44092883295 on `f8301a4` is fully green. Removed here: `:modular_headers => true` on `CYLAnimatedItem` in the root,
-  TagCollectionView and React Native example Podfiles (`27c0394`), and the menu suite's diagnostic flag in `ios.yml`
-  (`32b210e`; `CYL_SWIFT_EXTRA_FLAGS` stays available in `scripts/unit-tests.sh`). If the menu suite fails again
-  without modular headers, restore them. The demo's `import CYLAnimatedItem` (`880d9b1`) is the other session's to
+  44092883295 on `65d2d4a` is fully green. Removed here: `:modular_headers => true` on `CYLAnimatedItem` in the root,
+  TagCollectionView and React Native example Podfiles (`2de3039`), and the menu suite's diagnostic flag in `ios.yml`
+  (`3c4e7ae`; `CYL_SWIFT_EXTRA_FLAGS` stays available in `scripts/unit-tests.sh`). If the menu suite fails again
+  without modular headers, restore them. The demo's `import CYLAnimatedItem` (`6931506`) is the other session's to
   remove.
-- **Confirmed** (2026-11-17 19:33 UTC): run 44142400181 on `8794487` (no modular headers, no demo `import
+- **Confirmed** (2026-11-17 19:33 UTC): run 44142400181 on `e73850e` (no modular headers, no demo `import
   CYLAnimatedItem`): menu, tag and example suites and `pod lib lint` pass. Library build, swift suite and Example
   screenshots were cancelled while still queued (no runner was assigned, 0 steps; runner capacity, not the workflow).
   TODO: the screenshots of these runs did not reach the `ci-screenshots` branch (no `feat-harmony/<sha>/` folder for
-  `f8301a4`, `698260e`, `8794487`), and artifact storage is not reachable from the cloud sessions; check the publish
+  `65d2d4a`, `348805e`, `e73850e`), and artifact storage is not reachable from the cloud sessions; check the publish
   step for pull request runs.
 
 ## DONE (2026-11-17): CI screenshots reach the ci-screenshots branch under the branch commit
 
 - **Context**: the "Example screenshots" job of `ios.yml` publishes with `scripts/publish-screenshots.sh`, but no
-  `ci-screenshots/feat-harmony/<sha>/` folder existed for `f8301a4`, `698260e` or `8794487`. The log of the `698260e` run
+  `ci-screenshots/feat-harmony/<sha>/` folder existed for `65d2d4a`, `348805e` or `e73850e`. The log of the `348805e` run
   says "Published 54 screenshots to ci-screenshots/feat-harmony/531cfa3": on `pull_request` runs `GITHUB_SHA` is the
   temporary merge commit (`refs/pull/N/merge`), not the branch commit, so the folder name matches no commit of the branch.
   Artifact storage is blocked from the cloud sessions, so the branch is the only way to read the images there.
 - **Requirements**: fix the screenshot publishing; also add a screenshot job to CYLSearchViewController's CI.
 - **Prompt (verbatim)**: "to fix the screenshot publishing in ClassifyMenu and add a screenshot job to CYLSearchViewController's CI"
-- **Status**: done. `c4e8b413` passes the head commit (`SCREENSHOT_SHA`); the run for it published 54 screenshots to
-  `ci-screenshots/feat-harmony/c4e8b41/` (checked 2026-11-17 21:15 UTC; `animations@en.png` shows every engine registered
+- **Status**: done. `bbda97a1` passes the head commit (`SCREENSHOT_SHA`); the run for it published 54 screenshots to
+  `ci-screenshots/feat-harmony/bbda97a/` (checked 2026-11-17 21:15 UTC; `animations@en.png` shows every engine registered
   and the playback controls).

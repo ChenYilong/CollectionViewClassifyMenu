@@ -128,7 +128,7 @@ all plays them to their last frame, with Loop on they keep moving (changed pixel
 [0, 0, 126, 28, 41], Messages [133, 0, 32, 99, 138], Posts [211, 65, 30, 88, 117]); `npm test` 145 pass.
 
 <img src="assets/miniprogram-devtools-svga.png" width="400" alt="Mini program SVGA sections in WeChat DevTools: at rest, after Play all, loop on">
-Flutter and React Native on iOS: DONE (2026-11-19, `c2073004`, `0202e515`): an SVGA section (Home, Search, Messages, Me;
+Flutter and React Native on iOS: DONE (2026-11-19, `478e83e2`, `e84772ee`): an SVGA section (Home, Search, Messages, Me;
 the iOS example's files) after Rive, pod `CYLAnimatedItem/SVGA` (React Native also needs `SVGAPlayerLite` with modular
 headers); on the iPhone 17 Pro simulator the icons rest gray and animate after Play all; Flutter iOS integration tests
 2 / 2 (21 tags), React Native `tsc` passes. Their Android side: DONE (2026-11-19, Windows session): both example apps add

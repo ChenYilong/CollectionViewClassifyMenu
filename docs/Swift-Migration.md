@@ -250,7 +250,7 @@ migrated type must be there (inherited initializers excepted). Verified on 2026-
 
 | Date | Commit | Files migrated | Objective-C files left | Score | API check | Tests |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-13 | `79b521f` | (standard, skills, API check) | 76 | 0 | baseline | baseline run |
+| 2026-11-13 | `13cf295` | (standard, skills, API check) | 76 | 0 | baseline | baseline run |
 | 2026-11-13 | step 2 | the roots: `NSArray+CYLLog`, `NSDictionary+CYLLog`, `CYLMultipleFilterController`, `CYLClassifyMenuViewController` (+ `CYLMenuKeys.h`), `CYLImageTagView`, `CYLTagView` (13 files) | 63 | 17.1 | unchanged | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
 
 | 2026-11-13 | step 3 | `CYLCollectionViewCell`, `CYLFilterHeaderView`, `CYLFilterBaseController`, `CYLTagCell`, `CYLTagHeaderCell` (10 files), first step under "core quality first" | 53 | 30.3 | changes listed in "Swift API changes", baseline refreshed | menu 30/30, tag 6/6, swift 19/19, example 79/80 (the baseline's failure) |
@@ -307,14 +307,14 @@ in Objective-C).
 Step 5's first test run stalled: another session tested CYLTabBarController on the same simulator at the same time; the
 stuck run of this repository was stopped and the suites run again.
 
-Note on `1e1df5a` (a docs commit): it also took the staged deletion of `CYLImageTagGroupView.h/.m` without the
+Note on `9dc0021` (a docs commit): it also took the staged deletion of `CYLImageTagGroupView.h/.m` without the
 Swift file, so that one commit does not build; step 4's commit, right after it, does. Published history is not
 rewritten.
 
 Examples updated in step 5: the demo app's Filter tab no longer migrates selections archived by versions before the
 user-defaults storage (`CYLFilterParamsTool` archives); its test checks the validation of stored selections instead.
 
-Baseline of the test suites (2026-11-13, clean worktree at `79b521f`, before any Swift): menu 30/30, tag 6/6, swift
+Baseline of the test suites (2026-11-13, clean worktree at `13cf295`, before any Swift): menu 30/30, tag 6/6, swift
 19/19, example 79/80. The failing example test, `CYLSearchCategoryScenarioTests
 testSearchCategoriesUseABottomTabBarAndFillTheSearchBar` (the nested tab bar's frame is zero), fails before the
 migration too; it is not caused by it and is tracked separately.

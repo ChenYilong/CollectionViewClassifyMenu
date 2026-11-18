@@ -498,9 +498,9 @@ recent searches and discover, the tag editor:
 - 平台 / Platform: Android
 - 环境 / Environment: Android 15（API 35）模拟器 `CYL_API35_arm64`（sdk_gphone64_arm64，主机 GPU 渲染 / host GPU
   rendering）；compileSdk / targetSdk 35，AGP 8.7.3，Kotlin 2.0.21，JDK 17；主机 macOS 27.3 / host macOS 27.3
-- 版本 / Version: [`b9b6a90`](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/b9b6a90)（各截图取自
-  `001e917` 至 `b9b6a90` 的提交，TabBar 取自 `b9b6a90` / the crops come from commits `001e917` to `b9b6a90`, the tab
-  bar from `b9b6a90`）；CYLTabBarController for Android
+- 版本 / Version: [`27edb4f`](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/27edb4f)（各截图取自
+  `047b2ab` 至 `27edb4f` 的提交，TabBar 取自 `27edb4f` / the crops come from commits `047b2ab` to `27edb4f`, the tab
+  bar from `27edb4f`）；CYLTabBarController for Android
   [`4639a0c`](https://github.com/ChenYilong/CYLTabBarController/commit/4639a0c)
 - 时间 / Taken: 2026-11-12 至 2026-11-13（NZDT，UTC+13）
 
@@ -516,7 +516,7 @@ elevation, a start icon, a custom delete icon and a tag without one:
 
 - 平台 / Platform: Android；环境 / Environment: Android 15（API 35）模拟器 `CYL_API35_arm64`，compileSdk / targetSdk 35，
   AGP 8.7.3，Kotlin 2.0.21；主机 macOS 27.3
-- 版本 / Version: `c7101dc`（上 / top）与 `1d37d32`（下 / bottom）on `feat/android-kotlin`；时间 / Taken: 2026-11-13
+- 版本 / Version: `b85e474`（上 / top）与 `fbe5cea`（下 / bottom）on `feat/android-kotlin`；时间 / Taken: 2026-11-13
   14:14 与 14:25（NZDT）
 
 ### Accessibility / 无障碍

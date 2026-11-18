@@ -124,11 +124,11 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   `I18nManager.getConstants().localeIdentifier` (RNOH's turbo module, which `NativeModules` does not reach), so
   Classify shows 分类菜单 / 筛选 / 全部 (screenshot below, retaken; `tsc --noEmit` passes for the iOS/Android example);
   autolinking adds op-sqlite to `harmony/oh-package.json5` during the build, so that file is committed with it.
-- **Fixed on the way:** `6bf3bae` had left out `harmony/entry/src` (the `src/` ignore pattern of the copied JS pages
-  matched it); the patterns are anchored now (`98a97f5`).
+- **Fixed on the way:** `289a9fa` had left out `harmony/entry/src` (the `src/` ignore pattern of the copied JS pages
+  matched it); the patterns are anchored now (`5907a29`).
 - **Evidence:** emulator (HarmonyOS 6.0.1 SDK API 21, Mate 70 Pro `6.0.0.112(SP3DEVC00E112R4P11)`, RNOH 0.86.1,
-  macOS 27.3, `98a97f5`, 2026-11-16 04:01 emulator time): Tags selected at launch; tapping 分类 shows Classify with 83
-  places; the plus button selects the Post page. A build from a clean `git archive` of `98a97f5` (setup.sh, ohpm,
+  macOS 27.3, `5907a29`, 2026-11-16 04:01 emulator time): Tags selected at launch; tapping 分类 shows Classify with 83
+  places; the plus button selects the Post page. A build from a clean `git archive` of `5907a29` (setup.sh, ohpm,
   hvigor) succeeds. Top to bottom: Tags, Classify, Post:
 
   <img src="assets/react-native-harmonyos-cyltabbar-tags.png" width="360" alt="React Native on HarmonyOS, CYLTabBarController: Tags">
@@ -295,7 +295,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   see Flutter's frame changes), and the page sizes the list to it, at most half the page.
 - **Tests:** `integration_test/classify_menu_test.dart` (83 places, categories 吃喝玩逛, a tag filters) and
   `tag_list_test.dart` pass on the iPhone 17 Pro simulator (iOS 27.0) and the Android 15 emulator (API 35).
-- **Screenshots** (Flutter 3.47.9, after commit `bd270bb`, 2026-11-15; 川菜 selected, iOS via
+- **Screenshots** (Flutter 3.47.9, after commit `25dcbee`, 2026-11-15; 川菜 selected, iOS via
   `--dart-define=CYL_TAB=1 --dart-define=CYL_SELECT=0-1`, Android tapped by accessibility bounds with 逛 expanded):
 
   <img src="assets/flutter-ios-classify-menu.png" width="300" alt="Flutter on iOS 27.0: classify menu, 川菜 selected, 3 places">
@@ -309,7 +309,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   "没有符合条件的地点，换个条件试试". The plugin gained `onSelectionChanged` (every selected tag, from
   `menu(_:didChangeSelectedItems:)` / `menuDidChangeSelectedItems`). Tests: `classify_menu_test.dart` (statement,
   saved selections, filter sheet) and `tag_list_test.dart` pass on iOS 27.0 and Android 15.
-  Screenshots (after commit `5c05cde`, 2026-11-15 08:03): Android, the sheet with 上海 picked (tapped by accessibility
+  Screenshots (after commit `809b2bf`, 2026-11-15 08:03): Android, the sheet with 上海 picked (tapped by accessibility
   bounds), and 川菜 · 广州 after relaunch (restored) and refiltering; iOS 27.0 with
   `--dart-define=CYL_TAB=1 --dart-define=CYL_SELECT=0-1 --dart-define=CYL_FILTER=0-3,1-0`:
 
@@ -343,7 +343,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   bundles CYLTabBarController's four Lottie tab icons). Codegen of React Native 0.88 rejects arrays of objects in events
   ("Unable to determine event type"), so the selection travels as `itemsJSON`. Build: `USE_FRAMEWORKS=static pod install`,
   Release, in the mirror `/tmp/xpr/rn` (exFAT). Evidence (iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2, React Native
-  0.88.0, base commit `7e3e696`, 2026-11-15): the list sizes itself to its content (Lottie row, ten SF Symbol tags, tail fold):
+  0.88.0, base commit `d0736eb`, 2026-11-15): the list sizes itself to its content (Lottie row, ten SF Symbol tags, tail fold):
 
   <img src="assets/react-native-ios-tag-list.png" width="300" alt="React Native on iOS: the native tag list, speed steps, Loop switch and Play all">
 
@@ -387,7 +387,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   CYLTabBarController's Kotlin sources from the `.deps` checkout (`cylAndroidRoot` in `example/android/build.gradle`), with
   Lottie 6.6.2. The tab icons are vector drawables `cyl_tab_tag` / `cyl_tab_classify`, because Android has no SF Symbols and the
   tab bar maps `system:tag` to a drawable named `tag`. Evidence (Android 15 / API 35 emulator `CYL_API35_arm64`, React Native
-  0.88.0, release APK, base commit `1b54d42`, CYLTabBarController `460ed89f`, 2026-11-15). Taps by adb, top to bottom:
+  0.88.0, release APK, base commit `56995b5`, CYLTabBarController `460ed89f`, 2026-11-15). Taps by adb, top to bottom:
   1. first launch;
   2. 2x speed, Loop on, Home tapped (the selection event reached JavaScript: "Selected: Home");
   3. the Post page:
@@ -415,7 +415,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
     - **Filter glyph:** the funnel glyph is missing from Android's fonts, so the filter button is the word Filter
       (with ● while filtering).
   - **Evidence** (Android 15 / API 35 emulator `CYL_API35_arm64`, release APK; iPhone 17 Pro simulator, iOS 27.0, Xcode 27.2;
-    React Native 0.88.0; base commit `59c55cd`; 2026-11-15). Taps by adb on Android, top to bottom:
+    React Native 0.88.0; base commit `d19ee3b`; 2026-11-15). Taps by adb on Android, top to bottom:
     1. every place (83);
     2. 川菜 tapped, then the filter sheet with 广州;
     3. after 确定 and a force-stop, the app relaunched with 川菜 · 广州 restored (1 place, as on iOS and Flutter);
@@ -444,7 +444,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
     event before Fabric gave the view its event emitter, so the event was lost, and the view had already recorded the height
     as sent. Fix: `CylTagListView.mm` overrides `updateEventEmitter:` and sends the height again
     (`CylTagListBridge.resendContentHeight()`).
-  - **Evidence** (base commit `a30e086`, React Native 0.88.0, 2026-11-15). The iOS UI test's filter sheet, then the Android end-to-end
+  - **Evidence** (base commit `9385647`, React Native 0.88.0, 2026-11-15). The iOS UI test's filter sheet, then the Android end-to-end
     result:
 
   <img src="assets/react-native-ios-uitest-filter-sheet.png" width="300" alt="React Native on iOS, UI test: the filter sheet with 广州">
@@ -762,7 +762,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **Prompt (verbatim):** "本项目 flutter android 端的tabbar请改用引用CYLTabBarController的flutter端实现"
 - **Prompt (English):** "In this project, make the Flutter Android tab bar use CYLTabBarController's Flutter
   implementation."
-- **Result (`a6ab1f02`):** on Android `HomePage` builds `CYLTabBar` (`flutter_cyltabbar`, a git dependency of
+- **Result (`12171ec8`):** on Android `HomePage` builds `CYLTabBar` (`flutter_cyltabbar`, a git dependency of
   `example/pubspec.yaml` at `b376c278`, `path: CrossPlatform/flutter_cyltabbar`) with the example's Lottie tab icons
   (`file:///android_asset/flutter_assets/assets/tab_*_animate.json`); `onTabSelect` switches the `IndexedStack`. iOS and
   HarmonyOS keep Material's `NavigationBar`. `MainActivity` is a `FlutterFragmentActivity` (the plugin needs one). The
@@ -774,7 +774,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   simulator (iOS 27.2); iOS builds with the plugin's pod. `integration_test` cannot tap a native view, so on Android the
   classify menu test opens the app on the Menu tab (`ExampleApp(initialTab:)`); a real tap was checked with adb.
 - **Rive tags at rest:** on this emulator (API 35 arm64, software GLES) the Rive row is empty on some launches with or
-  without this change (before: 2 of 3 launches drew it, after: 2 of 3; release build of `a6ab1f02`: 3 of 3); Play all
+  without this change (before: 2 of 3 launches drew it, after: 2 of 3; release build of `12171ec8`: 3 of 3); Play all
   always draws it.
 - **Evidence** (Android 15 API 35 emulator `CYL_API35_arm64`, 1080 × 2400, 420 dpi, macOS 27.3, Flutter 3.47.9,
   CYLTabBarController `b376c278`, 2026-11-19 06:19 NZDT): launch, then a tap on the Menu tab:
@@ -803,10 +803,10 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **Blocked (2026-11-19):** waiting for CYLTabBarController. Its session queued the height change after its Swift
   migration and asked to keep every pin at `b376c278` until it sends the commit.
 
-## TODO (2026-11-19, `feat/harmony`): every TODO below 100 to 100; Mini Program CI red since `a4517a3c`
+## TODO (2026-11-19, `feat/harmony`): every TODO below 100 to 100; Mini Program CI red since `b1500779`
 
 - **Context:** relayed by the "Mac-CYLSearchViewController文件夹" session to every session active today. A sweep of
-  docs/ on this branch found: (1) the Mini Program CI fails on every commit since `a4517a3c` with "Out of date (run
+  docs/ on this branch found: (1) the Mini Program CI fails on every commit since `b1500779` with "Out of date (run
   scripts/export-miniprogram-data.py): strings.js": the iOS drag-to-reorder demo added example strings that the
   generated `miniprogram/data/strings.js` did not get; (2) stale TODO notes in `rive.md` and `component-architecture.md`
   that later work already closed; (3) `android-api.md` 791 / 792: the row `CYLTagButton (CYLCollectionCellStyle)` has no
@@ -816,17 +816,17 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **Prompt (verbatim):** "向所有今天还在活跃session…继续完成TODO 完成评分不到100的任务，一直到满分为止"
 - **Prompt (English):** "To every session still active today: continue the TODOs; finish every task whose score is below
   100, until it reaches full marks."
-- **DONE (2026-11-19):** (1) `a0f75597` regenerates `strings.js`; the Mini Program CI passes again at `a0f75597` and
-  `43fc242a` (failed on every commit from `a4517a3c` to `1a80c275`). (2) Closed notes marked DONE in `rive.md` and
-  `component-architecture.md` (`a0f75597`). (3) The Windows session mapped the Android row in `c368c75e`:
+- **DONE (2026-11-19):** (1) `d846709c` regenerates `strings.js`; the Mini Program CI passes again at `d846709c` and
+  `bc4e4545` (failed on every commit from `b1500779` to `e4a69356`). (2) Closed notes marked DONE in `rive.md` and
+  `component-architecture.md` (`d846709c`). (3) The Windows session mapped the Android row in `9e9180d7`:
   `android-api.md` 792 / 792 = 100, `android-ios-api.md` 736 / 736 = 100. Still open, owned elsewhere or blocked: the
   default tab bar height (waits for CYLTabBarController), Android `CYLRightImageButton` / `CYLMultipleFilterHeaderView`
   on `CYLTagButton` and the Android drag demo (Windows session), checks on a real HarmonyOS device, a real iPhone
   (VoiceOver) and a phone (mini program BUG 1), and `npm publish` (needs the owner's npm login).
 
-### DONE (2026-11-19, `feat/harmony`, Windows session): HarmonyOS and the mini program follow the iOS `020434f1` tag rules, 100/100
+### DONE (2026-11-19, `feat/harmony`, Windows session): HarmonyOS and the mini program follow the iOS `25cb2ed0` tag rules, 100/100
 
-- **Context:** the Mac session's `020434f1` changed three things in the iOS core, all to match AndroidTagView: the new
+- **Context:** the Mac session's `25cb2ed0` changed three things in the iOS core, all to match AndroidTagView: the new
   `CYLMenuStyle.imageFillsTagHeight` (a leading image drawn as a circle as tall as the tag, at its leading edge);
   `maximumTitleLength` now keeps `max − 3` characters plus "..." (23 gives "Welcome to use Andro...", where it used to keep
   `max` plus "..."); `CYLTagRowAlignment.trailing` now starts each row at the trailing edge with its first tag

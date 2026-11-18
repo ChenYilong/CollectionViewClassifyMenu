@@ -306,7 +306,7 @@ Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
   2026-11-17): pin the newest branch's tip, and move once that newer commit is
   merged there. CollectionViewClassifyMenu and CYLSearchViewController pin the
   same commit.
-- Note (2026-11-17): from `4622434` to the next pin the pins stayed at `fbd05d5`
+- Note (2026-11-17): from `e7ec145` to the next pin the pins stayed at `fbd05d5`
   (CYLTabBarController PR #814) because the newest branch lacked it; the owner
   merged #814 into `feat/cross-platform-components` (PR #788, `9a54e26`), so the
   pins follow the newest commit of that branch again.
