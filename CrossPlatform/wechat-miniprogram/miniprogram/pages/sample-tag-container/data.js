@@ -4,8 +4,25 @@
  */
 const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
 
+/**
+ * The last tag of list1: the running system, as the iOS sample ("Welcome to use iOS 27.2 CollectionViewClassifyMenu"):
+ * `system` of wx.getDeviceInfo() ("iOS 17.0", "Android 14"); outside a mini program (node tests) "Node".
+ */
+function welcomeTitle() {
+  let system = 'Node';
+  try {
+    if (typeof wx !== 'undefined') {
+      const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync();
+      system = info.system || system;
+    }
+  } catch (error) {
+    // keep the fallback
+  }
+  return `Welcome to use ${system} CollectionViewClassifyMenu`;
+}
+
 const LIST1 = ['Java', 'C++', 'Python', 'Swift', '你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。',
-  'PHP', 'JavaScript', 'Html', 'Welcome to use AndroidTagView!'];
+  'PHP', 'JavaScript', 'Html', welcomeTitle()];
 const LIST2 = ['China', 'USA', 'Austria', 'Japan', 'Sudan', 'Spain', 'UK', 'Germany', 'Niger', 'Poland', 'Norway',
   'Uruguay', 'Brazil'];
 const LIST3 = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام'];
@@ -150,4 +167,4 @@ function containers() {
   return [first(), second(), third(), fourth(), fifth()];
 }
 
-module.exports = { LIST1, LIST2, LIST3, LIST4, LIST5, AVATAR, colors5, makeContainer, tagsWithTitles, containers };
+module.exports = { LIST1, LIST2, LIST3, LIST4, LIST5, AVATAR, colors5, welcomeTitle, makeContainer, tagsWithTitles, containers };

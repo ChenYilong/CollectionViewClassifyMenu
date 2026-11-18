@@ -69,7 +69,8 @@ class LujunTagContainerFragment : Fragment() {
         list1.add("PHP")
         list1.add("JavaScript")
         list1.add("Html")
-        list1.add("Welcome to use AndroidTagView!")
+        // The running system, as the iOS sample ("Welcome to use iOS 27.2 CollectionViewClassifyMenu").
+        list1.add("Welcome to use Android ${android.os.Build.VERSION.RELEASE} CollectionViewClassifyMenu")
 
         val list2 = ArrayList<String>()
         list2.add("China")

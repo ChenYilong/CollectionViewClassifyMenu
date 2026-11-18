@@ -148,3 +148,13 @@ test('every page of the area has its four files and uses t() for its title', () 
     }
   }
 });
+
+test('the Container sample greets with the running system, as the iOS sample', () => {
+  assert.equal(container.LIST1[container.LIST1.length - 1], 'Welcome to use Node CollectionViewClassifyMenu');
+  global.wx = { getDeviceInfo: () => ({ system: 'Android 14' }) };
+  try {
+    assert.equal(container.welcomeTitle(), 'Welcome to use Android 14 CollectionViewClassifyMenu');
+  } finally {
+    delete global.wx;
+  }
+});
