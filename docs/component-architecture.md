@@ -248,7 +248,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   :library:testDebugUnitTest :example:assembleDebug`) and the `build/repo` copy of `cylanimateditem`; (3) the example
   screenshots of the animated tags (Lottie, PAG, Rive, SVGA, GIF) against the previous ones.
 
-## TODO (2026-11-17): CYLAnimatedItem is its own pod and module
+## DONE (2026-11-17, closed 2026-11-19): CYLAnimatedItem is its own pod and module
 
 - **Context**: branch `feat/harmony` (PR #20). CYLTabBarController's guide
   ([docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md))
@@ -299,6 +299,10 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
 - **Pin `0a63bed`** (2026-11-17): the #788 tip and the newest commit on any branch: the engine report (`1e53d7a`,
   formerly `47aec88`) and license notices on top of the #814 merge `9a54e26`. Both #814 fixes are kept
   (`DEFINES_MODULE`, `CYLTabBarItemAnimationURLMayBeLottie`).
+
+- **Closed (2026-11-19):** the iOS CI (`pod lib lint` and the unit tests) passes at `1a80c275` with the pins at
+  CYLTabBarController `b376c278`; both upstream fixes (`DEFINES_MODULE`, the Lottie-only animator) are in every pin
+  since `0a63bed`.
 
 ## DONE (2026-11-17): the guide re-read at `0a63bed`
 
