@@ -19,7 +19,7 @@ export class PlacesDatabase {
   /**
    * The filter's regions (the iOS example's `CYLDemoDataSource.regions()`).
    */
-  static readonly regions = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳'];
+  static readonly regions = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳']; // NOLOCALIZE: source titles (queries match them)
 
   private async rows(sql: string, args: unknown[] = []): Promise<Row[]> {
     return (await this.db.execute(sql, args as never[])).rows as Row[];

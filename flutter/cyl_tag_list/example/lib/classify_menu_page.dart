@@ -41,7 +41,7 @@ class PlacesDatabase {
       (await db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'places'")).isNotEmpty;
 
   /// The filter's regions (the iOS example's `CYLDemoDataSource.regions()`).
-  static const List<String> regions = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳'];
+  static const List<String> regions = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳']; // NOLOCALIZE: source titles (queries match them)
 
   /// Every tag, in database order (the filter's dishes).
   Future<List<String>> tags() async =>
@@ -204,8 +204,8 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
         'sections': [
           for (final category in _categories)
             {
-              'title': category.key,
-              'items': [for (final tag in category.value) {'title': tag}],
+              'title': cylString(category.key),
+              'items': [for (final tag in category.value) {'title': cylDataTitle(tag)}],
             },
         ],
       };
@@ -220,10 +220,10 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
         'sections': [
           for (final (title, titles) in [('地区过滤', PlacesDatabase.regions), ('菜品过滤', _tags)])
             {
-              'title': title,
+              'title': cylString(title),
               'items': [
-                {'title': '全部', 'exclusive': true},
-                for (final t in titles) {'title': t},
+                {'title': cylString('全部'), 'exclusive': true},
+                for (final t in titles) {'title': cylDataTitle(t)},
               ],
             },
         ],
@@ -252,7 +252,7 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
                   child: FilledButton(
                     key: const Key('confirmFilter'),
                     onPressed: () => Navigator.pop(context, pending),
-                    child: const Text('确定'),
+                    child: Text(cylString('确定')),
                   ),
                 ),
               ),
@@ -269,8 +269,8 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
 
   String get _summary {
     // As the iOS example: labelled, "All" in the device language, then the number of matches.
-    String names(List<String> values) => values.isEmpty ? cylString('全部') : values.join('、');
-    final conditions = cylString('分类：%@ · 地区：%@ · 菜品：%@', [selectedTag ?? cylString('全部'), names(selectedRegions), names(selectedDishes)]);
+    String names(List<String> values) => values.isEmpty ? cylString('全部') : values.map(cylShortTitle).join(cylString('、'));
+    final conditions = cylString('分类：%@ · 地区：%@ · 菜品：%@', [selectedTag != null ? cylShortTitle(selectedTag!) : cylString('全部'), names(selectedRegions), names(selectedDishes)]);
     return '$conditions · ${cylString('匹配 %lu 条', [_places.length])}';
   }
 
@@ -333,7 +333,7 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
                       return ListTile(
                         dense: true,
                         // The name already says its region ("日式拉面 · 北京"): the subtitle does not repeat it.
-                        title: Text(place['name'] as String),
+                        title: Text((place['name'] as String).split(' · ').map(cylShortTitle).join(' · ')),
                         trailing: Text('★ ${(place['rating'] as num).toStringAsFixed(1)} · ¥${place['price']}'),
                       );
                     },
@@ -344,3 +344,25 @@ class _ClassifyMenuPageState extends State<ClassifyMenuPage> {
     );
   }
 }
+
+/// The sample suffixes of the shared data's long titles ("川菜 扩展文字😀✨"); data.json and the places database keep
+/// the source titles, the screens show them in the device language.
+const List<String> _sampleSuffixes = [' 扩展文字😀✨', ' 🏙️ 扩展文字']; // NOLOCALIZE: source suffixes
+
+String _shortTitle(String title) {
+  for (final suffix in _sampleSuffixes) {
+    if (title.endsWith(suffix)) return title.substring(0, title.length - suffix.length);
+  }
+  return title;
+}
+
+/// A source title in the device language: the name and the sample suffix each looked up
+/// ("川菜 扩展文字😀✨" → "Sichuan extended text😀✨").
+String cylDataTitle(String title) {
+  final short = _shortTitle(title);
+  if (short == title) return cylString(title);
+  return cylString(short) + title.substring(short.length).replaceAll('扩展文字', cylString('扩展文字'));
+}
+
+/// A source title without the sample suffix, in the device language ("北京 🏙️ 扩展文字" → "Beijing").
+String cylShortTitle(String title) => cylString(_shortTitle(title));

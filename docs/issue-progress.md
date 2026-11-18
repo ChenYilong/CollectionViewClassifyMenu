@@ -1061,3 +1061,13 @@ tags: [issues, ui, cocoapods, progress]
   the docs were remapped; `check-commit-message.sh b8c95591^..HEAD`: OK; tree of the new tip identical to the old one;
   pushed with `--force-with-lease`.
 
+- Flutter and React Native (Mac session, shared example code): the classify page showed the shared data (dishes,
+  regions, categories, place names), its section titles, "全部" and "确定" untranslated; React Native had no
+  Traditional Chinese. Fixed: Flutter's `tool/export_strings.py` exports the section titles, the separator and the 39
+  data words from the iOS bundle, `cylDataTitle` / `cylShortTitle` show the data where it is drawn; React Native gets
+  a Traditional Chinese table, `language()` (en / zh-Hans / zh-Hant as iOS picks), `tool/export_strings.py` →
+  `src/dataStrings.ts` (from the iOS bundle) and `dataTitle` / `shortTitle`. Queries keep the source titles.
+  `scripts/check-localization.py` now also scans both examples (a probe literal is caught in each). Flutter: `flutter
+  analyze` clean, integration tests 2 / 2 on the iOS 27.2 simulator. React Native: `tsc --noEmit` clean, Jest 5 / 5
+  (new `i18n.test.ts`). Not run: the React Native app on a simulator. Score so far 65 / 100 (Android, HarmonyOS and the
+  mini program audit is with the Windows session, −35).

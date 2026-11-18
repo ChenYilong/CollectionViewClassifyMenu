@@ -14,7 +14,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[4]
 BUNDLE = ROOT / 'Example/CYLMenuExample/CYLMenuExample.bundle'
 OUT = pathlib.Path(__file__).resolve().parents[1] / 'lib/strings.dart'
 KEYS = ['动效图标', '倍速', '循环播放', '全部播放', '从头播放屏幕上的全部动效', '全部', '重置', '多选筛选',
-        '没有符合条件的商家', '分类：%@ · 地区：%@ · 菜品：%@', '匹配 %lu 条', '分类菜单 + 多选筛选 · 数据库联动', '确定', '取消', '点击「%@」', '菜单', '菜单选择 · 数据库联动']
+        '没有符合条件的商家', '分类：%@ · 地区：%@ · 菜品：%@', '匹配 %lu 条', '分类菜单 + 多选筛选 · 数据库联动', '确定', '取消', '点击「%@」', '菜单', '菜单选择 · 数据库联动', '地区过滤', '菜品过滤', '、']
+# The shared demo data's dishes, regions, categories and sample suffix word (data.json and the places database keep
+# these source titles; the screens translate them where they are shown, as the iOS example does).
+KEYS += ['云南味道', '做手工', '先剁手后保暖', '凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面凉面', '吃蟹好去处Top10', '周末必去活动', '寻找秃黄油', '展览', '川菜', '戏剧', '日式拉面', '最爱私房菜', '榴莲控', '汉堡', '泡温泉', '炸鸡啤酒', '焖面', '特色火锅', '直播最美秋叶', '礼品店', '私厨', '粉面', '美妙下午茶', '肉食主义', '西餐', '逛市集', '邪恶美食', '饮料', '北京', '上海', '广州', '深圳', '扩展文字', '地区过滤', '菜品过滤', '吃', '喝', '玩', '逛']
+KEYS = list(dict.fromkeys(KEYS))  # One entry per key (a Dart const map rejects duplicates).
 LINE = re.compile(r'^"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)"\s*;', re.M)
 
 
