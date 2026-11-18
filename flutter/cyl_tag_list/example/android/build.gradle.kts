@@ -3,6 +3,8 @@ allprojects {
         google()
         mavenCentral()
         // The Kotlin CYLTagListView the plugin wraps (android/merged/library, see the plugin's README.md).
+        // SVGAPlayer-Android (CYLTabBarController's SVGA animator) is published on JitPack only.
+        maven { url = uri("https://jitpack.io"); content { includeGroup("com.github.yyued") } }
         maven { url = uri(providers.gradleProperty("cyl.classifymenu.repo").getOrElse("${rootDir}/../../../../android/merged/library/build/repo")) }
     }
 }

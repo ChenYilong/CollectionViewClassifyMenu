@@ -25,6 +25,8 @@ apply plugin: "com.facebook.react.rootproject"
 // points elsewhere (a build mirror).
 allprojects {
     repositories {
+        // SVGAPlayer-Android (CYLTabBarController's SVGA animator) is published on JitPack only.
+        maven { url = uri("https://jitpack.io"); content { includeGroup("com.github.yyued") } }
         maven { url = uri(rootProject.findProperty("cyl.classifymenu.repo") ?: "${rootDir}/../../../../android/merged/library/build/repo") }
     }
 }

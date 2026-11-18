@@ -121,8 +121,14 @@ Mini Program: TODO (Windows session).
 Flutter and React Native on iOS: DONE (2026-11-19, `c2073004`, `0202e515`): an SVGA section (Home, Search, Messages, Me;
 the iOS example's files) after Rive, pod `CYLAnimatedItem/SVGA` (React Native also needs `SVGAPlayerLite` with modular
 headers); on the iPhone 17 Pro simulator the icons rest gray and animate after Play all; Flutter iOS integration tests
-2 / 2 (21 tags), React Native `tsc` passes. Their Android side: TODO (Windows session, after these two files).
+2 / 2 (21 tags), React Native `tsc` passes. Their Android side: DONE (2026-11-19, Windows session): both example apps add
+`com.github.yyued:SVGAPlayer-Android` 2.6.1 (JitPack, group-filtered) and `tools:replace` for the `android:label` (Flutter) /
+`android:allowBackup` (React Native) that SVGAPlayer-Android's own manifest sets; React Native gets the four `.svga` files
+in `example/android/app/src/main/assets/`, Flutter already had them as Flutter assets. On the emulator all 4 SVGA icons
+draw at rest and play after Play all, in both apps.
 
 <img src="assets/flutter-rn-ios-svga.png" width="400" alt="SVGA tags in the Flutter and React Native examples on iOS: at rest and after Play all">
+
+<img src="assets/flutter-rn-android-svga.png" width="400" alt="SVGA tags in the Flutter and React Native examples on Android: at rest and after Play all">
 
 <img src="assets/android-svga-animated-icons.png" width="400" alt="Android example: SVGA sections at rest, after Play all, and the Styles SVGA choice">

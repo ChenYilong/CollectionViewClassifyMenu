@@ -629,8 +629,8 @@ tags: [issues, ui, cocoapods, progress]
   (the SVGA tag made six); the test now counts six and reads the image and string items from the end.
   CI run 43992497583 on `a6cdd69`: all 9 iOS jobs passed; SVGA screenshots in `screenshots.md`
   ("iOS: SVGA animated icons"). Other platforms: HarmonyOS done (D5); Android done (2026-11-19,
-  `example-demo-rules.md`, `assets/android-svga-animated-icons.png`); Flutter and React Native iOS done (Mac session),
-  their Android side and the Mini Program are still TODO.
+  `example-demo-rules.md`, `assets/android-svga-animated-icons.png`); Flutter and React Native done on iOS (Mac session)
+  and Android (2026-11-19, `assets/flutter-rn-android-svga.png`); the Mini Program is still TODO.
 
 - TODO（完成全部文档中的 TODO，2026-11-14，`feat/android-kotlin`）/ TODO (finish every TODO in the documents):
   - Context: the Swift core migration reached 100 (`250507c`). The user asks to continue the unfinished work of this

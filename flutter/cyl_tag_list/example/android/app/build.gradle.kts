@@ -52,11 +52,12 @@ flutter {
 
 // CYLTabBarController's Android library (tab bar and animation engine) comes from flutter_cyltabbar (pubspec.yaml),
 // which compiles Example-Android/cyltabbar and tabpages of its checkout; CYLTagListView finds the engine there at run
-// time to play the Lottie and Rive icons. The animated icon + title component
+// time to play the Lottie, Rive and SVGA icons (SVGA: SVGAPlayer-Android, on JitPack, see ../build.gradle.kts). The animated icon + title component
 // io.github.chenyilong:cyltabbarcontroller-animateditem comes once, with com.cyl:classifymenu (cyl.classifymenu.repo):
 // gradle.properties sets cylAnimatedItemProvided, so flutter_cyltabbar does not compile a second copy.
 dependencies {
     implementation("com.airbnb.android:lottie:6.6.2")
     implementation("app.rive:rive-android:10.3.0")
+    implementation("com.github.yyued:SVGAPlayer-Android:2.6.1")
     implementation("androidx.fragment:fragment-ktx:1.8.5")
 }
