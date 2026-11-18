@@ -70,3 +70,8 @@
 - Fix issues in the core first (AGENTS.md "Fix issues in the core first"): the core is the code published to a package registry (CocoaPods, Maven / Gradle, npm, pub.dev, ohpm); an example-layer fix is the worst option; when the core cannot fix a core defect, ask the user first and say why; record every example-layer fix and its reason in `docs/example-layer-fixes.md`.
 - Parity tables and the score loop (AGENTS.md "Parity tables and the score loop"): source API | description | counterpart (`TODO` by default); 100 when no `TODO` is left, 0 when all are; loop: match existing code, score, implement the `TODO` rows in the core first and show them in the example, score again, until 100; then the reverse table.
 - Bugs (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated item"): record first, then screenshot, then fix; animation and icon + title bugs are fixed in CYLTabBarController's animated item component, not in the examples; a demo that needs more gets a new component API from CYLTabBarController.
+- Session roles by name (English rule, AGENTS.md "Session roles by name: Mac for iOS, Win for the other platforms"):
+  before a task, check the active session names. A session whose name starts with `Mac` (case insensitive) mainly
+  develops and tests iOS; one starting with `Win` (case insensitive) mainly develops the other platforms (Android,
+  HarmonyOS, the mini program). When both are active, prefer handing each platform's part of a task to the matching
+  session; when no session follows this naming, skip the rule and finish the task independently.

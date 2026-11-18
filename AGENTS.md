@@ -36,6 +36,27 @@ Details and checklist: `.agents/skills/cyl-task-start/SKILL.md`.
 - **Update the document at the end.** Update the entry written when the task started: the final score, the reasons
   for the missing points, the result and its evidence (commits, tests, screenshots).
 
+## Session roles by name: Mac for iOS, Win for the other platforms
+
+Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
+
+- **Check the session names before a task.** List the active agent sessions working on this repository (for example
+  with the agent tool that lists sessions) and read their names.
+- **Mac sessions mainly do iOS.** A session whose name starts with `Mac` (case insensitive: `Mac`, `mac`, `MAC`…)
+  mainly develops and tests the iOS side: the Swift core, the iOS examples, and the iOS runs of the Flutter and React
+  Native examples, on macOS with Xcode and the iOS simulator.
+- **Win sessions mainly do the other platforms.** A session whose name starts with `Win` (case insensitive) mainly
+  develops the other platforms: Android, HarmonyOS, the WeChat mini program, and the Android runs of the Flutter and
+  React Native examples.
+- **Both active: route by platform.** When a matching Mac session and a matching Win session are both active, prefer
+  handing each platform's part of a task to the session that owns that platform: send it the request with the context
+  and the acceptance criteria, keep your own platform's part, and do not repeat the other session's part. A
+  cross-platform task is split by platform, each session doing its side and reporting back.
+- **Otherwise: skip the rule.** When no active session follows this naming, or only one side is active, skip this
+  rule and finish the whole task independently.
+- This rule decides who does a platform's work; the other rules (checking the other sessions for the same branch,
+  folder ownership, the task log) still apply.
+
 ## Shared emulators and simulators
 
 - Emulators and simulators are shared with other sessions (for example the Android emulator `emulator-5556`).

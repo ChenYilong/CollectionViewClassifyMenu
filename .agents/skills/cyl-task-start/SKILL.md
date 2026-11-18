@@ -1,6 +1,6 @@
 ---
 name: cyl-task-start
-description: What to do before, during and after every task in CollectionViewClassifyMenu - check the other sessions for the same branch, mark the task as TODO with the current branch at the top of the session, write it into docs/ with acceptance scoring criteria (full marks and pass), score until it passes, print the missing points as TODO at the end, and restart a hung or unopenable shared emulator after telling the other sessions.
+description: What to do before, during and after every task in CollectionViewClassifyMenu - check the session names (Mac sessions mainly iOS, Win sessions the other platforms; route platform work to the matching active session, else work alone), check the other sessions for the same branch, mark the task as TODO with the current branch at the top of the session, write it into docs/ with acceptance scoring criteria (full marks and pass), score until it passes, print the missing points as TODO at the end, and restart a hung or unopenable shared emulator after telling the other sessions.
 ---
 
 # Task start, scoring and shared emulators
@@ -10,6 +10,14 @@ and simulators"). This is the checklist.
 
 ## Before the task
 
+0. **Check the session names: Mac for iOS, Win for the other platforms** (AGENTS.md "Session roles by name").
+   - List the active sessions and read their names. A name starting with `Mac` (case insensitive) marks the session
+     that mainly develops and tests iOS; a name starting with `Win` (case insensitive) marks the one that mainly
+     develops the other platforms (Android, HarmonyOS, the mini program).
+   - Both a Mac and a Win session active: prefer handing each platform's part of the task to the matching session
+     (send the request with its context and acceptance criteria), keep your own platform's part, and do not repeat the
+     other session's part.
+   - No session follows this naming, or only one side is active: skip this step and finish the task independently.
 1. **Check other sessions first.** List the other agent sessions and read their current tasks.
    - Is any session editing the same repository and branch? If not, continue.
    - If one is: is its task the same as this one? Same task: do not repeat it; coordinate with that session or take
