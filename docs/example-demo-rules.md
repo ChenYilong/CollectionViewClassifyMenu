@@ -111,4 +111,10 @@ SVGA, on every platform, with the same playback controls (Play all, speed, loop)
 Status: iOS done (2026-11-16): the Animated icons sections `svga` and `svga-dark`, the Styles action `animation.svga`, the
 configuration file and dictionary demos, the launch screens `animations-svga` and `style-svga`, and the tests. SVGA, like
 Rive, plays once at its own speed: CYLTabBarController's SVGA player has no speed or loop API yet. HarmonyOS: done.
-Android, Flutter, React Native, Mini Program: TODO.
+Android, Mini Program: TODO (Windows session; Android started 2026-11-19).
+Flutter and React Native on iOS: DONE (2026-11-19, `c2073004`, `0202e515`): an SVGA section (Home, Search, Messages, Me;
+the iOS example's files) after Rive, pod `CYLAnimatedItem/SVGA` (React Native also needs `SVGAPlayerLite` with modular
+headers); on the iPhone 17 Pro simulator the icons rest gray and animate after Play all; Flutter iOS integration tests
+2 / 2 (21 tags), React Native `tsc` passes. Their Android side: TODO (Windows session, after these two files).
+
+<img src="assets/flutter-rn-ios-svga.png" width="400" alt="SVGA tags in the Flutter and React Native examples on iOS: at rest and after Play all">
