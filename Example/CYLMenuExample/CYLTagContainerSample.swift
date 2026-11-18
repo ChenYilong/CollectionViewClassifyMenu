@@ -14,7 +14,12 @@ import CollectionViewClassifyMenu
 enum CYLTagContainerSampleData {
     // NOLOCALIZE-BEGIN: AndroidTagView's sample lists, deliberately multilingual (the same tags in every language).
     static let list1 = ["Java", "C++", "Python", "Swift", "你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。",
-                        "PHP", "JavaScript", "Html", "Welcome to use AndroidTagView!"]
+                        "PHP", "JavaScript", "Html", welcomeTitle]
+    /// The sample's last tag ("Welcome to use AndroidTagView!" upstream), naming the OS it runs on and this library:
+    /// "Welcome to use iOS 27.2 CollectionViewClassifyMenu" on an iOS 27.2 simulator.
+    static var welcomeTitle: String {
+        "Welcome to use \(UIDevice.current.systemName) \(UIDevice.current.systemVersion) CollectionViewClassifyMenu"
+    }
     static let list2 = ["China", "USA", "Austria", "Japan", "Sudan", "Spain", "UK", "Germany", "Niger", "Poland", "Norway",
                         "Uruguay", "Brazil"]
     static let list3 = ["Persian", "波斯语", "فارسی", "Hello", "你好", "سلام"]
