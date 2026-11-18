@@ -488,3 +488,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Plan**: checked: `776b4635` is the newest commit on every branch, and no `.m`, `.h`, `.swift`, podspec or
   Package.swift changed in `4f73209c..776b4635`. Move the eight pin files, `pod install` x 4, build the Swift package,
   run the example suite.
+- **DONE (2026-11-18)**: the eight iOS pin files name `776b4635791b2197782b4db1b07126c4a16d8d9d`; `pod install` resolved
+  it in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift package (`Package.resolved`
+  revision `776b4635`) builds for the iOS Simulator; example suite 92 / 0 on iPhone 17 Pro `62B54974` (iOS 27.2,
+  Xcode 27.2, macOS 27.3). Every platform is on `776b4635`.
