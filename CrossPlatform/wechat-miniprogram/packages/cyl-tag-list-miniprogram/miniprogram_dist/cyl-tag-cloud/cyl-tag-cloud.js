@@ -20,10 +20,15 @@
  * name is `requestnewitem` {name, position} (the host adds it, as iOS's `menu(_:didRequestNewItemWithName:at:)`).
  * With `cachePolicy` ('database', 'userDefaults', 'sandboxFile'; 'none' by default) and `cacheName`, the titles are
  * saved after each edit while editing (`cachedTitles()` reads them back, `saveToCache()` saves now; cache.js).
+ *
+ * Network sync (iOS 3fc2c23b): leaving editing sends `editingfinish` {titles} (the edited titles by cache key, "0",
+ * already saved) for the host to upload; `setRemoteSource(source)` (an object with `fetchSectionsWithKeys(keys,
+ * callback(sections, error))`) and `loadPolicy` ('cacheThenNetwork' by default, 'cacheFirst', 'networkFirst') drive
+ * `loadSections(keys, completion(sections, origin))`; downloads are saved to the cache first.
  */
 const model = require('./model.js');
 const { coreString } = require('../core-strings.js');
-const { CYLTagListStore } = require('./cache.js');
+const { CYLTagListStore, loadSections } = require('./cache.js');
 const locale = require('../locale.js');
 
 /** How far a press moves before it counts as a drag rather than a long press (`dragThreshold`). */
@@ -63,6 +68,7 @@ Component({
     showsAddItemViewWhileEditing: { type: Boolean, value: true },
     cachePolicy: { type: String, value: 'none' },
     cacheName: { type: String, value: 'CYLTagListView' },
+    loadPolicy: { type: String, value: 'cacheThenNetwork' },
   },
 
   data: {
@@ -107,6 +113,7 @@ Component({
       this._rippleId = 1;
       this._editing = false;
       this._cache = null;
+      this._remoteSource = null;
     },
     attached() {
       this.setData({
@@ -203,6 +210,10 @@ Component({
       const value = !!editing;
       if (value === this._editing) return;
       this._editing = value;
+      if (!value) {
+        // The edited titles, for the host to upload (the cache already has them).
+        this.triggerEvent('editingfinish', { titles: this.editableSectionTitles() });
+      }
       this._dragging = null;
       this.setData({ isEditing: value, showsAddItem: value && this.data.showsAddItemViewWhileEditing, addText: value ? this.data.addText : '' });
       this._render(false);
@@ -217,6 +228,24 @@ Component({
     /** `saveEditableSectionsToCache()`: saves the current titles to the cache (the cloud saves after each edit). */
     saveToCache() {
       if (this._cache) this._cache.saveTitles(this._tags.map((tag) => String(tag.title)), '0');
+    },
+
+    /** `editableSectionTitles()`: the titles by cache key ({"0": titles}, the cloud being one section). */
+    editableSectionTitles() {
+      return { 0: this._tags.map((tag) => String(tag.title)) };
+    },
+
+    /** `remoteSource`: the server the tags are also kept on (`fetchSectionsWithKeys(keys, callback)`); null: none. */
+    setRemoteSource(source) {
+      this._remoteSource = source || null;
+    },
+
+    /**
+     * `loadSections(withKeys:completion:)`: the titles under `keys` (["0"]) from the cache and the remote source in the
+     * order of `loadPolicy`; `completion(sections, origin)` once or twice; downloads are saved to the cache first.
+     */
+    loadSections(keys, completion) {
+      loadSections({ cache: this._cache, remote: this._remoteSource, policy: this.data.loadPolicy, keys, completion });
     },
 
     onAddInput(event) {

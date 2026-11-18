@@ -111,4 +111,58 @@ class CYLTagListStore {
   }
 }
 
-module.exports = { CYLTagListStore, POLICIES };
+// MARK: Network sync (iOS 3fc2c23b)
+
+/** `CYLTagListLoadPolicy`: 'cacheThenNetwork' (the default), 'cacheFirst', 'networkFirst'. */
+const LOAD_POLICIES = ['cacheThenNetwork', 'cacheFirst', 'networkFirst'];
+
+/**
+ * `loadSections(withKeys:completion:)`: reads the sections saved under `keys` from `cache` (a store) and `remote` (an
+ * object with `fetchSectionsWithKeys(keys, callback(sections, error))`, the host's networking), in the order of
+ * `policy`, and calls `completion(sections, origin)` with the titles by key and 'cache' or 'network': once or twice
+ * ('cacheThenNetwork': the cache at once, then the server). Downloaded sections are saved to the cache first. Without a
+ * remote source it reads the cache only; nothing saved anywhere calls nothing.
+ */
+function loadSections({ cache, remote, policy = 'cacheThenNetwork', keys, completion }) {
+  const cached = {};
+  for (const key of keys) {
+    const titles = cache ? cache.cachedTitles(key) : undefined;
+    if (titles !== undefined) cached[key] = titles;
+  }
+  const count = Object.keys(cached).length;
+  const fetch = (done) => {
+    if (!remote || typeof remote.fetchSectionsWithKeys !== 'function') {
+      done(false);
+      return;
+    }
+    remote.fetchSectionsWithKeys(keys.slice(), (sections, error) => {
+      if (!sections || error) {
+        done(false);
+        return;
+      }
+      const downloaded = {};
+      for (const key of Object.keys(sections)) {
+        if (!keys.includes(key)) continue;
+        downloaded[key] = sections[key];
+        if (cache) cache.saveTitles(sections[key], key);
+      }
+      completion(downloaded, 'network');
+      done(true);
+    });
+  };
+  const fallBack = (ok) => {
+    if (!ok && count > 0) completion(cached, 'cache');
+  };
+  const chosen = LOAD_POLICIES.includes(policy) ? policy : 'cacheThenNetwork';
+  if (chosen === 'cacheThenNetwork') {
+    if (count > 0) completion(cached, 'cache');
+    fetch(() => {});
+  } else if (chosen === 'cacheFirst') {
+    if (count === keys.length) completion(cached, 'cache');
+    else fetch(fallBack);
+  } else {
+    fetch(fallBack);
+  }
+}
+
+module.exports = { CYLTagListStore, POLICIES, LOAD_POLICIES, loadSections };

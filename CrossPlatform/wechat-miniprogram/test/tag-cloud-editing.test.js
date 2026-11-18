@@ -71,3 +71,43 @@ test('elevation draws a shadow and stops clipping; titleWraps lets the title wra
   const d = model.defaultStyle();
   assert.deepEqual([d.titleWraps, d.elevation, d.deleteIndicatorImage], [false, 0, null]);
 });
+
+test('load policies order the cache and the server; a download is saved to the cache', () => {
+  const { loadSections } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-cloud/cache.js');
+  const loads = (policy, cached, remote) => {
+    const store = new CYLTagListStore('userDefaults', 'tag-cloud-editing.load');
+    store.removeAllTitles();
+    if (cached) store.saveTitles(cached, 'mine');
+    const fake = {
+      fetchSectionsWithKeys(keys, callback) {
+        callback(remote ? { mine: remote, other: ['x'] } : null, remote ? null : new Error('CYLFake'));
+      },
+    };
+    const events = [];
+    loadSections({
+      cache: store, remote: fake, policy, keys: ['mine'],
+      completion: (sections, origin) => events.push(`${origin} ${(sections.mine || []).join(',')}`),
+    });
+    const stored = store.cachedTitles('mine');
+    store.removeAllTitles();
+    return { events, stored };
+  };
+  const refreshed = loads('cacheThenNetwork', ['A', 'B'], ['B', 'A', 'C']);
+  assert.deepEqual(refreshed.events, ['cache A,B', 'network B,A,C'], 'the default: the cache, then the server');
+  assert.deepEqual(refreshed.stored, ['B', 'A', 'C'], 'a download is saved to the cache');
+  assert.deepEqual(loads('cacheThenNetwork', ['A'], null).events, ['cache A'], 'a failed download');
+  assert.deepEqual(loads('cacheFirst', ['A'], ['B']).events, ['cache A'], 'a full cache: no download');
+  assert.deepEqual(loads('cacheFirst', null, ['B']).events, ['network B']);
+  assert.deepEqual(loads('networkFirst', ['A'], ['B']).events, ['network B']);
+  assert.deepEqual(loads('networkFirst', ['A'], null).events, ['cache A'], 'the cache when it fails');
+  // A key not asked for is not reported or saved.
+  const store = new CYLTagListStore('userDefaults', 'tag-cloud-editing.other');
+  loadSections({ cache: store, remote: { fetchSectionsWithKeys: (k, cb) => cb({ mine: ['A'], other: ['x'] }, null) },
+    keys: ['mine'], completion: () => {} });
+  assert.equal(store.cachedTitles('other'), undefined);
+  store.removeAllTitles();
+  // Without a remote source and nothing saved: no call.
+  let called = false;
+  loadSections({ cache: null, remote: null, keys: ['mine'], completion: () => { called = true; } });
+  assert.equal(called, false);
+});

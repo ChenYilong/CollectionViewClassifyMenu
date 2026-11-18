@@ -1210,7 +1210,7 @@ tags: [issues, ui, cocoapods, progress]
   on an emulator: the HarmonyOS sixth container and editing (host tests and the build only).
 - **Next (separate request):** network sync (`3fc2c23b`) on Android, HarmonyOS and the mini program.
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): network sync of the tag list cache on Android, HarmonyOS and the mini program
+### DONE (2026-11-19, `feat/harmony`, Windows session): network sync of the tag list cache on Android, HarmonyOS and the mini program
 
 - **Request (relayed by the Mac ClassifyMenu session):** port iOS `3fc2c23b` (CYLSearchViewController session):
   `menu(_:didFinishEditingWithTitles:)`, `editingFinishHandler`, `editableSectionTitles()`, `CYLTagListRemoteSource`
@@ -1231,4 +1231,10 @@ tags: [issues, ui, cocoapods, progress]
   `CYLTagListCache.ets` (`CYLTagListLoadPolicy`, `CYLTagListDataOrigin`, `CYLTagListRemoteSource`); callbacks run on
   the UI thread's event loop (ArkTS's main queue). The two tests in `TagListEditing.test.ets`; host tests 71 / 71,
   `build.sh` OK. `docs/harmony.md` 902 / 902.
-- **TODO:** the mini program.
+- **Mini program (done, 30 / 30):** `cyl-tag-cloud` sends `editingfinish` {titles} (by cache key, "0") when editing
+  ends, and has `editableSectionTitles()`, `setRemoteSource(source)` (`fetchSectionsWithKeys(keys, callback)`),
+  `loadPolicy` ('cacheThenNetwork', 'cacheFirst', 'networkFirst') and `loadSections(keys, completion)`; the logic is
+  `cache.js` `loadSections` (downloads saved to the cache first, keys not asked for ignored). Test in
+  `tag-cloud-editing.test.js` (the iOS cases); `npm test` 154. WeChat DevTools: `editableSectionTitles()` and
+  `loadSections` with a fake remote source answer as expected.
+- **Score:** 100 / 100 (Android 40, HarmonyOS 30, mini program 30).
