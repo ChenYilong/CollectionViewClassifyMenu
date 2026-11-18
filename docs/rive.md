@@ -13,7 +13,7 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 | Flutter on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `flutter/cyl_tag_list_ohos/ohos/oh-package.json5` → `file:../../../harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
 | React Native on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `react-native/react-native-cyl-tag-list/harmony-example/harmony/entry/oh-package.json5` → `file:` `harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
 | Flutter on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile`; rive-android in `example/android/app/build.gradle.kts` (with `cyl.tabbar.libs`); `.riv` files in `example/assets/rive` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row (Home, Done, Menu) is in `example/lib/main.dart`. iOS simulator: draws and loops (2026-11-18, `assets/flutter-ios-rive-loop.png`); Android emulator not yet run here |
-| React Native on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `example/ios/Podfile`; rive-android in `example/android/app/build.gradle`; `.riv` files in the iOS app bundle (`Animations/`, in the Xcode project) and Android `assets/` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row is in `example/src/TagListPage.tsx`. Not yet run on a simulator / emulator |
+| React Native on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `example/ios/Podfile`; rive-android in `example/android/app/build.gradle`; `.riv` files in the iOS app bundle (`Animations/`, in the Xcode project) and Android `assets/` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row is in `example/src/TagListPage.tsx`. iOS simulator: draws, plays and loops (2026-11-18, `assets/react-native-ios-rive-loop.png`); Android emulator not yet run here |
 | WeChat mini program / 微信小程序 | `@rive-app/canvas-advanced` (WebAssembly, 573 KB) wrapped as `cyl-rive-miniprogram` | `2.39.1` | CYLTabBarController `CrossPlatform/rive-miniprogram`, copied into `cyl_components` by `scripts/fetch-cyltabbar.js` | Canvas 2D | Linked (`engines.rive: true` in `utils/tag-animations.js`); not affected |
 
 ## The HarmonyOS crash / 鸿蒙崩溃
@@ -92,4 +92,20 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 
   Platform: iOS 27.2, iPhone 17 Pro simulator | Host: macOS 27.3 | IDE: Xcode 27.2 (27B52), Flutter 3.47.9;
   CollectionViewClassifyMenu `822c9055`, CYLTabBarController `776b4635`, feat/harmony, 2026-11-18.
-  - Still TODO: step 2, React Native iOS.
+- **Progress (2026-11-18), step 2 done: React Native iOS, the Rive tags draw, play and loop.**
+  - Bugs found and fixed in `example/ios/Podfile` (the example did not install or build at the current pins):
+    `pod install` refused the Swift pod `CYLAnimatedItem` as a static library because `lottie-ios` has no module map
+    (now `pod 'lottie-ios', :modular_headers => true`); Xcode 27 refused `RiveRuntime-runtime_ios_privacy` with
+    iOS 14.0 (post_install raises every pod target below 15.0 to 15.0). A stale `.deps/CYLTabBarController` checkout
+    (`117be52c`) failed with `unknown type name 'CYLTabBarHostView'`; `scripts/fetch-cyltabbar.sh` moves it to the pin.
+  - Result (Release build, bundled JavaScript): Home, Done and Menu draw at launch; Play all with Loop off plays each
+    once (Home `Rooms`, the Done check, Menu from x to lines); with Loop on they keep playing for the whole 9 s
+    recording (4 fps tiles).
+
+  ![React Native iOS Rive tags loop](assets/react-native-ios-rive-loop.png)
+
+  Platform: iOS 27.2, iPhone 17 Pro simulator | Host: macOS 27.3 | IDE: Xcode 27.2 (27B52), React Native example
+  (Release); CollectionViewClassifyMenu `fe1a5083`, CYLTabBarController `776b4635`, feat/harmony, 2026-11-18.
+- **DONE (2026-11-19)**: all three steps pass on the iPhone 17 Pro simulator (iOS 27.2): the configuration file
+  screen's Rive Home (`822c9055`), Flutter iOS (`fe1a5083`) and React Native iOS (this commit). Not run here: the Flutter
+  and React Native Android examples on an emulator.
