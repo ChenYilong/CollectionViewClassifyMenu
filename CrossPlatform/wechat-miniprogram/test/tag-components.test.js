@@ -251,7 +251,8 @@ test('the pages load with their titles and react as the iOS screens', () => {
     toggleSelection: (i) => { selection = selection.includes(i) ? selection.filter((x) => x !== i) : selection.concat(i); },
   };
   const container = loadPage('sample-tag-container', { '#toast': toast, '#container-2': third });
-  assert.equal(container.data.containers.length, 5);
+  assert.equal(container.data.containers.length, 6);
+  assert.equal(container.data.containers[5].style.deleteIndicatorImage, "/images/samples/cross.png");
   container.onThirdTap({ detail: { position: 0, tag: { title: 'Persian' } } });
   assert.deepEqual(selection, [], 'an unselected tag while others are selected deselects all');
   container.onThirdTap({ detail: { position: 0, tag: { title: 'Persian' } } });

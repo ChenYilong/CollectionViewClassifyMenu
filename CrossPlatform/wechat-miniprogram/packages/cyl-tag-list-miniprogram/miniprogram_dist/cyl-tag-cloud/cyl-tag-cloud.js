@@ -13,9 +13,18 @@
  * (tagDeleteHandler, after the tag was removed unless `removesItemsOnDelete` is false), `taglongpress` {position, tag}
  * (tagLongPressHandler), `tagmove` {from, to} (tagMoveHandler), `selectedtagdrag` {position, tag}
  * (selectedTagDragHandler), `reorderingchange` {reordering}, `contentchange` after the tags changed.
+ *
+ * Editing mode (iOS `CYLTagListView.setEditing(_:animated:)`): `editing` (or `setEditing(true)`) shows every enabled
+ * tag's delete indicator, lets tags be dragged, makes a tap report (`tagtap`) without changing the selection, and shows
+ * the add control below the tags (`showsAddItemViewWhileEditing`); `editingchange` {editing} follows, and a submitted
+ * name is `requestnewitem` {name, position} (the host adds it, as iOS's `menu(_:didRequestNewItemWithName:at:)`).
+ * With `cachePolicy` ('database', 'userDefaults', 'sandboxFile'; 'none' by default) and `cacheName`, the titles are
+ * saved after each edit while editing (`cachedTitles()` reads them back, `saveToCache()` saves now; cache.js).
  */
 const model = require('./model.js');
 const { coreString } = require('../core-strings.js');
+const { CYLTagListStore } = require('./cache.js');
+const locale = require('../locale.js');
 
 /** How far a press moves before it counts as a drag rather than a long press (`dragThreshold`). */
 const DRAG_THRESHOLD = 8;
@@ -50,6 +59,10 @@ Component({
     containerCornerRadius: { type: Number, value: 0 },
     showsSectionHeaders: { type: Boolean, value: false },
     sectionTitle: { type: String, value: '' },
+    editing: { type: Boolean, value: false },
+    showsAddItemViewWhileEditing: { type: Boolean, value: true },
+    cachePolicy: { type: String, value: 'none' },
+    cacheName: { type: String, value: 'CYLTagListView' },
   },
 
   data: {
@@ -57,6 +70,11 @@ Component({
     list: {},
     ripples: {},
     deleteLabel: '',
+    isEditing: false,
+    showsAddItem: false,
+    addText: '',
+    addPlaceholder: '',
+    addTitle: '',
   },
 
   observers: {
@@ -69,6 +87,15 @@ Component({
     'listStyle, colorTheme, defaultTagImage, containerBorderWidth, containerBorderColor, containerCornerRadius'() {
       this._render(false);
     },
+    editing(value) {
+      this.setEditing(value);
+    },
+    'cachePolicy, cacheName'(policy, name) {
+      this._cache = CYLTagListStore.cache(policy, name);
+    },
+    showsAddItemViewWhileEditing() {
+      this.setData({ showsAddItem: this._editing && this.data.showsAddItemViewWhileEditing });
+    },
   },
 
   lifetimes: {
@@ -78,9 +105,16 @@ Component({
       this._pressed = -1;
       this._dragging = null;
       this._rippleId = 1;
+      this._editing = false;
+      this._cache = null;
     },
     attached() {
-      this.setData({ deleteLabel: coreString('CYLMenuDeleteTag') });
+      this.setData({
+        deleteLabel: coreString('CYLMenuDeleteTag'),
+        addPlaceholder: locale.tc('CYLMenuAddTagPlaceholder'),
+        addTitle: locale.tc('CYLMenuAddTag'),
+      });
+      this._cache = CYLTagListStore.cache(this.data.cachePolicy, this.data.cacheName);
       // The initial tags, when the observer has not run for them.
       if (!this._tagsSet) this._tags = (this.data.tags || []).map(keyed);
       this._render(false);
@@ -157,6 +191,47 @@ Component({
       this._render(false);
     },
 
+    // MARK: Editing (iOS CYLTagListView editing mode and cache)
+
+    /** Whether the cloud is in editing mode (`isEditing`). */
+    isEditing() {
+      return this._editing;
+    },
+
+    /** `setEditing(_:animated:)`: enters or leaves editing mode, then `editingchange` {editing}. */
+    setEditing(editing) {
+      const value = !!editing;
+      if (value === this._editing) return;
+      this._editing = value;
+      this._dragging = null;
+      this.setData({ isEditing: value, showsAddItem: value && this.data.showsAddItemViewWhileEditing, addText: value ? this.data.addText : '' });
+      this._render(false);
+      this.triggerEvent('editingchange', { editing: value });
+    },
+
+    /** `cachedTitles(inSection:)`: the titles saved in the cache, in order; undefined when nothing was saved or no cache. */
+    cachedTitles() {
+      return this._cache ? this._cache.cachedTitles('0') : undefined;
+    },
+
+    /** `saveEditableSectionsToCache()`: saves the current titles to the cache (the cloud saves after each edit). */
+    saveToCache() {
+      if (this._cache) this._cache.saveTitles(this._tags.map((tag) => String(tag.title)), '0');
+    },
+
+    onAddInput(event) {
+      this.setData({ addText: event.detail.value });
+    },
+
+    /** `CYLTagListAddItemView.submit()`: the trimmed name as `requestnewitem` {name, position}; the field is cleared. */
+    onAddSubmit() {
+      const name = String(this.data.addText || '').trim();
+      if (!name) return;
+      this.setData({ addText: '' });
+      this.triggerEvent('requestnewitem', { name, position: this._tags.length });
+      this.saveToCache();
+    },
+
     // MARK: Rendering
 
     _style() {
@@ -173,6 +248,7 @@ Component({
         pressed: this._pressed,
         defaultTagImage: this.data.defaultTagImage,
         dragging: this._dragging ? this._dragging.current : -1,
+        editing: this._editing,
       };
       const items = this._tags.map((tag, index) => model.renderTag(tag, index, context));
       const list = model.renderList(listStyle, {
@@ -180,6 +256,8 @@ Component({
         containerBorderColor: this.data.containerBorderColor,
         containerCornerRadius: this.data.containerCornerRadius,
       });
+      // While editing, every change of the tags is saved (a delete, an added tag, a drop; iOS saves after each edit).
+      if (contentChanged && this._editing) this.saveToCache();
       this.setData({ items, list }, () => {
         if (contentChanged) this.triggerEvent('contentchange', { count: this._tags.length });
       });
@@ -242,6 +320,8 @@ Component({
       this._render(false);
       this.triggerEvent('reorderingchange', { reordering: false });
       if (drag.current !== drag.from) {
+        // The new order survives a relaunch when the cloud has a cache.
+        this.saveToCache();
         this.triggerEvent('tagmove', { from: drag.from, to: drag.current });
         this.triggerEvent('contentchange', { count: this._tags.length });
       }
@@ -268,7 +348,10 @@ Component({
       const tag = this._tags[index];
       if (!tag || tag.isEnabled === false) return;
       const before = this._selection;
-      this._selection = model.tapSelection(before, index, this.data.selectionMode, this.data.allowsEmptySelection);
+      // Editing: a tap reports the tag without changing the selection.
+      if (!this._editing) {
+        this._selection = model.tapSelection(before, index, this.data.selectionMode, this.data.allowsEmptySelection);
+      }
       if (this._selection !== before) this._render(false);
       this.triggerEvent('tagtap', { position: index, tag: publicTag(tag) });
     },
@@ -277,7 +360,7 @@ Component({
       const index = this._index(event);
       const touch = (event.touches && event.touches[0]) || this._touchStart || { clientX: 0, clientY: 0 };
       if (this._pressed >= 0) this._pressed = -1;
-      if (this.data.allowsReordering) {
+      if (this.data.allowsReordering || this._editing) {
         // A long press begins the interactive movement; it is reported as a long press if it does not move.
         this._dragging = {
           from: index,
@@ -304,7 +387,7 @@ Component({
     onDelete(event) {
       const index = this._index(event);
       const tag = this._tags[index];
-      if (!tag || !tag.isDeletable || tag.isEnabled === false) return;
+      if (!tag || !(tag.isDeletable || this._editing) || tag.isEnabled === false) return;
       if (this.data.removesItemsOnDelete) {
         this._tags.splice(index, 1);
         this._selection = model.removeSelection(this._selection, index);

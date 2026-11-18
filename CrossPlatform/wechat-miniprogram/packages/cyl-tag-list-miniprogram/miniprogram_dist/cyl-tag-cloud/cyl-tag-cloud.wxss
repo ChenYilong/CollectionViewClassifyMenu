@@ -32,3 +32,11 @@
   from { transform: scale(0.05); opacity: 1; }
   to { transform: scale(1); opacity: 0; }
 }
+/* CYLMenuStyle.deleteIndicatorImage: the image centered in the indicator, which keeps the line height. */
+.cyl-tc-delete-image-box { position: relative; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+.cyl-tc-delete-image { flex: none; }
+/* The add control of editing mode (CYLTagListAddItemView): 44 px tall, a field and an Add button. */
+.cyl-tc-add { display: flex; align-items: center; height: 44px; margin: 0 16px 10px; }
+.cyl-tc-add-field { flex: 1; height: 44px; padding: 0 12px; border-radius: 8px; background-color: #F2F2F7; font-size: 17px; }
+.cyl-tc-add-button { margin-left: 12px; padding: 0 12px; line-height: 44px; font-size: 17px; font-weight: 600; color: #007AFF; }
+.cyl-tc-add-disabled { color: #C7C7CC; }

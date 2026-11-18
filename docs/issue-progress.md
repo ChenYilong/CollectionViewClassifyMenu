@@ -1146,7 +1146,7 @@ tags: [issues, ui, cocoapods, progress]
   `testTagContainerSample` (the wrapped tag taller, inside the container, the shadow, crosses). Screenshot:
   [ios-sixth-container.png](assets/ios-sixth-container.png). The open items are closed: **100 / 100**.
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): editing mode, tag list cache and the sixth container's options on Android, HarmonyOS and the mini program
+### DONE (2026-11-19, `feat/harmony`, Windows session): editing mode, tag list cache and the sixth container's options on Android, HarmonyOS and the mini program
 
 - **Requests (relayed by the Mac ClassifyMenu session, session-roles rule):** (1) port iOS `d6a94ce9` (CYLSearchViewController
   session): `CYLTagListView` editing mode (`isEditing`, `setEditing(_:animated:)`, `menuSectionAllowsEditing`,
@@ -1191,5 +1191,21 @@ tags: [issues, ui, cocoapods, progress]
   `sys.symbol.xmark_circle_fill` cross, 100 characters, wrapping titles, cyan tags, a `sys.symbol.star_fill` star, no
   cross on the last tag). Test `wrapsTitlesDrawsACrossImageAndAnElevation`; host tests 69 / 69, `build.sh` OK.
   `docs/harmony.md` 887 / 902: the 15 left are the network sync rows of `3fc2c23b` (next).
-- **TODO:** the mini program (editing mode and cache, the three options); network sync (`3fc2c23b`) on Android,
-  HarmonyOS and the mini program; device screenshots of the sixth container.
+- **Mini program (done, 25 / 25 and the options):** `cyl-tag-cloud` (the component with delete indicators and
+  reordering; `cyl-tag-list` has neither) gets `editing` / `setEditing()` / `isEditing()`, `showsAddItemViewWhileEditing`
+  (a name field and an Add button below the tags, `requestnewitem` {name, position}, `editingchange` {editing}),
+  `cachePolicy` / `cacheName` / `cachedTitles()` / `saveToCache()`; while editing every enabled tag shows its delete
+  indicator (the cloud is one editable section), tags can be dragged, a tap reports without selecting, and the titles
+  are saved after a delete, an added tag or a drop. `cache.js` `CYLTagListStore`: 'userDefaults' is
+  `wx.setStorageSync`, 'sandboxFile' a JSON file in `wx.env.USER_DATA_PATH`; a mini program has no SQLite, so
+  'database' keeps its own storage entry; without `wx` (node) the titles live in memory. The model gets `titleWraps`
+  (the tag grows, the title wraps), `elevation` (a box shadow, no clipping) and `deleteIndicatorImage` (a square as tall
+  as a line, the padding beside it); the Container sample gets the sixth container, its star and cross drawn by
+  `scripts/draw-sample-images.py`. Core strings regenerated (`core-tables.js`). New `test/tag-cloud-editing.test.js`
+  (4); `npm test` 153. WeChat DevTools:
+
+  <img src="assets/miniprogram-sixth-container-editing.png" width="360" alt="Mini program: the sixth container, and editing mode">
+
+- **Score:** 100 / 100 for these two requests (Android 40, HarmonyOS 25, mini program 25, the options 10). Not checked
+  on an emulator: the HarmonyOS sixth container and editing (host tests and the build only).
+- **Next (separate request):** network sync (`3fc2c23b`) on Android, HarmonyOS and the mini program.

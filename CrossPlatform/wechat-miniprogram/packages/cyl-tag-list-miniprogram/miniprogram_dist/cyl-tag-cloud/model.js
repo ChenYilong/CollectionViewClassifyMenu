@@ -120,6 +120,12 @@ function defaultStyle() {
     imageCornerRadius: 0,
     // A leading image as a circle as tall as the tag, at its leading edge (AndroidTagView's avatar).
     imageFillsTagHeight: false,
+    // A title too wide for its row wraps and the tag grows taller (AndroidTagView's tag_text_wrap).
+    titleWraps: false,
+    // A shadow under each tag, as Android's elevation in px (tag_elevation): offset down by half, blurred by half.
+    elevation: 0,
+    // An image as the delete indicator instead of the title or the drawn cross (setCrossDrawable).
+    deleteIndicatorImage: null,
     imageTitleSpacing: 4,
     imageSize: 14,
     itemHeight: 30,
@@ -528,7 +534,7 @@ function px(value) {
  * accessibility label.
  */
 function renderTag(tag, index, context) {
-  const { listStyle, theme, selection = [], pressed = -1, defaultTagImage = '', dragging = -1 } = context;
+  const { listStyle, theme, selection = [], pressed = -1, defaultTagImage = '', dragging = -1, editing = false } = context;
   const style = styleForItem(tag, index, listStyle, theme);
   const enabled = tag.isEnabled !== false;
   const selected = selection.includes(index);
@@ -541,17 +547,27 @@ function renderTag(tag, index, context) {
   const borderWidth = a.borderColor ? a.borderWidth : 0;
   const radius = cornerRadius(a.cornerRadius, height);
   const parts = [
-    `height: ${px(height)}`,
+    // A wrapping title (`titleWraps`) lets the tag grow taller than one line.
+    style.titleWraps ? `min-height: ${px(height)}; height: auto` : `height: ${px(height)}`,
     `padding: ${px(insets.top)} ${px(insets.right)} ${px(insets.bottom)} ${px(insets.left)}`,
     `border-radius: ${px(radius)}`,
     `background-color: ${background || 'transparent'}`,
   ];
   if (a.backgroundImage && !isPressed) parts.push(`background-image: ${a.backgroundImage}`);
-  if (borderWidth > 0) parts.push(`box-shadow: inset 0 0 0 ${px(borderWidth)} ${a.borderColor}`);
   if (dragging === index) parts.push('opacity: 0.8; transform: scale(1.08); z-index: 2');
+  const shadows = [];
+  if (borderWidth > 0) shadows.push(`inset 0 0 0 ${px(borderWidth)} ${a.borderColor}`);
+  // `elevation`: a shadow under the tag; the tag stops clipping (the shadow is outside it).
+  if (style.elevation > 0) {
+    shadows.push(`0 ${px(style.elevation / 2)} ${px(style.elevation)} rgba(0, 0, 0, 0.25)`);
+    parts.push('overflow: visible');
+  }
+  if (style.titleWraps) parts.push('white-space: normal');
+  if (shadows.length) parts.push(`box-shadow: ${shadows.join(', ')}`);
 
   const spacing = style.imageTitleSpacing;
-  const deletable = !!tag.isDeletable && enabled;
+  // Editing (`isEditing`): every enabled tag shows its delete indicator, the cloud being one editable section.
+  const deletable = (editing || !!tag.isDeletable) && enabled;
   const leading = style.deleteIndicatorPlacement === 'leading';
   let deleteIndicator = null;
   if (deletable) {
@@ -560,7 +576,19 @@ function renderTag(tag, index, context) {
     const hit = leading
       ? `margin: -${px(insets.top)} 0 -${px(insets.bottom)} -${px(insets.left)}; padding: 0 ${px(spacing)} 0 ${px(insets.left)}`
       : `margin: -${px(insets.top)} -${px(insets.right)} -${px(insets.bottom)} 0; padding: 0 ${px(insets.right)} 0 ${px(spacing)}`;
-    if (style.deleteIndicatorLineWidth > 0) {
+    if (style.deleteIndicatorImage) {
+      // A square image as tall as a line of the indicator font, the padding only beside it, so a one-line tag keeps
+      // it (on iOS it vanished while the padding was also taken above it).
+      const size = style.deleteIndicatorFontSize || a.fontSize;
+      const side = Math.ceil(lineHeight(size));
+      deleteIndicator = {
+        cross: false,
+        image: style.deleteIndicatorImage,
+        style: hit,
+        boxStyle: `width: ${px(side + 2 * style.deleteIndicatorPadding)}`,
+        imageStyle: `width: ${px(side)}; height: ${px(side)}`,
+      };
+    } else if (style.deleteIndicatorLineWidth > 0) {
       const width = crossIndicatorWidth(style, state);
       const side = Math.max(0, width - 2 * style.deleteIndicatorPadding);
       deleteIndicator = {
@@ -620,7 +648,8 @@ function renderTag(tag, index, context) {
     index,
     title,
     hasTitle: title.length > 0,
-    titleStyle: `font-size: ${px(a.fontSize)}; color: ${a.textColor}`,
+    titleStyle: `font-size: ${px(a.fontSize)}; color: ${a.textColor}`
+      + (style.titleWraps ? '; white-space: normal; word-break: break-word' : ''),
     style: parts.join('; '),
     icon,
     deleteIndicator,

@@ -20,6 +20,9 @@
               <view class="cyl-tc-cross-line cyl-tc-cross-a" style="{{item.deleteIndicator.lineStyle}}" />
               <view class="cyl-tc-cross-line cyl-tc-cross-b" style="{{item.deleteIndicator.lineStyle}}" />
             </view>
+            <view wx:elif="{{item.deleteIndicator.image}}" class="cyl-tc-delete-image-box" style="{{item.deleteIndicator.boxStyle}}">
+              <image class="cyl-tc-delete-image" src="{{item.deleteIndicator.image}}" mode="aspectFit" style="{{item.deleteIndicator.imageStyle}}" aria-hidden="true" />
+            </view>
             <text wx:else class="cyl-tc-delete-text" style="{{item.deleteIndicator.boxStyle}}">{{item.deleteIndicator.text}}</text>
           </view>
         </block>
@@ -34,9 +37,19 @@
             <view class="cyl-tc-cross-line cyl-tc-cross-a" style="{{item.deleteIndicator.lineStyle}}" />
             <view class="cyl-tc-cross-line cyl-tc-cross-b" style="{{item.deleteIndicator.lineStyle}}" />
           </view>
+          <view wx:elif="{{item.deleteIndicator.image}}" class="cyl-tc-delete-image-box" style="{{item.deleteIndicator.boxStyle}}">
+            <image class="cyl-tc-delete-image" src="{{item.deleteIndicator.image}}" mode="aspectFit" style="{{item.deleteIndicator.imageStyle}}" aria-hidden="true" />
+          </view>
           <text wx:else class="cyl-tc-delete-text" style="{{item.deleteIndicator.boxStyle}}">{{item.deleteIndicator.text}}</text>
         </view>
       </view>
+    </view>
+    <!-- CYLTagListAddItemView while editing: a name field and an Add button below the tags. -->
+    <view wx:if="{{showsAddItem}}" class="cyl-tc-add">
+      <input class="cyl-tc-add-field" id="CYLTagListAddItemField" value="{{addText}}" placeholder="{{addPlaceholder}}"
+             aria-label="{{addPlaceholder}}" confirm-type="done" bindinput="onAddInput" bindconfirm="onAddSubmit" />
+      <view class="cyl-tc-add-button {{addText ? '' : 'cyl-tc-add-disabled'}}" id="CYLTagListAddItemButton"
+            aria-role="button" aria-label="{{addTitle}}" aria-disabled="{{!addText}}" bindtap="onAddSubmit">{{addTitle}}</view>
     </view>
   </view>
 </view>

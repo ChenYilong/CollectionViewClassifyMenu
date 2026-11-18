@@ -28,6 +28,11 @@ const LIST2 = ['China', 'USA', 'Austria', 'Japan', 'Sudan', 'Spain', 'UK', 'Germ
 const LIST3 = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام']; // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
 const LIST4 = ['Adele', 'Whitney Houston'];
 const LIST5 = ['Custom Red Color', 'Custom Blue Color'];
+const LIST6 = ['Starred', 'A long tag that wraps onto a second line instead of leaving the container', 'End'];
+
+/** The sixth container's star (before the first tag) and cross image (scripts/draw-sample-images.py). */
+const STAR = '/images/samples/star.png';
+const CROSS = '/images/samples/cross.png';
 
 /** {backgroundColor, tagBorderColor, tagTextColor, tagSelectedBackgroundColor} of list5. */
 function colors5() {
@@ -162,9 +167,38 @@ function fifth() {
   return { ...container, tags: tagsWithTitles(LIST5, colors5()) };
 }
 
-/** The five containers, in order. */
-function containers() {
-  return [first(), second(), third(), fourth(), fifth()];
+/**
+ * tagcontainerLayout6: gravity end, 4 px elevation, a cross image, 100 characters, wrapping titles, cyan tags; a star
+ * before the first tag, no cross on the last (iOS 00760142, the Android Container tab's sixth container).
+ */
+function sixth() {
+  const container = makeContainer((options, style) => {
+    style.interitemSpacing = 10;
+    style.lineSpacing = 10;
+    style.rowAlignment = 'trailing';
+    style.elevation = 4;
+    style.maximumTitleLength = 100;
+    style.titleWraps = true;
+    style.imageSize = 18;
+    style.imageTitleSpacing = 6;
+    style.deleteIndicatorImage = CROSS;
+    for (const state of ['normal', 'selected', 'disabled']) {
+      style[state].backgroundColor = '#E0F7FA';
+      style[state].borderColor = '#4DD0E1';
+      style[state].textColor = '#006064';
+    }
+    options.colorTheme = 'none';
+    options.removesItemsOnDelete = false;
+  });
+  const tags = tagsWithTitles(LIST6, [], true);
+  tags[tags.length - 1].isDeletable = false;
+  tags[0].image = STAR;
+  return { ...container, tags };
 }
 
-module.exports = { LIST1, LIST2, LIST3, LIST4, LIST5, AVATAR, colors5, welcomeTitle, makeContainer, tagsWithTitles, containers };
+/** The six containers, in order. */
+function containers() {
+  return [first(), second(), third(), fourth(), fifth(), sixth()];
+}
+
+module.exports = { LIST1, LIST2, LIST3, LIST4, LIST5, LIST6, STAR, CROSS, AVATAR, colors5, welcomeTitle, makeContainer, tagsWithTitles, containers };

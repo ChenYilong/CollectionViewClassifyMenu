@@ -1,4 +1,4 @@
-<scroll-view class="scroll" scroll-y="{{!reordering}}">
+<scroll-view class="scroll" scroll-y="{{!reordering}}" scroll-into-view="{{scrollIntoView}}">
   <block wx:if="{{containers.length}}">
   <view class="stack">
     <cyl-tag-cloud id="container-0" class="container" tags="{{containers[0].tags}}" list-style="{{containers[0].style}}"
@@ -42,6 +42,13 @@
                    container-border-width="{{containers[4].options.containerBorderWidth}}"
                    container-border-color="{{containers[4].options.containerBorderColor}}"
                    container-corner-radius="{{containers[4].options.containerCornerRadius}}" />
+    <cyl-tag-cloud id="container-5" class="container spaced" tags="{{containers[5].tags}}" list-style="{{containers[5].style}}"
+                   color-theme="{{containers[5].options.colorTheme}}" allows-tapping="{{containers[5].options.allowsTapping}}"
+                   removes-items-on-delete="{{containers[5].options.removesItemsOnDelete}}"
+                   container-border-width="{{containers[5].options.containerBorderWidth}}"
+                   container-border-color="{{containers[5].options.containerBorderColor}}"
+                   container-corner-radius="{{containers[5].options.containerCornerRadius}}"
+                   bind:tagdelete="onFirstDelete" />
   </view>
   </block>
   <cyl-sample-toast id="toast" />

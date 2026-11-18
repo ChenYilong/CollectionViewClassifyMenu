@@ -1,5 +1,6 @@
 """Draws the sample pictures of CYLAndroidSample.picture(_:) (a diagonal gradient and a large white symbol at 0.55),
-the yellow avatar of CYLTagContainerSampleData.avatar() and a globe icon (SF Symbol "globe" stand-in)."""
+the yellow avatar of CYLTagContainerSampleData.avatar(), a globe icon (SF Symbol "globe" stand-in), and the sixth
+container's star (SF Symbol "star.fill" in system yellow) and cross (SF Symbol "xmark.circle.fill" in system gray)."""
 import math
 import os
 import sys
@@ -108,4 +109,25 @@ for y in (0.27, 0.73):
     half = math.sqrt(max(0, 0.25 - (y - 0.5) ** 2)) * (big - 2 * m)
     d.line([big / 2 - half, big * y, big / 2 + half, big * y], fill=gray, width=lw)
 img.resize((G, G), Image.LANCZOS).save(os.path.join(OUT, 'globe.png'), optimize=True)
+# The sixth container: a star before the first tag (18 pt at 3x, system yellow) and the cross image (system gray).
+T = 54
+big = T * SS
+img = Image.new('RGBA', (big, big), (0, 0, 0, 0))
+d = ImageDraw.Draw(img)
+points = []
+for i in range(10):
+    radius = big * (0.48 if i % 2 == 0 else 0.2)
+    angle = math.pi / 2 + i * math.pi / 5
+    points.append((big / 2 + radius * math.cos(angle), big / 2 - radius * math.sin(angle)))
+d.polygon(points, fill=(255, 204, 0, 255))
+img.resize((T, T), Image.LANCZOS).save(os.path.join(OUT, 'star.png'), optimize=True)
+img = Image.new('RGBA', (big, big), (0, 0, 0, 0))
+d = ImageDraw.Draw(img)
+d.ellipse([0, 0, big - 1, big - 1], fill=(142, 142, 147, 255))
+lw = round(big * 0.1)
+a, b = big * 0.32, big * 0.68
+d.line([a, a, b, b], fill=(255, 255, 255, 255), width=lw)
+d.line([b, a, a, b], fill=(255, 255, 255, 255), width=lw)
+img.resize((T, T), Image.LANCZOS).save(os.path.join(OUT, 'cross.png'), optimize=True)
+
 print('ok')
