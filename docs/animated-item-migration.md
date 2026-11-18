@@ -270,6 +270,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   compile ("Property 'restartToken' does not exist on type 'CYLAnimatedItemAnimationContext'"). Copied unmodified
   (`Index.ets`, `CYLAnimatedItemView.ets` changed), README commit updated; `harmony/scripts/build.sh` OK (HAR and HAP),
   `unit-test.sh` 62 / 62.
+- **Mini program and Android pins at `d8f47b4d` (2026-11-18)**: `70064275..d8f47b4d` (`044fc2c9`, `a8156b92`, `51d58545`,
+  `d8f47b4d`) changes iOS `CYLTabBarController.m`, Flutter and docs only (no Android, mini program or HarmonyOS
+  source; `harmony/cylanimateditem` unchanged), so the Android results at `70064275` stand; mini program `npm test`
+  143 / 143.
 - **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
   `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
   tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still
