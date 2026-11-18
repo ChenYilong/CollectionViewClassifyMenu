@@ -959,3 +959,17 @@ tags: [issues, ui, cocoapods, progress]
   specifiers (25); no user-facing literal outside a lookup (25); every screen of the iOS examples shows no Chinese in
   English and no Simplified-only text in Traditional Chinese, checked by a test that walks the screens (30); a script
   that checks the tables, run before commits (10); fixes in the right bundle, screenshots en / zh-Hant (10). Pass: 60.
+
+### TODO (2026-11-19, `feat/harmony`): route tasks by session name (Mac: iOS, Win: the other platforms)
+
+- Context: two sessions work on this branch, "Mac-…" (macOS, Xcode, iOS simulator) and "win…" (Windows: HarmonyOS, the
+  mini program, Android). The owner wants the split written into the instructions and skills.
+- Prompt (verbatim): "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入：开始任务前检查session名称，名字中以Mac开头（忽略大小写）的session主要负责iOS端开发测试，名字以Win开头（忽略大小写）主要负责其他端开发，如果相应session均处于活跃状态，优选分配不同平台端任务到合适session，如果不存在以上规则的session则跳过该规则继续独立完成任务。"
+- Prompt (English): "Find this project's instructions files and skills files (create them if missing, make sure the
+  write succeeds), in English: before a task, check the session names. A session whose name starts with Mac (case
+  insensitive) mainly does iOS development and testing; one starting with Win (case insensitive) mainly does the other
+  platforms. When both are active, prefer handing each platform's tasks to the matching session; when no session
+  follows this naming, skip the rule and finish the task alone."
+- Acceptance (100): the rule, in English, in AGENTS.md (30), every instructions.md this session may edit (30), the
+  task-start skill's checklist (30), and the HarmonyOS folder's instructions.md through the Windows session that owns
+  it (10). Appended, nothing overwritten (numstat), frontmatter intact. Pass: 60.
