@@ -4,3 +4,7 @@
 
 # harmony/scripts/screenshots.sh regenerates the HarmonyOS example screens (one raw screen per demo) as a set.
 docs/assets/harmonyos-*.jpeg
+
+# Animated screen recordings for the README: scripts/stitch-screenshots.py writes still PNGs, so a label would drop the
+# animation. Each recording is described where the README shows it.
+assets/*.gif

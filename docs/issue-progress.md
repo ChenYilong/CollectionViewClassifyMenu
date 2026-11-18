@@ -49,10 +49,12 @@ tags: [issues, ui, cocoapods, progress]
   refuses an incomplete label and writes it into the PNG), `scripts/check-screenshots.py` (new; run by
   `scripts/check-branch-pr.sh`, exit 3) and `.github/workflows/screenshot-labels.yml` (new); AGENTS.md "Screenshots:
   enforced", `cyl-screenshots` and `cyl-commit` updated; the four images restitched (header, captions, footer, original
-  pixels). -5: older images
-  committed before the check (for example `miniprogram-devtools-rive-house-number-input.png`, the
-  `react-native-android-*` and `miniprogram-devtools-rive-b20-*` sets) are not restitched; the check only covers images
-  added or changed from now on.
+  pixels). Then **100/100**: the 260 older images (every one in `docs/assets/` and `assets/`) were relabeled
+  with `scripts/stitch-screenshots.py` as one panel each, with the original pixels. The header and footer come from git
+  (first commit, its date and subject, the doc that shows the image); Host, IDE and tool versions say "not recorded",
+  since nobody wrote them down. The 17 JPEGs outside the HarmonyOS set are now PNGs, with their doc links updated. The
+  four animated README GIFs are exempt (a still PNG would drop the animation). `check-screenshots.py` on every tracked
+  image: "Screenshots OK (349 checked)".
 
 ### Done (2026-11-18, `feat/harmony`): Rive tags rest until played in the mini program (CYLTabBarController `ff2e7a22`)
 
@@ -77,12 +79,16 @@ tags: [issues, ui, cocoapods, progress]
 - Acceptance criteria: 100 = warnings gone (initial `view` hides the icon; 25), cyl-tag-button forwards the five options
   (20), cyl-tag-list items take the GIF options with registry defaults (20), Play all / `playAnimation()` play a GIF one
   pass through cyl-animated-item (20), tests and a WeChat DevTools check with a screenshot (15). Pass: 60.
-- Result: **95/100**. All five parts are in the library (`cyl-tag-button.js` / `.wxml`, `cyl-tag-list.js` / `.wxml`,
+- Result: **100/100** (was 95). All five parts are in the library (`cyl-tag-button.js` / `.wxml`, `cyl-tag-list.js` / `.wxml`,
   `model.js`, `animations.js` `gif()` / `gifOptions()`); `npm test` 141 / 141; DevTools: the GIF tags rest on their stills
   and play one pass of their own duration on Play all, no type warnings on the 动效 page
   (`docs/assets/miniprogram-devtools-gif-stills-play-all.png`). -5: the example has no page with a standalone
   cyl-tag-button, so the warning fix is verified by a test (the initial data) and not in DevTools; the
-  CYLSearchViewController session re-checks it after pinning.
+  CYLSearchViewController session re-checks it after pinning. That -5 is now closed: the CYLSearchViewController
+  session synced to `6295caf3` (cyl-animated-item `d8f47b4d`), ran `wx.reLaunch('/pages/examples/index')`, which shows a
+  standalone cyl-tag-button (SVGA header), and `get_simulator_console` printed 0 lines, with 0 matches for
+  cyl-tag-button, iconKind or cyl-animated-item. Before the fix it printed 8 warnings. That session recorded it in
+  rows 22-23 of its `docs/animated-icon-component.md`.
 
 ### Done (2026-11-18, `feat/harmony`): task-start rules in the instructions and skills
 
@@ -659,7 +665,7 @@ tags: [issues, ui, cocoapods, progress]
     `scripts/unit-tests.sh menu`：30 个测试 0 失败（新增 2 个 tab 测试）。CYLTabBarController 全部固定到 `53766de`。
   - 跨端：本仓库没有 React Native / Flutter 示例（CYLTabBarController 仓库的跨端示例复刻的是 CYLTabBarController），不适用；
     以后新增跨端示例时按“一个功能一个 tab”实现（记在 [android.md](android.md) 鸿蒙/跨端 TODO 下）。
-  - 上下文：用户附两张 Android 截图（`assets/request-split-classify-menu.png` 单选可折叠菜单，`assets/request-split-multiple-filter.jpg`
+  - 上下文：用户附两张 Android 截图（`assets/request-split-classify-menu.png` 单选可折叠菜单，`assets/request-split-multiple-filter.png`
     多选筛选），二者此前共用 Classify 一个 tab。
   - 要求：拆成两个 tabbaritem 分开展示，不共用；适用于所有平台的 example：iOS、Android、跨端 React Native / Flutter。
   - 计划：Android 合并示例：Classify（单选菜单，选中标签联动 SQLite）与 Filter（多选筛选，左上按钮从左侧滑出，联动 SQLite）两个 tab；
