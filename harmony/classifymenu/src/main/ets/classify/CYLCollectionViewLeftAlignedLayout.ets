@@ -73,13 +73,15 @@ export class CYLCollectionViewLeftAlignedLayout {
       let x = insets.left;
       if (this.rowAlignment === CYLTagRowAlignment.center) {
         x += Math.floor(free / 2);
-      } else if (this.rowAlignment === CYLTagRowAlignment.trailing) {
-        x += free;
       }
+      const trailing = this.rowAlignment === CYLTagRowAlignment.trailing;
       for (const index of items) {
         const size = sizes[index];
         const itemWidth = Math.min(size.width, contentWidth);
-        const frameX = rightToLeft ? width - x - itemWidth : x;
+        // Trailing, as AndroidTagView's container_gravity="right": the row's first item at the trailing inset, each next
+        // one before it (the leading position mirrored inside the row), as iOS since 58b2f335.
+        const alignedX = trailing ? insets.left + contentWidth - (x - insets.left) - itemWidth : x;
+        const frameX = rightToLeft ? width - alignedX - itemWidth : alignedX;
         frames.push(new CYLRect(frameX, y + (rowHeight - size.height) / 2, itemWidth, size.height));
         x += itemWidth + interitemSpacing;
       }

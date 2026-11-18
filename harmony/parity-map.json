@@ -90,6 +90,7 @@
     "CYLMenuStyle.headerIndicatorColor": "`CYLMenuStyle.headerIndicatorColor`",
     "CYLMenuStyle.headerIndicatorSize": "`CYLMenuStyle.headerIndicatorSize`",
     "CYLMenuStyle.imageCornerRadius": "`CYLMenuStyle.imageCornerRadius`",
+    "CYLMenuStyle.imageFillsTagHeight": "`CYLMenuStyle.imageFillsTagHeight` (AndroidTagView's avatar, `fillsTagHeight`)",
     "CYLMenuStyle.imageTitleSpacing": "`CYLMenuStyle.imageTitleSpacing`",
     "CYLMenuStyle.imageSize": "`CYLMenuStyle.imageSize`",
     "CYLMenuStyle.imageInsets": "`CYLMenuStyle.imageInsets`",

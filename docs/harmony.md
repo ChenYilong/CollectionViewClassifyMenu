@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 838 / 838 = 100.0 / 100** (API 816 / 816, demos 22 / 22). Both tables are scored together: every TODO removed
+**Score: 839 / 839 = 100.0 / 100** (API 817 / 817, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -392,6 +392,7 @@ overrides left out.
 | `CYLMenuStyle.titlePositionAdjustment` (CYLMenuStyle.swift) | `CYLMenuStyle.titlePositionAdjustment` | property |
 | `CYLMenuStyle.imagePositionAdjustment` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePositionAdjustment` | property |
 | `CYLMenuStyle.imagePlacement` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePlacement` | property |
+| `CYLMenuStyle.imageFillsTagHeight` (CYLMenuStyle.swift) | `CYLMenuStyle.imageFillsTagHeight` (AndroidTagView's avatar, `fillsTagHeight`) | property |
 | `CYLMenuStyle.layoutCentered` (CYLMenuStyle.swift) | `CYLMenuStyle.layoutCentered` | property |
 | `CYLMenuStyle.contentAlignment` (CYLMenuStyle.swift) | `CYLMenuStyle.contentAlignment` | property |
 | `CYLMenuStyle.animationSize` (CYLMenuStyle.swift) | `CYLMenuStyle.animationSize` | property |

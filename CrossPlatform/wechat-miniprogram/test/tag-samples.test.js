@@ -97,7 +97,7 @@ test('the five containers have the attributes of content_main.xml', () => {
   assert.equal(first.options.removesItemsOnDelete, false);
   assert.equal(first.options.colorTheme, 'pureTeal');
   assert.equal(first.options.defaultTagImage, '/images/samples/avatar.png');
-  assert.equal(first.style.imageSize, 24);
+  assert.equal(first.style.imageFillsTagHeight, true);
   assert.equal(second.options.colorTheme, 'random');
   assert.equal(second.options.containerBorderWidth, 4);
   assert.equal(second.options.allowsTapping, false);

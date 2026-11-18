@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.TypedValue
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -35,7 +34,6 @@ import com.cyl.classifymenu.CYLMenuStyleSelected
 import com.cyl.classifymenu.CYLMenuStyleTagContentInsets
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTag
-import com.cyl.classifymenu.CYLTagColorTheme
 import com.cyl.classifymenu.CYLTagAppearanceBackgroundColor
 import com.cyl.classifymenu.CYLTagAppearanceBorderColor
 import com.cyl.classifymenu.CYLTagAppearanceBorderWidth
@@ -247,63 +245,5 @@ class CYLTagConfigurationScreen(private val context: Context) : CYLMenuScreen, C
     override fun menuDidSelectItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {
         val list = menu as? CYLTagListView ?: return
         eventLabel.text = CYLExampleLocalizedString(context, "点击「%@」", list.menuDataSource?.menuTitleForItemAtIndexPath(indexPath).orEmpty())
-    }
-}
-
-/**
- * `CYLTagReorderDemoViewController`: drag to reorder. One tag list with `allowsReordering`: a long press picks a tag up,
- * dragging moves it, and the order below the list follows each move (`tagMoveHandler`). The core's drag keeps every
- * title whole (`CYLTagReorderWidthTest`). Reset (a button here; the bar button on iOS) restores the first order.
- */
-class CYLTagReorderScreen(private val context: Context) : CYLMenuScreen {
-    companion object {
-        /** The tags at launch and after Reset. */
-        val initialTitles = listOf("Swift", "Kotlin", "ArkTS", "Dart", "TypeScript", "Objective-C", "Java", "C++", "Rust", "Go")
-    }
-
-    override val title: CharSequence = CYLExampleLocalizedString(context, "拖拽排序")
-
-    /** The titles in their current order. */
-    var titles: List<String> = initialTitles
-        private set
-
-    val tagListView = CYLTagListView(context).apply {
-        contentDescription = "reorder.tags"
-        isScrollEnabled = false
-        allowsReordering = true
-        colorTheme = CYLTagColorTheme.CYLTagColorThemePureTeal
-        setTagsWithTitles(titles)
-        reloadMenuData()
-    }
-    val orderLabel = caption(context, "")
-    override val view: View
-
-    init {
-        tagListView.tagMoveHandler = { from, to -> move(from, to) }
-        val reset = Button(context).apply {
-            text = CYLExampleLocalizedString(context, "重置")
-            isAllCaps = false
-            setOnClickListener { reset() }
-        }
-        view = column(context, listOf(caption(context, CYLExampleLocalizedString(context, "长按一个标签，拖到新位置后松手。")), tagListView, orderLabel, reset))
-        updateOrder()
-    }
-
-    /** A tag moved from `from` to `to` (the list already shows it there). */
-    fun move(from: Int, to: Int) {
-        if (from !in titles.indices || to !in titles.indices) return
-        titles = titles.toMutableList().apply { add(to, removeAt(from)) }
-        updateOrder()
-    }
-
-    fun reset() {
-        titles = initialTitles
-        tagListView.setTagsWithTitles(titles)
-        tagListView.reloadMenuData()
-        updateOrder()
-    }
-
-    private fun updateOrder() {
-        orderLabel.text = CYLExampleLocalizedString(context, "当前顺序：%@", titles.joinToString(" · "))
     }
 }

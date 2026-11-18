@@ -61,8 +61,9 @@ function first() {
   const container = makeContainer((options, style) => {
     style.interitemSpacing = 10;
     style.lineSpacing = 10;
-    style.imageSize = 24;
-    style.imageCornerRadius = 12;
+    // The avatar as AndroidTagView draws it (and iOS's CYLTagContainerSample): a circle as tall as the tag at its
+    // leading edge.
+    style.imageFillsTagHeight = true;
     options.allowsReordering = true;
     options.allowsTapping = true;
     options.colorTheme = 'pureTeal';
