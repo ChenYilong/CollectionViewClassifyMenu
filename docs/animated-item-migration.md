@@ -532,3 +532,16 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Acceptance (100):** every iOS pin at 4da6b760 (20); the core and all four iOS projects build, menu / example / swift /
   tag suites pass, the Objective-C tests included (50); Flutter iOS builds (10); the bundled copies moved by the
   Windows session and the commit sent to CYLSearchViewController (20). Pass: 60.
+- **Result (iOS, 80/100 until the bundled copies move):** every iOS pin is at `4da6b760` (root, Example, Example-Swift and
+  TagCollectionView Podfiles, `Package.swift`, the Flutter pubspec and iOS Podfile, the React Native Podfile and
+  `scripts/fetch-cyltabbar.sh`). What broke: the Swift `CYLAnimatedItemView` declares `imageView` and `titleLabel` as
+  constants and `accessoryView` and `placeholderImage` as public, non-open properties; `CYLTagButton` overrode all four
+  only to forward to `super`, which no longer compiles. Fix: the forwarding overrides are removed (the API is the base
+  class's, unchanged for callers; `android-api.md` stays 793 / 793). Swift Package Manager: `CYLTagButton` also imports
+  `CYLAnimatedItemViews`, the view's own module there. No API gap for CYLTabBarController.
+  Tests on the iPhone 18 Pro simulator (iOS 27.2, Xcode 27.2): menu 37 / 37 (the Objective-C
+  `CYLCollectionViewClassifyMenuLayoutTests.m` included), Example 98 / 98, Swift Example 22 / 22, TagCollectionView 6 / 6;
+  `flutter build ios --simulator` OK. One Example test waited a fixed 0.2 s for the discover screen to hide its
+  navigation bar and failed once under load; it now waits for the condition (3 / 3 alone, then the full suite).
+  Next: the Windows session moves the mini program's `cyl-animated-item`, `harmony/cylanimateditem` and the Android pins
+  (`android/merged/gradle.properties`) to the same commit (−20).

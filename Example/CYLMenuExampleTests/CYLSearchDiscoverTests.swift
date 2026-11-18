@@ -34,8 +34,12 @@ final class CYLSearchDiscoverTests: CYLMenuExampleTestCase {
         let navigation = UINavigationController(rootViewController: UIViewController())
         show(navigation, size: CYLTestScreen.tall)
         navigation.pushViewController(screen, animated: false)
-        runMainLoop(for: 0.2)
         screen.loadViewIfNeeded()
+        // The bar hides during the appearance, a few run loop passes later under load (full suite): wait for it.
+        let deadline = Date(timeIntervalSinceNow: 2)
+        while !navigation.isNavigationBarHidden && Date() < deadline {
+            runMainLoop(for: 0.05)
+        }
         screen.view.layoutIfNeeded()
         XCTAssertTrue(navigation.isNavigationBarHidden, "The search bar replaces the navigation bar")
         // 最近搜索: folded to two rows with the chevron as the last tag; the trash in the header.

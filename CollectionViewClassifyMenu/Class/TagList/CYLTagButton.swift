@@ -21,7 +21,12 @@
 // CollectionViewClassifyMenu must load the base class's module too. Without the re-export an app target that never
 // imports CYLAnimatedItem itself failed with explicit modules: "cannot inherit from class
 // 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded" (CI on b4d0e51).
-#if canImport(CYLAnimatedItem)
+// Swift Package Manager (CYLTabBarController 4c7dc79d and later): the Swift CYLAnimatedItemView is in its own module,
+// CYLAnimatedItemViews, beside the engine's CYLAnimatedItem; CocoaPods builds both into the CYLAnimatedItem module.
+#if canImport(CYLAnimatedItemViews)
+@_exported import CYLAnimatedItem
+@_exported import CYLAnimatedItemViews
+#elseif canImport(CYLAnimatedItem)
 @_exported import CYLAnimatedItem
 #else
 @_exported import CYLTabBarController
@@ -304,31 +309,8 @@ open class CYLTagButton: CYLAnimatedItemView {
      */
     open override var animationView: UIView? { super.animationView }
 
-    /**
-     * The icon's image view (the static image, else the placeholder, until the animation shows).
-     */
-    open override var imageView: UIImageView { super.imageView }
-
-    /**
-     * The title label.
-     */
-    open override var titleLabel: UILabel { super.titleLabel }
-
-    /**
-     * The accessory beside the content (the delete indicator).
-     */
-    open override var accessoryView: UIView? {
-        get { super.accessoryView }
-        set { super.accessoryView = newValue }
-    }
-
-    /**
-     * Shown when there is no static image and `animationURL` cannot play; nil restores the default placeholder.
-     */
-    open override var placeholderImage: UIImage! {
-        get { super.placeholderImage }
-        set { super.placeholderImage = newValue }
-    }
+    // `imageView`, `titleLabel`, `accessoryView` and `placeholderImage` are the base class's: since CYLTabBarController 4c7dc79d the Swift
+    // CYLAnimatedItemView declares them as constants or non-open properties, so they are not overridden here.
 
     /**
      * Plays the animation again from its first frame.
