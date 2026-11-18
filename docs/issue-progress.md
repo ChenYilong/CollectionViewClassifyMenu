@@ -404,7 +404,7 @@ tags: [issues, ui, cocoapods, progress]
   `.agents/skills/cyl-commit/SKILL.md` (new section), `docs/instructions.md` and `harmony/instructions.md`, all
   appended; `scripts/check-commit-message.sh` checks the subject format, the author line and CJK characters.
 
-### TODO (2026-11-17, `feat/harmony`): every icon + title component is CYLTagButton (iOS done, Android open)
+### DONE (2026-11-17 → 2026-11-19, `feat/harmony`): every icon + title component is CYLTagButton (iOS and Android)
 
 - Prompt (verbatim): "请确保本项目中所有具有如下特征的组件使用的是同一个组件，如果不是相关代码修改内部实现，以保证使用的是同一个组件，方便我重构该组件就可以把修改应用到所有组件上。我的需求是以后新增动效类型，仅需需要修改这个组件，所有需要使用动效展示的组件都可以支持新增动效，无须在第二个地方修改代码。" (followed by the link to `CYLTagButton.swift#L94` and its description).
 - Decision (asked, 2026-11-17): "Replace with CYLTagButton (Recommended)": the public `UIButton` subclasses are
@@ -436,7 +436,16 @@ tags: [issues, ui, cocoapods, progress]
     `CYLTagButton.cylApply(_:)` have no Android counterpart yet, because Android's `CYLIndexPathButton`,
     `CYLRightImageButton` and `CYLMultipleFilterHeaderView` are still `Button` / `ViewGroup`s. TODO: the same refactor
     in `android/merged/library` (needs an Android build).
-- Status: iOS done; Android TODO.
+- Status: iOS done; Android done, **100/100**. Android (`cadbe530`, another session, not compiled there):
+  `CYLIndexPathButton` and `CYLRightImageButton` subclass `CYLTagButton`, `CYLMultipleFilterHeaderView` shows its title
+  in `titleButton` (a `CYLTagButton`), with `CYLMenuStyle.classifyMenuTag` / `filterTag` / `sectionTitle`,
+  `CYLTagButton.cylApply` and `expandTitle` / `collapseTitle`. Checked 2026-11-19 (Windows session): the library and the
+  example build, Android library tests 87 / 0; on the emulator the classify menu's More / Less switches with the arrow
+  after the title and the filter panel's section titles sit 50 dp in above their line
+  (`assets/android-menu-filter-tagbutton.png`); iOS -> Android API 792 / 792 (`c368c75e` mapped the last row, the
+  `CYLTagButton (CYLCollectionCellStyle)` category).
+
+  <img src="assets/android-menu-filter-tagbutton.png" width="500" alt="Android: classify menu More / Less and filter section headers on CYLTagButton">
 
 ### Done (2026-11-17, `feat/harmony`): CYLTagListView members visible to Objective-C
 

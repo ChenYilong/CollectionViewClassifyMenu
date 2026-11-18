@@ -80,6 +80,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "configuration" to "配置文件 / 字典（map）初始化", "tagCloud" to "标签云：android-tagview 的初始化方式",
             "sample.tagCloud" to "android-tagview 示例（Swift 版）", "sample.imageTag" to "TagViewGroup 示例：图片标签",
             "sample.tagContainer" to "AndroidTagView 示例：标签容器", "reset" to "重置 reset",
+            "sample.reorder" to "拖拽标签重新排序",
         )
 
         private fun offsetString(offset: CYLOffset) = "{${fmt(offset.horizontal)}, ${fmt(offset.vertical)}}"
@@ -87,6 +88,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
     }
 
     fun actionIdentifiers() = listOf(
+        listOf("sample.reorder"),
         listOf("iconColor.normal", "iconColor.selected", "titleColor.normal", "titleColor.selected", "font",
             "imageTitleSpacing", "imageSize", "imageInsets", "titlePositionAdjustment", "imagePositionAdjustment",
             "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"),
@@ -97,7 +99,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
     )
 
     fun titleForSection(section: Int) = CYLExampleLocalizedString(context, listOf(
-        "标题与图标（参照 CYLFlatDesignTabBarItem）", "背景、边框与圆角（参照 CYLBadgeView）",
+        "拖拽排序（长按标签后拖动）", "标题与图标（参照 CYLFlatDesignTabBarItem）", "背景、边框与圆角（参照 CYLBadgeView）",
         "动效图标（CYLTabBarController 动效引擎）", "Android 标签库示例（Swift 复刻）", "其它")[section])
 
     fun titleForAction(identifier: String) = CYLExampleLocalizedString(context, actionTitles[identifier] ?: identifier)
@@ -189,6 +191,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "animationSpeed" -> style.animationSpeed = listOf(0.5f, 2f, 1f)[step % 3]
             "configuration" -> { navigator.push(CYLTagConfigurationScreen(context)); return }
             "tagCloud" -> { navigator.push(CYLTagCloudScreen(context)); return }
+            "sample.reorder" -> { navigator.push(CYLTagReorderScreen(context)); return }
             "sample.tagCloud" -> { selectAppTab("kaede"); return }
             "sample.imageTag" -> { selectAppTab("licrafter"); return }
             "sample.tagContainer" -> { selectAppTab("lujun"); return }
