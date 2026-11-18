@@ -120,7 +120,7 @@ class _TagListPageState extends State<TagListPage> {
           'items': [
             // Rive state machines and inputs, as on the other platforms: without them the player drives the default
             // input "active", which these files do not have, so nothing plays.
-            // house.riv moves when its number input Rooms changes (Android: not supported yet, CYLTabBarController B20).
+            // house.riv moves when its number input Rooms changes (Android since CYLTabBarController 3f262501).
             {...animated('Home', 'rive/house.riv'), 'animationOptions': {'stateMachine': 'State Machine 1', 'numberInput': 'Rooms', 'values': '3,4,5,6'}},
             {...animated('Done', 'rive/check.riv'), 'animationOptions': {'stateMachine': 'State Machine 1', 'triggerInput': 'Check'}},
             {

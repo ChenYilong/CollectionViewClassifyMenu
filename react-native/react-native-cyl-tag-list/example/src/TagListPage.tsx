@@ -35,7 +35,7 @@ const configuration = {
         // "active", which these files do not have, so nothing plays.
         {
           ...animated('Home', 'house.riv'),
-          // house.riv moves when its number input Rooms changes (Android: not supported yet, CYLTabBarController B20).
+          // house.riv moves when its number input Rooms changes (Android since CYLTabBarController 3f262501).
           animationOptions: { stateMachine: 'State Machine 1', numberInput: 'Rooms', values: '3,4,5,6' },
         },
         {
