@@ -545,3 +545,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   navigation bar and failed once under load; it now waits for the condition (3 / 3 alone, then the full suite).
   Next: the Windows session moves the mini program's `cyl-animated-item`, `harmony/cylanimateditem` and the Android pins
   (`android/merged/gradle.properties`) to the same commit (−20).
+- **Result (mini program, HarmonyOS, Android; Windows session): at `5996fa96`** (the target moved from `4da6b760` to
+  `5996fa96`, the newest, which makes `accessoryView` and `placeholderImage` open again). Mini program:
+  `scripts/fetch-cyltabbar.js` `COMMIT` and `test/animated-item.test.js`; the vendored `cyl-animated-item` and
+  `cyl-animation-placeholder` and the installed packages re-fetched; `--check` OK; `npm test` 149 pass. HarmonyOS:
+  `harmony/cylanimateditem` re-vendored unmodified at `5996fa96` (new upstream files `CYLAnimatedItemStackView.ets` and
+  `CYLAnimatedItemStackModel.ts`; the upstream `test/` stays out, as before) and its README; host tests 63 / 63,
+  `build.sh` OK. One test was stale, not from the pin: it expected the review keyword "质量不错" translated, which the iOS
+  sweep made user content; it now expects it as written. Android: `android/merged/gradle.properties`
+  `cyl.tabbar.commit`; library tests 87 / 0, the example builds. Bundled copies: 20 / 20.
