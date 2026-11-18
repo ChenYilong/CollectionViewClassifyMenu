@@ -66,3 +66,14 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
   `numberInput: Rooms`, `values: 3,4,5,6`, `4d392b92`) moves when selected; frames before / after a tap, pixel diff.
   (2) React Native iOS example and (3) Flutter iOS example: the three Rive tags (`house`, `check`, `menu_button`, options
   from the fix above) play and loop; screenshots and pixel diffs. Stitched with `scripts/stitch-screenshots.swift`.
+- **Progress (2026-11-18), step 1 done: configuration file screen, Rive Home moves.** iPhone 17 Pro `62B54974`, iOS 27.2,
+  Xcode 27.2 (27B52), macOS 27.3, CYLTabBarController `776b4635`, `-CYLExampleScreen config`, `axe tap`, screenshots
+  and a 5 s recording (8 fps): selecting Rive switches the house to another `Rooms` value within 0.4 s and it stays;
+  deselecting changes it again. Each new selection lands on the same value (no stepping through 3, 4, 5, 6 without
+  loop; the loop is on the Animations screen only). Before `4d392b92` the file named only the state machine and the
+  house never changed.
+
+  ![iOS configuration file screen, Rive Home](assets/ios-config-rive-home-rooms.png)
+
+  Platform: iOS 27.2, iPhone 17 Pro simulator | Host: macOS 27.3 | IDE: Xcode 27.2 (27B52); CollectionViewClassifyMenu
+  `0f7dbb25` (`4d392b92`), CYLTabBarController `776b4635`, feat/harmony, 2026-11-18.
