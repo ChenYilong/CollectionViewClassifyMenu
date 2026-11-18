@@ -270,6 +270,9 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
         } else if screen == "config" {
             guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
             navigation.pushViewController(CYLTagConfigurationDemoViewController(), animated: false)
+        } else if screen == "reorder" {
+            guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
+            navigation.pushViewController(CYLTagReorderDemoViewController(), animated: false)
         } else if screen == "search-home" {
             selectTab(withRootClass: CYLSearchHomeViewController.self, in: tabs)
         } else if screen.hasPrefix("plus") {

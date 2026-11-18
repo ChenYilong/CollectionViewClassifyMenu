@@ -291,3 +291,10 @@
 "%@ 已接入" = "%@ registered";
 "%@ 未接入：添加 pod 'CYLAnimatedItem/%@'" = "%@ missing: add pod 'CYLAnimatedItem/%@'";
 "动效引擎冲突：%@" = "Engine conflict: %@";
+
+/* Drag to reorder (CYLTagReorderDemoViewController) */
+"拖拽排序" = "Drag to reorder";
+"长按一个标签，拖到新位置后松手。" = "Press and hold a tag, drag it to a new place, then let go.";
+"当前顺序：%@" = "Order: %@";
+"拖拽排序（长按标签后拖动）" = "Drag to reorder (press and hold a tag, then drag)";
+"拖拽标签重新排序" = "Drag tags to reorder them";
