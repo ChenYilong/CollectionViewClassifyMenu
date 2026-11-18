@@ -50,19 +50,13 @@ flutter {
     source = "../.."
 }
 
-// CYLTabBarController's Android animation engine (Example-Android/cyltabbar and tabpages at the commit of
-// android/merged/gradle.properties), which CYLTagListView finds at run time to play the Lottie icons. Build it with
-// android/scripts/gradle.sh merged :Example-Android:cyltabbar:assembleRelease :Example-Android:tabpages:jar and point
-// cyl.tabbar.libs (gradle.properties) at a folder holding cyltabbar-release.aar and tabpages-*.jar. cyltabbar's
-// dependency io.github.chenyilong:cyltabbarcontroller-animateditem (the animated icon + title component) is not in that
-// folder: it comes from cyl.classifymenu.repo, where publishing com.cyl:classifymenu copies it (do not add its aar
-// here as well, or its classes are duplicated).
-val cylTabBarLibs = providers.gradleProperty("cyl.tabbar.libs").orNull
+// CYLTabBarController's Android library (tab bar and animation engine) comes from flutter_cyltabbar (pubspec.yaml),
+// which compiles Example-Android/cyltabbar and tabpages of its checkout; CYLTagListView finds the engine there at run
+// time to play the Lottie and Rive icons. The animated icon + title component
+// io.github.chenyilong:cyltabbarcontroller-animateditem comes once, with com.cyl:classifymenu (cyl.classifymenu.repo):
+// gradle.properties sets cylAnimatedItemProvided, so flutter_cyltabbar does not compile a second copy.
 dependencies {
-    if (cylTabBarLibs != null) {
-        implementation(fileTree(cylTabBarLibs) { include("*.aar", "*.jar") })
-        implementation("com.airbnb.android:lottie:6.6.2")
-        implementation("app.rive:rive-android:10.3.0")
-        implementation("androidx.fragment:fragment-ktx:1.8.5")
-    }
+    implementation("com.airbnb.android:lottie:6.6.2")
+    implementation("app.rive:rive-android:10.3.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
 }
