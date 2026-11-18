@@ -35,6 +35,20 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-18, `feat/harmony`): Android PAG, GIF and Rive Home do not play
+
+- Prompt (verbatim): "rive （home title） pag  gif动画 播放异常，无法播放"
+- Acceptance criteria: 100 = bug recorded with a labeled screenshot (15), platform and scope found (15), cause found
+  for each engine (30), fixed in CYLTabBarController and pinned (25), re-verified on the emulator with frames (15).
+  Pass: 60.
+- Result so far: **55/100**. Recorded and screenshotted (`animated-item-migration.md`,
+  `docs/assets/android-pag-gif-rive-home-no-playback.png`). Scope: Android, every recent pin (the mini program plays
+  Rive and starts its GIFs; the DevTools runtime state switches to playing). Causes: GIF ignores Loop (fixed upstream
+  in `ad385a5a`, not yet pinned or checked). Rive Home needs its Rooms number input driven. PAG stops drawing after
+  one frame, with a libEGL "unimplemented OpenGL ES API" error, and is not yet bisected. The emulator went to the
+  TableViewPlaceHolder session mid-task. Missing: the PAG cause (-15), the upstream fixes and pins (-25), the
+  re-check (-15). The fixes are requested from CYLTabBarController's sessions.
+
 ### Done (2026-11-18, `feat/harmony`): Rive tint changes at CYLTabBarController `396d3fca` / `0505042f`
 
 - Prompt (relayed by winCYLTabBarController 鸿蒙开发, from the user): "the Rive tint interface is fixed, please

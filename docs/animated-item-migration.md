@@ -281,6 +281,28 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `d8f47b4d`) changes iOS `CYLTabBarController.m`, Flutter and docs only (no Android, mini program or HarmonyOS
   source; `harmony/cylanimateditem` unchanged), so the Android results at `70064275` stand; mini program `npm test`
   143 / 143.
+- **TODO (bug, 2026-11-18, Android): PAG, GIF and Rive Home do not play** (user report, verbatim: "rive （home title）
+  pag  gif动画 播放异常，无法播放"). Emulator-5556 (API 37, x86_64, host GPU), Animations page, Play all with Loop on;
+  tags found by their labels (uiautomator), changed pixels per 0.6 s frame pair:
+  - **PAG:** Home, Health, Me, Animation 1 and Animation 2 change 0 pixels. Posts changes 406 in the first pairs, then
+    0. On Play all, logcat prints `libEGL: called unimplemented OpenGL ES API` and
+    `tgfx: EGLDevice::checkGraphicsResetStatus() ignored out-of-spec status`. The PAG files load
+    (`PAGFile.LoadFromPath` for all 6). `PAGPlayer.play()` sets the repeat count (0 with loop), progress 0 and `play`,
+    so libpag stops drawing after the first frame on this GPU path. In 2026-11-15 (`android.md`) PAG played on this
+    emulator with `-gpu host`.
+  - **GIF:** Fire and Sample change 0 pixels; Rocket and Star change once (73 / 47 px), then 0. The GIF view plays one
+    pass of the file's own length (about 1 s) with a `ValueAnimator` and ignores Loop, so it looks still between
+    screenshots. Upstream `ad385a5a` (2026-11-18, after `0505042f`) adds loops, speed and restart to Android GIF
+    playback.
+  - **Rive Home** (`house.riv`): 3-27 pixels. The animation only moves when the `Rooms` number input changes, and
+    Android drives only boolean inputs and triggers. The mini program steps Rooms on each loop pass. Done, Shapes and
+    the icons.riv tags move 100-900 pixels.
+  - Animator duration scale is 1.0, so this is not Reduce Motion. The results are the same at CYLTabBarController
+    `6a9ede85`, `d8f47b4d` and `396d3fca`, so this is not a regression of the recent pins.
+  - Evidence: `docs/assets/android-pag-gif-rive-home-no-playback.png`.
+  - The fixes belong in CYLTabBarController (`cylanimateditem`: the PAG view on the emulator GPU path, GIF loops
+    (`ad385a5a`), and a Rive number input for house.riv's Rooms). Reported to its sessions. Next: pin past
+    `ad385a5a` and re-check GIF; bisect PAG on an older commit (`fe5c3ae3`) once the emulator is free.
 - **Mini program, Android and HarmonyOS module at `0505042f` (2026-11-18, `feat/harmony`)**: the user asked every
   session to check the Rive tint changes in CYLTabBarController `396d3fca` (`0dc6d1c4` item appearance, `d899816b`
   FlatDesign Rive tint, `00ed70e6` badge and tint follow a swapped view); `0505042f` adds docs only. On our platforms:
