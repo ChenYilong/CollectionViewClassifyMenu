@@ -261,3 +261,52 @@ public final class CYLTagListStore: NSObject, CYLTagListCache {
         return rows == 0 ? nil : titles
     }
 }
+
+// MARK: - Network sync
+
+/**
+ * In what order `CYLTagListView.loadSections(withKeys:completion:)` reads the cache and the remote source.
+ * Unlike a search suggestion cache, a tag list may be kept on a server and edited on several devices.
+ */
+@objc public enum CYLTagListLoadPolicy: Int {
+    /**
+     * The cache at once, then the remote source; a successful download is saved and reported again (the default).
+     */
+    case cacheThenNetwork
+    /**
+     * The cache when it holds every section asked for; otherwise the remote source (the cache if that fails).
+     */
+    case cacheFirst
+    /**
+     * The remote source; the cache only when the download fails.
+     */
+    case networkFirst
+}
+
+/**
+ * Where the titles reported by `CYLTagListView.loadSections(withKeys:completion:)` come from.
+ */
+@objc public enum CYLTagListDataOrigin: Int {
+    /**
+     * The local cache (`CYLTagListView.cache`).
+     */
+    case cache
+    /**
+     * The remote source (`CYLTagListView.remoteSource`).
+     */
+    case network
+}
+
+/**
+ * A server that keeps a tag list's sections, shared by the user's devices. The host implements it with its own
+ * networking; `CYLTagListView` only asks it for sections (`loadSections(withKeys:completion:)`). Uploading is the
+ * host's too: `menu(_:didFinishEditingWithTitles:)` gives it the edited sections.
+ */
+@objc public protocol CYLTagListRemoteSource: NSObjectProtocol {
+    /**
+     * Downloads the sections saved under `keys`; calls `completion` once, on any queue, with the titles by key (a
+     * missing key: nothing on the server) or an error.
+     */
+    @objc(fetchSectionsWithKeys:completion:)
+    func fetchSections(withKeys keys: [String], completion: @escaping ([String: [String]]?, Error?) -> Void)
+}

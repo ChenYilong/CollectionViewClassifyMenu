@@ -50,6 +50,23 @@ private final class CYLEditableTagSource: NSObject, CYLMenuDataSource, CYLMenuDe
     }
 }
 
+/**
+ * A remote source that answers at once with fixed sections, or fails.
+ */
+private final class CYLFakeRemoteSource: NSObject, CYLTagListRemoteSource {
+    var sections: [String: [String]]?
+    private(set) var fetchCount = 0
+
+    init(sections: [String: [String]]?) {
+        self.sections = sections
+    }
+
+    func fetchSections(withKeys keys: [String], completion: @escaping ([String: [String]]?, Error?) -> Void) {
+        fetchCount += 1
+        completion(sections, sections == nil ? NSError(domain: "CYLFake", code: 1) : nil)
+    }
+}
+
 final class CYLTagListEditingTests: CYLMenuExampleTestCase {
 
     private func makeList(_ source: CYLEditableTagSource) -> CYLTagListView {
@@ -174,5 +191,55 @@ final class CYLTagListEditingTests: CYLMenuExampleTestCase {
             XCTAssertNil(reopened.cachedTitles(forSection: "1"))
             closeHostWindow()
         }
+    }
+
+    func testFinishingEditingReportsTheEditedSectionsForUploading() {
+        let source = CYLEditableTagSource(sections: [["Recent A"], ["Family", "Friends", "Clients"]])
+        source.editableSections = [1]
+        let view = makeList(source)
+        var reported: [String: [String]]?
+        view.editingFinishHandler = { reported = $0 }
+        view.setEditing(true, animated: false)
+        let collection = view.subviews.compactMap { $0 as? UICollectionView }.first!
+        view.collectionView(collection, moveItemAt: IndexPath(item: 2, section: 1), to: IndexPath(item: 0, section: 1))
+        XCTAssertNil(reported, "nothing before editing ends")
+        view.setEditing(false, animated: false)
+        XCTAssertEqual(reported, ["1": ["Clients", "Family", "Friends"]], "the edited section, in its new order")
+    }
+
+    private func loads(policy: CYLTagListLoadPolicy, cached: [String]?, remote: [String]?) -> (events: [String], stored: [String]?) {
+        let name = "CYLTagListEditingTests.load"
+        let store = CYLTagListStore(policy: .userDefaults, name: name)
+        store.removeAllTitles()
+        if let cached {
+            store.saveTitles(cached, forSection: "mine")
+        }
+        let view = CYLTagListView(frame: .zero)
+        view.cache = store
+        let fake = CYLFakeRemoteSource(sections: remote.map { ["mine": $0] })
+        view.remoteSource = fake
+        view.loadPolicy = policy
+        var events: [String] = []
+        let done = expectation(description: "loaded")
+        done.isInverted = true
+        view.loadSections(withKeys: ["mine"]) { sections, origin in
+            events.append("\(origin == .cache ? "cache" : "network") \(sections["mine"]?.joined(separator: ",") ?? "-")")
+        }
+        wait(for: [done], timeout: 0.2)
+        let stored = store.cachedTitles(forSection: "mine")
+        store.removeAllTitles()
+        return (events, stored)
+    }
+
+    func testLoadPoliciesOrderTheCacheAndTheServer() {
+        let refreshed = loads(policy: .cacheThenNetwork, cached: ["A", "B"], remote: ["B", "A", "C"])
+        XCTAssertEqual(refreshed.events, ["cache A,B", "network B,A,C"], "the default: the cache, then the server")
+        XCTAssertEqual(refreshed.stored, ["B", "A", "C"], "a download is saved to the cache")
+        XCTAssertEqual(loads(policy: .cacheThenNetwork, cached: ["A"], remote: nil).events, ["cache A"], "a failed download")
+        XCTAssertEqual(loads(policy: .cacheFirst, cached: ["A"], remote: ["B"]).events, ["cache A"], "a full cache: no download")
+        XCTAssertEqual(loads(policy: .cacheFirst, cached: nil, remote: ["B"]).events, ["network B"])
+        XCTAssertEqual(loads(policy: .networkFirst, cached: ["A"], remote: ["B"]).events, ["network B"])
+        XCTAssertEqual(loads(policy: .networkFirst, cached: ["A"], remote: nil).events, ["cache A"], "the cache when it fails")
+        XCTAssertEqual(CYLTagListView(frame: .zero).loadPolicy, .cacheThenNetwork, "the core's default")
     }
 }

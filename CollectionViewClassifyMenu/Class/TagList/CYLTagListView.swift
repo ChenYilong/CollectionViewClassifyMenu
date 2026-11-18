@@ -885,6 +885,23 @@ open class CYLTagListView: UIView {
     @objc open var cache: CYLTagListCache?
 
     /**
+     * The server the sections are also kept on, for `loadSections(withKeys:completion:)`; nil: the cache only.
+     */
+    @objc open var remoteSource: CYLTagListRemoteSource?
+
+    /**
+     * How `loadSections(withKeys:completion:)` combines the cache and `remoteSource`: `.cacheThenNetwork` (the cache
+     * at once, then a refresh from the server) by default.
+     */
+    @objc open var loadPolicy: CYLTagListLoadPolicy = .cacheThenNetwork
+
+    /**
+     * Called when editing ends (`setEditing(false, animated:)`) with the edited sections, by cache key, after
+     * `menu(_:didFinishEditingWithTitles:)`: the place to upload them.
+     */
+    @objc open var editingFinishHandler: (([String: [String]]) -> Void)?
+
+    /**
      * The titles saved for `section` (its index), in order; nil when nothing was saved or there is no cache.
      */
     @objc(cachedTitlesInSection:)
@@ -904,16 +921,30 @@ open class CYLTagListView: UIView {
      * Saves the current titles of every editable section to `cache` (the list calls it after each edit).
      */
     @objc open func saveEditableSectionsToCache() {
-        guard let cache, let source = menuDataSource else {
+        guard let cache else {
             return
         }
+        for (key, titles) in editableSectionTitles() {
+            cache.saveTitles(titles, forSection: key)
+        }
+    }
+
+    /**
+     * The titles of every editable section, by cache key (`cacheKey(forSection:)`), without create items: what the
+     * list saves and what `menu(_:didFinishEditingWithTitles:)` reports.
+     */
+    @objc open func editableSectionTitles() -> [String: [String]] {
+        guard let source = menuDataSource else {
+            return [:]
+        }
+        var result: [String: [String]] = [:]
         for section in 0..<source.numberOfSectionsInMenu() where sectionAllowsEditing(section) {
-            let titles = (0..<source.menuNumberOfItems(inSection: section)).compactMap { item -> String? in
+            result[cacheKey(forSection: section)] = (0..<source.menuNumberOfItems(inSection: section)).compactMap { item in
                 let indexPath = IndexPath(item: item, section: section)
                 return source.menuItemType?(at: indexPath) == .create ? nil : source.menuTitleForItem(at: indexPath)
             }
-            cache.saveTitles(titles, forSection: cacheKey(forSection: section))
         }
+        return result
     }
 
     /**
@@ -928,6 +959,10 @@ open class CYLTagListView: UIView {
         isEditing = editing
         if !editing {
             addItemView.textField.resignFirstResponder()
+            // The edited sections, for the host to upload (the cache already has them).
+            let titles = editableSectionTitles()
+            menuDelegate?.menu?(self, didFinishEditingWithTitles: titles)
+            editingFinishHandler?(titles)
         }
         updateLongPressDuration()
         updateAddItemView()
@@ -2792,5 +2827,69 @@ private extension CYLTagListView {
         let item = titles.indices.contains(section) ? titles[section].count : 0
         menuDelegate?.menu?(self, didRequestNewItemWithName: name, at: IndexPath(item: item, section: section))
         saveEditableSectionsToCache()
+    }
+}
+
+// MARK: - Network sync
+
+extension CYLTagListView {
+
+    /**
+     * Reads the sections saved under `keys` from the cache and `remoteSource`, in the order of `loadPolicy`, and calls
+     * `completion` on the main queue with the titles by key and where they come from: once or twice
+     * (`.cacheThenNetwork`: the cache at once, then the server). Downloaded sections are saved to the cache first.
+     * Without a remote source it reads the cache only; nothing saved anywhere calls nothing.
+     */
+    @objc(loadSectionsWithKeys:completion:)
+    open func loadSections(withKeys keys: [String], completion: @escaping ([String: [String]], CYLTagListDataOrigin) -> Void) {
+        var cached: [String: [String]] = [:]
+        for key in keys {
+            if let titles = cache?.cachedTitles(forSection: key) {
+                cached[key] = titles
+            }
+        }
+        let fetch: (@escaping (Bool) -> Void) -> Void = { [weak self] done in
+            guard let remote = self?.remoteSource else {
+                done(false)
+                return
+            }
+            remote.fetchSections(withKeys: keys) { sections, error in
+                DispatchQueue.main.async {
+                    guard let self, let sections, error == nil else {
+                        done(false)
+                        return
+                    }
+                    let downloaded = sections.filter { keys.contains($0.key) }
+                    for (key, titles) in downloaded {
+                        self.cache?.saveTitles(titles, forSection: key)
+                    }
+                    completion(downloaded, .network)
+                    done(true)
+                }
+            }
+        }
+        switch loadPolicy {
+        case .cacheThenNetwork:
+            if !cached.isEmpty {
+                completion(cached, .cache)
+            }
+            fetch { _ in }
+        case .cacheFirst:
+            if cached.count == keys.count {
+                completion(cached, .cache)
+            } else {
+                fetch { ok in
+                    if !ok && !cached.isEmpty {
+                        completion(cached, .cache)
+                    }
+                }
+            }
+        case .networkFirst:
+            fetch { ok in
+                if !ok && !cached.isEmpty {
+                    completion(cached, .cache)
+                }
+            }
+        }
     }
 }

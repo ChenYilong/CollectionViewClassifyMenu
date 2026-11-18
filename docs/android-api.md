@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 834 / 834 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 834 / 849 with an Android counterpart = 98.2 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -285,6 +285,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuDelegate -menu:didTapMoreButtonInSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidTapMoreButtonInSection(menu, section)` |
 | `CYLMenuDelegate -menu:didDeleteItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidDeleteItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didChangeEditing:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidChangeEditing(menu, editing)` |
+| `CYLMenuDelegate -menu:didFinishEditingWithTitles:` | method, `CYLMenuDataSource.swift` | TODO |
 | `CYLMenuDelegate -menu:didLongPressItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidLongPressItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidMoveItemAtIndexPath(menu, sourceIndexPath, toIndexPath)` |
 | `CYLMenuDelegate -menu:didBeginDraggingSelectedItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath(menu, indexPath)` |
@@ -572,6 +573,15 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListStore.name` | property, `CYLTagListCache.swift` | `CYLTagListStore.name` |
 | `CYLTagListStore +cacheWithPolicy:name:` | method, `CYLTagListCache.swift` | `CYLTagListStore.cacheWithPolicy(context, policy, name)` |
 | `CYLTagListStore -initWithPolicy:name:` | method, `CYLTagListCache.swift` | `CYLTagListStore(context, policy, name)` |
+| `CYLTagListLoadPolicy` | enum, `CYLTagListCache.swift` | TODO |
+| `CYLTagListLoadPolicyCacheThenNetwork` | enum value, `CYLTagListCache.swift` | TODO |
+| `CYLTagListLoadPolicyCacheFirst` | enum value, `CYLTagListCache.swift` | TODO |
+| `CYLTagListLoadPolicyNetworkFirst` | enum value, `CYLTagListCache.swift` | TODO |
+| `CYLTagListDataOrigin` | enum, `CYLTagListCache.swift` | TODO |
+| `CYLTagListDataOriginCache` | enum value, `CYLTagListCache.swift` | TODO |
+| `CYLTagListDataOriginNetwork` | enum value, `CYLTagListCache.swift` | TODO |
+| `CYLTagListRemoteSource` | protocol, `CYLTagListCache.swift` | TODO |
+| `CYLTagListRemoteSource -fetchSectionsWithKeys:completion:` | method, `CYLTagListCache.swift` | TODO |
 | `CYLTagListCell` | class, `CYLTagListCell.swift` | `com.cyl.classifymenu.CYLTagListCell` |
 | `CYLTagListCell.button` | property, `CYLTagListCell.swift` | `CYLTagListCell.button` |
 | `CYLTagListCell.appliedStyle` | property, `CYLTagListCell.swift` | `CYLTagListCell.appliedStyle` |
@@ -755,9 +765,13 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView.cachePolicy` | property, `CYLTagListView.swift` | `CYLTagListView.cachePolicy` |
 | `CYLTagListView.cacheName` | property, `CYLTagListView.swift` | `CYLTagListView.cacheName` |
 | `CYLTagListView.cache` | property, `CYLTagListView.swift` | `CYLTagListView.cache` |
+| `CYLTagListView.remoteSource` | property, `CYLTagListView.swift` | TODO |
+| `CYLTagListView.loadPolicy` | property, `CYLTagListView.swift` | TODO |
+| `CYLTagListView.editingFinishHandler` | property, `CYLTagListView.swift` | TODO |
 | `CYLTagListView -cachedTitlesInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.cachedTitlesInSection` |
 | `CYLTagListView -cacheKeyForSection:` | method, `CYLTagListView.swift` | `CYLTagListView.cacheKeyForSection` |
 | `CYLTagListView -saveEditableSectionsToCache` | method, `CYLTagListView.swift` | `CYLTagListView.saveEditableSectionsToCache` |
+| `CYLTagListView -editableSectionTitles` | method, `CYLTagListView.swift` | TODO |
 | `CYLTagListView -setEditing:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.setEditing(editing, animated)` |
 | `CYLTagListView -sectionAllowsEditing:` | method, `CYLTagListView.swift` | `CYLTagListView.sectionAllowsEditing` |
 | `CYLTagListView -initWithFoldControl:` | method, `CYLTagListView.swift` | `CYLTagListView(context, foldControl)` |
@@ -793,6 +807,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView -numberOfVisibleItemsInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.numberOfVisibleItemsInSection` |
 | `CYLTagListView -scrollToSection:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.scrollToSection` |
 | `CYLTagListView -scrollToItemAtIndexPath:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.scrollToItemAtIndexPath` |
+| `CYLTagListView -loadSectionsWithKeys:completion:` | method, `CYLTagListView.swift` | TODO |
 | `CYLTagView` | class, `CYLTagView.swift` | `com.cyl.classifymenu.CYLTagView` |
 | `CYLTagView.sectionInset` | property, `CYLTagView.swift` | `kTagCollectionViewToTopMargin / ToLeftMargin / ToBottomtMargin / ToRightMargin` |
 | `CYLTagView.cellSpacing` | property, `CYLTagView.swift` | `kTagCollectionViewCellsHorizonMargin` |

@@ -272,6 +272,13 @@ import UIKit
     optional func menu(_ menu: Any, didChangeEditing editing: Bool)
 
     /**
+     * `CYLTagListView`'s editing ended: the edited sections' titles by cache key (`cacheKey(forSection:)`), in their
+     * new order, already saved to its cache; upload them to your server here.
+     */
+    @objc(menu:didFinishEditingWithTitles:)
+    optional func menu(_ menu: Any, didFinishEditingWithTitles titles: [String: [String]])
+
+    /**
      * A long press on an item that did not move it (AndroidTagView's onTagLongClick).
      */
     @objc(menu:didLongPressItemAtIndexPath:)

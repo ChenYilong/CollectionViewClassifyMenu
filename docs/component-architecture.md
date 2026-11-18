@@ -531,3 +531,32 @@ started run completes and the next one tests the newest commit.
   simulator (iOS 27.2). Android, HarmonyOS and mini program: the new public symbols are TODO rows in
   `docs/android-api.md` (793 of 831) for the Windows session. Used by CYLSearchViewController's contact tags example
   (Manage = `setEditing`, "My Tags" saved in the database).
+
+## DONE (2026-11-19; TODO 2026-11-19): CYLTagListView network sync: end-of-editing callback, remote source, load policy (iOS)
+
+- **Branch**: `feat/harmony`. Requested from the CYLSearchViewController session (Mac), for its contact tags example.
+- **Prompt (verbatim, from the user of that session)**: "这里需要注意 CollectionViewClassifyMenu 在模仿CYLSearchSuggestionStore 过程中有一个注意事项。与CYLSearchSuggestionStore 不同的是CYLSearchSuggestionStore 只需要本地缓存。无须上传网络  上传。但是 CollectionViewClassifyMenu的CYLTagListCachePolicy还有上传网络的需求，本地拖拽排序后，需要从本地获取到排序后的列表，我们将CYLSearchSuggestionStore保存的缓存称之为缓存A。上传网络，可能需要在编辑结束后增加回调，返回排序后数据给用户，让用户自行上传。下次再进入该页面需要 根据CYLTagListCachePolicy里的缓存策略，缓存优先还是网络优先。还是先缓存后网络刷新。你可能增加回调接口后在example层，演示example可以做一个演示。你将排序后的taglist数据。缓存到沙盒里，这里是缓存A，将缓存A复制一份称之为缓存B，这个就是缓存上传网络服务器后，服务器数据允许不同设备设备上传，这里涉及到多端同步的问题。在将将缓存A复制一份称之为缓存B的过程中增加5秒延迟，并在用户界面显示CYLHUD，提示正在上传，上传结束展示CYLHUD显示上传结束。下次进入该页面将沙盒里的这个新缓存B当作网络数据，并在获取该缓存时候增加5秒延迟，以模拟从网络下载的延迟效果。在该example右上角增加一个同步按钮，该按钮模拟其他设备编辑后，本机拉取新数据的功能，点击同步按钮后，展示CYLHUD显示正在从其他设备同步，该同步按钮如何模拟多设备数据同步：在example层随机一个tag，以模拟多设备编辑后的效果。并修改前两个tag的顺序。更新缓存B。下次进入该页面将沙盒里的这个新缓存B当作网络数据，并在获取该缓存时候增加5秒延迟，增加CYLHUD以模拟从网络下载的延迟效果。core层面缓存策略默认为先缓存后网络数据下载成功后刷新。example层面允许自定义。"
+- **Correction (verbatim, same user)**: "typo：我们将CYLTagListCachePolicy保存的缓存称之为缓存A" (English: typo: cache A is
+  the cache saved by `CYLTagListCachePolicy`, not by CYLSearchSuggestionStore).
+- **English**: unlike CYLSearchViewController's suggestion cache (local only), the tag list cache also needs a server.
+  After editing ends, a callback gives the host the reordered lists to upload itself. When the page opens again, a
+  load policy decides: cache first, network first, or cache then a network refresh (the core's default). The example
+  (CYLSearchViewController's contact tags) simulates the server: cache A is the local cache; uploading copies it to
+  cache B (the "server", shared by devices) after 5 s with a HUD ("Uploading", then "Upload finished"); opening reads
+  cache B as network data after 5 s with a HUD; a sync button (top right) simulates another device (a random new tag,
+  the first two tags swapped, written to cache B) and pulls it the same way. The example may choose another policy.
+- **Requirements (this library)**: delegate `menu(_:didFinishEditingWithTitles:)` (and `editingFinishHandler`);
+  protocol `CYLTagListRemoteSource`; enum `CYLTagListLoadPolicy` (`cacheThenNetwork` default, `cacheFirst`,
+  `networkFirst`) and `CYLTagListDataOrigin`; `CYLTagListView.remoteSource`, `loadPolicy`,
+  `loadSections(withKeys:completion:)` (network results saved to the cache); tests.
+- **Status**: DONE (2026-11-19). `setEditing(false, animated:)` reports the edited sections, by cache key and in their
+  new order, through `menu(_:didFinishEditingWithTitles:)` and `editingFinishHandler` (`editableSectionTitles()`
+  builds them; the cache already has them). `CYLTagListRemoteSource` (`fetchSections(withKeys:completion:)`),
+  `CYLTagListLoadPolicy` (`cacheThenNetwork`, the default: the cache at once, then the server, a successful download
+  saved and reported again; `cacheFirst`: the server only when the cache lacks a section; `networkFirst`: the cache
+  only when the download fails), `CYLTagListDataOrigin`; `CYLTagListView.remoteSource`, `loadPolicy`,
+  `loadSections(withKeys:completion:)` (completion on the main queue). Uploading stays the host's. Tests
+  `testFinishingEditingReportsTheEditedSectionsForUploading`, `testLoadPoliciesOrderTheCacheAndTheServer` (every
+  policy, success and failure, the download saved); Example 106 of 106 (iPhone 18 Pro simulator, iOS 27.2). The new
+  public symbols are TODO rows in `docs/android-api.md` (796 of 849) for the Windows session. Used by
+  CYLSearchViewController's contact tags example (a simulated server with a 5 s latency and CYLPlaceholderHUD).
