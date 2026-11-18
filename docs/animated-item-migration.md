@@ -347,3 +347,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   hung on its fetch, so `git ls-remote` was used). Since `70064275`: `044fc2c9` (docs) and `a8156b92` (Flutter plugin
   revert); no file under `CYLTabBarController/`, no Package.swift or podspec change, so the iOS results at `70064275`
   hold. Move the iOS pins, pod install, ask the Windows session to move Android and the mini program.
+- **Result (2026-11-18)**: DONE for iOS. iOS pins at CYLTabBarController `a8156b92` (Package.swift, Podfiles, React
+  Native and Flutter examples); pod install resolves it in the root, Example, Example-Swift and TagCollectionView
+  projects. Menu 32 and example 92 tests, 0 failures (iPhone 17 Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3); no
+  iOS library file changes since `70064275`, so the Rive check and the tag and swift suites there stand. Android and
+  the mini program: asked the Windows session to move to `a8156b92`.
