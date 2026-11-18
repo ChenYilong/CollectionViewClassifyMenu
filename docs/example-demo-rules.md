@@ -40,7 +40,7 @@ CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback contro
 
 The screen of the request (Android, merged example, Menu tab → Animated icons; the user's screenshot, 2026-11-13):
 
-<img src="assets/animated-icons-playback-controls-request-android.jpg" width="540" alt="Animated icons screen with the 1x and Play all buttons">
+<img src="assets/animated-icons-playback-controls-request-android.png" width="540" alt="Animated icons screen with the 1x and Play all buttons">
 
 | Platform | Example screen(s) | Status |
 | --- | --- | --- |

@@ -25,7 +25,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   `6.0.0.112(SP3DEVC00E112R4P11)`, with the native ArkTS `CYLTagListView` inside Flutter (macOS 27.3, branch
   `feat/android-kotlin` at the commit that adds this, 2026-11-16 11:07 emulator time):
 
-  <img src="assets/flutter-harmonyos-animated-icons.jpeg" width="360" alt="Flutter on HarmonyOS: Animated icons screen, native tag list">
+  <img src="assets/flutter-harmonyos-animated-icons.png" width="360" alt="Flutter on HarmonyOS: Animated icons screen, native tag list">
 
   How: the public OpenHarmony 6.1 SDK (API 23, SHA-256 checked) also lacks `autoFillManager.ViewData`, so it does not
   help. The Flutter embedding calls those APIs and `CompetitionStrategy` / `Window.isInFreeWindowMode` only behind
@@ -53,7 +53,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   `classify_menu_test.dart` and `tag_list_test.dart`, `All tests passed!`. Screenshots (12:05 and 12:14 emulator
   time):
 
-  <img src="assets/flutter-harmonyos-classify-menu.jpeg" width="360" alt="Flutter on HarmonyOS: Classify menu, 83 places">
+  <img src="assets/flutter-harmonyos-classify-menu.png" width="360" alt="Flutter on HarmonyOS: Classify menu, 83 places">
 - **Prompt (verbatim, 2026-11-16):** "找到跨端，相关文档，找到以下android端 rn端 flutter端，的TODO事项，汇总成表格第一列为找到的内容，第二列默认TODO，每每完成一项就删除一个TODO 没有TODO视为满分一直完成到满分。"
 - **English:** find the cross-platform documents and the Android, React Native and Flutter TODOs in them; summarize them
   in a table, column 1 the item found, column 2 `TODO` by default; remove one `TODO` for each item done; no `TODO`
@@ -72,7 +72,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   `6.0.0.112(SP3DEVC00E112R4P11)`, macOS 27.3, 2026-11-16 12:55 emulator time): tap Home → "Selected: Home", 2x →
   "Speed 2.00x", Loop on; two screenshots 0.2 s apart differ (the icons animate):
 
-  <img src="assets/react-native-harmonyos-tags.jpeg" width="360" alt="React Native on HarmonyOS: native tag list, 2x, Loop on, Home selected">
+  <img src="assets/react-native-harmonyos-tags.png" width="360" alt="React Native on HarmonyOS: native tag list, 2x, Loop on, Home selected">
 
   Classify and the tab bar: DONE later the same day (section "CYLTabBarController's tab bar in the React Native
   HarmonyOS example").
@@ -131,9 +131,9 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   places; the plus button selects the Post page. A build from a clean `git archive` of `98a97f5` (setup.sh, ohpm,
   hvigor) succeeds. Top to bottom: Tags, Classify, Post:
 
-  <img src="assets/react-native-harmonyos-cyltabbar-tags.jpeg" width="360" alt="React Native on HarmonyOS, CYLTabBarController: Tags">
-  <img src="assets/react-native-harmonyos-cyltabbar-classify.jpeg" width="360" alt="React Native on HarmonyOS, CYLTabBarController: Classify, 83 places">
-  <img src="assets/react-native-harmonyos-cyltabbar-post.jpeg" width="360" alt="React Native on HarmonyOS, CYLTabBarController: the Post page of the plus button">
+  <img src="assets/react-native-harmonyos-cyltabbar-tags.png" width="360" alt="React Native on HarmonyOS, CYLTabBarController: Tags">
+  <img src="assets/react-native-harmonyos-cyltabbar-classify.png" width="360" alt="React Native on HarmonyOS, CYLTabBarController: Classify, 83 places">
+  <img src="assets/react-native-harmonyos-cyltabbar-post.png" width="360" alt="React Native on HarmonyOS, CYLTabBarController: the Post page of the plus button">
 
 ## DONE (2026-11-15): one shared local database for every platform
 
@@ -648,7 +648,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 
   <img src="assets/request-miniprogram-search-discover-transparent-tags.png" width="220" alt="Request: search discover after 搜索, white tags, no results">
   <img src="assets/request-miniprogram-tab-bar-out-of-sync.png" width="220" alt="Request: 脉脉搜索 shown while the 样式 tab is selected">
-  <img src="assets/request-miniprogram-review-filter-tags.jpg" width="300" alt="Request: the review filter tags">
+  <img src="assets/request-miniprogram-review-filter-tags.png" width="300" alt="Request: the review filter tags">
 
 - **BUG 1, DONE: search results and the empty placeholder** (`pages/search-discover`). 搜索, the keyboard's search
   key, a recent search or a topic now also shows the results: the discover topics and sample searches of the page's
