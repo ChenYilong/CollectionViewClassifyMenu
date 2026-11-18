@@ -751,7 +751,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   differences: Chinese texts only (no en / zh-Hant switch in the example yet), SF Symbol images have no
   HarmonyOS counterpart, Rive has no playback speed.
 
-## TODO (2026-11-19, `feat/harmony`): the Flutter example's Android tab bar from CYLTabBarController's Flutter plugin
+## DONE (2026-11-19, `feat/harmony`): the Flutter example's Android tab bar from CYLTabBarController's Flutter plugin
 
 - **Context:** `flutter/cyl_tag_list/example/lib/main.dart` switches its two pages (动效图标, 菜单) with Material's
   `NavigationBar`. CYLTabBarController ships a Flutter plugin, `CrossPlatform/flutter_cyltabbar` (widget `CYLTabBar`,
@@ -762,3 +762,41 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **Prompt (verbatim):** "本项目 flutter android 端的tabbar请改用引用CYLTabBarController的flutter端实现"
 - **Prompt (English):** "In this project, make the Flutter Android tab bar use CYLTabBarController's Flutter
   implementation."
+- **Result (`a6ab1f02`):** on Android `HomePage` builds `CYLTabBar` (`flutter_cyltabbar`, a git dependency of
+  `example/pubspec.yaml` at `b376c278`, `path: CrossPlatform/flutter_cyltabbar`) with the example's Lottie tab icons
+  (`file:///android_asset/flutter_assets/assets/tab_*_animate.json`); `onTabSelect` switches the `IndexedStack`. iOS and
+  HarmonyOS keep Material's `NavigationBar`. `MainActivity` is a `FlutterFragmentActivity` (the plugin needs one). The
+  plugin compiles CYLTabBarController's Android library from its checkout, so the `cyl.tabbar.libs` aar folder is gone;
+  `cylAnimatedItemProvided=true` keeps one copy of the animated item (it comes with `com.cyl:classifymenu`).
+- **New pin:** the pubspec `ref:` is a CYLTabBarController pin; `scripts/cyl-tabbar-latest-commit.sh --check`, AGENTS.md
+  and the `cyl-dependency` skill now include it.
+- **Tests:** `flutter analyze` clean; integration tests 2 / 2 on the Android emulator and 2 / 2 on the iPhone 17 Pro
+  simulator (iOS 27.2); iOS builds with the plugin's pod. `integration_test` cannot tap a native view, so on Android the
+  classify menu test opens the app on the Menu tab (`ExampleApp(initialTab:)`); a real tap was checked with adb.
+- **Rive tags at rest:** on this emulator (API 35 arm64, software GLES) the Rive row is empty on some launches with or
+  without this change (before: 2 of 3 launches drew it, after: 2 of 3; release build of `a6ab1f02`: 3 of 3); Play all
+  always draws it.
+- **Evidence** (Android 15 API 35 emulator `CYL_API35_arm64`, 1080 × 2400, 420 dpi, macOS 27.3, Flutter 3.47.9,
+  CYLTabBarController `b376c278`, 2026-11-19 06:19 NZDT): launch, then a tap on the Menu tab:
+
+  <img src="assets/flutter-android-cyltabbar.png" width="600" alt="Flutter on Android: CYLTabBar at launch and after a tap on the Menu tab">
+
+## TODO (2026-11-19, `feat/harmony`): the default tab bar height is the system one, on every platform
+
+- **Context:** compared on the Android emulator, the Flutter example's system bar (Material 3 `NavigationBar`) is
+  80 dp tall and CYLTabBar 49 dp (`CYLConstants.CYLTabBarHeight = 49f`, the iOS UITabBar 49 pt reused), 31 dp shorter.
+  CYLTabBarController's defaults (its session, 2026-11-19): iOS UITabBar (already the system height), Android 49 dp
+  (system 80 dp), HarmonyOS 49 vp (system `Tabs` 56 vp), mini program 50 px; React Native and Flutter inherit the native
+  value.
+- **Requirements:** with no custom height, the tab bar's default height is the platform's system tab bar height, on
+  every platform; a custom height still wins. The core is CYLTabBarController (owned by the
+  "Mac-CYLTabBarController文件夹" session, task logged in its `9b0a5084`); this project moves every pin to the commit
+  that brings it and checks the Flutter Android example again.
+- **Prompt (verbatim):** "对比两个：cyltabbar与系统tabbar高度差异，如有必要在cyltabbar中的core代码实现。用户如果没有自定义，那么默认高度为系统tabbar高度。该默认行为适用于所有平台"
+- **Prompt (English):** "Compare the two: the height difference between the CYL tab bar and the system tab bar; if
+  needed, implement it in CYLTabBarController's core. When the user sets nothing, the default height is the system tab
+  bar height. This default applies to every platform."
+- **Measurement** (Android 15 API 35 emulator, 1080 × 2400, 420 dpi, bottom gesture inset 63 px = 24 dp; top edges by a
+  pixel scan: 2127 px before, 2208 px after):
+
+  <img src="assets/flutter-android-tabbar-height.png" width="400" alt="Tab bar height on Android: Material 3 NavigationBar 80 dp vs CYLTabBar 49 dp">

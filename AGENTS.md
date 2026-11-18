@@ -272,6 +272,9 @@ Details and checklist: `.agents/skills/cyl-task-start/SKILL.md`.
   commit: `:git => 'https://github.com/ChenYilong/CYLTabBarController.git'` with
   `:commit => '<sha>'` (the `CYL_TAB_BAR` hash of `Example/Podfile` and
   `Example-Swift/Podfile`). Never a version number, `:branch` or `:tag`.
+- The Flutter example's tab bar on Android is CYLTabBarController's Flutter plugin `flutter_cyltabbar`, a git
+  dependency of `flutter/cyl_tag_list/example/pubspec.yaml` (`ref:` the same commit, `path:
+  CrossPlatform/flutter_cyltabbar`). It is a pin like the Podfiles: it moves with them, and `--check` covers it.
 - Before every build, find the newest commit with
   `scripts/cyl-tabbar-latest-commit.sh` (it fetches the tip of every branch and
   sorts by committer date; `--check` fails when a Podfile pins another commit).
