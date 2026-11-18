@@ -945,3 +945,17 @@ tags: [issues, ui, cocoapods, progress]
 - TODO: `CYLSearchCategoryScenarioTests.testSearchCategoriesUseABottomTabBarAndFillTheSearchBar` fails: the tab bar's frame is at y = 0 (expected > 304.5, "Tab bars are always at the bottom") and the tags end at 586 (expected <= 0.5, "Tags end above the tab bar"). Not yet known whether this predates the API work.
 - 2026-11-17 (HarmonyOS port table, non-iOS session): `docs/harmony.md` 95.3 -> 838 / 838 = 100. Ported to ArkTS the APIs the iOS core gained for Android parity: `kTagCollectionView*`, `CYLClassifyMenuViewController.numberOfVisibleItems` / `setSection`, `CYLTagView.numberOfVisibleItems`, `CYLFilterParamsTool` (+ `kMultipleFilterSetting*`), `CYLFilterBaseController.settingArray`, `CYLMenuStyle.classifyMenuTag` / `filterTag` / `sectionTitle`, `CYLTag.resetColors`, `CYLTagButton.resetAnimationSpeed`, `CYLRightImageButton.expandTitle` / `collapseTitle`; Objective-C bridges and `init?(coder:)` marked N/A. Host tests 62 / 62 (new `AndroidParity.test.ets`).
 - 2026-11-17 (Android on Windows, non-iOS session): first Android build of `android/merged` on this Windows machine (Gradle 9.4.1, the Gradle-provisioned JDK 17; Android Studio's JDK 25 fails in Kotlin with "IllegalArgumentException: 25.0.4", DevEco's JDK 21 has no jlink). Bug recorded and fixed: `CYLTagListConfigurationTest.filesInJSONAndPropertyListFormat` failed (`CYLMenuConfigurationException: No configuration file at C:\...	ags.json`): `fileURL()` in `CYLTagListViewConfiguration.kt` took a path as absolute only with a leading "/", so a drive path was looked up as an asset; now `File(path).isAbsolute` (as CYLTabBarController B1). Result: `:library:testDebugUnitTest` 86 / 86, `:example:assembleDebug` OK at CYLTabBarController `4635ef7b`.
+
+### TODO (2026-11-19, `feat/harmony`): leftover internationalization and localization problems, full support
+
+- Context: after the drag example rework, the owner asked for a sweep of what is still not localized. Languages: en,
+  zh-Hans, zh-Hant; lookups per level (`CYLMenuLocalizedString`, `CYLExampleLocalizedString`,
+  `CYLTagEditorLocalizedString`, `CYLDemoLocalizedString`), AGENTS.md "Internationalization and localization".
+- Prompt (verbatim): "排查国际化 本地化遗留问题 完全支持，fix 样式 issue"
+- Prompt (English): "Investigate leftover internationalization / localization problems until it is fully supported; fix
+  the 样式 issue." (The "样式" issue: the pushed commit 58b2f335 had Chinese in its message; rewritten as 1d1f7904 with
+  the owner's OK, `--force-with-lease`.)
+- Acceptance (100): every key a lookup is called with exists in every language of its bundle with the same format
+  specifiers (25); no user-facing literal outside a lookup (25); every screen of the iOS examples shows no Chinese in
+  English and no Simplified-only text in Traditional Chinese, checked by a test that walks the screens (30); a script
+  that checks the tables, run before commits (10); fixes in the right bundle, screenshots en / zh-Hant (10). Pass: 60.
