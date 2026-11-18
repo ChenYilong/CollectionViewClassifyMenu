@@ -22,8 +22,10 @@ export default function localizationTest() {
       expect(CYLExampleLocalizedString('SVGA 动效图标', 'zh-Hant')).assertEqual('SVGA 動效圖示');
       // A key without a translation (sample data: a masked user name) stays as it is.
       expect(CYLExampleLocalizedString('雨**4', 'en')).assertEqual('雨**4');
-      // The review keyword chips are translated (E8).
-      expect(CYLExampleLocalizedString('质量不错', 'en')).assertEqual('Good quality');
+      // The review keyword chips are user content (the shop's reviews): kept as written, as iOS since its localization
+      // sweep (NOLOCALIZE there); a UI string next to them is translated.
+      expect(CYLExampleLocalizedString('质量不错', 'en')).assertEqual('质量不错');
+      expect(CYLExampleLocalizedString('热门搜索', 'en')).assertEqual('Hot searches');
       expect(CYLExampleLocalizedString('内存筛选', 'en')).assertEqual('In memory');
     });
 
