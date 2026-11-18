@@ -1129,3 +1129,19 @@ tags: [issues, ui, cocoapods, progress]
   the new commits. The tag `archive/feat-harmony-before-message-rewrite` (old tip `b7d5d289`) keeps every old hash
   reachable for pins in other repositories (for example `75d53825` → `6315202e`, `697e9307` → `4cadb7c7`).
   `check-commit-message.sh origin/master..HEAD`: no commit with Chinese. Pushed with `--force-with-lease`.
+- Localization audit, React Native on iOS (DONE): the app ran in English and Traditional Chinese (Release build, iPhone
+  18 Pro simulator): Traditional Chinese still showed English, because the language lookup read
+  `NativeModules.SettingsManager`, which the new architecture does not expose; it now reads `Settings.get
+  ('AppleLanguages')` (falling back to the old path). Screenshot:
+  [react-native-ios-localization.png](assets/react-native-ios-localization.png). With the Windows session's Android,
+  HarmonyOS and mini program audit (`45cdbf7a`, `scripts/check-localization-ports.py`, 35 / 35), the project-wide
+  localization audit is **100 / 100**.
+- Sixth container (DONE): new core options `CYLMenuStyle.titleWraps` (the title wraps and the list measures the taller
+  tag at its width, `CYLTagButton.height(forTitle:iconSize:width:showsDeleteIndicator:style:traitCollection:)`),
+  `elevation` (a shadow; the tag no longer clips to its bounds, its background image clips itself) and
+  `deleteIndicatorImage` (an image as the cross, as tall as the line); the last tag's cross off with `isDeletable`.
+  The iOS Container sample has the sixth container (rows from the right, a star on "Starred", cyan colors).
+  Bug found on the way: the cross image lost the padding vertically too and vanished on a one-line tag; fixed (padding
+  only beside it). Mapped to AndroidTagView in `api-map.json`. Tests: `testWrappingTitleElevationAndCrossImage`,
+  `testTagContainerSample` (the wrapped tag taller, inside the container, the shadow, crosses). Screenshot:
+  [ios-sixth-container.png](assets/ios-sixth-container.png). The open items are closed: **100 / 100**.

@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 793 / 831 with an Android counterpart = 95.4 / 100.** Full marks when no row is `TODO`; 0
+**Score: 796 / 834 with an Android counterpart = 95.4 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -378,6 +378,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuStyle.imagePositionAdjustment` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.imagePositionAdjustment` |
 | `CYLMenuStyle.imagePlacement` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.imagePlacement` |
 | `CYLMenuStyle.imageFillsTagHeight` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagView.setImage (always drawn as a circle the tag's height at its leading edge)` |
+| `CYLMenuStyle.titleWraps` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagContainerLayout.setTagTextWrap (tag_text_wrap)` |
+| `CYLMenuStyle.elevation` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagContainerLayout tag_elevation (TagView.elevation)` |
+| `CYLMenuStyle.deleteIndicatorImage` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagContainerLayout.setCrossDrawable (tag_cross drawable)` |
 | `CYLMenuStyle.layoutCentered` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.layoutCentered` |
 | `CYLMenuStyle.contentAlignment` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.contentAlignment` |
 | `CYLMenuStyle.animationSize` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.animationSize` |

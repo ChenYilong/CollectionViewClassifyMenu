@@ -26,6 +26,9 @@ enum CYLTagContainerSampleData {
     // NOLOCALIZE-END
     static let list4 = ["Adele", "Whitney Houston"]
     static let list5 = ["Custom Red Color", "Custom Blue Color"]
+    /// Tag layout options (AndroidTagView issues #19, #79, #101, #105, #68, #70, #119): a drawable, wrapping, elevation,
+    /// a cross drawable, no cross on the last tag.
+    static let list6 = ["Starred", "A long tag that wraps onto a second line instead of leaving the container", "End"]
 
     /// {backgroundColor, tagBorderColor, tagTextColor, tagSelectedBackgroundColor} of list5.
     static func colors5() -> [CYLTagColors] {
@@ -191,10 +194,39 @@ final class CYLTagContainerSampleViewController: UIViewController {
         }
         fifth.setTags(withTitles: data.list5, colors: data.colors5())
 
-        containers = [first, second, third, fourth, fifth]
+        // tagcontainerLayout6: gravity end, 4 pt elevation, a cross drawable, 100 characters, wrapping titles, cyan
+        // tags; a star before the first tag, no cross on the last.
+        let sixth = Self.makeContainer { list, style in
+            style.interitemSpacing = 10
+            style.lineSpacing = 10
+            style.rowAlignment = .trailing
+            style.elevation = 4
+            style.maximumTitleLength = 100
+            style.titleWraps = true
+            style.imageSize = CGSize(width: 18, height: 18)
+            style.imageTitleSpacing = 6
+            style.deleteIndicatorImage = UIImage(systemName: "xmark.circle.fill")?
+                .withTintColor(.systemGray, renderingMode: .alwaysOriginal)
+            for appearance in [style.normalAppearance, style.selectedAppearance, style.disabledAppearance] {
+                appearance.backgroundColor = UIColor.cylMenuColor(from: "#E0F7FA") ?? .systemTeal
+                appearance.borderColor = UIColor.cylMenuColor(from: "#4DD0E1") ?? .systemTeal
+                appearance.textColor = UIColor.cylMenuColor(from: "#006064") ?? .label
+            }
+            list.colorTheme = CYLTagColorTheme.none
+            list.removesItemsOnDelete = false
+        }
+        sixth.setTags(withTitles: data.list6)
+        sixth.tagDataSource.tags.forEach { $0.isDeletable = true }
+        sixth.tagDataSource.tags.last?.isDeletable = false
+        sixth.tagDataSource.tags.first?.image = UIImage(systemName: "star.fill")?
+            .withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
+        sixth.reloadMenuData()
+        sixth.tagDeleteHandler = { [weak self] position, _ in self?.toast(CYLExampleLocalizedString("点了标签的叉！位置 = %ld", position)) }
+
+        containers = [first, second, third, fourth, fifth, sixth]
         stackView.axis = .vertical
         stackView.spacing = 12
-        for (index, view) in [first, addRow, second, third, fourth, fifth].enumerated() {
+        for (index, view) in [first, addRow, second, third, fourth, fifth, sixth].enumerated() {
             stackView.addArrangedSubview(view)
             if index >= 3 {
                 stackView.setCustomSpacing(20, after: stackView.arrangedSubviews[index - 1])

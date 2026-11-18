@@ -1142,7 +1142,7 @@ open class CYLTagListView: UIView {
         let measured = width == measuredWidth
         let sectionWidths = measured ? itemWidths : widths(forContentWidth: available)
         let sectionRows = measured ? rows : rows(forWidths: sectionWidths, contentWidth: available)
-        let sectionHeights = measured ? itemHeights : measureItemHeights()
+        let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths)
         let header = headerHeight()
         let insets = style.sectionInsets
         var height: CGFloat = 0
@@ -1938,11 +1938,23 @@ private extension CYLTagListView {
         }
     }
 
-    func measureItemHeights() -> [[CGFloat]] {
+    /**
+     * Each item's height; an item whose style wraps its title (`CYLMenuStyle.titleWraps`) is measured at its width in
+     * `widths`, so a long title that wraps gets a taller cell.
+     */
+    func measureItemHeights(widths: [[CGFloat]]) -> [[CGFloat]] {
         let listHeight = itemHeight
         return titles.enumerated().map { section, items in
-            items.indices.map { item in
-                let itemStyle = style(forItemAt: IndexPath(item: item, section: section))
+            items.enumerated().map { item, title in
+                let indexPath = IndexPath(item: item, section: section)
+                let itemStyle = style(forItemAt: indexPath)
+                if itemStyle.titleWraps, widths.indices.contains(section), widths[section].indices.contains(item) {
+                    let iconSize = CYLTagButton.iconSize(for: image(at: indexPath), animated: animationURL(at: indexPath) != nil,
+                                                         style: itemStyle)
+                    return max(listHeight, CYLTagButton.height(forTitle: title, iconSize: iconSize, width: widths[section][item],
+                                                               showsDeleteIndicator: isDeletable(at: indexPath),
+                                                               style: itemStyle, traitCollection: traitCollection))
+                }
                 return itemStyle === style
                     ? listHeight : max(listHeight, CYLTagButton.height(for: itemStyle, traitCollection: traitCollection))
             }
@@ -2012,7 +2024,7 @@ private extension CYLTagListView {
         measuredWidth = width
         let available = contentWidth(forWidth: width)
         itemWidths = widths(forContentWidth: available)
-        itemHeights = measureItemHeights()
+        itemHeights = measureItemHeights(widths: itemWidths)
         rows = rows(forWidths: itemWidths, contentWidth: available)
         contentHeightNeedsUpdate = true
         setNeedsLayout()

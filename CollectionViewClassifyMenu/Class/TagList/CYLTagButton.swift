@@ -210,6 +210,8 @@ open class CYLTagButton: CYLAnimatedItemView {
      * The cross of `CYLMenuStyle.deleteIndicatorLineWidth`.
      */
     private let crossLayer = CAShapeLayer()
+    /// `CYLMenuStyle.deleteIndicatorImage`, inside the indicator label (so a tap on it still reaches the accessory).
+    private let deleteIndicatorImageView = UIImageView()
 
     // MARK: - Initializers
 
@@ -261,6 +263,9 @@ open class CYLTagButton: CYLAnimatedItemView {
         insertSubview(backgroundImageView, at: 0)
         deleteIndicatorLabel.textAlignment = .center
         deleteIndicatorLabel.isHidden = true
+        deleteIndicatorImageView.contentMode = .scaleAspectFit
+        deleteIndicatorImageView.isHidden = true
+        deleteIndicatorLabel.addSubview(deleteIndicatorImageView)
         // The accessory once: the base class adds its tap recognizer each time an accessory is set.
         accessoryView = deleteIndicatorLabel
         badgeLabel.textAlignment = .center
@@ -464,6 +469,37 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
     }
 
+    /**
+     * The height of a tag `width` wide: with `CYLMenuStyle.titleWraps`, the title wrapped to the room it has beside the
+     * icon and the delete indicator; otherwise `height(forTitle:iconSize:style:traitCollection:)`.
+     */
+    @objc(heightForTitle:iconSize:width:showsDeleteIndicator:style:traitCollection:)
+    public static func height(forTitle title: String?, iconSize: CGSize, width: CGFloat, showsDeleteIndicator: Bool,
+                              style: CYLMenuStyle, traitCollection: UITraitCollection?) -> CGFloat {
+        let single = height(forTitle: title, iconSize: iconSize, style: style, traitCollection: traitCollection)
+        let displayed = style.displayedTitle(forTitle: title)
+        guard style.titleWraps, !displayed.isEmpty, !style.imagePlacement.cylIsVertical else {
+            return single
+        }
+        return states.reduce(single) { height, state in
+            let insets = style.appearance(for: state).contentInsets
+            var room = width - insets.left - insets.right
+            if style.fillsTagHeight(withIconSize: iconSize) {
+                room -= single - insets.left + style.imageTitleSpacing
+            } else if iconSize.width > 0 {
+                room -= iconSize.width + style.imageTitleSpacing
+            }
+            if showsDeleteIndicator {
+                room -= style.imageTitleSpacing + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
+            }
+            let font = style.titleFont(for: state, traitCollection: traitCollection)
+            let text = (displayed as NSString).boundingRect(with: CGSize(width: max(1, room), height: .greatestFiniteMagnitude),
+                                                            options: [.usesLineFragmentOrigin, .usesFontLeading],
+                                                            attributes: [.font: font], context: nil)
+            return max(height, ceil(text.height) + insets.top + insets.bottom)
+        }
+    }
+
     // MARK: - Overrides
 
     /**
@@ -613,7 +649,10 @@ open class CYLTagButton: CYLAnimatedItemView {
         let spacing = showsImage && showsTitle ? style.imageTitleSpacing : 0
 
         let available = max(0, width - 2 * margin - (showsImage ? iconSize.width + spacing : 0))
-        let titleSize = showsTitle ? titleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: height))
+        // A wrapping title is measured at the width it can have; otherwise on one line.
+        let titleSize = showsTitle
+            ? titleLabel.sizeThatFits(CGSize(width: style.titleWraps ? available : CGFloat.greatestFiniteMagnitude,
+                                             height: style.titleWraps ? CGFloat.greatestFiniteMagnitude : height))
             : .zero
         var titleWidth = min(available, ceil(titleSize.width))
         let titleHeight = min(height, ceil(titleSize.height))
@@ -687,6 +726,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         // 0 is automatic: a capsule, as for CYLBadgeAppearance.
         let radius = style.appearance(for: state).cornerRadius
         layer.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : min(radius, height / 2)) : height / 2
+        updateElevationPath()
     }
 
     // MARK: - Private
@@ -722,6 +762,9 @@ open class CYLTagButton: CYLAnimatedItemView {
             return style.deleteIndicatorWidth
         }
         let font = style.deleteIndicatorFont(for: state, traitCollection: traitCollection)
+        if style.deleteIndicatorImage != nil {
+            return ceil(font.lineHeight) + 2 * style.deleteIndicatorPadding
+        }
         if style.deleteIndicatorLineWidth > 0 {
             return ceil(font.lineHeight * 0.75) + 2 * style.deleteIndicatorPadding
         }
@@ -757,7 +800,9 @@ open class CYLTagButton: CYLAnimatedItemView {
         layOutBadge(anchor: frame)
         if showsTitle {
             let x = frame.maxX + style.imageTitleSpacing
-            let size = titleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: height))
+            let room = max(0, bounds.width - trailing - x)
+            let size = titleLabel.sizeThatFits(CGSize(width: style.titleWraps ? room : CGFloat.greatestFiniteMagnitude,
+                                                      height: style.titleWraps ? CGFloat.greatestFiniteMagnitude : height))
             let titleHeight = min(height, ceil(size.height))
             let contentHeight = max(0, height - insets.top - insets.bottom)
             titleLabel.frame = CGRect(
@@ -770,6 +815,28 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         let radius = style.appearance(for: currentState).cornerRadius
         layer.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : min(radius, height / 2)) : height / 2
+        updateElevationPath()
+    }
+
+    /**
+     * `CYLMenuStyle.elevation`: a shadow under the tag. The tag stops clipping to its bounds then (the shadow is outside
+     * them); its background image clips itself to the corners instead.
+     */
+    private func applyElevation() {
+        let elevation = styleStorage.elevation
+        layer.masksToBounds = elevation <= 0
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = elevation > 0 ? 0.25 : 0
+        layer.shadowOffset = CGSize(width: 0, height: elevation / 2)
+        layer.shadowRadius = elevation / 2
+        backgroundImageView.layer.masksToBounds = true
+        updateElevationPath()
+    }
+
+    private func updateElevationPath() {
+        backgroundImageView.layer.cornerRadius = layer.cornerRadius
+        layer.shadowPath = styleStorage.elevation > 0
+            ? UIBezierPath(roundedRect: bounds, cornerRadius: layer.cornerRadius).cgPath : nil
     }
 
     private func placeImageView(_ frame: CGRect) {
@@ -817,6 +884,11 @@ open class CYLTagButton: CYLAnimatedItemView {
         cross.addLine(to: CGPoint(x: square.minX, y: square.maxY))
         crossLayer.frame = bounds
         crossLayer.path = cross.cgPath
+        // The image: a square inside the indicator (in the label's coordinates): the padding is beside it, not above it,
+        // so a one-line tag keeps the full line height for it.
+        let imageSide = max(0, min(indicator.width - 2 * style.deleteIndicatorPadding, indicator.height))
+        deleteIndicatorImageView.frame = CGRect(x: (indicator.width - imageSide) / 2, y: (indicator.height - imageSide) / 2,
+                                                width: imageSide, height: imageSide)
         return indicatorWidth + style.imageTitleSpacing
     }
 
@@ -891,10 +963,17 @@ open class CYLTagButton: CYLAnimatedItemView {
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)
-        let drawsCross = style.deleteIndicatorLineWidth > 0
-        // Kept visible (and empty) under a drawn cross, so that a tap on it still reaches the accessory.
+        let indicatorImage = style.deleteIndicatorImage
+        let drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage == nil
+        // Kept visible (and empty) under a drawn cross or an image, so that a tap on it still reaches the accessory.
         deleteIndicatorLabel.isHidden = !showsDeleteIndicator
-        deleteIndicatorLabel.text = showsDeleteIndicator && !drawsCross ? style.deleteIndicatorTitle : nil
+        deleteIndicatorLabel.text = showsDeleteIndicator && !drawsCross && indicatorImage == nil ? style.deleteIndicatorTitle : nil
+        deleteIndicatorImageView.image = indicatorImage
+        deleteIndicatorImageView.isHidden = !showsDeleteIndicator || indicatorImage == nil
+        // A wrapping title (CYLMenuStyle.titleWraps) takes as many lines as it needs.
+        titleLabel.numberOfLines = style.titleWraps ? 0 : 1
+        titleLabel.lineBreakMode = style.titleWraps ? .byWordWrapping : .byTruncatingTail
+        applyElevation()
         deleteIndicatorLabel.accessibilityLabel = showsDeleteIndicator ? CYLMenuLocalizedString("CYLMenuDeleteTag") : nil
         let placement: CYLAnimatedItemAccessoryPlacement = style.deleteIndicatorPlacement == .leading ? .leading : .trailing
         if accessoryPlacement != placement {

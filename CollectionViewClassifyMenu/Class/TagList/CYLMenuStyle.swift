@@ -264,6 +264,25 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var imageFillsTagHeight = false
 
     /**
+     * True: a title too wide for its row wraps onto more lines and the tag grows taller, instead of being truncated
+     * (AndroidTagView's tag_text_wrap). The list measures the taller tag at the width it gets. Default false.
+     */
+    open var titleWraps = false
+
+    /**
+     * A shadow under each tag, as Android's elevation in points (AndroidTagView's tag_elevation): offset down by half of
+     * it and blurred by it. Default 0, no shadow.
+     */
+    open var elevation: CGFloat = 0
+
+    /**
+     * An image drawn as the delete indicator instead of `deleteIndicatorTitle` or the drawn cross (AndroidTagView's
+     * tag_cross drawable), a square as tall as a line of the indicator font, plus `deleteIndicatorPadding` on each side.
+     * Default nil.
+     */
+    open var deleteIndicatorImage: UIImage?
+
+    /**
      * For a tag with only an icon or only a title: true (the default) centers it; false keeps it where it would be with
      * both, the title after an empty icon slot, the icon at the leading margin (as
      * `CYLFlatDesignTabBarItem.layoutCentered = NO`).
@@ -725,6 +744,9 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.imagePositionAdjustment = imagePositionAdjustment
         copy.imagePlacement = imagePlacement
         copy.imageFillsTagHeight = imageFillsTagHeight
+        copy.titleWraps = titleWraps
+        copy.elevation = elevation
+        copy.deleteIndicatorImage = deleteIndicatorImage
         copy.layoutCentered = layoutCentered
         copy.animationSize = animationSize
         copy.animationSpeed = animationSpeed

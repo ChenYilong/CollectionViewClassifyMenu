@@ -28,7 +28,7 @@ final class CYLTagReorderDemoTests: CYLMenuExampleTestCase {
         let sample = CYLTagContainerSampleViewController()
         showInNavigation(sample, size: CYLTestScreen.tall)
         sample.view.layoutIfNeeded()
-        XCTAssertEqual(sample.containers.map(\.allowsReordering), [true, true, false, false, false])
+        XCTAssertEqual(sample.containers.map(\.allowsReordering), [true, true, false, false, false, false])
         let list = sample.containers[0]
         list.probe.layOut()
         let collection = list.probe.collectionView

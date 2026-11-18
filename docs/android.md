@@ -646,4 +646,7 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 - **Deductions (−5):** the Android screen's sixth container (below the reference's fold: a star drawable, a tag that wraps
   onto a second line, 4 dp elevation, a cross drawable, no cross on the last tag) is not on iOS: `CYLTagButton` has no
   wrapping title, elevation or cross image yet. TODO, next: those three in the core, then the sixth container.
+- **Update (2026-11-19): the sixth container is on iOS (−5 resolved, 100 / 100):** `CYLMenuStyle.titleWraps`,
+  `elevation` and `deleteIndicatorImage` in the core; see `issue-progress.md`, "close the three open items", and
+  [ios-sixth-container.png](assets/ios-sixth-container.png).
 

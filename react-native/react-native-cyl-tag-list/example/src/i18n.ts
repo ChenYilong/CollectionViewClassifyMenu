@@ -1,4 +1,4 @@
-import { I18nManager, NativeModules, Platform } from 'react-native';
+import { I18nManager, NativeModules, Platform, Settings } from 'react-native';
 import { DATA_STRINGS } from './dataStrings';
 
 /**
@@ -27,8 +27,14 @@ const zh: Record<string, string> = {
 };
 
 function locale(): string {
-  const settings = NativeModules.SettingsManager?.settings;
-  const ios = settings?.AppleLocale ?? settings?.AppleLanguages?.[0];
+  // iOS: the app's languages (the system's, or -AppleLanguages at launch). `Settings` reaches the settings module in
+  // both architectures; NativeModules.SettingsManager is not there under the new architecture.
+  let ios: string | undefined;
+  if (Platform.OS === 'ios') {
+    const languages = Settings?.get?.('AppleLanguages');
+    ios = (Array.isArray(languages) ? languages[0] : undefined) ?? Settings?.get?.('AppleLocale')
+      ?? NativeModules.SettingsManager?.settings?.AppleLanguages?.[0];
+  }
   // Android and HarmonyOS (React Native for OpenHarmony: a turbo module that NativeModules does not reach).
   const other = I18nManager.getConstants?.()?.localeIdentifier ?? NativeModules.I18nManager?.localeIdentifier;
   return (Platform.OS === 'ios' ? ios : other) ?? 'en';

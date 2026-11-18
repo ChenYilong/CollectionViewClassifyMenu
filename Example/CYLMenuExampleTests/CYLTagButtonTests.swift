@@ -325,4 +325,45 @@ final class CYLTagButtonTests: XCTestCase {
                                  "the title ends before the cross")
         XCTAssertEqual(button.titleLabel.text, "Java")
     }
+
+    /// AndroidTagView's tag_text_wrap, tag_elevation and cross drawable: `titleWraps`, `elevation` and
+    /// `deleteIndicatorImage`; a copied style keeps them.
+    func testWrappingTitleElevationAndCrossImage() {
+        let style = CYLMenuStyle.tagContainer()
+        style.titleWraps = true
+        style.elevation = 4
+        let cross = UIGraphicsImageRenderer(size: CGSize(width: 10, height: 10)).image { _ in UIRectFill(CGRect(x: 0, y: 0, width: 10, height: 10)) }
+        style.deleteIndicatorImage = cross
+        let copy = style.copy() as? CYLMenuStyle
+        XCTAssertEqual(copy?.titleWraps, true)
+        XCTAssertEqual(copy?.elevation, 4)
+        XCTAssertTrue(copy?.deleteIndicatorImage === cross)
+
+        let title = "A long tag that wraps onto a second line instead of leaving the container"
+        let one = CYLTagButton.height(forTitle: title, iconSize: .zero, style: style, traitCollection: nil)
+        let wrapped = CYLTagButton.height(forTitle: title, iconSize: .zero, width: 200, showsDeleteIndicator: true,
+                                          style: style, traitCollection: nil)
+        XCTAssertGreaterThan(wrapped, one + 10, "the title takes several lines at 200 pt")
+        style.titleWraps = false
+        XCTAssertEqual(CYLTagButton.height(forTitle: title, iconSize: .zero, width: 200, showsDeleteIndicator: true,
+                                           style: style, traitCollection: nil), one, "no wrapping: one line")
+        style.titleWraps = true
+
+        let button = CYLTagButton(title: title, image: nil)
+        button.style = style
+        button.showsDeleteIndicator = true
+        button.frame = CGRect(x: 0, y: 0, width: 200, height: wrapped)
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.titleLabel.numberOfLines, 0)
+        XCTAssertGreaterThan(button.titleLabel.frame.height, button.titleLabel.font.lineHeight * 1.5)
+        XCTAssertLessThanOrEqual(button.titleLabel.frame.maxX, button.deleteIndicatorHitFrame.minX + 0.5)
+        XCTAssertFalse(button.layer.masksToBounds, "the shadow is outside the bounds")
+        XCTAssertEqual(button.layer.shadowOpacity, 0.25, accuracy: 0.001)
+        XCTAssertNotNil(button.layer.shadowPath)
+        XCTAssertNil(button.deleteIndicatorLabel.text, "the image replaces the indicator title")
+        let crossView = button.deleteIndicatorLabel.subviews.compactMap { $0 as? UIImageView }.first
+        XCTAssertTrue(crossView?.image === cross)
+        XCTAssertFalse(crossView?.isHidden ?? true)
+        XCTAssertGreaterThan(crossView?.bounds.width ?? 0, 0)
+    }
 }

@@ -182,13 +182,13 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
 
     // MARK: AndroidTagView
 
-    func testTagContainerSample() {
+    func testTagContainerSample() throws {
         let sample = CYLTagContainerSampleViewController()
         showInNavigation(sample, size: CYLTestScreen.tall)
         sample.view.layoutIfNeeded()
         sample.view.layoutIfNeeded()
         let containers = sample.containers
-        XCTAssertEqual(containers.count, 5)
+        XCTAssertEqual(containers.count, 6)
         containers.forEach { $0.probe.layOut() }
         let first = containers[0]
         XCTAssertEqual(first.containerCornerRadius, 10)
@@ -252,6 +252,24 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         let fifth = containers[4]
         XCTAssertEqual(fifth.tagButton(at: ip(0, 0))?.layer.backgroundColor, UIColor.cylMenuColor(from: "#ff0000")?.cgColor)
         XCTAssertFalse(fifth.allowsTapping)
+
+        // tagcontainerLayout6: a star, a wrapping title, elevation, a cross image, no cross on the last tag.
+        let sixth = containers[5]
+        sixth.probe.layOut()
+        XCTAssertEqual(sixth.tags.map(\.title), CYLTagContainerSampleData.list6)
+        XCTAssertNotNil(sixth.tagButton(at: ip(0, 0))?.imageView.image, "the star")
+        let long = try XCTUnwrap(sixth.tagButton(at: ip(1, 0)))
+        let short = try XCTUnwrap(sixth.tagButton(at: ip(2, 0)))
+        XCTAssertGreaterThan(long.bounds.height, short.bounds.height + 10, "the long title wraps and its tag grows")
+        XCTAssertGreaterThan(long.titleLabel.frame.height, long.titleLabel.font.lineHeight * 1.5)
+        XCTAssertLessThanOrEqual(long.frame.width, sixth.bounds.width - 20 + 0.5, "inside the container")
+        XCTAssertEqual(long.layer.shadowOpacity, 0.25, accuracy: 0.001)
+        XCTAssertEqual(long.layer.shadowOffset.height, 2, accuracy: 0.001)
+        XCTAssertTrue(long.showsDeleteIndicator)
+        XCTAssertFalse(short.showsDeleteIndicator, "no cross on the last tag")
+        // The cross image is drawn on a one-line tag too ("Starred"), not only on the taller wrapped one.
+        let starredCross = sixth.tagButton(at: ip(0, 0))?.deleteIndicatorLabel.subviews.compactMap { $0 as? UIImageView }.first
+        XCTAssertGreaterThan(starredCross?.bounds.width ?? 0, 10)
     }
 
     // MARK: Core features

@@ -4,6 +4,7 @@ jest.mock('react-native', () => ({
   I18nManager: { getConstants: () => ({ localeIdentifier: 'en_US' }) },
   NativeModules: {},
   Platform: { OS: 'android' },
+  Settings: { get: () => undefined },
 }));
 
 import { dataTitle, language, shortTitle } from '../i18n';
