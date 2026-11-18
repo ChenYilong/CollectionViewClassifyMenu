@@ -35,6 +35,19 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-19, `feat/harmony`): issues #13, #12, #8, #7 and #1 to 100; #11, #9 and #2 blocked
+
+- Context: the Windows session's audit found eight iOS rows in the table above below 100 (#13 90, #12 90, #11 85, #9 85,
+  #8 80, #7 90, #2 95, #1 80), missed by the sweep logged in `cross-platform.md`.
+- Prompt (relayed by Mac-CYLSearchViewController, verbatim): "向所有今天还在活跃session…继续完成TODO 完成评分不到100的任务，一直到满分为止"
+- Prompt (English): "To every session still active today: continue the TODOs; finish every task whose score is below 100,
+  until it reaches full marks."
+- Acceptance criteria per row: 100 = the deduction written in the row is covered by a test that runs in this repository
+  and passes (#13 every device width and text size; #12 copies from every query, with self-sizing cells and after a size
+  change; #8 self-sizing works and is documented; #7 the whole menu at 320 × 480, the 3.5-inch size; #1 every selection
+  combination survives repeated scrolling). Pass: 60. A deduction that needs something this repository cannot provide
+  (a CocoaPods trunk release and a tag on master, a real device, an old Xcode) stays and is written down as blocked.
+
 ### Done (2026-11-19, `feat/harmony`): Rive on Flutter and React Native Android (for the Mac session)
 
 - Request (Mac-CollectionViewClassifyMenu, verbatim): "Not run: Flutter and RN Android on an emulator — yours if you have one free."
