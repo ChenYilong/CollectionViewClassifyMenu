@@ -1003,3 +1003,19 @@ tags: [issues, ui, cocoapods, progress]
   removed except the skill's rewritten description line). `harmony/instructions.md` belongs to the Windows session:
   asked it to append the same rule (−10 until it confirms).
 - Update: the Windows session appended the rule to `harmony/instructions.md` (669dcfc1): **100/100**.
+
+### TODO (2026-11-19, `feat/harmony`): "Welcome to use AndroidTagView!" names the platform's OS version and CollectionViewClassifyMenu
+
+- Context: AndroidTagView's sample list (the Container sample on every platform) ends with "Welcome to use
+  AndroidTagView!". Occurrences in the examples' data: iOS `CYLTagContainerSample.swift`, Android
+  `LujunTagContainerFragment.kt` (and the vendored upstream sample `android/AndroidTagView/sample`), HarmonyOS
+  `TagContainerSample.ets`, mini program `sample-tag-container/data.js`. Unit tests that only feed the string to the
+  truncation rule are not demo data and stay.
+- Decision: "the simulator's system version" is read at run time: "Welcome to use <OS name> <OS version>
+  CollectionViewClassifyMenu" (iOS simulator: "Welcome to use iOS 27.2 CollectionViewClassifyMenu"). Session roles:
+  iOS here (Mac session); Android, HarmonyOS and the mini program by the Windows session.
+- Prompt (verbatim): "搜索demo example中所有包含关键字 welcome to 关键字，移除任何android及后面的字符替换为对应模拟器系统版本后缀加CollectionViewClassifyMenu"
+- Prompt (English): "Search every demo / example for the keyword 'welcome to'; remove 'android' and everything after it
+  and replace it with the corresponding simulator's system version suffix plus CollectionViewClassifyMenu."
+- Acceptance (100): iOS sample built from the running OS (40) with a test (20) and a screenshot (10); the other
+  platforms done by the Windows session (30). Pass: 60.
