@@ -267,6 +267,13 @@ open class CYLClassifyMenuViewController: UIViewController, UICollectionViewData
 
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        // The header is as wide as the menu, whatever width it was made with (issue #7: a header made with the screen's
+        // width ran off a narrower menu, e.g. on a 3.5-inch screen or in a split view).
+        if let header = menuHeaderView, let backgroundView, backgroundView.bounds.width > 0,
+           header.frame.width != backgroundView.bounds.width {
+            header.frame.size.width = backgroundView.bounds.width
+            header.layoutIfNeeded()
+        }
         let width = collectionView?.bounds.width ?? 0
         if width > 0 && width != calculatedCollectionWidth {
             calculatedCollectionWidth = width

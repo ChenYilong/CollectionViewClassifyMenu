@@ -44,6 +44,8 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
     open override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
+        // A cell is configured just before it appears, with the selection of that moment (issue #1).
+        collectionView.isPrefetchingEnabled = false
         collectionView.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
         reloadMenuData()
     }
@@ -182,14 +184,23 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
         let text = title(at: indexPath)
         // A CYLTagButton: its style (CYLMenuStyle.filterTag()) sets the font and the colors.
         button.title = text
-        button.isSelected = isSelected(at: indexPath)
         button.section = indexPath.section
         button.row = indexPath.row
         // The cell is the tappable element (the button ignores touches): describe it to VoiceOver.
         cell.isAccessibilityElement = true
         cell.accessibilityLabel = text
-        cell.accessibilityTraits = button.isSelected ? [.button, .selected] : .button
+        applySelection(to: cell, at: indexPath)
         return cell
+    }
+
+    /**
+     * Shows the model's selection on a cell. Called when the cell is made (prefetching is off, so that is just before it
+     * appears) and on the visible cells after a tap (issue #1: reused
+     * cells must never keep the state of the item they showed before).
+     */
+    private func applySelection(to cell: CYLFilterCollectionCell, at indexPath: IndexPath) {
+        cell.titleButton.isSelected = isSelected(at: indexPath)
+        cell.accessibilityTraits = cell.titleButton.isSelected ? [.button, .selected] : .button
     }
 
     // MARK: - UICollectionViewDelegate
@@ -220,7 +231,13 @@ open class CYLMultipleFilterController: CYLFilterBaseController, UICollectionVie
             }
         }
         selection[indexPath.section] = setting
-        self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
+        // A selection changes no cell's size: update the visible cells in place. An animated section reload left the
+        // old cells on screen when the selection changed again before the animation ended (issue #1).
+        for visible in self.collectionView.indexPathsForVisibleItems where visible.section == indexPath.section {
+            if let cell = self.collectionView.cellForItem(at: visible) as? CYLFilterCollectionCell {
+                applySelection(to: cell, at: visible)
+            }
+        }
         menuDelegate?.menu?(self, didSelectItemAt: indexPath)
     }
 

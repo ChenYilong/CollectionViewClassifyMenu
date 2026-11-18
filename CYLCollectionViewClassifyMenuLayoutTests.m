@@ -737,4 +737,161 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertGreaterThan(height, 40, @"The taller icon and the insets");
 }
 
+
+#pragma mark Issue #1: selection after scrolling; issue #13: every device width and text size
+
+/*!
+ * Every visible tag shows selected exactly when it is in `expected`, scrolling down and up three times so that cells
+ * are reused for other items.
+ */
+- (void)assertSelection:(NSSet<NSIndexPath *> *)expected
+                     in:(UICollectionView *)collection
+              buttonKey:(NSString *)buttonKey
+                  label:(NSString *)label {
+    for (NSInteger pass = 0; pass < 3; pass++) {
+        CGFloat maxY = MAX(0, collection.contentSize.height - CGRectGetHeight(collection.bounds));
+        NSMutableArray<NSNumber *> *offsets = [NSMutableArray array];
+        for (CGFloat y = 0; y < maxY; y += 150) [offsets addObject:@(y)];
+        [offsets addObject:@(maxY)];
+        for (CGFloat y = maxY; y > 0; y -= 150) [offsets addObject:@(y)];
+        [offsets addObject:@0];
+        for (NSNumber *offset in offsets) {
+            [collection setContentOffset:CGPointMake(0, offset.doubleValue) animated:NO];
+            [collection layoutIfNeeded];
+            XCTAssertGreaterThan(collection.indexPathsForVisibleItems.count, 0u, @"%@", label);
+            for (NSIndexPath *indexPath in collection.indexPathsForVisibleItems) {
+                CYLTagButton *button = [[collection cellForItemAtIndexPath:indexPath] valueForKey:buttonKey];
+                XCTAssertEqual(button.selected, [expected containsObject:indexPath],
+                               @"%@: %@ at offset %@", label, indexPath, offset);
+            }
+        }
+    }
+}
+
+- (void)tapItem:(NSIndexPath *)indexPath in:(UICollectionView *)collection {
+    [collection scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
+    [collection layoutIfNeeded];
+    XCTAssertNotNil([collection cellForItemAtIndexPath:indexPath]);
+    [collection.delegate collectionView:collection didSelectItemAtIndexPath:indexPath];
+    [collection layoutIfNeeded];
+}
+
+static NSIndexPath *CYLPath(NSInteger item, NSInteger section) {
+    return [NSIndexPath indexPathForItem:item inSection:section];
+}
+
+/*!
+ * Issue #1: after one item of a section was selected, scrolling several times showed the wrong items selected (reused
+ * cells kept the state of the item they showed before). Every combination in the filter: the default "All" in every
+ * section, one item in every section, several in one section, taps after scrolling (select, deselect, "All", the last
+ * item deselected falls back to "All"), nothing; and the classify menu's single selection.
+ */
+- (void)testIssue1EverySelectionCombinationSurvivesRepeatedScrolling {
+    NSMutableArray *titles = [NSMutableArray array];
+    for (NSInteger section = 0; section < 6; section++) {
+        NSMutableArray *items = [NSMutableArray arrayWithObject:@"全部"];
+        for (NSInteger item = 1; item < 14; item++) {
+            [items addObject:[NSString stringWithFormat:@"S%ld 标签 %ld%@", (long)section, (long)item,
+                              item % 3 ? @"" : @" 🧑‍🍳 长文字"]];
+        }
+        [titles addObject:items];
+    }
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = titles;
+    UITraitCollection *standard = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:UIContentSizeCategoryLarge];
+
+    CYLMultipleFilterController *filter = [[CYLMultipleFilterController alloc] init];
+    filter.menuDataSource = source;
+    UIWindow *window = nil;
+    [self cyl_hostChild:filter width:390 traits:standard window:&window];
+    UICollectionView *collection = filter.collectionView;
+    collection.frame = CGRectMake(0, 0, CGRectGetWidth(collection.bounds), 240);
+    [collection layoutIfNeeded];
+    XCTAssertGreaterThan(collection.contentSize.height, 3 * CGRectGetHeight(collection.bounds), @"Scrolling reuses cells");
+
+    NSMutableSet *expected = [NSMutableSet set];
+    for (NSInteger section = 0; section < 6; section++) [expected addObject:CYLPath(0, section)];
+    XCTAssertEqualObjects([NSSet setWithArray:filter.selectedIndexPaths], expected);
+    [self assertSelection:expected in:collection buttonKey:@"titleButton" label:@"default: All in every section"];
+
+    [expected removeAllObjects];
+    for (NSInteger section = 0; section < 6; section++) [expected addObject:CYLPath(1 + (section * 5) % 13, section)];
+    [filter setSelectedIndexPaths:expected.allObjects];
+    XCTAssertEqualObjects([NSSet setWithArray:filter.selectedIndexPaths], expected);
+    [self assertSelection:expected in:collection buttonKey:@"titleButton" label:@"one item in every section"];
+
+    expected = [NSMutableSet setWithArray:@[CYLPath(1, 2), CYLPath(4, 2), CYLPath(9, 2), CYLPath(13, 2), CYLPath(7, 5)]];
+    [filter setSelectedIndexPaths:expected.allObjects];
+    [self assertSelection:expected in:collection buttonKey:@"titleButton" label:@"several items in one section"];
+
+    [self tapItem:CYLPath(4, 2) in:collection];  // Deselects.
+    [self tapItem:CYLPath(3, 4) in:collection];  // Selects in a section with nothing selected.
+    [expected removeObject:CYLPath(4, 2)];
+    [expected addObject:CYLPath(3, 4)];
+    XCTAssertEqualObjects([NSSet setWithArray:filter.selectedIndexPaths], expected);
+    [self assertSelection:expected in:collection buttonKey:@"titleButton" label:@"taps after scrolling"];
+
+    [self tapItem:CYLPath(0, 2) in:collection];  // "All" replaces the section's items.
+    [self tapItem:CYLPath(7, 5) in:collection];  // The section's last item: falls back to "All".
+    expected = [NSMutableSet setWithArray:@[CYLPath(0, 2), CYLPath(3, 4), CYLPath(0, 5)]];
+    XCTAssertEqualObjects([NSSet setWithArray:filter.selectedIndexPaths], expected);
+    [self assertSelection:expected in:collection buttonKey:@"titleButton" label:@"All and the fallback to All"];
+
+    [filter setSelectedIndexPaths:@[]];
+    XCTAssertEqualObjects(filter.selectedIndexPaths, @[]);
+    [self assertSelection:[NSSet set] in:collection buttonKey:@"titleButton" label:@"nothing selected"];
+    window.hidden = YES;
+
+    CYLClassifyMenuViewController *menu = [[CYLClassifyMenuViewController alloc] init];
+    menu.menuDataSource = source;
+    menu.defaultVisibleRows = 1000;
+    [self cyl_hostChild:menu width:390 traits:standard window:&window];
+    UICollectionView *menuCollection = [menu valueForKey:@"collectionView"];
+    menuCollection.frame = CGRectMake(0, 0, 390, 240);
+    [menuCollection layoutIfNeeded];
+    for (NSIndexPath *selection in @[CYLPath(3, 0), CYLPath(12, 3), CYLPath(1, 5)]) {
+        menu.selectedIndexPath = selection;
+        [self assertSelection:[NSSet setWithObject:selection] in:menuCollection buttonKey:@"button"
+                        label:[NSString stringWithFormat:@"classify menu, %@", selection]];
+    }
+    menu.selectedIndexPath = nil;
+    [self assertSelection:[NSSet set] in:menuCollection buttonKey:@"button" label:@"classify menu, nothing selected"];
+    window.hidden = YES;
+}
+
+/*!
+ * Issue #13: cells overlapped after reuse. The classify menu and the filter with long emoji titles, on the narrowest
+ * to the widest screen this project supports (320 pt to a 13-inch iPad in landscape) and at the smallest, the default,
+ * the largest standard and the largest accessibility text size: no overlap, every title on its own cell after
+ * scrolling through the whole list.
+ */
+- (void)testIssue13TagsStayApartOnEveryDeviceWidthAndTextSize {
+    CYLTestMenuSource *source = [[CYLTestMenuSource alloc] init];
+    source.sections = [self longEmojiSections];
+    CYLLayoutFixture *fixture = [[CYLLayoutFixture alloc] init];
+    fixture.sections = source.sections;
+    NSArray<UIContentSizeCategory> *categories = @[UIContentSizeCategoryExtraSmall, UIContentSizeCategoryLarge,
+                                                   UIContentSizeCategoryExtraExtraExtraLarge,
+                                                   UIContentSizeCategoryAccessibilityExtraExtraExtraLarge];
+    // iPhone SE (1st generation) / 3.5-inch width, iPhone SE (3rd generation), iPhone 17 Pro, iPhone 17 Pro Max,
+    // iPad mini in portrait, 13-inch iPad Pro in landscape.
+    for (NSNumber *width in @[@320, @375, @402, @440, @744, @1366]) {
+        for (UIContentSizeCategory category in categories) {
+            UITraitCollection *traits = [UITraitCollection traitCollectionWithPreferredContentSizeCategory:category];
+            CYLClassifyMenuViewController *menu = [[CYLClassifyMenuViewController alloc] init];
+            menu.menuDataSource = source;
+            menu.defaultVisibleRows = 1000;
+            UIWindow *window = nil;
+            [self cyl_hostChild:menu width:width.doubleValue traits:traits window:&window];
+            UICollectionView *collection = [menu valueForKey:@"collectionView"];
+            XCTAssertEqualObjects(collection.traitCollection.preferredContentSizeCategory, category);
+            collection.frame = CGRectMake(0, 0, width.doubleValue, 240);
+            [collection layoutIfNeeded];
+            [self assertNoOverlaps:collection fixture:fixture];
+            [self scrollAndCheck:collection fixture:fixture buttonKey:@"button"];
+            window.hidden = YES;
+        }
+    }
+}
+
 @end
