@@ -283,6 +283,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   Alerts 54, Me 83, Truck 1 / 5 / 7, button.riv's time 0 -> 1 s; Loop on, every 250 ms: Menu `isOpen`
   `11111100001110001110000111000111`, house Rooms 3 at rest then 5, 6, 3, 4, 5, 6; `npm test` 143 / 143;
   `docs/assets/miniprogram-devtools-rive-rest-until-played-dcbfdec6.png`.
+  Button, measured on its own 84 x 84 px canvas (`toDataURL`) at `d8f47b4d`: 142 / 466 / 156 / 74 / 97 changed
+  pixels between frames 0.1-0.2 s apart on Play all, then 0 at the end of the pass;
+  `docs/assets/miniprogram-devtools-rive-button-canvas-frames.png`.
 - **Mini program and Android pins at `6f93ae6b` (2026-11-18)**: `fetch-cyltabbar.js`, the test, the vendored `COMMIT`
   files and `android/merged/gradle.properties`; `074285a6..6f93ae6b` changes HarmonyOS, Flutter, iOS demo resources and
   docs only (no Android source, no cyl-animated-item / cyl-animation-placeholder change: the re-vendor touched only the
