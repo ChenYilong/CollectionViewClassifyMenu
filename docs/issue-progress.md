@@ -1025,3 +1025,17 @@ tags: [issues, ui, cocoapods, progress]
   `testTagContainerSample` checks the title, its cut form and that no tag names Android; affected Example tests pass
   (39). Screenshot: [ios-welcome-tag-os-version.png](assets/ios-welcome-tag-os-version.png). Score 70 / 100 until the
   Windows session reports Android, HarmonyOS and the mini program (−30).
+
+### TODO (2026-11-19, `feat/harmony`): project-wide localization audit; rewrite 4e03f8a5's message (owner's OK)
+
+- Context: the iOS sweep above is done (core, demo app, both Examples). Left: the shared Flutter and React Native
+  example code (Mac session: their iOS runs), Android, HarmonyOS and the mini program (Windows session, session roles
+  rule). Commit `4e03f8a5` (Windows session) has "拖拽排序" in its body; the owner now asks to fix it. 14 linear
+  commits follow it; their hashes change; references to them in docs and commit messages are remapped.
+  16 older commits (2026-11-12 to 11-16) also have Chinese in their messages; not part of this request.
+- Prompt (verbatim): "排查项目国际化 本地化适配，并fix Commit message: 4e03f8a5, from the Windows session, has Chinese ("拖拽排序") in its body. Rewriting it means changing older history on the shared branch, so I'm leaving it unless you ask."
+- Prompt (English): "Audit the project's internationalization / localization, and fix commit 4e03f8a5's message
+  (Chinese in its body)."
+- Acceptance (100): 4e03f8a5's message in English, pushed with `--force-with-lease`, later hashes remapped in docs and
+  messages, the Windows session resynced (30); Flutter and React Native example strings localized with a check (35);
+  Android, HarmonyOS and the mini program audited by the Windows session (35). Pass: 60.
