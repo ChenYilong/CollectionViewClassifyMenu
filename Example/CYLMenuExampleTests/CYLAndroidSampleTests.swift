@@ -196,7 +196,11 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         // tag_max_length 23: the long Chinese tag is cut.
         XCTAssertTrue(first.tagButton(at: ip(4, 0))?.titleLabel.text?.hasSuffix("...") ?? false)
         XCTAssertEqual(first.tagButton(at: ip(4, 0))?.titleLabel.text?.count, 23, "20 characters and ...")
-        XCTAssertEqual(first.tagButton(at: ip(8, 0))?.titleLabel.text, "Welcome to use Andro...")
+        // The last tag names the running OS and the library, cut to 23 characters as every long tag here.
+        let welcome = "Welcome to use \(UIDevice.current.systemName) \(UIDevice.current.systemVersion) CollectionViewClassifyMenu"
+        XCTAssertEqual(first.tags[8].title, welcome)
+        XCTAssertEqual(first.tagButton(at: ip(8, 0))?.titleLabel.text, String(welcome.prefix(20)) + "...")
+        XCTAssertFalse(first.tags.contains { $0.title.localizedCaseInsensitiveContains("android") })
         let java = first.tagButton(at: ip(0, 0))
         XCTAssertTrue(java?.showsDeleteIndicator ?? false)
         XCTAssertNotNil(java?.imageView.image, "the default avatar")

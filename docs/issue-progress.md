@@ -1019,3 +1019,9 @@ tags: [issues, ui, cocoapods, progress]
   and replace it with the corresponding simulator's system version suffix plus CollectionViewClassifyMenu."
 - Acceptance (100): iOS sample built from the running OS (40) with a test (20) and a screenshot (10); the other
   platforms done by the Windows session (30). Pass: 60.
+- Result, iOS (Mac session): `CYLTagContainerSampleData.welcomeTitle` = "Welcome to use " + `UIDevice` systemName +
+  systemVersion + " CollectionViewClassifyMenu" ("Welcome to use iOS 27.2 CollectionViewClassifyMenu" on the iOS 27.2
+  simulator); the container's tag_max_length 23 shows it as "Welcome to use iOS 2...", as every long tag there.
+  `testTagContainerSample` checks the title, its cut form and that no tag names Android; affected Example tests pass
+  (39). Screenshot: [ios-welcome-tag-os-version.png](assets/ios-welcome-tag-os-version.png). Score 70 / 100 until the
+  Windows session reports Android, HarmonyOS and the mini program (−30).
