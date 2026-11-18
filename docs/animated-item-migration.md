@@ -512,3 +512,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `CYLTabBar+CYLImplementation.swift`, `CYLTabBarController+CYLInteraction.swift` and
   `UIControl+CYLTabBarControllerExtention.swift`. Move the eight pin files (`fetch-cyltabbar.sh` is one of them),
   `pod install` x 4, build the Swift package, run the menu, tag, example and swift suites.
+- **DONE (2026-11-19)**: the eight iOS pin files name `b376c278ef13db0a03e433de35aa191fe151ba94`; `pod install` resolved
+  it in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift package (`Package.resolved`
+  revision `b376c278`) builds for the iOS Simulator. iPhone 17 Pro `62B54974` (iOS 27.2, Xcode 27.2, macOS 27.3): menu
+  32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. Every platform is on `b376c278`.
