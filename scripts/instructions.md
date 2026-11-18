@@ -20,3 +20,8 @@ tags: [scripts, cocoapods]
   bands, original pixels. Usage is at the top of the file; checklist in `.agents/skills/cyl-screenshots/SKILL.md`.
 - `stitch-screenshots.swift --columns auto` (the default, 2026-11-18): one column, or two when the one-column image
   would be taller than a phone screen (height > 2.17 x width); `--columns 1` or `2` forces it.
+- Session roles by name (English rule, AGENTS.md "Session roles by name: Mac for iOS, Win for the other platforms"):
+  before a task, check the active session names. A session whose name starts with `Mac` (case insensitive) mainly
+  develops and tests iOS; one starting with `Win` (case insensitive) mainly develops the other platforms (Android,
+  HarmonyOS, the mini program). When both are active, prefer handing each platform's part of a task to the matching
+  session; when no session follows this naming, skip the rule and finish the task independently.

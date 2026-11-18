@@ -973,3 +973,8 @@ tags: [issues, ui, cocoapods, progress]
 - Acceptance (100): the rule, in English, in AGENTS.md (30), every instructions.md this session may edit (30), the
   task-start skill's checklist (30), and the HarmonyOS folder's instructions.md through the Windows session that owns
   it (10). Appended, nothing overwritten (numstat), frontmatter intact. Pass: 60.
+- Result (DONE, 90/100 until the HarmonyOS folder has it): the rule is in AGENTS.md "Session roles by name: Mac for
+  iOS, Win for the other platforms" (CLAUDE.md imports AGENTS.md), `docs/instructions.md`, `scripts/instructions.md`
+  and step 0 of `.agents/skills/cyl-task-start/SKILL.md` (and its description); appended only (numstat: no lines
+  removed except the skill's rewritten description line). `harmony/instructions.md` belongs to the Windows session:
+  asked it to append the same rule (−10 until it confirms).
