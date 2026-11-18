@@ -371,3 +371,15 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   repository does not use) and `d8f47b4d` (docs). Pod install resolves `d8f47b4d` in the four iOS projects; example 92
   tests, 0 failures (iPhone 17 Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3). Every platform at `d8f47b4d`
   (Android and mini program by the Windows session).
+
+## TODO (2026-11-18, `feat/harmony`): the search category test accepts UIKit's floating tab bar
+
+- **Request (from the Mac-CYLTabBarController session, owner's decision, verbatim)**: "The owner decided on iPhone Duo:
+  keep UIKit's floating bar on devices where UIKit chooses it. There's no core change; it's recorded in
+  CYLTabBarController docs/Tab-Item-Positioning.md. Please change
+  CYLSearchCategoryScenarioTests.testSearchCategoriesUseABottomTabBarAndFillTheSearchBar in your repo so it checks that
+  the tab bar is visible and its tabs can be selected, not that it sits at the bottom, at least where the bar is taller
+  than wide."
+- **Plan**: where the tab bar is taller than wide (UIKit's floating bar), assert it is visible in the window and that a
+  tab can be selected, instead of "at the bottom" and "tags end above the bar"; keep the bottom checks for a horizontal
+  bar. Run the test on iPhone 17 Pro and iPhone Duo.
