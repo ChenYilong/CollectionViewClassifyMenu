@@ -464,3 +464,14 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. `animated-tags.json` Rive Home now passes `numberInput: Rooms`,
   `values: 3,4,5,6`, like the Animations screen; its motion on the configuration file screen is not yet checked on a
   simulator (the Mac load is high). The mini program's copy of `animated-tags.json` belongs to the Windows session.
+
+## TODO (2026-11-18, `feat/harmony`): iOS pins from 918da089 to CYLTabBarController 4f73209c
+
+- **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
+  pins are at CYLTabBarController 4f73209c in cvcm-b 0ff2a1a (pushed). It's the newest commit on
+  feat/cross-platform-components and adds Android-only fixes on top of 918da089: PAG uses PAGImageView, Lottie image
+  assets keep their size, the Rive settle, and the GIF decoder. Please move the iOS pins to 4f73209c so every platform
+  matches; no iOS source changed in 918da089..4f73209c."
+- **Plan**: checked: no `.m`, `.h`, `.swift`, podspec or Package.swift changed in `918da089..4f73209c`; the branch head
+  `012cd15f` is docs only after it, so `4f73209c` keeps every platform on one commit. Move the eight pin files,
+  `pod install` x 4, build the Swift package, run the example suite.
