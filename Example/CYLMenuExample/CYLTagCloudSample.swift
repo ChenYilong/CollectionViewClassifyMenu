@@ -324,8 +324,10 @@ final class CYLHotSearchViewController: UIViewController {
 
     /// (title, badge); the titles are sample data, as in the screenshot.
     static let hotSearches: [(String, Badge?)] = [
+        // NOLOCALIZE-BEGIN: song and user names (search history content), as in the sample's screenshot.
         ("入戏太深混合串烧版", .song), ("他和她", .song), ("妤宸", nil), ("赛菲尔", nil), ("小西瓜", .trending),
         ("入戏太深", .song), ("小虾米", nil), ("羽冰", nil), ("梦梦", nil), ("神曲不跳转呀呀呀56567", .song),
+        // NOLOCALIZE-END
     ]
 
     static func hotTags() -> [CYLTag] {

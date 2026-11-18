@@ -121,8 +121,9 @@ open class CYLTagListCell: UICollectionViewCell {
     }
 
     /**
-     * Shows a tag: its title (also its accessibility label), icons, look and state. An icon's `accessibilityLabel`,
-     * when it has one (such as a "hot" icon), is read by VoiceOver as the tag's value.
+     * Shows a tag: its title (also its accessibility label; an icon-only tag's is its icon's), icons, look and state. An
+     * icon's `accessibilityLabel`, when the app gives it one (such as a "hot" icon), is read by VoiceOver as the tag's
+     * value; an SF Symbol's automatic label is not (it names the glyph, in the device's language).
      */
     open func configure(title: String, image: UIImage?, selectedImage: UIImage?, animationURL: URL?,
                         style: CYLMenuStyle, isSelected: Bool, isEnabled: Bool) {
@@ -136,9 +137,12 @@ open class CYLTagListCell: UICollectionViewCell {
         button.selectedImage = selectedImage
         button.isEnabled = isEnabled
         button.isSelected = isSelected
-        accessibilityLabel = title
-        // An icon with a meaning of its own (such as a "hot" icon) is read as the value.
-        accessibilityValue = image?.accessibilityLabel
+        // An icon-only tag is read by its icon's label.
+        accessibilityLabel = title.isEmpty ? image?.accessibilityLabel : title
+        // An icon with a meaning of its own (such as a "hot" icon, whose label the app sets) is read as the value. An SF
+        // Symbol's automatic label only names the glyph ("house" beside "Home"), in the device's language rather than
+        // the app's (CYLMenuResources.preferredLanguage), so a symbol on a titled tag adds no value.
+        accessibilityValue = title.isEmpty || image?.isSymbolImage == true ? nil : image?.accessibilityLabel
         accessibilityIdentifier = CYLTagListAccessibilityIdentifier.item
         accessibilityHint = nil
         var traits: UIAccessibilityTraits = .button

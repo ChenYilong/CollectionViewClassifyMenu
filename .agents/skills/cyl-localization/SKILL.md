@@ -68,6 +68,17 @@ commit over every branch, see `cyl-dependency`; its core lookup is `CYLLocalized
 ### Check
 
 ```sh
+python3 scripts/check-localization.py            # keys, format specifiers, Chinese literals outside a lookup
+python3 scripts/check-localization.py --unused   # keys no code names (data keys looked up at run time show too)
+```
+
+Run time: `CYLLocalizationTests.testEveryScreenIsInTheAppLanguage` opens every Example screen in English and
+Traditional Chinese and fails on Chinese (English) or Simplified-only characters (Traditional) outside the
+NOLOCALIZE content.
+
+#### Lookups
+
+```sh
 # Exactly the lookups below, one per level; no other bundle reads or NSLocalizedString calls.
 grep -rn "func CYLMenuLocalizedString\|func CYLExampleLocalizedString\|func CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
   CollectionViewClassifyMenu Example Example-Swift

@@ -466,6 +466,14 @@ Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
 - Details and checks: `.agents/skills/cyl-localization/` (and the copied
   `ios-localization` skill for general iOS practice).
 
+- Before a commit that touches strings or screens: `python3 scripts/check-localization.py` (every key a lookup is called
+  with exists in every translated language with the same format specifiers; no Chinese literal outside a lookup) and
+  `CYLLocalizationTests.testEveryScreenIsInTheAppLanguage` (every Example screen in English and Traditional Chinese).
+  Data shared with other platforms (data.json, the places database, configuration files) keeps its source titles;
+  the iOS screens translate them where they are shown. User-generated content (reviews, a shop's product title, song
+  and user names) and deliberately multilingual samples stay as written, between `NOLOCALIZE-BEGIN` / `NOLOCALIZE-END`
+  comments or with `NOLOCALIZE` on the line, with the reason.
+
 ## Accessibility
 
 Copied from CYLTabBarController ("Accessibility is required everywhere" in its

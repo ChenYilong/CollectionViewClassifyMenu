@@ -23,7 +23,7 @@ final class CYLMainViewController: CYLClassifyMenuViewController {
     private(set) var rowsCountBydefaultSwitch: UISwitch?
 
     override func viewDidLoad() {
-        let classifySource = CYLDemoDataSource.classifyDataSource()
+        let classifySource = CYLDemoDataSource.classifyDataSource { CYLDemoLocalizedString($0) }
         self.classifySource = classifySource
         menuDataSource = classifySource
         menuDelegate = self
