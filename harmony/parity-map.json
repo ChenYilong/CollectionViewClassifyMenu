@@ -884,7 +884,11 @@
     "CYLTagListView.cacheKey(forSection:)": "`CYLTagListState.cacheKeyForSection(section)`",
     "CYLTagListView.saveEditableSectionsToCache()": "`CYLTagListState.saveEditableSectionsToCache()`",
     "CYLTagListView.setEditing(_:animated:)": "`CYLTagListState.setEditing(editing, animated)`",
-    "CYLTagListView.sectionAllowsEditing(_:)": "`CYLTagListState.sectionAllowsEditing(section)`"
+    "CYLTagListView.sectionAllowsEditing(_:)": "`CYLTagListState.sectionAllowsEditing(section)`",
+    "CYLMenuStyle.titleWraps": "`CYLMenuStyle.titleWraps` (the title's `Text` takes as many lines as it needs)",
+    "CYLMenuStyle.elevation": "`CYLMenuStyle.elevation` (ArkUI `shadow`; the tag stops clipping)",
+    "CYLMenuStyle.deleteIndicatorImage": "`CYLMenuStyle.deleteIndicatorImage` (an image, or a system symbol drawn with `SymbolGlyph`)",
+    "CYLTagButton.static height(forTitle:iconSize:width:showsDeleteIndicator:style:traitCollection:)": "`CYLTagButtonMetrics.heightForTitleWidth(title, iconSize, width, showsDeleteIndicator, style, fontScale)`"
   },
   "demos": [
     {

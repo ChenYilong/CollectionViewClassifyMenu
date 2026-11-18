@@ -23,6 +23,8 @@ export class CYLTagContainerSampleData {
   static readonly list3: string[] = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام']; // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
   static readonly list4: string[] = ['Adele', 'Whitney Houston'];
   static readonly list5: string[] = ['Custom Red Color', 'Custom Blue Color'];
+  static readonly list6: string[] = ['Starred', 'A long tag that wraps onto a second line instead of leaving the container',
+    'End'];
 
   /**
    * The last tag of list1: the running system, as the iOS sample ("Welcome to use iOS 27.2 CollectionViewClassifyMenu"),
@@ -202,7 +204,38 @@ export struct CYLTagContainerSamplePage {
     });
     fifth.setTagsWithTitles(CYLTagContainerSampleData.list5, CYLTagContainerSampleData.colors5());
 
-    this.containers = [first, second, third, fourth, fifth];
+    // tagcontainerLayout6: gravity end, 4 vp elevation, a cross image, 100 characters, wrapping titles, cyan tags; a
+    // star before the first tag, no cross on the last (iOS 00760142, the Android Container tab's sixth container).
+    const sixth = makeContainer((list: CYLTagListState, style: CYLMenuStyle) => {
+      style.interitemSpacing = 10;
+      style.lineSpacing = 10;
+      style.rowAlignment = CYLTagRowAlignment.trailing;
+      style.elevation = 4;
+      style.maximumTitleLength = 100;
+      style.titleWraps = true;
+      style.imageSize = new CYLSize(18, 18);
+      style.imageTitleSpacing = 6;
+      style.deleteIndicatorImage = $r('sys.symbol.xmark_circle_fill');
+      style.deleteIndicatorColor = SYSTEM_GRAY;
+      [style.normalAppearance, style.selectedAppearance, style.disabledAppearance].forEach((a: CYLTagAppearance) => {
+        a.backgroundColor = CYLColor.fromHex('#E0F7FA') ?? SYSTEM_TEAL;
+        a.borderColor = CYLColor.fromHex('#4DD0E1') ?? SYSTEM_TEAL;
+        a.textColor = CYLColor.fromHex('#006064') ?? CYLColor.BLACK;
+      });
+      list.colorTheme = CYLTagColorTheme.none;
+      list.removesItemsOnDelete = false;
+    });
+    sixth.setTagsWithTitles(CYLTagContainerSampleData.list6);
+    const tags = sixth.tagDataSource.tags;
+    tags.forEach((tag: CYLTag) => {
+      tag.isDeletable = true;
+    });
+    tags[tags.length - 1].isDeletable = false;
+    tags[0].image = $r('sys.symbol.star_fill');
+    sixth.reloadMenuData();
+    sixth.tagDeleteHandler = (position: number) => cylToast(cylFormat(CYLExampleLocalizedString('点了标签的叉！位置 = %ld'), position));
+
+    this.containers = [first, second, third, fourth, fifth, sixth];
   }
 
   addTag(): void {
@@ -252,6 +285,7 @@ export struct CYLTagContainerSamplePage {
           CYLTagListView({ tagList: this.containers[2] }).margin({ top: 20 })
           CYLTagListView({ tagList: this.containers[3] }).margin({ top: 20 })
           CYLTagListView({ tagList: this.containers[4] }).margin({ top: 20 })
+          CYLTagListView({ tagList: this.containers[5] }).margin({ top: 20 })
         }
         .padding(16)
         .width('100%')

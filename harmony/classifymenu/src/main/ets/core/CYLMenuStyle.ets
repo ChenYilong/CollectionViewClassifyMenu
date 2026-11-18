@@ -4,7 +4,7 @@
  * are vp, font sizes fp, colors '#AARRGGBB'. `copy()` is NSCopying.
  */
 import { CYLTagAppearance, CYLTagCornerRadiusSquare } from './CYLTagAppearance';
-import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLOffset, CYLSize } from './CYLTypes';
+import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
 
@@ -110,6 +110,22 @@ export class CYLMenuStyle {
    * false.
    */
   imageFillsTagHeight: boolean = false;
+  /**
+   * True: a title too wide for its row wraps onto more lines and the tag grows taller, instead of being truncated
+   * (AndroidTagView's tag_text_wrap). The list measures the taller tag at the width it gets. Default false.
+   */
+  titleWraps: boolean = false;
+  /**
+   * A shadow under each tag, as Android's elevation in vp (AndroidTagView's tag_elevation): offset down by half of it
+   * and blurred by it. Default 0, no shadow.
+   */
+  elevation: number = 0;
+  /**
+   * An image drawn as the delete indicator instead of `deleteIndicatorTitle` or the drawn cross (AndroidTagView's
+   * tag_cross drawable): a square as tall as a line of the indicator font, plus `deleteIndicatorPadding` on each side.
+   * Default undefined.
+   */
+  deleteIndicatorImage?: CYLImage = undefined;
   layoutCentered: boolean = true;
   contentAlignment: CYLTagContentAlignment = CYLTagContentAlignment.center;
   animationSize: CYLSize = CYLSize.ZERO;
@@ -326,6 +342,9 @@ export class CYLMenuStyle {
     c.headerIndicatorSize = this.headerIndicatorSize;
     c.imageCornerRadius = this.imageCornerRadius;
     c.imageFillsTagHeight = this.imageFillsTagHeight;
+    c.titleWraps = this.titleWraps;
+    c.elevation = this.elevation;
+    c.deleteIndicatorImage = this.deleteIndicatorImage;
     c.imageTitleSpacing = this.imageTitleSpacing;
     c.imageSize = this.imageSize;
     c.imageInsets = this.imageInsets;

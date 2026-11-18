@@ -76,6 +76,45 @@ export default function tagButtonTest() {
       expect(copy.imageFillsTagHeight).assertTrue();
     });
 
+    it('wrapsTitlesDrawsACrossImageAndAnElevation', 0, () => {
+      // iOS 00760142 (the Android Container tab's sixth container): titleWraps, deleteIndicatorImage, elevation.
+      const style = new CYLMenuStyle();
+      style.titleWraps = true;
+      const title = 'A long tag that wraps';
+      const single = CYLTagButton.heightForTitle(title, CYLSize.ZERO, style);
+      const insets = style.normalAppearance.contentInsets;
+      // 21 characters at 10 vp each (210 vp) in a tag 120 vp wide wrap onto three lines.
+      const room = 120 - insets.left - insets.right;
+      const lines = Math.ceil(210 / room);
+      const wrapped = CYLTagButtonMetrics.heightForTitleWidth(title, CYLSize.ZERO, 120, false, style);
+      expect(lines > 1).assertTrue();
+      expect(wrapped > single).assertTrue();
+      style.titleWraps = false;
+      expect(CYLTagButtonMetrics.heightForTitleWidth(title, CYLSize.ZERO, 120, false, style)).assertEqual(single);
+      // A cross image: a square as tall as a line of the indicator font, the padding only beside it, so a one-line tag
+      // keeps the image (it vanished on iOS when the padding was taken above it too).
+      const crossed = new CYLMenuStyle();
+      crossed.deleteIndicatorPadding = 4;
+      crossed.deleteIndicatorImage = 'cross.png';
+      const button = new CYLTagButton('End');
+      button.style = crossed;
+      button.showsDeleteIndicator = true;
+      button.setBounds(120, CYLTagButton.height(crossed));
+      const frame = button.deleteIndicatorImageFrame;
+      expect(frame.width > 0 && frame.width === frame.height).assertTrue();
+      expect(button.deleteIndicatorImage).assertEqual('cross.png');
+      expect(button.showsCross).assertFalse();
+      expect(button.deleteIndicatorLabel.text === undefined).assertTrue();
+      // Elevation: on the button, and copied with the style.
+      crossed.elevation = 4;
+      button.style = crossed;
+      expect(button.elevation).assertEqual(4);
+      const copy = crossed.copy();
+      expect(copy.elevation).assertEqual(4);
+      expect(copy.deleteIndicatorImage).assertEqual('cross.png');
+      expect(style.copy().titleWraps).assertFalse();
+    });
+
     it('reservesNoSpacingForAMissingPart', 0, () => {
       const style = new CYLMenuStyle();
       style.imagePlacement = CYLTagImagePlacement.top;

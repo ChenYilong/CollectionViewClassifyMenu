@@ -1182,5 +1182,14 @@ tags: [issues, ui, cocoapods, progress]
   in host tests, the titles live in memory for the process). Same rules as iOS and Android. Core strings regenerated
   (`CYLCoreStrings.ets`). New host test `TagListEditing.test.ets` (5, as iOS and Android); host tests 68 / 68,
   `build.sh` OK. `docs/harmony.md` 883 / 887: the four left are the sixth-container options.
-- **TODO:** the mini program (editing mode and cache); `titleWraps`, `elevation`, `deleteIndicatorImage` (and the
-  wrapping title's height) on HarmonyOS and the mini program.
+- **HarmonyOS sixth-container options (done):** `CYLMenuStyle.titleWraps` (the title's `Text` takes as many lines as it
+  needs; `CYLTagButtonMetrics.heightForTitleWidth` measures the taller tag at the width it gets, with ArkUI's text
+  metrics on a device, and the list measures wrapping items at their widths), `elevation` (an ArkUI shadow, offset
+  down by half, blurred by half; the tag stops clipping), `deleteIndicatorImage` (an image, or a system symbol drawn with
+  `SymbolGlyph`; a square as tall as a line of the indicator font with the padding only beside it, so it stays on a
+  one-line tag). The Container sample gets the sixth container (trailing rows, 4 vp elevation, the
+  `sys.symbol.xmark_circle_fill` cross, 100 characters, wrapping titles, cyan tags, a `sys.symbol.star_fill` star, no
+  cross on the last tag). Test `wrapsTitlesDrawsACrossImageAndAnElevation`; host tests 69 / 69, `build.sh` OK.
+  `docs/harmony.md` 887 / 902: the 15 left are the network sync rows of `3fc2c23b` (next).
+- **TODO:** the mini program (editing mode and cache, the three options); network sync (`3fc2c23b`) on Android,
+  HarmonyOS and the mini program; device screenshots of the sixth container.

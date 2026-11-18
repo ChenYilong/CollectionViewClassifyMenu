@@ -5,7 +5,7 @@ import { CYLUIContext } from '../core/CYLUIContext';
  * methods and reordering. It needs no UI to be used or tested; `CYLTagListView` renders it and calls back into it.
  * Lengths are vp.
  */
-import { MeasureText } from '@kit.ArkUI';
+import { MeasureOptions, MeasureText } from '@kit.ArkUI';
 import { fileIo } from '@kit.CoreFileKit';
 import { util } from '@kit.ArkTS';
 import { CYLIndexPath } from './CYLTagListModel';
@@ -214,11 +214,61 @@ export class CYLTagButtonMetrics {
     return height;
   }
 
+  /**
+   * The height of `text` in `font` wrapped to `width` vp. With the window's text metrics, ArkUI measures it; without
+   * (host tests), the lines are the single-line width (`textMeasurer`) over `width`, rounded up.
+   */
+  static wrappedTextHeight: (text: string, font: CYLFont, width: number) => number =
+    (text: string, font: CYLFont, width: number): number => {
+      const line = Math.ceil(CYLTagButtonMetrics.lineHeight(font));
+      if (CYLUIContext.hasContext) {
+        const size = CYLUIContext.measureTextSize({ textContent: text, fontSize: font.size, fontWeight: font.weight,
+          constraintWidth: Math.max(1, width) } as MeasureOptions, font.size, font.weight, Math.max(1, width));
+        return Math.max(line, Math.ceil(size.height));
+      }
+      const lines = Math.max(1, Math.ceil(CYLTagButtonMetrics.textMeasurer(text, font) / Math.max(1, width)));
+      return lines * line;
+    };
+
+  /**
+   * `height(forTitle:iconSize:width:showsDeleteIndicator:style:traitCollection:)`: the height of a tag `width` wide; with
+   * `CYLMenuStyle.titleWraps` the title wrapped to the room it has beside the icon and the delete indicator, otherwise
+   * `heightForTitle`.
+   */
+  static heightForTitleWidth(title: string | undefined, iconSize: CYLSize, width: number, showsDeleteIndicator: boolean,
+    style: CYLMenuStyle, fontScale: number = 1): number {
+    const single = CYLTagButtonMetrics.heightForTitle(title, iconSize, style, fontScale);
+    const displayed = style.displayedTitle(title);
+    if (!style.titleWraps || displayed.length === 0 || CYLTagImagePlacementIsVertical(style.imagePlacement)) {
+      return single;
+    }
+    let height = single;
+    STATES.forEach((state: number) => {
+      const insets = style.appearance(state).contentInsets;
+      let room = width - insets.left - insets.right;
+      if (style.fillsTagHeight(iconSize)) {
+        room -= single - insets.left + style.imageTitleSpacing;
+      } else if (iconSize.width > 0) {
+        room -= iconSize.width + style.imageTitleSpacing;
+      }
+      if (showsDeleteIndicator) {
+        room -= style.imageTitleSpacing + CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale);
+      }
+      const text = CYLTagButtonMetrics.wrappedTextHeight(displayed, style.titleFont(state, fontScale), room);
+      height = Math.max(height, Math.ceil(text + insets.top + insets.bottom));
+    });
+    return height;
+  }
+
   static deleteIndicatorWidth(state: number, style: CYLMenuStyle, fontScale: number = 1): number {
     if (style.deleteIndicatorWidth > 0) {
       return style.deleteIndicatorWidth;
     }
     const font = style.deleteIndicatorFontFor(state, fontScale);
+    if (style.deleteIndicatorImage !== undefined) {
+      // A square image as tall as a line of the font, the padding beside it.
+      return Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + 2 * style.deleteIndicatorPadding;
+    }
     if (style.deleteIndicatorLineWidth > 0) {
       return Math.ceil(CYLTagButtonMetrics.lineHeight(font) * 0.75) + 2 * style.deleteIndicatorPadding;
     }
@@ -1261,7 +1311,7 @@ export class CYLTagListState {
     const measured = width === this.measuredWidth;
     const sectionWidths = measured ? this.itemWidths : this.widths(available);
     const sectionRows = measured ? this.rows : this.rowsFor(sectionWidths, available);
-    const sectionHeights = measured ? this.itemHeights : this.measureItemHeights();
+    const sectionHeights = measured ? this.itemHeights : this.measureItemHeights(sectionWidths);
     const header = this.headerHeight();
     const insets = this.styleStorage.sectionInsets;
     let height = 0;
@@ -2048,11 +2098,22 @@ export class CYLTagListState {
     });
   }
 
-  private measureItemHeights(): number[][] {
+  /**
+   * Each item's height; an item whose style wraps its title (`CYLMenuStyle.titleWraps`) is measured at its width in
+   * `widths`, so a long title that wraps gets a taller cell (iOS `measureItemHeights(widths:)`).
+   */
+  private measureItemHeights(widths: number[][] = []): number[][] {
     const listHeight = this.itemHeight;
     return this.titles.map((items: string[], section: number): number[] => items.map((title: string,
       item: number): number => {
-      const itemStyle = this.styleForItem(makePath(section, item));
+      const p = makePath(section, item);
+      const itemStyle = this.styleForItem(p);
+      if (itemStyle.titleWraps && section < widths.length && item < widths[section].length && widths[section][item] > 0) {
+        const iconSize = CYLTagButtonMetrics.iconSize(this.imageForItem(p), this.animationURLForItem(p) !== undefined,
+          itemStyle);
+        return Math.max(listHeight, CYLTagButtonMetrics.heightForTitleWidth(title, iconSize, widths[section][item],
+          this.isDeletable(p), itemStyle, this.fontScale));
+      }
       return itemStyle === this.styleStorage ? listHeight :
       Math.max(listHeight, CYLTagButtonMetrics.height(itemStyle, this.fontScale));
     }));
@@ -2113,7 +2174,7 @@ export class CYLTagListState {
     this.measuredWidth = width > 0 ? width : -1;
     const available = this.contentWidth(width);
     this.itemWidths = this.widths(available);
-    this.itemHeights = this.measureItemHeights();
+    this.itemHeights = this.measureItemHeights(this.itemWidths);
     this.rows = this.rowsFor(this.itemWidths, available);
   }
 

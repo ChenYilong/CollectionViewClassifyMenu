@@ -71,6 +71,10 @@ export class CYLTagButtonPart {
    * Degrees (the fold chevron's turn).
    */
   rotation: number = 0;
+  /**
+   * The lines of a title: 1, or 0 for as many as it needs (`CYLMenuStyle.titleWraps`).
+   */
+  maxLines: number = 1;
 }
 
 @Observed
@@ -141,6 +145,16 @@ export class CYLTagButton {
    * The two lines of the drawn cross ([x1, y1, x2, y2] each), or empty.
    */
   crossLines: number[][] = [];
+  /**
+   * `CYLMenuStyle.deleteIndicatorImage` and its frame in the tag: a square inside the indicator, the padding beside it,
+   * not above it, so a one-line tag keeps the full line height for it.
+   */
+  deleteIndicatorImage?: CYLImage = undefined;
+  deleteIndicatorImageFrame: CYLRect = new CYLRect();
+  /**
+   * `CYLMenuStyle.elevation`: a shadow under the tag (vp); the tag stops clipping its content then.
+   */
+  elevation: number = 0;
   crossLineWidth: number = 0;
   crossColor: ResourceColor = CYLColor.BLACK;
   showsCross: boolean = false;
@@ -682,7 +696,10 @@ export class CYLTagButton {
     const font = this.titleLabel.font;
     const measured = showsTitle ? CYLTagButtonMetrics.textMeasurer(titleText, font) : 0;
     let titleWidth = Math.min(available, Math.ceil(measured));
-    const titleHeight = showsTitle ? Math.min(height, Math.ceil(CYLTagButtonMetrics.lineHeight(font))) : 0;
+    // A wrapping title (`CYLMenuStyle.titleWraps`) is measured at the width it can have; otherwise on one line.
+    const lineHeight = style.titleWraps ? CYLTagButtonMetrics.wrappedTextHeight(titleText, font, available) :
+      CYLTagButtonMetrics.lineHeight(font);
+    const titleHeight = showsTitle ? Math.min(height, Math.ceil(lineHeight)) : 0;
 
     let imageX = 0;
     let titleX = 0;
@@ -775,9 +792,13 @@ export class CYLTagButton {
     if (showsTitle) {
       const x = frame.x + frame.width + style.imageTitleSpacing;
       const font = this.titleLabel.font;
-      const titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.lineHeight(font)));
+      let titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.lineHeight(font)));
       const contentHeight = Math.max(0, height - insets.top - insets.bottom);
       const measured = Math.ceil(CYLTagButtonMetrics.textMeasurer(titleText, font));
+      const room = Math.max(0, this.boundsWidth - trailing - x);
+      if (style.titleWraps) {
+        titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.wrappedTextHeight(titleText, font, room)));
+      }
       this.titleLabel.frame = new CYLRect(x + style.titlePositionAdjustment.horizontal,
         CYLTagButton.centeredY(titleHeight, insets.top, contentHeight, height) + style.titlePositionAdjustment.vertical,
         Math.min(measured, Math.max(0, this.boundsWidth - trailing - x)), titleHeight);
@@ -823,6 +844,11 @@ export class CYLTagButton {
     const minX = midX - side / 2;
     const minY = midY - side / 2;
     this.crossLines = [[minX, minY, minX + side, minY + side], [minX + side, minY, minX, minY + side]];
+    // The image: a square inside the indicator, the padding beside it, not above it, so a one-line tag keeps the full
+    // line height for it (iOS 00760142: with the padding above too it vanished on a one-line tag).
+    const imageSide = Math.max(0, Math.min(indicator.width - 2 * style.deleteIndicatorPadding, indicator.height));
+    this.deleteIndicatorImageFrame = new CYLRect(indicator.x + (indicator.width - imageSide) / 2,
+      indicator.y + (indicator.height - imageSide) / 2, imageSide, imageSide);
     return indicatorWidth + style.imageTitleSpacing;
   }
 
@@ -907,10 +933,16 @@ export class CYLTagButton {
     this.backgroundColor = pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor;
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;
-    const drawsCross = style.deleteIndicatorLineWidth > 0;
-    this.deleteIndicatorLabel.isHidden = !this.showsDeleteIndicatorValue || drawsCross;
-    this.deleteIndicatorLabel.text = this.showsDeleteIndicatorValue && !drawsCross ? style.deleteIndicatorTitle : undefined;
+    const indicatorImage: CYLImage | undefined = style.deleteIndicatorImage;
+    const drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage === undefined;
+    this.deleteIndicatorLabel.isHidden = !this.showsDeleteIndicatorValue || drawsCross || indicatorImage !== undefined;
+    this.deleteIndicatorLabel.text = this.showsDeleteIndicatorValue && !drawsCross && indicatorImage === undefined ?
+    style.deleteIndicatorTitle : undefined;
     this.showsCross = this.showsDeleteIndicatorValue && drawsCross;
+    this.deleteIndicatorImage = this.showsDeleteIndicatorValue ? indicatorImage : undefined;
+    // A wrapping title (`CYLMenuStyle.titleWraps`) takes as many lines as it needs.
+    this.titleLabel.maxLines = style.titleWraps ? 0 : 1;
+    this.elevation = Math.max(0, style.elevation);
     this.crossLineWidth = style.deleteIndicatorLineWidth;
     this.crossColor = style.deleteIndicatorColor ?? appearance.textColor;
     const imageRadius = style.imageCornerRadius;
@@ -991,7 +1023,8 @@ export struct CYLTagButtonComponent {
           .fontSize(this.tl().font.size)
           .fontWeight(this.tl().font.weight)
           .fontColor(this.tl().textColor)
-          .maxLines(1)
+          // 0: as many lines as the title needs (`CYLMenuStyle.titleWraps`).
+          .maxLines(this.tl().maxLines > 0 ? this.tl().maxLines : Number.MAX_SAFE_INTEGER)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width(this.part(this.tl()).width)
           .height(this.part(this.tl()).height)
@@ -1076,6 +1109,24 @@ export struct CYLTagButtonComponent {
           .position({ x: this.part(this.bl()).x, y: this.part(this.bl()).y })
           .accessibilityLevel('no')
       }
+      if (this.button.deleteIndicatorImage !== undefined && CYLImageIsSymbol(this.button.deleteIndicatorImage)) {
+        // `CYLMenuStyle.deleteIndicatorImage` as a system symbol ($r('sys.symbol.xmark_circle_fill')), in the indicator color.
+        SymbolGlyph(this.button.deleteIndicatorImage as Resource)
+          .fontSize(this.button.deleteIndicatorImageFrame.height)
+          .fontColor([this.dl().textColor])
+          .width(this.button.deleteIndicatorImageFrame.width)
+          .height(this.button.deleteIndicatorImageFrame.height)
+          .position({ x: this.button.deleteIndicatorImageFrame.x, y: this.button.deleteIndicatorImageFrame.y })
+          .accessibilityLevel('no')
+      } else if (this.button.deleteIndicatorImage !== undefined) {
+        // `CYLMenuStyle.deleteIndicatorImage`: the image in place of the cross.
+        Image(this.button.deleteIndicatorImage)
+          .objectFit(ImageFit.Contain)
+          .width(this.button.deleteIndicatorImageFrame.width)
+          .height(this.button.deleteIndicatorImageFrame.height)
+          .position({ x: this.button.deleteIndicatorImageFrame.x, y: this.button.deleteIndicatorImageFrame.y })
+          .accessibilityLevel('no')
+      }
       if (this.button.showsCross) {
         ForEach(this.button.crossLines, (line: number[]) => {
           Line()
@@ -1097,7 +1148,12 @@ export struct CYLTagButtonComponent {
     .backgroundImage(this.button.backgroundImage)
     .backgroundImageSize(ImageSize.Cover)
     .border({ width: this.button.borderWidth, color: this.button.borderColor, radius: this.button.cornerRadius })
-    .clip(true)
+    // `CYLMenuStyle.elevation`: a shadow under the tag (offset down by half of it, blurred by it); the tag stops
+    // clipping its content then, since the shadow is outside its bounds.
+    .shadow(this.button.elevation > 0 ?
+      { radius: this.button.elevation / 2, color: '#40000000', offsetX: 0, offsetY: this.button.elevation / 2 } :
+      { radius: 0, color: Color.Transparent })
+    .clip(this.button.elevation <= 0)
     .onAreaChange((oldArea: Area, newArea: Area) => {
       this.button.setBounds(Number(newArea.width), Number(newArea.height));
     })
