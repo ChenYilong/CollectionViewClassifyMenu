@@ -35,19 +35,34 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-18, `feat/harmony`): Android PAG, GIF and Rive Home do not play
+### Done (2026-11-18, `feat/harmony`): Android PAG, GIF, Rive Home and Lottie image assets, fixed in the core
 
-- Prompt (verbatim): "rive （home title） pag  gif动画 播放异常，无法播放"
-- Acceptance criteria: 100 = bug recorded with a labeled screenshot (15), platform and scope found (15), cause found
-  for each engine (30), fixed in CYLTabBarController and pinned (25), re-verified on the emulator with frames (15).
-  Pass: 60.
-- Result so far: **55/100**. Recorded and screenshotted (`animated-item-migration.md`,
-  `docs/assets/android-pag-gif-rive-home-no-playback.png`). Scope: Android, every recent pin (the mini program plays
-  Rive and starts its GIFs; the DevTools runtime state switches to playing). Causes: GIF ignores Loop (fixed upstream
-  in `ad385a5a`, not yet pinned or checked). Rive Home needs its Rooms number input driven. PAG stops drawing after
-  one frame, with a libEGL "unimplemented OpenGL ES API" error, and is not yet bisected. The emulator went to the
-  TableViewPlaceHolder session mid-task. Missing: the PAG cause (-15), the upstream fixes and pins (-25), the
-  re-check (-15). The fixes are requested from CYLTabBarController's sessions.
+- Prompts (verbatim): "rive （home title） pag  gif动画 播放异常，无法播放"; then "android 上 rive （home title） pag  gif动画
+  播放异常，无法播放，Lottie（image assets and placeholder）尺寸不对。请从CYLTabBar仓库内的animatedView 内的core代码修复。
+  Lottie换成animatedview展示后尺寸变大，好像在CYLTabBar仓库里修复过一次，不过是其他端的问题。你寻找commit记录，寻找的参考思路，修复android问题。"
+- Acceptance criteria: 100 = bug recorded with a labeled screenshot (10), cause found for each engine (25), fixed in
+  CYLTabBarController's cylanimateditem core, not in the example (25), pinned (10), re-verified on the emulator with
+  labeled frames (20), every Rive tag loops (10). Pass: 60.
+- Fixes in CYLTabBarController:
+  - **PAG** (`8d81583c`, this session): `CYLPAGTabBarItemAnimator` makes `PAGImageView` (bitmap frames) in place of
+    `PAGView` (a TextureView with a GL surface per icon, which froze after one frame on the emulator GL).
+  - **Lottie image assets** (`8d81583c`): `setMaintainOriginalImageBounds(true)`. lottie-android sized image layers
+    by bitmap pixels times density, and the drawable bitmaps are density-scaled, so they drew about 2.6x too large.
+    No earlier commit fixed this on another platform; lottie-ios already draws the declared size.
+  - **GIF** (`4f73209c`, HarmonyOS session, B24): a GIF decoder replaces `android.graphics.Movie`, and the view plays
+    on the frame clock. This emulator's app process sees animator duration scale 0, so a ValueAnimator jumped to its
+    end.
+  - **Rive rest / Loop** (`319ba8a4`, `3bd20b3c`, Mac session).
+- Rive Home: example configuration (`115b270`, `numberInput=Rooms`); the core already supported it.
+- Pins: `4f73209c` (mini program, Android, HarmonyOS module).
+- Evidence: `docs/assets/android-pag-lottie-fixed-8d81583c.png` and `docs/assets/android-gif-rive-home-fixed-4f73209c.png`.
+  - PAG Home 1174-1959 px per pair.
+  - GIF Fire 512-835 px, repeating with Loop.
+  - The Lottie icons fit their tags.
+  - Rive Home steps Rooms.
+- Result: **90/100**. -10: on the x86_64 emulator, Rive Menu toggles only on its first play, so it does not loop.
+  Mac's arm64 emulator loops it at `3bd20b3c`. Reported to the Mac CYLTabBarController session with numbers; waiting
+  for its fix.
 
 ### Done (2026-11-18, `feat/harmony`): Rive tint changes at CYLTabBarController `396d3fca` / `0505042f`
 
