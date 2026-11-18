@@ -397,3 +397,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   anything else below 100."
 - **Plan**: the newest commit across all branches is `0505042f` (docs only after `396d3fca`); move the eight iOS pin
   files, `pod install` in the four projects, build the Swift package, run the menu, tag, example and swift suites.
+- **DONE (2026-11-18)**: the eight iOS pin files name `0505042f111970cedeeb01b9768efb288b3d974b`. `pod install` resolved
+  `CYLAnimatedItem` at `0505042f` in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift
+  package (`Package.resolved` revision `0505042f`) builds for the iOS Simulator. Tests on iPhone 17 Pro `62B54974`
+  (iOS 27.2, Xcode 27.2, macOS 27.3): menu 32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. Android and the mini
+  program pins belong to the Windows session (still `d8f47b4d` until it moves them).
