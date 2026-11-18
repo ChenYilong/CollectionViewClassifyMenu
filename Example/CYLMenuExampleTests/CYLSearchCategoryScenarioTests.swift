@@ -37,8 +37,14 @@ final class CYLSearchCategoryScenarioTests: CYLMenuExampleTestCase {
         let list = controller.tagListView
         let barFrame = tabs.tabBar.convert(tabs.tabBar.bounds, to: controller.view)
         let tagsFrame = list.convert(list.bounds, to: controller.view)
-        XCTAssertGreaterThan(barFrame.minY, controller.view.bounds.height / 2, "Tab bars are always at the bottom")
-        XCTAssertLessThanOrEqual(tagsFrame.maxY, barFrame.minY + 0.5, "Tags end above the tab bar")
+        if barFrame.height > barFrame.width {
+            // UIKit's floating tab bar (iPhone Duo, iOS 27): a vertical strip that UIKit places itself; CYLTabBarController
+            // keeps it (owner's decision, its docs/Tab-Item-Positioning.md). Visible and selectable, not at the bottom.
+            XCTAssertTrue(isVisible(tabs.tabBar), "The floating tab bar is visible")
+        } else {
+            XCTAssertGreaterThan(barFrame.minY, controller.view.bounds.height / 2, "A horizontal tab bar is at the bottom")
+            XCTAssertLessThanOrEqual(tagsFrame.maxY, barFrame.minY + 0.5, "Tags end above the tab bar")
+        }
         XCTAssertNotNil(list.window)
 
         XCTAssertEqual(controller.category, .people)
