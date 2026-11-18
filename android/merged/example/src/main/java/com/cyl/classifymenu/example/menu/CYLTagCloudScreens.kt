@@ -208,6 +208,7 @@ class CYLTagConfigurationScreen(private val context: Context) : CYLMenuScreen, C
                 mapOf(CYLTagItemTitle to "Lottie", CYLTagItemAnimation to animation("Lottie/tab_me_animate.json")),
                 mapOf(CYLTagItemTitle to "GIF", CYLTagItemAnimation to animation("GIF/cyl_tab_sample_animated.gif")),
                 mapOf(CYLTagItemTitle to "Rive", CYLTagItemAnimation to animation("Rive/menu_button.riv")),
+                mapOf(CYLTagItemTitle to "SVGA", CYLTagItemAnimation to animation("SVGA/tab_chat.svga")),
                 mapOf(CYLTagItemImage to "system:heart", CYLTagItemSelectedImage to "system:heart.fill"),
                 "Text only",
             )

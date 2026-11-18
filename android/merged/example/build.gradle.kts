@@ -48,10 +48,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.glide)
     // Animated tag icons (the Styles and Animations screens of the menu example): CYLTabBarController's animation
-    // engine registers Lottie, PAG and Rive when their libraries are present (GIF needs none).
+    // engine registers Lottie, PAG, Rive and SVGA when their libraries are present (GIF needs none).
     implementation(libs.lottie)
     implementation(libs.libpag)
     implementation(libs.rive)
+    implementation(libs.svgaplayer)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)

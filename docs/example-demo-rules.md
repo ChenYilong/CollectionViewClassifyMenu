@@ -111,10 +111,18 @@ SVGA, on every platform, with the same playback controls (Play all, speed, loop)
 Status: iOS done (2026-11-16): the Animated icons sections `svga` and `svga-dark`, the Styles action `animation.svga`, the
 configuration file and dictionary demos, the launch screens `animations-svga` and `style-svga`, and the tests. SVGA, like
 Rive, plays once at its own speed: CYLTabBarController's SVGA player has no speed or loop API yet. HarmonyOS: done.
-Android, Mini Program: TODO (Windows session; Android started 2026-11-19).
+Android: DONE (2026-11-19): the Animated icons sections `svga` (Home, Search, Messages, Me) and `svga-dark` (Posts, List,
+Home on the icons.riv dark tags), the Styles action `animation.svga`, the dictionary demo's SVGA tag; the configuration
+file is the iOS bundle's `animated-tags.json` (already has its SVGA tag). The example adds `com.github.yyued:SVGAPlayer-Android`
+2.6.1 (JitPack, group-filtered); CYLTabBarController's `CYLSVGATabBarItemAnimator` registers itself when it is there. On
+the emulator all 7 icons draw at rest and play after Play all. The Android example has no launch screens (iOS
+`animations-svga`, `style-svga`) and no example unit tests, so nothing to add there.
+Mini Program: TODO (Windows session).
 Flutter and React Native on iOS: DONE (2026-11-19, `c2073004`, `0202e515`): an SVGA section (Home, Search, Messages, Me;
 the iOS example's files) after Rive, pod `CYLAnimatedItem/SVGA` (React Native also needs `SVGAPlayerLite` with modular
 headers); on the iPhone 17 Pro simulator the icons rest gray and animate after Play all; Flutter iOS integration tests
 2 / 2 (21 tags), React Native `tsc` passes. Their Android side: TODO (Windows session, after these two files).
 
 <img src="assets/flutter-rn-ios-svga.png" width="400" alt="SVGA tags in the Flutter and React Native examples on iOS: at rest and after Play all">
+
+<img src="assets/android-svga-animated-icons.png" width="400" alt="Android example: SVGA sections at rest, after Play all, and the Styles SVGA choice">
