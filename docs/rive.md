@@ -57,3 +57,12 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
   clean; not yet run on a simulator.
 - Still TODO upstream (CYLTabBarController, recorded in its `docs/WeChat-Mini-Program.md`): looping and replaying Rive
   icons (no state machine restart, triggers never loop, a held input cannot replay).
+
+## TODO (2026-11-18, `feat/harmony`): Rive checks on simulators (configuration file Home, React Native, Flutter)
+
+- **Prompt (verbatim)**: "continue Rive"
+- **Prompt (English)**: continue the paused Rive simulator checks.
+- **Plan**: (1) iOS example, configuration file screen (`-CYLExampleScreen config`): the Rive Home tag (`house.riv`, now
+  `numberInput: Rooms`, `values: 3,4,5,6`, `4d392b92`) moves when selected; frames before / after a tap, pixel diff.
+  (2) React Native iOS example and (3) Flutter iOS example: the three Rive tags (`house`, `check`, `menu_button`, options
+  from the fix above) play and loop; screenshots and pixel diffs. Stitched with `scripts/stitch-screenshots.swift`.
