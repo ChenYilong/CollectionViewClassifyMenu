@@ -47,3 +47,8 @@
 
 /* What VoiceOver reads for a CYLTagButton badge shown as a dot (badgeValue is an empty string). */
 "CYLTagBadgeDot" = "新";
+
+/* CYLTagListView editing: the add control below the last section (CYLTagListAddItemView). */
+"CYLMenuAddTag" = "新增標籤";
+"CYLMenuAddTagPlaceholder" = "標籤名稱";
+"CYLMenuTagAdded" = "已新增標籤：%@";

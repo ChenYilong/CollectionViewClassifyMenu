@@ -287,6 +287,7 @@ class CYLTagDataSource @JvmOverloads constructor(tags: List<CYLTag>? = null) : C
     override fun menuItemIsEnabledAtIndexPath(indexPath: CYLIndexPath): Boolean = tagAt(indexPath)?.isEnabled ?: true
 
     override fun menuItemIsDeletableAtIndexPath(indexPath: CYLIndexPath): Boolean = tagAt(indexPath)?.isDeletable ?: false
+    override fun decidesDeletableItems(): Boolean = true
 
     override fun menuRemoveItemAtIndexPath(indexPath: CYLIndexPath) {
         if (tagAt(indexPath) != null) removeTagAtIndex(indexPath.item)

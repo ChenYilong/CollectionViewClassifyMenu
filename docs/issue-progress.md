@@ -1145,3 +1145,31 @@ tags: [issues, ui, cocoapods, progress]
   only beside it). Mapped to AndroidTagView in `api-map.json`. Tests: `testWrappingTitleElevationAndCrossImage`,
   `testTagContainerSample` (the wrapped tag taller, inside the container, the shadow, crosses). Screenshot:
   [ios-sixth-container.png](assets/ios-sixth-container.png). The open items are closed: **100 / 100**.
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): editing mode, tag list cache and the sixth container's options on Android, HarmonyOS and the mini program
+
+- **Requests (relayed by the Mac ClassifyMenu session, session-roles rule):** (1) port iOS `d6a94ce9` (CYLSearchViewController
+  session): `CYLTagListView` editing mode (`isEditing`, `setEditing(_:animated:)`, `menuSectionAllowsEditing`,
+  `menu(_:didChangeEditing:)`, `CYLTagListAddItemView`) and the tag list cache (`CYLTagListCachePolicy`, `CYLTagListCache`,
+  `CYLTagListStore`, `cachePolicy`, `cacheName`, …) to the Android core first, map it, then HarmonyOS and the mini
+  program (`docs/android-api.md` was 796 / 834); (2) iOS `00760142`'s tag options `CYLMenuStyle.titleWraps`, `elevation`,
+  `deleteIndicatorImage` (Android has `tag_text_wrap`, `tag_elevation`, `setCrossDrawable`) on HarmonyOS and the mini
+  program, and their Container samples' sixth container. Known pitfall (iOS): the cross image keeps the line height and
+  takes the padding only beside it, or it vanishes on a one-line tag.
+- **Acceptance (100):** Android core and maps (40); HarmonyOS (25); mini program (25); the sixth-container options on
+  HarmonyOS and the mini program (10). Pass: 60.
+- **Android (done, 40 / 40):** `CYLTagListView.isEditing`, `setEditing(editing, animated)`, `sectionAllowsEditing`,
+  `showsAddItemViewWhileEditing`, `addItemView` (`CYLTagListAddItemView`: an `EditText` and a `Button`, `submitHandler`,
+  `preferredHeight`, `name`, `submit()`, the field and button identifiers as their tags; it sits below the last section
+  inside the scrolling content and adds to `contentHeight`), `cachePolicy` / `cacheName` / `cache`,
+  `cachedTitlesInSection`, `cacheKeyForSection`, `saveEditableSectionsToCache`; `CYLMenuDataSource.menuSectionAllowsEditing`,
+  `menuCacheKeyForSection`; `CYLMenuDelegate.menuDidChangeEditing`; `CYLTagListCache`, `CYLTagListStore` (SQLite,
+  `SharedPreferences` for `NSUserDefaults`, a JSON file in `filesDir`; Android needs a `Context`), with iOS's rules:
+  editing shows delete indicators on editable sections, drags them, a tap reports without selecting, folding is off,
+  and the list saves after a drag, a delete or an added tag. Android-only, for parity of iOS's optional-method checks:
+  `CYLMenuDataSource.decidesDeletableItems()` (the `respondsToSelector:` of `menuItemIsDeletable`, true for the built-in
+  data sources) and `CYLTagListView.canMoveItemAtIndexPath` / `moveItemAtIndexPath` (iOS's public
+  `UICollectionViewDataSource` methods). Core strings `CYLMenuAddTag`, `CYLMenuAddTagPlaceholder`, `CYLMenuTagAdded` copied
+  from iOS. New Robolectric `CYLTagListEditingTest` (5, one for one with iOS `CYLTagListEditingTests`); library 92 / 0,
+  the example builds. `docs/android-api.md` 834 / 834, `docs/android-ios-api.md` 772 / 772.
+- **TODO:** HarmonyOS and the mini program (editing mode and cache); the three sixth-container options there.

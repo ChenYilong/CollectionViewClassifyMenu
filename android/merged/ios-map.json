@@ -72,5 +72,8 @@
  "CYLTagBadgeDefaultColor": "`UIColor.systemRed` (the default `CYLTagButton.badgeColor`)",
  "CYLIndexPathButton.gravity": "`CYLMenuStyle.contentAlignment` (the style of a `CYLTagButton`)",
  "CYLMultipleFilterHeaderView.imageView": "`titleButton.imageView` (`CYLTagButton.imageView`)",
- "CYLMultipleFilterHeaderView.titleLabel": "`titleButton.titleLabel` (`CYLTagButton.titleLabel`)"
+ "CYLMultipleFilterHeaderView.titleLabel": "`titleButton.titleLabel` (`CYLTagButton.titleLabel`)",
+ "CYLMenuDataSource.decidesDeletableItems": "respondsToSelector: of -menuItemIsDeletableAtIndexPath: (CYLTagListView's editing mode)",
+ "CYLTagListView.canMoveItemAtIndexPath": "CYLTagListView -collectionView:canMoveItemAtIndexPath: (UICollectionViewDataSource)",
+ "CYLTagListView.moveItemAtIndexPath": "CYLTagListView -collectionView:moveItemAtIndexPath:toIndexPath: (UICollectionViewDataSource)"
 }

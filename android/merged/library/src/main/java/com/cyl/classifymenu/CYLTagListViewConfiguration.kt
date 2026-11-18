@@ -617,6 +617,7 @@ private class CYLTagListConfigurationSource(
     override fun menuItemIsEnabledAtIndexPath(indexPath: CYLIndexPath): Boolean = bool(item(indexPath)[CYLTagItemEnabled]) ?: true
     override fun menuItemIsExclusiveAtIndexPath(indexPath: CYLIndexPath): Boolean = bool(item(indexPath)[CYLTagItemExclusive]) == true
     override fun menuItemIsDeletableAtIndexPath(indexPath: CYLIndexPath): Boolean = bool(item(indexPath)[CYLTagItemDeletable]) == true
+    override fun decidesDeletableItems(): Boolean = true
 
     override fun menuRemoveItemAtIndexPath(indexPath: CYLIndexPath) {
         if (indexPath.section !in sections.indices) return

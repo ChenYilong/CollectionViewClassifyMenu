@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 796 / 834 with an Android counterpart = 95.4 / 100.** Full marks when no row is `TODO`; 0
+**Score: 834 / 834 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -271,8 +271,8 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuDataSource -menuItemIsDeletableAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuItemIsDeletableAtIndexPath` |
 | `CYLMenuDataSource -menuRemoveItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuRemoveItemAtIndexPath` |
 | `CYLMenuDataSource -menuMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuMoveItemAtIndexPath` |
-| `CYLMenuDataSource -menuSectionAllowsEditing:` | method, `CYLMenuDataSource.swift` | TODO |
-| `CYLMenuDataSource -menuCacheKeyForSection:` | method, `CYLMenuDataSource.swift` | TODO |
+| `CYLMenuDataSource -menuSectionAllowsEditing:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuSectionAllowsEditing` |
+| `CYLMenuDataSource -menuCacheKeyForSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuCacheKeyForSection` |
 | `CYLMenuDelegate` | protocol, `CYLMenuDataSource.swift` | `com.cyl.classifymenu.CYLMenuDelegate` |
 | `CYLMenuDelegate -menu:shouldSelectItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuShouldSelectItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didSelectItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidSelectItemAtIndexPath(menu, indexPath)` |
@@ -284,7 +284,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuDelegate -menu:didChangeContentHeight:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidChangeContentHeight(menu, height)` |
 | `CYLMenuDelegate -menu:didTapMoreButtonInSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidTapMoreButtonInSection(menu, section)` |
 | `CYLMenuDelegate -menu:didDeleteItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidDeleteItemAtIndexPath(menu, indexPath)` |
-| `CYLMenuDelegate -menu:didChangeEditing:` | method, `CYLMenuDataSource.swift` | TODO |
+| `CYLMenuDelegate -menu:didChangeEditing:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidChangeEditing(menu, editing)` |
 | `CYLMenuDelegate -menu:didLongPressItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidLongPressItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidMoveItemAtIndexPath(menu, sourceIndexPath, toIndexPath)` |
 | `CYLMenuDelegate -menu:didBeginDraggingSelectedItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath(menu, indexPath)` |
@@ -548,30 +548,30 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListAccessibilityIdentifier.createItem` | property, `CYLTagListAccessibility.swift` | `CYLTagCreateItemAccessibilityIdentifier` |
 | `CYLTagListAccessibilityIdentifier.moreButton` | property, `CYLTagListAccessibility.swift` | `CYLTagListMoreButtonAccessibilityIdentifier` |
 | `CYLTagListAccessibilityIdentifier.deleteButton` | property, `CYLTagListAccessibility.swift` | `CYLTagListDeleteAccessibilityIdentifier` |
-| `CYLTagListAddItemView` | class, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView.textField` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView.addButton` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView.submitHandler` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView.preferredHeight` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView.textFieldIdentifier` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView.addButtonIdentifier` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView.name` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView -submit` | method, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListCachePolicy` | enum, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCachePolicyNone` | enum value, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCachePolicyDatabase` | enum value, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCachePolicyUserDefaults` | enum value, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCachePolicySandboxFile` | enum value, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCache` | protocol, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCache -cachedTitlesForSection:` | method, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCache -saveTitles:forSection:` | method, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCache -removeTitlesForSection:` | method, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCache -removeAllTitles` | method, `CYLTagListCache.swift` | TODO |
-| `CYLTagListStore` | class, `CYLTagListCache.swift` | TODO |
-| `CYLTagListStore.policy` | property, `CYLTagListCache.swift` | TODO |
-| `CYLTagListStore.name` | property, `CYLTagListCache.swift` | TODO |
-| `CYLTagListStore +cacheWithPolicy:name:` | method, `CYLTagListCache.swift` | TODO |
-| `CYLTagListStore -initWithPolicy:name:` | method, `CYLTagListCache.swift` | TODO |
+| `CYLTagListAddItemView` | class, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView (a LinearLayout)` |
+| `CYLTagListAddItemView.textField` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.textField (EditText)` |
+| `CYLTagListAddItemView.addButton` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.addButton (Button)` |
+| `CYLTagListAddItemView.submitHandler` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.submitHandler` |
+| `CYLTagListAddItemView.preferredHeight` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.preferredHeight (px)` |
+| `CYLTagListAddItemView.textFieldIdentifier` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.textFieldIdentifier (the field's tag)` |
+| `CYLTagListAddItemView.addButtonIdentifier` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.addButtonIdentifier (the button's tag)` |
+| `CYLTagListAddItemView.name` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.name` |
+| `CYLTagListAddItemView -submit` | method, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.submit` |
+| `CYLTagListCachePolicy` | enum, `CYLTagListCache.swift` | `CYLTagListCachePolicy` |
+| `CYLTagListCachePolicyNone` | enum value, `CYLTagListCache.swift` | `CYLTagListCachePolicy.CYLTagListCachePolicyNone` |
+| `CYLTagListCachePolicyDatabase` | enum value, `CYLTagListCache.swift` | `CYLTagListCachePolicy.CYLTagListCachePolicyDatabase (SQLite)` |
+| `CYLTagListCachePolicyUserDefaults` | enum value, `CYLTagListCache.swift` | `CYLTagListCachePolicy.CYLTagListCachePolicyUserDefaults (SharedPreferences)` |
+| `CYLTagListCachePolicySandboxFile` | enum value, `CYLTagListCache.swift` | `CYLTagListCachePolicy.CYLTagListCachePolicySandboxFile (a JSON file in filesDir)` |
+| `CYLTagListCache` | protocol, `CYLTagListCache.swift` | `CYLTagListCache (interface)` |
+| `CYLTagListCache -cachedTitlesForSection:` | method, `CYLTagListCache.swift` | `CYLTagListCache.cachedTitlesForSection` |
+| `CYLTagListCache -saveTitles:forSection:` | method, `CYLTagListCache.swift` | `CYLTagListCache.saveTitles` |
+| `CYLTagListCache -removeTitlesForSection:` | method, `CYLTagListCache.swift` | `CYLTagListCache.removeTitlesForSection` |
+| `CYLTagListCache -removeAllTitles` | method, `CYLTagListCache.swift` | `CYLTagListCache.removeAllTitles` |
+| `CYLTagListStore` | class, `CYLTagListCache.swift` | `CYLTagListStore` |
+| `CYLTagListStore.policy` | property, `CYLTagListCache.swift` | `CYLTagListStore.policy` |
+| `CYLTagListStore.name` | property, `CYLTagListCache.swift` | `CYLTagListStore.name` |
+| `CYLTagListStore +cacheWithPolicy:name:` | method, `CYLTagListCache.swift` | `CYLTagListStore.cacheWithPolicy(context, policy, name)` |
+| `CYLTagListStore -initWithPolicy:name:` | method, `CYLTagListCache.swift` | `CYLTagListStore(context, policy, name)` |
 | `CYLTagListCell` | class, `CYLTagListCell.swift` | `com.cyl.classifymenu.CYLTagListCell` |
 | `CYLTagListCell.button` | property, `CYLTagListCell.swift` | `CYLTagListCell.button` |
 | `CYLTagListCell.appliedStyle` | property, `CYLTagListCell.swift` | `CYLTagListCell.appliedStyle` |
@@ -749,17 +749,17 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView.isReordering` | property, `CYLTagListView.swift` | `CYLTagListView.reordering` |
 | `CYLTagListView.tagMoveHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagMoveHandler` |
 | `CYLTagListView.selectedTagDragHandler` | property, `CYLTagListView.swift` | `CYLTagListView.selectedTagDragHandler` |
-| `CYLTagListView.isEditing` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.showsAddItemViewWhileEditing` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.addItemView` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.cachePolicy` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.cacheName` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.cache` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -cachedTitlesInSection:` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -cacheKeyForSection:` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -saveEditableSectionsToCache` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -setEditing:animated:` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -sectionAllowsEditing:` | method, `CYLTagListView.swift` | TODO |
+| `CYLTagListView.isEditing` | property, `CYLTagListView.swift` | `CYLTagListView.isEditing` |
+| `CYLTagListView.showsAddItemViewWhileEditing` | property, `CYLTagListView.swift` | `CYLTagListView.showsAddItemViewWhileEditing` |
+| `CYLTagListView.addItemView` | property, `CYLTagListView.swift` | `CYLTagListView.addItemView` |
+| `CYLTagListView.cachePolicy` | property, `CYLTagListView.swift` | `CYLTagListView.cachePolicy` |
+| `CYLTagListView.cacheName` | property, `CYLTagListView.swift` | `CYLTagListView.cacheName` |
+| `CYLTagListView.cache` | property, `CYLTagListView.swift` | `CYLTagListView.cache` |
+| `CYLTagListView -cachedTitlesInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.cachedTitlesInSection` |
+| `CYLTagListView -cacheKeyForSection:` | method, `CYLTagListView.swift` | `CYLTagListView.cacheKeyForSection` |
+| `CYLTagListView -saveEditableSectionsToCache` | method, `CYLTagListView.swift` | `CYLTagListView.saveEditableSectionsToCache` |
+| `CYLTagListView -setEditing:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.setEditing(editing, animated)` |
+| `CYLTagListView -sectionAllowsEditing:` | method, `CYLTagListView.swift` | `CYLTagListView.sectionAllowsEditing` |
 | `CYLTagListView -initWithFoldControl:` | method, `CYLTagListView.swift` | `CYLTagListView(context, foldControl)` |
 | `CYLTagListView -initWithFoldPosition:content:` | method, `CYLTagListView.swift` | `CYLTagListView.tagListViewWithFoldPosition` |
 | `CYLTagListView -reloadMenuData` | method, `CYLTagListView.swift` | `CYLTagListView.reloadMenuData` |

@@ -40,6 +40,24 @@ interface CYLMenuDataSource {
 
     /** Whether `menuMoveItemAtIndexPath` is implemented (`respondsToSelector:` on iOS). */
     fun supportsMovingItems(): Boolean = false
+
+    /**
+     * Whether `menuItemIsDeletableAtIndexPath` is implemented (`respondsToSelector:` on iOS). In `CYLTagListView`'s
+     * editing mode every item of an editable section is deletable unless the data source decides (then its answer).
+     */
+    fun decidesDeletableItems(): Boolean = false
+
+    /**
+     * `menuSectionAllowsEditing:`: whether a section takes part in `CYLTagListView`'s editing mode (delete indicators,
+     * reordering); true by default.
+     */
+    fun menuSectionAllowsEditing(section: Int): Boolean = true
+
+    /**
+     * `menuCacheKeyForSection:`: the key `CYLTagListView` saves a section's titles under in its cache (`cachePolicy`),
+     * stable when sections come and go (e.g. "mine"); null (the default) uses the section's index.
+     */
+    fun menuCacheKeyForSection(section: Int): String? = null
 }
 
 /**
@@ -60,6 +78,9 @@ interface CYLMenuDelegate {
     fun menuDidLongPressItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {}
     fun menuDidMoveItemAtIndexPath(menu: Any, sourceIndexPath: CYLIndexPath, toIndexPath: CYLIndexPath) {}
     fun menuDidBeginDraggingSelectedItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {}
+
+    /** `menu:didChangeEditing:`: `CYLTagListView` entered (true) or left (false) editing mode (`setEditing`). */
+    fun menuDidChangeEditing(menu: Any, editing: Boolean) {}
 
     /** Whether the long press is handled (`respondsToSelector:` of `menu:didLongPressItemAtIndexPath:`). */
     fun handlesLongPress(): Boolean = false

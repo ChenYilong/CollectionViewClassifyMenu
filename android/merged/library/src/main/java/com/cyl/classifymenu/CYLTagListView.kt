@@ -302,6 +302,115 @@ open class CYLTagListView @JvmOverloads constructor(
         return CYLRect(x, TITLE_VERTICAL_INSET, contentWidth, height - 2 * TITLE_VERTICAL_INSET)
     }
 
+    // MARK: Editing
+
+    /**
+     * `isEditing`: whether the list is in editing mode (`setEditing`). While editing, the items of the editable sections
+     * (`menuSectionAllowsEditing`, every section by default) show the delete indicator and can be dragged to reorder; a
+     * tap no longer selects an item but still calls `menuDidSelectItemAtIndexPath`, so the host can open the item;
+     * folded sections show every item; and `addItemView` appears below the last section. False by default.
+     */
+    var isEditing: Boolean = false
+        private set
+
+    /** `showsAddItemViewWhileEditing`: shows `addItemView` below the last section while editing. True by default. */
+    var showsAddItemViewWhileEditing: Boolean = true
+        set(value) {
+            field = value
+            if (isEditing) invalidateMeasurements()
+        }
+
+    /**
+     * `addItemView`: the "add tag" control shown while editing, a text field and an Add button. A submitted name is
+     * reported through `menuDidRequestNewItemWithName` with the index path after the last item of the first editable
+     * section.
+     */
+    val addItemView: CYLTagListAddItemView by lazy {
+        CYLTagListAddItemView(context).apply { submitHandler = { name -> requestNewItem(name) } }
+    }
+
+    /**
+     * `cachePolicy`: where the list saves its editable sections after an edit (a drag, a delete or an added tag in
+     * editing mode), so the order survives a relaunch: none (the default), a SQLite database, `SharedPreferences` or a
+     * file. The host restores it when it builds its data (`cachedTitlesInSection`). Setting it makes `cache` the
+     * built-in store of the policy and `cacheName`.
+     */
+    var cachePolicy: CYLTagListCachePolicy = CYLTagListCachePolicy.CYLTagListCachePolicyNone
+        set(value) {
+            field = value
+            cache = CYLTagListStore.cacheWithPolicy(context, value, cacheName)
+        }
+
+    /** `cacheName`: separates the caches of different lists ("CYLTagListView" by default); set it before `cachePolicy`. */
+    var cacheName: String = "CYLTagListView"
+        set(value) {
+            field = value
+            cache = CYLTagListStore.cacheWithPolicy(context, cachePolicy, value)
+        }
+
+    /** `cache`: the store the list saves to, the built-in store of `cachePolicy` or one of yours; null: no cache. */
+    var cache: CYLTagListCache? = null
+
+    /** `-cachedTitlesInSection:`: the titles saved for `section`, in order; null when nothing was saved or no cache. */
+    fun cachedTitlesInSection(section: Int): List<String>? = cache?.cachedTitlesForSection(cacheKeyForSection(section))
+
+    /** `-cacheKeyForSection:`: the data source's `menuCacheKeyForSection`, else the section's index. */
+    fun cacheKeyForSection(section: Int): String = menuDataSource?.menuCacheKeyForSection(section) ?: section.toString()
+
+    /** `-saveEditableSectionsToCache`: saves the current titles of every editable section to `cache` (after each edit). */
+    fun saveEditableSectionsToCache() {
+        val cache = cache ?: return
+        val source = menuDataSource ?: return
+        for (section in 0 until source.numberOfSectionsInMenu()) {
+            if (!sectionAllowsEditing(section)) continue
+            val titles = (0 until source.menuNumberOfItemsInSection(section)).mapNotNull { item ->
+                val indexPath = CYLIndexPath(item, section)
+                if (source.menuItemTypeAtIndexPath(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) null
+                else source.menuTitleForItemAtIndexPath(indexPath)
+            }
+            cache.saveTitles(titles, cacheKeyForSection(section))
+        }
+    }
+
+    /**
+     * `-setEditing:animated:`: enters or leaves editing mode; the delete indicators, reordering, the selection rules,
+     * folding and `addItemView` change together; then `menuDidChangeEditing` is called. The list itself does not move
+     * or open anything.
+     */
+    fun setEditing(editing: Boolean, animated: Boolean) {
+        if (editing == isEditing) return
+        isEditing = editing
+        if (!editing) {
+            addItemView.textField.clearFocus()
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager)
+                ?.hideSoftInputFromWindow(addItemView.textField.windowToken, 0)
+        }
+        invalidateMeasurements()
+        if (animated && isAttachedToWindow) {
+            content.alpha = 0f
+            content.animate().alpha(1f).setDuration(250).start()
+        }
+        menuDelegate?.menuDidChangeEditing(this, editing)
+    }
+
+    /** `-sectionAllowsEditing:`: the data source's `menuSectionAllowsEditing`, else true. */
+    fun sectionAllowsEditing(section: Int): Boolean = menuDataSource?.menuSectionAllowsEditing(section) ?: true
+
+    /** Whether `addItemView` is shown (editing, and `showsAddItemViewWhileEditing`). */
+    private fun showsAddItemView(): Boolean = isEditing && showsAddItemViewWhileEditing
+
+    /** The height `addItemView` takes below the sections, dp (with the bottom section inset), or 0. */
+    private fun addItemViewHeight(): Float =
+        if (showsAddItemView()) addItemView.preferredHeight / density + listStyle.sectionInsets.bottom else 0f
+
+    /** A name submitted in `addItemView`: reported at the end of the first editable section. */
+    private fun requestNewItem(name: String) {
+        val section = titles.indices.firstOrNull { sectionAllowsEditing(it) } ?: 0
+        val item = titles.getOrNull(section)?.size ?: 0
+        menuDelegate?.menuDidRequestNewItemWithName(this, name, CYLIndexPath(item, section))
+        saveEditableSectionsToCache()
+    }
+
     // MARK: Data
 
     /** `-reloadMenuData`: reads the data source again and lays the list out. */
@@ -326,8 +435,15 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun isEnabledAt(indexPath: CYLIndexPath): Boolean = menuDataSource?.menuItemIsEnabledAtIndexPath(indexPath) ?: true
 
-    private fun isDeletableAt(indexPath: CYLIndexPath): Boolean =
-        itemTypeAt(indexPath) != CYLMenuItemType.CYLMenuItemTypeCreate && menuDataSource?.menuItemIsDeletableAtIndexPath(indexPath) == true
+    private fun isDeletableAt(indexPath: CYLIndexPath): Boolean {
+        if (itemTypeAt(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) return false
+        val source = menuDataSource
+        if (isEditing && sectionAllowsEditing(indexPath.section)) {
+            // Editing: every item of an editable section, unless the data source decides.
+            return source == null || !source.decidesDeletableItems() || source.menuItemIsDeletableAtIndexPath(indexPath)
+        }
+        return source?.menuItemIsDeletableAtIndexPath(indexPath) == true
+    }
 
     private fun isExclusiveAt(indexPath: CYLIndexPath): Boolean = menuDataSource?.menuItemIsExclusiveAtIndexPath(indexPath) == true
 
@@ -355,7 +471,8 @@ open class CYLTagListView @JvmOverloads constructor(
     }
 
     private fun isSelectableAt(indexPath: CYLIndexPath): Boolean {
-        if (itemTypeAt(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) return false
+        // Editing: a tap reports the item (`menuDidSelectItemAtIndexPath`) without changing the selection.
+        if (isEditing || itemTypeAt(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) return false
         return menuDataSource?.menuItemIsSelectableAtIndexPath(indexPath) ?: true
     }
 
@@ -513,6 +630,7 @@ open class CYLTagListView @JvmOverloads constructor(
             height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
             if (foldable && foldIsInFooter()) height += footerHeight()
         }
+        height += addItemViewHeight()
         return ceil(height) + titleHeight()
     }
 
@@ -672,6 +790,7 @@ open class CYLTagListView @JvmOverloads constructor(
             reloadMenuData()
         }
         menuDelegate?.menuDidDeleteItemAtIndexPath(this, indexPath)
+        if (isEditing) saveEditableSectionsToCache()
         if (tag != null) tagDeleteHandler?.invoke(indexPath.item, tag)
     }
 
@@ -796,7 +915,23 @@ open class CYLTagListView @JvmOverloads constructor(
     var tagMoveHandler: ((fromIndex: Int, toIndex: Int) -> Unit)? = null
     var selectedTagDragHandler: ((index: Int, tag: CYLTag) -> Unit)? = null
 
-    private fun canReorder(): Boolean = allowsReordering && menuDataSource?.supportsMovingItems() == true
+    private fun canReorder(): Boolean = (allowsReordering || isEditing) && menuDataSource?.supportsMovingItems() == true
+
+    /**
+     * `collectionView(_:canMoveItemAt:)`: whether an item can be dragged, while reordering (`allowsReordering`) or
+     * editing (an editable section), and never the "+ New tag" item.
+     */
+    fun canMoveItemAtIndexPath(indexPath: CYLIndexPath): Boolean = canMoveItemAt(indexPath)
+
+    /**
+     * `collectionView(_:moveItemAt:to:)`: moves an item as a drag does (the data source moves it, the delegate is told,
+     * the list saves its editable sections when it has a cache).
+     */
+    fun moveItemAtIndexPath(sourceIndexPath: CYLIndexPath, toIndexPath: CYLIndexPath) = moveItem(sourceIndexPath, toIndexPath)
+
+    private fun canMoveItemAt(indexPath: CYLIndexPath): Boolean =
+        canReorder() && isValid(indexPath) && (allowsReordering || sectionAllowsEditing(indexPath.section)) &&
+            itemTypeAt(indexPath) != CYLMenuItemType.CYLMenuItemTypeCreate
 
     private fun reportLongPress(indexPath: CYLIndexPath) {
         menuDelegate?.menuDidLongPressItemAtIndexPath(this, indexPath)
@@ -828,13 +963,15 @@ open class CYLTagListView @JvmOverloads constructor(
             CYLIndexPath(item, indexPath.section)
         }
         menuDelegate?.menuDidMoveItemAtIndexPath(this, source, destination)
+        // The new order survives a relaunch when the list has a cache.
+        saveEditableSectionsToCache()
         if (menuDataSource === _tagDataSource) tagMoveHandler?.invoke(from, to)
         post { reloadMenuData() }
     }
 
     private fun accessibilityMove(indexPath: CYLIndexPath, offset: Int): Boolean {
         val target = indexPath.item + offset
-        if (!canReorder() || target < 0 || target >= numberOfVisibleItemsInSection(indexPath.section)) return false
+        if (!canMoveItemAt(indexPath) || target < 0 || target >= numberOfVisibleItemsInSection(indexPath.section)) return false
         val destination = CYLIndexPath(target, indexPath.section)
         if (indexPath in selection) reportSelectedDrag(indexPath)
         moveItem(indexPath, destination)
@@ -848,7 +985,7 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun accessibilityActions(indexPath: CYLIndexPath): List<CYLAccessibilityAction> {
         val actions = ArrayList<CYLAccessibilityAction>()
-        if (canReorder() && isValid(indexPath)) {
+        if (canMoveItemAt(indexPath)) {
             val count = numberOfVisibleItemsInSection(indexPath.section)
             if (indexPath.item > 0) actions.add(CYLAccessibilityAction(CYLMenuLocalizedString("CYLMenuMoveTagEarlier", "Moves a tag one place earlier")) { accessibilityMove(indexPath, -1) })
             if (indexPath.item + 1 < count) actions.add(CYLAccessibilityAction(CYLMenuLocalizedString("CYLMenuMoveTagLater", "Moves a tag one place later")) { accessibilityMove(indexPath, 1) })
@@ -989,6 +1126,8 @@ open class CYLTagListView @JvmOverloads constructor(
     // MARK: Folding
 
     private fun canFoldRowCount(rowCount: Int): Boolean {
+        // Editing shows every item, so each one can be deleted or dragged.
+        if (isEditing) return false
         val folds = _foldStyle == CYLMenuFoldStyle.CYLMenuFoldStyleTruncate || _foldControl.position != CYLMenuFoldControlPosition.NONE
         return folds && defaultVisibleRows > 0 && rowCount > defaultVisibleRows
     }
@@ -1169,6 +1308,10 @@ open class CYLTagListView @JvmOverloads constructor(
                 }
                 if (foldIsInFooter() && canFoldSection(section)) footers[section] = FooterView(context, section).also { addView(it) }
             }
+            if (showsAddItemView()) {
+                (addItemView.parent as? ViewGroup)?.removeView(addItemView)
+                addView(addItemView)
+            }
             computeFrames()
             if (animated) {
                 alpha = 0.6f
@@ -1218,6 +1361,12 @@ open class CYLTagListView @JvmOverloads constructor(
                     y += footerHeight()
                 }
             }
+            if (showsAddItemView() && addItemView.parent === this) {
+                // Right below the sections, inside the content (it scrolls with the items), as iOS.
+                val height = addItemView.preferredHeight / density
+                frames[addItemView] = CYLRect(insets.left, y, max(0f, width - insets.left - insets.right), height)
+                y += height + insets.bottom
+            }
             totalHeight = ceil(y)
         }
 
@@ -1247,7 +1396,7 @@ open class CYLTagListView @JvmOverloads constructor(
                 }
 
                 override fun onLongPress(e: MotionEvent) {
-                    if (canReorder()) {
+                    if (canMoveItemAt(indexPath)) {
                         reordering = true
                         dragCell = cell
                         dragIndexPath = indexPath
