@@ -29,9 +29,9 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 
 - TODO: run the animation screen on a real HarmonyOS device (GPU renderer).
 - Done (decided "加上 Rive"): the Flutter and React Native iOS / Android examples link Rive (`13bcb84`).
-- TODO need 模拟器截图验证: run the Rive row of the Flutter and React Native examples on the iOS simulator (a Mac) and the Android emulator; screenshots in `docs/assets`. This Windows machine has no Mac, no adb and no Android emulator.
+- Done (2026-11-19): the Rive row of the Flutter and React Native examples draws, plays and loops on the iOS simulator (Mac session) and the Android emulator (Windows session); screenshots and details in "Rive checks on simulators" below.
 
-## TODO (2026-11-16, `feat/harmony`): link Rive in the Flutter and React Native iOS / Android examples
+## DONE (2026-11-16, checked 2026-11-19, `feat/harmony`): link Rive in the Flutter and React Native iOS / Android examples
 
 - Prompt (verbatim): "加上 Rive" (answer to: link Rive in Flutter and React Native on iOS and Android so `.riv` tags animate there too).
 - Requirements: (1) iOS: `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile` and `react-native/react-native-cyl-tag-list/example/ios/Podfile`; (2) Android: `app.rive:rive-android:10.3.0` in both example apps; (3) a Rive section of `.riv` tags (from `harmony/entry/src/main/resources/rawfile/rive`, with `LICENSE-rive-ios.txt`) in `flutter/cyl_tag_list/example/lib/main.dart` and `react-native/react-native-cyl-tag-list/example/src/TagListPage.tsx`; (4) run on the iOS simulator and the Android emulator, screenshots in `docs/assets`; (5) update the table above.
@@ -58,7 +58,7 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 - Still TODO upstream (CYLTabBarController, recorded in its `docs/WeChat-Mini-Program.md`): looping and replaying Rive
   icons (no state machine restart, triggers never loop, a held input cannot replay).
 
-## TODO (2026-11-18, `feat/harmony`): Rive checks on simulators (configuration file Home, React Native, Flutter)
+## DONE (2026-11-19, `feat/harmony`): Rive checks on simulators (configuration file Home, React Native, Flutter)
 
 - **Prompt (verbatim)**: "continue Rive"
 - **Prompt (English)**: continue the paused Rive simulator checks.
