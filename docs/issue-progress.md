@@ -63,10 +63,14 @@ tags: [issues, ui, cocoapods, progress]
   `isOpen` off on each pass, house Rooms stepping).
 - Acceptance criteria: 100 = pins at the newest commit (10), Shapes and Truck still at launch (30), Play all moves the Rive
   tags (25), loop: Menu `isOpen` and house Rooms (25), tests and evidence (10). Pass: 60.
-- Result: **95/100**. Pins at `dcbfdec6`; at `dcbfdec6` alone Shapes still ran (the tag list autoplayed once on load), so
+- Result: **100/100** (was 95). Pins at `dcbfdec6`; at `dcbfdec6` alone Shapes still ran (the tag list autoplayed once on load), so
   the library now defaults tags to `autoplay: false`; then everything passes (numbers in
   `animated-item-migration.md`). -5: Button's motion (a white bar) is too faint for the pixel check; its animation time
-  goes 0 -> 1 s on Play all.
+  goes 0 -> 1 s on Play all. Closed later the same day (`d8f47b4d`): Button's own 84 x 84 px canvas, read with
+  `toDataURL` during Play all, changes 142 / 466 / 156 / 74 / 97 of 7056 pixels between frames 0.1-0.2 s apart. The
+  last frame pair (1.0 -> 1.0 s, the end of the pass) changes 0 pixels, and so do simulator screenshots at rest
+  (`docs/assets/miniprogram-devtools-rive-button-canvas-frames.png`). The simulator screenshot is 324 px wide, where
+  the 20 px icon is too small: 2-4 changed pixels.
 
 ### Done (2026-11-18, `feat/harmony`): mini program cyl-tag-button warnings and GIF options (migration row 19)
 
