@@ -445,3 +445,16 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   package (`Package.resolved` revision `0505042f`) builds for the iOS Simulator. Tests on iPhone 17 Pro `62B54974`
   (iOS 27.2, Xcode 27.2, macOS 27.3): menu 32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. Android and the mini
   program pins belong to the Windows session (still `d8f47b4d` until it moves them).
+
+## TODO (2026-11-18, `feat/harmony`): iOS pins from 0505042f to CYLTabBarController 918da089; Rive Home options
+
+- **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
+  pins are at CYLTabBarController 918da089d7f6991a24b1fcbc40c150c7a503d4b5 (cvcm-b 115b270, pushed), the newest commit on
+  feat/cross-platform-components. Please move the iOS pins there so every platform matches. The Android example's Rive
+  Home also passes numberInput=Rooms now. If iOS Home barely moves either, check that the iOS example passes the same
+  options."
+- **Plan**: `918da089` is the newest commit on every branch; on iOS it adds the `tint` option for every library
+  (`CYLTabBarItemAnimationEngine.m`) and an SVGA animator change. Move the eight pin files, `pod install` x 4, build the
+  Swift package, run the four suites. The Animations screen already passes `numberInput: Rooms`, `values: 3,4,5,6`
+  (`CYLTagAnimationDemoViewController.swift:101`); the configuration file demo (`animated-tags.json`) passes only the
+  state machine, so its Home barely moves: add the same two options there.
