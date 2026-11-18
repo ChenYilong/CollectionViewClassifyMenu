@@ -338,3 +338,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   1 s toggle aliasing with the captures, so it loops; the Android-only stop is fixed by `f84c1073`).
 
   ![iOS Rive icons rest until played, then loop, at CYLTabBarController 70064275](assets/ios-rive-rest-play-70064275.png)
+
+## TODO (2026-11-18, `feat/harmony`): re-check pins (second time)
+
+- **Prompt (verbatim)**: "re-check pins"
+- **English**: move the pins to CYLTabBarController's newest commit and re-test.
+- **Plan**: newest is `a8156b92` (feat/cross-platform-components, 12:56 NZDT; `scripts/cyl-tabbar-latest-commit.sh`
+  hung on its fetch, so `git ls-remote` was used). Since `70064275`: `044fc2c9` (docs) and `a8156b92` (Flutter plugin
+  revert); no file under `CYLTabBarController/`, no Package.swift or podspec change, so the iOS results at `70064275`
+  hold. Move the iOS pins, pod install, ask the Windows session to move Android and the mini program.
