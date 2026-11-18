@@ -810,6 +810,9 @@ open class CYLTagListView: UIView {
      */
     @objc open private(set) var isReordering = false
 
+    /// While a tag is dragged: its section, its original item and the item it is shown at (`measuredIndexPath(for:)`).
+    private var movingItem: (section: Int, from: Int, to: Int)?
+
     /**
      * One of `tags` moved (after `menu(_:didMoveItemAt:to:)`).
      */
@@ -2285,6 +2288,7 @@ private extension CYLTagListView {
         default:
             if isReordering {
                 isReordering = false
+                movingItem = nil
                 collectionView.cancelInteractiveMovement()
             }
             pressedIndexPath = nil
@@ -2369,6 +2373,7 @@ extension CYLTagListView: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath,
                                to destinationIndexPath: IndexPath) {
         guard sourceIndexPath != destinationIndexPath, canReorder else {
+            movingItem = nil
             return
         }
         menuDataSource?.menuMoveItem?(at: sourceIndexPath, to: destinationIndexPath)
@@ -2395,8 +2400,29 @@ extension CYLTagListView: UICollectionViewDataSource {
         }
         // The collection view has moved the cell; the measurements follow on the next pass.
         DispatchQueue.main.async {
+            self.movingItem = nil
             self.reloadMenuData()
         }
+    }
+
+    /**
+     * The index path whose measurement belongs at `indexPath`. While a tag is dragged (and until the measurements follow
+     * the move), the collection view shows the items in the new order but the widths are still in the old one: without
+     * this, every slot kept the width of the tag that was there before and the moved titles were cut ("Kot…").
+     */
+    func measuredIndexPath(for indexPath: IndexPath) -> IndexPath {
+        guard let moving = movingItem, indexPath.section == moving.section, moving.from != moving.to else {
+            return indexPath
+        }
+        var item = indexPath.item
+        if item == moving.to {
+            item = moving.from
+        } else if moving.from < moving.to && item >= moving.from && item < moving.to {
+            item += 1
+        } else if moving.to < moving.from && item > moving.to && item <= moving.from {
+            item -= 1
+        }
+        return IndexPath(item: item, section: indexPath.section)
     }
 
     /**
@@ -2496,6 +2522,8 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
         } else {
             item = proposedIndexPath.section < originalIndexPath.section ? 0 : last
         }
+        // The layout now asks for the sizes in the order being shown (see `measuredIndexPath(for:)`).
+        movingItem = (originalIndexPath.section, originalIndexPath.item, item)
         return IndexPath(item: item, section: originalIndexPath.section)
     }
 
@@ -2505,6 +2533,7 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
         if isInlineFoldCell(at: indexPath) {
             return inlineFoldSize(inSection: indexPath.section, expanded: isSectionExpanded(indexPath.section))
         }
+        let indexPath = measuredIndexPath(for: indexPath)
         var width: CGFloat = 0
         if itemWidths.indices.contains(indexPath.section),
            itemWidths[indexPath.section].indices.contains(indexPath.item) {
