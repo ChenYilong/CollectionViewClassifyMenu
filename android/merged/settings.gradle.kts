@@ -15,6 +15,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // SVGAPlayer-Android (CYLTabBarController's SVGA animator) is published on JitPack only.
+        maven("https://jitpack.io") { content { includeGroup("com.github.yyued") } }
     }
     versionCatalogs {
         create("libs") {

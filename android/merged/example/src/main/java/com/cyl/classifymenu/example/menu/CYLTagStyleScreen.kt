@@ -75,7 +75,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "backgroundColor.normal" to "设置背景色 backgroundColor（normal）", "backgroundColor.selected" to "设置背景色 backgroundColor（selected）",
             "borderColor" to "设置边框颜色 borderColor", "borderWidth" to "设置边框宽度 borderWidth",
             "cornerRadius" to "设置圆角 cornerRadius（0 为胶囊）", "margin" to "设置内边距 margin",
-            "animation.lottie" to "Lottie 动效图标", "animation.pag" to "PAG 动效图标", "animation.rive" to "Rive 动效图标",
+            "animation.lottie" to "Lottie 动效图标", "animation.pag" to "PAG 动效图标", "animation.rive" to "Rive 动效图标", "animation.svga" to "SVGA 动效图标",
             "animation.gif" to "GIF 动效图标", "animation.off" to "关闭动效（静态图标）", "animationSpeed" to "设置动效速度 animationSpeed",
             "configuration" to "配置文件 / 字典（map）初始化", "tagCloud" to "标签云：android-tagview 的初始化方式",
             "sample.tagCloud" to "android-tagview 示例（Swift 版）", "sample.imageTag" to "TagViewGroup 示例：图片标签",
@@ -91,7 +91,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "imageTitleSpacing", "imageSize", "imageInsets", "titlePositionAdjustment", "imagePositionAdjustment",
             "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"),
         listOf("backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"),
-        listOf("animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"),
+        listOf("animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"),
         listOf("sample.tagCloud", "sample.imageTag", "sample.tagContainer"),
         listOf("reset"),
     )
@@ -180,7 +180,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "borderWidth" -> listOf(2f, 0f, 1f, 0.5f)[step % 4].let { width -> appearances.forEach { it.borderWidth = width } }
             "cornerRadius" -> listOf(0f, 8f, 3f)[step % 3].let { radius -> appearances.forEach { it.cornerRadius = radius } }
             "margin" -> listOf(18f, 4f, 10f)[step % 3].let { margin -> appearances.forEach { it.margin = margin } }
-            "animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off" -> {
+            "animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off" -> {
                 val library = identifier.removePrefix("animation.")
                 animationLibrary = if (library == "off") null else library
                 reloadItems()
@@ -263,6 +263,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "gif" to listOf("CYLMenuExample.bundle/Animations/GIF/tab_star.gif", "CYLMenuExample.bundle/Animations/GIF/cyl_tab_sample_animated.gif"),
             "pag" to listOf("pag-ios/0.pag", "pag-ios/1.pag"),
             "rive" to listOf("CYLMenuExample.bundle/Animations/Rive/house.riv", "CYLMenuExample.bundle/Animations/Rive/menu_button.riv"),
+            "svga" to listOf("CYLMenuExample.bundle/Animations/SVGA/tab_home.svga", "CYLMenuExample.bundle/Animations/SVGA/tab_profile.svga"),
         )
         val library = animationLibrary ?: return null
         val names = files[library] ?: return null

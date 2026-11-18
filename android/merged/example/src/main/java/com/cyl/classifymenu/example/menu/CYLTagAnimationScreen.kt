@@ -48,7 +48,7 @@ import com.cyl.classifymenu.tagListViewWithConfiguration
 /**
  * `CYLTagAnimationDemoViewController`: one tag list made from a configuration dictionary, a section per animation
  * library of CYLTagListView's engine (CYLTabBarController's): Lottie (plain, with image assets and placeholders, green),
- * PAG, Rive (several state machines, icons.riv on dark tags), GIF and static images; the first tag of every section is
+ * PAG, Rive (several state machines, icons.riv on dark tags), SVGA (tab icons, dark tags), GIF and static images; the first tag of every section is
  * selected. "Play all" plays the selected tags; the speed button cycles 1x, 2x, 0.5x.
  */
 class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMenuDelegate {
@@ -66,7 +66,7 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
         const val SPEED_MAX = 4f
         const val SPEED_STEP = 0.25f
 
-        fun sectionIdentifiers() = listOf("lottie", "lottie-images", "lottie-green", "pag", "rive", "rive-icons", "gif", "images")
+        fun sectionIdentifiers() = listOf("lottie", "lottie-images", "lottie-green", "pag", "rive", "rive-icons", "svga", "svga-dark", "gif", "images")
 
         private fun animation(path: String) = "CYLMenuExample.bundle/Animations/$path"
 
@@ -82,6 +82,9 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
         fun configuration(context: Context): Map<String, Any?> {
             fun section(title: String, items: List<Map<String, Any?>>, style: Map<String, Any?>? = null) =
                 mutableMapOf<String, Any?>(CYLTagSectionTitle to title, CYLTagSectionItems to items).apply { style?.let { put(CYLTagSectionStyle, it) } }
+            val darkTags = mapOf(
+                CYLMenuStyleNormal to mapOf(CYLTagAppearanceBackgroundColor to "#17203A", CYLTagAppearanceTextColor to "#FFFFFF", CYLTagAppearanceBorderColor to "#17203A"),
+                CYLMenuStyleSelected to mapOf(CYLTagAppearanceBackgroundColor to "#3A4E8C", CYLTagAppearanceTextColor to "#FFFFFF", CYLTagAppearanceBorderColor to "#6792FF"))
             val sections = listOf(
                 section("Lottie · pod 'CYLTabBarController/Lottie'", listOf(
                     item(context, "首页", animation("Lottie/tab_home_animate.json")), item(context, "消息", animation("Lottie/tab_message_animate.json")),
@@ -113,8 +116,16 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
                     rive(context, "计时", "icons", mapOf("artboard" to "TIMER", "stateMachine" to "TIMER_Interactivity", "input" to "active")),
                     rive(context, "提醒", "icons", mapOf("artboard" to "BELL", "stateMachine" to "BELL_Interactivity", "input" to "active")),
                     rive(context, "我的", "icons", mapOf("artboard" to "USER", "stateMachine" to "USER_Interactivity", "input" to "active"))),
-                    mapOf(CYLMenuStyleNormal to mapOf(CYLTagAppearanceBackgroundColor to "#17203A", CYLTagAppearanceTextColor to "#FFFFFF", CYLTagAppearanceBorderColor to "#17203A"),
-                        CYLMenuStyleSelected to mapOf(CYLTagAppearanceBackgroundColor to "#3A4E8C", CYLTagAppearanceTextColor to "#FFFFFF", CYLTagAppearanceBorderColor to "#6792FF"))),
+                    darkTags),
+                // SVGA, one for one with the two Rive sections (as on iOS): CYLTabBarController's SVGA tab icons, then the
+                // other files on the same dark tags as icons.riv. SVGA plays once at the file's own speed:
+                // CYLTabBarController's SVGA player has no speed, loops or progress (as Rive).
+                section("SVGA · pod 'CYLTabBarController/SVGA'", listOf(
+                    item(context, "首页", animation("SVGA/tab_home.svga")), item(context, "搜索", animation("SVGA/tab_search.svga")),
+                    item(context, "消息", animation("SVGA/tab_chat.svga")), item(context, "我的", animation("SVGA/tab_profile.svga")))),
+                section(CYLExampleLocalizedString(context, "SVGA · 深色标签"), listOf(
+                    item(context, "动态", animation("SVGA/tab_activity.svga")), item(context, "列表", animation("SVGA/tab_list.svga")),
+                    item(context, "首页", animation("SVGA/tab_home.svga"))), darkTags),
                 section("GIF · pod 'CYLTabBarController/GIF'", listOf(
                     item(context, "火焰", animation("GIF/tab_fire.gif")), item(context, "火箭", animation("GIF/tab_rocket.gif")),
                     item(context, "星星", animation("GIF/tab_star.gif")), item(context, "示例", animation("GIF/cyl_tab_sample_animated.gif")))),
