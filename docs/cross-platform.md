@@ -750,3 +750,15 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   folder, GIF decoding, Lottie's last frame on first load, the classify menu and filter panel layout. Known
   differences: Chinese texts only (no en / zh-Hant switch in the example yet), SF Symbol images have no
   HarmonyOS counterpart, Rive has no playback speed.
+
+## TODO (2026-11-19, `feat/harmony`): the Flutter example's Android tab bar from CYLTabBarController's Flutter plugin
+
+- **Context:** `flutter/cyl_tag_list/example/lib/main.dart` switches its two pages (动效图标, 菜单) with Material's
+  `NavigationBar`. CYLTabBarController ships a Flutter plugin, `CrossPlatform/flutter_cyltabbar` (widget `CYLTabBar`,
+  the native Android tab bar as a platform view), at the commit every platform pins, `b376c278`.
+- **Requirements:** on Android the example's tab bar is `CYLTabBar` from `flutter_cyltabbar` (pinned at the same
+  CYLTabBarController commit as the other pins); the pages stay the example's; other platforms keep what they have
+  unless the change needs them too. Checked on the Android emulator with a labeled screenshot.
+- **Prompt (verbatim):** "本项目 flutter android 端的tabbar请改用引用CYLTabBarController的flutter端实现"
+- **Prompt (English):** "In this project, make the Flutter Android tab bar use CYLTabBarController's Flutter
+  implementation."
