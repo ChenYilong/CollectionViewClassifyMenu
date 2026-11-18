@@ -479,3 +479,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   it in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift package (`Package.resolved`
   revision `4f73209c`) builds for the iOS Simulator; example suite 92 / 0 on iPhone 17 Pro `62B54974` (iOS 27.2,
   Xcode 27.2, macOS 27.3). Every platform is on `4f73209c`.
+
+## TODO (2026-11-18, `feat/harmony`): iOS pins from 4f73209c to CYLTabBarController 776b4635
+
+- **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
+  pins are at CYLTabBarController 776b4635 in cvcm-b fed57ae, pushed. It's the newest commit and changes only the
+  Android Rive view since 4f73209c. Please move the iOS pins there so every platform matches."
+- **Plan**: checked: `776b4635` is the newest commit on every branch, and no `.m`, `.h`, `.swift`, podspec or
+  Package.swift changed in `4f73209c..776b4635`. Move the eight pin files, `pod install` x 4, build the Swift package,
+  run the example suite.
