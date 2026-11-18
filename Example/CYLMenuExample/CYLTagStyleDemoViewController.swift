@@ -44,7 +44,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
              "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"],
             ["backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"],
             ["animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
-            ["sample.tagCloud", "sample.imageTag", "sample.tagContainer"],
+            ["sample.tagCloud", "sample.imageTag", "sample.tagContainer", "sample.about"],
             ["reset"],
         ]
     }
@@ -94,6 +94,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         "sample.tagCloud": "android-tagview 示例（Swift 版）",
         "sample.imageTag": "TagViewGroup 示例：图片标签",
         "sample.tagContainer": "AndroidTagView 示例：标签容器",
+        "sample.about": "关于：三个 Android 标签库的来源与许可",
         "reset": "重置 reset",
     ]
 
@@ -222,6 +223,9 @@ final class CYLTagStyleDemoViewController: UIViewController {
             return
         case "sample.tagContainer":
             navigationController?.pushViewController(CYLTagContainerSampleViewController(), animated: true)
+            return
+        case "sample.about":
+            navigationController?.pushViewController(CYLAndroidSamplesAboutViewController(), animated: true)
             return
         case "reset":
             self.style = Self.demoStyle()

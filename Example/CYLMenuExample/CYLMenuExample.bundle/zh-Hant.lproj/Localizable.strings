@@ -288,3 +288,8 @@
 "当前顺序：%@" = "目前順序：%@";
 "拖拽排序（长按标签后拖动）" = "拖曳排序（長按標籤後拖動）";
 "拖拽标签重新排序" = "拖曳標籤重新排序";
+
+/* About the ported Android samples (CYLAndroidSamplesAboutViewController) */
+"关于" = "關於";
+"关于：三个 Android 标签库的来源与许可" = "關於：三個 Android 標籤庫的來源與授權";
+"本页的三个示例是三个 Android 标签库的 Swift 复刻，用的都是本库的 iOS 核心（CYLTagListView、CYLImageTagGroupView）。\n\n• 标签云：kaedea/android-tagview（b546a5f），Apache License 2.0。Copyright (c) kaedea.\n\n• 标签容器：whilu/AndroidTagView（75a3bba），Apache License 2.0。Copyright 2015 lujun.\n\n• 图片标签：shellljx/TagViewGroup（befcd9b）的公开 API，重新实现，未复制代码（原项目为 GPL-3.0）。\n\nAndroid 版把这三个库合并为一个 Kotlin 库（android/merged/library），每个示例一个 Tab。" = "本頁的三個範例是三個 Android 標籤庫的 Swift 復刻，用的都是本庫的 iOS 核心（CYLTagListView、CYLImageTagGroupView）。\n\n• 標籤雲：kaedea/android-tagview（b546a5f），Apache License 2.0。Copyright (c) kaedea.\n\n• 標籤容器：whilu/AndroidTagView（75a3bba），Apache License 2.0。Copyright 2015 lujun.\n\n• 圖片標籤：shellljx/TagViewGroup（befcd9b）的公開 API，重新實作，未複製程式碼（原專案為 GPL-3.0）。\n\nAndroid 版把這三個庫合併為一個 Kotlin 庫（android/merged/library），每個範例一個 Tab。";

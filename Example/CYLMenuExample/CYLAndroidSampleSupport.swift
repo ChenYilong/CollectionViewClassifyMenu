@@ -126,3 +126,36 @@ final class CYLPaddedLabel: UILabel {
         return CGSize(width: size.width + insets.left + insets.right, height: size.height + insets.top + insets.bottom)
     }
 }
+
+/**
+ * The Android example's About tab (`AboutFragment`): where the three ported samples come from and their licenses.
+ */
+final class CYLAndroidSamplesAboutViewController: UIViewController {
+
+    /// The text shown (localized; the key is the Chinese text).
+    static let text = "本页的三个示例是三个 Android 标签库的 Swift 复刻，用的都是本库的 iOS 核心（CYLTagListView、CYLImageTagGroupView）。\n\n• 标签云：kaedea/android-tagview（b546a5f），Apache License 2.0。Copyright (c) kaedea.\n\n• 标签容器：whilu/AndroidTagView（75a3bba），Apache License 2.0。Copyright 2015 lujun.\n\n• 图片标签：shellljx/TagViewGroup（befcd9b）的公开 API，重新实现，未复制代码（原项目为 GPL-3.0）。\n\nAndroid 版把这三个库合并为一个 Kotlin 库（android/merged/library），每个示例一个 Tab。"
+
+    private(set) var textView: UITextView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = CYLExampleLocalizedString("关于")
+        view.backgroundColor = .systemBackground
+        let text = UITextView()
+        text.accessibilityIdentifier = "sample.about.text"
+        text.text = CYLExampleLocalizedString(Self.text)
+        text.font = .preferredFont(forTextStyle: .body)
+        text.adjustsFontForContentSizeCategory = true
+        text.isEditable = false
+        text.textContainerInset = UIEdgeInsets(top: 16, left: 12, bottom: 16, right: 12)
+        text.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(text)
+        NSLayoutConstraint.activate([
+            text.topAnchor.constraint(equalTo: view.topAnchor),
+            text.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            text.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            text.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+        ])
+        textView = text
+    }
+}

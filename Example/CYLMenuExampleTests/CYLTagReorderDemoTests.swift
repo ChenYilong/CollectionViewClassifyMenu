@@ -66,4 +66,19 @@ final class CYLTagReorderDemoTests: CYLMenuExampleTestCase {
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.2))
         XCTAssertEqual((0..<4).map(width), [before[1], before[2], before[3], before[0]])
     }
+
+    /// The Android example's About tab, ported: the Style tab's last sample row names the three sources and licenses.
+    func testTheAboutRowNamesTheThreeAndroidLibrariesAndTheirLicenses() {
+        let style = CYLTagStyleDemoViewController()
+        let navigation = showInNavigation(style)
+        XCTAssertTrue(style.actionIdentifiers().contains { $0.last == "sample.about" })
+        style.performAction("sample.about")
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.5))
+        let about = navigation.topViewController as? CYLAndroidSamplesAboutViewController
+        about?.loadViewIfNeeded()
+        let text = about?.textView.text ?? ""
+        for source in ["kaedea/android-tagview", "whilu/AndroidTagView", "shellljx/TagViewGroup", "Apache License 2.0", "GPL-3.0"] {
+            XCTAssertTrue(text.contains(source), source)
+        }
+    }
 }
