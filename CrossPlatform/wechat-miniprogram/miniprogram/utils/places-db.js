@@ -7,7 +7,7 @@
 const ROWS = require('../data/places.js');
 
 /** The filter's regions (the iOS example's `CYLDemoDataSource.regions()`). */
-const REGIONS = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳'];
+const REGIONS = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳']; // NOLOCALIZE: source titles (the database matches them)
 
 /** Every tag, in database order: `SELECT tag FROM places GROUP BY tag ORDER BY MIN(id)`. */
 function tags(rows = ROWS) {

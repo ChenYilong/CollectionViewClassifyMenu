@@ -24,10 +24,10 @@ class TagCollectionDemoFragment : Fragment(), CYLMenuDataSource, CYLMenuDelegate
 
     // Sample data of the iOS demo, kept as data.
     val sections: List<List<String>> = listOf(
-        listOf("吃饭", "睡觉", "看书", "跑步", "听音乐", "看电影", "做饭", "逛公园"),
-        listOf("吃饭", "睡觉", "看书", "游泳", "爬山", "打豆豆", "练武功", "写代码"),
+        listOf("吃饭", "睡觉", "看书", "跑步", "听音乐", "看电影", "做饭", "逛公园"),  // NOLOCALIZE: sample data of the iOS TagCollectionView demo (Chinese there too)
+        listOf("吃饭", "睡觉", "看书", "游泳", "爬山", "打豆豆", "练武功", "写代码"),  // NOLOCALIZE: sample data of the iOS TagCollectionView demo (Chinese there too)
     )
-    val sectionTitles = listOf("日常安排", "周末活动")
+    val sectionTitles = listOf("日常安排", "周末活动")  // NOLOCALIZE: sample data of the iOS TagCollectionView demo (Chinese there too)
 
     var tagView: CYLTagView? = null
         private set
@@ -54,7 +54,7 @@ class TagCollectionDemoFragment : Fragment(), CYLMenuDataSource, CYLMenuDelegate
     override fun numberOfSectionsInMenu() = sections.size
     override fun menuNumberOfItemsInSection(section: Int) = sections[section].size
     override fun menuTitleForSection(section: Int) = sectionTitles[section]
-    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = sections[indexPath.section][indexPath.item] + " 扩展文字😀✨"
+    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = sections[indexPath.section][indexPath.item] + " 扩展文字😀✨"  // NOLOCALIZE: sample data of the iOS TagCollectionView demo (Chinese there too)
 
     override fun menuDidSelectItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {
         val text = menuTitleForItemAtIndexPath(indexPath)

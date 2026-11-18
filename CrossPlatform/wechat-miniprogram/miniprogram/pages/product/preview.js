@@ -7,7 +7,7 @@ const store = require('../reviews/store.js');
 const list = require('../reviews/list.js');
 
 /** The sample product (not localized). */
-const PRODUCT = { name: '潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮', price: '¥9.90-14.90' };
+const PRODUCT = { name: '潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮', price: '¥9.90-14.90' }; // NOLOCALIZE: user content: the shop's product title
 
 /** Maps preview items to indexes in store.filters. */
 function previewFilterIndexes() {

@@ -88,6 +88,7 @@ export class CYLReviewStore {
 
   /** Sample data (not localized). */
   static mockReviews(): CYLReview[] {
+    // NOLOCALIZE-BEGIN: user content: the shop's reviews and product variants, as iOS CYLReviewStore
     const pink = '颜色分类:苹果6 4.7【镜面粉字】';
     const white = '颜色分类:苹果6plus【白边白字】';
     const G = CYLReviewRating.good;
@@ -102,6 +103,7 @@ export class CYLReviewStore {
       review('z**9', '物流很快，第二天就到了，壳子做工精细，背面细节一般。', '2015-06-08', white, G, true, false, ['质量不错', '背面细节一般']),
       review('大**熊', '给女朋友买的，她很喜欢，客服回复也很及时。', '2015-06-07', pink, G, false, true, ['态度不错']),
       review('m**0', '性价比高，用了一周没有掉色，会回购。', '2015-06-05', white, G, false, false, ['划算', '质量不错'])
+    // NOLOCALIZE-END
     ];
   }
 
@@ -117,7 +119,7 @@ export class CYLReviewStore {
       makeFilter(CYLExampleLocalizedString('有图'), undefined, orange, false, (r: CYLReview) => r.hasPhoto),
       makeFilter(CYLExampleLocalizedString('追加'), undefined, orange, false, (r: CYLReview) => r.hasFollowUp)
     ];
-    ['手机套不错', '质量不错', '态度不错', '划算', '颜色不错', '背面细节一般'].forEach((keyword: string) => {
+    ['手机套不错', '质量不错', '态度不错', '划算', '颜色不错', '背面细节一般'].forEach((keyword: string) => { // NOLOCALIZE: user content: the shop's review keywords, as iOS CYLReviewStore
       // The chip shows the keyword in the app's language; the match keeps the data's keyword.
       const filter = makeFilter(CYLExampleLocalizedString(keyword), undefined, orange, true,
         (r: CYLReview) => r.keywords.includes(keyword));

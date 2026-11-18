@@ -108,7 +108,9 @@ function reviewRow(review) {
 }
 
 /** The core's CYLMenuExpand / CYLMenuCollapse (CYLClassifyMenu.strings), the fold control's action. */
-const FOLD_TITLES = { 'zh-Hans': ['更多', '收起'], 'zh-Hant': ['更多', '收合'], en: ['More', 'Less'] };
+const CORE_TABLES = require('cyl-tag-list-miniprogram/core-tables.js');
+const FOLD_TITLES = Object.fromEntries(Object.entries(CORE_TABLES)
+  .map(([lang, table]) => [lang, [table.CYLMenuExpand, table.CYLMenuCollapse]]));
 
 /** The fold control's VoiceOver label (foldAccessibilityLabel): "<section title> <expand or collapse title>". */
 function foldAccessibilityLabel(expanded, lang = language()) {

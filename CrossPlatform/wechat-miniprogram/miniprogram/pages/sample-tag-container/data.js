@@ -21,11 +21,11 @@ function welcomeTitle() {
   return `Welcome to use ${system} CollectionViewClassifyMenu`;
 }
 
-const LIST1 = ['Java', 'C++', 'Python', 'Swift', '你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。',
+const LIST1 = ['Java', 'C++', 'Python', 'Swift', '你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。', // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
   'PHP', 'JavaScript', 'Html', welcomeTitle()];
 const LIST2 = ['China', 'USA', 'Austria', 'Japan', 'Sudan', 'Spain', 'UK', 'Germany', 'Niger', 'Poland', 'Norway',
   'Uruguay', 'Brazil'];
-const LIST3 = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام'];
+const LIST3 = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام']; // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
 const LIST4 = ['Adele', 'Whitney Houston'];
 const LIST5 = ['Custom Red Color', 'Custom Blue Color'];
 

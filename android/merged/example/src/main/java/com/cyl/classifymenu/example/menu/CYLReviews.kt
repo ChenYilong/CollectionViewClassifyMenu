@@ -55,7 +55,7 @@ class CYLReviewStore private constructor(context: Context) {
             filter("差评", "hand.thumbsdown.fill", Color.GRAY, false) { it.rating == CYLReviewRating.BAD },
             filter("有图", null, orange, false) { it.hasPhoto },
             filter("追加", null, orange, false) { it.hasFollowUp },
-        ) + listOf("手机套不错", "质量不错", "态度不错", "划算", "颜色不错", "背面细节一般").map { keyword -> filter(keyword, null, orange, true) { keyword in it.keywords } }
+        ) + listOf("手机套不错", "质量不错", "态度不错", "划算", "颜色不错", "背面细节一般").map { keyword -> filter(keyword, null, orange, true) { keyword in it.keywords } }  // NOLOCALIZE: user content: the shop's review keywords, as iOS CYLReviewStore
     }
 
     companion object {

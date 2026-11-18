@@ -1,12 +1,23 @@
+import { CYL_SEARCH_DISCOVER_JSON } from '../../data/CYLExampleStrings';
+import { cylExampleLanguage } from '../../data/CYLExampleLocalization';
+
 /**
  * The data of the search history and discover demo (iOS CYLSearchDiscoverData.swift, from
- * CYLMenuExample.bundle/zh-Hans.lproj/search-discover.json): recent searches, and a pool of discover topics from which
+ * CYLMenuExample.bundle/<language>.lproj/search-discover.json): recent searches, and a pool of discover topics from which
  * the More button picks another random selection.
  */
 export interface CYLDiscoverTopic {
   title: string;
   /** "hot": the hot icon (discover-hot.png, 热) after the title. */
   icon?: string;
+}
+
+/** search-discover.json as parsed. */
+interface CYLSearchDiscoverFile {
+  version?: number;
+  discoverCount?: number;
+  recentSearches?: string[];
+  discover?: CYLDiscoverTopic[];
 }
 
 export class CYLSearchDiscoverData {
@@ -16,16 +27,22 @@ export class CYLSearchDiscoverData {
   recentSearches: string[] = [];
   discover: CYLDiscoverTopic[] = [];
 
-  static bundled(): CYLSearchDiscoverData {
+  /**
+   * The data of the app's language (iOS: CYLMenuExample.bundle/<language>.lproj/search-discover.json, exported to
+   * CYL_SEARCH_DISCOVER_JSON by harmony/scripts/export-example-strings.py); Simplified Chinese when a language has none.
+   */
+  static bundled(language: string = cylExampleLanguage()): CYLSearchDiscoverData {
     const data = new CYLSearchDiscoverData();
-    data.recentSearches = ['swift 并发', 'SwiftUI 动画', 'iOS 26 液态玻璃适配', '标签云布局', 'Xcode 27 新功能',
-      'CocoaPods 私有库', '折叠菜单交互设计', 'VoiceOver 测试清单', '暗黑模式配色', '为什么越想早睡越睡不着'];
-    const hot = ['春季露营装备清单', '城市骑行路线推荐', '读书笔记怎么做才不会忘', '空气炸锅食谱'];
-    data.discover = ['春季露营装备清单', '旧手机改造成家庭服务器的完整教程', '手冲咖啡入门', '番茄工作法', '低糖早餐做法',
-      '周末短途自驾路线', '城市骑行路线推荐', '开源项目贡献指南', '极简桌面布置', '雨天室内运动', '胶片相机入门', '猫咪换粮指南',
-      '自制酸奶', '读书笔记怎么做才不会忘', '阳台种菜', '新手钓鱼装备', '高铁出行省钱技巧', '儿童编程启蒙', '城市夜景拍摄参数',
-      '居家收纳技巧', '空气炸锅食谱', '第一次跑半程马拉松的训练计划', '设计师常用配色', '徒步登山安全须知']
-      .map((title: string): CYLDiscoverTopic => hot.includes(title) ? { title: title, icon: 'hot' } : { title: title });
+    const text = CYL_SEARCH_DISCOVER_JSON[language] ?? CYL_SEARCH_DISCOVER_JSON['zh-Hans'];
+    if (text === undefined) {
+      return data;
+    }
+    const file = JSON.parse(text) as CYLSearchDiscoverFile;
+    data.version = file.version ?? 1;
+    data.discoverCount = file.discoverCount ?? 6;
+    data.recentSearches = file.recentSearches ?? [];
+    data.discover = (file.discover ?? []).map((t: CYLDiscoverTopic): CYLDiscoverTopic =>
+      t.icon !== undefined ? { title: t.title, icon: t.icon } : { title: t.title });
     return data;
   }
 

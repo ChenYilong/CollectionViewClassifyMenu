@@ -9,7 +9,7 @@ const db = require('../../utils/places-db.js');
 const CLASSIFY = require('../../data/classify-menu.js');
 
 /** CYLDemoDataSource.regions(). */
-const REGIONS = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳'];
+const REGIONS = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳']; // NOLOCALIZE: source titles (the database matches them)
 
 /** CYLDBManager.allTags(): every tag of data.json, once, in order. */
 const ALL_TAGS = Array.from(new Set(CLASSIFY.flatMap((section) => section.items.map((item) => item.title))));
@@ -25,10 +25,28 @@ const DEFAULT_FILTER = FILTER.map((_, section) => `${section}-0`);
 
 /** "北京 🏙️ 扩展文字" → "北京" (CYLDemoDataSource.shortTitle(forTitle:)). */
 function shortTitle(title) {
-  for (const suffix of [' 扩展文字😀✨', ' 🏙️ 扩展文字']) {
+  for (const suffix of [' 扩展文字😀✨', ' 🏙️ 扩展文字']) { // NOLOCALIZE: source suffixes
     if (title.endsWith(suffix)) return title.slice(0, -suffix.length);
   }
   return title;
+}
+
+/** The sample suffix of the long titles ("川菜 扩展文字😀✨"), a word of its own in the tables. */
+const SAMPLE_SUFFIX_WORD = '扩展文字';
+
+/**
+ * `localizedTitle(_:)`: a source title in the app's language through `t`, the name and the sample suffix each looked
+ * up ("川菜 扩展文字😀✨" → "Sichuan extended text😀✨"). The source titles stay as data (the database matches them).
+ */
+function localizedTitle(t, title) {
+  const short = shortTitle(title);
+  if (short === title) return t(title);
+  return t(short) + title.slice(short.length).replace(SAMPLE_SUFFIX_WORD, t(SAMPLE_SUFFIX_WORD));
+}
+
+/** `localizedShortTitle(_:)`: "北京 🏙️ 扩展文字" → "Beijing". */
+function localizedShortTitle(t, title) {
+  return t(shortTitle(title));
 }
 
 function parse(key) {
@@ -162,11 +180,11 @@ function rows(tag, regions, dishes, all = db.ROWS) {
 function results(t, tag, regions, dishes, total = db.ROWS.length) {
   const all = t('全部');
   const separator = t('、');
-  const names = (values) => (values.length ? values.map(shortTitle).join(separator) : all);
+  const names = (values) => (values.length ? values.map((v) => localizedShortTitle(t, v)).join(separator) : all);
   const q = query(tag, regions, dishes);
   const found = rows(tag, regions, dishes);
   const status = [
-    t('分类：%@ · 地区：%@ · 菜品：%@', tag ? shortTitle(tag) : all, names(regions), names(dishes)),
+    t('分类：%@ · 地区：%@ · 菜品：%@', tag ? localizedShortTitle(t, tag) : all, names(regions), names(dishes)),
     displayString(q),
     t('SQLite 返回 %lu 条（共 %ld 家）', found.length, total),
   ].join('\n');
@@ -177,12 +195,12 @@ function results(t, tag, regions, dishes, total = db.ROWS.length) {
     rows: found.map((row) => ({
       id: row.id,
       title: row.name,
-      detail: `${row.category} · ${shortTitle(row.tag)} · ${shortTitle(row.region)} · ★${row.rating.toFixed(1)} · ¥${row.price}`,
+      detail: `${t(row.category)} · ${localizedShortTitle(t, row.tag)} · ${localizedShortTitle(t, row.region)} · ★${row.rating.toFixed(1)} · ¥${row.price}`,
     })),
   };
 }
 
 module.exports = {
-  CLASSIFY, REGIONS, ALL_TAGS, FILTER, DEFAULT_FILTER, shortTitle, contains, classifyTitle, toggleClassify, tapFilter,
+  CLASSIFY, REGIONS, ALL_TAGS, FILTER, DEFAULT_FILTER, shortTitle, localizedTitle, localizedShortTitle, contains, classifyTitle, toggleClassify, tapFilter,
   keysOf, selectionOf, isValidFilterSelection, conditionsOf, query, displayString, rows, results,
 };

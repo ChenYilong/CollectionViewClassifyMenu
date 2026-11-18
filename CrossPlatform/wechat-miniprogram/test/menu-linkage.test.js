@@ -37,11 +37,13 @@ test('plus-menu-filtered: 吃 · 川菜, in 上海 or 深圳, dishes 川菜 or �
   assert.deepEqual(dishes, ['川菜 扩展文字😀✨', '特色火锅 扩展文字😀✨']);
   i18n.setLanguage('en');
   const r = m.results(i18n.t, tag, regions, dishes);
-  assert.equal(r.status.split('\n')[0], 'Category: 川菜 · Regions: 上海, 深圳 · Dishes: 川菜, 特色火锅');
+  assert.equal(r.status.split('\n')[0], 'Category: Sichuan · Regions: Shanghai, Shenzhen · Dishes: Sichuan, Hot pot');
   assert.equal(r.status.split('\n')[1], "SELECT name, category, tag, region, rating, price FROM places WHERE tag = '川菜 扩展文字😀✨' "
     + "AND region IN ('上海', '深圳') AND tag IN ('川菜 扩展文字😀✨', '特色火锅 扩展文字😀✨') ORDER BY rating DESC, id");
   assert.equal(r.status.split('\n')[2], 'SQLite returned 1 (of 83 places)');
-  assert.deepEqual(r.rows, [{ id: r.rows[0].id, title: '川菜 · 深圳', detail: '吃 · 川菜 · 深圳 · ★3.5 · ¥226' }]);
+  // The place's name is the database's (kept as written); its category, dish and region are translated, as iOS.
+  assert.deepEqual(r.rows, [{ id: r.rows[0].id, title: '川菜 · 深圳', detail: 'Eat · Sichuan · Shenzhen · ★3.5 · ¥226' }]);
+  assert.equal(m.localizedTitle(i18n.t, '川菜 扩展文字😀✨'), 'Sichuan extended text😀✨');
   i18n.setLanguage('zh_CN');
 });
 

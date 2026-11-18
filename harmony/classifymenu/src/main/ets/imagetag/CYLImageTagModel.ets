@@ -456,7 +456,7 @@ export class CYLImageTagGeometry {
       return titles[0];
     }
     if (language.toLowerCase().startsWith('zh')) {
-      const conjunction = '和';
+      const conjunction = '和'; // NOLOCALIZE: the Chinese list conjunction, used only for zh languages
       return titles.slice(0, titles.length - 1).join('、') + conjunction + titles[titles.length - 1];
     }
     if (titles.length === 2) {

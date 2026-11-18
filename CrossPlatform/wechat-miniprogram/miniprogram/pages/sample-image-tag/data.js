@@ -7,11 +7,11 @@ const model = require('cyl-tag-list-miniprogram/cyl-tag-image/model.js');
 function initialGroups() {
   return [
     model.makeGroup([
-      model.makeTag('头层牛皮', 'rightTop', 'http://www.baidu.com'),
-      model.makeTag('英伦加绒青年棕色保暖鞋子。', 'rightCenter', 'http://blog.licrafter.com'),
-      model.makeTag('PLAYBOY/花花公子', 'rightBottom', 'http://mc.licrafter.com'),
+      model.makeTag('头层牛皮', 'rightTop', 'http://www.baidu.com'), // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
+      model.makeTag('英伦加绒青年棕色保暖鞋子。', 'rightCenter', 'http://blog.licrafter.com'), // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
+      model.makeTag('PLAYBOY/花花公子', 'rightBottom', 'http://mc.licrafter.com'), // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
     ], { x: 0.4, y: 0.5 }),
-    model.makeGroup([model.makeTag('很不错的鞋子', 'rightCenter', 'http://mc.licrafter.com')], { x: 0.3, y: 0.2 }),
+    model.makeGroup([model.makeTag('很不错的鞋子', 'rightCenter', 'http://mc.licrafter.com')], { x: 0.3, y: 0.2 }), // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
   ];
 }
 

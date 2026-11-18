@@ -1071,6 +1071,40 @@ tags: [issues, ui, cocoapods, progress]
   analyze` clean, integration tests 2 / 2 on the iOS 27.2 simulator. React Native: `tsc --noEmit` clean, Jest 5 / 5
   (new `i18n.test.ts`). Not run: the React Native app on a simulator. Score so far 65 / 100 (Android, HarmonyOS and the
   mini program audit is with the Windows session, −35).
+- Result, Android, HarmonyOS and the mini program (Windows session, 2026-11-19): **35 / 35; the audit is 100 / 100.**
+  - New check `scripts/check-localization-ports.py` (the twin of `check-localization.py`): every table these ports
+    read is an iOS table or generated from one, which `check-localization.py` already checks; this one checks the
+    ports' code (a Chinese literal is a lookup's argument, a key of the iOS tables, or marked NOLOCALIZE) and their
+    own tables (Android `res/values*`, HarmonyOS `string.json`: the same names in every language, no Chinese in
+    English, no Simplified-only character in Traditional Chinese, learned from the iOS key / zh-Hant pairs; a planted
+    "设置" in `values-zh-rTW` is caught). First run: 310 problems; now 0.
+  - Fixed, Android: the TagViewGroup sample's strings (`licrafter_*`) were Chinese in the default (English) `values` with
+    no Chinese folders; now English, Simplified (`values-zh-rCN`) and Traditional (`values-zh-rTW`), worded as the iOS
+    example's. The About text, "GitHub Project" and "Settings" got Simplified and Traditional; the app name and two
+    activity class names are `translatable="false"`.
+  - Fixed, every port: the classify menu / filter's places titles ("云南味道 扩展文字😀✨", "北京 🏙️ 扩展文字") showed in
+    Chinese in English. As iOS `localizedTitle` / `localizedShortTitle`: the name and the sample suffix are looked up
+    for display, the source titles stay the data, and the queries use them (`sourceTitle`); section titles, categories,
+    dishes and regions of the results are translated too. Android `ClassifyDemoDataSource`, HarmonyOS `CYLDemoDataSource`,
+    mini program `menu-linkage.js` / `classify.js`.
+  - Fixed, HarmonyOS: the search history and discover data was the Simplified Chinese file in every language; it is now
+    each language's `search-discover.json`, exported into `CYLExampleStrings.ets` (`CYL_SEARCH_DISCOVER_JSON`) by
+    `export-example-strings.py`, whose `--check` covers it. The example strings were also out of date after the iOS
+    sweep (regenerated, `f4b68b31`).
+  - Fixed, mini program: three copies of the core's "更多 / 收起" (reviews list, discover, the library's fallback) now
+    read the generated `core-tables.js`.
+  - Kept as written and marked NOLOCALIZE, as iOS: reviews and review keywords, product titles, the image tag sample, hot
+    searches (song and singer names), the multilingual sample tags, the places' source titles, and the iOS
+    TagCollectionView demo's sample tags (Chinese there too). Inline tables marked as such: UIKit's switch values and
+    the discover results view's own strings (same keys in en and zh-Hant). The core's "和" (the Chinese list conjunction,
+    used only for zh) is marked.
+  - Tests: Android library 87 / 0 and the example builds; HarmonyOS host tests 63 / 63 and `build.sh`; mini program
+    `npm test` 149 (the classify status test now expects English names). Emulator (Android 17, English): Classify and
+    the Filter panel show English names, and Shanghai still queries `region IN ('上海')` (21 places):
+
+    <img src="assets/android-localization-places.png" width="360" alt="Android: places titles in English, the query on the source title">
+
+  - Not wired into CI (nor is `check-localization.py`); run both before a commit that touches strings.
 
 ### TODO (2026-11-19, `feat/harmony`): close the three open items (localization audit, 16 commit messages, the sixth container)
 

@@ -309,10 +309,12 @@ export struct CYLHotSearchPage {
   static readonly blue: string = CYLColor.rgb(0.29, 0.64, 0.94);
   static readonly red: string = CYLColor.rgb(0.9, 0.31, 0.29);
   static readonly hotSearches: CYLHotSearch[] = [
+    // NOLOCALIZE-BEGIN: sample data: hot searches (song and singer names), as iOS
     new CYLHotSearch('入戏太深混合串烧版', CYLHotSearchBadge.song), new CYLHotSearch('他和她', CYLHotSearchBadge.song),
     new CYLHotSearch('妤宸'), new CYLHotSearch('赛菲尔'), new CYLHotSearch('小西瓜', CYLHotSearchBadge.trending),
     new CYLHotSearch('入戏太深', CYLHotSearchBadge.song), new CYLHotSearch('小虾米'), new CYLHotSearch('羽冰'),
     new CYLHotSearch('梦梦'), new CYLHotSearch('神曲不跳转呀呀呀56567', CYLHotSearchBadge.song),
+    // NOLOCALIZE-END
   ];
   @State text: string = '';
   private list: CYLTagListState = new CYLTagListState();

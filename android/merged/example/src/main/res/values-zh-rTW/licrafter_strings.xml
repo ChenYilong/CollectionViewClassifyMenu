@@ -1,0 +1,22 @@
+<!-- The TagViewGroup sample (com.licrafter.sample), prefixed: licrafter_. -->
+<resources>
+    <string name="licrafter_title_main">圖片標籤</string>
+    <string name="licrafter_title_edit">建立標籤</string>
+    <string name="licrafter_title_list">標籤列表</string>
+    <string name="licrafter_create_tags">建立標籤</string>
+    <string name="licrafter_tag_list">標籤列表</string>
+    <string name="licrafter_create">建立</string>
+    <string name="licrafter_save">儲存</string>
+    <string name="licrafter_cancel">取消</string>
+    <string name="licrafter_ok">確定</string>
+    <string name="licrafter_circle_click">點擊中心圓</string>
+    <string name="licrafter_tag_click">點擊標籤：%1$s</string>
+    <string name="licrafter_tag_hint">標籤 %1$d</string>
+    <string name="licrafter_delete_group">刪除標籤組</string>
+    <string name="licrafter_delete_group_message">你確定要刪除該標籤組嗎？</string>
+    <string name="licrafter_toggle_hint">點兩下顯示或隱藏標籤</string>
+    <string name="licrafter_edit_info">1. 點擊建立按鈕開始建立標籤組\n2. 按住標籤組滑動，調整位置\n3. 點擊單個標籤，調整該標籤的方向\n4. 點擊中心圓彈出提示\n5. 長按標籤組刪除</string>
+    <string name="licrafter_picture_shoes">鞋子圖片</string>
+    <string name="licrafter_picture_bag">包圖片</string>
+    <string name="licrafter_picture_clothes">衣服圖片</string>
+</resources>

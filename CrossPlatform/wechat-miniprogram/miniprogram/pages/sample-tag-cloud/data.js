@@ -94,8 +94,10 @@ const RED = model.rgba(0.9, 0.31, 0.29);
 
 /** (title, badge): 'song' is 神 (blue), 'trending' is 热 (red); the titles are sample data, as in the screenshot. */
 const HOT_SEARCHES = [
+  // NOLOCALIZE-BEGIN: sample data: hot searches (song and singer names), as iOS
   ['入戏太深混合串烧版', 'song'], ['他和她', 'song'], ['妤宸', null], ['赛菲尔', null], ['小西瓜', 'trending'],
   ['入戏太深', 'song'], ['小虾米', null], ['羽冰', null], ['梦梦', null], ['神曲不跳转呀呀呀56567', 'song'],
+  // NOLOCALIZE-END
 ];
 
 function hotTags() {

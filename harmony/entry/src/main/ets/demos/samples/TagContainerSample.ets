@@ -16,11 +16,11 @@ import { CYLSampleButton, SYSTEM_GRAY, SYSTEM_TEAL, cylFormat, cylToast } from '
 /** The sample's lists and colors. */
 export class CYLTagContainerSampleData {
   static readonly list1: string[] = ['Java', 'C++', 'Python', 'Swift',
-    '你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。', 'PHP', 'JavaScript', 'Html',
+    '你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。', 'PHP', 'JavaScript', 'Html', // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
     CYLTagContainerSampleData.welcomeTitle()];
   static readonly list2: string[] = ['China', 'USA', 'Austria', 'Japan', 'Sudan', 'Spain', 'UK', 'Germany', 'Niger',
     'Poland', 'Norway', 'Uruguay', 'Brazil'];
-  static readonly list3: string[] = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام'];
+  static readonly list3: string[] = ['Persian', '波斯语', 'فارسی', 'Hello', '你好', 'سلام']; // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
   static readonly list4: string[] = ['Adele', 'Whitney Houston'];
   static readonly list5: string[] = ['Custom Red Color', 'Custom Blue Color'];
 

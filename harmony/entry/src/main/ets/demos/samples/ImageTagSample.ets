@@ -15,11 +15,11 @@ export class CYLImageTagSampleData {
   static tagGroups: CYLImageTagGroup[] = CYLImageTagSampleData.initialGroups();
 
   static initialGroups(): CYLImageTagGroup[] {
-    const leather = new CYLImageTag('头层牛皮', CYLImageTagDirection.rightTop, 'http://www.baidu.com');
-    const shoes = new CYLImageTag('英伦加绒青年棕色保暖鞋子。', CYLImageTagDirection.rightCenter,
+    const leather = new CYLImageTag('头层牛皮', CYLImageTagDirection.rightTop, 'http://www.baidu.com'); // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
+    const shoes = new CYLImageTag('英伦加绒青年棕色保暖鞋子。', CYLImageTagDirection.rightCenter, // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
       'http://blog.licrafter.com');
-    const brand = new CYLImageTag('PLAYBOY/花花公子', CYLImageTagDirection.rightBottom, 'http://mc.licrafter.com');
-    const good = new CYLImageTag('很不错的鞋子', CYLImageTagDirection.rightCenter, 'http://mc.licrafter.com');
+    const brand = new CYLImageTag('PLAYBOY/花花公子', CYLImageTagDirection.rightBottom, 'http://mc.licrafter.com'); // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
+    const good = new CYLImageTag('很不错的鞋子', CYLImageTagDirection.rightCenter, 'http://mc.licrafter.com'); // NOLOCALIZE: sample data: a shop's image tags, as iOS CYLImageTagSample
     return [new CYLImageTagGroup([leather, shoes, brand], new CYLPoint(0.4, 0.5)),
       new CYLImageTagGroup([good], new CYLPoint(0.3, 0.2))];
   }

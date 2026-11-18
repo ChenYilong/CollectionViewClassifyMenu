@@ -16,7 +16,7 @@ export interface PlacesQuery {
 }
 
 /** The filter's regions (the iOS example's `CYLDemoDataSource.regions()`). */
-export const REGIONS: string[] = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳'];
+export const REGIONS: string[] = ['北京 🏙️ 扩展文字', '上海', '广州', '深圳']; // NOLOCALIZE: source titles (the database matches them)
 
 const NAME = 'cyl_places.sqlite';
 

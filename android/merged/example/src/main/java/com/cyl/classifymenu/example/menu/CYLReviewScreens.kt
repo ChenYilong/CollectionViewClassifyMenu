@@ -98,7 +98,7 @@ class CYLProductScreen(private val context: Context, private val navigator: CYLM
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Color.WHITE)
             setPadding(pad, (12 * d).toInt(), pad, (12 * d).toInt())
-            addView(label(context, "潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮", 16f, Color.BLACK))
+            addView(label(context, "潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮", 16f, Color.BLACK))  // NOLOCALIZE: user content: the shop's product title
             addView(label(context, "¥9.90-14.90", 22f, Color.rgb(255, 79, 0), true))
         }
         val reviews = LinearLayout(context).apply {

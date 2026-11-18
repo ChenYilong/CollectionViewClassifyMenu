@@ -11,6 +11,7 @@ export interface CYLDemoSection {
 }
 
 export const CYL_DEMO_SECTIONS: CYLDemoSection[] = [
+  // NOLOCALIZE-BEGIN: source titles of data.json and the places database (shown through CYLDemoDataSource.localizedTitle)
   {
     type: "吃",
     items: [
@@ -61,5 +62,6 @@ export const CYL_DEMO_SECTIONS: CYLDemoSection[] = [
       { title: "先剁手后保暖 扩展文字😀✨", picture: true },
       { title: "逛市集 扩展文字😀✨", picture: true },
     ]
+  // NOLOCALIZE-END
   },
 ];

@@ -187,7 +187,8 @@ class FilterDemoFragment : Fragment(), CYLMenuDelegate, CYLFilterControllerDeleg
         val dishes = ArrayList<String>()
         for (indexPath in indexPaths) {
             if (source.menuItemIsExclusiveAtIndexPath(indexPath)) continue
-            val title = source.menuTitleForItemAtIndexPath(indexPath)
+            // The source title, as the database holds it (the menu shows it translated).
+            val title = (source as? ClassifyDemoDataSource)?.sourceTitle(indexPath) ?: source.menuTitleForItemAtIndexPath(indexPath)
             if (indexPath.section == 0) regions.add(title) else dishes.add(title)
         }
         selectedRegions = regions

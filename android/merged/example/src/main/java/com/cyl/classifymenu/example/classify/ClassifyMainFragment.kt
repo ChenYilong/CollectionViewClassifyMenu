@@ -146,8 +146,9 @@ class ClassifyMainFragment : CYLClassifyMenuViewController(), CYLMenuDelegate {
     fun selectClassifyItem(indexPath: CYLIndexPath) {
         val deselect = selectedIndexPath == indexPath
         selectedIndexPath = if (deselect) null else indexPath
-        selectedTag = if (deselect) null else classifySource?.menuTitleForItemAtIndexPath(indexPath)
-        navigationTitle?.text = selectedTag ?: menuTitle
+        // The source title queries the database; the bar shows it in the app's language.
+        selectedTag = if (deselect) null else (classifySource as? ClassifyDemoDataSource)?.sourceTitle(indexPath)
+        navigationTitle?.text = selectedTag?.let { (classifySource as? ClassifyDemoDataSource)?.localizedTitle(it) } ?: menuTitle
         runQuery()
     }
 

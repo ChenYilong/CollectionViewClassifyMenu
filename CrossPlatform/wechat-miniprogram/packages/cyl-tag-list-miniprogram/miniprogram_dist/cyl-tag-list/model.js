@@ -343,8 +343,10 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
 
 // MARK: - Configuration
 
-const EXPAND_TITLE = '更多';
-const COLLAPSE_TITLE = '收起';
+// The core's CYLMenuExpand / CYLMenuCollapse in Simplified Chinese (the fallback when no language table answers).
+const CORE_TABLES = require('../core-tables.js');
+const EXPAND_TITLE = CORE_TABLES['zh-Hans'].CYLMenuExpand;
+const COLLAPSE_TITLE = CORE_TABLES['zh-Hans'].CYLMenuCollapse;
 
 function key(section, item) {
   return `${section}-${item}`;

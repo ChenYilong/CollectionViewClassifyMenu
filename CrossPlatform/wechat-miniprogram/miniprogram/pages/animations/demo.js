@@ -131,9 +131,11 @@ function speedValue(speed) {
 
 /** UIKit's own value of a switch (VoiceOver reads "Loop, on"); it is not in the example's bundle. */
 const SWITCH_VALUES = {
+  // NOLOCALIZE-BEGIN: UIKit's own switch values per language (not in any bundle table)
   en: ['off', 'on'],
   'zh-Hans': ['关', '开'],
   'zh-Hant': ['關', '開'],
+  // NOLOCALIZE-END
 };
 
 /** The texts and accessibility labels of the controls for a speed and a loop setting. */

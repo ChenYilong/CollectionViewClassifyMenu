@@ -70,7 +70,7 @@ export struct CYLProductPage {
         Column({ space: 1 }) {
           Column({ space: 8 }) {
             // Sample data: the product's name and price.
-            Text('潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮').fontSize(16).fontColor($r('app.color.cyl_animation_label'))
+            Text('潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮').fontSize(16).fontColor($r('app.color.cyl_animation_label')) // NOLOCALIZE: user content: the shop's product title
             Text('¥9.90-14.90').fontSize(22).fontWeight(FontWeight.Bold).fontColor('#FF4F00')
           }
           .alignItems(HorizontalAlign.Start)

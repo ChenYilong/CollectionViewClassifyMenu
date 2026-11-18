@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Writes harmony/entry/src/main/ets/data/CYLExampleStrings.ets: the example's strings
-(Example/CYLMenuExample/CYLMenuExample.bundle/*.lproj/Localizable.strings) for CYLExampleLocalizedString.
+(Example/CYLMenuExample/CYLMenuExample.bundle/*.lproj/Localizable.strings) for CYLExampleLocalizedString, and the
+search history and discover demo's data of each language (*.lproj/search-discover.json), as iOS reads them.
 
   export-example-strings.py           write the module
   export-example-strings.py --check   exit 1 when it is out of date
@@ -38,6 +39,12 @@ def module():
             lines.append("    %s: %s," % (json.dumps(key, ensure_ascii=False),
                                          json.dumps(tables[language][key], ensure_ascii=False)))
         lines.append("  },")
+    lines.append("};")
+    lines += ["", "/** search-discover.json of each language (the same topics in the same order), as JSON text. */",
+              "export const CYL_SEARCH_DISCOVER_JSON: Record<string, string> = {"]
+    for path in sorted(SOURCE.glob("*.lproj/search-discover.json")):
+        compact = json.dumps(json.loads(path.read_text(encoding="utf-8")), ensure_ascii=False, separators=(",", ":"))
+        lines.append("  %s: %s," % (json.dumps(path.parent.name[: -len(".lproj")]), json.dumps(compact, ensure_ascii=False)))
     lines.append("};")
     return "\n".join(lines) + "\n"
 

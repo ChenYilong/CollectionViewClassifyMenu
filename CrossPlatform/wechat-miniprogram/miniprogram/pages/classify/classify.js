@@ -107,13 +107,14 @@ Page({
       const expanded = Boolean(this.expanded[s]);
       return {
         index: s,
-        title: section.title,
+        title: t(section.title),
         canFold,
         expanded,
         moreTitle: tc(expanded ? 'CYLMenuCollapse' : 'CYLMenuExpand'),
         items: section.items.map((item, i) => ({
           key: `${s}-${i}`,
-          title: item.title,
+          // The source title stays the data (queries); the tag shows it in the app's language.
+          title: state.localizedTitle(t, item.title),
           picture: item.picture,
           selected: this.selected === `${s}-${i}`,
           hidden: canFold && !expanded && rows[i] >= VISIBLE_ROWS,
@@ -163,8 +164,8 @@ Page({
     this.setData({
       panelSections: state.FILTER.map((section, s) => ({
         index: s,
-        title: section.title,
-        items: section.items.map((title, i) => ({ key: `${s}-${i}`, title, selected: this.filterSelection[s][i] })),
+        title: t(section.title),
+        items: section.items.map((title, i) => ({ key: `${s}-${i}`, title: state.localizedTitle(t, title), selected: this.filterSelection[s][i] })),
       })),
     });
   },

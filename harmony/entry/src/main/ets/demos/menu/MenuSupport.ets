@@ -181,18 +181,44 @@ export class CYLDemoDataSource implements CYLMenuDataSource {
   }
 
   static regions(): string[] {
-    return ['北京 🏙️ 扩展文字', '上海', '广州', '深圳'];
+    return ['北京 🏙️ 扩展文字', '上海', '广州', '深圳']; // NOLOCALIZE: source titles (the database matches them)
   }
 
   /** The title without the long sample suffix ("北京 🏙️ 扩展文字" → "北京"). */
   static shortTitle(title: string): string {
-    const suffixes = [' 扩展文字😀✨', ' 🏙️ 扩展文字'];
+    const suffixes = [' 扩展文字😀✨', ' 🏙️ 扩展文字']; // NOLOCALIZE: source suffixes
     for (const suffix of suffixes) {
       if (title.endsWith(suffix)) {
         return title.substring(0, title.length - suffix.length);
       }
     }
     return title;
+  }
+
+  /** The sample suffix of the long titles ("川菜 扩展文字😀✨"), a word of its own in the tables. */
+  static readonly sampleSuffixWord: string = '扩展文字';
+
+  /**
+   * `localizedTitle(_:)`: a source title in the app's language, the name and the sample suffix each looked up
+   * ("川菜 扩展文字😀✨" → "Sichuan extended text😀✨"). The source titles stay as data (the database matches them).
+   */
+  static localizedTitle(title: string): string {
+    const short = CYLDemoDataSource.shortTitle(title);
+    if (short === title) {
+      return CYLExampleLocalizedString(title);
+    }
+    const word = CYLDemoDataSource.sampleSuffixWord;
+    return CYLExampleLocalizedString(short) + title.substring(short.length).replace(word, CYLExampleLocalizedString(word));
+  }
+
+  /** `localizedShortTitle(_:)`: a source title without the sample suffix, in the app's language ("北京 🏙️ 扩展文字" → "Beijing"). */
+  static localizedShortTitle(title: string): string {
+    return CYLExampleLocalizedString(CYLDemoDataSource.shortTitle(title));
+  }
+
+  /** The source title of an item, as data.json and the places database hold it (for queries). */
+  sourceTitle(indexPath: CYLIndexPath): string {
+    return this.sections[indexPath.section].items[indexPath.item].title;
   }
 
   numberOfSectionsInMenu(): number {
@@ -204,11 +230,11 @@ export class CYLDemoDataSource implements CYLMenuDataSource {
   }
 
   menuTitleForSection(section: number): string {
-    return this.sections[section].type;
+    return CYLExampleLocalizedString(this.sections[section].type);
   }
 
   menuTitleForItem(indexPath: CYLIndexPath): string {
-    return this.sections[indexPath.section].items[indexPath.item].title;
+    return CYLDemoDataSource.localizedTitle(this.sourceTitle(indexPath));
   }
 }
 

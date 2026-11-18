@@ -47,17 +47,19 @@ class ClassifyResultsView(context: Context) : LinearLayout(context) {
     fun show(tag: String?, regions: List<String>, dishes: List<String>, query: ClassifySQLQuery, results: List<Map<String, Any>>, total: Int) {
         val all = CYLDemoLocalizedString(context, R.string.classify_all)
         val separator = CYLDemoLocalizedString(context, R.string.classify_separator)
-        fun names(values: List<String>) = if (values.isEmpty()) all else values.joinToString(separator) { ClassifyDemoDataSource.shortTitle(it) }
+        // Source titles (the database's) shown short and in the app's language, as iOS's localizedShortTitle.
+        fun local(title: String) = com.cyl.classifymenu.example.menu.CYLExampleLocalizedString(context, ClassifyDemoDataSource.shortTitle(title))
+        fun names(values: List<String>) = if (values.isEmpty()) all else values.joinToString(separator) { local(it) }
         statusLabel.text = listOf(
-            context.getString(R.string.classify_conditions, tag?.let { ClassifyDemoDataSource.shortTitle(it) } ?: all, names(regions), names(dishes)),
+            context.getString(R.string.classify_conditions, tag?.let { local(it) } ?: all, names(regions), names(dishes)),
             query.displayString(),
             context.getString(R.string.classify_sqlite_count, results.size, total),
         ).joinToString("\n")
         rows.removeAllViews()
         if (results.isEmpty()) rows.addView(row(CYLDemoLocalizedString(context, R.string.classify_no_places), null))
         for (place in results) {
-            val detail = String.format(java.util.Locale.ROOT, "%s · %s · %s · ★%.1f · ¥%d", place["category"],
-                ClassifyDemoDataSource.shortTitle(place["tag"] as String), ClassifyDemoDataSource.shortTitle(place["region"] as String),
+            val detail = String.format(java.util.Locale.ROOT, "%s · %s · %s · ★%.1f · ¥%d", local(place["category"] as String),
+                local(place["tag"] as String), local(place["region"] as String),
                 place["rating"] as Double, place["price"] as Int)
             rows.addView(row(place["name"] as String, detail))
         }

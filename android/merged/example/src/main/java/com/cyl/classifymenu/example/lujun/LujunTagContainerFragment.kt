@@ -65,7 +65,7 @@ class LujunTagContainerFragment : Fragment() {
         list1.add("C++")
         list1.add("Python")
         list1.add("Swift")
-        list1.add("你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。")
+        list1.add("你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。")  // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
         list1.add("PHP")
         list1.add("JavaScript")
         list1.add("Html")
@@ -87,7 +87,7 @@ class LujunTagContainerFragment : Fragment() {
         list2.add("Uruguay")
         list2.add("Brazil")
 
-        val list3 = arrayOf("Persian", "波斯语", "فارسی", "Hello", "你好", "سلام")
+        val list3 = arrayOf("Persian", "波斯语", "فارسی", "Hello", "你好", "سلام")  // NOLOCALIZE: sample data: deliberately multilingual tags of AndroidTagView's sample
         val list4 = arrayOf("Adele", "Whitney Houston")
 
         val list5 = ArrayList<String>()

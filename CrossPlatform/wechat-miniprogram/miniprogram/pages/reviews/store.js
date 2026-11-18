@@ -13,7 +13,7 @@ const RATING = { good: 0, neutral: 1, bad: 2 };
 const IDENTIFIERS = { 全部: 'all', 好评: 'good', 中评: 'neutral', 差评: 'bad', 有图: 'photo', 追加: 'followup' };
 
 /** The keyword filters, in the order of makeFilters(). */
-const KEYWORDS = ['手机套不错', '质量不错', '态度不错', '划算', '颜色不错', '背面细节一般'];
+const KEYWORDS = ['手机套不错', '质量不错', '态度不错', '划算', '颜色不错', '背面细节一般']; // NOLOCALIZE: user content: the shop's review keywords, as iOS CYLReviewStore
 
 /**
  * Stand-ins for the SF Symbols of makeFilters(), tinted as there (orange, 差评 gray; `.alwaysOriginal`, so they keep

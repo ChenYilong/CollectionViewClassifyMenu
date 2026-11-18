@@ -181,7 +181,7 @@ export struct CYLMenuLinkagePage {
     const classify = (await this.db?.savedSelection(CYLMenuLinkageClassifyScenario)) ?? [];
     if (classify.length > 0 && this.contains(classify[0], this.classifySource)) {
       this.menu.selectedIndexPath = classify[0];
-      this.selectedTag = this.classifySource.menuTitleForItem(classify[0]);
+      this.selectedTag = this.classifySource.sourceTitle(classify[0]);
     }
     const filter = ((await this.db?.savedSelection(CYLMenuLinkageFilterScenario)) ?? [])
       .filter((p: CYLIndexPath) => this.contains(p, this.filterSource));
@@ -215,7 +215,8 @@ export struct CYLMenuLinkagePage {
       if (this.filterSource.menuItemIsExclusive !== undefined && this.filterSource.menuItemIsExclusive(p)) {
         continue;
       }
-      const title = this.filterSource.menuTitleForItem(p);
+      // The source title, as the database holds it (the menu shows it translated).
+      const title = this.filterSource.sourceTitle(p);
       if (p.section === 0) {
         regions.push(title);
       } else {
@@ -235,7 +236,7 @@ export struct CYLMenuLinkagePage {
     const current = this.menu.selectedIndexPath;
     const deselect = current !== undefined && current.section === indexPath.section && current.item === indexPath.item;
     this.menu.selectedIndexPath = deselect ? undefined : indexPath;
-    this.selectedTag = deselect ? undefined : this.classifySource.menuTitleForItem(indexPath);
+    this.selectedTag = deselect ? undefined : this.classifySource.sourceTitle(indexPath);
     await this.db?.saveSelection(deselect ? [] : [indexPath], CYLMenuLinkageClassifyScenario);
     await this.runQuery();
   }
@@ -266,8 +267,8 @@ export struct CYLMenuLinkagePage {
     this.updateFilterButton();
     const all = CYLExampleLocalizedString('全部');
     const names = (values: string[]): string =>
-    values.length === 0 ? all : values.map((v: string) => CYLDemoDataSource.shortTitle(v)).join(CYLExampleLocalizedString('、'));
-    const tag = this.selectedTag !== undefined ? CYLDemoDataSource.shortTitle(this.selectedTag) : all;
+    values.length === 0 ? all : values.map((v: string) => CYLDemoDataSource.localizedShortTitle(v)).join(CYLExampleLocalizedString('、'));
+    const tag = this.selectedTag !== undefined ? CYLDemoDataSource.localizedShortTitle(this.selectedTag) : all;
     const status = [
       cylFormat(CYLExampleLocalizedString('分类：%@ · 地区：%@ · 菜品：%@'), tag, names(this.selectedRegions), names(this.selectedDishes)),
       query.displayString(),
@@ -278,8 +279,10 @@ export struct CYLMenuLinkagePage {
     results.map((row: CYLPlaceRow): CYLLinkageRow => ({
       title: row.name,
       // The dish and the region only when the name does not already say them ("日式拉面 · 北京" repeated both).
+      // Compared in source form (the name is the database's), shown in the app's language.
       detail: [row.category, CYLDemoDataSource.shortTitle(row.tag), CYLDemoDataSource.shortTitle(row.region)]
         .filter((part: string, index: number) => index === 0 || !row.name.includes(part))
+        .map((part: string) => CYLExampleLocalizedString(part))
         .concat([`★${row.rating.toFixed(1)}`, `¥${row.price}`])
         .join(' · ')
     }));

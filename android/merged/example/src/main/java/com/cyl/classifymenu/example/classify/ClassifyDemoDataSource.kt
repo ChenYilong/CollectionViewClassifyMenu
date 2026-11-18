@@ -8,6 +8,7 @@ import com.cyl.classifymenu.CYLMenuResources
 import com.cyl.classifymenu.kDataSourceCellPictureKey
 import com.cyl.classifymenu.kDataSourceCellTextKey
 import com.cyl.classifymenu.kDataSourceSectionKey
+import com.cyl.classifymenu.example.menu.CYLExampleLocalizedString
 import org.json.JSONArray
 
 /**
@@ -56,6 +57,8 @@ object ClassifyDemoDatabase {
 class ClassifyDemoDataSource private constructor(
     val sections: List<Map<String, Any?>>,
     val hasExclusiveFirstItem: Boolean,
+    /** The example's lookup (`CYLExampleLocalizedString`): the source titles stay as data, only the display is translated. */
+    private val localize: (String) -> String = { it },
 ) : CYLMenuDataSource {
 
     companion object {
@@ -64,7 +67,8 @@ class ClassifyDemoDataSource private constructor(
         /**
          * `+classifyDataSource`.
          */
-        fun classifyDataSource(context: Context) = ClassifyDemoDataSource(ClassifyDemoDatabase.dataSource(context), false)
+        fun classifyDataSource(context: Context) =
+            ClassifyDemoDataSource(ClassifyDemoDatabase.dataSource(context), false) { CYLExampleLocalizedString(context, it) }
 
         /**
          * `+filterDataSource`: "地区过滤" and "菜品过滤", each led by the exclusive "全部" (sample data).
@@ -76,30 +80,49 @@ class ClassifyDemoDataSource private constructor(
             return ClassifyDemoDataSource(listOf(
                 mapOf(SECTION_TITLE_KEY to "地区过滤", kDataSourceSectionKey to regions),
                 mapOf(SECTION_TITLE_KEY to "菜品过滤", kDataSourceSectionKey to foods),
-            ), true)
+            ), true) { CYLExampleLocalizedString(context, it) }
         }
 
         /**
          * `+regions`.
          */
-        fun regions() = listOf("北京 🏙️ 扩展文字", "上海", "广州", "深圳")
+        fun regions() = listOf("北京 🏙️ 扩展文字", "上海", "广州", "深圳")  // NOLOCALIZE: source titles (the database matches them)
 
         /**
          * `+shortTitleForTitle:`: the title without the demo's long suffix.
          */
         fun shortTitle(title: String): String {
-            for (suffix in listOf(" 扩展文字😀✨", " 🏙️ 扩展文字")) if (title.endsWith(suffix)) return title.dropLast(suffix.length)
+            for (suffix in listOf(" 扩展文字😀✨", " 🏙️ 扩展文字")) if (title.endsWith(suffix)) return title.dropLast(suffix.length)  // NOLOCALIZE: source suffixes
             return title
         }
+
+        /** The sample suffix of the long titles ("川菜 扩展文字😀✨"), a word of its own in the tables. */
+        const val SAMPLE_SUFFIX_WORD = "扩展文字"
     }
+
+    /**
+     * `localizedTitle(_:)`: a source title in the app's language, the name and the sample suffix each looked up
+     * ("川菜 扩展文字😀✨" → "Sichuan extended text😀✨").
+     */
+    fun localizedTitle(title: String): String {
+        val short = shortTitle(title)
+        if (short == title) return localize(title)
+        return localize(short) + title.substring(short.length).replace(SAMPLE_SUFFIX_WORD, localize(SAMPLE_SUFFIX_WORD))
+    }
+
+    /** `localizedShortTitle(_:)`: a source title without the sample suffix, in the app's language ("北京 🏙️ 扩展文字" → "Beijing"). */
+    fun localizedShortTitle(title: String) = localize(shortTitle(title))
+
+    /** The source title of an item, as the JSON and the places database hold it (for queries). */
+    fun sourceTitle(indexPath: CYLIndexPath) = items(indexPath.section)[indexPath.item][kDataSourceCellTextKey] as? String ?: ""
 
     @Suppress("UNCHECKED_CAST")
     private fun items(section: Int): List<Map<String, Any?>> = sections[section][kDataSourceSectionKey] as? List<Map<String, Any?>> ?: emptyList()
 
     override fun numberOfSectionsInMenu() = sections.size
     override fun menuNumberOfItemsInSection(section: Int) = items(section).size
-    override fun menuTitleForSection(section: Int) = sections[section][SECTION_TITLE_KEY] as? String ?: ""
-    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = items(indexPath.section)[indexPath.item][kDataSourceCellTextKey] as? String ?: ""
+    override fun menuTitleForSection(section: Int) = localize(sections[section][SECTION_TITLE_KEY] as? String ?: "")
+    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = localizedTitle(sourceTitle(indexPath))
 
     override fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? =
         if (items(indexPath.section)[indexPath.item].containsKey(kDataSourceCellPictureKey)) CYLMenuResources.imageNamed("home_btn_shrink") else null

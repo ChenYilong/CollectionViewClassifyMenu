@@ -332,11 +332,8 @@ function gridRows(topics, itemsPerRow = DISCOVER_STYLE.itemsPerRow) {
  * The core's own strings (CYLClassifyMenu.strings) for the fold cell: CYLMenuExpand / CYLMenuCollapse, through
  * i18n.tc() (the core's string table) when it has them, else these copies.
  */
-const CORE_STRINGS = {
-  'zh-Hans': { expand: '更多', collapse: '收起' },
-  'zh-Hant': { expand: '更多', collapse: '收合' },
-  en: { expand: 'More', collapse: 'Less' },
-};
+const CORE_STRINGS = Object.fromEntries(Object.entries(require('cyl-tag-list-miniprogram/core-tables.js'))
+  .map(([lang, table]) => [lang, { expand: table.CYLMenuExpand, collapse: table.CYLMenuCollapse }]));
 
 function foldTitle(expanded, lang = language()) {
   const key = expanded ? 'CYLMenuCollapse' : 'CYLMenuExpand';
@@ -355,6 +352,7 @@ function foldTitle(expanded, lang = language()) {
  * the Chinese text, as the bundle's strings.
  */
 const RESULT_STRINGS = {
+  // NOLOCALIZE-BEGIN: the results view's own table (en, zh-Hant; keys are the zh-Hans text), which the iOS example does not have
   en: {
     '搜索结果': 'Results',
     '“%@” · %lu 条结果': '“%@” · %lu results',
@@ -367,6 +365,7 @@ const RESULT_STRINGS = {
     '没有找到“%@”的相关结果': '沒有找到「%@」的相關結果',
     '换个关键词试试，或者看看下面的发现': '換個關鍵詞試試，或清除搜尋看看發現',
   },
+  // NOLOCALIZE-END
 };
 
 function resultString(key, lang = language(), ...args) {
