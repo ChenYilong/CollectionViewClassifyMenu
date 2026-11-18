@@ -21,7 +21,7 @@
         { "title": "Lottie", "image": "system:sparkles", "animation": "../Animations/Lottie/tab_home_animate.json" },
         { "title": "PAG", "image": "system:play.circle", "animation": "pag-ios/0.pag" },
         { "title": "Rive", "image": "system:circle.hexagongrid", "animation": "../Animations/Rive/house.riv",
-          "animationOptions": { "stateMachine": "State Machine 1" } },
+          "animationOptions": { "stateMachine": "State Machine 1", "numberInput": "Rooms", "values": "3,4,5,6" } },
         { "title": "SVGA", "image": "system:play.fill", "animation": "../Animations/SVGA/tab_search.svga" },
         { "title": "GIF", "image": "system:photo", "animation": "../Animations/GIF/tab_star.gif" },
         { "title": "SF Symbol", "image": "system:star", "selectedImage": "system:star.fill" },

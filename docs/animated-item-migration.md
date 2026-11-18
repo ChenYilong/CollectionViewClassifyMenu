@@ -458,3 +458,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   Swift package, run the four suites. The Animations screen already passes `numberInput: Rooms`, `values: 3,4,5,6`
   (`CYLTagAnimationDemoViewController.swift:101`); the configuration file demo (`animated-tags.json`) passes only the
   state machine, so its Home barely moves: add the same two options there.
+- **DONE (2026-11-18)**: the eight iOS pin files name `918da089d7f6991a24b1fcbc40c150c7a503d4b5`; `pod install` resolved
+  it in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift package (`Package.resolved`
+  revision `918da089`) builds for the iOS Simulator. iPhone 17 Pro `62B54974` (iOS 27.2, Xcode 27.2, macOS 27.3): menu
+  32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. `animated-tags.json` Rive Home now passes `numberInput: Rooms`,
+  `values: 3,4,5,6`, like the Animations screen; its motion on the configuration file screen is not yet checked on a
+  simulator (the Mac load is high). The mini program's copy of `animated-tags.json` belongs to the Windows session.
