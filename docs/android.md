@@ -584,7 +584,7 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 
 - **TODOs still open elsewhere (not this task; owner):** (mini program Rive B20, the Menu `isOpen` and BUG 1 drift:
   done, `animated-item-migration.md` `074285a6`, `cross-platform.md`; only BUG 1 on a phone is left); Android `CYLRightImageButton` /
-  `CYLMultipleFilterHeaderView` on `CYLTagButton` (`issue-progress.md`; Windows session); SVGA in the Android, Flutter,
+  `CYLMultipleFilterHeaderView` on `CYLTagButton` (done 2026-11-19, `issue-progress.md`); SVGA in the Android, Flutter,
   React Native and mini program examples (done 2026-11-19, `example-demo-rules.md`); `npm publish` of the mini program package (needs the
   maintainer's `npm login`); a VoiceOver / Switch Control check on a real device; the default tab bar height
   (`cross-platform.md`; CYLTabBarController).
@@ -601,6 +601,13 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 - **Test (new):** `CYLTagReorderWidthTest` drags "Kotlin" onto "Go" in the iOS demo's ten tags (long press, ten move
   steps, drop). Every tag keeps its own title's width at each step, right after the drop and after the reload, and
   `tagMoveHandler` reports 1 → 9. Android library 87 / 0.
-- **TODO (missing, not part of this check):** the Android example has no `CYLTagListView` drag demo (`allowsReordering`)
-  like the iOS Style tab's first row `CYLTagReorderDemoViewController`; the existing Android drag demo is
-  `TagContainerLayout`'s.
+- **DONE (2026-11-19, was the TODO "no `CYLTagListView` drag demo"), 100/100:** the Android example's Styles screen now
+  starts, as on iOS, with the section 拖拽排序（长按标签后拖动） and its row 拖拽标签重新排序, which opens
+  `CYLTagReorderScreen` (`CYLTagCloudScreens.kt`), the counterpart of `CYLTagReorderDemoViewController`: the same ten tags,
+  `allowsReordering`, the Pure Teal theme, the hint, the order below the list (`tagMoveHandler`) and Reset (a button; iOS
+  has a bar button, the Android screens have none). Example layer only, no core change; the strings are the iOS
+  example's. Emulator: long press on Kotlin, drag to Go, drop: every title stays whole while dragging and the order
+  reads Swift · ArkTS · Dart · TypeScript · Objective-C · Java · C++ · Rust · Go · Kotlin
+  (`assets/android-tag-drag-reorder.png`).
+
+  <img src="assets/android-tag-drag-reorder.png" width="360" alt="Android drag to reorder: before, while dragging, dropped">
