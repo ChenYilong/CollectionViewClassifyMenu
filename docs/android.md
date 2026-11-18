@@ -611,3 +611,22 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
   (`assets/android-tag-drag-reorder.png`).
 
   <img src="assets/android-tag-drag-reorder.png" width="360" alt="Android drag to reorder: before, while dragging, dropped">
+
+## TODO (2026-11-19, `feat/harmony`): the iOS drag-to-reorder example looks like the Android one, built on CYLAnimatedItemView
+
+- **Context:** the owner's reference is the Android example's "Container" tab (AndroidTagView's sample, `LujunTagContainerFragment`):
+  pill tags with a round avatar on the left (a remote photo per tag, the yellow avatar while it loads or when it fails) and a
+  drawn cross on the right, in a pale red rounded container; an add field with ADD TAG; a long list of colored country
+  tags in a green-bordered box; right-to-left tags with a leading cross; centered tags; custom red and blue tags; and a sixth
+  container (a star drawable, a long tag that wraps, a cross drawable, no cross on the last tag). Reference:
+  [android-tag-container-reference.png](assets/android-tag-container-reference.png). The iOS drag demo added in `a4517a3c`
+  (`CYLTagReorderDemoViewController`, ten teal tags) does not look like it.
+- **Requirements:** the iOS drag example matches the Android screen; every tag icon is drawn by the core's animated item
+  component (`CYLTagButton`, a `CYLAnimatedItemView`); where the component cannot do what the screen needs, its API grows
+  (core first); before / after screenshots next to the Android reference; tests.
+- **Prompt (verbatim):** "iOS的拖拽example不够还原，附件为android的拖拽样式。请复用animatedView组件完成。如有必要更新animatedView组件api以帮助实现"
+- **Prompt (English):** "The iOS drag example is not faithful enough; the attachment is the Android drag style. Please build
+  it by reusing the animatedView component. If necessary, update the animatedView component's API to help implement it."
+- **Acceptance (100):** layout and look match the reference container by container (40); icons drawn through
+  `CYLTagButton` / `CYLAnimatedItemView`, any new API in the core with a test (25); drag works in the first two containers
+  on the simulator (20); stitched before / after / Android screenshots (15). Pass: 60.
