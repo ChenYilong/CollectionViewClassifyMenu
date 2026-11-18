@@ -588,3 +588,19 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
   React Native and mini program examples (`example-demo-rules.md`); `npm publish` of the mini program package (needs the
   maintainer's `npm login`); a VoiceOver / Switch Control check on a real device; the default tab bar height
   (`cross-platform.md`; CYLTabBarController).
+
+## DONE (2026-11-19, `feat/harmony`): does Android's drag cut titles like iOS did before `a4517a3c`?
+
+- **Task (from the Mac session's TODO audit, 248eaa1c):** iOS `a4517a3c` fixed tag titles cut ("Kot…") while a tag was
+  dragged. Check whether Android's drag has the same issue. Score: **100 / 100** (pass 60).
+- **Answer: no.** iOS showed the new order with the widths of the old one. Android's `CYLTagListView` drag translates
+  only the dragged cell (the others stay where they are), and on the drop `moveItem` reloads the titles and the widths
+  together (`reloadMenuData`: titles, then `measureIfNeeded` and `content.rebuild`). No cell ever shows one tag's title at
+  another tag's width. The Android example's drag demo (`LujunTagContainerFragment`, `container_enable_drag`) uses
+  `TagContainerLayout`, whose tags are views sized by their own text, so it cannot have the issue either.
+- **Test (new):** `CYLTagReorderWidthTest` drags "Kotlin" onto "Go" in the iOS demo's ten tags (long press, ten move
+  steps, drop). Every tag keeps its own title's width at each step, right after the drop and after the reload, and
+  `tagMoveHandler` reports 1 → 9. Android library 87 / 0.
+- **TODO (missing, not part of this check):** the Android example has no `CYLTagListView` drag demo (`allowsReordering`)
+  like the iOS Style tab's first row `CYLTagReorderDemoViewController`; the existing Android drag demo is
+  `TagContainerLayout`'s.
