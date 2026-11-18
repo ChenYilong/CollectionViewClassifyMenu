@@ -58,6 +58,7 @@ function mapConfiguration(t = (s) => s) {
         { title: 'Lottie', animation: animation('Lottie/tab_me_animate.json') },
         { title: 'GIF', animation: animation('GIF/cyl_tab_sample_animated.gif') },
         { title: 'Rive', animation: animation('Rive/menu_button.riv') },
+        { title: 'SVGA', animation: animation('SVGA/tab_chat.svga') },
         { image: 'system:heart', selectedImage: 'system:heart.fill' },
         'Text only',
       ],

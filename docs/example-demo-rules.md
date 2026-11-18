@@ -117,7 +117,17 @@ file is the iOS bundle's `animated-tags.json` (already has its SVGA tag). The ex
 2.6.1 (JitPack, group-filtered); CYLTabBarController's `CYLSVGATabBarItemAnimator` registers itself when it is there. On
 the emulator all 7 icons draw at rest and play after Play all. The Android example has no launch screens (iOS
 `animations-svga`, `style-svga`) and no example unit tests, so nothing to add there.
-Mini Program: TODO (Windows session).
+Mini Program: DONE (2026-11-19, Windows session): the Animated icons sections `svga` (Home, Search, Messages, Me) and
+`svga-dark` (Posts, List, Home on the icons.riv dark tags), the Styles action `animation.svga`, the dictionary demo's SVGA
+tag; the configuration file's SVGA tag now plays too. CYLTabBarController's `cyl-svga-miniprogram` (pinned commit) is
+installed by `scripts/fetch-cyltabbar.js` into the "engines" subpackage next to cyl-pag, and `scripts/export-animations.py`
+copies the iOS bundle's six `.svga` files there as `engines/svga/*.svga.bin` (a code package leaves out `.svga`); the
+example's engine adapter (`components/cyl-tag-animation-view`) gives the tags `cyl-svga` through `generic:cyl-svga-view`,
+which the library and cyl-animated-item already declared, so no core change. WeChat DevTools: all 7 SVGA icons draw, Play
+all plays them to their last frame, with Loop on they keep moving (changed pixels per icon over 12 s: Search
+[0, 0, 126, 28, 41], Messages [133, 0, 32, 99, 138], Posts [211, 65, 30, 88, 117]); `npm test` 145 pass.
+
+<img src="assets/miniprogram-devtools-svga.png" width="400" alt="Mini program SVGA sections in WeChat DevTools: at rest, after Play all, loop on">
 Flutter and React Native on iOS: DONE (2026-11-19, `c2073004`, `0202e515`): an SVGA section (Home, Search, Messages, Me;
 the iOS example's files) after Rive, pod `CYLAnimatedItem/SVGA` (React Native also needs `SVGAPlayerLite` with modular
 headers); on the iPhone 17 Pro simulator the icons rest gray and animate after Play all; Flutter iOS integration tests

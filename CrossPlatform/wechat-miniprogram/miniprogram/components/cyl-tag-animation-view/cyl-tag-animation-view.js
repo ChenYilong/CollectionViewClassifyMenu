@@ -1,12 +1,13 @@
 /**
  * The example's engine component for the tags: given to cyl-tag-list (and cyl-tag-button) as the abstract nodes
- * `cyl-lottie-view`, `cyl-rive-view` and `cyl-pag-view`, which the library forwards to CYLTabBarController's
+ * `cyl-lottie-view`, `cyl-rive-view`, `cyl-pag-view` and `cyl-svga-view`, which the library forwards to CYLTabBarController's
  * cyl-animated-item, the component that draws every tag icon. The library links no engine; this component plays:
  *
  * - a Lottie file in CYLTabBarController's `cyl-lottie` (its lottie-miniprogram fork: image assets, a canvas per
  *   animation, and in WeChat DevTools an <image> of the canvas, so the icon stays in its tag while the list scrolls);
  * - a Rive file in CYLTabBarController's `cyl-rive`, with the tag's animationOptions;
- * - a PAG file in CYLTabBarController's `cyl-pag` (the "engines" subpackage, loaded asynchronously).
+ * - a PAG file in CYLTabBarController's `cyl-pag` (the "engines" subpackage, loaded asynchronously);
+ * - an SVGA file in CYLTabBarController's `cyl-svga` (also in the "engines" subpackage).
  *
  * A GIF never comes here: cyl-animated-item draws it with <image>.
  *
@@ -35,7 +36,7 @@ function rivePath(src, parameters) {
   return pairs.length ? `${src}#${pairs.join('&')}` : src;
 }
 
-const ENGINES = ['lottie', 'rive', 'pag'];
+const ENGINES = ['lottie', 'rive', 'pag', 'svga'];
 
 Component({
   properties: {
@@ -48,7 +49,7 @@ Component({
     label: { type: String, value: '' },
   },
 
-  data: { engine: '', lottieData: null, rivePath: '', wasmPath: RIVE_WASM, pagPath: '', pagWasmPath: PAG_WASM },
+  data: { engine: '', lottieData: null, rivePath: '', wasmPath: RIVE_WASM, pagPath: '', pagWasmPath: PAG_WASM, svgaPath: '' },
 
   lifetimes: {
     ready() {
@@ -81,6 +82,7 @@ Component({
       if (engine === 'lottie') next.lottieData = JSON.parse(JSON.stringify(this.entry.data()));
       if (engine === 'rive') next.rivePath = rivePath(this.entry.src, this.parameters);
       if (engine === 'pag') next.pagPath = this.entry.src;
+      if (engine === 'svga') next.svgaPath = this.entry.src;
       this.setData(next);
     },
 

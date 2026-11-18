@@ -33,13 +33,16 @@ const CHECKOUT = path.join(ROOT, '.deps', 'CYLTabBarController');
  * CYLTabBarController's fork of lottie-miniprogram (cyl-lottie-miniprogram, which draws the base64 image assets the npm
  * lottie-miniprogram 1.0.12 never drew), cyl-rive (the Rive runtime and its 573 KB WebAssembly), and cyl-pag (libpag
  * 4.5.85, about 0.96 MB with its WebAssembly), which does not fit the 2 MB main package next to Rive: it goes to the
- * "engines" subpackage, which the icon component loads asynchronously (componentPlaceholder).
+ * "engines" subpackage, which the icon component loads asynchronously (componentPlaceholder). cyl-svga (an SVGA 2.x
+ * player for the 2D canvas, about 75 KB) goes there too, next to the example's .svga.bin files
+ * (scripts/export-animations.py), so the main package stays as it is.
  */
 const PACKAGES = [
   { name: 'cyl-tabbar-miniprogram', folder: 'CrossPlatform/wechat-miniprogram-cyltabbar' },
   { name: 'cyl-lottie-miniprogram', folder: 'CrossPlatform/lottie-miniprogram' },
   { name: 'cyl-rive-miniprogram', folder: 'CrossPlatform/rive-miniprogram' },
   { name: 'cyl-pag-miniprogram', folder: 'CrossPlatform/pag-miniprogram', root: 'engines' },
+  { name: 'cyl-svga-miniprogram', folder: 'CrossPlatform/svga-miniprogram', root: 'engines' },
 ];
 
 /**

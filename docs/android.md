@@ -582,10 +582,10 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
   <img src="assets/ios-style-tab-reorder-entry.png" width="360" alt="iOS 样式 tab: the drag-to-reorder row first">
   <img src="assets/ios-tag-drag-reorder.png" width="600" alt="iOS drag to reorder: before, while dragging (titles whole), dropped">
 
-- **TODOs still open elsewhere (not this task; owner):** mini program Rive B20, the Menu `isOpen` and BUG 1 drift
-  (`cross-platform.md`, `animated-item-migration.md`; Windows session); Android `CYLRightImageButton` /
+- **TODOs still open elsewhere (not this task; owner):** (mini program Rive B20, the Menu `isOpen` and BUG 1 drift:
+  done, `animated-item-migration.md` `074285a6`, `cross-platform.md`; only BUG 1 on a phone is left); Android `CYLRightImageButton` /
   `CYLMultipleFilterHeaderView` on `CYLTagButton` (`issue-progress.md`; Windows session); SVGA in the Android, Flutter,
-  React Native and mini program examples (`example-demo-rules.md`); `npm publish` of the mini program package (needs the
+  React Native and mini program examples (done 2026-11-19, `example-demo-rules.md`); `npm publish` of the mini program package (needs the
   maintainer's `npm login`); a VoiceOver / Switch Control check on a real device; the default tab bar height
   (`cross-platform.md`; CYLTabBarController).
 

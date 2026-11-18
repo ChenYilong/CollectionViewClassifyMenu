@@ -3,7 +3,7 @@
  * The animated icons of the iOS example (CYLMenuExample.bundle/Animations), by the path the iOS example uses
  * ("Lottie/tab_home_animate.json"). A Lottie entry loads its data on first use (`data()`); a GIF entry has
  * the file, its first and last frames and the duration of one pass in milliseconds; a Rive entry has its
- * .riv.bin file. PAG files are not here: their engine is not in the package (cyl-tag-list/animations.js).
+ * .riv.bin file; a PAG or SVGA entry has its .bin file in the "engines" subpackage.
  */
 module.exports = {
   "Lottie/tab_home_animate.json": { engine: 'lottie', data: () => require('../lottie/home.js') },
@@ -35,4 +35,10 @@ module.exports = {
   "pag-ios/tab_health.pag": {"engine": "pag", "src": "/engines/pag/tab_health.pag.bin"},
   "pag-ios/tab_me.pag": {"engine": "pag", "src": "/engines/pag/tab_me.pag.bin"},
   "pag-ios/tab_moments.pag": {"engine": "pag", "src": "/engines/pag/tab_moments.pag.bin"},
+  "SVGA/tab_activity.svga": {"engine": "svga", "src": "/engines/svga/tab_activity.svga.bin"},
+  "SVGA/tab_chat.svga": {"engine": "svga", "src": "/engines/svga/tab_chat.svga.bin"},
+  "SVGA/tab_home.svga": {"engine": "svga", "src": "/engines/svga/tab_home.svga.bin"},
+  "SVGA/tab_list.svga": {"engine": "svga", "src": "/engines/svga/tab_list.svga.bin"},
+  "SVGA/tab_profile.svga": {"engine": "svga", "src": "/engines/svga/tab_profile.svga.bin"},
+  "SVGA/tab_search.svga": {"engine": "svga", "src": "/engines/svga/tab_search.svga.bin"},
 };
