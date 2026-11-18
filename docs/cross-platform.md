@@ -824,9 +824,9 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   on `CYLTagButton` and the Android drag demo (Windows session), checks on a real HarmonyOS device, a real iPhone
   (VoiceOver) and a phone (mini program BUG 1), and `npm publish` (needs the owner's npm login).
 
-### DONE (2026-11-19, `feat/harmony`, Windows session): HarmonyOS and the mini program follow the iOS `1d1f7904` tag rules, 100/100
+### DONE (2026-11-19, `feat/harmony`, Windows session): HarmonyOS and the mini program follow the iOS `020434f1` tag rules, 100/100
 
-- **Context:** the Mac session's `1d1f7904` changed three things in the iOS core, all to match AndroidTagView: the new
+- **Context:** the Mac session's `020434f1` changed three things in the iOS core, all to match AndroidTagView: the new
   `CYLMenuStyle.imageFillsTagHeight` (a leading image drawn as a circle as tall as the tag, at its leading edge);
   `maximumTitleLength` now keeps `max − 3` characters plus "..." (23 gives "Welcome to use Andro...", where it used to keep
   `max` plus "..."); `CYLTagRowAlignment.trailing` now starts each row at the trailing edge with its first tag

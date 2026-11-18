@@ -953,7 +953,7 @@ tags: [issues, ui, cocoapods, progress]
   `CYLTagEditorLocalizedString`, `CYLDemoLocalizedString`), AGENTS.md "Internationalization and localization".
 - Prompt (verbatim): "排查国际化 本地化遗留问题 完全支持，fix 样式 issue"
 - Prompt (English): "Investigate leftover internationalization / localization problems until it is fully supported; fix
-  the 样式 issue." (The "样式" issue: the pushed commit 58b2f335 had Chinese in its message; rewritten as 1d1f7904 with
+  the 样式 issue." (The "样式" issue: the pushed commit 58b2f335 had Chinese in its message; rewritten as 020434f1 with
   the owner's OK, `--force-with-lease`.)
 - Acceptance (100): every key a lookup is called with exists in every language of its bundle with the same format
   specifiers (25); no user-facing literal outside a lookup (25); every screen of the iOS examples shows no Chinese in
@@ -1002,7 +1002,7 @@ tags: [issues, ui, cocoapods, progress]
   and step 0 of `.agents/skills/cyl-task-start/SKILL.md` (and its description); appended only (numstat: no lines
   removed except the skill's rewritten description line). `harmony/instructions.md` belongs to the Windows session:
   asked it to append the same rule (−10 until it confirms).
-- Update: the Windows session appended the rule to `harmony/instructions.md` (669dcfc1): **100/100**.
+- Update: the Windows session appended the rule to `harmony/instructions.md` (e9abb559): **100/100**.
 
 ### TODO (2026-11-19, `feat/harmony`): "Welcome to use AndroidTagView!" names the platform's OS version and CollectionViewClassifyMenu
 
@@ -1026,16 +1026,24 @@ tags: [issues, ui, cocoapods, progress]
   (39). Screenshot: [ios-welcome-tag-os-version.png](assets/ios-welcome-tag-os-version.png). Score 70 / 100 until the
   Windows session reports Android, HarmonyOS and the mini program (−30).
 
-### TODO (2026-11-19, `feat/harmony`): project-wide localization audit; rewrite 4e03f8a5's message (owner's OK)
+### TODO (2026-11-19, `feat/harmony`): project-wide localization audit; rewrite b8c95591's message (owner's OK)
 
 - Context: the iOS sweep above is done (core, demo app, both Examples). Left: the shared Flutter and React Native
   example code (Mac session: their iOS runs), Android, HarmonyOS and the mini program (Windows session, session roles
-  rule). Commit `4e03f8a5` (Windows session) has "拖拽排序" in its body; the owner now asks to fix it. 14 linear
+  rule). Commit `b8c95591` (Windows session) has "拖拽排序" in its body; the owner now asks to fix it. 14 linear
   commits follow it; their hashes change; references to them in docs and commit messages are remapped.
   16 older commits (2026-11-12 to 11-16) also have Chinese in their messages; not part of this request.
-- Prompt (verbatim): "排查项目国际化 本地化适配，并fix Commit message: 4e03f8a5, from the Windows session, has Chinese ("拖拽排序") in its body. Rewriting it means changing older history on the shared branch, so I'm leaving it unless you ask."
-- Prompt (English): "Audit the project's internationalization / localization, and fix commit 4e03f8a5's message
+- Prompt (verbatim): "排查项目国际化 本地化适配，并fix Commit message: b8c95591, from the Windows session, has Chinese ("拖拽排序") in its body. Rewriting it means changing older history on the shared branch, so I'm leaving it unless you ask."
+- Prompt (English): "Audit the project's internationalization / localization, and fix commit b8c95591's message
   (Chinese in its body)."
-- Acceptance (100): 4e03f8a5's message in English, pushed with `--force-with-lease`, later hashes remapped in docs and
+- Acceptance (100): b8c95591's message in English, pushed with `--force-with-lease`, later hashes remapped in docs and
   messages, the Windows session resynced (30); Flutter and React Native example strings localized with a check (35);
   Android, HarmonyOS and the mini program audited by the Windows session (35). Pass: 60.
+- Commit message rewrite (DONE): the old `4e03f8a5` is now `b8c95591` ("Styles starts with the drag-to-reorder row"),
+  replayed with `git commit-tree` on the same trees, authors and dates; the 15 later commits got new hashes (map:
+  4e03f8a5→b8c95591, 6e33af93→2a70241d, 8e21f7b0→170e3bb6, 1a64677c→ca8fce5a, 3f696cd5→699b5724, 1d1f7904→020434f1,
+  6e9973bf→185198ad, cc761c21→efabb11a, 669dcfc1→e9abb559, 3222912d→e438e1cb, be8a74e7→d7436d3b, f88f9406→8b57c329,
+  501fe58e→4e41816c, 8ccb2f8d→5031043b, 33802f5b→cb9d6528, 1950b703→3a09462d); hashes cited in later messages and in
+  the docs were remapped; `check-commit-message.sh b8c95591^..HEAD`: OK; tree of the new tip identical to the old one;
+  pushed with `--force-with-lease`.
+
