@@ -52,6 +52,11 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # CocoaPods only on iOS: the Rive engine comes from the pod CYLAnimatedItem/Rive, and the core from the pod
+  # CollectionViewClassifyMenu, so CYLAnimatedItem is linked once (with Swift Package Manager the plugin brought a second
+  # copy through the package CollectionViewClassifyMenu: 21 duplicate symbols).
+  config:
+    enable-swift-package-manager: false
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

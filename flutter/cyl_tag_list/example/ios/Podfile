@@ -37,6 +37,7 @@ target 'Runner' do
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
                   :commit => '776b4635791b2197782b4db1b07126c4a16d8d9d' }
   pod 'CYLTabBarController', cyl_tab_bar
+  pod 'CollectionViewClassifyMenu', :path => '../../../..'
   pod 'CYLAnimatedItem', cyl_tab_bar
   # The animated icon engines the example plays; the core depends on the CYLAnimatedItem pod only.
   pod 'CYLAnimatedItem/LottieObjectiveC', cyl_tab_bar
