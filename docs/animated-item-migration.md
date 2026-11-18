@@ -554,3 +554,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `build.sh` OK. One test was stale, not from the pin: it expected the review keyword "质量不错" translated, which the iOS
   sweep made user content; it now expects it as written. Android: `android/merged/gradle.properties`
   `cyl.tabbar.commit`; library tests 87 / 0, the example builds. Bundled copies: 20 / 20.
+- **Update (2026-11-19): iOS pins from 4da6b760 to 5996fa96.** CYLTabBarController `5996fa96` (newest) makes
+  `accessoryView` and `placeholderImage` open again after our report; no code change here. pod install in the four
+  projects; menu 37 / 37, Example 98 / 98, Swift Example 22 / 22, TagCollectionView 6 / 6; `flutter build ios --simulator`
+  OK. With the Windows session's bundled copies at 5996fa96 (`a23a81f9`), every platform is at the same commit:
+  **100/100**.
