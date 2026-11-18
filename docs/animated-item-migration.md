@@ -516,3 +516,19 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   it in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift package (`Package.resolved`
   revision `b376c278`) builds for the iOS Simulator. iPhone 17 Pro `62B54974` (iOS 27.2, Xcode 27.2, macOS 27.3): menu
   32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. Every platform is on `b376c278`.
+
+## TODO (2026-11-19, `feat/harmony`): pins from b376c278 to CYLTabBarController 4da6b760 (Swift CYLAnimatedItemView)
+
+- **Context:** CYLTabBarController `4c7dc79d` (contained in `4da6b760`, the newest commit of `feat/cross-platform-components`)
+  moves `CYLAnimatedItemView`, its enums and protocols to Swift, with the same Objective-C API and the same Swift names
+  for subclasses (`layoutContent(in:)`, `contentSizeThatFits(_:)`, `itemStateDidChange()`, `itemAccessibilityLabel()`);
+  Objective-C can no longer subclass it. CYLSearchViewController needs one ClassifyMenu commit whose iOS pins and the
+  mini program / HarmonyOS bundled copies are all at that commit. iOS pins here (Mac session); the mini program's
+  `cyl-animated-item` and `harmony/cylanimateditem` by the Windows session.
+- **Requests (relayed by the Mac-CYLTabBarController and Mac-CYLSearchViewController sessions):** "adapt
+  CollectionViewClassifyMenu to the new Swift CYLAnimatedItemView and keep every existing feature" (original:
+  "要转发任务给其他session要求适应swift新代码完成原有功能 …"); pin 4c7dc79d or later; build and run the tests, including
+  `CYLTagButton` and the Objective-C tests; fix what breaks or report an API gap.
+- **Acceptance (100):** every iOS pin at 4da6b760 (20); the core and all four iOS projects build, menu / example / swift /
+  tag suites pass, the Objective-C tests included (50); Flutter iOS builds (10); the bundled copies moved by the
+  Windows session and the commit sent to CYLSearchViewController (20). Pass: 60.
