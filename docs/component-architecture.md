@@ -326,7 +326,7 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   module (`@_exported import CYLAnimatedItem`, as CYLTabBarController does), so every client of the library loads it.
   Pending CI.
 
-## TODO (2026-11-17): Android CYLIndexPathButton, CYLRightImageButton, CYLMultipleFilterHeaderView on CYLTagButton
+## DONE (2026-11-17, checked 2026-11-19): Android CYLIndexPathButton, CYLRightImageButton, CYLMultipleFilterHeaderView on CYLTagButton
 
 - **Context**: branch `feat/harmony` (PR #20). On iOS all three already use the one icon + title component:
   `CYLIndexPathButton` and `CYLRightImageButton` subclass `CYLTagButton`, and `CYLMultipleFilterHeaderView` shows its
@@ -368,10 +368,12 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   - Parity tables regenerated from the maps (`android/merged/api-map.json`, `ios-map.json`):
     `docs/android-api.md` 784 to 791 / 792 (99.9), `docs/android-ios-api.md` 736 / 736 (100).
   - Remaining: CI build and the unit tests; screenshots of the classify menu and the multiple filter on Android to
-    compare with iOS.
+    compare with iOS. **Done 2026-11-19 (Windows session), 100/100:** the library and the example build, Android library
+    tests 87 / 0 at `c368c75e`; on the emulator the More / Less button and the filter section titles render as on iOS
+    (`assets/android-menu-filter-tagbutton.png`); `docs/android-api.md` 792 / 792 (`c368c75e` mapped the category row).
 - **Pin `d875dd1`** (2026-11-17): the #788 tip and newest commit (`5ff6021` guide, `ab29a84` late-failure fallback and remote GIF downloads, `d875dd1` remote PAG downloads); `DEFINES_MODULE` kept.
 
-## TODO (2026-11-17): the guide re-read at `57a527e`: CYLAnimatedItem on HarmonyOS and the mini program
+## 90/100 (2026-11-17, reviewed 2026-11-19): the guide re-read at `57a527e`: CYLAnimatedItem on HarmonyOS and the mini program
 
 - **Context**: CYLTabBarController `842aef8` adds the component on HarmonyOS (ohpm module
   `CrossPlatform/harmonyos-cyltabbar/cylanimateditem`, `CYLAnimatedItemView`, engines registered by the app with
@@ -410,6 +412,19 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
      `harmony/classifymenu` from source: they need the `cylanimateditem` module and their own engine registration.
   3. Publishing `@cyl/classifymenu` to ohpm needs `cylanimateditem` published first (`file:` dependency).
   4. Build and run: ArkTS compile, HarmonyOS tests and an emulator run; the mini program in WeChat DevTools.
+- **Review (2026-11-19, Windows session): 90/100.**
+  1. Done. The mini program gaps closed upstream (PR #815, `faf535e0`, in the pins since `074285a6`; GIF stills, one-pass
+     play, `embedded`, `autoplay`: `animated-item-migration.md` row 19), and SVGA joined the engines on 2026-11-19
+     (`43fc242a`). HarmonyOS: built, host tests and emulator checks (row 17, `harmony-verification.md`).
+  2. **Open.** The React Native HarmonyOS shell (`harmony-example/harmony/build-profile.json5`) lists `entry`,
+     `cyltabbar` and `classifymenu` but not `cylanimateditem`, which `classifymenu` now depends on (`file:../cylanimateditem`).
+     It also registers no engines, so its tags would show static images. Fix: add the module, register the example's
+     engines as `harmony/entry` does, then build. It is a full React Native for OpenHarmony app (`npm install`,
+     `scripts/setup.sh` codegen and bundle, native build); not built here yet. The Flutter shell
+     (`flutter/cyl_tag_list_ohos`) needs the Flutter for OpenHarmony SDK, which is not installed on this Windows host.
+  3. Blocked on the maintainer: publishing `cylanimateditem`, then `@cyl/classifymenu`, to ohpm.
+  4. Done: HarmonyOS ArkTS build, host tests and emulator runs (row 17); the mini program in WeChat DevTools (row 20, and
+     the SVGA check of 2026-11-19).
 
 ## DONE (2026-11-17): upstream `cyl-animated-item` playback for the mini program tags (CYLTabBarController PR #815)
 
