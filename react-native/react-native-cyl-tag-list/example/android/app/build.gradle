@@ -111,9 +111,10 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     // The animation library of CYLTabBarController's engine (react-native-cyltabbar compiles the engine): the tag list's
-    // Lottie row plays through it.
+    // Lottie, Rive and SVGA rows play through it (SVGAPlayer-Android is on JitPack, see ../build.gradle).
     implementation("com.airbnb.android:lottie:6.6.2")
     implementation("app.rive:rive-android:10.3.0")
+    implementation("com.github.yyued:SVGAPlayer-Android:2.6.1")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
