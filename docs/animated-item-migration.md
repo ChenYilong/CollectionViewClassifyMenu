@@ -475,3 +475,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Plan**: checked: no `.m`, `.h`, `.swift`, podspec or Package.swift changed in `918da089..4f73209c`; the branch head
   `012cd15f` is docs only after it, so `4f73209c` keeps every platform on one commit. Move the eight pin files,
   `pod install` x 4, build the Swift package, run the example suite.
+- **DONE (2026-11-18)**: the eight iOS pin files name `4f73209c0d357d42b55fcb2e2fa2ccb174220a2d`; `pod install` resolved
+  it in the root, `Example`, `Example-Swift` and `TagCollectionView` projects; the Swift package (`Package.resolved`
+  revision `4f73209c`) builds for the iOS Simulator; example suite 92 / 0 on iPhone 17 Pro `62B54974` (iOS 27.2,
+  Xcode 27.2, macOS 27.3). Every platform is on `4f73209c`.
