@@ -24,6 +24,29 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
         "CYLMenuExample.bundle/Configurations/animated-tags.json"
     }
 
+    /// The configuration file, its section titles in the Example's language. The file is shared with the Android,
+    /// HarmonyOS and mini program examples, so its titles stay the source text and are looked up here.
+    static func localizedFileConfiguration() throws -> [String: Any] {
+        var configuration = try CYLTagListView.configuration(contentsOfFile: configurationFilePath())
+        if let sections = configuration[CYLTagListKey.sections] as? [[String: Any]] {
+            configuration[CYLTagListKey.sections] = sections.map { section -> [String: Any] in
+                var section = section
+                if let title = section[CYLTagSectionKey.title] as? String {
+                    section[CYLTagSectionKey.title] = CYLExampleLocalizedString(title)
+                }
+                return section
+            }
+        }
+        return configuration
+    }
+
+    /// An icon-only tag's icon with a label in the app's language (an SF Symbol's own label follows the device's).
+    static func likeImage(_ symbol: String) -> Any {
+        guard let image = UIImage(systemName: symbol) else { return "system:\(symbol)" }
+        image.accessibilityLabel = CYLExampleLocalizedString("喜欢")
+        return image
+    }
+
     static func animationNamed(_ name: String) -> URL? {
         let resource = ("CYLMenuExample.bundle/Animations" as NSString).appendingPathComponent((name as NSString).deletingPathExtension)
         return Bundle.main.url(forResource: resource, withExtension: (name as NSString).pathExtension)
@@ -61,7 +84,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
             [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
             [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv")] as [String: Any],
             [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga")] as [String: Any],
-            [CYLTagItemKey.image: "system:heart", CYLTagItemKey.selectedImage: "system:heart.fill"] as [String: Any],
+            [CYLTagItemKey.image: likeImage("heart"), CYLTagItemKey.selectedImage: likeImage("heart.fill")] as [String: Any],
             "Text only",
         ]
         let section: [String: Any] = [
@@ -85,7 +108,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
 
         let fileTitle = caption(withText: CYLExampleLocalizedString("配置文件初始化：%@", Self.configurationFilePath()))
         do {
-            let fileTagListView = try CYLTagListView(configurationFile: Self.configurationFilePath())
+            let fileTagListView = CYLTagListView(configuration: try Self.localizedFileConfiguration())
             fileTagListView.menuDelegate = self
             self.fileTagListView = fileTagListView
         } catch {

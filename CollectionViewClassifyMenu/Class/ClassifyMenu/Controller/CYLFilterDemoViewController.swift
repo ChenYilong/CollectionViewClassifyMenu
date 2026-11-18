@@ -115,6 +115,8 @@ final class CYLFilterDemoViewController: UIViewController {
     static let filterSelectionKey = "CYLDemoFilterSelection"
 
     var filterSource: CYLMenuDataSource?
+    /// The filter's source as the demo data source (source titles for queries, localized titles for display).
+    private var demoSource: CYLDemoDataSource? { filterSource as? CYLDemoDataSource }
 
     /// The conditions (empty for "全部") and the matching places.
     private(set) var selectedRegions: [String] = []
@@ -190,7 +192,7 @@ final class CYLFilterDemoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if filterSource == nil {
-            filterSource = CYLDemoDataSource.filterDataSource()
+            filterSource = CYLDemoDataSource.filterDataSource { CYLDemoLocalizedString($0) }
         }
         navigationItem.title = CYLDemoLocalizedString("多选筛选")
         view.backgroundColor = .systemGroupedBackground
@@ -278,7 +280,8 @@ final class CYLFilterDemoViewController: UIViewController {
         var regions: [String] = []
         var dishes: [String] = []
         for indexPath in indexPaths where !(filterSource.menuItemIsExclusive?(at: indexPath) ?? false) {
-            let title = filterSource.menuTitleForItem(at: indexPath)
+            // The query matches the source titles.
+            let title = demoSource?.sourceTitle(at: indexPath) ?? filterSource.menuTitleForItem(at: indexPath)
             if indexPath.section == 0 {
                 regions.append(title)
             } else {
@@ -297,7 +300,7 @@ final class CYLFilterDemoViewController: UIViewController {
         let all = CYLDemoLocalizedString("全部")
         let separator = CYLDemoLocalizedString("、")
         func names(_ values: [String]) -> String {
-            values.isEmpty ? all : values.map(CYLDemoDataSource.shortTitle(forTitle:)).joined(separator: separator)
+            values.isEmpty ? all : values.map { self.demoSource?.localizedShortTitle($0) ?? $0 }.joined(separator: separator)
         }
         statusLabel.text = [
             CYLDemoLocalizedString("分类：%@ · 地区：%@ · 菜品：%@", all, names(selectedRegions), names(selectedDishes)),
@@ -311,10 +314,16 @@ final class CYLFilterDemoViewController: UIViewController {
             resultsStack.addArrangedSubview(rowLabel(title: CYLDemoLocalizedString("没有符合条件的商家"), detail: nil))
         }
         for place in results {
-            let detail = String(format: "%@ · %@ · %@ · ★%.1f · ¥%ld", place.category, CYLDemoDataSource.shortTitle(forTitle: place.tag),
-                                CYLDemoDataSource.shortTitle(forTitle: place.region), place.rating, place.price)
-            resultsStack.addArrangedSubview(rowLabel(title: place.name, detail: detail))
+            let name = { (title: String) in self.demoSource?.localizedShortTitle(title) ?? title }
+            let detail = String(format: "%@ · %@ · %@ · ★%.1f · ¥%ld", name(place.category), name(place.tag), name(place.region),
+                                place.rating, place.price)
+            resultsStack.addArrangedSubview(rowLabel(title: Self.localizedPlaceName(place.name, name), detail: detail))
         }
+    }
+
+    /// A place's name ("川菜 · 北京", made of its tag and region) in the app's language.
+    static func localizedPlaceName(_ name: String, _ localize: (String) -> String) -> String {
+        name.components(separatedBy: " · ").map { localize($0) }.joined(separator: " · ")
     }
 
     private func rowLabel(title: String, detail: String?) -> UILabel {

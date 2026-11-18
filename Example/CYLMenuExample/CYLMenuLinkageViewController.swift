@@ -18,8 +18,8 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
 
     let database: CYLExampleDatabase
     /// The original app's data sources (CYLDemoDataSource, shared with the demo app).
-    let classifySource = CYLDemoDataSource.classifyDataSource()
-    let filterSource = CYLDemoDataSource.filterDataSource()
+    let classifySource = CYLDemoDataSource.classifyDataSource { CYLExampleLocalizedString($0) }
+    let filterSource = CYLDemoDataSource.filterDataSource { CYLExampleLocalizedString($0) }
 
     /// The conditions: the classify menu's tag (nil for every tag), and the filter's regions and dishes
     /// (empty for "全部").
@@ -146,7 +146,7 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
         var regions: [String] = []
         var dishes: [String] = []
         for indexPath in indexPaths where !filterSource.menuItemIsExclusive(at: indexPath) {
-            let title = filterSource.menuTitleForItem(at: indexPath)
+            let title = filterSource.sourceTitle(at: indexPath)  // The query matches the source titles.
             if indexPath.section == 0 {
                 regions.append(title)
             } else {
@@ -167,7 +167,7 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
     func selectClassifyItem(at indexPath: IndexPath) {
         let deselect = selectedIndexPath == indexPath
         selectedIndexPath = deselect ? nil : indexPath
-        selectedTag = deselect ? nil : classifySource.menuTitleForItem(at: indexPath)
+        selectedTag = deselect ? nil : classifySource.sourceTitle(at: indexPath)
         database.saveSelection(selectedIndexPath.map { [$0] } ?? [], forScenario: CYLMenuLinkageClassifyScenario)
         runQuery()
     }
@@ -181,7 +181,7 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
         let tool = CYLFilterParamsTool()
         tool.dataSources = (0..<filterSource.numberOfSectionsInMenu()).map { section in
             (0..<filterSource.menuNumberOfItems(inSection: section)).map {
-                filterSource.menuTitleForItem(at: IndexPath(item: $0, section: section))
+                filterSource.sourceTitle(at: IndexPath(item: $0, section: section))
             }
         }
         let all = tool.filterParamsArray.enumerated().flatMap { section, flags in
@@ -219,7 +219,7 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
         if let classify = database.savedSelection(forScenario: CYLMenuLinkageClassifyScenario)?.first,
            contains(classify, in: classifySource) {
             selectedIndexPath = classify
-            selectedTag = classifySource.menuTitleForItem(at: classify)
+            selectedTag = classifySource.sourceTitle(at: classify)
         }
         let filter = (database.savedSelection(forScenario: CYLMenuLinkageFilterScenario) ?? []).filter { contains($0, in: filterSource) }
         if !filter.isEmpty {
@@ -271,11 +271,11 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
         let all = CYLExampleLocalizedString("全部")
         let separator = CYLExampleLocalizedString("、")
         func names(_ values: [String]) -> String {
-            values.isEmpty ? all : values.map(CYLDemoDataSource.shortTitle(forTitle:)).joined(separator: separator)
+            values.isEmpty ? all : values.map(filterSource.localizedShortTitle).joined(separator: separator)
         }
         let lines = [
             CYLExampleLocalizedString("分类：%@ · 地区：%@ · 菜品：%@",
-                                      selectedTag.map(CYLDemoDataSource.shortTitle(forTitle:)) ?? all, names(selectedRegions), names(selectedDishes)),
+                                      selectedTag.map(classifySource.localizedShortTitle) ?? all, names(selectedRegions), names(selectedDishes)),
             lastQuery.displayString(),
             CYLExampleLocalizedString("SQLite 返回 %lu 条（共 %ld 家）", UInt(results.count), database.countOfTable("places")),
         ]
@@ -290,11 +290,12 @@ final class CYLMenuLinkageViewController: CYLClassifyMenuViewController {
         for row in results {
             let rating = (row["rating"] as? NSNumber)?.doubleValue ?? 0
             let detail = String(format: "%@ · %@ · %@ · ★%.1f · ¥%@",
-                                "\(row["category"] ?? "")",
-                                CYLDemoDataSource.shortTitle(forTitle: row["tag"] as? String ?? ""),
-                                CYLDemoDataSource.shortTitle(forTitle: row["region"] as? String ?? ""),
+                                filterSource.localizedShortTitle("\(row["category"] ?? "")"),
+                                filterSource.localizedShortTitle(row["tag"] as? String ?? ""),
+                                filterSource.localizedShortTitle(row["region"] as? String ?? ""),
                                 rating, "\(row["price"] ?? "")")
-            resultsStack.addArrangedSubview(rowLabel(title: row["name"] as? String ?? "", detail: detail))
+            resultsStack.addArrangedSubview(rowLabel(title: (row["name"] as? String ?? "").components(separatedBy: " · ")
+                .map(filterSource.localizedShortTitle).joined(separator: " · "), detail: detail))
         }
         updateMenuLayout()
     }

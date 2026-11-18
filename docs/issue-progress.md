@@ -946,7 +946,7 @@ tags: [issues, ui, cocoapods, progress]
 - 2026-11-17 (HarmonyOS port table, non-iOS session): `docs/harmony.md` 95.3 -> 838 / 838 = 100. Ported to ArkTS the APIs the iOS core gained for Android parity: `kTagCollectionView*`, `CYLClassifyMenuViewController.numberOfVisibleItems` / `setSection`, `CYLTagView.numberOfVisibleItems`, `CYLFilterParamsTool` (+ `kMultipleFilterSetting*`), `CYLFilterBaseController.settingArray`, `CYLMenuStyle.classifyMenuTag` / `filterTag` / `sectionTitle`, `CYLTag.resetColors`, `CYLTagButton.resetAnimationSpeed`, `CYLRightImageButton.expandTitle` / `collapseTitle`; Objective-C bridges and `init?(coder:)` marked N/A. Host tests 62 / 62 (new `AndroidParity.test.ets`).
 - 2026-11-17 (Android on Windows, non-iOS session): first Android build of `android/merged` on this Windows machine (Gradle 9.4.1, the Gradle-provisioned JDK 17; Android Studio's JDK 25 fails in Kotlin with "IllegalArgumentException: 25.0.4", DevEco's JDK 21 has no jlink). Bug recorded and fixed: `CYLTagListConfigurationTest.filesInJSONAndPropertyListFormat` failed (`CYLMenuConfigurationException: No configuration file at C:\...	ags.json`): `fileURL()` in `CYLTagListViewConfiguration.kt` took a path as absolute only with a leading "/", so a drive path was looked up as an asset; now `File(path).isAbsolute` (as CYLTabBarController B1). Result: `:library:testDebugUnitTest` 86 / 86, `:example:assembleDebug` OK at CYLTabBarController `4635ef7b`.
 
-### TODO (2026-11-19, `feat/harmony`): leftover internationalization and localization problems, full support
+### DONE (2026-11-19, `feat/harmony`): leftover internationalization and localization problems, full support
 
 - Context: after the drag example rework, the owner asked for a sweep of what is still not localized. Languages: en,
   zh-Hans, zh-Hant; lookups per level (`CYLMenuLocalizedString`, `CYLExampleLocalizedString`,
@@ -959,6 +959,30 @@ tags: [issues, ui, cocoapods, progress]
   specifiers (25); no user-facing literal outside a lookup (25); every screen of the iOS examples shows no Chinese in
   English and no Simplified-only text in Traditional Chinese, checked by a test that walks the screens (30); a script
   that checks the tables, run before commits (10); fixes in the right bundle, screenshots en / zh-Hant (10). Pass: 60.
+- Result: **100/100** (iOS: the core, the demo app, both Examples). Found by the new checks and fixed:
+  - `scripts/check-localization.py` (new): keys a lookup is called with, in every translated language, with the same
+    format specifiers; no Chinese literal outside a lookup; `--unused`. 266 findings at first, 0 now.
+  - `CYLLocalizationTests.testEveryScreenIsInTheAppLanguage` (new): 16 Example screens (the four search categories one
+    by one) in English and Traditional Chinese; no Chinese in English, no Simplified-only character in Traditional.
+  - Configuration screen: the shared configuration file's section title showed in Chinese in English; the iOS demo now
+    reads the file and looks its section titles up (the file, shared with Android, HarmonyOS and the mini program, keeps
+    the source text).
+  - Tag cloud screen: the caption's key was renamed in code (`CYLTagListKey.tags`) but not in the tables.
+  - Search categories (people, posts, gossip, jobs): 98 tags and keywords translated (en, zh-Hant), looked up where the
+    data becomes tags (`CYLExampleMenuSection(title:localizedTitles:)`).
+  - Menu and database (Example) and the demo app: dish, region and category names and the sample suffix translated
+    where shown (`CYLDemoDataSource(localize:)` with the module's lookup); data.json and the places database keep the
+    source titles and the queries match them (`sourceTitle(at:)`); 39 entries in both bundles.
+  - Core (VoiceOver): `CYLTagListCell` read an SF Symbol's automatic label as a titled tag's value ("主页" beside
+    "Home"), in the device's language rather than the app's (`CYLMenuResources.preferredLanguage`); a symbol on a titled
+    tag now adds no value, an app-set icon label (the "hot" icon) still does, an icon-only tag is read by its icon. The
+    configuration screen's icon-only heart gets a localized label ("Like").
+  - Stale keys removed (demo app 1, Swift Example 1); the mini program strings.js regenerated.
+- Kept as written (marked NOLOCALIZE with the reason): user-generated content (reviews, their SKU and keyword tags, a
+  shop's product title, song and user names, a shoe listing) and AndroidTagView's deliberately multilingual sample lists.
+- Tests: Example 98 / 98, menu 37 / 37, Swift Example 22 / 22 (iPhone 18 Pro simulator, iOS 27.2, Xcode 27.2).
+  Screenshots: [ios-localization-en-zh-hant.png](assets/ios-localization-en-zh-hant.png).
+- Rules: AGENTS.md "Internationalization and localization" and `.agents/skills/cyl-localization/` name both checks.
 
 ### TODO (2026-11-19, `feat/harmony`): route tasks by session name (Mac: iOS, Win: the other platforms)
 

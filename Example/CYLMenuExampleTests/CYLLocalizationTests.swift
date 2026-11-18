@@ -102,4 +102,105 @@ final class CYLLocalizationTests: CYLMenuExampleTestCase {
         defer { CYLMenuResources.preferredLanguage = "zh-Hant" }
         return try CYLSearchDiscoverData.bundled().discover.map(\.icon)
     }
+
+    // MARK: Every screen
+
+    /// Text that stays as written in every language (marked NOLOCALIZE in the code): user-generated reviews and their
+    /// keyword tags, a shop's product title, song and user names, a shoe listing, AndroidTagView's multilingual lists.
+    private func untranslatedContent() -> [String] {
+        var content = CYLReviewStore.mockReviews().flatMap { [$0.user, $0.text, $0.sku] + $0.keywords }
+        content += ["潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮", "手机套不错", "质量不错", "态度不错", "划算",
+                    "颜色不错", "背面细节一般"]
+        content += CYLHotSearchViewController.hotSearches.map(\.0)
+        content += CYLImageTagSampleData.initialGroups().flatMap { $0.tags.map(\.title) }
+        content += CYLTagContainerSampleData.list1 + CYLTagContainerSampleData.list3
+        // The same, cut to tag_max_length (23: 20 characters and "...").
+        content += CYLTagContainerSampleData.list1.map { String($0.prefix(20)) }
+        return content
+    }
+
+    /// Every visible text of a view tree: labels, buttons, text fields and views, accessibility labels and values.
+    private func visibleTexts(in view: UIView) -> [String] {
+        guard !view.isHidden, view.alpha > 0.01 else { return [] }
+        var texts: [String] = []
+        if let label = view as? UILabel { texts.append(label.text ?? "") }
+        if let button = view as? UIButton { texts.append(button.currentTitle ?? "") }
+        if let field = view as? UITextField { texts += [field.text ?? "", field.placeholder ?? ""] }
+        if let textView = view as? UITextView { texts.append(textView.text ?? "") }
+        if let control = view as? UISegmentedControl {
+            texts += (0..<control.numberOfSegments).compactMap { control.titleForSegment(at: $0) }
+        }
+        if view.isAccessibilityElement { texts += [view.accessibilityLabel ?? "", view.accessibilityValue ?? ""] }
+        let kind = String(describing: type(of: view))
+        return texts.filter { !$0.isEmpty }.map { "\(kind) \($0)" } + view.subviews.flatMap(visibleTexts(in:))
+    }
+
+    /// The text with the untranslated content removed, and a shown SQL statement (it holds the database's own values).
+    private func translatedPart(of text: String, content: [String]) -> String {
+        let lines = text.components(separatedBy: "\n").map { line in
+            line.range(of: "SELECT ").map { String(line[..<$0.lowerBound]) } ?? line
+        }
+        return content.sorted { $0.count > $1.count }.reduce(lines.joined(separator: "\n")) {
+            $0.replacingOccurrences(of: $1, with: "")
+        }
+    }
+
+    /// Characters that exist only in Simplified Chinese, among the common ones of this Example.
+    private static let simplifiedOnly = Set("这个们时后动标签选择删设图显语关开为对数据库网络页级务发说话读写认识门间问题区东车马鸟鱼风")
+
+    private func screens() -> [(String, () -> UIViewController)] {
+        [("Styles", { CYLTagStyleDemoViewController() }),
+         ("Animations", { CYLTagAnimationDemoViewController() }),
+         ("Configuration", { CYLTagConfigurationDemoViewController() }),
+         ("Tag cloud", { CYLTagCloudDemoViewController() }),
+         ("Search home", { CYLSearchHomeViewController() }),
+         ("Search discover", { CYLSearchDiscoverViewController() }),
+         ("Search categories", { CYLSearchCategoryViewController() }),
+         ("Reviews", { CYLReviewListViewController(selectedFilterIndex: 0) }),
+         ("Menu and database", { CYLMenuLinkageViewController() }),
+         ("Query scenarios", { CYLQueryScenariosViewController() }),
+         ("Product", { CYLProductViewController() }),
+         ("Container sample", { CYLTagContainerSampleViewController() }),
+         ("Tag cloud sample", { CYLTagCloudSampleViewController() }),
+         ("Hot searches", { CYLHotSearchViewController() }),
+         ("Image tags", { CYLImageTagSampleViewController() }),
+         ("About", { CYLAndroidSamplesAboutViewController() })]
+    }
+
+    /// Every screen of the Example in English and in Traditional Chinese: no Chinese text in English and no
+    /// Simplified-only character in Traditional Chinese, apart from the untranslated content above; the search
+    /// categories are checked one by one.
+    func testEveryScreenIsInTheAppLanguage() {
+        let content = untranslatedContent()
+        var failures: [String] = []
+        for language in ["en", "zh-Hant"] {
+            CYLMenuResources.preferredLanguage = language
+            for (name, make) in screens() {
+                let controller = make()
+                let navigation = showInNavigation(controller, size: CYLTestScreen.tall)
+                controller.view.layoutIfNeeded()
+                runMainLoop(for: 0.3)
+                var views: [(String, UIView)] = [(name, navigation.view)]
+                if let search = controller as? CYLSearchCategoryViewController {
+                    for category in [CYLSearchCategory.people, .feeds, .gossip, .jobs] {
+                        search.select(category)
+                        search.layOutSelectedCategory()
+                        views.append(("\(name) \(category.rawValue)", navigation.view))
+                    }
+                }
+                for (where_, view) in views {
+                    var texts = visibleTexts(in: view)
+                    texts.append("title " + (controller.navigationItem.title ?? ""))
+                    for text in texts {
+                        let rest = translatedPart(of: text, content: content)
+                        let wrong = language == "en"
+                            ? rest.unicodeScalars.contains { (0x3400...0x9FFF).contains($0.value) }
+                            : rest.contains { Self.simplifiedOnly.contains($0) }
+                        if wrong { failures.append("\(language) \(where_): \(text)") }
+                    }
+                }
+            }
+        }
+        XCTAssertEqual(failures, [], failures.joined(separator: "\n"))
+    }
 }

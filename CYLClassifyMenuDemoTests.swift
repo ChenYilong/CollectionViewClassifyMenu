@@ -57,9 +57,11 @@ final class CYLClassifyMenuDemoTests: XCTestCase {
         filter.loadViewIfNeeded()
         XCTAssertEqual(filter.results.count, CYLDemoPlaces.all.count)
         XCTAssertNotNil(filter.navigationItem.leftBarButtonItem, "the filter button")
-        let source = try XCTUnwrap(filter.filterSource)
+        let source = try XCTUnwrap(filter.filterSource as? CYLDemoDataSource)
         let beijing = IndexPath(item: 1, section: 0)
-        let region = source.menuTitleForItem(at: beijing)
+        // The query matches the database's source title; the menu shows it in the app's language.
+        let region = source.sourceTitle(at: beijing)
+        XCTAssertEqual(source.menuTitleForItem(at: beijing), source.localizedTitle(region))
         filter.menu(filter.filterController, didConfirmSelectedItems: [beijing, IndexPath(item: 0, section: 1)])
         XCTAssertFalse(filter.results.isEmpty)
         XCTAssertTrue(filter.results.allSatisfy { $0.region == region })

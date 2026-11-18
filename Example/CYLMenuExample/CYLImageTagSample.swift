@@ -15,6 +15,7 @@ enum CYLImageTagSampleData {
     static var tagGroups: [CYLImageTagGroup] = initialGroups()
 
     static func initialGroups() -> [CYLImageTagGroup] {
+        // NOLOCALIZE-BEGIN: TagViewGroup's sample tags on a shoe photo (a shop listing), as in its screenshot.
         let leather = CYLImageTag(title: "头层牛皮", direction: .rightTop)
         leather.link = "http://www.baidu.com"
         let shoes = CYLImageTag(title: "英伦加绒青年棕色保暖鞋子。", direction: .rightCenter)
@@ -23,6 +24,7 @@ enum CYLImageTagSampleData {
         brand.link = "http://mc.licrafter.com"
         let good = CYLImageTag(title: "很不错的鞋子", direction: .rightCenter)
         good.link = "http://mc.licrafter.com"
+        // NOLOCALIZE-END
         return [CYLImageTagGroup(tags: [leather, shoes, brand], percentPosition: CGPoint(x: 0.4, y: 0.5)),
                 CYLImageTagGroup(tags: [good], percentPosition: CGPoint(x: 0.3, y: 0.2))]
     }

@@ -34,7 +34,7 @@ final class CYLProductViewController: UIViewController {
         scrollView.addSubview(stack)
 
         // Sample data: the product's name and price.
-        let name = label(text: "潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮", font: .systemFont(ofSize: 16), color: .label)
+        let name = label(text: "潮牌电镀镜面MLGB字母iphone6手机壳苹果6plus手机壳情侣5S外壳潮", font: .systemFont(ofSize: 16), color: .label)  // NOLOCALIZE: the shop's own title
         let price = label(text: "¥9.90-14.90", font: .boldSystemFont(ofSize: 22), color: UIColor(red: 1, green: 0.31, blue: 0, alpha: 1))
         let reviewTitle = label(text: CYLExampleLocalizedString("宝贝评价(%lu)", UInt(store.reviews.count)),
                                 font: .systemFont(ofSize: 15), color: .label)

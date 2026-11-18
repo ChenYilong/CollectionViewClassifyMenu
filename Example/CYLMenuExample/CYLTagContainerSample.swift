@@ -12,11 +12,13 @@ import CollectionViewClassifyMenu
 
 /// The sample's lists and colors.
 enum CYLTagContainerSampleData {
+    // NOLOCALIZE-BEGIN: AndroidTagView's sample lists, deliberately multilingual (the same tags in every language).
     static let list1 = ["Java", "C++", "Python", "Swift", "你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。",
                         "PHP", "JavaScript", "Html", "Welcome to use AndroidTagView!"]
     static let list2 = ["China", "USA", "Austria", "Japan", "Sudan", "Spain", "UK", "Germany", "Niger", "Poland", "Norway",
                         "Uruguay", "Brazil"]
     static let list3 = ["Persian", "波斯语", "فارسی", "Hello", "你好", "سلام"]
+    // NOLOCALIZE-END
     static let list4 = ["Adele", "Whitney Houston"]
     static let list5 = ["Custom Red Color", "Custom Blue Color"]
 
