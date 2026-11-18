@@ -888,7 +888,22 @@
     "CYLMenuStyle.titleWraps": "`CYLMenuStyle.titleWraps` (the title's `Text` takes as many lines as it needs)",
     "CYLMenuStyle.elevation": "`CYLMenuStyle.elevation` (ArkUI `shadow`; the tag stops clipping)",
     "CYLMenuStyle.deleteIndicatorImage": "`CYLMenuStyle.deleteIndicatorImage` (an image, or a system symbol drawn with `SymbolGlyph`)",
-    "CYLTagButton.static height(forTitle:iconSize:width:showsDeleteIndicator:style:traitCollection:)": "`CYLTagButtonMetrics.heightForTitleWidth(title, iconSize, width, showsDeleteIndicator, style, fontScale)`"
+    "CYLTagButton.static height(forTitle:iconSize:width:showsDeleteIndicator:style:traitCollection:)": "`CYLTagButtonMetrics.heightForTitleWidth(title, iconSize, width, showsDeleteIndicator, style, fontScale)`",
+    "CYLMenuDelegate.menu(_:didFinishEditingWithTitles:)": "`menuDidFinishEditingWithTitles?`",
+    "CYLTagListLoadPolicy": "`CYLTagListLoadPolicy`",
+    "CYLTagListLoadPolicy.cacheThenNetwork": "`CYLTagListLoadPolicy.cacheThenNetwork`",
+    "CYLTagListLoadPolicy.cacheFirst": "`CYLTagListLoadPolicy.cacheFirst`",
+    "CYLTagListLoadPolicy.networkFirst": "`CYLTagListLoadPolicy.networkFirst`",
+    "CYLTagListDataOrigin": "`CYLTagListDataOrigin`",
+    "CYLTagListDataOrigin.cache": "`CYLTagListDataOrigin.cache`",
+    "CYLTagListDataOrigin.network": "`CYLTagListDataOrigin.network`",
+    "CYLTagListRemoteSource": "`CYLTagListRemoteSource` (interface)",
+    "CYLTagListRemoteSource.fetchSections(withKeys:)": "`CYLTagListRemoteSource.fetchSectionsWithKeys(keys, completion)`",
+    "CYLTagListView.remoteSource": "`CYLTagListState.remoteSource`",
+    "CYLTagListView.loadPolicy": "`CYLTagListState.loadPolicy`",
+    "CYLTagListView.editingFinishHandler": "`CYLTagListState.editingFinishHandler`",
+    "CYLTagListView.editableSectionTitles()": "`CYLTagListState.editableSectionTitles()`",
+    "CYLTagListView.loadSections(withKeys:)": "`CYLTagListState.loadSectionsWithKeys(keys, completion)`"
   },
   "demos": [
     {

@@ -28,7 +28,9 @@ import {
   CYLMenuConfigurationErrorCode, CYLTagItemKey, CYLTagListKey, CYLTagSectionKey, cylAddingAnimationOptions
 } from '../core/CYLTagListConfiguration';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
-import { CYLTagListCache, CYLTagListCachePolicy, CYLTagListStore } from '../core/CYLTagListCache';
+import {
+  CYLTagListCache, CYLTagListCachePolicy, CYLTagListDataOrigin, CYLTagListLoadPolicy, CYLTagListRemoteSource, CYLTagListStore
+} from '../core/CYLTagListCache';
 import { CYLTagListAddItemView } from './CYLTagListAddItemView';
 
 /** How taps select items. */
@@ -537,6 +539,103 @@ export class CYLTagListState {
   private cacheNameStorage: string = 'CYLTagListView';
   /** `cache`: the store the list saves to, the built-in store of `cachePolicy` or one of yours; undefined: no cache. */
   cache?: CYLTagListCache = undefined;
+  /** `remoteSource`: the server the sections are also kept on, for `loadSectionsWithKeys`; undefined: the cache only. */
+  remoteSource?: CYLTagListRemoteSource = undefined;
+  /**
+   * `loadPolicy`: how `loadSectionsWithKeys` combines the cache and `remoteSource`; `cacheThenNetwork` (the cache at
+   * once, then a refresh from the server) by default.
+   */
+  loadPolicy: CYLTagListLoadPolicy = CYLTagListLoadPolicy.cacheThenNetwork;
+  /**
+   * `editingFinishHandler`: called when editing ends (`setEditing(false)`) with the edited sections by cache key, after
+   * `menuDidFinishEditingWithTitles`: the place to upload them.
+   */
+  editingFinishHandler?: (titles: Map<string, string[]>) => void = undefined;
+
+  /**
+   * `editableSectionTitles()`: the titles of every editable section by cache key (`cacheKeyForSection`), without
+   * "+ New tag" items: what the list saves and what `menuDidFinishEditingWithTitles` reports.
+   */
+  editableSectionTitles(): Map<string, string[]> {
+    const result = new Map<string, string[]>();
+    const source = this.menuDataSource;
+    if (source === undefined) {
+      return result;
+    }
+    for (let section = 0; section < source.numberOfSectionsInMenu(); section++) {
+      if (!this.sectionAllowsEditing(section)) {
+        continue;
+      }
+      const titles: string[] = [];
+      for (let item = 0; item < source.menuNumberOfItemsInSection(section); item++) {
+        const p = makePath(section, item);
+        if (this.itemType(p) !== CYLMenuItemType.create) {
+          titles.push(source.menuTitleForItem(p));
+        }
+      }
+      result.set(this.cacheKeyForSection(section), titles);
+    }
+    return result;
+  }
+
+  /**
+   * `loadSections(withKeys:completion:)`: reads the sections saved under `keys` from the cache and `remoteSource`, in the
+   * order of `loadPolicy`, and calls `completion` with the titles by key and where they come from: once or twice
+   * (`cacheThenNetwork`: the cache at once, then the server). Downloaded sections are saved to the cache first. Without
+   * a remote source it reads the cache only; nothing saved anywhere calls nothing. (ArkTS runs callbacks on the UI
+   * thread's event loop, iOS's main queue.)
+   */
+  loadSectionsWithKeys(keys: string[], completion: (sections: Map<string, string[]>, origin: CYLTagListDataOrigin) => void): void {
+    const cached = new Map<string, string[]>();
+    keys.forEach((key: string) => {
+      const titles = this.cache?.cachedTitles(key);
+      if (titles !== undefined) {
+        cached.set(key, titles);
+      }
+    });
+    const fetch = (done: (ok: boolean) => void): void => {
+      const remote = this.remoteSource;
+      if (remote === undefined) {
+        done(false);
+        return;
+      }
+      remote.fetchSectionsWithKeys(keys, (sections: Map<string, string[]> | undefined, error: Error | undefined) => {
+        if (sections === undefined || error !== undefined) {
+          done(false);
+          return;
+        }
+        const downloaded = new Map<string, string[]>();
+        sections.forEach((titles: string[], key: string) => {
+          if (keys.includes(key)) {
+            downloaded.set(key, titles);
+            this.cache?.saveTitles(titles, key);
+          }
+        });
+        completion(downloaded, CYLTagListDataOrigin.network);
+        done(true);
+      });
+    };
+    const fallBack = (ok: boolean): void => {
+      if (!ok && cached.size > 0) {
+        completion(cached, CYLTagListDataOrigin.cache);
+      }
+    };
+    if (this.loadPolicy === CYLTagListLoadPolicy.cacheThenNetwork) {
+      if (cached.size > 0) {
+        completion(cached, CYLTagListDataOrigin.cache);
+      }
+      fetch(() => {
+      });
+    } else if (this.loadPolicy === CYLTagListLoadPolicy.cacheFirst) {
+      if (cached.size === keys.length) {
+        completion(cached, CYLTagListDataOrigin.cache);
+      } else {
+        fetch(fallBack);
+      }
+    } else {
+      fetch(fallBack);
+    }
+  }
 
   /**
    * `isEditing`: whether the list is in editing mode (`setEditing`). While editing, the items of the editable sections
@@ -615,19 +714,7 @@ export class CYLTagListState {
     if (cache === undefined || source === undefined) {
       return;
     }
-    for (let section = 0; section < source.numberOfSectionsInMenu(); section++) {
-      if (!this.sectionAllowsEditing(section)) {
-        continue;
-      }
-      const titles: string[] = [];
-      for (let item = 0; item < source.menuNumberOfItemsInSection(section); item++) {
-        const p = makePath(section, item);
-        if (this.itemType(p) !== CYLMenuItemType.create) {
-          titles.push(source.menuTitleForItem(p));
-        }
-      }
-      cache.saveTitles(titles, this.cacheKeyForSection(section));
-    }
+    this.editableSectionTitles().forEach((titles: string[], key: string) => cache.saveTitles(titles, key));
   }
 
   /**
@@ -640,6 +727,12 @@ export class CYLTagListState {
       return;
     }
     this.isEditingStorage = editing;
+    if (!editing) {
+      // The edited sections, for the host to upload (the cache already has them).
+      const titles = this.editableSectionTitles();
+      this.menuDelegate?.menuDidFinishEditingWithTitles?.(this, titles);
+      this.editingFinishHandler?.(titles);
+    }
     this.addItemView.fontScale = this.fontScale;
     this.reloadMenuData();
     this.menuDelegate?.menuDidChangeEditing?.(this, editing);

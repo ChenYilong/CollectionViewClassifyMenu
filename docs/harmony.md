@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 887 / 902 = 98.3 / 100** (API 865 / 880, demos 22 / 22). Both tables are scored together: every TODO removed
+**Score: 902 / 902 = 100.0 / 100** (API 880 / 880, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -302,7 +302,7 @@ overrides left out.
 | `CYLMenuDelegate.menu(_:didTapMoreButtonInSection:)` (CYLMenuDataSource.swift) | `menuDidTapMoreButtonInSection?` | method |
 | `CYLMenuDelegate.menu(_:didDeleteItemAt:)` (CYLMenuDataSource.swift) | `menuDidDeleteItem?` | method |
 | `CYLMenuDelegate.menu(_:didChangeEditing:)` (CYLMenuDataSource.swift) | `menuDidChangeEditing?` | method |
-| `CYLMenuDelegate.menu(_:didFinishEditingWithTitles:)` (CYLMenuDataSource.swift) | TODO | method |
+| `CYLMenuDelegate.menu(_:didFinishEditingWithTitles:)` (CYLMenuDataSource.swift) | `menuDidFinishEditingWithTitles?` | method |
 | `CYLMenuDelegate.menu(_:didLongPressItemAt:)` (CYLMenuDataSource.swift) | `menuDidLongPressItem?` | method |
 | `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` (CYLMenuDataSource.swift) | `menuDidMoveItem?` | method |
 | `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` (CYLMenuDataSource.swift) | `menuDidBeginDraggingSelectedItem?` | method |
@@ -610,15 +610,15 @@ overrides left out.
 | `CYLTagListStore.saveTitles(_:forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.saveTitles(titles, section)` | method |
 | `CYLTagListStore.removeTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.removeTitles(section)` | method |
 | `CYLTagListStore.removeAllTitles()` (CYLTagListCache.swift) | `CYLTagListStore.removeAllTitles()` | method |
-| `CYLTagListLoadPolicy` (CYLTagListCache.swift) | TODO | enum |
-| `CYLTagListLoadPolicy.cacheThenNetwork` (CYLTagListCache.swift) | TODO | case |
-| `CYLTagListLoadPolicy.cacheFirst` (CYLTagListCache.swift) | TODO | case |
-| `CYLTagListLoadPolicy.networkFirst` (CYLTagListCache.swift) | TODO | case |
-| `CYLTagListDataOrigin` (CYLTagListCache.swift) | TODO | enum |
-| `CYLTagListDataOrigin.cache` (CYLTagListCache.swift) | TODO | case |
-| `CYLTagListDataOrigin.network` (CYLTagListCache.swift) | TODO | case |
-| `CYLTagListRemoteSource` (CYLTagListCache.swift) | TODO | protocol |
-| `CYLTagListRemoteSource.fetchSections(withKeys:)` (CYLTagListCache.swift) | TODO | method |
+| `CYLTagListLoadPolicy` (CYLTagListCache.swift) | `CYLTagListLoadPolicy` | enum |
+| `CYLTagListLoadPolicy.cacheThenNetwork` (CYLTagListCache.swift) | `CYLTagListLoadPolicy.cacheThenNetwork` | case |
+| `CYLTagListLoadPolicy.cacheFirst` (CYLTagListCache.swift) | `CYLTagListLoadPolicy.cacheFirst` | case |
+| `CYLTagListLoadPolicy.networkFirst` (CYLTagListCache.swift) | `CYLTagListLoadPolicy.networkFirst` | case |
+| `CYLTagListDataOrigin` (CYLTagListCache.swift) | `CYLTagListDataOrigin` | enum |
+| `CYLTagListDataOrigin.cache` (CYLTagListCache.swift) | `CYLTagListDataOrigin.cache` | case |
+| `CYLTagListDataOrigin.network` (CYLTagListCache.swift) | `CYLTagListDataOrigin.network` | case |
+| `CYLTagListRemoteSource` (CYLTagListCache.swift) | `CYLTagListRemoteSource` (interface) | protocol |
+| `CYLTagListRemoteSource.fetchSections(withKeys:)` (CYLTagListCache.swift) | `CYLTagListRemoteSource.fetchSectionsWithKeys(keys, completion)` | method |
 | `CYLTagListCell` (CYLTagListCell.swift) | `CYLTagListCell` (tagviews/CYLTagListCell.ets + component) | class |
 | `CYLTagListCell.button` (CYLTagListCell.swift) | `CYLTagListCell.button` | property |
 | `CYLTagListCell.appliedStyle` (CYLTagListCell.swift) | `CYLTagListCell.appliedStyle` | property |
@@ -804,13 +804,13 @@ overrides left out.
 | `CYLTagListView.cachePolicy` (CYLTagListView.swift) | `CYLTagListState.cachePolicy` | property |
 | `CYLTagListView.cacheName` (CYLTagListView.swift) | `CYLTagListState.cacheName` | property |
 | `CYLTagListView.cache` (CYLTagListView.swift) | `CYLTagListState.cache` | property |
-| `CYLTagListView.remoteSource` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.loadPolicy` (CYLTagListView.swift) | TODO | property |
-| `CYLTagListView.editingFinishHandler` (CYLTagListView.swift) | TODO | property |
+| `CYLTagListView.remoteSource` (CYLTagListView.swift) | `CYLTagListState.remoteSource` | property |
+| `CYLTagListView.loadPolicy` (CYLTagListView.swift) | `CYLTagListState.loadPolicy` | property |
+| `CYLTagListView.editingFinishHandler` (CYLTagListView.swift) | `CYLTagListState.editingFinishHandler` | property |
 | `CYLTagListView.cachedTitles(inSection:)` (CYLTagListView.swift) | `CYLTagListState.cachedTitlesInSection(section)` | method |
 | `CYLTagListView.cacheKey(forSection:)` (CYLTagListView.swift) | `CYLTagListState.cacheKeyForSection(section)` | method |
 | `CYLTagListView.saveEditableSectionsToCache()` (CYLTagListView.swift) | `CYLTagListState.saveEditableSectionsToCache()` | method |
-| `CYLTagListView.editableSectionTitles()` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.editableSectionTitles()` (CYLTagListView.swift) | `CYLTagListState.editableSectionTitles()` | method |
 | `CYLTagListView.setEditing(_:animated:)` (CYLTagListView.swift) | `CYLTagListState.setEditing(editing, animated)` | method |
 | `CYLTagListView.sectionAllowsEditing(_:)` (CYLTagListView.swift) | `CYLTagListState.sectionAllowsEditing(section)` | method |
 | `CYLTagListView.init?(coder:)` (CYLTagListView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
@@ -865,7 +865,7 @@ overrides left out.
 | `CYLTagListView.collectionView(_:layout:minimumLineSpacingForSectionAt:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (line spacing) | method |
 | `CYLTagListView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (header frames) | method |
 | `CYLTagListView.collectionView(_:layout:referenceSizeForFooterInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (footer frames) | method |
-| `CYLTagListView.loadSections(withKeys:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.loadSections(withKeys:)` (CYLTagListView.swift) | `CYLTagListState.loadSectionsWithKeys(keys, completion)` | method |
 | `CYLTagView` (CYLTagView.swift) | `CYLTagView` (tagviews/CYLTagView.ets + CYLTagViewComponent) | class |
 | `CYLTagView.static sectionInset` (CYLTagView.swift) | `CYLTagView.sectionInset` | property |
 | `CYLTagView.static cellSpacing` (CYLTagView.swift) | `CYLTagView.cellSpacing` | property |

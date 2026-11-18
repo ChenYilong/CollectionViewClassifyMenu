@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import {
   CYLFont, CYLIndexPath, CYLMenuDataSource, CYLMenuDelegate, CYLMenuFoldStyle, CYLMenuSelectionMode, CYLTagButtonMetrics,
-  CYLTagListCachePolicy, CYLTagListState, CYLTagListStore, CYLTextMeasurer
+  CYLTagListCachePolicy, CYLTagListDataOrigin, CYLTagListLoadPolicy, CYLTagListRemoteSource, CYLTagListState,
+  CYLTagListStore, CYLTextMeasurer
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -44,6 +45,26 @@ class CYLEditableTagSource implements CYLMenuDataSource, CYLMenuDelegate {
     this.sections[indexPath.section].splice(indexPath.item, 0, name);
     (menu as CYLTagListState).reloadMenuData();
   };
+}
+
+/** A remote source that answers at once with fixed sections, or fails. */
+class CYLFakeRemoteSource implements CYLTagListRemoteSource {
+  private titles?: string[];
+
+  constructor(titles: string[] | undefined) {
+    this.titles = titles;
+  }
+
+  fetchSectionsWithKeys(keys: string[], completion: (sections: Map<string, string[]> | undefined,
+    error: Error | undefined) => void): void {
+    if (this.titles === undefined) {
+      completion(undefined, new Error('CYLFake'));
+      return;
+    }
+    const sections = new Map<string, string[]>();
+    sections.set('mine', this.titles);
+    completion(sections, undefined);
+  }
 }
 
 function makeList(source: CYLEditableTagSource): CYLTagListState {
@@ -142,6 +163,55 @@ export default function tagListEditingTest() {
       expect(list.canMoveItem(path(0, 0))).assertFalse();
       list.setEditing(false, false);
       expect(list.canMoveItem(path(1, 0))).assertFalse();
+    });
+
+    it('finishingEditingReportsTheEditedSectionsForUploading', 0, () => {
+      const source = new CYLEditableTagSource([['Recent A'], ['Family', 'Friends', 'Clients']]);
+      source.editableSections = [1];
+      const list = makeList(source);
+      let reported: Map<string, string[]> | undefined = undefined;
+      list.editingFinishHandler = (titles: Map<string, string[]>) => {
+        reported = titles;
+      };
+      list.setEditing(true, false);
+      list.moveItem(path(1, 2), path(1, 0));
+      expect(reported === undefined).assertTrue();
+      list.setEditing(false, false);
+      const titles = reported as Map<string, string[]> | undefined;
+      expect(titles !== undefined && titles.size === 1).assertTrue();
+      expect((titles?.get('1') ?? []).join(',')).assertEqual('Clients,Family,Friends');
+    });
+
+    it('loadPoliciesOrderTheCacheAndTheServer', 0, () => {
+      const loads = (policy: CYLTagListLoadPolicy, cached: string[] | undefined, remote: string[] | undefined): string[] => {
+        const store = new CYLTagListStore(CYLTagListCachePolicy.userDefaults, 'TagListEditingTest.load');
+        store.removeAllTitles();
+        if (cached !== undefined) {
+          store.saveTitles(cached, 'mine');
+        }
+        const list = new CYLTagListState();
+        list.cache = store;
+        list.remoteSource = new CYLFakeRemoteSource(remote);
+        list.loadPolicy = policy;
+        const events: string[] = [];
+        list.loadSectionsWithKeys(['mine'], (sections: Map<string, string[]>, origin: CYLTagListDataOrigin) => {
+          events.push(`${origin === CYLTagListDataOrigin.cache ? 'cache' : 'network'} ${(sections.get('mine') ?? []).join(',')}`);
+        });
+        if (remote !== undefined && policy === CYLTagListLoadPolicy.cacheThenNetwork) {
+          // A download is saved to the cache.
+          expect((store.cachedTitles('mine') ?? []).join(',')).assertEqual(remote.join(','));
+        }
+        store.removeAllTitles();
+        return events;
+      };
+      expect(loads(CYLTagListLoadPolicy.cacheThenNetwork, ['A', 'B'], ['B', 'A', 'C']).join('|'))
+        .assertEqual('cache A,B|network B,A,C');
+      expect(loads(CYLTagListLoadPolicy.cacheThenNetwork, ['A'], undefined).join('|')).assertEqual('cache A');
+      expect(loads(CYLTagListLoadPolicy.cacheFirst, ['A'], ['B']).join('|')).assertEqual('cache A');
+      expect(loads(CYLTagListLoadPolicy.cacheFirst, undefined, ['B']).join('|')).assertEqual('network B');
+      expect(loads(CYLTagListLoadPolicy.networkFirst, ['A'], ['B']).join('|')).assertEqual('network B');
+      expect(loads(CYLTagListLoadPolicy.networkFirst, ['A'], undefined).join('|')).assertEqual('cache A');
+      expect(new CYLTagListState().loadPolicy).assertEqual(CYLTagListLoadPolicy.cacheThenNetwork);
     });
 
     it('savesEditsInEveryCachePolicy', 0, () => {

@@ -1226,4 +1226,9 @@ tags: [issues, ui, cocoapods, progress]
   editing reports the edited sections before `menuDidChangeEditing`, as iOS. Tests
   `finishingEditingReportsTheEditedSectionsForUploading`, `loadPoliciesOrderTheCacheAndTheServer` (as iOS); library
   94 / 0, the example builds. `docs/android-api.md` 849 / 849, `docs/android-ios-api.md` 787 / 787.
-- **TODO:** HarmonyOS and the mini program.
+- **HarmonyOS (done, 30 / 30):** the same API on `CYLTagListState` (`menuDidFinishEditingWithTitles?`,
+  `editingFinishHandler`, `editableSectionTitles()`, `remoteSource`, `loadPolicy`, `loadSectionsWithKeys`) and in
+  `CYLTagListCache.ets` (`CYLTagListLoadPolicy`, `CYLTagListDataOrigin`, `CYLTagListRemoteSource`); callbacks run on
+  the UI thread's event loop (ArkTS's main queue). The two tests in `TagListEditing.test.ets`; host tests 71 / 71,
+  `build.sh` OK. `docs/harmony.md` 902 / 902.
+- **TODO:** the mini program.

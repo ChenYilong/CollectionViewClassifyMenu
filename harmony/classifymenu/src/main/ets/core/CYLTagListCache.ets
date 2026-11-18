@@ -343,3 +343,40 @@ export class CYLTagListStore implements CYLTagListCache {
     this.executeDatabase('COMMIT', []);
   }
 }
+
+// MARK: - Network sync
+
+/**
+ * `CYLTagListLoadPolicy`: in what order `CYLTagListState.loadSectionsWithKeys` reads the cache and the remote source.
+ * Unlike a search suggestion cache, a tag list may be kept on a server and edited on several devices.
+ */
+export enum CYLTagListLoadPolicy {
+  /** The cache at once, then the remote source; a successful download is saved and reported again (the default). */
+  cacheThenNetwork = 0,
+  /** The cache when it holds every section asked for; otherwise the remote source (the cache if that fails). */
+  cacheFirst = 1,
+  /** The remote source; the cache only when the download fails. */
+  networkFirst = 2
+}
+
+/** `CYLTagListDataOrigin`: where the titles reported by `loadSectionsWithKeys` come from. */
+export enum CYLTagListDataOrigin {
+  /** The local cache (`cache`). */
+  cache = 0,
+  /** The remote source (`remoteSource`). */
+  network = 1
+}
+
+/**
+ * `CYLTagListRemoteSource`: a server that keeps a tag list's sections, shared by the user's devices. The host implements
+ * it with its own networking; the list only asks it for sections (`loadSectionsWithKeys`). Uploading is the host's too:
+ * `menuDidFinishEditingWithTitles` / `editingFinishHandler` give it the edited sections.
+ */
+export interface CYLTagListRemoteSource {
+  /**
+   * `fetchSections(withKeys:completion:)`: downloads the sections saved under `keys`; calls `completion` once with the
+   * titles by key (a missing key: nothing on the server) or an error.
+   */
+  fetchSectionsWithKeys(keys: string[], completion: (sections: Map<string, string[]> | undefined,
+    error: Error | undefined) => void): void;
+}

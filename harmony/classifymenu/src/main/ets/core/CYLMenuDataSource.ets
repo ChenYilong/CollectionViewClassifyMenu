@@ -83,6 +83,11 @@ export interface CYLMenuDelegate {
   menuDidBeginDraggingSelectedItem?: (menu: Object, indexPath: CYLIndexPath) => void;
   /** `menu(_:didChangeEditing:)`: the list entered (true) or left (false) editing mode (`setEditing`). */
   menuDidChangeEditing?: (menu: Object, editing: boolean) => void;
+  /**
+   * `menu(_:didFinishEditingWithTitles:)`: the list's editing ended; the edited sections' titles by cache key
+   * (`cacheKeyForSection`), in their new order, already saved to its cache: upload them to your server here.
+   */
+  menuDidFinishEditingWithTitles?: (menu: Object, titles: Map<string, string[]>) => void;
 }
 
 /** The iOS defaults of the optional data source methods, for a data source that does not implement them. */
