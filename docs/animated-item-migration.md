@@ -264,6 +264,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `docs/assets/android-rive-menu-loops-f84c1073.png`. **Pins at `70064275` (2026-11-18)** (adds the opt-in Rive `tint` option on Android and iOS): Android
   rebuilt, at rest every Rive tag 0 changed pixels, Loop on Menu changes in 29 of 29 frame pairs (61-468 px), every other
   Rive tag moves; mini program `npm test` 143 / 143.
+- **HarmonyOS `harmony/cylanimateditem` re-vendored at `70064275` (2026-11-18)**, was `fe5c3ae3`. Request from the
+  CYLSearchViewController session: CYLTabBarController's HarmonyOS cyltabbar reads `speed`, `restartToken` and `loops`
+  on `CYLAnimatedItemAnimationContext` since `d733c80e`, so an app taking the module from this folder failed ArkTS
+  compile ("Property 'restartToken' does not exist on type 'CYLAnimatedItemAnimationContext'"). Copied unmodified
+  (`Index.ets`, `CYLAnimatedItemView.ets` changed), README commit updated; `harmony/scripts/build.sh` OK (HAR and HAP),
+  `unit-test.sh` 62 / 62.
 - **Rive icons rest until played, pins at `dcbfdec6` (2026-11-18)**: CYLTabBarController `ff2e7a22` (mini program
   `cyl-rive` rests on its first frame until played), `ef1d0313` (iOS, Android), `dc2fef02` (HarmonyOS). The mini program
   tag list and cyl-tag-button asked cyl-animated-item to autoplay once on load, so shapes.riv (a looping animation) still

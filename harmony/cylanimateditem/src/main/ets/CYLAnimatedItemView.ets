@@ -1,5 +1,8 @@
 import BuildProfile from '../../../BuildProfile';
 
+/** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
+const CYL_UNLIMITED_LINES: number = 1000;
+
 /**
  * [EN] Icon beside the title (default) or above it. [CN] 图标在标题旁（默认）或上方。
  */
@@ -29,10 +32,38 @@ export class CYLAnimatedItemAnimationContext {
   url: string = '';
   size: number = 24;
   selected: boolean = false;
+  /**
+   * [EN] The playback the engine applies (the item's `animationSpeed`, `animationLoops`, and `restartToken`, which grows
+   *      on every restart: the engine plays from progress 0 when it changes). The item hands a new context to the builder
+   *      whenever one of them changes, so the engine view gets them as props and needs no state of the host.
+   * [CN] 引擎应用的播放设置（条目的 `animationSpeed`、`animationLoops`，以及每次重播都会增长的 `restartToken`：变化时引擎从进度 0 播放）。
+   *      其中任一项变化时条目都会把新的 context 交给 builder，因此引擎视图通过 prop 获得它们，不需要宿主的状态。
+   */
+  speed: number = 1;
+  loops: boolean = false;
+  restartToken: number = 0;
   onLoaded: () => void = () => {
   };
   onFailed: () => void = () => {
   };
+}
+
+/**
+ * [EN] Imperative playback for a `CYLAnimatedItemView` (iOS / Android `restartAnimation`): pass one as `controller`, then
+ *      call `restartAnimation()`, for example from `onItemTap`. The props `animationSpeed`, `animationLoops` and
+ *      `animationRestartToken` do the same declaratively.
+ * [CN] `CYLAnimatedItemView` 的命令式播放控制（iOS / Android 的 `restartAnimation`）：作为 `controller` 传入，然后调用 `restartAnimation()`，
+ *      例如在 `onItemTap` 中。prop `animationSpeed`、`animationLoops` 与 `animationRestartToken` 以声明式实现相同功能。
+ */
+export class CYLAnimatedItemController {
+  /** [EN] Set by the item it is attached to. [CN] 由所关联的条目设置。 */
+  cylRestart: () => void = () => {
+  };
+
+  /** [EN] Plays the animation again from progress 0. [CN] 从进度 0 重新播放动画。 */
+  restartAnimation(): void {
+    this.cylRestart();
+  }
 }
 
 /**
@@ -197,7 +228,23 @@ export struct CYLAnimatedItemView {
   @Prop selectedImage: ResourceStr = '';
   @Prop placeholderImage: ResourceStr = $r('app.media.cyl_animated_item_placeholder');
   @Prop @Watch('cylAnimationDidChange') animationUrl: string = '';
-  @Prop isItemSelected: boolean = false;
+  @Prop @Watch('cylPlaybackDidChange') isItemSelected: boolean = false;
+  /**
+   * [EN] Playback speed of the animation, 1 by default (iOS / Android `animationSpeed`). [CN] 动画播放速度，默认 1（iOS / Android `animationSpeed`）。
+   */
+  @Prop @Watch('cylPlaybackDidChange') animationSpeed: number = 1;
+  /**
+   * [EN] Whether the animation repeats (iOS / Android `animationLoops`). [CN] 动画是否循环（iOS / Android `animationLoops`）。
+   */
+  @Prop @Watch('cylPlaybackDidChange') animationLoops: boolean = false;
+  /**
+   * [EN] Any change plays the animation again from progress 0 (declarative `restartAnimation`); see also `controller`.
+   * [CN] 任何变化都会让动画从进度 0 重新播放（声明式的 `restartAnimation`）；另见 `controller`。
+   */
+  @Prop @Watch('cylPlaybackDidChange') animationRestartToken: number = 0;
+  /** [EN] Optional imperative control (`restartAnimation()`). [CN] 可选的命令式控制（`restartAnimation()`）。 */
+  controller?: CYLAnimatedItemController;
+  @State private cylControllerRestarts: number = 0;
   @Prop isItemEnabled: boolean = true;
   @Prop axis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Horizontal;
   @Prop iconSize: number = 24;
@@ -208,7 +255,17 @@ export struct CYLAnimatedItemView {
    *      only. [CN] 静态图标的颜色（如 iOS 的模板图着色）：SVG 与符号图作为填充色，位图通过保留透明度的颜色滤镜着色；''（默认）保留原色。
    */
   @Prop iconColor: ResourceColor = '';
+  /**
+   * [EN] The gap in vp between the icon and the title, and between an inline accessory and the rest (iOS `spacing`,
+   *      Android `spacingDp`, the mini program's `titleSpacing`). Bug B21: it was declared but never read.
+   * [CN] 图标与标题之间、行内附件与其余内容之间的间距（vp）（iOS `spacing`、Android `spacingDp`、小程序 `titleSpacing`）。问题 B21：此前声明了却从未使用。
+   */
   @Prop spacing: number = 4;
+  /**
+   * [EN] The most lines of the title: 1 (the default) is one line with an ellipsis, 0 has no limit (as the mini
+   *      program's `titleLines`). [CN] 标题的最大行数：1（默认）为单行加省略号，0 不限（与小程序的 `titleLines` 相同）。
+   */
+  @Prop titleLines: number = 1;
   @Prop titleFontSize: number = 14;
   @Prop titleColor: ResourceColor = '#333333';
   @Prop accessoryImage: ResourceStr = '';
@@ -235,9 +292,15 @@ export struct CYLAnimatedItemView {
   onItemDragStart?: () => void;
   onItemDragMove?: (dx: number, dy: number) => void;
   onItemDragEnd?: (dx: number, dy: number) => void;
-  private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
+  @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
   aboutToAppear(): void {
+    if (this.controller) {
+      this.controller.cylRestart = () => {
+        this.cylControllerRestarts += 1;
+        this.cylPlaybackDidChange();
+      };
+    }
     this.cylAnimationDidChange();
   }
 
@@ -252,10 +315,28 @@ export struct CYLAnimatedItemView {
   cylAnimationDidChange(): void {
     this.animationLoaded = false;
     this.animationFailed = false;
+    this.cylUpdateContext();
+    if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
+      CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
+    }
+  }
+
+  /**
+   * [EN] The selection, speed, loops or a restart changed: the engine gets them in a new context, without reloading the
+   *      file. [CN] 选中、速度、循环或重播发生变化：引擎通过新的 context 获得它们，不重新加载文件。
+   */
+  cylPlaybackDidChange(): void {
+    this.cylUpdateContext();
+  }
+
+  private cylUpdateContext(): void {
     let context: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
     context.url = this.animationUrl;
     context.size = this.iconSize;
     context.selected = this.isItemSelected;
+    context.speed = this.animationSpeed;
+    context.loops = this.animationLoops;
+    context.restartToken = this.animationRestartToken + this.cylControllerRestarts;
     let url: string = this.animationUrl;
     context.onLoaded = () => {
       if (url === this.animationUrl) {
@@ -268,9 +349,6 @@ export struct CYLAnimatedItemView {
       }
     };
     this.animationContext = context;
-    if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
-      CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
-    }
   }
 
   /**
@@ -331,7 +409,19 @@ export struct CYLAnimatedItemView {
       }
       if (this.cylMakesAnimation()) {
         Column() {
-          this.animationBuilder(this.animationContext)
+          // [EN] One object literal whose fields read state: ArkUI passes it by reference, so the engine view gets new
+          //      values (selection, speed, loops, restarts) as they change; a context object alone is rendered once.
+          // [CN] 字段读取状态的单个对象字面量：ArkUI 按引用传递，引擎视图随变化获得新值（选中、速度、循环、重播）；单独的 context 对象只渲染一次。
+          this.animationBuilder({
+            url: this.animationUrl,
+            size: this.iconSize,
+            selected: this.isItemSelected,
+            speed: this.animationSpeed,
+            loops: this.animationLoops,
+            restartToken: this.animationRestartToken + this.cylControllerRestarts,
+            onLoaded: this.animationContext.onLoaded,
+            onFailed: this.animationContext.onFailed
+          })
         }
         .width(this.iconSize)
         .height(this.iconSize)
@@ -357,6 +447,11 @@ export struct CYLAnimatedItemView {
       }
       .constraintSize({ minWidth: 44, minHeight: 44 })
       .justifyContent(FlexAlign.Center)
+      // [EN] An inline accessory keeps `spacing` from the icon and title, as on Android (B21). [CN] 行内附件与图标、标题保持 `spacing`，与 Android 相同（B21）。
+      .margin(!this.cylShowsIconOrTitle() ? 0 :
+        this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Leading ?
+          (this.axis === CYLAnimatedItemAxis.Vertical ? { bottom: this.spacing } : { right: this.spacing }) :
+          this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Trailing ? this.cylLeadingGap(this.spacing) : 0)
       .accessibilityGroup(true)
       .accessibilityText(this.accessoryAccessibilityText.length > 0 ? this.accessoryAccessibilityText : this.accessoryText)
       .id(this.itemId.length > 0 ? `${this.itemId}-accessory` : '')
@@ -374,10 +469,22 @@ export struct CYLAnimatedItemView {
       Text(this.itemTitle)
         .fontSize(this.titleFontSize)
         .fontColor(this.titleColor)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .maxLines(this.titleLines > 0 ? Math.floor(this.titleLines) : CYL_UNLIMITED_LINES)
+        .textOverflow({ overflow: this.titleLines > 0 ? TextOverflow.Ellipsis : TextOverflow.None })
+        .textAlign(this.axis === CYLAnimatedItemAxis.Vertical ? TextAlign.Center : TextAlign.Start)
+        .margin(this.cylShowsIcon() ? this.cylLeadingGap(this.spacing) : 0)
         .accessibilityLevel('no')
     }
+  }
+
+  /** [EN] A gap before a part: above it on the vertical axis, before it on the horizontal one. [CN] 某部分之前的间距：纵向在其上方，横向在其前方。 */
+  private cylLeadingGap(gap: number): Margin {
+    return this.axis === CYLAnimatedItemAxis.Vertical ? { top: gap } : { left: gap };
+  }
+
+  /** [EN] Whether the icon or the title shows (an inline accessory keeps `spacing` from them). [CN] 是否显示图标或标题（行内附件与它们保持 `spacing`）。 */
+  private cylShowsIconOrTitle(): boolean {
+    return this.cylShowsIcon() || this.itemTitle.length > 0;
   }
 
   @Builder
@@ -394,6 +501,11 @@ export struct CYLAnimatedItemView {
     }
   }
 
+  /** [EN] Bare and only an icon: no title, no accessory. [CN] 纯图标模式且只有图标：没有标题和附件。 */
+  private cylIsBareIcon(): boolean {
+    return this.isBare && this.itemTitle.length === 0 && this.cylIsEmpty(this.accessoryImage) && this.accessoryText.length === 0;
+  }
+
   build() {
     Flex({
       direction: this.axis === CYLAnimatedItemAxis.Vertical ? FlexDirection.Column : FlexDirection.Row,
@@ -403,6 +515,14 @@ export struct CYLAnimatedItemView {
       this.cylContent()
     }
     .padding(this.isBare ? 0 : 4)
+    // [EN] A Flex without a size fills its parent. A bare icon (a host's tab icon, no title, no accessory) is exactly the
+    //      icon, so a host can place things against its edges: the tab bar puts the badge at the icon's top-right, and an
+    //      item as wide as the tab slot moved it to the icon's top-left (HarmonyOS issue list #51). `undefined` keeps the
+    //      default size everywhere else.
+    // [CN] 未设置尺寸的 Flex 会填满父组件。纯图标（宿主的 Tab 图标，无标题、无附件）的尺寸就是图标尺寸，宿主才能依据其边缘布局：TabBar 把角标放在
+    //      图标右上角，而与 Tab 槽位同宽的条目把角标挪到了图标左上角（鸿蒙问题列表 #51）。其他情况为 `undefined`，保持默认尺寸。
+    .width(this.cylIsBareIcon() ? this.iconSize : undefined)
+    .height(this.cylIsBareIcon() ? this.iconSize : undefined)
     .opacity(this.isItemEnabled ? 1 : 0.5)
     .constraintSize({ minHeight: this.isBare ? 0 : 44 })
     .hitTestBehavior(this.isBare ? HitTestMode.None : HitTestMode.Default)
