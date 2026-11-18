@@ -473,6 +473,9 @@ Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
   the iOS screens translate them where they are shown. User-generated content (reviews, a shop's product title, song
   and user names) and deliberately multilingual samples stay as written, between `NOLOCALIZE-BEGIN` / `NOLOCALIZE-END`
   comments or with `NOLOCALIZE` on the line, with the reason.
+- The Flutter and React Native examples take their strings from the iOS bundle: after changing those keys, run
+  `python3 flutter/cyl_tag_list/example/tool/export_strings.py` and
+  `python3 react-native/react-native-cyl-tag-list/example/tool/export_strings.py` (each has `--check`).
 
 ## Accessibility
 

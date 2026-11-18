@@ -12,7 +12,9 @@ For every module (core, demo app, Example, Swift Example):
      says NOLOCALIZE, or it sits between NOLOCALIZE-BEGIN and NOLOCALIZE-END comments: user-generated content and sample
      data that stay as written (reviews, a shop's product title, song names, deliberately multilingual sample tags);
   4. with --unused, keys no code mentions are listed (keys built at run time are reported too, so review by hand).
-Exits 1 when 1-3 find anything.
+  5. the Flutter and React Native examples: a Chinese literal is a lookup's argument, a key of their generated tables
+     (exported from the iOS bundle), or marked NOLOCALIZE.
+Exits 1 when 1-3 or 5 find anything.
 """
 import pathlib
 import re
@@ -96,6 +98,55 @@ def specifiers(text):
     return [s.replace("ld", "d").replace("lu", "u").replace("ll", "") for s in SPECIFIER.findall(text)]
 
 
+CROSS_PLATFORM = [
+    {
+        "name": "Flutter example",
+        "sources": "flutter/cyl_tag_list/example/lib",
+        "suffixes": (".dart",),
+        "lookups": ["cylString", "cylDataTitle", "cylShortTitle"],
+        "tables": ["flutter/cyl_tag_list/example/lib/strings.dart"],
+        "generated": ["strings.dart"],
+    },
+    {
+        "name": "React Native example",
+        "sources": "react-native/react-native-cyl-tag-list/example/src",
+        "suffixes": (".ts", ".tsx"),
+        "lookups": ["t", "dataString", "dataTitle", "shortTitle"],
+        "tables": ["react-native/react-native-cyl-tag-list/example/src/dataStrings.ts",
+                   "react-native/react-native-cyl-tag-list/example/src/i18n.ts"],
+        "generated": ["dataStrings.ts", "i18n.ts"],
+    },
+]
+
+
+def check_cross_platform():
+    """Flutter and React Native examples: a Chinese literal is a lookup's argument, a key of the generated tables
+    (looked up later), or marked NOLOCALIZE; tests and the tables themselves are skipped."""
+    problems = 0
+    for example in CROSS_PLATFORM:
+        keys = set()
+        for table in example["tables"]:
+            keys |= set(re.findall(r"""["']((?:[^"'\\\n]|\\.)*)["']\s*:""", (ROOT / table).read_text(encoding="utf-8")))
+        call = re.compile(r"\b(?:" + "|".join(example["lookups"]) + r")\(\s*(['\"])((?:(?!\1)[^\\\n]|\\.)*)\1")
+        literal = re.compile(r"(['\"])((?:(?!\1)[^\\\n]|\\.)*)\1")
+        for f in sorted((ROOT / example["sources"]).rglob("*")):
+            if f.suffix not in example["suffixes"] or f.name in example["generated"] or "__tests__" in f.parts:
+                continue
+            raw = f.read_text(encoding="utf-8")
+            text = strip_comments(raw)
+            for number, line in enumerate(text.split("\n"), 1):
+                if "NOLOCALIZE" in raw.split("\n")[number - 1]:
+                    continue
+                spans = [m.span() for m in call.finditer(line)]
+                for m in literal.finditer(line):
+                    value = m.group(2)
+                    if not HAN.search(value) or any(s <= m.start() < e for s, e in spans) or value in keys:
+                        continue
+                    print(f"[{example['name']}] {f.relative_to(ROOT)}:{number}: Chinese literal outside the lookup: \"{value[:40]}\"")
+                    problems += 1
+    return problems
+
+
 def main():
     show_unused = "--unused" in sys.argv
     problems = 0
@@ -170,6 +221,7 @@ def main():
             for key in sorted(set().union(*[set(t) for t in tables.values()]) - used):
                 if f'"{key}"' not in all_text:
                     print(f"[{module['name']}] unused key: \"{key}\"")
+    problems += check_cross_platform()
     print(f"{problems} problem(s)")
     return 1 if problems else 0
 

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { CylTagListView, type TagEvent } from 'react-native-cyl-tag-list';
 import { PlacesDatabase } from './PlacesDatabase';
-import { t } from './i18n';
+import { dataString, dataTitle, shortTitle, t } from './i18n';
 import { launchFilter, launchSelection } from './launchOptions';
 
 /**
@@ -120,8 +120,8 @@ export default function ClassifyPage() {
     foldControl: { position: 'headerTrailing', content: 'iconAndTitle' },
     style: STYLE,
     sections: categories.map(([category, items]) => ({
-      title: category,
-      items: items.map((name) => ({ title: name })),
+      title: dataString(category),
+      items: items.map((name) => ({ title: dataTitle(name) })),
     })),
   };
   const filterConfiguration = {
@@ -135,10 +135,10 @@ export default function ClassifyPage() {
       [t('Dishes'), tags],
     ].map(([sectionTitle, titles]) => ({
       title: sectionTitle as string,
-      items: [{ title: t('All'), exclusive: true }, ...(titles as string[]).map((name) => ({ title: name }))],
+      items: [{ title: t('All'), exclusive: true }, ...(titles as string[]).map((name) => ({ title: dataTitle(name) }))],
     })),
   };
-  const names = (values: string[]) => (values.length ? values.join('、') : t('All'));
+  const names = (values: string[]) => (values.length ? values.map((v) => shortTitle(v)).join(dataString('、')) : t('All'));
   const filtered = selectedRegions.length > 0 || selectedDishes.length > 0;
 
   return (
@@ -180,7 +180,7 @@ export default function ClassifyPage() {
       />
       <View style={styles.divider} />
       <Text testID="placesSummary" style={styles.summary}>
-        {`${selectedTag ?? t('All')} · ${names(selectedRegions)} · ${names(selectedDishes)} · ${places.length}`}
+        {`${selectedTag ? shortTitle(selectedTag) : t('All')} · ${names(selectedRegions)} · ${names(selectedDishes)} · ${places.length}`}
       </Text>
       <FlatList
         data={places}
@@ -194,8 +194,8 @@ export default function ClassifyPage() {
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.rowText}>
-              <Text>{item.name as string}</Text>
-              <Text style={styles.region}>{item.region as string}</Text>
+              <Text>{(item.name as string).split(' · ').map((n) => shortTitle(n)).join(' · ')}</Text>
+              <Text style={styles.region}>{shortTitle(item.region as string)}</Text>
             </View>
             <Text>{`★ ${(item.rating as number).toFixed(1)} · ¥${item.price}`}</Text>
           </View>
