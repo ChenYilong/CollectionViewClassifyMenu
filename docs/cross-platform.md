@@ -816,3 +816,10 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 - **Prompt (verbatim):** "向所有今天还在活跃session…继续完成TODO 完成评分不到100的任务，一直到满分为止"
 - **Prompt (English):** "To every session still active today: continue the TODOs; finish every task whose score is below
   100, until it reaches full marks."
+- **DONE (2026-11-19):** (1) `a0f75597` regenerates `strings.js`; the Mini Program CI passes again at `a0f75597` and
+  `43fc242a` (failed on every commit from `a4517a3c` to `1a80c275`). (2) Closed notes marked DONE in `rive.md` and
+  `component-architecture.md` (`a0f75597`). (3) The Windows session mapped the Android row in `c368c75e`:
+  `android-api.md` 792 / 792 = 100, `android-ios-api.md` 736 / 736 = 100. Still open, owned elsewhere or blocked: the
+  default tab bar height (waits for CYLTabBarController), Android `CYLRightImageButton` / `CYLMultipleFilterHeaderView`
+  on `CYLTagButton` and the Android drag demo (Windows session), checks on a real HarmonyOS device, a real iPhone
+  (VoiceOver) and a phone (mini program BUG 1), and `npm publish` (needs the owner's npm login).
