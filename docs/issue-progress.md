@@ -60,9 +60,14 @@ tags: [issues, ui, cocoapods, progress]
   - GIF Fire 512-835 px, repeating with Loop.
   - The Lottie icons fit their tags.
   - Rive Home steps Rooms.
-- Result: **90/100**. -10: on the x86_64 emulator, Rive Menu toggles only on its first play, so it does not loop.
-  Mac's arm64 emulator loops it at `3bd20b3c`. Reported to the Mac CYLTabBarController session with numbers; waiting
-  for its fix.
+- Result: **100/100** (was 90). Rive Menu loops at CYLTabBarController `776b4635`. On x86_64 it had toggled only on
+  its first play. The call log this session sent showed `isOpen` alternating on every pass while the drawing stayed
+  put. Mac's fix plays a settled state machine again before each input.
+  - Emulator, Loop on: X, menu icon (440 px), X, menu icon (`docs/assets/android-rive-menu-loops-776b4635.png`).
+  - Pins at `776b4635`; mini program `npm test` 145 / 145.
+  - Observation, not a defect: with Loop on for every icon, the x86_64 emulator drops most frames (gfxinfo: 96% janky,
+    median 117-121 ms, the same at `4f73209c` and `776b4635`). PAG and GIF still advance, but sparsely between
+    screenshots.
 
 ### Done (2026-11-18, `feat/harmony`): Rive tint changes at CYLTabBarController `396d3fca` / `0505042f`
 
