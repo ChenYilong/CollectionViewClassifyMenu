@@ -21,7 +21,7 @@ void main() {
     expect(controller.isAttached, isTrue, reason: 'the platform view was created and its channel attached');
 
     var state = await controller.state();
-    expect(state['tagCount'], 17, reason: 'the native list holds the configuration\'s 4 Lottie, 3 Rive and 10 plain tags');
+    expect(state['tagCount'], 21, reason: 'the native list holds the configuration\'s 4 Lottie, 3 Rive, 4 SVGA and 10 plain tags');
     expect(state['loops'], false);
 
     // Dart controls -> native list, at once.
