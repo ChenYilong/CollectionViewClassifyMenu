@@ -210,6 +210,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   the whole height. An earlier note here blamed a regular size class; that was wrong (CYLTabBarController `5e01014a`,
   docs/Tab-Item-Positioning.md, measured the same). Fix in CYLTabBarController (its session); the example keeps its
   assertion ("Tab bars are always at the bottom").
+  Update (2026-11-18, CYLTabBarController `1b9e6e89`, its docs/Tab-Item-Positioning.md): no fix yet. On iPhone Duo UIKit
+  draws the tabs with its floating visual provider (`_UITabBarVisualProvider_Floating` in `_UITabContainerView`); the
+  bottom group has zero height and `CYLTabBar` is empty (lldb view dump, iOS 27.2). The iPad pinning (mode `.tabBar`,
+  compact override, hidden container, bottom frame) moved an empty bar to the bottom and hid every tab; reverted, never
+  pushed. The iOS 27.2 SDK has no public API to choose the bottom bar. Waiting on the owner's choice: (1) accept the
+  floating bar there and test that it is visible, not at the bottom; (2) `CYLTabBar` draws its own buttons when UIKit
+  goes floating; (3) a private-API switch. Until then the test keeps failing on iPhone Duo only.
 - **Bug fixed (2026-11-17, `0583e1d`)**: the example's test screenshots showed empty places instead of the animated icons
   (Lottie, PAG, Rive, SVGA, GIF), although the running app draws them (`assets/ios-animations-live.png`): the capture ran
   before the icons' first frame was drawn. `CYLScreenshotCapturing.captureScreenshot` now runs the main run loop for 0.5 s
