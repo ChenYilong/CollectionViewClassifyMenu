@@ -942,5 +942,6 @@
  "CYLTagListView -cacheKeyForSection:": "CYLTagListView.cacheKeyForSection",
  "CYLTagListView -saveEditableSectionsToCache": "CYLTagListView.saveEditableSectionsToCache",
  "CYLTagListView -setEditing:animated:": "CYLTagListView.setEditing(editing, animated)",
- "CYLTagListView -sectionAllowsEditing:": "CYLTagListView.sectionAllowsEditing"
+ "CYLTagListView -sectionAllowsEditing:": "CYLTagListView.sectionAllowsEditing",
+ "CYLMenuDelegate -menu:didFinishEditingWithTitles:": "CYLMenuDelegate.menuDidFinishEditingWithTitles(menu, titles)"
 }

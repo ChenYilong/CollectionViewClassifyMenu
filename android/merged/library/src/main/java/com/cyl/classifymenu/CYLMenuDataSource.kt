@@ -82,6 +82,12 @@ interface CYLMenuDelegate {
     /** `menu:didChangeEditing:`: `CYLTagListView` entered (true) or left (false) editing mode (`setEditing`). */
     fun menuDidChangeEditing(menu: Any, editing: Boolean) {}
 
+    /**
+     * `menu:didFinishEditingWithTitles:`: `CYLTagListView`'s editing ended; the edited sections' titles by cache key
+     * (`cacheKeyForSection`), in their new order, already saved to its cache: upload them to your server here.
+     */
+    fun menuDidFinishEditingWithTitles(menu: Any, titles: Map<String, List<String>>) {}
+
     /** Whether the long press is handled (`respondsToSelector:` of `menu:didLongPressItemAtIndexPath:`). */
     fun handlesLongPress(): Boolean = false
 }

@@ -351,6 +351,77 @@ open class CYLTagListView @JvmOverloads constructor(
     /** `cache`: the store the list saves to, the built-in store of `cachePolicy` or one of yours; null: no cache. */
     var cache: CYLTagListCache? = null
 
+    /** `remoteSource`: the server the sections are also kept on, for `loadSectionsWithKeys`; null: the cache only. */
+    var remoteSource: CYLTagListRemoteSource? = null
+
+    /**
+     * `loadPolicy`: how `loadSectionsWithKeys` combines the cache and `remoteSource`; `CacheThenNetwork` (the cache at
+     * once, then a refresh from the server) by default.
+     */
+    var loadPolicy: CYLTagListLoadPolicy = CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheThenNetwork
+
+    /**
+     * `editingFinishHandler`: called when editing ends (`setEditing(false, …)`) with the edited sections by cache key,
+     * after `menuDidFinishEditingWithTitles`: the place to upload them.
+     */
+    var editingFinishHandler: ((Map<String, List<String>>) -> Unit)? = null
+
+    /**
+     * `-editableSectionTitles`: the titles of every editable section by cache key (`cacheKeyForSection`), without
+     * "+ New tag" items: what the list saves and what `menuDidFinishEditingWithTitles` reports.
+     */
+    fun editableSectionTitles(): Map<String, List<String>> {
+        val source = menuDataSource ?: return emptyMap()
+        val result = LinkedHashMap<String, List<String>>()
+        for (section in 0 until source.numberOfSectionsInMenu()) {
+            if (!sectionAllowsEditing(section)) continue
+            result[cacheKeyForSection(section)] = (0 until source.menuNumberOfItemsInSection(section)).mapNotNull { item ->
+                val indexPath = CYLIndexPath(item, section)
+                if (source.menuItemTypeAtIndexPath(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) null
+                else source.menuTitleForItemAtIndexPath(indexPath)
+            }
+        }
+        return result
+    }
+
+    /**
+     * `-loadSectionsWithKeys:completion:`: reads the sections saved under `keys` from the cache and `remoteSource`, in
+     * the order of `loadPolicy`, and calls `completion` on the main thread with the titles by key and where they come
+     * from: once or twice (`CacheThenNetwork`: the cache at once, then the server). Downloaded sections are saved to
+     * the cache first. Without a remote source it reads the cache only; nothing saved anywhere calls nothing.
+     */
+    fun loadSectionsWithKeys(keys: List<String>, completion: (Map<String, List<String>>, CYLTagListDataOrigin) -> Unit) {
+        val cached = LinkedHashMap<String, List<String>>()
+        for (key in keys) cache?.cachedTitlesForSection(key)?.let { cached[key] = it }
+        val main = android.os.Handler(android.os.Looper.getMainLooper())
+        fun fetch(done: (Boolean) -> Unit) {
+            val remote = remoteSource ?: return done(false)
+            remote.fetchSectionsWithKeys(keys) { sections, error ->
+                main.post {
+                    if (sections == null || error != null) {
+                        done(false)
+                        return@post
+                    }
+                    val downloaded = sections.filterKeys { it in keys }
+                    for ((key, titles) in downloaded) cache?.saveTitles(titles, key)
+                    completion(downloaded, CYLTagListDataOrigin.CYLTagListDataOriginNetwork)
+                    done(true)
+                }
+            }
+        }
+        when (loadPolicy) {
+            CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheThenNetwork -> {
+                if (cached.isNotEmpty()) completion(cached, CYLTagListDataOrigin.CYLTagListDataOriginCache)
+                fetch { }
+            }
+            CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheFirst ->
+                if (cached.size == keys.size) completion(cached, CYLTagListDataOrigin.CYLTagListDataOriginCache)
+                else fetch { ok -> if (!ok && cached.isNotEmpty()) completion(cached, CYLTagListDataOrigin.CYLTagListDataOriginCache) }
+            CYLTagListLoadPolicy.CYLTagListLoadPolicyNetworkFirst ->
+                fetch { ok -> if (!ok && cached.isNotEmpty()) completion(cached, CYLTagListDataOrigin.CYLTagListDataOriginCache) }
+        }
+    }
+
     /** `-cachedTitlesInSection:`: the titles saved for `section`, in order; null when nothing was saved or no cache. */
     fun cachedTitlesInSection(section: Int): List<String>? = cache?.cachedTitlesForSection(cacheKeyForSection(section))
 
@@ -360,16 +431,7 @@ open class CYLTagListView @JvmOverloads constructor(
     /** `-saveEditableSectionsToCache`: saves the current titles of every editable section to `cache` (after each edit). */
     fun saveEditableSectionsToCache() {
         val cache = cache ?: return
-        val source = menuDataSource ?: return
-        for (section in 0 until source.numberOfSectionsInMenu()) {
-            if (!sectionAllowsEditing(section)) continue
-            val titles = (0 until source.menuNumberOfItemsInSection(section)).mapNotNull { item ->
-                val indexPath = CYLIndexPath(item, section)
-                if (source.menuItemTypeAtIndexPath(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) null
-                else source.menuTitleForItemAtIndexPath(indexPath)
-            }
-            cache.saveTitles(titles, cacheKeyForSection(section))
-        }
+        for ((key, titles) in editableSectionTitles()) cache.saveTitles(titles, key)
     }
 
     /**
@@ -384,6 +446,10 @@ open class CYLTagListView @JvmOverloads constructor(
             addItemView.textField.clearFocus()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager)
                 ?.hideSoftInputFromWindow(addItemView.textField.windowToken, 0)
+            // The edited sections, for the host to upload (the cache already has them).
+            val titles = editableSectionTitles()
+            menuDelegate?.menuDidFinishEditingWithTitles(this, titles)
+            editingFinishHandler?.invoke(titles)
         }
         invalidateMeasurements()
         if (animated && isAttachedToWindow) {

@@ -11,7 +11,7 @@ Every public symbol of the Android core (`android/merged/library`, Kotlin) and i
 from the Kotlin sources, `android/merged/api-map.json` (the reverse table, [android-api.md](android-api.md)) and
 `android/merged/ios-map.json` (hand-made entries); do not edit the table by hand. A row without a counterpart is `TODO`.
 
-**Score: 772 / 772 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
+**Score: 787 / 787 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
 row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same
 logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100.
 
@@ -244,7 +244,8 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLMenuDelegate.menuDidMoveItemAtIndexPath` | method, `CYLMenuDataSource.kt:79` | `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` |
 | `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath` | method, `CYLMenuDataSource.kt:80` | `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` |
 | `CYLMenuDelegate.menuDidChangeEditing` | method, `CYLMenuDataSource.kt:83` | `CYLMenuDelegate.menu(_:didChangeEditing:)` |
-| `CYLMenuDelegate.handlesLongPress` | method, `CYLMenuDataSource.kt:86` | `responds(to: #selector(CYLMenuDelegate.menu(_:didLongPressItemAt:)))` (optional Objective-C method; `CYLTagListView` checks it) |
+| `CYLMenuDelegate.menuDidFinishEditingWithTitles` | method, `CYLMenuDataSource.kt:89` | `CYLMenuDelegate.menu(_:didFinishEditingWithTitles:)` |
+| `CYLMenuDelegate.handlesLongPress` | method, `CYLMenuDataSource.kt:92` | `responds(to: #selector(CYLMenuDelegate.menu(_:didLongPressItemAt:)))` (optional Objective-C method; `CYLTagListView` checks it) |
 | `CYLMenuFoldControlPosition` | class, `CYLMenuFoldControl.kt:6` | `CYLMenuFoldControlPosition` |
 | `CYLMenuFoldControlPosition.NONE` | enum case, `CYLMenuFoldControl.kt:7` | `CYLMenuFoldControlPositionNone` |
 | `CYLMenuFoldControlPosition.FOOTER` | enum case, `CYLMenuFoldControl.kt:8` | `CYLMenuFoldControlPositionFooter` |
@@ -526,6 +527,15 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagListCache.removeAllTitles` | method, `CYLTagListCache.kt:44` | `CYLTagListCache.removeAllTitles()` |
 | `CYLTagListStore` | class, `CYLTagListCache.kt:52` | `CYLTagListStore` |
 | `CYLTagListStore.name` | read-only property, `CYLTagListCache.kt:54` | `CYLTagListStore.name` |
+| `CYLTagListLoadPolicy` | class, `CYLTagListCache.kt:214` | `CYLTagListLoadPolicy` |
+| `CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheThenNetwork` | enum case, `CYLTagListCache.kt:216` | `CYLTagListLoadPolicyCacheThenNetwork` |
+| `CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheFirst` | enum case, `CYLTagListCache.kt:219` | `CYLTagListLoadPolicyCacheFirst` |
+| `CYLTagListLoadPolicy.CYLTagListLoadPolicyNetworkFirst` | enum case, `CYLTagListCache.kt:222` | `CYLTagListLoadPolicyNetworkFirst` |
+| `CYLTagListDataOrigin` | class, `CYLTagListCache.kt:226` | `CYLTagListDataOrigin` |
+| `CYLTagListDataOrigin.CYLTagListDataOriginCache` | enum case, `CYLTagListCache.kt:228` | `CYLTagListDataOriginCache` |
+| `CYLTagListDataOrigin.CYLTagListDataOriginNetwork` | enum case, `CYLTagListCache.kt:231` | `CYLTagListDataOriginNetwork` |
+| `CYLTagListRemoteSource` | interface, `CYLTagListCache.kt:239` | `CYLTagListRemoteSource` |
+| `CYLTagListRemoteSource.fetchSectionsWithKeys` | method, `CYLTagListCache.kt:244` | `CYLTagListRemoteSource.fetchSections(withKeys:completion:)` |
 | `CYLTagListCell` | class, `CYLTagListCell.kt:23` | `CYLTagListCell` |
 | `CYLTagListCell.button` | read-only property, `CYLTagListCell.kt:25` | `CYLTagListCell.button` |
 | `CYLTagListCell.appliedStyle` | property, `CYLTagListCell.kt:43` | `CYLTagListCell.appliedStyle` |
@@ -563,72 +573,77 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagListView.cachePolicy` | property, `CYLTagListView.kt:338` | `CYLTagListView.cachePolicy` |
 | `CYLTagListView.cacheName` | property, `CYLTagListView.kt:345` | `CYLTagListView.cacheName` |
 | `CYLTagListView.cache` | property, `CYLTagListView.kt:352` | `CYLTagListView.cache` |
-| `CYLTagListView.cachedTitlesInSection` | method, `CYLTagListView.kt:355` | `CYLTagListView.cachedTitles(inSection:)` |
-| `CYLTagListView.cacheKeyForSection` | method, `CYLTagListView.kt:358` | `CYLTagListView.cacheKey(forSection:)` |
-| `CYLTagListView.saveEditableSectionsToCache` | method, `CYLTagListView.kt:361` | `CYLTagListView.saveEditableSectionsToCache()` |
-| `CYLTagListView.setEditing` | method, `CYLTagListView.kt:380` | `CYLTagListView.setEditing(_:animated:)` |
-| `CYLTagListView.sectionAllowsEditing` | method, `CYLTagListView.kt:397` | `CYLTagListView.sectionAllowsEditing(_:)` |
-| `CYLTagListView.reloadMenuData` | method, `CYLTagListView.kt:417` | `CYLTagListView.reloadMenuData()` |
-| `CYLTagListView.heightThatFitsWidth` | method, `CYLTagListView.kt:611` | `CYLTagListView.heightThatFitsWidth(_:)` |
-| `CYLTagListView.lineSpacing` | property, `CYLTagListView.kt:680` | `CYLTagListView.lineSpacing` |
-| `CYLTagListView.interitemSpacing` | property, `CYLTagListView.kt:684` | `CYLTagListView.interitemSpacing` |
-| `CYLTagListView.tagContentInsets` | property, `CYLTagListView.kt:688` | `CYLTagListView.tagContentInsets` |
-| `CYLTagListView.tagContentInsetTop` | property, `CYLTagListView.kt:692` | `CYLTagListView.tagContentInsetTop` |
-| `CYLTagListView.tagContentInsetLeft` | property, `CYLTagListView.kt:696` | `CYLTagListView.tagContentInsetLeft` |
-| `CYLTagListView.tagContentInsetBottom` | property, `CYLTagListView.kt:700` | `CYLTagListView.tagContentInsetBottom` |
-| `CYLTagListView.tagContentInsetRight` | property, `CYLTagListView.kt:704` | `CYLTagListView.tagContentInsetRight` |
-| `CYLTagListView.tagDataSource` | read-only property, `CYLTagListView.kt:711` | `CYLTagListView.tagDataSource` |
-| `CYLTagListView.tags` | read-only property, `CYLTagListView.kt:718` | `CYLTagListView.tags` |
-| `CYLTagListView.addTag` | method, `CYLTagListView.kt:736` | `CYLTagListView.addTag(_:)` |
-| `CYLTagListView.addTags` | method, `CYLTagListView.kt:741` | `CYLTagListView.addTags(_:)` |
-| `CYLTagListView.addTagsWithTitles` | method, `CYLTagListView.kt:746` | `CYLTagListView.addTags(withTitles:)` |
-| `CYLTagListView.insertTag` | method, `CYLTagListView.kt:748` | `CYLTagListView.insertTag(_:at:)` |
-| `CYLTagListView.removeTagAtIndex` | method, `CYLTagListView.kt:756` | `CYLTagListView.removeTag(at:)` |
-| `CYLTagListView.removeAllTags` | method, `CYLTagListView.kt:764` | `CYLTagListView.removeAllTags()` |
-| `CYLTagListView.tagClickHandler` | property, `CYLTagListView.kt:770` | `CYLTagListView.tagClickHandler` |
-| `CYLTagListView.tagDeleteHandler` | property, `CYLTagListView.kt:771` | `CYLTagListView.tagDeleteHandler` |
-| `CYLTagListView.deleteItemAtIndexPath` | method, `CYLTagListView.kt:783` | `CYLTagListView.deleteItem(at:)` |
-| `CYLTagListView.containerBorderWidth` | property, `CYLTagListView.kt:799` | `CYLTagListView.containerBorderWidth` |
-| `CYLTagListView.containerBorderColor` | property, `CYLTagListView.kt:805` | `CYLTagListView.containerBorderColor` |
-| `CYLTagListView.containerCornerRadius` | property, `CYLTagListView.kt:811` | `CYLTagListView.containerCornerRadius` |
-| `CYLTagListView.maximumNumberOfRows` | property, `CYLTagListView.kt:824` | `CYLTagListView.maximumNumberOfRows` |
-| `CYLTagListView.colorTheme` | property, `CYLTagListView.kt:835` | `CYLTagListView.colorTheme` |
-| `CYLTagListView.allowsTapping` | property, `CYLTagListView.kt:851` | `CYLTagListView.allowsTapping` |
-| `CYLTagListView.defaultTagImage` | property, `CYLTagListView.kt:852` | `CYLTagListView.defaultTagImage` |
-| `CYLTagListView.removesItemsOnDelete` | property, `CYLTagListView.kt:853` | `CYLTagListView.removesItemsOnDelete` |
-| `CYLTagListView.tagButtonAtIndexPath` | method, `CYLTagListView.kt:856` | `CYLTagListView.tagButton(at:)` |
-| `CYLTagListView.animationSpeed` | property, `CYLTagListView.kt:864` | `CYLTagListView.animationSpeed` |
-| `CYLTagListView.animationLoops` | property, `CYLTagListView.kt:874` | `CYLTagListView.animationLoops` |
-| `CYLTagListView.playAllAnimations` | method, `CYLTagListView.kt:881` | `CYLTagListView.playAllAnimations()` |
-| `CYLTagListView.tagLongPressHandler` | property, `CYLTagListView.kt:887` | `CYLTagListView.tagLongPressHandler` |
-| `CYLTagListView.longPressAccessibilityActionName` | property, `CYLTagListView.kt:893` | `CYLTagListView.longPressAccessibilityActionName` |
-| `CYLTagListView.allowsReordering` | property, `CYLTagListView.kt:899` | `CYLTagListView.allowsReordering` |
-| `CYLTagListView.reorderingSensitivity` | property, `CYLTagListView.kt:906` | `CYLTagListView.reorderingSensitivity` |
-| `CYLTagListView.reordering` | property, `CYLTagListView.kt:909` | `CYLTagListView.isReordering` |
-| `CYLTagListView.isReordering` | read-only property, `CYLTagListView.kt:913` | `isReordering` (same name in the iOS core) |
-| `CYLTagListView.tagMoveHandler` | property, `CYLTagListView.kt:915` | `CYLTagListView.tagMoveHandler` |
-| `CYLTagListView.selectedTagDragHandler` | property, `CYLTagListView.kt:916` | `CYLTagListView.selectedTagDragHandler` |
-| `CYLTagListView.canMoveItemAtIndexPath` | method, `CYLTagListView.kt:924` | CYLTagListView -collectionView:canMoveItemAtIndexPath: (UICollectionViewDataSource) |
-| `CYLTagListView.moveItemAtIndexPath` | method, `CYLTagListView.kt:930` | CYLTagListView -collectionView:moveItemAtIndexPath:toIndexPath: (UICollectionViewDataSource) |
-| `CYLTagListView.replaceTags` | method, `CYLTagListView.kt:1003` | `CYLTagListView.replaceTags(_:)` |
-| `CYLTagListView.setTagsWithTitles` | method, `CYLTagListView.kt:1009` | `CYLTagListView.setTags(withTitles:colors:)` |
-| `CYLTagListView.setTagsWithTitles` | method, `CYLTagListView.kt:1011` | `CYLTagListView.setTags(withTitles:colors:)` |
-| `CYLTagListView.addTagWithTitle` | method, `CYLTagListView.kt:1015` | `CYLTagListView.addTag(withTitle:)` |
-| `CYLTagListView.insertTagWithTitle` | method, `CYLTagListView.kt:1017` | `CYLTagListView.insertTag(withTitle:at:)` |
-| `CYLTagListView.removeTagsAtIndexes` | method, `CYLTagListView.kt:1020` | `CYLTagListView.removeTags(at:)` |
-| `CYLTagListView.toggleSelectionOfItemAtIndexPath` | method, `CYLTagListView.kt:1031` | `CYLTagListView.toggleSelection(at:)` |
-| `CYLTagListView.selectedTitles` | read-only property, `CYLTagListView.kt:1044` | `CYLTagListView.selectedTitles` |
-| `CYLTagListView.selectedIndexPaths` | property, `CYLTagListView.kt:1050` | `CYLTagListView.selectedIndexPaths` |
-| `CYLTagListView.selectItemAtIndexPath` | method, `CYLTagListView.kt:1063` | `CYLTagListView.selectItem(at:)` |
-| `CYLTagListView.deselectItemAtIndexPath` | method, `CYLTagListView.kt:1069` | `CYLTagListView.deselectItem(at:)` |
-| `CYLTagListView.deselectAllItems` | method, `CYLTagListView.kt:1074` | `CYLTagListView.deselectAllItems()` |
-| `CYLTagListView.canFoldSection` | method, `CYLTagListView.kt:1135` | `CYLTagListView.canFoldSection(_:)` |
-| `CYLTagListView.numberOfRowsInSection` | method, `CYLTagListView.kt:1140` | `CYLTagListView.numberOfRows(inSection:)` |
-| `CYLTagListView.isSectionExpanded` | method, `CYLTagListView.kt:1145` | `CYLTagListView.isSectionExpanded(_:)` |
-| `CYLTagListView.numberOfVisibleItemsInSection` | method, `CYLTagListView.kt:1147` | `CYLTagListView.numberOfVisibleItems(inSection:)` |
-| `CYLTagListView.setExpanded` | method, `CYLTagListView.kt:1176` | `CYLTagListView.setExpanded(_:forSection:animated:)` |
-| `CYLTagListView.scrollToSection` | method, `CYLTagListView.kt:1197` | `CYLTagListView.scroll(toSection:animated:)` |
-| `CYLTagListView.scrollToItemAtIndexPath` | method, `CYLTagListView.kt:1203` | `CYLTagListView.scrollToItem(at:animated:)` |
+| `CYLTagListView.remoteSource` | property, `CYLTagListView.kt:355` | `CYLTagListView.remoteSource` |
+| `CYLTagListView.loadPolicy` | property, `CYLTagListView.kt:361` | `CYLTagListView.loadPolicy` |
+| `CYLTagListView.editingFinishHandler` | property, `CYLTagListView.kt:367` | `CYLTagListView.editingFinishHandler` |
+| `CYLTagListView.editableSectionTitles` | method, `CYLTagListView.kt:373` | `CYLTagListView.editableSectionTitles()` |
+| `CYLTagListView.loadSectionsWithKeys` | method, `CYLTagListView.kt:393` | `CYLTagListView.loadSections(withKeys:completion:)` |
+| `CYLTagListView.cachedTitlesInSection` | method, `CYLTagListView.kt:426` | `CYLTagListView.cachedTitles(inSection:)` |
+| `CYLTagListView.cacheKeyForSection` | method, `CYLTagListView.kt:429` | `CYLTagListView.cacheKey(forSection:)` |
+| `CYLTagListView.saveEditableSectionsToCache` | method, `CYLTagListView.kt:432` | `CYLTagListView.saveEditableSectionsToCache()` |
+| `CYLTagListView.setEditing` | method, `CYLTagListView.kt:442` | `CYLTagListView.setEditing(_:animated:)` |
+| `CYLTagListView.sectionAllowsEditing` | method, `CYLTagListView.kt:463` | `CYLTagListView.sectionAllowsEditing(_:)` |
+| `CYLTagListView.reloadMenuData` | method, `CYLTagListView.kt:483` | `CYLTagListView.reloadMenuData()` |
+| `CYLTagListView.heightThatFitsWidth` | method, `CYLTagListView.kt:677` | `CYLTagListView.heightThatFitsWidth(_:)` |
+| `CYLTagListView.lineSpacing` | property, `CYLTagListView.kt:746` | `CYLTagListView.lineSpacing` |
+| `CYLTagListView.interitemSpacing` | property, `CYLTagListView.kt:750` | `CYLTagListView.interitemSpacing` |
+| `CYLTagListView.tagContentInsets` | property, `CYLTagListView.kt:754` | `CYLTagListView.tagContentInsets` |
+| `CYLTagListView.tagContentInsetTop` | property, `CYLTagListView.kt:758` | `CYLTagListView.tagContentInsetTop` |
+| `CYLTagListView.tagContentInsetLeft` | property, `CYLTagListView.kt:762` | `CYLTagListView.tagContentInsetLeft` |
+| `CYLTagListView.tagContentInsetBottom` | property, `CYLTagListView.kt:766` | `CYLTagListView.tagContentInsetBottom` |
+| `CYLTagListView.tagContentInsetRight` | property, `CYLTagListView.kt:770` | `CYLTagListView.tagContentInsetRight` |
+| `CYLTagListView.tagDataSource` | read-only property, `CYLTagListView.kt:777` | `CYLTagListView.tagDataSource` |
+| `CYLTagListView.tags` | read-only property, `CYLTagListView.kt:784` | `CYLTagListView.tags` |
+| `CYLTagListView.addTag` | method, `CYLTagListView.kt:802` | `CYLTagListView.addTag(_:)` |
+| `CYLTagListView.addTags` | method, `CYLTagListView.kt:807` | `CYLTagListView.addTags(_:)` |
+| `CYLTagListView.addTagsWithTitles` | method, `CYLTagListView.kt:812` | `CYLTagListView.addTags(withTitles:)` |
+| `CYLTagListView.insertTag` | method, `CYLTagListView.kt:814` | `CYLTagListView.insertTag(_:at:)` |
+| `CYLTagListView.removeTagAtIndex` | method, `CYLTagListView.kt:822` | `CYLTagListView.removeTag(at:)` |
+| `CYLTagListView.removeAllTags` | method, `CYLTagListView.kt:830` | `CYLTagListView.removeAllTags()` |
+| `CYLTagListView.tagClickHandler` | property, `CYLTagListView.kt:836` | `CYLTagListView.tagClickHandler` |
+| `CYLTagListView.tagDeleteHandler` | property, `CYLTagListView.kt:837` | `CYLTagListView.tagDeleteHandler` |
+| `CYLTagListView.deleteItemAtIndexPath` | method, `CYLTagListView.kt:849` | `CYLTagListView.deleteItem(at:)` |
+| `CYLTagListView.containerBorderWidth` | property, `CYLTagListView.kt:865` | `CYLTagListView.containerBorderWidth` |
+| `CYLTagListView.containerBorderColor` | property, `CYLTagListView.kt:871` | `CYLTagListView.containerBorderColor` |
+| `CYLTagListView.containerCornerRadius` | property, `CYLTagListView.kt:877` | `CYLTagListView.containerCornerRadius` |
+| `CYLTagListView.maximumNumberOfRows` | property, `CYLTagListView.kt:890` | `CYLTagListView.maximumNumberOfRows` |
+| `CYLTagListView.colorTheme` | property, `CYLTagListView.kt:901` | `CYLTagListView.colorTheme` |
+| `CYLTagListView.allowsTapping` | property, `CYLTagListView.kt:917` | `CYLTagListView.allowsTapping` |
+| `CYLTagListView.defaultTagImage` | property, `CYLTagListView.kt:918` | `CYLTagListView.defaultTagImage` |
+| `CYLTagListView.removesItemsOnDelete` | property, `CYLTagListView.kt:919` | `CYLTagListView.removesItemsOnDelete` |
+| `CYLTagListView.tagButtonAtIndexPath` | method, `CYLTagListView.kt:922` | `CYLTagListView.tagButton(at:)` |
+| `CYLTagListView.animationSpeed` | property, `CYLTagListView.kt:930` | `CYLTagListView.animationSpeed` |
+| `CYLTagListView.animationLoops` | property, `CYLTagListView.kt:940` | `CYLTagListView.animationLoops` |
+| `CYLTagListView.playAllAnimations` | method, `CYLTagListView.kt:947` | `CYLTagListView.playAllAnimations()` |
+| `CYLTagListView.tagLongPressHandler` | property, `CYLTagListView.kt:953` | `CYLTagListView.tagLongPressHandler` |
+| `CYLTagListView.longPressAccessibilityActionName` | property, `CYLTagListView.kt:959` | `CYLTagListView.longPressAccessibilityActionName` |
+| `CYLTagListView.allowsReordering` | property, `CYLTagListView.kt:965` | `CYLTagListView.allowsReordering` |
+| `CYLTagListView.reorderingSensitivity` | property, `CYLTagListView.kt:972` | `CYLTagListView.reorderingSensitivity` |
+| `CYLTagListView.reordering` | property, `CYLTagListView.kt:975` | `CYLTagListView.isReordering` |
+| `CYLTagListView.isReordering` | read-only property, `CYLTagListView.kt:979` | `isReordering` (same name in the iOS core) |
+| `CYLTagListView.tagMoveHandler` | property, `CYLTagListView.kt:981` | `CYLTagListView.tagMoveHandler` |
+| `CYLTagListView.selectedTagDragHandler` | property, `CYLTagListView.kt:982` | `CYLTagListView.selectedTagDragHandler` |
+| `CYLTagListView.canMoveItemAtIndexPath` | method, `CYLTagListView.kt:990` | CYLTagListView -collectionView:canMoveItemAtIndexPath: (UICollectionViewDataSource) |
+| `CYLTagListView.moveItemAtIndexPath` | method, `CYLTagListView.kt:996` | CYLTagListView -collectionView:moveItemAtIndexPath:toIndexPath: (UICollectionViewDataSource) |
+| `CYLTagListView.replaceTags` | method, `CYLTagListView.kt:1069` | `CYLTagListView.replaceTags(_:)` |
+| `CYLTagListView.setTagsWithTitles` | method, `CYLTagListView.kt:1075` | `CYLTagListView.setTags(withTitles:colors:)` |
+| `CYLTagListView.setTagsWithTitles` | method, `CYLTagListView.kt:1077` | `CYLTagListView.setTags(withTitles:colors:)` |
+| `CYLTagListView.addTagWithTitle` | method, `CYLTagListView.kt:1081` | `CYLTagListView.addTag(withTitle:)` |
+| `CYLTagListView.insertTagWithTitle` | method, `CYLTagListView.kt:1083` | `CYLTagListView.insertTag(withTitle:at:)` |
+| `CYLTagListView.removeTagsAtIndexes` | method, `CYLTagListView.kt:1086` | `CYLTagListView.removeTags(at:)` |
+| `CYLTagListView.toggleSelectionOfItemAtIndexPath` | method, `CYLTagListView.kt:1097` | `CYLTagListView.toggleSelection(at:)` |
+| `CYLTagListView.selectedTitles` | read-only property, `CYLTagListView.kt:1110` | `CYLTagListView.selectedTitles` |
+| `CYLTagListView.selectedIndexPaths` | property, `CYLTagListView.kt:1116` | `CYLTagListView.selectedIndexPaths` |
+| `CYLTagListView.selectItemAtIndexPath` | method, `CYLTagListView.kt:1129` | `CYLTagListView.selectItem(at:)` |
+| `CYLTagListView.deselectItemAtIndexPath` | method, `CYLTagListView.kt:1135` | `CYLTagListView.deselectItem(at:)` |
+| `CYLTagListView.deselectAllItems` | method, `CYLTagListView.kt:1140` | `CYLTagListView.deselectAllItems()` |
+| `CYLTagListView.canFoldSection` | method, `CYLTagListView.kt:1201` | `CYLTagListView.canFoldSection(_:)` |
+| `CYLTagListView.numberOfRowsInSection` | method, `CYLTagListView.kt:1206` | `CYLTagListView.numberOfRows(inSection:)` |
+| `CYLTagListView.isSectionExpanded` | method, `CYLTagListView.kt:1211` | `CYLTagListView.isSectionExpanded(_:)` |
+| `CYLTagListView.numberOfVisibleItemsInSection` | method, `CYLTagListView.kt:1213` | `CYLTagListView.numberOfVisibleItems(inSection:)` |
+| `CYLTagListView.setExpanded` | method, `CYLTagListView.kt:1242` | `CYLTagListView.setExpanded(_:forSection:animated:)` |
+| `CYLTagListView.scrollToSection` | method, `CYLTagListView.kt:1263` | `CYLTagListView.scroll(toSection:animated:)` |
+| `CYLTagListView.scrollToItemAtIndexPath` | method, `CYLTagListView.kt:1269` | `CYLTagListView.scrollToItem(at:animated:)` |
 | `CYLTagListViewSections` | read-only property, `CYLTagListViewConfiguration.kt:24` | `CYLTagListKey.sections` |
 | `CYLTagListViewStyle` | read-only property, `CYLTagListViewConfiguration.kt:28` | `CYLTagListKey.style` |
 | `CYLTagListViewSelectionMode` | read-only property, `CYLTagListViewConfiguration.kt:32` | `CYLTagListKey.selectionMode` |

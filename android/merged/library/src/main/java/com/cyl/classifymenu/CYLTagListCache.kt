@@ -204,3 +204,42 @@ class CYLTagListStore(context: Context, val policy: CYLTagListCachePolicy, name:
         }
     }
 }
+
+// MARK: - Network sync
+
+/**
+ * `CYLTagListLoadPolicy`: in what order `CYLTagListView.loadSectionsWithKeys` reads the cache and the remote source.
+ * Unlike a search suggestion cache, a tag list may be kept on a server and edited on several devices.
+ */
+enum class CYLTagListLoadPolicy {
+    /** The cache at once, then the remote source; a successful download is saved and reported again (the default). */
+    CYLTagListLoadPolicyCacheThenNetwork,
+
+    /** The cache when it holds every section asked for; otherwise the remote source (the cache if that fails). */
+    CYLTagListLoadPolicyCacheFirst,
+
+    /** The remote source; the cache only when the download fails. */
+    CYLTagListLoadPolicyNetworkFirst,
+}
+
+/** `CYLTagListDataOrigin`: where the titles reported by `CYLTagListView.loadSectionsWithKeys` come from. */
+enum class CYLTagListDataOrigin {
+    /** The local cache (`CYLTagListView.cache`). */
+    CYLTagListDataOriginCache,
+
+    /** The remote source (`CYLTagListView.remoteSource`). */
+    CYLTagListDataOriginNetwork,
+}
+
+/**
+ * `CYLTagListRemoteSource`: a server that keeps a tag list's sections, shared by the user's devices. The host implements
+ * it with its own networking; `CYLTagListView` only asks it for sections (`loadSectionsWithKeys`). Uploading is the
+ * host's too: `menuDidFinishEditingWithTitles` / `editingFinishHandler` give it the edited sections.
+ */
+interface CYLTagListRemoteSource {
+    /**
+     * `fetchSectionsWithKeys:completion:`: downloads the sections saved under `keys`; calls `completion` once, on any
+     * thread, with the titles by key (a missing key: nothing on the server) or an error.
+     */
+    fun fetchSectionsWithKeys(keys: List<String>, completion: (Map<String, List<String>>?, Throwable?) -> Unit)
+}

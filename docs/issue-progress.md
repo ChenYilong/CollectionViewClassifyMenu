@@ -1209,3 +1209,21 @@ tags: [issues, ui, cocoapods, progress]
 - **Score:** 100 / 100 for these two requests (Android 40, HarmonyOS 25, mini program 25, the options 10). Not checked
   on an emulator: the HarmonyOS sixth container and editing (host tests and the build only).
 - **Next (separate request):** network sync (`3fc2c23b`) on Android, HarmonyOS and the mini program.
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): network sync of the tag list cache on Android, HarmonyOS and the mini program
+
+- **Request (relayed by the Mac ClassifyMenu session):** port iOS `3fc2c23b` (CYLSearchViewController session):
+  `menu(_:didFinishEditingWithTitles:)`, `editingFinishHandler`, `editableSectionTitles()`, `CYLTagListRemoteSource`
+  (`fetchSections(withKeys:completion:)`), `CYLTagListLoadPolicy` (`cacheThenNetwork` default, `cacheFirst`,
+  `networkFirst`), `CYLTagListDataOrigin`, `remoteSource`, `loadPolicy`, `loadSections(withKeys:completion:)` (downloads
+  saved to the cache first, completion on the main thread). Android core first, mapped, then HarmonyOS and the mini
+  program (`docs/android-api.md` was 834 / 849).
+- **Acceptance (100):** Android (40), HarmonyOS (30), mini program (30), each with tests. Pass: 60.
+- **Android (done, 40 / 40):** `CYLMenuDelegate.menuDidFinishEditingWithTitles`, `CYLTagListView.editingFinishHandler`,
+  `editableSectionTitles()` (also what `saveEditableSectionsToCache` saves), `remoteSource` (`CYLTagListRemoteSource`,
+  `fetchSectionsWithKeys(keys, completion)`), `loadPolicy` (`CYLTagListLoadPolicy`), `CYLTagListDataOrigin`,
+  `loadSectionsWithKeys(keys, completion)` (completion on the main thread through a main-looper `Handler`). Leaving
+  editing reports the edited sections before `menuDidChangeEditing`, as iOS. Tests
+  `finishingEditingReportsTheEditedSectionsForUploading`, `loadPoliciesOrderTheCacheAndTheServer` (as iOS); library
+  94 / 0, the example builds. `docs/android-api.md` 849 / 849, `docs/android-ios-api.md` 787 / 787.
+- **TODO:** HarmonyOS and the mini program.

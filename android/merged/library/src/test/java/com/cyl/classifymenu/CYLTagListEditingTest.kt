@@ -174,6 +174,63 @@ class CYLTagListEditingTest {
         assertFalse(list.canMoveItemAtIndexPath(CYLIndexPath(0, 1)))
     }
 
+    /** A remote source that answers at once with fixed sections, or fails. */
+    private class CYLFakeRemoteSource(var sections: Map<String, List<String>>?) : CYLTagListRemoteSource {
+        var fetchCount = 0
+        override fun fetchSectionsWithKeys(keys: List<String>, completion: (Map<String, List<String>>?, Throwable?) -> Unit) {
+            fetchCount += 1
+            completion(sections, if (sections == null) IllegalStateException("CYLFake") else null)
+        }
+    }
+
+    @Test
+    fun finishingEditingReportsTheEditedSectionsForUploading() {
+        val source = CYLEditableTagSource(mutableListOf(mutableListOf("Recent A"), mutableListOf("Family", "Friends", "Clients")))
+        source.editableSections = setOf(1)
+        val list = makeList(source)
+        var reported: Map<String, List<String>>? = null
+        list.editingFinishHandler = { reported = it }
+        list.setEditing(true, animated = false)
+        list.moveItemAtIndexPath(CYLIndexPath(2, 1), CYLIndexPath(0, 1))
+        assertNull("nothing before editing ends", reported)
+        list.setEditing(false, animated = false)
+        assertEquals("the edited section, in its new order", mapOf("1" to listOf("Clients", "Family", "Friends")), reported)
+    }
+
+    private fun loads(policy: CYLTagListLoadPolicy, cached: List<String>?, remote: List<String>?): Pair<List<String>, List<String>?> {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val store = CYLTagListStore(activity, CYLTagListCachePolicy.CYLTagListCachePolicyUserDefaults, "CYLTagListEditingTest.load")
+        store.removeAllTitles()
+        if (cached != null) store.saveTitles(cached, "mine")
+        val list = CYLTagListView(activity)
+        list.cache = store
+        list.remoteSource = CYLFakeRemoteSource(remote?.let { mapOf("mine" to it) })
+        list.loadPolicy = policy
+        val events = ArrayList<String>()
+        list.loadSectionsWithKeys(listOf("mine")) { sections, origin ->
+            val from = if (origin == CYLTagListDataOrigin.CYLTagListDataOriginCache) "cache" else "network"
+            events.add("$from ${sections["mine"]?.joinToString(",") ?: "-"}")
+        }
+        frames()
+        val stored = store.cachedTitlesForSection("mine")
+        store.removeAllTitles()
+        return events to stored
+    }
+
+    @Test
+    fun loadPoliciesOrderTheCacheAndTheServer() {
+        val refreshed = loads(CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheThenNetwork, listOf("A", "B"), listOf("B", "A", "C"))
+        assertEquals("the default: the cache, then the server", listOf("cache A,B", "network B,A,C"), refreshed.first)
+        assertEquals("a download is saved to the cache", listOf("B", "A", "C"), refreshed.second)
+        assertEquals("a failed download", listOf("cache A"), loads(CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheThenNetwork, listOf("A"), null).first)
+        assertEquals("a full cache: no download", listOf("cache A"), loads(CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheFirst, listOf("A"), listOf("B")).first)
+        assertEquals(listOf("network B"), loads(CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheFirst, null, listOf("B")).first)
+        assertEquals(listOf("network B"), loads(CYLTagListLoadPolicy.CYLTagListLoadPolicyNetworkFirst, listOf("A"), listOf("B")).first)
+        assertEquals("the cache when it fails", listOf("cache A"), loads(CYLTagListLoadPolicy.CYLTagListLoadPolicyNetworkFirst, listOf("A"), null).first)
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        assertEquals("the core's default", CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheThenNetwork, CYLTagListView(activity).loadPolicy)
+    }
+
     @Test
     fun editsAreSavedInEveryCachePolicy() {
         for (policy in listOf(CYLTagListCachePolicy.CYLTagListCachePolicyDatabase, CYLTagListCachePolicy.CYLTagListCachePolicyUserDefaults,
