@@ -12,7 +12,7 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 | HarmonyOS (ArkTS) | `@ohos/rive` (`RiveAnimationView`) | `1.0.4` | `harmony/classifymenu/oh-package.json5`; `CYLAnimatedIcon.ets` | Emulator: `RendererType.Canvas`; device: `RendererType.Rive` (`cylRiveRendererType()`, `3417e7e`) | Crash fixed on the emulator (`e82b503`, `3417e7e`); real device untested. Switch: `CYL_RIVE_ENABLED` |
 | Flutter on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `flutter/cyl_tag_list_ohos/ohos/oh-package.json5` → `file:../../../harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
 | React Native on HarmonyOS | `@ohos/rive` via the HarmonyOS core | `1.0.4` | `react-native/react-native-cyl-tag-list/harmony-example/harmony/entry/oh-package.json5` → `file:` `harmony/classifymenu` | Same as HarmonyOS | Same fix as HarmonyOS |
-| Flutter on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile`; rive-android in `example/android/app/build.gradle.kts` (with `cyl.tabbar.libs`); `.riv` files in `example/assets/rive` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row (Home, Done, Menu) is in `example/lib/main.dart`. Not yet run on a simulator / emulator |
+| Flutter on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `flutter/cyl_tag_list/example/ios/Podfile`; rive-android in `example/android/app/build.gradle.kts` (with `cyl.tabbar.libs`); `.riv` files in `example/assets/rive` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row (Home, Done, Menu) is in `example/lib/main.dart`. iOS simulator: draws and loops (2026-11-18, `assets/flutter-ios-rive-loop.png`); Android emulator not yet run here |
 | React Native on iOS / Android | `RiveRuntime` (rive-ios) / `app.rive:rive-android` | `~> 6.29` / `10.3.0` | `pod 'CYLTabBarController/Rive'` in `example/ios/Podfile`; rive-android in `example/android/app/build.gradle`; `.riv` files in the iOS app bundle (`Animations/`, in the Xcode project) and Android `assets/` (`13bcb84`) | Rive (Metal / GPU) | Linked; the Rive row is in `example/src/TagListPage.tsx`. Not yet run on a simulator / emulator |
 | WeChat mini program / 微信小程序 | `@rive-app/canvas-advanced` (WebAssembly, 573 KB) wrapped as `cyl-rive-miniprogram` | `2.39.1` | CYLTabBarController `CrossPlatform/rive-miniprogram`, copied into `cyl_components` by `scripts/fetch-cyltabbar.js` | Canvas 2D | Linked (`engines.rive: true` in `utils/tag-animations.js`); not affected |
 
@@ -77,3 +77,19 @@ platform. The table lists which one, its version, and its state on 2026-11-16 (b
 
   Platform: iOS 27.2, iPhone 17 Pro simulator | Host: macOS 27.3 | IDE: Xcode 27.2 (27B52); CollectionViewClassifyMenu
   `0f7dbb25` (`4d392b92`), CYLTabBarController `776b4635`, feat/harmony, 2026-11-18.
+- **Progress (2026-11-18), step 3 done: Flutter iOS, the Rive tags draw and loop.**
+  - Bug found and fixed: the example no longer linked (`21 duplicate symbols`, `CYLAnimatedItem` twice): the plugin
+    brought the core through Swift Package Manager (package `CollectionViewClassifyMenu`, which depends on the product
+    `CYLAnimatedItem`), while the Podfile's `CYLAnimatedItem/Rive` engine brought the pod `CYLAnimatedItem`; CYLTabBarController
+    has no Swift package product for the Rive engine. Fix: the example uses CocoaPods only on iOS
+    (`pubspec.yaml` `flutter: config: enable-swift-package-manager: false`, `pod 'CollectionViewClassifyMenu', :path`
+    in the Podfile, and the two local package references `cyl_tag_list` and `FlutterFramework` removed from
+    `Runner.xcodeproj`). `flutter build ios --simulator --debug` builds (Flutter 3.47.9).
+  - Result: Home, Done and Menu draw (before: empty, `assets/flutter-ios-rive-section-13bcb84.png`) and keep playing
+    with Loop on and Play all: Done redraws its check, Home changes `Rooms`, Menu toggles (8 s recording, 4 fps tiles).
+
+  ![Flutter iOS Rive tags loop](assets/flutter-ios-rive-loop.png)
+
+  Platform: iOS 27.2, iPhone 17 Pro simulator | Host: macOS 27.3 | IDE: Xcode 27.2 (27B52), Flutter 3.47.9;
+  CollectionViewClassifyMenu `822c9055`, CYLTabBarController `776b4635`, feat/harmony, 2026-11-18.
+  - Still TODO: step 2, React Native iOS.
