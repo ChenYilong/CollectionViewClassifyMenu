@@ -294,4 +294,35 @@ final class CYLTagButtonTests: XCTestCase {
         titleOnly.layoutIfNeeded()
         XCTAssertNil(titleOnly.imageView.image, "A title without an icon never shows a placeholder")
     }
+
+    /// `CYLMenuStyle.imageFillsTagHeight` (AndroidTagView's avatar): the image a circle as tall as the tag at its
+    /// leading edge, the title after it; the measured width and height follow, and a copied style keeps it.
+    func testImageFillsTheTagHeightAtTheLeadingEdge() {
+        let style = CYLMenuStyle.tagContainer()
+        style.imageFillsTagHeight = true
+        XCTAssertTrue((style.copy() as? CYLMenuStyle)?.imageFillsTagHeight ?? false)
+        let icon = UIGraphicsImageRenderer(size: CGSize(width: 40, height: 40)).image { _ in
+            UIColor.systemYellow.setFill()
+            UIRectFill(CGRect(x: 0, y: 0, width: 40, height: 40))
+        }
+        let button = CYLTagButton(title: "Java", image: icon)
+        button.style = style
+        button.showsDeleteIndicator = true
+        let size = button.intrinsicContentSize
+        let plainHeight = CYLTagButton.height(forTitle: "Java", iconSize: .zero, style: style, traitCollection: nil)
+        XCTAssertEqual(size.height, plainHeight, accuracy: 0.5, "the image takes no extra height")
+        let font = style.titleFont(for: .normal, traitCollection: nil)
+        let title = ceil(("Java" as NSString).size(withAttributes: [.font: font]).width)
+        XCTAssertGreaterThanOrEqual(size.width, plainHeight + title + style.normalAppearance.contentInsets.right,
+                                    "room for the image, the title and the right inset")
+        button.frame = CGRect(origin: .zero, size: size)
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.imageView.frame, CGRect(x: 0, y: 0, width: size.height, height: size.height))
+        XCTAssertEqual(button.imageView.layer.cornerRadius, size.height / 2, accuracy: 0.01)
+        XCTAssertTrue(button.imageView.layer.masksToBounds)
+        XCTAssertGreaterThanOrEqual(button.titleLabel.frame.minX, size.height + style.imageTitleSpacing - 0.5)
+        XCTAssertLessThanOrEqual(button.titleLabel.frame.maxX, button.deleteIndicatorHitFrame.minX + 0.5,
+                                 "the title ends before the cross")
+        XCTAssertEqual(button.titleLabel.text, "Java")
+    }
 }

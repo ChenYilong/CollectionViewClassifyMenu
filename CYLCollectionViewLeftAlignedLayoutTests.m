@@ -334,6 +334,38 @@ static NSArray<NSValue *> *CYLSizes(NSUInteger count, CGSize (^size)(NSUInteger 
     }
 }
 
+#pragma mark Trailing rows: AndroidTagView's container_gravity="right"
+
+/*!
+ * `.trailing`: each row's first item at the trailing inset, the next ones before it with the same spacing, as
+ * AndroidTagView lays out container_gravity="right" (the rows break where a leading row would).
+ */
+- (void)testTrailingRowsStartAtTheTrailingEdge {
+    CYLLeftAlignedFixture *fixture = [[CYLLeftAlignedFixture alloc] init];
+    fixture.sizes = @[CYLSizes(9, ^CGSize(NSUInteger i) { return CGSizeMake(60 + (i % 3) * 25, 30); })];
+    CYLCollectionViewLeftAlignedLayout *leading = [[CYLCollectionViewLeftAlignedLayout alloc] init];
+    UICollectionView *leadingView = [self collectionViewWithLayout:leading fixture:fixture width:320];
+    NSArray<UICollectionViewLayoutAttributes *> *rows = [self cellAttributesIn:leadingView];
+    CYLCollectionViewLeftAlignedLayout *trailing = [[CYLCollectionViewLeftAlignedLayout alloc] init];
+    trailing.rowAlignment = CYLTagRowAlignmentTrailing;
+    UICollectionView *trailingView = [self collectionViewWithLayout:trailing fixture:fixture width:320];
+    NSArray<UICollectionViewLayoutAttributes *> *mirrored = [self cellAttributesIn:trailingView];
+    XCTAssertEqual(rows.count, mirrored.count);
+    CGFloat right = 320 - fixture.inset.right;
+    for (NSUInteger i = 0; i < rows.count; i++) {
+        CGRect l = rows[i].frame, t = mirrored[i].frame;
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(t), CGRectGetMinY(l), 0.5, @"same row as leading, item %lu", (unsigned long)i);
+        XCTAssertEqualWithAccuracy(CGRectGetMaxX(t), right - (CGRectGetMinX(l) - fixture.inset.left), 0.5,
+                                   @"item %lu mirrored inside its row", (unsigned long)i);
+        BOOL startsRow = i == 0 || CGRectGetMinY(l) > CGRectGetMinY(rows[i - 1].frame) + 0.5;
+        if (startsRow) {
+            XCTAssertEqualWithAccuracy(CGRectGetMaxX(t), right, 0.5, @"a row's first item at the trailing inset");
+        } else {
+            XCTAssertLessThan(CGRectGetMaxX(t), CGRectGetMinX(mirrored[i - 1].frame), @"each next item before the previous one");
+        }
+    }
+}
+
 #pragma mark Issue #36: privacy manifest
 
 - (void)testThePodShipsAPrivacyManifest {

@@ -87,8 +87,12 @@ open class CYLCollectionViewLeftAlignedLayout: UICollectionViewFlowLayout {
             x += min(previous.frame.width, width) + spacing
             item -= 1
         }
-        if rowAlignment != .leading {
-            // Centered or trailing: the row's width, with the items after this one.
+        if rowAlignment == .trailing {
+            // From the trailing edge, as AndroidTagView's container_gravity="right": the row's first item at the
+            // trailing inset, each next one before it (the leading position mirrored inside the row).
+            x = inset.left + width - (x - inset.left) - frame.width
+        } else if rowAlignment == .center {
+            // Centered: the row's width, with the items after this one.
             var rowWidth = x + frame.width - inset.left
             let count = collectionView?.numberOfItems(inSection: section) ?? 0
             item = indexPath.item + 1
@@ -98,7 +102,7 @@ open class CYLCollectionViewLeftAlignedLayout: UICollectionViewFlowLayout {
                 item += 1
             }
             let free = max(0, width - rowWidth)
-            x += rowAlignment == .center ? floor(free / 2) : free
+            x += floor(free / 2)
         }
         // Never past the trailing inset (PR #20, issue #33), never before the leading one.
         frame.origin.x = max(inset.left, min(x, inset.left + width - frame.width))

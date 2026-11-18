@@ -195,10 +195,18 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(first.layer.borderWidth, 0.5)
         // tag_max_length 23: the long Chinese tag is cut.
         XCTAssertTrue(first.tagButton(at: ip(4, 0))?.titleLabel.text?.hasSuffix("...") ?? false)
-        XCTAssertEqual(first.tagButton(at: ip(4, 0))?.titleLabel.text?.count, 26)
-        XCTAssertTrue(first.tagButton(at: ip(0, 0))?.showsDeleteIndicator ?? false)
-        XCTAssertNotNil(first.tagButton(at: ip(0, 0))?.imageView.image, "the default avatar")
-        XCTAssertGreaterThan(first.tagButton(at: ip(0, 0))?.imageView.layer.cornerRadius ?? 0, 0)
+        XCTAssertEqual(first.tagButton(at: ip(4, 0))?.titleLabel.text?.count, 23, "20 characters and ...")
+        XCTAssertEqual(first.tagButton(at: ip(8, 0))?.titleLabel.text, "Welcome to use Andro...")
+        let java = first.tagButton(at: ip(0, 0))
+        XCTAssertTrue(java?.showsDeleteIndicator ?? false)
+        XCTAssertNotNil(java?.imageView.image, "the default avatar")
+        // The avatar: a circle as tall as the tag at its leading edge, the title after it.
+        let avatar = java?.imageView.frame ?? .zero
+        XCTAssertEqual(avatar.minX, 0, accuracy: 0.5)
+        XCTAssertEqual(avatar.height, java?.bounds.height ?? 0, accuracy: 0.5)
+        XCTAssertEqual(avatar.width, avatar.height, accuracy: 0.5)
+        XCTAssertEqual(java?.imageView.layer.cornerRadius ?? 0, avatar.height / 2, accuracy: 0.5)
+        XCTAssertGreaterThan(java?.titleLabel.frame.minX ?? 0, avatar.maxX)
         captureScreen(named: "test-sample-tag-container")
 
         // A cross tap only reports (onTagCrossClick).
@@ -209,13 +217,23 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         sample.addTag()
         XCTAssertEqual(first.tags.last?.title, "Kotlin")
 
-        // Right-to-left container: titles reversed, the cross first, rows at the trailing edge.
+        // container_gravity="right": titles as written, the cross first, each row from the right edge (first tag
+        // rightmost), as the Android example shows them.
         let third = containers[2]
-        XCTAssertEqual(third.tagButton(at: ip(3, 0))?.titleLabel.text, "olleH")
+        XCTAssertEqual(third.tagButton(at: ip(3, 0))?.titleLabel.text, "Hello")
         let button = third.tagButton(at: ip(3, 0))
         XCTAssertLessThan(button?.deleteIndicatorHitFrame.minX ?? 1, 1)
-        let lastFrame = third.probe.itemFrame(at: ip(5, 0)) ?? .zero
-        XCTAssertEqual(lastFrame.maxX, third.bounds.width - 10, accuracy: 1)
+        let frames = (0..<third.tags.count).map { third.probe.itemFrame(at: ip($0, 0)) ?? .zero }
+        var rows = 0
+        for (index, frame) in frames.enumerated() {
+            if index == 0 || frame.minY > frames[index - 1].minY + 0.5 {
+                rows += 1
+                XCTAssertEqual(frame.maxX, third.bounds.width - 10, accuracy: 1, "tag \(index) starts its row at the right")
+            } else {
+                XCTAssertLessThan(frame.maxX, frames[index - 1].minX, "tag \(index) left of the one before it")
+            }
+        }
+        XCTAssertGreaterThan(rows, 1)
         third.tagLongPressHandler?(1, third.tags[1])
         XCTAssertEqual(third.selectedIndexPaths, [ip(1, 0)])
         XCTAssertEqual(third.selectedTitles, ["波斯语"])
@@ -318,8 +336,12 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
 
         // Titles: cut and reversed; badges.
         let style = CYLMenuStyle()
-        style.maximumTitleLength = 3
-        XCTAssertEqual(style.displayedTitle(forTitle: "Hello"), "Hel...")
+        style.maximumTitleLength = 6
+        XCTAssertEqual(style.displayedTitle(forTitle: "Hello"), "Hello")
+        // As AndroidTagView: 6 characters in all, the last three "..." (23: "Welcome to use Andro...").
+        XCTAssertEqual(style.displayedTitle(forTitle: "Hello World"), "Hel...")
+        style.maximumTitleLength = 23
+        XCTAssertEqual(style.displayedTitle(forTitle: "Welcome to use AndroidTagView!"), "Welcome to use Andro...")
         style.reversesTitleCharacters = true
         style.maximumTitleLength = 0
         XCTAssertEqual(style.displayedTitle(forTitle: "你好"), "好你")

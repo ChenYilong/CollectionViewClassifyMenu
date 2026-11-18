@@ -28,20 +28,18 @@ enum CYLTagContainerSampleData {
         }
     }
 
-    /// The default image (yellow_avatar): a round yellow face.
+    /// The default image: AndroidTagView's sample drawable yellow_avatar (Apache 2.0), as in the Android example.
     static func avatar() -> UIImage {
-        UIGraphicsImageRenderer(size: CGSize(width: 48, height: 48)).image { _ in
-            UIColor.systemYellow.setFill()
-            UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 48, height: 48)).fill()
-            UIColor.brown.setFill()
-            UIBezierPath(ovalIn: CGRect(x: 14, y: 16, width: 6, height: 6)).fill()
-            UIBezierPath(ovalIn: CGRect(x: 28, y: 16, width: 6, height: 6)).fill()
-            let smile = UIBezierPath(arcCenter: CGPoint(x: 24, y: 26), radius: 11, startAngle: 0.2 * .pi, endAngle: 0.8 * .pi, clockwise: true)
-            smile.lineWidth = 3
-            UIColor.brown.setStroke()
-            smile.stroke()
-        }
+        UIImage(named: "lujun_yellow_avatar") ?? UIImage()
     }
+
+    /// The photos the sample loads for list1, one per tag in turn (MainActivity.loadImages); a tag keeps the default
+    /// avatar until its photo arrives, or when it fails.
+    static let avatarURLs = [
+        "https://forums.oneplus.com/data/avatars/m/231/231279.jpg",
+        "https://d1marr3m5x4iac.cloudfront.net/images/block/movies/17214/17214_aa.jpg",
+        "https://lh3.googleusercontent.com/-KSI1bJ1aVS4/AAAAAAAAAAI/AAAAAAAAB9c/Vrgt6WyS5OU/il/photo.jpg",
+    ].compactMap(URL.init(string:))
 }
 
 final class CYLTagContainerSampleViewController: UIViewController {
@@ -80,8 +78,8 @@ final class CYLTagContainerSampleViewController: UIViewController {
         let first = Self.makeContainer { list, style in
             style.interitemSpacing = 10
             style.lineSpacing = 10
-            style.imageSize = CGSize(width: 24, height: 24)
-            style.imageCornerRadius = 12
+            // The avatar is a circle as tall as the tag, at its leading edge (CYLTagButton, a CYLAnimatedItemView).
+            style.imageFillsTagHeight = true
             list.allowsReordering = true
             list.allowsTapping = true
             list.colorTheme = .pureTeal
@@ -94,6 +92,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
         first.tagClickHandler = { [weak self] position, tag in self?.toast(CYLExampleLocalizedString("点击位置：%ld，文字：%@", position, tag.title)) }
         first.tagLongPressHandler = { [weak self] position, _ in self?.confirmDelete(at: position) }
         first.longPressAccessibilityActionName = CYLExampleLocalizedString("删除")
+        loadAvatars(into: first)
         first.tagDeleteHandler = { [weak self] position, _ in self?.toast(CYLExampleLocalizedString("点了标签的叉！位置 = %ld", position)) }
 
         let field = CYLAndroidSample.textField(placeholder: CYLExampleLocalizedString("新标签"), label: CYLExampleLocalizedString("新标签"))
@@ -121,9 +120,9 @@ final class CYLTagContainerSampleViewController: UIViewController {
             style.interitemSpacing = 10
             style.lineSpacing = 10
             style.backgroundColor = .clear
+            // container_gravity="right": each row from the right edge, the first tag rightmost.
             style.rowAlignment = .trailing
             style.maximumTitleLength = 18
-            style.reversesTitleCharacters = true
             style.deleteIndicatorPlacement = .leading
             style.tagContentInsets = UIEdgeInsets(top: 10, left: 15, bottom: 10, right: 15)
             for appearance in [style.normalAppearance, style.selectedAppearance] {
@@ -222,6 +221,22 @@ final class CYLTagContainerSampleViewController: UIViewController {
             } else {
                 list.heightAnchor.constraint(equalToConstant: height).isActive = true
             }
+        }
+    }
+
+    /// MainActivity.loadImages: each tag of list1 gets one of the three photos in turn, set when it arrives.
+    private func loadAvatars(into list: CYLTagListView) {
+        let urls = CYLTagContainerSampleData.avatarURLs
+        for index in list.tags.indices {
+            let url = urls[index % urls.count]
+            URLSession.shared.dataTask(with: url) { [weak list] data, _, _ in
+                guard let data, let image = UIImage(data: data) else { return }
+                DispatchQueue.main.async {
+                    guard let list, index < list.tags.count else { return }
+                    list.tags[index].image = image
+                    list.reloadMenuData()
+                }
+            }.resume()
         }
     }
 
