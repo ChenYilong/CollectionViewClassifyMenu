@@ -1071,3 +1071,18 @@ tags: [issues, ui, cocoapods, progress]
   analyze` clean, integration tests 2 / 2 on the iOS 27.2 simulator. React Native: `tsc --noEmit` clean, Jest 5 / 5
   (new `i18n.test.ts`). Not run: the React Native app on a simulator. Score so far 65 / 100 (Android, HarmonyOS and the
   mini program audit is with the Windows session, −35).
+
+### TODO (2026-11-19, `feat/harmony`): close the three open items (localization audit, 16 commit messages, the sixth container)
+
+- Context: open after the work above: (1) the localization audit at 65 / 100, waiting on Android, HarmonyOS and the
+  mini program (Windows session) and the React Native app run (Mac session); (2) 16 older commits (2026-11-12 to
+  11-16) with Chinese in their messages: 10 English messages with a few Chinese UI terms, 6 automatic commits whose
+  message was a pasted Chinese prompt unrelated to their diff; rewriting them replays 536 commits (18 merges) from
+  `ed8b3b18`; an `archive/feat-harmony-before-message-rewrite` tag keeps the old hashes reachable (other repositories
+  pin commits in that range); (3) the Android Container tab's sixth container (a star drawable, a tag that wraps, 4 dp
+  elevation, a cross drawable, no cross on the last tag) has no iOS counterpart.
+- Prompt (verbatim): "fix Open items haven't changed: the localization audit waits on the Windows session (65/100), 16 older commit messages still contain Chinese, and Android's sixth container has no iOS version."
+- Acceptance (100): localization audit at 100 on every platform (35); no commit message on `feat/harmony` with Chinese,
+  trees unchanged, hashes remapped in later messages and the docs, the archive tag pushed, other sessions told (30);
+  the sixth container on iOS with the core APIs it needs (wrapping title, elevation, cross image, per-tag cross),
+  tests and a screenshot next to Android (35). Pass: 60.
