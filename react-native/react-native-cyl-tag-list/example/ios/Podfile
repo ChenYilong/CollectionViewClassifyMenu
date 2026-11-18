@@ -28,6 +28,8 @@ target 'CylTagListExample' do
   # The animated icon engines the example plays; the core depends on the CYLAnimatedItem pod only.
   pod 'CYLAnimatedItem/LottieObjectiveC', cyl_tab_bar
   pod 'CYLAnimatedItem/Rive', cyl_tab_bar
+  # CYLAnimatedItem is a Swift pod now; it imports lottie-ios, which has no module map as a static library.
+  pod 'lottie-ios', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -42,5 +44,13 @@ target 'CylTagListExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    # Xcode 27 supports iOS 15 and later; RiveRuntime's resource bundle target still asks for 14.0.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |build|
+        if build.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 15.0
+          build.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+        end
+      end
+    end
   end
 end
