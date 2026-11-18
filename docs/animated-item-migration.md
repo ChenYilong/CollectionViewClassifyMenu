@@ -356,3 +356,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   projects. Menu 32 and example 92 tests, 0 failures (iPhone 17 Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3); no
   iOS library file changes since `70064275`, so the Rive check and the tag and swift suites there stand. Android and
   the mini program: asked the Windows session to move to `a8156b92`.
+- **iOS pins at `d8f47b4d` (2026-11-18)**: CYLTabBarController `51d58545` (iOS: the Rive tint is applied when an
+  animation view is added; 4 lines in `CYLTabBarController.m`, only with the opt-in `tint` option, which this
+  repository does not use) and `d8f47b4d` (docs). Pod install resolves `d8f47b4d` in the four iOS projects; example 92
+  tests, 0 failures (iPhone 17 Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3). Every platform at `d8f47b4d`
+  (Android and mini program by the Windows session).
