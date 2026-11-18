@@ -1,7 +1,7 @@
 import 'package:cyl_tag_list/cyl_tag_list.dart';
 import 'package:cyl_tag_list_example/classify_menu_page.dart';
 import 'package:cyl_tag_list_example/main.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cyl_tag_list_example/strings.dart';
@@ -44,9 +44,13 @@ void main() {
     expect(await database.savedSelection('test'), ['1-2', '0-0']);
     expect(await database.savedSelection('missing'), isNull);
 
-    await tester.pumpWidget(const ExampleApp());
+    // Android: CYLTabBarController's native tab bar draws the tabs, and taps that integration_test synthesizes do not
+    // reach a native view, so the app opens on the Menu tab (a real tap on the native bar is checked on the emulator,
+    // docs/cross-platform.md). Elsewhere: a tap on Material's navigation bar.
+    final android = defaultTargetPlatform == TargetPlatform.android;
+    await tester.pumpWidget(ExampleApp(initialTab: android ? 1 : 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(cylString('菜单')).last);
+    if (!android) await tester.tap(find.text(cylString('菜单')).last);
     await waitFor(tester, find.byKey(const Key('resetConditions')));
     await tester.pump(const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const Key('resetConditions')));

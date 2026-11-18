@@ -30,6 +30,13 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  # CYLTabBarController's Flutter plugin: the example's tab bar on Android (CYLTabBar). Pinned at the same
+  # CYLTabBarController commit as every other pin (Package.swift, Podfiles, android/merged/gradle.properties...).
+  flutter_cyltabbar:
+    git:
+      url: https://github.com/ChenYilong/CYLTabBarController.git
+      ref: b376c278ef13db0a03e433de35aa191fe151ba94
+      path: CrossPlatform/flutter_cyltabbar
   cupertino_icons: ^1.0.8
   sqflite: ^2.4.6
   path: ^1.9.1

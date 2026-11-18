@@ -1,5 +1,7 @@
 import 'package:cyl_tag_list/cyl_tag_list.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cyltabbar/flutter_cyltabbar.dart';
 
 import 'strings.dart';
 
@@ -8,7 +10,10 @@ import 'classify_menu_page.dart';
 void main() => runApp(const ExampleApp());
 
 class ExampleApp extends StatelessWidget {
-  const ExampleApp({super.key});
+  const ExampleApp({super.key, this.initialTab = const int.fromEnvironment('CYL_TAB')});
+
+  /// The tab shown at launch; `--dart-define=CYL_TAB=1` opens the second one, for screenshots.
+  final int initialTab;
 
   @override
   Widget build(BuildContext context) {
@@ -17,37 +22,57 @@ class ExampleApp extends StatelessWidget {
       // Screenshots show the app, not the debug ribbon.
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorSchemeSeed: const Color(0xFF2AB9A0), useMaterial3: true),
-      home: const HomePage(),
+      home: HomePage(initialTab: initialTab),
     );
   }
 }
 
 /// The example's screens, one bottom tab each (tab bars stay at the bottom, AGENTS.md).
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.initialTab = 0});
+
+  final int initialTab;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  /// `--dart-define=CYL_TAB=1` opens the second tab at launch, for screenshots.
-  int _index = const int.fromEnvironment('CYL_TAB');
+  late int _index = widget.initialTab;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _index, children: const [TagListPage(), ClassifyMenuPage()]),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: defaultTargetPlatform == TargetPlatform.android ? _cylTabBar() : _materialTabBar(),
+    );
+  }
+
+  /// Android: CYLTabBarController's native tab bar (flutter_cyltabbar), with the example's Lottie tab icons.
+  Widget _cylTabBar() {
+    CYLTabBarItem item(String title, String lottie) => CYLTabBarItem(
+          title: title,
+          identifier: lottie,
+          attributes: {'CYLTabBarLottieFilePath': 'file:///android_asset/flutter_assets/assets/$lottie.json'},
+        );
+    return CYLTabBar(
+      items: [item(cylString('动效图标'), 'tab_home_animate'), item(cylString('菜单'), 'tab_search_animate')],
+      selectedIndex: _index,
+      onTabSelect: (index, _) {
+        if (index >= 0) setState(() => _index = index);
+      },
+    );
+  }
+
+  /// iOS and HarmonyOS: Material's navigation bar.
+  Widget _materialTabBar() => NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (index) => setState(() => _index = index),
         destinations: [
           NavigationDestination(icon: const Icon(Icons.animation), label: cylString('动效图标')),
           NavigationDestination(icon: const Icon(Icons.category_outlined), label: cylString('菜单')),
         ],
-      ),
-    );
-  }
+      );
 }
 
 /// A tag list from one configuration map, and the playback controls of docs/example-demo-rules.md: Play all, a speed
