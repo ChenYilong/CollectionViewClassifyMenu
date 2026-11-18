@@ -601,7 +601,7 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 - **Test (new):** `CYLTagReorderWidthTest` drags "Kotlin" onto "Go" in the iOS demo's ten tags (long press, ten move
   steps, drop). Every tag keeps its own title's width at each step, right after the drop and after the reload, and
   `tagMoveHandler` reports 1 → 9. Android library 87 / 0.
-- **Withdrawn (2026-11-19), the TODO "no `CYLTagListView` drag demo" is closed as not needed:** `4e03f8a5` added
+- **Withdrawn (2026-11-19), the TODO "no `CYLTagListView` drag demo" is closed as not needed:** `b8c95591` added
   `CYLTagReorderScreen` (a Styles row copying iOS `CYLTagReorderDemoViewController`). The owner's reference for "the drag
   example" is the Android Container tab (`LujunTagContainerFragment`), and iOS replaced its teal demo with a port of that
   tab (`58b2f335`, entry below). The Android copy of the removed iOS demo is therefore reverted. Android's drag example
