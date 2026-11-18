@@ -531,3 +531,16 @@ Kotlin samples on the API 35 emulator, top to bottom: android-tagview, AndroidTa
 <img src="assets/android-sample-androidtagview.png" width="300" alt="AndroidTagView sample in Kotlin">
 
 <img src="assets/android-sample-tagviewgroup.png" width="300" alt="TagViewGroup sample in Kotlin">
+
+## TODO (2026-11-19, `feat/harmony`): Android API and Android example ports to iOS, progress; a visible drag-to-reorder demo on iOS
+
+- **Context:** `android-ios-api.md` scores the Android core API against iOS (736 / 736). No document tracks the
+  Android example's screens against the iOS example. The iOS drag-to-reorder demo exists (`CYLTagContainerSample`,
+  `allowsReordering`) but sits behind 样式 → AndroidTagView 示例, so the owner has not seen it.
+- **Requirements:** report both progress figures from the docs; add a table of every Android example screen and its iOS
+  counterpart (score, TODO rows); port what is missing; make drag-to-reorder an easy-to-find iOS example with a labeled
+  screenshot; continue the remaining TODOs.
+- **Prompt (verbatim):** "检查docs文档，找到android 的api 翻译到iOS端的进度。并且android 的example也翻译到iOS端的进度。我现在一直没看到iOS端演示拖拽tag重新排序的example。如果还有todo 继续完成"
+- **Prompt (English):** "Check the docs: find the progress of translating the Android API to iOS, and of translating the
+  Android example to iOS. I still have not seen an iOS example demonstrating dragging a tag to reorder. If TODOs remain,
+  continue them."
