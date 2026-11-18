@@ -1172,4 +1172,15 @@ tags: [issues, ui, cocoapods, progress]
   `UICollectionViewDataSource` methods). Core strings `CYLMenuAddTag`, `CYLMenuAddTagPlaceholder`, `CYLMenuTagAdded` copied
   from iOS. New Robolectric `CYLTagListEditingTest` (5, one for one with iOS `CYLTagListEditingTests`); library 92 / 0,
   the example builds. `docs/android-api.md` 834 / 834, `docs/android-ios-api.md` 772 / 772.
-- **TODO:** HarmonyOS and the mini program (editing mode and cache); the three sixth-container options there.
+- **HarmonyOS editing and cache (done, 25 / 25):** `CYLTagListState.isEditing`, `setEditing`, `sectionAllowsEditing`,
+  `showsAddItemViewWhileEditing`, `addItemView` (`CYLTagListAddItemView`, the control's model; `CYLTagListView` draws a
+  `TextInput` and a `Button` at `addItemViewFrame`, below the last section, and the content height includes it),
+  `cachePolicy` / `cacheName` / `cache`, `cachedTitlesInSection`, `cacheKeyForSection`, `saveEditableSectionsToCache`;
+  `menuSectionAllowsEditing?`, `menuCacheKeyForSection?`, `menuDidChangeEditing?`; `CYLTagListCache`, `CYLTagListStore`
+  (`relationalStore`, `preferences`, a JSON file in `filesDir`; the database opens asynchronously, so the store answers
+  from an in-memory mirror that it fills from the saved rows once open and writes through; without an app context, as
+  in host tests, the titles live in memory for the process). Same rules as iOS and Android. Core strings regenerated
+  (`CYLCoreStrings.ets`). New host test `TagListEditing.test.ets` (5, as iOS and Android); host tests 68 / 68,
+  `build.sh` OK. `docs/harmony.md` 883 / 887: the four left are the sixth-container options.
+- **TODO:** the mini program (editing mode and cache); `titleWraps`, `elevation`, `deleteIndicatorImage` (and the
+  wrapping title's height) on HarmonyOS and the mini program.

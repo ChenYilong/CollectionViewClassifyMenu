@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 839 / 839 = 100.0 / 100** (API 817 / 817, demos 22 / 22). Both tables are scored together: every TODO removed
+**Score: 883 / 887 = 99.5 / 100** (API 861 / 865, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -288,6 +288,8 @@ overrides left out.
 | `CYLMenuDataSource.menuItemIsDeletable(at:)` (CYLMenuDataSource.swift) | `menuItemIsDeletable?` | method |
 | `CYLMenuDataSource.menuRemoveItem(at:)` (CYLMenuDataSource.swift) | `menuRemoveItem?` | method |
 | `CYLMenuDataSource.menuMoveItem(at:to:)` (CYLMenuDataSource.swift) | `menuMoveItem?` | method |
+| `CYLMenuDataSource.menuSectionAllowsEditing(_:)` (CYLMenuDataSource.swift) | `menuSectionAllowsEditing?` | method |
+| `CYLMenuDataSource.menuCacheKey(forSection:)` (CYLMenuDataSource.swift) | `menuCacheKeyForSection?` | method |
 | `CYLMenuDelegate` (CYLMenuDataSource.swift) | `interface CYLMenuDelegate` | protocol |
 | `CYLMenuDelegate.menu(_:shouldSelectItemAt:)` (CYLMenuDataSource.swift) | `menuShouldSelectItem?` | method |
 | `CYLMenuDelegate.menu(_:didSelectItemAt:)` (CYLMenuDataSource.swift) | `menuDidSelectItem?` | method |
@@ -299,6 +301,7 @@ overrides left out.
 | `CYLMenuDelegate.menu(_:didChangeContentHeight:)` (CYLMenuDataSource.swift) | `menuDidChangeContentHeight?` | method |
 | `CYLMenuDelegate.menu(_:didTapMoreButtonInSection:)` (CYLMenuDataSource.swift) | `menuDidTapMoreButtonInSection?` | method |
 | `CYLMenuDelegate.menu(_:didDeleteItemAt:)` (CYLMenuDataSource.swift) | `menuDidDeleteItem?` | method |
+| `CYLMenuDelegate.menu(_:didChangeEditing:)` (CYLMenuDataSource.swift) | `menuDidChangeEditing?` | method |
 | `CYLMenuDelegate.menu(_:didLongPressItemAt:)` (CYLMenuDataSource.swift) | `menuDidLongPressItem?` | method |
 | `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` (CYLMenuDataSource.swift) | `menuDidMoveItem?` | method |
 | `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` (CYLMenuDataSource.swift) | `menuDidBeginDraggingSelectedItem?` | method |
@@ -393,6 +396,9 @@ overrides left out.
 | `CYLMenuStyle.imagePositionAdjustment` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePositionAdjustment` | property |
 | `CYLMenuStyle.imagePlacement` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePlacement` | property |
 | `CYLMenuStyle.imageFillsTagHeight` (CYLMenuStyle.swift) | `CYLMenuStyle.imageFillsTagHeight` (AndroidTagView's avatar, `fillsTagHeight`) | property |
+| `CYLMenuStyle.titleWraps` (CYLMenuStyle.swift) | TODO | property |
+| `CYLMenuStyle.elevation` (CYLMenuStyle.swift) | TODO | property |
+| `CYLMenuStyle.deleteIndicatorImage` (CYLMenuStyle.swift) | TODO | property |
 | `CYLMenuStyle.layoutCentered` (CYLMenuStyle.swift) | `CYLMenuStyle.layoutCentered` | property |
 | `CYLMenuStyle.contentAlignment` (CYLMenuStyle.swift) | `CYLMenuStyle.contentAlignment` | property |
 | `CYLMenuStyle.animationSize` (CYLMenuStyle.swift) | `CYLMenuStyle.animationSize` | property |
@@ -528,6 +534,7 @@ overrides left out.
 | `CYLTagButton.static iconSize(for:animated:style:)` (CYLTagButton.swift) | `CYLTagButton.iconSize(image, animated, style)` | method |
 | `CYLTagButton.static height(for:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.height(style, fontScale)` | method |
 | `CYLTagButton.static height(forTitle:iconSize:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.heightForTitle(title, iconSize, style, fontScale)` | method |
+| `CYLTagButton.static height(forTitle:iconSize:width:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | TODO | method |
 | `CYLTagColorTheme` (CYLTagColors.swift) | `enum CYLTagColorTheme` | enum |
 | `CYLTagColorTheme.none` (CYLTagColors.swift) | `CYLTagColorTheme.none` | case |
 | `CYLTagColorTheme.random` (CYLTagColors.swift) | `CYLTagColorTheme.random` | case |
@@ -572,6 +579,36 @@ overrides left out.
 | `CYLTagListAccessibilityIdentifier.static createItem` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.createItem` | property |
 | `CYLTagListAccessibilityIdentifier.static moreButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.moreButton` | property |
 | `CYLTagListAccessibilityIdentifier.static deleteButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.deleteButton` | property |
+| `CYLTagListAddItemView` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView` (its model; `CYLTagListView` draws a `TextInput` and a `Button`) | class |
+| `CYLTagListAddItemView.textField` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.text` / `placeholder` (the view's `TextInput`, id `CYLTagListAddItemField`) | property |
+| `CYLTagListAddItemView.addButton` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.addTitle` (the view's `Button`, id `CYLTagListAddItemButton`) | property |
+| `CYLTagListAddItemView.submitHandler` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.submitHandler` | property |
+| `CYLTagListAddItemView.preferredHeight` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.preferredHeight` | property |
+| `CYLTagListAddItemView.init?(coder:)` (CYLTagListAddItemView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
+| `CYLTagListAddItemView.static textFieldIdentifier` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.textFieldIdentifier` | property |
+| `CYLTagListAddItemView.static addButtonIdentifier` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.addButtonIdentifier` | property |
+| `CYLTagListAddItemView.name` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.name` | property |
+| `CYLTagListAddItemView.submit()` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.submit()` | method |
+| `CYLTagListAddItemView.textFieldShouldReturn(_:)` (CYLTagListAddItemView.swift) | the `TextInput`'s `onSubmit` (Done key) calls `submit()` | method |
+| `CYLTagListCachePolicy` (CYLTagListCache.swift) | `CYLTagListCachePolicy` | enum |
+| `CYLTagListCachePolicy.none` (CYLTagListCache.swift) | `CYLTagListCachePolicy.none` | case |
+| `CYLTagListCachePolicy.database` (CYLTagListCache.swift) | `CYLTagListCachePolicy.database` (relationalStore) | case |
+| `CYLTagListCachePolicy.userDefaults` (CYLTagListCache.swift) | `CYLTagListCachePolicy.userDefaults` (preferences) | case |
+| `CYLTagListCachePolicy.sandboxFile` (CYLTagListCache.swift) | `CYLTagListCachePolicy.sandboxFile` (a JSON file in filesDir) | case |
+| `CYLTagListCache` (CYLTagListCache.swift) | `CYLTagListCache` (interface) | protocol |
+| `CYLTagListCache.cachedTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListCache.cachedTitles(section)` | method |
+| `CYLTagListCache.saveTitles(_:forSection:)` (CYLTagListCache.swift) | `CYLTagListCache.saveTitles(titles, section)` | method |
+| `CYLTagListCache.removeTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListCache.removeTitles(section)` | method |
+| `CYLTagListCache.removeAllTitles()` (CYLTagListCache.swift) | `CYLTagListCache.removeAllTitles()` | method |
+| `CYLTagListStore` (CYLTagListCache.swift) | `CYLTagListStore` | class |
+| `CYLTagListStore.policy` (CYLTagListCache.swift) | `CYLTagListStore.policy` | property |
+| `CYLTagListStore.name` (CYLTagListCache.swift) | `CYLTagListStore.name` | property |
+| `CYLTagListStore.static cache(policy:name:)` (CYLTagListCache.swift) | `CYLTagListStore.cache(policy, name, context?)` | method |
+| `CYLTagListStore.init(policy:name:)` (CYLTagListCache.swift) | `new CYLTagListStore(policy, name, context?)` | init |
+| `CYLTagListStore.cachedTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.cachedTitles(section)` | method |
+| `CYLTagListStore.saveTitles(_:forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.saveTitles(titles, section)` | method |
+| `CYLTagListStore.removeTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.removeTitles(section)` | method |
+| `CYLTagListStore.removeAllTitles()` (CYLTagListCache.swift) | `CYLTagListStore.removeAllTitles()` | method |
 | `CYLTagListCell` (CYLTagListCell.swift) | `CYLTagListCell` (tagviews/CYLTagListCell.ets + component) | class |
 | `CYLTagListCell.button` (CYLTagListCell.swift) | `CYLTagListCell.button` | property |
 | `CYLTagListCell.appliedStyle` (CYLTagListCell.swift) | `CYLTagListCell.appliedStyle` | property |
@@ -751,6 +788,17 @@ overrides left out.
 | `CYLTagListView.isReordering` (CYLTagListView.swift) | `CYLTagListState.isReordering` | property |
 | `CYLTagListView.tagMoveHandler` (CYLTagListView.swift) | `CYLTagListState.tagMoveHandler` | property |
 | `CYLTagListView.selectedTagDragHandler` (CYLTagListView.swift) | `CYLTagListState.selectedTagDragHandler` | property |
+| `CYLTagListView.isEditing` (CYLTagListView.swift) | `CYLTagListState.isEditing` | property |
+| `CYLTagListView.showsAddItemViewWhileEditing` (CYLTagListView.swift) | `CYLTagListState.showsAddItemViewWhileEditing` | property |
+| `CYLTagListView.addItemView` (CYLTagListView.swift) | `CYLTagListState.addItemView` (drawn at `addItemViewFrame`) | property |
+| `CYLTagListView.cachePolicy` (CYLTagListView.swift) | `CYLTagListState.cachePolicy` | property |
+| `CYLTagListView.cacheName` (CYLTagListView.swift) | `CYLTagListState.cacheName` | property |
+| `CYLTagListView.cache` (CYLTagListView.swift) | `CYLTagListState.cache` | property |
+| `CYLTagListView.cachedTitles(inSection:)` (CYLTagListView.swift) | `CYLTagListState.cachedTitlesInSection(section)` | method |
+| `CYLTagListView.cacheKey(forSection:)` (CYLTagListView.swift) | `CYLTagListState.cacheKeyForSection(section)` | method |
+| `CYLTagListView.saveEditableSectionsToCache()` (CYLTagListView.swift) | `CYLTagListState.saveEditableSectionsToCache()` | method |
+| `CYLTagListView.setEditing(_:animated:)` (CYLTagListView.swift) | `CYLTagListState.setEditing(editing, animated)` | method |
+| `CYLTagListView.sectionAllowsEditing(_:)` (CYLTagListView.swift) | `CYLTagListState.sectionAllowsEditing(section)` | method |
 | `CYLTagListView.init?(coder:)` (CYLTagListView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagListView.init(foldControl:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl)` | init |
 | `CYLTagListView.init(foldControl:title:titleImage:titlePosition:)` (CYLTagListView.swift) | `new CYLTagListState(foldControl, title, titleImage, titlePosition)` | init |

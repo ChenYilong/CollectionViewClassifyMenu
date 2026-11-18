@@ -1,5 +1,7 @@
 import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { accessibility } from '@kit.AccessibilityKit';
+import { CYLTagListAddItemView } from './CYLTagListAddItemView';
 import { CYLUIContext } from '../core/CYLUIContext';
 import { CYLAnimationPlayer } from './CYLAnimationPlayer';
 import { CYLTagAnimatedIcon, cylTagAnimationImage } from './CYLTagAnimatedIcon';
@@ -174,6 +176,9 @@ export struct CYLTagListView {
   @State private footers: CYLSectionRender[] = [];
   @State private titleItem?: CYLTagRenderItem = undefined;
   @State private contentHeight: number = 0;
+  /** `addItemView`'s frame [x, y, width, height] while editing (`CYLTagListState.addItemViewFrame`), else empty. */
+  @State private addItemFrame: number[] = [];
+  @State private addItemText: string = '';
   @State private backgroundColorValue: string = CYLColor.WHITE;
   @State private borderWidthValue: number = 0;
   @State private borderColorValue: string = CYLColor.CLEAR;
@@ -285,6 +290,11 @@ export struct CYLTagListView {
     this.footers = footers;
     this.titleItem = m.hasTitle ? this.title() : undefined;
     this.contentHeight = m.contentHeight;
+    const addFrame = m.addItemViewFrame;
+    this.addItemFrame = addFrame !== undefined ? [addFrame.x, addFrame.y, addFrame.width, addFrame.height] : [];
+    if (addFrame !== undefined) {
+      this.addItemText = m.addItemView.text;
+    }
     this.backgroundColorValue = style.backgroundColor;
     this.borderWidthValue = m.containerBorderWidth;
     this.borderColorValue = m.containerBorderColor ?? CYLColor.CLEAR;
@@ -839,6 +849,53 @@ export struct CYLTagListView {
     }))
   }
 
+  /** `CYLTagListAddItemView` while editing: a text field and an Add button below the last section. */
+  @Builder
+  addItemControl() {
+    Row({ space: 12 }) {
+      TextInput({ text: this.addItemText, placeholder: this.model.addItemView.placeholder })
+        .id(CYLTagListAddItemView.textFieldIdentifier)
+        .accessibilityText(this.model.addItemView.placeholder)
+        .enterKeyType(EnterKeyType.Done)
+        .borderRadius(8)
+        .layoutWeight(1)
+        .height('100%')
+        .onChange((value: string) => {
+          this.addItemText = value;
+          this.model.addItemView.text = value;
+        })
+        .onSubmit(() => this.submitAddItem())
+      Button(this.model.addItemView.addTitle)
+        .id(CYLTagListAddItemView.addButtonIdentifier)
+        .type(ButtonType.Normal)
+        .borderRadius(8)
+        .fontWeight(FontWeight.Medium)
+        .height('100%')
+        .enabled(this.addItemText.trim().length > 0)
+        .onClick(() => this.submitAddItem())
+    }
+    .width(this.addItemFrame[2])
+    .height(this.addItemFrame[3])
+    .position({ x: this.addItemFrame[0], y: this.addItemFrame[1] })
+  }
+
+  private submitAddItem(): void {
+    const announcement = this.model.addItemView.submit();
+    this.addItemText = this.model.addItemView.text;
+    if (announcement.length > 0) {
+      // "Tag added: <name>" for screen readers, as iOS posts it (`CYLMenuTagAdded`).
+      try {
+        accessibility.sendAccessibilityEvent({
+          type: 'announceForAccessibility', bundleName: '', triggerAction: 'common',
+          textAnnouncedForAccessibility: announcement
+        } as accessibility.EventInfo).catch(() => {
+        });
+      } catch (error) {
+        // No accessibility service: nothing to announce.
+      }
+    }
+  }
+
   build() {
     Scroll(this.scroller) {
       Stack({ alignContent: Alignment.TopStart }) {
@@ -905,6 +962,9 @@ export struct CYLTagListView {
             this.tagButton(r)
           }
         }, (r: CYLTagRenderItem) => r.key)
+        if (this.addItemFrame.length === 4) {
+          this.addItemControl()
+        }
       }
       .width('100%')
       .height(this.contentHeight)

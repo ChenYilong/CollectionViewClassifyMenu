@@ -27,7 +27,9 @@ import {
   CYLConfiguration, CYLConfigurationValue, CYLMenuConfiguration, CYLMenuConfigurationError,
   CYLMenuConfigurationErrorCode, CYLTagItemKey, CYLTagListKey, CYLTagSectionKey, cylAddingAnimationOptions
 } from '../core/CYLTagListConfiguration';
-import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLSize } from '../core/CYLTypes';
+import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
+import { CYLTagListCache, CYLTagListCachePolicy, CYLTagListStore } from '../core/CYLTagListCache';
+import { CYLTagListAddItemView } from './CYLTagListAddItemView';
 
 /** How taps select items. */
 export enum CYLMenuSelectionMode {
@@ -474,6 +476,166 @@ export class CYLTagListState {
   /** `init(foldPosition:content:)`: a tag list with a fold control at this position showing this content. */
   static withFoldPosition(position: CYLMenuFoldControlPosition, content: CYLMenuFoldControlContent): CYLTagListState {
     return new CYLTagListState(new CYLMenuFoldControl(position, content));
+  }
+
+  // MARK: Editing
+
+  private isEditingStorage: boolean = false;
+  private showsAddItemViewWhileEditingStorage: boolean = true;
+  private addItemViewStorage?: CYLTagListAddItemView;
+  private cachePolicyStorage: CYLTagListCachePolicy = CYLTagListCachePolicy.none;
+  private cacheNameStorage: string = 'CYLTagListView';
+  /** `cache`: the store the list saves to, the built-in store of `cachePolicy` or one of yours; undefined: no cache. */
+  cache?: CYLTagListCache = undefined;
+
+  /**
+   * `isEditing`: whether the list is in editing mode (`setEditing`). While editing, the items of the editable sections
+   * (`menuSectionAllowsEditing`, every section by default) show the delete indicator and can be dragged to reorder; a
+   * tap no longer selects an item but still calls `menuDidSelectItem`, so the host can open the item; folded sections
+   * show every item; and `addItemView` appears below the last section. False by default.
+   */
+  get isEditing(): boolean {
+    return this.isEditingStorage;
+  }
+
+  /** `showsAddItemViewWhileEditing`: shows `addItemView` below the last section while editing. True by default. */
+  get showsAddItemViewWhileEditing(): boolean {
+    return this.showsAddItemViewWhileEditingStorage;
+  }
+
+  set showsAddItemViewWhileEditing(value: boolean) {
+    this.showsAddItemViewWhileEditingStorage = value;
+    this.reloadLayout();
+  }
+
+  /**
+   * `addItemView`: the "add tag" control shown while editing. A submitted name is reported through
+   * `menuDidRequestNewItemWithName` with the index path after the last item of the first editable section.
+   */
+  get addItemView(): CYLTagListAddItemView {
+    if (this.addItemViewStorage === undefined) {
+      const view = new CYLTagListAddItemView();
+      view.submitHandler = (name: string) => this.requestNewItem(name);
+      view.textChangeHandler = () => this.setNeedsDisplay();
+      this.addItemViewStorage = view;
+    }
+    return this.addItemViewStorage;
+  }
+
+  /**
+   * `cachePolicy`: where the list saves its editable sections after an edit (a drag, a delete or an added tag in
+   * editing mode), so the order survives a relaunch: none (the default), a database, the app's preferences or a file.
+   * The host restores it when it builds its data (`cachedTitlesInSection`). Setting it makes `cache` the built-in store
+   * of the policy and `cacheName`.
+   */
+  get cachePolicy(): CYLTagListCachePolicy {
+    return this.cachePolicyStorage;
+  }
+
+  set cachePolicy(value: CYLTagListCachePolicy) {
+    this.cachePolicyStorage = value;
+    this.cache = CYLTagListStore.cache(value, this.cacheNameStorage);
+  }
+
+  /** `cacheName`: separates the caches of different lists ("CYLTagListView" by default); set it before `cachePolicy`. */
+  get cacheName(): string {
+    return this.cacheNameStorage;
+  }
+
+  set cacheName(value: string) {
+    this.cacheNameStorage = value;
+    this.cache = CYLTagListStore.cache(this.cachePolicyStorage, value);
+  }
+
+  /** `cachedTitles(inSection:)`: the titles saved for `section`, in order; undefined when nothing was saved or no cache. */
+  cachedTitlesInSection(section: number): string[] | undefined {
+    return this.cache?.cachedTitles(this.cacheKeyForSection(section));
+  }
+
+  /** `cacheKey(forSection:)`: the data source's `menuCacheKeyForSection`, else the section's index. */
+  cacheKeyForSection(section: number): string {
+    const source = this.menuDataSource;
+    return source?.menuCacheKeyForSection !== undefined ? source.menuCacheKeyForSection(section) : `${section}`;
+  }
+
+  /** `saveEditableSectionsToCache()`: saves the current titles of every editable section to `cache` (after each edit). */
+  saveEditableSectionsToCache(): void {
+    const cache = this.cache;
+    const source = this.menuDataSource;
+    if (cache === undefined || source === undefined) {
+      return;
+    }
+    for (let section = 0; section < source.numberOfSectionsInMenu(); section++) {
+      if (!this.sectionAllowsEditing(section)) {
+        continue;
+      }
+      const titles: string[] = [];
+      for (let item = 0; item < source.menuNumberOfItemsInSection(section); item++) {
+        const p = makePath(section, item);
+        if (this.itemType(p) !== CYLMenuItemType.create) {
+          titles.push(source.menuTitleForItem(p));
+        }
+      }
+      cache.saveTitles(titles, this.cacheKeyForSection(section));
+    }
+  }
+
+  /**
+   * `setEditing(_:animated:)`: enters or leaves editing mode; the delete indicators, reordering, the selection rules,
+   * folding and `addItemView` change together; then `menuDidChangeEditing` is called. The list itself does not move or
+   * open anything. (`animated` is accepted for parity; the view redraws the list either way.)
+   */
+  setEditing(editing: boolean, animated: boolean = false): void {
+    if (editing === this.isEditingStorage) {
+      return;
+    }
+    this.isEditingStorage = editing;
+    this.addItemView.fontScale = this.fontScale;
+    this.reloadMenuData();
+    this.menuDelegate?.menuDidChangeEditing?.(this, editing);
+  }
+
+  /** `sectionAllowsEditing(_:)`: the data source's `menuSectionAllowsEditing`, else true. */
+  sectionAllowsEditing(section: number): boolean {
+    const source = this.menuDataSource;
+    return source?.menuSectionAllowsEditing !== undefined ? source.menuSectionAllowsEditing(section) : true;
+  }
+
+  /** Whether `addItemView` is shown (editing, and `showsAddItemViewWhileEditing`). */
+  get showsAddItemView(): boolean {
+    return this.isEditingStorage && this.showsAddItemViewWhileEditingStorage;
+  }
+
+  /** The height `addItemView` takes below the sections, vp (with the bottom section inset), or 0. */
+  private addItemViewHeight(): number {
+    return this.showsAddItemView ? this.addItemView.preferredHeight + this.styleStorage.sectionInsets.bottom : 0;
+  }
+
+  /** Where the view draws `addItemView`: right below the sections, inside the scrolling content; undefined when hidden. */
+  get addItemViewFrame(): CYLRect | undefined {
+    if (!this.showsAddItemView) {
+      return undefined;
+    }
+    const sections = this.layoutSections();
+    const last = sections.length > 0 ? sections[sections.length - 1] : undefined;
+    const insets = this.styleStorage.sectionInsets;
+    const top = (last !== undefined ? last.y + last.height : 0) + this.titleHeight();
+    return new CYLRect(insets.left, top, Math.max(0, this.layoutWidth - insets.left - insets.right),
+      this.addItemView.preferredHeight);
+  }
+
+  /** A name submitted in `addItemView`: reported at the end of the first editable section. */
+  private requestNewItem(name: string): void {
+    let section = 0;
+    for (let s = 0; s < this.titles.length; s++) {
+      if (this.sectionAllowsEditing(s)) {
+        section = s;
+        break;
+      }
+    }
+    const item = section < this.titles.length ? this.titles[section].length : 0;
+    this.menuDelegate?.menuDidRequestNewItemWithName?.(this, name, makePath(section, item));
+    this.saveEditableSectionsToCache();
   }
 
   // MARK: View plumbing
@@ -1120,6 +1282,7 @@ export class CYLTagListState {
         height += this.footerHeight;
       }
     }
+    height += this.addItemViewHeight();
     return Math.ceil(height) + this.titleHeight();
   }
 
@@ -1233,6 +1396,9 @@ export class CYLTagListState {
       this.reloadMenuData();
     }
     this.menuDelegate?.menuDidDeleteItem?.(this, indexPath);
+    if (this.isEditingStorage) {
+      this.saveEditableSectionsToCache();
+    }
     if (deletedTag !== undefined) {
       this.tagDeleteHandler?.(indexPath.item, deletedTag);
     }
@@ -1527,12 +1693,14 @@ export class CYLTagListState {
 
   /** Whether items can be reordered: `allowsReordering` and a data source that moves items. */
   get canReorder(): boolean {
-    return this.allowsReorderingStorage && this.menuDataSource !== undefined &&
+    return (this.allowsReorderingStorage || this.isEditingStorage) && this.menuDataSource !== undefined &&
     CYLMenuDefaults.supportsMovingItems(this.menuDataSource);
   }
 
   canMoveItem(indexPath: CYLIndexPath): boolean {
-    return this.canReorder && this.isValid(indexPath) && !this.isInlineFoldCell(indexPath);
+    return this.canReorder && this.isValid(indexPath) && !this.isInlineFoldCell(indexPath) &&
+      (this.allowsReorderingStorage || this.sectionAllowsEditing(indexPath.section)) &&
+      this.itemType(indexPath) !== CYLMenuItemType.create;
   }
 
   /**
@@ -1618,6 +1786,8 @@ export class CYLTagListState {
     });
     this.selection = moved;
     this.menuDelegate?.menuDidMoveItem?.(this, source, destination);
+    // The new order survives a relaunch when the list has a cache.
+    this.saveEditableSectionsToCache();
     if (this.tagMoveHandler !== undefined && this.tagDataSourceStorage !== undefined &&
       this.menuDataSource === this.tagDataSourceStorage) {
       this.tagMoveHandler(from, to);
@@ -1686,8 +1856,15 @@ export class CYLTagListState {
   }
 
   isDeletable(indexPath: CYLIndexPath): boolean {
-    return this.itemType(indexPath) !== CYLMenuItemType.create && this.menuDataSource !== undefined &&
-    CYLMenuDefaults.isDeletable(this.menuDataSource, indexPath);
+    if (this.itemType(indexPath) === CYLMenuItemType.create) {
+      return false;
+    }
+    const source = this.menuDataSource;
+    if (this.isEditingStorage && this.sectionAllowsEditing(indexPath.section)) {
+      // Editing: every item of an editable section, unless the data source decides.
+      return source === undefined || source.menuItemIsDeletable === undefined || source.menuItemIsDeletable(indexPath);
+    }
+    return source !== undefined && CYLMenuDefaults.isDeletable(source, indexPath);
   }
 
   isExclusive(indexPath: CYLIndexPath): boolean {
@@ -1695,7 +1872,8 @@ export class CYLTagListState {
   }
 
   isSelectable(indexPath: CYLIndexPath): boolean {
-    return this.itemType(indexPath) !== CYLMenuItemType.create &&
+    // Editing: a tap reports the item (`menuDidSelectItem`) without changing the selection.
+    return !this.isEditingStorage && this.itemType(indexPath) !== CYLMenuItemType.create &&
       (this.menuDataSource === undefined || CYLMenuDefaults.isSelectable(this.menuDataSource, indexPath));
   }
 
@@ -1959,7 +2137,7 @@ export class CYLTagListState {
     if (this.layoutWidth > 0) {
       const sections = this.layoutSections();
       const last = sections.length > 0 ? sections[sections.length - 1] : undefined;
-      height = Math.ceil(last !== undefined ? last.y + last.height : 0) + this.titleHeight();
+      height = Math.ceil(last !== undefined ? last.y + last.height : 0) + this.titleHeight() + this.addItemViewHeight();
     } else {
       height = this.heightThatFitsWidth(0);
     }
@@ -1971,6 +2149,10 @@ export class CYLTagListState {
   }
 
   private canFold(rowCount: number): boolean {
+    // Editing shows every item, so each one can be deleted or dragged.
+    if (this.isEditingStorage) {
+      return false;
+    }
     const folds = this.foldStyleStorage === CYLMenuFoldStyle.truncate ||
       this.foldControlStorage.position !== CYLMenuFoldControlPosition.none;
     return folds && this.defaultVisibleRowsStorage > 0 && rowCount > this.defaultVisibleRowsStorage;

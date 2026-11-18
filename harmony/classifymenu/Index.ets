@@ -1,4 +1,6 @@
 export { CYLTagListView } from './src/main/ets/components/CYLTagListView';
+export { CYLTagListCache, CYLTagListCachePolicy, CYLTagListStore } from './src/main/ets/core/CYLTagListCache';
+export { CYLTagListAddItemView } from './src/main/ets/components/CYLTagListAddItemView';
 export {
   CYLTagItem, CYLTagSection, CYLTagStyle, CYLTagStateStyle, CYLTagListConfiguration, CYLTagTap, CYLIndexPath,
   CYLSelectionMode, parseConfiguration, CYLTagSelection, foldedHeight, CYLTagListController

@@ -51,6 +51,16 @@ export interface CYLMenuDataSource {
   menuRemoveItem?: (indexPath: CYLIndexPath) => void;
   /** Implemented when the list may reorder items (iOS: `respondsToSelector:`). */
   menuMoveItem?: (from: CYLIndexPath, to: CYLIndexPath) => void;
+  /**
+   * `menuSectionAllowsEditing(_:)`: whether a section takes part in `CYLTagListState`'s editing mode (delete indicators,
+   * reordering); true when not implemented.
+   */
+  menuSectionAllowsEditing?: (section: number) => boolean;
+  /**
+   * `menuCacheKey(forSection:)`: the key the list saves a section's titles under in its cache (`cachePolicy`), stable
+   * when sections come and go (e.g. "mine"); the section's index when not implemented.
+   */
+  menuCacheKeyForSection?: (section: number) => string;
 }
 
 /**
@@ -71,6 +81,8 @@ export interface CYLMenuDelegate {
   menuDidLongPressItem?: (menu: Object, indexPath: CYLIndexPath) => void;
   menuDidMoveItem?: (menu: Object, from: CYLIndexPath, to: CYLIndexPath) => void;
   menuDidBeginDraggingSelectedItem?: (menu: Object, indexPath: CYLIndexPath) => void;
+  /** `menu(_:didChangeEditing:)`: the list entered (true) or left (false) editing mode (`setEditing`). */
+  menuDidChangeEditing?: (menu: Object, editing: boolean) => void;
 }
 
 /** The iOS defaults of the optional data source methods, for a data source that does not implement them. */
