@@ -39,6 +39,12 @@
  * many rows with a fold control (a chevron, `foldControlContent` 'icon' / 'title' / 'titleAndIcon') as the last tag;
  * a tap on it (or `setExpanded(true)`) shows every tag, the control then folding them again; `foldchange` {canFold,
  * expanded}. Editing shows every tag, as iOS.
+ *
+ * Word picker (iOS 选词填入): `setTagsWithCharactersOfText(text)` (one tag per character, keeps `selectionMode`),
+ * `selectedText()`, `selectItemsFrom(start, end)`, and `allowsSmearSelection`: a drag that starts on a tag selects every
+ * tag from it to the one under the finger (or deselects them when it started on a selected one), the page not
+ * scrolling meanwhile; a tap still toggles; `selectionchange` {positions}. Needs `selectionMode` 'multiple';
+ * `model.wordPickerStyle()` is the matching look.
  */
 const model = require('./model.js');
 const { coreString } = require('../core-strings.js');
@@ -88,6 +94,7 @@ Component({
     renamesOnTitleTapWhileEditing: { type: Boolean, value: true },
     showsClearButton: { type: Boolean, value: false },
     defaultVisibleRows: { type: Number, value: 0 },
+    allowsSmearSelection: { type: Boolean, value: false },
     foldControlContent: { type: String, value: 'icon' },
     foldControlColor: { type: String, value: '' },
   },
@@ -236,6 +243,45 @@ Component({
       if (index < 0 || index >= this._tags.length) return;
       this._selection = model.toggleSelection(this._selection, index, this.data.selectionMode);
       this._render(false);
+    },
+
+    // MARK: Word picker (iOS setTags(withCharactersOf:), selectedText, smear selection)
+
+    /** One tag per character of `text` (graphemes); keeps `selectionMode`, unlike setting `tags`. */
+    setTagsWithCharactersOfText(text) {
+      this._tags = model.characters(text).map((title) => keyed(model.makeTag(title)));
+      this._selection = [];
+      this._render(true);
+    },
+
+    /** The titles of the selected tags joined in order: the picked text. */
+    selectedText() {
+      return this.selectedIndexes().map((index) => String(this._tags[index].title)).join('');
+    },
+
+    /** Selects the enabled tags from `start` through `end` (either order) without an event. Needs 'multiple'. */
+    selectItemsFrom(start, end) {
+      if (this.data.selectionMode !== 'multiple' || !this._tags[start] || !this._tags[end]) return;
+      this._selection = model.smearSelection(this._selection, start, end, true, this._tags);
+      this._render(false);
+    },
+
+    /** Whether a smear may start on the tag at `index`. */
+    _canSmearFrom(index) {
+      const tag = this._tags[index];
+      return !!this.data.allowsSmearSelection && this.data.selectionMode === 'multiple' && !this._editing
+        && !!tag && tag.isEnabled !== false;
+    },
+
+    /** The smear's next tag: the one under the finger extends the range from the first one. */
+    _smearTo(index) {
+      const smear = this._smear;
+      if (!smear || index < 0 || !this._canSmearFrom(index)) return;
+      const next = model.smearSelection(smear.base, smear.anchor, index, smear.selects, this._tags);
+      if (next.join(',') === this._selection.slice().sort((a, b) => a - b).join(',')) return;
+      this._selection = next;
+      this._render(false);
+      this.triggerEvent('selectionchange', { positions: next.slice() });
     },
 
     /** Deselects every tag without an event (deselectAllItems()). */
@@ -535,6 +581,10 @@ Component({
       const items = this._tags.map((tag, index) => {
         const item = model.renderTag(tag, index, { ...context, renamable: renames });
         item.renamesOnTitleTap = !!item.editingIcons && this.data.renamesOnTitleTapWhileEditing;
+        // A space (a word picker cell) is read as "Space", not as silence.
+        if (String(tag.title).length > 0 && String(tag.title).trim().length === 0) {
+          item.accessibilityLabel = coreString('CYLMenuSpaceCharacter');
+        }
         return item;
       });
       const list = model.renderList(listStyle, {
@@ -579,6 +629,13 @@ Component({
       const index = this._index(event);
       const touch = event.touches[0];
       this._touchStart = { x: touch.clientX, y: touch.clientY };
+      // `allowsSmearSelection`: the tag the finger went down on anchors a smear; the frames find the tags it crosses.
+      this._smear = null;
+      this._smearPending = this._canSmearFrom(index) ? { anchor: index, rects: null } : null;
+      if (this._smearPending && this.createSelectorQuery) {
+        const pending = this._smearPending;
+        this._measure((rects) => { pending.rects = rects; });
+      }
       // Pressed: CYLMenuStyle.highlightedBackgroundColor, only while taps are allowed.
       if (this.data.allowsTapping && this._pressed !== index) {
         this._pressed = index;
@@ -591,6 +648,20 @@ Component({
     onTouchMove(event) {
       const touch = event.touches[0];
       const drag = this._dragging;
+      const pending = this._smearPending;
+      if (!drag && pending && this._touchStart) {
+        if (!this._smear && Math.hypot(touch.clientX - this._touchStart.x, touch.clientY - this._touchStart.y) > DRAG_THRESHOLD) {
+          this._smear = { anchor: pending.anchor, base: this._selection.slice(), selects: !this._selection.includes(pending.anchor) };
+          this._pressed = -1;
+          this._smearTo(pending.anchor);
+        }
+        if (this._smear && pending.rects) {
+          const target = pending.rects.findIndex((rect) => rect && touch.clientX >= rect.left && touch.clientX <= rect.right
+            && touch.clientY >= rect.top && touch.clientY <= rect.bottom);
+          this._smearTo(target);
+        }
+        if (this._smear) return;
+      }
       if (!drag) {
         if (this._pressed >= 0 && this._touchStart
           && Math.hypot(touch.clientX - this._touchStart.x, touch.clientY - this._touchStart.y) > 10) {
@@ -616,6 +687,8 @@ Component({
     },
 
     onTouchEnd() {
+      this._smear = null;
+      this._smearPending = null;
       if (this._pressed >= 0) {
         this._pressed = -1;
         this._render(false);
@@ -636,6 +709,8 @@ Component({
     },
 
     onTouchCancel() {
+      this._smear = null;
+      this._smearPending = null;
       const drag = this._dragging;
       this._pressed = -1;
       if (drag) {

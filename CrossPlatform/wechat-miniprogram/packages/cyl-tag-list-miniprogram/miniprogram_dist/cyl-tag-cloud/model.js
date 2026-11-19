@@ -134,6 +134,8 @@ function defaultStyle() {
     // The section header's clear button: its image (null: the core's trash icon) and color (null: the header's).
     clearButtonImage: null,
     clearButtonColor: null,
+    // Equal cells, this many per row (iOS `numberOfItemsPerRow`); 0: each tag as wide as its content.
+    numberOfItemsPerRow: 0,
     imageTitleSpacing: 4,
     imageSize: 14,
     itemHeight: 30,
@@ -189,6 +191,72 @@ function tagCloudStyle() {
   style.itemHeight = 0;
   style.backgroundColor = NAMED_COLORS.clear;
   return style;
+}
+
+/**
+ * `CYLMenuStyle.wordPicker()` (选词填入, as WeChat's "涂抹选择填入词"): one character per cell, 9 equal cells per row,
+ * light gray cells with small corners that turn mint green when selected, the character centered. Use it with
+ * `setTagsWithCharactersOfText`, `selectionMode` 'multiple' and `allowsSmearSelection`; the picked text is
+ * `selectedText()`.
+ */
+function wordPickerStyle() {
+  const style = defaultStyle();
+  style.numberOfItemsPerRow = 9;
+  forAllAppearances(style, (a) => {
+    a.fontSize = 18;
+    a.fontWeight = 500;
+    a.cornerRadius = 3;
+    a.borderWidth = 0;
+    a.borderColor = null;
+    a.textColor = '#1C1C1E';
+    a.backgroundColor = '#F2F2F7';
+  });
+  // Mint green (iOS 0.70 / 0.92 / 0.81).
+  style.selected.backgroundColor = '#B3EBCF';
+  style.disabled.textColor = 'rgba(60, 60, 67, 0.3)';
+  setTagContentInsets(style, { top: 0, left: 0, bottom: 0, right: 0 });
+  style.itemHeight = 40;
+  style.interitemSpacing = 6;
+  style.lineSpacing = 10;
+  style.sectionInsets = { top: 12, left: 24, bottom: 12, right: 24 };
+  style.backgroundColor = NAMED_COLORS.clear;
+  return style;
+}
+
+/**
+ * The characters of `text` as a reader sees them (graphemes): a code point with the marks, variation selectors, skin
+ * tones and zero-width-joined parts that follow it.
+ */
+function characters(text) {
+  const result = [];
+  let joinNext = false;
+  for (const ch of Array.from(String(text || ''))) {
+    const cp = ch.codePointAt(0);
+    const extend = (cp >= 0x0300 && cp <= 0x036F) || (cp >= 0xFE00 && cp <= 0xFE0F) || (cp >= 0x1F3FB && cp <= 0x1F3FF)
+      || (cp >= 0xE0020 && cp <= 0xE007F) || cp === 0x20E3;
+    if (result.length && (extend || joinNext || cp === 0x200D)) {
+      result[result.length - 1] += ch;
+      joinNext = cp === 0x200D;
+    } else {
+      result.push(ch);
+      joinNext = false;
+    }
+  }
+  return result;
+}
+
+/**
+ * A smear (`allowsSmearSelection`): `base` with the positions from `anchor` to `end` selected (`selects`) or
+ * deselected, skipping disabled tags; a new array, ascending.
+ */
+function smearSelection(base, anchor, end, selects, tags) {
+  const result = new Set(base);
+  for (let i = Math.min(anchor, end); i <= Math.max(anchor, end); i += 1) {
+    if (!tags[i] || tags[i].isEnabled === false) continue;
+    if (selects) result.add(i);
+    else result.delete(i);
+  }
+  return Array.from(result).sort((a, b) => a - b);
 }
 
 /**
@@ -572,6 +640,11 @@ function renderTag(tag, index, context) {
     `border-radius: ${px(radius)}`,
     `background-color: ${background || 'transparent'}`,
   ];
+  if (style.numberOfItemsPerRow > 0) {
+    // Equal cells (iOS `numberOfItemsPerRow`): the row's width less the spaces, shared out.
+    const n = style.numberOfItemsPerRow;
+    parts.push(`width: calc((100% - ${px((n - 1) * style.interitemSpacing)}) / ${n})`, 'flex: none');
+  }
   if (a.backgroundImage && !isPressed) parts.push(`background-image: ${a.backgroundImage}`);
   if (dragging === index) parts.push('opacity: 0.8; transform: scale(1.08); z-index: 2');
   const shadows = [];
@@ -688,7 +761,7 @@ function renderTag(tag, index, context) {
     index,
     title,
     hasTitle: title.length > 0,
-    titleStyle: `font-size: ${px(a.fontSize)}; color: ${a.textColor}`
+    titleStyle: `font-size: ${px(a.fontSize)}; color: ${a.textColor}${a.fontWeight ? `; font-weight: ${a.fontWeight}` : ''}`
       + (style.titleWraps ? '; white-space: normal; word-break: break-word' : ''),
     style: parts.join('; '),
     icon,
@@ -810,4 +883,7 @@ module.exports = {
   editingIconSide,
   rowsFromTops,
   foldVisibility,
+  wordPickerStyle,
+  characters,
+  smearSelection,
 };

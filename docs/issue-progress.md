@@ -1504,6 +1504,13 @@ tags: [issues, ui, cocoapods, progress]
   adds a parallel `PanGesture` per item whose direction is `None` unless the item can smear (lists without smearing
   scroll as before), mapping the finger to `indexPathAtPoint`; a space cell reads `CYLMenuSpaceCharacter`. New
   `TagListWordPicker.test.ets` (2); host tests 77 / 77; the app builds.
+- **Mini program core (the example and its screenshot to come):** `cyl-tag-cloud` `setTagsWithCharactersOfText`
+  (graphemes, keeps `selectionMode`), `selectedText()`, `selectItemsFrom`, `allowsSmearSelection` (the touched-down tag
+  anchors the smear; `touchmove` against the measured frames extends it; the item catches `touchmove` while smearing so
+  the page does not scroll, through a data-bound handler name; a tap still toggles; `selectionchange` {positions});
+  `model.wordPickerStyle()` and a new `numberOfItemsPerRow` (equal cells: `calc((100% - spaces) / n)`), title
+  `fontWeight`; a space cell reads `CYLMenuSpaceCharacter`. New `test/tag-cloud-word-picker.test.js` (2); `npm test`
+  164 / 164 with and without `verify-package.js`.
 - Result (DONE, **100 / 100**): `CYLWordPickerDemoViewController.message` is the Example string
   "你好，我是设计部的 Alex 👋" (en "Hi, I'm Alex from Design 👋", zh-Hant "你好，我是設計部的 Alex 👋"), the sender "Alex";
   the NOLOCALIZE exemption and its entry in the language test are gone. The tests find the name in whatever language
