@@ -1500,6 +1500,11 @@ tags: [issues, ui, cocoapods, progress]
 - **Android on the emulator (40 / 40):** Menu → Styles → "Word picker: swipe across words to fill in" → Pick words;
   `adb shell input swipe` from A to x selected "Alex" across the row break, Fill in filled the remark. Screenshot
   `docs/assets/android-word-picker.png`.
+- **Several smears add up (the owner's check, iOS 5fad4509):** each smear adds its range to the selection it began with,
+  one from a selected cell removes its range. Tests on all three (`severalSmearsAddUp`: "Alex" then " Design" from the
+  space -> "Alex Design", then "Alex" again -> " Design"): Android 3 / 3, HarmonyOS 78 / 78, mini program 166 / 166
+  (4f99c54f). On the Android emulator two `adb` swipes and in DevTools two touch smears give "Alex Design" (Android's
+  Fill in fills it): `docs/assets/word-picker-several-smears-android-miniprogram.png`. HarmonyOS: with its emulator.
 - **HarmonyOS core (the example and its screenshot to come):** `CYLMenuStyle.wordPicker()`,
   `CYLTagListState.setTagsWithCharactersOfText` (graphemes by hand, `cylCharacters`: surrogate pairs, marks, variation
   selectors, skin tones, ZWJ; `Array.from` split the emoji into UTF-16 units on the host test runtime), `selectedText`,
