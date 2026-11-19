@@ -612,3 +612,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `test/` folder included), README pin; `android/merged/gradle.properties` `cyl.tabbar.commit`; the React Native
   `scripts/fetch-cyltabbar.sh` and the Flutter example's `pubspec.yaml` ref. Results: mini program `npm test`
   159 / 159; HarmonyOS host tests 75 / 75 and the app builds; Android library tests 99 / 0 and the example builds.
+- **Result, iOS (Mac session):** every iOS pin at `f88d67a8` (the four Podfiles, `Package.swift`, the Flutter iOS Podfile;
+  the Flutter pubspec and the React Native fetch script also changed by the Windows session to the same value); no code
+  change needed for the Swift CYLTabBar. pod install in the four projects; menu 37 / 37, Example 110 / 110, Swift Example
+  22 / 22, TagCollectionView 6 / 6; `flutter build ios --simulator` OK.
+- **DONE (2026-11-19): every platform at `f88d67a8`, 100 / 100.** iOS (this commit) and the Windows session's `46c861fc` (mini
+  program 159 / 159, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build).
+  CYLTabBarController and CYLSearchViewController told the commit and the counts.
