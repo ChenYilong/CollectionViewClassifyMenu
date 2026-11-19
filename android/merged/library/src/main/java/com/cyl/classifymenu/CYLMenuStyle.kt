@@ -50,6 +50,26 @@ class CYLMenuStyle {
     var deleteIndicatorLineWidth: Float = 0f
     var deleteIndicatorWidth: Float = 0f
     var deleteIndicatorPadding: Float = 0f
+
+    /**
+     * `editingIndicatorSpacing`: the space between the two editing icons of a renamable tag in `CYLTagListView`'s
+     * editing mode (the edit icon and the delete icon, `CYLTagButton.editingIndicatorsView`), dp. 10 by default; a
+     * negative value is 0.
+     */
+    var editingIndicatorSpacing: Float = 10f
+
+    /**
+     * `editingIndicatorInsets`: the margins around the two editing icons as a whole: left from the title, right to the
+     * tag's padding, top and bottom within the tag, dp. Left 4 and right 0 by default (the tag's own padding follows
+     * the cross); negative values are 0.
+     */
+    var editingIndicatorInsets: CYLEdgeInsets = CYLEdgeInsets(0f, 4f, 0f, 0f)
+
+    /** `clearButtonImage`: the image of a section header's clear button; null: the core's trash icon ("cyl_trash"). */
+    var clearButtonImage: android.graphics.drawable.Drawable? = null
+
+    /** `clearButtonColor`: the color of the clear button; null: `headerTextColor`. */
+    var clearButtonColor: Int? = null
     var deleteIndicatorPlacement: CYLTagDeleteIndicatorPlacement = CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementTrailing
 
     // Touch ripple
@@ -243,6 +263,10 @@ class CYLMenuStyle {
         copy.deleteIndicatorLineWidth = deleteIndicatorLineWidth
         copy.deleteIndicatorWidth = deleteIndicatorWidth
         copy.deleteIndicatorPadding = deleteIndicatorPadding
+        copy.editingIndicatorSpacing = editingIndicatorSpacing
+        copy.editingIndicatorInsets = editingIndicatorInsets
+        copy.clearButtonImage = clearButtonImage
+        copy.clearButtonColor = clearButtonColor
         copy.deleteIndicatorPlacement = deleteIndicatorPlacement
         copy.rippleColor = rippleColor
         copy.rippleAlpha = rippleAlpha

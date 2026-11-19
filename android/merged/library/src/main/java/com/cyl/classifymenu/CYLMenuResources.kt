@@ -12,6 +12,13 @@ import java.util.Locale
 object CYLMenuResources {
 
     private const val BUNDLE = "CYLClassifyMenuResources"
+
+    /**
+     * `imagesBundle`: the core's image folder, `CYLClassifyMenuImages.bundle` (new images live there as files, e.g.
+     * "cyl_trash", AGENTS.md "Image resources: folder bundles"); `imageNamed` reads it first.
+     */
+    @JvmStatic
+    val imagesBundle: String = "CYLClassifyMenuImages.bundle"
     private const val TABLE = "CYLClassifyMenu"
     private const val FALLBACK_LANGUAGE = "en"
     private val tables = HashMap<String, Map<String, String>>()
@@ -28,7 +35,8 @@ object CYLMenuResources {
     fun imageNamed(name: String): Drawable? {
         val loader = javaClass.classLoader ?: return null
         for ((suffix, density) in listOf("@3x" to android.util.DisplayMetrics.DENSITY_XXHIGH, "@2x" to android.util.DisplayMetrics.DENSITY_XHIGH, "" to android.util.DisplayMetrics.DENSITY_MEDIUM)) {
-            val stream = loader.getResourceAsStream("$BUNDLE/$name$suffix.png") ?: continue
+            val stream = loader.getResourceAsStream("$imagesBundle/$name$suffix.png")
+                ?: loader.getResourceAsStream("$BUNDLE/$name$suffix.png") ?: continue
             val bitmap = stream.use { android.graphics.BitmapFactory.decodeStream(it) } ?: continue
             bitmap.density = density
             return android.graphics.drawable.BitmapDrawable(android.content.res.Resources.getSystem(), bitmap)

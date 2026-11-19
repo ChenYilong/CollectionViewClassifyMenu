@@ -75,5 +75,8 @@
  "CYLMultipleFilterHeaderView.titleLabel": "`titleButton.titleLabel` (`CYLTagButton.titleLabel`)",
  "CYLMenuDataSource.decidesDeletableItems": "respondsToSelector: of -menuItemIsDeletableAtIndexPath: (CYLTagListView's editing mode)",
  "CYLTagListView.canMoveItemAtIndexPath": "CYLTagListView -collectionView:canMoveItemAtIndexPath: (UICollectionViewDataSource)",
- "CYLTagListView.moveItemAtIndexPath": "CYLTagListView -collectionView:moveItemAtIndexPath:toIndexPath: (UICollectionViewDataSource)"
+ "CYLTagListView.moveItemAtIndexPath": "CYLTagListView -collectionView:moveItemAtIndexPath:toIndexPath: (UICollectionViewDataSource)",
+ "CYLMenuDataSource.supportsRenamingItems": "respondsToSelector: of -menuRenameItemAtIndexPath:toTitle: (the rename indicator)",
+ "CYLTagListCache.supportsItems": "respondsToSelector: of -saveItems:forSection: (an optional CYLTagListCache method)",
+ "CYLTagListView.loadItemsWithKeys": "CYLTagListView -loadItemsWithKeys:completion:"
 }

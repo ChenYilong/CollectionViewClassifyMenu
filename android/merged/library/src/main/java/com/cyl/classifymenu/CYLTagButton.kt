@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.cyl.animateditem.CYLAnimatedItemAccessoryPlacement
 import com.cyl.animateditem.CYLAnimatedItemAxis
+import com.cyl.animateditem.CYLAnimatedItemStackView
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLTabBarItemAnimationViewMaking
 import kotlin.math.ceil
@@ -245,6 +246,49 @@ open class CYLTagButton @JvmOverloads constructor(
             updateAppearance()
         }
 
+    /**
+     * `showsRenameIndicator`: shows a rename indicator (a square and pencil) before the delete indicator, for a tag that
+     * can be renamed; the two icons are then drawn by `editingIndicatorsView`. Needs `showsDeleteIndicator`. False by
+     * default; `CYLTagListView` turns it on in editing mode for the items its data source can rename.
+     */
+    var showsRenameIndicator: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            updateAppearance()
+        }
+
+    /** `renameIndicatorHitFrame`: the area a tap on the rename indicator should cover, dp; empty while it is hidden. */
+    var renameIndicatorHitFrame: CYLRect = CYLRect()
+        private set
+
+    private var editingIndicatorsViewIsLoaded = false
+
+    /**
+     * `editingIndicatorsView`: the two editing icons while `showsRenameIndicator` (a pencil, then a cross), a horizontal
+     * `CYLAnimatedItemStackView` of two icon-only `CYLAnimatedItemView`s. It only draws; the list cell takes the taps.
+     */
+    val editingIndicatorsView: CYLAnimatedItemStackView by lazy {
+        CYLAnimatedItemStackView(context).apply {
+            contentMarginDp = 0f
+            stackView.orientation = android.widget.LinearLayout.HORIZONTAL
+            stackView.gravity = Gravity.CENTER_VERTICAL
+            for (kind in listOf(CYLEditingIconDrawable.Kind.Rename, CYLEditingIconDrawable.Kind.Delete)) {
+                val icon = CYLAnimatedItemView(context)
+                icon.image = CYLEditingIconDrawable(kind)
+                icon.title = null
+                icon.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+                append(icon, null, 0f)
+            }
+            isClickable = false
+            isFocusable = false
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+            visibility = GONE
+            this@CYLTagButton.addView(this)
+            editingIndicatorsViewIsLoaded = true
+        }
+    }
+
     override fun setSelected(selected: Boolean) {
         val changed = selected != isSelected
         super.setSelected(selected)
@@ -354,10 +398,17 @@ open class CYLTagButton @JvmOverloads constructor(
         box.setColor(backgroundColor)
         backgroundImageView.setImageDrawable(appearance.backgroundImage)
         backgroundImageView.visibility = if (appearance.backgroundImage == null || highlighted) GONE else VISIBLE
-        drawsCross = showsDeleteIndicator && style.deleteIndicatorLineWidth > 0
+        // With the rename indicator, editingIndicatorsView draws both icons instead.
+        val editingIcons = showsDeleteIndicator && showsRenameIndicator
+        drawsCross = showsDeleteIndicator && style.deleteIndicatorLineWidth > 0 && !editingIcons
         // Kept visible (and empty) under a drawn cross, so that a tap on it still reaches the accessory.
         deleteIndicatorLabel.visibility = if (showsDeleteIndicator) VISIBLE else GONE
-        deleteIndicatorLabel.text = if (showsDeleteIndicator && !drawsCross) style.deleteIndicatorTitle else null
+        deleteIndicatorLabel.text = if (showsDeleteIndicator && !drawsCross && !editingIcons) style.deleteIndicatorTitle else null
+        if (editingIcons || editingIndicatorsViewIsLoaded) {
+            editingIndicatorsView.visibility = if (editingIcons) VISIBLE else GONE
+            val color = style.deleteIndicatorColor ?: appearance.textColor
+            for (icon in editingIndicatorsView.itemViews) (icon.image as? CYLEditingIconDrawable)?.color = color
+        }
         deleteIndicatorLabel.contentDescription = if (showsDeleteIndicator) CYLMenuLocalizedString("CYLMenuDeleteTag", "Deletes a tag") else null
         val placement = if (style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading)
             CYLAnimatedItemAccessoryPlacement.Leading else CYLAnimatedItemAccessoryPlacement.Trailing
@@ -386,7 +437,7 @@ open class CYLTagButton @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val iconSize = if (animationView != null) animationSize() else iconSizeForImage(imageView.drawable, false, currentStyle)
-        val width = px(widthForTitle(rawTitle?.toString(), iconSize, showsDeleteIndicator, currentStyle))
+        val width = px(widthForTitle(rawTitle?.toString(), iconSize, showsDeleteIndicator, showsRenameIndicator, currentStyle))
         // Side by side: the style's height, as in a tag list; stacked: the icon, the spacing and the title.
         val height = px(if (currentStyle.imagePlacement.isVertical) heightForTitle(rawTitle?.toString(), iconSize, currentStyle) else heightForStyle(currentStyle))
         setMeasuredDimension(resolveSize(width, widthMeasureSpec), resolveSize(height, heightMeasureSpec))
@@ -404,7 +455,11 @@ open class CYLTagButton @JvmOverloads constructor(
         val insets = appearance.contentInsets
         backgroundImageView.layout(0, 0, r - l, b - t)
         var deleteWidth = 0f
-        if (showsDeleteIndicator) {
+        if (showsDeleteIndicator && showsRenameIndicator) {
+            deleteWidth = layOutEditingIndicators(editingIconSide(state, style), insets, width, height)
+            crossPath.reset()
+        } else if (showsDeleteIndicator) {
+            renameIndicatorHitFrame = CYLRect()
             val indicatorWidth = deleteIndicatorWidthForState(state, style)
             deleteWidth = indicatorWidth + style.imageTitleSpacing
             val leadingIndicator = style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading
@@ -429,8 +484,10 @@ open class CYLTagButton @JvmOverloads constructor(
         } else {
             place(deleteIndicatorLabel, CYLRect())
             deleteIndicatorHitFrame = CYLRect()
+            renameIndicatorHitFrame = CYLRect()
             crossPath.reset()
         }
+        if (!(showsDeleteIndicator && showsRenameIndicator) && editingIndicatorsViewIsLoaded) place(editingIndicatorsView, CYLRect())
         val indicatorFirst = showsDeleteIndicator && style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading
         val margin = insets.left + if (indicatorFirst) deleteWidth else 0f
         val trailing = insets.right + if (indicatorFirst) 0f else deleteWidth
@@ -574,6 +631,49 @@ open class CYLTagButton @JvmOverloads constructor(
      * Measures `view` at the size of `frame`, then lays it out there: a container (the engine's Rive view wraps a
      * RiveAnimationView at MATCH_PARENT) lays its children out by their measured sizes, which stay 0 × 0 without it.
      */
+    /**
+     * The pencil and the cross of `editingIndicatorsView`, each `side` wide, at the delete indicator's place; the
+     * pencil's tap area is on its side, the cross's on the other. Returns the width they take with their spacing, dp.
+     */
+    private fun layOutEditingIndicators(side: Float, insets: CYLEdgeInsets, width: Float, height: Float): Float {
+        val style = currentStyle
+        val spacing = max(0f, style.editingIndicatorSpacing)
+        val m = style.editingIndicatorInsets
+        val left = max(0f, m.left)
+        val right = max(0f, m.right)
+        val top = max(0f, m.top)
+        val bottom = max(0f, m.bottom)
+        val total = left + 2 * side + spacing + right
+        val leading = style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading
+        val x = if (leading) insets.left else max(insets.left, width - insets.right - total)
+        val outer = CYLRect(x, insets.top, total, max(0f, height - insets.top - insets.bottom))
+        val area = CYLRect(outer.x + left, outer.y + top, max(0f, outer.width - left - right), max(0f, outer.height - top - bottom))
+        // Each icon's slot is `side` wide; the glyph fills it (iOS 3af1b7cd: the slot is the cap height x 1.25).
+        val glyph = max(0f, min(side, area.height))
+        val stack = editingIndicatorsView
+        stack.itemViews.forEachIndexed { index, icon ->
+            icon.iconSizeDp = com.cyl.animateditem.CYLSize(glyph, glyph)
+            val params = (icon.layoutParams as? android.widget.LinearLayout.LayoutParams)
+                ?: android.widget.LinearLayout.LayoutParams(0, 0)
+            params.width = px(side)
+            params.height = px(area.height)
+            params.leftMargin = if (index == 0) 0 else px(spacing)
+            icon.layoutParams = params
+        }
+        place(stack, area)
+        place(deleteIndicatorLabel, CYLRect())
+        val middle = area.x + side + spacing / 2
+        if (leading) {
+            renameIndicatorHitFrame = CYLRect(0f, 0f, middle, height)
+            deleteIndicatorHitFrame = CYLRect(middle, 0f, max(0f, outer.maxX + style.imageTitleSpacing - middle), height)
+        } else {
+            val start = max(0f, outer.x - style.imageTitleSpacing)
+            renameIndicatorHitFrame = CYLRect(start, 0f, max(0f, middle - start), height)
+            deleteIndicatorHitFrame = CYLRect(middle, 0f, max(0f, width - middle), height)
+        }
+        return total + style.imageTitleSpacing
+    }
+
     private fun place(view: View, frame: CYLRect) {
         val width = maxOf(0, px(frame.maxX) - px(frame.x))
         val height = maxOf(0, px(frame.maxY) - px(frame.y))
@@ -644,6 +744,22 @@ open class CYLTagButton @JvmOverloads constructor(
         @JvmStatic
         fun widthForTitle(title: String?, iconSize: CYLSize, style: CYLMenuStyle): Float = widthForTitle(title, iconSize, false, style)
 
+        /** The cap height of `font`, dp (the height of "H"). */
+        internal fun fontCapHeight(font: CYLFont): Float {
+            val bounds = android.graphics.Rect()
+            paintFor(font).getTextBounds("H", 0, 1, bounds)
+            return bounds.height() / Resources.getSystem().displayMetrics.density
+        }
+
+        /** The side of one editing icon (the pencil or the cross): the title's cap height x 1.25 (iOS 3af1b7cd). */
+        internal fun editingIconSide(state: Int, style: CYLMenuStyle): Float = ceil(fontCapHeight(style.titleFontForState(state)) * 1.25f)
+
+        /** The width of the two editing icons with the space between and around them, dp. */
+        private fun editingIndicatorsWidth(state: Int, style: CYLMenuStyle): Float {
+            val m = style.editingIndicatorInsets
+            return max(0f, m.left) + 2 * editingIconSide(state, style) + max(0f, style.editingIndicatorSpacing) + max(0f, m.right)
+        }
+
         private fun deleteIndicatorWidthForState(state: Int, style: CYLMenuStyle): Float {
             if (style.deleteIndicatorWidth > 0) return style.deleteIndicatorWidth
             val font = style.deleteIndicatorFontForState(state)
@@ -653,7 +769,17 @@ open class CYLTagButton @JvmOverloads constructor(
 
         /** `+widthForTitle:iconSize:showsDeleteIndicator:style:traitCollection:`: the widest of the three states, dp. */
         @JvmStatic
-        fun widthForTitle(title: String?, iconSize: CYLSize, showsDeleteIndicator: Boolean, style: CYLMenuStyle): Float {
+        fun widthForTitle(title: String?, iconSize: CYLSize, showsDeleteIndicator: Boolean, style: CYLMenuStyle): Float =
+            widthForTitle(title, iconSize, showsDeleteIndicator, false, style)
+
+        /**
+         * `+widthForTitle:iconSize:showsDeleteIndicator:showsRenameIndicator:style:traitCollection:`: with the rename
+         * indicator, the two editing icons replace the delete indicator.
+         */
+        @JvmStatic
+        fun widthForTitle(title: String?, iconSize: CYLSize, showsDeleteIndicator: Boolean, showsRenameIndicator: Boolean,
+                          style: CYLMenuStyle): Float {
+            val editingIcons = showsDeleteIndicator && showsRenameIndicator
             val text = style.displayedTitleForTitle(title)
             var width = 0f
             for (state in states) {
@@ -668,7 +794,8 @@ open class CYLTagButton @JvmOverloads constructor(
                 } else if (titleWidth > 0 && !style.layoutCentered && style.contentAlignment == CYLTagContentAlignment.CYLTagContentAlignmentCenter) {
                     content += style.imageSize.width + style.imageTitleSpacing
                 }
-                if (showsDeleteIndicator) content += style.imageTitleSpacing + deleteIndicatorWidthForState(state, style)
+                if (editingIcons) content += style.imageTitleSpacing + editingIndicatorsWidth(state, style)
+                else if (showsDeleteIndicator) content += style.imageTitleSpacing + deleteIndicatorWidthForState(state, style)
                 width = max(width, ceil(content + appearance.contentInsets.left + appearance.contentInsets.right))
             }
             return width

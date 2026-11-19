@@ -72,6 +72,38 @@ open class CYLTagListAddItemView @JvmOverloads constructor(context: Context, att
     /** The trimmed name in the field. */
     open val name: String get() = textField.text?.toString()?.trim().orEmpty()
 
+    /** `isRenaming`: whether the control renames a tag (`beginRenamingWithTitle`) instead of adding one. */
+    var isRenaming: Boolean = false
+        private set
+
+    /**
+     * `-beginRenamingWithTitle:`: renames a tag; the field shows `title` with the keyboard up, the button reads "Done"
+     * (`CYLMenuRenameDone`); the next submit reports the new name, then the control adds tags again.
+     */
+    open fun beginRenamingWithTitle(title: String) {
+        isRenaming = true
+        textField.setText(title)
+        textField.hint = CYLMenuLocalizedString("CYLMenuRenamePlaceholder", "The rename field")
+        textField.contentDescription = textField.hint
+        addButton.text = CYLMenuLocalizedString("CYLMenuRenameDone", "The rename button")
+        addButton.isEnabled = name.isNotEmpty()
+        textField.requestFocus()
+        textField.selectAll()
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager)
+            ?.showSoftInput(textField, 0)
+    }
+
+    /** `-endRenaming`: leaves renaming without a change; the field is cleared and adds tags again. */
+    open fun endRenaming() {
+        if (!isRenaming) return
+        isRenaming = false
+        textField.setText("")
+        textField.hint = CYLMenuLocalizedString("CYLMenuAddTagPlaceholder", "The add control's field")
+        textField.contentDescription = textField.hint
+        addButton.text = CYLMenuLocalizedString("CYLMenuAddTag", "The add control's button")
+        addButton.isEnabled = false
+    }
+
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
@@ -101,9 +133,16 @@ open class CYLTagListAddItemView @JvmOverloads constructor(context: Context, att
     open fun submit() {
         val name = this.name
         if (name.isEmpty()) return
+        val renaming = isRenaming
+        if (renaming) {
+            endRenaming()
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager)
+                ?.hideSoftInputFromWindow(textField.windowToken, 0)
+        }
         textField.setText("")
         addButton.isEnabled = false
         submitHandler?.invoke(name)
-        announceForAccessibility(String.format(CYLMenuLocalizedString("CYLMenuTagAdded", "Announced after adding a tag").replace("%@", "%s"), name))
+        val key = if (renaming) "CYLMenuTagRenamed" else "CYLMenuTagAdded"
+        announceForAccessibility(String.format(CYLMenuLocalizedString(key, "Announced after adding or renaming a tag").replace("%@", "%s"), name))
     }
 }

@@ -1238,3 +1238,29 @@ tags: [issues, ui, cocoapods, progress]
   `tag-cloud-editing.test.js` (the iOS cases); `npm test` 154. WeChat DevTools: `editableSectionTitles()` and
   `loadSections` with a fake remote source answer as expected.
 - **Score:** 100 / 100 (Android 40, HarmonyOS 30, mini program 30).
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): renaming in editing mode, item ids, the header clear button, image folders and the editing icon spacing on Android, HarmonyOS and the mini program
+
+- **Requests (relayed by the Mac ClassifyMenu session; the CYLSearchViewController session needs them for its contact
+  tags example):** port iOS `990cf115` (renaming in editing mode with two icons, `CYLAnimatedItemStackView`; item ids;
+  cache items; `menu(_:didFinishEditingWithItems:)`; `fetchItems` / `loadItems`), `cea04255` (the section header's clear
+  button), `7d84d709` (the owner's rule: new image files live in a folder bundle), `d58c4e6f` and `3af1b7cd` (editing icon
+  spacing 10, insets left 4 / right 0, the icon slot the title's cap height x 1.25). Android first, then HarmonyOS and the
+  mini program.
+- **Acceptance (100):** Android with tests (40); HarmonyOS (30); mini program (30). Pass: 60.
+- **Android (done, 40 / 40):** `CYLTagButton.showsRenameIndicator`, `renameIndicatorHitFrame`, `editingIndicatorsView`
+  (CYLTabBarController's `CYLAnimatedItemStackView` of two icon-only items, drawn icons `CYLEditingIconDrawable` in place
+  of iOS's SF Symbols), `CYLMenuStyle.editingIndicatorSpacing` (10) / `editingIndicatorInsets` (left 4, right 0) /
+  `clearButtonImage` / `clearButtonColor`; `CYLTagListCell.isRenamable` / `renameHandler` / `renamesOnTitleTap` (a
+  TalkBack "Edit" action too); `CYLTagListView.renamingIndexPath`, `renamesOnTitleTapWhileEditing`,
+  `renameRequestHandler`, `clearButtonHandler`, `editableSectionItems()`, `beginRenamingItemAtIndexPath`,
+  `cancelRenaming`, `submitNewItemNamed`, `finishRenamingToTitle`, `loadItemsWithKeys`; `CYLTagListAddItemView.isRenaming`
+  / `beginRenamingWithTitle` / `endRenaming`; `CYLTagListCacheItem`, `CYLTagListCache.cachedItemsForSection` /
+  `saveItems` (the store keeps a `#items` companion section, as iOS), `CYLTagListRemoteSource.fetchItemsWithKeys`;
+  `CYLMenuDataSource.menuIdentifierForItemAtIndexPath`, `menuRenameItemAtIndexPath` (+ `supportsRenamingItems`),
+  `menuShowsClearButtonForSection`; `CYLMenuDelegate.menuDidFinishEditingWithItems`, `menuDidRenameItemAtIndexPath`,
+  `menuDidTapClearButtonInSection`; the three accessibility identifiers. Images: `CYLMenuResources.imagesBundle`, the
+  library's `resources/CYLClassifyMenuImages.bundle` (`cyl_trash` at 1x / 2x / 3x), read first by `imageNamed`. Core
+  strings copied from iOS. New `CYLTagListRenamingTest` (4, as iOS); library 98 / 0, the example builds.
+  `docs/android-api.md` 888 / 888, `docs/android-ios-api.md` 826 / 826.
+- **TODO:** HarmonyOS and the mini program.

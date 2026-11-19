@@ -42,6 +42,30 @@ interface CYLTagListCache {
 
     /** `removeAllTitles`: removes every section of this cache. */
     fun removeAllTitles()
+
+    /**
+     * `cachedItemsForSection:`: the items (stable identifier and title) saved for `section`, in order; null when none
+     * were saved. Optional on iOS: the default (a cache that keeps titles only) returns null.
+     */
+    fun cachedItemsForSection(section: String): List<CYLTagListCacheItem>? = null
+
+    /** Whether `saveItems` is implemented (`respondsToSelector:` on iOS); false for a cache that keeps titles only. */
+    fun supportsItems(): Boolean = false
+
+    /**
+     * `saveItems:forSection:`: saves `items` (in this order) as the contents of `section`; `cachedTitlesForSection` then
+     * returns their titles. Optional on iOS: the default does nothing.
+     */
+    fun saveItems(items: List<CYLTagListCacheItem>, forSection: String) {}
+}
+
+/**
+ * `CYLTagListCacheItem`: one saved item of a tag list, its stable identifier (a database id; the title when the item
+ * has none) and its current title. A reorder or a rename keeps the identifier, so whatever the host binds to it stays
+ * bound.
+ */
+data class CYLTagListCacheItem(val identifier: String, val title: String) {
+    override fun toString(): String = "$identifier:$title"
 }
 
 /**
@@ -78,6 +102,37 @@ class CYLTagListStore(context: Context, val policy: CYLTagListCachePolicy, name:
     }
 
     override fun saveTitles(titles: List<String>, forSection: String) {
+        // Plain titles replace any items saved for the section.
+        removeRawTitles(itemsSection(forSection))
+        saveRawTitles(titles, forSection)
+    }
+
+    // MARK: Items (a companion section of encoded "identifier<US>title" entries next to the titles, as iOS)
+
+    private val itemSeparator = "\u001F"
+
+    private fun itemsSection(section: String) = "$section#items"
+
+    override fun supportsItems(): Boolean = policy != CYLTagListCachePolicy.CYLTagListCachePolicyNone
+
+    override fun cachedItemsForSection(section: String): List<CYLTagListCacheItem>? {
+        cachedTitlesForSection(itemsSection(section))?.let { encoded ->
+            return encoded.map { entry ->
+                val parts = entry.split(itemSeparator)
+                if (parts.size >= 2) CYLTagListCacheItem(parts[0], parts.drop(1).joinToString(itemSeparator))
+                else CYLTagListCacheItem(entry, entry)
+            }
+        }
+        // Saved as titles only: each title is its own identifier.
+        return cachedTitlesForSection(section)?.map { CYLTagListCacheItem(it, it) }
+    }
+
+    override fun saveItems(items: List<CYLTagListCacheItem>, forSection: String) {
+        saveRawTitles(items.map { it.identifier + itemSeparator + it.title }, itemsSection(forSection))
+        saveRawTitles(items.map { it.title }, forSection)
+    }
+
+    private fun saveRawTitles(titles: List<String>, forSection: String) {
         when (policy) {
             CYLTagListCachePolicy.CYLTagListCachePolicyNone -> return
             CYLTagListCachePolicy.CYLTagListCachePolicyDatabase -> {
@@ -101,6 +156,11 @@ class CYLTagListStore(context: Context, val policy: CYLTagListCachePolicy, name:
     }
 
     override fun removeTitlesForSection(section: String) {
+        removeRawTitles(itemsSection(section))
+        removeRawTitles(section)
+    }
+
+    private fun removeRawTitles(section: String) {
         when (policy) {
             CYLTagListCachePolicy.CYLTagListCachePolicyNone -> return
             CYLTagListCachePolicy.CYLTagListCachePolicyDatabase ->
@@ -242,4 +302,14 @@ interface CYLTagListRemoteSource {
      * thread, with the titles by key (a missing key: nothing on the server) or an error.
      */
     fun fetchSectionsWithKeys(keys: List<String>, completion: (Map<String, List<String>>?, Throwable?) -> Unit)
+
+    /**
+     * `fetchItemsWithKeys:completion:`: downloads the sections saved under `keys` as items (stable identifier and title),
+     * for `CYLTagListView.loadItemsWithKeys`. Optional on iOS: the default fetches the titles, each its own identifier.
+     */
+    fun fetchItemsWithKeys(keys: List<String>, completion: (Map<String, List<CYLTagListCacheItem>>?, Throwable?) -> Unit) {
+        fetchSectionsWithKeys(keys) { sections, error ->
+            completion(sections?.mapValues { (_, titles) -> titles.map { CYLTagListCacheItem(it, it) } }, error)
+        }
+    }
 }

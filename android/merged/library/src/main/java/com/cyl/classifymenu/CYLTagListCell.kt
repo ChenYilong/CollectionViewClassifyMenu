@@ -53,6 +53,44 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
 
     var deleteHandler: (() -> Unit)? = null
 
+    private val renameControl = View(context).apply {
+        visibility = GONE
+        cyl_accessibilityIdentifier = CYLTagListRenameAccessibilityIdentifier
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+        setOnClickListener { rename() }
+    }
+    private val titleControl = View(context).apply {
+        visibility = GONE
+        cyl_accessibilityIdentifier = CYLTagListRenameTitleAccessibilityIdentifier
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+        setOnClickListener { rename() }
+    }
+
+    /**
+     * `isRenamable`: shows the rename indicator (a pencil before the cross, `CYLTagButton.showsRenameIndicator`) and
+     * makes it tappable; also adds a TalkBack "Edit" action. Needs `deletable`. False by default.
+     */
+    var isRenamable: Boolean = false
+        set(value) {
+            field = value
+            button.showsRenameIndicator = value
+            renameControl.visibility = if (value) VISIBLE else GONE
+            titleControl.visibility = if (renamesOnTitleTap && value) VISIBLE else GONE
+            updateAccessibility()
+            requestLayout()
+        }
+
+    /** `renameHandler`: called when the rename indicator is tapped (or the TalkBack action), and on a title tap while `renamesOnTitleTap`. */
+    var renameHandler: (() -> Unit)? = null
+
+    /** `renamesOnTitleTap`: a tap on the title (outside the editing icons) renames too. Needs `isRenamable`. False by default. */
+    var renamesOnTitleTap: Boolean = false
+        set(value) {
+            field = value
+            titleControl.visibility = if (value && isRenamable) VISIBLE else GONE
+            requestLayout()
+        }
+
     var additionalAccessibilityActions: List<CYLAccessibilityAction>? = null
         set(value) {
             field = value?.toList()
@@ -64,7 +102,9 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
 
     init {
         addView(button)
+        addView(titleControl)
         addView(deleteControl)
+        addView(renameControl)
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         isFocusable = true
         setWillNotDraw(false)
@@ -84,6 +124,8 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
         setMeasuredDimension(resolveSize(button.measuredWidth, widthMeasureSpec), resolveSize(button.measuredHeight, heightMeasureSpec))
         button.measure(MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(measuredHeight, MeasureSpec.EXACTLY))
         deleteControl.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        renameControl.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        titleControl.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -91,6 +133,19 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
         val density = resources.displayMetrics.density
         val hit = if (deletable) button.deleteIndicatorHitFrame else CYLRect()
         deleteControl.layout((hit.x * density).roundToInt(), (hit.y * density).roundToInt(), (hit.maxX * density).roundToInt(), (hit.maxY * density).roundToInt())
+        val rename = if (isRenamable) button.renameIndicatorHitFrame else CYLRect()
+        renameControl.layout((rename.x * density).roundToInt(), (rename.y * density).roundToInt(), (rename.maxX * density).roundToInt(), (rename.maxY * density).roundToInt())
+        if (isRenamable && renamesOnTitleTap) {
+            // The title's frame, kept clear of the icons' tap areas.
+            val title = button.titleLabel
+            var right = title.right
+            val iconsLeft = minOf(renameControl.left, deleteControl.left)
+            if (right > iconsLeft && title.left < iconsLeft) right = iconsLeft
+            val slop = (4 * density).roundToInt()
+            titleControl.layout(title.left, maxOf(0, title.top - slop), right, minOf(b - t, title.bottom + slop))
+        } else {
+            titleControl.layout(0, 0, 0, 0)
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -144,9 +199,14 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
         deleteHandler?.invoke()
     }
 
+    private fun rename() {
+        renameHandler?.invoke()
+    }
+
     private fun updateAccessibility() {
         val actions = ArrayList<CYLAccessibilityAction>()
         if (deletable) actions.add(CYLAccessibilityAction(CYLMenuLocalizedString("CYLMenuDeleteTag", "Deletes a tag")) { delete(); true })
+        if (isRenamable) actions.add(CYLAccessibilityAction(CYLMenuLocalizedString("CYLMenuRenameTag", "Renames a tag")) { rename(); true })
         additionalAccessibilityActions?.let { actions.addAll(it) }
         CYLAccessibilityNode.apply(this, true, selectedForAccessibility, accessibilityHintText, actions)
     }
@@ -154,7 +214,10 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
     /** `-prepareForReuse`. */
     open fun prepareForReuse() {
         deleteHandler = null
+        renameHandler = null
         additionalAccessibilityActions = null
+        renamesOnTitleTap = false
+        isRenamable = false
         deletable = false
     }
 

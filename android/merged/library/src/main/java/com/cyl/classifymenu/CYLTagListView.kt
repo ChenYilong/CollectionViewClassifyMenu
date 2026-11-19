@@ -431,6 +431,11 @@ open class CYLTagListView @JvmOverloads constructor(
     /** `-saveEditableSectionsToCache`: saves the current titles of every editable section to `cache` (after each edit). */
     fun saveEditableSectionsToCache() {
         val cache = cache ?: return
+        if (cache.supportsItems()) {
+            // With identifiers, so a renamed item stays the same item.
+            for ((key, items) in editableSectionItems()) cache.saveItems(items, key)
+            return
+        }
         for ((key, titles) in editableSectionTitles()) cache.saveTitles(titles, key)
     }
 
@@ -446,9 +451,12 @@ open class CYLTagListView @JvmOverloads constructor(
             addItemView.textField.clearFocus()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager)
                 ?.hideSoftInputFromWindow(addItemView.textField.windowToken, 0)
+            renamingIndexPath = null
+            addItemView.endRenaming()
             // The edited sections, for the host to upload (the cache already has them).
             val titles = editableSectionTitles()
             menuDelegate?.menuDidFinishEditingWithTitles(this, titles)
+            menuDelegate?.menuDidFinishEditingWithItems(this, editableSectionItems())
             editingFinishHandler?.invoke(titles)
         }
         invalidateMeasurements()
@@ -462,8 +470,163 @@ open class CYLTagListView @JvmOverloads constructor(
     /** `-sectionAllowsEditing:`: the data source's `menuSectionAllowsEditing`, else true. */
     fun sectionAllowsEditing(section: Int): Boolean = menuDataSource?.menuSectionAllowsEditing(section) ?: true
 
+    // MARK: Renaming (iOS 990cf115)
+
+    /** `renamingIndexPath`: the item being renamed in editing mode (its rename indicator was tapped); null otherwise. */
+    var renamingIndexPath: CYLIndexPath? = null
+        private set
+
+    /**
+     * `renamesOnTitleTapWhileEditing`: in editing mode, a tap on a renamable item's title (outside its pencil and cross)
+     * renames it too; a tap elsewhere still calls `menuDidSelectItemAtIndexPath`. True by default; it needs the data
+     * source's `menuRenameItemAtIndexPath`.
+     */
+    var renamesOnTitleTapWhileEditing: Boolean = true
+        set(value) {
+            field = value
+            refreshVisibleCells()
+        }
+
+    /**
+     * `renameRequestHandler`: your own editor for renaming: when set, a pencil or title tap calls it with the item and its
+     * title instead of filling `addItemView`; finish with `finishRenamingToTitle` or `cancelRenaming`. null (the
+     * default): `addItemView` is the rename field.
+     */
+    var renameRequestHandler: ((CYLIndexPath, String) -> Unit)? = null
+
+    /**
+     * `clearButtonHandler`: called with the section when its header's clear button (`menuShowsClearButtonForSection`)
+     * is tapped, after `menuDidTapClearButtonInSection`.
+     */
+    var clearButtonHandler: ((Int) -> Unit)? = null
+
+    /**
+     * `-editableSectionItems`: the items (identifier from `menuIdentifierForItemAtIndexPath`, else the title; and title)
+     * of every editable section, by cache key, without "+ New tag" items.
+     */
+    fun editableSectionItems(): Map<String, List<CYLTagListCacheItem>> {
+        val source = menuDataSource ?: return emptyMap()
+        val result = LinkedHashMap<String, List<CYLTagListCacheItem>>()
+        for (section in 0 until source.numberOfSectionsInMenu()) {
+            if (!sectionAllowsEditing(section)) continue
+            result[cacheKeyForSection(section)] = (0 until source.menuNumberOfItemsInSection(section)).mapNotNull { item ->
+                val indexPath = CYLIndexPath(item, section)
+                if (source.menuItemTypeAtIndexPath(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) return@mapNotNull null
+                val title = source.menuTitleForItemAtIndexPath(indexPath)
+                CYLTagListCacheItem(source.menuIdentifierForItemAtIndexPath(indexPath) ?: title, title)
+            }
+        }
+        return result
+    }
+
+    /** Whether the item can be renamed now: editing, an editable section, deletable, and a data source that renames. */
+    private fun isRenamableAt(indexPath: CYLIndexPath): Boolean =
+        isEditing && sectionAllowsEditing(indexPath.section) && itemTypeAt(indexPath) != CYLMenuItemType.CYLMenuItemTypeCreate &&
+            isDeletableAt(indexPath) && menuDataSource?.supportsRenamingItems() == true
+
+    /**
+     * `-beginRenamingItemAtIndexPath:`: starts renaming (the rename indicator does this): `addItemView` shows the title
+     * with the keyboard up; its submit renames the item through the data source's `menuRenameItemAtIndexPath`.
+     */
+    fun beginRenamingItemAtIndexPath(indexPath: CYLIndexPath) {
+        if (!isValid(indexPath) || !isRenamableAt(indexPath)) return
+        renamingIndexPath = indexPath
+        val title = menuDataSource?.menuTitleForItemAtIndexPath(indexPath).orEmpty()
+        renameRequestHandler?.let {
+            // The host's editor takes it.
+            it(indexPath, title)
+            return
+        }
+        invalidateMeasurements()
+        addItemView.beginRenamingWithTitle(title)
+        // The field is below the last section: bring it into view.
+        post { scrollView.smoothScrollTo(0, max(0, addItemView.bottom - scrollView.height)) }
+    }
+
+    /** `-cancelRenaming`: ends renaming without a change. */
+    fun cancelRenaming() {
+        if (renamingIndexPath == null) return
+        renamingIndexPath = null
+        addItemView.endRenaming()
+        invalidateMeasurements()
+    }
+
+    /**
+     * `-submitNewItemNamed:`: adds an item named `name` from your own editor, as `addItemView`'s submit does: reported
+     * through `menuDidRequestNewItemWithName` at the end of the first editable section, then the cache is saved.
+     */
+    fun submitNewItemNamed(name: String) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return
+        cancelRenaming()
+        requestNewItem(trimmed)
+    }
+
+    /**
+     * `-finishRenamingToTitle:`: renames the item being renamed to `title` (trimmed; an empty or unchanged one only ends
+     * renaming): the data source renames it, the list reloads, saves its cache and calls `menuDidRenameItemAtIndexPath`.
+     */
+    fun finishRenamingToTitle(title: String) {
+        val indexPath = renamingIndexPath ?: return
+        renamingIndexPath = null
+        addItemView.endRenaming()
+        val name = title.trim()
+        if (!isValid(indexPath) || name.isEmpty() || name == menuDataSource?.menuTitleForItemAtIndexPath(indexPath)) {
+            invalidateMeasurements()
+            return
+        }
+        menuDataSource?.menuRenameItemAtIndexPath(indexPath, name)
+        reloadMenuData()
+        saveEditableSectionsToCache()
+        menuDelegate?.menuDidRenameItemAtIndexPath(this, indexPath, name)
+    }
+
+    /**
+     * `-loadItemsWithKeys:completion:`: `loadSectionsWithKeys` with identifiers: the cache's items
+     * (`cachedItemsForSection`) and the remote source's (`fetchItemsWithKeys`, by default its titles, each its own
+     * identifier), in the order of `loadPolicy`; downloaded items are saved to the cache first.
+     */
+    fun loadItemsWithKeys(keys: List<String>, completion: (Map<String, List<CYLTagListCacheItem>>, CYLTagListDataOrigin) -> Unit) {
+        val cached = LinkedHashMap<String, List<CYLTagListCacheItem>>()
+        for (key in keys) {
+            val items = cache?.cachedItemsForSection(key) ?: cache?.cachedTitlesForSection(key)?.map { CYLTagListCacheItem(it, it) }
+            if (items != null) cached[key] = items
+        }
+        val main = android.os.Handler(android.os.Looper.getMainLooper())
+        fun fetch(done: (Boolean) -> Unit) {
+            val remote = remoteSource ?: return done(false)
+            remote.fetchItemsWithKeys(keys) { items, error ->
+                main.post {
+                    if (items == null || error != null) {
+                        done(false)
+                        return@post
+                    }
+                    val downloaded = items.filterKeys { it in keys }
+                    for ((key, sectionItems) in downloaded) {
+                        val store = cache
+                        if (store != null && store.supportsItems()) store.saveItems(sectionItems, key)
+                        else store?.saveTitles(sectionItems.map { it.title }, key)
+                    }
+                    completion(downloaded, CYLTagListDataOrigin.CYLTagListDataOriginNetwork)
+                    done(true)
+                }
+            }
+        }
+        val fallBack: (Boolean) -> Unit = { ok -> if (!ok && cached.isNotEmpty()) completion(cached, CYLTagListDataOrigin.CYLTagListDataOriginCache) }
+        when (loadPolicy) {
+            CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheThenNetwork -> {
+                if (cached.isNotEmpty()) completion(cached, CYLTagListDataOrigin.CYLTagListDataOriginCache)
+                fetch { }
+            }
+            CYLTagListLoadPolicy.CYLTagListLoadPolicyCacheFirst ->
+                if (cached.size == keys.size) completion(cached, CYLTagListDataOrigin.CYLTagListDataOriginCache) else fetch(fallBack)
+            CYLTagListLoadPolicy.CYLTagListLoadPolicyNetworkFirst -> fetch(fallBack)
+        }
+    }
+
     /** Whether `addItemView` is shown (editing, and `showsAddItemViewWhileEditing`). */
-    private fun showsAddItemView(): Boolean = isEditing && showsAddItemViewWhileEditing
+    private fun showsAddItemView(): Boolean =
+        isEditing && (showsAddItemViewWhileEditing || (renamingIndexPath != null && renameRequestHandler == null))
 
     /** The height `addItemView` takes below the sections, dp (with the bottom section inset), or 0. */
     private fun addItemViewHeight(): Float =
@@ -471,6 +634,10 @@ open class CYLTagListView @JvmOverloads constructor(
 
     /** A name submitted in `addItemView`: reported at the end of the first editable section. */
     private fun requestNewItem(name: String) {
+        if (renamingIndexPath != null) {
+            finishRenamingToTitle(name)
+            return
+        }
         val section = titles.indices.firstOrNull { sectionAllowsEditing(it) } ?: 0
         val item = titles.getOrNull(section)?.size ?: 0
         menuDelegate?.menuDidRequestNewItemWithName(this, name, CYLIndexPath(item, section))
@@ -592,7 +759,8 @@ open class CYLTagListView @JvmOverloads constructor(
             val indexPath = CYLIndexPath(item, section)
             val itemStyle = styleForItem(indexPath)
             val iconSize = CYLTagButton.iconSizeForImage(imageAt(indexPath), animationURLAt(indexPath) != null, itemStyle)
-            var width = CYLTagButton.widthForTitle(title, iconSize, isDeletableAt(indexPath), itemStyle)
+            val deletable = isDeletableAt(indexPath)
+            var width = CYLTagButton.widthForTitle(title, iconSize, deletable, deletable && isRenamableAt(indexPath), itemStyle)
             val perRow = styleForSection(section).numberOfItemsPerRow
             if (perRow > 0) width = gridItemWidth(contentWidth, perRow)
             min(width, contentWidth)
@@ -1299,6 +1467,10 @@ open class CYLTagListView @JvmOverloads constructor(
         val deletable = isDeletableAt(indexPath) && isEnabledAt(indexPath)
         cell.deletable = deletable
         cell.deleteHandler = if (deletable) ({ deleteItemAtIndexPath(indexPath) }) else null
+        val renamable = deletable && isRenamableAt(indexPath)
+        cell.isRenamable = renamable
+        cell.renamesOnTitleTap = renamable && renamesOnTitleTapWhileEditing
+        cell.renameHandler = if (renamable) ({ beginRenamingItemAtIndexPath(indexPath) }) else null
         cell.additionalAccessibilityActions = accessibilityActions(indexPath)
         menuDataSource?.menuAccessibilityHintForItemAtIndexPath(indexPath)?.let { cell.accessibilityHint = it }
     }
@@ -1547,6 +1719,17 @@ open class CYLTagListView @JvmOverloads constructor(
             ViewCompat.setAccessibilityHeading(this, true)
         }
         val foldButton = CYLTagFoldButton(context)
+        /**
+         * The section's clear button (`menuShowsClearButtonForSection`, the core's trash icon): a square as tall as a
+         * line of the title at the trailing inset, its top and bottom the title text's, tapped in a 44 dp area.
+         */
+        val clearButton = ImageButton(context).apply {
+            visibility = GONE
+            background = null
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            setPadding(0, 0, 0, 0)
+            cyl_accessibilityIdentifier = CYLTagListClearButtonAccessibilityIdentifier
+        }
         val moreButton = ImageButton(context).apply {
             background = null
             cyl_accessibilityIdentifier = CYLTagListMoreButtonAccessibilityIdentifier
@@ -1562,6 +1745,7 @@ open class CYLTagListView @JvmOverloads constructor(
             addView(iconView)
             addView(titleLabel)
             addView(foldButton)
+            addView(clearButton)
             addView(moreButton)
             indicatorView.visibility = if (style.headerIndicatorColor == null) GONE else VISIBLE
             style.headerIndicatorColor?.let { indicatorView.setBackgroundColor(it) }
@@ -1583,6 +1767,22 @@ open class CYLTagListView @JvmOverloads constructor(
             foldButton.setOnClickListener { toggleSection(section) }
             titleLabel.visibility = if (showsSectionHeaders) VISIBLE else GONE
             iconView.visibility = if (showsSectionHeaders && iconView.drawable != null) VISIBLE else GONE
+            // The clear button: the core's trash icon (or the style's image), the host's action.
+            val showsClear = source?.menuShowsClearButtonForSection(section) == true
+            clearButton.visibility = if (showsClear) VISIBLE else GONE
+            if (showsClear) {
+                val image = (style.clearButtonImage ?: CYLMenuImage("cyl_trash"))?.mutate()
+                image?.setTint(style.clearButtonColor ?: style.headerTextColor)
+                clearButton.setImageDrawable(image)
+                val title = source?.menuTitleForSection(section).orEmpty()
+                val clear = CYLMenuLocalizedString("CYLMenuClearSection", "The clear button of a section")
+                clearButton.contentDescription = if (title.isEmpty()) clear else "$clear $title"
+                androidx.appcompat.widget.TooltipCompat.setTooltipText(clearButton, clearButton.contentDescription)
+                clearButton.setOnClickListener {
+                    menuDelegate?.menuDidTapClearButtonInSection(this@CYLTagListView, section)
+                    clearButtonHandler?.invoke(section)
+                }
+            }
             val showsMore = showsMoreButtonIn(section)
             moreButton.visibility = if (showsMore) VISIBLE else GONE
             if (showsMore) {
@@ -1612,6 +1812,17 @@ open class CYLTagListView @JvmOverloads constructor(
             val inset = listStyle.headerHorizontalInset
             var trailing = width - inset
             var leading = inset
+            if (clearButton.visibility == VISIBLE) {
+                // A square as tall as a line of the title at the trailing inset, aligned with the title text.
+                val line = min(height, ceil(titleLabel.lineHeight / density))
+                trailing -= line
+                place(clearButton, CYLRect(trailing, floor((height - line) / 2), line, line))
+                // A 44 dp touch area around it.
+                val extra = max(0, ((44 - line) / 2 * density).roundToInt())
+                val bounds = android.graphics.Rect(clearButton.left - extra, clearButton.top - extra, clearButton.right + extra, clearButton.bottom + extra)
+                touchDelegate = android.view.TouchDelegate(bounds, clearButton)
+                trailing -= 8
+            }
             if (moreButton.visibility == VISIBLE) {
                 val size = min(MORE_BUTTON_SIZE, if (height > 0) max(height, 30f) else MORE_BUTTON_SIZE)
                 trailing += floor((size - 22f) / 2)

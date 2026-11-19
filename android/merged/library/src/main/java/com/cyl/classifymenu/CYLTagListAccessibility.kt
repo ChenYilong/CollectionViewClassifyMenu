@@ -23,6 +23,15 @@ const val CYLTagListMoreButtonAccessibilityIdentifier: String = "CYLTagListMoreB
 /** A tag's delete control. */
 const val CYLTagListDeleteAccessibilityIdentifier: String = "CYLTagListDeleteButton"
 
+/** `renameButton`: the rename indicator of a tag in editing mode (an edit icon before the delete indicator). */
+const val CYLTagListRenameAccessibilityIdentifier: String = "CYLTagListRenameButton"
+
+/** `renameTitle`: the title of a renamable tag in editing mode (a tap renames it, `renamesOnTitleTapWhileEditing`). */
+const val CYLTagListRenameTitleAccessibilityIdentifier: String = "CYLTagListRenameTitle"
+
+/** `clearButton`: a section header's clear button (`menuShowsClearButtonForSection`). */
+const val CYLTagListClearButtonAccessibilityIdentifier: String = "CYLTagListClearButton"
+
 /**
  * `UIAccessibilityCustomAction`: a named action TalkBack, Switch Access and Voice Access offer on a view.
  */

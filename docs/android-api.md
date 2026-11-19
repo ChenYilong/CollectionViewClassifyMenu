@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 849 / 887 with an Android counterpart = 95.7 / 100.** Full marks when no row is `TODO`; 0
+**Score: 888 / 888 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -273,9 +273,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuDataSource -menuMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuMoveItemAtIndexPath` |
 | `CYLMenuDataSource -menuSectionAllowsEditing:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuSectionAllowsEditing` |
 | `CYLMenuDataSource -menuCacheKeyForSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuCacheKeyForSection` |
-| `CYLMenuDataSource -menuShowsClearButtonForSection:` | method, `CYLMenuDataSource.swift` | TODO |
-| `CYLMenuDataSource -menuIdentifierForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | TODO |
-| `CYLMenuDataSource -menuRenameItemAtIndexPath:toTitle:` | method, `CYLMenuDataSource.swift` | TODO |
+| `CYLMenuDataSource -menuShowsClearButtonForSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuShowsClearButtonForSection (same name in the Android core)` |
+| `CYLMenuDataSource -menuIdentifierForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuIdentifierForItemAtIndexPath (same name in the Android core)` |
+| `CYLMenuDataSource -menuRenameItemAtIndexPath:toTitle:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuRenameItemAtIndexPath (same name in the Android core)` |
 | `CYLMenuDelegate` | protocol, `CYLMenuDataSource.swift` | `com.cyl.classifymenu.CYLMenuDelegate` |
 | `CYLMenuDelegate -menu:shouldSelectItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuShouldSelectItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didSelectItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidSelectItemAtIndexPath(menu, indexPath)` |
@@ -289,9 +289,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuDelegate -menu:didDeleteItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidDeleteItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didChangeEditing:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidChangeEditing(menu, editing)` |
 | `CYLMenuDelegate -menu:didFinishEditingWithTitles:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidFinishEditingWithTitles(menu, titles)` |
-| `CYLMenuDelegate -menu:didFinishEditingWithItems:` | method, `CYLMenuDataSource.swift` | TODO |
-| `CYLMenuDelegate -menu:didRenameItemAtIndexPath:toTitle:` | method, `CYLMenuDataSource.swift` | TODO |
-| `CYLMenuDelegate -menu:didTapClearButtonInSection:` | method, `CYLMenuDataSource.swift` | TODO |
+| `CYLMenuDelegate -menu:didFinishEditingWithItems:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidFinishEditingWithItems(menu, items)` |
+| `CYLMenuDelegate -menu:didRenameItemAtIndexPath:toTitle:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidRenameItemAtIndexPath(menu, indexPath, title)` |
+| `CYLMenuDelegate -menu:didTapClearButtonInSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidTapClearButtonInSection(menu, section)` |
 | `CYLMenuDelegate -menu:didLongPressItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidLongPressItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidMoveItemAtIndexPath(menu, sourceIndexPath, toIndexPath)` |
 | `CYLMenuDelegate -menu:didBeginDraggingSelectedItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath(menu, indexPath)` |
@@ -305,6 +305,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuLocalizedString` | function, `CYLMenuResources.swift` | `CYLMenuLocalizedString` |
 | `CYLMenuResources` | class, `CYLMenuResources.swift` | `com.cyl.classifymenu.CYLMenuResources` |
 | `CYLMenuResources.bundle` | property, `CYLMenuResources.swift` | `CYLMenuResources.bundle (same name in the Android core)` |
+| `CYLMenuResources.imagesBundle` | property, `CYLMenuResources.swift` | `CYLMenuResources.imagesBundle (same name in the Android core)` |
 | `CYLMenuResources +imageNamed:` | method, `CYLMenuResources.swift` | `CYLMenuResources.imageNamed` |
 | `CYLMenuResources.availableLanguages` | property, `CYLMenuResources.swift` | `CYLMenuResources.availableLanguages (same name in the Android core)` |
 | `CYLMenuResources.preferredLanguage` | property, `CYLMenuResources.swift` | `CYLMenuResources.preferredLanguage` |
@@ -368,10 +369,10 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuStyle.deleteIndicatorLineWidth` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.deleteIndicatorLineWidth` |
 | `CYLMenuStyle.deleteIndicatorWidth` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.deleteIndicatorWidth` |
 | `CYLMenuStyle.deleteIndicatorPadding` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.deleteIndicatorPadding` |
-| `CYLMenuStyle.editingIndicatorSpacing` | property, `CYLMenuStyle.swift` | TODO |
-| `CYLMenuStyle.clearButtonImage` | property, `CYLMenuStyle.swift` | TODO |
-| `CYLMenuStyle.clearButtonColor` | property, `CYLMenuStyle.swift` | TODO |
-| `CYLMenuStyle.editingIndicatorInsets` | property, `CYLMenuStyle.swift` | TODO |
+| `CYLMenuStyle.editingIndicatorSpacing` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.editingIndicatorSpacing (same name in the Android core)` |
+| `CYLMenuStyle.clearButtonImage` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.clearButtonImage (same name in the Android core)` |
+| `CYLMenuStyle.clearButtonColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.clearButtonColor (same name in the Android core)` |
+| `CYLMenuStyle.editingIndicatorInsets` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.editingIndicatorInsets (same name in the Android core)` |
 | `CYLMenuStyle.deleteIndicatorPlacement` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.deleteIndicatorPlacement` |
 | `CYLMenuStyle.rippleColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.rippleColor` |
 | `CYLMenuStyle.rippleAlpha` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.rippleAlpha` |
@@ -514,9 +515,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagButton.badgeColor` | property, `CYLTagButton.swift` | `CYLTagButton.badgeColor (same name in the Android core)` |
 | `CYLTagButton.showsDeleteIndicator` | property, `CYLTagButton.swift` | `CYLTagButton.showsDeleteIndicator` |
 | `CYLTagButton.deleteIndicatorHitFrame` | property, `CYLTagButton.swift` | `CYLTagButton.deleteIndicatorHitFrame` |
-| `CYLTagButton.showsRenameIndicator` | property, `CYLTagButton.swift` | TODO |
-| `CYLTagButton.renameIndicatorHitFrame` | property, `CYLTagButton.swift` | TODO |
-| `CYLTagButton.editingIndicatorsView` | property, `CYLTagButton.swift` | TODO |
+| `CYLTagButton.showsRenameIndicator` | property, `CYLTagButton.swift` | `CYLTagButton.showsRenameIndicator (same name in the Android core)` |
+| `CYLTagButton.renameIndicatorHitFrame` | property, `CYLTagButton.swift` | `CYLTagButton.renameIndicatorHitFrame (same name in the Android core)` |
+| `CYLTagButton.editingIndicatorsView` | property, `CYLTagButton.swift` | `CYLTagButton.editingIndicatorsView (same name in the Android core)` |
 | `CYLTagButton.style` | property, `CYLTagButton.swift` | `CYLTagButton.style` |
 | `CYLTagButton.isAnimationEngineAvailable` | property, `CYLTagButton.swift` | `CYLTagButton.isAnimationEngineAvailable` |
 | `CYLTagButton -initWithTitle:image:` | method, `CYLTagButton.swift` | `CYLTagButton(context, title, image)` |
@@ -562,16 +563,16 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListAccessibilityIdentifier.createItem` | property, `CYLTagListAccessibility.swift` | `CYLTagCreateItemAccessibilityIdentifier` |
 | `CYLTagListAccessibilityIdentifier.moreButton` | property, `CYLTagListAccessibility.swift` | `CYLTagListMoreButtonAccessibilityIdentifier` |
 | `CYLTagListAccessibilityIdentifier.deleteButton` | property, `CYLTagListAccessibility.swift` | `CYLTagListDeleteAccessibilityIdentifier` |
-| `CYLTagListAccessibilityIdentifier.renameButton` | property, `CYLTagListAccessibility.swift` | TODO |
-| `CYLTagListAccessibilityIdentifier.renameTitle` | property, `CYLTagListAccessibility.swift` | TODO |
-| `CYLTagListAccessibilityIdentifier.clearButton` | property, `CYLTagListAccessibility.swift` | TODO |
+| `CYLTagListAccessibilityIdentifier.renameButton` | property, `CYLTagListAccessibility.swift` | `CYLTagListRenameAccessibilityIdentifier` |
+| `CYLTagListAccessibilityIdentifier.renameTitle` | property, `CYLTagListAccessibility.swift` | `CYLTagListRenameTitleAccessibilityIdentifier` |
+| `CYLTagListAccessibilityIdentifier.clearButton` | property, `CYLTagListAccessibility.swift` | `CYLTagListClearButtonAccessibilityIdentifier` |
 | `CYLTagListAddItemView` | class, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView (a LinearLayout)` |
 | `CYLTagListAddItemView.textField` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.textField (EditText)` |
 | `CYLTagListAddItemView.addButton` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.addButton (Button)` |
 | `CYLTagListAddItemView.submitHandler` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.submitHandler` |
-| `CYLTagListAddItemView.isRenaming` | property, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView -beginRenamingWithTitle:` | method, `CYLTagListAddItemView.swift` | TODO |
-| `CYLTagListAddItemView -endRenaming` | method, `CYLTagListAddItemView.swift` | TODO |
+| `CYLTagListAddItemView.isRenaming` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.isRenaming (same name in the Android core)` |
+| `CYLTagListAddItemView -beginRenamingWithTitle:` | method, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.beginRenamingWithTitle (same name in the Android core)` |
+| `CYLTagListAddItemView -endRenaming` | method, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.endRenaming (same name in the Android core)` |
 | `CYLTagListAddItemView.preferredHeight` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.preferredHeight (px)` |
 | `CYLTagListAddItemView.textFieldIdentifier` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.textFieldIdentifier (the field's tag)` |
 | `CYLTagListAddItemView.addButtonIdentifier` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.addButtonIdentifier (the button's tag)` |
@@ -587,12 +588,12 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListCache -saveTitles:forSection:` | method, `CYLTagListCache.swift` | `CYLTagListCache.saveTitles` |
 | `CYLTagListCache -removeTitlesForSection:` | method, `CYLTagListCache.swift` | `CYLTagListCache.removeTitlesForSection` |
 | `CYLTagListCache -removeAllTitles` | method, `CYLTagListCache.swift` | `CYLTagListCache.removeAllTitles` |
-| `CYLTagListCache -cachedItemsForSection:` | method, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCache -saveItems:forSection:` | method, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCacheItem` | class, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCacheItem.identifier` | property, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCacheItem.title` | property, `CYLTagListCache.swift` | TODO |
-| `CYLTagListCacheItem -initWithIdentifier:title:` | method, `CYLTagListCache.swift` | TODO |
+| `CYLTagListCache -cachedItemsForSection:` | method, `CYLTagListCache.swift` | `CYLTagListCache.cachedItemsForSection (same name in the Android core)` |
+| `CYLTagListCache -saveItems:forSection:` | method, `CYLTagListCache.swift` | `CYLTagListCache.saveItems (same name in the Android core)` |
+| `CYLTagListCacheItem` | class, `CYLTagListCache.swift` | `CYLTagListCacheItem (same name in the Android core)` |
+| `CYLTagListCacheItem.identifier` | property, `CYLTagListCache.swift` | `CYLTagListCacheItem.identifier` |
+| `CYLTagListCacheItem.title` | property, `CYLTagListCache.swift` | `CYLTagListCacheItem.title` |
+| `CYLTagListCacheItem -initWithIdentifier:title:` | method, `CYLTagListCache.swift` | `CYLTagListCacheItem(identifier, title)` |
 | `CYLTagListStore` | class, `CYLTagListCache.swift` | `CYLTagListStore` |
 | `CYLTagListStore.policy` | property, `CYLTagListCache.swift` | `CYLTagListStore.policy` |
 | `CYLTagListStore.name` | property, `CYLTagListCache.swift` | `CYLTagListStore.name` |
@@ -607,15 +608,15 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListDataOriginNetwork` | enum value, `CYLTagListCache.swift` | `CYLTagListDataOrigin.CYLTagListDataOriginNetwork (same name in the Android core)` |
 | `CYLTagListRemoteSource` | protocol, `CYLTagListCache.swift` | `CYLTagListRemoteSource (same name in the Android core)` |
 | `CYLTagListRemoteSource -fetchSectionsWithKeys:completion:` | method, `CYLTagListCache.swift` | `CYLTagListRemoteSource.fetchSectionsWithKeys (same name in the Android core)` |
-| `CYLTagListRemoteSource -fetchItemsWithKeys:completion:` | method, `CYLTagListCache.swift` | TODO |
+| `CYLTagListRemoteSource -fetchItemsWithKeys:completion:` | method, `CYLTagListCache.swift` | `CYLTagListRemoteSource.fetchItemsWithKeys (same name in the Android core)` |
 | `CYLTagListCell` | class, `CYLTagListCell.swift` | `com.cyl.classifymenu.CYLTagListCell` |
 | `CYLTagListCell.button` | property, `CYLTagListCell.swift` | `CYLTagListCell.button` |
 | `CYLTagListCell.appliedStyle` | property, `CYLTagListCell.swift` | `CYLTagListCell.appliedStyle` |
 | `CYLTagListCell.isDeletable` | property, `CYLTagListCell.swift` | `CYLTagListCell.deletable` |
 | `CYLTagListCell.deleteHandler` | property, `CYLTagListCell.swift` | `CYLTagListCell.deleteHandler (same name in the Android core)` |
-| `CYLTagListCell.isRenamable` | property, `CYLTagListCell.swift` | TODO |
-| `CYLTagListCell.renameHandler` | property, `CYLTagListCell.swift` | TODO |
-| `CYLTagListCell.renamesOnTitleTap` | property, `CYLTagListCell.swift` | TODO |
+| `CYLTagListCell.isRenamable` | property, `CYLTagListCell.swift` | `CYLTagListCell.isRenamable (same name in the Android core)` |
+| `CYLTagListCell.renameHandler` | property, `CYLTagListCell.swift` | `CYLTagListCell.renameHandler (same name in the Android core)` |
+| `CYLTagListCell.renamesOnTitleTap` | property, `CYLTagListCell.swift` | `CYLTagListCell.renamesOnTitleTap (same name in the Android core)` |
 | `CYLTagListCell.additionalAccessibilityActions` | property, `CYLTagListCell.swift` | `CYLTagListCell.additionalAccessibilityActions` |
 | `CYLTagListCell -showRippleAt:` | method, `CYLTagListCell.swift` | `CYLTagListCell.showRippleAtPoint` |
 | `CYLTagListKey` | enum, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListView* configuration keys (CYLTagListViewConfiguration.kt)` |
@@ -791,10 +792,10 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView.isEditing` | property, `CYLTagListView.swift` | `CYLTagListView.isEditing` |
 | `CYLTagListView.showsAddItemViewWhileEditing` | property, `CYLTagListView.swift` | `CYLTagListView.showsAddItemViewWhileEditing` |
 | `CYLTagListView.addItemView` | property, `CYLTagListView.swift` | `CYLTagListView.addItemView` |
-| `CYLTagListView.renamingIndexPath` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.renameRequestHandler` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.clearButtonHandler` | property, `CYLTagListView.swift` | TODO |
-| `CYLTagListView.renamesOnTitleTapWhileEditing` | property, `CYLTagListView.swift` | TODO |
+| `CYLTagListView.renamingIndexPath` | property, `CYLTagListView.swift` | `CYLTagListView.renamingIndexPath (same name in the Android core)` |
+| `CYLTagListView.renameRequestHandler` | property, `CYLTagListView.swift` | `CYLTagListView.renameRequestHandler (same name in the Android core)` |
+| `CYLTagListView.clearButtonHandler` | property, `CYLTagListView.swift` | `CYLTagListView.clearButtonHandler (same name in the Android core)` |
+| `CYLTagListView.renamesOnTitleTapWhileEditing` | property, `CYLTagListView.swift` | `CYLTagListView.renamesOnTitleTapWhileEditing (same name in the Android core)` |
 | `CYLTagListView.cachePolicy` | property, `CYLTagListView.swift` | `CYLTagListView.cachePolicy` |
 | `CYLTagListView.cacheName` | property, `CYLTagListView.swift` | `CYLTagListView.cacheName` |
 | `CYLTagListView.cache` | property, `CYLTagListView.swift` | `CYLTagListView.cache` |
@@ -804,11 +805,11 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView -cachedTitlesInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.cachedTitlesInSection` |
 | `CYLTagListView -cacheKeyForSection:` | method, `CYLTagListView.swift` | `CYLTagListView.cacheKeyForSection` |
 | `CYLTagListView -saveEditableSectionsToCache` | method, `CYLTagListView.swift` | `CYLTagListView.saveEditableSectionsToCache` |
-| `CYLTagListView -editableSectionItems` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -beginRenamingItemAtIndexPath:` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -cancelRenaming` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -submitNewItemNamed:` | method, `CYLTagListView.swift` | TODO |
-| `CYLTagListView -finishRenamingToTitle:` | method, `CYLTagListView.swift` | TODO |
+| `CYLTagListView -editableSectionItems` | method, `CYLTagListView.swift` | `CYLTagListView.editableSectionItems (same name in the Android core)` |
+| `CYLTagListView -beginRenamingItemAtIndexPath:` | method, `CYLTagListView.swift` | `CYLTagListView.beginRenamingItemAtIndexPath (same name in the Android core)` |
+| `CYLTagListView -cancelRenaming` | method, `CYLTagListView.swift` | `CYLTagListView.cancelRenaming (same name in the Android core)` |
+| `CYLTagListView -submitNewItemNamed:` | method, `CYLTagListView.swift` | `CYLTagListView.submitNewItemNamed (same name in the Android core)` |
+| `CYLTagListView -finishRenamingToTitle:` | method, `CYLTagListView.swift` | `CYLTagListView.finishRenamingToTitle (same name in the Android core)` |
 | `CYLTagListView -editableSectionTitles` | method, `CYLTagListView.swift` | `CYLTagListView.editableSectionTitles (same name in the Android core)` |
 | `CYLTagListView -setEditing:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.setEditing(editing, animated)` |
 | `CYLTagListView -sectionAllowsEditing:` | method, `CYLTagListView.swift` | `CYLTagListView.sectionAllowsEditing` |
