@@ -574,3 +574,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   change needed. pod install in the four projects; menu 37 / 37, Example 110 / 110, Swift Example 22 / 22,
   TagCollectionView 6 / 6; `flutter build ios --simulator` OK. Waiting for the Windows session's bundled copies and the
   Android pin (−40) and the commit for CYLSearchViewController (−10).
+- **Result (mini program, HarmonyOS, Android; Windows session): at `5744917d`.** Mini program:
+  `scripts/fetch-cyltabbar.js` `COMMIT` and `test/animated-item.test.js`; the vendored `cyl-animated-item` and
+  `cyl-animation-placeholder` re-fetched (only their COMMIT files changed) and the installed packages; `--check` OK;
+  `npm test` 154. HarmonyOS: `harmony/cylanimateditem` re-vendored unmodified (`CYLAnimatedItemStackModel.ts` and
+  `CYLAnimatedItemStackView.ets` changed upstream) and its README; host tests 71 / 71. Android:
+  `android/merged/gradle.properties` `cyl.tabbar.commit`; library tests 94 / 0, the example builds. The C: drive was
+  full; the old Android checkouts of CYLTabBarController (`android/merged/.cyltabbar/<commit>`, git-ignored build
+  caches) were removed, so only the HarmonyOS host tests ran there, not the full HAP build.

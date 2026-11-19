@@ -8,7 +8,7 @@ depended on with `file:`, at a pinned commit.
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`5996fa962e25e216210dd24c4b3186bb2e155abe`](https://github.com/ChenYilong/CYLTabBarController/tree/5996fa962e25e216210dd24c4b3186bb2e155abe/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-19; was `b376c278`) |
+| Commit | [`5744917dfd947b4c09bbc55a0a2f2d2a853097d2`](https://github.com/ChenYilong/CYLTabBarController/tree/5744917dfd947b4c09bbc55a0a2f2d2a853097d2/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-19; was `5996fa96`) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
 | Changes | None. Only this README was added. |
