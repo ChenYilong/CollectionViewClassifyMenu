@@ -1519,3 +1519,15 @@ tags: [issues, ui, cocoapods, progress]
   mini program `strings.js` regenerated. Screenshots in the three languages:
   [ios-word-picker.png](assets/ios-word-picker.png).
 
+
+### TODO (2026-11-19, `feat/harmony`): the word picker takes several smears; demo "设计部 Alex"
+
+- Context: the owner asks whether the word picker allows several smears in a row, with screenshots; expected result
+  "设计部 Alex" from 你好，我是设计部的 Alex 👋 (zh-Hant 設計部 Alex; English, in text order: Alex Design). A second smear that
+  starts on an unselected cell adds its range to the selection (the base is the selection when it began); one that
+  starts on a selected cell removes its range.
+- Prompt (verbatim): "确认一下 这个功能能不能 多次涂抹。请截图演示 多次涂抹后，结果预期是 设计部 Alex 。待处理文字如下： Language	Message English	Hi, I'm Alex from Design 👋 Simplified Chinese	你好，我是设计部的 Alex 👋 Traditional Chinese	你好，我是設計部的 Alex 👋"
+- Prompt (English): "Confirm whether the feature allows smearing several times. Show it with screenshots; after several
+  smears the expected result is 设计部 Alex. The texts: (the three messages)."
+- Acceptance (100): a test with two smears per language giving 设计部 Alex / 設計部 Alex / Alex Design (40); the simulator:
+  two real drags per language and the field filled (40); labelled screenshots (20). Pass: 60.
