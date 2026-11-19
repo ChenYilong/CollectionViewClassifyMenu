@@ -559,3 +559,13 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   projects; menu 37 / 37, Example 98 / 98, Swift Example 22 / 22, TagCollectionView 6 / 6; `flutter build ios --simulator`
   OK. With the Windows session's bundled copies at 5996fa96 (`ba13e99c`), every platform is at the same commit:
   **100/100**.
+
+## TODO (2026-11-19, `feat/harmony`): every pin from 5996fa96 to CYLTabBarController 5744917d
+
+- **Context:** every platform is at CYLTabBarController `5996fa96`; the newest commit of `feat/cross-platform-components`
+  is `5744917d` (38 commits later; 2 files of the Swift `CYLAnimatedItemView` changed). iOS pins here (Mac session); the
+  mini program's `cyl-animated-item` / `cyl-animation-placeholder`, `harmony/cylanimateditem` and the Android pin by
+  the Windows session, so that every platform lands on one commit again.
+- **Prompt (verbatim):** "move the iOS pins with the Windows session moving the other platforms, so they land on one commit again."
+- **Acceptance (100):** iOS pins at 5744917d with pod install, the four iOS suites and the Flutter iOS build passing (50);
+  the other platforms at the same commit with their tests (40); CYLSearchViewController told the commit (10). Pass: 60.
