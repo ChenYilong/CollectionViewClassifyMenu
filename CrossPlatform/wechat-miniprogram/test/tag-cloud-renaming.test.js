@@ -11,6 +11,19 @@ const PACKAGE = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram
 const model = require(path.join(PACKAGE, 'cyl-tag-cloud/model.js'));
 const { CYLTagListStore, loadItems } = require(path.join(PACKAGE, 'cyl-tag-cloud/cache.js'));
 const { iconImage, base64 } = require(path.join(PACKAGE, 'cyl-tag-cloud/editing-icons.js'));
+// The component's own locale: after `verify-package.js` the example's i18n reaches the installed copy in node_modules,
+// a separate module, so the language is set on both (and put back after each test).
+const packageLocale = require(path.join(PACKAGE, 'locale.js'));
+
+function useLanguage(value) {
+  const before = [i18n.language(), packageLocale.language()];
+  i18n.setLanguage(value);
+  packageLocale.setLanguage(value);
+  return () => {
+    i18n.setLanguage(before[0]);
+    packageLocale.setLanguage(before[1]);
+  };
+}
 
 function setPath(target, keyPath, value) {
   const parts = keyPath.replace(/\[(\d+)\]/g, '.$1').split('.');
@@ -113,7 +126,7 @@ test('the store keeps ids with the titles; plain titles are their own ids; loadI
 });
 
 test('renaming through the add field keeps the id after a reorder and reports it when editing ends', () => {
-  i18n.setLanguage('en');
+  const restoreLanguage = useLanguage('en');
   const name = 'tag-cloud-renaming.rename';
   new CYLTagListStore('userDefaults', name).removeAllTitles();
   const cloud = mountCloud({
@@ -148,6 +161,7 @@ test('renaming through the add field keeps the id after a reorder and reports it
   assert.deepEqual(finish.detail.items['0'][1], { identifier: 'Friends', title: 'Best Friends' });
   assert.deepEqual(finish.detail.titles['0'], ['Family', 'Best Friends', 'Clients']);
   new CYLTagListStore('userDefaults', name).removeAllTitles();
+  restoreLanguage();
 });
 
 test("a host's editor renames and adds; cancelling changes nothing", () => {
@@ -175,7 +189,7 @@ test("a host's editor renames and adds; cancelling changes nothing", () => {
 });
 
 test('the header clear button is built in, read with the section title', () => {
-  i18n.setLanguage('en');
+  const restoreLanguage = useLanguage('en');
   const cloud = mountCloud({
     tags: [model.makeTag('Coworkers')],
     listStyle: model.tagCloudStyle(),
@@ -188,4 +202,5 @@ test('the header clear button is built in, read with the section title', () => {
   assert.equal(cloud.data.clearLabel, 'Clear Recent');
   cloud.onClearTap();
   assert.deepEqual(cloud.events.pop(), { name: 'clearbuttontap', detail: { section: 0 } });
+  restoreLanguage();
 });
