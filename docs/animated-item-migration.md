@@ -593,3 +593,16 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   build; no full HarmonyOS HAP build this time, the Windows disk was full). Checked on the Mac after both: no pin file
   names an older CYLTabBarController commit; `scripts/cyl-tabbar-latest-commit.sh --check` finds no stale pin.
   CYLSearchViewController told to pin `43ec09ce`.
+
+## TODO (2026-11-19, `feat/harmony`): every pin from 5744917d to CYLTabBarController f88d67a8
+
+- **Context:** CYLTabBarController `f88d67a8` (`f88d67a840a06b39dc812bf4253b14f2fb50b7c2`): CYLTabBar in Swift (migration step 100, same Objective-C
+  API), FlatDesign badges reach the visible button, FlatDesign GIF tab images rest until played, `CYLAnimatedItemView`
+  plays an animated UIImage (`playAnimatedImage`), `CYLAnimatedItemStackView` hooks `isItemViewInteractive` /
+  `dispatchesItemTaps`, mini program Sonar refactors. iOS pins here (Mac session); the mini program, HarmonyOS and
+  Android copies by the Windows session, all at one commit.
+- **Request (relayed by Mac-CYLTabBarController 小程序开发 from the owner):** "re-pin to it and push your adapted work",
+  run the tests, reply with the commit and the counts.
+- **Acceptance (100):** iOS pins at f88d67a8 with pod install, the four iOS suites and the Flutter iOS build passing,
+  anything that breaks fixed (50); the other platforms at the same commit with their tests (40); CYLTabBarController
+  and CYLSearchViewController told the commit and counts (10). Pass: 60.
