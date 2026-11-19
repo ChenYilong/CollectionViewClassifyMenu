@@ -476,6 +476,8 @@ Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
 - The Flutter and React Native examples take their strings from the iOS bundle: after changing those keys, run
   `python3 flutter/cyl_tag_list/example/tool/export_strings.py` and
   `python3 react-native/react-native-cyl-tag-list/example/tool/export_strings.py` (each has `--check`).
+- CI (`.github/workflows/localization.yml`, every pull request): `check-localization.py`, `check-localization-ports.py`
+  and both export `--check`s; a red Localization run blocks the change like a failing test.
 
 ## Accessibility
 

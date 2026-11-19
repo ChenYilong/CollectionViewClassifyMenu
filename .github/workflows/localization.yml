@@ -1,0 +1,39 @@
+# [EN] Localization checks (AGENTS.md "Internationalization and localization"): every key a lookup is called with exists
+#      in every translated language with the same format specifiers, and no Chinese text is shown outside a lookup;
+#      scripts/check-localization.py covers iOS (core, demo app, both Examples), Flutter and React Native,
+#      scripts/check-localization-ports.py covers Android, HarmonyOS and the mini program. The Flutter and React Native
+#      string tables are exported from the iOS bundle and must match it. Python 3 standard library only.
+# [CN] 本地化检查（AGENTS.md「Internationalization and localization」）：每个查找用到的键在所有翻译语言中都存在且格式说明符
+#      一致，界面上没有绕过查找的中文；scripts/check-localization.py 覆盖 iOS（核心、演示 App、两个 Example）、Flutter 与
+#      React Native，scripts/check-localization-ports.py 覆盖 Android、HarmonyOS 与小程序。Flutter 与 React Native 的字符串表
+#      由 iOS 资源包导出，必须与其一致。只用 Python 3 标准库。
+name: Localization
+
+on:
+  pull_request:
+  push:
+    branches: [ master, 'claude/**' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: localization-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Localization checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: iOS, Flutter and React Native
+        run: python3 scripts/check-localization.py
+      - name: Android, HarmonyOS and the mini program
+        run: python3 scripts/check-localization-ports.py
+      - name: Flutter and React Native tables match the iOS bundle
+        run: |
+          python3 flutter/cyl_tag_list/example/tool/export_strings.py --check
+          python3 react-native/react-native-cyl-tag-list/example/tool/export_strings.py --check
