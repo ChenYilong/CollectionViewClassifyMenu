@@ -453,6 +453,47 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertFalse(messages[0].unicodeScalars.contains { (0x3400...0x9FFF).contains($0.value) }, "English has no Chinese")
     }
 
+    /// Several smears in a row add up: each one that starts on an unselected cell adds its range to the selection. In
+    /// the demo's message, "设计部" and then " Alex" (from the space before the name) give "设计部 Alex"; in Traditional
+    /// Chinese "設計部 Alex"; in English, in text order, "Alex" and then " Design" give "Alex Design".
+    func testSeveralSmearsAddUp() {
+        let cases: [(String, [(String, String)], String)] = [
+            ("zh-Hans", [("设计部", "设计部"), (" Alex", " Alex")], "设计部 Alex"),
+            ("zh-Hant", [("設計部", "設計部"), (" Alex", " Alex")], "設計部 Alex"),
+            ("en", [("Alex", "Alex"), (" Design", " Design")], "Alex Design"),
+        ]
+        for (language, smears, expected) in cases {
+            CYLMenuResources.preferredLanguage = language
+            let text = CYLWordPickerDemoViewController.message
+            let list = wordPickerList(text)
+            let collection = list.probe.collectionView
+            let characters = Array(text).map(String.init)
+            func cells(of word: String) -> Range<Int> {
+                let letters = Array(word).map(String.init)
+                let start = (0...(characters.count - letters.count)).first {
+                    Array(characters[$0..<($0 + letters.count)]) == letters
+                }!
+                return start..<(start + letters.count)
+            }
+            func center(_ item: Int) -> CGPoint {
+                let frame = collection.layoutAttributesForItem(at: ip(item, 0))?.frame ?? .zero
+                return CGPoint(x: frame.midX, y: frame.midY)
+            }
+            let pan = CYLFakePan()
+            for (word, _) in smears {
+                let range = cells(of: word)
+                for (state, item) in [(UIGestureRecognizer.State.began, range.lowerBound),
+                                      (.changed, range.upperBound - 1), (.ended, range.upperBound - 1)] {
+                    pan.fakeState = state
+                    pan.fakeLocation = center(item)
+                    list.perform(NSSelectorFromString("handleSmear:"), with: pan)
+                }
+            }
+            XCTAssertEqual(list.selectedText, expected, language)
+        }
+        CYLMenuResources.preferredLanguage = "zh-Hans"
+    }
+
     /// A drag that starts on a cell selects every cell from it to the finger; starting on a selected cell deselects;
     /// the delegate hears of each change.
     func testSmearSelectionSelectsAndDeselectsARange() {

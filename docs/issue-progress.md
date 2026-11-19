@@ -1524,7 +1524,7 @@ tags: [issues, ui, cocoapods, progress]
   [ios-word-picker.png](assets/ios-word-picker.png).
 
 
-### TODO (2026-11-19, `feat/harmony`): the word picker takes several smears; demo "设计部 Alex"
+### DONE (2026-11-19, `feat/harmony`): the word picker takes several smears; demo "设计部 Alex"
 
 - Context: the owner asks whether the word picker allows several smears in a row, with screenshots; expected result
   "设计部 Alex" from 你好，我是设计部的 Alex 👋 (zh-Hant 設計部 Alex; English, in text order: Alex Design). A second smear that
@@ -1535,3 +1535,11 @@ tags: [issues, ui, cocoapods, progress]
   smears the expected result is 设计部 Alex. The texts: (the three messages)."
 - Acceptance (100): a test with two smears per language giving 设计部 Alex / 設計部 Alex / Alex Design (40); the simulator:
   two real drags per language and the field filled (40); labelled screenshots (20). Pass: 60.
+- Result (DONE, **100 / 100**): yes, several smears add up (no code change needed): each smear that starts on an
+  unselected cell adds its range to the selection it began with; one that starts on a selected cell removes its range.
+  Test `testSeveralSmearsAddUp` (through the real gesture handler, all three languages): 设计部 then " Alex" gives
+  "设计部 Alex", zh-Hant "設計部 Alex", English (cells follow the text) "Alex" then " Design" gives "Alex Design";
+  `CYLAndroidSampleTests` 12 / 12. Simulator: two real drags per language (the second starting on the space cell before
+  the word), then Fill in: the remark field shows exactly those texts.
+  Screenshots: [ios-word-picker-several-smears.png](assets/ios-word-picker-several-smears.png).
+
