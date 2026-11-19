@@ -1,0 +1,16 @@
+/* CYLTagButton on its own: cyl-tag-list's tag box (model.js tagLayout sets the numbers and colors inline), not clipped,
+   so that the badge on the icon's (or the title's) top trailing corner stays whole. */
+:host { display: inline-block; }
+.cyl-tag-button {
+  display: inline-flex; align-items: center; box-sizing: border-box; border-style: solid; white-space: nowrap;
+  max-width: 100%; overflow: visible;
+}
+.cyl-tag-button:active { opacity: 0.85; }
+.cyl-icon-slot { position: relative; flex: none; }
+.cyl-icon { position: absolute; left: 0; top: 0; display: block; }
+/* cyl-animated-item lays its icon out in a box of its own (at least 44 px high, 4 px padding, transparent): its center is
+   put on the icon frame's center, so the icon fills the frame and the rest of the box, clipped by the tag, draws nothing. */
+.cyl-animated-icon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); line-height: 0; }
+.cyl-glyph { display: flex; align-items: center; justify-content: center; line-height: 1; overflow: visible; }
+.cyl-title-box { position: relative; display: inline-grid; min-width: 0; overflow: visible; }
+.cyl-title { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -1,0 +1,19 @@
+<view class="page">
+  <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view" id="preview" class="preview" configuration="{{configuration}}" bind:selectionchange="onSelectionChange" />
+  <view class="separator" />
+  <scroll-view scroll-y class="table">
+    <view class="ios-grouped table-content">
+      <view wx:for="{{sections}}" wx:for-item="section" wx:key="header" class="ios-section">
+        <view class="ios-section-header">{{section.header}}</view>
+        <view class="ios-group">
+          <view wx:for="{{section.rows}}" wx:for-item="row" wx:key="identifier" class="ios-cell"
+                hover-class="ios-cell-hover" data-identifier="{{row.identifier}}" bindtap="onRowTap" id="action-{{row.identifier}}"
+                aria-role="button" aria-label="{{row.title}}{{row.value ? ', ' + row.value : ''}}">
+            <text class="ios-cell-text action-title">{{row.title}}</text>
+            <text wx:if="{{row.value}}" class="ios-cell-detail action-value">{{row.value}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

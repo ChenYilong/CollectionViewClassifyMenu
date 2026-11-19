@@ -1,0 +1,55 @@
+<scroll-view class="scroll" scroll-y="{{!reordering}}" scroll-into-view="{{scrollIntoView}}">
+  <block wx:if="{{containers.length}}">
+  <view class="stack">
+    <cyl-tag-cloud id="container-0" class="container" tags="{{containers[0].tags}}" list-style="{{containers[0].style}}"
+                   color-theme="{{containers[0].options.colorTheme}}" allows-tapping="{{containers[0].options.allowsTapping}}"
+                   allows-reordering="{{containers[0].options.allowsReordering}}"
+                   removes-items-on-delete="{{containers[0].options.removesItemsOnDelete}}"
+                   default-tag-image="{{containers[0].options.defaultTagImage}}"
+                   container-border-width="{{containers[0].options.containerBorderWidth}}"
+                   container-border-color="{{containers[0].options.containerBorderColor}}"
+                   container-corner-radius="{{containers[0].options.containerCornerRadius}}"
+                   bind:tagtap="onFirstTap" bind:taglongpress="onFirstLongPress" bind:tagdelete="onFirstDelete"
+                   bind:reorderingchange="onReorderingChange" />
+    <view class="add-row">
+      <input class="sample-field" placeholder-class="sample-field-placeholder" placeholder="{{fieldLabel}}"
+             aria-label="{{fieldLabel}}" value="{{text}}" bindinput="onInput" confirm-type="done" />
+      <view class="sample-button" hover-class="sample-button-hover" style="background-color: {{gray}};"
+            id="sample.add" bindtap="addTag" aria-role="button" aria-label="{{addTitle}}">{{addTitle}}</view>
+    </view>
+    <cyl-tag-cloud id="container-1" class="container" tags="{{containers[1].tags}}" list-style="{{containers[1].style}}"
+                   color-theme="{{containers[1].options.colorTheme}}" allows-tapping="{{containers[1].options.allowsTapping}}"
+                   allows-reordering="{{containers[1].options.allowsReordering}}"
+                   container-border-width="{{containers[1].options.containerBorderWidth}}"
+                   container-border-color="{{containers[1].options.containerBorderColor}}"
+                   container-corner-radius="{{containers[1].options.containerCornerRadius}}"
+                   bind:reorderingchange="onReorderingChange" />
+    <cyl-tag-cloud id="container-2" class="container spaced" tags="{{containers[2].tags}}" list-style="{{containers[2].style}}"
+                   color-theme="{{containers[2].options.colorTheme}}" allows-tapping="{{containers[2].options.allowsTapping}}"
+                   removes-items-on-delete="{{containers[2].options.removesItemsOnDelete}}"
+                   container-border-width="{{containers[2].options.containerBorderWidth}}"
+                   container-border-color="{{containers[2].options.containerBorderColor}}"
+                   container-corner-radius="{{containers[2].options.containerCornerRadius}}"
+                   bind:tagtap="onThirdTap" bind:taglongpress="onThirdLongPress" bind:selectedtagdrag="onThirdSelectedDrag" />
+    <cyl-tag-cloud id="container-3" class="container spaced" tags="{{containers[3].tags}}" list-style="{{containers[3].style}}"
+                   color-theme="{{containers[3].options.colorTheme}}" allows-tapping="{{containers[3].options.allowsTapping}}"
+                   container-border-width="{{containers[3].options.containerBorderWidth}}"
+                   container-border-color="{{containers[3].options.containerBorderColor}}"
+                   container-corner-radius="{{containers[3].options.containerCornerRadius}}"
+                   bind:tagtap="onFourthTap" />
+    <cyl-tag-cloud id="container-4" class="container spaced" tags="{{containers[4].tags}}" list-style="{{containers[4].style}}"
+                   color-theme="{{containers[4].options.colorTheme}}" allows-tapping="{{containers[4].options.allowsTapping}}"
+                   container-border-width="{{containers[4].options.containerBorderWidth}}"
+                   container-border-color="{{containers[4].options.containerBorderColor}}"
+                   container-corner-radius="{{containers[4].options.containerCornerRadius}}" />
+    <cyl-tag-cloud id="container-5" class="container spaced" tags="{{containers[5].tags}}" list-style="{{containers[5].style}}"
+                   color-theme="{{containers[5].options.colorTheme}}" allows-tapping="{{containers[5].options.allowsTapping}}"
+                   removes-items-on-delete="{{containers[5].options.removesItemsOnDelete}}"
+                   container-border-width="{{containers[5].options.containerBorderWidth}}"
+                   container-border-color="{{containers[5].options.containerBorderColor}}"
+                   container-corner-radius="{{containers[5].options.containerCornerRadius}}"
+                   bind:tagdelete="onFirstDelete" />
+  </view>
+  </block>
+  <cyl-sample-toast id="toast" />
+</scroll-view>

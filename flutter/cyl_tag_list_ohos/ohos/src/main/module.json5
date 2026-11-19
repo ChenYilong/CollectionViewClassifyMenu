@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cyl_tag_list_ohos",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

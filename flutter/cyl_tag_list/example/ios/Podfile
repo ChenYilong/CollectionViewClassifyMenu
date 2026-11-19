@@ -1,0 +1,55 @@
+# Uncomment this line to define a global platform for your project
+platform :ios, '15.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks! :linkage => :static
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  # The native tag list the plugin wraps comes through Swift Package Manager (flutter/cyl_tag_list/ios/cyl_tag_list/
+  # Package.swift); a CollectionViewClassifyMenu pod as well would link it twice (3666 duplicate symbols).
+  # The animation engine the tags play Lottie files with (found at run time; the core does not depend on it).
+  cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
+                  :commit => '74f0b4cd8c8e55b8954650b063e2955b9f4e92ef' }
+  pod 'CYLTabBarController', cyl_tab_bar
+  pod 'CollectionViewClassifyMenu', :path => '../../../..'
+  pod 'CYLAnimatedItem', cyl_tab_bar
+  # The animated icon engines the example plays; the core depends on the CYLAnimatedItem pod only.
+  pod 'CYLAnimatedItem/LottieObjectiveC', cyl_tab_bar
+  pod 'CYLAnimatedItem/Rive', cyl_tab_bar
+  pod 'CYLAnimatedItem/SVGA', cyl_tab_bar
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+  end
+end

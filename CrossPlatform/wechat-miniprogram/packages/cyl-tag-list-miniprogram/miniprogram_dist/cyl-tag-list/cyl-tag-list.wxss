@@ -1,0 +1,36 @@
+/* The layout of the core's CYLTagListView and CYLTagButton (CYLMenuStyle defaults, overridable by the configuration's
+   style): per section a header (headerHeight 36, gray 14 pt title, headerHorizontalInset 16), then the tags inside
+   sectionInsets with interitemSpacing and lineSpacing; a tag centers its icon slot and title with imageTitleSpacing
+   between them. The numbers and colors are set inline from the style (model.js tagLayout / sectionLayout). */
+:host { display: block; }
+.cyl-header { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+.cyl-header-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cyl-fold-header { display: flex; align-items: center; font-size: 13px; padding: 4px 0 4px 12px; }
+.cyl-items { display: flex; flex-wrap: wrap; }
+.cyl-item {
+  display: inline-flex; align-items: center; box-sizing: border-box; border-style: solid; white-space: nowrap;
+  max-width: 100%; overflow: hidden;
+}
+.cyl-item:active { opacity: 0.85; }
+.cyl-icon-slot { position: relative; flex: none; }
+.cyl-icon { position: absolute; left: 0; top: 0; display: block; }
+/* cyl-animated-item lays its icon out in a box of its own (at least 44 px high, 4 px padding, transparent): its center is
+   put on the icon frame's center, so the icon fills the frame and the rest of the box, clipped by the tag, draws nothing. */
+.cyl-animated-icon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); line-height: 0; }
+/* An emoji stand-in takes the icon's frame like an image; its glyph is drawn inside it. */
+.cyl-glyph { display: flex; align-items: center; justify-content: center; line-height: 1; overflow: visible; }
+.cyl-spacer { flex: none; height: 1px; }
+/* The title and, hidden, the title in the fonts of the other states: the tag is as wide as its widest state. */
+.cyl-title-box { position: relative; display: inline-grid; min-width: 0; overflow: hidden; }
+.cyl-title, .cyl-sizer { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cyl-sizer { visibility: hidden; height: 0; }
+.cyl-fold-tail { justify-content: center; }
+/* CYLTagListFooterView: 28 pt high, chevron.down in the fold color, turned 180° when expanded. */
+.cyl-fold-footer { display: flex; align-items: center; justify-content: center; height: 28px; font-size: 13px; }
+.cyl-footer-chevron {
+  width: 8px; height: 8px; margin-top: -5px; transform: rotate(45deg); transition: transform 0.25s;
+  border-style: solid; border-color: currentColor; border-width: 0 1.6px 1.6px 0;
+}
+.cyl-footer-chevron-up { transform: rotate(225deg); margin-top: 5px; }
+.cyl-fold-arrow { display: inline-block; margin-left: 2px; transition: transform 0.2s; }
+.cyl-up { transform: rotate(180deg); }

@@ -25,7 +25,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
     /// The style being edited; applied to the preview after every action.
     private(set) var style: CYLMenuStyle = CYLTagStyleDemoViewController.demoStyle()
     private(set) var content: CYLTagStyleDemoContent = .iconAndTitle
-    /// "lottie", "gif", "pag", "rive", or nil for static icons.
+    /// "lottie", "gif", "pag", "rive", "svga", or nil for static icons.
     private(set) var animationLibrary: String?
     private(set) var usesSelectedImage = true
     private var menuSource: CYLExampleMenuSource?
@@ -38,21 +38,25 @@ final class CYLTagStyleDemoViewController: UIViewController {
     /// Identifiers of the actions, in table order (e.g. "iconColor.normal", "cornerRadius").
     func actionIdentifiers() -> [[String]] {
         [
+            ["sample.reorder"],
             ["iconColor.normal", "iconColor.selected", "titleColor.normal", "titleColor.selected", "font",
              "imageTitleSpacing", "imageSize", "imageInsets", "titlePositionAdjustment", "imagePositionAdjustment",
              "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"],
             ["backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"],
-            ["animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
-            ["sample.tagCloud", "sample.imageTag", "sample.tagContainer"],
+            ["animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
+            ["sample.tagCloud", "sample.imageTag", "sample.tagContainer", "sample.about"],
+            ["sample.wordPicker"],
             ["reset"],
         ]
     }
 
     func title(forSection section: Int) -> String {
-        [CYLExampleLocalizedString("标题与图标（参照 CYLFlatDesignTabBarItem）"),
+        [CYLExampleLocalizedString("拖拽排序（长按标签后拖动）"),
+         CYLExampleLocalizedString("标题与图标（参照 CYLFlatDesignTabBarItem）"),
          CYLExampleLocalizedString("背景、边框与圆角（参照 CYLBadgeView）"),
          CYLExampleLocalizedString("动效图标（CYLTabBarController 动效引擎）"),
          CYLExampleLocalizedString("Android 标签库示例（Swift 复刻）"),
+         CYLExampleLocalizedString("选词填入（涂抹选择）"),
          CYLExampleLocalizedString("其它")][section]
     }
 
@@ -82,14 +86,18 @@ final class CYLTagStyleDemoViewController: UIViewController {
         "animation.lottie": "Lottie 动效图标",
         "animation.pag": "PAG 动效图标",
         "animation.rive": "Rive 动效图标",
+        "animation.svga": "SVGA 动效图标",
         "animation.gif": "GIF 动效图标",
         "animation.off": "关闭动效（静态图标）",
         "animationSpeed": "设置动效速度 animationSpeed",
         "configuration": "配置文件 / 字典（map）初始化",
         "tagCloud": "标签云：android-tagview 的初始化方式",
+        "sample.reorder": "拖拽标签重新排序",
         "sample.tagCloud": "android-tagview 示例（Swift 版）",
         "sample.imageTag": "TagViewGroup 示例：图片标签",
         "sample.tagContainer": "AndroidTagView 示例：标签容器",
+        "sample.about": "关于：三个 Android 标签库的来源与许可",
+        "sample.wordPicker": "选词填入：涂抹选择填入词",
         "reset": "重置 reset",
     ]
 
@@ -188,7 +196,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
             for appearance in appearances {
                 appearance.margin = margin
             }
-        case "animation.lottie", "animation.pag", "animation.rive", "animation.gif", "animation.off":
+        case "animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off":
             let library = String(identifier.dropFirst("animation.".count))
             animationLibrary = library == "off" ? nil : library
             reloadItems()
@@ -207,6 +215,9 @@ final class CYLTagStyleDemoViewController: UIViewController {
         case "tagCloud":
             navigationController?.pushViewController(CYLTagCloudDemoViewController(), animated: true)
             return
+        case "sample.reorder":
+            navigationController?.pushViewController(CYLTagContainerSampleViewController(), animated: true)
+            return
         case "sample.tagCloud":
             navigationController?.pushViewController(CYLTagCloudSampleViewController(), animated: true)
             return
@@ -215,6 +226,12 @@ final class CYLTagStyleDemoViewController: UIViewController {
             return
         case "sample.tagContainer":
             navigationController?.pushViewController(CYLTagContainerSampleViewController(), animated: true)
+            return
+        case "sample.wordPicker":
+            navigationController?.pushViewController(CYLWordPickerDemoViewController(), animated: true)
+            return
+        case "sample.about":
+            navigationController?.pushViewController(CYLAndroidSamplesAboutViewController(), animated: true)
             return
         case "reset":
             self.style = Self.demoStyle()
@@ -304,7 +321,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         tagListView.selectedIndexPaths = selection.isEmpty ? [IndexPath(item: 0, section: 0)] : selection
     }
 
-    /// The demo's animated icons, from CYLTabBarController's examples (Lottie, GIF, Rive) and
+    /// The demo's animated icons, from CYLTabBarController's examples (Lottie, GIF, Rive, SVGA) and
     /// libpag/pag-ios (PAG, downloaded by `pod install`).
     func animationURL(forIndex index: Int) -> URL? {
         let files: [String: [String]] = [
@@ -312,12 +329,13 @@ final class CYLTagStyleDemoViewController: UIViewController {
             "gif": ["CYLMenuExample.bundle/Animations/GIF/tab_star.gif", "CYLMenuExample.bundle/Animations/GIF/cyl_tab_sample_animated.gif"],
             "pag": ["pag-ios/0.pag", "pag-ios/1.pag"],
             "rive": ["CYLMenuExample.bundle/Animations/Rive/house.riv", "CYLMenuExample.bundle/Animations/Rive/menu_button.riv"],
+            "svga": ["CYLMenuExample.bundle/Animations/SVGA/tab_home.svga", "CYLMenuExample.bundle/Animations/SVGA/tab_profile.svga"],
         ]
         guard let library = animationLibrary, let names = files[library], !names.isEmpty else { return nil }
         var url = Bundle.main.resourceURL?.appendingPathComponent(names[index % names.count])
         if library == "rive" {
             // The state machines CYLTabBarController's Rive example plays for these files.
-            url = CYLMenuAnimationURLWithOptions(url, index % 2 == 0
+            url = url?.cylAddingAnimationOptions(index % 2 == 0
                 ? ["stateMachine": "State Machine 1"]
                 : ["stateMachine": "State Machine", "input": "isOpen", "duration": "0"])
         }

@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""Android -> iOS API table: every public symbol of the Android core and its iOS counterpart.
+
+  android_public_api.py          write docs/android-ios-api.md
+  android_public_api.py --check  exit 1 when docs/android-ios-api.md is out of date
+
+Android symbols are the public declarations of android/merged/library (class / interface / object / enum class, their
+public `fun` / `val` / `var` members and enum entries, and top-level `fun` / `val`). A symbol has an iOS counterpart
+when (1) android/merged/api-map.json maps an iOS symbol to it (the iOS -> Android table, docs/android-api.md), or
+(2) android/merged/ios-map.json names one by hand, or (3) the iOS Swift core (CollectionViewClassifyMenu/Class,
+TagCollectionView) declares a type or member of the same name. Everything else is `TODO`.
+"""
+import json
+import pathlib
+import re
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+KOTLIN = ROOT / "android/merged/library/src/main/java/com/cyl/classifymenu"
+API_MAP = ROOT / "android/merged/api-map.json"
+IOS_MAP = ROOT / "android/merged/ios-map.json"
+IOS_DIRS = [ROOT / "CollectionViewClassifyMenu/Class", ROOT / "TagCollectionView"]
+DOC = ROOT / "docs/android-ios-api.md"
+
+DECL = re.compile(r"^(\s*)((?:@\w+(?:\([^)]*\))?\s+)*)((?:(?:public|open|abstract|override|data|enum|sealed|inline|operator|infix|const|lateinit|companion|final)\s+)*)"
+                  r"(class|interface|object|fun|val|var)\s+(?:<[^>]+>\s*)?(?:[\w.]+\.)?(`?\w+`?)")
+HIDDEN = re.compile(r"\b(private|internal|protected)\b")
+
+
+def kotlin_symbols():
+    """[(file, owner, name, kind, line)] of public Kotlin declarations; owner is '' for top-level ones."""
+    out = []
+    for path in sorted(KOTLIN.rglob("*.kt")):
+        if path.name.startswith("._"):
+            continue
+        stack = []  # (indent, name, is_enum)
+        lines = path.read_text(encoding="utf-8").splitlines()
+        depth = 0
+        # A class whose primary constructor spans several lines: (name, open parentheses) until the line that closes
+        # it. Its `val` / `var` parameters are the class's properties; a `{` on the closing line opens its body.
+        ctor = None
+        for no, line in enumerate(lines, 1):
+            stripped = line.strip()
+            if stripped.startswith(("//", "*", "/*")):
+                continue
+            if ctor:
+                p = DECL.match(line)
+                if p and p.group(4) in ("val", "var") and not HIDDEN.search(line[:p.start(4)]) \
+                        and "override" not in p.group(3):
+                    out.append((path.name, ctor[0], p.group(5).strip("`"), p.group(4), no))
+                opened = ctor[1] + line.count("(") - line.count(")")
+                if opened > 0:
+                    ctor = (ctor[0], opened)
+                    continue
+                ctor = None
+                depth += line.count("{") - line.count("}")
+                if "{" not in line and stack:
+                    stack.pop()
+                continue
+            while stack and depth < stack[-1][0]:
+                stack.pop()
+            m = DECL.match(line)
+            prefix = line[:m.start(4)] if m else ""
+            if m and not HIDDEN.search(prefix) and depth == (stack[-1][0] if stack else 0):
+                kind, name = m.group(4), m.group(5).strip("`")
+                owner = stack[-1][1] if stack else ""
+                if not (kind in ("fun", "val", "var") and "override" in m.group(3)):
+                    out.append((path.name, owner, name, kind, no))
+                if kind in ("class", "interface", "object") and name != "companion":
+                    stack.append((depth + 1, name if "companion" not in m.group(3) else owner, "enum" in m.group(3)))
+            elif stack and stack[-1][2] and re.match(r"^\s+([A-Z][A-Za-z0-9_]*)\s*[,(;]", line) and depth == stack[-1][0]:
+                out.append((path.name, stack[-1][1], re.match(r"^\s+(\w+)", line).group(1), "entry", no))
+            depth += line.count("{") - line.count("}")
+            if m and m.group(4) in ("class", "interface", "object") and "{" not in line and stack and stack[-1][1] == m.group(5):
+                if line.count("(") > line.count(")"):
+                    ctor = (m.group(5).strip("`"), line.count("(") - line.count(")"))
+                else:
+                    stack.pop()
+    return out
+
+
+def mapped_from_api_map():
+    """Kotlin symbols ('Owner.name' or 'name') that the iOS -> Android map points at, with their iOS symbol."""
+    found = {}
+    for ios, kotlin in json.loads(API_MAP.read_text(encoding="utf-8")).items():
+        for part in re.split(r"[,;/]| and ", kotlin):
+            part = part.strip().split("(")[0].replace("com.cyl.classifymenu.", "").strip()
+            if part:
+                found.setdefault(part, ios)
+                found.setdefault(part.split(".")[-1], ios)
+    return found
+
+
+def mapped_from_swift_symbols():
+    """Kotlin symbols ('Owner.name' or 'name') with the current Swift symbol that maps to them, from the same pairs as
+    the iOS -> Android table (ios_public_api.py): the iOS column names what the Swift core declares now, not the
+    Objective-C selector an api-map.json key may still carry from before the Swift migration."""
+    import ios_public_api
+    mapping = json.loads(API_MAP.read_text(encoding="utf-8"))
+    kotlin = ios_public_api.kotlin_names()
+    found = {}
+    for row in ios_public_api.symbols(ROOT):
+        cell = ios_public_api.counterpart(row, mapping, kotlin)
+        if not cell:
+            continue
+        for part in re.split(r"[,;/]| and ", cell):
+            part = part.strip().split("(")[0].replace("com.cyl.classifymenu.", "").strip()
+            if part:
+                swift = row[5] if len(row) > 5 else row[3]
+                found.setdefault(part, swift)
+                found.setdefault(part.split(".")[-1], swift)
+    return found
+
+
+def ios_names():
+    names = set()
+    for d in IOS_DIRS:
+        for path in d.rglob("*.swift"):
+            if path.name.startswith("._"):
+                continue
+            for m in re.finditer(r"\b(?:class|struct|enum|protocol|func|var|let|case)\s+`?(\w+)", path.read_text(encoding="utf-8")):
+                names.add(m.group(1))
+        # The Objective-C headers (most of the iOS core): classes, protocols, properties, enum cases, constants and the
+        # first part of each method selector (`-setSectionExpanded:animated:` -> setSectionExpanded).
+        for path in d.rglob("*.h"):
+            if path.name.startswith("._"):
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for m in re.finditer(r"@(?:interface|protocol)\s+(\w+)", text):
+                names.add(m.group(1))
+            for m in re.finditer(r"@property\s*(?:\([^)]*\))?[^;]*?\b(\w+)\s*(?:(?:NS|API|UI)_\w+(?:\([^)]*\))?\s*)*;", text):
+                names.add(m.group(1))
+            for m in re.finditer(r"^\s*[-+]\s*\([^)]*\)\s*(\w+)", text, re.M):
+                names.add(m.group(1))
+            for m in re.finditer(r"\b(?:extern|FOUNDATION_EXPORT|UIKIT_EXTERN)\b[^;]*?\b(\w+)\s*;", text):
+                names.add(m.group(1))
+            for m in re.finditer(r"^\s*((?:CYL|k)\w+)\s*(?:=|,|NS_SWIFT|$)", text, re.M):
+                names.add(m.group(1))
+    return names
+
+
+def swift_case(owner, name):
+    """`CYLImageTagDirectionLeftCenter` of `CYLImageTagDirection` -> `leftCenter`, the Swift case name."""
+    rest = name[len(owner):] if owner and name.startswith(owner) else name
+    return rest[:1].lower() + rest[1:] if rest else name
+
+
+def build():
+    symbols = kotlin_symbols()
+    api_map = mapped_from_api_map()
+    swift_map = mapped_from_swift_symbols()
+    hand = json.loads(IOS_MAP.read_text(encoding="utf-8")) if IOS_MAP.exists() else {}
+    ios = ios_names()
+    rows, done = [], 0
+    for file, owner, name, kind, line in symbols:
+        key = f"{owner}.{name}" if owner else name
+        if key in hand:
+            counterpart = hand[key]
+        elif key in swift_map:
+            counterpart = f"`{swift_map[key]}`"
+        elif name in swift_map and re.match(r"^(CYL|k)[A-Z]", name):
+            # A global name (an enum value that Kotlin nests under its type, a constant): unique across the core.
+            counterpart = f"`{swift_map[name]}`"
+        # api-map.json keys alone no longer count: 155 of them still name Objective-C selectors that the Swift
+        # migration renamed or removed (CYLFilterParamsTool…), so a match must come from a current Swift symbol.
+        elif name in ios or swift_case(owner, name) in ios:
+            counterpart = f"`{name}` (same name in the iOS core)"
+        else:
+            counterpart = "TODO"
+        done += counterpart != "TODO"
+        desc = {"class": "class", "interface": "interface", "object": "object", "fun": "method", "val": "read-only property",
+                "var": "property", "entry": "enum case"}[kind]
+        rows.append(f"| `{key}` | {desc}, `{file}:{line}` | {counterpart} |")
+    total = len(rows)
+    score = 100.0 * done / total if total else 100.0
+    head = f"""---
+title: Android and iOS core API (Android -> iOS)
+date: 2026-11-17
+tags: [android, ios, api-parity, score]
+---
+
+# Android and iOS core API (Android -> iOS)
+
+Every public symbol of the Android core (`android/merged/library`, Kotlin) and its counterpart in the iOS core
+(`CollectionViewClassifyMenu/Class`, `TagCollectionView`, Swift). Generated by `android/scripts/android_public_api.py`
+from the Kotlin sources, `android/merged/api-map.json` (the reverse table, [android-api.md](android-api.md)) and
+`android/merged/ios-map.json` (hand-made entries); do not edit the table by hand. A row without a counterpart is `TODO`.
+
+**Score: {done} / {total} with an iOS counterpart = {score:.1f} / 100.** Full marks when no row is `TODO`; 0 when every
+row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same
+logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100.
+
+| Android API | Description | iOS API |
+|---|---|---|
+"""
+    return head + "\n".join(rows) + "\n", done, total, score
+
+
+def main():
+    text, done, total, score = build()
+    if "--check" in sys.argv:
+        current = DOC.read_text(encoding="utf-8") if DOC.exists() else ""
+        sys.exit(0 if current == text else 1)
+    DOC.write_text(text, encoding="utf-8")
+    print(f"{done} / {total} = {score:.1f}")
+
+
+if __name__ == "__main__":
+    main()

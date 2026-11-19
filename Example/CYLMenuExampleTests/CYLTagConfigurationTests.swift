@@ -21,9 +21,12 @@ final class CYLTagConfigurationTests: XCTestCase {
         XCTAssertEqual(view.selectedIndexPaths, [ip(1, 0)])
         XCTAssertNotNil(view.configurationDataSource, "The view keeps the data source it built")
         XCTAssertTrue(view.menuDataSource === view.configurationDataSource)
-        XCTAssertEqual(view.menuDataSource?.menuNumberOfItems(inSection: 0), 5)
-        XCTAssertEqual(view.menuDataSource?.menuTitleForItem(at: ip(4, 0)), "Text only", "A string item is a title")
-        XCTAssertNotNil(view.menuDataSource?.menuImageForItem?(at: ip(3, 0)), "system: images are SF Symbols")
+        // Lottie, GIF, Rive, SVGA, then an image-only item and a string item, the last two items.
+        let count = view.menuDataSource?.menuNumberOfItems(inSection: 0) ?? 0
+        XCTAssertEqual(count, 6)
+        XCTAssertEqual(view.menuDataSource?.menuTitleForItem(at: ip(count - 1, 0)), "Text only", "A string item is a title")
+        XCTAssertNotNil(view.menuDataSource?.menuImageForItem?(at: ip(count - 2, 0)), "system: images are SF Symbols")
+        XCTAssertEqual(view.menuDataSource?.menuAnimationURLForItem?(at: ip(3, 0))?.pathExtension, "svga")
         XCTAssertEqual(view.style.imageSize, CGSize(width: 20, height: 20))
         XCTAssertEqual(view.style.normalAppearance.cornerRadius, 8)
         XCTAssertEqual(view.style.normalAppearance.iconColor, UIColor.systemIndigo)
@@ -31,30 +34,30 @@ final class CYLTagConfigurationTests: XCTestCase {
 
     func testConfigurationStringValuesAreConverted() {
         let normal: [String: Any] = [
-            CYLTagAppearanceTextColor: "#FF0000",
-            CYLTagAppearanceBorderColor: "systemBlue",
-            CYLTagAppearanceFont: ["size": 15, "weight": "bold"] as [String: Any],
-            CYLTagAppearanceMargin: "6",
+            CYLTagAppearanceKey.textColor: "#FF0000",
+            CYLTagAppearanceKey.borderColor: "systemBlue",
+            CYLTagAppearanceKey.font: ["size": 15, "weight": "bold"] as [String: Any],
+            CYLTagAppearanceKey.margin: "6",
         ]
         let style: [String: Any] = [
-            CYLMenuStyleImageInsets: "{1, 2, 3, 4}",
-            CYLMenuStyleTitlePositionAdjustment: [2, -1],
-            CYLMenuStyleImageSize: ["width": 18, "height": 16],
-            CYLMenuStyleLayoutCentered: "no",
-            CYLMenuStyleNormal: normal,
+            CYLMenuStyleKey.imageInsets: "{1, 2, 3, 4}",
+            CYLMenuStyleKey.titlePositionAdjustment: [2, -1],
+            CYLMenuStyleKey.imageSize: ["width": 18, "height": 16],
+            CYLMenuStyleKey.layoutCentered: "no",
+            CYLMenuStyleKey.normal: normal,
         ]
         let sections: [[String: Any]] = [
-            [CYLTagSectionTitle: "A", CYLTagSectionItems: ["x", "y"]],
-            [CYLTagSectionTitle: "B", CYLTagSectionItems: [[CYLTagItemTitle: "z", CYLTagItemEnabled: "false"]]],
+            [CYLTagSectionKey.title: "A", CYLTagSectionKey.items: ["x", "y"]],
+            [CYLTagSectionKey.title: "B", CYLTagSectionKey.items: [[CYLTagItemKey.title: "z", CYLTagItemKey.enabled: "false"]]],
         ]
         let view = CYLTagListView(configuration: [
-            CYLTagListViewSelectionMode: "single",
-            CYLTagListViewFoldStyle: "footerChevron",
-            CYLTagListViewDefaultVisibleRows: "2",
-            CYLTagListViewShowsSectionHeaders: "false",
-            CYLTagListViewSelectedItems: ["1-0"],
-            CYLTagListViewStyle: style,
-            CYLTagListViewSections: sections,
+            CYLTagListKey.selectionMode: "single",
+            CYLTagListKey.foldStyle: "footerChevron",
+            CYLTagListKey.defaultVisibleRows: "2",
+            CYLTagListKey.showsSectionHeaders: "false",
+            CYLTagListKey.selectedItems: ["1-0"],
+            CYLTagListKey.style: style,
+            CYLTagListKey.sections: sections,
         ])
         XCTAssertEqual(view.selectionMode, .single)
         XCTAssertEqual(view.foldStyle, .footerChevron)
@@ -77,7 +80,7 @@ final class CYLTagConfigurationTests: XCTestCase {
 
     func testConfigurationFileCreatesAnimatedTags() throws {
         let file = CYLTagConfigurationDemoViewController.configurationFilePath()
-        let configuration = try CYLTagListView.configuration(withContentsOfFile: file)
+        let configuration = try CYLTagListView.configuration(contentsOfFile: file)
         XCTAssertFalse(configuration.isEmpty)
         let view = try CYLTagListView(configurationFile: file)
         XCTAssertEqual(view.selectionMode, .single)

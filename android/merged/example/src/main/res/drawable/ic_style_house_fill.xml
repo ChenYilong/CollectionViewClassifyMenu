@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SF Symbol "house.fill" of the menu example's Styles screen. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FF000000" android:strokeColor="#FF000000" android:strokeWidth="1.8"
+        android:strokeLineJoin="round" android:strokeLineCap="round" android:pathData="M3.5,11L12,4l8.5,7M5.5,9.5V20h5v-5.5h3V20h5V9.5" />
+</vector>

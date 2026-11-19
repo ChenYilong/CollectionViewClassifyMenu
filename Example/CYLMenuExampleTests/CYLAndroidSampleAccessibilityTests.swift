@@ -176,7 +176,8 @@ final class CYLAndroidSampleAccessibilityTests: CYLMenuExampleTestCase {
 
         // Activating the picture toggles the groups, as a tap does; hidden groups have no elements.
         XCTAssertTrue(picture.accessibilityActivate())
-        runMainLoop(for: UIAccessibility.isReduceMotionEnabled ? 0.05 : 1.2)
+        // The hide animation (the dot's bounce, then a 0.4 s fade) ends later on a busy CI simulator: wait for it.
+        waitUntil { group.isGroupHidden }
         XCTAssertTrue(group.isGroupHidden)
         XCTAssertEqual((group.accessibilityElements ?? []).count, 0)
         imageView.toggleTagGroups(animated: false)
@@ -206,8 +207,8 @@ final class CYLAndroidSampleAccessibilityTests: CYLMenuExampleTestCase {
 
         // Activating a tag turns it, and the hint stays on the new view.
         let before = imageView.tagGroups[0].tags[0].direction
-        group.delegate?.groupView?(group, didTapTagAt: 0)
-        XCTAssertEqual(imageView.tagGroups[0].tags[0].direction, CYLImageTagDirectionNext(before))
+        group.delegate?.groupView(group, didTapTagAt: 0)
+        XCTAssertEqual(imageView.tagGroups[0].tags[0].direction, before.next)
         XCTAssertEqual(group.tagViews[0].accessibilityHint, "轻点两下改变方向")
 
         // The delete action asks first, as the long press does.

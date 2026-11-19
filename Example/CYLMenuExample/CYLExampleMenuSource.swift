@@ -49,6 +49,12 @@ final class CYLExampleMenuSection: NSObject {
         self.init(title: title, items: titles.map(CYLExampleMenuItem.init(title:)))
     }
 
+    /// Convenience: one plain item per key, each title looked up in the Example's language (the keys are the
+    /// Simplified Chinese source text, as everywhere in the Example's tables).
+    convenience init(title: String, localizedTitles keys: [String]) {
+        self.init(title: title, titles: keys.map { CYLExampleLocalizedString($0) })
+    }
+
     override convenience init() {
         self.init(title: "", items: [])
     }

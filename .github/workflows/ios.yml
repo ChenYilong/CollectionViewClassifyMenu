@@ -13,9 +13,12 @@ on:
 permissions:
   contents: read
 
+# A started run always finishes: several sessions push to the same branch within minutes, and cancelling the running
+# run on every push left no iOS run finished for hours (2026-11-17). GitHub keeps at most one pending run per group and
+# replaces it with the newest push, so the queue stays one run deep.
 concurrency:
   group: ios-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   # [EN] A pull request that only changes docs (docs/, *.md, *.gif) skips the macOS steps; the jobs still report success.
@@ -30,6 +33,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # [EN] Long paths break checkouts on Windows (260-character limit), so every tracked path stays at most 160 characters.
+      # [CN] 路径过长会导致 Windows 上 checkout 失败（260 字符上限），所有受版本控制的路径保持在 160 字符以内。
+      - name: Path length
+        run: bash scripts/check-path-length.sh 160
       - id: diff
         name: Code changed?
         env:
@@ -186,6 +193,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SCREENSHOT_REF: ${{ github.head_ref || github.ref_name }}
+          SCREENSHOT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: scripts/publish-screenshots.sh
       - uses: actions/upload-artifact@v4
         # [EN] Screenshots are required (AGENTS.md); a failed upload must still be visible, so it is not ignored.

@@ -1,0 +1,66 @@
+# [EN] WeChat Mini Program example (CrossPlatform/wechat-miniprogram): the unit tests (node --test) and the check that
+#      the exported data matches Example-Shared/Database/cyl_places.sqlite and the Lottie files.
+# [CN] 微信小程序示例（CrossPlatform/wechat-miniprogram）：运行单元测试（node --test），并检查导出的数据与
+#      Example-Shared/Database/cyl_places.sqlite 及 Lottie 文件一致。
+name: Mini Program
+
+on:
+  pull_request:
+    paths:
+      - 'CrossPlatform/wechat-miniprogram/**'
+      - 'Example-Shared/Database/**'
+      - 'Example/CYLMenuExample/CYLMenuExample.bundle/**'
+      - 'CollectionViewClassifyMenu/Resources/Localization/**'
+      - 'CollectionViewClassifyMenu/Class/Other/data.json'
+      - 'flutter/cyl_tag_list/example/assets/**'
+      - 'scripts/export-miniprogram-data.py'
+      - '.github/workflows/miniprogram.yml'
+  push:
+    branches: [ master, 'claude/**' ]
+    paths:
+      - 'CrossPlatform/wechat-miniprogram/**'
+      - 'Example-Shared/Database/**'
+      - 'Example/CYLMenuExample/CYLMenuExample.bundle/**'
+      - 'CollectionViewClassifyMenu/Resources/Localization/**'
+      - 'CollectionViewClassifyMenu/Class/Other/data.json'
+      - 'scripts/export-miniprogram-data.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Unit tests and data check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Data check
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 scripts/export-miniprogram-data.py --check
+          python3 CrossPlatform/wechat-miniprogram/scripts/export-search-data.py --check
+          python3 CrossPlatform/wechat-miniprogram/scripts/export-animations.py --check
+      # [EN] CYLTabBarController's tab bar component at the pinned commit, so its configuration reader checks the example's tab bar.
+      # [CN] 按固定 commit 安装 CYLTabBarController 的 TabBar 组件，用它的配置读取器检查示例的 TabBar。
+      - name: CYLTabBarController component
+        working-directory: CrossPlatform/wechat-miniprogram
+        run: |
+          python3 ../../scripts/fetch-animation-resources.py PAGResources
+          node scripts/fetch-cyltabbar.js && node scripts/fetch-cyltabbar.js --check
+      # [EN] The tag list library (packages/cyl-tag-list-miniprogram), linked by npm install; npm pack must ship exactly its files.
+      # [CN] 标签库（packages/cyl-tag-list-miniprogram）由 npm install 链接；npm pack 的包必须正好包含它的文件。
+      - name: Unit tests
+        working-directory: CrossPlatform/wechat-miniprogram
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+      - name: npm package
+        working-directory: CrossPlatform/wechat-miniprogram
+        run: |
+          node scripts/verify-package.js
+          npm test

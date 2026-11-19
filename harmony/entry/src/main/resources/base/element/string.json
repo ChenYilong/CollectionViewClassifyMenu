@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "CYLClassifyMenu example"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "CYLClassifyMenu example"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "CYLMenuExample"
+    },
+    {
+      "name": "tab_home",
+      "value": "Home"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "Nearby"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Messages"
+    },
+    {
+      "name": "tab_me",
+      "value": "Me"
+    }
+  ]
+}

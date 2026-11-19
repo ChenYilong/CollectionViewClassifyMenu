@@ -26,12 +26,18 @@ echo "$LATEST"
 if [ "${1:-}" = "--check" ]; then
   SHA=${LATEST%% *}
   STATUS=0
-  for PODFILE in "$ROOT"/Example/Podfile "$ROOT"/Example-Swift/Podfile; do
+  for PODFILE in "$ROOT"/Podfile "$ROOT"/Example/Podfile "$ROOT"/Example-Swift/Podfile "$ROOT"/TagCollectionView/Podfile; do
     [ -f "$PODFILE" ] || continue
     if grep -q "CYLTabBarController" "$PODFILE" && ! grep -q ":commit => '$SHA'" "$PODFILE"; then
       echo "warning: ${PODFILE#"$ROOT"/} does not pin CYLTabBarController at $SHA"
       STATUS=1
     fi
   done
+  # [EN] The Flutter example's flutter_cyltabbar (a git dependency at the same commit). [CN] Flutter 示例的 flutter_cyltabbar（同一提交的 git 依赖）。
+  PUBSPEC="$ROOT/flutter/cyl_tag_list/example/pubspec.yaml"
+  if [ -f "$PUBSPEC" ] && grep -q "flutter_cyltabbar:" "$PUBSPEC" && ! grep -q "ref: $SHA" "$PUBSPEC"; then
+    echo "warning: ${PUBSPEC#"$ROOT"/} does not pin flutter_cyltabbar at $SHA"
+    STATUS=1
+  fi
   exit "$STATUS"
 fi

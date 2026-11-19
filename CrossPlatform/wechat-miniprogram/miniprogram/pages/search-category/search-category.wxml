@@ -1,0 +1,53 @@
+<!-- The navigation bar: the back button and the search bar (CYLSearchBarView as the titleView). -->
+<view class="nav" style="padding-top: {{nav.statusBar}}px;">
+  <view class="nav-bar" style="height: {{nav.height}}px; padding-right: {{nav.rightInset}}px;">
+    <view class="nav-back" bindtap="goBack" hover-class="nav-back-hover" aria-role="button" aria-label="{{backLabel}}">
+      <image class="nav-back-image" src="/images/search/chevron-left-blue.svg" mode="aspectFit" />
+    </view>
+    <view class="search-field">
+      <image class="search-icon" src="/images/search/magnifyingglass.svg" mode="aspectFit" aria-hidden="true" />
+      <input id="searchField" class="search-input" value="{{searchText}}" placeholder="{{placeholder}}"
+             placeholder-class="search-placeholder" confirm-type="search" aria-label="{{placeholder}}"
+             bindinput="onSearchInput" bindconfirm="onSearchConfirm" />
+    </view>
+  </view>
+</view>
+
+<!-- One page per category, only the selected one shown; they end above the tab bar. -->
+<view class="pages" style="top: {{nav.statusBar + nav.height}}px;">
+  <scroll-view wx:for="{{pages}}" wx:for-item="page" wx:key="index" scroll-y
+               class="page {{page.index === category ? '' : 'page-hidden'}}" id="page-{{page.index}}">
+    <view wx:for="{{page.sections}}" wx:for-item="section" wx:key="title">
+      <view class="header" aria-role="heading"
+            style="height: {{header.height}}px; font-size: {{header.fontSize}}px; color: {{header.color}}; padding: 0 {{header.horizontalInset}}px;">
+        <text class="header-title">{{section.title}}</text>
+      </view>
+      <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view" configuration="{{section.configuration}}" bind:tagtap="onTagTap" />
+    </view>
+  </scroll-view>
+
+  <!-- 职位: the job category sidebar, then the keywords with the industry button in their header. -->
+  <view class="page jobs {{category === 3 ? '' : 'page-hidden'}}" id="page-3">
+    <scroll-view scroll-y class="sidebar">
+      <view wx:for="{{jobCategories}}" wx:key="*this" id="jobCategory-{{index}}"
+            class="sidebar-row {{index === jobCategoryIndex ? 'sidebar-row-selected' : ''}}"
+            data-index="{{index}}" bindtap="onJobCategoryTap" aria-role="button" aria-label="{{item}}"
+            aria-selected="{{index === jobCategoryIndex}}">
+        <text class="sidebar-text">{{item}}</text>
+      </view>
+    </scroll-view>
+    <scroll-view scroll-y class="job-tags">
+      <view class="header"
+            style="height: {{header.height}}px; font-size: {{header.fontSize}}px; color: {{header.color}}; padding: 0 {{header.horizontalInset}}px;">
+        <text class="header-title" aria-role="heading">{{jobSection.title}}</text>
+        <view id="industryButton" class="industry-button" hover-class="industry-button-hover" bindtap="showIndustryMenu"
+              aria-role="button" aria-label="{{industryButton.accessibilityLabel}}">{{industryButton.title}}</view>
+      </view>
+      <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view" configuration="{{jobSection.configuration}}" bind:tagtap="onTagTap" />
+    </scroll-view>
+  </view>
+</view>
+
+<!-- The category tab bar (the nested CYLTabBarController), at the bottom like every tab bar. -->
+<cyl-tab-bar id="categoryTabBar" configuration="{{tabBarConfiguration}}" image-base-path="/images"
+             selected-identifier="{{selectedIdentifier}}" bind:select="onCategorySelect" />

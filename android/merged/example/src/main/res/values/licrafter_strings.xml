@@ -1,0 +1,22 @@
+<!-- The TagViewGroup sample (com.licrafter.sample), prefixed: licrafter_. -->
+<resources>
+    <string name="licrafter_title_main">TagViewGroup</string>
+    <string name="licrafter_title_edit">Create tags</string>
+    <string name="licrafter_title_list">Tag list</string>
+    <string name="licrafter_create_tags">Create tags</string>
+    <string name="licrafter_tag_list">Tag list</string>
+    <string name="licrafter_create">Create</string>
+    <string name="licrafter_save">Save</string>
+    <string name="licrafter_cancel">Cancel</string>
+    <string name="licrafter_ok">OK</string>
+    <string name="licrafter_circle_click">Tapped the dot</string>
+    <string name="licrafter_tag_click">Tapped tag: %1$s</string>
+    <string name="licrafter_tag_hint">Tag %1$d</string>
+    <string name="licrafter_delete_group">Delete tag group</string>
+    <string name="licrafter_delete_group_message">Do you want to delete this tag group?</string>
+    <string name="licrafter_toggle_hint">Double-tap to show or hide the tags</string>
+    <string name="licrafter_edit_info">1. Tap Create to make a tag group\n2. Drag a group to move it\n3. Tap a tag to turn it\n4. Tap the dot for a message\n5. Long-press a group to delete it</string>
+    <string name="licrafter_picture_shoes">Picture of shoes</string>
+    <string name="licrafter_picture_bag">Picture of a bag</string>
+    <string name="licrafter_picture_clothes">Picture of a shirt</string>
+</resources>

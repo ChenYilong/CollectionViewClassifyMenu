@@ -1,0 +1,5 @@
+@import "../../styles/android-sample.wxss";
+
+/* systemBackground; the button 200 pt wide, centered. */
+.page { display: flex; align-items: center; justify-content: center; height: 100vh; background: #FFFFFF; }
+.sample-button { width: 200px; }

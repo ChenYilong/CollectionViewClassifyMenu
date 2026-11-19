@@ -1,0 +1,42 @@
+<view class="page">
+  <!-- The navigation bar: back, and the mode control as its titleView (UISegmentedControl). -->
+  <view class="nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar" style="height: {{navBarHeight}}px; padding-right: {{navRight}}px;">
+      <view class="nav-back" bindtap="goBack" hover-class="nav-back-hover" aria-role="button" aria-label="{{backLabel}}">
+        <view class="nav-back-chevron" />
+      </view>
+      <view class="segmented" aria-role="tablist">
+        <view wx:for="{{segments}}" wx:key="*this" class="segment {{index === modeIndex ? 'segment-selected' : ''}}"
+              data-index="{{index}}" bindtap="onModeTap" id="mode-{{index}}"
+              aria-role="tab" aria-label="{{item}}" aria-selected="{{index === modeIndex}}">
+          <text class="segment-title">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- The filter: multiple choice, folded to two rows, the footer chevron (the component's) alone below the tags. -->
+  <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view" id="review-filter" class="filter" configuration="{{configuration}}"
+                bindtagtap="onTagTap" bindselectionchange="onSelectionChange"
+                bindfoldchange="onFoldChange" />
+
+  <!-- The status: a spinner while the server answers, the last tap, the selection, the mode and its count. -->
+  <view class="status">
+    <view wx:if="{{loading}}" class="spinner" aria-hidden="true" />
+    <text class="status-text" user-select>{{status}}</text>
+  </view>
+
+  <view class="table {{loading ? 'table-loading' : ''}}">
+    <scroll-view class="table-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+      <view wx:for="{{rows}}" wx:key="id" class="cell" aria-label="{{item.label}}">
+        <image class="cell-image" src="/images/reviews/person-crop-circle.png" mode="aspectFit" aria-hidden="true" />
+        <view class="cell-content">
+          <text class="cell-text">{{item.user}}</text>
+          <text class="cell-secondary">{{item.secondary}}</text>
+        </view>
+      </view>
+    </scroll-view>
+    <!-- The table's backgroundView when nothing matches. -->
+    <view wx:if="{{empty}}" class="empty">{{emptyText}}</view>
+  </view>
+</view>

@@ -12,36 +12,44 @@ import CollectionViewClassifyMenu
 
 /// The sample's lists and colors.
 enum CYLTagContainerSampleData {
+    // NOLOCALIZE-BEGIN: AndroidTagView's sample lists, deliberately multilingual (the same tags in every language).
     static let list1 = ["Java", "C++", "Python", "Swift", "你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。",
-                        "PHP", "JavaScript", "Html", "Welcome to use AndroidTagView!"]
+                        "PHP", "JavaScript", "Html", welcomeTitle]
+    /// The sample's last tag ("Welcome to use AndroidTagView!" upstream), naming the OS it runs on and this library:
+    /// "Welcome to use iOS 27.2 CollectionViewClassifyMenu" on an iOS 27.2 simulator.
+    static var welcomeTitle: String {
+        "Welcome to use \(UIDevice.current.systemName) \(UIDevice.current.systemVersion) CollectionViewClassifyMenu"
+    }
     static let list2 = ["China", "USA", "Austria", "Japan", "Sudan", "Spain", "UK", "Germany", "Niger", "Poland", "Norway",
                         "Uruguay", "Brazil"]
     static let list3 = ["Persian", "波斯语", "فارسی", "Hello", "你好", "سلام"]
+    // NOLOCALIZE-END
     static let list4 = ["Adele", "Whitney Houston"]
     static let list5 = ["Custom Red Color", "Custom Blue Color"]
+    /// Tag layout options (AndroidTagView issues #19, #79, #101, #105, #68, #70, #119): a drawable, wrapping, elevation,
+    /// a cross drawable, no cross on the last tag.
+    static let list6 = ["Starred", "A long tag that wraps onto a second line instead of leaving the container", "End"]
 
     /// {backgroundColor, tagBorderColor, tagTextColor, tagSelectedBackgroundColor} of list5.
     static func colors5() -> [CYLTagColors] {
         ["#ff0000", "#0000ff"].map {
-            CYLTagColors(backgroundColor: CYLMenuColorFromString($0), borderColor: .black, textColor: .white,
-                         selectedBackgroundColor: CYLMenuColorFromString("#999999"))
+            CYLTagColors(backgroundColor: UIColor.cylMenuColor(from: $0), borderColor: .black, textColor: .white,
+                         selectedBackgroundColor: UIColor.cylMenuColor(from: "#999999"))
         }
     }
 
-    /// The default image (yellow_avatar): a round yellow face.
+    /// The default image: AndroidTagView's sample drawable yellow_avatar (Apache 2.0), as in the Android example.
     static func avatar() -> UIImage {
-        UIGraphicsImageRenderer(size: CGSize(width: 48, height: 48)).image { _ in
-            UIColor.systemYellow.setFill()
-            UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 48, height: 48)).fill()
-            UIColor.brown.setFill()
-            UIBezierPath(ovalIn: CGRect(x: 14, y: 16, width: 6, height: 6)).fill()
-            UIBezierPath(ovalIn: CGRect(x: 28, y: 16, width: 6, height: 6)).fill()
-            let smile = UIBezierPath(arcCenter: CGPoint(x: 24, y: 26), radius: 11, startAngle: 0.2 * .pi, endAngle: 0.8 * .pi, clockwise: true)
-            smile.lineWidth = 3
-            UIColor.brown.setStroke()
-            smile.stroke()
-        }
+        UIImage(named: "lujun_yellow_avatar") ?? UIImage()
     }
+
+    /// The photos the sample loads for list1, one per tag in turn (MainActivity.loadImages); a tag keeps the default
+    /// avatar until its photo arrives, or when it fails.
+    static let avatarURLs = [
+        "https://forums.oneplus.com/data/avatars/m/231/231279.jpg",
+        "https://d1marr3m5x4iac.cloudfront.net/images/block/movies/17214/17214_aa.jpg",
+        "https://lh3.googleusercontent.com/-KSI1bJ1aVS4/AAAAAAAAAAI/AAAAAAAAB9c/Vrgt6WyS5OU/il/photo.jpg",
+    ].compactMap(URL.init(string:))
 }
 
 final class CYLTagContainerSampleViewController: UIViewController {
@@ -80,8 +88,8 @@ final class CYLTagContainerSampleViewController: UIViewController {
         let first = Self.makeContainer { list, style in
             style.interitemSpacing = 10
             style.lineSpacing = 10
-            style.imageSize = CGSize(width: 24, height: 24)
-            style.imageCornerRadius = 12
+            // The avatar is a circle as tall as the tag, at its leading edge (CYLTagButton, a CYLAnimatedItemView).
+            style.imageFillsTagHeight = true
             list.allowsReordering = true
             list.allowsTapping = true
             list.colorTheme = .pureTeal
@@ -94,6 +102,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
         first.tagClickHandler = { [weak self] position, tag in self?.toast(CYLExampleLocalizedString("点击位置：%ld，文字：%@", position, tag.title)) }
         first.tagLongPressHandler = { [weak self] position, _ in self?.confirmDelete(at: position) }
         first.longPressAccessibilityActionName = CYLExampleLocalizedString("删除")
+        loadAvatars(into: first)
         first.tagDeleteHandler = { [weak self] position, _ in self?.toast(CYLExampleLocalizedString("点了标签的叉！位置 = %ld", position)) }
 
         let field = CYLAndroidSample.textField(placeholder: CYLExampleLocalizedString("新标签"), label: CYLExampleLocalizedString("新标签"))
@@ -121,9 +130,9 @@ final class CYLTagContainerSampleViewController: UIViewController {
             style.interitemSpacing = 10
             style.lineSpacing = 10
             style.backgroundColor = .clear
+            // container_gravity="right": each row from the right edge, the first tag rightmost.
             style.rowAlignment = .trailing
             style.maximumTitleLength = 18
-            style.reversesTitleCharacters = true
             style.deleteIndicatorPlacement = .leading
             style.tagContentInsets = UIEdgeInsets(top: 10, left: 15, bottom: 10, right: 15)
             for appearance in [style.normalAppearance, style.selectedAppearance] {
@@ -185,10 +194,39 @@ final class CYLTagContainerSampleViewController: UIViewController {
         }
         fifth.setTags(withTitles: data.list5, colors: data.colors5())
 
-        containers = [first, second, third, fourth, fifth]
+        // tagcontainerLayout6: gravity end, 4 pt elevation, a cross drawable, 100 characters, wrapping titles, cyan
+        // tags; a star before the first tag, no cross on the last.
+        let sixth = Self.makeContainer { list, style in
+            style.interitemSpacing = 10
+            style.lineSpacing = 10
+            style.rowAlignment = .trailing
+            style.elevation = 4
+            style.maximumTitleLength = 100
+            style.titleWraps = true
+            style.imageSize = CGSize(width: 18, height: 18)
+            style.imageTitleSpacing = 6
+            style.deleteIndicatorImage = UIImage(systemName: "xmark.circle.fill")?
+                .withTintColor(.systemGray, renderingMode: .alwaysOriginal)
+            for appearance in [style.normalAppearance, style.selectedAppearance, style.disabledAppearance] {
+                appearance.backgroundColor = UIColor.cylMenuColor(from: "#E0F7FA") ?? .systemTeal
+                appearance.borderColor = UIColor.cylMenuColor(from: "#4DD0E1") ?? .systemTeal
+                appearance.textColor = UIColor.cylMenuColor(from: "#006064") ?? .label
+            }
+            list.colorTheme = CYLTagColorTheme.none
+            list.removesItemsOnDelete = false
+        }
+        sixth.setTags(withTitles: data.list6)
+        sixth.tagDataSource.tags.forEach { $0.isDeletable = true }
+        sixth.tagDataSource.tags.last?.isDeletable = false
+        sixth.tagDataSource.tags.first?.image = UIImage(systemName: "star.fill")?
+            .withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
+        sixth.reloadMenuData()
+        sixth.tagDeleteHandler = { [weak self] position, _ in self?.toast(CYLExampleLocalizedString("点了标签的叉！位置 = %ld", position)) }
+
+        containers = [first, second, third, fourth, fifth, sixth]
         stackView.axis = .vertical
         stackView.spacing = 12
-        for (index, view) in [first, addRow, second, third, fourth, fifth].enumerated() {
+        for (index, view) in [first, addRow, second, third, fourth, fifth, sixth].enumerated() {
             stackView.addArrangedSubview(view)
             if index >= 3 {
                 stackView.setCustomSpacing(20, after: stackView.arrangedSubviews[index - 1])
@@ -225,6 +263,22 @@ final class CYLTagContainerSampleViewController: UIViewController {
         }
     }
 
+    /// MainActivity.loadImages: each tag of list1 gets one of the three photos in turn, set when it arrives.
+    private func loadAvatars(into list: CYLTagListView) {
+        let urls = CYLTagContainerSampleData.avatarURLs
+        for index in list.tags.indices {
+            let url = urls[index % urls.count]
+            URLSession.shared.dataTask(with: url) { [weak list] data, _, _ in
+                guard let data, let image = UIImage(data: data) else { return }
+                DispatchQueue.main.async {
+                    guard let list, index < list.tags.count else { return }
+                    list.tags[index].image = image
+                    list.reloadMenuData()
+                }
+            }.resume()
+        }
+    }
+
     func addTag() {
         containers.first?.addTag(withTitle: textField.text ?? "")
         view.setNeedsLayout()
@@ -236,7 +290,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("删除"), style: .destructive) { [weak self] _ in
             guard let first = self?.containers.first, position < first.tags.count else { return }
-            first.removeTag(at: UInt(position))
+            first.removeTag(at: position)
             self?.view.setNeedsLayout()
         })
         alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("取消"), style: .cancel))

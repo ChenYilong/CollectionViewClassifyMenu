@@ -47,7 +47,7 @@ final class CYLTagCloudTests: CYLMenuExampleTestCase {
         XCTAssertEqual(copy.cornerRadius, 20)
 
         // Every look property lands in the style (android-tagview's tagTextColor, layoutColor, layoutColorPress…).
-        let style = tag.style(withBaseStyle: CYLMenuStyle())
+        let style = tag.style(basedOn: CYLMenuStyle())
         XCTAssertEqual(style.normalAppearance.textColor, .white)
         XCTAssertEqual(style.highlightedBackgroundColor, UIColor(white: 0.33, alpha: 1))
         XCTAssertEqual(style.normalAppearance.cornerRadius, 20)
@@ -55,7 +55,7 @@ final class CYLTagCloudTests: CYLMenuExampleTestCase {
         XCTAssertEqual(style.normalAppearance.font.pointSize, 14)
         XCTAssertEqual(style.normalAppearance.borderWidth, 1)
         XCTAssertEqual(style.normalAppearance.borderColor, .white)
-        let custom = CYLTagCloudDemoViewController.styledTags()[3].style(withBaseStyle: CYLMenuStyle())
+        let custom = CYLTagCloudDemoViewController.styledTags()[3].style(basedOn: CYLMenuStyle())
         XCTAssertEqual(custom.deleteIndicatorTitle, "⊗")
         XCTAssertEqual(custom.deleteIndicatorFont?.pointSize, 18)
         XCTAssertEqual(CYLMenuStyle().deleteIndicatorTitle, "×")
@@ -129,7 +129,7 @@ final class CYLTagCloudTests: CYLMenuExampleTestCase {
         captureScreen(named: "test-tag-cloud-deletable")
 
         // A tap on the × (the cell's delete control) deletes; a tap on the title does not.
-        let control = cell?.contentView.views(withIdentifier: CYLTagListDeleteAccessibilityIdentifier).first as? UIControl
+        let control = cell?.contentView.views(withIdentifier: CYLTagListAccessibilityIdentifier.deleteButton).first as? UIControl
         XCTAssertNotNil(control)
         XCTAssertFalse(control?.isHidden ?? true)
         control?.sendActions(for: .touchUpInside)
@@ -147,8 +147,8 @@ final class CYLTagCloudTests: CYLMenuExampleTestCase {
     func testDeletableItemsOfAHostDataSourceAndAConfiguration() {
         // A configuration's section items: "deletable" removes them from the view's own data.
         let list = CYLTagListView(configuration: [
-            CYLTagListViewSections: [[CYLTagSectionTitle: "A",
-                                      CYLTagSectionItems: [[CYLTagItemTitle: "x", CYLTagItemDeletable: true], "y"]]],
+            CYLTagListKey.sections: [[CYLTagSectionKey.title: "A",
+                                      CYLTagSectionKey.items: [[CYLTagItemKey.title: "x", CYLTagItemKey.deletable: true], "y"]]],
         ])
         show(list, size: CGSize(width: 375, height: 300))
         list.probe.layOut()
@@ -238,17 +238,17 @@ final class CYLTagCloudTests: CYLMenuExampleTestCase {
         XCTAssertEqual(list.style.lineSpacing, 5)
         XCTAssertEqual(list.style.tagContentInsets, UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10))
         let africa = list.probe.tagButton(at: ip(2, 0))
-        XCTAssertEqual(africa?.style.highlightedBackgroundColor, CYLMenuColorFromString("#88363636"))
+        XCTAssertEqual(africa?.style.highlightedBackgroundColor, UIColor.cylMenuColor(from: "#88363636"))
         XCTAssertEqual(CYLColorComponents(africa?.titleLabel.textColor), CYLColorComponents(.white))
 
         let style = CYLMenuStyle(configuration: [
-            CYLMenuStyleDeleteIndicatorTitle: "✕",
-            CYLMenuStyleDeleteIndicatorColor: "#FF0000",
-            CYLMenuStyleDeleteIndicatorFont: 16,
-            CYLMenuStyleNormal: [CYLTagAppearanceContentInsets: [1, 2, 3, 4], CYLTagAppearanceBackgroundImage: "system:star"],
+            CYLMenuStyleKey.deleteIndicatorTitle: "✕",
+            CYLMenuStyleKey.deleteIndicatorColor: "#FF0000",
+            CYLMenuStyleKey.deleteIndicatorFont: 16,
+            CYLMenuStyleKey.normal: [CYLTagAppearanceKey.contentInsets: [1, 2, 3, 4], CYLTagAppearanceKey.backgroundImage: "system:star"],
         ])
         XCTAssertEqual(style.deleteIndicatorTitle, "✕")
-        XCTAssertEqual(style.deleteIndicatorColor, CYLMenuColorFromString("#FF0000"))
+        XCTAssertEqual(style.deleteIndicatorColor, UIColor.cylMenuColor(from: "#FF0000"))
         XCTAssertEqual(style.deleteIndicatorFont?.pointSize, 16)
         XCTAssertEqual(style.normalAppearance.contentInsets, UIEdgeInsets(top: 1, left: 2, bottom: 3, right: 4))
         XCTAssertNotNil(style.normalAppearance.backgroundImage)

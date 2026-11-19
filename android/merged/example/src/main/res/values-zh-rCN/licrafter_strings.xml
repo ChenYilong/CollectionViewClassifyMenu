@@ -1,0 +1,22 @@
+<!-- The TagViewGroup sample (com.licrafter.sample), prefixed: licrafter_. -->
+<resources>
+    <string name="licrafter_title_main">图片标签</string>
+    <string name="licrafter_title_edit">创建标签</string>
+    <string name="licrafter_title_list">标签列表</string>
+    <string name="licrafter_create_tags">创建标签</string>
+    <string name="licrafter_tag_list">标签列表</string>
+    <string name="licrafter_create">创建</string>
+    <string name="licrafter_save">保存</string>
+    <string name="licrafter_cancel">取消</string>
+    <string name="licrafter_ok">确定</string>
+    <string name="licrafter_circle_click">点击中心圆</string>
+    <string name="licrafter_tag_click">点击标签：%1$s</string>
+    <string name="licrafter_tag_hint">标签 %1$d</string>
+    <string name="licrafter_delete_group">删除标签组</string>
+    <string name="licrafter_delete_group_message">你确定要删除该标签组吗？</string>
+    <string name="licrafter_toggle_hint">轻点两下显示或隐藏标签</string>
+    <string name="licrafter_edit_info">1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3. 点击单个标签，调整该标签的方向\n4. 点击中心圆弹出提示\n5. 长按标签组删除</string>
+    <string name="licrafter_picture_shoes">鞋子图片</string>
+    <string name="licrafter_picture_bag">包图片</string>
+    <string name="licrafter_picture_clothes">衣服图片</string>
+</resources>

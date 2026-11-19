@@ -103,3 +103,28 @@ As CYLTabBarController does (its `AGENTS.md`, "Swift-friendly names for undersco
 | `MultipleFilter/Other/Category/UIView+CYLGeneral.h` | `- (UIImage *)cyl_captureWithWidth:(CGFloat)width;` |
 | `Other/Category/NSArray+CYLLog.h` | `- (NSString *)cyl_descriptionWithLocale:(id)locale;` |
 | `Other/Category/NSDictionary+CYLLog.h` | `- (NSString *)cyl_descriptionWithLocale:(id)locale;` |
+
+## Migrating the core to Swift
+
+Since 2026-11-12 the core (the pod's sources) is translated from Objective-C to Swift. Follow
+`docs/Swift-Coding-Standard.md` (the rules) and `docs/Swift-Migration.md` (progress, score, order of the modules),
+with the installed Swift skills: `swift-api-design-guidelines-skill` (naming), `migration-patterns`
+(`objc-to-swift.md`: idioms, `@objc`, incremental migration) and `swift-concurrency` (`@MainActor`, Sendable).
+
+- Keep the Swift API: run `scripts/swift-api-check.sh` after every file or module; it compares the module's API
+  with `scripts/swift-api-baseline.json`, dumped from the Objective-C core, and lists removed, renamed or retyped
+  declarations.
+- Keep the Objective-C names: `@objc(CYLClassName)` on classes and protocols, `@objc(selector:)` where the
+  selector differs from the Swift name, so the core's Objective-C tests and XIB `customClass` entries still resolve.
+- A file migrates whole: delete its `.h` / `.m`, add the `.swift`, and check the four test suites
+  (`scripts/unit-tests.sh menu|tag|example|swift`).
+
+### Priority: core quality first, examples last (2026-11-13)
+
+- An example that no longer compiles or passes after a migration step is fixed in the example (`Example/`,
+  `Example-Swift/`, the demo app, the `TagCollectionView` demo, their tests). Examples have the lowest weight.
+- Never keep an old name, a `T!`, an Objective-C-style signature, `NSArray` / `NSDictionary`, a factory method or
+  any other construct in the core only because an example uses it; no compatibility work for examples at all.
+- The core's Swift follows `docs/Swift-Coding-Standard.md` section 1: API changes the standard asks for are allowed,
+  reported by `scripts/swift-api-check.sh`, listed in `docs/Swift-Migration.md` ("Swift API changes"), with the
+  baseline refreshed in the same commit. The core's own tests are updated with the API.

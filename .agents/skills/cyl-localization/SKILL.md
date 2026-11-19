@@ -68,8 +68,19 @@ commit over every branch, see `cyl-dependency`; its core lookup is `CYLLocalized
 ### Check
 
 ```sh
+python3 scripts/check-localization.py            # keys, format specifiers, Chinese literals outside a lookup
+python3 scripts/check-localization.py --unused   # keys no code names (data keys looked up at run time show too)
+```
+
+Run time: `CYLLocalizationTests.testEveryScreenIsInTheAppLanguage` opens every Example screen in English and
+Traditional Chinese and fails on Chinese (English) or Simplified-only characters (Traditional) outside the
+NOLOCALIZE content.
+
+#### Lookups
+
+```sh
 # Exactly the lookups below, one per level; no other bundle reads or NSLocalizedString calls.
-grep -rn "define CYLMenuLocalizedString\|func CYLExampleLocalizedString\|func CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
+grep -rn "func CYLMenuLocalizedString\|func CYLExampleLocalizedString\|func CYLDemoLocalizedString\|func CYLTagEditorLocalizedString" \
   CollectionViewClassifyMenu Example Example-Swift
 grep -rn "NSLocalizedString(" CollectionViewClassifyMenu Example Example-Swift --include=*.m --include=*.swift
 ```
@@ -81,6 +92,12 @@ grep -rn "NSLocalizedString(" CollectionViewClassifyMenu Example Example-Swift -
 `CYLMenuLocalizedString(_:)` (`NS_SWIFT_NAME`). Both read the same bundle; tests check both
 (`testCoreLookupIsCallableFromSwift`, `testCoreAndDemoLookupsReadTheirOwnBundles`). Core images go through
 `CYLMenuImage(name)`, never `[UIImage imageNamed:]` or the bundle.
+
+Since the core moved to Swift (2026-11-14, step 10 of `docs/Swift-Migration.md`) the macros and the C function are
+gone: the core's lookup is the Swift function `CYLMenuLocalizedString(_:)` (in `CYLMenuResources.swift`), images go
+through `CYLMenuResources.image(named:)`, and Objective-C (the core's tests) calls
+`+[CYLMenuResources localizedStringForKey:]` and `+imageNamed:`. The check above looks for
+`func CYLMenuLocalizedString` instead of `define CYLMenuLocalizedString`.
 
 ## No user-facing text in code
 
@@ -109,3 +126,16 @@ PY
 - `CYLDemoDataSource.swift` (shared by the demo app and `Example/CYLMenuExample`, which have different bundles)
   keeps its sample sections ("全部", "地区过滤", "菜品过滤") as Chinese sample data; so does the `TagCollectionView`
   demo's tag data. Localize them through a lookup both apps can reach if they become real UI text.
+
+## HarmonyOS
+
+- Example strings: generated from the iOS example bundle (`harmony/scripts/export-example-strings.py`, `--check`),
+  looked up with `CYLExampleLocalizedString(key)`; formats use the iOS keys with `cylFormat` (`%@`, `%ld`, `%lu`).
+- Core strings: `harmony/scripts/export-core-strings.py`, `CYLMenuLocalizedString`.
+- Native resources (`harmony/entry/src/main/resources/{base,en_US,zh_CN,zh_TW}/element/string.json`,
+  `harmony/AppScope/resources/base`): the strings the system shows, and the tab titles copied from
+  CYLTabBarController's HarmonyOS example (only the ones this project uses: `tab_home`, `tab_nearby`, `tab_messages`,
+  `tab_me`). Check: `harmony/scripts/check-native-strings.py`.
+- Compare keys or flags in code, never translated text (`sample.disabled`, not `title !== '已禁用'`).
+- Launch options for checks in another language: `cylLanguage` (`en`, `zh-Hans`, `zh-Hant`), see
+  `harmony/scripts/screenshots.sh`.

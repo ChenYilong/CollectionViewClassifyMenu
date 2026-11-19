@@ -5,7 +5,7 @@ selectionMode: "multiple"
 defaultVisibleRows: 1
 scrollEnabled: false
 foldControl:
-  position: "topLeading"
+  position: "headerLeading"
   content: "icon"
 style:
   itemHeight: 32

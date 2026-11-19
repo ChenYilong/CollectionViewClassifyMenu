@@ -1,0 +1,12 @@
+/* systemGroupedBackground; UIButton.Configuration.gray() (a tertiarySystemFill capsule, secondaryLabel content,
+   content insets {12, 16, 12, 16}, image padding 8, leading aligned); the hint in footnote secondaryLabel. */
+.home { min-height: 100vh; background: var(--ios-grouped-background); padding-bottom: 96px; box-sizing: border-box; }
+.stack { display: flex; flex-direction: column; padding: 16px 16px 0; }
+.search-button {
+  display: flex; align-items: center; justify-content: flex-start; padding: 12px 16px; border-radius: 999px;
+  background: rgba(118, 118, 128, 0.12); color: var(--ios-secondary-label);
+}
+.search-button-hover { opacity: 0.6; }
+.search-button-image { flex: none; width: 18px; height: 18px; margin-right: 8px; }
+.search-button-title { flex: 1; min-width: 0; font-size: 17px; line-height: 22px; }
+.hint { margin-top: 12px; font-size: 13px; line-height: 18px; color: var(--ios-secondary-label); }

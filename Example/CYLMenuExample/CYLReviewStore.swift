@@ -76,6 +76,7 @@ final class CYLReviewStore: NSObject {
 
     /// Sample data (not localized).
     static func mockReviews() -> [CYLReview] {
+        // NOLOCALIZE-BEGIN: user-generated reviews (and their SKU and keyword tags) are shown as their authors wrote them.
         let pink = "颜色分类:苹果6 4.7【镜面粉字】"
         let white = "颜色分类:苹果6plus【白边白字】"
         return [
@@ -90,6 +91,7 @@ final class CYLReviewStore: NSObject {
             review(user: "大**熊", text: "给女朋友买的，她很喜欢，客服回复也很及时。", date: "2015-06-07", sku: pink, rating: .good, photo: false, followUp: true, keywords: ["态度不错"]),
             review(user: "m**0", text: "性价比高，用了一周没有掉色，会回购。", date: "2015-06-05", sku: white, rating: .good, photo: false, followUp: false, keywords: ["划算", "质量不错"]),
         ]
+        // NOLOCALIZE-END
     }
 
     /// Identifiers of the rating filters; their names are localization keys looked up in title(for:).
@@ -118,7 +120,8 @@ final class CYLReviewStore: NSObject {
             filter(named: "有图", symbol: nil, color: orange, keyword: false) { $0.hasPhoto },
             filter(named: "追加", symbol: nil, color: orange, keyword: false) { $0.hasFollowUp },
         ]
-        for keyword in ["手机套不错", "质量不错", "态度不错", "划算", "颜色不错", "背面细节一般"] {
+        // The reviews' own keyword tags, matched against them: user content, as written.
+        for keyword in ["手机套不错", "质量不错", "态度不错", "划算", "颜色不错", "背面细节一般"] {  // NOLOCALIZE
             filters.append(filter(named: keyword, symbol: nil, color: orange, keyword: true) { $0.keywords.contains(keyword) })
         }
         return filters

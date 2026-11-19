@@ -1,0 +1,43 @@
+ext.CylTagList = [
+  minSdkVersion: 24,
+  compileSdkVersion: 36
+]
+
+ext.getExtOrDefault = { prop ->
+  if (rootProject.ext.has(prop)) {
+    return rootProject.ext.get(prop)
+  }
+
+  return CylTagList[prop]
+}
+
+
+apply plugin: "com.android.library"
+
+if (project.extensions.findByName("kotlin") == null) {
+  apply plugin: "kotlin-android"
+}
+
+
+apply plugin: "com.facebook.react"
+
+android {
+  namespace "com.cyltaglist"
+
+  compileSdkVersion getExtOrDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion getExtOrDefault("minSdkVersion")
+  }
+}
+
+repositories {
+  // The Kotlin CYLTagListView: CollectionViewClassifyMenu's Maven artifact, published by
+  // `android/scripts/gradle.sh merged :library:publishReleasePublicationToBuildRepository` (folder: cyl.classifymenu.repo).
+  maven { url = uri(project.findProperty("cyl.classifymenu.repo") ?: "${projectDir}/../../../android/merged/library/build/repo") }
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android"
+  implementation "com.cyl:classifymenu:0.1.0"
+}

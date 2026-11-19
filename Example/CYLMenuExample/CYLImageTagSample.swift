@@ -15,6 +15,7 @@ enum CYLImageTagSampleData {
     static var tagGroups: [CYLImageTagGroup] = initialGroups()
 
     static func initialGroups() -> [CYLImageTagGroup] {
+        // NOLOCALIZE-BEGIN: TagViewGroup's sample tags on a shoe photo (a shop listing), as in its screenshot.
         let leather = CYLImageTag(title: "头层牛皮", direction: .rightTop)
         leather.link = "http://www.baidu.com"
         let shoes = CYLImageTag(title: "英伦加绒青年棕色保暖鞋子。", direction: .rightCenter)
@@ -23,6 +24,7 @@ enum CYLImageTagSampleData {
         brand.link = "http://mc.licrafter.com"
         let good = CYLImageTag(title: "很不错的鞋子", direction: .rightCenter)
         good.link = "http://mc.licrafter.com"
+        // NOLOCALIZE-END
         return [CYLImageTagGroup(tags: [leather, shoes, brand], percentPosition: CGPoint(x: 0.4, y: 0.5)),
                 CYLImageTagGroup(tags: [good], percentPosition: CGPoint(x: 0.3, y: 0.2))]
     }
@@ -130,8 +132,8 @@ final class CYLImageTagEditViewController: UIViewController {
     /// TagEditDialog.createTagGroup: the non-empty names, the sample's directions, at the center.
     static func group(withNames names: [String]) -> CYLImageTagGroup {
         let titles = names.filter { !$0.isEmpty }
-        let directions = CYLImageTagGroup.defaultDirections(forTagCount: UInt(titles.count))
-        let tags = zip(titles, directions).map { CYLImageTag(title: $0, direction: CYLImageTagDirection(rawValue: $1.intValue) ?? .rightCenter) }
+        let directions = CYLImageTagGroup.defaultDirections(forTagCount: titles.count)
+        let tags = zip(titles, directions).map { CYLImageTag(title: $0, direction: $1) }
         return CYLImageTagGroup(tags: tags, percentPosition: CGPoint(x: 0.5, y: 0.5))
     }
 
@@ -157,7 +159,7 @@ final class CYLImageTagEditViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    private func confirmDelete(groupAt index: UInt) {
+    private func confirmDelete(groupAt index: Int) {
         let alert = UIAlertController(title: CYLExampleLocalizedString("删除标签组"), message: CYLExampleLocalizedString("你确定要删除该标签组吗？"),
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: CYLExampleLocalizedString("取消"), style: .cancel))

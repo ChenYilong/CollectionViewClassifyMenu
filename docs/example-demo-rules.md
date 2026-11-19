@@ -1,0 +1,144 @@
+# Example demo rules
+
+Rules for what the examples of every platform demonstrate and how. They apply to every example layer: iOS, Android,
+the cross-platform examples (React Native, Flutter), Mini Program and HarmonyOS. Referenced from `AGENTS.md`
+("Example demo rules") and `.agents/skills/cyl-dependency/`.
+
+## Animation playback controls
+
+Every example screen that shows animated icons or animations (Lottie, PAG, Rive, GIF, symbol effects), for example
+the Android Menu tab's "Animated icons" screen with its "1x" and "Play all" buttons, offers these controls together:
+
+1. **Play all:** restarts every animation on the screen from progress 0, once (existing behavior).
+2. **Speed slider:** sets the playback speed of every animation on the screen (for example 0.25x to 4x, default 1x),
+   with the current value shown next to it. It replaces a speed button that cycles fixed values.
+3. **Loop switch:** turns looping on or off for every animation on the screen. Off plays once and stops at the
+   resting frame; on repeats until it is turned off.
+
+The controls combine: the speed applies to Play all and to looping alike, and every change takes effect immediately,
+on animations already playing, without restarting the screen. When an animation engine cannot do one of these
+(a speed or a loop setting), change the core library so that it can: add the API to the core (and to
+CYLTabBarController's animation engine when the engine itself lacks it), never work around it in the example. The
+controls are accessible (labels, values, Dynamic Type / font scaling; VoiceOver / TalkBack read, for example, "Speed,
+1.5 times" and "Loop, on") and localized through the example's lookup. The animated icons come from
+CYLTabBarController's `CYLTabBarItemAnimationFactory`; the same rule, with its library-side notes, is in
+CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback controls in the animation examples").
+
+## TODO (2026-11-13): speed slider and loop switch in every animation example
+
+- **Context:** the animation examples have a "Play all" button (restart from 0, once) and a speed button ("1x"), as
+  in the attached screenshot of the Android "Animated icons" screen. The user wants playback strategy controls that
+  combine and act in real time.
+- **Requirements:** (1) keep Play all (restart from progress 0); (2) add a speed slider; (3) add a loop switch;
+  (4) the three combine and change playback in real time; (5) change the core when needed to support it; (6) every
+  example layer: iOS, Android, React Native, Flutter, Mini Program, HarmonyOS; (7) record the rule in English in the
+  instructions documents and reference this document from the related skills.
+- **Status:** iOS and Android DONE (2026-11-14); Flutter: iOS and Android DONE (`flutter/cyl_tag_list`); React Native
+  and HarmonyOS DONE (2026-11-15); Mini Program: DONE in WeChat DevTools (`CrossPlatform/wechat-miniprogram`, 2026-11-15). Rule recorded 2026-11-13. Recorded twice in parallel on 2026-11-13 (this document and
+  `example-animation-controls.md` from another session's branch `docs/animation-playback-controls`); merged here,
+  and that file now points to this one.
+
+The screen of the request (Android, merged example, Menu tab → Animated icons; the user's screenshot, 2026-11-13):
+
+<img src="assets/animated-icons-playback-controls-request-android.png" width="540" alt="Animated icons screen with the 1x and Play all buttons">
+
+| Platform | Example screen(s) | Status |
+| --- | --- | --- |
+| iOS | Animated icons, `Example/CYLMenuExample/CYLTagAnimationDemoViewController.swift` | DONE (2026-11-14, below) |
+| Android | Animated icons, `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | DONE (2026-11-14, below) |
+| React Native | `react-native/react-native-cyl-tag-list/example`, Tags tab | iOS and Android DONE (2026-11-15: Play all command, speed steps 0.25x–4x, Loop switch; `cross-platform.md`, `scripts/e2e-android.sh` and the iOS UI test check the speed) |
+| Flutter | `flutter/cyl_tag_list/example`, Animated icons | iOS and Android DONE (animations play, `cross-platform.md`) |
+| Mini Program | `CrossPlatform/wechat-miniprogram/miniprogram/pages/animations` (动效, the iOS screen 1:1) | DONE in WeChat DevTools (2026-11-15; Play all, speed slider, Loop switch; Lottie, Rive, PAG and GIF through CYLTabBarController's cyl-lottie / cyl-rive / cyl-pag; `cross-platform.md`) |
+| HarmonyOS | `harmony/entry`, Tags tab | DONE (2026-11-15: `@ohos/lottie` icons in the core, speed slider 0.25x–4x, Loop switch, Play all; `android.md`) |
+
+### iOS: DONE (2026-11-14)
+
+- **Core** (`CYLTagButton`, `CYLTagListView`): `animationSpeed` (an override of `style.animationSpeed` applied at once,
+  also to an animation that is playing, without reloading the list), `animationLoops` and
+  `CYLTagListView.playAllAnimations()` (every animated icon on screen from progress 0). Setting a style no longer
+  resets a playing animation. Looping uses the player's own `loops` when it has one (CYLTabBarController from
+  `dc04439`); with the pinned `0e69250`, which has none, the core starts the animation again when the player's
+  `progress` reaches the end (Lottie, PAG).
+- **Limits:** Rive and GIF players expose neither `loops` nor `progress` at `0e69250`, so they play once; PAG has no
+  playback speed. Both go away with a newer CYLTabBarController, whose pin is blocked (`issue-progress.md`, the
+  framework build).
+- **Example:** the Animated icons screen has a speed slider (0.25× to 4× in steps of 0.25, the value next to it), a
+  loop switch and Play all; they replace the "1x" bar button. VoiceOver reads "Speed, 2 times" and "Loop, on";
+  strings in the example's bundle (en, zh-Hans, zh-Hant). Styles is a list of style parameters (one row sets
+  `style.animationSpeed`), not a playback screen: unchanged.
+- **Evidence:** `CYLAnimatedIconTests` (the slider's steps and clamping, the labels, loop and speed on the tags on
+  screen, the style untouched); the example suite, 80 tests, 0 failures. Screenshot: iOS, iPhone 17 Pro simulator,
+  iOS 27.0, Xcode 27.2 (iOS 27.2 SDK), macOS 27.3, this commit, 2026-11-14 15:23 NZDT; 2×, Loop on, the Lottie icons
+  playing:
+
+  <img src="assets/ios-animation-playback-controls.png" width="360" alt="iOS: speed slider at 2x, loop switch on, Play all">
+
+### Android: DONE (2026-11-14)
+
+- **Core** (`CYLTagButton.kt`, `CYLTagListView.kt`): the same three APIs as iOS, `animationSpeed`, `animationLoops`
+  and `playAllAnimations()`. The engine's players (CYLTabBarController `4639a0c`) have a speed and a progress but no
+  loop mode, so the tag starts the animation again when the player's progress reaches the end; a player without a
+  progress plays once.
+- **Example:** the Animated icons screen (Menu tab) has a speed `SeekBar` (0.25× to 4× in steps of 0.25, the value next
+  to it), a loop `Switch` and Play all; they replace the "1x" button. TalkBack reads "Speed, 2 times" and "Loop"; the
+  strings are the iOS example's (the Android example reads its string tables).
+- **Evidence:** `animationSpeedAndLoopsReachEveryTagWithoutReplacingTheStyle` in the library's unit tests;
+  `scripts/gradle.sh merged :library:testDebugUnitTest :example:assembleDebug`: BUILD SUCCESSFUL. Screenshot:
+  Android 15 (API 35) emulator `CYL_API35_test`, 1080 × 2400, macOS 27.3, this commit, 2026-11-14 15:31 NZDT; 2×, Loop
+  on, the icons playing:
+
+  <img src="assets/android-animation-playback-controls.png" width="360" alt="Android: speed slider at 2x, loop switch on, Play all">
+
+- **User prompt (verbatim, 2026-11-13):**
+
+> 在docs 中找到example演示规则，找到相关文档及相关章节，如果没有就新建，确保写入成功：全英文写入：instructions相关相关文档中中记录 相关skills中记录引用该文档去，在展示动效相关example展示中，除了一次性play all ，触发重新开始从0进度开始播放， 额外增加倍速滑块，以及循环播放switch。这几个组件可以组合控制动效播放策略。请在example相关页面实现，如有必要可以修改core核心代码，以支持该演示策略。通过调整这些组件可以实时控制动效的播放策略。标记为TODO事项：举例说明，截图中的页面就可以应用该策略。此要求适用于所有层面的example包括iOS端 android端，跨端 rn flutter 小程序 鸿蒙
+
+- **English:** find the example demo rules in docs (create the document or section if missing) and record, in
+  English, in the instructions documents, with the related skills referencing this document: in examples that show
+  animations, besides the one-shot "Play all" that restarts from progress 0, add a speed slider and a loop switch.
+  These controls combine to set the playback strategy and change it in real time. Implement it on the example pages,
+  changing the core when needed. Mark it as a TODO; the screenshot's page (Animated icons) is an example where it
+  applies. The requirement covers every example layer: iOS, Android, cross-platform React Native and Flutter, Mini
+  Program and HarmonyOS.
+
+## TODO (2026-11-16): SVGA wherever Rive is shown
+
+CYLTabBarController added SVGA animations. Every example scene that demonstrates Rive (Animated icons sections,
+the Styles animation choice, configuration and menu data, screenshot launch screens, tests) gets the same scene with
+SVGA, on every platform, with the same playback controls (Play all, speed, loop). Details and the core work:
+`issue-progress.md`, "TODO (2026-11-16): SVGA animated icons".
+
+Status: iOS done (2026-11-16): the Animated icons sections `svga` and `svga-dark`, the Styles action `animation.svga`, the
+configuration file and dictionary demos, the launch screens `animations-svga` and `style-svga`, and the tests. SVGA, like
+Rive, plays once at its own speed: CYLTabBarController's SVGA player has no speed or loop API yet. HarmonyOS: done.
+Android: DONE (2026-11-19): the Animated icons sections `svga` (Home, Search, Messages, Me) and `svga-dark` (Posts, List,
+Home on the icons.riv dark tags), the Styles action `animation.svga`, the dictionary demo's SVGA tag; the configuration
+file is the iOS bundle's `animated-tags.json` (already has its SVGA tag). The example adds `com.github.yyued:SVGAPlayer-Android`
+2.6.1 (JitPack, group-filtered); CYLTabBarController's `CYLSVGATabBarItemAnimator` registers itself when it is there. On
+the emulator all 7 icons draw at rest and play after Play all. The Android example has no launch screens (iOS
+`animations-svga`, `style-svga`) and no example unit tests, so nothing to add there.
+Mini Program: DONE (2026-11-19, Windows session): the Animated icons sections `svga` (Home, Search, Messages, Me) and
+`svga-dark` (Posts, List, Home on the icons.riv dark tags), the Styles action `animation.svga`, the dictionary demo's SVGA
+tag; the configuration file's SVGA tag now plays too. CYLTabBarController's `cyl-svga-miniprogram` (pinned commit) is
+installed by `scripts/fetch-cyltabbar.js` into the "engines" subpackage next to cyl-pag, and `scripts/export-animations.py`
+copies the iOS bundle's six `.svga` files there as `engines/svga/*.svga.bin` (a code package leaves out `.svga`); the
+example's engine adapter (`components/cyl-tag-animation-view`) gives the tags `cyl-svga` through `generic:cyl-svga-view`,
+which the library and cyl-animated-item already declared, so no core change. WeChat DevTools: all 7 SVGA icons draw, Play
+all plays them to their last frame, with Loop on they keep moving (changed pixels per icon over 12 s: Search
+[0, 0, 126, 28, 41], Messages [133, 0, 32, 99, 138], Posts [211, 65, 30, 88, 117]); `npm test` 145 pass.
+
+<img src="assets/miniprogram-devtools-svga.png" width="400" alt="Mini program SVGA sections in WeChat DevTools: at rest, after Play all, loop on">
+Flutter and React Native on iOS: DONE (2026-11-19, `478e83e2`, `e84772ee`): an SVGA section (Home, Search, Messages, Me;
+the iOS example's files) after Rive, pod `CYLAnimatedItem/SVGA` (React Native also needs `SVGAPlayerLite` with modular
+headers); on the iPhone 17 Pro simulator the icons rest gray and animate after Play all; Flutter iOS integration tests
+2 / 2 (21 tags), React Native `tsc` passes. Their Android side: DONE (2026-11-19, Windows session): both example apps add
+`com.github.yyued:SVGAPlayer-Android` 2.6.1 (JitPack, group-filtered) and `tools:replace` for the `android:label` (Flutter) /
+`android:allowBackup` (React Native) that SVGAPlayer-Android's own manifest sets; React Native gets the four `.svga` files
+in `example/android/app/src/main/assets/`, Flutter already had them as Flutter assets. On the emulator all 4 SVGA icons
+draw at rest and play after Play all, in both apps.
+
+<img src="assets/flutter-rn-ios-svga.png" width="400" alt="SVGA tags in the Flutter and React Native examples on iOS: at rest and after Play all">
+
+<img src="assets/flutter-rn-android-svga.png" width="400" alt="SVGA tags in the Flutter and React Native examples on Android: at rest and after Play all">
+
+<img src="assets/android-svga-animated-icons.png" width="400" alt="Android example: SVGA sections at rest, after Play all, and the Styles SVGA choice">

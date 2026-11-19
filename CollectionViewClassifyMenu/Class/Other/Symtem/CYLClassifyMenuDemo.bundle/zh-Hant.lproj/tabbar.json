@@ -1,0 +1,26 @@
+{
+  "CYLTabBarControllerContext": "CYLClassifyMenuDemoRoot",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "分類",
+      "CYLTabBarItemImage": "system:list.bullet.rectangle",
+      "CYLTabBarItemSelectedImage": "system:list.bullet.rectangle.fill",
+      "CYLTabBarItemPageIdentifier": "classify",
+      "CYLTabBarItemAccessibilityLabel": "分類"
+    },
+    {
+      "CYLTabBarItemTitle": "篩選",
+      "CYLTabBarItemImage": "system:line.3.horizontal.decrease.circle",
+      "CYLTabBarItemSelectedImage": "system:line.3.horizontal.decrease.circle.fill",
+      "CYLTabBarItemPageIdentifier": "filter",
+      "CYLTabBarItemAccessibilityLabel": "篩選"
+    }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "關於",
+    "CYLTabBarItemImage": "system:plus.circle.fill",
+    "CYLTabBarItemPageIdentifier": "about",
+    "CYLPlusButtonImageSize": "{52, 52}",
+    "CYLTabBarItemAccessibilityLabel": "關於"
+  }
+}

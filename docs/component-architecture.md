@@ -49,6 +49,51 @@ persistence in the demos.
 `Example/` 通过 Podfile 以本地路径集成核心库，用这些接口实现 README 的两个场景；
 `CYLExampleMenuSource` 演示宿主如何把自己的模型转成数据源。
 
+## DONE (2026-11-14, logged as TODO 2026-11-13): rename the fold control positions (`CYLMenuFoldControlPosition`)
+
+- **Context:** the fold control's place is named by geometry today (`Bottom`, `TopTrailing`, `TopLeading`,
+  `Inline`). The maintainer proposes names taken from the collection view's own parts: the control that is always the
+  last item of the tags (folded or expanded, as in the Android recent searches and the review filter screenshots)
+  is the `tail`; below the section, the `footer`; in the header's top right / top left corner, `headerRight` /
+  `headerLeft`. The core is not released and not on `master`, so the names may change (no compatibility kept,
+  AGENTS.md "Core quality first, examples last").
+- **Requirements:** compare the current and the proposed names in a table, judge which is easier to understand,
+  pick one set and implement it (iOS core, Android port, examples, configuration strings, README, docs).
+
+| Today | Proposed | What it is | Assessment | Chosen |
+| --- | --- | --- | --- | --- |
+| `none` | (unchanged) | no fold control, every row shown | clear | `none` |
+| `bottom` | `footer` | centered below the section | **proposed is better**: it names the collection view's section footer, where the control is a supplementary view, and pairs with "header…"; "bottom" could mean the bottom of the whole list | `footer` |
+| `topTrailing` | `headerRight` | at the end of the section header | **mixed**: "header" is better than "top" (it says which view holds it); "right" is wrong in right-to-left languages, where the code puts it on the left (the header layout follows the leading edge, `foldAtLeadingEdge`), and UIKit / Android name such edges leading / trailing (start / end) | `headerTrailing` |
+| `topLeading` | `headerLeft` | before the section title in the header | same as above | `headerLeading` |
+| `inline` | `tail` | a tag cell that is always the last item, folded or expanded | **proposed is better**: "inline" only says it sits among the tags, "tail" says where (the end of the items, as `byTruncatingTail` is the end of a text); `lastItem` was considered and is longer without being clearer in a list of positions | `tail` |
+
+- **Decision:** `none`, `footer`, `headerLeading`, `headerTrailing`, `tail`: the proposal's structure-based names,
+  with leading / trailing instead of left / right so that they stay true in right-to-left layouts. Swift:
+  `CYLMenuFoldControlPosition.footer` … `.tail`; Objective-C while the file is not migrated:
+  `CYLMenuFoldControlPositionFooter` …; Kotlin: `FOOTER`, `HEADER_LEADING`, `HEADER_TRAILING`, `TAIL`.
+- **Configuration strings:** `"footer"`, `"headerLeading"`, `"headerTrailing"`, `"tail"`; `"headerLeft"` /
+  `"headerRight"` accepted as aliases of the leading / trailing names (as `"topleft"` / `"topright"` are today); the
+  old strings (`"bottom"`, `"topLeading"`, `"topTrailing"`, `"inline"`) are dropped, and the example JSON files are
+  updated.
+- **When:** with the Swift migration of `CYLMenuFoldControl`, the enum's file (step 8 of `docs/Swift-Migration.md`;
+  step 7 moved `CYLTagListView` and kept the old case names, so the names change once, in Swift), together with the
+  Android port in the same commit.
+- **Status:** DONE (step 8 of `docs/Swift-Migration.md`): iOS `CYLMenuFoldControlPosition.none / .footer /
+  .headerTrailing / .headerLeading / .tail` (Objective-C `CYLMenuFoldControlPositionFooter`…), Kotlin `NONE`, `FOOTER`,
+  `HEADER_TRAILING`, `HEADER_LEADING`, `TAIL`; configuration strings `"footer"`, `"headerLeading"`, `"headerTrailing"`,
+  `"tail"` (aliases `"headerLeft"`, `"headerRight"`) on both platforms; the example JSON, plist, YAML and XML files,
+  the examples, tests, README and this document updated.
+- **Prompt (verbatim, 2026-11-13, with the Android recent searches and the review filter screenshots):**
+
+  > 我想到一个很好的，定义折叠功能按钮位置的枚举定义。如果是截图中tag list ，collectionView总是最后一个按钮是折叠按钮。无论折叠还是不折叠都是最后一个是折叠或者展开按钮。那么我们可以成为tail ，底部用 footer . 顶部 右上角  headerright 顶部 左上角 。headerleft。评估我现在的命名与现在代码的实现相比哪一个更容易理解。在合适的文档中记入TODO，在文档中列出表格 旧有的那现有的对比，选一个实现。该core代码还没发布不在master分支，命名可修改
+
+- **Prompt (English):** a better enum for the fold button's position: in a tag list like the screenshots, the last
+  item of the collection view is always the fold button, folded or not, so call it `tail`; below, `footer`; top right,
+  `headerRight`; top left, `headerLeft`. Judge whether my names or the current ones are easier to understand; record a
+  TODO in a suitable document with a table comparing the old and the proposed names, and pick one to implement. The
+  core is not released and not on `master`, so the names may change.
+
 ## 截图 / Screenshots
 
 CI 截图（`Example screenshots`，提交 `22370a8`，iPhone 模拟器，`macos-26`）。`CYLTagListView` 的折叠控件与标题样式、由配置文件创建、多选与新建标签，以及移植的分类菜单与多选筛选：
@@ -104,3 +149,528 @@ declarations, so Objective-C callers see no change.
   2026-11-11 的 CI（[ff35b27](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/ff35b27)，`macos-26`）中
   `pod lib lint` 与库的构建/静态分析（有警告即失败）均已通过。
 - 历史 3.5 英寸设备不支持项目现有的 iOS 15 最低版本，因此不能在原设备上复验 #7。
+
+## 动效组件改造进度 / Progress against CYLTabBarController's Animated-Item.md
+
+The progress table, score and TODO list against CYLTabBarController's
+[docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)
+are kept in one place: [animated-item-migration.md](animated-item-migration.md). The entries below are the detailed task logs.
+
+## DONE (2026-11-17): CYLTagButton subclasses CYLTabBarController's CYLAnimatedItemView; no animation engine in the core
+
+- **Context**: branch `feat/harmony` (PR #20). CYLTabBarController's guide
+  [docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)
+  (read at the branch tip `35aa757`) ships the shared animated icon + title component `CYLAnimatedItem`: iOS subspec
+  `CYLTabBarController/CYLAnimatedItem` (CYLUtils only, static images, `CYL_ANIMATION_ENGINE_AVAILABLE` = 0 without an
+  engine) and one Core-free engine subspec per file type (`CYLAnimatedItemLottieSwift`, `…LottieObjectiveC`, `…PAG`,
+  `…PAGEnterprise`, `…Rive`, `…SVGA`, `…GIF`); Android module `:cylanimateditem`, Maven
+  `io.github.chenyilong:cyltabbarcontroller-animateditem`. Its migration row for this repository: `CYLTagButton`
+  subclasses `CYLAnimatedItemView`, `CYLTagAnimationEngine` and the own icon / title / animation storage go,
+  `deleteIndicatorLabel` becomes `accessoryView`, the per-state look goes to `itemStateDidChange` / `onItemStateChanged`,
+  the indicator's side to `accessoryPlacement`, the static measuring stays. The display priority (animation, then the
+  static image, then the component's placeholder only without a static image), the failure cases and the URL loading
+  rule are the base class's and are inherited. CYLSearchViewController's search bar items subclass `CYLTagButton` and
+  follow (its task log: `docs/animated-icon-component.md`).
+- **Requirements**:
+  1. Change the CocoaPods, Gradle / Maven and npm configuration as the guide says; the core depends on the component.
+  2. Rework the core so that it shows the same animations through it.
+  3. The core depends on no animation engine; animated icons show only when the example layer adds an engine.
+  4. The components concerned: the packaged animated icon + title core component, `CYLTagButton`.
+- **Prompt (verbatim)**: "https://github.com/ChenYilong/CYLTabBarController/blob/13e717c9/docs/Animated-Item.md 根据文档链接，根据该文档，修改cocoapods gradle maven npm等配置，要求更新core核心代码 ，依赖该新组件。改造core核心代码，要求实现同等动效效果。core核心代码不依赖于动效引擎，仅仅在example层引入动效引擎时才展示动效icon。涉及的组件为本仓库中已经封装好的动效icon加title的核心组件代码。"
+- **Prompt (English)**: "Following the linked document, change the CocoaPods, Gradle, Maven, npm and similar
+  configuration; update the core code to depend on the new component. Rework the core code to achieve the same
+  animation effects. The core code does not depend on the animation engine; animated icons show only when the example
+  layer adds the animation engine. The components concerned are this repository's packaged animated icon + title core
+  components."
+- **Guide link (user, 2026-11-17)**: link the guide on its branch, the newest address:
+  <https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md>.
+- **Status**: done in the commit after the task log `7a280fa` (the row "CollectionViewClassifyMenu" of the guide's
+  "Downstream migration status" table points at `7a280fa`); CYLTabBarController pinned at its branch tip `7511f7d`
+  (no code change since `35aa757`, the guide read there). Verification items below stay TODO.
+- **Result**:
+  - iOS: `CYLTagButton` subclasses `CYLAnimatedItemView` (`import CYLTabBarController`); `CYLTagAnimationEngine`, the own
+    icon / title / animation storage, the player and the loop timer are gone. Inherited: `title`, `image`,
+    `selectedImage`, `imageView`, `titleLabel`, `animationURL`, `animationSpeed` (now `CGFloat`; `resetAnimationSpeed()`
+    follows the style again, `CYLTagListView.animationSpeed = nil` calls it), `animationLoops`,
+    `animationRestingProgress`, `animationView`, `playAnimation()` / `restartAnimation()` / `stopAnimation()` /
+    `showAnimationLastFrame()`, `delegate`. Overridden hooks: `layoutContent(in:)` (the style's layout, the image view
+    under the animation view in the same frame), `contentSizeThatFits(_:)`, `itemStateDidChange()` (the appearance per
+    state), `itemAccessibilityLabel()`, `updateItemAccessibility()` (no-op: label, value and traits stay computed),
+    `reloadAnimation()` (the selection's frame), `playAnimation()` (Reduce Motion). `deleteIndicatorLabel` is the
+    `accessoryView` (set once; its tap reaches `animatedItemViewDidTapAccessory(_:)`; leading / trailing through
+    `accessoryPlacement`); `top` / `bottom` set `axis = .vertical`. The display priority, the failure fallbacks, the
+    placeholder and the URL loading are the base class's; a tag keeps the component placeholder (sized like its icon)
+    when it has an animation file and no static image, and a title-only tag shows none.
+    `isAnimationEngineAvailable` is `NSClassFromString("CYLTabBarItemAnimationFactory") != nil`; `animationPlayer` is
+    not referenced by the core (the base class declares it only with an engine). `animationPlayer` (public before) is
+    removed from `CYLTagButton`'s own API (docs/Swift-Migration.md, row 9).
+  - Objective-C callers import only `CollectionViewClassifyMenu`, never `CYLTabBarController`. Clang shows a module's
+    declarations only to a file that imports that module, so `CYLTagButton` redeclares (forwarding to the base class)
+    the inherited members Objective-C uses: `animationURL`, `animationLoops`, `animationView`, `imageView`,
+    `titleLabel`, `accessoryView`, `placeholderImage`, `restartAnimation()`, `stopAnimation()` (with the ones it already
+    overrides: `title`, `image`, `selectedImage`, `animationSpeed`, `animationRestingProgress`, `playAnimation()`,
+    `reloadAnimation()`). CI failed "Unit tests (menu)" on `9ecc535` without them; `e128fa8` worked around it by importing
+    CYLTabBarController in the test, which the owner rejected (2026-11-17, prompt verbatim: "Donot import tabbar and fix
+    it"); it is reverted and fixed in the core. DONE (2026-11-18): CI "Unit tests (menu)" passes without the import (run 44142400181 at `e73850e`; also `65d2d4a`).
+  - CocoaPods: podspec `s.dependency 'CYLTabBarController/CYLAnimatedItem'`; Example Podfile `CYLAnimatedItem` plus
+    `CYLAnimatedItemLottieObjectiveC`, `…PAG`, `…Rive`, `…SVGA`, `…GIF`; RN and Flutter example Podfiles
+    `CYLAnimatedItemLottieObjectiveC`, `…Rive`; Example-Swift and the root project no engine; TagCollectionView's Podfile
+    pins CYLTabBarController by commit (`CYLAnimatedItem`). `scripts/pod-lint.sh lib` lints with the pinned commit's
+    podspec (`--include-podspecs`), since no trunk release has the subspec.
+  - SwiftPM: `Package.swift` depends on CYLTabBarController by revision, product `CYLTabBarController` (its only
+    product, which also holds its tab bar and Lottie engine). TODO: switch to a `CYLAnimatedItem` product once
+    CYLTabBarController offers one; its SwiftPM build is not green upstream, and this repository's CI does not build
+    SwiftPM.
+  - Android: `CYLTagButton` subclasses `com.cyl.animateditem.CYLAnimatedItemView`; `api("io.github.chenyilong:
+    cyltabbarcontroller-animateditem:1.100.0")`, substituted by `project(":cylanimateditem")` of the pinned checkout in
+    `android/merged/settings.gradle.kts`; `animationURL` is the base class's `String?` (the cell passes
+    `Uri.toString()`; the convenience constructor still takes a `Uri`); `imageView` / `titleLabel` alias `iconView` /
+    `titleView`; `disabledAlpha = 1` (the style draws the disabled look); a non-clickable tag (a cell's) leaves touches
+    to its parent; the fold button's TalkBack text through `accessibilityText()`. Publishing the library to
+    `build/repo` also publishes the pinned `cylanimateditem` there, for the React Native and Flutter hosts. The core adds
+    no animation library; the example keeps Lottie, libpag and rive-android.
+  - HarmonyOS and the mini program: TODO, blocked upstream. CYLTabBarController has no `CYLAnimatedItem` component there
+    yet (the guide's TODO 3 and 4); no local copy is invented. When it ships, `harmony/classifymenu` and the mini program
+    `cyl-tag-button` move onto it the same way.
+  - Tests: Example-Swift `CYLTagButtonStaticImageTests` (no engine in that example: static image, placeholder only
+    without a static image, none for a title alone, playback does nothing, the accessory), Example
+    `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` (with the engines: a missing file and an
+    unknown type), the Objective-C standalone test (inherited members visible to Objective-C), Android
+    `CYLTagButtonStandaloneTest` (no library: static image and same layout, placeholder rule, the accessory's tap).
+  - Parity tables regenerated: iOS -> Android 784 / 792 = 99.0 (the 8 `TODO` rows predate this task), Android -> iOS
+    731 / 731 = 100; `ios_public_api.py` lists CYLTagButton's inherited `CYLAnimatedItemView` members, mapped in
+    `api-map.json`. Mini program `npm test`: 110 pass, 0 fail.
+- **TODO (verification)**: no Xcode, Android SDK or DevEco in this Linux container, so nothing was compiled: (1) `pod
+  install` and the iOS builds and tests (`scripts/unit-tests.sh`, `scripts/pod-lint.sh lib`) in CI, in particular the
+  Swift overrides of the Objective-C members (`title`, `image`, `selectedImage`, `animationSpeed`,
+  `animationRestingProgress`, `layoutContent(in:)`) and `scripts/swift-api-check.sh` (refresh
+  `scripts/swift-api-baseline.json`); (2) the Android build and Robolectric tests (`android/scripts/gradle.sh merged
+  :library:testDebugUnitTest :example:assembleDebug`) and the `build/repo` copy of `cylanimateditem`; (3) the example
+  screenshots of the animated tags (Lottie, PAG, Rive, SVGA, GIF) against the previous ones.
+
+## DONE (2026-11-17, closed 2026-11-19): CYLAnimatedItem is its own pod and module
+
+- **Context**: branch `feat/harmony` (PR #20). CYLTabBarController's guide
+  ([docs/Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md))
+  was updated at `1f0fcce` (`c53d2899`): the component is now the pod and module `CYLAnimatedItem`
+  (`CYLAnimatedItem.podspec`, subspecs `Core`, `Engine`, `LottieObjectiveC`, `Lottie`, `LottieSwift`, `PAG`,
+  `PAGEnterprise`, `Rive`, `SVGA`, `GIF`), with no dependency on CYLTabBarController; Swift writes
+  `import CYLAnimatedItem`, Objective-C `@import CYLAnimatedItem;`; Android's engine classes moved to
+  `com.cyl.animateditem` (type aliases stay in `com.cyl.tabbar`). Until it is on the trunk, every Podfile names
+  `pod 'CYLAnimatedItem'` by `:git` + `:commit`.
+- **Requirements**: re-read the updated guide and adjust: the core depends on `CYLAnimatedItem` (no engine), imports
+  it instead of CYLTabBarController; the examples add `CYLAnimatedItem/<Type>` engines; pins move to `1f0fcce`; lint
+  includes both podspecs; Android imports the new package.
+- **Prompt (verbatim)**: "更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
+- **Prompt (English)**: "The document was updated, latest address …/docs/Animated-Item.md; some descriptions changed. Please
+  read it again and adjust."
+- **Status**: iOS and Android adjusted, pending CI. The podspec depends on `CYLAnimatedItem` (default subspec `Core`,
+  no engine); `CYLTagButton.swift` imports `CYLAnimatedItem` (`CYLTabBarController` only where the module is missing,
+  that is Swift Package Manager, which still compiles the component into CYLTabBarController); every Podfile names
+  `pod 'CYLAnimatedItem'` by `CYL_ANIMATED_ITEM` (same commit) and the examples' engines are `CYLAnimatedItem/<Type>`;
+  pins `7511f7d` → `1f0fcce`; `scripts/pod-lint.sh lib` includes `CYLAnimatedItem.podspec` from a checkout of the
+  commit; Android imports `CYLTabBarItemAnimationViewMaking` from `com.cyl.animateditem`. Not built here (no Xcode,
+  no Android SDK). TODO: CI on the commit; the Objective-C redeclarations of `082f753` can go once Objective-C tests
+  `@import CYLAnimatedItem;` (kept for now: the owner rejected importing the tab bar, and they work).
+- **CI on `0b6917d`** (run 44017316252): three failures.
+  1. "Unit tests (menu)": the demo app could not load `CYLClassifyMenuViewController`'s members. The root Podfile
+     builds static libraries, and `CYLAnimatedItem.podspec` does not set `DEFINES_MODULE`, so the module
+     `CYLTagButton` imports did not exist there. Fix: `:modular_headers => true` on the pod in the root and
+     TagCollectionView Podfiles (the other Podfiles use frameworks). Upstream suggestion: `DEFINES_MODULE` in
+     `CYLAnimatedItem.podspec`.
+  2. `CYLAndroidSampleAccessibilityTests.testPictureAndTagGroupsAreAccessibilityElements`: the groups were not hidden
+     after a fixed 1.2 s wait (the image tag code does not use `CYLTagButton`). The test now waits for the condition.
+  3. **TODO, upstream**: `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay` fails for a file
+     with an unknown extension. CYLTabBarController's Lottie animator takes every file no other animator takes
+     (`canAnimateFileAtURL:` returns `URL != nil`), and its Objective-C player returns a `LOTAnimationView` even when
+     the file is not an animation, so the static image is hidden instead of shown. The guide lists the Lottie
+     Objective-C load callback as TODO 2. The fix belongs in CYLTabBarController (return no view when the
+     composition does not load); the test is kept as written.
+- **Upstream fixes pinned** (2026-11-17): CYLTabBarController `fbd05d5` (branch `fix/lottie-unplayable-file`, PR #814,
+  the newest commit on any branch) sets `DEFINES_MODULE` in `CYLAnimatedItem.podspec`, and its Lottie animator no
+  longer makes a view for a file Lottie cannot play. Every pin moves from `1f0fcce` to `fbd05d5`. The
+  `:modular_headers => true` workarounds stay until CI confirms the module, then go. Pending CI.
+
+- **PR #814 merged** (2026-11-17): the owner merged CYLTabBarController PR #814 into `feat/cross-platform-components`
+  (PR #788, merge `9a54e26`), so every pin moves from `fbd05d5` to `9a54e26` and the AGENTS.md exception goes. The
+  newer `47aec88` ("report registered and missing animation engines", 05:25 UTC) is on the merged PR's branch
+  `fix/lottie-unplayable-file`, not in #788, and lacks the license notices: not pinned until it is merged into #788.
+  The `:modular_headers => true` workarounds stay until CI on this pin passes (`9a54e26` sets `DEFINES_MODULE`).
+- **Pin `0a63bed`** (2026-11-17): the #788 tip and the newest commit on any branch: the engine report (`1e53d7a`,
+  formerly `47aec88`) and license notices on top of the #814 merge `9a54e26`. Both #814 fixes are kept
+  (`DEFINES_MODULE`, `CYLTabBarItemAnimationURLMayBeLottie`).
+
+- **Closed (2026-11-19):** the iOS CI (`pod lib lint` and the unit tests) passes at `e4a69356` with the pins at
+  CYLTabBarController `b376c278`; both upstream fixes (`DEFINES_MODULE`, the Lottie-only animator) are in every pin
+  since `0a63bed`.
+
+## DONE (2026-11-17): the guide re-read at `0a63bed`
+
+- **Prompt (verbatim)**: "我已经更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
+- **Prompt (English)**: "I updated the document, latest address …/docs/Animated-Item.md; some descriptions changed. Please read
+  it again and adjust."
+- **What changed**: the guide records both bugs this repository's CI found on `0b6917d` as fixed in CYLTabBarController's
+  core: `CYLAnimatedItem.podspec` defines its module ("no app needs modular headers for it"), and the Lottie animator
+  takes only a Lottie document (`CYLTabBarItemAnimationURLMayBeLottie()`); failure case (4) now says a picture or a
+  broken local file makes no Lottie view; the entry waits for a re-test here.
+- **Adjusted**: the `:modular_headers => true` workaround is removed from the root and TagCollectionView Podfiles (the
+  core fix replaces it, as the core-first rule asks). `CYLTagButtonTests.testTagButtonDisplayPriorityWhenTheAnimationCannotPlay`
+  is the re-test: unchanged, expected to pass on `0a63bed`. Pending CI.
+
+- **CI on `69db925`** (run 44026180641): `pod lib lint` passes (first time since the migration). "Unit tests (menu)"
+  fails again with "cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable members that
+  could not be loaded", now with `CYLAnimatedItem.modulemap` on the command line (upstream `DEFINES_MODULE`, the
+  workaround removed in `dd8c535`). Cause: the demo app imports only CollectionViewClassifyMenu, whose public classes
+  are `CYLAnimatedItemView`s, and with explicit modules it did not load the base class's module (at `082f753` the app
+  imported CYLTabBarController, which then held the component). Fix in the core: `CYLTagButton.swift` re-exports the
+  module (`@_exported import CYLAnimatedItem`, as CYLTabBarController does), so every client of the library loads it.
+  Pending CI.
+
+## DONE (2026-11-17, checked 2026-11-19): Android CYLIndexPathButton, CYLRightImageButton, CYLMultipleFilterHeaderView on CYLTagButton
+
+- **Context**: branch `feat/harmony` (PR #20). On iOS all three already use the one icon + title component:
+  `CYLIndexPathButton` and `CYLRightImageButton` subclass `CYLTagButton`, and `CYLMultipleFilterHeaderView` shows its
+  title in `titleButton`, a `CYLTagButton` (`docs/Swift-Migration.md`, row 12). On Android
+  (`android/merged/library`) they still extend `Button` / `ViewGroup` and draw their own icon and title, so a new
+  animation type would not reach them. Android SDK not available in this container: CI is the build check.
+- **Requirements**: continue the TODOs; do not block progress; same structure as iOS, so the shared
+  `CYLAnimatedItemView` engine reaches every icon + title view.
+- **Prompt (verbatim)**: "continue fix todo还没发布的组件尝试使用commit方式导入。不要阻碍进度"
+- **Prompt (English)**: "Continue fixing the TODOs. Try to import components that are not released yet by commit. Do not
+  block progress."
+- **Status** (2026-11-17): code changed, **not compiled here; CI is the check** (no Android SDK in this container).
+  - `CYLIndexPathButton` (`CYLClassifyMenu.kt`) now subclasses `CYLTagButton` (was `Button`). Kept: `section`, `row`,
+    `cyl_imageTitleSpacing` (now `style.imageTitleSpacing`), `cyl_titleLeadingInset` (now the leading content inset
+    of every state of `style`), `currentImage` (`selectedImage` while selected, else `image`), and a new `gravity`
+    property (horizontal gravity mapped to `style.contentAlignment`). Removed: `setImage(Drawable?)` (its JVM signature
+    clashes with `CYLTagButton.image`'s setter; callers use `image = …`) and the hand-made layout (`onLayout`,
+    `onTextChanged`, padding math): the icon, title, animation, placeholder and fallbacks are `CYLTagButton`'s.
+  - `CYLRightImageButton` now subclasses `CYLTagButton` (was `Button`, now `open` as on iOS): style
+    `CYLMenuStyle.sectionTitle(fontSize = 12f)` with the arrow after the title 7 dp apart, `image` / `selectedImage`
+    the bundle arrows (kept in their own colors), new `expandTitle` / `collapseTitle` (the iOS properties), never
+    pressed.
+  - `CYLMultipleFilterHeaderView` (`CYLMultipleFilter.kt`) shows its title in `titleButton: CYLTagButton` (a
+    `CYLIndexPathButton`, `CYLMenuStyle.sectionTitle(16f, 50 % black)`, 24 dp icon, title at 50 dp with or without the
+    icon, a TalkBack heading reported as text, not a button). `imageView` and `titleLabel` stay as read-only accessors
+    of `titleButton.imageView` / `titleButton.titleLabel`.
+  - Core additions, ported from iOS: `CYLMenuStyle.classifyMenuTag(look)`, `CYLMenuStyle.filterTag()`,
+    `CYLMenuStyle.sectionTitle(fontSize, textColor, leadingInset)`, the enum `CYLCollectionCellButtonStyle`
+    (`general`, `home`, `red`, `chengNi`) and `CYLTagButton.cylApply(look)` (`CYLGeneralExtensions.kt`; the
+    `TextView.cyl_*Style` functions stay for plain text views).
+  - Callers changed: `CYLCollectionViewCell` (`cylApply(chengNi)` instead of `cyl_chengNiStyle()`),
+    `CYLFilterHeaderView` (`titleButton` in `sectionTitle(leadingInset = 16f)`, not clickable, heading),
+    `CYLClassifyMenuViewController` (`title` / `image` instead of `text` / `setImage` / font / gravity calls; data
+    source images wrapped with `cyl_imageWithRenderingModeAlwaysOriginal()` so they keep their colors as on iOS; the
+    More button's section name is its accessibility hint), `CYLFilterCollectionCell` (`CYLMenuStyle.filterTag()`
+    instead of a state-list background and text colors), `CYLMultipleFilterController` (`titleButton.title`). The
+    example and the androidTest folder had no callers. New Robolectric test
+    `CYLClassifyMenuTest.menuButtonsAndFilterHeaderUseTagButtons`.
+  - Parity tables regenerated from the maps (`android/merged/api-map.json`, `ios-map.json`):
+    `docs/android-api.md` 784 to 791 / 792 (99.9), `docs/android-ios-api.md` 736 / 736 (100).
+  - Remaining: CI build and the unit tests; screenshots of the classify menu and the multiple filter on Android to
+    compare with iOS. **Done 2026-11-19 (Windows session), 100/100:** the library and the example build, Android library
+    tests 87 / 0 at `9e9180d7`; on the emulator the More / Less button and the filter section titles render as on iOS
+    (`assets/android-menu-filter-tagbutton.png`); `docs/android-api.md` 792 / 792 (`9e9180d7` mapped the category row).
+- **Pin `d875dd1`** (2026-11-17): the #788 tip and newest commit (`5ff6021` guide, `ab29a84` late-failure fallback and remote GIF downloads, `d875dd1` remote PAG downloads); `DEFINES_MODULE` kept.
+
+## 90/100 (2026-11-17, reviewed 2026-11-19): the guide re-read at `57a527e`: CYLAnimatedItem on HarmonyOS and the mini program
+
+- **Context**: CYLTabBarController `842aef8` adds the component on HarmonyOS (ohpm module
+  `CrossPlatform/harmonyos-cyltabbar/cylanimateditem`, `CYLAnimatedItemView`, engines registered by the app with
+  `CYLAnimatedItemEngines.register(...)` and an `animationBuilder`, no animation library in the module) and on the WeChat
+  mini program (`src/cyl-animated-item` in cyl-tabbar-miniprogram, engines as abstract nodes `cyl-lottie-view` and its
+  siblings, GIF through `<image>`). Unpublished: taken by commit (HarmonyOS `file:` or a copy of the folder at the pinned
+  commit; mini program `github:ChenYilong/CYLTabBarController#<sha>` or a copy of `src/cyl-animated-item`). `57a527e`
+  fixes the iOS umbrella header (animator headers) and an accessory test. Pins move to `57a527e`.
+- **Requirements**: re-read the guide and adjust; import unreleased components by commit; do not block progress; the core
+  depends on no animation engine, only the examples add engines; every platform.
+- **Prompt (verbatim)**: "我已经更新了该文档地址 最新地址https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md 文档更新了一些描述 请重新阅读 调整"
+- **Prompt (English)**: "I updated the document, latest address …/docs/Animated-Item.md; some descriptions changed. Please read it
+  again and adjust."
+- **Status**: started. Pins `57a527e`; HarmonyOS and mini program migrations next (not buildable here: no DevEco, no WeChat
+  DevTools).
+- **HarmonyOS done** (`222a58a`, not compiled here: no DevEco): `harmony/classifymenu`'s `CYLTagButton` draws its icon
+  (animation, static image, placeholder) with `CYLAnimatedItemView` through `CYLTagAnimatedIcon` (ArkTS structs cannot
+  subclass). The component is vendored unmodified at `57a527e` in `harmony/cylanimateditem` (README with commit, source,
+  license), registered in `harmony/build-profile.json5`, depended on with `file:../cylanimateditem`. The library dropped
+  `@ohos/lottie`, `@tencent/libpag` and `@ohos/rive`; the example adds them and registers Lottie, PAG, Rive, SVGA and GIF
+  (`cylRegisterExampleAnimationEngines()` in `EntryAbility.onCreate`); the players and the SVGA decoder moved to the
+  example. Public API kept (`animationView`, `animationPlayer`, `playAnimation()`, speed, loops, resting progress);
+  `CYLAnimatedIcon` and the per-engine players left the library.
+- **Mini program done** (`b4c7460`, `npm test` 126/126, the packed tarball too; not run in WeChat DevTools):
+  `cyl-tag-list` and `cyl-tag-button` draw every icon through `cyl-animated-item`, vendored at `57a527e` into
+  `miniprogram_dist/` by `scripts/fetch-cyltabbar.js` (with `cyl-animation-placeholder`, LICENSE and COMMIT files;
+  `--check` compares them); engines come from the app through `generic:cyl-lottie-view` / `-pag-` / `-rive-` / `-svga-`;
+  the library's `cyl-animation-icon`, the `engines` option and `isAnimationEngineAvailable` are gone.
+- **TODO**:
+  1. Upstream gaps in `cyl-animated-item` (asked of the CYLTabBarController session, core first): GIF drawn with a plain
+     `<image>` (no resting/last frame, speed or loop: a step back on the "Play all / speed / loop" example rule) and
+     always-on autoplay. HarmonyOS `CYLAnimatedItemView`: square icon only, no pixel map or symbol as the static image,
+     type by file extension (no inline Lottie JSON), 4 vp padding and a 44 vp minimum height (centred and clipped by the
+     tag; check on a device).
+  2. The React Native and Flutter HarmonyOS shells (`react-native/.../harmony-example`, `flutter/cyl_tag_list_ohos`) build
+     `harmony/classifymenu` from source: they need the `cylanimateditem` module and their own engine registration.
+  3. Publishing `@cyl/classifymenu` to ohpm needs `cylanimateditem` published first (`file:` dependency).
+  4. Build and run: ArkTS compile, HarmonyOS tests and an emulator run; the mini program in WeChat DevTools.
+- **Review (2026-11-19, Windows session): 90/100.**
+  1. Done. The mini program gaps closed upstream (PR #815, `faf535e0`, in the pins since `074285a6`; GIF stills, one-pass
+     play, `embedded`, `autoplay`: `animated-item-migration.md` row 19), and SVGA joined the engines on 2026-11-19
+     (`bc4e4545`). HarmonyOS: built, host tests and emulator checks (row 17, `harmony-verification.md`).
+  2. **Open.** The React Native HarmonyOS shell (`harmony-example/harmony/build-profile.json5`) lists `entry`,
+     `cyltabbar` and `classifymenu` but not `cylanimateditem`, which `classifymenu` now depends on (`file:../cylanimateditem`).
+     It also registers no engines, so its tags would show static images. Fix: add the module, register the example's
+     engines as `harmony/entry` does, then build. It is a full React Native for OpenHarmony app (`npm install`,
+     `scripts/setup.sh` codegen and bundle, native build); not built here yet. The Flutter shell
+     (`flutter/cyl_tag_list_ohos`) needs the Flutter for OpenHarmony SDK, which is not installed on this Windows host.
+  3. Blocked on the maintainer: publishing `cylanimateditem`, then `@cyl/classifymenu`, to ohpm.
+  4. Done: HarmonyOS ArkTS build, host tests and emulator runs (row 17); the mini program in WeChat DevTools (row 20, and
+     the SVGA check of 2026-11-19).
+
+## DONE (2026-11-17): upstream `cyl-animated-item` playback for the mini program tags (CYLTabBarController PR #815)
+
+- **Context**: the owner chose "Extend upstream, then migrate (Recommended)": add playback, a resting progress, GIF stills
+  and data-module sources to CYLTabBarController's mini program `cyl-animated-item`, pin it by commit, then move the tags
+  onto it with no demo regression.
+- **Result upstream**: [CYLTabBarController PR #815](https://github.com/ChenYilong/CYLTabBarController/pull/815)
+  (branch `feat/animated-item-miniprogram-playback`, into `feat/cross-platform-components`): `fe1978e0` (`animationData`,
+  `autoplay`, `restingProgress`, `gifFirstFrame` / `gifLastFrame` / `gifDuration`, `playAnimation()` /
+  `restartAnimation()` / `stopAnimation()`), `3602ae67` (`riveWasmPath` / `pagWasmPath`; cyl-rive and cyl-pag treat an
+  empty `wasm-path` as their default), `ca6219a9` (`animationType`, for `.riv.bin` / `.pag.bin`), `b51ac0ae` (`embedded`:
+  no padding, 44 px minimum or accessibility role inside a tag). `npm test` there: 36 pass.
+- **Migration here**: the other session pushed the same migration first (`b4c7460`, vendored at `57a527e`, the engines
+  behind the example's `components/cyl-tag-animation-view`), so this session's copy was not committed (a patch is kept
+  in its scratchpad). Left (handed to that session): at `57a527e` a GIF tag loops with no stills and Play all cannot
+  restart it; once #815 is merged, move the pins to its merge commit and pass `gif-first-frame` / `gif-last-frame` /
+  `gif-duration` (and `embedded`) to the vendored component.
+
+## Progress against the guide (2026-11-17)
+
+The item-by-item progress, the score (72 at `3b0d9ea`) and the remaining TODOs of the CYLAnimatedItem migration are kept in
+[animated-item-migration.md](animated-item-migration.md).
+
+## Concurrency: a started run finishes (2026-11-17)
+
+`ios.yml` uses `cancel-in-progress: false`. Several sessions push to the same branch within minutes; with
+`cancel-in-progress: true` every push cancelled the running iOS run, and on 2026-11-17 no iOS run finished for more
+than two hours. GitHub keeps at most one pending run per concurrency group and replaces it with the newest push, so a
+started run completes and the next one tests the newest commit.
+- **Pin `c8132d2`** (2026-11-17): CYLTabBarController `c8132d2`, the #788 tip and newest commit. It fixes the cause of the
+  static-library demo failure ("cannot inherit from class 'CYLClassifyMenuViewController' because it has overridable
+  members that could not be loaded", still failing on `438172c` with every workaround here): under CocoaPods
+  `CYLTabBarController.h/.m` now import `<CYLAnimatedItem/CYLAnimatedItemView.h>` by its module instead of the quoted
+  path, so `CYLAnimatedItemView` is declared once. Also brings the mini program `cyl-animated-item` reading `*.svga.bin`
+  and `animationType`, remote Lottie downloads on iOS and the FlatDesign tab button on `CYLAnimatedItemView`. The vendored
+  mini program component was re-fetched (`fetch-cyltabbar.js`, `npm test` 130/130); the HarmonyOS module is unchanged
+  upstream (README pin updated). Pending CI: the menu job decides whether the demo-app workarounds (`2de3039` modular
+  headers, `6931506` demo import) can go.
+- **Core fix for Objective-C callers** (2026-11-17): CYLSearchViewController's example tests failed to compile on its
+  `e7d9655` with "property 'position' not found on object of type 'CYLMenuFoldControl *'": the Swift translation of
+  `CYLMenuFoldControl` exposed only its initializer to Objective-C. The class is now `@objcMembers`, so every property
+  and method is visible from Objective-C; the Swift API is unchanged. Not built here (no Xcode; `swift-api-check.sh`
+  needs it); CI is the check.
+- **Workarounds removed** (2026-11-17 17:55 UTC): the static-library menu suite passes since CYLTabBarController
+  `83a8ff8` (its public headers `@import CYLAnimatedItem;`; the cause was "CYLAnimatedItemView expected in
+  'CYLAnimatedItem' but found in 'CYLTabBarController'", found with `-disable-deserialization-recovery`). Run
+  44092883295 on `65d2d4a` is fully green. Removed here: `:modular_headers => true` on `CYLAnimatedItem` in the root,
+  TagCollectionView and React Native example Podfiles (`2de3039`), and the menu suite's diagnostic flag in `ios.yml`
+  (`3c4e7ae`; `CYL_SWIFT_EXTRA_FLAGS` stays available in `scripts/unit-tests.sh`). If the menu suite fails again
+  without modular headers, restore them. The demo's `import CYLAnimatedItem` (`6931506`) is the other session's to
+  remove.
+- **Confirmed** (2026-11-17 19:33 UTC): run 44142400181 on `e73850e` (no modular headers, no demo `import
+  CYLAnimatedItem`): menu, tag and example suites and `pod lib lint` pass. Library build, swift suite and Example
+  screenshots were cancelled while still queued (no runner was assigned, 0 steps; runner capacity, not the workflow).
+  TODO: the screenshots of these runs did not reach the `ci-screenshots` branch (no `feat-harmony/<sha>/` folder for
+  `65d2d4a`, `348805e`, `e73850e`), and artifact storage is not reachable from the cloud sessions; check the publish
+  step for pull request runs.
+
+## DONE (2026-11-17): CI screenshots reach the ci-screenshots branch under the branch commit
+
+- **Context**: the "Example screenshots" job of `ios.yml` publishes with `scripts/publish-screenshots.sh`, but no
+  `ci-screenshots/feat-harmony/<sha>/` folder existed for `65d2d4a`, `348805e` or `e73850e`. The log of the `348805e` run
+  says "Published 54 screenshots to ci-screenshots/feat-harmony/531cfa3": on `pull_request` runs `GITHUB_SHA` is the
+  temporary merge commit (`refs/pull/N/merge`), not the branch commit, so the folder name matches no commit of the branch.
+  Artifact storage is blocked from the cloud sessions, so the branch is the only way to read the images there.
+- **Requirements**: fix the screenshot publishing; also add a screenshot job to CYLSearchViewController's CI.
+- **Prompt (verbatim)**: "to fix the screenshot publishing in ClassifyMenu and add a screenshot job to CYLSearchViewController's CI"
+- **Status**: done. `bbda97a1` passes the head commit (`SCREENSHOT_SHA`); the run for it published 54 screenshots to
+  `ci-screenshots/feat-harmony/bbda97a/` (checked 2026-11-17 21:15 UTC; `animations@en.png` shows every engine registered
+  and the playback controls).
+
+## DONE (2026-11-19; TODO 2026-11-19): CYLTagListView editing mode and tag list cache (iOS)
+
+- **Branch**: `feat/harmony`. Requested from the CYLSearchViewController session (Mac), for its contact tags example.
+- **Prompt (verbatim, from the user of that session)**: "为展示CYLPlaceholderView，为该example增加以下编辑功能，最近使用右侧加删除图标，修改我的标签section样式，为尾部tag折叠展开样式。点击管理后进入编辑模式tag 会显示删除按钮，底部会有增加tag按钮。编辑状态下允许拖动。点击删除按钮之外的tag区域可以跳转下一页面显示全部含有此标签的联系人全列表。模仿附件的样式。要求不跳转其他页面，仅仅修改taglist接口进入编辑状态。我推测你可能需要修改 CollectionView对应的库的代码，新增编辑样式接口。在调用编辑样式接口后，taglist样式会变动，在tag上显示删除icon，允许推动，还有显示新增tag的底部控件。修改CollectionView对应的库的代码后直接推送到CollectionView对应的库的代码，repin对应commit完成需求。"
+  (English: to show CYLPlaceholderView, add editing to that example: a delete icon right of "Recent", the "My Tags"
+  section folded with a trailing fold tag; "Manage" enters editing mode, where tags show a delete button, an add-tag
+  control appears at the bottom and tags can be dragged; a tap outside the delete button opens a page listing every
+  contact with that tag. Like the attached AndroidTagView demo. No page change for editing: only switch the tag list
+  into editing through its API, which you will need to add to this library: after calling it, the tags show a delete
+  icon, can be dragged, and an add-tag control shows at the bottom. Push the library change and re-pin it.)
+- **Requirements (this library, iOS)**: `CYLTagListView.isEditing` / `setEditing(_:animated:)`; while editing: delete
+  indicators on the items of editable sections, reordering, a tap reports `menu(_:didSelectItemAt:)` without selecting,
+  folded sections unfold, and `addItemView` (`CYLTagListAddItemView`: a text field and an Add button) shows below the
+  last section and reports through `menu(_:didRequestNewItemWithName:at:)`; data source `menuSectionAllowsEditing(_:)`,
+  delegate `menu(_:didChangeEditing:)`; localized strings (en, zh-Hans, zh-Hant); tests.
+- **Follow-up prompt (verbatim)**: "注意编辑模式，触发新的排序后，你可能需要加入缓存 或者数据库支持，为ClassifyMenu 增加类似本仓库的数据库 缓存实现。"
+  (English: after a new order in editing mode you may need a cache or a database: add to ClassifyMenu a database / cache
+  like CYLSearchViewController's.)
+- **Status**: DONE (2026-11-19). `CYLTagListView.isEditing` / `setEditing(_:animated:)`: while editing, the items of the
+  editable sections (`menuSectionAllowsEditing(_:)`) show the delete indicator (deletable unless `menuItemIsDeletable`
+  says no), can be dragged (`menuMoveItem(at:to:)`, also without `allowsReordering`), are not selected by a tap (the
+  delegate still gets `menu(_:didSelectItemAt:)`), folded sections show every item (`canFold` is false), and
+  `addItemView` (`CYLTagListAddItemView`: a text field and an Add button, `CYLMenuAddTag`, `CYLMenuAddTagPlaceholder`,
+  `CYLMenuTagAdded`) shows below the last section, inside the collection view (its height is in `contentHeight`), and
+  reports through `menu(_:didRequestNewItemWithName:at:)`; `menu(_:didChangeEditing:)`. Cache (the follow-up), as
+  CYLSearchViewController's suggestion cache: `CYLTagListCachePolicy` (none, database, userDefaults, sandboxFile),
+  protocol `CYLTagListCache`, store `CYLTagListStore` (SQLite in Application Support, `NSUserDefaults`, or a JSON
+  file; an emptied section is kept apart from a never-saved one); `CYLTagListView.cachePolicy`, `cacheName`, `cache`,
+  `cachedTitles(inSection:)`, `cacheKey(forSection:)` (data source `menuCacheKey(forSection:)`), and
+  `saveEditableSectionsToCache()`, called after a drag, an editing delete and an added tag. The podspec and
+  Package.swift link `sqlite3`. Tests `CYLTagListEditingTests` (5: indicators and the add control, taps and deletes,
+  unfolding and adding, reordering of editable sections, every cache policy); Example 103 of 103 on an iPhone 18 Pro
+  simulator (iOS 27.2). Android, HarmonyOS and mini program: the new public symbols are TODO rows in
+  `docs/android-api.md` (793 of 831) for the Windows session. Used by CYLSearchViewController's contact tags example
+  (Manage = `setEditing`, "My Tags" saved in the database).
+
+## DONE (2026-11-19; TODO 2026-11-19): CYLTagListView network sync: end-of-editing callback, remote source, load policy (iOS)
+
+- **Branch**: `feat/harmony`. Requested from the CYLSearchViewController session (Mac), for its contact tags example.
+- **Prompt (verbatim, from the user of that session)**: "这里需要注意 CollectionViewClassifyMenu 在模仿CYLSearchSuggestionStore 过程中有一个注意事项。与CYLSearchSuggestionStore 不同的是CYLSearchSuggestionStore 只需要本地缓存。无须上传网络  上传。但是 CollectionViewClassifyMenu的CYLTagListCachePolicy还有上传网络的需求，本地拖拽排序后，需要从本地获取到排序后的列表，我们将CYLSearchSuggestionStore保存的缓存称之为缓存A。上传网络，可能需要在编辑结束后增加回调，返回排序后数据给用户，让用户自行上传。下次再进入该页面需要 根据CYLTagListCachePolicy里的缓存策略，缓存优先还是网络优先。还是先缓存后网络刷新。你可能增加回调接口后在example层，演示example可以做一个演示。你将排序后的taglist数据。缓存到沙盒里，这里是缓存A，将缓存A复制一份称之为缓存B，这个就是缓存上传网络服务器后，服务器数据允许不同设备设备上传，这里涉及到多端同步的问题。在将将缓存A复制一份称之为缓存B的过程中增加5秒延迟，并在用户界面显示CYLHUD，提示正在上传，上传结束展示CYLHUD显示上传结束。下次进入该页面将沙盒里的这个新缓存B当作网络数据，并在获取该缓存时候增加5秒延迟，以模拟从网络下载的延迟效果。在该example右上角增加一个同步按钮，该按钮模拟其他设备编辑后，本机拉取新数据的功能，点击同步按钮后，展示CYLHUD显示正在从其他设备同步，该同步按钮如何模拟多设备数据同步：在example层随机一个tag，以模拟多设备编辑后的效果。并修改前两个tag的顺序。更新缓存B。下次进入该页面将沙盒里的这个新缓存B当作网络数据，并在获取该缓存时候增加5秒延迟，增加CYLHUD以模拟从网络下载的延迟效果。core层面缓存策略默认为先缓存后网络数据下载成功后刷新。example层面允许自定义。"
+- **Correction (verbatim, same user)**: "typo：我们将CYLTagListCachePolicy保存的缓存称之为缓存A" (English: typo: cache A is
+  the cache saved by `CYLTagListCachePolicy`, not by CYLSearchSuggestionStore).
+- **English**: unlike CYLSearchViewController's suggestion cache (local only), the tag list cache also needs a server.
+  After editing ends, a callback gives the host the reordered lists to upload itself. When the page opens again, a
+  load policy decides: cache first, network first, or cache then a network refresh (the core's default). The example
+  (CYLSearchViewController's contact tags) simulates the server: cache A is the local cache; uploading copies it to
+  cache B (the "server", shared by devices) after 5 s with a HUD ("Uploading", then "Upload finished"); opening reads
+  cache B as network data after 5 s with a HUD; a sync button (top right) simulates another device (a random new tag,
+  the first two tags swapped, written to cache B) and pulls it the same way. The example may choose another policy.
+- **Requirements (this library)**: delegate `menu(_:didFinishEditingWithTitles:)` (and `editingFinishHandler`);
+  protocol `CYLTagListRemoteSource`; enum `CYLTagListLoadPolicy` (`cacheThenNetwork` default, `cacheFirst`,
+  `networkFirst`) and `CYLTagListDataOrigin`; `CYLTagListView.remoteSource`, `loadPolicy`,
+  `loadSections(withKeys:completion:)` (network results saved to the cache); tests.
+- **Status**: DONE (2026-11-19). `setEditing(false, animated:)` reports the edited sections, by cache key and in their
+  new order, through `menu(_:didFinishEditingWithTitles:)` and `editingFinishHandler` (`editableSectionTitles()`
+  builds them; the cache already has them). `CYLTagListRemoteSource` (`fetchSections(withKeys:completion:)`),
+  `CYLTagListLoadPolicy` (`cacheThenNetwork`, the default: the cache at once, then the server, a successful download
+  saved and reported again; `cacheFirst`: the server only when the cache lacks a section; `networkFirst`: the cache
+  only when the download fails), `CYLTagListDataOrigin`; `CYLTagListView.remoteSource`, `loadPolicy`,
+  `loadSections(withKeys:completion:)` (completion on the main queue). Uploading stays the host's. Tests
+  `testFinishingEditingReportsTheEditedSectionsForUploading`, `testLoadPoliciesOrderTheCacheAndTheServer` (every
+  policy, success and failure, the download saved); Example 106 of 106 (iPhone 18 Pro simulator, iOS 27.2). The new
+  public symbols are TODO rows in `docs/android-api.md` (796 of 849) for the Windows session. Used by
+  CYLSearchViewController's contact tags example (a simulated server with a 5 s latency and CYLPlaceholderHUD).
+
+## DONE (2026-11-19; TODO 2026-11-19): CYLTagListView renaming in editing mode, two trailing icons, item identifiers (iOS)
+
+- **Branch**: `feat/harmony`. Requested from the CYLSearchViewController session (Mac), for its contact tags example.
+- **Prompt (verbatim, from the user of that session)**: "编辑模式还应在删除按钮左边加一个编辑按钮，你可以适应CollectionView库新增加的CYLAnimatedStackView实现。追加两个icon的场景。点击编辑按钮后唤醒键盘，可以更新tag名字。依然遵循缓存以及网络下载策略。点击完成后更新缓存中的tag名称。这里注意tag的主键应该是id，避免更换顺序，改名后tag对应不到原来的联系人列表。联系人列表也应和主键id绑定。"
+  (English: in editing mode add an edit button left of the delete button, using the new CYLAnimatedItemStackView for
+  the two-icon case; the edit button raises the keyboard to rename the tag; the cache and download policies still
+  apply; Done updates the name in the cache. A tag's primary key must be an id, so a reorder or a rename never loses
+  its contacts; the contact list is bound to the id too.)
+- **Requirements (this library, iOS)**: `CYLTagButton.showsRenameIndicator` (a horizontal `CYLAnimatedItemStackView`
+  with a pencil and a cross before the title's end), a rename hit area in `CYLTagListCell` with a VoiceOver action;
+  `CYLTagListView`: data source `menuRenameItem(at:to:)` turns renaming on in editing mode, the add control becomes the
+  rename field (keyboard up, the title filled in), `menu(_:didRenameItemAt:to:)`, the cache saved; identifiers: data
+  source `menuIdentifierForItem(at:)`, `CYLTagListCacheItem` (identifier, title) in the cache, the edit-end callback
+  and the remote source (`loadItems(withKeys:completion:)`); strings in three languages; tests.
+- **Follow-up prompts (verbatim)**: "同时在编辑按钮和icon之外的区域，用户直接点击title label也可以直接唤起键盘编辑。如有必要更新 CollectionView库新增加接口实现完成该功能，并在CollectionView库新增加接口后，repin commit完成example。"
+  (a tap on the title, outside the icons, also edits); "编辑按钮图标换一个 这个图标 不易识别 边框带笔 那种" (a square-and-pencil
+  icon); "编辑按钮 与 删除按钮可以自定义间距，修改CollectionView的core里面的StackView组件，添加自定义间距 允许用户自定义。并默认增加合适间距" and
+  "这个间距要完整：可以stackview整体上下左右间距控制，以及item间距控制" (the spacing between the icons and around them, customizable,
+  with fitting defaults); "这个编辑框复用seachbar样式，为seachbar样式增加新的编辑样式初始化，该样式应固定fix跟随在键盘顶部完成core代码，后调用接口完成example"
+  (the edit field reuses CYLSearchViewController's search bar, as a new editing style pinned above the keyboard: done
+  there; this library lets the host bring that editor).
+- **Status**: DONE (2026-11-19). `CYLTagButton.showsRenameIndicator`: the delete indicator gives way to
+  `editingIndicatorsView`, a horizontal `CYLAnimatedItemStackView` of two icon-only `CYLAnimatedItemView`s (SF Symbols
+  "square.and.pencil" and "xmark"), each at least a line of the title; `CYLMenuStyle.editingIndicatorSpacing` (between
+  the icons, 8 by default) and `editingIndicatorInsets` (around them, left 4, right 2 by default) set every space and
+  count in the measured width; `renameIndicatorHitFrame`. `CYLTagListCell.isRenamable`, `renameHandler`,
+  `renamesOnTitleTap` (a title-sized tap area clear of the icons), a VoiceOver "Edit" action
+  (`CYLTagListAccessibilityIdentifier.renameButton`, `.renameTitle`). `CYLTagListView`: data source
+  `menuRenameItem(at:to:)` turns renaming on in editing mode; `renamesOnTitleTapWhileEditing` (true);
+  `beginRenaming(at:)`, `finishRenaming(to:)`, `cancelRenaming()`, `renamingIndexPath`; the add control becomes the
+  rename field (`CYLTagListAddItemView.beginRenaming(title:)`, "Done"), or the host's editor takes it
+  (`renameRequestHandler`, `submitNewItem(named:)`); `menu(_:didRenameItemAt:to:)`; the keyboard's overlap is added to
+  the bottom inset while editing, so the field stays above it. Identifiers: data source `menuIdentifierForItem(at:)`,
+  `CYLTagListCacheItem` (identifier, title), `CYLTagListCache.cachedItems(forSection:)` / `saveItems(_:forSection:)`
+  (optional; `CYLTagListStore` keeps them next to the titles), `editableSectionItems()`,
+  `menu(_:didFinishEditingWithItems:)`, `CYLTagListRemoteSource.fetchItems(withKeys:completion:)` (optional) and
+  `loadItems(withKeys:completion:)`. Strings `CYLMenuRenameTag`, `CYLMenuRenamePlaceholder`, `CYLMenuRenameDone`,
+  `CYLMenuTagRenamed` (en, zh-Hans, zh-Hant). Tests: renaming with two icons and ids, title taps, spacing and margins,
+  items from the server, an external editor; Example 109 of 109 (iPhone 18 Pro simulator, iOS 27.2). The new public
+  symbols are TODO rows in `docs/android-api.md` for the Windows session. Used by CYLSearchViewController's contact tags
+  example (tags keyed by id, contacts bound to the id, CYLSearchBarView's editing bar above the keyboard).
+
+## DONE (2026-11-19; TODO 2026-11-19): a built-in clear button in the section header, aligned with the title (iOS)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "recent右上角的删除图标应直接调用CollectView组件原有的自定义接口，这个属于已经封装好的，删除图标样式icon在其内部资源包已经内置，如果没有内置，增加该资源，且暴露接口直接在右上角添加删除按钮以及自定义点击事件回调，且新增限制，该图标顶部与底部应与左侧元素顶部 底部对齐。更新CollectView组件增加该限制，完成CollectView组件core代码后repin commit继续完成example"
+  (English: the trash icon at the top right of "Recent" should be this component's own API with its icon in the
+  component's bundle (add it if missing), a public way to show it with a tap callback, and a new rule: its top and
+  bottom align with the title on its left.)
+- **Status**: DONE (2026-11-19). There was no built-in clear button (hosts used `menuAccessoryView(forSection:)`).
+  Added: data source `menuShowsClearButton(forSection:)`, delegate `menu(_:didTapClearButtonInSection:)`,
+  `CYLTagListView.clearButtonHandler`, `CYLMenuStyle.clearButtonImage` / `clearButtonColor` (default: the bundle's
+  `cyl_trash`, an original template icon drawn for this library at 20 pt @1x, @2x, @3x, a file in the folder bundle
+  `Resources/CYLClassifyMenuImages.bundle` (user, verbatim: "请确保新增的图片资源文件在core代码仓库中均以文件夹形式管理，以iOS为例，图片资源文件均存放在.bundle的文件夹形式中";
+  copied by the podspec and by `Package.swift`, read first by `CYLMenuResources.image(named:)` through `imagesBundle`), tinted with
+  `headerTextColor`), `CYLTagListAccessibilityIdentifier.clearButton`, string `CYLMenuClearSection` (en, zh-Hans, zh-Hant;
+  VoiceOver reads "Clear <section title>"). The rule: the button is a square as tall as the title's text, its top and
+  bottom on the title label's, with a 44 point tap area. Test `testTheHeaderClearButtonIsBuiltInAndAlignedWithTheTitle`;
+  Example 110 of 110. Used by CYLSearchViewController's contact tags example ("Recent").
+
+## DONE (2026-11-19; TODO 2026-11-19): even spacing of the two editing icons by default (iOS)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "tag 的编辑状态下 CYlAnimated StackView右侧间距过大，item 间距过小，直接调整自定义间距实现，完成合适间距默认值，在本example中无须修改自定义间距就可实现合理间距效果。修改CYlAnimated StackView 代码后 repin无须修改example，测试效果。效果不佳继续修改。修改CYlAnimated StackView 代码后 repin无须修改example，测试效果"
+  (English: in editing mode the stack view's right gap is too large and the space between its items too small; fix it
+  through the spacing settings with fitting defaults, so the example needs no settings of its own; re-pin and test.)
+- **Cause**: `CYLAnimatedItemStackView.append(_:action:spacingBefore: 0)` set a custom spacing of 0 after the first icon,
+  which wins over `stackView.spacing`, and the inner stack kept its own small size, centered in the reserved area, so
+  the leftover width showed as a gap after the cross.
+- **Status**: DONE (2026-11-19). Each icon is pinned to its slot (width and height constraints), the style's spacing is
+  set as the custom spacing after the first icon, the glyphs are 80 % of their slot; defaults `editingIndicatorSpacing`
+  10 and `editingIndicatorInsets` left 4, right 0 (the tag's own padding follows the cross). Measured in
+  CYLSearchViewController's contact tags example without settings (iPhone 18 Pro simulator, @3x): title to edit icon
+  about 15 pt, between the icons about 17 pt, cross to the tag's edge about 17 pt (the tag's 14 pt padding). Tests check
+  the gap and that the icons fill the stack; Example 110 of 110.
+
+## DONE (2026-11-19; TODO 2026-11-19): editing icons sized to their glyphs, so the spacing is what one sees (iOS)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "space is not good enough continue fix"
+- **Cause**: each icon's slot was a full line of the title, and its glyph only 80 % of it, so about 2 points of empty
+  slot sat on each side of each glyph: the space after the cross looked larger than the tag's left padding, the spaces
+  around the icons uneven.
+- **Status**: DONE (2026-11-19). The slot is the title's cap height plus a quarter (`editingIconSide`), and the glyph
+  fills it. Measured in CYLSearchViewController's contact tags example without settings (iPhone 18 Pro simulator, @3x,
+  "Family"): left padding 14 pt, title to edit icon about 12.7 pt, between the icons about 12.7 pt, cross to the edge
+  about 14.7 pt. Example 110 of 110.
+
+## DONE (2026-11-19; TODO 2026-11-19): dragging a tag holds page scrolling (mini program)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "拖拽taglist启动后，以及拖拽结束后，应禁止taglist的滚动浏览功能防止拖拽手势和taglist 滚动浏览手势冲突。现在是有这个问题，你需要在taglist core 核心代码中修复后repin完成example 修复，需要默认启动。在联系人example中点击编辑后。可以复现。 我的测试平台是微信小程序"
+  (English: from the start of a tag drag until it ends, scrolling must be held so the drag and the scroll gestures do
+  not fight; fix it in the tag list core, on by default, then re-pin and fix the example; reproduced in the contact tags
+  example's editing mode on the WeChat mini program.)
+- **Cause**: `cyl-tag-cloud` bound `touchmove` without catching it (except with smear selection), so the finger that
+  drags a tag also scrolled the page.
+- **Status**: DONE (2026-11-19). `disablesScrollingWhileReordering` (default true): from the long press that starts a
+  drag until the drag ends or is cancelled, `scrollLocked` makes the item catch `touchmove`, which holds the page's
+  scrolling; `reorderingchange` {reordering} tells a host with a `<scroll-view>` to turn its `scroll-y` off for the same
+  time. Tests: `tag-components.test.js` (the drag sets and clears `scrollLocked`; off when the property is off; the
+  template binds `catchtouchmove` while locked).
+
+## DONE (2026-11-19, second pass; TODO 2026-11-19): the tag cloud locks scrolling from the first touch while editing (mini program)
+
+- **Prompt (verbatim, 2026-11-19)**: "还是不行，手势冲突，你应该找到类似CYLRootWindow这样的方法处理根视图，禁止滚动。拖拽taglist启动后，以及拖拽结束后，应禁止taglist的滚动浏览功能防止拖拽手势和taglist 滚动浏览手势冲突。…需要默认启动。在联系人example中点击编辑后。可以复现。 我的测试平台是微信小程序"
+  (English: still not working, the gestures conflict; handle the root view as CYLRootWindow does and disable scrolling;
+  hold the list's scrolling once a drag starts and after it ends; fix in the core, on by default; reproduced in the
+  contact tags example's editing mode on the WeChat mini program.)
+- **Why the first fix (`2ec3d90e`) was not enough**: it caught `touchmove` only after the long press; WeChat decides
+  whether a touch scrolls at its first `touchstart`, so the scroll had already begun.
+- **Status**: DONE in code (2026-11-19). `scrollLocked` now holds for the whole editing mode and any drag
+  (`disablesScrollingWhileReordering`, default true): the items bind `catchtouchmove` from the first touch, so a finger
+  on a tag drags or taps and never scrolls (gaps, headers and the rest of the page still scroll); it stays after a drop
+  while editing and is released when editing ends. Hosts also hold their own scrolling on `reorderingchange`
+  (`<scroll-view scroll-y>`, `<page-meta page-style="overflow: hidden">`, the root-view lock). Tests:
+  `tag-components.test.js`. Left: the user's check on a phone.

@@ -1,0 +1,207 @@
+[wechatide] skill-call: client=ClaudeCode tool=automation_evaluate
+{
+  "ok": true,
+  "tool": "automation_evaluate",
+  "clientName": "ClaudeCode",
+  "result": {
+    "success": true,
+    "result": {
+      "result": [
+        {
+          "path": "/data/animations/rive/house.riv.bin#stateMachine=State%20Machine%201",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"stateMachine\":\"State Machine 1\",\"duration\":1}",
+          "inputs": [
+            "Rooms"
+          ],
+          "info": {
+            "artboard": "Artboard",
+            "animations": 9,
+            "machines": 1
+          },
+          "viewModel": false
+        },
+        {
+          "path": "rive/check.riv.bin#stateMachine=State%20Machine%201&triggerInput=Check",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"stateMachine\":\"State Machine 1\",\"triggerInput\":\"Check\",\"duration\":1}",
+          "inputs": [
+            "Check",
+            "Error",
+            "Reset"
+          ],
+          "info": {
+            "artboard": "check_artboard",
+            "animations": 6,
+            "machines": 1
+          },
+          "viewModel": false
+        },
+        {
+          "path": "nu_button.riv.bin#stateMachine=State%20Machine&input=isOpen&duration=0",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"stateMachine\":\"State Machine\",\"input\":\"isOpen\",\"duration\":0}",
+          "inputs": [
+            "isOpen"
+          ],
+          "info": {
+            "artboard": "menu",
+            "animations": 4,
+            "machines": 1
+          },
+          "viewModel": false
+        },
+        {
+          "path": "/data/animations/rive/button.riv.bin#animation=active",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": false,
+          "hasInstance": true,
+          "options": "{\"animation\":\"active\",\"duration\":1}",
+          "inputs": [],
+          "info": {
+            "artboard": "main",
+            "animations": 2,
+            "machines": 0
+          },
+          "viewModel": false
+        },
+        {
+          "path": "/data/animations/rive/shapes.riv.bin",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": false,
+          "hasInstance": true,
+          "options": "{\"duration\":1}",
+          "inputs": [],
+          "info": {
+            "artboard": "Shapes",
+            "animations": 1,
+            "machines": 0
+          },
+          "viewModel": false
+        },
+        {
+          "path": "/data/animations/rive/truck.riv.bin",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": false,
+          "hasInstance": true,
+          "options": "{\"duration\":1}",
+          "inputs": [],
+          "info": {
+            "artboard": "Truck Motion",
+            "animations": 2,
+            "machines": 0
+          },
+          "viewModel": false
+        },
+        {
+          "path": "ons.riv.bin#artboard=CHAT&stateMachine=CHAT_Interactivity&input=active",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"artboard\":\"CHAT\",\"stateMachine\":\"CHAT_Interactivity\",\"input\":\"active\",\"duration\":1}",
+          "inputs": [
+            "active"
+          ],
+          "info": {
+            "artboard": "CHAT",
+            "animations": 2,
+            "machines": 1
+          },
+          "viewModel": false
+        },
+        {
+          "path": "riv.bin#artboard=SEARCH&stateMachine=SEARCH_Interactivity&input=active",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"artboard\":\"SEARCH\",\"stateMachine\":\"SEARCH_Interactivity\",\"input\":\"active\",\"duration\":1}",
+          "inputs": [
+            "active"
+          ],
+          "info": {
+            "artboard": "SEARCH",
+            "animations": 2,
+            "machines": 1
+          },
+          "viewModel": false
+        },
+        {
+          "path": "s.riv.bin#artboard=TIMER&stateMachine=TIMER_Interactivity&input=active",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"artboard\":\"TIMER\",\"stateMachine\":\"TIMER_Interactivity\",\"input\":\"active\",\"duration\":1}",
+          "inputs": [
+            "active"
+          ],
+          "info": {
+            "artboard": "TIMER",
+            "animations": 2,
+            "machines": 1
+          },
+          "viewModel": false
+        },
+        {
+          "path": "ons.riv.bin#artboard=BELL&stateMachine=BELL_Interactivity&input=active",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"artboard\":\"BELL\",\"stateMachine\":\"BELL_Interactivity\",\"input\":\"active\",\"duration\":1}",
+          "inputs": [
+            "active"
+          ],
+          "info": {
+            "artboard": "BELL",
+            "animations": 2,
+            "machines": 1
+          },
+          "viewModel": false
+        },
+        {
+          "path": "ons.riv.bin#artboard=USER&stateMachine=USER_Interactivity&input=active",
+          "loop": true,
+          "loaded": true,
+          "playing": true,
+          "isStateMachine": true,
+          "hasInstance": true,
+          "options": "{\"artboard\":\"USER\",\"stateMachine\":\"USER_Interactivity\",\"input\":\"active\",\"duration\":1}",
+          "inputs": [
+            "active"
+          ],
+          "info": {
+            "artboard": "USER",
+            "animations": 2,
+            "machines": 1
+          },
+          "viewModel": false
+        }
+      ]
+    }
+  }
+}

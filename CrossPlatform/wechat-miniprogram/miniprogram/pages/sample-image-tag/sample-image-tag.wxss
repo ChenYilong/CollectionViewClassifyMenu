@@ -1,0 +1,9 @@
+@import "../../styles/android-sample.wxss";
+
+/* systemBackground; the picture full width and square, then two equal pink buttons 16 pt below, 16 pt from the
+   sides, 8 pt apart. */
+page { background: #FFFFFF; }
+.page { min-height: 100vh; background: #FFFFFF; }
+.picture { width: 100vw; height: 100vw; }
+.buttons { display: flex; gap: 8px; margin: 16px 16px 0; }
+.buttons .sample-button { flex: 1; }

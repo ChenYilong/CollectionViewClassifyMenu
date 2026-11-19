@@ -44,3 +44,23 @@
 "CYLImageTagMoveLeft" = "左移";
 /* Moves a tag group right. */
 "CYLImageTagMoveRight" = "右移";
+
+/* What VoiceOver reads for a CYLTagButton badge shown as a dot (badgeValue is an empty string). */
+"CYLTagBadgeDot" = "新";
+
+/* CYLTagListView editing: the add control below the last section (CYLTagListAddItemView). */
+"CYLMenuAddTag" = "添加标签";
+"CYLMenuAddTagPlaceholder" = "标签名称";
+"CYLMenuTagAdded" = "已添加标签：%@";
+
+/* CYLTagListView editing: renaming a tag (the pencil before the delete indicator, the add control as the rename field). */
+"CYLMenuRenameTag" = "编辑";
+"CYLMenuRenamePlaceholder" = "新名称";
+"CYLMenuRenameDone" = "完成";
+"CYLMenuTagRenamed" = "已重命名标签：%@";
+
+/* A section header's clear button (the trash icon), read before the section title. */
+"CYLMenuClearSection" = "清除";
+
+/* 选词填入中内容为空格的格子，VoiceOver 朗读的名称。 */
+"CYLMenuSpaceCharacter" = "空格";

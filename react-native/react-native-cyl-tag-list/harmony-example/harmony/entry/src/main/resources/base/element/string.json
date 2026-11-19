@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": ""
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": ""
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "template"
+    },
+    {
+      "name": "tab_post",
+      "value": "Post"
+    },
+    {
+      "name": "tab_tags",
+      "value": "Tags"
+    },
+    {
+      "name": "tab_classify",
+      "value": "Classify"
+    }
+  ]
+}

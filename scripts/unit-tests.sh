@@ -42,6 +42,7 @@ set +e
   -scheme "$SCHEME" \
   -destination "id=$DEVICE_ID" \
   -derivedDataPath "$DERIVED_DATA" \
+  ${CYL_SWIFT_EXTRA_FLAGS:+"OTHER_SWIFT_FLAGS=\$(inherited) $CYL_SWIFT_EXTRA_FLAGS"} \
   CODE_SIGNING_ALLOWED=NO) > "$LOG" 2>&1
 STATUS=$?
 set -e
@@ -50,6 +51,14 @@ grep -E "^Test Case .*(passed|failed)|error: -\[|Executed [0-9]+ tests|\*\* TEST
 if [ "$STATUS" -ne 0 ]; then
   echo "xcodebuild test failed ($STATUS). Errors and last lines:"
   grep -nE "(error|fatal error):" "$LOG" | sort -u | head -n 60 || true
+  # [EN] With CYL_SWIFT_EXTRA_FLAGS=-Xfrontend -disable-deserialization-recovery the compiler names the declaration it
+  #      cannot load (a cross-reference into another module) instead of "members that could not be loaded".
+  # [CN] 设置 CYL_SWIFT_EXTRA_FLAGS 后，编译器会给出无法加载的跨模块引用。
+  # [EN] Every compile command carries the flag itself, so those lines are left out; the failure block is printed whole.
+  # [CN] 每条编译命令都带有该参数，因此排除这些行；完整打印失败信息。
+  grep -v -- "-disable-deserialization-recovery" "$LOG" \
+    | grep -nE -A25 "DESERIALIZATION FAILURE|[Cc]ross-reference|[Cc]ould not deserialize|Could not find|Caused by" \
+    | grep -vE "^[0-9]+-[0-9]+ +(swift-frontend|libsystem|dyld|libc)" | head -n 120 || true
   tail -n 40 "$LOG"
 fi
 echo "Test screenshots: $(find "$SCREENSHOTS" -name '*.png' | wc -l | tr -d ' ') in $SCREENSHOTS"

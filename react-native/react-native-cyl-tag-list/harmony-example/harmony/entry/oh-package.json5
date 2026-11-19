@@ -1,0 +1,11 @@
+{
+  "license": "ISC",
+  "devDependencies": {},
+  "name": "entry",
+  "description": "example description",
+  "version": "1.0.0",
+  "dependencies": {
+    "cyltabbar": "file:../../.deps/CYLTabBarController/CrossPlatform/harmonyos-cyltabbar/cyltabbar",
+    "@cyl/classifymenu": "file:../../../../../harmony/classifymenu"
+  }
+}

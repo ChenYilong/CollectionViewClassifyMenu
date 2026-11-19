@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "tab_post",
+      "value": "發佈"
+    },
+    {
+      "name": "tab_tags",
+      "value": "標籤"
+    },
+    {
+      "name": "tab_classify",
+      "value": "分類"
+    }
+  ]
+}

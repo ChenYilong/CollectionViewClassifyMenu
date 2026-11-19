@@ -12,7 +12,7 @@
 #      SCREENS 与 SWIFT_SCREENS 可替换页面列表（以逗号分隔；SWIFT_SCREENS 为空时跳过 Swift Example）。
 set -eu
 cd "$(dirname "$0")/.."
-SCREENS="${SCREENS:-product,reviews,reviews-multi,reviews-expanded,reviews-network,search-home,search,search-gossip,search-jobs,style,style-custom,style-icon-only,style-title-uncentered,style-lottie,style-pag,style-rive,style-gif,config,animations,animations-speed,animations-rive,plus,plus-reviews-db,plus-menu,plus-menu-filtered,plus-discover,plus-discover-expanded,plus-discover-refreshed,product@en,style@en,animations@en,reviews-expanded@en,search-jobs@en,search@zh-Hant,plus@en,plus-menu-filtered@en,plus-discover@en,plus-discover-expanded@en,plus-discover@zh-Hant}"
+SCREENS="${SCREENS:-product,reviews,reviews-multi,reviews-expanded,reviews-network,search-home,search,search-gossip,search-jobs,style,style-custom,style-icon-only,style-title-uncentered,style-lottie,style-pag,style-rive,style-svga,style-gif,config,animations,animations-speed,animations-rive,animations-svga,plus,plus-reviews-db,plus-menu,plus-menu-filtered,plus-discover,plus-discover-expanded,plus-discover-refreshed,product@en,style@en,animations@en,reviews-expanded@en,search-jobs@en,search@zh-Hant,plus@en,plus-menu-filtered@en,plus-discover@en,plus-discover-expanded@en,plus-discover@zh-Hant}"
 SWIFT_SCREENS="${SWIFT_SCREENS-remark,editor,editor-bottom,editor-search,editor-created,editor-new,styles,styles-expanded,styles-config,editor@en,editor-search@en,styles@en,styles-config@en}"
 DERIVED=build/screenshots-build
 OUT=build/screenshots
@@ -57,6 +57,7 @@ capture() {
 
   OLD_IFS=$IFS
   IFS=','
+  FIRST=1
   for SCREEN in $LIST; do
     IFS=$OLD_IFS
     # [EN] Screens without "@<language>" are taken in Simplified Chinese, the language of the scenarios;
@@ -79,6 +80,13 @@ capture() {
         continue
       fi
       sleep 8
+      # [EN] The first launch after installing is slower: at 8 s the screen can still show the previous app's last frame
+      #      (seen: product@zh-Hans captured the animations screen of the run before). Wait longer for it.
+      # [CN] 安装后的首次启动较慢：8 秒时屏幕可能仍是上一个 App 的最后一帧（曾见 product@zh-Hans 截到上一轮的动效页）。首次多等一会。
+      if [ "$FIRST" = 1 ]; then
+        sleep 10
+        FIRST=0
+      fi
       # [EN] Still running? A crash leaves the home screen behind: report it and launch once more.
       # [CN] 仍在运行？崩溃后会回到主屏幕：报告并重新启动一次。
       if xcrun simctl spawn "$DEVICE_ID" launchctl list | grep -q "UIKitApplication:$BUNDLE_ID"; then

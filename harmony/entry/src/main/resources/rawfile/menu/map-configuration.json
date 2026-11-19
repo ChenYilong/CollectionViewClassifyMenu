@@ -1,0 +1,53 @@
+{
+ "selectionMode": "multiple",
+ "foldControl": {
+  "position": "none",
+  "content": "icon"
+ },
+ "scrollEnabled": false,
+ "selectedItems": [
+  "0-1"
+ ],
+ "style": {
+  "imageSize": "{20, 20}",
+  "imageTitleSpacing": 4,
+  "itemHeight": 36,
+  "layoutCentered": true,
+  "normal": {
+   "iconColor": "#5856D6",
+   "borderColor": "#5856D6",
+   "borderWidth": 1,
+   "cornerRadius": 8
+  },
+  "selected": {
+   "backgroundColor": "#5856D6",
+   "borderColor": "#5856D6",
+   "iconColor": "#FFFFFF",
+   "cornerRadius": 8
+  }
+ },
+ "sections": [
+  {
+   "title": "字典（map）初始化",
+   "items": [
+    {
+     "title": "Lottie",
+     "animation": "asset:tab_me_animate.json"
+    },
+    {
+     "title": "GIF",
+     "animation": ""
+    },
+    {
+     "title": "Rive",
+     "animation": ""
+    },
+    {
+     "image": "system:heart",
+     "selectedImage": "system:heart.fill"
+    },
+    "Text only"
+   ]
+  }
+ ]
+}

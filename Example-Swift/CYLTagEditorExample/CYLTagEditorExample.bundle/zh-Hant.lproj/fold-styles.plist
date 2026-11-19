@@ -9,7 +9,7 @@
 		<key>content</key>
 		<string>title</string>
 		<key>position</key>
-		<string>topTrailing</string>
+		<string>headerTrailing</string>
 	</dict>
 	<key>scrollEnabled</key>
 	<false/>

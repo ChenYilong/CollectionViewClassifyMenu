@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      >
+    <item android:id="@+id/action_github"
+          android:title="@string/kaede_action_github"
+          android:orderInCategory="100"
+          android:icon="@drawable/kaede_icon_github"
+          app:showAsAction="ifRoom"/>
+</menu>

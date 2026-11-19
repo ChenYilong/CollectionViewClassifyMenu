@@ -1,0 +1,15 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@cyl/classifymenu": "file:../classifymenu",
+    "@ohos/lottie": "2.0.38",
+    "@tencent/libpag": "4.4.31",
+    "@ohos/rive": "1.0.4"
+  }
+}
+

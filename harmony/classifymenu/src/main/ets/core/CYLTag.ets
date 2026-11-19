@@ -1,0 +1,333 @@
+import { CYLUIContext } from './CYLUIContext';
+/**
+ * A tag of a tag list built from models, as iOS `CYLTag.swift`: `CYLTag` (a title with its own look) and
+ * `CYLTagDataSource` (a one-section data source of tags, caching each tag's style over its `baseStyle`).
+ */
+import { CYLIndexPath } from '../components/CYLTagListModel';
+import { CYLMenuDataSource } from './CYLMenuDataSource';
+import { CYLMenuStyle } from './CYLMenuStyle';
+import { CYLTagColors } from './CYLTagColors';
+import { CYLMenuColorFromString } from './CYLMenuColor';
+import { CYLFont, CYLImage } from './CYLTypes';
+import { image } from '@kit.ImageKit';
+
+function validValue(value: number | undefined): number | undefined {
+  return value !== undefined && Number.isFinite(value) && value >= 0 ? value : undefined;
+}
+
+/** `UIColor.systemBlue`, the badge color when the tag has neither a badge nor a text color. */
+const SYSTEM_BLUE: string = '#FF007AFF';
+
+export class CYLTag {
+  identifier: number;
+  title: string;
+  image?: CYLImage;
+  selectedImage?: CYLImage;
+  /** A Lottie animation: `asset:<rawfile path>` or the JSON text. */
+  animationURL?: string;
+  isEnabled: boolean = true;
+  isDeletable: boolean = false;
+  /** A badge drawn as the tag's image when it has none (a count, "hot"). */
+  badgeText?: string;
+  badgeColor?: string;
+  badgeAccessibilityLabel?: string;
+  userInfo?: Object;
+  private styleStorage?: CYLMenuStyle;
+  textColor?: string;
+  font?: CYLFont;
+  textSize?: number;
+  backgroundColor?: string;
+  highlightedBackgroundColor?: string;
+  selectedBackgroundColor?: string;
+  backgroundImage?: ResourceStr;
+  cornerRadius?: number;
+  borderWidth?: number;
+  borderColor?: string;
+  deleteIndicatorTitle?: string;
+  deleteIndicatorColor?: string;
+  deleteIndicatorSize?: number;
+
+  constructor(identifier: number = 0, title: string = '', backgroundColor?: string) {
+    this.identifier = identifier;
+    this.title = title;
+    this.backgroundColor = backgroundColor;
+  }
+
+  /** `init(identifier:title:backgroundColorHex:)`: the background from "#RRGGBB" or a UIColor name. */
+  static withHex(identifier: number, title: string, backgroundColorHex: string | undefined): CYLTag {
+    return new CYLTag(identifier, title, CYLMenuColorFromString(backgroundColorHex));
+  }
+
+  /** The tag's own style (copied when set); undefined for the list's. */
+  get style(): CYLMenuStyle | undefined {
+    return this.styleStorage;
+  }
+
+  set style(value: CYLMenuStyle | undefined) {
+    this.styleStorage = value?.copy();
+  }
+
+  /** The four colors of the tag; setting it sets them. */
+  get colors(): CYLTagColors {
+    return new CYLTagColors(this.backgroundColor, this.borderColor, this.textColor, this.selectedBackgroundColor);
+  }
+
+  /** `resetColors()`: the colors back to their defaults (the style's). */
+  resetColors(): void {
+    this.colors = new CYLTagColors();
+  }
+
+  set colors(value: CYLTagColors) {
+    this.backgroundColor = value.backgroundColor;
+    this.borderColor = value.borderColor;
+    this.textColor = value.textColor;
+    this.selectedBackgroundColor = value.selectedBackgroundColor;
+  }
+
+  /** Whether the tag changes anything of the list's style. */
+  get hasCustomStyle(): boolean {
+    return this.styleStorage !== undefined || this.textColor !== undefined || this.font !== undefined ||
+      validValue(this.textSize) !== undefined || this.backgroundColor !== undefined ||
+      this.highlightedBackgroundColor !== undefined || this.selectedBackgroundColor !== undefined ||
+      this.backgroundImage !== undefined || validValue(this.cornerRadius) !== undefined ||
+      validValue(this.borderWidth) !== undefined || this.borderColor !== undefined ||
+      this.deleteIndicatorTitle !== undefined || this.deleteIndicatorColor !== undefined ||
+      validValue(this.deleteIndicatorSize) !== undefined;
+  }
+
+  /** The tag's look over `baseStyle` (over its own `style` when set). */
+  styleBasedOn(baseStyle: CYLMenuStyle): CYLMenuStyle {
+    const style = (this.styleStorage ?? baseStyle).copy();
+    const normal = style.normalAppearance;
+    const cornerRadius = validValue(this.cornerRadius);
+    const borderWidth = validValue(this.borderWidth);
+    if (this.textColor !== undefined) {
+      normal.textColor = this.textColor;
+    }
+    if (this.backgroundColor !== undefined) {
+      normal.backgroundColor = this.backgroundColor;
+    }
+    if (this.backgroundImage !== undefined) {
+      normal.backgroundImage = this.backgroundImage;
+    }
+    if (this.borderColor !== undefined) {
+      normal.borderColor = this.borderColor;
+      if (borderWidth === undefined && normal.borderWidth <= 0) {
+        normal.borderWidth = 1;
+      }
+    }
+    const size = validValue(this.textSize);
+    const font: CYLFont | undefined = this.font ?? (size !== undefined && size > 0 ? CYLFont.systemFont(size) : undefined);
+    [normal, style.selectedAppearance, style.disabledAppearance].forEach((appearance) => {
+      if (font !== undefined) {
+        appearance.font = font;
+      }
+      if (cornerRadius !== undefined) {
+        appearance.cornerRadius = cornerRadius;
+      }
+      if (borderWidth !== undefined) {
+        appearance.borderWidth = borderWidth;
+      }
+    });
+    if (this.highlightedBackgroundColor !== undefined) {
+      style.highlightedBackgroundColor = this.highlightedBackgroundColor;
+    }
+    if (this.selectedBackgroundColor !== undefined) {
+      style.selectedAppearance.backgroundColor = this.selectedBackgroundColor;
+    }
+    if (this.deleteIndicatorTitle !== undefined) {
+      style.deleteIndicatorTitle = this.deleteIndicatorTitle;
+    }
+    if (this.deleteIndicatorColor !== undefined) {
+      style.deleteIndicatorColor = this.deleteIndicatorColor;
+    }
+    const indicator = validValue(this.deleteIndicatorSize);
+    if (indicator !== undefined && indicator > 0) {
+      style.deleteIndicatorFont = CYLFont.systemFont(indicator);
+    }
+    return style;
+  }
+
+  /** NSCopying. */
+  copy(): CYLTag {
+    const c = new CYLTag(this.identifier, this.title, this.backgroundColor);
+    c.image = this.image;
+    c.selectedImage = this.selectedImage;
+    c.animationURL = this.animationURL;
+    c.isEnabled = this.isEnabled;
+    c.isDeletable = this.isDeletable;
+    c.userInfo = this.userInfo;
+    c.styleStorage = this.styleStorage;
+    c.textColor = this.textColor;
+    c.font = this.font;
+    c.textSize = this.textSize;
+    c.highlightedBackgroundColor = this.highlightedBackgroundColor;
+    c.selectedBackgroundColor = this.selectedBackgroundColor;
+    c.badgeText = this.badgeText;
+    c.badgeColor = this.badgeColor;
+    c.badgeAccessibilityLabel = this.badgeAccessibilityLabel;
+    c.backgroundImage = this.backgroundImage;
+    c.cornerRadius = this.cornerRadius;
+    c.borderWidth = this.borderWidth;
+    c.borderColor = this.borderColor;
+    c.deleteIndicatorTitle = this.deleteIndicatorTitle;
+    c.deleteIndicatorColor = this.deleteIndicatorColor;
+    c.deleteIndicatorSize = this.deleteIndicatorSize;
+    return c;
+  }
+
+  /** A filled circle of `color`, `diameter` vp wide, with `text` in bold white at 60 % of the diameter. */
+  static badgeImage(text: string, color: string, diameter: number): image.PixelMap {
+    const side = Math.max(1, Math.round(CYLUIContext.vp2px(Math.max(1, diameter))));
+    const canvas = new OffscreenCanvas(side, side);
+    const context = canvas.getContext('2d');
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(side / 2, side / 2, side / 2, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = '#FFFFFFFF';
+    // Canvas coordinates are vp (its default unit), so the font is too: a px font drew the glyph a density-fraction
+    // of the circle (unreadable "神" / "热" in the hot-search badges).
+    context.font = `bold ${Math.round(side * 0.6)}vp sans-serif`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(text, side / 2, side / 2);
+    return context.getPixelMap(0, 0, side, side);
+  }
+
+  get description(): string {
+    return `<CYLTag: identifier = ${this.identifier}; title = ${this.title}>`;
+  }
+}
+
+/** A one-section data source of tags; each tag's style over `baseStyle` is cached until `invalidateStyles()`. */
+export class CYLTagDataSource implements CYLMenuDataSource {
+  sectionTitle?: string;
+  private storedTags: CYLTag[];
+  private baseStyleStorage: CYLMenuStyle = new CYLMenuStyle();
+  private styles: Map<CYLTag, CYLMenuStyle> = new Map<CYLTag, CYLMenuStyle>();
+
+  constructor(tags: CYLTag[] = []) {
+    this.storedTags = tags.slice();
+  }
+
+  get tags(): CYLTag[] {
+    return this.storedTags;
+  }
+
+  set tags(value: CYLTag[]) {
+    this.storedTags = value.slice();
+    this.invalidateStyles();
+  }
+
+  /** The style the tags' own looks apply over (copied when set). */
+  get baseStyle(): CYLMenuStyle {
+    return this.baseStyleStorage;
+  }
+
+  set baseStyle(value: CYLMenuStyle) {
+    this.baseStyleStorage = value.copy();
+    this.invalidateStyles();
+  }
+
+  addTag(tag: CYLTag): void {
+    this.storedTags.push(tag);
+  }
+
+  addTags(tags: CYLTag[]): void {
+    tags.forEach((tag: CYLTag) => this.storedTags.push(tag));
+  }
+
+  insertTag(tag: CYLTag, index: number): void {
+    this.storedTags.splice(Math.min(Math.max(0, index), this.storedTags.length), 0, tag);
+  }
+
+  removeTag(index: number): void {
+    if (index < 0 || index >= this.storedTags.length) {
+      return;
+    }
+    this.styles.delete(this.storedTags[index]);
+    this.storedTags.splice(index, 1);
+  }
+
+  removeAllTags(): void {
+    this.storedTags = [];
+    this.invalidateStyles();
+  }
+
+  moveTag(fromIndex: number, toIndex: number): void {
+    const count = this.storedTags.length;
+    if (fromIndex < 0 || fromIndex >= count || toIndex < 0 || toIndex >= count || fromIndex === toIndex) {
+      return;
+    }
+    const moved = this.storedTags.splice(fromIndex, 1)[0];
+    this.storedTags.splice(toIndex, 0, moved);
+  }
+
+  invalidateStyles(): void {
+    this.styles.clear();
+  }
+
+  private tagAt(indexPath: CYLIndexPath): CYLTag | undefined {
+    return indexPath.section === 0 && indexPath.item >= 0 && indexPath.item < this.storedTags.length ?
+    this.storedTags[indexPath.item] : undefined;
+  }
+
+  numberOfSectionsInMenu(): number {
+    return 1;
+  }
+
+  menuNumberOfItemsInSection(section: number): number {
+    return section === 0 ? this.storedTags.length : 0;
+  }
+
+  menuTitleForSection(section: number): string {
+    return this.sectionTitle ?? '';
+  }
+
+  menuTitleForItem(indexPath: CYLIndexPath): string {
+    return this.tagAt(indexPath)?.title ?? '';
+  }
+
+  /** The tag's image; a tag with a badge and no image gets the badge drawn at the style's image size. */
+  menuImageForItem = (indexPath: CYLIndexPath): CYLImage | undefined => {
+    const tag = this.tagAt(indexPath);
+    if (tag === undefined) {
+      return undefined;
+    }
+    if (tag.image === undefined && tag.badgeText !== undefined && tag.badgeText.length > 0) {
+      const size = this.baseStyleStorage.imageSize;
+      const side = Math.max(size.width, size.height);
+      tag.image = CYLTag.badgeImage(tag.badgeText, tag.badgeColor ?? tag.textColor ?? SYSTEM_BLUE,
+        side > 0 ? side : 16);
+    }
+    return tag.image;
+  }
+  menuSelectedImageForItem = (indexPath: CYLIndexPath): CYLImage | undefined => this.tagAt(indexPath)?.selectedImage;
+  menuAnimationURLForItem = (indexPath: CYLIndexPath): string | undefined => this.tagAt(indexPath)?.animationURL;
+  menuItemIsEnabled = (indexPath: CYLIndexPath): boolean => this.tagAt(indexPath)?.isEnabled ?? true;
+  menuItemIsDeletable = (indexPath: CYLIndexPath): boolean => this.tagAt(indexPath)?.isDeletable ?? false;
+  menuRemoveItem = (indexPath: CYLIndexPath): void => {
+    if (this.tagAt(indexPath) !== undefined) {
+      this.removeTag(indexPath.item);
+    }
+  }
+  menuMoveItem = (from: CYLIndexPath, to: CYLIndexPath): void => {
+    if (from.section === 0 && to.section === 0) {
+      this.moveTag(from.item, to.item);
+    }
+  }
+  /** The cached style of a tag with its own look; undefined for the list's. */
+  menuStyleForItem = (indexPath: CYLIndexPath): CYLMenuStyle | undefined => {
+    const tag = this.tagAt(indexPath);
+    if (tag === undefined || !tag.hasCustomStyle) {
+      return undefined;
+    }
+    let style = this.styles.get(tag);
+    if (style === undefined) {
+      style = tag.styleBasedOn(this.baseStyleStorage);
+      this.styles.set(tag, style);
+    }
+    return style;
+  }
+}

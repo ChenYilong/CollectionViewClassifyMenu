@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CYLTagListView finds "system:<name>" icons by name (getIdentifier): keep them through resource shrinking. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@drawable/cyl_system_*" />

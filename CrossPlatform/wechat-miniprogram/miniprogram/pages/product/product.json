@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "宝贝详情",
+  "navigationBarBackgroundColor": "#F2F2F7",
+  "backgroundColor": "#F2F2F7",
+  "usingComponents": {
+    "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
+    "cyl-tag-animation-view": "/components/cyl-tag-animation-view/cyl-tag-animation-view"
+  }
+}

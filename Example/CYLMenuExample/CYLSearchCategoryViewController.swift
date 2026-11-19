@@ -102,17 +102,17 @@ final class CYLSearchCategoryViewController: UIViewController {
     static func sections(for category: CYLSearchCategory) -> [CYLExampleMenuSection] {
         switch category {
         case .people:
-            return [CYLExampleMenuSection(title: CYLExampleLocalizedString("认识同行"), titles: ["百度研发", "腾讯工程师", "搜狗开发", "腾讯开发", "搜狗研究员"]),
-                    CYLExampleMenuSection(title: CYLExampleLocalizedString("找投资"), titles: ["创投", "IDG资本", "晨兴资本", "合伙人", "投资经理"]),
-                    CYLExampleMenuSection(title: CYLExampleLocalizedString("谈合作"), titles: ["CEO", "副总裁", "VP", "总经理", "总监"]),
-                    CYLExampleMenuSection(title: CYLExampleLocalizedString("挖人才"), titles: ["Java", "Android", "JS", "C++", "HTML/CSS", "iOS", "PHP", "前端"])]
+            return [CYLExampleMenuSection(title: CYLExampleLocalizedString("认识同行"), localizedTitles: ["百度研发", "腾讯工程师", "搜狗开发", "腾讯开发", "搜狗研究员"]),
+                    CYLExampleMenuSection(title: CYLExampleLocalizedString("找投资"), localizedTitles: ["创投", "IDG资本", "晨兴资本", "合伙人", "投资经理"]),
+                    CYLExampleMenuSection(title: CYLExampleLocalizedString("谈合作"), localizedTitles: ["CEO", "副总裁", "VP", "总经理", "总监"]),
+                    CYLExampleMenuSection(title: CYLExampleLocalizedString("挖人才"), localizedTitles: ["Java", "Android", "JS", "C++", "HTML/CSS", "iOS", "PHP", "前端"])]
         case .feeds:
             return [CYLExampleMenuSection(title: CYLExampleLocalizedString("热门动态关键词"),
-                                          titles: ["投资", "创业", "o2o", "社交", "招聘", "运营", "线下聚会", "脉脉", "融资", "在线教育", "硬件", "电商", "产品经理"])]
+                                          localizedTitles: ["投资", "创业", "o2o", "社交", "招聘", "运营", "线下聚会", "脉脉", "融资", "在线教育", "硬件", "电商", "产品经理"])]
         case .gossip:
             return [CYLExampleMenuSection(title: CYLExampleLocalizedString("热门词"),
-                                          titles: ["百度", "新浪", "程序猿", "离职", "阿里", "360", "创业", "工资", "跳槽", "小三", "裁员", "加班", "女同事", "产品经理", "投资人", "老板"]),
-                    CYLExampleMenuSection(title: CYLExampleLocalizedString("我关注的标签"), titles: ["社交", "移动", "程序猿"])]
+                                          localizedTitles: ["百度", "新浪", "程序猿", "离职", "阿里", "360", "创业", "工资", "跳槽", "小三", "裁员", "加班", "女同事", "产品经理", "投资人", "老板"]),
+                    CYLExampleMenuSection(title: CYLExampleLocalizedString("我关注的标签"), localizedTitles: ["社交", "移动", "程序猿"])]
         case .jobs:
             return []
         }
@@ -235,7 +235,7 @@ final class CYLSearchCategoryViewController: UIViewController {
         let sections: [CYLExampleMenuSection]
         if category == .jobs {
             let name = jobCategories[jobCategoryIndex]
-            let section = CYLExampleMenuSection(title: CYLExampleLocalizedString("热搜职位关键词:"), titles: Self.jobKeywords[name] ?? [])
+            let section = CYLExampleMenuSection(title: CYLExampleLocalizedString("热搜职位关键词:"), localizedTitles: Self.jobKeywords[name] ?? [])
             section.accessoryView = industryButton
             sections = [section]
         } else {

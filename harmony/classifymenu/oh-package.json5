@@ -1,0 +1,13 @@
+{
+  "name": "@cyl/classifymenu",
+  "version": "0.1.0",
+  "description": "CYLTagListView for HarmonyOS NEXT: a tag list and classify menu driven by one JSON configuration.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "cylanimateditem": "file:../cylanimateditem"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
+}

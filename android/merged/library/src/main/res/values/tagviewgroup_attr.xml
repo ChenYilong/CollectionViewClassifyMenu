@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TagViewGroup">
+        <attr name="inner_radius" format="dimension"/>
+        <attr name="radius" format="dimension"/>
+        <attr name="line_width" format="dimension"/>
+        <attr name="v_distance" format="dimension"/>
+        <attr name="tilt_distance" format="dimension"/>
+    </declare-styleable>
+    <declare-styleable name="RippleView">
+        <attr name="ripple_alpha" format="integer"/>
+        <attr name="ripple_maxRadius" format="dimension"/>
+    </declare-styleable>
+</resources>

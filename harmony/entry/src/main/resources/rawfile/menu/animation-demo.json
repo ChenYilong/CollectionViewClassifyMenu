@@ -1,0 +1,336 @@
+{
+ "selectionMode": "single",
+ "allowsEmptySelection": false,
+ "selectedItems": [
+  "0-0",
+  "1-0",
+  "2-0",
+  "3-0",
+  "4-0",
+  "5-0",
+  "6-0",
+  "7-0",
+  "8-0",
+  "9-0"
+ ],
+ "style": {
+  "imageSize": "{28, 28}",
+  "imageTitleSpacing": 6,
+  "itemHeight": 44,
+  "layoutCentered": true,
+  "sectionInsets": [
+   6,
+   16,
+   14,
+   16
+  ],
+  "normal": {
+   "cornerRadius": 0,
+   "margin": 12,
+   "borderColor": "#D1D1D6",
+   "borderWidth": 1
+  },
+  "selected": {
+   "cornerRadius": 0,
+   "margin": 12,
+   "backgroundColor": "#FFF1E6",
+   "textColor": "#FF6A00",
+   "borderColor": "#FF6A00",
+   "borderWidth": 1
+  }
+ },
+ "sections": [
+  {
+   "title": "Lottie · pod 'CYLTabBarController/Lottie'",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:tab_home_animate.json"
+    },
+    {
+     "title": "消息",
+     "animation": "asset:tab_message_animate.json"
+    },
+    {
+     "title": "搜索",
+     "animation": "asset:tab_search_animate.json"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:tab_me_animate.json"
+    }
+   ]
+  },
+  {
+   "title": "Lottie（带图片资源与占位图）",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:b_gray_tabbar_home_animation.json"
+    },
+    {
+     "title": "消息",
+     "animation": "asset:b_gray_tabbar_message_animation.json"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:b_gray_tabbar_me_animation.json"
+    }
+   ]
+  },
+  {
+   "title": "Lottie（绿色主题）",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:b_green_lottie_tab_home.json"
+    },
+    {
+     "title": "资讯",
+     "animation": "asset:b_green_lottie_tab_news.json"
+    },
+    {
+     "title": "发现",
+     "animation": "asset:b_green_lottie_tab_discover.json"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:b_green_lottie_tab_mine.json"
+    }
+   ]
+  },
+  {
+   "title": "PAG · pod 'CYLTabBarController/PAG'",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:pag/tab_home.pag"
+    },
+    {
+     "title": "健康",
+     "animation": "asset:pag/tab_health.pag"
+    },
+    {
+     "title": "动态",
+     "animation": "asset:pag/tab_moments.pag"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:pag/tab_me.pag"
+    },
+    {
+     "title": "动效一",
+     "animation": "asset:pag/0.pag"
+    },
+    {
+     "title": "动效二",
+     "animation": "asset:pag/1.pag",
+     "animationRestingProgress": 1
+    }
+   ]
+  },
+  {
+   "title": "Rive · pod 'CYLTabBarController/Rive'",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:rive/house.riv",
+     "animationOptions": {
+      "stateMachine": "State Machine 1"
+     }
+    },
+    {
+     "title": "完成",
+     "animation": "asset:rive/check.riv",
+     "animationOptions": {
+      "stateMachine": "State Machine 1",
+      "triggerInput": "Check"
+     }
+    },
+    {
+     "title": "菜单",
+     "animation": "asset:rive/menu_button.riv",
+     "animationOptions": {
+      "stateMachine": "State Machine",
+      "input": "isOpen",
+      "duration": "0"
+     }
+    },
+    {
+     "title": "按钮",
+     "animation": "asset:rive/button.riv",
+     "animationOptions": {
+      "animation": "active"
+     }
+    },
+    {
+     "title": "形状",
+     "animation": "asset:rive/shapes.riv",
+     "animationOptions": {
+      "legacy": "1"
+     }
+    },
+    {
+     "title": "卡车",
+     "animation": "asset:rive/truck.riv",
+     "animationOptions": {
+      "legacy": "1"
+     }
+    }
+   ]
+  },
+  {
+   "title": "Rive · icons.riv（深色标签）",
+   "style": {
+    "normal": {
+     "backgroundColor": "#17203A",
+     "textColor": "#FFFFFF",
+     "borderColor": "#17203A"
+    },
+    "selected": {
+     "backgroundColor": "#3A4E8C",
+     "textColor": "#FFFFFF",
+     "borderColor": "#6792FF"
+    }
+   },
+   "items": [
+    {
+     "title": "聊天",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "CHAT",
+      "stateMachine": "CHAT_Interactivity",
+      "input": "active"
+     }
+    },
+    {
+     "title": "搜索",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "SEARCH",
+      "stateMachine": "SEARCH_Interactivity",
+      "input": "active"
+     }
+    },
+    {
+     "title": "计时",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "TIMER",
+      "stateMachine": "TIMER_Interactivity",
+      "input": "active"
+     }
+    },
+    {
+     "title": "提醒",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "BELL",
+      "stateMachine": "BELL_Interactivity",
+      "input": "active"
+     }
+    },
+    {
+     "title": "我的",
+     "animation": "asset:rive/icons.riv",
+     "animationOptions": {
+      "artboard": "USER",
+      "stateMachine": "USER_Interactivity",
+      "input": "active"
+     }
+    }
+   ]
+  },
+  {
+   "title": "SVGA · pod 'CYLTabBarController/SVGA'",
+   "items": [
+    {
+     "title": "首页",
+     "animation": "asset:svga/tab_home.svga"
+    },
+    {
+     "title": "搜索",
+     "animation": "asset:svga/tab_search.svga"
+    },
+    {
+     "title": "消息",
+     "animation": "asset:svga/tab_chat.svga"
+    },
+    {
+     "title": "我的",
+     "animation": "asset:svga/tab_profile.svga"
+    }
+   ]
+  },
+  {
+   "title": "SVGA · 深色标签",
+   "style": {
+    "normal": {
+     "backgroundColor": "#17203A",
+     "textColor": "#FFFFFF",
+     "borderColor": "#17203A"
+    },
+    "selected": {
+     "backgroundColor": "#3A4E8C",
+     "textColor": "#FFFFFF",
+     "borderColor": "#6792FF"
+    }
+   },
+   "items": [
+    {
+     "title": "动态",
+     "animation": "asset:svga/tab_activity.svga"
+    },
+    {
+     "title": "列表",
+     "animation": "asset:svga/tab_list.svga"
+    },
+    {
+     "title": "首页",
+     "animation": "asset:svga/tab_home.svga"
+    }
+   ]
+  },
+  {
+   "title": "GIF · pod 'CYLTabBarController/GIF'",
+   "items": [
+    {
+     "title": "火焰",
+     "animation": "asset:gif/tab_fire.gif"
+    },
+    {
+     "title": "火箭",
+     "animation": "asset:gif/tab_rocket.gif"
+    },
+    {
+     "title": "星星",
+     "animation": "asset:gif/tab_star.gif"
+    },
+    {
+     "title": "示例",
+     "animation": "asset:gif/cyl_tab_sample_animated.gif"
+    }
+   ]
+  },
+  {
+   "title": "静态图片（CYLTabBarController Example）",
+   "items": [
+    {
+     "title": "首页"
+    },
+    {
+     "title": "同城"
+    },
+    {
+     "title": "发布"
+    },
+    {
+     "title": "消息"
+    },
+    {
+     "title": "我的"
+    }
+   ]
+  }
+ ]
+}

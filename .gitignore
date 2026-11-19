@@ -136,3 +136,7 @@ __pycache__/
 # macOS AppleDouble metadata written on external volumes: never commit
 ._*
 *.base
+.swiftpm/
+
+# hvigor writes BuildProfile.ets into each HarmonyOS module on every build (classifymenu's is tracked from before).
+harmony/**/BuildProfile.ets

@@ -28,7 +28,8 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         XCTAssertGreaterThan(firstTag()?.title?.count ?? 0, 0)
 
         // A tap on the cornerRadius row: 0 makes capsules.
-        let cornerRow = IndexPath(row: actions[1].firstIndex(of: "cornerRadius") ?? 0, section: 1)
+        let cornerSection = actions.firstIndex { $0.contains("cornerRadius") } ?? 0
+        let cornerRow = IndexPath(row: actions[cornerSection].firstIndex(of: "cornerRadius") ?? 0, section: cornerSection)
         demo.tableView.delegate?.tableView?(demo.tableView, didSelectRowAt: cornerRow)
         XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 0)
         XCTAssertEqual(firstTag()?.layer.cornerRadius ?? -1, (firstTag()?.bounds.height ?? 0) / 2, accuracy: 0.5)
@@ -50,7 +51,7 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         let demo = CYLTagStyleDemoViewController()
         let navigation = showInNavigation(demo)
         let tags = demo.tagListView.probe
-        for library in ["lottie", "gif", "pag", "rive"] {
+        for library in ["lottie", "gif", "pag", "rive", "svga"] {
             demo.performAction("animation." + library)
             tags.layOut()
             XCTAssertEqual(demo.animationLibrary, library)

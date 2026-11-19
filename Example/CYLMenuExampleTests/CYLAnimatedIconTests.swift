@@ -10,25 +10,25 @@ import CryptoKit
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 @testable import CYLMenuExample
 
 final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
 
     func testAnimationOptionsAreEncodedAsCYLTabBarControllerDoes() {
         let file = URL(fileURLWithPath: "/tmp/icons.riv")
-        XCTAssertNil(CYLMenuAnimationURLWithOptions(nil, ["artboard": "CHAT"]))
-        XCTAssertEqual(CYLMenuAnimationURLWithOptions(file, nil), file)
-        let url = CYLMenuAnimationURLWithOptions(file, ["stateMachine": "State Machine 1", "artboard": "A&B", "duration": 2])
-        XCTAssertEqual(url?.path, file.path)
-        XCTAssertEqual(url?.fragment, "artboard=A%26B&duration=2&stateMachine=State%20Machine%201", "Sorted, percent-encoded")
+        XCTAssertEqual(file.cylAddingAnimationOptions([:]), file)
+        let url = file.cylAddingAnimationOptions(["stateMachine": "State Machine 1", "artboard": "A&B", "duration": 2])
+        XCTAssertEqual(url.path, file.path)
+        XCTAssertEqual(url.fragment, "artboard=A%26B&duration=2&stateMachine=State%20Machine%201", "Sorted, percent-encoded")
 
         let items: [[String: Any]] = [
-            [CYLTagItemTitle: "a", CYLTagItemAnimation: "CYLMenuExample.bundle/Animations/Rive/icons.riv",
-             CYLTagItemAnimationOptions: ["artboard": "CHAT", "input": "active"]],
-            [CYLTagItemTitle: "b", CYLTagItemAnimation: "CYLMenuExample.bundle/Animations/Rive/icons.riv#artboard=USER"],
+            [CYLTagItemKey.title: "a", CYLTagItemKey.animation: "CYLMenuExample.bundle/Animations/Rive/icons.riv",
+             CYLTagItemKey.animationOptions: ["artboard": "CHAT", "input": "active"]],
+            [CYLTagItemKey.title: "b", CYLTagItemKey.animation: "CYLMenuExample.bundle/Animations/Rive/icons.riv#artboard=USER"],
         ]
-        let sections: [[String: Any]] = [[CYLTagSectionItems: items]]
-        let view = CYLTagListView(configuration: [CYLTagListViewSections: sections])
+        let sections: [[String: Any]] = [[CYLTagSectionKey.items: items]]
+        let view = CYLTagListView(configuration: [CYLTagListKey.sections: sections])
         let first = view.menuDataSource?.menuAnimationURLForItem?(at: ip(0, 0))
         let second = view.menuDataSource?.menuAnimationURLForItem?(at: ip(1, 0))
         XCTAssertEqual(first?.fragment, "artboard=CHAT&input=active")
@@ -38,14 +38,42 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
         XCTAssertNotNil(UIImage(named: "img_tab_home_0"), "Lottie image assets are found by name, as in CYLTabBarController's Example")
     }
 
+    /**
+     * The five engines this example links (CYLAnimatedItem/LottieObjectiveC, PAG, Rive, SVGA, GIF) registered themselves
+     * (CYLTabBarItemAnimatorRegistry), with no conflict, and the Animated icons screen lists each one as registered.
+     */
+    func testEveryLinkedEngineIsRegisteredAndListed() {
+        let known = CYLAnimationKnownTypes()
+        XCTAssertEqual(known, ["Lottie", "PAG", "Rive", "SVGA", "GIF"])
+        for type in known {
+            XCTAssertTrue(CYLTabBarItemAnimatorRegistry.isAnimatorRegistered(withIdentifier: type), "\(type) engine registered")
+        }
+        XCTAssertTrue(CYLTabBarItemAnimatorRegistry.missingKnownIdentifiers().isEmpty)
+        XCTAssertTrue(CYLTabBarItemAnimatorRegistry.conflictDescriptions().isEmpty,
+                      CYLTabBarItemAnimatorRegistry.conflictDescriptions().joined(separator: "; "))
+        XCTAssertFalse(CYLTabBarItemAnimatorRegistry.registrationReport().isEmpty)
+
+        let demo = CYLTagAnimationDemoViewController()
+        showInNavigation(demo)
+        demo.view.layoutIfNeeded()
+        let status = demo.statusLabel.text ?? ""
+        for type in known {
+            XCTAssertTrue(status.contains("✅ " + CYLExampleLocalizedString("%@ 已接入", type)), "\(type) in: \(status)")
+        }
+        XCTAssertFalse(status.contains("➖"), status)
+        XCTAssertEqual(CYLTagAnimationDemoViewController.engineReportLines().count, known.count + 1, "A title and one line per engine")
+        captureScreen(named: "test-animation-engine-report")
+    }
+
     func testAnimatedIconsUseCYLTabBarControllerAnimationEngine() {
-        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable(), "CYLTabBarController/CYLTabBarItemAnimation is linked")
+        XCTAssertTrue(CYLTagButton.isAnimationEngineAvailable, "The example adds the CYLAnimatedItem engine subspecs")
         let resources = Bundle.main.resourceURL!
         let files = [
             "GIF": "CYLMenuExample.bundle/Animations/GIF/tab_star.gif",
             "Lottie": "CYLMenuExample.bundle/Animations/Lottie/tab_home_animate.json",
             "PAG": "pag-ios/0.pag",
             "Rive": "CYLMenuExample.bundle/Animations/Rive/check.riv",
+            "SVGA": "CYLMenuExample.bundle/Animations/SVGA/tab_home.svga",
         ]
         for (library, path) in files {
             let url = resources.appendingPathComponent(path)
@@ -54,7 +82,8 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
             button.animationURL = url
             button.layoutIfNeeded()
             XCTAssertNotNil(button.animationView, "\(library) view from CYLTabBarItemAnimationFactory")
-            XCTAssertNotNil(button.animationPlayer, "\(library) player")
+            // `animationPlayer` is declared only when an engine is linked: read it by key.
+            XCTAssertNotNil(button.value(forKey: "animationPlayer"), "\(library) player")
             XCTAssertTrue(button.imageView.isHidden, "\(library) takes the icon slot")
             let animationFrame = button.animationView?.frame ?? .zero
             XCTAssertEqual(animationFrame.size, button.style.imageSize, "\(library) \(NSCoder.string(for: animationFrame))")
@@ -96,10 +125,25 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
                 XCTAssertNotNil(button?.animationView, "\(sections[section]) animated by CYLTabBarController's engine")
             }
         }
-        demo.playSelectedAnimations()
-        demo.changeSpeed()
-        XCTAssertEqual(list.style.animationSpeed, 2, accuracy: 0.01)
-        XCTAssertEqual(demo.navigationItem.leftBarButtonItem?.title, "2x")
+        // The playback controls: Play all, the speed slider and the loop switch act on the list at once.
+        demo.playAllAnimations()
+        demo.setSpeed(1.6)
+        XCTAssertEqual(list.animationSpeed ?? 0, 1.5, accuracy: 0.01, "The slider moves in steps of 0.25")
+        XCTAssertEqual(demo.speedLabel.text, "1.5×")
+        XCTAssertEqual(demo.speedSlider.accessibilityLabel, CYLExampleLocalizedString("倍速"))
+        XCTAssertEqual(demo.speedSlider.accessibilityValue, CYLExampleLocalizedString("%@ 倍", "1.5"))
+        demo.setSpeed(100)
+        XCTAssertEqual(list.animationSpeed ?? 0, 4, accuracy: 0.01, "Clamped to the slider's range")
+        XCTAssertEqual(list.style.animationSpeed, 1, accuracy: 0.01, "The style is not replaced: the list is not reloaded")
+        demo.setLoops(true)
+        XCTAssertTrue(list.animationLoops)
+        let visible = tags.collectionView.visibleCells.compactMap { ($0 as? CYLTagListCell)?.button }
+        XCTAssertFalse(visible.isEmpty)
+        XCTAssertTrue(visible.allSatisfy { $0.animationLoops && $0.animationSpeed == 4 }, "Applied to the tags on screen")
+        demo.setLoops(false)
+        XCTAssertTrue(visible.allSatisfy { !$0.animationLoops })
+        XCTAssertEqual(demo.loopSwitch.accessibilityLabel, CYLExampleLocalizedString("循环播放"))
+        XCTAssertNil(demo.navigationItem.leftBarButtonItem, "The speed button is replaced by the slider")
         tags.tap(item: 1, section: 4)
         XCTAssertTrue(list.selectedIndexPaths.contains(ip(1, 4)))
         XCTAssertFalse(list.selectedIndexPaths.contains(ip(0, 4)), "One selected tag per section")
@@ -144,7 +188,7 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
         let resting = tags.tagButton(at: ip(restingItem, pag))
         XCTAssertEqual(resting?.animationRestingProgress ?? 0, 1, accuracy: 0.001)
         XCTAssertFalse(resting?.isSelected ?? true)
-        let progress = ((resting?.animationPlayer as AnyObject?)?.value(forKey: "progress") as? NSNumber)?.doubleValue ?? 0
+        let progress = ((resting?.value(forKey: "animationPlayer") as AnyObject?)?.value(forKey: "progress") as? NSNumber)?.doubleValue ?? 0
         XCTAssertEqual(progress, 1, accuracy: 0.01, "Shows its last frame")
         // truck.riv (rive-app/rive-ios) replaced confetti.riv, which draws nothing at rest.
         let rive = sections.firstIndex(of: "rive") ?? 0
@@ -159,6 +203,43 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
             let path = (Bundle.main.resourcePath ?? "") + "/pag-ios/\(name).pag"
             XCTAssertTrue(FileManager.default.fileExists(atPath: path), "CYLTabBarController's PAG tab icon \(name)")
         }
+    }
+
+    /**
+     * SVGA, one for one with Rive: a section of CYLTabBarController's SVGA tab icons and one on the same dark tags as
+     * icons.riv; every file is in the app and gets a view from the SVGA animator.
+     */
+    func testSVGASectionsMirrorTheRiveSections() {
+        let demo = CYLTagAnimationDemoViewController()
+        showInNavigation(demo)
+        demo.view.layoutIfNeeded()
+        let list: CYLTagListView = demo.tagListView
+        let tags = list.probe
+        let source = list.menuDataSource
+        let sections = CYLTagAnimationDemoViewController.sectionIdentifiers()
+        guard let svga = sections.firstIndex(of: "svga"), let svgaDark = sections.firstIndex(of: "svga-dark"),
+              let riveIcons = sections.firstIndex(of: "rive-icons") else {
+            return XCTFail("SVGA sections in \(sections)")
+        }
+        XCTAssertEqual(svga, riveIcons + 1, "SVGA follows Rive")
+        XCTAssertEqual(source?.numberOfSectionsInMenu(), sections.count)
+        XCTAssertNil(source?.menuStyle?(forSection: svga), "The list's style")
+        let dark = source?.menuStyle?(forSection: svgaDark)
+        XCTAssertTrue(dark?.normalAppearance.backgroundColor.cgColor == source?.menuStyle?(forSection: riveIcons)?
+            .normalAppearance.backgroundColor.cgColor, "The dark tags of icons.riv")
+        for section in [svga, svgaDark] {
+            let count = source?.menuNumberOfItems(inSection: section) ?? 0
+            XCTAssertGreaterThan(count, 0)
+            list.scroll(toSection: section, animated: false)
+            tags.layOut()
+            for item in 0..<count {
+                let url = source?.menuAnimationURLForItem?(at: ip(item, section))
+                XCTAssertEqual(url?.pathExtension, "svga")
+                XCTAssertTrue(FileManager.default.fileExists(atPath: url?.path ?? ""), "\(String(describing: url))")
+                XCTAssertNotNil(tags.tagButton(at: ip(item, section))?.animationView, "SVGA view for \(url?.lastPathComponent ?? "")")
+            }
+        }
+        captureScreen(named: "test-animation-svga-sections")
     }
 
     /**

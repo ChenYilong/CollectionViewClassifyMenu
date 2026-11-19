@@ -1,0 +1,6 @@
+<resources>
+    <!-- Android 15 draws apps edge to edge when they target SDK 35; the original sample (target SDK 21) never did. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+</resources>

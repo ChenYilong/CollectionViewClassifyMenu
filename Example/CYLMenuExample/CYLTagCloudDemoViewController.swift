@@ -5,7 +5,7 @@
 //  标签云：android-tagview（kaede/android-tagview）的初始化方式。先创建 CYLTagListView，设置行距、标签间距与内边距
 //  （lineSpacing、interitemSpacing、tagContentInsets，也可在 Interface Builder 中设置），再 addTags(withTitles:) 或
 //  addTag(_:) 添加 CYLTag；点击与删除用 tagClickHandler、tagDeleteHandler 监听。下方是同样的标签，用配置字典
-//  （CYLTagListViewTags）创建。
+//  （CYLTagListKey.tags）创建。
 //
 
 import UIKit
@@ -15,7 +15,7 @@ final class CYLTagCloudDemoViewController: UIViewController {
 
     /// Created the android-tagview way: init(), spacing, then tags.
     private(set) var codeTagListView: CYLTagListView!
-    /// The same kind of tags from a configuration dictionary (CYLTagListViewTags).
+    /// The same kind of tags from a configuration dictionary (CYLTagListKey.tags).
     private(set) var mapTagListView: CYLTagListView!
     private(set) var eventLabel: UILabel!
 
@@ -72,19 +72,19 @@ final class CYLTagCloudDemoViewController: UIViewController {
 
     /// The configuration of the lower list: the same kinds of tags, as strings and dictionaries.
     static func mapConfiguration() -> [String: Any] {
-        let blue: [String: Any] = [CYLMenuStyleNormal: [CYLTagAppearanceBackgroundColor: "#00BFFF",
-                                                        CYLTagAppearanceTextColor: "#FFFFFF",
-                                                        CYLTagAppearanceBorderWidth: 0,
-                                                        CYLTagAppearanceCornerRadius: 0],
-                                   CYLMenuStyleHighlightedBackgroundColor: "#88363636"]
+        let blue: [String: Any] = [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.backgroundColor: "#00BFFF",
+                                                        CYLTagAppearanceKey.textColor: "#FFFFFF",
+                                                        CYLTagAppearanceKey.borderWidth: 0,
+                                                        CYLTagAppearanceKey.cornerRadius: 0],
+                                   CYLMenuStyleKey.highlightedBackgroundColor: "#88363636"]
         return [
-            CYLTagListViewStyle: [CYLMenuStyleLineSpacing: 5, CYLMenuStyleInteritemSpacing: 3,
-                                  CYLMenuStyleTagContentInsets: "{3, 10, 3, 10}"],
-            CYLTagListViewScrollEnabled: false,
-            CYLTagListViewTags: ["Asia", "Europe",
-                                 [CYLTagItemTitle: "Africa", CYLTagItemIdentifier: 3, CYLTagItemDeletable: true,
-                                  CYLTagItemStyle: blue] as [String: Any],
-                                 [CYLTagItemTitle: "Australia", CYLTagItemImage: "system:globe"] as [String: Any]],
+            CYLTagListKey.style: [CYLMenuStyleKey.lineSpacing: 5, CYLMenuStyleKey.interitemSpacing: 3,
+                                  CYLMenuStyleKey.tagContentInsets: "{3, 10, 3, 10}"],
+            CYLTagListKey.scrollEnabled: false,
+            CYLTagListKey.tags: ["Asia", "Europe",
+                                 [CYLTagItemKey.title: "Africa", CYLTagItemKey.identifier: 3, CYLTagItemKey.deletable: true,
+                                  CYLTagItemKey.style: blue] as [String: Any],
+                                 [CYLTagItemKey.title: "Australia", CYLTagItemKey.image: "system:globe"] as [String: Any]],
         ]
     }
 
@@ -120,7 +120,7 @@ final class CYLTagCloudDemoViewController: UIViewController {
 
         eventLabel = caption(withText: CYLExampleLocalizedString("点击标签，或点 × 删除"))
         let views: [UIView] = [caption(withText: CYLExampleLocalizedString("代码初始化：addTags(withTitles:)、addTag(_:)")), codeTagListView,
-                               caption(withText: CYLExampleLocalizedString("字典初始化：CYLTagListViewTags")), mapTagListView, eventLabel]
+                               caption(withText: CYLExampleLocalizedString("字典初始化：CYLTagListKey.tags")), mapTagListView, eventLabel]
         let stack = UIStackView(arrangedSubviews: views)
         stack.axis = .vertical
         stack.spacing = 8

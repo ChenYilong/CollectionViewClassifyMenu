@@ -1,0 +1,37 @@
+{
+  "CYLTabBarControllerContext": "CYLTagListHarmonyExample",
+  "CYLTabBarControllerStyleType": "default",
+  "CYLTabBarControllerTitlePositionAdjustment": "{0, -2}",
+  "CYLTabBarControllerThemes": {
+    "light": {
+      "CYLTabBarItemSelectedTitleColor": "#007AFF",
+      "CYLTabBarItemSelectedIconColor": "#007AFF"
+    }
+  },
+  "CYLTabBarControllerThemeIdentifier": "light",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Tags",
+      "CYLTabBarItemImage": "cyl_tab_tag",
+      "CYLTabBarItemSelectedImage": "cyl_tab_tag_selected",
+      "CYLTabBarItemIdentifier": "tags"
+    },
+    {
+      "CYLTabBarItemTitle": "Classify",
+      "CYLTabBarItemImage": "cyl_tab_classify",
+      "CYLTabBarItemSelectedImage": "cyl_tab_classify_selected",
+      "CYLTabBarItemIdentifier": "classify"
+    }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "Post",
+    "CYLTabBarItemImage": "post_normal",
+    "CYLTabBarItemSelectedImage": "post_highlight",
+    "CYLPlusButtonIndexInTabBar": 1,
+    "CYLPlusButtonCenterYOffset": -14,
+    "CYLPlusButtonImageSize": "{55, 55}",
+    "CYLPlusButtonAlignsTitle": true,
+    "CYLTabBarItemIdentifier": "plus",
+    "CYLTabBarItemPageIdentifier": "post"
+  }
+}

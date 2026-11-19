@@ -4,7 +4,7 @@
 //
 //  标签的两种初始化方式（参照 CYLTabBarController 的 -initWithConfiguration: 与
 //  -initWithConfigurationFile:error:）：配置文件（JSON）与字典（map）。图标使用
-//  CYLTabBarController 的动效引擎（Lottie、PAG、Rive、GIF）。
+//  CYLTabBarController 的动效引擎（Lottie、PAG、Rive、SVGA、GIF）。
 //
 
 import UIKit
@@ -24,6 +24,29 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
         "CYLMenuExample.bundle/Configurations/animated-tags.json"
     }
 
+    /// The configuration file, its section titles in the Example's language. The file is shared with the Android,
+    /// HarmonyOS and mini program examples, so its titles stay the source text and are looked up here.
+    static func localizedFileConfiguration() throws -> [String: Any] {
+        var configuration = try CYLTagListView.configuration(contentsOfFile: configurationFilePath())
+        if let sections = configuration[CYLTagListKey.sections] as? [[String: Any]] {
+            configuration[CYLTagListKey.sections] = sections.map { section -> [String: Any] in
+                var section = section
+                if let title = section[CYLTagSectionKey.title] as? String {
+                    section[CYLTagSectionKey.title] = CYLExampleLocalizedString(title)
+                }
+                return section
+            }
+        }
+        return configuration
+    }
+
+    /// An icon-only tag's icon with a label in the app's language (an SF Symbol's own label follows the device's).
+    static func likeImage(_ symbol: String) -> Any {
+        guard let image = UIImage(systemName: symbol) else { return "system:\(symbol)" }
+        image.accessibilityLabel = CYLExampleLocalizedString("喜欢")
+        return image
+    }
+
     static func animationNamed(_ name: String) -> URL? {
         let resource = ("CYLMenuExample.bundle/Animations" as NSString).appendingPathComponent((name as NSString).deletingPathExtension)
         return Bundle.main.url(forResource: resource, withExtension: (name as NSString).pathExtension)
@@ -40,40 +63,41 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
     /// The dictionary of the map example.
     static func mapConfiguration() -> [String: Any] {
         // In code, values keep their types (UIColor, NSValue, NSURL...); strings work too.
-        let normal: [String: Any] = [CYLTagAppearanceIconColor: UIColor.systemIndigo,
-                                     CYLTagAppearanceBorderColor: UIColor.systemIndigo,
-                                     CYLTagAppearanceBorderWidth: 1,
-                                     CYLTagAppearanceCornerRadius: 8]
-        let selected: [String: Any] = [CYLTagAppearanceBackgroundColor: UIColor.systemIndigo,
-                                       CYLTagAppearanceBorderColor: UIColor.systemIndigo,
-                                       CYLTagAppearanceIconColor: UIColor.white,
-                                       CYLTagAppearanceCornerRadius: 8]
+        let normal: [String: Any] = [CYLTagAppearanceKey.iconColor: UIColor.systemIndigo,
+                                     CYLTagAppearanceKey.borderColor: UIColor.systemIndigo,
+                                     CYLTagAppearanceKey.borderWidth: 1,
+                                     CYLTagAppearanceKey.cornerRadius: 8]
+        let selected: [String: Any] = [CYLTagAppearanceKey.backgroundColor: UIColor.systemIndigo,
+                                       CYLTagAppearanceKey.borderColor: UIColor.systemIndigo,
+                                       CYLTagAppearanceKey.iconColor: UIColor.white,
+                                       CYLTagAppearanceKey.cornerRadius: 8]
         let style: [String: Any] = [
-            CYLMenuStyleImageSize: NSValue(cgSize: CGSize(width: 20, height: 20)),
-            CYLMenuStyleImageTitleSpacing: 4,
-            CYLMenuStyleItemHeight: 36,
-            CYLMenuStyleLayoutCentered: true,
-            CYLMenuStyleNormal: normal,
-            CYLMenuStyleSelected: selected,
+            CYLMenuStyleKey.imageSize: NSValue(cgSize: CGSize(width: 20, height: 20)),
+            CYLMenuStyleKey.imageTitleSpacing: 4,
+            CYLMenuStyleKey.itemHeight: 36,
+            CYLMenuStyleKey.layoutCentered: true,
+            CYLMenuStyleKey.normal: normal,
+            CYLMenuStyleKey.selected: selected,
         ]
         let items: [Any] = [
-            [CYLTagItemTitle: "Lottie", CYLTagItemAnimation: animationValue("Lottie/tab_me_animate.json")] as [String: Any],
-            [CYLTagItemTitle: "GIF", CYLTagItemAnimation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
-            [CYLTagItemTitle: "Rive", CYLTagItemAnimation: animationValue("Rive/menu_button.riv")] as [String: Any],
-            [CYLTagItemImage: "system:heart", CYLTagItemSelectedImage: "system:heart.fill"] as [String: Any],
+            [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json")] as [String: Any],
+            [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
+            [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv")] as [String: Any],
+            [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga")] as [String: Any],
+            [CYLTagItemKey.image: likeImage("heart"), CYLTagItemKey.selectedImage: likeImage("heart.fill")] as [String: Any],
             "Text only",
         ]
         let section: [String: Any] = [
-            CYLTagSectionTitle: CYLExampleLocalizedString("字典（map）初始化"),
-            CYLTagSectionItems: items,
+            CYLTagSectionKey.title: CYLExampleLocalizedString("字典（map）初始化"),
+            CYLTagSectionKey.items: items,
         ]
         return [
-            CYLTagListViewSelectionMode: CYLMenuSelectionMode.multiple.rawValue,
-            CYLTagListViewFoldControl: CYLMenuFoldControl(position: .none, content: .icon),
-            CYLTagListViewScrollEnabled: false,
-            CYLTagListViewSelectedItems: [NSIndexPath(item: 1, section: 0)],
-            CYLTagListViewStyle: style,
-            CYLTagListViewSections: [section],
+            CYLTagListKey.selectionMode: CYLMenuSelectionMode.multiple.rawValue,
+            CYLTagListKey.foldControl: CYLMenuFoldControl(position: .none, content: .icon),
+            CYLTagListKey.scrollEnabled: false,
+            CYLTagListKey.selectedItems: [NSIndexPath(item: 1, section: 0)],
+            CYLTagListKey.style: style,
+            CYLTagListKey.sections: [section],
         ]
     }
 
@@ -84,7 +108,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
 
         let fileTitle = caption(withText: CYLExampleLocalizedString("配置文件初始化：%@", Self.configurationFilePath()))
         do {
-            let fileTagListView = try CYLTagListView(configurationFile: Self.configurationFilePath())
+            let fileTagListView = CYLTagListView(configuration: try Self.localizedFileConfiguration())
             fileTagListView.menuDelegate = self
             self.fileTagListView = fileTagListView
         } catch {
@@ -96,7 +120,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
         mapTagListView.menuDelegate = self
         self.mapTagListView = mapTagListView
 
-        eventLabel = caption(withText: CYLTagButton.isAnimationEngineAvailable()
+        eventLabel = caption(withText: CYLTagButton.isAnimationEngineAvailable
                              ? CYLExampleLocalizedString("动效引擎：CYLTabBarItemAnimationFactory 已链接")
                              : CYLExampleLocalizedString("动效引擎未链接：显示静态图标"))
 

@@ -1,0 +1,10 @@
+# Images in docs/assets/ or assets/ that scripts/check-screenshots.py does not check, one glob per line, each with
+# its reason. Only for images that are not screenshots (diagrams, icons) or that a script regenerates as a set; a
+# screenshot taken for a document or the README is never listed here (AGENTS.md "CI/CD and Example screenshots").
+
+# harmony/scripts/screenshots.sh regenerates the HarmonyOS example screens (one raw screen per demo) as a set.
+docs/assets/harmonyos-*.jpeg
+
+# Animated screen recordings for the README: scripts/stitch-screenshots.py writes still PNGs, so a label would drop the
+# animation. Each recording is described where the README shows it.
+assets/*.gif

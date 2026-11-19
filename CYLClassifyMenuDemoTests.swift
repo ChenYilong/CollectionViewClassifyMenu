@@ -28,20 +28,49 @@ private final class CYLDemoTestMenuSource: NSObject, CYLMenuDataSource {
 
 final class CYLClassifyMenuDemoTests: XCTestCase {
 
-    func testLegacyFilterSelectionMigrationValidatesArchivedStates() throws {
+    func testStoredFilterSelectionIsValidated() {
         let source = CYLDemoTestMenuSource(sections: [["All", "One"], ["All", "Two"]])
-        let controller = CYLMainViewController()
+        let controller = CYLFilterDemoViewController()
         controller.filterSource = source
-        let legacy = CYLFilterParamsTool()
-        legacy.filterParamsArray = NSMutableArray(array: [NSMutableArray(array: [0, 1]), NSMutableArray(array: [1, 0])])
-        var archive = try NSKeyedArchiver.archivedData(withRootObject: legacy, requiringSecureCoding: false)
-        XCTAssertEqual(controller.selection(fromLegacyArchiveData: archive), [[0, 1], [1, 0]])
-        XCTAssertNil(controller.selection(fromLegacyArchiveData: Data("invalid".utf8)))
+        XCTAssertNotNil(controller.validatedSelection([[0, 1], [1, 0]]))
         XCTAssertNil(controller.validatedSelection([[-1, 0]]))
         XCTAssertNil(controller.validatedSelection([[0, 0], [0, 1]]))
-        (legacy.filterParamsArray[0] as! NSMutableArray)[1] = "bad"
-        archive = try NSKeyedArchiver.archivedData(withRootObject: legacy, requiringSecureCoding: false)
-        XCTAssertNil(controller.selection(fromLegacyArchiveData: archive))
+    }
+
+    /// The two features have a tab each (Classify, Filter); the plus button's page is About.
+    func testClassifyAndFilterHaveTabsOfTheirOwn() throws {
+        let tabs = try XCTUnwrap(CYLAppDelegate.makeTabBarController())
+        tabs.loadViewIfNeeded()
+        let roots = (tabs.viewControllers ?? []).compactMap { ($0 as? UINavigationController)?.viewControllers.first }
+        XCTAssertTrue(roots.contains { $0 is CYLMainViewController }, "a Classify tab")
+        XCTAssertTrue(roots.contains { $0 is CYLFilterDemoViewController }, "a Filter tab")
+        XCTAssertFalse(roots.contains { $0 is CYLMainViewController && $0 is CYLFilterDemoViewController })
+        let classify = try XCTUnwrap(roots.first { $0 is CYLMainViewController })
+        classify.loadViewIfNeeded()
+        XCTAssertNil(classify.navigationItem.leftBarButtonItem, "the Classify tab has no filter button")
+    }
+
+    /// The Filter tab lists the demo places of the selected regions and dishes.
+    func testFilterTabListsTheMatchingPlaces() throws {
+        UserDefaults.standard.removeObject(forKey: CYLFilterDemoViewController.filterSelectionKey)
+        let filter = CYLFilterDemoViewController()
+        filter.loadViewIfNeeded()
+        XCTAssertEqual(filter.results.count, CYLDemoPlaces.all.count)
+        XCTAssertNotNil(filter.navigationItem.leftBarButtonItem, "the filter button")
+        let source = try XCTUnwrap(filter.filterSource as? CYLDemoDataSource)
+        let beijing = IndexPath(item: 1, section: 0)
+        // The query matches the database's source title; the menu shows it in the app's language.
+        let region = source.sourceTitle(at: beijing)
+        XCTAssertEqual(source.menuTitleForItem(at: beijing), source.localizedTitle(region))
+        filter.menu(filter.filterController, didConfirmSelectedItems: [beijing, IndexPath(item: 0, section: 1)])
+        XCTAssertFalse(filter.results.isEmpty)
+        XCTAssertTrue(filter.results.allSatisfy { $0.region == region })
+        XCTAssertEqual(filter.results, CYLDemoPlaces.places(regions: [region], dishes: []))
+        XCTAssertEqual(CYLDemoPlaces.all.count, 83, "the shared database: the same places as the Android example")
+        XCTAssertEqual(CYLDemoPlaces.all.first?.name, "日式拉面 · 北京", "the shared database's first place by rating")
+        XCTAssertEqual(filter.lastQuery.displayString(),
+                       "SELECT name, category, tag, region, rating, price FROM places WHERE region IN ('\(region)') ORDER BY rating DESC, id")
+        UserDefaults.standard.removeObject(forKey: CYLFilterDemoViewController.filterSelectionKey)
     }
 
     func testDemoHeaderFitsANarrowScreen() throws {
@@ -56,6 +85,69 @@ final class CYLClassifyMenuDemoTests: XCTestCase {
         XCTAssertLessThanOrEqual(title.frame.maxX, toggle.frame.minX)
         XCTAssertTrue(title.accessibilityTraits.contains(.header))
         XCTAssertFalse(toggle.accessibilityLabel?.isEmpty ?? true, "The switch has a label of its own")
+    }
+
+    /**
+     * Issue #7: on a 3.5-inch screen (320 × 480 pt) the home page's header ran off the right edge. No 3.5-inch device
+     * runs iOS 15, so the whole home screen is laid out in a window of that size, at the default and the largest text
+     * size: the header, the menu's section headers and its tags stay on screen while it scrolls.
+     */
+    func testDemoHomeFitsA35InchScreen() throws {
+        for category in [UIContentSizeCategory.large, .accessibilityExtraExtraExtraLarge] {
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+            let parent = UIViewController()
+            window.rootViewController = parent
+            window.makeKeyAndVisible()
+            let demo = CYLMainViewController()
+            parent.addChild(demo)
+            demo.view.frame = parent.view.bounds
+            demo.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            parent.view.addSubview(demo.view)
+            demo.didMove(toParent: parent)
+            parent.setOverrideTraitCollection(UITraitCollection(preferredContentSizeCategory: category), forChild: demo)
+            demo.view.setNeedsLayout()
+            demo.view.layoutIfNeeded()
+
+            let title = try XCTUnwrap(demo.titleLabel)
+            let toggle = try XCTUnwrap(demo.rowsCountBydefaultSwitch)
+            let titleFrame = title.convert(title.bounds, to: window)
+            let toggleFrame = toggle.convert(toggle.bounds, to: window)
+            XCTAssertGreaterThanOrEqual(titleFrame.minX, 0, "\(category.rawValue)")
+            XCTAssertLessThanOrEqual(toggleFrame.maxX, 320.5, "\(category.rawValue): the header's switch is on screen")
+            XCTAssertLessThanOrEqual(titleFrame.maxX, toggleFrame.minX + 0.5, "\(category.rawValue)")
+
+            let collection = try XCTUnwrap(collectionView(in: demo.view))
+            XCTAssertGreaterThan(collection.numberOfSections, 0)
+            let maxY = max(0, collection.contentSize.height - collection.bounds.height)
+            var checkedHeaders = 0
+            for y in stride(from: 0, through: maxY, by: 120) {
+                collection.setContentOffset(CGPoint(x: 0, y: y), animated: false)
+                collection.layoutIfNeeded()
+                let headers = collection.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader)
+                for case let header as CYLFilterHeaderView in headers {
+                    checkedHeaders += 1
+                    let more = header.moreButton.convert(header.moreButton.bounds, to: window)
+                    let name = header.titleButton.convert(header.titleButton.bounds, to: window)
+                    XCTAssertGreaterThanOrEqual(name.minX, -0.5, "\(category.rawValue)")
+                    XCTAssertLessThanOrEqual(more.maxX, 320.5, "\(category.rawValue): the section header's button is on screen")
+                    XCTAssertLessThanOrEqual(name.maxX, more.minX + 0.5, "\(category.rawValue)")
+                }
+                for cell in collection.visibleCells {
+                    let frame = cell.convert(cell.bounds, to: window)
+                    XCTAssertGreaterThanOrEqual(frame.minX, -0.5, "\(category.rawValue)")
+                    XCTAssertLessThanOrEqual(frame.maxX, 320.5, "\(category.rawValue): a tag is on screen")
+                }
+            }
+            XCTAssertGreaterThan(checkedHeaders, 0, "\(category.rawValue)")
+            window.isHidden = true
+        }
+    }
+
+    private func collectionView(in view: UIView) -> UICollectionView? {
+        if let collection = view as? UICollectionView {
+            return collection
+        }
+        return view.subviews.lazy.compactMap { self.collectionView(in: $0) }.first
     }
 
     func testDemoLookupReadsItsOwnBundle() {

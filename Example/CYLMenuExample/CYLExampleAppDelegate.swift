@@ -234,6 +234,7 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
                 "style-lottie": ["animation.lottie"],
                 "style-pag": ["animation.pag"],
                 "style-rive": ["animation.rive"],
+                "style-svga": ["animation.svga"],
                 "style-gif": ["animation.gif"],
             ]
             for action in actions[screen] ?? [] {
@@ -243,17 +244,45 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
             guard let navigation = selectTab(withRootClass: CYLTagAnimationDemoViewController.self, in: tabs),
                   let demo = navigation.viewControllers.first as? CYLTagAnimationDemoViewController else { return }
             if screen == "animations-speed" {
+                // The playback controls: 2× and looping, every icon playing.
                 demo.loadViewIfNeeded()
-                demo.changeSpeed()
+                demo.setSpeed(2)
+                demo.setLoops(true)
             } else if screen == "animations-rive" {
                 // PAG, Rive and icons.riv on dark tags, below the first screen.
                 DispatchQueue.main.async {
                     demo.scroll(toSectionIdentifier: "pag")
                 }
+            } else if screen == "animations-rive-loop" {
+                // Bug B20: the Rive section with looping on after Play all, to watch whether the Rive tags replay.
+                demo.loadViewIfNeeded()
+                demo.setLoops(true)
+                DispatchQueue.main.async {
+                    demo.scroll(toSectionIdentifier: "rive")
+                    demo.playAllAnimations()
+                }
+            } else if screen == "animations-svga" {
+                // The two SVGA sections, below Rive.
+                DispatchQueue.main.async {
+                    demo.scroll(toSectionIdentifier: "svga")
+                }
             }
         } else if screen == "config" {
             guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
             navigation.pushViewController(CYLTagConfigurationDemoViewController(), animated: false)
+        } else if screen == "reorder" {
+            guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
+            navigation.pushViewController(CYLTagContainerSampleViewController(), animated: false)
+        } else if screen == "wordPicker" {
+            guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
+            let demo = CYLWordPickerDemoViewController()
+            navigation.pushViewController(demo, animated: false)
+            if UserDefaults.standard.bool(forKey: "CYLWordPickerOpen") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { demo.showPicker() }
+            }
+        } else if screen == "container" {
+            guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
+            navigation.pushViewController(CYLTagContainerSampleViewController(), animated: false)
         } else if screen == "search-home" {
             selectTab(withRootClass: CYLSearchHomeViewController.self, in: tabs)
         } else if screen.hasPrefix("plus") {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tab icon of the Classify demo: rows of tags (the iOS demo's menu). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24" android:tint="?android:attr/textColorSecondary">
+    <path android:fillColor="@android:color/white"
+        android:pathData="M3,5h7a2,2 0,0 1,0 4H3a2,2 0,0 1,0 -4zM13,5h8a2,2 0,0 1,0 4h-8a2,2 0,0 1,0 -4zM3,11h11a2,2 0,0 1,0 4H3a2,2 0,0 1,0 -4zM17,11h4a2,2 0,0 1,0 4h-4a2,2 0,0 1,0 -4zM3,17h5a2,2 0,0 1,0 4H3a2,2 0,0 1,0 -4z"/>
+</vector>

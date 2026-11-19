@@ -1,0 +1,75 @@
+/* The core's CYLTagListView with CYLTagButton tags; the numbers (insets, spacing, colors, radii) are set inline from
+   the style (model.js). A tag: [delete indicator (leading)] [icon] [title] [delete indicator (trailing)], centered. */
+:host { display: block; }
+.cyl-tc { overflow: hidden; box-sizing: border-box; font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif; }
+.cyl-tc-header { display: flex; align-items: center; box-sizing: border-box; }
+.cyl-tc-header-indicator { flex: none; margin-right: 8px; }
+.cyl-tc-header-title { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cyl-tc-items { display: flex; flex-wrap: wrap; align-items: center; }
+.cyl-tc-item {
+  position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box; max-width: 100%; white-space: nowrap; background-size: 100% 100%;
+  background-repeat: no-repeat; transition: transform 0.15s;
+}
+.cyl-tc-disabled { pointer-events: auto; }
+.cyl-tc-title { position: relative; min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; line-height: 1.1934; }
+.cyl-tc-icon { position: relative; flex: none; }
+.cyl-tc-badge {
+  position: relative; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  color: #FFFFFF; font-weight: bold; line-height: 1;
+}
+.cyl-tc-delete { position: relative; flex: none; align-self: stretch; display: flex; align-items: center; }
+.cyl-tc-delete-text { line-height: 1.1934; }
+.cyl-tc-cross { position: relative; align-self: stretch; }
+.cyl-tc-cross-line { position: absolute; left: 50%; top: 50%; }
+.cyl-tc-cross-a { transform: translate(-50%, -50%) rotate(45deg); }
+.cyl-tc-cross-b { transform: translate(-50%, -50%) rotate(-45deg); }
+.cyl-tc-ripple {
+  position: absolute; border-radius: 50%; pointer-events: none; opacity: 0;
+  animation-name: cyl-tc-ripple; animation-timing-function: ease-out; animation-fill-mode: forwards;
+}
+@keyframes cyl-tc-ripple {
+  from { transform: scale(0.05); opacity: 1; }
+  to { transform: scale(1); opacity: 0; }
+}
+/* CYLMenuStyle.deleteIndicatorImage: the image centered in the indicator, which keeps the line height. */
+.cyl-tc-delete-image-box { position: relative; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+.cyl-tc-delete-image { flex: none; }
+/* The add control of editing mode (CYLTagListAddItemView): 44 px tall, a field and an Add button. */
+.cyl-tc-add { display: flex; align-items: center; height: 44px; margin: 0 16px 10px; }
+.cyl-tc-add-field { flex: 1; height: 44px; padding: 0 12px; border-radius: 8px; background-color: #F2F2F7; font-size: 17px; }
+.cyl-tc-add-button { margin-left: 12px; padding: 0 12px; line-height: 44px; font-size: 17px; font-weight: 600; color: #007AFF; }
+.cyl-tc-add-disabled { color: #C7C7CC; }
+
+/* The two editing icons of a renamable tag, each a full-height tap area. */
+.cyl-tc-edit-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+/* The header's clear button at the trailing end, a 44 px tap area around the icon. */
+.cyl-tc-clear {
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  margin-top: -12px;
+  margin-bottom: -12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Folding: hidden tags, the fold control as the last tag, and its hidden copy that measures its width. */
+.cyl-tc-hidden { display: none !important; }
+.cyl-tc-fold { flex-shrink: 0; }
+.cyl-tc-fold-arrow { display: block; flex-shrink: 0; transition: transform 0.2s; }
+.cyl-tc-fold-arrow-after { margin-left: 4px; }
+.cyl-tc-up { transform: rotate(180deg); }
+.cyl-tc-fold-sizer {
+  position: absolute; visibility: hidden; left: 0; top: 0; display: inline-flex; align-items: center;
+  box-sizing: border-box; white-space: nowrap;
+}
+.cyl-tc-body { position: relative; }

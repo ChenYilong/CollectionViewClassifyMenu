@@ -1,0 +1,5 @@
+<view class="table">
+  <view wx:for="{{rows}}" wx:key="row" class="cell">
+    <cyl-tag-cloud tags="{{item.tags}}" list-style="{{style}}" />
+  </view>
+</view>

@@ -64,3 +64,14 @@ branch, see `cyl-dependency`). General practice: the copied `ios-accessibility`,
    flow, then the fold-styles tab at the largest accessibility text size.
 
 A change that adds a control or a text without accessibility is not done.
+
+## HarmonyOS
+
+- Every control has `accessibilityText` (localized), a description when useful, and its selected state through
+  `CYLAccessibilitySelectedModifier` (API 13+). Rows and buttons of several views are one element
+  (`accessibilityGroup(true)`); icons beside a label are `accessibilityLevel('no')`; text fields are labeled like
+  their placeholder.
+- Check: `harmony/scripts/accessibility-check.py`. A finding is fixed before the task goes on.
+- UI tests find controls by their localized accessibility label first (`cylFindAccessible`, `cylTapAccessible` in
+  `harmony/entry/src/ohosTest/ets/test/TestSupport.ets`), for taps, flows and sequences of actions; ids only as a
+  fallback. Rule: AGENTS.md "HarmonyOS: accessibility, localization and accessibility-first UI tests".

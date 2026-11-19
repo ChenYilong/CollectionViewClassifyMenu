@@ -1,0 +1,11 @@
+/* The preview on top (white), a hairline (UIColor.separator), then the inset grouped table filling the rest. */
+.page { display: flex; flex-direction: column; height: 100vh; background: #ffffff; }
+.preview { flex: none; }
+.separator { flex: none; height: 1px; transform: scaleY(0.5); background: var(--ios-separator); }
+.table { flex: 1; height: 0; background: var(--ios-grouped-background); }
+.table-content { min-height: 100%; }
+/* UITableView.Style.insetGrouped titles are not upper-cased on iOS 15 and later. */
+.ios-section-header { text-transform: none; }
+/* UIListContentConfiguration.valueCell(): the title in .subheadline (15 pt, any number of lines), the value beside it. */
+.action-title { font-size: 15px; line-height: 20px; }
+.action-value { flex: none; max-width: 45%; text-align: right; }

@@ -1,0 +1,40 @@
+buildscript {
+    ext {
+        buildToolsVersion = "37.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 37
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
+        kotlinVersion = "2.2.0"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"
+
+// The Kotlin CYLTagListView (com.cyl:classifymenu), published to a local Maven folder by CollectionViewClassifyMenu's
+// `android/scripts/gradle.sh merged :library:publishReleasePublicationToBuildRepository`; -Pcyl.classifymenu.repo=<folder>
+// points elsewhere (a build mirror).
+allprojects {
+    repositories {
+        // SVGAPlayer-Android (CYLTabBarController's SVGA animator) is published on JitPack only.
+        maven { url = uri("https://jitpack.io"); content { includeGroup("com.github.yyued") } }
+        maven { url = uri(rootProject.findProperty("cyl.classifymenu.repo") ?: "${rootDir}/../../../../android/merged/library/build/repo") }
+    }
+}
+
+// react-native-cyltabbar compiles CYLTabBarController's Kotlin sources (Example-Android) from the checkout of
+// scripts/fetch-cyltabbar.sh; its default path assumes the CYLTabBarController repository around it.
+subprojects { project ->
+    if (project.name == "react-native-cyltabbar") {
+        project.ext.cylAndroidRoot = "${rootDir}/../../.deps/CYLTabBarController/Example-Android"
+    }
+}

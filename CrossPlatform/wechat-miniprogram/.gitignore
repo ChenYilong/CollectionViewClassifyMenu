@@ -1,0 +1,8 @@
+node_modules/
+miniprogram/miniprogram_npm/
+project.private.config.json
+.deps/
+miniprogram/cyl_components/
+miniprogram/engines/cyl-pag-miniprogram/
+miniprogram/engines/pag/
+miniprogram/engines/cyl-svga-miniprogram/
