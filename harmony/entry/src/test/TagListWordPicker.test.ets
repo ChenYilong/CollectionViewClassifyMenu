@@ -71,6 +71,26 @@ export default function tagListWordPickerTest() {
       expect(cell.accessibilityLabel.trim().length > 0).assertTrue();
     });
 
+    it('severalSmearsAddUp', 0, () => {
+      // Owner's check (iOS testSeveralSmearsAddUp): each smear adds its range to the selection it began with.
+      const list = wordPicker(MESSAGE);
+      const alex = MESSAGE.indexOf('Alex');
+      list.beginSmear(path(alex));
+      list.smearTo(path(alex + 2));
+      list.smearTo(path(alex + 3));
+      list.endSmear();
+      expect(list.selectedText).assertEqual('Alex');
+      const design = MESSAGE.indexOf(' Design');
+      list.beginSmear(path(design));
+      list.smearTo(path(design + 6));
+      list.endSmear();
+      expect(list.selectedText).assertEqual('Alex Design');
+      list.beginSmear(path(alex));
+      list.smearTo(path(alex + 3));
+      list.endSmear();
+      expect(list.selectedText).assertEqual(' Design');
+    });
+
     it('smearSelectsAndDeselectsARange', 0, () => {
       const list = wordPicker('ABCDEFGHIJKL');
       const recorder = new CYLSelectionRecorder();

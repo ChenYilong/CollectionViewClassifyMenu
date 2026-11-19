@@ -90,6 +90,26 @@ function touchAt(cloud, item) {
   return { clientX: r.left + 20, clientY: r.top + 20 };
 }
 
+test('several smears add up; one from a selected cell removes its range (owner check, iOS testSeveralSmearsAddUp)', () => {
+  const cloud = mountCloud({ listStyle: model.wordPickerStyle(), selectionMode: 'multiple', allowsSmearSelection: true });
+  cloud.setTagsWithCharactersOfText(MESSAGE);
+  const cellOf = (index) => model.characters(MESSAGE.slice(0, index)).length;
+  function smear(from, to) {
+    cloud.onTouchStart({ currentTarget: { dataset: { index: from } }, touches: [touchAt(cloud, from)] });
+    cloud.onTouchMove({ touches: [touchAt(cloud, Math.floor((from + to) / 2))] });
+    cloud.onTouchMove({ touches: [touchAt(cloud, to)] });
+    cloud.onTouchEnd();
+  }
+  const alex = cellOf(MESSAGE.indexOf('Alex'));
+  smear(alex, alex + 3);
+  assert.equal(cloud.selectedText(), 'Alex');
+  const design = cellOf(MESSAGE.indexOf(' Design'));
+  smear(design, design + 6);
+  assert.equal(cloud.selectedText(), 'Alex Design', 'the second starts on the space before the word');
+  smear(alex, alex + 3);
+  assert.equal(cloud.selectedText(), ' Design');
+});
+
 test('a smear from a tag selects the tags it crosses, deselects from a selected one, a tap still toggles', () => {
   const cloud = mountCloud({ listStyle: model.wordPickerStyle(), selectionMode: 'multiple', allowsSmearSelection: true });
   cloud.setTagsWithCharactersOfText('ABCDEFGHIJKL');

@@ -93,6 +93,31 @@ class CYLWordPickerTest {
     }
 
     @Test
+    fun severalSmearsAddUp() {
+        // Owner's check (iOS testSeveralSmearsAddUp): each smear adds its range to the selection it began with.
+        val list = wordPicker(message)
+        val text = list.tags.joinToString("") { it.title }
+        fun cellOf(index: Int) = text.codePointCount(0, index)
+        fun smear(from: Int, to: Int) {
+            val target = cell(list, from)
+            touch(list, target, MotionEvent.ACTION_DOWN, from)
+            touch(list, target, MotionEvent.ACTION_MOVE, (from + to) / 2)
+            touch(list, target, MotionEvent.ACTION_MOVE, to)
+            touch(list, target, MotionEvent.ACTION_UP, to)
+        }
+        val alex = cellOf(text.indexOf("Alex"))
+        smear(alex, alex + 3)
+        assertEquals("Alex", list.selectedText)
+        // The second starts on the space before "Design".
+        val design = cellOf(text.indexOf(" Design"))
+        smear(design, design + 6)
+        assertEquals("Alex Design", list.selectedText)
+        // One that starts on a selected cell removes its range.
+        smear(alex, alex + 3)
+        assertEquals(" Design", list.selectedText)
+    }
+
+    @Test
     fun smearSelectsAndDeselectsARange() {
         val list = wordPicker("ABCDEFGHIJKL")
         val recorder = Recorder()
