@@ -682,3 +682,14 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `android/merged/gradle.properties`; the RN `scripts/fetch-cyltabbar.sh` and the Flutter example's `pubspec.yaml` ref.
   Results: mini program `npm test` 167 / 167; HarmonyOS host tests 78 / 78 and the app builds; Android library tests
   102 / 0 and the example builds; `check-localization-ports.py` 0 problems.
+- **Result, iOS (Mac session), first half:** the four Podfiles, `Package.swift` and the Flutter / React Native iOS
+  Podfiles at `8ece77dd`; pod install in the four projects; menu 37 / 37, Example 115 / 115, Swift Example 22 / 22,
+  TagCollectionView 6 / 6 on the iPhone 18 Pro simulator (iOS 27.2); no code change needed for the Swift
+  `CYLTabBarController` class or the iOS 15 podspecs. Flutter iOS: `flutter build ios --simulator` OK.
+- **Blocked (React Native iOS example, 2026-11-20):** at `8ece77dd` its static-library build (pods without
+  `use_frameworks!`) fails with "Import of module 'CYLAnimatedItem' appears within same top-level module 'CYLAnimatedItem'"
+  at `CYLTabBarController.h:109`. The include chain: the `CYLAnimatedItem` umbrella → `CYLTabBarItemAnimationPlayableView.h`
+  → the `CYLTabBarController` target's generated `CYLTabBarController-Swift.h` → `CYLTabBarController.h` →
+  `@import CYLAnimatedItem`: a module cycle. It built at `74f0b4cd` (checked the same day), so the break is in the 146
+  commits between (class switch, `Package/` header move). Reported to CYLTabBarController; this example's Podfile
+  stays at `74f0b4cd` until it is fixed, every other iOS pin is at `8ece77dd`. Score 80 / 100 until then (−20).

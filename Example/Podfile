@@ -8,11 +8,11 @@ project 'CYLMenuExample.xcodeproj'
 
 # The revision whose API the Example uses (feat/cross-platform-components); update together.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => '74f0b4cd8c8e55b8954650b063e2955b9f4e92ef' }
+                :commit => '8ece77ddc8ecb1c26ac8d09d1d9bc63c0b5d8094' }
 # CYLAnimatedItem, the shared animated icon + title component: its own pod in the same repository and commit, not
 # on the trunk yet (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
 CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                      :commit => '74f0b4cd8c8e55b8954650b063e2955b9f4e92ef' }
+                      :commit => '8ece77ddc8ecb1c26ac8d09d1d9bc63c0b5d8094' }
 
 # The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
 # revision whose API the Example uses (feat/search-bar-view); update together.
