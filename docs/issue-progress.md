@@ -1386,3 +1386,12 @@ tags: [issues, ui, cocoapods, progress]
   [ios-cocoapods-commit-consumer.png](assets/ios-cocoapods-commit-consumer.png). The trunk release and the master tag
   are no longer required for this issue (owner's decision); `scripts/pod-lint.sh push` stays for a future release.
 
+
+### TODO (2026-11-19, `feat/harmony`): the localization checks run in CI
+
+- Context: `scripts/check-localization.py` (iOS, Flutter and React Native code and tables) and
+  `scripts/check-localization-ports.py` (Android, HarmonyOS and mini program) ran only by hand. Both are Python 3
+  standard library only. The Flutter and React Native string exports from the iOS bundle have `--check` too.
+- Prompt (verbatim): "go ahead for Localization checks in CI: should I add scripts/check-localization.py and scripts/check-localization-ports.py as one small workflow? They're quick Python scripts with no dependencies."
+- Acceptance (100): one workflow running both checks and the two export `--check`s on pushes and pull requests that
+  touch strings or code (50); green on GitHub on `feat/harmony` (30); AGENTS.md says so (20). Pass: 60.
