@@ -1511,6 +1511,10 @@ tags: [issues, ui, cocoapods, progress]
   `model.wordPickerStyle()` and a new `numberOfItemsPerRow` (equal cells: `calc((100% - spaces) / n)`), title
   `fontWeight`; a space cell reads `CYLMenuSpaceCharacter`. New `test/tag-cloud-word-picker.test.js` (2); `npm test`
   164 / 164 with and without `verify-package.js`.
+- **Mini program example (30 / 30):** Styles → "选词填入：涂抹选择填入词" (`pages/sample-word-picker`: the remark field,
+  the localized message, a sheet with Cancel, the grid and 填入, off until something is selected); the styles table test
+  expects the new section. DevTools with miniprogram-automator: a touch smear from A to x picked "Alex", 填入 filled the
+  field. Screenshot `docs/assets/miniprogram-word-picker.png`. `npm test` 164 / 164.
 - Result (DONE, **100 / 100**): `CYLWordPickerDemoViewController.message` is the Example string
   "你好，我是设计部的 Alex 👋" (en "Hi, I'm Alex from Design 👋", zh-Hant "你好，我是設計部的 Alex 👋"), the sender "Alex";
   the NOLOCALIZE exemption and its entry in the language test are gone. The tests find the name in whatever language

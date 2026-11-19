@@ -1,0 +1,21 @@
+<view class="page">
+  <text class="caption" aria-role="heading">{{labels.remark}}</text>
+  <input class="field" id="wordPicker.field" value="{{remark}}" placeholder="{{labels.placeholder}}"
+         aria-label="{{labels.placeholder}}" bindinput="onRemarkInput" />
+  <text class="sender">{{sender}}</text>
+  <text class="message">"{{message}}"</text>
+  <view class="pick" id="wordPicker.pick" bindtap="showPicker" aria-role="button" aria-label="{{labels.pick}}">{{labels.pick}}</view>
+
+  <!-- The sheet: Cancel, the hint, the grid, 填入 (off until something is selected). -->
+  <view wx:if="{{sheetShown}}" class="dim" bindtap="hidePicker" catchtouchmove="noop"></view>
+  <view wx:if="{{sheetShown}}" class="sheet" aria-role="dialog" aria-label="{{labels.hint}}">
+    <view class="bar">
+      <text class="cancel" id="wordPicker.cancel" bindtap="hidePicker" aria-role="button">{{labels.cancel}}</text>
+      <view class="fill {{canFill ? '' : 'fill-off'}}" id="wordPicker.fill" bindtap="fill" aria-role="button"
+            aria-label="{{labels.fill}}" aria-disabled="{{!canFill}}">{{labels.fill}}</view>
+    </view>
+    <text class="hint" aria-role="heading">{{labels.hint}}</text>
+    <cyl-tag-cloud id="word-picker" list-style="{{pickerStyle}}" selection-mode="multiple"
+                   allows-smear-selection="{{true}}" bind:selectionchange="onSelectionChange" bind:tagtap="onCellTap" />
+  </view>
+</view>

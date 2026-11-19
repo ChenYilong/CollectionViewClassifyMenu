@@ -1,0 +1,15 @@
+.page { padding: 20px; background: #FFFFFF; min-height: 100vh; box-sizing: border-box; }
+.caption { display: block; font-size: 15px; color: #6C6C70; }
+.field { margin-top: 10px; height: 52px; padding: 0 16px; border-radius: 10px; background: #F2F2F7; font-size: 20px; }
+.sender { display: block; margin-top: 16px; font-size: 17px; font-weight: 600; color: #5856D6; }
+.message { display: block; margin-top: 10px; font-size: 17px; color: #6C6C70; }
+.pick { margin-top: 4px; padding: 10px 0; font-size: 17px; color: #007AFF; }
+.dim { position: fixed; left: 0; top: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.35); }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; padding: 16px 16px 32px; background: #FFFFFF;
+  border-radius: 16px 16px 0 0; }
+.bar { display: flex; align-items: center; justify-content: space-between; }
+.cancel { font-size: 20px; color: #000000; padding: 8px 8px 8px 0; }
+.fill { min-width: 88px; height: 40px; line-height: 40px; text-align: center; border-radius: 8px; background: #34C759;
+  color: #FFFFFF; font-size: 17px; }
+.fill-off { opacity: 0.4; }
+.hint { display: block; margin: 20px 0; font-size: 17px; font-weight: 600; color: #000000; }

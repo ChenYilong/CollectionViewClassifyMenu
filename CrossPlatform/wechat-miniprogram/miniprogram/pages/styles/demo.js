@@ -14,6 +14,7 @@ const ACTION_IDENTIFIERS = [
   ['backgroundColor.normal', 'backgroundColor.selected', 'borderColor', 'borderWidth', 'cornerRadius', 'margin'],
   ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.svga', 'animation.gif', 'animation.off', 'animationSpeed', 'configuration', 'tagCloud'],
   ['sample.tagCloud', 'sample.imageTag', 'sample.tagContainer'],
+  ['sample.wordPicker'],
   ['reset'],
 ];
 
@@ -22,6 +23,7 @@ const SECTION_TITLES = [
   '背景、边框与圆角（参照 CYLBadgeView）',
   '动效图标（CYLTabBarController 动效引擎）',
   'Android 标签库示例（Swift 复刻）',
+  '选词填入（涂抹选择）',
   '其它',
 ];
 
@@ -60,6 +62,7 @@ const ACTION_TITLES = {
   'sample.tagCloud': 'android-tagview 示例（Swift 版）',
   'sample.imageTag': 'TagViewGroup 示例：图片标签',
   'sample.tagContainer': 'AndroidTagView 示例：标签容器',
+  'sample.wordPicker': '选词填入：涂抹选择填入词',
   reset: '重置 reset',
 };
 
@@ -70,6 +73,7 @@ const PAGES = {
   'sample.tagCloud': '/pages/sample-tag-cloud/sample-tag-cloud',
   'sample.imageTag': '/pages/sample-image-tag/sample-image-tag',
   'sample.tagContainer': '/pages/sample-tag-container/sample-tag-container',
+  'sample.wordPicker': '/pages/sample-word-picker/sample-word-picker',
 };
 
 /** A fixed palette, so that screenshots are stable: systemOrange, systemPurple, systemTeal, systemPink, systemIndigo, systemGreen. */

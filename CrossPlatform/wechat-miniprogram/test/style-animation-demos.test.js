@@ -14,11 +14,15 @@ const path = require('node:path');
 test('styles: the table has the iOS sections and actions in order, with their localized titles', () => {
   setLanguage('en');
   const table = styles.table(styles.createState(), t);
-  assert.equal(table.length, 5);
+  assert.equal(table.length, 6);
   assert.equal(table[0].header, 'Title and icon (as CYLFlatDesignTabBarItem)');
-  assert.deepEqual(table.map((s) => s.rows.length), [15, 6, 9, 3, 1]);
+  assert.deepEqual(table.map((s) => s.rows.length), [15, 6, 9, 3, 1, 1]);
   assert.equal(table[0].rows[0].title, 'Set iconColor (normal)');
-  assert.equal(table[4].rows[0].identifier, 'reset');
+  // The word picker (iOS cf5d9f7e), before "Other".
+  assert.equal(table[4].header, 'Pick words to fill in (swipe to select)');
+  assert.equal(table[4].rows[0].identifier, 'sample.wordPicker');
+  assert.equal(table[4].rows[0].title, 'Word picker: swipe across words to fill in');
+  assert.equal(table[5].rows[0].identifier, 'reset');
   assert.deepEqual(table[2].rows.slice(0, 5).map((r) => r.identifier),
     ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.svga', 'animation.gif']);
   assert.equal(table[2].rows[3].title, 'SVGA animated icons');
