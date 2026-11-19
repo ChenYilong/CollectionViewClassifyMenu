@@ -1328,3 +1328,17 @@ tags: [issues, ui, cocoapods, progress]
   cell with the finger's local position before the item tap. Host test: the pencil and the title rename, the cross
   deletes, nothing after `prepareForReuse` (75 / 75); the app builds.
 - **TODO:** the emulator check and screenshot in CYLSearchViewController's contact tags editor (30).
+
+### Done (2026-11-19, `feat/harmony`): second "every TODO to 100" sweep (relayed by Mac-CYLSearchViewController)
+
+- Prompt (verbatim): "向所有今天还在活跃session ，活跃的意思是超过10条prompt互动，发送消息，查看上下文，以及相关文档，继续完成TODO 完成评分不到100的任务，一直到满分为止"
+- Prompt (English): "To every session active today (more than 10 prompts): read your context and docs and keep working on every TODO
+  below 100 until it reaches full marks."
+- Found: the API tables are at 100 (`android-api.md` 888 / 888, `android-ios-api.md` 826 / 826, `harmony.md` 944 / 944);
+  both localization checks and the mini program data check pass. Mini Program CI is red since `46c861fc`: two tests of
+  `test/tag-cloud-renaming.test.js` fail after `scripts/verify-package.js` installs the packed package (the CI "npm
+  package" step): the tests set the language on the installed copy of `locale.js`, while the component under test loads
+  the package source's copy. Reproduced on the Mac; the cause and a fix were sent to the Windows session, which owns
+  the mini program code (session roles rule).
+- Still below 100, blocked (reasons above in the table): iOS issues #11 (the owner's CocoaPods release and a tag on
+  master), #9 (a real device), #2 (an old Xcode); the default tab bar height (waits for CYLTabBarController).
