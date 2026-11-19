@@ -630,3 +630,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   your re-bundled commit, so please send it the new pin too."
 - **Acceptance (100):** iOS pins with pod install, the four iOS suites and the Flutter iOS build (50); the other platforms
   at the same commit with their tests (40); both sessions told the commit and counts (10). Pass: 60.
+- **Windows (mini program, HarmonyOS, Android, RN and Flutter wrappers; 40 / 40):** `fetch-cyltabbar.js` COMMIT and
+  the re-fetched vendored `cyl-animated-item` / `cyl-animation-placeholder` (`--check` OK), `test/animated-item.test.js`;
+  `harmony/cylanimateditem` re-vendored with `git archive` (README kept; new upstream `CYLAnimatedItemResources.ts` and
+  its test, the B30 `SymbolGlyph` drawing); `android/merged/gradle.properties`; the RN `scripts/fetch-cyltabbar.sh` and
+  the Flutter example's `pubspec.yaml` ref. Results: mini program `npm test` 159 / 159; HarmonyOS host tests 75 / 75
+  and the app builds; Android library tests 99 / 0 and the example builds.
