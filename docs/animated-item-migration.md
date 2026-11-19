@@ -636,3 +636,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   its test, the B30 `SymbolGlyph` drawing); `android/merged/gradle.properties`; the RN `scripts/fetch-cyltabbar.sh` and
   the Flutter example's `pubspec.yaml` ref. Results: mini program `npm test` 159 / 159; HarmonyOS host tests 75 / 75
   and the app builds; Android library tests 99 / 0 and the example builds.
+- **Result, iOS (Mac session):** the four Podfiles, `Package.swift` and the Flutter / React Native iOS Podfiles at
+  `9a4ad95e`; no code change needed. pod install in the four projects; menu 37 / 37, Example 110 / 110, Swift Example
+  22 / 22, TagCollectionView 6 / 6; `flutter build ios --simulator` OK (with the pubspec ref at 9a4ad95e).
+- **DONE (2026-11-19): every platform at `9a4ad95e`, 100 / 100**, with the Windows session's `91c33997` (mini program
+  159 / 159, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build). Both sessions told.
