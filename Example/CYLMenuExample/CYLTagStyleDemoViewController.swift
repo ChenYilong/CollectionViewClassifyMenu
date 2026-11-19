@@ -45,6 +45,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
             ["backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"],
             ["animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"],
             ["sample.tagCloud", "sample.imageTag", "sample.tagContainer", "sample.about"],
+            ["sample.wordPicker"],
             ["reset"],
         ]
     }
@@ -55,6 +56,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
          CYLExampleLocalizedString("背景、边框与圆角（参照 CYLBadgeView）"),
          CYLExampleLocalizedString("动效图标（CYLTabBarController 动效引擎）"),
          CYLExampleLocalizedString("Android 标签库示例（Swift 复刻）"),
+         CYLExampleLocalizedString("选词填入（涂抹选择）"),
          CYLExampleLocalizedString("其它")][section]
     }
 
@@ -95,6 +97,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         "sample.imageTag": "TagViewGroup 示例：图片标签",
         "sample.tagContainer": "AndroidTagView 示例：标签容器",
         "sample.about": "关于：三个 Android 标签库的来源与许可",
+        "sample.wordPicker": "选词填入：涂抹选择填入词",
         "reset": "重置 reset",
     ]
 
@@ -223,6 +226,9 @@ final class CYLTagStyleDemoViewController: UIViewController {
             return
         case "sample.tagContainer":
             navigationController?.pushViewController(CYLTagContainerSampleViewController(), animated: true)
+            return
+        case "sample.wordPicker":
+            navigationController?.pushViewController(CYLWordPickerDemoViewController(), animated: true)
             return
         case "sample.about":
             navigationController?.pushViewController(CYLAndroidSamplesAboutViewController(), animated: true)

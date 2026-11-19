@@ -273,6 +273,13 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
         } else if screen == "reorder" {
             guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
             navigation.pushViewController(CYLTagContainerSampleViewController(), animated: false)
+        } else if screen == "wordPicker" {
+            guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
+            let demo = CYLWordPickerDemoViewController()
+            navigation.pushViewController(demo, animated: false)
+            if UserDefaults.standard.bool(forKey: "CYLWordPickerOpen") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { demo.showPicker() }
+            }
         } else if screen == "container" {
             guard let navigation = selectTab(withRootClass: CYLTagStyleDemoViewController.self, in: tabs) else { return }
             navigation.pushViewController(CYLTagContainerSampleViewController(), animated: false)

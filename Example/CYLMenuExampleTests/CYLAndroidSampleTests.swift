@@ -369,4 +369,127 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(style.displayedTitle(forTitle: "你好"), "好你")
         XCTAssertEqual(CYLTag.badgeImage(text: "热", color: .red, diameter: 16).size, CGSize(width: 16, height: 16))
     }
+
+    // MARK: Word picker (选词填入)
+
+    /// A pan recognizer whose state and location a test sets, to drive `allowsSmearSelection`.
+    private final class CYLFakePan: UIPanGestureRecognizer {
+        var fakeState: UIGestureRecognizer.State = .possible
+        var fakeLocation: CGPoint = .zero
+        override var state: UIGestureRecognizer.State {
+            get { fakeState }
+            set { fakeState = newValue }
+        }
+        override func location(in view: UIView?) -> CGPoint { fakeLocation }
+    }
+
+    private func wordPickerList(_ text: String) -> CYLTagListView {
+        let list = CYLTagListView()
+        list.style = .wordPicker()
+        list.colorTheme = CYLTagColorTheme.none
+        list.selectionMode = .multiple
+        list.allowsSmearSelection = true
+        list.isScrollEnabled = false
+        list.setTags(withCharactersOf: text)
+        list.frame = CGRect(x: 0, y: 0, width: 390, height: 400)
+        let host = UIViewController()
+        host.view.addSubview(list)
+        show(host, size: CYLTestScreen.tall)
+        list.probe.layOut()
+        return list
+    }
+
+    /// One cell per character (an emoji and a space are one each), 9 equal cells per row, a space read as "Space"; a
+    /// range selects in text order and the picked text is the selected characters as they stand in the text.
+    func testWordPickerCellsAndPickedText() {
+        let text = CYLWordPickerDemoViewController.message
+        let list = wordPickerList(text)
+        XCTAssertEqual(list.tags.count, text.count)
+        XCTAssertEqual(list.tags.map(\.title).joined(), text)
+        XCTAssertTrue(list.tags.contains { $0.title == "🚧" }, "an emoji is one cell")
+        let first = list.probe.itemFrame(at: ip(0, 0)) ?? .zero
+        let ninth = list.probe.itemFrame(at: ip(8, 0)) ?? .zero
+        let tenth = list.probe.itemFrame(at: ip(9, 0)) ?? .zero
+        XCTAssertEqual(first.width, ninth.width, accuracy: 0.5, "equal cells")
+        XCTAssertEqual(first.minY, ninth.minY, accuracy: 0.5, "9 per row")
+        XCTAssertGreaterThan(tenth.minY, first.maxY, "the 10th starts the second row")
+        let space = list.tags.firstIndex { $0.title == " " }!
+        XCTAssertEqual(list.probe.cell(at: ip(space, 0))?.accessibilityLabel, "空格", "a space is read, not silent")
+
+        // L (index 5) through y (the last): "LANEPRO TEAM A🚧\"的Sunny".
+        let l = list.tags.firstIndex { $0.title == "L" }!
+        list.selectItems(from: ip(text.count - 1, 0), through: ip(l, 0))
+        XCTAssertEqual(list.selectedText, "LANEPRO TEAM A🚧\"的Sunny")
+        list.deselectAllItems()
+        XCTAssertEqual(list.selectedText, "")
+    }
+
+    /// A drag that starts on a cell selects every cell from it to the finger; starting on a selected cell deselects;
+    /// the delegate hears of each change.
+    func testSmearSelectionSelectsAndDeselectsARange() {
+        let list = wordPickerList("ABCDEFGHIJKL")
+        let source = CYLTestMenuDelegate()
+        list.menuDelegate = source
+        let collection = list.probe.collectionView
+        func center(_ item: Int) -> CGPoint {
+            let frame = collection.layoutAttributesForItem(at: ip(item, 0))?.frame ?? .zero
+            return CGPoint(x: frame.midX, y: frame.midY)
+        }
+        let pan = CYLFakePan()
+        func smear(_ state: UIGestureRecognizer.State, at item: Int) {
+            pan.fakeState = state
+            pan.fakeLocation = center(item)
+            list.perform(NSSelectorFromString("handleSmear:"), with: pan)
+        }
+        smear(.began, at: 2)
+        smear(.changed, at: 4)
+        smear(.changed, at: 10)   // Across the row break.
+        smear(.ended, at: 10)
+        XCTAssertEqual(list.selectedText, "CDEFGHIJK")
+        XCTAssertGreaterThanOrEqual(source.selectionChanges, 2)
+        // Back toward the start while still dragging: the range shrinks.
+        smear(.began, at: 0)
+        smear(.changed, at: 1)
+        smear(.ended, at: 1)
+        XCTAssertEqual(list.selectedText, "ABCDEFGHIJK")
+        // Starting on a selected cell deselects.
+        smear(.began, at: 5)
+        smear(.changed, at: 7)
+        smear(.ended, at: 7)
+        XCTAssertEqual(list.selectedText, "ABCDEIJK")
+        // Only in multiple selection: a smear in single selection changes nothing.
+        list.selectionMode = .single
+        list.deselectAllItems()
+        smear(.began, at: 0)
+        smear(.changed, at: 3)
+        smear(.ended, at: 3)
+        XCTAssertLessThanOrEqual(list.selectedIndexPaths.count, 1)
+    }
+
+    /// The Example: "Fill in" is off until a cell is selected, then fills the remark field with the picked text.
+    func testWordPickerSheetFillsTheRemark() {
+        let demo = CYLWordPickerDemoViewController()
+        showInNavigation(demo, size: CYLTestScreen.tall)
+        demo.view.layoutIfNeeded()
+        var filled: String?
+        let sheet = CYLWordPickerSheetViewController(text: CYLWordPickerDemoViewController.message) { filled = $0 }
+        sheet.loadViewIfNeeded()
+        XCTAssertFalse(sheet.fillButton.isEnabled, "nothing selected: Fill in is off")
+        let list = sheet.tagListView!
+        let l = list.tags.firstIndex { $0.title == "L" }!
+        list.selectItems(from: ip(l, 0), through: ip(list.tags.count - 1, 0))
+        sheet.menu(list, didChangeSelectedItems: list.selectedIndexPaths)
+        XCTAssertTrue(sheet.fillButton.isEnabled)
+        sheet.fillTapped()
+        XCTAssertEqual(filled, "LANEPRO TEAM A🚧\"的Sunny")
+    }
 }
+
+/// Counts `menu(_:didChangeSelectedItems:)` calls.
+final class CYLTestMenuDelegate: NSObject, CYLMenuDelegate {
+    var selectionChanges = 0
+    func menu(_ menu: Any, didChangeSelectedItems indexPaths: [IndexPath]) {
+        selectionChanges += 1
+    }
+}
+

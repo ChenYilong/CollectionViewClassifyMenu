@@ -1428,7 +1428,7 @@ tags: [issues, ui, cocoapods, progress]
   highlights it (and the same on 3.18.0); `docs/assets/miniprogram-tag-cloud-icon-taps.png`. The CYLSearchViewController
   session confirmed it on its page (a32ab9e7). **Score: 100 / 100.**
 
-### TODO (2026-11-19, `feat/harmony`): a "word picker" (选词填入) tag list style
+### DONE (2026-11-19, `feat/harmony`): a "word picker" (选词填入) tag list style
 
 - Context: the owner's screenshots (WeChat, "通过朋友验证"): under the friend's verification message, a "选词填入" link
   opens a sheet "涂抹选择填入词" with Cancel and "填入" (disabled until something is selected). The message is split
@@ -1446,3 +1446,19 @@ tags: [issues, ui, cocoapods, progress]
   documentation comments and tests (40); the Example screen with the sheet, the disabled / enabled fill button and the
   field filled (25); accessibility (VoiceOver selects with taps) and localization (en, zh-Hans, zh-Hant) (15); labelled
   screenshots next to the reference (10); the iOS→Android table rows handed to the Windows session (10). Pass: 60.
+- Result (DONE, **100 / 100**): core `CYLMenuStyle.wordPicker()` (9 equal cells per row, light gray, small corners, mint
+  green when selected), `CYLTagListView.setTags(withCharactersOf:)` (one cell per grapheme; keeps `selectionMode`),
+  `allowsSmearSelection` (a drag from the touched-down cell selects every cell up to the finger in item order, or
+  deselects when it started on a selected cell; taps still toggle, so VoiceOver / Voice Control / Switch Control
+  select too; the delegate gets `menu(_:didChangeSelectedItems:)`), `selectedText`, `selectItems(from:through:)`; a
+  space cell is read as "Space" (`CYLMenuSpaceCharacter`, en / zh-Hans / zh-Hant). Example: Styles tab "选词填入：涂抹选择
+  填入词" (`CYLWordPickerDemoViewController`, launch `-CYLExampleScreen wordPicker -CYLWordPickerOpen YES`): the
+  remark field, the friend's message, the sheet with Cancel and "填入" (off until something is selected). Bugs found on
+  the way and fixed: the first `setTags` turns selection off (the character method keeps the mode); a smear did not
+  start when the finger had reached a gap by the time the drag was recognized (it now anchors on the touched-down
+  cell). Simulator: an axe drag from L to y selected exactly "LANEPRO TEAM A🚧\"的Sunny" and "填入" filled the field
+  with it. Tests: `testWordPickerCellsAndPickedText`, `testSmearSelectionSelectsAndDeselectsARange`,
+  `testWordPickerSheetFillsTheRemark`, the demo in `testEveryScreenIsInTheAppLanguage`; menu 37 / 37, Example
+  113 / 113; both localization checks 0. Screenshot: [ios-word-picker.png](assets/ios-word-picker.png). The 5 new
+  iOS→Android rows (888 / 893) are for the Windows session.
+

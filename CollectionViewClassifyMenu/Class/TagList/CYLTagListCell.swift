@@ -181,7 +181,10 @@ open class CYLTagListCell: UICollectionViewCell {
         button.isEnabled = isEnabled
         button.isSelected = isSelected
         // An icon-only tag is read by its icon's label.
-        accessibilityLabel = title.isEmpty ? image?.accessibilityLabel : title
+        // A space (a word picker cell) is read as "Space", not as silence.
+        let blank = !title.isEmpty && title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        accessibilityLabel = title.isEmpty ? image?.accessibilityLabel
+            : (blank ? CYLMenuLocalizedString("CYLMenuSpaceCharacter") : title)
         // An icon with a meaning of its own (such as a "hot" icon, whose label the app sets) is read as the value. An SF
         // Symbol's automatic label only names the glyph ("house" beside "Home"), in the device's language rather than
         // the app's (CYLMenuResources.preferredLanguage), so a symbol on a titled tag adds no value.

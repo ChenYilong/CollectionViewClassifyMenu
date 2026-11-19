@@ -542,6 +542,41 @@ open class CYLMenuStyle: NSObject, NSCopying {
         return style
     }
 
+    /**
+     * The word picker (选词填入, as WeChat's "涂抹选择填入词"): one character per cell, 9 equal cells per row, light gray
+     * cells with small corners that turn mint green when selected, the character centered. Use it with
+     * `CYLTagListView.setTags(withCharactersOf:)`, `selectionMode = .multiple` and `allowsSmearSelection = true`; the
+     * picked text is `selectedText`.
+     */
+    open class func wordPicker() -> Self {
+        let style = Self()
+        style.numberOfItemsPerRow = 9
+        let font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        for appearance in style.allAppearances {
+            appearance.font = font
+            appearance.cornerRadius = 3
+            appearance.borderWidth = 0
+            appearance.borderColor = nil
+            appearance.margin = 0
+            appearance.textColor = .label
+            appearance.backgroundColor = .secondarySystemBackground
+        }
+        style.selectedAppearance.backgroundColor = UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 0.13, green: 0.42, blue: 0.29, alpha: 1)
+                : UIColor(red: 0.70, green: 0.92, blue: 0.81, alpha: 1)
+        }
+        style.disabledAppearance.textColor = .tertiaryLabel
+        style.contentAlignment = .center
+        style.layoutCentered = true
+        style.itemHeight = 40
+        style.interitemSpacing = 6
+        style.lineSpacing = 10
+        style.sectionInsets = UIEdgeInsets(top: 12, left: 24, bottom: 12, right: 24)
+        style.backgroundColor = .clear
+        return style
+    }
+
     // MARK: - Looks of the classify menu and the multiple filter
 
     /**

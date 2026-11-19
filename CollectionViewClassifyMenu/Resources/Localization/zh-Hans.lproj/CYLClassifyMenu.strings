@@ -61,3 +61,6 @@
 
 /* A section header's clear button (the trash icon), read before the section title. */
 "CYLMenuClearSection" = "清除";
+
+/* 选词填入中内容为空格的格子，VoiceOver 朗读的名称。 */
+"CYLMenuSpaceCharacter" = "空格";

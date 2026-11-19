@@ -442,3 +442,12 @@
 "玩" = "Play";
 "逛" = "Shop";
 "喜欢" = "Like";
+
+/* Word picker (选词填入). */
+"选词填入" = "Pick words";
+"备注" = "Remark";
+"添加备注" = "Add a remark";
+"涂抹选择填入词" = "Swipe across the words to fill in";
+"填入" = "Fill in";
+"选词填入（涂抹选择）" = "Pick words to fill in (swipe to select)";
+"选词填入：涂抹选择填入词" = "Word picker: swipe across words to fill in";

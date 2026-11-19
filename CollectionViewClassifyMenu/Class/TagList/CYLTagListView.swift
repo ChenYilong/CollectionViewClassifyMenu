@@ -827,6 +827,19 @@ open class CYLTagListView: UIView {
     }
 
     /**
+     * True: a finger dragged across the items selects them ("smearing", as in WeChat's 涂抹选择填入词): the drag starts on
+     * an item and selects every item from it to the item under the finger, in item order, or deselects them when the
+     * first item was already selected. A tap still toggles one item, so VoiceOver, Voice Control and Switch Control
+     * select the same items. Needs `selectionMode == .multiple`; a drag that starts between items scrolls the list. The
+     * delegate gets `menu(_:didChangeSelectedItems:)`. False by default; `CYLMenuStyle.wordPicker()` is the matching look.
+     */
+    @objc open var allowsSmearSelection = false {
+        didSet {
+            smearRecognizer.isEnabled = allowsSmearSelection
+        }
+    }
+
+    /**
      * How quickly a press starts reordering (container_drag_sensitivity): the press lasts 0.5 s divided by it; a value
      * that is not positive is 1. 1 by default.
      */
@@ -1207,6 +1220,25 @@ open class CYLTagListView: UIView {
     private weak var createItemBaseStyle: CYLMenuStyle?
     private let longPressRecognizer = UILongPressGestureRecognizer()
     /**
+     * `allowsSmearSelection`: the drag, and while it lasts the selection it began with, the item it began on and whether
+     * it selects or deselects.
+     */
+    private let smearRecognizer = UIPanGestureRecognizer()
+    private var smearStart: (selection: Set<IndexPath>, anchor: IndexPath, selects: Bool)?
+    /**
+     * Where the finger touched down for the current smear (in the collection view): the smear begins on that item, not
+     * on the one under the finger once it has moved far enough to count as a drag (it may be in a gap by then).
+     */
+    var smearTouchDown: CGPoint?
+    /**
+     * The smear recognizer's delegate (gesture recognizers keep their delegate weakly).
+     */
+    private lazy var smearGestureDelegate: CYLTagListSmearGestureDelegate = {
+        let delegate = CYLTagListSmearGestureDelegate()
+        delegate.list = self
+        return delegate
+    }()
+    /**
      * The item under the current long press, and whether the press moved it.
      */
     private var pressedIndexPath: IndexPath?
@@ -1307,6 +1339,13 @@ open class CYLTagListView: UIView {
         addSubview(collectionView)
         longPressRecognizer.addTarget(self, action: #selector(handleLongPress(_:)))
         collectionView.addGestureRecognizer(longPressRecognizer)
+        smearRecognizer.addTarget(self, action: #selector(handleSmear(_:)))
+        smearRecognizer.delegate = smearGestureDelegate
+        smearRecognizer.maximumNumberOfTouches = 1
+        smearRecognizer.isEnabled = false
+        collectionView.addGestureRecognizer(smearRecognizer)
+        // A drag that starts on an item smears; anywhere else the list scrolls.
+        collectionView.panGestureRecognizer.require(toFail: smearRecognizer)
         // The list's title: a tag view (icon and/or title, horizontal), not tappable.
         titleStyleStorage = Self.defaultTitleStyle
         titleView.style = titleStyleStorage
@@ -3224,3 +3263,152 @@ final class CYLTagListClearButton: UIButton {
         return bounds.insetBy(dx: dx, dy: dy).contains(point)
     }
 }
+
+// MARK: - Smear selection and the word picker
+
+extension CYLTagListView {
+
+    /**
+     * Replaces the tags with one tag per character of `text`, in order: each grapheme (a letter, a Chinese character, an
+     * emoji, a space) is one tag, as the word picker's cells (`CYLMenuStyle.wordPicker()`). Unlike the first
+     * `setTags(withTitles:)`, it keeps `selectionMode` (a word picker selects several cells).
+     */
+    @objc(setTagsWithCharactersOfText:)
+    open func setTags(withCharactersOf text: String) {
+        let mode = selectionMode
+        setTags(withTitles: text.map(String.init))
+        selectionMode = mode
+    }
+
+    /**
+     * The titles of the selected items joined in item order: the picked text (for a word picker, the characters the user
+     * smeared, as they stand in the text).
+     */
+    @objc open var selectedText: String {
+        selectedTitles.joined()
+    }
+
+    /**
+     * Selects every selectable item from `start` through `end` (either order), in item order across sections, as a smear
+     * over them does, without calling the delegate. Needs `selectionMode == .multiple`.
+     */
+    @objc(selectItemsFromIndexPath:throughIndexPath:)
+    open func selectItems(from start: IndexPath, through end: IndexPath) {
+        guard selectionMode == .multiple, isValid(start), isValid(end) else {
+            return
+        }
+        selection = smearedSelection(from: selection, anchor: start, to: end, selects: true)
+        refreshVisibleCells()
+    }
+
+    /**
+     * Every item, in order across sections (the order a smear follows).
+     */
+    func itemIndexPathsInOrder() -> [IndexPath] {
+        titles.enumerated().flatMap { section, items in items.indices.map { IndexPath(item: $0, section: section) } }
+    }
+
+    /**
+     * `base` with the items from `anchor` to `end` (in item order) selected, or deselected when `selects` is false.
+     */
+    func smearedSelection(from base: Set<IndexPath>, anchor: IndexPath, to end: IndexPath, selects: Bool) -> Set<IndexPath> {
+        let order = itemIndexPathsInOrder()
+        guard let a = order.firstIndex(of: anchor), let b = order.firstIndex(of: end) else {
+            return base
+        }
+        var result = base
+        for indexPath in order[min(a, b)...max(a, b)] where isSelectable(at: indexPath) && itemType(at: indexPath) != .create {
+            if selects {
+                result.insert(indexPath)
+            } else {
+                result.remove(indexPath)
+            }
+        }
+        return result
+    }
+
+    /**
+     * The item a smear can start on or reach at `point` (in the collection view): a selectable tag, not the fold cell or
+     * the "new tag" cell.
+     */
+    func smearableIndexPath(at point: CGPoint) -> IndexPath? {
+        guard let indexPath = collectionView.indexPathForItem(at: point), isValid(indexPath),
+              !isInlineFoldCell(at: indexPath), itemType(at: indexPath) != .create, isSelectable(at: indexPath) else {
+            return nil
+        }
+        return indexPath
+    }
+
+    /**
+     * Whether a smear may begin at `point`: smear selection on, multiple selection, a tag under the finger.
+     */
+    func shouldBeginSmear(at point: CGPoint) -> Bool {
+        allowsSmearSelection && selectionMode == .multiple && !isEditing
+            && smearableIndexPath(at: smearTouchDown ?? point) != nil
+    }
+
+    @objc func handleSmear(_ recognizer: UIPanGestureRecognizer) {
+        let point = recognizer.location(in: collectionView)
+        switch recognizer.state {
+        case .began:
+            guard allowsSmearSelection, selectionMode == .multiple,
+                  let indexPath = smearableIndexPath(at: smearTouchDown ?? point) else {
+                smearStart = nil
+                return
+            }
+            smearStart = (selection, indexPath, !selection.contains(indexPath))
+            applySmear(to: indexPath)
+            // The finger may already be over a later item.
+            if let current = smearableIndexPath(at: point) {
+                applySmear(to: current)
+            }
+        case .changed:
+            if let indexPath = smearableIndexPath(at: point) {
+                applySmear(to: indexPath)
+            }
+        default:
+            smearStart = nil
+            smearTouchDown = nil
+        }
+    }
+
+    /**
+     * The selection the smear began with, with the items from its first item to `indexPath` changed; the delegate hears
+     * of every change.
+     */
+    private func applySmear(to indexPath: IndexPath) {
+        guard let start = smearStart else {
+            return
+        }
+        let smeared = smearedSelection(from: start.selection, anchor: start.anchor, to: indexPath, selects: start.selects)
+        guard smeared != selection else {
+            return
+        }
+        selection = smeared
+        refreshVisibleCells()
+        menuDelegate?.menu?(self, didChangeSelectedItems: selectedIndexPaths)
+    }
+}
+
+/**
+ * Lets the smear recognizer begin only on a tag (`CYLTagListView.allowsSmearSelection`), so that a drag elsewhere
+ * scrolls.
+ */
+final class CYLTagListSmearGestureDelegate: NSObject, UIGestureRecognizerDelegate {
+
+    weak var list: CYLTagListView?
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        // Remember where the finger touched down: the smear starts on that item.
+        list?.smearTouchDown = gestureRecognizer.view.map { touch.location(in: $0) }
+        return true
+    }
+
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let list, let view = gestureRecognizer.view else {
+            return false
+        }
+        return list.shouldBeginSmear(at: gestureRecognizer.location(in: view))
+    }
+}
+

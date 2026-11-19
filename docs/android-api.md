@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 888 / 888 with an Android counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0
+**Score: 888 / 893 with an Android counterpart = 99.4 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -417,6 +417,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuStyle +tagCloud` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.tagCloudStyle` |
 | `CYLMenuStyle +tagContainer` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.tagContainerStyle` |
 | `CYLMenuStyle +gridStyleWithItemsPerRow:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.gridStyleWithNumberOfItemsPerRow` |
+| `CYLMenuStyle +wordPicker` | method, `CYLMenuStyle.swift` | TODO |
 | `CYLMenuStyle +classifyMenuTag:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.classifyMenuTag` |
 | `CYLMenuStyle +filterTag` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.filterTag` |
 | `CYLMenuStyle +sectionTitleWithFontSize:textColor:leadingInset:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.sectionTitle` |
@@ -785,6 +786,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView.tagLongPressHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagLongPressHandler` |
 | `CYLTagListView.longPressAccessibilityActionName` | property, `CYLTagListView.swift` | `CYLTagListView.longPressAccessibilityActionName` |
 | `CYLTagListView.allowsReordering` | property, `CYLTagListView.swift` | `CYLTagListView.allowsReordering` |
+| `CYLTagListView.allowsSmearSelection` | property, `CYLTagListView.swift` | TODO |
 | `CYLTagListView.reorderingSensitivity` | property, `CYLTagListView.swift` | `CYLTagListView.reorderingSensitivity` |
 | `CYLTagListView.isReordering` | property, `CYLTagListView.swift` | `CYLTagListView.reordering` |
 | `CYLTagListView.tagMoveHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagMoveHandler` |
@@ -847,6 +849,9 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView -scrollToSection:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.scrollToSection` |
 | `CYLTagListView -scrollToItemAtIndexPath:animated:` | method, `CYLTagListView.swift` | `CYLTagListView.scrollToItemAtIndexPath` |
 | `CYLTagListView -loadSectionsWithKeys:completion:` | method, `CYLTagListView.swift` | `CYLTagListView.loadSectionsWithKeys (same name in the Android core)` |
+| `CYLTagListView -setTagsWithCharactersOfText:` | method, `CYLTagListView.swift` | TODO |
+| `CYLTagListView.selectedText` | property, `CYLTagListView.swift` | TODO |
+| `CYLTagListView -selectItemsFromIndexPath:throughIndexPath:` | method, `CYLTagListView.swift` | TODO |
 | `CYLTagView` | class, `CYLTagView.swift` | `com.cyl.classifymenu.CYLTagView` |
 | `CYLTagView.sectionInset` | property, `CYLTagView.swift` | `kTagCollectionViewToTopMargin / ToLeftMargin / ToBottomtMargin / ToRightMargin` |
 | `CYLTagView.cellSpacing` | property, `CYLTagView.swift` | `kTagCollectionViewCellsHorizonMargin` |
