@@ -78,12 +78,25 @@ Check out [my twitter](https://twitter.com/stevechen1010) for more info.
 
 ## CocoaPods
 
-The component supports iOS 15.0 and later. Until a versioned release is
-published, add the current branch to your Podfile:
+The component supports iOS 15.0 and later. It is not on the CocoaPods trunk: reference a commit of this repository,
+and pin CYLAnimatedItem (CYLTabBarController's animated icon component, also not on the trunk) by commit the same way.
+Use the newest commit of `feat/harmony` and the CYLTabBarController commit its own Podfiles name:
 
 ```ruby
-pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :branch => 'master'
+pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git',
+                                  :commit => '<CollectionViewClassifyMenu commit>'
+pod 'CYLAnimatedItem', :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
+                       :commit => '<the CYLTabBarController commit in this repository\'s Podfile>'
 ```
+
+Swift Package Manager, the same by revision:
+
+```swift
+.package(url: "https://github.com/ChenYilong/CollectionViewClassifyMenu.git", revision: "<commit>")
+```
+
+Checked from an app outside the repository (issue #11): `docs/issue-progress.md` and
+[ios-cocoapods-commit-consumer.png](docs/assets/ios-cocoapods-commit-consumer.png).
 
 The pod contains the reusable menus, XIBs and images, but **not** demo data.
 The existing copyright notices continue to apply.
