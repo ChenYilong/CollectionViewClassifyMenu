@@ -19,6 +19,7 @@ android {
     compileSdk = 35
     defaultConfig {
         minSdk = 23
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -42,6 +43,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.recyclerview)
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("junit:junit:4.13.2")
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)

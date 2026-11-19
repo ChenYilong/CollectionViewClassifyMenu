@@ -1272,3 +1272,23 @@ tags: [issues, ui, cocoapods, progress]
   iOS cases); 75 / 75; the app builds; `docs/harmony.md` 944 / 944.
 - **TODO:** HarmonyOS emulator screenshot of the editing icons and the clear button; the mini program; CYLTabBarController:
   a horizontal axis (and symbol tint) for the HarmonyOS `CYLAnimatedItemStackView`, so the tag can use the view itself.
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): Android tags cut short with "…" although there is room
+
+- **Bug (step 1, recorded; reported by the CYLSearchViewController session):** on emulator-5556 (API 37, 1080 px wide)
+  with `CYLFont.systemFont(16f)`, margin 14, corner radius 6, item height 36, "Book Club" shows as "Book Cl…" (normal
+  and selected) and "Recruiters" in editing mode as "Recruite…" before the pencil; "College Classmates" is fine. The
+  tag's measured title width looks a few px short for some strings.
+- **Acceptance (100):** a failing test at 420 dpi first (30); the fix in the library, not the example (40); labelled
+  emulator screenshot before / after (30). Pass: 60.
+- **Screenshot (step 2):** `docs/assets/android-tag-title-ellipsis-before.png`.
+- **Cause:** not the font. The list rounds a cell's edges to pixels, so a tag measured at 100 dp (262.5 px at 420 dpi)
+  was laid out at 262 px. `CYLTagButton` then clamped the title to the 71.8 dp left between the insets; the text needed
+  72 dp (189 px), so the label got 188 px and TextView ended it with "…". Titles whose width lands just under a pixel
+  boundary ("Book Club", "Recruiters", "Family", "Tennis") were hit; the others had a spare fraction.
+- **Fix (library, 70 / 100 so far):** `CYLTagButton.fitTitle`: a title short of its space by at most one device pixel
+  keeps its full width (it spills under a pixel into the inset), and `place` never rounds a frame narrower than its
+  width. New device test `CYLTagTitleFitDeviceTest` (androidTest, 15 titles x 5 insets, normal and editing): it failed on
+  emulator-5556 before the fix (188 px labels for 189 px of text) and passes after; the Robolectric twin
+  `CYLTagTitleFitTest` rounds the same way. Library 99 / 0; the example builds.
+- **TODO:** the "after" screenshot in CYLSearchViewController's contact tags once it pins the fix commit (30).

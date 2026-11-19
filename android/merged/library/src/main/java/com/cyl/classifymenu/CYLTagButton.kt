@@ -501,7 +501,7 @@ open class CYLTagButton @JvmOverloads constructor(
         val spacing = if (showsImage && showsTitle) style.imageTitleSpacing else 0f
         val available = max(0f, width - 2 * margin - if (showsImage) iconSize.width + spacing else 0f)
         val titleSize = if (showsTitle) CYLSize(titleLabel.paint.measureText(titleLabel.text.toString()) / density, lineHeight(titleLabel.paint)) else CYLSize.ZERO
-        var titleWidth = min(available, ceil(titleSize.width))
+        var titleWidth = fitTitle(available, ceil(titleSize.width))
         val titleHeight = min(height, ceil(titleSize.height))
         var imageX = 0f
         var titleX = 0f
@@ -510,7 +510,7 @@ open class CYLTagButton @JvmOverloads constructor(
         val leading = style.contentAlignment == CYLTagContentAlignment.CYLTagContentAlignmentLeading
         if (style.imagePlacement.isVertical) {
             // Stacked: each centered (or at the leading margin), the group centered between the insets.
-            titleWidth = min(ceil(titleSize.width), max(0f, width - 2 * margin))
+            titleWidth = fitTitle(max(0f, width - 2 * margin), ceil(titleSize.width))
             imageX = if (leading) margin else floor((width - iconSize.width) / 2)
             titleX = if (leading) margin else floor((width - titleWidth) / 2)
             val group = (if (showsImage) iconSize.height else 0f) + spacing + (if (showsTitle) titleHeight else 0f)
@@ -536,12 +536,12 @@ open class CYLTagButton @JvmOverloads constructor(
             imageX = margin
         } else if (showsTitle && leading) {
             titleX = margin
-            titleWidth = min(titleWidth, max(0f, width - 2 * margin))
+            titleWidth = fitTitle(max(0f, width - 2 * margin), titleWidth)
         } else if (showsImage) {
             imageX = if (style.layoutCentered) floor((width - iconSize.width) / 2) else margin
         } else if (showsTitle) {
             titleX = if (style.layoutCentered) floor((width - titleWidth) / 2) else margin + style.imageSize.width + style.imageTitleSpacing
-            titleWidth = min(titleWidth, max(0f, width - margin - titleX))
+            titleWidth = fitTitle(max(0f, width - margin - titleX), titleWidth)
         }
         if (showsTitle) {
             place(titleLabel, CYLRect(titleX + style.titlePositionAdjustment.horizontal,
@@ -674,8 +674,16 @@ open class CYLTagButton @JvmOverloads constructor(
         return total + style.imageTitleSpacing
     }
 
+    /**
+     * The title's width: `needed`, unless `limit` is short of it by more than a device pixel. The list rounds a cell's
+     * edges to pixels, so a tag measured at 262.5 px can be laid out at 262 px; clamping the title to that lost its last
+     * pixel and TextView ended "Book Club" with "…" (API 37, 420 dpi). Under a pixel it now spills into the inset.
+     */
+    private fun fitTitle(limit: Float, needed: Float): Float = if (needed - limit <= 1.01f / density) needed else min(limit, needed)
+
     private fun place(view: View, frame: CYLRect) {
-        val width = maxOf(0, px(frame.maxX) - px(frame.x))
+        // Never narrower than the frame: rounding both edges could take a pixel off a title that just fits.
+        val width = maxOf(0, px(frame.maxX) - px(frame.x), ceil(frame.width * density - 0.01f).toInt())
         val height = maxOf(0, px(frame.maxY) - px(frame.y))
         // Children are measured UNSPECIFIED in onMeasure; a view laid out narrower than that keeps its old text layout
         // and is clipped (PR #17). Measuring it at its frame lets the title's maxLines = 1 + ellipsize = END end it with
