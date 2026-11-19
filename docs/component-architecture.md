@@ -659,3 +659,18 @@ started run completes and the next one tests the newest commit.
   scrolling; `reorderingchange` {reordering} tells a host with a `<scroll-view>` to turn its `scroll-y` off for the same
   time. Tests: `tag-components.test.js` (the drag sets and clears `scrollLocked`; off when the property is off; the
   template binds `catchtouchmove` while locked).
+
+## DONE (2026-11-19, second pass; TODO 2026-11-19): the tag cloud locks scrolling from the first touch while editing (mini program)
+
+- **Prompt (verbatim, 2026-11-19)**: "还是不行，手势冲突，你应该找到类似CYLRootWindow这样的方法处理根视图，禁止滚动。拖拽taglist启动后，以及拖拽结束后，应禁止taglist的滚动浏览功能防止拖拽手势和taglist 滚动浏览手势冲突。…需要默认启动。在联系人example中点击编辑后。可以复现。 我的测试平台是微信小程序"
+  (English: still not working, the gestures conflict; handle the root view as CYLRootWindow does and disable scrolling;
+  hold the list's scrolling once a drag starts and after it ends; fix in the core, on by default; reproduced in the
+  contact tags example's editing mode on the WeChat mini program.)
+- **Why the first fix (`2ec3d90e`) was not enough**: it caught `touchmove` only after the long press; WeChat decides
+  whether a touch scrolls at its first `touchstart`, so the scroll had already begun.
+- **Status**: DONE in code (2026-11-19). `scrollLocked` now holds for the whole editing mode and any drag
+  (`disablesScrollingWhileReordering`, default true): the items bind `catchtouchmove` from the first touch, so a finger
+  on a tag drags or taps and never scrolls (gaps, headers and the rest of the page still scroll); it stays after a drop
+  while editing and is released when editing ends. Hosts also hold their own scrolling on `reorderingchange`
+  (`<scroll-view scroll-y>`, `<page-meta page-style="overflow: hidden">`, the root-view lock). Tests:
+  `tag-components.test.js`. Left: the user's check on a phone.

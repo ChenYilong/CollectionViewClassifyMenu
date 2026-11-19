@@ -289,3 +289,20 @@ test('cyl-tag-cloud: a drag holds scrolling unless disablesScrollingWhileReorder
   assert.equal(list.data.scrollLocked, false);
 });
 
+test('cyl-tag-cloud: editing catches touchmove from the first touch (scrolling cannot be stopped later) and a drag end keeps it', () => {
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+  const rects = [0, 1].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
+    tags: ['a', 'b'].map((title) => model.makeTag(title)), listStyle: model.tagContainerStyle(),
+  }, (selector) => (selector === '.cyl-tc-item' ? rects : rects[0]));
+  assert.equal(list.data.scrollLocked, false);
+  list.setEditing(true);
+  assert.equal(list.data.scrollLocked, true);
+  list.onTouchStart(tap(0));
+  list.onLongPress(tap(0));
+  list.onTouchEnd();
+  assert.equal(list.data.scrollLocked, true, 'still editing after the drop');
+  list.setEditing(false);
+  assert.equal(list.data.scrollLocked, false);
+});
+
