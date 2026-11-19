@@ -1424,3 +1424,22 @@ tags: [issues, ui, cocoapods, progress]
 - **DevTools (20 / 20):** with the fix, `element.tap()` on `#CYLTagListDeleteButton-0` deleted the tag (25 -> 24, not
   pressed), on `#CYLTagListRenameButton-0` started renaming, a press on the tag body still highlights it;
   `docs/assets/miniprogram-tag-cloud-icon-taps.png`. **Score: 80 / 100** (the failure not reproduced on our page).
+
+### TODO (2026-11-19, `feat/harmony`): a "word picker" (选词填入) tag list style
+
+- Context: the owner's screenshots (WeChat, "通过朋友验证"): under the friend's verification message, a "选词填入" link
+  opens a sheet "涂抹选择填入词" with Cancel and "填入" (disabled until something is selected). The message is split
+  into single characters (an emoji and a space are one cell each) in a grid of equal square cells, 9 per row, light
+  gray with small corners; dragging a finger across cells ("smearing") selects them, selected cells turn mint green;
+  "填入" writes the selected characters, in text order, into the remark field. Reference screenshots:
+  [word-picker-reference.png](assets/word-picker-reference.png).
+- Requirements: a new tag list style in the core (iOS first, session roles rule; Android, HarmonyOS and the mini program
+  afterwards by the Windows session): the character grid, smear selection, the selected text in order; an Example
+  screen like the screenshots; tests; labelled screenshots.
+- Prompt (verbatim): "为taglist新增样式 选词填入样式，分析截图里的功能完成新样式代码实现"
+- Prompt (English): "Add a new style to the tag list: the 'pick words to fill in' style; analyze the features in the
+  screenshots and implement the new style."
+- Acceptance (100): core API (the preset style, the character tags, smear selection, the selected text) with
+  documentation comments and tests (40); the Example screen with the sheet, the disabled / enabled fill button and the
+  field filled (25); accessibility (VoiceOver selects with taps) and localization (en, zh-Hans, zh-Hant) (15); labelled
+  screenshots next to the reference (10); the iOS→Android table rows handed to the Windows session (10). Pass: 60.
