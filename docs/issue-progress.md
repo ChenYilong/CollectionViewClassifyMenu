@@ -1395,3 +1395,7 @@ tags: [issues, ui, cocoapods, progress]
 - Prompt (verbatim): "go ahead for Localization checks in CI: should I add scripts/check-localization.py and scripts/check-localization-ports.py as one small workflow? They're quick Python scripts with no dependencies."
 - Acceptance (100): one workflow running both checks and the two export `--check`s on pushes and pull requests that
   touch strings or code (50); green on GitHub on `feat/harmony` (30); AGENTS.md says so (20). Pass: 60.
+- Result (DONE, **100 / 100**): `.github/workflows/localization.yml` (`511d72b2`) runs `check-localization.py`,
+  `check-localization-ports.py` and the Flutter / React Native exports' `--check` on every pull request (and pushes to
+  master / `claude/**`), Python 3 standard library only. First run on GitHub (run 44457566107): every step green.
+  AGENTS.md "Internationalization and localization" names the workflow.
