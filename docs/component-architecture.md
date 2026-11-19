@@ -634,3 +634,14 @@ started run completes and the next one tests the newest commit.
   CYLSearchViewController's contact tags example without settings (iPhone 18 Pro simulator, @3x): title to edit icon
   about 15 pt, between the icons about 17 pt, cross to the tag's edge about 17 pt (the tag's 14 pt padding). Tests check
   the gap and that the icons fill the stack; Example 110 of 110.
+
+## DONE (2026-11-19; TODO 2026-11-19): editing icons sized to their glyphs, so the spacing is what one sees (iOS)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "space is not good enough continue fix"
+- **Cause**: each icon's slot was a full line of the title, and its glyph only 80 % of it, so about 2 points of empty
+  slot sat on each side of each glyph: the space after the cross looked larger than the tag's left padding, the spaces
+  around the icons uneven.
+- **Status**: DONE (2026-11-19). The slot is the title's cap height plus a quarter (`editingIconSide`), and the glyph
+  fills it. Measured in CYLSearchViewController's contact tags example without settings (iPhone 18 Pro simulator, @3x,
+  "Family"): left padding 14 pt, title to edit icon about 12.7 pt, between the icons about 12.7 pt, cross to the edge
+  about 14.7 pt. Example 110 of 110.

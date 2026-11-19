@@ -832,12 +832,11 @@ open class CYLTagButton: CYLAnimatedItemView {
     /**
      * The delete indicator's width, in a state.
      */
-    /// The side of one editing icon (the pencil or the cross): the delete indicator's width, and at least a line of the
-    /// title, so the pencil stays legible.
+    /// The side of one editing icon (the edit icon or the cross), which its glyph fills: about the title's cap height
+    /// (a quarter more, as SF Symbols sit beside text), so the style's spacing is exactly the space one sees.
     private static func editingIconSide(for state: UIControl.State, style: CYLMenuStyle,
                                         traitCollection: UITraitCollection?) -> CGFloat {
-        max(deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection),
-            ceil(style.titleFont(for: state, traitCollection: traitCollection).lineHeight))
+        ceil(style.titleFont(for: state, traitCollection: traitCollection).capHeight * 1.25)
     }
 
     /// The width of the two editing icons with the space between them.
@@ -1008,8 +1007,8 @@ open class CYLTagButton: CYLAnimatedItemView {
         let area = outer.inset(by: margins)
         editingIndicatorsView.stackView.spacing = spacing
         editingIndicatorsView.frame = area
-        // The glyphs a little smaller than their slot, about the title's cap height.
-        let side = max(0, min(indicatorWidth * 0.8, area.height))
+        // The glyph fills its slot: no hidden margin around it, so the spaces are the style's.
+        let side = max(0, min(indicatorWidth, area.height))
         // Each icon fills its slot (the stack view otherwise keeps its own small size, centered, and the leftover width
         // shows as a gap after the cross), and the style's spacing is the space after the first icon (`append` set a
         // custom spacing of 0 there, which wins over `stackView.spacing`).
