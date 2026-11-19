@@ -310,6 +310,39 @@ class CYLMenuStyle {
             return style
         }
 
+        /**
+         * `+wordPicker` (选词填入, as WeChat's "涂抹选择填入词"): one character per cell, 9 equal cells per row, light gray
+         * cells with small corners that turn mint green when selected, the character centered. Use it with
+         * `CYLTagListView.setTagsWithCharactersOfText`, `selectionMode` multiple and `allowsSmearSelection`; the picked
+         * text is `selectedText`.
+         */
+        @JvmStatic
+        fun wordPicker(): CYLMenuStyle {
+            val style = defaultStyle()
+            style.numberOfItemsPerRow = 9
+            val font = CYLFont(18f, android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL))
+            for (appearance in style.appearances()) {
+                appearance.font = font
+                appearance.cornerRadius = 3f
+                appearance.borderWidth = 0f
+                appearance.borderColor = null
+                appearance.margin = 0f
+                appearance.textColor = Color.rgb(0x1C, 0x1C, 0x1E)
+                appearance.backgroundColor = Color.rgb(0xF2, 0xF2, 0xF7)
+            }
+            // Mint green (iOS 0.70 / 0.92 / 0.81).
+            style.selectedAppearance.backgroundColor = Color.rgb(0xB3, 0xEB, 0xCF)
+            style.disabledAppearance.textColor = Color.argb(0x4C, 0x3C, 0x3C, 0x43)
+            style.contentAlignment = CYLTagContentAlignment.CYLTagContentAlignmentCenter
+            style.layoutCentered = true
+            style.itemHeight = 40f
+            style.interitemSpacing = 6f
+            style.lineSpacing = 10f
+            style.sectionInsets = CYLEdgeInsets(12f, 24f, 12f, 24f)
+            style.backgroundColor = CYLColor.CLEAR
+            return style
+        }
+
         /** `+tagContainerStyle`: AndroidTagView's look: translucent red capsules, gray text, 23 characters at most. */
         @JvmStatic
         fun tagContainerStyle(): CYLMenuStyle {

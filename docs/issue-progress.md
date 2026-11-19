@@ -1474,3 +1474,23 @@ tags: [issues, ui, cocoapods, progress]
   `CYLExampleLocalizedString` in en, zh-Hans and zh-Hant (40); the sender name generic too (10); tests no longer depend on
   the old text and pass in any language (25); screenshots in the three languages (15); the NOLOCALIZE exemption removed
   and the localization checks at 0 (10). Pass: 60.
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): the word picker (选词填入) on Android, HarmonyOS and the mini program
+
+- **Request (the Mac ClassifyMenu session, session-roles rule):** port iOS cf5d9f7e (`CYLMenuStyle.wordPicker()`,
+  `setTags(withCharactersOf:)`, `allowsSmearSelection`, `selectedText`, `selectItems(from:through:)`, the core string
+  `CYLMenuSpaceCharacter`, the Styles tab demo with the remark field and the sheet) to the Android core and example
+  first, map the rows, then HarmonyOS and the mini program (its touchmove can drive the smear).
+- **Acceptance (100):** Android core, example, tests, rows (40); HarmonyOS (30); mini program (30); each with a labelled
+  screenshot. Pass: 60.
+- **Android (core, example, tests; the screenshot waits for the emulator):** `CYLMenuStyle.wordPicker()` (9 per row,
+  light gray, corner 3, mint green selected, 18 medium, item height 40, spacing 6 / 10), `setTagsWithCharactersOfText`
+  (graphemes, keeps `selectionMode`), `selectedText`, `selectItemsFromIndexPath`, `allowsSmearSelection` (the cell the
+  finger went down on keeps the gesture, as iOS anchors on the touched-down item; it stops the scroll view from taking
+  the drag, hit-tests the finger against the item frames; starting on a selected cell deselects; a tap still toggles;
+  `menuDidChangeSelectedItems`); a space cell reads `CYLMenuSpaceCharacter`; core strings copied from iOS. Example:
+  Styles → "选词填入：涂抹选择填入词" (`CYLWordPickerScreen`: remark field, the message, a bottom sheet with Cancel,
+  the grid and "填入", off until something is selected). New `CYLWordPickerTest` (2: cells and picked text; a smear by
+  real touch events across the row break, deselecting, a tap toggling, single selection); library 101 / 0, the example
+  builds; `docs/android-api.md` 893 / 893, `docs/android-ios-api.md` 830 / 830; `check-localization-ports.py` 0 (it
+  now prints UTF-8: a GBK console crashed on the message's emoji).

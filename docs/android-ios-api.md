@@ -11,7 +11,7 @@ Every public symbol of the Android core (`android/merged/library`, Kotlin) and i
 from the Kotlin sources, `android/merged/api-map.json` (the reverse table, [android-api.md](android-api.md)) and
 `android/merged/ios-map.json` (hand-made entries); do not edit the table by hand. A row without a counterpart is `TODO`.
 
-**Score: 826 / 826 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
+**Score: 830 / 830 with an iOS counterpart = 100.0 / 100.** Full marks when no row is `TODO`; 0 when every
 row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same
 logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100.
 
@@ -484,13 +484,13 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagButton.showsDeleteIndicator` | property, `CYLTagButton.kt:242` | `CYLTagButton.showsDeleteIndicator` |
 | `CYLTagButton.showsRenameIndicator` | property, `CYLTagButton.kt:254` | `CYLTagButton.showsRenameIndicator` |
 | `CYLTagButton.renameIndicatorHitFrame` | property, `CYLTagButton.kt:262` | `CYLTagButton.renameIndicatorHitFrame` |
-| `CYLTagButton.editingIndicatorsView` | read-only property, `CYLTagButton.kt:271` | `CYLTagButton.editingIndicatorsView` |
-| `CYLTagButton.isHighlighted` | read-only property, `CYLTagButton.kt:310` | `isHighlighted` (same name in the iOS core) |
-| `CYLTagButton.badgeFrame` | property, `CYLTagButton.kt:583` | `CYLTagButton.badgeLabel.frame` |
-| `CYLTagBadgeDefaultColor` | read-only property, `CYLTagButton.kt:845` | `UIColor.systemRed` (the default `CYLTagButton.badgeColor`) |
-| `CYLAccessibility` | object, `CYLTagButton.kt:893` | `UIAccessibility` (UIKit) |
-| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:896` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
-| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:901` | `UIAccessibility.isDarkerSystemColorsEnabled` (`UIAccessibilityDarkerSystemColorsEnabled()`) |
+| `CYLTagButton.editingIndicatorsView` | read-only property, `CYLTagButton.kt:273` | `CYLTagButton.editingIndicatorsView` |
+| `CYLTagButton.isHighlighted` | read-only property, `CYLTagButton.kt:312` | `isHighlighted` (same name in the iOS core) |
+| `CYLTagButton.badgeFrame` | property, `CYLTagButton.kt:584` | `CYLTagButton.badgeLabel.frame` |
+| `CYLTagBadgeDefaultColor` | read-only property, `CYLTagButton.kt:857` | `UIColor.systemRed` (the default `CYLTagButton.badgeColor`) |
+| `CYLAccessibility` | object, `CYLTagButton.kt:905` | `UIAccessibility` (UIKit) |
+| `CYLAccessibility.isReduceMotionEnabled` | method, `CYLTagButton.kt:908` | `UIAccessibility.isReduceMotionEnabled` (`UIAccessibilityIsReduceMotionEnabled()`) |
+| `CYLAccessibility.isIncreaseContrastEnabled` | method, `CYLTagButton.kt:913` | `UIAccessibility.isDarkerSystemColorsEnabled` (`UIAccessibilityDarkerSystemColorsEnabled()`) |
 | `CYLTagColorTheme` | class, `CYLTagColors.kt:7` | `CYLTagColorTheme` |
 | `CYLTagColorTheme.CYLTagColorThemeNone` | enum case, `CYLTagColors.kt:8` | `CYLTagColorThemeNone` |
 | `CYLTagColorTheme.CYLTagColorThemeRandom` | enum case, `CYLTagColors.kt:9` | `CYLTagColorThemeRandom` |
@@ -667,22 +667,26 @@ logic and names as Android), show them in the iOS example (a port of the Android
 | `CYLTagListView.replaceTags` | method, `CYLTagListView.kt:1237` | `CYLTagListView.replaceTags(_:)` |
 | `CYLTagListView.setTagsWithTitles` | method, `CYLTagListView.kt:1243` | `CYLTagListView.setTags(withTitles:colors:)` |
 | `CYLTagListView.setTagsWithTitles` | method, `CYLTagListView.kt:1245` | `CYLTagListView.setTags(withTitles:colors:)` |
-| `CYLTagListView.addTagWithTitle` | method, `CYLTagListView.kt:1249` | `CYLTagListView.addTag(withTitle:)` |
-| `CYLTagListView.insertTagWithTitle` | method, `CYLTagListView.kt:1251` | `CYLTagListView.insertTag(withTitle:at:)` |
-| `CYLTagListView.removeTagsAtIndexes` | method, `CYLTagListView.kt:1254` | `CYLTagListView.removeTags(at:)` |
-| `CYLTagListView.toggleSelectionOfItemAtIndexPath` | method, `CYLTagListView.kt:1265` | `CYLTagListView.toggleSelection(at:)` |
-| `CYLTagListView.selectedTitles` | read-only property, `CYLTagListView.kt:1278` | `CYLTagListView.selectedTitles` |
-| `CYLTagListView.selectedIndexPaths` | property, `CYLTagListView.kt:1284` | `CYLTagListView.selectedIndexPaths` |
-| `CYLTagListView.selectItemAtIndexPath` | method, `CYLTagListView.kt:1297` | `CYLTagListView.selectItem(at:)` |
-| `CYLTagListView.deselectItemAtIndexPath` | method, `CYLTagListView.kt:1303` | `CYLTagListView.deselectItem(at:)` |
-| `CYLTagListView.deselectAllItems` | method, `CYLTagListView.kt:1308` | `CYLTagListView.deselectAllItems()` |
-| `CYLTagListView.canFoldSection` | method, `CYLTagListView.kt:1369` | `CYLTagListView.canFoldSection(_:)` |
-| `CYLTagListView.numberOfRowsInSection` | method, `CYLTagListView.kt:1374` | `CYLTagListView.numberOfRows(inSection:)` |
-| `CYLTagListView.isSectionExpanded` | method, `CYLTagListView.kt:1379` | `CYLTagListView.isSectionExpanded(_:)` |
-| `CYLTagListView.numberOfVisibleItemsInSection` | method, `CYLTagListView.kt:1381` | `CYLTagListView.numberOfVisibleItems(inSection:)` |
-| `CYLTagListView.setExpanded` | method, `CYLTagListView.kt:1410` | `CYLTagListView.setExpanded(_:forSection:animated:)` |
-| `CYLTagListView.scrollToSection` | method, `CYLTagListView.kt:1431` | `CYLTagListView.scroll(toSection:animated:)` |
-| `CYLTagListView.scrollToItemAtIndexPath` | method, `CYLTagListView.kt:1437` | `CYLTagListView.scrollToItem(at:animated:)` |
+| `CYLTagListView.setTagsWithCharactersOfText` | method, `CYLTagListView.kt:1254` | `CYLTagListView.setTags(withCharactersOf:)` |
+| `CYLTagListView.selectedText` | read-only property, `CYLTagListView.kt:1261` | `CYLTagListView.selectedText` |
+| `CYLTagListView.selectItemsFromIndexPath` | method, `CYLTagListView.kt:1269` | `CYLTagListView.selectItems(from:through:)` |
+| `CYLTagListView.allowsSmearSelection` | property, `CYLTagListView.kt:1284` | `CYLTagListView.allowsSmearSelection` |
+| `CYLTagListView.addTagWithTitle` | method, `CYLTagListView.kt:1335` | `CYLTagListView.addTag(withTitle:)` |
+| `CYLTagListView.insertTagWithTitle` | method, `CYLTagListView.kt:1337` | `CYLTagListView.insertTag(withTitle:at:)` |
+| `CYLTagListView.removeTagsAtIndexes` | method, `CYLTagListView.kt:1340` | `CYLTagListView.removeTags(at:)` |
+| `CYLTagListView.toggleSelectionOfItemAtIndexPath` | method, `CYLTagListView.kt:1351` | `CYLTagListView.toggleSelection(at:)` |
+| `CYLTagListView.selectedTitles` | read-only property, `CYLTagListView.kt:1364` | `CYLTagListView.selectedTitles` |
+| `CYLTagListView.selectedIndexPaths` | property, `CYLTagListView.kt:1370` | `CYLTagListView.selectedIndexPaths` |
+| `CYLTagListView.selectItemAtIndexPath` | method, `CYLTagListView.kt:1383` | `CYLTagListView.selectItem(at:)` |
+| `CYLTagListView.deselectItemAtIndexPath` | method, `CYLTagListView.kt:1389` | `CYLTagListView.deselectItem(at:)` |
+| `CYLTagListView.deselectAllItems` | method, `CYLTagListView.kt:1394` | `CYLTagListView.deselectAllItems()` |
+| `CYLTagListView.canFoldSection` | method, `CYLTagListView.kt:1455` | `CYLTagListView.canFoldSection(_:)` |
+| `CYLTagListView.numberOfRowsInSection` | method, `CYLTagListView.kt:1460` | `CYLTagListView.numberOfRows(inSection:)` |
+| `CYLTagListView.isSectionExpanded` | method, `CYLTagListView.kt:1465` | `CYLTagListView.isSectionExpanded(_:)` |
+| `CYLTagListView.numberOfVisibleItemsInSection` | method, `CYLTagListView.kt:1467` | `CYLTagListView.numberOfVisibleItems(inSection:)` |
+| `CYLTagListView.setExpanded` | method, `CYLTagListView.kt:1496` | `CYLTagListView.setExpanded(_:forSection:animated:)` |
+| `CYLTagListView.scrollToSection` | method, `CYLTagListView.kt:1517` | `CYLTagListView.scroll(toSection:animated:)` |
+| `CYLTagListView.scrollToItemAtIndexPath` | method, `CYLTagListView.kt:1523` | `CYLTagListView.scrollToItem(at:animated:)` |
 | `CYLTagListViewSections` | read-only property, `CYLTagListViewConfiguration.kt:24` | `CYLTagListKey.sections` |
 | `CYLTagListViewStyle` | read-only property, `CYLTagListViewConfiguration.kt:28` | `CYLTagListKey.style` |
 | `CYLTagListViewSelectionMode` | read-only property, `CYLTagListViewConfiguration.kt:32` | `CYLTagListKey.selectionMode` |

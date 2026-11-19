@@ -234,7 +234,9 @@ open class CYLTagListCell @JvmOverloads constructor(context: Context, attrs: Att
         button.isEnabled = enabled
         button.isSelected = selected
         val value = (image as? CYLBadgeDrawable)?.accessibilityLabel
-        contentDescription = if (value.isNullOrEmpty()) title else "$title, $value"
+        // A space (a word picker cell) is read as "Space", not as silence.
+        val spoken = if (title.isNotEmpty() && title.isBlank()) CYLMenuLocalizedString("CYLMenuSpaceCharacter", "A space character") else title
+        contentDescription = if (value.isNullOrEmpty()) spoken else "$spoken, $value"
         cyl_accessibilityIdentifier = CYLTagListItemAccessibilityIdentifier
         accessibilityHintText = null
         selectedForAccessibility = selected

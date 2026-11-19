@@ -952,5 +952,6 @@
  "CYLTagListAccessibilityIdentifier.clearButton": "CYLTagListClearButtonAccessibilityIdentifier",
  "CYLTagListCacheItem.identifier": "CYLTagListCacheItem.identifier",
  "CYLTagListCacheItem.title": "CYLTagListCacheItem.title",
- "CYLTagListCacheItem -initWithIdentifier:title:": "CYLTagListCacheItem(identifier, title)"
+ "CYLTagListCacheItem -initWithIdentifier:title:": "CYLTagListCacheItem(identifier, title)",
+ "CYLMenuStyle +wordPicker": "CYLMenuStyle.wordPicker()"
 }

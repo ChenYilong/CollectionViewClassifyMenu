@@ -21,6 +21,10 @@ import pathlib
 import re
 import sys
 
+# Problems quote source lines (emoji, CJK): print UTF-8 on any console (a GBK Windows console crashed on an emoji).
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 HAN = re.compile("[一-鿿]")
 

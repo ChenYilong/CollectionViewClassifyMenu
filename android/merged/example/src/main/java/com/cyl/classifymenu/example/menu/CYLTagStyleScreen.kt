@@ -79,7 +79,8 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "animation.gif" to "GIF 动效图标", "animation.off" to "关闭动效（静态图标）", "animationSpeed" to "设置动效速度 animationSpeed",
             "configuration" to "配置文件 / 字典（map）初始化", "tagCloud" to "标签云：android-tagview 的初始化方式",
             "sample.tagCloud" to "android-tagview 示例（Swift 版）", "sample.imageTag" to "TagViewGroup 示例：图片标签",
-            "sample.tagContainer" to "AndroidTagView 示例：标签容器", "reset" to "重置 reset",
+            "sample.tagContainer" to "AndroidTagView 示例：标签容器", "sample.wordPicker" to "选词填入：涂抹选择填入词",
+            "reset" to "重置 reset",
         )
 
         private fun offsetString(offset: CYLOffset) = "{${fmt(offset.horizontal)}, ${fmt(offset.vertical)}}"
@@ -93,12 +94,13 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
         listOf("backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"),
         listOf("animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"),
         listOf("sample.tagCloud", "sample.imageTag", "sample.tagContainer"),
+        listOf("sample.wordPicker"),
         listOf("reset"),
     )
 
     fun titleForSection(section: Int) = CYLExampleLocalizedString(context, listOf(
         "标题与图标（参照 CYLFlatDesignTabBarItem）", "背景、边框与圆角（参照 CYLBadgeView）",
-        "动效图标（CYLTabBarController 动效引擎）", "Android 标签库示例（Swift 复刻）", "其它")[section])
+        "动效图标（CYLTabBarController 动效引擎）", "Android 标签库示例（Swift 复刻）", "选词填入（涂抹选择）", "其它")[section])
 
     fun titleForAction(identifier: String) = CYLExampleLocalizedString(context, actionTitles[identifier] ?: identifier)
 
@@ -192,6 +194,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "sample.tagCloud" -> { selectAppTab("kaede"); return }
             "sample.imageTag" -> { selectAppTab("licrafter"); return }
             "sample.tagContainer" -> { selectAppTab("lujun"); return }
+            "sample.wordPicker" -> { navigator.push(CYLWordPickerScreen(context)); return }
             "reset" -> {
                 this.style = demoStyle()
                 content = CYLTagStyleDemoContent.ICON_AND_TITLE

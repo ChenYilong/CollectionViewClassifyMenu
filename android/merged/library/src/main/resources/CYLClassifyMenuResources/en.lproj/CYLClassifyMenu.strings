@@ -61,3 +61,6 @@
 
 /* A section header's clear button (the trash icon), read before the section title. */
 "CYLMenuClearSection" = "Clear";
+
+/* A cell of the word picker that holds a space, as VoiceOver reads it. */
+"CYLMenuSpaceCharacter" = "Space";

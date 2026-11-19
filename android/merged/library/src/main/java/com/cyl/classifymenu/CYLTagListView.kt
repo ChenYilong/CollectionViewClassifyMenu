@@ -1246,6 +1246,92 @@ open class CYLTagListView @JvmOverloads constructor(
         replaceTags(titles.mapIndexed { index, title -> CYLTag(title).also { tag -> colors.getOrNull(index)?.let { tag.colors = it } } })
     }
 
+    /**
+     * `-setTagsWithCharactersOfText:`: one tag per character of `text`, in order: each grapheme (a letter, a Chinese
+     * character, an emoji, a space) is one tag, as the word picker's cells (`CYLMenuStyle.wordPicker()`). Unlike the
+     * first `setTagsWithTitles`, it keeps `selectionMode` (a word picker selects several cells).
+     */
+    fun setTagsWithCharactersOfText(text: String) {
+        val mode = selectionMode
+        setTagsWithTitles(Regex("\\X").findAll(text).map { it.value }.toList())
+        selectionMode = mode
+    }
+
+    /** `selectedText`: the titles of the selected items joined in item order (a word picker's picked characters). */
+    val selectedText: String
+        get() = selectedTitles.joinToString("")
+
+    /**
+     * `-selectItemsFromIndexPath:throughIndexPath:`: selects every selectable item from `start` through `end` (either
+     * order), in item order across sections, as a smear over them does, without calling the delegate. Needs multiple
+     * selection.
+     */
+    fun selectItemsFromIndexPath(start: CYLIndexPath, throughIndexPath: CYLIndexPath) {
+        if (selectionMode != CYLMenuSelectionMode.CYLMenuSelectionModeMultiple || !isValid(start) || !isValid(throughIndexPath)) return
+        val result = smearedSelection(selection, start, throughIndexPath, true)
+        selection.clear()
+        selection.addAll(result)
+        refreshVisibleCells()
+    }
+
+    /**
+     * `allowsSmearSelection`: a finger dragged across the items selects them ("smearing", as WeChat's 涂抹选择填入词): the
+     * drag starts on the item it touched down on and selects every item from it to the item under the finger, in item
+     * order, or deselects them when that item was already selected. A tap still toggles one item, so TalkBack and Switch
+     * Access select the same items. Needs multiple selection; a drag that starts between items scrolls. The delegate
+     * gets `menuDidChangeSelectedItems`. False by default; `CYLMenuStyle.wordPicker()` is the matching look.
+     */
+    var allowsSmearSelection: Boolean = false
+
+    /** The current smear: the selection it began with, its first item and whether it selects. */
+    private class Smear(val base: Set<CYLIndexPath>, val anchor: CYLIndexPath, val selects: Boolean)
+
+    private var smear: Smear? = null
+
+    /** Every item in order across sections (the order a smear follows). */
+    private fun itemIndexPathsInOrder(): List<CYLIndexPath> {
+        val source = menuDataSource ?: return emptyList()
+        return (0 until source.numberOfSectionsInMenu()).flatMap { section ->
+            (0 until source.menuNumberOfItemsInSection(section)).map { CYLIndexPath(it, section) }
+        }
+    }
+
+    /** `base` with the items from `anchor` to `end` (item order) selected, or deselected when `selects` is false. */
+    private fun smearedSelection(base: Set<CYLIndexPath>, anchor: CYLIndexPath, end: CYLIndexPath, selects: Boolean): LinkedHashSet<CYLIndexPath> {
+        val order = itemIndexPathsInOrder()
+        val result = LinkedHashSet(base)
+        val a = order.indexOf(anchor)
+        val b = order.indexOf(end)
+        if (a < 0 || b < 0) return result
+        for (indexPath in order.subList(min(a, b), max(a, b) + 1)) {
+            if (!isSelectableAt(indexPath) || itemTypeAt(indexPath) == CYLMenuItemType.CYLMenuItemTypeCreate) continue
+            if (selects) result.add(indexPath) else result.remove(indexPath)
+        }
+        return result
+    }
+
+    /** Whether a smear may start on `indexPath`: smear selection on, multiple selection, not editing, a selectable tag. */
+    private fun canSmearFrom(indexPath: CYLIndexPath): Boolean =
+        allowsSmearSelection && selectionMode == CYLMenuSelectionMode.CYLMenuSelectionModeMultiple && !isEditing &&
+            isValid(indexPath) && isSelectableAt(indexPath) && itemTypeAt(indexPath) != CYLMenuItemType.CYLMenuItemTypeCreate
+
+    /** Starts a smear on `indexPath` (the touched-down item). */
+    private fun beginSmear(indexPath: CYLIndexPath) {
+        smear = Smear(LinkedHashSet(selection), indexPath, indexPath !in selection)
+        applySmear(indexPath)
+    }
+
+    /** The selection the smear began with, with the items from its first item to `indexPath` changed. */
+    private fun applySmear(indexPath: CYLIndexPath) {
+        val current = smear ?: return
+        val smeared = smearedSelection(current.base, current.anchor, indexPath, current.selects)
+        if (smeared == selection) return
+        selection.clear()
+        selection.addAll(smeared)
+        refreshVisibleCells()
+        menuDelegate?.menuDidChangeSelectedItems(this, selectedIndexPaths)
+    }
+
     fun addTagWithTitle(title: String) = addTag(CYLTag(title))
 
     fun insertTagWithTitle(title: String, atIndex: Int) = insertTag(CYLTag(title), atIndex)
@@ -1651,7 +1737,37 @@ open class CYLTagListView @JvmOverloads constructor(
             })
             detector.setIsLongpressEnabled(true)
             cell.isLongClickable = true
+            var smearDown: CYLPoint? = null
             cell.setOnTouchListener { view, event ->
+                // `allowsSmearSelection`: a drag from this tag selects the tags it crosses; the list does not scroll.
+                if (canSmearFrom(indexPath)) {
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> {
+                            smearDown = CYLPoint(event.rawX, event.rawY)
+                            parent?.requestDisallowInterceptTouchEvent(true)
+                        }
+                        MotionEvent.ACTION_MOVE -> {
+                            val down = smearDown
+                            if (smear == null && down != null && hypot(event.rawX - down.x, event.rawY - down.y) > 8 * density) {
+                                beginSmear(indexPath)
+                                view.isPressed = false
+                                detector.onTouchEvent(MotionEvent.obtain(event).apply { action = MotionEvent.ACTION_CANCEL })
+                            }
+                            if (smear != null) {
+                                indexPathAtRaw(event.rawX, event.rawY)?.let { applySmear(it) }
+                                return@setOnTouchListener true
+                            }
+                        }
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                            smearDown = null
+                            if (smear != null) {
+                                smear = null
+                                view.isPressed = false
+                                return@setOnTouchListener true
+                            }
+                        }
+                    }
+                }
                 if (view.isPressed != (event.actionMasked == MotionEvent.ACTION_DOWN || (event.actionMasked == MotionEvent.ACTION_MOVE && view.isPressed))) {
                     view.isPressed = event.actionMasked == MotionEvent.ACTION_DOWN && allowsTapping
                 }
@@ -1673,6 +1789,21 @@ open class CYLTagListView @JvmOverloads constructor(
                 view.onTouchEvent(event)
                 true
             }
+        }
+
+        /** The selectable tag under the screen point (`rawX`, `rawY`), for a smear; null between tags. */
+        fun indexPathAtRaw(rawX: Float, rawY: Float): CYLIndexPath? {
+            val origin = IntArray(2)
+            getLocationOnScreen(origin)
+            val x = (rawX - origin[0]) / density
+            val y = (rawY - origin[1]) / density
+            for ((indexPath, cell) in cells) {
+                val frame = frames[cell] ?: continue
+                if (x >= frame.x && x < frame.maxX && y >= frame.y && y < frame.maxY) {
+                    return indexPath.takeIf { canSmearFrom(it) }
+                }
+            }
+            return null
         }
 
         private fun finishDrag(released: Boolean) {
