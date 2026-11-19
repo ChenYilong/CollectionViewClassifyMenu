@@ -1462,3 +1462,15 @@ tags: [issues, ui, cocoapods, progress]
   113 / 113; both localization checks 0. Screenshot: [ios-word-picker.png](assets/ios-word-picker.png). The 5 new
   iOS→Android rows (888 / 893) are for the Windows session.
 
+
+### TODO (2026-11-19, `feat/harmony`): the word picker demo uses a generic, localized message
+
+- Context: the word picker demo (`cf5d9f7e`) shows the owner's WeChat screenshot text, `我是群聊"LANEPRO TEAM A🚧"的Sunny`,
+  marked as user content and never translated. The owner wants a generic message that can be localized.
+- Prompt (verbatim): "example在使用选词功能时，应该修改截图里的文字，生成更加通用的，适配做国际化的文字。"
+- Prompt (English): "When the example uses the word picker, change the text from the screenshot to a more generic text
+  that is suitable for internationalization."
+- Acceptance (100): a neutral greeting with a name to pick, an emoji and a space, looked up through
+  `CYLExampleLocalizedString` in en, zh-Hans and zh-Hant (40); the sender name generic too (10); tests no longer depend on
+  the old text and pass in any language (25); screenshots in the three languages (15); the NOLOCALIZE exemption removed
+  and the localization checks at 0 (10). Pass: 60.
