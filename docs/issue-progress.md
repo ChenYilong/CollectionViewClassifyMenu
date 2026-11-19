@@ -1363,3 +1363,16 @@ tags: [issues, ui, cocoapods, progress]
   as a ~6 px dash in DevTools at 16 pt tags. Now a drawn chevron (`editing-icons.js` 'chevron', tinted with the fold
   color) sized as the editing icons (cap height x 1.25, 13 px at 15 px tags), turned up while unfolded. Test checks
   the icon and its size; `npm test` 161 / 161; before / after: `docs/assets/miniprogram-tag-cloud-fold-chevron.png`.
+
+### TODO (2026-11-19, `feat/harmony`): issue #11 (CocoaPods) closed by commit reference
+
+- Context: issue #11 stayed at 85 / 100 because the pod is not on the CocoaPods trunk and master has no tag. The owner
+  chooses the commit reference instead, as every dependency of this project is consumed today (CYLTabBarController /
+  CYLAnimatedItem by `:git` + `:commit`). The README still installs `:branch => 'master'`, which lacks the current code,
+  and does not say that `CYLAnimatedItem` (not on trunk either) must be pinned the same way.
+- Prompt (verbatim): "使用commit引用  fix Issue #11 needs your CocoaPods release and a tag on master. #9 and #2 stay blocked on a real device and an old Xcode."
+- Prompt (English): "Use a commit reference to fix issue #11 (instead of the CocoaPods release and the master tag)."
+- Acceptance (100): a clean app outside the repository installs `CollectionViewClassifyMenu` by `:git` + `:commit` (with
+  CYLAnimatedItem pinned the same way), builds and runs (40); Swift Package Manager resolves the package by `revision:`
+  and builds (20); README and docs give the commit-reference install for both (20); the issue row at 100 with the
+  evidence (20). Pass: 60.
