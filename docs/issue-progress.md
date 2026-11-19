@@ -1399,3 +1399,28 @@ tags: [issues, ui, cocoapods, progress]
   `check-localization-ports.py` and the Flutter / React Native exports' `--check` on every pull request (and pushes to
   master / `claude/**`), Python 3 standard library only. First run on GitHub (run 44457566107): every step green.
   AGENTS.md "Internationalization and localization" names the workflow.
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): mini program `cyl-tag-cloud`, tapping a tag's × or pencil in editing mode does nothing
+
+- **Bug (step 1, recorded; the user reported it through the CYLSearchViewController session, reproduced at c43eebcd in
+  WeChat DevTools 2.02.2609250 with miniprogram-automator):** a touch-based tap (`element.tap()`) on
+  `#CYLTagListDeleteButton-0` or `#CYLTagListRenameButton-0` never calls `onDelete` / `onRename`; `element.trigger('tap')`
+  does, so the handlers are fine and no tap is produced from the touches. Suspected cause: `catchtouchstart="noop"` on
+  the editing icons and the delete indicator (4 places in `cyl-tag-cloud.wxml`), which keeps WeChat from producing the
+  tap.
+- **Acceptance (100):** reproduced here (20); the fix in the library (40); a regression test (20); a labelled DevTools
+  check (20). Pass: 60.
+- **Reproduction here (0 / 20, written down):** on our TagView sample page in the same DevTools, miniprogram-automator's
+  `element.tap()` on the × and the pencil worked with the old template too (checked that DevTools rendered the old
+  template: a `data-template="old"` marker on the icon). So `catchtouchstart` alone does not block the tap on our
+  page; what differs on the CYLSearchViewController page was not found. (The wechatide `automation_element_action`
+  cannot reach nodes inside a custom component: its selector stops at the component.)
+- **Fix (library, 40 / 40):** `catchtouchstart="noop"` on the two delete indicators and the two editing icons ->
+  `mut-bind:touchstart="noop"`, and the item's `bindtouchstart` -> `mut-bind:touchstart` (base library 2.8.2+; the
+  project's is 3.6): a touch on an icon still does not press the tag, and nothing on the icons catches touchstart. The
+  CYLSearchViewController session's check on its page: the × and the pencil work with it and failed without it.
+- **Regression test (20 / 20):** `test/tag-cloud-renaming.test.js`: no `catchtouchstart` in the cloud; `mut-bind` on the
+  item and on all four icons. `npm test` 162 / 162 with and without `verify-package.js`.
+- **DevTools (20 / 20):** with the fix, `element.tap()` on `#CYLTagListDeleteButton-0` deleted the tag (25 -> 24, not
+  pressed), on `#CYLTagListRenameButton-0` started renaming, a press on the tag body still highlights it;
+  `docs/assets/miniprogram-tag-cloud-icon-taps.png`. **Score: 80 / 100** (the failure not reproduced on our page).

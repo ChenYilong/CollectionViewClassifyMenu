@@ -1,3 +1,6 @@
+<!-- Touches: mut-bind (base library 2.8.2+) on the item and on its delete / rename icons, so a touch on an icon does not
+     press the tag while WeChat still makes a tap of it (catching touchstart stopped the tap: the × and the pencil did
+     nothing). -->
 <view class="cyl-tc" style="{{list.rootStyle}}">
   <view wx:if="{{showsSectionHeaders}}" class="cyl-tc-header" style="{{list.headerStyle}}">
     <view wx:if="{{list.headerIndicatorStyle}}" class="cyl-tc-header-indicator" style="{{list.headerIndicatorStyle}}" />
@@ -13,14 +16,14 @@
       <view wx:for="{{items}}" wx:key="key" id="cyl-tc-item-{{index}}"
             class="cyl-tc-item {{item.enabled ? '' : 'cyl-tc-disabled'}} {{item.hidden ? 'cyl-tc-hidden' : ''}}" style="{{item.style}}"
             data-index="{{index}}" bindtap="onTap" bindlongpress="onLongPress"
-            bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"
+            mut-bind:touchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"
             bindtouchcancel="onTouchCancel"
             aria-role="button" aria-label="{{item.accessibilityLabel}}" aria-selected="{{item.selected}}"
             aria-disabled="{{!item.enabled}}">
         <view wx:for="{{ripples['k' + item.key]}}" wx:for-item="ripple" wx:key="id" class="cyl-tc-ripple" style="{{ripple.style}}" />
         <block wx:if="{{item.deleteFirst}}">
           <view class="cyl-tc-delete cyl-tc-delete-leading" style="{{item.deleteIndicator.style}}" data-index="{{index}}"
-                catchtap="onDelete" catchtouchstart="noop" catchlongpress="noop" aria-role="button" aria-label="{{deleteLabel}}">
+                catchtap="onDelete" mut-bind:touchstart="noop" catchlongpress="noop" aria-role="button" aria-label="{{deleteLabel}}">
             <view wx:if="{{item.deleteIndicator.cross}}" class="cyl-tc-cross" style="{{item.deleteIndicator.boxStyle}}">
               <view class="cyl-tc-cross-line cyl-tc-cross-a" style="{{item.deleteIndicator.lineStyle}}" />
               <view class="cyl-tc-cross-line cyl-tc-cross-b" style="{{item.deleteIndicator.lineStyle}}" />
@@ -40,18 +43,18 @@
         <!-- A renamable tag while editing: the edit icon then the cross (iOS editingIndicatorsView). -->
         <block wx:if="{{item.editingIcons}}">
           <view class="cyl-tc-edit-icon" id="CYLTagListRenameButton-{{index}}" style="{{item.editingIcons.renameStyle}}"
-                data-index="{{index}}" catchtap="onRename" catchtouchstart="noop" catchlongpress="noop"
+                data-index="{{index}}" catchtap="onRename" mut-bind:touchstart="noop" catchlongpress="noop"
                 aria-role="button" aria-label="{{renameLabel}}">
             <image src="{{item.editingIcons.renameImage}}" mode="aspectFit" style="{{item.editingIcons.iconStyle}}" aria-hidden="true" />
           </view>
           <view class="cyl-tc-edit-icon" id="CYLTagListDeleteButton-{{index}}" style="{{item.editingIcons.deleteStyle}}"
-                data-index="{{index}}" catchtap="onDelete" catchtouchstart="noop" catchlongpress="noop"
+                data-index="{{index}}" catchtap="onDelete" mut-bind:touchstart="noop" catchlongpress="noop"
                 aria-role="button" aria-label="{{deleteLabel}}">
             <image src="{{item.editingIcons.deleteImage}}" mode="aspectFit" style="{{item.editingIcons.iconStyle}}" aria-hidden="true" />
           </view>
         </block>
         <view wx:if="{{item.deleteIndicator && !item.deleteFirst}}" class="cyl-tc-delete" style="{{item.deleteIndicator.style}}"
-              data-index="{{index}}" catchtap="onDelete" catchtouchstart="noop" catchlongpress="noop"
+              data-index="{{index}}" catchtap="onDelete" mut-bind:touchstart="noop" catchlongpress="noop"
               aria-role="button" aria-label="{{deleteLabel}}">
           <view wx:if="{{item.deleteIndicator.cross}}" class="cyl-tc-cross" style="{{item.deleteIndicator.boxStyle}}">
             <view class="cyl-tc-cross-line cyl-tc-cross-a" style="{{item.deleteIndicator.lineStyle}}" />

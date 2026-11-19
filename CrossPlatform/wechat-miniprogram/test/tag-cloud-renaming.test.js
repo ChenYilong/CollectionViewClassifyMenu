@@ -204,3 +204,15 @@ test('the header clear button is built in, read with the section title', () => {
   assert.deepEqual(cloud.events.pop(), { name: 'clearbuttontap', detail: { section: 0 } });
   restoreLanguage();
 });
+
+test('a touch on the × or the pencil still makes a tap: mut-bind, no catchtouchstart (the × did nothing)', () => {
+  const fs = require('node:fs');
+  const wxml = fs.readFileSync(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.wxml'), 'utf8');
+  // catchtouchstart keeps WeChat from making a tap of the touches: the handlers never ran on a device or in DevTools.
+  assert.doesNotMatch(wxml, /catchtouchstart/, 'no catchtouchstart anywhere in the cloud');
+  // The item and every icon use mut-bind, so a touch on an icon does not press (highlight) the tag.
+  assert.match(wxml, /class="cyl-tc-item [^"]*"[^>]*mut-bind:touchstart="onTouchStart"/s);
+  const icons = wxml.match(/<view[^>]*(?:catchtap="onDelete"|catchtap="onRename")[^>]*>/gs) || [];
+  assert.equal(icons.length, 4, 'the two delete indicators and the two editing icons');
+  for (const icon of icons) assert.match(icon, /mut-bind:touchstart="noop"/);
+});
