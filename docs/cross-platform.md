@@ -845,3 +845,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 
 - **Android drag demo withdrawn:** `CYLTagReorderScreen` (copy of the removed iOS `CYLTagReorderDemoViewController`) is
   reverted; the drag example on every platform is the Container sample (`docs/android.md`).
+
+- **Still blocked (2026-11-19, re-checked):** CYLTabBarController's newest commit `5744917d` has the task logged
+  (`9b0a5084`) but no default-height change yet; nothing to pin. The pins follow when it lands.
+

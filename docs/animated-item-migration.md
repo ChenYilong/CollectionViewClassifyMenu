@@ -68,6 +68,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 
 ## TODO (in order)
 
+> **Status (2026-11-19, `feat/harmony`, re-read for the "every TODO to 100" request):** item 3 is DONE (`Package.swift`
+> depends on CYLTabBarController's `CYLAnimatedItem` product, which ships the Swift view as `CYLAnimatedItemViews`
+> since `4c7dc79d`; pins at `5744917d`). Item 6 (B20) is DONE on the mini program (`074285a6`, Windows session). Item 2
+> (PR #815) was merged upstream and every pin has moved past it. Items 1 and 4 are covered by the later sections
+> (CI on `feat/harmony`; toolchain checks recorded per platform). Kept as written below for the history.
+
 1. **CI**: since `9095849` a started iOS run always finishes (`cancel-in-progress: false`); row 12 waits for the upstream umbrella-header fix and a pin move; then rows 12 and 13 (demo app, menu / example / swift
    tests, screenshots of the engine report screen into `docs/assets/`).
 2. **Upstream merge of PR #815** (owner): then pins → the merge commit in this repository and CYLSearchViewController, and
