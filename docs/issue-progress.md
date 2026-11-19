@@ -1271,7 +1271,8 @@ tags: [issues, ui, cocoapods, progress]
   `#items` companion section, the header clear button (`cyl_trash` in `resources/base/media`, a 44 vp
   `responseRegion`). Cap height: 0.7 of the font size (HarmonyOS Sans). 4 new host tests (`TagListEditing.test.ets`, the
   iOS cases); 75 / 75; the app builds; `docs/harmony.md` 944 / 944.
-- **Mini program (done in code, 25 / 30; a DevTools screenshot is still due):** `cyl-tag-cloud` properties
+- **Mini program (30 / 30; screenshot `docs/assets/miniprogram-tag-editing-icons-and-clear-button.png`, at c966c527 in
+  CYLSearchViewController's contact tags editor):** `cyl-tag-cloud` properties
   `supportsRenamingItems`, `renamesOnTitleTapWhileEditing`, `showsClearButton`; methods `beginRenaming`,
   `cancelRenaming`, `finishRenaming`, `submitNewItem`, `renamingIndex`, `setRenameRequestHandler`, `editableSectionItems`,
   `cachedItems`, `loadItems`; events `tagrename`, `clearbuttontap`, `editingfinish` {titles, items}. The cloud owns its
@@ -1286,12 +1287,10 @@ tags: [issues, ui, cocoapods, progress]
     `iconColor`; the tag draws the view. Host tests 75 / 75; the app builds.
   - Android (f9d1cb16): `axis` Horizontal, `spacingDp`, `iconColor`; device test `CYLTagEditingIconsDeviceTest`: both
     icons draw in the indicator color on API 37.
-- **Score: 95 / 100** (Android 40 / 40, HarmonyOS 30 / 30, mini program 25 / 30).
-- **Blocked (2026-11-19):** the mini program screenshot needs an editing page that renames; neither example here has
-  one (the contact tags editor moved to CYLSearchViewController, whose mini program editor is not written yet; it will
-  send the DevTools screenshot). The mini program tag's switch to CYLTabBarController's `cyl-animated-item-stack`
-  (`axis="horizontal"`, `spacing`, `icon-color`) waits for the same page, so the rendering can be checked; it also
-  needs `cyl-animated-item-stack` vendored into the library package (`fetch-cyltabbar.js` `VENDORED`).
+- **Score: 100 / 100** (Android 40 / 40, HarmonyOS 30 / 30, mini program 30 / 30).
+- **Follow-up (not part of the score):** the mini program tag's icons on CYLTabBarController's `cyl-animated-item-stack`
+  (`axis="horizontal"`, `spacing`, `icon-color`) as Android and HarmonyOS now do; it needs the stack vendored into the
+  library package (`fetch-cyltabbar.js` `VENDORED`).
 
 ### TODO (2026-11-19, `feat/harmony`, Windows session): Android tags cut short with "…" although there is room
 
@@ -1344,3 +1343,11 @@ tags: [issues, ui, cocoapods, progress]
   the mini program code (session roles rule).
 - Still below 100, blocked (reasons above in the table): iOS issues #11 (the owner's CocoaPods release and a tag on
   master), #9 (a real device), #2 (an old Xcode); the default tab bar height (waits for CYLTabBarController).
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): mini program `cyl-tag-cloud` folding (`defaultVisibleRows`, a tail fold control)
+
+- **Request (the CYLSearchViewController session):** `cyl-tag-cloud` has no folding, while iOS, Android and HarmonyOS
+  fold My Tags to three rows with the chevron as the last tag (`defaultVisibleRows` + `CYLMenuFoldControl` tail / icon);
+  `cyl-tag-list` folds but has no editing. Add `defaultVisibleRows` and a tail fold control to `cyl-tag-cloud`.
+- **Acceptance (100):** folding with the chevron as the last visible tag, unfolding, editing shows every tag as iOS
+  (40); tests (30); a labelled DevTools screenshot (30). Pass: 60.
