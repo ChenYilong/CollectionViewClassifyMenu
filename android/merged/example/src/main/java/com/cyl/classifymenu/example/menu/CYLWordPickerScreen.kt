@@ -29,9 +29,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 class CYLWordPickerScreen(private val context: Context) : CYLMenuScreen {
 
     companion object {
-        /** The friend's message (user content, not localized). */
-        const val MESSAGE = "我是群聊\"LANEPRO TEAM A🚧\"的Sunny"  // NOLOCALIZE: a friend's message (user content)
-        const val SENDER = "Sunny"
+        /** The sample message's key: a greeting with a name to pick, an emoji and a space, in every language. */
+        const val MESSAGE_KEY = "你好，我是设计部的 Alex 👋"
+
+        /** The sender, and the name the message lets you pick (a name, the same in every language). */
+        const val SENDER = "Alex"
+
+        /** The sample message in the app's language. */
+        fun message(context: Context) = CYLExampleLocalizedString(context, MESSAGE_KEY)
     }
 
     private val d = context.resources.displayMetrics.density
@@ -65,7 +70,7 @@ class CYLWordPickerScreen(private val context: Context) : CYLMenuScreen {
             setTextColor(Color.rgb(88, 86, 214))
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = (16 * d).toInt() })
         addView(TextView(context).apply {
-            text = "\"$MESSAGE\""
+            text = "\"${message(context)}\""
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
             setTextColor(Color.rgb(108, 108, 112))
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = (10 * d).toInt() })
@@ -91,7 +96,7 @@ class CYLWordPickerScreen(private val context: Context) : CYLMenuScreen {
 
     /** Opens the sheet; "填入" puts the picked text into the remark field. */
     fun showPicker() {
-        val picker = CYLWordPickerSheet(context, MESSAGE) { picked -> remarkField.setText(picked) }
+        val picker = CYLWordPickerSheet(context, message(context)) { picked -> remarkField.setText(picked) }
         sheet = picker
         picker.show()
     }

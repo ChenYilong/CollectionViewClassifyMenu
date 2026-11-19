@@ -1494,6 +1494,16 @@ tags: [issues, ui, cocoapods, progress]
   real touch events across the row break, deselecting, a tap toggling, single selection); library 101 / 0, the example
   builds; `docs/android-api.md` 893 / 893, `docs/android-ios-api.md` 830 / 830; `check-localization-ports.py` 0 (it
   now prints UTF-8: a GBK console crashed on the message's emoji).
+- **The generic message (iOS 251131c5):** the Android demo looks up "你好，我是设计部的 Alex 👋" through the example's
+  tables (en "Hi, I'm Alex from Design 👋", zh-Hant), sender "Alex", no NOLOCALIZE mark; `CYLWordPickerTest` finds the
+  name wherever it stands. Library 101 / 0.
+- **HarmonyOS core (the example and its screenshot to come):** `CYLMenuStyle.wordPicker()`,
+  `CYLTagListState.setTagsWithCharactersOfText` (graphemes by hand, `cylCharacters`: surrogate pairs, marks, variation
+  selectors, skin tones, ZWJ; `Array.from` split the emoji into UTF-16 units on the host test runtime), `selectedText`,
+  `selectItemsFrom`, `allowsSmearSelection` with `canSmearFrom` / `beginSmear` / `smearTo` / `endSmear`; the list view
+  adds a parallel `PanGesture` per item whose direction is `None` unless the item can smear (lists without smearing
+  scroll as before), mapping the finger to `indexPathAtPoint`; a space cell reads `CYLMenuSpaceCharacter`. New
+  `TagListWordPicker.test.ets` (2); host tests 77 / 77; the app builds.
 - Result (DONE, **100 / 100**): `CYLWordPickerDemoViewController.message` is the Example string
   "你好，我是设计部的 Alex 👋" (en "Hi, I'm Alex from Design 👋", zh-Hant "你好，我是設計部的 Alex 👋"), the sender "Alex";
   the NOLOCALIZE exemption and its entry in the language test are gone. The tests find the name in whatever language

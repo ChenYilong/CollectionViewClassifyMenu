@@ -26,7 +26,7 @@ import java.time.Duration
 @Config(qualifiers = "w411dp-h914dp-420dpi")
 class CYLWordPickerTest {
 
-    private val message = "我是群聊\"LANEPRO TEAM A🚧\"的Sunny"
+    private val message = "Hi, I'm Alex from Design 👋"
 
     private class Recorder : CYLMenuDelegate {
         var changes = 0
@@ -57,7 +57,7 @@ class CYLWordPickerTest {
         val titles = list.tags.map { it.title }
         assertEquals("one cell per character (graphemes)", message.codePoints().count().toInt(), titles.size)
         assertEquals(message, titles.joinToString(""))
-        assertTrue("an emoji is one cell", titles.contains("🚧"))
+        assertTrue("an emoji is one cell", titles.contains("👋"))
         assertEquals("keeps the multiple selection", CYLMenuSelectionMode.CYLMenuSelectionModeMultiple, list.selectionMode)
         val first = cell(list, 0)
         val ninth = cell(list, 8)
@@ -67,9 +67,10 @@ class CYLWordPickerTest {
         assertTrue("the 10th starts the second row", tenth.top > first.bottom)
         val space = titles.indexOf(" ")
         assertEquals("a space is read, not silent", CYLMenuLocalizedString("CYLMenuSpaceCharacter", ""), cell(list, space).contentDescription)
-        val l = titles.indexOf("L")
-        list.selectItemsFromIndexPath(CYLIndexPath(titles.size - 1, 0), CYLIndexPath(l, 0))
-        assertEquals("LANEPRO TEAM A🚧\"的Sunny", list.selectedText)
+        // The name, wherever it stands in the message (either order of the ends).
+        val start = titles.joinToString("").let { text -> text.codePointCount(0, text.indexOf("Alex")) }
+        list.selectItemsFromIndexPath(CYLIndexPath(start + 3, 0), CYLIndexPath(start, 0))
+        assertEquals("Alex", list.selectedText)
         list.deselectAllItems()
         assertEquals("", list.selectedText)
     }

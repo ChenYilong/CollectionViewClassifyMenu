@@ -144,7 +144,9 @@ export class CYLTagListCell {
     this.button.selectedImage = selectedImage;
     this.button.isEnabled = isEnabled;
     this.button.isSelected = isSelected;
-    this.accessibilityLabel = title;
+    // A space (a word picker cell) is read as "Space", not as silence.
+    this.accessibilityLabel = title.length > 0 && title.trim().length === 0 ?
+      CYLMenuLocalizedString('CYLMenuSpaceCharacter') : title;
     this.accessibilityIdentifier = CYLTagListAccessibilityIdentifier.item;
     this.accessibilityHint = undefined;
     this.accessibilitySelected = isSelected;

@@ -665,6 +665,17 @@ export struct CYLTagListView {
     }
   }
 
+  /** Where the finger went down in the item a smear started on (its local point). */
+  private smearStartX: number = 0;
+  private smearStartY: number = 0;
+
+  /** The item under the finger, in the list's content, extends the smear. */
+  private smearMove(r: CYLTagRenderItem, event: GestureEvent): void {
+    const x = this.fx(r) + this.smearStartX + event.offsetX;
+    const y = this.fy(r) - this.model.titleHeight() + this.smearStartY + event.offsetY;
+    this.model.smearTo(this.model.indexPathAtPoint(x, y));
+  }
+
   private endDrag(r: CYLTagRenderItem, offsetX: number, offsetY: number, moved: boolean): void {
     const target = this.model.indexPathAtPoint(r.x + r.width / 2 + offsetX,
       r.y - this.model.titleHeight() + r.height / 2 + offsetY);
@@ -847,6 +858,22 @@ export struct CYLTagListView {
       }
       this.tap(r);
     }))
+    // `allowsSmearSelection`: a drag from this tag selects (or deselects) the tags it crosses; off, the pan does not
+    // recognize (no direction) and the list scrolls as before.
+    .parallelGesture(PanGesture({
+      distance: 8,
+      direction: this.model.canSmearFrom({ section: r.section, item: r.item }) ? PanDirection.All : PanDirection.None
+    })
+      .onActionStart((event: GestureEvent) => {
+        const finger = event.fingerList.length > 0 ? event.fingerList[0] : undefined;
+        this.smearStartX = (finger?.localX ?? 0) - event.offsetX;
+        this.smearStartY = (finger?.localY ?? 0) - event.offsetY;
+        this.model.beginSmear({ section: r.section, item: r.item });
+        this.smearMove(r, event);
+      })
+      .onActionUpdate((event: GestureEvent) => this.smearMove(r, event))
+      .onActionEnd(() => this.model.endSmear())
+      .onActionCancel(() => this.model.endSmear()))
     .gesture(GestureGroup(GestureMode.Sequence,
       LongPressGesture({ duration: this.longPressDuration })
         .onAction(() => {

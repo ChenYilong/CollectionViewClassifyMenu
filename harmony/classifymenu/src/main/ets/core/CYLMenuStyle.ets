@@ -527,6 +527,38 @@ export class CYLMenuStyle {
   }
 
   /**
+   * `wordPicker()` (选词填入, as WeChat's "涂抹选择填入词"): one character per cell, 9 equal cells per row, light gray
+   * cells with small corners that turn mint green when selected, the character centered. Use it with
+   * `CYLTagListState.setTagsWithCharactersOfText`, multiple selection and `allowsSmearSelection`; the picked text is
+   * `selectedText`.
+   */
+  static wordPicker(): CYLMenuStyle {
+    const style = new CYLMenuStyle();
+    style.numberOfItemsPerRow = 9;
+    const font = new CYLFont(18, FontWeight.Medium);
+    style.appearances().forEach((appearance: CYLTagAppearance) => {
+      appearance.font = font;
+      appearance.cornerRadius = 3;
+      appearance.borderWidth = 0;
+      appearance.borderColor = undefined;
+      appearance.margin = 0;
+      appearance.textColor = CYLColor.argb(255, 0x1C, 0x1C, 0x1E);
+      appearance.backgroundColor = CYLColor.argb(255, 0xF2, 0xF2, 0xF7);
+    });
+    // Mint green (iOS 0.70 / 0.92 / 0.81).
+    style.storedSelected.backgroundColor = CYLColor.argb(255, 0xB3, 0xEB, 0xCF);
+    style.storedDisabled.textColor = CYLColor.argb(0x4C, 0x3C, 0x3C, 0x43);
+    style.contentAlignment = CYLTagContentAlignment.center;
+    style.layoutCentered = true;
+    style.itemHeight = 40;
+    style.interitemSpacing = 6;
+    style.lineSpacing = 10;
+    style.sectionInsets = new CYLEdgeInsets(12, 24, 12, 24);
+    style.backgroundColor = CYLColor.CLEAR;
+    return style;
+  }
+
+  /**
    * AndroidTagView's look: translucent red capsules, gray text, 23 characters at most.
    */
   static tagContainer(): CYLMenuStyle {

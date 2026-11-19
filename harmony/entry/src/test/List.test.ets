@@ -10,6 +10,7 @@ import reviewFilterTapTest from './ReviewFilterTap.test';
 import tagButtonTest from './TagButton.test';
 import androidParityTest from './AndroidParity.test';
 import tagListEditingTest from './TagListEditing.test';
+import tagListWordPickerTest from './TagListWordPicker.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -24,4 +25,5 @@ export default function testsuite() {
   tagButtonTest();
   androidParityTest();
   tagListEditingTest();
+  tagListWordPickerTest();
 }

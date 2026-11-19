@@ -423,6 +423,43 @@ export class CYLTagListItemFrame {
   isFoldCell: boolean = false;
 }
 
+
+/**
+ * The characters of `text` as a reader sees them (graphemes): a code point with the marks, variation selectors, skin
+ * tones and zero-width-joined parts that follow it (ArkTS has no `Intl.Segmenter` on every target).
+ */
+export function cylCharacters(text: string): string[] {
+  // Code points by hand: `Array.from` splits a string into UTF-16 units on some ArkTS runtimes (an emoji fell apart).
+  const points: string[] = [];
+  for (let i = 0; i < text.length; i++) {
+    const unit = text.charCodeAt(i);
+    if (unit >= 0xD800 && unit <= 0xDBFF && i + 1 < text.length) {
+      const next = text.charCodeAt(i + 1);
+      if (next >= 0xDC00 && next <= 0xDFFF) {
+        points.push(text.substring(i, i + 2));
+        i++;
+        continue;
+      }
+    }
+    points.push(text.charAt(i));
+  }
+  const result: string[] = [];
+  let joinNext = false;
+  for (const ch of points) {
+    const cp = ch.codePointAt(0) ?? 0;
+    const extends_ = (cp >= 0x0300 && cp <= 0x036F) || (cp >= 0xFE00 && cp <= 0xFE0F) || (cp >= 0x1F3FB && cp <= 0x1F3FF) ||
+      (cp >= 0xE0020 && cp <= 0xE007F) || cp === 0x20E3;
+    if (result.length > 0 && (extends_ || joinNext || cp === 0x200D)) {
+      result[result.length - 1] += ch;
+      joinNext = cp === 0x200D;
+      continue;
+    }
+    result.push(ch);
+    joinNext = false;
+  }
+  return result;
+}
+
 /** A section as laid out: its header, items and footer. */
 export class CYLTagListSectionFrame {
   section: number = 0;
@@ -1792,6 +1829,126 @@ export class CYLTagListState {
       }
       return tag;
     }));
+  }
+
+  /**
+   * `setTags(withCharactersOf:)`: one tag per character of `text`, in order: each character (a letter, a Chinese
+   * character, an emoji with its modifiers, a space) is one tag, as the word picker's cells (`CYLMenuStyle.wordPicker()`).
+   * Unlike the first `setTagsWithTitles`, it keeps `selectionMode` (a word picker selects several cells).
+   */
+  setTagsWithCharactersOfText(text: string): void {
+    const mode = this.selectionMode;
+    this.setTagsWithTitles(cylCharacters(text));
+    this.selectionMode = mode;
+  }
+
+  /** `selectedText`: the titles of the selected items joined in item order (a word picker's picked characters). */
+  get selectedText(): string {
+    return this.selectedTitles.join('');
+  }
+
+  /**
+   * `selectItems(from:through:)`: selects every selectable item from `start` through `end` (either order), in item
+   * order across sections, as a smear over them does, without calling the delegate. Needs multiple selection.
+   */
+  selectItemsFrom(start: CYLIndexPath, end: CYLIndexPath): void {
+    if (this.selectionModeStorage !== CYLMenuSelectionMode.multiple || !this.isValid(start) || !this.isValid(end)) {
+      return;
+    }
+    this.selection = this.smearedSelection(this.selection, start, end, true);
+    this.setNeedsDisplay();
+  }
+
+  /**
+   * `allowsSmearSelection`: a finger dragged across the items selects them ("smearing", as WeChat's 涂抹选择填入词): the
+   * drag starts on the item it touched down on and selects every item from it to the item under the finger, in item
+   * order, or deselects them when that item was already selected. A tap still toggles one item, so screen readers select
+   * the same items. Needs multiple selection; a drag that starts between items scrolls. The delegate gets
+   * `menuDidChangeSelectedItems`. False by default; `CYLMenuStyle.wordPicker()` is the matching look.
+   */
+  allowsSmearSelection: boolean = false;
+  private smearBase?: Map<string, CYLIndexPath>;
+  private smearAnchor?: CYLIndexPath;
+  private smearSelects: boolean = true;
+
+  /** Every item, in order across sections (the order a smear follows). */
+  private itemIndexPathsInOrder(): CYLIndexPath[] {
+    const result: CYLIndexPath[] = [];
+    this.titles.forEach((items: string[], section: number) => {
+      items.forEach((_title: string, item: number) => result.push(makePath(section, item)));
+    });
+    return result;
+  }
+
+  /** `base` with the items from `anchor` to `end` (item order) selected, or deselected when `selects` is false. */
+  private smearedSelection(base: Map<string, CYLIndexPath>, anchor: CYLIndexPath, end: CYLIndexPath,
+    selects: boolean): Map<string, CYLIndexPath> {
+    const order = this.itemIndexPathsInOrder();
+    const result = new Map<string, CYLIndexPath>(base);
+    const a = order.findIndex((p: CYLIndexPath) => p.section === anchor.section && p.item === anchor.item);
+    const b = order.findIndex((p: CYLIndexPath) => p.section === end.section && p.item === end.item);
+    if (a < 0 || b < 0) {
+      return result;
+    }
+    for (let i = Math.min(a, b); i <= Math.max(a, b); i++) {
+      const p = order[i];
+      if (!this.isSelectable(p) || this.itemType(p) === CYLMenuItemType.create) {
+        continue;
+      }
+      if (selects) {
+        result.set(key(p.section, p.item), p);
+      } else {
+        result.delete(key(p.section, p.item));
+      }
+    }
+    return result;
+  }
+
+  /** Whether a smear may start on `indexPath`: smear selection on, multiple selection, not editing, a selectable tag. */
+  canSmearFrom(indexPath: CYLIndexPath): boolean {
+    return this.allowsSmearSelection && this.selectionModeStorage === CYLMenuSelectionMode.multiple &&
+      !this.isEditing && this.isValid(indexPath) && this.isSelectable(indexPath) &&
+      this.itemType(indexPath) !== CYLMenuItemType.create;
+  }
+
+  /** Starts a smear on `indexPath` (the item the finger went down on). */
+  beginSmear(indexPath: CYLIndexPath): void {
+    if (!this.canSmearFrom(indexPath)) {
+      return;
+    }
+    this.smearBase = new Map<string, CYLIndexPath>(this.selection);
+    this.smearAnchor = indexPath;
+    this.smearSelects = !this.isSelected(indexPath);
+    this.smearTo(indexPath);
+  }
+
+  /** The selection the smear began with, with the items from its first item to `indexPath` changed. */
+  smearTo(indexPath: CYLIndexPath | undefined): void {
+    const base = this.smearBase;
+    const anchor = this.smearAnchor;
+    if (base === undefined || anchor === undefined || indexPath === undefined || !this.canSmearFrom(indexPath)) {
+      return;
+    }
+    const smeared = this.smearedSelection(base, anchor, indexPath, this.smearSelects);
+    const same = smeared.size === this.selection.size &&
+      Array.from(smeared.keys()).every((k: string) => this.selection.has(k));
+    if (same) {
+      return;
+    }
+    this.selection = smeared;
+    this.setNeedsDisplay();
+    this.menuDelegate?.menuDidChangeSelectedItems?.(this, this.selectedIndexPaths);
+  }
+
+  /** Ends the smear. */
+  endSmear(): void {
+    this.smearBase = undefined;
+    this.smearAnchor = undefined;
+  }
+
+  /** Whether a smear is in progress. */
+  get isSmearing(): boolean {
+    return this.smearAnchor !== undefined;
   }
 
   /** Deletes a deletable, enabled item as a tap on its delete indicator does. */
