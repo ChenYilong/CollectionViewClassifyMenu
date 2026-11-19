@@ -658,3 +658,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   test); `android/merged/gradle.properties`; the RN `scripts/fetch-cyltabbar.sh` and the Flutter example's
   `pubspec.yaml` ref. Results: mini program `npm test` 161 / 161; HarmonyOS host tests 75 / 75 and the app builds;
   Android library tests 99 / 0 and the example builds; `check-localization-ports.py` 0 problems.
+- **Result, iOS (Mac session):** the four Podfiles, `Package.swift` and the Flutter / React Native iOS Podfiles at
+  `74f0b4cd`; no code change. pod install in the four projects; menu 37 / 37, Example 110 / 110, Swift Example 22 / 22,
+  TagCollectionView 6 / 6; `flutter build ios --simulator` OK. React Native example (Release, iOS simulator): a tap on
+  the Classify tab switches the page in JavaScript ([react-native-ios-tab-tap-74f0b4cd.png](assets/react-native-ios-tab-tap-74f0b4cd.png)).
+- **DONE (2026-11-19): every platform at `74f0b4cd`, 100 / 100**, with the Windows session's `542a0094` (mini program
+  161 / 161, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build).
