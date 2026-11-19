@@ -324,6 +324,9 @@ export default function tagListEditingTest() {
       expect(button.renameIndicatorHitFrame.width > 0).assertTrue();
       expect(button.renameIndicatorHitFrame.maxX).assertEqual(button.deleteIndicatorHitFrame.x);
       expect(button.editingIconFrames[1].x - button.editingIconFrames[0].maxX).assertEqual(10);
+      expect(button.editingIndicatorsView.axis).assertEqual('horizontal');
+      expect(button.editingIndicatorsView.spacing).assertEqual(10);
+      expect(button.editingIndicatorsFrame.width).assertEqual(button.editingIconFrames[1].maxX - button.editingIconFrames[0].x);
       const wider = new CYLMenuStyle();
       wider.editingIndicatorSpacing = 20;
       expect(CYLTagButton.widthWithRenameIndicator('Family', CYLSize.ZERO, true, true, wider) -

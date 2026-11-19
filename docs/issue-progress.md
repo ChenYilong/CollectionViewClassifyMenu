@@ -1278,9 +1278,14 @@ tags: [issues, ui, cocoapods, progress]
   `saveItems` and `loadItems` (with `fetchItemsWithKeys`) in cache.js. The editing icons and the trash are drawn SVGs in
   data URIs (`editing-icons.js`): an `<image>` cannot tint a file, so there is no image file to add to a folder. New
   `test/tag-cloud-renaming.test.js` (5); `npm test` 159 / 159; WeChat DevTools Build npm and refresh succeed.
-- **TODO:** emulator screenshots of the editing icons and the clear button (HarmonyOS, mini program); use
-  CYLTabBarController's new stack view options (HarmonyOS 692f0aa7 `model.axis` / `spacing` / `iconColor`, Android
-  1fbd8048 `stack.axis` / `spacingDp` / `iconColor`) for the tag's editing icons once they are in a pinned commit.
+- **HarmonyOS, the stack view itself:** CYLTabBarController 692f0aa7 (in the pinned f88d67a8) gave the HarmonyOS
+  `CYLAnimatedItemStackView` `axis` 'horizontal', `spacing` and `iconColor`; the tag now draws its two editing icons
+  with that view (no more hand-drawn `SymbolGlyph`s). Host tests 75 / 75 (axis, spacing and the frame checked); the app
+  builds.
+- **TODO:** emulator screenshots of the editing icons and the clear button (HarmonyOS, in CYLSearchViewController's
+  contact tags example, which now holds the editing example; the mini program). Android (1fbd8048), iOS (4eac795d) and
+  the mini program (d3ad4751) stack view options are on CYLTabBarController's branch after f88d67a8: switch those tags at
+  the next pin.
 
 ### TODO (2026-11-19, `feat/harmony`, Windows session): Android tags cut short with "…" although there is room
 
