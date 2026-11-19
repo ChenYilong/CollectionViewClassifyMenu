@@ -664,3 +664,15 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   the Classify tab switches the page in JavaScript ([react-native-ios-tab-tap-74f0b4cd.png](assets/react-native-ios-tab-tap-74f0b4cd.png)).
 - **DONE (2026-11-19): every platform at `74f0b4cd`, 100 / 100**, with the Windows session's `542a0094` (mini program
   161 / 161, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build).
+
+## TODO (2026-11-20, `feat/harmony`): every pin from 74f0b4cd to CYLTabBarController 8ece77dd (iOS 15 minimum, Swift class)
+
+- **Context:** CYLTabBarController `8ece77dd` (`8ece77ddc8ecb1c26ac8d09d1d9bc63c0b5d8094`, newest, 146 commits after our pin)
+  raises `CYLTabBarController.podspec` and `CYLAnimatedItem.podspec` and every subspec to iOS 15.0 and `Package.swift`
+  to `.iOS(.v15)` (the owner's request "raise iOS .spec the minimum to iOS 15"), and contains the class switch
+  (`CYLTabBarController` is a Swift class, `e51c51d4`; CYLTabBar and CYLAnimatedItemView were Swift already). iOS pins
+  here (Mac session); the mini program, HarmonyOS, Android, React Native and Flutter refs by the Windows session.
+- **Acceptance (100):** iOS pins; pod install; the four iOS suites and the Flutter iOS build pass; the React Native app
+  builds and its Classify tab still switches (class switch); anything that breaks is fixed here or reported to
+  CYLTabBarController (50); the other platforms at the same commit with their tests (30); CYLSearchViewController told
+  the commit (10); the iOS 15 TODO (docs/issue-progress.md) updated (10). Pass: 60.
