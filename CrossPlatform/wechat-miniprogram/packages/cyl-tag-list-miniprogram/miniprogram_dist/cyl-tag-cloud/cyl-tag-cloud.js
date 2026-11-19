@@ -34,6 +34,11 @@
  * `editableSectionItems()`, `editingfinish` {titles, items} and `loadItems(keys, completion(items, origin))` (with the
  * remote source's `fetchItemsWithKeys`). `showsClearButton` puts a trash button in the header: `clearbuttontap`
  * {section: 0}.
+ *
+ * Folding (iOS `defaultVisibleRows` + `CYLMenuFoldControl` tail): with `defaultVisibleRows` > 0 the cloud shows that
+ * many rows with a fold control (a chevron, `foldControlContent` 'icon' / 'title' / 'titleAndIcon') as the last tag;
+ * a tap on it (or `setExpanded(true)`) shows every tag, the control then folding them again; `foldchange` {canFold,
+ * expanded}. Editing shows every tag, as iOS.
  */
 const model = require('./model.js');
 const { coreString } = require('../core-strings.js');
@@ -82,6 +87,9 @@ Component({
     supportsRenamingItems: { type: Boolean, value: false },
     renamesOnTitleTapWhileEditing: { type: Boolean, value: true },
     showsClearButton: { type: Boolean, value: false },
+    defaultVisibleRows: { type: Number, value: 0 },
+    foldControlContent: { type: String, value: 'icon' },
+    foldControlColor: { type: String, value: '' },
   },
 
   data: {
@@ -99,6 +107,10 @@ Component({
     clearImage: '',
     clearStyle: '',
     renamingIndex: -1,
+    canFold: false,
+    expanded: false,
+    foldTitle: '',
+    foldStyle: '',
   },
 
   observers: {
@@ -126,6 +138,10 @@ Component({
     'showsClearButton, sectionTitle'() {
       this._updateClearButton();
     },
+    'defaultVisibleRows, foldControlContent, foldControlColor'() {
+      this._render(false);
+      this._measureFold();
+    },
   },
 
   lifetimes: {
@@ -140,6 +156,8 @@ Component({
       this._remoteSource = null;
       this._renaming = -1;
       this._renameRequestHandler = null;
+      this._expanded = false;
+      this._fold = { canFold: false, visible: [] };
     },
     attached() {
       this.setData({
@@ -246,6 +264,8 @@ Component({
       this._dragging = null;
       this.setData({ isEditing: value, addText: value ? this.data.addText : '' });
       this._updateAddItem();
+      // Editing shows every tag; leaving it folds again.
+      this._measureFold();
       this._render(false);
       this.triggerEvent('editingchange', { editing: value });
     },
@@ -345,6 +365,75 @@ Component({
 
     onRename(event) {
       this.beginRenaming(this._index(event));
+    },
+
+    // MARK: Folding (iOS defaultVisibleRows, CYLMenuFoldControl tail)
+
+    /** Whether the folded tags are shown (`isExpanded(section:)`). */
+    isExpanded() {
+      return this._expanded;
+    },
+
+    /** `setExpanded(_:forSection:animated:)`: shows every tag, or folds them to `defaultVisibleRows` again. */
+    setExpanded(expanded) {
+      const value = !!expanded;
+      if (value === this._expanded) return;
+      this._expanded = value;
+      this._applyFold();
+      this.triggerEvent('foldchange', { canFold: this._fold.canFold, expanded: value });
+    },
+
+    onFoldTap() {
+      this.setExpanded(!this._expanded);
+    },
+
+    /** Shows every tag, measures their rows and the fold control, then folds (a layout change measures again). */
+    _measureFold() {
+      if (!(this.data.defaultVisibleRows > 0) || this._editing || !this.createSelectorQuery) {
+        if (this._fold.canFold || this.data.canFold) {
+          this._fold = { canFold: false, visible: [] };
+          this._applyFold();
+        }
+        return;
+      }
+      this._fold = { canFold: false, visible: [] };
+      this._applyFold(true, () => {
+        const query = this.createSelectorQuery();
+        query.selectAll('.cyl-tc-item').boundingClientRect();
+        query.select('.cyl-tc-items').boundingClientRect();
+        query.select('#CYLTagListFoldSizer').boundingClientRect();
+        query.exec((results) => {
+          const [rects, container, sizer] = results || [];
+          if (!rects || !container) return;
+          const listStyle = this._style();
+          this._fold = model.foldVisibility({
+            rects: rects.map((rect) => ({ left: rect.left, top: rect.top, right: rect.right })),
+            containerRight: container.right,
+            tailWidth: sizer ? sizer.width : 0,
+            spacing: listStyle.interitemSpacing,
+            limit: this.data.defaultVisibleRows,
+            expanded: false,
+          });
+          this._applyFold();
+          this.triggerEvent('foldchange', { canFold: this._fold.canFold, expanded: this._expanded });
+        });
+      });
+    },
+
+    /** The items' hidden flags and the fold control from the last measurement (`measuring`: the sizer, every tag). */
+    _applyFold(measuring = false, callback) {
+      const fold = this._fold;
+      const folded = fold.canFold && !this._expanded && !this._editing;
+      const patch = {
+        canFold: fold.canFold && !this._editing,
+        expanded: this._expanded,
+        measuringFold: measuring,
+        foldTitle: locale.tc(this._expanded ? 'CYLMenuCollapse' : 'CYLMenuExpand'),
+      };
+      (this.data.items || []).forEach((item, index) => {
+        patch[`items[${index}].hidden`] = folded && fold.visible.length > index ? !fold.visible[index] : false;
+      });
+      this.setData(patch, callback);
     },
 
     onClearTap() {
@@ -455,8 +544,24 @@ Component({
       });
       // While editing, every change of the tags is saved (a delete, an added tag, a drop; iOS saves after each edit).
       if (contentChanged && this._editing) this.saveToCache();
-      this.setData({ items, list }, () => {
-        if (contentChanged) this.triggerEvent('contentchange', { count: this._tags.length });
+      const fold = this._fold || { canFold: false, visible: [] };
+      const folded = fold.canFold && !this._expanded && !this._editing;
+      items.forEach((item, index) => {
+        item.hidden = folded && fold.visible.length > index ? !fold.visible[index] : false;
+      });
+      const tail = model.renderTag(model.makeTag('x'), 0, { listStyle, theme: this.data.colorTheme });
+      const foldColor = this.data.foldControlColor || listStyle.normal.textColor;
+      this.setData({
+        items,
+        list,
+        foldStyle: `${tail.style}; color: ${foldColor}; font-size: ${listStyle.normal.fontSize}px`,
+        foldContent: this.data.foldControlContent,
+        foldTitle: locale.tc(this._expanded ? 'CYLMenuCollapse' : 'CYLMenuExpand'),
+      }, () => {
+        if (contentChanged) {
+          this.triggerEvent('contentchange', { count: this._tags.length });
+          this._measureFold();
+        }
       });
     },
 

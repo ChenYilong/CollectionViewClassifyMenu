@@ -11,7 +11,7 @@
   <view class="cyl-tc-body" style="{{list.bodyStyle}}">
     <view class="cyl-tc-items" style="{{list.itemsStyle}}">
       <view wx:for="{{items}}" wx:key="key" id="cyl-tc-item-{{index}}"
-            class="cyl-tc-item {{item.enabled ? '' : 'cyl-tc-disabled'}}" style="{{item.style}}"
+            class="cyl-tc-item {{item.enabled ? '' : 'cyl-tc-disabled'}} {{item.hidden ? 'cyl-tc-hidden' : ''}}" style="{{item.style}}"
             data-index="{{index}}" bindtap="onTap" bindlongpress="onLongPress"
             bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"
             bindtouchcancel="onTouchCancel"
@@ -63,6 +63,16 @@
           <text wx:else class="cyl-tc-delete-text" style="{{item.deleteIndicator.boxStyle}}">{{item.deleteIndicator.text}}</text>
         </view>
       </view>
+      <view wx:if="{{canFold}}" class="cyl-tc-item cyl-tc-fold" id="CYLTagListFoldControl" style="{{foldStyle}}"
+            bindtap="onFoldTap" aria-role="button" aria-label="{{sectionTitle}} {{foldTitle}}">
+        <text wx:if="{{foldContent !== 'icon'}}">{{foldTitle}}</text>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-tc-fold-arrow {{expanded ? 'cyl-tc-up' : ''}}">▾</text>
+      </view>
+    </view>
+    <!-- The fold control as the last tag (iOS CYLMenuFoldControl tail); a hidden copy measures its width. -->
+    <view wx:if="{{measuringFold || canFold}}" class="cyl-tc-fold-sizer" id="CYLTagListFoldSizer" style="{{foldStyle}}" aria-hidden="true">
+      <text wx:if="{{foldContent !== 'icon'}}">{{foldTitle}}</text>
+      <text wx:if="{{foldContent !== 'title'}}" class="cyl-tc-fold-arrow">▾</text>
     </view>
     <!-- CYLTagListAddItemView while editing: a name field and an Add button below the tags. -->
     <view wx:if="{{showsAddItem}}" class="cyl-tc-add">

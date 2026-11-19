@@ -61,3 +61,14 @@
   align-items: center;
   justify-content: flex-end;
 }
+
+/* Folding: hidden tags, the fold control as the last tag, and its hidden copy that measures its width. */
+.cyl-tc-hidden { display: none !important; }
+.cyl-tc-fold { flex-shrink: 0; }
+.cyl-tc-fold-arrow { display: inline-block; transition: transform 0.2s; }
+.cyl-tc-up { transform: rotate(180deg); }
+.cyl-tc-fold-sizer {
+  position: absolute; visibility: hidden; left: 0; top: 0; display: inline-flex; align-items: center;
+  box-sizing: border-box; white-space: nowrap;
+}
+.cyl-tc-body { position: relative; }

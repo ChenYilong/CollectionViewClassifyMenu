@@ -1351,3 +1351,11 @@ tags: [issues, ui, cocoapods, progress]
   `cyl-tag-list` folds but has no editing. Add `defaultVisibleRows` and a tail fold control to `cyl-tag-cloud`.
 - **Acceptance (100):** folding with the chevron as the last visible tag, unfolding, editing shows every tag as iOS
   (40); tests (30); a labelled DevTools screenshot (30). Pass: 60.
+- **Done (100 / 100):** `cyl-tag-cloud` properties `defaultVisibleRows`, `foldControlContent` ('icon' / 'title' /
+  'titleAndIcon'), `foldControlColor`; methods `setExpanded`, `isExpanded`; event `foldchange` {canFold, expanded}. The
+  cloud shows every tag, measures their frames and a hidden copy of the control, then hides the rows after the limit
+  and the last tags of the limit row that leave no room for the control (`model.foldVisibility`, as iOS puts the
+  chevron in the last visible row; `cyl-tag-list` appends it instead). Editing shows every tag without the control.
+  Tests `test/tag-cloud-folding.test.js` (2: the fold rule, the component with a stand-in layout); `npm test` 161 / 161
+  with and without `verify-package.js`. Screenshot `docs/assets/miniprogram-tag-cloud-folding.png` (DevTools: folded,
+  unfolded, editing).

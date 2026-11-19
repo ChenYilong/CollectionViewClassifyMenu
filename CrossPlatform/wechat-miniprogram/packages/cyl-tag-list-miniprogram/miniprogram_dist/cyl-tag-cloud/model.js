@@ -708,6 +708,44 @@ function renderTag(tag, index, context) {
 const ROW_ALIGNMENT = { leading: 'flex-start', center: 'center', trailing: 'flex-start; flex-direction: row-reverse' };
 
 /** The list's own render data: the background, the container border, the section insets and spacing, the header. */
+/** The row of each item from the tops of their frames (a new row where the top moves by more than 1 px). */
+function rowsFromTops(tops) {
+  const rows = [];
+  let row = -1;
+  let lastTop = null;
+  tops.forEach((top) => {
+    if (lastTop === null || Math.abs(top - lastTop) > 1) {
+      row += 1;
+      lastTop = top;
+    }
+    rows.push(row);
+  });
+  return rows;
+}
+
+/**
+ * Folding to `limit` rows with the fold control as the last tag (iOS `defaultVisibleRows` + `CYLMenuFoldControl`
+ * position tail): from the items' frames (every item shown, `{left, top, right}`), the right edge of the row, the fold
+ * control's width and the space between tags. While folded, the items after row `limit` are hidden, and so are the last
+ * items of row `limit` that leave no room for the control after them. Returns `{canFold, visible}`.
+ */
+function foldVisibility({ rects = [], containerRight = 0, tailWidth = 0, spacing = 0, limit = 0, expanded = false }) {
+  const rows = rowsFromTops(rects.map((rect) => rect.top));
+  const rowCount = rows.length ? rows[rows.length - 1] + 1 : 0;
+  const canFold = limit > 0 && rowCount > limit;
+  const visible = rows.map((row) => !canFold || expanded || row < limit);
+  if (!canFold || expanded) return { canFold, visible };
+  let last = visible.lastIndexOf(true);
+  while (last >= 0 && rows[last] === limit - 1 && rects[last].right + spacing + tailWidth > containerRight) {
+    // The control goes where this item was, if it fits there.
+    const start = rects[last].left;
+    visible[last] = false;
+    if (start + tailWidth <= containerRight) break;
+    last -= 1;
+  }
+  return { canFold, visible };
+}
+
 function renderList(listStyle, options = {}) {
   const insets = listStyle.sectionInsets;
   const root = [`background-color: ${listStyle.backgroundColor || 'transparent'}`];
@@ -770,4 +808,6 @@ module.exports = {
   renderList,
   capHeight,
   editingIconSide,
+  rowsFromTops,
+  foldVisibility,
 };
