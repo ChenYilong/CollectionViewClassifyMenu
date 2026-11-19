@@ -16,4 +16,10 @@ export class CYLTagListAccessibilityIdentifier {
   static readonly moreButton: string = 'CYLTagListMoreButton';
   /** The tappable delete indicator ("×") of a deletable tag. */
   static readonly deleteButton: string = 'CYLTagListDeleteButton';
+  /** The rename indicator of a tag in editing mode (an edit icon before the delete indicator). */
+  static readonly renameButton: string = 'CYLTagListRenameButton';
+  /** The title of a renamable tag in editing mode: a tap renames it too (`renamesOnTitleTapWhileEditing`). */
+  static readonly renameTitle: string = 'CYLTagListRenameTitle';
+  /** A section header's clear button (`menuShowsClearButtonForSection`). */
+  static readonly clearButton: string = 'CYLTagListClearButton';
 }

@@ -1,3 +1,4 @@
+import { CYLTagListCacheItem } from '../core/CYLTagListCache';
 import { CYLUIContext } from '../core/CYLUIContext';
 /**
  * The model and controller of a `CYLTagListView`, as iOS `CYLTagListView.swift` without its UIKit views: the data
@@ -102,6 +103,9 @@ function measureWithArkUI(text: string, font: CYLFont): number {
 }
 
 /** The measurements of a tag (`CYLTagButton`'s static methods). */
+/** The cap height of HarmonyOS Sans, as a share of the font size. */
+const CAP_HEIGHT_RATIO: number = 0.7;
+
 export class CYLTagButtonMetrics {
   /** Replaced in tests that run without a UI context. */
   static textMeasurer: CYLTextMeasurer = measureWithArkUI;
@@ -118,8 +122,13 @@ export class CYLTagButtonMetrics {
 
   /** The width a tag needs in every state, before any limit on the available width. */
   static width(title: string | undefined, iconSize: CYLSize, showsDeleteIndicator: boolean, style: CYLMenuStyle,
-    fontScale: number = 1): number {
+    fontScale: number = 1, showsRenameIndicator: boolean = false): number {
     const displayed = style.displayedTitle(title);
+    // With the rename indicator, the two editing icons replace the delete indicator.
+    const editingIcons = showsDeleteIndicator && showsRenameIndicator;
+    const indicatorWidth = (state: number): number => editingIcons ?
+      CYLTagButtonMetrics.editingIndicatorsWidth(state, style, fontScale) :
+      CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale);
     let width = 0;
     if (style.fillsTagHeight(iconSize)) {
       // The image is as wide as the tag is tall, from the leading edge; the title and the indicator follow it.
@@ -128,8 +137,7 @@ export class CYLTagButtonMetrics {
         const font = style.titleFont(state, fontScale);
         const titleWidth = displayed.length === 0 ? 0 :
           Math.ceil(CYLTagButtonMetrics.textMeasurer(displayed, font)) + style.imageTitleSpacing;
-        const indicator = showsDeleteIndicator ?
-          style.imageTitleSpacing + CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale) : 0;
+        const indicator = showsDeleteIndicator ? style.imageTitleSpacing + indicatorWidth(state) : 0;
         width = Math.max(width, Math.ceil(side + titleWidth + indicator + style.appearance(state).contentInsets.right));
       });
       return width;
@@ -148,7 +156,7 @@ export class CYLTagButtonMetrics {
         content += style.imageSize.width + style.imageTitleSpacing;
       }
       if (showsDeleteIndicator) {
-        content += style.imageTitleSpacing + CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale);
+        content += style.imageTitleSpacing + indicatorWidth(state);
       }
       width = Math.max(width, Math.ceil(content + appearance.contentInsets.left + appearance.contentInsets.right));
     });
@@ -260,6 +268,23 @@ export class CYLTagButtonMetrics {
       height = Math.max(height, Math.ceil(text + insets.top + insets.bottom));
     });
     return height;
+  }
+
+  /** The cap height of `font` (HarmonyOS Sans: 0.7 of the size). */
+  static capHeight(font: CYLFont): number {
+    return font.size * CAP_HEIGHT_RATIO;
+  }
+
+  /** The side of one editing icon (the edit icon or the cross): the title's cap height x 1.25 (iOS 3af1b7cd). */
+  static editingIconSide(state: number, style: CYLMenuStyle, fontScale: number = 1): number {
+    return Math.ceil(CYLTagButtonMetrics.capHeight(style.titleFont(state, fontScale)) * 1.25);
+  }
+
+  /** The width of the two editing icons with the space between and around them. */
+  static editingIndicatorsWidth(state: number, style: CYLMenuStyle, fontScale: number = 1): number {
+    const m = style.editingIndicatorInsets;
+    return Math.max(0, m.left) + 2 * CYLTagButtonMetrics.editingIconSide(state, style, fontScale) +
+      Math.max(0, style.editingIndicatorSpacing) + Math.max(0, m.right);
   }
 
   static deleteIndicatorWidth(state: number, style: CYLMenuStyle, fontScale: number = 1): number {
@@ -714,7 +739,240 @@ export class CYLTagListState {
     if (cache === undefined || source === undefined) {
       return;
     }
+    const saveItems = cache.saveItems;
+    if (saveItems !== undefined) {
+      // With identifiers, so a renamed item stays the same item.
+      this.editableSectionItems().forEach((items: CYLTagListCacheItem[], key: string) => saveItems(items, key));
+      return;
+    }
     this.editableSectionTitles().forEach((titles: string[], key: string) => cache.saveTitles(titles, key));
+  }
+
+  // MARK: Renaming (iOS 990cf115)
+
+  private renamingIndexPathStorage?: CYLIndexPath;
+  private renamesOnTitleTapWhileEditingStorage: boolean = true;
+
+  /** `renamingIndexPath`: the item being renamed in editing mode (its rename indicator was tapped); undefined otherwise. */
+  get renamingIndexPath(): CYLIndexPath | undefined {
+    return this.renamingIndexPathStorage;
+  }
+
+  /**
+   * `renamesOnTitleTapWhileEditing`: in editing mode, a tap on a renamable item's title (outside its two icons) renames
+   * it too; a tap elsewhere still selects. True by default; it needs the data source's `menuRenameItem`.
+   */
+  get renamesOnTitleTapWhileEditing(): boolean {
+    return this.renamesOnTitleTapWhileEditingStorage;
+  }
+
+  set renamesOnTitleTapWhileEditing(value: boolean) {
+    this.renamesOnTitleTapWhileEditingStorage = value;
+    this.setNeedsDisplay();
+  }
+
+  /**
+   * `renameRequestHandler`: your own editor for renaming: when set, a rename indicator or title tap calls it with the
+   * item and its title instead of filling `addItemView`; finish with `finishRenaming` or `cancelRenaming`.
+   */
+  renameRequestHandler?: (indexPath: CYLIndexPath, title: string) => void = undefined;
+
+  /** `clearButtonHandler`: called with the section when its header's clear button is tapped (after the delegate). */
+  clearButtonHandler?: (section: number) => void = undefined;
+
+  /** The items (identifier and title) of every editable section, by cache key, without "+ New tag" items. */
+  editableSectionItems(): Map<string, CYLTagListCacheItem[]> {
+    const result = new Map<string, CYLTagListCacheItem[]>();
+    const source = this.menuDataSource;
+    if (source === undefined) {
+      return result;
+    }
+    for (let section = 0; section < source.numberOfSectionsInMenu(); section++) {
+      if (!this.sectionAllowsEditing(section)) {
+        continue;
+      }
+      const items: CYLTagListCacheItem[] = [];
+      for (let item = 0; item < source.menuNumberOfItemsInSection(section); item++) {
+        const p = makePath(section, item);
+        if (this.itemType(p) !== CYLMenuItemType.create) {
+          const title = source.menuTitleForItem(p);
+          items.push(new CYLTagListCacheItem(source.menuIdentifierForItem?.(p) ?? title, title));
+        }
+      }
+      result.set(this.cacheKeyForSection(section), items);
+    }
+    return result;
+  }
+
+  /** Whether the item can be renamed now: editing, an editable section, deletable, a data source that renames. */
+  isRenamable(indexPath: CYLIndexPath): boolean {
+    return this.isEditingStorage && this.sectionAllowsEditing(indexPath.section) &&
+      this.itemType(indexPath) !== CYLMenuItemType.create && this.isDeletable(indexPath) &&
+      this.menuDataSource?.menuRenameItem !== undefined;
+  }
+
+  /**
+   * `beginRenaming(at:)`: starts renaming (the rename indicator does this): `addItemView` shows the title, its submit
+   * renames the item through the data source's `menuRenameItem`; or `renameRequestHandler` gets it.
+   */
+  beginRenaming(indexPath: CYLIndexPath): void {
+    if (!this.isValid(indexPath) || !this.isRenamable(indexPath)) {
+      return;
+    }
+    this.renamingIndexPathStorage = indexPath;
+    const title = this.menuDataSource?.menuTitleForItem(indexPath) ?? '';
+    const handler = this.renameRequestHandler;
+    if (handler !== undefined) {
+      handler(indexPath, title);
+      return;
+    }
+    this.addItemView.beginRenaming(title);
+    this.invalidateMeasurements();
+    // The field is below the last section: bring it into view.
+    const frame = this.addItemViewFrame;
+    if (frame !== undefined) {
+      this.requestScroll(frame.y + frame.height - this.viewportHeight, true);
+    }
+  }
+
+  /** `cancelRenaming()`: ends renaming without a change. */
+  cancelRenaming(): void {
+    if (this.renamingIndexPathStorage === undefined) {
+      return;
+    }
+    this.renamingIndexPathStorage = undefined;
+    this.addItemView.endRenaming();
+    this.invalidateMeasurements();
+  }
+
+  /** `submitNewItem(named:)`: adds an item from your own editor, as `addItemView`'s submit does (trimmed). */
+  submitNewItem(name: string): void {
+    const trimmed = name.trim();
+    if (trimmed.length === 0) {
+      return;
+    }
+    this.cancelRenaming();
+    this.requestNewItem(trimmed);
+  }
+
+  /**
+   * `finishRenaming(to:)`: renames the item being renamed to `title` (trimmed; an empty or unchanged one only ends
+   * renaming): the data source renames it, the list reloads, saves its cache and calls `menuDidRenameItem`.
+   */
+  finishRenaming(title: string): void {
+    const indexPath = this.renamingIndexPathStorage;
+    if (indexPath === undefined) {
+      return;
+    }
+    this.renamingIndexPathStorage = undefined;
+    this.addItemView.endRenaming();
+    const name = title.trim();
+    const source = this.menuDataSource;
+    if (!this.isValid(indexPath) || name.length === 0 || source === undefined || name === source.menuTitleForItem(indexPath)) {
+      this.invalidateMeasurements();
+      return;
+    }
+    source.menuRenameItem?.(indexPath, name);
+    this.reloadMenuData();
+    this.saveEditableSectionsToCache();
+    this.menuDelegate?.menuDidRenameItem?.(this, indexPath, name);
+  }
+
+  /** Whether the section's header shows the clear button (`menuShowsClearButtonForSection`). */
+  showsClearButton(section: number): boolean {
+    return this.menuDataSource?.menuShowsClearButtonForSection?.(section) ?? false;
+  }
+
+  /** The clear button's accessibility label: "Clear <section title>". */
+  clearButtonLabel(section: number): string {
+    const title = this.menuDataSource?.menuTitleForSection?.(section) ?? '';
+    const clear = CYLMenuLocalizedString('CYLMenuClearSection');
+    return title.length > 0 ? `${clear} ${title}` : clear;
+  }
+
+  /** A tap on a section header's clear button. */
+  tapClearButton(section: number): void {
+    this.menuDelegate?.menuDidTapClearButtonInSection?.(this, section);
+    this.clearButtonHandler?.(section);
+  }
+
+  /**
+   * `loadItems(withKeys:completion:)`: `loadSectionsWithKeys` with identifiers: the cache's items and the remote
+   * source's (`fetchItemsWithKeys`, else its titles, each its own identifier); downloaded items are saved first.
+   */
+  loadItemsWithKeys(keys: string[],
+    completion: (items: Map<string, CYLTagListCacheItem[]>, origin: CYLTagListDataOrigin) => void): void {
+    const cached = new Map<string, CYLTagListCacheItem[]>();
+    keys.forEach((key: string) => {
+      const cache = this.cache;
+      const items = cache?.cachedItems !== undefined ? cache.cachedItems(key) :
+        cache?.cachedTitles(key)?.map((title: string) => new CYLTagListCacheItem(title, title));
+      if (items !== undefined) {
+        cached.set(key, items);
+      }
+    });
+    const fetch = (done: (ok: boolean) => void): void => {
+      const remote = this.remoteSource;
+      if (remote === undefined) {
+        done(false);
+        return;
+      }
+      const received = (items: Map<string, CYLTagListCacheItem[]> | undefined, error: Error | undefined): void => {
+        if (items === undefined || error !== undefined) {
+          done(false);
+          return;
+        }
+        const downloaded = new Map<string, CYLTagListCacheItem[]>();
+        items.forEach((sectionItems: CYLTagListCacheItem[], key: string) => {
+          if (!keys.includes(key)) {
+            return;
+          }
+          downloaded.set(key, sectionItems);
+          const cache = this.cache;
+          if (cache?.saveItems !== undefined) {
+            cache.saveItems(sectionItems, key);
+          } else {
+            cache?.saveTitles(sectionItems.map((item: CYLTagListCacheItem) => item.title), key);
+          }
+        });
+        completion(downloaded, CYLTagListDataOrigin.network);
+        done(true);
+      };
+      if (remote.fetchItemsWithKeys !== undefined) {
+        remote.fetchItemsWithKeys(keys, received);
+      } else {
+        remote.fetchSectionsWithKeys(keys, (sections: Map<string, string[]> | undefined, error: Error | undefined) => {
+          let items: Map<string, CYLTagListCacheItem[]> | undefined = undefined;
+          if (sections !== undefined) {
+            const mapped = new Map<string, CYLTagListCacheItem[]>();
+            sections.forEach((titles: string[], key: string) => mapped.set(key,
+              titles.map((title: string) => new CYLTagListCacheItem(title, title))));
+            items = mapped;
+          }
+          received(items, error);
+        });
+      }
+    };
+    const fallBack = (ok: boolean): void => {
+      if (!ok && cached.size > 0) {
+        completion(cached, CYLTagListDataOrigin.cache);
+      }
+    };
+    if (this.loadPolicy === CYLTagListLoadPolicy.cacheThenNetwork) {
+      if (cached.size > 0) {
+        completion(cached, CYLTagListDataOrigin.cache);
+      }
+      fetch(() => {
+      });
+    } else if (this.loadPolicy === CYLTagListLoadPolicy.cacheFirst) {
+      if (cached.size === keys.length) {
+        completion(cached, CYLTagListDataOrigin.cache);
+      } else {
+        fetch(fallBack);
+      }
+    } else {
+      fetch(fallBack);
+    }
   }
 
   /**
@@ -729,8 +987,11 @@ export class CYLTagListState {
     this.isEditingStorage = editing;
     if (!editing) {
       // The edited sections, for the host to upload (the cache already has them).
+      this.renamingIndexPathStorage = undefined;
+      this.addItemView.endRenaming();
       const titles = this.editableSectionTitles();
       this.menuDelegate?.menuDidFinishEditingWithTitles?.(this, titles);
+      this.menuDelegate?.menuDidFinishEditingWithItems?.(this, this.editableSectionItems());
       this.editingFinishHandler?.(titles);
     }
     this.addItemView.fontScale = this.fontScale;
@@ -746,7 +1007,9 @@ export class CYLTagListState {
 
   /** Whether `addItemView` is shown (editing, and `showsAddItemViewWhileEditing`). */
   get showsAddItemView(): boolean {
-    return this.isEditingStorage && this.showsAddItemViewWhileEditingStorage;
+    // Renaming needs the field even when the add control is hidden, unless the host's editor takes it.
+    return this.isEditingStorage && (this.showsAddItemViewWhileEditingStorage ||
+      (this.renamingIndexPathStorage !== undefined && this.renameRequestHandler === undefined));
   }
 
   /** The height `addItemView` takes below the sections, vp (with the bottom section inset), or 0. */
@@ -769,6 +1032,11 @@ export class CYLTagListState {
 
   /** A name submitted in `addItemView`: reported at the end of the first editable section. */
   private requestNewItem(name: string): void {
+    if (this.renamingIndexPathStorage !== undefined) {
+      // A submit while renaming renames.
+      this.finishRenaming(name);
+      return;
+    }
     let section = 0;
     for (let s = 0; s < this.titles.length; s++) {
       if (this.sectionAllowsEditing(s)) {
@@ -2184,7 +2452,9 @@ export class CYLTagListState {
         const itemStyle = this.styleForItem(p);
         const iconSize = CYLTagButtonMetrics.iconSize(this.imageForItem(p), this.animationURLForItem(p) !== undefined,
           itemStyle);
-        const width = CYLTagButtonMetrics.width(title, iconSize, this.isDeletable(p), itemStyle, this.fontScale);
+        const deletable = this.isDeletable(p);
+        const width = CYLTagButtonMetrics.width(title, iconSize, deletable, itemStyle, this.fontScale,
+          deletable && this.isRenamable(p));
         // Before the list knows its width (0), a tag keeps its own width: clamping to 0 drew every tag as a hairline.
         return contentWidth > 0 ? Math.min(width, contentWidth) : width;
       });

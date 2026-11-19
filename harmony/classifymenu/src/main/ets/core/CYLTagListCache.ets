@@ -33,7 +33,32 @@ export interface CYLTagListCache {
   removeTitles(section: string): void;
   /** Removes every section of this cache. */
   removeAllTitles(): void;
+  /** `cachedItems(forSection:)`: the items saved for `section`, in order; undefined when none. Optional. */
+  cachedItems?: (section: string) => CYLTagListCacheItem[] | undefined;
+  /** `saveItems(_:forSection:)`: saves `items` (in this order) as the contents of `section`. Optional. */
+  saveItems?: (items: CYLTagListCacheItem[], section: string) => void;
 }
+
+/**
+ * `CYLTagListCacheItem`: one saved item of a tag list, its stable identifier (a database id; the title when the item
+ * has none) and its current title. A reorder or a rename keeps the identifier.
+ */
+export class CYLTagListCacheItem {
+  readonly identifier: string;
+  readonly title: string;
+
+  constructor(identifier: string, title: string) {
+    this.identifier = identifier;
+    this.title = title;
+  }
+
+  toString(): string {
+    return `${this.identifier}:${this.title}`;
+  }
+}
+
+/** The separator of an encoded "identifier<US>title" item (iOS `itemSeparator`). */
+const CYL_ITEM_SEPARATOR: string = '\u001F';
 
 /** Every saved list: {list name: {section: titles}}. Shared by the stores of one process, as the storage is. */
 const CYL_MEMORY: Map<string, Map<string, string[]>> = new Map<string, Map<string, string[]>>();
@@ -94,6 +119,31 @@ export class CYLTagListStore implements CYLTagListCache {
   }
 
   saveTitles(titles: string[], section: string): void {
+    // Plain titles replace any items saved for the section.
+    this.removeRawTitles(`${section}#items`);
+    this.saveRawTitles(titles, section);
+  }
+
+  /** `cachedItems(forSection:)`: the saved items; titles saved alone are their own identifiers. */
+  cachedItems = (section: string): CYLTagListCacheItem[] | undefined => {
+    const encoded = this.cachedTitles(`${section}#items`);
+    if (encoded !== undefined) {
+      return encoded.map((entry: string) => {
+        const parts = entry.split(CYL_ITEM_SEPARATOR);
+        return parts.length >= 2 ? new CYLTagListCacheItem(parts[0], parts.slice(1).join(CYL_ITEM_SEPARATOR)) :
+          new CYLTagListCacheItem(entry, entry);
+      });
+    }
+    return this.cachedTitles(section)?.map((title: string) => new CYLTagListCacheItem(title, title));
+  };
+
+  /** `saveItems(_:forSection:)`: the items in a companion section, the titles in the section itself. */
+  saveItems = (items: CYLTagListCacheItem[], section: string): void => {
+    this.saveRawTitles(items.map((item: CYLTagListCacheItem) => item.identifier + CYL_ITEM_SEPARATOR + item.title), `${section}#items`);
+    this.saveRawTitles(items.map((item: CYLTagListCacheItem) => item.title), section);
+  };
+
+  private saveRawTitles(titles: string[], section: string): void {
     switch (this.policy) {
       case CYLTagListCachePolicy.none:
         return;
@@ -116,6 +166,11 @@ export class CYLTagListStore implements CYLTagListCache {
   }
 
   removeTitles(section: string): void {
+    this.removeRawTitles(`${section}#items`);
+    this.removeRawTitles(section);
+  }
+
+  private removeRawTitles(section: string): void {
     switch (this.policy) {
       case CYLTagListCachePolicy.none:
         return;
@@ -379,4 +434,10 @@ export interface CYLTagListRemoteSource {
    */
   fetchSectionsWithKeys(keys: string[], completion: (sections: Map<string, string[]> | undefined,
     error: Error | undefined) => void): void;
+  /**
+   * `fetchItems(withKeys:completion:)`: downloads the sections as items (stable identifier and title), for
+   * `loadItemsWithKeys`. Optional: without it, the titles are fetched and each title is its own identifier.
+   */
+  fetchItemsWithKeys?: (keys: string[], completion: (items: Map<string, CYLTagListCacheItem[]> | undefined,
+    error: Error | undefined) => void) => void;
 }

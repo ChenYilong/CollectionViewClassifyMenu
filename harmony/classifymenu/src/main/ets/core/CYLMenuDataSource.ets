@@ -3,6 +3,7 @@
  * methods: the four required data source methods are methods, every optional one is an optional function property, and
  * `CYLMenuDefaults` gives the iOS default of each (the value when a data source does not implement it).
  */
+import { CYLTagListCacheItem } from './CYLTagListCache';
 import { CYLIndexPath } from '../components/CYLTagListModel';
 import { CYLMenuStyle } from './CYLMenuStyle';
 import { CYLImage } from './CYLTypes';
@@ -61,6 +62,23 @@ export interface CYLMenuDataSource {
    * when sections come and go (e.g. "mine"); the section's index when not implemented.
    */
   menuCacheKeyForSection?: (section: number) => string;
+  /**
+   * `menuIdentifierForItem(at:)`: the item's stable identifier (a database id), kept by the list's cache and sync so a
+   * reorder or a rename never loses what the item stands for; its title when not implemented.
+   */
+  menuIdentifierForItem?: (indexPath: CYLIndexPath) => string;
+  /**
+   * `menuRenameItem(at:to:)`: rename the item in your data. Implementing it shows the rename indicator (an edit icon
+   * before the delete indicator) in editing mode; its submit calls this, then the list reloads, saves its cache and
+   * calls `menuDidRenameItem`.
+   */
+  menuRenameItem?: (indexPath: CYLIndexPath, title: string) => void;
+  /**
+   * `menuShowsClearButton(forSection:)`: shows a clear button (the trash icon, `CYLMenuStyle.clearButtonImage`) at the
+   * trailing end of the section's header; a tap calls `menuDidTapClearButtonInSection` and `clearButtonHandler`. False
+   * when not implemented.
+   */
+  menuShowsClearButtonForSection?: (section: number) => boolean;
 }
 
 /**
@@ -88,6 +106,12 @@ export interface CYLMenuDelegate {
    * (`cacheKeyForSection`), in their new order, already saved to its cache: upload them to your server here.
    */
   menuDidFinishEditingWithTitles?: (menu: Object, titles: Map<string, string[]>) => void;
+  /** `menu(_:didFinishEditingWithItems:)`: the same edited sections as items (stable identifier and title). */
+  menuDidFinishEditingWithItems?: (menu: Object, items: Map<string, CYLTagListCacheItem[]>) => void;
+  /** `menu(_:didRenameItemAt:to:)`: the list renamed an item in editing mode, already saved to its cache. */
+  menuDidRenameItem?: (menu: Object, indexPath: CYLIndexPath, title: string) => void;
+  /** `menu(_:didTapClearButtonInSection:)`: a section header's clear button was tapped: clear the section's data. */
+  menuDidTapClearButtonInSection?: (menu: Object, section: number) => void;
 }
 
 /** The iOS defaults of the optional data source methods, for a data source that does not implement them. */

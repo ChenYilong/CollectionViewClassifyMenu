@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import {
   CYLFont, CYLIndexPath, CYLMenuDataSource, CYLMenuDelegate, CYLMenuFoldStyle, CYLMenuSelectionMode, CYLTagButtonMetrics,
   CYLTagListCachePolicy, CYLTagListDataOrigin, CYLTagListLoadPolicy, CYLTagListRemoteSource, CYLTagListState,
-  CYLTagListStore, CYLTextMeasurer
+  CYLTagListStore, CYLTextMeasurer, CYLTagListCacheItem, CYLTagButton, CYLMenuStyle, CYLEdgeInsets, CYLSize,
+  CYLTagListCell
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -16,10 +17,26 @@ class CYLEditableTagSource implements CYLMenuDataSource, CYLMenuDelegate {
   sections: string[][];
   editableSections?: number[];
   events: string[] = [];
+  /** Each item's stable id ("id-<first title>"), moved with it and kept by a rename. */
+  identifiers: string[][];
+  finishedItems?: Map<string, CYLTagListCacheItem[]>;
 
   constructor(sections: string[][]) {
     this.sections = sections;
+    this.identifiers = sections.map((titles: string[]) => titles.map((title: string) => `id-${title}`));
   }
+
+  menuIdentifierForItem = (indexPath: CYLIndexPath): string => this.identifiers[indexPath.section][indexPath.item];
+  menuShowsClearButtonForSection = (section: number): boolean => section === 0;
+  menuDidRenameItem = (menu: Object, indexPath: CYLIndexPath, title: string): void => {
+    this.events.push(`rename ${indexPath.item}-${indexPath.section} ${title}`);
+  };
+  menuDidTapClearButtonInSection = (menu: Object, section: number): void => {
+    this.events.push(`clear ${section}`);
+  };
+  menuDidFinishEditingWithItems = (menu: Object, items: Map<string, CYLTagListCacheItem[]>): void => {
+    this.finishedItems = items;
+  };
 
   numberOfSectionsInMenu = (): number => this.sections.length;
   menuNumberOfItemsInSection = (section: number): number => this.sections[section].length;
@@ -29,10 +46,13 @@ class CYLEditableTagSource implements CYLMenuDataSource, CYLMenuDelegate {
     this.editableSections === undefined || this.editableSections.includes(section);
   menuRemoveItem = (indexPath: CYLIndexPath): void => {
     this.sections[indexPath.section].splice(indexPath.item, 1);
+    this.identifiers[indexPath.section].splice(indexPath.item, 1);
   };
   menuMoveItem = (from: CYLIndexPath, to: CYLIndexPath): void => {
     const title = this.sections[from.section].splice(from.item, 1)[0];
     this.sections[to.section].splice(to.item, 0, title);
+    const identifier = this.identifiers[from.section].splice(from.item, 1)[0];
+    this.identifiers[to.section].splice(to.item, 0, identifier);
   };
   menuDidSelectItem = (menu: Object, indexPath: CYLIndexPath): void => {
     this.events.push(`select ${indexPath.item}-${indexPath.section}`);
@@ -43,7 +63,37 @@ class CYLEditableTagSource implements CYLMenuDataSource, CYLMenuDelegate {
   menuDidRequestNewItemWithName = (menu: Object, name: string, indexPath: CYLIndexPath): void => {
     this.events.push(`add ${name} at ${indexPath.item}-${indexPath.section}`);
     this.sections[indexPath.section].splice(indexPath.item, 0, name);
+    this.identifiers[indexPath.section].splice(indexPath.item, 0, `id-${name}`);
     (menu as CYLTagListState).reloadMenuData();
+  };
+}
+
+/** `CYLEditableTagSource` that renames (iOS: it responds to `menuRenameItem(at:to:)`). */
+class CYLRenamableTagSource extends CYLEditableTagSource {
+  menuRenameItem = (indexPath: CYLIndexPath, title: string): void => {
+    this.sections[indexPath.section][indexPath.item] = title;
+  };
+}
+
+/** A remote source that answers with fixed items. */
+class CYLFakeItemsRemoteSource implements CYLTagListRemoteSource {
+  items: Map<string, CYLTagListCacheItem[]>;
+
+  constructor(items: Map<string, CYLTagListCacheItem[]>) {
+    this.items = items;
+  }
+
+  fetchSectionsWithKeys(keys: string[], completion: (sections: Map<string, string[]> | undefined,
+    error: Error | undefined) => void): void {
+    const sections = new Map<string, string[]>();
+    this.items.forEach((items: CYLTagListCacheItem[], key: string) =>
+      sections.set(key, items.map((item: CYLTagListCacheItem) => item.title)));
+    completion(sections, undefined);
+  }
+
+  fetchItemsWithKeys = (keys: string[], completion: (items: Map<string, CYLTagListCacheItem[]> | undefined,
+    error: Error | undefined) => void): void => {
+    completion(this.items, undefined);
   };
 }
 
@@ -240,6 +290,140 @@ export default function tagListEditingTest() {
         expect(reopened.cachedTitles('1') === undefined).assertTrue();
         expect(CYLTagListStore.cache(CYLTagListCachePolicy.none, name) === undefined).assertTrue();
       });
+    });
+    it('renamingShowsTwoIconsRenamesAndKeepsTheIdentifier', 0, () => {
+      const name = 'CYLTagListEditingTest.rename';
+      new CYLTagListStore(CYLTagListCachePolicy.userDefaults, name).removeAllTitles();
+      const plain = makeList(new CYLEditableTagSource([['Recent A'], ['Family', 'Friends', 'Clients']]));
+      plain.setEditing(true, false);
+      expect(plain.isRenamable(path(1, 0))).assertFalse();
+      const source = new CYLRenamableTagSource([['Recent A'], ['Family', 'Friends', 'Clients']]);
+      source.editableSections = [1];
+      const list = makeList(source);
+      list.cacheName = name;
+      list.cachePolicy = CYLTagListCachePolicy.userDefaults;
+      expect(list.isRenamable(path(1, 0))).assertFalse();
+      list.setEditing(true, false);
+      expect(list.isRenamable(path(1, 0))).assertTrue();
+      expect(list.isRenamable(path(0, 0))).assertFalse();
+      expect(list.renamesOnTitleTapWhileEditing).assertTrue();
+
+      // The button: two icons from the stack model, the defaults of iOS 3af1b7cd.
+      const defaults = new CYLMenuStyle();
+      expect(defaults.editingIndicatorSpacing).assertEqual(10);
+      expect(defaults.editingIndicatorInsets.left).assertEqual(4);
+      expect(defaults.editingIndicatorInsets.right).assertEqual(0);
+      const button = new CYLTagButton();
+      button.title = 'Family';
+      button.showsDeleteIndicator = true;
+      button.showsRenameIndicator = true;
+      const size = button.intrinsicSize();
+      button.setBounds(size.width, size.height);
+      expect(button.editingIndicatorsView.items.length).assertEqual(2);
+      expect(button.editingIconFrames.length).assertEqual(2);
+      expect(button.renameIndicatorHitFrame.width > 0).assertTrue();
+      expect(button.renameIndicatorHitFrame.maxX).assertEqual(button.deleteIndicatorHitFrame.x);
+      expect(button.editingIconFrames[1].x - button.editingIconFrames[0].maxX).assertEqual(10);
+      const wider = new CYLMenuStyle();
+      wider.editingIndicatorSpacing = 20;
+      expect(CYLTagButton.widthWithRenameIndicator('Family', CYLSize.ZERO, true, true, wider) -
+        CYLTagButton.widthWithRenameIndicator('Family', CYLSize.ZERO, true, true, defaults)).assertEqual(10);
+      const padded = new CYLMenuStyle();
+      padded.editingIndicatorInsets = new CYLEdgeInsets(2, 10, 2, 6);
+      expect(CYLTagButton.widthWithRenameIndicator('Family', CYLSize.ZERO, true, true, padded) -
+        CYLTagButton.widthWithRenameIndicator('Family', CYLSize.ZERO, true, true, defaults)).assertEqual(12);
+      const cell = new CYLTagListCell();
+      cell.configure('Family', undefined, undefined, undefined, defaults, false, true);
+      cell.isDeletable = true;
+      cell.isRenamable = true;
+      cell.renamesOnTitleTap = true;
+      expect(cell.button.showsRenameIndicator).assertTrue();
+      expect(cell.renameAccessibilityLabel.length > 0).assertTrue();
+      cell.prepareForReuse();
+      expect(cell.isRenamable).assertFalse();
+
+      list.beginRenaming(path(1, 0));
+      expect(list.renamingIndexPath?.item).assertEqual(0);
+      list.finishRenaming('Family');
+      expect(list.renamingIndexPath === undefined).assertTrue();
+      list.moveItem(path(1, 1), path(1, 0));
+      list.beginRenaming(path(1, 0));
+      expect(list.addItemView.isRenaming).assertTrue();
+      expect(list.addItemView.text).assertEqual('Friends');
+      list.addItemView.text = 'Best Friends';
+      list.addItemView.submit();
+      expect(list.renamingIndexPath === undefined).assertTrue();
+      expect(list.addItemView.isRenaming).assertFalse();
+      expect(source.sections[1].join(',')).assertEqual('Best Friends,Family,Clients');
+      expect(source.events[source.events.length - 1]).assertEqual('rename 0-1 Best Friends');
+      const items = new CYLTagListStore(CYLTagListCachePolicy.userDefaults, name).cachedItems('1') ?? [];
+      expect(items.map((item: CYLTagListCacheItem) => item.identifier).join(',')).assertEqual('id-Friends,id-Family,id-Clients');
+      expect(items.map((item: CYLTagListCacheItem) => item.title).join(',')).assertEqual('Best Friends,Family,Clients');
+      list.setEditing(false, false);
+      const first = source.finishedItems?.get('1');
+      expect(first !== undefined && first.length > 0 ? first[0].toString() : '').assertEqual('id-Friends:Best Friends');
+      new CYLTagListStore(CYLTagListCachePolicy.userDefaults, name).removeAllTitles();
+    });
+
+    it('loadItemsKeepsIdentifiersFromTheServer', 0, () => {
+      const store = new CYLTagListStore(CYLTagListCachePolicy.sandboxFile, 'CYLTagListEditingTest.items');
+      store.removeAllTitles();
+      store.saveItems([new CYLTagListCacheItem('t1', 'Family')], 'mine');
+      expect((store.cachedTitles('mine') ?? []).join(',')).assertEqual('Family');
+      const list = new CYLTagListState();
+      list.cache = store;
+      const server = new Map<string, CYLTagListCacheItem[]>();
+      server.set('mine', [new CYLTagListCacheItem('t2', 'Work'), new CYLTagListCacheItem('t1', 'Home')]);
+      list.remoteSource = new CYLFakeItemsRemoteSource(server);
+      const events: string[] = [];
+      list.loadItemsWithKeys(['mine'], (items: Map<string, CYLTagListCacheItem[]>, origin: CYLTagListDataOrigin) => {
+        const from = origin === CYLTagListDataOrigin.cache ? 'cache' : 'network';
+        events.push(`${from} ${(items.get('mine') ?? []).map((item: CYLTagListCacheItem) => item.toString()).join(',')}`);
+      });
+      expect(events.join('|')).assertEqual('cache t1:Family|network t2:Work,t1:Home');
+      expect((store.cachedItems('mine') ?? []).map((item: CYLTagListCacheItem) => item.toString()).join(','))
+        .assertEqual('t2:Work,t1:Home');
+      store.saveTitles(['A'], 'mine');
+      expect((store.cachedItems('mine') ?? [])[0].identifier).assertEqual('A');
+      store.removeAllTitles();
+    });
+
+    it('anExternalEditorRenamesAndAdds', 0, () => {
+      const source = new CYLRenamableTagSource([['Family', 'Friends']]);
+      const list = makeList(source);
+      list.showsAddItemViewWhileEditing = false;
+      let request = '';
+      list.renameRequestHandler = (indexPath: CYLIndexPath, title: string) => {
+        request = `${indexPath.item}-${indexPath.section} ${title}`;
+      };
+      list.setEditing(true, false);
+      expect(list.showsAddItemView).assertFalse();
+      list.beginRenaming(path(0, 1));
+      expect(request).assertEqual('1-0 Friends');
+      expect(list.showsAddItemView).assertFalse();
+      list.finishRenaming('Pals');
+      expect(source.sections[0].join(',')).assertEqual('Family,Pals');
+      list.beginRenaming(path(0, 0));
+      list.cancelRenaming();
+      expect(list.renamingIndexPath === undefined).assertTrue();
+      expect(source.sections[0].join(',')).assertEqual('Family,Pals');
+      list.submitNewItem('  Clients ');
+      expect(source.sections[0].join(',')).assertEqual('Family,Pals,Clients');
+    });
+
+    it('theHeaderClearButtonIsBuiltIn', 0, () => {
+      const source = new CYLEditableTagSource([['Coworkers', 'Clients'], ['Family']]);
+      const list = makeList(source);
+      let handled = -1;
+      list.clearButtonHandler = (section: number) => {
+        handled = section;
+      };
+      expect(list.showsClearButton(0)).assertTrue();
+      expect(list.showsClearButton(1)).assertFalse();
+      expect(list.clearButtonLabel(0).endsWith('Section 0')).assertTrue();
+      list.tapClearButton(0);
+      expect(source.events[source.events.length - 1]).assertEqual('clear 0');
+      expect(handled).assertEqual(0);
     });
   });
 }

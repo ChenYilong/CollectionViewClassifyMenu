@@ -34,6 +34,37 @@ export class CYLTagListAddItemView {
     return this.text.trim();
   }
 
+  private isRenamingValue: boolean = false;
+
+  /** `isRenaming`: whether the control renames a tag (`beginRenaming`) instead of adding one. */
+  get isRenaming(): boolean {
+    return this.isRenamingValue;
+  }
+
+  /**
+   * `beginRenaming(title:)`: renames a tag; the field shows `title`, the button reads "Done" (`CYLMenuRenameDone`); the
+   * next submit reports the new name, then the control adds tags again.
+   */
+  beginRenaming(title: string): void {
+    this.isRenamingValue = true;
+    this.text = title;
+    this.placeholder = CYLMenuLocalizedString('CYLMenuRenamePlaceholder');
+    this.addTitle = CYLMenuLocalizedString('CYLMenuRenameDone');
+    this.textChangeHandler?.();
+  }
+
+  /** `endRenaming()`: leaves renaming without a change; the field is cleared and adds tags again. */
+  endRenaming(): void {
+    if (!this.isRenamingValue) {
+      return;
+    }
+    this.isRenamingValue = false;
+    this.text = '';
+    this.placeholder = CYLMenuLocalizedString('CYLMenuAddTagPlaceholder');
+    this.addTitle = CYLMenuLocalizedString('CYLMenuAddTag');
+    this.textChangeHandler?.();
+  }
+
   /**
    * Submits the name in the field (as the Add button does): calls `submitHandler` and clears the field. An empty name
    * does nothing. Returns the announcement for screen readers ("Tag added: <name>", `CYLMenuTagAdded`), or ''.
@@ -43,9 +74,11 @@ export class CYLTagListAddItemView {
     if (name.length === 0) {
       return '';
     }
+    const renaming = this.isRenamingValue;
+    this.endRenaming();
     this.text = '';
     this.textChangeHandler?.();
     this.submitHandler?.(name);
-    return CYLMenuLocalizedString('CYLMenuTagAdded').replace('%@', name);
+    return CYLMenuLocalizedString(renaming ? 'CYLMenuTagRenamed' : 'CYLMenuTagAdded').replace('%@', name);
   }
 }

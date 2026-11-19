@@ -16,6 +16,7 @@ const IMAGES: Map<string, Resource> = new Map<string, Resource>([
   ['cyl_filter_normal', $r('app.media.cyl_filter_normal')],
   ['cyl_fold_chevron', $r('app.media.cyl_fold_chevron')],
   ['cyl_more', $r('app.media.cyl_more')],
+  ['cyl_trash', $r('app.media.cyl_trash')],
   ['cyl_tag_plus', $r('app.media.cyl_tag_plus')],
   ['home_btn_cosmetic', $r('app.media.home_btn_cosmetic')],
   ['home_btn_more_normal', $r('app.media.home_btn_more_normal')],

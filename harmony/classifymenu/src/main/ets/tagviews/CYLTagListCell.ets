@@ -7,6 +7,7 @@ import { CYLAccessibilitySelectedModifier } from '../core/CYLAccessibilitySelect
  * `CYLTagListCell` holds the state and the API; `CYLTagListCellComponent` draws it.
  */
 import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
+import { CYLRect } from '../core/CYLTypes';
 import { CYLMenuStyle } from '../core/CYLMenuStyle';
 import { CYLImage, CYLPoint } from '../core/CYLTypes';
 import { CYLTagButton, CYLTagButtonComponent } from './CYLTagButton';
@@ -44,6 +45,42 @@ export class CYLTagListCell {
   /** Set by the component to play ripples. */
   rippleListener?: (ripple: CYLTagRipple) => void;
   private deletableValue: boolean = false;
+  private renamableValue: boolean = false;
+  /** `renameHandler`: called when the rename indicator is tapped, and on a title tap while `renamesOnTitleTap`. */
+  renameHandler?: () => void;
+  /** `renamesOnTitleTap`: a tap on the title (outside the editing icons) renames too. Needs `isRenamable`. */
+  renamesOnTitleTap: boolean = false;
+
+  /**
+   * `isRenamable`: shows the rename indicator (an edit icon before the cross, `CYLTagButton.showsRenameIndicator`) and
+   * makes it tappable. Needs `isDeletable`. False by default.
+   */
+  get isRenamable(): boolean {
+    return this.renamableValue;
+  }
+
+  set isRenamable(value: boolean) {
+    this.renamableValue = value;
+    this.button.showsRenameIndicator = value;
+    this.revision++;
+  }
+
+  /** The label of the rename indicator for screen readers ("Edit"). */
+  get renameAccessibilityLabel(): string {
+    return CYLMenuLocalizedString('CYLMenuRenameTag');
+  }
+
+  /** The title's tap area while `renamesOnTitleTap`: the title, clear of the editing icons, 4 vp taller each way. */
+  get renameTitleFrame(): CYLRect {
+    if (!this.renamableValue || !this.renamesOnTitleTap) {
+      return new CYLRect();
+    }
+    const title = this.button.titleLabel.frame;
+    const icons = Math.min(this.button.renameIndicatorHitFrame.x, this.button.deleteIndicatorHitFrame.x);
+    const right = title.maxX > icons && title.x < icons ? icons : title.maxX;
+    const top = Math.max(0, title.y - 4);
+    return new CYLRect(title.x, top, Math.max(0, right - title.x), Math.min(this.button.bounds.height, title.maxY + 4) - top);
+  }
 
   /** Shows the delete indicator and makes it tappable. False by default. */
   get isDeletable(): boolean {
@@ -118,6 +155,9 @@ export class CYLTagListCell {
   /** Clears what a reused cell must not keep (`prepareForReuse`). */
   prepareForReuse(): void {
     this.deleteHandler = undefined;
+    this.renameHandler = undefined;
+    this.renamesOnTitleTap = false;
+    this.isRenamable = false;
     this.isDeletable = false;
   }
 }
@@ -192,6 +232,24 @@ export struct CYLTagListCellComponent {
           .id(CYLTagListAccessibilityIdentifier.deleteButton)
           .accessibilityText(this.cell.deleteAccessibilityLabel)
           .onClick(() => this.cell.deleteHandler?.())
+      }
+      if (this.cell.revision >= 0 && this.cell.isRenamable) {
+        Column()
+          .width(this.cell.button.renameIndicatorHitFrame.width)
+          .height(this.cell.button.renameIndicatorHitFrame.height)
+          .position({ x: this.cell.button.renameIndicatorHitFrame.x, y: this.cell.button.renameIndicatorHitFrame.y })
+          .id(CYLTagListAccessibilityIdentifier.renameButton)
+          .accessibilityText(this.cell.renameAccessibilityLabel)
+          .onClick(() => this.cell.renameHandler?.())
+        if (this.cell.renamesOnTitleTap) {
+          Column()
+            .width(this.cell.renameTitleFrame.width)
+            .height(this.cell.renameTitleFrame.height)
+            .position({ x: this.cell.renameTitleFrame.x, y: this.cell.renameTitleFrame.y })
+            .id(CYLTagListAccessibilityIdentifier.renameTitle)
+            .accessibilityLevel('no')
+            .onClick(() => this.cell.renameHandler?.())
+        }
       }
     }
     .clip(true)

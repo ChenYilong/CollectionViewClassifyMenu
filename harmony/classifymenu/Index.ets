@@ -1,6 +1,7 @@
 export { CYLTagListView } from './src/main/ets/components/CYLTagListView';
 export {
-  CYLTagListCache, CYLTagListCachePolicy, CYLTagListDataOrigin, CYLTagListLoadPolicy, CYLTagListRemoteSource, CYLTagListStore
+  CYLTagListCache, CYLTagListCacheItem, CYLTagListCachePolicy, CYLTagListDataOrigin, CYLTagListLoadPolicy,
+  CYLTagListRemoteSource, CYLTagListStore
 } from './src/main/ets/core/CYLTagListCache';
 export { CYLTagListAddItemView } from './src/main/ets/components/CYLTagListAddItemView';
 export {

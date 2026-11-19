@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 902 / 902 = 100.0 / 100** (API 880 / 880, demos 22 / 22). Both tables are scored together: every TODO removed
+**Score: 944 / 944 = 100.0 / 100** (API 922 / 922, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -290,6 +290,9 @@ overrides left out.
 | `CYLMenuDataSource.menuMoveItem(at:to:)` (CYLMenuDataSource.swift) | `menuMoveItem?` | method |
 | `CYLMenuDataSource.menuSectionAllowsEditing(_:)` (CYLMenuDataSource.swift) | `menuSectionAllowsEditing?` | method |
 | `CYLMenuDataSource.menuCacheKey(forSection:)` (CYLMenuDataSource.swift) | `menuCacheKeyForSection?` | method |
+| `CYLMenuDataSource.menuShowsClearButton(forSection:)` (CYLMenuDataSource.swift) | `CYLMenuDataSource.menuShowsClearButtonForSection?(section)` | method |
+| `CYLMenuDataSource.menuIdentifierForItem(at:)` (CYLMenuDataSource.swift) | `CYLMenuDataSource.menuIdentifierForItem?(indexPath)` | method |
+| `CYLMenuDataSource.menuRenameItem(at:to:)` (CYLMenuDataSource.swift) | `CYLMenuDataSource.menuRenameItem?(indexPath, title)` | method |
 | `CYLMenuDelegate` (CYLMenuDataSource.swift) | `interface CYLMenuDelegate` | protocol |
 | `CYLMenuDelegate.menu(_:shouldSelectItemAt:)` (CYLMenuDataSource.swift) | `menuShouldSelectItem?` | method |
 | `CYLMenuDelegate.menu(_:didSelectItemAt:)` (CYLMenuDataSource.swift) | `menuDidSelectItem?` | method |
@@ -303,6 +306,9 @@ overrides left out.
 | `CYLMenuDelegate.menu(_:didDeleteItemAt:)` (CYLMenuDataSource.swift) | `menuDidDeleteItem?` | method |
 | `CYLMenuDelegate.menu(_:didChangeEditing:)` (CYLMenuDataSource.swift) | `menuDidChangeEditing?` | method |
 | `CYLMenuDelegate.menu(_:didFinishEditingWithTitles:)` (CYLMenuDataSource.swift) | `menuDidFinishEditingWithTitles?` | method |
+| `CYLMenuDelegate.menu(_:didFinishEditingWithItems:)` (CYLMenuDataSource.swift) | `CYLMenuDelegate.menuDidFinishEditingWithItems?(menu, items)` | method |
+| `CYLMenuDelegate.menu(_:didRenameItemAt:to:)` (CYLMenuDataSource.swift) | `CYLMenuDelegate.menuDidRenameItem?(menu, indexPath, title)` | method |
+| `CYLMenuDelegate.menu(_:didTapClearButtonInSection:)` (CYLMenuDataSource.swift) | `CYLMenuDelegate.menuDidTapClearButtonInSection?(menu, section)` | method |
 | `CYLMenuDelegate.menu(_:didLongPressItemAt:)` (CYLMenuDataSource.swift) | `menuDidLongPressItem?` | method |
 | `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` (CYLMenuDataSource.swift) | `menuDidMoveItem?` | method |
 | `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` (CYLMenuDataSource.swift) | `menuDidBeginDraggingSelectedItem?` | method |
@@ -316,6 +322,7 @@ overrides left out.
 | `CYLMenuLocalizedString(_:)` (CYLMenuResources.swift) | `CYLMenuLocalizedString(key)` (core/CYLMenuResources.ets) | method |
 | `CYLMenuResources` (CYLMenuResources.swift) | `class CYLMenuResources` | class |
 | `CYLMenuResources.static bundle` (CYLMenuResources.swift) | `CYLMenuResources.bundle` | property |
+| `CYLMenuResources.static imagesBundle` (CYLMenuResources.swift) | the module's `resources/base/media` (`cyl_trash`), read by `CYLMenuResources.image(name)` | property |
 | `CYLMenuResources.static image(named:)` (CYLMenuResources.swift) | `CYLMenuResources.image(name) (the HAR's media)` | method |
 | `CYLMenuResources.static availableLanguages` (CYLMenuResources.swift) | `CYLMenuResources.availableLanguages` | property |
 | `CYLMenuResources.static preferredLanguage` (CYLMenuResources.swift) | `CYLMenuResources.preferredLanguage` | property |
@@ -380,6 +387,10 @@ overrides left out.
 | `CYLMenuStyle.deleteIndicatorLineWidth` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorLineWidth` | property |
 | `CYLMenuStyle.deleteIndicatorWidth` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorWidth` | property |
 | `CYLMenuStyle.deleteIndicatorPadding` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorPadding` | property |
+| `CYLMenuStyle.editingIndicatorSpacing` (CYLMenuStyle.swift) | `CYLMenuStyle.editingIndicatorSpacing` | property |
+| `CYLMenuStyle.clearButtonImage` (CYLMenuStyle.swift) | `CYLMenuStyle.clearButtonImage` | property |
+| `CYLMenuStyle.clearButtonColor` (CYLMenuStyle.swift) | `CYLMenuStyle.clearButtonColor` | property |
+| `CYLMenuStyle.editingIndicatorInsets` (CYLMenuStyle.swift) | `CYLMenuStyle.editingIndicatorInsets` | property |
 | `CYLMenuStyle.deleteIndicatorPlacement` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorPlacement` | property |
 | `CYLMenuStyle.rippleColor` (CYLMenuStyle.swift) | `CYLMenuStyle.rippleColor` | property |
 | `CYLMenuStyle.rippleAlpha` (CYLMenuStyle.swift) | `CYLMenuStyle.rippleAlpha` | property |
@@ -524,6 +535,9 @@ overrides left out.
 | `CYLTagButton.badgeColor` (CYLTagButton.swift) | `CYLTagButton.badgeColor` (`CYLTagBadgeDefaultColor` by default) | property |
 | `CYLTagButton.showsDeleteIndicator` (CYLTagButton.swift) | `CYLTagButton.showsDeleteIndicator` | property |
 | `CYLTagButton.deleteIndicatorHitFrame` (CYLTagButton.swift) | `CYLTagButton.deleteIndicatorHitFrame` | property |
+| `CYLTagButton.showsRenameIndicator` (CYLTagButton.swift) | `CYLTagButton.showsRenameIndicator` | property |
+| `CYLTagButton.renameIndicatorHitFrame` (CYLTagButton.swift) | `CYLTagButton.renameIndicatorHitFrame` | property |
+| `CYLTagButton.editingIndicatorsView` (CYLTagButton.swift) | `CYLTagButton.editingIndicatorsView` (a `CYLAnimatedItemStackModel`; the tag draws its two icons side by side) | property |
 | `CYLTagButton.style` (CYLTagButton.swift) | `CYLTagButton.style` | property |
 | `CYLTagButton.static isAnimationEngineAvailable` (CYLTagButton.swift) | `CYLTagButton.isAnimationEngineAvailable` | property |
 | `CYLTagButton.init?(coder:)` (CYLTagButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
@@ -531,7 +545,7 @@ overrides left out.
 | `CYLTagButton.init(title:image:animationURL:)` (CYLTagButton.swift) | `new CYLTagButton(title, image, animationURL)` | init |
 | `CYLTagButton.resetAnimationSpeed()` (CYLTagButton.swift) | `CYLTagButton.resetAnimationSpeed()` | method |
 | `CYLTagButton.static width(forTitle:image:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.widthWithImage(title, image, style, fontScale)` | method |
-| `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.width(title, iconSize, showsDeleteIndicator, style, fontScale)` | method |
+| `CYLTagButton.static width(forTitle:iconSize:showsDeleteIndicator:showsRenameIndicator:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.widthWithRenameIndicator(title, iconSize, showsDeleteIndicator, showsRenameIndicator, style, fontScale)` | method |
 | `CYLTagButton.static iconSize(for:animated:style:)` (CYLTagButton.swift) | `CYLTagButton.iconSize(image, animated, style)` | method |
 | `CYLTagButton.static height(for:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.height(style, fontScale)` | method |
 | `CYLTagButton.static height(forTitle:iconSize:style:traitCollection:)` (CYLTagButton.swift) | `CYLTagButton.heightForTitle(title, iconSize, style, fontScale)` | method |
@@ -580,10 +594,16 @@ overrides left out.
 | `CYLTagListAccessibilityIdentifier.static createItem` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.createItem` | property |
 | `CYLTagListAccessibilityIdentifier.static moreButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.moreButton` | property |
 | `CYLTagListAccessibilityIdentifier.static deleteButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.deleteButton` | property |
+| `CYLTagListAccessibilityIdentifier.static renameButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.renameButton` | property |
+| `CYLTagListAccessibilityIdentifier.static renameTitle` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.renameTitle` | property |
+| `CYLTagListAccessibilityIdentifier.static clearButton` (CYLTagListAccessibility.swift) | `CYLTagListAccessibilityIdentifier.clearButton` | property |
 | `CYLTagListAddItemView` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView` (its model; `CYLTagListView` draws a `TextInput` and a `Button`) | class |
 | `CYLTagListAddItemView.textField` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.text` / `placeholder` (the view's `TextInput`, id `CYLTagListAddItemField`) | property |
 | `CYLTagListAddItemView.addButton` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.addTitle` (the view's `Button`, id `CYLTagListAddItemButton`) | property |
 | `CYLTagListAddItemView.submitHandler` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.submitHandler` | property |
+| `CYLTagListAddItemView.isRenaming` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.isRenaming` | property |
+| `CYLTagListAddItemView.beginRenaming(title:)` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.beginRenaming(title)` | method |
+| `CYLTagListAddItemView.endRenaming()` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.endRenaming()` | method |
 | `CYLTagListAddItemView.preferredHeight` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.preferredHeight` | property |
 | `CYLTagListAddItemView.init?(coder:)` (CYLTagListAddItemView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagListAddItemView.static textFieldIdentifier` (CYLTagListAddItemView.swift) | `CYLTagListAddItemView.textFieldIdentifier` | property |
@@ -601,6 +621,12 @@ overrides left out.
 | `CYLTagListCache.saveTitles(_:forSection:)` (CYLTagListCache.swift) | `CYLTagListCache.saveTitles(titles, section)` | method |
 | `CYLTagListCache.removeTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListCache.removeTitles(section)` | method |
 | `CYLTagListCache.removeAllTitles()` (CYLTagListCache.swift) | `CYLTagListCache.removeAllTitles()` | method |
+| `CYLTagListCache.cachedItems(forSection:)` (CYLTagListCache.swift) | `CYLTagListCache.cachedItems?(section)` | method |
+| `CYLTagListCache.saveItems(_:forSection:)` (CYLTagListCache.swift) | `CYLTagListCache.saveItems?(items, section)` | method |
+| `CYLTagListCacheItem` (CYLTagListCache.swift) | `CYLTagListCacheItem` | class |
+| `CYLTagListCacheItem.identifier` (CYLTagListCache.swift) | `CYLTagListCacheItem.identifier` | property |
+| `CYLTagListCacheItem.title` (CYLTagListCache.swift) | `CYLTagListCacheItem.title` | property |
+| `CYLTagListCacheItem.init(identifier:title:)` (CYLTagListCache.swift) | `new CYLTagListCacheItem(identifier, title)` | init |
 | `CYLTagListStore` (CYLTagListCache.swift) | `CYLTagListStore` | class |
 | `CYLTagListStore.policy` (CYLTagListCache.swift) | `CYLTagListStore.policy` | property |
 | `CYLTagListStore.name` (CYLTagListCache.swift) | `CYLTagListStore.name` | property |
@@ -608,6 +634,8 @@ overrides left out.
 | `CYLTagListStore.init(policy:name:)` (CYLTagListCache.swift) | `new CYLTagListStore(policy, name, context?)` | init |
 | `CYLTagListStore.cachedTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.cachedTitles(section)` | method |
 | `CYLTagListStore.saveTitles(_:forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.saveTitles(titles, section)` | method |
+| `CYLTagListStore.cachedItems(forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.cachedItems(section)` | method |
+| `CYLTagListStore.saveItems(_:forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.saveItems(items, section)` | method |
 | `CYLTagListStore.removeTitles(forSection:)` (CYLTagListCache.swift) | `CYLTagListStore.removeTitles(section)` | method |
 | `CYLTagListStore.removeAllTitles()` (CYLTagListCache.swift) | `CYLTagListStore.removeAllTitles()` | method |
 | `CYLTagListLoadPolicy` (CYLTagListCache.swift) | `CYLTagListLoadPolicy` | enum |
@@ -619,11 +647,15 @@ overrides left out.
 | `CYLTagListDataOrigin.network` (CYLTagListCache.swift) | `CYLTagListDataOrigin.network` | case |
 | `CYLTagListRemoteSource` (CYLTagListCache.swift) | `CYLTagListRemoteSource` (interface) | protocol |
 | `CYLTagListRemoteSource.fetchSections(withKeys:)` (CYLTagListCache.swift) | `CYLTagListRemoteSource.fetchSectionsWithKeys(keys, completion)` | method |
+| `CYLTagListRemoteSource.fetchItems(withKeys:)` (CYLTagListCache.swift) | `CYLTagListRemoteSource.fetchItemsWithKeys?(keys, completion)` | method |
 | `CYLTagListCell` (CYLTagListCell.swift) | `CYLTagListCell` (tagviews/CYLTagListCell.ets + component) | class |
 | `CYLTagListCell.button` (CYLTagListCell.swift) | `CYLTagListCell.button` | property |
 | `CYLTagListCell.appliedStyle` (CYLTagListCell.swift) | `CYLTagListCell.appliedStyle` | property |
 | `CYLTagListCell.isDeletable` (CYLTagListCell.swift) | `CYLTagListCell.isDeletable` | property |
 | `CYLTagListCell.deleteHandler` (CYLTagListCell.swift) | `CYLTagListCell.deleteHandler` | property |
+| `CYLTagListCell.isRenamable` (CYLTagListCell.swift) | `CYLTagListCell.isRenamable` | property |
+| `CYLTagListCell.renameHandler` (CYLTagListCell.swift) | `CYLTagListCell.renameHandler` | property |
+| `CYLTagListCell.renamesOnTitleTap` (CYLTagListCell.swift) | `CYLTagListCell.renamesOnTitleTap` | property |
 | `CYLTagListCell.additionalAccessibilityActions` (CYLTagListCell.swift) | N/A: no custom accessibility actions in ArkUI (through API 21) | property |
 | `CYLTagListCell.init?(coder:)` (CYLTagListCell.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagListCell.showRipple(at:)` (CYLTagListCell.swift) | `showRipple(point)` | method |
@@ -801,6 +833,10 @@ overrides left out.
 | `CYLTagListView.isEditing` (CYLTagListView.swift) | `CYLTagListState.isEditing` | property |
 | `CYLTagListView.showsAddItemViewWhileEditing` (CYLTagListView.swift) | `CYLTagListState.showsAddItemViewWhileEditing` | property |
 | `CYLTagListView.addItemView` (CYLTagListView.swift) | `CYLTagListState.addItemView` (drawn at `addItemViewFrame`) | property |
+| `CYLTagListView.renamingIndexPath` (CYLTagListView.swift) | `CYLTagListState.renamingIndexPath` | property |
+| `CYLTagListView.renameRequestHandler` (CYLTagListView.swift) | `CYLTagListState.renameRequestHandler` | property |
+| `CYLTagListView.clearButtonHandler` (CYLTagListView.swift) | `CYLTagListState.clearButtonHandler` | property |
+| `CYLTagListView.renamesOnTitleTapWhileEditing` (CYLTagListView.swift) | `CYLTagListState.renamesOnTitleTapWhileEditing` | property |
 | `CYLTagListView.cachePolicy` (CYLTagListView.swift) | `CYLTagListState.cachePolicy` | property |
 | `CYLTagListView.cacheName` (CYLTagListView.swift) | `CYLTagListState.cacheName` | property |
 | `CYLTagListView.cache` (CYLTagListView.swift) | `CYLTagListState.cache` | property |
@@ -810,6 +846,11 @@ overrides left out.
 | `CYLTagListView.cachedTitles(inSection:)` (CYLTagListView.swift) | `CYLTagListState.cachedTitlesInSection(section)` | method |
 | `CYLTagListView.cacheKey(forSection:)` (CYLTagListView.swift) | `CYLTagListState.cacheKeyForSection(section)` | method |
 | `CYLTagListView.saveEditableSectionsToCache()` (CYLTagListView.swift) | `CYLTagListState.saveEditableSectionsToCache()` | method |
+| `CYLTagListView.editableSectionItems()` (CYLTagListView.swift) | `CYLTagListState.editableSectionItems()` | method |
+| `CYLTagListView.beginRenaming(at:)` (CYLTagListView.swift) | `CYLTagListState.beginRenaming(indexPath)` | method |
+| `CYLTagListView.cancelRenaming()` (CYLTagListView.swift) | `CYLTagListState.cancelRenaming()` | method |
+| `CYLTagListView.submitNewItem(named:)` (CYLTagListView.swift) | `CYLTagListState.submitNewItem(name)` | method |
+| `CYLTagListView.finishRenaming(to:)` (CYLTagListView.swift) | `CYLTagListState.finishRenaming(title)` | method |
 | `CYLTagListView.editableSectionTitles()` (CYLTagListView.swift) | `CYLTagListState.editableSectionTitles()` | method |
 | `CYLTagListView.setEditing(_:animated:)` (CYLTagListView.swift) | `CYLTagListState.setEditing(editing, animated)` | method |
 | `CYLTagListView.sectionAllowsEditing(_:)` (CYLTagListView.swift) | `CYLTagListState.sectionAllowsEditing(section)` | method |
@@ -866,6 +907,7 @@ overrides left out.
 | `CYLTagListView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (header frames) | method |
 | `CYLTagListView.collectionView(_:layout:referenceSizeForFooterInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (footer frames) | method |
 | `CYLTagListView.loadSections(withKeys:)` (CYLTagListView.swift) | `CYLTagListState.loadSectionsWithKeys(keys, completion)` | method |
+| `CYLTagListView.loadItems(withKeys:)` (CYLTagListView.swift) | `CYLTagListState.loadItemsWithKeys(keys, completion)` | method |
 | `CYLTagView` (CYLTagView.swift) | `CYLTagView` (tagviews/CYLTagView.ets + CYLTagViewComponent) | class |
 | `CYLTagView.static sectionInset` (CYLTagView.swift) | `CYLTagView.sectionInset` | property |
 | `CYLTagView.static cellSpacing` (CYLTagView.swift) | `CYLTagView.cellSpacing` | property |

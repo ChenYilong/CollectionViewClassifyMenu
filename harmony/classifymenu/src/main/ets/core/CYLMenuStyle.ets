@@ -111,6 +111,20 @@ export class CYLMenuStyle {
    */
   imageFillsTagHeight: boolean = false;
   /**
+   * The space between the two editing icons of a renamable tag in editing mode (the edit icon and the delete icon,
+   * `CYLTagButton.editingIndicatorsView`), vp. 10 by default; a negative value is 0.
+   */
+  editingIndicatorSpacing: number = 10;
+  /**
+   * The margins around the two editing icons as a whole: left from the title, right to the tag's padding, top and
+   * bottom within the tag, vp. Left 4 and right 0 by default; negative values are 0.
+   */
+  editingIndicatorInsets: CYLEdgeInsets = new CYLEdgeInsets(0, 4, 0, 0);
+  /** The image of a section header's clear button; undefined: the core's trash icon ("cyl_trash"). */
+  clearButtonImage?: CYLImage = undefined;
+  /** The color of the clear button; undefined: `headerTextColor`. */
+  clearButtonColor?: ResourceColor = undefined;
+  /**
    * True: a title too wide for its row wraps onto more lines and the tag grows taller, instead of being truncated
    * (AndroidTagView's tag_text_wrap). The list measures the taller tag at the width it gets. Default false.
    */
@@ -342,6 +356,10 @@ export class CYLMenuStyle {
     c.headerIndicatorSize = this.headerIndicatorSize;
     c.imageCornerRadius = this.imageCornerRadius;
     c.imageFillsTagHeight = this.imageFillsTagHeight;
+    c.editingIndicatorSpacing = this.editingIndicatorSpacing;
+    c.editingIndicatorInsets = this.editingIndicatorInsets;
+    c.clearButtonImage = this.clearButtonImage;
+    c.clearButtonColor = this.clearButtonColor;
     c.titleWraps = this.titleWraps;
     c.elevation = this.elevation;
     c.deleteIndicatorImage = this.deleteIndicatorImage;

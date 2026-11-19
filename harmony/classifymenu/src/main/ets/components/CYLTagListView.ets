@@ -16,6 +16,7 @@ import {
 } from './CYLTagListState';
 import { CYLMenuFoldControl, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
+import { CYLTagListAccessibilityIdentifier } from '../tagviews/CYLTagListAccessibility';
 import { CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement } from '../core/CYLMenuStyle';
 import { CYLConfiguration, CYLConfigurationValue } from '../core/CYLTagListConfiguration';
 import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLSize } from '../core/CYLTypes';
@@ -88,6 +89,12 @@ class CYLSectionRender {
   moreImage?: ResourceStr;
   moreColor: string = CYLColor.GRAY;
   moreLabel: string = '';
+  /** The clear button (`menuShowsClearButtonForSection`): a square as tall as a line of the title. */
+  showsClear: boolean = false;
+  clearImage?: ResourceStr;
+  clearColor: ResourceColor = CYLColor.GRAY;
+  clearLabel: string = '';
+  clearSide: number = 0;
   accessory?: WrappedBuilder<[number]>;
 }
 
@@ -410,17 +417,21 @@ export struct CYLTagListView {
     const selectedImage = m.selectedImageForItem(p);
     const animation = m.animationURLForItem(p);
     const resting = m.animationRestingProgressForItem(p);
+    const renamable = deletable && m.isRenamable(p);
     const inputs = [m.viewGeneration, title, imageKey(image), imageKey(selectedImage), animation ?? '', selected,
-      enabled, deletable, m.fontScale, resting].join('|');
+      enabled, deletable, renamable, m.fontScale, resting].join('|');
     if (this.cellInputs.get(k) !== inputs || cell.appliedStyle !== style) {
       this.cellInputs.set(k, inputs);
       cell.button.fontScale = m.fontScale;
       cell.button.animationRestingProgress = resting;
       cell.configure(title, image, selectedImage, animation, style, selected, enabled);
       cell.isDeletable = deletable;
+      cell.isRenamable = renamable;
       cell.accessibilityHint = m.accessibilityHintForItem(p);
     }
     cell.deleteHandler = () => m.deleteItem(p);
+    cell.renamesOnTitleTap = renamable && m.renamesOnTitleTapWhileEditing;
+    cell.renameHandler = renamable ? () => m.beginRenaming(p) : undefined;
     cell.button.animationSpeed = m.animationSpeed;
     cell.button.animationLoops = m.animationLoops;
     const plays = m.playTokenForItem(p) - m.playToken;
@@ -500,7 +511,14 @@ export struct CYLTagListView {
     h.moreColor = view.moreColor;
     h.moreLabel = view.moreAccessibilityLabel;
     h.accessory = view.accessoryView;
-    h.key = ['h', h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
+    h.showsClear = m.showsClearButton(h.section);
+    if (h.showsClear) {
+      h.clearImage = (style.clearButtonImage ?? CYLMenuResources.image('cyl_trash')) as ResourceStr;
+      h.clearColor = style.clearButtonColor ?? style.headerTextColor;
+      h.clearLabel = m.clearButtonLabel(h.section);
+      h.clearSide = Math.min(h.height, Math.ceil(CYLTagButtonMetrics.lineHeight(style.headerFontFor(m.fontScale))));
+    }
+    h.key = ['h', h.showsClear, h.clearLabel, h.clearSide, CYLColorKey(h.clearColor), h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
       h.inset,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
       h.fold.key, h.showsMore, h.moreColor, h.moreLabel, h.accessory !== undefined].join('|');
@@ -920,6 +938,19 @@ export struct CYLTagListView {
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .layoutWeight(1)
+            if (h.showsClear && h.clearImage !== undefined) {
+              // The section's clear button: its top and bottom the title text's, a 44 vp tap area around it.
+              Image(h.clearImage)
+                .width(h.clearSide)
+                .height(h.clearSide)
+                .objectFit(ImageFit.Contain)
+                .fillColor(h.clearColor)
+                .responseRegion({ x: -Math.max(0, (44 - h.clearSide) / 2), y: -Math.max(0, (44 - h.clearSide) / 2),
+                  width: Math.max(44, h.clearSide), height: Math.max(44, h.clearSide) })
+                .id(CYLTagListAccessibilityIdentifier.clearButton)
+                .accessibilityText(h.clearLabel)
+                .onClick(() => this.model.tapClearButton(h.section))
+            }
             if (h.showsMore && h.moreImage !== undefined) {
               Image(h.moreImage)
                 .width(24)

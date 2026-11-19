@@ -1263,4 +1263,12 @@ tags: [issues, ui, cocoapods, progress]
   library's `resources/CYLClassifyMenuImages.bundle` (`cyl_trash` at 1x / 2x / 3x), read first by `imageNamed`. Core
   strings copied from iOS. New `CYLTagListRenamingTest` (4, as iOS); library 98 / 0, the example builds.
   `docs/android-api.md` 888 / 888, `docs/android-ios-api.md` 826 / 826.
-- **TODO:** HarmonyOS and the mini program.
+- **HarmonyOS (done in code, 25 / 30; an emulator screenshot is still due):** the same API on `CYLTagListState`,
+  `CYLTagListCell`, `CYLTagButton` (`editingIndicatorsView` is CYLTabBarController's `CYLAnimatedItemStackModel` with
+  `sys.symbol.square_and_pencil` and `sys.symbol.xmark`; the tag draws them side by side as tinted `SymbolGlyph`s,
+  because the HarmonyOS `CYLAnimatedItemStackView` stacks vertically only and does not tint symbols), the store's
+  `#items` companion section, the header clear button (`cyl_trash` in `resources/base/media`, a 44 vp
+  `responseRegion`). Cap height: 0.7 of the font size (HarmonyOS Sans). 4 new host tests (`TagListEditing.test.ets`, the
+  iOS cases); 75 / 75; the app builds; `docs/harmony.md` 944 / 944.
+- **TODO:** HarmonyOS emulator screenshot of the editing icons and the clear button; the mini program; CYLTabBarController:
+  a horizontal axis (and symbol tint) for the HarmonyOS `CYLAnimatedItemStackView`, so the tag can use the view itself.

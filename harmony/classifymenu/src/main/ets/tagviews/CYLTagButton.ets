@@ -16,7 +16,7 @@
  * pixel map or a system symbol (`$r('sys.symbol.camera')`, drawn with `SymbolGlyph`); every color takes a
  * `ResourceColor`, so theme colors (`$r('sys.color.font_primary')`) follow the color mode.
  */
-import { CYLAnimatedItemEngines } from 'cylanimateditem';
+import { CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel } from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import {
   CYLTagAnimatedIcon, cylTagAnimatedIconOuterHeight, cylTagAnimatedIconOuterWidth, cylTagAnimationImage
@@ -112,6 +112,9 @@ export class CYLTagButton {
   private animationSpeedValue?: number;
   private animationLoopsValue: boolean = false;
   private showsDeleteIndicatorValue: boolean = false;
+  private showsRenameIndicatorValue: boolean = false;
+  private renameHitFrame: CYLRect = new CYLRect();
+  private editingIndicatorsModel?: CYLAnimatedItemStackModel;
   private badgeValueStorage?: string;
   private badgeColorStorage: ResourceColor = CYLTagBadgeDefaultColor;
   private badgeTextColorStorage?: ResourceColor;
@@ -158,6 +161,10 @@ export class CYLTagButton {
   crossLineWidth: number = 0;
   crossColor: ResourceColor = CYLColor.BLACK;
   showsCross: boolean = false;
+  /** The frames of the two editing icons (the edit icon, then the cross) while `showsRenameIndicator`, or empty. */
+  editingIconFrames: CYLRect[] = [];
+  /** The color of the editing icons (`CYLMenuStyle.deleteIndicatorColor`, else the text color). */
+  editingIconColor: ResourceColor = CYLColor.BLACK;
   cornerRadius: number = 0;
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   backgroundImage?: ResourceStr;
@@ -454,6 +461,48 @@ export class CYLTagButton {
   }
 
   /**
+   * `showsRenameIndicator`: shows a rename indicator (an edit icon, `sys.symbol.square_and_pencil`) before the delete
+   * indicator, for a tag that can be renamed in editing mode; with `showsDeleteIndicator`, the two icons are drawn by
+   * `editingIndicatorsView` instead of the style's indicator. False by default.
+   */
+  get showsRenameIndicator(): boolean {
+    return this.showsRenameIndicatorValue;
+  }
+
+  set showsRenameIndicator(value: boolean) {
+    if (value !== this.showsRenameIndicatorValue) {
+      this.showsRenameIndicatorValue = value;
+      this.updateAppearance();
+    }
+  }
+
+  /** `renameIndicatorHitFrame`: the area a tap on the rename indicator covers, the tag's full height; empty while hidden. */
+  get renameIndicatorHitFrame(): CYLRect {
+    return this.renameHitFrame;
+  }
+
+  /**
+   * `editingIndicatorsView`: the two editing icons while `showsRenameIndicator` (the edit icon, then the cross), as a
+   * CYLTabBarController `CYLAnimatedItemStackModel` of icon-only items, `CYLMenuStyle.editingIndicatorSpacing` apart.
+   * The tag draws its items side by side (the HarmonyOS stack view stacks vertically only).
+   */
+  get editingIndicatorsView(): CYLAnimatedItemStackModel {
+    if (this.editingIndicatorsModel === undefined) {
+      const rename = new CYLAnimatedItemStackItem('', $r('sys.symbol.square_and_pencil'));
+      rename.accessibilityText = CYLMenuLocalizedString('CYLMenuRenameTag');
+      const remove = new CYLAnimatedItemStackItem('', $r('sys.symbol.xmark'));
+      remove.accessibilityText = CYLMenuLocalizedString('CYLMenuDeleteTag');
+      this.editingIndicatorsModel = new CYLAnimatedItemStackModel([rename, remove]);
+    }
+    return this.editingIndicatorsModel;
+  }
+
+  /** Whether the two editing icons replace the delete indicator. */
+  get showsEditingIcons(): boolean {
+    return this.showsDeleteIndicatorValue && this.showsRenameIndicatorValue;
+  }
+
+  /**
    * The style the tag is drawn with. Setting copies it; set it again after changing it.
    */
   get style(): CYLMenuStyle {
@@ -540,6 +589,11 @@ export class CYLTagButton {
   /**
    * `width(forTitle:iconSize:showsDeleteIndicator:style:traitCollection:)`.
    */
+  static widthWithRenameIndicator(title: string | undefined, iconSize: CYLSize, showsDeleteIndicator: boolean,
+    showsRenameIndicator: boolean, style: CYLMenuStyle, fontScale: number = 1): number {
+    return CYLTagButtonMetrics.width(title, iconSize, showsDeleteIndicator, style, fontScale, showsRenameIndicator);
+  }
+
   static width(title: string | undefined, iconSize: CYLSize, showsDeleteIndicator: boolean, style: CYLMenuStyle,
     fontScale: number = 1): number {
     return CYLTagButtonMetrics.width(title, iconSize, showsDeleteIndicator, style, fontScale);
@@ -586,8 +640,8 @@ export class CYLTagButton {
   intrinsicSize(): CYLSize {
     const animated = this.animationURLValue !== undefined;
     const icon = CYLTagButton.iconSize(this.imageValue ?? this.selectedImageValue, animated, this.styleStorage);
-    const width = CYLTagButton.width(this.titleValue, icon, this.showsDeleteIndicatorValue, this.styleStorage,
-      this.fontScale);
+    const width = CYLTagButtonMetrics.width(this.titleValue, icon, this.showsDeleteIndicatorValue, this.styleStorage,
+      this.fontScale, this.showsRenameIndicatorValue);
     const height = CYLTagButton.heightForTitle(this.titleValue, icon, this.styleStorage, this.fontScale);
     const minimum = this.minimumSizeStorage;
     return new CYLSize(Math.max(width, minimum.width), Math.max(height, minimum.height));
@@ -817,11 +871,16 @@ export class CYLTagButton {
     const style = this.styleStorage;
     const width = this.boundsWidth;
     const height = this.boundsHeight;
+    this.renameHitFrame = new CYLRect();
+    this.editingIconFrames = [];
     if (!this.showsDeleteIndicatorValue) {
       this.deleteIndicatorLabel.frame = new CYLRect();
       this.hitFrame = new CYLRect();
       this.crossLines = [];
       return 0;
+    }
+    if (this.showsRenameIndicatorValue) {
+      return this.layOutEditingIndicators(state, insets);
     }
     const indicatorWidth = CYLTagButtonMetrics.deleteIndicatorWidth(state, style, this.fontScale);
     const leadingIndicator = style.deleteIndicatorPlacement === CYLTagDeleteIndicatorPlacement.leading;
@@ -850,6 +909,52 @@ export class CYLTagButton {
     this.deleteIndicatorImageFrame = new CYLRect(indicator.x + (indicator.width - imageSide) / 2,
       indicator.y + (indicator.height - imageSide) / 2, imageSide, imageSide);
     return indicatorWidth + style.imageTitleSpacing;
+  }
+
+  /**
+   * The two editing icons (iOS 3af1b7cd): each slot the title's cap height x 1.25 with the glyph filling it,
+   * `editingIndicatorSpacing` between them, `editingIndicatorInsets` around them; the rename hit area runs to the
+   * middle of the space between them, the delete one from there.
+   */
+  private layOutEditingIndicators(state: number, insets: CYLEdgeInsets): number {
+    const style = this.styleStorage;
+    const width = this.boundsWidth;
+    const height = this.boundsHeight;
+    const side = CYLTagButtonMetrics.editingIconSide(state, style, this.fontScale);
+    const spacing = Math.max(0, style.editingIndicatorSpacing);
+    const m = style.editingIndicatorInsets;
+    const left = Math.max(0, m.left);
+    const right = Math.max(0, m.right);
+    const top = Math.max(0, m.top);
+    const bottom = Math.max(0, m.bottom);
+    const total = left + 2 * side + spacing + right;
+    const leading = style.deleteIndicatorPlacement === CYLTagDeleteIndicatorPlacement.leading;
+    const x = leading ? insets.left : Math.max(insets.left, width - insets.right - total);
+    const outerHeight = Math.max(0, height - insets.top - insets.bottom);
+    const areaY = insets.top + top;
+    const areaHeight = Math.max(0, outerHeight - top - bottom);
+    const glyph = Math.max(0, Math.min(side, areaHeight));
+    const model = this.editingIndicatorsView;
+    model.items.forEach((item: CYLAnimatedItemStackItem, index: number) => {
+      item.iconSize = glyph;
+      item.spacingBefore = index === 0 ? 0 : spacing;
+    });
+    const glyphY = areaY + (areaHeight - glyph) / 2;
+    const firstX = x + left;
+    this.editingIconFrames = [new CYLRect(firstX + (side - glyph) / 2, glyphY, glyph, glyph),
+      new CYLRect(firstX + side + spacing + (side - glyph) / 2, glyphY, glyph, glyph)];
+    this.deleteIndicatorLabel.frame = new CYLRect();
+    this.crossLines = [];
+    const middle = firstX + side + spacing / 2;
+    if (leading) {
+      this.renameHitFrame = new CYLRect(0, 0, middle, height);
+      this.hitFrame = new CYLRect(middle, 0, Math.max(0, x + total + style.imageTitleSpacing - middle), height);
+    } else {
+      const start = Math.max(0, x - style.imageTitleSpacing);
+      this.renameHitFrame = new CYLRect(start, 0, Math.max(0, middle - start), height);
+      this.hitFrame = new CYLRect(middle, 0, Math.max(0, width - middle), height);
+    }
+    return total + style.imageTitleSpacing;
   }
 
   /**
@@ -933,10 +1038,15 @@ export class CYLTagButton {
     this.backgroundColor = pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor;
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;
-    const indicatorImage: CYLImage | undefined = style.deleteIndicatorImage;
-    const drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage === undefined;
-    this.deleteIndicatorLabel.isHidden = !this.showsDeleteIndicatorValue || drawsCross || indicatorImage !== undefined;
-    this.deleteIndicatorLabel.text = this.showsDeleteIndicatorValue && !drawsCross && indicatorImage === undefined ?
+    // With the rename indicator, the two editing icons are drawn instead of the style's indicator.
+    const editingIcons = this.showsDeleteIndicatorValue && this.showsRenameIndicatorValue;
+    const indicatorImage: CYLImage | undefined = editingIcons ? undefined : style.deleteIndicatorImage;
+    const drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage === undefined && !editingIcons;
+    this.editingIconColor = style.deleteIndicatorColor ?? appearance.textColor;
+    this.deleteIndicatorLabel.isHidden = !this.showsDeleteIndicatorValue || drawsCross || indicatorImage !== undefined ||
+      editingIcons;
+    this.deleteIndicatorLabel.text = this.showsDeleteIndicatorValue && !drawsCross && indicatorImage === undefined &&
+      !editingIcons ?
     style.deleteIndicatorTitle : undefined;
     this.showsCross = this.showsDeleteIndicatorValue && drawsCross;
     this.deleteIndicatorImage = this.showsDeleteIndicatorValue ? indicatorImage : undefined;
@@ -1126,6 +1236,18 @@ export struct CYLTagButtonComponent {
           .height(this.button.deleteIndicatorImageFrame.height)
           .position({ x: this.button.deleteIndicatorImageFrame.x, y: this.button.deleteIndicatorImageFrame.y })
           .accessibilityLevel('no')
+      }
+      if (this.button.showsEditingIcons) {
+        // `editingIndicatorsView`'s two icons side by side, in the indicator color.
+        ForEach(this.button.editingIconFrames, (frame: CYLRect, index: number) => {
+          SymbolGlyph(this.button.editingIndicatorsView.items[index].image as Resource)
+            .fontSize(frame.height)
+            .fontColor([this.button.editingIconColor])
+            .width(frame.width)
+            .height(frame.height)
+            .position({ x: frame.x, y: frame.y })
+            .accessibilityLevel('no')
+        }, (frame: CYLRect, index: number) => `${index}|${frame.x}|${frame.y}|${frame.width}`)
       }
       if (this.button.showsCross) {
         ForEach(this.button.crossLines, (line: number[]) => {
