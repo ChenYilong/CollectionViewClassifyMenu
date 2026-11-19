@@ -52,3 +52,9 @@
 "CYLMenuAddTag" = "新增標籤";
 "CYLMenuAddTagPlaceholder" = "標籤名稱";
 "CYLMenuTagAdded" = "已新增標籤：%@";
+
+/* CYLTagListView editing: renaming a tag (the pencil before the delete indicator, the add control as the rename field). */
+"CYLMenuRenameTag" = "編輯";
+"CYLMenuRenamePlaceholder" = "新名稱";
+"CYLMenuRenameDone" = "完成";
+"CYLMenuTagRenamed" = "已重新命名標籤：%@";

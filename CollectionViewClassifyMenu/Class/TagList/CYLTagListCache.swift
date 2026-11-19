@@ -56,6 +56,57 @@ import SQLite3
      * Removes every section of this cache.
      */
     func removeAllTitles()
+
+    /**
+     * The items (stable identifier and title) saved for `section`, in order; nil when none were saved. Optional: a
+     * cache without it keeps titles only.
+     */
+    @objc optional func cachedItems(forSection section: String) -> [CYLTagListCacheItem]?
+
+    /**
+     * Saves `items` (in this order) as the contents of `section`; `cachedTitles(forSection:)` then returns their titles.
+     */
+    @objc optional func saveItems(_ items: [CYLTagListCacheItem], forSection section: String)
+}
+
+/**
+ * One saved item of a tag list: its stable identifier (a database id; the title when the item has none) and its
+ * current title. A reorder or a rename keeps the identifier, so whatever the host binds to it (contacts) stays bound.
+ */
+@objc(CYLTagListCacheItem)
+@objcMembers
+public final class CYLTagListCacheItem: NSObject {
+    /**
+     * The stable identifier.
+     */
+    public let identifier: String
+
+    /**
+     * The title shown.
+     */
+    public let title: String
+
+    /**
+     * An item with `identifier` and `title`.
+     */
+    public init(identifier: String, title: String) {
+        self.identifier = identifier
+        self.title = title
+        super.init()
+    }
+
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? CYLTagListCacheItem else { return false }
+        return identifier == other.identifier && title == other.title
+    }
+
+    public override var hash: Int {
+        identifier.hashValue ^ title.hashValue
+    }
+
+    public override var description: String {
+        "\(identifier):\(title)"
+    }
 }
 
 /**
@@ -105,6 +156,16 @@ public final class CYLTagListStore: NSObject, CYLTagListCache {
     // MARK: - CYLTagListCache
 
     public func cachedTitles(forSection section: String) -> [String]? {
+        rawTitles(forSection: section)
+    }
+
+    public func saveTitles(_ titles: [String], forSection section: String) {
+        // Plain titles replace any items saved for the section.
+        removeRawTitles(forSection: Self.itemsSection(section))
+        saveRawTitles(titles, forSection: section)
+    }
+
+    private func rawTitles(forSection section: String) -> [String]? {
         switch policy {
         case .none:
             return nil
@@ -117,7 +178,7 @@ public final class CYLTagListStore: NSObject, CYLTagListCache {
         }
     }
 
-    public func saveTitles(_ titles: [String], forSection section: String) {
+    private func saveRawTitles(_ titles: [String], forSection section: String) {
         switch policy {
         case .none:
             return
@@ -147,7 +208,37 @@ public final class CYLTagListStore: NSObject, CYLTagListCache {
         }
     }
 
+    // MARK: Items (a companion section of encoded "identifier<US>title" entries next to the titles)
+
+    private static let itemSeparator = "\u{1F}"
+
+    private static func itemsSection(_ section: String) -> String {
+        section + "#items"
+    }
+
+    public func cachedItems(forSection section: String) -> [CYLTagListCacheItem]? {
+        if let encoded = rawTitles(forSection: Self.itemsSection(section)) {
+            return encoded.map { entry in
+                let parts = entry.components(separatedBy: Self.itemSeparator)
+                return parts.count >= 2 ? CYLTagListCacheItem(identifier: parts[0], title: parts.dropFirst().joined(separator: Self.itemSeparator))
+                    : CYLTagListCacheItem(identifier: entry, title: entry)
+            }
+        }
+        // Saved as titles only: each title is its own identifier.
+        return rawTitles(forSection: section)?.map { CYLTagListCacheItem(identifier: $0, title: $0) }
+    }
+
+    public func saveItems(_ items: [CYLTagListCacheItem], forSection section: String) {
+        saveRawTitles(items.map { $0.identifier + Self.itemSeparator + $0.title }, forSection: Self.itemsSection(section))
+        saveRawTitles(items.map(\.title), forSection: section)
+    }
+
     public func removeTitles(forSection section: String) {
+        removeRawTitles(forSection: Self.itemsSection(section))
+        removeRawTitles(forSection: section)
+    }
+
+    private func removeRawTitles(forSection section: String) {
         switch policy {
         case .none:
             return
@@ -309,4 +400,12 @@ public final class CYLTagListStore: NSObject, CYLTagListCache {
      */
     @objc(fetchSectionsWithKeys:completion:)
     func fetchSections(withKeys keys: [String], completion: @escaping ([String: [String]]?, Error?) -> Void)
+
+    /**
+     * Downloads the sections saved under `keys` as items (stable identifier and title), for
+     * `CYLTagListView.loadItems(withKeys:completion:)`. Optional: without it, the titles are fetched and each title is
+     * its own identifier.
+     */
+    @objc(fetchItemsWithKeys:completion:)
+    optional func fetchItems(withKeys keys: [String], completion: @escaping ([String: [CYLTagListCacheItem]]?, Error?) -> Void)
 }

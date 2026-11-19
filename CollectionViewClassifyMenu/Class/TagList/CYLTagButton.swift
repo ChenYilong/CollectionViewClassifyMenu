@@ -166,6 +166,56 @@ open class CYLTagButton: CYLAnimatedItemView {
     open private(set) var deleteIndicatorHitFrame: CGRect = .zero
 
     /**
+     * Shows a rename indicator (a square and pencil) before the delete indicator, for a tag that can be renamed: the two icons are
+     * then drawn by `editingIndicatorsView`. Needs `showsDeleteIndicator`. False by default; `CYLTagListView` turns it
+     * on in editing mode for the items its data source can rename and handles taps on it.
+     */
+    @objc open var showsRenameIndicator = false {
+        didSet {
+            if oldValue != showsRenameIndicator {
+                updateAppearance()
+                setNeedsLayout()
+            }
+        }
+    }
+
+    /**
+     * The area a tap on the rename indicator should cover, in the tag's coordinates; `.zero` while it is hidden.
+     */
+    open private(set) var renameIndicatorHitFrame: CGRect = .zero
+
+    /**
+     * The two editing icons while `showsRenameIndicator` (a pencil, then a cross): a horizontal
+     * `CYLAnimatedItemStackView` of two icon-only `CYLAnimatedItemView`s, each as wide as the delete indicator. It only
+     * draws; the list cell's controls take the taps.
+     */
+    /// Whether `editingIndicatorsView` was made (it is lazy: most tags never show it).
+    private var editingIndicatorsViewIsLoaded: Bool {
+        subviews.contains { $0 is CYLAnimatedItemStackView }
+    }
+
+    @objc public private(set) lazy var editingIndicatorsView: CYLAnimatedItemStackView = {
+        let stack = CYLAnimatedItemStackView(frame: .zero)
+        stack.contentMargin = 0
+        stack.stackView.axis = .horizontal
+        stack.stackView.alignment = .center
+        stack.stackView.distribution = .fillEqually
+        // The edit icon is a square with a pencil (SF Symbols "square.and.pencil"), easier to recognize than a pencil alone.
+        for symbol in ["square.and.pencil", "xmark"] {
+            let icon = CYLAnimatedItemView(frame: .zero)
+            icon.image = UIImage(systemName: symbol)?.withRenderingMode(.alwaysTemplate)
+            icon.title = nil
+            icon.isAccessibilityElement = false
+            stack.append(icon, action: nil, spacingBefore: 0)
+        }
+        stack.isUserInteractionEnabled = false
+        stack.accessibilityElementsHidden = true
+        stack.isHidden = true
+        addSubview(stack)
+        return stack
+    }()
+
+    /**
      * The style the tag is drawn with. Setting copies it; set it again after changing it.
      */
     @objc open var style: CYLMenuStyle {
@@ -379,7 +429,11 @@ open class CYLTagButton: CYLAnimatedItemView {
      * when `showsDeleteIndicator`.
      */
     public static func width(forTitle title: String?, iconSize: CGSize, showsDeleteIndicator: Bool = false,
+                             showsRenameIndicator: Bool = false,
                              style: CYLMenuStyle, traitCollection: UITraitCollection?) -> CGFloat {
+        // With the rename indicator, the two editing icons (each at least a line of the title high) replace the delete
+        // indicator.
+        let editingIcons = showsDeleteIndicator && showsRenameIndicator
         let displayed = style.displayedTitle(forTitle: title)
         if style.fillsTagHeight(withIconSize: iconSize) {
             // The image is as wide as the tag is tall, from the leading edge; the title and the indicator follow it.
@@ -388,7 +442,9 @@ open class CYLTagButton: CYLAnimatedItemView {
                 let font = style.titleFont(for: state, traitCollection: traitCollection)
                 let titleWidth = displayed.isEmpty ? 0
                     : ceil((displayed as NSString).size(withAttributes: [.font: font]).width) + style.imageTitleSpacing
-                let delete = showsDeleteIndicator
+                let delete = editingIcons
+                    ? editingIndicatorsWidth(for: state, style: style, traitCollection: traitCollection) + style.imageTitleSpacing
+                    : showsDeleteIndicator
                     ? style.imageTitleSpacing + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
                     : 0
                 return max(width, ceil(side + titleWidth + delete + style.appearance(for: state).contentInsets.right))
@@ -409,7 +465,10 @@ open class CYLTagButton: CYLAnimatedItemView {
                 // The title keeps its place after an empty icon slot.
                 content += style.imageSize.width + style.imageTitleSpacing
             }
-            if showsDeleteIndicator {
+            if editingIcons {
+                content += style.imageTitleSpacing
+                    + editingIndicatorsWidth(for: state, style: style, traitCollection: traitCollection)
+            } else if showsDeleteIndicator {
                 content += style.imageTitleSpacing
                     + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
             }
@@ -756,6 +815,22 @@ open class CYLTagButton: CYLAnimatedItemView {
     /**
      * The delete indicator's width, in a state.
      */
+    /// The side of one editing icon (the pencil or the cross): the delete indicator's width, and at least a line of the
+    /// title, so the pencil stays legible.
+    private static func editingIconSide(for state: UIControl.State, style: CYLMenuStyle,
+                                        traitCollection: UITraitCollection?) -> CGFloat {
+        max(deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection),
+            ceil(style.titleFont(for: state, traitCollection: traitCollection).lineHeight))
+    }
+
+    /// The width of the two editing icons with the space between them.
+    private static func editingIndicatorsWidth(for state: UIControl.State, style: CYLMenuStyle,
+                                               traitCollection: UITraitCollection?) -> CGFloat {
+        let insets = style.editingIndicatorInsets
+        return max(0, insets.left) + 2 * editingIconSide(for: state, style: style, traitCollection: traitCollection)
+            + max(0, style.editingIndicatorSpacing) + max(0, insets.right)
+    }
+
     private static func deleteIndicatorWidth(for state: UIControl.State, style: CYLMenuStyle,
                                              traitCollection: UITraitCollection?) -> CGFloat {
         if style.deleteIndicatorWidth > 0 {
@@ -855,10 +930,16 @@ open class CYLTagButton: CYLAnimatedItemView {
         guard showsDeleteIndicator else {
             deleteIndicatorLabel.frame = .zero
             deleteIndicatorHitFrame = .zero
+            renameIndicatorHitFrame = .zero
             crossLayer.path = nil
             return 0
         }
         let indicatorWidth = Self.deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
+        if showsRenameIndicator {
+            return layOutEditingIndicators(indicatorWidth: Self.editingIconSide(for: state, style: style, traitCollection: traitCollection),
+                                           insets: insets)
+        }
+        renameIndicatorHitFrame = .zero
         let leadingIndicator = style.deleteIndicatorPlacement == .leading
         let indicatorX = leadingIndicator ? insets.left : max(insets.left, width - insets.right - indicatorWidth)
         let indicator = CGRect(x: indicatorX, y: insets.top, width: indicatorWidth,
@@ -890,6 +971,43 @@ open class CYLTagButton: CYLAnimatedItemView {
         deleteIndicatorImageView.frame = CGRect(x: (indicator.width - imageSide) / 2, y: (indicator.height - imageSide) / 2,
                                                 width: imageSide, height: imageSide)
         return indicatorWidth + style.imageTitleSpacing
+    }
+
+    /**
+     * The pencil and the cross of `editingIndicatorsView`, each `indicatorWidth` wide, at the delete indicator's place;
+     * the pencil's tap area is on its side, the cross's on the other. Returns the width they take with their spacing.
+     */
+    private func layOutEditingIndicators(indicatorWidth: CGFloat, insets: UIEdgeInsets) -> CGFloat {
+        let style = styleStorage
+        // The style's spaces: between the two icons (editingIndicatorSpacing, the stack view's spacing) and around them
+        // (editingIndicatorInsets, the stack view's margins in the tag).
+        let spacing = max(0, style.editingIndicatorSpacing)
+        let margins = UIEdgeInsets(top: max(0, style.editingIndicatorInsets.top), left: max(0, style.editingIndicatorInsets.left),
+                                   bottom: max(0, style.editingIndicatorInsets.bottom), right: max(0, style.editingIndicatorInsets.right))
+        let total = margins.left + 2 * indicatorWidth + spacing + margins.right
+        let leading = style.deleteIndicatorPlacement == .leading
+        let x = leading ? insets.left : max(insets.left, bounds.width - insets.right - total)
+        let outer = CGRect(x: x, y: insets.top, width: total, height: max(0, bounds.height - insets.top - insets.bottom))
+        let area = outer.inset(by: margins)
+        editingIndicatorsView.stackView.spacing = spacing
+        editingIndicatorsView.frame = area
+        // The glyphs a little smaller than their slot, as the title's cap height.
+        let side = max(0, min(indicatorWidth * 0.75, area.height))
+        for icon in editingIndicatorsView.itemViews where icon.iconSize.width != side {
+            icon.iconSize = CGSize(width: side, height: side)
+        }
+        deleteIndicatorLabel.frame = .zero
+        crossLayer.path = nil
+        // The pencil first, then the cross (left to right); each tap area reaches its own edge of the tag.
+        let middle = area.minX + indicatorWidth + spacing / 2
+        let start = max(0, outer.minX - style.imageTitleSpacing)
+        renameIndicatorHitFrame = CGRect(x: start, y: 0, width: middle - start, height: bounds.height)
+        deleteIndicatorHitFrame = CGRect(x: middle, y: 0, width: bounds.width - middle, height: bounds.height)
+        if leading {
+            renameIndicatorHitFrame = CGRect(x: 0, y: 0, width: middle, height: bounds.height)
+            deleteIndicatorHitFrame = CGRect(x: middle, y: 0, width: outer.maxX + style.imageTitleSpacing - middle, height: bounds.height)
+        }
+        return total + style.imageTitleSpacing
     }
 
     /**
@@ -966,10 +1084,19 @@ open class CYLTagButton: CYLAnimatedItemView {
         let indicatorImage = style.deleteIndicatorImage
         let drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage == nil
         // Kept visible (and empty) under a drawn cross or an image, so that a tap on it still reaches the accessory.
-        deleteIndicatorLabel.isHidden = !showsDeleteIndicator
+        // With the rename indicator, editingIndicatorsView draws both icons instead.
+        let editingIcons = showsDeleteIndicator && showsRenameIndicator
+        deleteIndicatorLabel.isHidden = !showsDeleteIndicator || editingIcons
         deleteIndicatorLabel.text = showsDeleteIndicator && !drawsCross && indicatorImage == nil ? style.deleteIndicatorTitle : nil
         deleteIndicatorImageView.image = indicatorImage
-        deleteIndicatorImageView.isHidden = !showsDeleteIndicator || indicatorImage == nil
+        deleteIndicatorImageView.isHidden = !showsDeleteIndicator || indicatorImage == nil || editingIcons
+        if editingIcons || editingIndicatorsViewIsLoaded {
+            editingIndicatorsView.isHidden = !editingIcons
+            let color = style.deleteIndicatorColor ?? appearance.textColor
+            for icon in editingIndicatorsView.itemViews {
+                icon.imageView.tintColor = color
+            }
+        }
         // A wrapping title (CYLMenuStyle.titleWraps) takes as many lines as it needs.
         titleLabel.numberOfLines = style.titleWraps ? 0 : 1
         titleLabel.lineBreakMode = style.titleWraps ? .byWordWrapping : .byTruncatingTail
@@ -979,7 +1106,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         if accessoryPlacement != placement {
             accessoryPlacement = placement
         }
-        crossLayer.isHidden = !showsDeleteIndicator || !drawsCross
+        crossLayer.isHidden = !showsDeleteIndicator || !drawsCross || editingIcons
         crossLayer.lineWidth = style.deleteIndicatorLineWidth
         crossLayer.strokeColor = (style.deleteIndicatorColor ?? appearance.textColor)?.cgColor
         let imageRadius = style.imageCornerRadius

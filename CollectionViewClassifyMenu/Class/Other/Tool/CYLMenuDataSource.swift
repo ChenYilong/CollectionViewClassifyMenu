@@ -191,6 +191,21 @@ import UIKit
      */
     @objc(menuCacheKeyForSection:)
     optional func menuCacheKey(forSection section: Int) -> String
+
+    /**
+     * The item's stable identifier (a database id), kept by `CYLTagListView`'s cache and sync so that a reorder or a
+     * rename never loses what the item stands for; its title when not implemented.
+     */
+    @objc(menuIdentifierForItemAtIndexPath:)
+    optional func menuIdentifierForItem(at indexPath: IndexPath) -> String
+
+    /**
+     * Rename the item in your data. Implementing it shows `CYLTagListView`'s rename indicator (a pencil before the
+     * delete indicator) in editing mode; a tap fills the add control with the title and raises the keyboard, and its
+     * submit calls this, then the list reloads, saves its cache and calls `menu(_:didRenameItemAt:to:)`.
+     */
+    @objc(menuRenameItemAtIndexPath:toTitle:)
+    optional func menuRenameItem(at indexPath: IndexPath, to title: String)
 }
 
 /**
@@ -277,6 +292,19 @@ import UIKit
      */
     @objc(menu:didFinishEditingWithTitles:)
     optional func menu(_ menu: Any, didFinishEditingWithTitles titles: [String: [String]])
+
+    /**
+     * The same edited sections as items (stable identifier and title, `menuIdentifierForItem(at:)`): upload these when
+     * your items have ids.
+     */
+    @objc(menu:didFinishEditingWithItems:)
+    optional func menu(_ menu: Any, didFinishEditingWithItems items: [String: [CYLTagListCacheItem]])
+
+    /**
+     * `CYLTagListView` renamed an item in editing mode (`menuRenameItem(at:to:)`), already saved to its cache.
+     */
+    @objc(menu:didRenameItemAtIndexPath:toTitle:)
+    optional func menu(_ menu: Any, didRenameItemAt indexPath: IndexPath, to title: String)
 
     /**
      * A long press on an item that did not move it (AndroidTagView's onTagLongClick).

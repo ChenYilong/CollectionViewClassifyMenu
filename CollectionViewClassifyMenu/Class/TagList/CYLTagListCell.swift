@@ -44,6 +44,37 @@ open class CYLTagListCell: UICollectionViewCell {
     open var deleteHandler: (() -> Void)?
 
     /**
+     * Shows the rename indicator (a pencil before the cross, `CYLTagButton.showsRenameIndicator`) and makes it
+     * tappable; also adds a VoiceOver "Edit" action. Needs `isDeletable`. False by default.
+     */
+    open var isRenamable = false {
+        didSet {
+            button.showsRenameIndicator = isRenamable
+            renameControl.isHidden = !isRenamable
+            titleControl.isHidden = !(renamesOnTitleTap && isRenamable)
+            updateAccessibilityActions()
+            setNeedsLayout()
+        }
+    }
+
+    /**
+     * Called when the rename indicator is tapped (or the VoiceOver action is used), and on a title tap while
+     * `renamesOnTitleTap`.
+     */
+    open var renameHandler: (() -> Void)?
+
+    /**
+     * A tap on the title (outside the editing icons) renames too, as the pencil does. Needs `isRenamable`. False by
+     * default.
+     */
+    open var renamesOnTitleTap = false {
+        didSet {
+            titleControl.isHidden = !(renamesOnTitleTap && isRenamable)
+            setNeedsLayout()
+        }
+    }
+
+    /**
      * Custom actions after 删除 (the list's long-press and 前移 / 后移 actions); reset on reuse.
      */
     open var additionalAccessibilityActions: [UIAccessibilityCustomAction] = [] {
@@ -53,6 +84,8 @@ open class CYLTagListCell: UICollectionViewCell {
     }
 
     private let deleteControl = UIControl()
+    private let renameControl = UIControl()
+    private let titleControl = UIControl()
 
     // MARK: - Initializers
 
@@ -75,6 +108,16 @@ open class CYLTagListCell: UICollectionViewCell {
         deleteControl.accessibilityIdentifier = CYLTagListAccessibilityIdentifier.deleteButton
         deleteControl.addTarget(self, action: #selector(deleteTapped), for: .touchUpInside)
         contentView.addSubview(deleteControl)
+        renameControl.isHidden = true
+        renameControl.accessibilityIdentifier = CYLTagListAccessibilityIdentifier.renameButton
+        renameControl.addTarget(self, action: #selector(renameTapped), for: .touchUpInside)
+        contentView.addSubview(renameControl)
+        // Under the icons' controls: the title's area, for renaming by a tap on the name.
+        titleControl.isHidden = true
+        titleControl.isAccessibilityElement = false
+        titleControl.accessibilityIdentifier = CYLTagListAccessibilityIdentifier.renameTitle
+        titleControl.addTarget(self, action: #selector(renameTapped), for: .touchUpInside)
+        contentView.insertSubview(titleControl, belowSubview: deleteControl)
         isAccessibilityElement = true
         accessibilityTraits = .button
     }
@@ -175,12 +218,27 @@ open class CYLTagListCell: UICollectionViewCell {
         super.layoutSubviews()
         button.layoutIfNeeded()
         deleteControl.frame = isDeletable ? button.convert(button.deleteIndicatorHitFrame, to: contentView) : .zero
+        renameControl.frame = isRenamable ? button.convert(button.renameIndicatorHitFrame, to: contentView) : .zero
+        // The title's frame, kept clear of the icons' tap areas.
+        var title = button.convert(button.titleLabel.frame, to: contentView)
+        if isRenamable, renamesOnTitleTap {
+            let icons = renameControl.frame.union(deleteControl.frame)
+            if title.maxX > icons.minX && title.minX < icons.minX {
+                title.size.width = icons.minX - title.minX
+            }
+            titleControl.frame = title.insetBy(dx: 0, dy: -4)
+        } else {
+            titleControl.frame = .zero
+        }
     }
 
     open override func prepareForReuse() {
         super.prepareForReuse()
         deleteHandler = nil
+        renameHandler = nil
         additionalAccessibilityActions = []
+        renamesOnTitleTap = false
+        isRenamable = false
         isDeletable = false
     }
 
@@ -188,6 +246,12 @@ open class CYLTagListCell: UICollectionViewCell {
 
     private func updateAccessibilityActions() {
         var actions: [UIAccessibilityCustomAction] = []
+        if isRenamable {
+            actions.append(UIAccessibilityCustomAction(name: CYLMenuLocalizedString("CYLMenuRenameTag")) { [weak self] _ in
+                self?.renameHandler?()
+                return true
+            })
+        }
         if isDeletable {
             actions.append(UIAccessibilityCustomAction(name: CYLMenuLocalizedString("CYLMenuDeleteTag")) { [weak self] _ in
                 self?.deleteHandler?()
@@ -200,5 +264,9 @@ open class CYLTagListCell: UICollectionViewCell {
 
     @objc private func deleteTapped() {
         deleteHandler?()
+    }
+
+    @objc private func renameTapped() {
+        renameHandler?()
     }
 }

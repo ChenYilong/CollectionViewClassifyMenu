@@ -857,6 +857,32 @@ open class CYLTagListView: UIView {
     /// The bottom inset added to the collection view for `addItemView`.
     private var addItemInset: CGFloat = 0
 
+    /// The bottom inset added for the keyboard while editing (the part of the list it covers).
+    private var keyboardInset: CGFloat = 0
+
+    /**
+     * The item being renamed in editing mode (its rename indicator was tapped); nil otherwise.
+     */
+    @objc open private(set) var renamingIndexPath: IndexPath?
+
+    /**
+     * In editing mode, a tap on a renamable item's title (outside its pencil and cross) renames it too, as the pencil
+     * does; a tap elsewhere on the item still calls `menu(_:didSelectItemAt:)`. True by default; it needs the data
+     * source's `menuRenameItem(at:to:)`.
+     */
+    /**
+     * Your own editor for renaming (an editing bar above the keyboard, for example): when set, a pencil or title tap
+     * calls it with the item and its title instead of filling `addItemView`; finish with `finishRenaming(to:)` or
+     * `cancelRenaming()`. nil (the default): `addItemView` is the rename field.
+     */
+    @objc open var renameRequestHandler: ((IndexPath, String) -> Void)?
+
+    @objc open var renamesOnTitleTapWhileEditing = true {
+        didSet {
+            refreshVisibleCells()
+        }
+    }
+
     /**
      * Where the list saves its editable sections after an edit (a drag, a delete or an added tag in editing mode), so
      * the order survives a relaunch: `.none` (the default), a SQLite database, `NSUserDefaults` or a sandbox file. The
@@ -924,9 +950,108 @@ open class CYLTagListView: UIView {
         guard let cache else {
             return
         }
+        if cache.responds(to: #selector(CYLTagListCache.saveItems(_:forSection:))) {
+            // With identifiers, so a renamed item stays the same item.
+            for (key, items) in editableSectionItems() {
+                cache.saveItems?(items, forSection: key)
+            }
+            return
+        }
         for (key, titles) in editableSectionTitles() {
             cache.saveTitles(titles, forSection: key)
         }
+    }
+
+    /**
+     * The items (identifier from `menuIdentifierForItem(at:)`, else the title; and title) of every editable section,
+     * by cache key, without create items.
+     */
+    @objc open func editableSectionItems() -> [String: [CYLTagListCacheItem]] {
+        guard let source = menuDataSource else {
+            return [:]
+        }
+        var result: [String: [CYLTagListCacheItem]] = [:]
+        for section in 0..<source.numberOfSectionsInMenu() where sectionAllowsEditing(section) {
+            result[cacheKey(forSection: section)] = (0..<source.menuNumberOfItems(inSection: section)).compactMap { item in
+                let indexPath = IndexPath(item: item, section: section)
+                guard source.menuItemType?(at: indexPath) != .create else { return nil }
+                let title = source.menuTitleForItem(at: indexPath)
+                return CYLTagListCacheItem(identifier: source.menuIdentifierForItem?(at: indexPath) ?? title, title: title)
+            }
+        }
+        return result
+    }
+
+    /**
+     * Starts renaming `indexPath` (its rename indicator does this): `addItemView` shows the title with the keyboard up;
+     * its submit renames the item through the data source's `menuRenameItem(at:to:)`.
+     */
+    @objc(beginRenamingItemAtIndexPath:)
+    open func beginRenaming(at indexPath: IndexPath) {
+        guard isValid(indexPath), isRenamable(at: indexPath) else {
+            return
+        }
+        renamingIndexPath = indexPath
+        let title = menuDataSource?.menuTitleForItem(at: indexPath) ?? ""
+        if let renameRequestHandler {
+            // The host's editor takes it.
+            renameRequestHandler(indexPath, title)
+            return
+        }
+        updateAddItemView()
+        layoutIfNeeded()
+        addItemView.beginRenaming(title: title)
+        // The field is below the last section: bring it into view.
+        collectionView.scrollRectToVisible(addItemView.frame.insetBy(dx: 0, dy: -8), animated: true)
+    }
+
+    /**
+     * Ends renaming without a change.
+     */
+    @objc open func cancelRenaming() {
+        guard renamingIndexPath != nil else {
+            return
+        }
+        renamingIndexPath = nil
+        addItemView.endRenaming()
+        updateAddItemView()
+    }
+
+    /**
+     * Adds an item named `name` from your own editor, as `addItemView`'s submit does: reported through
+     * `menu(_:didRequestNewItemWithName:at:)` at the end of the first editable section, then the cache is saved.
+     */
+    @objc(submitNewItemNamed:)
+    open func submitNewItem(named name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return
+        }
+        cancelRenaming()
+        requestNewItem(named: trimmed)
+    }
+
+    /**
+     * Renames the item being renamed to `title` (trimmed; an empty or unchanged one only ends renaming): the data
+     * source renames it, the list reloads, saves its cache and calls `menu(_:didRenameItemAt:to:)`.
+     */
+    @objc(finishRenamingToTitle:)
+    open func finishRenaming(to title: String) {
+        guard let indexPath = renamingIndexPath else {
+            return
+        }
+        renamingIndexPath = nil
+        addItemView.endRenaming()
+        let name = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard isValid(indexPath), !name.isEmpty, name != menuDataSource?.menuTitleForItem(at: indexPath) else {
+            updateAddItemView()
+            return
+        }
+        menuDataSource?.menuRenameItem?(at: indexPath, to: name)
+        reloadMenuData()
+        saveEditableSectionsToCache()
+        updateAddItemView()
+        menuDelegate?.menu?(self, didRenameItemAt: indexPath, to: name)
     }
 
     /**
@@ -957,11 +1082,25 @@ open class CYLTagListView: UIView {
             return
         }
         isEditing = editing
+        // While editing, the keyboard (the add or rename field) must not cover the field.
+        if editing {
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameChanged(_:)),
+                                                   name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameChanged(_:)),
+                                                   name: UIResponder.keyboardWillHideNotification, object: nil)
+        } else {
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+            setKeyboardInset(0)
+        }
         if !editing {
+            renamingIndexPath = nil
+            addItemView.endRenaming()
             addItemView.textField.resignFirstResponder()
             // The edited sections, for the host to upload (the cache already has them).
             let titles = editableSectionTitles()
             menuDelegate?.menu?(self, didFinishEditingWithTitles: titles)
+            menuDelegate?.menu?(self, didFinishEditingWithItems: editableSectionItems())
             editingFinishHandler?(titles)
         }
         updateLongPressDuration()
@@ -1693,6 +1832,11 @@ private extension CYLTagListView {
         return menuDataSource?.menuItemIsDeletable?(at: indexPath) == true
     }
 
+    func isRenamable(at indexPath: IndexPath) -> Bool {
+        isEditing && sectionAllowsEditing(indexPath.section) && itemType(at: indexPath) != .create && isDeletable(at: indexPath)
+            && menuDataSource?.responds(to: #selector(CYLMenuDataSource.menuRenameItem(at:to:))) == true
+    }
+
     func isExclusive(at indexPath: IndexPath) -> Bool {
         menuDataSource?.menuItemIsExclusive?(at: indexPath) == true
     }
@@ -1966,7 +2110,8 @@ private extension CYLTagListView {
                 let iconSize = CYLTagButton.iconSize(for: image(at: indexPath), animated: animationURL(at: indexPath) != nil,
                                                      style: itemStyle)
                 let width = CYLTagButton.width(forTitle: title, iconSize: iconSize,
-                                               showsDeleteIndicator: isDeletable(at: indexPath), style: itemStyle,
+                                               showsDeleteIndicator: isDeletable(at: indexPath),
+                                               showsRenameIndicator: isRenamable(at: indexPath), style: itemStyle,
                                                traitCollection: traitCollection)
                 return min(width, contentWidth)
             }
@@ -2084,8 +2229,9 @@ private extension CYLTagListView {
         if collectionView.bounds.width > 0 {
             collectionView.layoutIfNeeded()
             // Explicit insets only: safe-area adjustments belong to the host's layout.
+            // The keyboard's inset is not content: it would change the list's height while typing.
             height = ceil(collectionView.collectionViewLayout.collectionViewContentSize.height
-                          + collectionView.contentInset.top + collectionView.contentInset.bottom)
+                          + collectionView.contentInset.top + collectionView.contentInset.bottom - keyboardInset)
                 + titleHeight(forWidth: bounds.width)
         } else {
             height = heightThatFitsWidth(0)
@@ -2361,6 +2507,12 @@ private extension CYLTagListView {
         cell.isDeletable = deletable
         cell.deleteHandler = deletable ? { [weak self] in
             self?.deleteItem(at: indexPath)
+        } : nil
+        let renamable = deletable && isRenamable(at: indexPath)
+        cell.isRenamable = renamable
+        cell.renamesOnTitleTap = renamable && renamesOnTitleTapWhileEditing
+        cell.renameHandler = renamable ? { [weak self] in
+            self?.beginRenaming(at: indexPath)
         } : nil
         cell.additionalAccessibilityActions = accessibilityActions(forItemAt: indexPath)
         if let source = menuDataSource,
@@ -2795,7 +2947,8 @@ private extension CYLTagListView {
 
     /// Shows or hides `addItemView` and reserves its space below the last section.
     func updateAddItemView() {
-        let shows = isEditing && showsAddItemViewWhileEditing
+        // Renaming needs the field even when the add control is hidden, unless the host's editor takes it.
+        let shows = isEditing && (showsAddItemViewWhileEditing || (renamingIndexPath != nil && renameRequestHandler == nil))
         if shows && addItemView.superview !== collectionView {
             collectionView.addSubview(addItemView)
         } else if !shows {
@@ -2821,8 +2974,13 @@ private extension CYLTagListView {
                                    height: addItemView.preferredHeight)
     }
 
-    /// A name submitted in `addItemView`: reported at the end of the first editable section.
+    /// A name submitted in `addItemView`: a rename while one is in progress, else a new item at the end of the first
+    /// editable section.
     func requestNewItem(named name: String) {
+        if renamingIndexPath != nil {
+            finishRenaming(to: name)
+            return
+        }
         let section = firstEditableSection ?? 0
         let item = titles.indices.contains(section) ? titles[section].count : 0
         menuDelegate?.menu?(self, didRequestNewItemWithName: name, at: IndexPath(item: item, section: section))
@@ -2891,5 +3049,108 @@ extension CYLTagListView {
                 }
             }
         }
+    }
+
+    /**
+     * `loadSections(withKeys:completion:)` with identifiers: the cache's items (`cachedItems(forSection:)`) and the
+     * remote source's (`fetchItems(withKeys:completion:)`, else its titles, each its own identifier), in the order of
+     * `loadPolicy`; downloaded items are saved to the cache first.
+     */
+    @objc(loadItemsWithKeys:completion:)
+    open func loadItems(withKeys keys: [String],
+                        completion: @escaping ([String: [CYLTagListCacheItem]], CYLTagListDataOrigin) -> Void) {
+        var cached: [String: [CYLTagListCacheItem]] = [:]
+        for key in keys {
+            if let items = cache?.cachedItems?(forSection: key)
+                ?? cache?.cachedTitles(forSection: key)?.map({ CYLTagListCacheItem(identifier: $0, title: $0) }) {
+                cached[key] = items
+            }
+        }
+        let fetch: (@escaping (Bool) -> Void) -> Void = { [weak self] done in
+            guard let remote = self?.remoteSource else {
+                done(false)
+                return
+            }
+            let finish: ([String: [CYLTagListCacheItem]]?, Error?) -> Void = { items, error in
+                DispatchQueue.main.async {
+                    guard let self, let items, error == nil else {
+                        done(false)
+                        return
+                    }
+                    let downloaded = items.filter { keys.contains($0.key) }
+                    for (key, sectionItems) in downloaded {
+                        if self.cache?.saveItems?(sectionItems, forSection: key) == nil {
+                            self.cache?.saveTitles(sectionItems.map(\.title), forSection: key)
+                        }
+                    }
+                    completion(downloaded, .network)
+                    done(true)
+                }
+            }
+            if remote.responds(to: #selector(CYLTagListRemoteSource.fetchItems(withKeys:completion:))) {
+                remote.fetchItems?(withKeys: keys, completion: finish)
+            } else {
+                remote.fetchSections(withKeys: keys) { sections, error in
+                    finish(sections?.mapValues { $0.map { CYLTagListCacheItem(identifier: $0, title: $0) } }, error)
+                }
+            }
+        }
+        switch loadPolicy {
+        case .cacheThenNetwork:
+            if !cached.isEmpty {
+                completion(cached, .cache)
+            }
+            fetch { _ in }
+        case .cacheFirst:
+            if cached.count == keys.count {
+                completion(cached, .cache)
+            } else {
+                fetch { ok in
+                    if !ok && !cached.isEmpty {
+                        completion(cached, .cache)
+                    }
+                }
+            }
+        case .networkFirst:
+            fetch { ok in
+                if !ok && !cached.isEmpty {
+                    completion(cached, .cache)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Editing: the keyboard
+
+extension CYLTagListView {
+
+    /// The keyboard moved: the list's bottom inset takes the part it covers, and an active add or rename field scrolls
+    /// above it.
+    @objc private func keyboardFrameChanged(_ notification: Notification) {
+        guard isEditing, let window else {
+            return
+        }
+        var overlap: CGFloat = 0
+        if notification.name != UIResponder.keyboardWillHideNotification,
+           let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+            let keyboard = collectionView.convert(window.convert(frame, from: window.screen.coordinateSpace), from: window)
+            let visibleBottom = collectionView.bounds.maxY
+            overlap = max(0, visibleBottom - keyboard.minY)
+        }
+        setKeyboardInset(overlap)
+        if overlap > 0, addItemView.textField.isFirstResponder {
+            collectionView.layoutIfNeeded()
+            collectionView.scrollRectToVisible(addItemView.frame.insetBy(dx: 0, dy: -8), animated: true)
+        }
+    }
+
+    fileprivate func setKeyboardInset(_ inset: CGFloat) {
+        guard inset != keyboardInset else {
+            return
+        }
+        collectionView.contentInset.bottom += inset - keyboardInset
+        collectionView.verticalScrollIndicatorInsets.bottom = collectionView.contentInset.bottom
+        keyboardInset = inset
     }
 }

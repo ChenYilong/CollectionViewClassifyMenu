@@ -43,4 +43,15 @@ public enum CYLTagListAccessibilityIdentifier {
      * The tappable delete indicator ("×") of a deletable tag; VoiceOver users get a "Delete" action on the tag instead.
      */
     public static let deleteButton = "CYLTagListDeleteButton"
+
+    /**
+     * The rename indicator of a tag in editing mode (a pencil before the delete indicator).
+     */
+    public static let renameButton = "CYLTagListRenameButton"
+
+    /**
+     * The title of a renamable tag in editing mode: a tap on it renames the tag too
+     * (`CYLTagListView.renamesOnTitleTapWhileEditing`).
+     */
+    public static let renameTitle = "CYLTagListRenameTitle"
 }

@@ -560,3 +560,45 @@ started run completes and the next one tests the newest commit.
   policy, success and failure, the download saved); Example 106 of 106 (iPhone 18 Pro simulator, iOS 27.2). The new
   public symbols are TODO rows in `docs/android-api.md` (796 of 849) for the Windows session. Used by
   CYLSearchViewController's contact tags example (a simulated server with a 5 s latency and CYLPlaceholderHUD).
+
+## DONE (2026-11-19; TODO 2026-11-19): CYLTagListView renaming in editing mode, two trailing icons, item identifiers (iOS)
+
+- **Branch**: `feat/harmony`. Requested from the CYLSearchViewController session (Mac), for its contact tags example.
+- **Prompt (verbatim, from the user of that session)**: "编辑模式还应在删除按钮左边加一个编辑按钮，你可以适应CollectionView库新增加的CYLAnimatedStackView实现。追加两个icon的场景。点击编辑按钮后唤醒键盘，可以更新tag名字。依然遵循缓存以及网络下载策略。点击完成后更新缓存中的tag名称。这里注意tag的主键应该是id，避免更换顺序，改名后tag对应不到原来的联系人列表。联系人列表也应和主键id绑定。"
+  (English: in editing mode add an edit button left of the delete button, using the new CYLAnimatedItemStackView for
+  the two-icon case; the edit button raises the keyboard to rename the tag; the cache and download policies still
+  apply; Done updates the name in the cache. A tag's primary key must be an id, so a reorder or a rename never loses
+  its contacts; the contact list is bound to the id too.)
+- **Requirements (this library, iOS)**: `CYLTagButton.showsRenameIndicator` (a horizontal `CYLAnimatedItemStackView`
+  with a pencil and a cross before the title's end), a rename hit area in `CYLTagListCell` with a VoiceOver action;
+  `CYLTagListView`: data source `menuRenameItem(at:to:)` turns renaming on in editing mode, the add control becomes the
+  rename field (keyboard up, the title filled in), `menu(_:didRenameItemAt:to:)`, the cache saved; identifiers: data
+  source `menuIdentifierForItem(at:)`, `CYLTagListCacheItem` (identifier, title) in the cache, the edit-end callback
+  and the remote source (`loadItems(withKeys:completion:)`); strings in three languages; tests.
+- **Follow-up prompts (verbatim)**: "同时在编辑按钮和icon之外的区域，用户直接点击title label也可以直接唤起键盘编辑。如有必要更新 CollectionView库新增加接口实现完成该功能，并在CollectionView库新增加接口后，repin commit完成example。"
+  (a tap on the title, outside the icons, also edits); "编辑按钮图标换一个 这个图标 不易识别 边框带笔 那种" (a square-and-pencil
+  icon); "编辑按钮 与 删除按钮可以自定义间距，修改CollectionView的core里面的StackView组件，添加自定义间距 允许用户自定义。并默认增加合适间距" and
+  "这个间距要完整：可以stackview整体上下左右间距控制，以及item间距控制" (the spacing between the icons and around them, customizable,
+  with fitting defaults); "这个编辑框复用seachbar样式，为seachbar样式增加新的编辑样式初始化，该样式应固定fix跟随在键盘顶部完成core代码，后调用接口完成example"
+  (the edit field reuses CYLSearchViewController's search bar, as a new editing style pinned above the keyboard: done
+  there; this library lets the host bring that editor).
+- **Status**: DONE (2026-11-19). `CYLTagButton.showsRenameIndicator`: the delete indicator gives way to
+  `editingIndicatorsView`, a horizontal `CYLAnimatedItemStackView` of two icon-only `CYLAnimatedItemView`s (SF Symbols
+  "square.and.pencil" and "xmark"), each at least a line of the title; `CYLMenuStyle.editingIndicatorSpacing` (between
+  the icons, 8 by default) and `editingIndicatorInsets` (around them, left 4, right 2 by default) set every space and
+  count in the measured width; `renameIndicatorHitFrame`. `CYLTagListCell.isRenamable`, `renameHandler`,
+  `renamesOnTitleTap` (a title-sized tap area clear of the icons), a VoiceOver "Edit" action
+  (`CYLTagListAccessibilityIdentifier.renameButton`, `.renameTitle`). `CYLTagListView`: data source
+  `menuRenameItem(at:to:)` turns renaming on in editing mode; `renamesOnTitleTapWhileEditing` (true);
+  `beginRenaming(at:)`, `finishRenaming(to:)`, `cancelRenaming()`, `renamingIndexPath`; the add control becomes the
+  rename field (`CYLTagListAddItemView.beginRenaming(title:)`, "Done"), or the host's editor takes it
+  (`renameRequestHandler`, `submitNewItem(named:)`); `menu(_:didRenameItemAt:to:)`; the keyboard's overlap is added to
+  the bottom inset while editing, so the field stays above it. Identifiers: data source `menuIdentifierForItem(at:)`,
+  `CYLTagListCacheItem` (identifier, title), `CYLTagListCache.cachedItems(forSection:)` / `saveItems(_:forSection:)`
+  (optional; `CYLTagListStore` keeps them next to the titles), `editableSectionItems()`,
+  `menu(_:didFinishEditingWithItems:)`, `CYLTagListRemoteSource.fetchItems(withKeys:completion:)` (optional) and
+  `loadItems(withKeys:completion:)`. Strings `CYLMenuRenameTag`, `CYLMenuRenamePlaceholder`, `CYLMenuRenameDone`,
+  `CYLMenuTagRenamed` (en, zh-Hans, zh-Hant). Tests: renaming with two icons and ids, title taps, spacing and margins,
+  items from the server, an external editor; Example 109 of 109 (iPhone 18 Pro simulator, iOS 27.2). The new public
+  symbols are TODO rows in `docs/android-api.md` for the Windows session. Used by CYLSearchViewController's contact tags
+  example (tags keyed by id, contacts bound to the id, CYLSearchBarView's editing bar above the keyboard).

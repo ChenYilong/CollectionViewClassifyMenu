@@ -16,11 +16,33 @@ import CollectionViewClassifyMenu
  */
 private final class CYLEditableTagSource: NSObject, CYLMenuDataSource, CYLMenuDelegate {
     var sections: [[String]]
+    /// Each item's stable id ("id-<first title>"), moved with it and kept by a rename.
+    var identifiers: [[String]]
     var editableSections: IndexSet?
+    var renames = false
     private(set) var events: [String] = []
 
     init(sections: [[String]]) {
         self.sections = sections
+        self.identifiers = sections.map { $0.map { "id-" + $0 } }
+    }
+
+    func menuIdentifierForItem(at indexPath: IndexPath) -> String { identifiers[indexPath.section][indexPath.item] }
+
+    override func responds(to aSelector: Selector!) -> Bool {
+        // Renaming is optional: the source offers it only when `renames`.
+        if aSelector == #selector(CYLMenuDataSource.menuRenameItem(at:to:)) {
+            return renames
+        }
+        return super.responds(to: aSelector)
+    }
+
+    func menuRenameItem(at indexPath: IndexPath, to title: String) {
+        sections[indexPath.section][indexPath.item] = title
+    }
+
+    func menu(_ menu: Any, didRenameItemAt indexPath: IndexPath, to title: String) {
+        events.append("rename \(indexPath.item)-\(indexPath.section) \(title)")
     }
 
     func numberOfSectionsInMenu() -> Int { sections.count }
@@ -28,11 +50,16 @@ private final class CYLEditableTagSource: NSObject, CYLMenuDataSource, CYLMenuDe
     func menuTitle(forSection section: Int) -> String { "Section \(section)" }
     func menuTitleForItem(at indexPath: IndexPath) -> String { sections[indexPath.section][indexPath.item] }
     func menuSectionAllowsEditing(_ section: Int) -> Bool { editableSections?.contains(section) ?? true }
-    func menuRemoveItem(at indexPath: IndexPath) { sections[indexPath.section].remove(at: indexPath.item) }
+    func menuRemoveItem(at indexPath: IndexPath) {
+        sections[indexPath.section].remove(at: indexPath.item)
+        identifiers[indexPath.section].remove(at: indexPath.item)
+    }
 
     func menuMoveItem(at sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let title = sections[sourceIndexPath.section].remove(at: sourceIndexPath.item)
         sections[destinationIndexPath.section].insert(title, at: destinationIndexPath.item)
+        let identifier = identifiers[sourceIndexPath.section].remove(at: sourceIndexPath.item)
+        identifiers[destinationIndexPath.section].insert(identifier, at: destinationIndexPath.item)
     }
 
     func menu(_ menu: Any, didSelectItemAt indexPath: IndexPath) {
@@ -46,6 +73,7 @@ private final class CYLEditableTagSource: NSObject, CYLMenuDataSource, CYLMenuDe
     func menu(_ menu: Any, didRequestNewItemWithName name: String, at indexPath: IndexPath) {
         events.append("add \(name) at \(indexPath.item)-\(indexPath.section)")
         sections[indexPath.section].insert(name, at: indexPath.item)
+        identifiers[indexPath.section].insert("id-" + name, at: indexPath.item)
         (menu as? CYLTagListView)?.reloadMenuData()
     }
 }
@@ -53,6 +81,22 @@ private final class CYLEditableTagSource: NSObject, CYLMenuDataSource, CYLMenuDe
 /**
  * A remote source that answers at once with fixed sections, or fails.
  */
+private final class CYLFakeItemsRemoteSource: NSObject, CYLTagListRemoteSource {
+    var items: [String: [CYLTagListCacheItem]]
+
+    init(items: [String: [CYLTagListCacheItem]]) {
+        self.items = items
+    }
+
+    func fetchSections(withKeys keys: [String], completion: @escaping ([String: [String]]?, Error?) -> Void) {
+        completion(items.mapValues { $0.map(\.title) }, nil)
+    }
+
+    func fetchItems(withKeys keys: [String], completion: @escaping ([String: [CYLTagListCacheItem]]?, Error?) -> Void) {
+        completion(items, nil)
+    }
+}
+
 private final class CYLFakeRemoteSource: NSObject, CYLTagListRemoteSource {
     var sections: [String: [String]]?
     private(set) var fetchCount = 0
@@ -241,5 +285,138 @@ final class CYLTagListEditingTests: CYLMenuExampleTestCase {
         XCTAssertEqual(loads(policy: .networkFirst, cached: ["A"], remote: ["B"]).events, ["network B"])
         XCTAssertEqual(loads(policy: .networkFirst, cached: ["A"], remote: nil).events, ["cache A"], "the cache when it fails")
         XCTAssertEqual(CYLTagListView(frame: .zero).loadPolicy, .cacheThenNetwork, "the core's default")
+    }
+
+    func testRenamingShowsTwoIconsRenamesAndKeepsTheIdentifier() {
+        let name = "CYLTagListEditingTests.rename"
+        CYLTagListStore(policy: .userDefaults, name: name).removeAllTitles()
+        let source = CYLEditableTagSource(sections: [["Recent A"], ["Family", "Friends", "Clients"]])
+        source.editableSections = [1]
+        let view = makeList(source)
+        view.cacheName = name
+        view.cachePolicy = .userDefaults
+        view.setEditing(true, animated: false)
+        XCTAssertFalse(cell(view, 0, 1)?.isRenamable ?? true, "no rename indicator without menuRenameItem")
+        source.renames = true
+        view.reloadMenuData()
+        let renamable = cell(view, 0, 1)
+        XCTAssertTrue(renamable?.isRenamable ?? false, "a pencil before the cross")
+        XCTAssertFalse(renamable?.button.editingIndicatorsView.isHidden ?? true, "drawn by the two-icon stack view")
+        XCTAssertEqual(renamable?.button.editingIndicatorsView.itemViews.count, 2)
+        XCTAssertGreaterThan(renamable?.button.renameIndicatorHitFrame.width ?? 0, 0)
+        XCTAssertEqual(renamable?.button.editingIndicatorsView.stackView.spacing, 8, "the default spacing between the icons")
+        let wider = CYLMenuStyle()
+        wider.editingIndicatorSpacing = 20
+        XCTAssertEqual(CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
+                                          style: wider, traitCollection: nil)
+                       - CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
+                                            style: CYLMenuStyle(), traitCollection: nil), 12, accuracy: 0.5,
+                       "editingIndicatorSpacing widens the tag by the extra space")
+        let padded = CYLMenuStyle()
+        padded.editingIndicatorInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 6)
+        XCTAssertEqual(CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
+                                          style: padded, traitCollection: nil)
+                       - CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
+                                            style: CYLMenuStyle(), traitCollection: nil), 10, accuracy: 0.5,
+                       "editingIndicatorInsets (left 10 + right 6 instead of 4 + 2) widens the tag")
+        XCTAssertEqual(CYLMenuStyle().editingIndicatorInsets, UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 2), "the default margins")
+        XCTAssertFalse(cell(view, 0, 0)?.isRenamable ?? true, "not outside the editable sections")
+        XCTAssertTrue(renamable?.renamesOnTitleTap ?? false, "a tap on the title renames too, by default")
+        let titleArea = renamable?.contentView.subviews.first { $0.accessibilityIdentifier == CYLTagListAccessibilityIdentifier.renameTitle }
+        XCTAssertGreaterThan(titleArea?.frame.width ?? 0, 0)
+        (titleArea as? UIControl)?.sendActions(for: .touchUpInside)
+        XCTAssertEqual(view.renamingIndexPath, IndexPath(item: 0, section: 1), "the title tap starts renaming")
+        view.finishRenaming(to: "Family")
+        XCTAssertNil(view.renamingIndexPath, "an unchanged name only ends renaming")
+        view.renamesOnTitleTapWhileEditing = false
+        XCTAssertFalse(cell(view, 0, 1)?.renamesOnTitleTap ?? true)
+        view.renamesOnTitleTapWhileEditing = true
+
+        let collection = view.subviews.compactMap { $0 as? UICollectionView }.first!
+        view.collectionView(collection, moveItemAt: IndexPath(item: 1, section: 1), to: IndexPath(item: 0, section: 1))
+        view.beginRenaming(at: IndexPath(item: 0, section: 1))
+        XCTAssertEqual(view.renamingIndexPath, IndexPath(item: 0, section: 1))
+        XCTAssertTrue(view.addItemView.isRenaming)
+        XCTAssertEqual(view.addItemView.textField.text, "Friends", "the field shows the title to rename")
+        view.addItemView.textField.text = "Best Friends"
+        view.addItemView.submit()
+        XCTAssertNil(view.renamingIndexPath)
+        XCTAssertFalse(view.addItemView.isRenaming, "the control adds tags again")
+        XCTAssertEqual(source.sections[1], ["Best Friends", "Family", "Clients"])
+        XCTAssertEqual(source.events.last, "rename 0-1 Best Friends")
+        let items = CYLTagListStore(policy: .userDefaults, name: name).cachedItems(forSection: "1")
+        XCTAssertEqual(items?.map(\.identifier), ["id-Friends", "id-Family", "id-Clients"], "reordered and renamed, the same ids")
+        XCTAssertEqual(items?.map(\.title), ["Best Friends", "Family", "Clients"])
+        var finished: [String: [CYLTagListCacheItem]]?
+        let delegate = CYLItemsRecorder { finished = $0 }
+        view.menuDelegate = delegate
+        view.setEditing(false, animated: false)
+        XCTAssertEqual(finished?["1"]?.first, CYLTagListCacheItem(identifier: "id-Friends", title: "Best Friends"))
+        CYLTagListStore(policy: .userDefaults, name: name).removeAllTitles()
+    }
+
+    func testLoadItemsKeepsIdentifiersFromTheServer() {
+        let name = "CYLTagListEditingTests.items"
+        let store = CYLTagListStore(policy: .sandboxFile, name: name)
+        store.removeAllTitles()
+        store.saveItems([CYLTagListCacheItem(identifier: "t1", title: "Family")], forSection: "mine")
+        XCTAssertEqual(store.cachedTitles(forSection: "mine"), ["Family"], "the titles follow the items")
+        let view = CYLTagListView(frame: .zero)
+        view.cache = store
+        let renamedOnServer = [CYLTagListCacheItem(identifier: "t2", title: "Work"), CYLTagListCacheItem(identifier: "t1", title: "Home")]
+        view.remoteSource = CYLFakeItemsRemoteSource(items: ["mine": renamedOnServer])
+        var events: [String] = []
+        let wait = expectation(description: "loaded")
+        wait.isInverted = true
+        view.loadItems(withKeys: ["mine"]) { items, origin in
+            events.append("\(origin == .cache ? "cache" : "network") \(items["mine"]?.map(\.description).joined(separator: ",") ?? "-")")
+        }
+        self.wait(for: [wait], timeout: 0.2)
+        XCTAssertEqual(events, ["cache t1:Family", "network t2:Work,t1:Home"])
+        XCTAssertEqual(store.cachedItems(forSection: "mine"), renamedOnServer, "the server's items are saved with their ids")
+        store.saveTitles(["A"], forSection: "mine")
+        XCTAssertEqual(store.cachedItems(forSection: "mine")?.first?.identifier, "A", "plain titles: each title is its id")
+        store.removeAllTitles()
+    }
+}
+
+
+extension CYLTagListEditingTests {
+    func testAnExternalEditorRenamesAndAdds() {
+        let source = CYLEditableTagSource(sections: [["Family", "Friends"]])
+        source.renames = true
+        let view = makeList(source)
+        view.showsAddItemViewWhileEditing = false
+        var request: (IndexPath, String)?
+        view.renameRequestHandler = { request = ($0, $1) }
+        view.setEditing(true, animated: false)
+        XCTAssertFalse(view.addItemView.isDescendant(of: view), "no built-in field")
+        view.beginRenaming(at: IndexPath(item: 1, section: 0))
+        XCTAssertEqual(request?.0, IndexPath(item: 1, section: 0))
+        XCTAssertEqual(request?.1, "Friends", "the host's editor gets the title")
+        XCTAssertFalse(view.addItemView.isDescendant(of: view), "still no built-in field while the host renames")
+        view.finishRenaming(to: "Pals")
+        XCTAssertEqual(source.sections[0], ["Family", "Pals"])
+        view.beginRenaming(at: IndexPath(item: 0, section: 0))
+        view.cancelRenaming()
+        XCTAssertNil(view.renamingIndexPath)
+        XCTAssertEqual(source.sections[0], ["Family", "Pals"], "cancelling changes nothing")
+        view.submitNewItem(named: "  Clients ")
+        XCTAssertEqual(source.sections[0], ["Family", "Pals", "Clients"], "the host's field adds, trimmed")
+    }
+}
+
+/**
+ * Records `menu(_:didFinishEditingWithItems:)`.
+ */
+private final class CYLItemsRecorder: NSObject, CYLMenuDelegate {
+    let handler: ([String: [CYLTagListCacheItem]]) -> Void
+
+    init(_ handler: @escaping ([String: [CYLTagListCacheItem]]) -> Void) {
+        self.handler = handler
+    }
+
+    func menu(_ menu: Any, didFinishEditingWithItems items: [String: [CYLTagListCacheItem]]) {
+        handler(items)
     }
 }

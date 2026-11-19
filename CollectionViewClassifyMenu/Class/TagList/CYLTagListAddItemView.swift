@@ -32,6 +32,41 @@ open class CYLTagListAddItemView: UIView, UITextFieldDelegate {
     open var submitHandler: ((String) -> Void)?
 
     /**
+     * Whether the control renames a tag (`beginRenaming(title:)`) instead of adding one.
+     */
+    open private(set) var isRenaming = false
+
+    /**
+     * Renames a tag: the field shows `title` with the keyboard up, the button reads "Done" (`CYLMenuRenameDone`); the
+     * next submit reports the new name, then the control adds tags again.
+     */
+    @objc open func beginRenaming(title: String) {
+        isRenaming = true
+        textField.text = title
+        textField.placeholder = CYLMenuLocalizedString("CYLMenuRenamePlaceholder")
+        textField.accessibilityLabel = CYLMenuLocalizedString("CYLMenuRenamePlaceholder")
+        addButton.setTitle(CYLMenuLocalizedString("CYLMenuRenameDone"), for: .normal)
+        addButton.isEnabled = !name.isEmpty
+        setNeedsLayout()
+        textField.becomeFirstResponder()
+        textField.selectAll(nil)
+    }
+
+    /**
+     * Leaves renaming without a change: the field is cleared and adds tags again.
+     */
+    @objc open func endRenaming() {
+        guard isRenaming else { return }
+        isRenaming = false
+        textField.text = ""
+        textField.placeholder = CYLMenuLocalizedString("CYLMenuAddTagPlaceholder")
+        textField.accessibilityLabel = CYLMenuLocalizedString("CYLMenuAddTagPlaceholder")
+        addButton.setTitle(CYLMenuLocalizedString("CYLMenuAddTag"), for: .normal)
+        addButton.isEnabled = false
+        setNeedsLayout()
+    }
+
+    /**
      * The height of the control; 44 points by default, larger with larger Dynamic Type.
      */
     open var preferredHeight: CGFloat {
@@ -115,11 +150,16 @@ open class CYLTagListAddItemView: UIView, UITextFieldDelegate {
         guard !name.isEmpty else {
             return
         }
+        let renaming = isRenaming
         textField.text = ""
         addButton.isEnabled = false
         submitHandler?(name)
+        if renaming {
+            endRenaming()
+            textField.resignFirstResponder()
+        }
         UIAccessibility.post(notification: .announcement,
-                             argument: String(format: CYLMenuLocalizedString("CYLMenuTagAdded"), name))
+                             argument: String(format: CYLMenuLocalizedString(renaming ? "CYLMenuTagRenamed" : "CYLMenuTagAdded"), name))
     }
 
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {

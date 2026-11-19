@@ -52,3 +52,9 @@
 "CYLMenuAddTag" = "Add Tag";
 "CYLMenuAddTagPlaceholder" = "Tag name";
 "CYLMenuTagAdded" = "Tag added: %@";
+
+/* CYLTagListView editing: renaming a tag (the pencil before the delete indicator, the add control as the rename field). */
+"CYLMenuRenameTag" = "Edit";
+"CYLMenuRenamePlaceholder" = "New name";
+"CYLMenuRenameDone" = "Done";
+"CYLMenuTagRenamed" = "Tag renamed: %@";
