@@ -1559,3 +1559,22 @@ tags: [issues, ui, cocoapods, progress]
   the word), then Fill in: the remark field shows exactly those texts.
   Screenshots: [ios-word-picker-several-smears.png](assets/ios-word-picker-several-smears.png).
 
+
+### TODO (2026-11-20, `feat/harmony`): raise the iOS minimum of the podspecs below 15 to iOS 15
+
+- Context: CollectionViewClassifyMenu is already at iOS 15.0 everywhere (podspec `s.platform`, `Package.swift`
+  `.iOS(.v15)`, every Podfile, 14 Xcode targets, the Flutter plugin podspec; the React Native plugin follows React
+  Native's own minimum). Podspecs elsewhere in the vault are lower: CYLTabBarController and CYLAnimatedItem (`'12.0'`,
+  the Lottie subspec `13.0`; our pod depends on CYLAnimatedItem), CYLTableViewPlaceHolder (`'12.0'`, `13.0`), and older
+  pods: MJRefresh (`12.0`, a copy `9.0`), ChatKit-OC-leancloud (`7.0`), Haidilao's CYLChatKit (`8.0`), WZLBadge (`5.0`).
+  Raising a published pod's minimum is a breaking change for its users; the owner chose these three groups when asked.
+- Prompt (verbatim): "raise iOS .spec the minimum to iOS 15"
+- Prompt (English): same.
+- Owner's answer (asked which podspecs): "CYLTabBarController + CYLAnimatedItem, CYLTableViewPlaceHolder, Older pods
+  (MJRefresh, ChatKit, WZLBadge...)".
+- Plan (session roles rule, repository owners): CYLTabBarController and CYLTableViewPlaceHolder are other Mac sessions'
+  repositories: the request goes to them. The older pods are third-party copies on `master` (MJRefresh: 3 unrelated
+  uncommitted files): edited in the working tree only, not committed or pushed.
+- Acceptance (100): the five older podspecs say iOS 15.0 and still parse (30); both CYL requests sent and confirmed done
+  by their owners (40); this repository's pins follow if CYLAnimatedItem changes (20); the result listed here (10).
+  Pass: 60.
