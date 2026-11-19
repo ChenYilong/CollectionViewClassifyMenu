@@ -14,6 +14,7 @@
  */
 
 /** The iOS colors the samples use, as UIKit's light-mode values. */
+const { iconImage } = require('./editing-icons.js');
 const NAMED_COLORS = {
   clear: 'rgba(0, 0, 0, 0)',
   white: '#FFFFFF',
@@ -126,6 +127,13 @@ function defaultStyle() {
     elevation: 0,
     // An image as the delete indicator instead of the title or the drawn cross (setCrossDrawable).
     deleteIndicatorImage: null,
+    // The space between a renamable tag's two editing icons (the edit icon and the cross) while editing (iOS 3af1b7cd).
+    editingIndicatorSpacing: 10,
+    // The margins around the two editing icons: left from the title, right to the tag's padding.
+    editingIndicatorInsets: { top: 0, left: 4, bottom: 0, right: 0 },
+    // The section header's clear button: its image (null: the core's trash icon) and color (null: the header's).
+    clearButtonImage: null,
+    clearButtonColor: null,
     imageTitleSpacing: 4,
     imageSize: 14,
     itemHeight: 30,
@@ -444,6 +452,16 @@ function cornerRadius(radius, height) {
   return height / 2;
 }
 
+/** The cap height of a font (about 0.7 of its size). */
+function capHeight(fontSize) {
+  return fontSize * 0.7;
+}
+
+/** The side of one editing icon: the title's cap height x 1.25 (iOS 3af1b7cd). */
+function editingIconSide(fontSize) {
+  return Math.ceil(capHeight(fontSize) * 1.25);
+}
+
 /** The delete indicator's area for a drawn cross: three quarters of a line plus the padding on both sides. */
 function crossIndicatorWidth(style, state = 'normal') {
   if (style.deleteIndicatorWidth > 0) return style.deleteIndicatorWidth;
@@ -534,7 +552,8 @@ function px(value) {
  * accessibility label.
  */
 function renderTag(tag, index, context) {
-  const { listStyle, theme, selection = [], pressed = -1, defaultTagImage = '', dragging = -1, editing = false } = context;
+  const { listStyle, theme, selection = [], pressed = -1, defaultTagImage = '', dragging = -1, editing = false,
+    renamable = false } = context;
   const style = styleForItem(tag, index, listStyle, theme);
   const enabled = tag.isEnabled !== false;
   const selected = selection.includes(index);
@@ -570,7 +589,28 @@ function renderTag(tag, index, context) {
   const deletable = (editing || !!tag.isDeletable) && enabled;
   const leading = style.deleteIndicatorPlacement === 'leading';
   let deleteIndicator = null;
-  if (deletable) {
+  let editingIcons = null;
+  if (deletable && renamable && editing) {
+    // A renamable tag (iOS `CYLTagButton.showsRenameIndicator`): the edit icon then the cross, each slot the title's
+    // cap height x 1.25 with the glyph filling it, `editingIndicatorSpacing` apart, `editingIndicatorInsets` around.
+    const color = style.deleteIndicatorColor || a.textColor;
+    const side = editingIconSide(a.fontSize);
+    const m = style.editingIndicatorInsets || { top: 0, left: 4, bottom: 0, right: 0 };
+    const gap = Math.max(0, style.editingIndicatorSpacing);
+    const left = Math.max(0, m.left);
+    const right = Math.max(0, m.right);
+    const half = gap / 2;
+    editingIcons = {
+      // Each hit area runs the tag's full height; they meet halfway between the icons.
+      renameStyle: `margin: -${px(insets.top)} 0 -${px(insets.bottom)} 0; padding: 0 ${px(half)} 0 ${px(spacing + left)}`,
+      deleteStyle: `margin: -${px(insets.top)} -${px(insets.right)} -${px(insets.bottom)} 0; `
+        + `padding: 0 ${px(insets.right + right)} 0 ${px(gap - half)}`,
+      iconStyle: `width: ${px(side)}; height: ${px(side)}`,
+      renameImage: iconImage('rename', color),
+      deleteImage: iconImage('delete', color),
+      width: spacing + left + 2 * side + gap + right,
+    };
+  } else if (deletable) {
     const indicatorColor = style.deleteIndicatorColor || a.textColor;
     // The hit area reaches the tag's edge and its full height (`deleteIndicatorHitFrame`).
     const hit = leading
@@ -654,6 +694,7 @@ function renderTag(tag, index, context) {
     icon,
     deleteIndicator,
     deleteFirst: !!deleteIndicator && leading,
+    editingIcons,
     selected,
     enabled,
     rippleColor: style.rippleColor ? withAlpha(style.rippleColor, Math.min(1, Math.max(0, style.rippleAlpha))) : '',
@@ -727,4 +768,6 @@ module.exports = {
   tapSelection,
   renderTag,
   renderList,
+  capHeight,
+  editingIconSide,
 };

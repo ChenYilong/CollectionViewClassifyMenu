@@ -1270,8 +1270,17 @@ tags: [issues, ui, cocoapods, progress]
   `#items` companion section, the header clear button (`cyl_trash` in `resources/base/media`, a 44 vp
   `responseRegion`). Cap height: 0.7 of the font size (HarmonyOS Sans). 4 new host tests (`TagListEditing.test.ets`, the
   iOS cases); 75 / 75; the app builds; `docs/harmony.md` 944 / 944.
-- **TODO:** HarmonyOS emulator screenshot of the editing icons and the clear button; the mini program; CYLTabBarController:
-  a horizontal axis (and symbol tint) for the HarmonyOS `CYLAnimatedItemStackView`, so the tag can use the view itself.
+- **Mini program (done in code, 25 / 30; a DevTools screenshot is still due):** `cyl-tag-cloud` properties
+  `supportsRenamingItems`, `renamesOnTitleTapWhileEditing`, `showsClearButton`; methods `beginRenaming`,
+  `cancelRenaming`, `finishRenaming`, `submitNewItem`, `renamingIndex`, `setRenameRequestHandler`, `editableSectionItems`,
+  `cachedItems`, `loadItems`; events `tagrename`, `clearbuttontap`, `editingfinish` {titles, items}. The cloud owns its
+  tags, so a rename changes the tag (its id, `identifier` or the old title, stays). `CYLTagListStore.cachedItems` /
+  `saveItems` and `loadItems` (with `fetchItemsWithKeys`) in cache.js. The editing icons and the trash are drawn SVGs in
+  data URIs (`editing-icons.js`): an `<image>` cannot tint a file, so there is no image file to add to a folder. New
+  `test/tag-cloud-renaming.test.js` (5); `npm test` 159 / 159; WeChat DevTools Build npm and refresh succeed.
+- **TODO:** emulator screenshots of the editing icons and the clear button (HarmonyOS, mini program); use
+  CYLTabBarController's new stack view options (HarmonyOS 692f0aa7 `model.axis` / `spacing` / `iconColor`, Android
+  1fbd8048 `stack.axis` / `spacingDp` / `iconColor`) for the tag's editing icons once they are in a pinned commit.
 
 ### TODO (2026-11-19, `feat/harmony`, Windows session): Android tags cut short with "…" although there is room
 
@@ -1291,4 +1300,5 @@ tags: [issues, ui, cocoapods, progress]
   width. New device test `CYLTagTitleFitDeviceTest` (androidTest, 15 titles x 5 insets, normal and editing): it failed on
   emulator-5556 before the fix (188 px labels for 189 px of text) and passes after; the Robolectric twin
   `CYLTagTitleFitTest` rounds the same way. Library 99 / 0; the example builds.
-- **TODO:** the "after" screenshot in CYLSearchViewController's contact tags once it pins the fix commit (30).
+- **Screenshot (after, 30 / 30):** `docs/assets/android-tag-title-ellipsis-after.png` (CYLSearchViewController 918a7fa with
+  1a3a31dc on emulator-5556): "Book Club" and "Recruiters" in full. **Score: 100 / 100.**

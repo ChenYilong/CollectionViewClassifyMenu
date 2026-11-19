@@ -25,10 +25,20 @@
  * already saved) for the host to upload; `setRemoteSource(source)` (an object with `fetchSectionsWithKeys(keys,
  * callback(sections, error))`) and `loadPolicy` ('cacheThenNetwork' by default, 'cacheFirst', 'networkFirst') drive
  * `loadSections(keys, completion(sections, origin))`; downloads are saved to the cache first.
+ *
+ * Renaming (iOS 990cf115): with `supportsRenamingItems`, every enabled tag shows an edit icon before its cross while
+ * editing; a tap on it (or on the title, `renamesOnTitleTapWhileEditing`) starts renaming (`beginRenaming(position)`):
+ * the add field shows the title and its submit renames the tag, then `tagrename` {position, title, tag}; or a host's
+ * editor set with `setRenameRequestHandler(fn(position, title))` gets it, finishing with `finishRenaming(title)` or
+ * `cancelRenaming()`. A tag's id (`identifier`, else its title) is kept by reordering and renaming: `cachedItems()`,
+ * `editableSectionItems()`, `editingfinish` {titles, items} and `loadItems(keys, completion(items, origin))` (with the
+ * remote source's `fetchItemsWithKeys`). `showsClearButton` puts a trash button in the header: `clearbuttontap`
+ * {section: 0}.
  */
 const model = require('./model.js');
 const { coreString } = require('../core-strings.js');
-const { CYLTagListStore, loadSections } = require('./cache.js');
+const { CYLTagListStore, loadSections, loadItems } = require('./cache.js');
+const { iconImage } = require('./editing-icons.js');
 const locale = require('../locale.js');
 
 /** How far a press moves before it counts as a drag rather than a long press (`dragThreshold`). */
@@ -69,6 +79,9 @@ Component({
     cachePolicy: { type: String, value: 'none' },
     cacheName: { type: String, value: 'CYLTagListView' },
     loadPolicy: { type: String, value: 'cacheThenNetwork' },
+    supportsRenamingItems: { type: Boolean, value: false },
+    renamesOnTitleTapWhileEditing: { type: Boolean, value: true },
+    showsClearButton: { type: Boolean, value: false },
   },
 
   data: {
@@ -81,6 +94,11 @@ Component({
     addText: '',
     addPlaceholder: '',
     addTitle: '',
+    renameLabel: '',
+    clearLabel: '',
+    clearImage: '',
+    clearStyle: '',
+    renamingIndex: -1,
   },
 
   observers: {
@@ -100,7 +118,13 @@ Component({
       this._cache = CYLTagListStore.cache(policy, name);
     },
     showsAddItemViewWhileEditing() {
-      this.setData({ showsAddItem: this._editing && this.data.showsAddItemViewWhileEditing });
+      this._updateAddItem();
+    },
+    'supportsRenamingItems, renamesOnTitleTapWhileEditing'() {
+      this._render(false);
+    },
+    'showsClearButton, sectionTitle'() {
+      this._updateClearButton();
     },
   },
 
@@ -114,13 +138,17 @@ Component({
       this._editing = false;
       this._cache = null;
       this._remoteSource = null;
+      this._renaming = -1;
+      this._renameRequestHandler = null;
     },
     attached() {
       this.setData({
         deleteLabel: coreString('CYLMenuDeleteTag'),
         addPlaceholder: locale.tc('CYLMenuAddTagPlaceholder'),
         addTitle: locale.tc('CYLMenuAddTag'),
+        renameLabel: locale.tc('CYLMenuRenameTag'),
       });
+      this._updateClearButton();
       this._cache = CYLTagListStore.cache(this.data.cachePolicy, this.data.cacheName);
       // The initial tags, when the observer has not run for them.
       if (!this._tagsSet) this._tags = (this.data.tags || []).map(keyed);
@@ -211,11 +239,13 @@ Component({
       if (value === this._editing) return;
       this._editing = value;
       if (!value) {
-        // The edited titles, for the host to upload (the cache already has them).
-        this.triggerEvent('editingfinish', { titles: this.editableSectionTitles() });
+        this._endRenaming();
+        // The edited titles and items, for the host to upload (the cache already has them).
+        this.triggerEvent('editingfinish', { titles: this.editableSectionTitles(), items: this.editableSectionItems() });
       }
       this._dragging = null;
-      this.setData({ isEditing: value, showsAddItem: value && this.data.showsAddItemViewWhileEditing, addText: value ? this.data.addText : '' });
+      this.setData({ isEditing: value, addText: value ? this.data.addText : '' });
+      this._updateAddItem();
       this._render(false);
       this.triggerEvent('editingchange', { editing: value });
     },
@@ -227,7 +257,135 @@ Component({
 
     /** `saveEditableSectionsToCache()`: saves the current titles to the cache (the cloud saves after each edit). */
     saveToCache() {
-      if (this._cache) this._cache.saveTitles(this._tags.map((tag) => String(tag.title)), '0');
+      // With ids, so a renamed tag stays the same tag.
+      if (this._cache) this._cache.saveItems(this.editableSectionItems()['0'], '0');
+    },
+
+    /** `cachedItems(forSection:)`: the saved items ({identifier, title}); undefined when nothing was saved. */
+    cachedItems() {
+      return this._cache ? this._cache.cachedItems('0') : undefined;
+    },
+
+    /** `editableSectionItems()`: the items by cache key ({"0": [{identifier, title}]}): the id, else the title. */
+    editableSectionItems() {
+      return { 0: this._tags.map((tag) => ({ identifier: this._identifier(tag), title: String(tag.title) })) };
+    },
+
+    /** `loadItems(withKeys:completion:)`: `loadSections` with ids (the remote source's `fetchItemsWithKeys`). */
+    loadItems(keys, completion) {
+      loadItems({ cache: this._cache, remote: this._remoteSource, policy: this.data.loadPolicy, keys, completion });
+    },
+
+    // MARK: Renaming (iOS 990cf115)
+
+    /** `renamingIndexPath`: the position of the tag being renamed; -1 otherwise. */
+    renamingIndex() {
+      return this._renaming;
+    },
+
+    /** `renameRequestHandler`: your own editor, `fn(position, title)`, instead of the add field; null: the add field. */
+    setRenameRequestHandler(handler) {
+      this._renameRequestHandler = typeof handler === 'function' ? handler : null;
+      this._updateAddItem();
+    },
+
+    /** Whether the tag at `index` can be renamed now (editing, enabled, `supportsRenamingItems`). */
+    isRenamable(index) {
+      const tag = this._tags[index];
+      return !!tag && this._editing && this.data.supportsRenamingItems && tag.isEnabled !== false;
+    },
+
+    /** `beginRenaming(at:)`: the add field shows the tag's title; its submit renames it (or the host's editor gets it). */
+    beginRenaming(index) {
+      if (!this.isRenamable(index)) return;
+      this._renaming = index;
+      const title = String(this._tags[index].title);
+      if (this._renameRequestHandler) {
+        this._renameRequestHandler(index, title);
+        return;
+      }
+      this.setData({ renamingIndex: index, addText: title, addPlaceholder: locale.tc('CYLMenuRenamePlaceholder'), addTitle: locale.tc('CYLMenuRenameDone') });
+      this._updateAddItem();
+    },
+
+    /** `cancelRenaming()`: ends renaming without a change. */
+    cancelRenaming() {
+      if (this._renaming < 0) return;
+      this._endRenaming();
+      this.setData({ addText: '' });
+    },
+
+    /**
+     * `finishRenaming(to:)`: renames the tag to `title` (trimmed; an empty or unchanged one only ends renaming), saves
+     * the cache and sends `tagrename` {position, title, tag}.
+     */
+    finishRenaming(title) {
+      const index = this._renaming;
+      if (index < 0) return;
+      this._endRenaming();
+      this.setData({ addText: '' });
+      const name = String(title == null ? '' : title).trim();
+      const tag = this._tags[index];
+      if (!tag || !name || name === String(tag.title)) return;
+      // The id stays with the tag: a tag without one keeps its old title as its id.
+      if (!this._hasIdentifier(tag)) tag.identifier = String(tag.title);
+      tag.title = name;
+      this._render(true);
+      this.triggerEvent('tagrename', { position: index, title: name, tag: publicTag(tag) });
+    },
+
+    /** `submitNewItem(named:)`: adds a tag from your own editor, as the add field's submit does (trimmed). */
+    submitNewItem(name) {
+      const trimmed = String(name == null ? '' : name).trim();
+      if (!trimmed) return;
+      this.cancelRenaming();
+      this.triggerEvent('requestnewitem', { name: trimmed, position: this._tags.length });
+      this.saveToCache();
+    },
+
+    onRename(event) {
+      this.beginRenaming(this._index(event));
+    },
+
+    onClearTap() {
+      this.triggerEvent('clearbuttontap', { section: 0 });
+    },
+
+    _hasIdentifier(tag) {
+      const id = tag.identifier;
+      return (typeof id === 'string' && id.length > 0) || (typeof id === 'number' && id !== 0);
+    },
+
+    _identifier(tag) {
+      return this._hasIdentifier(tag) ? String(tag.identifier) : String(tag.title);
+    },
+
+    _endRenaming() {
+      if (this._renaming < 0 && this.data.renamingIndex < 0) return;
+      this._renaming = -1;
+      this.setData({ renamingIndex: -1, addPlaceholder: locale.tc('CYLMenuAddTagPlaceholder'), addTitle: locale.tc('CYLMenuAddTag') });
+      this._updateAddItem();
+    },
+
+    /** The add field: while editing and `showsAddItemViewWhileEditing`, or while renaming without the host's editor. */
+    _updateAddItem() {
+      const renaming = this._renaming >= 0 && !this._renameRequestHandler;
+      this.setData({ showsAddItem: this._editing && (this.data.showsAddItemViewWhileEditing || renaming) });
+    },
+
+    _updateClearButton() {
+      if (!this.data.showsClearButton) {
+        this.setData({ clearImage: '' });
+        return;
+      }
+      const style = this._style();
+      const side = Math.ceil(model.lineHeight(style.headerFontSize || 15));
+      const clear = locale.tc('CYLMenuClearSection');
+      this.setData({
+        clearImage: style.clearButtonImage || iconImage('clear', style.clearButtonColor || style.headerTextColor || '#999999'),
+        clearStyle: `width: ${side}px; height: ${side}px`,
+        clearLabel: this.data.sectionTitle ? `${clear} ${this.data.sectionTitle}` : clear,
+      });
     },
 
     /** `editableSectionTitles()`: the titles by cache key ({"0": titles}, the cloud being one section). */
@@ -256,6 +414,11 @@ Component({
     onAddSubmit() {
       const name = String(this.data.addText || '').trim();
       if (!name) return;
+      if (this._renaming >= 0) {
+        // A submit while renaming renames.
+        this.finishRenaming(name);
+        return;
+      }
       this.setData({ addText: '' });
       this.triggerEvent('requestnewitem', { name, position: this._tags.length });
       this.saveToCache();
@@ -279,7 +442,12 @@ Component({
         dragging: this._dragging ? this._dragging.current : -1,
         editing: this._editing,
       };
-      const items = this._tags.map((tag, index) => model.renderTag(tag, index, context));
+      const renames = this._editing && this.data.supportsRenamingItems;
+      const items = this._tags.map((tag, index) => {
+        const item = model.renderTag(tag, index, { ...context, renamable: renames });
+        item.renamesOnTitleTap = !!item.editingIcons && this.data.renamesOnTitleTapWhileEditing;
+        return item;
+      });
       const list = model.renderList(listStyle, {
         containerBorderWidth: this.data.containerBorderWidth,
         containerBorderColor: this.data.containerBorderColor,

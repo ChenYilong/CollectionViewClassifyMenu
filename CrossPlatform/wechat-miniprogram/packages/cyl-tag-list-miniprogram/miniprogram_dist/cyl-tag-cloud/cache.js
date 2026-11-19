@@ -43,6 +43,8 @@ class CYLTagListStore {
     if (this.policy === 'none') return;
     const all = this._read();
     all[String(section)] = (titles || []).map(String);
+    // Plain titles replace any items saved for the section.
+    delete all[`${section}#items`];
     this._write(all);
   }
 
@@ -50,12 +52,33 @@ class CYLTagListStore {
     if (this.policy === 'none') return;
     const all = this._read();
     delete all[String(section)];
+    delete all[`${section}#items`];
     this._write(all);
   }
 
   removeAllTitles() {
     if (this.policy === 'none') return;
     this._write({});
+  }
+
+  /** `cachedItems(forSection:)`: the saved items ({identifier, title}); titles saved alone are their own ids. */
+  cachedItems(section) {
+    if (this.policy === 'none') return undefined;
+    const all = this._read();
+    const items = all[`${section}#items`];
+    if (Array.isArray(items)) return items.map((item) => ({ identifier: String(item.identifier), title: String(item.title) }));
+    const titles = all[String(section)];
+    return Array.isArray(titles) ? titles.map((title) => ({ identifier: String(title), title: String(title) })) : undefined;
+  }
+
+  /** `saveItems(_:forSection:)`: the items with their ids, and their titles as the section itself. */
+  saveItems(items, section) {
+    if (this.policy === 'none') return;
+    const all = this._read();
+    const list = (items || []).map((item) => ({ identifier: String(item.identifier), title: String(item.title) }));
+    all[`${section}#items`] = list;
+    all[String(section)] = list.map((item) => item.title);
+    this._write(all);
   }
 
   // MARK: Storage
@@ -165,4 +188,43 @@ function loadSections({ cache, remote, policy = 'cacheThenNetwork', keys, comple
   }
 }
 
-module.exports = { CYLTagListStore, POLICIES, LOAD_POLICIES, loadSections };
+/**
+ * `loadItems(withKeys:completion:)`: `loadSections` with ids: the cache's items and the remote source's
+ * (`fetchItemsWithKeys(keys, callback(items, error))`, else its titles, each its own id); downloads are saved first.
+ */
+function loadItems({ cache, remote, policy = 'cacheThenNetwork', keys, completion }) {
+  const asItems = (titles) => titles.map((title) => ({ identifier: String(title), title: String(title) }));
+  const itemsRemote = remote ? {
+    fetchSectionsWithKeys(fetchKeys, callback) {
+      const done = (items, error) => {
+        if (!items || error) {
+          callback(null, error || new Error('CYLTagListRemoteSource'));
+          return;
+        }
+        callback(items, null);
+      };
+      if (typeof remote.fetchItemsWithKeys === 'function') {
+        remote.fetchItemsWithKeys(fetchKeys, done);
+      } else if (typeof remote.fetchSectionsWithKeys === 'function') {
+        remote.fetchSectionsWithKeys(fetchKeys, (sections, error) => {
+          if (!sections || error) {
+            done(null, error);
+            return;
+          }
+          const items = {};
+          for (const key of Object.keys(sections)) items[key] = asItems(sections[key]);
+          done(items, null);
+        });
+      } else {
+        done(null, new Error('CYLTagListRemoteSource'));
+      }
+    },
+  } : null;
+  const itemsCache = cache ? {
+    cachedTitles: (key) => cache.cachedItems(key),
+    saveTitles: (items, key) => cache.saveItems(items, key),
+  } : null;
+  loadSections({ cache: itemsCache, remote: itemsRemote, policy, keys, completion });
+}
+
+module.exports = { CYLTagListStore, POLICIES, LOAD_POLICIES, loadSections, loadItems };

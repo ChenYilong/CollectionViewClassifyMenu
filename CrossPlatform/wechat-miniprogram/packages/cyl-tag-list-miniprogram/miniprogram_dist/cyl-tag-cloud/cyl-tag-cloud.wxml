@@ -2,6 +2,11 @@
   <view wx:if="{{showsSectionHeaders}}" class="cyl-tc-header" style="{{list.headerStyle}}">
     <view wx:if="{{list.headerIndicatorStyle}}" class="cyl-tc-header-indicator" style="{{list.headerIndicatorStyle}}" />
     <text class="cyl-tc-header-title" aria-role="heading">{{sectionTitle}}</text>
+    <!-- The section's clear button (iOS menuShowsClearButton(forSection:)): a 44 px tap area around the icon. -->
+    <view wx:if="{{clearImage}}" class="cyl-tc-clear" id="CYLTagListClearButton" bindtap="onClearTap"
+          aria-role="button" aria-label="{{clearLabel}}">
+      <image class="cyl-tc-clear-image" src="{{clearImage}}" mode="aspectFit" style="{{clearStyle}}" aria-hidden="true" />
+    </view>
   </view>
   <view class="cyl-tc-body" style="{{list.bodyStyle}}">
     <view class="cyl-tc-items" style="{{list.itemsStyle}}">
@@ -29,7 +34,22 @@
         <image wx:if="{{item.icon.image}}" class="cyl-tc-icon" src="{{item.icon.image}}" mode="{{item.icon.mode}}"
                style="{{item.icon.style}}" aria-hidden="true" />
         <view wx:elif="{{item.icon.badge}}" class="cyl-tc-badge" style="{{item.icon.style}}" aria-hidden="true">{{item.icon.badge}}</view>
-        <text wx:if="{{item.hasTitle}}" class="cyl-tc-title" style="{{item.titleStyle}}">{{item.title}}</text>
+        <text wx:if="{{item.hasTitle && item.renamesOnTitleTap}}" class="cyl-tc-title" id="CYLTagListRenameTitle-{{index}}"
+              style="{{item.titleStyle}}" data-index="{{index}}" catchtap="onRename">{{item.title}}</text>
+        <text wx:elif="{{item.hasTitle}}" class="cyl-tc-title" style="{{item.titleStyle}}">{{item.title}}</text>
+        <!-- A renamable tag while editing: the edit icon then the cross (iOS editingIndicatorsView). -->
+        <block wx:if="{{item.editingIcons}}">
+          <view class="cyl-tc-edit-icon" id="CYLTagListRenameButton-{{index}}" style="{{item.editingIcons.renameStyle}}"
+                data-index="{{index}}" catchtap="onRename" catchtouchstart="noop" catchlongpress="noop"
+                aria-role="button" aria-label="{{renameLabel}}">
+            <image src="{{item.editingIcons.renameImage}}" mode="aspectFit" style="{{item.editingIcons.iconStyle}}" aria-hidden="true" />
+          </view>
+          <view class="cyl-tc-edit-icon" id="CYLTagListDeleteButton-{{index}}" style="{{item.editingIcons.deleteStyle}}"
+                data-index="{{index}}" catchtap="onDelete" catchtouchstart="noop" catchlongpress="noop"
+                aria-role="button" aria-label="{{deleteLabel}}">
+            <image src="{{item.editingIcons.deleteImage}}" mode="aspectFit" style="{{item.editingIcons.iconStyle}}" aria-hidden="true" />
+          </view>
+        </block>
         <view wx:if="{{item.deleteIndicator && !item.deleteFirst}}" class="cyl-tc-delete" style="{{item.deleteIndicator.style}}"
               data-index="{{index}}" catchtap="onDelete" catchtouchstart="noop" catchlongpress="noop"
               aria-role="button" aria-label="{{deleteLabel}}">

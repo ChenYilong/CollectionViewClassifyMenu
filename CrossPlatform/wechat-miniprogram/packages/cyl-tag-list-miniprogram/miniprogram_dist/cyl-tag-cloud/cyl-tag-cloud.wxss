@@ -40,3 +40,24 @@
 .cyl-tc-add-field { flex: 1; height: 44px; padding: 0 12px; border-radius: 8px; background-color: #F2F2F7; font-size: 17px; }
 .cyl-tc-add-button { margin-left: 12px; padding: 0 12px; line-height: 44px; font-size: 17px; font-weight: 600; color: #007AFF; }
 .cyl-tc-add-disabled { color: #C7C7CC; }
+
+/* The two editing icons of a renamable tag, each a full-height tap area. */
+.cyl-tc-edit-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+/* The header's clear button at the trailing end, a 44 px tap area around the icon. */
+.cyl-tc-clear {
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  margin-top: -12px;
+  margin-bottom: -12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
