@@ -945,7 +945,12 @@
     "CYLTagListView.cancelRenaming()": "`CYLTagListState.cancelRenaming()`",
     "CYLTagListView.submitNewItem(named:)": "`CYLTagListState.submitNewItem(name)`",
     "CYLTagListView.finishRenaming(to:)": "`CYLTagListState.finishRenaming(title)`",
-    "CYLTagListView.loadItems(withKeys:)": "`CYLTagListState.loadItemsWithKeys(keys, completion)`"
+    "CYLTagListView.loadItems(withKeys:)": "`CYLTagListState.loadItemsWithKeys(keys, completion)`",
+    "CYLMenuStyle.static wordPicker()": "`CYLMenuStyle.wordPicker()`",
+    "CYLTagListView.allowsSmearSelection": "`CYLTagListState.allowsSmearSelection` (a per-item `PanGesture` in `CYLTagListView`)",
+    "CYLTagListView.setTags(withCharactersOf:)": "`CYLTagListState.setTagsWithCharactersOfText(text)`",
+    "CYLTagListView.selectedText": "`CYLTagListState.selectedText`",
+    "CYLTagListView.selectItems(from:through:)": "`CYLTagListState.selectItemsFrom(start, end)`"
   },
   "demos": [
     {

@@ -20,7 +20,7 @@ core and `harmony/parity-map.json`; do not edit the tables by hand. A row withou
 
 ## Score
 
-**Score: 944 / 944 = 100.0 / 100** (API 922 / 922, demos 22 / 22). Both tables are scored together: every TODO removed
+**Score: 949 / 949 = 100.0 / 100** (API 927 / 927, demos 22 / 22). Both tables are scored together: every TODO removed
 is one row closer to full marks, and the port is done at 100 / 100, when no TODO is left. The history is below.
 A row marked `N/A` has no HarmonyOS counterpart by nature (UIKit-only API, such as Interface Builder decoding);
 it counts as aligned and states its reason.
@@ -435,6 +435,7 @@ overrides left out.
 | `CYLMenuStyle.static tagCloud()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagCloud()` | method |
 | `CYLMenuStyle.static tagContainer()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagContainer()` | method |
 | `CYLMenuStyle.static gridStyle(itemsPerRow:)` (CYLMenuStyle.swift) | `CYLMenuStyle.static gridStyle(itemsPerRow)` | method |
+| `CYLMenuStyle.static wordPicker()` (CYLMenuStyle.swift) | `CYLMenuStyle.wordPicker()` | method |
 | `CYLMenuStyle.static classifyMenuTag(_:)` (CYLMenuStyle.swift) | `CYLMenuStyle.classifyMenuTag(look)` (the `CYLCollectionCellButtonStyle` raw value) | method |
 | `CYLMenuStyle.static filterTag()` (CYLMenuStyle.swift) | `CYLMenuStyle.filterTag()` | method |
 | `CYLMenuStyle.static sectionTitle(fontSize:textColor:leadingInset:)` (CYLMenuStyle.swift) | `CYLMenuStyle.sectionTitle(fontSize, textColor, leadingInset)` | method |
@@ -826,6 +827,7 @@ overrides left out.
 | `CYLTagListView.tagLongPressHandler` (CYLTagListView.swift) | `CYLTagListState.tagLongPressHandler` | property |
 | `CYLTagListView.longPressAccessibilityActionName` (CYLTagListView.swift) | N/A: no custom accessibility actions in ArkUI (through API 21) | property |
 | `CYLTagListView.allowsReordering` (CYLTagListView.swift) | `CYLTagListState.allowsReordering` | property |
+| `CYLTagListView.allowsSmearSelection` (CYLTagListView.swift) | `CYLTagListState.allowsSmearSelection` (a per-item `PanGesture` in `CYLTagListView`) | property |
 | `CYLTagListView.reorderingSensitivity` (CYLTagListView.swift) | `CYLTagListState.reorderingSensitivity` | property |
 | `CYLTagListView.isReordering` (CYLTagListView.swift) | `CYLTagListState.isReordering` | property |
 | `CYLTagListView.tagMoveHandler` (CYLTagListView.swift) | `CYLTagListState.tagMoveHandler` | property |
@@ -908,6 +910,9 @@ overrides left out.
 | `CYLTagListView.collectionView(_:layout:referenceSizeForFooterInSection:)` (CYLTagListView.swift) | `CYLTagListState.layoutSections()` (footer frames) | method |
 | `CYLTagListView.loadSections(withKeys:)` (CYLTagListView.swift) | `CYLTagListState.loadSectionsWithKeys(keys, completion)` | method |
 | `CYLTagListView.loadItems(withKeys:)` (CYLTagListView.swift) | `CYLTagListState.loadItemsWithKeys(keys, completion)` | method |
+| `CYLTagListView.setTags(withCharactersOf:)` (CYLTagListView.swift) | `CYLTagListState.setTagsWithCharactersOfText(text)` | method |
+| `CYLTagListView.selectedText` (CYLTagListView.swift) | `CYLTagListState.selectedText` | property |
+| `CYLTagListView.selectItems(from:through:)` (CYLTagListView.swift) | `CYLTagListState.selectItemsFrom(start, end)` | method |
 | `CYLTagView` (CYLTagView.swift) | `CYLTagView` (tagviews/CYLTagView.ets + CYLTagViewComponent) | class |
 | `CYLTagView.static sectionInset` (CYLTagView.swift) | `CYLTagView.sectionInset` | property |
 | `CYLTagView.static cellSpacing` (CYLTagView.swift) | `CYLTagView.cellSpacing` | property |
