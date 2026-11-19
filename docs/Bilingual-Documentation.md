@@ -41,6 +41,24 @@
 
 - `README.md`
 - `docs/Bilingual-Documentation.md`
+- `docs/Swift-Coding-Standard.md`
+- `docs/Swift-Migration.md`
+- `docs/example-animation-controls.md`
+- `docs/example-demo-rules.md`
+- `docs/example-layer-fixes.md`
+- `docs/rive.md`
+- `docs/screenshots.md`
+- `docs/CYLCollectionViewLeftAlignedLayout.md`
+- `docs/androidtagview-api.md`
+- `docs/android-tagview-api.md`
+- `docs/tagviewgroup-api.md`
+- `docs/android-api.md`
+- `docs/android-ios-api.md`
+- `docs/harmony.md`
+
+| 中文 | English |
+|:---|:---|
+| 最后三个是自动生成的文档，只有标题和说明是双语，表格保持代码名称。 | The last three are generated documents: only the headings and intros are bilingual, the tables stay code names. |
 
 ## 任务记录 / Task log
 

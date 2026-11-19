@@ -1,13 +1,23 @@
-# Example-layer fixes
+# 示例层修复 / Example-layer fixes
 
-Rule (AGENTS.md "Fix issues in the core first"): an issue is fixed in the core, the code published to a package registry
-(CocoaPods / Swift package, Maven / Gradle, npm, pub.dev, ohpm, the mini program packages). A fix in the example layer is
-the worst option. Every example-layer fix is listed here with the reason it is not in the core; a core defect is fixed in
-the example only after the user agreed.
+| 中文 | English |
+|:---|:---|
+| 规则（AGENTS.md“Fix issues in the core first”）：问题应在核心库中修复，即发布到包仓库的代码（CocoaPods / Swift package、Maven / Gradle、npm、pub.dev、ohpm、小程序包）。在示例层修复是最差的选择。每个示例层的修复都列在这里，并说明为什么不在核心库中；核心库的缺陷只有在用户同意后才会在示例中修复。 | Rule (AGENTS.md "Fix issues in the core first"): an issue is fixed in the core, the code published to a package registry (CocoaPods / Swift package, Maven / Gradle, npm, pub.dev, ohpm, the mini program packages). A fix in the example layer is the worst option. Every example-layer fix is listed here with the reason it is not in the core; a core defect is fixed in the example only after the user agreed. |
+| 列：问题（其进度表中的行）、提交、文件、为什么不在核心库中。 | Columns: issue (row of its progress table), commit, files, why not in the core. |
 
-Columns: issue (row of its progress table), commit, files, why not in the core.
+## 仅示例的缺陷（缺陷在示例代码或数据中） / Example-only defects (the defect is in example code or data)
 
-## Example-only defects (the defect is in example code or data)
+| 问题 | 提交 | 文件 | 为什么不在核心库中 |
+| --- | --- | --- | --- |
+| C5：菜单联动的结果行重复菜品和地区 | `de06d49` | `harmony/entry/.../CYLMenuLinkagePage.ets` | 结果行是示例自己的 SQLite 演示数据和文本；核心库没有结果列表。 |
+| P1：根标签页标题互相挤在一起 | `de06d49` | `harmony/entry/.../pages/Index.ets` | 根标签栏是示例应用自己的 `Tabs`，不是核心库组件。 |
+| E1 / E3 / E6：截图打开了错误的标签页、截到了启动器，或在标签绘制之前就截了图 | `de06d49`, `164b0e2` | `harmony/entry/.../pages/Index.ets`, `EntryAbility.ets`, `harmony/scripts/screenshots.sh` | 启动选项和截图脚本属于示例工具；与核心库无关。 |
+| E4 / E5 / E8：分区标题为中文，标签标题、分段和关键词标签为英文 | `9db8a0f`, `164b0e2`, `569c29c` | `harmony/entry/.../CYLTagAnimationPage.ets`, `CYLReviewStore.ets`, `CYLReviewListPage.ets`, `data/CYLExampleStrings.ets` | 这些文本是示例数据（演示配置和评价）；核心库只本地化它自己的字符串，并显示应用提供的内容。 |
+| Y3：菜单联动的筛选按钮几乎看不见 | `a791539`, `c70e82a` | `harmony/entry/.../CYLMenuLinkagePage.ets` | 该按钮由示例页面绘制（iOS：示例的栏按钮），只有它的图片来自核心库。 |
+| E2 / Z3 / Z4 / Z6：根页面、标签栏和动效页面在深色模式下仍是浅色 | `72426f0`, `6e8ba55`, `535d96a`, `1fa6c78` | `harmony/entry/.../CYLProductPage.ets`, `pages/Index.ets`, `CYLTagAnimationPage.ets`, `DemoNav.ets`, `resources/*/element/color.json` | 页面背景、栏和标签是使用固定浅色的示例视图。 |
+| B20：小程序的 Rive 标签丢失了新的 `cyl-rive` 选项（`numberInput`、`number`、`values`） | 本次变更 | `CrossPlatform/wechat-miniprogram/miniprogram/components/cyl-tag-animation-view/cyl-tag-animation-view.js` (`RIVE_OPTIONS`) | 示例的引擎适配器把 Rive 选项写入路径片段时，使用的是自己保存的一份 `cyl-rive` 选项列表，而 `cyl-rive` 没有导出该列表（`cyl_rive_options.js` 中的 `CYL_OPTION_NAMES`）。已向 CYLTabBarController 提出：导出该列表，然后适配器导入它，这一行即可删除。**已关闭**：CYLTabBarController `a10cdffc` 导出了 `CYL_RIVE_OPTION_NAMES`；适配器 `require` 它，那份副本已删除（固定版本为 `6a9ede85`）。 |
+| Android 的 Rive Home（house.riv）几乎不动（2026-11-18 用户反馈） | 本次变更 | `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | 属于示例配置，不是变通方案：house.riv 只有在其数值输入 Rooms 变化时才会动，而核心库的 Rive 视图只有在条目的选项指明它（`numberInput`、`values`，CYLTabBarController `3f262501`）时才会推动数值输入。小程序、Flutter 和 React Native 示例已经传入了这些选项；Android 示例没有。 |
+| Flutter / React Native Android：加入 SVGAPlayer-Android 后清单合并失败 | 本次变更 | `flutter/cyl_tag_list/example/android/app/src/main/AndroidManifest.xml`, `react-native/react-native-cyl-tag-list/example/android/app/src/main/AndroidManifest.xml` (`tools:replace`) | SVGAPlayer-Android 2.6.1（CYLTabBarController 的 SVGA 动画器通过它播放）在自己的清单中带有 `<application android:allowBackup="true" android:label="@string/app_name">`，与设置了其他标签或 `allowBackup="false"` 的应用冲突。只有应用的清单才能覆盖库的属性；两个核心库都做不到。CYLTabBarController 自己的 `example-rive` 也是这样做的（`tools:replace="android:allowBackup"`）。 |
 
 | Issue | Commit | Files | Why not in the core |
 | --- | --- | --- | --- |
@@ -21,14 +31,22 @@ Columns: issue (row of its progress table), commit, files, why not in the core.
 | Android Rive Home (house.riv) barely moves (2026-11-18 user report) | this change | `android/merged/example/.../menu/CYLTagAnimationScreen.kt` | Example configuration, not a workaround: house.riv moves only when its number input Rooms changes, and the core's Rive view steps a number input only when the item's options name it (`numberInput`, `values`, CYLTabBarController `3f262501`). The mini program, Flutter and React Native examples already passed them; the Android example did not. |
 | Flutter / React Native Android: manifest merger fails once SVGAPlayer-Android is added | this change | `flutter/cyl_tag_list/example/android/app/src/main/AndroidManifest.xml`, `react-native/react-native-cyl-tag-list/example/android/app/src/main/AndroidManifest.xml` (`tools:replace`) | SVGAPlayer-Android 2.6.1 (the library CYLTabBarController's SVGA animator plays through) ships an `<application android:allowBackup="true" android:label="@string/app_name">` in its own manifest, which clashes with an app that sets another label or `allowBackup="false"`. Only the app's manifest can override a library's attributes; neither core can. CYLTabBarController's own `example-rive` does the same (`tools:replace="android:allowBackup"`). |
 
-## Core defects fixed in the example (core follow-up needed)
+## 在示例中修复的核心库缺陷（需要在核心库跟进） / Core defects fixed in the example (core follow-up needed)
 
-These were fixed in the example before the rule; each has a core cause. Status: TODO, to be moved into the core (ask
-the user first if the core cannot take it).
+| 中文 | English |
+|:---|:---|
+| 这些缺陷是在该规则出现之前在示例中修复的；每一个都有核心库层面的原因。状态：待办，移入核心库（核心库无法接受时先询问用户）。 | These were fixed in the example before the rule; each has a core cause. Status: TODO, to be moved into the core (ask the user first if the core cannot take it). |
+
+| 问题 | 提交 | 文件 | 核心库原因 | 为什么采用示例修复 |
+| --- | --- | --- | --- | --- |
+| Y2：选中标签的图标是橙底橙色 | 已移入核心库（本次变更）；示例中的变通方案已删除 | `harmony/classifymenu/.../tagviews/CYLTagButton.ets`, `core/CYLTypes.ets` (`CYLColor.tintFilter`) | 已在核心库中修复：用 `setIconColor(_, state)` 设置的图标颜色现在也会为位图着色（保留 alpha 的 `colorFilter`，与 iOS 的模板图片一致）；没有设置时，位图保持原色。主机测试 `tintsBitmapIconsWithAnAlphaPreservingFilter`。模拟器：第一版（在 `fillColor` 之后使用矩阵 `colorFilter`）没有效果（`assets/harmonyos-y2-retest-icon-still-orange.jpeg`）；改用 `ColorFilter` 对象后生效，选中标签上显示白色图标（`assets/harmonyos-y2-fixed-white-icon.jpeg`）。已完成 | 白色的 `a_*_selected.png` 副本已删除；评价样式的 `setIconColor(WHITE, SELECTED)` 现在通过核心库生效。 |
+| E7：评价标签在深色模式下仍是浅灰色 | 核心库：`39ee4d7`（主题颜色）；示例：本次变更 | `harmony/classifymenu/.../core/CYLTagAppearance.ets` (`ResourceColor`), `harmony/entry/.../CYLProductPage.ets`, `resources/*/element/color.json` (`cyl_chip_*`) | 已在核心库中修复：标签外观颜色为 `ResourceColor`（`39ee4d7`），因此带有深色变体的资源会跟随颜色模式，与 iOS 的动态 `UIColor` 一样。待办：需要模拟器截图验证 | 示例不再在页面出现时读取颜色模式；它给标签提供资源颜色（浅色和深色），页面打开期间颜色模式改变时也会跟随。 |
+| Z2：滚动的标签绘制在页面标题之上 | `6e8ba55`, `c70e82a` | `harmony/entry/.../CYLTagAnimationPage.ets`（裁剪、zIndex） | `CYLTagListView` 本应裁剪其内容；在其 `Scroll` 上设置 `.clip(true)`（`6e8ba55`）没能阻止溢出绘制，页面级的裁剪则可以。 | 核心库内部的原因尚未找到。核心库修复：找出列表自身的裁剪为何不生效并在那里修复，然后删除页面中的变通方案。 |
+| Flutter Android：Rive 标签静止时为空（CYLTabBarController B26） | 本次变更 | `flutter/cyl_tag_list/lib/cyl_tag_list.dart`（Android 分支：`PlatformViewLink` + `initExpensiveAndroidView`） | 不是示例的问题：而是 Flutter 插件（库）层的问题。核心库无法修复：Flutter 的纹理层 `AndroidView` 不显示新的 TextureView 帧，从平台视图内部使其失效也没有重绘（尝试了两处核心库改动，均无效）。CYLTabBarController 自己的 `flutter_cyltabbar` 自 273a4175 起用 Hybrid Composition 承载其视图，其 B26 条目现在也说明 Flutter 宿主必须这样做。 |
 
 | Issue | Commit | Files | Core cause | Why the example fix was used |
 | --- | --- | --- | --- | --- |
 | Y2: the selected chip's icon is orange on orange | moved to the core (this change); example workaround removed | `harmony/classifymenu/.../tagviews/CYLTagButton.ets`, `core/CYLTypes.ets` (`CYLColor.tintFilter`) | Fixed in the core: an icon color set with `setIconColor(_, state)` now tints bitmaps too (an alpha-preserving `colorFilter`, as iOS template images); without one a bitmap keeps its colors. Host test `tintsBitmapIconsWithAnAlphaPreservingFilter`. Emulator: the first version (a matrix `colorFilter` after `fillColor`) had no effect (`assets/harmonyos-y2-retest-icon-still-orange.jpeg`); a `ColorFilter` object works, white icon on the selected chip (`assets/harmonyos-y2-fixed-white-icon.jpeg`). DONE | The white `a_*_selected.png` copies are gone; the review style's `setIconColor(WHITE, SELECTED)` now works through the core. |
-| E7: the review chips stay light gray in dark mode | core: `39ee4d7` (theme colors); example: this change | `harmony/classifymenu/.../core/CYLTagAppearance.ets` (`ResourceColor`), `harmony/entry/.../CYLProductPage.ets`, `resources/*/element/color.json` (`cyl_chip_*`) | Fixed in the core: tag appearance colors are `ResourceColor` (`39ee4d7`), so a resource with a dark variant follows the color mode, as iOS dynamic `UIColor`. TODO need 模拟器截图验证 | The example no longer reads the color mode when the page appears; it gives the chips resource colors (light and dark), which also follow a mode change while the page is open. |
+| E7: the review chips stay light gray in dark mode | core: `39ee4d7` (theme colors); example: this change | `harmony/classifymenu/.../core/CYLTagAppearance.ets` (`ResourceColor`), `harmony/entry/.../CYLProductPage.ets`, `resources/*/element/color.json` (`cyl_chip_*`) | Fixed in the core: tag appearance colors are `ResourceColor` (`39ee4d7`), so a resource with a dark variant follows the color mode, as iOS dynamic `UIColor`. TODO: needs verification with a simulator screenshot | The example no longer reads the color mode when the page appears; it gives the chips resource colors (light and dark), which also follow a mode change while the page is open. |
 | Z2: scrolled tags draw over the page title | `6e8ba55`, `c70e82a` | `harmony/entry/.../CYLTagAnimationPage.ets` (clip, zIndex) | `CYLTagListView` is meant to clip its content; `.clip(true)` on its `Scroll` (`6e8ba55`) did not stop the overdraw, the page-level clip did. | The cause inside the core is not found yet. Core fix: find why the list's own clip does not apply and fix it there, then remove the page workaround. |
 | Flutter Android: Rive tags empty at rest (CYLTabBarController B26) | this change | `flutter/cyl_tag_list/lib/cyl_tag_list.dart` (Android branch: `PlatformViewLink` + `initExpensiveAndroidView`) | Not the example: the Flutter plugin (library) layer. The core cannot fix it: Flutter's texture-layer `AndroidView` does not show new TextureView frames, and invalidation from inside the platform view did not redraw it (two core changes tried, no effect). CYLTabBarController's own `flutter_cyltabbar` hosts its views with Hybrid Composition since 273a4175, and its B26 entry now states that a Flutter host must do the same. |

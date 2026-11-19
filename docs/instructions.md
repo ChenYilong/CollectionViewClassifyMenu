@@ -75,3 +75,5 @@
   develops and tests iOS; one starting with `Win` (case insensitive) mainly develops the other platforms (Android,
   HarmonyOS, the mini program). When both are active, prefer handing each platform's part of a task to the matching
   session; when no session follows this naming, skip the rule and finish the task independently.
+- Bilingual documents (English rule, AGENTS.md "Documentation: bilingual Chinese–English"): the documents listed in
+  `Bilingual-Documentation.md` are written in Chinese and English; check them with `scripts/bilingual-docs.py check`.

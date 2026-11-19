@@ -753,3 +753,16 @@ AGENTS.md, newest commit) and adapted to this project:
   `Package.swift` copies it with `.copy`, and `CYLMenuResources.image(named:)` reads it first (`imagesBundle`).
   Other platforms keep their images in a resource folder of the same kind.
 
+
+## Documentation: bilingual Chinese–English (added 2026-11-20)
+
+- `README.md` and the documents in `docs/` are bilingual, in the format of CYLTabBarController's standard, copied to
+  `docs/Bilingual-Documentation.md` (the list of converted documents is there): headings `中文 / English`, body text as
+  a two-column table `| 中文 | English |` (one row per paragraph or list item), multi-column tables given twice (Chinese,
+  then English). Code blocks, inline code, link targets and screenshots are shared and never translated.
+- When you add or change a converted document, write both languages. Check it with
+  `python3 scripts/bilingual-docs.py check <file> --against origin/master`. To convert a document: `extract`, translate
+  the passages, `assemble` (the script keeps code, table structure, images and links).
+- Stays English: this file, every `instructions.md`, `.agents/skills/` and third-party files. Generated documents
+  (`docs/android-api.md`, `docs/android-ios-api.md`, `docs/harmony.md`) get their bilingual headings and intros from
+  the generator scripts; the tables stay code names (`<!-- bilingual:keep -->`).

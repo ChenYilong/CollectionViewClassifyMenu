@@ -7,6 +7,8 @@
   check FILE... [--against GIT_REF]       check the layout; with --against also that code blocks, inline code, links
                                           and images equal those of the same file at GIT_REF (nothing but text changed)
 
+A table, list or paragraph right after `<!-- bilingual:keep -->` is generated data (code names, a score history) and stays as is.
+
 Layout (CYLTabBarController's bilingual standard): a heading is one line "Chinese / English"; prose (a paragraph or a
 list item) is one row of a two-column table, Chinese left and English right; a table with more columns is given twice,
 a Chinese table and then its English twin; code blocks, HTML, comments and images are shared.
@@ -52,6 +54,11 @@ def has_latin_words(text):
 def translatable(text):
     stripped = strip_untranslatable(text)
     return HAN.search(stripped) is not None or re.search(r"[A-Za-z]{3,}", stripped) is not None
+
+
+def same_both_ways(zh, en):
+    """A short proper noun or token (at most two words) may be the same in both languages."""
+    return zh == en and len(zh.split()) <= 2
 
 
 def need_of(text):
@@ -189,6 +196,34 @@ def parse(text):
         blocks.append({"t": "prose", "kind": "p", "depth": 0, "marker": "", "text": " ".join(parts), "raw": lines[i:j]})
         i = j
         stack = []
+    return mark_keep(blocks)
+
+
+def mark_keep(blocks):
+    """A table, a run of list items or a paragraph right after `<!-- bilingual:keep -->` is generated data (code names, history):
+    kept as it is, never extracted, assembled or checked."""
+    state = None
+    for block in blocks:
+        if block["t"] == "raw":
+            if any("bilingual:keep" in l for l in block["lines"]):
+                state = "next"
+            elif state == "next" and any(l.strip() for l in block["lines"]):
+                state = None
+            continue
+        if state == "next":
+            if block["t"] == "table":
+                block["keep"], state = True, None
+            elif block["t"] == "prose" and block["kind"] == "li":
+                block["keep"], state = True, "list"
+            elif block["t"] == "prose":
+                block["keep"], state = True, None
+            else:
+                state = None
+        elif state == "list":
+            if block["t"] == "prose" and block["kind"] == "li":
+                block["keep"] = True
+            else:
+                state = None
     return blocks
 
 
@@ -212,6 +247,8 @@ def units_of(blocks):
             units.append(unit)
 
     for block in blocks:
+        if block.get("keep"):
+            continue
         if block["t"] == "heading":
             add("heading", block["text"])
         elif block["t"] == "prose":
@@ -235,7 +272,7 @@ def spans(text):
     found = [m.group(2) for m in CODE_SPAN.finditer(text)]
     found += [t for t in LINK_TARGET.findall(text) if not t.startswith("#")]
     found += IMAGE_REF.findall(text)
-    return sorted(found)
+    return sorted(item.replace("\\|", "|") for item in found)
 
 
 def escape_cell(text):
@@ -261,7 +298,7 @@ def build(blocks, units, by_text, translations):
         if not zh or not en:
             problems.append(f"{uid}: missing translation ({unit['need']}): {text[:60]}")
             return text, text
-        if not HAN.search(strip_untranslatable(zh)):
+        if not HAN.search(strip_untranslatable(zh)) and not same_both_ways(zh, en):
             problems.append(f"{uid}: the Chinese text has no Chinese: {zh[:60]}")
         if unit["need"] != "zh" and HAN.search(strip_untranslatable(en)) and "「" not in en:
             problems.append(f"{uid}: the English text has Chinese: {en[:60]}")
@@ -278,6 +315,12 @@ def build(blocks, units, by_text, translations):
             run.clear()
 
     for block in blocks:
+        if block.get("keep"):
+            if run:
+                flush()
+                out.append("")
+            out.extend(block["lines"] if block["t"] == "table" else block["raw"])
+            continue
         if block["t"] == "prose" and translatable(block["text"]):
             zh, en = pair(block["text"])
             prefix = ("↳ " * block["depth"]) + (block["marker"] + " " if block["marker"] else "")
@@ -297,7 +340,7 @@ def build(blocks, units, by_text, translations):
         if block["t"] == "heading":
             if translatable(block["text"]):
                 zh, en = pair(block["text"])
-                out.append(f"{'#' * block['level']} {zh} / {en}")
+                out.append(f"{'#' * block['level']} {zh}" if same_both_ways(zh, en) else f"{'#' * block['level']} {zh} / {en}")
             else:
                 out.append(f"{'#' * block['level']} {block['text']}")
         elif block["t"] == "prose":
@@ -366,6 +409,29 @@ def cmd_assemble(args):
     return 0
 
 
+FENCED = re.compile(r"(?ms)^[ \t]*(`{3,}|~{3,}).*?^[ \t]*\1[ \t]*$")
+
+
+def outside_fences(text):
+    """The text without its fenced code blocks (their backticks are not inline code)."""
+    return FENCED.sub("", text)
+
+
+def document_spans(text):
+    """Inline code, link targets and image paths of a document's passages (soft-wrapped lines joined, fences skipped)."""
+    found = set()
+    for block in parse(text):
+        if block["t"] in ("heading", "prose"):
+            found |= set(spans(block["text"]))
+        elif block["t"] == "table":
+            for cells in [block["header"]] + block["rows"]:
+                for cell in cells:
+                    found |= set(spans(cell))
+        elif block["t"] == "raw" and not (block["lines"] and FENCE.match(block["lines"][0])):
+            found |= set(spans(" ".join(block["lines"])))
+    return found
+
+
 def fenced_blocks(text):
     return ["\n".join(b["lines"]).strip() for b in parse(text) if b["t"] == "raw" and b["lines"] and FENCE.match(b["lines"][0])]
 
@@ -375,9 +441,14 @@ def check_file(path, against):
     blocks = parse(text)
     problems = []
     for index, block in enumerate(blocks):
+        if block.get("keep"):
+            continue
         if block["t"] == "heading" and translatable(block["text"]):
             parts = block["text"].split(" / ")
-            if len(parts) < 2 or not HAN.search(parts[0]) or not has_latin_words(" / ".join(parts[1:])):
+            if len(parts) >= 2:
+                if not HAN.search(parts[0]) or not has_latin_words(" / ".join(parts[1:])):
+                    problems.append(f"heading is not '中文 / English': {block['text'][:70]}")
+            elif HAN.search(block["text"]) or len(block["text"].split()) > 2:
                 problems.append(f"heading is not '中文 / English': {block['text'][:70]}")
         elif block["t"] == "prose" and translatable(block["text"]):
             problems.append(f"prose outside a bilingual table: {block['text'][:70]}")
@@ -386,6 +457,8 @@ def check_file(path, against):
                 for cells in block["rows"]:
                     if len(cells) != 2 or not cells[0] or not cells[1]:
                         problems.append(f"row without both languages: {' | '.join(cells)[:70]}")
+                        continue
+                    if same_both_ways(cells[0], cells[1]):
                         continue
                     if translatable(cells[0]) and not HAN.search(strip_untranslatable(cells[0])):
                         problems.append(f"left cell has no Chinese: {cells[0][:70]}")
@@ -409,9 +482,10 @@ def check_file(path, against):
         else:
             if fenced_blocks(old.stdout) != fenced_blocks(text):
                 problems.append("the code blocks differ from the original")
-            if sorted(set(spans(old.stdout))) != sorted(set(spans(text))):
-                missing = sorted(set(spans(old.stdout)) - set(spans(text)))
-                added = sorted(set(spans(text)) - set(spans(old.stdout)))
+            before, after = document_spans(old.stdout), document_spans(text)
+            if before != after:
+                missing = sorted(before - after)
+                added = sorted(after - before)
                 problems.append(f"inline code, links or images differ: missing {missing[:4]} added {added[:4]}")
     return problems
 
