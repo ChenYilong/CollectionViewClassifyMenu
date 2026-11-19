@@ -1327,7 +1327,9 @@ tags: [issues, ui, cocoapods, progress]
   indicator and (while `renamesOnTitleTap`) the title area and calls their handlers; the list's tap gesture asks the
   cell with the finger's local position before the item tap. Host test: the pencil and the title rename, the cross
   deletes, nothing after `prepareForReuse` (75 / 75); the app builds.
-- **TODO:** the emulator check and screenshot in CYLSearchViewController's contact tags editor (30).
+- **Screenshot (30 / 30):** `docs/assets/harmonyos-tag-rename-tap-fix.png` (CYLSearchViewController's contact tags
+  editor at c966c527, its workaround removed): the pencil and the title open the editing bar, the rename keeps the id,
+  the stack view draws both icons tinted. **Score: 100 / 100.**
 
 ### Done (2026-11-19, `feat/harmony`): second "every TODO to 100" sweep (relayed by Mac-CYLSearchViewController)
 
