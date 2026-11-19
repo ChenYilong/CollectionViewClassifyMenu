@@ -1463,7 +1463,7 @@ tags: [issues, ui, cocoapods, progress]
   iOS→Android rows (888 / 893) are for the Windows session.
 
 
-### TODO (2026-11-19, `feat/harmony`): the word picker demo uses a generic, localized message
+### DONE (2026-11-19, `feat/harmony`): the word picker demo uses a generic, localized message
 
 - Context: the word picker demo (`cf5d9f7e`) shows the owner's WeChat screenshot text, `我是群聊"LANEPRO TEAM A🚧"的Sunny`,
   marked as user content and never translated. The owner wants a generic message that can be localized.
@@ -1494,3 +1494,11 @@ tags: [issues, ui, cocoapods, progress]
   real touch events across the row break, deselecting, a tap toggling, single selection); library 101 / 0, the example
   builds; `docs/android-api.md` 893 / 893, `docs/android-ios-api.md` 830 / 830; `check-localization-ports.py` 0 (it
   now prints UTF-8: a GBK console crashed on the message's emoji).
+- Result (DONE, **100 / 100**): `CYLWordPickerDemoViewController.message` is the Example string
+  "你好，我是设计部的 Alex 👋" (en "Hi, I'm Alex from Design 👋", zh-Hant "你好，我是設計部的 Alex 👋"), the sender "Alex";
+  the NOLOCALIZE exemption and its entry in the language test are gone. The tests find the name in whatever language
+  is current (`testWordPickerMessageInEveryLanguage`: translated in all three, the name, the emoji and a space in each,
+  picking the name gives "Alex"). Example tests of the word picker and localization: 16 / 16; localization checks 0;
+  mini program `strings.js` regenerated. Screenshots in the three languages:
+  [ios-word-picker.png](assets/ios-word-picker.png).
+

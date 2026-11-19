@@ -2,7 +2,7 @@
 //  CYLWordPickerDemoViewController.swift
 //  CYLMenuExample
 //
-//  The word picker (选词填入), as WeChat's friend verification page: a remark field, the friend's message with a
+//  The word picker (选词填入), as in a messaging app's contact request: a remark field, the sender's message with a
 //  "pick words" link, and a sheet where the message is one cell per character; smearing a finger across cells selects
 //  them, and "Fill in" writes the selected characters, in text order, into the field. The cells are a CYLTagListView
 //  with CYLMenuStyle.wordPicker(), setTags(withCharactersOf:), allowsSmearSelection and selectedText.
@@ -13,9 +13,13 @@ import CollectionViewClassifyMenu
 
 final class CYLWordPickerDemoViewController: UIViewController {
 
-    /// The friend's verification message: user content, shown as written in every language.
-    static let message = "我是群聊\"LANEPRO TEAM A🚧\"的Sunny"  // NOLOCALIZE: a friend's message (user content)
-    static let sender = "Sunny"
+    /// The sample message, in the app's language: a greeting with a name to pick, an emoji and a space, so the word
+    /// picker shows letters, Chinese characters, an emoji cell and a space cell.
+    static var message: String {
+        CYLExampleLocalizedString("你好，我是设计部的 Alex 👋")
+    }
+    /// The sender, and the name the demo's message lets you pick (a name, the same in every language).
+    static let sender = "Alex"
 
     private(set) var remarkField: UITextField!
     private(set) var pickButton: UIButton!

@@ -383,6 +383,14 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         override func location(in view: UIView?) -> CGPoint { fakeLocation }
     }
 
+    /// The cells of the sender's name in `text` (one cell per character), in any language.
+    private func nameRange(in text: String) -> Range<Int> {
+        let characters = Array(text).map(String.init)
+        let name = Array(CYLWordPickerDemoViewController.sender).map(String.init)
+        let start = (0...(characters.count - name.count)).first { Array(characters[$0..<($0 + name.count)]) == name }!
+        return start..<(start + name.count)
+    }
+
     private func wordPickerList(_ text: String) -> CYLTagListView {
         let list = CYLTagListView()
         list.style = .wordPicker()
@@ -406,7 +414,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         let list = wordPickerList(text)
         XCTAssertEqual(list.tags.count, text.count)
         XCTAssertEqual(list.tags.map(\.title).joined(), text)
-        XCTAssertTrue(list.tags.contains { $0.title == "🚧" }, "an emoji is one cell")
+        XCTAssertTrue(list.tags.contains { $0.title == "👋" }, "an emoji is one cell")
         let first = list.probe.itemFrame(at: ip(0, 0)) ?? .zero
         let ninth = list.probe.itemFrame(at: ip(8, 0)) ?? .zero
         let tenth = list.probe.itemFrame(at: ip(9, 0)) ?? .zero
@@ -416,12 +424,33 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         let space = list.tags.firstIndex { $0.title == " " }!
         XCTAssertEqual(list.probe.cell(at: ip(space, 0))?.accessibilityLabel, "空格", "a space is read, not silent")
 
-        // L (index 5) through y (the last): "LANEPRO TEAM A🚧\"的Sunny".
-        let l = list.tags.firstIndex { $0.title == "L" }!
-        list.selectItems(from: ip(text.count - 1, 0), through: ip(l, 0))
-        XCTAssertEqual(list.selectedText, "LANEPRO TEAM A🚧\"的Sunny")
+        // The name, from its last letter back to its first: the picked text is "Alex", in text order.
+        let name = nameRange(in: text)
+        list.selectItems(from: ip(name.upperBound - 1, 0), through: ip(name.lowerBound, 0))
+        XCTAssertEqual(list.selectedText, CYLWordPickerDemoViewController.sender)
         list.deselectAllItems()
         XCTAssertEqual(list.selectedText, "")
+    }
+
+    /// The demo's message in every language: translated, with the name to pick, an emoji and a space; picking the name
+    /// gives the name.
+    func testWordPickerMessageInEveryLanguage() {
+        var messages: [String] = []
+        for language in ["en", "zh-Hans", "zh-Hant"] {
+            CYLMenuResources.preferredLanguage = language
+            let text = CYLWordPickerDemoViewController.message
+            messages.append(text)
+            XCTAssertTrue(text.contains(CYLWordPickerDemoViewController.sender), language)
+            XCTAssertTrue(text.contains("👋"), language)
+            XCTAssertTrue(text.contains(" "), language)
+            let list = wordPickerList(text)
+            let name = nameRange(in: text)
+            list.selectItems(from: ip(name.lowerBound, 0), through: ip(name.upperBound - 1, 0))
+            XCTAssertEqual(list.selectedText, CYLWordPickerDemoViewController.sender, language)
+        }
+        CYLMenuResources.preferredLanguage = "zh-Hans"
+        XCTAssertEqual(Set(messages).count, 3, "a different text per language")
+        XCTAssertFalse(messages[0].unicodeScalars.contains { (0x3400...0x9FFF).contains($0.value) }, "English has no Chinese")
     }
 
     /// A drag that starts on a cell selects every cell from it to the finger; starting on a selected cell deselects;
@@ -476,12 +505,12 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         sheet.loadViewIfNeeded()
         XCTAssertFalse(sheet.fillButton.isEnabled, "nothing selected: Fill in is off")
         let list = sheet.tagListView!
-        let l = list.tags.firstIndex { $0.title == "L" }!
-        list.selectItems(from: ip(l, 0), through: ip(list.tags.count - 1, 0))
+        let name = nameRange(in: CYLWordPickerDemoViewController.message)
+        list.selectItems(from: ip(name.lowerBound, 0), through: ip(name.upperBound - 1, 0))
         sheet.menu(list, didChangeSelectedItems: list.selectedIndexPaths)
         XCTAssertTrue(sheet.fillButton.isEnabled)
         sheet.fillTapped()
-        XCTAssertEqual(filled, "LANEPRO TEAM A🚧\"的Sunny")
+        XCTAssertEqual(filled, CYLWordPickerDemoViewController.sender)
     }
 }
 

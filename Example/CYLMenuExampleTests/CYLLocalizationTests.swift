@@ -114,8 +114,6 @@ final class CYLLocalizationTests: CYLMenuExampleTestCase {
         content += CYLHotSearchViewController.hotSearches.map(\.0)
         content += CYLImageTagSampleData.initialGroups().flatMap { $0.tags.map(\.title) }
         content += CYLTagContainerSampleData.list1 + CYLTagContainerSampleData.list3
-        // The word picker's friend message (user content).
-        content.append(CYLWordPickerDemoViewController.message)
         // The same, cut to tag_max_length (23: 20 characters and "...").
         content += CYLTagContainerSampleData.list1.map { String($0.prefix(20)) }
         return content
