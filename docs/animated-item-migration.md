@@ -652,3 +652,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Acceptance (100):** iOS pins with pod install, the four iOS suites and the Flutter iOS build (40); the React Native
   example's tab taps checked on the simulator (20); the other platforms at the same commit (30); CYLSearchViewController
   told the commit (10). Pass: 60.
+- **Windows (mini program, HarmonyOS, Android, RN and Flutter wrappers; 40 / 40):** `fetch-cyltabbar.js` COMMIT and
+  the re-fetched vendored `cyl-animated-item` / `cyl-animation-placeholder` (`--check` OK), `test/animated-item.test.js`;
+  `harmony/cylanimateditem` re-vendored with `git archive` (README kept; new upstream `CYLAnimatedItemTypes.ts` and its
+  test); `android/merged/gradle.properties`; the RN `scripts/fetch-cyltabbar.sh` and the Flutter example's
+  `pubspec.yaml` ref. Results: mini program `npm test` 161 / 161; HarmonyOS host tests 75 / 75 and the app builds;
+  Android library tests 99 / 0 and the example builds; `check-localization-ports.py` 0 problems.
