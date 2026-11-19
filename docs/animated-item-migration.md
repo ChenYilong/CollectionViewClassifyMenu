@@ -582,3 +582,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `android/merged/gradle.properties` `cyl.tabbar.commit`; library tests 94 / 0, the example builds. The C: drive was
   full; the old Android checkouts of CYLTabBarController (`android/merged/.cyltabbar/<commit>`, git-ignored build
   caches) were removed, so only the HarmonyOS host tests ran there, not the full HAP build.
+- **DONE (2026-11-19): every platform at `5744917d`, 100 / 100.** iOS `e20e57fe`; the mini program, HarmonyOS and Android
+  copies `43ec09ce` (Windows session: npm test 154, HarmonyOS host tests 71 / 71, Android library 94 / 0 and the example
+  build; no full HarmonyOS HAP build this time, the Windows disk was full). Checked on the Mac after both: no pin file
+  names an older CYLTabBarController commit; `scripts/cyl-tabbar-latest-commit.sh --check` finds no stale pin.
+  CYLSearchViewController told to pin `43ec09ce`.
