@@ -1497,6 +1497,9 @@ tags: [issues, ui, cocoapods, progress]
 - **The generic message (iOS 251131c5):** the Android demo looks up "你好，我是设计部的 Alex 👋" through the example's
   tables (en "Hi, I'm Alex from Design 👋", zh-Hant), sender "Alex", no NOLOCALIZE mark; `CYLWordPickerTest` finds the
   name wherever it stands. Library 101 / 0.
+- **Android on the emulator (40 / 40):** Menu → Styles → "Word picker: swipe across words to fill in" → Pick words;
+  `adb shell input swipe` from A to x selected "Alex" across the row break, Fill in filled the remark. Screenshot
+  `docs/assets/android-word-picker.png`.
 - **HarmonyOS core (the example and its screenshot to come):** `CYLMenuStyle.wordPicker()`,
   `CYLTagListState.setTagsWithCharactersOfText` (graphemes by hand, `cylCharacters`: surrogate pairs, marks, variation
   selectors, skin tones, ZWJ; `Array.from` split the emoji into UTF-16 units on the host test runtime), `selectedText`,
