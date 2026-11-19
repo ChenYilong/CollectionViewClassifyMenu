@@ -265,20 +265,22 @@ open class CYLTagButton @JvmOverloads constructor(
     private var editingIndicatorsViewIsLoaded = false
 
     /**
-     * `editingIndicatorsView`: the two editing icons while `showsRenameIndicator` (a pencil, then a cross), a horizontal
-     * `CYLAnimatedItemStackView` of two icon-only `CYLAnimatedItemView`s. It only draws; the list cell takes the taps.
+     * `editingIndicatorsView`: the two editing icons while `showsRenameIndicator` (a pencil, then a cross), a
+     * `CYLAnimatedItemStackView` in a row (`axis` Horizontal) of two icon-only `CYLAnimatedItemView`s,
+     * `CYLMenuStyle.editingIndicatorSpacing` apart (`spacingDp`), tinted with the indicator color (`iconColor`). It only
+     * draws; the list cell takes the taps.
      */
     val editingIndicatorsView: CYLAnimatedItemStackView by lazy {
         CYLAnimatedItemStackView(context).apply {
             contentMarginDp = 0f
-            stackView.orientation = android.widget.LinearLayout.HORIZONTAL
+            axis = com.cyl.animateditem.CYLAnimatedItemAxis.Horizontal
             stackView.gravity = Gravity.CENTER_VERTICAL
             for (kind in listOf(CYLEditingIconDrawable.Kind.Rename, CYLEditingIconDrawable.Kind.Delete)) {
                 val icon = CYLAnimatedItemView(context)
                 icon.image = CYLEditingIconDrawable(kind)
                 icon.title = null
                 icon.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-                append(icon, null, 0f)
+                append(icon, null)
             }
             isClickable = false
             isFocusable = false
@@ -406,8 +408,7 @@ open class CYLTagButton @JvmOverloads constructor(
         deleteIndicatorLabel.text = if (showsDeleteIndicator && !drawsCross && !editingIcons) style.deleteIndicatorTitle else null
         if (editingIcons || editingIndicatorsViewIsLoaded) {
             editingIndicatorsView.visibility = if (editingIcons) VISIBLE else GONE
-            val color = style.deleteIndicatorColor ?: appearance.textColor
-            for (icon in editingIndicatorsView.itemViews) (icon.image as? CYLEditingIconDrawable)?.color = color
+            editingIndicatorsView.iconColor = style.deleteIndicatorColor ?: appearance.textColor
         }
         deleteIndicatorLabel.contentDescription = if (showsDeleteIndicator) CYLMenuLocalizedString("CYLMenuDeleteTag", "Deletes a tag") else null
         val placement = if (style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading)
@@ -651,13 +652,14 @@ open class CYLTagButton @JvmOverloads constructor(
         // Each icon's slot is `side` wide; the glyph fills it (iOS 3af1b7cd: the slot is the cap height x 1.25).
         val glyph = max(0f, min(side, area.height))
         val stack = editingIndicatorsView
-        stack.itemViews.forEachIndexed { index, icon ->
+        // The slots are `side` wide, so the stack's spacing is the editing spacing itself.
+        if (stack.spacingDp != spacing) stack.spacingDp = spacing
+        stack.itemViews.forEach { icon ->
             icon.iconSizeDp = com.cyl.animateditem.CYLSize(glyph, glyph)
             val params = (icon.layoutParams as? android.widget.LinearLayout.LayoutParams)
                 ?: android.widget.LinearLayout.LayoutParams(0, 0)
             params.width = px(side)
             params.height = px(area.height)
-            params.leftMargin = if (index == 0) 0 else px(spacing)
             icon.layoutParams = params
         }
         place(stack, area)
@@ -756,6 +758,8 @@ open class CYLTagButton @JvmOverloads constructor(
         internal fun fontCapHeight(font: CYLFont): Float {
             val bounds = android.graphics.Rect()
             paintFor(font).getTextBounds("H", 0, 1, bounds)
+            // Without glyph bounds (a test runtime), about 0.7 of the size, as HarmonyOS and the mini program use.
+            if (bounds.height() <= 0) return font.size * 0.7f
             return bounds.height() / Resources.getSystem().displayMetrics.density
         }
 

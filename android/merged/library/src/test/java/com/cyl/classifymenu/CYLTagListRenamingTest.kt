@@ -122,6 +122,17 @@ class CYLTagListRenamingTest {
         assertTrue("a pencil before the cross", renamable.isRenamable)
         assertEquals("drawn by the two-icon stack view", View.VISIBLE, renamable.button.editingIndicatorsView.visibility)
         assertEquals(2, renamable.button.editingIndicatorsView.itemViews.size)
+        assertEquals("a row", com.cyl.animateditem.CYLAnimatedItemAxis.Horizontal, renamable.button.editingIndicatorsView.axis)
+        assertEquals("the editing spacing", 10f, renamable.button.editingIndicatorsView.spacingDp, 0f)
+        assertTrue("tinted", renamable.button.editingIndicatorsView.iconColor != null)
+        // Laid out as a row of two icon slots, the editing spacing apart (the pixels are checked on a device:
+        // CYLTagEditingIconsDeviceTest).
+        val tagButton = renamable.button
+        tagButton.requestLayout()
+        tagButton.measure(View.MeasureSpec.makeMeasureSpec(tagButton.width, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(tagButton.height, View.MeasureSpec.EXACTLY))
+        tagButton.layout(tagButton.left, tagButton.top, tagButton.right, tagButton.bottom)
+        val icons = tagButton.editingIndicatorsView.itemViews
+        assertTrue("two slots side by side", icons[0].width > 0 && icons[1].left - icons[0].right > 0 && icons[0].top == icons[1].top)
         assertTrue(renamable.button.renameIndicatorHitFrame.width > 0)
         // The defaults (d58c4e6f): 10 between the icons, left 4 and right 0 around them.
         val defaults = CYLMenuStyle()
