@@ -16,7 +16,9 @@
  * pixel map or a system symbol (`$r('sys.symbol.camera')`, drawn with `SymbolGlyph`); every color takes a
  * `ResourceColor`, so theme colors (`$r('sys.color.font_primary')`) follow the color mode.
  */
-import { CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel } from 'cylanimateditem';
+import {
+  CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel, CYLAnimatedItemStackView
+} from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import {
   CYLTagAnimatedIcon, cylTagAnimatedIconOuterHeight, cylTagAnimatedIconOuterWidth, cylTagAnimationImage
@@ -163,6 +165,8 @@ export class CYLTagButton {
   showsCross: boolean = false;
   /** The frames of the two editing icons (the edit icon, then the cross) while `showsRenameIndicator`, or empty. */
   editingIconFrames: CYLRect[] = [];
+  /** The frame of `editingIndicatorsView` (the two icon slots and the space between them), or empty. */
+  editingIndicatorsFrame: CYLRect = new CYLRect();
   /** The color of the editing icons (`CYLMenuStyle.deleteIndicatorColor`, else the text color). */
   editingIconColor: ResourceColor = CYLColor.BLACK;
   cornerRadius: number = 0;
@@ -482,9 +486,9 @@ export class CYLTagButton {
   }
 
   /**
-   * `editingIndicatorsView`: the two editing icons while `showsRenameIndicator` (the edit icon, then the cross), as a
-   * CYLTabBarController `CYLAnimatedItemStackModel` of icon-only items, `CYLMenuStyle.editingIndicatorSpacing` apart.
-   * The tag draws its items side by side (the HarmonyOS stack view stacks vertically only).
+   * `editingIndicatorsView`: the two editing icons while `showsRenameIndicator` (the edit icon, then the cross): the
+   * model of a CYLTabBarController `CYLAnimatedItemStackView` laid out in a row (`axis` 'horizontal'),
+   * `CYLMenuStyle.editingIndicatorSpacing` apart, tinted with the indicator color (`iconColor`).
    */
   get editingIndicatorsView(): CYLAnimatedItemStackModel {
     if (this.editingIndicatorsModel === undefined) {
@@ -492,7 +496,10 @@ export class CYLTagButton {
       rename.accessibilityText = CYLMenuLocalizedString('CYLMenuRenameTag');
       const remove = new CYLAnimatedItemStackItem('', $r('sys.symbol.xmark'));
       remove.accessibilityText = CYLMenuLocalizedString('CYLMenuDeleteTag');
-      this.editingIndicatorsModel = new CYLAnimatedItemStackModel([rename, remove]);
+      const model = new CYLAnimatedItemStackModel([rename, remove]);
+      model.axis = 'horizontal';
+      model.contentMargin = 0;
+      this.editingIndicatorsModel = model;
     }
     return this.editingIndicatorsModel;
   }
@@ -935,12 +942,15 @@ export class CYLTagButton {
     const areaHeight = Math.max(0, outerHeight - top - bottom);
     const glyph = Math.max(0, Math.min(side, areaHeight));
     const model = this.editingIndicatorsView;
-    model.items.forEach((item: CYLAnimatedItemStackItem, index: number) => {
+    // Each glyph is centered in its slot: the space between the glyphs is the spacing plus what the slots add.
+    model.spacing = spacing + (side - glyph);
+    model.items.forEach((item: CYLAnimatedItemStackItem) => {
       item.iconSize = glyph;
-      item.spacingBefore = index === 0 ? 0 : spacing;
+      item.spacingBefore = -1;
     });
     const glyphY = areaY + (areaHeight - glyph) / 2;
     const firstX = x + left;
+    this.editingIndicatorsFrame = new CYLRect(firstX, areaY, 2 * side + spacing, areaHeight);
     this.editingIconFrames = [new CYLRect(firstX + (side - glyph) / 2, glyphY, glyph, glyph),
       new CYLRect(firstX + side + spacing + (side - glyph) / 2, glyphY, glyph, glyph)];
     this.deleteIndicatorLabel.frame = new CYLRect();
@@ -1043,6 +1053,10 @@ export class CYLTagButton {
     const indicatorImage: CYLImage | undefined = editingIcons ? undefined : style.deleteIndicatorImage;
     const drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage === undefined && !editingIcons;
     this.editingIconColor = style.deleteIndicatorColor ?? appearance.textColor;
+    if (editingIcons) {
+      const color = this.editingIconColor;
+      this.editingIndicatorsView.iconColor = typeof color === 'string' ? color : '';
+    }
     this.deleteIndicatorLabel.isHidden = !this.showsDeleteIndicatorValue || drawsCross || indicatorImage !== undefined ||
       editingIcons;
     this.deleteIndicatorLabel.text = this.showsDeleteIndicatorValue && !drawsCross && indicatorImage === undefined &&
@@ -1238,16 +1252,15 @@ export struct CYLTagButtonComponent {
           .accessibilityLevel('no')
       }
       if (this.button.showsEditingIcons) {
-        // `editingIndicatorsView`'s two icons side by side, in the indicator color.
-        ForEach(this.button.editingIconFrames, (frame: CYLRect, index: number) => {
-          SymbolGlyph(this.button.editingIndicatorsView.items[index].image as Resource)
-            .fontSize(frame.height)
-            .fontColor([this.button.editingIconColor])
-            .width(frame.width)
-            .height(frame.height)
-            .position({ x: frame.x, y: frame.y })
-            .accessibilityLevel('no')
-        }, (frame: CYLRect, index: number) => `${index}|${frame.x}|${frame.y}|${frame.width}`)
+        // `editingIndicatorsView`: CYLTabBarController's stack view in a row; the cell's hit areas take the taps.
+        Column() {
+          CYLAnimatedItemStackView({ model: this.button.editingIndicatorsView })
+        }
+        .width(this.button.editingIndicatorsFrame.width)
+        .height(this.button.editingIndicatorsFrame.height)
+        .position({ x: this.button.editingIndicatorsFrame.x, y: this.button.editingIndicatorsFrame.y })
+        .hitTestBehavior(HitTestMode.None)
+        .accessibilityLevel('no-hide-descendants')
       }
       if (this.button.showsCross) {
         ForEach(this.button.crossLines, (line: number[]) => {

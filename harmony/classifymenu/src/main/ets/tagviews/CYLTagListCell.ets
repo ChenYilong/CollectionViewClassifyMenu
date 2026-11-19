@@ -152,6 +152,29 @@ export class CYLTagListCell {
     this.revision++;
   }
 
+  /**
+   * A tap at (`x`, `y`) in the cell: on the rename indicator (or the title while `renamesOnTitleTap`) it calls
+   * `renameHandler`, on the delete indicator `deleteHandler`; returns whether it did. The list takes every physical tap
+   * on an item in one gesture (ahead of the views inside it), so it asks the cell first.
+   */
+  performTapAt(x: number, y: number): boolean {
+    const inside = (frame: CYLRect): boolean => frame.width > 0 && frame.height > 0 && x >= frame.x &&
+      x < frame.x + frame.width && y >= frame.y && y < frame.y + frame.height;
+    if (this.renamableValue && inside(this.button.renameIndicatorHitFrame)) {
+      this.renameHandler?.();
+      return true;
+    }
+    if (this.deletableValue && inside(this.button.deleteIndicatorHitFrame)) {
+      this.deleteHandler?.();
+      return true;
+    }
+    if (this.renamableValue && this.renamesOnTitleTap && inside(this.renameTitleFrame)) {
+      this.renameHandler?.();
+      return true;
+    }
+    return false;
+  }
+
   /** Clears what a reused cell must not keep (`prepareForReuse`). */
   prepareForReuse(): void {
     this.deleteHandler = undefined;

@@ -1278,13 +1278,16 @@ tags: [issues, ui, cocoapods, progress]
   `saveItems` and `loadItems` (with `fetchItemsWithKeys`) in cache.js. The editing icons and the trash are drawn SVGs in
   data URIs (`editing-icons.js`): an `<image>` cannot tint a file, so there is no image file to add to a folder. New
   `test/tag-cloud-renaming.test.js` (5); `npm test` 159 / 159; WeChat DevTools Build npm and refresh succeed.
-- **HarmonyOS stack view switch reverted (97b87b7b, then reverted):** at f88d67a8 the HarmonyOS
-  `CYLAnimatedItemView` drew `sys.symbol` resources blank (an ArkUI Image does not draw them), so the tag's two icons
-  were invisible; CYLTabBarController fixed it in 370ab981 (bug B30, after the pin). The tag draws its own
-  `SymbolGlyph`s again until the next coordinated pin includes 370ab981.
-- **TODO:** emulator screenshots of the editing icons and the clear button (HarmonyOS, mini program); use
-  CYLTabBarController's new stack view options (HarmonyOS 692f0aa7 `model.axis` / `spacing` / `iconColor`, Android
-  1fbd8048 `stack.axis` / `spacingDp` / `iconColor`) for the tag's editing icons once they are in a pinned commit.
+- **The editing icons drawn by CYLTabBarController's stack view:** first tried on HarmonyOS at f88d67a8 (97b87b7b) and
+  reverted (357478ba): the HarmonyOS `CYLAnimatedItemView` drew `sys.symbol` resources blank there (CYLTabBarController
+  B30, fixed in 370ab981). At the 9a4ad95e pin (B30 plus `axis` / `spacing` / icon colors on every platform):
+  - HarmonyOS: `editingIndicatorsView` is a `CYLAnimatedItemStackView` model, `axis` 'horizontal', `spacing`,
+    `iconColor`; the tag draws the view. Host tests 75 / 75; the app builds.
+  - Android (f9d1cb16): `axis` Horizontal, `spacingDp`, `iconColor`; device test `CYLTagEditingIconsDeviceTest`: both
+    icons draw in the indicator color on API 37.
+- **TODO:** emulator screenshots of the editing icons and the clear button (HarmonyOS, in CYLSearchViewController's
+  contact tags example, which now holds the editing example; the mini program); the mini program's tag on its
+  `cyl-animated-item-stack` (`axis="horizontal"`, `spacing`, `icon-color`, CYLTabBarController d3ad4751).
 
 ### TODO (2026-11-19, `feat/harmony`, Windows session): Android tags cut short with "…" although there is room
 
@@ -1306,3 +1309,18 @@ tags: [issues, ui, cocoapods, progress]
   `CYLTagTitleFitTest` rounds the same way. Library 99 / 0; the example builds.
 - **Screenshot (after, 30 / 30):** `docs/assets/android-tag-title-ellipsis-after.png` (CYLSearchViewController 918a7fa with
   1a3a31dc on emulator-5556): "Book Club" and "Recruiters" in full. **Score: 100 / 100.**
+
+### TODO (2026-11-19, `feat/harmony`, Windows session): HarmonyOS, tapping a tag's pencil or title in editing mode does not rename
+
+- **Bug (step 1, recorded; reported by the CYLSearchViewController session at 357478ba, Mate 70 Pro emulator):** in
+  editing mode the pencil (and the title, with `renamesOnTitleTapWhileEditing`) goes to the normal item tap
+  (`menuDidSelectItem`) instead of `beginRenaming`.
+- **Acceptance (100):** a failing check first (30); the fix in the library (40); a labelled emulator screenshot (30).
+- **Cause:** the list does draw each tag with `CYLTagListCellComponent` (its rename hit areas included), but the item
+  wrapper's `priorityGesture(TapGesture)` takes every physical tap ahead of the views inside it and calls the plain
+  item tap; the cell's own `onClick`s only ever ran for screen readers.
+- **Fix (library, 70 / 100 so far):** `CYLTagListCell.performTapAt(x, y)` hit-tests the rename indicator, the delete
+  indicator and (while `renamesOnTitleTap`) the title area and calls their handlers; the list's tap gesture asks the
+  cell with the finger's local position before the item tap. Host test: the pencil and the title rename, the cross
+  deletes, nothing after `prepareForReuse` (75 / 75); the app builds.
+- **TODO:** the emulator check and screenshot in CYLSearchViewController's contact tags editor (30).

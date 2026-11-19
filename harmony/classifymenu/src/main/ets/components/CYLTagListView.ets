@@ -837,8 +837,14 @@ export struct CYLTagListView {
     .id(`CYLTagListItem-${r.section}-${r.item}`)
     // A physical tap is taken here, once, ahead of the views inside the item (their layout changes with the
     // selection); the cell's own onClick stays for screen readers, which activate without gestures.
-    .priorityGesture(TapGesture().onAction(() => {
+    .priorityGesture(TapGesture().onAction((event: GestureEvent) => {
       hilog.info(0x0000, 'CYLTagList', 'tap gesture %{public}d-%{public}d', r.section, r.item);
+      // The rename indicator, the title while renaming on a title tap, and the delete indicator take their taps
+      // first: this gesture runs ahead of the cell's own controls.
+      const finger = event.fingerList.length > 0 ? event.fingerList[0] : undefined;
+      if (finger !== undefined && r.cell !== undefined && r.cell.performTapAt(finger.localX, finger.localY)) {
+        return;
+      }
       this.tap(r);
     }))
     .gesture(GestureGroup(GestureMode.Sequence,

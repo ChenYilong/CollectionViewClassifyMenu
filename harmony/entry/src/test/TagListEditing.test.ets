@@ -324,6 +324,9 @@ export default function tagListEditingTest() {
       expect(button.renameIndicatorHitFrame.width > 0).assertTrue();
       expect(button.renameIndicatorHitFrame.maxX).assertEqual(button.deleteIndicatorHitFrame.x);
       expect(button.editingIconFrames[1].x - button.editingIconFrames[0].maxX).assertEqual(10);
+      expect(button.editingIndicatorsView.axis).assertEqual('horizontal');
+      expect(button.editingIndicatorsView.spacing).assertEqual(10);
+      expect(button.editingIndicatorsFrame.width).assertEqual(button.editingIconFrames[1].maxX - button.editingIconFrames[0].x);
       const wider = new CYLMenuStyle();
       wider.editingIndicatorSpacing = 20;
       expect(CYLTagButton.widthWithRenameIndicator('Family', CYLSize.ZERO, true, true, wider) -
@@ -339,8 +342,31 @@ export default function tagListEditingTest() {
       cell.renamesOnTitleTap = true;
       expect(cell.button.showsRenameIndicator).assertTrue();
       expect(cell.renameAccessibilityLabel.length > 0).assertTrue();
+      // A physical tap reaches the cell through the list's gesture: the pencil and the title rename, the cross deletes.
+      let renames = 0;
+      let deletes = 0;
+      cell.renameHandler = () => {
+        renames++;
+      };
+      cell.deleteHandler = () => {
+        deletes++;
+      };
+      const cellSize = cell.button.intrinsicSize();
+      cell.button.setBounds(cellSize.width, cellSize.height);
+      const pencil = cell.button.renameIndicatorHitFrame;
+      const cross = cell.button.deleteIndicatorHitFrame;
+      const titleArea = cell.renameTitleFrame;
+      expect(cell.performTapAt(pencil.x + pencil.width / 2, pencil.y + pencil.height / 2)).assertTrue();
+      expect(renames).assertEqual(1);
+      expect(cell.performTapAt(cross.x + cross.width / 2, cross.y + cross.height / 2)).assertTrue();
+      expect(deletes).assertEqual(1);
+      expect(cell.performTapAt(titleArea.x + 1, titleArea.y + titleArea.height / 2)).assertTrue();
+      expect(renames).assertEqual(2);
+      cell.renamesOnTitleTap = false;
+      expect(cell.performTapAt(titleArea.x + 1, titleArea.y + titleArea.height / 2)).assertFalse();
       cell.prepareForReuse();
       expect(cell.isRenamable).assertFalse();
+      expect(cell.performTapAt(pencil.x + pencil.width / 2, pencil.y + pencil.height / 2)).assertFalse();
 
       list.beginRenaming(path(1, 0));
       expect(list.renamingIndexPath?.item).assertEqual(0);
