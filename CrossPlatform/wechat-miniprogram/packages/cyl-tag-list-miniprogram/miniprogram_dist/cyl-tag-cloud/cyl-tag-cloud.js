@@ -551,10 +551,14 @@ Component({
       });
       const tail = model.renderTag(model.makeTag('x'), 0, { listStyle, theme: this.data.colorTheme });
       const foldColor = this.data.foldControlColor || listStyle.normal.textColor;
+      // The chevron as large as an editing icon: the title's cap height x 1.25 (a text glyph drew a 6 px dash).
+      const chevronSide = model.editingIconSide(listStyle.normal.fontSize);
       this.setData({
         items,
         list,
         foldStyle: `${tail.style}; color: ${foldColor}; font-size: ${listStyle.normal.fontSize}px`,
+        foldChevron: iconImage('chevron', foldColor),
+        foldChevronStyle: `width: ${chevronSide}px; height: ${chevronSide}px`,
         foldContent: this.data.foldControlContent,
         foldTitle: locale.tc(this._expanded ? 'CYLMenuCollapse' : 'CYLMenuExpand'),
       }, () => {

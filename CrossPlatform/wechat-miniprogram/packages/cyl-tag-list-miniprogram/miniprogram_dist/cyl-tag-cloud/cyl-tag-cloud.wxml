@@ -66,13 +66,15 @@
       <view wx:if="{{canFold}}" class="cyl-tc-item cyl-tc-fold" id="CYLTagListFoldControl" style="{{foldStyle}}"
             bindtap="onFoldTap" aria-role="button" aria-label="{{sectionTitle}} {{foldTitle}}">
         <text wx:if="{{foldContent !== 'icon'}}">{{foldTitle}}</text>
-        <text wx:if="{{foldContent !== 'title'}}" class="cyl-tc-fold-arrow {{expanded ? 'cyl-tc-up' : ''}}">▾</text>
+        <image wx:if="{{foldContent !== 'title'}}" class="cyl-tc-fold-arrow {{expanded ? 'cyl-tc-up' : ''}} {{foldContent !== 'icon' ? 'cyl-tc-fold-arrow-after' : ''}}"
+               src="{{foldChevron}}" mode="aspectFit" style="{{foldChevronStyle}}" aria-hidden="true" />
       </view>
     </view>
     <!-- The fold control as the last tag (iOS CYLMenuFoldControl tail); a hidden copy measures its width. -->
     <view wx:if="{{measuringFold || canFold}}" class="cyl-tc-fold-sizer" id="CYLTagListFoldSizer" style="{{foldStyle}}" aria-hidden="true">
       <text wx:if="{{foldContent !== 'icon'}}">{{foldTitle}}</text>
-      <text wx:if="{{foldContent !== 'title'}}" class="cyl-tc-fold-arrow">▾</text>
+      <image wx:if="{{foldContent !== 'title'}}" class="cyl-tc-fold-arrow {{foldContent !== 'icon' ? 'cyl-tc-fold-arrow-after' : ''}}"
+             src="{{foldChevron}}" mode="aspectFit" style="{{foldChevronStyle}}" />
     </view>
     <!-- CYLTagListAddItemView while editing: a name field and an Add button below the tags. -->
     <view wx:if="{{showsAddItem}}" class="cyl-tc-add">

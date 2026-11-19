@@ -1,5 +1,5 @@
 /**
- * The tag cloud's drawn icons, tinted: the two editing icons of a renamable tag (iOS "square.and.pencil" and "xmark", in
+ * The tag cloud's drawn icons, tinted: the fold control's chevron, the two editing icons of a renamable tag (iOS "square.and.pencil" and "xmark", in
  * a horizontal `CYLAnimatedItemStackView`) and the section header's clear button (the core's `cyl_trash`). A Mini
  * Program `<image>` cannot tint a file, so each icon is an SVG in a data URI drawn in the color asked for.
  */
@@ -27,11 +27,13 @@ const PATHS = {
     + '<path d="M18.4 3.6a2 2 0 0 1 2.9 2.9L12 15.8l-3.8 1 1-3.8z"/>',
   // A cross (iOS "xmark").
   delete: '<path d="M5 5l14 14M19 5L5 19"/>',
+  // A chevron pointing down (the fold control, iOS "chevron.down"); turned up while unfolded.
+  chevron: '<path d="M5 9l7 7 7-7"/>',
   // A trash can (the core's cyl_trash).
   clear: '<path d="M4 6.5h16M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.2 10v6.5M13.8 10v6.5"/>',
 };
 
-/** The icon `kind` ('rename', 'delete' or 'clear') as a data URI, stroked in `color`. */
+/** The icon `kind` ('rename', 'delete', 'chevron' or 'clear') as a data URI, stroked in `color`. */
 function iconImage(kind, color) {
   const stroke = String(color || '#000000').replace(/"/g, '');
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + stroke + '" '

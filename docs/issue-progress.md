@@ -1359,3 +1359,7 @@ tags: [issues, ui, cocoapods, progress]
   Tests `test/tag-cloud-folding.test.js` (2: the fold rule, the component with a stand-in layout); `npm test` 161 / 161
   with and without `verify-package.js`. Screenshot `docs/assets/miniprogram-tag-cloud-folding.png` (DevTools: folded,
   unfolded, editing).
+- **Follow-up (2026-11-19, reported by the CYLSearchViewController session):** the chevron was the "▾" text glyph, drawn
+  as a ~6 px dash in DevTools at 16 pt tags. Now a drawn chevron (`editing-icons.js` 'chevron', tinted with the fold
+  color) sized as the editing icons (cap height x 1.25, 13 px at 15 px tags), turned up while unfolded. Test checks
+  the icon and its size; `npm test` 161 / 161; before / after: `docs/assets/miniprogram-tag-cloud-fold-chevron.png`.

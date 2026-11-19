@@ -111,6 +111,10 @@ test('cyl-tag-cloud folds to defaultVisibleRows with the control as the last tag
   assert.equal(cloud.data.canFold, true);
   assert.deepEqual(cloud.data.items.map((item) => item.hidden), [false, false, false, false, false, true, true, true]);
   assert.deepEqual(cloud.events.filter((e) => e.name === 'foldchange').pop().detail, { canFold: true, expanded: false });
+  // The chevron is a drawn icon as large as an editing icon (cap height x 1.25), not a text glyph.
+  const side = model.editingIconSide(model.tagCloudStyle().normal.fontSize);
+  assert.match(cloud.data.foldChevron, /^data:image\/svg\+xml;base64,/);
+  assert.equal(cloud.data.foldChevronStyle, `width: ${side}px; height: ${side}px`);
   cloud.onFoldTap();
   assert.equal(cloud.isExpanded(), true);
   assert.ok(cloud.data.items.every((item) => !item.hidden), 'unfolded: every tag');
