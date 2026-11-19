@@ -1578,3 +1578,10 @@ tags: [issues, ui, cocoapods, progress]
 - Acceptance (100): the five older podspecs say iOS 15.0 and still parse (30); both CYL requests sent and confirmed done
   by their owners (40); this repository's pins follow if CYLAnimatedItem changes (20); the result listed here (10).
   Pass: 60.
+- Progress (2026-11-20): the five older podspecs now say `:ios, '15.0'` and parse (`pod ipc spec`): MJRefresh (two
+  copies, were 12.0 and 9.0), ChatKit-OC-leancloud (7.0), Haidilao's CYLChatKit (8.0), WZLBadge-master (5.0). They are
+  working-tree edits only: those repositories are on `master` with third-party remotes (MJRefresh also has 3
+  unrelated uncommitted files), so nothing was committed or pushed. QQTabBarKit (13.0) and QMUIKit (13.0) were not in
+  the owner's list and are unchanged. The requests for CYLTabBarController / CYLAnimatedItem and CYLTableViewPlaceHolder
+  went to their owning sessions (the CYLTabBarController one also raises the Lottie subspec's 13.0). Score 40 / 100 until
+  they confirm (−40) and this repository re-pins if CYLAnimatedItem changes (−20).
