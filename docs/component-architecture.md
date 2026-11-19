@@ -645,3 +645,17 @@ started run completes and the next one tests the newest commit.
   fills it. Measured in CYLSearchViewController's contact tags example without settings (iPhone 18 Pro simulator, @3x,
   "Family"): left padding 14 pt, title to edit icon about 12.7 pt, between the icons about 12.7 pt, cross to the edge
   about 14.7 pt. Example 110 of 110.
+
+## DONE (2026-11-19; TODO 2026-11-19): dragging a tag holds page scrolling (mini program)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "拖拽taglist启动后，以及拖拽结束后，应禁止taglist的滚动浏览功能防止拖拽手势和taglist 滚动浏览手势冲突。现在是有这个问题，你需要在taglist core 核心代码中修复后repin完成example 修复，需要默认启动。在联系人example中点击编辑后。可以复现。 我的测试平台是微信小程序"
+  (English: from the start of a tag drag until it ends, scrolling must be held so the drag and the scroll gestures do
+  not fight; fix it in the tag list core, on by default, then re-pin and fix the example; reproduced in the contact tags
+  example's editing mode on the WeChat mini program.)
+- **Cause**: `cyl-tag-cloud` bound `touchmove` without catching it (except with smear selection), so the finger that
+  drags a tag also scrolled the page.
+- **Status**: DONE (2026-11-19). `disablesScrollingWhileReordering` (default true): from the long press that starts a
+  drag until the drag ends or is cancelled, `scrollLocked` makes the item catch `touchmove`, which holds the page's
+  scrolling; `reorderingchange` {reordering} tells a host with a `<scroll-view>` to turn its `scroll-y` off for the same
+  time. Tests: `tag-components.test.js` (the drag sets and clears `scrollLocked`; off when the property is off; the
+  template binds `catchtouchmove` while locked).

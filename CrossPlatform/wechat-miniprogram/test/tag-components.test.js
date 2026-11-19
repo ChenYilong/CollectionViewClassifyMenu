@@ -105,12 +105,16 @@ test('cyl-tag-cloud: a long press selects (in none mode) or reorders, and report
     listStyle: model.tagContainerStyle(),
     allowsReordering: true,
   }, (selector) => (selector === '.cyl-tc-item' ? rects : rects[0]));
+  assert.equal(list.data.scrollLocked, false);
   list.onTouchStart(tap(0));
   list.onLongPress(tap(0));
   assert.equal(list.events.pop().name, 'reorderingchange');
+  // Dragging holds page scrolling (the item catches touchmove) until the drag ends.
+  assert.equal(list.data.scrollLocked, true);
   list.onTouchMove({ touches: [{ clientX: 250, clientY: 10 }] });
   assert.deepEqual(list.getTags().map((tag) => tag.title), ['b', 'c', 'a']);
   list.onTouchEnd();
+  assert.equal(list.data.scrollLocked, false);
   const names = list.events.map((event) => event.name);
   assert.ok(names.includes('tagmove'));
   assert.deepEqual(list.events.find((event) => event.name === 'tagmove').detail, { from: 0, to: 2 });
@@ -266,3 +270,22 @@ test('the pages load with their titles and react as the iOS screens', () => {
   delete global.Page;
   delete global.Component;
 });
+
+test('cyl-tag-cloud: a drag holds scrolling unless disablesScrollingWhileReordering is off; the template catches touchmove then', () => {
+  const fs = require('node:fs');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+  const wxml = fs.readFileSync(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.wxml'), 'utf8');
+  assert.match(wxml, /catchtouchmove="\{\{allowsSmearSelection \|\| scrollLocked \? 'onTouchMove' : ''\}\}"/);
+  assert.match(wxml, /bindtouchmove="\{\{allowsSmearSelection \|\| scrollLocked \? '' : 'onTouchMove'\}\}"/);
+  const rects = [0, 1].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
+    tags: ['a', 'b'].map((title) => model.makeTag(title)), listStyle: model.tagContainerStyle(), allowsReordering: true,
+    disablesScrollingWhileReordering: false,
+  }, (selector) => (selector === '.cyl-tc-item' ? rects : rects[0]));
+  list.onTouchStart(tap(0));
+  list.onLongPress(tap(0));
+  assert.equal(list.data.scrollLocked, false);
+  list.onTouchCancel();
+  assert.equal(list.data.scrollLocked, false);
+});
+

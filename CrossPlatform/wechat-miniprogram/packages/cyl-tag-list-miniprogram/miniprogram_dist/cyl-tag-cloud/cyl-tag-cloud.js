@@ -95,6 +95,10 @@ Component({
     showsClearButton: { type: Boolean, value: false },
     defaultVisibleRows: { type: Number, value: 0 },
     allowsSmearSelection: { type: Boolean, value: false },
+    // While a tag is dragged (from the long press to the end of the drag), its touch moves do not scroll the page, so
+    // the drag and scrolling do not fight. On by default; a host with a <scroll-view> also turns its scroll-y off on
+    // `reorderingchange` {reordering}.
+    disablesScrollingWhileReordering: { type: Boolean, value: true },
     foldControlContent: { type: String, value: 'icon' },
     foldControlColor: { type: String, value: '' },
   },
@@ -105,6 +109,8 @@ Component({
     ripples: {},
     deleteLabel: '',
     isEditing: false,
+    // A drag is in progress and scrolling is held (`disablesScrollingWhileReordering`).
+    scrollLocked: false,
     showsAddItem: false,
     addText: '',
     addPlaceholder: '',
@@ -696,6 +702,7 @@ Component({
       const drag = this._dragging;
       if (!drag) return;
       this._dragging = null;
+      this._setScrollLocked(false);
       this._render(false);
       this.triggerEvent('reorderingchange', { reordering: false });
       if (drag.current !== drag.from) {
@@ -718,9 +725,15 @@ Component({
         this._tags = model.moveItem(this._tags, drag.current, drag.from);
         this._selection = model.moveSelection(this._selection, drag.current, drag.from);
         this._dragging = null;
+        this._setScrollLocked(false);
         this.triggerEvent('reorderingchange', { reordering: false });
       }
       this._render(false);
+    },
+
+    /** Holds or releases page scrolling for a drag: the item catches its touch moves while `scrollLocked`. */
+    _setScrollLocked(locked) {
+      if (locked !== this.data.scrollLocked) this.setData({ scrollLocked: locked });
     },
 
     onTap(event) {
@@ -751,6 +764,7 @@ Component({
           rects: null,
         };
         const drag = this._dragging;
+        this._setScrollLocked(this.data.disablesScrollingWhileReordering);
         this._render(false);
         this.triggerEvent('reorderingchange', { reordering: true });
         if (this._selection.includes(index)) {

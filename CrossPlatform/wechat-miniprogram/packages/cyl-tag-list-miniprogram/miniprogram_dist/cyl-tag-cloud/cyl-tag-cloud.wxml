@@ -16,8 +16,8 @@
       <view wx:for="{{items}}" wx:key="key" id="cyl-tc-item-{{index}}"
             class="cyl-tc-item {{item.enabled ? '' : 'cyl-tc-disabled'}} {{item.hidden ? 'cyl-tc-hidden' : ''}}" style="{{item.style}}"
             data-index="{{index}}" bindtap="onTap" bindlongpress="onLongPress"
-            mut-bind:touchstart="onTouchStart" bindtouchmove="{{allowsSmearSelection ? '' : 'onTouchMove'}}"
-            catchtouchmove="{{allowsSmearSelection ? 'onTouchMove' : ''}}" bindtouchend="onTouchEnd"
+            mut-bind:touchstart="onTouchStart" bindtouchmove="{{allowsSmearSelection || scrollLocked ? '' : 'onTouchMove'}}"
+            catchtouchmove="{{allowsSmearSelection || scrollLocked ? 'onTouchMove' : ''}}" bindtouchend="onTouchEnd"
             bindtouchcancel="onTouchCancel"
             aria-role="button" aria-label="{{item.accessibilityLabel}}" aria-selected="{{item.selected}}"
             aria-disabled="{{!item.enabled}}">
