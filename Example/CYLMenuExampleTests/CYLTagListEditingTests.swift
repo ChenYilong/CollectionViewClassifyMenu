@@ -406,6 +406,63 @@ extension CYLTagListEditingTests {
     }
 }
 
+
+/**
+ * Two sections; the first shows the header's clear button, and the taps are recorded.
+ */
+private final class CYLClearableSource: NSObject, CYLMenuDataSource, CYLMenuDelegate {
+    var sections = [["Coworkers", "Clients"], ["Family"]]
+    private(set) var cleared: [Int] = []
+    func numberOfSectionsInMenu() -> Int { sections.count }
+    func menuNumberOfItems(inSection section: Int) -> Int { sections[section].count }
+    func menuTitle(forSection section: Int) -> String { section == 0 ? "Recent" : "My Tags" }
+    func menuTitleForItem(at indexPath: IndexPath) -> String { sections[indexPath.section][indexPath.item] }
+    func menuShowsClearButton(forSection section: Int) -> Bool { section == 0 }
+    func menu(_ menu: Any, didTapClearButtonInSection section: Int) { cleared.append(section) }
+}
+
+extension CYLTagListEditingTests {
+    func testTheHeaderClearButtonIsBuiltInAndAlignedWithTheTitle() {
+        let source = CYLClearableSource()
+        let view = CYLTagListView(frame: .zero)
+        view.menuDataSource = source
+        view.menuDelegate = source
+        view.showsSectionHeaders = true
+        show(view, size: CGSize(width: 320, height: 500))
+        view.reloadMenuData()
+        view.layoutIfNeeded()
+        var handled: [Int] = []
+        view.clearButtonHandler = { handled.append($0) }
+        func clearButton(inSection section: Int) -> UIButton? {
+            view.probe.header(inSection: section)?.subviews.compactMap { $0 as? UIButton }
+                .first { $0.accessibilityIdentifier == CYLTagListAccessibilityIdentifier.clearButton }
+        }
+        let button = clearButton(inSection: 0)
+        XCTAssertNotNil(button)
+        XCTAssertFalse(button?.isHidden ?? true, "shown for the section that asks for it")
+        XCTAssertNotNil(button?.currentImage, "the bundle's trash icon")
+        XCTAssertEqual(button?.accessibilityLabel, CYLMenuLocalizedString("CYLMenuClearSection") + " Recent")
+        XCTAssertTrue(clearButton(inSection: 1)?.isHidden ?? true, "hidden elsewhere")
+        // The rule: its top and bottom are the title text's.
+        if let button, let header = view.probe.header(inSection: 0) {
+            let labels = header.subviews.flatMap { [$0] + $0.subviews }.compactMap { $0 as? UILabel }
+            let title = labels.first { $0.text == "Recent" }
+            XCTAssertNotNil(title)
+            if let title {
+                let text = title.convert(title.bounds, to: header)
+                XCTAssertEqual(button.frame.minY, text.minY, accuracy: 0.5, "top aligned with the title")
+                XCTAssertEqual(button.frame.maxY, text.maxY, accuracy: 0.5, "bottom aligned with the title")
+            }
+            XCTAssertTrue(button.point(inside: CGPoint(x: button.bounds.midX, y: button.bounds.midY - 20), with: nil),
+                          "a 44 point tap area")
+        }
+        button?.sendActions(for: .touchUpInside)
+        XCTAssertEqual(source.cleared, [0], "the delegate hears the tap")
+        XCTAssertEqual(handled, [0], "and the closure")
+        XCTAssertNotNil(CYLMenuResources.image(named: "cyl_trash"), "the icon is in the core bundle")
+    }
+}
+
 /**
  * Records `menu(_:didFinishEditingWithItems:)`.
  */

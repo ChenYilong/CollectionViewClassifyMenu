@@ -175,6 +175,17 @@ open class CYLMenuStyle: NSObject, NSCopying {
     @objc open var editingIndicatorSpacing: CGFloat = 8
 
     /**
+     * The image of a section header's clear button (`CYLMenuDataSource.menuShowsClearButton(forSection:)`); nil: the
+     * bundle's trash icon ("cyl_trash"), drawn as a template.
+     */
+    @objc open var clearButtonImage: UIImage?
+
+    /**
+     * The color of the clear button; nil: `headerTextColor`.
+     */
+    @objc open var clearButtonColor: UIColor?
+
+    /**
      * The margins around the two editing icons as a whole (the stack view `CYLTagButton.editingIndicatorsView`): left
      * from the title, right to the tag's padding, top and bottom within the tag. Left 4 and right 2 points by default;
      * negative values are 0. With `editingIndicatorSpacing` (between the icons) it sets every space of the icons.
@@ -790,6 +801,8 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.deleteIndicatorWidth = deleteIndicatorWidth
         copy.deleteIndicatorPadding = deleteIndicatorPadding
         copy.editingIndicatorSpacing = editingIndicatorSpacing
+        copy.clearButtonImage = clearButtonImage
+        copy.clearButtonColor = clearButtonColor
         copy.editingIndicatorInsets = editingIndicatorInsets
         copy.deleteIndicatorPlacement = deleteIndicatorPlacement
         copy.rippleColor = rippleColor

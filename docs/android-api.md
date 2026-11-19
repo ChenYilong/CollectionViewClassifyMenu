@@ -12,7 +12,7 @@ Every public symbol of the iOS core (Swift: `CollectionViewClassifyMenu/Class` a
 not edit the table by hand. A row without a counterpart is `TODO`. The reverse table is
 [android-ios-api.md](android-ios-api.md).
 
-**Score: 849 / 881 with an Android counterpart = 96.4 / 100.** Full marks when no row is `TODO`; 0
+**Score: 849 / 887 with an Android counterpart = 95.7 / 100.** Full marks when no row is `TODO`; 0
 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO`
 rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the
 Android example, score again, until 100. The score history is in [android.md](android.md).
@@ -273,6 +273,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuDataSource -menuMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuMoveItemAtIndexPath` |
 | `CYLMenuDataSource -menuSectionAllowsEditing:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuSectionAllowsEditing` |
 | `CYLMenuDataSource -menuCacheKeyForSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuCacheKeyForSection` |
+| `CYLMenuDataSource -menuShowsClearButtonForSection:` | method, `CYLMenuDataSource.swift` | TODO |
 | `CYLMenuDataSource -menuIdentifierForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | TODO |
 | `CYLMenuDataSource -menuRenameItemAtIndexPath:toTitle:` | method, `CYLMenuDataSource.swift` | TODO |
 | `CYLMenuDelegate` | protocol, `CYLMenuDataSource.swift` | `com.cyl.classifymenu.CYLMenuDelegate` |
@@ -290,6 +291,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuDelegate -menu:didFinishEditingWithTitles:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidFinishEditingWithTitles(menu, titles)` |
 | `CYLMenuDelegate -menu:didFinishEditingWithItems:` | method, `CYLMenuDataSource.swift` | TODO |
 | `CYLMenuDelegate -menu:didRenameItemAtIndexPath:toTitle:` | method, `CYLMenuDataSource.swift` | TODO |
+| `CYLMenuDelegate -menu:didTapClearButtonInSection:` | method, `CYLMenuDataSource.swift` | TODO |
 | `CYLMenuDelegate -menu:didLongPressItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidLongPressItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidMoveItemAtIndexPath(menu, sourceIndexPath, toIndexPath)` |
 | `CYLMenuDelegate -menu:didBeginDraggingSelectedItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath(menu, indexPath)` |
@@ -367,6 +369,8 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLMenuStyle.deleteIndicatorWidth` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.deleteIndicatorWidth` |
 | `CYLMenuStyle.deleteIndicatorPadding` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.deleteIndicatorPadding` |
 | `CYLMenuStyle.editingIndicatorSpacing` | property, `CYLMenuStyle.swift` | TODO |
+| `CYLMenuStyle.clearButtonImage` | property, `CYLMenuStyle.swift` | TODO |
+| `CYLMenuStyle.clearButtonColor` | property, `CYLMenuStyle.swift` | TODO |
 | `CYLMenuStyle.editingIndicatorInsets` | property, `CYLMenuStyle.swift` | TODO |
 | `CYLMenuStyle.deleteIndicatorPlacement` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.deleteIndicatorPlacement` |
 | `CYLMenuStyle.rippleColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.rippleColor` |
@@ -560,6 +564,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListAccessibilityIdentifier.deleteButton` | property, `CYLTagListAccessibility.swift` | `CYLTagListDeleteAccessibilityIdentifier` |
 | `CYLTagListAccessibilityIdentifier.renameButton` | property, `CYLTagListAccessibility.swift` | TODO |
 | `CYLTagListAccessibilityIdentifier.renameTitle` | property, `CYLTagListAccessibility.swift` | TODO |
+| `CYLTagListAccessibilityIdentifier.clearButton` | property, `CYLTagListAccessibility.swift` | TODO |
 | `CYLTagListAddItemView` | class, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView (a LinearLayout)` |
 | `CYLTagListAddItemView.textField` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.textField (EditText)` |
 | `CYLTagListAddItemView.addButton` | property, `CYLTagListAddItemView.swift` | `CYLTagListAddItemView.addButton (Button)` |
@@ -788,6 +793,7 @@ Android example, score again, until 100. The score history is in [android.md](an
 | `CYLTagListView.addItemView` | property, `CYLTagListView.swift` | `CYLTagListView.addItemView` |
 | `CYLTagListView.renamingIndexPath` | property, `CYLTagListView.swift` | TODO |
 | `CYLTagListView.renameRequestHandler` | property, `CYLTagListView.swift` | TODO |
+| `CYLTagListView.clearButtonHandler` | property, `CYLTagListView.swift` | TODO |
 | `CYLTagListView.renamesOnTitleTapWhileEditing` | property, `CYLTagListView.swift` | TODO |
 | `CYLTagListView.cachePolicy` | property, `CYLTagListView.swift` | `CYLTagListView.cachePolicy` |
 | `CYLTagListView.cacheName` | property, `CYLTagListView.swift` | `CYLTagListView.cacheName` |

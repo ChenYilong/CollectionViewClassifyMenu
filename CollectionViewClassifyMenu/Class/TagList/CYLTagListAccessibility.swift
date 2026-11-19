@@ -54,4 +54,9 @@ public enum CYLTagListAccessibilityIdentifier {
      * (`CYLTagListView.renamesOnTitleTapWhileEditing`).
      */
     public static let renameTitle = "CYLTagListRenameTitle"
+
+    /**
+     * A section header's clear button (the trash icon).
+     */
+    public static let clearButton = "CYLTagListClearButton"
 }

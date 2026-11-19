@@ -602,3 +602,18 @@ started run completes and the next one tests the newest commit.
   items from the server, an external editor; Example 109 of 109 (iPhone 18 Pro simulator, iOS 27.2). The new public
   symbols are TODO rows in `docs/android-api.md` for the Windows session. Used by CYLSearchViewController's contact tags
   example (tags keyed by id, contacts bound to the id, CYLSearchBarView's editing bar above the keyboard).
+
+## DONE (2026-11-19; TODO 2026-11-19): a built-in clear button in the section header, aligned with the title (iOS)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "recent右上角的删除图标应直接调用CollectView组件原有的自定义接口，这个属于已经封装好的，删除图标样式icon在其内部资源包已经内置，如果没有内置，增加该资源，且暴露接口直接在右上角添加删除按钮以及自定义点击事件回调，且新增限制，该图标顶部与底部应与左侧元素顶部 底部对齐。更新CollectView组件增加该限制，完成CollectView组件core代码后repin commit继续完成example"
+  (English: the trash icon at the top right of "Recent" should be this component's own API with its icon in the
+  component's bundle (add it if missing), a public way to show it with a tap callback, and a new rule: its top and
+  bottom align with the title on its left.)
+- **Status**: DONE (2026-11-19). There was no built-in clear button (hosts used `menuAccessoryView(forSection:)`).
+  Added: data source `menuShowsClearButton(forSection:)`, delegate `menu(_:didTapClearButtonInSection:)`,
+  `CYLTagListView.clearButtonHandler`, `CYLMenuStyle.clearButtonImage` / `clearButtonColor` (default: the bundle's
+  `cyl_trash`, an original template icon drawn for this library at 20 pt @1x, @2x, @3x in `Images.xcassets`, tinted with
+  `headerTextColor`), `CYLTagListAccessibilityIdentifier.clearButton`, string `CYLMenuClearSection` (en, zh-Hans, zh-Hant;
+  VoiceOver reads "Clear <section title>"). The rule: the button is a square as tall as the title's text, its top and
+  bottom on the title label's, with a 44 point tap area. Test `testTheHeaderClearButtonIsBuiltInAndAlignedWithTheTitle`;
+  Example 110 of 110. Used by CYLSearchViewController's contact tags example ("Recent").

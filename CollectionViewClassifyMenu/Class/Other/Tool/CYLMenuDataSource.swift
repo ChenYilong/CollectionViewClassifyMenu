@@ -193,6 +193,14 @@ import UIKit
     optional func menuCacheKey(forSection section: Int) -> String
 
     /**
+     * Shows a clear button (the bundle's trash icon, `CYLMenuStyle.clearButtonImage`) at the trailing end of the
+     * section's header, its top and bottom aligned with the title's; a tap calls `menu(_:didTapClearButtonInSection:)`
+     * and `CYLTagListView.clearButtonHandler`. False when not implemented.
+     */
+    @objc(menuShowsClearButtonForSection:)
+    optional func menuShowsClearButton(forSection section: Int) -> Bool
+
+    /**
      * The item's stable identifier (a database id), kept by `CYLTagListView`'s cache and sync so that a reorder or a
      * rename never loses what the item stands for; its title when not implemented.
      */
@@ -305,6 +313,13 @@ import UIKit
      */
     @objc(menu:didRenameItemAtIndexPath:toTitle:)
     optional func menu(_ menu: Any, didRenameItemAt indexPath: IndexPath, to title: String)
+
+    /**
+     * The clear button of `section`'s header was tapped (`menuShowsClearButton(forSection:)`): clear the section's data
+     * (and reload).
+     */
+    @objc(menu:didTapClearButtonInSection:)
+    optional func menu(_ menu: Any, didTapClearButtonInSection section: Int)
 
     /**
      * A long press on an item that did not move it (AndroidTagView's onTagLongClick).

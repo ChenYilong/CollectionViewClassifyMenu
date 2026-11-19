@@ -58,3 +58,6 @@
 "CYLMenuRenamePlaceholder" = "New name";
 "CYLMenuRenameDone" = "Done";
 "CYLMenuTagRenamed" = "Tag renamed: %@";
+
+/* A section header's clear button (the trash icon), read before the section title. */
+"CYLMenuClearSection" = "Clear";

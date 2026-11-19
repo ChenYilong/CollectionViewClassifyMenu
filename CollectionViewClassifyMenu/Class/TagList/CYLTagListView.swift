@@ -98,6 +98,12 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
      * CYLMenuStyle.headerIndicatorColor and size: a bar before the title.
      */
     let indicatorView = UIView()
+    /**
+     * The section's clear button (the bundle's trash icon, `CYLMenuDataSource.menuShowsClearButton(forSection:)`): its top
+     * and bottom are the title's.
+     */
+    let clearButton = CYLTagListClearButton(type: .system)
+    var clearHandler: ((Int) -> Void)?
     var moreHandler: ((Int) -> Void)?
     var foldHandler: ((Int) -> Void)?
     /**
@@ -143,6 +149,13 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         moreButton.largeContentTitle = moreButton.accessibilityLabel
         moreButton.showsLargeContentViewer = true
         moreButton.addTarget(self, action: #selector(moreTapped), for: .touchUpInside)
+        clearButton.isHidden = true
+        clearButton.accessibilityIdentifier = CYLTagListAccessibilityIdentifier.clearButton
+        clearButton.imageView?.contentMode = .scaleAspectFit
+        clearButton.contentHorizontalAlignment = .fill
+        clearButton.contentVerticalAlignment = .fill
+        clearButton.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
+        addSubview(clearButton)
         indicatorView.isHidden = true
         addSubview(indicatorView)
         addSubview(titleButton)
@@ -155,6 +168,7 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         accessoryView = nil
         foldHandler = nil
         moreHandler = nil
+        clearHandler = nil
     }
 
     override func layoutSubviews() {
@@ -171,6 +185,13 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
             trailing -= size
             moreButton.frame = CGRect(x: trailing, y: floor((height - size) / 2), width: size, height: size)
             trailing -= 4
+        }
+        if !clearButton.isHidden {
+            // A square as tall as a line of the title, at the trailing inset; aligned with the title text below.
+            let side = min(height, ceil(titleButton.titleLabel.font?.lineHeight ?? 17))
+            trailing -= side
+            clearButton.frame = CGRect(x: trailing, y: floor((height - side) / 2), width: side, height: side)
+            trailing -= 8
         }
         if !foldButton.isHidden {
             let size = CGSize(width: min(foldSize.width, width / 2), height: min(foldSize.height, height))
@@ -201,6 +222,19 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
             x += indicatorSize.width + 8
         }
         titleButton.frame = CGRect(x: x, y: 0, width: max(0, trailing - x), height: height)
+        if !clearButton.isHidden {
+            // The rule: the clear button's top and bottom are the title text's (the element to its left).
+            titleButton.layoutIfNeeded()
+            let text = titleButton.convert(titleButton.titleLabel.frame, to: self)
+            if text.height > 0 {
+                clearButton.frame = CGRect(x: clearButton.frame.maxX - text.height, y: text.minY, width: text.height,
+                                           height: text.height)
+            }
+        }
+    }
+
+    @objc private func clearTapped() {
+        clearHandler?(section)
     }
 
     @objc private func moreTapped() {
@@ -876,6 +910,12 @@ open class CYLTagListView: UIView {
      * `cancelRenaming()`. nil (the default): `addItemView` is the rename field.
      */
     @objc open var renameRequestHandler: ((IndexPath, String) -> Void)?
+
+    /**
+     * Called with the section when its clear button (the bundle's trash icon, shown for the sections the data source's
+     * `menuShowsClearButton(forSection:)` names) is tapped, after `menu(_:didTapClearButtonInSection:)`.
+     */
+    @objc open var clearButtonHandler: ((Int) -> Void)?
 
     @objc open var renamesOnTitleTapWhileEditing = true {
         didSet {
@@ -2811,6 +2851,25 @@ extension CYLTagListView: UICollectionViewDataSource {
         header.foldHandler = { [weak self] tappedSection in
             self?.toggleSection(tappedSection)
         }
+        // The clear button: the bundle's trash icon (or the style's image), the host's action.
+        let showsClear = source?.menuShowsClearButton?(forSection: section) == true
+        header.clearButton.isHidden = !showsClear
+        if showsClear {
+            let image = style.clearButtonImage ?? CYLMenuResources.image(named: "cyl_trash") ?? UIImage(systemName: "trash")
+            header.clearButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
+            header.clearButton.tintColor = style.clearButtonColor ?? style.headerTextColor
+            let title = source?.menuTitle(forSection: section) ?? ""
+            let clear = CYLMenuLocalizedString("CYLMenuClearSection")
+            header.clearButton.accessibilityLabel = title.isEmpty ? clear : "\(clear) \(title)"
+            header.clearButton.largeContentTitle = header.clearButton.accessibilityLabel
+            header.clearHandler = { [weak self] tappedSection in
+                guard let self else {
+                    return
+                }
+                self.menuDelegate?.menu?(self, didTapClearButtonInSection: tappedSection)
+                self.clearButtonHandler?(tappedSection)
+            }
+        }
         // The More button: the bundle's three dots (or the style's image), the host's action.
         let showsMore = showsMoreButton(inSection: section)
         header.moreButton.isHidden = !showsMore
@@ -3152,5 +3211,16 @@ extension CYLTagListView {
         collectionView.contentInset.bottom += inset - keyboardInset
         collectionView.verticalScrollIndicatorInsets.bottom = collectionView.contentInset.bottom
         keyboardInset = inset
+    }
+}
+
+/**
+ * A section header's clear button: drawn as tall as the title's line, tapped in a 44 point area around it.
+ */
+final class CYLTagListClearButton: UIButton {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let dx = min(0, (bounds.width - 44) / 2)
+        let dy = min(0, (bounds.height - 44) / 2)
+        return bounds.insetBy(dx: dx, dy: dy).contains(point)
     }
 }
