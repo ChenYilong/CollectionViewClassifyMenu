@@ -304,22 +304,28 @@ final class CYLTagListEditingTests: CYLMenuExampleTestCase {
         XCTAssertFalse(renamable?.button.editingIndicatorsView.isHidden ?? true, "drawn by the two-icon stack view")
         XCTAssertEqual(renamable?.button.editingIndicatorsView.itemViews.count, 2)
         XCTAssertGreaterThan(renamable?.button.renameIndicatorHitFrame.width ?? 0, 0)
-        XCTAssertEqual(renamable?.button.editingIndicatorsView.stackView.spacing, 8, "the default spacing between the icons")
+        if let icons = renamable?.button.editingIndicatorsView.itemViews, icons.count == 2, let stack = renamable?.button.editingIndicatorsView {
+            stack.layoutIfNeeded()
+            let gap = icons[1].convert(icons[1].bounds, to: stack).minX - icons[0].convert(icons[0].bounds, to: stack).maxX
+            XCTAssertEqual(gap, 10, accuracy: 0.5, "the default space between the two icons is the style's")
+            XCTAssertEqual(icons[1].convert(icons[1].bounds, to: stack).maxX, stack.bounds.maxX, accuracy: 0.5,
+                           "the icons fill the stack: no gap after the cross")
+        }
         let wider = CYLMenuStyle()
         wider.editingIndicatorSpacing = 20
         XCTAssertEqual(CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
                                           style: wider, traitCollection: nil)
                        - CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
-                                            style: CYLMenuStyle(), traitCollection: nil), 12, accuracy: 0.5,
+                                            style: CYLMenuStyle(), traitCollection: nil), 10, accuracy: 0.5,
                        "editingIndicatorSpacing widens the tag by the extra space")
         let padded = CYLMenuStyle()
         padded.editingIndicatorInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 6)
         XCTAssertEqual(CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
                                           style: padded, traitCollection: nil)
                        - CYLTagButton.width(forTitle: "Family", iconSize: .zero, showsDeleteIndicator: true, showsRenameIndicator: true,
-                                            style: CYLMenuStyle(), traitCollection: nil), 10, accuracy: 0.5,
-                       "editingIndicatorInsets (left 10 + right 6 instead of 4 + 2) widens the tag")
-        XCTAssertEqual(CYLMenuStyle().editingIndicatorInsets, UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 2), "the default margins")
+                                            style: CYLMenuStyle(), traitCollection: nil), 12, accuracy: 0.5,
+                       "editingIndicatorInsets (left 10 + right 6 instead of 4 + 0) widens the tag")
+        XCTAssertEqual(CYLMenuStyle().editingIndicatorInsets, UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0), "the default margins")
         XCTAssertFalse(cell(view, 0, 0)?.isRenamable ?? true, "not outside the editable sections")
         XCTAssertTrue(renamable?.renamesOnTitleTap ?? false, "a tap on the title renames too, by default")
         let titleArea = renamable?.contentView.subviews.first { $0.accessibilityIdentifier == CYLTagListAccessibilityIdentifier.renameTitle }

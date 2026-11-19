@@ -619,3 +619,18 @@ started run completes and the next one tests the newest commit.
   VoiceOver reads "Clear <section title>"). The rule: the button is a square as tall as the title's text, its top and
   bottom on the title label's, with a 44 point tap area. Test `testTheHeaderClearButtonIsBuiltInAndAlignedWithTheTitle`;
   Example 110 of 110. Used by CYLSearchViewController's contact tags example ("Recent").
+
+## DONE (2026-11-19; TODO 2026-11-19): even spacing of the two editing icons by default (iOS)
+
+- **Prompt (verbatim, from the user of CYLSearchViewController's session)**: "tag 的编辑状态下 CYlAnimated StackView右侧间距过大，item 间距过小，直接调整自定义间距实现，完成合适间距默认值，在本example中无须修改自定义间距就可实现合理间距效果。修改CYlAnimated StackView 代码后 repin无须修改example，测试效果。效果不佳继续修改。修改CYlAnimated StackView 代码后 repin无须修改example，测试效果"
+  (English: in editing mode the stack view's right gap is too large and the space between its items too small; fix it
+  through the spacing settings with fitting defaults, so the example needs no settings of its own; re-pin and test.)
+- **Cause**: `CYLAnimatedItemStackView.append(_:action:spacingBefore: 0)` set a custom spacing of 0 after the first icon,
+  which wins over `stackView.spacing`, and the inner stack kept its own small size, centered in the reserved area, so
+  the leftover width showed as a gap after the cross.
+- **Status**: DONE (2026-11-19). Each icon is pinned to its slot (width and height constraints), the style's spacing is
+  set as the custom spacing after the first icon, the glyphs are 80 % of their slot; defaults `editingIndicatorSpacing`
+  10 and `editingIndicatorInsets` left 4, right 0 (the tag's own padding follows the cross). Measured in
+  CYLSearchViewController's contact tags example without settings (iPhone 18 Pro simulator, @3x): title to edit icon
+  about 15 pt, between the icons about 17 pt, cross to the tag's edge about 17 pt (the tag's 14 pt padding). Tests check
+  the gap and that the icons fill the stack; Example 110 of 110.

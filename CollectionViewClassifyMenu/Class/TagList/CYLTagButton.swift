@@ -189,6 +189,23 @@ open class CYLTagButton: CYLAnimatedItemView {
      * `CYLAnimatedItemStackView` of two icon-only `CYLAnimatedItemView`s, each as wide as the delete indicator. It only
      * draws; the list cell's controls take the taps.
      */
+    /// Pins an editing icon to its slot: `side` wide, `height` high.
+    private func setSlotConstraints(of icon: UIView, side: CGFloat, height: CGFloat) {
+        let identifier = "CYLEditingIconSlot"
+        let existing = icon.constraints.filter { $0.identifier == identifier }
+        if existing.count == 2 {
+            existing.first { $0.firstAttribute == .width }?.constant = side
+            existing.first { $0.firstAttribute == .height }?.constant = height
+            return
+        }
+        icon.translatesAutoresizingMaskIntoConstraints = false
+        let width = icon.widthAnchor.constraint(equalToConstant: side)
+        let tall = icon.heightAnchor.constraint(equalToConstant: height)
+        width.identifier = identifier
+        tall.identifier = identifier
+        NSLayoutConstraint.activate([width, tall])
+    }
+
     /// Whether `editingIndicatorsView` was made (it is lazy: most tags never show it).
     private var editingIndicatorsViewIsLoaded: Bool {
         subviews.contains { $0 is CYLAnimatedItemStackView }
@@ -991,10 +1008,20 @@ open class CYLTagButton: CYLAnimatedItemView {
         let area = outer.inset(by: margins)
         editingIndicatorsView.stackView.spacing = spacing
         editingIndicatorsView.frame = area
-        // The glyphs a little smaller than their slot, as the title's cap height.
-        let side = max(0, min(indicatorWidth * 0.75, area.height))
-        for icon in editingIndicatorsView.itemViews where icon.iconSize.width != side {
-            icon.iconSize = CGSize(width: side, height: side)
+        // The glyphs a little smaller than their slot, about the title's cap height.
+        let side = max(0, min(indicatorWidth * 0.8, area.height))
+        // Each icon fills its slot (the stack view otherwise keeps its own small size, centered, and the leftover width
+        // shows as a gap after the cross), and the style's spacing is the space after the first icon (`append` set a
+        // custom spacing of 0 there, which wins over `stackView.spacing`).
+        let items = editingIndicatorsView.itemViews
+        for icon in items {
+            if icon.iconSize.width != side {
+                icon.iconSize = CGSize(width: side, height: side)
+            }
+            setSlotConstraints(of: icon, side: indicatorWidth, height: area.height)
+        }
+        if let first = items.first {
+            editingIndicatorsView.stackView.setCustomSpacing(spacing, after: first)
         }
         deleteIndicatorLabel.frame = .zero
         crossLayer.path = nil

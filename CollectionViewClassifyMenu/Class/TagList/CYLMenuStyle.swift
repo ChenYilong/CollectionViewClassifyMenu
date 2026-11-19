@@ -169,10 +169,10 @@ open class CYLMenuStyle: NSObject, NSCopying {
 
     /**
      * The space between the two editing icons of a renamable tag in `CYLTagListView`'s editing mode (the edit icon and
-     * the delete icon, `CYLTagButton.editingIndicatorsView`, a `CYLAnimatedItemStackView`). 8 points by default; a
+     * the delete icon, `CYLTagButton.editingIndicatorsView`, a `CYLAnimatedItemStackView`). 10 points by default; a
      * negative value is 0.
      */
-    @objc open var editingIndicatorSpacing: CGFloat = 8
+    @objc open var editingIndicatorSpacing: CGFloat = 10
 
     /**
      * The image of a section header's clear button (`CYLMenuDataSource.menuShowsClearButton(forSection:)`); nil: the
@@ -187,10 +187,11 @@ open class CYLMenuStyle: NSObject, NSCopying {
 
     /**
      * The margins around the two editing icons as a whole (the stack view `CYLTagButton.editingIndicatorsView`): left
-     * from the title, right to the tag's padding, top and bottom within the tag. Left 4 and right 2 points by default;
-     * negative values are 0. With `editingIndicatorSpacing` (between the icons) it sets every space of the icons.
+     * from the title, right to the tag's padding, top and bottom within the tag. Left 4 and right 0 points by default
+     * (the tag's own padding follows the cross); negative values are 0. With `editingIndicatorSpacing` (between the
+     * icons) it sets every space of the icons.
      */
-    @objc open var editingIndicatorInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 2)
+    @objc open var editingIndicatorInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
 
     /**
      * After the title (the default) or before the content.
