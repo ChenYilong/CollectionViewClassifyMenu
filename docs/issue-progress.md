@@ -1286,9 +1286,12 @@ tags: [issues, ui, cocoapods, progress]
     `iconColor`; the tag draws the view. Host tests 75 / 75; the app builds.
   - Android (f9d1cb16): `axis` Horizontal, `spacingDp`, `iconColor`; device test `CYLTagEditingIconsDeviceTest`: both
     icons draw in the indicator color on API 37.
-- **TODO:** emulator screenshots of the editing icons and the clear button (HarmonyOS, in CYLSearchViewController's
-  contact tags example, which now holds the editing example; the mini program); the mini program's tag on its
-  `cyl-animated-item-stack` (`axis="horizontal"`, `spacing`, `icon-color`, CYLTabBarController d3ad4751).
+- **Score: 95 / 100** (Android 40 / 40, HarmonyOS 30 / 30, mini program 25 / 30).
+- **Blocked (2026-11-19):** the mini program screenshot needs an editing page that renames; neither example here has
+  one (the contact tags editor moved to CYLSearchViewController, whose mini program editor is not written yet; it will
+  send the DevTools screenshot). The mini program tag's switch to CYLTabBarController's `cyl-animated-item-stack`
+  (`axis="horizontal"`, `spacing`, `icon-color`) waits for the same page, so the rendering can be checked; it also
+  needs `cyl-animated-item-stack` vendored into the library package (`fetch-cyltabbar.js` `VENDORED`).
 
 ### TODO (2026-11-19, `feat/harmony`, Windows session): Android tags cut short with "…" although there is room
 

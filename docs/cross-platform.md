@@ -634,6 +634,9 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   four scrolls while every icon loops: Lottie, PAG and Rive icons stay in their tags): Lottie icons now play in CYLTabBarController's `cyl-lottie` (in DevTools an image of
   the canvas, as `cyl-rive`, which did not drift), and the Animations page scrolls the page itself with a sticky
   header instead of a nested `scroll-view`. Left: the same check on a phone.
+- **Blocked (re-checked 2026-11-19, Windows session):** the phone check needs a real AppID (the project uses
+  `touristappid`, which cannot preview on a phone) and a phone signed in to WeChat, neither of which this session has.
+  Both bugs stay fixed in WeChat DevTools; the owner can run `auto_preview` with a real AppID to close it.
 
 ### Mini Program bugs (2026-11-15): search results, tab bar selection, transparent tags
 
@@ -802,6 +805,9 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   <img src="assets/flutter-android-tabbar-height.png" width="400" alt="Tab bar height on Android: Material 3 NavigationBar 80 dp vs CYLTabBar 49 dp">
 - **Blocked (2026-11-19):** waiting for CYLTabBarController. Its session queued the height change after its Swift
   migration and asked to keep every pin at `b376c278` until it sends the commit.
+- **Re-checked (2026-11-19, Windows session, at the 9a4ad95e pin):** still blocked. CYLTabBarController has only the
+  logged task (`9b0a5084`); its Android tab bar still defaults to `CYLConstants.CYLTabBarHeight` (49 dp). Nothing to do
+  here until it ships the system-height default; then move every pin and re-measure the Flutter Android example.
 
 ## TODO (2026-11-19, `feat/harmony`): every TODO below 100 to 100; Mini Program CI red since `b1500779`
 
