@@ -30,6 +30,9 @@ Pod::Spec.new do |s|
     'CollectionViewClassifyMenu/Class/MultipleFilter/**/*.xib',
     'CollectionViewClassifyMenu/Class/Other/Symtem/Images.xcassets',
     'CollectionViewClassifyMenu/Resources/Localization/*.lproj',
+    # Images of the core as a folder bundle (the trash icon of the clear button), as CYLTabBarController's
+    # CYLAnimatedItem.bundle: copied whole into the resource bundle, found by CYLMenuResources.imagesBundle.
+    'CollectionViewClassifyMenu/Resources/CYLClassifyMenuImages.bundle',
     'CollectionViewClassifyMenu/Resources/Privacy/PrivacyInfo.xcprivacy',
     # The license and the third-party notices ship inside the bundle (AGENTS.md, "License in every published package").
     'CollectionViewClassifyMenu/Resources/License/*',

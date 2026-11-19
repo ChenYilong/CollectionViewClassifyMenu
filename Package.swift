@@ -49,6 +49,8 @@ let package = Package(
             ],
             resources: [
                 .process("Resources/Localization"),
+                // The core's images as a folder bundle (CYLMenuResources.imagesBundle).
+                .copy("Resources/CYLClassifyMenuImages.bundle"),
                 .copy("Resources/Privacy/PrivacyInfo.xcprivacy"),
                 // The license and the third-party notices, in the package's bundle (AGENTS.md).
                 .copy("Resources/License")

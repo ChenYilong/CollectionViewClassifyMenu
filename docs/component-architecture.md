@@ -612,7 +612,9 @@ started run completes and the next one tests the newest commit.
 - **Status**: DONE (2026-11-19). There was no built-in clear button (hosts used `menuAccessoryView(forSection:)`).
   Added: data source `menuShowsClearButton(forSection:)`, delegate `menu(_:didTapClearButtonInSection:)`,
   `CYLTagListView.clearButtonHandler`, `CYLMenuStyle.clearButtonImage` / `clearButtonColor` (default: the bundle's
-  `cyl_trash`, an original template icon drawn for this library at 20 pt @1x, @2x, @3x in `Images.xcassets`, tinted with
+  `cyl_trash`, an original template icon drawn for this library at 20 pt @1x, @2x, @3x, a file in the folder bundle
+  `Resources/CYLClassifyMenuImages.bundle` (user, verbatim: "请确保新增的图片资源文件在core代码仓库中均以文件夹形式管理，以iOS为例，图片资源文件均存放在.bundle的文件夹形式中";
+  copied by the podspec and by `Package.swift`, read first by `CYLMenuResources.image(named:)` through `imagesBundle`), tinted with
   `headerTextColor`), `CYLTagListAccessibilityIdentifier.clearButton`, string `CYLMenuClearSection` (en, zh-Hans, zh-Hant;
   VoiceOver reads "Clear <section title>"). The rule: the button is a square as tall as the title's text, its top and
   bottom on the title label's, with a 44 point tap area. Test `testTheHeaderClearButtonIsBuiltInAndAlignedWithTheTitle`;

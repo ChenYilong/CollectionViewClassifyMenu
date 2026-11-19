@@ -56,11 +56,21 @@ public final class CYLMenuResources: NSObject {
     }
 
     /**
-     * An image of the component's bundle (e.g. "cyl_tag_plus").
+     * The core's image folder, `CYLClassifyMenuImages.bundle` inside `bundle` (new images live there as files, e.g.
+     * "cyl_trash"); nil if it is missing.
+     */
+    @objc public static let imagesBundle: Bundle? = bundle.url(forResource: "CYLClassifyMenuImages", withExtension: "bundle")
+        .flatMap(Bundle.init(url:))
+
+    /**
+     * An image of the component: from `imagesBundle` first, then the bundle's asset catalog (e.g. "cyl_tag_plus").
      */
     @objc(imageNamed:)
     public static func image(named name: String) -> UIImage? {
-        UIImage(named: name, in: bundle, compatibleWith: nil)
+        if let imagesBundle, let image = UIImage(named: name, in: imagesBundle, compatibleWith: nil) {
+            return image
+        }
+        return UIImage(named: name, in: bundle, compatibleWith: nil)
     }
 
     // MARK: - Localization

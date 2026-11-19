@@ -460,6 +460,9 @@ extension CYLTagListEditingTests {
         XCTAssertEqual(source.cleared, [0], "the delegate hears the tap")
         XCTAssertEqual(handled, [0], "and the closure")
         XCTAssertNotNil(CYLMenuResources.image(named: "cyl_trash"), "the icon is in the core bundle")
+        let folder = CYLMenuResources.imagesBundle
+        XCTAssertEqual(folder?.bundleURL.lastPathComponent, "CYLClassifyMenuImages.bundle", "new images live in a folder bundle")
+        XCTAssertNotNil(folder.flatMap { UIImage(named: "cyl_trash", in: $0, compatibleWith: nil) }, "the trash icon is a file there")
     }
 }
 

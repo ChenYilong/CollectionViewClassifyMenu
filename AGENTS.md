@@ -741,3 +741,13 @@ AGENTS.md, newest commit) and adapted to this project:
 - Keep all issues in `docs/issue-progress.md`, including non-UI issues.
 - After each issue-fix commit, add its URL and reassess the score. Explain
   unverified scenarios and why a score is below 100.
+
+## Image resources: folder bundles (added 2026-11-19)
+
+- **New images of the core live as files in a folder bundle**, never in an asset catalog (user's prompt, verbatim:
+  "请确保新增的图片资源文件在core代码仓库中均以文件夹形式管理，以iOS为例，图片资源文件均存放在.bundle的文件夹形式中"). On iOS that folder is
+  `CollectionViewClassifyMenu/Resources/CYLClassifyMenuImages.bundle` (PNG files at @1x, @2x, @3x, e.g. `cyl_trash`),
+  as CYLTabBarController's `CYLAnimatedItem.bundle`: the podspec copies it into `CYLClassifyMenuResources.bundle`,
+  `Package.swift` copies it with `.copy`, and `CYLMenuResources.image(named:)` reads it first (`imagesBundle`).
+  Other platforms keep their images in a resource folder of the same kind.
+
