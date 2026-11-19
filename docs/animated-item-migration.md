@@ -619,3 +619,14 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **DONE (2026-11-19): every platform at `f88d67a8`, 100 / 100.** iOS (this commit) and the Windows session's `46c861fc` (mini
   program 159 / 159, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build).
   CYLTabBarController and CYLSearchViewController told the commit and the counts.
+
+## TODO (2026-11-19, `feat/harmony`): every pin from f88d67a8 to CYLTabBarController 9a4ad95e
+
+- **Context:** CYLTabBarController `9a4ad95e` (`9a4ad95e685de768d2977cdeb0ed1058557e5e88`, newest; contains `9a4ad95e`): `CYLAnimatedItemStackView` gets
+  `axis` and `spacing` (wrapping its stack view's, so existing `stackView.axis` / `.spacing` code keeps working) and
+  `itemAppearance`, a stack-wide default (`4eac795d`), plus step 100 warning fixes. iOS pins here (Mac session); the
+  mini program, HarmonyOS, Android, React Native and Flutter refs by the Windows session; all at one commit.
+- **Request (Mac-CYLTabBarController 小程序开发):** "please move to 9a4ad95e (or later) … CYLSearchViewController waits for
+  your re-bundled commit, so please send it the new pin too."
+- **Acceptance (100):** iOS pins with pod install, the four iOS suites and the Flutter iOS build (50); the other platforms
+  at the same commit with their tests (40); both sessions told the commit and counts (10). Pass: 60.
