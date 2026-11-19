@@ -641,3 +641,14 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   22 / 22, TagCollectionView 6 / 6; `flutter build ios --simulator` OK (with the pubspec ref at 9a4ad95e).
 - **DONE (2026-11-19): every platform at `9a4ad95e`, 100 / 100**, with the Windows session's `91c33997` (mini program
   159 / 159, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build). Both sessions told.
+
+## TODO (2026-11-19, `feat/harmony`): every pin from 9a4ad95e to CYLTabBarController 74f0b4cd (tab tap regression fix)
+
+- **Context:** CYLTabBarController `3ddb2868` (in `74f0b4cd`, newest) fixes an iOS regression since its migration step 63:
+  a delegate that only implements the tab bar delegate methods got no tab taps (React Native tabs never reported taps).
+  Our examples are at `9a4ad95e`, after step 63, so the React Native example's tabs are affected. Reported by
+  Mac-CYLSearchViewController, which re-pins both together. iOS here (Mac session); the mini program, HarmonyOS,
+  Android, React Native and Flutter refs by the Windows session.
+- **Acceptance (100):** iOS pins with pod install, the four iOS suites and the Flutter iOS build (40); the React Native
+  example's tab taps checked on the simulator (20); the other platforms at the same commit (30); CYLSearchViewController
+  told the commit (10). Pass: 60.
