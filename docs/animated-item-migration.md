@@ -569,3 +569,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Prompt (verbatim):** "move the iOS pins with the Windows session moving the other platforms, so they land on one commit again."
 - **Acceptance (100):** iOS pins at 5744917d with pod install, the four iOS suites and the Flutter iOS build passing (50);
   the other platforms at the same commit with their tests (40); CYLSearchViewController told the commit (10). Pass: 60.
+- **Result, iOS (Mac session):** every iOS pin at `5744917d` (root, Example, Example-Swift and TagCollectionView
+  Podfiles, `Package.swift`, the Flutter pubspec and iOS Podfile, the React Native Podfile and fetch script); no code
+  change needed. pod install in the four projects; menu 37 / 37, Example 110 / 110, Swift Example 22 / 22,
+  TagCollectionView 6 / 6; `flutter build ios --simulator` OK. Waiting for the Windows session's bundled copies and the
+  Android pin (−40) and the commit for CYLSearchViewController (−10).
