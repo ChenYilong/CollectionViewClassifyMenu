@@ -9,6 +9,7 @@ import {
 } from './TagCloudSample';
 import { CYLImageTagEditPage, CYLImageTagEditParam, CYLImageTagListPage, CYLImageTagSamplePage } from './ImageTagSample';
 import { CYLTagContainerSamplePage } from './TagContainerSample';
+import { CYLWordPickerSamplePage } from './WordPickerSample';
 
 @Builder
 function tagCloudDemo(param: Object) {
@@ -60,6 +61,11 @@ function tagContainerSample(param: Object) {
   CYLTagContainerSamplePage()
 }
 
+@Builder
+function wordPickerSample(param: Object) {
+  CYLWordPickerSamplePage()
+}
+
 export const SAMPLE_ROUTES: Map<string, WrappedBuilder<[Object]>> =
   new Map<string, WrappedBuilder<[Object]>>([
     ['CYLTagCloudDemoViewController', wrapBuilder(tagCloudDemo)],
@@ -72,4 +78,5 @@ export const SAMPLE_ROUTES: Map<string, WrappedBuilder<[Object]>> =
     ['CYLImageTagEditViewController', wrapBuilder(imageTagEdit)],
     ['CYLImageTagListViewController', wrapBuilder(imageTagList)],
     ['CYLTagContainerSampleViewController', wrapBuilder(tagContainerSample)],
+    ['CYLWordPickerDemoViewController', wrapBuilder(wordPickerSample)],
   ]);

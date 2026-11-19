@@ -27,11 +27,13 @@ const ACTIONS: string[][] = [
   ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.svga', 'animation.gif', 'animation.off', 'animationSpeed',
     'configuration', 'tagCloud'],
   ['sample.tagCloud', 'sample.imageTag', 'sample.tagContainer'],
+  ['sample.wordPicker'],
   ['reset']
 ];
 
 const SECTION_TITLES: string[] = ['标题与图标（参照 CYLFlatDesignTabBarItem）', CYLExampleLocalizedString('背景、边框与圆角（参照 CYLBadgeView）'),
-  CYLExampleLocalizedString('动效图标（CYLTabBarController 动效引擎）'), CYLExampleLocalizedString('Android 标签库示例（Swift 复刻）'), CYLExampleLocalizedString('其它')];
+  CYLExampleLocalizedString('动效图标（CYLTabBarController 动效引擎）'), CYLExampleLocalizedString('Android 标签库示例（Swift 复刻）'), CYLExampleLocalizedString('选词填入（涂抹选择）'),
+  CYLExampleLocalizedString('其它')];
 
 const ACTION_TITLES: Map<string, string> = new Map<string, string>([
   ['iconColor.normal', CYLExampleLocalizedString('设置 iconColor（normal）')],
@@ -67,6 +69,7 @@ const ACTION_TITLES: Map<string, string> = new Map<string, string>([
   ['sample.tagCloud', CYLExampleLocalizedString('android-tagview 示例（Swift 版）')],
   ['sample.imageTag', CYLExampleLocalizedString('TagViewGroup 示例：图片标签')],
   ['sample.tagContainer', CYLExampleLocalizedString('AndroidTagView 示例：标签容器')],
+  ['sample.wordPicker', CYLExampleLocalizedString('选词填入：涂抹选择填入词')],
   ['reset', CYLExampleLocalizedString('重置 reset')]
 ]);
 
@@ -76,7 +79,8 @@ const ROUTES: Map<string, string> = new Map<string, string>([
   ['tagCloud', 'CYLTagCloudDemoViewController'],
   ['sample.tagCloud', 'CYLTagCloudSampleViewController'],
   ['sample.imageTag', 'CYLImageTagSampleViewController'],
-  ['sample.tagContainer', 'CYLTagContainerSampleViewController']
+  ['sample.tagContainer', 'CYLTagContainerSampleViewController'],
+  ['sample.wordPicker', 'CYLWordPickerDemoViewController']
 ]);
 
 /** A fixed palette, so that screenshots are stable. */

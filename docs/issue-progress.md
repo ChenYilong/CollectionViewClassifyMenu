@@ -1507,6 +1507,13 @@ tags: [issues, ui, cocoapods, progress]
   adds a parallel `PanGesture` per item whose direction is `None` unless the item can smear (lists without smearing
   scroll as before), mapping the finger to `indexPathAtPoint`; a space cell reads `CYLMenuSpaceCharacter`. New
   `TagListWordPicker.test.ets` (2); host tests 77 / 77; the app builds.
+- **HarmonyOS example (25 / 30; the emulator screenshot is blocked):** Styles → "选词填入：涂抹选择填入词"
+  (`WordPickerSample.ets`, route `CYLWordPickerDemoViewController`: the remark field, the localized message, a sheet
+  (`bindSheet`) with Cancel, the grid and 填入, off until something is selected); example strings regenerated
+  (`export-example-strings.py`); the app builds. **Blocked:** the Mate 70 Pro emulator does not boot from the command
+  line ("can not read uuid file": its identity file under `%LOCALAPPDATA%\Temp` was removed by a Temp clean-up); DevEco
+  Studio's Device Manager recreates it, but DevEco is to stay closed at the owner's request, so the screenshot waits
+  for the owner's OK to open it.
 - **Mini program core (the example and its screenshot to come):** `cyl-tag-cloud` `setTagsWithCharactersOfText`
   (graphemes, keeps `selectionMode`), `selectedText()`, `selectItemsFrom`, `allowsSmearSelection` (the touched-down tag
   anchors the smear; `touchmove` against the measured frames extends it; the item catches `touchmove` while smearing so
