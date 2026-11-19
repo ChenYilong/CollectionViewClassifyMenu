@@ -1515,10 +1515,11 @@ tags: [issues, ui, cocoapods, progress]
 - **HarmonyOS example (25 / 30; the emulator screenshot is blocked):** Styles → "选词填入：涂抹选择填入词"
   (`WordPickerSample.ets`, route `CYLWordPickerDemoViewController`: the remark field, the localized message, a sheet
   (`bindSheet`) with Cancel, the grid and 填入, off until something is selected); example strings regenerated
-  (`export-example-strings.py`); the app builds. **Blocked:** the Mate 70 Pro emulator does not boot from the command
-  line ("can not read uuid file": its identity file under `%LOCALAPPDATA%\Temp` was removed by a Temp clean-up); DevEco
-  Studio's Device Manager recreates it, but DevEco is to stay closed at the owner's request, so the screenshot waits
-  for the owner's OK to open it.
+  (`export-example-strings.py`); the app builds. **Blocked (re-checked):** the Mate 70 Pro emulator starts from the
+  command line with `-imageRoot "%LOCALAPPDATA%\Huawei\Sdk"` (without it: "can not read uuid file"), then refuses
+  "No enough space to start Emulator" even at 7.6 GB free on C: (its data partition is 6 GB and RAM 4 GB, so it likely
+  wants 10 GB or more). This session freed 2.6 GB of its own git-ignored outputs; the rest is other sessions' clones and
+  the SDKs, so the owner decides. The HarmonyOS screenshots (one smear, several smears) wait for that.
 - **Mini program core (the example and its screenshot to come):** `cyl-tag-cloud` `setTagsWithCharactersOfText`
   (graphemes, keeps `selectionMode`), `selectedText()`, `selectItemsFrom`, `allowsSmearSelection` (the touched-down tag
   anchors the smear; `touchmove` against the measured frames extends it; the item catches `touchmove` while smearing so
