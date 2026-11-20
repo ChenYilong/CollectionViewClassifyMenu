@@ -35,6 +35,33 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-20, `docs/readme-swift-refresh`): README refresh, Swift only, every platform's setup
+
+- Context: README.md has outdated descriptions (the core was Objective-C until the migration finished on 2026-11-14,
+  the README still shows Objective-C code and says "the core stays Objective-C"). Reference: the current API
+  (`CollectionViewClassifyMenu/Class`, Swift) and docs/Swift-Migration.md.
+- Requirements: (1) update clearly outdated descriptions, the current interface is the truth; (2) iOS: Swift is the
+  truth, remove Objective-C descriptions and code; (3) the other platforms (Android, HarmonyOS, mini program, Flutter,
+  React Native) also get a basic initialization / setup method in the README; (4) details: link to the docs/ documents;
+  (5) README stays bilingual (docs/Bilingual-Documentation.md), checked with scripts/bilingual-docs.py.
+- Prompt (verbatim): "继续更新readme文档更新明显过时的描述，以现有接口为准，iOS端以swift为准。移除objc描述，其他端文档也给出基本初始化设置方法。更详细细节引用docs文档。"
+- Prompt (English): "Continue updating the README: fix clearly outdated descriptions, the existing interface is the truth, on iOS
+  Swift is the truth. Remove the Objective-C descriptions; give the other platforms' basic initialization and setup
+  as well. Refer to the docs/ documents for more detail."
+- Acceptance (100): no Objective-C code or description left, except where React Native's `CylTagListView.mm` or the
+  CocoaPods module name needs it (30); every code sample matches the current API and compiles (a Swift sample is
+  compiled in a scratch file against the core) (30); each platform has a short setup / init section with a link to its
+  docs/ document (25); bilingual check passes, links valid (15). Pass: 60.
+- Status: DONE (2026-11-20), score 90 / 100. Result: the NSCoding history and every Objective-C sample and selector
+  are gone (Swift names, 5 Swift samples type-checked with `swiftc -typecheck` against the built core, 0 errors); the
+  "core stays Objective-C" claim, the Objective-C-era naming migration table and button-layout section are replaced by
+  pointers to docs/Swift-Migration.md; duplicate paragraphs merged; counts updated (Example 115, Swift Example 22,
+  Android 893 / 893); a new section "Basic setup on the other platforms" (Android, HarmonyOS, mini program, Flutter,
+  React Native) with links to their docs. Remaining Objective-C mentions: the React Native iOS bridge
+  (`CylTagListView.mm`, Objective-C++ by React Native's rule) and `@objc` annotations. Deductions (-10): the Kotlin,
+  ArkTS, Dart and TSX snippets were checked against the sources, not compiled; the "Test screenshots" paragraph still
+  states the older run's counts (it describes that run).
+
 ### DONE (2026-11-19, `feat/harmony`): issues #13, #12, #8, #7 and #1 to 100; #11, #9 and #2 blocked
 
 - Context: the Windows session's audit found eight iOS rows in the table above below 100 (#13 90, #12 90, #11 85, #9 85,
