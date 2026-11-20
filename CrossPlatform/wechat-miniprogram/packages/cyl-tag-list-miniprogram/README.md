@@ -90,3 +90,20 @@ The engine component gets the registered path (`Lottie/home.json`, `Rive/house.r
 (`animations.parameters(path)`). A GIF gets its registered `src`; an absolute path or URL in a configuration is passed
 as it is. The example's `components/cyl-tag-animation-view` plays Lottie, Rive and PAG with CYLTabBarController's
 cyl-lottie, cyl-rive and cyl-pag.
+
+## Scrolling while dragging or smearing
+
+`cyl-tag-cloud` catches `touchmove` on its tags while editing, during a drag (`disablesScrollingWhileReordering`, on
+by default) and during a word picker smear. In WeChat's render layer a catch binding only stops the event from
+bubbling; it does not stop native scrolling. The host holds its own scroller:
+
+- put the cloud in a `<scroll-view>`, not in a page that scrolls (a page with `min-height: 100vh` and taller content
+  is itself the scroller, and nothing holds it); give the page `"disableScroll": true`;
+- set the scroll view's `scroll-y` to false on `reorderingchange` {reordering: true} and `smearingchange`
+  {smearing: true}, and back on when they are false.
+
+```xml
+<scroll-view scroll-y="{{!reordering && !smearing}}" style="height: 100vh">
+  <cyl-tag-cloud bind:reorderingchange="onReordering" bind:smearingchange="onSmearing" ... />
+</scroll-view>
+```

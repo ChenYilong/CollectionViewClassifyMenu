@@ -108,6 +108,9 @@ test('several smears add up; one from a selected cell removes its range (owner c
   assert.equal(cloud.selectedText(), 'Alex Design', 'the second starts on the space before the word');
   smear(alex, alex + 3);
   assert.equal(cloud.selectedText(), ' Design');
+  // Each smear tells the host to hold its scroller, then to let it go (a catch binding does not stop native scrolling).
+  const smearing = cloud.events.filter((e) => e.name === 'smearingchange').map((e) => e.detail.smearing);
+  assert.deepEqual(smearing, [true, false, true, false, true, false]);
 });
 
 test('a smear from a tag selects the tags it crosses, deselects from a selected one, a tap still toggles', () => {

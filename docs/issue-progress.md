@@ -1522,8 +1522,10 @@ tags: [issues, ui, cocoapods, progress]
   the SDKs, so the owner decides. The HarmonyOS screenshots (one smear, several smears) wait for that.
 - **Mini program core (the example and its screenshot to come):** `cyl-tag-cloud` `setTagsWithCharactersOfText`
   (graphemes, keeps `selectionMode`), `selectedText()`, `selectItemsFrom`, `allowsSmearSelection` (the touched-down tag
-  anchors the smear; `touchmove` against the measured frames extends it; the item catches `touchmove` while smearing so
-  the page does not scroll, through a data-bound handler name; a tap still toggles; `selectionchange` {positions});
+  anchors the smear; `touchmove` against the measured frames extends it; the item catches `touchmove` while smearing
+  through a data-bound handler name (correction, 2026-11-20: that only stops bubbling, not native scrolling; the cloud
+  now sends `smearingchange` {smearing} so the host holds its `<scroll-view>`, README "Scrolling while dragging or
+  smearing"); a tap still toggles; `selectionchange` {positions});
   `model.wordPickerStyle()` and a new `numberOfItemsPerRow` (equal cells: `calc((100% - spaces) / n)`), title
   `fontWeight`; a space cell reads `CYLMenuSpaceCharacter`. New `test/tag-cloud-word-picker.test.js` (2); `npm test`
   164 / 164 with and without `verify-package.js`.
