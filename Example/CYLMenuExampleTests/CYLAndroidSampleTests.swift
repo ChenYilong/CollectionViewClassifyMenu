@@ -373,6 +373,41 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
     // MARK: Word picker (选词填入)
 
     /// A pan recognizer whose state and location a test sets, to drive `allowsSmearSelection`.
+    private final class CYLFakeLongPress: UILongPressGestureRecognizer {
+        var fakeState: UIGestureRecognizer.State = .possible
+        var fakeLocation: CGPoint = .zero
+        override var state: UIGestureRecognizer.State {
+            get { fakeState }
+            set { fakeState = newValue }
+        }
+        override func location(in view: UIView?) -> CGPoint { fakeLocation }
+    }
+
+    /// A drag to reorder tells the delegate once when it begins and once when it ends or is cancelled.
+    func testReorderingReportsItsBeginAndEnd() {
+        let list = wordPickerList("ABCDEF")
+        list.allowsReordering = true
+        let source = CYLTestMenuDelegate()
+        list.menuDelegate = source
+        let collection = list.probe.collectionView
+        let frame = collection.layoutAttributesForItem(at: ip(0, 0))?.frame ?? .zero
+        let recognizer = CYLFakeLongPress()
+        func press(_ state: UIGestureRecognizer.State) {
+            recognizer.fakeState = state
+            recognizer.fakeLocation = CGPoint(x: frame.midX, y: frame.midY)
+            list.perform(NSSelectorFromString("handleLongPress:"), with: recognizer)
+        }
+        press(.began)
+        XCTAssertTrue(list.isReordering)
+        XCTAssertEqual(source.reordering, [true])
+        press(.changed)
+        press(.ended)
+        XCTAssertEqual(source.reordering, [true, false], "false once at the drop")
+        press(.began)
+        press(.cancelled)
+        XCTAssertEqual(source.reordering, [true, false, true, false], "a cancelled drag reports false too")
+    }
+
     private final class CYLFakePan: UIPanGestureRecognizer {
         var fakeState: UIGestureRecognizer.State = .possible
         var fakeLocation: CGPoint = .zero
@@ -512,9 +547,11 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
             list.perform(NSSelectorFromString("handleSmear:"), with: pan)
         }
         smear(.began, at: 2)
+        XCTAssertEqual(source.smearing, [true], "true once when the smear begins")
         smear(.changed, at: 4)
         smear(.changed, at: 10)   // Across the row break.
         smear(.ended, at: 10)
+        XCTAssertEqual(source.smearing, [true, false], "false once when it ends, not per finger move")
         XCTAssertEqual(list.selectedText, "CDEFGHIJK")
         XCTAssertGreaterThanOrEqual(source.selectionChanges, 2)
         // Back toward the start while still dragging: the range shrinks.
@@ -558,8 +595,18 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
 /// Counts `menu(_:didChangeSelectedItems:)` calls.
 final class CYLTestMenuDelegate: NSObject, CYLMenuDelegate {
     var selectionChanges = 0
+    /// `didChangeSmearing` values, in order.
+    var smearing: [Bool] = []
+    /// `didChangeReordering` values, in order.
+    var reordering: [Bool] = []
     func menu(_ menu: Any, didChangeSelectedItems indexPaths: [IndexPath]) {
         selectionChanges += 1
+    }
+    func menu(_ menu: Any, didChangeSmearing smearing: Bool) {
+        self.smearing.append(smearing)
+    }
+    func menu(_ menu: Any, didChangeReordering reordering: Bool) {
+        self.reordering.append(reordering)
     }
 }
 

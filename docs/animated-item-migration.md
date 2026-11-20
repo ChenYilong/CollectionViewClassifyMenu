@@ -742,3 +742,18 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `git archive` (unchanged; README pin); `android/merged/gradle.properties`; the Flutter example's `pubspec.yaml` ref.
   Results: mini program `npm test` 168 / 168; HarmonyOS host tests 78 / 78 and the app builds; Android library tests
   102 / 0 and the example builds; `check-localization-ports.py` 0 problems.
+
+### TODO (2026-11-20, `feat/harmony`): tag list gesture callbacks on iOS (`didChangeReordering`, `didChangeSmearing`)
+
+- Context: the Windows session added `CYLMenuDelegate.menuDidChangeReordering(menu, reordering)` and
+  `menuDidChangeSmearing(menu, smearing)` on Android and HarmonyOS (53608bb5), as the mini program's `reorderingchange` /
+  `smearingchange` (requested by Mac-CYLSearchViewController, so a host can lock its scroll view during a drag or smear).
+  `docs/android-ios-api.md` maps them to the Swift names `menu(_:didChangeReordering:)` and
+  `menu(_:didChangeSmearing:)`; iOS does not have them yet.
+- Requirements: true at the start of a drag (reorder) or smear, false at its drop, end or cancel, once per change;
+  Swift core first (`CYLMenuDelegate`), a test, the parity tables regenerated.
+- Prompt (relayed, verbatim): "docs/android-ios-api.md maps them to your Swift names menuDidChangeReordering(_:reordering:) and menuDidChangeSmearing(_:smearing:), so once iOS has them, ios_public_api.py should match them by name."
+- Acceptance (100): the two optional delegate methods with `@objc` selectors and doc comments (30); fired once per change
+  for reorder (begin, end, cancel) and smear (began, ended / cancelled) (30); unit test (20); parity tables regenerated, `--check`
+  passes (10); documented in the README table (10).
+- Status: started.

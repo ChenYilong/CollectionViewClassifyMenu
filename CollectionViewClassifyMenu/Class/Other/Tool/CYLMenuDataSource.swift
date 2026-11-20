@@ -338,4 +338,18 @@ import UIKit
      */
     @objc(menu:didBeginDraggingSelectedItemAtIndexPath:)
     optional func menu(_ menu: Any, didBeginDraggingSelectedItemAt indexPath: IndexPath)
+
+    /**
+     * A drag to reorder items began (`reordering` is true) or ended, was dropped or was cancelled (false), once per change.
+     * A host that embeds the list in a scroll view locks that scroll view while it is true.
+     */
+    @objc(menu:didChangeReordering:)
+    optional func menu(_ menu: Any, didChangeReordering reordering: Bool)
+
+    /**
+     * A smear selection (`allowsSmearSelection`) began (`smearing` is true) or ended or was cancelled (false), once per
+     * change. A host that embeds the list in a scroll view locks that scroll view while it is true.
+     */
+    @objc(menu:didChangeSmearing:)
+    optional func menu(_ menu: Any, didChangeSmearing smearing: Bool)
 }

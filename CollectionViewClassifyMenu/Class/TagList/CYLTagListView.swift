@@ -2686,6 +2686,7 @@ private extension CYLTagListView {
             pressStart = point
             if canReorder && collectionView.beginInteractiveMovementForItem(at: indexPath) {
                 isReordering = true
+                menuDelegate?.menu?(self, didChangeReordering: true)
                 if selection.contains(indexPath) {
                     reportSelectedDrag(at: indexPath)
                 }
@@ -2704,6 +2705,7 @@ private extension CYLTagListView {
             if isReordering {
                 isReordering = false
                 collectionView.endInteractiveMovement()
+                menuDelegate?.menu?(self, didChangeReordering: false)
                 if !pressMoved, let pressedIndexPath {
                     reportLongPress(at: pressedIndexPath)
                 }
@@ -2714,6 +2716,7 @@ private extension CYLTagListView {
                 isReordering = false
                 movingItem = nil
                 collectionView.cancelInteractiveMovement()
+                menuDelegate?.menu?(self, didChangeReordering: false)
             }
             pressedIndexPath = nil
         }
@@ -3357,6 +3360,7 @@ extension CYLTagListView {
                 return
             }
             smearStart = (selection, indexPath, !selection.contains(indexPath))
+            menuDelegate?.menu?(self, didChangeSmearing: true)
             applySmear(to: indexPath)
             // The finger may already be over a later item.
             if let current = smearableIndexPath(at: point) {
@@ -3367,7 +3371,10 @@ extension CYLTagListView {
                 applySmear(to: indexPath)
             }
         default:
-            smearStart = nil
+            if smearStart != nil {
+                smearStart = nil
+                menuDelegate?.menu?(self, didChangeSmearing: false)
+            }
             smearTouchDown = nil
         }
     }
