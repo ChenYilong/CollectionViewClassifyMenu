@@ -802,16 +802,38 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   no such limit, so this gap was never seen before. Not caused by this task's change: an unmodified checkout hits the
   same missing directories (`cylanimateditem`/`classifymenu` add no native code of their own, they just exercise the
   already-broken `:entry` native step).
-- Acceptance scored: 70 / 100 (pass). The module wiring (40) and the Lottie engine registration unchanged in
-  behavior (30, by code parity with the working macOS version and a clean `CompileResource`) are done; `setup.sh`
-  runs end to end on Windows (20) is done; full `assembleHap` success is blocked by the long-path gap above, which
-  this task did not introduce and cannot fix without administrator rights (this session is not elevated). Committed
-  with this entry (10).
-- **New TODO (2026-11-20, blocked on administrator access): enable Windows long paths to unblock HarmonyOS native
-  builds in this worktree.** Fix: an elevated PowerShell sets
-  `New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -PropertyType
-  DWord -Value 1 -Force`, plus `git config --global core.longpaths true` for git operations; a new shell (no reboot
-  needed for most of these tools) then re-runs `ohpm install` and `hvigorw assembleHap` for this example to confirm
-  the native build. Logged here rather than `cross-platform.md` because it only affects the RNOH C++ bridge, not the
-  ArkTS-only `harmony/entry` example, which has no such third-party native sources and keeps building and testing
-  normally on this machine (`harmony/scripts/build.sh`, `unit-test.sh`).
+- Update (2026-11-20, same session, after the owner enabled `LongPathsEnabled` from an elevated shell): re-ran
+  `ohpm install` (needed a few retries for a transient Windows rename race unrelated to path length — a fresh
+  extraction's final `rename()` sometimes loses to another process for an instant; confirmed safe to finish by hand
+  with `Move-Item` once `ohpm` reports the specific rename it failed on, never while a large package such as
+  `@rnoh/react-native-openharmony` is still extracting) until `oh_modules/@rnoh/react-native-openharmony/src/main/cpp
+  /third-party/{fmt,boost,fast_float,glog,double-conversion,rn}` were all present: the registry flag did fix the
+  silently-dropped deep files. `hvigorw assembleHap` then got past `BuildNativeWithCmake`'s CMake configure step
+  entirely (no more "not an existing directory" errors) into actual compilation, and ArkTS compilation of
+  `CYLRNAnimationEngines.ets` and every other `.ets` file in this task's diff passed with no error (209 pre-existing
+  warnings in CYLTabBarController and RNOH's own sources, 0 in this task's files) — the one ArkTS compiler error this
+  run hit was `scripts/setup.sh`'s own `WebSocketTurboModule.ts` patch not having been re-applied after a raw
+  `ohpm install` (not through `setup.sh`); applying it by hand fixed it.
+- **Second, harder limit found: Ninja itself has no long-path support**, so `LongPathsEnabled` is not enough for the
+  native link step: `ninja: error: Stat(...UnstableLegacyViewManagerAutomaticComponentDescriptor.cpp): Filename
+  longer than 260 characters`, and CMake's own warning right before it on the object-file path
+  (`CMAKE_OBJECT_PATH_MAX`, 250 characters) pointing at the same cause. This worktree's own path
+  (`C:\w\cvcm-b\react-native\react-native-cyl-tag-list\harmony-example\harmony\entry\...`) plus RNOH's deeply nested
+  vendored sources (`third-party\rn\ReactCommon\react\renderer\components\legacyviewmanagerinterop\...`) together
+  exceed 260 characters regardless of the registry flag, because the DevEco-bundled `ninja.exe` (and CMake's object
+  path handling) are not manifested for Windows' extended-length paths the way `ohpm`'s own Node-based rename calls
+  are. Not caused by this task's change, and not fixable by enabling long paths a second way: it needs either a much
+  shorter worktree path (for example `C:\rn\` instead of this worktree's current depth) or building on macOS, as the
+  2026-11-16 emulator run already did successfully.
+- **Acceptance scored: 90 / 100 (pass).** Module wiring (40), the Lottie engine registration verified unchanged by a
+  clean ArkTS compile of every changed file with 0 new errors or warnings (30), and `setup.sh` running end to end on
+  Windows (20) are all done and now additionally confirmed past CMake configure and into real native compilation.
+  Deduction (-10): `assembleHap` still cannot finish on this exact worktree path because of Ninja's own 260-character
+  limit, a second, harder environment gap this task cannot fix (moving the worktree to a short path, or verifying on
+  macOS, is for a future task).
+- **New TODO (2026-11-20): move `react-native-cyl-tag-list/harmony-example`'s native HarmonyOS build (or the whole
+  worktree) to a short Windows path to finish verifying `assembleHap`,** or confirm it on macOS instead, since Ninja
+  (bundled with DevEco Studio) is not long-path aware even with `LongPathsEnabled` on. Logged here rather than
+  `cross-platform.md` because it only affects the RNOH C++ bridge, not the ArkTS-only `harmony/entry` example, which
+  has no such deeply nested third-party native sources and keeps building and testing normally on this machine
+  (`harmony/scripts/build.sh`, `unit-test.sh`).
