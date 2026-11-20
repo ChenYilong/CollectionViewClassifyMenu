@@ -53,6 +53,13 @@ const { CYLTagListStore, loadSections, loadItems } = require('./cache.js');
 const { iconImage } = require('./editing-icons.js');
 const locale = require('../locale.js');
 
+/**
+ * `reorderingchange` and `smearingchange` bubble and cross component boundaries, so a container that is an ancestor in
+ * the host's template (through a slot), such as a page's single scroller, hears when a drag or a smear starts and ends
+ * and turns its own scrolling off meanwhile.
+ */
+const GESTURE_EVENT = { bubbles: true, composed: true };
+
 /** How far a press moves before it counts as a drag rather than a long press (`dragThreshold`). */
 const DRAG_THRESHOLD = 8;
 
@@ -665,7 +672,7 @@ Component({
           this._smear = { anchor: pending.anchor, base: this._selection.slice(), selects: !this._selection.includes(pending.anchor) };
           this._pressed = -1;
           // The host holds its scroller now (a catch binding does not stop native scrolling).
-          this.triggerEvent('smearingchange', { smearing: true });
+          this.triggerEvent('smearingchange', { smearing: true }, GESTURE_EVENT);
           this._smearTo(pending.anchor);
         }
         if (this._smear && pending.rects) {
@@ -700,7 +707,7 @@ Component({
     },
 
     onTouchEnd() {
-      if (this._smear) this.triggerEvent('smearingchange', { smearing: false });
+      if (this._smear) this.triggerEvent('smearingchange', { smearing: false }, GESTURE_EVENT);
       this._smear = null;
       this._smearPending = null;
       if (this._pressed >= 0) {
@@ -712,7 +719,7 @@ Component({
       this._dragging = null;
       this._updateScrollLock();
       this._render(false);
-      this.triggerEvent('reorderingchange', { reordering: false });
+      this.triggerEvent('reorderingchange', { reordering: false }, GESTURE_EVENT);
       if (drag.current !== drag.from) {
         // The new order survives a relaunch when the cloud has a cache.
         this.saveToCache();
@@ -724,7 +731,7 @@ Component({
     },
 
     onTouchCancel() {
-      if (this._smear) this.triggerEvent('smearingchange', { smearing: false });
+      if (this._smear) this.triggerEvent('smearingchange', { smearing: false }, GESTURE_EVENT);
       this._smear = null;
       this._smearPending = null;
       const drag = this._dragging;
@@ -735,7 +742,7 @@ Component({
         this._selection = model.moveSelection(this._selection, drag.current, drag.from);
         this._dragging = null;
         this._updateScrollLock();
-        this.triggerEvent('reorderingchange', { reordering: false });
+        this.triggerEvent('reorderingchange', { reordering: false }, GESTURE_EVENT);
       }
       this._render(false);
     },
@@ -776,7 +783,7 @@ Component({
         const drag = this._dragging;
         this._updateScrollLock();
         this._render(false);
-        this.triggerEvent('reorderingchange', { reordering: true });
+        this.triggerEvent('reorderingchange', { reordering: true }, GESTURE_EVENT);
         if (this._selection.includes(index)) {
           this.triggerEvent('selectedtagdrag', { position: index, tag: publicTag(this._tags[index]) });
         }

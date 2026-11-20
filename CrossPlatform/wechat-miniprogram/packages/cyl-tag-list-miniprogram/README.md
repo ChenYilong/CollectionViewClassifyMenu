@@ -95,15 +95,20 @@ cyl-lottie, cyl-rive and cyl-pag.
 
 `cyl-tag-cloud` catches `touchmove` on its tags while editing, during a drag (`disablesScrollingWhileReordering`, on
 by default) and during a word picker smear. In WeChat's render layer a catch binding only stops the event from
-bubbling; it does not stop native scrolling. The host holds its own scroller:
+bubbling; it does not stop native scrolling, so the scroller that contains the cloud turns its own scrolling off while
+a gesture is active.
 
-- put the cloud in a `<scroll-view>`, not in a page that scrolls (a page with `min-height: 100vh` and taller content
-  is itself the scroller, and nothing holds it); give the page `"disableScroll": true`;
-- set the scroll view's `scroll-y` to false on `reorderingchange` {reordering: true} and `smearingchange`
-  {smearing: true}, and back on when they are false.
+`reorderingchange` {reordering} and `smearingchange` {smearing} bubble and are composed (`{ bubbles: true, composed:
+true }`), so the container that scrolls can hear them as an ancestor, through a slot, without the page wiring anything:
+a container component (such as CYLSearchViewController's core content page) binds them on its own scroller and sets
+`scroll-y` off while either is true. Do not let a page with `min-height: 100vh` and taller content be the scroller
+(nothing holds a scrolling page); give it `"disableScroll": true`.
 
 ```xml
-<scroll-view scroll-y="{{!reordering && !smearing}}" style="height: 100vh">
-  <cyl-tag-cloud bind:reorderingchange="onReordering" bind:smearingchange="onSmearing" ... />
+<!-- inside the container component's own template -->
+<scroll-view scroll-y="{{!gestureActive}}" bind:reorderingchange="onGesture" bind:smearingchange="onGesture">
+  <slot />
 </scroll-view>
 ```
+
+A page that hosts the cloud directly can bind the same events on the cloud or on any ancestor view.
