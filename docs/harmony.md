@@ -22,7 +22,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 ## 评分 / Score
 
 <!-- bilingual:keep -->
-**Score: 949 / 951 = 99.8 / 100** (API 927 / 929, demos 22 / 22). 评分：949 / 951 = 99.8 / 100（API 927 / 929，示例 22 / 22）。
+**Score: 951 / 951 = 100.0 / 100** (API 929 / 929, demos 22 / 22). 评分：951 / 951 = 100.0 / 100（API 929 / 929，示例 22 / 22）。
 
 | 中文 | English |
 |:---|:---|
@@ -317,8 +317,8 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuDelegate.menu(_:didLongPressItemAt:)` (CYLMenuDataSource.swift) | `menuDidLongPressItem?` | method |
 | `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` (CYLMenuDataSource.swift) | `menuDidMoveItem?` | method |
 | `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` (CYLMenuDataSource.swift) | `menuDidBeginDraggingSelectedItem?` | method |
-| `CYLMenuDelegate.menu(_:didChangeReordering:)` (CYLMenuDataSource.swift) | TODO | method |
-| `CYLMenuDelegate.menu(_:didChangeSmearing:)` (CYLMenuDataSource.swift) | TODO | method |
+| `CYLMenuDelegate.menu(_:didChangeReordering:)` (CYLMenuDataSource.swift) | `CYLMenuDelegate.menuDidChangeReordering?(menu, reordering)` (and `CYLMenuGestureState.shared`) | method |
+| `CYLMenuDelegate.menu(_:didChangeSmearing:)` (CYLMenuDataSource.swift) | `CYLMenuDelegate.menuDidChangeSmearing?(menu, smearing)` (and `CYLMenuGestureState.shared`) | method |
 | `kDataSourceSectionKey` (CYLMenuKeys.swift) | `kDataSourceSectionKey` (core/CYLMenuKeys.ets) | property |
 | `kDataSourceCellTextKey` (CYLMenuKeys.swift) | `kDataSourceCellTextKey` | property |
 | `kDataSourceCellPictureKey` (CYLMenuKeys.swift) | `kDataSourceCellPictureKey` | property |

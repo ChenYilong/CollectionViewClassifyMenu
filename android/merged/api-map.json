@@ -953,5 +953,7 @@
  "CYLTagListCacheItem.identifier": "CYLTagListCacheItem.identifier",
  "CYLTagListCacheItem.title": "CYLTagListCacheItem.title",
  "CYLTagListCacheItem -initWithIdentifier:title:": "CYLTagListCacheItem(identifier, title)",
- "CYLMenuStyle +wordPicker": "CYLMenuStyle.wordPicker()"
+ "CYLMenuStyle +wordPicker": "CYLMenuStyle.wordPicker()",
+ "CYLMenuDelegate -menu:didChangeReordering:": "CYLMenuDelegate.menuDidChangeReordering(menu, reordering)",
+ "CYLMenuDelegate -menu:didChangeSmearing:": "CYLMenuDelegate.menuDidChangeSmearing(menu, smearing)"
 }

@@ -239,8 +239,8 @@ tags: [android, ios, api-parity, score]
 | `CYLMenuDelegate.menuDidRequestNewItemWithName` | method, `CYLMenuDataSource.kt:94` | `CYLMenuDelegate.menu(_:didRequestNewItemWithName:at:)` |
 | `CYLMenuDelegate.menuDidDeselectItemAtIndexPath` | method, `CYLMenuDataSource.kt:95` | `CYLMenuDelegate.menu(_:didDeselectItemAt:)` |
 | `CYLMenuDelegate.menuDidChangeSelectedItems` | method, `CYLMenuDataSource.kt:96` | `CYLMenuDelegate.menu(_:didChangeSelectedItems:)` |
-| `CYLMenuDelegate.menuDidChangeReordering` | method, `CYLMenuDataSource.kt:103` | CYLMenuDelegate menuDidChangeReordering(_:reordering:) (agreed name; iOS adds it, Mac session) |
-| `CYLMenuDelegate.menuDidChangeSmearing` | method, `CYLMenuDataSource.kt:109` | CYLMenuDelegate menuDidChangeSmearing(_:smearing:) (agreed name; iOS adds it, Mac session) |
+| `CYLMenuDelegate.menuDidChangeReordering` | method, `CYLMenuDataSource.kt:103` | CYLMenuDelegate -menu:didChangeReordering: (Swift menu(_:didChangeReordering:)) |
+| `CYLMenuDelegate.menuDidChangeSmearing` | method, `CYLMenuDataSource.kt:109` | CYLMenuDelegate -menu:didChangeSmearing: (Swift menu(_:didChangeSmearing:)) |
 | `CYLMenuDelegate.menuDidConfirmSelectedItems` | method, `CYLMenuDataSource.kt:110` | `CYLMenuDelegate.menu(_:didConfirmSelectedItems:)` |
 | `CYLMenuDelegate.menuDidChangeExpanded` | method, `CYLMenuDataSource.kt:111` | `CYLMenuDelegate.menu(_:didChangeExpanded:inSection:)` |
 | `CYLMenuDelegate.menuDidChangeContentHeight` | method, `CYLMenuDataSource.kt:112` | `CYLMenuDelegate.menu(_:didChangeContentHeight:)` |
