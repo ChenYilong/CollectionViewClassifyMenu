@@ -112,3 +112,9 @@ a container component (such as CYLSearchViewController's core content page) bind
 ```
 
 A page that hosts the cloud directly can bind the same events on the cloud or on any ancestor view.
+
+The page itself must not scroll: give it a fixed-height column (`height: 100vh`, `overflow: hidden`, the scroller
+with `min-height: 0`) and `"disableScroll": true`, and let that one scroll view hold its `scroll-y`. WeChat's page-level
+switches do not help from a component: `<page-meta page-style>` works only as the first node of a page (inside a
+component it does nothing), and `wx.setPageStyle` is undocumented and changed nothing in DevTools (base library 3.6.6;
+real drags, CYLSearchViewController `docs/CYLTabBarController-Integration.md`, fourth pass).
