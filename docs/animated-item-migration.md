@@ -733,7 +733,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - Prompt (relayed, verbatim): "The user wants it on their phone: please re-bundle 41660d24 for every platform (mini program cyl-tabbar/cyl-animated-item/cyl-svga/cyl-lottie/cyl-pag/cyl-rive copies, HarmonyOS, Android, iOS pods and Package.swift, RN/Flutter refs), run your suites, and send me the ClassifyMenu commit"
 - Acceptance (100): iOS suites pass (menu, Example, Swift Example, TagCollectionView) (35); Flutter iOS build (10); RN iOS
   build (15); other platforms' pins and suites by the Windows session (30); PR open and CI green, commit sent (10).
-- Status: started.
+- iOS result (2026-11-20): menu 37 / 37, TagCollectionView 6 / 6, Swift Example 22 / 22, Example 115 / 115;
+  Flutter iOS `flutter build ios --simulator` OK; React Native iOS Release build OK. No code change was needed.
+  Status: iOS done; other platforms by the Windows session (see its entry); PR #26 CI pending.
 - **Windows (mini program, HarmonyOS, Android, Flutter ref; 30 / 30):** `fetch-cyltabbar.js` COMMIT and every
   mini program copy re-fetched (cyl-tabbar, cyl-lottie, cyl-rive, cyl-pag, cyl-svga and the vendored cyl-animated-item /
   cyl-animation-placeholder; `--check` OK), `test/animated-item.test.js`; `harmony/cylanimateditem` re-vendored with
