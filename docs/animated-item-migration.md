@@ -759,5 +759,5 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - Result (2026-11-20): `menu(_:didChangeReordering:)` and `menu(_:didChangeSmearing:)` added to `CYLMenuDelegate` (`@objc`
   `menu:didChangeReordering:` / `menu:didChangeSmearing:`), fired once per change, also when the list leaves its window
   mid-gesture; tests: smear true / false once, reorder begin / drop / cancel / removal. Suites: menu 37, TagCollectionView 6,
-  Swift Example 22, Example 116, all pass. Status: iOS done (score 90 / 100); the two parity rows stay `TODO` on Android
-  (`api-map.json`) and HarmonyOS (`parity-map.json`) until the Windows session maps them (tables 893 / 895, 949 / 951).
+  Swift Example 22, Example 116, all pass. Status: DONE, score 100 / 100: the Windows session mapped the two rows (4ee79396; tables 895 / 895,
+  832 / 832, 951 / 951).
