@@ -718,3 +718,19 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `pubspec.yaml` ref (the RN `fetch-cyltabbar.sh` was already moved by the Mac session). Results: mini program
   `npm test` 167 / 167; HarmonyOS host tests 78 / 78 and the app builds; Android library tests 102 / 0 and the example
   builds; `check-localization-ports.py` 0 problems.
+
+### TODO (2026-11-20, `feat/harmony`): pins move to CYLTabBarController 41660d24 (mini program tab switch fix)
+
+- Context: 41660d24 (origin/feat/cross-platform-components) fixes the WeChat mini program tab bar: tapping the next tab
+  mid-animation left the previous tab playing (two tab items looked selected); `cyl-tab-bar` now stops and rests every
+  other tab first (`cyl_stopOtherAnimations`), `cyl-animated-item` halts on selected→false (`cyl_halt`), and the
+  svga / pag / lottie / rive `cyl_pause` cancels a pending play. Upstream: 8 new tests, suites tab bar 78, svga 10,
+  lottie 14, rive 19. Relayed by Mac-CYLSearchViewController; PRs #24 and #25 are merged, `feat/harmony` (ab84db37)
+  carries the Windows mini program commits that are not on master yet.
+- Requirements: re-bundle 41660d24 for every platform: iOS (Package.swift, Podfiles, Flutter iOS), React Native refs,
+  and (Windows session) mini program copies, HarmonyOS, Android, Flutter pubspec; run the suites; send the pushed
+  ClassifyMenu commit to Mac-CYLSearchViewController, which re-pins iOS.
+- Prompt (relayed, verbatim): "The user wants it on their phone: please re-bundle 41660d24 for every platform (mini program cyl-tabbar/cyl-animated-item/cyl-svga/cyl-lottie/cyl-pag/cyl-rive copies, HarmonyOS, Android, iOS pods and Package.swift, RN/Flutter refs), run your suites, and send me the ClassifyMenu commit"
+- Acceptance (100): iOS suites pass (menu, Example, Swift Example, TagCollectionView) (35); Flutter iOS build (10); RN iOS
+  build (15); other platforms' pins and suites by the Windows session (30); PR open and CI green, commit sent (10).
+- Status: started.
