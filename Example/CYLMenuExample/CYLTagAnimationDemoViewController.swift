@@ -33,7 +33,8 @@ final class CYLTagAnimationDemoViewController: UIViewController {
     /// with the pod line that adds it, then ⚠️ for each conflict between registered engines (CYLTabBarItemAnimatorRegistry).
     static func engineReportLines() -> [String] {
         var lines = [CYLExampleLocalizedString("动效引擎")]
-        for type in CYLAnimationKnownTypes() {
+        // [EN] CYLAnimationKnownTypes() is an untyped NSArray since CYLTabBarController 8b7dea18. [CN] 自 8b7dea18 起返回无类型的 NSArray。
+        for case let type as String in CYLAnimationKnownTypes() {
             if CYLTabBarItemAnimatorRegistry.isAnimatorRegistered(withIdentifier: type) {
                 lines.append("✅ " + CYLExampleLocalizedString("%@ 已接入", type))
             } else {

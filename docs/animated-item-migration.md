@@ -705,4 +705,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - Prompt (relayed, verbatim): "Please re-bundle 8b7dea18 for iOS (and your RN iOS example can use it again) plus the other platforms' bundles, and send me the pushed ClassifyMenu commit"
 - Acceptance (100): iOS suites pass (menu, Example, Swift Example, TagCollectionView) (35); Flutter iOS build (15); RN iOS
   Release build and Classify tab switch (30); other platforms' pins updated by the Windows session (10); commit sent (10).
-- Status: started.
+- Status: DONE for iOS (2026-11-20), score 90 / 100. Results at 8b7dea18: menu 37 / 37, TagCollectionView 6 / 6, Swift
+  Example 22 / 22, Example 115 / 115 (after one Example fix: `CYLAnimationKnownTypes()` returns an untyped `NSArray` since
+  8b7dea18, so Swift sees `[Any]`; the demo and its test cast to `[String]`; reported upstream as a typing regression);
+  Flutter iOS `flutter build ios --simulator` OK; React Native iOS Release build OK and the Classify tab switches on the
+  iPhone 18 Pro simulator (axe tap on "Classify", the classify menu and the results list shown). Open (-10): the other
+  platforms' bundles (Windows session) and the sent commit to Mac-CYLSearchViewController.
