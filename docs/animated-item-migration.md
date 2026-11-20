@@ -693,3 +693,28 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `@import CYLAnimatedItem`: a module cycle. It built at `74f0b4cd` (checked the same day), so the break is in the 146
   commits between (class switch, `Package/` header move). Reported to CYLTabBarController; this example's Podfile
   stays at `74f0b4cd` until it is fixed, every other iOS pin is at `8ece77dd`. Score 80 / 100 until then (−20).
+
+### TODO (2026-11-20, `feat/pin-cyltabbar-8b7dea18`): pins move to CYLTabBarController 8b7dea18
+
+- Context: 8b7dea18 (origin/feat/cross-platform-components) fixes the launch crash in `init(configurationFile:)` and the
+  React Native module import cycle (noexcept / NSArray / Ivar fixes in the generated headers), and includes the iOS 15
+  minimum. Requested by Mac-CYLSearchViewController, which pins ClassifyMenu and the tab bar together afterwards.
+- Requirements: re-bundle 8b7dea18 for iOS (Package.swift, Podfiles, Flutter iOS) and the React Native iOS example
+  (back from 74f0b4cd); the other platforms' bundles (mini program, HarmonyOS, Android, Flutter / RN scripts) belong to the
+  Windows session; then send the pushed commit to Mac-CYLSearchViewController.
+- Prompt (relayed, verbatim): "Please re-bundle 8b7dea18 for iOS (and your RN iOS example can use it again) plus the other platforms' bundles, and send me the pushed ClassifyMenu commit"
+- Acceptance (100): iOS suites pass (menu, Example, Swift Example, TagCollectionView) (35); Flutter iOS build (15); RN iOS
+  Release build and Classify tab switch (30); other platforms' pins updated by the Windows session (10); commit sent (10).
+- Status: DONE for iOS (2026-11-20), score 90 / 100. Results at 8b7dea18: menu 37 / 37, TagCollectionView 6 / 6, Swift
+  Example 22 / 22, Example 115 / 115 (after one Example fix: `CYLAnimationKnownTypes()` returns an untyped `NSArray` since
+  8b7dea18, so Swift sees `[Any]`; the demo and its test cast to `[String]`; reported upstream as a typing regression);
+  Flutter iOS `flutter build ios --simulator` OK; React Native iOS Release build OK and the Classify tab switches on the
+  iPhone 18 Pro simulator (axe tap on "Classify", the classify menu and the results list shown). Open (-10): the other
+  platforms' bundles (Windows session) and the sent commit to Mac-CYLSearchViewController.
+- **Windows (mini program, HarmonyOS, Android, Flutter ref; 10 / 10 of the other platforms' share):** on
+  `feat/pin-cyltabbar-8b7dea18`: `fetch-cyltabbar.js` COMMIT and the re-fetched vendored `cyl-animated-item` /
+  `cyl-animation-placeholder` (`--check` OK), `test/animated-item.test.js`; `harmony/cylanimateditem` re-vendored with
+  `git archive` (unchanged since 8ece77dd; README pin); `android/merged/gradle.properties`; the Flutter example's
+  `pubspec.yaml` ref (the RN `fetch-cyltabbar.sh` was already moved by the Mac session). Results: mini program
+  `npm test` 167 / 167; HarmonyOS host tests 78 / 78 and the app builds; Android library tests 102 / 0 and the example
+  builds; `check-localization-ports.py` 0 problems.

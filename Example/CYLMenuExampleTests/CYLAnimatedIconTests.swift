@@ -43,7 +43,7 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
      * (CYLTabBarItemAnimatorRegistry), with no conflict, and the Animated icons screen lists each one as registered.
      */
     func testEveryLinkedEngineIsRegisteredAndListed() {
-        let known = CYLAnimationKnownTypes()
+        let known = (CYLAnimationKnownTypes() as? [String]) ?? []
         XCTAssertEqual(known, ["Lottie", "PAG", "Rive", "SVGA", "GIF"])
         for type in known {
             XCTAssertTrue(CYLTabBarItemAnimatorRegistry.isAnimatorRegistered(withIdentifier: type), "\(type) engine registered")
