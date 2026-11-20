@@ -1,3 +1,4 @@
+import { CYLMenuGestureState } from '../core/CYLMenuGestureState';
 import { CYLTagListCacheItem } from '../core/CYLTagListCache';
 import { CYLUIContext } from '../core/CYLUIContext';
 /**
@@ -459,6 +460,9 @@ export function cylCharacters(text: string): string[] {
   }
   return result;
 }
+
+/** The next id of a tag list in `CYLMenuGestureState.shared`. */
+let cylNextGestureOwner: number = 1;
 
 /** A section as laid out: its header, items and footer. */
 export class CYLTagListSectionFrame {
@@ -1919,6 +1923,7 @@ export class CYLTagListState {
     this.smearBase = new Map<string, CYLIndexPath>(this.selection);
     this.smearAnchor = indexPath;
     this.menuDelegate?.menuDidChangeSmearing?.(this, true);
+    this.reportGestureState();
     this.smearSelects = !this.isSelected(indexPath);
     this.smearTo(indexPath);
   }
@@ -1948,7 +1953,21 @@ export class CYLTagListState {
     this.smearAnchor = undefined;
     if (wasSmearing) {
       this.menuDelegate?.menuDidChangeSmearing?.(this, false);
+      this.reportGestureState();
     }
+  }
+
+  /** This list's id in `CYLMenuGestureState.shared`. */
+  private readonly gestureOwner: number = cylNextGestureOwner++;
+
+  /** Tells `CYLMenuGestureState.shared` whether this list has a drag or a smear in progress. */
+  private reportGestureState(): void {
+    CYLMenuGestureState.shared.setActive(this.gestureOwner, this.isReorderingStorage || this.smearAnchor !== undefined);
+  }
+
+  /** Ends this list's share of `CYLMenuGestureState.shared` (its view went away in the middle of a gesture). */
+  clearGestureState(): void {
+    CYLMenuGestureState.shared.setActive(this.gestureOwner, false);
   }
 
   /** Whether a smear is in progress. */
@@ -2289,6 +2308,7 @@ export class CYLTagListState {
     if (this.canReorder) {
       this.isReorderingStorage = true;
       this.menuDelegate?.menuDidChangeReordering?.(this, true);
+      this.reportGestureState();
       if (this.isSelected(indexPath)) {
         this.reportSelectedDrag(indexPath);
       }
@@ -2309,6 +2329,7 @@ export class CYLTagListState {
     }
     this.isReorderingStorage = false;
     this.menuDelegate?.menuDidChangeReordering?.(this, false);
+    this.reportGestureState();
     if (pressed !== undefined && moved && destination !== undefined) {
       this.moveItem(pressed, this.targetIndexPathForMove(pressed, destination));
     } else if (pressed !== undefined && !moved) {
@@ -2322,6 +2343,7 @@ export class CYLTagListState {
     if (this.isReorderingStorage) {
       this.isReorderingStorage = false;
       this.menuDelegate?.menuDidChangeReordering?.(this, false);
+      this.reportGestureState();
       this.setNeedsDisplay();
     }
   }

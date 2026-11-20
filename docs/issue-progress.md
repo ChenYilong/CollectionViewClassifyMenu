@@ -1606,4 +1606,12 @@ tags: [issues, ui, cocoapods, progress]
   a drop, a cancelled drag); HarmonyOS `TagListWordPicker.test.ets` (the same, plus repeated ends that do not report
   twice). Android library 103 / 0, the example builds; HarmonyOS host tests 79 / 79, the app builds. `docs/android-ios-api.md`
   maps both to the agreed iOS names (Mac-CollectionViewClassifyMenu adds them).
+- **HarmonyOS, a hook for containers (follow-up for the search core):** an ArkTS builder gives the search core's
+  content `Scroll` no event bubbling, so `CYLMenuGestureState.shared` (exported) says whether any tag list has a drag or
+  a smear in progress: every `CYLTagListState` reports to it with its delegate callbacks, each list's share kept apart
+  (`CYLTagListView.aboutToDisappear` clears a list that goes away mid-gesture); a container adds a listener while shown
+  and sets `enableScrollInteraction(!active)`. Chosen over `@Provide` / `@Consume` because `@Consume` needs a provider
+  above every tag list (default values only in later API levels than the target API 12). Test
+  `sharedGestureStateFollowsEveryList` (two lists, a smear each, a drop, a list cleared mid-drag; the listener hears
+  each change once); host tests 80 / 80; the app builds.
 

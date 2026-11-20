@@ -60,3 +60,4 @@ export {
 } from './src/main/ets/components/CYLTagListSupplementaryView';
 export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
 export { CYLUIContext } from './src/main/ets/core/CYLUIContext';
+export { CYLMenuGestureState } from './src/main/ets/core/CYLMenuGestureState';
