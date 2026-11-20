@@ -711,3 +711,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   Flutter iOS `flutter build ios --simulator` OK; React Native iOS Release build OK and the Classify tab switches on the
   iPhone 18 Pro simulator (axe tap on "Classify", the classify menu and the results list shown). Open (-10): the other
   platforms' bundles (Windows session) and the sent commit to Mac-CYLSearchViewController.
+- **Windows (mini program, HarmonyOS, Android, Flutter ref; 10 / 10 of the other platforms' share):** on
+  `feat/pin-cyltabbar-8b7dea18`: `fetch-cyltabbar.js` COMMIT and the re-fetched vendored `cyl-animated-item` /
+  `cyl-animation-placeholder` (`--check` OK), `test/animated-item.test.js`; `harmony/cylanimateditem` re-vendored with
+  `git archive` (unchanged since 8ece77dd; README pin); `android/merged/gradle.properties`; the Flutter example's
+  `pubspec.yaml` ref (the RN `fetch-cyltabbar.sh` was already moved by the Mac session). Results: mini program
+  `npm test` 167 / 167; HarmonyOS host tests 78 / 78 and the app builds; Android library tests 102 / 0 and the example
+  builds; `check-localization-ports.py` 0 problems.
