@@ -52,7 +52,15 @@ tags: [issues, ui, cocoapods, progress]
   CocoaPods module name needs it (30); every code sample matches the current API and compiles (a Swift sample is
   compiled in a scratch file against the core) (30); each platform has a short setup / init section with a link to its
   docs/ document (25); bilingual check passes, links valid (15). Pass: 60.
-- Status: started.
+- Status: DONE (2026-11-20), score 90 / 100. Result: the NSCoding history and every Objective-C sample and selector
+  are gone (Swift names, 5 Swift samples type-checked with `swiftc -typecheck` against the built core, 0 errors); the
+  "core stays Objective-C" claim, the Objective-C-era naming migration table and button-layout section are replaced by
+  pointers to docs/Swift-Migration.md; duplicate paragraphs merged; counts updated (Example 115, Swift Example 22,
+  Android 893 / 893); a new section "Basic setup on the other platforms" (Android, HarmonyOS, mini program, Flutter,
+  React Native) with links to their docs. Remaining Objective-C mentions: the React Native iOS bridge
+  (`CylTagListView.mm`, Objective-C++ by React Native's rule) and `@objc` annotations. Deductions (-10): the Kotlin,
+  ArkTS, Dart and TSX snippets were checked against the sources, not compiled; the "Test screenshots" paragraph still
+  states the older run's counts (it describes that run).
 
 ### DONE (2026-11-19, `feat/harmony`): issues #13, #12, #8, #7 and #1 to 100; #11, #9 and #2 blocked
 

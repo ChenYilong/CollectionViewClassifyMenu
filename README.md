@@ -34,36 +34,7 @@
 | 中文 | English |
 |:---|:---|
 | 第一种是用 CollectionView 做的两级菜单，可以折叠第二级菜单 | The first is a two-level menu built with a collection view; the second level can be folded |
-| 第二种是侧边栏菜单，具有多选功能。示例应用保存筛选条件；组件本身不读取或持久化业务数据。 | The second is a side-bar menu with multiple selection. The example app saves the filter conditions; the component itself neither reads nor persists business data. |
-| 以下 NSCoding 用法是旧版本的历史说明；当前示例使用 `NSUserDefaults`，由宿主处理选择结果。旧版本若要关闭持久化，可在 AppDelegate 里清除固化数据。 | The NSCoding usage below is historical, from an old version; the current example uses `NSUserDefaults`, and the host handles the selection result. To turn persistence off in an old version, clear the archived data in the AppDelegate. |
-| 清除方法已经在工程中写出: | The way to clear it is already written in the project: |
-
-```Objective-C
-- (void)initFilterSetting:(BOOL)restore
-{
-    if (!restore) {
-        CYLFilterParamsTool *filterParamsTool = [[CYLFilterParamsTool alloc] init];
-        [NSKeyedArchiver archiveRootObject:filterParamsTool toFile:filterParamsTool.filename];
-    }
-}
-```
-
-| 中文 | English |
-|:---|:---|
-| 用法如下 | Usage: |
-| YES 表示保存，NO 表示不保存。 | YES saves, NO does not save. |
-
-```Objective-C
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    //...
-    //设NO表示,每次启动程序,清除用户上次的筛选条件,不写该行,默认保存.
-    [self initFilterSetting:NO];
-    return YES;
-}
-```
-
-
-
+| 第二种是侧边栏菜单，具有多选功能。示例应用保存筛选条件（`UserDefaults`，由宿主处理选择结果）；组件本身不读取或持久化业务数据。 | The second is a side-bar menu with multiple selection. The example app saves the filter conditions (`UserDefaults`, the host handles the selection result); the component itself neither reads nor persists business data. |
 
 | 中文 | English |
 |:---|:---|
@@ -73,7 +44,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 本组件支持 iOS 15.0 及以上。它不在 CocoaPods trunk 上：请引用本仓库的某个提交，并以同样方式按提交固定 CYLAnimatedItem（CYLTabBarController 的动效图标组件，同样不在 trunk 上）。使用 `feat/harmony` 的最新提交，以及它自己的 Podfile 所指定的 CYLTabBarController 提交： | The component supports iOS 15.0 and later. It is not on the CocoaPods trunk: reference a commit of this repository, and pin CYLAnimatedItem (CYLTabBarController's animated icon component, also not on the trunk) by commit the same way. Use the newest commit of `feat/harmony` and the CYLTabBarController commit its own Podfiles name: |
+| 本组件支持 iOS 15.0 及以上。它不在 CocoaPods trunk 上：请引用本仓库的某个提交，并以同样方式按提交固定 CYLAnimatedItem（CYLTabBarController 的动效图标组件，同样不在 trunk 上）。使用 `master` 的最新提交，以及它自己的 Podfile 所指定的 CYLTabBarController 提交： | The component supports iOS 15.0 and later. It is not on the CocoaPods trunk: reference a commit of this repository, and pin CYLAnimatedItem (CYLTabBarController's animated icon component, also not on the trunk) by commit the same way. Use the newest commit of `master` and the CYLTabBarController commit its own Podfiles name: |
 
 ```ruby
 pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git',
@@ -106,49 +77,49 @@ pod install
 open TagCollectionView.xcworkspace
 ```
 
-### 面向接口使用 / Interface-oriented usage
+### 快速开始（Swift） / Quick start (Swift)
 
 | 中文 | English |
 |:---|:---|
-| 请在宿主中实现 `CYLMenuDataSource`，并在菜单使用期间持有它。组件对数据源和代理只做弱引用。宿主提供分区标题和条目标题、可选的图片与互斥项标记，处理选择事件，并决定是否保存以及如何保存。 | Implement `CYLMenuDataSource` in the host and retain it for as long as the menu is in use. The component holds the data source and delegate weakly. The host provides section and item titles, optional image and exclusive-item flags, handles selections, and decides whether and how to persist them. |
+| 核心库是纯 Swift，公开 API 同时带有 `@objc` 标注。请在宿主中实现 `CYLMenuDataSource`，并在菜单使用期间持有它。组件对数据源和代理只做弱引用。宿主提供分区标题和条目标题、可选的图片与互斥项标记，处理选择事件，并决定是否保存以及如何保存。 | The core library is pure Swift, and its public API also carries `@objc` annotations. Implement `CYLMenuDataSource` in the host and retain it for as long as the menu is in use. The component holds the data source and delegate weakly. The host provides section and item titles, optional image and exclusive-item flags, handles selections, and decides whether and how to persist them. |
 
-```objc
-@import CollectionViewClassifyMenu;
+```swift
+import CollectionViewClassifyMenu
 
 // self implements CYLMenuDataSource and CYLMenuDelegate.
-CYLClassifyMenuViewController *menu = [[CYLClassifyMenuViewController alloc] init];
-menu.menuDataSource = self;
-menu.menuDelegate = self;
-menu.defaultVisibleRows = 2;  // Default: 1.
+let menu = CYLClassifyMenuViewController()
+menu.menuDataSource = self
+menu.menuDelegate = self
+menu.defaultVisibleRows = 2  // Default: 1.
 // Present or embed menu as a child view controller.
 ```
 
 | 中文 | English |
 |:---|:---|
-| 数据源必须实现的方法有 `numberOfSectionsInMenu`、`menuNumberOfItemsInSection:`、`menuTitleForSection:` 和 `menuTitleForItemAtIndexPath:`。可在加载视图之前设置可选的 `menuHeaderView`。`menuFooterView` 位于标签下方的同一个滚动视图中（例如显示所选标签的结果；内容变化后请调用 `updateMenuLayout`），`selectedIndexPath` 用于高亮已选中的标签（请在 `-menu:didSelectItemAtIndexPath:` 中设置；点击不会改变它）。宿主数据变化后，请调用 `reloadMenuData`。筛选控制器使用同样的协议；宿主可通过 `selectedIndexPaths` 和 `setSelectedIndexPaths:` 保存并恢复选择。如果提供了互斥项，`reloadMenuData` 会把筛选的选择重置为每个分区的第一个互斥项。 | The required data source methods are `numberOfSectionsInMenu`, `menuNumberOfItemsInSection:`, `menuTitleForSection:` and `menuTitleForItemAtIndexPath:`. Set an optional `menuHeaderView` before loading the view. `menuFooterView` sits below the tags in the same scroll view (for example the results of the selected tag; call `updateMenuLayout` after its content changes), and `selectedIndexPath` highlights the selected tag (set it from `-menu:didSelectItemAtIndexPath:`; taps do not change it). After changing host data, call `reloadMenuData`. The filter controller uses the same protocols; `selectedIndexPaths` and `setSelectedIndexPaths:` allow the host to save and restore selections. `reloadMenuData` resets filter selections to each section's first exclusive item, if one is supplied. |
-| `CYLTagView` 同样接受这些协议，并同时支持 `[[CYLTagView alloc] initWithFrame:]` 与 `+[CYLTagView tagView]`。完整实现请参见两个示例控制器。 | `CYLTagView` also accepts the same protocols and supports both `[[CYLTagView alloc] initWithFrame:]` and `+[CYLTagView tagView]`. See the two demo controllers for complete implementations. |
+| 数据源必须实现的方法有 `numberOfSectionsInMenu()`、`menuNumberOfItems(inSection:)`、`menuTitle(forSection:)` 和 `menuTitleForItem(at:)`。可在加载视图之前设置可选的 `menuHeaderView`。`menuFooterView` 位于标签下方的同一个滚动视图中（例如显示所选标签的结果；内容变化后请调用 `updateMenuLayout()`），`selectedIndexPath` 用于高亮已选中的标签（请在 `menu(_:didSelectItemAt:)` 中设置；点击不会改变它）。宿主数据变化后，请调用 `reloadMenuData()`。筛选控制器使用同样的协议；宿主可通过 `selectedIndexPaths` 保存并恢复选择。如果提供了互斥项，`reloadMenuData()` 会把筛选的选择重置为每个分区的第一个互斥项。 | The required data source methods are `numberOfSectionsInMenu()`, `menuNumberOfItems(inSection:)`, `menuTitle(forSection:)` and `menuTitleForItem(at:)`. Set an optional `menuHeaderView` before loading the view. `menuFooterView` sits below the tags in the same scroll view (for example the results of the selected tag; call `updateMenuLayout()` after its content changes), and `selectedIndexPath` highlights the selected tag (set it from `menu(_:didSelectItemAt:)`; taps do not change it). After changing host data, call `reloadMenuData()`. The filter controller uses the same protocols; `selectedIndexPaths` allows the host to save and restore selections. `reloadMenuData()` resets filter selections to each section's first exclusive item, if one is supplied. |
+| `CYLTagView` 同样接受这些协议，并支持 `CYLTagView()` 与 `CYLTagView(frame:)`（仅 CocoaPods，Swift Package Manager 暂不包含）。完整实现请参见两个示例控制器。 | `CYLTagView` also accepts the same protocols and supports both `CYLTagView()` and `CYLTagView(frame:)` (CocoaPods only; Swift Package Manager does not include it yet). See the two demo controllers for complete implementations. |
 
 ### CYLTagListView：可组合的标签菜单 / CYLTagListView: composable tag menu
 
 | 中文 | English |
 |:---|:---|
-| `CYLTagListView` 是一个可嵌入的标签视图：数据和业务逻辑全部由宿主通过 `CYLMenuDataSource` / `CYLMenuDelegate` 提供，组件只负责布局、折叠和选择状态。README 中的两个场景（淘宝评价筛选、脉脉搜索分类）已在 `Example/` 中用它实现。 | `CYLTagListView` is an embeddable tag view: the host provides all data and business logic through `CYLMenuDataSource` / `CYLMenuDelegate`, and the component only handles layout, folding and selection state. The two scenarios in this README (the Taobao review filter and the Maimai search categories) are implemented with it in `Example/`. |
+| `CYLTagListView` 是一个可嵌入的标签视图：数据和业务逻辑全部由宿主通过 `CYLMenuDataSource` / `CYLMenuDelegate` 提供，组件只负责布局、折叠和选择状态。README 中的两个场景（淘宝评价筛选、脉脉搜索分类）已在 `Example/` 中用它实现，更多用法见 [docs/component-architecture.md](docs/component-architecture.md)。 | `CYLTagListView` is an embeddable tag view: the host provides all data and business logic through `CYLMenuDataSource` / `CYLMenuDelegate`, and the component only handles layout, folding and selection state. The two scenarios in this README (the Taobao review filter and the Maimai search categories) are implemented with it in `Example/`; more usage is in [docs/component-architecture.md](docs/component-architecture.md). |
 
-```objc
-@import CollectionViewClassifyMenu;
+```swift
+import CollectionViewClassifyMenu
 
-CYLTagListView *filter = [[CYLTagListView alloc] init];
-filter.style = style;                                   // CYLMenuStyle
-filter.selectionMode = CYLMenuSelectionModeSingle;      // None / Single / Multiple
-filter.allowsEmptySelection = NO;                       // 再次点击不会取消最后一项
-filter.showsSectionHeaders = NO;                        // 平铺，不显示分组标题
-filter.foldStyle = CYLMenuFoldStyleFooterChevron;       // 底部 ∨/∧ 折叠
-filter.defaultVisibleRows = 2;                          // 折叠时显示两行
-filter.scrollEnabled = NO;                              // 嵌入其他滚动视图
-filter.menuDataSource = self;
-filter.menuDelegate = self;
-[filter reloadMenuData];
-filter.selectedIndexPaths = @[[NSIndexPath indexPathForItem:0 inSection:0]];
+let filter = CYLTagListView()
+filter.style = style                                    // CYLMenuStyle
+filter.selectionMode = .single                          // .none / .single / .multiple
+filter.allowsEmptySelection = false                     // 再次点击不会取消最后一项
+filter.showsSectionHeaders = false                      // 平铺，不显示分组标题
+filter.foldStyle = .footerChevron                       // 底部 ∨/∧ 折叠
+filter.defaultVisibleRows = 2                           // 折叠时显示两行
+filter.isScrollEnabled = false                          // 嵌入其他滚动视图
+filter.menuDataSource = self
+filter.menuDelegate = self
+filter.reloadMenuData()
+filter.selectedIndexPaths = [IndexPath(item: 0, section: 0)]
 ```
 
 | 中文 | English |
@@ -157,55 +128,55 @@ filter.selectedIndexPaths = @[[NSIndexPath indexPathForItem:0 inSection:0]];
 
 | API | 用途 |
 | --- | --- |
-| `-menuImageForItemAtIndexPath:` | 标签图标由宿主提供（替代 `menuItemHasImageAtIndexPath:` 与内置图片） |
-| `-menuImageForSection:` | 分组标题图标（`CYLClassifyMenuViewController` 不再写死图片） |
-| `-menuAccessoryViewForSection:` | 分组标题右侧的自定义视图，如“行业: IT互联网 ▾” |
-| `-menuItemIsEnabledAtIndexPath:` | 禁用标签，如“差评(0)” |
-| `-menu:shouldSelectItemAtIndexPath:` | 宿主拦截点击 |
-| `-menu:didDeselectItemAtIndexPath:` | 取消选中回调 |
-| `-menu:didChangeExpanded:inSection:` | 展开/折叠回调 |
-| `-menu:didChangeContentHeight:` | 内容高度变化，便于嵌入时调整高度 |
-| `-menu:didChangeSelectedItems:` | 每次点击改变选择后回调一次，用于刷新筛选结果 |
+| `menuImageForItem(at:)` | 标签图标由宿主提供（替代旧的“条目是否有图片”回调与内置图片） |
+| `menuImage(forSection:)` | 分组标题图标（`CYLClassifyMenuViewController` 不再写死图片） |
+| `menuAccessoryView(forSection:)` | 分组标题右侧的自定义视图，如“行业: IT互联网 ▾” |
+| `menuItemIsEnabled(at:)` | 禁用标签，如“差评(0)” |
+| `menu(_:shouldSelectItemAt:)` | 宿主拦截点击 |
+| `menu(_:didDeselectItemAt:)` | 取消选中回调 |
+| `menu(_:didChangeExpanded:inSection:)` | 展开/折叠回调 |
+| `menu(_:didChangeContentHeight:)` | 内容高度变化，便于嵌入时调整高度 |
+| `menu(_:didChangeSelectedItems:)` | 每次点击改变选择后回调一次，用于刷新筛选结果 |
 | `CYLMenuStyle.foldChevronImage` | 底部折叠箭头图片，展开时旋转 180° |
 | `CYLMenuStyle` | 标题字体与颜色、图标颜色（按状态）、图标与文字间距、图标大小、位置偏移、`layoutCentered`、间距、高度、折叠文案；Dynamic Type |
 | `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
-| `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也是唯一的“图标 + 标题 + 动效图标”组件，可单独使用：`init(title:image:)` / `init(title:image:animationURL:)`（Objective-C `-initWithTitle:image:` / `-initWithTitle:image:animationURL:`），按内容自适应大小（`intrinsicContentSize`）；角标 `badgeValue`（`nil` 隐藏、空字符串为小红点、其他文字为胶囊）与 `badgeColor`（默认 `systemRed`），位于图标（无图标时为标题）右上角，VoiceOver 读作标签的值；`CYLMenuStyle.imagePlacement = .top` / `.bottom` 使图标位于标题上方 / 下方；`height(forTitle:iconSize:style:traitCollection:)` 测量高度。Android、HarmonyOS、微信小程序（`cyl-tag-button`）提供同名 API |
-| `-menuSelectedImageForItemAtIndexPath:` | 选中态图标 |
-| `-menuAnimationURLForItemAtIndexPath:`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF 动效图标（CYLTabBarController 动效引擎） |
-| `-initWithConfiguration:`, `+tagListViewWithConfigurationFile:error:`, `+styleWithConfiguration:` | 字典（map）与配置文件初始化 |
+| `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也是唯一的“图标 + 标题 + 动效图标”组件，可单独使用：`init(title:image:)` / `init(title:image:animationURL:)`，按内容自适应大小（`intrinsicContentSize`）；角标 `badgeValue`（`nil` 隐藏、空字符串为小红点、其他文字为胶囊）与 `badgeColor`（默认 `systemRed`），位于图标（无图标时为标题）右上角，VoiceOver 读作标签的值；`CYLMenuStyle.imagePlacement = .top` / `.bottom` 使图标位于标题上方 / 下方；`height(forTitle:iconSize:style:traitCollection:)` 测量高度。Android、HarmonyOS、微信小程序（`cyl-tag-button`）提供同名 API |
+| `menuSelectedImageForItem(at:)` | 选中态图标 |
+| `menuAnimationURLForItem(at:)`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF 动效图标（CYLTabBarController 动效引擎） |
+| `init(configuration:)`, `init(configurationFile:)`, `CYLMenuStyle(configuration:)` | 字典（map）与配置文件初始化 |
 | `selectionMode`, `allowsEmptySelection` | 无选择 / 单选 / 多选（支持互斥项“全部”） |
 | `foldStyle`, `defaultVisibleRows` | 标题“更多”按钮、底部箭头或仅截断预览 |
 | `showsSectionHeaders` | 分组或平铺 |
-| `selectedIndexPaths`, `-selectItemAtIndexPath:`, `-deselectItemAtIndexPath:`, `-deselectAllItems` | 代码控制选择（不触发回调） |
-| `-setExpanded:forSection:animated:`, `-isSectionExpanded:`, `-canFoldSection:` | 代码控制折叠 |
-| `contentHeight`, `-heightThatFitsWidth:`, `intrinsicContentSize`, `scrollEnabled` | 嵌入到表头、Stack View 或 Auto Layout |
-| `-numberOfRowsInSection:`, `-numberOfVisibleItemsInSection:` | 查询布局结果 |
+| `selectedIndexPaths`, `selectItem(at:)`, `deselectItem(at:)`, `deselectAllItems()` | 代码控制选择（不触发回调） |
+| `setExpanded(_:forSection:animated:)`, `isSectionExpanded(_:)`, `canFoldSection(_:)` | 代码控制折叠 |
+| `contentHeight`, `heightThatFitsWidth(_:)`, `intrinsicContentSize`, `isScrollEnabled` | 嵌入到表头、Stack View 或 Auto Layout |
+| `numberOfRows(inSection:)`, `numberOfVisibleItems(inSection:)` | 查询布局结果 |
 
 | API | Purpose |
 | --- | --- |
-| `-menuImageForItemAtIndexPath:` | Tag icons are provided by the host (replaces `menuItemHasImageAtIndexPath:` and the built-in images) |
-| `-menuImageForSection:` | Section title icon (`CYLClassifyMenuViewController` no longer hard-codes images) |
-| `-menuAccessoryViewForSection:` | Custom view on the right of the section title, such as "Industry: IT & Internet ▾" |
-| `-menuItemIsEnabledAtIndexPath:` | Disable a tag, such as "Negative reviews (0)" |
-| `-menu:shouldSelectItemAtIndexPath:` | Lets the host intercept taps |
-| `-menu:didDeselectItemAtIndexPath:` | Deselection callback |
-| `-menu:didChangeExpanded:inSection:` | Expand / collapse callback |
-| `-menu:didChangeContentHeight:` | Callback when the content height changes, so an embedding view can adjust its height |
-| `-menu:didChangeSelectedItems:` | Called once after each tap that changes the selection, to refresh the filter results |
+| `menuImageForItem(at:)` | Tag icons are provided by the host (replaces the old "item has an image" callback and the built-in images) |
+| `menuImage(forSection:)` | Section title icon (`CYLClassifyMenuViewController` no longer hard-codes images) |
+| `menuAccessoryView(forSection:)` | Custom view on the right of the section title, such as "Industry: IT & Internet ▾" |
+| `menuItemIsEnabled(at:)` | Disable a tag, such as "Negative reviews (0)" |
+| `menu(_:shouldSelectItemAt:)` | Lets the host intercept taps |
+| `menu(_:didDeselectItemAt:)` | Deselection callback |
+| `menu(_:didChangeExpanded:inSection:)` | Expand / collapse callback |
+| `menu(_:didChangeContentHeight:)` | Callback when the content height changes, so an embedding view can adjust its height |
+| `menu(_:didChangeSelectedItems:)` | Called once after each tap that changes the selection, to refresh the filter results |
 | `CYLMenuStyle.foldChevronImage` | Image of the bottom fold arrow, rotated 180° when expanded |
 | `CYLMenuStyle` | Title font and color, icon color (per state), spacing between icon and text, icon size, position offset, `layoutCentered`, spacing, height, fold text; Dynamic Type |
 | `CYLTagAppearance` | Per state: background, text color, font, icon color, corner radius (0 means a capsule), border and margin (modeled on `CYLBadgeAppearance`) |
-| `CYLTagButton` | A single tag view (a horizontal `CYLFlatDesignTabBarButton`) and the only "icon + title + animated icon" component; it can be used on its own: `init(title:image:)` / `init(title:image:animationURL:)` (Objective-C `-initWithTitle:image:` / `-initWithTitle:image:animationURL:`), sized to its content (`intrinsicContentSize`); the badge `badgeValue` (`nil` hides it, an empty string is a red dot, any other text is a capsule) and `badgeColor` (default `systemRed`) sit at the top right of the icon (of the title when there is no icon) and VoiceOver reads them as the tag's value; `CYLMenuStyle.imagePlacement = .top` / `.bottom` puts the icon above / below the title; `height(forTitle:iconSize:style:traitCollection:)` measures the height. Android, HarmonyOS and the WeChat Mini Program (`cyl-tag-button`) have the same API |
-| `-menuSelectedImageForItemAtIndexPath:` | Selected-state icon |
-| `-menuAnimationURLForItemAtIndexPath:`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF animated icons (CYLTabBarController's animation engines) |
-| `-initWithConfiguration:`, `+tagListViewWithConfigurationFile:error:`, `+styleWithConfiguration:` | Initialization from a dictionary (map) and from configuration files |
+| `CYLTagButton` | A single tag view (a horizontal `CYLFlatDesignTabBarButton`) and the only "icon + title + animated icon" component; it can be used on its own: `init(title:image:)` / `init(title:image:animationURL:)`, sized to its content (`intrinsicContentSize`); the badge `badgeValue` (`nil` hides it, an empty string is a red dot, any other text is a capsule) and `badgeColor` (default `systemRed`) sit at the top right of the icon (of the title when there is no icon) and VoiceOver reads them as the tag's value; `CYLMenuStyle.imagePlacement = .top` / `.bottom` puts the icon above / below the title; `height(forTitle:iconSize:style:traitCollection:)` measures the height. Android, HarmonyOS and the WeChat Mini Program (`cyl-tag-button`) have the same API |
+| `menuSelectedImageForItem(at:)` | Selected-state icon |
+| `menuAnimationURLForItem(at:)`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF animated icons (CYLTabBarController's animation engines) |
+| `init(configuration:)`, `init(configurationFile:)`, `CYLMenuStyle(configuration:)` | Initialization from a dictionary (map) and from configuration files |
 | `selectionMode`, `allowsEmptySelection` | No selection / single selection / multiple selection (supports an exclusive "All" item) |
 | `foldStyle`, `defaultVisibleRows` | "More" button in the title, bottom arrow, or a truncated preview only |
 | `showsSectionHeaders` | Grouped or flat |
-| `selectedIndexPaths`, `-selectItemAtIndexPath:`, `-deselectItemAtIndexPath:`, `-deselectAllItems` | Control selection from code (no callback is triggered) |
-| `-setExpanded:forSection:animated:`, `-isSectionExpanded:`, `-canFoldSection:` | Control folding from code |
-| `contentHeight`, `-heightThatFitsWidth:`, `intrinsicContentSize`, `scrollEnabled` | Embed in a table header, a stack view or Auto Layout |
-| `-numberOfRowsInSection:`, `-numberOfVisibleItemsInSection:` | Query the layout result |
+| `selectedIndexPaths`, `selectItem(at:)`, `deselectItem(at:)`, `deselectAllItems()` | Control selection from code (no callback is triggered) |
+| `setExpanded(_:forSection:animated:)`, `isSectionExpanded(_:)`, `canFoldSection(_:)` | Control folding from code |
+| `contentHeight`, `heightThatFitsWidth(_:)`, `intrinsicContentSize`, `isScrollEnabled` | Embed in a table header, a stack view or Auto Layout |
+| `numberOfRows(inSection:)`, `numberOfVisibleItems(inSection:)` | Query the layout result |
 
 #### 折叠控件与标题 / Fold control and title
 
@@ -237,7 +208,7 @@ let menu = CYLTagListView(foldControl: CYLMenuFoldControl(position: .headerTrail
 
 | 中文 | English |
 |:---|:---|
-| 折叠控件是一个无边框的 `CYLTagButton`（与标签相同的视图），图标位于文字之后（`CYLMenuStyle.imagePlacement = CYLTagImagePlacementTrailing`）。旧的 `foldStyle` 仍可使用，并与 `foldControl` 互相对应（`.headerButton` 为 header 右侧文字，`.footerChevron` 为 footer 箭头）。配置文件中的位置名称为 `"footer"`、`"headerLeading"`、`"headerTrailing"`、`"tail"`（`"headerLeft"` / `"headerRight"` 为别名）；旧名称 `bottom`、`topLeading`、`topTrailing`、`inline` 已移除（见 `docs/component-architecture.md`）。 | The fold control is a borderless `CYLTagButton` (the same view as the tags) with the icon after the text (`CYLMenuStyle.imagePlacement = CYLTagImagePlacementTrailing`). The old `foldStyle` still works and corresponds to `foldControl` (`.headerButton` is the text on the right of the header, `.footerChevron` is the arrow in the footer). In configuration files the position names are `"footer"`, `"headerLeading"`, `"headerTrailing"` and `"tail"` (`"headerLeft"` / `"headerRight"` are aliases); the old names `bottom`, `topLeading`, `topTrailing` and `inline` have been removed (see `docs/component-architecture.md`). |
+| 折叠控件是一个无边框的 `CYLTagButton`（与标签相同的视图），图标位于文字之后（`CYLMenuStyle.imagePlacement = .trailing`）。旧的 `foldStyle` 仍可使用，并与 `foldControl` 互相对应（`.headerButton` 为 header 右侧文字，`.footerChevron` 为 footer 箭头）。配置文件中的位置名称为 `"footer"`、`"headerLeading"`、`"headerTrailing"`、`"tail"`（`"headerLeft"` / `"headerRight"` 为别名）；旧名称 `bottom`、`topLeading`、`topTrailing`、`inline` 已移除（见 `docs/component-architecture.md`）。 | The fold control is a borderless `CYLTagButton` (the same view as the tags) with the icon after the text (`CYLMenuStyle.imagePlacement = .trailing`). The old `foldStyle` still works and corresponds to `foldControl` (`.headerButton` is the text on the right of the header, `.footerChevron` is the arrow in the footer). In configuration files the position names are `"footer"`, `"headerLeading"`, `"headerTrailing"` and `"tail"` (`"headerLeft"` / `"headerRight"` are aliases); the old names `bottom`, `topLeading`, `topTrailing` and `inline` have been removed (see `docs/component-architecture.md`). |
 
 #### 网格、文字在左图标在右与 More 按钮 / Grid, title-then-icon and the More button
 
@@ -259,21 +230,21 @@ discover.style = CYLMenuStyle.gridStyle(itemsPerRow: 2)
 
 | 接口 | 说明 |
 | --- | --- |
-| `CYLMenuStyle.numberOfItemsPerRow`、`+gridStyleWithNumberOfItemsPerRow:`（Swift 为 `gridStyle(itemsPerRow:)`） | 大于 0 时每行固定个数、所有标签等宽，文字超出时末尾省略号；`gridStyle` 为无背景、无边框、文字居左的网格外观。配置文件键 `itemsPerRow` |
+| `CYLMenuStyle.numberOfItemsPerRow`、`CYLMenuStyle.gridStyle(itemsPerRow:)` | 大于 0 时每行固定个数、所有标签等宽，文字超出时末尾省略号；`gridStyle` 为无背景、无边框、文字居左的网格外观。配置文件键 `itemsPerRow` |
 | `CYLMenuStyle.imagePlacement`、`contentAlignment` | 封装的标签按钮（`CYLTagButton`）支持图标在文字之前（`Leading`，默认）或之后（`Trailing`，文字在左、图标在右）；`contentAlignment` 为 `Center`（默认，整体居中）或 `Leading`（从左边距开始：文字在前、图标紧随其后，文字过长时末尾省略号，图标始终可见；只有文字时不留图标空位）。`gridStyle` 即为 `Leading` + `Trailing`。配置文件键为 `imagePlacement`、`contentAlignment`。图标的 `accessibilityLabel`（如“热门”）由 VoiceOver 读作该标签的值 |
-| `-menuShowsMoreButtonInSection:`、`-menu:didTapMoreButtonInSection:`、`-menuAccessibilityLabelForMoreButtonInSection:` | 分区标题右侧的 More 按钮（三个点，核心 bundle 的 `cyl_more`，与 CYLTabBarController 的 More Tab 使用的 `ellipsis` 图标一致；可用 `moreButtonImage` / `moreButtonColor` 替换），点击事件由宿主实现；标识符为 `CYLTagListMoreButton`，VoiceOver 默认读作“<分区> 更多操作”，宿主可按其动作提供名称（如“换一批”） |
+| `menuShowsMoreButton(inSection:)`、`menu(_:didTapMoreButtonInSection:)`、`menuAccessibilityLabelForMoreButton(inSection:)` | 分区标题右侧的 More 按钮（三个点，核心 bundle 的 `cyl_more`，与 CYLTabBarController 的 More Tab 使用的 `ellipsis` 图标一致；可用 `moreButtonImage` / `moreButtonColor` 替换），点击事件由宿主实现；标识符为 `CYLTagListMoreButton`，VoiceOver 默认读作“<分区> 更多操作”，宿主可按其动作提供名称（如“换一批”） |
 
 | API | Description |
 | --- | --- |
-| `CYLMenuStyle.numberOfItemsPerRow`、`+gridStyleWithNumberOfItemsPerRow:`（Swift `gridStyle(itemsPerRow:)`） | When greater than 0, each row has a fixed number of tags of equal width, and text that does not fit is truncated with an ellipsis; `gridStyle` is a grid look with no background, no border and left-aligned text. Configuration key `itemsPerRow` |
+| `CYLMenuStyle.numberOfItemsPerRow`, `CYLMenuStyle.gridStyle(itemsPerRow:)` | When greater than 0, each row has a fixed number of tags of equal width, and text that does not fit is truncated with an ellipsis; `gridStyle` is a grid look with no background, no border and left-aligned text. Configuration key `itemsPerRow` |
 | `CYLMenuStyle.imagePlacement`、`contentAlignment` | The encapsulated tag button (`CYLTagButton`) supports the icon before the text (`Leading`, the default) or after it (`Trailing`, text on the left and icon on the right); `contentAlignment` is `Center` (the default, centered as a whole) or `Leading` (starting from the left margin: the text first and the icon right after it; a text that is too long is truncated with an ellipsis while the icon always stays visible; with text only, no space is left for an icon). `gridStyle` is `Leading` + `Trailing`. Configuration keys are `imagePlacement` and `contentAlignment`. The icon's `accessibilityLabel` (such as "Hot") is read by VoiceOver as the tag's value |
-| `-menuShowsMoreButtonInSection:`、`-menu:didTapMoreButtonInSection:`、`-menuAccessibilityLabelForMoreButtonInSection:` | The More button on the right of the section title (three dots, `cyl_more` in the core bundle, the same as the `ellipsis` icon used by CYLTabBarController's More tab; replaceable through `moreButtonImage` / `moreButtonColor`); the host implements the tap event. Its identifier is `CYLTagListMoreButton`, VoiceOver reads it as "<section> More actions" by default, and the host can supply a name that matches its action (such as "Shuffle") |
+| `menuShowsMoreButton(inSection:)`、`menu(_:didTapMoreButtonInSection:)`、`menuAccessibilityLabelForMoreButton(inSection:)` | The More button on the right of the section title (three dots, `cyl_more` in the core bundle, the same as the `ellipsis` icon used by CYLTabBarController's More tab; replaceable through `moreButtonImage` / `moreButtonColor`); the host implements the tap event. Its identifier is `CYLTagListMoreButton`, VoiceOver reads it as "<section> More actions" by default, and the host can supply a name that matches its action (such as "Shuffle") |
 
 #### 新建标签 / New tag item
 
 | 中文 | English |
 |:---|:---|
-| `-menuItemTypeAtIndexPath:` 返回 `CYLMenuItemTypeCreate` 的条目由核心库的 `CYLTagCreateCell`（继承 `CYLTagListCell`）显示：核心 bundle 中的加号图标 `cyl_tag_plus`、本地化标题“新建标签”或“新建标签：<名称>”（`CYLMenuNewTag`、`CYLMenuNewTagNamed`，简体中文、繁体中文、英文）、带边框的外观，且不会被选中。数据源返回的标题是要新建的名称（空字符串表示由宿主询问名称），点击时回调 `-menu:didRequestNewItemWithName:atIndexPath:`。 | Items for which `-menuItemTypeAtIndexPath:` returns `CYLMenuItemTypeCreate` are shown by the core's `CYLTagCreateCell` (a subclass of `CYLTagListCell`): the plus icon `cyl_tag_plus` in the core bundle, the localized title "New tag" or "New tag: <name>" (`CYLMenuNewTag`, `CYLMenuNewTagNamed`; Simplified Chinese, Traditional Chinese and English), a bordered look, and they are never selected. The title returned by the data source is the name to create (an empty string means the host asks for the name), and a tap calls back `-menu:didRequestNewItemWithName:atIndexPath:`. |
+| `menuItemType(at:)` 返回 `CYLMenuItemTypeCreate` 的条目由核心库的 `CYLTagCreateCell`（继承 `CYLTagListCell`）显示：核心 bundle 中的加号图标 `cyl_tag_plus`、本地化标题“新建标签”或“新建标签：<名称>”（`CYLMenuNewTag`、`CYLMenuNewTagNamed`，简体中文、繁体中文、英文）、带边框的外观，且不会被选中。数据源返回的标题是要新建的名称（空字符串表示由宿主询问名称），点击时回调 `menu(_:didRequestNewItemWithName:at:)`。 | Items for which `menuItemType(at:)` returns `CYLMenuItemTypeCreate` are shown by the core's `CYLTagCreateCell` (a subclass of `CYLTagListCell`): the plus icon `cyl_tag_plus` in the core bundle, the localized title "New tag" or "New tag: <name>" (`CYLMenuNewTag`, `CYLMenuNewTagNamed`; Simplified Chinese, Traditional Chinese and English), a bordered look, and they are never selected. The title returned by the data source is the name to create (an empty string means the host asks for the name), and a tap calls back `menu(_:didRequestNewItemWithName:at:)`. |
 
 #### 配置文件 / Configuration files
 
@@ -287,40 +258,39 @@ discover.style = CYLMenuStyle.gridStyle(itemsPerRow: 2)
 |:---|:---|
 | 每个标签由 `CYLTagButton` 绘制：图标与标题的参数完全参照 CYLTabBarController 的 `CYLFlatDesignTabBarItem`，只是把纵向排列改为横向排列；背景、边框、圆角参照 `CYLBadgeView`（`CYLBadgeAppearance`），每种状态一个 `CYLTagAppearance`。 | Each tag is drawn by `CYLTagButton`: the icon and title parameters follow CYLTabBarController's `CYLFlatDesignTabBarItem` exactly, only with a horizontal layout instead of a vertical one; the background, border and corner radius follow `CYLBadgeView` (`CYLBadgeAppearance`), with one `CYLTagAppearance` per state. |
 
-```objc
-CYLMenuStyle *style = [CYLMenuStyle defaultStyle];
+```swift
+let style = CYLMenuStyle()
 // 标题与图标（CYLFlatDesignTabBarItem）
-[style setTitleTextAttributes:@{NSFontAttributeName: [UIFont systemFontOfSize:13],
-                                NSForegroundColorAttributeName: UIColor.darkGrayColor}
-                     forState:UIControlStateNormal];
-[style setIconColor:UIColor.systemBlueColor forState:UIControlStateNormal];   // 模板图标的 tintColor
-[style setIconColor:UIColor.whiteColor forState:UIControlStateSelected];
-style.imageTitleSpacing = 6;                       // 图标与文字间距
-style.imageSize = CGSizeMake(16, 16);
-style.titlePositionAdjustment = UIOffsetMake(0, 1);
-style.layoutCentered = YES;                        // 只有图标或只有标题时居中
+style.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 13),
+                              .foregroundColor: UIColor.darkGray], for: .normal)
+style.setIconColor(.systemBlue, for: .normal)          // 模板图标的 tintColor
+style.setIconColor(.white, for: .selected)
+style.imageTitleSpacing = 6                            // 图标与文字间距
+style.imageSize = CGSize(width: 16, height: 16)
+style.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 1)
+style.layoutCentered = true                            // 只有图标或只有标题时居中
 // 背景、边框、圆角（CYLBadgeView）
-style.normalAppearance.borderColor = UIColor.systemGray4Color;
-style.normalAppearance.borderWidth = 1;
-style.normalAppearance.cornerRadius = 0;           // 0 = 自动胶囊
-style.normalAppearance.margin = 12;
-style.selectedAppearance.backgroundColor = UIColor.systemBlueColor;
+style.normalAppearance.borderColor = .systemGray4
+style.normalAppearance.borderWidth = 1
+style.normalAppearance.cornerRadius = 0                // 0 = 自动胶囊
+style.normalAppearance.margin = 12
+style.selectedAppearance.backgroundColor = .systemBlue
 ```
 
 | 中文 | English |
 |:---|:---|
-| 数据源可通过 `-menuSelectedImageForItemAtIndexPath:` 提供选中态图标。 | The data source can provide the selected-state icon through `-menuSelectedImageForItemAtIndexPath:`. |
+| 数据源可通过 `menuSelectedImageForItem(at:)` 提供选中态图标。 | The data source can provide the selected-state icon through `menuSelectedImageForItem(at:)`. |
 
 #### 动效图标 / Animated icons
 
 | 中文 | English |
 |:---|:---|
-| `-menuAnimationURLForItemAtIndexPath:`（或 `CYLTagButton.animationURL`）可以提供 Lottie（.json）、PAG（.pag）、Rive（.riv）、SVGA、GIF 动效文件，播放方式与 CYLTabBarController 的 Tab 图标相同：点击选中时播放，选中时停在最后一帧，取消选中时回到第一帧（开启“减弱动态效果”时不播放）。 | `-menuAnimationURLForItemAtIndexPath:` (or `CYLTagButton.animationURL`) can supply Lottie (.json), PAG (.pag), Rive (.riv), SVGA and GIF animation files, played the same way as CYLTabBarController's tab icons: it plays when a tap selects the tag, rests on the last frame while selected, and returns to the first frame when deselected (it does not play when Reduce Motion is on). |
+| `menuAnimationURLForItem(at:)`（或 `CYLTagButton.animationURL`）可以提供 Lottie（.json）、PAG（.pag）、Rive（.riv）、SVGA、GIF 动效文件，播放方式与 CYLTabBarController 的 Tab 图标相同：点击选中时播放，选中时停在最后一帧，取消选中时回到第一帧（开启“减弱动态效果”时不播放）。 | `menuAnimationURLForItem(at:)` (or `CYLTagButton.animationURL`) can supply Lottie (.json), PAG (.pag), Rive (.riv), SVGA and GIF animation files, played the same way as CYLTabBarController's tab icons: it plays when a tap selects the tag, rests on the last frame while selected, and returns to the first frame when deselected (it does not play when Reduce Motion is on). |
 | `CYLTagButton` 是 CYLTabBarController 共享的“动效图标 + 标题”组件 `CYLAnimatedItemView` 的子类（[指南](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)）。pod 只依赖 `CYLTabBarController/CYLAnimatedItem`（静态图片，不含 TabBar 和动效引擎）；App 需自行加入所播放文件类型对应的引擎： | `CYLTagButton` is a subclass of CYLTabBarController's shared animated icon + title component, `CYLAnimatedItemView` ([guide](https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md)). The pod depends on `CYLTabBarController/CYLAnimatedItem` only (static images, no tab bar, no animation engine); the app adds the engine of each file type it plays: |
 
 ```ruby
 cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :commit => '<sha>' }
-pod 'CYLTabBarController/CYLAnimatedItemLottieSwift', cyl_tab_bar   # or …LottieObjectiveC, …PAG, …PAGEnterprise, …Rive, …SVGA, …GIF
+pod 'CYLTabBarController/CYLAnimatedItemLottieSwift', cyl_tab_bar   # or …PAG, …PAGEnterprise, …Rive, …SVGA, …GIF
 ```
 
 | 中文 | English |
@@ -341,8 +311,8 @@ tag.animationURL = iconsURL.cylAddingAnimationOptions(["artboard": "CHAT",
 
 | 中文 | English |
 |:---|:---|
-| 未选中时动效默认停在第一帧（与 CYLTabBarController 的 Tab 图标相同）；第一帧为空的文件可以停在其他帧：`-menuAnimationRestingProgressForItemAtIndexPath:`、`CYLTagButton.animationRestingProgress` 或字典中的 `CYLTagItemKey.animationRestingProgress`（0...1，例如 `1` 为最后一帧）。 | When not selected, the animation rests on the first frame by default (the same as CYLTabBarController's tab icons); a file whose first frame is empty can rest on another frame: `-menuAnimationRestingProgressForItemAtIndexPath:`, `CYLTagButton.animationRestingProgress`, or `CYLTagItemKey.animationRestingProgress` in a dictionary (0...1; for example `1` is the last frame). |
-| 每个分区可以有自己的外观：`-menuStyleForSection:` 或字典中的 `CYLTagSectionKey.style`（覆盖在列表样式之上的 `CYLMenuStyleKey` 键），例如把白色线条的 Rive 图标（CYLTabBarController 深色 TabBar 用的 `icons.riv`）放在深色标签上。颜色、字体、边框、图标颜色、图文布局按分区设置；高度、间距与内边距始终使用列表的样式。`-scrollToSection:animated:` 滚动到某个分区。 | Each section can have its own look: `-menuStyleForSection:` or `CYLTagSectionKey.style` in a dictionary (`CYLMenuStyleKey` keys layered over the list style), for example white-line Rive icons (the `icons.riv` used by CYLTabBarController's dark tab bar) on dark tags. Colors, fonts, borders, icon colors and the icon-text layout are set per section; the height, spacing and padding always use the list's style. `-scrollToSection:animated:` scrolls to a section. |
+| 未选中时动效默认停在第一帧（与 CYLTabBarController 的 Tab 图标相同）；第一帧为空的文件可以停在其他帧：`menuAnimationRestingProgressForItem(at:)`、`CYLTagButton.animationRestingProgress` 或字典中的 `CYLTagItemKey.animationRestingProgress`（0...1，例如 `1` 为最后一帧）。 | When not selected, the animation rests on the first frame by default (the same as CYLTabBarController's tab icons); a file whose first frame is empty can rest on another frame: `menuAnimationRestingProgressForItem(at:)`, `CYLTagButton.animationRestingProgress`, or `CYLTagItemKey.animationRestingProgress` in a dictionary (0...1; for example `1` is the last frame). |
+| 每个分区可以有自己的外观：`menuStyle(forSection:)` 或字典中的 `CYLTagSectionKey.style`（覆盖在列表样式之上的 `CYLMenuStyleKey` 键），例如把白色线条的 Rive 图标（CYLTabBarController 深色 TabBar 用的 `icons.riv`）放在深色标签上。颜色、字体、边框、图标颜色、图文布局按分区设置；高度、间距与内边距始终使用列表的样式。`scroll(toSection:animated:)` 滚动到某个分区。 | Each section can have its own look: `menuStyle(forSection:)` or `CYLTagSectionKey.style` in a dictionary (`CYLMenuStyleKey` keys layered over the list style), for example white-line Rive icons (the `icons.riv` used by CYLTabBarController's dark tab bar) on dark tags. Colors, fonts, borders, icon colors and the icon-text layout are set per section; the height, spacing and padding always use the list's style. `scroll(toSection:animated:)` scrolls to a section. |
 | Lottie 2.x 按名称查找 JSON 引用的图片，因此示例把这些图片放在 `Assets.xcassets/LottieImages`（CYLTabBarController 的示例放在 App 根目录）。 | Lottie 2.x looks up the images referenced by the JSON by name, so the example keeps these images in `Assets.xcassets/LottieImages` (CYLTabBarController's example keeps them in the app root). |
 | 示例的“动效”Tab（`CYLTagAnimationDemoViewController`）使用从 CYLTabBarController（所有分支中最新的提交）示例复制的资源：Lottie（含图片资源与占位图、绿色主题）、Rive、GIF 动效文件与 TabBar 图片（`Assets.xcassets/TabBarIcon`），PAG 文件由 `pod install` 下载（包括 CYLTabBarController Example-PAG 的 Tab 图标 `tab_home`、`tab_health`、`tab_moments`、`tab_me`）；每个分区一种动效库，点击播放，可全部播放并切换速度。`style.animationSize`、`style.animationSpeed` 设置大小与速度。 | The example's "Animation" tab (`CYLTagAnimationDemoViewController`) uses resources copied from the CYLTabBarController example (the newest commit across all branches): Lottie (with image assets, a placeholder and a green theme), Rive and GIF animation files and the tab bar images (`Assets.xcassets/TabBarIcon`); the PAG files are downloaded by `pod install` (including the tab icons `tab_home`, `tab_health`, `tab_moments` and `tab_me` of CYLTabBarController's Example-PAG). Each section uses one animation library, a tap plays it, and you can play all of them and switch the speed. `style.animationSize` and `style.animationSpeed` set the size and the speed. |
 | Rive 文件自带的背景：`truck.riv` 的画板填充（红色 `Background`）会在标签里画出一块矩形，按 CYLTableViewPlaceHolder 的 [PR #22](https://github.com/ChenYilong/CYLTableViewPlaceHolder/pull/22) 把它的透明度设为 0（只改这一个字节）；`house.riv` 的天空（紫色渐变）与灰色画板填充同样设为透明（三个字节，按维护者的决定修改，来源没有许可文件，版权归原作者），房子下方的地面属于画面，保留。记录与 SHA-256 见 `Animations/Rive/README.md`。 | Backgrounds that ship inside the Rive files: the artboard fill of `truck.riv` (the red `Background`) draws a rectangle inside the tag, so its opacity is set to 0 following CYLTableViewPlaceHolder's [PR #22](https://github.com/ChenYilong/CYLTableViewPlaceHolder/pull/22) (only this one byte is changed); the sky of `house.riv` (a purple gradient) and its gray artboard fill are made transparent in the same way (three bytes, changed at the maintainer's decision; the source has no license file and the copyright belongs to the original author), while the ground below the house is part of the picture and is kept. The record and the SHA-256 are in `Animations/Rive/README.md`. |
@@ -371,13 +341,12 @@ let fromFile = try CYLTagListView(configurationFile: "tags.json")
 | 中文 | English |
 |:---|:---|
 | 文件中的值都可以写成字符串（颜色 "#RRGGBB"、图片 "system:star"、内边距 "{t, l, b, r}" 或数组、枚举名称等），文件名相对于配置文件或 App 资源解析。JSON 与 plist 直接读取；YAML、TOML 等格式在链接 CYLTabBarController 时由其解析器读取。示例见 `Example/CYLMenuExample/CYLMenuExample.bundle/Configurations/animated-tags.json` 与 `CYLTagConfigurationDemoViewController`。示例的 PAG 文件由 `pod install` 下载（`scripts/fetch-animation-resources.py`，固定版本并校验 SHA-256，与 CYLTabBarController 相同）。示例的“样式”Tab（`CYLTagStyleDemoViewController`）参照 `CYLFlatDesignTabBarDemoViewController`：上方为标签预览，点击下方列表的每一行即时修改一个参数。 | Values in the file can all be written as strings (colors as "#RRGGBB", images as "system:star", insets as "{t, l, b, r}" or an array, enum names, and so on), and file names are resolved relative to the configuration file or the app resources. JSON and plist are read directly; formats such as YAML and TOML are read by CYLTabBarController's parser when CYLTabBarController is linked. For examples see `Example/CYLMenuExample/CYLMenuExample.bundle/Configurations/animated-tags.json` and `CYLTagConfigurationDemoViewController`. The example's PAG files are downloaded by `pod install` (`scripts/fetch-animation-resources.py`, with pinned versions and SHA-256 verification, the same as CYLTabBarController). The example's "Style" tab (`CYLTagStyleDemoViewController`) follows `CYLFlatDesignTabBarDemoViewController`: the tag preview is at the top, and tapping each row of the list below changes one parameter instantly. |
-| **破坏性变更：**`CYLMenuStyle` 中扁平的颜色、边框和内边距属性（`textColor`、`itemBackgroundColor`、`borderColor`、`cornerRadius`、`itemHorizontalPadding`……）已移到按状态区分的 `CYLTagAppearance` 对象中，`itemFontForTraitCollection:` 改为 `titleFontForState:traitCollection:`，圆角为 0 现在表示胶囊形。`menuItemHasImageAtIndexPath:` 已移除，请改为从 `menuImageForItemAtIndexPath:` 返回图片。`CYLClassifyMenuViewController` 的分区图标现在来自 `menuImageForSection:`。 | **Breaking changes:** `CYLMenuStyle`'s flat color, border and padding properties (`textColor`, `itemBackgroundColor`, `borderColor`, `cornerRadius`, `itemHorizontalPadding`…) moved to its per-state `CYLTagAppearance` objects, `itemFontForTraitCollection:` became `titleFontForState:traitCollection:`, and a corner radius of 0 now means a capsule. `menuItemHasImageAtIndexPath:` was removed; return the image from `menuImageForItemAtIndexPath:` instead. Section icons of `CYLClassifyMenuViewController` now come from `menuImageForSection:`. |
+| **破坏性变更：**`CYLMenuStyle` 中扁平的颜色、边框和内边距属性（`textColor`、`itemBackgroundColor`、`borderColor`、`cornerRadius`、`itemHorizontalPadding`……）已移到按状态区分的 `CYLTagAppearance` 对象中，标题字体改为 `titleFont(for:traitCollection:)`，圆角为 0 现在表示胶囊形。旧的“条目是否有图片”回调已移除，请改为从 `menuImageForItem(at:)` 返回图片。`CYLClassifyMenuViewController` 的分区图标现在来自 `menuImage(forSection:)`。 | **Breaking changes:** `CYLMenuStyle`'s flat color, border and padding properties (`textColor`, `itemBackgroundColor`, `borderColor`, `cornerRadius`, `itemHorizontalPadding`…) moved to its per-state `CYLTagAppearance` objects, the title font is now `titleFont(for:traitCollection:)`, and a corner radius of 0 now means a capsule. The old "item has an image" callback was removed; return the image from `menuImageForItem(at:)` instead. Section icons of `CYLClassifyMenuViewController` now come from `menuImage(forSection:)`. |
 
 #### 标签云：android-tagview 的初始化方式 / Tag cloud, the android-tagview way
 
 | 中文 | English |
 |:---|:---|
-| 参照 [kaedea/android-tagview](https://github.com/kaedea/android-tagview)：先创建列表、设置间距，再添加标签（`CYLTag`），用 block 监听点击和删除。它的每个公开 API 在本项目都有对应项（47 / 47，100 分），对照表见 [docs/android-tagview-api.md](docs/android-tagview-api.md)。 | Modeled on [kaedea/android-tagview](https://github.com/kaedea/android-tagview): create the list, set the spacing, then add tags (`CYLTag`), and listen to taps and deletions with blocks. Every public API of it has a counterpart in this project (47 / 47, score 100); the comparison table is in [docs/android-tagview-api.md](docs/android-tagview-api.md). |
 | 与 android-tagview 一样：创建列表、设置间距、添加标签，并用 block 监听点击和删除。android-tagview 的每个公开 API 在这里都有对应项，对照表见 [docs/android-tagview-api.md](docs/android-tagview-api.md)。 | Like android-tagview: create the list, set its spacing, add tags, and listen to taps and deletions in blocks. Every public API of android-tagview has a counterpart here; the table is in [docs/android-tagview-api.md](docs/android-tagview-api.md). |
 
 ```swift
@@ -415,7 +384,6 @@ tagListView.tagDeleteHandler = { index, tag in print("deleted", index, tag.title
 
 | 中文 | English |
 |:---|:---|
-| 三个 Android 标签库的每个公开 API 都在本项目有对应项（各 100 分），它们的示例也已复刻为 Swift（“样式”Tab → Android 标签库示例）。核心库负责绘制与交互，示例只传入数据、样式参数并处理点击。 | Every public API of three Android tag libraries has a counterpart in this project (100 each), and their samples are ported to Swift (the "Style" tab → Android tag library samples). The core library handles drawing and interaction; the samples only pass in data and style parameters and handle taps. |
 | 三个 Android 标签库的每个公开 API 在这里都有对应项（各 100 分），它们的示例也已移植为 Swift（“样式”Tab → Android 标签库示例）。核心库负责绘制并处理全部交互；示例只传入数据和样式值，并处理点击。 | Every public API of three Android tag libraries has a counterpart here (100 each), and their samples are ported to Swift (the "Style" tab → Android tag library samples). The core draws and handles everything; the samples pass data and style values and handle taps. |
 
 | 库 | 对照表 | 核心 API | 示例 |
@@ -482,8 +450,7 @@ tagListView.tagDeleteHandler = { index, tag in print("deleted", index, tag.title
 
 | 中文 | English |
 |:---|:---|
-| `android/` 是 Android 版：三个 Android 标签库各自转写为 Kotlin（`android-tagview`、`TagViewGroup`、`AndroidTagView`），再合并为一个库 `android/merged/library`（包名 `com.cyl.classifymenu`），保留三者的全部 API，并对齐 iOS 端的全部公开 API：709 / 709，满分（对照表见 [docs/android-api.md](docs/android-api.md)）。示例 `android/merged/example` 只有一个 App：CYLTabBarController 的 Android 版按提交（commit）集成（`android/merged/gradle.properties`），由配置文件创建 TabBar，一个示例一个 Tab，PlusButton 凸出 TabBar。 | `android/` is the Android version: each of the three Android tag libraries (`android-tagview`, `TagViewGroup`, `AndroidTagView`) is transcribed to Kotlin and then merged into one library, `android/merged/library` (package `com.cyl.classifymenu`), which keeps all of their APIs and matches every public API of the iOS side: 709 / 709, a full score (comparison table: [docs/android-api.md](docs/android-api.md)). The example `android/merged/example` is a single app: it integrates the Android version of CYLTabBarController by commit (`android/merged/gradle.properties`), builds the tab bar from a configuration file, gives each example one tab, and raises the PlusButton above the tab bar. |
-| `android/` 是 Android 版：三个 Android 标签库各自转写为 Kotlin，再合并为一个库（`android/merged/library`，包名 `com.cyl.classifymenu`），保留它们的全部 API，并对齐 iOS 库的每个公开 API：709 / 709（对照表：[docs/android-api.md](docs/android-api.md)）。示例 App（`android/merged/example`）按提交集成 Android 版 CYLTabBarController（`android/merged/gradle.properties`），由配置文件创建 TabBar，每个示例一个 Tab，并让加号按钮凸出 TabBar。 | `android/` is the Android version: the three Android tag libraries, each transcribed to Kotlin, merged into one library (`android/merged/library`, package `com.cyl.classifymenu`) that keeps all their APIs and matches every public API of the iOS library: 709 / 709 (table: [docs/android-api.md](docs/android-api.md)). The example app (`android/merged/example`) integrates CYLTabBarController for Android by commit (`android/merged/gradle.properties`), builds its tab bar from a configuration file, gives each example a tab, and raises the plus button above the bar. |
+| `android/` 是 Android 版：三个 Android 标签库各自转写为 Kotlin，再合并为一个库（`android/merged/library`，包名 `com.cyl.classifymenu`），保留它们的全部 API，并对齐 iOS 库的每个公开 API：893 / 893（对照表：[docs/android-api.md](docs/android-api.md)）。示例 App（`android/merged/example`）按提交集成 Android 版 CYLTabBarController（`android/merged/gradle.properties`），由配置文件创建 TabBar，每个示例一个 Tab，并让加号按钮凸出 TabBar。 | `android/` is the Android version: the three Android tag libraries, each transcribed to Kotlin, merged into one library (`android/merged/library`, package `com.cyl.classifymenu`) that keeps all their APIs and matches every public API of the iOS library: 893 / 893 (table: [docs/android-api.md](docs/android-api.md)). The example app (`android/merged/example`) integrates CYLTabBarController for Android by commit (`android/merged/gradle.properties`), builds its tab bar from a configuration file, gives each example a tab, and raises the plus button above the bar. |
 
 | Tab | 示例 |
 | --- | --- |
@@ -529,6 +496,110 @@ android/scripts/gradle.sh merged :library:testDebugUnitTest :example:assembleDeb
 | 平台：Android；环境：Android 15（API 35）模拟器 `CYL_API35_arm64`，compileSdk / targetSdk 35，AGP 8.7.3，Kotlin 2.0.21；主机 macOS 27.3 | Platform: Android; environment: Android 15 (API 35) emulator `CYL_API35_arm64`, compileSdk / targetSdk 35, AGP 8.7.3, Kotlin 2.0.21; host macOS 27.3 |
 | 版本：`b85e474`（上）与 `fbe5cea`（下），位于 `feat/android-kotlin`；时间：2026-11-13 14:14 与 14:25（NZDT） | Version: `b85e474` (top) and `fbe5cea` (bottom) on `feat/android-kotlin`; taken: 2026-11-13 14:14 and 14:25 (NZDT) |
 
+### 其他平台的基本初始化 / Basic setup on the other platforms
+
+| 中文 | English |
+|:---|:---|
+| 所有平台都用同一套概念：宿主提供数据源（分区、条目标题）和代理（点击、选择变化），或者传入一份配置（字典 / JSON，键与 iOS 的 `CYLTagListKey` 等相同）。下面是每个平台最小的初始化，更多细节见各自的文档。 | Every platform uses the same concepts: the host provides a data source (sections, item titles) and a delegate (taps, selection changes), or passes in a configuration (a dictionary / JSON with the same keys as iOS's `CYLTagListKey` and friends). Below is the smallest setup of each platform; see its document for more. |
+
+#### Android（Kotlin）
+
+| 中文 | English |
+|:---|:---|
+| 库在 `android/merged/library`（包名 `com.cyl.classifymenu`），示例 App 通过 `implementation(project(":library"))` 引用。实现 `CYLMenuDataSource`，创建 `CYLTagListView`，设置数据源并重新加载。详见 [docs/android.md](docs/android.md) 与 [docs/android-api.md](docs/android-api.md)。 | The library is in `android/merged/library` (package `com.cyl.classifymenu`), and the example app references it with `implementation(project(":library"))`. Implement `CYLMenuDataSource`, create a `CYLTagListView`, set the data source and reload. See [docs/android.md](docs/android.md) and [docs/android-api.md](docs/android-api.md). |
+
+```kotlin
+class ReviewMenu(context: Context) : CYLMenuDataSource, CYLMenuDelegate {
+    private val titles = listOf("All", "Positive", "With photos")
+
+    override fun numberOfSectionsInMenu() = 1
+    override fun menuNumberOfItemsInSection(section: Int) = titles.size
+    override fun menuTitleForSection(section: Int) = "Reviews"
+    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = titles[indexPath.item]
+
+    val list = CYLTagListView(context).also {
+        it.menuDataSource = this
+        it.menuDelegate = this
+        it.reloadMenuData()
+    }
+}
+```
+
+#### HarmonyOS（ArkTS）
+
+| 中文 | English |
+|:---|:---|
+| 核心库是 HAR 模块 `harmony/classifymenu`（依赖名 `@cyl/classifymenu`，示例中为 `"@cyl/classifymenu": "file:../classifymenu"`）。用 `CYLTagListState` 保存数据源和代理，再用 `CYLTagListView` 组件显示。详见 [docs/harmony.md](docs/harmony.md)。 | The core library is the HAR module `harmony/classifymenu` (dependency name `@cyl/classifymenu`, `"@cyl/classifymenu": "file:../classifymenu"` in the example). Hold the data source and delegate in a `CYLTagListState` and show it with the `CYLTagListView` component. See [docs/harmony.md](docs/harmony.md). |
+
+```ts
+import { CYLTagListState, CYLTagListView, CYLMenuDataSource, CYLIndexPath } from '@cyl/classifymenu';
+
+class ReviewSource implements CYLMenuDataSource {
+  private titles: string[] = ['All', 'Positive', 'With photos'];
+  numberOfSectionsInMenu(): number { return 1; }
+  menuNumberOfItemsInSection(section: number): number { return this.titles.length; }
+  menuTitleForSection(section: number): string { return 'Reviews'; }
+  menuTitleForItem(indexPath: CYLIndexPath): string { return this.titles[indexPath.item]; }
+}
+
+// In a component: @State list: CYLTagListState = new CYLTagListState();
+//   aboutToAppear() { this.list.menuDataSource = new ReviewSource(); this.list.reloadMenuData(); }
+//   build() { CYLTagListView({ tagList: this.list }) }
+```
+
+#### 微信小程序 / WeChat Mini Program
+
+| 中文 | English |
+|:---|:---|
+| 安装 npm 包 `cyl-tag-list-miniprogram`，在微信开发者工具中选择“工具 → 构建 npm”，在页面的 `usingComponents` 中声明组件，再把配置传给 `cyl-tag-list`。详见 [CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/README.md](CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/README.md) 与 [CrossPlatform/README.md](CrossPlatform/README.md)。 | Install the npm package `cyl-tag-list-miniprogram`, choose "Tools → Build npm" in WeChat DevTools, declare the component in the page's `usingComponents`, and pass a configuration to `cyl-tag-list`. See [CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/README.md](CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/README.md) and [CrossPlatform/README.md](CrossPlatform/README.md). |
+
+```sh
+npm install cyl-tag-list-miniprogram
+```
+
+```json
+{ "usingComponents": { "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list" } }
+```
+
+```xml
+<cyl-tag-list configuration="{{configuration}}" bind:tagtap="onTagTap" />
+```
+
+#### Flutter
+
+| 中文 | English |
+|:---|:---|
+| `flutter/cyl_tag_list` 是原生 `CYLTagListView` 的 Flutter 封装（iOS 用 Swift pod，Android 用 Kotlin 库）。`configuration` 就是 iOS `CYLTagListView(configuration:)` 的字典。iOS 要求静态链接（`use_frameworks! :linkage => :static`），详见 [flutter/cyl_tag_list/README.md](flutter/cyl_tag_list/README.md) 与 [docs/cross-platform.md](docs/cross-platform.md)。 | `flutter/cyl_tag_list` wraps the native `CYLTagListView` for Flutter (the Swift pod on iOS, the Kotlin library on Android). `configuration` is the dictionary of iOS's `CYLTagListView(configuration:)`. iOS needs static linking (`use_frameworks! :linkage => :static`); see [flutter/cyl_tag_list/README.md](flutter/cyl_tag_list/README.md) and [docs/cross-platform.md](docs/cross-platform.md). |
+
+```dart
+CylTagListView(
+  controller: CylTagListController(),
+  configuration: {
+    'selectionMode': 'multiple',
+    'sections': [
+      {'title': 'Reviews', 'items': [{'title': 'All'}, {'title': 'Positive'}]},
+    ],
+  },
+  onTap: (tap) => print(tap.title),
+);
+```
+
+#### React Native
+
+| 中文 | English |
+|:---|:---|
+| `react-native/react-native-cyl-tag-list` 是 `CYLTagListView` 的 Fabric 视图（iOS 与 Android），`configuration` 同样是配置字典，事件有 `onTagTap`、`onSelectionChange` 和 `onContentHeightChange`。iOS 的 `CylTagListView.mm` / `.h` 是 React Native 的桥接代码，按 React Native 的要求保持 Objective-C++。详见 [react-native/react-native-cyl-tag-list/README.md](react-native/react-native-cyl-tag-list/README.md)。 | `react-native/react-native-cyl-tag-list` is a Fabric view of `CYLTagListView` (iOS and Android); `configuration` is the same configuration dictionary, and the events are `onTagTap`, `onSelectionChange` and `onContentHeightChange`. The iOS `CylTagListView.mm` / `.h` are React Native's bridge code and stay Objective-C++ as React Native requires. See [react-native/react-native-cyl-tag-list/README.md](react-native/react-native-cyl-tag-list/README.md). |
+
+```tsx
+import { CylTagListView } from 'react-native-cyl-tag-list';
+
+<CylTagListView
+  style={{ height: 120 }}
+  configuration={{ selectionMode: 'multiple', sections: [{ title: 'Reviews', items: [{ title: 'All' }, { title: 'Positive' }] }] }}
+  onTagTap={(e) => console.log(e.nativeEvent.title)}
+/>
+```
+
 ### 无障碍 / Accessibility
 
 | 设置 | 支持 |
@@ -550,7 +621,7 @@ android/scripts/gradle.sh merged :library:testDebugUnitTest :example:assembleDeb
 | 中文 | English |
 |:---|:---|
 | \| Voice Control / Switch Control / 全键盘控制 \| 每个标签、“+ 新建标签”、折叠按钮和列表标题都是带本地化标签的元素，可用名称点击或依次聚焦。 \| | \| Voice Control / Switch Control / Full Keyboard Access \| Every tag, the "+ New tag" item, the fold button and the list title are elements with localized labels, so they can be tapped by name or focused in turn. \| |
-| `CYLTagListView` 的视图带有固定的 `accessibilityIdentifier`（声明于 `CYLTagListAccessibility.h`），测试与工具无需坐标即可找到它们： | The views of `CYLTagListView` carry fixed `accessibilityIdentifier`s (declared in `CYLTagListAccessibility.h`), so tests and tools can find them without coordinates: |
+| `CYLTagListView` 的视图带有固定的 `accessibilityIdentifier`（声明于 `CYLTagListAccessibility.swift`），测试与工具无需坐标即可找到它们： | The views of `CYLTagListView` carry fixed `accessibilityIdentifier`s (declared in `CYLTagListAccessibility.swift`), so tests and tools can find them without coordinates: |
 
 | 视图 | 标识符 | 朗读 |
 | --- | --- | --- |
@@ -570,7 +641,7 @@ android/scripts/gradle.sh merged :library:testDebugUnitTest :example:assembleDeb
 
 | 中文 | English |
 |:---|:---|
-| 数据源可实现 `-menuAccessibilityHintForItemAtIndexPath:`（Swift：`menuAccessibilityHintForItem(at:)`）为标签提供朗读提示，如 Swift 示例管理模式下的“轻点两下删除此标签”。 | The data source can implement `-menuAccessibilityHintForItemAtIndexPath:` (Swift: `menuAccessibilityHintForItem(at:)`) to give tags a spoken hint, such as "Double-tap to delete this tag" in the manage mode of the Swift example. |
+| 数据源可实现 `menuAccessibilityHintForItem(at:)`为标签提供朗读提示，如 Swift 示例管理模式下的“轻点两下删除此标签”。 | The data source can implement `menuAccessibilityHintForItem(at:)` to give tags a spoken hint, such as "Double-tap to delete this tag" in the manage mode of the Swift example. |
 | 宿主提供的分区右侧视图（如行业选择按钮）应设置自己的 `accessibilityLabel`，示例中有演示。 | A view the host puts on the right of a section (such as an industry picker button) should set its own `accessibilityLabel`; the example shows how. |
 
 ### 国际化与本地化 / Localization
@@ -579,16 +650,15 @@ android/scripts/gradle.sh merged :library:testDebugUnitTest :example:assembleDeb
 |:---|:---|
 | 组件的全部资源只有一个 bundle：`CYLClassifyMenuResources.bundle`，其中包含图片、XIB 以及 `en.lproj`、`zh-Hans.lproj`、`zh-Hant.lproj` 下的 `CYLClassifyMenu.strings`（源文件位于 `CollectionViewClassifyMenu/Resources/Localization/`）。组件自己选择 `.lproj`，宿主 App 无需声明这些语言。 | All of the component's resources live in a single bundle, `CYLClassifyMenuResources.bundle`, which contains the images, the XIBs and `CYLClassifyMenu.strings` under `en.lproj`, `zh-Hans.lproj` and `zh-Hant.lproj` (the sources are in `CollectionViewClassifyMenu/Resources/Localization/`). The component picks the `.lproj` itself, so the host app does not need to declare these languages. |
 
-```objc
-CYLMenuResources.preferredLanguage = @"en";   // App 内切换语言；nil 跟随系统
-NSString *more = CYLMenuLocalizedString(@"CYLMenuExpand", nil);   // "More"
-UIImage *plus = CYLMenuImage(@"cyl_tag_plus");                     // 组件 bundle 中的图片
-[CYLMenuResources localizedStringForKey:@"CYLMenuCollapse" language:@"zh-Hant"];   // "收合"
+```swift
+CYLMenuResources.preferredLanguage = "en"                          // App 内切换语言；nil 跟随系统
+let more = CYLMenuLocalizedString("CYLMenuExpand")                 // "More"
+let plus = CYLMenuResources.image(named: "cyl_tag_plus")           // 组件 bundle 中的图片
+CYLMenuResources.localizedString(forKey: "CYLMenuCollapse", language: "zh-Hant")   // "收合"
 ```
 
 | 中文 | English |
 |:---|:---|
-| Swift 无法调用宏，请使用同名函数：`CYLMenuLocalizedString("CYLMenuExpand")`。 | Swift cannot call macros; use the function of the same name: `CYLMenuLocalizedString("CYLMenuExpand")`. |
 | 切换语言后新创建的视图使用新语言。`CYLMenuStyle` 的 `expandTitle` / `collapseTitle` 默认取自该 bundle，也可由宿主覆盖。新增文案时，在三个 `.strings` 中加入相同的键（测试会检查键一致）。 | Views created after switching the language use the new language. `expandTitle` / `collapseTitle` of `CYLMenuStyle` default to the values in this bundle and can be overridden by the host. When adding a string, add the same key to all three `.strings` files (a test checks that the keys match). |
 | 示例的界面文案同样只放在一个 bundle：`Example/CYLMenuExample/CYLMenuExample.bundle`，通过 Swift 函数 `CYLExampleLocalizedString` 读取，键为中文原文；评价关键词与标签属于示例数据，不翻译。启动参数 `-CYLExampleLanguage en` 可切换示例与组件的语言。Swift 示例使用函数 `CYLTagEditorLocalizedString` 读取 `CYLTagEditorExample.bundle`；`CollectionViewClassifyMenu.xcodeproj` 的演示 App 使用 Swift 函数 `CYLDemoLocalizedString` 读取 `CYLClassifyMenuDemo.bundle`。每一层各有自己的查找宏（或函数）与 bundle，代码中不出现面向用户的中文字面量（含无障碍标签与提示）。 | The example's UI text is likewise kept in a single bundle, `Example/CYLMenuExample/CYLMenuExample.bundle`, read through the Swift function `CYLExampleLocalizedString`, with the original Chinese text as the key; review keywords and tags are example data and are not translated. The launch argument `-CYLExampleLanguage en` switches the language of the example and the component. The Swift example reads `CYLTagEditorExample.bundle` with the function `CYLTagEditorLocalizedString`; the demo app of `CollectionViewClassifyMenu.xcodeproj` reads `CYLClassifyMenuDemo.bundle` with the Swift function `CYLDemoLocalizedString`. Each layer has its own lookup macro (or function) and bundle, and no user-facing Chinese literals appear in the code (accessibility labels and hints included). |
 
@@ -596,7 +666,7 @@ UIImage *plus = CYLMenuImage(@"cyl_tag_plus");                     // 组件 bun
 
 | 中文 | English |
 |:---|:---|
-| 所有示例（`Example/`、`Example-Swift/`、根目录工程的演示 App、`TagCollectionView` 演示）及其测试均以 Swift 编写；核心库保持 Objective-C，并通过 `NS_SWIFT_NAME` 等标注适配 Swift 命名。 | All examples (`Example/`, `Example-Swift/`, the demo app of the root project, the `TagCollectionView` demo) and their tests are written in Swift; the core library stays in Objective-C and adapts to Swift naming through annotations such as `NS_SWIFT_NAME`. |
+| 核心库与所有示例（`Example/`、`Example-Swift/`、根目录工程的演示 App、`TagCollectionView` 演示）及其测试均以 Swift 编写；公开 API 带有 `@objc` 标注，迁移记录见 [docs/Swift-Migration.md](docs/Swift-Migration.md)。 | The core library, all examples (`Example/`, `Example-Swift/`, the demo app of the root project, the `TagCollectionView` demo) and their tests are written in Swift; the public API carries `@objc` annotations, and the migration log is in [docs/Swift-Migration.md](docs/Swift-Migration.md). |
 | `Example/` 通过 Podfile 以本地路径集成核心库，并引入 [CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 搭建两个作用不同的 TabBar： | `Example/` integrates the core library by local path in its Podfile and pulls in [CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) to build two tab bars with different roles: |
 | 根 TabBar（底部）：“场景一：评价筛选”与“场景二：搜索分类”两个 Tab； | The root tab bar (at the bottom): the two tabs "Scenario 1: review filter" and "Scenario 2: search categories"; |
 | 分类 TabBar（场景二）：场景二首页点击搜索框 push 进入搜索页（`hidesBottomBarWhenPushed`，隐藏根 TabBar），搜索页内嵌的 CYLTabBarController 同样位于底部，切换“找人/动态/八卦/职位”，每个 Tab 是一个标签页。 | The category tab bar (scenario 2): tapping the search box on the scenario 2 home page pushes the search page (`hidesBottomBarWhenPushed`, which hides the root tab bar); the CYLTabBarController embedded in the search page is also at the bottom and switches between "People / Posts / Gossip / Jobs", each tab being a tag page. |
@@ -611,18 +681,18 @@ open CYLMenuExample.xcworkspace
 
 | 场景 | 实现 |
 | --- | --- |
-| 场景一：淘宝评价筛选 | `CYLProductViewController` 在商品页用 `CYLMenuFoldStyleTruncate` 预览两行关键词；`CYLReviewListViewController` 使用多选、带图标和数量的筛选，默认折叠为两行，底部箭头旋转 180° 展开/折叠。每次点击（显示点击事件）都按所有所选条件（AND，“全部”表示不限）刷新下方列表。顶部开关区分两种场景：**内存筛选**（`CYLMemoryReviewQuery`，在已加载的数据中同步匹配）与**网络筛选**（`CYLNetworkReviewQuery`，把条件编码为请求 URL，模拟服务器延迟返回，显示加载状态并丢弃过期响应）。 |
+| 场景一：淘宝评价筛选 | `CYLProductViewController` 在商品页用 `CYLMenuFoldStyle.truncate` 预览两行关键词；`CYLReviewListViewController` 使用多选、带图标和数量的筛选，默认折叠为两行，底部箭头旋转 180° 展开/折叠。每次点击（显示点击事件）都按所有所选条件（AND，“全部”表示不限）刷新下方列表。顶部开关区分两种场景：**内存筛选**（`CYLMemoryReviewQuery`，在已加载的数据中同步匹配）与**网络筛选**（`CYLNetworkReviewQuery`，把条件编码为请求 URL，模拟服务器延迟返回，显示加载状态并丢弃过期响应）。 |
 | 场景二：脉脉搜索分类 | `CYLSearchHomeViewController` push `CYLSearchCategoryViewController`，提供搜索框和底部 CYLTabBarController 分类（找人/动态/八卦/职位）；点击标签填入搜索框；“职位”页左侧为职位类别，右侧为关键词，分区标题右侧为宿主提供的行业选择按钮。 |
 
 | Scenario | Implementation |
 | --- | --- |
-| Scenario 1: Taobao review filter | `CYLProductViewController` previews two rows of keywords on the product page with `CYLMenuFoldStyleTruncate`; `CYLReviewListViewController` uses a multiple-selection filter with icons and counts, folded to two rows by default, and the bottom arrow rotates 180° to expand or collapse. Every tap (the tap event is shown) refreshes the list below by all the selected conditions (AND; "All" means no limit). A switch at the top distinguishes two modes: **in-memory filtering** (`CYLMemoryReviewQuery`, which matches synchronously within the loaded data) and **network filtering** (`CYLNetworkReviewQuery`, which encodes the conditions into a request URL, simulates a delayed server response, shows a loading state and discards stale responses). |
+| Scenario 1: Taobao review filter | `CYLProductViewController` previews two rows of keywords on the product page with `CYLMenuFoldStyle.truncate`; `CYLReviewListViewController` uses a multiple-selection filter with icons and counts, folded to two rows by default, and the bottom arrow rotates 180° to expand or collapse. Every tap (the tap event is shown) refreshes the list below by all the selected conditions (AND; "All" means no limit). A switch at the top distinguishes two modes: **in-memory filtering** (`CYLMemoryReviewQuery`, which matches synchronously within the loaded data) and **network filtering** (`CYLNetworkReviewQuery`, which encodes the conditions into a request URL, simulates a delayed server response, shows a loading state and discards stale responses). |
 | Scenario 2: Maimai search categories | `CYLSearchHomeViewController` pushes `CYLSearchCategoryViewController`, which provides the search box and the categories (People / Posts / Gossip / Jobs) in a CYLTabBarController at the bottom; tapping a tag fills in the search box; on the "Jobs" page the left side holds the job categories and the right side the keywords, and the host supplies an industry picker button on the right of the section title. |
 
 | 中文 | English |
 |:---|:---|
 | \| 查询筛选（PlusButton）· 查询参数设置 \| 淘宝评价默认显示全部；条件太多时由用户多选输入筛选条件，这正是标签列表（TagCollectionView）的用途。场景一的评价筛选增加第三种方式**数据库筛选**（`CYLDatabaseReviewQuery`）：所选条件生成一条 SQL（评分、有图、追加为 `reviews` 表的列，关键词为 `review_keywords` 表的行，全部 AND），在 SQLite 中查询，状态栏显示 SQL 与匹配数量。 \| | \| Query filters (PlusButton) · query parameter settings \| Taobao reviews show everything by default; when there are too many conditions the user enters them by multiple selection, which is exactly what the tag list (TagCollectionView) is for. The review filter of scenario 1 adds a third mode, **database filtering** (`CYLDatabaseReviewQuery`): the selected conditions generate one SQL statement (rating, with images and follow-up reviews are columns of the `reviews` table, keywords are rows of the `review_keywords` table, all combined with AND), which is queried in SQLite, and the status bar shows the SQL and the number of matches. \| |
-| \| 查询筛选（PlusButton）· 最近搜索 + 发现 \| `CYLSearchDiscoverViewController`（纯 Swift）按搜索 App 的搜索页实现：顶部返回、搜索框（占位文字为第一个发现话题）、以图搜索与“搜索”按钮；“最近搜索”折叠为两行，箭头是最后一个标签（`CYLMenuFoldControlPosition.tail`），右侧垃圾桶清空；“发现”每行两个（`gridStyle(itemsPerRow: 2)`），超出部分省略号，热门话题文字之后有“热”图标（`menuImageForItem(at:)`，文字在左、图标在右），右上角 More 按钮随机刷新；底部“按住提问，有问必答 ✨”与麦克风按钮。数据按语言放在 `CYLMenuExample.bundle/<语言>.lproj/search-discover.json`（简体中文、繁体中文、英文各一份，最近搜索与 24 个发现话题，顺序与热门话题相同），“热”图标同样按语言放在该 `.lproj`（热、熱、HOT）；刷新时随机选取 6 个；点击话题或最近搜索即填入搜索框并移到最近搜索最前。无障碍：每个标签提示“轻点两下搜索”，More 按钮读作“换一批”（核心库 `-menuAccessibilityLabelForMoreButtonInSection:`），热门图标读作“热门”，仅图标的按钮支持大字内容查看器（Large Content Viewer），边框颜色随深色模式与“增强对比度”变化，搜索与聆听时有朗读提示，以图搜索按钮给出说明而不是无响应。 \| | \| Query filters (PlusButton) · recent searches + discover \| `CYLSearchDiscoverViewController` (pure Swift) follows the search page of a search app: a back button at the top, a search box (its placeholder is the first discover topic), an image search button and a "Search" button; "Recent searches" fold to two rows, the arrow is the last tag (`CYLMenuFoldControlPosition.tail`), and the trash can on the right clears them; "Discover" has two tags per row (`gridStyle(itemsPerRow: 2)`) with overflow truncated by an ellipsis, a "Hot" icon after the text of hot topics (`menuImageForItem(at:)`, text on the left and icon on the right), and a More button at the top right that refreshes randomly; at the bottom are "Hold to ask, every question answered ✨" and a microphone button. The data lives per language in `CYLMenuExample.bundle/<语言>.lproj/search-discover.json` (one file each for Simplified Chinese, Traditional Chinese and English, with the recent searches and 24 discover topics in the same order as the hot topics), and the "Hot" icon is likewise kept per language in that `.lproj` (Simplified Chinese, Traditional Chinese and English variants of "Hot"); a refresh picks 6 at random; tapping a topic or a recent search fills in the search box and moves it to the front of the recent searches. Accessibility: each tag has the hint "Double-tap to search", the More button is read as "Shuffle" (the core's `-menuAccessibilityLabelForMoreButtonInSection:`), the hot icon is read as "Hot", icon-only buttons support the Large Content Viewer, border colors follow dark mode and Increase Contrast, searching and listening give spoken feedback, and the image search button gives an explanation instead of doing nothing. \| |
+| \| 查询筛选（PlusButton）· 最近搜索 + 发现 \| `CYLSearchDiscoverViewController`（纯 Swift）按搜索 App 的搜索页实现：顶部返回、搜索框（占位文字为第一个发现话题）、以图搜索与“搜索”按钮；“最近搜索”折叠为两行，箭头是最后一个标签（`CYLMenuFoldControlPosition.tail`），右侧垃圾桶清空；“发现”每行两个（`gridStyle(itemsPerRow: 2)`），超出部分省略号，热门话题文字之后有“热”图标（`menuImageForItem(at:)`，文字在左、图标在右），右上角 More 按钮随机刷新；底部“按住提问，有问必答 ✨”与麦克风按钮。数据按语言放在 `CYLMenuExample.bundle/<语言>.lproj/search-discover.json`（简体中文、繁体中文、英文各一份，最近搜索与 24 个发现话题，顺序与热门话题相同），“热”图标同样按语言放在该 `.lproj`（热、熱、HOT）；刷新时随机选取 6 个；点击话题或最近搜索即填入搜索框并移到最近搜索最前。无障碍：每个标签提示“轻点两下搜索”，More 按钮读作“换一批”（核心库 `menuAccessibilityLabelForMoreButton(inSection:)`），热门图标读作“热门”，仅图标的按钮支持大字内容查看器（Large Content Viewer），边框颜色随深色模式与“增强对比度”变化，搜索与聆听时有朗读提示，以图搜索按钮给出说明而不是无响应。 \| | \| Query filters (PlusButton) · recent searches + discover \| `CYLSearchDiscoverViewController` (pure Swift) follows the search page of a search app: a back button at the top, a search box (its placeholder is the first discover topic), an image search button and a "Search" button; "Recent searches" fold to two rows, the arrow is the last tag (`CYLMenuFoldControlPosition.tail`), and the trash can on the right clears them; "Discover" has two tags per row (`gridStyle(itemsPerRow: 2)`) with overflow truncated by an ellipsis, a "Hot" icon after the text of hot topics (`menuImageForItem(at:)`, text on the left and icon on the right), and a More button at the top right that refreshes randomly; at the bottom are "Hold to ask, every question answered ✨" and a microphone button. The data lives per language in `CYLMenuExample.bundle/<语言>.lproj/search-discover.json` (one file each for Simplified Chinese, Traditional Chinese and English, with the recent searches and 24 discover topics in the same order as the hot topics), and the "Hot" icon is likewise kept per language in that `.lproj` (Simplified Chinese, Traditional Chinese and English variants of "Hot"); a refresh picks 6 at random; tapping a topic or a recent search fills in the search box and moves it to the front of the recent searches. Accessibility: each tag has the hint "Double-tap to search", the More button is read as "Shuffle" (the core's `menuAccessibilityLabelForMoreButton(inSection:)`), the hot icon is read as "Hot", icon-only buttons support the Large Content Viewer, border colors follow dark mode and Increase Contrast, searching and listening give spoken feedback, and the image search button gives an explanation instead of doing nothing. \| |
 | \| 查询筛选（PlusButton）· 菜单选择 \| 移植原 Demo（`CollectionViewClassifyMenu.xcodeproj`）的分类菜单与多选筛选：`CYLMenuLinkageViewController` 继承核心库的 `CYLClassifyMenuViewController`，左上角按钮打开核心库的 `CYLMultipleFilterController`，数据源直接复用原 Demo 的 `CYLDemoDataSource`、`CYLDBManager` 与 `data.json`（工程引用原文件，不复制）。原 Demo 只实现了筛选界面，没有筛选数据；现在点击分类标签（单选，高亮）或确认多选筛选（地区、菜品）都会生成 SQL，在 `places` 表中查询，并在标签下方（`menuFooterView`）显示条件、SQL 与结果；选择保存在数据库的 `selections` 表中，再次进入时恢复。 \| | \| Query filters (PlusButton) · menu selection \| Ports the classify menu and multiple-choice filter of the original demo (`CollectionViewClassifyMenu.xcodeproj`): `CYLMenuLinkageViewController` subclasses the core's `CYLClassifyMenuViewController`, the button at the top left opens the core's `CYLMultipleFilterController`, and the data source reuses the original demo's `CYLDemoDataSource`, `CYLDBManager` and `data.json` directly (the project references the original files instead of copying them). The original demo only implemented the filter UI and had no data to filter; now tapping a category tag (single selection, highlighted) or confirming a multiple-choice filter (region, dishes) generates SQL, queries the `places` table, and shows the conditions, the SQL and the result below the tags (`menuFooterView`); the selections are saved in the `selections` table of the database and restored when you come back. \| |
 | 数据库是 `CYLExampleDatabase`（iOS SDK 自带的 libsqlite3，文件在 Caches 目录）：每次启动由 App 内的数据重新生成 `reviews`、`review_keywords`、`places` 表，`selections` 表保留各演示最后确认的条件。所有值都通过 `?` 绑定，界面上显示的 SQL 只用于展示。 | The database is `CYLExampleDatabase` (the libsqlite3 that ships with the iOS SDK, with the file in the Caches directory): on every launch the `reviews`, `review_keywords` and `places` tables are regenerated from the data inside the app, while the `selections` table keeps the conditions each demo last confirmed. All values are bound through `?`, and the SQL shown in the UI is for display only. |
 | `CYLExampleMenuSource` 演示了宿主如何把自己的模型转换为 `CYLMenuDataSource`；核心库不持有任何业务数据。 | `CYLExampleMenuSource` shows how a host turns its own models into a `CYLMenuDataSource`; the core library holds no business data. |
@@ -669,14 +739,14 @@ open CYLMenuExample.xcworkspace
 | 页面 | 实现 |
 | --- | --- |
 | 编辑备注（`CYLRemarkViewController`） | “标签”行显示已选标签（只读的 `CYLTagListView`），点击后以 sheet 弹出编辑标签。 |
-| 编辑标签（`CYLTagEditorViewController`） | 顶部「取消 / 编辑标签 / 完成」，「完成」有选择或改动时为绿色，搜索时不可用；搜索框；「最近使用」与「我的标签」（分组标题右侧为「管理」，`-menuAccessoryViewForSection:`）。选中的标签为绿色，同一标签在两个分组中同时选中。最后一个标签后是「+ 新建标签」，输入名称后新建并选中。 |
+| 编辑标签（`CYLTagEditorViewController`） | 顶部「取消 / 编辑标签 / 完成」，「完成」有选择或改动时为绿色，搜索时不可用；搜索框；「最近使用」与「我的标签」（分组标题右侧为「管理」，`menuAccessoryView(forSection:)`）。选中的标签为绿色，同一标签在两个分组中同时选中。最后一个标签后是「+ 新建标签」，输入名称后新建并选中。 |
 | 搜索 | 输入文字（不区分大小写，如 "ios" 找到 "iOS"）显示“搜索结果”，该名称的标签不存在时末尾为“+ 新建标签：ios”；点击或按键盘搜索键即新建、选中，结束搜索并滚动到新标签。 |
 | 管理 | 「管理」后点击「我的标签」中的标签可删除。 |
 
 | Page | Implementation |
 | --- | --- |
 | Edit remark (`CYLRemarkViewController`) | The "Tags" row shows the selected tags (a read-only `CYLTagListView`); tapping it presents the tag editor as a sheet. |
-| Edit tags (`CYLTagEditorViewController`) | "Cancel / Edit tags / Done" at the top; "Done" turns green when there is a selection or a change, and is unavailable while searching; a search box; "Recently used" and "My tags" (the right side of the section title shows "Manage", through `-menuAccessoryViewForSection:`). Selected tags are green, and the same tag is selected in both sections at once. After the last tag comes "+ New tag"; entering a name creates the tag and selects it. |
+| Edit tags (`CYLTagEditorViewController`) | "Cancel / Edit tags / Done" at the top; "Done" turns green when there is a selection or a change, and is unavailable while searching; a search box; "Recently used" and "My tags" (the right side of the section title shows "Manage", through `menuAccessoryView(forSection:)`). Selected tags are green, and the same tag is selected in both sections at once. After the last tag comes "+ New tag"; entering a name creates the tag and selects it. |
 | Search | Typing text (case-insensitive, so "ios" finds "iOS") shows "Search results"; when no tag with that name exists, "+ New tag: ios" appears at the end; tapping it or pressing the keyboard's search key creates and selects the tag, ends the search and scrolls to the new tag. |
 | Manage | After tapping "Manage", tapping a tag in "My tags" deletes it. |
 
@@ -684,7 +754,7 @@ open CYLMenuExample.xcworkspace
 |:---|:---|
 | 演示数据来自本地 JSON：`CYLTagEditorExample.bundle/<语言>.lproj/tags.json`（简体中文、繁体中文、英文各一份，标签相同、顺序相同），由 `CYLTagData`（`Codable`）解析，按 App 当前语言加载。内容是有意义的联系人标签（家人、大学同学、客户、iOS 开发、读书会、深圳、待回复……），以及“最近使用”和编辑备注页初始选中的标签；修改文件即可替换数据。 | The demo data comes from local JSON: `CYLTagEditorExample.bundle/<语言>.lproj/tags.json` (one file each for Simplified Chinese, Traditional Chinese and English, with the same tags in the same order), parsed by `CYLTagData` (`Codable`) and loaded according to the app's current language. The content is meaningful contact tags (family, university classmates, clients, iOS development, book club, Shenzhen, to reply...), plus the "Recently used" tags and the tags initially selected on the edit remark page; edit the file to replace the data. |
 | 第二个 Tab“折叠样式”（`CYLFoldStylesViewController`）用初始化参数创建各种折叠控件与标题样式（底部仅箭头、底部文字 + 箭头、底部仅文字、右上角文字 + 箭头（原分类菜单）、右上角仅箭头、左上角文字 + 箭头、标题居中），以及不同的标题样式（图标 + 文字、仅图标、仅文字居中、绿色标题、图标在文字之后），每个演示都使用封装好的 title 属性；再分别从 JSON、plist、YAML、XML 配置文件创建；根 TabBar 为 CYLTabBarController（底部）。 | The second tab, "Fold styles" (`CYLFoldStylesViewController`), creates various fold controls and title styles from initialization parameters (arrow only at the bottom, text + arrow at the bottom, text only at the bottom, text + arrow at the top right (the original classify menu), arrow only at the top right, text + arrow at the top left, centered title), as well as different title styles (icon + text, icon only, centered text only, a green title, icon after the text); every demo uses the encapsulated title property; it then creates them again from JSON, plist, YAML and XML configuration files; the root tab bar is a CYLTabBarController (at the bottom). |
-| 为此核心库新增：`-menuItemIsSelectableAtIndexPath:`（「+ 新建标签」这样的操作项：点击会回调，但不会被选中）、 `-menuStyleForItemAtIndexPath:`（单个标签的外观，如带边框的「+ 新建标签」）与 `-scrollToItemAtIndexPath:animated:`。 | To support this the core library adds: `-menuItemIsSelectableAtIndexPath:` (for action items such as "+ New tag": a tap calls back but the item is never selected), `-menuStyleForItemAtIndexPath:` (the look of a single tag, such as the bordered "+ New tag") and `-scrollToItemAtIndexPath:animated:`. |
+| 为此核心库新增：`menuItemIsSelectable(at:)`（「+ 新建标签」这样的操作项：点击会回调，但不会被选中）、 `menuStyleForItem(at:)`（单个标签的外观，如带边框的「+ 新建标签」）与 `scrollToItem(at:animated:)`。 | To support this the core library adds: `menuItemIsSelectable(at:)` (for action items such as "+ New tag": a tap calls back but the item is never selected), `menuStyleForItem(at:)` (the look of a single tag, such as the bordered "+ New tag") and `scrollToItem(at:animated:)`. |
 
 ```sh
 cd Example-Swift
@@ -708,8 +778,7 @@ open CYLTagEditorExample.xcworkspace
 
 | 中文 | English |
 |:---|:---|
-| 两个示例的测试（`Example/CYLMenuExampleTests`：80 个，`Example-Swift/CYLTagEditorExampleTests`：19 个）按**面向协议**组织：每个功能一个测试类、一个文件（高内聚）；测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，同时编译进两个测试 target（低耦合，不重复）。 | The tests of the two examples (`Example/CYLMenuExampleTests`: 80, `Example-Swift/CYLTagEditorExampleTests`: 19) are organized **around protocols**: one test case class and one file per feature (high cohesion); the capabilities shared between tests are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into both test targets (low coupling, no duplication). |
-| 两个示例的测试按**面向协议**组织：每个功能一个测试类、一个文件，测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，同时编译进两个测试 target。 | The tests of both examples are organized around protocols: one test case class and one file per feature, and the capabilities they share are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into both test targets. |
+| 两个示例的测试（`Example/CYLMenuExampleTests`：115 个，`Example-Swift/CYLTagEditorExampleTests`：22 个）按**面向协议**组织：每个功能一个测试类、一个文件，测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，同时编译进两个测试 target。 | The tests of the two examples (`Example/CYLMenuExampleTests`: 115, `Example-Swift/CYLTagEditorExampleTests`: 22) are organized around protocols: one test case class and one file per feature, and the capabilities they share are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into both test targets. |
 
 | 协议 | 作用 |
 | --- | --- |
@@ -761,8 +830,8 @@ open CYLTagEditorExample.xcworkspace
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | The Swift example: tag data, tag editing, fold styles, accessibility |
 
 ```sh
-scripts/unit-tests.sh example   # 80 tests; screenshots in build/test-screenshots/example/
-scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshots/swift/
+scripts/unit-tests.sh example   # 115 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh swift     # 22 tests; screenshots in build/test-screenshots/swift/
 ```
 
 | 中文 | English |
@@ -838,45 +907,7 @@ scripts/unit-tests.sh swift     # 19 tests; screenshots in build/test-screenshot
 
 | 中文 | English |
 |:---|:---|
-| 这次命名变更与旧名称在**源码和运行时都不兼容**。集成新版本时，请更新 import、类型引用、自定义的 XIB / storyboard 类，以及所有 `NSClassFromString` 调用： | This naming change is **source and runtime incompatible** with the old names. Update imports, type references, custom XIB/storyboard classes, and any `NSClassFromString` calls when integrating the new version: |
-
-| 旧名称 | 新名称 |
-| --- | --- |
-| `CollectionViewCell` | `CYLCollectionViewCell` |
-| `FilterBaseController`, `FilterCollectionCell` | `CYLFilterBaseController`, `CYLFilterCollectionCell` |
-| `UICollectionViewLeftAlignedLayout` | `CYLCollectionViewLeftAlignedLayout` |
-| `TagView`, `TagGroup`, `TagModel` | `CYLTagView`, `CYLTagGroup`, `CYLTagModel` |
-| `HeaderCell`, `TagCell` | `CYLTagHeaderCell`, `CYLTagCell` |
-| `FilterControllerDelegate`, `FilterHeaderViewDelegate`, `HeaderCellDelegate` | `CYLFilterControllerDelegate`, `CYLFilterHeaderViewDelegate`, `CYLTagHeaderCellDelegate` |
-| `+[TagView TagView]` | `+[CYLTagView tagView]` |
-| `filterControllerDidCompleted:` | `filterControllerDidComplete:` |
-| `filterHeaderViewMoreBtnClicked:`, `moreBtnClicked:` | `filterHeaderViewDidTapMoreButton:`, `moreButtonTapped:` |
-| `headerViewDidClickedNameView:index:` | `headerViewDidTapNameView:index:` |
-| `cyl_setBoarderWith:color:` | `cyl_setBorderWidth:color:` |
-
-| Old name | New name |
-| --- | --- |
-| `CollectionViewCell` | `CYLCollectionViewCell` |
-| `FilterBaseController`, `FilterCollectionCell` | `CYLFilterBaseController`, `CYLFilterCollectionCell` |
-| `UICollectionViewLeftAlignedLayout` | `CYLCollectionViewLeftAlignedLayout` |
-| `TagView`, `TagGroup`, `TagModel` | `CYLTagView`, `CYLTagGroup`, `CYLTagModel` |
-| `HeaderCell`, `TagCell` | `CYLTagHeaderCell`, `CYLTagCell` |
-| `FilterControllerDelegate`, `FilterHeaderViewDelegate`, `HeaderCellDelegate` | `CYLFilterControllerDelegate`, `CYLFilterHeaderViewDelegate`, `CYLTagHeaderCellDelegate` |
-| `+[TagView TagView]` | `+[CYLTagView tagView]` |
-| `filterControllerDidCompleted:` | `filterControllerDidComplete:` |
-| `filterHeaderViewMoreBtnClicked:`, `moreBtnClicked:` | `filterHeaderViewDidTapMoreButton:`, `moreButtonTapped:` |
-| `headerViewDidClickedNameView:index:` | `headerViewDidTapNameView:index:` |
-| `cyl_setBoarderWith:color:` | `cyl_setBorderWidth:color:` |
-
-| 中文 | English |
-|:---|:---|
-| Category 头文件使用 `UIView+CYLGeneral.h` 这样的名称；category 方法使用 `cyl_` 前缀。`NSArray` 和 `NSDictionary` 不再覆盖系统的 `descriptionWithLocale:` 来打印日志；需要旧的自定义格式时，请显式调用 `cyl_descriptionWithLocale:`。 | Category headers use names such as `UIView+CYLGeneral.h`; category methods use the `cyl_` prefix. `NSArray` and `NSDictionary` no longer override the system `descriptionWithLocale:` for logging; call `cyl_descriptionWithLocale:` explicitly when the old custom format is desired. |
-
-### 按钮布局：不再使用已弃用的 insets / Button layout without deprecated insets
-
-| 中文 | English |
-|:---|:---|
-| iOS 15 弃用了 `titleEdgeInsets`、`imageEdgeInsets` 和 `adjustsImageWhenHighlighted`。组件不再使用它们：`CYLIndexPathButton` 提供 `cyl_imageTitleSpacing` 和 `cyl_titleLeadingInset`，`CYLRightImageButton` 通过重写内容区域把图片放在标题之后。图片辅助方法使用 `UIGraphicsImageRenderer`。如果你自己给这些按钮设置了 edge insets，请改用新属性。 | iOS 15 deprecates `titleEdgeInsets`, `imageEdgeInsets` and `adjustsImageWhenHighlighted`. The component no longer uses them: `CYLIndexPathButton` offers `cyl_imageTitleSpacing` and `cyl_titleLeadingInset`, and `CYLRightImageButton` places its image after the title by overriding the content rects. Image helpers use `UIGraphicsImageRenderer`. If you set edge insets on these buttons yourself, use the new properties instead. |
+| 类型和方法的重命名（`CYL` 前缀、Swift 命名）与旧的 Objective-C 名称在**源码和运行时都不兼容**；集成新版本时请更新 import、类型引用、自定义的 XIB / storyboard 类。完整的旧名称与新名称对照见 [docs/Swift-Migration.md](docs/Swift-Migration.md)（“Swift API changes”）。iOS 15 弃用的 `titleEdgeInsets`、`imageEdgeInsets` 和 `adjustsImageWhenHighlighted` 不再使用，按钮布局由 `CYLMenuStyle` 的 `imageTitleSpacing` 与 `imagePlacement` 控制。 | The renaming of types and methods (the `CYL` prefix, Swift naming) is **source and runtime incompatible** with the old Objective-C names; when integrating the new version update imports, type references and custom XIB / storyboard classes. The full table of old and new names is in [docs/Swift-Migration.md](docs/Swift-Migration.md) ("Swift API changes"). The `titleEdgeInsets`, `imageEdgeInsets` and `adjustsImageWhenHighlighted` that iOS 15 deprecates are no longer used; the button layout is controlled by `CYLMenuStyle`'s `imageTitleSpacing` and `imagePlacement`. |
 
 ### 发布 / Release
 
