@@ -2670,6 +2670,29 @@ private extension CYLTagListView {
     }
 
     /**
+     * Removed from its window in the middle of a drag or a smear: the gesture is over, so the delegate hears `false` and a
+     * host that locked its scroll view unlocks it.
+     */
+    open override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window == nil else {
+            return
+        }
+        if isReordering {
+            isReordering = false
+            movingItem = nil
+            pressedIndexPath = nil
+            collectionView.cancelInteractiveMovement()
+            menuDelegate?.menu?(self, didChangeReordering: false)
+        }
+        if smearStart != nil {
+            smearStart = nil
+            smearTouchDown = nil
+            menuDelegate?.menu?(self, didChangeSmearing: false)
+        }
+    }
+
+    /**
      * Reorders on a long press and a move; a long press that does not move is reported (onTagLongClick).
      */
     @objc func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {

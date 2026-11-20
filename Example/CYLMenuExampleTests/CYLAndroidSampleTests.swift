@@ -406,6 +406,11 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         press(.began)
         press(.cancelled)
         XCTAssertEqual(source.reordering, [true, false, true, false], "a cancelled drag reports false too")
+        // Removed from its window in the middle of a drag: false too.
+        press(.began)
+        list.removeFromSuperview()
+        XCTAssertEqual(source.reordering, [true, false, true, false, true, false], "removing the view ends the drag")
+        XCTAssertFalse(list.isReordering)
     }
 
     private final class CYLFakePan: UIPanGestureRecognizer {
