@@ -12,7 +12,7 @@ tags: [android, ios, api-parity, score]
 | 满分是没有 `TODO` 行，全部是 `TODO` 则为 0。循环：把现有的 iOS 代码对应到 `TODO` 行，评分，先在核心库中实现缺失的 iOS API（逻辑和名称与 Android 相同），再在 iOS 示例（Android 示例的移植）中展示，重新评分，直到 100。 | Full marks when no row is `TODO`; 0 when every row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100. |
 
 <!-- bilingual:keep -->
-**Score: 830 / 830 with an iOS counterpart = 100.0 / 100.** 评分：830 / 830 个符号有 iOS 对应项 = 100.0 / 100。
+**Score: 832 / 832 with an iOS counterpart = 100.0 / 100.** 评分：832 / 832 个符号有 iOS 对应项 = 100.0 / 100。
 
 <!-- bilingual:keep -->
 | Android API | 说明 / Description | iOS API |
@@ -239,20 +239,22 @@ tags: [android, ios, api-parity, score]
 | `CYLMenuDelegate.menuDidRequestNewItemWithName` | method, `CYLMenuDataSource.kt:94` | `CYLMenuDelegate.menu(_:didRequestNewItemWithName:at:)` |
 | `CYLMenuDelegate.menuDidDeselectItemAtIndexPath` | method, `CYLMenuDataSource.kt:95` | `CYLMenuDelegate.menu(_:didDeselectItemAt:)` |
 | `CYLMenuDelegate.menuDidChangeSelectedItems` | method, `CYLMenuDataSource.kt:96` | `CYLMenuDelegate.menu(_:didChangeSelectedItems:)` |
-| `CYLMenuDelegate.menuDidConfirmSelectedItems` | method, `CYLMenuDataSource.kt:97` | `CYLMenuDelegate.menu(_:didConfirmSelectedItems:)` |
-| `CYLMenuDelegate.menuDidChangeExpanded` | method, `CYLMenuDataSource.kt:98` | `CYLMenuDelegate.menu(_:didChangeExpanded:inSection:)` |
-| `CYLMenuDelegate.menuDidChangeContentHeight` | method, `CYLMenuDataSource.kt:99` | `CYLMenuDelegate.menu(_:didChangeContentHeight:)` |
-| `CYLMenuDelegate.menuDidTapMoreButtonInSection` | method, `CYLMenuDataSource.kt:100` | `CYLMenuDelegate.menu(_:didTapMoreButtonInSection:)` |
-| `CYLMenuDelegate.menuDidDeleteItemAtIndexPath` | method, `CYLMenuDataSource.kt:101` | `CYLMenuDelegate.menu(_:didDeleteItemAt:)` |
-| `CYLMenuDelegate.menuDidLongPressItemAtIndexPath` | method, `CYLMenuDataSource.kt:102` | `CYLMenuDelegate.menu(_:didLongPressItemAt:)` |
-| `CYLMenuDelegate.menuDidMoveItemAtIndexPath` | method, `CYLMenuDataSource.kt:103` | `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` |
-| `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath` | method, `CYLMenuDataSource.kt:104` | `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` |
-| `CYLMenuDelegate.menuDidChangeEditing` | method, `CYLMenuDataSource.kt:107` | `CYLMenuDelegate.menu(_:didChangeEditing:)` |
-| `CYLMenuDelegate.menuDidFinishEditingWithTitles` | method, `CYLMenuDataSource.kt:113` | `CYLMenuDelegate.menu(_:didFinishEditingWithTitles:)` |
-| `CYLMenuDelegate.menuDidFinishEditingWithItems` | method, `CYLMenuDataSource.kt:119` | `CYLMenuDelegate.menu(_:didFinishEditingWithItems:)` |
-| `CYLMenuDelegate.menuDidRenameItemAtIndexPath` | method, `CYLMenuDataSource.kt:122` | `CYLMenuDelegate.menu(_:didRenameItemAt:to:)` |
-| `CYLMenuDelegate.menuDidTapClearButtonInSection` | method, `CYLMenuDataSource.kt:125` | `CYLMenuDelegate.menu(_:didTapClearButtonInSection:)` |
-| `CYLMenuDelegate.handlesLongPress` | method, `CYLMenuDataSource.kt:128` | `responds(to: #selector(CYLMenuDelegate.menu(_:didLongPressItemAt:)))` (optional Objective-C method; `CYLTagListView` checks it) |
+| `CYLMenuDelegate.menuDidChangeReordering` | method, `CYLMenuDataSource.kt:103` | CYLMenuDelegate menuDidChangeReordering(_:reordering:) (agreed name; iOS adds it, Mac session) |
+| `CYLMenuDelegate.menuDidChangeSmearing` | method, `CYLMenuDataSource.kt:109` | CYLMenuDelegate menuDidChangeSmearing(_:smearing:) (agreed name; iOS adds it, Mac session) |
+| `CYLMenuDelegate.menuDidConfirmSelectedItems` | method, `CYLMenuDataSource.kt:110` | `CYLMenuDelegate.menu(_:didConfirmSelectedItems:)` |
+| `CYLMenuDelegate.menuDidChangeExpanded` | method, `CYLMenuDataSource.kt:111` | `CYLMenuDelegate.menu(_:didChangeExpanded:inSection:)` |
+| `CYLMenuDelegate.menuDidChangeContentHeight` | method, `CYLMenuDataSource.kt:112` | `CYLMenuDelegate.menu(_:didChangeContentHeight:)` |
+| `CYLMenuDelegate.menuDidTapMoreButtonInSection` | method, `CYLMenuDataSource.kt:113` | `CYLMenuDelegate.menu(_:didTapMoreButtonInSection:)` |
+| `CYLMenuDelegate.menuDidDeleteItemAtIndexPath` | method, `CYLMenuDataSource.kt:114` | `CYLMenuDelegate.menu(_:didDeleteItemAt:)` |
+| `CYLMenuDelegate.menuDidLongPressItemAtIndexPath` | method, `CYLMenuDataSource.kt:115` | `CYLMenuDelegate.menu(_:didLongPressItemAt:)` |
+| `CYLMenuDelegate.menuDidMoveItemAtIndexPath` | method, `CYLMenuDataSource.kt:116` | `CYLMenuDelegate.menu(_:didMoveItemAt:to:)` |
+| `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath` | method, `CYLMenuDataSource.kt:117` | `CYLMenuDelegate.menu(_:didBeginDraggingSelectedItemAt:)` |
+| `CYLMenuDelegate.menuDidChangeEditing` | method, `CYLMenuDataSource.kt:120` | `CYLMenuDelegate.menu(_:didChangeEditing:)` |
+| `CYLMenuDelegate.menuDidFinishEditingWithTitles` | method, `CYLMenuDataSource.kt:126` | `CYLMenuDelegate.menu(_:didFinishEditingWithTitles:)` |
+| `CYLMenuDelegate.menuDidFinishEditingWithItems` | method, `CYLMenuDataSource.kt:132` | `CYLMenuDelegate.menu(_:didFinishEditingWithItems:)` |
+| `CYLMenuDelegate.menuDidRenameItemAtIndexPath` | method, `CYLMenuDataSource.kt:135` | `CYLMenuDelegate.menu(_:didRenameItemAt:to:)` |
+| `CYLMenuDelegate.menuDidTapClearButtonInSection` | method, `CYLMenuDataSource.kt:138` | `CYLMenuDelegate.menu(_:didTapClearButtonInSection:)` |
+| `CYLMenuDelegate.handlesLongPress` | method, `CYLMenuDataSource.kt:141` | `responds(to: #selector(CYLMenuDelegate.menu(_:didLongPressItemAt:)))` (optional Objective-C method; `CYLTagListView` checks it) |
 | `CYLMenuFoldControlPosition` | class, `CYLMenuFoldControl.kt:6` | `CYLMenuFoldControlPosition` |
 | `CYLMenuFoldControlPosition.NONE` | enum case, `CYLMenuFoldControl.kt:7` | `CYLMenuFoldControlPositionNone` |
 | `CYLMenuFoldControlPosition.FOOTER` | enum case, `CYLMenuFoldControl.kt:8` | `CYLMenuFoldControlPositionFooter` |
@@ -671,22 +673,22 @@ tags: [android, ios, api-parity, score]
 | `CYLTagListView.selectedText` | read-only property, `CYLTagListView.kt:1261` | `CYLTagListView.selectedText` |
 | `CYLTagListView.selectItemsFromIndexPath` | method, `CYLTagListView.kt:1269` | `CYLTagListView.selectItems(from:through:)` |
 | `CYLTagListView.allowsSmearSelection` | property, `CYLTagListView.kt:1284` | `CYLTagListView.allowsSmearSelection` |
-| `CYLTagListView.addTagWithTitle` | method, `CYLTagListView.kt:1335` | `CYLTagListView.addTag(withTitle:)` |
-| `CYLTagListView.insertTagWithTitle` | method, `CYLTagListView.kt:1337` | `CYLTagListView.insertTag(withTitle:at:)` |
-| `CYLTagListView.removeTagsAtIndexes` | method, `CYLTagListView.kt:1340` | `CYLTagListView.removeTags(at:)` |
-| `CYLTagListView.toggleSelectionOfItemAtIndexPath` | method, `CYLTagListView.kt:1351` | `CYLTagListView.toggleSelection(at:)` |
-| `CYLTagListView.selectedTitles` | read-only property, `CYLTagListView.kt:1364` | `CYLTagListView.selectedTitles` |
-| `CYLTagListView.selectedIndexPaths` | property, `CYLTagListView.kt:1370` | `CYLTagListView.selectedIndexPaths` |
-| `CYLTagListView.selectItemAtIndexPath` | method, `CYLTagListView.kt:1383` | `CYLTagListView.selectItem(at:)` |
-| `CYLTagListView.deselectItemAtIndexPath` | method, `CYLTagListView.kt:1389` | `CYLTagListView.deselectItem(at:)` |
-| `CYLTagListView.deselectAllItems` | method, `CYLTagListView.kt:1394` | `CYLTagListView.deselectAllItems()` |
-| `CYLTagListView.canFoldSection` | method, `CYLTagListView.kt:1455` | `CYLTagListView.canFoldSection(_:)` |
-| `CYLTagListView.numberOfRowsInSection` | method, `CYLTagListView.kt:1460` | `CYLTagListView.numberOfRows(inSection:)` |
-| `CYLTagListView.isSectionExpanded` | method, `CYLTagListView.kt:1465` | `CYLTagListView.isSectionExpanded(_:)` |
-| `CYLTagListView.numberOfVisibleItemsInSection` | method, `CYLTagListView.kt:1467` | `CYLTagListView.numberOfVisibleItems(inSection:)` |
-| `CYLTagListView.setExpanded` | method, `CYLTagListView.kt:1496` | `CYLTagListView.setExpanded(_:forSection:animated:)` |
-| `CYLTagListView.scrollToSection` | method, `CYLTagListView.kt:1517` | `CYLTagListView.scroll(toSection:animated:)` |
-| `CYLTagListView.scrollToItemAtIndexPath` | method, `CYLTagListView.kt:1523` | `CYLTagListView.scrollToItem(at:animated:)` |
+| `CYLTagListView.addTagWithTitle` | method, `CYLTagListView.kt:1336` | `CYLTagListView.addTag(withTitle:)` |
+| `CYLTagListView.insertTagWithTitle` | method, `CYLTagListView.kt:1338` | `CYLTagListView.insertTag(withTitle:at:)` |
+| `CYLTagListView.removeTagsAtIndexes` | method, `CYLTagListView.kt:1341` | `CYLTagListView.removeTags(at:)` |
+| `CYLTagListView.toggleSelectionOfItemAtIndexPath` | method, `CYLTagListView.kt:1352` | `CYLTagListView.toggleSelection(at:)` |
+| `CYLTagListView.selectedTitles` | read-only property, `CYLTagListView.kt:1365` | `CYLTagListView.selectedTitles` |
+| `CYLTagListView.selectedIndexPaths` | property, `CYLTagListView.kt:1371` | `CYLTagListView.selectedIndexPaths` |
+| `CYLTagListView.selectItemAtIndexPath` | method, `CYLTagListView.kt:1384` | `CYLTagListView.selectItem(at:)` |
+| `CYLTagListView.deselectItemAtIndexPath` | method, `CYLTagListView.kt:1390` | `CYLTagListView.deselectItem(at:)` |
+| `CYLTagListView.deselectAllItems` | method, `CYLTagListView.kt:1395` | `CYLTagListView.deselectAllItems()` |
+| `CYLTagListView.canFoldSection` | method, `CYLTagListView.kt:1456` | `CYLTagListView.canFoldSection(_:)` |
+| `CYLTagListView.numberOfRowsInSection` | method, `CYLTagListView.kt:1461` | `CYLTagListView.numberOfRows(inSection:)` |
+| `CYLTagListView.isSectionExpanded` | method, `CYLTagListView.kt:1466` | `CYLTagListView.isSectionExpanded(_:)` |
+| `CYLTagListView.numberOfVisibleItemsInSection` | method, `CYLTagListView.kt:1468` | `CYLTagListView.numberOfVisibleItems(inSection:)` |
+| `CYLTagListView.setExpanded` | method, `CYLTagListView.kt:1497` | `CYLTagListView.setExpanded(_:forSection:animated:)` |
+| `CYLTagListView.scrollToSection` | method, `CYLTagListView.kt:1518` | `CYLTagListView.scroll(toSection:animated:)` |
+| `CYLTagListView.scrollToItemAtIndexPath` | method, `CYLTagListView.kt:1524` | `CYLTagListView.scrollToItem(at:animated:)` |
 | `CYLTagListViewSections` | read-only property, `CYLTagListViewConfiguration.kt:24` | `CYLTagListKey.sections` |
 | `CYLTagListViewStyle` | read-only property, `CYLTagListViewConfiguration.kt:28` | `CYLTagListKey.style` |
 | `CYLTagListViewSelectionMode` | read-only property, `CYLTagListViewConfiguration.kt:32` | `CYLTagListKey.selectionMode` |

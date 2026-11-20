@@ -1918,6 +1918,7 @@ export class CYLTagListState {
     }
     this.smearBase = new Map<string, CYLIndexPath>(this.selection);
     this.smearAnchor = indexPath;
+    this.menuDelegate?.menuDidChangeSmearing?.(this, true);
     this.smearSelects = !this.isSelected(indexPath);
     this.smearTo(indexPath);
   }
@@ -1942,8 +1943,12 @@ export class CYLTagListState {
 
   /** Ends the smear. */
   endSmear(): void {
+    const wasSmearing = this.smearAnchor !== undefined;
     this.smearBase = undefined;
     this.smearAnchor = undefined;
+    if (wasSmearing) {
+      this.menuDelegate?.menuDidChangeSmearing?.(this, false);
+    }
   }
 
   /** Whether a smear is in progress. */
@@ -2283,6 +2288,7 @@ export class CYLTagListState {
     this.pressedIndexPath = indexPath;
     if (this.canReorder) {
       this.isReorderingStorage = true;
+      this.menuDelegate?.menuDidChangeReordering?.(this, true);
       if (this.isSelected(indexPath)) {
         this.reportSelectedDrag(indexPath);
       }
@@ -2302,6 +2308,7 @@ export class CYLTagListState {
       return;
     }
     this.isReorderingStorage = false;
+    this.menuDelegate?.menuDidChangeReordering?.(this, false);
     if (pressed !== undefined && moved && destination !== undefined) {
       this.moveItem(pressed, this.targetIndexPathForMove(pressed, destination));
     } else if (pressed !== undefined && !moved) {
@@ -2314,6 +2321,7 @@ export class CYLTagListState {
     this.pressedIndexPath = undefined;
     if (this.isReorderingStorage) {
       this.isReorderingStorage = false;
+      this.menuDelegate?.menuDidChangeReordering?.(this, false);
       this.setNeedsDisplay();
     }
   }

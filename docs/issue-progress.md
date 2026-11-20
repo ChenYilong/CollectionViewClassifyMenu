@@ -1587,3 +1587,23 @@ tags: [issues, ui, cocoapods, progress]
   the owner's list and are unchanged. The requests for CYLTabBarController / CYLAnimatedItem and CYLTableViewPlaceHolder
   went to their owning sessions (the CYLTabBarController one also raises the Lottie subspec's 13.0). Score 40 / 100 until
   they confirm (−40) and this repository re-pins if CYLAnimatedItem changes (−20).
+
+### TODO (2026-11-20, `feat/harmony`, Windows session): the tag list reports drags and smears on Android and HarmonyOS, as the mini program
+
+- **Request (the user through the CYLSearchViewController session, verbatim):** "小程序联系人example拖动taglist期间禁止滚动测试通过，现在排查其他端的逻辑，要求与小程序的逻辑保持一致，修改searchbar以及collectionview库里的core代码实现该功能"
+  (English: the mini program contact tags example's no-scroll-while-dragging passed; now check the other platforms, make
+  their logic the same as the mini program's, and change the core code of the search bar and the collection view
+  libraries to do it.)
+- **Acceptance (100):** `CYLMenuDelegate.menuDidChangeReordering(menu, reordering)` and `menuDidChangeSmearing(menu,
+  smearing)` on Android and HarmonyOS, true at the start of a drag or smear, false at its end and cancel (a drop, a
+  cancelled touch), once per change (50); tests: a drag, a cancelled drag and a smear give the pairs in order (40); the
+  commit sent to the CYLSearchViewController session (10). Pass: 60.
+- **Done (100 / 100):** Android: `CYLMenuDelegate` defaults; `CYLTagListView` reports reordering at the long press that
+  starts a drag and in `finishDrag` (drop or cancel), smearing in `beginSmear` and at the touch's end or cancel.
+  HarmonyOS: optional `CYLMenuDelegate` members; `CYLTagListState` reports reordering in `beginLongPress` (when it
+  reorders), `endLongPress` and `cancelLongPress`, smearing in `beginSmear` and `endSmear` (once, only after a smear).
+  Tests: Android `CYLWordPickerTest.gestureStateCallbacksComeInPairs` (real touch events: a smear, a long-press drag with
+  a drop, a cancelled drag); HarmonyOS `TagListWordPicker.test.ets` (the same, plus repeated ends that do not report
+  twice). Android library 103 / 0, the example builds; HarmonyOS host tests 79 / 79, the app builds. `docs/android-ios-api.md`
+  maps both to the agreed iOS names (Mac-CollectionViewClassifyMenu adds them).
+

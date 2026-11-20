@@ -91,6 +91,34 @@ export default function tagListWordPickerTest() {
       expect(list.selectedText).assertEqual(' Design');
     });
 
+    it('gestureStateCallbacksComeInPairs', 0, () => {
+      // As the mini program's reorderingchange / smearingchange: true at the start, false at the drop or the cancel.
+      const list = wordPicker('ABCDEFGHIJ');
+      const events: string[] = [];
+      const delegate: CYLMenuDelegate = {
+        menuDidChangeReordering: (menu: Object, reordering: boolean): void => {
+          events.push(`reordering ${reordering}`);
+        },
+        menuDidChangeSmearing: (menu: Object, smearing: boolean): void => {
+          events.push(`smearing ${smearing}`);
+        }
+      };
+      list.menuDelegate = delegate;
+      list.beginSmear(path(0));
+      list.smearTo(path(3));
+      list.endSmear();
+      list.endSmear();
+      list.allowsSmearSelection = false;
+      list.allowsReordering = true;
+      expect(list.beginLongPress(path(1))).assertTrue();
+      list.endLongPress(path(4), true);
+      expect(list.beginLongPress(path(2))).assertTrue();
+      list.cancelLongPress();
+      list.cancelLongPress();
+      expect(events.join('|')).assertEqual(
+        'smearing true|smearing false|reordering true|reordering false|reordering true|reordering false');
+    });
+
     it('smearSelectsAndDeselectsARange', 0, () => {
       const list = wordPicker('ABCDEFGHIJKL');
       const recorder = new CYLSelectionRecorder();

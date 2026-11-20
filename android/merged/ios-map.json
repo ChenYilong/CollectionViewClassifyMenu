@@ -78,5 +78,7 @@
  "CYLTagListView.moveItemAtIndexPath": "CYLTagListView -collectionView:moveItemAtIndexPath:toIndexPath: (UICollectionViewDataSource)",
  "CYLMenuDataSource.supportsRenamingItems": "respondsToSelector: of -menuRenameItemAtIndexPath:toTitle: (the rename indicator)",
  "CYLTagListCache.supportsItems": "respondsToSelector: of -saveItems:forSection: (an optional CYLTagListCache method)",
- "CYLTagListView.loadItemsWithKeys": "CYLTagListView -loadItemsWithKeys:completion:"
+ "CYLTagListView.loadItemsWithKeys": "CYLTagListView -loadItemsWithKeys:completion:",
+ "CYLMenuDelegate.menuDidChangeReordering": "CYLMenuDelegate menuDidChangeReordering(_:reordering:) (agreed name; iOS adds it, Mac session)",
+ "CYLMenuDelegate.menuDidChangeSmearing": "CYLMenuDelegate menuDidChangeSmearing(_:smearing:) (agreed name; iOS adds it, Mac session)"
 }
