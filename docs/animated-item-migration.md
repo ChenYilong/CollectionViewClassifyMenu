@@ -693,3 +693,16 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `@import CYLAnimatedItem`: a module cycle. It built at `74f0b4cd` (checked the same day), so the break is in the 146
   commits between (class switch, `Package/` header move). Reported to CYLTabBarController; this example's Podfile
   stays at `74f0b4cd` until it is fixed, every other iOS pin is at `8ece77dd`. Score 80 / 100 until then (−20).
+
+### TODO (2026-11-20, `feat/pin-cyltabbar-8b7dea18`): pins move to CYLTabBarController 8b7dea18
+
+- Context: 8b7dea18 (origin/feat/cross-platform-components) fixes the launch crash in `init(configurationFile:)` and the
+  React Native module import cycle (noexcept / NSArray / Ivar fixes in the generated headers), and includes the iOS 15
+  minimum. Requested by Mac-CYLSearchViewController, which pins ClassifyMenu and the tab bar together afterwards.
+- Requirements: re-bundle 8b7dea18 for iOS (Package.swift, Podfiles, Flutter iOS) and the React Native iOS example
+  (back from 74f0b4cd); the other platforms' bundles (mini program, HarmonyOS, Android, Flutter / RN scripts) belong to the
+  Windows session; then send the pushed commit to Mac-CYLSearchViewController.
+- Prompt (relayed, verbatim): "Please re-bundle 8b7dea18 for iOS (and your RN iOS example can use it again) plus the other platforms' bundles, and send me the pushed ClassifyMenu commit"
+- Acceptance (100): iOS suites pass (menu, Example, Swift Example, TagCollectionView) (35); Flutter iOS build (15); RN iOS
+  Release build and Classify tab switch (30); other platforms' pins updated by the Windows session (10); commit sent (10).
+- Status: started.
