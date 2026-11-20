@@ -31,7 +31,7 @@ printf '{"name":"react-native-cyl-tag-list","version":"0.1.0","main":"src/index.
 cp "$LIB/src/CylTagListViewNativeComponent.ts" specs/
 
 # The pages of the iOS/Android example, unchanged.
-for f in TagListPage.tsx Slider.tsx i18n.ts ClassifyPage.tsx PlacesDatabase.ts launchOptions.ts; do
+for f in TagListPage.tsx Slider.tsx i18n.ts dataStrings.ts ClassifyPage.tsx PlacesDatabase.ts launchOptions.ts; do
   cp "$LIB/example/src/$f" src/
 done
 
@@ -46,6 +46,8 @@ npx react-native bundle-harmony --dev false
 
 # RNOH 0.86.1 calls a WebSocket API of API 26 behind a run-time check; this cast lets it compile on API 21 SDKs.
 if [ -d harmony/oh_modules ]; then
-  find harmony/oh_modules/.ohpm -path '*turboModules/WebSocketTurboModule.ts' -exec sed -i '' \
+  # `-i.cylbak` works with BSD sed (macOS) and GNU sed (Linux, Git Bash on Windows); `-i ''` is BSD only.
+  find harmony/oh_modules/.ohpm -path '*turboModules/WebSocketTurboModule.ts' -exec sed -i.cylbak \
     "s/      ws.on('openInfo', (err: BusinessError, value: webSocket.WebSocketOpenInfo) => {/      (ws as ESObject).on('openInfo', (err: BusinessError, value: ESObject) => {/" {} \;
+  find harmony/oh_modules/.ohpm -name '*.cylbak' -delete
 fi

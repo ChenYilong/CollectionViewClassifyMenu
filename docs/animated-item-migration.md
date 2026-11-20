@@ -761,3 +761,57 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   mid-gesture; tests: smear true / false once, reorder begin / drop / cancel / removal. Suites: menu 37, TagCollectionView 6,
   Swift Example 22, Example 116, all pass. Status: DONE, score 100 / 100: the Windows session mapped the two rows (4ee79396; tables 895 / 895,
   832 / 832, 951 / 951).
+
+### TODO (2026-11-20, `feat/harmony`, Windows session): React Native HarmonyOS example builds again after `classifymenu` depends on `cylanimateditem`
+
+- Context: resumed from uncommitted work left in the `C:\w\cvcm-b` worktree. `harmony/classifymenu`'s `oh-package.json5`
+  depends on `cylanimateditem` by `file:../cylanimateditem` (the CYLAnimatedItemView migration), but
+  `react-native/react-native-cyl-tag-list/harmony-example/harmony/build-profile.json5` only listed `classifymenu` as a
+  local module, not `cylanimateditem`: a module-path dependency hvigor cannot resolve without every module listed,
+  so the RN example stopped building after the core switched. The task also was not logged before starting; logging
+  it now, per AGENTS.md "Task log in docs/".
+- Requirements: (1) add `cylanimateditem` to `build-profile.json5`'s module list, matching `harmony/entry`'s own
+  `build-profile.json5`; (2) the shell app (not the core, which depends on no engine) registers its own animation
+  engine before any tag shows, as `harmony/entry` does: a new `CYLRNAnimationEngines.ets` registers Lottie
+  (`CYLAnimatedItemEngines.register('Lottie')`, `CYLTagAnimationBuilder.register(...)`) with a
+  `CYLLottiePlayer` / `CYLRNLottieIconView` built on `@ohos/lottie` (added to `entry/oh-package.json5`), called from
+  `EntryAbility.onCreate`; (3) `scripts/setup.sh` copies `dataStrings.ts` too (added by the iOS/Android example since
+  this was last run) and the `WebSocketTurboModule.ts` patch's `sed -i ''` is BSD-only and fails under GNU sed /
+  Git Bash on Windows, so it needs a portable in-place form.
+- Acceptance (100): `ohpm install` and `hvigorw assembleHar` / `assembleHap` succeed for the RN HarmonyOS example with
+  the new module wired in (40); the example's tags play Lottie through the registered engine, unchanged from before
+  the core's dependency switch (30); `scripts/setup.sh` runs end to end on this Windows machine (20); committed with
+  the task logged (10). Pass: 60.
+- Result (2026-11-20): `scripts/setup.sh` ran end to end with Git Bash
+  (`"C:\Program Files\Git\bin\bash.exe" scripts/setup.sh`): codegen, bundling and the portable `sed` patch all
+  succeeded, no leftover `.cylbak` files. `ohpm install` needed several retries: fresh extractions of
+  `@ohos/hypium`, `@ohos/lottie` and `@react-native-ohos/op-sqlite` failed to rename into place
+  (`EPERM: operation not permitted, rename ...<pkg>.<pid>.<n>.<n> -> ...<pkg>`), a Node-on-Windows
+  rename race (PowerShell's own `Move-Item` completed the same rename instantly after the failure, so it is not a
+  real permission problem); a watcher loop that finishes any such pending rename while `ohpm install` runs made it
+  succeed consistently. `hvigorw assembleHap` then got past `PreBuild` through `BuildJS` and `CompileResource` (so
+  `CYLRNAnimationEngines.ets` and the `EntryAbility.onCreate` change parse and resource-process cleanly, and
+  `cylanimateditem` / `classifymenu` / `cyltabbar` all finish their own, native-free `BuildNativeWithCmake` step), then
+  failed at `:entry:default@BuildNativeWithCmake`: `oh_modules/@rnoh/react-native-openharmony/src/main/cpp/third-party`
+  is missing `fmt`, `double-conversion`, `glog`, `fast_float`, `rn` and boost's `BoostRoot.cmake` (only a partial
+  `boost/` folder extracted). **Root cause found:** `HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled`
+  is `0` on this machine; RNOH 0.86.1 vendors these C++ libraries (boost especially) with very deep nested paths that
+  exceed Windows' 260-character limit once appended to this project's own long path
+  (`C:\w\cvcm-b\react-native\...\oh_modules\@rnoh\react-native-openharmony\src\main\cpp\third-party\...`), so ohpm
+  silently drops the files it cannot create. The 2026-11-16 build that reached a real emulator ran on macOS, which has
+  no such limit, so this gap was never seen before. Not caused by this task's change: an unmodified checkout hits the
+  same missing directories (`cylanimateditem`/`classifymenu` add no native code of their own, they just exercise the
+  already-broken `:entry` native step).
+- Acceptance scored: 70 / 100 (pass). The module wiring (40) and the Lottie engine registration unchanged in
+  behavior (30, by code parity with the working macOS version and a clean `CompileResource`) are done; `setup.sh`
+  runs end to end on Windows (20) is done; full `assembleHap` success is blocked by the long-path gap above, which
+  this task did not introduce and cannot fix without administrator rights (this session is not elevated). Committed
+  with this entry (10).
+- **New TODO (2026-11-20, blocked on administrator access): enable Windows long paths to unblock HarmonyOS native
+  builds in this worktree.** Fix: an elevated PowerShell sets
+  `New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -PropertyType
+  DWord -Value 1 -Force`, plus `git config --global core.longpaths true` for git operations; a new shell (no reboot
+  needed for most of these tools) then re-runs `ohpm install` and `hvigorw assembleHap` for this example to confirm
+  the native build. Logged here rather than `cross-platform.md` because it only affects the RNOH C++ bridge, not the
+  ArkTS-only `harmony/entry` example, which has no such third-party native sources and keeps building and testing
+  normally on this machine (`harmony/scripts/build.sh`, `unit-test.sh`).
