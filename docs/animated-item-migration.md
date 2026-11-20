@@ -756,4 +756,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - Acceptance (100): the two optional delegate methods with `@objc` selectors and doc comments (30); fired once per change
   for reorder (begin, end, cancel) and smear (began, ended / cancelled) (30); unit test (20); parity tables regenerated, `--check`
   passes (10); documented in the README table (10).
-- Status: started.
+- Result (2026-11-20): `menu(_:didChangeReordering:)` and `menu(_:didChangeSmearing:)` added to `CYLMenuDelegate` (`@objc`
+  `menu:didChangeReordering:` / `menu:didChangeSmearing:`), fired once per change, also when the list leaves its window
+  mid-gesture; tests: smear true / false once, reorder begin / drop / cancel / removal. Suites: menu 37, TagCollectionView 6,
+  Swift Example 22, Example 116, all pass. Status: iOS done (score 90 / 100); the two parity rows stay `TODO` on Android
+  (`api-map.json`) and HarmonyOS (`parity-map.json`) until the Windows session maps them (tables 893 / 895, 949 / 951).
