@@ -2670,29 +2670,6 @@ private extension CYLTagListView {
     }
 
     /**
-     * Removed from its window in the middle of a drag or a smear: the gesture is over, so the delegate hears `false` and a
-     * host that locked its scroll view unlocks it.
-     */
-    open override func didMoveToWindow() {
-        super.didMoveToWindow()
-        guard window == nil else {
-            return
-        }
-        if isReordering {
-            isReordering = false
-            movingItem = nil
-            pressedIndexPath = nil
-            collectionView.cancelInteractiveMovement()
-            menuDelegate?.menu?(self, didChangeReordering: false)
-        }
-        if smearStart != nil {
-            smearStart = nil
-            smearTouchDown = nil
-            menuDelegate?.menu?(self, didChangeSmearing: false)
-        }
-    }
-
-    /**
      * Reorders on a long press and a move; a long press that does not move is reported (onTagLongClick).
      */
     @objc func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
@@ -3442,3 +3419,35 @@ final class CYLTagListSmearGestureDelegate: NSObject, UIGestureRecognizerDelegat
     }
 }
 
+// MARK: - Window
+
+/*
+ * [EN] Outside the private extension: an override of an open UIView method stays open, and an access modifier inside a
+ *      private extension conflicts with the extension's default access (pod lint warning).
+ * [CN] 放在 private 扩展之外：重写 UIView 的 open 方法仍为 open；private 扩展中的访问修饰符与扩展的默认访问级别冲突（pod lint 警告）。
+ */
+extension CYLTagListView {
+
+    /**
+     * Removed from its window in the middle of a drag or a smear: the gesture is over, so the delegate hears `false` and a
+     * host that locked its scroll view unlocks it.
+     */
+    open override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window == nil else {
+            return
+        }
+        if isReordering {
+            isReordering = false
+            movingItem = nil
+            pressedIndexPath = nil
+            collectionView.cancelInteractiveMovement()
+            menuDelegate?.menu?(self, didChangeReordering: false)
+        }
+        if smearStart != nil {
+            smearStart = nil
+            smearTouchDown = nil
+            menuDelegate?.menu?(self, didChangeSmearing: false)
+        }
+    }
+}
