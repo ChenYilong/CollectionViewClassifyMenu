@@ -1,4 +1,4 @@
-import { CYLAccessibilitySelectedModifier } from '@cyl/classifymenu';
+import { CYLAccessibilitySelectedModifier, CYLFilterBaseController } from '@cyl/classifymenu';
 import { CYLExampleLocalizedString } from '../data/CYLExampleLocalization';
 import { CYLExampleUIContext } from '../demos/samples/SampleSupport';
 import { CYLDemoNav } from '../demos/DemoNav';
@@ -88,6 +88,9 @@ struct Index {
       routeBuilder(name).builder(param)
     }
     .hideTitleBar(true)
+    // The system back key closes an open filter panel first (CYLMenuLinkageViewController's multiple filter), not the
+    // page under it.
+    .onBackPressed(() => CYLFilterBaseController.hideShowingPanelForBackPress())
   }
 
   @Builder

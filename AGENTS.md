@@ -72,50 +72,34 @@ Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
 
 - **Symptom:** `hdc install` of `harmony/entry/build/default/outputs/default/entry-default-unsigned.hap` fails with
   `code:9568347 install parse native so failed ... the Abi type supported by the device does not match`.
-- **Cause:** the HAP's native libraries are `arm64-v8a` only: `libohos_rive.so` (`@ohos/rive` 1.0.4, the latest; no
-  x86_64 build is published), `libpag.so` (`@tencent/libpag` 4.4.31) and `libc++_shared.so`. The Windows HarmonyOS
-  emulators are x86_64. Check both sides first: `hdc -t <target> shell param get const.product.cpu.abilist`
-  (`x86_64` or `arm64-v8a`) and `unzip -l entry-default-unsigned.hap | grep '\.so$'` (only `libs/arm64-v8a/...`).
-- **Where the fix belongs: CYLTabBarController's `CYLAnimatedItemView` component** (HarmonyOS module
-  `CrossPlatform/harmonyos-cyltabbar/cylanimateditem`, vendored here as `harmony/cylanimateditem`), not this
-  repository's example. Every app and library that depends on the component (this example, CYLTableViewPlaceHolder,
-  CYLSearchViewController, CYLTabBarController's own examples) then gets the same x86_64 test path. Follow "Fix issues
-  in the core first" and "Bugs: record, screenshot, fix in CYLTabBarController's animated item". The test plan for that
-  upstream task:
-  1. **An ABI gate in the component.** An engine type can declare the ABIs its native library needs (for example
-     `CYLAnimatedItemEngines.register('Rive', undefined, '@ohos/rive')` with `arm64-v8a`; the same for PAG). The
-     component reads `deviceInfo.abiList` (`@kit.BasicServicesKit`) and, for a type the device cannot run, never calls
-     the app's animation builder: it shows the item's static image through its existing load-failure path, tinted by
-     `iconColor`, and reports the reason once in debug builds. Move CYLTabBarController's `cylRiveIsSupported()`
-     (`cyltabbar/src/main/ets/CYLRiveTabBarItemAnimator.ets`) into the component so the tab bar and every other user
-     share one check.
-  2. **Lazy engines.** The component never imports `@ohos/rive` or `@tencent/libpag` (it has no dependencies). Its
-     documented engine pattern loads them with a dynamic `import()` only when the gate allows it, so a HAP without
-     their `.so` files still starts. A static import of `@ohos/rive` / `@tencent/libpag` in an app is expected to fail
-     on load once their libraries are left out.
-  3. **An `x86_64Emulator` product template**, in CYLTabBarController's HarmonyOS example first, documented for
-     dependents: a separate product (never the default one) whose entry module excludes every arm64 library,
-     `"buildOption": { "nativeLib": { "filter": { "excludes": ["**/arm64-v8a/*.so"] } } }`. Excluding only
-     `libohos_rive.so` and `libpag.so` is not enough: verified here 2026-11-22, `libs/arm64-v8a/libc++_shared.so` stays
-     in the HAP and the install still fails. Release HAPs keep their arm64 libraries.
-  4. **Tests.** Host unit tests of the gate with a faked ABI list (`x86_64`: Rive and PAG items show the image and the
-     builder is not called; `arm64-v8a`: the builder is called), and an x86_64 emulator run of the example built with
-     `x86_64Emulator`: the app installs and starts, Rive and PAG items show their tinted image, and Lottie, GIF, SVGA,
-     titles, badges, countdown, layout and accessibility are fully tested there. Rive and PAG playback is still checked
-     on an arm64 target.
-- **Then in this repository:** pin the CYLTabBarController commit that has the gate (see "CYLTabBarController
-  dependency"), load `@ohos/rive` and `@tencent/libpag` lazily in `harmony/entry/src/main/ets/animation/`
-  (`CYLExampleAnimationPlayers.ets` and `CYLExampleAnimationViews.ets` import them statically today), add the
-  `x86_64Emulator` product, and run `harmony/scripts/ui-test.sh` and the screenshots on the x86_64 emulator.
-- **Until then:**
-  - Run checks that need the app on an arm64 target: an Apple Silicon Mac's DevEco Studio emulator
-    (`arm64-v8a`; verified 2026-11-18 on `127.0.0.1:5559`: the unsigned HAP installs, every Rive tag draws and
-    replays) or a real device. From Windows, ask the Mac session for this repository with a cross-session message
-    (see "Sessions"): the commit, the page and the screenshots wanted.
-  - Never make the default build install by deleting libraries, adding an ABI filter to the default product, or
-    dropping `@ohos/rive` / `@tencent/libpag`.
-  - A check that stays blocked: deduct its points in the task log and write "needs an arm64 emulator or a device (the
-    x86_64 emulator rejects the arm64-only Rive and PAG libraries, code 9568347)".
+- **Cause:** the default HAP's native libraries are `arm64-v8a` only: `libohos_rive.so` (`@ohos/rive` 1.0.4, the
+  latest; no x86_64 build is published), `libpag.so` (`@tencent/libpag` 4.4.31) and `libc++_shared.so`. The Windows
+  HarmonyOS emulators are x86_64. Check: `hdc -t <target> shell param get const.product.cpu.abilist` (`x86_64` or
+  `arm64-v8a`) and `unzip -l <hap> | grep '\.so$'`.
+- **The fix lives in CYLTabBarController's `CYLAnimatedItemView`** (`CrossPlatform/harmonyos-cyltabbar/cylanimateditem`,
+  vendored here as `harmony/cylanimateditem`, since `62715829`; its README, "x86_64 emulator"), so every example and
+  library that depends on the component can be fully tested on the x86_64 emulator:
+  - `CYLAnimatedItemEngines` reads `deviceInfo.abiList`; PAG and Rive need `arm64-v8a`. Without it `canPlay` is false:
+    the component never calls `animationBuilder` for those items, they show their still image (or the placeholder), and
+    debug builds log the reason once. `isSupportedOnDevice(type)`, `unsupportedReason(url)`, `setDeviceAbis` (tests),
+    `setRequiredNativeAbis` / the fourth argument of `register`.
+  - Static imports of `@ohos/rive` / `@tencent/libpag` are fine: the library loads when a view is built. Code that builds
+    PAG or Rive views outside `animationBuilder` checks `CYLAnimatedItemEngines.isSupportedOnDevice(type)` first.
+  - `harmony/cylanimateditem/tools/cyl_hap_x86_64.py install <hap> --target <device>` strips the libraries the device
+    cannot load and installs any HAP (`--strip auto|yes|no`, `CYL_HAP_STRIP_LIBS=1|0`).
+- **In this repository (adopted 2026-11-22):** `harmony/entry/build-profile.json5` has the `emulator` build option
+  (`nativeLib.filter.excludes` `**/arm64-v8a/*.so`: excluding only the Rive and PAG libraries leaves `libc++_shared.so`
+  and the install still fails), the `emulator` target and the `emulatorTest` build mode (for `ohosTest`);
+  `harmony/build-profile.json5` lists them. `harmony/scripts/build.sh` builds both HAPs; install
+  `entry/build/default/outputs/emulator/entry-emulator-unsigned.hap` on x86_64. `harmony/scripts/ui-test.sh` reads the
+  device's ABIs and picks `emulator` / `emulatorTest` by itself. Phones, arm64 emulators and releases keep `default`.
+  Never add the ABI filter to the default target and never drop `@ohos/rive` / `@tencent/libpag`.
+- **What x86_64 covers:** Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still
+  images (no crash, no blank item); layout, dark mode, accessibility, localization, gestures and the UI tests
+  (`ui-test.sh`, 14 / 14 on 2026-11-22). **Still needs an arm64 target** (the Apple Silicon Mac's DevEco Studio
+  emulator, verified 2026-11-18 on `127.0.0.1:5559`, or a device; from Windows, ask the Mac session): PAG and Rive
+  playback, their end callbacks and Rive's dispose workarounds. Say in every report and screenshot caption which part ran
+  on x86_64 and which still needs arm64.
 - Details and commands: `.agents/skills/cyl-harmonyos/SKILL.md`, "Emulator ABI: arm64-only Rive and PAG".
 
 ## Code and naming

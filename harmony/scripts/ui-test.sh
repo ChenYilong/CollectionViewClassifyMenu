@@ -17,10 +17,20 @@ export PATH="$DEVECO/jbr/bin:$DEVECO/tools/node:$DEVECO/tools/node/bin:$DEVECO/t
 BUNDLE=com.cyl.classifymenu.example
 
 cd "$PROJECT"
+# An x86_64 emulator cannot load the arm64-only Rive and PAG libraries (install error 9568347): use the entry's
+# "emulator" target and the "emulatorTest" build mode, which leave out every arm64-v8a library; Rive and PAG tags show
+# their still images there (CYLAnimatedItemEngines.isSupportedOnDevice). Phones and arm64 emulators use "default".
+ABIS=$($HDC shell param get const.product.cpu.abilist | tr -d '\r')
+case "$ABIS" in
+  *arm64-v8a*) TARGET=default; TEST_MODE="" ;;
+  *) TARGET=emulator; TEST_MODE="-p buildMode=emulatorTest" ;;
+esac
+echo "device ABIs: $ABIS; entry target: $TARGET"
 node "$DEVECO/tools/hvigor/bin/hvigorw.js" --no-daemon assembleHap
-node "$DEVECO/tools/hvigor/bin/hvigorw.js" --no-daemon -p module=entry@ohosTest assembleHap
+# shellcheck disable=SC2086
+node "$DEVECO/tools/hvigor/bin/hvigorw.js" --no-daemon $TEST_MODE -p module=entry@ohosTest assembleHap
 OUT=entry/build/default/outputs
-$HDC install -r "$OUT/default/entry-default-unsigned.hap"
+$HDC install -r "$OUT/$TARGET/entry-$TARGET-unsigned.hap"
 $HDC install -r "$OUT/ohosTest/entry-ohosTest-unsigned.hap"
 RESULT=$($HDC shell aa test -b "$BUNDLE" -m entry_test -s unittest OpenHarmonyTestRunner -s timeout 60000 -w 180)
 echo "$RESULT"

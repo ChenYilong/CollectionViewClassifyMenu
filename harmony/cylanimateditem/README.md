@@ -1,32 +1,87 @@
-# cylanimateditem (vendored)
+# cylanimateditem
 
-CYLTabBarController's shared animated icon + title component for HarmonyOS NEXT (`CYLAnimatedItemView`), copied
-unmodified so that `@cyl/classifymenu` can use it while it is not published to ohpm. Its guide,
-`docs/Animated-Item.md` in CYLTabBarController, says an unpublished HarmonyOS module is taken by commit: copied, or
-depended on with `file:`, at a pinned commit.
+The animated icon + title component of CYLTabBarController for HarmonyOS NEXT (`CYLAnimatedItemView`,
+`CYLAnimatedItemStackView`, `CYLAnimatedItemEngines`). It depends on no other package and on no animation library.
+Guide: [docs/Animated-Item.md](../../../docs/Animated-Item.md) in CYLTabBarController.
 
-| Field | Value |
+## x86_64 emulator
+
+The local HarmonyOS emulator (Mate 70 Pro image, HarmonyOS 6.0.1) is x86_64. `@ohos/rive` 1.0.4 (`libohos_rive.so`) and
+`@tencent/libpag` 4.4.31 (`libpag.so`) ship `arm64-v8a` libraries only, so a HAP that bundles them does not install
+there ("install parse native so failed", error 9568347), and a HAP without them crashes at the first PAG or Rive view.
+This module owns the x86_64 test path, so every app and library that depends on it (the cyltabbar example,
+CollectionViewClassifyMenu, CYLTableViewPlaceHolder, CYLSearchViewController) can test fully on the x86_64 emulator.
+
+### 1. Runtime check (in this module)
+
+`CYLAnimatedItemEngines` reads the device's ABIs (`deviceInfo.abiList`) and knows the ABIs each engine's library ships:
+PAG and Rive need `arm64-v8a`; Lottie, SVGA and GIF are pure ArkTS. On a device without them:
+
+- `CYLAnimatedItemEngines.canPlay(url)` is false, so `CYLAnimatedItemView` never calls `animationBuilder` for that item:
+  no engine view is created, nothing loads the missing `.so`, and the item shows its still image (or the placeholder).
+- `CYLAnimatedItemEngines.isSupportedOnDevice('Rive')` is false and `unsupportedReason(url)` says why
+  ("Rive needs a native library built for arm64-v8a; this device has x86_64"); debug builds log it once per type.
+- `setRequiredNativeAbis(type, abis)` (or the fourth argument of `register`) changes what an engine needs, e.g. when a
+  library version adds x86_64, or for an app's own engine with a native library; `setDeviceAbis(['x86_64'])` simulates
+  the emulator in a test.
+
+Static imports of `@ohos/rive` / `@tencent/libpag` are fine: the native library is resolved when a view is created
+(checked 2026-11-22: CollectionViewClassifyMenu's animations page, which imports both statically, ran without its
+`.so` files once no PAG or Rive view was built). An app that creates PAG or Rive views outside `animationBuilder`
+checks `CYLAnimatedItemEngines.isSupportedOnDevice(type)` first.
+
+### 2. A HAP for the emulator (in the app's build profile)
+
+`entry/build-profile.json5`: an `emulator` build option that leaves out every `arm64-v8a` library (`libc++_shared.so`
+too: leaving it alone still fails the install), an `emulator` target bound to it, and, for an app with an `ohosTest`
+target, an `emulatorTest` build mode:
+
+```json5
+"buildOptionSet": [
+  { "name": "emulator", "nativeLib": { "filter": { "excludes": ["**/arm64-v8a/*.so"] } } }
+],
+"buildModeBinder": [
+  { "buildModeName": "debug", "mappings": [{ "targetName": "emulator", "buildOptionName": "emulator" }] },
+  { "buildModeName": "release", "mappings": [{ "targetName": "emulator", "buildOptionName": "emulator" }] },
+  { "buildModeName": "emulatorTest", "mappings": [{ "targetName": "ohosTest", "buildOptionName": "emulator" }] }
+],
+"targets": [{ "name": "default" }, { "name": "ohosTest" }, { "name": "emulator" }]
+```
+
+The root `build-profile.json5` lists the target (`{ "name": "emulator", "applyToProducts": ["default"] }`) and, with
+`ohosTest`, the mode (`buildModeSet`: `{ "name": "emulatorTest" }`). Build with
+`hvigorw --mode module -p module=entry@emulator -p product=default assembleHap` and install
+`entry/build/default/outputs/emulator/entry-emulator-unsigned.hap`; tests with `-p buildMode=emulatorTest`. Phones,
+arm64 emulators and releases keep the `default` target. The cyltabbar example (`entry/build-profile.json5`) has it.
+
+### 3. A HAP built without it: `tools/cyl_hap_x86_64.py`
+
+`python3 tools/cyl_hap_x86_64.py install <app.hap> [--target 127.0.0.1:5557]` asks the device for its ABIs, strips the
+`libs/<abi>/` folders it cannot load, and runs `hdc install -r` (`--strip yes|no` or `CYL_HAP_STRIP_LIBS=1|0` forces
+it); `strip <in.hap> [<out.hap>]` only copies the HAP without native libraries. Standard library only; tests in
+`test/test_cyl_hap_x86_64.py`.
+
+### 4. Test plan on x86_64
+
+| Testable on the x86_64 emulator | Needs an arm64 device |
 |:---|:---|
-| Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`618ac11a2b467666c8783683af29617988377956`](https://github.com/ChenYilong/CYLTabBarController/tree/618ac11a2b467666c8783683af29617988377956/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-22; was `ace1af0e`) |
-| Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` |
-| License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
-| Changes | None. Only this README was added. |
+| Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | PAG and Rive playback, their `onEnded`, Rive's dispose crash workarounds |
 
-## How it is used
+Device tests (hypium): the cyltabbar example's `entry/src/ohosTest` (`CYLAnimatedItemFallback.test.ets`) checks the
+ABI rules on the device (expectations follow `deviceInfo.abiList`, so it also passes on arm64), a simulated x86_64 and
+arm64 device, an app engine with a native library, and a UI test whose page holds a Rive and a Lottie item with a marker
+builder: without `arm64-v8a` the Rive item builds no engine view and keeps its still image, the Lottie item builds one.
+On the x86_64 emulator:
 
-- `harmony/build-profile.json5` registers it as the module `cylanimateditem` (as CYLTabBarController's HarmonyOS
-  project does), and `harmony/classifymenu/oh-package.json5` depends on it with `"cylanimateditem":
-  "file:../cylanimateditem"`.
-- It depends on no animation library. `@cyl/classifymenu` draws a tag's animated icon with `CYLAnimatedItemView`
-  (`CYLTagAnimatedIcon` in `classifymenu/src/main/ets/components/CYLTagAnimation.ets`); the app registers the types it
-  plays (`CYLAnimatedItemEngines.register('Lottie')` and its siblings) and the views that play them
-  (`CYLTagAnimationBuilder.register(wrapBuilder(...))`). The example does both in
-  `entry/src/main/ets/animation/CYLExampleAnimationViews.ets`.
-- `src/main/ets/CYLAnimatedItemView.ets` imports `BuildProfile` from the module root: hvigor generates that file when
-  it builds the module.
+```sh
+hvigorw --mode module -p module=entry@emulator -p product=default assembleHap
+hvigorw --mode module -p module=entry@ohosTest -p isOhosTest=true -p buildMode=emulatorTest -p product=default assembleHap
+hdc install -r entry/build/default/outputs/emulator/entry-emulator-unsigned.hap
+hdc install -r entry/build/default/outputs/ohosTest/entry-ohosTest-unsigned.hap
+hdc shell aa test -b com.cyl.tabbar.harmony -m entry_test -s unittest OpenHarmonyTestRunner -s timeout 15000
+```
 
-## Updating
+Result on 2026-11-22 (x86_64 emulator, HarmonyOS 6.0.1): Tests run: 6, Failure: 0, Error: 0, Pass: 6. On Windows give hdc
+backslash paths (`tools/cyl_hap_x86_64.py` does).
 
-Copy the folder from a newer commit (`git archive <sha> CrossPlatform/harmonyos-cyltabbar/cylanimateditem`), keep this
-README, and update the commit above. Do not edit the copied files: change them in CYLTabBarController and copy again.
+Say in every report and screenshot footer which part ran on x86_64 and which still needs an arm64 device.

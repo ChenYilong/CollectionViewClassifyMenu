@@ -25,7 +25,10 @@ export default function stylesAndAnimationsTest() {
       await cylTapAccessible(driver, CYLExampleLocalizedString('动效'), 'tab-动效', 1500);
       await driver.assertComponentExist(ON.id('speedSlider'));
       await driver.assertComponentExist(ON.id('loopSwitch'));
-      expect(await cylText(driver, 'speedValue')).assertEqual('1×');
+      // The speed is read through accessibility: the "1×" label is hidden from it (accessibilityLevel('no'), so uitest
+      // reads it as empty) and the slider's description announces the speed instead.
+      const slider = await driver.findComponent(ON.id('speedSlider'));
+      expect(await slider.getDescription()).assertEqual(CYLExampleLocalizedString('%@ 倍').replace('%@', '1'));
       await cylTapAccessible(driver, CYLExampleLocalizedString('循环播放'), 'loopSwitch', 400);
       await cylTapAccessible(driver, CYLExampleLocalizedString('全部播放'), 'playAll', 1500);
       const status = await cylText(driver, 'animationStatus');

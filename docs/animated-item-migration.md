@@ -960,3 +960,51 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `nativeLib.filter.excludes` for the Rive and PAG libraries still keeps `libc++_shared.so` (so the filter must exclude
   every arm64 library; the trial filter was reverted). **Score 100 / 100** for the instructions. The x86_64 emulator
   product itself is not built (a task of its own; it needs lazy imports of `@ohos/rive` and `@tencent/libpag`).
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): pins to CYLTabBarController 62715829 (then 882ece17) and the x86_64 HarmonyOS emulator path
+
+- Context: CYLTabBarController `62715829` (chen-yilong-b6) makes `cylanimateditem` run on the x86_64 HarmonyOS
+  emulator: `CYLAnimatedItemEngines` reads `deviceInfo.abiList`, PAG and Rive need `arm64-v8a`, so on x86_64
+  `canPlay` is false and the item shows its still image; `isSupportedOnDevice`, `unsupportedReason`, `setDeviceAbis`;
+  `tools/cyl_hap_x86_64.py`; README "x86_64 emulator" (an `emulator` target that excludes `**/arm64-v8a/*.so`, an
+  `emulatorTest` build mode, a test plan). It also brings `c5dfa4d2` (mini program `cyl-lottie` completes once per pass)
+  and `6c9d7fff` (the iOS GIF view in Swift).
+- Prompt (verbatim): "move the pins to 62715829 and adopt it".
+- Acceptance (100): every pin at `62715829` and `--check` passes (15); `harmony/cylanimateditem` re-vendored (upstream now
+  ships its own README) and the mini program re-fetched (10); the example's `emulator` target and `emulatorTest` mode
+  build, the emulator HAP has no arm64 library (15); the HAP installs and starts on the x86_64 emulator, PAG and Rive tags
+  show their still images, Lottie / SVGA / GIF play (screenshots) (25); UI tests on the x86_64 emulator (15); Android,
+  HarmonyOS host, mini program tests (10); instructions and skill updated, iOS CI (10).
+- Pin: `882ece17`, not `62715829`: while this ran, chen-yilong-b6 pushed `882ece17` (hypium tests of the fallback, a Windows
+  path fix in `tools/cyl_hap_x86_64.py`; only README, tool and test files change), and the pin must be the newest commit
+  (`--check` and the iOS workflow step "CYLTabBarController pin is the newest commit"). CYLSearchViewController asked
+  for the same commit.
+- Result:
+  - Every pin at `882ece17` (`--check` OK); mini program re-fetched (`--check` OK); `harmony/cylanimateditem`
+    re-vendored, with upstream's own `README.md` now kept as it ships and this repository's notes moved to
+    `harmony/cylanimateditem/VENDORED.md` (`harmony/README.md` points to it); `tools/cyl_hap_x86_64.py` and its test come
+    with it.
+  - Adopted: `harmony/entry/build-profile.json5` gets the `emulator` build option (`nativeLib.filter.excludes`
+    `**/arm64-v8a/*.so`), the `emulator` target and the `emulatorTest` build mode; `harmony/build-profile.json5` lists
+    them. The emulator HAP has 0 native libraries (the default HAP keeps its 3 arm64 ones).
+    `harmony/scripts/ui-test.sh` reads the device's ABIs and uses the `emulator` target and `emulatorTest` mode on an
+    x86_64 device. No lazy import was needed: the example's PAG and Rive views are only built through
+    `animationBuilder`, which the component no longer calls on x86_64.
+  - x86_64 emulator `127.0.0.1:5557` (HarmonyOS 6.0.1, DevEco Studio 6.0.1, Windows 11): the HAP installs and starts;
+    PAG and Rive tags show the placeholder and the debug log "Rive needs a native library built for arm64-v8a; this device
+    has x86_64"; Lottie, SVGA and GIF play
+    (![Lottie](assets/harmonyos-x86_64-animations-lottie.jpeg), ![PAG and Rive](assets/harmonyos-x86_64-animations-pag-rive-still.jpeg),
+    ![SVGA and GIF](assets/harmonyos-x86_64-animations-svga-gif.jpeg)). `tools/cyl_hap_x86_64.py install` also strips and
+    installs the default HAP.
+  - UI tests on x86_64, the first run there: 5 / 14 at first. `menuLinkageQueriesTheDatabase` timed out and its stuck
+    `scrollSearch` broke the 8 tests after it. Cause, a core bug: with the multiple filter panel open, the system back key
+    closed the whole page instead of the panel. Fixed in the core: `CYLFilterBaseController` keeps the panels on screen and
+    `hideShowingPanelForBackPress()` closes the newest one; the example's `NavDestination.onBackPressed` calls it (test
+    `theBackKeyClosesTheNewestFilterPanel`). Then `animationControlsPlayAll` read the hidden "1×" label (`accessibilityLevel('no')`,
+    which uitest reads as empty); it now reads the speed slider's accessibility description, as the accessibility-first
+    rule asks. **UI tests 14 / 14 on x86_64.**
+  - Android library 105 tests, 0 failures, and the example build; HarmonyOS host tests 82 / 82 and the build;
+    `accessibility-check.py` and `harmony_parity.py --check` OK; mini program 168 / 168.
+  - Found for upstream (sent to chen-yilong-b6): on dark tags the fallback placeholder is black on navy, nearly
+    invisible ("Rive · icons.riv (深色标签)").
+- **Score 90 / 100** until PR #26's iOS CI passes at this commit (−10); PAG and Rive playback stays an arm64 check.
