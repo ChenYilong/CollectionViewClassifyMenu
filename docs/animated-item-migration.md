@@ -837,3 +837,17 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `cross-platform.md` because it only affects the RNOH C++ bridge, not the ArkTS-only `harmony/entry` example, which
   has no such deeply nested third-party native sources and keeps building and testing normally on this machine
   (`harmony/scripts/build.sh`, `unit-test.sh`).
+
+## Android tag editor: drag to reorder in manage mode (2026-11-21)
+
+- **TODO / user prompt (verbatim):** 「android端联系人taglist编辑模式 ，无法拖动排序。请修复。注意增加推动开启期间禁止seachbar 相关页面滚动」
+  (EN: on Android the contact tag list cannot be dragged to reorder in editing mode; fix it, and disable scrolling of
+  the pages around the search bar while a drag is on.)
+- **Cause:** the core's editing-mode drag works (a Robolectric test drives a long press and drag through an outer
+  `ScrollView`); the tag editor example's Manage mode never enabled reordering (no `supportsMovingItems`,
+  `menuMoveItemAtIndexPath` or `allowsReordering`), so the long press only reported.
+- **Fix:** Manage mode now lets a long press drag a tag of "my tags" (not while searching; moves reach `CYLTagStore.moveTag`);
+  the core ends a drag or smear when the list leaves the window (`onDetachedFromWindow`). Scrolling of the list and of
+  every ancestor is already locked from the long press to the drop (`requestDisallowInterceptTouchEvent`, the inner
+  scroll view ignores touches while `reordering`), now covered by `CYLTagEditingDragTest`.
+- **Not done:** iOS Manage mode (`CYLTagEditorViewController`) does not reorder either; not asked. Emulator screenshot not taken.

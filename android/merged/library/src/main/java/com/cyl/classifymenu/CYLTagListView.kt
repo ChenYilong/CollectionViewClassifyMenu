@@ -1809,6 +1809,16 @@ open class CYLTagListView @JvmOverloads constructor(
             return null
         }
 
+        /** A drag or smear in progress ends, reporting it, when the list leaves the window (as iOS `didMoveToWindow`). */
+        override fun onDetachedFromWindow() {
+            super.onDetachedFromWindow()
+            if (dragCell != null) finishDrag(false)
+            if (smear != null) {
+                smear = null
+                menuDelegate?.menuDidChangeSmearing(this@CYLTagListView, false)
+            }
+        }
+
         private fun finishDrag(released: Boolean) {
             val cell = dragCell ?: return
             val source = dragIndexPath ?: return
