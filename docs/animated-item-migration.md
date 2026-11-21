@@ -1007,4 +1007,24 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
     `accessibility-check.py` and `harmony_parity.py --check` OK; mini program 168 / 168.
   - Found for upstream (sent to chen-yilong-b6): on dark tags the fallback placeholder is black on navy, nearly
     invisible ("Rive · icons.riv (深色标签)").
-- **Score 90 / 100** until PR #26's iOS CI passes at this commit (−10); PAG and Rive playback stays an arm64 check.
+- Then (same day): PR #26 had a conflict with master (PR #24's README refresh, PR #25), so GitHub ran no pull request
+  CI on it; master merged into `feat/harmony` (the only conflict, two task log entries in `docs/issue-progress.md`, keeps
+  both). CYLTabBarController moved on to `022da59a` meanwhile (the HarmonyOS tab bar's default height 49 → 56 vp, which
+  this repository does not use; docs; the component's README), so every pin moves to `022da59a`.
+- **Score 90 / 100** until PR #26's iOS CI passes (−10); PAG and Rive playback stays an arm64 check.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): the owner's two plans for arm64-only Rive and PAG tests in the instructions and skills
+
+- Prompt (verbatim): "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入： Rive; pag 编译问题：
+  针对需要只能在arm64上才能执行的测试， 有两个方案可供实现， 第一个方案是在CYLTabBarController的CYLAnimatedItemView中进行改造，
+  从GitHub中引入x86 架构的依赖库， 以完成测试功能。判断guards条件为， 运行系统的版本。 为x86架构， 首先你要保证x86架构能编译通过，且不会crash
+  影响其他功能，其次才是实现功能运行正常。 在该方案未测试通过前使用debug环境编译选项进行guards，因为该方案目前只在运行模拟器时候会触发，
+  当该方案验证可行时候才再移除debug编译guards，你在移除该guards前需要经过我的同意。如果该方案实现失败， 则选择第二个方案，
+  将任务转发给正在macOS上的session进行测试， 因为macOS就是arm64架构的。"
+- Acceptance (100): AGENTS.md (50), CLAUDE.md (20) and `.agents/skills/cyl-harmonyos/SKILL.md` (30) state, in English: plan 1
+  in CYLTabBarController's `CYLAnimatedItemView` (x86_64 libraries from GitHub, guarded by the running system's
+  architecture; compile and no crash first, then playback; a debug build guard until verified; the owner approves its
+  removal), and plan 2 (forward to the macOS arm64 session) if plan 1 fails.
+- Result: written in all three, in the section "HarmonyOS: the HAP will not install on an x86_64 emulator (arm64-only
+  Rive and PAG)" and the skill's "Emulator ABI" section. CYLTabBarController records the same plans in `022da59a`.
+  **Score 100 / 100.** Plan 1 itself is CYLTabBarController work (chen-yilong-b6's session holds the x86_64 task there).
