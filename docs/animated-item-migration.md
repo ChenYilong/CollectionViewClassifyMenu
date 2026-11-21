@@ -929,5 +929,22 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `harmony/classifymenu/Index.ets` comment. `--check` finds no stale pin. Android library 105 tests, 0 failures, and
   `:example:assembleDebug` OK against `.cyltabbar/618ac11a…`; HarmonyOS host tests 81 / 81 and `build.sh` BUILD
   SUCCESSFUL; mini program `npm test` 168 / 168; `check-localization-ports.py` 0 problems. No CI was failing on PR #26
-  before this change (every workflow green at 881476a1). **Score 85 / 100** until PR #26's iOS CI passes at this commit
-  (−10: `73d352d5` moves the iOS tab player to Swift, only CI builds iOS here) and CYLSearchViewController is told (−5).
+  before this change (every workflow green at 881476a1). **Score 100 / 100** (was 85): PR #26's iOS CI passed at 9dc1f761
+  (run 44956397808: library build and analyze, pod lib lint, the four unit test suites, Example screenshots), and
+  CYLSearchViewController (chen-yilong-a4) was told the commit.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): the x86_64 HarmonyOS emulator fix in the instructions and skills
+
+- Prompt (verbatim): "到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入： to fix HAP won't
+  install on this x86_64 emulator because its Rive and PAG libraries are arm64-only,", then the same with "最好的CYLTabBarController里的CYLAnimatedItemView库中完成该测试方案， 以让依赖该组件的example以及其他库完成完整测试 x86_64 emulator"
+- Acceptance (100): AGENTS.md section with the symptom, the cause, how to diagnose and the fix order (40); CLAUDE.md
+  points to it (15); `.agents/skills/cyl-harmonyos/SKILL.md` section with the commands (30); the claims checked on this
+  machine (15).
+- Result: AGENTS.md "HarmonyOS: the HAP will not install on an x86_64 emulator (arm64-only Rive and PAG)", a CLAUDE.md
+  note, and the skill section "Emulator ABI: arm64-only Rive and PAG", all in English. The fix is placed in
+  CYLTabBarController's `CYLAnimatedItemView` (an ABI gate, lazy Rive / PAG engines, an `x86_64Emulator` product, tests),
+  then adopted here, so every dependent can be fully tested on an x86_64 emulator. Checked here: the HAP holds
+  `libs/arm64-v8a/libc++_shared.so`, `libohos_rive.so` and `libpag.so` only; a build with
+  `nativeLib.filter.excludes` for the Rive and PAG libraries still keeps `libc++_shared.so` (so the filter must exclude
+  every arm64 library; the trial filter was reverted). **Score 100 / 100** for the instructions. The x86_64 emulator
+  product itself is not built (a task of its own; it needs lazy imports of `@ohos/rive` and `@tencent/libpag`).
