@@ -850,4 +850,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   the core ends a drag or smear when the list leaves the window (`onDetachedFromWindow`). Scrolling of the list and of
   every ancestor is already locked from the long press to the drop (`requestDisallowInterceptTouchEvent`, the inner
   scroll view ignores touches while `reordering`), now covered by `CYLTagEditingDragTest`.
-- **Not done:** iOS Manage mode (`CYLTagEditorViewController`) does not reorder either; not asked. Emulator screenshot not taken.
+- **iOS (the user asked for it too):** `CYLTagEditorViewController` Manage mode now reorders the same way (`allowsReordering`
+  while managing and not searching, `menuMoveItem(at:to:)` for "我的标签" only, `CYLTagStore.moveTag`); a drop elsewhere is
+  undone by a reload. Test `testManageModeReordersTheTagsOfMyTags`; the Swift suite passes (23 tests).
+- **Not done:** emulator / simulator screenshots of a drag are not taken.
