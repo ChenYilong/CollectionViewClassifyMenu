@@ -50,13 +50,15 @@ export {
 } from './src/main/ets/components/CYLTagAnimatedIcon';
 /**
  * CYLTabBarController's shared animated icon + title component (module `cylanimateditem`, vendored at commit fe5c3ae):
- * an app registers the animation types it plays with `CYLAnimatedItemEngines.register(type)`.
+ * an app registers the animation types it plays with `CYLAnimatedItemEngines.register(type)`; `cylIconColorFilter` is the
+ * alpha-preserving filter of its `iconColor`, which tags use for their static icons too.
  */
 export {
-  CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, cylAnimatedItemTypeOf
+  CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter
 } from 'cylanimateditem';
 export {
   CYLTagListSupplementaryView, CYLTagListElementKindSectionHeader, CYLTagListElementKindSectionFooter
 } from './src/main/ets/components/CYLTagListSupplementaryView';
 export { CYLAccessibilitySelectedModifier } from './src/main/ets/core/CYLAccessibilitySelected';
 export { CYLUIContext } from './src/main/ets/core/CYLUIContext';
+export { CYLMenuGestureState } from './src/main/ets/core/CYLMenuGestureState';

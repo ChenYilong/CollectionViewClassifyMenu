@@ -83,6 +83,13 @@ final class CYLTagStore {
         recentTags.removeAll { $0 == tag }
     }
 
+    /// Moves the tag at `from` to `to` (a drag in "管理" mode); out-of-range `from` does nothing, `to` is clamped.
+    func moveTag(from: Int, to: Int) {
+        guard tags.indices.contains(from) else { return }
+        let tag = tags.remove(at: from)
+        tags.insert(tag, at: min(max(to, 0), tags.count))
+    }
+
     /// Moves tags to the front of "最近使用" (when the editor is confirmed).
     func markUsed(_ used: [String]) {
         let used = used.filter(contains)

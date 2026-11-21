@@ -146,4 +146,24 @@ final class CYLTagEditorTests: CYLTagEditorTestCase {
         XCTAssertEqual(editor.shownTitles(inSection: 0).last, "New tag: ios")
         XCTAssertEqual(CYLMenuResources.preferredLanguage, "en", "The component follows the Example's language")
     }
+
+    func testManageModeReordersTheTagsOfMyTags() {
+        let editor = showEditor()
+        XCTAssertFalse(editor.tagListView.allowsReordering, "Not before \"管理\"")
+        editor.toggleManaging()
+        XCTAssertTrue(editor.tagListView.allowsReordering, "\"管理\" turns the drag on")
+        let before = editor.shownTitles(inSection: 1)
+        editor.menuMoveItem(at: IndexPath(item: 0, section: 1), to: IndexPath(item: 2, section: 1))
+        XCTAssertEqual(Array(editor.shownTitles(inSection: 1).prefix(3)), [before[1], before[2], before[0]], "The first tag moved to the third place")
+        XCTAssertEqual(Array(editor.store.tags.prefix(3)), [before[1], before[2], before[0]])
+        // A drop into 最近使用 changes nothing.
+        let order = editor.store.tags
+        editor.menuMoveItem(at: IndexPath(item: 0, section: 1), to: IndexPath(item: 0, section: 0))
+        XCTAssertEqual(editor.store.tags, order)
+        editor.setQuery("家")
+        XCTAssertFalse(editor.tagListView.allowsReordering, "Not while searching")
+        editor.setQuery("")
+        editor.toggleManaging()
+        XCTAssertFalse(editor.tagListView.allowsReordering, "Off again after \"退出管理\"")
+    }
 }

@@ -51,6 +51,48 @@ class CYLWordPickerTest {
 
     private fun cell(list: CYLTagListView, item: Int): CYLTagListCell = list.tagButtonAtIndexPath(CYLIndexPath(item, 0))!!.parent as CYLTagListCell
 
+    /** Records the gesture state callbacks in order. */
+    private class GestureRecorder : CYLMenuDelegate {
+        val events = ArrayList<String>()
+        override fun menuDidChangeReordering(menu: Any, reordering: Boolean) {
+            events.add("reordering $reordering")
+        }
+
+        override fun menuDidChangeSmearing(menu: Any, smearing: Boolean) {
+            events.add("smearing $smearing")
+        }
+    }
+
+    @Test
+    fun gestureStateCallbacksComeInPairs() {
+        // As the mini program's reorderingchange / smearingchange: true at the start, false at the drop or the cancel.
+        val list = wordPicker("ABCDEFGHIJ")
+        val recorder = GestureRecorder()
+        list.menuDelegate = recorder
+        // A smear.
+        val first = cell(list, 0)
+        touch(list, first, MotionEvent.ACTION_DOWN, 0)
+        touch(list, first, MotionEvent.ACTION_MOVE, 3)
+        touch(list, first, MotionEvent.ACTION_UP, 3)
+        // A drag (long press, move, drop), then a cancelled drag.
+        list.allowsSmearSelection = false
+        list.allowsReordering = true
+        frames()
+        fun longPress(item: Int): View {
+            val target = cell(list, item)
+            touch(list, target, MotionEvent.ACTION_DOWN, item)
+            shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(800))
+            return target
+        }
+        val dragged = longPress(1)
+        touch(list, dragged, MotionEvent.ACTION_MOVE, 4)
+        touch(list, dragged, MotionEvent.ACTION_UP, 4)
+        val cancelled = longPress(2)
+        touch(list, cancelled, MotionEvent.ACTION_CANCEL, 2)
+        assertEquals(listOf("smearing true", "smearing false", "reordering true", "reordering false",
+            "reordering true", "reordering false"), recorder.events)
+    }
+
     @Test
     fun cellsAndPickedText() {
         val list = wordPicker(message)

@@ -357,6 +357,8 @@ class CYLTagEditorView(context: Context, val store: CYLTagStore, selected: List<
         sections = makeSections()
         manageButton.text = CYLTagEditorLocalizedString(context, if (isManaging) "退出管理" else "管理")
         manageButton.contentDescription = "${manageButton.text}, ${CYLTagEditorLocalizedString(context, if (isManaging) "轻点两下完成管理" else "轻点两下选择或删除标签")}"
+        // Manage mode: a long press drags a tag of "my tags" to reorder it (not while searching).
+        tagListView.allowsReordering = isManaging && query.isEmpty()
         tagListView.reloadMenuData()
         syncSelection()
         updateDoneButton()
@@ -444,6 +446,14 @@ class CYLTagEditorView(context: Context, val store: CYLTagStore, selected: List<
     }
     override fun menuItemTypeAtIndexPath(indexPath: CYLIndexPath) = if (item(indexPath) is Item.Create) CYLMenuItemType.CYLMenuItemTypeCreate else CYLMenuItemType.CYLMenuItemTypeTag
     override fun menuItemIsSelectableAtIndexPath(indexPath: CYLIndexPath) = !isManaging
+    override fun supportsMovingItems() = true
+    override fun menuMoveItemAtIndexPath(sourceIndexPath: CYLIndexPath, toIndexPath: CYLIndexPath) {
+        // Only the tags of "my tags" move, within the section; the list reloads from `sections` afterwards.
+        if (!isManaging || sourceIndexPath.section != toIndexPath.section || sections[sourceIndexPath.section].kind != SectionKind.MINE) return
+        if (item(sourceIndexPath) !is Item.Tag) return
+        store.moveTag(sourceIndexPath.item, toIndexPath.item)
+        sections = makeSections()
+    }
     override fun menuAccessibilityHintForItemAtIndexPath(indexPath: CYLIndexPath): String? =
         if (isManaging && sections[indexPath.section].kind == SectionKind.MINE && item(indexPath) is Item.Tag) CYLTagEditorLocalizedString(context, "轻点两下删除此标签") else null
     override fun menuAccessoryViewForSection(section: Int): View? = if (sections[section].kind == SectionKind.MINE) manageButton else null

@@ -12,7 +12,7 @@ tags: [android, kotlin, api-parity, score]
 | 满分是没有 `TODO` 行，全部是 `TODO` 则为 0。循环（AGENTS.md「Parity tables and the score loop」）：把现有的 Android 代码对应到 `TODO` 行，评分，先在核心库中实现缺失的 Android API（逻辑和名称与 iOS 相同），再在 Android 示例中展示，重新评分，直到 100。评分历史见 [android.md](android.md)。 | Full marks when no row is `TODO`; 0 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO` rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the Android example, score again, until 100. The score history is in [android.md](android.md). |
 
 <!-- bilingual:keep -->
-**Score: 893 / 893 with an Android counterpart = 100.0 / 100.** 评分：893 / 893 个符号有 Android 对应项 = 100.0 / 100。
+**Score: 895 / 895 with an Android counterpart = 100.0 / 100.** 评分：895 / 895 个符号有 Android 对应项 = 100.0 / 100。
 
 <!-- bilingual:keep -->
 | iOS API | 说明 / Description | Android API |
@@ -293,6 +293,8 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuDelegate -menu:didLongPressItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidLongPressItemAtIndexPath(menu, indexPath)` |
 | `CYLMenuDelegate -menu:didMoveItemAtIndexPath:toIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidMoveItemAtIndexPath(menu, sourceIndexPath, toIndexPath)` |
 | `CYLMenuDelegate -menu:didBeginDraggingSelectedItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidBeginDraggingSelectedItemAtIndexPath(menu, indexPath)` |
+| `CYLMenuDelegate -menu:didChangeReordering:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidChangeReordering(menu, reordering)` |
+| `CYLMenuDelegate -menu:didChangeSmearing:` | method, `CYLMenuDataSource.swift` | `CYLMenuDelegate.menuDidChangeSmearing(menu, smearing)` |
 | `kDataSourceSectionKey` | constant, `CYLMenuKeys.swift` | `kDataSourceSectionKey` |
 | `kDataSourceCellTextKey` | constant, `CYLMenuKeys.swift` | `kDataSourceCellTextKey` |
 | `kDataSourceCellPictureKey` | constant, `CYLMenuKeys.swift` | `kDataSourceCellPictureKey` |

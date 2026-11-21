@@ -137,6 +137,11 @@ export struct CYLTagAnimatedIcon {
    */
   @Prop selectedImage: ResourceStr = '';
   @Prop isSelected: boolean = false;
+  /**
+   * The color the component tints the static image with (`CYLAnimatedItemView.iconColor`, the tag's
+   * `animationIconColor`); '' keeps the image's own colors.
+   */
+  @Prop iconColor: ResourceColor = '';
   @Prop iconWidth: number = 0;
   /**
    * 0: `iconWidth`.
@@ -208,6 +213,7 @@ export struct CYLTagAnimatedIcon {
         image: this.image,
         selectedImage: this.selectedImage,
         isItemSelected: this.isSelected,
+        iconColor: this.iconColor,
         iconSize: this.side(),
         spacing: 0,
         animationBuilder: (context: CYLAnimatedItemAnimationContext): void => {

@@ -134,6 +134,16 @@ class CYLTagStore(tags: List<String>, recentTags: List<String> = emptyList(), va
         recentTags = recentTags - tag
     }
 
+    /**
+     * Moves the tag at `from` to `to` in `tags` (a drag in manage mode); out-of-range indexes do nothing, `to` is clamped.
+     */
+    fun moveTag(from: Int, to: Int) {
+        if (from !in tags.indices) return
+        val moved = tags.toMutableList()
+        moved.add(to.coerceIn(0, moved.size - 1), moved.removeAt(from))
+        tags = moved
+    }
+
     fun markUsed(used: List<String>) {
         val known = used.filter(::contains)
         recentTags = (known + recentTags.filter { it !in known }).take(recentLimit)

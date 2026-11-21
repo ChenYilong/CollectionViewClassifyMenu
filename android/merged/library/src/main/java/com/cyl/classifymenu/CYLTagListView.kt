@@ -1318,6 +1318,7 @@ open class CYLTagListView @JvmOverloads constructor(
     /** Starts a smear on `indexPath` (the touched-down item). */
     private fun beginSmear(indexPath: CYLIndexPath) {
         smear = Smear(LinkedHashSet(selection), indexPath, indexPath !in selection)
+        menuDelegate?.menuDidChangeSmearing(this, true)
         applySmear(indexPath)
     }
 
@@ -1722,6 +1723,7 @@ open class CYLTagListView @JvmOverloads constructor(
                 override fun onLongPress(e: MotionEvent) {
                     if (canMoveItemAt(indexPath)) {
                         reordering = true
+                        menuDelegate?.menuDidChangeReordering(this@CYLTagListView, true)
                         dragCell = cell
                         dragIndexPath = indexPath
                         dragStart = CYLPoint(e.rawX, e.rawY)
@@ -1762,6 +1764,7 @@ open class CYLTagListView @JvmOverloads constructor(
                             smearDown = null
                             if (smear != null) {
                                 smear = null
+                                menuDelegate?.menuDidChangeSmearing(this@CYLTagListView, false)
                                 view.isPressed = false
                                 return@setOnTouchListener true
                             }
@@ -1806,12 +1809,23 @@ open class CYLTagListView @JvmOverloads constructor(
             return null
         }
 
+        /** A drag or smear in progress ends, reporting it, when the list leaves the window (as iOS `didMoveToWindow`). */
+        override fun onDetachedFromWindow() {
+            super.onDetachedFromWindow()
+            if (dragCell != null) finishDrag(false)
+            if (smear != null) {
+                smear = null
+                menuDelegate?.menuDidChangeSmearing(this@CYLTagListView, false)
+            }
+        }
+
         private fun finishDrag(released: Boolean) {
             val cell = dragCell ?: return
             val source = dragIndexPath ?: return
             dragCell = null
             dragIndexPath = null
             reordering = false
+            menuDelegate?.menuDidChangeReordering(this@CYLTagListView, false)
             cell.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
             val frame = frames[cell]
             val center = frame?.let { CYLPoint(it.x + it.width / 2 + cell.translationX / density, it.y + it.height / 2 + cell.translationY / density) }

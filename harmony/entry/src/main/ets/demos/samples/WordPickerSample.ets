@@ -101,6 +101,7 @@ export struct CYLWordPickerSamplePage {
           .fontColor('#6C6C70')
         TextInput({ text: this.remark, placeholder: CYLExampleLocalizedString('添加备注') })
           .id('wordPicker.field')
+          .accessibilityText(CYLExampleLocalizedString('添加备注'))
           .height(52)
           .fontSize(20)
           .borderRadius(10)

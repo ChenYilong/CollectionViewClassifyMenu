@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import {
-  CYLColorKey, CYLControlState, CYLEdgeInsets, CYLFont, CYLImageIsSymbol, CYLMenuLocalizedString, CYLMenuStyle,
-  CYLOffset, CYLSize, CYLTagBadgeDefaultColor, CYLTagButton, CYLTagButtonMetrics, CYLTagImagePlacement, CYLTextMeasurer
+  CYLColor, CYLColorKey, CYLControlState, CYLEdgeInsets, CYLFont, CYLImageIsSymbol, CYLMenuLocalizedString, CYLMenuStyle,
+  CYLOffset, CYLSize, CYLTagBadgeDefaultColor, cylIconColorFilter, CYLTagButton, CYLTagButtonMetrics, CYLTagImagePlacement, CYLTextMeasurer
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -44,6 +44,30 @@ export default function tagButtonTest() {
       style.imagePlacement = CYLTagImagePlacement.bottom;
       button.style = style;
       expect(button.imageView.frame.y - button.titleLabel.frame.maxY).assertEqual(4);
+    });
+
+    it('tintsTheAnimatedIconsStaticImageThroughTheComponent', 0, () => {
+      // CYLAnimatedItemView.iconColor (CYLTabBarController PR #816): the static image under an animated icon takes the
+      // state's icon color, as the tag's own static icon does; '' without a style color or without an animation.
+      const style = new CYLMenuStyle();
+      style.setIconColor('#FFFFFF', CYLControlState.SELECTED);
+      const animated = new CYLTagButton('Home', 'home.png');
+      animated.animationURL = 'asset:lottie/home.json';
+      animated.style = style;
+      expect(animated.animationIconColor as string).assertEqual('');
+      animated.isSelected = true;
+      expect(animated.animationIconColor as string).assertEqual('#FFFFFF');
+      animated.isSelected = false;
+      expect(animated.animationIconColor as string).assertEqual('');
+      const still = new CYLTagButton('Home', 'home.png');
+      still.style = style;
+      still.isSelected = true;
+      expect(still.animationIconColor as string).assertEqual('');
+      expect(still.imageView.tintsImage).assertTrue();
+      // One filter: the tag's own (CYLColor.tintFilter) is the component's, for every kind of value.
+      for (const color of ['#FFFFFF', '#FF5000', '#80112233', 'FF5000', '', 'red']) {
+        expect(JSON.stringify(CYLColor.tintFilter(color))).assertEqual(JSON.stringify(cylIconColorFilter(color)));
+      }
     });
 
     it('imageFillsTheTagHeightAtTheLeadingEdge', 0, () => {

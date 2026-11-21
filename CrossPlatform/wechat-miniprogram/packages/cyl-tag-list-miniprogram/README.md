@@ -90,3 +90,31 @@ The engine component gets the registered path (`Lottie/home.json`, `Rive/house.r
 (`animations.parameters(path)`). A GIF gets its registered `src`; an absolute path or URL in a configuration is passed
 as it is. The example's `components/cyl-tag-animation-view` plays Lottie, Rive and PAG with CYLTabBarController's
 cyl-lottie, cyl-rive and cyl-pag.
+
+## Scrolling while dragging or smearing
+
+`cyl-tag-cloud` catches `touchmove` on its tags while editing, during a drag (`disablesScrollingWhileReordering`, on
+by default) and during a word picker smear. In WeChat's render layer a catch binding only stops the event from
+bubbling; it does not stop native scrolling, so the scroller that contains the cloud turns its own scrolling off while
+a gesture is active.
+
+`reorderingchange` {reordering} and `smearingchange` {smearing} bubble and are composed (`{ bubbles: true, composed:
+true }`), so the container that scrolls can hear them as an ancestor, through a slot, without the page wiring anything:
+a container component (such as CYLSearchViewController's core content page) binds them on its own scroller and sets
+`scroll-y` off while either is true. Do not let a page with `min-height: 100vh` and taller content be the scroller
+(nothing holds a scrolling page); give it `"disableScroll": true`.
+
+```xml
+<!-- inside the container component's own template -->
+<scroll-view scroll-y="{{!gestureActive}}" bind:reorderingchange="onGesture" bind:smearingchange="onGesture">
+  <slot />
+</scroll-view>
+```
+
+A page that hosts the cloud directly can bind the same events on the cloud or on any ancestor view.
+
+The page itself must not scroll: give it a fixed-height column (`height: 100vh`, `overflow: hidden`, the scroller
+with `min-height: 0`) and `"disableScroll": true`, and let that one scroll view hold its `scroll-y`. WeChat's page-level
+switches do not help from a component: `<page-meta page-style>` works only as the first node of a page (inside a
+component it does nothing), and `wx.setPageStyle` is undocumented and changed nothing in DevTools (base library 3.6.6;
+real drags, CYLSearchViewController `docs/CYLTabBarController-Integration.md`, fourth pass).

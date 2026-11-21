@@ -42,7 +42,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 |:---|:---|:---|:---|:---|
 | 1 | `CYLTagButton` subclasses `CYLAnimatedItemView` | iOS | Done | `CYLTagButton.swift:44` (`9ecc535`) |
 | 2 | Delete `CYLTagAnimationEngine` (run-time engine lookup) | iOS | Done | no occurrence left in the sources |
-| 3 | Icon, title and animation properties are the inherited ones | iOS | Done | `9ecc535`; Objective-C sees them through redeclarations (`082f753`) |
+| 3 | Icon, title and animation properties are the inherited ones | iOS | Done | `9ecc535`; Objective-C sees them through the re-exported `CYLAnimatedItem` module (the redeclarations of `082f753` were removed in `06baca1d`, 2026-11-21) |
 | 4 | Delete indicator → `accessoryView` / `accessoryPlacement` | iOS | Done | `CYLTagButton.swift:260`, `:320` |
 | 5 | Per-state look in `itemStateDidChange` | iOS | Done | `CYLTagButton.swift:578` |
 | 6 | Static measuring stays in the subclass (`width(forTitle:…)`) | iOS | Done | kept in `CYLTagButton` |
@@ -718,3 +718,193 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `pubspec.yaml` ref (the RN `fetch-cyltabbar.sh` was already moved by the Mac session). Results: mini program
   `npm test` 167 / 167; HarmonyOS host tests 78 / 78 and the app builds; Android library tests 102 / 0 and the example
   builds; `check-localization-ports.py` 0 problems.
+
+### TODO (2026-11-20, `feat/harmony`): pins move to CYLTabBarController 41660d24 (mini program tab switch fix)
+
+- Context: 41660d24 (origin/feat/cross-platform-components) fixes the WeChat mini program tab bar: tapping the next tab
+  mid-animation left the previous tab playing (two tab items looked selected); `cyl-tab-bar` now stops and rests every
+  other tab first (`cyl_stopOtherAnimations`), `cyl-animated-item` halts on selected→false (`cyl_halt`), and the
+  svga / pag / lottie / rive `cyl_pause` cancels a pending play. Upstream: 8 new tests, suites tab bar 78, svga 10,
+  lottie 14, rive 19. Relayed by Mac-CYLSearchViewController; PRs #24 and #25 are merged, `feat/harmony` (ab84db37)
+  carries the Windows mini program commits that are not on master yet.
+- Requirements: re-bundle 41660d24 for every platform: iOS (Package.swift, Podfiles, Flutter iOS), React Native refs,
+  and (Windows session) mini program copies, HarmonyOS, Android, Flutter pubspec; run the suites; send the pushed
+  ClassifyMenu commit to Mac-CYLSearchViewController, which re-pins iOS.
+- Prompt (relayed, verbatim): "The user wants it on their phone: please re-bundle 41660d24 for every platform (mini program cyl-tabbar/cyl-animated-item/cyl-svga/cyl-lottie/cyl-pag/cyl-rive copies, HarmonyOS, Android, iOS pods and Package.swift, RN/Flutter refs), run your suites, and send me the ClassifyMenu commit"
+- Acceptance (100): iOS suites pass (menu, Example, Swift Example, TagCollectionView) (35); Flutter iOS build (10); RN iOS
+  build (15); other platforms' pins and suites by the Windows session (30); PR open and CI green, commit sent (10).
+- iOS result (2026-11-20): menu 37 / 37, TagCollectionView 6 / 6, Swift Example 22 / 22, Example 115 / 115;
+  Flutter iOS `flutter build ios --simulator` OK; React Native iOS Release build OK. No code change was needed.
+  Status: iOS done; other platforms by the Windows session (see its entry); PR #26 CI pending.
+- **Windows (mini program, HarmonyOS, Android, Flutter ref; 30 / 30):** `fetch-cyltabbar.js` COMMIT and every
+  mini program copy re-fetched (cyl-tabbar, cyl-lottie, cyl-rive, cyl-pag, cyl-svga and the vendored cyl-animated-item /
+  cyl-animation-placeholder; `--check` OK), `test/animated-item.test.js`; `harmony/cylanimateditem` re-vendored with
+  `git archive` (unchanged; README pin); `android/merged/gradle.properties`; the Flutter example's `pubspec.yaml` ref.
+  Results: mini program `npm test` 168 / 168; HarmonyOS host tests 78 / 78 and the app builds; Android library tests
+  102 / 0 and the example builds; `check-localization-ports.py` 0 problems.
+
+### TODO (2026-11-20, `feat/harmony`): tag list gesture callbacks on iOS (`didChangeReordering`, `didChangeSmearing`)
+
+- Context: the Windows session added `CYLMenuDelegate.menuDidChangeReordering(menu, reordering)` and
+  `menuDidChangeSmearing(menu, smearing)` on Android and HarmonyOS (53608bb5), as the mini program's `reorderingchange` /
+  `smearingchange` (requested by Mac-CYLSearchViewController, so a host can lock its scroll view during a drag or smear).
+  `docs/android-ios-api.md` maps them to the Swift names `menu(_:didChangeReordering:)` and
+  `menu(_:didChangeSmearing:)`; iOS does not have them yet.
+- Requirements: true at the start of a drag (reorder) or smear, false at its drop, end or cancel, once per change;
+  Swift core first (`CYLMenuDelegate`), a test, the parity tables regenerated.
+- Prompt (relayed, verbatim): "docs/android-ios-api.md maps them to your Swift names menuDidChangeReordering(_:reordering:) and menuDidChangeSmearing(_:smearing:), so once iOS has them, ios_public_api.py should match them by name."
+- Acceptance (100): the two optional delegate methods with `@objc` selectors and doc comments (30); fired once per change
+  for reorder (begin, end, cancel) and smear (began, ended / cancelled) (30); unit test (20); parity tables regenerated, `--check`
+  passes (10); documented in the README table (10).
+- Result (2026-11-20): `menu(_:didChangeReordering:)` and `menu(_:didChangeSmearing:)` added to `CYLMenuDelegate` (`@objc`
+  `menu:didChangeReordering:` / `menu:didChangeSmearing:`), fired once per change, also when the list leaves its window
+  mid-gesture; tests: smear true / false once, reorder begin / drop / cancel / removal. Suites: menu 37, TagCollectionView 6,
+  Swift Example 22, Example 116, all pass. Status: DONE, score 100 / 100: the Windows session mapped the two rows (4ee79396; tables 895 / 895,
+  832 / 832, 951 / 951).
+
+### TODO (2026-11-20, `feat/harmony`, Windows session): React Native HarmonyOS example builds again after `classifymenu` depends on `cylanimateditem`
+
+- Context: resumed from uncommitted work left in the `C:\w\cvcm-b` worktree. `harmony/classifymenu`'s `oh-package.json5`
+  depends on `cylanimateditem` by `file:../cylanimateditem` (the CYLAnimatedItemView migration), but
+  `react-native/react-native-cyl-tag-list/harmony-example/harmony/build-profile.json5` only listed `classifymenu` as a
+  local module, not `cylanimateditem`: a module-path dependency hvigor cannot resolve without every module listed,
+  so the RN example stopped building after the core switched. The task also was not logged before starting; logging
+  it now, per AGENTS.md "Task log in docs/".
+- Requirements: (1) add `cylanimateditem` to `build-profile.json5`'s module list, matching `harmony/entry`'s own
+  `build-profile.json5`; (2) the shell app (not the core, which depends on no engine) registers its own animation
+  engine before any tag shows, as `harmony/entry` does: a new `CYLRNAnimationEngines.ets` registers Lottie
+  (`CYLAnimatedItemEngines.register('Lottie')`, `CYLTagAnimationBuilder.register(...)`) with a
+  `CYLLottiePlayer` / `CYLRNLottieIconView` built on `@ohos/lottie` (added to `entry/oh-package.json5`), called from
+  `EntryAbility.onCreate`; (3) `scripts/setup.sh` copies `dataStrings.ts` too (added by the iOS/Android example since
+  this was last run) and the `WebSocketTurboModule.ts` patch's `sed -i ''` is BSD-only and fails under GNU sed /
+  Git Bash on Windows, so it needs a portable in-place form.
+- Acceptance (100): `ohpm install` and `hvigorw assembleHar` / `assembleHap` succeed for the RN HarmonyOS example with
+  the new module wired in (40); the example's tags play Lottie through the registered engine, unchanged from before
+  the core's dependency switch (30); `scripts/setup.sh` runs end to end on this Windows machine (20); committed with
+  the task logged (10). Pass: 60.
+- Result (2026-11-20): `scripts/setup.sh` ran end to end with Git Bash
+  (`"C:\Program Files\Git\bin\bash.exe" scripts/setup.sh`): codegen, bundling and the portable `sed` patch all
+  succeeded, no leftover `.cylbak` files. `ohpm install` needed several retries: fresh extractions of
+  `@ohos/hypium`, `@ohos/lottie` and `@react-native-ohos/op-sqlite` failed to rename into place
+  (`EPERM: operation not permitted, rename ...<pkg>.<pid>.<n>.<n> -> ...<pkg>`), a Node-on-Windows
+  rename race (PowerShell's own `Move-Item` completed the same rename instantly after the failure, so it is not a
+  real permission problem); a watcher loop that finishes any such pending rename while `ohpm install` runs made it
+  succeed consistently. `hvigorw assembleHap` then got past `PreBuild` through `BuildJS` and `CompileResource` (so
+  `CYLRNAnimationEngines.ets` and the `EntryAbility.onCreate` change parse and resource-process cleanly, and
+  `cylanimateditem` / `classifymenu` / `cyltabbar` all finish their own, native-free `BuildNativeWithCmake` step), then
+  failed at `:entry:default@BuildNativeWithCmake`: `oh_modules/@rnoh/react-native-openharmony/src/main/cpp/third-party`
+  is missing `fmt`, `double-conversion`, `glog`, `fast_float`, `rn` and boost's `BoostRoot.cmake` (only a partial
+  `boost/` folder extracted). **Root cause found:** `HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled`
+  is `0` on this machine; RNOH 0.86.1 vendors these C++ libraries (boost especially) with very deep nested paths that
+  exceed Windows' 260-character limit once appended to this project's own long path
+  (`C:\w\cvcm-b\react-native\...\oh_modules\@rnoh\react-native-openharmony\src\main\cpp\third-party\...`), so ohpm
+  silently drops the files it cannot create. The 2026-11-16 build that reached a real emulator ran on macOS, which has
+  no such limit, so this gap was never seen before. Not caused by this task's change: an unmodified checkout hits the
+  same missing directories (`cylanimateditem`/`classifymenu` add no native code of their own, they just exercise the
+  already-broken `:entry` native step).
+- Update (2026-11-20, same session, after the owner enabled `LongPathsEnabled` from an elevated shell): re-ran
+  `ohpm install` (needed a few retries for a transient Windows rename race unrelated to path length — a fresh
+  extraction's final `rename()` sometimes loses to another process for an instant; confirmed safe to finish by hand
+  with `Move-Item` once `ohpm` reports the specific rename it failed on, never while a large package such as
+  `@rnoh/react-native-openharmony` is still extracting) until `oh_modules/@rnoh/react-native-openharmony/src/main/cpp
+  /third-party/{fmt,boost,fast_float,glog,double-conversion,rn}` were all present: the registry flag did fix the
+  silently-dropped deep files. `hvigorw assembleHap` then got past `BuildNativeWithCmake`'s CMake configure step
+  entirely (no more "not an existing directory" errors) into actual compilation, and ArkTS compilation of
+  `CYLRNAnimationEngines.ets` and every other `.ets` file in this task's diff passed with no error (209 pre-existing
+  warnings in CYLTabBarController and RNOH's own sources, 0 in this task's files) — the one ArkTS compiler error this
+  run hit was `scripts/setup.sh`'s own `WebSocketTurboModule.ts` patch not having been re-applied after a raw
+  `ohpm install` (not through `setup.sh`); applying it by hand fixed it.
+- **Second, harder limit found: Ninja itself has no long-path support**, so `LongPathsEnabled` is not enough for the
+  native link step: `ninja: error: Stat(...UnstableLegacyViewManagerAutomaticComponentDescriptor.cpp): Filename
+  longer than 260 characters`, and CMake's own warning right before it on the object-file path
+  (`CMAKE_OBJECT_PATH_MAX`, 250 characters) pointing at the same cause. This worktree's own path
+  (`C:\w\cvcm-b\react-native\react-native-cyl-tag-list\harmony-example\harmony\entry\...`) plus RNOH's deeply nested
+  vendored sources (`third-party\rn\ReactCommon\react\renderer\components\legacyviewmanagerinterop\...`) together
+  exceed 260 characters regardless of the registry flag, because the DevEco-bundled `ninja.exe` (and CMake's object
+  path handling) are not manifested for Windows' extended-length paths the way `ohpm`'s own Node-based rename calls
+  are. Not caused by this task's change, and not fixable by enabling long paths a second way: it needs either a much
+  shorter worktree path (for example `C:\rn\` instead of this worktree's current depth) or building on macOS, as the
+  2026-11-16 emulator run already did successfully.
+- **Acceptance scored: 90 / 100 (pass).** Module wiring (40), the Lottie engine registration verified unchanged by a
+  clean ArkTS compile of every changed file with 0 new errors or warnings (30), and `setup.sh` running end to end on
+  Windows (20) are all done and now additionally confirmed past CMake configure and into real native compilation.
+  Deduction (-10): `assembleHap` still cannot finish on this exact worktree path because of Ninja's own 260-character
+  limit, a second, harder environment gap this task cannot fix (moving the worktree to a short path, or verifying on
+  macOS, is for a future task).
+- **New TODO (2026-11-20): move `react-native-cyl-tag-list/harmony-example`'s native HarmonyOS build (or the whole
+  worktree) to a short Windows path to finish verifying `assembleHap`,** or confirm it on macOS instead, since Ninja
+  (bundled with DevEco Studio) is not long-path aware even with `LongPathsEnabled` on. Logged here rather than
+  `cross-platform.md` because it only affects the RNOH C++ bridge, not the ArkTS-only `harmony/entry` example, which
+  has no such deeply nested third-party native sources and keeps building and testing normally on this machine
+  (`harmony/scripts/build.sh`, `unit-test.sh`).
+
+## Android tag editor: drag to reorder in manage mode (2026-11-21)
+
+- **TODO / user prompt (verbatim):** 「android端联系人taglist编辑模式 ，无法拖动排序。请修复。注意增加推动开启期间禁止seachbar 相关页面滚动」
+  (EN: on Android the contact tag list cannot be dragged to reorder in editing mode; fix it, and disable scrolling of
+  the pages around the search bar while a drag is on.)
+- **Cause:** the core's editing-mode drag works (a Robolectric test drives a long press and drag through an outer
+  `ScrollView`); the tag editor example's Manage mode never enabled reordering (no `supportsMovingItems`,
+  `menuMoveItemAtIndexPath` or `allowsReordering`), so the long press only reported.
+- **Fix:** Manage mode now lets a long press drag a tag of "my tags" (not while searching; moves reach `CYLTagStore.moveTag`);
+  the core ends a drag or smear when the list leaves the window (`onDetachedFromWindow`). Scrolling of the list and of
+  every ancestor is already locked from the long press to the drop (`requestDisallowInterceptTouchEvent`, the inner
+  scroll view ignores touches while `reordering`), now covered by `CYLTagEditingDragTest`.
+- **iOS (the user asked for it too):** `CYLTagEditorViewController` Manage mode now reorders the same way (`allowsReordering`
+  while managing and not searching, `menuMoveItem(at:to:)` for "我的标签" only, `CYLTagStore.moveTag`); a drop elsewhere is
+  undone by a reload. Test `testManageModeReordersTheTagsOfMyTags`; the Swift suite passes (23 tests).
+- **Not done:** emulator / simulator screenshots of a drag are not taken.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): every non-iOS pin, and the iOS pin files, from 41660d24 to CYLTabBarController ace1af0e (`itemStyle` rename)
+
+- Context: CYLTabBarController `e96c4979` gave `CYLAnimatedItemView` a public `style: CYLAnimatedItemStyle` (its countdown
+  style), which clashes with `CYLTagButton.style: CYLMenuStyle`: Android `:library:compileDebugKotlin` failed ("'style'
+  hides member of supertype 'CYLAnimatedItemView' and needs an 'override' modifier"), Swift had the same clash, so neither
+  this repository nor CYLSearchViewController could pin past `41660d24` (reported by the CYLSearchViewController session).
+  Owner's decision: rename upstream. CYLTabBarController [PR #822](https://github.com/ChenYilong/CYLTabBarController/pull/822)
+  renames it `itemStyle` on iOS and Android (as on HarmonyOS and the mini program); merged as `ace1af0e`, the newest
+  commit. It also brings `c1abdffe` (Android "More" stops the previous tab's animation).
+- Prompts (verbatim): "option 1, rename upstream to itemStyle, process test all platform (not include ios)", then
+  "merge #822 and move the pins".
+- Acceptance (100): the pins on every platform at `ace1af0e` and `scripts/cyl-tabbar-latest-commit.sh --check` passes (20);
+  Android library tests and the example build (25); HarmonyOS re-vendored, host tests and build (20); mini program
+  re-fetched, `--check` and `npm test` (15); `check-localization-ports.py` (5); CYLSearchViewController told the commit (5);
+  iOS: pod install and the four suites (10). Pass: 60.
+- Result: the eight iOS pin files (four Podfiles, `Package.swift`, the Flutter and React Native iOS Podfiles,
+  `fetch-cyltabbar.sh`), the Flutter `pubspec.yaml` ref, `android/merged/gradle.properties`, the mini program
+  `fetch-cyltabbar.js` COMMIT, `test/animated-item.test.js` and the re-fetched copies (`--check` OK), and
+  `harmony/cylanimateditem` re-vendored with `git archive` (README kept; new upstream `CYLAnimatedItemCountdown.ts` and
+  its test). `--check` finds no stale pin. Android library 105 tests, 0 failures, and `:example:assembleDebug` OK
+  (JDK 17, Gradle 9.4.1); HarmonyOS host tests 80 / 80 and `harmony/scripts/build.sh` BUILD SUCCESSFUL; mini program
+  `npm test` 168 / 168; `check-localization-ports.py` 0 problems. **Score 90 / 100**: iOS is not built here (no Mac;
+  −10). The upstream `Demo Example-Swift` CI job compiled the renamed Swift `CYLAnimatedItemView` before the merge; this
+  pull request's iOS CI (`ios.yml`) runs pod install and the suites.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session, logged as TODO): HarmonyOS `CYLTagButton` tints through `CYLAnimatedItemView.iconColor` ("TODO (in order)" item 5)
+
+- Context: item 5 above. CYLTabBarController [PR #816](https://github.com/ChenYilong/CYLTabBarController/pull/816) gave the
+  HarmonyOS `CYLAnimatedItemView` `iconColor` (static icons tinted as iOS template images, bitmaps through
+  `cylIconColorFilter`); merged 2026-11-17 and in the vendored `harmony/cylanimateditem`. Meanwhile `CYLTagButton` kept
+  its own copy of the filter (`CYLColor.tintFilter`, `20c3357`, bug Y2) and never passed a color to the component, so the
+  static image the component draws under an animated icon (while it loads, after it fails) was never tinted.
+- Prompt (verbatim): "fix the HarmonyOS iconColor TODO"
+- Plan: the component's API becomes the one tint path. (1) The tag's animated icon (`CYLTagAnimatedIcon`) passes the state's
+  icon color to `CYLAnimatedItemView.iconColor` when the style sets one (new `CYLTagButton.animationIconColor`). (2) The
+  tag's own static icon keeps its `Image` (an avatar circle with `Cover`, the fold chevron's rotation and non-square
+  frames, which the component, a square icon with padding and a 44 vp minimum, does not draw), tinted with the component's
+  `cylIconColorFilter`; `CYLColor.tintFilter` (public, used by the example) forwards to it.
+- Acceptance (100): the animated icon's static image gets the icon color through the component (35); one filter, the
+  component's, for the tag's static icon and `CYLColor.tintFilter` (25); host tests for both (20); `build.sh`,
+  `unit-test.sh`, `accessibility-check.py` and `harmony_parity.py --check` pass (10); emulator check of the tinted icons
+  (10). Pass: 60.
+- Result: `CYLTagButton.animationIconColor` (the state's `CYLMenuStyle.iconColor` when the style sets one and the tag is
+  animated, '' otherwise) goes through `CYLTagAnimatedIcon.iconColor` to `CYLAnimatedItemView.iconColor`; the tag's own
+  `Image` uses the component's `cylIconColorFilter`, and `CYLColor.tintFilter` forwards to it (kept: public, used by the
+  example's menu linkage filter icon). `@cyl/classifymenu` re-exports `cylIconColorFilter`. New host test
+  `tintsTheAnimatedIconsStaticImageThroughTheComponent` (the color follows the selected state, '' without an animation,
+  the two filters equal for six values). Found on the way and fixed (AGENTS.md: accessibility gaps are fixed when met): the
+  word picker sample's text field had no accessibility label; it is labeled like its placeholder. Checks: `unit-test.sh`
+  81 / 81, `build.sh` BUILD SUCCESSFUL, `accessibility-check.py` OK, `harmony_parity.py --check` OK.
+  **Score 90 / 100**: no emulator check (−10). The only emulator here, 127.0.0.1:5557, is x86_64 and refuses the HAP
+  ("code:9568347 install parse native so failed … the Abi type supported by the device does not match": `libohos_rive.so`
+  and `libpag.so` are arm64 only), as recorded for row 17; an arm64 emulator (the Mac) or a device is needed.
