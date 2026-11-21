@@ -240,13 +240,23 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   - Parity tables regenerated: iOS -> Android 784 / 792 = 99.0 (the 8 `TODO` rows predate this task), Android -> iOS
     731 / 731 = 100; `ios_public_api.py` lists CYLTagButton's inherited `CYLAnimatedItemView` members, mapped in
     `api-map.json`. Mini program `npm test`: 110 pass, 0 fail.
-- **TODO (verification)**: no Xcode, Android SDK or DevEco in this Linux container, so nothing was compiled: (1) `pod
+- **Verification (logged as TODO; DONE 2026-11-21 for iOS)**: no Xcode, Android SDK or DevEco in this Linux container, so nothing was compiled: (1) `pod
   install` and the iOS builds and tests (`scripts/unit-tests.sh`, `scripts/pod-lint.sh lib`) in CI, in particular the
   Swift overrides of the Objective-C members (`title`, `image`, `selectedImage`, `animationSpeed`,
   `animationRestingProgress`, `layoutContent(in:)`) and `scripts/swift-api-check.sh` (refresh
   `scripts/swift-api-baseline.json`); (2) the Android build and Robolectric tests (`android/scripts/gradle.sh merged
   :library:testDebugUnitTest :example:assembleDebug`) and the `build/repo` copy of `cylanimateditem`; (3) the example
   screenshots of the animated tags (Lottie, PAG, Rive, SVGA, GIF) against the previous ones.
+  - Result (2026-11-21): (1) Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md). The Swift overrides build and are covered by `CYLTagButtonTests`.
+    `swift-api-check.sh` builds and reports 104 lines against the Objective-C baseline of 2026-11-13: the renames the
+    Swift standard asked for (`docs/Swift-Migration.md`), the same before and after this check, plus three `CYLTagButton`
+    members "removed" by `06baca1d` that are still inherited from `CYLAnimatedItemView` (the baseline is kept as the
+    Objective-C reference, not refreshed). (2) Android: the Windows session's runs (`:library` tests 102 / 0 and
+    `:example:assembleDebug` at `8ece77dd` and `41660d24`, [animated-item-migration.md](animated-item-migration.md)).
+    (3) [ios-animated-tags-06baca1d.png](assets/ios-animated-tags-06baca1d.png): every engine registered, Lottie, SVGA
+    and GIF tags drawn at rest, as in `assets/ios-animation-engine-report.png` (2026-11-17).
+
+  <img src="assets/ios-animated-tags-06baca1d.png" width="600" alt="Platform: iOS 27.2, iPhone 18 Pro simulator | Host: macOS 27.3 | IDE: Xcode 27.2 (27B52); CollectionViewClassifyMenu 06baca1d, CYLTabBarController 41660d24, feat/harmony, 2026-11-21. Purpose: animated tags after the CYLTagButton redeclarations were removed">
 
 ## DONE (2026-11-17, closed 2026-11-19): CYLAnimatedItem is its own pod and module
 
@@ -272,6 +282,10 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
   commit; Android imports `CYLTabBarItemAnimationViewMaking` from `com.cyl.animateditem`. Not built here (no Xcode,
   no Android SDK). TODO: CI on the commit; the Objective-C redeclarations of `082f753` can go once Objective-C tests
   `@import CYLAnimatedItem;` (kept for now: the owner rejected importing the tab bar, and they work).
+  DONE (2026-11-21): CI passed on the commit (closed below, 2026-11-19). The redeclarations are gone (`06baca1d`) without
+  any new import: `CYLTagButton` re-exports `CYLAnimatedItem`, so the Objective-C menu test that uses `animationURL`,
+  `animationView`, `restartAnimation` and `stopAnimation` through `@import CollectionViewClassifyMenu;` alone compiles and
+  passes (37 / 37).
 - **CI on `0b6917d`** (run 44017316252): three failures.
   1. "Unit tests (menu)": the demo app could not load `CYLClassifyMenuViewController`'s members. The root Podfile
      builds static libraries, and `CYLAnimatedItem.podspec` does not set `DEFINES_MODULE`, so the module
@@ -467,7 +481,7 @@ started run completes and the next one tests the newest commit.
   `e7d9655` with "property 'position' not found on object of type 'CYLMenuFoldControl *'": the Swift translation of
   `CYLMenuFoldControl` exposed only its initializer to Objective-C. The class is now `@objcMembers`, so every property
   and method is visible from Objective-C; the Swift API is unchanged. Not built here (no Xcode; `swift-api-check.sh`
-  needs it); CI is the check.
+  needs it); CI is the check. DONE: CI is green since (`65d2d4a`, below); Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md).
 - **Workarounds removed** (2026-11-17 17:55 UTC): the static-library menu suite passes since CYLTabBarController
   `83a8ff8` (its public headers `@import CYLAnimatedItem;`; the cause was "CYLAnimatedItemView expected in
   'CYLAnimatedItem' but found in 'CYLTabBarController'", found with `-disable-deserialization-recovery`). Run
@@ -694,4 +708,15 @@ started run completes and the next one tests the newest commit.
   redeclarations removed with the Objective-C tests importing `CYLAnimatedItem`, or the reason they stay written
   down (15); every iOS "not built here" note replaced with what was verified (20); a labeled screenshot of the animated
   tags in `docs/assets/` (10). Pass: 60.
-- **Status**: started.
+- **Status**: DONE (2026-11-21), **score 91 / 100**.
+  - Four iOS suites on a clean build, before and after the change (40 / 40): menu 37, tag 6, swift 23, example 116.
+  - Pod lint and the Swift API check (8 / 15): `pod-lint.sh lib` passes with no warning (`06baca1d` moves
+    `CYLTagListView.didMoveToWindow` out of its private extension: "'open' modifier conflicts with extension's default
+    access" was the only one). −7: `swift-api-check.sh` exits 1 against the Objective-C baseline (104 lines, the
+    standard's renames, unchanged by this task, plus three inherited `CYLTagButton` members it now lists as removed);
+    whether to refresh the baseline is the owner's call.
+  - Redeclarations (15 / 15): removed in `06baca1d` with no new import (above).
+  - Notes (20 / 20): the iOS notes above and seven in `issue-progress.md` say what was verified.
+  - Screenshot (8 / 10): `assets/ios-animated-tags-06baca1d.png`. −2: the PAG and Rive tags are below the captured area;
+    the engine report shows them registered.
+  - Not part of this task: the pin move to CYLTabBarController `e96c4979` (its branch was being pushed during this run).
