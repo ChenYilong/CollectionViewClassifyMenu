@@ -73,6 +73,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 > since `4c7dc79d`; pins at `5744917d`). Item 6 (B20) is DONE on the mini program (`074285a6`, Windows session). Item 2
 > (PR #815) was merged upstream and every pin has moved past it. Items 1 and 4 are covered by the later sections
 > (CI on `feat/harmony`; toolchain checks recorded per platform). Kept as written below for the history.
+> **Re-read (2026-11-21):** item 5 is still open on HarmonyOS. CYLTabBarController [PR #816](https://github.com/ChenYilong/CYLTabBarController/pull/816)
+> (`CYLAnimatedItemView.iconColor`) was merged on 2026-11-17, but `CYLTagButton` still tints its static icon with its own
+> `ColorFilter` (`harmony/classifymenu/src/main/ets/tagviews/CYLTagButton.ets`, the Y2 workaround). Moving it to the
+> component's `iconColor` needs a HarmonyOS build and an emulator check (Y2 before / after screenshots).
 
 1. **CI**: since `9095849` a started iOS run always finishes (`cancel-in-progress: false`); row 12 waits for the upstream umbrella-header fix and a pin move; then rows 12 and 13 (demo app, menu / example / swift
    tests, screenshots of the engine report screen into `docs/assets/`).
@@ -195,7 +199,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
    run (its 1 s toggle aliased by the slow captures) and `[225, 19, 245, 689, 653, 157, 0, 144, 144, 189, 189]` in a second,
    12-frame run. Every Rive tag still replays on iOS at `6a9ede85`.
 
-## TODO (2026-11-17, macOS 27 + Xcode 27, `feat/harmony`): rows 12 and 13 on a Mac, simulator screenshots, bugs
+## DONE (2026-11-17, macOS 27 + Xcode 27, `feat/harmony`, logged as TODO): rows 12 and 13 on a Mac, simulator screenshots, bugs
 
 - **Prompt (verbatim)**: "运行模拟器 截图测试 更新文档 记录bug 修复bug  阅读CYLAnimatedItem 相关的集成文档，continue fix todo iOS端代码与测试"
 - **Prompt (English)**: "Run the simulator, take screenshots and test, update the docs, record bugs, fix bugs; read the
@@ -233,7 +237,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   screen"), `assets/ios-1117/`. Bug fixed: `scripts/example-screenshots.sh` captured the previous app's last frame for the
   first screen of a run (`product@zh-Hans` showed the animations screen); it now waits 10 s more for the first launch.
 
-## TODO (2026-11-17, `feat/harmony`): raise the migration score from 80
+## DONE (2026-11-17, `feat/harmony`, logged as TODO): raise the migration score from 80
 
 - **Prompt (verbatim)**: "fix The migration score stays at 80 / 100."
 - **Plan**: rows this Mac can close: 17 (HarmonyOS check on the emulator `CYL ClassifyMenu Test`), 22 (Flutter and React
@@ -352,8 +356,9 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `127.0.0.1:5559` (hdc gives it a free port; `5563` was wrong). The HAP installs on its arm64 image, every Rive tag
   draws and replays on a second Play All. Evidence: `assets/harmonyos-rive-b20-replay.png`,
   `assets/harmonyos-rive-section-arm64.jpeg`. Left: rows 11 (SwiftPM product) and 19 (upstream merge).
+- **Closed (2026-11-21):** rows 11 and 19 were finished in "migration score from 92 to 100" below; the score is 100.
 
-## TODO (2026-11-18, `feat/harmony`): migration score from 92 to 100
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): migration score from 92 to 100
 
 - **Prompt (verbatim)**: "My session: nothing new on feat/harmony since eba4b34; the score is still 92 fix to100"
 - **English**: raise the migration score from 92 to 100.
@@ -385,7 +390,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   and this repository's tab bars use no GIF images). Menu 32, tag 6, example 92, swift 22 tests, 0 failures, iPhone 17
   Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3. All platforms at `ad3dca0e` (Android and mini program: `2b3e2cd`).
 
-## TODO (2026-11-18, `feat/harmony`): re-check pins
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): re-check pins
 
 - **Prompt (verbatim)**: "re-check pins"
 - **English**: move the iOS pins to CYLTabBarController's newest commit and re-test.
@@ -402,7 +407,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 
   ![iOS Rive icons rest until played, then loop, at CYLTabBarController 70064275](assets/ios-rive-rest-play-70064275.png)
 
-## TODO (2026-11-18, `feat/harmony`): re-check pins (second time)
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): re-check pins (second time)
 
 - **Prompt (verbatim)**: "re-check pins"
 - **English**: move the pins to CYLTabBarController's newest commit and re-test.
@@ -421,7 +426,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   tests, 0 failures (iPhone 17 Pro simulator, iOS 27.2, Xcode 27.2, macOS 27.3). Every platform at `d8f47b4d`
   (Android and mini program by the Windows session).
 
-## TODO (2026-11-18, `feat/harmony`): the search category test accepts UIKit's floating tab bar
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): the search category test accepts UIKit's floating tab bar
 
 - **Request (from the Mac-CYLTabBarController session, owner's decision, verbatim)**: "The owner decided on iPhone Duo:
   keep UIKit's floating bar on devices where UIKit chooses it. There's no core change; it's recorded in
@@ -437,7 +442,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   bar" checks. Example suite 92 / 0 on iPhone Duo `B7499C73` (iOS 27.2, the device that failed before) and 92 / 0 on
   iPhone 17 Pro `62B54974` (iOS 27.2), Xcode 27.2, macOS 27.3. This closes the iPhone Duo bug above.
 
-## TODO (2026-11-18, `feat/harmony`): iOS pins from d8f47b4d to CYLTabBarController 0505042f
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): iOS pins from d8f47b4d to CYLTabBarController 0505042f
 
 - **Request (relayed by winCYLTabBarController 鸿蒙开发, from the user, verbatim)**: "the Rive tint interface is fixed,
   please continue. CYLTabBarController feat/cross-platform-components head is 396d3fca (0dc6d1c4 item appearance and tint
@@ -452,7 +457,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   (iOS 27.2, Xcode 27.2, macOS 27.3): menu 32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. Android and the mini
   program pins belong to the Windows session (still `d8f47b4d` until it moves them).
 
-## TODO (2026-11-18, `feat/harmony`): iOS pins from 0505042f to CYLTabBarController 918da089; Rive Home options
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): iOS pins from 0505042f to CYLTabBarController 918da089; Rive Home options
 
 - **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
   pins are at CYLTabBarController 918da089d7f6991a24b1fcbc40c150c7a503d4b5 (cvcm-b 3b697c9, pushed), the newest commit on
@@ -471,7 +476,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `values: 3,4,5,6`, like the Animations screen; its motion on the configuration file screen is not yet checked on a
   simulator (the Mac load is high). The mini program's copy of `animated-tags.json` belongs to the Windows session.
 
-## TODO (2026-11-18, `feat/harmony`): iOS pins from 918da089 to CYLTabBarController 4f73209c
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): iOS pins from 918da089 to CYLTabBarController 4f73209c
 
 - **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
   pins are at CYLTabBarController 4f73209c in cvcm-b d9d99a1 (pushed). It's the newest commit on
@@ -486,7 +491,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   revision `4f73209c`) builds for the iOS Simulator; example suite 92 / 0 on iPhone 17 Pro `62B54974` (iOS 27.2,
   Xcode 27.2, macOS 27.3). Every platform is on `4f73209c`.
 
-## TODO (2026-11-18, `feat/harmony`): iOS pins from 4f73209c to CYLTabBarController 776b4635
+## DONE (2026-11-18, `feat/harmony`, logged as TODO): iOS pins from 4f73209c to CYLTabBarController 776b4635
 
 - **Request (from winCollectionViewClassifyMenu 文件夹, verbatim)**: "The Android, mini program and harmony/cylanimateditem
   pins are at CYLTabBarController 776b4635 in cvcm-b 2953c10, pushed. It's the newest commit and changes only the
@@ -507,7 +512,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   files (`node scripts/fetch-cyltabbar.js --check` OK), `harmony/cylanimateditem` (README and the re-vendored
   `CYLAnimatedItemView.ets`). iOS pins (eight files, and the React Native fetch script tied to its Podfile): Mac session.
 
-## TODO (2026-11-19, `feat/harmony`): iOS pins from 776b4635 to CYLTabBarController b376c278
+## DONE (2026-11-19, `feat/harmony`, logged as TODO): iOS pins from 776b4635 to CYLTabBarController b376c278
 
 - **Request (from winCollectionViewClassifyMenu 文件夹, verbatim, pin part)**: "Pins: Android, the mini program and
   harmony/cylanimateditem are now at CYLTabBarController b376c278ef13db0a03e433de35aa191fe151ba94, the newest commit.
@@ -523,7 +528,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   revision `b376c278`) builds for the iOS Simulator. iPhone 17 Pro `62B54974` (iOS 27.2, Xcode 27.2, macOS 27.3): menu
   32 / 0, tag 6 / 0, example 92 / 0, swift 22 / 0. Every platform is on `b376c278`.
 
-## TODO (2026-11-19, `feat/harmony`): pins from b376c278 to CYLTabBarController 4da6b760 (Swift CYLAnimatedItemView)
+## DONE (2026-11-19, `feat/harmony`, logged as TODO): pins from b376c278 to CYLTabBarController 4da6b760 (Swift CYLAnimatedItemView)
 
 - **Context:** CYLTabBarController `4c7dc79d` (contained in `4da6b760`, the newest commit of `feat/cross-platform-components`)
   moves `CYLAnimatedItemView`, its enums and protocols to Swift, with the same Objective-C API and the same Swift names
@@ -566,7 +571,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   OK. With the Windows session's bundled copies at 5996fa96 (`ba13e99c`), every platform is at the same commit:
   **100/100**.
 
-## TODO (2026-11-19, `feat/harmony`): every pin from 5996fa96 to CYLTabBarController 5744917d
+## DONE (2026-11-19, `feat/harmony`, logged as TODO): every pin from 5996fa96 to CYLTabBarController 5744917d
 
 - **Context:** every platform is at CYLTabBarController `5996fa96`; the newest commit of `feat/cross-platform-components`
   is `5744917d` (38 commits later; 2 files of the Swift `CYLAnimatedItemView` changed). iOS pins here (Mac session); the
@@ -594,7 +599,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   names an older CYLTabBarController commit; `scripts/cyl-tabbar-latest-commit.sh --check` finds no stale pin.
   CYLSearchViewController told to pin `43ec09ce`.
 
-## TODO (2026-11-19, `feat/harmony`): every pin from 5744917d to CYLTabBarController f88d67a8
+## DONE (2026-11-19, `feat/harmony`, logged as TODO): every pin from 5744917d to CYLTabBarController f88d67a8
 
 - **Context:** CYLTabBarController `f88d67a8` (`f88d67a840a06b39dc812bf4253b14f2fb50b7c2`): CYLTabBar in Swift (migration step 100, same Objective-C
   API), FlatDesign badges reach the visible button, FlatDesign GIF tab images rest until played, `CYLAnimatedItemView`
@@ -620,7 +625,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   program 159 / 159, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build).
   CYLTabBarController and CYLSearchViewController told the commit and the counts.
 
-## TODO (2026-11-19, `feat/harmony`): every pin from f88d67a8 to CYLTabBarController 9a4ad95e
+## DONE (2026-11-19, `feat/harmony`, logged as TODO): every pin from f88d67a8 to CYLTabBarController 9a4ad95e
 
 - **Context:** CYLTabBarController `9a4ad95e` (`9a4ad95e685de768d2977cdeb0ed1058557e5e88`, newest; contains `9a4ad95e`): `CYLAnimatedItemStackView` gets
   `axis` and `spacing` (wrapping its stack view's, so existing `stackView.axis` / `.spacing` code keeps working) and
@@ -642,7 +647,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **DONE (2026-11-19): every platform at `9a4ad95e`, 100 / 100**, with the Windows session's `91c33997` (mini program
   159 / 159, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build). Both sessions told.
 
-## TODO (2026-11-19, `feat/harmony`): every pin from 9a4ad95e to CYLTabBarController 74f0b4cd (tab tap regression fix)
+## DONE (2026-11-19, `feat/harmony`, logged as TODO): every pin from 9a4ad95e to CYLTabBarController 74f0b4cd (tab tap regression fix)
 
 - **Context:** CYLTabBarController `3ddb2868` (in `74f0b4cd`, newest) fixes an iOS regression since its migration step 63:
   a delegate that only implements the tab bar delegate methods got no tab taps (React Native tabs never reported taps).
@@ -665,7 +670,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **DONE (2026-11-19): every platform at `74f0b4cd`, 100 / 100**, with the Windows session's `542a0094` (mini program
   161 / 161, HarmonyOS host tests 75 / 75 and the build, Android library 99 / 0 and the example build).
 
-## TODO (2026-11-20, `feat/harmony`): every pin from 74f0b4cd to CYLTabBarController 8ece77dd (iOS 15 minimum, Swift class)
+## DONE (2026-11-20, `feat/harmony`, logged as TODO): every pin from 74f0b4cd to CYLTabBarController 8ece77dd (iOS 15 minimum, Swift class)
 
 - **Context:** CYLTabBarController `8ece77dd` (`8ece77ddc8ecb1c26ac8d09d1d9bc63c0b5d8094`, newest, 146 commits after our pin)
   raises `CYLTabBarController.podspec` and `CYLAnimatedItem.podspec` and every subspec to iOS 15.0 and `Package.swift`
@@ -693,8 +698,10 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `@import CYLAnimatedItem`: a module cycle. It built at `74f0b4cd` (checked the same day), so the break is in the 146
   commits between (class switch, `Package/` header move). Reported to CYLTabBarController; this example's Podfile
   stays at `74f0b4cd` until it is fixed, every other iOS pin is at `8ece77dd`. Score 80 / 100 until then (−20).
+- **Closed (2026-11-21), superseded:** CYLTabBarController `8b7dea18` fixed the module cycle; the next entry moved the
+  React Native Podfile back from `74f0b4cd`, and its iOS Release build passes with a working Classify tab. 100 / 100.
 
-### TODO (2026-11-20, `feat/pin-cyltabbar-8b7dea18`): pins move to CYLTabBarController 8b7dea18
+### DONE (2026-11-20, `feat/pin-cyltabbar-8b7dea18`, logged as TODO): pins move to CYLTabBarController 8b7dea18
 
 - Context: 8b7dea18 (origin/feat/cross-platform-components) fixes the launch crash in `init(configurationFile:)` and the
   React Native module import cycle (noexcept / NSArray / Ivar fixes in the generated headers), and includes the iOS 15
@@ -718,6 +725,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `pubspec.yaml` ref (the RN `fetch-cyltabbar.sh` was already moved by the Mac session). Results: mini program
   `npm test` 167 / 167; HarmonyOS host tests 78 / 78 and the app builds; Android library tests 102 / 0 and the example
   builds; `check-localization-ports.py` 0 problems.
+- **Closed (2026-11-21), superseded:** iOS 90 + the Windows share 10 = 100 for the pins; every platform then moved on
+  to `41660d24` (next entry), which carries the open "commit sent" point.
 
 ### TODO (2026-11-20, `feat/harmony`): pins move to CYLTabBarController 41660d24 (mini program tab switch fix)
 
@@ -742,8 +751,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `git archive` (unchanged; README pin); `android/merged/gradle.properties`; the Flutter example's `pubspec.yaml` ref.
   Results: mini program `npm test` 168 / 168; HarmonyOS host tests 78 / 78 and the app builds; Android library tests
   102 / 0 and the example builds; `check-localization-ports.py` 0 problems.
+- **Status (2026-11-21):** PR #26 is open and its checks are green (11 passed, 0 failed). Score 95 / 100: still to confirm
+  (−5) that the pushed commit was sent to Mac-CYLSearchViewController; no such session is active now. CYLTabBarController
+  has moved on since (newest `e96c4979`, 2026-11-21, 17 commits after `41660d24`), so the next pin move is due.
 
-### TODO (2026-11-20, `feat/harmony`): tag list gesture callbacks on iOS (`didChangeReordering`, `didChangeSmearing`)
+### DONE (2026-11-20, `feat/harmony`, logged as TODO): tag list gesture callbacks on iOS (`didChangeReordering`, `didChangeSmearing`)
 
 - Context: the Windows session added `CYLMenuDelegate.menuDidChangeReordering(menu, reordering)` and
   `menuDidChangeSmearing(menu, smearing)` on Android and HarmonyOS (53608bb5), as the mini program's `reorderingchange` /
@@ -762,7 +774,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   Swift Example 22, Example 116, all pass. Status: DONE, score 100 / 100: the Windows session mapped the two rows (4ee79396; tables 895 / 895,
   832 / 832, 951 / 951).
 
-### TODO (2026-11-20, `feat/harmony`, Windows session): React Native HarmonyOS example builds again after `classifymenu` depends on `cylanimateditem`
+### DONE (2026-11-20, `feat/harmony`, Windows session, logged as TODO): React Native HarmonyOS example builds again after `classifymenu` depends on `cylanimateditem`
 
 - Context: resumed from uncommitted work left in the `C:\w\cvcm-b` worktree. `harmony/classifymenu`'s `oh-package.json5`
   depends on `cylanimateditem` by `file:../cylanimateditem` (the CYLAnimatedItemView migration), but

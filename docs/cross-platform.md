@@ -3,7 +3,7 @@
 The examples of this project on every platform (iOS, Android, and later React Native, Flutter, HarmonyOS, Mini
 Program) show the same screens with the same data and look the same as iOS, which is the reference.
 
-## TODO summary: Android, React Native and Flutter (2026-11-16)
+## DONE summary (logged as TODO summary): Android, React Native and Flutter (2026-11-16)
 
 Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `android.md`, `example-demo-rules.md`,
 `issue-progress.md`). Column 2 starts as `TODO`; when an item is done, its `TODO` is replaced by the result. Score:
@@ -809,7 +809,7 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   logged task (`9b0a5084`); its Android tab bar still defaults to `CYLConstants.CYLTabBarHeight` (49 dp). Nothing to do
   here until it ships the system-height default; then move every pin and re-measure the Flutter Android example.
 
-## TODO (2026-11-19, `feat/harmony`): every TODO below 100 to 100; Mini Program CI red since `b1500779`
+## DONE (2026-11-19, `feat/harmony`, logged as TODO): every TODO below 100 to 100; Mini Program CI red since `b1500779`
 
 - **Context:** relayed by the "Mac-CYLSearchViewController文件夹" session to every session active today. A sweep of
   docs/ on this branch found: (1) the Mini Program CI fails on every commit since `b1500779` with "Out of date (run
