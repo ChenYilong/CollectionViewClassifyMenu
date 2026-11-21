@@ -854,3 +854,28 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   while managing and not searching, `menuMoveItem(at:to:)` for "我的标签" only, `CYLTagStore.moveTag`); a drop elsewhere is
   undone by a reload. Test `testManageModeReordersTheTagsOfMyTags`; the Swift suite passes (23 tests).
 - **Not done:** emulator / simulator screenshots of a drag are not taken.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): every non-iOS pin, and the iOS pin files, from 41660d24 to CYLTabBarController ace1af0e (`itemStyle` rename)
+
+- Context: CYLTabBarController `e96c4979` gave `CYLAnimatedItemView` a public `style: CYLAnimatedItemStyle` (its countdown
+  style), which clashes with `CYLTagButton.style: CYLMenuStyle`: Android `:library:compileDebugKotlin` failed ("'style'
+  hides member of supertype 'CYLAnimatedItemView' and needs an 'override' modifier"), Swift had the same clash, so neither
+  this repository nor CYLSearchViewController could pin past `41660d24` (reported by the CYLSearchViewController session).
+  Owner's decision: rename upstream. CYLTabBarController [PR #822](https://github.com/ChenYilong/CYLTabBarController/pull/822)
+  renames it `itemStyle` on iOS and Android (as on HarmonyOS and the mini program); merged as `ace1af0e`, the newest
+  commit. It also brings `c1abdffe` (Android "More" stops the previous tab's animation).
+- Prompts (verbatim): "option 1, rename upstream to itemStyle, process test all platform (not include ios)", then
+  "merge #822 and move the pins".
+- Acceptance (100): the pins on every platform at `ace1af0e` and `scripts/cyl-tabbar-latest-commit.sh --check` passes (20);
+  Android library tests and the example build (25); HarmonyOS re-vendored, host tests and build (20); mini program
+  re-fetched, `--check` and `npm test` (15); `check-localization-ports.py` (5); CYLSearchViewController told the commit (5);
+  iOS: pod install and the four suites (10). Pass: 60.
+- Result: the eight iOS pin files (four Podfiles, `Package.swift`, the Flutter and React Native iOS Podfiles,
+  `fetch-cyltabbar.sh`), the Flutter `pubspec.yaml` ref, `android/merged/gradle.properties`, the mini program
+  `fetch-cyltabbar.js` COMMIT, `test/animated-item.test.js` and the re-fetched copies (`--check` OK), and
+  `harmony/cylanimateditem` re-vendored with `git archive` (README kept; new upstream `CYLAnimatedItemCountdown.ts` and
+  its test). `--check` finds no stale pin. Android library 105 tests, 0 failures, and `:example:assembleDebug` OK
+  (JDK 17, Gradle 9.4.1); HarmonyOS host tests 80 / 80 and `harmony/scripts/build.sh` BUILD SUCCESSFUL; mini program
+  `npm test` 168 / 168; `check-localization-ports.py` 0 problems. **Score 90 / 100**: iOS is not built here (no Mac;
+  −10). The upstream `Demo Example-Swift` CI job compiled the renamed Swift `CYLAnimatedItemView` before the merge; this
+  pull request's iOS CI (`ios.yml`) runs pod install and the suites.
