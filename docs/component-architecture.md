@@ -674,3 +674,24 @@ started run completes and the next one tests the newest commit.
   while editing and is released when editing ends. Hosts also hold their own scrolling on `reorderingchange`
   (`<scroll-view scroll-y>`, `<page-meta page-style="overflow: hidden">`, the root-view lock). Tests:
   `tag-components.test.js`. Left: the user's check on a phone.
+
+## TODO (2026-11-21, `feat/harmony`): iOS / Swift TODOs in docs checked with Xcode
+
+- **Prompt (verbatim)**: "fix all todo in docs about ios/swift and test with  Xcode"
+- **Prompt (English)**: same.
+- **Context**: PR #27 (`docs/todo-reconcile`, open) already relabels 41 finished TODO headings as DONE, including
+  the `8ece77dd` / `8b7dea18` pin entries and the iOS 15 podspec entry; this task does not repeat it and keeps out of
+  its hunks. What stays open for iOS on that branch: the "not built here / not compiled here (Linux, no Xcode)" notes in
+  this document (the verification TODO of the `CYLTagButton` entry, the `CYLAnimatedItem` pod entry, the
+  `CYLMenuFoldControl` `@objcMembers` note) and in `issue-progress.md` (seven notes), plus one code TODO: the
+  Objective-C redeclarations in `CYLTagButton.swift` (`082f753`) "can go once Objective-C tests `@import CYLAnimatedItem`".
+  Android, HarmonyOS and mini program notes belong to the Windows session. The next pin move (CYLTabBarController
+  `e96c4979`) is not part of this task: that branch is being pushed to right now.
+- **Plan**: fresh clone of `origin/feat/harmony` (`7b7051ab`) in `/tmp/xpr/cvcm-ios-todo`; Xcode 27.2, a new
+  iPhone 18 Pro simulator on iOS 27.2 for this session; `pod install`; suites menu, tag, swift, example
+  (`scripts/unit-tests.sh`), `scripts/pod-lint.sh lib`, `scripts/swift-api-check.sh`; try removing the redeclarations.
+- **Acceptance (100)**: four iOS suites pass on a clean build (40); pod lint and the Swift API check pass (15); the
+  redeclarations removed with the Objective-C tests importing `CYLAnimatedItem`, or the reason they stay written
+  down (15); every iOS "not built here" note replaced with what was verified (20); a labeled screenshot of the animated
+  tags in `docs/assets/` (10). Pass: 60.
+- **Status**: started.
