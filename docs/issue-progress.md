@@ -245,7 +245,8 @@ tags: [issues, ui, cocoapods, progress]
   (the Flutter "TODO" placeholder replaced) and their HAR, the ohpm HAR (module root and `rawfile`), the mini program
   package (root, listed in `files`, expected by `verify-package.js`). Check: `scripts/check-licenses.sh` (passes,
   shellcheck clean); mini program `verify-package.js` and `npm test` 111/111 pass. Not built here: the iOS bundle,
-  the AAR and the HAR (CI and the platform toolchains). iOS bundle: Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md).
+  the AAR and the HAR (CI and the platform toolchains). iOS bundle (2026-11-21, `06baca1d`): the `pod-lint.sh lib` build
+  product `CYLClassifyMenuResources.bundle` contains `LICENSE` and `THIRD-PARTY-NOTICES.md`; Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md).
   2026-11-17, after re-reading CYLTabBarController's guide (tip `ec12a9d`, its `docs/License-Notices.md`): the mini
   program package also carries `miniprogram_dist/LICENSE`, as CYLTabBarController's mini program component folders
   do (the earlier worry about WeChat file types did not hold).

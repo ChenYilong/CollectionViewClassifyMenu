@@ -42,7 +42,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 |:---|:---|:---|:---|:---|
 | 1 | `CYLTagButton` subclasses `CYLAnimatedItemView` | iOS | Done | `CYLTagButton.swift:44` (`9ecc535`) |
 | 2 | Delete `CYLTagAnimationEngine` (run-time engine lookup) | iOS | Done | no occurrence left in the sources |
-| 3 | Icon, title and animation properties are the inherited ones | iOS | Done | `9ecc535`; Objective-C sees them through redeclarations (`082f753`) |
+| 3 | Icon, title and animation properties are the inherited ones | iOS | Done | `9ecc535`; Objective-C sees them through the re-exported `CYLAnimatedItem` module (the redeclarations of `082f753` were removed in `06baca1d`, 2026-11-21) |
 | 4 | Delete indicator → `accessoryView` / `accessoryPlacement` | iOS | Done | `CYLTagButton.swift:260`, `:320` |
 | 5 | Per-state look in `itemStateDidChange` | iOS | Done | `CYLTagButton.swift:578` |
 | 6 | Static measuring stays in the subclass (`width(forTitle:…)`) | iOS | Done | kept in `CYLTagButton` |

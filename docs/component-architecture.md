@@ -204,7 +204,8 @@ are kept in one place: [animated-item-migration.md](animated-item-migration.md).
     `isAnimationEngineAvailable` is `NSClassFromString("CYLTabBarItemAnimationFactory") != nil`; `animationPlayer` is
     not referenced by the core (the base class declares it only with an engine). `animationPlayer` (public before) is
     removed from `CYLTagButton`'s own API (docs/Swift-Migration.md, row 9).
-  - Objective-C callers import only `CollectionViewClassifyMenu`, never `CYLTabBarController`. Clang shows a module's
+  - (Superseded 2026-11-21, `06baca1d`: the redeclarations below are removed; `@_exported import CYLAnimatedItem` makes
+    the inherited members visible to Objective-C.) Objective-C callers import only `CollectionViewClassifyMenu`, never `CYLTabBarController`. Clang shows a module's
     declarations only to a file that imports that module, so `CYLTagButton` redeclares (forwarding to the base class)
     the inherited members Objective-C uses: `animationURL`, `animationLoops`, `animationView`, `imageView`,
     `titleLabel`, `accessoryView`, `placeholderImage`, `restartAnimation()`, `stopAnimation()` (with the ones it already
@@ -689,7 +690,7 @@ started run completes and the next one tests the newest commit.
   (`<scroll-view scroll-y>`, `<page-meta page-style="overflow: hidden">`, the root-view lock). Tests:
   `tag-components.test.js`. Left: the user's check on a phone.
 
-## TODO (2026-11-21, `feat/harmony`): iOS / Swift TODOs in docs checked with Xcode
+## DONE (2026-11-21; TODO 2026-11-21, `feat/harmony`): iOS / Swift TODOs in docs checked with Xcode
 
 - **Prompt (verbatim)**: "fix all todo in docs about ios/swift and test with  Xcode"
 - **Prompt (English)**: same.
