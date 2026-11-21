@@ -879,3 +879,32 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `npm test` 168 / 168; `check-localization-ports.py` 0 problems. **Score 90 / 100**: iOS is not built here (no Mac;
   −10). The upstream `Demo Example-Swift` CI job compiled the renamed Swift `CYLAnimatedItemView` before the merge; this
   pull request's iOS CI (`ios.yml`) runs pod install and the suites.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session, logged as TODO): HarmonyOS `CYLTagButton` tints through `CYLAnimatedItemView.iconColor` ("TODO (in order)" item 5)
+
+- Context: item 5 above. CYLTabBarController [PR #816](https://github.com/ChenYilong/CYLTabBarController/pull/816) gave the
+  HarmonyOS `CYLAnimatedItemView` `iconColor` (static icons tinted as iOS template images, bitmaps through
+  `cylIconColorFilter`); merged 2026-11-17 and in the vendored `harmony/cylanimateditem`. Meanwhile `CYLTagButton` kept
+  its own copy of the filter (`CYLColor.tintFilter`, `20c3357`, bug Y2) and never passed a color to the component, so the
+  static image the component draws under an animated icon (while it loads, after it fails) was never tinted.
+- Prompt (verbatim): "fix the HarmonyOS iconColor TODO"
+- Plan: the component's API becomes the one tint path. (1) The tag's animated icon (`CYLTagAnimatedIcon`) passes the state's
+  icon color to `CYLAnimatedItemView.iconColor` when the style sets one (new `CYLTagButton.animationIconColor`). (2) The
+  tag's own static icon keeps its `Image` (an avatar circle with `Cover`, the fold chevron's rotation and non-square
+  frames, which the component, a square icon with padding and a 44 vp minimum, does not draw), tinted with the component's
+  `cylIconColorFilter`; `CYLColor.tintFilter` (public, used by the example) forwards to it.
+- Acceptance (100): the animated icon's static image gets the icon color through the component (35); one filter, the
+  component's, for the tag's static icon and `CYLColor.tintFilter` (25); host tests for both (20); `build.sh`,
+  `unit-test.sh`, `accessibility-check.py` and `harmony_parity.py --check` pass (10); emulator check of the tinted icons
+  (10). Pass: 60.
+- Result: `CYLTagButton.animationIconColor` (the state's `CYLMenuStyle.iconColor` when the style sets one and the tag is
+  animated, '' otherwise) goes through `CYLTagAnimatedIcon.iconColor` to `CYLAnimatedItemView.iconColor`; the tag's own
+  `Image` uses the component's `cylIconColorFilter`, and `CYLColor.tintFilter` forwards to it (kept: public, used by the
+  example's menu linkage filter icon). `@cyl/classifymenu` re-exports `cylIconColorFilter`. New host test
+  `tintsTheAnimatedIconsStaticImageThroughTheComponent` (the color follows the selected state, '' without an animation,
+  the two filters equal for six values). Found on the way and fixed (AGENTS.md: accessibility gaps are fixed when met): the
+  word picker sample's text field had no accessibility label; it is labeled like its placeholder. Checks: `unit-test.sh`
+  81 / 81, `build.sh` BUILD SUCCESSFUL, `accessibility-check.py` OK, `harmony_parity.py --check` OK.
+  **Score 90 / 100**: no emulator check (−10). The only emulator here, 127.0.0.1:5557, is x86_64 and refuses the HAP
+  ("code:9568347 install parse native so failed … the Abi type supported by the device does not match": `libohos_rive.so`
+  and `libpag.so` are arm64 only), as recorded for row 17; an arm64 emulator (the Mac) or a device is needed.

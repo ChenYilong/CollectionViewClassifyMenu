@@ -17,7 +17,7 @@
  * `ResourceColor`, so theme colors (`$r('sys.color.font_primary')`) follow the color mode.
  */
 import {
-  CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel, CYLAnimatedItemStackView
+  CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel, CYLAnimatedItemStackView, cylIconColorFilter
 } from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import {
@@ -187,6 +187,13 @@ export class CYLTagButton {
    * The static image under the animated icon while it loads and after it fails (`CYLAnimatedItemView.image`), or ''.
    */
   animationImage: ResourceStr = '';
+  /**
+   * The color `CYLAnimatedItemView` tints the animated icon's static image with (`iconColor`: `animationImage` /
+   * `animationSelectedImage` while the animation loads and after it fails): the state's `CYLMenuStyle.iconColor` when
+   * the style sets one, as the tag's own static icon is tinted; '' (the image's own colors) otherwise or without an
+   * animation.
+   */
+  animationIconColor: ResourceColor = '';
   /**
    * The static image under the animated icon while selected (`CYLAnimatedItemView.selectedImage`), or ''.
    */
@@ -1038,6 +1045,7 @@ export class CYLTagButton {
     this.animationOpacity = state === CYLControlState.DISABLED ? DISABLED_ANIMATION_ALPHA : 1;
     this.imageView.tintColor = style.iconColor(state);
     this.imageView.tintsImage = style.appearance(state).iconColor !== undefined;
+    this.animationIconColor = animated && this.imageView.tintsImage ? this.imageView.tintColor : '';
     this.titleLabel.text = style.displayedTitle(this.titleValue);
     this.titleLabel.font = style.titleFont(state, this.fontScale);
     this.titleLabel.textColor = appearance.textColor;
@@ -1173,8 +1181,9 @@ export struct CYLTagButtonComponent {
           .fillColor(this.iv().tintColor)
           // Bitmaps too, when the style sets an icon color (see `tintsImage`): an orange PNG on an orange selected tag
           // stayed orange and invisible (HarmonyOS issue Y2). A drawing color filter (`ColorFilter`) applies to every
-          // image source; the matrix form had no effect after `fillColor` on the emulator.
-          .colorFilter(new ColorFilter(this.iv().tintsImage ? CYLColor.tintFilter(this.iv().tintColor) : CYLColor.IDENTITY_FILTER))
+          // image source; the matrix form had no effect after `fillColor` on the emulator. The filter is the shared
+          // component's (`cylIconColorFilter`, `CYLAnimatedItemView.iconColor`), as for the animated icon's static image.
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.iv().tintsImage ? this.iv().tintColor : '')))
           .objectFit(this.iv().cornerRadius > 0 ? ImageFit.Cover : ImageFit.Contain)
           .borderRadius(this.iv().cornerRadius)
           .clip(this.iv().cornerRadius > 0)
@@ -1190,6 +1199,7 @@ export struct CYLTagButtonComponent {
             animationURL: this.button.animationURL ?? '',
             image: this.button.animationImage,
             selectedImage: this.button.animationSelectedImage,
+            iconColor: this.button.animationIconColor,
             isSelected: this.button.isSelected,
             iconWidth: this.af().width,
             iconHeight: this.af().height,
