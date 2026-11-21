@@ -100,6 +100,22 @@ Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
   emulator, verified 2026-11-18 on `127.0.0.1:5559`, or a device; from Windows, ask the Mac session): PAG and Rive
   playback, their end callbacks and Rive's dispose workarounds. Say in every report and screenshot caption which part ran
   on x86_64 and which still needs arm64.
+- **Rive and PAG tests that only run on arm64 (owner's rule, 2026-11-22): two plans, in this order.**
+  1. **Plan 1, in CYLTabBarController's `CYLAnimatedItemView`:** bring in x86_64 builds of the Rive and PAG native
+     libraries from GitHub (their source repositories or forks that publish x86_64 builds) so the Rive and PAG tests run on
+     the x86_64 emulator. The guard is the running system's architecture (`deviceInfo.abiList` /
+     `const.product.cpu.abilist` is x86_64): only then are the x86_64 libraries used.
+     - Order of work: first, the x86_64 build compiles and does not crash or affect any other feature (Lottie, SVGA,
+       GIF, still images, layout, accessibility, the UI tests); only then make Rive and PAG play correctly.
+     - Until plan 1 is verified, wrap it in a debug build guard as well (debug builds only; it only takes effect on the
+       emulator). Release builds and arm64 devices keep the published arm64 libraries and today's behavior.
+     - **Removing the debug guard needs the owner's approval first**, after plan 1 is verified. Never remove it on your
+       own.
+     - The work is done in CYLTabBarController (`cylanimateditem`), never in this repository's example; this repository
+       then pins the commit and runs its tests on x86_64.
+  2. **Plan 2, if plan 1 fails:** forward the Rive and PAG test task to the session on macOS (Apple Silicon, arm64) with a
+     cross-session message (the commit, the pages, the checks and the screenshots wanted), and record in the task log
+     that plan 1 failed and why.
 - Details and commands: `.agents/skills/cyl-harmonyos/SKILL.md`, "Emulator ABI: arm64-only Rive and PAG".
 
 ## Code and naming

@@ -83,6 +83,14 @@ accessibility description, then an id), to tap, to drive complex flows and to ch
 - x86_64 covers Lottie, SVGA and GIF playback, PAG and Rive still images, layout, dark mode, accessibility, localization
   and the UI tests. PAG and Rive playback needs an arm64 target (the Apple Silicon Mac's DevEco Studio emulator or a
   device; from Windows, ask the Mac session). Never add the ABI filter to the default target.
+- Rive and PAG tests that need arm64, two plans in order (owner's rule):
+  1. Plan 1, in CYLTabBarController's `CYLAnimatedItemView`: x86_64 builds of the Rive and PAG native libraries from
+     GitHub, used only when the running system is x86_64 (`deviceInfo.abiList`). Checklist: (a) the x86_64 build
+     compiles; (b) nothing crashes and no other feature changes (Lottie, SVGA, GIF, still images, layout, accessibility,
+     `ui-test.sh`); (c) then Rive and PAG play. Keep it behind a debug build guard until verified; ask the owner before
+     removing that guard. Release builds and arm64 devices keep the published arm64 libraries.
+  2. Plan 2, if plan 1 fails: send the Rive and PAG tests to the macOS (arm64) session (commit, pages, checks,
+     screenshots) and log why plan 1 failed.
 - On Git Bash, `hdc shell` paths such as `/data/local/tmp` need `MSYS_NO_PATHCONV=1`.
 - Source: AGENTS.md, "HarmonyOS: the HAP will not install on an x86_64 emulator (arm64-only Rive and PAG)".
 
