@@ -295,7 +295,7 @@
 | <img src="assets/harmonyos-push-search-category-tag.jpeg" width="300" alt="HarmonyOS search-category-tag"> search category → "Tencent engineer": the search field takes the tag (after `38fc21d`) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `d1bc5ec` | 2026-11-16 15:26–15:31 NZDT |
 | <img src="assets/harmonyos-push-menu-filter-sheet.jpeg" width="300" alt="HarmonyOS menu-filter-sheet"> menu linkage → filter button: the regions and dishes panel opens (after `53266fd`), but under a gray dimming layer, so it looks blurred (TODO) | HarmonyOS | HarmonyOS 6.0.1 SDK (API 21), emulator `CYL ClassifyMenu Test` (6.0.0.112(SP3DEVC00E112R4P11), 1316 × 2832), macOS 27.3 | `d1bc5ec` | 2026-11-16 15:26–15:31 NZDT |
 
-## 待办（2026-11-18，`feat/harmony`）：截图拼接规则（布局、页眉、页脚、标签） / TODO (2026-11-18, `feat/harmony`): screenshot stitching rules (layout, header, footer, labels)
+## 已完成（2026-11-18，`feat/harmony`）：截图拼接规则（布局、页眉、页脚、标签） / DONE (2026-11-18, `feat/harmony`): screenshot stitching rules (layout, header, footer, labels)
 
 | 中文 | English |
 |:---|:---|
@@ -306,7 +306,7 @@
 
   ![iOS Rive icons rest until played, then play and loop: 2 x 2 grid with header and footer](assets/ios-rive-rest-then-play-grid.png)
 
-## 待办（2026-11-18，`feat/harmony`）：优先一列，一列高于一屏手机时用两列 / TODO (2026-11-18, `feat/harmony`): one column first, two columns when one column is taller than a phone screen
+## 已完成（2026-11-18，`feat/harmony`）：优先一列，一列高于一屏手机时用两列 / DONE (2026-11-18, `feat/harmony`): one column first, two columns when one column is taller than a phone screen
 
 | 中文 | English |
 |:---|:---|
@@ -317,7 +317,7 @@
 
   ![iOS Rive icons at rest, one column with header and footer](assets/ios-rive-rest-one-column.png)
 
-## 待办（2026-11-18，`feat/harmony`）：从 CI 中移除截图标签检查 / TODO (2026-11-18, `feat/harmony`): remove the screenshot label check from CI
+## 已完成（2026-11-18，`feat/harmony`）：从 CI 中移除截图标签检查 / DONE (2026-11-18, `feat/harmony`): remove the screenshot label check from CI
 
 | 中文 | English |
 |:---|:---|
