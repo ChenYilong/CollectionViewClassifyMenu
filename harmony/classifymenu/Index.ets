@@ -49,7 +49,7 @@ export {
   cylTagAnimatedIconOuterWidth, cylTagAnimatedIconOuterHeight
 } from './src/main/ets/components/CYLTagAnimatedIcon';
 /**
- * CYLTabBarController's shared animated icon + title component (module `cylanimateditem`, vendored at commit fe5c3ae):
+ * CYLTabBarController's shared animated icon + title component (module `cylanimateditem`, vendored at commit 618ac11a):
  * an app registers the animation types it plays with `CYLAnimatedItemEngines.register(type)`; `cylIconColorFilter` is the
  * alpha-preserving filter of its `iconColor`, which tags use for their static icons too.
  */

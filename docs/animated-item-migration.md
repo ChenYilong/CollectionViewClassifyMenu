@@ -908,3 +908,26 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   **Score 90 / 100**: no emulator check (−10). The only emulator here, 127.0.0.1:5557, is x86_64 and refuses the HAP
   ("code:9568347 install parse native so failed … the Abi type supported by the device does not match": `libohos_rive.so`
   and `libpag.so` are arm64 only), as recorded for row 17; an arm64 emulator (the Mac) or a device is needed.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): every pin from ace1af0e to CYLTabBarController 618ac11a
+
+- Context: `scripts/cyl-tabbar-latest-commit.sh` names `618ac11a` (`feat/cross-platform-components`, 2026-11-22), 19
+  commits after `ace1af0e`: `b13b88f1` (`showsImageWhenAnimationEnds`, the still image when a play-once animation ends),
+  `73d352d5` (the iOS UIControl tab player moves to Swift), `0076059c` (FlatDesign plus button) and docs. Master's tip
+  `960dc211` (2026-11-15) was asked for first, but it is older and has no `CYLAnimatedItem` on any platform, so the owner
+  chose `618ac11a`.
+- Prompts (verbatim): "move the pins to 960dc211， fix ci error", then "yes, move the pins to 618ac11a".
+- Acceptance (100): the pins on every platform at `618ac11a` and `scripts/cyl-tabbar-latest-commit.sh --check` passes (20);
+  Android library tests and the example build (25); HarmonyOS re-vendored, host tests and build (20); mini program
+  re-fetched, `--check` and `npm test` (15); `check-localization-ports.py` (5); CYLSearchViewController told the commit (5);
+  iOS CI on PR #26 (10).
+- Result: the same pin files as the ace1af0e move (four Podfiles, `Package.swift`, the Flutter and React Native iOS
+  Podfiles and `fetch-cyltabbar.sh`, the Flutter `pubspec.yaml` ref, `android/merged/gradle.properties`, the mini program
+  `fetch-cyltabbar.js` COMMIT and `test/animated-item.test.js`), the mini program copies re-fetched (`--check` OK; the
+  vendored `cyl-animated-item` brings `showsImageWhenAnimationEnds`), `harmony/cylanimateditem` re-vendored with
+  `git archive` (README kept; only `CYLAnimatedItemView.ets` changed), and the stale `fe5c3ae` in the
+  `harmony/classifymenu/Index.ets` comment. `--check` finds no stale pin. Android library 105 tests, 0 failures, and
+  `:example:assembleDebug` OK against `.cyltabbar/618ac11a…`; HarmonyOS host tests 81 / 81 and `build.sh` BUILD
+  SUCCESSFUL; mini program `npm test` 168 / 168; `check-localization-ports.py` 0 problems. No CI was failing on PR #26
+  before this change (every workflow green at 881476a1). **Score 85 / 100** until PR #26's iOS CI passes at this commit
+  (−10: `73d352d5` moves the iOS tab player to Swift, only CI builds iOS here) and CYLSearchViewController is told (−5).
