@@ -1683,7 +1683,7 @@ tags: [issues, ui, cocoapods, progress]
 
 
 
-### TODO (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): no fold control when every tag fits in `defaultVisibleRows`
+### DONE (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): no fold control when every tag fits in `defaultVisibleRows`
 
 - **Request (the user through the CYLSearchViewController session, verbatim):** "全部展开时也显示折叠按钮，改ClassifyMenu 。 When all tags fit in 2 rows, should the fold button still show? It decides whether the ClassifyMenu work adds that option. NO。 如果用户设置的默认行数， taglist 刚好可以在默认行数内全部展示， 甚至少于用户自定义的行数就能全部展示， 就不需要展示展开按钮。"
   (English: while expanded, the fold button still shows; change ClassifyMenu. Should the fold button show when every tag
@@ -1696,3 +1696,12 @@ tags: [issues, ui, cocoapods, progress]
 - **Acceptance (100):** tests on iOS, Android and HarmonyOS (the mini program has them: `search-discover.test.js`):
   tags in fewer rows than `defaultVisibleRows` → no fold cell (25); tags in exactly `defaultVisibleRows` rows → no fold
   cell (25); one row more → a fold cell, last when folded and last when expanded (40); docs updated (10). Pass: 60.
+- **Done (score / 100):** 100. No library change was needed: every platform already follows the rule; tests now pin it with
+  `defaultVisibleRows = 2` and a tail icon fold control, the row counts asserted. HarmonyOS `TagListTailFold.test.ets`
+  (`hasNoFoldCellWhenTheTagsFitInFewerRowsThanDefaultVisibleRows`, `hasNoFoldCellWhenTheTagsFitExactlyDefaultVisibleRows`,
+  `endsWithTheFoldCellWhenTheTagsNeedOneRowMoreThanDefaultVisibleRows`; folded, expanded and collapsed again): host tests
+  85 / 85, commit `65d1181`. Android `CYLTagListTailFoldTest` (the same three names; Robolectric): 3 / 3 with
+  `:library:testDebugUnitTest --tests '*TailFold*'`, commit `c74f56e`. iOS `CYLTagListFoldingTests`:
+  `testInlineFoldCellIsHiddenWhenTagsFillExactlyTheDefaultVisibleRows` added (the one-row and three-row cases already
+  existed), the class 7 / 7 on simulator CB9BDA60 (iOS 27.2) with a fresh derived data path, commit `e217988`. The mini
+  program keeps `search-discover.test.js`.
