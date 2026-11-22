@@ -8,7 +8,7 @@ depended on with `file:`, at a pinned commit.
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`7755741da7750bd6e37c08d499f5ee5fced0bb5c`](https://github.com/ChenYilong/CYLTabBarController/tree/7755741da7750bd6e37c08d499f5ee5fced0bb5c/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-22; was `618ac11a`, then `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`, `c4a1f8fd`) |
+| Commit | [`db883bfa1b9560f3cff52f96c241c6da7626916a`](https://github.com/ChenYilong/CYLTabBarController/tree/db883bfa1b9560f3cff52f96c241c6da7626916a/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-22; was `618ac11a`, then `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`, `c4a1f8fd`, `7755741d`, `43c9eaa2`) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
 | Changes | None. Only this file (`VENDORED.md`) was added; `README.md` is upstream's own (since `62715829`). |

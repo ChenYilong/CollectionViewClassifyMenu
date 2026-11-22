@@ -8,11 +8,12 @@
   `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` at commit `57a527e` (its own MIT license;
   `cylanimateditem/VENDORED.md`), registered in `build-profile.json5` and depended on with `file:` until it is published
   to ohpm.
-- `entry/`: the example (Tags with the playback controls, Classify on the shared `cyl_places.sqlite`). It adds the
-  animation libraries (Lottie `@ohos/lottie` 2.0.38, PAG `@tencent/libpag` 4.4.31, Rive `@ohos/rive` 1.0.4; GIF through
-  ImageKit; SVGA 2.x through its own decoder in `entry/src/main/ets/animation/svga/`, checked without a device by
-  `scripts/svga-decoder-test.sh`), registers them (`CYLAnimatedItemEngines.register(...)`) and supplies the views that
-  play them (`CYLTagAnimationBuilder.register(...)`) in `entry/src/main/ets/animation/`.
+- `cylanimateditem_lottie/`, `cylanimateditem_pag/`, `cylanimateditem_rive/`: CYLTabBarController's engine modules for Lottie
+  (`@ohos/lottie` 2.0.38), PAG (`@tencent/libpag` 4.4.31) and Rive (`@ohos/rive` 1.0.4), vendored like `cylanimateditem`
+  (which plays GIF and SVGA itself). Every player and engine fix lives there, in CYLTabBarController.
+- `entry/`: the example (Tags with the playback controls, Classify on the shared `cyl_places.sqlite`). It registers the five
+  engines (`cylRegisterExampleAnimationEngines()` in `entry/src/main/ets/animation/CYLExampleAnimationViews.ets`) and has
+  no players of its own: every tag icon plays through `CYLAnimatedItemView`'s default engine view.
 - Build, tests and screenshots: `docs/android.md` (HarmonyOS NEXT).
 
 ## TODO: CYLAnimatedItemView migration (2026-11-17)

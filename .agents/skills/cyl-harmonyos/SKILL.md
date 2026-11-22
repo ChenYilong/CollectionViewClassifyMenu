@@ -99,7 +99,6 @@ accessibility description, then an id), to tap, to drive complex flows and to ch
 ```sh
 harmony/scripts/build.sh                 # HAR + HAP
 harmony/scripts/unit-test.sh             # local unit tests on the computer, no device
-harmony/scripts/svga-decoder-test.sh     # SVGA decoder against zlib
 harmony/scripts/accessibility-check.py   # labels on every image, input and control
 harmony/scripts/check-native-strings.py  # native string resources
 harmony/scripts/ui-test.sh               # UI tests on the emulator

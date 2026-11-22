@@ -1,6 +1,9 @@
 /**
- * Inflate (RFC 1951) for SVGA 2.x files, which are zlib streams (RFC 1950) of a protobuf movie. Written in ArkTS so
- * the decoder runs anywhere the library does (UI thread, worker, unit test), without a native zlib binding.
+ * [EN] Inflate (RFC 1951) for SVGA 2.x files, which are zlib streams (RFC 1950) of a protobuf movie, in plain TypeScript so
+ *      the decoder runs anywhere (UI thread, worker, Node unit tests) without a native zlib binding. Moved from
+ *      CollectionViewClassifyMenu's example (harmony/entry/src/main/ets/animation/svga/CYLInflate.ets).
+ * [CN] SVGA 2.x 文件的 Inflate（RFC 1951）：文件是 protobuf 动画的 zlib 流（RFC 1950）。用纯 TypeScript 实现，解码器可在任何地方运行（UI 线程、
+ *      worker、Node 单元测试），无需原生 zlib。从 CollectionViewClassifyMenu 示例迁移而来。
  */
 
 const LENGTH_BASE: number[] = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115,
@@ -49,7 +52,7 @@ class CYLBitReader {
   bits(count: number): number {
     while (this.bitCount < count) {
       if (this.position >= this.data.length) {
-        throw new Error('SVGA: truncated deflate stream');
+        throw new Error('CYLSVGA: zlib: truncated deflate stream');
       }
       this.bitBuffer |= this.data[this.position++] << this.bitCount;
       this.bitCount += 8;
@@ -67,7 +70,7 @@ class CYLBitReader {
 
   byte(): number {
     if (this.position >= this.data.length) {
-      throw new Error('SVGA: truncated deflate stream');
+      throw new Error('CYLSVGA: zlib: truncated deflate stream');
     }
     return this.data[this.position++];
   }
@@ -87,7 +90,7 @@ class CYLBitReader {
       first <<= 1;
       code <<= 1;
     }
-    throw new Error('SVGA: bad Huffman code');
+    throw new Error('CYLSVGA: zlib: bad Huffman code');
   }
 }
 
@@ -119,7 +122,7 @@ class CYLOutput {
 
   copy(distance: number, length: number): void {
     if (distance > this.length) {
-      throw new Error('SVGA: bad deflate distance');
+      throw new Error('CYLSVGA: zlib: bad deflate distance');
     }
     this.ensure(length);
     let from = this.length - distance;
@@ -160,7 +163,7 @@ function dynamicCodes(reader: CYLBitReader): CYLHuffman[] {
     let value = 0;
     if (symbol === 16) {
       if (i === 0) {
-        throw new Error('SVGA: bad code lengths');
+        throw new Error('CYLSVGA: zlib: bad code lengths');
       }
       value = lengths[i - 1];
       repeat = 3 + reader.bits(2);
@@ -198,7 +201,7 @@ export function cylInflateRaw(data: Uint8Array, offset: number = 0): Uint8Array 
       continue;
     }
     if (type === 3) {
-      throw new Error('SVGA: bad deflate block');
+      throw new Error('CYLSVGA: zlib: bad deflate block');
     }
     const codes = type === 1 ? fixedCodes() : dynamicCodes(reader);
     for (;;) {
@@ -210,12 +213,12 @@ export function cylInflateRaw(data: Uint8Array, offset: number = 0): Uint8Array 
       } else {
         const index = symbol - 257;
         if (index >= LENGTH_BASE.length) {
-          throw new Error('SVGA: bad length symbol');
+          throw new Error('CYLSVGA: zlib: bad length symbol');
         }
         const length = LENGTH_BASE[index] + reader.bits(LENGTH_EXTRA[index]);
         const d = reader.decode(codes[1]);
         if (d >= DIST_BASE.length) {
-          throw new Error('SVGA: bad distance symbol');
+          throw new Error('CYLSVGA: zlib: bad distance symbol');
         }
         output.copy(DIST_BASE[d] + reader.bits(DIST_EXTRA[d]), length);
       }
@@ -229,7 +232,7 @@ export function cylInflateRaw(data: Uint8Array, offset: number = 0): Uint8Array 
  */
 export function cylInflateZlib(data: Uint8Array): Uint8Array {
   if (data.length < 2 || (data[0] & 0x0f) !== 8 || ((data[0] << 8) | data[1]) % 31 !== 0) {
-    throw new Error('SVGA: not a zlib stream');
+    throw new Error('CYLSVGA: not a zlib stream (damaged file)');
   }
   return cylInflateRaw(data, (data[1] & 0x20) !== 0 ? 6 : 2);
 }

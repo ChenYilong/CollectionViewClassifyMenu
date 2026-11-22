@@ -45,6 +45,10 @@
       "srcPath": "./cylanimateditem_pag"
     },
     {
+      "name": "cylanimateditem_rive",
+      "srcPath": "./cylanimateditem_rive"
+    },
+    {
       "name": "entry",
       "srcPath": "./entry",
       "targets": [

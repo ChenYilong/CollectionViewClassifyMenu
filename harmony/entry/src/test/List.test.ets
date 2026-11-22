@@ -1,5 +1,4 @@
 import localUnitTest from './LocalUnit.test';
-import svgaDecoderTest from './SVGADecoder.test';
 import localizationTest from './Localization.test';
 import tagListStateTest from './TagListState.test';
 import classifyAndFilterTest from './ClassifyAndFilter.test';
@@ -14,7 +13,6 @@ import tagListWordPickerTest from './TagListWordPicker.test';
 
 export default function testsuite() {
   localUnitTest();
-  svgaDecoderTest();
   localizationTest();
   tagListStateTest();
   classifyAndFilterTest();

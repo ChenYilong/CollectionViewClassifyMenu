@@ -1173,5 +1173,14 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `cylRegisterExampleAnimationEngines()` registers `CYLAnimatedItemLottie`, `CYLAnimatedItemPAG`, `CYLAnimatedItemGIF`. Checks: host tests
   82 / 82, `build.sh` BUILD SUCCESSFUL; x86_64 emulator (debug HAP, kit PAG + Rive): on the animations page Lottie (with image
   assets), PAG and GIF play after "Play all", Rive and SVGA still play through the example's views, no crash.
-- **Score 80 / 100** so far: CI not run yet (−10); Rive and SVGA still in the example (−10, next step: chen-yilong-3a's SVGA engine
-  landed in CYLTabBarController after `7755741d`, Rive in progress).
+- Step 2 result: pins `db883bfa`; `harmony/cylanimateditem` (now with GIF, SVGA and its pure-TS SVGA decoder),
+  `cylanimateditem_lottie`, `cylanimateditem_pag` and the new `cylanimateditem_rive` vendored. The example has no players any more:
+  `CYLExampleAnimationPlayers.ets` and `animation/svga/` deleted, `CYLExampleAnimationViews.ets` only registers the five engines.
+  The SVGA decoder tests (`SVGADecoder.test.ets`, 5) and `scripts/svga-decoder-test.*` moved to CYLTabBarController with the decoder
+  (`cylanimateditem/test/CYLAnimatedItemSVGADecoder.test.mjs`, chen-yilong-3a), and the 2 example SVGA player tests are covered there by
+  `CYLAnimatedItemPlayer.test.mjs`; host tests 82 → 75. Android: `CYLTagLottieImages` (Lottie images by reflection) moved into
+  CYLTabBarController's `:cylanimateditem` (`CYLLottieImageAssets`, 43c9eaa2), so `CYLTagButton.kt` no longer sets it. Checks: host tests
+  75 / 75, `build.sh` BUILD SUCCESSFUL, Android `gradle test` BUILD SUCCESSFUL; x86_64 emulator (kit PAG + Rive): Lottie, PAG, Rive
+  (with `icons.riv`), GIF and SVGA all play after "Play all", no crash.
+- **Score 90 / 100**: CI of PR #31 not passed yet (−10). The other platforms' animation code (mini program example engine component,
+  React Native's HarmonyOS example `CYLRNAnimationEngines.ets`) is tracked in CYLTabBarController's task log (PR #824).
