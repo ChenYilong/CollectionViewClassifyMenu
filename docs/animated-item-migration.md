@@ -1011,7 +1011,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   CI on it; master merged into `feat/harmony` (the only conflict, two task log entries in `docs/issue-progress.md`, keeps
   both). CYLTabBarController moved on to `022da59a` meanwhile (the HarmonyOS tab bar's default height 49 → 56 vp, which
   this repository does not use; docs; the component's README), so every pin moves to `022da59a`.
-- **Score 90 / 100** until PR #26's iOS CI passes (−10); PAG and Rive playback stays an arm64 check.
+- **Score 100 / 100**: PR #26's CI passed on every check (iOS included) and it was merged as `1fc954a4`. PAG and Rive
+  playback stayed an arm64 check (Rive on x86_64 since `c8fee654`, next entry).
 
 ### DONE (2026-11-22, `feat/harmony`, Windows session): the owner's two plans for arm64-only Rive and PAG tests in the instructions and skills
 
@@ -1078,3 +1079,71 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `git.md` read in full before this commit; its rules applied: `check-branch-pr.sh`, the `.gitignore` sync from
   CYLTabBarController's newest commit with `git ls-files -ci --exclude-standard`, the staged diff checked.
   **Score 100 / 100.**
+
+### DONE (2026-11-22, `feat/pin-c8fee654`, Windows session): pins to `c8fee654` and its x86_64 Rive debug kit adopted
+
+- Prompt (verbatim): "move the pins to c8fee654 and adopt it， fix ci build fail"
+- Context: `feat/harmony` was merged (#26), so this is a new branch from `master` (1fc954a4). `c8fee654` adds the
+  x86_64 Rive debug engine kit (`cylanimateditem/x86_64-debug-engines/rive`, installed by
+  `tools/cyl_hap_x86_64.py install --x86-engines`, read only in debug builds) and moves two iOS helpers to Swift
+  (`CYLPAGTabBarItemAttributes`, `CYLAnimatedItemResources`). The newest commit over all branches is already
+  `fe60097a`; the owner named `c8fee654`.
+- Acceptance (100): every pin at `c8fee654` and `harmony/cylanimateditem` re-vendored (30); local tests pass: HarmonyOS
+  host tests and HAP builds, Android, mini program (30); Rive plays on the x86_64 emulator with the kit (20); every CI check
+  of the pull request passes (20).
+- Result: every pin moved `022da59a` → `c8fee654` (four Podfiles, `Package.swift`, the Flutter and React Native pins,
+  `android/merged/gradle.properties`, the mini program's fetch script, test and COMMIT files); `harmony/cylanimateditem`
+  re-vendored with the kit (`VENDORED.md` kept and updated); `.gitignore` unchanged upstream. Local checks: HarmonyOS
+  host tests 82 / 82, `harmony/scripts/build.sh` BUILD SUCCESSFUL (default and emulator HAPs), Android `gradle test`
+  BUILD SUCCESSFUL, mini program 168 / 168. On the x86_64 emulator (127.0.0.1:5557), the emulator HAP installed with
+  `tools/cyl_hap_x86_64.py install --x86-engines yes`: `default/ohos_rive` loads, and on the Animations page every Rive
+  item draws and plays ("Play all": the check mark draws, the shapes and the truck move); no crash. PAG keeps its
+  placeholder (no x86_64 kit yet).
+- Defect found and fixed: after "Play all", the five `icons.riv` dark tags all showed the same "refresh" artboard
+  and kept it. Cause (found by the CYLTabBarController session, chen-yilong-b6): @ohos/rive 1.0.4's `reset()` selects
+  the file's first artboard. The Rive player is this example's own (`CYLRivePlayer` in
+  `harmony/entry/src/main/ets/animation/CYLExampleAnimationPlayers.ets`; the core has no Rive dependency), so it now
+  selects the `artboard` option again after `reset()`; recorded in `docs/example-layer-fixes.md`. CYLTabBarController
+  fixed the same bug in `CYLRiveTabBarItemAnimator`. Checked on the emulator: each dark tag keeps and animates its own
+  icon; host tests 82 / 82, build OK.
+- **Score 100 / 100**: PR #28's CI passed on every check at `03de656d` (Localization, Mini Program, and iOS: library build,
+  `pod lib lint`, the four unit test suites, Example screenshots).
+
+### DONE (2026-11-22, `feat/pin-c8fee654`, Windows session): pins to `143fadff` and its x86_64 PAG debug kit adopted
+
+- Prompt (verbatim): "move the pins to 143fadff and adopt it"
+- Context: PR #28 (pins at `c8fee654`, all checks passed) is still open, so this goes on the same branch. Since
+  `c8fee654`: `fe60097a` and `61b96912` (iOS PAG player to Swift, PAGEnterprise keeps the Objective-C player),
+  `014cf3b5` (x86_64 PAG debug kit, libpag 4.4.31) and `143fadff` (the install tool adds a kit only when it matches the
+  app's engine version, `kit.json`; a 4.5.102 PAG kit too). The example already registers PAG and Rive the same way
+  (`CYLAnimatedItemEngines.register`), so the runtime needs no change.
+- Acceptance (100): every pin at `143fadff` and `harmony/cylanimateditem` re-vendored (30); local tests pass (30); PAG
+  and Rive play on the x86_64 emulator with the kit, no crash (20); every CI check of PR #28 passes (20).
+- Result: every pin moved `c8fee654` → `143fadff` (same files as the entry above); `harmony/cylanimateditem` re-vendored
+  (the PAG kits `x86_64-debug-engines/pag` for libpag 4.4.31 and `pag-4.5.102`, each kit's `kit.json`);
+  `VENDORED.md` updated; `.gitignore` unchanged upstream. Local checks: HarmonyOS host tests 82 / 82, `build.sh` BUILD
+  SUCCESSFUL, the kit tool's Python tests 9 / 9, Android `gradle test` BUILD SUCCESSFUL, mini program 168 / 168. On the
+  x86_64 emulator, `tools/cyl_hap_x86_64.py install` printed "skipped pag-4.5.102 … the app uses @tencent/libpag 4.4.31"
+  and "PAG, Rive"; the app logs "x86_64 debug engine kit active: PAG, Rive (debug builds only)". On the Animations page
+  the six PAG tags now draw their own icons instead of the placeholder and play after "Play all" (the play icon, the
+  ring, the rose change from frame to frame), Rive plays as before, no crash. Not checked: PAG's `onEnded` with the kit.
+- **Score 100 / 100**: PR #28's CI passed on every check at `4c6ae18e` (Localization, Mini Program, and iOS: library
+  build, `pod lib lint`, the four unit test suites, Example screenshots).
+
+### DONE (2026-11-22, `feat/pin-c4a1f8fd`, Windows session): pins to the newest CYLTabBarController commit, `c4a1f8fd`
+
+- Prompt (verbatim): "move the pins to the latest commit and adopt it"
+- Context: PR #28 (pins at `143fadff`) was merged as `a67b9de1`; this is a new branch from `master`. The newest commit
+  over every branch is `c4a1f8fd` (feat/cross-platform-components). Since `143fadff`: `63214dfc` and `c4a1f8fd` (docs),
+  `c5ef58d4` (the cyltabbar Rive tab icons play their state machine by name, not used here). `cylanimateditem`, the
+  mini program components, `Package.swift` and the podspec are unchanged.
+- Acceptance (100): every pin at `c4a1f8fd`, `--check` clean, the vendored copies re-checked (40); local tests pass (30);
+  every CI check of the pull request passes (30).
+- Result: every pin moved `143fadff` → `c4a1f8fd` (four Podfiles, `Package.swift`, Flutter, React Native, Android,
+  the mini program files, `VENDORED.md`); `scripts/cyl-tabbar-latest-commit.sh --check` exits 0. Re-vendoring
+  `harmony/cylanimateditem` and re-fetching the mini program components changed nothing (no upstream change there).
+  Local checks: HarmonyOS host tests 82 / 82, `build.sh` BUILD SUCCESSFUL, Android `gradle test` BUILD SUCCESSFUL, mini
+  program 168 / 168. No emulator check: the component and the kits are byte for byte the ones checked at `143fadff`.
+- **Score 100 / 100**: PR #29's CI passed on every check at `04b39e26` (Localization, Mini Program, and iOS: library
+  build, `pod lib lint`, the four unit test suites, Example screenshots). chen-yilong-b6 also built `04b39e26` on the
+  x86_64 emulator with the kits: Rive and PAG play, the artboards are kept, no crash.
