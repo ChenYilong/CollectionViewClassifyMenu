@@ -1739,7 +1739,7 @@ tags: [issues, ui, cocoapods, progress]
     `src/test/resources/robolectric.properties` keeps `sdk=23` as before; unit tests 108 / 108 again.
 
 
-### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS device (UI) tests on the Mate 70 Pro emulator
+### IN PROGRESS (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS device (UI) tests on the Mate 70 Pro emulator
 
 - **Request (verbatim):** "want the HarmonyOS device (UI) tests run on the Mate 70 Pro emulator"
 - **Context:** HarmonyOS host tests pass (85 / 85). The UI tests (`harmony/entry/src/ohosTest`: Ability, ExampleUi,
@@ -1749,7 +1749,7 @@ tags: [issues, ui, cocoapods, progress]
   in the core (`harmony/classifymenu`) or explained.
 
 
-### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): Rive does not play on HarmonyOS
+### DONE (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): Rive does not play on HarmonyOS
 
 - **Request (verbatim):** "鸿蒙系统上， rive 动画无法播放。 请查看 CYLTabBarController CYLAnimatedItemView 最近的类似commit提交请确认该提交修复了该问题，如果没修复继续修复。"
   (English: on HarmonyOS, Rive animations do not play. Look at CYLTabBarController's recent similar CYLAnimatedItemView
@@ -1768,3 +1768,22 @@ tags: [issues, ui, cocoapods, progress]
   (cylanimateditem upstream) or the example's `CYLRivePlayer` if it persists.
 - **Acceptance (100):** master merged, builds (20); Rive pod rows animate (20); `icons.riv` tags show distinct icons and
   animate (30); Play all test passes 10 runs in a row without the jscrash (30). Pass: 60.
+
+#### Results (2026-11-23)
+
+- **Rive on HarmonyOS: DONE (100 / 100).** The CYLTabBarController commits did fix it, but `feat/harmony` never had
+  them: `ea988cff` merges `origin/master` (PR #28, PR #29) into `feat/harmony` without conflicts, so cylanimateditem is
+  `c4a1f8fd` (includes `c5ef58d4` and the x86_64 Rive kit) and the example has `03de656d`. On the arm64 Mate 70 Pro
+  emulator (HarmonyOS 6.0.0.112, hdc 127.0.0.1:5555): the build installs; after Play all the Rive pod rows and every
+  `icons.riv` dark tag change from frame to frame, and each dark tag shows its own icon (chat, search, timer, bell,
+  user) instead of the shared "refresh" artboard. `StylesAndAnimationsTest#animationControlsPlayAll` passed 10 / 10
+  runs with no new jscrash log (it crashed about 1 run in 4 before the merge). Not checked here: the x86_64 emulator
+  (the Windows session's), where the kit replaces the still image.
+- **HarmonyOS UI tests: 70 / 100, still open.** Every one of the 14 tests passes when run alone. Full runs: 7 / 14 (one
+  60 s timeout in `styleActionsApplyAndReset`, then 6 tests blocked at `Driver.create`), 9 / 14 and, after the merge,
+  10 / 14 with `ui-test.sh` at 120 s per test. The failing tests change between runs (`configurationBuildsBothLists`,
+  the four `SamplesTest` cases: "No control labeled 样式", "The offset is too large and exceeds the widget size", a
+  scrollable that no longer exists). Cause: the tests share one app process and `cylLaunchExample` starts the ability
+  again without resetting its navigation stack or scroll positions, so a test starts on the page or offset the one before
+  left. TODO (owner of `harmony/`, the Windows session): reset the example to its root tab bar in `cylLaunchExample`
+  (pop to root, scroll to top) and re-find a scrollable after each scroll in `cylFindAccessible`.
