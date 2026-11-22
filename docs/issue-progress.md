@@ -1804,3 +1804,28 @@ tags: [issues, ui, cocoapods, progress]
   `harmony/scripts/ui-test.sh` on the arm64 Mate 70 Pro emulator (HarmonyOS 6.0.0.112, hdc 127.0.0.1:5555): 14 / 14,
   three runs in a row (before: 7, 9 and 10 / 14). This also closes the UI test entry above (70 → 100). Test code only;
   `harmony/` is the Windows session's: it should pull `feat/harmony` before its next change there.
+
+
+### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS Rive tags ignore the Loop switch; one shared Rive engine
+
+- **Requests (verbatim):**
+  1. "NO，   NOT All suites are now green on feat/harmony: 鸿蒙os 在rive时候还是有问题， 出现了和之前小程序上一模一样的问题， 不响应loop事件。 pag是可以的，是不是之前只修复了小程序，没修复其他端的， 这次鸿蒙os测试出来了， 请排查Android， flutter React native，有没有这个问题， 先修复鸿蒙os上出现的该问题。"
+     (English: not all suites are green: on HarmonyOS Rive still has the same problem the mini program had, it ignores
+     the Loop switch; PAG is fine. Was only the mini program fixed? Check Android, Flutter and React Native for it; fix
+     HarmonyOS first.)
+  2. "你应该通知   CYLSearch's CYLRiveIcon， 让他把 CYLRiveIcon，封装进 CYLTabBarController 里的CYLAnimatedItemView中， 这样所有引用rive的库都能共享修复好的rive动画， 并且其他端也应该这样，统一使用CYLTabBarController 里的CYLAnimatedItemView。 请通知 CYLSearch来重构， 或者你自己修复，通知相关session。"
+     (English: put CYLRiveIcon into CYLTabBarController's CYLAnimatedItemView so every library that uses Rive shares the
+     fixed Rive animation, and do the same on the other platforms: all use CYLTabBarController's CYLAnimatedItemView.
+     Have CYLSearch refactor it, or fix it yourself and notify the related sessions.)
+- **Cause (HarmonyOS):** the example's `CYLRivePlayer` drives `RiveAnimationView` directly; `supportsLoops` is false for a
+  state machine and `applyLoops` returns early, so state-machine tags (most of them) play once. CYLTabBarController's
+  `CYLRiveIcon` (module `cyltabbar`, not `cylanimateditem`) loops, but only while selected (tab semantics), so reusing it
+  as is would not fix tags either.
+- **Plan (agreed with chenyilong-0b, -e3, -83):** CYLTabBarController gets a sibling module `cylanimateditemrive`
+  (`cylanimateditem` + `@ohos/rive`; `cylanimateditem` stays free of animation libraries because a HAP with @ohos/rive does
+  not install on x86_64) holding `CYLRiveIcon` and a ready `animationBuilder`, with a loop mode for "played and not
+  stopped"; `cyltabbar` re-exports it. Then this repository vendors it and drops its own Rive player; CYLSearch and
+  CYLTableViewPlaceHolder follow. Android, Flutter, React Native: checked on emulators, results below.
+- **Acceptance (100):** shared module in CYLTabBarController, tab bar Rive unchanged (20); ClassifyMenu HarmonyOS uses it,
+  Loop on keeps state-machine Rive tags moving at 5-8 s and Loop off lets them rest, `icons.riv` artboards distinct (40);
+  UI 14 / 14 and host tests pass (15); Android / Flutter / React Native checked and fixed where needed (15); docs (10).
