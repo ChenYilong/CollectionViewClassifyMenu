@@ -1,0 +1,2 @@
+[CYLExampleLayout] screen=editor-search top=CYLTagEditorViewController tags=["Family", "College Classmates", "Book Club"]
+[CYLExampleLayout] editor sections=Search Results(2) selected=["Family", "College Classmates", "Book Club"] query=ios done=false tagList={{0, 130}, {402, 511}} contentHeight=100.0 selectedIndexPaths=0
