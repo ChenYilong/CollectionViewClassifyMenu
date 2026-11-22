@@ -30,6 +30,9 @@ android {
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        // The instrumented test APK defaults to minSdk (23) as its target; Android 14 and later refuse to install an
+        // APK that targets less than 24 (INSTALL_FAILED_DEPRECATED_SDK_VERSION), so connectedDebugAndroidTest stalled.
+        targetSdk = 35
     }
 }
 

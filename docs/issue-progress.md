@@ -1722,10 +1722,18 @@ tags: [issues, ui, cocoapods, progress]
   - Not covered: Android instrumented (device) tests and iOS versions other than 27.2.
 
 
-### TODO (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): Android instrumented (device) tests
+### DONE (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): Android instrumented (device) tests
 
 - **Request (verbatim):** "continue" (after the offer to run the Android device tests on an emulator).
 - **Context:** the unit suites pass (`440cfd9`). `android/merged/library/src/androidTest` holds
   `CYLTagEditingIconsDeviceTest` and `CYLTagTitleFitDeviceTest`. Run `:library:connectedDebugAndroidTest` on this
   session's own emulator (`CYL_API35_test`, read-only, port 5620); the two running emulators belong to other sessions.
 - **Acceptance (100):** both device test classes run to the end and pass, or each failure is fixed in the core.
+- **Done (100 / 100):** `connectedDebugAndroidTest` passes 2 / 2 on `CYL_API35_test` (Android 15, API 35):
+  `CYLTagEditingIconsDeviceTest.theEditIconAndTheCrossDraw`, `CYLTagTitleFitDeviceTest.titlesFitTheirMeasuredWidth`.
+  - **Bug found and fixed (build config of the core library):** the test APK targeted minSdk 23, and Android 14+
+    refuses to install a target below 24 (`INSTALL_FAILED_DEPRECATED_SDK_VERSION`), so the Gradle task stalled at the
+    device step without installing anything. `android/merged/library/build.gradle.kts` now sets
+    `testOptions.targetSdk = 35`. That setting also moved Robolectric's default SDK from 23 to 35 and failed 3 unit
+    tests (two tail fold tests, `UpstreamPullRequestsTest.linesUseStartAndEndRulesForRightToLeft`), so
+    `src/test/resources/robolectric.properties` keeps `sdk=23` as before; unit tests 108 / 108 again.
