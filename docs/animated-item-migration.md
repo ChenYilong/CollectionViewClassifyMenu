@@ -1106,4 +1106,5 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   selects the `artboard` option again after `reset()`; recorded in `docs/example-layer-fixes.md`. CYLTabBarController
   fixed the same bug in `CYLRiveTabBarItemAnimator`. Checked on the emulator: each dark tag keeps and animates its own
   icon; host tests 82 / 82, build OK.
-- **Score 80 / 100** until this pull request's CI passes (−20).
+- **Score 100 / 100**: PR #28's CI passed on every check at `03de656d` (Localization, Mini Program, and iOS: library build,
+  `pod lib lint`, the four unit test suites, Example screenshots).
