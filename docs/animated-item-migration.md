@@ -1127,4 +1127,5 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   and "PAG, Rive"; the app logs "x86_64 debug engine kit active: PAG, Rive (debug builds only)". On the Animations page
   the six PAG tags now draw their own icons instead of the placeholder and play after "Play all" (the play icon, the
   ring, the rose change from frame to frame), Rive plays as before, no crash. Not checked: PAG's `onEnded` with the kit.
-- **Score 80 / 100** until PR #28's CI passes (−20).
+- **Score 100 / 100**: PR #28's CI passed on every check at `4c6ae18e` (Localization, Mini Program, and iOS: library
+  build, `pod lib lint`, the four unit test suites, Example screenshots).
