@@ -11,7 +11,7 @@
  *   drives the progress itself (`setProgress` + `flush` on a timer).
  * - GIF: speed, loop, play from the start, any progress (the player shows the decoded frames on its own timer).
  * - SVGA: speed, loop, play from the start, any progress (2.x files; the player draws the frame for its own timer).
- * - Rive: not here. CYLTabBarController's `CYLRiveAnimationBuilder` plays it, driven by the library's `CYLAnimatedItemPlayer`.
+ * - Rive: not here. CYLTabBarController's `CYLRiveAnimationBuilder` plays it, driven through CYLAnimatedItemView's own props.
  */
 import { AnimationItem } from '@ohos/lottie';
 import { PAGViewController } from '@tencent/libpag';

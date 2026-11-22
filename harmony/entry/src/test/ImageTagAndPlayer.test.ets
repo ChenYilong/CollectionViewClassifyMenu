@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLAnimatedItemPlaybackHost, CYLAnimatedItemPlayer, CYLAnimationEngine, CYLAnimationSource, cylTagItemBuilderURL,
+  CYLAnimationSource, cylTagItemBuilderURL,
   CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
   CYLImageTagMetrics, CYLImageTagPlacement, CYLPoint, CYLRect, CYLSize, CYLTagListState
 } from '@cyl/classifymenu';
@@ -112,27 +112,7 @@ export default function imageTagAndPlayerTest() {
     });
   });
 
-  describe('CYLAnimatedItemPlayer', () => {
-    it('drivesARiveBuilderThroughTheComponentsProps', 0, () => {
-      const calls: string[] = [];
-      const host: CYLAnimatedItemPlaybackHost = {
-        restart: () => { calls.push('restart'); },
-        setLoops: (loops: boolean) => { calls.push(`loops:${loops}`); }
-      };
-      const source = CYLAnimationSource.parse('asset:rive/house.riv#stateMachine=State%20Machine%201');
-      const player = new CYLAnimatedItemPlayer(CYLAnimationEngine.RIVE, source, host);
-      expect(player.supportsLoops).assertTrue();
-      expect(player.supportsSpeed).assertFalse();
-      expect(player.supportsProgress).assertFalse();
-      player.loops = true;
-      player.play();
-      expect(player.isPlaying).assertTrue();
-      player.stopAtProgress(1);
-      expect(player.isPlaying).assertFalse();
-      player.loops = false;
-      expect(calls.join(',')).assertEqual('loops:true,restart,loops:false');
-    });
-
+  describe('cylTagItemBuilderURL', () => {
     it('givesTheBuilderARawfilePathWithItsOptions', 0, () => {
       const source = CYLAnimationSource.parse('asset:Rive/house.riv#stateMachine=State%20Machine%201');
       expect(cylTagItemBuilderURL(source, 'house.riv')).assertEqual('house.riv#stateMachine=State%20Machine%201');

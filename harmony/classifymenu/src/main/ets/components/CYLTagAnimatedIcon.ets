@@ -14,12 +14,13 @@
  * A type whose engine module ships a builder for `CYLAnimatedItemView` itself (CYLTabBarController's
  * `CYLRiveAnimationBuilder` in `cylanimateditemrive`) needs no app view: the app registers that builder with
  * `CYLTagAnimationBuilder.registerItemBuilder(CYLAnimationEngine.RIVE, wrapBuilder(CYLRiveAnimationBuilder))`, the
- * icon hands it the component's context with the file as a rawfile path, and the tag drives it through the component's
- * `animationLoops` and `animationRestartToken` (`CYLAnimatedItemPlayer`). The library still imports no engine module.
+ * icon hands it the component's context with the file as a rawfile path, and the tag passes its playback straight to
+ * the component's `animationSpeed`, `animationLoops` and `animationRestartToken` props. The library still imports no
+ * engine module.
  */
 import { CYLAnimatedItemAnimationContext, CYLAnimatedItemView } from 'cylanimateditem';
 import {
-  CYLAnimatedItemPlayer, CYLAnimationEngine, CYLAnimationPlayer, CYLAnimationSource, cylAnimationEngine
+  CYLAnimationEngine, CYLAnimationPlayer, CYLAnimationSource, cylAnimationEngine
 } from './CYLAnimationPlayer';
 import { CYLImage, CYLImageIsSymbol } from '../core/CYLTypes';
 import { CYLUIContext } from '../core/CYLUIContext';
@@ -94,7 +95,7 @@ export class CYLTagAnimationBuilder {
    * builder: for Rive, `registerItemBuilder(CYLAnimationEngine.RIVE, wrapBuilder(CYLRiveAnimationBuilder))` with
    * CYLTabBarController's `cylanimateditemrive` (register the type too, with `cylRegisterRiveEngine(context)`). It gets the
    * component's context (`url` a rawfile path with the options after `#`, `size`, `selected`, `loops`, `restartToken`,
-   * `onLoaded`, `onFailed`, `onEnded`, `setRestartHandler`); the tag drives it with `CYLAnimatedItemPlayer`.
+   * `onLoaded`, `onFailed`, `onEnded`, `setRestartHandler`); the tag passes its playback to the component's own props.
    */
   static registerItemBuilder(engine: CYLAnimationEngine, builder: WrappedBuilder<[CYLAnimatedItemAnimationContext]>): void {
     cylTagItemBuilders.set(engine, builder);
@@ -184,6 +185,19 @@ export struct CYLTagAnimatedIcon {
    * `animationIconColor`); '' keeps the image's own colors.
    */
   @Prop iconColor: ResourceColor = '';
+  /**
+   * The playback speed passed to `CYLAnimatedItemView.animationSpeed` for a file drawn by a component-level builder.
+   */
+  @Prop animationSpeed: number = 1;
+  /**
+   * Whether a file drawn by a component-level builder repeats (`CYLAnimatedItemView.animationLoops`).
+   */
+  @Prop animationLoops: boolean = false;
+  /**
+   * Bumped to replay a file drawn by a component-level builder from progress 0
+   * (`CYLAnimatedItemView.animationRestartToken`).
+   */
+  @Prop animationRestartToken: number = 0;
   @Prop iconWidth: number = 0;
   /**
    * 0: `iconWidth`.
@@ -198,6 +212,10 @@ export struct CYLTagAnimatedIcon {
    */
   onTap?: () => void;
   /**
+   * A file drawn by a component-level builder has loaded.
+   */
+  onItemLoaded?: () => void;
+  /**
    * The app's animation views (`CYLTagAnimationBuilder.register`), read when the icon is made.
    */
   private animationViews: WrappedBuilder<[CYLTagAnimationContext]> = CYLTagAnimationBuilder.current;
@@ -206,12 +224,6 @@ export struct CYLTagAnimatedIcon {
    * is made; undefined: the app's tag builder draws it.
    */
   private itemBuilder?: WrappedBuilder<[CYLAnimatedItemAnimationContext]>;
-  /**
-   * What `CYLAnimatedItemPlayer` drives on the component when `itemBuilder` plays the file.
-   */
-  @State private itemLoops: boolean = false;
-  @State private itemRestartToken: number = 0;
-  private itemPlayer?: CYLAnimatedItemPlayer;
   private itemURL: string = '';
 
   aboutToAppear(): void {
@@ -230,21 +242,6 @@ export struct CYLTagAnimatedIcon {
       // No host context (a host test): keep the path as written.
     }
     this.itemURL = cylTagItemBuilderURL(source, existing);
-    this.itemPlayer = new CYLAnimatedItemPlayer(source.engine, source, {
-      restart: () => {
-        this.itemRestartToken += 1;
-      },
-      setLoops: (loops: boolean) => {
-        this.itemLoops = loops;
-      }
-    });
-  }
-
-  aboutToDisappear(): void {
-    if (this.itemPlayer !== undefined) {
-      this.itemPlayer.destroy();
-      this.onPlayer?.(undefined);
-    }
   }
 
   /**
@@ -284,8 +281,7 @@ export struct CYLTagAnimatedIcon {
   }
 
   /**
-   * The component's context for `itemBuilder`: the same values, with the tag's player handed over once the file plays
-   * and told when a pass ends.
+   * The component's context for `itemBuilder`: the same values, telling the tag when the file has loaded.
    */
   itemContext(context: CYLAnimatedItemAnimationContext): CYLAnimatedItemAnimationContext {
     const itemContext = new CYLAnimatedItemAnimationContext();
@@ -299,12 +295,9 @@ export struct CYLTagAnimatedIcon {
     itemContext.setRestartHandler = context.setRestartHandler;
     itemContext.onLoaded = () => {
       context.onLoaded();
-      if (this.itemPlayer !== undefined) {
-        this.onPlayer?.(this.itemPlayer);
-      }
+      this.onItemLoaded?.();
     };
     itemContext.onEnded = () => {
-      this.itemPlayer?.didEnd();
       context.onEnded();
     };
     return itemContext;
@@ -334,8 +327,9 @@ export struct CYLTagAnimatedIcon {
         iconColor: this.iconColor,
         iconSize: this.side(),
         spacing: 0,
-        animationLoops: this.itemLoops,
-        animationRestartToken: this.itemRestartToken,
+        animationSpeed: this.itemBuilder !== undefined ? this.animationSpeed : 1,
+        animationLoops: this.itemBuilder !== undefined ? this.animationLoops : false,
+        animationRestartToken: this.itemBuilder !== undefined ? this.animationRestartToken : 0,
         animationBuilder: (context: CYLAnimatedItemAnimationContext): void => {
           this.tagAnimation(context)
         },

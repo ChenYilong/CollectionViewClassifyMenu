@@ -64,6 +64,7 @@ neither the module nor `@ohos/rive`.
 
 **2026-11-22: the adapter is gone too.** The core's `CYLTagAnimatedIcon` takes a component-level builder per type
 (`CYLTagAnimationBuilder.registerItemBuilder`) and drives it through `CYLAnimatedItemView`'s `animationLoops` and
-`animationRestartToken` with the library's engine-free `CYLAnimatedItemPlayer`. The example registers CYLTabBarController's
+`animationRestartToken` (first through a `CYLAnimatedItemPlayer` wrapper, removed the same day: the tag now passes its speed,
+loop switch and play token straight to those props). The example registers CYLTabBarController's
 `CYLRiveAnimationBuilder` for Rive and keeps no Rive code of its own (`CYLRiveIconView`, `CYLRiveIconHost` and `CYLRivePlayer`
 deleted); docs/issue-progress.md, "HarmonyOS tags play Rive through `CYLRiveAnimationBuilder`".

@@ -68,6 +68,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 
 ## TODO (in order)
 
+> **TODO (2026-11-22, CYLTabBarController request)**: HarmonyOS `CYLAnimatedItemView` has `animationSpeed`, `animationLoops` and
+> `animationRestartToken`, which the HarmonyOS tags now pass straight through for builder-drawn types (Rive), but no
+> `animationRestingProgress` (iOS and the mini program have one). Until it has, `CYLTagButton` keeps driving the app's
+> Lottie / PAG / GIF / SVGA players through `CYLAnimationPlayer.stopAtProgress` for the resting frame and the last frame while
+> selected (docs/issue-progress.md, "no wrapper over CYLAnimatedItemView's playback API").
+
 > **Status (2026-11-19, `feat/harmony`, re-read for the "every TODO to 100" request):** item 3 is DONE (`Package.swift`
 > depends on CYLTabBarController's `CYLAnimatedItem` product, which ships the Swift view as `CYLAnimatedItemViews`
 > since `4c7dc79d`; pins at `5744917d`). Item 6 (B20) is DONE on the mini program (`074285a6`, Windows session). Item 2

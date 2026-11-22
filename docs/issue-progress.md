@@ -35,6 +35,36 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### DONE (2026-11-22, `feat/harmony`, 90/100, not compiled): no wrapper over CYLAnimatedItemView's playback API (advisor decides, Sonnet implements)
+
+- **Prompt (verbatim)**: "上游 CYLTabBarController 的 CYLAnimationView 已有同名的 animationSpeed、animationLoops、animationRestartToken 和 restart()。在本仓库新建包装，请不要重复实现 直接调用上游接口即可。并请advisor评估 直接调用上游还是新建包装，哪一个方案更有利于本项目，sonnet实现。"
+- **Prompt (English)**: "Upstream CYLTabBarController's animated item view already has animationSpeed, animationLoops,
+  animationRestartToken and restart() with the same names. Do not reimplement them in a new wrapper in this repository; call
+  the upstream API directly. Have an advisor evaluate which is better for this project, calling upstream directly or a new
+  wrapper; Sonnet implements."
+- **Context**: iOS and Android `CYLTagButton` subclass `CYLAnimatedItemView` and only override its properties. On HarmonyOS
+  (ArkTS structs cannot subclass) the tag drives a `CYLAnimationPlayer` handle, and `86d085c7` added
+  `CYLAnimatedItemPlayer`, which wraps the component's `animationLoops` / `animationRestartToken` for Rive.
+- **Acceptance (100, pass 60)**: advisor's written recommendation (20); no playback wrapper left that duplicates the
+  component's props where they can be called directly (40); behavior kept: Play all, speed, Loop switch, selected state on
+  every engine (20); docs and task log updated, static checks pass (20).
+- **Advisor (20/20)**: iOS, Android and the mini program already call the component directly (`CYLTagButton` subclasses
+  `CYLAnimatedItemView`, or passes `speed` / `loop` and calls `playAnimation()`); only HarmonyOS had a wrapper,
+  `CYLAnimatedItemPlayer` plus copies of the component's state in `CYLTagAnimatedIcon`, which also dropped the speed.
+  Recommendation: call upstream directly; keep `CYLAnimationPlayer` only for what the HarmonyOS component lacks (resting
+  progress and the last frame while selected, the app's Lottie / PAG / GIF / SVGA players).
+- **Result (Sonnet implementation, reviewed)**: `CYLAnimatedItemPlayer` and `CYLAnimatedItemPlaybackHost` deleted (and their
+  exports); `CYLTagAnimatedIcon` takes `animationSpeed`, `animationLoops`, `animationRestartToken` and passes them straight to
+  `CYLAnimatedItemView` for builder-drawn types (Rive); `CYLTagButtonComponent` passes `resolvedAnimationSpeed`,
+  `animationLoops` and `playToken`; `CYLTagButton.itemDidLoad()` replays a play made before the load. `animationView` is
+  undefined for builder-drawn types. Tests: the adapter tests became `cylTagItemBuilderURL` and
+  `replaysABuilderDrawnIconOnceItHasLoaded`. Checks: accessibility, native strings OK, parity 100. **Score 90/100**: behavior
+  (20) only reviewed statically (10): not compiled here. **TODO (owner, DevEco)**: ArkTS build, host tests, emulator (arm64)
+  Play all twice, speed, Loop on/off, select on Rive and on Lottie / PAG / GIF / SVGA tags. **TODO (upstream)**: an
+  `animationRestingProgress` prop on HarmonyOS `CYLAnimatedItemView` (docs/animated-item-migration.md) would let the
+  app-engine path drop `stopAtProgress` too.
+
+
 ### DONE (2026-11-22, `feat/harmony`, static code; build and emulator test by the owner): HarmonyOS tags play Rive through `CYLRiveAnimationBuilder`, no app-side Rive view
 
 - **Prompt (verbatim)**: "searchbar反馈TODO (50 points): ClassifyMenu 会话把 Rive 接到 CYLTagAnimatedIcon 的 CYLRiveAnimationBuilder 上并推送。
@@ -53,7 +83,7 @@ tags: [issues, ui, cocoapods, progress]
 - **Result** (`86d085c7`): core `harmony/classifymenu`: `CYLTagAnimationBuilder.registerItemBuilder(engine, builder)` /
   `itemBuilder(engine)`; `CYLTagAnimatedIcon` hands a registered builder `CYLAnimatedItemView`'s context, with the file as a
   rawfile path (`cylTagItemBuilderURL`: `asset:` removed, the rawfile that exists, options after `#`), and drives
-  `animationLoops` / `animationRestartToken` through `CYLAnimatedItemPlayer` (play restarts, loops, the pass end from
+  `animationLoops` / `animationRestartToken` through `CYLAnimatedItemPlayer` (removed later the same day, see above) (play restarts, loops, the pass end from
   `onEnded`; no speed, no progress), handed to the tag when the file loads. Example: `cylRegisterExampleAnimationEngines`
   registers `CYLRiveAnimationBuilder` for `CYLAnimationEngine.RIVE` (behind `CYL_RIVE_ENABLED`); `CYLRiveIconView`,
   `CYLRiveIconHost` and `CYLRivePlayer` are deleted. The adapter's host test became two tests of `CYLAnimatedItemPlayer` and

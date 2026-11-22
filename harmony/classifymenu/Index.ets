@@ -42,8 +42,7 @@ export * from './src/main/ets/imagetag/ImageTagIndex';
 export * from './src/main/ets/classify/ClassifyIndex';
 export * from './src/main/ets/tagviews/TagViewsIndex';
 export {
-  CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, cylAnimationEngine, CYLAnimatedItemPlayer,
-  CYLAnimatedItemPlaybackHost
+  CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, cylAnimationEngine
 } from './src/main/ets/components/CYLAnimationPlayer';
 export {
   CYLTagAnimatedIcon, CYLTagAnimationBuilder, CYLTagAnimationContext, cylTagAnimationImage,
