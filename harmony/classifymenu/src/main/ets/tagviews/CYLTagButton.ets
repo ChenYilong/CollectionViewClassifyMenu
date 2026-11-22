@@ -435,7 +435,7 @@ export class CYLTagButton {
 
   /**
    * `animationView`: the live player of the animated icon, the one the app's animation view handed over with
-   * `CYLTagAnimationContext.ready(player)` (the example's players expose `lottieItem`, `pagController`, `riveView`,
+   * `CYLTagAnimationContext.ready(player)` (the example's players expose `lottieItem`, `pagController`,
    * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine).
    */
   get animationView(): CYLAnimationPlayer | undefined {
