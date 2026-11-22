@@ -50,7 +50,16 @@ tags: [issues, ui, cocoapods, progress]
 - **Requirements**: the core (`harmony/classifymenu`) still depends on no animation library (no `cylanimateditemrive`, no
   `@ohos/rive`); the app registers upstream's builder for the Rive type, the tag drives loops and replay through the
   component's props; the example drops its Rive view and adapter; static code only (no DevEco here), the owner builds and tests.
-- **Status**: in progress.
+- **Result** (`86d085c7`): core `harmony/classifymenu`: `CYLTagAnimationBuilder.registerItemBuilder(engine, builder)` /
+  `itemBuilder(engine)`; `CYLTagAnimatedIcon` hands a registered builder `CYLAnimatedItemView`'s context, with the file as a
+  rawfile path (`cylTagItemBuilderURL`: `asset:` removed, the rawfile that exists, options after `#`), and drives
+  `animationLoops` / `animationRestartToken` through `CYLAnimatedItemPlayer` (play restarts, loops, the pass end from
+  `onEnded`; no speed, no progress), handed to the tag when the file loads. Example: `cylRegisterExampleAnimationEngines`
+  registers `CYLRiveAnimationBuilder` for `CYLAnimationEngine.RIVE` (behind `CYL_RIVE_ENABLED`); `CYLRiveIconView`,
+  `CYLRiveIconHost` and `CYLRivePlayer` are deleted. The adapter's host test became two tests of `CYLAnimatedItemPlayer` and
+  `cylTagItemBuilderURL`. Checks here: accessibility and native strings OK, parity 100, licenses OK. Not compiled (no DevEco
+  in this container). **TODO (owner)**: ArkTS build (`hvigorw assembleHap`), host tests, and the Rive tags on the emulator
+  (Play all, Loop switch, selected state, `icons.riv` artboards).
 
 
 ### TODO → DONE (2026-11-21, `docs/todo-reconcile`, Windows session): fix every TODO in docs/ (heading pass)
