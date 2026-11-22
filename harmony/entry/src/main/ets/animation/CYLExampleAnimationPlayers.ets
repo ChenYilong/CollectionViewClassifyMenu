@@ -311,6 +311,12 @@ export class CYLRivePlayer extends CYLAnimationPlayer {
       const machine = this.stateMachine;
       const loop = this.loopsValue ? Loop.LOOP : Loop.ONESHOT;
       this.riveView.reset();
+      // @ohos/rive 1.0.4's reset() selects the file's first artboard: select the named one again (a file with several
+      // artboards, such as icons.riv, would otherwise play its first artboard on every item).
+      const artboard = this.source.options.get('artboard');
+      if (artboard !== undefined && this.riveView.getArtboardName() !== artboard) {
+        this.riveView.setArtboardName(artboard);
+      }
       if (machine !== undefined) {
         this.riveView.play(machine, loop, Direction.AUTO, true);
         const trigger = this.source.options.get('triggerInput');

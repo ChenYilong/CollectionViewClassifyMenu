@@ -1099,8 +1099,11 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `tools/cyl_hap_x86_64.py install --x86-engines yes`: `default/ohos_rive` loads, and on the Animations page every Rive
   item draws and plays ("Play all": the check mark draws, the shapes and the truck move); no crash. PAG keeps its
   placeholder (no x86_64 kit yet).
-- Defect found (CYLTabBarController, to be fixed there): after "Play all", the five `icons.riv` dark tags all show
-  the same "refresh" artboard and keep it, while their still images are five different icons; the log has
-  "RiveFileController: selectArtboard: cannot select an Artboard without a valid File". Reported to the
-  CYLTabBarController session.
+- Defect found and fixed: after "Play all", the five `icons.riv` dark tags all showed the same "refresh" artboard
+  and kept it. Cause (found by the CYLTabBarController session, chen-yilong-b6): @ohos/rive 1.0.4's `reset()` selects
+  the file's first artboard. The Rive player is this example's own (`CYLRivePlayer` in
+  `harmony/entry/src/main/ets/animation/CYLExampleAnimationPlayers.ets`; the core has no Rive dependency), so it now
+  selects the `artboard` option again after `reset()`; recorded in `docs/example-layer-fixes.md`. CYLTabBarController
+  fixed the same bug in `CYLRiveTabBarItemAnimator`. Checked on the emulator: each dark tag keeps and animates its own
+  icon; host tests 82 / 82, build OK.
 - **Score 80 / 100** until this pull request's CI passes (−20).
