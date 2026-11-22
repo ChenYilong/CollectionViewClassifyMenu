@@ -1,82 +1,17 @@
 /**
- * The example's animation players, one per engine (moved here from the library, which depends on no animation
- * library): `.json` Lottie (@ohos/lottie), `.pag` PAG (@tencent/libpag), `.riv` Rive (@ohos/rive), `.gif` GIF (frames
- * decoded by ImageKit), `.svga` SVGA (decoded by `CYLSVGAMovie`, drawn on a Canvas). Each subclasses the library's
+ * The example's animation players for the types CYLTabBarController's component does not play yet: `.riv` Rive
+ * (@ohos/rive) and `.svga` SVGA (decoded by `CYLSVGAMovie`, drawn on a Canvas). Lottie, PAG and GIF moved to the
+ * component (`cylanimateditem_lottie`, `cylanimateditem_pag`, `cylanimateditem`). Each subclasses the library's
  * `CYLAnimationPlayer`, the handle a `CYLTagButton` drives (`animationView`), and is handed to the tag by the views in
  * `CYLExampleAnimationViews.ets` through `CYLTagAnimationContext.ready(player)`.
  *
- * What each engine can do (the rest is a no-op, reported by `supportsSpeed` / `supportsLoops` / `supportsProgress`):
- * - Lottie: speed, loop, play from the start, any progress (resting progress, the last frame while selected).
- * - PAG: speed, loop, play from the start, any progress: libpag has no playback speed on HarmonyOS, so the player
- *   drives the progress itself (`setProgress` + `flush` on a timer).
- * - GIF: speed, loop, play from the start, any progress (the player shows the decoded frames on its own timer).
  * - SVGA: speed, loop, play from the start, any progress (2.x files; the player draws the frame for its own timer).
  * - Rive: play from the start (reset, then the state machine's trigger / boolean input, or the animation), loop for
  *   a linear animation (`Loop.LOOP`); @ohos/rive exposes no playback speed and no progress for a state machine.
  */
-import { AnimationItem } from '@ohos/lottie';
-import { PAGViewController } from '@tencent/libpag';
 import { Loop, Direction, RiveAnimationView } from '@ohos/rive';
-import { image } from '@kit.ImageKit';
 import { CYLAnimationEngine, CYLAnimationPlayer, CYLAnimationSource } from '@cyl/classifymenu';
 import { CYLSVGAMovie } from './svga/CYLSVGAMovie';
-
-/** Lottie: `AnimationItem`. */
-export class CYLLottiePlayer extends CYLAnimationPlayer {
-  readonly lottieItem: AnimationItem;
-
-  /** The progress asked for before the animation finished loading, applied once it has. */
-  private pendingProgress?: number;
-
-  constructor(source: CYLAnimationSource, item: AnimationItem) {
-    super(CYLAnimationEngine.LOTTIE, source);
-    this.lottieItem = item;
-    item.addEventListener('DOMLoaded', () => {
-      const progress = this.pendingProgress;
-      this.pendingProgress = undefined;
-      if (progress !== undefined && this.lottieItem.isPaused) {
-        this.stopAtProgress(progress);
-      }
-    });
-  }
-
-  get isPlaying(): boolean {
-    return !this.lottieItem.isPaused;
-  }
-
-  get progress(): number | undefined {
-    const last = Math.max(1, this.lottieItem.totalFrames - 1);
-    return Math.min(1, Math.max(0, this.lottieItem.currentFrame / last));
-  }
-
-  play(): void {
-    this.pendingProgress = undefined;
-    this.lottieItem.loop = this.loopsValue;
-    this.lottieItem.setSpeed(this.speedValue);
-    this.lottieItem.goToAndPlay(0, true);
-  }
-
-  stopAtProgress(progress: number): void {
-    if (this.lottieItem.totalFrames <= 0) {
-      this.pendingProgress = progress;
-      return;
-    }
-    const last = Math.max(0, this.lottieItem.totalFrames - 1);
-    this.lottieItem.goToAndStop(Math.min(1, Math.max(0, progress)) * last, true);
-  }
-
-  destroy(): void {
-    this.lottieItem.destroy();
-  }
-
-  protected applySpeed(): void {
-    this.lottieItem.setSpeed(this.speedValue);
-  }
-
-  protected applyLoops(): void {
-    this.lottieItem.loop = this.loopsValue;
-  }
-}
 
 const TICK_MS: number = 16;
 
@@ -146,88 +81,6 @@ class CYLTimedPlayer extends CYLAnimationPlayer {
       clearInterval(this.timer);
       this.timer = -1;
     }
-  }
-}
-
-/** PAG: `PAGViewController`, its progress driven by the player (libpag has no speed on HarmonyOS). */
-export class CYLPAGPlayer extends CYLTimedPlayer {
-  readonly pagController: PAGViewController;
-
-  constructor(source: CYLAnimationSource, controller: PAGViewController) {
-    super(CYLAnimationEngine.PAG, source);
-    this.pagController = controller;
-  }
-
-  protected get durationMs(): number {
-    return this.pagController.duration() / 1000;
-  }
-
-  protected render(): void {
-    this.pagController.setProgress(this.progressValue);
-    this.pagController.flush();
-  }
-
-  destroy(): void {
-    super.destroy();
-    this.pagController.release();
-  }
-}
-
-/** GIF: the frames decoded by ImageKit, shown one at a time by the icon (`onFrame`). */
-export class CYLGIFPlayer extends CYLTimedPlayer {
-  readonly gifFrames: image.PixelMap[];
-  /** Milliseconds each frame stays. */
-  readonly gifDelays: number[];
-  private total: number = 0;
-  private shownIndex: number = -1;
-  onFrame?: (frame: image.PixelMap) => void;
-
-  constructor(source: CYLAnimationSource, frames: image.PixelMap[], delays: number[]) {
-    super(CYLAnimationEngine.GIF, source);
-    this.gifFrames = frames;
-    this.gifDelays = frames.map((f: image.PixelMap, i: number): number => {
-      const d = i < delays.length ? delays[i] : 100;
-      return d > 0 ? d : 100;
-    });
-    this.total = this.gifDelays.reduce((sum: number, d: number) => sum + d, 0);
-  }
-
-  protected get durationMs(): number {
-    return this.total;
-  }
-
-  /** The frame shown at `progress`: 1 is the last frame. */
-  frameIndex(progress: number): number {
-    if (this.gifFrames.length === 0) {
-      return -1;
-    }
-    if (progress >= 1) {
-      return this.gifFrames.length - 1;
-    }
-    let t = progress * this.total;
-    for (let i = 0; i < this.gifDelays.length; i++) {
-      if (t < this.gifDelays[i]) {
-        return i;
-      }
-      t -= this.gifDelays[i];
-    }
-    return this.gifFrames.length - 1;
-  }
-
-  protected render(): void {
-    const index = this.frameIndex(this.progressValue);
-    if (index >= 0 && index !== this.shownIndex) {
-      this.shownIndex = index;
-      this.onFrame?.(this.gifFrames[index]);
-    }
-  }
-
-  destroy(): void {
-    super.destroy();
-    this.onFrame = undefined;
-    this.gifFrames.forEach((f: image.PixelMap) => {
-      f.release();
-    });
   }
 }
 

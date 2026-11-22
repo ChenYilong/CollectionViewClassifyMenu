@@ -1147,3 +1147,31 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Score 100 / 100**: PR #29's CI passed on every check at `04b39e26` (Localization, Mini Program, and iOS: library
   build, `pod lib lint`, the four unit test suites, Example screenshots). chen-yilong-b6 also built `04b39e26` on the
   x86_64 emulator with the kits: Rive and PAG play, the artboards are kept, no crash.
+
+### IN PROGRESS (2026-11-22, `feat/animated-item-engines`, Windows session): HarmonyOS example on CYLTabBarController's engine views
+
+- Prompt (verbatim): "你应该将CYLRiveIcon 和CYLPagIcon等等所有动效相关的也可能涉及Lottie， gif ，svga， 等等， 你都需要封装进 CYLTabBarController 的CYLAnimatedItemView中， 然后调用的CYLAnimatedItemView中接口来完成example实现。你在 CYLRiveIcon 和CYLPagIcon 等等动效里修复的bug，其他项目也遇到了， 现在要让你帮忙修复后，他们直接更新  CYLTabBarController 的CYLAnimatedItemView，来共共享你的成果。"
+  Follow-up (verbatim): "刚刚我提交的要求，不仅仅适用于鸿蒙os，同时适用与所有平台， 包括iOS， Android ， 小程序， react native， flutter等等平台。迁移动效相关的代码， 重构到 cylanimateditem"
+- Context: the engines move into CYLTabBarController (PR #824, branch `feat/harmony-animated-item-engines`, task log in its
+  `docs/Animated-Item.md`): `cylanimateditem` carries the player API, the default engine view and GIF (and SVGA, by
+  chen-yilong-3a); `cylanimateditem_lottie` and `cylanimateditem_pag` (this session) and `cylanimateditem_rive`
+  (chen-yilong-3a) carry the library engines. This repository then drops its own players
+  (`harmony/entry/src/main/ets/animation/CYLExampleAnimationPlayers.ets`, `CYLExampleAnimationViews.ets`, `svga/`) for them.
+  First step: pins at `7755741d`, the three modules vendored, `CYLTagAnimatedIcon` (core) uses the component's engine
+  view for every type that has one (Lottie, PAG, GIF now) and keeps the app's builder for the others (Rive, SVGA) until their
+  engines land; the tag still drives the player (resting progress, Play all) through an adapter to `CYLAnimationPlayer`.
+- Acceptance (100): pins and vendored modules (20); the core switched with `CYLAnimationPlayer` and `CYLTagButton.animationView`
+  unchanged for apps (25); the example's Lottie, PAG and GIF players removed (15); host tests and builds (15); the animations page
+  on the x86_64 emulator with the kits: Lottie, PAG and GIF play, Play all, speed, loop (15); CI passes (10). Rive and SVGA move
+  in a second step once their engines land.
+- Step 1 result: pins `c4a1f8fd` → `7755741d` (CYLTabBarController PR #824); `harmony/cylanimateditem` re-vendored and
+  `harmony/cylanimateditem_lottie`, `harmony/cylanimateditem_pag` vendored (each with a `VENDORED.md`), registered in
+  `harmony/build-profile.json5` and `entry/oh-package.json5`. Core: `CYLTagAnimatedIcon` uses the component's engine view when an
+  engine registered one for the type (`drivesAnimationPlayback: false`, the player handed to the tag as
+  `CYLAnimatedItemPlayerAdapter`, a `CYLAnimationPlayer`), so `CYLTagButton` and its public API are unchanged. Example: Lottie, PAG
+  and GIF players and views deleted from `CYLExampleAnimationPlayers.ets` / `CYLExampleAnimationViews.ets`;
+  `cylRegisterExampleAnimationEngines()` registers `CYLAnimatedItemLottie`, `CYLAnimatedItemPAG`, `CYLAnimatedItemGIF`. Checks: host tests
+  82 / 82, `build.sh` BUILD SUCCESSFUL; x86_64 emulator (debug HAP, kit PAG + Rive): on the animations page Lottie (with image
+  assets), PAG and GIF play after "Play all", Rive and SVGA still play through the example's views, no crash.
+- **Score 80 / 100** so far: CI not run yet (−10); Rive and SVGA still in the example (−10, next step: chen-yilong-3a's SVGA engine
+  landed in CYLTabBarController after `7755741d`, Rive in progress).

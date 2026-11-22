@@ -1,25 +1,24 @@
 /**
- * The example's animation views (moved here from the library, which depends on no animation library): the app side
- * of CYLTabBarController's `CYLAnimatedItemView`. `cylRegisterExampleAnimationEngines()` registers the types the
- * example plays (`CYLAnimatedItemEngines.register('Lottie')`, 'PAG', 'Rive', 'SVGA', 'GIF') and the builder that draws
- * them (`CYLTagAnimationBuilder.register`); every tag's animated icon then shows `CYLExampleAnimationView`, which picks
- * the engine by the file's extension, hands its player to the tag (`CYLTagAnimationContext.ready`) once it plays, and
+ * The example's animation engines. `cylRegisterExampleAnimationEngines()` registers CYLTabBarController's engine views for
+ * Lottie, PAG and GIF (`CYLAnimatedItemLottie`, `CYLAnimatedItemPAG`, `CYLAnimatedItemGIF`: the tags play them through
+ * `CYLAnimatedItemView`'s default engine view), and, until their engines land in the component, the types 'Rive' and
+ * 'SVGA' with the builder that draws them here (`CYLTagAnimationBuilder.register`): those icons show
+ * `CYLExampleAnimationView`, which picks the engine by the file's extension, hands its player to the tag (`CYLTagAnimationContext.ready`) once it plays, and
  * calls `onFailed()` when the file cannot play, so the component shows the static image or the placeholder again.
  */
-import lottie, { AnimationItem } from '@ohos/lottie';
-import { PAGFile, PAGView, PAGViewController } from '@tencent/libpag';
 import { initializeRive, RendererType, RiveAnimationView } from '@ohos/rive';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { util } from '@kit.ArkTS';
 import {
   CYLAnimatedItemEngines, CYLAnimationEngine, CYLAnimationPlayer, CYLAnimationSource, CYLTagAnimationBuilder,
   CYLTagAnimationContext, CYLUIContext
 } from '@cyl/classifymenu';
 import {
-  CYLGIFPlayer, CYLLottiePlayer, CYLPAGPlayer, CYLRivePlayer, CYLSVGAPlayer
+  CYLRivePlayer, CYLSVGAPlayer
 } from './CYLExampleAnimationPlayers';
+import { CYLAnimatedItemGIF } from 'cylanimateditem';
+import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
+import { CYLAnimatedItemPAG } from 'cylanimateditem_pag';
 import { CYLSVGAMovie, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform } from './svga/CYLSVGAMovie';
 
 /**
@@ -49,108 +48,6 @@ function ensureRive(): boolean {
     }
   }
   return true;
-}
-
-/** The Lottie JSON of a source. */
-function lottieData(context: Context, source: CYLAnimationSource): Object | undefined {
-  try {
-    if (source.inlineJSON !== undefined) {
-      return JSON.parse(source.inlineJSON) as Object;
-    }
-    const bytes = source.rawFileContent(context);
-    if (bytes === undefined) {
-      return undefined;
-    }
-    return JSON.parse(util.TextDecoder.create('utf-8').decodeToString(bytes)) as Object;
-  } catch (e) {
-    return undefined;
-  }
-}
-
-/** Lottie: a canvas. Image assets (`u` + `p`) are rawfiles next to the JSON file, or at the rawfile root. */
-@Component
-struct CYLLottieIconView {
-  source: CYLAnimationSource = new CYLAnimationSource();
-  @Prop iconWidth: number = 0;
-  @Prop iconHeight: number = 0;
-  onPlayer?: (player: CYLAnimationPlayer) => void;
-  onFailed?: () => void;
-  private settings: RenderingContextSettings = new RenderingContextSettings(true);
-  private context2D: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
-
-  private load(): void {
-    const context = CYLUIContext.hostContext(this.getUIContext());
-    const data = lottieData(context, this.source);
-    if (data === undefined) {
-      this.onFailed?.();
-      return;
-    }
-    const directory = this.source.directory;
-    const item: AnimationItem = lottie.loadAnimation({
-      container: this.context2D,
-      renderer: 'canvas',
-      loop: false,
-      autoplay: false,
-      animationData: data,
-      imageAssetDelegate: (imagePath: string, callback: (err: BusinessError, data: image.PixelMap) => void) => {
-        const name = imagePath.split('/').pop() ?? imagePath;
-        const candidates: string[] = [directory + imagePath, directory + name, name];
-        for (const candidate of candidates) {
-          try {
-            const bytes = context.resourceManager.getRawFileContentSync(candidate);
-            const imageSource = image.createImageSource(bytes.buffer as ArrayBuffer);
-            imageSource.createPixelMap().then((pixelMap: image.PixelMap) => {
-              imageSource.release();
-              callback(new Error() as BusinessError, pixelMap);
-            });
-            return;
-          } catch (e) {
-            // Try the next location.
-          }
-        }
-      }
-    });
-    this.onPlayer?.(new CYLLottiePlayer(this.source, item));
-  }
-
-  build() {
-    Canvas(this.context2D)
-      .width(this.iconWidth)
-      .height(this.iconHeight)
-      .accessibilityLevel('no')
-      .onReady(() => this.load())
-  }
-}
-
-/** PAG: libpag's `PAGView`. */
-@Component
-struct CYLPAGIconView {
-  source: CYLAnimationSource = new CYLAnimationSource();
-  @Prop iconWidth: number = 0;
-  @Prop iconHeight: number = 0;
-  onPlayer?: (player: CYLAnimationPlayer) => void;
-  onFailed?: () => void;
-  @State controller: PAGViewController = new PAGViewController();
-
-  aboutToAppear(): void {
-    const context = CYLUIContext.hostContext(this.getUIContext());
-    const file = PAGFile.LoadFromAssets(context.resourceManager, this.source.existingRawFilePath(context));
-    if (file === null) {
-      this.onFailed?.();
-      return;
-    }
-    this.controller.setComposition(file);
-    this.onPlayer?.(new CYLPAGPlayer(this.source, this.controller));
-  }
-
-  build() {
-    Stack() {
-      PAGView({ controller: this.controller })
-    }
-    .width(this.iconWidth)
-    .height(this.iconHeight)
-    .accessibilityLevel('no')
-  }
 }
 
 /** Rive: @ohos/rive's `RiveAnimationView`, with the item's artboard, state machine or animation. */
@@ -190,55 +87,6 @@ struct CYLRiveIconView {
     .width(this.iconWidth)
     .height(this.iconHeight)
     .hitTestBehavior(HitTestMode.None)
-    .accessibilityLevel('no')
-  }
-}
-
-/** GIF: the frames ImageKit decodes, shown by the player. */
-@Component
-struct CYLGIFIconView {
-  source: CYLAnimationSource = new CYLAnimationSource();
-  @Prop iconWidth: number = 0;
-  @Prop iconHeight: number = 0;
-  onPlayer?: (player: CYLAnimationPlayer) => void;
-  onFailed?: () => void;
-  @State frame: image.PixelMap | undefined = undefined;
-
-  aboutToAppear(): void {
-    const bytes = this.source.rawFileContent(CYLUIContext.hostContext(this.getUIContext()));
-    if (bytes === undefined) {
-      this.onFailed?.();
-      return;
-    }
-    const imageSource = image.createImageSource(bytes.buffer as ArrayBuffer);
-    imageSource.getDelayTimeList().then((delays: number[]) => {
-      imageSource.createPixelMapList().then((frames: image.PixelMap[]) => {
-        imageSource.release();
-        const player = new CYLGIFPlayer(this.source, frames, delays);
-        player.onFrame = (f: image.PixelMap) => {
-          this.frame = f;
-        };
-        this.frame = frames.length > 0 ? frames[0] : undefined;
-        this.onPlayer?.(player);
-      });
-    }).catch(() => {
-      imageSource.release();
-      this.onFailed?.();
-    });
-  }
-
-  build() {
-    Stack() {
-      if (this.frame !== undefined) {
-        Image(this.frame)
-          .accessibilityLevel('no')
-          .width(this.iconWidth)
-          .height(this.iconHeight)
-          .objectFit(ImageFit.Contain)
-      }
-    }
-    .width(this.iconWidth)
-    .height(this.iconHeight)
     .accessibilityLevel('no')
   }
 }
@@ -466,13 +314,6 @@ struct CYLExampleAnimationView {
     Stack() {
       if (!this.created) {
         // Waiting for its turn: the component shows the static image (or the placeholder) meanwhile.
-      } else if (this.animationContext.source.engine === CYLAnimationEngine.PAG) {
-        CYLPAGIconView({
-          source: this.animationContext.source,
-          iconWidth: this.animationContext.width,
-          iconHeight: this.animationContext.height,
-          onPlayer: (p: CYLAnimationPlayer) => this.ready(p), onFailed: () => this.failed()
-        })
       } else if (this.animationContext.source.engine === CYLAnimationEngine.RIVE) {
         CYLRiveIconView({
           source: this.animationContext.source,
@@ -482,20 +323,6 @@ struct CYLExampleAnimationView {
         })
       } else if (this.animationContext.source.engine === CYLAnimationEngine.SVGA) {
         CYLSVGAIconView({
-          source: this.animationContext.source,
-          iconWidth: this.animationContext.width,
-          iconHeight: this.animationContext.height,
-          onPlayer: (p: CYLAnimationPlayer) => this.ready(p), onFailed: () => this.failed()
-        })
-      } else if (this.animationContext.source.engine === CYLAnimationEngine.GIF) {
-        CYLGIFIconView({
-          source: this.animationContext.source,
-          iconWidth: this.animationContext.width,
-          iconHeight: this.animationContext.height,
-          onPlayer: (p: CYLAnimationPlayer) => this.ready(p), onFailed: () => this.failed()
-        })
-      } else {
-        CYLLottieIconView({
           source: this.animationContext.source,
           iconWidth: this.animationContext.width,
           iconHeight: this.animationContext.height,
@@ -526,10 +353,12 @@ const CYL_EXAMPLE_ANIMATION_BUILDER: WrappedBuilder<[CYLTagAnimationContext]> =
  * (`EntryAbility.onCreate`).
  */
 export function cylRegisterExampleAnimationEngines(): void {
-  CYLAnimatedItemEngines.register('Lottie');
-  CYLAnimatedItemEngines.register('PAG');
+  // Lottie, PAG and GIF play through CYLTabBarController's engine views (CYLAnimatedItemView's default engine view).
+  CYLAnimatedItemLottie.register();
+  CYLAnimatedItemPAG.register();
+  CYLAnimatedItemGIF.register();
+  // Rive and SVGA keep the example's views until their engines land in the component (docs/animated-item-migration.md).
   CYLAnimatedItemEngines.register('Rive');
   CYLAnimatedItemEngines.register('SVGA');
-  CYLAnimatedItemEngines.register('GIF');
   CYLTagAnimationBuilder.register(CYL_EXAMPLE_ANIMATION_BUILDER);
 }

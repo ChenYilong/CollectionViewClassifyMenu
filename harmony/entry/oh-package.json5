@@ -7,6 +7,9 @@
   "license": "",
   "dependencies": {
     "@cyl/classifymenu": "file:../classifymenu",
+    "cylanimateditem": "file:../cylanimateditem",
+    "cylanimateditem_lottie": "file:../cylanimateditem_lottie",
+    "cylanimateditem_pag": "file:../cylanimateditem_pag",
     "@ohos/lottie": "2.0.38",
     "@tencent/libpag": "4.4.31",
     "@ohos/rive": "1.0.4"

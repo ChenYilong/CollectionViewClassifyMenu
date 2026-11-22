@@ -5,7 +5,7 @@ project 'TagCollectionView.xcodeproj'
 # CYLTabBarController's repository, not on the trunk yet, so by commit, the same as the other Podfiles' CYL_TAB_BAR
 # (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
 CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                      :commit => 'c4a1f8fda52aef766039893d8476f4b09493db23' }
+                      :commit => '7755741da7750bd6e37c08d499f5ee5fced0bb5c' }
 
 target 'TagCollectionView' do
   pod 'CollectionViewClassifyMenu', :path => '..'
