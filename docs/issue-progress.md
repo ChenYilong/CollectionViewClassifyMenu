@@ -1681,3 +1681,18 @@ tags: [issues, ui, cocoapods, progress]
   `sharedGestureStateFollowsEveryList` (two lists, a smear each, a drop, a list cleared mid-drag; the listener hears
   each change once); host tests 80 / 80; the app builds.
 
+
+
+### TODO (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): no fold control when every tag fits in `defaultVisibleRows`
+
+- **Request (the user through the CYLSearchViewController session, verbatim):** "全部展开时也显示折叠按钮，改ClassifyMenu 。 When all tags fit in 2 rows, should the fold button still show? It decides whether the ClassifyMenu work adds that option. NO。 如果用户设置的默认行数， taglist 刚好可以在默认行数内全部展示， 甚至少于用户自定义的行数就能全部展示， 就不需要展示展开按钮。"
+  (English: while expanded, the fold button still shows; change ClassifyMenu. Should the fold button show when every tag
+  fits in 2 rows? No. When the tags fit in exactly the default number of rows that the user set, or in fewer, no expand
+  button is shown.)
+- **Context:** the tail fold control (`CYLMenuFoldControl(position: .tail, content: .icon)`, `defaultVisibleRows = 2`) is
+  the default suggestion style of CYLSearchViewController. Every platform already folds only when the tags need more rows
+  than `defaultVisibleRows` (`canFold(rowCount:)`: `rowCount > defaultVisibleRows`), and an expanded section keeps the
+  fold cell as its last item. So no option is added; the work is to pin the rule with tests where they are missing.
+- **Acceptance (100):** tests on iOS, Android and HarmonyOS (the mini program has them: `search-discover.test.js`):
+  tags in fewer rows than `defaultVisibleRows` → no fold cell (25); tags in exactly `defaultVisibleRows` rows → no fold
+  cell (25); one row more → a fold cell, last when folded and last when expanded (40); docs updated (10). Pass: 60.
