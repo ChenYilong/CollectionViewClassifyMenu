@@ -1,43 +1,30 @@
 # docs · 文件夹规则
 
+Rules are grouped under tag headings (`## [<tag>] <title>`), the same tags as [AGENTS.md](../AGENTS.md); the full rules of each tag are in [instructions/](instructions/).
+
+## [workflow] Tasks and workflow
+
 - 本文件夹记录项目文档和 issue 修复进度，继承根目录及项目的指令。
 - 修改进度表时保留已有记录，并注明实际验证结果和未完成原因。
 - 每次提交 issue 修复后，将该提交地址和重新评估的分数补充到进度表。
-- 本文件夹封面为 `docs.base`。
 - Task log (English rule, AGENTS.md "Task log in docs/"): before starting any task, add a `TODO` entry to the
   most relevant document here (the general list is in `issue-progress.md`) with the task's detailed context, the
   user's requirements and the user's prompt quoted verbatim; mark it done with the result and evidence when the
   task is finished, so an interrupted task can be resumed from it.
-- Screenshots (English rule, AGENTS.md "CI/CD and Example screenshots"): every screenshot, from CI/CD or a local
-  build, is saved in the repository and shown in the related document here (images in `assets/`; default document
-  `screenshots.md`), labeled with platform (iOS, Android, Flutter, React Native, HarmonyOS, Mini Program), OS version,
-  simulator / emulator version, platform SDK version, repository version or commit URL and the time taken; clear
-  originals; README images are cropped key details, stitched vertically first, then two columns, then at most three
-  side by side. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
-- Screenshot stitching, update (2026-11-18, English rule, AGENTS.md "Screenshots: stitching layout, update" and
-  "Screenshots: header and footer"; checklist `.agents/skills/cyl-screenshots/SKILL.md`): portrait, two columns by
-  default and several rows (one column only for a single panel or wide crops, never more than two); same-size panels
-  of whole elements at original pixels; a header (red, bold: `Purpose:`; `Platform:` simulator platform and device,
-  simulator OS version, `Host:` OS version, `IDE:` version), a caption above each panel and a footer (`Result:`,
-  `Versions:`, `Taken:`), each in its own band, never overlapping a panel; English only. Tool:
-  `scripts/stitch-screenshots.swift`. Example: `assets/ios-rive-rest-then-play-grid.png`.
-- Screenshot columns, update (2026-11-18, later; AGENTS.md "Screenshots: columns, update"): one column first, panels
-  top to bottom; two columns and several rows only when the one-column image would be taller than one phone screen
-  (height > 2.17 x width, 19.5:9). Examples: `assets/ios-rive-rest-one-column.png`,
-  `assets/ios-rive-rest-then-play-grid.png`.
-- Upstream projects (English rule, AGENTS.md "Upstream projects (translations and ports)"): when a project linked in
-  these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
-  of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each
-  fix until 100; a translation not started yet waits until the score reaches 60.
-- Example demo rules (English rule, AGENTS.md "Example demo rules"): `example-demo-rules.md` holds the rules for what
-  the examples of every platform demonstrate; animation screens offer Play all (restart from progress 0), a speed
-  slider and a loop switch that combine and act in real time.
-- Swift (English rule, AGENTS.md "Swift examples and a Swift-friendly core"): `Swift-Coding-Standard.md` is the Swift
-  coding standard (compatibility of the Swift and Objective-C API, files, language, concurrency, comments,
-  verification); `Swift-Migration.md` logs the core's migration to Swift with its score after every commit.
-- Swift migration priority (English rule, AGENTS.md "Core quality first, examples last"): example compile errors and
-  test failures caused by the migration are fixed in the example code first; the examples have the lowest weight and
-  get no compatibility work; the core's Swift code follows `Swift-Coding-Standard.md` with no baggage kept for them.
+
+## [sessions] Sessions and shared devices
+
+- Running scripts (English rule, AGENTS.md "Running scripts"; skill `.agents/skills/cyl-verify/`): Run scripts with bash,
+  not the interactive shell (zsh does not split `$var` into words, so a command or a list in a variable breaks);
+  use `bash script.sh` or `bash <<'EOF'`, and wrapper scripts or bash arrays for commands with arguments.
+- Session roles by name (English rule, AGENTS.md "Session roles by name: Mac for iOS, Win for the other platforms"):
+  before a task, check the active session names. A session whose name starts with `Mac` (case insensitive) mainly
+  develops and tests iOS; one starting with `Win` (case insensitive) mainly develops the other platforms (Android,
+  HarmonyOS, the mini program). When both are active, prefer handing each platform's part of a task to the matching
+  session; when no session follows this naming, skip the rule and finish the task independently.
+
+## [harmonyos] HarmonyOS
+
 - HarmonyOS port (English rule, 2026-11-16, the user's prompt verbatim: "写入instructions相关文档，鸿蒙系统版本，原则如下：API对标iOS端，example对标iOS端。需要一比一复刻。内部实现对标android 内的Kotlin 源码实现迁移到鸿蒙端。"):
   `harmony.md` is the HarmonyOS document. Versions: target HarmonyOS 5.0.0 (API 12), built with the HarmonyOS
   6.0.1 SDK (API 21) and DevEco Studio 6.0.1, run on the Mate 70 Pro emulator (HarmonyOS 6.0.0). Principles:
@@ -55,25 +42,66 @@
   (and every platform)"): all code supports screen readers, visual assistance and localization through resource
   files; add support first where it is missing; automated UI tests locate controls, tap and run multi-step flows
   through accessibility and localized text first. The HarmonyOS parity sheet is `harmony.md`.
+
+## [code] Code, Swift core and bugs
+
+- Swift (English rule, AGENTS.md "Swift examples and a Swift-friendly core"): `Swift-Coding-Standard.md` is the Swift
+  coding standard (compatibility of the Swift and Objective-C API, files, language, concurrency, comments,
+  verification); `Swift-Migration.md` logs the core's migration to Swift with its score after every commit.
+- Swift migration priority (English rule, AGENTS.md "Core quality first, examples last"): example compile errors and
+  test failures caused by the migration are fixed in the example code first; the examples have the lowest weight and
+  get no compatibility work; the core's Swift code follows `Swift-Coding-Standard.md` with no baggage kept for them.
 - Commit messages (English rule, AGENTS.md "Commit messages: git cz style, English only"; skill
   `.agents/skills/cyl-commit/`): `git cz` style (`<type>(<scope>): <emoji> <summary>`), the whole message in English, no
   Chinese characters; a non-English prompt is quoted only in the task log here, never in a commit.
-- Running scripts (English rule, AGENTS.md "Running scripts"; skill `.agents/skills/cyl-verify/`): Run scripts with bash,
-  not the interactive shell (zsh does not split `$var` into words, so a command or a list in a variable breaks);
-  use `bash script.sh` or `bash <<'EOF'`, and wrapper scripts or bash arrays for commands with arguments.
+- Fix issues in the core first (AGENTS.md "Fix issues in the core first"): the core is the code published to a package registry (CocoaPods, Maven / Gradle, npm, pub.dev, ohpm); an example-layer fix is the worst option; when the core cannot fix a core defect, ask the user first and say why; record every example-layer fix and its reason in `docs/example-layer-fixes.md`.
+- Bugs (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated item"): record first, then screenshot, then fix; animation and icon + title bugs are fixed in CYLTabBarController's animated item component, not in the examples; a demo that needs more gets a new component API from CYLTabBarController.
+
+## [testing] Testing, parity and CI
+
+- Screenshots (English rule, AGENTS.md "CI/CD and Example screenshots"): every screenshot, from CI/CD or a local
+  build, is saved in the repository and shown in the related document here (images in `assets/`; default document
+  `screenshots.md`), labeled with platform (iOS, Android, Flutter, React Native, HarmonyOS, Mini Program), OS version,
+  simulator / emulator version, platform SDK version, repository version or commit URL and the time taken; clear
+  originals; README images are cropped key details, stitched vertically first, then two columns, then at most three
+  side by side. Correction (2026-11-12): the original request said both "prefer a horizontal layout" and "a horizontal stitch is the worst", which contradict each other; the user corrected it to vertical first.
+- Screenshot stitching, update (2026-11-18, English rule, AGENTS.md "Screenshots: stitching layout, update" and
+  "Screenshots: header and footer"; checklist `.agents/skills/cyl-screenshots/SKILL.md`): portrait, two columns by
+  default and several rows (one column only for a single panel or wide crops, never more than two); same-size panels
+  of whole elements at original pixels; a header (red, bold: `Purpose:`; `Platform:` simulator platform and device,
+  simulator OS version, `Host:` OS version, `IDE:` version), a caption above each panel and a footer (`Result:`,
+  `Versions:`, `Taken:`), each in its own band, never overlapping a panel; English only. Tool:
+  `scripts/stitch-screenshots.swift`. Example: `assets/ios-rive-rest-then-play-grid.png`.
+- Screenshot columns, update (2026-11-18, later; AGENTS.md "Screenshots: columns, update"): one column first, panels
+  top to bottom; two columns and several rows only when the one-column image would be taller than one phone screen
+  (height > 2.17 x width, 19.5:9). Examples: `assets/ios-rive-rest-one-column.png`,
+  `assets/ios-rive-rest-then-play-grid.png`.
+- Parity tables and the score loop (AGENTS.md "Parity tables and the score loop"): source API | description | counterpart (`TODO` by default); 100 when no `TODO` is left, 0 when all are; loop: match existing code, score, implement the `TODO` rows in the core first and show them in the example, score again, until 100; then the reverse table.
+
+## [dependencies] Dependencies, licenses and resources
+
+- Upstream projects (English rule, AGENTS.md "Upstream projects (translations and ports)"): when a project linked in
+  these docs is the source of a translation, merge (or translate and merge) its open pull requests, and keep a table
+  of its open issues here (issue link, description, fix status `TODO` by default), fixing them and scoring after each
+  fix until 100; a translation not started yet waits until the score reaches 60.
+
+## [examples] Example demo rules
+
+- Example demo rules (English rule, AGENTS.md "Example demo rules"): `example-demo-rules.md` holds the rules for what
+  the examples of every platform demonstrate; animation screens offer Play all (restart from progress 0), a speed
+  slider and a loop switch that combine and act in real time.
+
+## [docs] Documentation
+
+- 本文件夹封面为 `docs.base`。
+- Bilingual documents (English rule, AGENTS.md "Documentation: bilingual Chinese–English"): the documents listed in
+  `Bilingual-Documentation.md` are written in Chinese and English; check them with `scripts/bilingual-docs.py check`.
+
+## [git] Git, branches and repository hygiene
+
 - Pull requests (English rule, AGENTS.md "Branches and pull requests"; skill `.agents/skills/cyl-commit/`): a branch
   with commits always has an open pull request; before every commit run `bash scripts/check-branch-pr.sh` and open
   one if missing (base: the previously active PR's branch, else `master`); more than two open pull requests: ask the
   user before creating another branch.
 - Commit and push (English rule, AGENTS.md "Branches and pull requests"): at the end of every answer, on any branch
   other than `master` / `main`, commit and push without asking (after `bash scripts/check-branch-pr.sh`).
-- Fix issues in the core first (AGENTS.md "Fix issues in the core first"): the core is the code published to a package registry (CocoaPods, Maven / Gradle, npm, pub.dev, ohpm); an example-layer fix is the worst option; when the core cannot fix a core defect, ask the user first and say why; record every example-layer fix and its reason in `docs/example-layer-fixes.md`.
-- Parity tables and the score loop (AGENTS.md "Parity tables and the score loop"): source API | description | counterpart (`TODO` by default); 100 when no `TODO` is left, 0 when all are; loop: match existing code, score, implement the `TODO` rows in the core first and show them in the example, score again, until 100; then the reverse table.
-- Bugs (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated item"): record first, then screenshot, then fix; animation and icon + title bugs are fixed in CYLTabBarController's animated item component, not in the examples; a demo that needs more gets a new component API from CYLTabBarController.
-- Session roles by name (English rule, AGENTS.md "Session roles by name: Mac for iOS, Win for the other platforms"):
-  before a task, check the active session names. A session whose name starts with `Mac` (case insensitive) mainly
-  develops and tests iOS; one starting with `Win` (case insensitive) mainly develops the other platforms (Android,
-  HarmonyOS, the mini program). When both are active, prefer handing each platform's part of a task to the matching
-  session; when no session follows this naming, skip the rule and finish the task independently.
-- Bilingual documents (English rule, AGENTS.md "Documentation: bilingual Chinese–English"): the documents listed in
-  `Bilingual-Documentation.md` are written in Chinese and English; check them with `scripts/bilingual-docs.py check`.

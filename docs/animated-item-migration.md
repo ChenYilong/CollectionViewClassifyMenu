@@ -1028,3 +1028,23 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - Result: written in all three, in the section "HarmonyOS: the HAP will not install on an x86_64 emulator (arm64-only
   Rive and PAG)" and the skill's "Emulator ABI" section. CYLTabBarController records the same plans in `022da59a`.
   **Score 100 / 100.** Plan 1 itself is CYLTabBarController work (chen-yilong-b6's session holds the x86_64 task there).
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): instruction files organized by tag, AGENTS.md under 200 lines
+
+- Prompt (verbatim): "找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入，并且在本次任务中就执行一次下面的指令：
+  将项目的instructions相关文件，可能包含agent Claude文件， 首先将文件进行归类， 以及使用关键词管理，关键词可以称之为称作 tag，
+  使用标题形式将所有内容归类， 比如测试场景， windows场景， macos专属场景， 文档场景， 等等等等， 将现有的所有文件按照分类，并打上tag，
+  以标题形式展示。 每个分类标题不能隐藏， 将文件限制在200行以内，如果tag内的内容过多导致超出， 那么就将 超出的部分， 在docs文件夹中新建文件夹，
+  为instructions文件夹， 按照tag新建文件，将每个分类超出的部分放进去。以相对路径链接形式进行引用， 保证触发关键词，触发tag的时候才去看更详细的描述。"
+- Acceptance (100): the rule written in English into the instructions and a skill (20); AGENTS.md re-organized by tag,
+  every heading visible, 200 lines or fewer (30); the overflow in `docs/instructions/<tag>.md`, word for word, linked by
+  relative paths (30); CLAUDE.md and the folder `instructions.md` files under the same tag headings (20).
+- Result: AGENTS.md 818 → 151 lines: a tag table and 14 `## [<tag>]` headings (`instructions`, `workflow`, `sessions`,
+  `windows`, `macos`, `testing`, `harmonyos`, `code`, `dependencies`, `examples`, `i18n`, `accessibility`, `docs`,
+  `git`), each with a short form and links to its sections. The 30 sections moved word for word into 12 tag files in
+  `docs/instructions/` (checked by a script: every section's text is found unchanged); `docs/instructions/windows.md` is
+  new (Windows notes checked this session: Git Bash path conversion, hdc paths, `PYTHONUTF8`, the x86_64 emulator).
+  CLAUDE.md (25 lines), `docs/instructions.md` (107), `scripts/instructions.md` (43) and `harmony/instructions.md` (34)
+  have their bullets, unchanged, under the same tag headings. New skill `.agents/skills/cyl-instructions/SKILL.md`.
+  **Score 100 / 100.** CYLTabBarController (198f84a7) and CYLSearchViewController (1943fe6) were re-organized the same
+  day by their sessions; their tag names differ slightly.
