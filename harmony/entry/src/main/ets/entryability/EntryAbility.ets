@@ -12,7 +12,7 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     // The library plays no animation by itself: the example registers the engines it bundles (Lottie, PAG, Rive, SVGA,
     // GIF) and the views that play them, before any tag is shown.
-    cylRegisterExampleAnimationEngines();
+    cylRegisterExampleAnimationEngines(this.context);
     CYLLaunchOptions.read(want);
     this.applyLaunchOptions();
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');

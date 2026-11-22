@@ -116,7 +116,7 @@ export function cylAnimationEngine(url: string): CYLAnimationEngine {
 /**
  * `CYLTagButton.animationView` on HarmonyOS: the live player of an animated icon, a handle to the engine's view or
  * controller. The base class plays nothing; the app's engine views subclass it (the example's `CYLLottiePlayer`
- * exposes `lottieItem`, `CYLPAGPlayer` `pagController`, `CYLRivePlayer` `riveView`, `CYLGIFPlayer` `gifFrames`,
+ * exposes `lottieItem`, `CYLPAGPlayer` `pagController`, `CYLGIFPlayer` `gifFrames`,
  * `CYLSVGAPlayer` `svgaMovie`) and hand it to the tag with `CYLTagAnimationContext.ready(player)`.
  */
 export class CYLAnimationPlayer {

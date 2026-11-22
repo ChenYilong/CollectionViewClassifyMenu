@@ -8,8 +8,8 @@
  */
 import lottie, { AnimationItem } from '@ohos/lottie';
 import { PAGFile, PAGView, PAGViewController } from '@tencent/libpag';
-import { initializeRive, RendererType, RiveAnimationView } from '@ohos/rive';
-import { deviceInfo } from '@kit.BasicServicesKit';
+import { CYLRiveIcon, CYLRiveLoopPolicy, cylRegisterRiveEngine } from 'cylanimateditemrive';
+import { common } from '@kit.AbilityKit';
 import { image } from '@kit.ImageKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
@@ -27,29 +27,6 @@ import { CYLSVGAMovie, CYLSVGAShape, CYLSVGAShapeType, CYLSVGATransform } from '
  * crashes again (issue Z1).
  */
 export const CYL_RIVE_ENABLED: boolean = true;
-
-/**
- * The emulator draws Rive with the Canvas renderer: @ohos/rive's default GPU renderer (one EGL surface per view) stalled
- * the emulator's GPU thread and crashed in eglDestroySurface on dispose (issue Z1; the same fix worked in
- * CYLTableViewPlaceHolder). Real devices keep the GPU renderer.
- */
-function cylRiveRendererType(): RendererType {
-  return deviceInfo.productModel === 'emulator' ? RendererType.Canvas : RendererType.Rive;
-}
-
-let riveInitialized: boolean = false;
-
-function ensureRive(): boolean {
-  if (!riveInitialized) {
-    try {
-      initializeRive();
-      riveInitialized = true;
-    } catch (e) {
-      return false;
-    }
-  }
-  return true;
-}
 
 /** The Lottie JSON of a source. */
 function lottieData(context: Context, source: CYLAnimationSource): Object | undefined {
@@ -153,7 +130,12 @@ struct CYLPAGIconView {
   }
 }
 
-/** Rive: @ohos/rive's `RiveAnimationView`, with the item's artboard, state machine or animation. */
+/**
+ * Rive: CYLTabBarController's `CYLRiveIcon` (the tab bar's Rive icon) with the item's file and options (`artboard`,
+ * `stateMachine`, `input` / `triggerInput`, `numberInput` / `values`, `animation`), so the tags and the tab bar play
+ * Rive alike; it picks the Canvas renderer on emulators. A file that cannot load (or @ohos/rive, arm64 only, cannot
+ * run) calls `onFailed()`: the tag shows its static image.
+ */
 @Component
 struct CYLRiveIconView {
   source: CYLAnimationSource = new CYLAnimationSource();
@@ -161,29 +143,46 @@ struct CYLRiveIconView {
   @Prop iconHeight: number = 0;
   onPlayer?: (player: CYLAnimationPlayer) => void;
   onFailed?: () => void;
-  private available: boolean = CYL_RIVE_ENABLED && ensureRive();
+  @State selected: boolean = false;
+  @State replayToken: number = 0;
+  @State loops: boolean = false;
+  private path: string = '';
 
   aboutToAppear(): void {
-    if (!this.available) {
+    if (!CYL_RIVE_ENABLED) {
       this.onFailed?.();
+      return;
     }
+    const pairs: string[] = [];
+    this.source.options.forEach((value: string, key: string) => {
+      pairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+    });
+    const file = this.source.existingRawFilePath(CYLUIContext.hostContext(this.getUIContext()));
+    this.path = pairs.length === 0 ? file : `${file}#${pairs.join('&')}`;
+    this.onPlayer?.(new CYLRivePlayer(this.source, {
+      replay: () => {
+        this.replayToken += 1;
+      },
+      select: (selected: boolean) => {
+        this.selected = selected;
+      },
+      setLoops: (loops: boolean) => {
+        this.loops = loops;
+      }
+    }));
   }
 
   build() {
     Stack() {
-      if (this.available) {
-        RiveAnimationView({
-          riveResource: `@rawfile/${this.source.existingRawFilePath(CYLUIContext.hostContext(this.getUIContext()))}`,
-          riveArtboard: this.source.options.get('artboard') ?? '',
-          riveStateMachine: this.source.options.get('stateMachine') ?? '',
-          riveAnimation: this.source.options.get('animation') ?? '',
-          riveAutoPlay: false,
-          riveFit: 'contain',
-          rendererType: cylRiveRendererType(),
-          touchPassThrough: true,
-          onReady: (view: RiveAnimationView) => {
-            this.onPlayer?.(new CYLRivePlayer(this.source, view));
-          }
+      if (CYL_RIVE_ENABLED) {
+        CYLRiveIcon({
+          path: this.path,
+          iconSize: Math.min(this.iconWidth, this.iconHeight),
+          selected: this.selected,
+          replayToken: this.replayToken,
+          loops: this.loops,
+          loopPolicy: CYLRiveLoopPolicy.WhilePlaying,
+          onLoadError: (message: string) => this.onFailed?.()
         })
       }
     }
@@ -522,13 +521,13 @@ const CYL_EXAMPLE_ANIMATION_BUILDER: WrappedBuilder<[CYLTagAnimationContext]> =
 
 /**
  * Registers the engines the example plays with CYLTabBarController's `CYLAnimatedItemEngines` (Lottie, PAG, Rive, SVGA,
- * GIF) and the views that play them with the library (`CYLTagAnimationBuilder`). Called once, before any tag is shown
+ * GIF; Rive through `cylRegisterRiveEngine(context)` of the shared `cylanimateditemrive` module) and the views that play them with the library (`CYLTagAnimationBuilder`). Called once, before any tag is shown
  * (`EntryAbility.onCreate`).
  */
-export function cylRegisterExampleAnimationEngines(): void {
+export function cylRegisterExampleAnimationEngines(context?: common.Context): void {
   CYLAnimatedItemEngines.register('Lottie');
   CYLAnimatedItemEngines.register('PAG');
-  CYLAnimatedItemEngines.register('Rive');
+  cylRegisterRiveEngine(context);
   CYLAnimatedItemEngines.register('SVGA');
   CYLAnimatedItemEngines.register('GIF');
   CYLTagAnimationBuilder.register(CYL_EXAMPLE_ANIMATION_BUILDER);

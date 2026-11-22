@@ -11,12 +11,10 @@
  *   drives the progress itself (`setProgress` + `flush` on a timer).
  * - GIF: speed, loop, play from the start, any progress (the player shows the decoded frames on its own timer).
  * - SVGA: speed, loop, play from the start, any progress (2.x files; the player draws the frame for its own timer).
- * - Rive: play from the start (reset, then the state machine's trigger / boolean input, or the animation), loop for
- *   a linear animation (`Loop.LOOP`); @ohos/rive exposes no playback speed and no progress for a state machine.
+ * - Rive: CYLTabBarController's `CYLRiveIcon` plays it (restart on every play, loop, number inputs); no speed or progress.
  */
 import { AnimationItem } from '@ohos/lottie';
 import { PAGViewController } from '@tencent/libpag';
-import { Loop, Direction, RiveAnimationView } from '@ohos/rive';
 import { image } from '@kit.ImageKit';
 import { CYLAnimationEngine, CYLAnimationPlayer, CYLAnimationSource } from '@cyl/classifymenu';
 import { CYLSVGAMovie } from './svga/CYLSVGAMovie';
@@ -266,111 +264,72 @@ export class CYLSVGAPlayer extends CYLTimedPlayer {
 }
 
 /**
- * Rive: `RiveAnimationView`. The options of CYLTabBarController's Rive examples: `stateMachine` with `triggerInput`
- * (fired on play) or `input` (a boolean, true on play and while selected), `animation`, `artboard`; `legacy` plays
- * the file's first animation.
+ * What the Rive player changes on its view: `CYLRiveIconView` passes these to CYLTabBarController's `CYLRiveIcon`.
+ */
+export interface CYLRiveIconHost {
+  replay: () => void;
+  select: (selected: boolean) => void;
+  setLoops: (loops: boolean) => void;
+}
+
+/**
+ * Rive: CYLTabBarController's `CYLRiveIcon` plays the file (`CYLRiveIconView`), so the tag buttons restart Rive the
+ * same way as the tab bar: on every play a trigger restarts the state machine and fires 50 ms later, a boolean input
+ * goes false then true, `numberInput` / `values` step, a missing input restarts; with loops on it replays while
+ * selected. This player only bumps its replay token, sets `selected` and `loops` (CYLTabBarController 6a9ede85).
  */
 export class CYLRivePlayer extends CYLAnimationPlayer {
-  readonly riveView: RiveAnimationView;
+  private host: CYLRiveIconHost;
   private playing: boolean = false;
 
-  constructor(source: CYLAnimationSource, view: RiveAnimationView) {
+  constructor(source: CYLAnimationSource, host: CYLRiveIconHost) {
     super(CYLAnimationEngine.RIVE, source);
-    this.riveView = view;
+    this.host = host;
   }
 
-  /** @ohos/rive has no playback speed. */
+  /**
+   * @ohos/rive has no playback speed.
+   */
   get supportsSpeed(): boolean {
     return false;
   }
 
-  /** Only a linear animation loops (`Loop.LOOP`); a state machine runs its own states. */
+  /**
+   * `CYLRiveIcon` loops any Rive file (`loops`).
+   */
   get supportsLoops(): boolean {
-    return this.stateMachine === undefined;
+    return true;
   }
 
-  /** @ohos/rive exposes no progress. */
+  /**
+   * @ohos/rive exposes no progress.
+   */
   get supportsProgress(): boolean {
     return false;
   }
 
   get isPlaying(): boolean {
-    try {
-      return this.riveView.isPlaying();
-    } catch (e) {
-      return this.playing;
-    }
-  }
-
-  private get stateMachine(): string | undefined {
-    return this.source.options.get('stateMachine');
+    return this.playing;
   }
 
   play(): void {
-    try {
-      const machine = this.stateMachine;
-      const loop = this.loopsValue ? Loop.LOOP : Loop.ONESHOT;
-      this.riveView.reset();
-      // @ohos/rive 1.0.4's reset() selects the file's first artboard: select the named one again (a file with several
-      // artboards, such as icons.riv, would otherwise play its first artboard on every item).
-      const artboard = this.source.options.get('artboard');
-      if (artboard !== undefined && this.riveView.getArtboardName() !== artboard) {
-        this.riveView.setArtboardName(artboard);
-      }
-      if (machine !== undefined) {
-        this.riveView.play(machine, loop, Direction.AUTO, true);
-        const trigger = this.source.options.get('triggerInput');
-        const input = this.source.options.get('input');
-        if (trigger !== undefined) {
-          this.riveView.fireState(machine, trigger);
-        } else if (input !== undefined) {
-          this.riveView.setBooleanState(machine, input, true);
-        }
-      } else {
-        const animation = this.source.options.get('animation');
-        if (animation !== undefined) {
-          this.riveView.play(animation, loop, Direction.AUTO, false);
-        } else {
-          this.riveView.play(undefined, loop);
-        }
-      }
-      this.playing = true;
-    } catch (e) {
-      this.playing = false;
-    }
+    this.playing = true;
+    this.host.replay();
   }
 
-  /** Selected (1): the boolean input on; otherwise off. Rive has no frame to stop at. */
+  /**
+   * Selected (1): `selected` on, which keeps a boolean input on; otherwise off. Rive has no frame to stop at.
+   */
   stopAtProgress(progress: number): void {
-    const machine = this.stateMachine;
-    const input = this.source.options.get('input');
-    if (machine !== undefined && input !== undefined) {
-      try {
-        this.riveView.setBooleanState(machine, input, progress >= 1);
-      } catch (e) {
-        // The file is not loaded yet.
-      }
-    }
+    this.playing = false;
+    this.host.select(progress >= 1);
   }
 
   destroy(): void {
-    try {
-      this.riveView.stop();
-    } catch (e) {
-      // Already gone.
-    }
+    this.playing = false;
   }
 
   protected applyLoops(): void {
-    if (this.stateMachine !== undefined || !this.isPlaying) {
-      return;
-    }
-    // A linear animation picks up the new loop mode by playing on from where it is.
-    try {
-      const animation = this.source.options.get('animation');
-      this.riveView.play(animation, this.loopsValue ? Loop.LOOP : Loop.ONESHOT, Direction.AUTO, false, false);
-    } catch (e) {
-      // Not loaded yet.
-    }
+    this.host.setLoops(this.loopsValue);
   }
 }

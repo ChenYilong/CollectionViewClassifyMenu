@@ -51,3 +51,13 @@
 | E7: the review chips stay light gray in dark mode | core: `39ee4d7` (theme colors); example: this change | `harmony/classifymenu/.../core/CYLTagAppearance.ets` (`ResourceColor`), `harmony/entry/.../CYLProductPage.ets`, `resources/*/element/color.json` (`cyl_chip_*`) | Fixed in the core: tag appearance colors are `ResourceColor` (`39ee4d7`), so a resource with a dark variant follows the color mode, as iOS dynamic `UIColor`. TODO: needs verification with a simulator screenshot | The example no longer reads the color mode when the page appears; it gives the chips resource colors (light and dark), which also follow a mode change while the page is open. |
 | Z2: scrolled tags draw over the page title | `6e8ba55`, `c70e82a` | `harmony/entry/.../CYLTagAnimationPage.ets` (clip, zIndex) | `CYLTagListView` is meant to clip its content; `.clip(true)` on its `Scroll` (`6e8ba55`) did not stop the overdraw, the page-level clip did. | The cause inside the core is not found yet. Core fix: find why the list's own clip does not apply and fix it there, then remove the page workaround. |
 | Flutter Android: Rive tags empty at rest (CYLTabBarController B26) | this change | `flutter/cyl_tag_list/lib/cyl_tag_list.dart` (Android branch: `PlatformViewLink` + `initExpensiveAndroidView`) | Not the example: the Flutter plugin (library) layer. The core cannot fix it: Flutter's texture-layer `AndroidView` does not show new TextureView frames, and invalidation from inside the platform view did not redraw it (two core changes tried, no effect). CYLTabBarController's own `flutter_cyltabbar` hosts its views with Hybrid Composition since 273a4175, and its B26 entry now states that a Flutter host must do the same. |
+
+## HarmonyOS Rive: the artboard workaround of `03de656d` is gone (2026-11-23)
+
+The row "HarmonyOS Rive: `icons.riv` dark tags all show the same artboard" above stays as history. Its workaround (the example's
+`CYLRivePlayer` selected the named artboard again after `reset()`, commit `03de656d`) was removed: the example no longer
+has a Rive player that drives `RiveAnimationView`. Every Rive tag now plays through CYLTabBarController's shared engine,
+the vendored `harmony/cylanimateditemrive` (`CYLRiveIcon`, loop policy `WhilePlaying`, registered with
+`cylRegisterRiveEngine(context)`), which handles artboards, replay and the Loop switch itself. `CYLRivePlayer` is only an
+adapter (play -> replay token, stopAtProgress -> selected, loops -> loops). The core `harmony/classifymenu` still depends on
+neither the module nor `@ohos/rive`.

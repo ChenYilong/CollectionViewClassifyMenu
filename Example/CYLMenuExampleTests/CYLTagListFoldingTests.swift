@@ -142,6 +142,21 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
         withExtendedLifetime(source) {}
     }
 
+    func testInlineFoldCellIsHiddenWhenTagsFillExactlyTheDefaultVisibleRows() {
+        // At 320 pt two of these tags fit in a row, so four tags are exactly two rows.
+        let source = CYLMenuFixtures.source(itemCount: 4, sections: 1)
+        let view = showTagList(source, width: 320)
+        view.foldControl = CYLMenuFoldControl(position: .tail, content: .icon)
+        view.defaultVisibleRows = 2
+        view.reloadMenuData()
+        view.layoutIfNeeded()
+        XCTAssertEqual(view.numberOfRows(inSection: 0), 2, "The setup is exactly defaultVisibleRows rows")
+        XCTAssertFalse(view.canFoldSection(0))
+        XCTAssertEqual(view.numberOfVisibleItems(inSection: 0), 4)
+        XCTAssertEqual(view.probe.numberOfItems(inSection: 0), 4, "No fold cell")
+        withExtendedLifetime(source) {}
+    }
+
     func testInlineFoldCellIsHiddenWhenEverythingFits() {
         let source = CYLMenuFixtures.source(itemCount: 2, sections: 1)
         let view = showTagList(source, width: 390)

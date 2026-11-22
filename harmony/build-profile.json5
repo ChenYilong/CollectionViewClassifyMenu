@@ -37,6 +37,10 @@
       "srcPath": "./cylanimateditem"
     },
     {
+      "name": "cylanimateditemrive",
+      "srcPath": "./cylanimateditemrive"
+    },
+    {
       "name": "entry",
       "srcPath": "./entry",
       "targets": [

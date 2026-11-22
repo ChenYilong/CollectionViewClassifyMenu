@@ -3,15 +3,43 @@ import { Want } from '@kit.AbilityKit';
 
 export const BUNDLE = 'com.cyl.classifymenu.example';
 
+/** A control of the root tab bar, hidden on pushed pages. */
+const ROOT_TAB_ID = 'tab-plus';
+const ROOT_BACK_LIMIT = 6;
+
 /**
  * Starts the example (again) at its root tab bar.
  */
 export async function cylLaunchExample(): Promise<Driver> {
   const want: Want = { bundleName: BUNDLE, abilityName: 'EntryAbility' };
-  await abilityDelegatorRegistry.getAbilityDelegator().startAbility(want);
+  const delegator = abilityDelegatorRegistry.getAbilityDelegator();
+  await delegator.startAbility(want);
   const driver = Driver.create();
   await driver.delayMs(2000);
+  // The tests share one app process, and starting the ability again keeps the page the previous test left (a pushed
+  // page hides the tab bar): go back until the root tab bar shows, and start again if back left the app.
+  for (let i = 0; i < ROOT_BACK_LIMIT && await driver.findComponent(ON.id(ROOT_TAB_ID)) === null; i++) {
+    await driver.pressBack();
+    await driver.delayMs(800);
+  }
+  if (await driver.findComponent(ON.id(ROOT_TAB_ID)) === null) {
+    await delegator.startAbility(want);
+    await driver.delayMs(2000);
+  }
   return driver;
+}
+
+/**
+ * Scrolls `list` to its top, then searches it for `matcher`. A list that is gone or too small to scroll (an earlier
+ * scroll rebuilt it) gives null instead of failing the test.
+ */
+async function cylScrollSearch(list: Component, matcher: On): Promise<Component | null> {
+  try {
+    await list.scrollToTop();
+    return await list.scrollSearch(matcher);
+  } catch (e) {
+    return null;
+  }
 }
 
 /**
@@ -34,7 +62,7 @@ export async function cylFindAccessible(driver: Driver, label: string, fallbackI
   const lists = await driver.findComponents(ON.scrollable(true));
   for (const list of lists ?? []) {
     for (const matcher of matchers) {
-      const component = await list.scrollSearch(matcher);
+      const component = await cylScrollSearch(list, matcher);
       if (component !== null) {
         return component;
       }
@@ -62,7 +90,7 @@ export async function cylTap(driver: Driver, id: string, waitMs: number = 800): 
   if (component === null) {
     const lists = await driver.findComponents(ON.scrollable(true));
     for (const list of lists ?? []) {
-      component = await list.scrollSearch(ON.id(id));
+      component = await cylScrollSearch(list, ON.id(id));
       if (component !== null) {
         break;
       }

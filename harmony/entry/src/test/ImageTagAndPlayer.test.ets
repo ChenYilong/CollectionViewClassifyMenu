@@ -3,7 +3,7 @@ import {
   CYLAnimationSource, CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
   CYLImageTagMetrics, CYLImageTagPlacement, CYLPoint, CYLRect, CYLSize, CYLTagListState
 } from '@cyl/classifymenu';
-import { CYLSVGAPlayer } from '../main/ets/animation/CYLExampleAnimationPlayers';
+import { CYLRivePlayer, CYLRiveIconHost, CYLSVGAPlayer } from '../main/ets/animation/CYLExampleAnimationPlayers';
 import { CYLSVGAMovie } from '../main/ets/animation/svga/CYLSVGAMovie';
 
 function movie(frames: number, fps: number): CYLSVGAMovie {
@@ -108,6 +108,25 @@ export default function imageTagAndPlayerTest() {
       expect(player.speed).assertEqual(1);
       player.destroy();
       expect(player.isPlaying).assertFalse();
+    });
+  });
+
+  describe('CYLRivePlayer', () => {
+    it('followsTheLoopSwitchThroughItsView', 0, () => {
+      const calls: string[] = [];
+      const host: CYLRiveIconHost = {
+        replay: () => { calls.push('replay'); },
+        select: (selected: boolean) => { calls.push(`select:${selected}`); },
+        setLoops: (loops: boolean) => { calls.push(`loops:${loops}`); }
+      };
+      const player = new CYLRivePlayer(CYLAnimationSource.parse('asset:rive/house.riv?stateMachine=State%20Machine%201'),
+        host);
+      expect(player.supportsLoops).assertTrue();
+      player.loops = true;
+      player.play();
+      player.stopAtProgress(1);
+      player.loops = false;
+      expect(calls.join(',')).assertEqual('loops:true,replay,select:true,loops:false');
     });
   });
 

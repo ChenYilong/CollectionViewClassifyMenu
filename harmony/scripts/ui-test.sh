@@ -32,7 +32,10 @@ node "$DEVECO/tools/hvigor/bin/hvigorw.js" --no-daemon $TEST_MODE -p module=entr
 OUT=entry/build/default/outputs
 $HDC install -r "$OUT/$TARGET/entry-$TARGET-unsigned.hap"
 $HDC install -r "$OUT/ohosTest/entry-ohosTest-unsigned.hap"
-RESULT=$($HDC shell aa test -b "$BUNDLE" -m entry_test -s unittest OpenHarmonyTestRunner -s timeout 60000 -w 180)
+# Per-test timeout 120 s: accessibility-first lookups scroll-search long lists (styleActionsApplyAndReset taps five rows
+# of the style list and needs about 55-60 s on the Mac's arm64 emulator); a test that overruns leaves its scrollSearch
+# running, and every later test then fails at Driver.create ("uitest-api dose not allow calling concurrently").
+RESULT=$($HDC shell aa test -b "$BUNDLE" -m entry_test -s unittest OpenHarmonyTestRunner -s timeout 120000 -w 600)
 echo "$RESULT"
 echo "$RESULT" | grep -q "OHOS_REPORT_CODE: 0" || exit 1
 echo "$RESULT" | grep -Eq "Failure: 0, Error: 0" || exit 1

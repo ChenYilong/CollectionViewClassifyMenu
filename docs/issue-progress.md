@@ -1681,3 +1681,191 @@ tags: [issues, ui, cocoapods, progress]
   `sharedGestureStateFollowsEveryList` (two lists, a smear each, a drop, a list cleared mid-drag; the listener hears
   each change once); host tests 80 / 80; the app builds.
 
+
+
+### DONE (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): no fold control when every tag fits in `defaultVisibleRows`
+
+- **Request (the user through the CYLSearchViewController session, verbatim):** "全部展开时也显示折叠按钮，改ClassifyMenu 。 When all tags fit in 2 rows, should the fold button still show? It decides whether the ClassifyMenu work adds that option. NO。 如果用户设置的默认行数， taglist 刚好可以在默认行数内全部展示， 甚至少于用户自定义的行数就能全部展示， 就不需要展示展开按钮。"
+  (English: while expanded, the fold button still shows; change ClassifyMenu. Should the fold button show when every tag
+  fits in 2 rows? No. When the tags fit in exactly the default number of rows that the user set, or in fewer, no expand
+  button is shown.)
+- **Context:** the tail fold control (`CYLMenuFoldControl(position: .tail, content: .icon)`, `defaultVisibleRows = 2`) is
+  the default suggestion style of CYLSearchViewController. Every platform already folds only when the tags need more rows
+  than `defaultVisibleRows` (`canFold(rowCount:)`: `rowCount > defaultVisibleRows`), and an expanded section keeps the
+  fold cell as its last item. So no option is added; the work is to pin the rule with tests where they are missing.
+- **Acceptance (100):** tests on iOS, Android and HarmonyOS (the mini program has them: `search-discover.test.js`):
+  tags in fewer rows than `defaultVisibleRows` → no fold cell (25); tags in exactly `defaultVisibleRows` rows → no fold
+  cell (25); one row more → a fold cell, last when folded and last when expanded (40); docs updated (10). Pass: 60.
+- **Done (score / 100):** 100. No library change was needed: every platform already follows the rule; tests now pin it with
+  `defaultVisibleRows = 2` and a tail icon fold control, the row counts asserted. HarmonyOS `TagListTailFold.test.ets`
+  (`hasNoFoldCellWhenTheTagsFitInFewerRowsThanDefaultVisibleRows`, `hasNoFoldCellWhenTheTagsFitExactlyDefaultVisibleRows`,
+  `endsWithTheFoldCellWhenTheTagsNeedOneRowMoreThanDefaultVisibleRows`; folded, expanded and collapsed again): host tests
+  85 / 85, commit `65d1181`. Android `CYLTagListTailFoldTest` (the same three names; Robolectric): 3 / 3 with
+  `:library:testDebugUnitTest --tests '*TailFold*'`, commit `c74f56e`. iOS `CYLTagListFoldingTests`:
+  `testInlineFoldCellIsHiddenWhenTagsFillExactlyTheDefaultVisibleRows` added (the one-row and three-row cases already
+  existed), the class 7 / 7 on simulator CB9BDA60 (iOS 27.2) with a fresh derived data path, commit `e217988`. The mini
+  program keeps `search-discover.test.js`.
+
+
+### DONE (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): full iOS and Android test suites after the tail fold tests
+
+- **Request (verbatim):** "跑完整的iOS和Android测试" (English: run the full iOS and Android test suites.)
+- **Context:** the tail fold control tests (`65d1181`..`df23aa4`) ran only their own cases. This run covers every iOS
+  suite (`scripts/unit-tests.sh menu|tag|example|swift`) and every Android project's unit tests
+  (`android/scripts/gradle.sh <project> testDebugUnitTest`), on a fresh derived data folder and a fresh mirror.
+- **Acceptance (100):** every suite runs to the end; each failure is fixed in the core or explained.
+- **Done (100 / 100), at `20d110b`:** every suite passes, 0 failures.
+  - iOS (Xcode 27.2, iOS 27.2 simulator CB9BDA60, fresh derived data per suite, `scripts/unit-tests.sh`): menu 37 / 37,
+    tag 6 / 6, example 117 / 117, swift 23 / 23 (183 tests).
+  - Android (`android/scripts/gradle.sh <project> testDebugUnitTest`, fresh mirror `/tmp/xpa/cmfold-android`, JDK 17):
+    merged 108 / 108 (all in `library`); AndroidTagView, TagViewGroup and android-tagview build and have no unit tests.
+  - Not covered: Android instrumented (device) tests and iOS versions other than 27.2.
+
+
+### DONE (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): Android instrumented (device) tests
+
+- **Request (verbatim):** "continue" (after the offer to run the Android device tests on an emulator).
+- **Context:** the unit suites pass (`440cfd9`). `android/merged/library/src/androidTest` holds
+  `CYLTagEditingIconsDeviceTest` and `CYLTagTitleFitDeviceTest`. Run `:library:connectedDebugAndroidTest` on this
+  session's own emulator (`CYL_API35_test`, read-only, port 5620); the two running emulators belong to other sessions.
+- **Acceptance (100):** both device test classes run to the end and pass, or each failure is fixed in the core.
+- **Done (100 / 100):** `connectedDebugAndroidTest` passes 2 / 2 on `CYL_API35_test` (Android 15, API 35):
+  `CYLTagEditingIconsDeviceTest.theEditIconAndTheCrossDraw`, `CYLTagTitleFitDeviceTest.titlesFitTheirMeasuredWidth`.
+  - **Bug found and fixed (build config of the core library):** the test APK targeted minSdk 23, and Android 14+
+    refuses to install a target below 24 (`INSTALL_FAILED_DEPRECATED_SDK_VERSION`), so the Gradle task stalled at the
+    device step without installing anything. `android/merged/library/build.gradle.kts` now sets
+    `testOptions.targetSdk = 35`. That setting also moved Robolectric's default SDK from 23 to 35 and failed 3 unit
+    tests (two tail fold tests, `UpstreamPullRequestsTest.linesUseStartAndEndRulesForRightToLeft`), so
+    `src/test/resources/robolectric.properties` keeps `sdk=23` as before; unit tests 108 / 108 again.
+
+
+### DONE (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS device (UI) tests on the Mate 70 Pro emulator
+
+- **Request (verbatim):** "want the HarmonyOS device (UI) tests run on the Mate 70 Pro emulator"
+- **Context:** HarmonyOS host tests pass (85 / 85). The UI tests (`harmony/entry/src/ohosTest`: Ability, ExampleUi,
+  QueryScenarios, Samples, StylesAndAnimations) run with `harmony/scripts/ui-test.sh` on this session's own Mate 70 Pro
+  emulator "CYL ClassifyMenu Test" (hdc 127.0.0.1:5563), from the APFS clone `/tmp/xpr/cm-fold`.
+- **Acceptance (100):** every UI test runs to the end and passes (`Failure: 0, Error: 0`), or each failure is fixed
+  in the core (`harmony/classifymenu`) or explained.
+
+
+### DONE (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): Rive does not play on HarmonyOS
+
+- **Request (verbatim):** "鸿蒙系统上， rive 动画无法播放。 请查看 CYLTabBarController CYLAnimatedItemView 最近的类似commit提交请确认该提交修复了该问题，如果没修复继续修复。"
+  (English: on HarmonyOS, Rive animations do not play. Look at CYLTabBarController's recent similar CYLAnimatedItemView
+  commits, confirm they fixed the problem, and if not, keep fixing it.)
+- **Findings:** CYLTabBarController's fixes are `c5ef58d4` (Rive icons play their state machine by name), the x86_64
+  debug Rive kit (`c8fee654`) and `c4a1f8fd` (newest cylanimateditem). This repository adopted them on `master` only
+  (PR #28: `71fac461` kit, `03de656d` "Rive items keep their artboard after playback"; PR #29: pin `c4a1f8fd`).
+  `feat/harmony` (PR #30) never merged `master` back: it vendors cylanimateditem `62715829`, so Rive shows the still
+  image on the x86_64 emulator, and on the arm64 emulator every `icons.riv` dark tag plays the same "refresh" artboard
+  (screenshot 2026-11-23, `feat/harmony` `09b04a1`). The Rive pod rows do animate on arm64.
+- **Also seen (UI test run):** an intermittent jscrash in @ohos/rive 1.0.4 during "Play all":
+  `Accessing released C++ object: StateMachineInstance` (RiveFileController.getStateMachinesByNames from
+  RiveArtboardRenderer.advance), about 1 run in 4 of `StylesAndAnimationsTest#animationControlsPlayAll` on arm64.
+- **Plan:** merge `origin/master` into `feat/harmony`; build; check on the arm64 emulator that every Rive row (pod row and
+  `icons.riv`) shows its own artboard and animates after Play all; repeat the Play all test for the crash; fix in the core
+  (cylanimateditem upstream) or the example's `CYLRivePlayer` if it persists.
+- **Acceptance (100):** master merged, builds (20); Rive pod rows animate (20); `icons.riv` tags show distinct icons and
+  animate (30); Play all test passes 10 runs in a row without the jscrash (30). Pass: 60.
+
+#### Results (2026-11-23)
+
+- **Rive on HarmonyOS: DONE (100 / 100).** The CYLTabBarController commits did fix it, but `feat/harmony` never had
+  them: `ea988cff` merges `origin/master` (PR #28, PR #29) into `feat/harmony` without conflicts, so cylanimateditem is
+  `c4a1f8fd` (includes `c5ef58d4` and the x86_64 Rive kit) and the example has `03de656d`. On the arm64 Mate 70 Pro
+  emulator (HarmonyOS 6.0.0.112, hdc 127.0.0.1:5555): the build installs; after Play all the Rive pod rows and every
+  `icons.riv` dark tag change from frame to frame, and each dark tag shows its own icon (chat, search, timer, bell,
+  user) instead of the shared "refresh" artboard. `StylesAndAnimationsTest#animationControlsPlayAll` passed 10 / 10
+  runs with no new jscrash log (it crashed about 1 run in 4 before the merge). Not checked here: the x86_64 emulator
+  (the Windows session's), where the kit replaces the still image.
+- **HarmonyOS UI tests: 70 / 100, still open.** Every one of the 14 tests passes when run alone. Full runs: 7 / 14 (one
+  60 s timeout in `styleActionsApplyAndReset`, then 6 tests blocked at `Driver.create`), 9 / 14 and, after the merge,
+  10 / 14 with `ui-test.sh` at 120 s per test. The failing tests change between runs (`configurationBuildsBothLists`,
+  the four `SamplesTest` cases: "No control labeled 样式", "The offset is too large and exceeds the widget size", a
+  scrollable that no longer exists). Cause: the tests share one app process and `cylLaunchExample` starts the ability
+  again without resetting its navigation stack or scroll positions, so a test starts on the page or offset the one before
+  left. TODO (owner of `harmony/`, the Windows session): reset the example to its root tab bar in `cylLaunchExample`
+  (pop to root, scroll to top) and re-find a scrollable after each scroll in `cylFindAccessible`.
+
+
+### DONE (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS UI tests reset the example between tests
+
+- **Request (verbatim):** "fix" (answer to: "the HarmonyOS UI tests in ClassifyMenu (10 of 14 in a full run) still need
+  their test helper to reset the app between tests. Should I send that TODO to the Windows session, or fix it here?")
+- **Plan:** in `harmony/entry/src/ohosTest/ets/test/TestSupport.ets`, `cylLaunchExample` goes back until the root tab
+  bar (`tab-plus`) is visible (start the ability again if back left the app); `cylFindAccessible` and `cylTap` scroll
+  each list to the top before `scrollSearch` and skip a list that is gone or too small instead of failing.
+- **Acceptance (100):** the full suite (`harmony/scripts/ui-test.sh`) passes 14 / 14 three runs in a row on the arm64
+  emulator (90); docs updated (10). Pass: 60.
+- **Done (100 / 100):** `TestSupport.ets`: `cylLaunchExample` presses back (at most 6 times) until the root tab bar
+  (`tab-plus`) shows and starts the ability again if back left the app; `cylScrollSearch` scrolls a list to its top
+  before `scrollSearch` and returns null for a list that is gone or too small, used by `cylFindAccessible` and `cylTap`.
+  `harmony/scripts/ui-test.sh` on the arm64 Mate 70 Pro emulator (HarmonyOS 6.0.0.112, hdc 127.0.0.1:5555): 14 / 14,
+  three runs in a row (before: 7, 9 and 10 / 14). This also closes the UI test entry above (70 → 100). Test code only;
+  `harmony/` is the Windows session's: it should pull `feat/harmony` before its next change there.
+
+
+### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS Rive tags ignore the Loop switch; one shared Rive engine
+
+- **Requests (verbatim):**
+  1. "NO，   NOT All suites are now green on feat/harmony: 鸿蒙os 在rive时候还是有问题， 出现了和之前小程序上一模一样的问题， 不响应loop事件。 pag是可以的，是不是之前只修复了小程序，没修复其他端的， 这次鸿蒙os测试出来了， 请排查Android， flutter React native，有没有这个问题， 先修复鸿蒙os上出现的该问题。"
+     (English: not all suites are green: on HarmonyOS Rive still has the same problem the mini program had, it ignores
+     the Loop switch; PAG is fine. Was only the mini program fixed? Check Android, Flutter and React Native for it; fix
+     HarmonyOS first.)
+  2. "你应该通知   CYLSearch's CYLRiveIcon， 让他把 CYLRiveIcon，封装进 CYLTabBarController 里的CYLAnimatedItemView中， 这样所有引用rive的库都能共享修复好的rive动画， 并且其他端也应该这样，统一使用CYLTabBarController 里的CYLAnimatedItemView。 请通知 CYLSearch来重构， 或者你自己修复，通知相关session。"
+     (English: put CYLRiveIcon into CYLTabBarController's CYLAnimatedItemView so every library that uses Rive shares the
+     fixed Rive animation, and do the same on the other platforms: all use CYLTabBarController's CYLAnimatedItemView.
+     Have CYLSearch refactor it, or fix it yourself and notify the related sessions.)
+- **Cause (HarmonyOS):** the example's `CYLRivePlayer` drives `RiveAnimationView` directly; `supportsLoops` is false for a
+  state machine and `applyLoops` returns early, so state-machine tags (most of them) play once. CYLTabBarController's
+  `CYLRiveIcon` (module `cyltabbar`, not `cylanimateditem`) loops, but only while selected (tab semantics), so reusing it
+  as is would not fix tags either.
+- **Plan (agreed with chenyilong-0b, -e3, -83):** CYLTabBarController gets a sibling module `cylanimateditemrive`
+  (`cylanimateditem` + `@ohos/rive`; `cylanimateditem` stays free of animation libraries because a HAP with @ohos/rive does
+  not install on x86_64) holding `CYLRiveIcon` and a ready `animationBuilder`, with a loop mode for "played and not
+  stopped"; `cyltabbar` re-exports it. Then this repository vendors it and drops its own Rive player; CYLSearch and
+  CYLTableViewPlaceHolder follow. Android, Flutter, React Native: checked on emulators, results below.
+- **Acceptance (100):** shared module in CYLTabBarController, tab bar Rive unchanged (20); ClassifyMenu HarmonyOS uses it,
+  Loop on keeps state-machine Rive tags moving at 5-8 s and Loop off lets them rest, `icons.riv` artboards distinct (40);
+  UI 14 / 14 and host tests pass (15); Android / Flutter / React Native checked and fixed where needed (15); docs (10).
+- **Progress (HarmonyOS):** commits `669ab5e5` (vendor `cylanimateditem` and the new `cylanimateditemrive` at CYLTabBarController
+  `3074c51d`, unmodified, with VENDORED.md and LICENSE; registered in `build-profile.json5`) and `653452e6` (the example
+  plays Rive through `CYLRiveIcon`, loop policy `WhilePlaying`, registered with `cylRegisterRiveEngine(context)`; the
+  example's own Rive player and the `03de656d` artboard workaround are gone, `CYLRivePlayer` is an adapter only; entry
+  depends on `cylanimateditemrive`, the core `classifymenu` on neither it nor `@ohos/rive`; `@ohos/rive` stays 1.0.4).
+  Build: `ohpm install --all` and `assembleHap` succeed. Host tests 86 / 86, `accessibility-check.py` OK. Full UI suite on
+  127.0.0.1:5555 (arm64 Mate 70 Pro emulator): 14 / 14 on the second run; the first run had 2 errors in unrelated tests
+  (`configurationBuildsBothLists`, `tagCloudSampleAndItsPages`, a list / control not found right after
+  `animationControlsPlayAll`) and passed on the rerun. `animationControlsPlayAll` repeated 5 / 5, 0 new jscrash files.
+  Device, Loop ON, Play all (frames `/tmp/xpr/cm-rive-loop-on-{2,4,6,8,10,12}.jpeg`, icon crops md5 at 8, 10, 12 s): house,
+  check, menu, button, shapes, truck, chat, search, timer, bell and me (the five `icons.riv` tags) all change between 8, 10
+  and 12 s in two fresh-launch runs; in an earlier run menu and me repeated one md5 at 10 and 12 s (a hold between two
+  passes) and a 22 s dense sampling showed both still changing. The five `icons.riv` tags show five different icons
+  (chat, search, timer, bell, user). Loop OFF, Play all (`/tmp/xpr/cm-rive-loop-off-*.jpeg`): chat, search, timer, bell, me,
+  check and button come to rest by 4 s and keep the same md5 to 22 s; house, shapes and truck keep moving (their own
+  artwork moves on its own, as CYLTabBarController documents for shapes.riv and truck.riv; house.riv's machine plus linear
+  animation never settles); menu showed no visible change on Play all with Loop OFF (stays at the hamburger; with Loop ON it
+  flips between the hamburger and the X). Not verified: why menu does not open with Loop OFF (engine behavior, not
+  compared with the old player); the x86_64 fallback on a device (no x86_64 target used; the engine calls `onLoadError`
+  there and the tag keeps its still image); one of four fresh launches with Loop ON left house, check, menu, chat, search
+  and timer without any motion (not reproduced in the next three launches, cause unknown); an `appfreeze` (THREAD_BLOCK_6S)
+  after about 80 s of continuous Loop ON, stuck in libpag `eglMakeCurrent` on the main thread (the PAG tags, not Rive).
+  Android, Flutter, React Native, CYLSearch and CYLTableViewPlaceHolder are not covered by this bullet.
+- **Status (2026-11-23, parent session): 87 / 100, still TODO.**
+  - Shared module in CYLTabBarController `3074c51d` (`cylanimateditemrive`: CYLRiveIcon moved from cyltabbar, `CYLRiveLoopPolicy`
+    WhileSelected / WhilePlaying, `CYLRiveAnimationBuilder`, `cylRegisterRiveEngine`; cyltabbar re-exports; hypium 20 / 20, Node
+    41 / 41, tab bar Rive unchanged on the arm64 emulator) (20 / 20).
+  - This repository: `669ab5e5` vendors it, `653452e6` plays Rive tags through it (WhilePlaying); Loop on: all 11 Rive icons
+    still move at 8-12 s (two launches); Loop off: icons.riv tags, check and button rest by about 4 s; house, shapes, truck keep
+    moving by design of their artwork (32 / 40: menu.riv does not play its single pass with Loop off, also on Android; one of
+    four fresh launches with Loop on left six icons still, not reproduced).
+  - UI 14 / 14 (second run; first run 12 / 14 in two non-Rive tests), host 86 / 86, Play all 5 / 5 without jscrash (15 / 15).
+  - Android: on the API 35 emulator (`c4a1f8fd`), Loop on keeps every Rive icon moving through 12 s and Loop off lets them rest
+    (same three self-moving files, same still menu.riv); Flutter and React Native on Android use the same library and pin, not
+    run on a device; iOS loops since `386a5ad1` / `6a81143c` (10 / 15).
+  - Docs (10 / 10). CYLSearchViewController switched too (`797f321`, `9c0ff1e`, pins tab bar `f51057a7`, ClassifyMenu `e474f469`).
+  - **Open:** menu.riv single pass with Loop off (CYLTabBarController's input restart, all platforms); the one stalled launch;
+    a libpag `eglMakeCurrent` main-thread freeze (THREAD_BLOCK_6S) after about 80 s of Loop on (PAG, not Rive); CYLTabBarController
+    PR #824 (`feat/harmony-animated-item-engines`, another session) adds `cylanimateditem_rive` with the same goal: when it lands,
+    `cylanimateditemrive` folds into it and every dependent re-pins once.
