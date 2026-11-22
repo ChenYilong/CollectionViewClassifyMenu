@@ -1011,7 +1011,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   CI on it; master merged into `feat/harmony` (the only conflict, two task log entries in `docs/issue-progress.md`, keeps
   both). CYLTabBarController moved on to `022da59a` meanwhile (the HarmonyOS tab bar's default height 49 → 56 vp, which
   this repository does not use; docs; the component's README), so every pin moves to `022da59a`.
-- **Score 90 / 100** until PR #26's iOS CI passes (−10); PAG and Rive playback stays an arm64 check.
+- **Score 100 / 100**: PR #26's CI passed on every check (iOS included) and it was merged as `1fc954a4`. PAG and Rive
+  playback stayed an arm64 check (Rive on x86_64 since `c8fee654`, next entry).
 
 ### DONE (2026-11-22, `feat/harmony`, Windows session): the owner's two plans for arm64-only Rive and PAG tests in the instructions and skills
 
@@ -1078,3 +1079,28 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `git.md` read in full before this commit; its rules applied: `check-branch-pr.sh`, the `.gitignore` sync from
   CYLTabBarController's newest commit with `git ls-files -ci --exclude-standard`, the staged diff checked.
   **Score 100 / 100.**
+
+### DONE (2026-11-22, `feat/pin-c8fee654`, Windows session): pins to `c8fee654` and its x86_64 Rive debug kit adopted
+
+- Prompt (verbatim): "move the pins to c8fee654 and adopt it， fix ci build fail"
+- Context: `feat/harmony` was merged (#26), so this is a new branch from `master` (1fc954a4). `c8fee654` adds the
+  x86_64 Rive debug engine kit (`cylanimateditem/x86_64-debug-engines/rive`, installed by
+  `tools/cyl_hap_x86_64.py install --x86-engines`, read only in debug builds) and moves two iOS helpers to Swift
+  (`CYLPAGTabBarItemAttributes`, `CYLAnimatedItemResources`). The newest commit over all branches is already
+  `fe60097a`; the owner named `c8fee654`.
+- Acceptance (100): every pin at `c8fee654` and `harmony/cylanimateditem` re-vendored (30); local tests pass: HarmonyOS
+  host tests and HAP builds, Android, mini program (30); Rive plays on the x86_64 emulator with the kit (20); every CI check
+  of the pull request passes (20).
+- Result: every pin moved `022da59a` → `c8fee654` (four Podfiles, `Package.swift`, the Flutter and React Native pins,
+  `android/merged/gradle.properties`, the mini program's fetch script, test and COMMIT files); `harmony/cylanimateditem`
+  re-vendored with the kit (`VENDORED.md` kept and updated); `.gitignore` unchanged upstream. Local checks: HarmonyOS
+  host tests 82 / 82, `harmony/scripts/build.sh` BUILD SUCCESSFUL (default and emulator HAPs), Android `gradle test`
+  BUILD SUCCESSFUL, mini program 168 / 168. On the x86_64 emulator (127.0.0.1:5557), the emulator HAP installed with
+  `tools/cyl_hap_x86_64.py install --x86-engines yes`: `default/ohos_rive` loads, and on the Animations page every Rive
+  item draws and plays ("Play all": the check mark draws, the shapes and the truck move); no crash. PAG keeps its
+  placeholder (no x86_64 kit yet).
+- Defect found (CYLTabBarController, to be fixed there): after "Play all", the five `icons.riv` dark tags all show
+  the same "refresh" artboard and keep it, while their still images are five different icons; the log has
+  "RiveFileController: selectArtboard: cannot select an Artboard without a valid File". Reported to the
+  CYLTabBarController session.
+- **Score 80 / 100** until this pull request's CI passes (−20).
