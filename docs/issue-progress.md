@@ -1852,3 +1852,20 @@ tags: [issues, ui, cocoapods, progress]
   and timer without any motion (not reproduced in the next three launches, cause unknown); an `appfreeze` (THREAD_BLOCK_6S)
   after about 80 s of continuous Loop ON, stuck in libpag `eglMakeCurrent` on the main thread (the PAG tags, not Rive).
   Android, Flutter, React Native, CYLSearch and CYLTableViewPlaceHolder are not covered by this bullet.
+- **Status (2026-11-23, parent session): 87 / 100, still TODO.**
+  - Shared module in CYLTabBarController `3074c51d` (`cylanimateditemrive`: CYLRiveIcon moved from cyltabbar, `CYLRiveLoopPolicy`
+    WhileSelected / WhilePlaying, `CYLRiveAnimationBuilder`, `cylRegisterRiveEngine`; cyltabbar re-exports; hypium 20 / 20, Node
+    41 / 41, tab bar Rive unchanged on the arm64 emulator) (20 / 20).
+  - This repository: `669ab5e5` vendors it, `653452e6` plays Rive tags through it (WhilePlaying); Loop on: all 11 Rive icons
+    still move at 8-12 s (two launches); Loop off: icons.riv tags, check and button rest by about 4 s; house, shapes, truck keep
+    moving by design of their artwork (32 / 40: menu.riv does not play its single pass with Loop off, also on Android; one of
+    four fresh launches with Loop on left six icons still, not reproduced).
+  - UI 14 / 14 (second run; first run 12 / 14 in two non-Rive tests), host 86 / 86, Play all 5 / 5 without jscrash (15 / 15).
+  - Android: on the API 35 emulator (`c4a1f8fd`), Loop on keeps every Rive icon moving through 12 s and Loop off lets them rest
+    (same three self-moving files, same still menu.riv); Flutter and React Native on Android use the same library and pin, not
+    run on a device; iOS loops since `386a5ad1` / `6a81143c` (10 / 15).
+  - Docs (10 / 10). CYLSearchViewController switched too (`797f321`, `9c0ff1e`, pins tab bar `f51057a7`, ClassifyMenu `e474f469`).
+  - **Open:** menu.riv single pass with Loop off (CYLTabBarController's input restart, all platforms); the one stalled launch;
+    a libpag `eglMakeCurrent` main-thread freeze (THREAD_BLOCK_6S) after about 80 s of Loop on (PAG, not Rive); CYLTabBarController
+    PR #824 (`feat/harmony-animated-item-engines`, another session) adds `cylanimateditem_rive` with the same goal: when it lands,
+    `cylanimateditemrive` folds into it and every dependent re-pins once.
