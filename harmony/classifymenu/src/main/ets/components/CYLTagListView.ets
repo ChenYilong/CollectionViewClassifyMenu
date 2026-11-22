@@ -234,6 +234,8 @@ export struct CYLTagListView {
   }
 
   aboutToDisappear(): void {
+    // A list that goes away in the middle of a drag or a smear releases its share of the gesture state.
+    this.model.clearGestureState();
     this.model.detach();
   }
 

@@ -56,6 +56,12 @@
 .cyl-animated-item-hidden {
   opacity: 0;
 }
+/* [EN] An ended play-once animation under its still image (showsImageWhenAnimationEnds): a canvas ignores opacity, so it is
+   also made invisible. [CN] 已结束的只播放一次的动画位于静态图片下方（showsImageWhenAnimationEnds）：canvas 不受 opacity 影响，因此同时设为不可见。 */
+.cyl-animated-item-ended {
+  opacity: 0;
+  visibility: hidden;
+}
 .cyl-animated-item-horizontal .cyl-animated-item-title {
   margin-left: 4px;
 }
@@ -95,4 +101,15 @@
 .cyl-animated-item-accessory-image {
   width: 18px;
   height: 18px;
+}
+/* [EN] The countdown style (`itemStyle` "countdown"): a bordered, rounded button with a light background; the border is
+        gray while it counts down. [CN] 倒计时样式（`itemStyle` 为 "countdown"）：带边框与圆角、浅色背景的按钮；倒计时中边框为灰色。 */
+.cyl-animated-item-countdown {
+  padding: 8px 12px;
+  border: 0.5px solid #07c160;
+  border-radius: 6px;
+  background-color: #f2f2f7;
+}
+.cyl-animated-item-countdown.cyl-animated-item-disabled {
+  border-color: #c7c7cc;
 }

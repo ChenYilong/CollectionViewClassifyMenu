@@ -17,6 +17,7 @@
  */
 const { cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
+const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
 
 /**
  * [EN] The id of the engine node (only one is rendered), reached by `selectComponent` for the playback methods.
@@ -62,6 +63,17 @@ Component({
      * [CN] 文件就绪后播放一次（默认，与之前相同）。false：静止，直到调用 `playAnimation()`。
      */
     autoplay: { type: Boolean, value: true },
+    /**
+     * [EN] Whether a play-once animation (`loop` off) is replaced by the still image when it ends (iOS / Android
+     *      `showsImageWhenAnimationEnds`): the engine is hidden and `selectedImage` / `image` (else the placeholder)
+     *      shows. Off by default, so the last frame stays. `playAnimation()`, `stopAnimation()`, a new selection, a new
+     *      file or turning `loop` on shows the animation again. The end is the engine's `complete` (Lottie, PAG, Rive,
+     *      SVGA) or the end of a timed GIF pass (with stills); `animationcomplete` is sent either way.
+     * [CN] 只播放一次的动画（`loop` 关闭）结束时是否换成静态图片（iOS / Android 的 `showsImageWhenAnimationEnds`）：隐藏引擎，显示
+     *      `selectedImage` / `image`（没有时为占位图）。默认关闭，保留最后一帧。`playAnimation()`、`stopAnimation()`、重新选中、新文件或开启
+     *      `loop` 时重新显示动画。结束来自引擎的 `complete`（Lottie、PAG、Rive、SVGA）或有静帧的 GIF 一遍计时结束；两种情况都发送 `animationcomplete`。
+     */
+    showsImageWhenAnimationEnds: { type: Boolean, value: false },
     /**
      * [EN] The frame (0...1) shown at rest while not selected (iOS `animationRestingProgress`); selected shows the last.
      * [CN] 未选中时静止显示的帧（0...1，iOS 的 `animationRestingProgress`）；选中时显示最后一帧。
@@ -145,6 +157,27 @@ Component({
      * [CN] 图标与标题的间距（px；纵向在图标下方，横向在图标旁）；-1 为默认的 2 px（纵向）/ 4 px（横向）。
      */
     titleSpacing: { type: Number, value: -1 },
+    /**
+     * [EN] 'plain' (default) or 'countdown': a countdown button, e.g. "Get code" of an SMS login (`itemStyle`, the same name
+     *      as on iOS, Android and HarmonyOS; `style` is the host's own attribute). Set the `countdown…` properties, then call
+     *      `startCountdown()` (or set `startsCountdownOnTap`). The end is a time read from the local clock, so the seconds in the
+     *      background count (FIX: issue #1 of SMSCodeButton); a clock past the longest duration, or set back to before the start,
+     *      closes it; `countdownCacheKey` keeps it across a restart. While it runs the item is disabled. Events: `countdownstart`,
+     *      `countdowntick` (`detail.seconds`, once per second), `countdownfinish`.
+     * [CN] 'plain'（默认）或 'countdown'：倒计时按钮，例如短信登录的「获取验证码」（`itemStyle`，与 iOS、Android、HarmonyOS
+     *      同名；`style` 是宿主自己的属性）。设置 `countdown…` 属性后调用 `startCountdown()`（或设置 `startsCountdownOnTap`）。结束是从本地时钟读取的时间点，
+     *      因此后台的秒数计入（修复 SMSCodeButton 的 issue #1）；时钟超过最长时长或被调回到开始之前时关闭；`countdownCacheKey` 使其在重启后继续。
+     *      倒计时中条目不可用。事件：`countdownstart`、`countdowntick`（`detail.seconds`，每秒一次）、`countdownfinish`。
+     */
+    itemStyle: { type: String, value: 'plain' },
+    countdownDuration: { type: Number, value: 60 },
+    countdownIdleTitle: { type: String, value: 'Get code' },
+    countdownRunningTitleFormat: { type: String, value: '%ld s left' },
+    countdownFinishedTitle: { type: String, value: 'Resend' },
+    countdownImage: { type: String, value: '' },
+    countdownRunningTitleColor: { type: String, value: '#999999' },
+    startsCountdownOnTap: { type: Boolean, value: false },
+    countdownCacheKey: { type: String, value: '' },
     iconWidth: { type: Number, value: 0 },
     iconHeight: { type: Number, value: 0 },
     bare: { type: Boolean, value: false },
@@ -160,9 +193,12 @@ Component({
     gifPlaying: false,
     gifImageReady: false,
     gifImagePlaying: false,
+    animationEnded: false,
     lottieData: null,
     m: {},
     systemTheme: 'light',
+    countdownState: 'idle',
+    countdownSeconds: 0,
   },
 
   observers: {
@@ -184,19 +220,37 @@ Component({
       this.cylPendingPlay = false
       // cyl-lottie keeps the data it gets and changes it while playing: every item gets its own copy.
       const lottieData = animationData && typeof animationData === 'object' ? JSON.parse(JSON.stringify(animationData)) : null // NOSONAR: `structuredClone` is not in every mini program runtime
-      this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
+      this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, animationEnded: false, lottieData })
       this.cyl_update()
     },
     'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
-    'selected, restingProgress': function () {
+    'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
+      if (itemStyle !== 'countdown' && this.cylCountdown && this.data.countdownState !== 'idle') this.resetCountdown()
       this.cyl_update()
-      if (!this.data.autoplay || this.data.gifFirstFrame || this.data.gifLastFrame) this.cyl_rest()
+    },
+    'countdownCacheKey, itemStyle': function (key, itemStyle) {
+      if (itemStyle === 'countdown') this.cyl_countdown().setCacheKey(key)
+    },
+    'showsImageWhenAnimationEnds': function (shows) {
+      if (!shows) this.cyl_showAnimationAgain()
+    },
+    'selected, restingProgress': function () {
+      this.cyl_showAnimationAgain()
+      this.cyl_update()
+      if (!this.data.autoplay || this.data.gifFirstFrame || this.data.gifLastFrame) {
+        // [EN] No longer selected: stop the engine (and any play still waiting for it) before showing the resting frame, so
+        //      two tabs never look selected (the iOS contract: a switch stops and resets the other tabs).
+        // [CN] 不再被选中：先停止引擎（以及仍在等待它的播放），再显示静止帧，避免两个 Tab 同时看起来是选中的（iOS 约定：切换时停止并重置其他 Tab）。
+        if (!this.data.selected) this.cyl_halt()
+        this.cyl_rest()
+      }
       // [EN] Another tab is selected: a playing GIF image rests. [CN] 选中了其他 Tab：正在播放的 GIF 图片回到静止。
       if (!this.data.selected && this.data.gifImagePlaying) this.cyl_restGIFImage()
     },
     'loop': function () {
+      if (this.data.loop) this.cyl_showAnimationAgain()
       // [EN] A GIF image: off lets the pass in progress end, on keeps it playing. [CN] GIF 图片：关闭时让当前一遍播完，开启时一直播放。
       if (this.data.gifImagePlaying) {
         clearTimeout(this.cylGIFImageTimer)
@@ -225,9 +279,13 @@ Component({
         this.cyl_update()
       }
       if (typeof wx !== 'undefined' && typeof wx.onThemeChange === 'function') wx.onThemeChange(this.cylThemeListener)
+      // [EN] A countdown kept before a restart continues. [CN] 重启之前保存的倒计时继续。
+      if (this.data.itemStyle === 'countdown') this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
       this.cyl_update()
     },
     detached() {
+      this.cyl_stopCountdownTimer()
+      if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && this.cylAppShowListener) wx.offAppShow(this.cylAppShowListener)
       clearTimeout(this.cylGifTimer)
       clearTimeout(this.cylGIFImageTimer)
       if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && this.cylThemeListener) wx.offThemeChange(this.cylThemeListener)
@@ -235,6 +293,71 @@ Component({
   },
 
   methods: {
+    /**
+     * [EN] The countdown state machine of this item, made on first use with the local clock and the mini program storage.
+     * [CN] 本条目的倒计时状态机，首次使用时以本地时钟与小程序存储创建。
+     */
+    cyl_countdown() {
+      if (this.cylCountdown) return this.cylCountdown
+      const storage = typeof wx !== 'undefined' && typeof wx.getStorageSync === 'function' ? {
+        get: (name) => { try { return wx.getStorageSync(name) } catch { return null } },
+        set: (name, value) => { try { wx.setStorageSync(name, value) } catch { /* [EN] a full storage only loses the restart case. [CN] 存储已满只会丢失重启恢复。 */ } },
+        remove: (name) => { try { wx.removeStorageSync(name) } catch { /* [EN] nothing to drop. [CN] 没有可丢弃的内容。 */ } },
+      } : null
+      const countdown = new CYLAnimatedItemCountdown({
+        storage,
+        onChange: () => {
+          const running = countdown.state === 'running'
+          this.setData({ countdownState: countdown.state, countdownSeconds: countdown.shown })
+          if (running) this.cyl_startCountdownTimer()
+          else this.cyl_stopCountdownTimer()
+          this.cyl_update()
+        },
+        onStart: () => this.triggerEvent('countdownstart', {}),
+        onTick: (seconds) => this.triggerEvent('countdowntick', { seconds }),
+        onFinish: () => this.triggerEvent('countdownfinish', {}),
+      })
+      this.cylCountdown = countdown
+      // [EN] The time spent in the background counts: read the clock when the mini program is shown again.
+      // [CN] 后台度过的时间计入：小程序再次显示时读取时钟。
+      this.cylAppShowListener = () => countdown.refresh()
+      if (typeof wx !== 'undefined' && typeof wx.onAppShow === 'function') wx.onAppShow(this.cylAppShowListener)
+      return countdown
+    },
+
+    cyl_startCountdownTimer() {
+      if (this.cylCountdownTimer) return
+      this.cylCountdownTimer = setInterval(() => this.cyl_countdown().refresh(), CYL_COUNTDOWN_TICK_INTERVAL)
+    },
+
+    cyl_stopCountdownTimer() {
+      clearInterval(this.cylCountdownTimer)
+      this.cylCountdownTimer = null
+    },
+
+    /**
+     * [EN] Starts (or restarts) the countdown for `seconds` (default `countdownDuration`, e.g. the server's "retry after").
+     *      Switches the item to the countdown style when it is not. [CN] 开始（或重新开始）`seconds` 秒的倒计时（默认 `countdownDuration`，
+     *      例如服务器返回的「多少秒后重试」）。条目不是倒计时样式时切换为倒计时样式。
+     */
+    startCountdown(seconds) {
+      if (this.data.itemStyle !== 'countdown') {
+        this.setData({ itemStyle: 'countdown' })
+        this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
+      }
+      this.cyl_countdown().startFor(Number(seconds) > 0 ? Number(seconds) : this.data.countdownDuration)
+    },
+
+    /** [EN] Stops and goes idle, with no finish event. [CN] 停止并回到待机，不触发结束事件。 */
+    resetCountdown() {
+      this.cyl_countdown().reset()
+    },
+
+    /** [EN] Reads the clock now (done by the item itself). [CN] 立即读取时钟（条目自己会做）。 */
+    refreshCountdown() {
+      this.cyl_countdown().refresh()
+    },
+
     cyl_update() {
       const m = cylAnimatedItemModel({ ...this.data })
       this.setData({ m })
@@ -351,6 +474,7 @@ Component({
      *      “全部播放”对每个条目调用此方法。
      */
     playAnimation() {
+      this.cyl_showAnimationAgain()
       const m = this.data.m
       if (m.gifImage && this.cylGIFImageInfo) {
         this.cyl_playGIFImage()
@@ -377,8 +501,24 @@ Component({
 
     /** [EN] Stops and shows the resting frame (iOS `stopAnimation`). [CN] 停止并显示静止帧（iOS 的 `stopAnimation`）。 */
     stopAnimation() {
-      this.cylPendingPlay = false
+      this.cyl_showAnimationAgain()
+      this.cyl_halt()
       this.cyl_rest()
+    },
+
+    /**
+     * [EN] Cancels a play that waits for the file and stops the engine where it is (a seek alone, `cyl_setProgress`, does not stop
+     *      SVGA or PAG, and Rive has no seek), so the resting frame that follows is the last thing drawn.
+     * [CN] 取消仍在等待文件的播放，并让引擎停在当前位置（单独的跳转 `cyl_setProgress` 不会停止 SVGA 或 PAG，Rive 也没有跳转），
+     *      这样随后显示的静止帧就是最后绘制的内容。
+     */
+    cyl_halt() {
+      this.cylPendingPlay = false
+      clearTimeout(this.cylGifTimer)
+      if (this.data.gifImagePlaying) this.cyl_restGIFImage()
+      if (!this.data.m.usesEngine || !this.data.animationLoaded) return
+      const engine = this.selectComponent(CYL_ENGINE_ID)
+      if (engine && typeof engine.cyl_pause === 'function') engine.cyl_pause()
     },
 
     /**
@@ -405,6 +545,9 @@ Component({
         engine.cyl_goToAndStop(Math.round(last * progress), true)
       } else if (typeof engine.cyl_rest === 'function') {
         engine.cyl_rest()
+      } else if (typeof engine.cyl_stop === 'function') {
+        // [EN] Rive: stopping resets its input, which is its resting state. [CN] Rive：停止会重置其输入，即静止状态。
+        engine.cyl_stop()
       }
     },
 
@@ -431,7 +574,27 @@ Component({
       this.cylGifTimer = setTimeout(() => {
         this.setData({ gifPlaying: false })
         this.cyl_update()
+        // [EN] A timed pass of a GIF with stills ended: the same as an engine's `complete`. [CN] 有静帧的 GIF 一遍计时结束：与引擎的 `complete` 相同。
+        this.cyl_animationDidEnd()
+        this.triggerEvent('animationcomplete', { type: 'gif' })
       }, duration - (elapsed % duration))
+    },
+
+    /**
+     * [EN] A play-once pass ended: the still image replaces the animation when `showsImageWhenAnimationEnds`.
+     * [CN] 只播放一次的一遍结束：开启 `showsImageWhenAnimationEnds` 时用静态图片替换动画。
+     */
+    cyl_animationDidEnd() {
+      if (this.data.loop || !this.data.showsImageWhenAnimationEnds || this.data.animationEnded) return
+      this.setData({ animationEnded: true })
+      this.cyl_update()
+    },
+
+    /** [EN] The animation shows again in place of the still image. [CN] 重新显示动画，替换静态图片。 */
+    cyl_showAnimationAgain() {
+      if (!this.data.animationEnded) return
+      this.setData({ animationEnded: false })
+      this.cyl_update()
     },
 
     /**
@@ -457,6 +620,7 @@ Component({
      * [CN] 引擎播放结束（非循环的一遍）：以 `animationcomplete` 转发，例如用于统计重复次数。
      */
     cyl_onAnimationComplete(event) {
+      this.cyl_animationDidEnd()
       this.triggerEvent('animationcomplete', event?.detail || {})
     },
 
@@ -495,8 +659,10 @@ Component({
     },
 
     cyl_onTap() {
-      if (this.data.enabled && !this.data.embedded) {
+      if (this.data.enabled && !this.data.embedded && this.data.countdownState !== 'running') {
         this.triggerEvent('itemtap', {})
+        // [EN] After the page handled the tap (send the code there), the countdown starts. [CN] 页面处理点击（在那里发送验证码）之后开始倒计时。
+        if (this.data.itemStyle === 'countdown' && this.data.startsCountdownOnTap) this.startCountdown()
       }
     },
 

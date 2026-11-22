@@ -21,6 +21,9 @@
       },
       {
         "name": "release"
+      },
+      {
+        "name": "emulatorTest"
       }
     ]
   },
@@ -39,6 +42,12 @@
       "targets": [
         {
           "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        },
+        {
+          "name": "emulator",
           "applyToProducts": [
             "default"
           ]

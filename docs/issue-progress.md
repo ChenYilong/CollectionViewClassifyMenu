@@ -35,6 +35,37 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO → DONE (2026-11-21, `docs/todo-reconcile`, Windows session): fix every TODO in docs/ (heading pass)
+
+- Context: `docs/` held 49 `TODO` / `Open` headings. Most recorded finished work (DONE results, 100 / 100) under a
+  heading that still said TODO, so the open work could not be told apart from the history. Other active sessions
+  (chen-yilong-3a, -a4, -b6) work in other repositories; no overlap.
+- Prompt (verbatim): "fix all todo in docs"
+- Acceptance (100): every heading whose own result shows the work finished is relabelled DONE, Chinese and English
+  (40); superseded or stale entries get a dated closing note with the evidence (20); entries still open keep TODO, with
+  what blocks them written down (20); the external facts checked rather than assumed (PR #816, PR #26 checks, the
+  CYLTableViewPlaceHolder podspec, npm, CYLTabBarController's newest commit) (10); the list of remaining TODOs is in
+  this entry (10). Pass: 60.
+- Result: 41 headings relabelled (animated-item-migration.md 20, issue-progress.md 14, cross-platform.md 2,
+  example-demo-rules.md 2, screenshots.md 3); closing notes on the 80 → 100 migration entry, the `8ece77dd` and
+  `8b7dea18` pin entries (superseded), the migration's "Open, score 72" entry (now 100) and the iOS 15 entry (40 → 100:
+  CYLTabBarController `8ece77dd`, CYLTableViewPlaceHolder `a1fb4c0`). **Score: 100 / 100** for this pass.
+- Still TODO after this pass (work, not labels):
+  - `animated-item-migration.md`, pins at `41660d24`: 95 / 100. It is not recorded whether the commit was sent to
+    Mac-CYLSearchViewController. CYLTabBarController's newest commit is now `e96c4979` (17 commits later), so the next
+    pin move is due on every platform.
+  - `animated-item-migration.md`, "TODO (in order)" item 5: move HarmonyOS `CYLTagButton` from its own
+    `ColorFilter` to `CYLAnimatedItemView.iconColor` (PR #816, merged); needs a HarmonyOS build and an emulator check.
+  - `animated-item-migration.md`, React Native HarmonyOS example: `assembleHap` from a short Windows path or on
+    macOS (Ninja's 260-character limit).
+  - `cross-platform.md`: the mini program real-device preview (needs a real AppID and a phone); `npm publish` of
+    `cyl-tag-list-miniprogram` (not on npm on 2026-11-21; needs the owner's `npm login`); the system tab bar
+    height default (waits for CYLTabBarController; not in `e96c4979`).
+  - `rive.md`: the animation screen on a real HarmonyOS device.
+  - `harmony-verification.md` (C1-C6, D1-D5, E3, F1, G2, and B9 / B11) and `harmony-screenshot-issues.md` (R1-R3,
+    F1-F3: "TODO need 模拟器截图验证"): emulator or device checks.
+  - Issues #11, #9 and #2 in the table above stay blocked (the owner, a real device, an old Xcode).
+
 ### TODO (2026-11-20, `docs/readme-swift-refresh`): README refresh, Swift only, every platform's setup
 
 - Context: README.md has outdated descriptions (the core was Objective-C until the migration finished on 2026-11-14,
@@ -218,11 +249,12 @@ tags: [issues, ui, cocoapods, progress]
 - Result: **100/100**. AGENTS.md has both sections; `.agents/skills/cyl-task-start/SKILL.md` is new; `cyl-commit`
   step 5 links it; committed and pushed on `feat/harmony` (PR #20).
 
-### Open (2026-11-17): CYLAnimatedItem migration, score 72
+### Done (2026-11-17 → 2026-11-18, logged as Open): CYLAnimatedItem migration, score 100
 
 - Progress against CYLTabBarController's `docs/Animated-Item.md`, item by item, and the TODOs (iOS CI and the static-library
   demo app, SwiftPM product, PR #815 merge for the mini program GIF stills, HarmonyOS / WeChat DevTools / Flutter and React
   Native Android builds): [animated-item-migration.md](animated-item-migration.md).
+- Update (2026-11-21): that document scores 100 (25 / 25 rows since 2026-11-18); the score here was stale.
 
 ### Done (2026-11-17, `feat/harmony`): CYLAnimatedItem module in static-library Podfiles, again
 
@@ -254,7 +286,7 @@ tags: [issues, ui, cocoapods, progress]
   registered engine, ➖ with the `pod 'CYLAnimatedItem/<subspec>'` line for a missing one, ⚠️ for each conflict
   (`engineReportLines()`); strings in en and zh-Hant (zh-Hans: the keys), mini program `strings.js` regenerated. Test:
   `CYLAnimatedIconTests.testEveryLinkedEngineIsRegisteredAndListed` (all five registered, none missing, no conflict,
-  each listed; screenshot `test-animation-engine-report`). Not compiled here (Linux, no Xcode): CI.
+  each listed; screenshot `test-animation-engine-report`). Not compiled here (Linux, no Xcode): CI. Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md).
 
 ### Done (2026-11-17, `feat/harmony`): every published package ships its license
 
@@ -272,7 +304,8 @@ tags: [issues, ui, cocoapods, progress]
   (the Flutter "TODO" placeholder replaced) and their HAR, the ohpm HAR (module root and `rawfile`), the mini program
   package (root, listed in `files`, expected by `verify-package.js`). Check: `scripts/check-licenses.sh` (passes,
   shellcheck clean); mini program `verify-package.js` and `npm test` 111/111 pass. Not built here: the iOS bundle,
-  the AAR and the HAR (CI and the platform toolchains).
+  the AAR and the HAR (CI and the platform toolchains). iOS bundle (2026-11-21, `06baca1d`): the `pod-lint.sh lib` build
+  product `CYLClassifyMenuResources.bundle` contains `LICENSE` and `THIRD-PARTY-NOTICES.md`; Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md).
   2026-11-17, after re-reading CYLTabBarController's guide (tip `ec12a9d`, its `docs/License-Notices.md`): the mini
   program package also carries `miniprogram_dist/LICENSE`, as CYLTabBarController's mini program component folders
   do (the earlier worry about WeChat file types did not hold).
@@ -460,7 +493,7 @@ tags: [issues, ui, cocoapods, progress]
   `CYLTagListView`, `UIImageView` + `UILabel`), `CYLMultipleFilterHeaderView` (XIB `UIImageView` + `UILabel`),
   `CYLIndexPathButton` (`UIButton`: classify menu and filter tags, filter header title) and `CYLRightImageButton`
   (`UIButton`: the classify menu's "更多").
-- Result (not compiled here: Linux, no Xcode; CI builds and tests it):
+- Result (not compiled here: Linux, no Xcode; CI builds and tests it; Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md)):
   - `CYLIndexPathButton` and `CYLRightImageButton` are `CYLTagButton` subclasses (the names, `section` / `row` and the
     key-value keys `button` / `titleButton` / `moreButton` kept). Their old `UIButton` looks are `CYLMenuStyle` looks:
     `classifyMenuTag(_:)`, `filterTag()`, `sectionTitle(fontSize:textColor:leadingInset:)`. The classify menu and the
@@ -503,7 +536,7 @@ tags: [issues, ui, cocoapods, progress]
   initializers, the configuration API) with conventional Objective-C names; keep the Swift names; give members whose
   types Objective-C cannot see (`CYLTag`, `CYLTagColors`, `CGFloat?`) an Objective-C route; prove it with an
   Objective-C test in the core's tests.
-- Status: done in the core (not compiled here: Linux, no Xcode; CI builds and tests it). Result and details:
+- Status: done in the core (not compiled here: Linux, no Xcode; CI builds and tests it; Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md)). Result and details:
   `Swift-Migration.md`, "Objective-C API changes". The other repository can move its pin to the commit that adds
   this.
 
@@ -521,7 +554,7 @@ tags: [issues, ui, cocoapods, progress]
 - Result: `objcTagClickHandler` (`@objc(tagClickHandler)`, unavailable in Swift) in `CYLTagListView.swift`, called in
   `handleTap(at:)` right after `tagClickHandler` with `tag.title`; `testTagListViewAPIIsVisibleToObjectiveC` sets and
   calls it from Objective-C; `Swift-Migration.md`, "Objective-C API changes". Tables: iOS -> Android 767 / 767,
-  Android -> iOS 733 / 733. Not compiled here (Linux, no Xcode); CI builds and tests it. The test sets and calls the
+  Android -> iOS 733 / 733. Not compiled here (Linux, no Xcode); CI builds and tests it (Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md)). The test sets and calls the
   block; it does not simulate a tap (the tap path is private), so the call from `handleTap` is checked only by
   reading it.
 
@@ -635,6 +668,7 @@ tags: [issues, ui, cocoapods, progress]
     `CYLTagButtonStandaloneTest` (4); HarmonyOS `TagButton.test.ets` (3); mini program `test/tag-button.test.js` (4).
     Run here: `npm test` (108 pass), `export-core-strings.py --check`, `check-native-strings.py`. Not compiled or run
     here (Linux, no Xcode, Android SDK or DevEco): the Swift, Kotlin and ArkTS code and their tests; CI builds iOS.
+    Swift: Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md).
   - Tables: Android -> iOS 740 / 740 = 100; iOS -> Android 770 / 778 (the 8 TODO rows are the classify menu and filter
     buttons of `39fce57`, Android refactor still TODO there); `docs/harmony.md` 811 / 849 (the 38 TODO rows are iOS
     symbols added since the last regeneration, none of this task's; four stale keys of `39fce57` removed from
@@ -680,7 +714,7 @@ tags: [issues, ui, cocoapods, progress]
   string `"列表"` (en, zh-Hant). Limit, stated honestly: like Rive, CYLTabBarController's SVGA player has no
   `animationSpeed`, `loops` or `progress`, so SVGA icons play once at the file's own speed. The speed slider and the loop
   switch do not change them. That needs CYLTabBarController's view player to expose them (SVGAPlayer has `loops`), not
-  an example workaround. Not compiled here (Linux, no Xcode). CI on `4b054c4`: `CYLTagConfigurationTests` still counted five tags in the dictionary demo
+  an example workaround. Not compiled here (Linux, no Xcode; Mac check (2026-11-21, `06baca1d`, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2, clean derived data): menu 37 / 37, tag 6 / 6, swift 23 / 23, example 116 / 116, `pod-lint.sh lib` passes; see "iOS / Swift TODOs in docs checked with Xcode" in [component-architecture.md](component-architecture.md)). CI on `4b054c4`: `CYLTagConfigurationTests` still counted five tags in the dictionary demo
   (the SVGA tag made six); the test now counts six and reads the image and string items from the end.
   CI run 43992497583 on `b27d340`: all 9 iOS jobs passed; SVGA screenshots in `screenshots.md`
   ("iOS: SVGA animated icons"). Other platforms: HarmonyOS done (D5); Android done (2026-11-19,
@@ -1011,7 +1045,7 @@ tags: [issues, ui, cocoapods, progress]
   Screenshots: [ios-localization-en-zh-hant.png](assets/ios-localization-en-zh-hant.png).
 - Rules: AGENTS.md "Internationalization and localization" and `.agents/skills/cyl-localization/` name both checks.
 
-### TODO (2026-11-19, `feat/harmony`): route tasks by session name (Mac: iOS, Win: the other platforms)
+### DONE (2026-11-19, `feat/harmony`, logged as TODO): route tasks by session name (Mac: iOS, Win: the other platforms)
 
 - Context: two sessions work on this branch, "Mac-…" (macOS, Xcode, iOS simulator) and "win…" (Windows: HarmonyOS, the
   mini program, Android). The owner wants the split written into the instructions and skills.
@@ -1031,7 +1065,7 @@ tags: [issues, ui, cocoapods, progress]
   asked it to append the same rule (−10 until it confirms).
 - Update: the Windows session appended the rule to `harmony/instructions.md` (6d8deef3): **100/100**.
 
-### TODO (2026-11-19, `feat/harmony`): "Welcome to use AndroidTagView!" names the platform's OS version and CollectionViewClassifyMenu
+### DONE (2026-11-19, `feat/harmony`, logged as TODO): "Welcome to use AndroidTagView!" names the platform's OS version and CollectionViewClassifyMenu
 
 - Context: AndroidTagView's sample list (the Container sample on every platform) ends with "Welcome to use
   AndroidTagView!". Occurrences in the examples' data: iOS `CYLTagContainerSample.swift`, Android
@@ -1067,7 +1101,7 @@ tags: [issues, ui, cocoapods, progress]
 
   <img src="assets/welcome-tag-os-version-other-platforms.png" width="400" alt="Welcome tag with the running system on Android, HarmonyOS and the mini program">
 
-### TODO (2026-11-19, `feat/harmony`): project-wide localization audit; rewrite 4a1cc7aa's message (owner's OK)
+### DONE (2026-11-19, `feat/harmony`, logged as TODO): project-wide localization audit; rewrite 4a1cc7aa's message (owner's OK)
 
 - Context: the iOS sweep above is done (core, demo app, both Examples). Left: the shared Flutter and React Native
   example code (Mac session: their iOS runs), Android, HarmonyOS and the mini program (Windows session, session roles
@@ -1133,7 +1167,7 @@ tags: [issues, ui, cocoapods, progress]
 
   - Not wired into CI (nor is `check-localization.py`); run both before a commit that touches strings.
 
-### TODO (2026-11-19, `feat/harmony`): close the three open items (localization audit, 16 commit messages, the sixth container)
+### DONE (2026-11-19, `feat/harmony`, logged as TODO): close the three open items (localization audit, 16 commit messages, the sixth container)
 
 - Context: open after the work above: (1) the localization audit at 65 / 100, waiting on Android, HarmonyOS and the
   mini program (Windows session) and the React Native app run (Mac session); (2) 16 older commits (2026-11-12 to
@@ -1266,7 +1300,7 @@ tags: [issues, ui, cocoapods, progress]
   `loadSections` with a fake remote source answer as expected.
 - **Score:** 100 / 100 (Android 40, HarmonyOS 30, mini program 30).
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): renaming in editing mode, item ids, the header clear button, image folders and the editing icon spacing on Android, HarmonyOS and the mini program
+### DONE (2026-11-19, `feat/harmony`, Windows session, logged as TODO): renaming in editing mode, item ids, the header clear button, image folders and the editing icon spacing on Android, HarmonyOS and the mini program
 
 - **Requests (relayed by the Mac ClassifyMenu session; the CYLSearchViewController session needs them for its contact
   tags example):** port iOS `990cf115` (renaming in editing mode with two icons, `CYLAnimatedItemStackView`; item ids;
@@ -1319,7 +1353,7 @@ tags: [issues, ui, cocoapods, progress]
   (`axis="horizontal"`, `spacing`, `icon-color`) as Android and HarmonyOS now do; it needs the stack vendored into the
   library package (`fetch-cyltabbar.js` `VENDORED`).
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): Android tags cut short with "…" although there is room
+### DONE (2026-11-19, `feat/harmony`, Windows session, logged as TODO): Android tags cut short with "…" although there is room
 
 - **Bug (step 1, recorded; reported by the CYLSearchViewController session):** on emulator-5556 (API 37, 1080 px wide)
   with `CYLFont.systemFont(16f)`, margin 14, corner radius 6, item height 36, "Book Club" shows as "Book Cl…" (normal
@@ -1340,7 +1374,7 @@ tags: [issues, ui, cocoapods, progress]
 - **Screenshot (after, 30 / 30):** `docs/assets/android-tag-title-ellipsis-after.png` (CYLSearchViewController 918a7fa with
   1a3a31dc on emulator-5556): "Book Club" and "Recruiters" in full. **Score: 100 / 100.**
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): HarmonyOS, tapping a tag's pencil or title in editing mode does not rename
+### DONE (2026-11-19, `feat/harmony`, Windows session, logged as TODO): HarmonyOS, tapping a tag's pencil or title in editing mode does not rename
 
 - **Bug (step 1, recorded; reported by the CYLSearchViewController session at 357478ba, Mate 70 Pro emulator):** in
   editing mode the pencil (and the title, with `renamesOnTitleTapWhileEditing`) goes to the normal item tap
@@ -1371,7 +1405,7 @@ tags: [issues, ui, cocoapods, progress]
 - Still below 100, blocked (reasons above in the table): iOS issues #11 (the owner's CocoaPods release and a tag on
   master), #9 (a real device), #2 (an old Xcode); the default tab bar height (waits for CYLTabBarController).
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): mini program `cyl-tag-cloud` folding (`defaultVisibleRows`, a tail fold control)
+### DONE (2026-11-19, `feat/harmony`, Windows session, logged as TODO): mini program `cyl-tag-cloud` folding (`defaultVisibleRows`, a tail fold control)
 
 - **Request (the CYLSearchViewController session):** `cyl-tag-cloud` has no folding, while iOS, Android and HarmonyOS
   fold My Tags to three rows with the chevron as the last tag (`defaultVisibleRows` + `CYLMenuFoldControl` tail / icon);
@@ -1414,7 +1448,7 @@ tags: [issues, ui, cocoapods, progress]
   are no longer required for this issue (owner's decision); `scripts/pod-lint.sh push` stays for a future release.
 
 
-### TODO (2026-11-19, `feat/harmony`): the localization checks run in CI
+### DONE (2026-11-19, `feat/harmony`, logged as TODO): the localization checks run in CI
 
 - Context: `scripts/check-localization.py` (iOS, Flutter and React Native code and tables) and
   `scripts/check-localization-ports.py` (Android, HarmonyOS and mini program) ran only by hand. Both are Python 3
@@ -1427,7 +1461,7 @@ tags: [issues, ui, cocoapods, progress]
   master / `claude/**`), Python 3 standard library only. First run on GitHub (run 44457566107): every step green.
   AGENTS.md "Internationalization and localization" names the workflow.
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): mini program `cyl-tag-cloud`, tapping a tag's × or pencil in editing mode does nothing
+### DONE (2026-11-19, `feat/harmony`, Windows session, logged as TODO): mini program `cyl-tag-cloud`, tapping a tag's × or pencil in editing mode does nothing
 
 - **Bug (step 1, recorded; the user reported it through the CYLSearchViewController session, reproduced at c43eebcd in
   WeChat DevTools 2.02.2609250 with miniprogram-automator):** a touch-based tap (`element.tap()`) on
@@ -1502,7 +1536,7 @@ tags: [issues, ui, cocoapods, progress]
   the old text and pass in any language (25); screenshots in the three languages (15); the NOLOCALIZE exemption removed
   and the localization checks at 0 (10). Pass: 60.
 
-### TODO (2026-11-19, `feat/harmony`, Windows session): the word picker (选词填入) on Android, HarmonyOS and the mini program
+### DONE (2026-11-19, `feat/harmony`, Windows session, logged as TODO): the word picker (选词填入) on Android, HarmonyOS and the mini program
 
 - **Request (the Mac ClassifyMenu session, session-roles rule):** port iOS cf5d9f7e (`CYLMenuStyle.wordPicker()`,
   `setTags(withCharactersOf:)`, `allowsSmearSelection`, `selectedText`, `selectItems(from:through:)`, the core string
@@ -1549,8 +1583,10 @@ tags: [issues, ui, cocoapods, progress]
   the SDKs, so the owner decides. The HarmonyOS screenshots (one smear, several smears) wait for that.
 - **Mini program core (the example and its screenshot to come):** `cyl-tag-cloud` `setTagsWithCharactersOfText`
   (graphemes, keeps `selectionMode`), `selectedText()`, `selectItemsFrom`, `allowsSmearSelection` (the touched-down tag
-  anchors the smear; `touchmove` against the measured frames extends it; the item catches `touchmove` while smearing so
-  the page does not scroll, through a data-bound handler name; a tap still toggles; `selectionchange` {positions});
+  anchors the smear; `touchmove` against the measured frames extends it; the item catches `touchmove` while smearing
+  through a data-bound handler name (correction, 2026-11-20: that only stops bubbling, not native scrolling; the cloud
+  now sends `smearingchange` {smearing} so the host holds its `<scroll-view>`, README "Scrolling while dragging or
+  smearing"); a tap still toggles; `selectionchange` {positions});
   `model.wordPickerStyle()` and a new `numberOfItemsPerRow` (equal cells: `calc((100% - spaces) / n)`), title
   `fontWeight`; a space cell reads `CYLMenuSpaceCharacter`. New `test/tag-cloud-word-picker.test.js` (2); `npm test`
   164 / 164 with and without `verify-package.js`.
@@ -1587,7 +1623,7 @@ tags: [issues, ui, cocoapods, progress]
   Screenshots: [ios-word-picker-several-smears.png](assets/ios-word-picker-several-smears.png).
 
 
-### TODO (2026-11-20, `feat/harmony`): raise the iOS minimum of the podspecs below 15 to iOS 15
+### DONE (2026-11-20, `feat/harmony`, logged as TODO): raise the iOS minimum of the podspecs below 15 to iOS 15
 
 - Context: CollectionViewClassifyMenu is already at iOS 15.0 everywhere (podspec `s.platform`, `Package.swift`
   `.iOS(.v15)`, every Podfile, 14 Xcode targets, the Flutter plugin podspec; the React Native plugin follows React
@@ -1612,3 +1648,36 @@ tags: [issues, ui, cocoapods, progress]
   the owner's list and are unchanged. The requests for CYLTabBarController / CYLAnimatedItem and CYLTableViewPlaceHolder
   went to their owning sessions (the CYLTabBarController one also raises the Lottie subspec's 13.0). Score 40 / 100 until
   they confirm (−40) and this repository re-pins if CYLAnimatedItem changes (−20).
+- Update (2026-11-21): both requests are done. CYLTabBarController `8ece77dd` raises `CYLTabBarController.podspec`,
+  `CYLAnimatedItem.podspec`, every subspec and `Package.swift` to iOS 15 (see `animated-item-migration.md`); this
+  repository re-pinned to it and later commits (`8b7dea18`, `41660d24`). CYLTableViewPlaceHolder: `a1fb4c0` ("raise the
+  minimum to iOS 15.0", `s.platform = :ios, '15.0'`), pushed on its `feat/android-refresh-port-followup` branch, not yet
+  on its master. **Score: 100 / 100.**
+
+### DONE (2026-11-20, `feat/harmony`, Windows session, logged as TODO): the tag list reports drags and smears on Android and HarmonyOS, as the mini program
+
+- **Request (the user through the CYLSearchViewController session, verbatim):** "小程序联系人example拖动taglist期间禁止滚动测试通过，现在排查其他端的逻辑，要求与小程序的逻辑保持一致，修改searchbar以及collectionview库里的core代码实现该功能"
+  (English: the mini program contact tags example's no-scroll-while-dragging passed; now check the other platforms, make
+  their logic the same as the mini program's, and change the core code of the search bar and the collection view
+  libraries to do it.)
+- **Acceptance (100):** `CYLMenuDelegate.menuDidChangeReordering(menu, reordering)` and `menuDidChangeSmearing(menu,
+  smearing)` on Android and HarmonyOS, true at the start of a drag or smear, false at its end and cancel (a drop, a
+  cancelled touch), once per change (50); tests: a drag, a cancelled drag and a smear give the pairs in order (40); the
+  commit sent to the CYLSearchViewController session (10). Pass: 60.
+- **Done (100 / 100):** Android: `CYLMenuDelegate` defaults; `CYLTagListView` reports reordering at the long press that
+  starts a drag and in `finishDrag` (drop or cancel), smearing in `beginSmear` and at the touch's end or cancel.
+  HarmonyOS: optional `CYLMenuDelegate` members; `CYLTagListState` reports reordering in `beginLongPress` (when it
+  reorders), `endLongPress` and `cancelLongPress`, smearing in `beginSmear` and `endSmear` (once, only after a smear).
+  Tests: Android `CYLWordPickerTest.gestureStateCallbacksComeInPairs` (real touch events: a smear, a long-press drag with
+  a drop, a cancelled drag); HarmonyOS `TagListWordPicker.test.ets` (the same, plus repeated ends that do not report
+  twice). Android library 103 / 0, the example builds; HarmonyOS host tests 79 / 79, the app builds. `docs/android-ios-api.md`
+  maps both to the agreed iOS names (Mac-CollectionViewClassifyMenu adds them).
+- **HarmonyOS, a hook for containers (follow-up for the search core):** an ArkTS builder gives the search core's
+  content `Scroll` no event bubbling, so `CYLMenuGestureState.shared` (exported) says whether any tag list has a drag or
+  a smear in progress: every `CYLTagListState` reports to it with its delegate callbacks, each list's share kept apart
+  (`CYLTagListView.aboutToDisappear` clears a list that goes away mid-gesture); a container adds a listener while shown
+  and sets `enableScrollInteraction(!active)`. Chosen over `@Provide` / `@Consume` because `@Consume` needs a provider
+  above every tag list (default values only in later API levels than the target API 12). Test
+  `sharedGestureStateFollowsEveryList` (two lists, a smear each, a drop, a list cleared mid-drag; the listener hears
+  each change once); host tests 80 / 80; the app builds.
+

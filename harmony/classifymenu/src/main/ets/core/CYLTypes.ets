@@ -1,4 +1,5 @@
 import { image } from '@kit.ImageKit';
+import { cylIconColorFilter } from 'cylanimateditem';
 
 /**
  * The ArkTS forms of the UIKit value types the iOS API uses. Lengths are vp and font sizes fp, as points on iOS.
@@ -209,19 +210,12 @@ export class CYLColor {
   /**
    * The color filter (`Image.colorFilter`) that paints every pixel of an image in `color`, keeping the pixel's alpha:
    * the template rendering of iOS (`UIImage.withRenderingMode(.alwaysTemplate)` tinted by `tintColor`), for bitmaps,
-   * which `fillColor` does not recolor (it only colors SVG and symbol images). Each output channel is the color's
-   * component scaled by the pixel's alpha (a matrix without offsets, so it does not depend on the channel range).
+   * which `fillColor` does not recolor (it only colors SVG and symbol images). It is the filter of the shared component,
+   * `cylIconColorFilter` of `CYLAnimatedItemView.iconColor` (CYLTabBarController PR #816), so the tag's own icon and the
+   * component's static image are tinted alike; the identity for a theme resource or a named color, which cannot be read.
    */
   static tintFilter(color: ResourceColor): number[] {
-    // A theme resource or a named color cannot be read here: the image keeps its colors.
-    if (typeof color !== 'string' || !new RegExp('^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$').test(color)) {
-      return CYLColor.IDENTITY_FILTER;
-    }
-    const hex = color.replace('#', '');
-    const argb = hex.length === 6 ? 'FF' + hex : hex.padStart(8, 'F');
-    const component = (index: number): number => parseInt(argb.substring(index, index + 2), 16) / 255;
-    const a = component(0);
-    return [0, 0, 0, component(2), 0, 0, 0, 0, component(4), 0, 0, 0, 0, component(6), 0, 0, 0, 0, a, 0];
+    return cylIconColorFilter(color);
   }
 
   /**

@@ -950,7 +950,9 @@
     "CYLTagListView.allowsSmearSelection": "`CYLTagListState.allowsSmearSelection` (a per-item `PanGesture` in `CYLTagListView`)",
     "CYLTagListView.setTags(withCharactersOf:)": "`CYLTagListState.setTagsWithCharactersOfText(text)`",
     "CYLTagListView.selectedText": "`CYLTagListState.selectedText`",
-    "CYLTagListView.selectItems(from:through:)": "`CYLTagListState.selectItemsFrom(start, end)`"
+    "CYLTagListView.selectItems(from:through:)": "`CYLTagListState.selectItemsFrom(start, end)`",
+    "CYLMenuDelegate.menu(_:didChangeReordering:)": "`CYLMenuDelegate.menuDidChangeReordering?(menu, reordering)` (and `CYLMenuGestureState.shared`)",
+    "CYLMenuDelegate.menu(_:didChangeSmearing:)": "`CYLMenuDelegate.menuDidChangeSmearing?(menu, smearing)` (and `CYLMenuGestureState.shared`)"
   },
   "demos": [
     {

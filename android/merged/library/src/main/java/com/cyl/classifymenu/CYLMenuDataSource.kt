@@ -94,6 +94,19 @@ interface CYLMenuDelegate {
     fun menuDidRequestNewItemWithName(menu: Any, name: String, atIndexPath: CYLIndexPath) {}
     fun menuDidDeselectItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {}
     fun menuDidChangeSelectedItems(menu: Any, indexPaths: List<CYLIndexPath>) {}
+
+    /**
+     * `menuDidChangeReordering(_:reordering:)`: a drag (reordering) started (true) or ended (false: a drop or a
+     * cancelled touch), once per change, as the mini program's `reorderingchange`; a container turns its own scrolling
+     * off while it is true.
+     */
+    fun menuDidChangeReordering(menu: Any, reordering: Boolean) {}
+
+    /**
+     * `menuDidChangeSmearing(_:smearing:)`: a word picker smear (`allowsSmearSelection`) started (true) or ended
+     * (false), once per change, as the mini program's `smearingchange`.
+     */
+    fun menuDidChangeSmearing(menu: Any, smearing: Boolean) {}
     fun menuDidConfirmSelectedItems(menu: Any, indexPaths: List<CYLIndexPath>) {}
     fun menuDidChangeExpanded(menu: Any, expanded: Boolean, inSection: Int) {}
     fun menuDidChangeContentHeight(menu: Any, height: Float) {}

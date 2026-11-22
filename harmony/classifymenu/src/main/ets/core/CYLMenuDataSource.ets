@@ -91,6 +91,17 @@ export interface CYLMenuDelegate {
   menuDidRequestNewItemWithName?: (menu: Object, name: string, indexPath: CYLIndexPath) => void;
   menuDidDeselectItem?: (menu: Object, indexPath: CYLIndexPath) => void;
   menuDidChangeSelectedItems?: (menu: Object, indexPaths: CYLIndexPath[]) => void;
+  /**
+   * `menuDidChangeReordering(_:reordering:)`: a drag (reordering) started (true) or ended (false: a drop or a cancelled
+   * touch), once per change, as the mini program's `reorderingchange`; a container turns its own scrolling off while it
+   * is true.
+   */
+  menuDidChangeReordering?: (menu: Object, reordering: boolean) => void;
+  /**
+   * `menuDidChangeSmearing(_:smearing:)`: a word picker smear (`allowsSmearSelection`) started (true) or ended (false),
+   * once per change, as the mini program's `smearingchange`.
+   */
+  menuDidChangeSmearing?: (menu: Object, smearing: boolean) => void;
   menuDidConfirmSelectedItems?: (menu: Object, indexPaths: CYLIndexPath[]) => void;
   menuDidChangeExpanded?: (menu: Object, expanded: boolean, section: number) => void;
   menuDidChangeContentHeight?: (menu: Object, height: number) => void;

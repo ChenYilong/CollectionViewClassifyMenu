@@ -48,6 +48,23 @@ export class CYLFilterBaseController {
   /** The insets of the list's sections: the panel leaves 50 vp of the host view visible on the left. */
   static readonly sectionInset: CYLEdgeInsets = new CYLEdgeInsets(12, 50, 15, 5);
 
+  /** The panels on screen, the newest last (for the system back key). */
+  private static showingPanels: CYLFilterBaseController[] = [];
+
+  /**
+   * The system back key (HarmonyOS only; iOS has none): closes the newest panel on screen, like a tap on the dimmed
+   * area, and returns true; false when no panel is showing. Call it first in the page's back handler (a
+   * `NavDestination.onBackPressed` or `onBackPress`), so back closes the panel instead of the page under it.
+   */
+  static hideShowingPanelForBackPress(): boolean {
+    const panels = CYLFilterBaseController.showingPanels;
+    if (panels.length === 0) {
+      return false;
+    }
+    panels[panels.length - 1].hide();
+    return true;
+  }
+
   /** The list. */
   readonly collectionView: CYLFilterCollectionView = new CYLFilterCollectionView();
   /** The dimmed area outside the panel; a tap on it closes the panel. */
@@ -84,6 +101,8 @@ export class CYLFilterBaseController {
    * panel and slides the panel in.
    */
   show(): void {
+    CYLFilterBaseController.showingPanels =
+      CYLFilterBaseController.showingPanels.filter((panel: CYLFilterBaseController) => panel !== this).concat([this]);
     this.isShowing = true;
     this.isPanelVisible = false;
     this.contentView.alpha = 0;
@@ -154,6 +173,8 @@ export class CYLFilterBaseController {
       completion();
       return;
     }
+    CYLFilterBaseController.showingPanels =
+      CYLFilterBaseController.showingPanels.filter((panel: CYLFilterBaseController) => panel !== this);
     this.animate(false, () => {
       this.isShowing = false;
       this.notify();

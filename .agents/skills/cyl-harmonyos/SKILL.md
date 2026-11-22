@@ -57,6 +57,43 @@ accessibility description, then an id), to tap, to drive complex flows and to ch
   `harmony/entry/src/ohosTest/ets/test/TestSupport.ets`; `cylTap(driver, id)` only for controls without a label.
 - One test file per feature; run with `harmony/scripts/ui-test.sh` on a booted emulator.
 
+## Emulator ABI: arm64-only Rive and PAG
+
+- Symptom: `hdc install` fails with `code:9568347 install parse native so failed ... the Abi type supported by the device
+  does not match`: the default HAP ships `libs/arm64-v8a` only (`libohos_rive.so`, `libpag.so`, `libc++_shared.so`)
+  and the Windows emulators are x86_64.
+- The fix is in CYLTabBarController's `CYLAnimatedItemView` (vendored `harmony/cylanimateditem`, README "x86_64
+  emulator"): on a device without `arm64-v8a`, `CYLAnimatedItemEngines.canPlay` is false for PAG and Rive, the component
+  skips `animationBuilder` and shows the still image or the placeholder, and debug builds log why. Code that builds PAG or
+  Rive views outside `animationBuilder` checks `CYLAnimatedItemEngines.isSupportedOnDevice(type)` first.
+- This repository uses the entry's `emulator` target (every `arm64-v8a` library left out) and the `emulatorTest` build
+  mode. Commands:
+
+  ```sh
+  HDC="/c/Program Files/Huawei/DevEco Studio/sdk/default/openharmony/toolchains/hdc"
+  "$HDC" -t 127.0.0.1:5557 shell param get const.product.cpu.abilist     # x86_64 or arm64-v8a
+  harmony/scripts/build.sh                                                # default and emulator HAPs
+  unzip -l harmony/entry/build/default/outputs/emulator/entry-emulator-unsigned.hap | grep -c '\.so$'   # 0
+  # install from the output folder (hdc misreads some absolute Windows paths), or use the component's tool:
+  cd harmony/entry/build/default/outputs/emulator && "$HDC" -t 127.0.0.1:5557 install -r entry-emulator-unsigned.hap
+  py -3 harmony/cylanimateditem/tools/cyl_hap_x86_64.py install <any.hap> --target 127.0.0.1:5557   # strips, installs
+  HDC_TARGET=127.0.0.1:5557 harmony/scripts/ui-test.sh                    # picks emulator / emulatorTest on x86_64
+  ```
+
+- x86_64 covers Lottie, SVGA and GIF playback, PAG and Rive still images, layout, dark mode, accessibility, localization
+  and the UI tests. PAG and Rive playback needs an arm64 target (the Apple Silicon Mac's DevEco Studio emulator or a
+  device; from Windows, ask the Mac session). Never add the ABI filter to the default target.
+- Rive and PAG tests that need arm64, two plans in order (owner's rule):
+  1. Plan 1, in CYLTabBarController's `CYLAnimatedItemView`: x86_64 builds of the Rive and PAG native libraries from
+     GitHub, used only when the running system is x86_64 (`deviceInfo.abiList`). Checklist: (a) the x86_64 build
+     compiles; (b) nothing crashes and no other feature changes (Lottie, SVGA, GIF, still images, layout, accessibility,
+     `ui-test.sh`); (c) then Rive and PAG play. Keep it behind a debug build guard until verified; ask the owner before
+     removing that guard. Release builds and arm64 devices keep the published arm64 libraries.
+  2. Plan 2, if plan 1 fails: send the Rive and PAG tests to the macOS (arm64) session (commit, pages, checks,
+     screenshots) and log why plan 1 failed.
+- On Git Bash, `hdc shell` paths such as `/data/local/tmp` need `MSYS_NO_PATHCONV=1`.
+- Source: AGENTS.md, "HarmonyOS: the HAP will not install on an x86_64 emulator (arm64-only Rive and PAG)".
+
 ## Commands
 
 ```sh

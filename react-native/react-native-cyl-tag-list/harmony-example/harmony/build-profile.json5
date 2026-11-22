@@ -41,5 +41,10 @@
       name: 'classifymenu',
       srcPath: '../../../../harmony/classifymenu',
     },
+    {
+      // CYLTabBarController's CYLAnimatedItemView, vendored in harmony/ (classifymenu depends on it by file:).
+      name: 'cylanimateditem',
+      srcPath: '../../../../harmony/cylanimateditem',
+    },
   ],
 }

@@ -2686,6 +2686,7 @@ private extension CYLTagListView {
             pressStart = point
             if canReorder && collectionView.beginInteractiveMovementForItem(at: indexPath) {
                 isReordering = true
+                menuDelegate?.menu?(self, didChangeReordering: true)
                 if selection.contains(indexPath) {
                     reportSelectedDrag(at: indexPath)
                 }
@@ -2704,6 +2705,7 @@ private extension CYLTagListView {
             if isReordering {
                 isReordering = false
                 collectionView.endInteractiveMovement()
+                menuDelegate?.menu?(self, didChangeReordering: false)
                 if !pressMoved, let pressedIndexPath {
                     reportLongPress(at: pressedIndexPath)
                 }
@@ -2714,6 +2716,7 @@ private extension CYLTagListView {
                 isReordering = false
                 movingItem = nil
                 collectionView.cancelInteractiveMovement()
+                menuDelegate?.menu?(self, didChangeReordering: false)
             }
             pressedIndexPath = nil
         }
@@ -3357,6 +3360,7 @@ extension CYLTagListView {
                 return
             }
             smearStart = (selection, indexPath, !selection.contains(indexPath))
+            menuDelegate?.menu?(self, didChangeSmearing: true)
             applySmear(to: indexPath)
             // The finger may already be over a later item.
             if let current = smearableIndexPath(at: point) {
@@ -3367,7 +3371,10 @@ extension CYLTagListView {
                 applySmear(to: indexPath)
             }
         default:
-            smearStart = nil
+            if smearStart != nil {
+                smearStart = nil
+                menuDelegate?.menu?(self, didChangeSmearing: false)
+            }
             smearTouchDown = nil
         }
     }
@@ -3412,3 +3419,35 @@ final class CYLTagListSmearGestureDelegate: NSObject, UIGestureRecognizerDelegat
     }
 }
 
+// MARK: - Window
+
+/*
+ * [EN] Outside the private extension: an override of an open UIView method stays open, and an access modifier inside a
+ *      private extension conflicts with the extension's default access (pod lint warning).
+ * [CN] 放在 private 扩展之外：重写 UIView 的 open 方法仍为 open；private 扩展中的访问修饰符与扩展的默认访问级别冲突（pod lint 警告）。
+ */
+extension CYLTagListView {
+
+    /**
+     * Removed from its window in the middle of a drag or a smear: the gesture is over, so the delegate hears `false` and a
+     * host that locked its scroll view unlocks it.
+     */
+    open override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window == nil else {
+            return
+        }
+        if isReordering {
+            isReordering = false
+            movingItem = nil
+            pressedIndexPath = nil
+            collectionView.cancelInteractiveMovement()
+            menuDelegate?.menu?(self, didChangeReordering: false)
+        }
+        if smearStart != nil {
+            smearStart = nil
+            smearTouchDown = nil
+            menuDelegate?.menu?(self, didChangeSmearing: false)
+        }
+    }
+}

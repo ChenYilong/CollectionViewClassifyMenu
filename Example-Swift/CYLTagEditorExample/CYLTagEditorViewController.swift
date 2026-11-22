@@ -200,6 +200,9 @@ final class CYLTagEditorViewController: UIViewController {
         manageButton.accessibilityHint = CYLTagEditorLocalizedString(isManaging ? "轻点两下完成管理" : "轻点两下选择或删除标签")
         manageButton.sizeToFit()
         tagListView.reloadMenuData()
+        // "管理" mode: a long press drags a tag of "我的标签" to reorder it (not while searching). After the reload:
+        // setting it refreshes the visible cells from the data source, which must already show the new sections.
+        tagListView.allowsReordering = isManaging && query.isEmpty
         syncSelection()
         updateDoneButton()
     }
@@ -363,6 +366,18 @@ extension CYLTagEditorViewController: CYLMenuDataSource {
 
     func menuItemIsSelectable(at indexPath: IndexPath) -> Bool {
         !isManaging
+    }
+
+    /// A drag in "管理" mode: only the tags of "我的标签" move, within the section; any other drop is undone by a reload.
+    func menuMoveItem(at sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard isManaging, sourceIndexPath.section == destinationIndexPath.section,
+              sections[sourceIndexPath.section].kind == .mine,
+              case .tag = sections[sourceIndexPath.section].items[sourceIndexPath.item] else {
+            DispatchQueue.main.async { [weak self] in self?.tagListView.reloadMenuData() }
+            return
+        }
+        store.moveTag(from: sourceIndexPath.item, to: destinationIndexPath.item)
+        sections = makeSections()
     }
 
     /// In "管理" mode a tag of "我的标签" is deleted by a tap: VoiceOver says so.

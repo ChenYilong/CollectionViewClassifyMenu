@@ -6,7 +6,7 @@
   animation library.
 - `cylanimateditem/`: that component, an unmodified copy of CYLTabBarController's
   `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` at commit `57a527e` (its own MIT license;
-  `cylanimateditem/README.md`), registered in `build-profile.json5` and depended on with `file:` until it is published
+  `cylanimateditem/VENDORED.md`), registered in `build-profile.json5` and depended on with `file:` until it is published
   to ohpm.
 - `entry/`: the example (Tags with the playback controls, Classify on the shared `cyl_places.sqlite`). It adds the
   animation libraries (Lottie `@ohos/lottie` 2.0.38, PAG `@tencent/libpag` 4.4.31, Rive `@ohos/rive` 1.0.4; GIF through

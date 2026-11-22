@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLClassifyMenuCellFrame, CYLClassifyMenuViewController, CYLIndexPath, CYLMenuDataSource, CYLMenuDelegate, CYLMultipleFilterController
+  CYLClassifyMenuCellFrame, CYLClassifyMenuViewController, CYLFilterBaseController, CYLIndexPath, CYLMenuDataSource, CYLMenuDelegate, CYLMultipleFilterController
 } from '@cyl/classifymenu';
 
 /** A menu of sections; the first item of each section is "全部" (exclusive) when `exclusiveAll`. */
@@ -143,6 +143,25 @@ export default function classifyAndFilterTest() {
       expect(outside).assertTrue();
       // A rejected call leaves the selection as it was.
       expect(keys(filter.selectedIndexPaths())).assertEqual('0-1,0-2');
+    });
+
+    it('theBackKeyClosesTheNewestFilterPanel', 0, () => {
+      const first = new CYLFilterBaseController();
+      const second = new CYLFilterBaseController();
+      expect(CYLFilterBaseController.hideShowingPanelForBackPress()).assertFalse();
+      first.show();
+      second.show();
+      // Back closes the newest panel only, then the older one, then reports that none is left (the page goes back).
+      expect(CYLFilterBaseController.hideShowingPanelForBackPress()).assertTrue();
+      expect(second.isShowing).assertFalse();
+      expect(first.isShowing).assertTrue();
+      expect(CYLFilterBaseController.hideShowingPanelForBackPress()).assertTrue();
+      expect(first.isShowing).assertFalse();
+      expect(CYLFilterBaseController.hideShowingPanelForBackPress()).assertFalse();
+      // A panel closed by Apply is no longer on screen for the back key.
+      first.show();
+      first.confirmButtonClicked();
+      expect(CYLFilterBaseController.hideShowingPanelForBackPress()).assertFalse();
     });
   });
 }

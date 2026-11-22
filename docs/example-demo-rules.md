@@ -14,7 +14,7 @@
 | 3. **循环开关：** 为界面上的每个动效开启或关闭循环。关闭时播放一次并停在静止帧；开启时重复播放，直到关闭。 | 3. **Loop switch:** turns looping on or off for every animation on the screen. Off plays once and stops at the resting frame; on repeats until it is turned off. |
 | 这些控制可以组合：速度同时作用于 Play all 和循环播放，且每次更改都立即生效，作用于已在播放的动效，无需重启界面。当动效引擎无法做到其中某一项（速度或循环设置）时，修改核心库使其能够做到：把 API 加到核心库（引擎本身缺少时也加到 CYLTabBarController 的动效引擎），绝不在示例中绕过。这些控制要支持无障碍（标签、值、Dynamic Type / 字体缩放；VoiceOver / TalkBack 会朗读，例如“Speed, 1.5 times”和“Loop, on”），并通过示例自己的查找机制本地化。动效图标来自 CYLTabBarController 的 `CYLTabBarItemAnimationFactory`；同一规则及其库侧说明见 CYLTabBarController 的 `docs/Tab-Icon-Animation-Quick-Start.md`（“Playback controls in the animation examples”）。 | The controls combine: the speed applies to Play all and to looping alike, and every change takes effect immediately, on animations already playing, without restarting the screen. When an animation engine cannot do one of these (a speed or a loop setting), change the core library so that it can: add the API to the core (and to CYLTabBarController's animation engine when the engine itself lacks it), never work around it in the example. The controls are accessible (labels, values, Dynamic Type / font scaling; VoiceOver / TalkBack read, for example, "Speed, 1.5 times" and "Loop, on") and localized through the example's lookup. The animated icons come from CYLTabBarController's `CYLTabBarItemAnimationFactory`; the same rule, with its library-side notes, is in CYLTabBarController's `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback controls in the animation examples"). |
 
-## 待办（2026-11-13）：每个动效示例中加入速度滑块和循环开关 / TODO (2026-11-13): speed slider and loop switch in every animation example
+## 已完成（2026-11-13）：每个动效示例中加入速度滑块和循环开关 / DONE (2026-11-13): speed slider and loop switch in every animation example
 
 | 中文 | English |
 |:---|:---|
@@ -74,7 +74,7 @@
 |:---|:---|
 | **英文：** 在 docs 中找到示例演示规则（缺少则创建文档或章节），并用英文记录在说明文档中，相关 skill 引用本文档：在展示动效的示例中，除了从进度 0 重新开始的一次性“Play all”之外，增加速度滑块和循环开关。这些控制可组合以设置播放策略，并实时改变它。在示例页面上实现，需要时修改核心库。标记为待办；截图中的页面（Animated icons）就是适用的示例。该需求覆盖每个示例层：iOS、Android、跨平台的 React Native 和 Flutter、微信小程序以及 HarmonyOS。 | **English:** find the example demo rules in docs (create the document or section if missing) and record, in English, in the instructions documents, with the related skills referencing this document: in examples that show animations, besides the one-shot "Play all" that restarts from progress 0, add a speed slider and a loop switch. These controls combine to set the playback strategy and change it in real time. Implement it on the example pages, changing the core when needed. Mark it as a TODO; the screenshot's page (Animated icons) is an example where it applies. The requirement covers every example layer: iOS, Android, cross-platform React Native and Flutter, Mini Program and HarmonyOS. |
 
-## 待办（2026-11-16）：凡展示 Rive 的地方都加上 SVGA / TODO (2026-11-16): SVGA wherever Rive is shown
+## 已完成（2026-11-16）：凡展示 Rive 的地方都加上 SVGA / DONE (2026-11-16): SVGA wherever Rive is shown
 
 | 中文 | English |
 |:---|:---|

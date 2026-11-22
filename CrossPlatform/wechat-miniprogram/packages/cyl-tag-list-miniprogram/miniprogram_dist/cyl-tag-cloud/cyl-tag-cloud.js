@@ -42,8 +42,9 @@
  *
  * Word picker (iOS 选词填入): `setTagsWithCharactersOfText(text)` (one tag per character, keeps `selectionMode`),
  * `selectedText()`, `selectItemsFrom(start, end)`, and `allowsSmearSelection`: a drag that starts on a tag selects every
- * tag from it to the one under the finger (or deselects them when it started on a selected one), the page not
- * scrolling meanwhile; a tap still toggles; `selectionchange` {positions}. Needs `selectionMode` 'multiple';
+ * tag from it to the one under the finger (or deselects them when it started on a selected one); a tap still toggles;
+ * `selectionchange` {positions}; `smearingchange` {smearing} when a smear starts and ends, so a host holds its
+ * <scroll-view> meanwhile (catching touchmove alone does not stop native scrolling). Needs `selectionMode` 'multiple';
  * `model.wordPickerStyle()` is the matching look.
  */
 const model = require('./model.js');
@@ -51,6 +52,13 @@ const { coreString } = require('../core-strings.js');
 const { CYLTagListStore, loadSections, loadItems } = require('./cache.js');
 const { iconImage } = require('./editing-icons.js');
 const locale = require('../locale.js');
+
+/**
+ * `reorderingchange` and `smearingchange` bubble and cross component boundaries, so a container that is an ancestor in
+ * the host's template (through a slot), such as a page's single scroller, hears when a drag or a smear starts and ends
+ * and turns its own scrolling off meanwhile.
+ */
+const GESTURE_EVENT = { bubbles: true, composed: true };
 
 /** How far a press moves before it counts as a drag rather than a long press (`dragThreshold`). */
 const DRAG_THRESHOLD = 8;
@@ -95,10 +103,12 @@ Component({
     showsClearButton: { type: Boolean, value: false },
     defaultVisibleRows: { type: Number, value: 0 },
     allowsSmearSelection: { type: Boolean, value: false },
-    // Scrolling cannot be stopped once a finger has started it (WeChat decides at touchstart), so while the cloud is
-    // editing, and during a drag, the tags catch touchmove from the first touch: a finger on a tag drags or taps, it
-    // never scrolls (the gaps, headers and other views still scroll). On by default; a host also holds its own
-    // scrolling (a <scroll-view>'s scroll-y, `<page-meta page-style>`) on `reorderingchange` {reordering}.
+    // While the cloud is editing, and during a drag, the tags catch touchmove (`scrollLocked`). In WeChat's render layer
+    // a catch binding only stops the event from bubbling: it does NOT stop native scrolling (a fast swipe on a tag still
+    // scrolls, which is wanted). The only real lock is the HOST's: put the cloud in a <scroll-view> (not a page that
+    // scrolls: a page with `min-height: 100vh` and taller content is itself the scroller, and nothing holds it) and set
+    // its scroll-y to false on `reorderingchange` {reordering: true} (and `smearingchange` {smearing: true} for the word
+    // picker), back on false; give the page `"disableScroll": true`. On by default.
     disablesScrollingWhileReordering: { type: Boolean, value: true },
     foldControlContent: { type: String, value: 'icon' },
     foldControlColor: { type: String, value: '' },
@@ -661,6 +671,8 @@ Component({
         if (!this._smear && Math.hypot(touch.clientX - this._touchStart.x, touch.clientY - this._touchStart.y) > DRAG_THRESHOLD) {
           this._smear = { anchor: pending.anchor, base: this._selection.slice(), selects: !this._selection.includes(pending.anchor) };
           this._pressed = -1;
+          // The host holds its scroller now (a catch binding does not stop native scrolling).
+          this.triggerEvent('smearingchange', { smearing: true }, GESTURE_EVENT);
           this._smearTo(pending.anchor);
         }
         if (this._smear && pending.rects) {
@@ -695,6 +707,7 @@ Component({
     },
 
     onTouchEnd() {
+      if (this._smear) this.triggerEvent('smearingchange', { smearing: false }, GESTURE_EVENT);
       this._smear = null;
       this._smearPending = null;
       if (this._pressed >= 0) {
@@ -706,7 +719,7 @@ Component({
       this._dragging = null;
       this._updateScrollLock();
       this._render(false);
-      this.triggerEvent('reorderingchange', { reordering: false });
+      this.triggerEvent('reorderingchange', { reordering: false }, GESTURE_EVENT);
       if (drag.current !== drag.from) {
         // The new order survives a relaunch when the cloud has a cache.
         this.saveToCache();
@@ -718,6 +731,7 @@ Component({
     },
 
     onTouchCancel() {
+      if (this._smear) this.triggerEvent('smearingchange', { smearing: false }, GESTURE_EVENT);
       this._smear = null;
       this._smearPending = null;
       const drag = this._dragging;
@@ -728,7 +742,7 @@ Component({
         this._selection = model.moveSelection(this._selection, drag.current, drag.from);
         this._dragging = null;
         this._updateScrollLock();
-        this.triggerEvent('reorderingchange', { reordering: false });
+        this.triggerEvent('reorderingchange', { reordering: false }, GESTURE_EVENT);
       }
       this._render(false);
     },
@@ -769,7 +783,7 @@ Component({
         const drag = this._dragging;
         this._updateScrollLock();
         this._render(false);
-        this.triggerEvent('reorderingchange', { reordering: true });
+        this.triggerEvent('reorderingchange', { reordering: true }, GESTURE_EVENT);
         if (this._selection.includes(index)) {
           this.triggerEvent('selectedtagdrag', { position: index, tag: publicTag(this._tags[index]) });
         }

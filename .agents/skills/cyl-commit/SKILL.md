@@ -3,6 +3,12 @@ name: cyl-commit
 description: Commit message format for CollectionViewClassifyMenu (Conventional Commits with emoji, the required author line), the task log in docs/ kept before and after every task, the checks to run before every commit, and the pull request every new branch gets.
 ---
 
+## Before any git operation
+
+- Read `docs/instructions/git.md` in full, every line, before any git operation (commit, push, merge, branch, rebase, reset,
+  `gh pr`), then run it (AGENTS.md "[git]").
+
+
 # Commits
 
 ## Task log in docs/ (before any work)

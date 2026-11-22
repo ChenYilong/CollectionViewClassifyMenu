@@ -62,7 +62,7 @@ function mountCloud(properties) {
       }
       if (callback) callback();
     },
-    triggerEvent(name, detail) { events.push({ name, detail }); },
+    triggerEvent(name, detail, options) { events.push({ name, detail, options }); },
     createSelectorQuery() {
       const calls = [];
       const api = {
@@ -108,6 +108,32 @@ test('several smears add up; one from a selected cell removes its range (owner c
   assert.equal(cloud.selectedText(), 'Alex Design', 'the second starts on the space before the word');
   smear(alex, alex + 3);
   assert.equal(cloud.selectedText(), ' Design');
+  // Each smear tells the host to hold its scroller, then to let it go (a catch binding does not stop native scrolling).
+  const smearing = cloud.events.filter((e) => e.name === 'smearingchange').map((e) => e.detail.smearing);
+  assert.deepEqual(smearing, [true, false, true, false, true, false]);
+});
+
+test('reorderingchange and smearingchange bubble and are composed, so an ancestor container hears them', () => {
+  const cloud = mountCloud({ listStyle: model.wordPickerStyle(), selectionMode: 'multiple', allowsSmearSelection: true,
+    allowsReordering: true });
+  cloud.setTagsWithCharactersOfText('ABCDEFGHIJ');
+  // A smear.
+  cloud.onTouchStart({ currentTarget: { dataset: { index: 0 } }, touches: [touchAt(cloud, 0)] });
+  cloud.onTouchMove({ touches: [touchAt(cloud, 3)] });
+  cloud.onTouchEnd();
+  // A drag (long press, then the end), and a cancelled one.
+  cloud.setData({ allowsSmearSelection: false });
+  cloud.onTouchStart({ currentTarget: { dataset: { index: 1 } }, touches: [touchAt(cloud, 1)] });
+  cloud.onLongPress({ currentTarget: { dataset: { index: 1 } } });
+  cloud.onTouchEnd();
+  cloud.onTouchStart({ currentTarget: { dataset: { index: 2 } }, touches: [touchAt(cloud, 2)] });
+  cloud.onLongPress({ currentTarget: { dataset: { index: 2 } } });
+  cloud.onTouchCancel();
+  const gestures = cloud.events.filter((e) => e.name === 'reorderingchange' || e.name === 'smearingchange');
+  assert.deepEqual(gestures.map((e) => `${e.name} ${e.detail.reordering ?? e.detail.smearing}`),
+    ['smearingchange true', 'smearingchange false', 'reorderingchange true', 'reorderingchange false',
+      'reorderingchange true', 'reorderingchange false']);
+  for (const event of gestures) assert.deepEqual(event.options, { bubbles: true, composed: true }, event.name);
 });
 
 test('a smear from a tag selects the tags it crosses, deselects from a selected one, a tap still toggles', () => {

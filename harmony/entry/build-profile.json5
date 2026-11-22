@@ -16,6 +16,48 @@
         }
       }
     },
+    {
+      // The x86_64 emulator: leaves out every arm64-v8a library (libohos_rive.so, libpag.so and libc++_shared.so), which
+      // that emulator cannot load (install error 9568347). Rive and PAG tags show their still images there
+      // (CYLAnimatedItemEngines.isSupportedOnDevice). Phones, arm64 emulators and releases use the default target.
+      "name": "emulator",
+      "nativeLib": {
+        "filter": {
+          "excludes": [
+            "**/arm64-v8a/*.so"
+          ]
+        }
+      }
+    }
+  ],
+  "buildModeBinder": [
+    {
+      "buildModeName": "debug",
+      "mappings": [
+        {
+          "targetName": "emulator",
+          "buildOptionName": "emulator"
+        }
+      ]
+    },
+    {
+      "buildModeName": "release",
+      "mappings": [
+        {
+          "targetName": "emulator",
+          "buildOptionName": "emulator"
+        }
+      ]
+    },
+    {
+      "buildModeName": "emulatorTest",
+      "mappings": [
+        {
+          "targetName": "ohosTest",
+          "buildOptionName": "emulator"
+        }
+      ]
+    }
   ],
   "targets": [
     {
@@ -23,6 +65,9 @@
     },
     {
       "name": "ohosTest",
+    },
+    {
+      "name": "emulator"
     }
   ]
 }

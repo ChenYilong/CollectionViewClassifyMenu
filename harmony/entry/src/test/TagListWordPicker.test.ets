@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import {
   CYLFont, CYLIndexPath, CYLMenuDelegate, CYLMenuSelectionMode, CYLMenuStyle, CYLTagButtonMetrics, CYLTagListCell,
-  CYLTagListState, CYLTextMeasurer
+  CYLTagListState, CYLTextMeasurer, CYLMenuGestureState
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -89,6 +89,66 @@ export default function tagListWordPickerTest() {
       list.smearTo(path(alex + 3));
       list.endSmear();
       expect(list.selectedText).assertEqual(' Design');
+    });
+
+    it('gestureStateCallbacksComeInPairs', 0, () => {
+      // As the mini program's reorderingchange / smearingchange: true at the start, false at the drop or the cancel.
+      const list = wordPicker('ABCDEFGHIJ');
+      const events: string[] = [];
+      const delegate: CYLMenuDelegate = {
+        menuDidChangeReordering: (menu: Object, reordering: boolean): void => {
+          events.push(`reordering ${reordering}`);
+        },
+        menuDidChangeSmearing: (menu: Object, smearing: boolean): void => {
+          events.push(`smearing ${smearing}`);
+        }
+      };
+      list.menuDelegate = delegate;
+      list.beginSmear(path(0));
+      list.smearTo(path(3));
+      list.endSmear();
+      list.endSmear();
+      list.allowsSmearSelection = false;
+      list.allowsReordering = true;
+      expect(list.beginLongPress(path(1))).assertTrue();
+      list.endLongPress(path(4), true);
+      expect(list.beginLongPress(path(2))).assertTrue();
+      list.cancelLongPress();
+      list.cancelLongPress();
+      expect(events.join('|')).assertEqual(
+        'smearing true|smearing false|reordering true|reordering false|reordering true|reordering false');
+    });
+
+    it('sharedGestureStateFollowsEveryList', 0, () => {
+      // A container follows CYLMenuGestureState.shared without the host's delegate (no event bubbling in a builder).
+      const shared = CYLMenuGestureState.shared;
+      const changes: boolean[] = [];
+      const listener = (active: boolean): void => {
+        changes.push(active);
+      };
+      shared.addListener(listener);
+      const a = wordPicker('ABCDEF');
+      const b = wordPicker('GHIJKL');
+      a.allowsReordering = true;
+      expect(shared.isActive).assertFalse();
+      a.beginSmear(path(0));
+      expect(shared.isActive).assertTrue();
+      b.beginSmear(path(1));
+      a.endSmear();
+      expect(shared.isActive).assertTrue();
+      b.endSmear();
+      expect(shared.isActive).assertFalse();
+      expect(a.beginLongPress(path(2))).assertTrue();
+      expect(shared.isActive).assertTrue();
+      a.endLongPress(path(3), true);
+      expect(shared.isActive).assertFalse();
+      // A list that goes away in the middle of a drag releases its share.
+      expect(a.beginLongPress(path(1))).assertTrue();
+      a.clearGestureState();
+      expect(shared.isActive).assertFalse();
+      a.cancelLongPress();
+      shared.removeListener(listener);
+      expect(changes.join(',')).assertEqual('true,false,true,false,true,false');
     });
 
     it('smearSelectsAndDeselectsARange', 0, () => {
