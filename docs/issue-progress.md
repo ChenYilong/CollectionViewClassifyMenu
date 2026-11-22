@@ -1739,7 +1739,7 @@ tags: [issues, ui, cocoapods, progress]
     `src/test/resources/robolectric.properties` keeps `sdk=23` as before; unit tests 108 / 108 again.
 
 
-### IN PROGRESS (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS device (UI) tests on the Mate 70 Pro emulator
+### DONE (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS device (UI) tests on the Mate 70 Pro emulator
 
 - **Request (verbatim):** "want the HarmonyOS device (UI) tests run on the Mate 70 Pro emulator"
 - **Context:** HarmonyOS host tests pass (85 / 85). The UI tests (`harmony/entry/src/ohosTest`: Ability, ExampleUi,
@@ -1789,7 +1789,7 @@ tags: [issues, ui, cocoapods, progress]
   (pop to root, scroll to top) and re-find a scrollable after each scroll in `cylFindAccessible`.
 
 
-### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS UI tests reset the example between tests
+### DONE (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS UI tests reset the example between tests
 
 - **Request (verbatim):** "fix" (answer to: "the HarmonyOS UI tests in ClassifyMenu (10 of 14 in a full run) still need
   their test helper to reset the app between tests. Should I send that TODO to the Windows session, or fix it here?")
@@ -1798,3 +1798,9 @@ tags: [issues, ui, cocoapods, progress]
   each list to the top before `scrollSearch` and skip a list that is gone or too small instead of failing.
 - **Acceptance (100):** the full suite (`harmony/scripts/ui-test.sh`) passes 14 / 14 three runs in a row on the arm64
   emulator (90); docs updated (10). Pass: 60.
+- **Done (100 / 100):** `TestSupport.ets`: `cylLaunchExample` presses back (at most 6 times) until the root tab bar
+  (`tab-plus`) shows and starts the ability again if back left the app; `cylScrollSearch` scrolls a list to its top
+  before `scrollSearch` and returns null for a list that is gone or too small, used by `cylFindAccessible` and `cylTap`.
+  `harmony/scripts/ui-test.sh` on the arm64 Mate 70 Pro emulator (HarmonyOS 6.0.0.112, hdc 127.0.0.1:5555): 14 / 14,
+  three runs in a row (before: 7, 9 and 10 / 14). This also closes the UI test entry above (70 → 100). Test code only;
+  `harmony/` is the Windows session's: it should pull `feat/harmony` before its next change there.
