@@ -1144,4 +1144,6 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   `harmony/cylanimateditem` and re-fetching the mini program components changed nothing (no upstream change there).
   Local checks: HarmonyOS host tests 82 / 82, `build.sh` BUILD SUCCESSFUL, Android `gradle test` BUILD SUCCESSFUL, mini
   program 168 / 168. No emulator check: the component and the kits are byte for byte the ones checked at `143fadff`.
-- **Score 70 / 100** until the pull request's CI passes (−30).
+- **Score 100 / 100**: PR #29's CI passed on every check at `04b39e26` (Localization, Mini Program, and iOS: library
+  build, `pod lib lint`, the four unit test suites, Example screenshots). chen-yilong-b6 also built `04b39e26` on the
+  x86_64 emulator with the kits: Rive and PAG play, the artboards are kept, no crash.
