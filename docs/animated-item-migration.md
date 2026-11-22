@@ -1129,3 +1129,19 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   ring, the rose change from frame to frame), Rive plays as before, no crash. Not checked: PAG's `onEnded` with the kit.
 - **Score 100 / 100**: PR #28's CI passed on every check at `4c6ae18e` (Localization, Mini Program, and iOS: library
   build, `pod lib lint`, the four unit test suites, Example screenshots).
+
+### DONE (2026-11-22, `feat/pin-c4a1f8fd`, Windows session): pins to the newest CYLTabBarController commit, `c4a1f8fd`
+
+- Prompt (verbatim): "move the pins to the latest commit and adopt it"
+- Context: PR #28 (pins at `143fadff`) was merged as `a67b9de1`; this is a new branch from `master`. The newest commit
+  over every branch is `c4a1f8fd` (feat/cross-platform-components). Since `143fadff`: `63214dfc` and `c4a1f8fd` (docs),
+  `c5ef58d4` (the cyltabbar Rive tab icons play their state machine by name, not used here). `cylanimateditem`, the
+  mini program components, `Package.swift` and the podspec are unchanged.
+- Acceptance (100): every pin at `c4a1f8fd`, `--check` clean, the vendored copies re-checked (40); local tests pass (30);
+  every CI check of the pull request passes (30).
+- Result: every pin moved `143fadff` → `c4a1f8fd` (four Podfiles, `Package.swift`, Flutter, React Native, Android,
+  the mini program files, `VENDORED.md`); `scripts/cyl-tabbar-latest-commit.sh --check` exits 0. Re-vendoring
+  `harmony/cylanimateditem` and re-fetching the mini program components changed nothing (no upstream change there).
+  Local checks: HarmonyOS host tests 82 / 82, `build.sh` BUILD SUCCESSFUL, Android `gradle test` BUILD SUCCESSFUL, mini
+  program 168 / 168. No emulator check: the component and the kits are byte for byte the ones checked at `143fadff`.
+- **Score 70 / 100** until the pull request's CI passes (−30).
