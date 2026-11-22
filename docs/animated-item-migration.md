@@ -1048,3 +1048,18 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   have their bullets, unchanged, under the same tag headings. New skill `.agents/skills/cyl-instructions/SKILL.md`.
   **Score 100 / 100.** CYLTabBarController (198f84a7) and CYLSearchViewController (1943fe6) were re-organized the same
   day by their sessions; their tag names differ slightly.
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): the behavioral guidelines linked at the top of the root instructions
+
+- Prompt (verbatim): "找到本项目instructions 相关文件（可能包含根目录的agent Claude文件instructions 文件， 首先确认下面内容的归类。如果agent
+  Claude文件文件超出每个文件200行限制，则优先放入docs 里的instructions文件夹合适文件，）以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入，
+  并且在本次任务中就执行一次下面的指令： 找到本项目docs文件夹或者子文件夹里的如下文件， Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes
+  使用相对路径的方式放入根目录instructions 相关文件 ，相关文件顶部，并标注必须全文阅读该文件。新建分类，新建tag标题。"
+- Acceptance (100): the file found and committed in `docs/` (20); a relative link at the top of AGENTS.md and CLAUDE.md,
+  marked as required reading in full, under a new tag heading and in the tag table (50); the skills say it too (20);
+  every root instruction file still 200 lines or fewer (10).
+- Result: the file was untracked in the main checkout (`docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md`,
+  66 lines), now committed unchanged. New tag `guidelines`: `## [guidelines] Behavioral guidelines: read in full first`
+  right after the introduction of AGENTS.md (and a row in its tag table) and at the top of CLAUDE.md, each with the
+  relative link and "read in full, every line, before any task"; `.agents/skills/cyl-instructions/SKILL.md` and
+  `.agents/skills/cyl-task-start/SKILL.md` (first step before a task) say the same. **Score 100 / 100.**

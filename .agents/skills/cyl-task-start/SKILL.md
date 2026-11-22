@@ -10,6 +10,8 @@ and simulators"). This is the checklist.
 
 ## Before the task
 
+- **Read `docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md` in full first**, every line (AGENTS.md "[guidelines]"): think before coding, simplicity first,
+  surgical changes, goal-driven execution.
 0. **Check the session names: Mac for iOS, Win for the other platforms** (AGENTS.md "Session roles by name").
    - List the active sessions and read their names. A name starting with `Mac` (case insensitive) marks the session
      that mainly develops and tests iOS; a name starting with `Win` (case insensitive) marks the one that mainly

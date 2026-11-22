@@ -9,7 +9,7 @@ description: Keep this project's instruction files (AGENTS.md, CLAUDE.md, docs/i
 
 - Every rule in an instruction file sits under a visible tag heading: `## [<tag>] <title>`. A heading is never hidden
   or folded away.
-- Tags in use: `instructions`, `workflow`, `sessions`, `windows`, `macos`, `testing`, `harmonyos`, `code`,
+- Tags in use: `guidelines`, `instructions`, `workflow`, `sessions`, `windows`, `macos`, `testing`, `harmonyos`, `code`,
   `dependencies`, `examples`, `i18n`, `accessibility`, `docs`, `git`. Add a new tag only when no existing one fits,
   and add it to the tag table in AGENTS.md.
 - Every instruction file stays at 200 lines or fewer. When a tag's text would push a file over, move the overflow into
@@ -17,6 +17,11 @@ description: Keep this project's instruction files (AGENTS.md, CLAUDE.md, docs/i
   are read only when the task touches that tag.
 - The tag files keep the moved sections word for word, with their original headings, so a reference such as
   AGENTS.md "Fix issues in the core first" still finds its section (now in `docs/instructions/code.md`).
+
+## Required reading
+
+- `docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md` is linked at the top of AGENTS.md and CLAUDE.md under `## [guidelines]` and must be read in full, every
+  line, before any task. Keep that link at the top of both files.
 
 ## Adding a rule
 

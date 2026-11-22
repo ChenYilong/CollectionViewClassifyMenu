@@ -5,6 +5,12 @@ collection-view menu and a multiple-choice filter. Read `README.md` and the
 relevant source before changing behavior. If documentation and code disagree,
 verify the behavior and update the applicable documentation.
 
+## [guidelines] Behavioral guidelines: read in full first
+
+- **Read [docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md) in full, every line, before any task.** It is required reading, not a summary: think before
+  coding (state assumptions, ask when unclear), simplicity first, surgical changes, goal-driven execution with
+  verifiable success criteria. Where it and a project rule below differ, the project rule decides.
+
 ## [instructions] How these instructions are organized
 
 - Every rule is filed under a tag, and each tag is a visible heading here: `## [<tag>] <title>`. Read the headings
@@ -17,6 +23,7 @@ verify the behavior and update the applicable documentation.
 
 | Tag | Covers | Details |
 |:---|:---|:---|
+| `guidelines` | behavioral guidelines, read in full before any task | [Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md) |
 | `workflow` | task log, task start, acceptance score, issue progress | [workflow.md](docs/instructions/workflow.md) |
 | `sessions` | session roles, shared emulators, running scripts | [sessions.md](docs/instructions/sessions.md) |
 | `windows` | Windows-only notes: shell, paths, HarmonyOS and Android tools | [windows.md](docs/instructions/windows.md) |
