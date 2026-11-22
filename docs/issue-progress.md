@@ -1720,3 +1720,12 @@ tags: [issues, ui, cocoapods, progress]
   - Android (`android/scripts/gradle.sh <project> testDebugUnitTest`, fresh mirror `/tmp/xpa/cmfold-android`, JDK 17):
     merged 108 / 108 (all in `library`); AndroidTagView, TagViewGroup and android-tagview build and have no unit tests.
   - Not covered: Android instrumented (device) tests and iOS versions other than 27.2.
+
+
+### TODO (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): Android instrumented (device) tests
+
+- **Request (verbatim):** "continue" (after the offer to run the Android device tests on an emulator).
+- **Context:** the unit suites pass (`440cfd9`). `android/merged/library/src/androidTest` holds
+  `CYLTagEditingIconsDeviceTest` and `CYLTagTitleFitDeviceTest`. Run `:library:connectedDebugAndroidTest` on this
+  session's own emulator (`CYL_API35_test`, read-only, port 5620); the two running emulators belong to other sessions.
+- **Acceptance (100):** both device test classes run to the end and pass, or each failure is fixed in the core.
