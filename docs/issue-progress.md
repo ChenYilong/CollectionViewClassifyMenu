@@ -1787,3 +1787,14 @@ tags: [issues, ui, cocoapods, progress]
   again without resetting its navigation stack or scroll positions, so a test starts on the page or offset the one before
   left. TODO (owner of `harmony/`, the Windows session): reset the example to its root tab bar in `cylLaunchExample`
   (pop to root, scroll to top) and re-find a scrollable after each scroll in `cylFindAccessible`.
+
+
+### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS UI tests reset the example between tests
+
+- **Request (verbatim):** "fix" (answer to: "the HarmonyOS UI tests in ClassifyMenu (10 of 14 in a full run) still need
+  their test helper to reset the app between tests. Should I send that TODO to the Windows session, or fix it here?")
+- **Plan:** in `harmony/entry/src/ohosTest/ets/test/TestSupport.ets`, `cylLaunchExample` goes back until the root tab
+  bar (`tab-plus`) is visible (start the ability again if back left the app); `cylFindAccessible` and `cylTap` scroll
+  each list to the top before `scrollSearch` and skip a list that is gone or too small instead of failing.
+- **Acceptance (100):** the full suite (`harmony/scripts/ui-test.sh`) passes 14 / 14 three runs in a row on the arm64
+  emulator (90); docs updated (10). Pass: 60.
