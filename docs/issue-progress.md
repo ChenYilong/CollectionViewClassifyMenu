@@ -1829,3 +1829,26 @@ tags: [issues, ui, cocoapods, progress]
 - **Acceptance (100):** shared module in CYLTabBarController, tab bar Rive unchanged (20); ClassifyMenu HarmonyOS uses it,
   Loop on keeps state-machine Rive tags moving at 5-8 s and Loop off lets them rest, `icons.riv` artboards distinct (40);
   UI 14 / 14 and host tests pass (15); Android / Flutter / React Native checked and fixed where needed (15); docs (10).
+- **Progress (HarmonyOS):** commits `669ab5e5` (vendor `cylanimateditem` and the new `cylanimateditemrive` at CYLTabBarController
+  `3074c51d`, unmodified, with VENDORED.md and LICENSE; registered in `build-profile.json5`) and `653452e6` (the example
+  plays Rive through `CYLRiveIcon`, loop policy `WhilePlaying`, registered with `cylRegisterRiveEngine(context)`; the
+  example's own Rive player and the `03de656d` artboard workaround are gone, `CYLRivePlayer` is an adapter only; entry
+  depends on `cylanimateditemrive`, the core `classifymenu` on neither it nor `@ohos/rive`; `@ohos/rive` stays 1.0.4).
+  Build: `ohpm install --all` and `assembleHap` succeed. Host tests 86 / 86, `accessibility-check.py` OK. Full UI suite on
+  127.0.0.1:5555 (arm64 Mate 70 Pro emulator): 14 / 14 on the second run; the first run had 2 errors in unrelated tests
+  (`configurationBuildsBothLists`, `tagCloudSampleAndItsPages`, a list / control not found right after
+  `animationControlsPlayAll`) and passed on the rerun. `animationControlsPlayAll` repeated 5 / 5, 0 new jscrash files.
+  Device, Loop ON, Play all (frames `/tmp/xpr/cm-rive-loop-on-{2,4,6,8,10,12}.jpeg`, icon crops md5 at 8, 10, 12 s): house,
+  check, menu, button, shapes, truck, chat, search, timer, bell and me (the five `icons.riv` tags) all change between 8, 10
+  and 12 s in two fresh-launch runs; in an earlier run menu and me repeated one md5 at 10 and 12 s (a hold between two
+  passes) and a 22 s dense sampling showed both still changing. The five `icons.riv` tags show five different icons
+  (chat, search, timer, bell, user). Loop OFF, Play all (`/tmp/xpr/cm-rive-loop-off-*.jpeg`): chat, search, timer, bell, me,
+  check and button come to rest by 4 s and keep the same md5 to 22 s; house, shapes and truck keep moving (their own
+  artwork moves on its own, as CYLTabBarController documents for shapes.riv and truck.riv; house.riv's machine plus linear
+  animation never settles); menu showed no visible change on Play all with Loop OFF (stays at the hamburger; with Loop ON it
+  flips between the hamburger and the X). Not verified: why menu does not open with Loop OFF (engine behavior, not
+  compared with the old player); the x86_64 fallback on a device (no x86_64 target used; the engine calls `onLoadError`
+  there and the tag keeps its still image); one of four fresh launches with Loop ON left house, check, menu, chat, search
+  and timer without any motion (not reproduced in the next three launches, cause unknown); an `appfreeze` (THREAD_BLOCK_6S)
+  after about 80 s of continuous Loop ON, stuck in libpag `eglMakeCurrent` on the main thread (the PAG tags, not Rive).
+  Android, Flutter, React Native, CYLSearch and CYLTableViewPlaceHolder are not covered by this bullet.
