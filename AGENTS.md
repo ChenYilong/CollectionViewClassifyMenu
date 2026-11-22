@@ -151,6 +151,8 @@ verify the behavior and update the applicable documentation.
 
 ## [git] Git, branches and repository hygiene
 
+- **Before any git operation (commit, push, merge, branch, rebase, reset, `gh pr`), read [docs/instructions/git.md](docs/instructions/git.md) in full,
+  every line, then run the operation.**
 - Every new branch gets a pull request right away; a branch with commits always has one. Run
   `bash scripts/check-branch-pr.sh` before every commit; more than two open pull requests: ask the user first.
 - At the end of every answer on a branch other than `master` / `main`, commit and push.

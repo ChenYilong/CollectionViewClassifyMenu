@@ -23,6 +23,8 @@ description: Keep this project's instruction files (AGENTS.md, CLAUDE.md, docs/i
 - `docs/instructions/behavioral.md` is linked at the top of AGENTS.md and CLAUDE.md under `## [behavioral]` and must be read in full, every
   line, before any task. Keep that link at the top of both files.
 
+- `docs/instructions/git.md` must be read in full before any git operation (AGENTS.md and CLAUDE.md say so under `[git]`).
+
 ## Adding a rule
 
 1. Pick the tag. Write the full rule in `docs/instructions/<tag>.md` (under an existing section or a new `##` section).

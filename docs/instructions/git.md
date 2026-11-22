@@ -6,6 +6,15 @@ AGENTS.md was limited to 200 lines; section names are unchanged, so a reference 
 means the section of that name here.
 
 
+## Read this file before every git operation
+
+- **Before any git operation, read this whole file, every line, and only then run the operation** (owner's rule,
+  2026-11-22): `git commit`, `push`, `merge`, `pull`, `branch`, `checkout`, `rebase`, `reset`, `rm`, `mv`, tags, and
+  `gh pr` create / merge. The rules below (pull request first, `check-branch-pr.sh`, the `.gitignore` sync, the
+  staged-diff check, never pushing to `master` / `main` without the user) are easy to miss when only the short form in
+  AGENTS.md is read.
+
+
 ## Branches and pull requests
 
 - **Every new branch gets a pull request right away, without asking.** As soon as a branch is created and first

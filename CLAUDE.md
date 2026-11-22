@@ -7,6 +7,11 @@ You must read [docs/instructions/behavioral.md](docs/instructions/behavioral.md)
 Rules are filed under tag headings, as in AGENTS.md (`## [<tag>] <title>`); the details of each tag are in
 `docs/instructions/<tag>.md`.
 
+## [git] Read the git rules before any git operation
+
+Before any git operation (commit, push, merge, branch, rebase, reset, `gh pr`), read [docs/instructions/git.md](docs/instructions/git.md) in full, every
+line, then run the operation.
+
 ## [harmonyos] HarmonyOS x86_64 emulator
 
 When `hdc install` fails with code 9568347 ("the Abi type supported by the device does not match"), the default HAP's

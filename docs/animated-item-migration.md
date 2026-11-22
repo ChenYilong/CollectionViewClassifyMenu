@@ -1064,3 +1064,17 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   relative link and "read in full, every line, before any task" (moved the same day, at the owner's request, first to `docs/instructions/`, then renamed by the tag rule to
   `docs/instructions/behavioral.md`, tag `behavioral`, with a tag-file header and every reference updated); `.agents/skills/cyl-instructions/SKILL.md` and
   `.agents/skills/cyl-task-start/SKILL.md` (first step before a task) say the same. **Score 100 / 100.**
+
+### DONE (2026-11-22, `feat/harmony`, Windows session): read the git tag file in full before any git operation
+
+- Prompt (verbatim): "找到本项目instructions 相关文件（可能包含根目录的agent Claude文件instructions 文件， 首先确认下面内容的归类。如果agent
+  Claude文件文件超出每个文件200行限制，则优先放入docs 里的instructions文件夹合适文件，）以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入，
+  并且在本次任务中就执行一次下面的指令： 执行git 操作前，必须全文阅读git 对应的tag文件。再进行git操作。"
+- Acceptance (100): the rule under `[git]` in AGENTS.md and CLAUDE.md (30), at the top of `docs/instructions/git.md`
+  (20) and in the skills (20), files within 200 lines (10); done once in this task: `git.md` read in full before the
+  next git operation, and its rules applied (20).
+- Result: AGENTS.md `[git]` first bullet, CLAUDE.md `## [git]`, a new first section "Read this file before every git
+  operation" in `docs/instructions/git.md`, `.agents/skills/cyl-commit/SKILL.md` and `cyl-instructions`. Done once:
+  `git.md` read in full before this commit; its rules applied: `check-branch-pr.sh`, the `.gitignore` sync from
+  CYLTabBarController's newest commit with `git ls-files -ci --exclude-standard`, the staged diff checked.
+  **Score 100 / 100.**
