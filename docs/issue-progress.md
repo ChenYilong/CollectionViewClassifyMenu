@@ -1705,3 +1705,12 @@ tags: [issues, ui, cocoapods, progress]
   `testInlineFoldCellIsHiddenWhenTagsFillExactlyTheDefaultVisibleRows` added (the one-row and three-row cases already
   existed), the class 7 / 7 on simulator CB9BDA60 (iOS 27.2) with a fresh derived data path, commit `e217988`. The mini
   program keeps `search-discover.test.js`.
+
+
+### TODO (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): full iOS and Android test suites after the tail fold tests
+
+- **Request (verbatim):** "跑完整的iOS和Android测试" (English: run the full iOS and Android test suites.)
+- **Context:** the tail fold control tests (`65d1181`..`df23aa4`) ran only their own cases. This run covers every iOS
+  suite (`scripts/unit-tests.sh menu|tag|example|swift`) and every Android project's unit tests
+  (`android/scripts/gradle.sh <project> testDebugUnitTest`), on a fresh derived data folder and a fresh mirror.
+- **Acceptance (100):** every suite runs to the end; each failure is fixed in the core or explained.
