@@ -3,8 +3,10 @@
  * (`CYLAnimationEngine`, `cylAnimationEngine`) and the handle a tag drives (`CYLAnimationPlayer`: play from the start,
  * stop at a progress, speed, loop). The library depends on no animation library: the icon is CYLTabBarController's
  * `CYLAnimatedItemView` (`CYLTagAnimatedIcon`), and the app supplies the views and players that play each type (the
- * example's `CYLLottiePlayer`, `CYLPAGPlayer`, `CYLRivePlayer`, `CYLGIFPlayer` and `CYLSVGAPlayer`), registered with
- * `CYLAnimatedItemEngines.register(type)` and `CYLTagAnimationBuilder.register(builder)`.
+ * example's `CYLLottiePlayer`, `CYLPAGPlayer`, `CYLGIFPlayer` and `CYLSVGAPlayer`), registered with
+ * `CYLAnimatedItemEngines.register(type)` and `CYLTagAnimationBuilder.register(builder)`. A type whose engine ships a
+ * builder for `CYLAnimatedItemView` itself (Rive: CYLTabBarController's `CYLRiveAnimationBuilder`) is registered with
+ * `CYLTagAnimationBuilder.registerItemBuilder(engine, builder)` instead and played by `CYLAnimatedItemPlayer`.
  *
  * The value is `asset:<rawfile path>` (or Lottie JSON text); options (`cylAddingAnimationOptions`) follow `#` as
  * "name=value&...". A player that cannot do something reports it with `supportsSpeed` / `supportsLoops` /
@@ -187,5 +189,67 @@ export class CYLAnimationPlayer {
   }
 
   protected applyLoops(): void {
+  }
+}
+
+/**
+ * What a `CYLAnimatedItemPlayer` changes on the tag's `CYLAnimatedItemView`: its `animationRestartToken` and its
+ * `animationLoops`.
+ */
+export interface CYLAnimatedItemPlaybackHost {
+  restart: () => void;
+  setLoops: (loops: boolean) => void;
+}
+
+/**
+ * The player of a tag whose type is drawn by a component-level builder (`CYLTagAnimationBuilder.registerItemBuilder`,
+ * e.g. CYLTabBarController's `CYLRiveAnimationBuilder`): the engine lives in that builder, so the tag drives it through
+ * `CYLAnimatedItemView`'s own props. `play()` restarts the animation from progress 0 (`animationRestartToken`), `loops`
+ * is `animationLoops`; the selected state reaches the engine through `isItemSelected`, so `stopAtProgress` only ends
+ * the pass. Such a builder reports no speed and no progress.
+ */
+export class CYLAnimatedItemPlayer extends CYLAnimationPlayer {
+  private host: CYLAnimatedItemPlaybackHost;
+  private playing: boolean = false;
+
+  constructor(engine: CYLAnimationEngine, source: CYLAnimationSource, host: CYLAnimatedItemPlaybackHost) {
+    super(engine, source);
+    this.host = host;
+  }
+
+  get supportsSpeed(): boolean {
+    return false;
+  }
+
+  get supportsProgress(): boolean {
+    return false;
+  }
+
+  get isPlaying(): boolean {
+    return this.playing;
+  }
+
+  play(): void {
+    this.playing = true;
+    this.host.restart();
+  }
+
+  stopAtProgress(progress: number): void {
+    this.playing = false;
+  }
+
+  /**
+   * The pass ended (the builder's `onEnded`).
+   */
+  didEnd(): void {
+    this.playing = false;
+  }
+
+  destroy(): void {
+    this.playing = false;
+  }
+
+  protected applyLoops(): void {
+    this.host.setLoops(this.loopsValue);
   }
 }

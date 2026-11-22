@@ -1,6 +1,6 @@
 /**
  * The example's animation players, one per engine (moved here from the library, which depends on no animation
- * library): `.json` Lottie (@ohos/lottie), `.pag` PAG (@tencent/libpag), `.riv` Rive (@ohos/rive), `.gif` GIF (frames
+ * library): `.json` Lottie (@ohos/lottie), `.pag` PAG (@tencent/libpag), `.gif` GIF (frames
  * decoded by ImageKit), `.svga` SVGA (decoded by `CYLSVGAMovie`, drawn on a Canvas). Each subclasses the library's
  * `CYLAnimationPlayer`, the handle a `CYLTagButton` drives (`animationView`), and is handed to the tag by the views in
  * `CYLExampleAnimationViews.ets` through `CYLTagAnimationContext.ready(player)`.
@@ -11,7 +11,7 @@
  *   drives the progress itself (`setProgress` + `flush` on a timer).
  * - GIF: speed, loop, play from the start, any progress (the player shows the decoded frames on its own timer).
  * - SVGA: speed, loop, play from the start, any progress (2.x files; the player draws the frame for its own timer).
- * - Rive: CYLTabBarController's `CYLRiveIcon` plays it (restart on every play, loop, number inputs); no speed or progress.
+ * - Rive: not here. CYLTabBarController's `CYLRiveAnimationBuilder` plays it, driven by the library's `CYLAnimatedItemPlayer`.
  */
 import { AnimationItem } from '@ohos/lottie';
 import { PAGViewController } from '@tencent/libpag';
@@ -263,73 +263,3 @@ export class CYLSVGAPlayer extends CYLTimedPlayer {
   }
 }
 
-/**
- * What the Rive player changes on its view: `CYLRiveIconView` passes these to CYLTabBarController's `CYLRiveIcon`.
- */
-export interface CYLRiveIconHost {
-  replay: () => void;
-  select: (selected: boolean) => void;
-  setLoops: (loops: boolean) => void;
-}
-
-/**
- * Rive: CYLTabBarController's `CYLRiveIcon` plays the file (`CYLRiveIconView`), so the tag buttons restart Rive the
- * same way as the tab bar: on every play a trigger restarts the state machine and fires 50 ms later, a boolean input
- * goes false then true, `numberInput` / `values` step, a missing input restarts; with loops on it replays while
- * selected. This player only bumps its replay token, sets `selected` and `loops` (CYLTabBarController 6a9ede85).
- */
-export class CYLRivePlayer extends CYLAnimationPlayer {
-  private host: CYLRiveIconHost;
-  private playing: boolean = false;
-
-  constructor(source: CYLAnimationSource, host: CYLRiveIconHost) {
-    super(CYLAnimationEngine.RIVE, source);
-    this.host = host;
-  }
-
-  /**
-   * @ohos/rive has no playback speed.
-   */
-  get supportsSpeed(): boolean {
-    return false;
-  }
-
-  /**
-   * `CYLRiveIcon` loops any Rive file (`loops`).
-   */
-  get supportsLoops(): boolean {
-    return true;
-  }
-
-  /**
-   * @ohos/rive exposes no progress.
-   */
-  get supportsProgress(): boolean {
-    return false;
-  }
-
-  get isPlaying(): boolean {
-    return this.playing;
-  }
-
-  play(): void {
-    this.playing = true;
-    this.host.replay();
-  }
-
-  /**
-   * Selected (1): `selected` on, which keeps a boolean input on; otherwise off. Rive has no frame to stop at.
-   */
-  stopAtProgress(progress: number): void {
-    this.playing = false;
-    this.host.select(progress >= 1);
-  }
-
-  destroy(): void {
-    this.playing = false;
-  }
-
-  protected applyLoops(): void {
-    this.host.setLoops(this.loopsValue);
-  }
-}

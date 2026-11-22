@@ -42,11 +42,12 @@ export * from './src/main/ets/imagetag/ImageTagIndex';
 export * from './src/main/ets/classify/ClassifyIndex';
 export * from './src/main/ets/tagviews/TagViewsIndex';
 export {
-  CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, cylAnimationEngine
+  CYLAnimationEngine, CYLAnimationSource, CYLAnimationPlayer, cylAnimationEngine, CYLAnimatedItemPlayer,
+  CYLAnimatedItemPlaybackHost
 } from './src/main/ets/components/CYLAnimationPlayer';
 export {
   CYLTagAnimatedIcon, CYLTagAnimationBuilder, CYLTagAnimationContext, cylTagAnimationImage,
-  cylTagAnimatedIconOuterWidth, cylTagAnimatedIconOuterHeight
+  cylTagAnimatedIconOuterWidth, cylTagAnimatedIconOuterHeight, cylTagItemBuilderURL
 } from './src/main/ets/components/CYLTagAnimatedIcon';
 /**
  * CYLTabBarController's shared animated icon + title component (module `cylanimateditem`, vendored at commit 618ac11a):

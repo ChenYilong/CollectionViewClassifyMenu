@@ -35,6 +35,24 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### DONE (2026-11-22, `feat/harmony`, static code; build and emulator test by the owner): HarmonyOS tags play Rive through `CYLRiveAnimationBuilder`, no app-side Rive view
+
+- **Prompt (verbatim)**: "searchbar反馈TODO (50 points): ClassifyMenu 会话把 Rive 接到 CYLTagAnimatedIcon 的 CYLRiveAnimationBuilder 上并推送。
+  TODO (30 points): 我重新 pin ClassifyMenu,并删掉 harmonyos/entry 里那三个适配类。
+  TODO (20 points): 你在 HarmonyOS 模拟器上编译和测试。"
+- **Prompt (English)**: the CYLSearchViewController session's list: (50) this session routes Rive in `CYLTagAnimatedIcon` to
+  `CYLRiveAnimationBuilder` and pushes; (30) it re-pins ClassifyMenu and deletes its three adapter classes; (20) the owner
+  builds and tests on the HarmonyOS emulator.
+- **Context**: CYLTabBarController's `cylanimateditemrive` (vendored at `3074c51d`, `669ab5e5`) offers `CYLRiveAnimationBuilder`,
+  an `animationBuilder` for `CYLAnimatedItemView` driven by its `animationLoops` / `animationRestartToken`. The example still
+  wraps `CYLRiveIcon` in its own `CYLRiveIconView`, `CYLRiveIconHost` and `CYLRivePlayer` (`653452e6`), because the core's
+  `CYLTagAnimatedIcon` only takes the app's tag builder and a `CYLAnimationPlayer`.
+- **Requirements**: the core (`harmony/classifymenu`) still depends on no animation library (no `cylanimateditemrive`, no
+  `@ohos/rive`); the app registers upstream's builder for the Rive type, the tag drives loops and replay through the
+  component's props; the example drops its Rive view and adapter; static code only (no DevEco here), the owner builds and tests.
+- **Status**: in progress.
+
+
 ### TODO → DONE (2026-11-21, `docs/todo-reconcile`, Windows session): fix every TODO in docs/ (heading pass)
 
 - Context: `docs/` held 49 `TODO` / `Open` headings. Most recorded finished work (DONE results, 100 / 100) under a
