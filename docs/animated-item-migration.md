@@ -1059,8 +1059,8 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   marked as required reading in full, under a new tag heading and in the tag table (50); the skills say it too (20);
   every root instruction file still 200 lines or fewer (10).
 - Result: the file was untracked in the main checkout (`docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md`,
-  66 lines), now committed unchanged. New tag `guidelines`: `## [guidelines] Behavioral guidelines: read in full first`
+  66 lines), now committed unchanged. New tag `behavioral` (first named `guidelines`): `## [behavioral] Behavioral guidelines: read in full first`
   right after the introduction of AGENTS.md (and a row in its tag table) and at the top of CLAUDE.md, each with the
-  relative link and "read in full, every line, before any task" (moved the same day, at the owner's request, to
-  `docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md`, with every reference updated); `.agents/skills/cyl-instructions/SKILL.md` and
+  relative link and "read in full, every line, before any task" (moved the same day, at the owner's request, first to `docs/instructions/`, then renamed by the tag rule to
+  `docs/instructions/behavioral.md`, tag `behavioral`, with a tag-file header and every reference updated); `.agents/skills/cyl-instructions/SKILL.md` and
   `.agents/skills/cyl-task-start/SKILL.md` (first step before a task) say the same. **Score 100 / 100.**

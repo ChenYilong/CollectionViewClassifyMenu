@@ -1,3 +1,10 @@
+# Behavioral guidelines
+
+Tag: `behavioral`. **Required reading: read this whole file, every line, before any task.** [AGENTS.md](../../AGENTS.md)
+and [CLAUDE.md](../../CLAUDE.md) link it at their top under `[behavioral] Behavioral guidelines: read in full first`.
+Added on 2026-11-22 from `Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md`; the text below is unchanged.
+
+
 # CLAUDE.md
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
