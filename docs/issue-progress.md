@@ -1737,3 +1737,13 @@ tags: [issues, ui, cocoapods, progress]
     `testOptions.targetSdk = 35`. That setting also moved Robolectric's default SDK from 23 to 35 and failed 3 unit
     tests (two tail fold tests, `UpstreamPullRequestsTest.linesUseStartAndEndRulesForRightToLeft`), so
     `src/test/resources/robolectric.properties` keeps `sdk=23` as before; unit tests 108 / 108 again.
+
+
+### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS device (UI) tests on the Mate 70 Pro emulator
+
+- **Request (verbatim):** "want the HarmonyOS device (UI) tests run on the Mate 70 Pro emulator"
+- **Context:** HarmonyOS host tests pass (85 / 85). The UI tests (`harmony/entry/src/ohosTest`: Ability, ExampleUi,
+  QueryScenarios, Samples, StylesAndAnimations) run with `harmony/scripts/ui-test.sh` on this session's own Mate 70 Pro
+  emulator "CYL ClassifyMenu Test" (hdc 127.0.0.1:5563), from the APFS clone `/tmp/xpr/cm-fold`.
+- **Acceptance (100):** every UI test runs to the end and passes (`Failure: 0, Error: 0`), or each failure is fixed
+  in the core (`harmony/classifymenu`) or explained.
