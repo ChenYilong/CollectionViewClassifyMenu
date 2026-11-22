@@ -1707,10 +1707,16 @@ tags: [issues, ui, cocoapods, progress]
   program keeps `search-discover.test.js`.
 
 
-### TODO (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): full iOS and Android test suites after the tail fold tests
+### DONE (2026-11-22, `feat/harmony`, Mac session chenyilong-e4): full iOS and Android test suites after the tail fold tests
 
 - **Request (verbatim):** "跑完整的iOS和Android测试" (English: run the full iOS and Android test suites.)
 - **Context:** the tail fold control tests (`65d1181`..`df23aa4`) ran only their own cases. This run covers every iOS
   suite (`scripts/unit-tests.sh menu|tag|example|swift`) and every Android project's unit tests
   (`android/scripts/gradle.sh <project> testDebugUnitTest`), on a fresh derived data folder and a fresh mirror.
 - **Acceptance (100):** every suite runs to the end; each failure is fixed in the core or explained.
+- **Done (100 / 100), at `20d110b`:** every suite passes, 0 failures.
+  - iOS (Xcode 27.2, iOS 27.2 simulator CB9BDA60, fresh derived data per suite, `scripts/unit-tests.sh`): menu 37 / 37,
+    tag 6 / 6, example 117 / 117, swift 23 / 23 (183 tests).
+  - Android (`android/scripts/gradle.sh <project> testDebugUnitTest`, fresh mirror `/tmp/xpa/cmfold-android`, JDK 17):
+    merged 108 / 108 (all in `library`); AndroidTagView, TagViewGroup and android-tagview build and have no unit tests.
+  - Not covered: Android instrumented (device) tests and iOS versions other than 27.2.
