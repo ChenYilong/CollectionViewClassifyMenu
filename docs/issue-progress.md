@@ -1747,3 +1747,24 @@ tags: [issues, ui, cocoapods, progress]
   emulator "CYL ClassifyMenu Test" (hdc 127.0.0.1:5563), from the APFS clone `/tmp/xpr/cm-fold`.
 - **Acceptance (100):** every UI test runs to the end and passes (`Failure: 0, Error: 0`), or each failure is fixed
   in the core (`harmony/classifymenu`) or explained.
+
+
+### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): Rive does not play on HarmonyOS
+
+- **Request (verbatim):** "鸿蒙系统上， rive 动画无法播放。 请查看 CYLTabBarController CYLAnimatedItemView 最近的类似commit提交请确认该提交修复了该问题，如果没修复继续修复。"
+  (English: on HarmonyOS, Rive animations do not play. Look at CYLTabBarController's recent similar CYLAnimatedItemView
+  commits, confirm they fixed the problem, and if not, keep fixing it.)
+- **Findings:** CYLTabBarController's fixes are `c5ef58d4` (Rive icons play their state machine by name), the x86_64
+  debug Rive kit (`c8fee654`) and `c4a1f8fd` (newest cylanimateditem). This repository adopted them on `master` only
+  (PR #28: `71fac461` kit, `03de656d` "Rive items keep their artboard after playback"; PR #29: pin `c4a1f8fd`).
+  `feat/harmony` (PR #30) never merged `master` back: it vendors cylanimateditem `62715829`, so Rive shows the still
+  image on the x86_64 emulator, and on the arm64 emulator every `icons.riv` dark tag plays the same "refresh" artboard
+  (screenshot 2026-11-23, `feat/harmony` `09b04a1`). The Rive pod rows do animate on arm64.
+- **Also seen (UI test run):** an intermittent jscrash in @ohos/rive 1.0.4 during "Play all":
+  `Accessing released C++ object: StateMachineInstance` (RiveFileController.getStateMachinesByNames from
+  RiveArtboardRenderer.advance), about 1 run in 4 of `StylesAndAnimationsTest#animationControlsPlayAll` on arm64.
+- **Plan:** merge `origin/master` into `feat/harmony`; build; check on the arm64 emulator that every Rive row (pod row and
+  `icons.riv`) shows its own artboard and animates after Play all; repeat the Play all test for the crash; fix in the core
+  (cylanimateditem upstream) or the example's `CYLRivePlayer` if it persists.
+- **Acceptance (100):** master merged, builds (20); Rive pod rows animate (20); `icons.riv` tags show distinct icons and
+  animate (30); Play all test passes 10 runs in a row without the jscrash (30). Pass: 60.
