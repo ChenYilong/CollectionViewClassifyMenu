@@ -1182,5 +1182,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   CYLTabBarController's `:cylanimateditem` (`CYLLottieImageAssets`, 43c9eaa2), so `CYLTagButton.kt` no longer sets it. Checks: host tests
   75 / 75, `build.sh` BUILD SUCCESSFUL, Android `gradle test` BUILD SUCCESSFUL; x86_64 emulator (kit PAG + Rive): Lottie, PAG, Rive
   (with `icons.riv`), GIF and SVGA all play after "Play all", no crash.
-- **Score 90 / 100**: CI of PR #31 not passed yet (−10). The other platforms' animation code (mini program example engine component,
-  React Native's HarmonyOS example `CYLRNAnimationEngines.ets`) is tracked in CYLTabBarController's task log (PR #824).
+- Step 3 result: pins `b3c87fd1` (`cylanimateditem_pag` now declares `@tencent/libpag` `^4.4.31`, because CYLTableViewPlaceHolder
+  uses 4.5.102), so `harmony/oh-package.json5` gets `"overrides": { "@tencent/libpag": "4.4.31" }` to keep one libpag (ohpm had
+  resolved 4.5.102 for the module next to the entry's 4.4.31; now only 4.4.31 is installed, and the x86_64 kit tool still picks the
+  4.4.31 kit). React Native's HarmonyOS example (`react-native/react-native-cyl-tag-list/harmony-example`) drops its own Lottie
+  player (`CYLRNAnimationEngines.ets`) and registers `CYLAnimatedItemLottie` from the vendored `harmony/cylanimateditem_lottie`.
+  Checks: host tests 75 / 75, `build.sh` BUILD SUCCESSFUL; x86_64 emulator: PAG still plays (kit 4.4.31), no crash. Not verified: the
+  React Native HarmonyOS HAP does not build on this Windows worktree (RNOH's C++ paths pass 260 characters, as before this change;
+  a `subst` drive confused hvigor); it needs macOS or a shorter path.
+- **Score 85 / 100**: PR #31's CI not passed yet (−10); the React Native HarmonyOS example not built here (−5).

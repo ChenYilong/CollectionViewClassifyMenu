@@ -6,7 +6,7 @@ published to ohpm (as `../cylanimateditem`, see its `VENDORED.md`).
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`db883bfa1b9560f3cff52f96c241c6da7626916a`](https://github.com/ChenYilong/CYLTabBarController/tree/db883bfa1b9560f3cff52f96c241c6da7626916a/CrossPlatform/harmonyos-cyltabbar/cylanimateditem_rive) (2026-11-22) |
+| Commit | [`b3c87fd1b10ca0fe571f6622a2f834baa2030664`](https://github.com/ChenYilong/CYLTabBarController/tree/b3c87fd1b10ca0fe571f6622a2f834baa2030664/CrossPlatform/harmonyos-cyltabbar/cylanimateditem_rive) (2026-11-22) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditem_rive` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE) |
 | Changes | None. Only this file was added. |
