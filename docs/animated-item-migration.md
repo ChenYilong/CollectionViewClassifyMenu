@@ -1108,3 +1108,23 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   icon; host tests 82 / 82, build OK.
 - **Score 100 / 100**: PR #28's CI passed on every check at `03de656d` (Localization, Mini Program, and iOS: library build,
   `pod lib lint`, the four unit test suites, Example screenshots).
+
+### DONE (2026-11-22, `feat/pin-c8fee654`, Windows session): pins to `143fadff` and its x86_64 PAG debug kit adopted
+
+- Prompt (verbatim): "move the pins to 143fadff and adopt it"
+- Context: PR #28 (pins at `c8fee654`, all checks passed) is still open, so this goes on the same branch. Since
+  `c8fee654`: `fe60097a` and `61b96912` (iOS PAG player to Swift, PAGEnterprise keeps the Objective-C player),
+  `014cf3b5` (x86_64 PAG debug kit, libpag 4.4.31) and `143fadff` (the install tool adds a kit only when it matches the
+  app's engine version, `kit.json`; a 4.5.102 PAG kit too). The example already registers PAG and Rive the same way
+  (`CYLAnimatedItemEngines.register`), so the runtime needs no change.
+- Acceptance (100): every pin at `143fadff` and `harmony/cylanimateditem` re-vendored (30); local tests pass (30); PAG
+  and Rive play on the x86_64 emulator with the kit, no crash (20); every CI check of PR #28 passes (20).
+- Result: every pin moved `c8fee654` → `143fadff` (same files as the entry above); `harmony/cylanimateditem` re-vendored
+  (the PAG kits `x86_64-debug-engines/pag` for libpag 4.4.31 and `pag-4.5.102`, each kit's `kit.json`);
+  `VENDORED.md` updated; `.gitignore` unchanged upstream. Local checks: HarmonyOS host tests 82 / 82, `build.sh` BUILD
+  SUCCESSFUL, the kit tool's Python tests 9 / 9, Android `gradle test` BUILD SUCCESSFUL, mini program 168 / 168. On the
+  x86_64 emulator, `tools/cyl_hap_x86_64.py install` printed "skipped pag-4.5.102 … the app uses @tencent/libpag 4.4.31"
+  and "PAG, Rive"; the app logs "x86_64 debug engine kit active: PAG, Rive (debug builds only)". On the Animations page
+  the six PAG tags now draw their own icons instead of the placeholder and play after "Play all" (the play icon, the
+  ring, the rose change from frame to frame), Rive plays as before, no crash. Not checked: PAG's `onEnded` with the kit.
+- **Score 80 / 100** until PR #28's CI passes (−20).

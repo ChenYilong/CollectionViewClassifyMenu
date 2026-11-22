@@ -141,6 +141,6 @@ __pycache__/
 # hvigor writes BuildProfile.ets into each HarmonyOS module on every build (classifymenu's is tracked from before).
 harmony/**/BuildProfile.ets
 
-# From CYLTabBarController's .gitignore (c8fee654), with this project's name
+# From CYLTabBarController's .gitignore (143fadff), with this project's name
 CollectionViewClassifyMenu.xcodeproj/project.xcworkspace/xcuserdata/chenyilong.xcuserdatad/UserInterfaceState.xcuserstate
 CollectionViewClassifyMenu.xcodeproj/xcuserdata/chenyilong.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
