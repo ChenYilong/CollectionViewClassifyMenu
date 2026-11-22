@@ -2,7 +2,7 @@
 
 ## [guidelines] Behavioral guidelines: read in full first
 
-You must read [docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md) in full, every line, before any task.
+You must read [docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md) in full, every line, before any task.
 
 Rules are filed under tag headings, as in AGENTS.md (`## [<tag>] <title>`); the details of each tag are in
 `docs/instructions/<tag>.md`.

@@ -1061,5 +1061,6 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - Result: the file was untracked in the main checkout (`docs/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md`,
   66 lines), now committed unchanged. New tag `guidelines`: `## [guidelines] Behavioral guidelines: read in full first`
   right after the introduction of AGENTS.md (and a row in its tag table) and at the top of CLAUDE.md, each with the
-  relative link and "read in full, every line, before any task"; `.agents/skills/cyl-instructions/SKILL.md` and
+  relative link and "read in full, every line, before any task" (moved the same day, at the owner's request, to
+  `docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md`, with every reference updated); `.agents/skills/cyl-instructions/SKILL.md` and
   `.agents/skills/cyl-task-start/SKILL.md` (first step before a task) say the same. **Score 100 / 100.**
