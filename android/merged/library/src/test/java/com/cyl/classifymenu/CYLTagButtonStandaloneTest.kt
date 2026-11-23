@@ -34,6 +34,17 @@ class CYLTagButtonStandaloneTest {
         button.layout(0, 0, width, height)
     }
 
+    /** The tag is the host of the engine's player: it never lets the view play on selection (the Android view defaults to false, iOS to true). */
+    @Test
+    fun theTagDrivesItsOwnPlaybackAndTheViewNeverPlaysOnSelection() {
+        val button = CYLTagButton(context, "Tag", icon())
+        assertEquals(false, button.drivesAnimationPlayback)
+        val token = button.animationRestartToken
+        button.isSelected = true
+        assertEquals(false, button.drivesAnimationPlayback)
+        assertEquals("selecting does not restart", token, button.animationRestartToken)
+    }
+
     @Test
     fun theIconCanBeAboveOrBelowTheTitle() {
         assertEquals(2, CYLTagImagePlacement.CYLTagImagePlacementTop.ordinal)

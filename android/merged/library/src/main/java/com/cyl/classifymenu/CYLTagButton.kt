@@ -109,6 +109,10 @@ open class CYLTagButton @JvmOverloads constructor(
         isClickable = true
         isFocusable = true
         ready = true
+        // The tag plays through the engine's player itself (Play all, resting progress, speed, loops), never on selection:
+        // the engine's "host drives" mode, as HarmonyOS's tag passes `drivesAnimationPlayback: false`. iOS defaults to
+        // the opposite value, so it is set here and not left to the view's default.
+        drivesAnimationPlayback = false
         iconSizeDp = animationSize().toAnimatedItemSize()
         applyStyleAnimationSpeed()
         afterAnimationReload()
