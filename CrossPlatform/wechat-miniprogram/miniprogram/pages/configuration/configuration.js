@@ -2,7 +2,7 @@
  * 配置初始化 (pushed from 样式): CYLTagConfigurationDemoViewController, 1:1. The two ways to create a tag list, after
  * CYLTabBarController's -initWithConfiguration: and -initWithConfigurationFile:error:: a configuration file (JSON) and
  * a dictionary (map), each under a caption, then a line with the engine status that shows the tapped tag. The icons
- * use the example's animation engines (components/cyl-tag-animation-view; GIF is drawn by cyl-animated-item itself).
+ * use the example's animation engines (CYLTabBarController's engine components, bound directly; GIF is drawn by cyl-animated-item itself).
  */
 const { t } = require('../../utils/i18n.js');
 const animations = require('../../utils/tag-animations.js');

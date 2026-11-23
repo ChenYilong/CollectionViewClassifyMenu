@@ -2,6 +2,8 @@
   "navigationBarTitleText": "动效图标",
   "usingComponents": {
     "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
-    "cyl-tag-animation-view": "/components/cyl-tag-animation-view/cyl-tag-animation-view"
+    "cyl-lottie": "/cyl_components/cyl-lottie-miniprogram/cyl-lottie/index",
+    "cyl-rive": "/cyl_components/cyl-rive-miniprogram/cyl-rive/index",
+    "cyl-async-engine-view": "/components/cyl-async-engine-view/cyl-async-engine-view"
   }
 }

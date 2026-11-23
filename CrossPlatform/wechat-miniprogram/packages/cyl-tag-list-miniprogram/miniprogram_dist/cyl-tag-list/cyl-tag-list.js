@@ -111,6 +111,7 @@ Component({
               title: item.title,
               styleSpeed: style.animationSpeed,
               ...icon,
+              animationData: icon.animationUrl ? animations.data(item.animation) : null,
               enabled: item.enabled,
               selected,
               hidden: fold.visible.length ? !fold.visible[i] : false,
@@ -122,6 +123,7 @@ Component({
       });
       this.setData({
         sections,
+        ...animations.wasm(),
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
         foldColor: m.foldControl.color || m.style.foldControlColor,

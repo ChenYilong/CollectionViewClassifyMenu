@@ -1,0 +1,11 @@
+{
+  "component": true,
+  "usingComponents": {
+    "cyl-pag": "/engines/cyl-pag-miniprogram/cyl-pag/index",
+    "cyl-svga": "/engines/cyl-svga-miniprogram/cyl-svga/index"
+  },
+  "componentPlaceholder": {
+    "cyl-pag": "view",
+    "cyl-svga": "view"
+  }
+}

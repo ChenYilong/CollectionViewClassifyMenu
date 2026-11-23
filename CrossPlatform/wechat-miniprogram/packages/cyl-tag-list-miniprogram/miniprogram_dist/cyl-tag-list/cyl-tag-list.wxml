@@ -24,7 +24,7 @@
               <cyl-animated-item id="anim-{{item.key}}" class="cyl-animated-icon"
                                  generic:cyl-lottie-view="cyl-lottie-view" generic:cyl-pag-view="cyl-pag-view"
                                  generic:cyl-rive-view="cyl-rive-view" generic:cyl-svga-view="cyl-svga-view"
-                                 animation-url="{{item.animationUrl}}" image="{{item.iconSrc}}" icon-size="{{item.iconSize}}"
+                                 animation-url="{{item.animationUrl}}" animation-data="{{item.animationData}}" rive-wasm-path="{{riveWasmPath}}" pag-wasm-path="{{pagWasmPath}}" image="{{item.iconSrc}}" icon-size="{{item.iconSize}}"
                                  speed="{{animationSpeed > 0 ? animationSpeed : item.styleSpeed}}" loop="{{animationLoops}}"
                                  selected="{{item.selected}}" enabled="{{item.iconEnabled}}"
                                  gif-first-frame="{{item.gifFirstFrame}}" gif-last-frame="{{item.gifLastFrame}}" gif-duration="{{item.gifDuration}}" autoplay="{{item.autoplay}}" />

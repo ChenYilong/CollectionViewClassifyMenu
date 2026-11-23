@@ -7,6 +7,10 @@
   "dependencies": {
     "cyltabbar": "file:../../.deps/CYLTabBarController/CrossPlatform/harmonyos-cyltabbar/cyltabbar",
     "@cyl/classifymenu": "file:../../../../../harmony/classifymenu",
-    "@ohos/lottie": "2.0.38"
+    "cylanimateditem": "file:../../../../../harmony/cylanimateditem",
+    "cylanimateditem_lottie": "file:../../../../../harmony/cylanimateditem_lottie",
+    "cylanimateditem_rive": "file:../../../../../harmony/cylanimateditem_rive",
+    "@ohos/lottie": "2.0.38",
+    "@ohos/rive": "1.0.4"
   }
 }

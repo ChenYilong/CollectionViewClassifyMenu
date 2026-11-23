@@ -14,7 +14,7 @@ const ROOT = path.join(__dirname, '..', 'miniprogram');
 const INSTALLED = path.dirname(require.resolve('cyl-tag-list-miniprogram/cyl-tag-list/model.js'));
 const installed = (file) => path.join(path.dirname(INSTALLED), file);
 const GENERICS = ['cyl-lottie-view', 'cyl-pag-view', 'cyl-rive-view', 'cyl-svga-view'];
-const COMMIT = 'c4a1f8fda52aef766039893d8476f4b09493db23';
+const COMMIT = 'b3c87fd1b10ca0fe571f6622a2f834baa2030664';
 
 // The example's files are registered with the library, as app.js does.
 require('../miniprogram/utils/tag-animations.js');
@@ -128,48 +128,47 @@ test('cyl-tag-button: the icon through cyl-animated-item and playAnimation throu
     animationOptions: { stateMachine: 'State Machine' },
   }, { '#cyl-tag-button-animation': { playAnimation: () => played.push(1) } });
   instance.render();
-  assert.equal(instance.data.view.animationUrl, 'Rive/house.riv#stateMachine=State%20Machine');
+  assert.equal(instance.data.view.animationUrl, '/data/animations/rive/house.riv.bin#stateMachine=State%20Machine');
   assert.equal(instance.data.view.iconSrc, '/images/house.png');
   instance.playAnimation();
   assert.deepEqual(played, [1]);
 });
 
-test('the example\'s engine component follows the engine contract of cyl-animated-item', () => {
-  const file = path.join(ROOT, 'components', 'cyl-tag-animation-view', 'cyl-tag-animation-view.js');
+test('the engines are bound directly: the library gives cyl-animated-item the file, the Lottie data and the WebAssembly paths', () => {
+  const animations = require('cyl-tag-list-miniprogram/cyl-tag-list/animations.js');
+  require('../miniprogram/utils/tag-animations.js');
+  // Lottie: the registered key is the path and the JSON comes as animation-data.
+  assert.equal(animations.url('Lottie/tab_home_animate.json'), 'Lottie/tab_home_animate.json');
+  assert.ok(animations.data('Lottie/tab_home_animate.json').layers);
+  // Rive, with the tag's options and a resting progress after "#": the registered src.
+  assert.equal(animations.url('Rive/house.riv', { stateMachine: 'State Machine' }, 0.5),
+    '/data/animations/rive/house.riv.bin#stateMachine=State%20Machine&restingProgress=0.5');
+  assert.equal(animations.data('Rive/house.riv'), null);
+  assert.equal(animations.url('Nothing/missing.json'), '');
+  assert.deepEqual(animations.wasm(), {
+    riveWasmPath: '/cyl_components/cyl-rive-miniprogram/rive/rive.wasm.br',
+    pagWasmPath: '/engines/cyl-pag-miniprogram/libpag/libpag.wasm.br',
+  });
+  assert.equal(fs.existsSync(path.join(ROOT, 'components', 'cyl-tag-animation-view')), false, 'the example own engine component is gone');
+  // What stays is the stand-in for the PAG and SVGA engines of the async subpackage, with the engine contract of the placeholder.
+  const file = path.join(ROOT, 'components', 'cyl-async-engine-view', 'cyl-async-engine-view.js');
   const placeholder = mount(path.join(DIST, 'cyl-animation-placeholder', 'index.js')).definition;
   const { definition } = mount(file);
-  ['path', 'loop', 'speed', 'autoplay', 'restingFrame'].forEach((name) => assert.ok(definition.properties[name], name));
+  ['path', 'loop', 'speed', 'autoplay', 'restingFrame', 'wasmPath'].forEach((name) => assert.ok(definition.properties[name], name));
   Object.keys(placeholder.methods).forEach((name) => assert.equal(typeof definition.methods[name], 'function', name));
-
-  // An unknown file: `error`, so cyl-animated-item shows the image.
-  const missing = mount(file, { path: 'Lottie/missing.json' }).instance;
-  missing.load();
-  assert.equal(missing.events[0].name, 'error');
-
-  // A Lottie file: loads its data, rests on the selected tag's last frame, then `ready` and autoplay.
-  const calls = [];
-  const lottie = {
-    cyl_animation: () => ({ totalFrames: 31 }),
-    cyl_goToAndStop: (frame) => calls.push(['stop', frame]),
-    cyl_playFromStart: () => calls.push(['play']),
-  };
-  const view = mount(file, { path: 'Lottie/tab_home_animate.json', restingFrame: 'last' }, { '#lottie': lottie }).instance;
-  view.load();
-  assert.equal(view.data.engine, 'lottie');
-  assert.ok(view.data.lottieData && view.data.lottieData.layers);
-  view.onEngineReady();
-  assert.deepEqual(calls, [['stop', 30], ['play']]);
-  assert.deepEqual(view.events.map((event) => event.name), ['ready']);
-
-  // Rive: the tag's options go to cyl-rive's path; a resting progress rests there while not selected.
-  const progress = [];
-  const rive = mount(file, { path: 'Rive/house.riv#stateMachine=State%20Machine&restingProgress=0.5', autoplay: false },
-    { '#rive': { cyl_setProgress: (value) => progress.push(value) } }).instance;
-  rive.load();
-  assert.equal(rive.data.rivePath, '/data/animations/rive/house.riv.bin#stateMachine=State%20Machine');
-  rive.onEngineReady();
-  assert.deepEqual(progress, [0.5]);
+  const svga = mount(file, { path: '/engines/svga/tab_home.svga.bin' }).instance;
+  svga.load();
+  assert.equal(svga.data.engine, 'svga');
+  const pag = mount(file, { path: '/engines/pag/tab_home.pag.bin#restingProgress=0.5' }, { '#engine': { cyl_setProgress: (value) => pag.progress = value } }).instance;
+  pag.load();
+  assert.equal(pag.data.engine, 'pag');
+  pag.onEngineReady();
+  assert.equal(pag.progress, 0.5);
+  const other = mount(file, { path: 'Lottie/x.json' }).instance;
+  other.load();
+  assert.equal(other.events[0].name, 'error');
 });
+
 
 test('every page that shows a tag list gives it the example\'s engines as the abstract nodes', () => {
   const pages = fs.readdirSync(path.join(ROOT, 'pages'));
@@ -181,10 +180,11 @@ test('every page that shows a tag list gives it the example\'s engines as the ab
   users.forEach((page) => {
     const wxml = fs.readFileSync(path.join(ROOT, 'pages', page, `${page}.wxml`), 'utf8');
     const lists = wxml.match(/<cyl-tag-list[^>]*>/g);
-    lists.forEach((list) => ['cyl-lottie-view', 'cyl-rive-view', 'cyl-pag-view'].forEach((generic) => {
-      assert.ok(list.includes(`generic:${generic}="cyl-tag-animation-view"`), `${page}: ${generic}`);
+    lists.forEach((list) => [['cyl-lottie-view', 'cyl-lottie'], ['cyl-rive-view', 'cyl-rive'], ['cyl-pag-view', 'cyl-async-engine-view'], ['cyl-svga-view', 'cyl-async-engine-view']].forEach(([generic, engine]) => {
+      assert.ok(list.includes(`generic:${generic}="${engine}"`), `${page}: ${generic}`);
     }));
     const json = JSON.parse(fs.readFileSync(path.join(ROOT, 'pages', page, `${page}.json`), 'utf8'));
-    assert.equal(json.usingComponents['cyl-tag-animation-view'], '/components/cyl-tag-animation-view/cyl-tag-animation-view');
+    ['cyl-lottie', 'cyl-rive', 'cyl-async-engine-view'].forEach((name) => assert.ok(json.usingComponents[name], `${page}: ${name}`));
+    assert.equal(json.usingComponents['cyl-tag-animation-view'], undefined);
   });
 });

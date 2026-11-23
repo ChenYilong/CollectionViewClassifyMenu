@@ -93,6 +93,10 @@ hvigor/hvigor-wrapper.js
 /src/
 harmony/entry/src/main/resources/rawfile/bundle.harmony.js
 harmony/entry/src/main/resources/rawfile/tab_*.json
+harmony/entry/src/main/resources/rawfile/*.riv
+harmony/entry/src/main/resources/rawfile/*.svga
+harmony/entry/src/main/resources/rawfile/LICENSE-*.txt
+harmony/entry/src/main/resources/rawfile/NOTICE-svga.md
 harmony/entry/src/main/resources/rawfile/cyl_places.sqlite
 harmony/entry/src/main/resources/rawfile/assets/
 .deps/

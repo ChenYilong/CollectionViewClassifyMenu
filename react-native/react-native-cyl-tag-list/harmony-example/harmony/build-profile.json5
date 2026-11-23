@@ -8,7 +8,11 @@
         targetSdkVersion: '6.0.1(21)',
         runtimeOS: 'HarmonyOS',
         buildOption: {
-          nativeCompiler: 'BiSheng'
+          nativeCompiler: 'BiSheng',
+          // @ohos/rive (cylanimateditem_rive) is a bytecode HAR, which needs normalized OHM URLs.
+          strictMode: {
+            useNormalizedOHMUrl: true
+          }
         }
       },
     ],
@@ -45,6 +49,16 @@
       // CYLTabBarController's CYLAnimatedItemView, vendored in harmony/ (classifymenu depends on it by file:).
       name: 'cylanimateditem',
       srcPath: '../../../../harmony/cylanimateditem',
+    },
+    {
+      // CYLTabBarController's Lottie engine, vendored in harmony/ (registered in CYLRNAnimationEngines.ets).
+      name: 'cylanimateditem_lottie',
+      srcPath: '../../../../harmony/cylanimateditem_lottie',
+    },
+    {
+      // CYLTabBarController's Rive engine, vendored in harmony/ (the Rive section of the Tags page).
+      name: 'cylanimateditem_rive',
+      srcPath: '../../../../harmony/cylanimateditem_rive',
     },
   ],
 }

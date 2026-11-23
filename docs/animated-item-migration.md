@@ -1147,3 +1147,108 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Score 100 / 100**: PR #29's CI passed on every check at `04b39e26` (Localization, Mini Program, and iOS: library
   build, `pod lib lint`, the four unit test suites, Example screenshots). chen-yilong-b6 also built `04b39e26` on the
   x86_64 emulator with the kits: Rive and PAG play, the artboards are kept, no crash.
+
+### DONE (2026-11-22, `feat/animated-item-engines`, Windows session): HarmonyOS example on CYLTabBarController's engine views
+
+- Prompt (verbatim): "你应该将CYLRiveIcon 和CYLPagIcon等等所有动效相关的也可能涉及Lottie， gif ，svga， 等等， 你都需要封装进 CYLTabBarController 的CYLAnimatedItemView中， 然后调用的CYLAnimatedItemView中接口来完成example实现。你在 CYLRiveIcon 和CYLPagIcon 等等动效里修复的bug，其他项目也遇到了， 现在要让你帮忙修复后，他们直接更新  CYLTabBarController 的CYLAnimatedItemView，来共共享你的成果。"
+  Follow-up (verbatim): "刚刚我提交的要求，不仅仅适用于鸿蒙os，同时适用与所有平台， 包括iOS， Android ， 小程序， react native， flutter等等平台。迁移动效相关的代码， 重构到 cylanimateditem"
+- Context: the engines move into CYLTabBarController (PR #824, branch `feat/harmony-animated-item-engines`, task log in its
+  `docs/Animated-Item.md`): `cylanimateditem` carries the player API, the default engine view and GIF (and SVGA, by
+  chen-yilong-3a); `cylanimateditem_lottie` and `cylanimateditem_pag` (this session) and `cylanimateditem_rive`
+  (chen-yilong-3a) carry the library engines. This repository then drops its own players
+  (`harmony/entry/src/main/ets/animation/CYLExampleAnimationPlayers.ets`, `CYLExampleAnimationViews.ets`, `svga/`) for them.
+  First step: pins at `7755741d`, the three modules vendored, `CYLTagAnimatedIcon` (core) uses the component's engine
+  view for every type that has one (Lottie, PAG, GIF now) and keeps the app's builder for the others (Rive, SVGA) until their
+  engines land; the tag still drives the player (resting progress, Play all) through an adapter to `CYLAnimationPlayer`.
+- Acceptance (100): pins and vendored modules (20); the core switched with `CYLAnimationPlayer` and `CYLTagButton.animationView`
+  unchanged for apps (25); the example's Lottie, PAG and GIF players removed (15); host tests and builds (15); the animations page
+  on the x86_64 emulator with the kits: Lottie, PAG and GIF play, Play all, speed, loop (15); CI passes (10). Rive and SVGA move
+  in a second step once their engines land.
+- Step 1 result: pins `c4a1f8fd` → `7755741d` (CYLTabBarController PR #824); `harmony/cylanimateditem` re-vendored and
+  `harmony/cylanimateditem_lottie`, `harmony/cylanimateditem_pag` vendored (each with a `VENDORED.md`), registered in
+  `harmony/build-profile.json5` and `entry/oh-package.json5`. Core: `CYLTagAnimatedIcon` uses the component's engine view when an
+  engine registered one for the type (`drivesAnimationPlayback: false`, the player handed to the tag as
+  `CYLAnimatedItemPlayerAdapter`, a `CYLAnimationPlayer`), so `CYLTagButton` and its public API are unchanged. Example: Lottie, PAG
+  and GIF players and views deleted from `CYLExampleAnimationPlayers.ets` / `CYLExampleAnimationViews.ets`;
+  `cylRegisterExampleAnimationEngines()` registers `CYLAnimatedItemLottie`, `CYLAnimatedItemPAG`, `CYLAnimatedItemGIF`. Checks: host tests
+  82 / 82, `build.sh` BUILD SUCCESSFUL; x86_64 emulator (debug HAP, kit PAG + Rive): on the animations page Lottie (with image
+  assets), PAG and GIF play after "Play all", Rive and SVGA still play through the example's views, no crash.
+- Step 2 result: pins `db883bfa`; `harmony/cylanimateditem` (now with GIF, SVGA and its pure-TS SVGA decoder),
+  `cylanimateditem_lottie`, `cylanimateditem_pag` and the new `cylanimateditem_rive` vendored. The example has no players any more:
+  `CYLExampleAnimationPlayers.ets` and `animation/svga/` deleted, `CYLExampleAnimationViews.ets` only registers the five engines.
+  The SVGA decoder tests (`SVGADecoder.test.ets`, 5) and `scripts/svga-decoder-test.*` moved to CYLTabBarController with the decoder
+  (`cylanimateditem/test/CYLAnimatedItemSVGADecoder.test.mjs`, chen-yilong-3a), and the 2 example SVGA player tests are covered there by
+  `CYLAnimatedItemPlayer.test.mjs`; host tests 82 → 75. Android: `CYLTagLottieImages` (Lottie images by reflection) moved into
+  CYLTabBarController's `:cylanimateditem` (`CYLLottieImageAssets`, 43c9eaa2), so `CYLTagButton.kt` no longer sets it. Checks: host tests
+  75 / 75, `build.sh` BUILD SUCCESSFUL, Android `gradle test` BUILD SUCCESSFUL; x86_64 emulator (kit PAG + Rive): Lottie, PAG, Rive
+  (with `icons.riv`), GIF and SVGA all play after "Play all", no crash.
+- Step 3 result: pins `b3c87fd1` (`cylanimateditem_pag` now declares `@tencent/libpag` `^4.4.31`, because CYLTableViewPlaceHolder
+  uses 4.5.102), so `harmony/oh-package.json5` gets `"overrides": { "@tencent/libpag": "4.4.31" }` to keep one libpag (ohpm had
+  resolved 4.5.102 for the module next to the entry's 4.4.31; now only 4.4.31 is installed, and the x86_64 kit tool still picks the
+  4.4.31 kit). React Native's HarmonyOS example (`react-native/react-native-cyl-tag-list/harmony-example`) drops its own Lottie
+  player (`CYLRNAnimationEngines.ets`) and registers `CYLAnimatedItemLottie` from the vendored `harmony/cylanimateditem_lottie`.
+  Checks: host tests 75 / 75, `build.sh` BUILD SUCCESSFUL; x86_64 emulator: PAG still plays (kit 4.4.31), no crash. Not verified: the
+  React Native HarmonyOS HAP does not build on this Windows worktree (RNOH's C++ paths pass 260 characters, as before this change;
+  a `subst` drive confused hvigor); it needs macOS or a shorter path.
+- Score after step 3: 85 / 100 (PR #31's CI not passed yet, −10; the React Native HarmonyOS example not built here, −5).
+- Step 4 (2026-11-23), prompt (verbatim): "fix todo and score to 100". Rubric: **100** = PR #31's CI green on its head, and the
+  React Native HarmonyOS example built and run on the x86_64 emulator with its tags playing through the engines (a labeled
+  screenshot); **60** = CI green and the example's build failure explained. Result:
+  - CI: all 11 checks of PR #31 pass on `74524702` (the merge of PR #30).
+  - React Native HarmonyOS example: two faults found and fixed, both in the example's configuration. (1) Its
+    `harmony/build-profile.json5` did not list `cylanimateditem_lottie` as a module, so ArkTS stopped with "Cannot import files
+    outside of the current module" (step 3 added the dependency but not the module). (2) The shared Tags page has Rive and SVGA
+    sections, but the shell registered only Lottie and `setup.sh` copied only the Lottie rawfiles, so those tags showed the
+    placeholder image. Now `CYLRNAnimationEngines.ets` registers Lottie, Rive, GIF and SVGA. The entry depends on
+    `cylanimateditem_rive` and `@ohos/rive` 1.0.4, and the module is listed. `useNormalizedOHMUrl` is on, because @ohos/rive is a
+    bytecode HAR. `setup.sh` copies the `.riv` and `.svga` files, with their license and notice (git-ignored, like the Lottie
+    copies).
+  - Windows build: ninja cannot open paths over 260 characters, even with `LongPathsEnabled` = 1. Hvigor builds through the
+    real path, so a junction does not help. The build ran from a copy at a short root (`C:\q`, keeping the relative layout
+    `harmony/` and `r/l/{e,.deps}`), with `ohpm install --all` and `setup.sh`'s WebSocket cast applied: `assembleHap` BUILD
+    SUCCESSFUL (HarmonyOS 6.0.1 SDK, API 21, DevEco Studio on Windows 11).
+  - Emulator (x86_64 Mate 70 Pro, 127.0.0.1:5555; HAP installed with `cyl_hap_x86_64.py`, x86_64 kit: Rive): every Lottie, Rive and
+    SVGA tag draws its first frame. After "Play all", two frames 0.2 s apart differ in each section (Lottie 538 pixels, Rive 43,
+    SVGA 717), and 11,197 pixels differ from the resting page. No crash.
+
+    <img src="assets/react-native-harmonyos-engines.png" width="300" alt="React Native on HarmonyOS, x86_64 emulator: Lottie, Rive and SVGA tags playing through CYLTabBarController's engines after Play all">
+
+    Label: React Native for OpenHarmony 0.86.1 example, x86_64 Mate 70 Pro emulator, HarmonyOS 6.0.1 SDK API 21, Windows 11,
+    CollectionViewClassifyMenu `feat/animated-item-engines` after `74524702`, 2026-11-23. Purpose: the shell plays Lottie, Rive and
+    SVGA tags through the shared engines (no player of its own), shown after "Play all".
+- **Score 100 / 100**.
+
+## Mini program: delete ClassifyMenu's own `cyl-tag-animation-view` (2026-11-23, branch `feat/animated-item-engines`, PR #31)
+
+- **TODO (blocked upstream) / user prompt (verbatim):** 「阅读以下 向 阅读该pr 贡献代码，https://github.com/ChenYilong/CYLTabBarController/pull/824 并让advisor阅读pr描述提及的文档，评估该进度，并分配任务给合适的session，让sonnet开始实施动效残余代码的迁移计划。 Mini program: the advisor worried that a default engine component would pull every engine into the 2 MB package limit. It won't, because the component already uses one generic slot per engine type, with a placeholder as the default. So no decision from you is needed there. What remains is deleting ClassifyMenu's own cyl-tag-animation-view in that other repository.」
+- **Assessment (PR #824, `feat/harmony-animated-item-engines`, task log at 80 / 100):** the PR's own "Missing" list names
+  "the mini program default engine component (3a, -10)". Checked in the local worktree (`785e2ccc`): `cyl-lottie`, `cyl-rive`,
+  `cyl-pag`, `cyl-svga` and `cyl-animated-item` exist, but no component that picks the engine from the path. iOS, Flutter and
+  React Native dependents carry no players (the PR's audit), so only the mini program is left here.
+- **Routing:** the upstream component goes to session `winsCYLTabBarController` (message sent 2026-11-23; criteria: engine
+  contract of `cyl-tag-animation-view`, one generic slot per engine type, PAG / SVGA stay in the async "engines" subpackage,
+  commit hash back). This session (Win, mini program) then does the steps below.
+- **Steps after it lands:** move the pin in `scripts/fetch-cyltabbar.js` and re-vendor; repoint the 7 page `.json` files and the
+  `generic:` lines in the 7 `.wxml` files (animations, configuration, product, reviews, search-category, styles); fix the
+  comments in `animations.js`, `configuration.js`, `utils/tag-animations.js`; delete
+  `components/cyl-tag-animation-view/`; `npm test`; WeChat DevTools check of the Animations page (Play all, loop, all four engines
+  inside their tags) with a screenshot in `docs/assets/`.
+- **Update (2026-11-23, user chose option 1: keep a slim wrapper for PAG and SVGA): mini program part DONE except the evidence below; not committed.**
+  - The premise changed: `cyl-animated-item` already passes `path`, `animation-data`, `colors`, `resting-frame` and the wasm
+    paths to each engine slot, and CYLTabBarController's own example binds the engines directly. So no new upstream component
+    was needed; the request sent to `winsCYLTabBarController` is withdrawn.
+  - `cyl-tag-list-miniprogram`: `animations.url()` now returns the registered `src` (with the "#" options) for Rive, PAG and
+    SVGA; new `animations.data()` (Lottie JSON for `animation-data`) and `animations.wasm()` (`configure({riveWasmPath,
+    pagWasmPath})`); `cyl-tag-list` and `cyl-tag-button` pass them to `cyl-animated-item`.
+  - Pages bind `generic:cyl-lottie-view="cyl-lottie"` and `generic:cyl-rive-view="cyl-rive"` directly. PAG and SVGA stay in the
+    async "engines" subpackage (the 2 MB limit); a page cannot bind an async subpackage component to an abstract node (the
+    placeholder answered: "no animation component"), so they go through the slim `components/cyl-async-engine-view` (picks
+    PAG or SVGA by extension, strips the "#" options that cyl-pag read as part of the file name, rests, plays after load).
+    `components/cyl-tag-animation-view` is deleted. TODO (CYLTabBarController): bind engines from an async subpackage, or ship a
+    component for it, then delete `cyl-async-engine-view`.
+  - Evidence: `npm test` 168 / 168; WeChat DevTools (2.02.2609250, Windows, 2026-11-23 22:24-22:26), Animations page: Lottie (three
+    sections), Rive, PAG (Home, Health, Posts, Me, Animation 1), SVGA (both sections), GIF and static images all draw, the console
+    has no `cyl-` warning or error after the "#" fix. Not done: Play all / loop check, a look at PAG "Animation 2" after the fix
+    (its error is gone from the console), and a labeled stitched screenshot in `docs/assets/` (`scripts/stitch-screenshots.py`).
+  - Committed to PR #31 on the user's choice (the first branch, `docs/todo-reconcile`, had no pull request and three were open, which AGENTS.md says to
+    ask about).

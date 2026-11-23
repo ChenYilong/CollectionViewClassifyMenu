@@ -5,7 +5,7 @@
  * configuration (map): one section per animation library (Lottie, PAG, Rive, GIF) and CYLTabBarController's static
  * tab images, single choice per section, the first tag of each selected. A tapped tag plays its icon and the status
  * shows 点击「section · title」. Every icon is CYLTabBarController's cyl-animated-item (inside cyl-tag-list); the engines
- * are components/cyl-tag-animation-view, given as the abstract nodes cyl-lottie-view, cyl-rive-view and cyl-pag-view.
+ * are CYLTabBarController's cyl-lottie, cyl-rive, cyl-pag and cyl-svga, bound to the abstract nodes of cyl-tag-list.
  */
 const i18n = require('../../utils/i18n.js');
 const animations = require('../../utils/tag-animations.js');

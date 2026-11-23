@@ -38,6 +38,11 @@ done
 # The Lottie files the tags play (rawfiles, as in harmony/entry) and the shared database of the Classify page.
 mkdir -p harmony/entry/src/main/resources/rawfile
 cp "$REPO"/harmony/entry/src/main/resources/rawfile/tab_*.json harmony/entry/src/main/resources/rawfile/
+# The Rive and SVGA files of the shared Tags page ("asset:house.riv", "asset:tab_home.svga"), with their licenses.
+cp "$REPO"/harmony/entry/src/main/resources/rawfile/rive/*.riv "$REPO"/harmony/entry/src/main/resources/rawfile/rive/LICENSE-*.txt \
+  harmony/entry/src/main/resources/rawfile/
+cp "$REPO"/harmony/entry/src/main/resources/rawfile/svga/*.svga harmony/entry/src/main/resources/rawfile/
+cp "$REPO"/harmony/entry/src/main/resources/rawfile/svga/NOTICE.md harmony/entry/src/main/resources/rawfile/NOTICE-svga.md
 cp "$REPO/Example-Shared/Database/cyl_places.sqlite" harmony/entry/src/main/resources/rawfile/
 
 npx react-native codegen-harmony --no-safety-check \

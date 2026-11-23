@@ -2,8 +2,44 @@
 
 The animated icon + title component of CYLTabBarController for HarmonyOS NEXT (`CYLAnimatedItemView`,
 `CYLAnimatedItemStackView`, `CYLAnimatedItemEngines`). It depends on no other package and on no animation library.
-Guide: [docs/Animated-Item.md](../../../docs/Animated-Item.md) in CYLTabBarController. To play `.riv` files in it with one shared
-Rive view and a working Loop, add the sibling module [cylanimateditemrive](../cylanimateditemrive/README.md).
+Guide: [docs/Animated-Item.md](../../../docs/Animated-Item.md) in CYLTabBarController.
+
+## Engine views (no `animationBuilder` needed)
+
+[EN] The component carries the engine views, so an app no longer writes its own players. Register the engines once (for
+example in `EntryAbility.onCreate`); every `CYLAnimatedItemView` without an `animationBuilder` then plays files of those
+types by its selection and playback (selected: once from the start; unselected: progress 0; `animationRestartToken` /
+`controller.restartAnimation()`: again; `animationSpeed`, `animationLoops` at once; `onAnimationEnd`).
+[CN] 组件自带引擎视图，App 不再编写自己的播放器。注册一次引擎（例如在 `EntryAbility.onCreate` 中）后，所有未传入 `animationBuilder` 的
+`CYLAnimatedItemView` 都按其选中状态与播放设置播放这些类型的文件。
+
+| Type | Where | Register |
+|:---|:---|:---|
+| GIF | this module (ImageKit, no library) | `CYLAnimatedItemGIF.register()` |
+| SVGA | this module (no library) | in progress (chen-yilong-3a) |
+| Lottie | module `cylanimateditem_lottie` (`@ohos/lottie`) | in progress |
+| PAG | module `cylanimateditem_pag` (`@tencent/libpag`) | in progress |
+| Rive | module `cylanimateditem_rive` (`@ohos/rive`) | in progress (chen-yilong-3a) |
+
+- A host that drives playback itself (resting progress, Play all) sets `drivesAnimationPlayback: false` and gets the
+  player in `onAnimationPlayer`: `CYLAnimatedItemPlayer` (`play()`, `stopAtProgress(p)`, `speed`, `loops`,
+  `supportsSpeed` / `supportsLoops` / `supportsProgress`, `isPlaying`, `progress`, `onEnded`).
+- Writing an engine: a `@Component` that gets `state: CYLAnimatedItemEngineState` (the parsed
+  `CYLAnimatedItemSource` with its `#` options, the size, the playback, the callbacks), makes a player (subclass
+  `CYLAnimatedItemPlayer`, or `CYLAnimatedItemTimedPlayer` for an engine without speed), and calls
+  `CYLAnimatedItemEngineBinding.ready(state, player)` / `failed(state)` / `update(state)` /
+  `release()`, listening with `state.listen(...)` in `aboutToAppear` (and calling the returned function in `aboutToDisappear`); then `CYLAnimatedItemEngineViews.register(type, wrapBuilder(globalBuilder))`. `CYLAnimatedItemGIF.ets` is
+  the smallest example.
+- Engine views are created one at a time, 50 ms apart (a screen full of animated items froze while decoding all of them
+  at once: CollectionViewClassifyMenu Z5).
+- Tests: `node --test test/*.test.mjs` (`CYLAnimatedItemSource`, `CYLAnimatedItemPlayer`, GIF timing).
+- SVGA: `CYLAnimatedItemSVGA.register()` (in this module: `svga/` decoder and renderer, a timed player). Rive: the
+  `cylanimateditem_rive` module, `CYLAnimatedItemRive.register()`; cyltabbar's `CYLRiveIcon` is a thin wrapper over its
+  `CYLAnimatedItemRiveView`. Checked on the x86_64 emulator with the debug engine kit (2026-11-22):
+  ![Rive tabs on cylanimateditem_rive](../../../docs/assets/harmonyos-x86-64-rive-tabs-on-cylanimateditem-rive.png)
+- The SVGA decoder is plain TypeScript (`svga/CYLInflate.ts`, `svga/CYLSVGADecoder.ts`), tested with Node
+  (`test/CYLAnimatedItemSVGADecoder.test.mjs`). SVGA tabs on the x86_64 emulator (2026-11-22):
+  ![SVGA tabs on the pure TypeScript decoder](../../../docs/assets/harmonyos-x86-64-svga-tabs-on-pure-ts-decoder.png)
 
 ## x86_64 emulator
 

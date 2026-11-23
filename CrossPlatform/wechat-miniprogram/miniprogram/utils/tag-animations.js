@@ -12,17 +12,24 @@
  * - **svga**: CYLTabBarController's cyl-svga-miniprogram (an SVGA 2.x player for the 2D canvas, about 75 KB) and the
  *   .svga.bin files of engines/svga, in the same subpackage.
  *
- * components/cyl-tag-animation-view plays Lottie, Rive, PAG and SVGA; the pages hand it to cyl-tag-list as the abstract
- * nodes generic:cyl-lottie-view, generic:cyl-rive-view, generic:cyl-pag-view and generic:cyl-svga-view. Required by app.js, so the files are
+ * The pages bind CYLTabBarController's Lottie and Rive directly to cyl-tag-list's abstract nodes (generic:cyl-lottie-view="cyl-lottie",
+ * generic:cyl-rive-view="cyl-rive"); PAG and SVGA (the async "engines" subpackage) go through components/cyl-async-engine-view,
+ * given as generic:cyl-pag-view and generic:cyl-svga-view. Required by app.js, so the files are
  * registered before any page shows a tag.
  */
 const animations = require('cyl-tag-list-miniprogram/cyl-tag-list/animations.js');
 const registry = require('../data/animations/index.js');
 const assets = require('../data/lottie-registry.js');
 
-animations.configure({ registry, assets });
+animations.configure({
+  registry,
+  assets,
+  // CYLTabBarController's cyl-rive and cyl-pag load their WebAssembly from here (installed by scripts/fetch-cyltabbar.js).
+  riveWasmPath: '/cyl_components/cyl-rive-miniprogram/rive/rive.wasm.br',
+  pagWasmPath: '/engines/cyl-pag-miniprogram/libpag/libpag.wasm.br',
+});
 
-/** The engines the example ships (components/cyl-tag-animation-view, and <image> for GIF). */
+/** The engines the example ships (the engines bound by the pages, and <image> for GIF). */
 const ENGINES = Object.freeze({ lottie: true, gif: true, pag: true, rive: true, svga: true });
 
 module.exports = {
