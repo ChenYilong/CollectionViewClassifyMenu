@@ -22,6 +22,15 @@
 //
 
 import UIKit
+// CYLAnimationSource (the engine's shared source parser): in Swift Package Manager it is the `CYLAnimatedItemSwift`
+// target, in CocoaPods and the framework the `CYLAnimatedItem` module (as CYLTagButton.swift imports it).
+#if canImport(CYLAnimatedItemSwift)
+import CYLAnimatedItemSwift
+#elseif canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#else
+import CYLTabBarController
+#endif
 
 // MARK: - Keys
 
@@ -649,15 +658,15 @@ enum CYLConfigurationValue {
         guard let string = value as? String, !string.isEmpty else {
             return nil
         }
-        // "file.riv#artboard=HOME": resolve the file, then keep the options.
-        if let hash = string.firstIndex(of: "#"), hash > string.startIndex,
+        // "file.riv#artboard=HOME" or "file.riv?artboard=HOME": the engine's shared source rules (CYLAnimationSource,
+        // the same as HarmonyOS, Android and the mini program) split the file from its options; resolve the file, then
+        // keep the options in its fragment, as CYLTabBarController writes them.
+        if string.contains(where: { $0 == "#" || $0 == "?" }),
            (URL(string: string)?.scheme?.count ?? 0) <= 1 {
-            let file = fileURL(String(string[..<hash]), baseURL: baseURL)
-            guard let file, var components = URLComponents(url: file, resolvingAgainstBaseURL: true) else {
-                return file
+            let source = CYLAnimationSource(parsing: string)
+            if !source.file.isEmpty {
+                return fileURL(source.file, baseURL: baseURL)?.cylAddingAnimationOptions(source.options)
             }
-            components.percentEncodedFragment = String(string[string.index(after: hash)...])
-            return components.url ?? file
         }
         if let url = URL(string: string), (url.scheme?.count ?? 0) > 1 {
             return url
