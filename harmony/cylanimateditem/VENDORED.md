@@ -19,10 +19,10 @@ depended on with `file:`, at a pinned commit.
   project does), and `harmony/classifymenu/oh-package.json5` depends on it with `"cylanimateditem":
   "file:../cylanimateditem"`.
 - It depends on no animation library. `@cyl/classifymenu` draws a tag's animated icon with `CYLAnimatedItemView`
-  (`CYLTagAnimatedIcon` in `classifymenu/src/main/ets/components/CYLTagAnimation.ets`); the app registers the types it
-  plays (`CYLAnimatedItemEngines.register('Lottie')` and its siblings) and the views that play them
-  (`CYLTagAnimationBuilder.register(wrapBuilder(...))`). The example does both in
-  `entry/src/main/ets/animation/CYLExampleAnimationViews.ets`.
+  (`CYLTagAnimatedIcon` in `classifymenu/src/main/ets/components/CYLTagAnimation.ets`); the app registers the engines it
+  plays (`CYLAnimatedItemLottie.register()` and its siblings, one call each). A registered engine brings its own view, so
+  the host registers no `CYLTagAnimationBuilder`; that builder is only for a custom type no engine plays. The example
+  registers the engines in `entry/src/main/ets/animation/CYLExampleAnimationViews.ets`.
 - `src/main/ets/CYLAnimatedItemView.ets` imports `BuildProfile` from the module root: hvigor generates that file when
   it builds the module.
 
