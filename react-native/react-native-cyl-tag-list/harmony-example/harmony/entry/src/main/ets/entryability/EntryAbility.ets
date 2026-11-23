@@ -12,7 +12,7 @@ import { cylRegisterRNAnimationEngines } from '../CYLRNAnimationEngines';
 export default class EntryAbility extends RNAbility {
   override onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     super.onCreate(want, launchParam);
-    // The core plays no animation itself: the shell registers its Lottie engine before any tag is shown.
+    // The core plays no animation itself: the shell registers CYLTabBarController's engines before any tag is shown.
     cylRegisterRNAnimationEngines();
   }
 

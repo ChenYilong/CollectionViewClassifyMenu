@@ -1148,7 +1148,7 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   build, `pod lib lint`, the four unit test suites, Example screenshots). chen-yilong-b6 also built `04b39e26` on the
   x86_64 emulator with the kits: Rive and PAG play, the artboards are kept, no crash.
 
-### IN PROGRESS (2026-11-22, `feat/animated-item-engines`, Windows session): HarmonyOS example on CYLTabBarController's engine views
+### DONE (2026-11-22, `feat/animated-item-engines`, Windows session): HarmonyOS example on CYLTabBarController's engine views
 
 - Prompt (verbatim): "你应该将CYLRiveIcon 和CYLPagIcon等等所有动效相关的也可能涉及Lottie， gif ，svga， 等等， 你都需要封装进 CYLTabBarController 的CYLAnimatedItemView中， 然后调用的CYLAnimatedItemView中接口来完成example实现。你在 CYLRiveIcon 和CYLPagIcon 等等动效里修复的bug，其他项目也遇到了， 现在要让你帮忙修复后，他们直接更新  CYLTabBarController 的CYLAnimatedItemView，来共共享你的成果。"
   Follow-up (verbatim): "刚刚我提交的要求，不仅仅适用于鸿蒙os，同时适用与所有平台， 包括iOS， Android ， 小程序， react native， flutter等等平台。迁移动效相关的代码， 重构到 cylanimateditem"
@@ -1190,7 +1190,33 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   Checks: host tests 75 / 75, `build.sh` BUILD SUCCESSFUL; x86_64 emulator: PAG still plays (kit 4.4.31), no crash. Not verified: the
   React Native HarmonyOS HAP does not build on this Windows worktree (RNOH's C++ paths pass 260 characters, as before this change;
   a `subst` drive confused hvigor); it needs macOS or a shorter path.
-- **Score 85 / 100**: PR #31's CI not passed yet (−10); the React Native HarmonyOS example not built here (−5).
+- Score after step 3: 85 / 100 (PR #31's CI not passed yet, −10; the React Native HarmonyOS example not built here, −5).
+- Step 4 (2026-11-23), prompt (verbatim): "fix todo and score to 100". Rubric: **100** = PR #31's CI green on its head, and the
+  React Native HarmonyOS example built and run on the x86_64 emulator with its tags playing through the engines (a labeled
+  screenshot); **60** = CI green and the example's build failure explained. Result:
+  - CI: all 11 checks of PR #31 pass on `74524702` (the merge of PR #30).
+  - React Native HarmonyOS example: two faults found and fixed, both in the example's configuration. (1) Its
+    `harmony/build-profile.json5` did not list `cylanimateditem_lottie` as a module, so ArkTS stopped with "Cannot import files
+    outside of the current module" (step 3 added the dependency but not the module). (2) The shared Tags page has Rive and SVGA
+    sections, but the shell registered only Lottie and `setup.sh` copied only the Lottie rawfiles, so those tags showed the
+    placeholder image. Now `CYLRNAnimationEngines.ets` registers Lottie, Rive, GIF and SVGA. The entry depends on
+    `cylanimateditem_rive` and `@ohos/rive` 1.0.4, and the module is listed. `useNormalizedOHMUrl` is on, because @ohos/rive is a
+    bytecode HAR. `setup.sh` copies the `.riv` and `.svga` files, with their license and notice (git-ignored, like the Lottie
+    copies).
+  - Windows build: ninja cannot open paths over 260 characters, even with `LongPathsEnabled` = 1. Hvigor builds through the
+    real path, so a junction does not help. The build ran from a copy at a short root (`C:\q`, keeping the relative layout
+    `harmony/` and `r/l/{e,.deps}`), with `ohpm install --all` and `setup.sh`'s WebSocket cast applied: `assembleHap` BUILD
+    SUCCESSFUL (HarmonyOS 6.0.1 SDK, API 21, DevEco Studio on Windows 11).
+  - Emulator (x86_64 Mate 70 Pro, 127.0.0.1:5555; HAP installed with `cyl_hap_x86_64.py`, x86_64 kit: Rive): every Lottie, Rive and
+    SVGA tag draws its first frame. After "Play all", two frames 0.2 s apart differ in each section (Lottie 538 pixels, Rive 43,
+    SVGA 717), and 11,197 pixels differ from the resting page. No crash.
+
+    <img src="assets/react-native-harmonyos-engines.png" width="300" alt="React Native on HarmonyOS, x86_64 emulator: Lottie, Rive and SVGA tags playing through CYLTabBarController's engines after Play all">
+
+    Label: React Native for OpenHarmony 0.86.1 example, x86_64 Mate 70 Pro emulator, HarmonyOS 6.0.1 SDK API 21, Windows 11,
+    CollectionViewClassifyMenu `feat/animated-item-engines` after `74524702`, 2026-11-23. Purpose: the shell plays Lottie, Rive and
+    SVGA tags through the shared engines (no player of its own), shown after "Play all".
+- **Score 100 / 100**.
 
 ## Mini program: delete ClassifyMenu's own `cyl-tag-animation-view` (2026-11-23, branch `feat/animated-item-engines`, PR #31)
 
