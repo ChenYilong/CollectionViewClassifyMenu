@@ -1926,3 +1926,10 @@ tags: [issues, ui, cocoapods, progress]
     a libpag `eglMakeCurrent` main-thread freeze (THREAD_BLOCK_6S) after about 80 s of Loop on (PAG, not Rive); CYLTabBarController
     PR #824 (`feat/harmony-animated-item-engines`, another session) adds `cylanimateditem_rive` with the same goal: when it lands,
     `cylanimateditemrive` folds into it and every dependent re-pins once.
+
+- **TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): fix the open items, score to 100.**
+  - Prompt, verbatim: "fix to do and score to 100". English: fix the open items of this entry and bring the score to 100.
+  - Items: (1) menu.riv with Loop off stays at the hamburger (frames from 2 s; Android the same); (2) the one launch with six
+    still icons; (3) the libpag `eglMakeCurrent` freeze after about 80 s of Loop on; (4) Flutter and React Native on Android
+    run on a device; (5) PR #824 convergence (owner's call, recorded, not scored here).
+  - Note: host load average 638-897 at the start (other sessions' emulators and builds); device checks wait for it to drop.
