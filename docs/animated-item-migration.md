@@ -1191,3 +1191,38 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
   React Native HarmonyOS HAP does not build on this Windows worktree (RNOH's C++ paths pass 260 characters, as before this change;
   a `subst` drive confused hvigor); it needs macOS or a shorter path.
 - **Score 85 / 100**: PR #31's CI not passed yet (−10); the React Native HarmonyOS example not built here (−5).
+
+## Mini program: delete ClassifyMenu's own `cyl-tag-animation-view` (2026-11-23, branch `feat/animated-item-engines`, PR #31)
+
+- **TODO (blocked upstream) / user prompt (verbatim):** 「阅读以下 向 阅读该pr 贡献代码，https://github.com/ChenYilong/CYLTabBarController/pull/824 并让advisor阅读pr描述提及的文档，评估该进度，并分配任务给合适的session，让sonnet开始实施动效残余代码的迁移计划。 Mini program: the advisor worried that a default engine component would pull every engine into the 2 MB package limit. It won't, because the component already uses one generic slot per engine type, with a placeholder as the default. So no decision from you is needed there. What remains is deleting ClassifyMenu's own cyl-tag-animation-view in that other repository.」
+- **Assessment (PR #824, `feat/harmony-animated-item-engines`, task log at 80 / 100):** the PR's own "Missing" list names
+  "the mini program default engine component (3a, -10)". Checked in the local worktree (`785e2ccc`): `cyl-lottie`, `cyl-rive`,
+  `cyl-pag`, `cyl-svga` and `cyl-animated-item` exist, but no component that picks the engine from the path. iOS, Flutter and
+  React Native dependents carry no players (the PR's audit), so only the mini program is left here.
+- **Routing:** the upstream component goes to session `winsCYLTabBarController` (message sent 2026-11-23; criteria: engine
+  contract of `cyl-tag-animation-view`, one generic slot per engine type, PAG / SVGA stay in the async "engines" subpackage,
+  commit hash back). This session (Win, mini program) then does the steps below.
+- **Steps after it lands:** move the pin in `scripts/fetch-cyltabbar.js` and re-vendor; repoint the 7 page `.json` files and the
+  `generic:` lines in the 7 `.wxml` files (animations, configuration, product, reviews, search-category, styles); fix the
+  comments in `animations.js`, `configuration.js`, `utils/tag-animations.js`; delete
+  `components/cyl-tag-animation-view/`; `npm test`; WeChat DevTools check of the Animations page (Play all, loop, all four engines
+  inside their tags) with a screenshot in `docs/assets/`.
+- **Update (2026-11-23, user chose option 1: keep a slim wrapper for PAG and SVGA): mini program part DONE except the evidence below; not committed.**
+  - The premise changed: `cyl-animated-item` already passes `path`, `animation-data`, `colors`, `resting-frame` and the wasm
+    paths to each engine slot, and CYLTabBarController's own example binds the engines directly. So no new upstream component
+    was needed; the request sent to `winsCYLTabBarController` is withdrawn.
+  - `cyl-tag-list-miniprogram`: `animations.url()` now returns the registered `src` (with the "#" options) for Rive, PAG and
+    SVGA; new `animations.data()` (Lottie JSON for `animation-data`) and `animations.wasm()` (`configure({riveWasmPath,
+    pagWasmPath})`); `cyl-tag-list` and `cyl-tag-button` pass them to `cyl-animated-item`.
+  - Pages bind `generic:cyl-lottie-view="cyl-lottie"` and `generic:cyl-rive-view="cyl-rive"` directly. PAG and SVGA stay in the
+    async "engines" subpackage (the 2 MB limit); a page cannot bind an async subpackage component to an abstract node (the
+    placeholder answered: "no animation component"), so they go through the slim `components/cyl-async-engine-view` (picks
+    PAG or SVGA by extension, strips the "#" options that cyl-pag read as part of the file name, rests, plays after load).
+    `components/cyl-tag-animation-view` is deleted. TODO (CYLTabBarController): bind engines from an async subpackage, or ship a
+    component for it, then delete `cyl-async-engine-view`.
+  - Evidence: `npm test` 168 / 168; WeChat DevTools (2.02.2609250, Windows, 2026-11-23 22:24-22:26), Animations page: Lottie (three
+    sections), Rive, PAG (Home, Health, Posts, Me, Animation 1), SVGA (both sections), GIF and static images all draw, the console
+    has no `cyl-` warning or error after the "#" fix. Not done: Play all / loop check, a look at PAG "Animation 2" after the fix
+    (its error is gone from the console), and a labeled stitched screenshot in `docs/assets/` (`scripts/stitch-screenshots.py`).
+  - Committed to PR #31 on the user's choice (the first branch, `docs/todo-reconcile`, had no pull request and three were open, which AGENTS.md says to
+    ask about).

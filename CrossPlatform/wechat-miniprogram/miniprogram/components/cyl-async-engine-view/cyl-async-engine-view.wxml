@@ -1,0 +1,10 @@
+<!-- Fills the icon frame cyl-animated-item gives it; decorative (the tag carries the label). -->
+<view class="cyl-animation-box" aria-hidden="true">
+  <!-- cyl-pag and cyl-svga live in the "engines" subpackage, loaded asynchronously: a plain view stands in until they arrive. -->
+  <cyl-pag wx:if="{{engine === 'pag'}}" id="engine" class="cyl-engine" path="{{filePath}}" autoplay="{{false}}" loop="{{loop}}"
+           speed="{{speed > 0 ? speed : 1}}" resting-frame="{{restingFrame}}" wasm-path="{{wasmPath}}"
+           bind:ready="onEngineReady" bind:error="onEngineError" />
+  <cyl-svga wx:elif="{{engine === 'svga'}}" id="engine" class="cyl-engine" path="{{filePath}}" autoplay="{{false}}" loop="{{loop}}"
+            speed="{{speed > 0 ? speed : 1}}" resting-frame="{{restingFrame}}"
+            bind:ready="onEngineReady" bind:error="onEngineError" />
+</view>

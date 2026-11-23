@@ -20,11 +20,13 @@
  */
 const model = require('./model.js');
 
-const state = { registry: {}, assets: {} };
+const state = { registry: {}, assets: {}, riveWasmPath: '', pagWasmPath: '' };
 
 function configure(options = {}) {
   if (options.registry) state.registry = options.registry;
   if (options.assets) state.assets = options.assets;
+  if (typeof options.riveWasmPath === 'string') state.riveWasmPath = options.riveWasmPath;
+  if (typeof options.pagWasmPath === 'string') state.pagWasmPath = options.pagWasmPath;
   return module.exports;
 }
 
@@ -33,9 +35,31 @@ function resolve(animation) {
   return model.resolveAnimation(animation, state.registry, state.assets);
 }
 
-/** The `animation-url` of a tag's animation for cyl-animated-item, or '' (model.animationURL). */
+/**
+ * The `animation-url` of a tag's animation for cyl-animated-item, or '' (model.animationURL). The engine components
+ * are bound directly (generic:cyl-rive-view="cyl-rive"), so a Rive, PAG or SVGA file is its registered `src` (a
+ * loadable path, the tag's "#" options after it); a Lottie file keeps its registered key and comes as `data()`.
+ */
 function url(animation, options, restingProgress) {
-  return model.animationURL(animation, state.registry, state.assets, options, restingProgress);
+  const logical = model.animationURL(animation, state.registry, state.assets, options, restingProgress);
+  const resolved = logical ? resolve(animation) : null;
+  if (!resolved || resolved.engine === 'lottie' || resolved.engine === 'gif') return logical;
+  const src = resolved.entry && resolved.entry.src;
+  if (!src) return logical;
+  const hash = logical.indexOf('#');
+  return hash < 0 ? src : `${src}${logical.slice(hash)}`;
+}
+
+/** A registered Lottie file's JSON for cyl-animated-item's `animation-data` (each icon copies it), else null. */
+function data(animation) {
+  const resolved = resolve(animation);
+  return resolved && resolved.engine === 'lottie' && resolved.entry && typeof resolved.entry.data === 'function'
+    ? resolved.entry.data() : null;
+}
+
+/** The WebAssembly paths the Rive and PAG engines load (`configure({riveWasmPath, pagWasmPath})`). */
+function wasm() {
+  return { riveWasmPath: state.riveWasmPath, pagWasmPath: state.pagWasmPath };
 }
 
 /** A registered GIF's stills and the length of one pass: {gifFirstFrame, gifLastFrame, gifDuration}, '' / 0 when unknown. */
@@ -63,6 +87,8 @@ module.exports = {
   configure,
   resolve,
   url,
+  data,
+  wasm,
   gif,
   gifOptions,
   parameters: model.animationParameters,

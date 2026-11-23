@@ -7,7 +7,7 @@
       <cyl-animated-item id="cyl-tag-button-animation" class="cyl-animated-icon"
                          generic:cyl-lottie-view="cyl-lottie-view" generic:cyl-pag-view="cyl-pag-view"
                          generic:cyl-rive-view="cyl-rive-view" generic:cyl-svga-view="cyl-svga-view"
-                         animation-url="{{view.animationUrl}}" image="{{view.iconSrc}}" icon-size="{{view.iconSize}}"
+                         animation-url="{{view.animationUrl}}" animation-data="{{view.animationData}}" rive-wasm-path="{{riveWasmPath}}" pag-wasm-path="{{pagWasmPath}}" image="{{view.iconSrc}}" icon-size="{{view.iconSize}}"
                          speed="{{view.speed}}" loop="{{animationLoops}}" selected="{{selected}}" enabled="{{view.iconEnabled}}"
                          gif-first-frame="{{view.gifFirstFrame}}" gif-last-frame="{{view.gifLastFrame}}" gif-duration="{{view.gifDuration}}" autoplay="{{view.autoplay}}" embedded="{{embedded}}" />
     </view>

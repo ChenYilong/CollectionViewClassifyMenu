@@ -67,7 +67,9 @@ Component({
     render() {
       const url = animations.url(this.data.animationURL, this.data.animationOptions, this.data.animationRestingProgress);
       const props = { ...this.data, ...animations.gifOptions(this.data.animationURL, this.data) };
-      this.setData({ view: model.tagButtonView(props, url, pixelRatio()) });
+      const view = model.tagButtonView(props, url, pixelRatio());
+      view.animationData = view.animationUrl ? animations.data(this.data.animationURL) : null;
+      this.setData({ view, ...animations.wasm() });
     },
 
     /** Plays the animated icon from progress 0 (`CYLTagButton.playAnimation()`). */

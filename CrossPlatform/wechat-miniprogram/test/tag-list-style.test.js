@@ -123,7 +123,7 @@ test('animations resolve by file, with no engine check: the app\'s engine compon
   assert.equal(model.resolveAnimation('GIF/missing.gif', registry), null);
   assert.equal(model.resolveAnimation('asset:home', {}, { home: {} }).engine, 'lottie');
   assert.equal(model.resolveAnimation('asset:home.json#restingProgress=1', {}, { home: {} }).key, 'asset:home');
-  // The example's engines (components/cyl-tag-animation-view, <image> for GIF) and files.
+  // The example's engines (the engines bound by the pages, <image> for GIF) and files.
   assert.equal(animations.isAnimationEngineAvailable, true);
   assert.equal(animations.resolve('CYLMenuExample.bundle/Animations/Lottie/green_lottie_tab_home.json').engine, 'lottie');
   assert.equal(animations.resolve('../Animations/GIF/tab_star.gif').entry.last, '/data/animations/gif/tab_star.last.png');

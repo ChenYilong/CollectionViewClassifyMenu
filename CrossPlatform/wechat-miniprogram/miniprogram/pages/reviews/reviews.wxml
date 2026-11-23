@@ -16,7 +16,7 @@
   </view>
 
   <!-- The filter: multiple choice, folded to two rows, the footer chevron (the component's) alone below the tags. -->
-  <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view" id="review-filter" class="filter" configuration="{{configuration}}"
+  <cyl-tag-list generic:cyl-lottie-view="cyl-lottie" generic:cyl-rive-view="cyl-rive" generic:cyl-pag-view="cyl-async-engine-view" generic:cyl-svga-view="cyl-async-engine-view" id="review-filter" class="filter" configuration="{{configuration}}"
                 bindtagtap="onTagTap" bindselectionchange="onSelectionChange"
                 bindfoldchange="onFoldChange" />
 
