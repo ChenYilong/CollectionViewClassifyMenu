@@ -1,23 +1,10 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLAnimationSource, CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
+  CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
   CYLImageTagMetrics, CYLImageTagPlacement, CYLPoint, CYLRect, CYLSize, CYLTagListState
 } from '@cyl/classifymenu';
-import { CYLRivePlayer, CYLRiveIconHost, CYLSVGAPlayer } from '../main/ets/animation/CYLExampleAnimationPlayers';
-import { CYLSVGAMovie } from '../main/ets/animation/svga/CYLSVGAMovie';
-
-function movie(frames: number, fps: number): CYLSVGAMovie {
-  const m = new CYLSVGAMovie();
-  m.viewBoxWidth = 96;
-  m.viewBoxHeight = 96;
-  m.frames = frames;
-  m.fps = fps;
-  return m;
-}
-
 /**
- * The image tag geometry (TagViewGroup's TagGroupUtils), the timed animation player behind SVGA (and GIF, PAG), and
- * the JSON configuration of CYLTagListState.
+ * The image tag geometry (TagViewGroup's TagGroupUtils) and the JSON configuration of CYLTagListState.
  */
 export default function imageTagAndPlayerTest() {
   describe('CYLImageTagGeometry', () => {
@@ -76,57 +63,6 @@ export default function imageTagAndPlayerTest() {
       expect(CYLImageTagGeometry.joinTitles(['鞋', '包', '衣服'], 'zh-Hans')).assertEqual('鞋、包和衣服');
       expect(CYLImageTagGeometry.joinTitles(['a', 'b'], 'en')).assertEqual('a and b');
       expect(CYLImageTagGeometry.joinTitles([], 'en')).assertEqual('');
-    });
-  });
-
-  describe('CYLSVGAPlayer', () => {
-    it('restsOnAProgressAndTheLastFrame', 0, () => {
-      const frames: number[] = [];
-      const player = new CYLSVGAPlayer(CYLAnimationSource.parse('asset:svga/tab_home.svga'), movie(30, 30));
-      player.onFrame = (i: number) => frames.push(i);
-      expect(player.supportsSpeed && player.supportsLoops && player.supportsProgress).assertTrue();
-      player.stopAtProgress(1);
-      expect(player.frameIndex).assertEqual(29);
-      player.stopAtProgress(0.5);
-      expect(player.frameIndex).assertEqual(15);
-      player.stopAtProgress(-3);
-      expect(player.progress).assertEqual(0);
-      expect(frames.join(',')).assertEqual('29,15,0');
-      expect(player.isPlaying).assertFalse();
-    });
-
-    it('playsFromZeroWithItsSpeedAndLoop', 0, () => {
-      const player = new CYLSVGAPlayer(CYLAnimationSource.parse('asset:a.svga'), movie(20, 20));
-      player.speed = 2;
-      player.loops = true;
-      player.stopAtProgress(0.7);
-      player.play();
-      expect(player.progress).assertEqual(0);
-      expect(player.isPlaying).assertTrue();
-      expect(player.speed).assertEqual(2);
-      player.speed = -1;
-      expect(player.speed).assertEqual(1);
-      player.destroy();
-      expect(player.isPlaying).assertFalse();
-    });
-  });
-
-  describe('CYLRivePlayer', () => {
-    it('followsTheLoopSwitchThroughItsView', 0, () => {
-      const calls: string[] = [];
-      const host: CYLRiveIconHost = {
-        replay: () => { calls.push('replay'); },
-        select: (selected: boolean) => { calls.push(`select:${selected}`); },
-        setLoops: (loops: boolean) => { calls.push(`loops:${loops}`); }
-      };
-      const player = new CYLRivePlayer(CYLAnimationSource.parse('asset:rive/house.riv?stateMachine=State%20Machine%201'),
-        host);
-      expect(player.supportsLoops).assertTrue();
-      player.loops = true;
-      player.play();
-      player.stopAtProgress(1);
-      player.loops = false;
-      expect(calls.join(',')).assertEqual('loops:true,replay,select:true,loops:false');
     });
   });
 

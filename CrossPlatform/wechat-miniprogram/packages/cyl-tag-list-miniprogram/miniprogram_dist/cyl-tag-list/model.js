@@ -9,7 +9,7 @@
  */
 const symbols = require('./symbols.js');
 const locale = require('../locale.js');
-const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
+const { cylAnimatedItemType, cylAnimatedItemSource } = require('../cyl-animated-item/cyl_animated_item_model');
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
 const { cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule } = require('../cyl-animated-item/cyl_animated_item_model');
 
@@ -549,7 +549,8 @@ function animationEngine(animation) {
 
 /** "../Animations/Lottie/x.json", "CYLMenuExample.bundle/Animations/Lottie/x.json" → "Lottie/x.json". */
 function animationKey(animation) {
-  let path = String(animation || '').split('#')[0];
+  // The engine's parser (cylAnimatedItemSource, the shared fixture source-options.json): the file before the first "#" or "?".
+  let path = cylAnimatedItemSource(animation).file;
   ANIMATION_PREFIXES.forEach((prefix) => { path = path.replace(prefix, ''); });
   return path;
 }
@@ -592,7 +593,7 @@ function animationURL(animation, registry = {}, assets = {}, options = null, res
   let base = '';
   if (resolved && resolved.engine === 'gif') return resolved.entry.src || '';
   if (resolved) base = resolved.key.startsWith('asset:') ? `${resolved.key}.json` : resolved.key;
-  else if (isLoadablePath(animation) && animationEngine(animation)) base = String(animation).split('#')[0];
+  else if (isLoadablePath(animation) && animationEngine(animation)) base = cylAnimatedItemSource(animation).file;
   if (!base) return '';
   if (animationEngine(base) === 'gif') return base;
   const parameters = { ...(options || {}) };
@@ -604,13 +605,7 @@ function animationURL(animation, registry = {}, assets = {}, options = null, res
 
 /** The parameters after "#" of an `animationURL` ({stateMachine: 'State Machine', restingProgress: '1'}), for engines. */
 function animationParameters(url) {
-  const hash = String(url || '').indexOf('#');
-  if (hash < 0) return {};
-  return String(url).slice(hash + 1).split('&').filter(Boolean).reduce((parameters, pair) => {
-    const [name, value = ''] = pair.split('=');
-    parameters[decodeURIComponent(name)] = decodeURIComponent(value);
-    return parameters;
-  }, {});
+  return cylAnimatedItemSource(url).options;
 }
 
 // MARK: - One tag (CYLTagButton)
