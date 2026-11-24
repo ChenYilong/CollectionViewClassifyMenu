@@ -181,7 +181,7 @@ class CYLTagButtonStandaloneTest {
 
     @org.junit.After
     fun resetLiquidGlass() {
-        com.cyl.liquidglass.CYLLiquidGlass.activeOverride = null
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = null
     }
 
     @Test
@@ -205,17 +205,34 @@ class CYLTagButtonStandaloneTest {
     fun liquidGlassIsDrawnOnlyWhereTheDeviceDrawsIt() {
         val style = CYLMenuStyle()
         style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
-        com.cyl.liquidglass.CYLLiquidGlass.activeOverride = false
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = false
         assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style.resolvedBackgroundStyle)
         val flat = CYLTagButton(context, "Tag", icon())
         flat.style = style
-        assertEquals(android.view.View.GONE, flat.liquidGlassView.visibility)
+        flat.layout(0, 0, 300, 100)
+        assertEquals("flat: no glass layer", null, flat.liquidGlassView)
 
-        com.cyl.liquidglass.CYLLiquidGlass.activeOverride = true
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = true
         assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style.resolvedBackgroundStyle)
         val glass = CYLTagButton(context, "Tag", icon())
+        glass.layout(0, 0, 300, 100)
         glass.style = style
-        assertEquals(android.view.View.VISIBLE, glass.liquidGlassView.visibility)
+        assertTrue("CYLAnimatedItemView draws the glass layer", glass.liquidGlassView != null)
+    }
+
+    @Test
+    fun anUnsetRadiusIsACapsuleForGlassAndASetRadiusCustomizesIt() {
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = true
+        val style = CYLMenuStyle()
+        style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        val tag = CYLTagButton(context, "Tag", icon())
+        tag.style = style
+        assertEquals(null, tag.itemCornerRadius)
+        style.normalAppearance.cornerRadius = 0f
+        assertTrue(style.normalAppearance.isCornerRadiusSet)
+        tag.style = style
+        assertEquals(0f, tag.itemCornerRadius)
+        assertTrue(style.copy().normalAppearance.isCornerRadiusSet)
     }
 
     @Test

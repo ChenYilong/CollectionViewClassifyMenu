@@ -110,10 +110,10 @@ class CYLMenuStyle {
 
     /**
      * The background style a tag really draws: `backgroundStyle`, or flat when `CYLLiquidGlass.isActive()`
-     * (CYLTabBarController's base library `cylliquidglass`: Android 12 and later) is false.
+     * (`CYLAnimatedItemView.isLiquidGlassActive()`, the rule of CYLTabBarController: Android 12 and later) is false.
      */
     val resolvedBackgroundStyle: CYLTagBackgroundStyle
-        get() = if (backgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && com.cyl.liquidglass.CYLLiquidGlass.isActive())
+        get() = if (backgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && com.cyl.animateditem.CYLAnimatedItemView.isLiquidGlassActive())
             CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass else CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
 
     /**

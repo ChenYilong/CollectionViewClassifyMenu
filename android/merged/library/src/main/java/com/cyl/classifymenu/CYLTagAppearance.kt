@@ -34,7 +34,14 @@ class CYLTagAppearance : Cloneable {
     var iconColor: Int? = null
 
     var cornerRadius: Float = 3f
-        set(value) { field = sanitized(value) }
+        set(value) { field = sanitized(value); isCornerRadiusSet = true }
+
+    /**
+     * Whether [cornerRadius] was set (not the default of 3). A Liquid Glass tag whose radius was never set is a capsule, the default
+     * of `CYLAnimatedItemView`; a set value, 0 (square) included, is used as it is.
+     */
+    var isCornerRadiusSet: Boolean = false
+        private set
 
     var borderColor: Int? = null
 
@@ -61,6 +68,7 @@ class CYLTagAppearance : Cloneable {
         _font = null
         iconColor = null
         cornerRadius = 3f
+        isCornerRadiusSet = false
         borderColor = null
         borderWidth = 0f
         contentInsets = CYLEdgeInsets(5f, 10f, 5f, 10f)
@@ -83,6 +91,7 @@ class CYLTagAppearance : Cloneable {
         it._font = _font
         it.iconColor = iconColor
         it.cornerRadius = cornerRadius
+        it.isCornerRadiusSet = isCornerRadiusSet
         it.borderColor = borderColor
         it.borderWidth = borderWidth
         it.contentInsets = contentInsets

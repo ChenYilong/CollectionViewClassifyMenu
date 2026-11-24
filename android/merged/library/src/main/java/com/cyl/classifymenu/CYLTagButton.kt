@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.cyl.animateditem.CYLAnimatedItemAccessoryPlacement
 import com.cyl.animateditem.CYLAnimatedItemAxis
+import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
 import com.cyl.animateditem.CYLAnimatedItemStackView
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLTabBarItemAnimationViewMaking
@@ -28,7 +29,6 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import com.cyl.liquidglass.CYLLiquidGlassView
 
 /**
  * `CYLTagButton`: one tag, built on CYLTabBarController's shared animated icon + title component `CYLAnimatedItemView`
@@ -79,16 +79,11 @@ open class CYLTagButton @JvmOverloads constructor(
         scaleType = ImageView.ScaleType.FIT_XY
         visibility = GONE
     }
-    private val box = GradientDrawable()
-
     /**
-     * The Liquid Glass background behind the content (CYLTabBarController's base library `cylliquidglass`), shown while
-     * `style.resolvedBackgroundStyle` is Liquid Glass and the device draws it; gone (flat) otherwise.
+     * The Liquid Glass layer behind the content (CYLAnimatedItemView's `itemLiquidGlassView`) while `style.resolvedBackgroundStyle`
+     * is Liquid Glass and the device draws it; null while the tag is flat.
      */
-    private val glassView = CYLLiquidGlassView(context).apply { visibility = GONE }
-
-    /** The Liquid Glass layer behind the content: visible while the tag draws glass, gone while it is flat. */
-    val liquidGlassView: View get() = glassView
+    val liquidGlassView: View? get() = itemLiquidGlassView
     private val crossPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
@@ -106,7 +101,6 @@ open class CYLTagButton @JvmOverloads constructor(
 
     init {
         addView(backgroundImageView, 0)
-        addView(glassView, 1)
         titleView.includeFontPadding = false
         titleView.gravity = Gravity.CENTER_VERTICAL
         // The disabled look comes from the style's appearance, not from the base class's alpha.
@@ -114,7 +108,6 @@ open class CYLTagButton @JvmOverloads constructor(
         accessoryView = deleteIndicatorLabel
         badgeLabel.background = badgeBox
         addView(badgeLabel)
-        background = box
         clipToOutline = true
         setWillNotDraw(false)
         isClickable = true
@@ -408,13 +401,13 @@ open class CYLTagButton @JvmOverloads constructor(
         var backgroundColor = appearance.backgroundColor
         val highlighted = isHighlighted && state != CYLControlState.DISABLED && style.highlightedBackgroundColor != null
         if (highlighted) backgroundColor = style.highlightedBackgroundColor!!
-        // Liquid Glass: the state's background color tints the glass and the flat color is not drawn while the glass draws.
-        val glassWanted = style.resolvedBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
-        glassView.glassTintColor = backgroundColor
-        glassView.backdropSource = null
-        glassView.visibility = if (glassWanted) VISIBLE else GONE
-        glassView.applyEffect()
-        box.setColor(if (glassWanted && glassView.isGlassDrawn) android.graphics.Color.TRANSPARENT else backgroundColor)
+        // The background is CYLAnimatedItemView's: the flat color, or Liquid Glass tinted with it where the device draws it.
+        itemBackgroundStyle = if (style.backgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass) {
+            CYLAnimatedItemBackgroundStyle.LiquidGlass
+        } else {
+            CYLAnimatedItemBackgroundStyle.Flat
+        }
+        itemBackgroundColor = backgroundColor
         backgroundImageView.setImageDrawable(appearance.backgroundImage)
         backgroundImageView.visibility = if (appearance.backgroundImage == null || highlighted) GONE else VISIBLE
         // With the rename indicator, editingIndicatorsView draws both icons instead.
@@ -443,7 +436,9 @@ open class CYLTagButton @JvmOverloads constructor(
             borderColor = if (state == CYLControlState.SELECTED) appearance.borderColor ?: appearance.textColor else appearance.textColor
             borderWidth = max(1f, appearance.borderWidth)
         }
-        box.setStroke(if (borderWidth > 0) max(1, (borderWidth * density).roundToInt()) else 0, borderColor ?: 0)
+        // At least one pixel, as before; CYLAnimatedItemView draws the border.
+        itemBorderWidth = if (borderWidth > 0) max(1f / density, borderWidth) else 0f
+        itemBorderColor = borderColor
         val badge = badgeValue
         badgeLabel.visibility = if (badge == null) GONE else VISIBLE
         badgeLabel.text = if (badge.isNullOrEmpty()) null else badge
@@ -472,7 +467,6 @@ open class CYLTagButton @JvmOverloads constructor(
         val appearance = style.appearanceForState(state)
         val insets = appearance.contentInsets
         backgroundImageView.layout(0, 0, r - l, b - t)
-        glassView.layout(0, 0, r - l, b - t)
         var deleteWidth = 0f
         if (showsDeleteIndicator && showsRenameIndicator) {
             deleteWidth = layOutEditingIndicators(editingIconSide(state, style), insets, width, height)
@@ -593,10 +587,13 @@ open class CYLTagButton @JvmOverloads constructor(
                 }
             }
         }
-        val corner = appearance.cornerRadius
-        val radius = if (corner > 0) (if (corner <= CYLTagCornerRadiusSquare) 0f else min(corner, height / 2)) else height / 2
-        box.cornerRadius = radius * density
-        glassView.cornerRadius = radius * density
+        // CYLAnimatedItemView applies it, limited to half the height, with the background and the border: a Liquid Glass tag whose
+        // radius was never set gets null (its default, a capsule); otherwise the number, 0 is square.
+        itemCornerRadius = if (!appearance.isCornerRadiusSet && style.resolvedBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass) {
+            null
+        } else {
+            appearance.cornerRadius
+        }
     }
 
     /** `badgeFrame`: the badge's frame in this view, dp (`CYLRect()` while it is hidden). */
