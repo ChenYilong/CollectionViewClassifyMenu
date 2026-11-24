@@ -130,7 +130,7 @@ export class CYLTagButtonMetrics {
     const indicatorWidth = (state: number): number => editingIcons ?
       CYLTagButtonMetrics.editingIndicatorsWidth(state, style, fontScale) :
       CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale);
-    let width = 0;
+    let width = style.minimumTagSize.width;
     if (style.fillsTagHeight(iconSize)) {
       // The image is as wide as the tag is tall, from the leading edge; the title and the indicator follow it.
       const side = CYLTagButtonMetrics.heightForTitle(title, CYLSize.ZERO, style, fontScale);
@@ -193,7 +193,7 @@ export class CYLTagButtonMetrics {
     const iconHeight = CYLTagImagePlacementIsVertical(style.imagePlacement) ?
       Math.max(style.imageSize.height, style.animationSize.height) : 0;
     const stacked = iconHeight > 0 ? iconHeight + style.imageTitleSpacing : 0;
-    let height = style.itemHeight;
+    let height = Math.max(style.itemHeight, style.minimumTagSize.height);
     STATES.forEach((state: number) => {
       const insets = style.appearance(state).contentInsets;
       const font = style.titleFont(state, fontScale);
@@ -213,7 +213,7 @@ export class CYLTagButtonMetrics {
     }
     const hasTitle = style.displayedTitle(title).length > 0;
     const vertical = CYLTagImagePlacementIsVertical(style.imagePlacement);
-    let height = style.itemHeight;
+    let height = Math.max(style.itemHeight, style.minimumTagSize.height);
     STATES.forEach((state: number) => {
       const insets = style.appearance(state).contentInsets;
       const line = hasTitle ? Math.ceil(CYLTagButtonMetrics.lineHeight(style.titleFont(state, fontScale))) : 0;

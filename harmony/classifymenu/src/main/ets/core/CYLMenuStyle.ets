@@ -3,6 +3,7 @@
  * the touch ripple, titles, rows, icons, layout spacing, section headers, fold controls and the More button. Lengths
  * are vp, font sizes fp, colors '#AARRGGBB'. `copy()` is NSCopying.
  */
+import { CYLLiquidGlass } from 'cylliquidglass';
 import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
@@ -31,6 +32,16 @@ export function CYLTagImagePlacementIsVertical(placement: CYLTagImagePlacement):
 export enum CYLTagContentAlignment {
   center = 0,
   leading = 1
+}
+
+/**
+ * What a tag's background is made of: the solid color of each state's appearance (`flat`, the default), or a Liquid Glass
+ * background where the device draws one (`liquidGlass`, `CYLLiquidGlass.isActive()` of CYLTabBarController's base library
+ * `cylliquidglass`).
+ */
+export enum CYLTagBackgroundStyle {
+  flat = 0,
+  liquidGlass = 1
 }
 
 /**
@@ -142,6 +153,25 @@ export class CYLMenuStyle {
   deleteIndicatorImage?: CYLImage = undefined;
   layoutCentered: boolean = true;
   contentAlignment: CYLTagContentAlignment = CYLTagContentAlignment.center;
+  /**
+   * The tag background: `flat` (the default) is the solid color of each state's appearance; `liquidGlass` draws a glass
+   * background behind the content, tinted with the state's `backgroundColor` (a color string) and clipped to the corner
+   * radius. Where the device draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle()`).
+   */
+  backgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.flat;
+  /**
+   * The smallest size of a tag, vp: a tag narrower or shorter than it grows to it, its content staying where
+   * `contentAlignment` puts it. `CYLSize.ZERO` (the default) keeps the tag as large as its content and `itemHeight` make it.
+   */
+  minimumTagSize: CYLSize = CYLSize.ZERO;
+
+  /**
+   * The background style a tag really draws: `backgroundStyle`, or `flat` when `CYLLiquidGlass.isActive()` is false.
+   */
+  resolvedBackgroundStyle(): CYLTagBackgroundStyle {
+    return this.backgroundStyle === CYLTagBackgroundStyle.liquidGlass && CYLLiquidGlass.isActive() ?
+    CYLTagBackgroundStyle.liquidGlass : CYLTagBackgroundStyle.flat;
+  }
   animationSize: CYLSize = CYLSize.ZERO;
   animationSpeed: number = 1;
   adjustsFontForContentSizeCategory: boolean = true;
@@ -371,6 +401,8 @@ export class CYLMenuStyle {
     c.imagePlacement = this.imagePlacement;
     c.layoutCentered = this.layoutCentered;
     c.contentAlignment = this.contentAlignment;
+    c.backgroundStyle = this.backgroundStyle;
+    c.minimumTagSize = this.minimumTagSize;
     c.animationSize = this.animationSize;
     c.animationSpeed = this.animationSpeed;
     c.adjustsFontForContentSizeCategory = this.adjustsFontForContentSizeCategory;
