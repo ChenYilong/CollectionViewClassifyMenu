@@ -483,6 +483,8 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   | Android merged | `:example:assembleRelease`, lint included | BUILD SUCCESSFUL |
 ## TODO (2026-11-15): the WeChat Mini Program example
 
+- **Blocked on: owner (a real AppID for the phone preview; the project uses `touristappid`) and the Windows session, see the 2026-11-24 hand-over.** The example itself is done (the "1:1 port" entry below is DONE); the pixel comparison with iOS screenshots is the only Mac-side leftover and needs the Windows session's DevTools screenshots.
+
 - **Context:** the Mini Program is the next platform of this document (iOS, Android, React Native, Flutter, HarmonyOS,
   Mini Program). The repository had no Mini Program code; the documents mention it only as a platform of the rules
   (`example-demo-rules.md`: playback controls; `instructions.md`: screenshots labeled with the platform; the
@@ -604,6 +606,8 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
 
 ### TODO (2026-11-15): Mini Program bugs in the 动效 (Animations) tab
 
+- **Blocked on: owner (a real AppID and a phone signed in to WeChat for the phone check) and the Windows session (re-check of BUG 1 and BUG 2 in WeChat DevTools), see the 2026-11-24 hand-over** (`issue-progress.md`, "Windows test batch", item 5). Both bugs are fixed in DevTools (below); nothing is left for a Mac.
+
 - **Prompt (verbatim):**
 
   > 文档中记录bug 标记todo tabbar item中的Animations 每当播放动画时 尤其是打开loop开关，滚动上下之后，icon 会漂移，标记bug。同时rive动画图标无法显示
@@ -693,6 +697,8 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   <img src="assets/miniprogram-animations-pag-rive-loop.png" width="240" alt="Mini Program: Lottie, PAG and Rive icons looping, in their tags after scrolling">
 
 ### TODO (2026-11-15): the Mini Program tag list as an npm library (cyl- prefix)
+
+- **Blocked on: owner (`! npm login`, then `npm publish`; `npm whoami` still answers "not logged in"), see the 2026-11-24 hand-over.** Steps 1, 2 and 4 are done; not marked N/A.
 
 - **Prompt (verbatim):** "在跨端相关文档中标记TODO：小程序封装成库 cyl- 开头的小程序库，用 npm 打包加「构建 npm」实际验证过。提醒我的话先运行 ! npm login。"
   (EN: mark a TODO in the cross-platform documents: package the Mini Program as a library named with the cyl- prefix,

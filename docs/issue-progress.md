@@ -163,6 +163,8 @@ tags: [issues, ui, cocoapods, progress]
 
 ### TODO (2026-11-20, `docs/readme-swift-refresh`): README refresh, Swift only, every platform's setup
 
+- **Blocked on: Windows session** (compile the Kotlin, ArkTS, Dart and TSX snippets), see the 2026-11-24 hand-over. The other deduction, the stale counts of the README's "Test screenshots" paragraph, is a Mac item (2026-11-24 TODO below, step 4).
+
 - Context: README.md has outdated descriptions (the core was Objective-C until the migration finished on 2026-11-14,
   the README still shows Objective-C code and says "the core stays Objective-C"). Reference: the current API
   (`CollectionViewClassifyMenu/Class`, Swift) and docs/Swift-Migration.md.
@@ -1902,6 +1904,8 @@ tags: [issues, ui, cocoapods, progress]
 
 
 ### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS Rive tags ignore the Loop switch; one shared Rive engine
+
+- **Blocked on: Windows session** (HarmonyOS emulator, Flutter and React Native on an Android device, libpag freeze) **and the owner** (CYLTabBarController PR #824); menu.riv with Loop off waits for CYLTabBarController's input restart. See the 2026-11-24 hand-over.
 
 - **Requests (verbatim):**
   1. "NO，   NOT All suites are now green on feat/harmony: 鸿蒙os 在rive时候还是有问题， 出现了和之前小程序上一模一样的问题， 不响应loop事件。 pag是可以的，是不是之前只修复了小程序，没修复其他端的， 这次鸿蒙os测试出来了， 请排查Android， flutter React native，有没有这个问题， 先修复鸿蒙os上出现的该问题。"
