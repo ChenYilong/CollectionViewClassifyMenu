@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLLiquidGlass
 @testable import CYLMenuExample
 
 final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
@@ -74,8 +75,8 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         guard #available(iOS 26.0, *) else {
             throw XCTSkip("Liquid Glass needs iOS 26")
         }
-        CYLMenuStyle.liquidGlassAvailabilityOverride = true
-        defer { CYLMenuStyle.liquidGlassAvailabilityOverride = nil }
+        CYLLiquidGlass.activeOverride = true
+        defer { CYLLiquidGlass.activeOverride = nil }
         let size = CGSize(width: 393, height: 360)
         let canvas = UIView(frame: CGRect(origin: .zero, size: size))
         let gradient = CAGradientLayer()

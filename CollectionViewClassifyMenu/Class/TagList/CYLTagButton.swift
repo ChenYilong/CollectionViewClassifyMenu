@@ -23,6 +23,7 @@
 // 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded" (CI on b4d0e51).
 // Swift Package Manager (CYLTabBarController 4c7dc79d and later): the Swift CYLAnimatedItemView is in its own module,
 // CYLAnimatedItemViews, beside the engine's CYLAnimatedItem; CocoaPods builds both into the CYLAnimatedItem module.
+import CYLLiquidGlass
 #if canImport(CYLAnimatedItemViews)
 @_exported import CYLAnimatedItem
 @_exported import CYLAnimatedItemViews
@@ -275,8 +276,8 @@ open class CYLTagButton: CYLAnimatedItemView {
     private let backgroundImageView = UIImageView()
 
     /**
-     * The Liquid Glass material behind the content while `style.resolvedBackgroundStyle` is `.liquidGlass` (a
-     * `UIVisualEffectView` with a `UIGlassEffect`, iOS 26 and later); `nil` when the tag is flat.
+     * The Liquid Glass background behind the content while `style.resolvedBackgroundStyle` is `.liquidGlass` (a
+     * `CYLLiquidGlassView`); `nil` when the tag is flat.
      */
     public private(set) var liquidGlassView: UIView?
     /**
@@ -869,29 +870,25 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
     /**
-     * Shows or removes the Liquid Glass material for `style.resolvedBackgroundStyle`, tinted with `tint`; returns whether
-     * the tag is glass now (then the flat background color is not drawn). Where the system has no `UIGlassEffect` the
-     * tag stays flat, whatever the style says.
+     * Shows or removes the Liquid Glass background for `style.resolvedBackgroundStyle`, tinted with `tint`; returns
+     * whether the tag is glass now (then the flat background color is not drawn). Where the system has no Liquid Glass
+     * the tag stays flat, whatever the style says. The glass is CYLTabBarController's base library `CYLLiquidGlass`.
      */
     @discardableResult
     private func updateLiquidGlass(tint: UIColor?) -> Bool {
-        #if compiler(>=6.2)
-        if #available(iOS 26.0, *), styleStorage.resolvedBackgroundStyle == .liquidGlass {
-            let effectView = (liquidGlassView as? UIVisualEffectView) ?? UIVisualEffectView()
-            let effect = UIGlassEffect()
-            effect.tintColor = tint
-            effectView.effect = effect
-            effectView.isUserInteractionEnabled = false
-            effectView.clipsToBounds = true
-            effectView.layer.cornerRadius = layer.cornerRadius
-            effectView.frame = bounds
-            if effectView.superview == nil {
-                insertSubview(effectView, aboveSubview: backgroundImageView)
+        if styleStorage.resolvedBackgroundStyle == .liquidGlass {
+            let glass = (liquidGlassView as? CYLLiquidGlassView) ?? CYLLiquidGlassView()
+            glass.glassTintColor = tint
+            glass.cornerRadius = layer.cornerRadius
+            glass.frame = bounds
+            if glass.superview == nil {
+                insertSubview(glass, aboveSubview: backgroundImageView)
             }
-            liquidGlassView = effectView
-            return true
+            liquidGlassView = glass
+            if glass.isGlassDrawn {
+                return true
+            }
         }
-        #endif
         liquidGlassView?.removeFromSuperview()
         liquidGlassView = nil
         return false

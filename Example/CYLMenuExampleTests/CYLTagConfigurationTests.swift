@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLLiquidGlass
 @testable import CYLMenuExample
 
 final class CYLTagConfigurationTests: XCTestCase {
@@ -126,8 +127,8 @@ final class CYLTagConfigurationTests: XCTestCase {
     }
 
     func testLiquidGlassFallsBackToFlatWhereTheSystemDrawsNone() {
-        CYLMenuStyle.liquidGlassAvailabilityOverride = false
-        defer { CYLMenuStyle.liquidGlassAvailabilityOverride = nil }
+        CYLLiquidGlass.activeOverride = false
+        defer { CYLLiquidGlass.activeOverride = nil }
         let style = CYLMenuStyle()
         style.backgroundStyle = .liquidGlass
         style.normalAppearance.backgroundColor = .systemOrange
@@ -142,8 +143,8 @@ final class CYLTagConfigurationTests: XCTestCase {
         guard #available(iOS 26.0, *) else {
             throw XCTSkip("UIGlassEffect needs iOS 26")
         }
-        CYLMenuStyle.liquidGlassAvailabilityOverride = true
-        defer { CYLMenuStyle.liquidGlassAvailabilityOverride = nil }
+        CYLLiquidGlass.activeOverride = true
+        defer { CYLLiquidGlass.activeOverride = nil }
         let style = CYLMenuStyle()
         style.backgroundStyle = .liquidGlass
         style.normalAppearance.backgroundColor = .systemOrange

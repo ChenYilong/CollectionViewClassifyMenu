@@ -12,6 +12,7 @@
 //
 
 import UIKit
+import CYLLiquidGlass
 
 /**
  * Where a tag's icon goes relative to its title.
@@ -60,8 +61,8 @@ import UIKit
     case flat = 0
     /**
      * A Liquid Glass material behind the content, tinted with the state's `backgroundColor`, drawn only where the system
-     * draws Liquid Glass (`CYLMenuStyle.isLiquidGlassAvailable`: iOS 26 and later, as CYLTabBarController's
-     * `CYLUtils.isLiquidGlassActive()`); elsewhere the style is ignored and the tag stays flat.
+     * draws Liquid Glass (`CYLLiquidGlass.isActive()`: iOS 26 and later, the rule of CYLTabBarController's base library
+     * `CYLLiquidGlass`); elsewhere the style is ignored and the tag stays flat.
      */
     case liquidGlass
 }
@@ -346,35 +347,12 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var backgroundStyle: CYLTagBackgroundStyle = .flat
 
     /**
-     * The background style a tag really draws: `backgroundStyle`, or `.flat` when `isLiquidGlassAvailable` is false.
+     * The background style a tag really draws: `backgroundStyle`, or `.flat` where the system draws no Liquid Glass
+     * (`CYLLiquidGlass.isActive()`, the rule of CYLTabBarController's base library `CYLLiquidGlass`).
      */
     public var resolvedBackgroundStyle: CYLTagBackgroundStyle {
-        backgroundStyle == .liquidGlass && CYLMenuStyle.isLiquidGlassAvailable ? .liquidGlass : .flat
+        backgroundStyle == .liquidGlass && CYLLiquidGlass.isActive() ? .liquidGlass : .flat
     }
-
-    /**
-     * For tests: replaces the system check of `isLiquidGlassAvailable` (`nil`, the default, asks the system).
-     */
-    public nonisolated(unsafe) static var liquidGlassAvailabilityOverride: Bool?
-
-    /**
-     * Whether Liquid Glass is in use: iOS 27 and later always; iOS 26 unless the app sets `UIDesignRequiresCompatibility`
-     * in its Info.plist (the rule of CYLTabBarController's `CYLUtils.isLiquidGlassActive()`). Read once.
-     */
-    public static var isLiquidGlassAvailable: Bool {
-        liquidGlassAvailabilityOverride ?? systemDrawsLiquidGlass
-    }
-
-    private static let systemDrawsLiquidGlass: Bool = {
-        if #available(iOS 27.0, *) {
-            return true
-        }
-        if #available(iOS 26.0, *) {
-            let requiresCompatibility = Bundle.main.object(forInfoDictionaryKey: "UIDesignRequiresCompatibility") as? Bool
-            return !(requiresCompatibility ?? false)
-        }
-        return false
-    }()
 
     /**
      * The smallest size of a tag: a tag narrower or shorter than it grows to it, its content staying where
