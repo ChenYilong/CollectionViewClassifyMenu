@@ -136,7 +136,7 @@ public final class CYLTag {
     public var backgroundImage: UIImage?
 
     /**
-     * The corner radius (android-tagview's radius); 0 is a capsule, `nil` the style's.
+     * The corner radius (android-tagview's radius); 0 is square, a large value such as 1000 a capsule, `nil` the style's.
      */
     public var cornerRadius: CGFloat?
 

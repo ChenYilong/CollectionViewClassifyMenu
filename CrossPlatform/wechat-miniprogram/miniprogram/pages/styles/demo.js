@@ -48,7 +48,7 @@ const ACTION_TITLES = {
   'backgroundColor.selected': '设置背景色 backgroundColor（selected）',
   borderColor: '设置边框颜色 borderColor',
   borderWidth: '设置边框宽度 borderWidth',
-  cornerRadius: '设置圆角 cornerRadius（0 为胶囊）',
+  cornerRadius: '设置圆角 cornerRadius（0 为直角，1000 为胶囊）',
   margin: '设置内边距 margin',
   'animation.lottie': 'Lottie 动效图标',
   'animation.pag': 'PAG 动效图标',

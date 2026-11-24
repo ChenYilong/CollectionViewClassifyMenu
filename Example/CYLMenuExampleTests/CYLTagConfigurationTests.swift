@@ -87,7 +87,7 @@ final class CYLTagConfigurationTests: XCTestCase {
         XCTAssertFalse(view.allowsEmptySelection)
         XCTAssertEqual(view.foldStyle, .footerChevron)
         XCTAssertEqual(view.selectedIndexPaths, [ip(0, 0)])
-        XCTAssertEqual(view.style.normalAppearance.cornerRadius, 0, "A capsule")
+        XCTAssertEqual(view.style.normalAppearance.cornerRadius, 1000, "A capsule")
         for item in 0..<4 {
             let url = view.menuDataSource?.menuAnimationURLForItem?(at: ip(item, 0))
             XCTAssertNotNil(url, "item \(item)")

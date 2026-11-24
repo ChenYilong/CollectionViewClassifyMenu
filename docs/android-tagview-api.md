@@ -141,7 +141,7 @@ source: https://github.com/kaedea/android-tagview
 | `isDeletable` | `isDeletable`；数据源 `menuItemIsDeletable(at:)`；键 `CYLTagItemKey.deletable` |
 | `deleteIndicatorColor` | `deleteIndicatorColor`; `CYLMenuStyle.deleteIndicatorColor` |
 | `deleteIndicatorSize` | `deleteIndicatorSize`; `CYLMenuStyle.deleteIndicatorFont` |
-| `radius` | `cornerRadius`（0 为胶囊形） |
+| `radius` | `cornerRadius`（0 为直角，1000 为胶囊形） |
 | `deleteIcon` | `deleteIndicatorTitle`（默认“×”）；`CYLMenuStyle.deleteIndicatorTitle` |
 | `layoutBorderSize` | `borderWidth` |
 | `layoutBorderColor` | `borderColor` |
@@ -164,7 +164,7 @@ source: https://github.com/kaedea/android-tagview
 | `isDeletable` | `isDeletable`; data source `menuItemIsDeletable(at:)`; key `CYLTagItemKey.deletable` |
 | `deleteIndicatorColor` | `deleteIndicatorColor`; `CYLMenuStyle.deleteIndicatorColor` |
 | `deleteIndicatorSize` | `deleteIndicatorSize`; `CYLMenuStyle.deleteIndicatorFont` |
-| `radius` | `cornerRadius` (0 is a capsule) |
+| `radius` | `cornerRadius` (0 is square, 1000 a capsule) |
 | `deleteIcon` | `deleteIndicatorTitle` (default "×"); `CYLMenuStyle.deleteIndicatorTitle` |
 | `layoutBorderSize` | `borderWidth` |
 | `layoutBorderColor` | `borderColor` |

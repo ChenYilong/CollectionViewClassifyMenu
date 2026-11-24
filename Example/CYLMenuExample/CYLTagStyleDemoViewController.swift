@@ -81,7 +81,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         "backgroundColor.selected": "设置背景色 backgroundColor（selected）",
         "borderColor": "设置边框颜色 borderColor",
         "borderWidth": "设置边框宽度 borderWidth",
-        "cornerRadius": "设置圆角 cornerRadius（0 为胶囊）",
+        "cornerRadius": "设置圆角 cornerRadius（0 为直角，1000 为胶囊）",
         "margin": "设置内边距 margin",
         "animation.lottie": "Lottie 动效图标",
         "animation.pag": "PAG 动效图标",
@@ -185,7 +185,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
                 appearance.borderWidth = width
             }
         case "cornerRadius":
-            let radii: [CGFloat] = [0, 8, 3]
+            let radii: [CGFloat] = [1000, 8, 0]
             let radius = radii[step % 3]
             for appearance in appearances {
                 appearance.cornerRadius = radius

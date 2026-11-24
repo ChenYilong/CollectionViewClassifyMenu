@@ -27,11 +27,11 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         XCTAssertNotNil(firstTag()?.imageView.image)
         XCTAssertGreaterThan(firstTag()?.title?.count ?? 0, 0)
 
-        // A tap on the cornerRadius row: 0 makes capsules.
+        // A tap on the cornerRadius row: 1000 makes capsules (0 is square).
         let cornerSection = actions.firstIndex { $0.contains("cornerRadius") } ?? 0
         let cornerRow = IndexPath(row: actions[cornerSection].firstIndex(of: "cornerRadius") ?? 0, section: cornerSection)
         demo.tableView.delegate?.tableView?(demo.tableView, didSelectRowAt: cornerRow)
-        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 0)
+        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 1000)
         XCTAssertEqual(firstTag()?.layer.cornerRadius ?? -1, (firstTag()?.bounds.height ?? 0) / 2, accuracy: 0.5)
 
         demo.performAction("iconColor.normal")
