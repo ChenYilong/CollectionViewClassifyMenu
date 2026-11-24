@@ -51,6 +51,22 @@ import UIKit
 }
 
 /**
+ * What a tag's background is made of.
+ */
+@objc public enum CYLTagBackgroundStyle: Int {
+    /**
+     * The solid color of each state's appearance (the default).
+     */
+    case flat = 0
+    /**
+     * A Liquid Glass material behind the content, tinted with the state's `backgroundColor`, drawn only where the system
+     * draws Liquid Glass (`CYLMenuStyle.isLiquidGlassAvailable`: iOS 26 and later, as CYLTabBarController's
+     * `CYLUtils.isLiquidGlassActive()`); elsewhere the style is ignored and the tag stays flat.
+     */
+    case liquidGlass
+}
+
+/**
  * How the tags of a row line up (AndroidTagView's container_gravity).
  */
 @objc public enum CYLTagRowAlignment: Int {
@@ -321,6 +337,50 @@ open class CYLMenuStyle: NSObject, NSCopying {
      * ellipsis, so its icon stays visible.
      */
     open var contentAlignment: CYLTagContentAlignment = .center
+
+    /**
+     * The tag background: `.flat` (the default) is the solid color of each state's appearance; `.liquidGlass` draws a
+     * Liquid Glass material behind the content, tinted with the state's `backgroundColor` and clipped to the corner
+     * radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     */
+    open var backgroundStyle: CYLTagBackgroundStyle = .flat
+
+    /**
+     * The background style a tag really draws: `backgroundStyle`, or `.flat` when `isLiquidGlassAvailable` is false.
+     */
+    public var resolvedBackgroundStyle: CYLTagBackgroundStyle {
+        backgroundStyle == .liquidGlass && CYLMenuStyle.isLiquidGlassAvailable ? .liquidGlass : .flat
+    }
+
+    /**
+     * For tests: replaces the system check of `isLiquidGlassAvailable` (`nil`, the default, asks the system).
+     */
+    public nonisolated(unsafe) static var liquidGlassAvailabilityOverride: Bool?
+
+    /**
+     * Whether Liquid Glass is in use: iOS 27 and later always; iOS 26 unless the app sets `UIDesignRequiresCompatibility`
+     * in its Info.plist (the rule of CYLTabBarController's `CYLUtils.isLiquidGlassActive()`). Read once.
+     */
+    public static var isLiquidGlassAvailable: Bool {
+        liquidGlassAvailabilityOverride ?? systemDrawsLiquidGlass
+    }
+
+    private static let systemDrawsLiquidGlass: Bool = {
+        if #available(iOS 27.0, *) {
+            return true
+        }
+        if #available(iOS 26.0, *) {
+            let requiresCompatibility = Bundle.main.object(forInfoDictionaryKey: "UIDesignRequiresCompatibility") as? Bool
+            return !(requiresCompatibility ?? false)
+        }
+        return false
+    }()
+
+    /**
+     * The smallest size of a tag: a tag narrower or shorter than it grows to it, its content staying where
+     * `contentAlignment` puts it. `.zero` (the default) keeps the tag as large as its content and `itemHeight` make it.
+     */
+    open var minimumTagSize: CGSize = .zero
 
     /**
      * Size of animated icons (`menuAnimationURLForItem(at:)`). `.zero` (the default) uses `imageSize`.
@@ -827,6 +887,8 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.collapseTitle = collapseTitle
         copy.numberOfItemsPerRow = numberOfItemsPerRow
         copy.contentAlignment = contentAlignment
+        copy.backgroundStyle = backgroundStyle
+        copy.minimumTagSize = minimumTagSize
         copy.moreButtonImage = moreButtonImage
         copy.moreButtonColor = moreButtonColor
         copy.highlightedBackgroundColor = highlightedBackgroundColor
