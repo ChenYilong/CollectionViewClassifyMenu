@@ -59,6 +59,18 @@ tags: [issues, ui, cocoapods, progress]
   device, the mini program bugs), no CI wait; (3) menu.riv's input restart to the CYLTabBarController session; (4) Sonnet:
   Mac static work (stale TODO headings in docs, the iOS side of the tab bar height item) and one iOS screenshot batch on the
   ClassifyMenu simulator; never `harmony/` (Windows owns it).
+- **Windows test batch (hand-over, 2026-11-24, one batch, no CI wait):** no `Win*` session is reachable from the Mac
+  (`ListAgents` lists local sessions only), so the batch is here for the Windows session's next pull. Pull `feat/harmony`,
+  then on the Windows machine:
+  1. HarmonyOS: `ohpm install --all`, `hvigorw assembleHap`, host tests for `86d085c7` and `4b491046` (never compiled).
+  2. HarmonyOS arm64 emulator: Play all twice, speed slider, Loop on / off, select a tag, on Rive and on Lottie / PAG / GIF /
+     SVGA tags; the UI suite (14 tests); the two defect rows of `harmony-verification.md`.
+  3. HarmonyOS: the launch with six still icons (repeat 5 fresh launches), the libpag `eglMakeCurrent` freeze after about
+     80 s of Loop on (PAG tags).
+  4. Flutter and React Native examples on the Android emulator: Rive Loop on / off, Play all.
+  5. Mini program: re-check BUG 1 (icons drift after scrolling while playing) and BUG 2 (Rive icons) of
+     `cross-platform.md`; mark them DONE or keep them TODO with the evidence.
+  Report back with the results and screenshots in `screenshots.md`, scored in this entry.
 - **Status:** TODO.
 
 ### DONE (2026-11-22, `feat/harmony`, 90/100, not compiled): no wrapper over CYLAnimatedItemView's playback API (advisor decides, Sonnet implements)
