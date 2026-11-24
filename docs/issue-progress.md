@@ -35,6 +35,32 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-24, `feat/harmony`, Mac session chenyilong-68): advisor scores the all-platform API implementation, Sonnet implements, other sessions test
+
+- **Prompt (verbatim):** "continue TODO (missing points): advisor opus advisor点评目前全平台接口实现得分 以及下一步计划与建议。并立即让默认模型sonnet按照建议去实现。将得分优化到100转发合适任务给其他session 直接使用本机环境进行测试，iOS在macos机器，其余在windows机器。转发任务给相应session无需等待ci结果。"
+- **Prompt (English):** continue the TODO (missing points): the Opus advisor reviews the current score of the API
+  implementation on every platform and gives the next plan and advice; Sonnet implements the advice right away; bring the
+  score to 100; forward the right tasks to the other sessions, which test on their own machines (iOS on the macOS machine,
+  the rest on the Windows machine); do not wait for CI before forwarding.
+- **Scoreboard (advisor, 2026-11-24, from the docs at `7ce5ef7e`):**
+
+  | Platform | API parity | Below 100 because | Owner |
+  | --- | --- | --- | --- |
+  | iOS | Swift migration 100 | the labeled simulator screenshots of the current pins are not in `screenshots.md` | Mac |
+  | Android | 895 / 895 (iOS → Android), 736 / 736 (Android → iOS) | menu.riv with Loop off (Rive Loop entry, 87) | CYLTabBarController |
+  | HarmonyOS | 807 / 807 | verification 96.2 counts 38 deferred rows as N/A and has 2 defect rows; `86d085c7` and `4b491046` never compiled (90); Rive Loop 87 (menu.riv, one stalled launch, libpag `eglMakeCurrent` freeze) | Windows |
+  | Mini program | 1:1 port | npm publish needs `! npm login` (owner); Animations BUG 1 / 2 headings (2026-11-15) to re-check; CYLAnimatedItem migration 90 | owner, Windows |
+  | Flutter, React Native | shared pins | not run on an Android device; default tab bar height TODO (`cross-platform.md`) | Windows |
+
+  The HarmonyOS parity score is not its verified score: report both. Items blocked on the owner (npm login, PR #824,
+  issues #11, #9, #2) cap the score and are not marked N/A.
+- **Plan:** (1) this TODO, pushed; (2) one batch message to the Windows session (HarmonyOS build + emulator for `86d085c7` /
+  `4b491046`, the two verification defect rows, the stalled launch, the libpag freeze, Flutter / React Native on an Android
+  device, the mini program bugs), no CI wait; (3) menu.riv's input restart to the CYLTabBarController session; (4) Sonnet:
+  Mac static work (stale TODO headings in docs, the iOS side of the tab bar height item) and one iOS screenshot batch on the
+  ClassifyMenu simulator; never `harmony/` (Windows owns it).
+- **Status:** TODO.
+
 ### DONE (2026-11-22, `feat/harmony`, 90/100, not compiled): no wrapper over CYLAnimatedItemView's playback API (advisor decides, Sonnet implements)
 
 - **Prompt (verbatim)**: "上游 CYLTabBarController 的 CYLAnimationView 已有同名的 animationSpeed、animationLoops、animationRestartToken 和 restart()。在本仓库新建包装，请不要重复实现 直接调用上游接口即可。并请advisor评估 直接调用上游还是新建包装，哪一个方案更有利于本项目，sonnet实现。"
