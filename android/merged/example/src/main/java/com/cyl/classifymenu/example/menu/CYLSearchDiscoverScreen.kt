@@ -185,7 +185,7 @@ class CYLSearchDiscoverScreen(private val context: Context, private val navigato
                     backgroundColor = Color.WHITE
                     borderColor = separator
                     borderWidth = 1f
-                    cornerRadius = 0f
+                    cornerRadius = 1000f // a capsule
                     margin = 14f
                     font = CYLFont.systemFont(17f)
                     textColor = Color.BLACK

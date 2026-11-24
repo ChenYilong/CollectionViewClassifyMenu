@@ -147,7 +147,7 @@ class CYLTagCloudScreen(private val context: Context) : CYLMenuScreen {
 
         fun mapConfiguration(): Map<String, Any?> {
             val blue = mapOf(CYLMenuStyleNormal to mapOf(CYLTagAppearanceBackgroundColor to "#00BFFF", CYLTagAppearanceTextColor to "#FFFFFF",
-                CYLTagAppearanceBorderWidth to 0, CYLTagAppearanceCornerRadius to 0), CYLMenuStyleHighlightedBackgroundColor to "#88363636")
+                CYLTagAppearanceBorderWidth to 0, CYLTagAppearanceCornerRadius to 1000), CYLMenuStyleHighlightedBackgroundColor to "#88363636")
             return mapOf(
                 CYLTagListViewStyle to mapOf(CYLMenuStyleLineSpacing to 5, CYLMenuStyleInteritemSpacing to 3, CYLMenuStyleTagContentInsets to "{3, 10, 3, 10}"),
                 CYLTagListViewScrollEnabled to false,

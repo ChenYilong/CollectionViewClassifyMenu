@@ -134,7 +134,7 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
                     item(context, title, image = "${name}_normal").apply { put(CYLTagItemSelectedImage, "${name}_highlight") }
                 }),
             )
-            val appearance = mapOf(CYLTagAppearanceCornerRadius to 0, CYLTagAppearanceMargin to 12, CYLTagAppearanceBorderColor to "#D1D1D6", CYLTagAppearanceBorderWidth to 1)
+            val appearance = mapOf(CYLTagAppearanceCornerRadius to 1000, CYLTagAppearanceMargin to 12, CYLTagAppearanceBorderColor to "#D1D1D6", CYLTagAppearanceBorderWidth to 1)
             val style = mapOf(
                 CYLMenuStyleImageSize to "{28, 28}", CYLMenuStyleImageTitleSpacing to 6, CYLMenuStyleItemHeight to 44, CYLMenuStyleLayoutCentered to true,
                 CYLMenuStyleSectionInsets to listOf(6, 16, 14, 16),

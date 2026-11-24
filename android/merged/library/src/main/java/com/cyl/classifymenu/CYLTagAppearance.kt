@@ -3,9 +3,6 @@ package com.cyl.classifymenu
 import android.graphics.drawable.Drawable
 import kotlin.math.max
 
-/** `CYLTagCornerRadiusSquare`: a corner radius that draws square corners (0 means "the list's value"). */
-const val CYLTagCornerRadiusSquare: Float = 0.001f
-
 /**
  * `CYLTagAppearance`: the box and text of a tag in one state (normal, selected, disabled). Negative or non-finite
  * lengths become 0, as on iOS.
@@ -33,6 +30,10 @@ class CYLTagAppearance : Cloneable {
 
     var iconColor: Int? = null
 
+    /**
+     * The corner radius in dp, a plain number: limited to half the tag height, 0 draws square corners, half the height or
+     * more (for example 1000) a capsule.
+     */
     var cornerRadius: Float = 3f
         set(value) { field = sanitized(value) }
 
