@@ -8,7 +8,7 @@ depended on with `file:`, at a pinned commit.
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`dea0951e5b26ee09e6d39a67318921fd18d44fe4`](https://github.com/ChenYilong/CYLTabBarController/tree/dea0951e5b26ee09e6d39a67318921fd18d44fe4/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-24; was `43ad5f6a`, `3074c51d`, `c4a1f8fd`, then `618ac11a`, then `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`) |
+| Commit | [`3f2a5b99d1e560a744452a6d489bc6b662f626d9`](https://github.com/ChenYilong/CYLTabBarController/tree/3f2a5b99d1e560a744452a6d489bc6b662f626d9/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-24; was `dea0951e` on the PR #36 line and `b3c87fd1` on the engine line, then `618ac11a`, `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`, `c4a1f8fd`, `7755741d`, `43c9eaa2`, `db883bfa`) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
 | Changes | None. Only this file (`VENDORED.md`) was added; `README.md` is upstream's own (since `62715829`). |
@@ -19,10 +19,10 @@ depended on with `file:`, at a pinned commit.
   project does), and `harmony/classifymenu/oh-package.json5` depends on it with `"cylanimateditem":
   "file:../cylanimateditem"`.
 - It depends on no animation library. `@cyl/classifymenu` draws a tag's animated icon with `CYLAnimatedItemView`
-  (`CYLTagAnimatedIcon` in `classifymenu/src/main/ets/components/CYLTagAnimation.ets`); the app registers the types it
-  plays (`CYLAnimatedItemEngines.register('Lottie')` and its siblings) and the views that play them
-  (`CYLTagAnimationBuilder.register(wrapBuilder(...))`). The example does both in
-  `entry/src/main/ets/animation/CYLExampleAnimationViews.ets`.
+  (`CYLTagAnimatedIcon` in `classifymenu/src/main/ets/components/CYLTagAnimation.ets`); the app registers the engines it
+  plays (`CYLAnimatedItemLottie.register()` and its siblings, one call each). A registered engine brings its own view, so
+  the host registers no `CYLTagAnimationBuilder`; that builder is only for a custom type no engine plays. The example
+  registers the engines in `entry/src/main/ets/animation/CYLExampleAnimationViews.ets`.
 - `src/main/ets/CYLAnimatedItemView.ets` imports `BuildProfile` from the module root: hvigor generates that file when
   it builds the module.
 

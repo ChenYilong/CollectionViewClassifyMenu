@@ -11,8 +11,10 @@
  * builder gets a `CYLTagAnimationContext` and calls `ready(player)` once its view plays (or `onFailed()`), so that the
  * tag can drive the player (play, speed, loop, resting progress, the last frame while selected).
  */
-import { CYLAnimatedItemAnimationContext, CYLAnimatedItemView } from 'cylanimateditem';
-import { CYLAnimationPlayer, CYLAnimationSource } from './CYLAnimationPlayer';
+import {
+  CYLAnimatedItemAnimationContext, CYLAnimatedItemEngineViews, CYLAnimatedItemPlayer, CYLAnimatedItemSource, CYLAnimatedItemView
+} from 'cylanimateditem';
+import { CYLAnimatedItemPlayerAdapter, CYLAnimationPlayer, CYLAnimationSource } from './CYLAnimationPlayer';
 import { CYLImage, CYLImageIsSymbol } from '../core/CYLTypes';
 
 /**
@@ -206,8 +208,34 @@ export struct CYLTagAnimatedIcon {
     .accessibilityLevel('no')
   }
 
+  /**
+   * Whether CYLTabBarController's component plays this icon itself: an engine registered a view for its type
+   * (`CYLAnimatedItemGIF.register()`, `CYLAnimatedItemLottie.register()`, `CYLAnimatedItemPAG.register()`, ...). The tag
+   * still drives the player (`drivesAnimationPlayback` false); other types keep the app's builder
+   * (`CYLTagAnimationBuilder`).
+   */
+  usesEngineView(): boolean {
+    return CYLAnimatedItemEngineViews.hasView(CYLAnimatedItemSource.parse(this.animationURL).type);
+  }
+
   build() {
     Stack() {
+      if (this.usesEngineView()) {
+        CYLAnimatedItemView({
+          animationUrl: this.animationURL,
+          image: this.image,
+          selectedImage: this.selectedImage,
+          isItemSelected: this.isSelected,
+          iconColor: this.iconColor,
+          iconSize: this.side(),
+          spacing: 0,
+          drivesAnimationPlayback: false,
+          onAnimationPlayer: (player: CYLAnimatedItemPlayer | undefined) => {
+            this.onPlayer?.(player === undefined ? undefined : new CYLAnimatedItemPlayerAdapter(player));
+          },
+          onItemTap: () => this.onTap?.()
+        })
+      } else {
       CYLAnimatedItemView({
         animationUrl: this.animationURL,
         image: this.image,
@@ -221,6 +249,7 @@ export struct CYLTagAnimatedIcon {
         },
         onItemTap: () => this.onTap?.()
       })
+      }
     }
     .width(this.outerWidth())
     .height(this.outerHeight())

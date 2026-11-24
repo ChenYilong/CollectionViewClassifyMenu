@@ -141,7 +141,7 @@ feature in `harmony/entry/src/test` pass in `harmony/scripts/unit-test.sh` (no d
 | H5 | Image tags: directions, geometry, partial lines, separation, title lists | DONE | `ImageTagAndPlayer.test.ets` (6; found and fixed: `partialLine` added a zero-length point when the progress ended on a corner) |
 | H6 | Classify menu and multiple filter | DONE | `ClassifyAndFilter.test.ets` (6: folding to the default rows, layout inside the width, exclusive "全部", fallback, confirm / restore, conflicting selections rejected) |
 | H7 | Animation players (timed player: progress, last frame, speed, loop, play from 0) | DONE | `ImageTagAndPlayer.test.ets` (`CYLSVGAPlayer`, the timed player shared with GIF and PAG) |
-| H8 | SVGA decoder and localization | DONE | `SVGADecoder.test.ets` (5), `Localization.test.ets` (4), `scripts/svga-decoder-test.sh` |
+| H8 | SVGA decoder and localization | DONE | `SVGADecoder.test.ets` (5), `Localization.test.ets` (4), `scripts/svga-decoder-test.sh`; on 2026-11-22 the decoder and its tests moved to CYLTabBarController (`cylanimateditem/test/CYLAnimatedItemSVGADecoder.test.mjs`, see docs/animated-item-migration.md) |
 
 ## Score history
 

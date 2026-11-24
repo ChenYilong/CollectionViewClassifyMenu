@@ -113,6 +113,10 @@ open class CYLTagButton @JvmOverloads constructor(
         isClickable = true
         isFocusable = true
         ready = true
+        // The tag plays through the engine's player itself (Play all, resting progress, speed, loops), never on selection:
+        // the engine's "host drives" mode, as HarmonyOS's tag passes `drivesAnimationPlayback: false`. iOS defaults to
+        // the opposite value, so it is set here and not left to the view's default.
+        drivesAnimationPlayback = false
         iconSizeDp = animationSize().toAnimatedItemSize()
         applyStyleAnimationSpeed()
         afterAnimationReload()
@@ -354,7 +358,6 @@ open class CYLTagButton @JvmOverloads constructor(
     /** After the base class built the animation view again: Lottie images, the state's frame, the look. */
     private fun afterAnimationReload() {
         if (!ready) return
-        animationView?.let { CYLTagLottieImages.prepare(context, it) }
         updateAnimationState()
         updateAppearance()
     }
@@ -869,46 +872,6 @@ open class CYLTagButton @JvmOverloads constructor(
 val CYLTagBadgeDefaultColor: Int = Color.rgb(255, 59, 48)
 
 
-/**
- * Gives the Lottie views in an animation view an image delegate: the images of a Lottie file (its "assets" with a "p"
- * file name) load from the app's drawable of the same name, as Lottie on iOS loads them by name from the app's assets.
- * Without one, lottie-android throws when it draws an image layer ("You must set an images folder"). By reflection,
- * because the core does not depend on lottie-android (only an app that plays Lottie files adds it).
- */
-internal object CYLTagLottieImages {
-    fun prepare(context: Context, view: View) {
-        val lottieView = findView(view, "com.airbnb.lottie.LottieAnimationView") ?: return
-        try {
-            val delegateType = Class.forName("com.airbnb.lottie.ImageAssetDelegate")
-            val delegate = java.lang.reflect.Proxy.newProxyInstance(delegateType.classLoader, arrayOf(delegateType)) { _, method, arguments ->
-                if (method.name != "fetchBitmap") return@newProxyInstance null
-                val asset = arguments?.firstOrNull() ?: return@newProxyInstance null
-                val fileName = asset.javaClass.getMethod("getFileName").invoke(asset) as? String ?: return@newProxyInstance null
-                lottieBitmap(context, fileName)
-            }
-            lottieView.javaClass.getMethod("setImageAssetDelegate", delegateType).invoke(lottieView, delegate)
-        } catch (error: Throwable) {
-            // An older lottie-android without the delegate: the engine's failure listener shows the static image.
-        }
-    }
-
-    private fun lottieBitmap(context: Context, fileName: String): android.graphics.Bitmap? {
-        val name = fileName.substringAfterLast('/').substringBeforeLast('.').replace('-', '_').lowercase()
-        val id = context.resources.getIdentifier(name, "drawable", context.packageName)
-        if (id == 0) return null
-        return android.graphics.BitmapFactory.decodeResource(context.resources, id)
-    }
-
-    private fun findView(view: View, className: String): View? {
-        var type: Class<*>? = view.javaClass
-        while (type != null) {
-            if (type.name == className) return view
-            type = type.superclass
-        }
-        if (view is android.view.ViewGroup) for (index in 0 until view.childCount) findView(view.getChildAt(index), className)?.let { return it }
-        return null
-    }
-}
 
 /**
  * The system accessibility settings the core follows: Reduce Motion (Remove animations) and Increase Contrast (High

@@ -112,6 +112,16 @@ test('icons: the selected image while selected, SF Symbols tinted as SVG, emoji 
   assert.equal(symbols.base64('ab'), Buffer.from('ab').toString('base64'));
 });
 
+test('the tag list reads "file#options" and "file?options" through the engine\'s source parser (cylAnimatedItemSource)', () => {
+  assert.equal(model.animationKey('Animations/Rive/house.riv?artboard=A&input=active'), 'Rive/house.riv');
+  assert.equal(model.animationKey('Animations/Rive/house.riv#artboard=A'), 'Rive/house.riv');
+  assert.deepEqual(model.animationParameters('Rive/house.riv?stateMachine=State%20Machine&restingProgress=1'),
+    { stateMachine: 'State Machine', restingProgress: '1' });
+  assert.deepEqual(model.animationParameters('Rive/house.riv#a=1?b=2'), { a: '1', b: '2' }, 'the first "#" or "?" starts the options; "&" and "?" separate pairs');
+  assert.equal(model.animationURL('https://example.com/a.json?token=1', {}, {}), 'https://example.com/a.json',
+    'an absolute URL loses its query: the engine reads it as options, as on every platform');
+});
+
 test('animations resolve by file, with no engine check: the app\'s engine component reports what it cannot play', () => {
   assert.equal(model.animationEngine('pag-ios/0.pag'), 'pag');
   assert.equal(model.animationEngine('x/house.riv#artboard=A'), 'rive');

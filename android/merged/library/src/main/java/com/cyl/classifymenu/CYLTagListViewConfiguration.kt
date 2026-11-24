@@ -1,5 +1,6 @@
 package com.cyl.classifymenu
 
+import com.cyl.animateditem.CYLAnimatedItemSource
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
@@ -485,10 +486,15 @@ private fun fileURL(context: Context?, value: Any?, baseURL: Uri?): Uri? {
     if (value is Uri) return value
     val string = value as? String ?: return null
     if (string.isEmpty()) return null
-    val hash = string.indexOf('#')
-    if (hash > 0 && (Uri.parse(string).scheme?.length ?: 0) <= 1) {
-        val file = fileURL(context, string.substring(0, hash), baseURL) ?: return null
-        return file.buildUpon().encodedFragment(string.substring(hash + 1)).build()
+    // "file.riv#artboard=HOME" or "file.riv?artboard=HOME": the engine's shared source rules (CYLAnimatedItemSource, the
+    // same as iOS, HarmonyOS and the mini program) split the file from its options; resolve the file, then keep the
+    // options in its fragment, as CYLTabBarController writes them.
+    if (string.any { it == '#' || it == '?' } && (Uri.parse(string).scheme?.length ?: 0) <= 1) {
+        val source = CYLAnimatedItemSource.parse(string)
+        if (source.file.isNotEmpty()) {
+            val file = fileURL(context, source.file, baseURL) ?: return null
+            return CYLMenuAnimationURLWithOptions(file, source.options)
+        }
     }
     // An absolute file path first: `File.isAbsolute`, not a leading "/", so a drive path ("C:\...", the unit tests on
     // Windows) is a file too and not an asset name or a one-letter URI scheme (CYLTabBarController B1).

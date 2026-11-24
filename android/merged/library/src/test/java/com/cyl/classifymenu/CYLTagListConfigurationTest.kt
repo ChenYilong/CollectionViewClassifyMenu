@@ -47,6 +47,23 @@ class CYLTagListConfigurationTest {
         assertEquals(9f, style.selectedAppearance.cornerRadius)
     }
 
+    /** `#` and `?` forms of an animation source go through the engine's shared rules (CYLAnimatedItemSource), as on iOS. */
+    @Test
+    fun animationSourceTextSplitsOptionsAsTheEngineDoes() {
+        val file = File(System.getProperty("java.io.tmpdir"), "icons.riv").absolutePath
+        val texts = listOf("$file#artboard=USER&input=active", "$file?artboard=USER&input=active",
+            "$file?artboard=USER#input=active&novalue", file)
+        val items = texts.mapIndexed { index, text -> mapOf(CYLTagItemTitle to "t$index", CYLTagItemAnimation to text) }
+        val list = CYLTagListView.tagListViewWithConfiguration(context, mapOf(
+            CYLTagListViewSections to listOf(mapOf(CYLTagSectionItems to items))))
+        val urls = texts.indices.map { list.menuDataSource!!.menuAnimationURLForItemAtIndexPath(CYLIndexPath(it, 0)) }
+        assertEquals("artboard=USER&input=active", urls[0]?.fragment)
+        assertEquals("artboard=USER&input=active", urls[1]?.fragment)
+        assertEquals("artboard=USER&input=active", urls[2]?.fragment)
+        assertNull(urls[3]?.fragment)
+        urls.forEach { assertEquals(file, it?.path) }
+    }
+
     @Test
     fun animationSpeedAndLoopsReachEveryTagWithoutReplacingTheStyle() {
         val list = CYLTagListView.tagListViewWithConfiguration(context, mapOf(
