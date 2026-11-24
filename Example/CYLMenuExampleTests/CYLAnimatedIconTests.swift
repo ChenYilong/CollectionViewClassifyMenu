@@ -172,8 +172,8 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
         let selected = tags.tagButton(at: chat)
         let normal = tags.tagButton(at: search)
         XCTAssertNotNil(normal?.animationView, "icons.riv artboard")
-        XCTAssertTrue(normal?.layer.backgroundColor == dark?.normalAppearance.backgroundColor.cgColor, "Dark tag")
-        XCTAssertTrue(selected?.layer.backgroundColor == dark?.selectedAppearance.backgroundColor.cgColor)
+        XCTAssertEqual(CYLMenuFixtures.fillRGB(of: normal), CYLMenuFixtures.rgb(dark?.normalAppearance.backgroundColor), "Dark tag")
+        XCTAssertEqual(CYLMenuFixtures.fillRGB(of: selected), CYLMenuFixtures.rgb(dark?.selectedAppearance.backgroundColor))
         XCTAssertTrue(CYLColorComponents(normal?.titleLabel.textColor).isWhite,
                       "White titles: \(String(describing: normal?.titleLabel.textColor))")
         XCTAssertTrue((tags.cell(at: chat)?.frame ?? .zero).intersects(tags.collectionView.bounds), "Scrolled to the section")

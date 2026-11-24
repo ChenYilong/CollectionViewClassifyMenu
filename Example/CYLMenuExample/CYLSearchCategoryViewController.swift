@@ -138,6 +138,7 @@ final class CYLSearchCategoryViewController: UIViewController {
         style.headerHeight = 32
         style.headerFont = .systemFont(ofSize: 13)
         style.headerTextColor = UIColor(white: 0.6, alpha: 1)
+        style.backgroundStyle = .liquidGlass
         return style
     }
 

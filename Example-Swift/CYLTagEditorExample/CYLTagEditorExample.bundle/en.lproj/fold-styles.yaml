@@ -8,6 +8,7 @@ foldControl:
   position: "headerLeading"
   content: "icon"
 style:
+  backgroundStyle: liquidGlass
   itemHeight: 32
   interitemSpacing: 10
   lineSpacing: 10

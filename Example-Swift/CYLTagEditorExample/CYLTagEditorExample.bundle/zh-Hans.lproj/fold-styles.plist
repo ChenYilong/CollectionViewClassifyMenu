@@ -52,6 +52,8 @@
 	<dict>
 		<key>interitemSpacing</key>
 		<integer>10</integer>
+		<key>backgroundStyle</key>
+		<string>liquidGlass</string>
 		<key>itemHeight</key>
 		<integer>32</integer>
 		<key>lineSpacing</key>

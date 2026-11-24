@@ -180,6 +180,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
     }
 
     private static func applyHeaderLook(to style: CYLMenuStyle) {
+        style.backgroundStyle = .liquidGlass
         style.backgroundColor = .systemBackground
         style.headerHeight = 44
         style.headerFont = .systemFont(ofSize: 20, weight: .bold)

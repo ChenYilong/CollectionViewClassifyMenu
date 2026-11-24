@@ -152,6 +152,7 @@ final class CYLTagAnimationDemoViewController: UIViewController {
                 [CYLTagItemKey.title: CYLExampleLocalizedString("我的"), CYLTagItemKey.image: "account_normal", CYLTagItemKey.selectedImage: "account_highlight"]]])
         let selected = (0..<sections.count).map { "\($0)-0" }
         let style: [String: Any] = [
+            CYLMenuStyleKey.backgroundStyle: "liquidGlass",
             CYLMenuStyleKey.imageSize: "{28, 28}",
             CYLMenuStyleKey.imageTitleSpacing: 6,
             CYLMenuStyleKey.itemHeight: 44,

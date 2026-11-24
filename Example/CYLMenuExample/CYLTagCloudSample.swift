@@ -100,6 +100,7 @@ final class CYLTagCloudSampleViewController: UIViewController {
         // activity_main.xml: lineMargin 5dp, tagMargin 3dp, textPadding 10dp × 3dp.
         let list = CYLTagListView()
         list.style = .tagCloud()
+        list.style.backgroundStyle = .liquidGlass
         list.lineSpacing = 5
         list.interitemSpacing = 3
         list.tagContentInsets = UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10)
@@ -216,6 +217,7 @@ final class CYLTagCloudListCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         tagListView.style = .tagCloud()
+        tagListView.style.backgroundStyle = .liquidGlass
         tagListView.lineSpacing = 5
         tagListView.interitemSpacing = 3
         tagListView.tagContentInsets = UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10)
@@ -364,6 +366,7 @@ final class CYLHotSearchViewController: UIViewController {
         style.headerTextColor = UIColor(white: 0.13, alpha: 1)
         style.headerHeight = 48
         style.backgroundColor = .white
+        style.backgroundStyle = .liquidGlass
         return style
     }
 

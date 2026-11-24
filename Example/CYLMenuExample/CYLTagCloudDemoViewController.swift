@@ -78,7 +78,7 @@ final class CYLTagCloudDemoViewController: UIViewController {
                                                         CYLTagAppearanceKey.cornerRadius: 1000],
                                    CYLMenuStyleKey.highlightedBackgroundColor: "#88363636"]
         return [
-            CYLTagListKey.style: [CYLMenuStyleKey.lineSpacing: 5, CYLMenuStyleKey.interitemSpacing: 3,
+            CYLTagListKey.style: [CYLMenuStyleKey.backgroundStyle: "liquidGlass", CYLMenuStyleKey.lineSpacing: 5, CYLMenuStyleKey.interitemSpacing: 3,
                                   CYLMenuStyleKey.tagContentInsets: "{3, 10, 3, 10}"],
             CYLTagListKey.scrollEnabled: false,
             CYLTagListKey.tags: ["Asia", "Europe",
@@ -95,6 +95,7 @@ final class CYLTagCloudDemoViewController: UIViewController {
 
         // android-tagview: TagView tagview2 = new TagView(this); tagview2.setLineMargin(20f); …
         let codeTagListView = CYLTagListView()
+        codeTagListView.style.backgroundStyle = .liquidGlass
         codeTagListView.lineSpacing = 5
         codeTagListView.interitemSpacing = 3
         codeTagListView.tagContentInsets = UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10)

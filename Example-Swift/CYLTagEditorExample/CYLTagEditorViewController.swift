@@ -88,6 +88,7 @@ final class CYLTagEditorViewController: UIViewController {
         style.backgroundColor = .systemBackground
         style.imageSize = CGSize(width: 14, height: 14)
         style.imageTitleSpacing = 6
+        style.backgroundStyle = .liquidGlass
         return style
     }
 

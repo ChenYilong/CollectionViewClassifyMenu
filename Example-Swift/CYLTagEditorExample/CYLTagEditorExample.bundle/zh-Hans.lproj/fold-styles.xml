@@ -13,6 +13,7 @@
         <content>title</content>
     </foldControl>
     <style>
+        <backgroundStyle>liquidGlass</backgroundStyle>
         <itemHeight>32</itemHeight>
         <interitemSpacing>10</interitemSpacing>
         <lineSpacing>10</lineSpacing>

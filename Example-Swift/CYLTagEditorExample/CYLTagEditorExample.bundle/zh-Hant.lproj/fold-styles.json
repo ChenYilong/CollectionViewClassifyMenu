@@ -18,6 +18,7 @@
   },
   "style": {
     "itemHeight": 32,
+    "backgroundStyle": "liquidGlass",
     "interitemSpacing": 10,
     "lineSpacing": 10,
     "sectionInsets": "{8, 16, 8, 16}",

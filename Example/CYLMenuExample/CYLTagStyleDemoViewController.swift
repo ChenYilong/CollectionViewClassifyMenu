@@ -287,6 +287,7 @@ final class CYLTagStyleDemoViewController: UIViewController {
         style.imageTitleSpacing = 4
         style.itemHeight = 34
         style.sectionInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        style.backgroundStyle = .liquidGlass
         return style
     }
 

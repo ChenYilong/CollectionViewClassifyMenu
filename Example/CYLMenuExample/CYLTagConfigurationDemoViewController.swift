@@ -72,6 +72,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
                                        CYLTagAppearanceKey.iconColor: UIColor.white,
                                        CYLTagAppearanceKey.cornerRadius: 8]
         let style: [String: Any] = [
+            CYLMenuStyleKey.backgroundStyle: "liquidGlass",
             CYLMenuStyleKey.imageSize: NSValue(cgSize: CGSize(width: 20, height: 20)),
             CYLMenuStyleKey.imageTitleSpacing: 4,
             CYLMenuStyleKey.itemHeight: 36,

@@ -54,6 +54,7 @@ final class CYLReviewListViewController: UIViewController {
         style.lineSpacing = 10
         style.sectionInsets = UIEdgeInsets(top: 10, left: 12, bottom: 6, right: 12)
         style.foldControlColor = UIColor(white: 0.45, alpha: 1)
+        style.backgroundStyle = .liquidGlass
         return style
     }
 
