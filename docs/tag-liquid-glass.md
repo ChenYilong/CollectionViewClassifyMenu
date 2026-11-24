@@ -79,12 +79,15 @@ no other value has a special meaning; `CYLTagCornerRadiusSquare` is deleted. The
 A ClassifyMenu tag does not use "unset": its appearance's default radius IS the capsule constant (`CYLTagCornerRadiusCapsule`), so default flat and Liquid Glass
 tags are capsules and are handed to the view as a plain number; the presets that set a radius keep it.
 
-| Platform | Capsule constant (value 1000) | 0 |
+| Platform | Capsule constant (value 1000), defined once in `CYLAnimatedItemView`'s module | 0 |
 |:--|:--|:--|
-| iOS | `CYLTagCornerRadiusCapsule` (Swift global, `CYLTagAppearance.swift`) | square |
-| Android | `CYLTagCornerRadiusCapsule` (`const val`, `CYLTagAppearance.kt`) | square (was a capsule: breaking) |
-| HarmonyOS | `CYLTagCornerRadiusCapsule` (exported const, `CYLTagAppearance.ets`) | square |
-| Mini program | `CYLTagCornerRadiusCapsule` (`cyl-tag-cloud/model.js`) | square |
+| iOS | `CYLAnimatedItemCornerRadiusCapsule` (`CYLAnimatedItemView.swift`) | square |
+| Android | `CYLAnimatedItemCornerRadiusCapsule` (`com.cyl.animateditem`) | square (was a capsule: breaking) |
+| HarmonyOS | `CYLAnimatedItemCornerRadiusCapsule` (exported by `cylanimateditem`) | square |
+| Mini program | `cylAnimatedItemCornerRadiusCapsule` (`cyl_animated_item_model.js`) | square |
+
+ClassifyMenu has no capsule constant of its own any more (`CYLTagCornerRadiusCapsule` was removed the same day): the tag default and the presets use the
+animated item's constant.
 
 Everything else is additive: `backgroundStyle` flat by default, `minimumTagSize` zero. When an integrator moves its ClassifyMenu pin it moves its
 CYLTabBarController pin to the same generation (`43ad5f6a` or later): the tag uses `CYLAnimatedItemView.itemBackground…`.

@@ -49,7 +49,7 @@ test('a minimum tag size grows a smaller tag, a larger tag is not shrunk', () =>
 test('the default radius is the capsule constant in every style; a set radius customizes it', () => {
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   const height = model.tagHeight(model.mergeStyle({}));
-  assert.equal(model.mergeStyle({}).normal.cornerRadius, model.CYLTagCornerRadiusCapsule);
+  assert.equal(model.mergeStyle({}).normal.cornerRadius, model.cylAnimatedItemCornerRadiusCapsule);
   for (const backgroundStyle of ['liquidGlass', 'flat']) {
     const view = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle } }, '', 2);
     assert.match(view.cellStyle, new RegExp(`border-radius:${height / 2}px`), `${backgroundStyle}: a capsule`);

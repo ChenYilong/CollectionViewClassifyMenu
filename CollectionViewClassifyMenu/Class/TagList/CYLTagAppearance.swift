@@ -9,13 +9,16 @@
 //
 
 import UIKit
-
-/**
- * The corner radius of a capsule: pass this constant, never the number 1000. A corner radius is in points, limited to half the tag
- * height, and 0 is square; no other value has a special meaning.
- */
-public let CYLTagCornerRadiusCapsule: CGFloat = 1000
-
+// CYLAnimatedItemCornerRadiusCapsule (the capsule radius) and the rule for Liquid Glass: the module choice of CYLTagButton.swift, since
+// Swift Package Manager does not see another file's imports.
+#if canImport(CYLAnimatedItemViews)
+import CYLAnimatedItem
+import CYLAnimatedItemViews
+#elseif canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#else
+import CYLTabBarController
+#endif
 /**
  * The box and text of a tag in one state (`CYLMenuStyle.normalAppearance`…). A final class: the style copies it.
  */
@@ -36,7 +39,7 @@ public final class CYLTagAppearance {
      */
     public static let defaultFont = UIFont.systemFont(ofSize: 14)
 
-    private static let defaultCornerRadius: CGFloat = CYLTagCornerRadiusCapsule
+    private static let defaultCornerRadius: CGFloat = CYLAnimatedItemCornerRadiusCapsule
     private static let defaultContentInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
 
     /**
@@ -85,7 +88,7 @@ public final class CYLTagAppearance {
     /**
      * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
      * is limited to half the height, so a large value such as 1000 is a capsule for any tag). Negative or non-finite
-     * values are treated as 0. `CYLTagCornerRadiusCapsule` by default.
+     * values are treated as 0. `CYLAnimatedItemCornerRadiusCapsule` by default.
      */
     public var cornerRadius = CYLTagAppearance.defaultCornerRadius {
         didSet {

@@ -1,13 +1,8 @@
 package com.cyl.classifymenu
 
 import android.graphics.drawable.Drawable
+import com.cyl.animateditem.CYLAnimatedItemCornerRadiusCapsule
 import kotlin.math.max
-
-/**
- * The corner radius of a capsule, dp: pass this constant, never the number 1000. A corner radius is limited to half the tag height and
- * 0 is square; no other value has a special meaning.
- */
-const val CYLTagCornerRadiusCapsule: Float = 1000f
 
 /**
  * `CYLTagAppearance`: the box and text of a tag in one state (normal, selected, disabled). Negative or non-finite
@@ -36,7 +31,7 @@ class CYLTagAppearance : Cloneable {
 
     var iconColor: Int? = null
 
-    var cornerRadius: Float = CYLTagCornerRadiusCapsule
+    var cornerRadius: Float = CYLAnimatedItemCornerRadiusCapsule
         set(value) { field = sanitized(value) }
 
     var borderColor: Int? = null
@@ -63,7 +58,7 @@ class CYLTagAppearance : Cloneable {
         _textColor = null
         _font = null
         iconColor = null
-        cornerRadius = CYLTagCornerRadiusCapsule
+        cornerRadius = CYLAnimatedItemCornerRadiusCapsule
         borderColor = null
         borderWidth = 0f
         contentInsets = CYLEdgeInsets(5f, 10f, 5f, 10f)

@@ -40,7 +40,7 @@ test('styles: the initial values are those of demoStyle()', () => {
   assert.equal(value('selectedImage'), 'YES');
   assert.equal(value('font'), '.SFUI-Regular 14');
   assert.equal(value('borderWidth'), '0.3');
-  assert.equal(value('cornerRadius'), '1000'); // the capsule constant, CYLTagCornerRadiusCapsule
+  assert.equal(value('cornerRadius'), '1000'); // the capsule constant, cylAnimatedItemCornerRadiusCapsule
   assert.equal(value('margin'), '10');
   assert.equal(value('animationSpeed'), '1.0');
   assert.equal(value('content.iconAndTitle'), '✓');

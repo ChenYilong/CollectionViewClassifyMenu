@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 @testable import CYLMenuExample
 
 final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
@@ -44,7 +45,7 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
 
         demo.performAction("reset")
         XCTAssertEqual(demo.content, .iconAndTitle)
-        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, CYLTagCornerRadiusCapsule)
+        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, CYLAnimatedItemCornerRadiusCapsule)
     }
 
     func testStyleDemoShowsAnimatedIconsAndOpensTheConfigurationDemo() {

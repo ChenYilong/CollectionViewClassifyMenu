@@ -588,7 +588,7 @@ open class CYLTagButton @JvmOverloads constructor(
             }
         }
         // CYLAnimatedItemView applies it, limited to half the height, with the background and the border: the appearance's number
-        // (CYLTagCornerRadiusCapsule by default, 0 is square).
+        // (CYLAnimatedItemCornerRadiusCapsule by default, 0 is square).
         itemCornerRadius = appearance.cornerRadius
     }
 

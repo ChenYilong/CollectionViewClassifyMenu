@@ -2,18 +2,12 @@
  * The box and text of a tag in one state (normal, selected, disabled), as iOS `CYLTagAppearance`. Negative or
  * non-finite lengths become 0. The colors and the font are null_resettable: `reset…()` restores their default.
  */
+import { CYLAnimatedItemCornerRadiusCapsule } from 'cylanimateditem';
 import { CYLColor, CYLEdgeInsets, CYLFont } from './CYLTypes';
 
 function sanitized(value: number): number {
   return Number.isFinite(value) && value > 0 ? value : 0;
 }
-
-/**
- * The corner radius of a capsule, vp: pass this constant, never the number 1000. A corner radius is limited to half the tag height and 0
- * is square; no other value has a special meaning.
- */
-export const CYLTagCornerRadiusCapsule: number = 1000;
-
 export class CYLTagAppearance {
   static readonly defaultBackgroundColor: string = CYLColor.WHITE;
   static readonly defaultTextColor: string = CYLColor.white(0.25);
@@ -22,7 +16,7 @@ export class CYLTagAppearance {
   private storedBackgroundColor?: ResourceColor;
   private storedTextColor?: ResourceColor;
   private storedFont?: CYLFont;
-  private storedCornerRadius: number = CYLTagCornerRadiusCapsule;
+  private storedCornerRadius: number = CYLAnimatedItemCornerRadiusCapsule;
   private storedBorderWidth: number = 0;
   private storedContentInsets: CYLEdgeInsets = new CYLEdgeInsets(5, 10, 5, 10);
   /**
@@ -80,7 +74,7 @@ export class CYLTagAppearance {
   /**
    * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
    * is limited to half the height, so a large value such as 1000 is a capsule for any tag). Negative or non-finite
-   * values are treated as 0. `CYLTagCornerRadiusCapsule` by default.
+   * values are treated as 0. `CYLAnimatedItemCornerRadiusCapsule` by default.
    */
   get cornerRadius(): number {
     return this.storedCornerRadius;
@@ -128,7 +122,7 @@ export class CYLTagAppearance {
     this.storedTextColor = undefined;
     this.storedFont = undefined;
     this.iconColor = undefined;
-    this.storedCornerRadius = CYLTagCornerRadiusCapsule;
+    this.storedCornerRadius = CYLAnimatedItemCornerRadiusCapsule;
     this.borderColor = undefined;
     this.storedBorderWidth = 0;
     this.storedContentInsets = new CYLEdgeInsets(5, 10, 5, 10);

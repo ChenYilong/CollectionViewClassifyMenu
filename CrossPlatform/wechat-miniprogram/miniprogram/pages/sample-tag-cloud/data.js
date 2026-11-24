@@ -121,7 +121,7 @@ function hotStyle() {
       borderColor: model.white(0.88),
       borderWidth: 1,
       textColor: model.white(0.13),
-      cornerRadius: model.CYLTagCornerRadiusCapsule,
+      cornerRadius: model.cylAnimatedItemCornerRadiusCapsule,
       fontSize: 16,
     });
   }

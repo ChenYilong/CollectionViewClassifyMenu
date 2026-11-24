@@ -9,6 +9,7 @@
 
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 import CYLSearchViewController
 
 /// android-tagview's sample data (res/values/arrays.xml).
@@ -349,7 +350,7 @@ final class CYLHotSearchViewController: UIViewController {
             appearance.borderColor = UIColor(white: 0.88, alpha: 1)
             appearance.borderWidth = 1
             appearance.textColor = UIColor(white: 0.13, alpha: 1)
-            appearance.cornerRadius = CYLTagCornerRadiusCapsule
+            appearance.cornerRadius = CYLAnimatedItemCornerRadiusCapsule
             appearance.font = .systemFont(ofSize: 16)
         }
         style.tagContentInsets = UIEdgeInsets(top: 9, left: 16, bottom: 9, right: 16)

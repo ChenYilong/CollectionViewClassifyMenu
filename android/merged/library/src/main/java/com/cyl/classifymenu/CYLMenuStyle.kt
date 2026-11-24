@@ -1,5 +1,6 @@
 package com.cyl.classifymenu
 
+import com.cyl.animateditem.CYLAnimatedItemCornerRadiusCapsule
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -323,7 +324,7 @@ class CYLMenuStyle {
                 appearance.textColor = Color.WHITE
                 appearance.borderWidth = 0f
                 appearance.borderColor = Color.WHITE
-                appearance.cornerRadius = CYLTagCornerRadiusCapsule
+                appearance.cornerRadius = CYLAnimatedItemCornerRadiusCapsule
                 appearance.font = CYLFont.systemFont(14f)
             }
             style.disabledAppearance.backgroundColor = CYLColor.withAlpha(blue, 0.4f)

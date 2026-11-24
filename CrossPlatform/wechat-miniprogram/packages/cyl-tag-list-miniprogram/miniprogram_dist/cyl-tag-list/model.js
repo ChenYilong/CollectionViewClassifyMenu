@@ -11,8 +11,7 @@ const symbols = require('./symbols.js');
 const locale = require('../locale.js');
 const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
-const { cylAnimatedItemBackground } = require('../cyl-animated-item/cyl_animated_item_model');
-const { CYLTagCornerRadiusCapsule } = require('../cyl-tag-cloud/model.js');
+const { cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule } = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
 
@@ -175,7 +174,7 @@ function defaultAppearance(hairline) {
     textColor: DEFAULT_TEXT_COLOR,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
-    cornerRadius: CYLTagCornerRadiusCapsule,
+    cornerRadius: cylAnimatedItemCornerRadiusCapsule,
     borderColor: null,
     borderWidth: 0,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
@@ -897,7 +896,7 @@ function coderString(value) {
 }
 
 module.exports = {
-  CYLTagCornerRadiusCapsule,
+  cylAnimatedItemCornerRadiusCapsule,
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,

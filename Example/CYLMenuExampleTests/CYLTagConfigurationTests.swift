@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 @testable import CYLMenuExample
 
 final class CYLTagConfigurationTests: XCTestCase {
@@ -141,7 +142,7 @@ final class CYLTagConfigurationTests: XCTestCase {
     func testTheDefaultRadiusIsTheCapsuleConstantInEveryStyleAndASetRadiusCustomizesIt() throws {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
-        XCTAssertEqual(CYLMenuStyle().normalAppearance.cornerRadius, CYLTagCornerRadiusCapsule)
+        XCTAssertEqual(CYLMenuStyle().normalAppearance.cornerRadius, CYLAnimatedItemCornerRadiusCapsule)
         for background in [CYLTagBackgroundStyle.liquidGlass, .flat] {
             let style = CYLMenuStyle()
             style.backgroundStyle = background

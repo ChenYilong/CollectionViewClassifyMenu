@@ -1,5 +1,6 @@
 package com.cyl.classifymenu
 
+import com.cyl.animateditem.CYLAnimatedItemCornerRadiusCapsule
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -223,13 +224,13 @@ class CYLTagButtonStandaloneTest {
     @Test
     fun theDefaultRadiusIsTheCapsuleConstantInEveryStyleAndASetRadiusCustomizesIt() {
         com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = true
-        assertEquals(CYLTagCornerRadiusCapsule, CYLMenuStyle().normalAppearance.cornerRadius)
+        assertEquals(CYLAnimatedItemCornerRadiusCapsule, CYLMenuStyle().normalAppearance.cornerRadius)
         for (background in CYLTagBackgroundStyle.values()) {
             val style = CYLMenuStyle()
             style.backgroundStyle = background
             val tag = CYLTagButton(context, "Tag", icon())
             tag.style = style
-            assertEquals("$background: the default is the capsule constant", CYLTagCornerRadiusCapsule, tag.itemCornerRadius)
+            assertEquals("$background: the default is the capsule constant", CYLAnimatedItemCornerRadiusCapsule, tag.itemCornerRadius)
             style.normalAppearance.cornerRadius = 6f
             tag.style = style
             assertEquals(6f, tag.itemCornerRadius)

@@ -9,6 +9,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 @testable import CYLMenuExample
 
 final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
@@ -47,7 +48,7 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         let view = showTagList(source, width: 320)
         let style = CYLMenuStyle()
         style.itemHeight = 40
-        style.normalAppearance.cornerRadius = CYLTagCornerRadiusCapsule
+        style.normalAppearance.cornerRadius = CYLAnimatedItemCornerRadiusCapsule
         view.style = style
         view.layoutIfNeeded()
         XCTAssertEqual(view.probe.itemFrame(at: ip(0, 0))?.height ?? 0, 40, accuracy: 0.5)

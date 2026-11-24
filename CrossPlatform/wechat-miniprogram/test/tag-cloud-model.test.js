@@ -18,7 +18,7 @@ test('CYLMenuStyle() has gray bordered tags, a green selection, 30 pt tags', () 
   const style = model.defaultStyle();
   assert.equal(style.normal.backgroundColor, '#F2F2F7');
   assert.equal(style.normal.textColor, 'rgb(64, 64, 64)');
-  assert.equal(style.normal.cornerRadius, model.CYLTagCornerRadiusCapsule);
+  assert.equal(style.normal.cornerRadius, model.cylAnimatedItemCornerRadiusCapsule);
   assert.equal(style.selected.backgroundColor, 'rgb(42, 185, 160)');
   assert.deepEqual(style.normal.contentInsets, { top: 5, left: 10, bottom: 5, right: 10 });
   assert.equal(style.itemHeight, 30);

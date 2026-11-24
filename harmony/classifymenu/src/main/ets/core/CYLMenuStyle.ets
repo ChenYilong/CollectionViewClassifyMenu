@@ -3,8 +3,8 @@
  * the touch ripple, titles, rows, icons, layout spacing, section headers, fold controls and the More button. Lengths
  * are vp, font sizes fp, colors '#AARRGGBB'. `copy()` is NSCopying.
  */
-import { CYLLiquidGlass } from 'cylanimateditem';
-import { CYLTagAppearance, CYLTagCornerRadiusCapsule } from './CYLTagAppearance';
+import { CYLAnimatedItemCornerRadiusCapsule, CYLLiquidGlass } from 'cylanimateditem';
+import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
@@ -545,7 +545,7 @@ export class CYLMenuStyle {
       appearance.textColor = CYLColor.WHITE;
       appearance.borderWidth = 0;
       appearance.borderColor = CYLColor.WHITE;
-      appearance.cornerRadius = CYLTagCornerRadiusCapsule;
+      appearance.cornerRadius = CYLAnimatedItemCornerRadiusCapsule;
       appearance.font = CYLFont.systemFont(14);
     });
     style.storedDisabled.backgroundColor = CYLColor.withAlpha(blue, 0.4);

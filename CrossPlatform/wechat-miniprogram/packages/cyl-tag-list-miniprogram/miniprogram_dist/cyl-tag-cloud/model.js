@@ -15,9 +15,8 @@
 
 /** The iOS colors the samples use, as UIKit's light-mode values. */
 const { iconImage } = require('./editing-icons.js');
+const { cylAnimatedItemCornerRadiusCapsule } = require('../cyl-animated-item/cyl_animated_item_model');
 
-/** The corner radius of a capsule: pass this constant, never the number 1000. 0 is square; no other value has a special meaning. */
-const CYLTagCornerRadiusCapsule = 1000;
 const NAMED_COLORS = {
   clear: 'rgba(0, 0, 0, 0)',
   white: '#FFFFFF',
@@ -85,7 +84,7 @@ function appearance() {
     textColor: white(0.25),
     fontSize: 14,
     iconColor: null,
-    cornerRadius: CYLTagCornerRadiusCapsule,
+    cornerRadius: cylAnimatedItemCornerRadiusCapsule,
     borderColor: null,
     borderWidth: 0,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
@@ -180,7 +179,7 @@ function tagCloudStyle() {
     a.textColor = '#FFFFFF';
     a.borderWidth = 0;
     a.borderColor = '#FFFFFF';
-    a.cornerRadius = CYLTagCornerRadiusCapsule;
+    a.cornerRadius = cylAnimatedItemCornerRadiusCapsule;
     a.fontSize = 14;
   });
   style.disabled.backgroundColor = withAlpha(blue, 0.4);
@@ -841,7 +840,7 @@ function renderList(listStyle, options = {}) {
 }
 
 module.exports = {
-  CYLTagCornerRadiusCapsule,
+  cylAnimatedItemCornerRadiusCapsule,
   NAMED_COLORS,
   PALETTE,
   color,
