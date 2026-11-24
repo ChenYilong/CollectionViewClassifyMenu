@@ -1069,7 +1069,7 @@ export class CYLTagButton {
     // Liquid Glass: the state's background color tints the glass (CYLAnimatedItemBackgroundModifier, see build()).
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
     this.itemBackgroundStyle = glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
-    this.usesDefaultRadius = glass && !appearance.isCornerRadiusSet;
+    this.usesDefaultRadius = !appearance.isCornerRadiusSet;
     this.backgroundColor = stateBackground;
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;

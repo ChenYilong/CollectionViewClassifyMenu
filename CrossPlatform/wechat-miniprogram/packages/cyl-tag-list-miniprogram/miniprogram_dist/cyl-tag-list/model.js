@@ -175,7 +175,7 @@ function defaultAppearance(hairline) {
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
     cornerRadius: 3,
-    cornerRadiusSet: false, // an unset radius is a capsule for Liquid Glass (cyl-animated-item's default)
+    cornerRadiusSet: false, // an unset radius is a capsule in every style (cyl-animated-item's default)
     borderColor: null,
     borderWidth: 0,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
@@ -778,9 +778,8 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const justify = !vertical && (leading || (!style.layoutCentered && !(showsImage && showsTitle))) ? 'flex-start' : 'center';
   const directions = { trailing: 'row-reverse', top: 'column', bottom: 'column-reverse' };
   // The background, radius and border are cyl-animated-item's (the interface of CYLAnimatedItemView.itemBackgroundStyle…): an unset
-  // radius is -1, its default (a capsule for Liquid Glass); a set one is limited to half the height.
-  const glassWanted = style.backgroundStyle === 'liquidGlass';
-  const radius = !appearance.cornerRadiusSet && glassWanted ? -1 : cornerRadius(appearance.cornerRadius, height);
+  // radius is -1, its default (a capsule, every style); a set one is limited to half the height.
+  const radius = !appearance.cornerRadiusSet ? -1 : cornerRadius(appearance.cornerRadius, height);
   const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, appearance.backgroundColor, radius, border, appearance.borderColor, false);
   const glass = itemBackground.glass;
   const background = appearance.backgroundImage

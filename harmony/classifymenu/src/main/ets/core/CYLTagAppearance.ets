@@ -93,8 +93,8 @@ export class CYLTagAppearance {
   }
 
   /**
-   * Whether `cornerRadius` was set (not the default of 3). A Liquid Glass tag whose radius was never set is a capsule, the default of
-   * `cylanimateditem`'s `CYLAnimatedItemBackgroundModifier`; a set value, 0 (square) included, is used as it is.
+   * Whether `cornerRadius` was set. A tag whose radius was never set is a capsule in every background style (flat and Liquid Glass), the
+   * default of `cylanimateditem`'s `CYLAnimatedItemBackgroundModifier`; a set value, 0 (square) included, is used as it is.
    */
   get isCornerRadiusSet(): boolean {
     return this.storedCornerRadiusSet;

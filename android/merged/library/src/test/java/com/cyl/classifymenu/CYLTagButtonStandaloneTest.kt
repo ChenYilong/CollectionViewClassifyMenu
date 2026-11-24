@@ -221,13 +221,16 @@ class CYLTagButtonStandaloneTest {
     }
 
     @Test
-    fun anUnsetRadiusIsACapsuleForGlassAndASetRadiusCustomizesIt() {
+    fun anUnsetRadiusIsACapsuleInEveryStyleAndASetRadiusCustomizesIt() {
         com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = true
         val style = CYLMenuStyle()
         style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
         val tag = CYLTagButton(context, "Tag", icon())
         tag.style = style
         assertEquals(null, tag.itemCornerRadius)
+        val flatTag = CYLTagButton(context, "Tag", icon())
+        flatTag.style = CYLMenuStyle()
+        assertEquals("flat: unset too", null, flatTag.itemCornerRadius)
         style.normalAppearance.cornerRadius = 6f
         assertTrue(style.normalAppearance.isCornerRadiusSet)
         tag.style = style

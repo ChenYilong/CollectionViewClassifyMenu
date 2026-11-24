@@ -55,3 +55,10 @@ test('an unset radius is a capsule for glass (the animated item default); a set 
   const square = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 0 } } }, '', 2);
   assert.match(square.cellStyle, /border-radius:0px/);
 });
+
+test('a flat tag whose radius was never set is a capsule too', () => {
+  const flat = model.tagButtonView({ title: 'Tag' }, '', 2);
+  assert.match(flat.cellStyle, /border-radius:1000px/);
+  const set = model.tagButtonView({ title: 'Tag', tagStyle: { normal: { cornerRadius: 3 } } }, '', 2);
+  assert.match(set.cellStyle, /border-radius:3px/);
+});

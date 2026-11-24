@@ -40,8 +40,8 @@ class CYLTagAppearance : Cloneable {
         set(value) { field = sanitized(value); isCornerRadiusSet = true }
 
     /**
-     * Whether [cornerRadius] was set (not the default of 3). A Liquid Glass tag whose radius was never set is a capsule, the default
-     * of `CYLAnimatedItemView`; a set value, 0 (square) included, is used as it is.
+     * Whether [cornerRadius] was set. A tag whose radius was never set is a capsule in every background style (flat and Liquid Glass), the
+     * default of `CYLAnimatedItemView`; a set value, 0 (square) included, is used as it is.
      */
     var isCornerRadiusSet: Boolean = false
         private set

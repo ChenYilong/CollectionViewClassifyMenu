@@ -883,12 +883,11 @@ open class CYLTagButton: CYLAnimatedItemView {
         updateElevationPath()
     }
 
-    /// The radius handed to CYLAnimatedItemView: nil (its default, a capsule for Liquid Glass) while the radius was never set
-    /// and the glass is drawn; otherwise the appearance's number (0 is square).
+    /// The radius handed to CYLAnimatedItemView: nil (its default, a capsule) while the appearance's radius was never set, in every
+    /// background style, flat and Liquid Glass; otherwise the appearance's number (0 is square).
     private func resolvedCornerRadius(for state: UIControl.State) -> CGFloat? {
         let appearance = style.appearance(for: state)
-        if !appearance.isCornerRadiusSet && style.resolvedBackgroundStyle == .liquidGlass { return nil }
-        return appearance.cornerRadius
+        return appearance.isCornerRadiusSet ? appearance.cornerRadius : nil
     }
 
     private func updateElevationPath() {

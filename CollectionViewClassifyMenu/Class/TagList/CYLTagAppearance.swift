@@ -85,7 +85,7 @@ public final class CYLTagAppearance {
     /**
      * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
      * is limited to half the height, so a large value such as 1000 is a capsule for any tag). Negative or non-finite
-     * values are treated as 0. 3 by default.
+     * values are treated as 0. Not set by default: a capsule (see `isCornerRadiusSet`); the stored value reads 3 until it is set.
      */
     public var cornerRadius = CYLTagAppearance.defaultCornerRadius {
         didSet {
@@ -95,8 +95,8 @@ public final class CYLTagAppearance {
     }
 
     /**
-     * Whether `cornerRadius` was set (not the default of 3). A Liquid Glass tag whose radius was never set is a capsule, the
-     * default of `CYLAnimatedItemView`; a set value, 0 (square) included, is used as it is.
+     * Whether `cornerRadius` was set. A tag whose radius was never set is a capsule in every background style (flat and Liquid
+     * Glass), the default of `CYLAnimatedItemView`; a set value, 0 (square) included, is used as it is.
      */
     public internal(set) var isCornerRadiusSet = false
 
