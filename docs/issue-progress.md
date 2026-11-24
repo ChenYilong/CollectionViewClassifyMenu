@@ -1975,3 +1975,9 @@ tags: [issues, ui, cocoapods, progress]
     still icons; (3) the libpag `eglMakeCurrent` freeze after about 80 s of Loop on; (4) Flutter and React Native on Android
     run on a device; (5) PR #824 convergence (owner's call, recorded, not scored here).
   - Note: host load average 638-897 at the start (other sessions' emulators and builds); device checks wait for it to drop.
+  - **Claimed (2026-11-24) by Mac session chenyilong-68:** chenyilong-e4 is no longer running, so this entry is taken over.
+    Routing: (1) menu.riv with Loop off goes to CYLTabBarController (Mac-CYLTabBarController session reproduced it on iOS too,
+    logged in its `docs/Animated-Item.md` on PR #824 at `74505404`: `menu_button.riv`, boolean `isOpen`; a longer off window
+    did not fix it; cause not established); this repository re-pins once when it sends the fixing SHA. (2) the stalled launch,
+    (3) the libpag freeze and (4) Flutter / React Native on an Android device are in the 2026-11-24 Windows test batch at the
+    top of this file. (5) PR #824: owner's call.
