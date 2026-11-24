@@ -43,6 +43,9 @@ dependencies {
     // reflection: the core adds none of them; an app that plays animated icons adds the libraries it needs. The
     // version is CYLTabBarController's (its podspec); settings.gradle.kts builds the pinned commit in its place.
     api("io.github.chenyilong:cyltabbarcontroller-animateditem:1.100.0")
+    // CYLTagButton draws the Liquid Glass tag background (CYLTagBackgroundStyleLiquidGlass) with CYLTabBarController's base
+    // library (module :cylliquidglass: CYLLiquidGlass.isActive(), CYLLiquidGlassView); same version and commit as above.
+    api("io.github.chenyilong:cyltabbarcontroller-liquidglass:1.100.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.customview)
     implementation(libs.androidx.recyclerview)
@@ -102,11 +105,15 @@ val publishAnimatedItemToBuildRepository by tasks.registering {
     val staging = cylTabBarBuild?.let { File(it.projectDir, "build/staging-deploy") }
     if (cylTabBarBuild != null) {
         dependsOn(cylTabBarBuild.task(":cylanimateditem:publishReleasePublicationToStagingRepository"))
+        dependsOn(cylTabBarBuild.task(":cylliquidglass:publishReleasePublicationToStagingRepository"))
     }
     doLast {
         if (staging != null) {
             copy {
-                from(staging) { include("io/github/chenyilong/cyltabbarcontroller-animateditem/**") }
+                from(staging) {
+                    include("io/github/chenyilong/cyltabbarcontroller-animateditem/**")
+                    include("io/github/chenyilong/cyltabbarcontroller-liquidglass/**")
+                }
                 into(repo)
             }
         }

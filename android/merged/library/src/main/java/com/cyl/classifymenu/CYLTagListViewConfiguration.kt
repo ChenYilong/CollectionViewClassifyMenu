@@ -254,6 +254,12 @@ const val CYLMenuStyleImagePlacement = "imagePlacement"
  * Style key: "center" or "leading".
  */
 const val CYLMenuStyleContentAlignment = "contentAlignment"
+
+/** A `CYLTagBackgroundStyle` ordinal, or "flat" / "liquidGlass" (case-insensitive); anything else is flat. */
+const val CYLMenuStyleBackgroundStyle = "backgroundStyle"
+
+/** A size "{width, height}" in dp, or {"width": 69, "height": 29}: `CYLMenuStyle.minimumTagSize`. */
+const val CYLMenuStyleMinimumTagSize = "minimumTagSize"
 /**
  * Style key: a Boolean.
  */
@@ -746,6 +752,11 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
             "leading" to CYLTagContentAlignment.CYLTagContentAlignmentLeading, "left" to CYLTagContentAlignment.CYLTagContentAlignmentLeading),
             CYLTagContentAlignment.values(), contentAlignment)
     }
+    configuration[CYLMenuStyleBackgroundStyle]?.let {
+        backgroundStyle = enumValue(it, mapOf("flat" to CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat,
+            "liquidglass" to CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass), CYLTagBackgroundStyle.values(), backgroundStyle)
+    }
+    size(configuration[CYLMenuStyleMinimumTagSize])?.let { minimumTagSize = it }
     bool(configuration[CYLMenuStyleAdjustsFontForContentSizeCategory])?.let { adjustsFontForContentSizeCategory = it }
     size(configuration[CYLMenuStyleImageSize])?.let { imageSize = it }
     size(configuration[CYLMenuStyleAnimationSize])?.let { animationSize = it }

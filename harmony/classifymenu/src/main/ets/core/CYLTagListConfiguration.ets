@@ -8,7 +8,7 @@
 import { CYLMenuColorFromString } from './CYLMenuColor';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from './CYLMenuFoldControl';
 import { CYLMenuResources } from './CYLMenuResources';
-import { CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement } from './CYLMenuStyle';
+import { CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagImagePlacement } from './CYLMenuStyle';
 import { CYLTag } from './CYLTag';
 import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
@@ -108,6 +108,14 @@ export class CYLMenuStyleKey {
   static readonly layoutCentered: string = 'layoutCentered';
   static readonly imagePlacement: string = 'imagePlacement';
   static readonly contentAlignment: string = 'contentAlignment';
+  /**
+   * A `CYLTagBackgroundStyle` raw value, or 'flat' / 'liquidGlass' (case-insensitive); anything else is flat.
+   */
+  static readonly backgroundStyle: string = 'backgroundStyle';
+  /**
+   * A size '{width, height}' in vp, or { width: 69, height: 29 }: `CYLMenuStyle.minimumTagSize`.
+   */
+  static readonly minimumTagSize: string = 'minimumTagSize';
   static readonly adjustsFontForContentSizeCategory: string = 'adjustsFontForContentSizeCategory';
   static readonly backgroundColor: string = 'backgroundColor';
   static readonly headerTextColor: string = 'headerTextColor';
@@ -419,6 +427,10 @@ const IMAGE_PLACEMENTS: Map<string, number> = new Map<string, number>([
   ['top', CYLTagImagePlacement.top], ['bottom', CYLTagImagePlacement.bottom]
 ]);
 
+const BACKGROUND_STYLES: Map<string, number> = new Map<string, number>([
+  ['flat', CYLTagBackgroundStyle.flat], ['liquidglass', CYLTagBackgroundStyle.liquidGlass]
+]);
+
 const CONTENT_ALIGNMENTS: Map<string, number> = new Map<string, number>([
   ['center', CYLTagContentAlignment.center], ['leading', CYLTagContentAlignment.leading],
   ['left', CYLTagContentAlignment.leading]
@@ -593,6 +605,14 @@ export class CYLMenuConfiguration {
     const alignment = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.contentAlignment], CONTENT_ALIGNMENTS);
     if (alignment === CYLTagContentAlignment.center || alignment === CYLTagContentAlignment.leading) {
       style.contentAlignment = alignment as CYLTagContentAlignment;
+    }
+    const backgroundStyle = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.backgroundStyle], BACKGROUND_STYLES);
+    if (backgroundStyle === CYLTagBackgroundStyle.flat || backgroundStyle === CYLTagBackgroundStyle.liquidGlass) {
+      style.backgroundStyle = backgroundStyle as CYLTagBackgroundStyle;
+    }
+    const minimumTagSize = CYLConfigurationValue.size(configuration[CYLMenuStyleKey.minimumTagSize]);
+    if (minimumTagSize !== undefined) {
+      style.minimumTagSize = minimumTagSize;
     }
     const adjusts = CYLConfigurationValue.bool(configuration[CYLMenuStyleKey.adjustsFontForContentSizeCategory]);
     if (adjusts !== undefined) {

@@ -20,6 +20,9 @@ enum class CYLTagImagePlacement {
 /** `CYLTagContentAlignment`: the icon and title centered in the tag, or at its leading edge. */
 enum class CYLTagContentAlignment { CYLTagContentAlignmentCenter, CYLTagContentAlignmentLeading }
 
+/** `CYLTagBackgroundStyle`: a tag's flat color, or a Liquid Glass background where the device draws one (`CYLLiquidGlass.isActive()`). */
+enum class CYLTagBackgroundStyle { CYLTagBackgroundStyleFlat, CYLTagBackgroundStyleLiquidGlass }
+
 /** `CYLTagRowAlignment`: where a row of tags sits in the list's width. */
 enum class CYLTagRowAlignment { CYLTagRowAlignmentLeading, CYLTagRowAlignmentCenter, CYLTagRowAlignmentTrailing }
 
@@ -97,6 +100,27 @@ class CYLMenuStyle {
     var imagePlacement: CYLTagImagePlacement = CYLTagImagePlacement.CYLTagImagePlacementLeading
     var layoutCentered: Boolean = true
     var contentAlignment: CYLTagContentAlignment = CYLTagContentAlignment.CYLTagContentAlignmentCenter
+
+    /**
+     * The tag background: flat (the default) is the solid color of each state's appearance; Liquid Glass draws a glass background
+     * behind the content, tinted with the state's `backgroundColor` and clipped to the corner radius. Where the device draws no
+     * Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     */
+    var backgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+
+    /**
+     * The background style a tag really draws: `backgroundStyle`, or flat when `CYLLiquidGlass.isActive()`
+     * (CYLTabBarController's base library `cylliquidglass`: Android 12 and later) is false.
+     */
+    val resolvedBackgroundStyle: CYLTagBackgroundStyle
+        get() = if (backgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && com.cyl.liquidglass.CYLLiquidGlass.isActive())
+            CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass else CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+
+    /**
+     * The smallest size of a tag, dp: a tag narrower or shorter than it grows to it, its content staying where `contentAlignment`
+     * puts it. `CYLSize.ZERO` (the default) keeps the tag as large as its content and `itemHeight` make it.
+     */
+    var minimumTagSize: CYLSize = CYLSize.ZERO
     var animationSize: CYLSize = CYLSize.ZERO
     var animationSpeed: Float = 1f
     var adjustsFontForContentSizeCategory: Boolean = true
@@ -254,6 +278,8 @@ class CYLMenuStyle {
         copy.collapseTitle = collapseTitle
         copy.numberOfItemsPerRow = numberOfItemsPerRow
         copy.contentAlignment = contentAlignment
+        copy.backgroundStyle = backgroundStyle
+        copy.minimumTagSize = minimumTagSize
         copy.moreButtonImage = moreButtonImage
         copy.moreButtonColor = moreButtonColor
         copy.highlightedBackgroundColor = highlightedBackgroundColor

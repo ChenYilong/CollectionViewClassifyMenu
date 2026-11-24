@@ -12,6 +12,7 @@
 //
 
 import UIKit
+import CYLLiquidGlass
 
 /**
  * Where a tag's icon goes relative to its title.
@@ -48,6 +49,22 @@ import UIKit
      * "苹果官方社区… [热]" whose title is truncated so the icon after it stays visible.
      */
     case leading
+}
+
+/**
+ * What a tag's background is made of.
+ */
+@objc public enum CYLTagBackgroundStyle: Int {
+    /**
+     * The solid color of each state's appearance (the default).
+     */
+    case flat = 0
+    /**
+     * A Liquid Glass material behind the content, tinted with the state's `backgroundColor`, drawn only where the system
+     * draws Liquid Glass (`CYLLiquidGlass.isActive()`: iOS 26 and later, the rule of CYLTabBarController's base library
+     * `CYLLiquidGlass`); elsewhere the style is ignored and the tag stays flat.
+     */
+    case liquidGlass
 }
 
 /**
@@ -321,6 +338,27 @@ open class CYLMenuStyle: NSObject, NSCopying {
      * ellipsis, so its icon stays visible.
      */
     open var contentAlignment: CYLTagContentAlignment = .center
+
+    /**
+     * The tag background: `.flat` (the default) is the solid color of each state's appearance; `.liquidGlass` draws a
+     * Liquid Glass material behind the content, tinted with the state's `backgroundColor` and clipped to the corner
+     * radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     */
+    open var backgroundStyle: CYLTagBackgroundStyle = .flat
+
+    /**
+     * The background style a tag really draws: `backgroundStyle`, or `.flat` where the system draws no Liquid Glass
+     * (`CYLLiquidGlass.isActive()`, the rule of CYLTabBarController's base library `CYLLiquidGlass`).
+     */
+    public var resolvedBackgroundStyle: CYLTagBackgroundStyle {
+        backgroundStyle == .liquidGlass && CYLLiquidGlass.isActive() ? .liquidGlass : .flat
+    }
+
+    /**
+     * The smallest size of a tag: a tag narrower or shorter than it grows to it, its content staying where
+     * `contentAlignment` puts it. `.zero` (the default) keeps the tag as large as its content and `itemHeight` make it.
+     */
+    open var minimumTagSize: CGSize = .zero
 
     /**
      * Size of animated icons (`menuAnimationURLForItem(at:)`). `.zero` (the default) uses `imageSize`.
@@ -827,6 +865,8 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.collapseTitle = collapseTitle
         copy.numberOfItemsPerRow = numberOfItemsPerRow
         copy.contentAlignment = contentAlignment
+        copy.backgroundStyle = backgroundStyle
+        copy.minimumTagSize = minimumTagSize
         copy.moreButtonImage = moreButtonImage
         copy.moreButtonColor = moreButtonColor
         copy.highlightedBackgroundColor = highlightedBackgroundColor

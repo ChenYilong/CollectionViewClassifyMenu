@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLLiquidGlass
 @testable import CYLMenuExample
 
 final class CYLTagConfigurationTests: XCTestCase {
@@ -98,5 +99,83 @@ final class CYLTagConfigurationTests: XCTestCase {
             XCTAssertEqual(error.domain, CYLMenuConfigurationError.errorDomain)
             XCTAssertEqual(error.code, CYLMenuConfigurationError.Code.fileNotFound.rawValue)
         }
+    }
+
+    // MARK: - Tag background style (Liquid Glass) and minimumTagSize
+
+    func testBackgroundStyleAndMinimumTagSizeAreReadFromTheStyleConfiguration() {
+        func style(_ values: [String: Any]) -> CYLMenuStyle {
+            CYLTagListView(configuration: [CYLTagListKey.style: values,
+                                           CYLTagListKey.sections: [[CYLTagSectionKey.items: ["x"]]]]).style
+        }
+        XCTAssertEqual(style([:]).backgroundStyle, .flat, "flat is the default")
+        XCTAssertEqual(style([CYLMenuStyleKey.backgroundStyle: "liquidGlass"]).backgroundStyle, .liquidGlass)
+        XCTAssertEqual(style([CYLMenuStyleKey.backgroundStyle: "LiquidGlass"]).backgroundStyle, .liquidGlass, "case-insensitive")
+        XCTAssertEqual(style([CYLMenuStyleKey.backgroundStyle: 1]).backgroundStyle, .liquidGlass, "the raw value")
+        XCTAssertEqual(style([CYLMenuStyleKey.backgroundStyle: "frosted"]).backgroundStyle, .flat, "unknown is flat")
+        XCTAssertEqual(style([CYLMenuStyleKey.minimumTagSize: "{69, 29}"]).minimumTagSize, CGSize(width: 69, height: 29))
+        XCTAssertEqual(style([CYLMenuStyleKey.minimumTagSize: ["width": 69, "height": 29]]).minimumTagSize,
+                       CGSize(width: 69, height: 29))
+        XCTAssertEqual(style([:]).minimumTagSize, .zero)
+
+        let source = CYLMenuStyle()
+        source.backgroundStyle = .liquidGlass
+        source.minimumTagSize = CGSize(width: 69, height: 29)
+        let copy = source.copy() as? CYLMenuStyle
+        XCTAssertEqual(copy?.backgroundStyle, .liquidGlass, "a copied style keeps the background style")
+        XCTAssertEqual(copy?.minimumTagSize, CGSize(width: 69, height: 29))
+    }
+
+    func testLiquidGlassFallsBackToFlatWhereTheSystemDrawsNone() {
+        CYLLiquidGlass.activeOverride = false
+        defer { CYLLiquidGlass.activeOverride = nil }
+        let style = CYLMenuStyle()
+        style.backgroundStyle = .liquidGlass
+        style.normalAppearance.backgroundColor = .systemOrange
+        XCTAssertEqual(style.backgroundStyle, .liquidGlass, "the parameter is kept")
+        XCTAssertEqual(style.resolvedBackgroundStyle, .flat, "but ignored where glass is unavailable")
+        let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style)
+        XCTAssertNil(button.liquidGlassView)
+        XCTAssertNotNil(button.layer.backgroundColor, "the flat background color is drawn")
+    }
+
+    func testLiquidGlassBackgroundIsDrawnWhereTheSystemDrawsIt() throws {
+        guard #available(iOS 26.0, *) else {
+            throw XCTSkip("UIGlassEffect needs iOS 26")
+        }
+        CYLLiquidGlass.activeOverride = true
+        defer { CYLLiquidGlass.activeOverride = nil }
+        let style = CYLMenuStyle()
+        style.backgroundStyle = .liquidGlass
+        style.normalAppearance.backgroundColor = .systemOrange
+        style.normalAppearance.cornerRadius = 12
+        XCTAssertEqual(style.resolvedBackgroundStyle, .liquidGlass)
+        let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style)
+        let glass = try XCTUnwrap(button.liquidGlassView as? UIVisualEffectView, "a glass view behind the content")
+        XCTAssertTrue(glass.effect is UIGlassEffect)
+        XCTAssertEqual((glass.effect as? UIGlassEffect)?.tintColor, .systemOrange, "the state's backgroundColor tints it")
+        XCTAssertNil(button.layer.backgroundColor, "the flat color is not drawn under glass")
+        XCTAssertEqual(glass.frame, button.bounds)
+        XCTAssertEqual(glass.layer.cornerRadius, button.layer.cornerRadius, "clipped to the resolved radius")
+        XCTAssertFalse(glass.isUserInteractionEnabled)
+
+        // Back to flat: the glass goes, the color returns.
+        style.backgroundStyle = .flat
+        button.style = style
+        XCTAssertNil(button.liquidGlassView)
+        XCTAssertNotNil(button.layer.backgroundColor)
+    }
+
+    func testMinimumTagSizeGrowsATagThatIsSmaller() {
+        let style = CYLMenuStyle()
+        let plainWidth = CYLTagButton.width(forTitle: "A", iconSize: .zero, style: style, traitCollection: nil)
+        let plainHeight = CYLTagButton.height(forTitle: "A", iconSize: .zero, style: style, traitCollection: nil)
+        XCTAssertLessThan(plainWidth, 69)
+        style.minimumTagSize = CGSize(width: 69, height: plainHeight + 10)
+        XCTAssertEqual(CYLTagButton.width(forTitle: "A", iconSize: .zero, style: style, traitCollection: nil), 69)
+        XCTAssertEqual(CYLTagButton.height(forTitle: "A", iconSize: .zero, style: style, traitCollection: nil), plainHeight + 10)
+        let longTitle = String(repeating: "wide ", count: 20)
+        XCTAssertGreaterThan(CYLTagButton.width(forTitle: longTitle, iconSize: .zero, style: style, traitCollection: nil), 69,
+                             "a larger tag is not shrunk")
     }
 }

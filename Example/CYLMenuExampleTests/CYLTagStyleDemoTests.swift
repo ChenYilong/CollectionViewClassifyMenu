@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLLiquidGlass
 @testable import CYLMenuExample
 
 final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
@@ -67,5 +68,55 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         configuration?.loadViewIfNeeded()
         XCTAssertNotNil(configuration?.fileTagListView, "\(String(describing: configuration?.configurationError))")
         XCTAssertNotNil(configuration?.mapTagListView)
+    }
+
+    /// Flat tags next to Liquid Glass tags over a colorful background (the glass shows the colors through it).
+    func testFlatAndLiquidGlassTagsSideBySide() throws {
+        guard #available(iOS 26.0, *) else {
+            throw XCTSkip("Liquid Glass needs iOS 26")
+        }
+        CYLLiquidGlass.activeOverride = true
+        defer { CYLLiquidGlass.activeOverride = nil }
+        let size = CGSize(width: 393, height: 360)
+        let canvas = UIView(frame: CGRect(origin: .zero, size: size))
+        let gradient = CAGradientLayer()
+        gradient.frame = canvas.bounds
+        gradient.colors = [UIColor.systemTeal.cgColor, UIColor.systemPurple.cgColor, UIColor.systemOrange.cgColor]
+        gradient.startPoint = CGPoint(x: 0, y: 0)
+        gradient.endPoint = CGPoint(x: 1, y: 1)
+        canvas.layer.addSublayer(gradient)
+        show(canvas, size: size)
+
+        var y: CGFloat = 24
+        for (caption, background, radius) in [("flat", CYLTagBackgroundStyle.flat, CGFloat(1000)),
+                                              ("liquidGlass", .liquidGlass, 1000),
+                                              ("flat, radius 8", .flat, 8),
+                                              ("liquidGlass, radius 8", .liquidGlass, 8)] {
+            let label = UILabel(frame: CGRect(x: 16, y: y, width: 361, height: 18))
+            label.text = "backgroundStyle: " + caption
+            label.font = .preferredFont(forTextStyle: .caption1)
+            label.textColor = .white
+            canvas.addSubview(label)
+            let style = CYLMenuStyle()
+            style.backgroundStyle = background
+            style.normalAppearance.backgroundColor = UIColor.white.withAlphaComponent(0.25)
+            style.selectedAppearance.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.55)
+            style.normalAppearance.textColor = .white
+            style.selectedAppearance.textColor = .white
+            style.normalAppearance.borderWidth = 0
+            style.selectedAppearance.borderWidth = 0
+            style.normalAppearance.cornerRadius = radius
+            style.selectedAppearance.cornerRadius = radius
+            for (index, title) in ["Swift", "Kotlin", "ArkTS"].enumerated() {
+                let tag = CYLMenuFixtures.tagButton(title: title, image: nil, style: style, size: CGSize(width: 100, height: 34))
+                tag.frame.origin = CGPoint(x: 16 + CGFloat(index) * 112, y: y + 22)
+                tag.isSelected = index == 1
+                canvas.addSubview(tag)
+                tag.layoutIfNeeded()
+                XCTAssertEqual(tag.liquidGlassView != nil, background == .liquidGlass)
+            }
+            y += 82
+        }
+        captureScreen(named: "test-tag-background-flat-liquid-glass")
     }
 }

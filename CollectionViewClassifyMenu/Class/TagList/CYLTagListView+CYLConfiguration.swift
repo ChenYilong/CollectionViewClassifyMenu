@@ -355,6 +355,16 @@ public enum CYLMenuStyleKey {
     public static let contentAlignment = "contentAlignment"
 
     /**
+     * A `CYLTagBackgroundStyle` raw value, or "flat" / "liquidGlass"; anything else is "flat".
+     */
+    public static let backgroundStyle = "backgroundStyle"
+
+    /**
+     * A size "{width, height}" in points, or `CYLMenuStyle.minimumTagSize`'s `{"width": 69, "height": 29}`.
+     */
+    public static let minimumTagSize = "minimumTagSize"
+
+    /**
      * A Boolean, or "true" / "false".
      */
     public static let adjustsFontForContentSizeCategory = "adjustsFontForContentSizeCategory"
@@ -1130,6 +1140,15 @@ extension CYLMenuStyle {
         if let raw = Value.rawValue(configuration[Key.contentAlignment], names: alignments),
            let alignment = CYLTagContentAlignment(rawValue: raw) {
             contentAlignment = alignment
+        }
+        let backgroundStyles = ["flat": CYLTagBackgroundStyle.flat.rawValue,
+                                "liquidglass": CYLTagBackgroundStyle.liquidGlass.rawValue]
+        if let raw = Value.rawValue(configuration[Key.backgroundStyle], names: backgroundStyles),
+           let style = CYLTagBackgroundStyle(rawValue: raw) {
+            backgroundStyle = style
+        }
+        if let value = Value.size(configuration[Key.minimumTagSize]) {
+            minimumTagSize = value
         }
         if let value = Value.bool(configuration[Key.adjustsFontForContentSizeCategory]) {
             adjustsFontForContentSizeCategory = value

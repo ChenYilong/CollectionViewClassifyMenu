@@ -23,6 +23,7 @@
 // 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded" (CI on b4d0e51).
 // Swift Package Manager (CYLTabBarController 4c7dc79d and later): the Swift CYLAnimatedItemView is in its own module,
 // CYLAnimatedItemViews, beside the engine's CYLAnimatedItem; CocoaPods builds both into the CYLAnimatedItem module.
+import CYLLiquidGlass
 #if canImport(CYLAnimatedItemViews)
 @_exported import CYLAnimatedItem
 @_exported import CYLAnimatedItemViews
@@ -273,6 +274,12 @@ open class CYLTagButton: CYLAnimatedItemView {
     private var followsStyleAnimationSpeed = true
     private var isApplyingStyleAnimationSpeed = false
     private let backgroundImageView = UIImageView()
+
+    /**
+     * The Liquid Glass background behind the content while `style.resolvedBackgroundStyle` is `.liquidGlass` (a
+     * `CYLLiquidGlassView`); `nil` when the tag is flat.
+     */
+    public private(set) var liquidGlassView: UIView?
     /**
      * The cross of `CYLMenuStyle.deleteIndicatorLineWidth`.
      */
@@ -407,7 +414,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         if style.fillsTagHeight(withIconSize: iconSize) {
             // The image is as wide as the tag is tall, from the leading edge; the title and the indicator follow it.
             let side = height(forTitle: title, iconSize: .zero, style: style, traitCollection: traitCollection)
-            return states.reduce(0) { width, state in
+            return states.reduce(style.minimumTagSize.width) { width, state in
                 let font = style.titleFont(for: state, traitCollection: traitCollection)
                 let titleWidth = displayed.isEmpty ? 0
                     : ceil((displayed as NSString).size(withAttributes: [.font: font]).width) + style.imageTitleSpacing
@@ -419,7 +426,7 @@ open class CYLTagButton: CYLAnimatedItemView {
                 return max(width, ceil(side + titleWidth + delete + style.appearance(for: state).contentInsets.right))
             }
         }
-        var width: CGFloat = 0
+        var width = style.minimumTagSize.width
         for state in states {
             let appearance = style.appearance(for: state)
             let font = style.titleFont(for: state, traitCollection: traitCollection)
@@ -467,7 +474,7 @@ open class CYLTagButton: CYLAnimatedItemView {
      */
     public static func height(for style: CYLMenuStyle, traitCollection: UITraitCollection?) -> CGFloat {
         let iconHeight = style.imagePlacement.cylIsVertical ? max(style.imageSize.height, style.animationSize.height) : 0
-        return states.reduce(style.itemHeight) { height, state in
+        return states.reduce(max(style.itemHeight, style.minimumTagSize.height)) { height, state in
             let insets = style.appearance(for: state).contentInsets
             let font = style.titleFont(for: state, traitCollection: traitCollection)
             let stacked = iconHeight > 0 ? iconHeight + style.imageTitleSpacing : 0
@@ -486,7 +493,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         let hasTitle = !style.displayedTitle(forTitle: title).isEmpty
         // An image that fills the tag's height takes the height of the rest.
         let iconSize = style.fillsTagHeight(withIconSize: iconSize) ? .zero : iconSize
-        return states.reduce(style.itemHeight) { height, state in
+        return states.reduce(max(style.itemHeight, style.minimumTagSize.height)) { height, state in
             let insets = style.appearance(for: state).contentInsets
             let line = hasTitle ? ceil(style.titleFont(for: state, traitCollection: traitCollection).lineHeight) : 0
             var content = max(line, iconSize.height)
@@ -658,6 +665,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         let state = currentState
         let insets = style.appearance(for: state).contentInsets
         backgroundImageView.frame = bounds
+        liquidGlassView?.frame = bounds
         let deleteWidth = layOutDeleteIndicator(state: state, insets: insets)
         let indicatorFirst = showsDeleteIndicator && style.deleteIndicatorPlacement == .leading
         // The leading margin; `trailing` is the space after the content (the right inset and the delete indicator).
@@ -862,6 +870,31 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
     /**
+     * Shows or removes the Liquid Glass background for `style.resolvedBackgroundStyle`, tinted with `tint`; returns
+     * whether the tag is glass now (then the flat background color is not drawn). Where the system has no Liquid Glass
+     * the tag stays flat, whatever the style says. The glass is CYLTabBarController's base library `CYLLiquidGlass`.
+     */
+    @discardableResult
+    private func updateLiquidGlass(tint: UIColor?) -> Bool {
+        if styleStorage.resolvedBackgroundStyle == .liquidGlass {
+            let glass = (liquidGlassView as? CYLLiquidGlassView) ?? CYLLiquidGlassView()
+            glass.glassTintColor = tint
+            glass.cornerRadius = layer.cornerRadius
+            glass.frame = bounds
+            if glass.superview == nil {
+                insertSubview(glass, aboveSubview: backgroundImageView)
+            }
+            liquidGlassView = glass
+            if glass.isGlassDrawn {
+                return true
+            }
+        }
+        liquidGlassView?.removeFromSuperview()
+        liquidGlassView = nil
+        return false
+    }
+
+    /**
      * `CYLMenuStyle.elevation`: a shadow under the tag. The tag stops clipping to its bounds then (the shadow is outside
      * them); its background image clips itself to the corners instead.
      */
@@ -878,6 +911,7 @@ open class CYLTagButton: CYLAnimatedItemView {
 
     private func updateElevationPath() {
         backgroundImageView.layer.cornerRadius = layer.cornerRadius
+        liquidGlassView?.layer.cornerRadius = layer.cornerRadius
         layer.shadowPath = styleStorage.elevation > 0
             ? UIBezierPath(roundedRect: bounds, cornerRadius: layer.cornerRadius).cgPath : nil
     }
@@ -1055,7 +1089,8 @@ open class CYLTagButton: CYLAnimatedItemView {
         let pressed = isHighlighted && state != .disabled && style.highlightedBackgroundColor != nil
         // Pressed, as android-tagview's layoutColorPress.
         let background = pressed ? style.highlightedBackgroundColor : appearance.backgroundColor
-        layer.backgroundColor = background?.cgColor
+        let glass = updateLiquidGlass(tint: background)
+        layer.backgroundColor = glass ? nil : background?.cgColor
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)

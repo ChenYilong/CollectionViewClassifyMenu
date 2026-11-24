@@ -1,5 +1,9 @@
 <view class="cyl-tag-button" style="{{view.cellStyle}}" bindtap="onTap"
       aria-role="button" aria-label="{{view.accessibilityLabel}}" aria-selected="{{selected}}" aria-disabled="{{!enabled}}">
+  <!-- Liquid Glass background (CYLTabBarController's cyl-liquid-glass), behind the content, tinted with the state's background color. -->
+  <view wx:if="{{view.glass}}" class="cyl-tag-glass" aria-hidden="true">
+    <cyl-liquid-glass glass-tint-color="{{view.glassTint}}" corner-radius="{{view.glassRadius}}" />
+  </view>
   <view wx:if="{{view.iconKind !== 'none'}}" class="cyl-icon-slot" style="{{view.slotStyle}}">
     <text wx:if="{{view.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{view.iconStyle}}; font-size: {{view.glyphSize}}px;">{{view.glyph}}</text>
     <!-- CYLTabBarController's cyl-animated-item draws the icon (animation through the app's engine components, else the image). -->
