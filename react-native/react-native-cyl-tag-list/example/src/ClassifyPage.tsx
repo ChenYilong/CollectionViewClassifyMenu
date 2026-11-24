@@ -23,6 +23,7 @@ const FILTER = 'menu.filter';
 const FILTER_ALL = ['0-0', '1-0'];
 
 const STYLE = {
+  backgroundStyle: 'liquidGlass',
   itemHeight: 32,
   normal: { cornerRadius: 16, borderColor: '#D1D1D6', borderWidth: 1 },
   selected: { cornerRadius: 16, backgroundColor: '#E6F8F5', textColor: '#2AB9A0', borderColor: '#2AB9A0' },

@@ -23,6 +23,7 @@ import com.cyl.classifymenu.CYLMenuFoldControlPosition
 import com.cyl.classifymenu.CYLMenuFoldStyle
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagListView
 import com.cyl.classifymenu.example.tageditor.CYLSymbolDrawable
@@ -50,6 +51,7 @@ fun reviewFilterStyle(): CYLMenuStyle {
     }
     style.selectedAppearance.backgroundColor = orange
     style.selectedAppearance.borderColor = orange
+    style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
     style.itemHeight = 28f
     style.interitemSpacing = 8f
     style.lineSpacing = 10f

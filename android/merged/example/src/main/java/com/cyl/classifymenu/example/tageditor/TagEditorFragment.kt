@@ -37,6 +37,7 @@ import com.cyl.classifymenu.CYLMenuFoldControlPosition
 import com.cyl.classifymenu.CYLMenuItemType
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLMenuTitlePosition
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagImagePlacement
@@ -130,6 +131,7 @@ object CYLTagEditorStyle {
         style.normalAppearance.textColor = Color.BLACK
         style.selectedAppearance.backgroundColor = Color.argb(26, 7, 193, 96)
         style.selectedAppearance.textColor = green
+        style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
         style.itemHeight = 36f
         style.interitemSpacing = 12f
         style.lineSpacing = 12f

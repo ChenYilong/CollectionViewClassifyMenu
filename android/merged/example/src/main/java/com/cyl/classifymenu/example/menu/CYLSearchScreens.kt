@@ -29,6 +29,7 @@ import com.cyl.classifymenu.CYLIndexPath
 import com.cyl.classifymenu.CYLMenuDelegate
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLTagListView
 import com.cyl.classifymenu.example.R
 import com.cyl.tabbar.CYLConstants
@@ -208,6 +209,7 @@ class CYLSearchCategoryScreen(private val context: Context) : CYLMenuScreen, CYL
             style.normalAppearance.borderWidth = 1f
             style.normalAppearance.cornerRadius = 2f
             style.normalAppearance.margin = 14f
+            style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             style.itemHeight = 32f
             style.interitemSpacing = 14f
             style.lineSpacing = 14f

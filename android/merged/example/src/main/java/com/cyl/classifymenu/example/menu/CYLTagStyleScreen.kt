@@ -19,6 +19,7 @@ import com.cyl.classifymenu.CYLIndexPath
 import com.cyl.classifymenu.CYLMenuAnimationURLWithOptions
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLOffset
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagListView
@@ -58,6 +59,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             setIconColor(Color.WHITE, CYLControlState.SELECTED)
             selectedAppearance.backgroundColor = systemBlue
             selectedAppearance.borderColor = systemBlue
+            backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             imageSize = CYLSize(16f, 16f)
             imageTitleSpacing = 4f
             itemHeight = 34f
