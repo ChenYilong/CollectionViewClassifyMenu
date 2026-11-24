@@ -176,4 +176,57 @@ class CYLTagButtonStandaloneTest {
         button.showsDeleteIndicator = false
         assertEquals(View.GONE, button.deleteIndicatorLabel.visibility)
     }
+
+    // MARK: Tag background style (Liquid Glass) and minimumTagSize
+
+    @org.junit.After
+    fun resetLiquidGlass() {
+        com.cyl.liquidglass.CYLLiquidGlass.activeOverride = null
+    }
+
+    @Test
+    fun theBackgroundStyleAndTheMinimumTagSizeAreReadFromTheConfiguration() {
+        fun style(values: Map<String, Any?>) = CYLMenuStyle.styleWithConfiguration(values)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style(emptyMap()).backgroundStyle)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style(mapOf(CYLMenuStyleBackgroundStyle to "liquidGlass")).backgroundStyle)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style(mapOf(CYLMenuStyleBackgroundStyle to "LiquidGlass")).backgroundStyle)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style(mapOf(CYLMenuStyleBackgroundStyle to "frosted")).backgroundStyle)
+        assertEquals(CYLSize(69f, 29f), style(mapOf(CYLMenuStyleMinimumTagSize to "{69, 29}")).minimumTagSize)
+        assertEquals(CYLSize.ZERO, style(emptyMap()).minimumTagSize)
+        val source = CYLMenuStyle()
+        source.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        source.minimumTagSize = CYLSize(69f, 29f)
+        val copy = source.copy()
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, copy.backgroundStyle)
+        assertEquals(CYLSize(69f, 29f), copy.minimumTagSize)
+    }
+
+    @Test
+    fun liquidGlassIsDrawnOnlyWhereTheDeviceDrawsIt() {
+        val style = CYLMenuStyle()
+        style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        com.cyl.liquidglass.CYLLiquidGlass.activeOverride = false
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style.resolvedBackgroundStyle)
+        val flat = CYLTagButton(context, "Tag", icon())
+        flat.style = style
+        assertEquals(android.view.View.GONE, flat.liquidGlassView.visibility)
+
+        com.cyl.liquidglass.CYLLiquidGlass.activeOverride = true
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style.resolvedBackgroundStyle)
+        val glass = CYLTagButton(context, "Tag", icon())
+        glass.style = style
+        assertEquals(android.view.View.VISIBLE, glass.liquidGlassView.visibility)
+    }
+
+    @Test
+    fun aMinimumTagSizeGrowsATagThatIsSmaller() {
+        val style = CYLMenuStyle()
+        val plainWidth = CYLTagButton.widthForTitle("A", CYLSize.ZERO, style)
+        val plainHeight = CYLTagButton.heightForTitle("A", CYLSize.ZERO, style)
+        assertTrue(plainWidth < 69f)
+        style.minimumTagSize = CYLSize(69f, plainHeight + 10f)
+        assertEquals(69f, CYLTagButton.widthForTitle("A", CYLSize.ZERO, style))
+        assertEquals(plainHeight + 10f, CYLTagButton.heightForTitle("A", CYLSize.ZERO, style))
+        assertTrue("a larger tag is not shrunk", CYLTagButton.widthForTitle("wide ".repeat(20), CYLSize.ZERO, style) > 69f)
+    }
 }

@@ -28,6 +28,7 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import com.cyl.liquidglass.CYLLiquidGlassView
 
 /**
  * `CYLTagButton`: one tag, built on CYLTabBarController's shared animated icon + title component `CYLAnimatedItemView`
@@ -79,6 +80,15 @@ open class CYLTagButton @JvmOverloads constructor(
         visibility = GONE
     }
     private val box = GradientDrawable()
+
+    /**
+     * The Liquid Glass background behind the content (CYLTabBarController's base library `cylliquidglass`), shown while
+     * `style.resolvedBackgroundStyle` is Liquid Glass and the device draws it; gone (flat) otherwise.
+     */
+    private val glassView = CYLLiquidGlassView(context).apply { visibility = GONE }
+
+    /** The Liquid Glass layer behind the content: visible while the tag draws glass, gone while it is flat. */
+    val liquidGlassView: View get() = glassView
     private val crossPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
@@ -96,6 +106,7 @@ open class CYLTagButton @JvmOverloads constructor(
 
     init {
         addView(backgroundImageView, 0)
+        addView(glassView, 1)
         titleView.includeFontPadding = false
         titleView.gravity = Gravity.CENTER_VERTICAL
         // The disabled look comes from the style's appearance, not from the base class's alpha.
@@ -397,7 +408,13 @@ open class CYLTagButton @JvmOverloads constructor(
         var backgroundColor = appearance.backgroundColor
         val highlighted = isHighlighted && state != CYLControlState.DISABLED && style.highlightedBackgroundColor != null
         if (highlighted) backgroundColor = style.highlightedBackgroundColor!!
-        box.setColor(backgroundColor)
+        // Liquid Glass: the state's background color tints the glass and the flat color is not drawn while the glass draws.
+        val glassWanted = style.resolvedBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        glassView.glassTintColor = backgroundColor
+        glassView.backdropSource = null
+        glassView.visibility = if (glassWanted) VISIBLE else GONE
+        glassView.applyEffect()
+        box.setColor(if (glassWanted && glassView.isGlassDrawn) android.graphics.Color.TRANSPARENT else backgroundColor)
         backgroundImageView.setImageDrawable(appearance.backgroundImage)
         backgroundImageView.visibility = if (appearance.backgroundImage == null || highlighted) GONE else VISIBLE
         // With the rename indicator, editingIndicatorsView draws both icons instead.
@@ -455,6 +472,7 @@ open class CYLTagButton @JvmOverloads constructor(
         val appearance = style.appearanceForState(state)
         val insets = appearance.contentInsets
         backgroundImageView.layout(0, 0, r - l, b - t)
+        glassView.layout(0, 0, r - l, b - t)
         var deleteWidth = 0f
         if (showsDeleteIndicator && showsRenameIndicator) {
             deleteWidth = layOutEditingIndicators(editingIconSide(state, style), insets, width, height)
@@ -578,6 +596,7 @@ open class CYLTagButton @JvmOverloads constructor(
         val corner = appearance.cornerRadius
         val radius = if (corner > 0) (if (corner <= CYLTagCornerRadiusSquare) 0f else min(corner, height / 2)) else height / 2
         box.cornerRadius = radius * density
+        glassView.cornerRadius = radius * density
     }
 
     /** `badgeFrame`: the badge's frame in this view, dp (`CYLRect()` while it is hidden). */
@@ -793,7 +812,7 @@ open class CYLTagButton @JvmOverloads constructor(
                           style: CYLMenuStyle): Float {
             val editingIcons = showsDeleteIndicator && showsRenameIndicator
             val text = style.displayedTitleForTitle(title)
-            var width = 0f
+            var width = style.minimumTagSize.width
             for (state in states) {
                 val appearance = style.appearanceForState(state)
                 val titleWidth = if (text.isNotEmpty()) ceil(textWidth(text, style.titleFontForState(state))) else 0f
@@ -821,7 +840,7 @@ open class CYLTagButton @JvmOverloads constructor(
         fun heightForStyle(style: CYLMenuStyle): Float {
             val iconHeight = if (style.imagePlacement.isVertical) max(style.imageSize.height, style.animationSize.height) else 0f
             val stacked = if (iconHeight > 0) iconHeight + style.imageTitleSpacing else 0f
-            var height = style.itemHeight
+            var height = max(style.itemHeight, style.minimumTagSize.height)
             for (state in states) {
                 val insets = style.appearanceForState(state).contentInsets
                 height = max(height, ceil(fontLineHeight(style.titleFontForState(state))) + stacked + insets.top + insets.bottom)
@@ -837,7 +856,7 @@ open class CYLTagButton @JvmOverloads constructor(
         @JvmStatic
         fun heightForTitle(title: String?, iconSize: CYLSize, style: CYLMenuStyle): Float {
             val hasTitle = style.displayedTitleForTitle(title).isNotEmpty()
-            var height = style.itemHeight
+            var height = max(style.itemHeight, style.minimumTagSize.height)
             for (state in states) {
                 val insets = style.appearanceForState(state).contentInsets
                 val line = if (hasTitle) ceil(fontLineHeight(style.titleFontForState(state))) else 0f

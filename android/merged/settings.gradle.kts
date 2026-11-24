@@ -69,5 +69,8 @@ includeBuild(File(cylRoot, "Example-Android")) {
         // The shared animated icon + title component CYLTagButton subclasses (CYLAnimatedItemView, the animation engine,
         // no animation library): https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md
         substitute(module("io.github.chenyilong:cyltabbarcontroller-animateditem")).using(project(":cylanimateditem"))
+        // Liquid Glass as a base library (CYLLiquidGlass.isActive(), CYLLiquidGlassView), which the tags' glass background uses:
+        // https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Liquid-Glass-Component.md
+        substitute(module("io.github.chenyilong:cyltabbarcontroller-liquidglass")).using(project(":cylliquidglass"))
     }
 }
