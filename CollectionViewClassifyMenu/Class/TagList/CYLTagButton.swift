@@ -751,9 +751,9 @@ open class CYLTagButton: CYLAnimatedItemView {
             placeImageView(.zero)
             layOutBadge(anchor: showsTitle ? titleLabel.frame : bounds.inset(by: insets))
         }
-        // 0 is automatic: a capsule, as for CYLBadgeAppearance.
+        // Points, limited to half the height: 0 is square, half the height or more a capsule.
         let radius = style.appearance(for: state).cornerRadius
-        layer.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : min(radius, height / 2)) : height / 2
+        layer.cornerRadius = min(radius, height / 2)
         updateElevationPath()
     }
 
@@ -857,7 +857,7 @@ open class CYLTagButton: CYLAnimatedItemView {
             titleLabel.frame = .zero
         }
         let radius = style.appearance(for: currentState).cornerRadius
-        layer.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : min(radius, height / 2)) : height / 2
+        layer.cornerRadius = min(radius, height / 2)
         updateElevationPath()
     }
 

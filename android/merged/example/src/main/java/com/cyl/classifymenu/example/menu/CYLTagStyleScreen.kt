@@ -74,7 +74,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "layoutCentered" to "切换 layoutCentered（只有 icon 或 title 时居中）", "selectedImage" to "切换选中图片 selectedImage",
             "backgroundColor.normal" to "设置背景色 backgroundColor（normal）", "backgroundColor.selected" to "设置背景色 backgroundColor（selected）",
             "borderColor" to "设置边框颜色 borderColor", "borderWidth" to "设置边框宽度 borderWidth",
-            "cornerRadius" to "设置圆角 cornerRadius（0 为胶囊）", "margin" to "设置内边距 margin",
+            "cornerRadius" to "设置圆角 cornerRadius（0 为直角，1000 为胶囊）", "margin" to "设置内边距 margin",
             "animation.lottie" to "Lottie 动效图标", "animation.pag" to "PAG 动效图标", "animation.rive" to "Rive 动效图标", "animation.svga" to "SVGA 动效图标",
             "animation.gif" to "GIF 动效图标", "animation.off" to "关闭动效（静态图标）", "animationSpeed" to "设置动效速度 animationSpeed",
             "configuration" to "配置文件 / 字典（map）初始化", "tagCloud" to "标签云：android-tagview 的初始化方式",

@@ -576,7 +576,8 @@ open class CYLTagButton @JvmOverloads constructor(
             }
         }
         val corner = appearance.cornerRadius
-        val radius = if (corner > 0) (if (corner <= CYLTagCornerRadiusSquare) 0f else min(corner, height / 2)) else height / 2
+        // A plain number: 0 is square, half the height or more is a capsule (no special value).
+        val radius = min(max(corner, 0f), height / 2)
         box.cornerRadius = radius * density
     }
 

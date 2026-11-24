@@ -52,7 +52,7 @@ test('MainActivity\'s tags, in order, with their ids', () => {
   assert.equal(tags[7].textColor, 'rgb(233, 30, 99)');
   assert.equal(tags[11].backgroundColor, 'rgb(0, 191, 255)');
   assert.equal(tags[17].borderColor, 'rgb(233, 30, 99)');
-  assert.equal(tags[19].cornerRadius, model.CORNER_RADIUS_SQUARE);
+  assert.equal(tags[19].cornerRadius, 0);
   assert.equal(tags[22].title, 'Deletable');
   assert.equal(tags[24].title, 'Detail Tag');
   assert.equal(tags[24].isDeletable, true);
@@ -86,7 +86,7 @@ test('the list, RecyclerView and hot search data', () => {
   assert.equal(hot[2].badgeText, undefined);
   const style = cloud.hotStyle();
   assert.equal(model.tagHeight(style), 38);
-  assert.equal(style.normal.cornerRadius, 0);
+  assert.equal(style.normal.cornerRadius, 1000, 'white capsules');
 });
 
 test('the five containers have the attributes of content_main.xml', () => {

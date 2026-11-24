@@ -28,7 +28,6 @@ import {
   CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical
 } from '../core/CYLMenuStyle';
 import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
-import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
 import { CYLUIContext } from '../core/CYLUIContext';
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLImageIsSymbol, CYLOffset, CYLRect, CYLSize
@@ -833,9 +832,9 @@ export class CYLTagButton {
       this.layOutBadge(showsTitle ? this.titleLabel.frame :
         new CYLRect(insets.left, insets.top, Math.max(0, width - 2 * margin), contentHeight));
     }
-    // 0 is automatic: a capsule, as for CYLBadgeAppearance.
+    // Points, limited to half the height: 0 is square, half the height or more a capsule.
     const radius = style.appearance(state).cornerRadius;
-    this.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, height / 2)) : height / 2;
+    this.cornerRadius = Math.min(radius, height / 2);
   }
 
   /**
@@ -874,7 +873,7 @@ export class CYLTagButton {
       this.titleLabel.frame = new CYLRect();
     }
     const radius = style.appearance(this.currentState).cornerRadius;
-    this.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, height / 2)) : height / 2;
+    this.cornerRadius = Math.min(radius, height / 2);
   }
 
   /**

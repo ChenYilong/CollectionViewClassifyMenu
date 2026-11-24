@@ -38,7 +38,7 @@ enum CYLTagCloudSampleData {
             tag.borderColor = color
             tags.append(tag)
         }
-        for radius: CGFloat in [CYLTagCornerRadiusSquare, 20.0 / 3, 60.0 / 3] {
+        for radius: CGFloat in [0, 20.0 / 3, 60.0 / 3] {
             let tag = CYLTag(title: CYLExampleLocalizedString("圆角"))
             tag.cornerRadius = radius
             tags.append(tag)
@@ -349,7 +349,7 @@ final class CYLHotSearchViewController: UIViewController {
             appearance.borderColor = UIColor(white: 0.88, alpha: 1)
             appearance.borderWidth = 1
             appearance.textColor = UIColor(white: 0.13, alpha: 1)
-            appearance.cornerRadius = 0
+            appearance.cornerRadius = 1000  // a capsule
             appearance.font = .systemFont(ofSize: 16)
         }
         style.tagContentInsets = UIEdgeInsets(top: 9, left: 16, bottom: 9, right: 16)

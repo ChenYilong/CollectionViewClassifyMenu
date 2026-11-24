@@ -98,7 +98,7 @@
 "设置背景色 backgroundColor（selected）" = "Set backgroundColor (selected)";
 "设置边框颜色 borderColor" = "Set borderColor";
 "设置边框宽度 borderWidth" = "Set borderWidth";
-"设置圆角 cornerRadius（0 为胶囊）" = "Set cornerRadius (0 is a capsule)";
+"设置圆角 cornerRadius（0 为直角，1000 为胶囊）" = "Set cornerRadius (0 is square, 1000 a capsule)";
 "设置内边距 margin" = "Set margin";
 "重置 reset" = "Reset";
 "首页" = "Home";

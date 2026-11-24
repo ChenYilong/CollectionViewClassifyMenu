@@ -1869,3 +1869,15 @@ tags: [issues, ui, cocoapods, progress]
     a libpag `eglMakeCurrent` main-thread freeze (THREAD_BLOCK_6S) after about 80 s of Loop on (PAG, not Rive); CYLTabBarController
     PR #824 (`feat/harmony-animated-item-engines`, another session) adds `cylanimateditem_rive` with the same goal: when it lands,
     `cylanimateditemrive` folds into it and every dependent re-pins once.
+
+- **2026-11-24, numeric `cornerRadius` on HarmonyOS and the mini program (PR #35, session Win): 80 / 100.** Prompt: "numeric
+  `cornerRadius` ... remove `CYLTagCornerRadiusSquare`, 0 = square, a value >= half the height = capsule, the presets keep their looks".
+  - HarmonyOS `89835260`: `CYLTagCornerRadiusSquare` removed; `CYLTagButton` and `CYLTagListView` use `min(radius, height / 2)`;
+    tagCloud 1000, filterTag and sectionTitle 0; demos keep their looks. Build (default and emulator HAPs) OK, host tests 88 / 88
+    (two new), `harmony_parity.py --check` OK (950 / 950; the PR had left the counter at 951).
+  - Mini program `cff27ed8`: `CORNER_RADIUS_SQUARE` removed, `cornerRadius()` is `min(radius, height / 2)` in both models; node tests
+    167 / 168 (the failing one needs `cyl_components`, unrelated).
+  - Screenshot: `docs/assets/harmonyos-corner-radius-numeric.png` (square, 6.67 pt, capsule, tagCloud preset; x86_64 emulator).
+  - **Open (-20):** no WeChat DevTools screenshot (`wechatide` CLI not installed); the iOS bundle `animated-tags.json` still has
+    `cornerRadius: 0` (now square on iOS; the mini program copy must stay byte for byte, so it and the Harmony copy follow once the
+    iOS file says 1000); the "（0 为胶囊）" label string is shared with the iOS bundle and is now stale.

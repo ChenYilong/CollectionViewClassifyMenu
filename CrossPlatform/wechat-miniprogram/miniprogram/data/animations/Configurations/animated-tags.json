@@ -11,8 +11,8 @@
     "itemHeight": 40,
     "sectionInsets": [12, 16, 12, 16],
     "headerTextColor": "#8E8E93",
-    "normal": { "font": { "size": 14, "weight": "medium" }, "textColor": "#3C3C43", "cornerRadius": 0, "borderColor": "#C7C7CC", "borderWidth": 1, "margin": 12 },
-    "selected": { "font": { "size": 14, "weight": "semibold" }, "textColor": "#FFFFFF", "backgroundColor": "#FF6A00", "borderColor": "#FF6A00", "borderWidth": 1, "cornerRadius": 0, "margin": 12 }
+    "normal": { "font": { "size": 14, "weight": "medium" }, "textColor": "#3C3C43", "cornerRadius": 1000, "borderColor": "#C7C7CC", "borderWidth": 1, "margin": 12 },
+    "selected": { "font": { "size": 14, "weight": "semibold" }, "textColor": "#FFFFFF", "backgroundColor": "#FF6A00", "borderColor": "#FF6A00", "borderWidth": 1, "cornerRadius": 1000, "margin": 12 }
   },
   "sections": [
     {

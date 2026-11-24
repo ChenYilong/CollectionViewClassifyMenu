@@ -14,7 +14,7 @@ export default function stylesAndAnimationsTest() {
       await cylTapAccessible(driver, CYLExampleLocalizedString('样式'), 'tab-样式', 1200);
       await driver.assertComponentExist(ON.id('styleTagList'));
       await cylTapAccessible(driver, CYLExampleLocalizedString('设置边框宽度 borderWidth'), 'style-borderWidth', 400);
-      await cylTapAccessible(driver, CYLExampleLocalizedString('设置圆角 cornerRadius（0 为胶囊）'), 'style-cornerRadius', 400);
+      await cylTapAccessible(driver, CYLExampleLocalizedString('设置圆角 cornerRadius（0 为直角，1000 为胶囊）'), 'style-cornerRadius', 400);
       await cylTapAccessible(driver, CYLExampleLocalizedString('只显示 title'), 'style-content.titleOnly', 400);
       await cylTapAccessible(driver, CYLExampleLocalizedString('重置 reset'), 'style-reset', 400);
       await driver.assertComponentExist(ON.id('styleTagList'));

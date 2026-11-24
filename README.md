@@ -139,7 +139,7 @@ filter.selectedIndexPaths = [IndexPath(item: 0, section: 0)]
 | `menu(_:didChangeSelectedItems:)` | 每次点击改变选择后回调一次，用于刷新筛选结果 |
 | `CYLMenuStyle.foldChevronImage` | 底部折叠箭头图片，展开时旋转 180° |
 | `CYLMenuStyle` | 标题字体与颜色、图标颜色（按状态）、图标与文字间距、图标大小、位置偏移、`layoutCentered`、间距、高度、折叠文案；Dynamic Type |
-| `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
+| `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为直角，1000 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
 | `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也是唯一的“图标 + 标题 + 动效图标”组件，可单独使用：`init(title:image:)` / `init(title:image:animationURL:)`，按内容自适应大小（`intrinsicContentSize`）；角标 `badgeValue`（`nil` 隐藏、空字符串为小红点、其他文字为胶囊）与 `badgeColor`（默认 `systemRed`），位于图标（无图标时为标题）右上角，VoiceOver 读作标签的值；`CYLMenuStyle.imagePlacement = .top` / `.bottom` 使图标位于标题上方 / 下方；`height(forTitle:iconSize:style:traitCollection:)` 测量高度。Android、HarmonyOS、微信小程序（`cyl-tag-button`）提供同名 API |
 | `menuSelectedImageForItem(at:)` | 选中态图标 |
 | `menuAnimationURLForItem(at:)`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF 动效图标（CYLTabBarController 动效引擎） |
@@ -272,7 +272,7 @@ style.layoutCentered = true                            // 只有图标或只有�
 // 背景、边框、圆角（CYLBadgeView）
 style.normalAppearance.borderColor = .systemGray4
 style.normalAppearance.borderWidth = 1
-style.normalAppearance.cornerRadius = 0                // 0 = 自动胶囊
+style.normalAppearance.cornerRadius = 1000             // 圆角半径（点）：0 = 方角，≥ 高度一半 = 胶囊
 style.normalAppearance.margin = 12
 style.selectedAppearance.backgroundColor = .systemBlue
 ```
@@ -329,7 +329,7 @@ tag.animationURL = iconsURL.cylAddingAnimationOptions(["artboard": "CHAT",
 let tags = CYLTagListView(configuration: [
     CYLTagListKey.selectionMode: "multiple",
     CYLTagListKey.foldStyle: "footerChevron",
-    CYLTagListKey.style: [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 0]],
+    CYLTagListKey.style: [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 1000]],
     CYLTagListKey.sections: [[CYLTagSectionKey.title: "Tabs",
                               CYLTagSectionKey.items: [[CYLTagItemKey.title: "Home",
                                                         CYLTagItemKey.image: "system:house",

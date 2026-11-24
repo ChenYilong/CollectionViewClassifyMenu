@@ -56,7 +56,7 @@ export class CYLTagCloudDemoData {
     return '{"style": {"lineSpacing": 5, "interitemSpacing": 3, "tagContentInsets": "{3, 10, 3, 10}"}, ' +
       '"scrollEnabled": false, "tags": ["Asia", "Europe", {"title": "Africa", "id": 3, "deletable": true, ' +
       '"style": {"normal": {"backgroundColor": "#00BFFF", "textColor": "#FFFFFF", "borderWidth": 0, ' +
-      '"cornerRadius": 0}, "highlightedBackgroundColor": "#88363636"}}, ' +
+      '"cornerRadius": 1000}, "highlightedBackgroundColor": "#88363636"}}, ' +
       '{"title": "Australia", "image": "system:globe"}]}';
   }
 }

@@ -1,4 +1,3 @@
-import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { accessibility } from '@kit.AccessibilityKit';
 import { CYLTagListAddItemView } from './CYLTagListAddItemView';
@@ -614,15 +613,11 @@ export struct CYLTagListView {
   }
 
   /**
-   * The corner radius a tag draws (CYLTagButton's rule): 0 is a capsule (half the height), CYLTagCornerRadiusSquare is
-   * square, anything else at most half the height. The inline fold cell uses it too, so it has the tags' shape.
+   * The corner radius a tag draws (CYLTagButton's rule): points, at most half the height (0 is square, half the height
+   * or more a capsule). The inline fold cell uses it too, so it has the tags' shape.
    */
   private tagCornerRadius(r: CYLTagRenderItem): number {
-    const radius = r.cornerRadius;
-    if (radius <= 0) {
-      return r.height / 2;
-    }
-    return radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, r.height / 2);
+    return Math.min(r.cornerRadius, r.height / 2);
   }
 
   private frameOf(r: CYLTagRenderItem): number[] {

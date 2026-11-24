@@ -248,7 +248,7 @@ source: https://github.com/whilu/AndroidTagView
 | `setTagBorderColor` | `CYLTag.borderColor` |
 | `setTagTextColor` | `CYLTag.textColor` |
 | `setBorderWidth` | `CYLTag.borderWidth` |
-| `setBorderRadius` | `CYLTag.cornerRadius`（方角用 `CYLTagCornerRadiusSquare`） |
+| `setBorderRadius` | `CYLTag.cornerRadius`（方角用 0，胶囊用不小于高度一半的值） |
 | `setTextSize` | `CYLTag.textSize` |
 | `setHorizontalPadding` / `setVerticalPadding` | `CYLTagAppearance.contentInsets` |
 | `setImage(Bitmap)` | `CYLTag.image`、`CYLTagButton.image`；圆形：`style.imageCornerRadius` |
@@ -277,7 +277,7 @@ source: https://github.com/whilu/AndroidTagView
 | `setTagBorderColor` | `CYLTag.borderColor` |
 | `setTagTextColor` | `CYLTag.textColor` |
 | `setBorderWidth` | `CYLTag.borderWidth` |
-| `setBorderRadius` | `CYLTag.cornerRadius` (`CYLTagCornerRadiusSquare` for square corners) |
+| `setBorderRadius` | `CYLTag.cornerRadius` (0 for square corners, half the height or more for a capsule) |
 | `setTextSize` | `CYLTag.textSize` |
 | `setHorizontalPadding` / `setVerticalPadding` | `CYLTagAppearance.contentInsets` |
 | `setImage(Bitmap)` | `CYLTag.image`, `CYLTagButton.image`; round: `style.imageCornerRadius` |

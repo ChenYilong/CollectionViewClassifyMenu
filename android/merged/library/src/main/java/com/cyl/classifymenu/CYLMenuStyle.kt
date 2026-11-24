@@ -297,7 +297,7 @@ class CYLMenuStyle {
                 appearance.textColor = Color.WHITE
                 appearance.borderWidth = 0f
                 appearance.borderColor = Color.WHITE
-                appearance.cornerRadius = 0f
+                appearance.cornerRadius = 1000f // a capsule: the radius is limited to half the tag height
                 appearance.font = CYLFont.systemFont(14f)
             }
             style.disabledAppearance.backgroundColor = CYLColor.withAlpha(blue, 0.4f)
@@ -431,7 +431,7 @@ class CYLMenuStyle {
             val style = compactTagStyle()
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = CYLColor.CLEAR
-                appearance.cornerRadius = CYLTagCornerRadiusSquare
+                appearance.cornerRadius = 0f
             }
             style.normalAppearance.backgroundImage = CYLStretchableDrawable.named("btn_slide_normal")
             style.normalAppearance.textColor = Color.rgb(96, 147, 130)
@@ -452,7 +452,7 @@ class CYLMenuStyle {
                 appearance.backgroundColor = CYLColor.CLEAR
                 appearance.borderWidth = 0f
                 appearance.borderColor = null
-                appearance.cornerRadius = CYLTagCornerRadiusSquare
+                appearance.cornerRadius = 0f
                 appearance.textColor = textColor
                 appearance.font = CYLFont.systemFont(fontSize)
                 appearance.contentInsets = CYLEdgeInsets(0f, leadingInset, 0f, 0f)

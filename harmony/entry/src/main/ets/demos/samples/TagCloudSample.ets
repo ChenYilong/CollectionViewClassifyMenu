@@ -7,7 +7,7 @@ import { CYLUIContext } from '@cyl/classifymenu';
  */
 import { common, Want } from '@kit.AbilityKit';
 import {
-  CYLColor, CYLEdgeInsets, CYLFont, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance, CYLTagCornerRadiusSquare,
+  CYLColor, CYLEdgeInsets, CYLFont, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance,
   CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
@@ -43,7 +43,7 @@ export class CYLTagCloudSampleData {
       tag.borderColor = borderColors[i];
       tags.push(tag);
     });
-    const radii: number[] = [CYLTagCornerRadiusSquare, 20 / 3, 60 / 3];
+    const radii: number[] = [0, 20 / 3, 60 / 3];
     radii.forEach((radius: number) => {
       const tag = new CYLTag(0, CYLExampleLocalizedString('圆角'));
       tag.cornerRadius = radius;
@@ -340,7 +340,7 @@ export struct CYLHotSearchPage {
       appearance.borderColor = CYLColor.white(0.88);
       appearance.borderWidth = 1;
       appearance.textColor = CYLColor.white(0.13);
-      appearance.cornerRadius = CYLTagCornerRadiusSquare;
+      appearance.cornerRadius = 0;
       appearance.font = CYLFont.systemFont(16);
     });
     style.tagContentInsets = new CYLEdgeInsets(9, 16, 9, 16);

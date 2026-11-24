@@ -336,7 +336,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(list.layer.cornerRadius, 6)
         list.defaultTagImage = UIImage(systemName: "person.circle")
         let square = CYLTag(title: "Square")
-        square.cornerRadius = CYLTagCornerRadiusSquare
+        square.cornerRadius = 0
         square.isDeletable = true
         list.insertTag(square, at: 0)
         list.probe.layOut()

@@ -38,7 +38,7 @@ source: https://github.com/kaedea/android-tagview
 
 | 中文 | English |
 |:---|:---|
-| android-tagview 的完整示例已移植到 Swift：“样式”标签页 → “android-tagview 示例”（`CYLTagCloudSample.swift`）：MainActivity（“TagView Sample”，其 `onCreate` 中的每个标签，INPUT TAG TEXT + ADD A TAG，Activity Result，GitHub）、SubActivity、ListViewActivity（51 行）、RecyclerViewActivity（21 行和一个页脚），以及其 README 中的 YY 热门搜索页面（橙色的 `CYLSearchBarView`，带“取消”，“热门搜索”及一个条形，“神 / 热”角标）。核心库绘制所有内容（`CYLMenuStyle.tagCloud()`、`CYLTag.badgeText`、`headerIndicatorColor`、`CYLTagCornerRadiusSquare`）；这些页面只传入数据和样式值并处理点击。由 `CYLAndroidSampleTests` 验证。 | android-tagview's whole sample is ported to Swift: Styles tab → android-tagview sample (`CYLTagCloudSample.swift`): MainActivity ("TagView Sample", every tag of its `onCreate`, INPUT TAG TEXT + ADD A TAG, Activity Result, GitHub), SubActivity, ListViewActivity (51 rows), RecyclerViewActivity (21 rows and a footer), and the YY hot search screen of its README (orange `CYLSearchBarView` with Cancel, Hot searches with a bar, Divine / Hot badges). The core draws all of it (`CYLMenuStyle.tagCloud()`, `CYLTag.badgeText`, `headerIndicatorColor`, `CYLTagCornerRadiusSquare`); the screens only pass data and style values and handle taps. Verified by `CYLAndroidSampleTests`. |
+| android-tagview 的完整示例已移植到 Swift：“样式”标签页 → “android-tagview 示例”（`CYLTagCloudSample.swift`）：MainActivity（“TagView Sample”，其 `onCreate` 中的每个标签，INPUT TAG TEXT + ADD A TAG，Activity Result，GitHub）、SubActivity、ListViewActivity（51 行）、RecyclerViewActivity（21 行和一个页脚），以及其 README 中的 YY 热门搜索页面（橙色的 `CYLSearchBarView`，带“取消”，“热门搜索”及一个条形，“神 / 热”角标）。核心库绘制所有内容（`CYLMenuStyle.tagCloud()`、`CYLTag.badgeText`、`headerIndicatorColor`）；这些页面只传入数据和样式值并处理点击。由 `CYLAndroidSampleTests` 验证。 | android-tagview's whole sample is ported to Swift: Styles tab → android-tagview sample (`CYLTagCloudSample.swift`): MainActivity ("TagView Sample", every tag of its `onCreate`, INPUT TAG TEXT + ADD A TAG, Activity Result, GitHub), SubActivity, ListViewActivity (51 rows), RecyclerViewActivity (21 rows and a footer), and the YY hot search screen of its README (orange `CYLSearchBarView` with Cancel, Hot searches with a bar, Divine / Hot badges). The core draws all of it (`CYLMenuStyle.tagCloud()`, `CYLTag.badgeText`, `headerIndicatorColor`); the screens only pass data and style values and handle taps. Verified by `CYLAndroidSampleTests`. |
 
 | 状态 | 截图 |
 | --- | :---: |
@@ -141,7 +141,7 @@ source: https://github.com/kaedea/android-tagview
 | `isDeletable` | `isDeletable`；数据源 `menuItemIsDeletable(at:)`；键 `CYLTagItemKey.deletable` |
 | `deleteIndicatorColor` | `deleteIndicatorColor`; `CYLMenuStyle.deleteIndicatorColor` |
 | `deleteIndicatorSize` | `deleteIndicatorSize`; `CYLMenuStyle.deleteIndicatorFont` |
-| `radius` | `cornerRadius`（0 为胶囊形） |
+| `radius` | `cornerRadius`（0 为直角，1000 为胶囊形） |
 | `deleteIcon` | `deleteIndicatorTitle`（默认“×”）；`CYLMenuStyle.deleteIndicatorTitle` |
 | `layoutBorderSize` | `borderWidth` |
 | `layoutBorderColor` | `borderColor` |
@@ -164,7 +164,7 @@ source: https://github.com/kaedea/android-tagview
 | `isDeletable` | `isDeletable`; data source `menuItemIsDeletable(at:)`; key `CYLTagItemKey.deletable` |
 | `deleteIndicatorColor` | `deleteIndicatorColor`; `CYLMenuStyle.deleteIndicatorColor` |
 | `deleteIndicatorSize` | `deleteIndicatorSize`; `CYLMenuStyle.deleteIndicatorFont` |
-| `radius` | `cornerRadius` (0 is a capsule) |
+| `radius` | `cornerRadius` (0 is square, 1000 a capsule) |
 | `deleteIcon` | `deleteIndicatorTitle` (default "×"); `CYLMenuStyle.deleteIndicatorTitle` |
 | `layoutBorderSize` | `borderWidth` |
 | `layoutBorderColor` | `borderColor` |

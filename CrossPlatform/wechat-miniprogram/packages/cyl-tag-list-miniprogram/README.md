@@ -28,6 +28,13 @@ Then in WeChat DevTools: **Tools → Build npm** (工具 → 构建 npm). It cop
 <cyl-tag-list configuration="{{configuration}}" bind:tagtap="onTagTap" />
 ```
 
+### Corner radius
+
+A style's `normal` / `selected` / `disabled` `cornerRadius` (and a tag's `cornerRadius`) is a plain number of points,
+limited to half the tag height, as on iOS and Android: `0` is square corners, a value of half the height or more (for
+example `1000`) is a capsule. `CORNER_RADIUS_SQUARE` is removed, and `0` no longer means an automatic capsule. The
+`tagCloudStyle()` preset keeps its capsules with `1000`; the default radius is `3`.
+
 ### One tag on its own
 
 `cyl-tag-button` is the iOS `CYLTagButton` on its own (a search bar item, a toolbar button, a placeholder's icon): an
