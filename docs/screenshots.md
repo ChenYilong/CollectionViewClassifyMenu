@@ -334,3 +334,12 @@
 | **结果：** Example 118 / 118、Example-Swift 23 / 23 单元测试通过；七个页面（场景一、场景二、样式、动效、加号按钮的查询筛选、Swift 示例的标签编辑器和样式）以 `-CYLExampleScreen` 启动并截图，无崩溃。截图保持原始像素。 | **Result:** Example 118 / 118 and Example-Swift 23 / 23 unit tests pass; seven screens (Scenario 1, Scenario 2, Styles, Animations, the plus button's query scenarios, the Swift example's tag editor and styles) launched with `-CYLExampleScreen` and photographed, no crash. Original pixels. |
 
 ![iOS 27.2, iPhone 18 Pro simulator: Example and Example-Swift main screens](assets/ios-27-2-iphone18pro-example-main-tabs.png)
+
+## 已完成（2026-11-25，`feat/harmony`）：iOS 27.2 上 menu.riv 的 Loop 关闭 / 开启（CYLTabBarController `edeb11e6`） / DONE (2026-11-25, `feat/harmony`): menu.riv with Loop off / on on iOS 27.2 (CYLTabBarController `edeb11e6`)
+
+| 中文 | English |
+|:---|:---|
+| **平台：** iOS，iPhone 18 Pro 模拟器 “CYL cm-harmony2”，iOS 27.2 \| 主机：macOS 27.3 \| Xcode 27.2 (27B52) \| 提交 [`f8a9a952`](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/f8a9a9529a3dd5281d0be93bcccba2ad6a3875eb)，CYLTabBarController `edeb11e6` \| 拍摄时间：2026-11-25 01:04 NZDT。 | **Platform:** iOS, iPhone 18 Pro simulator "CYL cm-harmony2", iOS 27.2 \| Host: macOS 27.3 \| Xcode 27.2 (27B52) \| commit [`f8a9a952`](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/f8a9a9529a3dd5281d0be93bcccba2ad6a3875eb), CYLTabBarController `edeb11e6` \| Taken: 2026-11-25 01:04 NZDT. |
+| **结果：** Loop 关闭，全部播放：Menu 标签只变化一次（X 变为汉堡，约 0.6 秒），随后静止（之后 11 秒内像素差 ≤ 0.1）；Loop 开启：Menu 约每 1.5 秒在 X 与汉堡之间交替，持续 19 秒。画面截自 60 fps 录屏，左列 Loop 关闭，右列 Loop 开启。 | **Result:** Loop off, Play all: the Menu tag changes once (X to hamburger, about 0.6 s) and then rests (pixel difference 0.1 or less for the next 11 s); Loop on: Menu alternates X and hamburger about every 1.5 s through 19 s. Frames cut from a 60 fps recording, left column Loop off, right column Loop on. |
+
+![iOS 27.2: menu.riv with Loop off and Loop on after Play all](assets/ios-27-2-iphone18pro-menu-riv-loop-off-on.png)
