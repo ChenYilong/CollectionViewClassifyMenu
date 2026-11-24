@@ -1065,6 +1065,8 @@ open class CYLTagButton: CYLAnimatedItemView {
         // The background is CYLAnimatedItemView's: flat color, or Liquid Glass tinted with it where the system draws it.
         itemBackgroundStyle = style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat
         itemBackgroundColor = background
+        // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
+        itemGlassTintAlpha = state == .selected ? 1 : nil
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)

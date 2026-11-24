@@ -50,6 +50,15 @@ final class CYLRootTabBarTests: CYLMenuExampleTestCase {
         XCTAssertTrue(first.topViewController?.hidesBottomBarWhenPushed ?? false)
     }
 
+    /// docs/cross-platform.md "the default tab bar height is the system one": the example sets no `tabBarHeight`, so the
+    /// root tab bar keeps CYLTabBarController's default (49, the UITabBar's own height without the home indicator's inset;
+    /// UIKit's `sizeThatFits` answers 83 on a phone with one, the 34 pt inset included).
+    func testRootTabBarKeepsTheDefaultHeight() {
+        let tabs = showRootTabBarController()
+        XCTAssertEqual(tabs.tabBarHeight, CYLTabBarController().tabBarHeight, accuracy: 0.5, "No custom height")
+        XCTAssertEqual(tabs.tabBarHeight, 49, accuracy: 0.5, "The UITabBar height without the safe-area inset")
+    }
+
     func testPlusButtonOpensFilterScenariosAndOnlyTheRootTabBarHasIt() {
         let tabs = showRootTabBarController()
         XCTAssertEqual(tabs.context, CYLExampleRootTabBarContext)

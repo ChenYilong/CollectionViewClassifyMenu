@@ -172,6 +172,8 @@ export class CYLTagButton {
   cornerRadius: number = 0;
   /** The appearance's radius as it is (the capsule constant by default): `cylanimateditem` implements the capsule. */
   appearanceCornerRadius: number = 0;
+  /** A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); -1 is the modifier's default share. */
+  glassTintAlpha: number = -1;
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   /**
    * The background, radius and border are `cylanimateditem`'s (`CYLAnimatedItemBackgroundModifier`, the interface of
@@ -443,7 +445,9 @@ export class CYLTagButton {
   /**
    * `animationView`: the live player of the animated icon, the one the app's animation view handed over with
    * `CYLTagAnimationContext.ready(player)` (the example's players expose `lottieItem`, `pagController`,
-   * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine).
+   * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine). It is
+   * always undefined for a type drawn by a component-level builder (Rive): that one is driven through
+   * `CYLAnimatedItemView`'s own props.
    */
   get animationView(): CYLAnimationPlayer | undefined {
     return this.player;
@@ -699,6 +703,17 @@ export class CYLTagButton {
       } else {
         this.updateAnimationState();
       }
+    }
+  }
+
+  /**
+   * The animated icon of a builder-drawn type has loaded: a `playAnimation()` made before that replays now.
+   */
+  itemDidLoad(): void {
+    if (this.pendingPlay) {
+      this.pendingPlay = false;
+      this.playToken++;
+      this.changed();
     }
   }
 
@@ -1065,6 +1080,7 @@ export class CYLTagButton {
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
     this.itemBackgroundStyle = glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
     this.appearanceCornerRadius = appearance.cornerRadius;
+    this.glassTintAlpha = state === CYLControlState.SELECTED ? 1 : -1;
     this.backgroundColor = stateBackground;
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;
@@ -1215,6 +1231,10 @@ export struct CYLTagButtonComponent {
             isSelected: this.button.isSelected,
             iconWidth: this.af().width,
             iconHeight: this.af().height,
+            animationSpeed: this.button.resolvedAnimationSpeed,
+            animationLoops: this.button.animationLoops,
+            animationRestartToken: this.button.playToken,
+            onItemLoaded: () => this.button.itemDidLoad(),
             onPlayer: (player: CYLAnimationPlayer | undefined) => {
               if (player !== undefined || this.button.animationPlayer !== undefined) {
                 this.button.setAnimationPlayer(player);
@@ -1303,7 +1323,7 @@ export struct CYLTagButtonComponent {
     .height(this.tagHeight ?? this.button.intrinsicSize().height)
     // Background, radius and border (the tint over the glass for Liquid Glass): cylanimateditem's one interface.
     .attributeModifier(new CYLAnimatedItemBackgroundModifier(this.button.itemBackgroundStyle, this.button.backgroundColor,
-      this.button.appearanceCornerRadius, this.button.borderWidth, this.button.borderColor))
+      this.button.appearanceCornerRadius, this.button.borderWidth, this.button.borderColor, this.button.glassTintAlpha))
     .backgroundImage(this.button.backgroundImage)
     .backgroundImageSize(ImageSize.Cover)
     // `CYLMenuStyle.elevation`: a shadow under the tag (offset down by half of it, blurred by it); the tag stops

@@ -432,7 +432,7 @@ const cylAnimatedItemGlassTintAlpha = 0.75
  * [CN] 玻璃使用的着色：'#RGB'、'#RRGGBB'、'#RRGGBBAA'、'rgb()' 或 'rgba()' 颜色变为半透明（其透明度乘以 `cylAnimatedItemGlassTintAlpha`），因此选中标签的
  *      绿色这样的不透明色是给玻璃着色而不是盖住它；与 iOS、Android、鸿蒙同一规则。其他颜色文本原样使用。
  */
-function cylAnimatedItemGlassTint(color) {
+function cylAnimatedItemGlassTint(color, tintAlpha) {
   const text = String(color || '').trim()
   let r, g, b, a = 1
   let m = text.match(/^#([0-9a-fA-F]{3})$/)
@@ -446,15 +446,17 @@ function cylAnimatedItemGlassTint(color) {
     r = Number(m[1]); g = Number(m[2]); b = Number(m[3])
     if (m[4] !== undefined) a = Number(m[4])
   } else {
-    return text
+    return text === 'transparent' ? '' : text
   }
-  return `rgba(${r},${g},${b},${Math.round(a * cylAnimatedItemGlassTintAlpha * 1000) / 1000})`
+  // A fully transparent color means "no color" too: the caller then uses the default frosted tint.
+  if (a === 0) return ''
+  return `rgba(${r},${g},${b},${Math.round(a * (Number(tintAlpha) >= 0 ? Number(tintAlpha) : cylAnimatedItemGlassTintAlpha) * 1000) / 1000})`
 }
 
 /**
  * @returns {{css: string, glass: boolean}} the inline style of the root view, '' when no `item…` background property is set
  */
-function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark) {
+function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, tintAlpha) {
   const border = Number(borderWidth) > 0 ? Number(borderWidth) : 0
   const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== ''
   if (!used) return { css: '', glass: false }
@@ -466,7 +468,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   let css = `border-radius:${radius}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
-    const tint = color ? cylAnimatedItemGlassTint(color) : (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
+    const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
     css += `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
     css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
   } else if (color) {
@@ -475,7 +477,33 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   return { css, glass }
 }
 
+/**
+ * [EN] The reason of a failed animation for `resourcemissing`: "engine library missing" (no engine component, e.g.
+ *      `cyl-animation-placeholder`'s message), "not found" (a missing file, a failed download or request), "unreadable"
+ *      (no permission, an empty file), else "decode failed". The same four strings on every platform.
+ * [CN] 动画失败时 `resourcemissing` 的原因："engine library missing"（没有引擎组件，如 `cyl-animation-placeholder` 的消息）、
+ *      "not found"（文件不存在、下载或请求失败）、"unreadable"（无权限、文件为空），其余为 "decode failed"。各平台字符串相同。
+ */
+function cylAnimatedItemMissingReason(message) {
+  const text = String(message || '')
+  if (/no animation component|no engine|install its package/i.test(text)) return 'engine library missing'
+  if (/not found|no such file|ENOENT|404|file not exist|request:fail|downloadFile:fail|download fail|failed to (load|fetch|download)/i.test(text)) return 'not found'
+  if (/permission|unreadable|empty file|EACCES/i.test(text)) return 'unreadable'
+  return 'decode failed'
+}
+
+/**
+ * [EN] The file name or path as configured: the `#` options of a source are not part of it. [CN] 按配置给出的文件名或路径：不含 source 的 `#` 选项。
+ */
+function cylAnimatedItemResource(animationUrl) {
+  const text = String(animationUrl || '')
+  const hash = text.indexOf('#')
+  return hash < 0 ? text : text.slice(0, hash)
+}
+
 module.exports = {
+  cylAnimatedItemMissingReason,
+  cylAnimatedItemResource,
   cylAnimatedItemGlassTint,
   cylAnimatedItemCornerRadiusCapsule,
   cylAnimatedItemBackground,

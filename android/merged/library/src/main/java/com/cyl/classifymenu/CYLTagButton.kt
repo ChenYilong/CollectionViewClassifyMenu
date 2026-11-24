@@ -411,6 +411,8 @@ open class CYLTagButton @JvmOverloads constructor(
             CYLAnimatedItemBackgroundStyle.Flat
         }
         itemBackgroundColor = backgroundColor
+        // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
+        itemGlassTintAlpha = if (state == CYLControlState.SELECTED) 1f else null
         // The appearance's radius (CYLAnimatedItemCornerRadiusCapsule by default, 0 is square), set with the style and not
         // only when the tag is laid out: the view's own default (null) is square for flat.
         itemCornerRadius = appearance.cornerRadius

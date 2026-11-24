@@ -23,7 +23,7 @@ const fs = require('fs');
 const path = require('path');
 
 // CYL_TAB_BAR: the same commit as the React Native example (fetch-cyltabbar.sh, example/ios/Podfile).
-const COMMIT = '55cb498d2fbadbde87bf476a53a5c878bf450acb';
+const COMMIT = '235f6e96a4e350a31302144b461efeda949f95a0';
 const REPOSITORY = 'https://github.com/ChenYilong/CYLTabBarController.git';
 const ROOT = path.resolve(__dirname, '..');
 const CHECKOUT = path.join(ROOT, '.deps', 'CYLTabBarController');
@@ -60,6 +60,7 @@ const PAG_HINT = 'run python3 scripts/fetch-animation-resources.py PAGResources 
  */
 const LIBRARY = path.join(ROOT, 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
 const VENDORED_SOURCE = 'CrossPlatform/wechat-miniprogram-cyltabbar';
+// cyl-dealloc-block-executor: required by cyl-animated-item since CYLTabBarController edeb11e6 (the moment bus).
 const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder', 'cyl-dealloc-block-executor'];
 const VENDORED_TEST = {
   from: 'test/cyl_animated_item.test.js',
@@ -73,11 +74,9 @@ function vendoredFiles() {
   const license = fs.readFileSync(path.join(base, 'src', 'LICENSE'));
   const entries = VENDORED.flatMap((folder) => {
     const source = path.join(base, 'src', folder);
-    const own = files(source);
-    return own.map((file) => ({ target: path.join(LIBRARY, folder, file), content: fs.readFileSync(path.join(source, file)) }))
+    return files(source).filter((file) => file !== 'LICENSE').map((file) => ({ target: path.join(LIBRARY, folder, file), content: fs.readFileSync(path.join(source, file)) }))
       .concat([
-        // A folder that ships its own LICENSE (cyl-dealloc-block-executor) keeps it; the others get the package's.
-        ...(own.includes('LICENSE') ? [] : [{ target: path.join(LIBRARY, folder, 'LICENSE'), content: license }]),
+        { target: path.join(LIBRARY, folder, 'LICENSE'), content: license },
         { target: path.join(LIBRARY, folder, 'COMMIT'), content: Buffer.from(`${COMMIT}\n`) },
       ]);
   });

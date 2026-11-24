@@ -58,6 +58,13 @@ The row "HarmonyOS Rive: `icons.riv` dark tags all show the same artboard" above
 `CYLRivePlayer` selected the named artboard again after `reset()`, commit `03de656d`) was removed: the example no longer
 has a Rive player that drives `RiveAnimationView`. Every Rive tag now plays through CYLTabBarController's shared engine,
 the vendored `harmony/cylanimateditemrive` (`CYLRiveIcon`, loop policy `WhilePlaying`, registered with
-`cylRegisterRiveEngine(context)`), which handles artboards, replay and the Loop switch itself. `CYLRivePlayer` is only an
+`cylRegisterRiveEngine(context)`), which handles artboards, replay and the Loop switch itself. `CYLRivePlayer` was only an
 adapter (play -> replay token, stopAtProgress -> selected, loops -> loops). The core `harmony/classifymenu` still depends on
 neither the module nor `@ohos/rive`.
+
+**2026-11-22: the adapter is gone too.** The core's `CYLTagAnimatedIcon` takes a component-level builder per type
+(`CYLTagAnimationBuilder.registerItemBuilder`) and drives it through `CYLAnimatedItemView`'s `animationLoops` and
+`animationRestartToken` (first through a `CYLAnimatedItemPlayer` wrapper, removed the same day: the tag now passes its speed,
+loop switch and play token straight to those props). The example registers CYLTabBarController's
+`CYLRiveAnimationBuilder` for Rive and keeps no Rive code of its own (`CYLRiveIconView`, `CYLRiveIconHost` and `CYLRivePlayer`
+deleted); docs/issue-progress.md, "HarmonyOS tags play Rive through `CYLRiveAnimationBuilder`".
