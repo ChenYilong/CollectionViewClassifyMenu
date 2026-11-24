@@ -761,7 +761,11 @@ export class CYLTagButton {
     const height = this.boundsHeight;
     const style = this.styleStorage;
     const state = this.currentState;
-    const insets = style.appearance(state).contentInsets;
+    // Left and right at least the shape's inset (14 on a drawn Liquid Glass tag, 0 on flat), as the measured width counted it.
+    const appearanceInsets = style.appearance(state).contentInsets;
+    const sideInset: number = CYLTagButtonMetrics.contentInset(style);
+    const insets = new CYLEdgeInsets(appearanceInsets.top, Math.max(appearanceInsets.left, sideInset), appearanceInsets.bottom,
+      Math.max(appearanceInsets.right, sideInset));
     const deleteWidth = this.layOutDeleteIndicator(state, insets);
     const indicatorFirst = this.showsDeleteIndicatorValue &&
       style.deleteIndicatorPlacement === CYLTagDeleteIndicatorPlacement.leading;

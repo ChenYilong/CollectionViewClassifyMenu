@@ -1,6 +1,8 @@
+import { CYLAnimatedItemLiquidGlassContentInset } from 'cylanimateditem';
 import { CYLMenuGestureState } from '../core/CYLMenuGestureState';
 import { CYLTagListCacheItem } from '../core/CYLTagListCache';
 import { CYLUIContext } from '../core/CYLUIContext';
+import { CYLTagBackgroundStyle } from '../core/CYLMenuStyle';
 /**
  * The model and controller of a `CYLTagListView`, as iOS `CYLTagListView.swift` without its UIKit views: the data
  * source and delegate, the style, selection, folding, measurement and row layout, the title, the android-tagview tag
@@ -108,6 +110,15 @@ function measureWithArkUI(text: string, font: CYLFont): number {
 const CAP_HEIGHT_RATIO: number = 0.7;
 
 export class CYLTagButtonMetrics {
+  /**
+   * The space between the border and the content, left and right, that the style's shape asks for: `CYLAnimatedItemLiquidGlassContentInset` for a
+   * Liquid Glass style where the glass is really drawn (the same condition as the capsule), else 0. The effective inset is the larger of this and
+   * the appearance's content inset.
+   */
+  static contentInset(style: CYLMenuStyle): number {
+    return style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass ? CYLAnimatedItemLiquidGlassContentInset : 0;
+  }
+
   /** Replaced in tests that run without a UI context. */
   static textMeasurer: CYLTextMeasurer = measureWithArkUI;
 
@@ -139,7 +150,8 @@ export class CYLTagButtonMetrics {
         const titleWidth = displayed.length === 0 ? 0 :
           Math.ceil(CYLTagButtonMetrics.textMeasurer(displayed, font)) + style.imageTitleSpacing;
         const indicator = showsDeleteIndicator ? style.imageTitleSpacing + indicatorWidth(state) : 0;
-        width = Math.max(width, Math.ceil(side + titleWidth + indicator + style.appearance(state).contentInsets.right));
+        width = Math.max(width, Math.ceil(side + titleWidth + indicator +
+          Math.max(style.appearance(state).contentInsets.right, CYLTagButtonMetrics.contentInset(style))));
       });
       return width;
     }
@@ -159,7 +171,9 @@ export class CYLTagButtonMetrics {
       if (showsDeleteIndicator) {
         content += style.imageTitleSpacing + indicatorWidth(state);
       }
-      width = Math.max(width, Math.ceil(content + appearance.contentInsets.left + appearance.contentInsets.right));
+      const sideInset: number = CYLTagButtonMetrics.contentInset(style);
+      width = Math.max(width, Math.ceil(content + Math.max(appearance.contentInsets.left, sideInset) +
+        Math.max(appearance.contentInsets.right, sideInset)));
     });
     return width;
   }
@@ -256,9 +270,11 @@ export class CYLTagButtonMetrics {
     let height = single;
     STATES.forEach((state: number) => {
       const insets = style.appearance(state).contentInsets;
-      let room = width - insets.left - insets.right;
+      const sideInset: number = CYLTagButtonMetrics.contentInset(style);
+      const leftInset: number = Math.max(insets.left, sideInset);
+      let room = width - leftInset - Math.max(insets.right, sideInset);
       if (style.fillsTagHeight(iconSize)) {
-        room -= single - insets.left + style.imageTitleSpacing;
+        room -= single - leftInset + style.imageTitleSpacing;
       } else if (iconSize.width > 0) {
         room -= iconSize.width + style.imageTitleSpacing;
       }

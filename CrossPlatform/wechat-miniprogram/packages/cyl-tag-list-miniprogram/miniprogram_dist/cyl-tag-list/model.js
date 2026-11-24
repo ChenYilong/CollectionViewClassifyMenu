@@ -11,7 +11,9 @@ const symbols = require('./symbols.js');
 const locale = require('../locale.js');
 const { cylAnimatedItemType, cylAnimatedItemSource } = require('../cyl-animated-item/cyl_animated_item_model');
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
-const { cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule } = require('../cyl-animated-item/cyl_animated_item_model');
+const {
+  cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive
+} = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
 
@@ -755,8 +757,11 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const appearance = style[state];
   const height = fixedHeight > 0 ? fixedHeight : tagHeight(style);
   const border = appearance.borderColor ? appearance.borderWidth : 0;
-  const left = Math.max(...APPEARANCE_STATES.map((s) => style[s].contentInsets.left));
-  const right = Math.max(...APPEARANCE_STATES.map((s) => style[s].contentInsets.right));
+  // Left and right at least the space the shape asks for between the border and the title: cyl-animated-item's
+  // cylAnimatedItemLiquidGlassContentInset (14) on a drawn Liquid Glass tag, 0 on flat.
+  const sideInset = style.backgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive() ? cylAnimatedItemLiquidGlassContentInset : 0;
+  const left = Math.max(sideInset, ...APPEARANCE_STATES.map((s) => style[s].contentInsets.left));
+  const right = Math.max(sideInset, ...APPEARANCE_STATES.map((s) => style[s].contentInsets.right));
   const showsImage = icon.kind !== 'none';
   const showsTitle = item.title !== '';
   const animated = icon.kind === 'animation';

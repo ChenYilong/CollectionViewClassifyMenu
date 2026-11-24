@@ -49,6 +49,15 @@ import UIKit
 open class CYLTagButton: CYLAnimatedItemView {
 
     private static let states: [UIControl.State] = [.normal, .selected, .disabled]
+
+    /**
+     * The space between the border and the content, left and right, that the shape asks for: `CYLAnimatedItemLiquidGlassContentInset` for a
+     * Liquid Glass style where the glass is really drawn (the same condition as the capsule), else 0 (CYLAnimatedItemView's
+     * `itemContentHorizontalInset` left unset gives the same). The effective inset is the larger of this and the appearance's.
+     */
+    static func contentInset(for style: CYLMenuStyle) -> CGFloat {
+        style.resolvedBackgroundStyle == .liquidGlass ? CYLAnimatedItemLiquidGlassContentInset : 0
+    }
     private static let disabledAnimationAlpha: CGFloat = 0.4
     /**
      * The badge's size: a dot's diameter, the minimum height of a badge with text, its text's side padding.
@@ -424,7 +433,7 @@ open class CYLTagButton: CYLAnimatedItemView {
                     : showsDeleteIndicator
                     ? style.imageTitleSpacing + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
                     : 0
-                return max(width, ceil(side + titleWidth + delete + style.appearance(for: state).contentInsets.right))
+                return max(width, ceil(side + titleWidth + delete + max(style.appearance(for: state).contentInsets.right, contentInset(for: style))))
             }
         }
         var width = style.minimumTagSize.width
@@ -449,7 +458,8 @@ open class CYLTagButton: CYLAnimatedItemView {
                 content += style.imageTitleSpacing
                     + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
             }
-            width = max(width, ceil(content + appearance.contentInsets.left + appearance.contentInsets.right))
+            let sideInset = contentInset(for: style)
+            width = max(width, ceil(content + max(appearance.contentInsets.left, sideInset) + max(appearance.contentInsets.right, sideInset)))
         }
         return width
     }
@@ -519,9 +529,11 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         return states.reduce(single) { height, state in
             let insets = style.appearance(for: state).contentInsets
-            var room = width - insets.left - insets.right
+            let sideInset = contentInset(for: style)
+            let left = max(insets.left, sideInset)
+            var room = width - left - max(insets.right, sideInset)
             if style.fillsTagHeight(withIconSize: iconSize) {
-                room -= single - insets.left + style.imageTitleSpacing
+                room -= single - left + style.imageTitleSpacing
             } else if iconSize.width > 0 {
                 room -= iconSize.width + style.imageTitleSpacing
             }
@@ -557,8 +569,14 @@ open class CYLTagButton: CYLAnimatedItemView {
     /**
      * The content's size without the current appearance's content insets (the base class's measuring hook).
      */
+    /// The appearance's insets with left and right at least `resolvedItemContentHorizontalInset` (14 on a drawn Liquid Glass tag, 0 on flat).
+    private func effectiveInsets(_ insets: UIEdgeInsets) -> UIEdgeInsets {
+        let side = resolvedItemContentHorizontalInset
+        return UIEdgeInsets(top: insets.top, left: max(insets.left, side), bottom: insets.bottom, right: max(insets.right, side))
+    }
+
     open override func contentSizeThatFits(_ size: CGSize) -> CGSize {
-        let insets = styleStorage.appearance(for: currentState).contentInsets
+        let insets = effectiveInsets(styleStorage.appearance(for: currentState).contentInsets)
         let size = intrinsicContentSize
         return CGSize(width: max(0, size.width - insets.left - insets.right),
                       height: max(0, size.height - insets.top - insets.bottom))
@@ -664,7 +682,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         let height = bounds.height
         let style = styleStorage
         let state = currentState
-        let insets = style.appearance(for: state).contentInsets
+        let insets = effectiveInsets(style.appearance(for: state).contentInsets)
         backgroundImageView.frame = bounds
         let deleteWidth = layOutDeleteIndicator(state: state, insets: insets)
         let indicatorFirst = showsDeleteIndicator && style.deleteIndicatorPlacement == .leading

@@ -160,6 +160,33 @@ final class CYLTagConfigurationTests: XCTestCase {
         }
     }
 
+    func testALiquidGlassTagKeepsFourteenBetweenTheBorderAndTheTitleAndFlatKeepsItsInsets() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
+        let flat = CYLMenuStyle()
+        let glass = CYLMenuStyle()
+        glass.backgroundStyle = .liquidGlass
+        for style in [flat, glass] {
+            style.normalAppearance.contentInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+            style.selectedAppearance.contentInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+            style.disabledAppearance.contentInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+        }
+        let flatWidth = CYLTagButton.width(forTitle: "Swift", iconSize: .zero, style: flat, traitCollection: nil)
+        let glassWidth = CYLTagButton.width(forTitle: "Swift", iconSize: .zero, style: glass, traitCollection: nil)
+        XCTAssertEqual(glassWidth - flatWidth, 2 * (CYLAnimatedItemLiquidGlassContentInset - 10), accuracy: 0.01,
+                       "measured: 14 each side on glass instead of the appearance's 10")
+        // Laid out: the title starts 14 from the left edge, and its width fits the measured width.
+        let button = CYLMenuFixtures.tagButton(title: "Swift", image: nil, style: glass, size: CGSize(width: glassWidth, height: 34))
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.resolvedItemContentHorizontalInset, 14, accuracy: 0.01)
+        XCTAssertEqual(button.titleLabel.frame.minX, 14, accuracy: 0.5, "the title keeps 14 from the border")
+        XCTAssertEqual(button.bounds.width - button.titleLabel.frame.maxX, 14, accuracy: 0.5)
+        // A larger appearance inset wins; an explicit 0 is respected; flat keeps its own.
+        let flatButton = CYLMenuFixtures.tagButton(title: "Swift", image: nil, style: flat, size: CGSize(width: flatWidth, height: 34))
+        flatButton.layoutIfNeeded()
+        XCTAssertEqual(flatButton.titleLabel.frame.minX, 10, accuracy: 0.5)
+    }
+
     func testLiquidGlassBackgroundIsDrawnWhereTheSystemDrawsIt() throws {
         guard #available(iOS 26.0, *) else {
             throw XCTSkip("UIGlassEffect needs iOS 26")

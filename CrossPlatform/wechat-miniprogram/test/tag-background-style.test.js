@@ -68,3 +68,17 @@ test('cyl-tag-cloud reads backgroundStyle too: a glass tag cloud tag has the gla
   assert.doesNotMatch(JSON.stringify(render({})), /backdrop-filter/);
   assert.doesNotMatch(JSON.stringify(render({ backgroundStyle: 'liquidGlass' })).replace(/backdrop-filter/g, ''), /undefined/);
 });
+
+test('a Liquid Glass tag keeps 14 between the border and the title, a flat tag its own insets', () => {
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
+  const padding = (backgroundStyle) => {
+    const view = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle } }, '', 2);
+    return /padding: 0 ([\d.]+)px 0 ([\d.]+)px/.exec(view.cellStyle).slice(1).map(Number);
+  };
+  const [flatRight, flatLeft] = padding('flat');
+  const [glassRight, glassLeft] = padding('liquidGlass');
+  assert.equal(glassLeft >= 13 && glassRight >= 13, true, 'about 14 less the hairline border');
+  assert.equal(flatLeft < glassLeft && flatRight < glassRight, true, 'the glass asks for more than the flat default of 10');
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(false);
+  assert.deepEqual(padding('liquidGlass'), [flatRight, flatLeft], 'where glass is not active the tag is flat');
+});
