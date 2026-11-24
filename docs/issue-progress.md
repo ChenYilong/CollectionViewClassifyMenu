@@ -35,13 +35,13 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-24, docs/tag-liquid-glass-screenshots, Mac session chenyilong-68): labeled iOS Liquid Glass screenshots (default style normal / selected / disabled, flat vs glass, contact tag editor selected)
+### TODO → DONE (2026-11-25, docs/tag-liquid-glass-screenshots, Mac session chenyilong-68): labeled iOS Liquid Glass screenshots (default style normal / selected / disabled, flat vs glass, contact tag editor selected)
 
 - Context: handed over by Mac-CollectionViewClassifyMenu 6de126 for Mac-CYLSearchViewController's items 3 and 4 (PR #36, branch feat/tag-liquid-glass, frozen). This branch is based on 7c64042e. The PR owner wants the shots on CYLTabBarController 3f2a5b99 (or 5b8869b2): the Podfiles are changed locally to build and restored before committing; fallback dea0951e would be noted here.
 - Requirements: (a) default style tag: normal, selected, disabled; (b) flat vs liquidGlass on a plain and on a colorful page; (c) contact tag editor with a selected tag. Light mode, dark mode if cheap. Original pixels in docs/assets/, stitched per AGENTS.md (one column, English header and footer: iOS, iOS 27.2, iPhone 18 Pro simulator, Xcode, ClassifyMenu 7c64042e + CYLTabBarController 3f2a5b99, time), listed in docs/screenshots.md. Docs-only commits.
 - Prompt (verbatim): "处理你接受到的从其他session中传来的消息，从找找到跟本项目相关的任务，认领后，开始修复。"
 - Prompt (English): "Handle the messages received from other sessions, find the tasks related to this project, claim them and start fixing."
-- Status: TODO.
+- Status: DONE 2026-11-25. Built with Podfiles pointing at CYLTabBarController 3f2a5b99 via a local file:// clone (github clone too slow), restored before commit. Evidence: docs/assets/ios-tag-liquid-glass-default-style-light.png, ios-tag-liquid-glass-flat-vs-glass-colorful-light.png, ios-contact-tag-editor-liquid-glass-selected.png; listed in docs/screenshots.md. Dark mode only for the editor; the default-style and flat-vs-glass shots are light only. Raw originals are not committed (check-screenshots.py requires stitched labels); the panels keep original pixels.
 
 ### TODO → DONE (2026-11-21, `docs/todo-reconcile`, Windows session): fix every TODO in docs/ (heading pass)
 
