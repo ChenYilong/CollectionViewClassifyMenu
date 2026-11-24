@@ -587,14 +587,9 @@ open class CYLTagButton @JvmOverloads constructor(
                 }
             }
         }
-        // CYLAnimatedItemView applies it, limited to half the height, with the background and the border: the number as it is (0 is
-        // square, CYLTagCornerRadiusCapsule a capsule). A tag whose radius was never set gets null in every style (flat and
-        // Liquid Glass), the view's own default (a capsule).
-        itemCornerRadius = if (!appearance.isCornerRadiusSet) {
-            null
-        } else {
-            appearance.cornerRadius
-        }
+        // CYLAnimatedItemView applies it, limited to half the height, with the background and the border: the appearance's number
+        // (CYLTagCornerRadiusCapsule by default, 0 is square).
+        itemCornerRadius = appearance.cornerRadius
     }
 
     /** `badgeFrame`: the badge's frame in this view, dp (`CYLRect()` while it is hidden). */

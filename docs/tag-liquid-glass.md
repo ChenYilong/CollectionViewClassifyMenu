@@ -75,8 +75,9 @@ config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's `backgroundC
 Corner radius rule (owner's decision 2026-11-24, relayed by the CYLSearchViewController session and confirmed by the owner in this session; breaking on purpose,
 the pins of integrators move together later): 「统一，圆角逻辑。0就是方。胶囊用1000，但需要使用宏定义定义1000。用户应通过宏定义传入而非传入魔法数字。其他值没有特殊含义。删除CYLTagCornerRadiusSquare。」 — one rule: the
 radius is plain points limited to half the height, 0 is square, a capsule is the one named constant whose value is 1000 and users pass the constant, never the number;
-no other value has a special meaning; `CYLTagCornerRadiusSquare` is deleted. The owner's answer in this session: apply it everywhere; the one special case that stays is the unset radius: in `CYLAnimatedItemView` it is a capsule for EVERY background style, Liquid Glass and flat (owner's correction in this session); a tag whose
-radius was never set (`isCornerRadiusSet` false, the default) passes it down in EVERY style, so default flat and Liquid Glass tags are capsules (owner's answer 2026-11-24; the presets that set a radius keep it).
+no other value has a special meaning; `CYLTagCornerRadiusSquare` is deleted. The owner's answer in this session: apply it everywhere; the unset radius of `CYLAnimatedItemView` is a capsule for the Liquid Glass style only (flat stays square: owner's correction later the same day).
+A ClassifyMenu tag does not use "unset": its appearance's default radius IS the capsule constant (`CYLTagCornerRadiusCapsule`), so default flat and Liquid Glass
+tags are capsules and are handed to the view as a plain number; the presets that set a radius keep it.
 
 | Platform | Capsule constant (value 1000) | 0 |
 |:--|:--|:--|

@@ -221,27 +221,22 @@ class CYLTagButtonStandaloneTest {
     }
 
     @Test
-    fun anUnsetRadiusIsACapsuleInEveryStyleAndASetRadiusCustomizesIt() {
+    fun theDefaultRadiusIsTheCapsuleConstantInEveryStyleAndASetRadiusCustomizesIt() {
         com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = true
-        val style = CYLMenuStyle()
-        style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
-        val tag = CYLTagButton(context, "Tag", icon())
-        tag.style = style
-        assertEquals(null, tag.itemCornerRadius)
-        val flatTag = CYLTagButton(context, "Tag", icon())
-        flatTag.style = CYLMenuStyle()
-        assertEquals("flat: unset too", null, flatTag.itemCornerRadius)
-        style.normalAppearance.cornerRadius = 6f
-        assertTrue(style.normalAppearance.isCornerRadiusSet)
-        tag.style = style
-        assertEquals(6f, tag.itemCornerRadius)
-        style.normalAppearance.cornerRadius = 0f
-        tag.style = style
-        assertEquals("0 is square", 0f, tag.itemCornerRadius)
-        style.normalAppearance.cornerRadius = CYLTagCornerRadiusCapsule
-        tag.style = style
-        assertEquals(CYLTagCornerRadiusCapsule, tag.itemCornerRadius)
-        assertTrue(style.copy().normalAppearance.isCornerRadiusSet)
+        assertEquals(CYLTagCornerRadiusCapsule, CYLMenuStyle().normalAppearance.cornerRadius)
+        for (background in CYLTagBackgroundStyle.values()) {
+            val style = CYLMenuStyle()
+            style.backgroundStyle = background
+            val tag = CYLTagButton(context, "Tag", icon())
+            tag.style = style
+            assertEquals("$background: the default is the capsule constant", CYLTagCornerRadiusCapsule, tag.itemCornerRadius)
+            style.normalAppearance.cornerRadius = 6f
+            tag.style = style
+            assertEquals(6f, tag.itemCornerRadius)
+            style.normalAppearance.cornerRadius = 0f
+            tag.style = style
+            assertEquals("0 is square", 0f, tag.itemCornerRadius)
+        }
     }
 
     @Test

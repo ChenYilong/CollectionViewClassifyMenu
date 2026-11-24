@@ -44,7 +44,7 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
 
         demo.performAction("reset")
         XCTAssertEqual(demo.content, .iconAndTitle)
-        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 3)
+        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, CYLTagCornerRadiusCapsule)
     }
 
     func testStyleDemoShowsAnimatedIconsAndOpensTheConfigurationDemo() {

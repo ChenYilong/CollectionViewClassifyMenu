@@ -12,6 +12,7 @@ const locale = require('../locale.js');
 const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
 const { cylAnimatedItemBackground } = require('../cyl-animated-item/cyl_animated_item_model');
+const { CYLTagCornerRadiusCapsule } = require('../cyl-tag-cloud/model.js');
 
 // MARK: - Values (CYLConfigurationValue)
 
@@ -174,8 +175,7 @@ function defaultAppearance(hairline) {
     textColor: DEFAULT_TEXT_COLOR,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
-    cornerRadius: 3,
-    cornerRadiusSet: false, // an unset radius is a capsule in every style (cyl-animated-item's default)
+    cornerRadius: CYLTagCornerRadiusCapsule,
     borderColor: null,
     borderWidth: 0,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
@@ -264,7 +264,7 @@ function applyAppearance(appearance, configuration, allowsTransparent = false) {
   if (has('borderColor')) appearance.borderColor = color(configuration.borderColor);
   const sanitized = (n) => (Number.isFinite(n) && n > 0 ? n : 0);
   const radius = numberValue(configuration.cornerRadius);
-  if (radius !== null) { appearance.cornerRadius = sanitized(radius); appearance.cornerRadiusSet = true; }
+  if (radius !== null) appearance.cornerRadius = sanitized(radius);
   const width = numberValue(configuration.borderWidth);
   if (width !== null) appearance.borderWidth = sanitized(width);
   const margin = numberValue(configuration.margin);
@@ -777,9 +777,9 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   // Stacked: the group centered from top to bottom, each part centered (or at the leading margin) across.
   const justify = !vertical && (leading || (!style.layoutCentered && !(showsImage && showsTitle))) ? 'flex-start' : 'center';
   const directions = { trailing: 'row-reverse', top: 'column', bottom: 'column-reverse' };
-  // The background, radius and border are cyl-animated-item's (the interface of CYLAnimatedItemView.itemBackgroundStyle…): an unset
-  // radius is -1, its default (a capsule, every style); a set one is limited to half the height.
-  const radius = !appearance.cornerRadiusSet ? -1 : cornerRadius(appearance.cornerRadius, height);
+  // The background, radius and border are cyl-animated-item's (the interface of CYLAnimatedItemView.itemBackgroundStyle…); the radius is
+  // the appearance's (the capsule constant by default), limited to half the height.
+  const radius = cornerRadius(appearance.cornerRadius, height);
   const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, appearance.backgroundColor, radius, border, appearance.borderColor, false);
   const glass = itemBackground.glass;
   const background = appearance.backgroundImage
@@ -897,6 +897,7 @@ function coderString(value) {
 }
 
 module.exports = {
+  CYLTagCornerRadiusCapsule,
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,

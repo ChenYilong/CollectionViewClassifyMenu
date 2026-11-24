@@ -11,7 +11,7 @@ test('the default style is CYLMenuStyle(): hairline gray borders, green selectio
   assert.equal(s.normal.textColor, '#404040');
   assert.equal(s.normal.borderColor, '#D1D1D1');
   assert.equal(s.normal.borderWidth, 1 / 3);
-  assert.equal(s.normal.cornerRadius, 3);
+  assert.equal(s.normal.cornerRadius, model.CYLTagCornerRadiusCapsule);
   assert.deepEqual([s.selected.backgroundColor, s.selected.textColor], ['#2AB9A0', '#FFFFFF']);
   assert.equal(s.disabled.textColor, '#B3B3B3');
   assert.equal(s.layoutCentered, true);

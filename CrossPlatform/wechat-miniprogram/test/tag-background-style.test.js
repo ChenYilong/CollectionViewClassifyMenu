@@ -46,19 +46,16 @@ test('a minimum tag size grows a smaller tag, a larger tag is not shrunk', () =>
   assert.equal(model.tagHeight(model.mergeStyle({ minimumTagSize: { width: 0, height: 1 } })), plainHeight, 'a smaller minimum changes nothing');
 });
 
-test('an unset radius is a capsule for glass (the animated item default); a set radius customizes it', () => {
+test('the default radius is the capsule constant in every style; a set radius customizes it', () => {
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
-  const unset = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass' } }, '', 2);
-  assert.match(unset.cellStyle, /border-radius:1000px/);
+  const height = model.tagHeight(model.mergeStyle({}));
+  assert.equal(model.mergeStyle({}).normal.cornerRadius, model.CYLTagCornerRadiusCapsule);
+  for (const backgroundStyle of ['liquidGlass', 'flat']) {
+    const view = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle } }, '', 2);
+    assert.match(view.cellStyle, new RegExp(`border-radius:${height / 2}px`), `${backgroundStyle}: a capsule`);
+  }
   const set = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 6 } } }, '', 2);
   assert.match(set.cellStyle, /border-radius:6px/);
   const square = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 0 } } }, '', 2);
   assert.match(square.cellStyle, /border-radius:0px/);
-});
-
-test('a flat tag whose radius was never set is a capsule too', () => {
-  const flat = model.tagButtonView({ title: 'Tag' }, '', 2);
-  assert.match(flat.cellStyle, /border-radius:1000px/);
-  const set = model.tagButtonView({ title: 'Tag', tagStyle: { normal: { cornerRadius: 3 } } }, '', 2);
-  assert.match(set.cellStyle, /border-radius:3px/);
 });

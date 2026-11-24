@@ -761,7 +761,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         // Points, limited to half the height: 0 is square, half the height or more a capsule.
         // CYLAnimatedItemView applies it (limited to half the height) with the background and the border.
-        itemCornerRadius = resolvedCornerRadius(for: state)
+        itemCornerRadius = style.appearance(for: state).cornerRadius
         updateElevationPath()
     }
 
@@ -864,7 +864,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         } else {
             titleLabel.frame = .zero
         }
-        itemCornerRadius = resolvedCornerRadius(for: currentState)
+        itemCornerRadius = style.appearance(for: currentState).cornerRadius
         updateElevationPath()
     }
 
@@ -881,13 +881,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         layer.shadowRadius = elevation / 2
         backgroundImageView.layer.masksToBounds = true
         updateElevationPath()
-    }
-
-    /// The radius handed to CYLAnimatedItemView: nil (its default, a capsule) while the appearance's radius was never set, in every
-    /// background style, flat and Liquid Glass; otherwise the appearance's number (0 is square).
-    private func resolvedCornerRadius(for state: UIControl.State) -> CGFloat? {
-        let appearance = style.appearance(for: state)
-        return appearance.isCornerRadiusSet ? appearance.cornerRadius : nil
     }
 
     private func updateElevationPath() {

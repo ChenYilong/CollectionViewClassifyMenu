@@ -22,8 +22,7 @@ export class CYLTagAppearance {
   private storedBackgroundColor?: ResourceColor;
   private storedTextColor?: ResourceColor;
   private storedFont?: CYLFont;
-  private storedCornerRadius: number = 3;
-  private storedCornerRadiusSet: boolean = false;
+  private storedCornerRadius: number = CYLTagCornerRadiusCapsule;
   private storedBorderWidth: number = 0;
   private storedContentInsets: CYLEdgeInsets = new CYLEdgeInsets(5, 10, 5, 10);
   /**
@@ -81,7 +80,7 @@ export class CYLTagAppearance {
   /**
    * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
    * is limited to half the height, so a large value such as 1000 is a capsule for any tag). Negative or non-finite
-   * values are treated as 0. 3 by default.
+   * values are treated as 0. `CYLTagCornerRadiusCapsule` by default.
    */
   get cornerRadius(): number {
     return this.storedCornerRadius;
@@ -89,15 +88,6 @@ export class CYLTagAppearance {
 
   set cornerRadius(value: number) {
     this.storedCornerRadius = sanitized(value);
-    this.storedCornerRadiusSet = true;
-  }
-
-  /**
-   * Whether `cornerRadius` was set. A tag whose radius was never set is a capsule in every background style (flat and Liquid Glass), the
-   * default of `cylanimateditem`'s `CYLAnimatedItemBackgroundModifier`; a set value, 0 (square) included, is used as it is.
-   */
-  get isCornerRadiusSet(): boolean {
-    return this.storedCornerRadiusSet;
   }
 
   get borderWidth(): number {
@@ -138,8 +128,7 @@ export class CYLTagAppearance {
     this.storedTextColor = undefined;
     this.storedFont = undefined;
     this.iconColor = undefined;
-    this.storedCornerRadius = 3;
-    this.storedCornerRadiusSet = false;
+    this.storedCornerRadius = CYLTagCornerRadiusCapsule;
     this.borderColor = undefined;
     this.storedBorderWidth = 0;
     this.storedContentInsets = new CYLEdgeInsets(5, 10, 5, 10);
@@ -156,7 +145,6 @@ export class CYLTagAppearance {
     result.storedFont = this.storedFont;
     result.iconColor = this.iconColor;
     result.storedCornerRadius = this.storedCornerRadius;
-    result.storedCornerRadiusSet = this.storedCornerRadiusSet;
     result.borderColor = this.borderColor;
     result.storedBorderWidth = this.storedBorderWidth;
     result.storedContentInsets = this.storedContentInsets;

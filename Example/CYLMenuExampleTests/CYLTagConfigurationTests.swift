@@ -138,29 +138,25 @@ final class CYLTagConfigurationTests: XCTestCase {
         XCTAssertNotNil(button.layer.backgroundColor, "the flat background color is drawn")
     }
 
-    func testAnUnsetRadiusIsACapsuleInEveryStyleAndASetRadiusCustomizesIt() throws {
+    func testTheDefaultRadiusIsTheCapsuleConstantInEveryStyleAndASetRadiusCustomizesIt() throws {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
-        let style = CYLMenuStyle()
-        style.backgroundStyle = .liquidGlass
-        let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style, size: CGSize(width: 100, height: 34))
-        button.layoutIfNeeded()
-        XCTAssertFalse(style.normalAppearance.isCornerRadiusSet)
-        XCTAssertEqual(button.layer.cornerRadius, 17, "never set: a capsule, CYLAnimatedItemView's default")
-        let flatStyle = CYLMenuStyle()
-        let flat = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: flatStyle, size: CGSize(width: 100, height: 34))
-        flat.layoutIfNeeded()
-        XCTAssertEqual(flat.layer.cornerRadius, 17, "flat is a capsule too while the radius was never set")
-        style.normalAppearance.cornerRadius = 6
-        XCTAssertTrue(style.normalAppearance.isCornerRadiusSet)
-        button.style = style
-        button.layoutIfNeeded()
-        XCTAssertEqual(button.layer.cornerRadius, 6, "a set radius customizes it")
-        style.normalAppearance.cornerRadius = 0
-        button.style = style
-        button.layoutIfNeeded()
-        XCTAssertEqual(button.layer.cornerRadius, 0, "0 is square")
-        XCTAssertTrue((style.copy() as! CYLMenuStyle).normalAppearance.isCornerRadiusSet)
+        XCTAssertEqual(CYLMenuStyle().normalAppearance.cornerRadius, CYLTagCornerRadiusCapsule)
+        for background in [CYLTagBackgroundStyle.liquidGlass, .flat] {
+            let style = CYLMenuStyle()
+            style.backgroundStyle = background
+            let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style, size: CGSize(width: 100, height: 34))
+            button.layoutIfNeeded()
+            XCTAssertEqual(button.layer.cornerRadius, 17, "\(background): the default is a capsule")
+            style.normalAppearance.cornerRadius = 6
+            button.style = style
+            button.layoutIfNeeded()
+            XCTAssertEqual(button.layer.cornerRadius, 6, "a set radius customizes it")
+            style.normalAppearance.cornerRadius = 0
+            button.style = style
+            button.layoutIfNeeded()
+            XCTAssertEqual(button.layer.cornerRadius, 0, "0 is square")
+        }
     }
 
     func testLiquidGlassBackgroundIsDrawnWhereTheSystemDrawsIt() throws {

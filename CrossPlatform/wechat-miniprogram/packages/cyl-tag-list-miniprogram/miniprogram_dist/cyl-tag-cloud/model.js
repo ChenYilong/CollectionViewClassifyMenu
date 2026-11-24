@@ -85,7 +85,7 @@ function appearance() {
     textColor: white(0.25),
     fontSize: 14,
     iconColor: null,
-    cornerRadius: 3,
+    cornerRadius: CYLTagCornerRadiusCapsule,
     borderColor: null,
     borderWidth: 0,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },

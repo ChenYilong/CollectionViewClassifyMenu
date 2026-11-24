@@ -33,7 +33,7 @@ test('the tag cloud demo: seven continents, the detailed tag and four styled tag
   assert.equal(code.tags[11].deleteIndicatorTitle, '⊗');
   assert.equal(code.style.lineSpacing, 5);
   assert.equal(code.style.interitemSpacing, 3);
-  assert.equal(code.style.normal.cornerRadius, 3, 'CYLMenuStyle(), not tagCloud()');
+  assert.equal(code.style.normal.cornerRadius, 1000, 'CYLMenuStyle(), not tagCloud(): the capsule constant');
   const map = demo.mapList();
   assert.deepEqual(map.tags.map((tag) => tag.title), ['Asia', 'Europe', 'Africa', 'Australia']);
   assert.equal(map.tags[2].identifier, 3);

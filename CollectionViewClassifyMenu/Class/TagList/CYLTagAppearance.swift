@@ -36,7 +36,7 @@ public final class CYLTagAppearance {
      */
     public static let defaultFont = UIFont.systemFont(ofSize: 14)
 
-    private static let defaultCornerRadius: CGFloat = 3
+    private static let defaultCornerRadius: CGFloat = CYLTagCornerRadiusCapsule
     private static let defaultContentInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
 
     /**
@@ -85,20 +85,13 @@ public final class CYLTagAppearance {
     /**
      * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
      * is limited to half the height, so a large value such as 1000 is a capsule for any tag). Negative or non-finite
-     * values are treated as 0. Not set by default: a capsule (see `isCornerRadiusSet`); the stored value reads 3 until it is set.
+     * values are treated as 0. `CYLTagCornerRadiusCapsule` by default.
      */
     public var cornerRadius = CYLTagAppearance.defaultCornerRadius {
         didSet {
             cornerRadius = Self.sanitized(cornerRadius)
-            isCornerRadiusSet = true
         }
     }
-
-    /**
-     * Whether `cornerRadius` was set. A tag whose radius was never set is a capsule in every background style (flat and Liquid
-     * Glass), the default of `CYLAnimatedItemView`; a set value, 0 (square) included, is used as it is.
-     */
-    public internal(set) var isCornerRadiusSet = false
 
     /**
      * Border color, `nil` (no border) by default. Drawn only when `borderWidth` > 0.
@@ -165,7 +158,6 @@ public final class CYLTagAppearance {
         font = Self.defaultFont
         iconColor = nil
         cornerRadius = Self.defaultCornerRadius
-        isCornerRadiusSet = false
         borderColor = nil
         borderWidth = 0
         contentInsets = Self.defaultContentInsets
@@ -182,7 +174,6 @@ public final class CYLTagAppearance {
         copy.font = font
         copy.iconColor = iconColor
         copy.cornerRadius = cornerRadius
-        copy.isCornerRadiusSet = isCornerRadiusSet
         copy.borderColor = borderColor
         copy.borderWidth = borderWidth
         copy.contentInsets = contentInsets

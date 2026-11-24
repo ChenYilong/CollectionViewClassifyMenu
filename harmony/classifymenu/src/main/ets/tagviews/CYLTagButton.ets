@@ -173,16 +173,9 @@ export class CYLTagButton {
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   /**
    * The background, radius and border are `cylanimateditem`'s (`CYLAnimatedItemBackgroundModifier`, the interface of
-   * `CYLAnimatedItemView.itemBackgroundStyle…`): the style, and the radius handed to it, -1 (its default, a capsule for Liquid
-   * Glass) while the radius was never set and the glass is drawn.
+   * `CYLAnimatedItemView.itemBackgroundStyle…`): the style; the radius is `cornerRadius` (the appearance's, the capsule constant by default).
    */
   itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
-  usesDefaultRadius: boolean = false;
-
-  /** The radius handed to the modifier: -1 (unset) for the default, else the clamped radius of the layout. */
-  get itemCornerRadius(): number {
-    return this.usesDefaultRadius ? -1 : this.cornerRadius;
-  }
   backgroundImage?: ResourceStr;
   borderColor: ResourceColor = CYLColor.CLEAR;
   borderWidth: number = 0;
@@ -1069,7 +1062,6 @@ export class CYLTagButton {
     // Liquid Glass: the state's background color tints the glass (CYLAnimatedItemBackgroundModifier, see build()).
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
     this.itemBackgroundStyle = glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
-    this.usesDefaultRadius = !appearance.isCornerRadiusSet;
     this.backgroundColor = stateBackground;
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;
@@ -1308,7 +1300,7 @@ export struct CYLTagButtonComponent {
     .height(this.tagHeight ?? this.button.intrinsicSize().height)
     // Background, radius and border (the tint over the glass for Liquid Glass): cylanimateditem's one interface.
     .attributeModifier(new CYLAnimatedItemBackgroundModifier(this.button.itemBackgroundStyle, this.button.backgroundColor,
-      this.button.itemCornerRadius, this.button.borderWidth, this.button.borderColor))
+      this.button.cornerRadius, this.button.borderWidth, this.button.borderColor))
     .backgroundImage(this.button.backgroundImage)
     .backgroundImageSize(ImageSize.Cover)
     // `CYLMenuStyle.elevation`: a shadow under the tag (offset down by half of it, blurred by it); the tag stops
