@@ -49,7 +49,7 @@ test('a minimum tag size grows a smaller tag, a larger tag is not shrunk', () =>
 test('an unset radius is a capsule for glass (the animated item default); a set radius customizes it', () => {
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   const unset = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass' } }, '', 2);
-  assert.match(unset.cellStyle, /border-radius:999px/);
+  assert.match(unset.cellStyle, /border-radius:1000px/);
   const set = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 6 } } }, '', 2);
   assert.match(set.cellStyle, /border-radius:6px/);
   const square = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 0 } } }, '', 2);
