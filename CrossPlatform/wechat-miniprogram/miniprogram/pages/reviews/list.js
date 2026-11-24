@@ -17,6 +17,7 @@ const ORANGE = '#FF4F00'; // UIColor(red: 1, green: 0.31, blue: 0)
 function reviewFilterStyle(overrides = {}) {
   const box = { cornerRadius: 2, borderWidth: 0.5, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' };
   return {
+    backgroundStyle: 'liquidGlass',
     itemHeight: 28,
     imageSize: 13,
     imageTitleSpacing: 3,

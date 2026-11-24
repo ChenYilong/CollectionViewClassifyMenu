@@ -10,7 +10,7 @@ import { common } from '@kit.AbilityKit';
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLIndexPath, CYLMenuDelegate, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuSelectionMode, CYLMenuStyle, CYLSize,
-  CYLTagListState, CYLTagListView
+  CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar } from '../DemoNav';
 import { CYLExampleMenuItem, CYLExampleMenuSection, CYLExampleMenuSource } from '../shell/CYLExampleMenuSource';
@@ -23,6 +23,7 @@ import {
 export function reviewFilterStyle(): CYLMenuStyle {
   const orange = CYLColor.rgb(1, 0.31, 0);
   const style = new CYLMenuStyle();
+  style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
   const font = CYLFont.systemFont(12);
   style.setTitleTextAttributes(font, CYLColor.white(0.3), CYLControlState.NORMAL);
   style.setTitleTextAttributes(font, CYLColor.WHITE, CYLControlState.SELECTED);

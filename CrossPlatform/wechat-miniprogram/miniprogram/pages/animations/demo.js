@@ -105,6 +105,7 @@ function configuration(t = (s) => s) {
     allowsEmptySelection: false,
     selectedItems: sections.map((section, index) => `${index}-0`),
     style: {
+      backgroundStyle: 'liquidGlass',
       imageSize: '{28, 28}',
       imageTitleSpacing: 6,
       itemHeight: 44,

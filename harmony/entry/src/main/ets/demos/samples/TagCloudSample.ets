@@ -8,7 +8,7 @@ import { CYLUIContext } from '@cyl/classifymenu';
 import { common, Want } from '@kit.AbilityKit';
 import {
   CYLColor, CYLEdgeInsets, CYLFont, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance,
-  CYLTagListState, CYLTagListView
+  CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
 import { CYLSampleButton, SYSTEM_ORANGE, SYSTEM_TEAL, cylFormat, cylToast } from './SampleSupport';
@@ -74,6 +74,7 @@ export class CYLTagCloudSampleData {
   static cellList(tags: CYLTag[]): CYLTagListState {
     const list = new CYLTagListState();
     list.style = CYLMenuStyle.tagCloud();
+    list.style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
     list.lineSpacing = 5;
     list.interitemSpacing = 3;
     list.tagContentInsets = new CYLEdgeInsets(3, 10, 3, 10);
@@ -102,6 +103,7 @@ export struct CYLTagCloudSamplePage {
     // activity_main.xml: lineMargin 5dp, tagMargin 3dp, textPadding 10dp × 3dp.
     const list = this.list;
     list.style = CYLMenuStyle.tagCloud();
+    list.style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
     list.lineSpacing = 5;
     list.interitemSpacing = 3;
     list.tagContentInsets = new CYLEdgeInsets(3, 10, 3, 10);
@@ -334,6 +336,7 @@ export struct CYLHotSearchPage {
 
   static hotStyle(): CYLMenuStyle {
     const style = new CYLMenuStyle();
+    style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
     const appearances: CYLTagAppearance[] = [style.normalAppearance, style.selectedAppearance];
     appearances.forEach((appearance: CYLTagAppearance) => {
       appearance.backgroundColor = CYLColor.WHITE;

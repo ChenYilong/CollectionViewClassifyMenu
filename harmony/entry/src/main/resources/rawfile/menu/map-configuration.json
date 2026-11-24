@@ -9,6 +9,7 @@
   "0-1"
  ],
  "style": {
+  "backgroundStyle": "liquidGlass",
   "imageSize": "{20, 20}",
   "imageTitleSpacing": 4,
   "itemHeight": 36,

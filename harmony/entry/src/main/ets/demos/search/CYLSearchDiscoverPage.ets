@@ -7,7 +7,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuSelectionMode, CYLMenuStyle, CYLSize,
-  CYLTagListState, CYLTagListView
+  CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoNav } from '../DemoNav';
 import { CYLDiscoverTopic, CYLSearchDiscoverData } from './CYLSearchDiscoverData';
@@ -75,6 +75,7 @@ function applyHeaderLook(style: CYLMenuStyle): void {
 /** The recent searches: white boxes with a light border, the inline chevron drawn the same way. */
 export function recentStyle(): CYLMenuStyle {
   const style = new CYLMenuStyle();
+  style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
   [CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED].forEach((state: number) => {
     const a = style.appearance(state);
     a.backgroundColor = CYLColor.WHITE;
@@ -96,6 +97,7 @@ export function recentStyle(): CYLMenuStyle {
 /** The discover grid: two plain titles per row, truncated, with the core's More button. */
 export function discoverStyle(): CYLMenuStyle {
   const style = CYLMenuStyle.gridStyle(2);
+  style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
   [CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED].forEach((state: number) => {
     style.appearance(state).font = new CYLFont(17, FontWeight.Medium);
   });

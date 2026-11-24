@@ -110,6 +110,7 @@ function industryButton(industry) {
 function maimaiStyle() {
   const look = { cornerRadius: 2, borderColor: '#CCCCCC', borderWidth: 1, textColor: '#595959', backgroundColor: '#F2F2F7' };
   return {
+    backgroundStyle: 'liquidGlass',
     font: 14,
     itemHeight: 32,
     interitemSpacing: 14,

@@ -45,6 +45,7 @@ function mapConfiguration(t = (s) => s) {
     scrollEnabled: false,
     selectedItems: ['0-1'],
     style: {
+      backgroundStyle: 'liquidGlass',
       imageSize: '{20, 20}',
       imageTitleSpacing: 4,
       itemHeight: 36,

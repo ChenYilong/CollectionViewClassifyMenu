@@ -99,6 +99,7 @@ const APPEARANCES = ['normal', 'selected', 'disabled'];
 /** CYLTagStyleDemoViewController.demoStyle(). */
 function demoStyle() {
   return {
+    backgroundStyle: 'liquidGlass',
     normal: { iconColor: 'systemBlue' },
     selected: { iconColor: '#FFFFFF', backgroundColor: 'systemBlue', borderColor: 'systemBlue' },
     disabled: {},

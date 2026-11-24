@@ -6,7 +6,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
  */
 import {
   CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLIndexPath, CYLMenuSelectionMode, CYLMenuStyle, CYLOffset,
-  CYLSize, CYLTagAppearance, CYLTagListController, CYLTagListState, CYLTagListView
+  CYLSize, CYLTagAppearance, CYLTagBackgroundStyle, CYLTagListController, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
 import {
@@ -144,6 +144,7 @@ const ANIMATION_FILES: Map<string, string[]> = new Map<string, string[]>([
 
 export function demoStyle(): CYLMenuStyle {
   const style = new CYLMenuStyle();
+  style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
   style.setIconColor(CYLSystemColor.blue, CYLControlState.NORMAL);
   style.setIconColor('#FFFFFF', CYLControlState.SELECTED);
   style.selectedAppearance.backgroundColor = CYLSystemColor.blue;

@@ -5,7 +5,7 @@
  * The message is localized (a greeting with a name to pick, an emoji and a space).
  */
 import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
-import { CYLIndexPath, CYLMenuDelegate, CYLMenuSelectionMode, CYLMenuStyle, CYLTagListState, CYLTagListView } from '@cyl/classifymenu';
+import { CYLIndexPath, CYLMenuDelegate, CYLMenuSelectionMode, CYLMenuStyle, CYLTagBackgroundStyle, CYLTagListState, CYLTagListView } from '@cyl/classifymenu';
 import { CYLDemoBar } from '../DemoNav';
 
 /** The sender, and the name the message lets you pick (the same in every language). */
@@ -32,6 +32,7 @@ export struct CYLWordPickerSamplePage {
 
   aboutToAppear(): void {
     this.list.style = CYLMenuStyle.wordPicker();
+    this.list.style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
     this.list.selectionMode = CYLMenuSelectionMode.multiple;
     this.list.allowsSmearSelection = true;
     this.delegate.onChange = () => {
