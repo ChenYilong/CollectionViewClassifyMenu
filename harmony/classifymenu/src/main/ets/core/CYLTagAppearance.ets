@@ -9,10 +9,10 @@ function sanitized(value: number): number {
 }
 
 /**
- * Kept so existing code compiles: a corner radius that draws square corners. A corner radius is in vp now and 0 is square, so `0`
- * does the same; this value is square too.
+ * The corner radius of a capsule, vp: pass this constant, never the number 1000. A corner radius is limited to half the tag height and 0
+ * is square; no other value has a special meaning.
  */
-export const CYLTagCornerRadiusSquare: number = 0.001;
+export const CYLTagCornerRadiusCapsule: number = 1000;
 
 export class CYLTagAppearance {
   static readonly defaultBackgroundColor: string = CYLColor.WHITE;

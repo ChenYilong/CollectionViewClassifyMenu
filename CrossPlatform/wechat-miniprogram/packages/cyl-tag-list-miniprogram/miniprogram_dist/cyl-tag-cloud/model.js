@@ -15,6 +15,9 @@
 
 /** The iOS colors the samples use, as UIKit's light-mode values. */
 const { iconImage } = require('./editing-icons.js');
+
+/** The corner radius of a capsule: pass this constant, never the number 1000. 0 is square; no other value has a special meaning. */
+const CYLTagCornerRadiusCapsule = 1000;
 const NAMED_COLORS = {
   clear: 'rgba(0, 0, 0, 0)',
   white: '#FFFFFF',
@@ -177,7 +180,7 @@ function tagCloudStyle() {
     a.textColor = '#FFFFFF';
     a.borderWidth = 0;
     a.borderColor = '#FFFFFF';
-    a.cornerRadius = 1000; // a capsule: the radius is limited to half the tag height
+    a.cornerRadius = CYLTagCornerRadiusCapsule;
     a.fontSize = 14;
   });
   style.disabled.backgroundColor = withAlpha(blue, 0.4);
@@ -838,6 +841,7 @@ function renderList(listStyle, options = {}) {
 }
 
 module.exports = {
+  CYLTagCornerRadiusCapsule,
   NAMED_COLORS,
   PALETTE,
   color,

@@ -234,7 +234,10 @@ class CYLTagButtonStandaloneTest {
         assertEquals(6f, tag.itemCornerRadius)
         style.normalAppearance.cornerRadius = 0f
         tag.style = style
-        assertEquals("Android's rule as before: 0 is a capsule", 1000f, tag.itemCornerRadius)
+        assertEquals("0 is square", 0f, tag.itemCornerRadius)
+        style.normalAppearance.cornerRadius = CYLTagCornerRadiusCapsule
+        tag.style = style
+        assertEquals(CYLTagCornerRadiusCapsule, tag.itemCornerRadius)
         assertTrue(style.copy().normalAppearance.isCornerRadiusSet)
     }
 

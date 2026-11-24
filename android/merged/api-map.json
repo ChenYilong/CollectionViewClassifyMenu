@@ -158,7 +158,7 @@
  "CYLTagDataSource -removeAllTags": "CYLTagDataSource.removeAllTags",
  "CYLTagDataSource -moveTagAtIndex:toIndex:": "CYLTagDataSource.moveTagAtIndex",
  "CYLTagDataSource -invalidateStyles": "CYLTagDataSource.invalidateStyles",
- "CYLTagCornerRadiusSquare": "CYLTagCornerRadiusSquare",
+ "CYLTagCornerRadiusCapsule": "CYLTagCornerRadiusCapsule",
  "CYLTagAppearance": "com.cyl.classifymenu.CYLTagAppearance",
  "CYLTagAppearance.backgroundColor": "CYLTagAppearance.backgroundColor",
  "CYLTagAppearance.textColor": "CYLTagAppearance.textColor",

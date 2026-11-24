@@ -72,11 +72,21 @@ config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's `backgroundC
 | HarmonyOS | `.attributeModifier(CYLAnimatedItemBackgroundModifier(...))` from the re-vendored `cylanimateditem` | static |
 | Mini program | `model.js` calls `cylAnimatedItemBackground(...)` of the vendored `cyl-animated-item` | node tests 173 / 173 |
 
-Compatibility for existing integrators (owner's feedback 2026-11-24, CYLSearchViewController session): every new API is additive and defaults
-keep the look (`backgroundStyle` flat, `minimumTagSize` zero). The public constant `CYLTagCornerRadiusSquare` is kept on iOS and HarmonyOS (PR #35 had
-removed it); Android keeps its old radius rule (0 is a capsule). No pin or integrator code moves by itself. When an integrator moves its ClassifyMenu pin
-it must move its CYLTabBarController pin to the same generation (`43ad5f6a` or later), because the tag now uses `CYLAnimatedItemView.itemBackground…`; that pair is
-the only requirement. Open for the owner (PR #35, base of this PR): on iOS, HarmonyOS and the mini program a radius of 0 changed from capsule to square.
+Corner radius rule (owner's decision 2026-11-24, relayed by the CYLSearchViewController session and confirmed by the owner in this session; breaking on purpose,
+the pins of integrators move together later): 「统一，圆角逻辑。0就是方。胶囊用1000，但需要使用宏定义定义1000。用户应通过宏定义传入而非传入魔法数字。其他值没有特殊含义。删除CYLTagCornerRadiusSquare。」 — one rule: the
+radius is plain points limited to half the height, 0 is square, a capsule is the one named constant whose value is 1000 and users pass the constant, never the number;
+no other value has a special meaning; `CYLTagCornerRadiusSquare` is deleted. The owner's answer in this session: apply it everywhere; the only special case that stays is
+the unset radius of a Liquid Glass tag (a capsule, `CYLAnimatedItemView`'s default).
+
+| Platform | Capsule constant (value 1000) | 0 |
+|:--|:--|:--|
+| iOS | `CYLTagCornerRadiusCapsule` (Swift global, `CYLTagAppearance.swift`) | square |
+| Android | `CYLTagCornerRadiusCapsule` (`const val`, `CYLTagAppearance.kt`) | square (was a capsule: breaking) |
+| HarmonyOS | `CYLTagCornerRadiusCapsule` (exported const, `CYLTagAppearance.ets`) | square |
+| Mini program | `CYLTagCornerRadiusCapsule` (`cyl-tag-cloud/model.js`) | square |
+
+Everything else is additive: `backgroundStyle` flat by default, `minimumTagSize` zero. When an integrator moves its ClassifyMenu pin it moves its
+CYLTabBarController pin to the same generation (`43ad5f6a` or later): the tag uses `CYLAnimatedItemView.itemBackground…`.
 
 Known follow-up: the vendored `cyl-dealloc-block-executor` stays at its current copy until the DeallocBlockExecutor session's
 PR #26 merge SHA.

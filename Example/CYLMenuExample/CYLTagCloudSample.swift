@@ -349,7 +349,7 @@ final class CYLHotSearchViewController: UIViewController {
             appearance.borderColor = UIColor(white: 0.88, alpha: 1)
             appearance.borderWidth = 1
             appearance.textColor = UIColor(white: 0.13, alpha: 1)
-            appearance.cornerRadius = 1000  // a capsule
+            appearance.cornerRadius = CYLTagCornerRadiusCapsule
             appearance.font = .systemFont(ofSize: 16)
         }
         style.tagContentInsets = UIEdgeInsets(top: 9, left: 16, bottom: 9, right: 16)

@@ -47,7 +47,7 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         let view = showTagList(source, width: 320)
         let style = CYLMenuStyle()
         style.itemHeight = 40
-        style.normalAppearance.cornerRadius = 1000  // a capsule
+        style.normalAppearance.cornerRadius = CYLTagCornerRadiusCapsule
         view.style = style
         view.layoutIfNeeded()
         XCTAssertEqual(view.probe.itemFrame(at: ip(0, 0))?.height ?? 0, 40, accuracy: 0.5)

@@ -587,16 +587,13 @@ open class CYLTagButton @JvmOverloads constructor(
                 }
             }
         }
-        // CYLAnimatedItemView applies it, limited to half the height, with the background and the border. Android keeps its rule of
-        // before (existing integrators look the same): 0 is a capsule, CYLTagCornerRadiusSquare square, a number that radius; a Liquid
-        // Glass tag whose radius was never set gets null, the view's own default (a capsule).
-        val corner = appearance.cornerRadius
+        // CYLAnimatedItemView applies it, limited to half the height, with the background and the border: the number as it is (0 is
+        // square, CYLTagCornerRadiusCapsule a capsule). Only a Liquid Glass tag whose radius was never set gets null, the view's own
+        // default (a capsule).
         itemCornerRadius = if (!appearance.isCornerRadiusSet && style.resolvedBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass) {
             null
-        } else if (corner > 0) {
-            if (corner <= CYLTagCornerRadiusSquare) 0f else corner
         } else {
-            1000f
+            appearance.cornerRadius
         }
     }
 

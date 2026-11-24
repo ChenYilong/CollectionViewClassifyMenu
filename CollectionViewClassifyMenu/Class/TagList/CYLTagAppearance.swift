@@ -11,10 +11,10 @@
 import UIKit
 
 /**
- * Kept so existing code compiles: a corner radius that draws square corners. A corner radius is in points now and 0 is square, so
- * `0` does the same; this value is square too (limited to half the height, it is not visible).
+ * The corner radius of a capsule: pass this constant, never the number 1000. A corner radius is in points, limited to half the tag
+ * height, and 0 is square; no other value has a special meaning.
  */
-public let CYLTagCornerRadiusSquare: CGFloat = 0.001
+public let CYLTagCornerRadiusCapsule: CGFloat = 1000
 
 /**
  * The box and text of a tag in one state (`CYLMenuStyle.normalAppearance`…). A final class: the style copies it.

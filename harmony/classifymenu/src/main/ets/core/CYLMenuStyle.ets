@@ -4,7 +4,7 @@
  * are vp, font sizes fp, colors '#AARRGGBB'. `copy()` is NSCopying.
  */
 import { CYLLiquidGlass } from 'cylanimateditem';
-import { CYLTagAppearance } from './CYLTagAppearance';
+import { CYLTagAppearance, CYLTagCornerRadiusCapsule } from './CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
@@ -545,7 +545,7 @@ export class CYLMenuStyle {
       appearance.textColor = CYLColor.WHITE;
       appearance.borderWidth = 0;
       appearance.borderColor = CYLColor.WHITE;
-      appearance.cornerRadius = 1000; // a capsule: the radius is limited to half the tag height
+      appearance.cornerRadius = CYLTagCornerRadiusCapsule;
       appearance.font = CYLFont.systemFont(14);
     });
     style.storedDisabled.backgroundColor = CYLColor.withAlpha(blue, 0.4);
