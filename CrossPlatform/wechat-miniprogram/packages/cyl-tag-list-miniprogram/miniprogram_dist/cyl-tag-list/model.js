@@ -10,6 +10,8 @@
 const symbols = require('./symbols.js');
 const locale = require('../locale.js');
 const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
+// CYLTabBarController's base library cyl-liquid-glass: the one rule for Liquid Glass (the same as iOS CYLLiquidGlass.isActive()).
+const { cylLiquidGlassIsActive } = require('../cyl-liquid-glass/cyl_liquid_glass');
 
 // MARK: - Values (CYLConfigurationValue)
 
@@ -207,6 +209,9 @@ function defaultStyle(pixelRatio = 2) {
     layoutCentered: true,
     imagePlacement: 'leading',
     contentAlignment: 'center',
+    // 'flat', or 'liquidGlass' (a glass background where cylLiquidGlassIsActive(), flat elsewhere); the smallest tag, points.
+    backgroundStyle: 'flat',
+    minimumTagSizeWH: { width: 0, height: 0 },
     imageSizeWH: { width: 14, height: 14 },
     animationSizeWH: { width: 0, height: 0 },
     imageInsets: { top: 0, left: 0, bottom: 0, right: 0 },
@@ -314,6 +319,11 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   const alignment = String(c.contentAlignment || '').toLowerCase();
   if (['leading', 'left', '1'].includes(alignment)) style.contentAlignment = 'leading';
   if (['center', '0'].includes(alignment)) style.contentAlignment = 'center';
+  const backgroundStyle = String(c.backgroundStyle || '').toLowerCase();
+  if (['liquidglass', '1'].includes(backgroundStyle)) style.backgroundStyle = 'liquidGlass';
+  if (['flat', '0'].includes(backgroundStyle)) style.backgroundStyle = 'flat';
+  const minimumTagSize = sizeValue(c.minimumTagSize);
+  if (minimumTagSize) style.minimumTagSizeWH = minimumTagSize;
   const size = sizeValue(c.imageSize);
   if (size) style.imageSizeWH = size;
   const animationSize = sizeValue(c.animationSize);
@@ -638,7 +648,7 @@ function tagHeight(style) {
   return APPEARANCE_STATES.reduce((height, state) => {
     const { font, contentInsets } = style[state];
     return Math.max(height, lineHeight(font.size) + stacked + contentInsets.top + contentInsets.bottom);
-  }, style.itemHeight);
+  }, Math.max(style.itemHeight, style.minimumTagSizeWH.height));
 }
 
 /**
@@ -656,7 +666,7 @@ function tagHeightForTitle(style, title, iconSize) {
       ? line + icon.height + (hasTitle && icon.height > 0 ? style.imageTitleSpacing : 0)
       : Math.max(line, icon.height);
     return Math.max(height, Math.ceil(content + contentInsets.top + contentInsets.bottom));
-  }, style.itemHeight);
+  }, Math.max(style.itemHeight, style.minimumTagSizeWH.height));
 }
 
 /** The badge's color when none is given: UIColor.systemRed. */
@@ -766,6 +776,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   // Stacked: the group centered from top to bottom, each part centered (or at the leading margin) across.
   const justify = !vertical && (leading || (!style.layoutCentered && !(showsImage && showsTitle))) ? 'flex-start' : 'center';
   const directions = { trailing: 'row-reverse', top: 'column', bottom: 'column-reverse' };
+  const glass = style.backgroundStyle === 'liquidGlass' && cylLiquidGlassIsActive();
   const background = appearance.backgroundImage
     ? `background-image: url("${appearance.backgroundImage}"); background-size: 100% 100%`
     : '';
@@ -778,7 +789,9 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     `border-width: ${border}px`,
     `border-color: ${appearance.borderColor || 'transparent'}`,
     `color: ${appearance.textColor}`,
-    `background-color: ${appearance.backgroundColor}`,
+    // Liquid Glass: the glass layer (cyl-liquid-glass) draws the background, tinted with the state's color.
+    `background-color: ${glass ? 'transparent' : appearance.backgroundColor}`,
+    style.minimumTagSizeWH.width > 0 ? `min-width: ${style.minimumTagSizeWH.width}px` : '',
     `justify-content: ${justify}`,
     `flex-direction: ${directions[style.imagePlacement] || 'row'}`,
     vertical ? `align-items: ${leading ? 'flex-start' : 'center'}` : '',
@@ -792,6 +805,9 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   return {
     height,
     cellStyle: cell,
+    glass,
+    glassTint: appearance.backgroundColor,
+    glassRadius: cornerRadius(appearance.cornerRadius, height),
     slotStyle: showsImage
       ? `width: ${slot.width}px; height: ${slot.height}px; ${gap}: ${spacing}px; left: ${io.horizontal}px; top: ${io.vertical}px`
       : '',

@@ -1,7 +1,8 @@
 {
   "component": true,
   "usingComponents": {
-    "cyl-animated-item": "../cyl-animated-item/index"
+    "cyl-animated-item": "../cyl-animated-item/index",
+    "cyl-liquid-glass": "../cyl-liquid-glass/index"
   },
   "componentGenerics": {
     "cyl-lottie-view": {

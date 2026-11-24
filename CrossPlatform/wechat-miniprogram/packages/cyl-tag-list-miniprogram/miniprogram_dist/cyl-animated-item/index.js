@@ -17,7 +17,28 @@
  */
 const { cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
+const { CYLAnimatedItemPlayer } = require('./cyl_animated_item_player')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
+const { LifecycleController } = require('../cyl-dealloc-block-executor/index')
+const {
+  cylAnimationDidStart, cylAnimationDidStop, cylForgetAnimation, cylPauseAnimation, cylResumeAnimation,
+} = require('./cyl_animation_events')
+
+/**
+ * [EN] What `detached` releases: the countdown timer, the app-show and theme listeners and the GIF timers. It runs as the keyed
+ *      teardown block `cyl.animatedItem.teardown` of CYLDeallocBlockExecutor (see `lifetimes`).
+ * [CN] `detached` 释放的内容：倒计时定时器、App 显示与主题监听、GIF 定时器。它作为 CYLDeallocBlockExecutor 中带 key 的销毁块
+ *      `cyl.animatedItem.teardown` 运行（见 `lifetimes`）。
+ */
+function cylTeardown(item) {
+  cylForgetAnimation(item)
+  if (item.cylPlayer) item.cylPlayer.destroy()
+  item.cyl_stopCountdownTimer()
+  if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && item.cylAppShowListener) wx.offAppShow(item.cylAppShowListener)
+  clearTimeout(item.cylGifTimer)
+  clearTimeout(item.cylGIFImageTimer)
+  if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && item.cylThemeListener) wx.offThemeChange(item.cylThemeListener)
+}
 
 /**
  * [EN] The id of the engine node (only one is rendered), reached by `selectComponent` for the playback methods.
@@ -68,12 +89,38 @@ Component({
      *      `showsImageWhenAnimationEnds`): the engine is hidden and `selectedImage` / `image` (else the placeholder)
      *      shows. Off by default, so the last frame stays. `playAnimation()`, `stopAnimation()`, a new selection, a new
      *      file or turning `loop` on shows the animation again. The end is the engine's `complete` (Lottie, PAG, Rive,
-     *      SVGA) or the end of a timed GIF pass (with stills); `animationcomplete` is sent either way.
+     *      SVGA) or the end of a timed GIF pass (with stills); `animationcomplete` and its alias `animationend` are sent either way.
      * [CN] 只播放一次的动画（`loop` 关闭）结束时是否换成静态图片（iOS / Android 的 `showsImageWhenAnimationEnds`）：隐藏引擎，显示
      *      `selectedImage` / `image`（没有时为占位图）。默认关闭，保留最后一帧。`playAnimation()`、`stopAnimation()`、重新选中、新文件或开启
-     *      `loop` 时重新显示动画。结束来自引擎的 `complete`（Lottie、PAG、Rive、SVGA）或有静帧的 GIF 一遍计时结束；两种情况都发送 `animationcomplete`。
+     *      `loop` 时重新显示动画。结束来自引擎的 `complete`（Lottie、PAG、Rive、SVGA）或有静帧的 GIF 一遍计时结束；两种情况都发送 `animationcomplete` 与别名 `animationend`。
      */
     showsImageWhenAnimationEnds: { type: Boolean, value: false },
+    /**
+     * [EN] Whether the item applies the default playback rules (HarmonyOS `drivesAnimationPlayback`, default true): selected plays
+     *      once from the start, unselected rests, `restartToken` plays again, `autoplay` plays on ready. false: the host drives
+     *      playback itself (resting progress, Play all) through `cyl_player()`; the item only hands out the player and applies
+     *      none of those rules (a selection change touches no engine, the engine never autoplays, `restartToken` is ignored).
+     *      `playAnimation()`, `restartAnimation()` and `stopAnimation()` still do what they are called for. Set it when the
+     *      item is created.
+     * [CN] 条目是否应用默认播放规则（鸿蒙的 `drivesAnimationPlayback`，默认 true）：选中时从头播放一次，未选中时静止，`restartToken`
+     *      再次播放，`autoplay` 在就绪时播放。false：宿主通过 `cyl_player()` 自行驱动播放（静止进度、全部播放）；条目只交出播放器，
+     *      不应用上述任何规则（选中状态变化不触及引擎，引擎不自动播放，忽略 `restartToken`）。`playAnimation()`、`restartAnimation()`、
+     *      `stopAnimation()` 仍按调用执行。请在创建条目时设置。
+     */
+    drivesAnimationPlayback: { type: Boolean, value: true },
+    /**
+     * [EN] A number that plays the animation again from the start each time it grows (HarmonyOS `animationRestartToken`), next
+     *      to `restartAnimation()`. The value at creation is not a restart; a lower value is not one either. Ignored while
+     *      `drivesAnimationPlayback` is false.
+     * [CN] 每次增大时从头再次播放动画的数字（鸿蒙的 `animationRestartToken`），与 `restartAnimation()` 并列。创建时的值不算重播；
+     *      变小也不算。`drivesAnimationPlayback` 为 false 时忽略。
+     */
+    restartToken: { type: Number, value: 0 },
+    /**
+     * [EN] Alias of `restartToken` under the HarmonyOS name: the same behavior; growth of either one restarts the animation.
+     * [CN] `restartToken` 的别名（鸿蒙的名称）：行为相同；任何一个增大都会重播。
+     */
+    animationRestartToken: { type: Number, value: 0 },
     /**
      * [EN] The frame (0...1) shown at rest while not selected (iOS `animationRestingProgress`); selected shows the last.
      * [CN] 未选中时静止显示的帧（0...1，iOS 的 `animationRestingProgress`）；选中时显示最后一帧。
@@ -108,6 +155,13 @@ Component({
     // [CN] `animationType` 与 `autoplay` 已在上方声明（"*.svga.bin" 读作 SVGA）。
     colors: { type: Object, value: null },
     iconTint: { type: String, value: '' },
+    /**
+     * [EN] The tint of `selectedImage` while selected. Not set (the default): `iconTint` for both. With both images set, each
+     *      is its own layer and a selection change only toggles their opacity (no node re-created, no `src` change).
+     * [CN] 选中时 `selectedImage` 的着色。未设置（默认）：两者都用 `iconTint`。两张图片都设置时各自为一个图层，选中变化只切换
+     *      它们的不透明度（不重建节点，不改变 `src`）。
+     */
+    selectedIconTint: { type: String, value: null, optionalTypes: [Object] },
     /**
      * [EN] One color for the animation (any CSS color), like a template image: Rive draws every pixel in it. '' keeps the
      *      file's colors. Rive only for now; other engines keep their colors.
@@ -194,6 +248,7 @@ Component({
     gifImageReady: false,
     gifImagePlaying: false,
     animationEnded: false,
+    hostRestingProgress: 0,
     lottieData: null,
     m: {},
     systemTheme: 'light',
@@ -218,12 +273,13 @@ Component({
       this.cylAnimationData = animationData
       clearTimeout(this.cylGifTimer)
       this.cylPendingPlay = false
+      this.cylIsPlaying = false
       // cyl-lottie keeps the data it gets and changes it while playing: every item gets its own copy.
       const lottieData = animationData && typeof animationData === 'object' ? JSON.parse(JSON.stringify(animationData)) : null // NOSONAR: `structuredClone` is not in every mini program runtime
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, animationEnded: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
     'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
@@ -236,7 +292,24 @@ Component({
     'showsImageWhenAnimationEnds': function (shows) {
       if (!shows) this.cyl_showAnimationAgain()
     },
+    'restartToken, animationRestartToken': function (token, aliasToken) {
+      // [EN] The value at creation is the baseline of each (set in `attached`); only a larger one restarts (either of the two), and a
+      //      host that drives the player itself is not restarted (HarmonyOS: the restart is one of the default rules).
+      // [CN] 创建时的值是各自的基准（在 `attached` 中设置）；只有更大的值才重播（两者任一），自行驱动播放器的宿主不会被重播
+      //      （鸿蒙：重播属于默认规则）。
+      const last = this.cylRestartToken
+      const lastAlias = this.cylAnimationRestartToken
+      this.cylRestartToken = token
+      this.cylAnimationRestartToken = aliasToken
+      if (last === undefined || !this.data.drivesAnimationPlayback) return
+      if (Number(token) > Number(last) || Number(aliasToken) > Number(lastAlias)) this.restartAnimation()
+    },
     'selected, restingProgress': function () {
+      // [EN] Host-driven: the host rests and plays through the player; only the drawing follows `selected`. [CN] 宿主驱动：宿主通过播放器静止与播放；只有绘制随 `selected` 变化。
+      if (!this.data.drivesAnimationPlayback) {
+        this.cyl_update()
+        return
+      }
       this.cyl_showAnimationAgain()
       this.cyl_update()
       if (!this.data.autoplay || this.data.gifFirstFrame || this.data.gifLastFrame) {
@@ -250,7 +323,7 @@ Component({
       if (!this.data.selected && this.data.gifImagePlaying) this.cyl_restGIFImage()
     },
     'loop': function () {
-      if (this.data.loop) this.cyl_showAnimationAgain()
+      if (this.data.loop && this.data.drivesAnimationPlayback) this.cyl_showAnimationAgain()
       // [EN] A GIF image: off lets the pass in progress end, on keeps it playing. [CN] GIF 图片：关闭时让当前一遍播完，开启时一直播放。
       if (this.data.gifImagePlaying) {
         clearTimeout(this.cylGIFImageTimer)
@@ -265,6 +338,13 @@ Component({
 
   lifetimes: {
     attached() {
+      this.cylLifecycle = new LifecycleController(this)
+      this.cylLifecycle.registry.addDeallocCallback(cylTeardown, { key: 'cyl.animatedItem.teardown' })
+      this.cylLifecycle.onLoad()
+      // [EN] The item's own screen events (`didEnterScreen` / `didLeaveScreen`) from a `wx.createIntersectionObserver`; stopped when it detaches.
+      // [CN] 条目自己的屏幕事件（`didEnterScreen` / `didLeaveScreen`）来自 `wx.createIntersectionObserver`；detached 时停止。
+      const stopObservingScreen = this.cylLifecycle.observeScreen('.cyl-animated-item')
+      this.cylLifecycle.registry.addDeallocCallback(() => stopObservingScreen(), { key: 'cyl.animatedItem.screenObserver' })
       // [EN] The system theme, kept current while attached. [CN] 系统主题，挂载期间保持最新。
       let theme = 'light'
       try {
@@ -281,14 +361,14 @@ Component({
       if (typeof wx !== 'undefined' && typeof wx.onThemeChange === 'function') wx.onThemeChange(this.cylThemeListener)
       // [EN] A countdown kept before a restart continues. [CN] 重启之前保存的倒计时继续。
       if (this.data.itemStyle === 'countdown') this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
+      this.cylRestartToken = this.data.restartToken
+      this.cylAnimationRestartToken = this.data.animationRestartToken
       this.cyl_update()
     },
     detached() {
-      this.cyl_stopCountdownTimer()
-      if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && this.cylAppShowListener) wx.offAppShow(this.cylAppShowListener)
-      clearTimeout(this.cylGifTimer)
-      clearTimeout(this.cylGIFImageTimer)
-      if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && this.cylThemeListener) wx.offThemeChange(this.cylThemeListener)
+      // [EN] Runs the teardown block; a component that never attached has no controller and is released directly. [CN] 运行销毁块；从未 attached 的组件没有控制器，直接释放。
+      if (this.cylLifecycle) this.cylLifecycle.onUnload()
+      else cylTeardown(this)
     },
   },
 
@@ -442,7 +522,13 @@ Component({
     cyl_scheduleGIFImageEnd() {
       const duration = this.cylGIFImageInfo?.duration || 1000
       const elapsed = Date.now() - (this.cylGIFImageStartedAt || Date.now())
-      this.cylGIFImageTimer = setTimeout(() => this.cyl_restGIFImage(), duration - (elapsed % duration))
+      this.cylGIFImageTimer = setTimeout(() => {
+        this.cyl_restGIFImage()
+        // [EN] A timed pass of a GIF image ended: the same as an engine's `complete`. [CN] GIF 图片的一遍计时结束：与引擎的 `complete` 相同。
+        this.cyl_animationDidEnd()
+        this.cyl_playDidEnd()
+        this.cyl_emitComplete({ type: 'gif' })
+      }, duration - (elapsed % duration))
     },
 
     /** [EN] Back to the first-frame still. [CN] 回到第一帧静帧。 */
@@ -462,8 +548,11 @@ Component({
       this.cyl_update()
       if (this.cylPendingPlay) {
         this.playAnimation()
-      } else if (!this.data.autoplay) {
+      } else if (!this.data.autoplay && this.data.drivesAnimationPlayback) {
         this.cyl_rest()
+      } else if (this.data.autoplay && this.data.drivesAnimationPlayback && this.data.m.usesEngine) {
+        // [EN] The engine plays by itself on ready (`autoplay`). [CN] 引擎在就绪时自行播放（`autoplay`）。
+        this.cylIsPlaying = true
       }
     },
 
@@ -476,12 +565,15 @@ Component({
     playAnimation() {
       this.cyl_showAnimationAgain()
       const m = this.data.m
+      if (m.gifImage || m.usesEngine || (m.animationType === 'gif' && m.gifPath)) this.cylIsPlaying = true
       if (m.gifImage && this.cylGIFImageInfo) {
         this.cyl_playGIFImage()
+        cylAnimationDidStart(this, { type: 'gifImage', loop: !!this.data.loop })
         return
       }
       if (m.animationType === 'gif' && m.gifPath) {
         this.cyl_playGif()
+        cylAnimationDidStart(this, { type: 'gif', loop: !!this.data.loop })
         return
       }
       if (!m.usesEngine) return
@@ -491,7 +583,23 @@ Component({
       }
       this.cylPendingPlay = false
       const engine = this.selectComponent(CYL_ENGINE_ID)
-      if (engine && typeof engine.cyl_playFromStart === 'function') engine.cyl_playFromStart()
+      if (engine && typeof engine.cyl_playFromStart === 'function') {
+        engine.cyl_playFromStart()
+        cylAnimationDidStart(this, { type: m.animationType, loop: !!this.data.loop })
+      }
+    },
+
+    /**
+     * [EN] Pauses the playing animation on its current frame (`cyl.animation.didPause`); the engine's `cyl_pause`. A GIF has no pause and keeps
+     *      playing. [CN] 把正在播放的动画暂停在当前帧（`cyl.animation.didPause`）；使用引擎的 `cyl_pause`。GIF 没有暂停，会继续播放。
+     */
+    pauseAnimation() {
+      return cylPauseAnimation(this)
+    },
+
+    /** [EN] Continues an animation paused by `pauseAnimation()` (`cyl.animation.didResume`). [CN] 继续被 `pauseAnimation()` 暂停的动画（`cyl.animation.didResume`）。 */
+    resumeAnimation() {
+      return cylResumeAnimation(this)
     },
 
     /** [EN] The same as `playAnimation()` (iOS `restartAnimation`). [CN] 与 `playAnimation()` 相同（iOS 的 `restartAnimation`）。 */
@@ -504,6 +612,7 @@ Component({
       this.cyl_showAnimationAgain()
       this.cyl_halt()
       this.cyl_rest()
+      cylAnimationDidStop(this, false)
     },
 
     /**
@@ -514,6 +623,7 @@ Component({
      */
     cyl_halt() {
       this.cylPendingPlay = false
+      this.cylIsPlaying = false
       clearTimeout(this.cylGifTimer)
       if (this.data.gifImagePlaying) this.cyl_restGIFImage()
       if (!this.data.m.usesEngine || !this.data.animationLoaded) return
@@ -528,6 +638,16 @@ Component({
      *      Rive 用 `resting-frame`（first / last），GIF 用其静帧。
      */
     cyl_rest() {
+      this.cyl_restAt(cylAnimatedItemRestingProgress(this.data))
+    },
+
+    /**
+     * [EN] The resting frame at `progress` (0...1): `cyl_rest()` for the item's own resting progress, `cyl_stopAtProgress()` for
+     *      the host's. An engine with no seek rests through `cyl_stop()` (Rive: its `resting-frame`).
+     * [CN] 停在 `progress`（0...1）的静止帧：`cyl_rest()` 使用条目自己的静止进度，`cyl_stopAtProgress()` 使用宿主给出的进度。
+     *      没有跳转的引擎通过 `cyl_stop()` 静止（Rive：其 `resting-frame`）。
+     */
+    cyl_restAt(progress) {
       clearTimeout(this.cylGifTimer)
       if (this.data.gifPlaying) {
         this.setData({ gifPlaying: false })
@@ -536,7 +656,6 @@ Component({
       if (!this.data.m.usesEngine || !this.data.animationLoaded) return
       const engine = this.selectComponent(CYL_ENGINE_ID)
       if (!engine) return
-      const progress = cylAnimatedItemRestingProgress(this.data)
       if (typeof engine.cyl_setProgress === 'function') {
         engine.cyl_setProgress(progress)
       } else if (typeof engine.cyl_goToAndStop === 'function' && typeof engine.cyl_animation === 'function') {
@@ -576,7 +695,8 @@ Component({
         this.cyl_update()
         // [EN] A timed pass of a GIF with stills ended: the same as an engine's `complete`. [CN] 有静帧的 GIF 一遍计时结束：与引擎的 `complete` 相同。
         this.cyl_animationDidEnd()
-        this.triggerEvent('animationcomplete', { type: 'gif' })
+        this.cyl_playDidEnd()
+        this.cyl_emitComplete({ type: 'gif' })
       }, duration - (elapsed % duration))
     },
 
@@ -585,6 +705,7 @@ Component({
      * [CN] 只播放一次的一遍结束：开启 `showsImageWhenAnimationEnds` 时用静态图片替换动画。
      */
     cyl_animationDidEnd() {
+      cylAnimationDidStop(this, true)
       if (this.data.loop || !this.data.showsImageWhenAnimationEnds || this.data.animationEnded) return
       this.setData({ animationEnded: true })
       this.cyl_update()
@@ -602,6 +723,7 @@ Component({
      *      a log naming the package to add. [CN] 没有引擎、文件损坏或下载失败：回到静态图片（或占位图），并按类型输出一次需要安装的包。
      */
     cyl_onAnimationError(event) {
+      this.cylIsPlaying = false
       this.setData({ animationFailed: true })
       this.cyl_update()
       // [EN] Forwarded as `animationerror` with the engine's detail (`message`); the item still falls back to its image.
@@ -621,12 +743,79 @@ Component({
      */
     cyl_onAnimationComplete(event) {
       this.cyl_animationDidEnd()
-      this.triggerEvent('animationcomplete', event?.detail || {})
+      this.cyl_playDidEnd()
+      this.cyl_emitComplete(event?.detail || {})
+    },
+
+    /**
+     * [EN] A play-once pass ended: sends `animationcomplete` and its alias `animationend` (HarmonyOS name), both with the same detail.
+     * [CN] 只播放一次的一遍播放结束：发送 `animationcomplete` 及其别名 `animationend`（鸿蒙的名称），detail 相同。
+     */
+    cyl_emitComplete(detail) {
+      this.triggerEvent('animationcomplete', detail)
+      this.triggerEvent('animationend', detail)
     },
 
     /** [EN] A looping play finished one pass: forwarded as `animationloopcomplete`. [CN] 循环播放完成一遍：以 `animationloopcomplete` 转发。 */
     cyl_onAnimationLoopComplete(event) {
       this.triggerEvent('animationloopcomplete', event?.detail || {})
+    },
+
+    /**
+     * [EN] A play-once pass ended: not playing any more, and the player's `onEnded` callback runs.
+     * [CN] 只播放一次的一遍播放结束：不再处于播放中，并调用播放器的 `onEnded` 回调。
+     */
+    cyl_playDidEnd() {
+      this.cylIsPlaying = false
+      if (this.cylPlayer) this.cylPlayer.didEnd()
+    },
+
+    /**
+     * [EN] Whether `loop` takes effect on this file: an engine, a GIF with stills, or a GIF image; a GIF with neither plays
+     *      by itself and cannot loop. [CN] `loop` 对该文件是否生效：引擎、有静帧的 GIF 或 GIF 图片；两者皆无的 GIF 自行播放，无法循环。
+     */
+    cyl_canLoop() {
+      const m = this.data.m
+      return !!(m.usesEngine || m.gifImage || (m.animationType === 'gif' && (this.data.gifFirstFrame || this.data.gifLastFrame)))
+    },
+
+    /**
+     * [EN] The player of this item (once per item, see cyl_animated_item_player.js): `play()`, `stopAtProgress(p)`, `speed`,
+     *      `loops`, `supportsSpeed` / `supportsLoops` / `supportsProgress`, `isPlaying`, `onEnded(cb)`, `supportsColors` /
+     *      `applyColors(colors)`. The way to play an item with `drivesAnimationPlayback` off; also fine with it on (the
+     *      default rules play through the same item). `animationready` says the engine is live.
+     * [CN] 本条目的播放器（每个条目一个，见 cyl_animated_item_player.js）：`play()`、`stopAtProgress(p)`、`speed`、`loops`、
+     *      `supportsSpeed` / `supportsLoops` / `supportsProgress`、`isPlaying`、`onEnded(cb)`、`supportsColors` / `applyColors(colors)`。
+     *      播放 `drivesAnimationPlayback` 关闭的条目的方式；开启时也可用（默认规则通过同一个条目播放）。`animationready` 表示引擎已就绪。
+     */
+    cyl_player() {
+      if (this.cylPlayer) return this.cylPlayer
+      this.cylPlayer = new CYLAnimatedItemPlayer({
+        engine: () => this.cyl_animationView(),
+        type: () => (this.data.m.gifImage ? 'gif' : this.data.m.animationType),
+        usesLoop: () => this.cyl_canLoop(),
+        isPlaying: () => !!this.cylIsPlaying,
+        get: (name) => this.data[name],
+        set: (patch) => this.setData(patch),
+        play: () => this.playAnimation(),
+        stopAtProgress: (progress) => this.cyl_stopAtProgress(progress),
+      })
+      return this.cylPlayer
+    },
+
+    /**
+     * [EN] Stops where it is, then shows the frame at `progress` (0...1): the player's `stopAtProgress`. Host-driven, the
+     *      resting frame and the GIF stills follow this progress until the next call.
+     * [CN] 停在当前位置，然后显示 `progress`（0...1）处的帧：播放器的 `stopAtProgress`。宿主驱动时，静止帧与 GIF 静帧在下次调用之前都以此进度为准。
+     */
+    cyl_stopAtProgress(progress) {
+      this.cyl_showAnimationAgain()
+      this.cyl_halt()
+      if (!this.data.drivesAnimationPlayback) {
+        this.setData({ hostRestingProgress: progress })
+        this.cyl_update()
+      }
+      this.cyl_restAt(progress)
     },
 
     /** [EN] The engine component, or null (no engine type, GIF, or not drawn yet). [CN] 引擎组件，没有时为 null。 */
