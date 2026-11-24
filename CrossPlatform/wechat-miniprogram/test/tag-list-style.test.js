@@ -179,7 +179,7 @@ test('tag layout: capsule for a corner radius of half the height or more, insets
   });
   const item = { title: '首页', enabled: true };
   const tag = model.tagLayout(style, item, 'normal', { kind: 'image' }, 10, 10);
-  assert.match(tag.cellStyle, /border-radius: 22px/);
+  assert.match(tag.cellStyle, /border-radius:22px/);
   assert.match(tag.cellStyle, /padding: 0 11px 0 11px/);
   assert.match(tag.cellStyle, /height: 44px/);
   assert.match(tag.slotStyle, /width: 28px; height: 28px; margin-right: 6px/);

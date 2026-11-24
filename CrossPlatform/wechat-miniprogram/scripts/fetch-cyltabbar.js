@@ -23,7 +23,7 @@ const fs = require('fs');
 const path = require('path');
 
 // CYL_TAB_BAR: the same commit as the React Native example (fetch-cyltabbar.sh, example/ios/Podfile).
-const COMMIT = '8fa168fa3554bf11bc6583a4ee356068f60ac785';
+const COMMIT = '43ad5f6af334b1560d30b62c8bbf9ae448d6e670';
 const REPOSITORY = 'https://github.com/ChenYilong/CYLTabBarController.git';
 const ROOT = path.resolve(__dirname, '..');
 const CHECKOUT = path.join(ROOT, '.deps', 'CYLTabBarController');
@@ -60,7 +60,7 @@ const PAG_HINT = 'run python3 scripts/fetch-animation-resources.py PAGResources 
  */
 const LIBRARY = path.join(ROOT, 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
 const VENDORED_SOURCE = 'CrossPlatform/wechat-miniprogram-cyltabbar';
-const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder', 'cyl-dealloc-block-executor', 'cyl-liquid-glass'];
+const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder', 'cyl-dealloc-block-executor'];
 const VENDORED_TEST = {
   from: 'test/cyl_animated_item.test.js',
   to: path.join(ROOT, 'test', 'cyl-animated-item.upstream.test.js'),

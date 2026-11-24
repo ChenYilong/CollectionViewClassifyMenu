@@ -10,8 +10,8 @@
 const symbols = require('./symbols.js');
 const locale = require('../locale.js');
 const { cylAnimatedItemType } = require('../cyl-animated-item/cyl_animated_item_model');
-// CYLTabBarController's base library cyl-liquid-glass: the one rule for Liquid Glass (the same as iOS CYLLiquidGlass.isActive()).
-const { cylLiquidGlassIsActive } = require('../cyl-liquid-glass/cyl_liquid_glass');
+// The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
+const { cylAnimatedItemBackground } = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
 
@@ -175,6 +175,7 @@ function defaultAppearance(hairline) {
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
     cornerRadius: 3,
+    cornerRadiusSet: false, // an unset radius is a capsule for Liquid Glass (cyl-animated-item's default)
     borderColor: null,
     borderWidth: 0,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
@@ -209,7 +210,7 @@ function defaultStyle(pixelRatio = 2) {
     layoutCentered: true,
     imagePlacement: 'leading',
     contentAlignment: 'center',
-    // 'flat', or 'liquidGlass' (a glass background where cylLiquidGlassIsActive(), flat elsewhere); the smallest tag, points.
+    // 'flat', or 'liquidGlass' (a glass background where cyl-animated-item's rule is active, flat elsewhere); the smallest tag, points.
     backgroundStyle: 'flat',
     minimumTagSizeWH: { width: 0, height: 0 },
     imageSizeWH: { width: 14, height: 14 },
@@ -263,7 +264,7 @@ function applyAppearance(appearance, configuration, allowsTransparent = false) {
   if (has('borderColor')) appearance.borderColor = color(configuration.borderColor);
   const sanitized = (n) => (Number.isFinite(n) && n > 0 ? n : 0);
   const radius = numberValue(configuration.cornerRadius);
-  if (radius !== null) appearance.cornerRadius = sanitized(radius);
+  if (radius !== null) { appearance.cornerRadius = sanitized(radius); appearance.cornerRadiusSet = true; }
   const width = numberValue(configuration.borderWidth);
   if (width !== null) appearance.borderWidth = sanitized(width);
   const margin = numberValue(configuration.margin);
@@ -776,7 +777,12 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   // Stacked: the group centered from top to bottom, each part centered (or at the leading margin) across.
   const justify = !vertical && (leading || (!style.layoutCentered && !(showsImage && showsTitle))) ? 'flex-start' : 'center';
   const directions = { trailing: 'row-reverse', top: 'column', bottom: 'column-reverse' };
-  const glass = style.backgroundStyle === 'liquidGlass' && cylLiquidGlassIsActive();
+  // The background, radius and border are cyl-animated-item's (the interface of CYLAnimatedItemView.itemBackgroundStyle…): an unset
+  // radius is -1, its default (a capsule for Liquid Glass); a set one is limited to half the height.
+  const glassWanted = style.backgroundStyle === 'liquidGlass';
+  const radius = !appearance.cornerRadiusSet && glassWanted ? -1 : cornerRadius(appearance.cornerRadius, height);
+  const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, appearance.backgroundColor, radius, border, appearance.borderColor, false);
+  const glass = itemBackground.glass;
   const background = appearance.backgroundImage
     ? `background-image: url("${appearance.backgroundImage}"); background-size: 100% 100%`
     : '';
@@ -785,12 +791,10 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     `padding: 0 ${Math.max(0, right - border)}px 0 ${Math.max(0, left - border)}px`,
     `margin: 0 ${interitemSpacing}px ${lineSpacing}px 0`,
     fontCSS(appearance.font),
-    `border-radius: ${cornerRadius(appearance.cornerRadius, height)}px`,
     `border-width: ${border}px`,
     `border-color: ${appearance.borderColor || 'transparent'}`,
     `color: ${appearance.textColor}`,
-    // Liquid Glass: the glass layer (cyl-liquid-glass) draws the background, tinted with the state's color.
-    `background-color: ${glass ? 'transparent' : appearance.backgroundColor}`,
+    itemBackground.css,
     style.minimumTagSizeWH.width > 0 ? `min-width: ${style.minimumTagSizeWH.width}px` : '',
     `justify-content: ${justify}`,
     `flex-direction: ${directions[style.imagePlacement] || 'row'}`,
@@ -806,8 +810,6 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     height,
     cellStyle: cell,
     glass,
-    glassTint: appearance.backgroundColor,
-    glassRadius: cornerRadius(appearance.cornerRadius, height),
     slotStyle: showsImage
       ? `width: ${slot.width}px; height: ${slot.height}px; ${gap}: ${spacing}px; left: ${io.horizontal}px; top: ${io.vertical}px`
       : '',

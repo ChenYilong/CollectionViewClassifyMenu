@@ -6,9 +6,6 @@
   max-width: 100%; overflow: visible;
 }
 .cyl-tag-button:active { opacity: 0.85; }
-/* Liquid Glass: the glass layer fills the tag behind its content (isolation keeps z-index -1 inside the tag). */
-.cyl-tag-button { position: relative; isolation: isolate; }
-.cyl-tag-glass { position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none; }
 .cyl-icon-slot { position: relative; flex: none; }
 .cyl-icon { position: absolute; left: 0; top: 0; display: block; }
 /* cyl-animated-item lays its icon out in a box of its own (at least 44 px high, 4 px padding, transparent): its center is

@@ -1,13 +1,13 @@
 'use strict';
 
 // The tag background style (flat, liquidGlass) and minimumTagSize in the mini program core, in the shape of the iOS
-// CYLMenuStyle.backgroundStyle / minimumTagSize; the glass comes from CYLTabBarController's cyl-liquid-glass.
+// CYLMenuStyle.backgroundStyle / minimumTagSize; the rule comes from CYLTabBarController's cyl-animated-item.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const model = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/model.js');
-const glass = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-liquid-glass/cyl_liquid_glass.js');
+const glass = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-animated-item/cyl_animated_item_model.js');
 
-test.afterEach(() => glass.cylLiquidGlassSetActiveOverride(undefined));
+test.afterEach(() => glass.cylAnimatedItemLiquidGlassSetActiveOverride(undefined));
 
 test('backgroundStyle and minimumTagSize are read from the style configuration', () => {
   assert.equal(model.mergeStyle({}).backgroundStyle, 'flat', 'flat is the default');
@@ -19,20 +19,19 @@ test('backgroundStyle and minimumTagSize are read from the style configuration',
   assert.deepEqual(model.mergeStyle({}).minimumTagSizeWH, { width: 0, height: 0 });
 });
 
-test('a tag draws glass only where cyl-liquid-glass is active, flat otherwise', () => {
+test('a tag draws glass only where the cyl-animated-item rule is active, flat otherwise', () => {
   const props = { title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass' } };
-  glass.cylLiquidGlassSetActiveOverride(true);
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   const withGlass = model.tagButtonView(props, '', 2);
   assert.equal(withGlass.glass, true);
-  assert.match(withGlass.cellStyle, /background-color: transparent/, 'the flat color is not drawn under the glass');
-  assert.equal(typeof withGlass.glassTint, 'string');
+  assert.match(withGlass.cellStyle, /backdrop-filter:blur\(16px\) saturate\(180%\)/, 'the state color tints the blur');
 
-  glass.cylLiquidGlassSetActiveOverride(false);
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(false);
   const flat = model.tagButtonView(props, '', 2);
   assert.equal(flat.glass, false);
-  assert.doesNotMatch(flat.cellStyle, /background-color: transparent/);
+  assert.doesNotMatch(flat.cellStyle, /backdrop-filter/);
 
-  glass.cylLiquidGlassSetActiveOverride(true);
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   assert.equal(model.tagButtonView({ title: 'Tag' }, '', 2).glass, false, 'the default style is flat');
 });
 
@@ -45,4 +44,14 @@ test('a minimum tag size grows a smaller tag, a larger tag is not shrunk', () =>
   const view = model.tagButtonView({ title: 'A', tagStyle: { minimumTagSize: { width: 69, height: plainHeight + 10 } } }, '', 2);
   assert.match(view.cellStyle, /min-width: 69px/);
   assert.equal(model.tagHeight(model.mergeStyle({ minimumTagSize: { width: 0, height: 1 } })), plainHeight, 'a smaller minimum changes nothing');
+});
+
+test('an unset radius is a capsule for glass (the animated item default); a set radius customizes it', () => {
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
+  const unset = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass' } }, '', 2);
+  assert.match(unset.cellStyle, /border-radius:999px/);
+  const set = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 6 } } }, '', 2);
+  assert.match(set.cellStyle, /border-radius:6px/);
+  const square = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 0 } } }, '', 2);
+  assert.match(square.cellStyle, /border-radius:0px/);
 });
