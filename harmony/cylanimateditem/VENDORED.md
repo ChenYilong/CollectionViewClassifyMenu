@@ -8,7 +8,7 @@ depended on with `file:`, at a pinned commit.
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`c6b3e976e5f009f3b06003df3a78835c4dd35835`](https://github.com/ChenYilong/CYLTabBarController/tree/c6b3e976e5f009f3b06003df3a78835c4dd35835/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-24; was `43ad5f6a`, `3074c51d`, `c4a1f8fd`, then `618ac11a`, then `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`) |
+| Commit | [`b4299707df2dc2d5e545f5175dc7dee075c93597`](https://github.com/ChenYilong/CYLTabBarController/tree/b4299707df2dc2d5e545f5175dc7dee075c93597/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-24; was `43ad5f6a`, `3074c51d`, `c4a1f8fd`, then `618ac11a`, then `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
 | Changes | None. Only this file (`VENDORED.md`) was added; `README.md` is upstream's own (since `62715829`). |

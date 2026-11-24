@@ -70,6 +70,49 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         XCTAssertNotNil(configuration?.mapTagListView)
     }
 
+    /// The default style, flat against Liquid Glass with only the style parameter changed: normal, selected and disabled tags, on a colorful
+    /// and on a plain background (what an example gets by passing `backgroundStyle = .liquidGlass` and nothing else).
+    func testDefaultStyleFlatVersusGlassNormalSelectedDisabled() throws {
+        guard #available(iOS 26.0, *) else {
+            throw XCTSkip("Liquid Glass needs iOS 26")
+        }
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
+        let size = CGSize(width: 393, height: 520)
+        let canvas = UIView(frame: CGRect(origin: .zero, size: size))
+        canvas.backgroundColor = .white
+        let gradient = CAGradientLayer()
+        gradient.frame = CGRect(x: 0, y: 0, width: size.width, height: 260)
+        gradient.colors = [UIColor.systemTeal.cgColor, UIColor.systemPurple.cgColor, UIColor.systemOrange.cgColor]
+        gradient.startPoint = CGPoint(x: 0, y: 0)
+        gradient.endPoint = CGPoint(x: 1, y: 1)
+        canvas.layer.addSublayer(gradient)
+        show(canvas, size: size)
+        var y: CGFloat = 12
+        for panel in 0..<2 {
+            for (caption, background) in [("default, flat", CYLTagBackgroundStyle.flat), ("default, backgroundStyle = liquidGlass", .liquidGlass)] {
+                let label = UILabel(frame: CGRect(x: 16, y: y, width: 361, height: 18))
+                label.text = caption + (panel == 0 ? " (colorful)" : " (plain)")
+                label.font = .preferredFont(forTextStyle: .caption1)
+                label.textColor = panel == 0 ? .white : .black
+                canvas.addSubview(label)
+                let style = CYLMenuStyle()
+                style.backgroundStyle = background
+                for (index, title) in ["Normal", "Selected", "Disabled"].enumerated() {
+                    let tag = CYLMenuFixtures.tagButton(title: title, image: nil, style: style, size: CGSize(width: 100, height: 34))
+                    tag.frame.origin = CGPoint(x: 16 + CGFloat(index) * 112, y: y + 22)
+                    tag.isSelected = index == 1
+                    tag.isEnabled = index != 2
+                    canvas.addSubview(tag)
+                    tag.layoutIfNeeded()
+                }
+                y += 62
+            }
+            y += 8
+        }
+        captureScreen(named: "test-tag-default-style-flat-vs-glass")
+    }
+
     /// Flat tags next to Liquid Glass tags over a colorful background (the glass shows the colors through it).
     func testFlatAndLiquidGlassTagsSideBySide() throws {
         guard #available(iOS 26.0, *) else {

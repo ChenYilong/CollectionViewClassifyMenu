@@ -174,7 +174,9 @@ final class CYLTagConfigurationTests: XCTestCase {
         let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style)
         let glass = try XCTUnwrap(button.liquidGlassView as? UIVisualEffectView, "a glass view behind the content")
         XCTAssertTrue(glass.effect is UIGlassEffect)
-        XCTAssertEqual((glass.effect as? UIGlassEffect)?.tintColor, .systemOrange, "the state's backgroundColor tints it")
+        var tintAlpha: CGFloat = -1
+        (glass.effect as? UIGlassEffect)?.tintColor?.getRed(nil, green: nil, blue: nil, alpha: &tintAlpha)
+        XCTAssertEqual(tintAlpha, 0.75, accuracy: 0.01, "the state's backgroundColor tints it, translucent (alpha x 0.75)")
         XCTAssertNil(button.layer.backgroundColor, "the flat color is not drawn under glass")
         XCTAssertEqual(glass.frame, button.bounds)
         XCTAssertEqual(glass.layer.cornerRadius, button.layer.cornerRadius, "clipped to the resolved radius")
