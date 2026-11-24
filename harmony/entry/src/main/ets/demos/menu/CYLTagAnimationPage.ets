@@ -12,7 +12,8 @@ import { CYLColor, CYLUIContext } from '@cyl/classifymenu';
  * called from EntryAbility), picked by the file's extension: Lottie (@ohos/lottie), PAG (@tencent/libpag), Rive
  * (@ohos/rive), SVGA (decoded by the example), GIF (frames decoded by ImageKit). The files are rawfiles (pag/, rive/,
  * svga/, gif/); every Rive scene has an SVGA twin (svga, svga-dark), with the same Rive
- * options and PAG resting progress as iOS. Rive has no playback speed on HarmonyOS (`CYLRivePlayer`).
+ * options and PAG resting progress as iOS. Rive has no playback speed on HarmonyOS (CYLTabBarController's
+ * `CYLRiveAnimationBuilder`, driven through CYLAnimatedItemView's own props).
  */
 import {
   CYLConfiguration, CYLImage, CYLIndexPath, CYLMenuDataSource, CYLMenuStyle,

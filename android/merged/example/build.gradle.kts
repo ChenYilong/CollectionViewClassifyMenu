@@ -58,10 +58,34 @@ dependencies {
     testImplementation(libs.androidx.test.core)
 }
 
+// The PAG files (pag-ios/*.pag) are gitignored: the iOS `pod install` downloads them with scripts/fetch-animation-resources.py, and without
+// them the PAG tags of the animation screen draw their titles only (the engine swallows the missing file). Downloaded before the first
+// build when Example-Shared/PAGResources/pag-ios/tab_home.pag is missing; python3, then `py -3` (on Windows python3 is often the Store stub),
+// then python; a failure is reported as a warning and the build goes on (the PAG tags then show their titles).
+val fetchPAGResources by tasks.registering {
+    val repositoryRoot = rootProject.file("../..")
+    val sample = File(repositoryRoot, "Example-Shared/PAGResources/pag-ios/tab_home.pag")
+    onlyIf { !sample.exists() }
+    doLast {
+        val script = File(repositoryRoot, "scripts/fetch-animation-resources.py").absolutePath
+        val interpreters = listOf(listOf("python3"), listOf("py", "-3"), listOf("python"))
+        var fetched = false
+        for (interpreter in interpreters) {
+            val finished = try {
+                ProcessBuilder(interpreter + listOf(script, "PAGResources")).directory(repositoryRoot).inheritIO().start().waitFor() == 0
+            } catch (e: java.io.IOException) {
+                false
+            }
+            if (finished && sample.exists()) { fetched = true; break }
+        }
+        if (!fetched) logger.warn("The PAG files were not downloaded (python3, py -3 and python all failed): the PAG tags show their titles only. Run scripts/fetch-animation-resources.py PAGResources.")
+    }
+}
 // The iOS examples' resource bundles, used as they are (no copies in the repository): CYLTagEditorExample.bundle
 // (Example-Swift) and CYLMenuExample.bundle (Example), synced into build/generated/cylBundles before every build and
 // read as assets under their own folder names (<Name>.bundle/<language>.lproj/…).
 val copyExampleBundles by tasks.registering(Sync::class) {
+    dependsOn(fetchPAGResources)
     from("../../../Example-Swift/CYLTagEditorExample/CYLTagEditorExample.bundle") { into("CYLTagEditorExample.bundle") }
     from("../../../Example/CYLMenuExample/CYLMenuExample.bundle") { into("CYLMenuExample.bundle") }
     // CYLTabBarController's Example-PAG icons (pag-ios/*.pag), shared by the iOS examples.

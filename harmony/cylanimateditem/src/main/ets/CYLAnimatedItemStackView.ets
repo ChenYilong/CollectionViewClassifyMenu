@@ -60,10 +60,19 @@ export struct CYLAnimatedItemStackView {
    * [CN] 圆角半径（vp）：0 为直角，`CYLAnimatedItemCornerRadiusCapsule` 为胶囊，其他值为 vp（平台会截断到半高）；-1（默认）时液态玻璃为胶囊、扁平为直角。
    */
   @Prop itemCornerRadius: number = -1;
+  /**
+   * [EN] The space between the stack's outer border and its items on the left and right, in vp, added to `contentMargin` horizontally only; -1 (the
+   *      default) is `CYLAnimatedItemLiquidGlassContentInset` for the drawn Liquid Glass and 0 for flat, as `CYLAnimatedItemView.itemContentHorizontalInset`.
+   * [CN] 堆叠外侧边框与条目之间左右的间距（vp），仅在水平方向叠加到 `contentMargin` 上；-1（默认）时绘制液态玻璃为 `CYLAnimatedItemLiquidGlassContentInset`、
+   *      扁平为 0，与 `CYLAnimatedItemView.itemContentHorizontalInset` 相同。
+   */
+  @Prop itemContentHorizontalInset: number = -1;
   /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
   @Prop itemBorderWidth: number = 0;
   /** [EN] The border color. [CN] 边框颜色。 */
   @Prop itemBorderColor: ResourceColor = '';
+  /** [EN] The share of the color's alpha that tints a Liquid Glass: -1 (the default) is 0.75, 1 the color as it is. [CN] 颜色透明度中用于给液态玻璃着色的比例：-1（默认）为 0.75，1 为原色。 */
+  @Prop itemGlassTintAlpha: number = -1;
   @Prop titleColor: ResourceColor = '#333333';
   /** [EN] The title font size of every item. [CN] 所有条目的标题字号。 */
   @Prop titleFontSize: number = 16;
@@ -105,8 +114,13 @@ export struct CYLAnimatedItemStackView {
     return this.revision >= 0 ? this.model.items : [];
   }
 
+  /** [EN] The inset really applied (vp). [CN] 实际应用的间距（vp）。 */
+  private cylContentInset(): number {
+    return CYLAnimatedItemBackgroundModifier.resolvedContentInset(this.itemBackgroundStyle, this.itemContentHorizontalInset);
+  }
+
   private cylMaxItemWidth(): number | undefined {
-    return this.viewWidth > 0 ? this.model.maxItemWidth(this.viewWidth) : undefined;
+    return this.viewWidth > 0 ? this.model.maxItemWidth(this.viewWidth - 2 * this.cylContentInset()) : undefined;
   }
 
   @Builder
@@ -192,9 +206,10 @@ export struct CYLAnimatedItemStackView {
     .height('100%')
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
-    .padding(this.model.contentMargin)
+    .padding({ top: this.model.contentMargin, bottom: this.model.contentMargin,
+      left: this.model.contentMargin + this.cylContentInset(), right: this.model.contentMargin + this.cylContentInset() })
     .attributeModifier(new CYLAnimatedItemBackgroundModifier(this.itemBackgroundStyle, this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent,
-      this.itemCornerRadius, this.itemBorderWidth, this.itemBorderColor !== '' ? this.itemBorderColor : Color.Transparent))
+      this.itemCornerRadius, this.itemBorderWidth, this.itemBorderColor !== '' ? this.itemBorderColor : Color.Transparent, this.itemGlassTintAlpha))
     .onAreaChange((oldValue: Area, newValue: Area) => {
       this.viewWidth = Number(newValue.width);
     })

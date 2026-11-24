@@ -11,7 +11,8 @@ export {
 } from './src/main/ets/CYLAnimatedItemView';
 export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
 export { CYLLiquidGlass } from './src/main/ets/CYLLiquidGlass';
-export { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemCornerRadiusCapsule } from './src/main/ets/CYLAnimatedItemBackground';
+export { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemCornerRadiusCapsule,
+  CYLAnimatedItemLiquidGlassContentInset } from './src/main/ets/CYLAnimatedItemBackground';
 export {
   CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing
 } from './src/main/ets/CYLAnimatedItemStackModel';
@@ -20,6 +21,10 @@ export {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownStorage, CYLAnimatedItemCountdownListener, CYLCountdownIdle, CYLCountdownRunning,
   CYLCountdownFinished, cylCountdownText, cylCountdownTitleWidth
 } from './src/main/ets/CYLAnimatedItemCountdown';
+export {
+  CYLAnimatedItemMissingReporter, CYLAnimatedItemResourceMissingCallback, cylAnimatedItemResourceOf, CYL_RESOURCE_NOT_FOUND,
+  CYL_RESOURCE_UNREADABLE, CYL_RESOURCE_DECODE_FAILED, CYL_RESOURCE_ENGINE_LIBRARY_MISSING
+} from './src/main/ets/CYLAnimatedItemMissing';
 export { CYLAnimatedItemSource, CYLAnimatedItemRawFileReader, cylAnimatedItemFileAndOptions } from './src/main/ets/CYLAnimatedItemSource';
 export {
   CYLAnimatedItemPlayer, CYLAnimatedItemTimedPlayer, CYLAnimatedItemClock, CYL_ANIMATED_ITEM_SYSTEM_CLOCK, CYLAnimatedItemPlayback,

@@ -21,6 +21,7 @@ import android.widget.TextView
 import com.cyl.animateditem.CYLAnimatedItemAccessoryPlacement
 import com.cyl.animateditem.CYLAnimatedItemAxis
 import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
+import com.cyl.animateditem.CYLAnimatedItemLiquidGlassContentInset
 import com.cyl.animateditem.CYLAnimatedItemStackView
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLTabBarItemAnimationViewMaking
@@ -411,6 +412,8 @@ open class CYLTagButton @JvmOverloads constructor(
             CYLAnimatedItemBackgroundStyle.Flat
         }
         itemBackgroundColor = backgroundColor
+        // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
+        itemGlassTintAlpha = if (state == CYLControlState.SELECTED) 1f else null
         // The appearance's radius (CYLAnimatedItemCornerRadiusCapsule by default, 0 is square), set with the style and not
         // only when the tag is laid out: the view's own default (null) is square for flat.
         itemCornerRadius = appearance.cornerRadius
@@ -456,7 +459,9 @@ open class CYLTagButton @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val iconSize = if (animationView != null) animationSize() else iconSizeForImage(imageView.drawable, false, currentStyle)
-        val width = px(widthForTitle(rawTitle?.toString(), iconSize, showsDeleteIndicator, showsRenameIndicator, currentStyle))
+        // The measured width counts the space the shape asks for between the border and the title, as the layout will use it.
+        val width = px(widthForTitleWithInset(rawTitle?.toString(), iconSize, showsDeleteIndicator, showsRenameIndicator, currentStyle,
+            resolvedItemContentHorizontalInset))
         // Side by side: the style's height, as in a tag list; stacked: the icon, the spacing and the title.
         val height = px(if (currentStyle.imagePlacement.isVertical) heightForTitle(rawTitle?.toString(), iconSize, currentStyle) else heightForStyle(currentStyle))
         setMeasuredDimension(resolveSize(width, widthMeasureSpec), resolveSize(height, heightMeasureSpec))
@@ -471,7 +476,9 @@ open class CYLTagButton @JvmOverloads constructor(
         val height = (b - t) / density
         val state = currentState()
         val appearance = style.appearanceForState(state)
-        val insets = appearance.contentInsets
+        // Left and right at least the shape's inset (14 on a drawn Liquid Glass tag, 0 on flat), as the measured width counted it.
+        val sideInset = resolvedItemContentHorizontalInset
+        val insets = appearance.contentInsets.let { it.copy(left = max(it.left, sideInset), right = max(it.right, sideInset)) }
         backgroundImageView.layout(0, 0, r - l, b - t)
         var deleteWidth = 0f
         if (showsDeleteIndicator && showsRenameIndicator) {
@@ -808,7 +815,23 @@ open class CYLTagButton @JvmOverloads constructor(
          */
         @JvmStatic
         fun widthForTitle(title: String?, iconSize: CYLSize, showsDeleteIndicator: Boolean, showsRenameIndicator: Boolean,
-                          style: CYLMenuStyle): Float {
+                          style: CYLMenuStyle): Float =
+            widthForTitleWithInset(title, iconSize, showsDeleteIndicator, showsRenameIndicator, style, styleContentInset(style))
+
+        /**
+         * The space between the border and the content, left and right, that the style's shape asks for: [CYLAnimatedItemLiquidGlassContentInset] for a
+         * Liquid Glass style where the glass is really drawn (the same condition as the capsule), else 0. The effective inset is the larger of this
+         * and the appearance's content inset.
+         */
+        internal fun styleContentInset(style: CYLMenuStyle): Float =
+            if (style.backgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && CYLAnimatedItemView.isLiquidGlassActive()) {
+                CYLAnimatedItemLiquidGlassContentInset
+            } else {
+                0f
+            }
+
+        private fun widthForTitleWithInset(title: String?, iconSize: CYLSize, showsDeleteIndicator: Boolean, showsRenameIndicator: Boolean,
+                                           style: CYLMenuStyle, sideInset: Float): Float {
             val editingIcons = showsDeleteIndicator && showsRenameIndicator
             val text = style.displayedTitleForTitle(title)
             var width = style.minimumTagSize.width
@@ -826,7 +849,7 @@ open class CYLTagButton @JvmOverloads constructor(
                 }
                 if (editingIcons) content += style.imageTitleSpacing + editingIndicatorsWidth(state, style)
                 else if (showsDeleteIndicator) content += style.imageTitleSpacing + deleteIndicatorWidthForState(state, style)
-                width = max(width, ceil(content + appearance.contentInsets.left + appearance.contentInsets.right))
+                width = max(width, ceil(content + max(appearance.contentInsets.left, sideInset) + max(appearance.contentInsets.right, sideInset)))
             }
             return width
         }

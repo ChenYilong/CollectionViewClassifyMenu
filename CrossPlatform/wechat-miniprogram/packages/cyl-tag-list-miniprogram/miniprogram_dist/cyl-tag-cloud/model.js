@@ -638,7 +638,7 @@ function renderTag(tag, index, context) {
   const radius = cornerRadius(a.cornerRadius, height);
   // Liquid Glass is cyl-animated-item's (the same call as cyl-tag-list): its CSS replaces the flat radius and color; a flat tag keeps its own.
   const glass = style.backgroundStyle === 'liquidGlass'
-    ? cylAnimatedItemBackground('liquidGlass', background, a.cornerRadius, 0, '', false) : null;
+    ? cylAnimatedItemBackground('liquidGlass', background, a.cornerRadius, 0, '', false, state === 'selected' ? 1 : -1) : null;
   const parts = [
     // A wrapping title (`titleWraps`) lets the tag grow taller than one line.
     style.titleWraps ? `min-height: ${px(height)}; height: auto` : `height: ${px(height)}`,

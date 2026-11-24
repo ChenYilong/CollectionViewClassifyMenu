@@ -88,6 +88,21 @@ export default function tagButtonTest() {
       expect(button.cornerRadius).assertEqual(height / 2);
     });
 
+    it('replaysABuilderDrawnIconOnceItHasLoaded', 0, () => {
+      // No player for a builder-drawn type (Rive): a play before the load is pending, and the load bumps the token that
+      // CYLAnimatedItemView.animationRestartToken gets.
+      const button = new CYLTagButton('Home', 'home.png');
+      button.animationURL = 'asset:rive/house.riv';
+      button.playAnimation();
+      expect(button.pendingPlay).assertTrue();
+      const before = button.playToken;
+      button.itemDidLoad();
+      expect(button.pendingPlay).assertFalse();
+      expect(button.playToken).assertEqual(before + 1);
+      button.itemDidLoad();
+      expect(button.playToken).assertEqual(before + 1);
+    });
+
     it('tintsTheAnimatedIconsStaticImageThroughTheComponent', 0, () => {
       // CYLAnimatedItemView.iconColor (CYLTabBarController PR #816): the static image under an animated icon takes the
       // state's icon color, as the tag's own static icon does; '' without a style color or without an animation.

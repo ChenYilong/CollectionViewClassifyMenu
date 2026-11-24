@@ -1,8 +1,10 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
+  CYLAnimationSource, cylTagItemBuilderURL,
   CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
   CYLImageTagMetrics, CYLImageTagPlacement, CYLPoint, CYLRect, CYLSize, CYLTagListState
 } from '@cyl/classifymenu';
+
 /**
  * The image tag geometry (TagViewGroup's TagGroupUtils) and the JSON configuration of CYLTagListState.
  */
@@ -63,6 +65,15 @@ export default function imageTagAndPlayerTest() {
       expect(CYLImageTagGeometry.joinTitles(['鞋', '包', '衣服'], 'zh-Hans')).assertEqual('鞋、包和衣服');
       expect(CYLImageTagGeometry.joinTitles(['a', 'b'], 'en')).assertEqual('a and b');
       expect(CYLImageTagGeometry.joinTitles([], 'en')).assertEqual('');
+    });
+  });
+
+  describe('cylTagItemBuilderURL', () => {
+    it('givesTheBuilderARawfilePathWithItsOptions', 0, () => {
+      const source = CYLAnimationSource.parse('asset:Rive/house.riv#stateMachine=State%20Machine%201');
+      expect(cylTagItemBuilderURL(source, 'house.riv')).assertEqual('house.riv#stateMachine=State%20Machine%201');
+      expect(cylTagItemBuilderURL(CYLAnimationSource.parse('asset:rive/truck.riv'), 'rive/truck.riv'))
+        .assertEqual('rive/truck.riv');
     });
   });
 

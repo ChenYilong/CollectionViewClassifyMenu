@@ -241,12 +241,18 @@ class CYLTagButtonStandaloneTest {
             style.backgroundStyle = background
             val tag = CYLTagButton(context, "Tag", icon())
             tag.style = style
+            tag.layout(0, 0, 300, 100)
             assertEquals("$background: the default is the capsule constant", CYLAnimatedItemCornerRadiusCapsule, tag.itemCornerRadius)
-            style.normalAppearance.cornerRadius = 6f
-            tag.style = style
+            // A new style object: assigning the same instance again does not re-apply it.
+            val customized = style.copy()
+            customized.normalAppearance.cornerRadius = 6f
+            tag.style = customized
+            tag.layout(0, 0, 300, 100)
             assertEquals(6f, tag.itemCornerRadius)
-            style.normalAppearance.cornerRadius = 0f
-            tag.style = style
+            val square = customized.copy()
+            square.normalAppearance.cornerRadius = 0f
+            tag.style = square
+            tag.layout(0, 0, 300, 100)
             assertEquals("0 is square", 0f, tag.itemCornerRadius)
         }
     }
