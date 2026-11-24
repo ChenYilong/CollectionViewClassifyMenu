@@ -325,3 +325,22 @@
 | **英文**：从 CI 中移除截图标签检查。 | **English**: remove the screenshot label check from CI. |
 | **计划**：删除 `.github/workflows/screenshot-labels.yml`；保留每次提交前的检查（`scripts/check-branch-pr.sh` 运行 `scripts/check-screenshots.py`）；更新 AGENTS.md 以及写有“in CI”的注释。CYLTabBarController 做了同样的事（`70064275`）。 | **Plan**: delete `.github/workflows/screenshot-labels.yml`; keep the check before every commit (`scripts/check-branch-pr.sh` runs `scripts/check-screenshots.py`); update AGENTS.md and the comments that say "in CI". CYLTabBarController did the same (`70064275`). |
 | **结果（2026-11-18）**：已完成。已删除 `.github/workflows/screenshot-labels.yml`；AGENTS.md 的“Checked before every commit”以及 `scripts/stitch-screenshots.py`、`.swift` 和 `check-screenshots.py` 的注释不再提到 CI。每次提交前的检查（`scripts/check-branch-pr.sh`）保留。 | **Result (2026-11-18)**: DONE. `.github/workflows/screenshot-labels.yml` removed; AGENTS.md "Checked before every commit" and the comments of `scripts/stitch-screenshots.py`, `.swift` and `check-screenshots.py` no longer mention CI. The check before every commit (`scripts/check-branch-pr.sh`) stays. |
+
+
+## iOS Liquid Glass tags (PR #36), 2026-11-25
+
+| 中文 | English |
+|:---|:---|
+| 标签的 Liquid Glass 背景（`backgroundStyle = liquidGlass`）。环境：iOS 27.2、iPhone 18 Pro 模拟器、Xcode 27.2 (27B52)；ClassifyMenu `7c64042e` + CYLTabBarController `3f2a5b99`；拍摄于 2026-11-25 00:33 NZDT。浅色模式；“纯色页面”一行由本地临时改动测试代码的渐变高度得到（未提交），其余为分支上的原测试。 | Liquid Glass tag background (`backgroundStyle = liquidGlass`). Environment: iOS 27.2, iPhone 18 Pro simulator, Xcode 27.2 (27B52); ClassifyMenu `7c64042e` + CYLTabBarController `3f2a5b99`; taken 2026-11-25 00:33 NZDT. Light mode; the plain-page rows come from the branch's `testDefaultStyleFlatVersusGlassNormalSelectedDisabled` with the gradient height shortened locally (not committed, so the plain rows are really on white); the other shots are the branch's tests unchanged. |
+
+![iOS default style tags: normal, selected, disabled; flat vs liquidGlass on a colorful and a plain page](assets/ios-tag-liquid-glass-default-style-light.png)
+
+Default style: normal / selected / disabled tags, flat vs `liquidGlass`, on a colorful page and on a plain white page. On white the glass normal and disabled tags are nearly invisible (only a thin outline), the selected glass tag is a lighter teal than the flat one.
+
+![iOS flat vs liquidGlass tags side by side on a colorful page](assets/ios-tag-liquid-glass-flat-vs-glass-colorful-light.png)
+
+Flat vs `liquidGlass` over a colorful gradient, radius 1000 and radius 8 (`testFlatAndLiquidGlassTagsSideBySide`); the middle tag of each row is selected.
+
+![iOS contact tag editor (Edit Tags) with selected tags, light and dark](assets/ios-contact-tag-editor-liquid-glass-selected.png)
+
+Contact tag editor (Swift Example, `-CYLExampleScreen editor` and `editor-created`): selected tags (Book Club, Family, College Classmates; `ios` after Create) are green glass tags. Dark mode shows low contrast on the selected tags' green text (observation, not fixed here).
