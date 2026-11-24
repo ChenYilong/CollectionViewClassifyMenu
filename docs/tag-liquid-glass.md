@@ -59,14 +59,41 @@ copy of any glass code or gate (today's copy of the iOS gate in `CYLMenuStyle` i
 Order: iOS, Android, HarmonyOS (Windows session `winsCYLSearchViewController`), mini program, then one re-pin of every
 platform to the single CYLTabBarController commit, then notify the other sessions.
 
-## TODO (iOS done, 35 / 100)
+## Status (2026-11-24): code on every platform, tests still to run on the machines that can run them
 
-| Item | Points | Reason |
+Owner's order 2026-11-24: write code statically, test once in one batch, deliver the test tasks to the right sessions. iOS
+was built and tested here; Android, HarmonyOS and the mini program were written without a build (the mini program's
+node tests ran). CYLTabBarController commit with the base library on every platform: `8fa168fa`
+(`feat/harmony-animated-item-engines`, PR #824). ClassifyMenu pins every platform to it.
+
+| Platform | Base library (CYLTabBarController) | ClassifyMenu tag | Verified |
+|:--|:--|:--|:--|
+| iOS | pod `CYLLiquidGlass` (`CYLLiquidGlass.isActive()`, `CYLLiquidGlassView`) | `CYLMenuStyle.backgroundStyle`, `resolvedBackgroundStyle`, `minimumTagSize`; `CYLTagButton` draws the glass | menu 37, tag 6, example 121, swift 23 tests pass (as a path pod of the same code); screenshot test flat against glass |
+| Android | `:cylliquidglass` (the tab bar's AGSL glass moved there; `CYLLiquidGlass.isActive()` Android 12+, `CYLLiquidGlassView`) | same names; `CYLTagButton.glassView` | not built (static) |
+| HarmonyOS | `cylliquidglass` (`CYLLiquidGlass.isActive()`, component `CYLLiquidGlassView`, material and capsule moved there) | same names; `CYLTagButton` shows the component; vendored `harmony/cylliquidglass` | not built (static) |
+| Mini program | `cyl-liquid-glass` (`cylLiquidGlassIsActive()`, component; `cyl-glass-lens` untouched) | style keys read in `model.js`, the tag template draws the component; vendored by `scripts/fetch-cyltabbar.js` (now also `cyl-dealloc-block-executor`) | node tests 172 / 172, `fetch-cyltabbar.js --check` OK; not run in DevTools |
+| Flutter, React Native | nothing to move | pass the keys through the configuration JSON to the native cores | iOS Podfiles name the new pods; not rebuilt |
+
+Android's tag corner radius is still the pre-PR #35 rule (0 is a capsule): PR #35 changed iOS, HarmonyOS and the mini program only.
+
+## TODO: the one test batch (what to run, on which machine)
+
+| Platform / machine | What to test |
+|:--|:--|
+| Windows, Android | In CYLTabBarController: `./gradlew :cylliquidglass:testDebugUnitTest :cyltabbar:testDebugUnitTest :app:assembleDebug`; the tab bar's glass on an Android 13+ emulator looks as before (`docs/Android-Liquid-Glass.md`). In ClassifyMenu: `:library:testDebugUnitTest`, `:example:assembleDebug`, `:library:publishReleasePublicationToBuildRepository` (the new artifact lands in `build/repo`), a Liquid Glass tag list on API 31 and API 34 emulators, frame time with 50 tags (each glass view records the backdrop itself: add a shared backdrop if it stutters). |
+| Windows, HarmonyOS | hvigor build of `cylliquidglass`, `cyltabbar`, `classifymenu`, `entry` (default and emulator HAP); host tests; the tab bar's Liquid Glass style unchanged on the emulator; a glass tag on the emulator (blur and tint, clipped to the radius). Unverified guesses to check: `export { ... } from 'cylliquidglass'` re-exports, `.clip(true)` on the glass Row. Then `harmony_parity.py --check` and add the new public API to the parity and api maps. |
+| Windows, mini program | WeChat DevTools: a glass tag renders (`cyl-tag-glass` layer, z-index -1 in the tag's isolated stacking context); the example pages look as before; `cyl-glass-lens` should later take its CSS from `cyl-liquid-glass` (after the tab bar session releases it). |
+| Mac, iOS | `pod lib lint`, the SwiftPM consumer build with the `CYLLiquidGlass` product, and the Flutter and React Native iOS example builds at `8fa168fa`; the four suites against the pinned hash (they ran as a path pod). |
+
+## Score
+
+| Item | Points | State |
 |:--|:--:|:--|
-| iOS: tag interface, glass view, fallback, config key, `minimumTagSize`, tests (`684346a`, four suites pass; screenshot `test-tag-background-flat-liquid-glass`) | 25 | DONE with a copied gate |
-| iOS: the gate and glass view live in pod `CYLLiquidGlass` (CYLTabBarController `ab6dd90b`), the tab bar and ClassifyMenu use it, the copy is deleted (suites menu, tag, example, swift pass against it) | 10 | DONE |
-| Android: `:cylliquidglass` extracted from the tab bar, tags draw glass, tests, emulator screenshots, frame time with 50 tags | 20 | Not started |
-| HarmonyOS: `cylliquidglass` extracted, tags use it, build, tests, emulator screenshot | 15 | Not started (Windows session) |
-| Mini program: `cyl-liquid-glass` extracted, tags use it, node tests | 10 | Not started |
-| Labeled screenshots flat against glass, docs, README, `cyl-api-map`, parity maps in both repositories | 10 | Not started |
-| Re-pin every platform, notify the other sessions | 10 | After the components exist |
+| iOS tag interface, glass, fallback, `minimumTagSize`, base library, tests | 35 | DONE |
+| Android: base library and tag code | 20 | written, untested (counts after Windows evidence) |
+| HarmonyOS: base library and tag code | 15 | written, untested |
+| Mini program: base library and tag code | 10 | written, node tests pass, DevTools untested |
+| Labeled screenshots flat against glass on Android, HarmonyOS, mini program; docs, parity maps | 10 | iOS screenshot test only; maps TODO |
+| Re-pin every platform, notify the other sessions | 10 | pinned; notifications sent with this push |
+
+Current score: 35 verified + 45 written (counts once tested) = **35 / 100 verified, up to 80 after the batch**; the rest is screenshots, parity maps and the Android corner radius.
