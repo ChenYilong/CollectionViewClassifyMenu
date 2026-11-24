@@ -35,24 +35,38 @@ radius, `min(radius, height / 2)`).
 | Effective style | One function, `resolvedBackgroundStyle`: `liquidGlass` only when the platform's gate below is open; otherwise `flat` and every other parameter is unchanged. |
 | Radius | The glass is clipped to the resolved corner radius (PR #35: `min(radius, height / 2)`). |
 
-## The gate on each platform: as CYLTabBarController
+## Shared base library (owner's decision 2026-11-24, replaces "stay flat on Android, HarmonyOS and the mini program")
 
-| Platform | CYLTabBarController's rule | Tags |
-|:--|:--|:--|
-| iOS | `CYLUtils.isLiquidGlassActive()`: iOS 27 and later always; iOS 26 unless the app sets `UIDesignRequiresCompatibility`. System `UIGlassEffect`. | Same gate, `UIVisualEffectView` with `UIGlassEffect` behind the content. |
-| Android | `CYLLiquidGlass`: Android 13+ full glass (AGSL shaders), Android 12 blur only, older an opaque capsule. Internal to the tab bar. | Parsed; flat until the glass is drawn for tags (TODO). |
-| HarmonyOS | `CYLLiquidGlassTabBarModifier`: system material from API 24, blur imitation below. | Parsed; flat until drawn for tags (TODO). |
-| Mini program | Glass lens style of the custom tab bar. | Parsed; flat until drawn for tags (TODO). |
-| Flutter, React Native | Pass the key through to the iOS and Android cores. | Key reaches the native side (test). |
+User prompt, verbatim: 「advisor你可以参考cyl animateditemview的做法，将液态玻璃实现封装为一个基础库，供本仓库引入，并实现全平台支持液态玻璃。」 English: the advisor may follow what
+`CYLAnimatedItemView` does: package the Liquid Glass implementation as a base library that this repository imports, and
+support Liquid Glass on every platform. (Earlier the same day: 「advisor需要重新设计，让cyltabbar里不同平台液态玻璃的实现，为所有平台都支持液态玻璃」, redesign so that the tab bar's Liquid Glass on each platform serves all platforms.)
 
-## TODO (0 / 100)
+Like `CYLAnimatedItem` (iOS pod `CYLAnimatedItem`, Android `:cylanimateditem`, HarmonyOS `cylanimateditem`, mini program
+`cyl-animated-item`), the glass becomes one component per platform in CYLTabBarController's repository (PR #824's
+branch): `CYLLiquidGlass` (iOS pod and Swift package target), `:cylliquidglass` (Android), `cylliquidglass`
+(HarmonyOS), `cyl-liquid-glass` (mini program). The component never depends on the tab bar; the tab bar depends on it
+(its glass code moves into the component, its behavior unchanged) and ClassifyMenu imports it. ClassifyMenu keeps no
+copy of any glass code or gate (today's copy of the iOS gate in `CYLMenuStyle` is removed once the pod exists).
+
+| Platform | Component | Gate (CYLTabBarController's rule, moved with the code) | Tag where the gate is closed |
+|:--|:--|:--|:--|
+| iOS | pod `CYLLiquidGlass`: `isActive` gate, glass view (`UIGlassEffect`) | iOS 27 and later; iOS 26 unless `UIDesignRequiresCompatibility` | flat |
+| Android | `:cylliquidglass`: the tab bar's `CYLLiquidGlass.kt` (AGSL shaders, backdrop, highlight) behind one public drawing entry | Android 13+ full glass, Android 12 blur only | flat below Android 12 |
+| HarmonyOS | `cylliquidglass`: the tab bar's material (system material, blur imitation) as one exported modifier | system material from API 24, blur imitation below, as the tab bar | flat where the tab bar draws none |
+| Mini program | `cyl-liquid-glass`: the tab bar's glass lens | as the tab bar's glass | flat where the lens is not drawn |
+| Flutter, React Native | nothing to move: they pass the key to the native cores | (native) | (native) |
+
+Order: iOS, Android, HarmonyOS (Windows session `winsCYLSearchViewController`), mini program, then one re-pin of every
+platform to the single CYLTabBarController commit, then notify the other sessions.
+
+## TODO (iOS tag glass done, 25 / 100)
 
 | Item | Points | Reason |
 |:--|:--:|:--|
-| Interface and config key on iOS, Android, HarmonyOS, mini program, copy in the style | 20 | Not started |
-| iOS glass view with fallback, tests with injected availability | 25 | Not started |
-| `minimumTagSize` on iOS | 5 | Not started |
-| Android, HarmonyOS, mini program: draw glass where CYLTabBarController does | 20 | Needs the tab bar's glass to be usable outside the bar (PR #824) or a separate implementation |
-| Labeled screenshots flat against glass | 10 | Not started |
-| Docs, README, parity maps, API baselines | 10 | Not started |
-| Other sessions notified | 10 | After the interface is pushed |
+| iOS: tag interface, glass view, fallback, config key, `minimumTagSize`, tests (`684346a`, four suites pass; screenshot `test-tag-background-flat-liquid-glass`) | 25 | DONE with a copied gate |
+| iOS: the gate and glass view move into pod `CYLLiquidGlass`, the tab bar and ClassifyMenu use it, the copy is deleted | 10 | Not started |
+| Android: `:cylliquidglass` extracted from the tab bar, tags draw glass, tests, emulator screenshots, frame time with 50 tags | 20 | Not started |
+| HarmonyOS: `cylliquidglass` extracted, tags use it, build, tests, emulator screenshot | 15 | Not started (Windows session) |
+| Mini program: `cyl-liquid-glass` extracted, tags use it, node tests | 10 | Not started |
+| Labeled screenshots flat against glass, docs, README, `cyl-api-map`, parity maps in both repositories | 10 | Not started |
+| Re-pin every platform, notify the other sessions | 10 | After the components exist |
