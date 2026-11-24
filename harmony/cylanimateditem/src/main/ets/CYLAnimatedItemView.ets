@@ -1,4 +1,7 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
+import { CYLLiquidGlass } from './CYLLiquidGlass';
+import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
+import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
@@ -8,6 +11,9 @@ import { preferences } from '@kit.ArkData';
 import { ApplicationStateChangeCallback, common } from '@kit.AbilityKit';
 import BuildProfile from '../../../BuildProfile';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineView } from './CYLAnimatedItemEngine';
+import { CYLAnimatedItemPlayer } from './CYLAnimatedItemPlayer';
+import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
 const CYL_UNLIMITED_LINES: number = 1000;
@@ -29,6 +35,7 @@ export enum CYLAnimatedItemAccessoryPlacement {
   Trailing = 1,
   TopTrailing = 2
 }
+
 
 /**
  * [EN] The look of `CYLAnimatedItemView`: the plain animated icon + title (default), or a countdown button, e.g. for "Get the
@@ -204,22 +211,22 @@ export class CYLAnimatedItemEngines {
   private static cylX86DebugEngines: string[] | undefined = undefined;
 
   /**
-   * [EN] Debug builds only: turns on the engines of the x86_64 debug engine kit (`x86_64-debug-engines`, e.g. Rive built
+   * [EN] Turns on the engines of the x86_64 debug engine kit (`x86_64-debug-engines`, e.g. Rive built
    *      for x86_64) when `tools/cyl_hap_x86_64.py install` added it to this HAP, which it marks with the rawfile
-   *      `cyl_x86_64_debug_engines.json`; those engines then also accept `x86_64`. Release builds, and debug builds installed
-   *      without the kit, change nothing (PAG and Rive keep their still images on x86_64). Kept once found; returns the engines.
-   *      CYLAnimatedItemView and CYLTabBarController call it. Owner's Plan 1: this debug guard stays until the owner
-   *      approves removing it.
-   * [CN] 仅 debug 构建：当 `tools/cyl_hap_x86_64.py install` 把 x86_64 调试引擎包（`x86_64-debug-engines`，例如为 x86_64 构建的 Rive）
-   *      加入本 HAP（以 rawfile `cyl_x86_64_debug_engines.json` 标记）时，开启该包中的引擎，这些引擎随即也接受 `x86_64`。release 构建以及
-   *      未安装该包的 debug 构建不做任何改变（x86_64 上 PAG 与 Rive 保持静态图片）。找到后保留；返回这些引擎。
+   *      `cyl_x86_64_debug_engines.json`; those engines then also accept `x86_64`, in debug and release builds. A HAP
+   *      installed without the kit changes nothing (PAG and Rive keep their still images on x86_64). Kept once found; returns the engines.
+   *      CYLAnimatedItemView and CYLTabBarController call it. Owner's Plan 1: the debug-build guard was removed with
+   *      the owner's approval (2026-11-23); the marker and the device's x86_64 ABI remain the guards.
+   * [CN] 当 `tools/cyl_hap_x86_64.py install` 把 x86_64 调试引擎包（`x86_64-debug-engines`，例如为 x86_64 构建的 Rive）
+   *      加入本 HAP（以 rawfile `cyl_x86_64_debug_engines.json` 标记）时，开启该包中的引擎，这些引擎随即也接受 `x86_64`。debug 与 release
+   *      构建均适用；未安装该包的 HAP 不做任何改变（x86_64 上 PAG 与 Rive 保持静态图片）。找到后保留；返回这些引擎。
    */
   static loadX86_64DebugEngines(context: common.Context | undefined): string[] {
     if (CYLAnimatedItemEngines.cylX86DebugEngines !== undefined && CYLAnimatedItemEngines.cylX86DebugEngines.length > 0) {
       return CYLAnimatedItemEngines.cylX86DebugEngines.slice();
     }
     let engines: string[] = [];
-    if (BuildProfile.DEBUG && context !== undefined) {
+    if (context !== undefined) {
       try {
         const bytes: Uint8Array = context.resourceManager.getRawFileContentSync('cyl_x86_64_debug_engines.json');
         let text: string = '';
@@ -237,7 +244,7 @@ export class CYLAnimatedItemEngines {
       }
     });
     if (engines.length > 0) {
-      console.warn(`[CYLAnimatedItem] x86_64 debug engine kit active: ${engines.join(', ')} (debug builds only).`);
+      console.warn(`[CYLAnimatedItem] x86_64 debug engine kit active: ${engines.join(', ')}.`);
     }
     CYLAnimatedItemEngines.cylX86DebugEngines = engines;
     return engines.slice();
@@ -403,6 +410,28 @@ export function cylIconColorFilter(color: ResourceColor): number[] {
  *      显示规则与 iOS、Android 相同：已注册的引擎能播放时显示动画；否则在加载期间与失败之后显示静态图片（`image` / `selectedImage`）；只有没有静态图片时
  *      才显示占位图。它是一个无障碍元素：文本为 `itemTitle`（或 `itemAccessibilityText`），描述为 `itemDescription` 加上选中状态。
  */
+let cylPausesWhileScrolling: boolean = false;
+let cylScrollObserverNumber: number = 0;
+
+/**
+ * [EN] true: every animated item pauses while the user scrolls (the app reports the scrolling with `scrollStarted()` /
+ *      `scrollStopped()` of a LifecycleController, or `cyl_reportScrollStarted()` of cyltabbar) and resumes afterwards. Read when
+ *      an item appears. Module-level, because ArkTS keeps statics off structs. [CN] 为 true 时，用户滚动期间所有动画条目暂停，
+ *      滚动结束后恢复。条目出现时读取。放在模块级，因为 ArkTS 不在 struct 上放静态成员。
+ */
+export function cylSetPausesWhileUserScrolls(enabled: boolean): void {
+  cylPausesWhileScrolling = enabled;
+}
+
+export function cylPausesWhileUserScrolls(): boolean {
+  return cylPausesWhileScrolling;
+}
+
+function cylNextScrollObserverNumber(): number {
+  cylScrollObserverNumber += 1;
+  return cylScrollObserverNumber;
+}
+
 @Component
 export struct CYLAnimatedItemView {
   @Prop itemTitle: string = '';
@@ -460,6 +489,30 @@ export struct CYLAnimatedItemView {
    *      only. [CN] 静态图标的颜色（如 iOS 的模板图着色）：SVG 与符号图作为填充色，位图通过保留透明度的颜色滤镜着色；''（默认）保留原色。
    */
   @Prop iconColor: ResourceColor = '';
+  /**
+   * [EN] The background: `flat` (default) fills the view with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass (a blur
+   *      with the tint `itemBackgroundColor`) clipped to `itemCornerRadius`; where `CYLLiquidGlass.isActive()` is false the style
+   *      is ignored and the view stays flat. Setting any `item…` background property makes the view draw its background, corner
+   *      radius and border (the countdown style keeps its own). Same names as iOS and Android.
+   * [CN] 背景：`flat`（默认）用 `itemBackgroundColor` 填充；`liquidGlass` 绘制液态玻璃（带 `itemBackgroundColor` 着色的模糊），按
+   *      `itemCornerRadius` 裁剪；`CYLLiquidGlass.isActive()` 为 false 时忽略该样式，保持扁平。设置任一 `item…` 背景属性后，视图绘制其
+   *      背景、圆角与边框（倒计时样式保持自己的外观）。与 iOS、Android 同名。
+   */
+  @Prop itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  /** [EN] The solid fill when flat, the glass tint when liquid glass; '' for none. [CN] 扁平时的纯色填充，液态玻璃时的着色；'' 表示无。 */
+  @Prop itemBackgroundColor: ResourceColor = '';
+  /**
+   * [EN] The corner radius in vp: a larger value than half the height is a capsule (the platform clamps), 0 is square. -1 (the
+   *      default) is not set: the Liquid Glass style is a capsule, so a host gets a capsule without setting anything and customizes
+   *      it by setting this property; the flat style is square.
+   * [CN] 圆角半径（vp）：大于半高的值为胶囊（平台会截断），0 为直角。-1（默认）表示未设置：液态玻璃样式为胶囊，宿主无需设置任何属性即可得到
+   *      胶囊，要自定义时设置此属性即可；扁平样式为直角。
+   */
+  @Prop itemCornerRadius: number = -1;
+  /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
+  @Prop itemBorderWidth: number = 0;
+  /** [EN] The border color; '' for none. [CN] 边框颜色；'' 表示无。 */
+  @Prop itemBorderColor: ResourceColor = '';
   /**
    * [EN] The color the animation is drawn in, as one color, like a tinted template image (iOS / Android
    *      `CYLTabBarAnimationOptionTint`); '' keeps the file's own colors. Any engine: a layer of this color is
@@ -555,7 +608,31 @@ export struct CYLAnimatedItemView {
   @Prop sizesToContent: boolean = false;
   @State animationLoaded: boolean = false;
   @State animationFailed: boolean = false;
-  @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylNoAnimation;
+  /**
+   * [EN] The engine view of the animation. Default: the view an engine registered for the file's type
+   *      (`CYLAnimatedItemEngineViews`: GIF and SVGA in this module, Lottie, PAG and Rive in cylanimateditem_lottie,
+   *      cylanimateditem_pag and cylanimateditem_rive), which plays by the item's selection and playback. An app or library
+   *      with its own engine views passes them here instead.
+   * [CN] 动画的引擎视图。默认：引擎为文件类型注册的视图（`CYLAnimatedItemEngineViews`：本模块的 GIF 与 SVGA，cylanimateditem_lottie、
+   *      cylanimateditem_pag、cylanimateditem_rive 中的 Lottie、PAG 与 Rive），按条目的选中状态与播放设置播放。有自己引擎视图的 App 或库
+   *      在这里传入。
+   */
+  @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylEngineAnimation;
+  /**
+   * [EN] true (default): the default engine view plays its animation by the item's selection and playback. false: the host
+   *      drives the player it gets in `onAnimationPlayer` (play, stop at a progress, speed, loop), as
+   *      CollectionViewClassifyMenu's tags do.
+   * [CN] true（默认）：默认引擎视图按条目的选中状态与播放设置播放动画。false：宿主驱动它在 `onAnimationPlayer` 中得到的播放器（播放、停在某进度、
+   *      速度、循环），如 CollectionViewClassifyMenu 的标签。
+   */
+  @Prop @Watch('cylPlaybackDidChange') drivesAnimationPlayback: boolean = true;
+  /**
+   * [EN] The default engine view's player once it plays the file, undefined when it goes away.
+   * [CN] 默认引擎视图播放文件时的播放器，视图消失时为 undefined。
+   */
+  onAnimationPlayer?: (player: CYLAnimatedItemPlayer | undefined) => void;
+  /** [EN] What the default engine view reads, updated in place. [CN] 默认引擎视图读取的内容，原地更新。 */
+  @State private cylEngineState: CYLAnimatedItemEngineState = new CYLAnimatedItemEngineState();
   onItemTap?: () => void;
   onItemLongPress?: () => void;
   onAccessoryTap?: () => void;
@@ -564,7 +641,19 @@ export struct CYLAnimatedItemView {
   onItemDragEnd?: (dx: number, dy: number) => void;
   @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
+  private cylLifecycle: LifecycleController<CYLAnimatedItemView> | undefined = undefined;
+  private cylScrollPaused: boolean = false;
+  private cylStopScrollObserver: (() => void) | undefined = undefined;
+
+
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
+    this.cylLifecycle.aboutToAppear();
+    if (cylPausesWhileUserScrolls()) {
+      this.cylStopScrollObserver = LifecycleCenter.whileUserScrolls(() => this.cylPauseAnimation(), () => this.cylResumeAnimation(),
+        { key: `cyl.animatedItem.scroll.${cylNextScrollObserverNumber()}` });
+    }
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
     this.cylLastSelected = this.isItemSelected;
@@ -579,6 +668,13 @@ export struct CYLAnimatedItemView {
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
+    this.cylPostAnimationEvent('cyl.animation.didStop');
+    this.cylStopScrollObserver?.();
     this.cylStopCountdownTimer();
     try {
       this.getUIContext().getHostContext()?.getApplicationContext().off('applicationStateChange', this.cylForegroundCallback);
@@ -716,6 +812,12 @@ export struct CYLAnimatedItemView {
   cylNoAnimation(context: CYLAnimatedItemAnimationContext) {
   }
 
+  /** [EN] The default engine view (see `animationBuilder`). [CN] 默认引擎视图（见 `animationBuilder`）。 */
+  @Builder
+  cylEngineAnimation(context: CYLAnimatedItemAnimationContext) {
+    CYLAnimatedItemEngineView({ state: this.cylEngineState })
+  }
+
   /**
    * [EN] A new file starts over: not loaded, not failed; a type nobody registered says so in debug builds.
    * [CN] 新文件重新开始：未加载、未失败；没有注册的类型在 debug 构建中给出提示。
@@ -744,8 +846,41 @@ export struct CYLAnimatedItemView {
     this.cylLastSelected = this.isItemSelected;
     if (token !== this.cylLastRestartToken) {
       this.cylLastRestartToken = token;
+      this.cylPostAnimationEvent('cyl.animation.didStart');
       this.cylRestartHandler?.();
     }
+  }
+
+  /**
+   * [EN] Posts an animation event (AnimationEvents of the core library) to the observers of this item.
+   * [CN] 向本控件的观察者发出动画事件（核心库的 AnimationEvents）。
+   */
+  cylPostAnimationEvent(name: string): void {
+    // [EN] ArkTS: a typed record, not an object literal. [CN] ArkTS：使用带类型的 Record，而不是对象字面量。
+    const info: Record<string, Object> = {};
+    info['url'] = this.animationUrl;
+    info['selected'] = this.isItemSelected;
+    this.cylLifecycle?.registry.postLifecycleEvent(name, info);
+  }
+
+  /** [EN] Scrolling pauses the engine: posts didPause. [CN] 滚动暂停动画：发出 didPause。 */
+  cylPauseAnimation(): void {
+    if (this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = true;
+    this.cylUpdateContext();
+    this.cylPostAnimationEvent('cyl.animation.didPause');
+  }
+
+  /** [EN] Scrolling ended: posts didResume. [CN] 滚动结束：发出 didResume。 */
+  cylResumeAnimation(): void {
+    if (!this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = false;
+    this.cylUpdateContext();
+    this.cylPostAnimationEvent('cyl.animation.didResume');
   }
 
   private cylUpdateContext(): void {
@@ -753,7 +888,8 @@ export struct CYLAnimatedItemView {
     context.url = this.animationUrl;
     context.size = this.iconSize;
     context.selected = this.isItemSelected;
-    context.speed = this.animationSpeed;
+    // [EN] Speed 0 while paused by scrolling: every engine already applies the context's speed. [CN] 滚动暂停时速度为 0：各引擎本来就应用 context 的速度。
+    context.speed = this.cylScrollPaused ? 0 : this.animationSpeed;
     context.loops = this.animationLoops;
     context.restartToken = this.animationRestartToken + this.cylControllerRestarts;
     context.setRestartHandler = this.cylSetRestartHandler;
@@ -778,6 +914,32 @@ export struct CYLAnimatedItemView {
       this.onAnimationEnd?.();
     };
     this.animationContext = context;
+    this.cylUpdateEngineState(context);
+  }
+
+  /**
+   * [EN] The default engine view's state, updated in place so the engine view sees each change; a new file gets a new
+   *      source. [CN] 默认引擎视图的 state，原地更新使引擎视图看到每次变化；新文件得到新的 source。
+   */
+  private cylUpdateEngineState(context: CYLAnimatedItemAnimationContext): void {
+    const state = this.cylEngineState;
+    if (state.source.url !== this.animationUrl) {
+      state.source = CYLAnimatedItemSource.parse(this.animationUrl);
+    }
+    state.width = this.iconSize;
+    state.height = this.iconSize;
+    state.speed = context.speed;
+    state.loops = context.loops;
+    state.drivesPlayback = this.drivesAnimationPlayback;
+    state.tintColor = this.animationTintColor;
+    state.onLoaded = context.onLoaded;
+    state.onFailed = context.onFailed;
+    state.onEnded = context.onEnded;
+    state.onPlayer = (player: CYLAnimatedItemPlayer | undefined) => this.onAnimationPlayer?.(player);
+    // [EN] Last, so the engine view reads the playback above when it reacts. [CN] 最后设置，使引擎视图响应时读到上面的播放设置。
+    state.selected = context.selected;
+    state.restartToken = context.restartToken;
+    state.changed();
   }
 
   /** [EN] Turned off: the animation shows again. [CN] 关闭时重新显示动画。 */
@@ -982,6 +1144,37 @@ export struct CYLAnimatedItemView {
     return this.isBare && this.cylTitleText().length === 0 && this.cylIsEmpty(this.accessoryImage) && this.accessoryText.length === 0;
   }
 
+  /**
+   * [EN] Whether any `item…` background property is set. [CN] 是否设置了任一 `item…` 背景属性。
+   */
+  private cylUsesItemBackground(): boolean {
+    return this.itemBackgroundStyle !== CYLAnimatedItemBackgroundStyle.flat || this.itemBackgroundColor !== '' ||
+      this.itemCornerRadius >= 0 || this.itemBorderWidth > 0 || this.itemBorderColor !== '';
+  }
+
+  /**
+   * [EN] Whether the Liquid Glass is drawn: the style asks for it and `CYLLiquidGlass.isActive()`. [CN] 是否绘制液态玻璃：样式要求且 `CYLLiquidGlass.isActive()`。
+   */
+  private cylItemGlassDrawn(): boolean {
+    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.itemBackgroundStyle);
+  }
+
+  /**
+   * [EN] The corner radius: the host's value, else a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
+   *      CollectionViewClassifyMenu's tags had, moved here) and square for flat. [CN] 圆角：宿主设置的值，否则绘制液态玻璃时为胶囊
+   *      （CollectionViewClassifyMenu 的标签曾有的「0 为自动，即胶囊」规则，移到这里），扁平时为直角。
+   */
+  private cylItemCornerRadius(): number {
+    return CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.itemBackgroundStyle, this.itemCornerRadius);
+  }
+
+  /**
+   * [EN] The background color: the tint over the glass blur, else the solid fill, '' meaning transparent. [CN] 背景色：玻璃模糊之上的着色，否则为纯色填充；'' 表示透明。
+   */
+  private cylItemBackgroundColor(): ResourceColor {
+    return this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent;
+  }
+
   build() {
     Flex({
       direction: this.axis === CYLAnimatedItemAxis.Vertical ? FlexDirection.Column : FlexDirection.Row,
@@ -991,10 +1184,15 @@ export struct CYLAnimatedItemView {
       this.cylContent()
     }
     .padding(this.cylPadding())
-    .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : Color.Transparent)
-    .borderRadius(this.cylIsCountdown() ? 6 : 0)
-    .borderWidth(this.cylIsCountdown() ? 0.5 : 0)
-    .borderColor(this.cylIsRunning() ? '#C7C7CC' : this.countdownBorderColor)
+    .backgroundEffect(this.cylItemGlassDrawn() ?
+      { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
+      { radius: 0 })
+    .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : this.cylItemBackgroundColor())
+    .borderRadius(this.cylIsCountdown() ? 6 : this.cylItemCornerRadius())
+    .borderWidth(this.cylIsCountdown() ? 0.5 : this.itemBorderWidth)
+    .borderColor(this.cylIsRunning() ? '#C7C7CC' : (this.cylUsesItemBackground() && this.itemBorderColor !== '' ?
+      this.itemBorderColor : this.countdownBorderColor))
+    .clip(this.cylItemGlassDrawn())
     // [EN] A Flex without a size fills its parent. A bare icon (a host's tab icon, no title, no accessory) is exactly the
     //      icon, so a host can place things against its edges: the tab bar puts the badge at the icon's top-right, and an
     //      item as wide as the tab slot moved it to the icon's top-left (HarmonyOS issue list #51). `undefined` keeps the
@@ -1012,6 +1210,15 @@ export struct CYLAnimatedItemView {
     .accessibilityDescription(this.isItemSelected && this.selectedDescription.length > 0 ?
       [this.itemDescription, this.selectedDescription].filter((part: string) => part.length > 0).join(', ') : this.itemDescription)
     .id(this.itemId)
+    .onVisibleAreaChange([0.0, 0.01], (isVisible: boolean) => {
+      this.cylLifecycle?.visibleAreaChanged(isVisible);
+    })
+    .onAttach(() => {
+      this.cylLifecycle?.windowAttached();
+    })
+    .onDetach(() => {
+      this.cylLifecycle?.windowDetached();
+    })
     .onClick(() => {
       this.cylHandleTap();
     })

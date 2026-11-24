@@ -6,8 +6,7 @@
   "author": "ChenYilong",
   "license": "MIT",
   "dependencies": {
-    "cylanimateditem": "file:../cylanimateditem",
-    "cylliquidglass": "file:../cylliquidglass"
+    "cylanimateditem": "file:../cylanimateditem"
   },
   "devDependencies": {},
   "dynamicDependencies": {}

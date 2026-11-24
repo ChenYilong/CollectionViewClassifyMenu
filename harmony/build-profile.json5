@@ -36,10 +36,7 @@
       "name": "cylanimateditem",
       "srcPath": "./cylanimateditem"
     },
-    {
-      "name": "cylliquidglass",
-      "srcPath": "./cylliquidglass"
-    },
+
     {
       "name": "cylanimateditemrive",
       "srcPath": "./cylanimateditemrive"

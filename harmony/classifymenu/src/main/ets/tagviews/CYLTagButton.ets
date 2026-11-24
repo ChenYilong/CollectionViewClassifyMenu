@@ -19,7 +19,7 @@
 import {
   CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel, CYLAnimatedItemStackView, cylIconColorFilter
 } from 'cylanimateditem';
-import { CYLLiquidGlassView } from 'cylliquidglass';
+import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import {
   CYLTagAnimatedIcon, cylTagAnimatedIconOuterHeight, cylTagAnimatedIconOuterWidth, cylTagAnimationImage
@@ -172,12 +172,17 @@ export class CYLTagButton {
   cornerRadius: number = 0;
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   /**
-   * While `style.resolvedBackgroundStyle()` is `liquidGlass`: the glass background is shown (`CYLLiquidGlassView`, from
-   * CYLTabBarController's base library `cylliquidglass`) and `backgroundColor` stays clear. `glassTintColor` is the state's
-   * background color as a color string ('' for a resource color, which cannot tint the glass).
+   * The background, radius and border are `cylanimateditem`'s (`CYLAnimatedItemBackgroundModifier`, the interface of
+   * `CYLAnimatedItemView.itemBackgroundStyle…`): the style, and the radius handed to it, -1 (its default, a capsule for Liquid
+   * Glass) while the radius was never set and the glass is drawn.
    */
-  showsLiquidGlass: boolean = false;
-  glassTintColor: string = '';
+  itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  usesDefaultRadius: boolean = false;
+
+  /** The radius handed to the modifier: -1 (unset) for the default, else the clamped radius of the layout. */
+  get itemCornerRadius(): number {
+    return this.usesDefaultRadius ? -1 : this.cornerRadius;
+  }
   backgroundImage?: ResourceStr;
   borderColor: ResourceColor = CYLColor.CLEAR;
   borderWidth: number = 0;
@@ -1061,10 +1066,11 @@ export class CYLTagButton {
       style.highlightedBackgroundColor !== undefined;
     // Pressed, as android-tagview's layoutColorPress.
     const stateBackground: ResourceColor = pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor;
-    // Liquid Glass: the state's background color tints the glass and the flat color is not drawn under it.
-    this.showsLiquidGlass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
-    this.glassTintColor = typeof stateBackground === 'string' ? stateBackground : '';
-    this.backgroundColor = this.showsLiquidGlass ? CYLColor.CLEAR : stateBackground;
+    // Liquid Glass: the state's background color tints the glass (CYLAnimatedItemBackgroundModifier, see build()).
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    this.itemBackgroundStyle = glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
+    this.usesDefaultRadius = glass && !appearance.isCornerRadiusSet;
+    this.backgroundColor = stateBackground;
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;
     // With the rename indicator, the two editing icons are drawn instead of the style's indicator.
@@ -1161,11 +1167,6 @@ export struct CYLTagButtonComponent {
 
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
-      if (this.button.revision >= 0 && this.button.showsLiquidGlass) {
-        CYLLiquidGlassView({ glassTintColor: this.button.glassTintColor, cornerRadius: this.button.cornerRadius })
-          .width('100%')
-          .height('100%')
-      }
       if (this.button.revision >= 0 && !this.tl().isHidden) {
         Text(this.tl().text ?? '')
           .fontSize(this.tl().font.size)
@@ -1305,10 +1306,11 @@ export struct CYLTagButtonComponent {
     }
     .width(this.tagWidth ?? this.button.intrinsicSize().width)
     .height(this.tagHeight ?? this.button.intrinsicSize().height)
-    .backgroundColor(this.button.backgroundColor)
+    // Background, radius and border (the tint over the glass for Liquid Glass): cylanimateditem's one interface.
+    .attributeModifier(new CYLAnimatedItemBackgroundModifier(this.button.itemBackgroundStyle, this.button.backgroundColor,
+      this.button.itemCornerRadius, this.button.borderWidth, this.button.borderColor))
     .backgroundImage(this.button.backgroundImage)
     .backgroundImageSize(ImageSize.Cover)
-    .border({ width: this.button.borderWidth, color: this.button.borderColor, radius: this.button.cornerRadius })
     // `CYLMenuStyle.elevation`: a shadow under the tag (offset down by half of it, blurred by it); the tag stops
     // clipping its content then, since the shadow is outside its bounds.
     .shadow(this.button.elevation > 0 ?

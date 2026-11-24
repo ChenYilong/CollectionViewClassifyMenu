@@ -3,7 +3,7 @@
  * the touch ripple, titles, rows, icons, layout spacing, section headers, fold controls and the More button. Lengths
  * are vp, font sizes fp, colors '#AARRGGBB'. `copy()` is NSCopying.
  */
-import { CYLLiquidGlass } from 'cylliquidglass';
+import { CYLLiquidGlass } from 'cylanimateditem';
 import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
@@ -36,8 +36,7 @@ export enum CYLTagContentAlignment {
 
 /**
  * What a tag's background is made of: the solid color of each state's appearance (`flat`, the default), or a Liquid Glass
- * background where the device draws one (`liquidGlass`, `CYLLiquidGlass.isActive()` of CYLTabBarController's base library
- * `cylliquidglass`).
+ * background (`liquidGlass`: the blur imitation of CYLTabBarController's glass, tinted with the state's background color).
  */
 export enum CYLTagBackgroundStyle {
   flat = 0,
@@ -155,7 +154,7 @@ export class CYLMenuStyle {
   contentAlignment: CYLTagContentAlignment = CYLTagContentAlignment.center;
   /**
    * The tag background: `flat` (the default) is the solid color of each state's appearance; `liquidGlass` draws a glass
-   * background behind the content, tinted with the state's `backgroundColor` (a color string) and clipped to the corner
+   * background behind the content, tinted with the state's `backgroundColor` and clipped to the corner
    * radius. Where the device draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle()`).
    */
   backgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.flat;
@@ -166,11 +165,12 @@ export class CYLMenuStyle {
   minimumTagSize: CYLSize = CYLSize.ZERO;
 
   /**
-   * The background style a tag really draws: `backgroundStyle`, or `flat` when `CYLLiquidGlass.isActive()` is false.
+   * The background style a tag really draws: `backgroundStyle`, flat where `CYLLiquidGlass.isActive()` (the rule of
+   * CYLTabBarController's `cylanimateditem`) is false; every other parameter is kept.
    */
   resolvedBackgroundStyle(): CYLTagBackgroundStyle {
-    return this.backgroundStyle === CYLTagBackgroundStyle.liquidGlass && CYLLiquidGlass.isActive() ?
-    CYLTagBackgroundStyle.liquidGlass : CYLTagBackgroundStyle.flat;
+    return this.backgroundStyle === CYLTagBackgroundStyle.liquidGlass && CYLLiquidGlass.isActive() ? CYLTagBackgroundStyle.liquidGlass :
+    CYLTagBackgroundStyle.flat;
   }
   animationSize: CYLSize = CYLSize.ZERO;
   animationSpeed: number = 1;
