@@ -2897,7 +2897,8 @@ extension CYLTagListView: UICollectionViewDataSource {
         let showsClear = source?.menuShowsClearButton?(forSection: section) == true
         header.clearButton.isHidden = !showsClear
         if showsClear {
-            let image = style.clearButtonImage ?? CYLMenuResources.image(named: "cyl_trash") ?? UIImage(systemName: "trash")
+            // A vector by default (an SF Symbol: sharp at every scale, a template tinted with the one dynamic color); the bundled raster is the fallback.
+            let image = style.clearButtonImage ?? UIImage(systemName: "trash") ?? CYLMenuResources.image(named: "cyl_trash")
             header.clearButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
             header.clearButton.tintColor = style.clearButtonColor ?? style.headerTextColor
             let title = source?.menuTitle(forSection: section) ?? ""
@@ -2916,7 +2917,7 @@ extension CYLTagListView: UICollectionViewDataSource {
         let showsMore = showsMoreButton(inSection: section)
         header.moreButton.isHidden = !showsMore
         if showsMore {
-            let image = style.moreButtonImage ?? CYLMenuResources.image(named: "cyl_more") ?? UIImage(systemName: "ellipsis")
+            let image = style.moreButtonImage ?? UIImage(systemName: "ellipsis") ?? CYLMenuResources.image(named: "cyl_more")
             header.moreButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
             header.moreButton.tintColor = style.moreButtonColor
             var label = source?.menuAccessibilityLabelForMoreButton?(inSection: section) ?? ""

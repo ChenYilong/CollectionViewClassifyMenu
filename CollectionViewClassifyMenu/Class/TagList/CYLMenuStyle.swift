@@ -432,9 +432,10 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var headerFont = UIFont.systemFont(ofSize: 14)
 
     /**
-     * Header title color, gray by default.
+     * Header title color: the dynamic label color by default (`UIColor.label`, resolved per trait collection, so dark mode works), the one
+     * tint of the list's own texts and icons together with `foldControlColor`, `moreButtonColor` and `clearButtonColor`.
      */
-    open var headerTextColor = UIColor.gray
+    open var headerTextColor = UIColor.label
 
     /**
      * Space before the header's title and after its controls, 16 by default.
@@ -444,9 +445,9 @@ open class CYLMenuStyle: NSObject, NSCopying {
     // MARK: Fold controls
 
     /**
-     * The fold controls' color, gray by default (a control's own color wins).
+     * The fold controls' color: the dynamic label color by default (`UIColor.label`; a control's own color wins), visible in dark mode and on glass.
      */
-    open var foldControlColor = UIColor.gray
+    open var foldControlColor = UIColor.label
 
     /**
      * Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
@@ -473,9 +474,9 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var moreButtonImage: UIImage?
 
     /**
-     * The color of the More button. Defaults to the secondary label color.
+     * The color of the More button: the dynamic label color by default (`UIColor.label`).
      */
-    open var moreButtonColor = UIColor.secondaryLabel
+    open var moreButtonColor = UIColor.label
 
     // MARK: - Initializers
 

@@ -25,14 +25,19 @@ import CYLTabBarController
 public final class CYLTagAppearance {
 
     /**
-     * The default background: white.
+     * The default background: white in light mode, the secondary system background in dark mode (a dynamic color), so the list's one dynamic
+     * tint (`UIColor.label`: the default of the text, the fold chevron, the More and clear icons, the header title) stays readable on it.
      */
-    public static let defaultBackgroundColor = UIColor.white
+    public static let defaultBackgroundColor = UIColor { traits in
+        traits.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground : UIColor.white
+    }
 
     /**
-     * The default title color: dark gray.
+     * The default title color: dark gray in light mode, the label color in dark mode (a dynamic color).
      */
-    public static let defaultTextColor = UIColor(white: 0.25, alpha: 1)
+    public static let defaultTextColor = UIColor { traits in
+        traits.userInterfaceStyle == .dark ? UIColor.label : UIColor(white: 0.25, alpha: 1)
+    }
 
     /**
      * The default title font: the system font of 14 points.

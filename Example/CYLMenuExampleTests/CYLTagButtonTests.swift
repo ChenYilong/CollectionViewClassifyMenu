@@ -106,7 +106,14 @@ final class CYLTagButtonTests: XCTestCase {
         appearance.backgroundColor = .red
         appearance.reset()
         XCTAssertEqual(appearance.backgroundColor, CYLTagAppearance.defaultBackgroundColor, "reset restores the default")
-        XCTAssertEqual(CYLTagAppearance.defaultBackgroundColor, UIColor.white)
+        let light = UITraitCollection(userInterfaceStyle: .light)
+        let dark = UITraitCollection(userInterfaceStyle: .dark)
+        XCTAssertEqual(CYLTagAppearance.defaultBackgroundColor.resolvedColor(with: light), UIColor.white.resolvedColor(with: light),
+                       "light mode: white, as before")
+        XCTAssertEqual(CYLTagAppearance.defaultBackgroundColor.resolvedColor(with: dark), UIColor.secondarySystemBackground.resolvedColor(with: dark),
+                       "dark mode: the secondary system background, so the dynamic label tint stays readable")
+        XCTAssertEqual(CYLTagAppearance.defaultTextColor.resolvedColor(with: dark), UIColor.label.resolvedColor(with: dark))
+        XCTAssertEqual(CYLTagAppearance.defaultTextColor.resolvedColor(with: light), UIColor(white: 0.25, alpha: 1).resolvedColor(with: light))
         appearance.reset()
         XCTAssertEqual(appearance.margin, 10)
 
