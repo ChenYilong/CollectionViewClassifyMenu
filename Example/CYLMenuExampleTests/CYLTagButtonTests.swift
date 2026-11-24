@@ -111,12 +111,18 @@ final class CYLTagButtonTests: XCTestCase {
         XCTAssertEqual(appearance.margin, 10)
 
         let style = CYLMenuStyle()
-        style.normalAppearance.cornerRadius = 0
+        style.normalAppearance.cornerRadius = 1000
         style.normalAppearance.borderColor = .green
         style.normalAppearance.borderWidth = 2
         style.normalAppearance.backgroundColor = .cyan
         let button = CYLMenuFixtures.tagButton(title: "首页", image: nil, style: style)
-        XCTAssertEqual(button.layer.cornerRadius, 15, accuracy: 0.01, "0 is an automatic capsule")
+        XCTAssertEqual(button.layer.cornerRadius, 15, accuracy: 0.01, "a radius of half the height or more is a capsule")
+        style.normalAppearance.cornerRadius = 0
+        let square = CYLMenuFixtures.tagButton(title: "首页", image: nil, style: style)
+        XCTAssertEqual(square.layer.cornerRadius, 0, "0 is square corners, no special meaning")
+        style.normalAppearance.cornerRadius = 6
+        let rounded = CYLMenuFixtures.tagButton(title: "首页", image: nil, style: style)
+        XCTAssertEqual(rounded.layer.cornerRadius, 6, accuracy: 0.01, "a plain number of points")
         XCTAssertEqual(button.layer.borderWidth, 2)
         XCTAssertTrue(button.layer.borderColor == UIColor.green.cgColor)
         XCTAssertTrue(button.layer.backgroundColor == UIColor.cyan.cgColor)

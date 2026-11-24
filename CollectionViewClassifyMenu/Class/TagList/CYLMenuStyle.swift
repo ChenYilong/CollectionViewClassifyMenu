@@ -467,7 +467,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
             appearance.borderWidth = 0
             // android-tagview's layoutBorderColor: a tag that sets only a border width gets a white border.
             appearance.borderColor = .white
-            appearance.cornerRadius = 0
+            appearance.cornerRadius = 1000  // a capsule: the radius is limited to half the tag height
             appearance.font = UIFont.systemFont(ofSize: 14)
         }
         style.disabledAppearance.backgroundColor = blue.withAlphaComponent(0.4)
@@ -633,7 +633,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         let style = Self.compactTagStyle()
         for appearance in style.allAppearances {
             appearance.backgroundColor = .clear
-            appearance.cornerRadius = CYLTagCornerRadiusSquare
+            appearance.cornerRadius = 0
         }
         style.normalAppearance.backgroundImage = Self.stretchableImage(named: "btn_slide_normal")
         style.normalAppearance.textColor = UIColor(red: 96 / 255, green: 147 / 255, blue: 130 / 255, alpha: 1)
@@ -652,7 +652,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
             appearance.backgroundColor = .clear
             appearance.borderWidth = 0
             appearance.borderColor = nil
-            appearance.cornerRadius = CYLTagCornerRadiusSquare
+            appearance.cornerRadius = 0
             appearance.textColor = textColor
             appearance.font = UIFont.systemFont(ofSize: fontSize)
             appearance.contentInsets = UIEdgeInsets(top: 0, left: leadingInset, bottom: 0, right: 0)

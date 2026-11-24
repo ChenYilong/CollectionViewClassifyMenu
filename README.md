@@ -272,7 +272,7 @@ style.layoutCentered = true                            // 只有图标或只有�
 // 背景、边框、圆角（CYLBadgeView）
 style.normalAppearance.borderColor = .systemGray4
 style.normalAppearance.borderWidth = 1
-style.normalAppearance.cornerRadius = 0                // 0 = 自动胶囊
+style.normalAppearance.cornerRadius = 1000             // 圆角半径（点）：0 = 方角，≥ 高度一半 = 胶囊
 style.normalAppearance.margin = 12
 style.selectedAppearance.backgroundColor = .systemBlue
 ```
@@ -329,7 +329,7 @@ tag.animationURL = iconsURL.cylAddingAnimationOptions(["artboard": "CHAT",
 let tags = CYLTagListView(configuration: [
     CYLTagListKey.selectionMode: "multiple",
     CYLTagListKey.foldStyle: "footerChevron",
-    CYLTagListKey.style: [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 0]],
+    CYLTagListKey.style: [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 1000]],
     CYLTagListKey.sections: [[CYLTagSectionKey.title: "Tabs",
                               CYLTagSectionKey.items: [[CYLTagItemKey.title: "Home",
                                                         CYLTagItemKey.image: "system:house",

@@ -515,7 +515,6 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagDataSource.menuRemoveItem(at:)` (CYLTag.swift) | `menuRemoveItem` | method |
 | `CYLTagDataSource.menuMoveItem(at:to:)` (CYLTag.swift) | `menuMoveItem` | method |
 | `CYLTagDataSource.menuStyleForItem(at:)` (CYLTag.swift) | `menuStyleForItem (cached)` | method |
-| `CYLTagCornerRadiusSquare` (CYLTagAppearance.swift) | `CYLTagCornerRadiusSquare` | property |
 | `CYLTagAppearance` (CYLTagAppearance.swift) | `class CYLTagAppearance` (core/CYLTagAppearance.ets) | class |
 | `CYLTagAppearance.static defaultBackgroundColor` (CYLTagAppearance.swift) | `CYLTagAppearance.defaultBackgroundColor` (static) | property |
 | `CYLTagAppearance.static defaultTextColor` (CYLTagAppearance.swift) | `CYLTagAppearance.defaultTextColor` (static) | property |

@@ -488,7 +488,6 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagDataSource -menuRemoveItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuRemoveItemAtIndexPath` |
 | `CYLTagDataSource -menuMoveItemAt:to:` | method, `CYLTag.swift` | `CYLTagDataSource.menuMoveItemAtIndexPath` |
 | `CYLTagDataSource -menuStyleForItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuStyleForItemAtIndexPath` |
-| `CYLTagCornerRadiusSquare` | constant, `CYLTagAppearance.swift` | `CYLTagCornerRadiusSquare` |
 | `CYLTagAppearance` | class, `CYLTagAppearance.swift` | `com.cyl.classifymenu.CYLTagAppearance` |
 | `CYLTagAppearance.defaultBackgroundColor` | property, `CYLTagAppearance.swift` | `CYLTagAppearance.resetBackgroundColor (the default it resets to)` |
 | `CYLTagAppearance.defaultTextColor` | property, `CYLTagAppearance.swift` | `CYLTagAppearance.resetTextColor (the default it resets to)` |

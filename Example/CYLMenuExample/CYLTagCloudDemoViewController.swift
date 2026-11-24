@@ -75,7 +75,7 @@ final class CYLTagCloudDemoViewController: UIViewController {
         let blue: [String: Any] = [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.backgroundColor: "#00BFFF",
                                                         CYLTagAppearanceKey.textColor: "#FFFFFF",
                                                         CYLTagAppearanceKey.borderWidth: 0,
-                                                        CYLTagAppearanceKey.cornerRadius: 0],
+                                                        CYLTagAppearanceKey.cornerRadius: 1000],
                                    CYLMenuStyleKey.highlightedBackgroundColor: "#88363636"]
         return [
             CYLTagListKey.style: [CYLMenuStyleKey.lineSpacing: 5, CYLMenuStyleKey.interitemSpacing: 3,

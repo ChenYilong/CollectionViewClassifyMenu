@@ -157,9 +157,9 @@ final class CYLTagAnimationDemoViewController: UIViewController {
             CYLMenuStyleKey.itemHeight: 44,
             CYLMenuStyleKey.layoutCentered: true,
             CYLMenuStyleKey.sectionInsets: [6, 16, 14, 16],
-            CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 0, CYLTagAppearanceKey.margin: 12,
+            CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 1000, CYLTagAppearanceKey.margin: 12,
                                  CYLTagAppearanceKey.borderColor: "#D1D1D6", CYLTagAppearanceKey.borderWidth: 1] as [String: Any],
-            CYLMenuStyleKey.selected: [CYLTagAppearanceKey.cornerRadius: 0, CYLTagAppearanceKey.margin: 12,
+            CYLMenuStyleKey.selected: [CYLTagAppearanceKey.cornerRadius: 1000, CYLTagAppearanceKey.margin: 12,
                                    CYLTagAppearanceKey.backgroundColor: "#FFF1E6", CYLTagAppearanceKey.textColor: "#FF6A00",
                                    CYLTagAppearanceKey.borderColor: "#FF6A00", CYLTagAppearanceKey.borderWidth: 1] as [String: Any],
         ]

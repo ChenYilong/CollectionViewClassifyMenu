@@ -3,17 +3,12 @@
 //  CollectionViewClassifyMenu
 //
 //  The box and text of a tag in one state. Every tag is treated like a CYLBadgeView (CYLTabBarController), so the
-//  properties and their defaults follow CYLBadgeAppearance: background, text color, font, corner radius (0 = automatic
-//  capsule), border and margin.
+//  properties and their defaults follow CYLBadgeAppearance: background, text color, font, corner radius (in points, 0 = square
+//  corners), border and margin.
 //  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
 //
 
 import UIKit
-
-/**
- * A corner radius that keeps the corners square (0 means a capsule), as android-tagview's radius 0.
- */
-public let CYLTagCornerRadiusSquare: CGFloat = 0.001
 
 /**
  * The box and text of a tag in one state (`CYLMenuStyle.normalAppearance`…). A final class: the style copies it.
@@ -82,8 +77,9 @@ public final class CYLTagAppearance {
     public var iconColor: UIColor?
 
     /**
-     * Corner radius. 0 means automatic: half the tag height (a capsule), as for CYLBadgeAppearance. Negative or
-     * non-finite values are treated as 0. 3 by default.
+     * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
+     * is limited to half the height, so a large value such as 1000 is a capsule for any tag). Negative or non-finite
+     * values are treated as 0. 3 by default.
      */
     public var cornerRadius = CYLTagAppearance.defaultCornerRadius {
         didSet {

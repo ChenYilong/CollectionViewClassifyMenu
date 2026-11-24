@@ -457,7 +457,6 @@ tags: [android, ios, api-parity, score]
 | `CYLTagDataSource.removeAllTags` | method, `CYLTag.kt:244` | `CYLTagDataSource.removeAllTags()` |
 | `CYLTagDataSource.moveTagAtIndex` | method, `CYLTag.kt:249` | `CYLTagDataSource.moveTag(at:to:)` |
 | `CYLTagDataSource.invalidateStyles` | method, `CYLTag.kt:255` | `CYLTagDataSource.invalidateStyles()` |
-| `CYLTagCornerRadiusSquare` | read-only property, `CYLTagAppearance.kt:7` | `CYLTagCornerRadiusSquare` |
 | `CYLTagAppearance` | class, `CYLTagAppearance.kt:13` | `CYLTagAppearance` |
 | `CYLTagAppearance.backgroundColor` | property, `CYLTagAppearance.kt:20` | `CYLTagAppearance.backgroundColor` |
 | `CYLTagAppearance.textColor` | property, `CYLTagAppearance.kt:25` | `CYLTagAppearance.textColor` |
