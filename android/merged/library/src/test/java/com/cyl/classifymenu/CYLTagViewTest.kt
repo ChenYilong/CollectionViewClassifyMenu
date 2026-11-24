@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,6 +61,8 @@ class CYLTagViewTest {
         assertEquals(2, view.groups.size)
         assertTrue(view.numberOfVisibleItemsInSection(0) in 1 until 12)
         val header = all(view, CYLTagHeaderCell::class.java).first { it.group?.section == 0 }
+        val moreButton = all(header, android.widget.Button::class.java).single()
+        assertNotNull("the More button shows the bundle arrow after its title", moreButton.compoundDrawablesRelative[2])
         header.btnClick()
         assertEquals(12, view.numberOfVisibleItemsInSection(0))
         val cell = all(view, CYLTagCell::class.java).first { it.model?.title == "标签 3 扩展文字" }
