@@ -2008,8 +2008,8 @@ tags: [issues, ui, cocoapods, progress]
     difference of 0.1 or less for the next 11 s while Done plays its single pass to the check; Loop ON: Menu alternates X and hamburger about every 1.5 s through
     19 s. Before the fix the entry recorded no change at all with Loop off. Screenshot: `docs/assets/ios-27-2-iphone18pro-menu-riv-loop-off-on.png` ([f8a9a952](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/f8a9a9529a3dd5281d0be93bcccba2ad6a3875eb)). Note:
     the rest pose before Play all is the X, so one Loop-off pass ends on the hamburger; that is upstream's choice of the file's pass, not a defect seen here.
-    Score of item 1 (menu.riv): iOS verified; Android and HarmonyOS unchanged (Windows item 6 below); the entry stays 87 / 100 until then. First attempt at
-    a height pin check is unrelated. The previous step list: (1) this entry; (2) pins; (3) iOS batch; (4) this result and Windows item 6.
+    Score of item 1 (menu.riv): iOS verified; Android and HarmonyOS unchanged (Windows item 6 below); the entry stays 87 / 100 until then. Steps: (1) this entry; (2) pins; (3) iOS batch;
+    (4) this result and Windows item 6.
     Prompt (verbatim): "continue". English: continue. Context: upstream fixed the menu.riv Loop-off bug (fix `19f689e2`, merge head
     `edeb11e63ae4ecd37433642a118dc43ffb11387d` on `feat/harmony-animated-item-engines`, PR #824). Plan: (1) this entry; (2) every pin except
     `harmony/` in one commit, Podfile.lock by `pod install`, mini program dist by its fetch script; (3) one iOS batch (Example, Example-Swift,
