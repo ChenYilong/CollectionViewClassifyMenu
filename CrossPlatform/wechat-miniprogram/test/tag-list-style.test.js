@@ -170,11 +170,11 @@ test('animatedIcon: the static image under the animation, a glyph stays text, on
   assert.equal(tag.iconSize, 20, 'cyl-animated-item draws a square: the largest that fits the frame');
 });
 
-test('tag layout: capsule for corner radius 0, insets with the border inside, imageInsets shrink the icon from the top left', () => {
+test('tag layout: capsule for a corner radius of half the height or more, insets with the border inside, imageInsets shrink the icon from the top left', () => {
   const style = model.mergeStyle({
     itemHeight: 44, imageSize: '{28, 28}', imageTitleSpacing: 6, imageInsets: [3, 3, 3, 3],
-    normal: { cornerRadius: 0, margin: 12, borderColor: '#D1D1D6', borderWidth: 1 },
-    selected: { cornerRadius: 0, margin: 12, borderWidth: 1 },
+    normal: { cornerRadius: 1000, margin: 12, borderColor: '#D1D1D6', borderWidth: 1 },
+    selected: { cornerRadius: 1000, margin: 12, borderWidth: 1 },
     titlePositionAdjustment: '{4, -2}',
   });
   const item = { title: '首页', enabled: true };
@@ -186,7 +186,10 @@ test('tag layout: capsule for corner radius 0, insets with the border inside, im
   assert.equal(tag.iconStyle, 'width: 22px; height: 22px');
   assert.equal(tag.titleStyle, 'left: 4px; top: -2px');
   assert.equal(model.cornerRadius(8, 36), 8);
-  assert.equal(model.cornerRadius(0.001, 36), 0);
+  assert.equal(model.cornerRadius(0, 36), 0, '0 is square');
+  assert.equal(model.cornerRadius(18, 36), 18);
+  assert.equal(model.cornerRadius(-1, 36), 0);
+  assert.equal(model.CORNER_RADIUS_SQUARE, undefined);
   assert.equal(model.cornerRadius(40, 36), 18);
 });
 

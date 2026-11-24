@@ -72,9 +72,6 @@ function withAlpha(css, alpha) {
   return `rgba(${match[1]}, ${match[2]}, ${match[3]}, ${round(alpha)})`;
 }
 
-/** `CYLTagCornerRadiusSquare`: square corners (0 is a capsule). */
-const CORNER_RADIUS_SQUARE = 0.001;
-
 /** The hairline of `CYLMenuStyle()`'s borders: 1 / screen scale. */
 const HAIRLINE = 0.5;
 
@@ -180,7 +177,7 @@ function tagCloudStyle() {
     a.textColor = '#FFFFFF';
     a.borderWidth = 0;
     a.borderColor = '#FFFFFF';
-    a.cornerRadius = 0;
+    a.cornerRadius = 1000; // a capsule: the radius is limited to half the tag height
     a.fontSize = 14;
   });
   style.disabled.backgroundColor = withAlpha(blue, 0.4);
@@ -514,10 +511,9 @@ function tagHeight(style) {
   }, style.itemHeight || 0);
 }
 
-/** The layer's corner radius: 0 is a capsule, `CYLTagCornerRadiusSquare` square, else at most half the height. */
+/** The layer's corner radius in points: 0 is square, at most half the height (half the height or more is a capsule). */
 function cornerRadius(radius, height) {
-  if (radius > 0) return radius <= CORNER_RADIUS_SQUARE ? 0 : Math.min(radius, height / 2);
-  return height / 2;
+  return Math.min(Number.isFinite(radius) && radius > 0 ? radius : 0, height / 2);
 }
 
 /** The cap height of a font (about 0.7 of its size). */
@@ -843,7 +839,6 @@ function renderList(listStyle, options = {}) {
 
 module.exports = {
   NAMED_COLORS,
-  CORNER_RADIUS_SQUARE,
   PALETTE,
   color,
   white,

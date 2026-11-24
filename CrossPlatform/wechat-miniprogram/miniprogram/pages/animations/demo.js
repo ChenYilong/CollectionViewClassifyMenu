@@ -110,8 +110,8 @@ function configuration(t = (s) => s) {
       itemHeight: 44,
       layoutCentered: true,
       sectionInsets: [6, 16, 14, 16],
-      normal: { cornerRadius: 0, margin: 12, borderColor: '#D1D1D6', borderWidth: 1 },
-      selected: { cornerRadius: 0, margin: 12, backgroundColor: '#FFF1E6', textColor: '#FF6A00', borderColor: '#FF6A00', borderWidth: 1 },
+      normal: { cornerRadius: 1000, margin: 12, borderColor: '#D1D1D6', borderWidth: 1 },
+      selected: { cornerRadius: 1000, margin: 12, backgroundColor: '#FFF1E6', textColor: '#FF6A00', borderColor: '#FF6A00', borderWidth: 1 },
     },
     sections,
   };

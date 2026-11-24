@@ -68,7 +68,7 @@ function codeList() {
 /** The configuration of the lower list: the same kinds of tags, as strings and dictionaries. */
 function mapConfiguration() {
   const blue = {
-    normal: { backgroundColor: '#00BFFF', textColor: '#FFFFFF', borderWidth: 0, cornerRadius: 0 },
+    normal: { backgroundColor: '#00BFFF', textColor: '#FFFFFF', borderWidth: 0, cornerRadius: 1000 },
     highlightedBackgroundColor: '#88363636',
   };
   return {

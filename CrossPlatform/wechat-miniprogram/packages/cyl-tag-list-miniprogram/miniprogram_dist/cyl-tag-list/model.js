@@ -689,10 +689,9 @@ function badgeLayout(badgeValue, badgeColor) {
   };
 }
 
-/** Corner radius: 0 is automatic (a capsule, as for CYLBadgeAppearance); CYLTagCornerRadiusSquare (0.001) is square. */
+/** Corner radius in points: 0 is square, at most half the height (half the height or more is a capsule). */
 function cornerRadius(radius, height) {
-  if (radius > 0) return radius <= 0.001 ? 0 : Math.min(radius, height / 2);
-  return height / 2;
+  return Math.min(Number.isFinite(radius) && radius > 0 ? radius : 0, height / 2);
 }
 
 function fontCSS(font) {

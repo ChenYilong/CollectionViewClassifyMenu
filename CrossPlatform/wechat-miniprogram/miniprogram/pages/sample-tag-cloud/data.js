@@ -29,7 +29,7 @@ function mainTags() {
   for (const [width, borderColor] of [[1, null], [2, color(1)], [3, color(3)]]) {
     tags.push(model.makeTag(t('边框'), { borderWidth: width, borderColor }));
   }
-  for (const radius of [model.CORNER_RADIUS_SQUARE, 20 / 3, 60 / 3]) {
+  for (const radius of [0, 20 / 3, 60 / 3]) {
     tags.push(model.makeTag(t('圆角'), { cornerRadius: radius }));
   }
   tags.push(model.makeTag(t('可删除'), { isDeletable: true }));
@@ -121,7 +121,7 @@ function hotStyle() {
       borderColor: model.white(0.88),
       borderWidth: 1,
       textColor: model.white(0.13),
-      cornerRadius: 0,
+      cornerRadius: 1000, // a capsule
       fontSize: 16,
     });
   }
