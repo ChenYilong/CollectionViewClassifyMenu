@@ -20,7 +20,7 @@ target 'CylTagListExample' do
   pod 'CollectionViewClassifyMenu', :path => '../../../..'
   # The animation engine the tags play Lottie files with (found at run time; the core does not depend on it).
   cyl_tab_bar = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                  :commit => '7facbcb263eb83954701a1cec14ee26da5bc33ff' }
+                  :commit => '6fff2be279c1374884b3bbbb8f8999353e012dc3' }
   pod 'CYLTabBarController', cyl_tab_bar
   # No modular headers needed: the module conflict came from CYLTabBarController's headers including CYLAnimatedItemView.h
   # as text (fixed upstream in 83a8ff8, CYLAnimatedItem.podspec sets DEFINES_MODULE); docs/component-architecture.md.

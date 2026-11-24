@@ -52,7 +52,7 @@ test('the default radius is the capsule constant in every style; a set radius cu
   assert.equal(model.mergeStyle({}).normal.cornerRadius, model.cylAnimatedItemCornerRadiusCapsule);
   for (const backgroundStyle of ['liquidGlass', 'flat']) {
     const view = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle } }, '', 2);
-    assert.match(view.cellStyle, new RegExp(`border-radius:${height / 2}px`), `${backgroundStyle}: a capsule`);
+    assert.match(view.cellStyle, new RegExp(`border-radius:${model.cylAnimatedItemCornerRadiusCapsule}px`), `${backgroundStyle}: the capsule constant, handled by cyl-animated-item`);
   }
   const set = model.tagButtonView({ title: 'Tag', tagStyle: { backgroundStyle: 'liquidGlass', normal: { cornerRadius: 6 } } }, '', 2);
   assert.match(set.cellStyle, /border-radius:6px/);

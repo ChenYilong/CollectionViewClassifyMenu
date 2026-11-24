@@ -777,8 +777,8 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const justify = !vertical && (leading || (!style.layoutCentered && !(showsImage && showsTitle))) ? 'flex-start' : 'center';
   const directions = { trailing: 'row-reverse', top: 'column', bottom: 'column-reverse' };
   // The background, radius and border are cyl-animated-item's (the interface of CYLAnimatedItemView.itemBackgroundStyle…); the radius is
-  // the appearance's (the capsule constant by default), limited to half the height.
-  const radius = cornerRadius(appearance.cornerRadius, height);
+  // the appearance's, handed over as it is (the capsule constant by default): cyl-animated-item implements the capsule.
+  const radius = appearance.cornerRadius;
   const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, appearance.backgroundColor, radius, border, appearance.borderColor, false);
   const glass = itemBackground.glass;
   const background = appearance.backgroundImage

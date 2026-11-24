@@ -170,6 +170,8 @@ export class CYLTagButton {
   /** The color of the editing icons (`CYLMenuStyle.deleteIndicatorColor`, else the text color). */
   editingIconColor: ResourceColor = CYLColor.BLACK;
   cornerRadius: number = 0;
+  /** The appearance's radius as it is (the capsule constant by default): `cylanimateditem` implements the capsule. */
+  appearanceCornerRadius: number = 0;
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   /**
    * The background, radius and border are `cylanimateditem`'s (`CYLAnimatedItemBackgroundModifier`, the interface of
@@ -1062,6 +1064,7 @@ export class CYLTagButton {
     // Liquid Glass: the state's background color tints the glass (CYLAnimatedItemBackgroundModifier, see build()).
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
     this.itemBackgroundStyle = glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
+    this.appearanceCornerRadius = appearance.cornerRadius;
     this.backgroundColor = stateBackground;
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;
@@ -1300,7 +1303,7 @@ export struct CYLTagButtonComponent {
     .height(this.tagHeight ?? this.button.intrinsicSize().height)
     // Background, radius and border (the tint over the glass for Liquid Glass): cylanimateditem's one interface.
     .attributeModifier(new CYLAnimatedItemBackgroundModifier(this.button.itemBackgroundStyle, this.button.backgroundColor,
-      this.button.cornerRadius, this.button.borderWidth, this.button.borderColor))
+      this.button.appearanceCornerRadius, this.button.borderWidth, this.button.borderColor))
     .backgroundImage(this.button.backgroundImage)
     .backgroundImageSize(ImageSize.Cover)
     // `CYLMenuStyle.elevation`: a shadow under the tag (offset down by half of it, blurred by it); the tag stops
