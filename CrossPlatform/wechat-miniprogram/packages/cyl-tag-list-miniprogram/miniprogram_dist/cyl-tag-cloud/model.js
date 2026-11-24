@@ -15,7 +15,7 @@
 
 /** The iOS colors the samples use, as UIKit's light-mode values. */
 const { iconImage } = require('./editing-icons.js');
-const { cylAnimatedItemCornerRadiusCapsule } = require('../cyl-animated-item/cyl_animated_item_model');
+const { cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemBackground } = require('../cyl-animated-item/cyl_animated_item_model');
 
 const NAMED_COLORS = {
   clear: 'rgba(0, 0, 0, 0)',
@@ -102,6 +102,8 @@ function defaultStyle() {
     selected: { ...appearance(), backgroundColor: tint, textColor: '#FFFFFF', borderColor: tint, borderWidth: HAIRLINE },
     disabled: { ...appearance(), textColor: white(0.7), borderColor: white(0.88), borderWidth: HAIRLINE },
     highlightedBackgroundColor: null,
+    // 'flat' (default) or 'liquidGlass' (cyl-animated-item's glass where its rule is active): the same key as cyl-tag-list and the native cores.
+    backgroundStyle: 'flat',
     deleteIndicatorTitle: '×',
     deleteIndicatorColor: null,
     deleteIndicatorFontSize: null,
@@ -336,6 +338,9 @@ function styleFromConfiguration(dictionary, base = defaultStyle()) {
     if (insets) setTagContentInsets(style, insets);
   }
   if (dictionary.backgroundColor != null) style.backgroundColor = color(dictionary.backgroundColor);
+  const backgroundStyle = String(dictionary.backgroundStyle || '').toLowerCase();
+  if (['liquidglass', '1'].includes(backgroundStyle)) style.backgroundStyle = 'liquidGlass';
+  if (['flat', '0'].includes(backgroundStyle)) style.backgroundStyle = 'flat';
   return style;
 }
 
@@ -631,12 +636,14 @@ function renderTag(tag, index, context) {
   const background = isPressed ? style.highlightedBackgroundColor : a.backgroundColor;
   const borderWidth = a.borderColor ? a.borderWidth : 0;
   const radius = cornerRadius(a.cornerRadius, height);
+  // Liquid Glass is cyl-animated-item's (the same call as cyl-tag-list): its CSS replaces the flat radius and color; a flat tag keeps its own.
+  const glass = style.backgroundStyle === 'liquidGlass'
+    ? cylAnimatedItemBackground('liquidGlass', background, a.cornerRadius, 0, '', false) : null;
   const parts = [
     // A wrapping title (`titleWraps`) lets the tag grow taller than one line.
     style.titleWraps ? `min-height: ${px(height)}; height: auto` : `height: ${px(height)}`,
     `padding: ${px(insets.top)} ${px(insets.right)} ${px(insets.bottom)} ${px(insets.left)}`,
-    `border-radius: ${px(radius)}`,
-    `background-color: ${background || 'transparent'}`,
+    glass && glass.glass ? glass.css : `border-radius: ${px(radius)}; background-color: ${background || 'transparent'}`,
   ];
   if (style.numberOfItemsPerRow > 0) {
     // Equal cells (iOS `numberOfItemsPerRow`): the row's width less the spaces, shared out.

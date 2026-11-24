@@ -18,7 +18,7 @@ Page({
     remark: '',
     sheetShown: false,
     canFill: false,
-    pickerStyle: model.wordPickerStyle(),
+    pickerStyle: Object.assign(model.wordPickerStyle(), { backgroundStyle: 'liquidGlass' }),
     labels: {},
   },
 

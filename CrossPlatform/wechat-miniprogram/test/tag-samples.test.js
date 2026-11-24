@@ -110,7 +110,8 @@ test('the five containers have the attributes of content_main.xml', () => {
   assert.equal(fifth.tags[0].backgroundColor, 'rgb(255, 0, 0)');
   assert.equal(fifth.tags[1].selectedBackgroundColor, 'rgb(153, 153, 153)');
   const red = model.renderTag(fifth.tags[0], 0, { listStyle: fifth.style, theme: fifth.options.colorTheme });
-  assert.match(red.style, /background-color: rgb\(255, 0, 0\)/);
+  // The sample is a Liquid Glass list now: the red tints the glass at 75% (flat would be background-color: rgb(255, 0, 0)).
+  assert.match(red.style, /background-color:rgba\(255,0,0,0.75\)/);
 });
 
 test('the sample pictures and images exist and are small', () => {

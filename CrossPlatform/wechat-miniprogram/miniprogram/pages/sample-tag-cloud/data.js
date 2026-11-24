@@ -51,6 +51,7 @@ function mainTags() {
 /** activity_main.xml and item_list_tag.xml: `.tagCloud()`, lineMargin 5, tagMargin 3, textPadding 10 × 3. */
 function cloudStyle() {
   const style = model.tagCloudStyle();
+  style.backgroundStyle = 'liquidGlass';
   style.lineSpacing = 5;
   style.interitemSpacing = 3;
   model.setTagContentInsets(style, { top: 3, left: 10, bottom: 3, right: 10 });
@@ -115,6 +116,7 @@ function hotTags() {
 /** White capsules with a light gray border, 16 pt titles, 18 pt badges, an orange bar before 热门搜索. */
 function hotStyle() {
   const style = model.defaultStyle();
+  style.backgroundStyle = 'liquidGlass';
   for (const state of ['normal', 'selected']) {
     Object.assign(style[state], {
       backgroundColor: '#FFFFFF',
