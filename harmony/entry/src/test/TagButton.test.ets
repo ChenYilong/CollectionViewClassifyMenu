@@ -46,6 +46,48 @@ export default function tagButtonTest() {
       expect(button.imageView.frame.y - button.titleLabel.frame.maxY).assertEqual(4);
     });
 
+    it('cornerRadiusIsPointsLimitedToHalfTheHeight', 0, () => {
+      // iOS CYLTagButtonTests: 0 is square corners, a number is points, half the height or more is a capsule.
+      const style = new CYLMenuStyle();
+      const button = new CYLTagButton('Home', undefined);
+      button.style = style;
+      const height = CYLTagButton.height(style);
+      button.setBounds(100, height);
+      style.normalAppearance.cornerRadius = 0;
+      button.style = style;
+      button.setBounds(100, height);
+      expect(button.cornerRadius).assertEqual(0);
+      style.normalAppearance.cornerRadius = 6;
+      button.style = style;
+      button.setBounds(100, height);
+      expect(button.cornerRadius).assertEqual(6);
+      style.normalAppearance.cornerRadius = 1000;
+      button.style = style;
+      button.setBounds(100, height);
+      expect(button.cornerRadius).assertEqual(height / 2);
+      style.normalAppearance.cornerRadius = height / 2;
+      button.style = style;
+      button.setBounds(100, height);
+      expect(button.cornerRadius).assertEqual(height / 2);
+      style.normalAppearance.cornerRadius = -4;
+      button.style = style;
+      button.setBounds(100, height);
+      expect(button.cornerRadius).assertEqual(0);
+    });
+
+    it('presetsKeepTheirShapes', 0, () => {
+      // tagCloud keeps its capsules (1000), filterTag and sectionTitle are square (0).
+      expect(CYLMenuStyle.tagCloud().normalAppearance.cornerRadius).assertEqual(1000);
+      expect(CYLMenuStyle.filterTag().normalAppearance.cornerRadius).assertEqual(0);
+      expect(CYLMenuStyle.sectionTitle().normalAppearance.cornerRadius).assertEqual(0);
+      const cloud = CYLMenuStyle.tagCloud();
+      const button = new CYLTagButton('Asia', undefined);
+      button.style = cloud;
+      const height = CYLTagButton.height(cloud);
+      button.setBounds(80, height);
+      expect(button.cornerRadius).assertEqual(height / 2);
+    });
+
     it('tintsTheAnimatedIconsStaticImageThroughTheComponent', 0, () => {
       // CYLAnimatedItemView.iconColor (CYLTabBarController PR #816): the static image under an animated icon takes the
       // state's icon color, as the tag's own static icon does; '' without a style color or without an animation.

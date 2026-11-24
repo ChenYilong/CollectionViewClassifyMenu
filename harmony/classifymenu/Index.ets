@@ -12,7 +12,7 @@ export { kDataSourceSectionKey, kDataSourceCellTextKey, kDataSourceCellPictureKe
 export { CYLMenuItemType, CYLMenuDataSource, CYLMenuDelegate, CYLMenuDefaults } from './src/main/ets/core/CYLMenuDataSource';
 export { CYLEdgeInsets, CYLSize, CYLOffset, CYLPoint, CYLRect, CYLFont, CYLControlState, CYLColor } from './src/main/ets/core/CYLTypes';
 export { CYLTagMetrics } from './src/main/ets/core/CYLTagMetrics';
-export { CYLTagAppearance, CYLTagCornerRadiusSquare } from './src/main/ets/core/CYLTagAppearance';
+export { CYLTagAppearance } from './src/main/ets/core/CYLTagAppearance';
 export { CYLMenuResources, CYLMenuLocalizedString } from './src/main/ets/core/CYLMenuResources';
 export {
   CYLMenuStyle, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagRowAlignment,

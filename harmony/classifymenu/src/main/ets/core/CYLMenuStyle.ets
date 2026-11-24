@@ -3,7 +3,7 @@
  * the touch ripple, titles, rows, icons, layout spacing, section headers, fold controls and the More button. Lengths
  * are vp, font sizes fp, colors '#AARRGGBB'. `copy()` is NSCopying.
  */
-import { CYLTagAppearance, CYLTagCornerRadiusSquare } from './CYLTagAppearance';
+import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
@@ -471,7 +471,7 @@ export class CYLMenuStyle {
     const style = CYLMenuStyle.compactTagStyle();
     style.appearances().forEach((appearance: CYLTagAppearance) => {
       appearance.backgroundColor = CYLColor.CLEAR;
-      appearance.cornerRadius = CYLTagCornerRadiusSquare;
+      appearance.cornerRadius = 0;
     });
     const normal = style.appearance(CYLControlState.NORMAL);
     normal.backgroundImage = CYLMenuResources.image('btn_slide_normal');
@@ -492,7 +492,7 @@ export class CYLMenuStyle {
       appearance.backgroundColor = CYLColor.CLEAR;
       appearance.borderWidth = 0;
       appearance.borderColor = undefined;
-      appearance.cornerRadius = CYLTagCornerRadiusSquare;
+      appearance.cornerRadius = 0;
       appearance.textColor = textColor;
       appearance.font = CYLFont.systemFont(fontSize);
       appearance.contentInsets = new CYLEdgeInsets(0, leadingInset, 0, 0);
@@ -513,7 +513,7 @@ export class CYLMenuStyle {
       appearance.textColor = CYLColor.WHITE;
       appearance.borderWidth = 0;
       appearance.borderColor = CYLColor.WHITE;
-      appearance.cornerRadius = 0;
+      appearance.cornerRadius = 1000; // a capsule: the radius is limited to half the tag height
       appearance.font = CYLFont.systemFont(14);
     });
     style.storedDisabled.backgroundColor = CYLColor.withAlpha(blue, 0.4);

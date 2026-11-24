@@ -4,11 +4,6 @@
  */
 import { CYLColor, CYLEdgeInsets, CYLFont } from './CYLTypes';
 
-/**
- * A corner radius that draws square corners (0 means "the list's value").
- */
-export const CYLTagCornerRadiusSquare: number = 0.001;
-
 function sanitized(value: number): number {
   return Number.isFinite(value) && value > 0 ? value : 0;
 }
@@ -76,6 +71,11 @@ export class CYLTagAppearance {
     this.storedFont = undefined;
   }
 
+  /**
+   * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
+   * is limited to half the height, so a large value such as 1000 is a capsule for any tag). Negative or non-finite
+   * values are treated as 0. 3 by default.
+   */
   get cornerRadius(): number {
     return this.storedCornerRadius;
   }

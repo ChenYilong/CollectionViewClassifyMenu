@@ -22,7 +22,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 ## 评分 / Score
 
 <!-- bilingual:keep -->
-**Score: 951 / 951 = 100.0 / 100** (API 929 / 929, demos 22 / 22). 评分：951 / 951 = 100.0 / 100（API 929 / 929，示例 22 / 22）。
+**Score: 950 / 950 = 100.0 / 100** (API 928 / 928, demos 22 / 22). 评分：950 / 950 = 100.0 / 100（API 928 / 928，示例 22 / 22）。
 
 | 中文 | English |
 |:---|:---|

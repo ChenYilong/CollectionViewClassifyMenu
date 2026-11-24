@@ -13,6 +13,9 @@
   ImageKit; SVGA 2.x through its own decoder in `entry/src/main/ets/animation/svga/`, checked without a device by
   `scripts/svga-decoder-test.sh`), registers them (`CYLAnimatedItemEngines.register(...)`) and supplies the views that
   play them (`CYLTagAnimationBuilder.register(...)`) in `entry/src/main/ets/animation/`.
+- `CYLTagAppearance.cornerRadius` is a plain number of points, limited to half the tag height (as on iOS and Android):
+  `0` is square corners, a value of half the height or more (for example `1000`) is a capsule; `CYLTagCornerRadiusSquare`
+  is removed. The presets keep their looks (`tagCloud()` uses `1000`; `filterTag()` and `sectionTitle()` use `0`).
 - Build, tests and screenshots: `docs/android.md` (HarmonyOS NEXT).
 
 ## TODO: CYLAnimatedItemView migration (2026-11-17)

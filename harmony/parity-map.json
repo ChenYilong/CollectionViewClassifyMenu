@@ -146,7 +146,6 @@
     "CYLMenuStyle.headerFont(for:)": "`CYLMenuStyle.headerFontFor(fontScale, boldText)`",
     "CYLMenuStyle.copy(with:)": "`CYLMenuStyle.copy()`",
     "CYLTagAppearance": "`class CYLTagAppearance` (core/CYLTagAppearance.ets)",
-    "CYLTagCornerRadiusSquare": "`CYLTagCornerRadiusSquare`",
     "CYLTagAppearance.static defaultBackgroundColor": "`CYLTagAppearance.defaultBackgroundColor` (static)",
     "CYLTagAppearance.static defaultTextColor": "`CYLTagAppearance.defaultTextColor` (static)",
     "CYLTagAppearance.static defaultFont": "`CYLTagAppearance.defaultFont` (static)",

@@ -80,7 +80,7 @@ export function recentStyle(): CYLMenuStyle {
     a.backgroundColor = CYLColor.WHITE;
     a.borderColor = SEPARATOR;
     a.borderWidth = 1;
-    a.cornerRadius = 0;
+    a.cornerRadius = 1000; // a capsule: the radius is limited to half the tag height
     a.margin = 14;
     a.font = CYLFont.systemFont(17);
     a.textColor = CYLColor.BLACK;
