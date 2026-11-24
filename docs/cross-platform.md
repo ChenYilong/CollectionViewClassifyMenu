@@ -809,6 +809,13 @@ Every open `TODO` found in the cross-platform documents (`cross-platform.md`, `a
   pixel scan: 2127 px before, 2208 px after):
 
   <img src="assets/flutter-android-tabbar-height.png" width="400" alt="Tab bar height on Android: Material 3 NavigationBar 80 dp vs CYLTabBar 49 dp">
+- **iOS side DONE (2026-11-24, Mac session chenyilong-68):** the core of this repository has no tab bar and sets no height; the examples
+  set no `tabBarHeight` (grep over every Swift / Objective-C file: none). The tab bar is CYLTabBarController's: its `tabBarHeight`
+  is "the system height until one is set" (49, the UITabBar's height without the home indicator's inset; UIKit's
+  `sizeThatFits` answers 83 with the 34 pt inset). Test `CYLRootTabBarTests.testRootTabBarKeepsTheDefaultHeight` (`4737201e`) pins it;
+  Example 118 / 118 on iOS 27.2. Upstream (CYLTabBarController `6ef9760c`) lists Android, HarmonyOS and the mini program as done.
+  **Blocked on: Windows session** — move every pin (this includes `harmony/`) past the commit that brings the Android / HarmonyOS
+  defaults and re-measure the Flutter Android example (49 dp before), see the 2026-11-24 hand-over.
 - **Blocked (2026-11-19):** waiting for CYLTabBarController. Its session queued the height change after its Swift
   migration and asked to keep every pin at `b376c278` until it sends the commit.
 - **Re-checked (2026-11-19, Windows session, at the 9a4ad95e pin):** still blocked. CYLTabBarController has only the

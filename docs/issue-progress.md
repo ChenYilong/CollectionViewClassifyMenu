@@ -71,7 +71,25 @@ tags: [issues, ui, cocoapods, progress]
   5. Mini program: re-check BUG 1 (icons drift after scrolling while playing) and BUG 2 (Rive icons) of
      `cross-platform.md`; mark them DONE or keep them TODO with the evidence.
   Report back with the results and screenshots in `screenshots.md`, scored in this entry.
-- **Status:** TODO.
+- **Status (2026-11-24, Mac session chenyilong-68, Sonnet, plan step 4): still TODO, iOS row now 100.**
+  - Done on the Mac: (a) the stale-heading sweep (`220368c5`): `animated-item-migration.md` "TODO (in order)" and the 41660d24 pin move are DONE; the
+    other five TODO headings stay TODO with a "Blocked on" line; (b) iOS side of the default tab bar height (`4737201e`): the
+    core has no tab bar, the examples set no height, a test pins CYLTabBarController's default; (c) one iOS batch on the own
+    simulator "CYL cm-harmony2" (8BDE43C1, iOS 27.2, Xcode 27.2): empty derived data, `pod install` in Example and Example-Swift
+    (Podfile / pbxproj leftovers restored, Podfile.lock unchanged), Example 118 / 118 and Example-Swift 23 / 23, both apps built,
+    seven screens in `docs/assets/ios-27-2-iphone18pro-example-main-tabs.png` (listed in `screenshots.md` with platform, OS, simulator,
+    Xcode, commit URL and time). README test counts updated (115 → 118, 22 → 23).
+  - Notes: the first Swift suite run failed for an environment reason (a flaky HTTPS clone of CYLTabBarController during
+    `pod install`) and passed on the retry; the first test runs needed the sandbox off (testmanagerd socket); the host load average was
+    500-950 but the runs finished in about 5 minutes each. My first height test compared with `UITabBar.sizeThatFits` (83, safe area
+    included) and failed: fixed in the test, not in the core (49 is CYLTabBarController's documented default). Pins are behind
+    the newest CYLTabBarController commit (`6ef9760c` vs `c4a1f8fd`); moving them touches `harmony/`, so it is one commit for the Windows session.
+  - Scoreboard after this work: iOS 100 (screenshots of the current pins are in `screenshots.md`; the test height item is done);
+    Android 895 / 895 and 736 / 736, unchanged (menu.riv with Loop off: CYLTabBarController); HarmonyOS 807 / 807 parity, verified 96.2
+    / 90 unchanged (Windows); mini program unchanged (owner: npm login; Windows: BUG 1 / 2 re-check); Flutter / React Native unchanged
+    (Windows: Android device run, default tab bar height re-measure).
+  - **Left for the Windows session:** the five-item hand-over above plus the pin move. **Left for the owner:** npm login, PR #824,
+    issues #11 / #9 / #2, a real AppID for the phone check. Not marked N/A.
 
 ### DONE (2026-11-22, `feat/harmony`, 90/100, not compiled): no wrapper over CYLAnimatedItemView's playback API (advisor decides, Sonnet implements)
 
@@ -163,7 +181,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ### TODO (2026-11-20, `docs/readme-swift-refresh`): README refresh, Swift only, every platform's setup
 
-- **Blocked on: Windows session** (compile the Kotlin, ArkTS, Dart and TSX snippets), see the 2026-11-24 hand-over. The other deduction, the stale counts of the README's "Test screenshots" paragraph, is a Mac item (2026-11-24 TODO below, step 4).
+- **Blocked on: Windows session** (compile the Kotlin, ArkTS, Dart and TSX snippets), see the 2026-11-24 hand-over. The other deduction, the stale counts of the README's "Test screenshots" paragraph, was a Mac item and is done (README counts 118 / 23, 2026-11-24 TODO above).
 
 - Context: README.md has outdated descriptions (the core was Objective-C until the migration finished on 2026-11-14,
   the README still shows Objective-C code and says "the core stays Objective-C"). Reference: the current API
