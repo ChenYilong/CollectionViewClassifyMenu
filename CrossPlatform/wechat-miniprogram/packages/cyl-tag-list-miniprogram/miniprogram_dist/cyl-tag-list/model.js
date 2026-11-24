@@ -147,6 +147,14 @@ const APP_TINT_COLOR = '#2AB9A0';
  * UIKit's systemGray6, and a configured clear / transparent / zero-alpha background falls back to it.
  */
 const DEFAULT_TAG_BACKGROUND = '#F2F2F7';
+/**
+ * Dark mode, as iOS's dynamic defaults: a tag's fill is the secondary system background (#1C1C1E), its title the primary
+ * label (white), and the list's own texts and icons (header title, fold controls) one tint, `UIColor.label` (black in
+ * light mode, white in dark mode). A color a configuration sets wins in both modes.
+ */
+const DARK_TAG_BACKGROUND = '#1C1C1E';
+const DARK_TEXT_COLOR = '#FFFFFF';
+const LIGHT_TINT = '#000000';
 
 /**
  * A background that may be transparent (style key `allowsTransparentBackground`): `transparent`, `clear` and zero alpha
@@ -170,10 +178,10 @@ function opaqueBackground(value) {
   return alpha && Number(alpha[1]) === 0 ? DEFAULT_TAG_BACKGROUND : parsed;
 }
 
-function defaultAppearance(hairline) {
+function defaultAppearance(hairline, dark = false) {
   return {
-    backgroundColor: DEFAULT_TAG_BACKGROUND,
-    textColor: DEFAULT_TEXT_COLOR,
+    backgroundColor: dark ? DARK_TAG_BACKGROUND : DEFAULT_TAG_BACKGROUND,
+    textColor: dark ? DARK_TEXT_COLOR : DEFAULT_TEXT_COLOR,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
     cornerRadius: cylAnimatedItemCornerRadiusCapsule,
@@ -190,15 +198,16 @@ function defaultAppearance(hairline) {
  * titles, light gray disabled tags; 14 × 14 icons, 4 between icon and title, 30 high tags, 10 between tags and lines,
  * section insets {10, 16, 10, 16}, 36 high headers with a gray 14 pt title.
  * @param {number} pixelRatio the screen scale, for the hairline (1 / scale)
+ * @param {boolean} dark dark mode: the dark tag fill and title, the light tint of the list's texts and icons
  */
-function defaultStyle(pixelRatio = 2) {
+function defaultStyle(pixelRatio = 2, dark = false) {
   const hairline = 1 / Math.max(1, pixelRatio || 1);
-  const normal = { ...defaultAppearance(hairline), borderColor: '#D1D1D1', borderWidth: hairline };
+  const normal = { ...defaultAppearance(hairline, dark), borderColor: '#D1D1D1', borderWidth: hairline };
   const selected = {
-    ...defaultAppearance(hairline), backgroundColor: APP_TINT_COLOR, textColor: '#FFFFFF', borderColor: APP_TINT_COLOR,
+    ...defaultAppearance(hairline, dark), backgroundColor: APP_TINT_COLOR, textColor: '#FFFFFF', borderColor: APP_TINT_COLOR,
     borderWidth: hairline,
   };
-  const disabled = { ...defaultAppearance(hairline), textColor: '#B3B3B3', borderColor: '#E0E0E0', borderWidth: hairline };
+  const disabled = { ...defaultAppearance(hairline, dark), textColor: '#B3B3B3', borderColor: '#E0E0E0', borderWidth: hairline };
   return finishStyle({
     normal, selected, disabled,
     imageTitleSpacing: 4,
@@ -221,8 +230,8 @@ function defaultStyle(pixelRatio = 2) {
     titlePositionAdjustment: { horizontal: 0, vertical: 0 },
     imagePositionAdjustment: { horizontal: 0, vertical: 0 },
     backgroundColor: '#FFFFFF',
-    headerTextColor: '#808080',
-    foldControlColor: '#808080',
+    headerTextColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
+    foldControlColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     headerFont: { size: 14, weight: 'regular', italic: false },
     headerHorizontalInset: 16,
     highlightedBackgroundColor: null,
@@ -402,11 +411,11 @@ function foldControlValue(value) {
  * the core), showsSectionHeaders (true), defaultVisibleRows (0 = never fold), foldControl ({position: "none" |
  * "headerTrailing" | "tail" | "footer", content: "title" | "icon" | "iconAndTitle"}), style and sections ([{title,
  * style, items: [{title, image, selectedImage, animation, animationOptions, animationRestingProgress, exclusive,
- * enabled, gifFirstFrame, gifLastFrame, gifDuration, autoplay}] }], a plain value being an item's title). `options.pixelRatio` sets the hairline of the default borders.
+ * enabled, gifFirstFrame, gifLastFrame, gifDuration, autoplay}] }], a plain value being an item's title). `options.pixelRatio` sets the hairline of the default borders, `options.dark` the dark mode defaults (tag fill and title, the list's tint).
  */
 function normalize(configuration = {}, options = {}) {
   const c = configuration || {};
-  const base = options.pixelRatio ? defaultStyle(options.pixelRatio) : DEFAULT_STYLE;
+  const base = options.pixelRatio || options.dark ? defaultStyle(options.pixelRatio || 2, !!options.dark) : DEFAULT_STYLE;
   const style = mergeStyle(c.style, base);
   const sections = (Array.isArray(c.sections) ? c.sections : []).map((section, s) => ({
     index: s,
@@ -832,8 +841,8 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
  * room for a missing icon or title), with the badge and an accessibility label that reads `accessibilityLabel` (else the
  * title), then the badge.
  */
-function tagButtonView(props, animationUrl, pixelRatio = 2) {
-  const style = mergeStyle((props && props.tagStyle) || {}, defaultStyle(pixelRatio));
+function tagButtonView(props, animationUrl, pixelRatio = 2, dark = false) {
+  const style = mergeStyle((props && props.tagStyle) || {}, defaultStyle(pixelRatio, dark));
   const item = {
     title: String(props.title || ''),
     image: props.image || '',

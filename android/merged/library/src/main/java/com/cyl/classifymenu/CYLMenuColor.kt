@@ -37,3 +37,33 @@ internal val CYLUIColorNames: Map<String, Int> = mapOf(
     "secondarySystemBackground" to Color.rgb(242, 242, 247), "tertiarySystemBackground" to Color.WHITE,
     "separator" to Color.argb(73, 60, 60, 67), "link" to Color.rgb(0, 122, 255), "tint" to Color.rgb(0, 122, 255),
 )
+
+/**
+ * The list's own tint and the tag defaults in dark mode, as iOS does with dynamic colors (`UIColor.label`,
+ * `secondarySystemBackground`): resolved from the context when the host left a color unset.
+ */
+internal object CYLSystemColors {
+    /** Whether the context is in night mode (the system's dark theme or the app's). */
+    fun isNight(context: android.content.Context): Boolean =
+        (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+    /**
+     * The one tint of the list's texts and icons: the theme's `textColorPrimary` (what `UIColor.label` is on iOS), else white in
+     * night mode and black otherwise.
+     */
+    fun primary(context: android.content.Context): Int {
+        val fallback = if (isNight(context)) Color.WHITE else Color.BLACK
+        val attributes = context.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
+        return try {
+            attributes.getColorStateList(0)?.defaultColor ?: fallback
+        } catch (error: Throwable) {
+            fallback
+        } finally {
+            attributes.recycle()
+        }
+    }
+
+    /** The secondary system background of dark mode (iOS #1C1C1E), the default tag background there. */
+    const val SECONDARY_BACKGROUND_DARK: Int = -0xe3e3e2 // 0xFF1C1C1E
+}
