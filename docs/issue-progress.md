@@ -1993,6 +1993,11 @@ tags: [issues, ui, cocoapods, progress]
     still icons; (3) the libpag `eglMakeCurrent` freeze after about 80 s of Loop on; (4) Flutter and React Native on Android
     run on a device; (5) PR #824 convergence (owner's call, recorded, not scored here).
   - Note: host load average 638-897 at the start (other sessions' emulators and builds); device checks wait for it to drop.
+  - **TODO (2026-11-25, chenyilong-68): re-pin CYLTabBarController c4a1f8fd -> edeb11e6 (menu.riv Loop-off fix 19f689e2).**
+    Prompt (verbatim): "continue". English: continue. Context: upstream fixed the menu.riv Loop-off bug (fix `19f689e2`, merge head
+    `edeb11e63ae4ecd37433642a118dc43ffb11387d` on `feat/harmony-animated-item-engines`, PR #824). Plan: (1) this entry; (2) every pin except
+    `harmony/` in one commit, Podfile.lock by `pod install`, mini program dist by its fetch script; (3) one iOS batch (Example, Example-Swift,
+    both suites) and menu.riv with Loop off / on on the animation screen; (4) DONE with evidence, Windows item 6 in the hand-over.
   - **Claimed (2026-11-24) by Mac session chenyilong-68:** chenyilong-e4 is no longer running, so this entry is taken over.
     Routing: (1) menu.riv with Loop off goes to CYLTabBarController (Mac-CYLTabBarController session reproduced it on iOS too,
     logged in its `docs/Animated-Item.md` on PR #824 at `74505404`: `menu_button.riv`, boolean `isOpen`; a longer off window
