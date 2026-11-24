@@ -84,8 +84,15 @@ public final class CYLTagAppearance {
     public var cornerRadius = CYLTagAppearance.defaultCornerRadius {
         didSet {
             cornerRadius = Self.sanitized(cornerRadius)
+            isCornerRadiusSet = true
         }
     }
+
+    /**
+     * Whether `cornerRadius` was set (not the default of 3). A Liquid Glass tag whose radius was never set is a capsule, the
+     * default of `CYLAnimatedItemView`; a set value, 0 (square) included, is used as it is.
+     */
+    public internal(set) var isCornerRadiusSet = false
 
     /**
      * Border color, `nil` (no border) by default. Drawn only when `borderWidth` > 0.
@@ -152,6 +159,7 @@ public final class CYLTagAppearance {
         font = Self.defaultFont
         iconColor = nil
         cornerRadius = Self.defaultCornerRadius
+        isCornerRadiusSet = false
         borderColor = nil
         borderWidth = 0
         contentInsets = Self.defaultContentInsets
@@ -168,6 +176,7 @@ public final class CYLTagAppearance {
         copy.font = font
         copy.iconColor = iconColor
         copy.cornerRadius = cornerRadius
+        copy.isCornerRadiusSet = isCornerRadiusSet
         copy.borderColor = borderColor
         copy.borderWidth = borderWidth
         copy.contentInsets = contentInsets

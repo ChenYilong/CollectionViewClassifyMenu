@@ -8,7 +8,6 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
-import CYLLiquidGlass
 @testable import CYLMenuExample
 
 final class CYLTagConfigurationTests: XCTestCase {
@@ -127,8 +126,8 @@ final class CYLTagConfigurationTests: XCTestCase {
     }
 
     func testLiquidGlassFallsBackToFlatWhereTheSystemDrawsNone() {
-        CYLLiquidGlass.activeOverride = false
-        defer { CYLLiquidGlass.activeOverride = nil }
+        CYLAnimatedItemView.liquidGlassActiveOverride = false
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
         let style = CYLMenuStyle()
         style.backgroundStyle = .liquidGlass
         style.normalAppearance.backgroundColor = .systemOrange
@@ -139,12 +138,33 @@ final class CYLTagConfigurationTests: XCTestCase {
         XCTAssertNotNil(button.layer.backgroundColor, "the flat background color is drawn")
     }
 
+    func testAnUnsetRadiusIsACapsuleForGlassAndASetRadiusCustomizesIt() throws {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
+        let style = CYLMenuStyle()
+        style.backgroundStyle = .liquidGlass
+        let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style, size: CGSize(width: 100, height: 34))
+        button.layoutIfNeeded()
+        XCTAssertFalse(style.normalAppearance.isCornerRadiusSet)
+        XCTAssertEqual(button.layer.cornerRadius, 17, "never set: a capsule, CYLAnimatedItemView's default")
+        style.normalAppearance.cornerRadius = 6
+        XCTAssertTrue(style.normalAppearance.isCornerRadiusSet)
+        button.style = style
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.layer.cornerRadius, 6, "a set radius customizes it")
+        style.normalAppearance.cornerRadius = 0
+        button.style = style
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.layer.cornerRadius, 0, "0 is square")
+        XCTAssertTrue((style.copy() as! CYLMenuStyle).normalAppearance.isCornerRadiusSet)
+    }
+
     func testLiquidGlassBackgroundIsDrawnWhereTheSystemDrawsIt() throws {
         guard #available(iOS 26.0, *) else {
             throw XCTSkip("UIGlassEffect needs iOS 26")
         }
-        CYLLiquidGlass.activeOverride = true
-        defer { CYLLiquidGlass.activeOverride = nil }
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
         let style = CYLMenuStyle()
         style.backgroundStyle = .liquidGlass
         style.normalAppearance.backgroundColor = .systemOrange

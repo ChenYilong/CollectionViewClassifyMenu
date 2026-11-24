@@ -2,7 +2,7 @@
 # Checks out CYLTabBarController at the commit the example uses (its React Native component react-native-cyltabbar
 # lives in CrossPlatform/ and is not on npm) into .deps/, which git ignores. Run before `yarn install`.
 set -e
-COMMIT=8fa168fa3554bf11bc6583a4ee356068f60ac785  # CYL_TAB_BAR: keep equal to the pin in example/ios/Podfile
+COMMIT=43ad5f6af334b1560d30b62c8bbf9ae448d6e670  # CYL_TAB_BAR: keep equal to the pin in example/ios/Podfile
 DIR="$(cd "$(dirname "$0")/.." && pwd)/.deps/CYLTabBarController"
 if [ ! -d "$DIR/.git" ]; then
   git clone --filter=blob:none --no-checkout https://github.com/ChenYilong/CYLTabBarController.git "$DIR"

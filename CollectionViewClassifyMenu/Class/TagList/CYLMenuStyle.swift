@@ -12,7 +12,16 @@
 //
 
 import UIKit
-import CYLLiquidGlass
+// CYLAnimatedItemView.isLiquidGlassActive() (the rule for Liquid Glass): the module choice of CYLTagButton.swift, since Swift
+// Package Manager does not see another file's imports.
+#if canImport(CYLAnimatedItemViews)
+import CYLAnimatedItem
+import CYLAnimatedItemViews
+#elseif canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#else
+import CYLTabBarController
+#endif
 
 /**
  * Where a tag's icon goes relative to its title.
@@ -61,8 +70,8 @@ import CYLLiquidGlass
     case flat = 0
     /**
      * A Liquid Glass material behind the content, tinted with the state's `backgroundColor`, drawn only where the system
-     * draws Liquid Glass (`CYLLiquidGlass.isActive()`: iOS 26 and later, the rule of CYLTabBarController's base library
-     * `CYLLiquidGlass`); elsewhere the style is ignored and the tag stays flat.
+     * draws Liquid Glass (`CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and later, the rule of CYLTabBarController);
+     * elsewhere the style is ignored and the tag stays flat.
      */
     case liquidGlass
 }
@@ -348,10 +357,10 @@ open class CYLMenuStyle: NSObject, NSCopying {
 
     /**
      * The background style a tag really draws: `backgroundStyle`, or `.flat` where the system draws no Liquid Glass
-     * (`CYLLiquidGlass.isActive()`, the rule of CYLTabBarController's base library `CYLLiquidGlass`).
+     * (`CYLAnimatedItemView.isLiquidGlassActive()`, the rule of CYLTabBarController).
      */
     public var resolvedBackgroundStyle: CYLTagBackgroundStyle {
-        backgroundStyle == .liquidGlass && CYLLiquidGlass.isActive() ? .liquidGlass : .flat
+        backgroundStyle == .liquidGlass && CYLAnimatedItemView.isLiquidGlassActive() ? .liquidGlass : .flat
     }
 
     /**

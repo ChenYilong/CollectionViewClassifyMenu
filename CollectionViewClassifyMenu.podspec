@@ -49,6 +49,5 @@ Pod::Spec.new do |s|
   # ...PAG, ...PAGEnterprise, ...Rive, ...SVGA, ...GIF); without one, tags show their static images. The subspec is
   # not in a CocoaPods release yet: Podfiles pin CYLTabBarController by commit (:git + :commit).
   s.dependency 'CYLAnimatedItem'
-  s.dependency 'CYLLiquidGlass'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 end

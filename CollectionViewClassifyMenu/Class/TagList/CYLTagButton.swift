@@ -23,7 +23,6 @@
 // 'CYLClassifyMenuViewController' because it has overridable members that could not be loaded" (CI on b4d0e51).
 // Swift Package Manager (CYLTabBarController 4c7dc79d and later): the Swift CYLAnimatedItemView is in its own module,
 // CYLAnimatedItemViews, beside the engine's CYLAnimatedItem; CocoaPods builds both into the CYLAnimatedItem module.
-import CYLLiquidGlass
 #if canImport(CYLAnimatedItemViews)
 @_exported import CYLAnimatedItem
 @_exported import CYLAnimatedItemViews
@@ -276,10 +275,12 @@ open class CYLTagButton: CYLAnimatedItemView {
     private let backgroundImageView = UIImageView()
 
     /**
-     * The Liquid Glass background behind the content while `style.resolvedBackgroundStyle` is `.liquidGlass` (a
-     * `CYLLiquidGlassView`); `nil` when the tag is flat.
+     * The Liquid Glass layer behind the content (CYLAnimatedItemView's `itemLiquidGlassView`) while
+     * `style.resolvedBackgroundStyle` is `.liquidGlass`; `nil` when the tag is flat.
      */
-    public private(set) var liquidGlassView: UIView?
+    public var liquidGlassView: UIView? {
+        itemLiquidGlassView
+    }
     /**
      * The cross of `CYLMenuStyle.deleteIndicatorLineWidth`.
      */
@@ -665,7 +666,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         let state = currentState
         let insets = style.appearance(for: state).contentInsets
         backgroundImageView.frame = bounds
-        liquidGlassView?.frame = bounds
         let deleteWidth = layOutDeleteIndicator(state: state, insets: insets)
         let indicatorFirst = showsDeleteIndicator && style.deleteIndicatorPlacement == .leading
         // The leading margin; `trailing` is the space after the content (the right inset and the delete indicator).
@@ -760,8 +760,8 @@ open class CYLTagButton: CYLAnimatedItemView {
             layOutBadge(anchor: showsTitle ? titleLabel.frame : bounds.inset(by: insets))
         }
         // Points, limited to half the height: 0 is square, half the height or more a capsule.
-        let radius = style.appearance(for: state).cornerRadius
-        layer.cornerRadius = min(radius, height / 2)
+        // CYLAnimatedItemView applies it (limited to half the height) with the background and the border.
+        itemCornerRadius = resolvedCornerRadius(for: state)
         updateElevationPath()
     }
 
@@ -864,34 +864,8 @@ open class CYLTagButton: CYLAnimatedItemView {
         } else {
             titleLabel.frame = .zero
         }
-        let radius = style.appearance(for: currentState).cornerRadius
-        layer.cornerRadius = min(radius, height / 2)
+        itemCornerRadius = resolvedCornerRadius(for: currentState)
         updateElevationPath()
-    }
-
-    /**
-     * Shows or removes the Liquid Glass background for `style.resolvedBackgroundStyle`, tinted with `tint`; returns
-     * whether the tag is glass now (then the flat background color is not drawn). Where the system has no Liquid Glass
-     * the tag stays flat, whatever the style says. The glass is CYLTabBarController's base library `CYLLiquidGlass`.
-     */
-    @discardableResult
-    private func updateLiquidGlass(tint: UIColor?) -> Bool {
-        if styleStorage.resolvedBackgroundStyle == .liquidGlass {
-            let glass = (liquidGlassView as? CYLLiquidGlassView) ?? CYLLiquidGlassView()
-            glass.glassTintColor = tint
-            glass.cornerRadius = layer.cornerRadius
-            glass.frame = bounds
-            if glass.superview == nil {
-                insertSubview(glass, aboveSubview: backgroundImageView)
-            }
-            liquidGlassView = glass
-            if glass.isGlassDrawn {
-                return true
-            }
-        }
-        liquidGlassView?.removeFromSuperview()
-        liquidGlassView = nil
-        return false
     }
 
     /**
@@ -909,9 +883,16 @@ open class CYLTagButton: CYLAnimatedItemView {
         updateElevationPath()
     }
 
+    /// The radius handed to CYLAnimatedItemView: nil (its default, a capsule for Liquid Glass) while the radius was never set
+    /// and the glass is drawn; otherwise the appearance's number (0 is square).
+    private func resolvedCornerRadius(for state: UIControl.State) -> CGFloat? {
+        let appearance = style.appearance(for: state)
+        if !appearance.isCornerRadiusSet && style.resolvedBackgroundStyle == .liquidGlass { return nil }
+        return appearance.cornerRadius
+    }
+
     private func updateElevationPath() {
         backgroundImageView.layer.cornerRadius = layer.cornerRadius
-        liquidGlassView?.layer.cornerRadius = layer.cornerRadius
         layer.shadowPath = styleStorage.elevation > 0
             ? UIBezierPath(roundedRect: bounds, cornerRadius: layer.cornerRadius).cgPath : nil
     }
@@ -1089,8 +1070,9 @@ open class CYLTagButton: CYLAnimatedItemView {
         let pressed = isHighlighted && state != .disabled && style.highlightedBackgroundColor != nil
         // Pressed, as android-tagview's layoutColorPress.
         let background = pressed ? style.highlightedBackgroundColor : appearance.backgroundColor
-        let glass = updateLiquidGlass(tint: background)
-        layer.backgroundColor = glass ? nil : background?.cgColor
+        // The background is CYLAnimatedItemView's: flat color, or Liquid Glass tinted with it where the system draws it.
+        itemBackgroundStyle = style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat
+        itemBackgroundColor = background
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)
@@ -1141,8 +1123,8 @@ open class CYLTagButton: CYLAnimatedItemView {
             borderColor = state == .selected ? (appearance.borderColor ?? appearance.textColor) : appearance.textColor
             borderWidth = max(1, appearance.borderWidth)
         }
-        layer.borderColor = borderColor?.cgColor
-        layer.borderWidth = borderWidth
+        itemBorderColor = borderColor
+        itemBorderWidth = borderWidth
         badgeLabel.isHidden = badgeValue == nil
         badgeLabel.text = badgeValue?.isEmpty == false ? badgeValue : nil
         badgeLabel.backgroundColor = badgeColorStorage
