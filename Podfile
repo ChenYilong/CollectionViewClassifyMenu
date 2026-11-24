@@ -16,7 +16,7 @@ target 'CollectionViewClassifyMenu' do
   # No modular headers needed: the module conflict came from CYLTabBarController's headers including CYLAnimatedItemView.h
   # as text (fixed upstream in 83a8ff8, CYLAnimatedItem.podspec sets DEFINES_MODULE); docs/component-architecture.md.
   pod 'CYLAnimatedItem', CYL_ANIMATED_ITEM
-  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => 'c85c10c0dac23308a5373e4ab4f4e1da7bc41ed9' # CYLTabBarController's badge needs 1.4, not on the trunk yet
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # CYLTabBarController's badge needs 1.4, not on the trunk yet
 
   target 'CollectionViewClassifyMenuTests' do
     inherit! :search_paths

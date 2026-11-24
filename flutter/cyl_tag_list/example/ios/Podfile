@@ -39,7 +39,7 @@ target 'Runner' do
   pod 'CYLTabBarController', cyl_tab_bar
   pod 'CollectionViewClassifyMenu', :path => '../../../..'
   pod 'CYLAnimatedItem', cyl_tab_bar
-  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => 'c85c10c0dac23308a5373e4ab4f4e1da7bc41ed9' # CYLTabBarController's badge needs 1.4, not on the trunk yet
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # CYLTabBarController's badge needs 1.4, not on the trunk yet
   # The animated icon engines the example plays; the core depends on the CYLAnimatedItem pod only.
   pod 'CYLAnimatedItem/LottieObjectiveC', cyl_tab_bar
   pod 'CYLAnimatedItem/Rive', cyl_tab_bar
