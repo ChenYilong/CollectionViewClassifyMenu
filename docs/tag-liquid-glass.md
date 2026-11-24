@@ -72,6 +72,12 @@ config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's `backgroundC
 | HarmonyOS | `.attributeModifier(CYLAnimatedItemBackgroundModifier(...))` from the re-vendored `cylanimateditem` | static |
 | Mini program | `model.js` calls `cylAnimatedItemBackground(...)` of the vendored `cyl-animated-item` | node tests 173 / 173 |
 
+Compatibility for existing integrators (owner's feedback 2026-11-24, CYLSearchViewController session): every new API is additive and defaults
+keep the look (`backgroundStyle` flat, `minimumTagSize` zero). The public constant `CYLTagCornerRadiusSquare` is kept on iOS and HarmonyOS (PR #35 had
+removed it); Android keeps its old radius rule (0 is a capsule). No pin or integrator code moves by itself. When an integrator moves its ClassifyMenu pin
+it must move its CYLTabBarController pin to the same generation (`43ad5f6a` or later), because the tag now uses `CYLAnimatedItemView.itemBackground…`; that pair is
+the only requirement. Open for the owner (PR #35, base of this PR): on iOS, HarmonyOS and the mini program a radius of 0 changed from capsule to square.
+
 Known follow-up: the vendored `cyl-dealloc-block-executor` stays at its current copy until the DeallocBlockExecutor session's
 PR #26 merge SHA.
 

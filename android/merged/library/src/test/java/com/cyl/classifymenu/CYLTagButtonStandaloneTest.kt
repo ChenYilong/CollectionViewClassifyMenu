@@ -228,10 +228,13 @@ class CYLTagButtonStandaloneTest {
         val tag = CYLTagButton(context, "Tag", icon())
         tag.style = style
         assertEquals(null, tag.itemCornerRadius)
-        style.normalAppearance.cornerRadius = 0f
+        style.normalAppearance.cornerRadius = 6f
         assertTrue(style.normalAppearance.isCornerRadiusSet)
         tag.style = style
-        assertEquals(0f, tag.itemCornerRadius)
+        assertEquals(6f, tag.itemCornerRadius)
+        style.normalAppearance.cornerRadius = 0f
+        tag.style = style
+        assertEquals("Android's rule as before: 0 is a capsule", 1000f, tag.itemCornerRadius)
         assertTrue(style.copy().normalAppearance.isCornerRadiusSet)
     }
 

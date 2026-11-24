@@ -8,6 +8,12 @@ function sanitized(value: number): number {
   return Number.isFinite(value) && value > 0 ? value : 0;
 }
 
+/**
+ * Kept so existing code compiles: a corner radius that draws square corners. A corner radius is in vp now and 0 is square, so `0`
+ * does the same; this value is square too.
+ */
+export const CYLTagCornerRadiusSquare: number = 0.001;
+
 export class CYLTagAppearance {
   static readonly defaultBackgroundColor: string = CYLColor.WHITE;
   static readonly defaultTextColor: string = CYLColor.white(0.25);
