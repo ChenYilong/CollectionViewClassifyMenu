@@ -12,8 +12,8 @@ export default function queryScenariosTest() {
     it('scenariosListTheTablesWithRowCounts', 0, async () => {
       const driver = await cylLaunchExample();
       await cylTapAccessible(driver, CYLExampleLocalizedString('查询筛选'), 'tab-plus', 1500);
-      await driver.assertComponentExist(ON.id('scenario-0'));
-      await driver.assertComponentExist(ON.id('scenario-3'));
+      await driver.assertComponentExist(ON.text(CYLExampleLocalizedString('评价筛选 · 数据库（SQLite）')));
+      await driver.assertComponentExist(ON.text(CYLExampleLocalizedString('分类菜单 + 多选筛选 · 数据库联动')));
       await cylTap(driver, 'table-reviews', 300);
       const places = await cylText(driver, 'table-places');
       expect(places.length > 0).assertTrue();
@@ -22,7 +22,7 @@ export default function queryScenariosTest() {
     it('menuLinkageQueriesTheDatabase', 0, async () => {
       const driver = await cylLaunchExample();
       await cylTapAccessible(driver, CYLExampleLocalizedString('查询筛选'), 'tab-plus', 1500);
-      await cylTapAccessible(driver, CYLExampleLocalizedString('分类菜单 + 多选筛选 · 数据库联动'), 'scenario-3', 2000);
+      await cylTapAccessible(driver, CYLExampleLocalizedString('分类菜单 + 多选筛选 · 数据库联动'), undefined, 2000);
       const before = await cylText(driver, 'menuLinkageStatus');
       expect(before.includes('SQLite')).assertTrue();
       await cylTapAccessible(driver, CYLExampleLocalizedString('多选筛选'), 'menuLinkageFilter', 1000);
@@ -37,7 +37,7 @@ export default function queryScenariosTest() {
     it('searchDiscoverShowsRecentAndDiscover', 0, async () => {
       const driver = await cylLaunchExample();
       await cylTapAccessible(driver, CYLExampleLocalizedString('查询筛选'), 'tab-plus', 1500);
-      await cylTapAccessible(driver, CYLExampleLocalizedString('最近搜索 + 发现'), 'scenario-4', 1500);
+      await cylTapAccessible(driver, CYLExampleLocalizedString('最近搜索 + 发现'), undefined, 1500);
       await driver.assertComponentExist(ON.id('recentList'));
       await driver.assertComponentExist(ON.id('discoverList'));
       await driver.assertComponentExist(ON.id('CYLSearchDiscoverField'));
