@@ -68,4 +68,50 @@ final class CYLTagCalloutTests: CYLMenuExampleTestCase {
             list.dismissCallout()
         }
     }
+
+    func testTheBubbleOfAFirstRowTagStaysBelowItAndKeepsTheSectionHeaderVisible() throws {
+        let source = CYLMenuFixtures.source(itemCount: 6, sections: 1)
+        let list = showTagList(source, width: screenWidth)
+        let collectionView = list.probe.collectionView
+        let window = try XCTUnwrap(list.window)
+        let header = try XCTUnwrap(collectionView.supplementaryView(forElementKind: UICollectionView.elementKindSectionHeader,
+                                                                     at: IndexPath(item: 0, section: 0)))
+        list.showCallout("setIconAnimation(bundled:size:for:)", at: IndexPath(item: 0, section: 0))
+        let callout = try XCTUnwrap(calloutView(in: window))
+        let cell = try XCTUnwrap(collectionView.cellForItem(at: IndexPath(item: 0, section: 0)))
+        let tag = collectionView.convert(cell.frame, to: window)
+        XCTAssertFalse(callout.frame.intersects(collectionView.convert(header.frame, to: window)),
+                       "the bubble does not cover the section header")
+        XCTAssertGreaterThanOrEqual(callout.frame.minY, tag.maxY, "it is below the tag, its arrow pointing up at it")
+    }
+
+    func testAScrollOfTheListDismissesTheCalloutAndStopsObserving() throws {
+        let source = CYLMenuFixtures.source(itemCount: 120, sections: 1)
+        let list = showTagList(source, width: screenWidth)
+        let window = try XCTUnwrap(list.window)
+        list.showCallout("about", at: IndexPath(item: 0, section: 0))
+        XCTAssertNotNil(calloutView(in: window))
+        list.probe.collectionView.contentOffset = CGPoint(x: 0, y: 60)
+        XCTAssertNil(calloutView(in: window), "a scroll, also a programmatic one, hides the callout")
+        list.probe.collectionView.contentOffset = CGPoint(x: 0, y: 120)
+        XCTAssertNil(calloutView(in: window))
+    }
+
+    func testAScrollOfAnAncestorScrollViewDismissesTheCallout() throws {
+        let source = CYLMenuFixtures.source(itemCount: 6, sections: 1)
+        let controller = UIViewController()
+        let window = show(controller, size: CGSize(width: screenWidth, height: 700))
+        let scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 700))
+        scrollView.contentSize = CGSize(width: screenWidth, height: 2000)
+        controller.view.addSubview(scrollView)
+        let list = CYLTagListView(frame: CGRect(x: 0, y: 100, width: screenWidth, height: 400))
+        list.menuDataSource = source
+        scrollView.addSubview(list)
+        list.reloadMenuData()
+        list.layoutIfNeeded()
+        list.showCallout("about", at: IndexPath(item: 0, section: 0))
+        XCTAssertNotNil(calloutView(in: window))
+        scrollView.contentOffset = CGPoint(x: 0, y: 40)
+        XCTAssertNil(calloutView(in: window), "the page that holds the list scrolled")
+    }
 }

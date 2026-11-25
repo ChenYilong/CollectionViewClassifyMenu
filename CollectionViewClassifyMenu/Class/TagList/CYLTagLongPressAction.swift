@@ -302,11 +302,35 @@ final class CYLTagCalloutView: UIView {
         text?.contains { $0.isWhitespace } ?? false
     }
 
+    /// The gap between the bubble's arrow tip and the tag.
+    private static let gap: CGFloat = 4
+
+    /**
+     * Whether the callout goes below the tag (arrow up). Above first (the contract); below when it does not fit above
+     * or when it would cover `header` (the section header above a first-row tag) and it fits below; above when neither
+     * side is free of the header and below does not fit. Pure: all frames are in the container's coordinates.
+     */
+    static func placesBelow(target: CGRect, height: CGFloat, safeTop: CGFloat, bottomLimit: CGFloat, header: CGRect?) -> Bool {
+        let aboveTop = target.minY - height - gap
+        let fitsAbove = aboveTop >= safeTop
+        let fitsBelow = target.maxY + gap + height <= bottomLimit
+        guard fitsAbove else {
+            return true
+        }
+        guard let header, !header.isEmpty else {
+            return false
+        }
+        // The bubble is clamped horizontally and may be wider than the header's text: compare the vertical ranges only.
+        let coversHeader = header.minY < aboveTop + height && header.maxY > aboveTop
+        return coversHeader && fitsBelow
+    }
+
     /**
      * Places the callout in `container` (the window), above `target` (the tag's frame in the container's coordinates),
-     * below it when there is no room above, clamped to the container, its arrow at the tag's center.
+     * below it when there is no room above or when the bubble would cover `header` (see `placesBelow`), clamped to the
+     * container, its arrow at the tag's center.
      */
-    func present(pointingAt target: CGRect, in container: UIView) {
+    func present(pointingAt target: CGRect, in container: UIView, avoiding header: CGRect? = nil) {
         // A text with no break opportunity (an API name such as `setIconAnimation(bundled:size:for:)`) is never split mid-word: it may use
         // the container's width, else UIKit breaks it by character and the closing `)` lands on a second line. Other text keeps `maxWidth`.
         let insets = Self.padding.left + Self.padding.right
@@ -318,8 +342,9 @@ final class CYLTagCalloutView: UIView {
         let bounds = container.bounds
         let safeTop = container.safeAreaInsets.top
         let x = max(Self.margin, min(bounds.width - Self.margin - width, target.midX - width / 2))
-        arrowUp = target.minY - height - 4 < safeTop
-        let y = arrowUp ? target.maxY + 4 : target.minY - height - 4
+        arrowUp = Self.placesBelow(target: target, height: height, safeTop: safeTop,
+                                   bottomLimit: bounds.height - container.safeAreaInsets.bottom, header: header)
+        let y = arrowUp ? target.maxY + Self.gap : target.minY - height - Self.gap
         frame = CGRect(x: x, y: y, width: width, height: height)
         arrowCenter = target.midX - x
         label.frame = CGRect(x: Self.padding.left, y: Self.padding.top + (arrowUp ? Self.arrowHeight : 0),

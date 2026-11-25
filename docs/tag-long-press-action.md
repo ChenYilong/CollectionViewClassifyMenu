@@ -17,8 +17,8 @@ never change the behavior. Designed by the advisor on 2026-11-25; HarmonyOS is i
 
 ## The callout (same on every platform)
 
-- A small bubble with an arrow pointing at the tag, above it (below when there is no room), text up to 3 lines, font 13.
-- Dismissed by a tap, a scroll, a reload, another long press, or when the list goes away.
+- A small bubble with an arrow pointing at the tag, above it (below when there is no room, or when above it would cover the section header of a first-row tag and there is room below), text up to 3 lines, font 13.
+- Dismissed by a tap, a scroll (of the list or of any scroll view that holds it; iOS observes their `contentOffset`), a reload, another long press, or when the list goes away.
 - **The release that ends a long press must not tap or select the item.** (On HarmonyOS the release fired a tap after the
   long press, which selected the tag and dismissed the callout: fixed by ignoring the next tap of the item after a
   recognized long press and clearing that on the next touch down.)
