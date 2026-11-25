@@ -826,13 +826,13 @@ open class CYLTagListView @JvmOverloads constructor(
     private fun cardInsets(): CYLEdgeInsets = if (listStyle.isInsetGrouped) listStyle.sectionContentInsets else CYLEdgeInsets.ZERO
 
     /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
-    internal fun contentColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = columnAt(max(0f, measuredContentWidth))
+    fun contentColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = columnAt(max(0f, measuredContentWidth))
 
     /**
      * The column the tags are laid in: [contentColumn], narrowed by the card's padding under `insetGrouped`. Every tag width,
      * row count, fold decision, height and frame takes its width and x from here.
      */
-    internal fun tagColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = tagColumnAt(max(0f, measuredContentWidth))
+    fun tagColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = tagColumnAt(max(0f, measuredContentWidth))
 
     private fun tagColumnAt(width: Float): CYLRect {
         val column = columnAt(width)

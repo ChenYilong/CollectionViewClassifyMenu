@@ -80,5 +80,19 @@
  "CYLTagListCache.supportsItems": "respondsToSelector: of -saveItems:forSection: (an optional CYLTagListCache method)",
  "CYLTagListView.loadItemsWithKeys": "CYLTagListView -loadItemsWithKeys:completion:",
  "CYLMenuDelegate.menuDidChangeReordering": "CYLMenuDelegate -menu:didChangeReordering: (Swift menu(_:didChangeReordering:))",
- "CYLMenuDelegate.menuDidChangeSmearing": "CYLMenuDelegate -menu:didChangeSmearing: (Swift menu(_:didChangeSmearing:))"
+ "CYLMenuDelegate.menuDidChangeSmearing": "CYLMenuDelegate -menu:didChangeSmearing: (Swift menu(_:didChangeSmearing:))",
+ "CYLTagAppearance.resolvedTextColor": "N/A on iOS: `CYLTagAppearance.textColor` is a dynamic `UIColor` (`defaultTextColor`) that UIKit resolves with the view's traits; Android has no dynamic colors, so it resolves the night-mode default from a `Context`",
+ "CYLTagListView.headerSeparator": "N/A on iOS: a field of Android's internal `CYLTagListSectionFrame` (the layout pass records the frames it paints itself); iOS draws the divider in the header view (`header.separatorThickness`) and the card in the `CYLTagListCardSpec` decoration, no public frame",
+ "CYLTagListView.headerInsetLeft": "N/A on iOS: a field of Android's internal `CYLTagListSectionFrame` (see `headerSeparator`); the header's insets are laid out by UIKit",
+ "CYLTagListView.headerInsetRight": "N/A on iOS: a field of Android's internal `CYLTagListSectionFrame` (see `headerSeparator`); the header's insets are laid out by UIKit",
+ "CYLMenuColorLuminance": "`CYLTintContrast` (the contrast rule of the default tint; iOS takes the luma 0.299 R + 0.587 G + 0.114 B of the opaque background, Android the WCAG relative luminance)",
+ "CYLTintLuminanceThreshold": "`CYLTintContrast.luminanceThreshold` (the light/dark cut-off of the default tint: 0.5 on the luma scale on iOS, 0.179 on the WCAG relative luminance scale on Android)",
+ "CYLSectionStyleColors.CARD": "`CYLSectionStyleColors.card` (the light value of the dynamic color)",
+ "CYLSectionStyleColors.CARD_DARK": "`CYLSectionStyleColors.card` (the dark value of the dynamic color)",
+ "CYLSectionStyleColors.HEADER_BAND": "`CYLSectionStyleColors.headerBand` (the light value of the dynamic color)",
+ "CYLSectionStyleColors.HEADER_BAND_DARK": "`CYLSectionStyleColors.headerBand` (the dark value of the dynamic color)",
+ "CYLSectionStyleColors.GROUPED_BACKGROUND": "`CYLSectionStyleColors.groupedBackground` (the light value of the dynamic color)",
+ "CYLSectionStyleColors.GROUPED_BACKGROUND_DARK": "`CYLSectionStyleColors.groupedBackground` (the dark value of the dynamic color)",
+ "CYLSectionStyleColors.SEPARATOR": "`CYLSectionStyleColors.separator` (the light value of the dynamic color)",
+ "CYLSectionStyleColors.SEPARATOR_DARK": "`CYLSectionStyleColors.separator` (the dark value of the dynamic color)"
 }
