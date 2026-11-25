@@ -107,6 +107,17 @@ export class CYLSectionStyleMetrics {
 export const CYLTintLuminanceThreshold: number = 0.179;
 
 /**
+ * The default `headerFont` size: the system table header look (17 pt / dp / vp), not a caption.
+ */
+export const CYLDefaultHeaderFontSize: number = 17;
+
+/**
+ * The default `headerFont` weight, the semibold of the iOS header (600). `FontWeight` has no 600: Medium is 500 and Bold
+ * 700, and the core takes Bold, the heavier neighbour, so that the title reads as a header and not as body text.
+ */
+export const CYLDefaultHeaderFontWeight: FontWeight = FontWeight.Bold;
+
+/**
  * The colors of the section style: each one follows the color mode (`resources/base` and `resources/dark`). A style whose
  * color is undefined resolves to them; an app can also set one itself, for example `headerBand` on `headerBackgroundColor`.
  */
@@ -363,7 +374,8 @@ export class CYLMenuStyle {
       Math.max(CYLHeaderTitleMaxLines.single, Math.floor(value)) : CYLHeaderTitleMaxLines.single;
   }
 
-  headerFont: CYLFont = CYLFont.systemFont(14);
+  /** The section header title font; default `CYLDefaultHeaderFontSize` (17) in `CYLDefaultHeaderFontWeight` (semibold). */
+  headerFont: CYLFont = new CYLFont(CYLDefaultHeaderFontSize, CYLDefaultHeaderFontWeight);
   /**
    * The one color of every built-in view that is not a tag (header title, section icon, fold / More control); undefined:
    * black or white by the luminance of the background it is drawn on (`resolvedTintColor`). A color set on the title,

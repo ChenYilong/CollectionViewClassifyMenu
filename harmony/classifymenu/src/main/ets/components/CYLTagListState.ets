@@ -546,12 +546,14 @@ export class CYLTagListSectionFrame {
   isRtl: boolean = false;
   /**
    * The x (from the list's left edge) of the header title's leading edge: the left inset in ltr, the list width minus
-   * the right inset in rtl, where the title is aligned to its right end.
+   * the right inset in rtl, where the title is aligned to its right end. Under `insetGrouped` it is the board's (card's)
+   * leading edge.
    */
   headerTitleLeadingX: number = 0;
   /**
    * The x of the header fold control's left edge when the section's header shows one, else undefined. The control sits
-   * at the trailing side (`headerTrailing`) or the leading side (`headerLeading`); rtl mirrors both.
+   * at the trailing side (`headerTrailing`) or the leading side (`headerLeading`); rtl mirrors both. Under
+   * `insetGrouped` its trailing edge (leading for `headerLeading`) is the board's (card's) edge.
    */
   headerFoldX?: number = undefined;
 }
@@ -2927,17 +2929,16 @@ export class CYLTagListState implements CYLTagLongPressHost {
   }
 
   /**
-   * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside
-   * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
-   * `headerHorizontalInset`.
+   * The distances from the list's leading and trailing edges to a header's title and fold control: the board's (card's)
+   * edges under `insetGrouped` (the title block is aligned with the board, not with the tags inside it), the band's edges
+   * plus `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
    */
   private headerEdgeInsets(width: number = this.layoutWidth): number[] {
     const style = this.styleStorage;
     const column = this.columnAt(width);
     const rest = Math.max(0, width - column.x - column.width);
     if (style.isInsetGrouped) {
-      const card = this.cardInsets();
-      return [column.x + card.left, rest + card.right];
+      return [column.x, rest];
     }
     if (style.headerBackgroundColor !== undefined) {
       const bandInsets = this.physical(style.headerContentInsets);

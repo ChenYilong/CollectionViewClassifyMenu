@@ -23,7 +23,7 @@ export { CYLMenuResources, CYLMenuLocalizedString } from './src/main/ets/core/CY
 export {
   CYLMenuStyle, CYLTagTitleMaxLines, CYLHeaderTitleMaxLines, CYLLayoutDirection, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagBackgroundStyle, CYLTagRowAlignment,
   CYLTagDeleteIndicatorPlacement, CYLTitleTextAttributes, CYLSectionStyle, CYLHeaderSeparatorStyle, CYLSectionStyleMetrics,
-  CYLSectionStyleColors, CYLTintLuminanceThreshold
+  CYLSectionStyleColors, CYLTintLuminanceThreshold, CYLDefaultHeaderFontSize, CYLDefaultHeaderFontWeight
 } from './src/main/ets/core/CYLMenuStyle';
 export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';
 export { CYLImage, CYLImageIsSymbol, CYLResourceTypeSymbol, CYLColorKey } from './src/main/ets/core/CYLTypes';

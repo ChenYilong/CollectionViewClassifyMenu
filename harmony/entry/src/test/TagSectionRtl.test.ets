@@ -203,9 +203,11 @@ export default function tagSectionRtlTest() {
       // ltr: the tags start at the leading padding; rtl: the first tag ends at the leading padding from the right edge.
       expect(ltr.items[0].x).assertEqual(SIDE_INSET + CARD_LEADING);
       expect(rtl.items[0].x).assertEqual(LIST_WIDTH - SIDE_INSET - CARD_LEADING - TAG_WIDTH);
-      // The header title aligns with the tags' leading edge inside the card.
-      expect(ltr.headerTitleLeadingX).assertEqual(ltr.items[0].x);
-      expect(rtl.headerTitleLeadingX).assertEqual(rtl.items[0].x + rtl.items[0].width);
+      // The header title aligns with the board's (card's) leading edge, not with the tags inside it.
+      expect(ltr.headerTitleLeadingX).assertEqual(ltr.card?.x);
+      expect(rtl.headerTitleLeadingX).assertEqual((rtl.card?.x ?? 0) + (rtl.card?.width ?? 0));
+      expect(ltr.headerInsetLeft).assertEqual(SIDE_INSET);
+      expect(rtl.headerInsetRight).assertEqual(SIDE_INSET);
     });
   });
 }
