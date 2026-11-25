@@ -84,3 +84,99 @@ final class CYLTagReorderDemoTests: CYLMenuExampleTestCase {
         }
     }
 }
+
+/// A host that records what an action asks of it (the long-press action contract, docs/tag-long-press-action.md).
+private final class CYLRecordingLongPressHost: CYLTagLongPressHost {
+    var log: [String] = []
+    var canReorder = false
+    var startsMovement = true
+    var subtitles: [Int: String] = [:]
+
+    func subtitleForItem(at indexPath: IndexPath) -> String? { subtitles[indexPath.item] }
+    func showCallout(_ text: String, at indexPath: IndexPath) { log.append("callout \(indexPath.item) \(text)") }
+    func dismissCallout() { log.append("dismiss") }
+    func canReorderItem(at indexPath: IndexPath) -> Bool { canReorder }
+    func beginReordering(at indexPath: IndexPath) -> Bool {
+        log.append("beginReordering \(indexPath.item)")
+        return startsMovement
+    }
+    func endReordering(destination: IndexPath?, moved: Bool) { log.append("endReordering \(moved)") }
+    func cancelReordering() { log.append("cancelReordering") }
+    func reportLongPress(at indexPath: IndexPath) { log.append("report \(indexPath.item)") }
+}
+
+/// The long-press action of a list: the default keeps the behavior before the API (reordering where the list can reorder,
+/// else the long press is reported; the reordering itself is the tests above), and the built-in, combined and custom
+/// actions replace it.
+final class CYLTagLongPressActionTests: XCTestCase {
+
+    private func press(_ action: CYLTagLongPressAction, _ host: CYLRecordingLongPressHost, item: Int) -> Bool {
+        let path = IndexPath(item: item, section: 0)
+        return action.canBegin(host: host, at: path) && action.begin(host: host, at: path)
+    }
+
+    func testTheDefaultReportsWhereTheListCannotReorderAndReordersWhereItCan() {
+        let host = CYLRecordingLongPressHost()
+        let action = CYLTagLongPressActions.makeDefault()
+        XCTAssertFalse(press(action, host, item: 1))
+        XCTAssertEqual(host.log, ["report 1"])
+        host.log = []
+        host.canReorder = true
+        XCTAssertTrue(press(action, host, item: 2))
+        action.end(host: host, destination: IndexPath(item: 0, section: 0), moved: false)
+        XCTAssertEqual(host.log, ["beginReordering 2", "endReordering false"])
+    }
+
+    func testReorderThatUIKitDoesNotStartIsOnlyALongPress() {
+        let host = CYLRecordingLongPressHost()
+        host.canReorder = true
+        host.startsMovement = false
+        XCTAssertFalse(press(CYLTagLongPressActions.makeDefault(), host, item: 0))
+        XCTAssertEqual(host.log, ["beginReordering 0", "report 0"])
+    }
+
+    func testCalloutNeedsASubtitleAndReports() {
+        let host = CYLRecordingLongPressHost()
+        host.subtitles = [1: "about y"]
+        let action = CYLTagLongPressActions.first([CYLTagLongPressActions.callout, CYLTagLongPressActions.report])
+        XCTAssertFalse(press(action, host, item: 0))
+        XCTAssertEqual(host.log, ["report 0"], "no subtitle: the next action takes the press")
+        host.log = []
+        XCTAssertFalse(press(action, host, item: 1))
+        XCTAssertEqual(host.log, ["callout 1 about y", "report 1"])
+    }
+
+    func testNoneAndHandlerReplaceTheBuiltInBehavior() {
+        let host = CYLRecordingLongPressHost()
+        XCTAssertFalse(press(CYLTagLongPressActions.none, host, item: 0))
+        XCTAssertTrue(host.log.isEmpty)
+        var seen: [Int] = []
+        let handler = CYLTagLongPressActions.handler { host, indexPath in
+            seen.append(indexPath.item)
+            host.showCallout("item \(indexPath.item)", at: indexPath)
+        }
+        XCTAssertFalse(press(handler, host, item: 2))
+        XCTAssertEqual(seen, [2])
+        XCTAssertEqual(host.log, ["callout 2 item 2"], "no built-in action ran: nothing was reported")
+    }
+
+    func testFirstGivesTheEndAndTheCancelToTheActionThatBegan() {
+        let host = CYLRecordingLongPressHost()
+        host.canReorder = true
+        let action = CYLTagLongPressActions.first([CYLTagLongPressActions.reorder, CYLTagLongPressActions.callout])
+        XCTAssertTrue(press(action, host, item: 0))
+        action.cancel(host: host)
+        action.end(host: host, destination: nil, moved: true)
+        XCTAssertEqual(host.log, ["beginReordering 0", "cancelReordering"], "the end after the cancel reaches nothing")
+    }
+
+    func testAConfigurationNamesTheSubtitle() {
+        let list = CYLTagListView(configuration: [
+            CYLTagListKey.longPressAction: "callout",
+            CYLTagListKey.sections: [[CYLTagSectionKey.items: [[CYLTagItemKey.title: "a", CYLTagItemKey.subtitle: "about a"], "b"]]],
+        ])
+        let source = list.menuDataSource
+        XCTAssertEqual(source?.menuSubtitleForItem?(at: IndexPath(item: 0, section: 0)), "about a")
+        XCTAssertNil(source?.menuSubtitleForItem?(at: IndexPath(item: 1, section: 0)) ?? nil)
+    }
+}

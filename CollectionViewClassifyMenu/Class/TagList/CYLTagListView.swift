@@ -795,6 +795,24 @@ open class CYLTagListView: UIView {
     // MARK: Long press and reordering
 
     /**
+     * What a long press on an item does: `CYLTagLongPressActions.first([reorder, report])` by default (reordering where
+     * the list can reorder, else the long press is reported). Set another built-in action, a combination or your own
+     * (docs/tag-long-press-action.md). Setting it cancels a press in progress and hides the callout.
+     */
+    open var longPressAction: CYLTagLongPressAction = CYLTagLongPressActions.makeDefault() {
+        didSet {
+            oldValue.cancel(host: self)
+            if isReordering {
+                cancelReordering()
+            }
+            dismissCallout()
+        }
+    }
+
+    /// The callout of a long press that shows now (`CYLTagLongPressHost.showCallout`).
+    private var calloutView: CYLTagCalloutView?
+
+    /**
      * A long press on an item without moving it: `menu(_:didLongPressItemAt:)`, then this (onTagLongClick).
      */
     open var tagLongPressHandler: ((Int, CYLTag) -> Void)? {
@@ -1367,6 +1385,7 @@ open class CYLTagListView: UIView {
      * Reads everything from the data source again. Selections and expanded sections that are still in range are kept.
      */
     @objc open func reloadMenuData() {
+        dismissCallout()
         let source = menuDataSource
         if let tagSource = tagDataSourceStorage, source === tagSource {
             // A tag's look may have changed.
@@ -2467,6 +2486,7 @@ private extension CYLTagListView {
     }
 
     func handleTap(at indexPath: IndexPath) {
+        dismissCallout()
         guard isEnabled(at: indexPath) else {
             return
         }
@@ -2598,6 +2618,10 @@ private extension CYLTagListView {
            source.responds(to: #selector(CYLMenuDataSource.menuAccessibilityHintForItem(at:))) {
             cell.accessibilityHint = source.menuAccessibilityHintForItem?(at: indexPath)
         }
+        // A screen-reader user rarely long-presses: the subtitle is the hint when the data source gives none.
+        if cell.accessibilityHint == nil {
+            cell.accessibilityHint = subtitleForItem(at: indexPath)
+        }
     }
 
     /**
@@ -2684,14 +2708,10 @@ private extension CYLTagListView {
             pressedIndexPath = indexPath
             pressMoved = false
             pressStart = point
-            if canReorder && collectionView.beginInteractiveMovementForItem(at: indexPath) {
-                isReordering = true
-                menuDelegate?.menu?(self, didChangeReordering: true)
-                if selection.contains(indexPath) {
-                    reportSelectedDrag(at: indexPath)
-                }
-            } else {
-                reportLongPress(at: indexPath)
+            dismissCallout()
+            // The long-press action decides what this does (reordering picks the item up through beginReordering).
+            let action = longPressAction
+            if !action.canBegin(host: self, at: indexPath) || !action.begin(host: self, at: indexPath) {
                 pressedIndexPath = nil
             }
         case .changed:
@@ -2702,27 +2722,15 @@ private extension CYLTagListView {
                 collectionView.updateInteractiveMovementTargetPosition(point)
             }
         case .ended:
-            if isReordering {
-                isReordering = false
-                collectionView.endInteractiveMovement()
-                menuDelegate?.menu?(self, didChangeReordering: false)
-                if !pressMoved, let pressedIndexPath {
-                    reportLongPress(at: pressedIndexPath)
-                }
-            }
+            longPressAction.end(host: self, destination: collectionView.indexPathForItem(at: point), moved: pressMoved)
             pressedIndexPath = nil
         default:
-            if isReordering {
-                isReordering = false
-                movingItem = nil
-                collectionView.cancelInteractiveMovement()
-                menuDelegate?.menu?(self, didChangeReordering: false)
-            }
+            longPressAction.cancel(host: self)
             pressedIndexPath = nil
         }
     }
 
-    func reportLongPress(at indexPath: IndexPath) {
+    public func reportLongPress(at indexPath: IndexPath) {
         menuDelegate?.menu?(self, didLongPressItemAt: indexPath)
         if let tag = tag(at: indexPath) {
             tagLongPressHandler?(indexPath.item, tag)
@@ -2942,6 +2950,11 @@ extension CYLTagListView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegateFlowLayout
 
 extension CYLTagListView: UICollectionViewDelegateFlowLayout {
+
+    /// A scroll hides the long-press callout.
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        dismissCallout()
+    }
 
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: false)
@@ -3438,6 +3451,7 @@ extension CYLTagListView {
         guard window == nil else {
             return
         }
+        dismissCallout()
         if isReordering {
             isReordering = false
             movingItem = nil
@@ -3450,5 +3464,73 @@ extension CYLTagListView {
             smearTouchDown = nil
             menuDelegate?.menu?(self, didChangeSmearing: false)
         }
+    }
+}
+
+// MARK: - CYLTagLongPressHost
+
+extension CYLTagListView: CYLTagLongPressHost {
+
+    public func subtitleForItem(at indexPath: IndexPath) -> String? {
+        guard let source = menuDataSource,
+              source.responds(to: #selector(CYLMenuDataSource.menuSubtitleForItem(at:))) else {
+            return nil
+        }
+        return source.menuSubtitleForItem?(at: indexPath) ?? nil
+    }
+
+    public func showCallout(_ text: String, at indexPath: IndexPath) {
+        dismissCallout()
+        guard let cell = collectionView.cellForItem(at: indexPath) else {
+            return
+        }
+        let callout = CYLTagCalloutView(text: text)
+        // In the window, so a list that clips its content does not clip the bubble above its first row.
+        let container: UIView = window ?? self
+        callout.present(pointingAt: collectionView.convert(cell.frame, to: container), in: container)
+        calloutView = callout
+    }
+
+    public func dismissCallout() {
+        calloutView?.removeFromSuperview()
+        calloutView = nil
+    }
+
+    public func canReorderItem(at indexPath: IndexPath) -> Bool {
+        canReorder
+    }
+
+    public func beginReordering(at indexPath: IndexPath) -> Bool {
+        guard collectionView.beginInteractiveMovementForItem(at: indexPath) else {
+            return false
+        }
+        isReordering = true
+        menuDelegate?.menu?(self, didChangeReordering: true)
+        if selection.contains(indexPath) {
+            reportSelectedDrag(at: indexPath)
+        }
+        return true
+    }
+
+    public func endReordering(destination: IndexPath?, moved: Bool) {
+        guard isReordering else {
+            return
+        }
+        isReordering = false
+        collectionView.endInteractiveMovement()
+        menuDelegate?.menu?(self, didChangeReordering: false)
+        if !moved, let pressedIndexPath {
+            reportLongPress(at: pressedIndexPath)
+        }
+    }
+
+    public func cancelReordering() {
+        guard isReordering else {
+            return
+        }
+        isReordering = false
+        movingItem = nil
+        collectionView.cancelInteractiveMovement()
+        menuDelegate?.menu?(self, didChangeReordering: false)
     }
 }
