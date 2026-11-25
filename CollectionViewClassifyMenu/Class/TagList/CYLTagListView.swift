@@ -111,7 +111,28 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
      */
     var foldSize: CGSize = .zero
     var foldAtLeadingEdge = false
-    var horizontalInset: CGFloat = 0
+    /**
+     * The distances from the header's leading and trailing edges to the title and the controls.
+     */
+    var leadingInset: CGFloat = 0
+    var trailingInset: CGFloat = 0
+    /**
+     * The header band (`CYLMenuStyle.headerBackgroundColor`) and the divider, as distances from the header's own edges
+     * (left, right); `nil`: not shown.
+     */
+    var bandEdges: (left: CGFloat, right: CGFloat)? {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+    var separatorEdges: (left: CGFloat, right: CGFloat)? {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+    var separatorThickness: CGFloat = 0
+    @objc let bandView = UIView()
+    @objc let separatorView = UIView()
     var indicatorSize: CGSize = .zero
     var section = 0
     var accessoryView: UIView? {
@@ -155,6 +176,13 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         clearButton.contentHorizontalAlignment = .fill
         clearButton.contentVerticalAlignment = .fill
         clearButton.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
+        for decoration in [bandView, separatorView] {
+            decoration.isHidden = true
+            decoration.isAccessibilityElement = false
+            decoration.isUserInteractionEnabled = false
+            addSubview(decoration)
+        }
+        bandView.layer.cornerCurve = .continuous
         addSubview(clearButton)
         indicatorView.isHidden = true
         addSubview(indicatorView)
@@ -175,8 +203,9 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         super.layoutSubviews()
         let width = bounds.width
         let height = bounds.height
-        var trailing = width - horizontalInset
-        var leading = horizontalInset
+        layoutDecorations(width: width, height: height)
+        var trailing = width - trailingInset
+        var leading = leadingInset
         if !moreButton.isHidden {
             // A 44 pt touch target whose icon lines up with the trailing inset.
             let size = min(Self.moreButtonSize, height > 0 ? max(height, 30) : Self.moreButtonSize)
@@ -231,6 +260,25 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
                                            height: text.height)
             }
         }
+    }
+
+    /**
+     * The band behind the title and the divider at the bottom edge, inside the header's height.
+     */
+    private func layoutDecorations(width: CGFloat, height: CGFloat) {
+        bandView.isHidden = bandEdges == nil
+        if let edges = bandEdges {
+            bandView.frame = CGRect(x: edges.left, y: 0, width: max(0, width - edges.left - edges.right), height: height)
+        }
+        separatorView.isHidden = separatorEdges == nil
+        if let edges = separatorEdges {
+            let thickness = min(separatorThickness, height)
+            separatorView.frame = CGRect(x: edges.left, y: height - thickness, width: max(0, width - edges.left - edges.right),
+                                         height: thickness)
+        }
+        // Behind the title and the controls, the divider on the band.
+        sendSubviewToBack(separatorView)
+        sendSubviewToBack(bandView)
     }
 
     @objc private func clearTapped() {
@@ -1270,13 +1318,13 @@ open class CYLTagListView: UIView {
 
     public override init(frame: CGRect) {
         collectionView = UICollectionView(frame: CGRect(origin: .zero, size: frame.size),
-                                          collectionViewLayout: CYLCollectionViewLeftAlignedLayout())
+                                          collectionViewLayout: CYLTagListLayout())
         super.init(frame: frame)
         commonInit()
     }
 
     public required init?(coder: NSCoder) {
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: CYLCollectionViewLeftAlignedLayout())
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: CYLTagListLayout())
         super.init(coder: coder)
         commonInit()
     }
@@ -1357,6 +1405,9 @@ open class CYLTagListView: UIView {
         collectionView.register(CYLTagListFooterView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: ReuseIdentifier.footer)
+        (collectionView.collectionViewLayout as? CYLTagListLayout)?.cardProvider = { [weak self] section in
+            self?.cardSpec(forSection: section)
+        }
         addSubview(collectionView)
         longPressRecognizer.addTarget(self, action: #selector(handleLongPress(_:)))
         collectionView.addGestureRecognizer(longPressRecognizer)
@@ -1419,7 +1470,7 @@ open class CYLTagListView: UIView {
         let sectionRows = measured ? rows : rows(forWidths: sectionWidths, contentWidth: available)
         let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths)
         let header = headerHeight()
-        let insets = style.sectionInsets
+        let insets = tagInsets(atWidth: width)
         var height: CGFloat = 0
         for section in sectionRows.indices {
             var rowCount = sectionRows[section].count
@@ -1439,6 +1490,22 @@ open class CYLTagListView: UIView {
             }
         }
         return ceil(height) + titleHeight(forWidth: width)
+    }
+
+    /**
+     * The section column at the current width: the list width minus `sectionInsets` (x and width; y and height are 0). The card,
+     * the header band and the divider span it.
+     */
+    open func contentColumn(inSection section: Int) -> CGRect {
+        column(atWidth: collectionView.bounds.width)
+    }
+
+    /**
+     * The column the tags are laid in: `contentColumn(inSection:)` narrowed by the card's padding under `.insetGrouped`. Tag
+     * widths, rows, fold decisions, heights and frames all come from it.
+     */
+    open func tagColumn(inSection section: Int) -> CGRect {
+        tagColumn(atWidth: collectionView.bounds.width)
     }
 
     // MARK: - Tags
@@ -1835,7 +1902,7 @@ open class CYLTagListView: UIView {
             top = header.frame.minY
         } else if collectionView.numberOfItems(inSection: section) > 0,
                   let item = layout.layoutAttributesForItem(at: indexPath) {
-            top = item.frame.minY - style.sectionInsets.top
+            top = item.frame.minY - tagInsets(atWidth: collectionView.bounds.width).top
         }
         guard let top else {
             return
@@ -2052,8 +2119,8 @@ private extension CYLTagListView {
 private extension CYLTagListView {
 
     func applyStyleColors() {
-        backgroundColor = styleStorage.backgroundColor
-        collectionView.backgroundColor = styleStorage.backgroundColor
+        backgroundColor = styleStorage.resolvedBackgroundColor
+        collectionView.backgroundColor = styleStorage.resolvedBackgroundColor
         if let layout = collectionView.collectionViewLayout as? CYLCollectionViewLeftAlignedLayout,
            layout.rowAlignment != styleStorage.rowAlignment {
             layout.rowAlignment = styleStorage.rowAlignment
@@ -2198,8 +2265,97 @@ private extension CYLTagListView {
         return max(style.headerHeight, ceil(font.lineHeight) + 12, foldHeight)
     }
 
+    /**
+     * The one column function: the section column at the list width `width`, the list width minus `sectionInsets` (x and width; y and
+     * height are 0). The card, the header band and the divider span it.
+     */
+    func column(atWidth width: CGFloat) -> CGRect {
+        let insets = style.sectionInsets
+        return CGRect(x: insets.left, y: 0, width: max(0, width - insets.left - insets.right), height: 0)
+    }
+
+    /**
+     * The card's padding around the tags: `sectionContentInsets` under `.insetGrouped`, else none.
+     */
+    var cardInsets: UIEdgeInsets {
+        style.sectionStyle == .insetGrouped ? style.sectionContentInsets : .zero
+    }
+
+    /**
+     * The column the tags are laid in: the section column, narrowed by the card's padding. Every tag width, row count, fold decision,
+     * height and frame takes its width and x from here.
+     */
+    func tagColumn(atWidth width: CGFloat) -> CGRect {
+        let column = column(atWidth: width)
+        let card = cardInsets
+        return CGRect(x: column.minX + card.left, y: 0, width: max(0, column.width - card.left - card.right), height: 0)
+    }
+
+    /**
+     * The flow layout's section insets: the tag column's edges, and the section's top and bottom insets plus the card's.
+     */
+    func tagInsets(atWidth width: CGFloat) -> UIEdgeInsets {
+        let tagColumn = tagColumn(atWidth: width)
+        let card = cardInsets
+        return UIEdgeInsets(top: style.sectionInsets.top + card.top, left: tagColumn.minX,
+                            bottom: style.sectionInsets.bottom + card.bottom, right: width - tagColumn.maxX)
+    }
+
     func contentWidth(forWidth width: CGFloat) -> CGFloat {
-        max(0, width - style.sectionInsets.left - style.sectionInsets.right)
+        tagColumn(atWidth: width).width
+    }
+
+    func cardSpec(forSection section: Int) -> CYLTagListCardSpec? {
+        guard style.sectionStyle == .insetGrouped else {
+            return nil
+        }
+        return CYLTagListCardSpec(column: column(atWidth: collectionView.bounds.width), padding: cardInsets,
+                                  color: style.resolvedSectionBackgroundColor, glassTint: style.sectionBackgroundColor,
+                                  usesGlass: style.resolvedSectionBackgroundStyle == .liquidGlass, cornerRadius: style.sectionCornerRadius)
+    }
+
+    /**
+     * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside the card
+     * (`.insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
+     */
+    func headerEdgeInsets(atWidth width: CGFloat) -> (leading: CGFloat, trailing: CGFloat) {
+        let column = column(atWidth: width)
+        let rest = max(0, width - column.maxX)
+        if style.sectionStyle == .insetGrouped {
+            let card = cardInsets
+            return (column.minX + card.left, rest + card.right)
+        }
+        if style.headerBackgroundColor != nil {
+            return (column.minX + style.headerContentInsets.left, rest + style.headerContentInsets.right)
+        }
+        return (style.headerHorizontalInset, style.headerHorizontalInset)
+    }
+
+    /**
+     * Gives a header its insets, band and divider.
+     */
+    func configureHeaderSectionStyle(_ header: CYLTagListHeaderView) {
+        let width = collectionView.bounds.width
+        let edges = headerEdgeInsets(atWidth: width)
+        header.leadingInset = edges.leading
+        header.trailingInset = edges.trailing
+        let column = column(atWidth: width)
+        let rest = max(0, width - column.maxX)
+        if let color = style.headerBackgroundColor {
+            header.bandEdges = (column.minX, rest)
+            header.bandView.backgroundColor = color
+            header.bandView.layer.cornerRadius = style.headerCornerRadius
+        } else {
+            header.bandEdges = nil
+        }
+        if style.headerSeparatorStyle == .line, style.headerSeparatorThickness > 0 {
+            let insets = style.headerSeparatorInsets
+            header.separatorEdges = (column.minX + insets.left, rest + insets.right)
+            header.separatorThickness = style.headerSeparatorThickness
+            header.separatorView.backgroundColor = style.resolvedHeaderSeparatorColor
+        } else {
+            header.separatorEdges = nil
+        }
     }
 
     func widths(forContentWidth contentWidth: CGFloat) -> [[CGFloat]] {
@@ -2887,7 +3043,7 @@ extension CYLTagListView: UICollectionViewDataSource {
     private func configureHeader(_ header: CYLTagListHeaderView, section: Int) {
         let source = menuDataSource
         header.section = section
-        header.horizontalInset = style.headerHorizontalInset
+        configureHeaderSectionStyle(header)
         header.indicatorView.isHidden = style.headerIndicatorColor == nil
         header.indicatorView.backgroundColor = style.headerIndicatorColor
         header.indicatorSize = style.headerIndicatorSize
@@ -3018,7 +3174,7 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                                insetForSectionAt section: Int) -> UIEdgeInsets {
-        style.sectionInsets
+        tagInsets(atWidth: collectionView.bounds.width)
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,

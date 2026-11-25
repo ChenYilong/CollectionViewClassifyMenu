@@ -433,9 +433,118 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var sectionInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
 
     /**
-     * The list's background, white by default.
+     * The list's background, white by default. Under `CYLSectionStyle.insetGrouped` a list whose background the app never set
+     * shows the grouped background instead (`resolvedBackgroundColor`).
      */
-    open var backgroundColor = UIColor.white
+    open var backgroundColor = UIColor.white {
+        didSet {
+            backgroundColorWasSet = true
+        }
+    }
+
+    /**
+     * Whether the app ever assigned `backgroundColor` (the presets' own assignments count).
+     */
+    private(set) var backgroundColorWasSet = false
+
+    // MARK: Section card, header band and header divider (docs/tag-section-style.md)
+
+    /**
+     * `.plain` (the default) puts the tags on the list's background; `.insetGrouped` puts each section's tags inside a rounded
+     * card, UITableView's inset grouped look, with the header above it.
+     */
+    open var sectionStyle: CYLSectionStyle = .plain
+
+    /**
+     * The card's color; `nil` (the default) resolves to `UIColor.secondarySystemGroupedBackground` (white; #1C1C1E in dark mode).
+     */
+    open var sectionBackgroundColor: UIColor?
+
+    /**
+     * The card's background: `.flat` (the default) is the solid `sectionBackgroundColor` (or the system card color); `.liquidGlass`
+     * is the library's Liquid Glass with the card's corner radius, tinted with `sectionBackgroundColor` when it is set. Where the system
+     * draws no glass the card is flat (`resolvedSectionBackgroundStyle`). Independent of the tags' `backgroundStyle`.
+     */
+    open var sectionBackgroundStyle: CYLTagBackgroundStyle = .flat
+
+    /**
+     * The card background really drawn: `sectionBackgroundStyle`, or `.flat` where the system draws no Liquid Glass.
+     */
+    public var resolvedSectionBackgroundStyle: CYLTagBackgroundStyle {
+        sectionBackgroundStyle == .liquidGlass && CYLAnimatedItemView.isLiquidGlassActive() ? .liquidGlass : .flat
+    }
+
+    /**
+     * The card's corner radius, 10 by default (`CYLSectionStyleMetrics.cardCornerRadius`).
+     */
+    open var sectionCornerRadius: CGFloat = CYLSectionStyleMetrics.cardCornerRadius
+
+    /**
+     * The padding inside the card around the tags (`.insetGrouped`), 12 on every side by default. In a right-to-left layout
+     * `left` is the leading side, as in `sectionInsets`.
+     */
+    open var sectionContentInsets = UIEdgeInsets(top: CYLSectionStyleMetrics.cardPadding, left: CYLSectionStyleMetrics.cardPadding,
+                                                 bottom: CYLSectionStyleMetrics.cardPadding, right: CYLSectionStyleMetrics.cardPadding)
+
+    /**
+     * The header band's color; `nil` (the default) draws no band. `CYLSectionStyleColors.headerBand` (#EFEFF4, with a dark variant)
+     * is the usual one.
+     */
+    open var headerBackgroundColor: UIColor?
+
+    /**
+     * The header band's corner radius, 0 by default.
+     */
+    open var headerCornerRadius: CGFloat = 0
+
+    /**
+     * A plain header's title and fold control inset from the band's edges (`left` and `right` only), 12 by default; used only
+     * where a band is shown.
+     */
+    open var headerContentInsets = UIEdgeInsets(top: 0, left: CYLSectionStyleMetrics.headerBandPadding, bottom: 0,
+                                                right: CYLSectionStyleMetrics.headerBandPadding)
+
+    /**
+     * `.none` (the default) or `.line`: a line at the bottom of a section header, inside the header's height (it adds none).
+     */
+    open var headerSeparatorStyle: CYLHeaderSeparatorStyle = .none
+
+    /**
+     * The divider's color; `nil` (the default) resolves to `UIColor.separator` (light and dark).
+     */
+    open var headerSeparatorColor: UIColor?
+
+    /**
+     * The divider's thickness, 0.5 points by default (`CYLSectionStyleMetrics.separatorThickness`).
+     */
+    open var headerSeparatorThickness: CGFloat = CYLSectionStyleMetrics.separatorThickness
+
+    /**
+     * The divider's `left` and `right` insets from the section column's edges, 0 by default: the divider has the same edges as the
+     * card and the header band (the column's), never the title's x.
+     */
+    open var headerSeparatorInsets = UIEdgeInsets.zero
+
+    /**
+     * The list background as drawn: the grouped background where the style is `.insetGrouped` and the app never set `backgroundColor`.
+     */
+    public var resolvedBackgroundColor: UIColor {
+        sectionStyle == .insetGrouped && !backgroundColorWasSet ? CYLSectionStyleColors.groupedBackground : backgroundColor
+    }
+
+    /**
+     * The card's color as drawn.
+     */
+    public var resolvedSectionBackgroundColor: UIColor {
+        sectionBackgroundColor ?? CYLSectionStyleColors.card
+    }
+
+    /**
+     * The divider's color as drawn.
+     */
+    public var resolvedHeaderSeparatorColor: UIColor {
+        headerSeparatorColor ?? CYLSectionStyleColors.separator
+    }
 
     // MARK: Section headers
 
@@ -883,6 +992,19 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.lineSpacing = lineSpacing
         copy.sectionInsets = sectionInsets
         copy.backgroundColor = backgroundColor
+        copy.backgroundColorWasSet = backgroundColorWasSet
+        copy.sectionStyle = sectionStyle
+        copy.sectionBackgroundColor = sectionBackgroundColor
+        copy.sectionBackgroundStyle = sectionBackgroundStyle
+        copy.sectionCornerRadius = sectionCornerRadius
+        copy.sectionContentInsets = sectionContentInsets
+        copy.headerBackgroundColor = headerBackgroundColor
+        copy.headerCornerRadius = headerCornerRadius
+        copy.headerContentInsets = headerContentInsets
+        copy.headerSeparatorStyle = headerSeparatorStyle
+        copy.headerSeparatorColor = headerSeparatorColor
+        copy.headerSeparatorThickness = headerSeparatorThickness
+        copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
         copy.headerFont = headerFont
         copy.headerTextColor = headerTextColor
@@ -963,6 +1085,90 @@ public extension UIColor {
      */
     @objc(cyl_appTintColor)
     static let cylAppTint = UIColor(red: 42 / 255, green: 185 / 255, blue: 160 / 255, alpha: 1)
+}
+
+/**
+ * How a section's tags sit in the list (`CYLMenuStyle.sectionStyle`).
+ */
+@objc public enum CYLSectionStyle: Int {
+    /**
+     * The tags sit on the list's background (the default).
+     */
+    case plain = 0
+    /**
+     * The tags sit inside a rounded card, UITableView's inset grouped look, the header above it.
+     */
+    case insetGrouped
+}
+
+/**
+ * The line at the bottom of a section header (`CYLMenuStyle.headerSeparatorStyle`).
+ */
+@objc public enum CYLHeaderSeparatorStyle: Int {
+    /**
+     * No line (the default).
+     */
+    case none = 0
+    /**
+     * A line at the header's bottom edge.
+     */
+    case line
+}
+
+/**
+ * The named lengths of the section style, in points.
+ */
+public enum CYLSectionStyleMetrics {
+
+    /**
+     * The corner radius of a section card.
+     */
+    public static let cardCornerRadius: CGFloat = 10
+
+    /**
+     * The padding between a section card and its tags.
+     */
+    public static let cardPadding: CGFloat = 12
+
+    /**
+     * The padding between a header band and its title, leading and trailing.
+     */
+    public static let headerBandPadding: CGFloat = 12
+
+    /**
+     * The thickness of the header divider: one hairline.
+     */
+    public static let separatorThickness: CGFloat = 0.5
+}
+
+/**
+ * The colors of the section style: dynamic colors, resolved with the traits of the view that shows them.
+ */
+public enum CYLSectionStyleColors {
+
+    /**
+     * The section card: white; #1C1C1E in dark mode.
+     */
+    public static let card = UIColor.secondarySystemGroupedBackground
+
+    /**
+     * The header band: #EFEFF4 (the TagCollectionView header); #2C2C2E in dark mode.
+     */
+    public static let headerBand = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0x2C / 255, green: 0x2C / 255, blue: 0x2E / 255, alpha: 1)
+            : UIColor(red: 0xEF / 255, green: 0xEF / 255, blue: 0xF4 / 255, alpha: 1)
+    }
+
+    /**
+     * The list background under `.insetGrouped`: #F2F2F7; black in dark mode.
+     */
+    public static let groupedBackground = UIColor.systemGroupedBackground
+
+    /**
+     * The header divider: the system separator color.
+     */
+    public static let separator = UIColor.separator
 }
 
 /**
