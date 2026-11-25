@@ -1,5 +1,6 @@
 <view class="table">
   <view wx:for="{{rows}}" wx:key="row" class="cell">
-    <cyl-tag-cloud tags="{{item.tags}}" list-style="{{style}}" />
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view"
+                  tags="{{item.tags}}" list-style="{{style}}" />
   </view>
 </view>

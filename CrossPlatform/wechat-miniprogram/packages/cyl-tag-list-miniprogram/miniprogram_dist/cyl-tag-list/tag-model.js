@@ -1,5 +1,5 @@
 /**
- * The model of `cyl-tag-cloud`: the core's CYLTagListView filled the android-tagview way (`addTag(_:)`,
+ * The model of `cyl-tag-list`'s flat tags (the `tags` property): the core's CYLTagListView filled the android-tagview way (`addTag(_:)`,
  * `addTags(withTitles:)`, `CYLTag`), with the AndroidTagView container options (`colorTheme`, `allowsTapping`,
  * `removesItemsOnDelete`, `allowsReordering`, `defaultTagImage`, container border). It ports:
  *
@@ -16,6 +16,8 @@
 /** The iOS colors the samples use, as UIKit's light-mode values. */
 const { iconImage } = require('./editing-icons.js');
 const { cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemBackground } = require('../cyl-animated-item/cyl_animated_item_model');
+// The section list's named line limits and dark mode colors, shared with the flat tags.
+const { TITLE_MAX_LINES, DARK_TAG_BACKGROUND, DARK_TEXT_COLOR } = require('./model.js');
 
 const NAMED_COLORS = {
   clear: 'rgba(0, 0, 0, 0)',
@@ -94,8 +96,11 @@ function appearance() {
 
 const STATES = ['normal', 'selected', 'disabled'];
 
-/** `CYLMenuStyle()`: gray bordered tags, a green selection. */
-function defaultStyle() {
+/**
+ * `CYLMenuStyle()`: gray bordered tags, a green selection.
+ * @param {boolean} dark dark mode: the dark tag fill and white titles and header, as the section list's defaults
+ */
+function defaultStyle(dark = false) {
   const tint = rgba(42 / 255, 185 / 255, 160 / 255);
   const style = {
     normal: { ...appearance(), borderColor: white(0.82), borderWidth: HAIRLINE },
@@ -124,6 +129,8 @@ function defaultStyle() {
     imageFillsTagHeight: false,
     // A title too wide for its row wraps and the tag grows taller (AndroidTagView's tag_text_wrap).
     titleWraps: false,
+    // The most lines a title may take (cyl-tag-list's `titleMaxLines`); above one the title wraps, clamped there.
+    titleMaxLines: TITLE_MAX_LINES.single,
     // A shadow under each tag, as Android's elevation in px (tag_elevation): offset down by half, blurred by half.
     elevation: 0,
     // An image as the delete indicator instead of the title or the drawn cross (setCrossDrawable).
@@ -149,6 +156,12 @@ function defaultStyle() {
     headerTextColor: NAMED_COLORS.gray,
     headerHorizontalInset: 16,
   };
+  if (dark) {
+    style.normal.backgroundColor = DARK_TAG_BACKGROUND;
+    style.normal.textColor = DARK_TEXT_COLOR;
+    style.disabled.backgroundColor = DARK_TAG_BACKGROUND;
+    style.headerTextColor = DARK_TEXT_COLOR;
+  }
   return style;
 }
 
@@ -505,6 +518,18 @@ function displayedTitle(style, title) {
   return text;
 }
 
+/** Whether a title may take more than one line: `titleWraps` (every line) or `titleMaxLines` above one. */
+function titleWraps(style) {
+  return !!style.titleWraps || style.titleMaxLines > TITLE_MAX_LINES.single;
+}
+
+/** The clamp of a title limited to `titleMaxLines` lines (none for `titleWraps` or `TITLE_MAX_LINES.unlimited`). */
+function titleClamp(style) {
+  const lines = style.titleMaxLines;
+  if (style.titleWraps || !(lines > TITLE_MAX_LINES.single) || lines === TITLE_MAX_LINES.unlimited) return '';
+  return `; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: ${lines}; overflow: hidden`;
+}
+
 /** The line height of the system font (SF Pro: ascender + descender + leading ≈ 1.193 × the point size). */
 function lineHeight(fontSize) {
   return fontSize * 1.1934;
@@ -639,9 +664,10 @@ function renderTag(tag, index, context) {
   // Liquid Glass is cyl-animated-item's (the same call as cyl-tag-list): its CSS replaces the flat radius and color; a flat tag keeps its own.
   const glass = style.backgroundStyle === 'liquidGlass'
     ? cylAnimatedItemBackground('liquidGlass', background, a.cornerRadius, 0, '', false, state === 'selected' ? 1 : -1) : null;
+  const wraps = titleWraps(style);
   const parts = [
-    // A wrapping title (`titleWraps`) lets the tag grow taller than one line.
-    style.titleWraps ? `min-height: ${px(height)}; height: auto` : `height: ${px(height)}`,
+    // A wrapping title (`titleWraps`, `titleMaxLines`) lets the tag grow taller than one line.
+    wraps ? `min-height: ${px(height)}; height: auto` : `height: ${px(height)}`,
     `padding: ${px(insets.top)} ${px(insets.right)} ${px(insets.bottom)} ${px(insets.left)}`,
     glass && glass.glass ? glass.css : `border-radius: ${px(radius)}; background-color: ${background || 'transparent'}`,
   ];
@@ -659,11 +685,11 @@ function renderTag(tag, index, context) {
     shadows.push(`0 ${px(style.elevation / 2)} ${px(style.elevation)} rgba(0, 0, 0, 0.25)`);
     parts.push('overflow: visible');
   }
-  if (style.titleWraps) parts.push('white-space: normal');
+  if (wraps) parts.push('white-space: normal');
   if (shadows.length) parts.push(`box-shadow: ${shadows.join(', ')}`);
 
   const spacing = style.imageTitleSpacing;
-  // Editing (`isEditing`): every enabled tag shows its delete indicator, the cloud being one editable section.
+  // Editing (`isEditing`): every enabled tag shows its delete indicator, the flat tags being one editable section.
   const deletable = (editing || !!tag.isDeletable) && enabled;
   const leading = style.deleteIndicatorPlacement === 'leading';
   let deleteIndicator = null;
@@ -767,7 +793,7 @@ function renderTag(tag, index, context) {
     title,
     hasTitle: title.length > 0,
     titleStyle: `font-size: ${px(a.fontSize)}; color: ${a.textColor}${a.fontWeight ? `; font-weight: ${a.fontWeight}` : ''}`
-      + (style.titleWraps ? '; white-space: normal; word-break: break-word' : ''),
+      + (wraps ? '; white-space: normal; word-break: break-word' : '') + titleClamp(style),
     style: parts.join('; '),
     icon,
     deleteIndicator,
@@ -871,6 +897,8 @@ module.exports = {
   applyColors,
   styleForItem,
   displayedTitle,
+  titleWraps,
+  titleClamp,
   lineHeight,
   tagHeight,
   cornerRadius,

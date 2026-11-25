@@ -1,8 +1,8 @@
-// The tag cloud model (components/cyl-tag-cloud/model.js): the core's CYLMenuStyle presets, CYLTag, CYLTagColors,
+// The tag cloud model (cyl-tag-list/tag-model.js): the core's CYLMenuStyle presets, CYLTag, CYLTagColors,
 // CYLTagButton metrics and CYLTagListView's rows and selection (node --test).
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 
 test('colors are read as UIColor.cylMenuColor(from:) reads them (#RRGGBBAA is red, green, blue, alpha)', () => {
   assert.equal(model.color('#00BFFF'), 'rgb(0, 191, 255)');

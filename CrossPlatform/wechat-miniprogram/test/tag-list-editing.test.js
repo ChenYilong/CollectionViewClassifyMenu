@@ -1,12 +1,12 @@
 /**
- * cyl-tag-cloud's editing mode and cache, and the sixth container's options (iOS d6a94ce9 and 00760142; Android
+ * cyl-tag-list's flat tags: editing mode and cache, and the sixth container's options (iOS d6a94ce9 and 00760142; Android
  * CYLTagListEditingTest; HarmonyOS TagListEditing.test.ets): the store of every policy (in memory without `wx`, as in
  * node), delete indicators on every enabled tag while editing, the cross image, the elevation and wrapping titles.
  */
 const test = require('node:test');
 const assert = require('node:assert');
-const model = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-cloud/model.js');
-const { CYLTagListStore } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-cloud/cache.js');
+const model = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/tag-model.js');
+const { CYLTagListStore } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/cache.js');
 
 test('every cache policy saves, reads back from a new store, keeps an emptied section and removes all', () => {
   for (const policy of ['database', 'userDefaults', 'sandboxFile']) {
@@ -73,7 +73,7 @@ test('elevation draws a shadow and stops clipping; titleWraps lets the title wra
 });
 
 test('load policies order the cache and the server; a download is saved to the cache', () => {
-  const { loadSections } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-cloud/cache.js');
+  const { loadSections } = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/cache.js');
   const loads = (policy, cached, remote) => {
     const store = new CYLTagListStore('userDefaults', 'tag-cloud-editing.load');
     store.removeAllTitles();

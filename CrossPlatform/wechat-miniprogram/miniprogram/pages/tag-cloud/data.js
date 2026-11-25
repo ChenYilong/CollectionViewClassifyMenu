@@ -3,7 +3,7 @@
  * (the continents, a detailed tag, the styled tags) and the configuration of the lower list. No `wx` calls.
  */
 const { t } = require('../../utils/i18n.js');
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 
 /** The continents of android-tagview's sample. */
 const CONTINENTS = ['Asia', 'Africa', 'North America', 'South America', 'Antarctica', 'Europe', 'Australia'];

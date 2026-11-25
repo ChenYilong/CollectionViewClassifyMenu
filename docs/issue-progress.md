@@ -35,6 +35,25 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO → DONE (2026-11-25, `refactor/mini-program-tag-cloud-merge`, Windows session): merge the mini program `cyl-tag-cloud` into `cyl-tag-list` and delete it
+
+- Context and requirements (owner's decision, given through the lead session): merge `cyl-tag-cloud` into `cyl-tag-list`
+  as iOS / Android / HarmonyOS `CYLTagListView` already do (sections and a flat tag API), then delete `cyl-tag-cloud`
+  with no shim or alias. Test first: the cloud tests are the spec, retargeted to `cyl-tag-list` without removing an
+  assertion; the list's own tests stay unchanged. Move the cloud's pure modules (`git mv`), flat tags are one section;
+  drag and long press go through the list's `longPressActions` (`reorder`) with begin / changed / end / cancel phases;
+  switch every consumer page, then `git rm`; package 0.2.0 with a migration section. No push, no merge.
+- Result: flat tags are section 0 of `cyl-tag-list` (`tags` property and the tag methods, drawn by
+  `cyl-tag-list/tag-model.js`); the long press decides through `model.longPressDecision` (`reorder` begins where flat
+  tags can move); `cyl-tag-cloud` removed; package `cyl-tag-list-miniprogram` 0.2.0 (README "Migration from
+  cyl-tag-cloud"). `npm test` 197: 195 pass, 1 known failure (`animated-item` test 5, missing `cyl-rive-miniprogram`,
+  as before), 1 skip; after the follow-up 200 (with the git-ignored `cyl_components` installed: 200/200). Commits
+  503fdff9, bd053c4c, edb3b471, f7b0e7e1, bf18d44b and the follow-up (empty configuration, dark mode defaults and
+  `titleMaxLines` for flat tags). WeChat DevTools: `open_project_window` and `build_npm` succeeded once, then the
+  automator timed out and later calls returned `APPID_ERROR` (`get_user_appids` ETIMEDOUT): no page was seen, no
+  screenshot. Gaps: flat tags are drawn by `renderTag`, not `tagLayout` (no cyl-animated-item icons), and fold with
+  their own tail control (`foldchange` {canFold, expanded}), because the retargeted cloud tests pin both.
+
 ### TODO → DONE (2026-11-25, docs/tag-liquid-glass-screenshots, Mac session chenyilong-68): labeled iOS Liquid Glass screenshots (default style normal / selected / disabled, flat vs glass, contact tag editor selected)
 
 - Context: handed over by Mac-CollectionViewClassifyMenu 6de126 for Mac-CYLSearchViewController's items 3 and 4 (PR #36, branch feat/tag-liquid-glass, frozen). This branch is based on 7c64042e. The PR owner wants the shots on CYLTabBarController 3f2a5b99 (or 5b8869b2): the Podfiles are changed locally to build and restored before committing; fallback dea0951e would be noted here.

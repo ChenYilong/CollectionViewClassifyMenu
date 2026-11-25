@@ -1,5 +1,5 @@
 /**
- * The tag cloud's drawn icons, tinted: the fold control's chevron, the two editing icons of a renamable tag (iOS "square.and.pencil" and "xmark", in
+ * The flat tags' drawn icons (cyl-tag-list), tinted: the fold control's chevron, the two editing icons of a renamable tag (iOS "square.and.pencil" and "xmark", in
  * a horizontal `CYLAnimatedItemStackView`) and the section header's clear button (the core's `cyl_trash`). A Mini
  * Program `<image>` cannot tint a file, so each icon is an SVG in a data URI drawn in the color asked for.
  */

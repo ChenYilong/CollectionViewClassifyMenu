@@ -2,7 +2,7 @@
  * whilu/AndroidTagView's sample data and the five containers of content_main.xml, as CYLTagContainerSample.swift
  * (CYLTagContainerSampleData and makeContainer). No `wx` calls.
  */
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 
 /**
  * The last tag of list1: the running system, as the iOS sample ("Welcome to use iOS 27.2 CollectionViewClassifyMenu"):

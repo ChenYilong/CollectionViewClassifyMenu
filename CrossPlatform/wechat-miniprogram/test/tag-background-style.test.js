@@ -60,8 +60,8 @@ test('the default radius is the capsule constant in every style; a set radius cu
   assert.match(square.cellStyle, /border-radius:0px/);
 });
 
-test('cyl-tag-cloud reads backgroundStyle too: a glass tag cloud tag has the glass CSS, flat does not', () => {
-  const cloud = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-cloud/model.js');
+test('cyl-tag-list (flat tags) reads backgroundStyle too: a glass tag cloud tag has the glass CSS, flat does not', () => {
+  const cloud = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/tag-model.js');
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   const render = (dictionary) => cloud.renderTag({ title: 'Tag' }, 0, { listStyle: cloud.styleFromConfiguration(dictionary), theme: {} });
   assert.match(JSON.stringify(render({ backgroundStyle: 'liquidGlass' })), /backdrop-filter/);

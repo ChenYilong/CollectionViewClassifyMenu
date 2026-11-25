@@ -9,7 +9,8 @@
     </view>
     <view class="cancel" hover-class="cancel-hover" bindtap="cancel" aria-role="button" aria-label="{{cancelTitle}}">{{cancelTitle}}</view>
   </view>
-  <cyl-tag-cloud id="hot-list" tags="{{tags}}" list-style="{{style}}" shows-section-headers="{{true}}"
+  <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view"
+                id="hot-list" tags="{{tags}}" list-style="{{style}}" shows-section-headers="{{true}}"
                  section-title="{{sectionTitle}}" bind:tagtap="onTagTap" />
   <cyl-sample-toast id="toast" />
 </view>
