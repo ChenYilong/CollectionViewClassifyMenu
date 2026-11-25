@@ -571,6 +571,20 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var headerHeight: CGFloat = 36
 
     /**
+     * The most lines a section header's title may take: a title too wide for the room left of the fold / More / clear controls
+     * wraps onto more lines, up to this number, and the header grows taller (the title's height plus 12 pt, never below
+     * `headerHeight`); beyond it the title is truncated. Default `CYLHeaderTitleMaxLines.single` (1: the header frames are
+     * unchanged). `CYLHeaderTitleMaxLines.unlimited` shows every line. A value below 1 is 1.
+     */
+    open var headerMaxLines = CYLHeaderTitleMaxLines.single {
+        didSet {
+            if headerMaxLines < CYLHeaderTitleMaxLines.single {
+                headerMaxLines = CYLHeaderTitleMaxLines.single
+            }
+        }
+    }
+
+    /**
      * Header font, the system font of 14 points by default (scaled for Dynamic Type).
      */
     open var headerFont = UIFont.systemFont(ofSize: 14)
@@ -1102,6 +1116,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.headerSeparatorThickness = headerSeparatorThickness
         copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
+        copy.headerMaxLines = headerMaxLines
         copy.headerFont = headerFont
         copy.headerTextColor = headerTextColor
         copy.headerTextColorWasSet = headerTextColorWasSet
@@ -1322,6 +1337,22 @@ public enum CYLTagTitleMaxLines {
 
     /**
      * No limit: a title wraps onto as many lines as it needs (the MAX of the line counts).
+     */
+    public static let unlimited = Int.max
+}
+
+/**
+ * The line limits of a section header's title (`CYLMenuStyle.headerMaxLines`): named values, never a literal at a call site.
+ */
+public enum CYLHeaderTitleMaxLines {
+
+    /**
+     * One line, the default: a title too wide for its header is truncated.
+     */
+    public static let single = 1
+
+    /**
+     * No limit: a title wraps onto as many lines as it needs.
      */
     public static let unlimited = Int.max
 }

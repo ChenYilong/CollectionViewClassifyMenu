@@ -329,6 +329,11 @@ public enum CYLMenuStyleKey {
     public static let headerHeight = "headerHeight"
 
     /**
+     * The most lines a section header's title may take: a whole number, or "unlimited". Default 1.
+     */
+    public static let headerMaxLines = "headerMaxLines"
+
+    /**
      * A number.
      */
     public static let animationSpeed = "animationSpeed"
@@ -1217,6 +1222,13 @@ extension CYLMenuStyle {
         }
         if let value = Value.double(configuration[Key.lineSpacing]) {
             lineSpacing = value
+        }
+        if let value = configuration[Key.headerMaxLines] {
+            if let text = value as? String, text == "unlimited" {
+                headerMaxLines = CYLHeaderTitleMaxLines.unlimited
+            } else if let number = Value.number(value) {
+                headerMaxLines = number.intValue
+            }
         }
         if let value = Value.double(configuration[Key.headerHeight]) {
             headerHeight = value

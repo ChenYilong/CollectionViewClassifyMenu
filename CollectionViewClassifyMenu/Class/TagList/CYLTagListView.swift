@@ -1485,7 +1485,6 @@ open class CYLTagListView: UIView {
         let sectionWidths = measured ? itemWidths : widths(forContentWidth: available)
         let sectionRows = measured ? rows : rows(forWidths: sectionWidths, contentWidth: available)
         let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths)
-        let header = headerHeight()
         let insets = tagInsets(atWidth: width)
         var height: CGFloat = 0
         for section in sectionRows.indices {
@@ -1498,7 +1497,7 @@ open class CYLTagListView: UIView {
                 let withFold = sectionWidths[section] + [inlineFoldSize(inSection: section, expanded: true).width]
                 rowCount = rows(forWidths: [withFold], contentWidth: available).first?.count ?? 0
             }
-            height += header + insets.top + insets.bottom
+            height += headerHeight(forSection: section, width: width, canFold: foldable) + insets.top + insets.bottom
             height += heightOfRows(rowCount, rows: sectionRows[section],
                                    heights: section < sectionHeights.count ? sectionHeights[section] : [])
             if foldable && foldControlIsInFooter {
@@ -2282,6 +2281,43 @@ private extension CYLTagListView {
     }
 
     /**
+     * The header of `section` at the list width `width`: `headerHeight()`, or, when `CYLMenuStyle.headerMaxLines` allows more than
+     * one line, tall enough for the title wrapped to the room left of the indicator and the fold / More / clear controls, plus 12 pt
+     * of padding; never below `headerHeight()`. `canFold`: the section shows a fold control.
+     */
+    func headerHeight(forSection section: Int, width: CGFloat, canFold: Bool) -> CGFloat {
+        let base = headerHeight()
+        guard showsSectionHeaders, style.headerMaxLines != CYLHeaderTitleMaxLines.single,
+              let title = menuDataSource?.menuTitle(forSection: section), !title.isEmpty else {
+            return base
+        }
+        let source = menuDataSource
+        let edges = headerEdgeInsets(atWidth: width)
+        var room = width - edges.leading - edges.trailing
+        if style.headerIndicatorColor != nil {
+            room -= style.headerIndicatorSize.width + 8
+        }
+        if foldControlIsInHeader && canFold {
+            // The wider of the two states, so the header does not change height when the section folds.
+            let foldWidth = max(foldSize(expanded: false).width, foldSize(expanded: true).width)
+            room -= min(foldWidth, width / 2) - 6 + (foldControl.position == .headerLeading ? 4 : 8)
+        }
+        if showsMoreButton(inSection: section) {
+            let image = style.moreButtonImage ?? UIImage(systemName: "ellipsis")
+            let iconWidth = image?.size.width ?? 22
+            room -= CYLTagListHeaderView.moreButtonSize - floor((CYLTagListHeaderView.moreButtonSize - iconWidth) / 2) + 4
+        }
+        if source?.menuShowsClearButton?(forSection: section) == true {
+            room -= ceil(style.headerFont(for: traitCollection).lineHeight) + 8
+        }
+        let icon = source?.menuImage?(forSection: section) == nil ? CGSize.zero
+            : CGSize(width: CYLTagListHeaderView.iconSize, height: CYLTagListHeaderView.iconSize)
+        let text = CYLTagButton.height(forTitle: title, iconSize: icon, width: max(1, room), showsDeleteIndicator: false,
+                                       style: headerTitleStyle(), traitCollection: traitCollection)
+        return max(base, ceil(text) + 12)
+    }
+
+    /**
      * The one column function: the section column at the list width `width`, the list width minus `sectionInsets` (x and width; y and
      * height are 0). The card, the header band and the divider span it.
      */
@@ -3045,7 +3081,7 @@ extension CYLTagListView: UICollectionViewDataSource {
      * The look of a section's icon and title: the style's header font and color, a 16 pt icon 8 pt before the title,
      * at the leading edge.
      */
-    private func headerTitleStyle() -> CYLMenuStyle {
+    func headerTitleStyle() -> CYLMenuStyle {
         let titleStyle = CYLMenuStyle.sectionTitle(textColor: style.resolvedHeaderTextColor)
         for state in [UIControl.State.normal, .selected, .disabled] {
             titleStyle.appearance(for: state).font = style.headerFont
@@ -3053,6 +3089,7 @@ extension CYLTagListView: UICollectionViewDataSource {
         titleStyle.adjustsFontForContentSizeCategory = style.adjustsFontForContentSizeCategory
         titleStyle.imageSize = CGSize(width: CYLTagListHeaderView.iconSize, height: CYLTagListHeaderView.iconSize)
         titleStyle.imageTitleSpacing = 8
+        titleStyle.titleMaxLines = style.headerMaxLines
         return titleStyle
     }
 
@@ -3205,8 +3242,9 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                                referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let height = headerHeight()
-        return height > 0 ? CGSize(width: collectionView.bounds.width, height: height) : .zero
+        let width = collectionView.bounds.width
+        let height = headerHeight(forSection: section, width: width, canFold: canFoldSection(section))
+        return height > 0 ? CGSize(width: width, height: height) : .zero
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
