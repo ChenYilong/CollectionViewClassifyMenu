@@ -117,6 +117,8 @@ The list cannot see the host's background, so the library must make its built-in
   (clear or any) is kept in both; the tint on the default background is dark in light and light in dark; the chevron (Harmony) uses
   the tint.
 
+- Android (written statically, not yet run): the fourth fold control content `CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon` (raw 3, configuration string `"titleAndIconAlways"`; the aliases `iconAndTitle` / `titleAndIcon` keep meaning IconAndTitle) shows the title and the chevron always ("More" + chevron folded, "Less" + the chevron turned 180 degrees expanded; custom `title` / `collapseTitle` apply). Its size is the wider of the two titles plus the icon in every state (header, footer and inline tail control, `CYLTagFoldButton.foldControlWidth`); the header control shows only on a foldable section (`canFoldSection`; an unfoldable one reserves no width or height), its font is capped by `CYL_FOLD_CONTROL_MAX_FONT_SCALE`, its width is at most 40% of the header (`HEADER_FOLD_TITLE_AND_ICON_MAX_FRACTION`) and the section title truncates at the tail. Tests: `CYLFoldControlTitleAndIconTest`, `CYLTagListConfigurationTest`.
+
 ## Gates
 
 Every platform: all existing tests pass unchanged, plus one test that the default style gives the same frames as before.

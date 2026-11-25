@@ -98,6 +98,17 @@ class CYLTagListConfigurationTest {
     }
 
     @Test
+    fun titleAndIconAlwaysIsTheFourthContentAndTheOldAliasesKeepTheirMeaning() {
+        fun content(name: String) = CYLMenuFoldControl.foldControlWithConfiguration(
+            mapOf(CYLMenuFoldControlKeyPosition to "footer", CYLMenuFoldControlKeyContent to name))!!.content
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon, content("titleAndIconAlways"))
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle, content("titleAndIcon"))
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle, content("iconAndTitle"))
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "footer", CYLMenuFoldControlKeyContent to 3))!!.content)
+    }
+
+    @Test
     fun theTailFoldControlDefaultsToTheChevronIconOnly() {
         // A fold control made with no content is the chevron icon only, on every platform; the title is opt-in.
         assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon, CYLMenuFoldControl().content)

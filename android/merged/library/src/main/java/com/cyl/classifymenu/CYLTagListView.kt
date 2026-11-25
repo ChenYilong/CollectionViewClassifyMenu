@@ -44,6 +44,9 @@ private const val HEADER_GAP = 8f
 /** What a header's fold control takes beyond its own width (its 6 dp overhang is given back, then the 8 dp gap), dp. */
 private const val HEADER_FOLD_EXTRA = 2f
 
+/** The most of the header's width a title-and-icon fold control takes (the section title truncates in the rest). */
+private const val HEADER_FOLD_TITLE_AND_ICON_MAX_FRACTION = 0.4f
+
 /** The gap after a header's More button, dp. */
 private const val HEADER_MORE_GAP = 4f
 
@@ -779,7 +782,9 @@ open class CYLTagListView @JvmOverloads constructor(
      * the wrapped lines; `section` -1 (and the default one line) keeps the fixed height.
      */
     private fun headerHeight(section: Int = -1, width: Float = measuredContentWidth): Float {
-        val foldHeight = if (foldIsInHeader()) foldSize(false).height else 0f
+        // Only a foldable section shows the header control, so only it reserves height (an unknown section -1 keeps the control's).
+        val foldable = section !in rows.indices || canFoldRowCount(rows[section].size)
+        val foldHeight = if (foldIsInHeader() && foldable) foldSize(false).height else 0f
         if (!showsSectionHeaders) return foldHeight
         val font = listStyle.headerFontForTraitCollection()
         var text = ceil(CYLTagButton.fontLineHeight(font))
@@ -804,7 +809,7 @@ open class CYLTagListView @JvmOverloads constructor(
         if (style.headerIndicatorColor != null) room -= style.headerIndicatorSize.width + HEADER_GAP
         if (source?.menuImageForSection(section) != null) room -= HEADER_ICON_SIZE + HEADER_GAP
         if (foldIsInHeader() && section in rows.indices && canFoldRowCount(rows[section].size)) {
-            room -= max(foldSize(false).width, foldSize(true).width) + HEADER_FOLD_EXTRA
+            room -= headerFoldWidth(max(foldSize(false).width, foldSize(true).width), width) + HEADER_FOLD_EXTRA
         }
         if (source?.menuShowsClearButtonForSection(section) == true) {
             room -= ceil(CYLTagButton.fontLineHeight(style.headerFontForTraitCollection())) + HEADER_GAP
@@ -812,6 +817,10 @@ open class CYLTagListView @JvmOverloads constructor(
         if (showsMoreButtonIn(section)) room -= MORE_BUTTON_SIZE - floor((MORE_BUTTON_SIZE - 22f) / 2) + HEADER_MORE_GAP
         return max(0f, room)
     }
+
+    /** The width the header gives its fold control: `natural`, but at most 40% of the header `width` for the title-and-icon content. */
+    private fun headerFoldWidth(natural: Float, width: Float): Float =
+        if (_foldControl.content == CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon) min(natural, width * HEADER_FOLD_TITLE_AND_ICON_MAX_FRACTION) else min(natural, width / 2)
 
     /**
      * The section's column at the list width `width` dp: the list width minus `sectionInsets` (x and width; y and height are
@@ -2309,7 +2318,7 @@ open class CYLTagListView @JvmOverloads constructor(
                 trailing -= 4
             }
             if (foldButton.visibility == VISIBLE) {
-                val size = CYLSize(min(foldSize.width, width / 2), min(foldSize.height, height))
+                val size = CYLSize(headerFoldWidth(foldSize.width, width), min(foldSize.height, height))
                 val y = floor((height - size.height) / 2)
                 if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) {
                     place(foldButton, CYLRect(leading - 6, y, size.width, size.height))

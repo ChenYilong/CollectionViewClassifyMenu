@@ -126,7 +126,7 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
             val style = inlineStyleForFoldControl(foldControl, itemStyle)
             val image = if (foldControl.showsImageWhenExpanded(expanded)) foldControl.image else null
             val height = heightForStyle(style)
-            val width = widthForTitle(foldControl.titleWhenExpanded(expanded), image, style)
+            val width = foldControlWidth(foldControl, expanded, image, style)
             return CYLSize(max(height, ceil(width)), height)
         }
 
@@ -135,8 +135,19 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
         fun sizeForFoldControl(foldControl: CYLMenuFoldControl, expanded: Boolean): CYLSize {
             val style = styleForFoldControl(foldControl, null)
             val image = if (foldControl.showsImageWhenExpanded(expanded)) foldControl.image else null
-            val width = widthForTitle(foldControl.titleWhenExpanded(expanded), image, style)
+            val width = foldControlWidth(foldControl, expanded, image, style)
             return CYLSize(max(44f, ceil(width)), max(HEIGHT, heightForStyle(style)))
+        }
+
+        /**
+         * The width of the control's content in the given state. With the title always shown (`TitleAndIcon`) it is the wider of
+         * the two titles ("More" and "Less") with the icon, so the control does not change size between folded and expanded.
+         */
+        private fun foldControlWidth(foldControl: CYLMenuFoldControl, expanded: Boolean, image: android.graphics.drawable.Drawable?, style: CYLMenuStyle): Float {
+            if (foldControl.content != CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon) {
+                return widthForTitle(foldControl.titleWhenExpanded(expanded), image, style)
+            }
+            return max(widthForTitle(foldControl.titleWhenExpanded(false), image, style), widthForTitle(foldControl.titleWhenExpanded(true), image, style))
         }
     }
 }

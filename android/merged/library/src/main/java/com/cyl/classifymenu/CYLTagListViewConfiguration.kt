@@ -736,6 +736,7 @@ fun CYLMenuFoldControl.applyConfiguration(configuration: Map<String, Any?>, cont
     configuration[CYLMenuFoldControlKeyContent]?.let {
         content = enumValue(it, mapOf("iconandtitle" to CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
             "titleandicon" to CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
+            "titleandiconalways" to CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon,
             "title" to CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle,
             "icon" to CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon), CYLMenuFoldControlContent.values(), content)
     }
