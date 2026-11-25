@@ -25,10 +25,8 @@ means the section of that name here.
   grouped list. Use the tag list's section style:
   - One tag list; one section per group; the section title is the section header.
   - A tag shows only the **main title and the icon**. The secondary line (detail, subtitle) is not drawn in the tag.
-  - **A colorful backing plate behind the list.** An example tag list sits on a colorful backing plate (a gradient or an image
-    behind the list, set in ONE shared place per example), so that the Liquid Glass tags and the glass tail control are visible; on a
-    plain page glass looks like a flat tag. The plate is an example-side view: the library has no backdrop API (HarmonyOS and
-    Android glass blur what is behind the list; iOS glass is drawn by the glass view itself), so the example draws it, never the core.
+  - **Colourful page, library plate.** The page behind the list is colourful (a gradient or an image, set in one shared place per example). The library draws the plate itself, one Liquid Glass card per section (sectionStyle insetGrouped, the default, with sectionBackgroundStyle = liquidGlass); the example draws no plate.
+  - **Headers and icon colours.** Long headers use headerMaxLines 2 (a named constant); icon colours are static colours passed through the item style (menuStyleForItem + setIconColor), template images, never .alwaysOriginal.
   - **The tail fold control is itself a Liquid Glass tag**, icon only (the same tag background style as the other tags).
   - **Fold with the tail control, icon only.** Sections that have more rows than `defaultVisibleRows` fold with the core's **tail**
     fold control: the last tag of the section is the expand / collapse button and shows only the chevron icon, no More / Less text

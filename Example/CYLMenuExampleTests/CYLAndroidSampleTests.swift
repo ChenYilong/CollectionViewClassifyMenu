@@ -370,6 +370,22 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(CYLTag.badgeImage(text: "热", color: .red, diameter: 16).size, CGSize(width: 16, height: 16))
     }
 
+    /// An empty badge text draws a dot (as `CYLTagButton.badgeValue` ""), nil draws nothing, text keeps the round badge.
+    func testAnEmptyBadgeTextDrawsADotAndNilDrawsNothing() {
+        let dotTag = CYLTag(title: "Messages")
+        dotTag.badgeText = ""
+        let textTag = CYLTag(title: "Hot")
+        textTag.badgeText = "热"
+        let plainTag = CYLTag(title: "Plain")
+        let dataSource = CYLTagDataSource(tags: [dotTag, textTag, plainTag])
+        let dot = dataSource.menuImageForItem(at: IndexPath(item: 0, section: 0))
+        XCTAssertNotNil(dot)
+        XCTAssertEqual(CYLTag.badgeDotDiameter, 8)
+        XCTAssertEqual(CYLTag.badgeDotImage(color: .systemRed, canvas: 4).size, CGSize(width: 4, height: 4), "the dot never exceeds its canvas")
+        XCTAssertNotNil(dataSource.menuImageForItem(at: IndexPath(item: 1, section: 0)))
+        XCTAssertNil(dataSource.menuImageForItem(at: IndexPath(item: 2, section: 0)))
+    }
+
     // MARK: Word picker (选词填入)
 
     /// A pan recognizer whose state and location a test sets, to drive `allowsSmearSelection`.

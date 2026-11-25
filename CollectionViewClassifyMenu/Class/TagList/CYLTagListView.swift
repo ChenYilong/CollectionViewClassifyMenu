@@ -2951,13 +2951,6 @@ private extension CYLTagListView {
         }
     }
 
-    public func reportLongPress(at indexPath: IndexPath) {
-        menuDelegate?.menu?(self, didLongPressItemAt: indexPath)
-        if let tag = tag(at: indexPath) {
-            tagLongPressHandler?(indexPath.item, tag)
-        }
-    }
-
     func reportSelectedDrag(at indexPath: IndexPath) {
         menuDelegate?.menu?(self, didBeginDraggingSelectedItemAt: indexPath)
         if let tag = tag(at: indexPath) {
@@ -3693,6 +3686,13 @@ extension CYLTagListView {
 // MARK: - CYLTagLongPressHost
 
 extension CYLTagListView: CYLTagLongPressHost {
+
+    public func reportLongPress(at indexPath: IndexPath) {
+        menuDelegate?.menu?(self, didLongPressItemAt: indexPath)
+        if let tag = tag(at: indexPath) {
+            tagLongPressHandler?(indexPath.item, tag)
+        }
+    }
 
     public func subtitleForItem(at indexPath: IndexPath) -> String? {
         guard let source = menuDataSource,

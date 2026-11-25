@@ -33,6 +33,15 @@ final class CYLIconContrastTests: CYLMenuExampleTestCase {
         return CYLIconContrast.contrastRatio(luminance, CYLIconContrast.glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha))
     }
 
+    /// The contrast against the bright-backdrop reference (the glass over the saturated blue).
+    private func brightContrast(_ color: UIColor, glassTint: UIColor? = nil, tintAlpha: CGFloat? = nil) -> CGFloat {
+        let c = rgb(color)
+        let luminance = CYLTintContrast.relativeLuminance(red: c.r, green: c.g, blue: c.b)
+        let reference = CYLIconContrast.glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha,
+                                                                over: CYLIconContrast.brightBackdropReference)
+        return CYLIconContrast.contrastRatio(luminance, reference)
+    }
+
     /// A system color resolved with the light traits, as a static color.
     private func staticLight(_ color: UIColor) -> UIColor { color.resolvedColor(with: light) }
 
@@ -44,14 +53,26 @@ final class CYLIconContrastTests: CYLMenuExampleTestCase {
         let reference = CYLIconContrast.glassReferenceLuminance(glassTint: nil, tintAlpha: nil)
         XCTAssertEqual(reference, CYLTintContrast.relativeLuminance(red: 36 / 255, green: 36 / 255, blue: 36 / 255), accuracy: 0.002)
         XCTAssertEqual(CYLIconContrast.glassReferenceLuminance(glassTint: .clear, tintAlpha: nil), reference, "alpha 0 is the frosted default")
+        // The bright reference: sRGB (0.29, 0.48, 0.88); the frosted glass is white at 0.14 over it.
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        CYLIconContrast.brightBackdropReference.getRed(&r, green: &g, blue: &b, alpha: &a)
+        XCTAssertEqual(r, 0.29, accuracy: 0.0001)
+        XCTAssertEqual(g, 0.48, accuracy: 0.0001)
+        XCTAssertEqual(b, 0.88, accuracy: 0.0001)
+        XCTAssertEqual(CYLIconContrast.lightnessStep, 0.005)
+        let over = CYLTintContrast.relativeLuminance(red: 0.29 * 0.86 + 0.14, green: 0.48 * 0.86 + 0.14, blue: 0.88 * 0.86 + 0.14)
+        XCTAssertEqual(CYLIconContrast.glassReferenceLuminance(glassTint: nil, tintAlpha: nil, over: CYLIconContrast.brightBackdropReference),
+                       over, accuracy: 0.001)
+        XCTAssertGreaterThan(over, reference, "the bright backdrop is the lighter reference")
     }
 
-    func testStaticTealRedAndBlueReach3To1OnTheFrostedReferenceWithTheirHue() {
+    func testStaticTealRedAndBlueReach3To1OnBothReferencesWithTheirHue() {
         for system in [UIColor.systemTeal, .systemRed, .systemBlue] {
             let icon = staticLight(system)
             let lifted = CYLIconContrast.liftedIconColor(icon, glassTint: nil, tintAlpha: nil)
-            XCTAssertGreaterThanOrEqual(contrast(lifted), CYLIconContrast.minimumContrastRatio - 0.01, "\(system)")
-            XCTAssertEqual(hue(lifted), hue(icon), accuracy: 0.01, "hue kept: \(system)")
+            XCTAssertGreaterThanOrEqual(contrast(lifted), CYLIconContrast.minimumContrastRatio - 0.01, "dark reference: \(system)")
+            XCTAssertGreaterThanOrEqual(brightContrast(lifted), CYLIconContrast.minimumContrastRatio - 0.01, "bright reference: \(system)")
+            XCTAssertEqual(hue(lifted), hue(icon), accuracy: 0.02, "hue kept: \(system)")
             let lightness = CYLIconContrast.hslFromRGB(red: rgb(lifted).r, green: rgb(lifted).g, blue: rgb(lifted).b).lightness
             XCTAssertLessThanOrEqual(lightness, 1)
         }
@@ -62,10 +83,12 @@ final class CYLIconContrastTests: CYLMenuExampleTestCase {
         let lifted = CYLIconContrast.liftedIconColor(darkTeal, glassTint: nil, tintAlpha: nil)
         XCTAssertLessThan(contrast(darkTeal), 3)
         XCTAssertGreaterThanOrEqual(contrast(lifted), 2.99)
+        XCTAssertGreaterThanOrEqual(brightContrast(lifted), 2.99)
         XCTAssertEqual(hue(lifted), hue(darkTeal), accuracy: 0.01)
         // Black cannot keep a hue: it is lifted to a gray, capped at white.
         let black = CYLIconContrast.liftedIconColor(.black, glassTint: nil, tintAlpha: nil)
         XCTAssertGreaterThanOrEqual(contrast(black), 2.99)
+        XCTAssertGreaterThanOrEqual(brightContrast(black), 2.99)
         XCTAssertLessThanOrEqual(rgb(black).r, 1)
     }
 
@@ -73,9 +96,11 @@ final class CYLIconContrastTests: CYLMenuExampleTestCase {
         let tint = UIColor(red: 0.2, green: 0.6, blue: 1, alpha: 0.8)
         let lifted = CYLIconContrast.liftedIconColor(staticLight(.systemBlue), glassTint: tint, tintAlpha: nil)
         XCTAssertGreaterThanOrEqual(contrast(lifted, glassTint: tint), 2.99)
+        XCTAssertGreaterThanOrEqual(brightContrast(lifted, glassTint: tint), 2.99)
         // The selected tag tints at alpha 1: a brighter reference, so the lift is at least as strong.
         let selected = CYLIconContrast.liftedIconColor(staticLight(.systemBlue), glassTint: tint, tintAlpha: 1)
         XCTAssertGreaterThanOrEqual(contrast(selected, glassTint: tint, tintAlpha: 1), 2.99)
+        XCTAssertGreaterThanOrEqual(brightContrast(selected, glassTint: tint, tintAlpha: 1), 2.99)
         let expected = CYLTintContrast.relativeLuminance(red: 0.2 * 0.6, green: 0.6 * 0.6, blue: 0.6)
         XCTAssertEqual(CYLIconContrast.glassReferenceLuminance(glassTint: tint, tintAlpha: nil), expected, accuracy: 0.001)
     }
@@ -83,8 +108,10 @@ final class CYLIconContrastTests: CYLMenuExampleTestCase {
     func testUnchangedCases() {
         // Already passing: returned as the same color.
         XCTAssertEqual(CYLIconContrast.liftedIconColor(.white, glassTint: nil, tintAlpha: nil), .white)
-        let bright = UIColor(red: 0.6, green: 0.9, blue: 1, alpha: 1)
+        // A near-white passes BOTH references.
+        let bright = UIColor(red: 0.95, green: 0.97, blue: 1, alpha: 1)
         XCTAssertGreaterThanOrEqual(contrast(bright), 3)
+        XCTAssertGreaterThanOrEqual(brightContrast(bright), 3)
         XCTAssertTrue(CYLIconContrast.liftedIconColor(bright, glassTint: nil, tintAlpha: nil) === bright)
         // Dynamic (light and dark differ): unchanged, the system picks the dark value.
         XCTAssertTrue(CYLIconContrast.liftedIconColor(.systemTeal, glassTint: nil, tintAlpha: nil) === UIColor.systemTeal)
@@ -93,6 +120,15 @@ final class CYLIconContrastTests: CYLMenuExampleTestCase {
         // A dynamic color that is the same in both modes counts as static.
         let same = UIColor { _ in UIColor(red: 0, green: 0.2, blue: 0.2, alpha: 1) }
         XCTAssertFalse(CYLIconContrast.liftedIconColor(same, glassTint: nil, tintAlpha: nil) === same)
+    }
+
+    func testWhiteIsTheCapWhenAnHueCannotReach3To1OnTheBrightReference() {
+        // A very light glass tint over the bright blue leaves a reference no icon below white may beat; the lift never goes above white.
+        let tint = UIColor(white: 1, alpha: 1)
+        let lifted = CYLIconContrast.liftedIconColor(staticLight(.systemTeal), glassTint: tint, tintAlpha: 1)
+        XCTAssertLessThanOrEqual(rgb(lifted).r, 1)
+        XCTAssertLessThanOrEqual(rgb(lifted).g, 1)
+        XCTAssertLessThanOrEqual(rgb(lifted).b, 1)
     }
 
     func testThePureFunctionGivesTheSameOutputForTheSameInput() {
