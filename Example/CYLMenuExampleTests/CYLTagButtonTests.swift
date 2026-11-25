@@ -474,4 +474,107 @@ final class CYLTagButtonTests: XCTestCase {
         XCTAssertEqual(explicit.imageView.tintColor?.resolvedColor(with: explicit.traitCollection), UIColor.systemTeal.resolvedColor(with: explicit.traitCollection), "an explicit icon color wins over the tag built-in")
         XCTAssertEqual(explicit.titleLabel.textColor, CYLTagAppearance.defaultTextColor, "the title is not affected by the icon color")
     }
+
+    // MARK: - Liquid Glass tint: an unset background is ignored
+
+    private func glassTint(of button: CYLTagButton, _ traits: UITraitCollection) -> UIColor? {
+        guard #available(iOS 26.0, *), let glass = (button.liquidGlassView as? UIVisualEffectView)?.effect as? UIGlassEffect else { return nil }
+        return glass.tintColor?.resolvedColor(with: traits)
+    }
+
+    func testGlassIgnoresAnUnsetBackgroundAndUsesTheFrostedDefault() throws {
+        guard #available(iOS 26.0, *) else { throw XCTSkip("Liquid Glass needs iOS 26") }
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
+        let light = UITraitCollection(userInterfaceStyle: .light)
+        let dark = UITraitCollection(userInterfaceStyle: .dark)
+        let style = CYLMenuStyle()
+        style.backgroundStyle = .liquidGlass
+        let normal = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        XCTAssertNil(normal.itemBackgroundColor, "unset background: nothing handed to the glass")
+        XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: normal, light)), CYLMenuFixtures.rgb(UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: 1)))
+        var alpha: CGFloat = 0
+        glassTint(of: normal, light)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        XCTAssertEqual(alpha, 0.5, accuracy: 0.01)
+        XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: normal, dark)), CYLMenuFixtures.rgb(.white))
+        glassTint(of: normal, dark)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        XCTAssertEqual(alpha, 0.14, accuracy: 0.01)
+        let disabled = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        disabled.isEnabled = false
+        XCTAssertNil(disabled.itemBackgroundColor)
+        // Reset back to unset is unset again.
+        style.normalAppearance.backgroundColor = .red
+        normal.style = style
+        XCTAssertEqual(normal.itemBackgroundColor, .red)
+        style.normalAppearance.backgroundColor = nil
+        normal.style = style
+        XCTAssertNil(normal.itemBackgroundColor)
+    }
+
+    func testGlassTintsWithAnExplicitBackgroundAndASelectedTagKeepsAlphaOne() throws {
+        guard #available(iOS 26.0, *) else { throw XCTSkip("Liquid Glass needs iOS 26") }
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
+        let light = UITraitCollection(userInterfaceStyle: .light)
+        let style = CYLMenuStyle()
+        style.backgroundStyle = .liquidGlass
+        style.normalAppearance.backgroundColor = UIColor.blue.withAlphaComponent(0.4)
+        let normal = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        XCTAssertEqual(normal.itemBackgroundColor, UIColor.blue.withAlphaComponent(0.4))
+        var alpha: CGFloat = 0
+        glassTint(of: normal, light)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        XCTAssertEqual(alpha, 0.4 * 0.75, accuracy: 0.01, "an explicit color tints at alpha x 0.75, as before")
+        let selected = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        selected.isSelected = true
+        XCTAssertNotNil(selected.itemBackgroundColor, "the selected tint is explicit")
+        XCTAssertEqual(selected.itemGlassTintAlpha, 1)
+        glassTint(of: selected, light)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        XCTAssertEqual(alpha, 1, accuracy: 0.01, "the selected tag's tint alpha stays 1")
+        // The pressed color is explicit too.
+        style.highlightedBackgroundColor = .green
+        let pressed = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        pressed.isHighlighted = true
+        XCTAssertEqual(pressed.itemBackgroundColor, .green)
+    }
+
+    func testFlatTagsStillResolveTheBuiltInBackground() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
+        for look in [CYLMenuStyle(), CYLMenuStyle.tagCloud(), CYLMenuStyle.tagContainer(), CYLMenuStyle.wordPicker(), CYLMenuStyle.gridStyle(itemsPerRow: 3),
+                     CYLMenuStyle.classifyMenuTag(.chengNi), CYLMenuStyle.classifyMenuTag(.general)] {
+            XCTAssertEqual(look.backgroundStyle, .flat)
+            let button = CYLMenuFixtures.tagButton(title: "A", image: nil, style: look)
+            XCTAssertEqual(button.itemBackgroundColor, look.normalAppearance.backgroundColor, "flat: the effective color, set or built-in")
+        }
+        let plain = CYLMenuFixtures.tagButton(title: "A", image: nil, style: CYLMenuStyle())
+        for traits in [UITraitCollection(userInterfaceStyle: .light), UITraitCollection(userInterfaceStyle: .dark)] {
+            XCTAssertEqual(plain.itemBackgroundColor?.resolvedColor(with: traits), CYLTagAppearance.defaultBackgroundColor.resolvedColor(with: traits))
+        }
+        // Glass requested where the system draws none: flat, so the built-in color still fills the tag.
+        CYLAnimatedItemView.liquidGlassActiveOverride = false
+        let style = CYLMenuStyle()
+        style.backgroundStyle = .liquidGlass
+        let fallback = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        XCTAssertEqual(fallback.itemBackgroundColor, CYLTagAppearance.defaultBackgroundColor)
+    }
+
+    /// WCAG contrast of the default 0.25-gray text (dark: label) on the frosted default tint over matching backdrops (the tint composited
+    /// over the backdrop; the real glass adds blur and highlights that this ignores). Mismatched ones (light text mode over black, dark over white) are not asserted.
+    func testDefaultTextContrastOnTheFrostedTint() {
+        func linear(_ value: CGFloat) -> CGFloat { value <= 0.03928 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4) }
+        func luminance(_ c: [CGFloat]) -> CGFloat { 0.2126 * linear(c[0]) + 0.7152 * linear(c[1]) + 0.0722 * linear(c[2]) }
+        func contrast(_ a: [CGFloat], _ b: [CGFloat]) -> CGFloat {
+            let (x, y) = (luminance(a), luminance(b))
+            return (max(x, y) + 0.05) / (min(x, y) + 0.05)
+        }
+        func over(_ tint: [CGFloat], _ alpha: CGFloat, _ backdrop: [CGFloat]) -> [CGFloat] { (0..<3).map { tint[$0] * alpha + backdrop[$0] * (1 - alpha) } }
+        let blue: [CGFloat] = [0, 122 / 255, 1], white: [CGFloat] = [1, 1, 1], black: [CGFloat] = [0, 0, 0]
+        let lightTint: [CGFloat] = [225 / 255, 222 / 255, 220 / 255], gray: [CGFloat] = [0.25, 0.25, 0.25]
+        for (name, backdrop) in [("blue", blue), ("white", white)] {
+            XCTAssertGreaterThanOrEqual(contrast(gray, over(lightTint, 0.5, backdrop)), 3, "light text on frosted tint over \(name)")
+        }
+        for (name, backdrop) in [("blue", blue), ("black", black)] {
+            XCTAssertGreaterThanOrEqual(contrast(white, over(white, 0.14, backdrop)), 3, "dark label on frosted tint over \(name)")
+        }
+    }
 }

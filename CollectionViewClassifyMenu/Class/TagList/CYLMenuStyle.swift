@@ -69,7 +69,7 @@ import CYLTabBarController
      */
     case flat = 0
     /**
-     * A Liquid Glass material behind the content, tinted with the state's `backgroundColor`, drawn only where the system
+     * A Liquid Glass material behind the content, tinted with the state's EXPLICIT `backgroundColor` (an unset one is ignored: frosted default), drawn only where the system
      * draws Liquid Glass (`CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and later, the rule of CYLTabBarController);
      * elsewhere the style is ignored and the tag stays flat.
      */
@@ -350,8 +350,8 @@ open class CYLMenuStyle: NSObject, NSCopying {
 
     /**
      * The tag background: `.flat` (the default) is the solid color of each state's appearance; `.liquidGlass` draws a
-     * Liquid Glass material behind the content, tinted with the state's `backgroundColor` and clipped to the corner
-     * radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     * Liquid Glass material behind the content, tinted with the state's explicit `backgroundColor` (an unset one is ignored, so the
+     * backdrop shows through the component's frosted default) and clipped to the corner radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
      */
     open var backgroundStyle: CYLTagBackgroundStyle = .flat
 

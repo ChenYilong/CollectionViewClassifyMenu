@@ -31,7 +31,7 @@ radius, `min(radius, height / 2)`).
 | Type | `CYLTagBackgroundStyle`: `flat` (default), `liquidGlass`. |
 | Where | A property of `CYLMenuStyle` (next to `tagContentAlignment`), copied with the style. |
 | Config key | `"backgroundStyle": "flat" \| "liquidGlass"`; an unknown value is `flat`. |
-| Tint | Each state's existing `backgroundColor` is the glass tint; no new appearance field. |
+| Tint | Under Liquid Glass only an EXPLICIT state `backgroundColor` tints the glass (the selected tag's tint, alpha 1; a color set by a preset or the app; the pressed color). An UNSET one is ignored: the built-in white is not handed to the glass, so the component's frosted default shows (light 225, 222, 220 at alpha 0.5; dark white at 0.14) and the backdrop shows through. A cleared (alpha 0) color means the same. Flat tags are unchanged (the effective color: explicit, else the built-in). Still no new appearance field. |
 | Effective style | One function, `resolvedBackgroundStyle`: `liquidGlass` only when the platform's gate below is open; otherwise `flat` and every other parameter is unchanged. |
 | Radius | The glass is clipped to the resolved corner radius (PR #35: `min(radius, height / 2)`). |
 
@@ -64,7 +64,7 @@ blur or capsule code in this repository (grep clean), tests, labeled screenshots
 ## Interface (unchanged names)
 
 `CYLTagBackgroundStyle` `flat` (default) / `liquidGlass`; `CYLMenuStyle.backgroundStyle`, `resolvedBackgroundStyle`, `minimumTagSize`;
-config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's `backgroundColor` tints the glass.
+config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's explicit `backgroundColor` tints the glass (an unset one is ignored: frosted default).
 
 ## Status (2026-11-24): code on every platform, nothing tested on devices yet
 

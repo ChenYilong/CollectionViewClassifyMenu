@@ -1084,9 +1084,12 @@ open class CYLTagButton: CYLAnimatedItemView {
         let pressed = isHighlighted && state != .disabled && style.highlightedBackgroundColor != nil
         // Pressed, as android-tagview's layoutColorPress.
         let background = pressed ? style.highlightedBackgroundColor : appearance.backgroundColor
-        // The background is CYLAnimatedItemView's: flat color, or Liquid Glass tinted with it where the system draws it.
+        // The background is CYLAnimatedItemView's: flat color, or Liquid Glass tinted with it where the system draws it. Where glass is drawn only an
+        // EXPLICIT color tints it: an unset one (the built-in white, which would hide the backdrop) is nil, and the view uses its frosted default.
+        // The pressed color is always explicit. Flat (also where the system draws no glass) keeps the effective color.
+        let drawsGlass = style.resolvedBackgroundStyle == .liquidGlass
         itemBackgroundStyle = style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat
-        itemBackgroundColor = background
+        itemBackgroundColor = drawsGlass && !pressed ? appearance.explicitBackgroundColor : background
         // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
         itemGlassTintAlpha = state == .selected ? 1 : nil
         backgroundImageView.image = appearance.backgroundImage
