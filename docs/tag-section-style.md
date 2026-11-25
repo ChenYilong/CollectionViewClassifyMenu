@@ -169,7 +169,7 @@ source and draws only its tint and rim (docs/tag-liquid-glass.md). `CYLTagListVi
 - Platforms where it is N/A, and why: iOS (`UIGlassEffect` samples what is behind it), HarmonyOS (ArkUI `backdropBlur` samples
   what is behind the component), the mini program (CSS `backdrop-filter` samples what is behind the element) and the cross-platform
   wrappers (they use the native views).
-- Mechanism: CYLTabBarController `8dba2b97` makes `CYLAnimatedItemView.itemGlassBackdropSource` public; the list sets it on each host.
+- Mechanism: CYLTabBarController `08343e9f` makes `CYLAnimatedItemView.itemGlassBackdropSource` public; the list sets it on each host.
   Tests: `CYLTagListBackdropSourceTest` (default null reaches nothing; set reaches every tag, the tail fold cell and the boards; a
   reloaded list takes it; null restores; an ancestor is passed through; flat tags unaffected; a tag outside the list is unaffected).
   Written statically, not yet run.

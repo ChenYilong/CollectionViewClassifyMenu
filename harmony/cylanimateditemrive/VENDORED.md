@@ -8,7 +8,7 @@ CYLTabBarController ("Shared HarmonyOS Rive engine"), says an unpublished Harmon
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`8dba2b978fb3bc44847e84adcfd0bb48e84d0a82`](https://github.com/ChenYilong/CYLTabBarController/tree/8dba2b978fb3bc44847e84adcfd0bb48e84d0a82/CrossPlatform/harmonyos-cyltabbar/cylanimateditemrive) (2026-11-25; was `6f563ef4`, `230b5266`, `3074c51d`, first vendored 2026-11-23; `cylanimateditem_rive` depends on it) |
+| Commit | [`08343e9f76d609e1a8c0b45c01fd31a0b7a1e5bc`](https://github.com/ChenYilong/CYLTabBarController/tree/08343e9f76d609e1a8c0b45c01fd31a0b7a1e5bc/CrossPlatform/harmonyos-cyltabbar/cylanimateditemrive) (2026-11-25; was `6f563ef4`, `230b5266`, `3074c51d`, first vendored 2026-11-23; `cylanimateditem_rive` depends on it) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditemrive` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
 | Changes | None. Only this file (`VENDORED.md`) was added; `README.md` is upstream's own. |
