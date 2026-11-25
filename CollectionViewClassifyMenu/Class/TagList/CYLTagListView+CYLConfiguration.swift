@@ -136,7 +136,8 @@ public enum CYLMenuFoldControlKey {
     public static let position = "position"
 
     /**
-     * A `CYLMenuFoldControlContent` raw value, or "iconAndTitle" ("titleAndIcon"), "title", "icon".
+     * A `CYLMenuFoldControlContent` raw value, or "iconAndTitle" ("titleAndIcon"), "title", "icon",
+     * "titleAndIconAlways" (`.titleAndIcon`: the title and the icon in both states).
      */
     public static let content = "content"
 
@@ -1035,6 +1036,7 @@ extension CYLMenuFoldControl {
         }
         let contents = ["iconandtitle": CYLMenuFoldControlContent.iconAndTitle.rawValue,
                         "titleandicon": CYLMenuFoldControlContent.iconAndTitle.rawValue,
+                        "titleandiconalways": CYLMenuFoldControlContent.titleAndIcon.rawValue,
                         "title": CYLMenuFoldControlContent.title.rawValue,
                         "icon": CYLMenuFoldControlContent.icon.rawValue]
         if let raw = Value.rawValue(configuration[CYLMenuFoldControlKey.content], names: contents),
