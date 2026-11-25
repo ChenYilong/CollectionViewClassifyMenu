@@ -6,6 +6,7 @@ import CollectionViewClassifyMenu
 public final class CylTagListBridge: UIView {
 
     @objc public var onTap: (([String: Any]) -> Void)?
+    @objc public var onLongPress: (([String: Any]) -> Void)?
     @objc public var onSelection: (([[String: Any]]) -> Void)?
     @objc public var onContentHeight: ((Double) -> Void)?
 
@@ -116,6 +117,11 @@ private final class MenuDelegate: NSObject, CYLMenuDelegate {
     func menu(_ menu: Any, didSelectItemAt indexPath: IndexPath) {
         guard let owner else { return }
         owner.onTap?(owner.item(indexPath))
+    }
+
+    func menu(_ menu: Any, didLongPressItemAt indexPath: IndexPath) {
+        guard let owner else { return }
+        owner.onLongPress?(owner.item(indexPath))
     }
 
     func menu(_ menu: Any, didChangeSelectedItems indexPaths: [IndexPath]) {

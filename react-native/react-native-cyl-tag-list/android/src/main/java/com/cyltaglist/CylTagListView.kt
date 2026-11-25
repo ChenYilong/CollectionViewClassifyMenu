@@ -135,6 +135,15 @@ class CylTagListView(context: Context) : FrameLayout(context), CYLMenuDelegate {
     })
   }
 
+  override fun menuDidLongPressItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {
+    val tag = item(indexPath)
+    dispatch("topTagLongPress", Arguments.createMap().apply {
+      putInt("section", tag["section"] as Int)
+      putInt("item", tag["item"] as Int)
+      putString("title", tag["title"] as String)
+    })
+  }
+
   override fun menuDidChangeSelectedItems(menu: Any, indexPaths: List<CYLIndexPath>) {
     val json = JSONArray(indexPaths.map { JSONObject(item(it)) }).toString()
     dispatch("topSelectionChange", Arguments.createMap().apply { putString("itemsJSON", json) })

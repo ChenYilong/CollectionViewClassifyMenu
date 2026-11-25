@@ -1,12 +1,16 @@
 import { forwardRef, useImperativeHandle, useRef, type ElementRef } from 'react';
 import type { HostComponent, ViewProps } from 'react-native';
+import type { CylTagListConfiguration } from './CylTagListConfiguration';
 import NativeCylTagListView, { Commands, type NativeProps, type TagEvent } from './CylTagListViewNativeComponent';
 
 export type CylTagListProps = ViewProps & {
-  configuration: Record<string, unknown>;
+  /** The configuration of the native list (see `CylTagListConfiguration`; unknown keys are passed through). */
+  configuration: CylTagListConfiguration;
   animationSpeed?: number;
   animationLoops?: boolean;
   onTagTap?: (tag: TagEvent) => void;
+  /** A long press the list reports: the `report` action (part of the default) or a `handler` action. */
+  onTagLongPress?: (tag: TagEvent) => void;
   onSelectionChange?: (items: ReadonlyArray<TagEvent>) => void;
   onContentHeightChange?: (height: number) => void;
 };
@@ -14,7 +18,7 @@ export type CylTagListProps = ViewProps & {
 export type CylTagListHandle = { playAll: () => void };
 
 export const CylTagListView = forwardRef<CylTagListHandle, CylTagListProps>(function CylTagListView(
-  { configuration, onTagTap, onSelectionChange, onContentHeightChange, ...rest },
+  { configuration, onTagTap, onTagLongPress, onSelectionChange, onContentHeightChange, ...rest },
   ref
 ) {
   const native = useRef<ElementRef<HostComponent<NativeProps>>>(null);
@@ -27,6 +31,7 @@ export const CylTagListView = forwardRef<CylTagListHandle, CylTagListProps>(func
       ref={native}
       configuration={JSON.stringify(configuration)}
       onTagTap={onTagTap && ((e) => onTagTap(e.nativeEvent))}
+      onTagLongPress={onTagLongPress && ((e) => onTagLongPress(e.nativeEvent))}
       onSelectionChange={onSelectionChange && ((e) => onSelectionChange(JSON.parse(e.nativeEvent.itemsJSON)))}
       onContentHeightChange={onContentHeightChange && ((e) => onContentHeightChange(e.nativeEvent.height))}
     />
