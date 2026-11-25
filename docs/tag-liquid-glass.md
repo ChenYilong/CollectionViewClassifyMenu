@@ -138,7 +138,8 @@ colors that already pass and dynamic colors never change.
 | Platform | Status |
 |:--|:--|
 | iOS | reference: `CYLIconContrast`, applied in `CYLTagButton` |
-| Android, HarmonyOS | their own sessions mirror it (see their parity maps) |
+| Android | `CYLIconContrast.kt`; `CYLTagButton.updateAppearance` lifts the icon color filter (night mode = `CYLSystemColors.isNight`, glass = `resolvedBackgroundStyle`, explicit = `CYLMenuStyle.explicitIconColorForState`); `CYLIconContrastTest`, written statically, not yet run. |
+| HarmonyOS | `CYLIconContrast` (`core/CYLIconContrast.ets`, exported from `Index.ets`); `CYLMenuStyle.explicitIconColor(state)` tells an explicit icon color from the built-in; `CYLTagButton.updateAppearance` lifts the tint when `resolvedBackgroundStyle()` is glass and `CYLTagButton.isDarkMode()` (AppStorage `cyl_colorMode`, as `cylanimateditem`; `darkModeOverride` for tests). Static '#RRGGBB' / '#AARRGGBB' strings only: resources and `Color` constants are dynamic, so unchanged. Tests: `entry/src/test/IconContrast.test.ets`, written statically, not yet compiled or run. A mode switch while a tag is shown re-resolves at the tag's next `updateAppearance` (no watcher on the mode yet) |
 | Mini program | `model.js`: `liftedIconColor`, `glassReferenceLuminance`, `contrastRatio`, `hslFromRgb`, `rgbFromHsl`, `relativeLuminance`; `drawnIconColor(style, state)` feeds the symbol icon of `iconContent`. Explicit = the appearance's `iconColor` (null by default, so nothing to track). Dark = `style.sectionPalette.dark` (the section style's detection); glass drawn = `backgroundStyle === 'liquidGlass'` and `cylAnimatedItemLiquidGlassIsActive()` (`isGlassDrawn`, the predicate of the glass background). Colors are static strings, so there is no dynamic case; the Mini Program has no separate animation tint. `test/tag-icon-lift.test.js`, written statically, not yet run |
 | Flutter | through the native Android / iOS cores: the platform view passes the configuration map to the core, so `style.normal.iconColor` (also `selected`, `disabled`) gets the lift there. No new parameter and no Dart key: the configuration is an untyped map and `iconColor` already exists inside a state dictionary of `style` |
 | React Native | the same: the bridge forwards the configuration JSON to the native cores (generic pass-through). `style.normal.iconColor` is now typed as `CylTagStateStyle.iconColor` in `CylTagListConfiguration.ts`; it only types the key the core already reads, there is no new bridge code |
@@ -148,17 +149,3 @@ colors that already pass and dynamic colors never change.
 A Liquid Glass tag in a list has the root view as its backdrop source, which contains the tag itself: sampling it re-enters the tag's own recording (a crash found by the
 Windows Android run on 4bc1ec1). CYLTabBarController `a5a2f1b1` makes `CYLLiquidGlassView` skip sampling when the view is inside its own source: it draws the tint only
 (no blur or refraction), and `CYLGlassBackdrop` guards the capture. iOS draws real glass. True glass for a list needs a backdrop source outside the list: `CYLTagListView.backdropSource` (docs/tag-section-style.md "Android backdropSource"); without it Android tags look like the default frosted tint (225, 222, 220 at 0.5 alpha, white 0.14 in dark mode).
-
-
-## Dark glass icon lift
-
-An EXPLICIT icon color (the app called `setIconColor` for the state) that is too dark for dark Liquid Glass is lifted until it has a 3:1 WCAG contrast ratio against the glass, keeping hue, saturation and alpha (`CYLIconContrast`, a pure function; iOS reference `CYLIconContrast.swift`).
-
-- Reference luminance: the glass over black. No glass tint (or alpha 0): white at 0.14 (about #242424). An explicit tint: its color times `tint.alpha * (tintAlpha ?? 0.75)`; the selected tag uses tint alpha 1.
-- Rule: contrast `(max + 0.05) / (min + 0.05) >= 3` leaves the color unchanged; otherwise the HSL lightness rises in steps of 0.005 up to 1 (never above white).
-- Applies only where glass is really drawn AND the mode is dark AND the state has an explicit icon color. Light mode, flat tags, the built-in icon color (the text color) and colors that already pass never change. A dynamic (per-mode) color is never changed; Android and the other platforms with static colors have none.
-- The lifted color feeds both the image tint and the animation tint.
-
-| Platform | Status |
-|:--|:--|
-| iOS | Reference (`CYLIconContrast.swift`, `CYLTagButton`). |
