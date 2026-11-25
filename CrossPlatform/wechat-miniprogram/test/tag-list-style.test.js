@@ -85,6 +85,11 @@ test('the fold control reads a dictionary or a position alone, as CYLMenuFoldCon
   assert.deepEqual(model.foldControlValue({ position: 'footer', content: 'iconAndTitle' }).position, 'footer');
   assert.equal(model.foldControlValue({ position: 'footer', content: 'iconAndTitle' }).content, 'iconAndTitle');
   assert.equal(model.foldControlValue('footer').content, 'icon');
+  // The tail defaults to the chevron icon only (as the footer), in the string and in the dictionary form; the header shows icon and title.
+  assert.equal(model.foldControlValue('tail').content, 'icon');
+  assert.equal(model.foldControlValue({ position: 'tail' }).content, 'icon');
+  assert.equal(model.foldControlValue({ position: 'headerTrailing' }).content, 'iconAndTitle');
+  assert.equal(model.foldControlValue({ position: 'tail', content: 'iconAndTitle' }).content, 'iconAndTitle');
   assert.equal(model.foldControlValue('headerRight').position, 'headerTrailing');
   assert.equal(model.foldControlValue('headerRight').content, 'iconAndTitle');
 });

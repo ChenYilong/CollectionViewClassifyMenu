@@ -25,7 +25,8 @@ enum class CYLMenuFoldControlContent {
 class CYLMenuFoldControl {
 
     var position: CYLMenuFoldControlPosition = CYLMenuFoldControlPosition.NONE
-    var content: CYLMenuFoldControlContent = CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
+    /** The chevron icon only, on every platform: the title ("More") is opt-in (`iconAndTitle`), as the header presets do. */
+    var content: CYLMenuFoldControlContent = CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon
     private var _title: String? = null
     private var _collapseTitle: String? = null
     private var _image: Drawable? = null

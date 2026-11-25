@@ -98,6 +98,22 @@ class CYLTagListConfigurationTest {
     }
 
     @Test
+    fun theTailFoldControlDefaultsToTheChevronIconOnly() {
+        // A fold control made with no content is the chevron icon only, on every platform; the title is opt-in.
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon, CYLMenuFoldControl().content)
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon,
+            CYLMenuFoldControl.foldControlWithConfiguration("tail")!!.content)
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "tail"))!!.content)
+        // The header controls keep icon and title; an explicit content wins everywhere.
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "headerTrailing"))!!.content)
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "tail",
+                CYLMenuFoldControlKeyContent to "iconAndTitle"))!!.content)
+    }
+
+    @Test
     fun animationURLCarriesSortedEncodedOptions() {
         val url = CYLMenuAnimationURLWithOptions(Uri.parse("file:///a/truck.riv"), mapOf("stateMachine" to "State Machine 1", "artboard" to "Truck"))
         assertEquals("artboard=Truck&stateMachine=State%20Machine%201", url!!.encodedFragment)

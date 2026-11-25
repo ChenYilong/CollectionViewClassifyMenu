@@ -676,13 +676,20 @@ fun CYLMenuFoldControl.Companion.foldControlWithConfiguration(configuration: Any
     val control = CYLMenuFoldControl.noFoldControl()
     if (configuration is String || configuration is Number) {
         control.applyConfiguration(mapOf(CYLMenuFoldControlKeyPosition to configuration), context)
-        control.content = if (control.position == CYLMenuFoldControlPosition.FOOTER)
-            CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon else CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
+        control.content = usualContentForPosition(control.position)
         return control
     }
     val dictionary = map(configuration) ?: return null
     control.applyConfiguration(dictionary, context)
+    // A dictionary without a content gets the position's usual content (the tail and the footer: the icon only).
+    if (dictionary[CYLMenuFoldControlKeyContent] == null) control.content = usualContentForPosition(control.position)
     return control
+}
+
+/** The content a position has when none is given: the header controls show the icon and the title, the tail and the footer the icon only. */
+private fun usualContentForPosition(position: CYLMenuFoldControlPosition): CYLMenuFoldControlContent = when (position) {
+    CYLMenuFoldControlPosition.FOOTER, CYLMenuFoldControlPosition.TAIL -> CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon
+    else -> CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
 }
 
 /**
