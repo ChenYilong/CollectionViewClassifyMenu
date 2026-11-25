@@ -320,8 +320,9 @@ final class CYLTagCalloutView: UIView {
         guard let header, !header.isEmpty else {
             return false
         }
-        let above = CGRect(x: -.greatestFiniteMagnitude / 4, y: aboveTop, width: .greatestFiniteMagnitude / 2, height: height)
-        return above.intersects(header) && fitsBelow
+        // The bubble is clamped horizontally and may be wider than the header's text: compare the vertical ranges only.
+        let coversHeader = header.minY < aboveTop + height && header.maxY > aboveTop
+        return coversHeader && fitsBelow
     }
 
     /**
@@ -329,6 +330,7 @@ final class CYLTagCalloutView: UIView {
      * below it when there is no room above or when the bubble would cover `header` (see `placesBelow`), clamped to the
      * container, its arrow at the tag's center.
      */
+    func present(pointingAt target: CGRect, in container: UIView, avoiding header: CGRect? = nil) {
         // A text with no break opportunity (an API name such as `setIconAnimation(bundled:size:for:)`) is never split mid-word: it may use
         // the container's width, else UIKit breaks it by character and the closing `)` lands on a second line. Other text keeps `maxWidth`.
         let insets = Self.padding.left + Self.padding.right
