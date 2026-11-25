@@ -497,8 +497,13 @@ final class CYLTagButtonTests: XCTestCase {
         var alpha: CGFloat = 0
         glassTint(of: normal, light)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
         XCTAssertEqual(alpha, CYLMenuStyle.defaultGlassTintAlphaLight, accuracy: 0.01)
-        XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: normal, dark)), CYLMenuFixtures.rgb(.white))
-        glassTint(of: normal, dark)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        // The glass takes its tint resolved with the button's own traits: a dark-mode button for the dark values.
+        let darkNormal = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        darkNormal.overrideUserInterfaceStyle = .dark
+        darkNormal.style = style
+        darkNormal.layoutIfNeeded()
+        XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: darkNormal, dark)), CYLMenuFixtures.rgb(.white))
+        glassTint(of: darkNormal, dark)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
         XCTAssertEqual(alpha, CYLMenuStyle.defaultGlassTintAlphaDark, accuracy: 0.01)
         let disabled = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
         disabled.isEnabled = false
