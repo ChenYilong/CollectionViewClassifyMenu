@@ -164,9 +164,12 @@ const LIGHT_TINT = '#000000';
 
 /**
  * The section style (docs/tag-section-style.md): the names of style keys `sectionStyle` and `headerSeparatorStyle`, the named
- * lengths (px) and the colors of each color mode. Every default reproduces the layout of before: no card, no band, no divider.
+ * lengths (px) and the colors of each color mode. The default is the rounded card (`insetGrouped`), no band, no divider;
+ * `sectionStyle: 'plain'` reproduces the layout of before the card was the default.
  */
 const SECTION_STYLES = { plain: 'plain', insetGrouped: 'insetGrouped' };
+/** The style of a list that sets nothing: the rounded section card. An app opts out with the style key `sectionStyle: 'plain'`. */
+const DEFAULT_SECTION_STYLE = SECTION_STYLES.insetGrouped;
 const HEADER_SEPARATOR_STYLES = { none: 'none', line: 'line' };
 const SECTION_METRICS = { cardCornerRadius: 10, cardPadding: 12, headerBandPadding: 12, separatorThickness: 0.5 };
 /** The card's background: the solid color, or the glass of cyl-animated-item's tags (style key `sectionBackgroundStyle`). */
@@ -308,7 +311,8 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     backgroundColorSet: false,
     // The section style (null colors resolve to `sectionPalette`, which follows the color mode).
     sectionPalette: { ...(dark ? SECTION_COLORS.dark : SECTION_COLORS.light), dark: !!dark },
-    sectionStyle: SECTION_STYLES.plain,
+    // The rounded section card is the default look (docs/tag-section-style.md); `plain` is the opt-out.
+    sectionStyle: DEFAULT_SECTION_STYLE,
     sectionBackgroundColor: null,
     sectionBackgroundStyle: SECTION_BACKGROUND_STYLES.flat,
     sectionCornerRadius: SECTION_METRICS.cardCornerRadius,
@@ -1205,8 +1209,9 @@ function resolvedHeaderSeparatorColor(style) {
 /**
  * The CSS of a section: its insets (the last line's spacing taken off the bottom), the negative trailing margin
  * that absorbs the last tag's spacing, the header (headerHeight, headerFont, headerTextColor, headerHorizontalInset)
- * and the list's background. With the section style on, it adds `cardStyle` (insetGrouped), a band in `headerStyle` and
- * `headerLineStyle` (the divider); with the default style these keys are absent and the rest is what it always was.
+ * and the list's background. It adds `cardStyle` (the default, insetGrouped), a band in `headerStyle` and `headerLineStyle`
+ * (the divider, opt-in); under `sectionStyle: 'plain'` there is no `cardStyle` and the rest is what it was before the card
+ * became the default.
  */
 function sectionLayout(style) {
   const i = style.sectionInsets;
@@ -1257,7 +1262,7 @@ module.exports = {
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
-  SECTION_STYLES, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
+  SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
 };

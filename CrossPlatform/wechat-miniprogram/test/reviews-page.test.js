@@ -21,6 +21,9 @@ test('the filter configuration: multiple choice, 全部 exclusive, empty filters
   assert.deepEqual(style.sectionInsets, { top: 10, left: 12, bottom: 6, right: 12 });
   assert.deepEqual(style.contentInsets, { top: 5, left: 8, bottom: 5, right: 8 });
   assert.equal(style.selected.backgroundColor, '#FF4F00');
+  // The filter sits in the page's own layout: it opts out of the default rounded section card.
+  assert.equal(style.sectionStyle, 'plain');
+  assert.equal(model.sectionLayout(style).cardStyle, undefined);
 });
 
 test('taps follow CYLTagListView: a filter replaces 全部, 全部 replaces every filter', () => {
@@ -69,6 +72,7 @@ test('the product page previews the keywords and opens the review page with the 
   assert.equal(configuration.defaultVisibleRows, 2);
   assert.equal(configuration.foldControl.position, 'none');
   assert.deepEqual(configuration.style.sectionInsets, { top: 4, left: 0, bottom: 12, right: 0 });
+  assert.equal(configuration.style.sectionStyle, 'plain', 'the preview opts out of the default card');
   assert.deepEqual(configuration.sections[0].items.map((i) => i.title),
     ['手机套不错(3)', '质量不错(5)', '态度不错(3)', '划算(3)', '颜色不错(2)', '背面细节一般(2)']);
   assert.deepEqual(preview.previewReviews().map((r) => r.text.split('\n')[0]), ['1**1', '雨**4']);
