@@ -499,7 +499,12 @@ final class CYLTagButtonTests: XCTestCase {
         XCTAssertEqual(alpha, CYLMenuStyle.defaultGlassTintAlphaLight, accuracy: 0.01)
         // The glass takes its tint resolved with the button's own traits: a dark-mode button for the dark values.
         let darkNormal = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
-        darkNormal.overrideUserInterfaceStyle = .dark
+        // In a dark window: a detached view reports the light trait whatever its override says.
+        let darkWindow = UIWindow(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+        darkWindow.overrideUserInterfaceStyle = .dark
+        darkWindow.isHidden = false
+        darkWindow.addSubview(darkNormal)
+        defer { darkWindow.isHidden = true }
         darkNormal.style = style
         darkNormal.layoutIfNeeded()
         XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: darkNormal, dark)), CYLMenuFixtures.rgb(.white))

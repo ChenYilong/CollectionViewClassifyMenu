@@ -147,14 +147,28 @@ final class CYLIconContrastTests: CYLMenuExampleTestCase {
 
     // MARK: - CYLTagButton
 
+    private var windows: [UIWindow] = []
+
+    override func tearDown() {
+        windows.forEach { $0.isHidden = true }
+        windows.removeAll()
+        super.tearDown()
+    }
+
     private func button(glass: Bool, mode: UIUserInterfaceStyle, icon: UIColor) -> CYLTagButton {
         let style = CYLMenuStyle()
         style.backgroundStyle = glass ? .liquidGlass : .flat
         style.setIconColor(icon, for: .normal)
         let button = CYLTagButton(title: "A", image: UIImage(systemName: "list.bullet")?.withRenderingMode(.alwaysTemplate))
+        // In a window of that mode: a detached view reports the light trait whatever its override says, so the dark rule would never run.
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+        window.overrideUserInterfaceStyle = mode
+        window.isHidden = false
+        button.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
+        window.addSubview(button)
+        windows.append(window)
         button.overrideUserInterfaceStyle = mode
         button.style = style
-        button.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
         button.layoutIfNeeded()
         return button
     }
