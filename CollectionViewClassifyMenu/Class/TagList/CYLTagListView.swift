@@ -1756,6 +1756,10 @@ open class CYLTagListView: UIView {
     @objc(canFoldSection:)
     open func canFoldSection(_ section: Int) -> Bool {
         measureIfNeeded()
+        // Without a known width every tag is laid out in a row of its own: that is no layout, so nothing can need a fold yet.
+        guard collectionView.bounds.width > 0 else {
+            return false
+        }
         return rows.indices.contains(section) && canFold(rowCount: rows[section].count)
     }
 

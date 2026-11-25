@@ -2114,6 +2114,10 @@ export class CYLTagListState implements CYLTagLongPressHost {
   /** Whether the section has more rows than `defaultVisibleRows` and can fold. */
   canFoldSection(section: number): boolean {
     this.measureIfNeeded();
+    // Without a known width every tag is laid out in a row of its own: that is no layout, so nothing can need a fold yet.
+    if (this.layoutWidth <= 0) {
+      return false;
+    }
     return section >= 0 && section < this.rows.length && this.canFold(this.rows[section].length);
   }
 

@@ -1558,6 +1558,8 @@ open class CYLTagListView @JvmOverloads constructor(
 
     fun canFoldSection(section: Int): Boolean {
         measureIfNeeded()
+        // Without a known width every tag is laid out in a row of its own: that is no layout, so nothing can need a fold yet.
+        if (currentWidth() <= 0f) return false
         return section in rows.indices && canFoldRowCount(rows[section].size)
     }
 
