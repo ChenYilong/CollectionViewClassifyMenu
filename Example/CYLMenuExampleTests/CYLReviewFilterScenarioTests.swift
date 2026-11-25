@@ -130,32 +130,87 @@ final class CYLReviewFilterScenarioTests: CYLMenuExampleTestCase {
         tags.layOut()
         XCTAssertTrue(filter.canFoldSection(0))
         let total = filter.menuDataSource?.menuNumberOfItems(inSection: 0) ?? 0
-        let folded = tags.numberOfItems(inSection: 0)
-        XCTAssertLessThan(folded, total, "Folded to two rows")
-        let footer = tags.footer(inSection: 0)
-        guard let chevron = tags.footerFoldButton(inSection: 0) else {
-            return XCTFail("The footer has a fold control")
+        let visible = filter.numberOfVisibleItems(inSection: 0)
+        XCTAssertLessThan(visible, total, "Folded to two rows")
+        func chevron() -> CYLTagButton? {
+            (tags.cell(at: ip(filter.numberOfVisibleItems(inSection: 0), 0)) as? CYLTagFoldCell)?.foldButton
         }
-        XCTAssertEqual(filter.foldControl.position, .footer)
-        XCTAssertEqual(filter.foldControl.content, .icon, "Taobao: the chevron alone")
-        XCTAssertTrue(chevron.imageView.transform.isIdentity, "Points down while folded")
+        guard let folded = chevron() else {
+            return XCTFail("The last tag is the fold control")
+        }
+        XCTAssertEqual(filter.foldControl.position, .tail, "Examples: the tail fold control")
+        XCTAssertEqual(filter.foldControl.content, .icon, "Icon only, no More / Less")
+        XCTAssertNil(folded.title, "No text")
+        XCTAssertNil(tags.footer(inSection: 0), "No footer: the chevron is among the tags")
+        XCTAssertEqual(tags.numberOfItems(inSection: 0), visible + 1, "The visible tags, then the chevron")
+        XCTAssertTrue(folded.imageView.transform.isIdentity, "Points down while folded")
         let foldedHeight = filter.frame.height
         captureScreen(named: "test-scenario1-review-filter-folded")
 
-        chevron.sendActions(for: .touchUpInside)
+        tags.tap(item: visible, section: 0)
         controller.view.layoutIfNeeded()
+        tags.layOut()
         XCTAssertTrue(filter.isSectionExpanded(0))
-        XCTAssertEqual(tags.numberOfItems(inSection: 0), total, "Every row is shown")
-        XCTAssertTrue(tags.footer(inSection: 0) === footer, "The footer stays, so its chevron can turn")
-        XCTAssertEqual(chevron.imageView.transform.a, -1, accuracy: 0.01, "Turned 180°")
+        XCTAssertEqual(tags.numberOfItems(inSection: 0), total + 1, "Every tag, then the chevron")
+        XCTAssertEqual(chevron()?.imageView.transform.a ?? 0, -1, accuracy: 0.01, "Turned 180°")
         XCTAssertGreaterThan(filter.frame.height, foldedHeight)
         captureScreen(named: "test-scenario1-review-filter-expanded")
 
-        chevron.sendActions(for: .touchUpInside)
+        tags.tap(item: total, section: 0)
         controller.view.layoutIfNeeded()
-        XCTAssertEqual(tags.numberOfItems(inSection: 0), folded)
-        XCTAssertEqual(chevron.imageView.transform.a, 1, accuracy: 0.01)
+        tags.layOut()
+        XCTAssertEqual(tags.numberOfItems(inSection: 0), visible + 1)
+        XCTAssertEqual(chevron()?.imageView.transform.a ?? 0, 1, accuracy: 0.01)
         XCTAssertEqual(filter.frame.height, foldedHeight, accuracy: 1)
+    }
+
+    /// Example rule: every example tag list folds behind the tail fold control, icon only, no More / Less text.
+    func testExampleTagListsUseTheTailIconFoldControlInLightAndDark() throws {
+        let review = CYLReviewListViewController(selectedFilterIndex: 0)
+        showInNavigation(review)
+        let search = CYLSearchDiscoverViewController()
+        search.loadViewIfNeeded()
+        let file = CYLTagConfigurationDemoViewController()
+        file.loadViewIfNeeded()
+        let lists: [(String, CYLTagListView?)] = [
+            ("review filter", review.filterView),
+            ("search recent", search.recentList),
+            ("configuration file", file.fileTagListView),
+        ]
+        for (name, list) in lists {
+            let list = try XCTUnwrap(list, name)
+            XCTAssertEqual(list.foldControl.position, .tail, name)
+            XCTAssertEqual(list.foldControl.content, .icon, name)
+        }
+        // Light and dark: the chevron is the last visible tag of the review filter.
+        for (style, suffix) in [(UIUserInterfaceStyle.light, "light"), (.dark, "dark")] {
+            hostWindow?.overrideUserInterfaceStyle = style
+            review.view.layoutIfNeeded()
+            runMainLoop(for: 0.2)
+            let tags = review.filterView.probe
+            tags.layOut()
+            let visible = review.filterView.numberOfVisibleItems(inSection: 0)
+            XCTAssertTrue(tags.cell(at: ip(visible, 0)) is CYLTagFoldCell, suffix)
+            captureScreen(named: "test-tail-fold-review-filter-\(suffix)")
+        }
+        hostWindow?.overrideUserInterfaceStyle = .unspecified
+        let navigation = UINavigationController(rootViewController: UIViewController())
+        show(navigation, size: CYLTestScreen.tall)
+        navigation.pushViewController(search, animated: false)
+        for (style, suffix) in [(UIUserInterfaceStyle.light, "light"), (.dark, "dark")] {
+            hostWindow?.overrideUserInterfaceStyle = style
+            search.view.layoutIfNeeded()
+            runMainLoop(for: 0.4)
+            captureScreen(named: "test-tail-fold-search-recent-\(suffix)")
+        }
+        hostWindow?.overrideUserInterfaceStyle = .unspecified
+        navigation.pushViewController(file, animated: false)
+        for (style, suffix) in [(UIUserInterfaceStyle.light, "light"), (.dark, "dark")] {
+            hostWindow?.overrideUserInterfaceStyle = style
+            file.view.layoutIfNeeded()
+            runMainLoop(for: 0.4)
+            captureScreen(named: "test-tail-fold-configuration-\(suffix)")
+        }
     }
 
     func testReviewPagePreselectsAndRevealsKeywordFilter() {

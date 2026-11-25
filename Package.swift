@@ -26,7 +26,7 @@ let package = Package(
         // pinned to the same commit as the Podfiles. Its Swift package's `CYLAnimatedItem` product is the component on
         // its own (the view, its resources and the animation engine), without the tab bar.
         .package(url: "https://github.com/ChenYilong/CYLTabBarController.git",
-                 revision: "230b52662cea3b584a5c0da704e55fe3f4758ae8")
+                 revision: "6f563ef4f34bcde96f10022d3f0d5f949a7c3a62")
     ],
     targets: [
         .target(

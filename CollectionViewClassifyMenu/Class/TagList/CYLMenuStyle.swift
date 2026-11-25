@@ -1276,6 +1276,127 @@ public enum CYLTintContrast {
 }
 
 /**
+ * The icon contrast rule of a Liquid Glass tag in dark mode: an explicit, static icon color that is too dark for the glass is lifted.
+ *
+ * Applies only when ALL hold: glass is drawn, the mode is dark, the icon color is explicit and static (the same color resolved with the
+ * light and the dark traits), and its WCAG contrast against the reference below is under `minimumContrastRatio`. Then the color gets
+ * the lightest-needed HSL lightness (hue and saturation kept) that reaches the ratio, at most white (the label color in dark mode).
+ * Light mode, flat tags, dynamic colors, built-in colors and colors that already pass are never changed.
+ */
+public enum CYLIconContrast {
+
+    /**
+     * The least WCAG contrast ratio (3:1, the floor for graphics and large text) an icon keeps against the glass.
+     */
+    public static let minimumContrastRatio: CGFloat = 3
+
+    /**
+     * The white share of the default frosted glass in dark mode (white at 0.14); over black it is about #242424.
+     */
+    public static let frostedGlassWhiteAlpha: CGFloat = 0.14
+
+    /**
+     * The share of an explicit glass tint's alpha that tints the glass when no tint alpha is given (`itemGlassTintAlpha` nil).
+     */
+    public static let defaultGlassTintShare: CGFloat = 0.75
+
+    /**
+     * The WCAG contrast ratio of two relative luminances, 1 to 21.
+     */
+    public static func contrastRatio(_ first: CGFloat, _ second: CGFloat) -> CGFloat {
+        (max(first, second) + 0.05) / (min(first, second) + 0.05)
+    }
+
+    /**
+     * The reference luminance the icon is judged against, with the glass over a black backdrop: the default frosted glass (`glassTint`
+     * nil or fully transparent) is white at `frostedGlassWhiteAlpha`; an explicit tint is its color times its alpha times `tintAlpha`
+     * (`defaultGlassTintShare` when nil).
+     */
+    public static func glassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?) -> CGFloat {
+        let dark = UITraitCollection(userInterfaceStyle: .dark)
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        guard let tint = glassTint, tint.resolvedColor(with: dark).getRed(&red, green: &green, blue: &blue, alpha: &alpha), alpha > 0 else {
+            let white = frostedGlassWhiteAlpha
+            return CYLTintContrast.relativeLuminance(red: white, green: white, blue: white)
+        }
+        let share = alpha * (tintAlpha ?? defaultGlassTintShare)
+        return CYLTintContrast.relativeLuminance(red: red * share, green: green * share, blue: blue * share)
+    }
+
+    /**
+     * The icon color to draw in dark mode on glass: `iconColor` itself when the rule does not apply, else the static lifted color.
+     * Pure: the same input gives the same output (it resolves with fixed light and dark traits, never the current ones). The caller
+     * calls it only when glass is drawn and the mode is dark.
+     */
+    public static func liftedIconColor(_ iconColor: UIColor, glassTint: UIColor?, tintAlpha: CGFloat?) -> UIColor {
+        let light = iconColor.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
+        let dark = iconColor.resolvedColor(with: UITraitCollection(userInterfaceStyle: .dark))
+        var lr: CGFloat = 0, lg: CGFloat = 0, lb: CGFloat = 0, la: CGFloat = 0
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        guard light.getRed(&lr, green: &lg, blue: &lb, alpha: &la), dark.getRed(&red, green: &green, blue: &blue, alpha: &alpha),
+              abs(lr - red) < 0.001, abs(lg - green) < 0.001, abs(lb - blue) < 0.001, abs(la - alpha) < 0.001 else {
+            return iconColor
+        }
+        let reference = glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
+        func ratio(_ lightness: CGFloat, hue: CGFloat, saturation: CGFloat) -> CGFloat {
+            let rgb = rgbFromHSL(hue: hue, saturation: saturation, lightness: lightness)
+            return contrastRatio(CYLTintContrast.relativeLuminance(red: rgb.red, green: rgb.green, blue: rgb.blue), reference)
+        }
+        let hsl = hslFromRGB(red: red, green: green, blue: blue)
+        guard ratio(hsl.lightness, hue: hsl.hue, saturation: hsl.saturation) < minimumContrastRatio else {
+            return iconColor
+        }
+        var lightness = hsl.lightness
+        while lightness < 1, ratio(lightness, hue: hsl.hue, saturation: hsl.saturation) < minimumContrastRatio {
+            lightness = min(1, lightness + 0.005)
+        }
+        let rgb = rgbFromHSL(hue: hsl.hue, saturation: hsl.saturation, lightness: lightness)
+        return UIColor(red: rgb.red, green: rgb.green, blue: rgb.blue, alpha: alpha)
+    }
+
+    /**
+     * HSL of an sRGB color: hue 0...1, saturation and lightness 0...1.
+     */
+    public static func hslFromRGB(red: CGFloat, green: CGFloat, blue: CGFloat) -> (hue: CGFloat, saturation: CGFloat, lightness: CGFloat) {
+        let high = max(red, green, blue), low = min(red, green, blue)
+        let lightness = (high + low) / 2
+        let delta = high - low
+        guard delta > 0 else { return (0, 0, lightness) }
+        let saturation = delta / (1 - abs(2 * lightness - 1))
+        var hue: CGFloat
+        if high == red {
+            hue = (green - blue) / delta
+            if hue < 0 { hue += 6 }
+        } else if high == green {
+            hue = (blue - red) / delta + 2
+        } else {
+            hue = (red - green) / delta + 4
+        }
+        return (hue / 6, saturation, lightness)
+    }
+
+    /**
+     * The sRGB color of an HSL triple (all 0...1).
+     */
+    public static func rgbFromHSL(hue: CGFloat, saturation: CGFloat, lightness: CGFloat) -> (red: CGFloat, green: CGFloat, blue: CGFloat) {
+        let chroma = (1 - abs(2 * lightness - 1)) * saturation
+        let sector = hue * 6
+        let second = chroma * (1 - abs(sector.truncatingRemainder(dividingBy: 2) - 1))
+        let base = lightness - chroma / 2
+        let parts: (CGFloat, CGFloat, CGFloat)
+        switch Int(sector) % 6 {
+        case 0: parts = (chroma, second, 0)
+        case 1: parts = (second, chroma, 0)
+        case 2: parts = (0, chroma, second)
+        case 3: parts = (0, second, chroma)
+        case 4: parts = (second, 0, chroma)
+        default: parts = (chroma, 0, second)
+        }
+        return (parts.0 + base, parts.1 + base, parts.2 + base)
+    }
+}
+
+/**
  * The named lengths of the section style, in points.
  */
 public enum CYLSectionStyleMetrics {

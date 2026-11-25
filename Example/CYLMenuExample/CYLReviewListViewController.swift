@@ -112,8 +112,8 @@ final class CYLReviewListViewController: UIViewController {
         menuSource = source
 
         // Multiple choice, folded to two rows behind a chevron that turns when it expands.
-        // The shopping app's review filter: the chevron alone below the tags, turned 180° when expanded.
-        let filterView = CYLTagListView(foldControl: CYLMenuFoldControl(position: .footer, content: .icon))
+        // The review filter: the tail fold control (the last tag, icon only, no More / Less), turned 180° when expanded.
+        let filterView = CYLTagListView(foldControl: CYLMenuFoldControl(position: .tail, content: .icon))
         self.filterView = filterView
         filterView.translatesAutoresizingMaskIntoConstraints = false
         filterView.style = Self.reviewFilterStyle()

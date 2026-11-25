@@ -297,13 +297,21 @@ final class CYLTagCalloutView: UIView {
         }
     }
 
+    /// Whether `text` has a space or a line break, where it may wrap.
+    private static func hasBreakOpportunity(_ text: String?) -> Bool {
+        text?.contains { $0.isWhitespace } ?? false
+    }
+
     /**
      * Places the callout in `container` (the window), above `target` (the tag's frame in the container's coordinates),
      * below it when there is no room above, clamped to the container, its arrow at the tag's center.
      */
     func present(pointingAt target: CGRect, in container: UIView) {
-        let textSize = label.sizeThatFits(CGSize(width: Self.maxWidth - Self.padding.left - Self.padding.right,
-                                                 height: .greatestFiniteMagnitude))
+        // A text with no break opportunity (an API name such as `setIconAnimation(bundled:size:for:)`) is never split mid-word: it may use
+        // the container's width, else UIKit breaks it by character and the closing `)` lands on a second line. Other text keeps `maxWidth`.
+        let insets = Self.padding.left + Self.padding.right
+        let widthLimit = Self.hasBreakOpportunity(label.text) ? Self.maxWidth : max(Self.maxWidth, container.bounds.width - 2 * Self.margin)
+        let textSize = label.sizeThatFits(CGSize(width: widthLimit - insets, height: .greatestFiniteMagnitude))
         let width = ceil(textSize.width) + Self.padding.left + Self.padding.right
         let bodyHeight = ceil(textSize.height) + Self.padding.top + Self.padding.bottom
         let height = bodyHeight + Self.arrowHeight
