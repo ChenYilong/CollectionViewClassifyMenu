@@ -21,6 +21,12 @@ export interface CYLMenuDataSource {
   menuTitleForSection(section: number): string;
   menuTitleForItem(indexPath: CYLIndexPath): string;
 
+  /**
+   * The item's subtitle, shown in a callout with an arrow on a long press when the list's `longPressAction` includes
+   * `CYLTagLongPressActions.callout` (a longer description of a short title). undefined or empty: none.
+   */
+  menuSubtitleForItem?: (indexPath: CYLIndexPath) => string | undefined;
+
   /** An image shown before the title (a resource or a path). */
   menuImageForItem?: (indexPath: CYLIndexPath) => CYLImage | undefined;
   /** The image of a selected item. */

@@ -194,6 +194,11 @@ export struct CYLTagListView {
   @State private loops: boolean = false;
   @State private pressedKey: string = '';
   @State private draggedKey: string = '';
+  /** The item the long-press callout points at (`CYLTagLongPressHost.showCallout`), '' while none shows, and its text. */
+  @State private calloutKey: string = '';
+  @State private calloutText: string = '';
+  /** The item whose next tap is the release of a long press: it is ignored; the next touch down clears it. */
+  private suppressedTapKey: string = '';
   @State private dragX: number = 0;
   @State private dragY: number = 0;
   @State private longPressDuration: number = 500;
@@ -311,6 +316,9 @@ export struct CYLTagListView {
     this.playToken = m.playToken;
     this.loops = m.animationLoops;
     this.longPressDuration = m.longPressDuration;
+    const callout = m.calloutIndexPath;
+    this.calloutKey = callout !== undefined ? `${callout.section}-${callout.item}` : '';
+    this.calloutText = m.calloutText;
   }
 
   /** The look of `style` in `state` on a render item. */
@@ -843,9 +851,32 @@ export struct CYLTagListView {
     .translate({ x: this.draggedKey === r.key ? this.dragX : 0, y: this.draggedKey === r.key ? this.dragY : 0 })
     .zIndex(this.draggedKey === r.key ? 1 : 0)
     .id(`CYLTagListItem-${r.section}-${r.item}`)
+    // The long-press callout: a small bubble with an arrow pointing at this item, above it (below when there is no room).
+    .bindPopup(this.calloutKey === `${r.section}-${r.item}` && this.calloutText.length > 0, {
+      message: this.calloutText,
+      placement: Placement.Top,
+      enableArrow: true,
+      showInSubWindow: false,
+      autoCancel: true,
+      messageOptions: { textColor: $r('sys.color.font_primary'), font: { size: 13 } },
+      onStateChange: (event: PopupStateChangeParam) => {
+        if (!event.isVisible) {
+          this.model.dismissCallout();
+        }
+      }
+    })
     // A physical tap is taken here, once, ahead of the views inside the item (their layout changes with the
     // selection); the cell's own onClick stays for screen readers, which activate without gestures.
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.suppressedTapKey = '';
+      }
+    })
     .priorityGesture(TapGesture().onAction((event: GestureEvent) => {
+      if (this.suppressedTapKey === r.key) {
+        this.suppressedTapKey = '';
+        return;
+      }
       hilog.info(0x0000, 'CYLTagList', 'tap gesture %{public}d-%{public}d', r.section, r.item);
       // The rename indicator, the title while renaming on a title tap, and the delete indicator take their taps
       // first: this gesture runs ahead of the cell's own controls.
@@ -874,6 +905,8 @@ export struct CYLTagListView {
     .gesture(GestureGroup(GestureMode.Sequence,
       LongPressGesture({ duration: this.longPressDuration })
         .onAction(() => {
+          // The release that ends a recognized long press must not also tap the item (it would select it and dismiss the callout).
+          this.suppressedTapKey = r.key;
           if (this.model.beginLongPress({ section: r.section, item: r.item })) {
             this.draggedKey = r.key;
           }
@@ -1037,6 +1070,7 @@ export struct CYLTagListView {
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.None)
     .nestedScroll({ scrollForward: NestedScrollMode.SELF_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST })
+    .onScrollStart(() => this.model.dismissCallout())
     .align(Alignment.Top)
     .backgroundColor(this.backgroundColorValue)
     .border({ width: this.borderWidthValue, color: this.borderColorValue, radius: this.cornerRadiusValue })

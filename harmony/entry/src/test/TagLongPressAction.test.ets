@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLFont, CYLIndexPath, CYLMenuDelegate, CYLMenuStyle, CYLTagListState, CYLTextMeasurer, CYLTagLongPressAction,
+  CYLFont, CYLIndexPath, CYLMenuDataSource, CYLMenuDelegate, CYLMenuStyle, CYLTagListState, CYLTextMeasurer, CYLTagLongPressAction,
   CYLTagLongPressActions, CYLTagLongPressHost
 } from '@cyl/classifymenu';
 
@@ -24,6 +24,27 @@ class CYLLongPressRecorder implements CYLMenuDelegate {
   menuDidLongPressItem = (menu: Object, indexPath: CYLIndexPath): void => {
     this.items.push(indexPath.item);
   };
+}
+
+/** Three items, the second with a subtitle. */
+class CYLSubtitleSource implements CYLMenuDataSource {
+  numberOfSectionsInMenu(): number {
+    return 1;
+  }
+
+  menuNumberOfItemsInSection(section: number): number {
+    return 3;
+  }
+
+  menuTitleForSection(section: number): string {
+    return 'S';
+  }
+
+  menuTitleForItem(indexPath: CYLIndexPath): string {
+    return ['x', 'y', 'z'][indexPath.item];
+  }
+
+  menuSubtitleForItem = (indexPath: CYLIndexPath): string | undefined => indexPath.item === 1 ? 'about y' : undefined;
 }
 
 /** A custom action that follows the finger, to check the end and the cancel reach the action that began. */
@@ -117,6 +138,60 @@ export default function tagLongPressActionTest() {
       state.cancelLongPress();
       expect(following.log.join('|')).assertEqual('begin 1|end 2 true|begin 1|cancel');
       expect(recorder.items.join(',')).assertEqual('0');
+    });
+
+    it('theCalloutShowsTheSubtitleOfTheDataSourceAndTapDismissesIt', 0, () => {
+      const state = list('ABC');
+      const recorder = new CYLLongPressRecorder();
+      state.menuDelegate = recorder;
+      state.menuDataSource = new CYLSubtitleSource();
+      state.longPressAction = CYLTagLongPressActions.first([CYLTagLongPressActions.callout]);
+      // An item without a subtitle: no callout, and nothing else takes the press.
+      expect(state.beginLongPress(path(0))).assertFalse();
+      expect(state.calloutIndexPath === undefined).assertTrue();
+      expect(recorder.items.length).assertEqual(0);
+      // An item with one: the callout points at it and the long press is reported too.
+      expect(state.beginLongPress(path(1))).assertFalse();
+      expect(state.calloutText).assertEqual('about y');
+      expect(state.calloutIndexPath?.item).assertEqual(1);
+      expect(recorder.items.join(',')).assertEqual('1');
+      // The subtitle is also the item's accessibility hint when the data source gives none.
+      expect(state.accessibilityHintForItem(path(1))).assertEqual('about y');
+      // A tap dismisses it.
+      state.tapItem(path(0));
+      expect(state.calloutIndexPath === undefined).assertTrue();
+      expect(state.calloutText).assertEqual('');
+    });
+
+    it('aConfigurationNamesTheLongPressActionAndTheSubtitle', 0, () => {
+      const configuration = JSON.parse(
+        '{"longPressAction":"callout","sections":[{"title":"S","items":[{"title":"a","subtitle":"about a"},"b"]}]}'
+      ) as Record<string, Object>;
+      const state = CYLTagListState.withConfiguration(configuration);
+      state.setLayoutWidth(390);
+      const recorder = new CYLLongPressRecorder();
+      state.menuDelegate = recorder;
+      expect(state.beginLongPress(path(0))).assertFalse();
+      expect(state.calloutText).assertEqual('about a');
+      state.dismissCallout();
+      // "callout" alone still reports the long press of a tag without a subtitle.
+      expect(state.beginLongPress(path(1))).assertFalse();
+      expect(state.calloutIndexPath === undefined).assertTrue();
+      expect(recorder.items.join(',')).assertEqual('0,1');
+      const none = CYLTagListState.withConfiguration(
+        JSON.parse('{"longPressAction":"none","sections":[{"items":["a"]}]}') as Record<string, Object>);
+      expect(none.beginLongPress(path(0))).assertFalse();
+    });
+
+    it('aCustomHandlerCanShowItsOwnCalloutText', 0, () => {
+      const state = list('ABC');
+      state.longPressAction = CYLTagLongPressActions.handler((host: CYLTagLongPressHost, indexPath: CYLIndexPath) => {
+        host.showCallout(`item ${indexPath.item}`, indexPath);
+      });
+      expect(state.beginLongPress(path(2))).assertFalse();
+      expect(state.calloutText).assertEqual('item 2');
+      state.longPressAction = CYLTagLongPressActions.none;
+      expect(state.calloutIndexPath === undefined).assertTrue();
     });
 
     it('settingAnotherActionCancelsAPressInProgress', 0, () => {

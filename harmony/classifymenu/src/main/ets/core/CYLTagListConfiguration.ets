@@ -30,6 +30,8 @@ export class CYLTagListKey {
   static readonly foldStyle: string = 'foldStyle';
   static readonly allowsEmptySelection: string = 'allowsEmptySelection';
   static readonly showsSectionHeaders: string = 'showsSectionHeaders';
+  /** What a long press does: "reorder", "callout", "report" or "none", or an array of them (the first that can begin wins). */
+  static readonly longPressAction: string = 'longPressAction';
   static readonly scrollEnabled: string = 'scrollEnabled';
   static readonly defaultVisibleRows: string = 'defaultVisibleRows';
   /** An array of index paths ({section, item}), "section-item" strings or [section, item] arrays. */
@@ -71,6 +73,8 @@ export class CYLTagSectionKey {
 /** The keys of an item dictionary. */
 export class CYLTagItemKey {
   static readonly title: string = 'title';
+  /** A longer description, shown in a callout on a long press (`longPressAction` "callout"). */
+  static readonly subtitle: string = 'subtitle';
   static readonly image: string = 'image';
   static readonly selectedImage: string = 'selectedImage';
   /** A Lottie animation: `asset:<rawfile path>`, or the JSON text. */

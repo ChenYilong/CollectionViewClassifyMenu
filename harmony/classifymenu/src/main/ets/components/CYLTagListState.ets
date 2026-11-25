@@ -1692,6 +1692,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
 
   /** Reads everything from the data source again; selections and expanded sections still in range are kept. */
   reloadMenuData(): void {
+    this.dismissCallout();
     this.viewGenerationStorage += 1;
     const source = this.menuDataSource;
     if (this.tagDataSourceStorage !== undefined && source === this.tagDataSourceStorage) {
@@ -2238,6 +2239,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
 
   /** A tap on an item (`collectionView(_:didSelectItemAt:)`): the inline fold control folds, a tag is handled. */
   tapItem(indexPath: CYLIndexPath): void {
+    this.dismissCallout();
     if (this.isInlineFoldCell(indexPath)) {
       this.toggleSection(indexPath.section);
       return;
@@ -2355,6 +2357,36 @@ export class CYLTagListState implements CYLTagLongPressHost {
     }
   }
 
+  /** A configuration's `longPressAction` (a name or an array of names) as an action; undefined when absent or unknown. */
+  private static longPressActionFromConfiguration(value: Object | undefined): CYLTagLongPressAction | undefined {
+    if (value === undefined || value === null) {
+      return undefined;
+    }
+    const names: Object[] = Array.isArray(value) ? value as Object[] : [value];
+    const actions: CYLTagLongPressAction[] = [];
+    for (const name of names) {
+      if (name === 'reorder') {
+        actions.push(CYLTagLongPressActions.reorder);
+      } else if (name === 'callout') {
+        actions.push(CYLTagLongPressActions.callout);
+      } else if (name === 'report') {
+        actions.push(CYLTagLongPressActions.report);
+      } else if (name === 'none') {
+        actions.push(CYLTagLongPressActions.none);
+      } else {
+        return undefined;
+      }
+    }
+    if (actions.length === 0) {
+      return undefined;
+    }
+    // The long press is still reported where no listed action takes it (a tag without a subtitle), unless "none".
+    if (actions.indexOf(CYLTagLongPressActions.none) < 0 && actions.indexOf(CYLTagLongPressActions.report) < 0) {
+      actions.push(CYLTagLongPressActions.report);
+    }
+    return actions.length === 1 ? actions[0] : CYLTagLongPressActions.first(actions);
+  }
+
   /**
    * What a long press on an item does: `CYLTagLongPressActions.first([reorder, report])` by default (reordering where the list
    * can reorder, else the long press is reported). Set another built-in action, a combination or your own.
@@ -2372,7 +2404,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
   // MARK: CYLTagLongPressHost
 
   subtitleForItem(indexPath: CYLIndexPath): string | undefined {
-    return undefined;
+    return this.menuDataSource?.menuSubtitleForItem?.(indexPath);
   }
 
   showCallout(text: string, indexPath: CYLIndexPath): void {
@@ -2581,7 +2613,8 @@ export class CYLTagListState implements CYLTagLongPressHost {
   }
 
   accessibilityHintForItem(indexPath: CYLIndexPath): string | undefined {
-    return this.menuDataSource?.menuAccessibilityHintForItem?.(indexPath);
+    // A screen-reader user rarely long-presses: the subtitle is the hint when the data source gives none.
+    return this.menuDataSource?.menuAccessibilityHintForItem?.(indexPath) ?? this.subtitleForItem(indexPath);
   }
 
   /** The item's own look, or its section's (themed by `colorTheme`; outlined for a create item). */
@@ -3091,6 +3124,10 @@ export class CYLTagListState implements CYLTagLongPressHost {
     if (allowsEmpty !== undefined) {
       this.allowsEmptySelection = allowsEmpty;
     }
+    const longPress = CYLTagListState.longPressActionFromConfiguration(configuration[CYLTagListKey.longPressAction]);
+    if (longPress !== undefined) {
+      this.longPressAction = longPress;
+    }
     const showsHeaders = CYLConfigurationValue.bool(configuration[CYLTagListKey.showsSectionHeaders]);
     if (showsHeaders !== undefined) {
       this.showsSectionHeaders = showsHeaders;
@@ -3203,6 +3240,9 @@ export class CYLTagListConfigurationSource implements CYLMenuDataSource {
   menuTitleForItem(indexPath: CYLIndexPath): string {
     return CYLConfigurationValue.text(this.item(indexPath)[CYLTagItemKey.title]) ?? '';
   }
+
+  menuSubtitleForItem = (indexPath: CYLIndexPath): string | undefined =>
+  CYLConfigurationValue.text(this.item(indexPath)[CYLTagItemKey.subtitle]);
 
   menuImageForItem = (indexPath: CYLIndexPath): CYLImage | undefined =>
   CYLConfigurationValue.image(this.item(indexPath)[CYLTagItemKey.image]);
