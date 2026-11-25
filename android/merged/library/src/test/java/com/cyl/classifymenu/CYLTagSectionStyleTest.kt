@@ -142,22 +142,22 @@ class CYLTagSectionStyleTest {
     }
 
     @Test
-    fun theHeaderTitleStartsWhereTheBoardDoesUnderInsetGrouped() {
-        val list = makeList(insetGrouped(), 4)
-        val title = descendants(list).filterIsInstance<TextView>().first { it.text == "Section 0" }
-        val frame = list.sectionFrame(0)!!
-        val tagX = tagFrame(list, 0, 0).x
-        // The title block has the board's edges; the tags stay inside the board by its padding.
-        assertEquals(frame.card!!.x, title.left.toFloat(), 0.5f)
-        assertEquals(frame.card!!.x, frame.headerInsetLeft, 0.5f)
-        assertEquals(WIDTH_PX - frame.card!!.maxX, frame.headerInsetRight, 0.5f)
-        assertEquals(16f, title.left.toFloat(), 0.5f)
-        assertEquals(16f + CYLSectionStyleMetrics.CARD_PADDING, tagX)
-        assertEquals(CYLSectionStyleMetrics.CARD_PADDING, tagX - title.left, 0.5f)
+    fun theHeaderTitleStartsWhereTheTagsDoInBothStyles() {
+        for (style in listOf(insetGrouped(), plain())) {
+            val list = makeList(style, 4)
+            val title = descendants(list).filterIsInstance<TextView>().first { it.text == "Section 0" }
+            assertEquals(tagFrame(list, 0, 0).x, title.left.toFloat(), 0.5f)
+            assertEquals(tagFrame(list, 0, 0).x, list.sectionFrame(0)!!.headerInsetLeft, 0.5f)
+        }
+        // Under the board: the board's padding inside the 16 margin, as in the first version.
+        val grouped = makeList(insetGrouped(), 4)
+        val frame = grouped.sectionFrame(0)!!
+        assertEquals(16f + CYLSectionStyleMetrics.CARD_PADDING, descendants(grouped).filterIsInstance<TextView>().first { it.text == "Section 0" }.left.toFloat(), 0.5f)
+        assertEquals(WIDTH_PX - frame.card!!.maxX + CYLSectionStyleMetrics.CARD_PADDING, frame.headerInsetRight, 0.5f)
     }
 
     @Test
-    fun aHeaderFoldControlEndsWhereTheBoardEnds() {
+    fun aHeaderFoldControlEndsWhereTheTagsEnd() {
         fun make(style: CYLMenuStyle) = makeList(style, TAGS_IN_TWO_ROWS) {
             it.defaultVisibleRows = 1
             it.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle)
@@ -165,10 +165,115 @@ class CYLTagSectionStyleTest {
         fun fold(list: CYLTagListView) = descendants(list).filterIsInstance<CYLTagFoldButton>().first { it.visibility == View.VISIBLE }
         val grouped = make(insetGrouped())
         assertTrue(grouped.canFoldSection(0))
-        assertEquals(grouped.sectionFrame(0)!!.card!!.maxX, fold(grouped).right.toFloat(), 0.5f)
-        // The plain style is unchanged: the control's glyph padding overhangs the header inset by 6.
+        // The tags' trailing edge (the column's); the control keeps its glyph padding overhang of 6, as in the plain style.
+        assertEquals(grouped.tagColumn(0).maxX + FOLD_OVERHANG, fold(grouped).right.toFloat(), 0.5f)
+        assertEquals(WIDTH_PX - 16f - CYLSectionStyleMetrics.CARD_PADDING + FOLD_OVERHANG, fold(grouped).right.toFloat(), 0.5f)
         val plain = make(plain())
-        assertEquals(WIDTH_PX - 16f + 6f, fold(plain).right.toFloat(), 0.5f)
+        assertEquals(WIDTH_PX - 16f + FOLD_OVERHANG, fold(plain).right.toFloat(), 0.5f)
+    }
+
+    // MARK: The board inset
+
+    @Test
+    fun theDefaultBoardInsetIsUnsetAndGivesTheFirstVersionNumbers() {
+        assertNull(CYLMenuStyle().sectionBoardInset)
+        val list = makeList(insetGrouped(), 4)
+        assertEquals(CYLRect(16f, 0f, WIDTH_PX - 32f, 0f), list.contentColumn(0))
+        assertEquals(16f, list.sectionFrame(0)!!.card!!.x, 0.001f)
+        assertEquals(304f, list.sectionFrame(0)!!.card!!.maxX, 0.001f)
+        assertEquals(28f, list.tagColumn(0).x, 0.001f)
+        assertEquals(292f, list.tagColumn(0).maxX, 0.001f)
+        // Unset is the same as a set 12.
+        val twelve = makeList(insetGrouped().also { it.sectionBoardInset = CYLSectionStyleMetrics.CARD_PADDING }, 4)
+        assertEquals(list.sectionFrame(0)!!.card, twelve.sectionFrame(0)!!.card)
+        assertEquals(list.tagColumn(0), twelve.tagColumn(0))
+        assertEquals(list.contentHeight, twelve.contentHeight, 0.001f)
+    }
+
+    @Test
+    fun theBoardIsTheInsetBeyondTheContentColumnOnBothSides() {
+        for (inset in listOf(0f, 4f, 20f)) {
+            val list = makeList(insetGrouped().also { it.sectionBoardInset = inset }, 4)
+            val card = list.sectionFrame(0)!!.card!!
+            val content = list.tagColumn(0)
+            assertEquals("board left == content left - inset", content.x - inset, card.x, 0.001f)
+            assertEquals("board right == content right + inset", content.maxX + inset, card.maxX, 0.001f)
+            // The board is the margin column whatever the inset.
+            assertEquals(16f, card.x, 0.001f)
+            assertEquals(WIDTH_PX - 16f, card.maxX, 0.001f)
+            val title = descendants(list).filterIsInstance<TextView>().first { it.text == "Section 0" }
+            assertEquals(content.x, title.left.toFloat(), 0.5f)
+            assertEquals(content.x, tagFrame(list, 0, 0).x, 0.5f)
+        }
+    }
+
+    @Test
+    fun anInsetOfZeroHugsTheTags() {
+        val list = makeList(insetGrouped().also { it.sectionBoardInset = 0f }, 4)
+        assertEquals(list.contentColumn(0), list.tagColumn(0))
+        assertEquals(16f, list.tagColumn(0).x, 0.001f)
+        assertEquals(WIDTH_PX - 16f, list.tagColumn(0).maxX, 0.001f)
+        assertEquals(list.sectionFrame(0)!!.card!!.x, tagFrame(list, 0, 0).x, 0.5f)
+    }
+
+    @Test
+    fun aSetInsetOverridesTheLeadingAndTrailingPartsOfTheContentInsets() {
+        val style = insetGrouped().also {
+            it.sectionContentInsets = CYLEdgeInsets(30f, 40f, 30f, 8f)
+            it.sectionBoardInset = 6f
+        }
+        val list = makeList(style, 4)
+        val card = list.sectionFrame(0)!!.card!!
+        assertEquals(card.x + 6f, list.tagColumn(0).x, 0.001f)
+        assertEquals(card.maxX - 6f, list.tagColumn(0).maxX, 0.001f)
+        // Unset: the content insets' own leading and trailing parts, as before.
+        val unset = makeList(insetGrouped().also { it.sectionContentInsets = CYLEdgeInsets(30f, 40f, 30f, 8f) }, 4)
+        val unsetCard = unset.sectionFrame(0)!!.card!!
+        assertEquals(unsetCard.x + 40f, unset.tagColumn(0).x, 0.001f)
+        assertEquals(unsetCard.maxX - 8f, unset.tagColumn(0).maxX, 0.001f)
+    }
+
+    @Test
+    fun theTopAndBottomOfTheContentInsetsStillApplyWithABoardInset() {
+        fun height(top: Float, bottom: Float, inset: Float?) = makeList(insetGrouped().also {
+            it.sectionContentInsets = CYLEdgeInsets(top, 12f, bottom, 12f)
+            it.sectionBoardInset = inset
+        }, 4).contentHeight
+        // 9 more on the top and 9 more on the bottom: 18 taller (the tags stay on one row at both widths).
+        assertEquals(height(12f, 12f, 12f) + 18f, height(21f, 21f, 12f), 0.5f)
+        assertEquals(height(30f, 5f, null), height(30f, 5f, 0f), 0.5f)
+        val list = makeList(insetGrouped().also {
+            it.sectionContentInsets = CYLEdgeInsets(30f, 12f, 5f, 12f)
+            it.sectionBoardInset = 0f
+        }, 4)
+        val card = list.sectionFrame(0)!!.card!!
+        assertEquals(card.y + 30f, tagFrame(list, 0, 0).y, 0.5f)
+    }
+
+    @Test
+    fun aNegativeBoardInsetIsZeroAndTheConfigurationKeyParses() {
+        assertEquals(0f, CYLMenuStyle().also { it.sectionBoardInset = -5f }.sectionBoardInset)
+        assertEquals("sectionBoardInset", CYLMenuStyleSectionBoardInset)
+        assertEquals(7f, CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleSectionBoardInset to 7)).sectionBoardInset)
+        assertEquals(0f, CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleSectionBoardInset to 0)).sectionBoardInset)
+        assertEquals(0f, CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleSectionBoardInset to -3)).sectionBoardInset)
+        assertNull(CYLMenuStyle.styleWithConfiguration(emptyMap()).sectionBoardInset)
+    }
+
+    @Test
+    fun copyKeepsTheBoardInset() {
+        assertEquals(9f, CYLMenuStyle().also { it.sectionBoardInset = 9f }.copy().sectionBoardInset)
+        assertEquals(0f, CYLMenuStyle().also { it.sectionBoardInset = 0f }.copy().sectionBoardInset)
+        assertNull(CYLMenuStyle().copy().sectionBoardInset)
+    }
+
+    @Test
+    fun theBoardInsetDoesNotChangeThePlainStyle() {
+        val plain = makeList(plain(), 4)
+        val withInset = makeList(plain().also { it.sectionBoardInset = 30f }, 4)
+        assertEquals(plain.tagColumn(0), withInset.tagColumn(0))
+        assertEquals(plain.contentHeight, withInset.contentHeight, 0.001f)
+        assertNull(withInset.sectionFrame(0)!!.card)
     }
 
     @Test
@@ -245,9 +350,8 @@ class CYLTagSectionStyleTest {
         assertEquals(frame.card!!.maxX, frame.headerSeparator!!.maxX, 0.001f)
         assertEquals(frame.headerBand!!.x, frame.headerSeparator!!.x)
         assertEquals(frame.headerBand!!.maxX, frame.headerSeparator!!.maxX, 0.001f)
-        // The title block, the card, the band and the divider all have the board's edges.
-        assertEquals(frame.card!!.x, frame.headerInsetLeft, 0.001f)
-        assertEquals(frame.headerSeparator!!.x, frame.headerInsetLeft, 0.001f)
+        // The card, the band and the divider keep the board's edges; the title block has the tags' edges inside them.
+        assertEquals(frame.card!!.x + CYLSectionStyleMetrics.CARD_PADDING, frame.headerInsetLeft, 0.001f)
     }
 
     @Test
@@ -735,6 +839,8 @@ class CYLTagSectionStyleTest {
 
     private companion object {
         const val WIDTH_PX = 320
+        /** The header fold control's glyph padding beyond the header's edge (HEADER_FOLD_OVERHANG of the list view), dp. */
+        const val FOLD_OVERHANG = 6f
         const val TAGS_IN_TWO_ROWS = 16
     }
 }

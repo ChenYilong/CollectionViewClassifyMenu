@@ -241,6 +241,13 @@ class CYLMenuStyle {
     /** The padding inside the card around the tags (`insetGrouped`), dp. */
     var sectionContentInsets: CYLEdgeInsets = CYLEdgeInsets(CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING,
         CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING)
+    /**
+     * The horizontal inset of the content column (the tags and the header block) inside the board, one value for both sides, dp.
+     * null (the default): the leading and trailing parts of [sectionContentInsets] ([CYLSectionStyleMetrics.CARD_PADDING], 12);
+     * a set value (0 included) replaces them (top and bottom still come from [sectionContentInsets]); a negative value is 0.
+     */
+    var sectionBoardInset: Float? = null
+        set(value) { field = value?.let { max(0f, it) } }
     /** The header band's color; null: no band (today's look). [CYLSectionStyleColors.HEADER_BAND] is the usual one. */
     var headerBackgroundColor: Int? = null
     var headerCornerRadius: Float = 0f
@@ -493,6 +500,7 @@ class CYLMenuStyle {
         copy.sectionBackgroundStyle = sectionBackgroundStyle
         copy.sectionCornerRadius = sectionCornerRadius
         copy.sectionContentInsets = sectionContentInsets
+        copy.sectionBoardInset = sectionBoardInset
         copy.headerBackgroundColor = headerBackgroundColor
         copy.headerCornerRadius = headerCornerRadius
         copy.headerContentInsets = headerContentInsets
