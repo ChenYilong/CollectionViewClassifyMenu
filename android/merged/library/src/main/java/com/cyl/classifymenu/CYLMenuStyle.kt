@@ -27,6 +27,55 @@ enum class CYLTagBackgroundStyle { CYLTagBackgroundStyleFlat, CYLTagBackgroundSt
 /** `CYLTagRowAlignment`: where a row of tags sits in the list's width. */
 enum class CYLTagRowAlignment { CYLTagRowAlignmentLeading, CYLTagRowAlignmentCenter, CYLTagRowAlignmentTrailing }
 
+/**
+ * `CYLSectionStyle`: how a section's tags sit in the list: `plain` (the default) on the list's background; `insetGrouped`
+ * inside a rounded card (UITableView's inset grouped look), the header above it.
+ */
+enum class CYLSectionStyle { CYLSectionStylePlain, CYLSectionStyleInsetGrouped }
+
+/** `CYLHeaderSeparatorStyle`: the line at the bottom of a section header: `none` (the default) or a `line`. */
+enum class CYLHeaderSeparatorStyle { CYLHeaderSeparatorStyleNone, CYLHeaderSeparatorStyleLine }
+
+/** The named lengths of the section style, dp. */
+object CYLSectionStyleMetrics {
+    /** The corner radius of a section card. */
+    const val CARD_CORNER_RADIUS: Float = 10f
+    /** The padding between a section card and its tags. */
+    const val CARD_PADDING: Float = 12f
+    /** The padding between a header band and its title, leading and trailing. */
+    const val HEADER_BAND_PADDING: Float = 12f
+    /** The thickness of the header divider: one hairline. */
+    const val SEPARATOR_THICKNESS: Float = 0.5f
+}
+
+/**
+ * The colors of the section style, each following the color mode (as `CYLSystemColors`): a style whose color is null
+ * resolves to them; an app can also set one itself, for example [HEADER_BAND] on `headerBackgroundColor`.
+ */
+object CYLSectionStyleColors {
+    /** The section card in light mode: white. */
+    const val CARD: Int = Color.WHITE
+    /** The section card in dark mode: #1C1C1E (the secondary system background). */
+    const val CARD_DARK: Int = CYLSystemColors.SECONDARY_BACKGROUND_DARK
+    /** The header band in light mode: #EFEFF4 (the TagCollectionView header). */
+    const val HEADER_BAND: Int = 0xFFEFEFF4.toInt()
+    /** The header band in dark mode: #2C2C2E. */
+    const val HEADER_BAND_DARK: Int = 0xFF2C2C2E.toInt()
+    /** The list background under `insetGrouped` in light mode: #F2F2F7. */
+    const val GROUPED_BACKGROUND: Int = 0xFFF2F2F7.toInt()
+    /** The list background under `insetGrouped` in dark mode: black. */
+    const val GROUPED_BACKGROUND_DARK: Int = Color.BLACK
+    /** The header divider in light mode: the system separator (#3C3C43 at 29 %). */
+    const val SEPARATOR: Int = 0x4A3C3C43
+    /** The header divider in dark mode: the system separator (#545458 at 60 %). */
+    const val SEPARATOR_DARK: Int = 0x99545458.toInt()
+
+    fun card(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) CARD_DARK else CARD
+    fun headerBand(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) HEADER_BAND_DARK else HEADER_BAND
+    fun groupedBackground(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) GROUPED_BACKGROUND_DARK else GROUPED_BACKGROUND
+    fun separator(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) SEPARATOR_DARK else SEPARATOR
+}
+
 /** `CYLTagDeleteIndicatorPlacement`: the delete indicator after or before the title. */
 enum class CYLTagDeleteIndicatorPlacement { CYLTagDeleteIndicatorPlacementTrailing, CYLTagDeleteIndicatorPlacementLeading }
 
@@ -140,7 +189,70 @@ class CYLMenuStyle {
     var interitemSpacing: Float = 10f
     var lineSpacing: Float = 10f
     var sectionInsets: CYLEdgeInsets = CYLEdgeInsets(10f, 16f, 10f, 16f)
-    var backgroundColor: Int = Color.WHITE
+    private var backgroundColorValue: Int = Color.WHITE
+    private var backgroundColorWasSet: Boolean = false
+
+    /**
+     * The list's background color, white by default. Under `insetGrouped` a list whose background the app never set shows
+     * the grouped background instead ([resolvedBackgroundColor]).
+     */
+    var backgroundColor: Int
+        get() = backgroundColorValue
+        set(value) {
+            backgroundColorValue = value
+            backgroundColorWasSet = true
+        }
+
+    // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
+    /** `plain` (the default) or `insetGrouped`: the section's tags inside a rounded card. */
+    var sectionStyle: CYLSectionStyle = CYLSectionStyle.CYLSectionStylePlain
+    /** The card's color; null resolves to the system card color ([resolvedSectionBackgroundColor]). */
+    var sectionBackgroundColor: Int? = null
+    /**
+     * The card's background: flat (the default) is the solid [sectionBackgroundColor]; Liquid Glass draws the library's glass
+     * behind the tags with the card's corners, tinted with [sectionBackgroundColor] when it is set. Where the device draws no
+     * glass the card stays flat ([resolvedSectionBackgroundStyle]). Independent of the tags' `backgroundStyle`.
+     */
+    var sectionBackgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+
+    /** The card background really drawn: [sectionBackgroundStyle], or flat when `CYLLiquidGlass.isActive()` is false. */
+    val resolvedSectionBackgroundStyle: CYLTagBackgroundStyle
+        get() = if (sectionBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && com.cyl.animateditem.CYLAnimatedItemView.isLiquidGlassActive())
+            CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass else CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+    var sectionCornerRadius: Float = CYLSectionStyleMetrics.CARD_CORNER_RADIUS
+        set(value) { field = max(0f, value) }
+    /** The padding inside the card around the tags (`insetGrouped`), dp. */
+    var sectionContentInsets: CYLEdgeInsets = CYLEdgeInsets(CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING,
+        CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING)
+    /** The header band's color; null: no band (today's look). [CYLSectionStyleColors.HEADER_BAND] is the usual one. */
+    var headerBackgroundColor: Int? = null
+    var headerCornerRadius: Float = 0f
+        set(value) { field = max(0f, value) }
+    /** A plain header's title and fold control inset from the band's edges (left and right), dp. */
+    var headerContentInsets: CYLEdgeInsets = CYLEdgeInsets(0f, CYLSectionStyleMetrics.HEADER_BAND_PADDING, 0f, CYLSectionStyleMetrics.HEADER_BAND_PADDING)
+    var headerSeparatorStyle: CYLHeaderSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone
+    /** The divider's color; null resolves to the system separator color ([resolvedHeaderSeparatorColor]). */
+    var headerSeparatorColor: Int? = null
+    var headerSeparatorThickness: Float = CYLSectionStyleMetrics.SEPARATOR_THICKNESS
+        set(value) { field = max(0f, value) }
+    /**
+     * The divider's leading (left) and trailing (right) inset from the column's edges, dp; null (the default) is 0 and 0: the
+     * divider has the same left and right edges as the card and the header band, never the title's x.
+     */
+    var headerSeparatorInsets: CYLEdgeInsets? = null
+
+    /** True when the section style draws the cards. */
+    val isInsetGrouped: Boolean get() = sectionStyle == CYLSectionStyle.CYLSectionStyleInsetGrouped
+
+    /** The list background in use: the grouped background where `insetGrouped` and the app never set [backgroundColor]. */
+    fun resolvedBackgroundColor(context: android.content.Context): Int =
+        if (isInsetGrouped && !backgroundColorWasSet) CYLSectionStyleColors.groupedBackground(context) else backgroundColorValue
+
+    /** The card's color in use. */
+    fun resolvedSectionBackgroundColor(context: android.content.Context): Int = sectionBackgroundColor ?: CYLSectionStyleColors.card(context)
+
+    /** The divider's color in use. */
+    fun resolvedHeaderSeparatorColor(context: android.content.Context): Int = headerSeparatorColor ?: CYLSectionStyleColors.separator(context)
 
     // Section headers
     var headerHeight: Float = 36f
@@ -292,7 +404,20 @@ class CYLMenuStyle {
         copy.interitemSpacing = interitemSpacing
         copy.lineSpacing = lineSpacing
         copy.sectionInsets = sectionInsets
-        copy.backgroundColor = backgroundColor
+        copy.backgroundColorValue = backgroundColorValue
+        copy.backgroundColorWasSet = backgroundColorWasSet
+        copy.sectionStyle = sectionStyle
+        copy.sectionBackgroundColor = sectionBackgroundColor
+        copy.sectionBackgroundStyle = sectionBackgroundStyle
+        copy.sectionCornerRadius = sectionCornerRadius
+        copy.sectionContentInsets = sectionContentInsets
+        copy.headerBackgroundColor = headerBackgroundColor
+        copy.headerCornerRadius = headerCornerRadius
+        copy.headerContentInsets = headerContentInsets
+        copy.headerSeparatorStyle = headerSeparatorStyle
+        copy.headerSeparatorColor = headerSeparatorColor
+        copy.headerSeparatorThickness = headerSeparatorThickness
+        copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
         copy.headerFont = headerFont
         copy.headerTextColor = headerTextColor

@@ -275,6 +275,30 @@ const val CYLMenuStyleAdjustsFontForContentSizeCategory = "adjustsFontForContent
  * Style key: a color.
  */
 const val CYLMenuStyleBackgroundColor = "backgroundColor"
+/** Style key: "plain" or "insetGrouped" (case-insensitive), or a `CYLSectionStyle` ordinal: the section card. */
+const val CYLMenuStyleSectionStyle = "sectionStyle"
+/** Style key: a color: the card's. */
+const val CYLMenuStyleSectionBackgroundColor = "sectionBackgroundColor"
+/** Style key: "flat" or "liquidGlass" (case-insensitive), or a `CYLTagBackgroundStyle` ordinal: the card's background. */
+const val CYLMenuStyleSectionBackgroundStyle = "sectionBackgroundStyle"
+/** Style key: a number, dp. */
+const val CYLMenuStyleSectionCornerRadius = "sectionCornerRadius"
+/** Style key: insets, the padding inside the card. */
+const val CYLMenuStyleSectionContentInsets = "sectionContentInsets"
+/** Style key: a color: the header band's; absent: no band. */
+const val CYLMenuStyleHeaderBackgroundColor = "headerBackgroundColor"
+/** Style key: a number, dp. */
+const val CYLMenuStyleHeaderCornerRadius = "headerCornerRadius"
+/** Style key: insets (left and right are used). */
+const val CYLMenuStyleHeaderContentInsets = "headerContentInsets"
+/** Style key: "none" or "line" (case-insensitive), or a `CYLHeaderSeparatorStyle` ordinal: the header divider. */
+const val CYLMenuStyleHeaderSeparatorStyle = "headerSeparatorStyle"
+/** Style key: a color: the divider's. */
+const val CYLMenuStyleHeaderSeparatorColor = "headerSeparatorColor"
+/** Style key: a number, dp. */
+const val CYLMenuStyleHeaderSeparatorThickness = "headerSeparatorThickness"
+/** Style key: insets (left and right are used): the divider's inset from the column's edges. */
+const val CYLMenuStyleHeaderSeparatorInsets = "headerSeparatorInsets"
 /**
  * Style key: a color.
  */
@@ -791,6 +815,32 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     (configuration[CYLMenuStyleDeleteIndicatorTitle] as? String)?.let { deleteIndicatorTitle = it }
     if (CYLMenuStyleDeleteIndicatorColor in configuration) deleteIndicatorColor = color(configuration[CYLMenuStyleDeleteIndicatorColor])
     if (CYLMenuStyleDeleteIndicatorFont in configuration) deleteIndicatorFont = font(configuration[CYLMenuStyleDeleteIndicatorFont])
+    applySectionStyleConfiguration(configuration)
+}
+
+/** The section card, header band and header divider keys of [applyConfiguration]. */
+private fun CYLMenuStyle.applySectionStyleConfiguration(configuration: Map<String, Any?>) {
+    configuration[CYLMenuStyleSectionStyle]?.let {
+        sectionStyle = enumValue(it, mapOf("plain" to CYLSectionStyle.CYLSectionStylePlain,
+            "insetgrouped" to CYLSectionStyle.CYLSectionStyleInsetGrouped), CYLSectionStyle.values(), sectionStyle)
+    }
+    color(configuration[CYLMenuStyleSectionBackgroundColor])?.let { sectionBackgroundColor = it }
+    configuration[CYLMenuStyleSectionBackgroundStyle]?.let {
+        sectionBackgroundStyle = enumValue(it, mapOf("flat" to CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat,
+            "liquidglass" to CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass), CYLTagBackgroundStyle.values(), sectionBackgroundStyle)
+    }
+    number(configuration[CYLMenuStyleSectionCornerRadius])?.let { sectionCornerRadius = it.toFloat() }
+    insets(configuration[CYLMenuStyleSectionContentInsets])?.let { sectionContentInsets = it }
+    color(configuration[CYLMenuStyleHeaderBackgroundColor])?.let { headerBackgroundColor = it }
+    number(configuration[CYLMenuStyleHeaderCornerRadius])?.let { headerCornerRadius = it.toFloat() }
+    insets(configuration[CYLMenuStyleHeaderContentInsets])?.let { headerContentInsets = it }
+    configuration[CYLMenuStyleHeaderSeparatorStyle]?.let {
+        headerSeparatorStyle = enumValue(it, mapOf("none" to CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone,
+            "line" to CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine), CYLHeaderSeparatorStyle.values(), headerSeparatorStyle)
+    }
+    color(configuration[CYLMenuStyleHeaderSeparatorColor])?.let { headerSeparatorColor = it }
+    number(configuration[CYLMenuStyleHeaderSeparatorThickness])?.let { headerSeparatorThickness = it.toFloat() }
+    insets(configuration[CYLMenuStyleHeaderSeparatorInsets])?.let { headerSeparatorInsets = it }
 }
 
 // MARK: Tag
