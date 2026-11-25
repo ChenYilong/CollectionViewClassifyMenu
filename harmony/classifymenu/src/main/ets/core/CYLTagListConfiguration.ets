@@ -541,8 +541,13 @@ export class CYLMenuConfiguration {
    */
   static applyToAppearance(appearance: CYLTagAppearance, configuration: CYLConfiguration): void {
     if (configuration[CYLTagAppearanceKey.backgroundColor] !== undefined) {
-      appearance.backgroundColor = CYLConfigurationValue.color(configuration[CYLTagAppearanceKey.backgroundColor]) ??
-      CYLTagAppearance.defaultBackgroundColor;
+      const configuredBackground = CYLConfigurationValue.color(configuration[CYLTagAppearanceKey.backgroundColor]);
+      if (configuredBackground !== undefined) {
+        appearance.backgroundColor = configuredBackground;
+      } else {
+        // Not a color: back to "unset", never the built-in default stored as if the app had set it.
+        appearance.resetBackgroundColor();
+      }
     }
     if (configuration[CYLTagAppearanceKey.textColor] !== undefined) {
       appearance.textColor = CYLConfigurationValue.color(configuration[CYLTagAppearanceKey.textColor]) ??

@@ -14,6 +14,7 @@ import tagListTailFoldTest from './TagListTailFold.test';
 import tagLongPressActionTest from './TagLongPressAction.test';
 import tagTitleMaxLinesTest from './TagTitleMaxLines.test';
 import tagSectionStyleTest from './TagSectionStyle.test';
+import tagGlassBackgroundTest from './TagGlassBackground.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -32,4 +33,5 @@ export default function testsuite() {
   tagLongPressActionTest();
   tagTitleMaxLinesTest();
   tagSectionStyleTest();
+  tagGlassBackgroundTest();
 }
