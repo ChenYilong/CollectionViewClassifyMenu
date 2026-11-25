@@ -23,6 +23,7 @@ const CONFIGURATION = {
   ],
 }
 
+// Note: the dark snapshot has the list background black (the unset background follows dark mode now), the one change since the snapshot.
 /** The same list with the opt-out of the default card: the look of before the section style, which the fixture holds. */
 const PLAIN_CONFIGURATION = { ...CONFIGURATION, style: { sectionStyle: PLAIN_SECTION_STYLE } }
 

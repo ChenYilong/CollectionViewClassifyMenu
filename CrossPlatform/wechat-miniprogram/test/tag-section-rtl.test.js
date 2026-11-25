@@ -113,7 +113,10 @@ test('the card and the band are symmetric: their CSS other than the sides is the
   const style = { headerBackgroundColor: '#EFEFF4' }
   const ltr = model.sectionLayout(styleOf(style))
   const rtl = model.sectionLayout(rtlOf(style))
-  assert.deepEqual(rtl, ltr)
+  // The list's items margin that absorbs the last tag's spacing is mirrored (left in rtl), which is the only difference.
+  const withoutItemsMargin = ({ itemsStyle, ...rest }) => rest
+  assert.deepEqual(withoutItemsMargin(rtl), withoutItemsMargin(ltr))
+  assert.notEqual(rtl.itemsStyle, ltr.itemsStyle)
 })
 
 test('the component puts direction: rtl on the list, selects the mirrored rules and keeps ltr as it was', () => {

@@ -17,11 +17,12 @@ function styleOf(style, options) {
   return model.normalize({ style, sections: [{ title: 'S', items: ['a'] }] }, options).sections[0].style;
 }
 
-test('an unset background is white in light mode and black in dark mode', () => {
-  assert.equal(model.resolvedBackgroundColor(styleOf({}, LIGHT)), WHITE);
-  assert.equal(model.resolvedBackgroundColor(styleOf({}, DARK)), BLACK);
-  assert.equal(model.sectionLayout(styleOf({}, LIGHT)).backgroundStyle, 'background-color: #FFFFFF');
-  assert.equal(model.sectionLayout(styleOf({}, DARK)).backgroundStyle, 'background-color: #000000');
+test('an unset background is white in light mode and black in dark mode (the plain look; the card default is grouped)', () => {
+  const plain = { sectionStyle: 'plain' };
+  assert.equal(model.resolvedBackgroundColor(styleOf(plain, LIGHT)), WHITE);
+  assert.equal(model.resolvedBackgroundColor(styleOf(plain, DARK)), BLACK);
+  assert.equal(model.sectionLayout(styleOf(plain, LIGHT)).backgroundStyle, 'background-color: #FFFFFF');
+  assert.equal(model.sectionLayout(styleOf(plain, DARK)).backgroundStyle, 'background-color: #000000');
   assert.equal(model.SECTION_COLORS.light.listBackground, WHITE);
   assert.equal(model.SECTION_COLORS.dark.listBackground, BLACK);
 });
