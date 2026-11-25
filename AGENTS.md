@@ -55,6 +55,10 @@ verify the behavior and update the applicable documentation.
 - Emulators and simulators are shared: tell the other sessions before restarting a hung one and when it is back; an
   emulator that will not boot is restarted without asking.
 - Run scripts with bash (`bash script.sh`, `bash <<'EOF'`), never in the interactive zsh.
+- **Before you run a simulator, read [Simulators and emulators: stop them when the work is done](docs/instructions/sessions.md#simulators-and-emulators-stop-them-when-the-work-is-done), or this text:** after running a
+  simulator and finishing the test or screenshots, immediately kill the app and the simulator process (your own devices
+  only: `xcrun simctl terminate <udid> <bundle id>`, `xcrun simctl shutdown <udid>`; never `shutdown all` or a broad `pkill`);
+  start them again when needed. Do not leave the app or the simulator running after the task is done.
 - Sections: [Session roles by name: Mac for iOS, Win for the other platforms](docs/instructions/sessions.md#session-roles-by-name-mac-for-ios-win-for-the-other-platforms) · [Shared emulators and simulators](docs/instructions/sessions.md#shared-emulators-and-simulators) · [Running scripts](docs/instructions/sessions.md#running-scripts).
 
 ## [windows] Windows-only scenarios
