@@ -27,6 +27,55 @@ enum class CYLTagBackgroundStyle { CYLTagBackgroundStyleFlat, CYLTagBackgroundSt
 /** `CYLTagRowAlignment`: where a row of tags sits in the list's width. */
 enum class CYLTagRowAlignment { CYLTagRowAlignmentLeading, CYLTagRowAlignmentCenter, CYLTagRowAlignmentTrailing }
 
+/**
+ * `CYLSectionStyle`: how a section's tags sit in the list: `plain` (the default) on the list's background; `insetGrouped`
+ * inside a rounded card (UITableView's inset grouped look), the header above it.
+ */
+enum class CYLSectionStyle { CYLSectionStylePlain, CYLSectionStyleInsetGrouped }
+
+/** `CYLHeaderSeparatorStyle`: the line at the bottom of a section header: `none` (the default) or a `line`. */
+enum class CYLHeaderSeparatorStyle { CYLHeaderSeparatorStyleNone, CYLHeaderSeparatorStyleLine }
+
+/** The named lengths of the section style, dp. */
+object CYLSectionStyleMetrics {
+    /** The corner radius of a section card. */
+    const val CARD_CORNER_RADIUS: Float = 10f
+    /** The padding between a section card and its tags. */
+    const val CARD_PADDING: Float = 12f
+    /** The padding between a header band and its title, leading and trailing. */
+    const val HEADER_BAND_PADDING: Float = 12f
+    /** The thickness of the header divider: one hairline. */
+    const val SEPARATOR_THICKNESS: Float = 0.5f
+}
+
+/**
+ * The colors of the section style, each following the color mode (as `CYLSystemColors`): a style whose color is null
+ * resolves to them; an app can also set one itself, for example [HEADER_BAND] on `headerBackgroundColor`.
+ */
+object CYLSectionStyleColors {
+    /** The section card in light mode: white. */
+    const val CARD: Int = Color.WHITE
+    /** The section card in dark mode: #1C1C1E (the secondary system background). */
+    const val CARD_DARK: Int = CYLSystemColors.SECONDARY_BACKGROUND_DARK
+    /** The header band in light mode: #EFEFF4 (the TagCollectionView header). */
+    const val HEADER_BAND: Int = 0xFFEFEFF4.toInt()
+    /** The header band in dark mode: #2C2C2E. */
+    const val HEADER_BAND_DARK: Int = 0xFF2C2C2E.toInt()
+    /** The list background under `insetGrouped` in light mode: #F2F2F7. */
+    const val GROUPED_BACKGROUND: Int = 0xFFF2F2F7.toInt()
+    /** The list background under `insetGrouped` in dark mode: black. */
+    const val GROUPED_BACKGROUND_DARK: Int = Color.BLACK
+    /** The header divider in light mode: the system separator (#3C3C43 at 29 %). */
+    const val SEPARATOR: Int = 0x4A3C3C43
+    /** The header divider in dark mode: the system separator (#545458 at 60 %). */
+    const val SEPARATOR_DARK: Int = 0x99545458.toInt()
+
+    fun card(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) CARD_DARK else CARD
+    fun headerBand(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) HEADER_BAND_DARK else HEADER_BAND
+    fun groupedBackground(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) GROUPED_BACKGROUND_DARK else GROUPED_BACKGROUND
+    fun separator(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) SEPARATOR_DARK else SEPARATOR
+}
+
 /** `CYLTagDeleteIndicatorPlacement`: the delete indicator after or before the title. */
 enum class CYLTagDeleteIndicatorPlacement { CYLTagDeleteIndicatorPlacementTrailing, CYLTagDeleteIndicatorPlacementLeading }
 
@@ -140,17 +189,80 @@ class CYLMenuStyle {
     var interitemSpacing: Float = 10f
     var lineSpacing: Float = 10f
     var sectionInsets: CYLEdgeInsets = CYLEdgeInsets(10f, 16f, 10f, 16f)
-    var backgroundColor: Int = Color.WHITE
+    private var backgroundColorValue: Int = Color.WHITE
+    private var backgroundColorWasSet: Boolean = false
+
+    /**
+     * The list's background color, white by default. Under `insetGrouped` a list whose background the app never set shows
+     * the grouped background instead ([resolvedBackgroundColor]).
+     */
+    var backgroundColor: Int
+        get() = backgroundColorValue
+        set(value) {
+            backgroundColorValue = value
+            backgroundColorWasSet = true
+        }
+
+    // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
+    /** `plain` (the default) or `insetGrouped`: the section's tags inside a rounded card. */
+    var sectionStyle: CYLSectionStyle = CYLSectionStyle.CYLSectionStylePlain
+    /** The card's color; null resolves to the system card color ([resolvedSectionBackgroundColor]). */
+    var sectionBackgroundColor: Int? = null
+    /**
+     * The card's background: flat (the default) is the solid [sectionBackgroundColor]; Liquid Glass draws the library's glass
+     * behind the tags with the card's corners, tinted with [sectionBackgroundColor] when it is set. Where the device draws no
+     * glass the card stays flat ([resolvedSectionBackgroundStyle]). Independent of the tags' `backgroundStyle`.
+     */
+    var sectionBackgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+
+    /** The card background really drawn: [sectionBackgroundStyle], or flat when `CYLLiquidGlass.isActive()` is false. */
+    val resolvedSectionBackgroundStyle: CYLTagBackgroundStyle
+        get() = if (sectionBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && com.cyl.animateditem.CYLAnimatedItemView.isLiquidGlassActive())
+            CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass else CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+    var sectionCornerRadius: Float = CYLSectionStyleMetrics.CARD_CORNER_RADIUS
+        set(value) { field = max(0f, value) }
+    /** The padding inside the card around the tags (`insetGrouped`), dp. */
+    var sectionContentInsets: CYLEdgeInsets = CYLEdgeInsets(CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING,
+        CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING)
+    /** The header band's color; null: no band (today's look). [CYLSectionStyleColors.HEADER_BAND] is the usual one. */
+    var headerBackgroundColor: Int? = null
+    var headerCornerRadius: Float = 0f
+        set(value) { field = max(0f, value) }
+    /** A plain header's title and fold control inset from the band's edges (left and right), dp. */
+    var headerContentInsets: CYLEdgeInsets = CYLEdgeInsets(0f, CYLSectionStyleMetrics.HEADER_BAND_PADDING, 0f, CYLSectionStyleMetrics.HEADER_BAND_PADDING)
+    var headerSeparatorStyle: CYLHeaderSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone
+    /** The divider's color; null resolves to the system separator color ([resolvedHeaderSeparatorColor]). */
+    var headerSeparatorColor: Int? = null
+    var headerSeparatorThickness: Float = CYLSectionStyleMetrics.SEPARATOR_THICKNESS
+        set(value) { field = max(0f, value) }
+    /**
+     * The divider's leading (left) and trailing (right) inset from the column's edges, dp; null (the default) is 0 and 0: the
+     * divider has the same left and right edges as the card and the header band, never the title's x.
+     */
+    var headerSeparatorInsets: CYLEdgeInsets? = null
+
+    /** True when the section style draws the cards. */
+    val isInsetGrouped: Boolean get() = sectionStyle == CYLSectionStyle.CYLSectionStyleInsetGrouped
+
+    /** The list background in use: the grouped background where `insetGrouped` and the app never set [backgroundColor]. */
+    fun resolvedBackgroundColor(context: android.content.Context): Int =
+        if (isInsetGrouped && !backgroundColorWasSet) CYLSectionStyleColors.groupedBackground(context) else backgroundColorValue
+
+    /** The card's color in use. */
+    fun resolvedSectionBackgroundColor(context: android.content.Context): Int = sectionBackgroundColor ?: CYLSectionStyleColors.card(context)
+
+    /** The divider's color in use. */
+    fun resolvedHeaderSeparatorColor(context: android.content.Context): Int = headerSeparatorColor ?: CYLSectionStyleColors.separator(context)
 
     // Section headers
     var headerHeight: Float = 36f
     var headerFont: CYLFont = CYLFont.systemFont(14f)
-    /** null (the default): the list's one tint, the theme's `textColorPrimary`, so it is visible in dark mode (iOS `UIColor.label`). */
+    /** null (the default): [tintColor], else its default by the background luminance ([resolvedHeaderTextColor]). */
     var headerTextColor: Int? = null
     var headerHorizontalInset: Float = 16f
 
     // Fold controls
-    /** null (the default): the list's one tint (see [headerTextColor]); a control's own color wins. */
+    /** null (the default): the tint (see [headerTextColor]); a control's own color wins. */
     var foldControlColor: Int? = null
     var expandTitle: String = CYLMenuLocalizedString("CYLMenuExpand", "Expand a section")
     var foldChevronImage: Drawable? = null
@@ -158,20 +270,52 @@ class CYLMenuStyle {
 
     // The More button
     var moreButtonImage: Drawable? = null
-    /** null (the default): the list's one tint (see [headerTextColor]). */
+    /** null (the default): the tint (see [headerTextColor]). */
     var moreButtonColor: Int? = null
 
-    /** The header title color in use: [headerTextColor], else the list's one tint of [context]. */
-    fun resolvedHeaderTextColor(context: android.content.Context): Int = headerTextColor ?: CYLSystemColors.primary(context)
+    /**
+     * The one color of every built-in view that is not a tag (header title, section icon, fold / More / clear controls); null
+     * (the default): black or white by the luminance of the background it is drawn on ([resolvedTintColor]). A color set on
+     * the title, the fold control, the More button or the clear button itself wins over it for that view.
+     */
+    var tintColor: Int? = null
 
-    /** The fold controls' color in use: [foldControlColor], else the list's one tint of [context]. */
-    fun resolvedFoldControlColor(context: android.content.Context): Int = foldControlColor ?: CYLSystemColors.primary(context)
+    /**
+     * The default tint on `background`: black on a light one, white on a dark one ([CYLTintLuminanceThreshold]); the system
+     * mode ([CYLSystemColors.primary]) when the background is not an opaque color (a transparent list shows the page).
+     */
+    private fun tintOn(context: android.content.Context, background: Int): Int {
+        val luminance = CYLMenuColorLuminance(background) ?: return CYLSystemColors.primary(context)
+        return if (luminance > CYLTintLuminanceThreshold) Color.BLACK else Color.WHITE
+    }
 
-    /** The More button's color in use: [moreButtonColor], else the list's one tint of [context]. */
-    fun resolvedMoreButtonColor(context: android.content.Context): Int = moreButtonColor ?: CYLSystemColors.primary(context)
+    /**
+     * The tint as drawn: [tintColor], else the default against what is behind the view: the band color when `onBand` (a
+     * header with a band) and a band is set, else the list's own background ([resolvedBackgroundColor]: the app's color, the
+     * grouped background under `insetGrouped`, the default white the list paints).
+     */
+    @JvmOverloads
+    fun resolvedTintColor(context: android.content.Context, onBand: Boolean = false): Int {
+        tintColor?.let { return it }
+        val band = headerBackgroundColor
+        return tintOn(context, if (onBand && band != null) band else resolvedBackgroundColor(context))
+    }
+
+    /** The header title color in use: [headerTextColor], else the tint. */
+    @JvmOverloads
+    fun resolvedHeaderTextColor(context: android.content.Context, onBand: Boolean = false): Int = headerTextColor ?: resolvedTintColor(context, onBand)
+
+    /** The fold controls' color in use: [foldControlColor], else the tint (a control's own color still wins). */
+    @JvmOverloads
+    fun resolvedFoldControlColor(context: android.content.Context, onBand: Boolean = false): Int = foldControlColor ?: resolvedTintColor(context, onBand)
+
+    /** The More button's color in use: [moreButtonColor], else the tint. */
+    @JvmOverloads
+    fun resolvedMoreButtonColor(context: android.content.Context, onBand: Boolean = false): Int = moreButtonColor ?: resolvedTintColor(context, onBand)
 
     /** The clear button's color in use: [clearButtonColor], else the header title's. */
-    fun resolvedClearButtonColor(context: android.content.Context): Int = clearButtonColor ?: resolvedHeaderTextColor(context)
+    @JvmOverloads
+    fun resolvedClearButtonColor(context: android.content.Context, onBand: Boolean = false): Int = clearButtonColor ?: resolvedHeaderTextColor(context, onBand)
 
     init {
         val hairline = 1f / max(1f, Resources.getSystem().displayMetrics.density)
@@ -292,9 +436,23 @@ class CYLMenuStyle {
         copy.interitemSpacing = interitemSpacing
         copy.lineSpacing = lineSpacing
         copy.sectionInsets = sectionInsets
-        copy.backgroundColor = backgroundColor
+        copy.backgroundColorValue = backgroundColorValue
+        copy.backgroundColorWasSet = backgroundColorWasSet
+        copy.sectionStyle = sectionStyle
+        copy.sectionBackgroundColor = sectionBackgroundColor
+        copy.sectionBackgroundStyle = sectionBackgroundStyle
+        copy.sectionCornerRadius = sectionCornerRadius
+        copy.sectionContentInsets = sectionContentInsets
+        copy.headerBackgroundColor = headerBackgroundColor
+        copy.headerCornerRadius = headerCornerRadius
+        copy.headerContentInsets = headerContentInsets
+        copy.headerSeparatorStyle = headerSeparatorStyle
+        copy.headerSeparatorColor = headerSeparatorColor
+        copy.headerSeparatorThickness = headerSeparatorThickness
+        copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
         copy.headerFont = headerFont
+        copy.tintColor = tintColor
         copy.headerTextColor = headerTextColor
         copy.headerHorizontalInset = headerHorizontalInset
         copy.foldControlColor = foldControlColor

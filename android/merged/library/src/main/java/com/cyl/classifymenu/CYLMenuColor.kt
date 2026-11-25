@@ -20,6 +20,34 @@ fun CYLMenuColorFromString(string: String?): Int? {
     return CYLUIColorNames[name]
 }
 
+/**
+ * The relative luminance (WCAG 2.x, 0 black ... 1 white) of an opaque ARGB color; null when the color is not opaque
+ * (transparent or translucent: what is behind it is not known).
+ */
+fun CYLMenuColorLuminance(color: Int): Float? {
+    if (Color.alpha(color) != CYLTintChannelMax) return null
+    fun linear(channel: Int): Double {
+        val c = channel / CYLTintChannelMax.toDouble()
+        return if (c <= CYLTintLinearCutoff) c / CYLTintLinearSlope else Math.pow((c + CYLTintOffset) / CYLTintScale, CYLTintGamma)
+    }
+    return (CYLTintLumaRed * linear(Color.red(color)) + CYLTintLumaGreen * linear(Color.green(color)) + CYLTintLumaBlue * linear(Color.blue(color))).toFloat()
+}
+
+/**
+ * The relative luminance above which a background counts as light, so that the default tint on it is black: 0.179 is where
+ * black and white have the same contrast ratio against it.
+ */
+const val CYLTintLuminanceThreshold: Float = 0.179f
+private const val CYLTintChannelMax = 255
+private const val CYLTintLinearCutoff = 0.03928
+private const val CYLTintLinearSlope = 12.92
+private const val CYLTintOffset = 0.055
+private const val CYLTintScale = 1.055
+private const val CYLTintGamma = 2.4
+private const val CYLTintLumaRed = 0.2126
+private const val CYLTintLumaGreen = 0.7152
+private const val CYLTintLumaBlue = 0.0722
+
 /** The UIColor class properties a configuration may name, in their light appearance. */
 internal val CYLUIColorNames: Map<String, Int> = mapOf(
     "black" to Color.BLACK, "white" to Color.WHITE, "clear" to Color.TRANSPARENT, "darkGray" to CYLColor.white(1f / 3),
