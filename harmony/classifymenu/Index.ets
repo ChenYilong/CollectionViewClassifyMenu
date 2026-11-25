@@ -21,7 +21,7 @@ export { CYLTagMetrics } from './src/main/ets/core/CYLTagMetrics';
 export { CYLTagAppearance } from './src/main/ets/core/CYLTagAppearance';
 export { CYLMenuResources, CYLMenuLocalizedString } from './src/main/ets/core/CYLMenuResources';
 export {
-  CYLMenuStyle, CYLTagTitleMaxLines, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagBackgroundStyle, CYLTagRowAlignment,
+  CYLMenuStyle, CYLTagTitleMaxLines, CYLHeaderTitleMaxLines, CYLLayoutDirection, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagBackgroundStyle, CYLTagRowAlignment,
   CYLTagDeleteIndicatorPlacement, CYLTitleTextAttributes, CYLSectionStyle, CYLHeaderSeparatorStyle, CYLSectionStyleMetrics,
   CYLSectionStyleColors, CYLTintLuminanceThreshold
 } from './src/main/ets/core/CYLMenuStyle';
@@ -33,7 +33,7 @@ export {
   CYLTagModel, CYLTagGroup, CYLTagViewSectionInset, CYLTagViewCellSpacing, CYLTagDefaultListWidth
 } from './src/main/ets/core/CYLTagModel';
 export {
-  CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent
+  CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent, CYLFoldControlMaxFontScale
 } from './src/main/ets/core/CYLMenuFoldControl';
 export {
   CYLConfiguration, CYLTagListKey, CYLMenuFoldControlKey, CYLTagSectionKey, CYLTagItemKey, CYLMenuStyleKey,

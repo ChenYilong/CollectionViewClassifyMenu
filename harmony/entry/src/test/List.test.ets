@@ -14,6 +14,8 @@ import tagListTailFoldTest from './TagListTailFold.test';
 import tagLongPressActionTest from './TagLongPressAction.test';
 import tagTitleMaxLinesTest from './TagTitleMaxLines.test';
 import tagSectionStyleTest from './TagSectionStyle.test';
+import tagSectionRtlTest from './TagSectionRtl.test';
+import tagHeaderMaxLinesAndFoldScaleTest from './TagHeaderMaxLinesAndFoldScale.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -32,4 +34,6 @@ export default function testsuite() {
   tagLongPressActionTest();
   tagTitleMaxLinesTest();
   tagSectionStyleTest();
+  tagSectionRtlTest();
+  tagHeaderMaxLinesAndFoldScaleTest();
 }

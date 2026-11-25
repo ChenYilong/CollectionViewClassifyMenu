@@ -1,5 +1,6 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { accessibility } from '@kit.AccessibilityKit';
+import { i18n } from '@kit.LocalizationKit';
 import { CYLTagListAddItemView } from './CYLTagListAddItemView';
 import { CYLUIContext } from '../core/CYLUIContext';
 import { CYLAnimationPlayer } from './CYLAnimationPlayer';
@@ -18,10 +19,14 @@ import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResourc
 import { CYLTagListAccessibilityIdentifier } from '../tagviews/CYLTagListAccessibility';
 import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
 import {
-  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement
+  CYLLayoutDirection, CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement,
+  CYLTagImagePlacement
 } from '../core/CYLMenuStyle';
 import { CYLConfiguration, CYLConfigurationValue } from '../core/CYLTagListConfiguration';
 import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
+
+/** The most lines a header title is given to ArkUI (`CYLHeaderTitleMaxLines.unlimited` is too large for a Text). */
+const HEADER_TITLE_LINES_CEILING: number = 1000;
 
 /** What a tag (or a fold control, or the title) shows, resolved from the list's state for one render. */
 class CYLTagRenderItem {
@@ -94,6 +99,10 @@ class CYLSectionRender {
   textColor: ResourceColor = CYLColor.GRAY;
   insetLeft: number = 16;
   insetRight: number = 16;
+  /** Right to left: the header row is mirrored (its views in reverse order, the title aligned to its right end). */
+  rtl: boolean = false;
+  /** The most lines of the title. */
+  maxLines: number = 1;
   indicatorColor?: string;
   indicatorWidth: number = 3;
   indicatorHeight: number = 16;
@@ -192,6 +201,8 @@ export struct CYLTagListView {
   @Prop @Watch('applyAnimation') animationLoops: boolean = false;
   /** Plays the animated icons again (`playAll()`). */
   controller?: CYLTagListController;
+  /** The layout direction; undefined (the default) follows the system language. */
+  layoutDirection?: CYLLayoutDirection;
   /** The list's state and API; made by the view when not given. */
   tagList?: CYLTagListState;
   onTagTap?: (tap: CYLTagTap) => void;
@@ -252,6 +263,8 @@ export struct CYLTagListView {
       this.scroller.scrollTo({ xOffset: 0, yOffset: offset, animation: animated });
     });
     this.controller?.attach(() => this.model.playAllAnimations());
+    this.model.layoutDirection = this.layoutDirection ??
+      (i18n.isRTL(i18n.System.getSystemLanguage()) ? CYLLayoutDirection.rtl : CYLLayoutDirection.ltr);
     this.applyAnimation();
     this.reload();
     this.refresh();
@@ -343,9 +356,10 @@ export struct CYLTagListView {
   }
 
   /** The look of `style` in `state` on a render item. */
-  private applyStyle(r: CYLTagRenderItem, style: CYLMenuStyle, state: number): void {
+  private applyStyle(r: CYLTagRenderItem, style: CYLMenuStyle, state: number,
+    fontScale: number = this.model.fontScale): void {
     const appearance = style.appearance(state);
-    const font = style.titleFont(state, this.model.fontScale);
+    const font = style.titleFont(state, fontScale);
     r.fontSize = font.size;
     r.fontWeight = font.weight;
     r.textColor = appearance.textColor;
@@ -478,7 +492,8 @@ export struct CYLTagListView {
     section: number): CYLTagRenderItem {
     const r = new CYLTagRenderItem();
     r.section = section;
-    this.applyStyle(r, style, CYLControlState.NORMAL);
+    // A fold / More control does not grow beyond `CYLFoldControlMaxFontScale`.
+    this.applyStyle(r, style, CYLControlState.NORMAL, CYLTagFoldMetrics.cappedFontScale(this.model.fontScale));
     r.title = control.titleWhenExpanded(expanded) ?? '';
     r.image = control.showsImage(expanded) ? control.image : undefined;
     r.iconWidth = r.image !== undefined ? style.imageSize.width : 0;
@@ -563,6 +578,8 @@ export struct CYLTagListView {
     const styled = style.isInsetGrouped || style.headerBackgroundColor !== undefined;
     h.insetLeft = styled ? frame.headerInsetLeft : view.horizontalInset;
     h.insetRight = styled ? frame.headerInsetRight : view.horizontalInset;
+    h.rtl = frame.isRtl;
+    h.maxLines = Math.min(style.headerMaxLines, HEADER_TITLE_LINES_CEILING);
     h.indicatorColor = view.indicatorColor;
     h.indicatorWidth = view.indicatorWidth;
     h.indicatorHeight = view.indicatorHeight;
@@ -586,7 +603,7 @@ export struct CYLTagListView {
       h.clearSide = Math.min(h.height, Math.ceil(CYLTagButtonMetrics.lineHeight(style.headerFontFor(m.fontScale))));
     }
     h.key = ['h', h.showsClear, h.clearLabel, h.clearSide, CYLColorKey(h.clearColor), h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
-      h.insetLeft, h.insetRight,
+      h.insetLeft, h.insetRight, h.rtl, h.maxLines,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
       h.fold.key, h.showsMore, CYLColorKey(h.moreColor), CYLColorKey(h.iconColor), h.moreLabel, h.accessory !== undefined].join('|');
     return h;
@@ -1066,8 +1083,9 @@ export struct CYLTagListView {
               .fontSize(h.fontSize)
               .fontWeight(h.fontWeight)
               .fontColor(h.textColor)
-              .maxLines(1)
+              .maxLines(h.maxLines)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .textAlign(TextAlign.Start)
               .layoutWeight(1)
             if (h.showsClear && h.clearImage !== undefined) {
               // The section's clear button: its top and bottom the title text's, a 44 vp tap area around it.
@@ -1105,6 +1123,8 @@ export struct CYLTagListView {
           }
           .width('100%')
           .height(h.height)
+          // The insets are physical (the state mirrored them); the direction reverses the views and aligns the title.
+          .direction(h.rtl ? Direction.Rtl : Direction.Ltr)
           .padding({ left: h.insetLeft, right: h.insetRight })
           .position({ x: 0, y: h.y })
         }, (h: CYLSectionRender) => h.key)

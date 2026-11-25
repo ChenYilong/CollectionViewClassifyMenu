@@ -140,6 +140,26 @@ export class CYLTagTitleMaxLines {
   static readonly unlimited: number = Number.MAX_SAFE_INTEGER;
 }
 
+/**
+ * The line limits of a section header's title (`CYLMenuStyle.headerMaxLines`): named values, never a literal in a call site.
+ */
+export class CYLHeaderTitleMaxLines {
+  /** One line, the default: a title too wide for its header is truncated. */
+  static readonly single: number = 1;
+  /** No limit: a title wraps onto as many lines as it needs. */
+  static readonly unlimited: number = Number.MAX_SAFE_INTEGER;
+}
+
+/**
+ * The layout direction of a list: `ltr` (the default) or `rtl`, which mirrors the section header (title, icon, fold /
+ * More control), the section insets, the header band, divider and card insets, and starts the rows of tags at the
+ * trailing edge.
+ */
+export enum CYLLayoutDirection {
+  ltr = 0,
+  rtl = 1
+}
+
 export class CYLMenuStyle {
   private storedNormal: CYLTagAppearance = new CYLTagAppearance();
   private storedSelected: CYLTagAppearance = new CYLTagAppearance();
@@ -321,6 +341,22 @@ export class CYLMenuStyle {
 
   // Section headers
   headerHeight: number = 36;
+  private headerMaxLinesValue: number = CYLHeaderTitleMaxLines.single;
+
+  /**
+   * The most lines a section header's title may take: default `CYLHeaderTitleMaxLines.single` (1, one line, truncated,
+   * as before). With more, a long title wraps and the header grows taller than `headerHeight` to hold the wrapped
+   * lines (`CYLHeaderTitleMaxLines.unlimited`: every line). A value that is not a whole number of 1 or more is 1.
+   */
+  get headerMaxLines(): number {
+    return this.headerMaxLinesValue;
+  }
+
+  set headerMaxLines(value: number) {
+    this.headerMaxLinesValue = Number.isFinite(value) || value === CYLHeaderTitleMaxLines.unlimited ?
+      Math.max(CYLHeaderTitleMaxLines.single, Math.floor(value)) : CYLHeaderTitleMaxLines.single;
+  }
+
   headerFont: CYLFont = CYLFont.systemFont(14);
   /**
    * The one color of every built-in view that is not a tag (header title, section icon, fold / More control); undefined:
@@ -662,6 +698,7 @@ export class CYLMenuStyle {
     c.headerSeparatorThickness = this.headerSeparatorThickness;
     c.headerSeparatorInsets = this.headerSeparatorInsets;
     c.headerHeight = this.headerHeight;
+    c.headerMaxLines = this.headerMaxLines;
     c.headerFont = this.headerFont;
     c.tintColor = this.tintColor;
     c.headerTextColorValue = this.headerTextColorValue;
