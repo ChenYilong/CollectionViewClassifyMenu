@@ -1073,6 +1073,9 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         animationView?.alpha = state == .disabled ? Self.disabledAnimationAlpha : 1
         // The component sets the icon's tint AND hands the color to the animation (`animationTint = "title"`), resolved with this view's own traits.
+        // Precedence: this item's or its stack's explicit icon color (the component's `itemAppearance`) > this class's built-in, which is the
+        // style's explicit icon color, else the effective text color (the explicit one, else the tag default) > the component's built-in.
+        // The tag's own built-ins keep the look of earlier versions; they are the level between, passed as the subclass color.
         applyIconTintColor(style.iconColor(for: state))
         titleLabel.text = style.displayedTitle(forTitle: title)
         titleLabel.font = style.titleFont(for: state, traitCollection: traitCollection)

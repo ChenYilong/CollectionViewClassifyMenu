@@ -4,11 +4,11 @@ project 'CollectionViewClassifyMenu.xcodeproj'
 # The demo app's tab bar (AGENTS.md, "CYLTabBarController reference and dependency"): CYLTabBarController at its
 # newest commit, as in Example/Podfile; the core library does not depend on it.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-              :commit => 'ee750a4636ef7cefb577ad70477649d43cf94bf9' }
+              :commit => '230b52662cea3b584a5c0da704e55fe3f4758ae8' }
 # CYLAnimatedItem, the shared animated icon + title component: its own pod in the same repository and commit, not
 # on the trunk yet (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
 CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                    :commit => 'ee750a4636ef7cefb577ad70477649d43cf94bf9' }
+                    :commit => '230b52662cea3b584a5c0da704e55fe3f4758ae8' }
 
 target 'CollectionViewClassifyMenu' do
   pod 'CollectionViewClassifyMenu', :path => '.'

@@ -379,4 +379,99 @@ final class CYLTagButtonTests: XCTestCase {
         XCTAssertFalse(crossView?.isHidden ?? true)
         XCTAssertGreaterThan(crossView?.bounds.width ?? 0, 0)
     }
+
+    // MARK: - Unset colors (null_resettable), spec: item explicit > stack explicit > subclass built-in > component built-in
+
+    func testUntouchedAppearanceReportsUnsetAndEffectiveBuiltIns() {
+        let appearance = CYLTagAppearance()
+        XCTAssertFalse(appearance.isBackgroundColorSet)
+        XCTAssertFalse(appearance.isTextColorSet)
+        XCTAssertFalse(appearance.isIconColorSet)
+        XCTAssertNil(appearance.explicitTextColor)
+        XCTAssertEqual(appearance.textColor, CYLTagAppearance.defaultTextColor, "reads the effective built-in, never nil")
+        XCTAssertEqual(appearance.iconColor, appearance.textColor, "an unset icon color follows the effective text color")
+        appearance.textColor = .red
+        XCTAssertTrue(appearance.isTextColorSet)
+        XCTAssertEqual(appearance.explicitTextColor, .red)
+        XCTAssertEqual(appearance.iconColor, .red, "the icon follows an explicit text color")
+        appearance.iconColor = .blue
+        XCTAssertEqual(appearance.explicitIconColor, .blue)
+        XCTAssertEqual(appearance.iconColor, .blue, "explicit icon color wins over the text color")
+        appearance.iconColor = nil
+        appearance.textColor = nil
+        appearance.backgroundColor = .green
+        appearance.backgroundColor = nil
+        XCTAssertFalse(appearance.isTextColorSet, "nil resets")
+        XCTAssertFalse(appearance.isIconColorSet)
+        XCTAssertFalse(appearance.isBackgroundColorSet)
+        XCTAssertEqual(appearance.textColor, CYLTagAppearance.defaultTextColor)
+        XCTAssertEqual(appearance.backgroundColor, CYLTagAppearance.defaultBackgroundColor)
+    }
+
+    func testExplicitWinsOverBuiltInInLightAndDark() {
+        let light = UITraitCollection(userInterfaceStyle: .light)
+        let dark = UITraitCollection(userInterfaceStyle: .dark)
+        let appearance = CYLTagAppearance()
+        for traits in [light, dark] {
+            XCTAssertEqual(appearance.textColor.resolvedColor(with: traits), CYLTagAppearance.defaultTextColor.resolvedColor(with: traits),
+                           "unset: the built-in, resolved with the traits at use time")
+        }
+        appearance.textColor = .systemPink
+        for traits in [light, dark] {
+            XCTAssertEqual(appearance.textColor.resolvedColor(with: traits), UIColor.systemPink.resolvedColor(with: traits), "explicit wins")
+        }
+        XCTAssertEqual(appearance.backgroundColor.resolvedColor(with: light), UIColor.white.resolvedColor(with: light))
+        XCTAssertEqual(appearance.backgroundColor.resolvedColor(with: dark), UIColor.secondarySystemBackground.resolvedColor(with: dark))
+    }
+
+    func testCopyAndEqualityCarryTheUnsetState() {
+        let untouched = CYLTagAppearance()
+        let copy = untouched.copy()
+        XCTAssertFalse(copy.isTextColorSet, "a copy of an untouched appearance stays unset, not the resolved color")
+        XCTAssertFalse(copy.isBackgroundColorSet)
+        XCTAssertFalse(copy.isIconColorSet)
+        XCTAssertTrue(copy == untouched)
+        let explicitDefault = CYLTagAppearance()
+        explicitDefault.textColor = CYLTagAppearance.defaultTextColor
+        XCTAssertFalse(explicitDefault == untouched, "set to the built-in's value is still explicit, so not equal to unset")
+        XCTAssertTrue(explicitDefault.copy().isTextColorSet)
+
+        let style = CYLMenuStyle()
+        let styleCopy = style.copy() as! CYLMenuStyle
+        XCTAssertFalse(styleCopy.disabledAppearance.isIconColorSet)
+        XCTAssertFalse(styleCopy.normalAppearance.isTextColorSet)
+        XCTAssertNil(styleCopy.explicitIconColor(for: .normal))
+        styleCopy.setIconColor(.orange, for: .normal)
+        XCTAssertEqual(styleCopy.explicitIconColor(for: .normal), UIColor.orange)
+        XCTAssertNil(style.explicitIconColor(for: .normal), "the copy is independent")
+        styleCopy.setIconColor(nil, for: .normal)
+        XCTAssertNil(styleCopy.explicitIconColor(for: .normal), "nil resets")
+    }
+
+    func testCopyOfUntouchedStyleStillFollowsLaterDefaults() {
+        // A stack-like default: the style copy made before a value is set on the original keeps no stale resolved color.
+        let original = CYLTagAppearance()
+        let copy = original.copy()
+        original.textColor = .brown
+        XCTAssertFalse(copy.isTextColorSet)
+        XCTAssertEqual(copy.textColor, CYLTagAppearance.defaultTextColor)
+        // Setting a value on the copy after copying wins, and resetting it returns to the built-in again.
+        copy.textColor = .purple
+        XCTAssertEqual(copy.textColor, .purple)
+        copy.textColor = nil
+        XCTAssertEqual(copy.textColor, CYLTagAppearance.defaultTextColor)
+    }
+
+    func testTagButtonPassesExplicitIconColorElseTheTagBuiltIn() {
+        let style = CYLMenuStyle()
+        style.normalAppearance.textColor = nil
+        style.setIconColor(nil, for: .normal)
+        let builtIn = CYLMenuFixtures.tagButton(title: "首页", image: UIImage(systemName: "message"), style: style)
+        XCTAssertEqual(builtIn.titleLabel.textColor, CYLTagAppearance.defaultTextColor, "the tag's built-in text color, as before")
+        XCTAssertEqual(builtIn.imageView.tintColor?.resolvedColor(with: builtIn.traitCollection), CYLTagAppearance.defaultTextColor.resolvedColor(with: builtIn.traitCollection), "the icon follows the built-in text color, as before")
+        style.setIconColor(.systemTeal, for: .normal)
+        let explicit = CYLMenuFixtures.tagButton(title: "首页", image: UIImage(systemName: "message"), style: style)
+        XCTAssertEqual(explicit.imageView.tintColor?.resolvedColor(with: explicit.traitCollection), UIColor.systemTeal.resolvedColor(with: explicit.traitCollection), "an explicit icon color wins over the tag built-in")
+        XCTAssertEqual(explicit.titleLabel.textColor, CYLTagAppearance.defaultTextColor, "the title is not affected by the icon color")
+    }
 }
