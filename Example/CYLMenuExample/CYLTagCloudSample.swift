@@ -367,6 +367,8 @@ final class CYLHotSearchViewController: UIViewController {
         style.headerHeight = 48
         style.backgroundColor = .white
         style.backgroundStyle = .liquidGlass
+        // The page draws its own background: the flat list, not the default section card.
+        style.sectionStyle = .plain
         return style
     }
 

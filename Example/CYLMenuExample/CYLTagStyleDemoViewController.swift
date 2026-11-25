@@ -288,6 +288,8 @@ final class CYLTagStyleDemoViewController: UIViewController {
         style.itemHeight = 34
         style.sectionInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
         style.backgroundStyle = .liquidGlass
+        // The page draws its own background: the flat list, not the default section card.
+        style.sectionStyle = .plain
         return style
     }
 

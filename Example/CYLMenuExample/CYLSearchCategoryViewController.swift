@@ -139,6 +139,8 @@ final class CYLSearchCategoryViewController: UIViewController {
         style.headerFont = .systemFont(ofSize: 13)
         style.headerTextColor = UIColor(white: 0.6, alpha: 1)
         style.backgroundStyle = .liquidGlass
+        // The page draws its own background: the flat list, not the default section card.
+        style.sectionStyle = .plain
         return style
     }
 

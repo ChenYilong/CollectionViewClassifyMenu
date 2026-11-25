@@ -15,7 +15,7 @@ final class CYLTagListTintTests: CYLMenuExampleTestCase {
 
     private func luma(_ color: UIColor?, _ style: UIUserInterfaceStyle) -> CGFloat {
         let components = CYLColorComponents(color?.resolvedColor(with: UITraitCollection(userInterfaceStyle: style)))
-        return 0.299 * components.red + 0.587 * components.green + 0.114 * components.blue
+        return CYLTintContrast.relativeLuminance(red: components.red, green: components.green, blue: components.blue)
     }
 
     private func resolved(_ color: UIColor?, _ style: UIUserInterfaceStyle) -> UIColor? {
@@ -46,9 +46,39 @@ final class CYLTagListTintTests: CYLMenuExampleTestCase {
         style.sectionStyle = .insetGrouped
         XCTAssertLessThan(luma(style.resolvedHeaderTextColor, .light), CYLTintContrast.luminanceThreshold, "#F2F2F7: dark tint")
         XCTAssertGreaterThan(luma(style.resolvedHeaderTextColor, .dark), CYLTintContrast.luminanceThreshold, "black: light tint")
-        // A plain list the app never configured paints white, so its tint stays dark even in dark mode.
+        // A plain list the app never configured paints the system background: dark tint in light mode, light tint in dark mode.
         let plain = CYLMenuStyle()
-        XCTAssertLessThan(luma(plain.resolvedHeaderTextColor, .dark), CYLTintContrast.luminanceThreshold)
+        plain.sectionStyle = .plain
+        XCTAssertLessThan(luma(plain.resolvedHeaderTextColor, .light), CYLTintContrast.luminanceThreshold)
+        XCTAssertGreaterThan(luma(plain.resolvedHeaderTextColor, .dark), CYLTintContrast.luminanceThreshold)
+    }
+
+    func testTheDefaultListBackgroundFollowsTheModeAndASetColorWins() {
+        let style = CYLMenuStyle()
+        style.sectionStyle = .plain
+        XCTAssertNotEqual(resolved(style.resolvedBackgroundColor, .light), resolved(style.resolvedBackgroundColor, .dark))
+        XCTAssertEqual(resolved(style.resolvedBackgroundColor, .light), resolved(UIColor.systemBackground, .light))
+        XCTAssertEqual(resolved(style.resolvedBackgroundColor, .dark), resolved(UIColor.systemBackground, .dark))
+        XCTAssertGreaterThan(luma(style.resolvedBackgroundColor, .light), luma(style.resolvedBackgroundColor, .dark))
+        // The grouped default under the card is the grouped background, also mode-aware.
+        let card = CYLMenuStyle()
+        XCTAssertEqual(resolved(card.resolvedBackgroundColor, .dark), resolved(UIColor.systemGroupedBackground, .dark))
+        style.backgroundColor = .clear
+        for mode in [UIUserInterfaceStyle.light, .dark] {
+            XCTAssertEqual(CYLColorComponents(resolved(style.resolvedBackgroundColor, mode)).alpha, 0, accuracy: 0.001, "clear wins")
+        }
+    }
+
+    func testTheThresholdIsTheWCAGRelativeLuminanceWhereBlackAndWhiteHaveTheSameContrast() {
+        XCTAssertEqual(CYLTintContrast.luminanceThreshold, 0.179)
+        XCTAssertEqual(CYLTintContrast.relativeLuminance(red: 0, green: 0, blue: 0), 0, accuracy: 0.0001)
+        XCTAssertEqual(CYLTintContrast.relativeLuminance(red: 1, green: 1, blue: 1), 1, accuracy: 0.0001)
+        // Mid gray (0.5 sRGB) has a luminance of 0.214: above the threshold, so black text; 0.4 has 0.133: white text.
+        let style = CYLMenuStyle()
+        style.backgroundColor = UIColor(white: 0.5, alpha: 1)
+        XCTAssertEqual(resolved(style.resolvedHeaderTextColor, .light), .black)
+        style.backgroundColor = UIColor(white: 0.4, alpha: 1)
+        XCTAssertEqual(resolved(style.resolvedHeaderTextColor, .light), .white)
     }
 
     func testATransparentListFollowsTheSystemMode() {
@@ -125,7 +155,7 @@ final class CYLTagListTintTests: CYLMenuExampleTestCase {
         func shownLuma() -> CGFloat {
             let color = title?.textColor.resolvedColor(with: title?.traitCollection ?? .current)
             let components = CYLColorComponents(color)
-            return 0.299 * components.red + 0.587 * components.green + 0.114 * components.blue
+            return CYLTintContrast.relativeLuminance(red: components.red, green: components.green, blue: components.blue)
         }
         view.overrideUserInterfaceStyle = .light
         view.layoutIfNeeded()

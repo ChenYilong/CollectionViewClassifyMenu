@@ -404,6 +404,13 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var adjustsFontForContentSizeCategory = true
 
     /**
+     * The largest content size category the fonts of this style scale to (the title never grows past what the system draws at that
+     * category); `nil` (the default) leaves only `CYLTagMetrics.maximumFontScale`. The fold control sets
+     * `CYLTagFoldButton.maximumContentSizeCategory`.
+     */
+    var maximumContentSizeCategory: UIContentSizeCategory?
+
+    /**
      * Minimum tag height; grows with the font for large text sizes. 30 by default.
      */
     open var itemHeight: CGFloat = 30
@@ -433,10 +440,11 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var sectionInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
 
     /**
-     * The list's background, white by default. Under `CYLSectionStyle.insetGrouped` a list whose background the app never set
-     * shows the grouped background instead (`resolvedBackgroundColor`).
+     * The list's background: `UIColor.systemBackground` by default (white in light mode, black in dark mode). Under
+     * `CYLSectionStyle.insetGrouped` a list whose background the app never set shows the grouped background instead
+     * (`resolvedBackgroundColor`). A color the app sets, a clear one included, wins in both modes.
      */
-    open var backgroundColor = UIColor.white {
+    open var backgroundColor = UIColor.systemBackground {
         didSet {
             backgroundColorWasSet = true
         }
@@ -450,10 +458,12 @@ open class CYLMenuStyle: NSObject, NSCopying {
     // MARK: Section card, header band and header divider (docs/tag-section-style.md)
 
     /**
-     * `.plain` (the default) puts the tags on the list's background; `.insetGrouped` puts each section's tags inside a rounded
-     * card, UITableView's inset grouped look, with the header above it.
+     * `.insetGrouped` (the default) puts each section's tags inside a rounded card, UITableView's inset grouped look, with the
+     * header above it; `.plain` puts the tags on the list's background. The presets that are a complete look of their own
+     * (`tagCloud()`, `tagContainer()`, `gridStyle(itemsPerRow:)`, `wordPicker()` and the tags of the classify menu and the
+     * filter) are `.plain`; in a configuration: `"sectionStyle": "plain"`.
      */
-    open var sectionStyle: CYLSectionStyle = .plain
+    open var sectionStyle: CYLSectionStyle = .insetGrouped
 
     /**
      * The card's color; `nil` (the default) resolves to `UIColor.secondarySystemGroupedBackground` (white; #1C1C1E in dark mode).
@@ -718,6 +728,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.lineSpacing = 5
         style.itemHeight = 0
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -750,6 +761,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.rippleColor = UIColor(white: 0xEE / 255, alpha: 1)
         style.rippleAlpha = 128 / 255
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -780,6 +792,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.itemHeight = 32
         style.interitemSpacing = 24
         style.lineSpacing = 18
+        style.sectionStyle = .plain
         return style
     }
 
@@ -815,6 +828,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.lineSpacing = 10
         style.sectionInsets = UIEdgeInsets(top: 12, left: 24, bottom: 12, right: 24)
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -921,6 +935,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.imageSize = CGSize(width: 16, height: 16)
         style.itemHeight = 30
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -1053,6 +1068,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.animationSize = animationSize
         copy.animationSpeed = animationSpeed
         copy.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
+        copy.maximumContentSizeCategory = maximumContentSizeCategory
         copy.itemHeight = itemHeight
         copy.interitemSpacing = interitemSpacing
         copy.lineSpacing = lineSpacing
@@ -1130,8 +1146,13 @@ open class CYLMenuStyle: NSObject, NSCopying {
         guard adjustsFontForContentSizeCategory else {
             return font
         }
-        return UIFontMetrics.default.scaledFont(for: font, maximumPointSize: font.pointSize * CYLTagMetrics.maximumFontScale,
-                                                compatibleWith: traitCollection)
+        var maximumPointSize = font.pointSize * CYLTagMetrics.maximumFontScale
+        if let category = maximumContentSizeCategory {
+            let capped = UIFontMetrics.default.scaledValue(for: font.pointSize,
+                                                           compatibleWith: UITraitCollection(preferredContentSizeCategory: category))
+            maximumPointSize = min(maximumPointSize, capped)
+        }
+        return UIFontMetrics.default.scaledFont(for: font, maximumPointSize: maximumPointSize, compatibleWith: traitCollection)
     }
 }
 
@@ -1162,11 +1183,11 @@ public extension UIColor {
  */
 @objc public enum CYLSectionStyle: Int {
     /**
-     * The tags sit on the list's background (the default).
+     * The tags sit on the list's background (the opt-out of the default card).
      */
     case plain = 0
     /**
-     * The tags sit inside a rounded card, UITableView's inset grouped look, the header above it.
+     * The tags sit inside a rounded card, UITableView's inset grouped look, the header above it (the default).
      */
     case insetGrouped
 }
@@ -1186,14 +1207,26 @@ public extension UIColor {
 }
 
 /**
- * The contrast rule of the default tint: black on a light background, white on a dark one.
+ * The contrast rule of the default tint: black on a light background, white on a dark one (WCAG relative luminance).
  */
 public enum CYLTintContrast {
 
     /**
-     * The luma (0 black, 1 white) above which a background counts as light and gets the dark tint.
+     * The WCAG relative luminance (0 black, 1 white; sRGB linearised) above which a background counts as light and gets the dark
+     * tint: 0.179, where black and white have the same contrast ratio (the value HarmonyOS, Android and the mini program use).
      */
-    public static let luminanceThreshold: CGFloat = 0.5
+    public static let luminanceThreshold: CGFloat = 0.179
+
+    /**
+     * The WCAG relative luminance of an sRGB color.
+     */
+    public static func relativeLuminance(red: CGFloat, green: CGFloat, blue: CGFloat) -> CGFloat {
+        func linear(_ value: CGFloat) -> CGFloat {
+            let clamped = min(max(value, 0), 1)
+            return clamped <= 0.03928 ? clamped / 12.92 : pow((clamped + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue)
+    }
 
     /**
      * Black or white for `background` resolved with `traits`; `nil` when the background is not opaque (it shows what is behind it).
@@ -1203,8 +1236,7 @@ public enum CYLTintContrast {
         guard background.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha), alpha >= 1 else {
             return nil
         }
-        let luma = 0.299 * red + 0.587 * green + 0.114 * blue
-        return luma > luminanceThreshold ? .black : .white
+        return relativeLuminance(red: red, green: green, blue: blue) > luminanceThreshold ? .black : .white
     }
 }
 

@@ -545,8 +545,10 @@ open class CYLTagButton: CYLAnimatedItemView {
                                                             options: [.usesLineFragmentOrigin, .usesFontLeading],
                                                             attributes: [.font: font], context: nil)
             // The title takes at most titleMaxLines lines: the wrapped height stops there.
+            // Counted in the lines the text really takes, so a line height that differs by a rounding cannot cut a line.
+            let textLines = max(1, (text.height / font.lineHeight).rounded())
             let lines = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? text.height
-                : min(text.height, CGFloat(style.titleMaxLines) * font.lineHeight)
+                : text.height * min(textLines, CGFloat(style.titleMaxLines)) / textLines
             return max(height, ceil(lines) + insets.top + insets.bottom)
         }
     }
@@ -684,6 +686,27 @@ open class CYLTagButton: CYLAnimatedItemView {
      * the icon frame: the base class shows the static image (or its placeholder) until the animation shows.
      */
     open override func layoutContent(in rect: CGRect) {
+        layOutContentLeftToRight(in: rect)
+        guard mirrorsContentInRightToLeft, effectiveUserInterfaceLayoutDirection == .rightToLeft else {
+            return
+        }
+        // The content was placed from the left edge: in a right-to-left layout it starts at the right edge.
+        for view in [titleLabel, imageView, animationView].compactMap({ $0 }) where !view.frame.isEmpty {
+            view.frame.origin.x = bounds.width - view.frame.maxX
+        }
+    }
+
+    /**
+     * Whether the icon and the title are mirrored in a right-to-left layout (the section headers' title and fold control set it; the
+     * tags keep the placement they have always had).
+     */
+    var mirrorsContentInRightToLeft = false {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+
+    private func layOutContentLeftToRight(in rect: CGRect) {
         var width = bounds.width
         let height = bounds.height
         let style = styleStorage

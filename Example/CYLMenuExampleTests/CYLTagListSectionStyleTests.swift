@@ -25,6 +25,8 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
                        configure: (CYLMenuStyle) -> Void) -> CYLTagListView {
         let view = showTagList(source, width: width ?? self.width)
         let style = CYLMenuStyle()
+        // The default is the card: these tests compare against the flat list, so `configure` starts from `.plain`.
+        style.sectionStyle = .plain
         configure(style)
         view.style = style
         view.layoutIfNeeded()
@@ -190,6 +192,121 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
         }
         XCTAssertEqual(card.frame.minX, 16, accuracy: 0.5)
         XCTAssertEqual(card.frame.maxX, width - 16, accuracy: 0.5)
+        withExtendedLifetime(source) {}
+    }
+
+
+    // MARK: The default flip: the card is the default look, `.plain` the opt-out
+
+    func testTheDefaultIsTheCardWithNoBandAndNoDivider() {
+        let defaults = CYLMenuStyle()
+        XCTAssertEqual(defaults.sectionStyle, .insetGrouped)
+        XCTAssertEqual(defaults.headerSeparatorStyle, .none, "The divider stays opt-in")
+        XCTAssertNil(defaults.headerBackgroundColor, "The band stays off")
+        XCTAssertEqual(defaults.sectionBackgroundStyle, .flat)
+        let source = CYLMenuFixtures.source(itemCount: 10, sections: 2)
+        let view = showTagList(source, width: width)
+        view.layoutIfNeeded()
+        view.probe.layOut()
+        XCTAssertEqual(view.style.sectionStyle, .insetGrouped, "A list that sets nothing gets the card")
+        for section in 0..<2 {
+            guard let card = cardAttributes(view, section: section)?.frame else {
+                XCTFail("section \(section) has no card by default")
+                continue
+            }
+            let padding = CYLSectionStyleMetrics.cardPadding
+            for item in 0..<view.probe.numberOfItems(inSection: section) {
+                let frame = view.probe.itemFrame(at: ip(item, section))!
+                XCTAssertTrue(card.insetBy(dx: padding - 0.5, dy: padding - 0.5).contains(frame), "The default card holds tag \(item)")
+            }
+        }
+        XCTAssertGreaterThanOrEqual(cardViews(view).count, 1)
+        let header = view.probe.header(inSection: 0)
+        XCTAssertTrue((header?.value(forKey: "separatorView") as? UIView)?.isHidden ?? false)
+        XCTAssertTrue((header?.value(forKey: "bandView") as? UIView)?.isHidden ?? false)
+        withExtendedLifetime(source) {}
+    }
+
+    func testPlainEqualsTheFlatListAndTheDefaultMovesTheFrames() {
+        let source = CYLMenuFixtures.source(itemCount: 10, sections: 2)
+        let plain = shown(source) { $0.sectionStyle = .plain }
+        let plainFrames = (0..<plain.probe.numberOfItems(inSection: 0)).map { plain.probe.itemFrame(at: ip($0, 0)) }
+        XCTAssertNil(cardAttributes(plain, section: 0))
+        XCTAssertEqual(plain.probe.itemFrame(at: ip(0, 0))?.minX ?? 0, 16, accuracy: 0.01, "plain: the tags start at the section inset")
+        closeHostWindow()
+        let card = showTagList(source, width: width)
+        card.layoutIfNeeded()
+        card.probe.layOut()
+        let cardFrames = (0..<card.probe.numberOfItems(inSection: 0)).map { card.probe.itemFrame(at: ip($0, 0)) }
+        XCTAssertNotEqual(plainFrames, cardFrames, "The default card moves the tags in by its padding")
+        XCTAssertEqual(card.probe.itemFrame(at: ip(0, 0))?.minX ?? 0, 16 + CYLSectionStyleMetrics.cardPadding, accuracy: 0.01)
+        withExtendedLifetime(source) {}
+    }
+
+    func testTheConfigurationKeyOptsOutAndAMissingKeyGivesTheCard() {
+        let missing = CYLMenuStyle()
+        missing.sectionStyle = .plain
+        missing.applyConfiguration(["itemHeight": 40])
+        XCTAssertEqual(missing.sectionStyle, .plain, "A configuration without the key leaves the style as it is")
+        let fresh = CYLMenuStyle()
+        fresh.applyConfiguration(["itemHeight": 40])
+        XCTAssertEqual(fresh.sectionStyle, .insetGrouped, "No key: the card")
+        let optOut = CYLMenuStyle()
+        optOut.applyConfiguration(["sectionStyle": "plain"])
+        XCTAssertEqual(optOut.sectionStyle, .plain)
+        let list = CYLTagListView(configuration: [CYLTagListKey.style: [CYLMenuStyleKey.sectionStyle: "plain"]])
+        XCTAssertEqual(list.style.sectionStyle, .plain)
+        XCTAssertEqual(CYLTagListView(configuration: [:]).style.sectionStyle, .insetGrouped)
+    }
+
+    func testThePresetsThatAreACompleteLookAreFlat() {
+        let presets: [(String, CYLMenuStyle)] = [("tagCloud", .tagCloud()), ("tagContainer", .tagContainer()),
+                                                 ("gridStyle", .gridStyle(itemsPerRow: 3)), ("wordPicker", .wordPicker()),
+                                                 ("classifyMenuTag", .classifyMenuTag()), ("filterTag", .filterTag())]
+        for (name, style) in presets {
+            XCTAssertEqual(style.sectionStyle, .plain, "\(name) is opted out of the card in its own code")
+        }
+    }
+
+    func testRightToLeftMirrorsTheHeaderTitleFoldControlBandAndDivider() {
+        let source = CYLMenuFixtures.source(itemCount: 6, sections: 1)
+        func headerFrames(rightToLeft: Bool) -> (title: CGRect, fold: CGRect, band: CGRect, line: CGRect, width: CGFloat) {
+            let view = showTagList(source, width: width)
+            if rightToLeft {
+                view.semanticContentAttribute = .forceRightToLeft
+                view.probe.collectionView.semanticContentAttribute = .forceRightToLeft
+            }
+            let style = CYLMenuStyle()
+            style.sectionStyle = .plain
+            style.sectionInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 10)
+            style.headerBackgroundColor = CYLSectionStyleColors.headerBand
+            style.headerSeparatorStyle = .line
+            view.style = style
+            view.defaultVisibleRows = 1
+            view.foldStyle = .headerButton
+            view.reloadMenuData()
+            view.layoutIfNeeded()
+            view.probe.layOut()
+            let header = view.probe.header(inSection: 0)!
+            header.layoutIfNeeded()
+            let band = (header.value(forKey: "bandView") as! UIView).frame
+            let line = (header.value(forKey: "separatorView") as! UIView).frame
+            let fold = header.convert(view.probe.headerFoldButton(inSection: 0)!.bounds, from: view.probe.headerFoldButton(inSection: 0)!)
+            let title = view.probe.headerTitleFrame(inSection: 0)!
+            let result = (title, fold, band, line, header.bounds.width)
+            closeHostWindow()
+            return result
+        }
+        let ltr = headerFrames(rightToLeft: false)
+        let rtl = headerFrames(rightToLeft: true)
+        XCTAssertEqual(ltr.band.minX, 30, accuracy: 0.5, "left is the leading side")
+        XCTAssertEqual(rtl.band.maxX, rtl.width - 30, accuracy: 0.5, "the band's leading edge is the right one")
+        XCTAssertEqual(rtl.band.minX, 10, accuracy: 0.5)
+        XCTAssertEqual(rtl.line.minX, rtl.band.minX, accuracy: 0.5, "the divider has the band's edges")
+        XCTAssertEqual(rtl.line.maxX, rtl.band.maxX, accuracy: 0.5)
+        XCTAssertLessThan(ltr.title.midX, ltr.fold.midX, "left to right: the title first, the fold control at the trailing end")
+        XCTAssertGreaterThan(rtl.title.midX, rtl.fold.midX, "right to left: the title at the right, the fold control at the left")
+        XCTAssertEqual(rtl.title.maxX, rtl.width - ltr.title.minX, accuracy: 1, "the title's start is the mirror of the left-to-right one")
         withExtendedLifetime(source) {}
     }
 
