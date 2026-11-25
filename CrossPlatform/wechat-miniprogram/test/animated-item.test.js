@@ -14,7 +14,7 @@ const ROOT = path.join(__dirname, '..', 'miniprogram');
 const INSTALLED = path.dirname(require.resolve('cyl-tag-list-miniprogram/cyl-tag-list/model.js'));
 const installed = (file) => path.join(path.dirname(INSTALLED), file);
 const GENERICS = ['cyl-lottie-view', 'cyl-pag-view', 'cyl-rive-view', 'cyl-svga-view'];
-const COMMIT = '6f563ef4f34bcde96f10022d3f0d5f949a7c3a62';
+const COMMIT = '8dba2b978fb3bc44847e84adcfd0bb48e84d0a82';
 
 // The example's files are registered with the library, as app.js does.
 require('../miniprogram/utils/tag-animations.js');
