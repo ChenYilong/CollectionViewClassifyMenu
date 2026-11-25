@@ -13,8 +13,10 @@
         <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
         <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
       </view>
+      <view wx:if="{{section.headerLineStyle}}" class="cyl-header-line" style="{{section.headerLineStyle}}" aria-hidden="true" />
     </view>
     <view class="cyl-section-body" style="{{section.listStyle}}">
+    <view class="cyl-card" style="{{section.cardStyle}}">
     <view class="cyl-items" style="{{section.itemsStyle}}">
       <block wx:for="{{section.items}}" wx:key="key">
         <view wx:if="{{!item.hidden}}"
@@ -48,6 +50,7 @@
         <text wx:if="{{foldContent !== 'icon'}}" class="cyl-fold-title">{{section.foldTitle}}</text>
         <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
       </view>
+    </view>
     </view>
     </view>
     <view wx:if="{{section.canFold && foldPosition === 'footer'}}" class="cyl-fold-footer" style="color: {{foldColor}};"

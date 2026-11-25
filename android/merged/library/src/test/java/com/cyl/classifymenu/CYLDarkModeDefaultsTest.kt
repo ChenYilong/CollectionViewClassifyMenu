@@ -31,7 +31,10 @@ class CYLDarkModeDefaultsTest {
     @Test
     @Config(qualifiers = "night")
     fun inDarkModeTheOneTintIsLightAndTheTagDefaultsAreTheDarkSurface() {
+        // A transparent list shows the page, so its texts follow the system mode; on the white it paints itself by default
+        // they are black whatever the mode (CYLTagTintTest).
         val style = CYLMenuStyle()
+        style.backgroundColor = Color.TRANSPARENT
         val tint = CYLSystemColors.primary(context)
         // Readable on the dark surface: the tint is a light color.
         assertEquals(true, (Color.red(tint) + Color.green(tint) + Color.blue(tint)) / 3 > 127)

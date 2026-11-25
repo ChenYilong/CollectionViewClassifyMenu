@@ -10,6 +10,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
+import com.cyl.animateditem.CYLAnimatedItemView
 import android.view.accessibility.AccessibilityEvent
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -280,10 +282,16 @@ open class CYLTagListView @JvmOverloads constructor(
     var contentHeight: Float = 0f
         private set
 
+    /** The list background as drawn: the style's, or the grouped background under `insetGrouped`, in the current mode. */
+    internal var backgroundColorInUse: Int = 0
+        private set
+
     private fun applyStyleColors() {
-        container.setColor(listStyle.backgroundColor)
+        backgroundColorInUse = listStyle.resolvedBackgroundColor(context)
+        container.setColor(backgroundColorInUse)
         content.layout.rowAlignment = listStyle.rowAlignment.ordinal
         themeStyles.clear()
+        content.invalidate()
     }
 
     private fun hasTitle(): Boolean = !title.isNullOrEmpty() || titleImage != null
@@ -760,7 +768,72 @@ open class CYLTagListView @JvmOverloads constructor(
         return max(max(listStyle.headerHeight, ceil(CYLTagButton.fontLineHeight(font)) + 12), foldHeight)
     }
 
-    private fun contentWidthFor(width: Float): Float = max(0f, width - listStyle.sectionInsets.left - listStyle.sectionInsets.right)
+    /**
+     * The section's column at the list width `width` dp: the list width minus `sectionInsets` (x and width; y and height are
+     * 0). The card, the header band and the divider span it. The one place the column comes from.
+     */
+    private fun columnAt(width: Float): CYLRect {
+        val insets = listStyle.sectionInsets
+        return CYLRect(insets.left, 0f, max(0f, width - insets.left - insets.right), 0f)
+    }
+
+    /** The card's padding around the tags: `sectionContentInsets` under `insetGrouped`, else none. */
+    private fun cardInsets(): CYLEdgeInsets = if (listStyle.isInsetGrouped) listStyle.sectionContentInsets else CYLEdgeInsets.ZERO
+
+    /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
+    internal fun contentColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = columnAt(max(0f, measuredContentWidth))
+
+    /**
+     * The column the tags are laid in: [contentColumn], narrowed by the card's padding under `insetGrouped`. Every tag width,
+     * row count, fold decision, height and frame takes its width and x from here.
+     */
+    internal fun tagColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = tagColumnAt(max(0f, measuredContentWidth))
+
+    private fun tagColumnAt(width: Float): CYLRect {
+        val column = columnAt(width)
+        val card = cardInsets()
+        return CYLRect(column.x + card.left, 0f, max(0f, column.width - card.left - card.right), 0f)
+    }
+
+    private fun contentWidthFor(width: Float): Float = tagColumnAt(width).width
+
+    /**
+     * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside
+     * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
+     * `headerHorizontalInset`.
+     */
+    private fun headerEdgeInsets(): Pair<Float, Float> {
+        val style = listStyle
+        val width = max(0f, measuredContentWidth)
+        val column = columnAt(width)
+        val rest = max(0f, width - column.x - column.width)
+        if (style.isInsetGrouped) {
+            val card = cardInsets()
+            return (column.x + card.left) to (rest + card.right)
+        }
+        if (style.headerBackgroundColor != null) return (column.x + style.headerContentInsets.left) to (rest + style.headerContentInsets.right)
+        return style.headerHorizontalInset to style.headerHorizontalInset
+    }
+
+    /**
+     * The card, header band and header divider of a section, and the distances of its header title (dp, in the content's
+     * coordinates, below the title): null where the style draws none. The divider sits at the header's bottom edge inside
+     * `headerHeight`: it adds no height.
+     */
+    internal data class CYLTagListSectionFrame(
+        val section: Int,
+        val top: Float,
+        val height: Float,
+        val headerHeight: Float,
+        val card: CYLRect?,
+        val headerBand: CYLRect?,
+        val headerSeparator: CYLRect?,
+        val headerInsetLeft: Float,
+        val headerInsetRight: Float,
+    )
+
+    /** The frames of section `section` as the last layout pass computed them; null before the first one. */
+    internal fun sectionFrame(section: Int): CYLTagListSectionFrame? = content.sectionFrames.getOrNull(section)
 
     private fun widthsFor(contentWidth: Float): List<List<Float>> = titles.mapIndexed { section, items ->
         items.mapIndexed { item, title ->
@@ -865,6 +938,7 @@ open class CYLTagListView @JvmOverloads constructor(
         val heights = if (same) itemHeights else heightsForItems(widths)
         val header = headerHeight()
         val insets = listStyle.sectionInsets
+        val card = cardInsets()
         var height = 0f
         for (section in sectionRows.indices) {
             var rowCount = sectionRows[section].size
@@ -875,7 +949,7 @@ open class CYLTagListView @JvmOverloads constructor(
                 val withFold = widths[section] + inlineFoldSize(section, true).width
                 rowCount = rowsFor(listOf(withFold), contentWidth).first().size
             }
-            height += header + insets.top + insets.bottom
+            height += header + insets.top + insets.bottom + card.top + card.bottom
             height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
             if (foldable && foldIsInFooter()) height += footerHeight()
         }
@@ -915,6 +989,8 @@ open class CYLTagListView @JvmOverloads constructor(
 
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration?) {
         super.onConfigurationChanged(newConfig)
+        // The light / dark mode may have changed: the background, card, band and divider resolve it again, no app code needed.
+        applyStyleColors()
         invalidateMeasurements()
     }
 
@@ -1682,8 +1758,9 @@ open class CYLTagListView @JvmOverloads constructor(
         CYLAccessibilityNode.apply(cell, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
     }
 
-    private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean) {
-        button.applyFoldControl(displayedFoldControl(), listStyle.resolvedFoldControlColor(context), expanded, animated)
+    /** `onBand`: the button sits in a header with a band, so the tint is chosen against the band color. */
+    private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean, onBand: Boolean = false) {
+        button.applyFoldControl(displayedFoldControl(), listStyle.resolvedFoldControlColor(context, onBand), expanded, animated)
         button.contentDescription = foldAccessibilityLabel(section)
         CYLAccessibilityNode.apply(button, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
     }
@@ -1698,6 +1775,8 @@ open class CYLTagListView @JvmOverloads constructor(
         private val foldCells = HashMap<Int, CYLTagFoldCell>()
         private val headers = HashMap<Int, HeaderView>()
         private val footers = HashMap<Int, FooterView>()
+        /** The Liquid Glass behind each section's tags while the card is glass (the library's glass drawing), by section. */
+        private val glassCards = HashMap<Int, CYLAnimatedItemView>()
         private val frames = HashMap<View, CYLRect>()
         private val sectionTops = HashMap<Int, Float>()
         private var totalHeight = 0f
@@ -1743,13 +1822,68 @@ open class CYLTagListView @JvmOverloads constructor(
 
         fun layoutHeight(): Float = totalHeight
 
+        /** The card, header band and divider of each section, from the last `computeFrames`. */
+        val sectionFrames = ArrayList<CYLTagListSectionFrame>()
+
+        private fun sectionFrameOf(
+            section: Int, top: Float, height: Float, header: Float, column: CYLRect, cardY: Float, cardBottom: Float,
+            headerEdges: Pair<Float, Float>,
+        ): CYLTagListSectionFrame {
+            val style = listStyle
+            val card = if (style.isInsetGrouped) CYLRect(column.x, cardY, column.width, cardBottom - cardY) else null
+            val band = if (header > 0f && style.headerBackgroundColor != null) CYLRect(column.x, top, column.width, header) else null
+            var separator: CYLRect? = null
+            if (header > 0f && style.headerSeparatorStyle == CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine && style.headerSeparatorThickness > 0f) {
+                val separatorInsets = style.headerSeparatorInsets
+                val left = column.x + (separatorInsets?.left ?: 0f)
+                val right = column.x + column.width - (separatorInsets?.right ?: 0f)
+                val thickness = min(style.headerSeparatorThickness, header)
+                separator = CYLRect(left, top + header - thickness, max(0f, right - left), thickness)
+            }
+            return CYLTagListSectionFrame(section, top, height, header, card, band, separator, headerEdges.first, headerEdges.second)
+        }
+
+        /** The glass of a card: not touchable, hidden from accessibility, tinted with `sectionBackgroundColor` when it is set. */
+        private fun makeGlassCard(): CYLAnimatedItemView = CYLAnimatedItemView(context).apply {
+            isClickable = false
+            isFocusable = false
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
+            itemBackgroundColor = listStyle.sectionBackgroundColor
+            itemCornerRadius = listStyle.sectionCornerRadius
+        }
+
+        init {
+            // The cards, bands and dividers are drawn behind the headers and tags (onDraw runs before the children).
+            setWillNotDraw(false)
+        }
+
+        override fun onDraw(canvas: android.graphics.Canvas) {
+            val style = listStyle
+            val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+            fun fill(rect: CYLRect?, color: Int, radius: Float) {
+                if (rect == null) return
+                paint.color = color
+                val box = android.graphics.RectF(rect.x * density, rect.y * density, rect.maxX * density, rect.maxY * density)
+                canvas.drawRoundRect(box, radius * density, radius * density, paint)
+            }
+            for (frame in sectionFrames) {
+                fill(frame.headerBand, style.headerBackgroundColor ?: CYLColor.CLEAR, style.headerCornerRadius)
+                if (glassCards.isEmpty()) fill(frame.card, style.resolvedSectionBackgroundColor(context), style.sectionCornerRadius)
+                fill(frame.headerSeparator, style.resolvedHeaderSeparatorColor(context), 0f)
+            }
+        }
+
         fun rebuild(animated: Boolean = false) {
             removeAllViews()
             cells.clear()
             foldCells.clear()
             headers.clear()
             footers.clear()
+            glassCards.clear()
+            val glassCard = listStyle.isInsetGrouped && listStyle.resolvedSectionBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             for (section in titles.indices) {
+                if (glassCard) glassCards[section] = makeGlassCard().also { addView(it) }
                 if (headerHeight() > 0) headers[section] = HeaderView(context, section).also { addView(it) }
                 val visible = numberOfVisibleItemsInSection(section)
                 for (item in 0 until visible) {
@@ -1790,12 +1924,19 @@ open class CYLTagListView @JvmOverloads constructor(
         private fun computeFrames() {
             frames.clear()
             sectionTops.clear()
+            sectionFrames.clear()
             val width = measuredContentWidth.coerceAtLeast(0f)
             val insets = listStyle.sectionInsets
+            val card = cardInsets()
+            val column = columnAt(width)
+            val headerEdges = headerEdgeInsets()
+            // The tags' insets: the section's, plus the card's padding (the same insets when the style is plain).
+            val tagInsets = CYLEdgeInsets(insets.top + card.top, insets.left + card.left, insets.bottom, insets.right + card.right)
             val rtl = layoutDirection == LAYOUT_DIRECTION_RTL
             var y = 0f
             for (section in titles.indices) {
                 sectionTops[section] = y
+                val sectionTop = y
                 val header = headerHeight()
                 headers[section]?.let { frames[it] = CYLRect(0f, y, width, header) }
                 y += header
@@ -1814,13 +1955,18 @@ open class CYLTagListView @JvmOverloads constructor(
                     views.add(it)
                     sizes.add(inlineFoldSize(section, isSectionExpanded(section)))
                 }
-                val (itemFrames, bottom) = layout.frames(sizes, y, width, insets, listStyle.interitemSpacing, listStyle.lineSpacing, rtl)
+                val cardY = y + insets.top
+                val (itemFrames, bottom) = layout.frames(sizes, y, width, tagInsets, listStyle.interitemSpacing, listStyle.lineSpacing, rtl)
                 views.forEachIndexed { index, view -> frames[view] = itemFrames[index] }
-                y = (if (sizes.isEmpty()) y + insets.top else bottom) + insets.bottom
+                val cardBottom = (if (sizes.isEmpty()) y + tagInsets.top else bottom) + card.bottom
+                y = cardBottom + insets.bottom
                 footers[section]?.let {
                     frames[it] = CYLRect(0f, y, width, footerHeight())
                     y += footerHeight()
                 }
+                val sectionFrame = sectionFrameOf(section, sectionTop, y - sectionTop, header, column, cardY, cardBottom, headerEdges)
+                sectionFrames.add(sectionFrame)
+                glassCards[section]?.let { glass -> sectionFrame.card?.let { frames[glass] = it } }
             }
             if (showsAddItemView() && addItemView.parent === this) {
                 // Right below the sections, inside the content (it scrolls with the items), as iOS.
@@ -2015,6 +2161,7 @@ open class CYLTagListView @JvmOverloads constructor(
         init {
             val source = menuDataSource
             val style = listStyle
+            val onBand = style.headerBackgroundColor != null
             addView(indicatorView)
             addView(iconView)
             addView(titleLabel)
@@ -2027,15 +2174,16 @@ open class CYLTagListView @JvmOverloads constructor(
             val font = style.headerFontForTraitCollection()
             titleLabel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, font.size)
             titleLabel.typeface = font.typeface
-            titleLabel.setTextColor(style.resolvedHeaderTextColor(context))
+            titleLabel.setTextColor(style.resolvedHeaderTextColor(context, onBand))
             iconView.setImageDrawable(source?.menuImageForSection(section))
+            iconView.imageTintList = android.content.res.ColorStateList.valueOf(style.resolvedTintColor(context, onBand))
             accessoryView = source?.menuAccessoryViewForSection(section)
             accessoryView?.let { (it.parent as? ViewGroup)?.removeView(it); addView(it) }
             val showsFold = foldIsInHeader() && canFoldSection(section)
             foldButton.visibility = if (showsFold) VISIBLE else GONE
             if (showsFold) {
                 val expanded = isSectionExpanded(section)
-                configureFoldButton(foldButton, section, expanded, false)
+                configureFoldButton(foldButton, section, expanded, false, onBand)
                 foldSize = foldSize(expanded)
             }
             foldButton.setOnClickListener { toggleSection(section) }
@@ -2046,7 +2194,7 @@ open class CYLTagListView @JvmOverloads constructor(
             clearButton.visibility = if (showsClear) VISIBLE else GONE
             if (showsClear) {
                 val image = (style.clearButtonImage ?: CYLMenuImage("cyl_trash"))?.mutate()
-                image?.setTint(style.resolvedClearButtonColor(context))
+                image?.setTint(style.resolvedClearButtonColor(context, onBand))
                 clearButton.setImageDrawable(image)
                 val title = source?.menuTitleForSection(section).orEmpty()
                 val clear = CYLMenuLocalizedString("CYLMenuClearSection", "The clear button of a section")
@@ -2061,7 +2209,7 @@ open class CYLTagListView @JvmOverloads constructor(
             moreButton.visibility = if (showsMore) VISIBLE else GONE
             if (showsMore) {
                 val image = (style.moreButtonImage ?: CYLMenuImage("cyl_more") ?: CYLMenuIconDrawable(CYLMenuIconDrawable.Kind.ELLIPSIS)).mutate()
-                image.setTint(style.resolvedMoreButtonColor(context))
+                image.setTint(style.resolvedMoreButtonColor(context, onBand))
                 moreButton.setImageDrawable(image)
                 var label = source?.menuAccessibilityLabelForMoreButtonInSection(section)
                 if (label.isNullOrEmpty()) {
@@ -2083,9 +2231,9 @@ open class CYLTagListView @JvmOverloads constructor(
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             val width = (r - l) / density
             val height = (b - t) / density
-            val inset = listStyle.headerHorizontalInset
-            var trailing = width - inset
-            var leading = inset
+            val (leadingInset, trailingInset) = headerEdgeInsets()
+            var trailing = width - trailingInset
+            var leading = leadingInset
             if (clearButton.visibility == VISIBLE) {
                 // A square as tall as a line of the title at the trailing inset, aligned with the title text.
                 val line = min(height, ceil(titleLabel.lineHeight / density))

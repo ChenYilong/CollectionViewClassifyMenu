@@ -129,6 +129,8 @@ export class CYLMenuStyleKey {
   static readonly backgroundColor: string = 'backgroundColor';
   static readonly headerTextColor: string = 'headerTextColor';
   static readonly foldControlColor: string = 'foldControlColor';
+  /** The one color of the built-in views that are not tags (title, icon, fold / More control): `CYLMenuStyle.tintColor`. */
+  static readonly tintColor: string = 'tintColor';
   static readonly headerFont: string = 'headerFont';
   static readonly highlightedBackgroundColor: string = 'highlightedBackgroundColor';
   static readonly tagContentInsets: string = 'tagContentInsets';
@@ -695,6 +697,10 @@ export class CYLMenuConfiguration {
     const foldControlColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.foldControlColor]);
     if (foldControlColor !== undefined) {
       style.foldControlColor = foldControlColor;
+    }
+    const tintColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.tintColor]);
+    if (tintColor !== undefined) {
+      style.tintColor = tintColor;
     }
     const headerFont = CYLConfigurationValue.font(configuration[CYLMenuStyleKey.headerFont]);
     if (headerFont !== undefined) {

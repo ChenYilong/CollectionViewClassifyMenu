@@ -86,7 +86,7 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
             val style = itemStyle.copy()
             val normal = itemStyle.normalAppearance
             // The tint and the colors a tag leaves unset are resolved for the context (dark mode); without one (a size) they do not matter.
-            val tint = control.color ?: itemStyle.foldControlColor ?: context?.let { CYLSystemColors.primary(it) } ?: Color.BLACK
+            val tint = control.color ?: itemStyle.foldControlColor ?: context?.let { itemStyle.resolvedTintColor(it) } ?: Color.BLACK
             for (state in listOf(CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 val appearance = style.appearanceForState(state)
                 appearance.backgroundColor = context?.let { normal.resolvedBackgroundColor(it) } ?: normal.backgroundColor
