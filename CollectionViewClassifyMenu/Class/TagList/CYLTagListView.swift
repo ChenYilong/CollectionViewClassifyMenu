@@ -811,6 +811,9 @@ open class CYLTagListView: UIView {
 
     /// The callout of a long press that shows now (`CYLTagLongPressHost.showCallout`).
     private var calloutView: CYLTagCalloutView?
+    /// A tap anywhere in the window dismisses the callout (also on the list's empty area, the bars and other screens' views).
+    private var calloutDismissTap: UITapGestureRecognizer?
+    private let calloutTapDelegate = CYLTagCalloutTapDelegate()
 
     /**
      * A long press on an item without moving it: `menu(_:didLongPressItemAt:)`, then this (onTagLongClick).
@@ -3493,11 +3496,25 @@ extension CYLTagListView: CYLTagLongPressHost {
         let container: UIView = window ?? self
         callout.present(pointingAt: collectionView.convert(cell.frame, to: container), in: container)
         calloutView = callout
+        // Added after the finger lifted: it never sees the press that opened the callout.
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissCalloutFromTap))
+        tap.cancelsTouchesInView = false
+        tap.delegate = calloutTapDelegate
+        container.addGestureRecognizer(tap)
+        calloutDismissTap = tap
     }
 
     public func dismissCallout() {
         calloutView?.removeFromSuperview()
         calloutView = nil
+        if let tap = calloutDismissTap {
+            tap.view?.removeGestureRecognizer(tap)
+            calloutDismissTap = nil
+        }
+    }
+
+    @objc private func dismissCalloutFromTap() {
+        dismissCallout()
     }
 
     public func canReorderItem(at indexPath: IndexPath) -> Bool {
