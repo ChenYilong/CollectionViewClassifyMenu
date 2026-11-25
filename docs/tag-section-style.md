@@ -83,6 +83,25 @@ Consequences, so nobody is surprised:
   Tests per platform: each unset color resolves to its light value in light mode and its dark value in dark mode, switching the mode
   updates a shown list, and a set color is kept in both modes.
 
+## Built-in views have a default tint that is legible on what is behind them (owner, bug `mp-home-dark.png`, 2026-11-25)
+
+The bug: in dark mode the list's own texts and icons (section header title, the More / Less control, the section icon) were drawn in the
+dark-mode tint (white) directly on the host page; a host page that does not follow dark mode stays light, so the texts could not be read.
+The list cannot see the host's background, so the library must make its built-in views legible by itself:
+
+- New style property `tintColor` (nullable; configuration key `tintColor`): the one color of every built-in view that is not a tag:
+  header title, section icon, fold / More control (text, icon, arrow). An app that sets it wins in both modes.
+- The default tint (`tintColor` unset) is resolved against the background the built-in views are really drawn on, in this order:
+  1. the opaque background the list paints itself: `backgroundColor` when the app set it, else the grouped background under
+     `insetGrouped` (the default look): choose black or white by the background's luminance (the contrast rule, one named threshold);
+  2. otherwise (a transparent list over the host page) the system mode: black in light, white in dark (what it did before).
+  The header band, when shown, is part of the background the title is drawn on: the tint is resolved against the band color there.
+- Because the card is the default look (see above) the default list background is the grouped background (#F2F2F7 / black), painted by
+  the list, so the built-in views are legible with no setup. A transparent list (`plain` with a clear `backgroundColor`) over a host
+  page that ignores dark mode is the host's choice: the app sets `tintColor` or its list `backgroundColor`.
+- Tests per platform: tint on a light list background is dark and on a dark one light, whatever the system mode; unset + transparent
+  follows the mode; a set `tintColor` wins; the band color is used when a band is shown; switching the mode re-resolves a shown list.
+
 ## Gates
 
 Every platform: all existing tests pass unchanged, plus one test that the default style gives the same frames as before.
