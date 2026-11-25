@@ -2926,21 +2926,34 @@ export class CYLTagListState implements CYLTagLongPressHost {
   }
 
   /**
-   * The card's padding around the tags under `insetGrouped`, else none: `sectionContentInsets`, whose leading and trailing
-   * parts are replaced by `sectionBoardInset` when the app set it (the one horizontal board inset, the same on both sides).
-   * The one place the horizontal board inset comes from: every tag column, width, row, fold, height and frame reads it.
+   * The card's padding around the tags under `insetGrouped`, else none: `sectionContentInsets`. It never depends on
+   * `sectionBoardInset`: the tag column (and the header's title and fold control, which share it) is the section column
+   * minus these leading and trailing parts, whatever the board inset is.
    */
   private cardInsets(): CYLEdgeInsets {
     const style = this.styleStorage;
     if (!style.isInsetGrouped) {
       return CYLEdgeInsets.ZERO;
     }
-    const insets = this.physical(style.sectionContentInsets);
+    return this.physical(style.sectionContentInsets);
+  }
+
+  /**
+   * The board's column (the card, the header band and the divider) at the layout width: the tag column extended outward by
+   * one value on both sides. `sectionBoardInset` unset extends it by the card's leading and trailing padding, so the board
+   * spans the section column (the default look); a set value, 0 included, replaces both. A value above the default can
+   * push the board past the list's margin (accepted). Outside `insetGrouped` it is the section column. y and height are 0.
+   */
+  private boardColumnAt(width: number): CYLRect {
+    const column = this.columnAt(width);
+    const style = this.styleStorage;
     const boardInset = style.sectionBoardInset;
-    if (boardInset === undefined) {
-      return insets;
+    if (!style.isInsetGrouped || boardInset === undefined) {
+      return column;
     }
-    return new CYLEdgeInsets(insets.top, boardInset, insets.bottom, boardInset);
+    const card = this.cardInsets();
+    const tagWidth = Math.max(0, column.width - card.left - card.right);
+    return new CYLRect(column.x + card.left - boardInset, 0, tagWidth + 2 * boardInset, 0);
   }
 
   /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
@@ -2949,7 +2962,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
   }
 
   /**
-   * The column the tags are laid in: `contentColumn(section)`, narrowed by the card's padding under `insetGrouped`. Every
+   * The tag column: `contentColumn(section)`, narrowed by the card's padding under `insetGrouped` (never by `sectionBoardInset`). Every
    * tag width, row count, fold decision, height and frame takes its width and x from here.
    */
   tagColumn(section: number): CYLRect {
@@ -3135,7 +3148,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
     const style = this.styleStorage;
     const insets = style.sectionInsets;
     const available = this.contentWidth(this.layoutWidth);
-    const column = this.columnAt(this.layoutWidth);
+    const column = this.boardColumnAt(this.layoutWidth);
     const card = this.cardInsets();
     const originX = this.tagColumn(0).x;
     const headerEdges = this.headerEdgeInsets();

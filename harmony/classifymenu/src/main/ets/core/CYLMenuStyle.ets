@@ -351,10 +351,13 @@ export class CYLMenuStyle {
     CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding);
   private boardInsetValue?: number = undefined;
   /**
-   * The horizontal inset of the content column (header block and tags) inside the board (`insetGrouped`), vp: ONE value for
-   * both sides. Undefined (the default) keeps the leading and trailing parts of `sectionContentInsets` (12, the first
-   * version); a set value, 0 included, replaces them (top and bottom still come from `sectionContentInsets`). 0 makes the
-   * content column equal the board column. A negative value is 0.
+   * How far the board (card, header band, divider) extends beyond the tag column on the left and on the right
+   * (`insetGrouped`), vp: ONE value for both sides. The header title and the tags always share the tag column (the section
+   * column minus `sectionContentInsets` leading and trailing); this value never moves them. Undefined (the default)
+   * extends the board by those leading and trailing parts (12), so it spans the section column (the first version's
+   * look); a set value, 0 included, replaces them (top and bottom padding still come from `sectionContentInsets`). 0 makes
+   * the board hug the tags. A value above the default can push the board past the list's margin (accepted). A negative
+   * value is 0. Right to left mirrors.
    */
   get sectionBoardInset(): number | undefined {
     return this.boardInsetValue;
