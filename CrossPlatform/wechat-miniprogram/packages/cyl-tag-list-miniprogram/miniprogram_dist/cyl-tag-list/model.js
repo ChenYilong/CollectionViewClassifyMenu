@@ -163,6 +163,20 @@ const DARK_TEXT_COLOR = '#FFFFFF';
 const LIGHT_TINT = '#000000';
 
 /**
+ * The section style (docs/tag-section-style.md): the names of style keys `sectionStyle` and `headerSeparatorStyle`, the named
+ * lengths (px) and the colors of each color mode. Every default reproduces the layout of before: no card, no band, no divider.
+ */
+const SECTION_STYLES = { plain: 'plain', insetGrouped: 'insetGrouped' };
+const HEADER_SEPARATOR_STYLES = { none: 'none', line: 'line' };
+const SECTION_METRICS = { cardCornerRadius: 10, cardPadding: 12, headerBandPadding: 12, separatorThickness: 0.5 };
+/** Card: white / #1C1C1E; header band: #EFEFF4 / #2C2C2E; grouped list background: #F2F2F7 / black; divider: the system separator. */
+const SECTION_COLORS = {
+  light: { card: '#FFFFFF', headerBand: '#EFEFF4', groupedBackground: '#F2F2F7', separator: 'rgba(60, 60, 67, 0.29)' },
+  dark: { card: '#1C1C1E', headerBand: '#2C2C2E', groupedBackground: '#000000', separator: 'rgba(84, 84, 88, 0.6)' },
+};
+const ZERO_INSETS = { top: 0, left: 0, bottom: 0, right: 0 };
+
+/**
  * A background that may be transparent (style key `allowsTransparentBackground`): `transparent`, `clear` and zero alpha
  * are kept as `transparent`; a missing or invalid color is still the default tag fill.
  */
@@ -197,6 +211,35 @@ function defaultAppearance(hairline, dark = false) {
     backgroundImage: '',
     hairline,
   };
+}
+
+/** The value of a name table (case-insensitive; the raw values 0 and 1 count), or null. */
+function namedValue(value, names) {
+  const text = String(value).toLowerCase();
+  const found = Object.keys(names).find((k) => k.toLowerCase() === text);
+  if (found) return names[found];
+  const raw = Object.values(names)[Number(text)];
+  return Number.isInteger(Number(text)) && text.trim() !== '' && raw ? raw : null;
+}
+
+/** The section card, header band and header divider keys of `mergeStyle`. */
+function mergeSectionStyle(style, c) {
+  const sectionStyle = namedValue(c.sectionStyle, SECTION_STYLES);
+  if (sectionStyle) style.sectionStyle = sectionStyle;
+  const separatorStyle = namedValue(c.headerSeparatorStyle, HEADER_SEPARATOR_STYLES);
+  if (separatorStyle) style.headerSeparatorStyle = separatorStyle;
+  ['sectionBackgroundColor', 'headerBackgroundColor', 'headerSeparatorColor'].forEach((k) => {
+    const value = color(c[k]);
+    if (value) style[k] = value;
+  });
+  ['sectionCornerRadius', 'headerCornerRadius', 'headerSeparatorThickness'].forEach((k) => {
+    const n = numberValue(c[k]);
+    if (n !== null) style[k] = Math.max(0, n);
+  });
+  ['sectionContentInsets', 'headerContentInsets', 'headerSeparatorInsets'].forEach((k) => {
+    const value = insetsValue(c[k]);
+    if (value) style[k] = value;
+  });
 }
 
 /**
@@ -237,6 +280,24 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     titlePositionAdjustment: { horizontal: 0, vertical: 0 },
     imagePositionAdjustment: { horizontal: 0, vertical: 0 },
     backgroundColor: '#FFFFFF',
+    // True once a configuration sets `backgroundColor`: under insetGrouped an unset one is the grouped background.
+    backgroundColorSet: false,
+    // The section style (null colors resolve to `sectionPalette`, which follows the color mode).
+    sectionPalette: { ...(dark ? SECTION_COLORS.dark : SECTION_COLORS.light) },
+    sectionStyle: SECTION_STYLES.plain,
+    sectionBackgroundColor: null,
+    sectionCornerRadius: SECTION_METRICS.cardCornerRadius,
+    sectionContentInsets: {
+      top: SECTION_METRICS.cardPadding, left: SECTION_METRICS.cardPadding,
+      bottom: SECTION_METRICS.cardPadding, right: SECTION_METRICS.cardPadding,
+    },
+    headerBackgroundColor: null,
+    headerCornerRadius: 0,
+    headerContentInsets: { top: 0, left: SECTION_METRICS.headerBandPadding, bottom: 0, right: SECTION_METRICS.headerBandPadding },
+    headerSeparatorStyle: HEADER_SEPARATOR_STYLES.none,
+    headerSeparatorColor: null,
+    headerSeparatorThickness: SECTION_METRICS.separatorThickness,
+    headerSeparatorInsets: null,
     headerTextColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     foldControlColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     headerFont: { size: 14, weight: 'regular', italic: false },
@@ -363,7 +424,9 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   ['backgroundColor', 'headerTextColor', 'foldControlColor'].forEach((k) => {
     const value = color(c[k]);
     if (value) style[k] = value;
+    if (value && k === 'backgroundColor') style.backgroundColorSet = true;
   });
+  mergeSectionStyle(style, c);
   if (Object.prototype.hasOwnProperty.call(c, 'highlightedBackgroundColor')) {
     style.highlightedBackgroundColor = color(c.highlightedBackgroundColor);
   }
@@ -936,20 +999,135 @@ function sizerFonts(style, state) {
   return Array.from(new Set(others));
 }
 
+// MARK: - Section style geometry (docs/tag-section-style.md)
+// A mini program lays tags out in CSS, so a column is two distances from the list's edges, { left, right }, and
+// `columnAt` turns them into x and width at a list width. `contentColumn` is the one place the column comes from: the CSS
+// of the card, the tags and the header, the header title's x and the divider all derive from it.
+
+function isInsetGrouped(style) {
+  return style.sectionStyle === SECTION_STYLES.insetGrouped;
+}
+
+/** The card's padding around the tags: `sectionContentInsets` under insetGrouped, else none. */
+function cardInsets(style) {
+  return isInsetGrouped(style) ? style.sectionContentInsets : ZERO_INSETS;
+}
+
+/** The section's column: the list width minus `sectionInsets`, as distances from the list's left and right edges. */
+function contentColumn(style) {
+  return { left: style.sectionInsets.left, right: style.sectionInsets.right };
+}
+
+/** The column the tags are laid in: `contentColumn` narrowed by the card's padding. Rows, folding and height follow it. */
+function tagColumn(style) {
+  const column = contentColumn(style);
+  const card = cardInsets(style);
+  return { left: column.left + card.left, right: column.right + card.right };
+}
+
+/** A column's x and width at the list width `listWidth`. */
+function columnAt(column, listWidth) {
+  return { x: column.left, width: Math.max(0, listWidth - column.left - column.right) };
+}
+
+function hasHeaderBand(style) {
+  return style.headerBackgroundColor !== null && style.headerBackgroundColor !== undefined;
+}
+
+/** True when the header spans the column (a band or a card) instead of the whole list width. */
+function isStyledHeader(style) {
+  return isInsetGrouped(style) || hasHeaderBand(style);
+}
+
+/**
+ * The distances from the list's edges to the header's title and fold control: the tags' edges inside the card
+ * (insetGrouped), the band's edges plus `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
+ */
+function headerEdges(style) {
+  const column = contentColumn(style);
+  if (isInsetGrouped(style)) return tagColumn(style);
+  if (hasHeaderBand(style)) {
+    return { left: column.left + style.headerContentInsets.left, right: column.right + style.headerContentInsets.right };
+  }
+  return { left: style.headerHorizontalInset, right: style.headerHorizontalInset };
+}
+
+/** The distances from the list's edges to the header element: the column when styled, else the whole list. */
+function headerBox(style) {
+  return isStyledHeader(style) ? contentColumn(style) : { left: 0, right: 0 };
+}
+
+/** The header's height (headerHeight, at least the title's line and 12). */
+function headerHeightOf(style) {
+  return Math.max(style.headerHeight, lineHeight(style.headerFont.size) + 12);
+}
+
+/**
+ * The header divider as distances from the list's edges and its thickness, or null when there is none: it starts at the
+ * header title (or `headerSeparatorInsets.left` from the column) and ends at the column's trailing edge. It sits at the
+ * header's bottom inside the header height, so it adds no height.
+ */
+function headerSeparator(style) {
+  if (style.headerSeparatorStyle !== HEADER_SEPARATOR_STYLES.line || !(style.headerSeparatorThickness > 0)) return null;
+  const column = contentColumn(style);
+  const own = style.headerSeparatorInsets;
+  return {
+    left: own ? column.left + own.left : headerEdges(style).left,
+    right: own ? column.right + own.right : column.right,
+    thickness: Math.min(style.headerSeparatorThickness, headerHeightOf(style)),
+  };
+}
+
+/** The list background as drawn: the grouped background where insetGrouped and the app never set `backgroundColor`. */
+function resolvedBackgroundColor(style) {
+  return isInsetGrouped(style) && !style.backgroundColorSet ? style.sectionPalette.groupedBackground : style.backgroundColor;
+}
+
+/** The card's color as drawn: its own, else the system card color of the color mode. */
+function resolvedSectionBackgroundColor(style) {
+  return style.sectionBackgroundColor || style.sectionPalette.card;
+}
+
+/** The divider's color as drawn: its own, else the system separator of the color mode. */
+function resolvedHeaderSeparatorColor(style) {
+  return style.headerSeparatorColor || style.sectionPalette.separator;
+}
+
 /**
  * The CSS of a section: its insets (the last line's spacing taken off the bottom), the negative trailing margin
  * that absorbs the last tag's spacing, the header (headerHeight, headerFont, headerTextColor, headerHorizontalInset)
- * and the list's background.
+ * and the list's background. With the section style on, it adds `cardStyle` (insetGrouped), a band in `headerStyle` and
+ * `headerLineStyle` (the divider); with the default style these keys are absent and the rest is what it always was.
  */
 function sectionLayout(style) {
   const i = style.sectionInsets;
-  const headerHeight = Math.max(style.headerHeight, lineHeight(style.headerFont.size) + 12);
-  return {
+  const headerHeight = headerHeightOf(style);
+  const layout = {
     listStyle: `padding: ${i.top}px ${i.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${i.left}px`,
     itemsStyle: `margin-right: -${style.interitemSpacing}px`,
     headerStyle: `height: ${headerHeight}px; padding: 0 ${style.headerHorizontalInset}px; ${fontCSS(style.headerFont)}; color: ${style.headerTextColor}`,
-    backgroundStyle: `background-color: ${style.backgroundColor}`,
+    backgroundStyle: `background-color: ${resolvedBackgroundColor(style)}`,
   };
+  if (isInsetGrouped(style)) {
+    // The card holds the last line's spacing: the tags' bottom margin is taken off inside it, not off the list's padding.
+    const card = style.sectionContentInsets;
+    layout.listStyle = `padding: ${i.top}px ${i.right}px ${i.bottom}px ${i.left}px`;
+    layout.itemsStyle += `; margin-bottom: -${style.lineSpacing}px`;
+    layout.cardStyle = `padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; background-color: ${resolvedSectionBackgroundColor(style)}`;
+  }
+  if (isStyledHeader(style)) {
+    const edges = headerEdges(style);
+    const box = headerBox(style);
+    const band = hasHeaderBand(style)
+      ? `; background-color: ${style.headerBackgroundColor}; border-radius: ${style.headerCornerRadius}px` : '';
+    layout.headerStyle = `height: ${headerHeight}px; margin: 0 ${box.right}px 0 ${box.left}px; padding: 0 ${edges.right - box.right}px 0 ${edges.left - box.left}px; ${fontCSS(style.headerFont)}; color: ${style.headerTextColor}${band}`;
+  }
+  const line = headerSeparator(style);
+  if (line) {
+    const box = headerBox(style);
+    layout.headerLineStyle = `left: ${line.left - box.left}px; right: ${line.right - box.right}px; height: ${line.thickness}px; background-color: ${resolvedHeaderSeparatorColor(style)}`;
+  }
+  return layout;
 }
 
 /** The value text of an offset, a size and insets, as NSCoder.string(for:) writes them ("{0, -4}", "{16, 16}"). */
@@ -969,4 +1147,7 @@ module.exports = {
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
+  SECTION_STYLES, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
+  columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
+  resolvedHeaderSeparatorColor,
 };

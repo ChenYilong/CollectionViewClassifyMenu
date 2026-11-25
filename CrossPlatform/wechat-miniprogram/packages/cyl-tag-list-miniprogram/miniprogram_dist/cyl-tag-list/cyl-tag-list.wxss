@@ -5,7 +5,11 @@
 :host { display: block; }
 /* The callout is positioned absolutely against the list (its top is relative to the list), so the list is the containing block. */
 .cyl-tag-list { position: relative; }
-.cyl-header { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+.cyl-header { position: relative; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+/* The header divider (headerSeparatorStyle "line"): at the header's bottom edge inside its height; left, right, height and color inline. */
+.cyl-header-line { position: absolute; bottom: 0; }
+/* The section card (sectionStyle "insetGrouped"): padding, radius and color inline; plain, it is a bare block. */
+.cyl-card { box-sizing: border-box; }
 .cyl-header-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cyl-fold-header { display: flex; align-items: center; font-size: 13px; padding: 4px 0 4px 12px; }
 .cyl-items { display: flex; flex-wrap: wrap; }

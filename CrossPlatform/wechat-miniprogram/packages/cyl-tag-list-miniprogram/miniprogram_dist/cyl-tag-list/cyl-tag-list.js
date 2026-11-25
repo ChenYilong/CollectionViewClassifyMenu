@@ -143,7 +143,7 @@ Component({
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
         foldColor: m.foldControl.color || m.style.foldControlColor,
-        backgroundStyle: `background-color: ${m.style.backgroundColor}`,
+        backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}`,
       }, () => {
         if (remeasure) this.measure();
         else this.reportHeight();
