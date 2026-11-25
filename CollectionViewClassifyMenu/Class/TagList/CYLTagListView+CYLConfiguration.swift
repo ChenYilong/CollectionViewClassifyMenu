@@ -385,6 +385,11 @@ public enum CYLMenuStyleKey {
     public static let sectionContentInsets = "sectionContentInsets"
 
     /**
+     * A number: how far the board extends beyond the tags, left and right. Absent: `sectionContentInsets` leading / trailing.
+     */
+    public static let sectionBoardInset = "sectionBoardInset"
+
+    /**
      * A color; absent: no band.
      */
     public static let headerBackgroundColor = "headerBackgroundColor"
@@ -1347,6 +1352,9 @@ private extension CYLMenuStyle {
         }
         if let value = Value.insets(configuration[Key.sectionContentInsets]) {
             sectionContentInsets = value
+        }
+        if let value = Value.double(configuration[Key.sectionBoardInset]) {
+            sectionBoardInset = max(0, value)
         }
         if let value = configuration[Key.headerBackgroundColor] {
             headerBackgroundColor = Value.color(value)
