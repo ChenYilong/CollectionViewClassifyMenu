@@ -878,6 +878,8 @@ open class CYLTagListView: UIView {
 
     /// The callout of a long press that shows now (`CYLTagLongPressHost.showCallout`).
     private var calloutView: CYLTagCalloutView?
+    /// KVO on the contentOffset of the list's scroll view and its ancestors while the callout shows; removed on dismiss.
+    private var calloutScrollObservations: [NSKeyValueObservation] = []
     /// A tap anywhere in the window dismisses the callout (also on the list's empty area, the bars and other screens' views).
     private var calloutDismissTap: UITapGestureRecognizer?
     private let calloutTapDelegate = CYLTagCalloutTapDelegate()
@@ -3708,8 +3710,11 @@ extension CYLTagListView: CYLTagLongPressHost {
         let callout = CYLTagCalloutView(text: text)
         // In the window, so a list that clips its content does not clip the bubble above its first row.
         let container: UIView = window ?? self
-        callout.present(pointingAt: collectionView.convert(cell.frame, to: container), in: container)
+        // The section header above a first-row tag stays visible: the bubble goes below the tag then, where there is room.
+        let headerFrame = header(inSection: indexPath.section).map { collectionView.convert($0.frame, to: container) }
+        callout.present(pointingAt: collectionView.convert(cell.frame, to: container), in: container, avoiding: headerFrame)
         calloutView = callout
+        observeScrollingToDismissCallout()
         // Added after the finger lifted: it never sees the press that opened the callout.
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissCalloutFromTap))
         tap.cancelsTouchesInView = false
@@ -3718,7 +3723,31 @@ extension CYLTagListView: CYLTagLongPressHost {
         calloutDismissTap = tap
     }
 
+    /// Watches the list's own scroll view and every ancestor scroll view: any scroll hides the callout (also a programmatic one).
+    private func observeScrollingToDismissCallout() {
+        var scrollViews: [UIScrollView] = [collectionView]
+        var ancestor: UIView? = superview
+        while let view = ancestor {
+            if let scrollView = view as? UIScrollView {
+                scrollViews.append(scrollView)
+            }
+            ancestor = view.superview
+        }
+        calloutScrollObservations = scrollViews.map { scrollView in
+            let start = scrollView.contentOffset
+            return scrollView.observe(\.contentOffset, options: [.new]) { [weak self] _, change in
+                guard let offset = change.newValue,
+                      abs(offset.x - start.x) > 0.5 || abs(offset.y - start.y) > 0.5 else {
+                    return
+                }
+                self?.dismissCallout()
+            }
+        }
+    }
+
     public func dismissCallout() {
+        calloutScrollObservations.forEach { $0.invalidate() }
+        calloutScrollObservations = []
         calloutView?.removeFromSuperview()
         calloutView = nil
         if let tap = calloutDismissTap {
