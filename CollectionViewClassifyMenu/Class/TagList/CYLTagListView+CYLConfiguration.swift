@@ -354,6 +354,66 @@ public enum CYLMenuStyleKey {
     public static let sectionInsets = "sectionInsets"
 
     /**
+     * A `CYLSectionStyle` raw value, or "plain" / "insetGrouped" (case-insensitive).
+     */
+    public static let sectionStyle = "sectionStyle"
+
+    /**
+     * A color; absent keeps the system card color.
+     */
+    public static let sectionBackgroundColor = "sectionBackgroundColor"
+
+    /**
+     * A `CYLTagBackgroundStyle` raw value, or "flat" / "liquidGlass" (case-insensitive); anything else is "flat".
+     */
+    public static let sectionBackgroundStyle = "sectionBackgroundStyle"
+
+    /**
+     * A number.
+     */
+    public static let sectionCornerRadius = "sectionCornerRadius"
+
+    /**
+     * Insets: an `NSValue`, "{top, left, bottom, right}", [t, l, b, r] or {top:, left:, bottom:, right:}.
+     */
+    public static let sectionContentInsets = "sectionContentInsets"
+
+    /**
+     * A color; absent: no band.
+     */
+    public static let headerBackgroundColor = "headerBackgroundColor"
+
+    /**
+     * A number.
+     */
+    public static let headerCornerRadius = "headerCornerRadius"
+
+    /**
+     * Insets (left and right are used; absent: 0).
+     */
+    public static let headerContentInsets = "headerContentInsets"
+
+    /**
+     * A `CYLHeaderSeparatorStyle` raw value, or "none" / "line" (case-insensitive).
+     */
+    public static let headerSeparatorStyle = "headerSeparatorStyle"
+
+    /**
+     * A color; absent keeps the system separator color.
+     */
+    public static let headerSeparatorColor = "headerSeparatorColor"
+
+    /**
+     * A number.
+     */
+    public static let headerSeparatorThickness = "headerSeparatorThickness"
+
+    /**
+     * Insets (left and right are used; absent: 0).
+     */
+    public static let headerSeparatorInsets = "headerSeparatorInsets"
+
+    /**
      * An offset: an `NSValue`, "{horizontal, vertical}", [h, v] or {horizontal:, vertical:}.
      */
     public static let titlePositionAdjustment = "titlePositionAdjustment"
@@ -403,6 +463,11 @@ public enum CYLMenuStyleKey {
      * A color.
      */
     public static let headerTextColor = "headerTextColor"
+
+    /**
+     * A color: the one tint of the header title, the section icon and the fold and More controls; absent resolves against the background.
+     */
+    public static let tintColor = "tintColor"
 
     /**
      * A color.
@@ -1201,6 +1266,7 @@ extension CYLMenuStyle {
         if let value = Value.insets(configuration[Key.sectionInsets]) {
             sectionInsets = value
         }
+        applySectionStyle(configuration)
         if let value = Value.offset(configuration[Key.titlePositionAdjustment]) {
             titlePositionAdjustment = value
         }
@@ -1212,6 +1278,9 @@ extension CYLMenuStyle {
         }
         if let value = Value.color(configuration[Key.headerTextColor]) {
             headerTextColor = value
+        }
+        if let value = configuration[Key.tintColor] {
+            tintColor = Value.color(value)
         }
         if let value = Value.color(configuration[Key.foldControlColor]) {
             foldControlColor = value
@@ -1233,6 +1302,60 @@ extension CYLMenuStyle {
         }
         if let value = configuration[Key.deleteIndicatorFont] {
             deleteIndicatorFont = Value.font(value)
+        }
+    }
+}
+
+private extension CYLMenuStyle {
+
+    /**
+     * The section card, header band and header divider keys of `applyConfiguration(_:)`.
+     */
+    func applySectionStyle(_ configuration: [String: Any]) {
+        typealias Value = CYLConfigurationValue
+        typealias Key = CYLMenuStyleKey
+        let sectionStyles = ["plain": CYLSectionStyle.plain.rawValue, "insetgrouped": CYLSectionStyle.insetGrouped.rawValue]
+        if let raw = Value.rawValue(configuration[Key.sectionStyle], names: sectionStyles),
+           let value = CYLSectionStyle(rawValue: raw) {
+            sectionStyle = value
+        }
+        if let value = configuration[Key.sectionBackgroundColor] {
+            sectionBackgroundColor = Value.color(value)
+        }
+        let backgroundStyles = ["flat": CYLTagBackgroundStyle.flat.rawValue,
+                                "liquidglass": CYLTagBackgroundStyle.liquidGlass.rawValue]
+        if let raw = Value.rawValue(configuration[Key.sectionBackgroundStyle], names: backgroundStyles),
+           let value = CYLTagBackgroundStyle(rawValue: raw) {
+            sectionBackgroundStyle = value
+        }
+        if let value = Value.double(configuration[Key.sectionCornerRadius]) {
+            sectionCornerRadius = max(0, value)
+        }
+        if let value = Value.insets(configuration[Key.sectionContentInsets]) {
+            sectionContentInsets = value
+        }
+        if let value = configuration[Key.headerBackgroundColor] {
+            headerBackgroundColor = Value.color(value)
+        }
+        if let value = Value.double(configuration[Key.headerCornerRadius]) {
+            headerCornerRadius = max(0, value)
+        }
+        if let value = Value.insets(configuration[Key.headerContentInsets]) {
+            headerContentInsets = value
+        }
+        let separatorStyles = ["none": CYLHeaderSeparatorStyle.none.rawValue, "line": CYLHeaderSeparatorStyle.line.rawValue]
+        if let raw = Value.rawValue(configuration[Key.headerSeparatorStyle], names: separatorStyles),
+           let value = CYLHeaderSeparatorStyle(rawValue: raw) {
+            headerSeparatorStyle = value
+        }
+        if let value = configuration[Key.headerSeparatorColor] {
+            headerSeparatorColor = Value.color(value)
+        }
+        if let value = Value.double(configuration[Key.headerSeparatorThickness]) {
+            headerSeparatorThickness = max(0, value)
+        }
+        if let value = Value.insets(configuration[Key.headerSeparatorInsets]) {
+            headerSeparatorInsets = value
         }
     }
 }
