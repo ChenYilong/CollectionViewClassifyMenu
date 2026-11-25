@@ -1242,7 +1242,9 @@ open class CYLTagListView @JvmOverloads constructor(
         bubble.arrowCenter = (cellCenterX - x).toFloat()
         val y = if (above) location[1] - bubble.measuredHeight + px(6f) else location[1] + cell.height - px(6f)
         val popup = android.widget.PopupWindow(bubble, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, false)
-        popup.isOutsideTouchable = true
+        // Not outside-touchable: the popup would dismiss itself when the finger that began the long press lifts. The list dismisses
+        // the callout on the next touch down, a tap, a scroll, a reload or another long press.
+        popup.isOutsideTouchable = false
         popup.setBackgroundDrawable(null)
         popup.setOnDismissListener { if (calloutPopup === popup) calloutPopup = null }
         calloutPopup = popup
@@ -1253,6 +1255,11 @@ open class CYLTagListView @JvmOverloads constructor(
 
     /** The text of the callout that shows now, or null (for tests). */
     internal val calloutText: String? get() = (calloutPopup?.contentView as? CYLTagCalloutBubble)?.text?.toString()
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) dismissCallout()
+        return super.dispatchTouchEvent(event)
+    }
 
     override fun dismissCallout() {
         val popup = calloutPopup ?: return
