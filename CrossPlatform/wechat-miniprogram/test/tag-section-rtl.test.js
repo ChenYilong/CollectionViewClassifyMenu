@@ -160,7 +160,10 @@ test('the component puts direction: rtl on the list, selects the mirrored rules 
   const wxml = fs.readFileSync(path.join(COMPONENT_DIR, 'cyl-tag-list.wxml'), 'utf8')
   assert.match(wxml, /class="cyl-tag-list \{\{rtl \? 'cyl-rtl' : ''\}\}"/)
   const wxss = fs.readFileSync(path.join(COMPONENT_DIR, 'cyl-tag-list.wxss'), 'utf8')
-  assert.match(wxss, /\.cyl-rtl \.cyl-fold-header \{ padding: 4px 12px 4px 0; \}/)
+  // The fold control's gap is its margin (HEADER_ITEM_SPACING), written inline on the physical side of the direction.
+  assert.doesNotMatch(wxss, /\.cyl-rtl \.cyl-fold-header/)
+  assert.match(model.foldHeaderWidthCSS({ rtl: true }), new RegExp(`margin-right: ${model.HEADER_ITEM_SPACING}px; margin-left: 0`))
+  assert.match(model.foldHeaderWidthCSS(), new RegExp(`margin-left: ${model.HEADER_ITEM_SPACING}px; margin-right: 0`))
   assert.match(wxss, /\.cyl-rtl \.cyl-fold-arrow \{ margin-left: 0; margin-right: 2px; \}/)
 })
 
@@ -238,5 +241,6 @@ test('the component applies the cap to the header, footer and tail fold controls
   assert.match(wxml, /class="cyl-fold-footer" style="color: \{\{foldColor\}\}; \{\{foldFontStyle\}\};"/)
   const source = fs.readFileSync(path.join(COMPONENT_DIR, 'cyl-tag-list.js'), 'utf8')
   assert.match(source, /foldFontStyle: model\.foldControlFontCSS\(\)/)
+  assert.match(source, /foldHeaderStyle: model\.foldHeaderWidthCSS\(\{ rtl: model\.isRtl\(m\.style\) \}\)/)
   assert.match(source, /model\.foldControlFontCSS\(style\.normal\.font\.size\)/)
 })

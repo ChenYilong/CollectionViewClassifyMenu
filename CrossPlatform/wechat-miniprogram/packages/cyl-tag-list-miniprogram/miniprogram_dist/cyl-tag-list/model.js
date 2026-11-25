@@ -180,8 +180,22 @@ const DEFAULT_DIRECTION = DIRECTIONS.ltr;
 const FOLD_CONTROL_FONT_SIZE = 13;
 const FOLD_CONTROL_MAX_FONT_SIZE = 20;
 
-/** The widest a fold control in a section header may be, as a percentage of the header (the section title truncates at the tail). */
-const FOLD_HEADER_MAX_WIDTH_PERCENT = 40;
+/**
+ * The header room model (docs/tag-section-style.md). INNER WIDTH is the header's content box (the tag column: the list width
+ * minus the header edges). Every two adjacent header views are HEADER_ITEM_SPACING px apart (the fold control's margin on its
+ * leading side; 12 is what the control's padding was, so the default look is unchanged). The fold control is at most
+ * HEADER_FOLD_ALONE_MAX_FRACTION of the inner width, or HEADER_FOLD_SHARED_MAX_FRACTION when More, a clear button or an
+ * accessory also shows (this component's header has none of those, so the alone value applies). The section title takes what
+ * is left, never less than HEADER_TITLE_MIN_EM of the header font (and at least HEADER_TITLE_MIN_WIDTH_PX).
+ */
+const HEADER_ITEM_SPACING = 12;
+const HEADER_FOLD_ALONE_MAX_FRACTION = 0.4;
+const HEADER_FOLD_SHARED_MAX_FRACTION = 0.3;
+const HEADER_TITLE_MIN_EM = 1;
+const HEADER_TITLE_MIN_WIDTH_PX = 1;
+/** The percent of a fraction, for CSS (rounded so that 0.3 gives 30, not 30.000000000000004). */
+const PERCENT_PER_FRACTION = 100;
+const PERCENT_PRECISION = 1000;
 
 /**
  * Dark mode, as iOS's dynamic defaults: a tag's fill is the secondary system background (#1C1C1E), its title the primary
@@ -1523,12 +1537,68 @@ function headerTitleCSS(maxLines) {
     : `white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: ${maxLines}; overflow: hidden; text-overflow: ellipsis`;
 }
 
-/** The CSS font size of a fold / More control: `size` px, never above FOLD_CONTROL_MAX_FONT_SIZE (the system font size scales text up). */
-/** The CSS width cap of a fold control in a section header: at most FOLD_HEADER_MAX_WIDTH_PERCENT of the header. */
-function foldHeaderWidthCSS() {
-  return `max-width: ${FOLD_HEADER_MAX_WIDTH_PERCENT}%`;
+/** The header's INNER WIDTH at the list width `listWidth`: between the header edges (the tag column), never negative. */
+function headerInnerWidth(style, listWidth) {
+  const edges = headerEdges(style);
+  return Math.max(0, listWidth - edges.left - edges.right);
 }
 
+/** The fold control's width cap as a fraction of the inner width: the shared one when More, clear or an accessory also shows. */
+function headerFoldMaxFraction(shared = false) {
+  return shared ? HEADER_FOLD_SHARED_MAX_FRACTION : HEADER_FOLD_ALONE_MAX_FRACTION;
+}
+
+/**
+ * The fold control's width: its natural width in the WIDER of the collapsed and expanded states, capped at the fraction of the
+ * inner width. One number for both states, so the title room does not change when the control is toggled. Pure.
+ */
+function headerFoldWidth(innerWidth, collapsedWidth, expandedWidth, shared = false) {
+  return Math.min(Math.max(collapsedWidth, expandedWidth), headerFoldMaxFraction(shared) * innerWidth);
+}
+
+/**
+ * The title's maximum width (px): the inner width minus the fixed parts present (`fixedWidths`, the fold control's width and any
+ * other part's) minus HEADER_ITEM_SPACING for each of them, never below the title's minimum (HEADER_TITLE_MIN_EM of the header
+ * font, at least HEADER_TITLE_MIN_WIDTH_PX). With no fixed part it is the inner width. The title wraps to `headerMaxLines` at
+ * exactly this width; the CSS reaches the same width by giving the fixed parts `flex: none` and the title `flex: 0 1 auto` with
+ * `min-width` of the minimum. Pure.
+ */
+function headerTitleMaxWidth(style, innerWidth, fixedWidths = []) {
+  const minimum = Math.max(HEADER_TITLE_MIN_WIDTH_PX, HEADER_TITLE_MIN_EM * style.headerFont.size);
+  const taken = fixedWidths.reduce((sum, width) => sum + width, 0) + HEADER_ITEM_SPACING * fixedWidths.length;
+  return fixedWidths.length ? Math.max(minimum, innerWidth - taken) : innerWidth;
+}
+
+/** The number of lines a title of `textWidth` px takes at `room` px, at most `maxLines` (an even split of whole lines; at least one). */
+function headerTitleLines(textWidth, room, maxLines) {
+  return Math.min(maxLines, Math.max(1, Math.ceil(textWidth / Math.max(1, room))));
+}
+
+/**
+ * The header's height for a title of `lines` lines: the fixed (or minimum) headerHeight for a one-line header, and for a wrapping
+ * one (headerMaxLines above 1) the minimum or the lines plus the wrap padding, whichever is taller; the same numbers
+ * `sectionLayout` writes into the CSS (`min-height`, `padding`).
+ */
+function headerHeightForLines(style, lines) {
+  const minimum = headerHeightOf(style);
+  if (!(style.headerMaxLines > HEADER_TITLE_MAX_LINES.single)) return minimum;
+  const padding = isHeaderTightToBoard(style) ? HEADER_BOARD_TITLE_PADDING / 2 : HEADER_WRAP_VERTICAL_PADDING;
+  return Math.max(minimum, lines * lineHeight(style.headerFont.size) + 2 * padding);
+}
+
+/**
+ * The CSS of the fold control in a section header: it never shrinks (`flex: none`), is at most the fraction of the header's
+ * content box, and sits HEADER_ITEM_SPACING from the title on its leading side (the physical side swaps right to left).
+ * `options.rtl`, `options.shared` (More, clear or an accessory also shows).
+ */
+function foldHeaderWidthCSS(options = {}) {
+  const percent = Math.round(headerFoldMaxFraction(options.shared) * PERCENT_PER_FRACTION * PERCENT_PRECISION) / PERCENT_PRECISION;
+  const near = options.rtl ? 'right' : 'left';
+  const far = options.rtl ? 'left' : 'right';
+  return `flex: none; max-width: ${percent}%; margin-${near}: ${HEADER_ITEM_SPACING}px; margin-${far}: 0`;
+}
+
+/** The CSS font size of a fold / More control: `size` px, never above FOLD_CONTROL_MAX_FONT_SIZE (the system font size scales text up). */
 function foldControlFontCSS(size = FOLD_CONTROL_FONT_SIZE) {
   return `font-size: min(${size}px, ${FOLD_CONTROL_MAX_FONT_SIZE}px)`;
 }
@@ -1619,5 +1689,6 @@ module.exports = {
   resolvedHeaderSeparatorColor,
   HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, HEADER_BOARD_TITLE_PADDING, HEADER_BOARD_SPACING, isHeaderTightToBoard, headerBoardOffset, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
   FOLD_CONTROL_FONT_SIZE, FOLD_CONTROL_MAX_FONT_SIZE, foldControlFontCSS,
-  FOLD_HEADER_MAX_WIDTH_PERCENT, foldHeaderWidthCSS, FOLD_CONTENT_TITLE_AND_ICON, longerFoldTitle,
+  HEADER_ITEM_SPACING, HEADER_FOLD_ALONE_MAX_FRACTION, HEADER_FOLD_SHARED_MAX_FRACTION, HEADER_TITLE_MIN_EM, HEADER_TITLE_MIN_WIDTH_PX,
+  headerInnerWidth, headerFoldMaxFraction, headerFoldWidth, headerTitleMaxWidth, headerTitleLines, headerHeightForLines, foldHeaderWidthCSS,FOLD_CONTENT_TITLE_AND_ICON, longerFoldTitle,
 };

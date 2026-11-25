@@ -10,8 +10,8 @@
       <view wx:if="{{section.canFold && foldPosition === 'headerTrailing'}}" class="cyl-fold-header" style="color: {{foldColor}}; {{foldFontStyle}}; {{foldHeaderStyle}};"
             data-section="{{section.index}}" bindtap="onFoldTap"
             aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
-        <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}">{{section.foldTitle}}</text>
-        <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
+        <!-- Every text content sizes by the wider of the two titles (hidden sizer), so the title room is the same collapsed and expanded. -->
+        <view wx:if="{{foldContent !== 'icon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
         <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
       </view>
       <view wx:if="{{section.headerLineStyle}}" class="cyl-header-line" style="{{section.headerLineStyle}}" aria-hidden="true" />
