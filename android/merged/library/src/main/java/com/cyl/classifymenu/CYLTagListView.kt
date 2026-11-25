@@ -839,7 +839,7 @@ open class CYLTagListView @JvmOverloads constructor(
         if (style.headerIndicatorColor != null) room -= style.headerIndicatorSize.width + HEADER_GAP
         if (source?.menuImageForSection(section) != null) room -= HEADER_ICON_SIZE + HEADER_GAP
         if (foldIsInHeader() && section in rows.indices && canFoldRowCount(rows[section].size)) {
-            room -= headerFoldWidth(max(foldSize(false).width, foldSize(true).width), width) + HEADER_FOLD_GAP - headerFoldOverhang()
+            room -= headerFoldWidth(max(foldSize(false).width, foldSize(true).width), width) + HEADER_FOLD_GAP - HEADER_FOLD_OVERHANG
         }
         if (source?.menuShowsClearButtonForSection(section) == true) {
             room -= ceil(CYLTagButton.fontLineHeight(style.headerFontForTraitCollection())) + HEADER_GAP
@@ -847,12 +847,6 @@ open class CYLTagListView @JvmOverloads constructor(
         if (showsMoreButtonIn(section)) room -= MORE_BUTTON_SIZE - floor((MORE_BUTTON_SIZE - 22f) / 2) + HEADER_MORE_GAP
         return max(0f, room)
     }
-
-    /**
-     * The overhang of a header's fold control beyond the header's edge: [HEADER_FOLD_OVERHANG] in the plain style, none under
-     * `insetGrouped`, where the control's edge is the board's edge exactly.
-     */
-    private fun headerFoldOverhang(): Float = if (listStyle.isInsetGrouped) 0f else HEADER_FOLD_OVERHANG
 
     /** The width the header gives its fold control: `natural`, but at most 40% of the header `width` for the title-and-icon content. */
     private fun headerFoldWidth(natural: Float, width: Float): Float =
@@ -867,8 +861,18 @@ open class CYLTagListView @JvmOverloads constructor(
         return CYLRect(insets.left, 0f, max(0f, width - insets.left - insets.right), 0f)
     }
 
-    /** The card's padding around the tags: `sectionContentInsets` under `insetGrouped`, else none. */
-    private fun cardInsets(): CYLEdgeInsets = if (listStyle.isInsetGrouped) listStyle.sectionContentInsets else CYLEdgeInsets.ZERO
+    /**
+     * The board's padding around the content column (the tags and the header block): under `insetGrouped`, `sectionContentInsets`
+     * with its leading and trailing parts replaced by `sectionBoardInset` when that is set (one value for both sides; the top and
+     * bottom stay); none in the plain style. The one place the board's horizontal inset comes from.
+     */
+    private fun cardInsets(): CYLEdgeInsets {
+        val style = listStyle
+        if (!style.isInsetGrouped) return CYLEdgeInsets.ZERO
+        val content = style.sectionContentInsets
+        val inset = style.sectionBoardInset ?: return content
+        return CYLEdgeInsets(content.top, inset, content.bottom, inset)
+    }
 
     /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
     fun contentColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = columnAt(max(0f, measuredContentWidth))
@@ -888,8 +892,8 @@ open class CYLTagListView @JvmOverloads constructor(
     private fun contentWidthFor(width: Float): Float = tagColumnAt(width).width
 
     /**
-     * The distances from the list's leading and trailing edges to a header's title and fold control: the board's own edges
-     * (`insetGrouped`: the title starts where the card starts and a control ends where it ends, not at the tags inside it), the band's edges plus `headerContentInsets` (a plain header with a band), else
+     * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside
+     * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
      * `headerHorizontalInset`.
      */
     private fun headerEdgeInsets(): Pair<Float, Float> = headerEdgeInsetsAt(max(0f, measuredContentWidth))
@@ -899,7 +903,8 @@ open class CYLTagListView @JvmOverloads constructor(
         val column = columnAt(width)
         val rest = max(0f, width - column.x - column.width)
         if (style.isInsetGrouped) {
-            return column.x to rest
+            val card = cardInsets()
+            return (column.x + card.left) to (rest + card.right)
         }
         if (style.headerBackgroundColor != null) return (column.x + style.headerContentInsets.left) to (rest + style.headerContentInsets.right)
         return style.headerHorizontalInset to style.headerHorizontalInset
@@ -2360,11 +2365,10 @@ open class CYLTagListView @JvmOverloads constructor(
                 val size = CYLSize(headerFoldWidth(foldSize.width, width), min(foldSize.height, height))
                 val y = floor((height - size.height) / 2)
                 if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) {
-                    val overhang = headerFoldOverhang()
-                    place(foldButton, CYLRect(leading - overhang, y, size.width, size.height))
-                    leading += size.width - overhang + 4
+                    place(foldButton, CYLRect(leading - HEADER_FOLD_OVERHANG, y, size.width, size.height))
+                    leading += size.width - HEADER_FOLD_OVERHANG + 4
                 } else {
-                    trailing -= size.width - headerFoldOverhang()
+                    trailing -= size.width - HEADER_FOLD_OVERHANG
                     place(foldButton, CYLRect(trailing, y, size.width, size.height))
                     trailing -= HEADER_FOLD_GAP
                 }
