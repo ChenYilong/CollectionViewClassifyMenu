@@ -106,7 +106,7 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         XCTAssertTrue(list.isSectionExpanded(0))
         XCTAssertGreaterThan(list.contentHeight, heightBefore)
         fold = tags.footerFoldButton(inSection: 0)
-        XCTAssertNil(fold?.title, "Expanded: only the chevron")
+        XCTAssertEqual(fold?.title, "收起", "Expanded: Less and the turned chevron")
         XCTAssertEqual(fold?.imageView.transform.a ?? 0, -1, accuracy: 0.01, "Turned 180°")
 
         // "左上角": the control before the section title.
@@ -125,7 +125,9 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         XCTAssertTrue(control.usesDefaultImage)
         XCTAssertNotNil(CYLMenuResources.image(named: "cyl_fold_chevron"), "The chevron is in the core bundle")
         XCTAssertEqual(control.title(whenExpanded: false), "更多")
-        XCTAssertNil(control.title(whenExpanded: true), "Icon and title: only the icon when expanded")
+        XCTAssertEqual(control.title(whenExpanded: true), "收起", "Icon and title: the collapse title (Less) when expanded too")
+        XCTAssertTrue(control.showsImage(whenExpanded: true))
+        XCTAssertNil(CYLMenuFoldControl(position: .footer, content: .icon).title(whenExpanded: true))
         XCTAssertEqual(CYLMenuFoldControl(position: .headerTrailing, content: .title).title(whenExpanded: true), "收起")
         XCTAssertEqual(CYLTagCreateCell.title(forName: ""), "新建标签")
         XCTAssertEqual(CYLTagCreateCell.title(forName: "ios"), "新建标签：ios")

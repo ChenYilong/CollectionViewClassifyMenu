@@ -2,8 +2,8 @@
 //  CYLTagListDefaultFramesTests.swift
 //  CYLMenuExampleTests
 //
-//  CYLTagListView: the frames of the default style, taken from the code before the section style (card, header band,
-//  header divider) existed. The section style must never move a pixel of them.
+//  CYLTagListView: the frames of the flat list (`sectionStyle = .plain`), taken from the code before the section style (card, header
+//  band, header divider) existed. The default is now the card (docs/tag-section-style.md): `.plain` must not move a pixel of them.
 //
 
 import XCTest
@@ -49,6 +49,9 @@ final class CYLTagListDefaultFramesTests: CYLMenuExampleTestCase {
         })
         let view = showTagList(source, width: width)
         hostWindow?.overrideUserInterfaceStyle = style
+        let plain = CYLMenuStyle()
+        plain.sectionStyle = .plain
+        view.style = plain
         view.defaultVisibleRows = 2
         view.foldStyle = foldStyle
         view.reloadMenuData()

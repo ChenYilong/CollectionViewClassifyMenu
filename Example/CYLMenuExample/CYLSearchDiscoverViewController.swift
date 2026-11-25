@@ -159,6 +159,8 @@ final class CYLSearchDiscoverViewController: UIViewController {
         style.lineSpacing = 12
         style.sectionInsets = UIEdgeInsets(top: 4, left: 16, bottom: 24, right: 16)
         applyHeaderLook(to: style)
+        // The page draws its own background: the flat list, not the default section card.
+        style.sectionStyle = .plain
         return style
     }
 

@@ -3,8 +3,7 @@
 //  CollectionViewClassifyMenu
 //
 //  Draws a CYLMenuFoldControl: a CYLTagButton (the tag view) without a border or background, with the title and the
-//  chevron after it. Expanded, it shows what the control shows expanded (only the icon, turned 180°, or the collapse
-//  title). CYLTagListView puts it below the section, in its header or among the tags.
+//  chevron after it. Expanded, it shows what the control shows expanded (the collapse title, the icon turned 180°, or only the icon). CYLTagListView puts it below the section, in its header or among the tags.
 //  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
 //
 
@@ -21,6 +20,19 @@ open class CYLTagFoldButton: CYLTagButton {
     private static let minimumTouchWidth: CGFloat = 44
     private static let imageTitleSpacing: CGFloat = 3
     private static let rotationDuration: TimeInterval = 0.25
+
+    /**
+     * The largest content size category the control's title scales to: at the accessibility sizes the "More" control stays a
+     * control, not a banner.
+     */
+    public static let maximumContentSizeCategory = UIContentSizeCategory.accessibilityMedium
+
+    /**
+     * The footnote text style at the default size category: the style scales it itself (`adjustsFontForContentSizeCategory`),
+     * so it is not asked for the already scaled size (that scaled it twice).
+     */
+    private static let defaultFont = UIFont.preferredFont(forTextStyle: .footnote,
+                                                          compatibleWith: UITraitCollection(preferredContentSizeCategory: .large))
 
     /**
      * The control last applied.
@@ -107,7 +119,7 @@ open class CYLTagFoldButton: CYLTagButton {
      */
     private static func style(for control: CYLMenuFoldControl, color: UIColor?) -> CYLMenuStyle {
         let style = CYLMenuStyle()
-        let font = control.font ?? UIFont.preferredFont(forTextStyle: .footnote)
+        let font = control.font ?? defaultFont
         let tint = control.color ?? color ?? .secondaryLabel
         for state in allStates {
             let appearance = style.appearance(for: state)
@@ -124,6 +136,7 @@ open class CYLTagFoldButton: CYLTagButton {
         style.imageTitleSpacing = imageTitleSpacing
         style.layoutCentered = true
         style.adjustsFontForContentSizeCategory = control.font == nil
+        style.maximumContentSizeCategory = maximumContentSizeCategory
         style.itemHeight = minimumHeight
         return style
     }

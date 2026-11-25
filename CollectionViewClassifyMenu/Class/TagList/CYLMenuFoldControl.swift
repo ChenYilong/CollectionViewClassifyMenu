@@ -49,7 +49,7 @@ import UIKit
  */
 @objc public enum CYLMenuFoldControlContent: Int {
     /**
-     * "更多 ⌄"; expanded, only the icon, turned.
+     * "更多 ⌄"; expanded, the collapse title and the icon, turned ("收起 ⌃").
      */
     case iconAndTitle = 0
     /**
@@ -169,10 +169,9 @@ open class CYLMenuFoldControl: NSObject, NSCopying {
      * Whether the control shows its title in the expanded or collapsed state.
      */
     open func showsTitle(whenExpanded expanded: Bool) -> Bool {
+        // Both states have a title ("More", "Less"), unless the content is the icon alone.
         switch content {
-        case .iconAndTitle:
-            return !expanded
-        case .title:
+        case .iconAndTitle, .title:
             return true
         case .icon:
             return false

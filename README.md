@@ -178,6 +178,22 @@ filter.selectedIndexPaths = [IndexPath(item: 0, section: 0)]
 | `contentHeight`, `heightThatFitsWidth(_:)`, `intrinsicContentSize`, `isScrollEnabled` | Embed in a table header, a stack view or Auto Layout |
 | `numberOfRows(inSection:)`, `numberOfVisibleItems(inSection:)` | Query the layout result |
 
+#### 分组卡片外观（iOS） / Section card look (iOS)
+
+| 中文 | English |
+|:---|:---|
+| 默认外观：每个分组的标签都放在圆角卡片里（UITableView 的 inset grouped 样式），列表背景为分组背景（浅色 #F2F2F7，深色黑色），分组标题在卡片上方。表头分割线默认关闭（`headerSeparatorStyle = .none`），表头底色默认关闭，卡片背景默认纯色（`sectionBackgroundStyle = .flat`）。不想要卡片时关闭它：`style.sectionStyle = .plain`，或在配置中写 `"sectionStyle": "plain"`（`tagCloud()`、`tagContainer()`、`gridStyle(itemsPerRow:)`、`wordPicker()` 等预设已自行设为 `.plain`）。可选项：`sectionBackgroundColor`、`sectionCornerRadius`、`sectionContentInsets`（卡片）；`headerBackgroundColor`（表头底色）；`headerSeparatorStyle = .line`（分割线）；`sectionBackgroundStyle = .liquidGlass`（玻璃卡片，系统不支持时回退为纯色）；`tintColor`（标题、图标、更多/收起控件的颜色，默认按背后背景的亮度取黑或白）。 | Default look: each section's tags sit inside a rounded card (UITableView's inset grouped look) on the grouped list background (#F2F2F7 in light mode, black in dark mode), the section title above the card. The header divider is off by default (`headerSeparatorStyle = .none`), so is the header band, and the card is a flat color (`sectionBackgroundStyle = .flat`). To opt out of the card set `style.sectionStyle = .plain`, or `"sectionStyle": "plain"` in a configuration (the presets `tagCloud()`, `tagContainer()`, `gridStyle(itemsPerRow:)`, `wordPicker()` and the others that are a complete look already set `.plain`). Options: `sectionBackgroundColor`, `sectionCornerRadius`, `sectionContentInsets` (the card); `headerBackgroundColor` (header band); `headerSeparatorStyle = .line` (divider); `sectionBackgroundStyle = .liquidGlass` (glass card, flat where the system draws no glass); `tintColor` (title, icon and More / Less controls; unset it is black or white by the luminance of what is behind it). |
+
+```swift
+let style = CYLMenuStyle()
+style.sectionStyle = .plain                       // opt out of the default card
+// or keep the card and dress it:
+style.sectionBackgroundStyle = .liquidGlass       // glass card
+style.headerBackgroundColor = CYLSectionStyleColors.headerBand   // header band
+style.headerSeparatorStyle = .line                // header divider
+style.tintColor = .systemTeal                     // title, icon, More / Less
+```
+
 #### 折叠控件与标题 / Fold control and title
 
 | 中文 | English |
