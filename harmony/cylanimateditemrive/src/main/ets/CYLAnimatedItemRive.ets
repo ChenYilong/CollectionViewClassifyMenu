@@ -26,10 +26,12 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { LifecycleController } from 'cyldeallocblockexecutor';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngines,
-  CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor
+  CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor,
+  CYL_RESOURCE_DECODE_FAILED, CYL_RESOURCE_ENGINE_LIBRARY_MISSING, CYL_RESOURCE_NOT_FOUND, CYL_RESOURCE_UNREADABLE
 } from 'cylanimateditem';
 import {
-  CYL_RIVE_COLOR_PROPERTY_PATH, CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveOptionColor,
+  CYL_RIVE_COLOR_PROPERTY_PATH, CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveOffWindowEnds,
+  cylRiveOptionColor,
   cylRiveUsesLegacyRuntime
 } from './CYLAnimatedItemRiveOptions';
 
@@ -41,8 +43,8 @@ const CYL_RIVE_LOOP_SECONDS: number = 1.5;
 const CYL_RIVE_LOOP_PAUSE_SECONDS: number = 0.4;
 /** [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。 */
 const CYL_RIVE_NEXT_FRAME_MS: number = 50;
-/** [EN] A held input's off time before it goes on again, outside a loop. [CN] 循环之外，保持的输入重新打开前的关闭时间。 */
-const CYL_RIVE_INPUT_OFF_MS: number = 150;
+/** [EN] How often the NO window of a restart checks whether the machine settled (a frame). [CN] 重新播放的 NO 窗口检查状态机是否稳定的间隔（一帧）。 */
+const CYL_RIVE_OFF_POLL_MS: number = 16;
 /** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
 const CYL_RIVE_FIRST_FRAME_MS: number = 100;
 /** [EN] How often a play-once pass is checked for its end. [CN] 检查只播放一次的播放是否结束的间隔。 */
@@ -492,9 +494,17 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
       && this.cylHasInput(view, machine, legacyInput))) {
       this.cylPlayMachine(view, machine);
       this.cylSetActive(view, false);
+      // [EN] Play with the input off, so the machine advances and runs its false pass (menu_button.riv: hamburger -> X); a
+      //      machine that is not playing only sees false and true in one advance and stays where it was.
+      // [CN] 带着 false 播放，使状态机前进并运行 false 的那一遍（menu_button.riv：汉堡 -> X）；不在播放的状态机会在同一次前进中同时看到 false 与 true，停在原处。
+      this.cylPlayMachine(view, machine);
       const duration = cylRiveActiveDuration(this.option(CYLAnimatedItemRiveOption.ACTIVE_DURATION));
       this.startPending = true;
-      this.deactivateTimer = setTimeout(() => {
+      // [EN] Half a loop pass while looping a held input, so the machine spends real time closed; otherwise until the false
+      //      pass has settled (at least 50 ms, at most the input's duration, never above 1500 ms), polled every frame.
+      // [CN] 循环保持的输入时为半个循环周期，使状态机真正停留在关闭状态；否则等到 false 的那一遍稳定（至少 50 ms，至多输入的时长，不超过 1500 ms），每帧轮询。
+      const fixedOffMs: number = this.loopsValue && duration <= 0 ? CYL_RIVE_LOOP_SECONDS * 500 : -1;
+      const turnOn = (): void => {
         this.deactivateTimer = -1;
         this.startPending = false;
         if (this.riveView !== view) {
@@ -509,9 +519,12 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
             }
           }, duration * 1000);
         }
-        // [EN] Half a loop pass while looping a held input, so the machine spends real time closed; otherwise a frame.
-        // [CN] 循环保持的输入时为半个循环周期，使状态机真正停留在关闭状态；否则为一帧。
-      }, this.loopsValue && duration <= 0 ? CYL_RIVE_LOOP_SECONDS * 500 : CYL_RIVE_INPUT_OFF_MS);
+      };
+      if (fixedOffMs >= 0) {
+        this.deactivateTimer = setTimeout(turnOn, fixedOffMs);
+      } else {
+        this.cylWaitForOffPass(view, 0, duration, turnOn);
+      }
     } else {
       this.cylReset(view);
       view.play();
@@ -624,6 +637,29 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     }
   }
 
+  /**
+   * [EN] Calls `turnOn` when the NO window ends (`cylRiveOffWindowEnds`, capped by the input's `activeDuration`), polling
+   *      `isPlaying()` every frame on the cancellable `deactivateTimer`.
+   * [CN] 在 NO 窗口结束（`cylRiveOffWindowEnds`，上限为输入的 `activeDuration`）时调用 `turnOn`，在可取消的 `deactivateTimer` 上每帧轮询 `isPlaying()`。
+   */
+  private cylWaitForOffPass(view: RiveAnimationView, elapsedMs: number, activeDuration: number, turnOn: () => void): void {
+    this.deactivateTimer = setTimeout(() => {
+      this.deactivateTimer = -1;
+      const elapsed: number = elapsedMs + CYL_RIVE_OFF_POLL_MS;
+      let settled = true;
+      try {
+        settled = this.riveView !== view || !view.isPlaying();
+      } catch (e) {
+        settled = true;
+      }
+      if (cylRiveOffWindowEnds(elapsed, settled, activeDuration)) {
+        turnOn();
+      } else {
+        this.cylWaitForOffPass(view, elapsed, activeDuration, turnOn);
+      }
+    }, CYL_RIVE_OFF_POLL_MS);
+  }
+
   private cylCancelDeactivate(): void {
     this.startPending = false;
     if (this.deactivateTimer >= 0) {
@@ -659,7 +695,7 @@ export struct CYLAnimatedItemRiveView {
       cylEnsureRiveInitialized();
     } catch (e) {
       this.unusable = true;
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_ENGINE_LIBRARY_MISSING);
       return;
     }
     this.cylReadFile();
@@ -696,13 +732,13 @@ export struct CYLAnimatedItemRiveView {
     this.bytes = null;
     if (/^https?:\/\//i.test(source.path)) {
       // [EN] @ohos/rive reads bytes only; remote files are not supported yet. [CN] @ohos/rive 只读取字节；尚不支持远程文件。
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_UNREADABLE);
       return;
     }
     const context = this.getUIContext().getHostContext();
     const content = context === undefined ? undefined : source.rawFileContent(context.resourceManager);
     if (content === undefined) {
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_NOT_FOUND);
       return;
     }
     this.bytes = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength) as ArrayBuffer;
@@ -725,7 +761,7 @@ export struct CYLAnimatedItemRiveView {
       this.loaded = true;
       this.binding.ready(this.state, new CYLAnimatedItemRivePlayer(source, view));
     } catch (e) {
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_DECODE_FAILED);
     }
   }
 
