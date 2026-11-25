@@ -609,7 +609,9 @@ class CYLTagSectionStyleTest {
         val optedOut = makeList(plain(), 6, 3)
         assertNull("plain draws no card", optedOut.sectionFrame(0)!!.card)
         assertEquals(CYLRect(16f, 0f, WIDTH_PX - 32f, 0f), optedOut.contentColumn(0))
-        assertTrue("the card adds its padding to the height", list.contentHeight > optedOut.contentHeight)
+        // The default list is the explicit insetGrouped list (the card list is no longer always taller than the plain one: its header is sized to the text).
+        val explicit = makeList(CYLMenuStyle().also { it.sectionStyle = CYLSectionStyle.CYLSectionStyleInsetGrouped }, 6, 3)
+        assertEquals(explicit.contentHeight, list.contentHeight, 0f)
     }
 
     @Test

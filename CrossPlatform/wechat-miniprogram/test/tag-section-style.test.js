@@ -811,9 +811,9 @@ test('the headerHeight key: set only by a number, kept by a section style, never
 test('a header that wraps under the board is the title lines plus 8: min-height line + 8, 4 above and 4 below', () => {
   const half = HEADER_BOARD_TITLE_PADDING / 2
   const css = model.sectionLayout(styleOf({ ...BOARD, headerMaxLines: 3 })).headerStyle
-  assert.match(css, new RegExp(`^min-height: ${TIGHT_HEADER_HEIGHT}px; margin: 0 16px 0 16px; padding: ${half}px 0px ${half}px 0px; `))
+  assert.match(css, new RegExp(`^min-height: ${TIGHT_HEADER_HEIGHT}px; margin: 0 16px 0 16px; padding: ${half}px 12px ${half}px 12px; `))
   // With the divider on the wrapping header is what it was.
   const old = model.sectionLayout(styleOf({ ...WITH_DIVIDER, headerMaxLines: 3 })).headerStyle
   const wrap = model.HEADER_WRAP_VERTICAL_PADDING
-  assert.match(old, new RegExp(`^min-height: ${FIXED_HEADER_HEIGHT}px; margin: 0 16px 0 16px; padding: ${wrap}px 0px ${wrap}px 0px; `))
+  assert.match(old, new RegExp(`^min-height: ${FIXED_HEADER_HEIGHT}px; margin: 0 16px 0 16px; padding: ${wrap}px 12px ${wrap}px 12px; `))
 })
