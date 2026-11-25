@@ -31,3 +31,18 @@ never change the behavior. Designed by the advisor on 2026-11-25; HarmonyOS is i
 | Android | Done in `android/merged/library`: `CYLTagLongPressAction.kt` (interfaces, built-ins, `CYLTagCalloutBubble` in a `PopupWindow`), `CYLTagListView.longPressAction`, `menuSubtitleForItemAtIndexPath`, `CYLTag.subtitle`, configuration keys `longPressAction` / `subtitle`. Library tests 119, one failure: the known Windows drive-path test (`animationSourceTextSplitsOptionsAsTheEngineDoes`); 5 new in `CYLTagLongPressActionTest`, and the contact-list drag reordering (`CYLTagEditingDragTest`) passes. The popup was not looked at on an emulator. |
 | Mini program | Done in `cyl-tag-list`: configuration key / property `longPressAction`, item `subtitle`, event `taglongpress` {section, item, title, subtitle}, a callout (a view with a CSS triangle) hidden by a tap, a fold, a rebuild or another long press, `dismissCallout()`. This list does not reorder, so `"reorder"` does not begin there (the next action takes the press); reordering stays in `cyl-tag-cloud` with its own events. `npm test` 184/184 (6 new in `tag-long-press-action.test.js`). Not seen in DevTools. |
 | iOS | Written, not compiled or run (Windows): `CYLTagLongPressAction.swift` (protocols, built-ins, `CYLTagCalloutView` added to the window), `CYLTagListView.longPressAction` with `handleLongPress` going through the action, `menuSubtitleForItem(at:)`, `CYLTag.subtitle`, configuration keys. Tests `CYLTagLongPressActionTests` are at the end of `Example/CYLMenuExampleTests/CYLTagReorderDemoTests.swift` (a file the Xcode project already lists). The Mac session builds it and runs the four iOS suites; the contact-list reordering is `CYLTagReorderDemoTests`. |
+
+## titleMaxLines: how many lines a tag's title may take
+
+Style property `titleMaxLines` (a style key in a configuration: a whole number of 1 or more, or `"unlimited"`). The default is
+**1** (one line, a title too wide is truncated); the app chooses any number; **every line is shown with the named constant**
+(HarmonyOS `CYLTagTitleMaxLines.unlimited`, Android `CYLTagTitleMaxLines.UNLIMITED`, iOS `CYLTagTitleMaxLines.unlimited`,
+mini program `TITLE_MAX_LINES.unlimited`), never a literal such as 0 or 999. A value below 1 is 1. The tag grows taller up to that
+many lines. The older boolean `titleWraps` (HarmonyOS, iOS) stays as the short form: true is unlimited, false is 1.
+
+| Platform | State |
+| --- | --- |
+| HarmonyOS | Done (`CYLMenuStyle.titleMaxLines`, `wrappedTextHeight` / `heightForTitleWidth` take the limit). Host tests 94/94. |
+| Android | Done: `CYLMenuStyle.titleMaxLines`, `CYLTagButton.heightForTitleWidth` / `wrappedTextHeight` (a `StaticLayout`), the list measures a wrapping tag at the width it gets, the title label `maxLines`, configuration key. Unit tests check the property, the configuration and that more lines never shrink the height; Robolectric's font metrics are fake (a line has no height), so the real wrapping was **not** looked at on an emulator. |
+| Mini program | Done: style key `titleMaxLines`, a wrapping tag's height is a `min-height` and the title is clamped with `-webkit-line-clamp`. Tests 188/188 on the styles; not seen in DevTools. |
+| iOS | Written, not compiled: `CYLMenuStyle.titleMaxLines` (`titleWraps` is computed from it), `CYLTagTitleMaxLines.single / unlimited`, the label's `numberOfLines`, the wrapped height cut at the limit, configuration key; tests `CYLTagTitleMaxLinesTests` in `CYLTagReorderDemoTests.swift`. The Mac session builds and runs them. |
