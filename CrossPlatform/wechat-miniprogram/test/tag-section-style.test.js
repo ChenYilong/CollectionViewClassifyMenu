@@ -187,18 +187,19 @@ test('the header title x equals the first tag x, plain and insetGrouped; the fol
   assert.equal(style.sectionInsets.right + paddingRight, edges.right)
 })
 
-// MARK: - sectionBoardInset: the board adapts to the taglist through one inset (docs/tag-section-style.md)
+// MARK: - sectionBoardInset: the board is the tag column extended outward (docs/tag-section-style.md)
 
 const BOARD_INSET_SMALL = 5
 const BOARD_INSET_LARGE = 20
 const FIRST_VERSION_BOARD = { left: 16, right: 304 }
 const FIRST_VERSION_CONTENT = { left: 28, right: 292 }
+const LARGE_INSET_BOARD = { left: 8, right: 312 }
 const CUSTOM_TOP = 7
 const CUSTOM_BOTTOM = 9
 
-/** The board's and the content's x edges at LIST_WIDTH: the board is the margin column, the content is the tag column. */
+/** The board's and the tag column's x edges at LIST_WIDTH: the tag column never depends on sectionBoardInset. */
 function edgesOf(style) {
-  const board = model.columnAt(model.contentColumn(style), LIST_WIDTH)
+  const board = model.columnAt(model.boardColumn(style), LIST_WIDTH)
   const content = model.columnAt(model.tagColumn(style), LIST_WIDTH)
   return { board: { left: board.x, right: board.x + board.width }, content: { left: content.x, right: content.x + content.width } }
 }
@@ -210,47 +211,60 @@ test('sectionBoardInset unset is the default 12: the numbers of the first versio
   const { board, content } = edgesOf(style)
   assert.deepEqual(board, FIRST_VERSION_BOARD)
   assert.deepEqual(content, FIRST_VERSION_CONTENT)
-  // Unset follows the leading / trailing parts of sectionContentInsets as before.
+  assert.deepEqual(model.boardColumn(style), model.contentColumn(style))
+  // Unset follows the leading / trailing parts of sectionContentInsets: the tag column and the board extension.
   const own = styleOf({ sectionContentInsets: [CUSTOM_TOP, 3, CUSTOM_BOTTOM, 8] })
   assert.deepEqual(model.boardInset(own), { left: 3, right: 8 })
   assert.equal(edgesOf(own).content.left, style.sectionInsets.left + 3)
-  // A set 12 is the same as unset.
+  assert.deepEqual(model.boardColumn(own), model.contentColumn(own))
+  // A set 12 is the same as unset, and the default card has no margin shift.
   assert.deepEqual(edgesOf(styleOf({ sectionBoardInset: CARD_PADDING })), edgesOf(style))
   assert.deepEqual(model.sectionLayout(styleOf({ sectionBoardInset: CARD_PADDING })), model.sectionLayout(style))
+  assert.doesNotMatch(model.sectionLayout(style).cardStyle, /margin/)
 })
 
-test('a set sectionBoardInset overrides the leading and trailing parts of sectionContentInsets on both sides', () => {
-  const style = styleOf({ sectionBoardInset: BOARD_INSET_LARGE, sectionContentInsets: [CUSTOM_TOP, 3, CUSTOM_BOTTOM, 8] })
+test('a set sectionBoardInset above the default pushes the board past the margin: 20 gives board 8..312, tag column still 28..292', () => {
+  const style = styleOf({ sectionBoardInset: BOARD_INSET_LARGE, sectionContentInsets: [CUSTOM_TOP, 12, CUSTOM_BOTTOM, 12] })
   assert.deepEqual(model.boardInset(style), { left: BOARD_INSET_LARGE, right: BOARD_INSET_LARGE })
   const { board, content } = edgesOf(style)
-  // The board is the margin column; the content is the board minus the inset on each side.
-  assert.deepEqual(board, FIRST_VERSION_BOARD)
-  assert.equal(board.left, content.left - BOARD_INSET_LARGE)
-  assert.equal(board.right, content.right + BOARD_INSET_LARGE)
-  // The rows are counted at the content width, so the flow follows the inset.
-  assert.equal(flow(style, TAG_WIDTHS).column.width, LIST_WIDTH - 2 * (style.sectionInsets.left + BOARD_INSET_LARGE))
+  assert.deepEqual(board, LARGE_INSET_BOARD)
+  assert.deepEqual(content, FIRST_VERSION_CONTENT)
+  // The tags wrap as in the default (the rows follow the tag column only).
+  assert.equal(flow(style, TAG_WIDTHS).column.width, LIST_WIDTH - 2 * (style.sectionInsets.left + CARD_PADDING))
+  assert.deepEqual(model.rowsFromTops(flow(style, TAG_WIDTHS).tops), model.rowsFromTops(flow(styleOf(), TAG_WIDTHS).tops))
+  // The header title and the fold control still end at the tag column; the list keeps the section column and the card
+  // reaches past it by a negative margin.
+  assert.deepEqual(model.headerEdges(style), model.tagColumn(style))
+  const css = model.sectionLayout(style)
+  assert.match(css.listStyle, /padding: 10px 16px 10px 16px/)
+  assert.match(css.cardStyle, /^margin: 0 -8px 0 -8px; padding: 7px 20px 9px 20px/)
+  assert.match(css.headerStyle, /margin: 0 -8px 0 -8px; padding: 0 20px 0 20px/)
+  // Between the default and 0 the board lies between the tag column and the section column.
   const small = edgesOf(styleOf({ sectionBoardInset: BOARD_INSET_SMALL }))
+  assert.deepEqual(small.content, FIRST_VERSION_CONTENT)
   assert.equal(small.board.left, small.content.left - BOARD_INSET_SMALL)
   assert.equal(small.board.right, small.content.right + BOARD_INSET_SMALL)
-  // The header title and the tags still share the content's x.
-  assert.equal(model.headerEdges(style).left, content.left)
-  assert.equal(LIST_WIDTH - model.headerEdges(style).right, content.right)
 })
 
-test('sectionBoardInset 0 hugs: the content column is the board column, and the card has no horizontal padding', () => {
+test('sectionBoardInset 0 hugs: the board is the tag column and the tag column is NOT widened (28..292)', () => {
   const style = styleOf({ sectionBoardInset: 0 })
   assert.equal(style.sectionBoardInset, 0)
   assert.deepEqual(model.boardInset(style), { left: 0, right: 0 })
   const { board, content } = edgesOf(style)
-  assert.deepEqual(content, board)
-  assert.deepEqual(model.tagColumn(style), model.contentColumn(style))
-  assert.deepEqual(model.headerEdges(style), model.contentColumn(style))
-  assert.match(model.sectionLayout(style).cardStyle, new RegExp(`padding: ${CARD_PADDING}px 0px ${CARD_PADDING}px 0px`))
-  assert.match(model.sectionLayout(style).headerStyle, /padding: 0 0px 0 0px/)
-  // 0 overrides sectionContentInsets' left / right too, while the tags wrap exactly as in plain.
+  assert.deepEqual(content, FIRST_VERSION_CONTENT)
+  assert.deepEqual(board, content)
+  assert.deepEqual(model.boardColumn(style), model.tagColumn(style))
+  assert.deepEqual(model.headerEdges(style), model.tagColumn(style))
+  assert.notDeepEqual(model.tagColumn(style), model.contentColumn(style))
+  const css = model.sectionLayout(style)
+  assert.match(css.cardStyle, new RegExp(`^margin: 0 ${CARD_PADDING}px 0 ${CARD_PADDING}px; padding: ${CARD_PADDING}px 0px ${CARD_PADDING}px 0px`))
+  assert.match(css.headerStyle, /margin: 0 28px 0 28px; padding: 0 0px 0 0px/)
+  // 0 overrides sectionContentInsets' left / right for the extension only; the tag column still takes them.
   const own = styleOf({ sectionBoardInset: 0, sectionContentInsets: [CARD_PADDING, 30, CARD_PADDING, 30] })
-  assert.deepEqual(edgesOf(own).content, edgesOf(own).board)
-  assert.deepEqual(model.rowsFromTops(flow(style, TAG_WIDTHS).tops), model.rowsFromTops(flow(plainOf(), TAG_WIDTHS).tops))
+  assert.equal(edgesOf(own).content.left, own.sectionInsets.left + 30)
+  assert.deepEqual(edgesOf(own).board, edgesOf(own).content)
+  // The tags wrap exactly as in the default style.
+  assert.deepEqual(model.rowsFromTops(flow(style, TAG_WIDTHS).tops), model.rowsFromTops(flow(styleOf(), TAG_WIDTHS).tops))
 })
 
 test('sectionContentInsets top and bottom still apply when sectionBoardInset is set', () => {
@@ -264,11 +278,12 @@ test('sectionContentInsets top and bottom still apply when sectionBoardInset is 
     new RegExp(`padding: ${CUSTOM_TOP}px ${BOARD_INSET_SMALL}px ${CUSTOM_BOTTOM}px ${BOARD_INSET_SMALL}px`))
 })
 
-test('the divider and the board keep the margin column whatever the board inset is', () => {
+test('the divider has the board edges whatever the board inset is, and the title stays at the tag column', () => {
   for (const sectionBoardInset of [0, BOARD_INSET_SMALL, BOARD_INSET_LARGE]) {
     const style = styleOf({ sectionBoardInset, headerSeparatorStyle: 'line' })
-    assert.deepEqual({ left: model.headerSeparator(style).left, right: model.headerSeparator(style).right }, model.contentColumn(style))
+    assert.deepEqual({ left: model.headerSeparator(style).left, right: model.headerSeparator(style).right }, model.boardColumn(style))
     assert.match(model.sectionLayout(style).headerLineStyle, /left: 0px; right: 0px/)
+    assert.deepEqual(model.headerEdges(style), model.tagColumn(style))
   }
 })
 
