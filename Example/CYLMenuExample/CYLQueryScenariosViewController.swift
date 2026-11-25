@@ -9,6 +9,8 @@
 //  - 搜索历史与发现：最近搜索（折叠按钮作为最后一个标签）与两列的发现网格（右上角 More 按钮刷新）；
 //  - 数据库：各表的行数。
 //  The plus button's child view controller: the filter demos grouped by scenario.
+//  The groups are one CYLTagListView (examples rule "Sectioned lists in demos use the tag list"): one section per
+//  group, a tag shows its title and an SF Symbol, the detail line is the callout of a long press.
 //
 
 import UIKit
@@ -22,15 +24,25 @@ import CollectionViewClassifyMenu
     case searchDiscover
 }
 
-final class CYLQueryScenariosViewController: UITableViewController {
+final class CYLQueryScenariosViewController: UIViewController {
 
-    private static let scenarioCell = "CYLQueryScenarioCell"
+    /// Tag rows shown while a section is folded; a section with more rows gets the More / Less control.
+    static let visibleRows = 2
+    /// A title may wrap onto this many lines in its tag.
+    static let titleMaxLines = 3
+    /// The scenario sections, then the database section.
+    static let databaseSection = 3
+    /// The tables whose row counts the database section shows.
+    static let databaseTables = ["reviews", "places", "selections"]
+    private static let databaseSymbol = "tablecells"
+    private static let detailSeparator = "\n"
 
     let database: CYLExampleDatabase
+    let tagList = CYLTagListView(foldControl: CYLMenuFoldControl(position: .headerTrailing, content: .iconAndTitle))
 
     init(database: CYLExampleDatabase) {
         self.database = database
-        super.init(style: .insetGrouped)
+        super.init(nibName: nil, bundle: nil)
     }
 
     convenience init() {
@@ -46,13 +58,33 @@ final class CYLQueryScenariosViewController: UITableViewController {
         super.viewDidLoad()
         // navigationItem, not title: a view controller's title would replace its tab's title.
         navigationItem.title = CYLExampleLocalizedString("查询筛选")
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.scenarioCell)
+        view.backgroundColor = .systemBackground
+
+        let style = CYLMenuStyle()
+        style.titleMaxLines = Self.titleMaxLines
+        tagList.style = style
+        // A tap opens a screen and nothing stays selected. numberOfItemsPerRow stays 0: a tag is as wide as its title.
+        tagList.selectionMode = .none
+        tagList.defaultVisibleRows = Self.visibleRows
+        // The old detail line is the callout of a long press (data source menuSubtitleForItem).
+        tagList.longPressAction = CYLTagLongPressActions.callout
+        tagList.menuDataSource = self
+        tagList.menuDelegate = self
+        tagList.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tagList)
+        NSLayoutConstraint.activate([
+            tagList.topAnchor.constraint(equalTo: view.topAnchor),
+            tagList.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tagList.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tagList.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        tagList.reloadMenuData()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // The selections saved by the demos change the database section.
-        tableView.reloadData()
+        tagList.reloadMenuData()
     }
 
     // MARK: Scenarios
@@ -86,7 +118,7 @@ final class CYLQueryScenariosViewController: UITableViewController {
         }
     }
 
-    /// The demo a row opens, with `hidesBottomBarWhenPushed`.
+    /// The demo a tag opens, with `hidesBottomBarWhenPushed`.
     func viewController(for scenario: CYLQueryScenario) -> UIViewController {
         let controller: UIViewController
         switch scenario {
@@ -106,27 +138,14 @@ final class CYLQueryScenariosViewController: UITableViewController {
         return controller
     }
 
-    /// Pushes a demo, as tapping its row does.
+    /// Pushes a demo, as tapping its tag does.
     func open(_ scenario: CYLQueryScenario) {
         navigationController?.pushViewController(viewController(for: scenario), animated: false)
     }
 
-    // MARK: UITableViewDataSource
+    // MARK: Section texts
 
-    /**
-     * The scenario sections, then the database.
-     */
-    static let databaseSection = 3
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        Self.databaseSection + 1
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        section == Self.databaseSection ? 3 : scenarios(inSection: section).count
-    }
-
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func sectionTitle(_ section: Int) -> String {
         switch section {
         case 0: return CYLExampleLocalizedString("场景：查询参数设置（多选）")
         case 1: return CYLExampleLocalizedString("场景：菜单选择（移植原 Demo）")
@@ -135,7 +154,8 @@ final class CYLQueryScenariosViewController: UITableViewController {
         }
     }
 
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+    /// The old section footer: now part of the long-press callout of every tag of the section.
+    func sectionDetail(_ section: Int) -> String {
         switch section {
         case 0: return CYLExampleLocalizedString("淘宝评价默认显示全部；条件太多时，由用户多选输入筛选条件，标签列表就是为此而做。每次选择后按全部条件（AND）刷新列表。")
         case 1: return CYLExampleLocalizedString("原 Demo 只实现了筛选界面，没有筛选数据；现在每次选择都会生成 SQL、查询数据库并显示结果，选择也保存在数据库中。")
@@ -144,36 +164,61 @@ final class CYLQueryScenariosViewController: UITableViewController {
         }
     }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Self.scenarioCell, for: indexPath)
-        var content: UIListContentConfiguration
-        if indexPath.section == Self.databaseSection {
-            let table = ["reviews", "places", "selections"][indexPath.row]
-            content = .valueCell()
-            content.text = table
-            content.textProperties.font = .monospacedSystemFont(ofSize: 15, weight: .regular)
-            content.secondaryText = CYLExampleLocalizedString("%ld 行", database.count(ofTable: table))
-            cell.accessoryType = .none
-            cell.selectionStyle = .none
-        } else {
-            let scenario = scenarios(inSection: indexPath.section)[indexPath.row]
-            content = .cell()
-            content.text = title(for: scenario)
-            content.image = UIImage(systemName: symbol(for: scenario))
-            cell.accessoryType = .disclosureIndicator
-            cell.selectionStyle = .default
+    /// The long-press text of a tag: for a database table its row count (the old detail line), then the section's detail.
+    func detail(at indexPath: IndexPath) -> String {
+        guard indexPath.section == Self.databaseSection else {
+            return sectionDetail(indexPath.section)
         }
-        cell.contentConfiguration = content
-        return cell
+        let count = CYLExampleLocalizedString("%ld 行", database.count(ofTable: Self.databaseTables[indexPath.item]))
+        return count + Self.detailSeparator + sectionDetail(indexPath.section)
+    }
+}
+
+// MARK: CYLMenuDataSource
+
+extension CYLQueryScenariosViewController: CYLMenuDataSource {
+
+    func numberOfSectionsInMenu() -> Int {
+        Self.databaseSection + 1
     }
 
-    // MARK: UITableViewDelegate
+    func menuNumberOfItems(inSection section: Int) -> Int {
+        section == Self.databaseSection ? Self.databaseTables.count : scenarios(inSection: section).count
+    }
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.section < Self.databaseSection {
-            let scenario = scenarios(inSection: indexPath.section)[indexPath.row]
-            navigationController?.pushViewController(viewController(for: scenario), animated: true)
+    func menuTitle(forSection section: Int) -> String {
+        sectionTitle(section)
+    }
+
+    func menuTitleForItem(at indexPath: IndexPath) -> String {
+        if indexPath.section == Self.databaseSection {
+            return Self.databaseTables[indexPath.item]
         }
+        return title(for: scenarios(inSection: indexPath.section)[indexPath.item])
+    }
+
+    func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
+        if indexPath.section == Self.databaseSection {
+            return UIImage(systemName: Self.databaseSymbol)
+        }
+        return UIImage(systemName: symbol(for: scenarios(inSection: indexPath.section)[indexPath.item]))
+    }
+
+    func menuSubtitleForItem(at indexPath: IndexPath) -> String? {
+        detail(at: indexPath)
+    }
+}
+
+// MARK: CYLMenuDelegate
+
+extension CYLQueryScenariosViewController: CYLMenuDelegate {
+
+    /// A tap pushes the demo, as the row did; a database table is not a link.
+    func menu(_ menu: Any, didSelectItemAt indexPath: IndexPath) {
+        guard indexPath.section < Self.databaseSection else {
+            return
+        }
+        let scenario = scenarios(inSection: indexPath.section)[indexPath.item]
+        navigationController?.pushViewController(viewController(for: scenario), animated: true)
     }
 }

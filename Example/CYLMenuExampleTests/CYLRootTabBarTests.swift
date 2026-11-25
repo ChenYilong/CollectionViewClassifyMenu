@@ -88,12 +88,14 @@ final class CYLRootTabBarTests: CYLMenuExampleTestCase {
         scenarios.loadViewIfNeeded()
         XCTAssertNil(scenarios.title, "navigationItem.title only: the tab keeps its title")
         // Query parameters, menu selection, search history + discover, then the database.
-        let table = scenarios.tableView!
-        XCTAssertEqual(table.numberOfSections, 4)
-        XCTAssertEqual(table.numberOfRows(inSection: 0), 3)
-        XCTAssertEqual(table.numberOfRows(inSection: 1), 1)
-        XCTAssertEqual(table.numberOfRows(inSection: 2), 1)
-        XCTAssertEqual(table.numberOfRows(inSection: CYLQueryScenariosViewController.databaseSection), 3)
+        // One tag list: the tag list replaced the table view, its data source answers the same questions.
+        let list = scenarios.tagList
+        XCTAssertEqual(list.probe.collectionView.numberOfSections, 4)
+        XCTAssertEqual(scenarios.menuNumberOfItems(inSection: 0), 3)
+        XCTAssertEqual(scenarios.menuNumberOfItems(inSection: 1), 1)
+        XCTAssertEqual(scenarios.menuNumberOfItems(inSection: 2), 1)
+        XCTAssertEqual(scenarios.menuNumberOfItems(inSection: CYLQueryScenariosViewController.databaseSection), 3)
+
         XCTAssertTrue(scenarios.viewController(for: .searchDiscover) is CYLSearchDiscoverViewController)
         let reviews = scenarios.viewController(for: .reviewsDatabase) as? CYLReviewListViewController
         XCTAssertNotNil(reviews)
