@@ -1345,7 +1345,7 @@ function contrastRatio(first, second) {
 function glassReferenceLuminance(glassTint, tintAlpha) {
   const tint = glassTint ? rgbaOf(color(glassTint) || glassTint) : null;
   if (!tint || !(tint.a > 0)) return relativeLuminance(FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA);
-  const share = tint.a * (Number(tintAlpha) >= 0 ? Number(tintAlpha) : DEFAULT_GLASS_TINT_SHARE);
+  const share = tint.a * (typeof tintAlpha === 'number' && tintAlpha >= 0 ? tintAlpha : DEFAULT_GLASS_TINT_SHARE);
   return relativeLuminance((tint.r / RGB_MAX) * share, (tint.g / RGB_MAX) * share, (tint.b / RGB_MAX) * share);
 }
 
