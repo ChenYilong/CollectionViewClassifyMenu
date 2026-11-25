@@ -6,6 +6,7 @@
 import { CYLAnimatedItemCornerRadiusCapsule, CYLLiquidGlass } from 'cylanimateditem';
 import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
+import { CYLMenuColorLuminance } from './CYLMenuColor';
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLTagMetrics } from './CYLTagMetrics';
 
@@ -100,10 +101,18 @@ export class CYLSectionStyleMetrics {
 }
 
 /**
+ * The relative luminance (WCAG, 0...1) above which a background counts as light, so that the default tint on it is black:
+ * 0.179 is where black and white have the same contrast ratio against it.
+ */
+export const CYLTintLuminanceThreshold: number = 0.179;
+
+/**
  * The colors of the section style: each one follows the color mode (`resources/base` and `resources/dark`). A style whose
  * color is undefined resolves to them; an app can also set one itself, for example `headerBand` on `headerBackgroundColor`.
  */
 export class CYLSectionStyleColors {
+  /** The system's primary font color (`sys.color.font_primary`): black in light mode, white in dark mode. */
+  static readonly systemTint: ResourceColor = $r('sys.color.font_primary');
   /** The section card: white; #1C1C1E in dark mode. */
   static readonly card: ResourceColor = $r('app.color.cyl_section_card');
   /** The header band: #EFEFF4; #2C2C2E in dark mode. */
@@ -314,15 +323,37 @@ export class CYLMenuStyle {
   headerHeight: number = 36;
   headerFont: CYLFont = CYLFont.systemFont(14);
   /**
-   * The list's one tint of texts and icons: the system's primary font color (`sys.color.font_primary`), which follows dark
-   * mode, as `UIColor.label` does on iOS. Any `ResourceColor` replaces it.
+   * The one color of every built-in view that is not a tag (header title, section icon, fold / More control); undefined:
+   * black or white by the luminance of the background it is drawn on (`resolvedTintColor`). A color set on the title,
+   * the fold control or the More button itself wins over it for that view.
    */
-  headerTextColor: ResourceColor = $r('sys.color.font_primary');
+  tintColor?: ResourceColor = undefined;
+  private headerTextColorValue?: ResourceColor = undefined;
+  private foldControlColorValue?: ResourceColor = undefined;
+  private moreButtonColorValue?: ResourceColor = undefined;
+
+  /**
+   * The section title's color: the system's primary font color (`sys.color.font_primary`, which follows dark mode, as
+   * `UIColor.label` does on iOS) until the app sets one; the color drawn by default is `resolvedHeaderTextColor`.
+   */
+  get headerTextColor(): ResourceColor {
+    return this.headerTextColorValue ?? CYLSectionStyleColors.systemTint;
+  }
+
+  set headerTextColor(value: ResourceColor) {
+    this.headerTextColorValue = value;
+  }
   headerHorizontalInset: number = 16;
 
   // Fold controls
   /** The fold controls' color: the list's one tint by default (see `headerTextColor`); a control's own color wins. */
-  foldControlColor: ResourceColor = $r('sys.color.font_primary');
+  get foldControlColor(): ResourceColor {
+    return this.foldControlColorValue ?? CYLSectionStyleColors.systemTint;
+  }
+
+  set foldControlColor(value: ResourceColor) {
+    this.foldControlColorValue = value;
+  }
   expandTitle: string = CYLMenuLocalizedString('CYLMenuExpand');
   foldChevronImage?: ResourceStr;
   collapseTitle: string = CYLMenuLocalizedString('CYLMenuCollapse');
@@ -330,7 +361,13 @@ export class CYLMenuStyle {
   // The More button
   moreButtonImage?: ResourceStr;
   /** The More button's color: the list's one tint by default (see `headerTextColor`). */
-  moreButtonColor: ResourceColor = $r('sys.color.font_primary');
+  get moreButtonColor(): ResourceColor {
+    return this.moreButtonColorValue ?? CYLSectionStyleColors.systemTint;
+  }
+
+  set moreButtonColor(value: ResourceColor) {
+    this.moreButtonColorValue = value;
+  }
 
   constructor() {
     this.storedNormal.borderColor = CYLColor.white(0.82);
@@ -500,6 +537,47 @@ export class CYLMenuStyle {
     this.backgroundColorValue;
   }
 
+  /**
+   * The default tint (`tintColor` unset) of a built-in view drawn on `background`: black on a light one, white on a dark
+   * one (`CYLTintLuminanceThreshold`); the system mode (`systemTint`: black in light, white in dark) when the background
+   * is not known as a color: transparent, or a resource (the library's palette follows the mode as the system tint does).
+   */
+  static tintOn(background: ResourceColor | undefined): ResourceColor {
+    const luminance = CYLMenuColorLuminance(background);
+    if (luminance === undefined) {
+      return CYLSectionStyleColors.systemTint;
+    }
+    return luminance > CYLTintLuminanceThreshold ? CYLColor.BLACK : CYLColor.WHITE;
+  }
+
+  /**
+   * The tint of the built-in views as drawn: `tintColor`, else the default against what is behind them: the band color
+   * when `onBand` (a header with a band) and a band is set, else the opaque background the list paints itself
+   * (`resolvedBackgroundColor()`: the app's `backgroundColor`, the grouped background under `insetGrouped`).
+   */
+  resolvedTintColor(onBand: boolean = false): ResourceColor {
+    if (this.tintColor !== undefined) {
+      return this.tintColor;
+    }
+    return CYLMenuStyle.tintOn(onBand && this.headerBackgroundColor !== undefined ? this.headerBackgroundColor :
+    this.resolvedBackgroundColor());
+  }
+
+  /** The section title's color as drawn: the one the app set, else the tint. */
+  resolvedHeaderTextColor(onBand: boolean = false): ResourceColor {
+    return this.headerTextColorValue ?? this.resolvedTintColor(onBand);
+  }
+
+  /** The fold controls' color as drawn (a control's own color still wins): the one the app set, else the tint. */
+  resolvedFoldControlColor(onBand: boolean = false): ResourceColor {
+    return this.foldControlColorValue ?? this.resolvedTintColor(onBand);
+  }
+
+  /** The More button's color as drawn: the one the app set, else the tint. */
+  resolvedMoreButtonColor(onBand: boolean = false): ResourceColor {
+    return this.moreButtonColorValue ?? this.resolvedTintColor(onBand);
+  }
+
   /** The card's background style as drawn: `sectionBackgroundStyle`, flat where `CYLLiquidGlass.isActive()` is false. */
   resolvedSectionBackgroundStyle(): CYLTagBackgroundStyle {
     return this.sectionBackgroundStyle === CYLTagBackgroundStyle.liquidGlass && CYLLiquidGlass.isActive() ?
@@ -585,14 +663,15 @@ export class CYLMenuStyle {
     c.headerSeparatorInsets = this.headerSeparatorInsets;
     c.headerHeight = this.headerHeight;
     c.headerFont = this.headerFont;
-    c.headerTextColor = this.headerTextColor;
+    c.tintColor = this.tintColor;
+    c.headerTextColorValue = this.headerTextColorValue;
     c.headerHorizontalInset = this.headerHorizontalInset;
-    c.foldControlColor = this.foldControlColor;
+    c.foldControlColorValue = this.foldControlColorValue;
     c.expandTitle = this.expandTitle;
     c.foldChevronImage = this.foldChevronImage;
     c.collapseTitle = this.collapseTitle;
     c.moreButtonImage = this.moreButtonImage;
-    c.moreButtonColor = this.moreButtonColor;
+    c.moreButtonColorValue = this.moreButtonColorValue;
     return c;
   }
 

@@ -23,11 +23,11 @@ export { CYLMenuResources, CYLMenuLocalizedString } from './src/main/ets/core/CY
 export {
   CYLMenuStyle, CYLTagTitleMaxLines, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagBackgroundStyle, CYLTagRowAlignment,
   CYLTagDeleteIndicatorPlacement, CYLTitleTextAttributes, CYLSectionStyle, CYLHeaderSeparatorStyle, CYLSectionStyleMetrics,
-  CYLSectionStyleColors
+  CYLSectionStyleColors, CYLTintLuminanceThreshold
 } from './src/main/ets/core/CYLMenuStyle';
 export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';
 export { CYLImage, CYLImageIsSymbol, CYLResourceTypeSymbol, CYLColorKey } from './src/main/ets/core/CYLTypes';
-export { CYLMenuColorFromString } from './src/main/ets/core/CYLMenuColor';
+export { CYLMenuColorFromString, CYLMenuColorLuminance } from './src/main/ets/core/CYLMenuColor';
 export { CYLTag, CYLTagDataSource } from './src/main/ets/core/CYLTag';
 export {
   CYLTagModel, CYLTagGroup, CYLTagViewSectionInset, CYLTagViewCellSpacing, CYLTagDefaultListWidth

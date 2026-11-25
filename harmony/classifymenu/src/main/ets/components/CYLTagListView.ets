@@ -104,6 +104,8 @@ class CYLSectionRender {
   showsMore: boolean = false;
   moreImage?: ResourceStr;
   moreColor: ResourceColor = CYLColor.GRAY;
+  /** The section icon's tint (`CYLMenuStyle.resolvedTintColor`). */
+  iconColor: ResourceColor = CYLColor.BLACK;
   moreLabel: string = '';
   /** The clear button (`menuShowsClearButtonForSection`): a square as tall as a line of the title. */
   showsClear: boolean = false;
@@ -502,10 +504,11 @@ export struct CYLTagListView {
     return r;
   }
 
-  private sectionFold(frame: CYLTagListSectionFrame): CYLTagRenderItem {
+  /** `onBand`: a header whose section has a band (the fold control is drawn on the band color). */
+  private sectionFold(frame: CYLTagListSectionFrame, onBand: boolean): CYLTagRenderItem {
     const m = this.model;
     const control = m.displayedFoldControl;
-    const style = CYLTagFoldMetrics.style(control, m.style.foldControlColor);
+    const style = CYLTagFoldMetrics.style(control, m.style.resolvedFoldControlColor(onBand));
     const r = this.foldItem(control, style, frame.expanded, m.foldSize(frame.expanded), frame.section);
     this.finishKey(r, 's');
     return r;
@@ -545,7 +548,8 @@ export struct CYLTagListView {
   private header(frame: CYLTagListSectionFrame, titleHeight: number): CYLSectionRender {
     const m = this.model;
     const style = m.style;
-    const view = this.configureHeader(frame.section);
+    const onBand = frame.headerBand !== undefined;
+    const view = this.configureHeader(frame.section, onBand);
     const h = new CYLSectionRender();
     h.section = frame.section;
     h.y = frame.y + titleHeight;
@@ -566,24 +570,25 @@ export struct CYLTagListView {
     h.showsFold = view.showsFoldButton;
     h.foldLeading = view.foldAtLeadingEdge;
     if (h.showsFold) {
-      h.fold = this.sectionFold(frame);
+      h.fold = this.sectionFold(frame, frame.headerBand !== undefined);
     }
     h.showsMore = view.showsMoreButton;
     h.moreImage = view.moreImage;
     h.moreColor = view.moreColor;
+    h.iconColor = view.iconView.tintColor;
     h.moreLabel = view.moreAccessibilityLabel;
     h.accessory = view.accessoryView;
     h.showsClear = m.showsClearButton(h.section);
     if (h.showsClear) {
       h.clearImage = (style.clearButtonImage ?? CYLMenuResources.image('cyl_trash')) as ResourceStr;
-      h.clearColor = style.clearButtonColor ?? style.headerTextColor;
+      h.clearColor = style.clearButtonColor ?? style.resolvedHeaderTextColor(onBand);
       h.clearLabel = m.clearButtonLabel(h.section);
       h.clearSide = Math.min(h.height, Math.ceil(CYLTagButtonMetrics.lineHeight(style.headerFontFor(m.fontScale))));
     }
     h.key = ['h', h.showsClear, h.clearLabel, h.clearSide, CYLColorKey(h.clearColor), h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
       h.insetLeft, h.insetRight,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
-      h.fold.key, h.showsMore, CYLColorKey(h.moreColor), h.moreLabel, h.accessory !== undefined].join('|');
+      h.fold.key, h.showsMore, CYLColorKey(h.moreColor), CYLColorKey(h.iconColor), h.moreLabel, h.accessory !== undefined].join('|');
     return h;
   }
 
@@ -591,7 +596,7 @@ export struct CYLTagListView {
    * `collectionView(_:viewForSupplementaryElementOfKind:at:)` for a header (`configureHeader`): configured again only
    * when its inputs change, so that changes made to it (then `setNeedsDisplay()`) stay drawn.
    */
-  private configureHeader(section: number): CYLTagListSupplementaryView {
+  private configureHeader(section: number, onBand: boolean): CYLTagListSupplementaryView {
     const m = this.model;
     const style = m.style;
     const view = m.dequeueSupplementaryView(CYLTagListElementKindSectionHeader, section);
@@ -600,7 +605,7 @@ export struct CYLTagListView {
     const accessory = m.menuDataSource?.menuAccessoryViewForSection?.(section);
     const inputs = [m.viewGeneration, m.showsSectionHeaders, title, imageKey(icon), m.fontScale,
       m.showsHeaderFoldControl(section), m.foldControl.position, m.showsMoreButton(section),
-      m.moreButtonAccessibilityLabel(section), accessory !== undefined].join('|');
+      m.moreButtonAccessibilityLabel(section), accessory !== undefined, onBand].join('|');
     if (view.configuredInputs === inputs) {
       return view;
     }
@@ -612,7 +617,8 @@ export struct CYLTagListView {
     view.indicatorHeight = style.headerIndicatorSize.height;
     view.titleLabel.text = title;
     view.titleLabel.font = style.headerFontFor(m.fontScale);
-    view.titleLabel.textColor = style.headerTextColor;
+    view.titleLabel.textColor = style.resolvedHeaderTextColor(onBand);
+    view.iconView.tintColor = style.resolvedTintColor(onBand);
     view.iconView.image = icon;
     // Section titles hidden: the header only holds the fold control.
     view.titleLabel.isHidden = !m.showsSectionHeaders;
@@ -622,7 +628,7 @@ export struct CYLTagListView {
     view.foldAtLeadingEdge = m.foldControl.position === CYLMenuFoldControlPosition.headerLeading;
     view.showsMoreButton = m.showsMoreButton(section);
     view.moreImage = style.moreButtonImage ?? CYLMenuResources.image('cyl_more');
-    view.moreColor = style.moreButtonColor;
+    view.moreColor = style.resolvedMoreButtonColor(onBand);
     view.moreAccessibilityLabel = m.moreButtonAccessibilityLabel(section);
     return view;
   }
@@ -636,7 +642,7 @@ export struct CYLTagListView {
     f.y = frame.y + frame.height - frame.footerHeight + titleHeight;
     f.height = frame.footerHeight;
     f.showsFold = true;
-    f.fold = this.sectionFold(frame);
+    f.fold = this.sectionFold(frame, false);
     f.key = ['f', f.section, f.y, f.height, f.fold.key].join('|');
     return f;
   }
@@ -1054,7 +1060,7 @@ export struct CYLTagListView {
               Column().width(h.indicatorWidth).height(h.indicatorHeight).backgroundColor(h.indicatorColor)
             }
             if (h.showsTitle && h.icon !== undefined) {
-              Image(h.icon).width(h.indicatorHeight).height(h.indicatorHeight).accessibilityLevel('no')
+              Image(h.icon).width(h.indicatorHeight).height(h.indicatorHeight).fillColor(h.iconColor).accessibilityLevel('no')
             }
             Text(h.showsTitle ? h.title : '')
               .fontSize(h.fontSize)

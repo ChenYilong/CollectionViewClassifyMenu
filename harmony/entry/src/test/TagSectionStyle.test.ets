@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import { CYLLiquidGlass } from 'cylanimateditem';
 import {
-  CYLColor, CYLEdgeInsets, CYLFont, CYLHeaderSeparatorStyle, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
+  CYLColor, CYLColorKey, CYLEdgeInsets, CYLFont, CYLHeaderSeparatorStyle, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuStyle, CYLRect, CYLSectionStyle, CYLSectionStyleColors,
-  CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButtonMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
+  CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButtonMetrics, CYLTintLuminanceThreshold, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
   CYLTextMeasurer
 } from '@cyl/classifymenu';
 
@@ -376,6 +376,94 @@ export default function tagSectionStyleTest() {
         .assertEqual(CYLSectionStyle.plain);
       expect(configured('{"headerSeparatorStyle":"bogus"}').headerSeparatorStyle)
         .assertEqual(CYLHeaderSeparatorStyle.none);
+    });
+
+    it('theDefaultTintFollowsTheLuminanceOfTheListBackground', 0, () => {
+      const system = $r('sys.color.font_primary');
+      const light = new CYLMenuStyle();
+      light.backgroundColor = '#FFF2F2F7';
+      const dark = new CYLMenuStyle();
+      dark.backgroundColor = '#FF101010';
+      // Dark on a light list and light on a dark one, whatever the system mode (these are fixed colors, not resources).
+      expect(light.resolvedTintColor()).assertEqual(CYLColor.BLACK);
+      expect(dark.resolvedTintColor()).assertEqual(CYLColor.WHITE);
+      expect(light.resolvedHeaderTextColor()).assertEqual(CYLColor.BLACK);
+      expect(dark.resolvedFoldControlColor()).assertEqual(CYLColor.WHITE);
+      expect(dark.resolvedMoreButtonColor()).assertEqual(CYLColor.WHITE);
+      expect(CYLMenuStyle.tintOn('#FF808080')).assertEqual(CYLColor.BLACK);
+      expect(CYLMenuStyle.tintOn('#FF404040')).assertEqual(CYLColor.WHITE);
+      expect(CYLTintLuminanceThreshold > 0 && CYLTintLuminanceThreshold < 1).assertTrue();
+      // Unset under insetGrouped: the grouped background is a resource that follows the mode, so does the tint.
+      const grouped = new CYLMenuStyle();
+      grouped.sectionStyle = CYLSectionStyle.insetGrouped;
+      expect(CYLColorKey(grouped.resolvedTintColor())).assertEqual(CYLColorKey(system));
+    });
+
+    it('anUnsetTintOnATransparentListKeepsTheResourceDefaults', 0, () => {
+      const system = CYLColorKey($r('sys.color.font_primary'));
+      const style = new CYLMenuStyle();
+      style.backgroundColor = CYLColor.CLEAR;
+      expect(CYLColorKey(style.resolvedTintColor())).assertEqual(system);
+      expect(CYLColorKey(style.resolvedHeaderTextColor())).assertEqual(system);
+      expect(CYLColorKey(style.resolvedFoldControlColor())).assertEqual(system);
+      expect(CYLColorKey(style.resolvedMoreButtonColor())).assertEqual(system);
+      expect(CYLColorKey(style.headerTextColor)).assertEqual(system);
+      expect(CYLColorKey(style.foldControlColor)).assertEqual(system);
+      expect(CYLColorKey(style.moreButtonColor)).assertEqual(system);
+    });
+
+    it('aSetTintColorWinsAndIndividualColorsWinOverIt', 0, () => {
+      const style = new CYLMenuStyle();
+      style.backgroundColor = '#FFFFFFFF';
+      style.tintColor = RED;
+      expect(style.resolvedTintColor()).assertEqual(RED);
+      expect(style.resolvedHeaderTextColor()).assertEqual(RED);
+      expect(style.resolvedFoldControlColor(true)).assertEqual(RED);
+      expect(style.resolvedMoreButtonColor()).assertEqual(RED);
+      // A color set on one view wins over the tint for that view only.
+      style.headerTextColor = BLUE;
+      style.moreButtonColor = '#FF00FF00';
+      expect(style.resolvedHeaderTextColor()).assertEqual(BLUE);
+      expect(style.resolvedMoreButtonColor()).assertEqual('#FF00FF00');
+      expect(style.resolvedFoldControlColor()).assertEqual(RED);
+      // Without a tint the individually set colors still win over the luminance default.
+      const plain = new CYLMenuStyle();
+      plain.backgroundColor = '#FF000000';
+      plain.foldControlColor = BLUE;
+      expect(plain.resolvedFoldControlColor()).assertEqual(BLUE);
+      expect(plain.resolvedHeaderTextColor()).assertEqual(CYLColor.WHITE);
+    });
+
+    it('theBandColorIsTheBackgroundOfTheTintUnderABand', 0, () => {
+      const style = new CYLMenuStyle();
+      style.backgroundColor = '#FFFFFFFF';
+      style.headerBackgroundColor = '#FF202020';
+      expect(style.resolvedTintColor(false)).assertEqual(CYLColor.BLACK);
+      expect(style.resolvedTintColor(true)).assertEqual(CYLColor.WHITE);
+      expect(style.resolvedHeaderTextColor(true)).assertEqual(CYLColor.WHITE);
+      // A band on a dark list with a light band color.
+      const reverse = new CYLMenuStyle();
+      reverse.backgroundColor = '#FF000000';
+      reverse.headerBackgroundColor = '#FFEFEFF4';
+      expect(reverse.resolvedTintColor(false)).assertEqual(CYLColor.WHITE);
+      expect(reverse.resolvedTintColor(true)).assertEqual(CYLColor.BLACK);
+      // No band set: the list background decides, whatever `onBand` says.
+      expect(new CYLMenuStyle().resolvedTintColor(true)).assertEqual(CYLColor.BLACK);
+    });
+
+    it('theTintColorKeyParsesAndCopyKeepsIt', 0, () => {
+      expect(configured('{"tintColor":"#112233"}').tintColor).assertEqual('#FF112233');
+      expect(configured('{}').tintColor).assertUndefined();
+      const style = new CYLMenuStyle();
+      style.tintColor = RED;
+      style.headerTextColor = BLUE;
+      const copy = style.copy();
+      expect(copy.tintColor).assertEqual(RED);
+      expect(copy.headerTextColor).assertEqual(BLUE);
+      // A color the app never set stays unset in the copy, so the tint still applies there.
+      const unset = new CYLMenuStyle();
+      unset.tintColor = RED;
+      expect(unset.copy().resolvedFoldControlColor()).assertEqual(RED);
     });
   });
 }

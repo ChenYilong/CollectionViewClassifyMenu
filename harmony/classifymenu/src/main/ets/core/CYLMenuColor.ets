@@ -47,3 +47,53 @@ export function CYLMenuColorFromString(value: string | undefined): string | unde
   const name = text.endsWith('Color') ? text.substring(0, text.length - 'Color'.length) : text;
   return UI_COLOR_NAMES.get(name);
 }
+
+/** The channel bytes of a '#AARRGGBB' or '#RRGGBB' color. */
+const ARGB_DIGITS: number = 8;
+const RGB_DIGITS: number = 6;
+const BYTE_MAX: number = 255;
+/** Linearization of an sRGB channel (WCAG 2.x). */
+const SRGB_LINEAR_CUTOFF: number = 0.03928;
+const SRGB_LINEAR_SLOPE: number = 12.92;
+const SRGB_OFFSET: number = 0.055;
+const SRGB_SCALE: number = 1.055;
+const SRGB_GAMMA: number = 2.4;
+const LUMA_RED: number = 0.2126;
+const LUMA_GREEN: number = 0.7152;
+const LUMA_BLUE: number = 0.0722;
+
+function linearChannel(byte: number): number {
+  const c = byte / BYTE_MAX;
+  return c <= SRGB_LINEAR_CUTOFF ? c / SRGB_LINEAR_SLOPE : Math.pow((c + SRGB_OFFSET) / SRGB_SCALE, SRGB_GAMMA);
+}
+
+/**
+ * The WCAG relative luminance (0 black ... 1 white) of an opaque color given as '#AARRGGBB', '#RRGGBB' or a number
+ * (0xRRGGBB, or 0xAARRGGBB above 0xFFFFFF). Undefined when the color cannot be read as an opaque color: no color, a
+ * transparent or translucent one, or a resource. A resource (`$r(...)`, such as the library's palette) is not resolved: a
+ * system resource has no value that a host test or the style can read, only the drawing sees it; the callers use the
+ * system mode for it (the library's palette flips with the mode as the system tint does).
+ */
+export function CYLMenuColorLuminance(color: ResourceColor | undefined): number | undefined {
+  let argb: number;
+  if (typeof color === 'string') {
+    const hex = (color as string).trim().replace('#', '');
+    if ((hex.length !== ARGB_DIGITS && hex.length !== RGB_DIGITS) || !new RegExp('^[0-9a-fA-F]+$').test(hex)) {
+      return undefined;
+    }
+    argb = parseInt(hex.length === RGB_DIGITS ? 'FF' + hex : hex, 16);
+  } else if (typeof color === 'number') {
+    const value = color as number;
+    argb = value <= 0xFFFFFF ? 0xFF000000 + value : value;
+  } else {
+    return undefined;
+  }
+  const alpha = Math.floor(argb / 0x1000000) % 0x100;
+  if (alpha !== BYTE_MAX) {
+    return undefined;
+  }
+  const red = Math.floor(argb / 0x10000) % 0x100;
+  const green = Math.floor(argb / 0x100) % 0x100;
+  const blue = argb % 0x100;
+  return LUMA_RED * linearChannel(red) + LUMA_GREEN * linearChannel(green) + LUMA_BLUE * linearChannel(blue);
+}
