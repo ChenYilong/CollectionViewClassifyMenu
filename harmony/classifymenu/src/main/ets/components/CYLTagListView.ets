@@ -1123,6 +1123,7 @@ export struct CYLTagListView {
           }
           .width('100%')
           .height(h.height)
+          .alignItems(VerticalAlign.Center)
           // The insets are physical (the state mirrored them); the direction reverses the views and aligns the title.
           .direction(h.rtl ? Direction.Rtl : Direction.Ltr)
           .padding({ left: h.insetLeft, right: h.insetRight })

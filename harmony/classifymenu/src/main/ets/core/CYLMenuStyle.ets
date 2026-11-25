@@ -98,6 +98,15 @@ export class CYLSectionStyleMetrics {
   static readonly headerBandPadding: number = 12;
   /** The thickness of the header divider: one hairline. */
   static readonly separatorThickness: number = 0.5;
+  /**
+   * The padding around a header's title lines under `insetGrouped` with no divider (4 above, 4 below), where the header is
+   * sized to its text instead of the fixed `headerHeight`.
+   */
+  static readonly headerBoardTitlePadding: number = 8;
+  /** The space between that header's bottom and the board (the section card), instead of the section's top inset. */
+  static readonly headerBoardSpacing: number = 4;
+  /** The default `headerHeight`: the fixed header band of the plain style and of a header with a divider. */
+  static readonly defaultHeaderHeight: number = 36;
 }
 
 /**
@@ -357,7 +366,27 @@ export class CYLMenuStyle {
   headerSeparatorInsets?: CYLEdgeInsets = undefined;
 
   // Section headers
-  headerHeight: number = 36;
+  private headerHeightValue: number = CYLSectionStyleMetrics.defaultHeaderHeight;
+  private headerHeightWasSet: boolean = false;
+
+  /**
+   * The fixed header height, vp (default `CYLSectionStyleMetrics.defaultHeaderHeight`, 36): the minimum of every header,
+   * except under `insetGrouped` with no header divider, where the header is sized to its text and this is a minimum only
+   * when the app set it (`isHeaderHeightSet`).
+   */
+  get headerHeight(): number {
+    return this.headerHeightValue;
+  }
+
+  set headerHeight(value: number) {
+    this.headerHeightValue = value;
+    this.headerHeightWasSet = true;
+  }
+
+  /** True when the app set `headerHeight` (the configuration key included); false while the default 36 applies. */
+  get isHeaderHeightSet(): boolean {
+    return this.headerHeightWasSet;
+  }
   private headerMaxLinesValue: number = CYLHeaderTitleMaxLines.single;
 
   /**
@@ -724,7 +753,8 @@ export class CYLMenuStyle {
     c.headerSeparatorColor = this.headerSeparatorColor;
     c.headerSeparatorThickness = this.headerSeparatorThickness;
     c.headerSeparatorInsets = this.headerSeparatorInsets;
-    c.headerHeight = this.headerHeight;
+    c.headerHeightValue = this.headerHeightValue;
+    c.headerHeightWasSet = this.headerHeightWasSet;
     c.headerMaxLines = this.headerMaxLines;
     c.headerFont = this.headerFont;
     c.tintColor = this.tintColor;

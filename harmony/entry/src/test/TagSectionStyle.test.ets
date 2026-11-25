@@ -13,6 +13,20 @@ const LIST_WIDTH: number = 320;
 const WIDE_WIDTH: number = 342;
 const SIDE_INSET: number = 16;
 const TOP_INSET: number = 10;
+/** The section's bottom inset: the space below the board, unchanged by the header rule. */
+const BOTTOM_INSET: number = 10;
+/** The default fixed header height: the header of the plain style and of a header with a divider. */
+const DEFAULT_HEADER_HEIGHT: number = 36;
+/** The header title line at the default 17 vp font: ceil(17 x 1.2). */
+const HEADER_LINE_HEIGHT: number = 21;
+/** The padding around the title of a header sized to its text, and the gap between that header and the board. */
+const HEADER_BOARD_TITLE_PADDING: number = 8;
+const HEADER_BOARD_SPACING: number = 4;
+const TAG_HEIGHT: number = 30;
+const EXPLICIT_HEADER_HEIGHT: number = 50;
+const TOO_SMALL_HEADER_HEIGHT: number = 10;
+const CONFIGURED_HEADER_HEIGHT: number = 40;
+const SHORT_SECTIONS: number = 2;
 const CARD_PADDING: number = 12;
 const DEFAULT_HEADER_INSET: number = 16;
 const TAGS_IN_SHORT_SECTION: number = 3;
@@ -194,8 +208,8 @@ export default function tagSectionStyleTest() {
           expect(c.y >= card.y + CARD_PADDING).assertTrue();
           expect(c.y + c.height <= card.maxY - CARD_PADDING).assertTrue();
         });
-        // The card sits below the header and ends inside the section.
-        expect(card.y).assertEqual(s.y + s.headerHeight + TOP_INSET);
+        // The card sits below the header (no divider: closely) and ends inside the section.
+        expect(card.y).assertEqual(s.y + s.headerHeight + HEADER_BOARD_SPACING);
         expect(card.maxY <= s.y + s.height).assertTrue();
       });
     });
@@ -214,7 +228,11 @@ export default function tagSectionStyleTest() {
       const plain = listWith(new CYLShortSectionsSource(), plainStyle(), WIDE_WIDTH);
       const grouped = listWith(new CYLShortSectionsSource(), groupedStyle(), WIDE_WIDTH);
       expect(grouped.numberOfRows(0)).assertEqual(plain.numberOfRows(0));
-      expect(grouped.contentHeight).assertEqual(plain.contentHeight + 2 * 2 * CARD_PADDING);
+      // Per section the card adds its padding top and bottom, and the header sized to its text with the closer board
+      // saves (36 + 10) - (21 + 8 + 4) = 13 vp.
+      const headerSaving = DEFAULT_HEADER_HEIGHT + TOP_INSET - (HEADER_LINE_HEIGHT + HEADER_BOARD_TITLE_PADDING +
+        HEADER_BOARD_SPACING);
+      expect(grouped.contentHeight).assertEqual(plain.contentHeight + SHORT_SECTIONS * (2 * CARD_PADDING - headerSaving));
       expect(grouped.heightThatFitsWidth(WIDE_WIDTH)).assertEqual(grouped.contentHeight);
       expect(plain.heightThatFitsWidth(WIDE_WIDTH)).assertEqual(plain.contentHeight);
     });
@@ -574,6 +592,121 @@ export default function tagSectionStyleTest() {
       const unset = new CYLMenuStyle();
       unset.tintColor = RED;
       expect(unset.copy().resolvedFoldControlColor()).assertEqual(RED);
+    });
+
+    it('withoutADividerTheHeaderIsTheTitleLinePlusEightAndTheBoardStartsFourBelow', 0, () => {
+      expect(Math.ceil(CYLTagButtonMetrics.lineHeight(new CYLMenuStyle().headerFont))).assertEqual(HEADER_LINE_HEIGHT);
+      const list = listWith(new CYLShortSectionsSource(), groupedStyle(), LIST_WIDTH);
+      const header = HEADER_LINE_HEIGHT + HEADER_BOARD_TITLE_PADDING;
+      let bottom = 0;
+      list.layoutSections().forEach((s: CYLTagListSectionFrame) => {
+        const card = s.card as CYLRect;
+        // The fixed 36 does not apply: the header is the line plus 8, the board starts 4 below it.
+        expect(s.headerHeight).assertEqual(header);
+        expect(card.y).assertEqual(s.y + header + HEADER_BOARD_SPACING);
+        expect(s.items[0].y).assertEqual(card.y + CARD_PADDING);
+        expect(card.height).assertEqual(2 * CARD_PADDING + TAG_HEIGHT);
+        // The space below the board is the section's bottom inset, as before.
+        expect(s.y + s.height).assertEqual(card.maxY + BOTTOM_INSET);
+        bottom = s.y + s.height;
+      });
+      // The section height, the content height and the measured height agree.
+      const section = header + HEADER_BOARD_SPACING + 2 * CARD_PADDING + TAG_HEIGHT + BOTTOM_INSET;
+      expect(list.layoutSections()[0].height).assertEqual(section);
+      expect(bottom).assertEqual(SHORT_SECTIONS * section);
+      expect(list.contentHeight).assertEqual(bottom);
+      expect(list.heightThatFitsWidth(LIST_WIDTH)).assertEqual(bottom);
+    });
+
+    it('theHeaderUnderTheBoardIsNeverBelowTheFoldControl', 0, () => {
+      const list = new CYLTagListState();
+      list.style = groupedStyle();
+      list.menuDataSource = new CYLEightTagsSource();
+      list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.headerTrailing,
+        CYLMenuFoldControlContent.icon);
+      list.defaultVisibleRows = 1;
+      list.setLayoutWidth(WIDE_WIDTH);
+      list.reloadMenuData();
+      expect(list.canFoldSection(0)).assertTrue();
+      const foldHeight = list.foldSize(false).height;
+      const expected = Math.max(HEADER_LINE_HEIGHT + HEADER_BOARD_TITLE_PADDING, foldHeight);
+      const frame = list.layoutSections()[0];
+      expect(frame.headerHeight).assertEqual(expected);
+      expect(frame.headerHeight >= foldHeight).assertTrue();
+      expect(list.headerHeight(0)).assertEqual(expected);
+      // The board is still 4 below that header.
+      expect((frame.card as CYLRect).y).assertEqual(frame.y + expected + HEADER_BOARD_SPACING);
+      expect(list.heightThatFitsWidth(WIDE_WIDTH)).assertEqual(list.contentHeight);
+    });
+
+    it('withTheDividerOnTheOldHeaderAndTheOldGapStay', 0, () => {
+      const style = groupedStyle();
+      style.headerSeparatorStyle = CYLHeaderSeparatorStyle.line;
+      const list = listWith(new CYLShortSectionsSource(), style, LIST_WIDTH);
+      list.layoutSections().forEach((s: CYLTagListSectionFrame) => {
+        const card = s.card as CYLRect;
+        expect(s.headerHeight).assertEqual(DEFAULT_HEADER_HEIGHT);
+        expect(card.y).assertEqual(s.y + DEFAULT_HEADER_HEIGHT + TOP_INSET);
+        expect(s.height).assertEqual(DEFAULT_HEADER_HEIGHT + TOP_INSET + 2 * CARD_PADDING + TAG_HEIGHT + BOTTOM_INSET);
+        // The divider sits at the header's bottom edge, inside its height.
+        const line = s.headerSeparator as CYLRect;
+        expect(line.y + line.height).assertEqual(s.y + DEFAULT_HEADER_HEIGHT);
+      });
+      expect(list.heightThatFitsWidth(LIST_WIDTH)).assertEqual(list.contentHeight);
+    });
+
+    it('thePlainStyleKeepsTheFixedHeaderAndTheTopInset', 0, () => {
+      const list = listWith(new CYLShortSectionsSource(), plainStyle(), LIST_WIDTH);
+      list.layoutSections().forEach((s: CYLTagListSectionFrame) => {
+        expect(s.headerHeight).assertEqual(DEFAULT_HEADER_HEIGHT);
+        expect(s.items[0].y).assertEqual(s.y + DEFAULT_HEADER_HEIGHT + TOP_INSET);
+        expect(s.height).assertEqual(DEFAULT_HEADER_HEIGHT + TOP_INSET + TAG_HEIGHT + BOTTOM_INSET);
+      });
+      expect(list.heightThatFitsWidth(LIST_WIDTH)).assertEqual(list.contentHeight);
+      // The frames of before the section style: the snapshot.
+      expect(snapshot(makeList())).assertEqual(DEFAULT_FRAMES);
+    });
+
+    it('anExplicitHeaderHeightIsTheMinimumUnderTheBoardToo', 0, () => {
+      const style = groupedStyle();
+      style.headerHeight = EXPLICIT_HEADER_HEIGHT;
+      const list = listWith(new CYLShortSectionsSource(), style, LIST_WIDTH);
+      list.layoutSections().forEach((s: CYLTagListSectionFrame) => {
+        expect(s.headerHeight).assertEqual(EXPLICIT_HEADER_HEIGHT);
+        expect((s.card as CYLRect).y).assertEqual(s.y + EXPLICIT_HEADER_HEIGHT + HEADER_BOARD_SPACING);
+      });
+      expect(list.heightThatFitsWidth(LIST_WIDTH)).assertEqual(list.contentHeight);
+      // A minimum below the text's height does not shrink the header.
+      const small = groupedStyle();
+      small.headerHeight = TOO_SMALL_HEADER_HEIGHT;
+      const smallList = listWith(new CYLShortSectionsSource(), small, LIST_WIDTH);
+      expect(smallList.layoutSections()[0].headerHeight).assertEqual(HEADER_LINE_HEIGHT + HEADER_BOARD_TITLE_PADDING);
+      // Setting the default value itself still counts as set: the app asked for 36.
+      const same = groupedStyle();
+      same.headerHeight = DEFAULT_HEADER_HEIGHT;
+      expect(listWith(new CYLShortSectionsSource(), same, LIST_WIDTH).layoutSections()[0].headerHeight)
+        .assertEqual(DEFAULT_HEADER_HEIGHT);
+    });
+
+    it('theHeaderHeightKnowsWhetherTheAppSetItAndCopyKeepsIt', 0, () => {
+      const style = new CYLMenuStyle();
+      expect(style.headerHeight).assertEqual(DEFAULT_HEADER_HEIGHT);
+      expect(style.isHeaderHeightSet).assertFalse();
+      expect(style.copy().isHeaderHeightSet).assertFalse();
+      expect(style.copy().headerHeight).assertEqual(DEFAULT_HEADER_HEIGHT);
+      style.headerHeight = EXPLICIT_HEADER_HEIGHT;
+      expect(style.isHeaderHeightSet).assertTrue();
+      expect(style.copy().isHeaderHeightSet).assertTrue();
+      expect(style.copy().headerHeight).assertEqual(EXPLICIT_HEADER_HEIGHT);
+    });
+
+    it('theHeaderHeightConfigurationKeyMarksItSet', 0, () => {
+      const style = configured('{"headerHeight":40}');
+      expect(style.headerHeight).assertEqual(CONFIGURED_HEADER_HEIGHT);
+      expect(style.isHeaderHeightSet).assertTrue();
+      const unset = configured('{}');
+      expect(unset.headerHeight).assertEqual(DEFAULT_HEADER_HEIGHT);
+      expect(unset.isHeaderHeightSet).assertFalse();
     });
   });
 }

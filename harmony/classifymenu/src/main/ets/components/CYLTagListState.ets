@@ -26,8 +26,8 @@ import {
 } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import {
-  CYLHeaderSeparatorStyle, CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagImagePlacementIsVertical,
-  CYLTagRowAlignment
+  CYLHeaderSeparatorStyle, CYLMenuStyle, CYLSectionStyleMetrics, CYLTagContentAlignment, CYLTagImagePlacement,
+  CYLTagImagePlacementIsVertical, CYLTagRowAlignment
 } from '../core/CYLMenuStyle';
 import { CYLTag, CYLTagDataSource } from '../core/CYLTag';
 import { CYLTagAppearance } from '../core/CYLTagAppearance';
@@ -85,6 +85,10 @@ const FOLD_MINIMUM_TOUCH_WIDTH: number = 44;
 const FOLD_IMAGE_TITLE_SPACING: number = 3;
 /** The vertical padding of a section header around its title lines, vp. */
 const HEADER_VERTICAL_PADDING: number = 12;
+/** The padding around the title lines of a header sized to its text (under `insetGrouped`, no divider), vp. */
+const HEADER_BOARD_TITLE_PADDING: number = CYLSectionStyleMetrics.headerBoardTitlePadding;
+/** The space between that header's bottom and the board's top, vp. */
+const HEADER_BOARD_SPACING: number = CYLSectionStyleMetrics.headerBoardSpacing;
 /** The space between the views of a header row (`CYLTagListView`'s header Row), vp. */
 const HEADER_ITEM_SPACING: number = 6;
 /** The side of a header's More button, vp. */
@@ -1850,7 +1854,8 @@ export class CYLTagListState implements CYLTagLongPressHost {
         const r = this.rowsFor([withFold], available);
         rowCount = r.length > 0 ? r[0].length : 0;
       }
-      height += this.headerHeight(section, width, foldable) + insets.top + insets.bottom + card.top + card.bottom;
+      const header = this.headerHeight(section, width, foldable);
+      height += header + this.headerToBoardOffset(header) + insets.bottom + card.top + card.bottom;
       height += this.heightOfRows(rowCount, sectionRows[section],
         section < sectionHeights.length ? sectionHeights[section] : []);
       if (foldable && this.foldControlIsInFooter) {
@@ -2856,8 +2861,10 @@ export class CYLTagListState implements CYLTagLongPressHost {
       return foldHeight;
     }
     const font = this.styleStorage.headerFontFor(this.fontScale);
-    const oneLine = Math.max(this.styleStorage.headerHeight,
-      Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + HEADER_VERTICAL_PADDING, foldHeight);
+    const sizedToText = this.headerIsSizedToText();
+    const padding = sizedToText ? HEADER_BOARD_TITLE_PADDING : HEADER_VERTICAL_PADDING;
+    const minimum = !sizedToText || this.styleStorage.isHeaderHeightSet ? this.styleStorage.headerHeight : 0;
+    const oneLine = Math.max(minimum, Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + padding, foldHeight);
     const maxLines = this.styleStorage.headerMaxLines;
     if (maxLines <= CYLHeaderTitleMaxLines.single || section < 0 || width <= 0) {
       return oneLine;
@@ -2867,7 +2874,25 @@ export class CYLTagListState implements CYLTagLongPressHost {
       return oneLine;
     }
     const text = CYLTagButtonMetrics.wrappedTextHeight(title, font, this.headerTitleRoom(section, width, font, foldShown), maxLines);
-    return Math.max(oneLine, Math.ceil(text) + HEADER_VERTICAL_PADDING);
+    return Math.max(oneLine, Math.ceil(text) + padding);
+  }
+
+  /**
+   * Whether the header is sized to its text: under `insetGrouped` with no header divider (`headerSeparatorStyle` none) it
+   * is the title lines plus `HEADER_BOARD_TITLE_PADDING` (never below the fold control), and the board follows it
+   * closely; with the divider, or in the plain style, the fixed `headerHeight` band stays.
+   */
+  private headerIsSizedToText(): boolean {
+    return this.styleStorage.isInsetGrouped && this.styleStorage.headerSeparatorStyle === CYLHeaderSeparatorStyle.none;
+  }
+
+  /**
+   * The distance from a header's bottom to the board's top (the card): `HEADER_BOARD_SPACING` below a header sized to its
+   * text, else the section's top inset. The one place it comes from: the frames, the section height and the content height
+   * all read it. A section with no header (`header` 0) keeps the top inset.
+   */
+  private headerToBoardOffset(header: number): number {
+    return header > 0 && this.headerIsSizedToText() ? HEADER_BOARD_SPACING : this.styleStorage.sectionInsets.top;
   }
 
   /** The width a header's title has: the header's width inside its edges, less the other views of its row. */
@@ -3145,7 +3170,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
         cells.push(cell);
       }
       const rows = this.rowsFor([cells.map((c: CYLTagListItemFrame) => c.width)], available)[0] ?? [];
-      const cardY = y + header + insets.top;
+      const cardY = y + header + this.headerToBoardOffset(header);
       let rowY = cardY + card.top;
       let index = 0;
       rows.forEach((count: number, row: number) => {
