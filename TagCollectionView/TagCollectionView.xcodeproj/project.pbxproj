@@ -12,8 +12,8 @@
 		41C689521C574FDE007E0D89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 41C689511C574FDE007E0D89 /* Assets.xcassets */; };
 		41C689551C574FDE007E0D89 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 41C689531C574FDE007E0D89 /* LaunchScreen.storyboard */; };
 		41C689601C574FDE007E0D89 /* CYLTagCollectionViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C6895F1C574FDE007E0D89 /* CYLTagCollectionViewTests.m */; };
-		C7A6B2010000000000000002 /* CYLTagGroupRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A6B2010000000000000001 /* CYLTagGroupRowTests.swift */; };
 		7B13E6C0A045469C8360BCD2 /* libPods-TagCollectionView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6231CAA67969300C32680786 /* libPods-TagCollectionView.a */; };
+		C7A6B2010000000000000002 /* CYLTagGroupRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A6B2010000000000000001 /* CYLTagGroupRowTests.swift */; };
 		E137FD46C7736707057546DC /* libPods-TagCollectionViewTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1452BBB6AC6F1F34F2BE97AF /* libPods-TagCollectionViewTests.a */; };
 /* End PBXBuildFile section */
 
@@ -28,30 +28,30 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4137FD011C901D7B00642710 /* CYLTagDemoAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTagDemoAppDelegate.swift; sourceTree = "<group>"; };
-		4137FD031C901D7B00642710 /* CYLTagDemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTagDemoViewController.swift; sourceTree = "<group>"; };
 		1452BBB6AC6F1F34F2BE97AF /* libPods-TagCollectionViewTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TagCollectionViewTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		23B7DFC0650B7B4D062084B0 /* Pods-TagCollectionViewTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TagCollectionViewTests.release.xcconfig"; path = "Target Support Files/Pods-TagCollectionViewTests/Pods-TagCollectionViewTests.release.xcconfig"; sourceTree = "<group>"; };
 		337E7AB9D4CAB5BA29414016 /* Pods-TagCollectionView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TagCollectionView.release.xcconfig"; path = "Target Support Files/Pods-TagCollectionView/Pods-TagCollectionView.release.xcconfig"; sourceTree = "<group>"; };
+		4137FD011C901D7B00642710 /* CYLTagDemoAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTagDemoAppDelegate.swift; sourceTree = "<group>"; };
+		4137FD031C901D7B00642710 /* CYLTagDemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTagDemoViewController.swift; sourceTree = "<group>"; };
 		41C689421C574FDE007E0D89 /* TagCollectionView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TagCollectionView.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		41C6894C1C574FDE007E0D89 /* CYLTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagView.swift"; sourceTree = "<group>"; };
+		41C6894C1C574FDE007E0D89 /* CYLTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagView.swift; sourceTree = "<group>"; };
 		41C689511C574FDE007E0D89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		41C689541C574FDE007E0D89 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		41C689561C574FDE007E0D89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		41C6895B1C574FDE007E0D89 /* TagCollectionViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TagCollectionViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		41C6895F1C574FDE007E0D89 /* CYLTagCollectionViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTagCollectionViewTests.m; sourceTree = "<group>"; };
-		C7A6B2010000000000000001 /* CYLTagGroupRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTagGroupRowTests.swift; sourceTree = "<group>"; };
 		41C689611C574FDE007E0D89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		41C6896D1C575A64007E0D89 /* CYLTagHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagHeaderCell.swift"; sourceTree = "<group>"; };
+		41C6896D1C575A64007E0D89 /* CYLTagHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagHeaderCell.swift; sourceTree = "<group>"; };
 		41C6896E1C575A64007E0D89 /* CYLTagHeaderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagHeaderCell.xib; sourceTree = "<group>"; };
-		41C689721C575AA1007E0D89 /* CYLTagCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagCell.swift"; sourceTree = "<group>"; };
+		41C689721C575AA1007E0D89 /* CYLTagCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagCell.swift; sourceTree = "<group>"; };
 		41C689731C575AA1007E0D89 /* CYLTagCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagCell.xib; sourceTree = "<group>"; };
-		41C689771C575B12007E0D89 /* CYLTagGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagGroup.swift"; sourceTree = "<group>"; };
-		41C6897A1C575B1A007E0D89 /* CYLTagModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CYLTagModel.swift"; sourceTree = "<group>"; };
+		41C689771C575B12007E0D89 /* CYLTagGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagGroup.swift; sourceTree = "<group>"; };
+		41C6897A1C575B1A007E0D89 /* CYLTagModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagModel.swift; sourceTree = "<group>"; };
 		41C689801C575B6D007E0D89 /* CYLTagView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CYLTagView.xib; sourceTree = "<group>"; };
 		5E98BE20A7F6D80ACAF5AF12 /* Pods-TagCollectionViewTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TagCollectionViewTests.debug.xcconfig"; path = "Target Support Files/Pods-TagCollectionViewTests/Pods-TagCollectionViewTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6231CAA67969300C32680786 /* libPods-TagCollectionView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TagCollectionView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		98298D9AEB54469F6BF8E987 /* Pods-TagCollectionView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TagCollectionView.debug.xcconfig"; path = "Target Support Files/Pods-TagCollectionView/Pods-TagCollectionView.debug.xcconfig"; sourceTree = "<group>"; };
+		C7A6B2010000000000000001 /* CYLTagGroupRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTagGroupRowTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -318,10 +318,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TagCollectionView/Pods-TagCollectionView-resources.sh",
+				"${PODS_ROOT}/CYLAnimatedItem/CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/CollectionViewClassifyMenu/CYLClassifyMenuResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLClassifyMenuResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -491,8 +493,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hundsun.www.TagCollectionViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TagCollectionView.app/TagCollectionView";
 				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TagCollectionView.app/TagCollectionView";
 			};
 			name = Debug;
 		};
@@ -505,8 +507,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hundsun.www.TagCollectionViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TagCollectionView.app/TagCollectionView";
 				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TagCollectionView.app/TagCollectionView";
 			};
 			name = Release;
 		};

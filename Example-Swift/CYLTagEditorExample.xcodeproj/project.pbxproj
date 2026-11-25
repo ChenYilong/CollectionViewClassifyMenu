@@ -9,11 +9,11 @@
 /* Begin PBXBuildFile section */
 		0490FE175868491DBA5FE998 /* Pods_CYLTagEditorExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLTagEditorExample.framework */; };
 		0C697595875BE2A91AC63C6F /* CYLFoldStylesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A73F17CF69A5051839D7B23 /* CYLFoldStylesTests.swift */; };
-		4E1A7C2D9B3F5E6A7C8D9E01 /* CYLTagButtonStaticImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1A7C2D9B3F5E6A7C8D9E02 /* CYLTagButtonStaticImageTests.swift */; };
 		1444E0B2A7724572EF905E3C /* CYLConditionWaiting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD431424E37C8D045BE23BE /* CYLConditionWaiting.swift */; };
 		181C75EE35961B7172FFEFE6 /* CYLTagStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78904484E6BC0703606769F4 /* CYLTagStoreTests.swift */; };
 		40F00716DC1B0DA638C6C343 /* CYLTagEditorExample.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 195779B23A13B1FE0BEBC98B /* CYLTagEditorExample.bundle */; };
 		431B8E772A07BE6866D3610F /* CYLTagEditorTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85356B4EE81A8D35E405469B /* CYLTagEditorTestCase.swift */; };
+		4E1A7C2D9B3F5E6A7C8D9E01 /* CYLTagButtonStaticImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1A7C2D9B3F5E6A7C8D9E02 /* CYLTagButtonStaticImageTests.swift */; };
 		54BE765644C6F40DEE726542 /* CYLWindowHosting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6159389886B3EA0857C667F /* CYLWindowHosting.swift */; };
 		79A9175921383FB87C570168 /* CYLTagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CDE4D234A48BA27025704B /* CYLTagStore.swift */; };
 		7FFC7CE0B51A13135C1F03C2 /* Pods_CYLTagEditorExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57BB6E92C5DE5A01D940E2F0 /* Pods_CYLTagEditorExampleTests.framework */; };
@@ -49,13 +49,13 @@
 		2F21882F7FA25A8A547A8929 /* CYLAccessibilityQuerying.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAccessibilityQuerying.swift; sourceTree = "<group>"; };
 		38CDE4D234A48BA27025704B /* CYLTagStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagStore.swift; sourceTree = "<group>"; };
 		4D1F2C5A7C5C5BCDFA029447 /* Pods-CYLTagEditorExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTagEditorExample.release.xcconfig"; path = "Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample.release.xcconfig"; sourceTree = "<group>"; };
+		4E1A7C2D9B3F5E6A7C8D9E02 /* CYLTagButtonStaticImageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagButtonStaticImageTests.swift; sourceTree = "<group>"; };
 		50ED88076C07C90FF1B1A76B /* CYLTagEditorExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLTagEditorExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		57BB6E92C5DE5A01D940E2F0 /* Pods_CYLTagEditorExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLTagEditorExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C6A639BF193E7BA7FB456BF /* CYLTagEditorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagEditorTests.swift; sourceTree = "<group>"; };
 		5FD431424E37C8D045BE23BE /* CYLConditionWaiting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLConditionWaiting.swift; sourceTree = "<group>"; };
 		6627EA4E0F4457A05AD4F525 /* CYLTagListInspecting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListInspecting.swift; sourceTree = "<group>"; };
 		6A73F17CF69A5051839D7B23 /* CYLFoldStylesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLFoldStylesTests.swift; sourceTree = "<group>"; };
-		4E1A7C2D9B3F5E6A7C8D9E02 /* CYLTagButtonStaticImageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagButtonStaticImageTests.swift; sourceTree = "<group>"; };
 		78904484E6BC0703606769F4 /* CYLTagStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagStoreTests.swift; sourceTree = "<group>"; };
 		7E731D0C873CBA73AD9BB6FE /* Pods-CYLTagEditorExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTagEditorExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-CYLTagEditorExampleTests/Pods-CYLTagEditorExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		7F0475DE8547FFAE51A8469E /* CYLViewOverlapInspecting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLViewOverlapInspecting.swift; sourceTree = "<group>"; };
@@ -205,6 +205,7 @@
 				885D3B69EA3BAD459F41048D /* Frameworks */,
 				F1E4C7A124641C6201468B9C /* Resources */,
 				1B05EBA6D227C0F8573B1421 /* [CP] Copy Pods Resources */,
+				E6E80448CFEEFA6E86CCFFB5 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -293,11 +294,13 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-resources.sh",
+				"${PODS_ROOT}/CYLAnimatedItem/CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/CYLTabBarController/CYLTabBarController/Resources/CYLTabBarController.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/CollectionViewClassifyMenu/CYLClassifyMenuResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLClassifyMenuResources.bundle",
 			);
@@ -326,6 +329,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E6E80448CFEEFA6E86CCFFB5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/CYLDeallocBlockExecutor/CYLDeallocBlockExecutor.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CYLDeallocBlockExecutor.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLTagEditorExample/Pods-CYLTagEditorExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F2A0EAAF82B272E15DF53425 /* [CP] Check Pods Manifest.lock */ = {
