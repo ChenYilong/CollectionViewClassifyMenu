@@ -218,11 +218,14 @@ export default function tagFoldTitleAndIconTest() {
       expect(list.layoutSections()[0].headerFoldX).assertEqual(LIST_WIDTH - SIDE_INSET - limit);
     });
 
-    it('aShortHeaderControlKeepsItsOwnWidth', 0, () => {
+    it('theHeaderControlIsCappedAndAWideListLeavesItItsOwnWidth', 0, () => {
       const list = makeList(makeControl(CYLMenuFoldControlPosition.headerTrailing,
         CYLMenuFoldControlContent.titleAndIcon));
-      expect(list.headerFoldSize(false).width).assertEqual(list.foldSize(false).width);
-      expect(list.foldSize(false).width <= LIST_WIDTH * CYLHeaderFoldMaxWidthFraction).assertTrue();
+      const own = list.foldSize(false).width;
+      // At the list's width the control is cut at the fraction of the header.
+      expect(list.headerFoldSize(false).width).assertEqual(Math.min(own, LIST_WIDTH * CYLHeaderFoldMaxWidthFraction));
+      // In a header wide enough for it, it keeps its own width.
+      expect(list.headerFoldSize(false, own / CYLHeaderFoldMaxWidthFraction + 1).width).assertEqual(own);
     });
   });
 }

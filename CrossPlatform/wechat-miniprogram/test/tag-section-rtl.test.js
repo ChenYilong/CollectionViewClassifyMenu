@@ -190,7 +190,7 @@ test('the fold control font is capped: min(size, cap) with a named cap, unchange
 
 test('the component applies the cap to the header, footer and tail fold controls', () => {
   const wxml = fs.readFileSync(path.join(COMPONENT_DIR, 'cyl-tag-list.wxml'), 'utf8')
-  assert.match(wxml, /class="cyl-fold-header" style="color: \{\{foldColor\}\}; \{\{foldFontStyle\}\};"/)
+  assert.match(wxml, /class="cyl-fold-header" style="color: \{\{foldColor\}\}; \{\{foldFontStyle\}\}; \{\{foldHeaderStyle\}\};"/)
   assert.match(wxml, /class="cyl-fold-footer" style="color: \{\{foldColor\}\}; \{\{foldFontStyle\}\};"/)
   const source = fs.readFileSync(path.join(COMPONENT_DIR, 'cyl-tag-list.js'), 'utf8')
   assert.match(source, /foldFontStyle: model\.foldControlFontCSS\(\)/)

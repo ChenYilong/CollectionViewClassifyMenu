@@ -12,7 +12,7 @@ tags: [android, kotlin, api-parity, score]
 | 满分是没有 `TODO` 行，全部是 `TODO` 则为 0。循环（AGENTS.md「Parity tables and the score loop」）：把现有的 Android 代码对应到 `TODO` 行，评分，先在核心库中实现缺失的 Android API（逻辑和名称与 iOS 相同），再在 Android 示例中展示，重新评分，直到 100。评分历史见 [android.md](android.md)。 | Full marks when no row is `TODO`; 0 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO` rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the Android example, score again, until 100. The score history is in [android.md](android.md). |
 
 <!-- bilingual:keep -->
-**Score: 994 / 994 with an Android counterpart = 100.0 / 100.** 评分：994 / 994 个符号有 Android 对应项 = 100.0 / 100。
+**Score: 996 / 999 with an Android counterpart = 99.7 / 100.** 评分：996 / 999 个符号有 Android 对应项 = 99.7 / 100。
 
 <!-- bilingual:keep -->
 | iOS API | 说明 / Description | Android API |
@@ -430,6 +430,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuStyle.resolvedSectionBackgroundColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedSectionBackgroundColor (same name in the Android core)` |
 | `CYLMenuStyle.resolvedHeaderSeparatorColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedHeaderSeparatorColor (same name in the Android core)` |
 | `CYLMenuStyle.headerHeight` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerHeight` |
+| `CYLMenuStyle.headerMaxLines` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerMaxLines (same name in the Android core)` |
 | `CYLMenuStyle.headerFont` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerFont` |
 | `CYLMenuStyle.headerTextColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerTextColor` |
 | `CYLMenuStyle.headerHorizontalInset` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerHorizontalInset` |
@@ -485,6 +486,9 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagTitleMaxLines` | enum, `CYLMenuStyle.swift` | `CYLTagTitleMaxLines (same name in the Android core)` |
 | `CYLTagTitleMaxLines.single` | property, `CYLMenuStyle.swift` | `CYLTagTitleMaxLines.SINGLE` |
 | `CYLTagTitleMaxLines.unlimited` | property, `CYLMenuStyle.swift` | `CYLTagTitleMaxLines.UNLIMITED` |
+| `CYLHeaderTitleMaxLines` | enum, `CYLMenuStyle.swift` | `CYLHeaderTitleMaxLines (same name in the Android core)` |
+| `CYLHeaderTitleMaxLines.single` | property, `CYLMenuStyle.swift` | TODO |
+| `CYLHeaderTitleMaxLines.unlimited` | property, `CYLMenuStyle.swift` | TODO |
 | `CYLTag` | class, `CYLTag.swift` | `com.cyl.classifymenu.CYLTag` |
 | `CYLTag.identifier` | property, `CYLTag.swift` | `CYLTag.identifier` |
 | `CYLTag.title` | property, `CYLTag.swift` | `CYLTag.title` |
@@ -732,6 +736,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuStyleKey.interitemSpacing` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleInteritemSpacing` |
 | `CYLMenuStyleKey.lineSpacing` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleLineSpacing` |
 | `CYLMenuStyleKey.headerHeight` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderHeight` |
+| `CYLMenuStyleKey.headerMaxLines` | property, `CYLTagListView+CYLConfiguration.swift` | TODO |
 | `CYLMenuStyleKey.animationSpeed` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleAnimationSpeed` |
 | `CYLMenuStyleKey.imageSize` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleImageSize` |
 | `CYLMenuStyleKey.animationSize` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleAnimationSize` |
