@@ -8,7 +8,7 @@ depended on with `file:`, at a pinned commit.
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`5a212de9b75c221536647ba2538450d47ade079c`](https://github.com/ChenYilong/CYLTabBarController/tree/5a212de9b75c221536647ba2538450d47ade079c/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-24; was `dea0951e` on the PR #36 line and `b3c87fd1` on the engine line, then `618ac11a`, `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`, `c4a1f8fd`, `7755741d`, `43c9eaa2`, `db883bfa`) |
+| Commit | [`ee750a4636ef7cefb577ad70477649d43cf94bf9`](https://github.com/ChenYilong/CYLTabBarController/tree/ee750a4636ef7cefb577ad70477649d43cf94bf9/CrossPlatform/harmonyos-cyltabbar/cylanimateditem) (2026-11-24; was `dea0951e` on the PR #36 line and `b3c87fd1` on the engine line, then `618ac11a`, `62715829`, `882ece17`, `022da59a`, `c8fee654`, `143fadff`, `c4a1f8fd`, `7755741d`, `43c9eaa2`, `db883bfa`) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditem` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
 | Changes | None. Only this file (`VENDORED.md`) was added; `README.md` is upstream's own (since `62715829`). |
