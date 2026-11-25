@@ -82,7 +82,9 @@ final class CYLFoldStylesViewController: UIViewController {
     /// The demos made with the initialization parameters: the fold control styles, then the title styles.
     func demos() -> [Demo] {
         [
-            // Fold controls.
+            // Fold controls. The first entry is the example default: the tail control, icon only.
+            Demo(title: CYLTagEditorLocalizedString("尾部：仅箭头（示例默认）"), foldControl: Self.fold(.tail, .icon),
+                 titleImage: "arrow.down.right.circle", showsSectionHeaders: false, groups: [1]),
             Demo(title: CYLTagEditorLocalizedString("底部箭头（淘宝评价筛选）"), foldControl: Self.fold(.footer, .icon),
                  titleImage: "star.bubble", showsSectionHeaders: false, groups: [0]),
             Demo(title: CYLTagEditorLocalizedString("底部：文字 + 箭头"), foldControl: Self.fold(.footer, .iconAndTitle),

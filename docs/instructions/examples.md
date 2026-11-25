@@ -34,6 +34,8 @@ means the section of that name here.
     fold control: the last tag of the section is the expand / collapse button and shows only the chevron icon, no More / Less text
     (`foldControl` position `tail`, content `icon`; JSON `"foldControl": {"position": "tail", "content": "icon"}`). Never use the
     header trailing More / Less control in an example.
+  - Other positions and contents (`footer`, `headerTrailing`, `title`, `iconAndTitle`) stay available in the core; only the fold-styles demo screen
+    (`CYLFoldStylesViewController`) shows them, because that screen exists to demo every variant. (Replaces the earlier rule "More / Less, header trailing", 2026-11-25.)
   - A tap on a tag does exactly what a tap on the replaced cell did (open the screen, select the row). The tag does not
     stay selected unless the cell did.
   - A **long press** on a tag shows the secondary line in a small floating callout with an arrow, through the tag list's

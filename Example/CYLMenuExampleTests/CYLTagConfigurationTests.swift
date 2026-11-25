@@ -86,7 +86,9 @@ final class CYLTagConfigurationTests: XCTestCase {
         let view = try CYLTagListView(configurationFile: file)
         XCTAssertEqual(view.selectionMode, .single)
         XCTAssertFalse(view.allowsEmptySelection)
-        XCTAssertEqual(view.foldStyle, .footerChevron)
+        // Example rule: every example tag list folds behind the tail fold control, icon only (`position: tail`, `content: icon`).
+        XCTAssertEqual(view.foldControl.position, .tail)
+        XCTAssertEqual(view.foldControl.content, .icon)
         XCTAssertEqual(view.selectedIndexPaths, [ip(0, 0)])
         XCTAssertEqual(view.style.normalAppearance.cornerRadius, 1000, "A capsule")
         for item in 0..<4 {
