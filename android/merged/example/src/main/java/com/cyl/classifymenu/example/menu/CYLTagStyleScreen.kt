@@ -80,8 +80,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "animation.lottie" to "Lottie 动效图标", "animation.pag" to "PAG 动效图标", "animation.rive" to "Rive 动效图标", "animation.svga" to "SVGA 动效图标",
             "animation.gif" to "GIF 动效图标", "animation.off" to "关闭动效（静态图标）", "animationSpeed" to "设置动效速度 animationSpeed",
             "configuration" to "配置文件 / 字典（map）初始化", "tagCloud" to "标签云：android-tagview 的初始化方式",
-            "sample.tagCloud" to "android-tagview 示例（Swift 版）", "sample.imageTag" to "TagViewGroup 示例：图片标签",
-            "sample.tagContainer" to "AndroidTagView 示例：标签容器", "sample.wordPicker" to "选词填入：涂抹选择填入词",
+            "sample.imageTag" to "TagViewGroup 示例：图片标签", "sample.wordPicker" to "选词填入：涂抹选择填入词",
             "reset" to "重置 reset",
         )
 
@@ -95,7 +94,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "content.iconAndTitle", "content.iconOnly", "content.titleOnly", "layoutCentered", "selectedImage"),
         listOf("backgroundColor.normal", "backgroundColor.selected", "borderColor", "borderWidth", "cornerRadius", "margin"),
         listOf("animation.lottie", "animation.pag", "animation.rive", "animation.svga", "animation.gif", "animation.off", "animationSpeed", "configuration", "tagCloud"),
-        listOf("sample.tagCloud", "sample.imageTag", "sample.tagContainer"),
+        listOf("sample.imageTag"),
         listOf("sample.wordPicker"),
         listOf("reset"),
     )
@@ -117,7 +116,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
      */
     private fun selectAppTab(pageIdentifier: String) {
         val controller = (context as? com.cyl.classifymenu.example.MainActivity)?.tabBarController ?: return
-        val index = listOf("kaede", "lujun", "licrafter").indexOf(pageIdentifier)
+        val index = listOf("licrafter").indexOf(pageIdentifier)
         if (index < 0) return
         // Back to the Menu home first: it shows the app's tab bar again (hidden while a screen is pushed).
         while (navigator.pop()) Unit
@@ -193,9 +192,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "animationSpeed" -> style.animationSpeed = listOf(0.5f, 2f, 1f)[step % 3]
             "configuration" -> { navigator.push(CYLTagConfigurationScreen(context)); return }
             "tagCloud" -> { navigator.push(CYLTagCloudScreen(context)); return }
-            "sample.tagCloud" -> { selectAppTab("kaede"); return }
             "sample.imageTag" -> { selectAppTab("licrafter"); return }
-            "sample.tagContainer" -> { selectAppTab("lujun"); return }
             "sample.wordPicker" -> { navigator.push(CYLWordPickerScreen(context)); return }
             "reset" -> {
                 this.style = demoStyle()

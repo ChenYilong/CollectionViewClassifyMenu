@@ -16,9 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".kaede.KaedeSubActivity" android:label="@string/kaede_title_second" />
-        <activity android:name=".kaede.KaedeListViewActivity" android:label="@string/kaede_title_list_view" />
-        <activity android:name=".kaede.KaedeRecyclerViewActivity" />
         <activity android:name=".licrafter.LicrafterTagEditActivity" />
         <activity android:name=".licrafter.LicrafterTagListActivity" />
     </application>

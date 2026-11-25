@@ -6,12 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.cyl.classifymenu.example.classify.ClassifyMainFragment
 import com.cyl.classifymenu.example.classify.FilterDemoFragment
-import com.cyl.classifymenu.example.tagcollection.TagCollectionDemoFragment
 import com.cyl.classifymenu.example.tageditor.TagEditorFragment
-import com.cyl.classifymenu.example.kaede.KaedeTagViewFragment
 import com.cyl.classifymenu.example.licrafter.LicrafterTagEditFragment
 import com.cyl.classifymenu.example.licrafter.LicrafterTagGroupFragment
-import com.cyl.classifymenu.example.lujun.LujunTagContainerFragment
 import com.cyl.tabbar.CYLTabBarConfiguration
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.CYLTabBarPageRegistry
@@ -66,13 +63,10 @@ class MainActivity : AppCompatActivity() {
                 icons[symbol]?.let { ContextCompat.getDrawable(context, it) }
             }
             val pages = CYLTabBarPageRegistry.sharedRegistry
-            pages.registerPageProvider({ _, _ -> KaedeTagViewFragment() }, "kaede")
-            pages.registerPageProvider({ _, _ -> LujunTagContainerFragment() }, "lujun")
             pages.registerPageProvider({ _, _ -> LicrafterTagGroupFragment() }, "licrafter")
             pages.registerPageProvider({ _, _ -> AboutFragment() }, "about")
             pages.registerPageProvider({ _, _ -> ClassifyMainFragment() }, "classify")
             pages.registerPageProvider({ _, _ -> FilterDemoFragment() }, "filter")
-            pages.registerPageProvider({ _, _ -> TagCollectionDemoFragment() }, "tagcollection")
             pages.registerPageProvider({ _, _ -> TagEditorFragment() }, "editor")
             pages.registerPageProvider({ _, _ -> com.cyl.classifymenu.example.menu.MenuFragment() }, "menu")
             pages.registerPageProvider({ _, _ -> LicrafterTagEditFragment() }, "plus")

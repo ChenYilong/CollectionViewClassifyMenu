@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Copy the three Kotlin libraries into android/merged/library, unchanged except for the R import.
+"""Copy the TagViewGroup Kotlin library into android/merged/library, unchanged except for the R import.
 
-The merged library has one namespace (com.cyl.classifymenu), so the classes of the three original packages
-(me.kaede.tagview, co.lujun.androidtagview, com.licrafter.tagview) import that R. Run it after changing a library in
-android/android-tagview, android/AndroidTagView or android/TagViewGroup; --check reports differences and exits 1.
+The merged library has one namespace (com.cyl.classifymenu), so the classes of the original package
+(com.licrafter.tagview) import that R. Run it after changing the library in android/TagViewGroup; --check reports differences and exits 1.
 """
 import pathlib
 import re
@@ -12,8 +11,6 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 NAMESPACE = "com.cyl.classifymenu"
 SOURCES = [
-    ("android-tagview/library/src/main", "me/kaede/tagview"),
-    ("AndroidTagView/androidtagview/src/main", "co/lujun/androidtagview"),
     ("TagViewGroup/library/src/main", "com/licrafter/tagview"),
 ]
 TARGET = ROOT / "merged/library/src/main"
@@ -21,7 +18,7 @@ TARGET = ROOT / "merged/library/src/main"
 
 def converted(text: str) -> str:
     # An explicit import of an original package's R becomes the merged library's R.
-    text = re.sub(r"^import (me\.kaede\.tagview|co\.lujun\.androidtagview|com\.licrafter\.tagview)\.R$", f"import {NAMESPACE}.R", text, flags=re.M)
+    text = re.sub(r"^import (com\.licrafter\.tagview)\.R$", f"import {NAMESPACE}.R", text, flags=re.M)
     if re.search(r"\bR\.", text) and f"import {NAMESPACE}.R" not in text:
         text = re.sub(r"^(package [\w.]+\n)", rf"\1\nimport {NAMESPACE}.R\n", text, count=1, flags=re.M)
     return text

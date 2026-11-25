@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Traditional Chinese of values/strings.xml, kaede_values.xml and lujun_values.xml (scripts/check-localization-ports.py). -->
+<!-- Traditional Chinese of values/strings.xml (scripts/check-localization-ports.py). -->
 <resources>
     <string name="about_title">關於</string>
     <string name="about_text">本 App 把三個 Android 標籤庫（均為 Kotlin）合併為一個庫（android/merged/library），每個範例是由設定檔建立的 CYLTabBarController 中的一個分頁。\n\n• TagView：kaedea/android-tagview（b546a5f），Apache License 2.0，轉寫為 Kotlin。Copyright (c) kaedea。\n\n• TagContainer：whilu/AndroidTagView（75a3bba），Apache License 2.0，轉寫為 Kotlin。Copyright 2015 lujun。\n\n• TagViewGroup：shellljx/TagViewGroup（befcd9b）的公開 API，用 Kotlin 重新實作；未複製程式碼（原專案為 GPL-3.0）。\n\n• 加號按鈕（New）開啟 TagViewGroup 編輯器。\n\n標籤列：Android 版 CYLTabBarController，按 commit 檢出（android/merged/gradle.properties）。</string>
-    <string name="kaede_action_github">GitHub 專案</string>
-    <string name="kaede_action_settings">設定</string>
-    <string name="lujun_action_settings">設定</string>
 </resources>
