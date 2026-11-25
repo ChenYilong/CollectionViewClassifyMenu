@@ -524,7 +524,7 @@ export struct CYLTagListView {
     const m = this.model;
     const control = m.displayedFoldControl;
     const style = CYLTagFoldMetrics.style(control, m.style.resolvedFoldControlColor(onBand));
-    const r = this.foldItem(control, style, frame.expanded, m.foldSize(frame.expanded), frame.section);
+    const r = this.foldItem(control, style, frame.expanded, m.headerFoldSize(frame.expanded), frame.section);
     this.finishKey(r, 's');
     return r;
   }
