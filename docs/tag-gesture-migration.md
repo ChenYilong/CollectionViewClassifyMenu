@@ -51,9 +51,27 @@ Consumers outside ClassifyMenu: CYLSearchViewController (iOS, contact tags: uses
 `classifymenu` and the engine modules; its mini program part has to be checked before the component is removed), CYLTabBarController
 (examples and tests of `CYLAnimatedItemView` only).
 
-## Decisions only the owner can make
+## Other code like cyl-tag-cloud (search of 2026-11-25)
 
-1. Push the baseline first (step 0)?
-2. On HarmonyOS and the mini program the tag is not an item view: "move the gesture into the item view" means making the whole tag one
-   (large), or giving the item view an interaction API that the tag's container wires to the same strategy. Which?
-3. Remove `cyl-tag-cloud` at once, or keep a deprecated shim for one release?
+Searched every platform of this repository for a second implementation of a tag container next to the tag list. Result:
+
+| Candidate | Platforms | Lines | Reuses the tag list? | Verdict |
+| --- | --- | --- | --- | --- |
+| `cyl-tag-cloud` | mini program | 2014 (+ 6 test files, 6 sample pages) | no | **duplicate: merge into `cyl-tag-list`, then delete** (owner decided: delete at once) |
+| `co.lujun.androidtagview.TagContainerLayout` / `TagView` (the AndroidTagView port inside the library; `android/AndroidTagView` is its upstream project and sample) | Android | 1538 + 896 | no (`CYLTagListView` refers to it once; the lujun example uses it) | **duplicate container: candidate** |
+| `CYLTagView` (the TagCollectionView port: sections of tags with a More / Less header; `TagCollectionView` is a separate Xcode module on iOS, with `CYLTagGroup`) | iOS 292, Android 435, HarmonyOS 394 | 0-1 refs | **duplicate sectioned list: candidate** |
+| `CYLImageTagGroupView` / `CYLImageTagView` (the TagViewGroup port: tags placed on a picture) | iOS 1249, Android 966, HarmonyOS 903, mini program `cyl-tag-image` | 0 refs | **not a duplicate**: a different component (tags positioned over an image, not a flowing list). Keep. |
+| `CYLClassifyMenuViewController`, `CYLMultipleFilterController` | iOS, Android, HarmonyOS | 297-641 | yes, they are built on `CYLTagListView` / `CYLTagButton` | not duplicates. Keep. |
+| React Native, Flutter | react-native, flutter | - | wrap the native tag list | nothing to merge or delete |
+
+Consumers: CYLSearchViewController's mini program pins `cyl-tag-list-miniprogram` and uses `cyl-tag-cloud` only in example pages, tests and one comment: it moves them to `cyl-tag-list` when the merge lands (no objection). CYLTabBarController and CYLTableViewPlaceHolder do not use the cloud.
+
+## Decisions
+
+Answered by the owner (2026-11-25): push the baseline first (done: PR #37 here, #38 and #39 in CYLTableViewPlaceHolder); the HarmonyOS and
+mini program tag gets the interaction API wired by its container to the same strategy (not a whole tag as an item view); remove `cyl-tag-cloud`
+at once, without a shim.
+
+Open: delete the Android `TagContainerLayout` / `TagView` port and `android/AndroidTagView`, and the `CYLTagView` (TagCollectionView) port on
+iOS, Android and HarmonyOS, as the same policy? They are public API of this library and upstream ports with attribution; deleting them breaks
+anyone who calls them. The image tag groups and the classify / filter controllers stay.
