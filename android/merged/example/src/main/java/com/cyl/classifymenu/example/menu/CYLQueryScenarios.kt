@@ -104,7 +104,7 @@ class CYLQueryScenariosScreen(private val context: Context, private val navigato
     private var tableCounts: List<Pair<String, Int>> = emptyList()
 
     /** The one tag list of the screen. */
-    val tagList = CYLTagListView(context, CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon))
+    val tagList = CYLTagListView(context, CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.TAIL, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon))
     override val view: View = tagList
 
     companion object {
