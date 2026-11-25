@@ -1,5 +1,5 @@
 /**
- * cyl-tag-cloud's renaming in editing mode, item ids and the header clear button (iOS 990cf115, cea04255, 3af1b7cd;
+ * cyl-tag-list's flat tags: renaming in editing mode, item ids and the header clear button (iOS 990cf115, cea04255, 3af1b7cd;
  * Android CYLTagListRenamingTest; HarmonyOS TagListEditing.test.ets), in a small stand-in of the Mini Program runtime.
  */
 const test = require('node:test');
@@ -35,11 +35,11 @@ function setPath(target, keyPath, value) {
   node[parts[parts.length - 1]] = value;
 }
 
-/** Loads cyl-tag-cloud and makes an instance with `properties`. */
+/** Loads cyl-tag-list and makes an instance with `properties`. */
 function mountCloud(properties) {
   let definition;
   global.Component = (def) => { definition = def; };
-  const file = path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js');
+  const file = path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.js');
   delete require.cache[require.resolve(file)];
   require(file);
   delete global.Component;
@@ -207,7 +207,7 @@ test('the header clear button is built in, read with the section title', () => {
 
 test('a touch on the × or the pencil still makes a tap: mut-bind, no catchtouchstart (the × did nothing)', () => {
   const fs = require('node:fs');
-  const wxml = fs.readFileSync(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.wxml'), 'utf8');
+  const wxml = fs.readFileSync(path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.wxml'), 'utf8');
   // catchtouchstart keeps WeChat from making a tap of the touches: the handlers never ran on a device or in DevTools.
   assert.doesNotMatch(wxml, /catchtouchstart/, 'no catchtouchstart anywhere in the cloud');
   // The item and every icon use mut-bind, so a touch on an icon does not press (highlight) the tag.

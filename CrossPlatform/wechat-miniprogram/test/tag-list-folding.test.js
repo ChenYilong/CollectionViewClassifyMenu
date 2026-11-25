@@ -1,5 +1,5 @@
 /**
- * cyl-tag-cloud folding (iOS `defaultVisibleRows` + `CYLMenuFoldControl` tail): the fold control is the last tag of
+ * cyl-tag-list (flat tags) folding (iOS `defaultVisibleRows` + `CYLMenuFoldControl` tail): the fold control is the last tag of
  * the last visible row, the items that leave it no room are hidden, a tap unfolds, editing shows every tag.
  */
 const test = require('node:test');
@@ -52,11 +52,11 @@ function setPath(target, keyPath, value) {
   node[parts[parts.length - 1]] = value;
 }
 
-/** cyl-tag-cloud with a stand-in layout: each tag `widths[i]` wide in rows of 300 px, the control 44 px. */
+/** cyl-tag-list (flat tags) with a stand-in layout: each tag `widths[i]` wide in rows of 300 px, the control 44 px. */
 function mountCloud(properties, widths) {
   let definition;
   global.Component = (def) => { definition = def; };
-  const file = path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js');
+  const file = path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.js');
   delete require.cache[require.resolve(file)];
   require(file);
   delete global.Component;
@@ -101,7 +101,7 @@ function mountCloud(properties, widths) {
   return instance;
 }
 
-test('cyl-tag-cloud folds to defaultVisibleRows with the control as the last tag, unfolds and shows all while editing', () => {
+test('cyl-tag-list (flat tags) folds to defaultVisibleRows with the control as the last tag, unfolds and shows all while editing', () => {
   const widths = [100, 100, 80, 100, 120, 90, 90, 60];
   const cloud = mountCloud({
     tags: widths.map((w, i) => model.makeTag(`T${i}`)),

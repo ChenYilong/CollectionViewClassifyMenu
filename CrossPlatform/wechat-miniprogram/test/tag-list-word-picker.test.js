@@ -1,5 +1,5 @@
 /**
- * cyl-tag-cloud's word picker (iOS 选词填入, cf5d9f7e / 251131c5): one cell per character, 9 equal cells per row, the
+ * cyl-tag-list's flat tags: word picker (iOS 选词填入, cf5d9f7e / 251131c5): one cell per character, 9 equal cells per row, the
  * picked text in order, and a smear driven by touch events (the touched-down tag anchors it).
  */
 const test = require('node:test');
@@ -36,11 +36,11 @@ function setPath(target, keyPath, value) {
   node[parts[parts.length - 1]] = value;
 }
 
-/** cyl-tag-cloud with a stand-in layout: 40 x 40 cells, 9 per row, 46 px apart. */
+/** cyl-tag-list (flat tags) with a stand-in layout: 40 x 40 cells, 9 per row, 46 px apart. */
 function mountCloud(properties) {
   let definition;
   global.Component = (def) => { definition = def; };
-  const file = path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js');
+  const file = path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.js');
   delete require.cache[require.resolve(file)];
   require(file);
   delete global.Component;
@@ -124,10 +124,10 @@ test('reorderingchange and smearingchange bubble and are composed, so an ancesto
   // A drag (long press, then the end), and a cancelled one.
   cloud.setData({ allowsSmearSelection: false });
   cloud.onTouchStart({ currentTarget: { dataset: { index: 1 } }, touches: [touchAt(cloud, 1)] });
-  cloud.onLongPress({ currentTarget: { dataset: { index: 1 } } });
+  cloud.onItemLongPress({ currentTarget: { dataset: { index: 1 } } });
   cloud.onTouchEnd();
   cloud.onTouchStart({ currentTarget: { dataset: { index: 2 } }, touches: [touchAt(cloud, 2)] });
-  cloud.onLongPress({ currentTarget: { dataset: { index: 2 } } });
+  cloud.onItemLongPress({ currentTarget: { dataset: { index: 2 } } });
   cloud.onTouchCancel();
   const gestures = cloud.events.filter((e) => e.name === 'reorderingchange' || e.name === 'smearingchange');
   assert.deepEqual(gestures.map((e) => `${e.name} ${e.detail.reordering ?? e.detail.smearing}`),

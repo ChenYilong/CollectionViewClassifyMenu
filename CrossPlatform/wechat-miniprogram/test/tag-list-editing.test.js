@@ -1,5 +1,5 @@
 /**
- * cyl-tag-cloud's editing mode and cache, and the sixth container's options (iOS d6a94ce9 and 00760142; Android
+ * cyl-tag-list's flat tags: editing mode and cache, and the sixth container's options (iOS d6a94ce9 and 00760142; Android
  * CYLTagListEditingTest; HarmonyOS TagListEditing.test.ets): the store of every policy (in memory without `wx`, as in
  * node), delete indicators on every enabled tag while editing, the cross image, the elevation and wrapping titles.
  */

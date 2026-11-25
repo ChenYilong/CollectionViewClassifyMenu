@@ -1,4 +1,4 @@
-// The tag cloud model (components/cyl-tag-list/tag-model.js): the core's CYLMenuStyle presets, CYLTag, CYLTagColors,
+// The tag cloud model (cyl-tag-list/tag-model.js): the core's CYLMenuStyle presets, CYLTag, CYLTagColors,
 // CYLTagButton metrics and CYLTagListView's rows and selection (node --test).
 const test = require('node:test');
 const assert = require('node:assert/strict');

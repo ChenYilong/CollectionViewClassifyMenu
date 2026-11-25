@@ -1,5 +1,5 @@
 /**
- * The model of `cyl-tag-cloud`: the core's CYLTagListView filled the android-tagview way (`addTag(_:)`,
+ * The model of `cyl-tag-list`'s flat tags (the `tags` property): the core's CYLTagListView filled the android-tagview way (`addTag(_:)`,
  * `addTags(withTitles:)`, `CYLTag`), with the AndroidTagView container options (`colorTheme`, `allowsTapping`,
  * `removesItemsOnDelete`, `allowsReordering`, `defaultTagImage`, container border). It ports:
  *
@@ -663,7 +663,7 @@ function renderTag(tag, index, context) {
   if (shadows.length) parts.push(`box-shadow: ${shadows.join(', ')}`);
 
   const spacing = style.imageTitleSpacing;
-  // Editing (`isEditing`): every enabled tag shows its delete indicator, the cloud being one editable section.
+  // Editing (`isEditing`): every enabled tag shows its delete indicator, the flat tags being one editable section.
   const deletable = (editing || !!tag.isDeletable) && enabled;
   const leading = style.deleteIndicatorPlacement === 'leading';
   let deleteIndicator = null;
