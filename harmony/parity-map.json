@@ -951,62 +951,167 @@
     "CYLTagListView.selectedText": "`CYLTagListState.selectedText`",
     "CYLTagListView.selectItems(from:through:)": "`CYLTagListState.selectItemsFrom(start, end)`",
     "CYLMenuDelegate.menu(_:didChangeReordering:)": "`CYLMenuDelegate.menuDidChangeReordering?(menu, reordering)` (and `CYLMenuGestureState.shared`)",
-    "CYLMenuDelegate.menu(_:didChangeSmearing:)": "`CYLMenuDelegate.menuDidChangeSmearing?(menu, smearing)` (and `CYLMenuGestureState.shared`)"
+    "CYLMenuDelegate.menu(_:didChangeSmearing:)": "`CYLMenuDelegate.menuDidChangeSmearing?(menu, smearing)` (and `CYLMenuGestureState.shared`)",
+    "CYLMenuDataSource.menuSubtitleForItem(at:)": "`CYLMenuDataSource.menuSubtitleForItem`",
+    "CYLTagBackgroundStyle": "`enum CYLTagBackgroundStyle`",
+    "CYLTagBackgroundStyle.flat": "`CYLTagBackgroundStyle.flat`",
+    "CYLTagBackgroundStyle.liquidGlass": "`CYLTagBackgroundStyle.liquidGlass`",
+    "CYLMenuStyle.titleMaxLines": "`CYLMenuStyle.titleMaxLines`",
+    "CYLMenuStyle.backgroundStyle": "`CYLMenuStyle.backgroundStyle`",
+    "CYLMenuStyle.resolvedBackgroundStyle": "`CYLMenuStyle.resolvedBackgroundStyle()`",
+    "CYLMenuStyle.minimumTagSize": "`CYLMenuStyle.minimumTagSize`",
+    "CYLMenuStyle.sectionStyle": "`CYLMenuStyle.sectionStyle`",
+    "CYLMenuStyle.sectionBackgroundColor": "`CYLMenuStyle.sectionBackgroundColor`",
+    "CYLMenuStyle.sectionBackgroundStyle": "`CYLMenuStyle.sectionBackgroundStyle`",
+    "CYLMenuStyle.resolvedSectionBackgroundStyle": "`CYLMenuStyle.resolvedSectionBackgroundStyle()`",
+    "CYLMenuStyle.sectionCornerRadius": "`CYLMenuStyle.sectionCornerRadius`",
+    "CYLMenuStyle.sectionContentInsets": "`CYLMenuStyle.sectionContentInsets`",
+    "CYLMenuStyle.headerBackgroundColor": "`CYLMenuStyle.headerBackgroundColor`",
+    "CYLMenuStyle.headerCornerRadius": "`CYLMenuStyle.headerCornerRadius`",
+    "CYLMenuStyle.headerContentInsets": "`CYLMenuStyle.headerContentInsets`",
+    "CYLMenuStyle.headerSeparatorStyle": "`CYLMenuStyle.headerSeparatorStyle`",
+    "CYLMenuStyle.headerSeparatorColor": "`CYLMenuStyle.headerSeparatorColor`",
+    "CYLMenuStyle.headerSeparatorThickness": "`CYLMenuStyle.headerSeparatorThickness`",
+    "CYLMenuStyle.headerSeparatorInsets": "`CYLMenuStyle.headerSeparatorInsets`",
+    "CYLMenuStyle.resolvedBackgroundColor": "`CYLMenuStyle.resolvedBackgroundColor()`",
+    "CYLMenuStyle.resolvedSectionBackgroundColor": "`CYLMenuStyle.resolvedSectionBackgroundColor()`",
+    "CYLMenuStyle.resolvedHeaderSeparatorColor": "`CYLMenuStyle.resolvedHeaderSeparatorColor()`",
+    "CYLMenuStyle.tintColor": "`CYLMenuStyle.tintColor`",
+    "CYLMenuStyle.resolvedTintColor(onHeaderBand:)": "`CYLMenuStyle.resolvedTintColor(onBand)`",
+    "CYLMenuStyle.resolvedHeaderTextColor": "`CYLMenuStyle.resolvedHeaderTextColor(onBand)`",
+    "CYLMenuStyle.resolvedFoldControlColor(inHeader:)": "`CYLMenuStyle.resolvedFoldControlColor(onBand)`",
+    "CYLMenuStyle.resolvedMoreButtonColor": "`CYLMenuStyle.resolvedMoreButtonColor(onBand)`",
+    "CYLSectionStyle": "`enum CYLSectionStyle`",
+    "CYLSectionStyle.plain": "`CYLSectionStyle.plain`",
+    "CYLSectionStyle.insetGrouped": "`CYLSectionStyle.insetGrouped`",
+    "CYLHeaderSeparatorStyle": "`enum CYLHeaderSeparatorStyle`",
+    "CYLHeaderSeparatorStyle.none": "`CYLHeaderSeparatorStyle.none`",
+    "CYLHeaderSeparatorStyle.line": "`CYLHeaderSeparatorStyle.line`",
+    "CYLTintContrast": "`CYLMenuStyle.tintOn(background)` with `CYLMenuColorLuminance` (core/CYLMenuColor.ets)",
+    "CYLTintContrast.static luminanceThreshold": "`CYLTintLuminanceThreshold`",
+    "CYLSectionStyleMetrics": "`class CYLSectionStyleMetrics`",
+    "CYLSectionStyleMetrics.static cardCornerRadius": "`CYLSectionStyleMetrics.cardCornerRadius`",
+    "CYLSectionStyleMetrics.static cardPadding": "`CYLSectionStyleMetrics.cardPadding`",
+    "CYLSectionStyleMetrics.static headerBandPadding": "`CYLSectionStyleMetrics.headerBandPadding`",
+    "CYLSectionStyleMetrics.static separatorThickness": "`CYLSectionStyleMetrics.separatorThickness`",
+    "CYLSectionStyleColors": "`class CYLSectionStyleColors`",
+    "CYLSectionStyleColors.static card": "`CYLSectionStyleColors.card`",
+    "CYLSectionStyleColors.static headerBand": "`CYLSectionStyleColors.headerBand`",
+    "CYLSectionStyleColors.static groupedBackground": "`CYLSectionStyleColors.groupedBackground`",
+    "CYLSectionStyleColors.static separator": "`CYLSectionStyleColors.separator`",
+    "CYLTagTitleMaxLines": "`class CYLTagTitleMaxLines`",
+    "CYLTagTitleMaxLines.static single": "`CYLTagTitleMaxLines.single`",
+    "CYLTagTitleMaxLines.static unlimited": "`CYLTagTitleMaxLines.unlimited`",
+    "CYLTag.subtitle": "`CYLTag.subtitle`",
+    "CYLTagDataSource.menuSubtitleForItem(at:)": "`CYLTagDataSource.menuSubtitleForItem`",
+    "CYLTagButton.liquidGlassView": "N/A: a UIKit view handle (the UIView behind the tag); HarmonyOS draws the glass with the core's liquid glass modifier on CYLAnimatedItemView (`itemBackgroundStyle`), there is no view to hand out",
+    "CYLTagListKey.static longPressAction": "`CYLTagListKey.longPressAction`",
+    "CYLTagItemKey.static subtitle": "`CYLTagItemKey.subtitle`",
+    "CYLMenuStyleKey.static titleMaxLines": "`CYLMenuStyleKey.titleMaxLines`",
+    "CYLMenuStyleKey.static sectionStyle": "`CYLMenuStyleKey.sectionStyle`",
+    "CYLMenuStyleKey.static sectionBackgroundColor": "`CYLMenuStyleKey.sectionBackgroundColor`",
+    "CYLMenuStyleKey.static sectionBackgroundStyle": "`CYLMenuStyleKey.sectionBackgroundStyle`",
+    "CYLMenuStyleKey.static sectionCornerRadius": "`CYLMenuStyleKey.sectionCornerRadius`",
+    "CYLMenuStyleKey.static sectionContentInsets": "`CYLMenuStyleKey.sectionContentInsets`",
+    "CYLMenuStyleKey.static headerBackgroundColor": "`CYLMenuStyleKey.headerBackgroundColor`",
+    "CYLMenuStyleKey.static headerCornerRadius": "`CYLMenuStyleKey.headerCornerRadius`",
+    "CYLMenuStyleKey.static headerContentInsets": "`CYLMenuStyleKey.headerContentInsets`",
+    "CYLMenuStyleKey.static headerSeparatorStyle": "`CYLMenuStyleKey.headerSeparatorStyle`",
+    "CYLMenuStyleKey.static headerSeparatorColor": "`CYLMenuStyleKey.headerSeparatorColor`",
+    "CYLMenuStyleKey.static headerSeparatorThickness": "`CYLMenuStyleKey.headerSeparatorThickness`",
+    "CYLMenuStyleKey.static headerSeparatorInsets": "`CYLMenuStyleKey.headerSeparatorInsets`",
+    "CYLMenuStyleKey.static backgroundStyle": "`CYLMenuStyleKey.backgroundStyle`",
+    "CYLMenuStyleKey.static minimumTagSize": "`CYLMenuStyleKey.minimumTagSize`",
+    "CYLMenuStyleKey.static tintColor": "`CYLMenuStyleKey.tintColor`",
+    "CYLTagListView.longPressAction": "`CYLTagListState.longPressAction`",
+    "CYLTagListView.contentColumn(inSection:)": "`CYLTagListState.contentColumn(section)`",
+    "CYLTagListView.tagColumn(inSection:)": "`CYLTagListState.tagColumn(section)`",
+    "reportLongPress(at:)": "`CYLTagListState.reportLongPress(indexPath)`",
+    "CYLTagListView.scrollViewWillBeginDragging(_:)": "`CYLTagListView` `onScrollStart` dismisses the callout",
+    "CYLTagListView.subtitleForItem(at:)": "`CYLTagListState.subtitleForItem(indexPath)`",
+    "CYLTagListView.showCallout(_:at:)": "`CYLTagListState.showCallout(text, indexPath)`",
+    "CYLTagListView.dismissCallout()": "`CYLTagListState.dismissCallout()`",
+    "CYLTagListView.canReorderItem(at:)": "`CYLTagListState.canReorderItem(indexPath)`",
+    "CYLTagListView.beginReordering(at:)": "`CYLTagListState.beginReordering(indexPath)`",
+    "CYLTagListView.endReordering(destination:moved:)": "`CYLTagListState.endReordering(destination, moved)`",
+    "CYLTagListView.cancelReordering()": "`CYLTagListState.cancelReordering()`",
+    "CYLTagLongPressHost": "`interface CYLTagLongPressHost`",
+    "CYLTagLongPressHost.subtitleForItem(at:)": "`CYLTagLongPressHost.subtitleForItem`",
+    "CYLTagLongPressHost.showCallout(_:at:)": "`CYLTagLongPressHost.showCallout`",
+    "CYLTagLongPressHost.dismissCallout()": "`CYLTagLongPressHost.dismissCallout`",
+    "CYLTagLongPressHost.canReorderItem(at:)": "`CYLTagLongPressHost.canReorderItem`",
+    "CYLTagLongPressHost.beginReordering(at:)": "`CYLTagLongPressHost.beginReordering`",
+    "CYLTagLongPressHost.endReordering(destination:moved:)": "`CYLTagLongPressHost.endReordering`",
+    "CYLTagLongPressHost.cancelReordering()": "`CYLTagLongPressHost.cancelReordering`",
+    "CYLTagLongPressHost.reportLongPress(at:)": "`CYLTagLongPressHost.reportLongPress`",
+    "CYLTagLongPressAction": "`interface CYLTagLongPressAction`",
+    "CYLTagLongPressAction.canBegin(host:at:)": "`canBegin(host, indexPath)`",
+    "CYLTagLongPressAction.begin(host:at:)": "`begin(host, indexPath)`",
+    "CYLTagLongPressAction.end(host:destination:moved:)": "`end(host, destination, moved)`",
+    "CYLTagLongPressAction.cancel(host:)": "`cancel(host)`",
+    "CYLTagLongPressActions": "`class CYLTagLongPressActions`",
+    "CYLTagLongPressActions.static reorder": "`CYLTagLongPressActions.reorder`",
+    "CYLTagLongPressActions.static report": "`CYLTagLongPressActions.report`",
+    "CYLTagLongPressActions.static callout": "`CYLTagLongPressActions.callout`",
+    "CYLTagLongPressActions.static none": "`CYLTagLongPressActions.none`",
+    "CYLTagLongPressActions.static handler()": "`CYLTagLongPressActions.handler(handler)`",
+    "CYLTagLongPressActions.static first(_:)": "`CYLTagLongPressActions.first(actions)`",
+    "CYLTagLongPressActions.static makeDefault()": "`CYLTagLongPressActions.makeDefault()`"
   },
   "demos": [
     {
       "ios": "Root tab bar (CYLExampleAppDelegate.makeRootTabBarController)",
-      "shows": "场景一：评价筛选, 场景二：搜索分类, the plus button (查询筛选), 样式, 动效",
-      "harmony": "`pages/Index.ets` Index: 场景一：评价筛选, 场景二：搜索分类, plus button, 样式, 动效"
+      "shows": "\u573a\u666f\u4e00\uff1a\u8bc4\u4ef7\u7b5b\u9009, \u573a\u666f\u4e8c\uff1a\u641c\u7d22\u5206\u7c7b, the plus button (\u67e5\u8be2\u7b5b\u9009), \u6837\u5f0f, \u52a8\u6548",
+      "harmony": "`pages/Index.ets` Index: \u573a\u666f\u4e00\uff1a\u8bc4\u4ef7\u7b5b\u9009, \u573a\u666f\u4e8c\uff1a\u641c\u7d22\u5206\u7c7b, plus button, \u6837\u5f0f, \u52a8\u6548"
     },
     {
       "ios": "CYLProductViewController",
-      "shows": "宝贝详情: the product, 宝贝评价(10), the keyword preview, 查看更多评价",
+      "shows": "\u5b9d\u8d1d\u8be6\u60c5: the product, \u5b9d\u8d1d\u8bc4\u4ef7(10), the keyword preview, \u67e5\u770b\u66f4\u591a\u8bc4\u4ef7",
       "harmony": "`demos/reviews/CYLProductPage` (tab 1 root)"
     },
     {
       "ios": "CYLReviewListViewController",
-      "shows": "The review filter (multiple choice, 全部 exclusive, folded, footer chevron); memory / network / database modes; the review cells",
+      "shows": "The review filter (multiple choice, \u5168\u90e8 exclusive, folded, footer chevron); memory / network / database modes; the review cells",
       "harmony": "`demos/reviews/CYLReviewListPage` (memory / network 0.6 s / database on cyl_places.sqlite)"
     },
     {
       "ios": "CYLSearchHomeViewController",
-      "shows": "脉脉搜索 and the search field button",
+      "shows": "\u8109\u8109\u641c\u7d22 and the search field button",
       "harmony": "`demos/search/CYLSearchHomePage` (tab 2 root)"
     },
     {
       "ios": "CYLSearchCategoryViewController",
-      "shows": "The search page with its own category tab bar (找人/动态/八卦/职位)",
-      "harmony": "`demos/search/CYLSearchCategoryPage` (category tab bar, 职位 sidebar, 行业 menu)"
+      "shows": "The search page with its own category tab bar (\u627e\u4eba/\u52a8\u6001/\u516b\u5366/\u804c\u4f4d)",
+      "harmony": "`demos/search/CYLSearchCategoryPage` (category tab bar, \u804c\u4f4d sidebar, \u884c\u4e1a menu)"
     },
     {
       "ios": "CYLSearchCategoryPageViewController",
-      "shows": "One category page: the 职位 sidebar and 行业 menu",
+      "shows": "One category page: the \u804c\u4f4d sidebar and \u884c\u4e1a menu",
       "harmony": "`CYLSearchCategoryPage.page()` (each category tab)"
     },
     {
       "ios": "CYLSearchDiscoverViewController",
-      "shows": "最近搜索 folded to two rows with the chevron as the last tag, 发现 two per row, 换一批",
-      "harmony": "`demos/search/CYLSearchDiscoverPage` (最近搜索, 发现, 换一批)"
+      "shows": "\u6700\u8fd1\u641c\u7d22 folded to two rows with the chevron as the last tag, \u53d1\u73b0 two per row, \u6362\u4e00\u6279",
+      "harmony": "`demos/search/CYLSearchDiscoverPage` (\u6700\u8fd1\u641c\u7d22, \u53d1\u73b0, \u6362\u4e00\u6279)"
     },
     {
       "ios": "CYLQueryScenariosViewController",
-      "shows": "查询筛选: the filter demos by scenario and the database's row counts",
+      "shows": "\u67e5\u8be2\u7b5b\u9009: the filter demos by scenario and the database's row counts",
       "harmony": "`demos/menu/CYLQueryScenariosPage` (plus button)"
     },
     {
       "ios": "CYLMenuLinkageViewController",
-      "shows": "菜单选择 · 数据库联动: the classify menu, the multiple filter panel, the SQL and the rows; saved selections",
+      "shows": "\u83dc\u5355\u9009\u62e9 \u00b7 \u6570\u636e\u5e93\u8054\u52a8: the classify menu, the multiple filter panel, the SQL and the rows; saved selections",
       "harmony": "`demos/menu/CYLMenuLinkagePage` (classify menu, multiple filter, SQL, saved selections)"
     },
     {
       "ios": "CYLTagStyleDemoViewController",
       "shows": "The preview and the style actions with their values",
-      "harmony": "`demos/menu/CYLTagStylePage` (样式 tab)"
+      "harmony": "`demos/menu/CYLTagStylePage` (\u6837\u5f0f tab)"
     },
     {
       "ios": "CYLTagAnimationDemoViewController",
-      "shows": "The animation sections, speed slider (0.25×–4×), loop switch, Play all",
+      "shows": "The animation sections, speed slider (0.25\u00d7\u20134\u00d7), loop switch, Play all",
       "harmony": "`demos/menu/CYLTagAnimationPage` (Lottie, PAG, Rive, GIF and SVGA through CYLTabBarController's CYLAnimatedItemView, with the engines and players the example registers in entry/src/main/ets/animation; speed slider, loop switch, Play all; Rive without speed, as the engine has none)"
     },
     {
@@ -1051,7 +1156,7 @@
     },
     {
       "ios": "CYLImageTagEditViewController",
-      "shows": "Edit image tags: drag, turn, delete, 创建, 保存",
+      "shows": "Edit image tags: drag, turn, delete, \u521b\u5efa, \u4fdd\u5b58",
       "harmony": "`demos/samples/CYLImageTagEditPage`"
     },
     {
@@ -1076,6 +1181,7 @@
     "2026-11-16: feature 8, the example: 21 of 22 iOS screens (demos/shell, reviews, search, menu, samples; root tab bar in pages/Index.ets); the library now draws menuAccessoryViewForSection. CYLTagAnimationDemoViewController stays TODO (PAG / Rive engines, GIF speed and loop). Compile only. Score 793 / 807 = 98.3.",
     "2026-11-16: four accessibility-action rows N/A (ArkUI through API 21 has only ACCESSIBILITY_CLICK); the image tag dot's accessibility node and move step mapped. Score 799 / 807 = 99.0.",
     "2026-11-16: feature 9, animated icons with Lottie (@ohos/lottie 2.0.38), PAG (@tencent/libpag 4.4.31, the newest for API 12), Rive (@ohos/rive 1.0.4) and GIF (ImageKit frames on our timer), the animation screen, and the view handles (titleView, titleLabel, tagButton(at:), cells, supplementary views, imageView, animationView). Full marks: no TODO left. Compile only; device checks pending. Score 807 / 807 = 100.0.",
-    "2026-11-17: the animated icon moved onto CYLTabBarController's CYLAnimatedItemView (module cylanimateditem, vendored at commit 57a527e); the library depends on no animation library, the example registers Lottie, PAG, Rive, SVGA and GIF. Same rows, new counterparts. Compile only. Score 807 / 807 = 100.0."
+    "2026-11-17: the animated icon moved onto CYLTabBarController's CYLAnimatedItemView (module cylanimateditem, vendored at commit 57a527e); the library depends on no animation library, the example registers Lottie, PAG, Rive, SVGA and GIF. Same rows, new counterparts. Compile only. Score 807 / 807 = 100.0.",
+    "2026-11-25: the iOS section style (insetGrouped cards, header band and divider, tint with its luminance contrast, Liquid Glass card), the tag Liquid Glass background, titleMaxLines, minimumTagSize, subtitles and the long-press action protocol were already on HarmonyOS under their own names: 104 rows mapped to their counterparts (CYLTintContrast -> CYLMenuStyle.tintOn / CYLMenuColorLuminance / CYLTintLuminanceThreshold; tagColumn / contentColumn -> CYLTagListState), CYLTagButton.liquidGlassView N/A (UIKit view handle). No new code. Compile only. Score 1055 / 1055 = 100.0."
   ]
 }
