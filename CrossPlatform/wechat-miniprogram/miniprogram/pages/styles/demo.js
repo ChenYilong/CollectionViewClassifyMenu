@@ -99,6 +99,8 @@ const APPEARANCES = ['normal', 'selected', 'disabled'];
 /** CYLTagStyleDemoViewController.demoStyle(). */
 function demoStyle() {
   return {
+    // The preview is a flat strip of glass tags, not a card: opt out of the default rounded section card.
+    sectionStyle: model.SECTION_STYLES.plain,
     backgroundStyle: 'liquidGlass',
     normal: { iconColor: 'systemBlue' },
     selected: { iconColor: '#FFFFFF', backgroundColor: 'systemBlue', borderColor: 'systemBlue' },

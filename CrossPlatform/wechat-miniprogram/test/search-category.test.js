@@ -76,6 +76,9 @@ test('a section is a cyl-tag-list in the Maimai look whose taps select nothing',
   assert.equal(style.normal.cornerRadius, 2);
   assert.equal(style.normal.borderColor, '#CCCCCC');
   assert.equal(style.normal.textColor, '#595959');
+  // The page draws the headers and the background: the lists opt out of the default rounded section card.
+  assert.equal(style.sectionStyle, 'plain');
+  assert.equal(tagModel.sectionLayout(tagModel.normalize(configuration).sections[0].style).cardStyle, undefined);
   assert.deepEqual(model.MAIMAI_HEADER, { height: 32, fontSize: 13, color: '#999999', horizontalInset: 16 });
   const list = tagModel.normalize(configuration);
   assert.equal(list.selectionMode, 'none');

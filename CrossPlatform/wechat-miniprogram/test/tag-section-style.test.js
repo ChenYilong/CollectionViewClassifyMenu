@@ -1,6 +1,6 @@
 // The section style of cyl-tag-list (docs/tag-section-style.md): a card around a section's tags (insetGrouped), a header band
-// and a header divider, all independent and off by default. The HarmonyOS component is the reference; the mini program lays
-// tags out in CSS, so the geometry is two distances from the list's edges (model.js contentColumn / tagColumn) and the
+// and a header divider, all independent: the card is the default look (opt out with sectionStyle plain), the band and the
+// divider are opt-in. The HarmonyOS component is the reference; the mini program lays tags out in CSS, so the geometry is two distances from the list's edges (model.js contentColumn / tagColumn) and the
 // rows are counted by a flow of fixed tag widths at the width those distances leave.
 const test = require('node:test')
 const assert = require('node:assert/strict')
@@ -22,6 +22,13 @@ const FOLD_ROWS = 2
 function styleOf(style = {}, options = { pixelRatio: 2 }) {
   const configuration = { style, sections: [{ title: TITLE, items: ['a'] }] }
   return model.normalize(configuration, options).sections[0].style
+}
+
+const PLAIN = { sectionStyle: 'plain' }
+
+/** The style of a list that opted out of the default card: `sectionStyle: 'plain'` is the look of before the card was the default. */
+function plainOf(style = {}, options = { pixelRatio: 2 }) {
+  return styleOf({ ...PLAIN, ...style }, options)
 }
 
 /** Greedy flow of fixed tag widths in a column of `width`, the CSS flex-wrap of the list: the tops of the rows and the x of each tag. */
@@ -49,16 +56,44 @@ function px(css, property) {
   return match ? Number(match[1]) : null
 }
 
-test('the default style is plain with no band and no divider', () => {
+test('the default style is the rounded section card, with no band and no divider', () => {
   const style = styleOf()
+  const layout = model.sectionLayout(style)
+  assert.equal(style.sectionStyle, 'insetGrouped')
+  assert.equal(style.sectionStyle, model.DEFAULT_SECTION_STYLE)
+  assert.equal(style.headerBackgroundColor, null)
+  assert.equal(style.headerSeparatorStyle, 'none')
+  assert.equal(style.sectionBackgroundStyle, 'flat')
+  assert.ok(layout.cardStyle, 'the card is in the layout of a list that sets nothing')
+  assert.match(layout.cardStyle, new RegExp(`padding: ${CARD_PADDING}px ${CARD_PADDING}px ${CARD_PADDING}px ${CARD_PADDING}px`))
+  assert.equal(px(layout.cardStyle, 'border-radius'), CARD_RADIUS)
+  assert.match(layout.cardStyle, /background-color: #FFFFFF/)
+  assert.equal(layout.headerLineStyle, undefined)
+  // Each side of the tag column is narrowed by the card padding.
+  assert.equal(model.tagColumn(style).left, model.contentColumn(style).left + CARD_PADDING)
+  assert.equal(model.tagColumn(style).right, model.contentColumn(style).right + CARD_PADDING)
+  assert.equal(model.headerEdges(style).left, model.tagColumn(style).left)
+})
+
+test('the default header divider is none: it shows only when the app asks for it', () => {
+  assert.equal(styleOf().headerSeparatorStyle, 'none')
+  assert.equal(model.headerSeparator(styleOf()), null)
+  assert.equal(model.sectionLayout(styleOf()).headerLineStyle, undefined)
+  assert.ok(model.headerSeparator(styleOf({ headerSeparatorStyle: 'line' })))
+  assert.ok(model.sectionLayout(styleOf({ headerSeparatorStyle: 'line' })).headerLineStyle)
+})
+
+test('sectionStyle plain is the opt-out: no card, the tags span the column, the layout of before', () => {
+  const style = plainOf()
   const layout = model.sectionLayout(style)
   assert.equal(style.sectionStyle, 'plain')
   assert.equal(style.headerBackgroundColor, null)
   assert.equal(style.headerSeparatorStyle, 'none')
-  assert.equal(layout.cardStyle, undefined)
-  assert.equal(layout.headerLineStyle, undefined)
+  // Exactly the four CSS fields the list had before the section style existed (the snapshot test compares their text).
+  assert.deepEqual(Object.keys(layout).sort(), ['backgroundStyle', 'headerStyle', 'itemsStyle', 'listStyle'])
   assert.deepEqual(model.tagColumn(style), model.contentColumn(style))
   assert.equal(model.headerEdges(style).left, style.headerHorizontalInset)
+  assert.equal(model.resolvedBackgroundColor(style), '#FFFFFF')
 })
 
 test('the named constants: radius 10, padding 12, band padding 12, hairline 0.5', () => {
@@ -88,7 +123,7 @@ test('the card frame contains every tag', () => {
 
 test('rows are counted at the reduced width, so tags wrap earlier inside a padded card', () => {
   const rowsOf = (style) => model.rowsFromTops(flow(style, TAG_WIDTHS).tops)
-  const plain = rowsOf(styleOf())
+  const plain = rowsOf(plainOf())
   const grouped = rowsOf(styleOf({ sectionStyle: 'insetGrouped' }))
   const rowCount = (rows) => rows[rows.length - 1] + 1
   assert.equal(rowCount(plain), 3)
@@ -99,7 +134,7 @@ test('rows are counted at the reduced width, so tags wrap earlier inside a padde
 })
 
 test('the card padding adds top and bottom to the section and the tags keep the line spacing inside the card', () => {
-  const plain = styleOf()
+  const plain = plainOf()
   const grouped = styleOf({ sectionStyle: 'insetGrouped' })
   const plainCss = model.sectionLayout(plain)
   const groupedCss = model.sectionLayout(grouped)
@@ -125,7 +160,7 @@ test('the header title x equals the tags leading x under insetGrouped', () => {
 })
 
 test('a plain header with a band insets its title from the band, the band spans the column', () => {
-  const style = styleOf({ headerBackgroundColor: LIGHT.headerBand })
+  const style = plainOf({ headerBackgroundColor: LIGHT.headerBand })
   const edges = model.headerEdges(style)
   assert.equal(edges.left, style.sectionInsets.left + BAND_PADDING)
   assert.equal(edges.right, style.sectionInsets.right + BAND_PADDING)
@@ -135,13 +170,13 @@ test('a plain header with a band insets its title from the band, the band spans 
   assert.match(css, /background-color: #EFEFF4; border-radius: 0px/)
   // The tags are not narrowed: the band alone does not change the tag column.
   assert.deepEqual(model.tagColumn(style), model.contentColumn(style))
-  assert.equal(model.sectionLayout(styleOf({ headerBackgroundColor: LIGHT.headerBand, headerCornerRadius: 6 })).headerStyle
+  assert.equal(model.sectionLayout(plainOf({ headerBackgroundColor: LIGHT.headerBand, headerCornerRadius: 6 })).headerStyle
     .includes('border-radius: 6px'), true)
 })
 
 test('the divider sits at the header bottom and adds no height', () => {
-  const without = styleOf()
-  const withLine = styleOf({ headerSeparatorStyle: 'line' })
+  const without = plainOf()
+  const withLine = plainOf({ headerSeparatorStyle: 'line' })
   const css = model.sectionLayout(withLine)
   // The header's height is unchanged; the line is absolute inside it, at the bottom.
   assert.equal(px(css.headerStyle, 'height'), px(model.sectionLayout(without).headerStyle, 'height'))
@@ -155,13 +190,13 @@ test('the divider sits at the header bottom and adds no height', () => {
   assert.deepEqual({ left: line.left, right: line.right }, model.contentColumn(withLine))
   assert.match(css.headerLineStyle, new RegExp(`left: ${line.left}px; right: ${line.right}px; height: ${HAIRLINE}px`))
   // Never taller than the header, and absent with thickness 0.
-  assert.equal(model.headerSeparator(styleOf({ headerSeparatorStyle: 'line', headerSeparatorThickness: 1000 })).thickness,
+  assert.equal(model.headerSeparator(plainOf({ headerSeparatorStyle: 'line', headerSeparatorThickness: 1000 })).thickness,
     px(css.headerStyle, 'height'))
-  assert.equal(model.headerSeparator(styleOf({ headerSeparatorStyle: 'line', headerSeparatorThickness: 0 })), null)
+  assert.equal(model.headerSeparator(plainOf({ headerSeparatorStyle: 'line', headerSeparatorThickness: 0 })), null)
 })
 
 test('the divider insets are from the column, and it has the card and band edges under every style', () => {
-  const own = styleOf({ headerSeparatorStyle: 'line', headerSeparatorInsets: [0, 5, 0, 7] })
+  const own = plainOf({ headerSeparatorStyle: 'line', headerSeparatorInsets: [0, 5, 0, 7] })
   assert.equal(model.headerSeparator(own).left, own.sectionInsets.left + 5)
   assert.equal(model.headerSeparator(own).right, own.sectionInsets.right + 7)
   const grouped = styleOf({ sectionStyle: 'insetGrouped', headerSeparatorStyle: 'line' })
@@ -172,7 +207,7 @@ test('the divider insets are from the column, and it has the card and band edges
   assert.notEqual(line.left, model.headerEdges(grouped).left)
   // The header element sits in the column, so the CSS left and right are 0 (the column's edges).
   assert.match(model.sectionLayout(grouped).headerLineStyle, /left: 0px; right: 0px/)
-  const banded = styleOf({ headerSeparatorStyle: 'line', headerBackgroundColor: LIGHT.headerBand })
+  const banded = plainOf({ headerSeparatorStyle: 'line', headerBackgroundColor: LIGHT.headerBand })
   assert.match(model.sectionLayout(banded).headerLineStyle, /left: 0px; right: 0px/)
   assert.equal(model.headerSeparator(banded).left, model.contentColumn(banded).left)
 })
@@ -182,7 +217,7 @@ test('the tags fold at the reduced width', () => {
     const rows = model.rowsFromTops(flow(style, TAG_WIDTHS).tops)
     return model.foldState({ defaultVisibleRows: FOLD_ROWS }, rows, false)
   }
-  const plain = foldable(styleOf())
+  const plain = foldable(plainOf())
   const grouped = foldable(styleOf({ sectionStyle: 'insetGrouped' }))
   assert.equal(plain.canFold, true)
   assert.equal(plain.visible.filter(Boolean).length, 6)
@@ -191,7 +226,7 @@ test('the tags fold at the reduced width', () => {
   assert.ok(grouped.visible.filter(Boolean).length < plain.visible.filter(Boolean).length)
   // Three rows at the full width fit the limit of three, four rows at the reduced width do not.
   const threeRows = (style) => model.foldState({ defaultVisibleRows: 3 }, model.rowsFromTops(flow(style, TAG_WIDTHS).tops), false)
-  assert.equal(threeRows(styleOf()).canFold, false)
+  assert.equal(threeRows(plainOf()).canFold, false)
   assert.equal(threeRows(styleOf({ sectionStyle: 'insetGrouped' })).canFold, true)
 })
 
@@ -216,7 +251,7 @@ test('unset colors resolve to the light and dark defaults', () => {
 
 test('insetGrouped uses the grouped background only when the app never set one', () => {
   const dark = { pixelRatio: 2, dark: true }
-  assert.equal(model.resolvedBackgroundColor(styleOf()), '#FFFFFF')
+  assert.equal(model.resolvedBackgroundColor(plainOf()), '#FFFFFF')
   assert.equal(model.resolvedBackgroundColor(styleOf({ sectionStyle: 'insetGrouped' })), LIGHT.groupedBackground)
   assert.equal(model.resolvedBackgroundColor(styleOf({ sectionStyle: 'insetGrouped' }, dark)), DARK.groupedBackground)
   assert.equal(model.resolvedBackgroundColor(styleOf({ sectionStyle: 'insetGrouped', backgroundColor: CUSTOM_BACKGROUND })),
@@ -263,11 +298,13 @@ test('the style keys parse', () => {
   assert.equal(style.headerSeparatorColor, '#778899')
   assert.equal(style.headerSeparatorThickness, 2)
   assert.deepEqual(style.headerSeparatorInsets, { top: 0, left: 3, bottom: 0, right: 4 })
-  // The raw values 0 and 1, negative lengths clamped, unknown names ignored.
+  // The raw values 0 and 1, negative lengths clamped, unknown names ignored (the style keeps its default: the card, no divider).
   assert.equal(styleOf({ sectionStyle: 1, headerSeparatorStyle: 1 }).sectionStyle, 'insetGrouped')
   assert.equal(styleOf({ sectionStyle: 1, headerSeparatorStyle: 1 }).headerSeparatorStyle, 'line')
   assert.equal(styleOf({ sectionStyle: 0 }).sectionStyle, 'plain')
-  assert.equal(styleOf({ sectionStyle: 'grid', headerSeparatorStyle: 'dashed' }).sectionStyle, 'plain')
+  assert.equal(styleOf({ sectionStyle: 'grid', headerSeparatorStyle: 'dashed' }).sectionStyle, 'insetGrouped')
+  assert.equal(styleOf({ sectionStyle: 'grid', headerSeparatorStyle: 'dashed' }).headerSeparatorStyle, 'none')
+  assert.equal(plainOf({ sectionStyle: 'grid' }).sectionStyle, 'insetGrouped', 'an unknown name does not opt out')
   assert.equal(styleOf({ sectionCornerRadius: -3, headerCornerRadius: -1, headerSeparatorThickness: -1 }).sectionCornerRadius, 0)
   assert.equal(styleOf({ headerSeparatorThickness: -1 }).headerSeparatorThickness, 0)
 })
@@ -428,9 +465,9 @@ test('under insetGrouped the grouped background decides when the app set none', 
 })
 
 test('unset with a transparent or unset list background follows the system mode', () => {
-  assert.equal(model.resolvedHeaderTextColor(styleOf({}, LIGHT_OPTIONS)), BLACK)
-  assert.equal(model.resolvedHeaderTextColor(styleOf({}, DARK_OPTIONS)), WHITE)
-  assert.equal(model.resolvedFoldControlColor(styleOf({}, DARK_OPTIONS)), WHITE)
+  assert.equal(model.resolvedHeaderTextColor(plainOf({}, LIGHT_OPTIONS)), BLACK)
+  assert.equal(model.resolvedHeaderTextColor(plainOf({}, DARK_OPTIONS)), WHITE)
+  assert.equal(model.resolvedFoldControlColor(plainOf({}, DARK_OPTIONS)), WHITE)
   // A translucent background is not opaque: the mode decides.
   assert.equal(model.resolvedHeaderTextColor(styleOf({ backgroundColor: CLEAR }, LIGHT_OPTIONS)), BLACK)
   assert.equal(model.resolvedHeaderTextColor(styleOf({ backgroundColor: CLEAR }, DARK_OPTIONS)), WHITE)
@@ -481,8 +518,29 @@ test('under a header band the tint is resolved against the band color', () => {
   assert.equal(model.resolvedHeaderTextColor(darkBand), WHITE)
   assert.match(model.sectionLayout(darkBand).headerStyle, /color: #FFFFFF/)
   // A band that is not opaque falls back to the list background, then the mode.
-  const clearBand = styleOf({ headerBackgroundColor: CLEAR }, DARK_OPTIONS)
+  const clearBand = plainOf({ headerBackgroundColor: CLEAR }, DARK_OPTIONS)
   assert.equal(model.resolvedHeaderTextColor(clearBand), WHITE)
+})
+
+test('the default list resolves its list background and its tint against the grouped background', () => {
+  // A list that sets nothing is a card on the grouped background (#F2F2F7 light, black dark), never the old white.
+  assert.equal(model.resolvedBackgroundColor(styleOf({}, LIGHT_OPTIONS)), LIGHT.groupedBackground)
+  assert.equal(model.resolvedBackgroundColor(styleOf({}, DARK_OPTIONS)), DARK.groupedBackground)
+  assert.equal(model.sectionLayout(styleOf({}, LIGHT_OPTIONS)).backgroundStyle, `background-color: ${LIGHT.groupedBackground}`)
+  assert.equal(model.resolvedHeaderTextColor(styleOf({}, LIGHT_OPTIONS)), BLACK)
+  assert.equal(model.resolvedHeaderTextColor(styleOf({}, DARK_OPTIONS)), WHITE)
+  assert.equal(model.resolvedFoldControlColor(styleOf({}, DARK_OPTIONS)), WHITE)
+  // The grouped background decides, not the system mode: a dark grouped background in light mode gives a light tint, a light
+  // one in dark mode a dark tint (the palette is replaced to tell the two rules apart).
+  const withGrouped = (options, groupedBackground) => {
+    const style = styleOf({}, options)
+    return { ...style, sectionPalette: { ...style.sectionPalette, groupedBackground } }
+  }
+  assert.equal(model.resolvedHeaderTextColor(withGrouped(LIGHT_OPTIONS, DARK.groupedBackground)), WHITE)
+  assert.equal(model.resolvedHeaderTextColor(withGrouped(DARK_OPTIONS, LIGHT.groupedBackground)), BLACK)
+  // Opted out (plain) with no background of the app's: nothing is painted, so the system mode decides, as before.
+  assert.equal(model.resolvedHeaderTextColor(plainOf({}, LIGHT_OPTIONS)), BLACK)
+  assert.equal(model.resolvedHeaderTextColor(plainOf({}, DARK_OPTIONS)), WHITE)
 })
 
 test('the component draws the fold control with the resolved tint and re-resolves on a theme change', () => {

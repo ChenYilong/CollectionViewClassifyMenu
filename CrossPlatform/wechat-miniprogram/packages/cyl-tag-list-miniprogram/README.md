@@ -35,6 +35,20 @@ limited to half the tag height, as on iOS and Android: `0` is square corners, a 
 example `1000`) is a capsule. `CORNER_RADIUS_SQUARE` is removed, and `0` no longer means an automatic capsule. The
 `tagCloudStyle()` preset keeps its capsules with `1000`; the default radius is `3`.
 
+### Section card (the default look)
+
+A list that sets nothing draws each section's tags in a rounded card (`sectionStyle: 'insetGrouped'`) on the grouped list
+background (#F2F2F7, black in dark mode) with no header divider and no header band. To remove the card, set the style key
+`sectionStyle` to `plain`:
+
+```js
+configuration: { style: { sectionStyle: 'plain' }, sections: [/* ... */] }
+```
+
+The header divider is not a default; it shows only when you ask for it: `style: { headerSeparatorStyle: 'line' }`. The card
+(`sectionBackgroundColor`, `sectionCornerRadius`, `sectionContentInsets`, `sectionBackgroundStyle`), the header band
+(`headerBackgroundColor`) and the divider keys are described in `docs/tag-section-style.md` of the repository.
+
 ### One tag on its own
 
 `cyl-tag-button` is the iOS `CYLTagButton` on its own (a search bar item, a toolbar button, a placeholder's icon): an
