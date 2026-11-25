@@ -6,6 +6,7 @@
   "scrollEnabled": false,
   "selectedItems": ["0-0"],
   "style": {
+    "sectionStyle": "plain",
     "backgroundStyle": "liquidGlass",
     "imageSize": "{22, 22}",
     "imageTitleSpacing": 6,

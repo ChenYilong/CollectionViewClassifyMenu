@@ -36,10 +36,27 @@ class CYLSectionStyleSource implements CYLMenuDataSource {
 
 function makeList(): CYLTagListState {
   const list = new CYLTagListState();
+  list.style = plainStyle();
   list.menuDataSource = new CYLSectionStyleSource();
   list.setLayoutWidth(LIST_WIDTH);
   list.reloadMenuData();
   return list;
+}
+
+/** The list of a default style: nothing set, so the rounded section card is on. */
+function makeDefaultList(): CYLTagListState {
+  const list = new CYLTagListState();
+  list.menuDataSource = new CYLSectionStyleSource();
+  list.setLayoutWidth(LIST_WIDTH);
+  list.reloadMenuData();
+  return list;
+}
+
+/** The opt-out: a style with no card, so every frame is the one of the time before the section style. */
+function plainStyle(): CYLMenuStyle {
+  const style = new CYLMenuStyle();
+  style.sectionStyle = CYLSectionStyle.plain;
+  return style;
 }
 
 /** Every frame of the list's layout as one string: section y / header / footer / height, then each item x y w h. */
@@ -105,7 +122,50 @@ export default function tagSectionStyleTest() {
       CYLTagButtonMetrics.textMeasurer = saved;
     });
 
-    it('aDefaultStyleGivesTheFramesOfBeforeTheSectionStyle', 0, () => {
+    it('theDefaultStyleIsTheRoundedSectionCard', 0, () => {
+      const style = new CYLMenuStyle();
+      expect(style.sectionStyle).assertEqual(CYLSectionStyle.insetGrouped);
+      expect(style.isInsetGrouped).assertTrue();
+      const list = makeDefaultList();
+      expect(list.style.sectionStyle).assertEqual(CYLSectionStyle.insetGrouped);
+      list.layoutSections().forEach((s: CYLTagListSectionFrame) => {
+        const card = s.card as CYLRect;
+        expect(card !== undefined).assertTrue();
+        expect(card.x).assertEqual(SIDE_INSET);
+        expect(card.width).assertEqual(LIST_WIDTH - 2 * SIDE_INSET);
+        // The tags sit inside the card, so the first one starts one card padding after the column's edge.
+        expect(s.items[0].x).assertEqual(SIDE_INSET + CARD_PADDING);
+      });
+      // Nothing was set, yet the frames are those of the explicit insetGrouped style and not the plain ones.
+      const grouped = listWith(new CYLSectionStyleSource(), groupedStyle(), LIST_WIDTH);
+      expect(snapshot(list)).assertEqual(snapshot(grouped));
+      expect(snapshot(list) === DEFAULT_FRAMES).assertFalse();
+      expect(list.contentHeight > makeList().contentHeight).assertTrue();
+    });
+
+    it('theDefaultDividerBandAndCardBackgroundStyleStayOff', 0, () => {
+      const style = new CYLMenuStyle();
+      expect(style.headerSeparatorStyle).assertEqual(CYLHeaderSeparatorStyle.none);
+      expect(style.headerBackgroundColor === undefined).assertTrue();
+      expect(style.sectionBackgroundStyle).assertEqual(CYLTagBackgroundStyle.flat);
+      makeDefaultList().layoutSections().forEach((s: CYLTagListSectionFrame) => {
+        expect(s.headerSeparator === undefined).assertTrue();
+        expect(s.headerBand === undefined).assertTrue();
+      });
+    });
+
+    it('theGroupedBackgroundRuleAppliesToADefaultList', 0, () => {
+      // An app that never set backgroundColor gets the grouped background under the default card.
+      expect(new CYLTagListState().style.resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
+      expect(new CYLMenuStyle().resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
+      // An app that set one keeps it, and the plain opt-out keeps today's white.
+      const set = new CYLMenuStyle();
+      set.backgroundColor = RED;
+      expect(set.resolvedBackgroundColor()).assertEqual(RED);
+      expect(plainStyle().resolvedBackgroundColor()).assertEqual(CYLColor.WHITE);
+    });
+
+    it('thePlainOptOutGivesTheFramesOfBeforeTheSectionStyle', 0, () => {
       const list = makeList();
       expect(snapshot(list)).assertEqual(DEFAULT_FRAMES);
       // The header: today's inset on both sides, and no card, band or divider.
@@ -116,7 +176,7 @@ export default function tagSectionStyleTest() {
         expect(s.headerBand === undefined).assertTrue();
         expect(s.headerSeparator === undefined).assertTrue();
       });
-      // The default list background is today's white.
+      // The plain list background is today's white.
       expect(list.style.resolvedBackgroundColor()).assertEqual(CYLColor.WHITE);
     });
 
@@ -141,7 +201,7 @@ export default function tagSectionStyleTest() {
     });
 
     it('rowsAreCountedAtTheReducedWidthSoTagsWrapEarlierInsideAPaddedCard', 0, () => {
-      const plain = listWith(new CYLEightTagsSource(), new CYLMenuStyle(), WIDE_WIDTH);
+      const plain = listWith(new CYLEightTagsSource(), plainStyle(), WIDE_WIDTH);
       const grouped = listWith(new CYLEightTagsSource(), groupedStyle(), WIDE_WIDTH);
       expect(plain.numberOfRows(0)).assertEqual(2);
       expect(grouped.numberOfRows(0)).assertEqual(3);
@@ -151,7 +211,7 @@ export default function tagSectionStyleTest() {
     });
 
     it('theCardPaddingAddsTopAndBottomToTheSectionHeightAndTheContentHeight', 0, () => {
-      const plain = listWith(new CYLShortSectionsSource(), new CYLMenuStyle(), WIDE_WIDTH);
+      const plain = listWith(new CYLShortSectionsSource(), plainStyle(), WIDE_WIDTH);
       const grouped = listWith(new CYLShortSectionsSource(), groupedStyle(), WIDE_WIDTH);
       expect(grouped.numberOfRows(0)).assertEqual(plain.numberOfRows(0));
       expect(grouped.contentHeight).assertEqual(plain.contentHeight + 2 * 2 * CARD_PADDING);
@@ -169,7 +229,7 @@ export default function tagSectionStyleTest() {
     });
 
     it('aPlainHeaderWithABandInsetsItsTitleFromTheBand', 0, () => {
-      const style = new CYLMenuStyle();
+      const style = plainStyle();
       style.headerBackgroundColor = CYLSectionStyleColors.headerBand;
       const list = listWith(new CYLSectionStyleSource(), style, LIST_WIDTH);
       list.layoutSections().forEach((s: CYLTagListSectionFrame) => {
@@ -186,7 +246,7 @@ export default function tagSectionStyleTest() {
     });
 
     it('theDividerSitsAtTheHeaderBottomAndAddsNoHeight', 0, () => {
-      const style = new CYLMenuStyle();
+      const style = plainStyle();
       style.headerSeparatorStyle = CYLHeaderSeparatorStyle.line;
       const list = listWith(new CYLSectionStyleSource(), style, LIST_WIDTH);
       expect(snapshot(list)).assertEqual(DEFAULT_FRAMES);
@@ -206,7 +266,7 @@ export default function tagSectionStyleTest() {
     });
 
     it('theTagsFoldAtTheReducedWidth', 0, () => {
-      const plain = new CYLMenuStyle();
+      const plain = plainStyle();
       const grouped = groupedStyle();
       [plain, grouped].forEach((style: CYLMenuStyle) => {
         const list = new CYLTagListState();
@@ -243,7 +303,7 @@ export default function tagSectionStyleTest() {
       expect(set.resolvedBackgroundColor()).assertEqual(CYLColor.CLEAR);
       expect(set.copy().resolvedBackgroundColor()).assertEqual(CYLColor.CLEAR);
       expect(groupedStyle().copy().resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
-      expect(new CYLMenuStyle().resolvedBackgroundColor()).assertEqual(CYLColor.WHITE);
+      expect(plainStyle().resolvedBackgroundColor()).assertEqual(CYLColor.WHITE);
     });
 
     it('copyKeepsTheSectionStyle', 0, () => {
@@ -372,8 +432,12 @@ export default function tagSectionStyleTest() {
       // Names are case-insensitive, raw values work, and an unknown value keeps the default.
       expect(configured('{"sectionStyle":"INSETGROUPED"}').sectionStyle).assertEqual(CYLSectionStyle.insetGrouped);
       expect(configured('{"sectionStyle":0}').sectionStyle).assertEqual(CYLSectionStyle.plain);
+      // The opt-out key, and the default when the key is missing.
+      expect(configured('{"sectionStyle":"plain"}').sectionStyle).assertEqual(CYLSectionStyle.plain);
+      expect(configured('{"sectionStyle":"PLAIN"}').sectionStyle).assertEqual(CYLSectionStyle.plain);
+      expect(configured('{}').sectionStyle).assertEqual(CYLSectionStyle.insetGrouped);
       expect(configured('{"sectionStyle":"bogus","headerSeparatorStyle":"bogus"}').sectionStyle)
-        .assertEqual(CYLSectionStyle.plain);
+        .assertEqual(CYLSectionStyle.insetGrouped);
       expect(configured('{"headerSeparatorStyle":"bogus"}').headerSeparatorStyle)
         .assertEqual(CYLHeaderSeparatorStyle.none);
     });
@@ -448,7 +512,7 @@ export default function tagSectionStyleTest() {
       expect(reverse.resolvedTintColor(false)).assertEqual(CYLColor.WHITE);
       expect(reverse.resolvedTintColor(true)).assertEqual(CYLColor.BLACK);
       // No band set: the list background decides, whatever `onBand` says.
-      expect(new CYLMenuStyle().resolvedTintColor(true)).assertEqual(CYLColor.BLACK);
+      expect(plainStyle().resolvedTintColor(true)).assertEqual(CYLColor.BLACK);
     });
 
     it('theTintColorKeyParsesAndCopyKeepsIt', 0, () => {

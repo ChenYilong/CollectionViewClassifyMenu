@@ -8,7 +8,7 @@ import { CYLUIContext } from '@cyl/classifymenu';
 import { common, Want } from '@kit.AbilityKit';
 import {
   CYLColor, CYLEdgeInsets, CYLFont, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance,
-  CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
+  CYLSectionStyle, CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
 import { CYLSampleButton, SYSTEM_ORANGE, SYSTEM_TEAL, cylFormat, cylToast } from './SampleSupport';
@@ -337,6 +337,7 @@ export struct CYLHotSearchPage {
   static hotStyle(): CYLMenuStyle {
     const style = new CYLMenuStyle();
     style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+    style.sectionStyle = CYLSectionStyle.plain;
     const appearances: CYLTagAppearance[] = [style.normalAppearance, style.selectedAppearance];
     appearances.forEach((appearance: CYLTagAppearance) => {
       appearance.backgroundColor = CYLColor.WHITE;

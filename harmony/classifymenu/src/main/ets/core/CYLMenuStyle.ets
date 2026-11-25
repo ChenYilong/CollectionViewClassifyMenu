@@ -70,8 +70,8 @@ export interface CYLTitleTextAttributes {
 }
 
 /**
- * How a section's tags sit in the list: `plain` (the default) on the list's background; `insetGrouped` inside a rounded card
- * (UITableView's inset grouped look), the header above it.
+ * How a section's tags sit in the list: `insetGrouped` (the default) inside a rounded card (UITableView's inset grouped look),
+ * the header above it; `plain` (the opt-out) on the list's background.
  */
 export enum CYLSectionStyle {
   plain = 0,
@@ -289,8 +289,8 @@ export class CYLMenuStyle {
   }
 
   // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
-  /** `plain` (the default) or `insetGrouped`: the section's tags inside a rounded card. */
-  sectionStyle: CYLSectionStyle = CYLSectionStyle.plain;
+  /** `insetGrouped` (the default: the section's tags inside a rounded card) or `plain` (the opt-out: no card). */
+  sectionStyle: CYLSectionStyle = CYLSectionStyle.insetGrouped;
   /** The card's color; undefined resolves to `CYLSectionStyleColors.card`. */
   sectionBackgroundColor?: ResourceColor = undefined;
   /**
@@ -698,6 +698,7 @@ export class CYLMenuStyle {
     style.imageSize = new CYLSize(16, 16);
     style.itemHeight = 30;
     style.backgroundColor = CYLColor.CLEAR;
+    style.sectionStyle = CYLSectionStyle.plain;
     return style;
   }
 
@@ -784,6 +785,7 @@ export class CYLMenuStyle {
     style.imageTitleSpacing = 4;
     style.itemHeight = 0;
     style.backgroundColor = CYLColor.CLEAR;
+    style.sectionStyle = CYLSectionStyle.plain;
     return style;
   }
 
@@ -805,6 +807,7 @@ export class CYLMenuStyle {
     style.lineSpacing = 5;
     style.itemHeight = 0;
     style.backgroundColor = CYLColor.CLEAR;
+    style.sectionStyle = CYLSectionStyle.plain;
     return style;
   }
 
@@ -837,6 +840,7 @@ export class CYLMenuStyle {
     style.lineSpacing = 10;
     style.sectionInsets = new CYLEdgeInsets(12, 24, 12, 24);
     style.backgroundColor = CYLColor.CLEAR;
+    style.sectionStyle = CYLSectionStyle.plain;
     return style;
   }
 
@@ -867,6 +871,7 @@ export class CYLMenuStyle {
     style.rippleColor = CYLColor.argb(255, 0xEE, 0xEE, 0xEE);
     style.rippleAlpha = 128 / 255;
     style.backgroundColor = CYLColor.CLEAR;
+    style.sectionStyle = CYLSectionStyle.plain;
     return style;
   }
 
@@ -894,6 +899,7 @@ export class CYLMenuStyle {
     style.itemHeight = 32;
     style.interitemSpacing = 24;
     style.lineSpacing = 18;
+    style.sectionStyle = CYLSectionStyle.plain;
     return style;
   }
 }

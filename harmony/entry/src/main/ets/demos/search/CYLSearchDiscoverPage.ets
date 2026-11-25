@@ -7,7 +7,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuSelectionMode, CYLMenuStyle, CYLSize,
-  CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
+  CYLSectionStyle, CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoNav } from '../DemoNav';
 import { CYLDiscoverTopic, CYLSearchDiscoverData } from './CYLSearchDiscoverData';
@@ -76,6 +76,7 @@ function applyHeaderLook(style: CYLMenuStyle): void {
 export function recentStyle(): CYLMenuStyle {
   const style = new CYLMenuStyle();
   style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+  style.sectionStyle = CYLSectionStyle.plain;
   [CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED].forEach((state: number) => {
     const a = style.appearance(state);
     a.backgroundColor = CYLColor.WHITE;

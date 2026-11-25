@@ -4,7 +4,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
  * 内边距，再 addTagsWithTitles / addTag 添加 CYLTag；点击与删除用 tagClickHandler、tagDeleteHandler 监听。下方是同样的
  * 标签，用配置字典（CYLTagListKey.tags）创建。
  */
-import { CYLColor, CYLEdgeInsets, CYLTag, CYLTagBackgroundStyle, CYLTagListState, CYLTagListView } from '@cyl/classifymenu';
+import { CYLColor, CYLEdgeInsets, CYLTag, CYLSectionStyle, CYLTagBackgroundStyle, CYLTagListState, CYLTagListView } from '@cyl/classifymenu';
 import { CYLDemoBar } from '../DemoNav';
 import { GROUPED_BACKGROUND, SECONDARY_LABEL, cylFormat } from './SampleSupport';
 
@@ -53,7 +53,7 @@ export class CYLTagCloudDemoData {
 
   /** The configuration of the lower list: the same kinds of tags, as strings and dictionaries. */
   static mapConfiguration(): string {
-    return '{"style": {"backgroundStyle": "liquidGlass", "lineSpacing": 5, "interitemSpacing": 3, "tagContentInsets": "{3, 10, 3, 10}"}, ' +
+    return '{"style": {"sectionStyle": "plain", "backgroundStyle": "liquidGlass", "lineSpacing": 5, "interitemSpacing": 3, "tagContentInsets": "{3, 10, 3, 10}"}, ' +
       '"scrollEnabled": false, "tags": ["Asia", "Europe", {"title": "Africa", "id": 3, "deletable": true, ' +
       '"style": {"normal": {"backgroundColor": "#00BFFF", "textColor": "#FFFFFF", "borderWidth": 0, ' +
       '"cornerRadius": 1000}, "highlightedBackgroundColor": "#88363636"}}, ' +
@@ -71,6 +71,7 @@ export struct CYLTagCloudDemoPage {
     // android-tagview: TagView tagview2 = new TagView(this); tagview2.setLineMargin(20f); …
     const list = this.codeList;
     list.style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+    list.style.sectionStyle = CYLSectionStyle.plain;
     list.lineSpacing = 5;
     list.interitemSpacing = 3;
     list.tagContentInsets = new CYLEdgeInsets(3, 10, 3, 10);
