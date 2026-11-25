@@ -23,7 +23,7 @@ const fs = require('fs');
 const path = require('path');
 
 // CYL_TAB_BAR: the same commit as the React Native example (fetch-cyltabbar.sh, example/ios/Podfile).
-const COMMIT = '991f76cdb8eca28c7de52d0ab4bd6771bc391ffb';
+const COMMIT = 'b6e0287591518e36a17abe2116170b047a365cab';
 const REPOSITORY = 'https://github.com/ChenYilong/CYLTabBarController.git';
 const ROOT = path.resolve(__dirname, '..');
 const CHECKOUT = path.join(ROOT, '.deps', 'CYLTabBarController');
