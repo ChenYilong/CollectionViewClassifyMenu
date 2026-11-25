@@ -30,6 +30,45 @@ export class CYLLiquidGlass {
   static readonly DARK_BRIGHTNESS: number = 0.9;
 
   /**
+   * [EN] The width of the glass rim, vp (Android: 1 dp). [CN] 玻璃边缘细边的宽度，单位 vp（Android 为 1 dp）。
+   */
+  static readonly RIM_WIDTH: number = 1;
+  /**
+   * [EN] Whether the app's color mode is dark (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`; light when unset). The rule
+   *      of the rim and the sheen: read when the background is applied.
+   * [CN] 应用颜色模式是否为深色（AppStorage 的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）。细边与高光的规则：
+   *      应用背景时读取。
+   */
+  static isDark(): boolean {
+    return AppStorage.get<string>('cyl_colorMode') === 'dark';
+  }
+
+  /**
+   * [EN] The rim per edge of every glass (a tag, a section card behind tags, an item, the tab bar capsule): lit from the top left as Android's
+   *      `CYLGlassHighlight` (45 degrees), the top and left edges the bright highlight, the bottom and right edges a dim line (dark on light glass,
+   *      where a white rim alone would wash out; faint white on dark glass). One definition: no host keeps its own.
+   * [CN] 所有玻璃（标签、标签后的分组卡片、条目、TabBar 胶囊）各边的细边：光从左上来，与 Android `CYLGlassHighlight`（45 度）相同，上边与左边是明亮的高光，
+   *      下边与右边是暗淡的线（浅色玻璃上为深色，因为白色细边单独画在浅色玻璃上会淡掉；深色玻璃上为微弱的白色）。只有这一份定义：宿主不保留自己的。
+   */
+  static rimEdgeColors(dark: boolean): EdgeColors {
+    const colors: EdgeColors = dark ?
+      { top: '#8CFFFFFF', right: '#24FFFFFF', bottom: '#24FFFFFF', left: '#8CFFFFFF' } :
+      { top: '#E6FFFFFF', right: '#2E000000', bottom: '#2E000000', left: '#E6FFFFFF' };
+    return colors;
+  }
+
+  /**
+   * [EN] The sheen of every glass over its tint, top to bottom: a specular band at the top fading down and a faint glow at the bottom (the light of
+   *      the tab bar capsule).
+   * [CN] 所有玻璃在着色之上的高光，自上而下：顶部向下渐隐的高光带与底部微弱的反光（TabBar 胶囊的光）。
+   */
+  static sheenColors(dark: boolean): Array<[ResourceColor, number]> {
+    return dark ?
+      [['#2EFFFFFF', 0], ['#0AFFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#12FFFFFF', 1]] :
+      [['#66FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]];
+  }
+
+  /**
    * [EN] For tests: replaces the rule of `isActive()` (`undefined`, the default, uses the rule). [CN] 供测试使用：替代 `isActive()` 的规则（默认 `undefined`，使用规则）。
    */
   static activeOverride: boolean | undefined = undefined;
