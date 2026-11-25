@@ -69,8 +69,9 @@ final class CYLTagListHeaderMaxLinesTests: CYLMenuExampleTestCase {
     }
 
     func testUnlimitedGrowsForALongTitleAndNeverBelowTheOldHeight() {
-        let unlimited = headerHeight(maxLines: CYLHeaderTitleMaxLines.unlimited)
-        let three = headerHeight(maxLines: 3)
+        let title = longTitle + ". " + longTitle
+        let unlimited = headerHeight(maxLines: CYLHeaderTitleMaxLines.unlimited, title: title)
+        let three = headerHeight(maxLines: 3, title: title)
         XCTAssertGreaterThan(unlimited.height, three.height)
         XCTAssertGreaterThan(unlimited.lines, 3)
         let short = headerHeight(maxLines: CYLHeaderTitleMaxLines.unlimited, title: "Short")
