@@ -439,6 +439,12 @@ class CYLMenuStyle {
         appearanceForState(forState).iconColor = iconColor
     }
 
+    /**
+     * The icon color the app set for `state`, null while it was never set: the built-in default (the text color) does not count.
+     * Only an explicit color takes the dark-glass lift ([CYLIconContrast]).
+     */
+    internal fun explicitIconColorForState(state: Int): Int? = appearanceForState(state).iconColor
+
     /** `-iconColorForState:`: the icon color, else the text color. */
     fun iconColorForState(state: Int): Int {
         val appearance = appearanceForState(state)
