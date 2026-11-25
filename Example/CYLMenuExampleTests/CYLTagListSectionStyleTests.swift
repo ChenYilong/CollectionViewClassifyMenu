@@ -108,6 +108,7 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
         let plain = shown(source) { _ in }
         let plainHeight = plain.contentHeight
         let plainRows = plain.numberOfRows(inSection: 0)
+        let plainHeader = plain.probe.header(inSection: 0)?.frame.height ?? 0
         closeHostWindow()
         let grouped = shown(source) { $0.sectionStyle = .insetGrouped }
         let padding = CYLSectionStyleMetrics.cardPadding
@@ -123,7 +124,10 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
             XCTAssertGreaterThanOrEqual(frame.minX, tagColumn.minX - 0.01)
         }
         XCTAssertGreaterThanOrEqual(grouped.numberOfRows(inSection: 0), plainRows)
-        XCTAssertGreaterThanOrEqual(grouped.contentHeight, plainHeight + 4 * padding - 0.5, "Two sections add their padding")
+        // The header is sized to its text and the board starts 4 below it (not 10): each section saves that much against the plain list.
+        let groupedHeader = grouped.probe.header(inSection: 0)?.frame.height ?? 0
+        let saved = (plainHeader - groupedHeader) + (grouped.style.sectionInsets.top - CYLSectionStyleMetrics.headerBoardSpacing)
+        XCTAssertGreaterThanOrEqual(grouped.contentHeight, plainHeight + 4 * padding - 2 * saved - 0.5, "Two sections add their padding")
         XCTAssertEqual(grouped.contentHeight, grouped.heightThatFitsWidth(width), accuracy: 1)
         withExtendedLifetime(source) {}
     }
@@ -489,9 +493,9 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(glass.contentHeight, flatHeight, accuracy: 0.01)
         if #available(iOS 26.0, *) {
             XCTAssertEqual(glass.style.resolvedSectionBackgroundStyle, .liquidGlass)
-            let host = cardViews(glass).first?.value(forKey: "glassHost") as? CYLAnimatedItemView
-            XCTAssertNotNil(host?.itemLiquidGlassView, "The card is the library's Liquid Glass")
-            XCTAssertEqual(host?.itemCornerRadius, CYLSectionStyleMetrics.cardCornerRadius)
+            // No sectionBackgroundColor: the untinted glass (CYLTagListSectionGlassTintTests has the tinted one).
+            let plainGlass = cardViews(glass).first?.value(forKey: "plainGlassView") as? UIVisualEffectView
+            XCTAssertTrue(plainGlass?.effect is UIGlassEffect, "The card is a plain Liquid Glass")
             XCTAssertNil(cardViews(glass).first?.backgroundColor)
             captureScreen(named: "test-section-style-glass-card")
         }
@@ -503,7 +507,7 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
     func testConfigurationKeysParse() {
         let style = CYLMenuStyle(configuration: [
             "sectionStyle": "insetGrouped", "sectionBackgroundColor": "#112233", "sectionBackgroundStyle": "liquidGlass",
-            "sectionCornerRadius": 14, "sectionContentInsets": [1, 2, 3, 4],
+            "sectionCornerRadius": 14, "sectionContentInsets": [1, 2, 3, 4], "sectionBoardInset": 7,
             "headerBackgroundColor": "#EFEFF4", "headerCornerRadius": 5, "headerContentInsets": [0, 9, 0, 8],
             "headerSeparatorStyle": "line", "headerSeparatorColor": "#445566", "headerSeparatorThickness": 1,
             "headerSeparatorInsets": [0, 6, 0, 7],
@@ -513,6 +517,7 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(style.sectionBackgroundStyle, .liquidGlass)
         XCTAssertEqual(style.sectionCornerRadius, 14)
         XCTAssertEqual(style.sectionContentInsets, UIEdgeInsets(top: 1, left: 2, bottom: 3, right: 4))
+        XCTAssertEqual(style.sectionBoardInset, 7)
         XCTAssertNotNil(style.headerBackgroundColor)
         XCTAssertEqual(style.headerCornerRadius, 5)
         XCTAssertEqual(style.headerContentInsets, UIEdgeInsets(top: 0, left: 9, bottom: 0, right: 8))
