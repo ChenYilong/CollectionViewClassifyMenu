@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
+import { CYLLiquidGlass } from 'cylanimateditem';
 import {
   CYLColor, CYLEdgeInsets, CYLFont, CYLHeaderSeparatorStyle, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuStyle, CYLRect, CYLSectionStyle, CYLSectionStyleColors,
-  CYLSectionStyleMetrics, CYLTagButtonMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
+  CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButtonMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
   CYLTextMeasurer
 } from '@cyl/classifymenu';
 
@@ -263,6 +264,92 @@ export default function tagSectionStyleTest() {
       expect((c.headerSeparatorInsets as CYLEdgeInsets).right).assertEqual(5);
       expect(new CYLMenuStyle().sectionCornerRadius).assertEqual(CYLSectionStyleMetrics.cardCornerRadius);
       expect(new CYLMenuStyle().sectionContentInsets.left).assertEqual(CYLSectionStyleMetrics.cardPadding);
+    });
+
+    it('theCardBackgroundStyleIsFlatByDefaultAndCopyKeepsIt', 0, () => {
+      const style = new CYLMenuStyle();
+      expect(style.sectionBackgroundStyle).assertEqual(CYLTagBackgroundStyle.flat);
+      expect(style.resolvedSectionBackgroundStyle()).assertEqual(CYLTagBackgroundStyle.flat);
+      style.sectionBackgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+      expect(style.copy().sectionBackgroundStyle).assertEqual(CYLTagBackgroundStyle.liquidGlass);
+      expect(groupedStyle().copy().sectionBackgroundStyle).assertEqual(CYLTagBackgroundStyle.flat);
+    });
+
+    it('theCardBackgroundStyleKeyParses', 0, () => {
+      expect(configured('{"sectionBackgroundStyle":"liquidGlass"}').sectionBackgroundStyle)
+        .assertEqual(CYLTagBackgroundStyle.liquidGlass);
+      expect(configured('{"sectionBackgroundStyle":"LIQUIDGLASS"}').sectionBackgroundStyle)
+        .assertEqual(CYLTagBackgroundStyle.liquidGlass);
+      expect(configured('{"sectionBackgroundStyle":"flat"}').sectionBackgroundStyle)
+        .assertEqual(CYLTagBackgroundStyle.flat);
+      expect(configured('{"sectionBackgroundStyle":"bogus"}').sectionBackgroundStyle)
+        .assertEqual(CYLTagBackgroundStyle.flat);
+      expect(configured('{}').sectionBackgroundStyle).assertEqual(CYLTagBackgroundStyle.flat);
+    });
+
+    it('glassFallsBackToFlatWhereNoGlassIsDrawnAndTheGeometryNeverChanges', 0, () => {
+      const glass = groupedStyle();
+      glass.sectionBackgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+      const flat = groupedStyle();
+      const savedOverride = CYLLiquidGlass.activeOverride;
+      try {
+        CYLLiquidGlass.activeOverride = false;
+        expect(glass.resolvedSectionBackgroundStyle()).assertEqual(CYLTagBackgroundStyle.flat);
+        expect(glass.resolvedSectionBackgroundColor()).assertEqual(CYLSectionStyleColors.card);
+        const inactive = snapshot(listWith(new CYLSectionStyleSource(), glass, LIST_WIDTH));
+        expect(inactive).assertEqual(snapshot(listWith(new CYLSectionStyleSource(), flat, LIST_WIDTH)));
+        CYLLiquidGlass.activeOverride = true;
+        expect(glass.resolvedSectionBackgroundStyle()).assertEqual(CYLTagBackgroundStyle.liquidGlass);
+        expect(snapshot(listWith(new CYLSectionStyleSource(), glass, LIST_WIDTH))).assertEqual(inactive);
+        const glassList = listWith(new CYLSectionStyleSource(), glass, LIST_WIDTH);
+        const flatList = listWith(new CYLSectionStyleSource(), flat, LIST_WIDTH);
+        glassList.layoutSections().forEach((s: CYLTagListSectionFrame, i: number) => {
+          const a = s.card as CYLRect;
+          const b = flatList.layoutSections()[i].card as CYLRect;
+          expect(`${a.x},${a.y},${a.width},${a.height}`).assertEqual(`${b.x},${b.y},${b.width},${b.height}`);
+        });
+      } finally {
+        CYLLiquidGlass.activeOverride = savedOverride;
+      }
+    });
+
+    it('theGlassCardTintIsTheAppColorElseTheModeAwareDefault', 0, () => {
+      const style = groupedStyle();
+      style.sectionBackgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+      const savedOverride = CYLLiquidGlass.activeOverride;
+      try {
+        CYLLiquidGlass.activeOverride = true;
+        // Unset: the resource tint (resources/base light, resources/dark dark), not a string baked at build time.
+        expect(style.resolvedSectionBackgroundColor()).assertEqual(CYLSectionStyleColors.glassTint);
+        expect(CYLSectionStyleColors.glassTint === CYLSectionStyleColors.card).assertFalse();
+        // Set: the app's color wins in both modes.
+        style.sectionBackgroundColor = RED;
+        expect(style.resolvedSectionBackgroundColor()).assertEqual(RED);
+        expect(style.copy().resolvedSectionBackgroundColor()).assertEqual(RED);
+      } finally {
+        CYLLiquidGlass.activeOverride = savedOverride;
+      }
+    });
+
+    it('everyUnsetColorIsItsOwnModeAwareResourceAndASetColorWins', 0, () => {
+      // Each named color is one ResourceColor, so the system picks its resources/base value in light mode and its
+      // resources/dark value in dark mode while the list is shown; no unset color is a string.
+      const named: ResourceColor[] = [CYLSectionStyleColors.card, CYLSectionStyleColors.headerBand,
+        CYLSectionStyleColors.groupedBackground, CYLSectionStyleColors.separator, CYLSectionStyleColors.glassTint];
+      named.forEach((color: ResourceColor) => expect(typeof color === 'string' || typeof color === 'number').assertFalse());
+      const style = groupedStyle();
+      expect(style.resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
+      expect(style.resolvedSectionBackgroundColor()).assertEqual(CYLSectionStyleColors.card);
+      expect(style.resolvedHeaderSeparatorColor()).assertEqual(CYLSectionStyleColors.separator);
+      expect(style.headerBackgroundColor === undefined).assertTrue();
+      style.backgroundColor = RED;
+      style.sectionBackgroundColor = BLUE;
+      style.headerBackgroundColor = RED;
+      style.headerSeparatorColor = BLUE;
+      expect(style.resolvedBackgroundColor()).assertEqual(RED);
+      expect(style.resolvedSectionBackgroundColor()).assertEqual(BLUE);
+      expect(style.headerBackgroundColor).assertEqual(RED);
+      expect(style.resolvedHeaderSeparatorColor()).assertEqual(BLUE);
     });
 
     it('theConfigurationKeysParse', 0, () => {

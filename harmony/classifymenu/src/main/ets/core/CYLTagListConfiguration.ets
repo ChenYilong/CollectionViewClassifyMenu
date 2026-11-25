@@ -138,6 +138,8 @@ export class CYLMenuStyleKey {
   /** The section card: "plain" or "insetGrouped" (case-insensitive), or a `CYLSectionStyle` raw value. */
   static readonly sectionStyle: string = 'sectionStyle';
   static readonly sectionBackgroundColor: string = 'sectionBackgroundColor';
+  /** The card's background, as `backgroundStyle`: 'flat' or 'liquidGlass'; anything else is flat. */
+  static readonly sectionBackgroundStyle: string = 'sectionBackgroundStyle';
   static readonly sectionCornerRadius: string = 'sectionCornerRadius';
   static readonly sectionContentInsets: string = 'sectionContentInsets';
   /** The header band's color; absent: no band. */
@@ -723,6 +725,11 @@ export class CYLMenuConfiguration {
     const sectionStyle = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.sectionStyle], SECTION_STYLES);
     if (sectionStyle === CYLSectionStyle.plain || sectionStyle === CYLSectionStyle.insetGrouped) {
       style.sectionStyle = sectionStyle as CYLSectionStyle;
+    }
+    const cardBackground =
+      CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.sectionBackgroundStyle], BACKGROUND_STYLES);
+    if (cardBackground === CYLTagBackgroundStyle.flat || cardBackground === CYLTagBackgroundStyle.liquidGlass) {
+      style.sectionBackgroundStyle = cardBackground as CYLTagBackgroundStyle;
     }
     if (configuration[CYLMenuStyleKey.sectionBackgroundColor] !== undefined) {
       style.sectionBackgroundColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.sectionBackgroundColor]);
