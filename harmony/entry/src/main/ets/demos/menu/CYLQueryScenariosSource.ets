@@ -123,8 +123,8 @@ export function cylConfigureScenarioList(list: CYLTagListState, source: CYLQuery
   open: (scenario: CYLQueryScenario) => void, onHeight: (height: number) => void): void {
   list.selectionMode = CYLMenuSelectionMode.none;
   list.defaultVisibleRows = SCENARIO_DEFAULT_VISIBLE_ROWS;
-  list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.headerTrailing,
-    CYLMenuFoldControlContent.iconAndTitle);
+  list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.tail,
+    CYLMenuFoldControlContent.icon);
   list.longPressAction = CYLTagLongPressActions.callout;
   const style = new CYLMenuStyle();
   style.titleMaxLines = SCENARIO_TITLE_MAX_LINES;

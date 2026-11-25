@@ -47,7 +47,7 @@ export default function queryScenariosSourceTest() {
       }, (height: number) => {
       });
       expect(list.defaultVisibleRows).assertEqual(SCENARIO_DEFAULT_VISIBLE_ROWS);
-      expect(list.foldControl.position).assertEqual(CYLMenuFoldControlPosition.headerTrailing);
+      expect(list.foldControl.position).assertEqual(CYLMenuFoldControlPosition.tail);
       expect(list.selectionMode).assertEqual(CYLMenuSelectionMode.none);
       expect(list.style.titleMaxLines).assertEqual(SCENARIO_TITLE_MAX_LINES);
       expect(list.style.numberOfItemsPerRow).assertEqual(0);
