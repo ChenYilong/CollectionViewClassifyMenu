@@ -37,11 +37,24 @@ and the multiple filter are **not** removed.
 | `defaultVisibleRows` of the group | `CYLMenuStyle.foldedRows` / the fold control's visible rows |
 | `CYLTagView.reloadMenuData()` | `reloadMenuData()` of the list |
 
-### `cyl-tag-cloud` -> `cyl-tag-list` (mini program, package 0.2.0)
+### `cyl-tag-cloud` -> `cyl-tag-list` (mini program, package 0.2.0, breaking)
 
-The component tag `<cyl-tag-cloud>` is `<cyl-tag-list>`; its flat `tags` are one section of the list. The cloud's methods and events keep their
-names on `cyl-tag-list`; the exact table is in the package README ("Migration from cyl-tag-cloud"). Consumers that pin `^0.1.0` do not pick
-up the removal: raise the dependency to `^0.2.0` and rename the component in `usingComponents`.
+| cyl-tag-cloud | cyl-tag-list |
+| --- | --- |
+| `usingComponents` path `.../cyl-tag-cloud/cyl-tag-cloud` | `.../cyl-tag-list/cyl-tag-list` |
+| `<cyl-tag-cloud ...>` | `<cyl-tag-list ...>` with no `configuration`, or one without `sections` (flat tags are section 0) |
+| `require('.../cyl-tag-cloud/model.js')`, `cache.js`, `editing-icons.js` | `.../cyl-tag-list/tag-model.js`, `cache.js`, `editing-icons.js` |
+| `index.js` export `tagCloud` | `tagModel` |
+| every property, method and event (`tagtap`, `taglongpress` {position, tag}, `foldchange` {canFold, expanded}, `selectionchange` {positions}, ...) | same names, defaults and payloads for flat tags |
+| `setExpanded(expanded)` | same, or `setExpanded(0, expanded)` |
+| long press: drag or report | same, now through the list's long-press action (`"reorder"` only where flat tags can move; `"callout"` shows a tag's `subtitle`) |
+| (none) | `selectedItems()` / `setSelectedItems()` with keys `"0-<index>"` |
+
+Dependency: `cyl-tag-list-miniprogram@^0.2.0` (consumers on `^0.1.0` do not pick it up). The package README has the same table
+("Migration from cyl-tag-cloud").
+
+Known gaps of this first merge (not hidden): flat tags are still drawn by the cloud's renderer, so they have no animated icons, and
+they keep the cloud's own fold control and `foldchange` payload instead of the list's fold. Not yet looked at in WeChat DevTools.
 
 ## Who has to adapt
 
