@@ -49,24 +49,23 @@ All three features stay independent switches, and any combination is allowed; th
 - An opaque card over a background the Liquid Glass tags need hides the glass: choose a translucent `sectionBackgroundColor`, keep the
   style `plain`, or accept the look. The core never changes a color on its own because of the tag background style.
 
-## Decision of the owner, later the same day: the card and the header divider are the DEFAULT look
+## Decision of the owner, later the same day (revised): the rounded card is the DEFAULT look; the divider is opt-in
 
-The owner wants the rounded section card and the header divider with no setup: a tag list that sets nothing gets `sectionStyle =
-insetGrouped` and `headerSeparatorStyle = line`. To remove them the app calls the API: `sectionStyle = plain` and
-`headerSeparatorStyle = none` (configuration keys `"sectionStyle": "plain"`, `"headerSeparatorStyle": "none"`). The header band stays
-off by default (`headerBackgroundColor` null). This replaces the "Default" column above for these two features; every other default is
-unchanged.
+The owner wants the rounded section card with no setup: a tag list that sets nothing gets `sectionStyle = insetGrouped`. To remove it the
+app calls the API: `sectionStyle = plain` (configuration `"sectionStyle": "plain"`). The header divider is **not** a default: it
+shows only when the app calls the API (`headerSeparatorStyle = line`, configuration `"headerSeparatorStyle": "line"`); the default stays
+`none`. (An earlier version of this decision made the divider a default too; it was withdrawn.) The header band stays off by default
+(`headerBackgroundColor` null). This replaces the "Default" column above for the card only; every other default is unchanged.
 
 Consequences, so nobody is surprised:
 
 - This is a visible, breaking change of the default look on every platform (a new rounded white card behind each section's tags on a
-  grouped background, a hairline under each header). Frame-based tests change with it; the gate "the default style gives the same frames
-  as before" is replaced by "`plain` + `none` gives the same frames as before" (the snapshot tests of the first ports are kept and run
-  with those two values).
-- The default flips in a LAST step per platform, after the ports are verified with the old defaults, as one commit that: flips the
-  defaults, sets `plain` / `none` in the tests and demos that must keep their old look, updates the screenshots that show a list,
-  and writes the default in the integration docs (README of the repository, each package README: iOS, Android, HarmonyOS, mini program,
-  React Native, Flutter) with the opt-out lines.
+  grouped background). Frame-based tests change with it; the gate "the default style gives the same frames as before" is replaced by
+  "`sectionStyle = plain` gives the same frames as before" (the snapshot tests of the first ports are kept and run with that value).
+- The default flips in a LAST step per platform, after the ports are verified with the old default, as one commit that: flips the
+  card default, sets `plain` in the tests and demos that must keep their old look, updates the screenshots that show a list, and writes
+  the default in the integration docs (README of the repository, each package README: iOS, Android, HarmonyOS, mini program,
+  React Native, Flutter) with the opt-out line and the opt-in line for the divider.
 - A tag list inside a screen that already draws its own card (a tag bar in a toolbar, the classify menu, the multiple filter, the tab
   bar's popovers) must opt out; the library's own such screens are changed to `plain` in the same commit.
 
@@ -83,6 +82,25 @@ Consequences, so nobody is surprised:
   both modes; an unset color follows the mode, and changes when the mode changes while the list is shown (no reload by the app).
   Tests per platform: each unset color resolves to its light value in light mode and its dark value in dark mode, switching the mode
   updates a shown list, and a set color is kept in both modes.
+
+## Built-in views have a default tint that is legible on what is behind them (owner, bug `mp-home-dark.png`, 2026-11-25)
+
+The bug: in dark mode the list's own texts and icons (section header title, the More / Less control, the section icon) were drawn in the
+dark-mode tint (white) directly on the host page; a host page that does not follow dark mode stays light, so the texts could not be read.
+The list cannot see the host's background, so the library must make its built-in views legible by itself:
+
+- New style property `tintColor` (nullable; configuration key `tintColor`): the one color of every built-in view that is not a tag:
+  header title, section icon, fold / More control (text, icon, arrow). An app that sets it wins in both modes.
+- The default tint (`tintColor` unset) is resolved against the background the built-in views are really drawn on, in this order:
+  1. the opaque background the list paints itself: `backgroundColor` when the app set it, else the grouped background under
+     `insetGrouped` (the default look): choose black or white by the background's luminance (the contrast rule, one named threshold);
+  2. otherwise (a transparent list over the host page) the system mode: black in light, white in dark (what it did before).
+  The header band, when shown, is part of the background the title is drawn on: the tint is resolved against the band color there.
+- Because the card is the default look (see above) the default list background is the grouped background (#F2F2F7 / black), painted by
+  the list, so the built-in views are legible with no setup. A transparent list (`plain` with a clear `backgroundColor`) over a host
+  page that ignores dark mode is the host's choice: the app sets `tintColor` or its list `backgroundColor`.
+- Tests per platform: tint on a light list background is dark and on a dark one light, whatever the system mode; unset + transparent
+  follows the mode; a set `tintColor` wins; the band color is used when a band is shown; switching the mode re-resolves a shown list.
 
 ## Gates
 
