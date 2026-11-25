@@ -22,9 +22,6 @@ import sys
 # [EN] The pod's public headers (CollectionViewClassifyMenu.podspec source_files). [CN] pod 的公开头文件。
 PUBLIC_HEADERS = [
     'CollectionViewClassifyMenu/Class/*.h',
-    'TagCollectionView/TagCollectionView/CYLTagView.h',
-    'TagCollectionView/TagCollectionView/Model/*.h',
-    'TagCollectionView/TagCollectionView/Views/*.h',
 ]
 ONE_LINE_BLOCK = re.compile(r'^(\s*)/\*[*!](?!<)\s?(.*?)\s*\*/\s*$')
 TRAILING = re.compile(r'^(\s*)(?!//|/\*|\*)([^"\n]*?[^\s/])\s*(?:///<|/\*\*<|/\*!<|//(?!/))\s?(.*?)\s*(?:\*/)?\s*$')

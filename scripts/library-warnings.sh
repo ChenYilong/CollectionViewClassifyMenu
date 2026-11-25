@@ -2,9 +2,9 @@
 # Usage: scripts/library-warnings.sh
 #
 # [EN] Builds and analyzes the Example app, which compiles the pod's sources, and fails when the library's own sources
-#      (CollectionViewClassifyMenu/Class, TagCollectionView/TagCollectionView) produce a build or analyzer warning.
+#      (CollectionViewClassifyMenu/Class) produce a build or analyzer warning.
 #      Logs: build/library-build.log, build/library-analyze.log. A table of warnings goes to build/warnings.md.
-# [CN] 编译并静态分析 Example（它会编译 pod 源码）；本库源码（CollectionViewClassifyMenu/Class、TagCollectionView/TagCollectionView）
+# [CN] 编译并静态分析 Example（它会编译 pod 源码）；本库源码（CollectionViewClassifyMenu/Class）
 #      出现构建或静态分析警告时失败。日志在 build/ 下，警告列表写入 build/warnings.md。
 set -eu
 cd "$(dirname "$0")/.."
@@ -31,7 +31,7 @@ for ACTION in build analyze; do
     exit "$STATUS"
   fi
 done
-WARNINGS=$(grep -hE '/(CollectionViewClassifyMenu/Class|TagCollectionView/TagCollectionView)/[^:]+\.[mh]:[0-9]+:[0-9]+: warning: ' \
+WARNINGS=$(grep -hE '/CollectionViewClassifyMenu/Class/[^:]+\.[mh]:[0-9]+:[0-9]+: warning: ' \
   build/library-build.log build/library-analyze.log | sed "s|$ROOT/||" | sort -u || true)
 COUNT=$(printf '%s' "$WARNINGS" | grep -c . || true)
 {

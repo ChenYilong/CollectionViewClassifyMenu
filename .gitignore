@@ -20,7 +20,6 @@ Example-Shared/PAGResources/pag-ios/
 .DS_Store 
 CollectionViewClassifyMenu.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
 Example/CYLMenuExample.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
-TagCollectionView/TagCollectionView.xcodeproj/project.xcworkspace/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
 build/ 
 *.pbxuser 
 !default.pbxuser 
@@ -45,7 +44,6 @@ Pods
 
 CollectionViewClassifyMenu.xcodeproj/xcuserdata/*.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
 Example/CYLMenuExample.xcodeproj/xcuserdata/*.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
-TagCollectionView/TagCollectionView.xcodeproj/xcuserdata/*.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
 *.xcuserstate
 *.xcbkptlist
 *.xcuserstate
