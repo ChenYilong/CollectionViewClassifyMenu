@@ -544,9 +544,15 @@ open class CYLTagButton: CYLAnimatedItemView {
             let text = (displayed as NSString).boundingRect(with: CGSize(width: max(1, room), height: .greatestFiniteMagnitude),
                                                             options: [.usesLineFragmentOrigin, .usesFontLeading],
                                                             attributes: [.font: font], context: nil)
-            return max(height, ceil(text.height) + insets.top + insets.bottom)
+            // The title takes at most titleMaxLines lines: the wrapped height stops there.
+            let lines = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? text.height
+                : min(text.height, CGFloat(style.titleMaxLines) * font.lineHeight)
+            return max(height, ceil(lines) + insets.top + insets.bottom)
         }
     }
+
+    /// UIKit's `numberOfLines` value for "as many lines as it needs".
+    private static let uiKitUnlimitedLines = 0
 
     // MARK: - Overrides
 
@@ -1104,9 +1110,9 @@ open class CYLTagButton: CYLAnimatedItemView {
                 icon.imageView.tintColor = color
             }
         }
-        // A wrapping title (CYLMenuStyle.titleWraps) takes as many lines as it needs.
-        titleLabel.numberOfLines = style.titleWraps ? 0 : 1
-        titleLabel.lineBreakMode = style.titleWraps ? .byWordWrapping : .byTruncatingTail
+        // A title that may wrap (CYLMenuStyle.titleMaxLines) takes that many lines (UIKit counts 0 as "as many as it needs").
+        titleLabel.numberOfLines = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? Self.uiKitUnlimitedLines : style.titleMaxLines
+        titleLabel.lineBreakMode = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? .byWordWrapping : .byTruncatingTail
         applyElevation()
         deleteIndicatorLabel.accessibilityLabel = showsDeleteIndicator ? CYLMenuLocalizedString("CYLMenuDeleteTag") : nil
         let placement: CYLAnimatedItemAccessoryPlacement = style.deleteIndicatorPlacement == .leading ? .leading : .trailing

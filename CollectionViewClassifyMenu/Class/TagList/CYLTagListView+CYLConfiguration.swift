@@ -304,6 +304,11 @@ public enum CYLMenuStyleKey {
     public static let itemHeight = "itemHeight"
 
     /**
+     * The most lines a title may take: a whole number, or "unlimited". Default 1.
+     */
+    public static let titleMaxLines = "titleMaxLines"
+
+    /**
      * The grid's items per row (`CYLMenuStyle.numberOfItemsPerRow`); 0 for the flow layout.
      */
     public static let numberOfItemsPerRow = "itemsPerRow"
@@ -1131,6 +1136,13 @@ extension CYLMenuStyle {
         }
         if let value = Value.double(configuration[Key.itemHeight]) {
             itemHeight = value
+        }
+        if let value = configuration[Key.titleMaxLines] {
+            if let text = value as? String, text == "unlimited" {
+                titleMaxLines = CYLTagTitleMaxLines.unlimited
+            } else if let number = Value.number(value) {
+                titleMaxLines = number.intValue
+            }
         }
         if let value = Value.number(configuration[Key.numberOfItemsPerRow]) {
             numberOfItemsPerRow = max(0, value.intValue)

@@ -180,3 +180,59 @@ final class CYLTagLongPressActionTests: XCTestCase {
         XCTAssertNil(source?.menuSubtitleForItem?(at: IndexPath(item: 1, section: 0)) ?? nil)
     }
 }
+
+/// A tag's title wraps up to `CYLMenuStyle.titleMaxLines` lines: 1 by default, a number of the app's choice, or
+/// `CYLTagTitleMaxLines.unlimited` (a named value, no literal at the call site).
+final class CYLTagTitleMaxLinesTests: XCTestCase {
+
+    func testTheDefaultIsOneLineAndTitleWrapsIsItsShortForm() {
+        let style = CYLMenuStyle()
+        XCTAssertEqual(style.titleMaxLines, CYLTagTitleMaxLines.single)
+        XCTAssertFalse(style.titleWraps)
+        style.titleWraps = true
+        XCTAssertEqual(style.titleMaxLines, CYLTagTitleMaxLines.unlimited)
+        style.titleMaxLines = 3
+        XCTAssertTrue(style.titleWraps)
+        XCTAssertEqual((style.copy() as? CYLMenuStyle)?.titleMaxLines, 3)
+        style.titleWraps = false
+        XCTAssertEqual(style.titleMaxLines, CYLTagTitleMaxLines.single)
+    }
+
+    func testAValueBelowOneIsOneLine() {
+        let style = CYLMenuStyle()
+        style.titleMaxLines = 0
+        XCTAssertEqual(style.titleMaxLines, CYLTagTitleMaxLines.single)
+        style.titleMaxLines = -4
+        XCTAssertEqual(style.titleMaxLines, CYLTagTitleMaxLines.single)
+    }
+
+    func testTheWrappedHeightStopsAtTheLimit() {
+        let text = String(repeating: "word ", count: 40)
+        let style = CYLMenuStyle()
+        func height() -> CGFloat {
+            CYLTagButton.height(forTitle: text, iconSize: .zero, width: 120, showsDeleteIndicator: false, style: style,
+                                traitCollection: nil)
+        }
+        let one = height()
+        style.titleMaxLines = 3
+        let three = height()
+        style.titleMaxLines = CYLTagTitleMaxLines.unlimited
+        let all = height()
+        XCTAssertGreaterThan(three, one)
+        XCTAssertGreaterThan(all, three)
+    }
+
+    func testAConfigurationSetsTheLimit() {
+        let sections: [[String: Any]] = [[CYLTagSectionKey.items: ["a"]]]
+        let three = CYLTagListView(configuration: [
+            CYLTagListKey.style: [CYLMenuStyleKey.titleMaxLines: 3],
+            CYLTagListKey.sections: sections,
+        ])
+        XCTAssertEqual(three.style.titleMaxLines, 3)
+        let all = CYLTagListView(configuration: [
+            CYLTagListKey.style: [CYLMenuStyleKey.titleMaxLines: "unlimited"],
+            CYLTagListKey.sections: sections,
+        ])
+        XCTAssertEqual(all.style.titleMaxLines, CYLTagTitleMaxLines.unlimited)
+    }
+}
