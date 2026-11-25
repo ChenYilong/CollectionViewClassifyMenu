@@ -220,21 +220,24 @@ export class CYLMenuStyle {
   // Section headers
   headerHeight: number = 36;
   headerFont: CYLFont = CYLFont.systemFont(14);
-  headerTextColor: string = CYLColor.GRAY;
+  /**
+   * The list's one tint of texts and icons: the system's primary font color (`sys.color.font_primary`), which follows dark
+   * mode, as `UIColor.label` does on iOS. Any `ResourceColor` replaces it.
+   */
+  headerTextColor: ResourceColor = $r('sys.color.font_primary');
   headerHorizontalInset: number = 16;
 
   // Fold controls
-  foldControlColor: string = CYLColor.GRAY;
+  /** The fold controls' color: the list's one tint by default (see `headerTextColor`); a control's own color wins. */
+  foldControlColor: ResourceColor = $r('sys.color.font_primary');
   expandTitle: string = CYLMenuLocalizedString('CYLMenuExpand');
   foldChevronImage?: ResourceStr;
   collapseTitle: string = CYLMenuLocalizedString('CYLMenuCollapse');
 
   // The More button
   moreButtonImage?: ResourceStr;
-  /**
-   * `UIColor.secondaryLabel` in its light appearance.
-   */
-  moreButtonColor: string = CYLColor.argb(153, 60, 60, 67);
+  /** The More button's color: the list's one tint by default (see `headerTextColor`). */
+  moreButtonColor: ResourceColor = $r('sys.color.font_primary');
 
   constructor() {
     this.storedNormal.borderColor = CYLColor.white(0.82);

@@ -401,9 +401,10 @@ open class CYLTagButton @JvmOverloads constructor(
         val font = style.titleFontForState(state)
         titleLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, font.size)
         titleLabel.typeface = font.typeface
-        titleLabel.setTextColor(appearance.textColor)
+        val textColor = appearance.resolvedTextColor(context)
+        titleLabel.setTextColor(textColor)
         titleLabel.maxLines = style.titleMaxLines
-        var backgroundColor = appearance.backgroundColor
+        var backgroundColor = appearance.resolvedBackgroundColor(context)
         val highlighted = isHighlighted && state != CYLControlState.DISABLED && style.highlightedBackgroundColor != null
         if (highlighted) backgroundColor = style.highlightedBackgroundColor!!
         // The background is CYLAnimatedItemView's: the flat color, or Liquid Glass tinted with it where the device draws it.
@@ -428,22 +429,22 @@ open class CYLTagButton @JvmOverloads constructor(
         deleteIndicatorLabel.text = if (showsDeleteIndicator && !drawsCross && !editingIcons) style.deleteIndicatorTitle else null
         if (editingIcons || editingIndicatorsViewIsLoaded) {
             editingIndicatorsView.visibility = if (editingIcons) VISIBLE else GONE
-            editingIndicatorsView.iconColor = style.deleteIndicatorColor ?: appearance.textColor
+            editingIndicatorsView.iconColor = style.deleteIndicatorColor ?: textColor
         }
         deleteIndicatorLabel.contentDescription = if (showsDeleteIndicator) CYLMenuLocalizedString("CYLMenuDeleteTag", "Deletes a tag") else null
         val placement = if (style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading)
             CYLAnimatedItemAccessoryPlacement.Leading else CYLAnimatedItemAccessoryPlacement.Trailing
         if (accessoryPlacement != placement) accessoryPlacement = placement
         crossPaint.strokeWidth = style.deleteIndicatorLineWidth * density
-        crossPaint.color = style.deleteIndicatorColor ?: appearance.textColor
+        crossPaint.color = style.deleteIndicatorColor ?: textColor
         val deleteFont = style.deleteIndicatorFontForState(state)
         deleteIndicatorLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, deleteFont.size)
         deleteIndicatorLabel.typeface = deleteFont.typeface
-        deleteIndicatorLabel.setTextColor(style.deleteIndicatorColor ?: appearance.textColor)
+        deleteIndicatorLabel.setTextColor(style.deleteIndicatorColor ?: textColor)
         var borderColor = appearance.borderColor
         var borderWidth = if (borderColor != null) appearance.borderWidth else 0f
         if (CYLAccessibility.isIncreaseContrastEnabled(context)) {
-            borderColor = if (state == CYLControlState.SELECTED) appearance.borderColor ?: appearance.textColor else appearance.textColor
+            borderColor = if (state == CYLControlState.SELECTED) appearance.borderColor ?: textColor else textColor
             borderWidth = max(1f, appearance.borderWidth)
         }
         // At least one pixel, as before; CYLAnimatedItemView draws the border.

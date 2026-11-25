@@ -30,7 +30,7 @@ export class CYLTagListSupplementaryView {
   /** The More button. */
   showsMoreButton: boolean = false;
   moreImage?: ResourceStr;
-  moreColor: string = CYLColor.GRAY;
+  moreColor: ResourceColor = CYLColor.GRAY;
   moreAccessibilityLabel: string = '';
   accessoryView?: WrappedBuilder<[number]>;
   /** The inputs it was last configured from (the list reconfigures it only when they change). */

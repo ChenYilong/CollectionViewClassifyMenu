@@ -24,6 +24,7 @@
 const model = require('./model.js');
 const animations = require('./animations.js');
 const locale = require('../locale.js');
+const theme = require('./theme.js');
 
 /** The core's localized fold titles (CYLMenuExpand / CYLMenuCollapse) when the string tables have them. */
 function foldTitle(control, expanded) {
@@ -70,6 +71,11 @@ Component({
     attached() {
       this.expanded = {};
       this.rebuild();
+      // The defaults follow dark mode: build again when the system theme changes.
+      this.stopThemeChanges = theme.onChange(() => this.rebuild());
+    },
+    detached() {
+      if (this.stopThemeChanges) this.stopThemeChanges();
     },
   },
 
@@ -83,7 +89,7 @@ Component({
   methods: {
     rebuild() {
       this.dismissCallout();
-      this.model = model.normalize(this.data.configuration, { pixelRatio: pixelRatio() });
+      this.model = model.normalize(this.data.configuration, { pixelRatio: pixelRatio(), dark: theme.isDark() });
       this.selection = this.model.selectedItems.slice();
       this.rows = null;
       this.expanded = this.expanded || {};

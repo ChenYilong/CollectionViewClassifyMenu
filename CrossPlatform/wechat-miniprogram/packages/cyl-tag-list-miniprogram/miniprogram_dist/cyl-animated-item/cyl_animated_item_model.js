@@ -334,6 +334,90 @@ function cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden) {
   }
 }
 
+/**
+ * [EN] A color the animation can be drawn in as a canvas / CSS color: '#RGB', '#RRGGBB' and '#RRGGBBAA' ('#RGBA' too) as written
+ *      ('#RRGGBBAA' as rgba(), which every canvas understands), any other plain color text (a name, rgb(), hsl()) as it is; '' for
+ *      blank text, "title" or text outside a plain color's characters (it could break out of a style value). The shared contract is "#RRGGBB" / "#RRGGBBAA".
+ * [CN] 动画可以使用的 canvas / CSS 颜色：'#RGB'、'#RRGGBB'、'#RRGGBBAA'（及 '#RGBA'）；'#RRGGBBAA' 转为 rgba()（所有 canvas 都认识），
+ *      其他普通颜色文本（名称、rgb()、hsl()）原样使用；空白文本、"title" 或含有普通颜色以外字符的文本（可能破坏样式值）为 ''。共同约定为 "#RRGGBB" / "#RRGGBBAA"。
+ */
+function cylAnimatedItemTintColor(value) {
+  const text = String(value === null || value === undefined ? '' : value).trim()
+  if (!text || text.toLowerCase() === 'title' || /[^\w#(),.%\s/-]/.test(text)) return ''
+  const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(text)
+  if (!hex || hex[1].length === 3 || hex[1].length === 6) return text
+  const digits = hex[1].length === 4 ? hex[1].replace(/./g, '$&$&') : hex[1]
+  const channel = (index) => Number.parseInt(digits.slice(index * 2, index * 2 + 2), 16)
+  return `rgba(${channel(0)},${channel(1)},${channel(2)},${Math.round((channel(3) / 255) * 1000) / 1000})`
+}
+
+/**
+ * [EN] A tint OPTION (`animationTint` / `animationDarkTint`) as a canvas / CSS color: only "#RGB", "#RGBA", "#RRGGBB" and
+ *      "#RRGGBBAA" count (8 digits are ALWAYS #RRGGBBAA, the iOS / Rive order, never #AARRGGBB); anything else (a name, "title",
+ *      other text) is '' = not set.
+ * [CN] 着色「选项」（`animationTint` / `animationDarkTint`）转为 canvas / CSS 颜色：只有 "#RGB"、"#RGBA"、"#RRGGBB"、"#RRGGBBAA"
+ *      有效（8 位始终是 #RRGGBBAA，即 iOS / Rive 的顺序，绝不是 #AARRGGBB）；其他文本（名称、"title"、任意文字）为 ''，即未设置。
+ */
+function cylAnimatedItemTintHex(value) {
+  const text = String(value === null || value === undefined ? '' : value).trim()
+  return /^#(?:[0-9a-f]{6}|[0-9a-f]{8})$/i.test(text) ? cylAnimatedItemTintColor(text) : ''
+}
+
+/**
+ * [EN] The one color an animation is drawn in (the same names and values as Rive's `tint` / `darkTint`), or '' for the file's own
+ *      colors. THE truth table (identical on every platform): `animationTint` unset or invalid text: no tint. "title": unselected the
+ *      normal icon color; selected the selected icon color, else the normal one; no icon color at all: no tint. A fixed color
+ *      ("#RRGGBB" / "#RRGGBBAA"): unselected the fixed color, in dark mode `animationDarkTint` when it is a valid color; selected the
+ *      selected icon color when there is one, else the fixed color (`animationDarkTint` still applies to that fixed color in dark
+ *      mode). `iconTint` / `selectedIconTint` are the icon colors (unset or '' = absent). A set `animationTint` overrides the same
+ *      option in the animation source; setting or clearing it is just another call with the new values.
+ * [CN] 动画使用的唯一颜色（名称与取值同 Rive 的 `tint` / `darkTint`），'' 表示保持文件自身的颜色。真值表（各平台一致）：`animationTint`
+ *      未设置或文本无效：不着色。"title"：未选中取普通图标颜色；选中取选中图标颜色，否则取普通图标颜色；完全没有图标颜色：不着色。
+ *      固定颜色（"#RRGGBB" / "#RRGGBBAA"）：未选中为固定颜色，深色模式下 `animationDarkTint` 有效时用它；选中时有选中图标颜色就用它，
+ *      否则用固定颜色（深色模式下 `animationDarkTint` 仍作用于该固定颜色）。`iconTint` / `selectedIconTint` 是图标颜色（未设置或 '' 为没有）。
+ *      已设置的 `animationTint` 覆盖动画来源中的同名选项；设置或清除只是用新值再调用一次。
+ */
+function cylAnimatedItemAnimationTint(input) {
+  const p = input || {}
+  // [EN] A non-blank property wins over the option of the same name in the source, valid or not (an invalid one is unset); a blank
+  //      one falls back to the option. Same on every platform. [CN] 非空属性（有效与否）优先于来源中同名的选项（无效即未设置）；
+  //      空属性回退到选项。各平台相同。
+  const option = cylAnimatedItemHasValue(p.animationTint) ? String(p.animationTint).trim() : cylAnimatedItemSourceOption(p.animationUrl, 'tint')
+  const darkOption = cylAnimatedItemHasValue(p.animationDarkTint) ? p.animationDarkTint : cylAnimatedItemSourceOption(p.animationUrl, 'darkTint')
+  const normal = cylAnimatedItemTintColor(p.iconTint)
+  const selectedColor = cylAnimatedItemTintColor(p.selectedIconTint)
+  // [EN] "title" is case-sensitive, as on every platform. [CN] "title" 区分大小写，各平台相同。
+  if (option === 'title') return p.selected ? selectedColor || normal : normal
+  const fixed = cylAnimatedItemTintHex(option)
+  if (!fixed) return ''
+  if (p.selected && selectedColor) return selectedColor
+  return (p.isDark && cylAnimatedItemTintHex(darkOption)) || fixed
+}
+
+/**
+ * [EN] The value of the option `name` in the animation source ("file#tint=title&darkTint=#FFFFFF", also after a "?"), '' when
+ *      the source has none; percent-decoded, trimmed. [CN] 动画来源中选项 `name` 的值（"file#tint=title&darkTint=#FFFFFF"，也可在 "?" 之后），
+ *      没有时为 ''；百分号解码并去掉首尾空白。
+ */
+function cylAnimatedItemSourceOption(source, name) {
+  const text = String(source === null || source === undefined ? '' : source)
+  const at = text.search(/[#?]/)
+  if (at < 0) return ''
+  let found = ''
+  cylAnimatedItemOptionPairs(text.slice(at + 1)).forEach((pair) => {
+    const eq = pair.indexOf('=')
+    if (eq <= 0 || pair.slice(0, eq) !== name) return
+    let value = pair.slice(eq + 1)
+    try { value = decodeURIComponent(value) } catch (e) { /* keep the raw value */ }
+    found = value.trim()
+  })
+  return found
+}
+
+function cylAnimatedItemHasValue(value) {
+  return value !== null && value !== undefined && String(value).trim() !== ''
+}
+
 function cylAnimatedItemModel(input) {
   const p = cylAnimatedItemCountdownProperties(input)
   const animationPath = p.animationUrl || ''
@@ -383,8 +467,20 @@ function cylAnimatedItemModel(input) {
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
     iconTint: layers.currentTint,
     still: layers,
-    // [EN] The animation's one color (cyl-rive `tint`). [CN] 动画的单一颜色（cyl-rive 的 `tint`）。
-    animationTint: String(p.animationTint || '').trim(),
+    // [EN] The animation's one color (cyl-rive `tint`; GIF through a CSS filter): see `cylAnimatedItemAnimationTint`.
+    //      [CN] 动画的单一颜色（cyl-rive 的 `tint`；GIF 通过 CSS filter）：见 `cylAnimatedItemAnimationTint`。
+    animationTint: cylAnimatedItemAnimationTint({
+      animationTint: p.animationTint,
+      animationDarkTint: p.animationDarkTint,
+      animationUrl: animationPath,
+      selected: p.selected,
+      isDark: dark,
+      // [EN] The icon colors the tint follows: `animationIconTint` / `animationSelectedIconTint` when set (a tab bar item passes its
+      //      title colors), else `iconTint` / `selectedIconTint`. [CN] 着色所跟随的图标颜色：设置了 `animationIconTint` /
+      //      `animationSelectedIconTint` 时用它们（TabBar 项传入标题颜色），否则用 `iconTint` / `selectedIconTint`。
+      iconTint: cylAnimatedItemHasValue(p.animationIconTint) ? p.animationIconTint : p.iconTint,
+      selectedIconTint: cylAnimatedItemHasValue(p.animationSelectedIconTint) ? p.animationSelectedIconTint : p.selectedIconTint,
+    }),
     axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : '') + (p.itemStyle === 'countdown' ? ' cyl-animated-item-countdown' : ''),
     ariaHidden: !!p.embedded,
     accessoryPlacement: ['leading', 'trailing', 'topTrailing'].includes(p.accessoryPlacement) ? p.accessoryPlacement : 'trailing',
@@ -516,6 +612,7 @@ function cylAnimatedItemResource(animationUrl) {
 }
 
 module.exports = {
+  cylAnimatedItemSourceOption,
   cylAnimatedItemMissingReason,
   cylAnimatedItemResource,
   cylAnimatedItemGlassTint,
@@ -526,6 +623,9 @@ module.exports = {
   cylAnimatedItemLiquidGlassSetActiveOverride,
   cylAnimatedItemCountdownTitleWidth,
   cylAnimatedItemIsDark,
+  cylAnimatedItemAnimationTint,
+  cylAnimatedItemTintColor,
+  cylAnimatedItemTintHex,
   cylAnimatedItemModel,
   cylAnimatedItemType,
   cylAnimatedItemSource,

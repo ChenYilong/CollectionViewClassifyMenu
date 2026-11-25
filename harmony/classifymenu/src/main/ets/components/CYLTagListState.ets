@@ -325,7 +325,7 @@ export class CYLTagButtonMetrics {
 /** The looks and sizes of the fold controls (`CYLTagFoldButton`). */
 export class CYLTagFoldMetrics {
   /** A borderless tag: no background, the title then the icon, in `color`. */
-  static style(control: CYLMenuFoldControl, color?: string): CYLMenuStyle {
+  static style(control: CYLMenuFoldControl, color?: ResourceColor): CYLMenuStyle {
     const style = new CYLMenuStyle();
     const font = control.font ?? CYLFont.systemFont(FOOTNOTE_SIZE);
     const tint = control.color ?? color ?? SECONDARY_LABEL;

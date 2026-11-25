@@ -16,7 +16,8 @@ test('the default style is CYLMenuStyle(): hairline gray borders, green selectio
   assert.equal(s.disabled.textColor, '#B3B3B3');
   assert.equal(s.layoutCentered, true);
   assert.equal(s.animationSpeed, 1);
-  assert.equal(s.headerTextColor, '#808080');
+  // The list's own texts and icons: one tint that follows dark mode (iOS UIColor.label), black in light mode.
+  assert.equal(s.headerTextColor, '#000000');
   assert.equal(model.normalize({}).style.normal.borderWidth, 0.5);
 });
 

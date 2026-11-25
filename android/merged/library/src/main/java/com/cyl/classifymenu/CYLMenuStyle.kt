@@ -145,18 +145,33 @@ class CYLMenuStyle {
     // Section headers
     var headerHeight: Float = 36f
     var headerFont: CYLFont = CYLFont.systemFont(14f)
-    var headerTextColor: Int = Color.GRAY
+    /** null (the default): the list's one tint, the theme's `textColorPrimary`, so it is visible in dark mode (iOS `UIColor.label`). */
+    var headerTextColor: Int? = null
     var headerHorizontalInset: Float = 16f
 
     // Fold controls
-    var foldControlColor: Int = Color.GRAY
+    /** null (the default): the list's one tint (see [headerTextColor]); a control's own color wins. */
+    var foldControlColor: Int? = null
     var expandTitle: String = CYLMenuLocalizedString("CYLMenuExpand", "Expand a section")
     var foldChevronImage: Drawable? = null
     var collapseTitle: String = CYLMenuLocalizedString("CYLMenuCollapse", "Collapse a section")
 
     // The More button
     var moreButtonImage: Drawable? = null
-    var moreButtonColor: Int = CYLColor.white(0.24f, 0.6f)
+    /** null (the default): the list's one tint (see [headerTextColor]). */
+    var moreButtonColor: Int? = null
+
+    /** The header title color in use: [headerTextColor], else the list's one tint of [context]. */
+    fun resolvedHeaderTextColor(context: android.content.Context): Int = headerTextColor ?: CYLSystemColors.primary(context)
+
+    /** The fold controls' color in use: [foldControlColor], else the list's one tint of [context]. */
+    fun resolvedFoldControlColor(context: android.content.Context): Int = foldControlColor ?: CYLSystemColors.primary(context)
+
+    /** The More button's color in use: [moreButtonColor], else the list's one tint of [context]. */
+    fun resolvedMoreButtonColor(context: android.content.Context): Int = moreButtonColor ?: CYLSystemColors.primary(context)
+
+    /** The clear button's color in use: [clearButtonColor], else the header title's. */
+    fun resolvedClearButtonColor(context: android.content.Context): Int = clearButtonColor ?: resolvedHeaderTextColor(context)
 
     init {
         val hairline = 1f / max(1f, Resources.getSystem().displayMetrics.density)

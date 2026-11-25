@@ -24,6 +24,14 @@ class CYLTagAppearance : Cloneable {
         get() = _textColor ?: CYLColor.white(0.25f)
         set(value) { _textColor = value }
 
+    /** The background in use: [backgroundColor] when set, else white, or the secondary system background in night mode (iOS: the dynamic default). */
+    fun resolvedBackgroundColor(context: android.content.Context): Int =
+        _backgroundColor ?: if (CYLSystemColors.isNight(context)) CYLSystemColors.SECONDARY_BACKGROUND_DARK else android.graphics.Color.WHITE
+
+    /** The title color in use: [textColor] when set, else dark gray, or the list's primary tint in night mode. */
+    fun resolvedTextColor(context: android.content.Context): Int =
+        _textColor ?: if (CYLSystemColors.isNight(context)) CYLSystemColors.primary(context) else CYLColor.white(0.25f)
+
     /** null_resettable: the 14 sp system font by default. */
     var font: CYLFont
         get() = _font ?: CYLFont.systemFont(14f)

@@ -33,7 +33,7 @@ export class CYLTagFoldButton extends CYLTagButton {
    * Shows `foldControl` in `color` (its own color wins) for the expanded or collapsed state; the icon turns with an
    * animation when `animated`.
    */
-  applyFoldControl(foldControl: CYLMenuFoldControl, color: string | undefined, expanded: boolean,
+  applyFoldControl(foldControl: CYLMenuFoldControl, color: ResourceColor | undefined, expanded: boolean,
     animated: boolean): void {
     this.apply(foldControl, CYLTagFoldMetrics.style(foldControl, color), expanded, animated);
   }
