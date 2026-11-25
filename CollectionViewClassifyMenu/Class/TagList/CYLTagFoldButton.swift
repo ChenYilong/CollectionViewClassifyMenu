@@ -138,13 +138,13 @@ open class CYLTagFoldButton: CYLTagButton {
         let tint = control.color ?? itemStyle.foldControlColor
         for state in [UIControl.State.selected, .disabled] {
             let appearance = style.appearance(for: state)
-            appearance.backgroundColor = normal.backgroundColor
+            appearance.backgroundColor = normal.explicitBackgroundColor
             appearance.borderColor = normal.borderColor
             appearance.borderWidth = normal.borderWidth
             appearance.cornerRadius = normal.cornerRadius
             appearance.margin = normal.margin
             appearance.font = normal.font
-            appearance.textColor = normal.textColor
+            appearance.textColor = normal.explicitTextColor
         }
         for state in allStates {
             style.setIconColor(tint, for: state)

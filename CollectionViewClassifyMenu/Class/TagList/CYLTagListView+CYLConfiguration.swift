@@ -1075,10 +1075,10 @@ extension CYLTagAppearance {
         typealias Key = CYLTagAppearanceKey
         let baseURL = Value.baseURL(of: configuration)
         if let value = configuration[Key.backgroundColor] {
-            backgroundColor = Value.color(value) ?? CYLTagAppearance.defaultBackgroundColor
+            backgroundColor = Value.color(value)
         }
         if let value = configuration[Key.textColor] {
-            textColor = Value.color(value) ?? CYLTagAppearance.defaultTextColor
+            textColor = Value.color(value)
         }
         if let value = configuration[Key.font] {
             font = Value.font(value) ?? CYLTagAppearance.defaultFont

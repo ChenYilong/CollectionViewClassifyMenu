@@ -69,7 +69,7 @@ import CYLTabBarController
      */
     case flat = 0
     /**
-     * A Liquid Glass material behind the content, tinted with the state's `backgroundColor`, drawn only where the system
+     * A Liquid Glass material behind the content, tinted with the state's EXPLICIT `backgroundColor` (an unset one is ignored: frosted default), drawn only where the system
      * draws Liquid Glass (`CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and later, the rule of CYLTabBarController);
      * elsewhere the style is ignored and the tag stays flat.
      */
@@ -368,8 +368,8 @@ open class CYLMenuStyle: NSObject, NSCopying {
 
     /**
      * The tag background: `.flat` (the default) is the solid color of each state's appearance; `.liquidGlass` draws a
-     * Liquid Glass material behind the content, tinted with the state's `backgroundColor` and clipped to the corner
-     * radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     * Liquid Glass material behind the content, tinted with the state's explicit `backgroundColor` (an unset one is ignored, so the
+     * backdrop shows through the component's frosted default) and clipped to the corner radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
      */
     open var backgroundStyle: CYLTagBackgroundStyle = .flat
 
@@ -778,12 +778,12 @@ open class CYLMenuStyle: NSObject, NSCopying {
 
     /**
      * Like `UITabBarItem.setTitleTextAttributes(_:for:)`: `.font` and `.foregroundColor` set the state's appearance
-     * font and text color (their defaults when missing).
+     * font and text color (their defaults when missing: a missing `.foregroundColor` resets the text color to unset, the class built-in).
      */
     open func setTitleTextAttributes(_ attributes: [NSAttributedString.Key: Any]?, for state: UIControl.State) {
         let appearance = appearance(for: state)
         appearance.font = attributes?[.font] as? UIFont ?? CYLTagAppearance.defaultFont
-        appearance.textColor = attributes?[.foregroundColor] as? UIColor ?? CYLTagAppearance.defaultTextColor
+        appearance.textColor = attributes?[.foregroundColor] as? UIColor
     }
 
     /**
@@ -803,11 +803,17 @@ open class CYLMenuStyle: NSObject, NSCopying {
     }
 
     /**
-     * The effective icon tint for a state.
+     * The effective icon tint for a state: the explicit icon color, else the effective text color (explicit, else the class built-in).
      */
     open func iconColor(for state: UIControl.State) -> UIColor {
-        let appearance = appearance(for: state)
-        return appearance.iconColor ?? appearance.textColor
+        appearance(for: state).iconColor
+    }
+
+    /**
+     * The icon color set for a state (`setIconColor`), nil when unset (the icon follows the text color).
+     */
+    open func explicitIconColor(for state: UIControl.State) -> UIColor? {
+        appearance(for: state).explicitIconColor
     }
 
     /**
