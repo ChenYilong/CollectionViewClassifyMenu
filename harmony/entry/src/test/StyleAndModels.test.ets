@@ -1,11 +1,10 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLColor, CYLControlState, CYLMenuColorFromString, CYLMenuStyle, CYLTag, CYLTagColors, CYLTagColorTheme, CYLTagGroup,
-  CYLTagModel
+  CYLColor, CYLControlState, CYLMenuColorFromString, CYLMenuStyle, CYLTag, CYLTagColors, CYLTagColorTheme
 } from '@cyl/classifymenu';
 
 /**
- * The style value types (CYLMenuStyle, colors) and the tag models (CYLTag, CYLTagModel, CYLTagGroup).
+ * The style value types (CYLMenuStyle, colors) and the tag model (CYLTag).
  */
 export default function styleAndModelsTest() {
   describe('CYLMenuStyle', () => {
@@ -97,14 +96,5 @@ export default function styleAndModelsTest() {
       expect(tag.title).assertEqual('hello');
     });
 
-    it('sizesAModelAndCountsRows', 0, () => {
-      const model = new CYLTagModel('标签');
-      model.updateSize();
-      expect(model.width > 0).assertTrue();
-      expect(model.height > 0).assertTrue();
-      const group = new CYLTagGroup();
-      group.groupName = 'G';
-      expect(group.groupName).assertEqual('G');
-    });
   });
 }

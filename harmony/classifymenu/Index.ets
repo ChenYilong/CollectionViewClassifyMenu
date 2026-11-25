@@ -29,9 +29,6 @@ export { CYLImage, CYLImageIsSymbol, CYLResourceTypeSymbol, CYLColorKey } from '
 export { CYLMenuColorFromString } from './src/main/ets/core/CYLMenuColor';
 export { CYLTag, CYLTagDataSource } from './src/main/ets/core/CYLTag';
 export {
-  CYLTagModel, CYLTagGroup, CYLTagViewSectionInset, CYLTagViewCellSpacing, CYLTagDefaultListWidth
-} from './src/main/ets/core/CYLTagModel';
-export {
   CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent
 } from './src/main/ets/core/CYLMenuFoldControl';
 export {

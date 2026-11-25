@@ -6,7 +6,3 @@ export { CYLTagListCell, CYLTagListCellComponent, CYLTagRipple } from './CYLTagL
 export { CYLTagFoldCell, CYLTagFoldCellComponent } from './CYLTagFoldCell';
 export { CYLTagCreateCell } from './CYLTagCreateCell';
 export { CYLTagListAccessibilityIdentifier } from './CYLTagListAccessibility';
-export {
-  CYLTagView, CYLTagViewComponent, CYLTagCell, CYLTagHeaderCell, CYLTagHeaderCellDelegate,
-  CYLTagViewElementKindSectionHeader
-} from './CYLTagView';
