@@ -199,7 +199,8 @@ test('configuration: the file is read as the core reads it, and the map configur
   const file = configurationDemo.readConfiguration(read);
   assert.equal(file.error, '');
   const m = model.normalize(file.configuration);
-  assert.equal(m.foldControl.position, 'footer');
+  assert.equal(m.foldControl.position, 'tail');
+  assert.equal(m.foldControl.content, 'icon');
   assert.equal(m.defaultVisibleRows, 2);
   assert.equal(m.style.selected.font.weight, 'semibold');
   assert.equal(m.style.headerTextColor, '#8E8E93');
