@@ -1072,7 +1072,8 @@ open class CYLTagButton: CYLAnimatedItemView {
             }
         }
         animationView?.alpha = state == .disabled ? Self.disabledAnimationAlpha : 1
-        imageView.tintColor = style.iconColor(for: state)
+        // The component sets the icon's tint AND hands the color to the animation (`animationTint = "title"`), resolved with this view's own traits.
+        applyIconTintColor(style.iconColor(for: state))
         titleLabel.text = style.displayedTitle(forTitle: title)
         titleLabel.font = style.titleFont(for: state, traitCollection: traitCollection)
         titleLabel.textColor = appearance.textColor
