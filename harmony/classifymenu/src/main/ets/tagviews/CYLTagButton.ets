@@ -26,7 +26,8 @@ import {
 } from '../components/CYLTagAnimatedIcon';
 import { CYLTagButtonMetrics } from '../components/CYLTagListState';
 import {
-  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical
+  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical,
+  CYLTagTitleMaxLines
 } from '../core/CYLMenuStyle';
 import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
 import { CYLUIContext } from '../core/CYLUIContext';
@@ -74,9 +75,10 @@ export class CYLTagButtonPart {
    */
   rotation: number = 0;
   /**
-   * The lines of a title: 1, or 0 for as many as it needs (`CYLMenuStyle.titleWraps`).
+   * The most lines of a title (`CYLMenuStyle.titleMaxLines`): 1 by default, `CYLTagTitleMaxLines.unlimited` for as many
+   * as it needs.
    */
-  maxLines: number = 1;
+  maxLines: number = CYLTagTitleMaxLines.single;
 }
 
 @Observed
@@ -791,7 +793,8 @@ export class CYLTagButton {
     const measured = showsTitle ? CYLTagButtonMetrics.textMeasurer(titleText, font) : 0;
     let titleWidth = Math.min(available, Math.ceil(measured));
     // A wrapping title (`CYLMenuStyle.titleWraps`) is measured at the width it can have; otherwise on one line.
-    const lineHeight = style.titleWraps ? CYLTagButtonMetrics.wrappedTextHeight(titleText, font, available) :
+    const lineHeight = style.titleWraps ? CYLTagButtonMetrics.wrappedTextHeight(titleText, font, available,
+      style.titleMaxLines) :
       CYLTagButtonMetrics.lineHeight(font);
     const titleHeight = showsTitle ? Math.min(height, Math.ceil(lineHeight)) : 0;
 
@@ -891,7 +894,8 @@ export class CYLTagButton {
       const measured = Math.ceil(CYLTagButtonMetrics.textMeasurer(titleText, font));
       const room = Math.max(0, this.boundsWidth - trailing - x);
       if (style.titleWraps) {
-        titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.wrappedTextHeight(titleText, font, room)));
+        titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.wrappedTextHeight(titleText, font, room,
+          style.titleMaxLines)));
       }
       this.titleLabel.frame = new CYLRect(x + style.titlePositionAdjustment.horizontal,
         CYLTagButton.centeredY(titleHeight, insets.top, contentHeight, height) + style.titlePositionAdjustment.vertical,
@@ -1105,7 +1109,7 @@ export class CYLTagButton {
     this.showsCross = this.showsDeleteIndicatorValue && drawsCross;
     this.deleteIndicatorImage = this.showsDeleteIndicatorValue ? indicatorImage : undefined;
     // A wrapping title (`CYLMenuStyle.titleWraps`) takes as many lines as it needs.
-    this.titleLabel.maxLines = style.titleWraps ? 0 : 1;
+    this.titleLabel.maxLines = style.titleMaxLines;
     this.elevation = Math.max(0, style.elevation);
     this.crossLineWidth = style.deleteIndicatorLineWidth;
     this.crossColor = style.deleteIndicatorColor ?? appearance.textColor;
@@ -1187,8 +1191,8 @@ export struct CYLTagButtonComponent {
           .fontSize(this.tl().font.size)
           .fontWeight(this.tl().font.weight)
           .fontColor(this.tl().textColor)
-          // 0: as many lines as the title needs (`CYLMenuStyle.titleWraps`).
-          .maxLines(this.tl().maxLines > 0 ? this.tl().maxLines : Number.MAX_SAFE_INTEGER)
+          // `CYLMenuStyle.titleMaxLines` lines at most (`CYLTagTitleMaxLines.unlimited`: as many as the title needs).
+          .maxLines(this.tl().maxLines)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width(this.part(this.tl()).width)
           .height(this.part(this.tl()).height)

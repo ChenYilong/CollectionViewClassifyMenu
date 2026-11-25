@@ -2,7 +2,7 @@ import { CYLAnimatedItemLiquidGlassContentInset } from 'cylanimateditem';
 import { CYLMenuGestureState } from '../core/CYLMenuGestureState';
 import { CYLTagListCacheItem } from '../core/CYLTagListCache';
 import { CYLUIContext } from '../core/CYLUIContext';
-import { CYLTagBackgroundStyle } from '../core/CYLMenuStyle';
+import { CYLTagBackgroundStyle, CYLTagTitleMaxLines } from '../core/CYLMenuStyle';
 /**
  * The model and controller of a `CYLTagListView`, as iOS `CYLTagListView.swift` without its UIKit views: the data
  * source and delegate, the style, selection, folding, measurement and row layout, the title, the android-tagview tag
@@ -244,16 +244,16 @@ export class CYLTagButtonMetrics {
    * The height of `text` in `font` wrapped to `width` vp. With the window's text metrics, ArkUI measures it; without
    * (host tests), the lines are the single-line width (`textMeasurer`) over `width`, rounded up.
    */
-  static wrappedTextHeight: (text: string, font: CYLFont, width: number) => number =
-    (text: string, font: CYLFont, width: number): number => {
+  static wrappedTextHeight: (text: string, font: CYLFont, width: number, maxLines?: number) => number =
+    (text: string, font: CYLFont, width: number, maxLines: number = CYLTagTitleMaxLines.unlimited): number => {
       const line = Math.ceil(CYLTagButtonMetrics.lineHeight(font));
       if (CYLUIContext.hasContext) {
         const size = CYLUIContext.measureTextSize({ textContent: text, fontSize: font.size, fontWeight: font.weight,
           constraintWidth: Math.max(1, width) } as MeasureOptions, font.size, font.weight, Math.max(1, width));
-        return Math.max(line, Math.ceil(size.height));
+        return Math.min(Math.max(line, Math.ceil(size.height)), Math.max(1, maxLines) * line);
       }
       const lines = Math.max(1, Math.ceil(CYLTagButtonMetrics.textMeasurer(text, font) / Math.max(1, width)));
-      return lines * line;
+      return Math.min(lines, Math.max(1, maxLines)) * line;
     };
 
   /**
@@ -282,7 +282,8 @@ export class CYLTagButtonMetrics {
       if (showsDeleteIndicator) {
         room -= style.imageTitleSpacing + CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale);
       }
-      const text = CYLTagButtonMetrics.wrappedTextHeight(displayed, style.titleFont(state, fontScale), room);
+      const text = CYLTagButtonMetrics.wrappedTextHeight(displayed, style.titleFont(state, fontScale), room,
+        style.titleMaxLines);
       height = Math.max(height, Math.ceil(text + insets.top + insets.bottom));
     });
     return height;

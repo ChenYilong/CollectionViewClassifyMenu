@@ -8,7 +8,9 @@
 import { CYLMenuColorFromString } from './CYLMenuColor';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from './CYLMenuFoldControl';
 import { CYLMenuResources } from './CYLMenuResources';
-import { CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagImagePlacement } from './CYLMenuStyle';
+import {
+  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagTitleMaxLines
+} from './CYLMenuStyle';
 import { CYLTag } from './CYLTag';
 import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
@@ -98,6 +100,8 @@ export class CYLMenuStyleKey {
   static readonly disabled: string = 'disabled';
   static readonly imageTitleSpacing: string = 'imageTitleSpacing';
   static readonly itemHeight: string = 'itemHeight';
+  /** The most lines a title may take: a whole number, or "unlimited". Default 1. */
+  static readonly titleMaxLines: string = 'titleMaxLines';
   static readonly numberOfItemsPerRow: string = 'itemsPerRow';
   static readonly interitemSpacing: string = 'interitemSpacing';
   static readonly lineSpacing: string = 'lineSpacing';
@@ -572,6 +576,15 @@ export class CYLMenuConfiguration {
     const imageTitleSpacing = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.imageTitleSpacing]);
     if (imageTitleSpacing !== undefined) {
       style.imageTitleSpacing = imageTitleSpacing;
+    }
+    const maxLinesValue = configuration[CYLMenuStyleKey.titleMaxLines];
+    if (maxLinesValue === 'unlimited') {
+      style.titleMaxLines = CYLTagTitleMaxLines.unlimited;
+    } else {
+      const maxLines = CYLConfigurationValue.number(maxLinesValue);
+      if (maxLines !== undefined) {
+        style.titleMaxLines = maxLines;
+      }
     }
     const itemHeight = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.itemHeight]);
     if (itemHeight !== undefined) {

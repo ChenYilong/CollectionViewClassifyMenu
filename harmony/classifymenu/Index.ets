@@ -21,7 +21,7 @@ export { CYLTagMetrics } from './src/main/ets/core/CYLTagMetrics';
 export { CYLTagAppearance } from './src/main/ets/core/CYLTagAppearance';
 export { CYLMenuResources, CYLMenuLocalizedString } from './src/main/ets/core/CYLMenuResources';
 export {
-  CYLMenuStyle, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagBackgroundStyle, CYLTagRowAlignment,
+  CYLMenuStyle, CYLTagTitleMaxLines, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagContentAlignment, CYLTagBackgroundStyle, CYLTagRowAlignment,
   CYLTagDeleteIndicatorPlacement, CYLTitleTextAttributes
 } from './src/main/ets/core/CYLMenuStyle';
 export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';

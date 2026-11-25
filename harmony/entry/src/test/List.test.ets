@@ -12,6 +12,7 @@ import tagListEditingTest from './TagListEditing.test';
 import tagListWordPickerTest from './TagListWordPicker.test';
 import tagListTailFoldTest from './TagListTailFold.test';
 import tagLongPressActionTest from './TagLongPressAction.test';
+import tagTitleMaxLinesTest from './TagTitleMaxLines.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -28,4 +29,5 @@ export default function testsuite() {
   tagListWordPickerTest();
   tagListTailFoldTest();
   tagLongPressActionTest();
+  tagTitleMaxLinesTest();
 }
