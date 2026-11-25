@@ -287,7 +287,7 @@ const val CYLMenuStyleSectionBackgroundStyle = "sectionBackgroundStyle"
 const val CYLMenuStyleSectionCornerRadius = "sectionCornerRadius"
 /** Style key: insets, the padding inside the card. */
 const val CYLMenuStyleSectionContentInsets = "sectionContentInsets"
-/** Style key: a number, dp: the content column's inset inside the board on both sides (negative is 0; absent: the default padding). */
+/** Style key: a number, dp: how far the board extends beyond the tag column on both sides (negative is 0; absent: the content insets' leading/trailing). */
 const val CYLMenuStyleSectionBoardInset = "sectionBoardInset"
 /** Style key: a color: the header band's; absent: no band. */
 const val CYLMenuStyleHeaderBackgroundColor = "headerBackgroundColor"

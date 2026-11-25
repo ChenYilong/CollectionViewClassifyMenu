@@ -219,6 +219,25 @@ class CYLTagSectionRtlTest {
         assertEquals(ltr.contentHeight, rtl.contentHeight, 0.5f)
     }
 
+    @Test
+    fun theBoardInsetMirrorsAndTheTagColumnStaysPut() {
+        for ((inset, board) in listOf(0f to (28f to 292f), 20f to (8f to 312f))) {
+            val ltr = makeList(insetGrouped().also { it.sectionBoardInset = inset }, rtl = false)
+            val rtl = makeList(insetGrouped().also { it.sectionBoardInset = inset }, rtl = true)
+            val ltrCard = ltr.sectionFrame(0)!!.card!!
+            val rtlCard = rtl.sectionFrame(0)!!.card!!
+            assertEquals("board left to right", board.first, ltrCard.x, 0.001f)
+            assertEquals("board left to right", board.second, ltrCard.maxX, 0.001f)
+            assertEquals("board right to left", WIDTH_PX - board.second, rtlCard.x, 0.001f)
+            assertEquals("board right to left", WIDTH_PX - board.first, rtlCard.maxX, 0.001f)
+            // The tag column and the title are the section column minus the padding, whatever the inset.
+            assertEquals(28f, rtl.tagColumn(0).x, 0.001f)
+            assertEquals(292f, rtl.tagColumn(0).maxX, 0.001f)
+            assertEquals(WIDTH_PX - 28f, title(rtl).right.toFloat(), 0.5f)
+            assertEquals(tagFrame(rtl, 0).maxX, title(rtl).right.toFloat(), 0.5f)
+        }
+    }
+
     private companion object {
         const val WIDTH_PX = 320
         /** The header fold control's glyph padding beyond the header's edge (HEADER_FOLD_OVERHANG of the list view), dp. */

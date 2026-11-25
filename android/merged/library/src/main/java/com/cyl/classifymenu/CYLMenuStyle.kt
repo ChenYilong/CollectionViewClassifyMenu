@@ -242,9 +242,12 @@ class CYLMenuStyle {
     var sectionContentInsets: CYLEdgeInsets = CYLEdgeInsets(CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING,
         CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING)
     /**
-     * The horizontal inset of the content column (the tags and the header block) inside the board, one value for both sides, dp.
-     * null (the default): the leading and trailing parts of [sectionContentInsets] ([CYLSectionStyleMetrics.CARD_PADDING], 12);
-     * a set value (0 included) replaces them (top and bottom still come from [sectionContentInsets]); a negative value is 0.
+     * How far the board (the card, the header band and the divider) extends beyond the tag column on the leading and trailing
+     * sides, one value for both, dp. The tags and the header title always share the tag column, so this never changes the tag
+     * width. 0: the board's edges coincide with the tags' edges. null (the default): the leading and trailing parts of
+     * [sectionContentInsets] ([CYLSectionStyleMetrics.CARD_PADDING], 12): the board spans the section column as before. A set
+     * value (0 included) replaces those two parts (top and bottom still come from [sectionContentInsets]); a negative value is 0.
+     * A set value above the default can push the board past the list's margin ([sectionInsets]); that is accepted.
      */
     var sectionBoardInset: Float? = null
         set(value) { field = value?.let { max(0f, it) } }
