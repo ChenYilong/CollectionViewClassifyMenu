@@ -18,7 +18,8 @@ import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResourc
 import { CYLTagListAccessibilityIdentifier } from '../tagviews/CYLTagListAccessibility';
 import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
 import {
-  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement
+  CYLMenuStyle, CYLSectionStyleColors, CYLTagBackgroundStyle, CYLTagContentAlignment,
+  CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement
 } from '../core/CYLMenuStyle';
 import { CYLConfiguration, CYLConfigurationValue } from '../core/CYLTagListConfiguration';
 import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
@@ -205,7 +206,7 @@ export struct CYLTagListView {
   /** `addItemView`'s frame [x, y, width, height] while editing (`CYLTagListState.addItemViewFrame`), else empty. */
   @State private addItemFrame: number[] = [];
   @State private addItemText: string = '';
-  @State private backgroundColorValue: ResourceColor = CYLColor.WHITE;
+  @State private backgroundColorValue: ResourceColor = CYLSectionStyleColors.listBackground;
   @State private borderWidthValue: number = 0;
   @State private borderColorValue: string = CYLColor.CLEAR;
   @State private cornerRadiusValue: number = 0;

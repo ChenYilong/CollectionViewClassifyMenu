@@ -2,6 +2,7 @@
   "color": [
     { "name": "cyl_tag_background", "value": "#FFFFFF" },
     { "name": "cyl_tag_text", "value": "#404040" },
+    { "name": "cyl_list_background", "value": "#FFFFFF" },
     { "name": "cyl_section_card", "value": "#FFFFFF" },
     { "name": "cyl_section_header_band", "value": "#EFEFF4" },
     { "name": "cyl_section_grouped_background", "value": "#F2F2F7" },
