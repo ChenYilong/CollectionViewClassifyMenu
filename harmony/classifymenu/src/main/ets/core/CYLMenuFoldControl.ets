@@ -6,6 +6,12 @@
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLFont, CYLImage } from './CYLTypes';
 
+/**
+ * The most the system font scale grows a fold / More control (its text and its size). At accessibility font sizes the
+ * control would otherwise dwarf the header; tags and titles keep scaling normally.
+ */
+export const CYLFoldControlMaxFontScale: number = 1.3;
+
 /** Where the fold control of a foldable section is. */
 export enum CYLMenuFoldControlPosition {
   /** No fold control: every row is shown. */

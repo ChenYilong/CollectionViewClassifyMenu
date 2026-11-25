@@ -10,7 +10,7 @@ import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPositi
 import { CYLMenuResources } from './CYLMenuResources';
 import {
   CYLHeaderSeparatorStyle, CYLMenuStyle, CYLSectionStyle, CYLTagBackgroundStyle, CYLTagContentAlignment,
-  CYLTagImagePlacement, CYLTagTitleMaxLines
+  CYLTagImagePlacement, CYLTagTitleMaxLines, CYLHeaderTitleMaxLines
 } from './CYLMenuStyle';
 import { CYLTag } from './CYLTag';
 import { CYLTagAppearance } from './CYLTagAppearance';
@@ -103,6 +103,8 @@ export class CYLMenuStyleKey {
   static readonly itemHeight: string = 'itemHeight';
   /** The most lines a title may take: a whole number, or "unlimited". Default 1. */
   static readonly titleMaxLines: string = 'titleMaxLines';
+  /** The most lines a section header's title may take: a whole number, or "unlimited". Default 1. */
+  static readonly headerMaxLines: string = 'headerMaxLines';
   static readonly numberOfItemsPerRow: string = 'itemsPerRow';
   static readonly interitemSpacing: string = 'interitemSpacing';
   static readonly lineSpacing: string = 'lineSpacing';
@@ -611,6 +613,15 @@ export class CYLMenuConfiguration {
       const maxLines = CYLConfigurationValue.number(maxLinesValue);
       if (maxLines !== undefined) {
         style.titleMaxLines = maxLines;
+      }
+    }
+    const headerLinesValue = configuration[CYLMenuStyleKey.headerMaxLines];
+    if (headerLinesValue === 'unlimited') {
+      style.headerMaxLines = CYLHeaderTitleMaxLines.unlimited;
+    } else {
+      const headerLines = CYLConfigurationValue.number(headerLinesValue);
+      if (headerLines !== undefined) {
+        style.headerMaxLines = headerLines;
       }
     }
     const itemHeight = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.itemHeight]);
