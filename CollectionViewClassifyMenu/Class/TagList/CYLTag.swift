@@ -69,7 +69,8 @@ public final class CYLTag {
 
     /**
      * A round badge before the title with this text, e.g. "热" or "神" in a search app's hot list; drawn in
-     * `badgeColor` (the title color by default) with white text, when the tag has no `image`.
+     * `badgeColor` (the title color by default) with white text, when the tag has no `image`. An empty string (not `nil`) draws a
+     * dot instead, as `CYLTagButton.badgeValue` "": a filled circle `badgeDotDiameter` points wide in `badgeColor` (system red by default).
      */
     public var badgeText: String?
 
@@ -315,6 +316,27 @@ public final class CYLTag {
     }
 
     /**
+     * The diameter of a badge dot, in points: 8, as `CYLTagButton`'s dot and the other platforms' (Android `BADGE_DOT_DIAMETER`).
+     */
+    public static let badgeDotDiameter: CGFloat = 8
+
+    /**
+     * A badge dot image: a filled `color` circle `badgeDotDiameter` points wide (at most `canvas`), centered in a `canvas` square
+     * so the tag's icon slot keeps its size (rendered as original). Its accessibility label is the localized dot text.
+     */
+    public static func badgeDotImage(color: UIColor, canvas: CGFloat) -> UIImage {
+        let side = max(1, canvas)
+        let dot = min(badgeDotDiameter, side)
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side))
+        let image = renderer.image { _ in
+            color.setFill()
+            UIBezierPath(ovalIn: CGRect(x: (side - dot) / 2, y: (side - dot) / 2, width: dot, height: dot)).fill()
+        }.withRenderingMode(.alwaysOriginal)
+        image.accessibilityLabel = CYLMenuLocalizedString("CYLTagBadgeDot")
+        return image
+    }
+
+    /**
      * A round badge image: `text` in white on a `color` circle `diameter` points wide (rendered as original).
      */
     public static func badgeImage(text: String, color: UIColor, diameter: CGFloat) -> UIImage {
@@ -489,10 +511,12 @@ open class CYLTagDataSource: NSObject, CYLMenuDataSource {
         guard let tag = tag(at: indexPath) else {
             return nil
         }
-        if tag.image == nil, let text = tag.badgeText, !text.isEmpty {
+        if tag.image == nil, let text = tag.badgeText {
             let side = max(baseStyleStorage.imageSize.width, baseStyleStorage.imageSize.height)
-            let image = CYLTag.badgeImage(text: text, color: tag.badgeColor ?? tag.textColor ?? .systemBlue,
-                                          diameter: side > 0 ? side : 16)
+            let canvas = side > 0 ? side : 16
+            let image = text.isEmpty
+                ? CYLTag.badgeDotImage(color: tag.badgeColor ?? .systemRed, canvas: canvas)
+                : CYLTag.badgeImage(text: text, color: tag.badgeColor ?? tag.textColor ?? .systemBlue, diameter: canvas)
             if let label = tag.badgeAccessibilityLabel, !label.isEmpty {
                 image.accessibilityLabel = label
             }
