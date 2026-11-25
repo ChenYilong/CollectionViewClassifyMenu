@@ -239,7 +239,10 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
             trailing -= 8
         }
         if !foldButton.isHidden {
-            let size = CGSize(width: min(foldSize.width, width / 2), height: min(foldSize.height, height))
+            // At most 40% of the header (CYLTagFoldButton.maximumHeaderWidthFraction), so that the section title keeps
+            // the rest and is the one that truncates.
+            let maximumWidth = width * CYLTagFoldButton.maximumHeaderWidthFraction
+            let size = CGSize(width: min(foldSize.width, maximumWidth), height: min(foldSize.height, height))
             let y = floor((height - size.height) / 2)
             // The control's own margin lines its content up with the title.
             if foldAtLeadingEdge {
@@ -2270,9 +2273,10 @@ private extension CYLTagListView {
         max(Self.footerHeight, foldSize(expanded: false).height)
     }
 
-    func headerHeight() -> CGFloat {
-        // A fold control at the top needs the header, also when section titles are hidden.
-        let foldHeight = foldControlIsInHeader ? foldSize(expanded: false).height : 0
+    func headerHeight(foldable: Bool) -> CGFloat {
+        // A fold control at the top needs the header, also when section titles are hidden, but only in a section that
+        // can fold (the footer control's rule).
+        let foldHeight = foldControlIsInHeader && foldable ? foldSize(expanded: false).height : 0
         guard showsSectionHeaders else {
             return foldHeight
         }
@@ -2281,12 +2285,12 @@ private extension CYLTagListView {
     }
 
     /**
-     * The header of `section` at the list width `width`: `headerHeight()`, or, when `CYLMenuStyle.headerMaxLines` allows more than
+     * The header of `section` at the list width `width`: `headerHeight(foldable:)`, or, when `CYLMenuStyle.headerMaxLines` allows more than
      * one line, tall enough for the title wrapped to the room left of the indicator and the fold / More / clear controls, plus 12 pt
-     * of padding; never below `headerHeight()`. `canFold`: the section shows a fold control.
+     * of padding; never below `headerHeight(foldable:)`. `canFold`: the section shows a fold control.
      */
     func headerHeight(forSection section: Int, width: CGFloat, canFold: Bool) -> CGFloat {
-        let base = headerHeight()
+        let base = headerHeight(foldable: canFold)
         guard showsSectionHeaders, style.headerMaxLines != CYLHeaderTitleMaxLines.single,
               let title = menuDataSource?.menuTitle(forSection: section), !title.isEmpty else {
             return base
