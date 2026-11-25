@@ -70,6 +70,20 @@ Consequences, so nobody is surprised:
 - A tag list inside a screen that already draws its own card (a tag bar in a toolbar, the classify menu, the multiple filter, the tab
   bar's popovers) must opt out; the library's own such screens are changed to `plain` in the same commit.
 
+## The card's background style, and light / dark mode for every new view (owner, 2026-11-25)
+
+- New property `sectionBackgroundStyle` (the same type as the tags' `backgroundStyle`: `flat` or `liquidGlass`; configuration key of the same
+  name, values `"flat"` / `"liquidGlass"`). Default `flat`: the card is the solid `sectionBackgroundColor` (or the system card color). With
+  `liquidGlass` the card is the core's Liquid Glass material (the same drawing as the glass tags, with the card's rounded corners),
+  tinted with `sectionBackgroundColor` when it is set; where the platform cannot draw glass the core falls back to the flat card
+  (never fake glass in the app). The header band stays flat. The two background styles are independent of the tags': flat tags in a
+  glass card and glass tags in a flat card are both allowed.
+- **Light and dark mode is part of every new view, in the core, with no app code:** the card (flat color and the glass tint, light and
+  dark values), the header band, the header divider, the grouped list background under `insetGrouped`. A color the app sets wins in
+  both modes; an unset color follows the mode, and changes when the mode changes while the list is shown (no reload by the app).
+  Tests per platform: each unset color resolves to its light value in light mode and its dark value in dark mode, switching the mode
+  updates a shown list, and a set color is kept in both modes.
+
 ## Gates
 
 Every platform: all existing tests pass unchanged, plus one test that the default style gives the same frames as before.
