@@ -3,6 +3,13 @@
  * as `CYLTagListView(configuration:)`, the Flutter plugin and the React Native component (model.js). A Mini Program
  * cannot host the native iOS / Android view, so this component draws the list itself with the same rules.
  *
+ * Long press (docs/tag-long-press-action.md): the configuration's `longPressAction` ("callout", "report", "none", "reorder",
+ * or an array: the first that can begin wins; this list does not reorder, cyl-tag-cloud does) or the property
+ * `longPressAction` decides what a long press on an item does: a callout with the item's `subtitle` (a small bubble with an
+ * arrow), or only the event `taglongpress` {section, item, title, subtitle}, which every long press sends (except "none").
+ * A tap, a fold, a rebuild or another long press hides the callout; `dismissCallout()` does too. WeChat sends no tap for the
+ * release of a long press.
+ *
  * Properties: `configuration`, `animationSpeed` (0, the default, uses each section's `style.animationSpeed`; above 0
  * overrides it, as `CYLTagListView.animationSpeed`), `animationLoops`.
  * Methods (through `selectComponent`): `playAll()`, `playItems(keys)`, `selectedItems()`, `contentHeight()`,
@@ -45,6 +52,8 @@ Component({
     // which a Number property reports as a type warning; anything not above 0 uses the style's speed anyway.
     animationSpeed: { type: null, value: 0 },
     animationLoops: { type: Boolean, value: false },
+    // What a long press does (a name or an array of names); null: the configuration's `longPressAction`, else a report.
+    longPressAction: { type: null, value: null },
   },
 
   data: {
@@ -53,6 +62,8 @@ Component({
     foldContent: 'title',
     foldColor: '#808080',
     backgroundStyle: '',
+    // The long-press callout {text, left, top, arrow, below}, or null.
+    callout: null,
   },
 
   lifetimes: {
@@ -71,6 +82,7 @@ Component({
 
   methods: {
     rebuild() {
+      this.dismissCallout();
       this.model = model.normalize(this.data.configuration, { pixelRatio: pixelRatio() });
       this.selection = this.model.selectedItems.slice();
       this.rows = null;
@@ -198,6 +210,7 @@ Component({
     },
 
     onItemTap(event) {
+      this.dismissCallout();
       const k = event.currentTarget.dataset.key;
       const item = model.itemAt(this.model, k);
       if (!item || !item.enabled) return;
@@ -218,10 +231,54 @@ Component({
     },
 
     onFoldTap(event) {
+      this.dismissCallout();
       const section = Number(event.currentTarget.dataset.section);
       this.expanded[section] = !this.expanded[section];
       this.render(false);
       this.reportFoldState();
+    },
+
+    /** Hides the long-press callout. */
+    dismissCallout() {
+      if (this.data.callout) this.setData({ callout: null });
+    },
+
+    /** A long press on an item: the first action of `longPressAction` that can begin decides (model.longPressDecision). */
+    onItemLongPress(event) {
+      const k = event.currentTarget.dataset.key;
+      const item = model.itemAt(this.model, k);
+      if (!item) return;
+      const own = this.data.longPressAction;
+      const actions = own ? model.longPressActions(own) : this.model.longPressActions;
+      const decision = model.longPressDecision(actions, item.subtitle.length > 0);
+      this.dismissCallout();
+      if (decision === 'none') return;
+      if (decision === 'callout') this.showCallout(item);
+      this.triggerEvent('taglongpress', { section: item.section, item: item.item, title: item.title, subtitle: item.subtitle });
+    },
+
+    /** Shows the callout above the item (below when there is no room), its arrow at the item's center. */
+    showCallout(item) {
+      const query = this.createSelectorQuery();
+      query.select(`#cyl-item-${item.key}`).boundingClientRect();
+      query.select('.cyl-tag-list').boundingClientRect();
+      query.exec(([itemRect, listRect]) => {
+        if (!itemRect || !listRect) return;
+        const center = itemRect.left - listRect.left + itemRect.width / 2;
+        // The bubble is at most 240 wide; keep it inside the list and point the arrow at the item.
+        const width = Math.min(240, Math.max(60, item.subtitle.length * 13 * 0.9 + 24));
+        const left = Math.max(8, Math.min(listRect.width - 8 - width, center - width / 2));
+        const below = itemRect.top < 60;
+        this.setData({
+          callout: {
+            text: item.subtitle,
+            left,
+            top: below ? itemRect.bottom - listRect.top : itemRect.top - listRect.top,
+            arrow: Math.max(14, Math.min(width - 14, center - left)),
+            below,
+          },
+        });
+      });
     },
 
     selectionPayload() {

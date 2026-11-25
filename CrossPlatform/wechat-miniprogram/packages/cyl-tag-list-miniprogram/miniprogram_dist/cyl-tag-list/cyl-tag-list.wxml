@@ -1,4 +1,9 @@
 <view class="cyl-tag-list" style="{{backgroundStyle}}">
+  <!-- The long-press callout: a small bubble with an arrow pointing at the tag (longPressAction "callout"). -->
+  <view wx:if="{{callout}}" class="cyl-callout {{callout.below ? 'cyl-callout-below' : ''}}" style="left: {{callout.left}}px; top: {{callout.top}}px;" aria-role="tooltip">
+    <text class="cyl-callout-text">{{callout.text}}</text>
+    <view class="cyl-callout-arrow" style="left: {{callout.arrow}}px;" />
+  </view>
   <view wx:for="{{sections}}" wx:for-item="section" wx:key="index" class="cyl-section" style="{{section.backgroundStyle}}">
     <view wx:if="{{section.showsHeader || (section.canFold && foldPosition === 'headerTrailing')}}" class="cyl-header" style="{{section.headerStyle}}">
       <text class="cyl-header-title">{{section.showsHeader ? section.title : ''}}</text>
@@ -13,9 +18,9 @@
     <view class="cyl-items" style="{{section.itemsStyle}}">
       <block wx:for="{{section.items}}" wx:key="key">
         <view wx:if="{{!item.hidden}}"
-              class="cyl-item cyl-item-s{{section.index}}"
-              style="{{item.cellStyle}}" data-key="{{item.key}}" bindtap="onItemTap"
-              aria-role="button" aria-label="{{item.title}}" aria-selected="{{item.selected}}" aria-disabled="{{!item.enabled}}">
+              id="cyl-item-{{item.key}}" class="cyl-item cyl-item-s{{section.index}}"
+              style="{{item.cellStyle}}" data-key="{{item.key}}" bindtap="onItemTap" bindlongpress="onItemLongPress"
+              aria-role="button" aria-label="{{item.subtitle ? item.title + ', ' + item.subtitle : item.title}}" aria-selected="{{item.selected}}" aria-disabled="{{!item.enabled}}">
           <view wx:if="{{item.iconKind !== 'none'}}" class="cyl-icon-slot" style="{{item.slotStyle}}">
             <text wx:if="{{item.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{item.iconStyle}}; font-size: {{item.glyphSize}}px;">{{item.glyph}}</text>
             <!-- CYLTabBarController's cyl-animated-item draws the icon: the animation through the app's engine

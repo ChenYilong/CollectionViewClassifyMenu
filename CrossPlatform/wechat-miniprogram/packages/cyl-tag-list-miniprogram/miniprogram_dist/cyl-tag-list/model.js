@@ -421,6 +421,8 @@ function normalize(configuration = {}, options = {}) {
         section: s,
         item: i,
         title: item.title != null ? String(item.title) : '',
+        // A longer description, shown in a callout on a long press (longPressAction "callout").
+        subtitle: item.subtitle != null ? String(item.subtitle) : '',
         image: typeof item.image === 'string' ? item.image : '',
         selectedImage: typeof item.selectedImage === 'string' ? item.selectedImage : '',
         animation: typeof item.animation === 'string' ? item.animation : '',
@@ -445,10 +447,43 @@ function normalize(configuration = {}, options = {}) {
     showsSectionHeaders: boolValue(c.showsSectionHeaders) !== false,
     defaultVisibleRows: Math.max(0, Math.floor(numberValue(c.defaultVisibleRows) || 0)),
     foldControl: foldControlValue(c.foldControl),
+    longPressActions: longPressActions(c.longPressAction),
     style,
     sections,
     selectedItems: sanitizeSelection(c.selectedItems || [], sections),
   };
+}
+
+/**
+ * The long-press actions of a configuration's `longPressAction` (docs/tag-long-press-action.md): a name ("reorder",
+ * "callout", "report", "none") or an array of names, the first that can begin winning. The long press is still reported
+ * where no listed action takes it (an item without a subtitle), unless "none" is listed. null when absent or unknown:
+ * the default, which reports the long press (the list does not reorder; reordering is cyl-tag-cloud's).
+ */
+function longPressActions(value) {
+  if (value === undefined || value === null) return null;
+  const names = Array.isArray(value) ? value : [value];
+  const known = ['reorder', 'callout', 'report', 'none'];
+  if (!names.length || names.some((name) => !known.includes(name))) return null;
+  const list = names.slice();
+  if (!list.includes('none') && !list.includes('report')) list.push('report');
+  return list;
+}
+
+/**
+ * What a long press does: the first of `actions` that can begin (null: the default, "report"). "callout" needs a
+ * subtitle, "reorder" needs a list that reorders (`canReorder`, false here), "report" and "none" always begin.
+ * @returns {'callout'|'report'|'none'}
+ */
+function longPressDecision(actions, hasSubtitle, canReorder = false) {
+  const list = actions || ['report'];
+  for (const name of list) {
+    if (name === 'callout' && hasSubtitle) return 'callout';
+    // "reorder" does not begin here: this list does not reorder (cyl-tag-cloud does), so the next action takes the press.
+    if (name === 'report') return 'report';
+    if (name === 'none') return 'none';
+  }
+  return 'none';
 }
 
 /** Drops keys that address no item, and duplicates; keeps the order. Keys are "s-i" strings or [s, i] pairs. */
@@ -900,6 +935,7 @@ module.exports = {
   cylAnimatedItemCornerRadiusCapsule,
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
+  longPressActions, longPressDecision,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,

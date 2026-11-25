@@ -25,6 +25,24 @@
 .cyl-title, .cyl-sizer { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cyl-sizer { visibility: hidden; height: 0; }
 .cyl-fold-tail { justify-content: center; }
+/* The long-press callout: a small bubble with an arrow, above the tag (below it when there is no room). */
+.cyl-callout {
+  position: absolute; z-index: 10; max-width: 240px; box-sizing: border-box; padding: 8px 12px; border-radius: 12px;
+  background: #FFFFFF; color: #000000; font-size: 13px; line-height: 1.35; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(calc(-100% - 8px));
+}
+.cyl-callout-below { transform: translateY(8px); }
+.cyl-callout-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.cyl-callout-arrow {
+  position: absolute; bottom: -6px; width: 0; height: 0; margin-left: -7px;
+  border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 7px solid #FFFFFF;
+}
+.cyl-callout-below .cyl-callout-arrow { bottom: auto; top: -6px; border-top: 0; border-bottom: 7px solid #FFFFFF; }
+@media (prefers-color-scheme: dark) {
+  .cyl-callout { background: #2C2C2E; color: #FFFFFF; }
+  .cyl-callout-arrow { border-top-color: #2C2C2E; }
+  .cyl-callout-below .cyl-callout-arrow { border-bottom-color: #2C2C2E; }
+}
 /* CYLTagListFooterView: 28 pt high, chevron.down in the fold color, turned 180° when expanded. */
 .cyl-fold-footer { display: flex; align-items: center; justify-content: center; height: 28px; font-size: 13px; }
 .cyl-footer-chevron {
