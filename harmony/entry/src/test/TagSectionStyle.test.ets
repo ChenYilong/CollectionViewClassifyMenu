@@ -237,17 +237,14 @@ export default function tagSectionStyleTest() {
       expect(plain.heightThatFitsWidth(WIDE_WIDTH)).assertEqual(plain.contentHeight);
     });
 
-    it('theHeaderTitleXEqualsTheBoardsLeadingXUnderInsetGrouped', 0, () => {
+    it('theHeaderTitleXEqualsTheTagsLeadingXUnderInsetGrouped', 0, () => {
       const list = listWith(new CYLSectionStyleSource(), groupedStyle(), LIST_WIDTH);
       list.layoutSections().forEach((s: CYLTagListSectionFrame) => {
-        const card = s.card as CYLRect;
-        // The title block spans the board (the card), not the tags inside it, which keep the card padding.
-        expect(s.headerInsetLeft).assertEqual(card.x);
-        expect(s.headerInsetRight).assertEqual(LIST_WIDTH - card.x - card.width);
-        expect(s.headerInsetLeft).assertEqual(SIDE_INSET);
-        expect(s.headerInsetRight).assertEqual(SIDE_INSET);
-        expect(s.headerTitleLeadingX).assertEqual(card.x);
-        expect(s.items[0].x).assertEqual(SIDE_INSET + CARD_PADDING);
+        // The header and the tags share one content column: the board extends beyond it by the board inset.
+        expect(s.headerInsetLeft).assertEqual(s.items[0].x);
+        expect(s.headerInsetLeft).assertEqual(SIDE_INSET + CARD_PADDING);
+        expect(s.headerInsetRight).assertEqual(SIDE_INSET + CARD_PADDING);
+        expect(s.headerTitleLeadingX).assertEqual(s.items[0].x);
       });
     });
 

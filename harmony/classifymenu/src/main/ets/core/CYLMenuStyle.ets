@@ -349,6 +349,21 @@ export class CYLMenuStyle {
   /** The padding inside the card around the tags (`insetGrouped`), vp. */
   sectionContentInsets: CYLEdgeInsets = new CYLEdgeInsets(CYLSectionStyleMetrics.cardPadding,
     CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding);
+  private boardInsetValue?: number = undefined;
+  /**
+   * The horizontal inset of the content column (header block and tags) inside the board (`insetGrouped`), vp: ONE value for
+   * both sides. Undefined (the default) keeps the leading and trailing parts of `sectionContentInsets` (12, the first
+   * version); a set value, 0 included, replaces them (top and bottom still come from `sectionContentInsets`). 0 makes the
+   * content column equal the board column. A negative value is 0.
+   */
+  get sectionBoardInset(): number | undefined {
+    return this.boardInsetValue;
+  }
+
+  set sectionBoardInset(value: number | undefined) {
+    this.boardInsetValue = value === undefined ? undefined : (value > 0 ? value : 0);
+  }
+
   /** The header band's color; undefined: no band (today's look). `CYLSectionStyleColors.headerBand` is the usual one. */
   headerBackgroundColor?: ResourceColor = undefined;
   headerCornerRadius: number = 0;
@@ -746,6 +761,7 @@ export class CYLMenuStyle {
     c.sectionBackgroundStyle = this.sectionBackgroundStyle;
     c.sectionCornerRadius = this.sectionCornerRadius;
     c.sectionContentInsets = this.sectionContentInsets;
+    c.sectionBoardInset = this.sectionBoardInset;
     c.headerBackgroundColor = this.headerBackgroundColor;
     c.headerCornerRadius = this.headerCornerRadius;
     c.headerContentInsets = this.headerContentInsets;
