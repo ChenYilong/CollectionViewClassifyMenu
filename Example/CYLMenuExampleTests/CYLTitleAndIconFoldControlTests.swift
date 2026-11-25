@@ -21,6 +21,10 @@ final class CYLTitleAndIconFoldControlTests: CYLMenuExampleTestCase {
         ])
     }
 
+    // The titles come from the localization bundles, in the simulator's language.
+    private var more: String { CYLMenuLocalizedString("CYLMenuExpand") }
+    private var less: String { CYLMenuLocalizedString("CYLMenuCollapse") }
+
     func testRawValuesAndConfigurationStrings() {
         XCTAssertEqual(CYLMenuFoldControlContent.iconAndTitle.rawValue, 0)
         XCTAssertEqual(CYLMenuFoldControlContent.title.rawValue, 1)
@@ -36,17 +40,17 @@ final class CYLTitleAndIconFoldControlTests: CYLMenuExampleTestCase {
 
     func testTitleAndChevronInBothStates() {
         let control = CYLMenuFoldControl(position: .footer, content: .titleAndIcon)
-        XCTAssertEqual(control.title(whenExpanded: false), "More")
-        XCTAssertEqual(control.title(whenExpanded: true), "Less")
+        XCTAssertEqual(control.title(whenExpanded: false), more)
+        XCTAssertEqual(control.title(whenExpanded: true), less)
         XCTAssertTrue(control.showsImage(whenExpanded: false))
         XCTAssertTrue(control.showsImage(whenExpanded: true))
         let button = CYLTagFoldButton(frame: CGRect(x: 0, y: 0, width: 120, height: 30))
         button.applyFoldControl(control, color: nil, expanded: false, animated: false)
-        XCTAssertEqual(button.titleLabel.text, "More")
+        XCTAssertEqual(button.titleLabel.text, more)
         XCTAssertNotNil(button.imageView.image)
         XCTAssertTrue(button.imageView.transform.isIdentity, "Chevron down while folded")
         button.applyFoldControl(control, color: nil, expanded: true, animated: false)
-        XCTAssertEqual(button.titleLabel.text, "Less")
+        XCTAssertEqual(button.titleLabel.text, less)
         XCTAssertNotNil(button.imageView.image)
         XCTAssertFalse(button.imageView.transform.isIdentity, "Chevron up while expanded")
         XCTAssertEqual(atan2(button.imageView.transform.b, button.imageView.transform.a), .pi, accuracy: 0.01)
@@ -54,7 +58,7 @@ final class CYLTitleAndIconFoldControlTests: CYLMenuExampleTestCase {
 
     func testIconAndTitleKeepsOnlyTheTurnedIconExpanded() {
         let control = CYLMenuFoldControl(position: .footer, content: .iconAndTitle)
-        XCTAssertEqual(control.title(whenExpanded: false), "More")
+        XCTAssertEqual(control.title(whenExpanded: false), more)
         XCTAssertNil(control.title(whenExpanded: true))
         XCTAssertTrue(control.showsImage(whenExpanded: true))
     }
