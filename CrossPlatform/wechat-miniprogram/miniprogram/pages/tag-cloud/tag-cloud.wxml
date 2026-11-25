@@ -1,10 +1,12 @@
 <view class="tag-cloud-page">
   <view class="stack">
     <text class="caption">{{codeCaption}}</text>
-    <cyl-tag-cloud id="code-list" tags="{{codeTags}}" list-style="{{codeStyle}}"
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view"
+                  id="code-list" tags="{{codeTags}}" list-style="{{codeStyle}}"
                    bind:tagtap="onCodeTap" bind:tagdelete="onDelete" />
     <text class="caption">{{mapCaption}}</text>
-    <cyl-tag-cloud id="map-list" tags="{{mapTags}}" list-style="{{mapStyle}}" bind:tagdelete="onDelete" />
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view"
+                  id="map-list" tags="{{mapTags}}" list-style="{{mapStyle}}" bind:tagdelete="onDelete" />
     <text class="caption" id="event-label" aria-live="polite">{{event}}</text>
   </view>
 </view>

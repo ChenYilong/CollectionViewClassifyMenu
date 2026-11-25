@@ -33,7 +33,7 @@ wechat-miniprogram/
 ├── project.config.json          appid "touristappid"; set an AppID in the git-ignored project.private.config.json
 ├── package.json                 `npm test` runs the unit tests; depends on the library below (file:)
 ├── packages/
-│   └── cyl-tag-list-miniprogram/ the npm library: cyl-tag-list, cyl-tag-cloud, cyl-tag-image, locale.js, the core
+│   └── cyl-tag-list-miniprogram/ the npm library: cyl-tag-list (sections or flat tags), cyl-tag-image, locale.js, the core
 │                                strings (miniprogram_dist; README.md for install and use); tag icons are drawn by
 │                                CYLTabBarController's cyl-animated-item, vendored at the pinned commit
 ├── scripts/

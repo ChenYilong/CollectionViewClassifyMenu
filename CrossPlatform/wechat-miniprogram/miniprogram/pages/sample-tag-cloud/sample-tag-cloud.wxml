@@ -4,7 +4,8 @@
           aria-role="button" aria-label="{{githubLabel}}"><text decode="{{true}}">&lt;/&gt;</text></view>
   </view>
   <scroll-view class="tags" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation>
-    <cyl-tag-cloud id="tag-list" tags="{{tags}}" list-style="{{style}}"
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view"
+                  id="tag-list" tags="{{tags}}" list-style="{{style}}"
                    bind:tagtap="onTagTap" bind:tagdelete="onTagDelete" />
   </scroll-view>
   <view class="controls">

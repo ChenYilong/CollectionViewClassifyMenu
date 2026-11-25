@@ -3,6 +3,7 @@
     <text class="text">{{item}}</text>
   </view>
   <view class="cell">
-    <cyl-tag-cloud tags="{{footerTags}}" list-style="{{style}}" />
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view"
+                  tags="{{footerTags}}" list-style="{{style}}" />
   </view>
 </view>
