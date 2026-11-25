@@ -83,14 +83,23 @@ test('rtl swaps the tag content insets: the leading inset is on the right', () =
   assert.match(rtl, new RegExp(`padding: 0 ${TAG_LEADING - BORDER}px 0 ${TAG_TRAILING - BORDER}px;`))
 })
 
-test('rtl mirrors the header title inset and the card padding inside the card', () => {
+test('rtl mirrors the card padding, the header title and fold control span the board in both directions', () => {
   const sectionContentInsets = CARD_INSETS
-  const ltr = model.sectionLayout(styleOf({ sectionContentInsets }))
-  const rtl = model.sectionLayout(rtlOf({ sectionContentInsets }))
-  assert.match(ltr.headerStyle, new RegExp(`padding: 0 ${CARD_TRAILING}px 0 ${CARD_LEADING}px;`))
-  assert.match(rtl.headerStyle, new RegExp(`padding: 0 ${CARD_LEADING}px 0 ${CARD_TRAILING}px;`))
+  const sectionInsets = SECTION_INSETS
+  const ltr = model.sectionLayout(styleOf({ sectionContentInsets, sectionInsets }))
+  const rtl = model.sectionLayout(rtlOf({ sectionContentInsets, sectionInsets }))
   assert.match(ltr.cardStyle, new RegExp(`padding: 12px ${CARD_TRAILING}px 12px ${CARD_LEADING}px;`))
   assert.match(rtl.cardStyle, new RegExp(`padding: 12px ${CARD_LEADING}px 12px ${CARD_TRAILING}px;`))
+  // The header has no padding of its own under the card: its box is the board's, so the title (leading) starts at the
+  // board's leading edge and the fold control (trailing) ends at the board's trailing edge, mirrored right to left.
+  const ltrStyle = styleOf({ sectionContentInsets, sectionInsets })
+  const rtlStyle = rtlOf({ sectionContentInsets, sectionInsets })
+  assert.deepEqual(model.headerEdges(ltrStyle), { left: LEADING_SMALL, right: TRAILING_LARGE })
+  assert.deepEqual(model.headerEdges(rtlStyle), { left: TRAILING_LARGE, right: LEADING_SMALL })
+  assert.deepEqual(model.headerEdges(ltrStyle), model.contentColumn(ltrStyle))
+  assert.deepEqual(model.headerEdges(rtlStyle), model.contentColumn(rtlStyle))
+  assert.match(ltr.headerStyle, new RegExp(`margin: 0 ${TRAILING_LARGE}px 0 ${LEADING_SMALL}px; padding: 0 0px 0 0px;`))
+  assert.match(rtl.headerStyle, new RegExp(`margin: 0 ${LEADING_SMALL}px 0 ${TRAILING_LARGE}px; padding: 0 0px 0 0px;`))
 })
 
 test('rtl mirrors the header band inset of a plain header', () => {

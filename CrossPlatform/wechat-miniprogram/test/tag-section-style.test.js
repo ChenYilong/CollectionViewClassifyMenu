@@ -10,6 +10,10 @@ const LIST_WIDTH = 320
 const TAG_WIDTHS = [85, 85, 85, 70, 60, 90, 60, 70, 90]
 const CARD_PADDING = 12
 const CARD_RADIUS = 10
+const HEADER_FONT_SIZE = 17
+const SEMIBOLD_CSS_WEIGHT = 600
+// The header is at least its title line plus this much (docs/tag-section-style.md: lineHeight + 12).
+const HEADER_VERTICAL_ROOM = 12
 const BAND_PADDING = 12
 const HAIRLINE = 0.5
 const TITLE = 'Section'
@@ -72,7 +76,8 @@ test('the default style is the rounded section card, with no band and no divider
   // Each side of the tag column is narrowed by the card padding.
   assert.equal(model.tagColumn(style).left, model.contentColumn(style).left + CARD_PADDING)
   assert.equal(model.tagColumn(style).right, model.contentColumn(style).right + CARD_PADDING)
-  assert.equal(model.headerEdges(style).left, model.tagColumn(style).left)
+  // The header title is aligned with the board (the column), not with the tags inside it.
+  assert.deepEqual(model.headerEdges(style), model.contentColumn(style))
 })
 
 test('the default header divider is none: it shows only when the app asks for it', () => {
@@ -146,17 +151,49 @@ test('the card padding adds top and bottom to the section and the tags keep the 
   assert.equal(model.cardInsets(plain).top + model.cardInsets(plain).bottom, 0)
 })
 
-test('the header title x equals the tags leading x under insetGrouped', () => {
+test('the header title x equals the board (card) leading x under insetGrouped, the tags stay inside the card padding', () => {
   const style = styleOf({ sectionStyle: 'insetGrouped' })
   const edges = model.headerEdges(style)
-  assert.equal(edges.left, model.tagColumn(style).left)
-  assert.equal(edges.right, model.tagColumn(style).right)
-  assert.equal(edges.left, flow(style, TAG_WIDTHS).xs[0])
-  // The header element spans the column: its margin plus padding is that x.
+  // The board spans the column: the title starts at its left edge and the fold control ends at its right edge.
+  assert.equal(edges.left, model.contentColumn(style).left)
+  assert.equal(edges.right, model.contentColumn(style).right)
+  assert.equal(edges.left, style.sectionInsets.left)
+  // The tags keep the card's content padding on every side.
+  assert.equal(flow(style, TAG_WIDTHS).xs[0], edges.left + CARD_PADDING)
+  assert.equal(edges.left + CARD_PADDING, model.tagColumn(style).left)
+  // The header element spans the column and has no padding of its own: its margin plus padding is the board's edge.
   const css = model.sectionLayout(style).headerStyle
   assert.match(css, new RegExp(`margin: 0 ${style.sectionInsets.right}px 0 ${style.sectionInsets.left}px`))
+  assert.match(css, /padding: 0 0px 0 0px/)
   const paddingLeft = Number(/padding: 0 [\d.]+px 0 ([\d.]+)px/.exec(css)[1])
+  const paddingRight = Number(/padding: 0 ([\d.]+)px 0 [\d.]+px/.exec(css)[1])
   assert.equal(style.sectionInsets.left + paddingLeft, edges.left)
+  assert.equal(style.sectionInsets.right + paddingRight, edges.right)
+})
+
+test('the default section header font is 17 semibold and the header height holds it', () => {
+  const style = styleOf()
+  assert.deepEqual(style.headerFont, { size: HEADER_FONT_SIZE, weight: 'semibold', italic: false })
+  assert.equal(style.headerFontSize, HEADER_FONT_SIZE)
+  assert.equal(model.FONT_WEIGHTS[style.headerFont.weight], SEMIBOLD_CSS_WEIGHT)
+  for (const css of [model.sectionLayout(style).headerStyle, model.sectionLayout(plainOf()).headerStyle]) {
+    assert.match(css, new RegExp(`font-size: ${HEADER_FONT_SIZE}px; font-weight: ${SEMIBOLD_CSS_WEIGHT}; font-style: normal`))
+  }
+  // The header is at least the title's line plus 12 and never below the style's headerHeight.
+  assert.ok(model.headerHeightOf(style) >= model.lineHeight(HEADER_FONT_SIZE) + HEADER_VERTICAL_ROOM)
+  assert.ok(model.headerHeightOf(style) >= style.headerHeight)
+  assert.equal(px(model.sectionLayout(style).headerStyle, 'height'), model.headerHeightOf(style))
+  // A bigger app font grows the header; an app headerFont wins over the default.
+  const big = styleOf({ headerFont: { size: 30, weight: 'bold' } })
+  assert.equal(big.headerFont.size, 30)
+  assert.equal(model.headerHeightOf(big), model.lineHeight(30) + HEADER_VERTICAL_ROOM)
+  assert.match(model.sectionLayout(big).headerStyle, /font-size: 30px; font-weight: 700/)
+})
+
+test('plain keeps the title with the tags at the column edge; only the header font changed', () => {
+  const style = plainOf()
+  assert.deepEqual(model.headerEdges(style), { left: style.headerHorizontalInset, right: style.headerHorizontalInset })
+  assert.match(model.sectionLayout(style).headerStyle, new RegExp(`^height: 36px; padding: 0 16px; font-size: ${HEADER_FONT_SIZE}px; font-weight: ${SEMIBOLD_CSS_WEIGHT};`))
 })
 
 test('a plain header with a band insets its title from the band, the band spans the column', () => {
@@ -203,8 +240,8 @@ test('the divider insets are from the column, and it has the card and band edges
   const line = model.headerSeparator(grouped)
   assert.equal(line.left, model.contentColumn(grouped).left)
   assert.equal(line.right, model.contentColumn(grouped).right)
-  // Not the title's x: the title is inside the card padding.
-  assert.notEqual(line.left, model.headerEdges(grouped).left)
+  // The title is aligned with the board too: the divider, the band and the title block share the column's edges.
+  assert.equal(line.left, model.headerEdges(grouped).left)
   // The header element sits in the column, so the CSS left and right are 0 (the column's edges).
   assert.match(model.sectionLayout(grouped).headerLineStyle, /left: 0px; right: 0px/)
   const banded = plainOf({ headerSeparatorStyle: 'line', headerBackgroundColor: LIGHT.headerBand })
