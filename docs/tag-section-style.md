@@ -133,6 +133,15 @@ The list cannot see the host's background, so the library must make its built-in
 - **Under the board (`sectionStyle = insetGrouped`) the header title aligns with the board, not with the tags inside it.** The board spans the column; the header title starts at the board's leading edge and a header fold / More / clear control ends at the board's trailing edge; the tags sit inside the board with its content padding (`sectionContentInsets`, default 12) on every side. (Before this change the title was aligned with the tags inside the board, 12 further in.) With the plain style nothing changes: the title and the tags share the column's leading edge. The band, the divider and the board all span the same left and right edges as the title block.
 - Tests per platform: the default header font is 17 semibold and the header grows to hold it; under insetGrouped the title's leading x equals the board's leading x and the fold control's trailing edge equals the board's trailing edge (and mirrored in right to left); the tags keep the board padding; plain frames are unchanged except the header font.
 
+## The gap between the header and the board is short when there is no divider (owner, 2026-11-25)
+
+The header height used to reserve a fixed band (`headerHeight` 36) with the title centered in it, and the section's top inset (10) came on top: with the 17 header font the visible gap between the title and the board was about 17. It must look like one section:
+
+- **Under the board (`sectionStyle = insetGrouped`) with the header divider OFF** (`headerSeparatorStyle = none`, the default) the header is sized to its text: height = the title's line height + a small padding (named constant `HEADER_BOARD_TITLE_PADDING` = 8: 4 above, 4 below), not less than the fold / More / clear control's height; the fixed `headerHeight` minimum does not apply (an app that sets `headerHeight` explicitly still wins as the minimum: track "was set" like `backgroundColor`). The board starts `HEADER_BOARD_SPACING` = 4 below the header (instead of the section's top inset 10). Result: about 8 between the title text and the board.
+- **With the divider ON** the old reservation stays (the divider sits at the header's bottom edge, inside its height; the board starts after the section's top inset as before), so the line has room.
+- The plain style is unchanged. The space below the board (the section's bottom inset 10, which separates it from the next header) is unchanged. `headerMaxLines` > 1 grows the header as before (the title lines + 8).
+- Tests per platform: header height under the board without a divider = line height + 8 (and never below the fold control), the board's top = header bottom + 4, the old values with the divider on and with the plain style, an explicitly set `headerHeight` wins as the minimum.
+
 ## Gates
 
 Every platform: all existing tests pass unchanged, plus one test that the default style gives the same frames as before.
