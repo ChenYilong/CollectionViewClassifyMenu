@@ -83,12 +83,35 @@ class CYLTagSectionRtlTest {
     fun theHeaderTitleIsMeasuredFromTheTrailingEdge() {
         val ltr = makeList(insetGrouped(), rtl = false)
         val rtl = makeList(insetGrouped(), rtl = true)
+        // The title block has the tags' edges (inside the board by its padding).
         val leading = 16f + CYLSectionStyleMetrics.CARD_PADDING
         assertEquals(leading, title(ltr).left.toFloat(), 0.5f)
+        assertEquals(tagFrame(ltr, 0).x, title(ltr).left.toFloat(), 0.5f)
         assertEquals("right to left: the title starts where the tags start, from the right", WIDTH_PX - leading, title(rtl).right.toFloat(), 0.5f)
+        assertEquals(tagFrame(rtl, 0).maxX, title(rtl).right.toFloat(), 0.5f)
         assertMirrored("title", title(ltr), title(rtl))
         // The section frame keeps the leading / trailing distances of the title.
         assertEquals(leading, rtl.sectionFrame(0)!!.headerInsetLeft, 0.5f)
+        assertEquals(leading, rtl.sectionFrame(0)!!.headerInsetRight, 0.5f)
+        // The plain style: the title starts at the tags there too.
+        val plainRtl = makeList(plain(), rtl = true)
+        assertEquals(tagFrame(plainRtl, 0).maxX, title(plainRtl).right.toFloat(), 0.5f)
+    }
+
+    @Test
+    fun theHeaderFoldControlEndsAtTheTagsTrailingEdgeInBothDirections() {
+        fun make(rtl: Boolean) = makeList(insetGrouped(), rtl) {
+            it.defaultVisibleRows = 1
+            it.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle)
+        }
+        val ltr = make(false)
+        val rtl = make(true)
+        val inset = 16f + CYLSectionStyleMetrics.CARD_PADDING
+        // The control keeps its glyph padding overhang of 6 beyond the content column's trailing edge (the right one left to right,
+        // the left one right to left).
+        assertEquals(WIDTH_PX - inset + FOLD_OVERHANG, foldButton(ltr).right.toFloat(), 0.5f)
+        assertEquals(inset - FOLD_OVERHANG, foldButton(rtl).left.toFloat(), 0.5f)
+        assertEquals("the title starts at the tags' leading edge", rtl.tagColumn(0).maxX, title(rtl).right.toFloat(), 0.5f)
     }
 
     @Test
@@ -196,8 +219,29 @@ class CYLTagSectionRtlTest {
         assertEquals(ltr.contentHeight, rtl.contentHeight, 0.5f)
     }
 
+    @Test
+    fun theBoardInsetMirrorsAndTheTagColumnStaysPut() {
+        for ((inset, board) in listOf(0f to (28f to 292f), 20f to (8f to 312f))) {
+            val ltr = makeList(insetGrouped().also { it.sectionBoardInset = inset }, rtl = false)
+            val rtl = makeList(insetGrouped().also { it.sectionBoardInset = inset }, rtl = true)
+            val ltrCard = ltr.sectionFrame(0)!!.card!!
+            val rtlCard = rtl.sectionFrame(0)!!.card!!
+            assertEquals("board left to right", board.first, ltrCard.x, 0.001f)
+            assertEquals("board left to right", board.second, ltrCard.maxX, 0.001f)
+            assertEquals("board right to left", WIDTH_PX - board.second, rtlCard.x, 0.001f)
+            assertEquals("board right to left", WIDTH_PX - board.first, rtlCard.maxX, 0.001f)
+            // The tag column and the title are the section column minus the padding, whatever the inset.
+            assertEquals(28f, rtl.tagColumn(0).x, 0.001f)
+            assertEquals(292f, rtl.tagColumn(0).maxX, 0.001f)
+            assertEquals(WIDTH_PX - 28f, title(rtl).right.toFloat(), 0.5f)
+            assertEquals(tagFrame(rtl, 0).maxX, title(rtl).right.toFloat(), 0.5f)
+        }
+    }
+
     private companion object {
         const val WIDTH_PX = 320
+        /** The header fold control's glyph padding beyond the header's edge (HEADER_FOLD_OVERHANG of the list view), dp. */
+        const val FOLD_OVERHANG = 6f
         const val MANY_TAGS = 16
     }
 }

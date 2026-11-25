@@ -98,6 +98,15 @@ export class CYLSectionStyleMetrics {
   static readonly headerBandPadding: number = 12;
   /** The thickness of the header divider: one hairline. */
   static readonly separatorThickness: number = 0.5;
+  /**
+   * The padding around a header's title lines under `insetGrouped` with no divider (4 above, 4 below), where the header is
+   * sized to its text instead of the fixed `headerHeight`.
+   */
+  static readonly headerBoardTitlePadding: number = 8;
+  /** The space between that header's bottom and the board (the section card), instead of the section's top inset. */
+  static readonly headerBoardSpacing: number = 4;
+  /** The default `headerHeight`: the fixed header band of the plain style and of a header with a divider. */
+  static readonly defaultHeaderHeight: number = 36;
 }
 
 /**
@@ -105,6 +114,17 @@ export class CYLSectionStyleMetrics {
  * 0.179 is where black and white have the same contrast ratio against it.
  */
 export const CYLTintLuminanceThreshold: number = 0.179;
+
+/**
+ * The default `headerFont` size: the system table header look (17 pt / dp / vp), not a caption.
+ */
+export const CYLDefaultHeaderFontSize: number = 17;
+
+/**
+ * The default `headerFont` weight, the semibold of the iOS header (600). `FontWeight` has no 600: Medium is 500 and Bold
+ * 700, and the core takes Bold, the heavier neighbour, so that the title reads as a header and not as body text.
+ */
+export const CYLDefaultHeaderFontWeight: FontWeight = FontWeight.Bold;
 
 /**
  * The colors of the section style: each one follows the color mode (`resources/base` and `resources/dark`). A style whose
@@ -329,6 +349,24 @@ export class CYLMenuStyle {
   /** The padding inside the card around the tags (`insetGrouped`), vp. */
   sectionContentInsets: CYLEdgeInsets = new CYLEdgeInsets(CYLSectionStyleMetrics.cardPadding,
     CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding);
+  private boardInsetValue?: number = undefined;
+  /**
+   * How far the board (card, header band, divider) extends beyond the tag column on the left and on the right
+   * (`insetGrouped`), vp: ONE value for both sides. The header title and the tags always share the tag column (the section
+   * column minus `sectionContentInsets` leading and trailing); this value never moves them. Undefined (the default)
+   * extends the board by those leading and trailing parts (12), so it spans the section column (the first version's
+   * look); a set value, 0 included, replaces them (top and bottom padding still come from `sectionContentInsets`). 0 makes
+   * the board hug the tags. A value above the default can push the board past the list's margin (accepted). A negative
+   * value is 0. Right to left mirrors.
+   */
+  get sectionBoardInset(): number | undefined {
+    return this.boardInsetValue;
+  }
+
+  set sectionBoardInset(value: number | undefined) {
+    this.boardInsetValue = value === undefined ? undefined : (value > 0 ? value : 0);
+  }
+
   /** The header band's color; undefined: no band (today's look). `CYLSectionStyleColors.headerBand` is the usual one. */
   headerBackgroundColor?: ResourceColor = undefined;
   headerCornerRadius: number = 0;
@@ -346,7 +384,27 @@ export class CYLMenuStyle {
   headerSeparatorInsets?: CYLEdgeInsets = undefined;
 
   // Section headers
-  headerHeight: number = 36;
+  private headerHeightValue: number = CYLSectionStyleMetrics.defaultHeaderHeight;
+  private headerHeightWasSet: boolean = false;
+
+  /**
+   * The fixed header height, vp (default `CYLSectionStyleMetrics.defaultHeaderHeight`, 36): the minimum of every header,
+   * except under `insetGrouped` with no header divider, where the header is sized to its text and this is a minimum only
+   * when the app set it (`isHeaderHeightSet`).
+   */
+  get headerHeight(): number {
+    return this.headerHeightValue;
+  }
+
+  set headerHeight(value: number) {
+    this.headerHeightValue = value;
+    this.headerHeightWasSet = true;
+  }
+
+  /** True when the app set `headerHeight` (the configuration key included); false while the default 36 applies. */
+  get isHeaderHeightSet(): boolean {
+    return this.headerHeightWasSet;
+  }
   private headerMaxLinesValue: number = CYLHeaderTitleMaxLines.single;
 
   /**
@@ -363,7 +421,8 @@ export class CYLMenuStyle {
       Math.max(CYLHeaderTitleMaxLines.single, Math.floor(value)) : CYLHeaderTitleMaxLines.single;
   }
 
-  headerFont: CYLFont = CYLFont.systemFont(14);
+  /** The section header title font; default `CYLDefaultHeaderFontSize` (17) in `CYLDefaultHeaderFontWeight` (semibold). */
+  headerFont: CYLFont = new CYLFont(CYLDefaultHeaderFontSize, CYLDefaultHeaderFontWeight);
   /**
    * The one color of every built-in view that is not a tag (header title, section icon, fold / More control); undefined:
    * black or white by the luminance of the background it is drawn on (`resolvedTintColor`). A color set on the title,
@@ -511,6 +570,14 @@ export class CYLMenuStyle {
   fillsTagHeight(iconSize: CYLSize): boolean {
     return this.imageFillsTagHeight && this.imagePlacement === CYLTagImagePlacement.leading &&
       (iconSize.width !== 0 || iconSize.height !== 0);
+  }
+
+  /**
+   * The icon color the style set for `state` (`setIconColor`); undefined while it is unset, when the icon follows the text
+   * color (the built-in default, which the dark glass icon lift never touches: `CYLIconContrast`).
+   */
+  explicitIconColor(state: number): ResourceColor | undefined {
+    return this.appearance(state).iconColor;
   }
 
   iconColor(state: number): ResourceColor {
@@ -705,6 +772,7 @@ export class CYLMenuStyle {
     c.sectionBackgroundStyle = this.sectionBackgroundStyle;
     c.sectionCornerRadius = this.sectionCornerRadius;
     c.sectionContentInsets = this.sectionContentInsets;
+    c.sectionBoardInset = this.sectionBoardInset;
     c.headerBackgroundColor = this.headerBackgroundColor;
     c.headerCornerRadius = this.headerCornerRadius;
     c.headerContentInsets = this.headerContentInsets;
@@ -712,7 +780,8 @@ export class CYLMenuStyle {
     c.headerSeparatorColor = this.headerSeparatorColor;
     c.headerSeparatorThickness = this.headerSeparatorThickness;
     c.headerSeparatorInsets = this.headerSeparatorInsets;
-    c.headerHeight = this.headerHeight;
+    c.headerHeightValue = this.headerHeightValue;
+    c.headerHeightWasSet = this.headerHeightWasSet;
     c.headerMaxLines = this.headerMaxLines;
     c.headerFont = this.headerFont;
     c.tintColor = this.tintColor;

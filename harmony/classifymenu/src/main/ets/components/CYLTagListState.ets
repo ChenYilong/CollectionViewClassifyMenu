@@ -26,8 +26,8 @@ import {
 } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import {
-  CYLHeaderSeparatorStyle, CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagImagePlacementIsVertical,
-  CYLTagRowAlignment
+  CYLHeaderSeparatorStyle, CYLMenuStyle, CYLSectionStyleMetrics, CYLTagContentAlignment, CYLTagImagePlacement,
+  CYLTagImagePlacementIsVertical, CYLTagRowAlignment
 } from '../core/CYLMenuStyle';
 import { CYLTag, CYLTagDataSource } from '../core/CYLTag';
 import { CYLTagAppearance } from '../core/CYLTagAppearance';
@@ -85,6 +85,10 @@ const FOLD_MINIMUM_TOUCH_WIDTH: number = 44;
 const FOLD_IMAGE_TITLE_SPACING: number = 3;
 /** The vertical padding of a section header around its title lines, vp. */
 const HEADER_VERTICAL_PADDING: number = 12;
+/** The padding around the title lines of a header sized to its text (under `insetGrouped`, no divider), vp. */
+const HEADER_BOARD_TITLE_PADDING: number = CYLSectionStyleMetrics.headerBoardTitlePadding;
+/** The space between that header's bottom and the board's top, vp. */
+const HEADER_BOARD_SPACING: number = CYLSectionStyleMetrics.headerBoardSpacing;
 /** The space between the views of a header row (`CYLTagListView`'s header Row), vp. */
 const HEADER_ITEM_SPACING: number = 6;
 /** The side of a header's More button, vp. */
@@ -546,7 +550,7 @@ export class CYLTagListSectionFrame {
   isRtl: boolean = false;
   /**
    * The x (from the list's left edge) of the header title's leading edge: the left inset in ltr, the list width minus
-   * the right inset in rtl, where the title is aligned to its right end.
+   * the right inset in rtl, where the title is aligned to its right end. Under `insetGrouped` it is the tags' leading edge.
    */
   headerTitleLeadingX: number = 0;
   /**
@@ -1848,7 +1852,8 @@ export class CYLTagListState implements CYLTagLongPressHost {
         const r = this.rowsFor([withFold], available);
         rowCount = r.length > 0 ? r[0].length : 0;
       }
-      height += this.headerHeight(section, width, foldable) + insets.top + insets.bottom + card.top + card.bottom;
+      const header = this.headerHeight(section, width, foldable);
+      height += header + this.headerToBoardOffset(header) + insets.bottom + card.top + card.bottom;
       height += this.heightOfRows(rowCount, sectionRows[section],
         section < sectionHeights.length ? sectionHeights[section] : []);
       if (foldable && this.foldControlIsInFooter) {
@@ -2854,8 +2859,10 @@ export class CYLTagListState implements CYLTagLongPressHost {
       return foldHeight;
     }
     const font = this.styleStorage.headerFontFor(this.fontScale);
-    const oneLine = Math.max(this.styleStorage.headerHeight,
-      Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + HEADER_VERTICAL_PADDING, foldHeight);
+    const sizedToText = this.headerIsSizedToText();
+    const padding = sizedToText ? HEADER_BOARD_TITLE_PADDING : HEADER_VERTICAL_PADDING;
+    const minimum = !sizedToText || this.styleStorage.isHeaderHeightSet ? this.styleStorage.headerHeight : 0;
+    const oneLine = Math.max(minimum, Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + padding, foldHeight);
     const maxLines = this.styleStorage.headerMaxLines;
     if (maxLines <= CYLHeaderTitleMaxLines.single || section < 0 || width <= 0) {
       return oneLine;
@@ -2865,7 +2872,25 @@ export class CYLTagListState implements CYLTagLongPressHost {
       return oneLine;
     }
     const text = CYLTagButtonMetrics.wrappedTextHeight(title, font, this.headerTitleRoom(section, width, font, foldShown), maxLines);
-    return Math.max(oneLine, Math.ceil(text) + HEADER_VERTICAL_PADDING);
+    return Math.max(oneLine, Math.ceil(text) + padding);
+  }
+
+  /**
+   * Whether the header is sized to its text: under `insetGrouped` with no header divider (`headerSeparatorStyle` none) it
+   * is the title lines plus `HEADER_BOARD_TITLE_PADDING` (never below the fold control), and the board follows it
+   * closely; with the divider, or in the plain style, the fixed `headerHeight` band stays.
+   */
+  private headerIsSizedToText(): boolean {
+    return this.styleStorage.isInsetGrouped && this.styleStorage.headerSeparatorStyle === CYLHeaderSeparatorStyle.none;
+  }
+
+  /**
+   * The distance from a header's bottom to the board's top (the card): `HEADER_BOARD_SPACING` below a header sized to its
+   * text, else the section's top inset. The one place it comes from: the frames, the section height and the content height
+   * all read it. A section with no header (`header` 0) keeps the top inset.
+   */
+  private headerToBoardOffset(header: number): number {
+    return header > 0 && this.headerIsSizedToText() ? HEADER_BOARD_SPACING : this.styleStorage.sectionInsets.top;
   }
 
   /** The width a header's title has: the header's width inside its edges, less the other views of its row. */
@@ -2900,9 +2925,35 @@ export class CYLTagListState implements CYLTagLongPressHost {
     return new CYLRect(insets.left, 0, Math.max(0, width - insets.left - insets.right), 0);
   }
 
-  /** The card's padding around the tags: `sectionContentInsets` under `insetGrouped`, else none. */
+  /**
+   * The card's padding around the tags under `insetGrouped`, else none: `sectionContentInsets`. It never depends on
+   * `sectionBoardInset`: the tag column (and the header's title and fold control, which share it) is the section column
+   * minus these leading and trailing parts, whatever the board inset is.
+   */
   private cardInsets(): CYLEdgeInsets {
-    return this.styleStorage.isInsetGrouped ? this.physical(this.styleStorage.sectionContentInsets) : CYLEdgeInsets.ZERO;
+    const style = this.styleStorage;
+    if (!style.isInsetGrouped) {
+      return CYLEdgeInsets.ZERO;
+    }
+    return this.physical(style.sectionContentInsets);
+  }
+
+  /**
+   * The board's column (the card, the header band and the divider) at the layout width: the tag column extended outward by
+   * one value on both sides. `sectionBoardInset` unset extends it by the card's leading and trailing padding, so the board
+   * spans the section column (the default look); a set value, 0 included, replaces both. A value above the default can
+   * push the board past the list's margin (accepted). Outside `insetGrouped` it is the section column. y and height are 0.
+   */
+  private boardColumnAt(width: number): CYLRect {
+    const column = this.columnAt(width);
+    const style = this.styleStorage;
+    const boardInset = style.sectionBoardInset;
+    if (!style.isInsetGrouped || boardInset === undefined) {
+      return column;
+    }
+    const card = this.cardInsets();
+    const tagWidth = Math.max(0, column.width - card.left - card.right);
+    return new CYLRect(column.x + card.left - boardInset, 0, tagWidth + 2 * boardInset, 0);
   }
 
   /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
@@ -2911,7 +2962,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
   }
 
   /**
-   * The column the tags are laid in: `contentColumn(section)`, narrowed by the card's padding under `insetGrouped`. Every
+   * The tag column: `contentColumn(section)`, narrowed by the card's padding under `insetGrouped` (never by `sectionBoardInset`). Every
    * tag width, row count, fold decision, height and frame takes its width and x from here.
    */
   tagColumn(section: number): CYLRect {
@@ -2928,8 +2979,8 @@ export class CYLTagListState implements CYLTagLongPressHost {
 
   /**
    * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside
-   * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
-   * `headerHorizontalInset`.
+   * the card (`insetGrouped`: the header and the tags share one content column), the band's edges plus
+   * `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
    */
   private headerEdgeInsets(width: number = this.layoutWidth): number[] {
     const style = this.styleStorage;
@@ -3097,7 +3148,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
     const style = this.styleStorage;
     const insets = style.sectionInsets;
     const available = this.contentWidth(this.layoutWidth);
-    const column = this.columnAt(this.layoutWidth);
+    const column = this.boardColumnAt(this.layoutWidth);
     const card = this.cardInsets();
     const originX = this.tagColumn(0).x;
     const headerEdges = this.headerEdgeInsets();
@@ -3144,7 +3195,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
         cells.push(cell);
       }
       const rows = this.rowsFor([cells.map((c: CYLTagListItemFrame) => c.width)], available)[0] ?? [];
-      const cardY = y + header + insets.top;
+      const cardY = y + header + this.headerToBoardOffset(header);
       let rowY = cardY + card.top;
       let index = 0;
       rows.forEach((count: number, row: number) => {

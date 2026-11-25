@@ -54,6 +54,8 @@
 		5A1D0F3C7B2E4A9D8C6E1F21 /* CYLTitleAndIconFoldControlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1D0F3C7B2E4A9D8C6E1F20 /* CYLTitleAndIconFoldControlTests.swift */; };
 		8EA32B4CA93024E7599B3F45 /* CYLTagListFoldingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB3543CBABA0EE86E689D85 /* CYLTagListFoldingTests.swift */; };
 		26298D4CFD1D7E912777B892 /* CYLTagListTintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A940537404525FA3A3ECCF66 /* CYLTagListTintTests.swift */; };
+		5A1C0DE2A1B2C3D4E5F6071A /* CYLTagListHeaderBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0DE3A1B2C3D4E5F6071B /* CYLTagListHeaderBoardTests.swift */; };
+		5A1C0DE4A1B2C3D4E5F6071C /* CYLTagListSectionGlassTintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0DE5A1B2C3D4E5F6071D /* CYLTagListSectionGlassTintTests.swift */; };
 		5A1C0DE0A1B2C3D4E5F60718 /* CYLTagListHeaderMaxLinesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0DE1A1B2C3D4E5F60719 /* CYLTagListHeaderMaxLinesTests.swift */; };
 		3D0D172C94CB61CD944BE02A /* CYLTagListSectionStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CA7751208D05397AA5225C /* CYLTagListSectionStyleTests.swift */; };
 		C8E3051FAF78996AEEC7D596 /* CYLTagListDefaultFramesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5451D9AA784D9BEAFF6E030A /* CYLTagListDefaultFramesTests.swift */; };
@@ -158,6 +160,8 @@
 		5A1D0F3C7B2E4A9D8C6E1F20 /* CYLTitleAndIconFoldControlTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTitleAndIconFoldControlTests.swift; sourceTree = "<group>"; };
 		DAB3543CBABA0EE86E689D85 /* CYLTagListFoldingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListFoldingTests.swift; sourceTree = "<group>"; };
 		A940537404525FA3A3ECCF66 /* CYLTagListTintTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListTintTests.swift; sourceTree = "<group>"; };
+		5A1C0DE3A1B2C3D4E5F6071B /* CYLTagListHeaderBoardTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListHeaderBoardTests.swift; sourceTree = "<group>"; };
+		5A1C0DE5A1B2C3D4E5F6071D /* CYLTagListSectionGlassTintTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListSectionGlassTintTests.swift; sourceTree = "<group>"; };
 		5A1C0DE1A1B2C3D4E5F60719 /* CYLTagListHeaderMaxLinesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListHeaderMaxLinesTests.swift; sourceTree = "<group>"; };
 		82CA7751208D05397AA5225C /* CYLTagListSectionStyleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListSectionStyleTests.swift; sourceTree = "<group>"; };
 		5451D9AA784D9BEAFF6E030A /* CYLTagListDefaultFramesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListDefaultFramesTests.swift; sourceTree = "<group>"; };
@@ -303,6 +307,8 @@
 				5C0A11E2D3F4A5B6C7D8E9F2 /* CYLTagCalloutTests.swift */,
 				5C0A11E2D3F4A5B6C7D8E9F4 /* CYLIconContrastTests.swift */,
 				5A1C0DE1A1B2C3D4E5F60719 /* CYLTagListHeaderMaxLinesTests.swift */,
+				5A1C0DE5A1B2C3D4E5F6071D /* CYLTagListSectionGlassTintTests.swift */,
+				5A1C0DE3A1B2C3D4E5F6071B /* CYLTagListHeaderBoardTests.swift */,
 				82CA7751208D05397AA5225C /* CYLTagListSectionStyleTests.swift */,
 				5451D9AA784D9BEAFF6E030A /* CYLTagListDefaultFramesTests.swift */,
 				5A1D0F3C7B2E4A9D8C6E1F20 /* CYLTitleAndIconFoldControlTests.swift */,
@@ -584,6 +590,8 @@
 				5C0A11E2D3F4A5B6C7D8E9F1 /* CYLTagCalloutTests.swift in Sources */,
 				5C0A11E2D3F4A5B6C7D8E9F3 /* CYLIconContrastTests.swift in Sources */,
 				5A1C0DE0A1B2C3D4E5F60718 /* CYLTagListHeaderMaxLinesTests.swift in Sources */,
+				5A1C0DE4A1B2C3D4E5F6071C /* CYLTagListSectionGlassTintTests.swift in Sources */,
+				5A1C0DE2A1B2C3D4E5F6071A /* CYLTagListHeaderBoardTests.swift in Sources */,
 				3D0D172C94CB61CD944BE02A /* CYLTagListSectionStyleTests.swift in Sources */,
 				C8E3051FAF78996AEEC7D596 /* CYLTagListDefaultFramesTests.swift in Sources */,
 				5A1D0F3C7B2E4A9D8C6E1F21 /* CYLTitleAndIconFoldControlTests.swift in Sources */,

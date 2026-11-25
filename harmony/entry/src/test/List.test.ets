@@ -18,6 +18,8 @@ import tagSectionRtlTest from './TagSectionRtl.test';
 import tagHeaderMaxLinesAndFoldScaleTest from './TagHeaderMaxLinesAndFoldScale.test';
 import tagGlassBackgroundTest from './TagGlassBackground.test';
 import tagFoldTitleAndIconTest from './TagFoldTitleAndIcon.test';
+import tagHeaderFontAndBoardAlignTest from './TagHeaderFontAndBoardAlign.test';
+import iconContrastTest from './IconContrast.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -40,4 +42,6 @@ export default function testsuite() {
   tagHeaderMaxLinesAndFoldScaleTest();
   tagGlassBackgroundTest();
   tagFoldTitleAndIconTest();
+  tagHeaderFontAndBoardAlignTest();
+  iconContrastTest();
 }

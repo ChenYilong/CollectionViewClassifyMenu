@@ -1521,6 +1521,14 @@ open class CYLTagListView: UIView {
     }
 
     /**
+     * The board (the card) of `.insetGrouped`: the tag column widened by `CYLMenuStyle.sectionBoardInset` on each side, which is
+     * `contentColumn(inSection:)` when the inset is unset. The header band and the divider span it too. Plain: `contentColumn(inSection:)`.
+     */
+    open func boardColumn(inSection section: Int) -> CGRect {
+        boardColumn(atWidth: collectionView.bounds.width)
+    }
+
+    /**
      * The column the tags are laid in: `contentColumn(inSection:)` narrowed by the card's padding under `.insetGrouped`. Tag
      * widths, rows, fold decisions, heights and frames all come from it.
      */
@@ -2283,7 +2291,19 @@ private extension CYLTagListView {
             return foldHeight
         }
         let font = style.headerFont(for: traitCollection)
+        if sizesHeaderToText {
+            return max(style.headerHeightWasSet ? style.headerHeight : 0, ceil(font.lineHeight) + CYLSectionStyleMetrics.headerBoardTitlePadding,
+                       foldHeight)
+        }
         return max(style.headerHeight, ceil(font.lineHeight) + 12, foldHeight)
+    }
+
+    /**
+     * Whether the header is sized to its text and the board starts `CYLSectionStyleMetrics.headerBoardSpacing` below it: under
+     * `.insetGrouped` with no header divider (the divider needs the old reservation) and with section headers shown.
+     */
+    var sizesHeaderToText: Bool {
+        showsSectionHeaders && style.sectionStyle == .insetGrouped && style.headerSeparatorStyle == .none
     }
 
     /**
@@ -2320,7 +2340,7 @@ private extension CYLTagListView {
             : CGSize(width: CYLTagListHeaderView.iconSize, height: CYLTagListHeaderView.iconSize)
         let text = CYLTagButton.height(forTitle: title, iconSize: icon, width: max(1, room), showsDeleteIndicator: false,
                                        style: headerTitleStyle(), traitCollection: traitCollection)
-        return max(base, ceil(text) + 12)
+        return max(base, ceil(text) + (sizesHeaderToText ? CYLSectionStyleMetrics.headerBoardTitlePadding : 12))
     }
 
     /**
@@ -2330,6 +2350,20 @@ private extension CYLTagListView {
     func column(atWidth width: CGFloat) -> CGRect {
         let insets = style.sectionInsets
         return CGRect(x: insets.left, y: 0, width: max(0, width - insets.left - insets.right), height: 0)
+    }
+
+    /**
+     * The board's column: the tag column widened by `sectionBoardInset` on both sides; the section column when the inset is unset or
+     * the style is plain (no board).
+     */
+    func boardColumn(atWidth width: CGFloat) -> CGRect {
+        let column = column(atWidth: width)
+        guard style.sectionStyle == .insetGrouped, let inset = style.sectionBoardInset else {
+            return column
+        }
+        let tags = tagColumn(atWidth: width)
+        let extra = max(0, inset)
+        return CGRect(x: tags.minX - extra, y: 0, width: tags.width + 2 * extra, height: 0)
     }
 
     /**
@@ -2355,7 +2389,8 @@ private extension CYLTagListView {
     func tagInsets(atWidth width: CGFloat) -> UIEdgeInsets {
         let tagColumn = tagColumn(atWidth: width)
         let card = cardInsets
-        return UIEdgeInsets(top: style.sectionInsets.top + card.top, left: tagColumn.minX,
+        let top = sizesHeaderToText ? CYLSectionStyleMetrics.headerBoardSpacing : style.sectionInsets.top
+        return UIEdgeInsets(top: top + card.top, left: tagColumn.minX,
                             bottom: style.sectionInsets.bottom + card.bottom, right: width - tagColumn.maxX)
     }
 
@@ -2367,7 +2402,7 @@ private extension CYLTagListView {
         guard style.sectionStyle == .insetGrouped else {
             return nil
         }
-        return CYLTagListCardSpec(column: column(atWidth: collectionView.bounds.width), padding: cardInsets,
+        return CYLTagListCardSpec(column: boardColumn(atWidth: collectionView.bounds.width), padding: cardInsets,
                                   color: style.resolvedSectionBackgroundColor, glassTint: style.sectionBackgroundColor,
                                   usesGlass: style.resolvedSectionBackgroundStyle == .liquidGlass, cornerRadius: style.sectionCornerRadius)
     }
@@ -2397,7 +2432,7 @@ private extension CYLTagListView {
         let edges = headerEdgeInsets(atWidth: width)
         header.leadingInset = edges.leading
         header.trailingInset = edges.trailing
-        let column = column(atWidth: width)
+        let column = boardColumn(atWidth: width)
         let rest = max(0, width - column.maxX)
         if let color = style.headerBackgroundColor {
             header.bandEdges = (column.minX, rest)

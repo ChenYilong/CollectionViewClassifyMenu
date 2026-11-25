@@ -4,7 +4,7 @@
       "layout": {
         "listStyle": "padding: 10px 16px 0px 16px",
         "itemsStyle": "margin-right: -10px",
-        "headerStyle": "height: 36px; padding: 0 16px; font-size: 14px; font-weight: 400; font-style: normal; color: #000000",
+        "headerStyle": "height: 36px; padding: 0 16px; font-size: 17px; font-weight: 600; font-style: normal; color: #000000",
         "backgroundStyle": "background-color: #FFFFFF"
       },
       "cells": [
@@ -22,7 +22,7 @@
       "layout": {
         "listStyle": "padding: 10px 16px 0px 16px",
         "itemsStyle": "margin-right: -10px",
-        "headerStyle": "height: 36px; padding: 0 16px; font-size: 14px; font-weight: 400; font-style: normal; color: #000000",
+        "headerStyle": "height: 36px; padding: 0 16px; font-size: 17px; font-weight: 600; font-style: normal; color: #000000",
         "backgroundStyle": "background-color: #FFFFFF"
       },
       "cells": [
@@ -35,7 +35,7 @@
       "layout": {
         "listStyle": "padding: 10px 16px 0px 16px",
         "itemsStyle": "margin-right: -10px",
-        "headerStyle": "height: 36px; padding: 0 16px; font-size: 14px; font-weight: 400; font-style: normal; color: #000000",
+        "headerStyle": "height: 36px; padding: 0 16px; font-size: 17px; font-weight: 600; font-style: normal; color: #000000",
         "backgroundStyle": "background-color: #FFFFFF"
       },
       "cells": [
@@ -53,7 +53,7 @@
       "layout": {
         "listStyle": "padding: 10px 16px 0px 16px",
         "itemsStyle": "margin-right: -10px",
-        "headerStyle": "height: 36px; padding: 0 16px; font-size: 14px; font-weight: 400; font-style: normal; color: #FFFFFF",
+        "headerStyle": "height: 36px; padding: 0 16px; font-size: 17px; font-weight: 600; font-style: normal; color: #FFFFFF",
         "backgroundStyle": "background-color: #000000"
       },
       "cells": [
@@ -71,7 +71,7 @@
       "layout": {
         "listStyle": "padding: 10px 16px 0px 16px",
         "itemsStyle": "margin-right: -10px",
-        "headerStyle": "height: 36px; padding: 0 16px; font-size: 14px; font-weight: 400; font-style: normal; color: #FFFFFF",
+        "headerStyle": "height: 36px; padding: 0 16px; font-size: 17px; font-weight: 600; font-style: normal; color: #FFFFFF",
         "backgroundStyle": "background-color: #000000"
       },
       "cells": [
@@ -84,7 +84,7 @@
       "layout": {
         "listStyle": "padding: 10px 16px 0px 16px",
         "itemsStyle": "margin-right: -10px",
-        "headerStyle": "height: 36px; padding: 0 16px; font-size: 14px; font-weight: 400; font-style: normal; color: #FFFFFF",
+        "headerStyle": "height: 36px; padding: 0 16px; font-size: 17px; font-weight: 600; font-style: normal; color: #FFFFFF",
         "backgroundStyle": "background-color: #000000"
       },
       "cells": [

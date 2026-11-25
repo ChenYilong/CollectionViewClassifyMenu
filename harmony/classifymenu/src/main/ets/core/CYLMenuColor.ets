@@ -68,6 +68,14 @@ function linearChannel(byte: number): number {
 }
 
 /**
+ * The WCAG relative luminance (0 black ... 1 white) of sRGB components 0...1 (iOS `CYLTintContrast.relativeLuminance`).
+ */
+export function CYLMenuRelativeLuminance(red: number, green: number, blue: number): number {
+  return LUMA_RED * linearChannel(red * BYTE_MAX) + LUMA_GREEN * linearChannel(green * BYTE_MAX) +
+    LUMA_BLUE * linearChannel(blue * BYTE_MAX);
+}
+
+/**
  * The WCAG relative luminance (0 black ... 1 white) of an opaque color given as '#AARRGGBB', '#RRGGBB' or a number
  * (0xRRGGBB, or 0xAARRGGBB above 0xFFFFFF). Undefined when the color cannot be read as an opaque color: no color, a
  * transparent or translucent one, or a resource. A resource (`$r(...)`, such as the library's palette) is not resolved: a

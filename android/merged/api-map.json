@@ -847,6 +847,7 @@
  "CYLMenuStyleKey.sectionBackgroundStyle": "CYLMenuStyleSectionBackgroundStyle",
  "CYLMenuStyleKey.sectionCornerRadius": "CYLMenuStyleSectionCornerRadius",
  "CYLMenuStyleKey.sectionContentInsets": "CYLMenuStyleSectionContentInsets",
+ "CYLMenuStyleKey.sectionBoardInset": "CYLMenuStyleSectionBoardInset",
  "CYLMenuStyleKey.headerBackgroundColor": "CYLMenuStyleHeaderBackgroundColor",
  "CYLMenuStyleKey.headerCornerRadius": "CYLMenuStyleHeaderCornerRadius",
  "CYLMenuStyleKey.headerContentInsets": "CYLMenuStyleHeaderContentInsets",

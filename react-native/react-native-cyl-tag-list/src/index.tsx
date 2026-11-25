@@ -17,6 +17,7 @@ export type {
   CylTagListConfiguration,
   CylTagListItem,
   CylTagListSection,
+  CylTagStateStyle,
   CylTagTitleMaxLines,
 } from './CylTagListConfiguration';
 export type { TagEvent } from './CylTagListViewNativeComponent';

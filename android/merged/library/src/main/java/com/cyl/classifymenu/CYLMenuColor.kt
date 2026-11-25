@@ -26,11 +26,16 @@ fun CYLMenuColorFromString(string: String?): Int? {
  */
 fun CYLMenuColorLuminance(color: Int): Float? {
     if (Color.alpha(color) != CYLTintChannelMax) return null
-    fun linear(channel: Int): Double {
-        val c = channel / CYLTintChannelMax.toDouble()
-        return if (c <= CYLTintLinearCutoff) c / CYLTintLinearSlope else Math.pow((c + CYLTintOffset) / CYLTintScale, CYLTintGamma)
-    }
-    return (CYLTintLumaRed * linear(Color.red(color)) + CYLTintLumaGreen * linear(Color.green(color)) + CYLTintLumaBlue * linear(Color.blue(color))).toFloat()
+    return CYLMenuRelativeLuminance(
+        Color.red(color) / CYLTintChannelMax.toDouble(), Color.green(color) / CYLTintChannelMax.toDouble(), Color.blue(color) / CYLTintChannelMax.toDouble(),
+    ).toFloat()
+}
+
+/** The WCAG relative luminance of an opaque sRGB color given as components in 0...1 (iOS: `CYLTintContrast.relativeLuminance(red:green:blue:)`). */
+internal fun CYLMenuRelativeLuminance(red: Double, green: Double, blue: Double): Double {
+    fun linear(c: Double): Double =
+        if (c <= CYLTintLinearCutoff) c / CYLTintLinearSlope else Math.pow((c + CYLTintOffset) / CYLTintScale, CYLTintGamma)
+    return CYLTintLumaRed * linear(red) + CYLTintLumaGreen * linear(green) + CYLTintLumaBlue * linear(blue)
 }
 
 /**

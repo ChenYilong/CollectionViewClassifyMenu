@@ -497,6 +497,15 @@ open class CYLMenuStyle: NSObject, NSCopying {
                                                  bottom: CYLSectionStyleMetrics.cardPadding, right: CYLSectionStyleMetrics.cardPadding)
 
     /**
+     * How far the board (the card) extends beyond the tag column on the left and on the right: one value for both sides. The tags
+     * and the header title always share the tag column, so the board never changes the tag width. `0`: the board's edges coincide
+     * with the tags' edges. `nil` (the default): `sectionContentInsets` leading / trailing (12), the board spans the section column as
+     * before. A set value (0 included) overrides those two parts of `sectionContentInsets`; top and bottom still come from it.
+     * Configuration key: `sectionBoardInset`.
+     */
+    open var sectionBoardInset: CGFloat?
+
+    /**
      * The header band's color; `nil` (the default) draws no band. `CYLSectionStyleColors.headerBand` (#EFEFF4, with a dark variant)
      * is the usual one.
      */
@@ -568,7 +577,17 @@ open class CYLMenuStyle: NSObject, NSCopying {
     /**
      * Minimum header height, 36 by default; it grows with the font.
      */
-    open var headerHeight: CGFloat = 36
+    open var headerHeight: CGFloat = 36 {
+        didSet {
+            headerHeightWasSet = true
+        }
+    }
+
+    /**
+     * Whether the app ever assigned `headerHeight`. Under `.insetGrouped` with no header divider an unset height is not a minimum:
+     * the header is sized to its text.
+     */
+    private(set) var headerHeightWasSet = false
 
     /**
      * The most lines a section header's title may take: a title too wide for the room left of the fold / More / clear controls
@@ -585,9 +604,9 @@ open class CYLMenuStyle: NSObject, NSCopying {
     }
 
     /**
-     * Header font, the system font of 14 points by default (scaled for Dynamic Type).
+     * Header font, the system table header look by default: the system font of 17 points, semibold (scaled for Dynamic Type).
      */
-    open var headerFont = UIFont.systemFont(ofSize: 14)
+    open var headerFont = UIFont.systemFont(ofSize: 17, weight: .semibold)
 
     /**
      * Header title color: the dynamic label color by default (`UIColor.label`, resolved per trait collection, so dark mode works), the one
@@ -1114,6 +1133,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.sectionBackgroundStyle = sectionBackgroundStyle
         copy.sectionCornerRadius = sectionCornerRadius
         copy.sectionContentInsets = sectionContentInsets
+        copy.sectionBoardInset = sectionBoardInset
         copy.headerBackgroundColor = headerBackgroundColor
         copy.headerCornerRadius = headerCornerRadius
         copy.headerContentInsets = headerContentInsets
@@ -1122,6 +1142,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.headerSeparatorThickness = headerSeparatorThickness
         copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
+        copy.headerHeightWasSet = headerHeightWasSet
         copy.headerMaxLines = headerMaxLines
         copy.headerFont = headerFont
         copy.headerTextColor = headerTextColor
@@ -1450,6 +1471,16 @@ public enum CYLSectionStyleMetrics {
      * The thickness of the header divider: one hairline.
      */
     public static let separatorThickness: CGFloat = 0.5
+
+    /**
+     * The padding around a header title that is sized to its text (4 above, 4 below), under `.insetGrouped` with no divider.
+     */
+    public static let headerBoardTitlePadding: CGFloat = 8
+
+    /**
+     * The gap between such a header and the board.
+     */
+    public static let headerBoardSpacing: CGFloat = 4
 }
 
 /**

@@ -105,6 +105,10 @@ function offsetValue(value) {
   return n ? { horizontal: n[0], vertical: n[1] } : null;
 }
 
+// The default section header font: the system table header look, 17 semibold (docs/tag-section-style.md).
+const HEADER_FONT_SIZE = 17;
+const HEADER_FONT_WEIGHT = 'semibold';
+
 const FONT_WEIGHTS = {
   ultralight: 100, thin: 200, light: 300, regular: 400, medium: 500, semibold: 600, bold: 700, heavy: 800, black: 900,
 };
@@ -198,6 +202,14 @@ const SECTION_STYLES = { plain: 'plain', insetGrouped: 'insetGrouped' };
 const DEFAULT_SECTION_STYLE = SECTION_STYLES.insetGrouped;
 const HEADER_SEPARATOR_STYLES = { none: 'none', line: 'line' };
 const SECTION_METRICS = { cardCornerRadius: 10, cardPadding: 12, headerBandPadding: 12, separatorThickness: 0.5 };
+/**
+ * Under the board (insetGrouped) with no header divider the header is sized to its text (docs/tag-section-style.md, "The gap
+ * between the header and the board is short when there is no divider"): the title's line height plus this padding (px; half
+ * above, half below), and never less than the fold / More control, which CSS min-height gives for free.
+ */
+const HEADER_BOARD_TITLE_PADDING = 8;
+/** The distance (px) from such a header's bottom to the board's top, instead of the section's top inset. */
+const HEADER_BOARD_SPACING = 4;
 /** The card's background: the solid color, or the glass of cyl-animated-item's tags (style key `sectionBackgroundStyle`). */
 const SECTION_BACKGROUND_STYLES = { flat: 'flat', liquidGlass: 'liquidGlass' };
 /**
@@ -307,6 +319,9 @@ function mergeSectionStyle(style, c) {
     const n = numberValue(c[k]);
     if (n !== null) style[k] = Math.max(0, n);
   });
+  // The horizontal inset of the content column inside the board: a negative value is 0, anything unparsable stays unset.
+  const boardInsetValue = numberValue(c.sectionBoardInset);
+  if (boardInsetValue !== null) style.sectionBoardInset = Math.max(0, boardInsetValue);
   ['sectionContentInsets', 'headerContentInsets', 'headerSeparatorInsets'].forEach((k) => {
     const value = insetsValue(c[k]);
     if (value) style[k] = value;
@@ -316,7 +331,7 @@ function mergeSectionStyle(style, c) {
 /**
  * The core's `CYLMenuStyle()`: gray bordered tags (a hairline of UIColor(white: 0.82)), green selection with white
  * titles, light gray disabled tags; 14 × 14 icons, 4 between icon and title, 30 high tags, 10 between tags and lines,
- * section insets {10, 16, 10, 16}, 36 high headers with a gray 14 pt title.
+ * section insets {10, 16, 10, 16}, 36 high headers with a 17 pt semibold title.
  * @param {number} pixelRatio the screen scale, for the hairline (1 / scale)
  * @param {boolean} dark dark mode: the dark tag fill and title, the light tint of the list's texts and icons
  */
@@ -337,6 +352,8 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     interitemSpacing: 10,
     lineSpacing: 10,
     headerHeight: 36,
+    // True once a configuration sets `headerHeight`: a header sized to its text takes it as its minimum only then.
+    headerHeightSet: false,
     animationSpeed: 1,
     layoutCentered: true,
     imagePlacement: 'leading',
@@ -364,6 +381,8 @@ function defaultStyle(pixelRatio = 2, dark = false) {
       top: SECTION_METRICS.cardPadding, left: SECTION_METRICS.cardPadding,
       bottom: SECTION_METRICS.cardPadding, right: SECTION_METRICS.cardPadding,
     },
+    // The horizontal inset of the content column inside the board; null = the default (sectionContentInsets' left / right, 12).
+    sectionBoardInset: null,
     headerBackgroundColor: null,
     headerCornerRadius: 0,
     headerContentInsets: { top: 0, left: SECTION_METRICS.headerBandPadding, bottom: 0, right: SECTION_METRICS.headerBandPadding },
@@ -378,7 +397,7 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     foldControlColorSet: false,
     headerTextColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     foldControlColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
-    headerFont: { size: 14, weight: 'regular', italic: false },
+    headerFont: { size: HEADER_FONT_SIZE, weight: HEADER_FONT_WEIGHT, italic: false },
     headerHorizontalInset: 16,
     // The most lines a section header's title may take (HEADER_TITLE_MAX_LINES): one line with an ellipsis by default.
     headerMaxLines: HEADER_TITLE_MAX_LINES.single,
@@ -486,6 +505,7 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   num('interitemSpacing');
   num('lineSpacing');
   num('headerHeight');
+  if (numberValue(c.headerHeight) !== null) style.headerHeightSet = true;
   num('animationSpeed');
   num('headerHorizontalInset');
   const centered = boolValue(c.layoutCentered);
@@ -947,7 +967,7 @@ function iconContent(item, state, style, animation) {
   if (!image) return { kind: 'none', src: '', glyph: '' };
   const system = /^system:(.+)$/.exec(image);
   if (!system) return { kind: 'image', src: image, glyph: '' };
-  const uri = symbols.symbolURI(system[1], iconColor(style, state));
+  const uri = symbols.symbolURI(system[1], drawnIconColor(style, state));
   if (uri) return { kind: 'image', src: uri, glyph: '' };
   return { kind: 'glyph', src: '', glyph: symbols.glyph(system[1]) };
 }
@@ -1012,8 +1032,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const radius = appearance.cornerRadius;
   // Under drawn Liquid Glass an unset background hands no color ('': the glass component's default frosted tint, so a colorful
   // backdrop shows through); an explicit one (selected tint, preset, app color) keeps the alpha x 0.75 rule. Flat is unchanged.
-  const glassDrawn = style.backgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive();
-  const handedColor = glassDrawn && !appearance.backgroundExplicit ? '' : appearance.backgroundColor;
+  const handedColor = glassHandedColor(style, appearance);
   const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, appearance.borderColor,
     !!(style.sectionPalette && style.sectionPalette.dark), // the color mode picks the glass component's default tint
     state === 'selected' ? 1 : -1); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
@@ -1137,9 +1156,31 @@ function physicalInsets(style, value) {
   return isRtl(style) ? { ...value, left: value.right, right: value.left } : value;
 }
 
-/** The card's padding around the tags: `sectionContentInsets` under insetGrouped, else none. */
+/**
+ * The board's outward extension, the ONE place it is computed: how far the board (card, header band, divider) reaches past
+ * the tag column on the left and the right. Unset `sectionBoardInset` (null) is the default, the leading / trailing parts of
+ * `sectionContentInsets` (the board then spans the section column); a set value (0 included) overrides them on both sides,
+ * 0 hugging the tags. A value above the default may push the board past the list margin. None without a board.
+ * It never moves the tag column.
+ */
+function boardInset(style) {
+  if (!isInsetGrouped(style)) return { left: 0, right: 0 };
+  if (style.sectionBoardInset !== null && style.sectionBoardInset !== undefined) {
+    return { left: style.sectionBoardInset, right: style.sectionBoardInset };
+  }
+  const insets = physicalInsets(style, style.sectionContentInsets);
+  return { left: insets.left, right: insets.right };
+}
+
+/**
+ * The card's padding around the tags under insetGrouped, else none: left / right are the board's extension (`boardInset`), top / bottom from
+ * `sectionContentInsets`.
+ */
 function cardInsets(style) {
-  return isInsetGrouped(style) ? physicalInsets(style, style.sectionContentInsets) : ZERO_INSETS;
+  if (!isInsetGrouped(style)) return ZERO_INSETS;
+  const insets = physicalInsets(style, style.sectionContentInsets);
+  const inset = boardInset(style);
+  return { top: insets.top, bottom: insets.bottom, left: inset.left, right: inset.right };
 }
 
 /** The section's column: the list width minus `sectionInsets`, as distances from the list's left and right edges (leading / trailing mirrored). */
@@ -1148,11 +1189,27 @@ function contentColumn(style) {
   return { left: insets.left, right: insets.right };
 }
 
-/** The column the tags are laid in: `contentColumn` narrowed by the card's padding. Rows, folding and height follow it. */
+/**
+ * The ONE column the header title and the tags share: `contentColumn` minus the leading / trailing `sectionContentInsets`
+ * under insetGrouped, else the section column. It never depends on `sectionBoardInset`. Rows, folding and height follow it.
+ */
 function tagColumn(style) {
   const column = contentColumn(style);
-  const card = cardInsets(style);
-  return { left: column.left + card.left, right: column.right + card.right };
+  if (!isInsetGrouped(style)) return column;
+  const insets = physicalInsets(style, style.sectionContentInsets);
+  return { left: column.left + insets.left, right: column.right + insets.right };
+}
+
+/**
+ * The column of the board (card, header band, divider): the tag column extended outward by `boardInset` on both sides
+ * (the section column by default, the tag column itself for 0). Without a board it is the section column. A distance
+ * can be negative when the board passes the list's margin (accepted).
+ */
+function boardColumn(style) {
+  if (!isInsetGrouped(style)) return contentColumn(style);
+  const tags = tagColumn(style);
+  const extension = boardInset(style);
+  return { left: tags.left - extension.left, right: tags.right - extension.right };
 }
 
 /** A column's x and width at the list width `listWidth`. */
@@ -1170,8 +1227,9 @@ function isStyledHeader(style) {
 }
 
 /**
- * The distances from the list's edges to the header's title and fold control: the tags' edges inside the card
- * (insetGrouped), the band's edges plus `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
+ * The distances from the list's edges to the header's title and fold control: the tags' edges inside the board
+ * (insetGrouped: the header and the taglist always align), the band's edges plus `headerContentInsets` (a plain header
+ * with a band), else `headerHorizontalInset`.
  */
 function headerEdges(style) {
   const column = contentColumn(style);
@@ -1185,12 +1243,27 @@ function headerEdges(style) {
 
 /** The distances from the list's edges to the header element: the column when styled, else the whole list. */
 function headerBox(style) {
-  return isStyledHeader(style) ? contentColumn(style) : { left: 0, right: 0 };
+  return isStyledHeader(style) ? boardColumn(style) : { left: 0, right: 0 };
 }
 
-/** The header's height (headerHeight, at least the title's line and 12). */
+/** True when the header is sized to its text and the board follows it closely: insetGrouped with no header divider. */
+function isHeaderTightToBoard(style) {
+  return isInsetGrouped(style) && style.headerSeparatorStyle !== HEADER_SEPARATOR_STYLES.line;
+}
+
+/** The distance from the header's bottom to the board's top: HEADER_BOARD_SPACING for a tight header, else the section's top inset. */
+function headerBoardOffset(style, hasHeader = true) {
+  return hasHeader && isHeaderTightToBoard(style) ? HEADER_BOARD_SPACING : style.sectionInsets.top;
+}
+
+/**
+ * The header's height (a minimum for a tight header): headerHeight, at least the title's line and 12. A tight header
+ * (isHeaderTightToBoard) is the title's line plus HEADER_BOARD_TITLE_PADDING, and `headerHeight` counts only when the app set it.
+ */
 function headerHeightOf(style) {
-  return Math.max(style.headerHeight, lineHeight(style.headerFont.size) + 12);
+  const line = lineHeight(style.headerFont.size);
+  if (isHeaderTightToBoard(style)) return Math.max(style.headerHeightSet ? style.headerHeight : 0, line + HEADER_BOARD_TITLE_PADDING);
+  return Math.max(style.headerHeight, line + 12);
 }
 
 /**
@@ -1200,7 +1273,7 @@ function headerHeightOf(style) {
  */
 function headerSeparator(style) {
   if (style.headerSeparatorStyle !== HEADER_SEPARATOR_STYLES.line || !(style.headerSeparatorThickness > 0)) return null;
-  const column = contentColumn(style);
+  const column = boardColumn(style);
   // The divider's leading / trailing insets swap sides right to left.
   const own = style.headerSeparatorInsets ? physicalInsets(style, style.headerSeparatorInsets) : null;
   return {
@@ -1245,11 +1318,146 @@ function rgbaOf(text) {
 function opaqueLuminance(text) {
   const c = text ? rgbaOf(text) : null;
   if (!c || c.a < OPAQUE_ALPHA) return null;
-  const channel = (x) => {
-    const s = x / RGB_MAX;
-    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  return relativeLuminance(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX);
+}
+
+// MARK: - Dark glass icon lift (CYLIconContrast of the iOS core)
+
+/** The least WCAG contrast ratio (3:1, the floor for graphics) an icon keeps against the glass. */
+const MINIMUM_CONTRAST_RATIO = 3;
+/** The white share of the default frosted glass in dark mode (white at 0.14; over black about #242424). */
+const FROSTED_GLASS_WHITE_ALPHA = 0.14;
+/** The share of an explicit glass tint's alpha that tints the glass when no tint alpha is given. */
+const DEFAULT_GLASS_TINT_SHARE = 0.75;
+/** The step in which the lift raises the HSL lightness. */
+const LIGHTNESS_STEP = 0.005;
+const LIGHTNESS_MAX = 1;
+const SRGB_LINEAR_CUTOFF = 0.03928;
+const SRGB_LINEAR_SLOPE = 12.92;
+const SRGB_GAMMA = 2.4;
+const SRGB_OFFSET = 0.055;
+const SRGB_SCALE = 1.055;
+const LUMA_RED = 0.2126;
+const LUMA_GREEN = 0.7152;
+const LUMA_BLUE = 0.0722;
+/** The flare term of the WCAG contrast ratio. */
+const CONTRAST_FLARE = 0.05;
+const HUE_SECTORS = 6;
+
+/** WCAG relative luminance of an sRGB color, components 0..1. */
+function relativeLuminance(red, green, blue) {
+  const channel = (s) => (s <= SRGB_LINEAR_CUTOFF ? s / SRGB_LINEAR_SLOPE : ((s + SRGB_OFFSET) / SRGB_SCALE) ** SRGB_GAMMA);
+  return LUMA_RED * channel(red) + LUMA_GREEN * channel(green) + LUMA_BLUE * channel(blue);
+}
+
+/** The WCAG contrast ratio of two relative luminances, 1 to 21. */
+function contrastRatio(first, second) {
+  return (Math.max(first, second) + CONTRAST_FLARE) / (Math.min(first, second) + CONTRAST_FLARE);
+}
+
+/**
+ * The reference luminance the icon is judged against, with the glass over a black backdrop: the default frosted glass (`glassTint`
+ * missing, invalid or fully transparent) is white at FROSTED_GLASS_WHITE_ALPHA; an explicit tint is its color times its alpha
+ * times `tintAlpha` (DEFAULT_GLASS_TINT_SHARE when missing or negative, as the glass component's rule).
+ */
+function glassReferenceLuminance(glassTint, tintAlpha) {
+  const tint = glassTint ? rgbaOf(color(glassTint) || glassTint) : null;
+  if (!tint || !(tint.a > 0)) return relativeLuminance(FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA);
+  const share = tint.a * (typeof tintAlpha === 'number' && tintAlpha >= 0 ? tintAlpha : DEFAULT_GLASS_TINT_SHARE);
+  return relativeLuminance((tint.r / RGB_MAX) * share, (tint.g / RGB_MAX) * share, (tint.b / RGB_MAX) * share);
+}
+
+/** HSL of an sRGB color (components 0..1): hue, saturation and lightness all 0..1. */
+function hslFromRgb(red, green, blue) {
+  const high = Math.max(red, green, blue);
+  const low = Math.min(red, green, blue);
+  const lightness = (high + low) / 2;
+  const delta = high - low;
+  if (!(delta > 0)) return { hue: 0, saturation: 0, lightness };
+  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
+  let hue;
+  if (high === red) {
+    hue = (green - blue) / delta;
+    if (hue < 0) hue += HUE_SECTORS;
+  } else if (high === green) {
+    hue = (blue - red) / delta + 2;
+  } else {
+    hue = (red - green) / delta + 4;
+  }
+  return { hue: hue / HUE_SECTORS, saturation, lightness };
+}
+
+/** The sRGB color {red, green, blue} (0..1) of an HSL triple (all 0..1). */
+function rgbFromHsl(hue, saturation, lightness) {
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const sector = hue * HUE_SECTORS;
+  const second = chroma * (1 - Math.abs((sector % 2) - 1));
+  const base = lightness - chroma / 2;
+  const parts = [[chroma, second, 0], [second, chroma, 0], [0, chroma, second], [0, second, chroma], [second, 0, chroma],
+    [chroma, 0, second]][Math.floor(sector) % HUE_SECTORS];
+  return { red: parts[0] + base, green: parts[1] + base, blue: parts[2] + base };
+}
+
+/** A CSS color text of 0..1 components: '#RRGGBB' when opaque, else rgba(). */
+function cssFromUnit(red, green, blue, alpha) {
+  const byte = (x) => Math.max(0, Math.min(RGB_MAX, Math.round(x * RGB_MAX)));
+  if (alpha >= OPAQUE_ALPHA) return `#${[red, green, blue].map((x) => byte(x).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
+  return `rgba(${byte(red)}, ${byte(green)}, ${byte(blue)}, ${alpha})`;
+}
+
+/**
+ * The icon color to draw in dark mode on glass: `iconColor` itself when the rule does not apply (an invalid color, or one that
+ * already has MINIMUM_CONTRAST_RATIO against the glass), else the color with its HSL lightness raised in LIGHTNESS_STEP steps, hue,
+ * saturation and alpha kept, up to white. Colors here are static (no per-mode colors exist), so the "dynamic" case never arises.
+ * Pure: the same input gives the same output. The caller calls it only when glass is drawn and the mode is dark.
+ * @param {string} iconColor a CSS color text ('#RRGGBB', rgb(), rgba(), a UIColor name)
+ * @param {string} [glassTint] the explicit glass color ('' or missing: the default frosted glass)
+ * @param {number} [tintAlpha] the tint alpha the glass uses (missing or negative: DEFAULT_GLASS_TINT_SHARE)
+ */
+function liftedIconColor(iconColor, glassTint, tintAlpha) {
+  const c = rgbaOf(color(iconColor) || iconColor);
+  if (!c) return iconColor;
+  const reference = glassReferenceLuminance(glassTint, tintAlpha);
+  const hsl = hslFromRgb(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX);
+  // The contrast of the color as it is drawn: its components rounded to whole bytes, so the result keeps the ratio it was judged by.
+  const drawn = (x) => Math.round(Math.max(0, Math.min(1, x)) * RGB_MAX) / RGB_MAX;
+  const ratioAt = (lightness) => {
+    const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness);
+    return contrastRatio(relativeLuminance(drawn(rgb.red), drawn(rgb.green), drawn(rgb.blue)), reference);
   };
-  return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
+  if (ratioAt(hsl.lightness) >= MINIMUM_CONTRAST_RATIO) return iconColor;
+  let lightness = hsl.lightness;
+  while (lightness < LIGHTNESS_MAX && ratioAt(lightness) < MINIMUM_CONTRAST_RATIO) {
+    lightness = Math.min(LIGHTNESS_MAX, lightness + LIGHTNESS_STEP);
+  }
+  const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness);
+  return cssFromUnit(rgb.red, rgb.green, rgb.blue, c.a);
+}
+
+/** Whether the tag's Liquid Glass background is really drawn (the predicate of the glass background of `tagLayout`). */
+function isGlassDrawn(style) {
+  return style.backgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive();
+}
+
+/**
+ * The color handed to the glass: under drawn glass an unset background hands none (''), else the appearance's own color.
+ * Flat tags hand it unchanged.
+ */
+function glassHandedColor(style, appearance) {
+  return isGlassDrawn(style) && !appearance.backgroundExplicit ? '' : appearance.backgroundColor;
+}
+
+/**
+ * The icon color a state draws: `iconColor` (the explicit color, else the text color), lifted by `liftedIconColor` only when
+ * glass is drawn, the mode is dark (`sectionPalette.dark`) and the state has an EXPLICIT icon color. Light mode, flat tags,
+ * the built-in (unset) icon color and colors that already pass are never changed. It feeds the icon tint; the Mini Program
+ * has no separate animation tint (an animation is drawn by its engine as it is).
+ */
+function drawnIconColor(style, state) {
+  const appearance = style[state];
+  const dark = !!(style.sectionPalette && style.sectionPalette.dark);
+  if (!appearance.iconColor || !dark || !isGlassDrawn(style)) return iconColor(style, state);
+  return liftedIconColor(appearance.iconColor, glassHandedColor(style, appearance), state === 'selected' ? 1 : null);
 }
 
 /** Black on a light opaque background, white on a dark one; null when the background is not opaque. */
@@ -1332,20 +1540,25 @@ function directionCSS(style) {
 /**
  * The CSS of a section: its insets (the last line's spacing taken off the bottom), the negative trailing margin
  * that absorbs the last tag's spacing, the header (headerHeight, headerFont, headerTextColor, headerHorizontalInset)
- * and the list's background. It adds `cardStyle` (the default, insetGrouped), a band in `headerStyle` and `headerLineStyle`
+ * and the list's background. `options.hasHeader` (default true) is false for a section that shows no header (its board then
+ * starts at the section's top inset). It adds `cardStyle` (the default, insetGrouped), a band in `headerStyle` and `headerLineStyle`
  * (the divider, opt-in); under `sectionStyle: 'plain'` there is no `cardStyle` and the rest is what it was before the card
  * became the default.
  */
-function sectionLayout(style) {
+function sectionLayout(style, options = {}) {
   const i = style.sectionInsets;
+  const hasHeader = options.hasHeader !== false;
+  const tight = isHeaderTightToBoard(style);
   // The column's distances from the physical left and right edges (the leading / trailing sides swapped right to left).
   const column = contentColumn(style);
   const rtl = isRtl(style);
   const headerHeight = headerHeightOf(style);
   // A header title that may wrap (headerMaxLines above 1) grows the header: the height is a minimum, with a little padding.
   const wraps = style.headerMaxLines > HEADER_TITLE_MAX_LINES.single;
-  const heightProperty = wraps ? 'min-height' : 'height';
-  const verticalPadding = wraps ? `${HEADER_WRAP_VERTICAL_PADDING}px` : '0';
+  // A tight header (sized to its text) only has a minimum height: the fold control may be taller than the title.
+  const heightProperty = wraps || tight ? 'min-height' : 'height';
+  const wrapPadding = tight ? HEADER_BOARD_TITLE_PADDING / 2 : HEADER_WRAP_VERTICAL_PADDING;
+  const verticalPadding = wraps ? `${wrapPadding}px` : '0';
   const layout = {
     listStyle: `padding: ${i.top}px ${column.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${column.left}px`,
     // The negative margin that absorbs the last tag's spacing is on the side the tags' spacing is on.
@@ -1357,9 +1570,13 @@ function sectionLayout(style) {
   if (isInsetGrouped(style)) {
     // The card holds the last line's spacing: the tags' bottom margin is taken off inside it, not off the list's padding.
     const card = cardInsets(style);
-    layout.listStyle = `padding: ${i.top}px ${column.right}px ${i.bottom}px ${column.left}px`;
+    layout.listStyle = `padding: ${headerBoardOffset(style, hasHeader)}px ${column.right}px ${i.bottom}px ${column.left}px`;
     layout.itemsStyle += `; margin-bottom: -${style.lineSpacing}px`;
-    layout.cardStyle = `padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
+    // The list's padding is the section column (never negative); a board wider or narrower than it is moved by the card's margin.
+    const board = boardColumn(style);
+    const shift = board.left !== column.left || board.right !== column.right
+      ? `margin: 0 ${board.right - column.right}px 0 ${board.left - column.left}px; ` : '';
+    layout.cardStyle = `${shift}padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
   }
   if (isStyledHeader(style)) {
     const edges = headerEdges(style);
@@ -1392,12 +1609,14 @@ module.exports = {
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
-  iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
+  iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
+  MINIMUM_CONTRAST_RATIO, FROSTED_GLASS_WHITE_ALPHA, DEFAULT_GLASS_TINT_SHARE, relativeLuminance, contrastRatio,
+  glassReferenceLuminance, hslFromRgb, rgbFromHsl, liftedIconColor, drawnIconColor,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
-  SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
+  SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, boardInset, cardInsets, contentColumn, tagColumn, boardColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
-  HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
+  HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, HEADER_BOARD_TITLE_PADDING, HEADER_BOARD_SPACING, isHeaderTightToBoard, headerBoardOffset, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
   FOLD_CONTROL_FONT_SIZE, FOLD_CONTROL_MAX_FONT_SIZE, foldControlFontCSS,
   FOLD_HEADER_MAX_WIDTH_PERCENT, foldHeaderWidthCSS, FOLD_CONTENT_TITLE_AND_ICON, longerFoldTitle,
 };

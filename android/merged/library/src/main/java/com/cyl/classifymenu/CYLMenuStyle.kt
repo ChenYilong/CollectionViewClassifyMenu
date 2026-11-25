@@ -47,6 +47,8 @@ object CYLSectionStyleMetrics {
     const val HEADER_BAND_PADDING: Float = 12f
     /** The thickness of the header divider: one hairline. */
     const val SEPARATOR_THICKNESS: Float = 0.5f
+    /** The default size of a section header title (the table header look; its weight is [CYLFont.WEIGHT_SEMIBOLD]). */
+    const val HEADER_FONT_SIZE: Float = 17f
 }
 
 /**
@@ -239,6 +241,16 @@ class CYLMenuStyle {
     /** The padding inside the card around the tags (`insetGrouped`), dp. */
     var sectionContentInsets: CYLEdgeInsets = CYLEdgeInsets(CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING,
         CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING)
+    /**
+     * How far the board (the card, the header band and the divider) extends beyond the tag column on the leading and trailing
+     * sides, one value for both, dp. The tags and the header title always share the tag column, so this never changes the tag
+     * width. 0: the board's edges coincide with the tags' edges. null (the default): the leading and trailing parts of
+     * [sectionContentInsets] ([CYLSectionStyleMetrics.CARD_PADDING], 12): the board spans the section column as before. A set
+     * value (0 included) replaces those two parts (top and bottom still come from [sectionContentInsets]); a negative value is 0.
+     * A set value above the default can push the board past the list's margin ([sectionInsets]); that is accepted.
+     */
+    var sectionBoardInset: Float? = null
+        set(value) { field = value?.let { max(0f, it) } }
     /** The header band's color; null: no band (today's look). [CYLSectionStyleColors.HEADER_BAND] is the usual one. */
     var headerBackgroundColor: Int? = null
     var headerCornerRadius: Float = 0f
@@ -276,7 +288,23 @@ class CYLMenuStyle {
     fun resolvedHeaderSeparatorColor(context: android.content.Context): Int = headerSeparatorColor ?: CYLSectionStyleColors.separator(context)
 
     // Section headers
-    var headerHeight: Float = 36f
+    private var headerHeightValue: Float = 36f
+    private var headerHeightWasSet: Boolean = false
+
+    /**
+     * The fixed header height, dp (default 36). Under `insetGrouped` with no header divider the header is sized to its text
+     * instead (a title line plus [HEADER_BOARD_TITLE_PADDING], not below the fold control) and this value is a minimum only
+     * when the app set it ([isHeaderHeightSet]); the divider and the plain style keep it as the minimum always.
+     */
+    var headerHeight: Float
+        get() = headerHeightValue
+        set(value) {
+            headerHeightValue = value
+            headerHeightWasSet = true
+        }
+
+    /** Whether the app set [headerHeight] (the default 36 does not count). */
+    val isHeaderHeightSet: Boolean get() = headerHeightWasSet
 
     /**
      * The most lines a section header's title may take: a title too wide for the room beside the fold control wraps onto more
@@ -286,7 +314,8 @@ class CYLMenuStyle {
      */
     var headerMaxLines: Int = CYLHeaderTitleMaxLines.SINGLE
         set(value) { field = max(CYLHeaderTitleMaxLines.SINGLE, value) }
-    var headerFont: CYLFont = CYLFont.systemFont(14f)
+    /** The section header title: 17 dp semibold ([CYLSectionStyleMetrics.HEADER_FONT_SIZE], weight 600), the table header look. */
+    var headerFont: CYLFont = CYLFont.semiboldSystemFont(CYLSectionStyleMetrics.HEADER_FONT_SIZE)
     /** null (the default): [tintColor], else its default by the background luminance ([resolvedHeaderTextColor]). */
     var headerTextColor: Int? = null
     var headerHorizontalInset: Float = 16f
@@ -413,6 +442,12 @@ class CYLMenuStyle {
         appearanceForState(forState).iconColor = iconColor
     }
 
+    /**
+     * The icon color the app set for `state`, null while it was never set: the built-in default (the text color) does not count.
+     * Only an explicit color takes the dark-glass lift ([CYLIconContrast]).
+     */
+    internal fun explicitIconColorForState(state: Int): Int? = appearanceForState(state).iconColor
+
     /** `-iconColorForState:`: the icon color, else the text color. */
     fun iconColorForState(state: Int): Int {
         val appearance = appearanceForState(state)
@@ -474,6 +509,7 @@ class CYLMenuStyle {
         copy.sectionBackgroundStyle = sectionBackgroundStyle
         copy.sectionCornerRadius = sectionCornerRadius
         copy.sectionContentInsets = sectionContentInsets
+        copy.sectionBoardInset = sectionBoardInset
         copy.headerBackgroundColor = headerBackgroundColor
         copy.headerCornerRadius = headerCornerRadius
         copy.headerContentInsets = headerContentInsets
@@ -481,7 +517,8 @@ class CYLMenuStyle {
         copy.headerSeparatorColor = headerSeparatorColor
         copy.headerSeparatorThickness = headerSeparatorThickness
         copy.headerSeparatorInsets = headerSeparatorInsets
-        copy.headerHeight = headerHeight
+        copy.headerHeightValue = headerHeightValue
+        copy.headerHeightWasSet = headerHeightWasSet
         copy.headerMaxLines = headerMaxLines
         copy.headerFont = headerFont
         copy.tintColor = tintColor

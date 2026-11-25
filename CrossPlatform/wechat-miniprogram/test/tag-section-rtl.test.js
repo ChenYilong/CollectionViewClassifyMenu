@@ -19,6 +19,7 @@ const CARD_LEADING = 4
 const CARD_TRAILING = 20
 const CARD_INSETS = [12, CARD_LEADING, 12, CARD_TRAILING]
 const DIVIDER_LEADING_INSET = 20
+const BOARD_INSET = 6
 const TAG_LEADING = 4
 const TAG_TRAILING = 12
 const BORDER = 0.5
@@ -83,14 +84,47 @@ test('rtl swaps the tag content insets: the leading inset is on the right', () =
   assert.match(rtl, new RegExp(`padding: 0 ${TAG_LEADING - BORDER}px 0 ${TAG_TRAILING - BORDER}px;`))
 })
 
-test('rtl mirrors the header title inset and the card padding inside the card', () => {
+test('rtl mirrors the card padding; the header title and fold control align with the tags in both directions', () => {
   const sectionContentInsets = CARD_INSETS
-  const ltr = model.sectionLayout(styleOf({ sectionContentInsets }))
-  const rtl = model.sectionLayout(rtlOf({ sectionContentInsets }))
-  assert.match(ltr.headerStyle, new RegExp(`padding: 0 ${CARD_TRAILING}px 0 ${CARD_LEADING}px;`))
-  assert.match(rtl.headerStyle, new RegExp(`padding: 0 ${CARD_LEADING}px 0 ${CARD_TRAILING}px;`))
+  const sectionInsets = SECTION_INSETS
+  const ltr = model.sectionLayout(styleOf({ sectionContentInsets, sectionInsets }))
+  const rtl = model.sectionLayout(rtlOf({ sectionContentInsets, sectionInsets }))
   assert.match(ltr.cardStyle, new RegExp(`padding: 12px ${CARD_TRAILING}px 12px ${CARD_LEADING}px;`))
   assert.match(rtl.cardStyle, new RegExp(`padding: 12px ${CARD_LEADING}px 12px ${CARD_TRAILING}px;`))
+  // The header block is the tags' column: the title (leading) starts at the tags' leading x and the fold control
+  // (trailing) ends at the tags' trailing edge, mirrored right to left.
+  const ltrStyle = styleOf({ sectionContentInsets, sectionInsets })
+  const rtlStyle = rtlOf({ sectionContentInsets, sectionInsets })
+  assert.deepEqual(model.headerEdges(ltrStyle), { left: LEADING_SMALL + CARD_LEADING, right: TRAILING_LARGE + CARD_TRAILING })
+  assert.deepEqual(model.headerEdges(rtlStyle), { left: TRAILING_LARGE + CARD_TRAILING, right: LEADING_SMALL + CARD_LEADING })
+  assert.deepEqual(model.headerEdges(ltrStyle), model.tagColumn(ltrStyle))
+  assert.deepEqual(model.headerEdges(rtlStyle), model.tagColumn(rtlStyle))
+  assert.match(ltr.headerStyle, new RegExp(`margin: 0 ${TRAILING_LARGE}px 0 ${LEADING_SMALL}px; padding: 0 ${CARD_TRAILING}px 0 ${CARD_LEADING}px;`))
+  assert.match(rtl.headerStyle, new RegExp(`margin: 0 ${LEADING_SMALL}px 0 ${TRAILING_LARGE}px; padding: 0 ${CARD_LEADING}px 0 ${CARD_TRAILING}px;`))
+})
+
+test('rtl: the tag column ignores sectionBoardInset, the board extends it by one value on both sides, mirrored', () => {
+  const CONTENT_INSET = 12
+  const sectionBoardInset = BOARD_INSET
+  const ltrStyle = styleOf({ sectionBoardInset, sectionInsets: SECTION_INSETS })
+  const rtlStyle = rtlOf({ sectionBoardInset, sectionInsets: SECTION_INSETS })
+  assert.deepEqual(model.boardInset(ltrStyle), { left: BOARD_INSET, right: BOARD_INSET })
+  assert.deepEqual(model.boardInset(rtlStyle), { left: BOARD_INSET, right: BOARD_INSET })
+  // The tag column is the section column minus sectionContentInsets, whatever the board inset is.
+  assert.deepEqual(model.tagColumn(ltrStyle), { left: LEADING_SMALL + CONTENT_INSET, right: TRAILING_LARGE + CONTENT_INSET })
+  assert.deepEqual(model.tagColumn(rtlStyle), { left: TRAILING_LARGE + CONTENT_INSET, right: LEADING_SMALL + CONTENT_INSET })
+  assert.deepEqual(model.headerEdges(ltrStyle), model.tagColumn(ltrStyle))
+  assert.deepEqual(model.headerEdges(rtlStyle), model.tagColumn(rtlStyle))
+  // The board is the tag column extended by the inset (physical, mirrored).
+  assert.deepEqual(model.boardColumn(ltrStyle), { left: LEADING_SMALL + CONTENT_INSET - BOARD_INSET, right: TRAILING_LARGE + CONTENT_INSET - BOARD_INSET })
+  assert.deepEqual(model.boardColumn(rtlStyle), { left: TRAILING_LARGE + CONTENT_INSET - BOARD_INSET, right: LEADING_SMALL + CONTENT_INSET - BOARD_INSET })
+  // Inset 0: the board is the tag column; unset: the board is the section column (mirrored too).
+  const hugging = rtlOf({ sectionBoardInset: 0, sectionInsets: SECTION_INSETS })
+  assert.deepEqual(model.boardColumn(hugging), model.tagColumn(hugging))
+  assert.deepEqual(model.tagColumn(hugging), model.tagColumn(rtlStyle))
+  const unset = rtlOf({ sectionInsets: SECTION_INSETS })
+  assert.deepEqual(model.boardColumn(unset), { left: TRAILING_LARGE, right: LEADING_SMALL })
+  assert.deepEqual(model.contentColumn(rtlStyle), { left: TRAILING_LARGE, right: LEADING_SMALL })
 })
 
 test('rtl mirrors the header band inset of a plain header', () => {
@@ -139,8 +173,12 @@ test('headerMaxLines defaults to one line: the header keeps its height and has n
   assert.match(plain.headerStyle, new RegExp(`^height: ${DEFAULT_HEADER_HEIGHT}px; padding: 0 16px;`))
   const card = model.sectionLayout(style)
   assert.equal(card.headerTitleStyle, undefined)
-  assert.match(card.headerStyle, new RegExp(`^height: ${DEFAULT_HEADER_HEIGHT}px; margin: `))
-  assert.doesNotMatch(card.headerStyle, /min-height/)
+  // Under the board with no divider the header is the title's line plus 8, a minimum (the fixed 36 does not apply).
+  assert.match(card.headerStyle, new RegExp(`^min-height: ${model.lineHeight(style.headerFont.size) + model.HEADER_BOARD_TITLE_PADDING}px; margin: `))
+  // With the divider on it keeps the fixed height.
+  const withLine = model.sectionLayout(styleOf({ headerSeparatorStyle: 'line' }))
+  assert.match(withLine.headerStyle, new RegExp(`^height: ${DEFAULT_HEADER_HEIGHT}px; margin: `))
+  assert.doesNotMatch(withLine.headerStyle, /min-height/)
 })
 
 test('headerMaxLines 3 clamps the title to three lines and the header height becomes a minimum', () => {
@@ -149,9 +187,15 @@ test('headerMaxLines 3 clamps the title to three lines and the header height bec
   const css = model.sectionLayout(style)
   assert.match(css.headerTitleStyle, new RegExp(`-webkit-line-clamp: ${HEADER_LINES}`))
   assert.match(css.headerTitleStyle, /white-space: normal/)
-  assert.match(css.headerStyle, new RegExp(`^min-height: ${DEFAULT_HEADER_HEIGHT}px;`))
+  // No divider under the board: the title lines plus 8 (min-height line + 8, 4 above and 4 below).
+  const tightHeight = model.lineHeight(style.headerFont.size) + model.HEADER_BOARD_TITLE_PADDING
+  assert.match(css.headerStyle, new RegExp(`^min-height: ${tightHeight}px;`))
   assert.doesNotMatch(css.headerStyle, /(^|; )height:/)
-  assert.match(css.headerStyle, new RegExp(`padding: ${model.HEADER_WRAP_VERTICAL_PADDING}px `))
+  assert.match(css.headerStyle, new RegExp(`padding: ${model.HEADER_BOARD_TITLE_PADDING / 2}px `))
+  // With the divider on the old minimum and padding stay.
+  const withLine = model.sectionLayout(styleOf({ headerMaxLines: HEADER_LINES, headerSeparatorStyle: 'line' }))
+  assert.match(withLine.headerStyle, new RegExp(`^min-height: ${DEFAULT_HEADER_HEIGHT}px;`))
+  assert.match(withLine.headerStyle, new RegExp(`padding: ${model.HEADER_WRAP_VERTICAL_PADDING}px `))
   const plain = model.sectionLayout(plainOf({ headerMaxLines: HEADER_LINES }))
   assert.match(plain.headerStyle, new RegExp(`^min-height: ${DEFAULT_HEADER_HEIGHT}px; padding: ${model.HEADER_WRAP_VERTICAL_PADDING}px 16px;`))
 })

@@ -146,6 +146,8 @@ export class CYLMenuStyleKey {
   static readonly sectionBackgroundStyle: string = 'sectionBackgroundStyle';
   static readonly sectionCornerRadius: string = 'sectionCornerRadius';
   static readonly sectionContentInsets: string = 'sectionContentInsets';
+  /** The horizontal inset of the content column inside the board, one number for both sides; absent: the default 12. */
+  static readonly sectionBoardInset: string = 'sectionBoardInset';
   /** The header band's color; absent: no band. */
   static readonly headerBackgroundColor: string = 'headerBackgroundColor';
   static readonly headerCornerRadius: string = 'headerCornerRadius';
@@ -764,6 +766,10 @@ export class CYLMenuConfiguration {
     const contentInsets = CYLConfigurationValue.insets(configuration[CYLMenuStyleKey.sectionContentInsets]);
     if (contentInsets !== undefined) {
       style.sectionContentInsets = contentInsets;
+    }
+    const boardInset = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.sectionBoardInset]);
+    if (boardInset !== undefined) {
+      style.sectionBoardInset = boardInset;
     }
     if (configuration[CYLMenuStyleKey.headerBackgroundColor] !== undefined) {
       style.headerBackgroundColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.headerBackgroundColor]);

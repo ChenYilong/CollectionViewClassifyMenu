@@ -79,6 +79,24 @@ data class CYLFont(val size: Float, val typeface: Typeface = Typeface.DEFAULT) {
         @JvmStatic
         fun systemFont(size: Float) = CYLFont(size, Typeface.DEFAULT)
 
+        /** The weight of a semibold font on the CSS / Android scale (400 regular, 700 bold). */
+        const val WEIGHT_SEMIBOLD = 600
+
+        /**
+         * The system font in `weight` (100...900). Android 9 (API 28) and later draw any weight; earlier ones only have regular
+         * and bold, so a weight of [WEIGHT_SEMIBOLD] or more is bold there (the closest to semibold they can draw).
+         */
+        @JvmStatic
+        fun systemFont(size: Float, weight: Int): CYLFont {
+            val typeface = if (android.os.Build.VERSION.SDK_INT >= 28) Typeface.create(Typeface.DEFAULT, weight, false)
+            else if (weight >= WEIGHT_SEMIBOLD) Typeface.create(Typeface.DEFAULT, Typeface.BOLD) else Typeface.DEFAULT
+            return CYLFont(size, typeface)
+        }
+
+        /** `+[UIFont systemFontOfSize:weight:]` with `UIFontWeightSemibold`: the table header look. */
+        @JvmStatic
+        fun semiboldSystemFont(size: Float) = systemFont(size, WEIGHT_SEMIBOLD)
+
         /** `+[UIFont boldSystemFontOfSize:]`. */
         @JvmStatic
         fun boldSystemFont(size: Float) = CYLFont(size, Typeface.DEFAULT_BOLD)

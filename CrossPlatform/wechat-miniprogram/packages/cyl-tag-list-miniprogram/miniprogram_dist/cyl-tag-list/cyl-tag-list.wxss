@@ -1,5 +1,5 @@
 /* The layout of the core's CYLTagListView and CYLTagButton (CYLMenuStyle defaults, overridable by the configuration's
-   style): per section a header (headerHeight 36, gray 14 pt title, headerHorizontalInset 16), then the tags inside
+   style): per section a header (headerHeight 36, 17 pt semibold title, headerHorizontalInset 16), then the tags inside
    sectionInsets with interitemSpacing and lineSpacing; a tag centers its icon slot and title with imageTitleSpacing
    between them. The numbers and colors are set inline from the style (model.js tagLayout / sectionLayout). */
 :host { display: block; }
