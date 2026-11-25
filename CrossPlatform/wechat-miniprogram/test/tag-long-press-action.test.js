@@ -123,3 +123,11 @@ test('cyl-tag-list: with no action configured a long press is only reported', ()
   assert.equal(list.data.callout, null);
   assert.equal(list.events.pop().name, 'taglongpress');
 });
+
+test('the list is the containing block of the absolutely positioned callout', () => {
+  const css = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/cyl-tag-list.wxss'), 'utf8');
+  const compact = css.replace(new RegExp(String.fromCharCode(92) + 's+', 'g'), ' ');
+  assert.ok(compact.includes('.cyl-tag-list { position: relative; }'));
+  assert.ok(compact.includes('.cyl-callout { position: absolute;'));
+});

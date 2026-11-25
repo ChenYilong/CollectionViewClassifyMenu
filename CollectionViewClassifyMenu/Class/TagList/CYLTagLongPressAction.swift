@@ -347,3 +347,14 @@ final class CYLTagCalloutView: UIView {
         layer.shadowPath = path.cgPath
     }
 }
+
+/**
+ * Lets the window-wide tap that dismisses a callout run next to every other gesture, without taking a touch from them.
+ */
+final class CYLTagCalloutTapDelegate: NSObject, UIGestureRecognizerDelegate {
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
+    }
+}
