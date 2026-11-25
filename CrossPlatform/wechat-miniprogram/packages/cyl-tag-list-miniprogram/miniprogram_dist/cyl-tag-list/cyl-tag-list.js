@@ -121,6 +121,8 @@ Component({
           canFold: fold.canFold,
           expanded,
           foldTitle: foldTitle(m.foldControl, expanded),
+          // The longer of the two titles: a hidden sizer in the "titleAndIcon" control, so it keeps its width when toggled.
+          foldSizerTitle: model.longerFoldTitle(foldTitle(m.foldControl, false), foldTitle(m.foldControl, true)),
           tailStyle,
           ...layout,
           items: section.items.map((item, i) => {
@@ -152,6 +154,7 @@ Component({
         backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}${model.directionCSS(m.style)}`,
         rtl: model.isRtl(m.style),
         foldFontStyle: model.foldControlFontCSS(),
+        foldHeaderStyle: model.foldHeaderWidthCSS(),
       }, () => {
         if (remeasure) this.measure();
         else this.reportHeight();

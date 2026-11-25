@@ -11,7 +11,10 @@
 /* The section card (sectionStyle "insetGrouped"): padding, radius and color inline; plain, it is a bare block. */
 .cyl-card { box-sizing: border-box; }
 .cyl-header-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cyl-fold-header { display: flex; align-items: center; font-size: 13px; padding: 4px 0 4px 12px; }
+/* The header fold control: never wider than 40% (inline max-width from model.foldHeaderWidthCSS; FOLD_HEADER_MAX_WIDTH_PERCENT); the section title truncates at the tail. */
+.cyl-fold-header { display: flex; flex: 0 1 auto; align-items: center; box-sizing: border-box; min-width: 0; overflow: hidden; font-size: 13px; padding: 4px 0 4px 12px; }
+.cyl-header-title { flex: 0 1 auto; min-width: 0; }
+.cyl-fold-header .cyl-fold-arrow { flex: none; }
 .cyl-items { display: flex; flex-wrap: wrap; }
 .cyl-item {
   display: inline-flex; align-items: center; box-sizing: border-box; border-style: solid; white-space: nowrap;
@@ -31,6 +34,10 @@
 .cyl-title, .cyl-sizer { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cyl-sizer { visibility: hidden; height: 0; }
 .cyl-fold-tail { justify-content: center; }
+/* The "titleAndIcon" fold title and, hidden, the longer of the two titles: the control is as wide as its widest state and does not jump when toggled. */
+.cyl-fold-title-box { display: inline-grid; min-width: 0; overflow: hidden; }
+.cyl-fold-title-text, .cyl-fold-sizer { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cyl-fold-sizer { visibility: hidden; height: 0; }
 /* The long-press callout: a small bubble with an arrow, above the tag (below it when there is no room). */
 .cyl-callout {
   position: absolute; z-index: 10; max-width: 240px; box-sizing: border-box; padding: 8px 12px; border-radius: 12px;

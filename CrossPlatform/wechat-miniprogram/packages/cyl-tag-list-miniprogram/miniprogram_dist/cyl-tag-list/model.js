@@ -176,6 +176,9 @@ const DEFAULT_DIRECTION = DIRECTIONS.ltr;
 const FOLD_CONTROL_FONT_SIZE = 13;
 const FOLD_CONTROL_MAX_FONT_SIZE = 20;
 
+/** The widest a fold control in a section header may be, as a percentage of the header (the section title truncates at the tail). */
+const FOLD_HEADER_MAX_WIDTH_PERCENT = 40;
+
 /**
  * Dark mode, as iOS's dynamic defaults: a tag's fill is the secondary system background (#1C1C1E), its title the primary
  * label (white), and the list's own texts and icons (header title, fold controls) one tint, `UIColor.label` (black in
@@ -565,7 +568,10 @@ function foldControlValue(value) {
     none: 'none', footer: 'footer', headertrailing: 'headerTrailing', headerright: 'headerTrailing',
     headerleading: 'headerLeading', headerleft: 'headerLeading', tail: 'tail',
   };
-  const contents = { iconandtitle: 'iconAndTitle', titleandicon: 'iconAndTitle', title: 'title', icon: 'icon' };
+  // "iconAndTitle" and its alias "titleAndIcon" keep their meaning; "titleAndIconAlways" is the title-and-icon-always content.
+  const contents = {
+    iconandtitle: 'iconAndTitle', titleandicon: 'iconAndTitle', titleandiconalways: 'titleAndIcon', title: 'title', icon: 'icon',
+  };
   const dictionary = typeof value === 'object' ? value : { position: value };
   const position = positions[String(dictionary.position || '').toLowerCase()];
   if (position) control.position = position;
@@ -581,7 +587,7 @@ function foldControlValue(value) {
 /**
  * The configuration with defaults: selectionMode ("none" | "single" | "multiple"), allowsEmptySelection (true, as in
  * the core), showsSectionHeaders (true), defaultVisibleRows (0 = never fold), foldControl ({position: "none" |
- * "headerTrailing" | "tail" | "footer", content: "title" | "icon" | "iconAndTitle"}), style and sections ([{title,
+ * "headerTrailing" | "tail" | "footer", content: "title" | "icon" | "iconAndTitle" | "titleAndIconAlways"}), style and sections ([{title,
  * style, items: [{title, image, selectedImage, animation, animationOptions, animationRestingProgress, exclusive,
  * enabled, gifFirstFrame, gifLastFrame, gifDuration, autoplay}] }], a plain value being an item's title). `options.pixelRatio` sets the hairline of the default borders, `options.dark` the dark mode defaults (tag fill and title, the list's tint).
  */
@@ -746,6 +752,14 @@ function foldState(model, rows, expanded) {
   const canFold = limit > 0 && rowCount > limit;
   const visible = rows.map((row) => !canFold || expanded || row < limit);
   return { canFold, visible };
+}
+
+/** The content "titleAndIcon" (configuration "titleAndIconAlways"): the title and the chevron in both states, "More ⌄" folded, "Less ⌃" expanded. */
+const FOLD_CONTENT_TITLE_AND_ICON = 'titleAndIcon';
+
+/** The longer of the fold titles: a hidden sizer of it keeps the control as wide as its widest state, so it does not jump when toggled. */
+function longerFoldTitle(a, b) {
+  return String(b).length > String(a).length ? String(b) : String(a);
 }
 
 function foldTitle(expanded) {
@@ -1301,6 +1315,11 @@ function headerTitleCSS(maxLines) {
 }
 
 /** The CSS font size of a fold / More control: `size` px, never above FOLD_CONTROL_MAX_FONT_SIZE (the system font size scales text up). */
+/** The CSS width cap of a fold control in a section header: at most FOLD_HEADER_MAX_WIDTH_PERCENT of the header. */
+function foldHeaderWidthCSS() {
+  return `max-width: ${FOLD_HEADER_MAX_WIDTH_PERCENT}%`;
+}
+
 function foldControlFontCSS(size = FOLD_CONTROL_FONT_SIZE) {
   return `font-size: min(${size}px, ${FOLD_CONTROL_MAX_FONT_SIZE}px)`;
 }
@@ -1380,4 +1399,5 @@ module.exports = {
   resolvedHeaderSeparatorColor,
   HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
   FOLD_CONTROL_FONT_SIZE, FOLD_CONTROL_MAX_FONT_SIZE, foldControlFontCSS,
+  FOLD_HEADER_MAX_WIDTH_PERCENT, foldHeaderWidthCSS, FOLD_CONTENT_TITLE_AND_ICON, longerFoldTitle,
 };

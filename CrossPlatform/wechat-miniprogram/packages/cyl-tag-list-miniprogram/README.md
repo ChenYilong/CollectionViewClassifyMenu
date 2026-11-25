@@ -99,6 +99,17 @@ The header divider is not a default; it shows only when you ask for it: `style: 
 (`sectionBackgroundColor`, `sectionCornerRadius`, `sectionContentInsets`, `sectionBackgroundStyle`), the header band
 (`headerBackgroundColor`) and the divider keys are described in `docs/tag-section-style.md` of the repository.
 
+### Fold control
+
+`defaultVisibleRows` folds a section; `foldControl: { position, content, title, collapseTitle, color }` draws the control
+(`position`: `headerTrailing`, `tail` or `footer`; the tail and the footer default to the chevron icon only, the header to
+icon and title). `content`: `icon`, `title`, `iconAndTitle` (the aliases `iconandtitle` and `titleandicon` mean this one), and
+`titleAndIconAlways`, which shows the title and the chevron in both states: "More v" folded, "Less ^" expanded (the collapse title
+and the chevron turned 180 degrees). `title` and `collapseTitle` replace the localized texts. The control is as wide as its longer
+title, so it does not jump when toggled. A control in the section header shows only on a section that can fold (an unfoldable
+section has no control and no space for it); its font is capped (20 px) and its width is at most 40% of the header, where the
+section title is truncated with an ellipsis.
+
 ### One tag on its own
 
 `cyl-tag-button` is the iOS `CYLTagButton` on its own (a search bar item, a toolbar button, a placeholder's icon): an
