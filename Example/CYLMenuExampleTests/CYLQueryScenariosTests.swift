@@ -55,8 +55,8 @@ final class CYLQueryScenariosTests: CYLMenuExampleTestCase {
         let list = screen.tagList
         XCTAssertEqual(list.defaultVisibleRows, CYLQueryScenariosViewController.visibleRows)
         XCTAssertEqual(list.defaultVisibleRows, 2)
-        XCTAssertEqual(list.foldControl.position, .headerTrailing)
-        XCTAssertEqual(list.foldControl.content, .iconAndTitle)
+        XCTAssertEqual(list.foldControl.position, .tail)
+        XCTAssertEqual(list.foldControl.content, .icon)
         XCTAssertEqual(list.selectionMode, .none)
         XCTAssertEqual(list.style.numberOfItemsPerRow, 0, "Adaptive tag width")
         XCTAssertEqual(list.style.titleMaxLines, 3)

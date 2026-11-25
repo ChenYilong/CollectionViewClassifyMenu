@@ -38,7 +38,7 @@ final class CYLQueryScenariosViewController: UIViewController {
     private static let detailSeparator = "\n"
 
     let database: CYLExampleDatabase
-    let tagList = CYLTagListView(foldControl: CYLMenuFoldControl(position: .headerTrailing, content: .iconAndTitle))
+    let tagList = CYLTagListView(foldControl: CYLMenuFoldControl(position: .tail, content: .icon))
 
     init(database: CYLExampleDatabase) {
         self.database = database
