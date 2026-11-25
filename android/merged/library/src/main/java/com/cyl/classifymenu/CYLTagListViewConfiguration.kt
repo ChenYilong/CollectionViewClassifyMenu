@@ -205,6 +205,8 @@ const val CYLMenuStyleImageTitleSpacing = "imageTitleSpacing"
 const val CYLMenuStyleItemHeight = "itemHeight"
 /** The most lines a title may take: a whole number, or "unlimited". Default 1. */
 const val CYLMenuStyleTitleMaxLines = "titleMaxLines"
+/** The most lines a section header's title may take: a whole number, or "unlimited"; a value below 1 is 1. Default 1. */
+const val CYLMenuStyleHeaderMaxLines = "headerMaxLines"
 /**
  * Style key: a number, 0 for flowing rows.
  */
@@ -783,6 +785,10 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     number(configuration[CYLMenuStyleInteritemSpacing])?.let { interitemSpacing = it.toFloat() }
     number(configuration[CYLMenuStyleLineSpacing])?.let { lineSpacing = it.toFloat() }
     number(configuration[CYLMenuStyleHeaderHeight])?.let { headerHeight = it.toFloat() }
+    configuration[CYLMenuStyleHeaderMaxLines].let { value ->
+        if (value == "unlimited") headerMaxLines = CYLHeaderTitleMaxLines.UNLIMITED
+        else number(value)?.let { headerMaxLines = it.toInt() }
+    }
     number(configuration[CYLMenuStyleAnimationSpeed])?.let { animationSpeed = it.toFloat() }
     bool(configuration[CYLMenuStyleLayoutCentered])?.let { layoutCentered = it }
     configuration[CYLMenuStyleImagePlacement]?.let {

@@ -5,6 +5,14 @@ import android.graphics.Color
 import android.util.AttributeSet
 import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
+
+/**
+ * The largest system font scale a fold control's text follows. A fold / More control sits in a fixed-height header or row, so at
+ * accessibility font sizes (up to [CYLMaximumFontScale]) it would dwarf its section: it stops growing here, while tags and
+ * titles keep scaling up to [CYLMaximumFontScale].
+ */
+const val CYL_FOLD_CONTROL_MAX_FONT_SCALE: Float = 1.3f
 
 /**
  * `CYLTagFoldButton`: a section's fold control as a tag button: its title and chevron, turned when expanded. Standalone
@@ -78,6 +86,7 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
             style.imageTitleSpacing = 3f
             style.layoutCentered = true
             style.adjustsFontForContentSizeCategory = control.font == null
+            style.maximumFontScale = CYL_FOLD_CONTROL_MAX_FONT_SCALE
             style.itemHeight = HEIGHT
             return style
         }
@@ -104,6 +113,7 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
             style.imageTitleSpacing = 3f
             style.layoutCentered = true
             style.numberOfItemsPerRow = 0
+            style.maximumFontScale = min(style.maximumFontScale, CYL_FOLD_CONTROL_MAX_FONT_SCALE)
             return style
         }
 

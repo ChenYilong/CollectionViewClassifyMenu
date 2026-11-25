@@ -175,6 +175,13 @@ class CYLMenuStyle {
     var animationSize: CYLSize = CYLSize.ZERO
     var animationSpeed: Float = 1f
     var adjustsFontForContentSizeCategory: Boolean = true
+
+    /**
+     * The largest system font scale this style's texts follow when `adjustsFontForContentSizeCategory`: the text grows with the
+     * system font size up to this factor. Default [CYLMaximumFontScale]; the fold controls lower it to
+     * [CYL_FOLD_CONTROL_MAX_FONT_SCALE] so they stay small at accessibility font sizes.
+     */
+    var maximumFontScale: Float = CYLMaximumFontScale
     var itemHeight: Float = 30f
 
     /**
@@ -260,6 +267,15 @@ class CYLMenuStyle {
 
     // Section headers
     var headerHeight: Float = 36f
+
+    /**
+     * The most lines a section header's title may take: a title too wide for the room beside the fold control wraps onto more
+     * lines, up to this number, and the header grows taller than [headerHeight]. Default [CYLHeaderTitleMaxLines.SINGLE] (1, one
+     * line, truncated: the header is exactly [headerHeight] high). [CYLHeaderTitleMaxLines.UNLIMITED] shows every line. A value
+     * below 1 is 1.
+     */
+    var headerMaxLines: Int = CYLHeaderTitleMaxLines.SINGLE
+        set(value) { field = max(CYLHeaderTitleMaxLines.SINGLE, value) }
     var headerFont: CYLFont = CYLFont.systemFont(14f)
     /** null (the default): [tintColor], else its default by the background luminance ([resolvedHeaderTextColor]). */
     var headerTextColor: Int? = null
@@ -401,7 +417,7 @@ class CYLMenuStyle {
         var result = if (boldText) font.bold() else font
         if (!adjustsFontForContentSizeCategory) return result
         val scale = fontScale ?: Resources.getSystem().configuration.fontScale
-        result = result.withSize(result.size * min(max(scale, 0f), CYLMaximumFontScale))
+        result = result.withSize(result.size * min(max(scale, 0f), maximumFontScale))
         return result
     }
 
@@ -435,6 +451,7 @@ class CYLMenuStyle {
         copy.animationSize = animationSize
         copy.animationSpeed = animationSpeed
         copy.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
+        copy.maximumFontScale = maximumFontScale
         copy.itemHeight = itemHeight
         copy.titleMaxLines = titleMaxLines
         copy.interitemSpacing = interitemSpacing
@@ -455,6 +472,7 @@ class CYLMenuStyle {
         copy.headerSeparatorThickness = headerSeparatorThickness
         copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
+        copy.headerMaxLines = headerMaxLines
         copy.headerFont = headerFont
         copy.tintColor = tintColor
         copy.headerTextColor = headerTextColor
@@ -728,6 +746,15 @@ class CYLMenuStyle {
             return style
         }
     }
+}
+
+/** The line limits of a section header's title ([CYLMenuStyle.headerMaxLines]): named values, never a literal at a call site. */
+object CYLHeaderTitleMaxLines {
+    /** One line, the default: a title too wide for its header is truncated and the header keeps its fixed height. */
+    const val SINGLE: Int = 1
+
+    /** No limit: a title wraps onto as many lines as it needs and the header grows with it. */
+    const val UNLIMITED: Int = Int.MAX_VALUE
 }
 
 /** The line limits of a tag's title ([CYLMenuStyle.titleMaxLines]): named values, never a literal at a call site. */
