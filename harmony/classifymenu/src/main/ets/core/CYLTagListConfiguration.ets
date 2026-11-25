@@ -9,7 +9,8 @@ import { CYLMenuColorFromString } from './CYLMenuColor';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from './CYLMenuFoldControl';
 import { CYLMenuResources } from './CYLMenuResources';
 import {
-  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagTitleMaxLines
+  CYLHeaderSeparatorStyle, CYLMenuStyle, CYLSectionStyle, CYLTagBackgroundStyle, CYLTagContentAlignment,
+  CYLTagImagePlacement, CYLTagTitleMaxLines
 } from './CYLMenuStyle';
 import { CYLTag } from './CYLTag';
 import { CYLTagAppearance } from './CYLTagAppearance';
@@ -134,6 +135,20 @@ export class CYLMenuStyleKey {
   static readonly deleteIndicatorTitle: string = 'deleteIndicatorTitle';
   static readonly deleteIndicatorColor: string = 'deleteIndicatorColor';
   static readonly deleteIndicatorFont: string = 'deleteIndicatorFont';
+  /** The section card: "plain" or "insetGrouped" (case-insensitive), or a `CYLSectionStyle` raw value. */
+  static readonly sectionStyle: string = 'sectionStyle';
+  static readonly sectionBackgroundColor: string = 'sectionBackgroundColor';
+  static readonly sectionCornerRadius: string = 'sectionCornerRadius';
+  static readonly sectionContentInsets: string = 'sectionContentInsets';
+  /** The header band's color; absent: no band. */
+  static readonly headerBackgroundColor: string = 'headerBackgroundColor';
+  static readonly headerCornerRadius: string = 'headerCornerRadius';
+  static readonly headerContentInsets: string = 'headerContentInsets';
+  /** The header divider: "none" or "line" (case-insensitive), or a `CYLHeaderSeparatorStyle` raw value. */
+  static readonly headerSeparatorStyle: string = 'headerSeparatorStyle';
+  static readonly headerSeparatorColor: string = 'headerSeparatorColor';
+  static readonly headerSeparatorThickness: string = 'headerSeparatorThickness';
+  static readonly headerSeparatorInsets: string = 'headerSeparatorInsets';
 }
 
 /** The keys of an appearance dictionary. */
@@ -439,6 +454,14 @@ const BACKGROUND_STYLES: Map<string, number> = new Map<string, number>([
   ['flat', CYLTagBackgroundStyle.flat], ['liquidglass', CYLTagBackgroundStyle.liquidGlass]
 ]);
 
+const SECTION_STYLES: Map<string, number> = new Map<string, number>([
+  ['plain', CYLSectionStyle.plain], ['insetgrouped', CYLSectionStyle.insetGrouped]
+]);
+
+const HEADER_SEPARATOR_STYLES: Map<string, number> = new Map<string, number>([
+  ['none', CYLHeaderSeparatorStyle.none], ['line', CYLHeaderSeparatorStyle.line]
+]);
+
 const CONTENT_ALIGNMENTS: Map<string, number> = new Map<string, number>([
   ['center', CYLTagContentAlignment.center], ['leading', CYLTagContentAlignment.leading],
   ['left', CYLTagContentAlignment.leading]
@@ -691,6 +714,53 @@ export class CYLMenuConfiguration {
     }
     if (configuration[CYLMenuStyleKey.deleteIndicatorFont] !== undefined) {
       style.deleteIndicatorFont = CYLConfigurationValue.font(configuration[CYLMenuStyleKey.deleteIndicatorFont]);
+    }
+    CYLMenuConfiguration.applySectionStyle(style, configuration);
+  }
+
+  /** The section card, header band and header divider keys of `applyToStyle`. */
+  private static applySectionStyle(style: CYLMenuStyle, configuration: CYLConfiguration): void {
+    const sectionStyle = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.sectionStyle], SECTION_STYLES);
+    if (sectionStyle === CYLSectionStyle.plain || sectionStyle === CYLSectionStyle.insetGrouped) {
+      style.sectionStyle = sectionStyle as CYLSectionStyle;
+    }
+    if (configuration[CYLMenuStyleKey.sectionBackgroundColor] !== undefined) {
+      style.sectionBackgroundColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.sectionBackgroundColor]);
+    }
+    const cornerRadius = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.sectionCornerRadius]);
+    if (cornerRadius !== undefined) {
+      style.sectionCornerRadius = Math.max(0, cornerRadius);
+    }
+    const contentInsets = CYLConfigurationValue.insets(configuration[CYLMenuStyleKey.sectionContentInsets]);
+    if (contentInsets !== undefined) {
+      style.sectionContentInsets = contentInsets;
+    }
+    if (configuration[CYLMenuStyleKey.headerBackgroundColor] !== undefined) {
+      style.headerBackgroundColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.headerBackgroundColor]);
+    }
+    const headerRadius = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.headerCornerRadius]);
+    if (headerRadius !== undefined) {
+      style.headerCornerRadius = Math.max(0, headerRadius);
+    }
+    const headerInsets = CYLConfigurationValue.insets(configuration[CYLMenuStyleKey.headerContentInsets]);
+    if (headerInsets !== undefined) {
+      style.headerContentInsets = headerInsets;
+    }
+    const separatorStyle =
+      CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.headerSeparatorStyle], HEADER_SEPARATOR_STYLES);
+    if (separatorStyle === CYLHeaderSeparatorStyle.none || separatorStyle === CYLHeaderSeparatorStyle.line) {
+      style.headerSeparatorStyle = separatorStyle as CYLHeaderSeparatorStyle;
+    }
+    if (configuration[CYLMenuStyleKey.headerSeparatorColor] !== undefined) {
+      style.headerSeparatorColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.headerSeparatorColor]);
+    }
+    const thickness = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.headerSeparatorThickness]);
+    if (thickness !== undefined) {
+      style.headerSeparatorThickness = Math.max(0, thickness);
+    }
+    const separatorInsets = CYLConfigurationValue.insets(configuration[CYLMenuStyleKey.headerSeparatorInsets]);
+    if (separatorInsets !== undefined) {
+      style.headerSeparatorInsets = separatorInsets;
     }
   }
 

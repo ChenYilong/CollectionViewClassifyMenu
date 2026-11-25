@@ -23,7 +23,8 @@ import { CYLTagLongPressAction, CYLTagLongPressActions, CYLTagLongPressHost } fr
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import {
-  CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagImagePlacementIsVertical, CYLTagRowAlignment
+  CYLHeaderSeparatorStyle, CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagImagePlacementIsVertical,
+  CYLTagRowAlignment
 } from '../core/CYLMenuStyle';
 import { CYLTag, CYLTagDataSource } from '../core/CYLTag';
 import { CYLTagAppearance } from '../core/CYLTagAppearance';
@@ -493,6 +494,15 @@ export class CYLTagListSectionFrame {
   foldable: boolean = false;
   expanded: boolean = false;
   items: CYLTagListItemFrame[] = [];
+  /** The section card (`CYLSectionStyle.insetGrouped`), in the list's content (below the title); undefined: none. */
+  card?: CYLRect = undefined;
+  /** The header band (`CYLMenuStyle.headerBackgroundColor`); undefined: none. */
+  headerBand?: CYLRect = undefined;
+  /** The header divider, at the header's bottom edge inside `headerHeight` (it adds no height); undefined: none. */
+  headerSeparator?: CYLRect = undefined;
+  /** The distances from the list's leading and trailing edges to the header's title and fold control. */
+  headerInsetLeft: number = 0;
+  headerInsetRight: number = 0;
 }
 
 function key(section: number, item: number): string {
@@ -1739,6 +1749,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
     const sectionHeights = measured ? this.itemHeights : this.measureItemHeights(sectionWidths);
     const header = this.headerHeight();
     const insets = this.styleStorage.sectionInsets;
+    const card = this.cardInsets();
     let height = 0;
     for (let section = 0; section < sectionRows.length; section++) {
       let rowCount = sectionRows[section].length;
@@ -1750,7 +1761,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
         const r = this.rowsFor([withFold], available);
         rowCount = r.length > 0 ? r[0].length : 0;
       }
-      height += header + insets.top + insets.bottom;
+      height += header + insets.top + insets.bottom + card.top + card.bottom;
       height += this.heightOfRows(rowCount, sectionRows[section],
         section < sectionHeights.length ? sectionHeights[section] : []);
       if (foldable && this.foldControlIsInFooter) {
@@ -2742,9 +2753,58 @@ export class CYLTagListState implements CYLTagLongPressHost {
     return Math.max(this.styleStorage.headerHeight, Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + 12, foldHeight);
   }
 
-  private contentWidth(width: number): number {
+  /**
+   * The section's column at the list width `width`: the list width minus `sectionInsets` (x and width; y and height are
+   * 0). The card, the header band and the divider span it. The one place the column comes from.
+   */
+  private columnAt(width: number): CYLRect {
     const insets = this.styleStorage.sectionInsets;
-    return Math.max(0, width - insets.left - insets.right);
+    return new CYLRect(insets.left, 0, Math.max(0, width - insets.left - insets.right), 0);
+  }
+
+  /** The card's padding around the tags: `sectionContentInsets` under `insetGrouped`, else none. */
+  private cardInsets(): CYLEdgeInsets {
+    return this.styleStorage.isInsetGrouped ? this.styleStorage.sectionContentInsets : CYLEdgeInsets.ZERO;
+  }
+
+  /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
+  contentColumn(section: number): CYLRect {
+    return this.columnAt(this.layoutWidth);
+  }
+
+  /**
+   * The column the tags are laid in: `contentColumn(section)`, narrowed by the card's padding under `insetGrouped`. Every
+   * tag width, row count, fold decision, height and frame takes its width and x from here.
+   */
+  tagColumn(section: number): CYLRect {
+    const column = this.contentColumn(section);
+    const card = this.cardInsets();
+    return new CYLRect(column.x + card.left, 0, Math.max(0, column.width - card.left - card.right), 0);
+  }
+
+  private contentWidth(width: number): number {
+    const column = this.columnAt(width);
+    const card = this.cardInsets();
+    return Math.max(0, column.width - card.left - card.right);
+  }
+
+  /**
+   * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside
+   * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
+   * `headerHorizontalInset`.
+   */
+  private headerEdgeInsets(): number[] {
+    const style = this.styleStorage;
+    const column = this.columnAt(this.layoutWidth);
+    const rest = Math.max(0, this.layoutWidth - column.x - column.width);
+    if (style.isInsetGrouped) {
+      const card = this.cardInsets();
+      return [column.x + card.left, rest + card.right];
+    }
+    if (style.headerBackgroundColor !== undefined) {
+      return [column.x + style.headerContentInsets.left, rest + style.headerContentInsets.right];
+    }
+    return [style.headerHorizontalInset, style.headerHorizontalInset];
   }
 
   private widths(contentWidth: number): number[][] {
@@ -2898,6 +2958,10 @@ export class CYLTagListState implements CYLTagLongPressHost {
     const style = this.styleStorage;
     const insets = style.sectionInsets;
     const available = this.contentWidth(this.layoutWidth);
+    const column = this.columnAt(this.layoutWidth);
+    const card = this.cardInsets();
+    const originX = this.tagColumn(0).x;
+    const headerEdges = this.headerEdgeInsets();
     const spacing = style.interitemSpacing;
     const header = this.headerHeight();
     const result: CYLTagListSectionFrame[] = [];
@@ -2909,6 +2973,8 @@ export class CYLTagListState implements CYLTagLongPressHost {
       frame.headerHeight = header;
       frame.foldable = this.canFoldSection(section);
       frame.expanded = this.isSectionExpanded(section);
+      frame.headerInsetLeft = headerEdges[0];
+      frame.headerInsetRight = headerEdges[1];
       const visible = this.numberOfVisibleItems(section);
       const cells: CYLTagListItemFrame[] = [];
       for (let item = 0; item < visible; item++) {
@@ -2930,7 +2996,8 @@ export class CYLTagListState implements CYLTagLongPressHost {
         cells.push(cell);
       }
       const rows = this.rowsFor([cells.map((c: CYLTagListItemFrame) => c.width)], available)[0] ?? [];
-      let rowY = y + header + insets.top;
+      const cardY = y + header + insets.top;
+      let rowY = cardY + card.top;
       let index = 0;
       rows.forEach((count: number, row: number) => {
         const rowCells = cells.slice(index, index + count);
@@ -2941,7 +3008,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
           rowWidth += (i > 0 ? spacing : 0) + c.width;
           rowHeight = Math.max(rowHeight, c.height);
         });
-        let x = insets.left;
+        let x = originX;
         if (style.rowAlignment === CYLTagRowAlignment.center) {
           x += Math.max(0, Math.floor((available - rowWidth) / 2));
         }
@@ -2949,7 +3016,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
         rowCells.forEach((c: CYLTagListItemFrame) => {
           // Trailing (AndroidTagView's container_gravity="right", iOS since 58b2f335): the first tag at the trailing
           // edge, each next one before it.
-          c.x = trailing ? insets.left + available - (x - insets.left) - c.width : x;
+          c.x = trailing ? originX + available - (x - originX) - c.width : x;
           c.y = rowY + Math.floor((rowHeight - c.height) / 2);
           x += c.width + spacing;
         });
@@ -2957,7 +3024,22 @@ export class CYLTagListState implements CYLTagLongPressHost {
       });
       frame.items = cells;
       frame.footerHeight = this.showsFooterFoldControl(section) ? this.footerHeight : 0;
-      frame.height = (rowY - y) + insets.bottom + frame.footerHeight;
+      frame.height = (rowY - y) + card.bottom + insets.bottom + frame.footerHeight;
+      if (style.isInsetGrouped) {
+        frame.card = new CYLRect(column.x, cardY, column.width, rowY + card.bottom - cardY);
+      }
+      if (header > 0 && style.headerBackgroundColor !== undefined) {
+        frame.headerBand = new CYLRect(column.x, y, column.width, header);
+      }
+      if (header > 0 && style.headerSeparatorStyle === CYLHeaderSeparatorStyle.line &&
+        style.headerSeparatorThickness > 0) {
+        const separatorInsets = style.headerSeparatorInsets;
+        const left = separatorInsets !== undefined ? column.x + separatorInsets.left : headerEdges[0];
+        const right = separatorInsets !== undefined ? column.x + column.width - separatorInsets.right :
+          column.x + column.width;
+        const thickness = Math.min(style.headerSeparatorThickness, header);
+        frame.headerSeparator = new CYLRect(left, y + header - thickness, Math.max(0, right - left), thickness);
+      }
       result.push(frame);
       y += frame.height;
     }

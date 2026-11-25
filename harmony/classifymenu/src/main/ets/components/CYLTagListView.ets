@@ -18,7 +18,7 @@ import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResourc
 import { CYLTagListAccessibilityIdentifier } from '../tagviews/CYLTagListAccessibility';
 import { CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement } from '../core/CYLMenuStyle';
 import { CYLConfiguration, CYLConfigurationValue } from '../core/CYLTagListConfiguration';
-import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLSize } from '../core/CYLTypes';
+import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
 
 /** What a tag (or a fold control, or the title) shows, resolved from the list's state for one render. */
 class CYLTagRenderItem {
@@ -65,6 +65,17 @@ class CYLTagRenderItem {
   cell?: CYLTagListCell;
 }
 
+/** A section card, header band or header divider, resolved for one render: a filled, optionally rounded rectangle. */
+class CYLSectionDecoration {
+  key: string = '';
+  x: number = 0;
+  y: number = 0;
+  width: number = 0;
+  height: number = 0;
+  color: ResourceColor = CYLColor.CLEAR;
+  radius: number = 0;
+}
+
 /** A section header or footer, resolved for one render. */
 class CYLSectionRender {
   key: string = '';
@@ -76,7 +87,8 @@ class CYLSectionRender {
   fontSize: number = 14;
   fontWeight: FontWeight = FontWeight.Normal;
   textColor: ResourceColor = CYLColor.GRAY;
-  inset: number = 16;
+  insetLeft: number = 16;
+  insetRight: number = 16;
   indicatorColor?: string;
   indicatorWidth: number = 3;
   indicatorHeight: number = 16;
@@ -179,13 +191,14 @@ export struct CYLTagListView {
   onSelectionChange?: (selected: CYLIndexPath[]) => void;
   @State private items: CYLTagRenderItem[] = [];
   @State private headers: CYLSectionRender[] = [];
+  @State private decorations: CYLSectionDecoration[] = [];
   @State private footers: CYLSectionRender[] = [];
   @State private titleItem?: CYLTagRenderItem = undefined;
   @State private contentHeight: number = 0;
   /** `addItemView`'s frame [x, y, width, height] while editing (`CYLTagListState.addItemViewFrame`), else empty. */
   @State private addItemFrame: number[] = [];
   @State private addItemText: string = '';
-  @State private backgroundColorValue: string = CYLColor.WHITE;
+  @State private backgroundColorValue: ResourceColor = CYLColor.WHITE;
   @State private borderWidthValue: number = 0;
   @State private borderColorValue: string = CYLColor.CLEAR;
   @State private cornerRadiusValue: number = 0;
@@ -300,6 +313,7 @@ export struct CYLTagListView {
     this.frames = frames;
     this.items = items;
     this.headers = headers;
+    this.decorations = this.sectionDecorations(sections, titleHeight);
     this.footers = footers;
     this.titleItem = m.hasTitle ? this.title() : undefined;
     this.contentHeight = m.contentHeight;
@@ -308,7 +322,7 @@ export struct CYLTagListView {
     if (addFrame !== undefined) {
       this.addItemText = m.addItemView.text;
     }
-    this.backgroundColorValue = style.backgroundColor;
+    this.backgroundColorValue = style.resolvedBackgroundColor();
     this.borderWidthValue = m.containerBorderWidth;
     this.borderColorValue = m.containerBorderColor ?? CYLColor.CLEAR;
     this.cornerRadiusValue = m.containerCornerRadius;
@@ -492,6 +506,34 @@ export struct CYLTagListView {
     return r;
   }
 
+  /** The cards, header bands and header dividers of the sections, behind the headers and the tags. */
+  private sectionDecorations(sections: CYLTagListSectionFrame[], titleHeight: number): CYLSectionDecoration[] {
+    const style = this.model.style;
+    const result: CYLSectionDecoration[] = [];
+    const add = (kind: string, section: number, rect: CYLRect | undefined, color: ResourceColor,
+      radius: number): void => {
+      if (rect === undefined) {
+        return;
+      }
+      const d = new CYLSectionDecoration();
+      d.x = rect.x;
+      d.y = rect.y + titleHeight;
+      d.width = rect.width;
+      d.height = rect.height;
+      d.color = color;
+      d.radius = radius;
+      d.key = [kind, section, d.x, d.y, d.width, d.height, CYLColorKey(color), radius].join('|');
+      result.push(d);
+    };
+    sections.forEach((frame: CYLTagListSectionFrame) => {
+      add('band', frame.section, frame.headerBand, style.headerBackgroundColor ?? CYLColor.CLEAR,
+        style.headerCornerRadius);
+      add('card', frame.section, frame.card, style.resolvedSectionBackgroundColor(), style.sectionCornerRadius);
+      add('line', frame.section, frame.headerSeparator, style.resolvedHeaderSeparatorColor(), 0);
+    });
+    return result;
+  }
+
   private header(frame: CYLTagListSectionFrame, titleHeight: number): CYLSectionRender {
     const m = this.model;
     const style = m.style;
@@ -505,7 +547,10 @@ export struct CYLTagListView {
     h.fontSize = view.titleLabel.font.size;
     h.fontWeight = view.titleLabel.font.weight;
     h.textColor = view.titleLabel.textColor;
-    h.inset = view.horizontalInset;
+    // A plain header without a band keeps `horizontalInset` (the view's own, which an app may change).
+    const styled = style.isInsetGrouped || style.headerBackgroundColor !== undefined;
+    h.insetLeft = styled ? frame.headerInsetLeft : view.horizontalInset;
+    h.insetRight = styled ? frame.headerInsetRight : view.horizontalInset;
     h.indicatorColor = view.indicatorColor;
     h.indicatorWidth = view.indicatorWidth;
     h.indicatorHeight = view.indicatorHeight;
@@ -528,7 +573,7 @@ export struct CYLTagListView {
       h.clearSide = Math.min(h.height, Math.ceil(CYLTagButtonMetrics.lineHeight(style.headerFontFor(m.fontScale))));
     }
     h.key = ['h', h.showsClear, h.clearLabel, h.clearSide, CYLColorKey(h.clearColor), h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
-      h.inset,
+      h.insetLeft, h.insetRight,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
       h.fold.key, h.showsMore, CYLColorKey(h.moreColor), h.moreLabel, h.accessory !== undefined].join('|');
     return h;
@@ -983,6 +1028,15 @@ export struct CYLTagListView {
         if (this.titleItem !== undefined) {
           this.titleView(this.titleItem)
         }
+        ForEach(this.decorations, (d: CYLSectionDecoration) => {
+          Column()
+            .width(d.width)
+            .height(d.height)
+            .backgroundColor(d.color)
+            .borderRadius(d.radius)
+            .accessibilityLevel('no')
+            .position({ x: d.x, y: d.y })
+        }, (d: CYLSectionDecoration) => d.key)
         ForEach(this.headers, (h: CYLSectionRender) => {
           Row({ space: 6 }) {
             if (h.showsFold && h.foldLeading) {
@@ -1037,7 +1091,7 @@ export struct CYLTagListView {
           }
           .width('100%')
           .height(h.height)
-          .padding({ left: h.inset, right: h.inset })
+          .padding({ left: h.insetLeft, right: h.insetRight })
           .position({ x: 0, y: h.y })
         }, (h: CYLSectionRender) => h.key)
         ForEach(this.footers, (f: CYLSectionRender) => {

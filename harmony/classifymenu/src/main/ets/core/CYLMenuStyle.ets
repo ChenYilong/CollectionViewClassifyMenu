@@ -69,6 +69,52 @@ export interface CYLTitleTextAttributes {
 }
 
 /**
+ * How a section's tags sit in the list: `plain` (the default) on the list's background; `insetGrouped` inside a rounded card
+ * (UITableView's inset grouped look), the header above it.
+ */
+export enum CYLSectionStyle {
+  plain = 0,
+  insetGrouped = 1
+}
+
+/**
+ * The line at the bottom of a section header: `none` (the default) or a `line`.
+ */
+export enum CYLHeaderSeparatorStyle {
+  none = 0,
+  line = 1
+}
+
+/**
+ * The named lengths of the section style, vp.
+ */
+export class CYLSectionStyleMetrics {
+  /** The corner radius of a section card. */
+  static readonly cardCornerRadius: number = 10;
+  /** The padding between a section card and its tags. */
+  static readonly cardPadding: number = 12;
+  /** The padding between a header band and its title, leading and trailing. */
+  static readonly headerBandPadding: number = 12;
+  /** The thickness of the header divider: one hairline. */
+  static readonly separatorThickness: number = 0.5;
+}
+
+/**
+ * The colors of the section style: each one follows the color mode (`resources/base` and `resources/dark`). A style whose
+ * color is undefined resolves to them; an app can also set one itself, for example `headerBand` on `headerBackgroundColor`.
+ */
+export class CYLSectionStyleColors {
+  /** The section card: white; #1C1C1E in dark mode. */
+  static readonly card: ResourceColor = $r('app.color.cyl_section_card');
+  /** The header band: #EFEFF4; #2C2C2E in dark mode. */
+  static readonly headerBand: ResourceColor = $r('app.color.cyl_section_header_band');
+  /** The list background under `insetGrouped`: #F2F2F7; black in dark mode. */
+  static readonly groupedBackground: ResourceColor = $r('app.color.cyl_section_grouped_background');
+  /** The header divider: the system separator color. */
+  static readonly separator: ResourceColor = $r('app.color.cyl_section_separator');
+}
+
+/**
  * A tag border of one physical pixel (iOS: 1 / screen scale).
  */
 const HAIRLINE: number = 0.5;
@@ -215,7 +261,46 @@ export class CYLMenuStyle {
   interitemSpacing: number = 10;
   lineSpacing: number = 10;
   sectionInsets: CYLEdgeInsets = new CYLEdgeInsets(10, 16, 10, 16);
-  backgroundColor: string = CYLColor.WHITE;
+  private backgroundColorValue: string = CYLColor.WHITE;
+  private backgroundColorWasSet: boolean = false;
+
+  /**
+   * The list's background color, white by default. Under `insetGrouped` a list whose background the app never set shows
+   * the grouped background instead (`resolvedBackgroundColor()`).
+   */
+  get backgroundColor(): string {
+    return this.backgroundColorValue;
+  }
+
+  set backgroundColor(value: string) {
+    this.backgroundColorValue = value;
+    this.backgroundColorWasSet = true;
+  }
+
+  // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
+  /** `plain` (the default) or `insetGrouped`: the section's tags inside a rounded card. */
+  sectionStyle: CYLSectionStyle = CYLSectionStyle.plain;
+  /** The card's color; undefined resolves to `CYLSectionStyleColors.card`. */
+  sectionBackgroundColor?: ResourceColor = undefined;
+  sectionCornerRadius: number = CYLSectionStyleMetrics.cardCornerRadius;
+  /** The padding inside the card around the tags (`insetGrouped`), vp. */
+  sectionContentInsets: CYLEdgeInsets = new CYLEdgeInsets(CYLSectionStyleMetrics.cardPadding,
+    CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding, CYLSectionStyleMetrics.cardPadding);
+  /** The header band's color; undefined: no band (today's look). `CYLSectionStyleColors.headerBand` is the usual one. */
+  headerBackgroundColor?: ResourceColor = undefined;
+  headerCornerRadius: number = 0;
+  /** A plain header's title and fold control inset from the band's edges (left and right), vp. */
+  headerContentInsets: CYLEdgeInsets = new CYLEdgeInsets(0, CYLSectionStyleMetrics.headerBandPadding, 0,
+    CYLSectionStyleMetrics.headerBandPadding);
+  headerSeparatorStyle: CYLHeaderSeparatorStyle = CYLHeaderSeparatorStyle.none;
+  /** The divider's color; undefined resolves to `CYLSectionStyleColors.separator`. */
+  headerSeparatorColor?: ResourceColor = undefined;
+  headerSeparatorThickness: number = CYLSectionStyleMetrics.separatorThickness;
+  /**
+   * The divider's leading (left) and trailing (right) inset from the column's edges, vp; undefined: it starts at the
+   * header title and ends at the column's trailing edge.
+   */
+  headerSeparatorInsets?: CYLEdgeInsets = undefined;
 
   // Section headers
   headerHeight: number = 36;
@@ -396,6 +481,27 @@ export class CYLMenuStyle {
     return this.scaledFont(this.headerFont, fontScale, boldText);
   }
 
+  /** True when the section style draws the cards. */
+  get isInsetGrouped(): boolean {
+    return this.sectionStyle === CYLSectionStyle.insetGrouped;
+  }
+
+  /** The list background as drawn: the grouped background where `insetGrouped` and the app never set `backgroundColor`. */
+  resolvedBackgroundColor(): ResourceColor {
+    return this.isInsetGrouped && !this.backgroundColorWasSet ? CYLSectionStyleColors.groupedBackground :
+    this.backgroundColorValue;
+  }
+
+  /** The card's color as drawn. */
+  resolvedSectionBackgroundColor(): ResourceColor {
+    return this.sectionBackgroundColor ?? CYLSectionStyleColors.card;
+  }
+
+  /** The divider's color as drawn. */
+  resolvedHeaderSeparatorColor(): ResourceColor {
+    return this.headerSeparatorColor ?? CYLSectionStyleColors.separator;
+  }
+
   /**
    * NSCopying.
    */
@@ -447,7 +553,19 @@ export class CYLMenuStyle {
     c.interitemSpacing = this.interitemSpacing;
     c.lineSpacing = this.lineSpacing;
     c.sectionInsets = this.sectionInsets;
-    c.backgroundColor = this.backgroundColor;
+    c.backgroundColorValue = this.backgroundColorValue;
+    c.backgroundColorWasSet = this.backgroundColorWasSet;
+    c.sectionStyle = this.sectionStyle;
+    c.sectionBackgroundColor = this.sectionBackgroundColor;
+    c.sectionCornerRadius = this.sectionCornerRadius;
+    c.sectionContentInsets = this.sectionContentInsets;
+    c.headerBackgroundColor = this.headerBackgroundColor;
+    c.headerCornerRadius = this.headerCornerRadius;
+    c.headerContentInsets = this.headerContentInsets;
+    c.headerSeparatorStyle = this.headerSeparatorStyle;
+    c.headerSeparatorColor = this.headerSeparatorColor;
+    c.headerSeparatorThickness = this.headerSeparatorThickness;
+    c.headerSeparatorInsets = this.headerSeparatorInsets;
     c.headerHeight = this.headerHeight;
     c.headerFont = this.headerFont;
     c.headerTextColor = this.headerTextColor;
