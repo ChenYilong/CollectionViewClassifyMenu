@@ -30,6 +30,7 @@ import {
   CYLTagTitleMaxLines
 } from '../core/CYLMenuStyle';
 import { CYLIconContrast } from '../core/CYLIconContrast';
+import { CYLTagAppearance } from '../core/CYLTagAppearance';
 import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
 import { CYLUIContext } from '../core/CYLUIContext';
 import {
@@ -192,6 +193,25 @@ export class CYLTagButton {
       return CYLTagButton.GLASS_DEFAULT_TINT;
     }
     return explicitColor;
+  }
+
+  /** The background style a tag of `style` hands to `CYLAnimatedItemBackgroundModifier` (also the inline fold cell's). */
+  static itemBackgroundStyleOf(style: CYLMenuStyle): CYLAnimatedItemBackgroundStyle {
+    return style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass ?
+    CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
+  }
+
+  /**
+   * The color a tag in `appearance` hands to `CYLAnimatedItemBackgroundModifier`. Where glass is drawn only an EXPLICIT color
+   * tints it (`glassTintColor`; an unset one means no tint); flat keeps the effective color. `pressed` uses the style's
+   * highlighted color. The inline fold cell shares this rule, so it has the tags' background.
+   */
+  static itemBackgroundColor(style: CYLMenuStyle, appearance: CYLTagAppearance, pressed: boolean = false): ResourceColor {
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    const explicitBackground: ResourceColor | undefined = pressed ? style.highlightedBackgroundColor :
+    appearance.explicitBackgroundColor;
+    return glass ? CYLTagButton.glassTintColor(explicitBackground) :
+      (pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor);
   }
   /** The key of the app's color mode ('dark' / 'light') in AppStorage, the one `cylanimateditem` reads (`cyl_colorMode`). */
   static readonly COLOR_MODE_KEY: string = 'cyl_colorMode';
@@ -1122,11 +1142,8 @@ export class CYLTagButton {
     // color, so the modifier uses the glass's frosted default tint. The pressed color is always explicit. Flat (also where the
     // system draws no glass) keeps the effective color.
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
-    const explicitBackground: ResourceColor | undefined = pressed ? style.highlightedBackgroundColor :
-    appearance.explicitBackgroundColor;
-    const stateBackground: ResourceColor = glass ? CYLTagButton.glassTintColor(explicitBackground) :
-      (pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor);
-    this.itemBackgroundStyle = glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
+    const stateBackground: ResourceColor = CYLTagButton.itemBackgroundColor(style, appearance, pressed);
+    this.itemBackgroundStyle = CYLTagButton.itemBackgroundStyleOf(style);
     this.appearanceCornerRadius = appearance.cornerRadius;
     this.glassTintAlpha = state === CYLControlState.SELECTED ? 1 : -1;
     this.backgroundColor = stateBackground;
