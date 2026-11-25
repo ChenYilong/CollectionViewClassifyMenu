@@ -19,3 +19,6 @@ means the section of that name here.
   be completed.
 - Project-specific Xcode and verification guidance lives in
   `.agents/skills/cyl-xcode-compat/` and `.agents/skills/cyl-verify/`.
+- Before you run the iOS simulator, read "Simulators and emulators: stop them when the work is done" in
+  [sessions.md](sessions.md#simulators-and-emulators-stop-them-when-the-work-is-done): after the tests or screenshots, terminate the app and shut your own simulator down.
+

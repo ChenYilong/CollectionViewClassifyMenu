@@ -52,3 +52,28 @@ Checklist: `.agents/skills/cyl-task-start/SKILL.md` ("Before the task", step 0).
   doesn't split $box into words either. Running the same measurement as a bash script." Keep a command with
   arguments in a wrapper script or a bash array (`hdc=(hdc -t 127.0.0.1:5563); "${hdc[@]}" shell …`), never in a
   string variable.
+
+
+## Simulators and emulators: stop them when the work is done
+
+Read this section before you run an iOS simulator (or any emulator). Added 2026-11-25 on the owner's order.
+
+- **The rule in the owner's words:** after running a simulator and finishing the test or the screenshots, immediately kill the
+  app and the simulator process; start them again when they are needed. Do not leave the app running after the task is
+  done, and do not leave the simulator process running.
+- **When:** as soon as the last screenshot is taken or the last test run has finished, before you write the report, and
+  also when a task is abandoned or fails. A long wait between two runs (a build, a review) is a reason to stop them too:
+  start them again for the next run (`xcrun simctl boot <udid>`, then install and launch).
+- **How, on iOS (only the devices your own task started):**
+  1. Terminate the app: `xcrun simctl terminate <udid> <bundle id>`.
+  2. Shut the simulator down: `xcrun simctl shutdown <udid>`, then check with `xcrun simctl list devices | grep Booted`.
+  3. Stop what your own run left behind: the `xcodebuild` / `xctest` / `testmanagerd` processes of your worktree, by their
+     process IDs (`pgrep -fl xcodebuild`, then `kill <pid>` for yours). Never `pkill -f` a pattern that other sessions' runs
+     also match, never `xcrun simctl shutdown all`, and never close the Simulator app window of another session: the Mac is
+     shared (one `pkill -f "unit-tests.sh example"` once aborted another session's test run).
+  4. Emulators of other platforms follow the same idea with their own tools: `adb -s <serial> emu kill`, the HarmonyOS
+     emulator by its own stop command.
+- **Which devices are yours:** the ones you booted or that your scripts boot for the task (record the UDID). A device that
+  was already booted by someone else is left alone; say so in the report instead.
+- **Report:** one line in the task report: "stopped: <udids> (app terminated, simulator shut down)".
+
