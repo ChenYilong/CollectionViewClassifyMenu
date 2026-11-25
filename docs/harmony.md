@@ -22,7 +22,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 ## 评分 / Score
 
 <!-- bilingual:keep -->
-**Score: 1055 / 1055 = 100.0 / 100** (API 1033 / 1033, demos 22 / 22). 评分：1055 / 1055 = 100.0 / 100（API 1033 / 1033，示例 22 / 22）。
+**Score: 1055 / 1057 = 99.8 / 100** (API 1033 / 1035, demos 22 / 22). 评分：1055 / 1057 = 99.8 / 100（API 1033 / 1035，示例 22 / 22）。
 
 | 中文 | English |
 |:---|:---|
@@ -450,6 +450,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyle.headerSeparatorColor` (CYLMenuStyle.swift) | `CYLMenuStyle.headerSeparatorColor` | property |
 | `CYLMenuStyle.headerSeparatorThickness` (CYLMenuStyle.swift) | `CYLMenuStyle.headerSeparatorThickness` | property |
 | `CYLMenuStyle.headerSeparatorInsets` (CYLMenuStyle.swift) | `CYLMenuStyle.headerSeparatorInsets` | property |
+| `CYLMenuStyle.isInsetGrouped` (CYLMenuStyle.swift) | TODO | property |
 | `CYLMenuStyle.resolvedBackgroundColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedBackgroundColor()` | property |
 | `CYLMenuStyle.resolvedSectionBackgroundColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedSectionBackgroundColor()` | property |
 | `CYLMenuStyle.resolvedHeaderSeparatorColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedHeaderSeparatorColor()` | property |
@@ -468,6 +469,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyle.resolvedHeaderTextColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedHeaderTextColor(onBand)` | property |
 | `CYLMenuStyle.resolvedFoldControlColor(inHeader:)` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedFoldControlColor(onBand)` | method |
 | `CYLMenuStyle.resolvedMoreButtonColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedMoreButtonColor(onBand)` | property |
+| `CYLMenuStyle.resolvedClearButtonColor` (CYLMenuStyle.swift) | TODO | property |
 | `CYLMenuStyle.static tagCloud()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagCloud()` | method |
 | `CYLMenuStyle.static tagContainer()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagContainer()` | method |
 | `CYLMenuStyle.static gridStyle(itemsPerRow:)` (CYLMenuStyle.swift) | `CYLMenuStyle.static gridStyle(itemsPerRow)` | method |
