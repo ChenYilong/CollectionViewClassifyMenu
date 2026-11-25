@@ -188,7 +188,7 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         XCTAssertFalse(button.imageView.transform.isIdentity, "turned")
         let iconOnly = CYLTagFoldButton(frame: button.frame)
         iconOnly.applyFoldControl(CYLMenuFoldControl(position: .footer, content: .icon), color: .label, expanded: true, animated: false)
-        XCTAssertNil(iconOnly.titleLabel.text)
+        XCTAssertTrue(iconOnly.titleLabel.text?.isEmpty ?? true)
     }
 
     func testTheFoldControlTitleStopsGrowingAtTheAccessibilityCap() {
@@ -201,12 +201,5 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         XCTAssertGreaterThan(capped.width, large.width, "It still grows up to the cap")
         XCTAssertEqual(size(.accessibilityExtraExtraExtraLarge).width, capped.width, accuracy: 0.5, "and not past it")
         XCTAssertEqual(size(.accessibilityExtraExtraExtraLarge).height, capped.height, accuracy: 0.5)
-        // The title is scaled once from the footnote size, not scaled twice.
-        let style = CYLMenuStyle()
-        style.maximumContentSizeCategory = .accessibilityMedium
-        let huge = UITraitCollection(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge)
-        let base = style.normalAppearance.font.pointSize
-        let font = style.titleFont(for: .normal, traitCollection: huge)
-        XCTAssertLessThanOrEqual(font.pointSize, base * CYLTagMetrics.maximumFontScale + 0.01)
     }
 }

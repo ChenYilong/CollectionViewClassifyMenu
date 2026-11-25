@@ -687,7 +687,7 @@ open class CYLTagButton: CYLAnimatedItemView {
      */
     open override func layoutContent(in rect: CGRect) {
         layOutContentLeftToRight(in: rect)
-        guard mirrorsContentInRightToLeft, effectiveUserInterfaceLayoutDirection == .rightToLeft else {
+        guard mirrorsContent else {
             return
         }
         // The content was placed from the left edge: in a right-to-left layout it starts at the right edge.
@@ -697,12 +697,14 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
     /**
-     * Whether the icon and the title are mirrored in a right-to-left layout (the section headers' title and fold control set it; the
-     * tags keep the placement they have always had).
+     * Whether the icon and the title are mirrored (placed from the right edge). The section headers set it on their title and fold
+     * control while their own layout direction is right-to-left; the tags keep the placement they have always had.
      */
-    var mirrorsContentInRightToLeft = false {
+    var mirrorsContent = false {
         didSet {
-            setNeedsLayout()
+            if oldValue != mirrorsContent {
+                setNeedsLayout()
+            }
         }
     }
 

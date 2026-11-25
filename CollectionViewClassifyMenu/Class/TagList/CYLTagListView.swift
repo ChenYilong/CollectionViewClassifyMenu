@@ -162,8 +162,6 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
 
     private func commonInit() {
         titleButton.isUserInteractionEnabled = false
-        titleButton.mirrorsContentInRightToLeft = true
-        foldButton.mirrorsContentInRightToLeft = true
         titleButton.titleLabel.accessibilityTraits = .header
         foldButton.addTarget(self, action: #selector(foldTapped), for: .touchUpInside)
         moreButton.isHidden = true
@@ -205,8 +203,11 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         super.layoutSubviews()
         let width = bounds.width
         let height = bounds.height
+        let rightToLeft = effectiveUserInterfaceLayoutDirection == .rightToLeft
+        titleButton.mirrorsContent = rightToLeft
+        foldButton.mirrorsContent = rightToLeft
         layOutLeadingToTrailing(width: width, height: height)
-        guard effectiveUserInterfaceLayoutDirection == .rightToLeft else {
+        guard rightToLeft else {
             return
         }
         // Everything above was placed from the left edge (the band's and the divider's `left` is the leading side): in a right-to-left

@@ -106,7 +106,7 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         XCTAssertTrue(list.isSectionExpanded(0))
         XCTAssertGreaterThan(list.contentHeight, heightBefore)
         fold = tags.footerFoldButton(inSection: 0)
-        XCTAssertNil(fold?.title, "Expanded: only the chevron")
+        XCTAssertEqual(fold?.title, "收起", "Expanded: Less and the turned chevron")
         XCTAssertEqual(fold?.imageView.transform.a ?? 0, -1, accuracy: 0.01, "Turned 180°")
 
         // "左上角": the control before the section title.

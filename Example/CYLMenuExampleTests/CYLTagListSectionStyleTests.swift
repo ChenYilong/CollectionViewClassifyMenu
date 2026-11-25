@@ -58,7 +58,7 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(view.style.headerSeparatorStyle, .none)
         XCTAssertNil(view.style.headerBackgroundColor)
         XCTAssertNil(cardAttributes(view, section: 0))
-        XCTAssertTrue(cardViews(view).isEmpty)
+        XCTAssertTrue(cardViews(view).filter { !$0.isHidden && $0.alpha > 0 }.isEmpty, "No card is shown (a reusable one may wait hidden)")
         let header = view.probe.header(inSection: 0)
         XCTAssertEqual(header?.value(forKey: "bandView") as? UIView, header?.value(forKey: "bandView") as? UIView)
         XCTAssertTrue((header?.value(forKey: "bandView") as? UIView)?.isHidden ?? false)
@@ -416,7 +416,8 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
 
     func testListBackgroundIsGroupedOnlyWhenTheAppNeverSetIt() {
         let style = CYLMenuStyle()
-        XCTAssertEqual(style.resolvedBackgroundColor, .white)
+        style.sectionStyle = .plain
+        XCTAssertEqual(style.resolvedBackgroundColor, .systemBackground, "The default list background is the mode-aware system background")
         style.sectionStyle = .insetGrouped
         XCTAssertEqual(style.resolvedBackgroundColor, UIColor.systemGroupedBackground)
         XCTAssertEqual((style.copy() as! CYLMenuStyle).resolvedBackgroundColor, UIColor.systemGroupedBackground)

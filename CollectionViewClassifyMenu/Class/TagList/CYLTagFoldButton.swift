@@ -25,7 +25,7 @@ open class CYLTagFoldButton: CYLTagButton {
      * The largest content size category the control's title scales to: at the accessibility sizes the "More" control stays a
      * control, not a banner.
      */
-    static let maximumContentSizeCategory = UIContentSizeCategory.accessibilityMedium
+    public static let maximumContentSizeCategory = UIContentSizeCategory.accessibilityMedium
 
     /**
      * The footnote text style at the default size category: the style scales it itself (`adjustsFontForContentSizeCategory`),
