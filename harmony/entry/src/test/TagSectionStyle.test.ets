@@ -193,8 +193,8 @@ export default function tagSectionStyleTest() {
         const line = s.headerSeparator as CYLRect;
         expect(line.height).assertEqual(CYLSectionStyleMetrics.separatorThickness);
         expect(line.y + line.height).assertEqual(s.y + s.headerHeight);
-        // From the title's x to the column's trailing edge.
-        expect(line.x).assertEqual(s.headerInsetLeft);
+        // The same left and right as the card and the band: the column's edges, not the title's x.
+        expect(line.x).assertEqual(SIDE_INSET);
         expect(line.maxX).assertEqual(LIST_WIDTH - SIDE_INSET);
       });
       style.headerSeparatorInsets = new CYLEdgeInsets(0, 40, 0, 8);

@@ -16,7 +16,7 @@ there is one. Every default reproduces today's look exactly (frames do not move 
 | --- | --- | --- |
 | Section card | `sectionStyle`: `plain` or `insetGrouped`; `sectionBackgroundColor` (nullable); `sectionCornerRadius`; `sectionContentInsets` (padding inside the card) | `plain`. Color null resolves to the system card color (white; #1C1C1E in dark mode). Radius = named constant 10. Padding = named constant 12 |
 | Header band | `headerBackgroundColor` (nullable); `headerCornerRadius`; `headerContentInsets` (leading / trailing) | null = no band (today's look). The named band color is #EFEFF4 (the TagCollectionView header) with a dark variant |
-| Header divider | `headerSeparatorStyle`: `none` or `line`; `headerSeparatorColor` (nullable); `headerSeparatorThickness`; `headerSeparatorInsets` (leading / trailing) | `none`. Color null resolves to the system separator (light and dark). Thickness = named hairline constant 0.5 (a point / vp / dp; the placeholder example's divider). Leading inset defaults to the header title's x, trailing to the column edge |
+| Header divider | `headerSeparatorStyle`: `none` or `line`; `headerSeparatorColor` (nullable); `headerSeparatorThickness`; `headerSeparatorInsets` (leading / trailing) | `none`. Color null resolves to the system separator (light and dark). Thickness = named hairline constant 0.5 (a point / vp / dp; the placeholder example's divider). Both insets default to 0: the divider has the same left and right edges as the card and the header band (the column's edges), never the title's x |
 
 Under `insetGrouped`, if the app never set the list's `backgroundColor`, it resolves to the grouped background (#F2F2F7; black in dark
 mode). Nullable colors follow the dark-mode defaults pattern of `CYLMenuColor` / `CYLSystemColors` / `theme.js`.
@@ -28,7 +28,7 @@ mode). Nullable colors follow the dark-mode defaults pattern of `CYLMenuColor` /
   then band leading + `headerContentInsets.leading`.
 - `insetGrouped`: the card spans the column; the tags sit inside it, inset by `sectionContentInsets`; the header title and the fold
   control align with the tags' leading / trailing edge inside the card.
-- The divider is drawn at the header's bottom edge, inside `headerHeight`: it adds no height. Heights, fold logic and `canFoldSection`
+- The divider is drawn at the header's bottom edge (full column width by default), inside `headerHeight`: it adds no height. Heights, fold logic and `canFoldSection`
   never see it.
 - The card padding narrows the width tags wrap in and adds top / bottom to the section's height: `widths`, `rowsFor`,
   `canFoldSection`, the content height and the layout all take the width from `contentColumn`.
@@ -48,6 +48,27 @@ All three features stay independent switches, and any combination is allowed; th
   is allowed (it is only mostly redundant); an example or an app uses the one it prefers, or both.
 - An opaque card over a background the Liquid Glass tags need hides the glass: choose a translucent `sectionBackgroundColor`, keep the
   style `plain`, or accept the look. The core never changes a color on its own because of the tag background style.
+
+## Decision of the owner, later the same day: the card and the header divider are the DEFAULT look
+
+The owner wants the rounded section card and the header divider with no setup: a tag list that sets nothing gets `sectionStyle =
+insetGrouped` and `headerSeparatorStyle = line`. To remove them the app calls the API: `sectionStyle = plain` and
+`headerSeparatorStyle = none` (configuration keys `"sectionStyle": "plain"`, `"headerSeparatorStyle": "none"`). The header band stays
+off by default (`headerBackgroundColor` null). This replaces the "Default" column above for these two features; every other default is
+unchanged.
+
+Consequences, so nobody is surprised:
+
+- This is a visible, breaking change of the default look on every platform (a new rounded white card behind each section's tags on a
+  grouped background, a hairline under each header). Frame-based tests change with it; the gate "the default style gives the same frames
+  as before" is replaced by "`plain` + `none` gives the same frames as before" (the snapshot tests of the first ports are kept and run
+  with those two values).
+- The default flips in a LAST step per platform, after the ports are verified with the old defaults, as one commit that: flips the
+  defaults, sets `plain` / `none` in the tests and demos that must keep their old look, updates the screenshots that show a list,
+  and writes the default in the integration docs (README of the repository, each package README: iOS, Android, HarmonyOS, mini program,
+  React Native, Flutter) with the opt-out lines.
+- A tag list inside a screen that already draws its own card (a tag bar in a toolbar, the classify menu, the multiple filter, the tab
+  bar's popovers) must opt out; the library's own such screens are changed to `plain` in the same commit.
 
 ## Gates
 
