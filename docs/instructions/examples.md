@@ -25,8 +25,15 @@ means the section of that name here.
   grouped list. Use the tag list's section style:
   - One tag list; one section per group; the section title is the section header.
   - A tag shows only the **main title and the icon**. The secondary line (detail, subtitle) is not drawn in the tag.
-  - Sections that have more rows than `defaultVisibleRows` use the core's **More / Less** fold control
-    (`foldControl`, header trailing).
+  - **A colorful backing plate behind the list.** An example tag list sits on a colorful backing plate (a gradient or an image
+    behind the list, set in ONE shared place per example), so that the Liquid Glass tags and the glass tail control are visible; on a
+    plain page glass looks like a flat tag. The plate is an example-side view: the library has no backdrop API (HarmonyOS and
+    Android glass blur what is behind the list; iOS glass is drawn by the glass view itself), so the example draws it, never the core.
+  - **The tail fold control is itself a Liquid Glass tag**, icon only (the same tag background style as the other tags).
+  - **Fold with the tail control, icon only.** Sections that have more rows than `defaultVisibleRows` fold with the core's **tail**
+    fold control: the last tag of the section is the expand / collapse button and shows only the chevron icon, no More / Less text
+    (`foldControl` position `tail`, content `icon`; JSON `"foldControl": {"position": "tail", "content": "icon"}`). Never use the
+    header trailing More / Less control in an example.
   - A tap on a tag does exactly what a tap on the replaced cell did (open the screen, select the row). The tag does not
     stay selected unless the cell did.
   - A **long press** on a tag shows the secondary line in a small floating callout with an arrow, through the tag list's
