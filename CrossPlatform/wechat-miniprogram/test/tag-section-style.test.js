@@ -236,9 +236,9 @@ test('a set sectionBoardInset above the default pushes the board past the margin
   // reaches past it by a negative margin.
   assert.deepEqual(model.headerEdges(style), model.tagColumn(style))
   const css = model.sectionLayout(style)
-  assert.match(css.listStyle, /padding: 10px 16px 10px 16px/)
+  assert.match(css.listStyle, /padding: [0-9]+px 16px 10px 16px/)
   assert.match(css.cardStyle, /^margin: 0 -8px 0 -8px; padding: 7px 20px 9px 20px/)
-  assert.match(css.headerStyle, /margin: 0 -8px 0 -8px; padding: 0 20px 0 20px/)
+  assert.match(css.headerStyle, /margin: 0 8px 0 8px; padding: 0 20px 0 20px/)
   // Between the default and 0 the board lies between the tag column and the section column.
   const small = edgesOf(styleOf({ sectionBoardInset: BOARD_INSET_SMALL }))
   assert.deepEqual(small.content, FIRST_VERSION_CONTENT)

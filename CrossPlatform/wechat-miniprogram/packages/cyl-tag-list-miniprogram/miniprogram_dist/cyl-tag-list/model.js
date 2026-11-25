@@ -1575,7 +1575,7 @@ function sectionLayout(style, options = {}) {
     // The list's padding is the section column (never negative); a board wider or narrower than it is moved by the card's margin.
     const board = boardColumn(style);
     const shift = board.left !== column.left || board.right !== column.right
-      ? `margin: 0 ${column.right - board.right}px 0 ${column.left - board.left}px; ` : '';
+      ? `margin: 0 ${board.right - column.right}px 0 ${board.left - column.left}px; ` : '';
     layout.cardStyle = `${shift}padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
   }
   if (isStyledHeader(style)) {

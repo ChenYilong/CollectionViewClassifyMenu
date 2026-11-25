@@ -276,10 +276,11 @@ export default function tagHeaderFontAndBoardAlignTest() {
       expect(card.x + card.width).assertEqual(LIST_WIDTH - SIDE_INSET - CONTENT_TRAILING + WIDE_BOARD_INSET);
       // Top and bottom still come from sectionContentInsets: the tags start CONTENT_TOP below the board's top.
       expect(frame.items[0].y - card.y).assertEqual(CONTENT_TOP);
-      const defaultVertical = styleOf(CYLSectionStyle.insetGrouped);
-      defaultVertical.sectionBoardInset = WIDE_BOARD_INSET;
-      const defaultCard = firstSection(boardList(defaultVertical, CYLLayoutDirection.ltr)).card as CYLRect;
-      expect(card.height - defaultCard.height).assertEqual(CONTENT_TOP + CONTENT_BOTTOM - 2 * CARD_PADDING);
+      // The inset only moves the board's sides: with the same content insets and no inset the board has the same height.
+      const sameColumn = styleOf(CYLSectionStyle.insetGrouped);
+      sameColumn.sectionContentInsets = new CYLEdgeInsets(CONTENT_TOP, CONTENT_LEADING, CONTENT_BOTTOM, CONTENT_TRAILING);
+      const sameColumnCard = firstSection(boardList(sameColumn, CYLLayoutDirection.ltr)).card as CYLRect;
+      expect(card.height).assertEqual(sameColumnCard.height);
     });
 
     it('theInsetNeverChangesTheRowsOrTheHeightsOfTheTagColumn', 0, () => {
