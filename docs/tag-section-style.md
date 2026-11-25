@@ -49,24 +49,23 @@ All three features stay independent switches, and any combination is allowed; th
 - An opaque card over a background the Liquid Glass tags need hides the glass: choose a translucent `sectionBackgroundColor`, keep the
   style `plain`, or accept the look. The core never changes a color on its own because of the tag background style.
 
-## Decision of the owner, later the same day: the card and the header divider are the DEFAULT look
+## Decision of the owner, later the same day (revised): the rounded card is the DEFAULT look; the divider is opt-in
 
-The owner wants the rounded section card and the header divider with no setup: a tag list that sets nothing gets `sectionStyle =
-insetGrouped` and `headerSeparatorStyle = line`. To remove them the app calls the API: `sectionStyle = plain` and
-`headerSeparatorStyle = none` (configuration keys `"sectionStyle": "plain"`, `"headerSeparatorStyle": "none"`). The header band stays
-off by default (`headerBackgroundColor` null). This replaces the "Default" column above for these two features; every other default is
-unchanged.
+The owner wants the rounded section card with no setup: a tag list that sets nothing gets `sectionStyle = insetGrouped`. To remove it the
+app calls the API: `sectionStyle = plain` (configuration `"sectionStyle": "plain"`). The header divider is **not** a default: it
+shows only when the app calls the API (`headerSeparatorStyle = line`, configuration `"headerSeparatorStyle": "line"`); the default stays
+`none`. (An earlier version of this decision made the divider a default too; it was withdrawn.) The header band stays off by default
+(`headerBackgroundColor` null). This replaces the "Default" column above for the card only; every other default is unchanged.
 
 Consequences, so nobody is surprised:
 
 - This is a visible, breaking change of the default look on every platform (a new rounded white card behind each section's tags on a
-  grouped background, a hairline under each header). Frame-based tests change with it; the gate "the default style gives the same frames
-  as before" is replaced by "`plain` + `none` gives the same frames as before" (the snapshot tests of the first ports are kept and run
-  with those two values).
-- The default flips in a LAST step per platform, after the ports are verified with the old defaults, as one commit that: flips the
-  defaults, sets `plain` / `none` in the tests and demos that must keep their old look, updates the screenshots that show a list,
-  and writes the default in the integration docs (README of the repository, each package README: iOS, Android, HarmonyOS, mini program,
-  React Native, Flutter) with the opt-out lines.
+  grouped background). Frame-based tests change with it; the gate "the default style gives the same frames as before" is replaced by
+  "`sectionStyle = plain` gives the same frames as before" (the snapshot tests of the first ports are kept and run with that value).
+- The default flips in a LAST step per platform, after the ports are verified with the old default, as one commit that: flips the
+  card default, sets `plain` in the tests and demos that must keep their old look, updates the screenshots that show a list, and writes
+  the default in the integration docs (README of the repository, each package README: iOS, Android, HarmonyOS, mini program,
+  React Native, Flutter) with the opt-out line and the opt-in line for the divider.
 - A tag list inside a screen that already draws its own card (a tag bar in a toolbar, the classify menu, the multiple filter, the tab
   bar's popovers) must opt out; the library's own such screens are changed to `plain` in the same commit.
 
