@@ -41,8 +41,11 @@ private const val HEADER_ICON_SIZE = 16f
 /** The gap between a header's indicator bar / icon / clear button and what follows, dp. */
 private const val HEADER_GAP = 8f
 
-/** What a header's fold control takes beyond its own width (its 6 dp overhang is given back, then the 8 dp gap), dp. */
-private const val HEADER_FOLD_EXTRA = 2f
+/** The overhang of a header's fold control beyond the header's edge in the plain style (its glyph padding), dp. */
+private const val HEADER_FOLD_OVERHANG = 6f
+
+/** The gap between a header's fold control and the next control or the title, dp. */
+private const val HEADER_FOLD_GAP = 8f
 
 /** The most of the header's width a title-and-icon fold control takes (the section title truncates in the rest). */
 private const val HEADER_FOLD_TITLE_AND_ICON_MAX_FRACTION = 0.4f
@@ -809,7 +812,7 @@ open class CYLTagListView @JvmOverloads constructor(
         if (style.headerIndicatorColor != null) room -= style.headerIndicatorSize.width + HEADER_GAP
         if (source?.menuImageForSection(section) != null) room -= HEADER_ICON_SIZE + HEADER_GAP
         if (foldIsInHeader() && section in rows.indices && canFoldRowCount(rows[section].size)) {
-            room -= headerFoldWidth(max(foldSize(false).width, foldSize(true).width), width) + HEADER_FOLD_EXTRA
+            room -= headerFoldWidth(max(foldSize(false).width, foldSize(true).width), width) + HEADER_FOLD_GAP - headerFoldOverhang()
         }
         if (source?.menuShowsClearButtonForSection(section) == true) {
             room -= ceil(CYLTagButton.fontLineHeight(style.headerFontForTraitCollection())) + HEADER_GAP
@@ -817,6 +820,12 @@ open class CYLTagListView @JvmOverloads constructor(
         if (showsMoreButtonIn(section)) room -= MORE_BUTTON_SIZE - floor((MORE_BUTTON_SIZE - 22f) / 2) + HEADER_MORE_GAP
         return max(0f, room)
     }
+
+    /**
+     * The overhang of a header's fold control beyond the header's edge: [HEADER_FOLD_OVERHANG] in the plain style, none under
+     * `insetGrouped`, where the control's edge is the board's edge exactly.
+     */
+    private fun headerFoldOverhang(): Float = if (listStyle.isInsetGrouped) 0f else HEADER_FOLD_OVERHANG
 
     /** The width the header gives its fold control: `natural`, but at most 40% of the header `width` for the title-and-icon content. */
     private fun headerFoldWidth(natural: Float, width: Float): Float =
@@ -852,8 +861,8 @@ open class CYLTagListView @JvmOverloads constructor(
     private fun contentWidthFor(width: Float): Float = tagColumnAt(width).width
 
     /**
-     * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside
-     * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
+     * The distances from the list's leading and trailing edges to a header's title and fold control: the board's own edges
+     * (`insetGrouped`: the title starts where the card starts and a control ends where it ends, not at the tags inside it), the band's edges plus `headerContentInsets` (a plain header with a band), else
      * `headerHorizontalInset`.
      */
     private fun headerEdgeInsets(): Pair<Float, Float> = headerEdgeInsetsAt(max(0f, measuredContentWidth))
@@ -863,8 +872,7 @@ open class CYLTagListView @JvmOverloads constructor(
         val column = columnAt(width)
         val rest = max(0f, width - column.x - column.width)
         if (style.isInsetGrouped) {
-            val card = cardInsets()
-            return (column.x + card.left) to (rest + card.right)
+            return column.x to rest
         }
         if (style.headerBackgroundColor != null) return (column.x + style.headerContentInsets.left) to (rest + style.headerContentInsets.right)
         return style.headerHorizontalInset to style.headerHorizontalInset
@@ -2321,12 +2329,13 @@ open class CYLTagListView @JvmOverloads constructor(
                 val size = CYLSize(headerFoldWidth(foldSize.width, width), min(foldSize.height, height))
                 val y = floor((height - size.height) / 2)
                 if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) {
-                    place(foldButton, CYLRect(leading - 6, y, size.width, size.height))
-                    leading += size.width - 6 + 4
+                    val overhang = headerFoldOverhang()
+                    place(foldButton, CYLRect(leading - overhang, y, size.width, size.height))
+                    leading += size.width - overhang + 4
                 } else {
-                    trailing -= size.width - 6
+                    trailing -= size.width - headerFoldOverhang()
                     place(foldButton, CYLRect(trailing, y, size.width, size.height))
-                    trailing -= 8
+                    trailing -= HEADER_FOLD_GAP
                 }
             }
             accessoryView?.let { view ->

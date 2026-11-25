@@ -139,13 +139,61 @@ class CYLTagSectionStyleTest {
     }
 
     @Test
-    fun theHeaderTitleStartsWhereTheTagsDoUnderInsetGrouped() {
+    fun theHeaderTitleStartsWhereTheBoardDoesUnderInsetGrouped() {
         val list = makeList(insetGrouped(), 4)
         val title = descendants(list).filterIsInstance<TextView>().first { it.text == "Section 0" }
+        val frame = list.sectionFrame(0)!!
         val tagX = tagFrame(list, 0, 0).x
-        assertEquals(tagX, title.left.toFloat(), 0.5f)
-        assertEquals(tagX, list.sectionFrame(0)!!.headerInsetLeft, 0.5f)
+        // The title block has the board's edges; the tags stay inside the board by its padding.
+        assertEquals(frame.card!!.x, title.left.toFloat(), 0.5f)
+        assertEquals(frame.card!!.x, frame.headerInsetLeft, 0.5f)
+        assertEquals(WIDTH_PX - frame.card!!.maxX, frame.headerInsetRight, 0.5f)
+        assertEquals(16f, title.left.toFloat(), 0.5f)
         assertEquals(16f + CYLSectionStyleMetrics.CARD_PADDING, tagX)
+        assertEquals(CYLSectionStyleMetrics.CARD_PADDING, tagX - title.left, 0.5f)
+    }
+
+    @Test
+    fun aHeaderFoldControlEndsWhereTheBoardEnds() {
+        fun make(style: CYLMenuStyle) = makeList(style, TAGS_IN_TWO_ROWS) {
+            it.defaultVisibleRows = 1
+            it.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle)
+        }
+        fun fold(list: CYLTagListView) = descendants(list).filterIsInstance<CYLTagFoldButton>().first { it.visibility == View.VISIBLE }
+        val grouped = make(insetGrouped())
+        assertTrue(grouped.canFoldSection(0))
+        assertEquals(grouped.sectionFrame(0)!!.card!!.maxX, fold(grouped).right.toFloat(), 0.5f)
+        // The plain style is unchanged: the control's glyph padding overhangs the header inset by 6.
+        val plain = make(plain())
+        assertEquals(WIDTH_PX - 16f + 6f, fold(plain).right.toFloat(), 0.5f)
+    }
+
+    @Test
+    fun theDefaultHeaderFontIs17Semibold() {
+        val style = CYLMenuStyle()
+        assertEquals(17f, style.headerFont.size, 0f)
+        assertEquals(CYLSectionStyleMetrics.HEADER_FONT_SIZE, style.headerFont.size, 0f)
+        assertEquals(600, CYLFont.WEIGHT_SEMIBOLD)
+        if (android.os.Build.VERSION.SDK_INT >= 28) assertEquals(CYLFont.WEIGHT_SEMIBOLD, style.headerFont.typeface.weight)
+        else assertTrue("before API 28 the closest to semibold is bold", style.headerFont.isBold)
+        // An app that sets the font wins.
+        assertEquals(20f, CYLMenuStyle().also { it.headerFont = CYLFont.systemFont(20f) }.headerFont.size, 0f)
+        // The header's title view draws it.
+        val title = descendants(makeList(plain(), 2)).filterIsInstance<TextView>().first { it.text == "Section 0" }
+        assertEquals(17f * context.resources.displayMetrics.density, title.textSize, 0.01f)
+        assertEquals(style.headerFont.isBold, title.typeface.isBold)
+    }
+
+    @Test
+    fun theHeaderGrowsWithTheHeaderFont() {
+        fun header(font: CYLFont): Float =
+            makeList(plain().also { it.headerHeight = 0f; it.headerFont = font }, 3).sectionFrame(0)!!.headerHeight
+        val line17 = Math.ceil(CYLTagButton.fontLineHeight(CYLFont.semiboldSystemFont(17f)).toDouble()).toFloat()
+        assertEquals(line17 + 12f, header(CYLFont.semiboldSystemFont(17f)), 0.5f)
+        assertTrue("a bigger header font makes a taller header", header(CYLFont.semiboldSystemFont(40f)) > header(CYLFont.semiboldSystemFont(17f)))
+        assertTrue("17 is at least as tall as 14", header(CYLFont.semiboldSystemFont(17f)) >= header(CYLFont.systemFont(14f)))
+        // With the default fixed headerHeight (36) the 17 sp line plus 12 still fits: the header is the fixed height.
+        assertEquals(maxOf(36f, line17 + 12f), makeList(plain(), 3).sectionFrame(0)!!.headerHeight, 0.5f)
     }
 
     @Test
@@ -192,8 +240,9 @@ class CYLTagSectionStyleTest {
         assertEquals(frame.card!!.maxX, frame.headerSeparator!!.maxX, 0.001f)
         assertEquals(frame.headerBand!!.x, frame.headerSeparator!!.x)
         assertEquals(frame.headerBand!!.maxX, frame.headerSeparator!!.maxX, 0.001f)
-        // The title is inset, the divider is not.
-        assertTrue(frame.headerInsetLeft > frame.headerSeparator!!.x)
+        // The title block, the card, the band and the divider all have the board's edges.
+        assertEquals(frame.card!!.x, frame.headerInsetLeft, 0.001f)
+        assertEquals(frame.headerSeparator!!.x, frame.headerInsetLeft, 0.001f)
     }
 
     @Test

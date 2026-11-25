@@ -83,12 +83,29 @@ class CYLTagSectionRtlTest {
     fun theHeaderTitleIsMeasuredFromTheTrailingEdge() {
         val ltr = makeList(insetGrouped(), rtl = false)
         val rtl = makeList(insetGrouped(), rtl = true)
-        val leading = 16f + CYLSectionStyleMetrics.CARD_PADDING
+        // The title block has the board's edges (the card's), not the tags' inside it.
+        val leading = 16f
         assertEquals(leading, title(ltr).left.toFloat(), 0.5f)
-        assertEquals("right to left: the title starts where the tags start, from the right", WIDTH_PX - leading, title(rtl).right.toFloat(), 0.5f)
+        assertEquals("right to left: the title starts where the board starts, from the right", WIDTH_PX - leading, title(rtl).right.toFloat(), 0.5f)
+        assertEquals(rtl.sectionFrame(0)!!.card!!.maxX, title(rtl).right.toFloat(), 0.5f)
         assertMirrored("title", title(ltr), title(rtl))
         // The section frame keeps the leading / trailing distances of the title.
         assertEquals(leading, rtl.sectionFrame(0)!!.headerInsetLeft, 0.5f)
+        assertEquals(leading, rtl.sectionFrame(0)!!.headerInsetRight, 0.5f)
+    }
+
+    @Test
+    fun theHeaderFoldControlEndsAtTheBoardsTrailingEdgeInBothDirections() {
+        fun make(rtl: Boolean) = makeList(insetGrouped(), rtl) {
+            it.defaultVisibleRows = 1
+            it.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle)
+        }
+        val ltr = make(false)
+        val rtl = make(true)
+        // Left to right the trailing edge is the right one, the card's right edge; right to left it is the left one.
+        assertEquals(ltr.sectionFrame(0)!!.card!!.maxX, foldButton(ltr).right.toFloat(), 0.5f)
+        assertEquals(rtl.sectionFrame(0)!!.card!!.x, foldButton(rtl).left.toFloat(), 0.5f)
+        assertEquals("the title starts at the board's leading edge", rtl.sectionFrame(0)!!.card!!.maxX, title(rtl).right.toFloat(), 0.5f)
     }
 
     @Test
