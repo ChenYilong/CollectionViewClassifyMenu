@@ -299,6 +299,8 @@ const val CYLMenuStyleHeaderSeparatorColor = "headerSeparatorColor"
 const val CYLMenuStyleHeaderSeparatorThickness = "headerSeparatorThickness"
 /** Style key: insets (left and right are used): the divider's inset from the column's edges. */
 const val CYLMenuStyleHeaderSeparatorInsets = "headerSeparatorInsets"
+/** Style key: a color: `CYLMenuStyle.tintColor`, the one color of the title, section icon and fold / More controls. */
+const val CYLMenuStyleTintColor = "tintColor"
 /**
  * Style key: a color.
  */
@@ -807,6 +809,7 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     offset(configuration[CYLMenuStyleTitlePositionAdjustment])?.let { titlePositionAdjustment = it }
     offset(configuration[CYLMenuStyleImagePositionAdjustment])?.let { imagePositionAdjustment = it }
     color(configuration[CYLMenuStyleBackgroundColor])?.let { backgroundColor = it }
+    color(configuration[CYLMenuStyleTintColor])?.let { tintColor = it }
     color(configuration[CYLMenuStyleHeaderTextColor])?.let { headerTextColor = it }
     color(configuration[CYLMenuStyleFoldControlColor])?.let { foldControlColor = it }
     font(configuration[CYLMenuStyleHeaderFont])?.let { headerFont = it }

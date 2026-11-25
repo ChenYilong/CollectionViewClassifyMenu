@@ -257,12 +257,12 @@ class CYLMenuStyle {
     // Section headers
     var headerHeight: Float = 36f
     var headerFont: CYLFont = CYLFont.systemFont(14f)
-    /** null (the default): the list's one tint, the theme's `textColorPrimary`, so it is visible in dark mode (iOS `UIColor.label`). */
+    /** null (the default): [tintColor], else its default by the background luminance ([resolvedHeaderTextColor]). */
     var headerTextColor: Int? = null
     var headerHorizontalInset: Float = 16f
 
     // Fold controls
-    /** null (the default): the list's one tint (see [headerTextColor]); a control's own color wins. */
+    /** null (the default): the tint (see [headerTextColor]); a control's own color wins. */
     var foldControlColor: Int? = null
     var expandTitle: String = CYLMenuLocalizedString("CYLMenuExpand", "Expand a section")
     var foldChevronImage: Drawable? = null
@@ -270,20 +270,52 @@ class CYLMenuStyle {
 
     // The More button
     var moreButtonImage: Drawable? = null
-    /** null (the default): the list's one tint (see [headerTextColor]). */
+    /** null (the default): the tint (see [headerTextColor]). */
     var moreButtonColor: Int? = null
 
-    /** The header title color in use: [headerTextColor], else the list's one tint of [context]. */
-    fun resolvedHeaderTextColor(context: android.content.Context): Int = headerTextColor ?: CYLSystemColors.primary(context)
+    /**
+     * The one color of every built-in view that is not a tag (header title, section icon, fold / More / clear controls); null
+     * (the default): black or white by the luminance of the background it is drawn on ([resolvedTintColor]). A color set on
+     * the title, the fold control, the More button or the clear button itself wins over it for that view.
+     */
+    var tintColor: Int? = null
 
-    /** The fold controls' color in use: [foldControlColor], else the list's one tint of [context]. */
-    fun resolvedFoldControlColor(context: android.content.Context): Int = foldControlColor ?: CYLSystemColors.primary(context)
+    /**
+     * The default tint on `background`: black on a light one, white on a dark one ([CYLTintLuminanceThreshold]); the system
+     * mode ([CYLSystemColors.primary]) when the background is not an opaque color (a transparent list shows the page).
+     */
+    private fun tintOn(context: android.content.Context, background: Int): Int {
+        val luminance = CYLMenuColorLuminance(background) ?: return CYLSystemColors.primary(context)
+        return if (luminance > CYLTintLuminanceThreshold) Color.BLACK else Color.WHITE
+    }
 
-    /** The More button's color in use: [moreButtonColor], else the list's one tint of [context]. */
-    fun resolvedMoreButtonColor(context: android.content.Context): Int = moreButtonColor ?: CYLSystemColors.primary(context)
+    /**
+     * The tint as drawn: [tintColor], else the default against what is behind the view: the band color when `onBand` (a
+     * header with a band) and a band is set, else the list's own background ([resolvedBackgroundColor]: the app's color, the
+     * grouped background under `insetGrouped`, the default white the list paints).
+     */
+    @JvmOverloads
+    fun resolvedTintColor(context: android.content.Context, onBand: Boolean = false): Int {
+        tintColor?.let { return it }
+        val band = headerBackgroundColor
+        return tintOn(context, if (onBand && band != null) band else resolvedBackgroundColor(context))
+    }
+
+    /** The header title color in use: [headerTextColor], else the tint. */
+    @JvmOverloads
+    fun resolvedHeaderTextColor(context: android.content.Context, onBand: Boolean = false): Int = headerTextColor ?: resolvedTintColor(context, onBand)
+
+    /** The fold controls' color in use: [foldControlColor], else the tint (a control's own color still wins). */
+    @JvmOverloads
+    fun resolvedFoldControlColor(context: android.content.Context, onBand: Boolean = false): Int = foldControlColor ?: resolvedTintColor(context, onBand)
+
+    /** The More button's color in use: [moreButtonColor], else the tint. */
+    @JvmOverloads
+    fun resolvedMoreButtonColor(context: android.content.Context, onBand: Boolean = false): Int = moreButtonColor ?: resolvedTintColor(context, onBand)
 
     /** The clear button's color in use: [clearButtonColor], else the header title's. */
-    fun resolvedClearButtonColor(context: android.content.Context): Int = clearButtonColor ?: resolvedHeaderTextColor(context)
+    @JvmOverloads
+    fun resolvedClearButtonColor(context: android.content.Context, onBand: Boolean = false): Int = clearButtonColor ?: resolvedHeaderTextColor(context, onBand)
 
     init {
         val hairline = 1f / max(1f, Resources.getSystem().displayMetrics.density)
@@ -420,6 +452,7 @@ class CYLMenuStyle {
         copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
         copy.headerFont = headerFont
+        copy.tintColor = tintColor
         copy.headerTextColor = headerTextColor
         copy.headerHorizontalInset = headerHorizontalInset
         copy.foldControlColor = foldControlColor

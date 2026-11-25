@@ -1758,8 +1758,9 @@ open class CYLTagListView @JvmOverloads constructor(
         CYLAccessibilityNode.apply(cell, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
     }
 
-    private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean) {
-        button.applyFoldControl(displayedFoldControl(), listStyle.resolvedFoldControlColor(context), expanded, animated)
+    /** `onBand`: the button sits in a header with a band, so the tint is chosen against the band color. */
+    private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean, onBand: Boolean = false) {
+        button.applyFoldControl(displayedFoldControl(), listStyle.resolvedFoldControlColor(context, onBand), expanded, animated)
         button.contentDescription = foldAccessibilityLabel(section)
         CYLAccessibilityNode.apply(button, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
     }
@@ -2160,6 +2161,7 @@ open class CYLTagListView @JvmOverloads constructor(
         init {
             val source = menuDataSource
             val style = listStyle
+            val onBand = style.headerBackgroundColor != null
             addView(indicatorView)
             addView(iconView)
             addView(titleLabel)
@@ -2172,15 +2174,16 @@ open class CYLTagListView @JvmOverloads constructor(
             val font = style.headerFontForTraitCollection()
             titleLabel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, font.size)
             titleLabel.typeface = font.typeface
-            titleLabel.setTextColor(style.resolvedHeaderTextColor(context))
+            titleLabel.setTextColor(style.resolvedHeaderTextColor(context, onBand))
             iconView.setImageDrawable(source?.menuImageForSection(section))
+            iconView.imageTintList = android.content.res.ColorStateList.valueOf(style.resolvedTintColor(context, onBand))
             accessoryView = source?.menuAccessoryViewForSection(section)
             accessoryView?.let { (it.parent as? ViewGroup)?.removeView(it); addView(it) }
             val showsFold = foldIsInHeader() && canFoldSection(section)
             foldButton.visibility = if (showsFold) VISIBLE else GONE
             if (showsFold) {
                 val expanded = isSectionExpanded(section)
-                configureFoldButton(foldButton, section, expanded, false)
+                configureFoldButton(foldButton, section, expanded, false, onBand)
                 foldSize = foldSize(expanded)
             }
             foldButton.setOnClickListener { toggleSection(section) }
@@ -2191,7 +2194,7 @@ open class CYLTagListView @JvmOverloads constructor(
             clearButton.visibility = if (showsClear) VISIBLE else GONE
             if (showsClear) {
                 val image = (style.clearButtonImage ?: CYLMenuImage("cyl_trash"))?.mutate()
-                image?.setTint(style.resolvedClearButtonColor(context))
+                image?.setTint(style.resolvedClearButtonColor(context, onBand))
                 clearButton.setImageDrawable(image)
                 val title = source?.menuTitleForSection(section).orEmpty()
                 val clear = CYLMenuLocalizedString("CYLMenuClearSection", "The clear button of a section")
@@ -2206,7 +2209,7 @@ open class CYLTagListView @JvmOverloads constructor(
             moreButton.visibility = if (showsMore) VISIBLE else GONE
             if (showsMore) {
                 val image = (style.moreButtonImage ?: CYLMenuImage("cyl_more") ?: CYLMenuIconDrawable(CYLMenuIconDrawable.Kind.ELLIPSIS)).mutate()
-                image.setTint(style.resolvedMoreButtonColor(context))
+                image.setTint(style.resolvedMoreButtonColor(context, onBand))
                 moreButton.setImageDrawable(image)
                 var label = source?.menuAccessibilityLabelForMoreButtonInSection(section)
                 if (label.isNullOrEmpty()) {

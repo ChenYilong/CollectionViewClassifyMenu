@@ -432,6 +432,124 @@ class CYLTagSectionStyleTest {
         assertNotNull(untouched.sectionContentInsets)
     }
 
+    // MARK: The default tint of the built-in views (tintColor)
+
+    private fun titleColor(list: CYLTagListView) = descendants(list).filterIsInstance<TextView>().first { it.text == "Section 0" }.currentTextColor
+
+    @Test
+    @Config(qualifiers = "night")
+    fun theTintIsDarkOnALightBackgroundWhateverTheMode() {
+        val style = CYLMenuStyle()
+        assertEquals(Color.BLACK, style.resolvedTintColor(context))
+        assertEquals(Color.BLACK, style.resolvedHeaderTextColor(context))
+        assertEquals(Color.BLACK, style.resolvedFoldControlColor(context))
+        assertEquals(Color.BLACK, style.resolvedMoreButtonColor(context))
+        assertEquals(Color.BLACK, style.resolvedClearButtonColor(context))
+        assertEquals(Color.BLACK, titleColor(makeList(style, 2)))
+        // The grouped background in light is light too; in dark mode it is black, so white.
+        assertEquals(Color.WHITE, insetGrouped().resolvedTintColor(context))
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun theTintIsLightOnADarkBackgroundWhateverTheMode() {
+        val style = CYLMenuStyle().also { it.backgroundColor = Color.BLACK }
+        assertEquals(Color.WHITE, style.resolvedTintColor(context))
+        assertEquals(Color.WHITE, titleColor(makeList(style, 2)))
+        assertEquals(Color.WHITE, CYLMenuStyle().also { it.backgroundColor = 0xFF1C1C1E.toInt() }.resolvedTintColor(context))
+        assertEquals(Color.BLACK, insetGrouped().resolvedTintColor(context))
+    }
+
+    @Test
+    fun theTintLuminanceHasOneNamedThreshold() {
+        assertEquals(0.179f, CYLTintLuminanceThreshold)
+        assertEquals(1f, CYLMenuColorLuminance(Color.WHITE)!!, 0.001f)
+        assertEquals(0f, CYLMenuColorLuminance(Color.BLACK)!!, 0.001f)
+        assertNull(CYLMenuColorLuminance(Color.TRANSPARENT))
+        assertNull(CYLMenuColorLuminance(0x80FFFFFF.toInt()))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun aTransparentListFollowsTheSystemModeInDark() {
+        val style = CYLMenuStyle().also { it.backgroundColor = Color.TRANSPARENT }
+        assertEquals(CYLSystemColors.primary(context), style.resolvedTintColor(context))
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun aTransparentListFollowsTheSystemModeInLight() {
+        val style = CYLMenuStyle().also { it.backgroundColor = Color.TRANSPARENT }
+        assertEquals(CYLSystemColors.primary(context), style.resolvedTintColor(context))
+        assertEquals(CYLSystemColors.primary(context), style.resolvedHeaderTextColor(context))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun aTintTheAppSetWinsInBothModes() {
+        val style = CYLMenuStyle().also { it.tintColor = Color.RED }
+        assertEquals(Color.RED, style.resolvedTintColor(context))
+        assertEquals(Color.RED, style.resolvedHeaderTextColor(context))
+        assertEquals(Color.RED, style.resolvedFoldControlColor(context, true))
+        assertEquals(Color.RED, style.resolvedMoreButtonColor(context))
+        assertEquals(Color.RED, titleColor(makeList(style, 2)))
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun underABandTheTintIsChosenAgainstTheBandColor() {
+        val style = CYLMenuStyle().also { it.headerBackgroundColor = CYLSectionStyleColors.HEADER_BAND_DARK }
+        assertEquals(Color.WHITE, style.resolvedTintColor(context, true))
+        assertEquals(Color.WHITE, style.resolvedHeaderTextColor(context, true))
+        // Off the band the list's own white background decides.
+        assertEquals(Color.BLACK, style.resolvedTintColor(context, false))
+        assertEquals(Color.WHITE, titleColor(makeList(style, 2)))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun colorsSetOnAViewWinOverTheTint() {
+        val style = CYLMenuStyle().also {
+            it.tintColor = Color.RED
+            it.headerTextColor = Color.GREEN
+            it.foldControlColor = Color.BLUE
+            it.moreButtonColor = Color.YELLOW
+        }
+        assertEquals(Color.GREEN, style.resolvedHeaderTextColor(context))
+        assertEquals(Color.BLUE, style.resolvedFoldControlColor(context))
+        assertEquals(Color.YELLOW, style.resolvedMoreButtonColor(context))
+        assertEquals(Color.GREEN, style.resolvedClearButtonColor(context))
+        assertEquals(Color.GREEN, titleColor(makeList(style, 2)))
+    }
+
+    @Test
+    fun theTintKeyParsesAndCopyKeepsIt() {
+        val style = CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleTintColor to "#112233"))
+        assertEquals(Color.rgb(0x11, 0x22, 0x33), style.tintColor)
+        assertEquals(Color.rgb(0x11, 0x22, 0x33), style.copy().tintColor)
+        assertNull(CYLMenuStyle().tintColor)
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun switchingTheModeReResolvesTheTintOfAShownList() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val list = CYLTagListView(activity)
+        // The grouped background follows the mode, so does the tint chosen against it.
+        list.style = insetGrouped()
+        list.menuDataSource = CYLSectionStyleSource(2)
+        activity.setContentView(FrameLayout(activity).apply { addView(list, FrameLayout.LayoutParams(WIDTH_PX, FrameLayout.LayoutParams.WRAP_CONTENT)) })
+        list.reloadMenuData()
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
+        val light = titleColor(list)
+        assertEquals(Color.BLACK, light)
+        org.robolectric.RuntimeEnvironment.setQualifiers("+night")
+        list.dispatchConfigurationChanged(activity.resources.configuration)
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
+        val dark = titleColor(list)
+        assertEquals(Color.WHITE, dark)
+    }
+
     private companion object {
         const val WIDTH_PX = 320
         const val TAGS_IN_TWO_ROWS = 16
