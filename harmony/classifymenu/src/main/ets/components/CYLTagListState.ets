@@ -353,7 +353,7 @@ export class CYLTagFoldMetrics {
   static inlineStyle(control: CYLMenuFoldControl, itemStyle: CYLMenuStyle): CYLMenuStyle {
     const style = itemStyle.copy();
     const normal = itemStyle.normalAppearance;
-    const tint = control.color ?? itemStyle.foldControlColor;
+    const tint = control.color ?? itemStyle.resolvedFoldControlColor();
     [CYLControlState.SELECTED, CYLControlState.DISABLED].forEach((state: number) => {
       const appearance = style.appearance(state);
       appearance.backgroundColor = normal.backgroundColor;
