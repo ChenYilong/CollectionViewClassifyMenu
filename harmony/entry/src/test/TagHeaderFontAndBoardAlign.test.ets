@@ -13,6 +13,9 @@ const CARD_PADDING: number = 12;
 /** A board inset other than the default, for the override tests. */
 const WIDE_BOARD_INSET: number = 20;
 const NEGATIVE_INSET: number = 5;
+/** The board of a 320 list with `sectionBoardInset` 20: the tag column 28 ... 292 extended by 20 on each side. */
+const WIDE_BOARD_LEFT: number = 8;
+const WIDE_BOARD_RIGHT: number = 312;
 /** The first version's numbers in a 320 list with the default section insets: board 16 ... 304, content 28 ... 292. */
 const BOARD_LEFT: number = 16;
 const BOARD_RIGHT: number = 304;
@@ -194,32 +197,56 @@ export default function tagHeaderFontAndBoardAlignTest() {
         style.sectionBoardInset = inset;
         const frame = firstSection(boardList(style, CYLLayoutDirection.ltr));
         const card = frame.card as CYLRect;
-        // The board is the margin column whatever the inset; the content column is narrower by the inset on each side.
-        expect(card.x).assertEqual(SIDE_INSET);
-        expect(card.x + card.width).assertEqual(LIST_WIDTH - SIDE_INSET);
-        expect(card.x).assertEqual(frame.items[0].x - inset);
-        expect(frame.headerTitleLeadingX).assertEqual(card.x + inset);
-        expect(frame.headerInsetRight).assertEqual(LIST_WIDTH - (card.x + card.width) + inset);
+        // The tag column never moves (28 ... 292); the board is that column extended by the inset on each side.
+        expect(card.x).assertEqual(CONTENT_LEFT - inset);
+        expect(card.x + card.width).assertEqual(CONTENT_RIGHT + inset);
+        expect(frame.items[0].x).assertEqual(CONTENT_LEFT);
+        expect(frame.headerTitleLeadingX).assertEqual(CONTENT_LEFT);
+        expect(frame.headerInsetLeft).assertEqual(CONTENT_LEFT);
+        expect(frame.headerInsetRight).assertEqual(LIST_WIDTH - CONTENT_RIGHT);
         frame.items.forEach((item: CYLTagListItemFrame) => {
-          expect(item.x >= card.x + inset).assertTrue();
-          expect(item.x + item.width <= card.x + card.width - inset).assertTrue();
+          expect(item.x >= CONTENT_LEFT).assertTrue();
+          expect(item.x + item.width <= CONTENT_RIGHT).assertTrue();
         });
       });
     });
 
-    it('anInsetOfZeroMakesTheContentColumnEqualTheBoardColumn', 0, () => {
+    it('anInsetOfZeroMakesTheBoardEqualTheTagColumnWhichStaysNarrow', 0, () => {
       const style = styleOf(CYLSectionStyle.insetGrouped);
       style.sectionBoardInset = 0;
-      const ltr = firstSection(boardList(style, CYLLayoutDirection.ltr));
+      const list = boardList(style, CYLLayoutDirection.ltr);
+      const ltr = firstSection(list);
       const rtl = firstSection(boardList(style, CYLLayoutDirection.rtl));
-      expect(ltr.items[0].x).assertEqual(SIDE_INSET);
-      expect(ltr.headerTitleLeadingX).assertEqual(SIDE_INSET);
-      expect(ltr.headerInsetLeft).assertEqual(SIDE_INSET);
-      expect(ltr.headerInsetRight).assertEqual(SIDE_INSET);
-      expect(ltr.card?.x).assertEqual(SIDE_INSET);
-      expect(ltr.card?.width).assertEqual(LIST_WIDTH - 2 * SIDE_INSET);
-      expect(rtl.headerTitleLeadingX).assertEqual(LIST_WIDTH - SIDE_INSET);
-      expect(rtl.items[0].x + rtl.items[0].width).assertEqual(LIST_WIDTH - SIDE_INSET);
+      // The tag column is still 28 ... 292, NOT widened to 16 ... 304.
+      expect(list.tagColumn(0).x).assertEqual(CONTENT_LEFT);
+      expect(list.tagColumn(0).width).assertEqual(CONTENT_RIGHT - CONTENT_LEFT);
+      expect(ltr.items[0].x).assertEqual(CONTENT_LEFT);
+      expect(ltr.headerTitleLeadingX).assertEqual(CONTENT_LEFT);
+      expect(ltr.headerInsetRight).assertEqual(LIST_WIDTH - CONTENT_RIGHT);
+      expect(ltr.card?.x).assertEqual(CONTENT_LEFT);
+      expect(ltr.card?.width).assertEqual(CONTENT_RIGHT - CONTENT_LEFT);
+      expect(rtl.headerTitleLeadingX).assertEqual(CONTENT_RIGHT);
+      expect(rtl.items[0].x + rtl.items[0].width).assertEqual(CONTENT_RIGHT);
+      expect(rtl.card?.x).assertEqual(CONTENT_LEFT);
+      expect(rtl.card?.width).assertEqual(CONTENT_RIGHT - CONTENT_LEFT);
+    });
+
+    it('aWideInsetPushesTheBoardPastTheMarginWhileTheTagColumnStays', 0, () => {
+      const style = styleOf(CYLSectionStyle.insetGrouped);
+      style.sectionBoardInset = WIDE_BOARD_INSET;
+      const list = boardList(style, CYLLayoutDirection.ltr);
+      const ltr = firstSection(list);
+      const rtl = firstSection(boardList(style, CYLLayoutDirection.rtl));
+      expect(ltr.card?.x).assertEqual(WIDE_BOARD_LEFT);
+      expect((ltr.card?.x ?? 0) + (ltr.card?.width ?? 0)).assertEqual(WIDE_BOARD_RIGHT);
+      expect(list.tagColumn(0).x).assertEqual(CONTENT_LEFT);
+      expect(list.tagColumn(0).width).assertEqual(CONTENT_RIGHT - CONTENT_LEFT);
+      expect(ltr.items[0].x).assertEqual(CONTENT_LEFT);
+      // Right to left mirrors: the board is symmetric and the tags and title start at the right end of the tag column.
+      expect(rtl.card?.x).assertEqual(WIDE_BOARD_LEFT);
+      expect(rtl.card?.width).assertEqual(WIDE_BOARD_RIGHT - WIDE_BOARD_LEFT);
+      expect(rtl.headerTitleLeadingX).assertEqual(CONTENT_RIGHT);
+      expect(rtl.items[0].x + rtl.items[0].width).assertEqual(CONTENT_RIGHT);
     });
 
     it('anUnsetInsetIsTwelveAndGivesTheFirstVersionNumbers', 0, () => {
@@ -237,16 +264,16 @@ export default function tagHeaderFontAndBoardAlignTest() {
       expect(frameKey(unset)).assertEqual(frameKey(explicit));
     });
 
-    it('aSetInsetOverridesTheLeadingAndTrailingPartsOfTheContentInsetsButNotTopAndBottom', 0, () => {
+    it('aSetInsetReplacesTheBoardExtensionButTheTagColumnKeepsTheContentInsetsAndTopAndBottomStay', 0, () => {
       const overridden = styleOf(CYLSectionStyle.insetGrouped);
       overridden.sectionContentInsets = new CYLEdgeInsets(CONTENT_TOP, CONTENT_LEADING, CONTENT_BOTTOM, CONTENT_TRAILING);
       overridden.sectionBoardInset = WIDE_BOARD_INSET;
-      const reference = styleOf(CYLSectionStyle.insetGrouped);
-      reference.sectionContentInsets = new CYLEdgeInsets(CONTENT_TOP, WIDE_BOARD_INSET, CONTENT_BOTTOM, WIDE_BOARD_INSET);
       const frame = firstSection(boardList(overridden, CYLLayoutDirection.ltr));
       const card = frame.card as CYLRect;
-      expect(frameKey(frame)).assertEqual(frameKey(firstSection(boardList(reference, CYLLayoutDirection.ltr))));
-      expect(frame.items[0].x).assertEqual(SIDE_INSET + WIDE_BOARD_INSET);
+      // The tag column is the section column minus the content insets (30 and 40); the board extends it by 20.
+      expect(frame.items[0].x).assertEqual(SIDE_INSET + CONTENT_LEADING);
+      expect(card.x).assertEqual(SIDE_INSET + CONTENT_LEADING - WIDE_BOARD_INSET);
+      expect(card.x + card.width).assertEqual(LIST_WIDTH - SIDE_INSET - CONTENT_TRAILING + WIDE_BOARD_INSET);
       // Top and bottom still come from sectionContentInsets: the tags start CONTENT_TOP below the board's top.
       expect(frame.items[0].y - card.y).assertEqual(CONTENT_TOP);
       const defaultVertical = styleOf(CYLSectionStyle.insetGrouped);
@@ -255,15 +282,20 @@ export default function tagHeaderFontAndBoardAlignTest() {
       expect(card.height - defaultCard.height).assertEqual(CONTENT_TOP + CONTENT_BOTTOM - 2 * CARD_PADDING);
     });
 
-    it('theInsetAlsoNarrowsTheRowsAndStaysMirroredInRtl', 0, () => {
-      const style = styleOf(CYLSectionStyle.insetGrouped);
-      style.sectionBoardInset = WIDE_BOARD_INSET;
-      const list = boardList(style, CYLLayoutDirection.ltr);
-      expect(list.tagColumn(0).x).assertEqual(SIDE_INSET + WIDE_BOARD_INSET);
-      expect(list.tagColumn(0).width).assertEqual(LIST_WIDTH - 2 * (SIDE_INSET + WIDE_BOARD_INSET));
-      const rtl = firstSection(boardList(style, CYLLayoutDirection.rtl));
-      expect(rtl.items[0].x + rtl.items[0].width).assertEqual(LIST_WIDTH - SIDE_INSET - WIDE_BOARD_INSET);
-      expect(rtl.headerTitleLeadingX).assertEqual(LIST_WIDTH - SIDE_INSET - WIDE_BOARD_INSET);
+    it('theInsetNeverChangesTheRowsOrTheHeightsOfTheTagColumn', 0, () => {
+      const unset = firstSection(boardList(styleOf(CYLSectionStyle.insetGrouped), CYLLayoutDirection.ltr));
+      const wide = styleOf(CYLSectionStyle.insetGrouped);
+      wide.sectionBoardInset = WIDE_BOARD_INSET;
+      const zero = styleOf(CYLSectionStyle.insetGrouped);
+      zero.sectionBoardInset = 0;
+      [wide, zero].forEach((style: CYLMenuStyle) => {
+        const frame = firstSection(boardList(style, CYLLayoutDirection.ltr));
+        expect(frame.height).assertEqual(unset.height);
+        expect(frame.card?.height).assertEqual(unset.card?.height);
+        frame.items.forEach((item: CYLTagListItemFrame, index: number) => {
+          expect(`${item.x},${item.y},${item.width}`).assertEqual(`${unset.items[index].x},${unset.items[index].y},${unset.items[index].width}`);
+        });
+      });
     });
 
     it('aNegativeInsetIsZeroAndCopyKeepsIt', 0, () => {
