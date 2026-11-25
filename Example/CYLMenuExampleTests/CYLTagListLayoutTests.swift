@@ -175,8 +175,10 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         withExtendedLifetime(source) {}
     }
 
-    func testTheFoldControlWithIconAndTitleShowsLessWhenExpanded() {
-        let control = CYLMenuFoldControl(position: .footer, content: .iconAndTitle)
+    func testTheFoldControlWithTitleAndIconShowsLessWhenExpanded() {
+        // Merge: `.iconAndTitle` keeps only the icon when expanded (the titleAndIcon line); the always-title content is
+        // `.titleAndIcon` (the section line's assertion).
+        let control = CYLMenuFoldControl(position: .footer, content: .titleAndIcon)
         let button = CYLTagFoldButton(frame: CGRect(x: 0, y: 0, width: 120, height: 40))
         button.applyFoldControl(control, color: .label, expanded: false, animated: false)
         XCTAssertEqual(button.titleLabel.text, control.title)
@@ -192,12 +194,14 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
     }
 
     func testTheFoldControlTitleStopsGrowingAtTheAccessibilityCap() {
-        let control = CYLMenuFoldControl(position: .headerTrailing, content: .iconAndTitle)
+        // The uncapped control (the footer's) scales up to `maximumUncappedContentSizeCategory`; the size-capped ones (the
+        // header controls, `.titleAndIcon`) stop at `maximumContentSizeCategory` (`.large`, see CYLTitleAndIconFoldControlTests).
+        let control = CYLMenuFoldControl(position: .footer, content: .iconAndTitle)
         func size(_ category: UIContentSizeCategory) -> CGSize {
             CYLTagFoldButton.size(for: control, expanded: false,
                                   traitCollection: UITraitCollection(preferredContentSizeCategory: category))
         }
-        let large = size(.large), capped = size(CYLTagFoldButton.maximumContentSizeCategory)
+        let large = size(.large), capped = size(CYLTagFoldButton.maximumUncappedContentSizeCategory)
         XCTAssertGreaterThan(capped.width, large.width, "It still grows up to the cap")
         XCTAssertEqual(size(.accessibilityExtraExtraExtraLarge).width, capped.width, accuracy: 0.5, "and not past it")
         XCTAssertEqual(size(.accessibilityExtraExtraExtraLarge).height, capped.height, accuracy: 0.5)
