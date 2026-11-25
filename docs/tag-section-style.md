@@ -40,6 +40,15 @@ mode). Nullable colors follow the dark-mode defaults pattern of `CYLMenuColor` /
   style `plain`. With `insetGrouped` the header sits above the card, so a header divider is mostly redundant: the two are
   independent; an example uses one or the other.
 
+## Decision of the owner (2026-11-25): keep every option, the integrator chooses
+
+All three features stay independent switches, and any combination is allowed; the library picks none for the app:
+
+- `sectionStyle` (plain / insetGrouped), the header band and the header divider combine freely. A divider under an `insetGrouped` header
+  is allowed (it is only mostly redundant); an example or an app uses the one it prefers, or both.
+- An opaque card over a background the Liquid Glass tags need hides the glass: choose a translucent `sectionBackgroundColor`, keep the
+  style `plain`, or accept the look. The core never changes a color on its own because of the tag background style.
+
 ## Gates
 
 Every platform: all existing tests pass unchanged, plus one test that the default style gives the same frames as before.
