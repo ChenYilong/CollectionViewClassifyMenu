@@ -19,6 +19,7 @@ const CARD_LEADING = 4
 const CARD_TRAILING = 20
 const CARD_INSETS = [12, CARD_LEADING, 12, CARD_TRAILING]
 const DIVIDER_LEADING_INSET = 20
+const BOARD_INSET = 6
 const TAG_LEADING = 4
 const TAG_TRAILING = 12
 const BORDER = 0.5
@@ -83,23 +84,37 @@ test('rtl swaps the tag content insets: the leading inset is on the right', () =
   assert.match(rtl, new RegExp(`padding: 0 ${TAG_LEADING - BORDER}px 0 ${TAG_TRAILING - BORDER}px;`))
 })
 
-test('rtl mirrors the card padding, the header title and fold control span the board in both directions', () => {
+test('rtl mirrors the card padding; the header title and fold control align with the tags in both directions', () => {
   const sectionContentInsets = CARD_INSETS
   const sectionInsets = SECTION_INSETS
   const ltr = model.sectionLayout(styleOf({ sectionContentInsets, sectionInsets }))
   const rtl = model.sectionLayout(rtlOf({ sectionContentInsets, sectionInsets }))
   assert.match(ltr.cardStyle, new RegExp(`padding: 12px ${CARD_TRAILING}px 12px ${CARD_LEADING}px;`))
   assert.match(rtl.cardStyle, new RegExp(`padding: 12px ${CARD_LEADING}px 12px ${CARD_TRAILING}px;`))
-  // The header has no padding of its own under the card: its box is the board's, so the title (leading) starts at the
-  // board's leading edge and the fold control (trailing) ends at the board's trailing edge, mirrored right to left.
+  // The header block is the tags' column: the title (leading) starts at the tags' leading x and the fold control
+  // (trailing) ends at the tags' trailing edge, mirrored right to left.
   const ltrStyle = styleOf({ sectionContentInsets, sectionInsets })
   const rtlStyle = rtlOf({ sectionContentInsets, sectionInsets })
-  assert.deepEqual(model.headerEdges(ltrStyle), { left: LEADING_SMALL, right: TRAILING_LARGE })
-  assert.deepEqual(model.headerEdges(rtlStyle), { left: TRAILING_LARGE, right: LEADING_SMALL })
-  assert.deepEqual(model.headerEdges(ltrStyle), model.contentColumn(ltrStyle))
-  assert.deepEqual(model.headerEdges(rtlStyle), model.contentColumn(rtlStyle))
-  assert.match(ltr.headerStyle, new RegExp(`margin: 0 ${TRAILING_LARGE}px 0 ${LEADING_SMALL}px; padding: 0 0px 0 0px;`))
-  assert.match(rtl.headerStyle, new RegExp(`margin: 0 ${LEADING_SMALL}px 0 ${TRAILING_LARGE}px; padding: 0 0px 0 0px;`))
+  assert.deepEqual(model.headerEdges(ltrStyle), { left: LEADING_SMALL + CARD_LEADING, right: TRAILING_LARGE + CARD_TRAILING })
+  assert.deepEqual(model.headerEdges(rtlStyle), { left: TRAILING_LARGE + CARD_TRAILING, right: LEADING_SMALL + CARD_LEADING })
+  assert.deepEqual(model.headerEdges(ltrStyle), model.tagColumn(ltrStyle))
+  assert.deepEqual(model.headerEdges(rtlStyle), model.tagColumn(rtlStyle))
+  assert.match(ltr.headerStyle, new RegExp(`margin: 0 ${TRAILING_LARGE}px 0 ${LEADING_SMALL}px; padding: 0 ${CARD_TRAILING}px 0 ${CARD_LEADING}px;`))
+  assert.match(rtl.headerStyle, new RegExp(`margin: 0 ${LEADING_SMALL}px 0 ${TRAILING_LARGE}px; padding: 0 ${CARD_LEADING}px 0 ${CARD_TRAILING}px;`))
+})
+
+test('rtl: one board inset is the same on both sides and the title is at the tags x', () => {
+  const sectionBoardInset = BOARD_INSET
+  const ltrStyle = styleOf({ sectionBoardInset, sectionInsets: SECTION_INSETS })
+  const rtlStyle = rtlOf({ sectionBoardInset, sectionInsets: SECTION_INSETS })
+  assert.deepEqual(model.boardInset(ltrStyle), { left: BOARD_INSET, right: BOARD_INSET })
+  assert.deepEqual(model.boardInset(rtlStyle), { left: BOARD_INSET, right: BOARD_INSET })
+  assert.deepEqual(model.tagColumn(ltrStyle), { left: LEADING_SMALL + BOARD_INSET, right: TRAILING_LARGE + BOARD_INSET })
+  assert.deepEqual(model.tagColumn(rtlStyle), { left: TRAILING_LARGE + BOARD_INSET, right: LEADING_SMALL + BOARD_INSET })
+  assert.deepEqual(model.headerEdges(ltrStyle), model.tagColumn(ltrStyle))
+  assert.deepEqual(model.headerEdges(rtlStyle), model.tagColumn(rtlStyle))
+  // The board keeps the margin column (physical, mirrored); the content is inside it by the inset.
+  assert.deepEqual(model.contentColumn(rtlStyle), { left: TRAILING_LARGE, right: LEADING_SMALL })
 })
 
 test('rtl mirrors the header band inset of a plain header', () => {

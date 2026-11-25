@@ -319,6 +319,9 @@ function mergeSectionStyle(style, c) {
     const n = numberValue(c[k]);
     if (n !== null) style[k] = Math.max(0, n);
   });
+  // The horizontal inset of the content column inside the board: a negative value is 0, anything unparsable stays unset.
+  const boardInsetValue = numberValue(c.sectionBoardInset);
+  if (boardInsetValue !== null) style.sectionBoardInset = Math.max(0, boardInsetValue);
   ['sectionContentInsets', 'headerContentInsets', 'headerSeparatorInsets'].forEach((k) => {
     const value = insetsValue(c[k]);
     if (value) style[k] = value;
@@ -378,6 +381,8 @@ function defaultStyle(pixelRatio = 2, dark = false) {
       top: SECTION_METRICS.cardPadding, left: SECTION_METRICS.cardPadding,
       bottom: SECTION_METRICS.cardPadding, right: SECTION_METRICS.cardPadding,
     },
+    // The horizontal inset of the content column inside the board; null = the default (sectionContentInsets' left / right, 12).
+    sectionBoardInset: null,
     headerBackgroundColor: null,
     headerCornerRadius: 0,
     headerContentInsets: { top: 0, left: SECTION_METRICS.headerBandPadding, bottom: 0, right: SECTION_METRICS.headerBandPadding },
@@ -1152,9 +1157,29 @@ function physicalInsets(style, value) {
   return isRtl(style) ? { ...value, left: value.right, right: value.left } : value;
 }
 
-/** The card's padding around the tags: `sectionContentInsets` under insetGrouped, else none. */
+/**
+ * The horizontal board inset, the ONE place it is computed: the distances from the board's left and right edges to the
+ * content column (the tags and the header block). Unset `sectionBoardInset` (null) is the default CARD_PADDING, the
+ * leading / trailing parts of `sectionContentInsets`; a set value (0 included) overrides them on both sides. None without a board.
+ */
+function boardInset(style) {
+  if (!isInsetGrouped(style)) return { left: 0, right: 0 };
+  if (style.sectionBoardInset !== null && style.sectionBoardInset !== undefined) {
+    return { left: style.sectionBoardInset, right: style.sectionBoardInset };
+  }
+  const insets = physicalInsets(style, style.sectionContentInsets);
+  return { left: insets.left, right: insets.right };
+}
+
+/**
+ * The card's padding around the tags under insetGrouped, else none: left / right from `boardInset`, top / bottom from
+ * `sectionContentInsets`.
+ */
 function cardInsets(style) {
-  return isInsetGrouped(style) ? physicalInsets(style, style.sectionContentInsets) : ZERO_INSETS;
+  if (!isInsetGrouped(style)) return ZERO_INSETS;
+  const insets = physicalInsets(style, style.sectionContentInsets);
+  const inset = boardInset(style);
+  return { top: insets.top, bottom: insets.bottom, left: inset.left, right: inset.right };
 }
 
 /** The section's column: the list width minus `sectionInsets`, as distances from the list's left and right edges (leading / trailing mirrored). */
@@ -1185,13 +1210,13 @@ function isStyledHeader(style) {
 }
 
 /**
- * The distances from the list's edges to the header's title and fold control: the board's (card's) edges, which are the
- * column's, under insetGrouped (the title aligns with the board, not with the tags inside it), the band's edges plus
- * `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
+ * The distances from the list's edges to the header's title and fold control: the tags' edges inside the board
+ * (insetGrouped: the header and the taglist always align), the band's edges plus `headerContentInsets` (a plain header
+ * with a band), else `headerHorizontalInset`.
  */
 function headerEdges(style) {
   const column = contentColumn(style);
-  if (isInsetGrouped(style)) return column;
+  if (isInsetGrouped(style)) return tagColumn(style);
   if (hasHeaderBand(style)) {
     const band = physicalInsets(style, style.headerContentInsets);
     return { left: column.left + band.left, right: column.right + band.right };
@@ -1430,7 +1455,7 @@ module.exports = {
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
-  SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
+  SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, boardInset, cardInsets, contentColumn, tagColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
   HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, HEADER_BOARD_TITLE_PADDING, HEADER_BOARD_SPACING, isHeaderTightToBoard, headerBoardOffset, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
