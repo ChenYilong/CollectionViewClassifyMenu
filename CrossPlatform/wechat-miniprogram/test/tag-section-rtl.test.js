@@ -148,8 +148,12 @@ test('headerMaxLines defaults to one line: the header keeps its height and has n
   assert.match(plain.headerStyle, new RegExp(`^height: ${DEFAULT_HEADER_HEIGHT}px; padding: 0 16px;`))
   const card = model.sectionLayout(style)
   assert.equal(card.headerTitleStyle, undefined)
-  assert.match(card.headerStyle, new RegExp(`^height: ${DEFAULT_HEADER_HEIGHT}px; margin: `))
-  assert.doesNotMatch(card.headerStyle, /min-height/)
+  // Under the board with no divider the header is the title's line plus 8, a minimum (the fixed 36 does not apply).
+  assert.match(card.headerStyle, new RegExp(`^min-height: ${model.lineHeight(style.headerFont.size) + model.HEADER_BOARD_TITLE_PADDING}px; margin: `))
+  // With the divider on it keeps the fixed height.
+  const withLine = model.sectionLayout(styleOf({ headerSeparatorStyle: 'line' }))
+  assert.match(withLine.headerStyle, new RegExp(`^height: ${DEFAULT_HEADER_HEIGHT}px; margin: `))
+  assert.doesNotMatch(withLine.headerStyle, /min-height/)
 })
 
 test('headerMaxLines 3 clamps the title to three lines and the header height becomes a minimum', () => {
@@ -158,9 +162,15 @@ test('headerMaxLines 3 clamps the title to three lines and the header height bec
   const css = model.sectionLayout(style)
   assert.match(css.headerTitleStyle, new RegExp(`-webkit-line-clamp: ${HEADER_LINES}`))
   assert.match(css.headerTitleStyle, /white-space: normal/)
-  assert.match(css.headerStyle, new RegExp(`^min-height: ${DEFAULT_HEADER_HEIGHT}px;`))
+  // No divider under the board: the title lines plus 8 (min-height line + 8, 4 above and 4 below).
+  const tightHeight = model.lineHeight(style.headerFont.size) + model.HEADER_BOARD_TITLE_PADDING
+  assert.match(css.headerStyle, new RegExp(`^min-height: ${tightHeight}px;`))
   assert.doesNotMatch(css.headerStyle, /(^|; )height:/)
-  assert.match(css.headerStyle, new RegExp(`padding: ${model.HEADER_WRAP_VERTICAL_PADDING}px `))
+  assert.match(css.headerStyle, new RegExp(`padding: ${model.HEADER_BOARD_TITLE_PADDING / 2}px `))
+  // With the divider on the old minimum and padding stay.
+  const withLine = model.sectionLayout(styleOf({ headerMaxLines: HEADER_LINES, headerSeparatorStyle: 'line' }))
+  assert.match(withLine.headerStyle, new RegExp(`^min-height: ${DEFAULT_HEADER_HEIGHT}px;`))
+  assert.match(withLine.headerStyle, new RegExp(`padding: ${model.HEADER_WRAP_VERTICAL_PADDING}px `))
   const plain = model.sectionLayout(plainOf({ headerMaxLines: HEADER_LINES }))
   assert.match(plain.headerStyle, new RegExp(`^min-height: ${DEFAULT_HEADER_HEIGHT}px; padding: ${model.HEADER_WRAP_VERTICAL_PADDING}px 16px;`))
 })

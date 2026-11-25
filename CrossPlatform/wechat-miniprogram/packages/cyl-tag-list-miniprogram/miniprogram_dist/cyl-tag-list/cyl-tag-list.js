@@ -109,7 +109,10 @@ Component({
         const rows = this.rows && this.rows[section.index];
         const expanded = !!this.expanded[section.index];
         const fold = rows && !remeasure ? model.foldState(m, rows, expanded) : { canFold: false, visible: [] };
-        const layout = model.sectionLayout(style);
+        // A section with no header (no shown title, no header fold control) keeps the section's top inset above its board.
+        const hasHeader = (m.showsSectionHeaders && section.title !== '')
+          || (fold.canFold && m.foldControl.position === 'headerTrailing');
+        const layout = model.sectionLayout(style, { hasHeader });
         const tailStyle = model.tagLayout(style, { title: 'x', enabled: true }, 'normal', { kind: 'none' },
           style.interitemSpacing, style.lineSpacing).cellStyle
           // The More tag follows the tag's font size, capped (the system font size scales the text up).
