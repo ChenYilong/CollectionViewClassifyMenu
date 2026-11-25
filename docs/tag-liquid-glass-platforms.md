@@ -65,10 +65,17 @@ the reason is recorded here (a platform's row is not final until its assessment 
 
 ## HarmonyOS capture (example page `CYLTagGlassDemoViewController`, 2026-11-26)
 
-`docs/assets/harmonyos-emulator-glass-demo-light.jpeg` and `harmonyos-emulator-glass-demo-dark.jpeg` (emulator, tab bar pin `b6e02875`):
+`docs/assets/harmonyos-emulator-glass-demo-light.jpeg` and `harmonyos-emulator-glass-demo-dark.jpeg` (emulator, tab bar pin `98966c43`, taken after the example set `cyl_colorMode`):
 glass tags, the glass section board and the glass tail fold cell on a black / white / red / blue / green plate. Seen: the board and the tags
 both have the lit edge, the tail chevron is now a glass capsule like the tags (it was an opaque capsule), and in dark mode the long header
 title "滚动隐藏：模拟意外情况（issue #13）" wraps to two lines with the "More ⌄" fold control in full at the right end (the header-room model).
 Not seen: the More and clear icon buttons next to the fold control (the page's data source does not enable them), and the light-mode header
 text on the black band and the dark-mode tags on the white band are unreadable, because the plate is a fixed colour set in both modes (a
 property of the demo plate, not of the library). No "before" capture was taken.
+
+Dark mode needs the app's color mode: `cylanimateditem` reads AppStorage `cyl_colorMode` ('dark' / 'light'; CYLTabBarController's
+`cyl_updateColorMode` sets it, light when unset). An app that uses the tag list without the tab bar module must set the key itself, or
+every glass is drawn in its light variant in dark mode (grey, bright tags and board; this is what the first dark captures showed). The
+ClassifyMenu example sets it in `EntryAbility` (`syncGlassColorMode`, `onConfigurationUpdate`). Whether `cylanimateditem` should fall back
+to the system mode by itself is the owner's decision (tab bar repo); the recaptured dark page now has dark translucent tags and board, the
+uniform rim, and the long header title wrapped with "More ⌄" in full.
