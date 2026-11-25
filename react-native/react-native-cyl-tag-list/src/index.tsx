@@ -1,6 +1,7 @@
 export { CylTagListView } from './CylTagListView';
 export type { CylTagListHandle, CylTagListProps } from './CylTagListView.native';
 export {
+  CylFoldControlContent,
   CylHeaderSeparatorStyle,
   CylSectionBackgroundStyle,
   CylSectionStyle,
@@ -9,6 +10,8 @@ export {
 } from './CylTagListConfiguration';
 export type {
   CylColorString,
+  CylFoldControl,
+  CylFoldControlPosition,
   CylInsets,
   CylSectionStyleKeys,
   CylTagListConfiguration,
