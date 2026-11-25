@@ -158,11 +158,11 @@ export default function tagSectionStyleTest() {
       // An app that never set backgroundColor gets the grouped background under the default card.
       expect(new CYLTagListState().style.resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
       expect(new CYLMenuStyle().resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
-      // An app that set one keeps it, and the plain opt-out keeps today's white.
+      // An app that set one keeps it, and the plain opt-out gets the mode-following system background.
       const set = new CYLMenuStyle();
       set.backgroundColor = RED;
       expect(set.resolvedBackgroundColor()).assertEqual(RED);
-      expect(plainStyle().resolvedBackgroundColor()).assertEqual(CYLColor.WHITE);
+      expect(plainStyle().resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.listBackground);
     });
 
     it('thePlainOptOutGivesTheFramesOfBeforeTheSectionStyle', 0, () => {
