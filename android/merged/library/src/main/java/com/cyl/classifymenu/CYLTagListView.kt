@@ -1570,7 +1570,7 @@ open class CYLTagListView @JvmOverloads constructor(
     }
 
     private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean) {
-        button.applyFoldControl(displayedFoldControl(), listStyle.foldControlColor, expanded, animated)
+        button.applyFoldControl(displayedFoldControl(), listStyle.resolvedFoldControlColor(context), expanded, animated)
         button.contentDescription = foldAccessibilityLabel(section)
         CYLAccessibilityNode.apply(button, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
     }
@@ -1898,7 +1898,7 @@ open class CYLTagListView @JvmOverloads constructor(
             val font = style.headerFontForTraitCollection()
             titleLabel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, font.size)
             titleLabel.typeface = font.typeface
-            titleLabel.setTextColor(style.headerTextColor)
+            titleLabel.setTextColor(style.resolvedHeaderTextColor(context))
             iconView.setImageDrawable(source?.menuImageForSection(section))
             accessoryView = source?.menuAccessoryViewForSection(section)
             accessoryView?.let { (it.parent as? ViewGroup)?.removeView(it); addView(it) }
@@ -1917,7 +1917,7 @@ open class CYLTagListView @JvmOverloads constructor(
             clearButton.visibility = if (showsClear) VISIBLE else GONE
             if (showsClear) {
                 val image = (style.clearButtonImage ?: CYLMenuImage("cyl_trash"))?.mutate()
-                image?.setTint(style.clearButtonColor ?: style.headerTextColor)
+                image?.setTint(style.resolvedClearButtonColor(context))
                 clearButton.setImageDrawable(image)
                 val title = source?.menuTitleForSection(section).orEmpty()
                 val clear = CYLMenuLocalizedString("CYLMenuClearSection", "The clear button of a section")
@@ -1932,7 +1932,7 @@ open class CYLTagListView @JvmOverloads constructor(
             moreButton.visibility = if (showsMore) VISIBLE else GONE
             if (showsMore) {
                 val image = (style.moreButtonImage ?: CYLMenuImage("cyl_more") ?: CYLMenuIconDrawable(CYLMenuIconDrawable.Kind.ELLIPSIS)).mutate()
-                image.setTint(style.moreButtonColor)
+                image.setTint(style.resolvedMoreButtonColor(context))
                 moreButton.setImageDrawable(image)
                 var label = source?.menuAccessibilityLabelForMoreButtonInSection(section)
                 if (label.isNullOrEmpty()) {

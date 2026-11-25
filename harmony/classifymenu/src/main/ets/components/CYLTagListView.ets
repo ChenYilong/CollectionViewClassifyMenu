@@ -86,7 +86,7 @@ class CYLSectionRender {
   fold: CYLTagRenderItem = new CYLTagRenderItem();
   showsMore: boolean = false;
   moreImage?: ResourceStr;
-  moreColor: string = CYLColor.GRAY;
+  moreColor: ResourceColor = CYLColor.GRAY;
   moreLabel: string = '';
   /** The clear button (`menuShowsClearButtonForSection`): a square as tall as a line of the title. */
   showsClear: boolean = false;
@@ -522,7 +522,7 @@ export struct CYLTagListView {
     h.key = ['h', h.showsClear, h.clearLabel, h.clearSide, CYLColorKey(h.clearColor), h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
       h.inset,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
-      h.fold.key, h.showsMore, h.moreColor, h.moreLabel, h.accessory !== undefined].join('|');
+      h.fold.key, h.showsMore, CYLColorKey(h.moreColor), h.moreLabel, h.accessory !== undefined].join('|');
     return h;
   }
 

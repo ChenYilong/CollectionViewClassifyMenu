@@ -30,11 +30,11 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
     }
 
     fun applyInlineFoldControl(foldControl: CYLMenuFoldControl, itemStyle: CYLMenuStyle, expanded: Boolean, animated: Boolean) {
-        apply(foldControl, inlineStyleForFoldControl(foldControl, itemStyle), expanded, animated)
+        apply(foldControl, inlineStyleForFoldControl(foldControl, itemStyle, context), expanded, animated)
     }
 
     fun applyFoldControl(foldControl: CYLMenuFoldControl, color: Int?, expanded: Boolean, animated: Boolean) {
-        apply(foldControl, styleForFoldControl(foldControl, color), expanded, animated)
+        apply(foldControl, styleForFoldControl(foldControl, color, context), expanded, animated)
     }
 
     private fun apply(foldControl: CYLMenuFoldControl, style: CYLMenuStyle, expanded: Boolean, animated: Boolean) {
@@ -59,10 +59,10 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
         private const val MARGIN = 6f
         private const val HEIGHT = 28f
 
-        private fun styleForFoldControl(control: CYLMenuFoldControl, color: Int?): CYLMenuStyle {
+        private fun styleForFoldControl(control: CYLMenuFoldControl, color: Int?, context: Context? = null): CYLMenuStyle {
             val style = CYLMenuStyle.defaultStyle()
             val font = control.font ?: CYLFont.systemFont(13f)
-            val tint = control.color ?: color ?: Color.argb(153, 60, 60, 67)
+            val tint = control.color ?: color ?: context?.let { CYLSystemColors.primary(it) } ?: Color.argb(153, 60, 60, 67)
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 val appearance = style.appearanceForState(state)
                 appearance.backgroundColor = Color.TRANSPARENT
@@ -82,19 +82,20 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
             return style
         }
 
-        private fun inlineStyleForFoldControl(control: CYLMenuFoldControl, itemStyle: CYLMenuStyle): CYLMenuStyle {
+        private fun inlineStyleForFoldControl(control: CYLMenuFoldControl, itemStyle: CYLMenuStyle, context: Context? = null): CYLMenuStyle {
             val style = itemStyle.copy()
             val normal = itemStyle.normalAppearance
-            val tint = control.color ?: itemStyle.foldControlColor
+            // The tint and the colors a tag leaves unset are resolved for the context (dark mode); without one (a size) they do not matter.
+            val tint = control.color ?: itemStyle.foldControlColor ?: context?.let { CYLSystemColors.primary(it) } ?: Color.BLACK
             for (state in listOf(CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 val appearance = style.appearanceForState(state)
-                appearance.backgroundColor = normal.backgroundColor
+                appearance.backgroundColor = context?.let { normal.resolvedBackgroundColor(it) } ?: normal.backgroundColor
                 appearance.borderColor = normal.borderColor
                 appearance.borderWidth = normal.borderWidth
                 appearance.cornerRadius = normal.cornerRadius
                 appearance.margin = normal.margin
                 appearance.font = normal.font
-                appearance.textColor = normal.textColor
+                appearance.textColor = context?.let { normal.resolvedTextColor(it) } ?: normal.textColor
             }
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) style.setIconColor(tint, state)
             control.font?.let { font -> listOf(style.normalAppearance, style.selectedAppearance, style.disabledAppearance).forEach { it.font = font } }
