@@ -1,6 +1,7 @@
 import { ON } from '@kit.TestKit';
 import { describe, it, expect } from '@ohos/hypium';
 import { CYLExampleLocalizedString } from '../../../main/ets/data/CYLExampleLocalization';
+import { GLASS_LONG_TITLE, GLASS_LONG_TITLE_FOLD_ID } from '../../../main/ets/demos/menu/CYLTagGlassPage';
 import { cylBack, cylLaunchExample, cylTapAccessible, cylText } from './TestSupport';
 
 /**
@@ -42,6 +43,26 @@ export default function stylesAndAnimationsTest() {
       await driver.assertComponentExist(ON.id('configurationFileList'));
       await driver.assertComponentExist(ON.id('configurationMapList'));
       await driver.assertComponentExist(ON.text(CYLExampleLocalizedString('配置初始化')));
+      await cylBack(driver);
+    })
+
+    it('glassDemoShowsHeaderFoldAndLongTitleOnScreen', 0, async () => {
+      const driver = await cylLaunchExample();
+      await cylTapAccessible(driver, CYLExampleLocalizedString('样式'), 'tab-样式', 1200);
+      await cylTapAccessible(driver, CYLExampleLocalizedString('液态玻璃：标签、分区板与折叠控件'), 'style-glass', 1500);
+      await driver.assertComponentExist(ON.id('CYLTagGlassDemoViewController'));
+      await driver.assertComponentExist(ON.text(CYLExampleLocalizedString('液态玻璃')));
+      const screenWidth = (await driver.getDisplaySize()).x;
+      // The header fold control of the long-title section is on screen: its right edge is within the screen width.
+      const fold = await driver.findComponent(ON.id(GLASS_LONG_TITLE_FOLD_ID));
+      expect(fold !== null).assertTrue();
+      const foldBounds = await fold!.getBounds();
+      expect(foldBounds.right > 0 && foldBounds.right <= screenWidth).assertTrue();
+      // The long title is on screen too.
+      const title = await driver.findComponent(ON.text(CYLExampleLocalizedString(GLASS_LONG_TITLE)));
+      expect(title !== null).assertTrue();
+      const titleBounds = await title!.getBounds();
+      expect(titleBounds.right > 0 && titleBounds.right <= screenWidth).assertTrue();
       await cylBack(driver);
     })
   })
