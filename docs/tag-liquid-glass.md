@@ -134,4 +134,3 @@ An EXPLICIT icon color (the app called `setIconColor` for the state) that is too
 | Platform | Status |
 |:--|:--|
 | iOS | Reference (`CYLIconContrast.swift`, `CYLTagButton`). |
-| Android | `CYLIconContrast.kt`; `CYLTagButton.updateAppearance` lifts the icon color filter (night mode = `CYLSystemColors.isNight`, glass = `resolvedBackgroundStyle`, explicit = `CYLMenuStyle.explicitIconColorForState`); `CYLIconContrastTest`, written statically, not yet run. |
