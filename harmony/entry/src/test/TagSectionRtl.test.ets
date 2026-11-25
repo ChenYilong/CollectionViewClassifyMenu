@@ -10,7 +10,7 @@ const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.fr
 const LIST_WIDTH: number = 320;
 /** The default section insets, left and right. */
 const SIDE_INSET: number = 16;
-const TAG_WIDTH: number = 70;
+const TAG_WIDTH: number = 80;
 const THREE_TAGS: number = 3;
 const EIGHT_TAGS: number = 8;
 const BAND_COLOR: string = '#FFEFEFF4';
@@ -20,7 +20,7 @@ const TRAILING_INSET: number = 4;
 const CARD_LEADING: number = 20;
 const CARD_TRAILING: number = 8;
 
-/** One section of same-width tags ("Tag 00": 70 vp each). */
+/** One section of same-width tags ("Tag 00": 80 vp each: 60 vp of text and the tag padding). */
 class CYLRtlSource implements CYLMenuDataSource {
   count: number;
 

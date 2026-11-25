@@ -3,7 +3,7 @@ import { CYLLiquidGlass } from 'cylanimateditem';
 import {
   CYLColor, CYLColorKey, CYLControlState, CYLEdgeInsets, CYLFont, CYLHeaderSeparatorStyle, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuStyle, CYLRect, CYLSectionStyle, CYLSectionStyleColors,
-  CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButtonMetrics, CYLTintLuminanceThreshold, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
+  CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTintLuminanceThreshold, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
   CYLTextMeasurer
 } from '@cyl/classifymenu';
 

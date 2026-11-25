@@ -284,16 +284,17 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "notnight")
     fun theDefaultListBackgroundIsWhiteInLightMode() {
-        assertEquals(Color.WHITE, CYLMenuStyle().resolvedBackgroundColor(context))
-        assertEquals(Color.WHITE, backgroundPixel(makeList(CYLMenuStyle(), 3)))
+        // The plain look: an unset background is the system background (the card default is the grouped background).
+        assertEquals(Color.WHITE, plain().resolvedBackgroundColor(context))
+        assertEquals(Color.WHITE, backgroundPixel(makeList(plain(), 3)))
     }
 
     @Test
     @Config(qualifiers = "night")
     fun theDefaultListBackgroundIsBlackInDarkMode() {
-        assertEquals(Color.BLACK, CYLMenuStyle().resolvedBackgroundColor(context))
-        assertEquals(Color.BLACK, backgroundPixel(makeList(CYLMenuStyle(), 3)))
-        assertEquals(Color.BLACK, CYLMenuStyle().copy().resolvedBackgroundColor(context))
+        assertEquals(Color.BLACK, plain().resolvedBackgroundColor(context))
+        assertEquals(Color.BLACK, backgroundPixel(makeList(plain(), 3)))
+        assertEquals(Color.BLACK, plain().copy().resolvedBackgroundColor(context))
     }
 
     @Test
@@ -469,8 +470,8 @@ class CYLTagSectionStyleTest {
     fun aDefaultListIsBlackInDarkModeAndItsTintIsLight() {
         assertEquals(Color.BLACK, backgroundPixel(makeList(CYLMenuStyle(), 3)))
         assertEquals(Color.WHITE, CYLMenuStyle().resolvedTintColor(context))
-        // plain keeps the white the list painted before, so its tint stays dark in either mode.
-        assertEquals(Color.BLACK, plain().resolvedTintColor(context))
+        // plain: the unset background is the system background (black in dark mode), so its tint is light there too.
+        assertEquals(Color.WHITE, plain().resolvedTintColor(context))
     }
 
     @Test
