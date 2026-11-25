@@ -147,6 +147,11 @@ const APP_TINT_COLOR = '#2AB9A0';
  * UIKit's systemGray6, and a configured clear / transparent / zero-alpha background falls back to it.
  */
 const DEFAULT_TAG_BACKGROUND = '#F2F2F7';
+/**
+ * The line limits of a tag's title (style key `titleMaxLines`): named values, never a literal at a call site.
+ * `single` is the default (a title too wide is truncated); `unlimited` shows every line.
+ */
+const TITLE_MAX_LINES = { single: 1, unlimited: Number.MAX_SAFE_INTEGER };
 
 /**
  * A background that may be transparent (style key `allowsTransparentBackground`): `transparent`, `clear` and zero alpha
@@ -203,6 +208,7 @@ function defaultStyle(pixelRatio = 2) {
     normal, selected, disabled,
     imageTitleSpacing: 4,
     itemHeight: 30,
+    titleMaxLines: TITLE_MAX_LINES.single,
     itemsPerRow: 0,
     interitemSpacing: 10,
     lineSpacing: 10,
@@ -305,6 +311,13 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   };
   num('imageTitleSpacing');
   num('itemHeight');
+  // The most lines a title may take: a whole number of 1 or more, or "unlimited"; anything else is one line.
+  if (c.titleMaxLines === 'unlimited') {
+    style.titleMaxLines = TITLE_MAX_LINES.unlimited;
+  } else if (c.titleMaxLines !== undefined) {
+    const lines = numberValue(c.titleMaxLines);
+    style.titleMaxLines = lines !== null && lines >= TITLE_MAX_LINES.single ? Math.floor(lines) : TITLE_MAX_LINES.single;
+  }
   num('itemsPerRow', 'itemsPerRow', 0);
   num('interitemSpacing');
   num('lineSpacing');
@@ -820,8 +833,10 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const background = appearance.backgroundImage
     ? `background-image: url("${appearance.backgroundImage}"); background-size: 100% 100%`
     : '';
+  // A title that may wrap (titleMaxLines above 1) grows the tag: the height is a minimum and the text wraps.
+  const wraps = style.titleMaxLines > TITLE_MAX_LINES.single;
   const cell = [
-    `height: ${height}px`,
+    wraps ? `min-height: ${height}px; white-space: normal; height: auto` : `height: ${height}px`,
     `padding: 0 ${Math.max(0, right - border)}px 0 ${Math.max(0, left - border)}px`,
     `margin: 0 ${interitemSpacing}px ${lineSpacing}px 0`,
     fontCSS(appearance.font),
@@ -843,6 +858,10 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   return {
     height,
     cellStyle: cell,
+    // The title's own style: at most titleMaxLines lines, then an ellipsis (every line when unlimited).
+    titleTextStyle: !wraps ? '' : style.titleMaxLines === TITLE_MAX_LINES.unlimited
+      ? 'white-space: normal; overflow: visible; text-overflow: clip'
+      : `white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: ${style.titleMaxLines}; overflow: hidden; text-overflow: ellipsis`,
     glass,
     slotStyle: showsImage
       ? `width: ${slot.width}px; height: ${slot.height}px; ${gap}: ${spacing}px; left: ${io.horizontal}px; top: ${io.vertical}px`
@@ -935,7 +954,7 @@ module.exports = {
   cylAnimatedItemCornerRadiusCapsule,
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
-  longPressActions, longPressDecision,
+  longPressActions, longPressDecision, TITLE_MAX_LINES,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,

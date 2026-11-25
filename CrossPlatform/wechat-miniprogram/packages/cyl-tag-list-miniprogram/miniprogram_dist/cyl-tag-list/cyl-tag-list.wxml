@@ -37,7 +37,7 @@
           </view>
           <view wx:if="{{item.spacerStyle}}" class="cyl-spacer" style="{{item.spacerStyle}}" />
           <view wx:if="{{item.showsTitle}}" class="cyl-title-box" style="{{item.titleStyle}}">
-            <text class="cyl-title">{{item.title}}</text>
+            <text class="cyl-title" style="{{item.titleTextStyle}}">{{item.title}}</text>
             <text wx:for="{{item.sizers}}" wx:for-item="sizer" wx:key="*this" class="cyl-sizer" style="{{sizer}}" aria-hidden="true">{{item.title}}</text>
           </view>
         </view>

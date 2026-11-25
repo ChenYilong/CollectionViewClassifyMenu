@@ -14,7 +14,7 @@
     <text wx:if="{{view.showsBadge}}" class="cyl-badge" style="{{view.badgeStyle}}" aria-hidden="true">{{view.badgeText}}</text>
   </view>
   <view wx:if="{{view.showsTitle}}" class="cyl-title-box" style="{{view.titleStyle}}">
-    <text class="cyl-title">{{view.title}}</text>
+    <text class="cyl-title" style="{{view.titleTextStyle}}">{{view.title}}</text>
     <text wx:if="{{view.showsBadge && view.iconKind === 'none'}}" class="cyl-badge" style="{{view.badgeStyle}}" aria-hidden="true">{{view.badgeText}}</text>
   </view>
 </view>
