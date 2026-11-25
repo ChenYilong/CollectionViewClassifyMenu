@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle, CYLLiquidGlass } from 'cylanimateditem';
 import {
-  CYLColor, CYLColorKey, CYLFont, CYLMenuStyle, CYLTagAppearance, CYLTagBackgroundStyle, CYLTagButton,
-  CYLTagButtonMetrics, CYLTagListState, CYLTextMeasurer
+  CYLColor, CYLColorKey, CYLFont, CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuStyle,
+  CYLTagAppearance, CYLTagBackgroundStyle, CYLTagButton, CYLTagButtonMetrics, CYLTagFoldButton, CYLTagFoldMetrics,
+  CYLTagListState, CYLTextMeasurer
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -164,5 +165,71 @@ export default function tagGlassBackgroundTest() {
       expect(CYLColorKey(button.backgroundColor)).assertEqual(CYLColorKey(CYLTagAppearance.defaultBackgroundColor));
       expect(button.itemBackgroundStyle === CYLAnimatedItemBackgroundStyle.liquidGlass).assertFalse();
     });
+
+    it('theTailCellInAGlassListHasTheTagsGlassWithNoTintWhenUnset', 0, () => {
+      const style = glassStyle();
+      expectTailLooksLikeATag(style);
+      const cell = tailCell(style);
+      expect(cell.itemBackgroundStyle).assertEqual(CYLAnimatedItemBackgroundStyle.liquidGlass);
+      expect(cell.backgroundColor).assertEqual(CYLTagButton.GLASS_DEFAULT_TINT);
+      // foldControlColor tints the icon only, never the background.
+      expect(cell.backgroundColor === BLUE).assertFalse();
+    });
+
+    it('theTailCellInAGlassListHandsTheExplicitBackgroundBorderAndRadius', 0, () => {
+      const style = glassStyle();
+      style.normalAppearance.backgroundColor = RED;
+      style.normalAppearance.borderColor = BLUE;
+      style.normalAppearance.borderWidth = 2;
+      style.normalAppearance.cornerRadius = 9;
+      expectTailLooksLikeATag(style);
+      const cell = tailCell(style);
+      expect(cell.backgroundColor).assertEqual(RED);
+      expect(cell.borderWidth).assertEqual(2);
+      expect(cell.appearanceCornerRadius).assertEqual(9);
+    });
+
+    it('theTailCellInAFlatListKeepsTheEffectiveBackgroundLikeATag', 0, () => {
+      const style = new CYLMenuStyle();
+      expectTailLooksLikeATag(style);
+      expect(tailCell(style).itemBackgroundStyle).assertEqual(CYLAnimatedItemBackgroundStyle.flat);
+      const explicit = new CYLMenuStyle();
+      explicit.normalAppearance.backgroundColor = RED;
+      expectTailLooksLikeATag(explicit);
+      expect(tailCell(explicit).backgroundColor).assertEqual(RED);
+    });
+
+    it('theTailCellWhereTheSystemDrawsNoGlassIsFlatLikeATag', 0, () => {
+      CYLLiquidGlass.activeOverride = false;
+      expectTailLooksLikeATag(glassStyle());
+      expect(tailCell(glassStyle()).itemBackgroundStyle).assertEqual(CYLAnimatedItemBackgroundStyle.flat);
+    });
   });
+}
+
+/** The inline (tail) fold control of `style`, applied like the list does; its icon color is BLUE. */
+function tailCell(style: CYLMenuStyle): CYLTagFoldButton {
+  const control = new CYLMenuFoldControl(CYLMenuFoldControlPosition.tail, CYLMenuFoldControlContent.icon);
+  control.color = BLUE;
+  const cell = new CYLTagFoldButton();
+  cell.applyInlineFoldControl(control, style, false, false);
+  cell.setBounds(BUTTON_HEIGHT, BUTTON_HEIGHT);
+  return cell;
+}
+
+function expectTailLooksLikeATag(style: CYLMenuStyle): void {
+  const tag = buttonWith(style);
+  const cell = tailCell(style);
+  expect(cell.itemBackgroundStyle).assertEqual(tag.itemBackgroundStyle);
+  expect(cell.backgroundColor).assertEqual(tag.backgroundColor);
+  expect(cell.appearanceCornerRadius).assertEqual(tag.appearanceCornerRadius);
+  expect(cell.borderWidth).assertEqual(tag.borderWidth);
+  expect(CYLColorKey(cell.borderColor)).assertEqual(CYLColorKey(tag.borderColor));
+  expect(cell.glassTintAlpha).assertEqual(tag.glassTintAlpha);
+  // The list's render item takes the same values from the style the tail cell uses (CYLTagListView.foldCell).
+  const control = new CYLMenuFoldControl(CYLMenuFoldControlPosition.tail, CYLMenuFoldControlContent.icon);
+  const inline = CYLTagFoldMetrics.inlineStyle(control, style);
+  expect(CYLTagButton.itemBackgroundStyleOf(inline)).assertEqual(tag.itemBackgroundStyle);
+  expect(CYLTagButton.itemBackgroundColor(inline, inline.normalAppearance)).assertEqual(tag.backgroundColor);
+  expect(inline.normalAppearance.cornerRadius).assertEqual(style.normalAppearance.cornerRadius);
 }

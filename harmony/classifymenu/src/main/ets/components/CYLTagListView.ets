@@ -8,7 +8,7 @@ import { CYLTagAnimatedIcon, cylTagAnimationImage } from './CYLTagAnimatedIcon';
 import {
   CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
 } from './CYLTagListSupplementaryView';
-import { CYLTagButtonComponent } from '../tagviews/CYLTagButton';
+import { CYLTagButton, CYLTagButtonComponent } from '../tagviews/CYLTagButton';
 import { CYLTagListCell, CYLTagListCellComponent } from '../tagviews/CYLTagListCell';
 import { CYLIndexPath, CYLTagListController, CYLTagTap } from './CYLTagListModel';
 import {
@@ -49,6 +49,10 @@ class CYLTagRenderItem {
   borderColor: ResourceColor = CYLColor.CLEAR;
   borderWidth: number = 0;
   cornerRadius: number = 0;
+  /** The inline fold cell: the background style a tag of its list draws (glass or flat). */
+  itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  /** The inline fold cell: the appearance's radius as it is (the capsule constant by default), as `CYLTagButton`. */
+  appearanceCornerRadius: number = 0;
   paddingLeft: number = 0;
   paddingRight: number = 0;
   image?: CYLImage;
@@ -390,7 +394,7 @@ export struct CYLTagListView {
     r.key = [extra, r.section, r.item, rive ? 'riv' : r.x, rive ? '' : r.y, rive ? '' : r.width, rive ? '' : r.height,
       r.title, r.fontSize, r.fontWeight, CYLColorKey(r.textColor),
       CYLColorKey(r.backgroundColor), CYLColorKey(r.highlightedBackgroundColor), CYLColorKey(r.borderColor),
-      r.borderWidth, r.cornerRadius,
+      r.borderWidth, r.cornerRadius, r.itemBackgroundStyle, r.appearanceCornerRadius,
       r.paddingLeft, r.paddingRight, imageKey(r.image), r.animation ?? '', r.iconWidth, r.iconHeight,
       CYLColorKey(r.iconColor),
       r.iconRotation, r.imageTrailing, r.alignLeading, r.spacing, r.selected, r.enabled, r.deletable, r.deleteTitle,
@@ -518,6 +522,14 @@ export struct CYLTagListView {
     const r = this.foldItem(control, style, frame.expanded, new CYLSize(cell.width, cell.height), cell.section);
     r.item = cell.item;
     r.isFoldCell = true;
+    // The same background strategy as a tag (CYLTagButton): the list's glass or flat style, only an explicit normal
+    // background tints the glass, the tag's radius and border. foldControlColor tints the icon only.
+    const normal = style.normalAppearance;
+    r.itemBackgroundStyle = CYLTagButton.itemBackgroundStyleOf(style);
+    r.backgroundColor = CYLTagButton.itemBackgroundColor(style, normal);
+    r.appearanceCornerRadius = normal.cornerRadius;
+    // As CYLTagButton: no border color means no border.
+    r.borderWidth = normal.borderColor !== undefined ? normal.borderWidth : 0;
     r.x = cell.x;
     r.y = cell.y + titleHeight;
     this.finishKey(r, 'f');
@@ -705,14 +717,6 @@ export struct CYLTagListView {
     return r;
   }
 
-  /**
-   * The corner radius a tag draws (CYLTagButton's rule): points, at most half the height (0 is square, half the height
-   * or more a capsule). The inline fold cell uses it too, so it has the tags' shape.
-   */
-  private tagCornerRadius(r: CYLTagRenderItem): number {
-    return Math.min(r.cornerRadius, r.height / 2);
-  }
-
   private frameOf(r: CYLTagRenderItem): number[] {
     return this.frames.get(r.key) ?? [r.x, r.y, r.width, r.height];
   }
@@ -893,8 +897,9 @@ export struct CYLTagListView {
     .height(r.height)
     .padding({ left: r.paddingLeft, right: r.paddingRight })
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(r.backgroundColor)
-    .border({ width: r.borderWidth, color: r.borderColor, radius: this.tagCornerRadius(r) })
+    // Background, radius and border: cylanimateditem's one interface, as a tag (CYLTagButtonComponent).
+    .attributeModifier(new CYLAnimatedItemBackgroundModifier(r.itemBackgroundStyle, r.backgroundColor,
+      r.appearanceCornerRadius, r.borderWidth, r.borderColor))
     .position({ x: r.x, y: r.y })
     .id(`CYLTagListFold-${r.section}`)
     .accessibilityGroup(true)
