@@ -446,6 +446,62 @@ tagListView.tagDeleteHandler = { index, tag in print("deleted", index, tag.title
 | Tag cloud in code and from a dictionary | <img src="assets/test-tag-cloud-android-api.png" width="280" alt="标签云"> |
 | A deletable tag | <img src="assets/test-tag-cloud-deletable.png" width="280" alt="可删除"> |
 
+#### 分区卡片的默认外观 / Default look: the section card
+
+| 中文 | English |
+|:---|:---|
+| **默认外观已改变：**标签列表现在默认把每个分区的标签放在圆角卡片上（`sectionStyle = insetGrouped`）；如果你从未设置 `backgroundColor`，列表背景会变成分组背景（#F2F2F7，深色模式为黑色）。要去掉卡片，请设置 `sectionStyle` 为 `plain`。分区标题的分隔线默认**关闭**，需要时把 `headerSeparatorStyle` 设为 `line`。 | **The default look changed:** a tag list now shows each section's tags on a rounded card by default (`sectionStyle = insetGrouped`); if you never set `backgroundColor`, the list background becomes the grouped background (#F2F2F7; black in dark mode). To remove the card, set `sectionStyle` to `plain`. The header divider is **off** by default; to show it, set `headerSeparatorStyle` to `line`. |
+| 可选项（都是 `CYLMenuStyle` 的属性，也是配置文件 `style` 中的同名键）：`sectionBackgroundColor`、`sectionCornerRadius`（默认 10）、`sectionContentInsets`（卡片内边距，默认 12）；分区标题背景条 `headerBackgroundColor`（默认无）、`headerCornerRadius`、`headerContentInsets`；分隔线 `headerSeparatorColor`、`headerSeparatorThickness`（默认 0.5）、`headerSeparatorInsets`（默认 0，与卡片和标题背景条左右边缘一致）。 | Options (all are `CYLMenuStyle` properties and the same-named keys of a configuration's `style`): `sectionBackgroundColor`, `sectionCornerRadius` (default 10), `sectionContentInsets` (the card's padding, default 12); the optional header band `headerBackgroundColor` (none by default), `headerCornerRadius`, `headerContentInsets`; the divider's `headerSeparatorColor`, `headerSeparatorThickness` (default 0.5) and `headerSeparatorInsets` (default 0: the same left and right edges as the card and the band). |
+| `sectionBackgroundStyle` 为 `flat`（默认，纯色卡片）或 `liquidGlass`（液态玻璃卡片；平台不支持时回退为 `flat`）。`tintColor` 是内置的分区标题、图标和更多 / 收起控件的唯一颜色；默认会按其背后的背景自动选择清晰的黑色或白色。所有新增颜色都会自动适应浅色 / 深色模式，你设置的颜色在两种模式下都生效。 | `sectionBackgroundStyle` is `flat` (the default, a solid card) or `liquidGlass` (a Liquid Glass card; it falls back to `flat` where the platform cannot draw glass). `tintColor` is the one color of the built-in section title, icon and More / Less control; by default it is black or white, whichever is legible on the background behind it. Every new color adapts to light and dark mode by itself, and a color you set wins in both modes. |
+| **迁移：默认外观改变（破坏性的视觉变更）。**升级后未做任何设置的列表会出现圆角卡片和分组背景。要恢复旧外观，请设置 `sectionStyle` 为 `plain`（Swift：`style.sectionStyle = .plain`；Kotlin：`style.sectionStyle = CYLSectionStyle.CYLSectionStylePlain`；ArkTS：`style.sectionStyle = CYLSectionStyle.plain`；配置：`"sectionStyle": "plain"`）。依赖像素位置的截图或界面测试需要更新。 | **Migration: the default look changed (a breaking visual change).** After the upgrade a list that sets nothing shows the rounded card and the grouped background. To get the old look back, set `sectionStyle` to `plain` (Swift: `style.sectionStyle = .plain`; Kotlin: `style.sectionStyle = CYLSectionStyle.CYLSectionStylePlain`; ArkTS: `style.sectionStyle = CYLSectionStyle.plain`; configuration: `"sectionStyle": "plain"`). Screenshots and UI tests that depend on pixel positions need updating. |
+
+```swift
+// Swift (iOS): the card is the default; opt out, or add the divider, band, glass card and tint.
+let style = CYLMenuStyle()
+style.sectionStyle = .plain                    // remove the rounded card (the old look)
+style.headerSeparatorStyle = .line             // show the header divider (off by default)
+style.headerSeparatorColor = .separator        // optional; thickness, insets: headerSeparatorThickness / headerSeparatorInsets
+style.headerBackgroundColor = .systemGray5     // optional header band (none by default)
+style.sectionBackgroundStyle = .liquidGlass    // glass card, flat where unsupported
+style.tintColor = .systemBlue                  // header title, icon and More / Less
+```
+
+```kotlin
+// Kotlin (Android)
+val style = CYLMenuStyle()
+style.sectionStyle = CYLSectionStyle.CYLSectionStylePlain                       // remove the card
+style.headerSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine // show the divider
+style.headerBackgroundColor = 0xFFEFEFF4.toInt()                                // optional band
+style.sectionBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+style.tintColor = 0xFF007AFF.toInt()
+```
+
+```ts
+// ArkTS (HarmonyOS)
+const style: CYLMenuStyle = new CYLMenuStyle();
+style.sectionStyle = CYLSectionStyle.plain;                       // remove the card
+style.headerSeparatorStyle = CYLHeaderSeparatorStyle.line;        // show the divider
+style.headerBackgroundColor = '#FFEFEFF4';                        // optional band
+style.sectionBackgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+style.tintColor = '#FF007AFF';
+```
+
+```json
+{
+  "style": {
+    "sectionStyle": "plain",
+    "headerSeparatorStyle": "line",
+    "headerBackgroundColor": "#EFEFF4",
+    "sectionBackgroundStyle": "liquidGlass",
+    "tintColor": "#007AFF"
+  }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 同一份配置也适用于微信小程序、Flutter（`configuration` 的 `style`）和 React Native（有类型的 `CylSectionStyle`、`CylHeaderSeparatorStyle`、`CylSectionBackgroundStyle`，见各自的 README）。 | The same configuration works in the WeChat Mini Program, Flutter (the `style` of `configuration`) and React Native (typed `CylSectionStyle`, `CylHeaderSeparatorStyle` and `CylSectionBackgroundStyle`; see each README). |
+
 ### Android 版（Kotlin） / Android version (Kotlin)
 
 | 中文 | English |

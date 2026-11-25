@@ -33,6 +33,47 @@ controller.playAll();     // from progress 0
   `state()`, which reads what the native list holds.
 - Status: iOS and Android pass the integration test and play the animated icons (see docs/cross-platform.md).
 
+## Section card, header divider and tint (the default look changed)
+
+A tag list now shows each section's tags on a rounded card by default (`sectionStyle` `insetGrouped`). If you never set
+`backgroundColor`, the list background becomes the grouped background (#F2F2F7; black in dark mode). The header divider is
+**off** by default. The header band (`headerBackgroundColor`) is off by default too.
+
+`configuration` is passed to the native list as it is, so the keys go in its `style` map (strings and numbers work for every value; there is no typed Dart class for them):
+
+- Remove the card: `'style': {'sectionStyle': 'plain'}`.
+- Show the header divider: `headerSeparatorStyle` `line`, optionally with `headerSeparatorColor`, `headerSeparatorThickness`
+  (default 0.5) and `headerSeparatorInsets` (default 0: it spans the same left and right edges as the card and the band).
+- Optional header band: `headerBackgroundColor`, with `headerCornerRadius` and `headerContentInsets`.
+- The card: `sectionBackgroundColor`, `sectionCornerRadius` (default 10), `sectionContentInsets` (default 12), and
+  `sectionBackgroundStyle` `flat` (default) or `liquidGlass` (falls back to flat where the platform cannot draw glass).
+- `tintColor`: the one color of the built-in header title, icon and More / Less control. Left out, it is black or white,
+  whichever is legible on the background behind them.
+- Every new color adapts to light and dark mode by itself; a color you set wins in both modes.
+
+### Migration: the default look changed
+
+This is a breaking visual change: a list that sets nothing now shows the rounded card and the grouped background. To get the
+old look, set `sectionStyle` to `plain`. Screenshots and tests that depend on pixel positions need updating.
+
+```dart
+CylTagListView(
+  controller: controller,
+  configuration: {
+    'style': {
+      'sectionStyle': 'plain',              // remove the card; leave 'style' out for the default card
+      'headerSeparatorStyle': 'line',       // the divider is opt-in
+      'headerBackgroundColor': '#EFEFF4',   // optional band
+      'sectionBackgroundStyle': 'liquidGlass',
+      'tintColor': '#007AFF',
+    },
+    'sections': [{'title': 'Reviews', 'items': [{'title': 'All'}]}],
+  },
+);
+```
+
+`controller.applyConfiguration({'style': {'sectionStyle': 'plain'}})` changes a shown list; keys that are missing keep their values.
+
 ## iOS
 
 The plugin's podspec depends on the `CollectionViewClassifyMenu` pod, which is a static framework: the app links

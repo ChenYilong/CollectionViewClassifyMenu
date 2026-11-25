@@ -13,6 +13,9 @@ jest.mock('../CylTagListViewNativeComponent', () => {
 
 import { CylTagListView, type CylTagListHandle } from '../CylTagListView.native';
 import {
+  CylHeaderSeparatorStyle,
+  CylSectionBackgroundStyle,
+  CylSectionStyle,
   CylTagLongPressActionName,
   CylTagTitleMaxLinesUnlimited,
   type CylTagListConfiguration,
@@ -72,6 +75,50 @@ describe('CylTagListView', () => {
     expect(sent.sections).toHaveLength(2);
     expect(sent.style.titleMaxLines).toBe('unlimited');
     expect(sent.longPressAction).toEqual(['callout']);
+  });
+
+  it('sends the typed section style keys to the native list as they are', () => {
+    const configuration: CylTagListConfiguration = {
+      style: {
+        sectionStyle: CylSectionStyle.plain,
+        sectionBackgroundColor: '#FFFFFF',
+        sectionBackgroundStyle: CylSectionBackgroundStyle.liquidGlass,
+        sectionCornerRadius: 16,
+        sectionContentInsets: [8, 12, 8, 12],
+        headerBackgroundColor: '#EFEFF4',
+        headerCornerRadius: 6,
+        headerContentInsets: { top: 0, left: 10, bottom: 0, right: 10 },
+        headerSeparatorStyle: CylHeaderSeparatorStyle.line,
+        headerSeparatorColor: '#000000',
+        headerSeparatorThickness: 1,
+        headerSeparatorInsets: '{0, 4, 0, 4}',
+        tintColor: 'systemBlue',
+        titleMaxLines: 2,
+      },
+      sections: [{ title: 'Flows', items: [{ title: 'Switch states' }] }],
+    };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.style.sectionStyle).toBe('plain');
+    expect(sent.style.sectionBackgroundStyle).toBe('liquidGlass');
+    expect(sent.style.headerSeparatorStyle).toBe('line');
+    expect(sent.style.sectionContentInsets).toEqual([8, 12, 8, 12]);
+    expect(sent.style.tintColor).toBe('systemBlue');
+  });
+
+  it('names the section style values as the native parsers read them', () => {
+    expect(CylSectionStyle).toEqual({ plain: 'plain', insetGrouped: 'insetGrouped' });
+    expect(CylSectionBackgroundStyle).toEqual({ flat: 'flat', liquidGlass: 'liquidGlass' });
+    expect(CylHeaderSeparatorStyle).toEqual({ none: 'none', line: 'line' });
+  });
+
+  it('sends a configuration without section keys unchanged, so the native defaults apply (card on, divider off)', () => {
+    const configuration: CylTagListConfiguration = { sections: [{ title: 'Flows', items: [{ title: 'A' }] }] };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.style).toBeUndefined();
   });
 
   it('runs the playAll command on the native view', () => {
