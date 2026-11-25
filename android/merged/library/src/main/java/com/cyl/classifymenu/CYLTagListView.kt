@@ -106,6 +106,30 @@ open class CYLTagListView @JvmOverloads constructor(
     /** The label of `titleView`. */
     val titleLabel: TextView get() = titleView.titleLabel
 
+    /**
+     * `backdropSource` (Android only): the view the Liquid Glass of this list's tags, fold controls and section boards blurs and
+     * refracts. null (the default) keeps the library's choice, the root of the window's views, which CONTAINS the list: the
+     * glass then cannot sample it and draws only its tint and rim.
+     *
+     * The one rule: the source must be a view BEHIND the list and NOT an ancestor of it, a sibling plate (for example the
+     * gradient view under the list in the same parent). The core does not check or guess: an ancestor is passed through
+     * unchanged and the glass then draws tint + rim, as with null. Below Android 12 (API 31) nothing is sampled and the
+     * frosted tint + rim fallback shows; refraction needs API 33+ (blur only on API 31 and 32).
+     *
+     * One parameter for the whole list: it is forwarded to every glass host the list makes, now and when it rebuilds (every
+     * `CYLTagButton`, the inline and header/footer fold controls, the list title and the section boards), and the setter
+     * applies it to the views already shown, so no `reloadMenuData` is needed. Tag buttons made outside the list are not
+     * affected. iOS, HarmonyOS and the mini program sample what is behind them by themselves and have no such property.
+     * See docs/tag-section-style.md "Android backdropSource".
+     */
+    var backdropSource: View? = null
+        set(value) {
+            if (field === value) return
+            field = value
+            titleView.itemGlassBackdropSource = value
+            content.applyBackdropSource()
+        }
+
     private var titles: List<List<String>> = emptyList()
     private var itemWidths: List<List<Float>> = emptyList()
     private var itemHeights: List<List<Float>> = emptyList()
@@ -1825,6 +1849,7 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun configureCell(cell: CYLTagListCell, indexPath: CYLIndexPath) {
         if (!isValid(indexPath)) return
+        cell.button.itemGlassBackdropSource = backdropSource
         if (cell is CYLTagCreateCell) {
             cell.configureWithName(menuDataSource?.menuTitleForItemAtIndexPath(indexPath), styleForItem(indexPath), isEnabledAt(indexPath))
             return
@@ -1847,6 +1872,7 @@ open class CYLTagListView @JvmOverloads constructor(
     }
 
     private fun configureFoldCell(cell: CYLTagFoldCell, section: Int, animated: Boolean) {
+        cell.foldButton.itemGlassBackdropSource = backdropSource
         val expanded = isSectionExpanded(section)
         cell.configureWithFoldControl(displayedFoldControl(), styleForSection(section), expanded, animated)
         cell.contentDescription = foldAccessibilityLabel(section)
@@ -1855,6 +1881,7 @@ open class CYLTagListView @JvmOverloads constructor(
 
     /** `onBand`: the button sits in a header with a band, so the tint is chosen against the band color. */
     private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean, onBand: Boolean = false) {
+        button.itemGlassBackdropSource = backdropSource
         button.applyFoldControl(displayedFoldControl(), listStyle.resolvedFoldControlColor(context, onBand), expanded, animated)
         button.contentDescription = foldAccessibilityLabel(section)
         CYLAccessibilityNode.apply(button, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
@@ -1953,6 +1980,17 @@ open class CYLTagListView @JvmOverloads constructor(
             itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
             itemBackgroundColor = listStyle.sectionBackgroundColor
             itemCornerRadius = listStyle.sectionCornerRadius
+            itemGlassBackdropSource = backdropSource
+        }
+
+        /** Forwards `backdropSource` to the glass hosts already shown: the tags, the fold controls and the section boards. */
+        fun applyBackdropSource() {
+            val source = backdropSource
+            for (cell in cells.values) cell.button.itemGlassBackdropSource = source
+            for (cell in foldCells.values) cell.foldButton.itemGlassBackdropSource = source
+            for (header in headers.values) header.foldButton.itemGlassBackdropSource = source
+            for (footer in footers.values) footer.foldButton.itemGlassBackdropSource = source
+            for (board in glassCards.values) board.itemGlassBackdropSource = source
         }
 
         init {

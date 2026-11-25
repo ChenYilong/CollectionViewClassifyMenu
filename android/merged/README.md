@@ -2,6 +2,22 @@
 
 The library is `library` (package `com.cyl.classifymenu`); see `docs/android.md` and `docs/android-api.md` at the repository root.
 
+## Real glass in a list: `backdropSource`
+
+Liquid Glass tags and boards in a list sample the window root by default, which contains the list, so they draw only a tint
+and a rim. Give the list a view BEHIND it that is NOT its ancestor (a sibling plate) and the glass blurs and refracts it
+(Android 12+ blur, Android 13+ refraction; below that the frosted tint + rim stays). One property covers every tag, the fold
+control and the section boards, also after a reload:
+
+```kotlin
+val root = FrameLayout(context)
+val plate = View(context).apply { background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(Color.rgb(255, 154, 158), Color.rgb(250, 208, 196))) }
+val list = CYLTagListView(context)
+root.addView(plate, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)) // behind the list, a sibling of it
+root.addView(list, FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+list.backdropSource = plate // never an ancestor of the list (root would draw tint + rim only); null restores the default
+```
+
 ## Section card, header divider and tint (the default look changed)
 
 A tag list now shows each section's tags on a rounded card by default (`sectionStyle` `insetGrouped`). If you never set

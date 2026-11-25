@@ -119,6 +119,5 @@ notifications 10 remain. Verified today: mini program node tests; everything els
 
 A Liquid Glass tag in a list has the root view as its backdrop source, which contains the tag itself: sampling it re-enters the tag's own recording (a crash found by the
 Windows Android run on 4bc1ec1). CYLTabBarController `a5a2f1b1` makes `CYLLiquidGlassView` skip sampling when the view is inside its own source: it draws the tint only
-(no blur or refraction), and `CYLGlassBackdrop` guards the capture. iOS draws real glass. True glass for a list needs a `backdropSource` outside the list (or sampling only the
-ancestors' backgrounds): a follow-up design, open for the owner; until then Android tags look like the default frosted tint (225, 222, 220 at 0.5 alpha, white 0.14 in dark mode).
+(no blur or refraction), and `CYLGlassBackdrop` guards the capture. iOS draws real glass. True glass for a list needs a backdrop source outside the list: `CYLTagListView.backdropSource` (docs/tag-section-style.md "Android backdropSource"); without it Android tags look like the default frosted tint (225, 222, 220 at 0.5 alpha, white 0.14 in dark mode).
 
