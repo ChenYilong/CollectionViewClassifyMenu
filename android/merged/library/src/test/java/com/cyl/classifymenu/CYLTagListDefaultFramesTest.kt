@@ -95,7 +95,15 @@ class CYLTagListDefaultFramesTest {
         assertEquals("tag 0.0 width", tagBox(plain, "tag 0.0")[2], tagBox(card, "tag 0.0")[2])
         assertEquals("tag 0.1 x", tagBox(plain, "tag 0.1")[0] + PADDING, tagBox(card, "tag 0.1")[0])
         assertEquals("tag 1.0 x", 16 + PADDING, tagBox(card, "tag 1.0")[0])
-        assertTrue("the card's padding adds to the content height", list.contentHeight > 298f)
+        // Per section: the card's padding (2 x 12), the header sized to its text (not 36) and the board 4 below it (not 10).
+        var expected = 298f
+        val plainList = makeList()
+        for (section in 0 until SECTIONS) {
+            expected += 2 * PADDING + (list.sectionFrame(section)!!.headerHeight - plainList.sectionFrame(section)!!.headerHeight) + (HEADER_BOARD_SPACING - 10f)
+        }
+        assertEquals(expected, list.contentHeight, 0.5f)
+        // The first tag sits the header, the 4 spacing and the card's padding below the section's top.
+        assertEquals("tag 0.0 y", list.sectionFrame(0)!!.headerHeight + HEADER_BOARD_SPACING + PADDING, tagBox(card, "tag 0.0")[1].toFloat(), 0.5f)
         assertEquals(list.contentHeight, list.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.5f)
     }
 

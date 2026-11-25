@@ -278,7 +278,23 @@ class CYLMenuStyle {
     fun resolvedHeaderSeparatorColor(context: android.content.Context): Int = headerSeparatorColor ?: CYLSectionStyleColors.separator(context)
 
     // Section headers
-    var headerHeight: Float = 36f
+    private var headerHeightValue: Float = 36f
+    private var headerHeightWasSet: Boolean = false
+
+    /**
+     * The fixed header height, dp (default 36). Under `insetGrouped` with no header divider the header is sized to its text
+     * instead (a title line plus [HEADER_BOARD_TITLE_PADDING], not below the fold control) and this value is a minimum only
+     * when the app set it ([isHeaderHeightSet]); the divider and the plain style keep it as the minimum always.
+     */
+    var headerHeight: Float
+        get() = headerHeightValue
+        set(value) {
+            headerHeightValue = value
+            headerHeightWasSet = true
+        }
+
+    /** Whether the app set [headerHeight] (the default 36 does not count). */
+    val isHeaderHeightSet: Boolean get() = headerHeightWasSet
 
     /**
      * The most lines a section header's title may take: a title too wide for the room beside the fold control wraps onto more
@@ -484,7 +500,8 @@ class CYLMenuStyle {
         copy.headerSeparatorColor = headerSeparatorColor
         copy.headerSeparatorThickness = headerSeparatorThickness
         copy.headerSeparatorInsets = headerSeparatorInsets
-        copy.headerHeight = headerHeight
+        copy.headerHeightValue = headerHeightValue
+        copy.headerHeightWasSet = headerHeightWasSet
         copy.headerMaxLines = headerMaxLines
         copy.headerFont = headerFont
         copy.tintColor = tintColor
