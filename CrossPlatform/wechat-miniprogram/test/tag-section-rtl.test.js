@@ -103,17 +103,27 @@ test('rtl mirrors the card padding; the header title and fold control align with
   assert.match(rtl.headerStyle, new RegExp(`margin: 0 ${LEADING_SMALL}px 0 ${TRAILING_LARGE}px; padding: 0 ${CARD_LEADING}px 0 ${CARD_TRAILING}px;`))
 })
 
-test('rtl: one board inset is the same on both sides and the title is at the tags x', () => {
+test('rtl: the tag column ignores sectionBoardInset, the board extends it by one value on both sides, mirrored', () => {
+  const CONTENT_INSET = 12
   const sectionBoardInset = BOARD_INSET
   const ltrStyle = styleOf({ sectionBoardInset, sectionInsets: SECTION_INSETS })
   const rtlStyle = rtlOf({ sectionBoardInset, sectionInsets: SECTION_INSETS })
   assert.deepEqual(model.boardInset(ltrStyle), { left: BOARD_INSET, right: BOARD_INSET })
   assert.deepEqual(model.boardInset(rtlStyle), { left: BOARD_INSET, right: BOARD_INSET })
-  assert.deepEqual(model.tagColumn(ltrStyle), { left: LEADING_SMALL + BOARD_INSET, right: TRAILING_LARGE + BOARD_INSET })
-  assert.deepEqual(model.tagColumn(rtlStyle), { left: TRAILING_LARGE + BOARD_INSET, right: LEADING_SMALL + BOARD_INSET })
+  // The tag column is the section column minus sectionContentInsets, whatever the board inset is.
+  assert.deepEqual(model.tagColumn(ltrStyle), { left: LEADING_SMALL + CONTENT_INSET, right: TRAILING_LARGE + CONTENT_INSET })
+  assert.deepEqual(model.tagColumn(rtlStyle), { left: TRAILING_LARGE + CONTENT_INSET, right: LEADING_SMALL + CONTENT_INSET })
   assert.deepEqual(model.headerEdges(ltrStyle), model.tagColumn(ltrStyle))
   assert.deepEqual(model.headerEdges(rtlStyle), model.tagColumn(rtlStyle))
-  // The board keeps the margin column (physical, mirrored); the content is inside it by the inset.
+  // The board is the tag column extended by the inset (physical, mirrored).
+  assert.deepEqual(model.boardColumn(ltrStyle), { left: LEADING_SMALL + CONTENT_INSET - BOARD_INSET, right: TRAILING_LARGE + CONTENT_INSET - BOARD_INSET })
+  assert.deepEqual(model.boardColumn(rtlStyle), { left: TRAILING_LARGE + CONTENT_INSET - BOARD_INSET, right: LEADING_SMALL + CONTENT_INSET - BOARD_INSET })
+  // Inset 0: the board is the tag column; unset: the board is the section column (mirrored too).
+  const hugging = rtlOf({ sectionBoardInset: 0, sectionInsets: SECTION_INSETS })
+  assert.deepEqual(model.boardColumn(hugging), model.tagColumn(hugging))
+  assert.deepEqual(model.tagColumn(hugging), model.tagColumn(rtlStyle))
+  const unset = rtlOf({ sectionInsets: SECTION_INSETS })
+  assert.deepEqual(model.boardColumn(unset), { left: TRAILING_LARGE, right: LEADING_SMALL })
   assert.deepEqual(model.contentColumn(rtlStyle), { left: TRAILING_LARGE, right: LEADING_SMALL })
 })
 

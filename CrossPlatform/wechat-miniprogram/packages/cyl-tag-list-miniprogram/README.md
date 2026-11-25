@@ -40,7 +40,7 @@ The keys go in the configuration's `style`:
 - Show the header divider: `headerSeparatorStyle` `line`, optionally with `headerSeparatorColor`, `headerSeparatorThickness`
   (default 0.5) and `headerSeparatorInsets` (default 0: it spans the same left and right edges as the card and the band).
 - Optional header band: `headerBackgroundColor`, with `headerCornerRadius` and `headerContentInsets`.
-- The card: `sectionBackgroundColor`, `sectionCornerRadius` (default 10), `sectionContentInsets` (default 12), `sectionBoardInset` (how far the card extends beyond the tags on both sides; unset = 12, 0 hugs the tags; the header title always aligns with the tags), and
+- The card: `sectionBackgroundColor`, `sectionCornerRadius` (default 10), `sectionContentInsets` (default 12), `sectionBoardInset` (how far the card, header band and divider extend beyond the tag column on both sides; unset = `sectionContentInsets` left / right, so the card spans the section column; 0 hugs the tags; a value above the default can push the card past the list margin; the tag column and the header title never move), and
   `sectionBackgroundStyle` `flat` (default) or `liquidGlass` (falls back to flat where the platform cannot draw glass).
 - `tintColor`: the one color of the built-in header title, icon and More / Less control. Left out, it is black or white,
   whichever is legible on the background behind them.

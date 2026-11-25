@@ -1157,9 +1157,11 @@ function physicalInsets(style, value) {
 }
 
 /**
- * The horizontal board inset, the ONE place it is computed: the distances from the board's left and right edges to the
- * content column (the tags and the header block). Unset `sectionBoardInset` (null) is the default CARD_PADDING, the
- * leading / trailing parts of `sectionContentInsets`; a set value (0 included) overrides them on both sides. None without a board.
+ * The board's outward extension, the ONE place it is computed: how far the board (card, header band, divider) reaches past
+ * the tag column on the left and the right. Unset `sectionBoardInset` (null) is the default, the leading / trailing parts of
+ * `sectionContentInsets` (the board then spans the section column); a set value (0 included) overrides them on both sides,
+ * 0 hugging the tags. A value above the default may push the board past the list margin. None without a board.
+ * It never moves the tag column.
  */
 function boardInset(style) {
   if (!isInsetGrouped(style)) return { left: 0, right: 0 };
@@ -1171,7 +1173,7 @@ function boardInset(style) {
 }
 
 /**
- * The card's padding around the tags under insetGrouped, else none: left / right from `boardInset`, top / bottom from
+ * The card's padding around the tags under insetGrouped, else none: left / right are the board's extension (`boardInset`), top / bottom from
  * `sectionContentInsets`.
  */
 function cardInsets(style) {
@@ -1187,11 +1189,27 @@ function contentColumn(style) {
   return { left: insets.left, right: insets.right };
 }
 
-/** The column the tags are laid in: `contentColumn` narrowed by the card's padding. Rows, folding and height follow it. */
+/**
+ * The ONE column the header title and the tags share: `contentColumn` minus the leading / trailing `sectionContentInsets`
+ * under insetGrouped, else the section column. It never depends on `sectionBoardInset`. Rows, folding and height follow it.
+ */
 function tagColumn(style) {
   const column = contentColumn(style);
-  const card = cardInsets(style);
-  return { left: column.left + card.left, right: column.right + card.right };
+  if (!isInsetGrouped(style)) return column;
+  const insets = physicalInsets(style, style.sectionContentInsets);
+  return { left: column.left + insets.left, right: column.right + insets.right };
+}
+
+/**
+ * The column of the board (card, header band, divider): the tag column extended outward by `boardInset` on both sides
+ * (the section column by default, the tag column itself for 0). Without a board it is the section column. A distance
+ * can be negative when the board passes the list's margin (accepted).
+ */
+function boardColumn(style) {
+  if (!isInsetGrouped(style)) return contentColumn(style);
+  const tags = tagColumn(style);
+  const extension = boardInset(style);
+  return { left: tags.left - extension.left, right: tags.right - extension.right };
 }
 
 /** A column's x and width at the list width `listWidth`. */
@@ -1225,7 +1243,7 @@ function headerEdges(style) {
 
 /** The distances from the list's edges to the header element: the column when styled, else the whole list. */
 function headerBox(style) {
-  return isStyledHeader(style) ? contentColumn(style) : { left: 0, right: 0 };
+  return isStyledHeader(style) ? boardColumn(style) : { left: 0, right: 0 };
 }
 
 /** True when the header is sized to its text and the board follows it closely: insetGrouped with no header divider. */
@@ -1255,7 +1273,7 @@ function headerHeightOf(style) {
  */
 function headerSeparator(style) {
   if (style.headerSeparatorStyle !== HEADER_SEPARATOR_STYLES.line || !(style.headerSeparatorThickness > 0)) return null;
-  const column = contentColumn(style);
+  const column = boardColumn(style);
   // The divider's leading / trailing insets swap sides right to left.
   const own = style.headerSeparatorInsets ? physicalInsets(style, style.headerSeparatorInsets) : null;
   return {
@@ -1554,7 +1572,11 @@ function sectionLayout(style, options = {}) {
     const card = cardInsets(style);
     layout.listStyle = `padding: ${headerBoardOffset(style, hasHeader)}px ${column.right}px ${i.bottom}px ${column.left}px`;
     layout.itemsStyle += `; margin-bottom: -${style.lineSpacing}px`;
-    layout.cardStyle = `padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
+    // The list's padding is the section column (never negative); a board wider or narrower than it is moved by the card's margin.
+    const board = boardColumn(style);
+    const shift = board.left !== column.left || board.right !== column.right
+      ? `margin: 0 ${column.right - board.right}px 0 ${column.left - board.left}px; ` : '';
+    layout.cardStyle = `${shift}padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
   }
   if (isStyledHeader(style)) {
     const edges = headerEdges(style);
@@ -1591,7 +1613,7 @@ module.exports = {
   MINIMUM_CONTRAST_RATIO, FROSTED_GLASS_WHITE_ALPHA, DEFAULT_GLASS_TINT_SHARE, relativeLuminance, contrastRatio,
   glassReferenceLuminance, hslFromRgb, rgbFromHsl, liftedIconColor, drawnIconColor,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
-  SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, boardInset, cardInsets, contentColumn, tagColumn,
+  SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, boardInset, cardInsets, contentColumn, tagColumn, boardColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
   HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, HEADER_BOARD_TITLE_PADDING, HEADER_BOARD_SPACING, isHeaderTightToBoard, headerBoardOffset, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
