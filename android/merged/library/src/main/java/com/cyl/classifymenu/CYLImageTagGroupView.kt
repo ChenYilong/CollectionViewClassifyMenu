@@ -171,7 +171,7 @@ class CYLImageTagGroup(var tags: List<CYLImageTag>, var percentPosition: CYLPoin
 /**
  * `CYLImageTagLabel`: the default tag view: white 13 sp text with a shadow, inside `contentInsets`.
  */
-class CYLImageTagLabel @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : TextView(context, attrs), CYLImageTagItem {
+class CYLImageTagLabel @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : androidx.appcompat.widget.AppCompatTextView(context, attrs), CYLImageTagItem {
     override var tagDirection: CYLImageTagDirection = CYLImageTagDirection.CYLImageTagDirectionRightCenter
 
     /**

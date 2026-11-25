@@ -177,7 +177,7 @@ object CYLTagLongPressActions {
  * The callout of a long press: a small bubble with an arrow pointing at the tag. [arrowCenter] is the arrow's x in the
  * bubble; [arrowUp] puts the arrow on the top edge (the bubble is below the tag), else on the bottom edge.
  */
-internal class CYLTagCalloutBubble(context: Context, text: String) : TextView(context) {
+internal class CYLTagCalloutBubble(context: Context, text: String) : androidx.appcompat.widget.AppCompatTextView(context) {
     private val density = resources.displayMetrics.density
     /** Dark mode: a dark bubble with a light text, as the system's callouts. */
     private val night = (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
