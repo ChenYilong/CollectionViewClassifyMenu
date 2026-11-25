@@ -16,7 +16,10 @@ import {
 import { CYLMenuFoldControl, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import { CYLTagListAccessibilityIdentifier } from '../tagviews/CYLTagListAccessibility';
-import { CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement } from '../core/CYLMenuStyle';
+import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
+import {
+  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement
+} from '../core/CYLMenuStyle';
 import { CYLConfiguration, CYLConfigurationValue } from '../core/CYLTagListConfiguration';
 import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
 
@@ -74,6 +77,8 @@ class CYLSectionDecoration {
   height: number = 0;
   color: ResourceColor = CYLColor.CLEAR;
   radius: number = 0;
+  /** The drawn background: flat, or the core's Liquid Glass tinted with `color`. */
+  background: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
 }
 
 /** A section header or footer, resolved for one render. */
@@ -511,7 +516,7 @@ export struct CYLTagListView {
     const style = this.model.style;
     const result: CYLSectionDecoration[] = [];
     const add = (kind: string, section: number, rect: CYLRect | undefined, color: ResourceColor,
-      radius: number): void => {
+      radius: number, background: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat): void => {
       if (rect === undefined) {
         return;
       }
@@ -522,13 +527,16 @@ export struct CYLTagListView {
       d.height = rect.height;
       d.color = color;
       d.radius = radius;
-      d.key = [kind, section, d.x, d.y, d.width, d.height, CYLColorKey(color), radius].join('|');
+      d.background = background;
+      d.key = [kind, section, d.x, d.y, d.width, d.height, CYLColorKey(color), radius, background].join('|');
       result.push(d);
     };
     sections.forEach((frame: CYLTagListSectionFrame) => {
       add('band', frame.section, frame.headerBand, style.headerBackgroundColor ?? CYLColor.CLEAR,
         style.headerCornerRadius);
-      add('card', frame.section, frame.card, style.resolvedSectionBackgroundColor(), style.sectionCornerRadius);
+      const glass = style.resolvedSectionBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+      add('card', frame.section, frame.card, style.resolvedSectionBackgroundColor(), style.sectionCornerRadius,
+        glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat);
       add('line', frame.section, frame.headerSeparator, style.resolvedHeaderSeparatorColor(), 0);
     });
     return result;
@@ -1032,8 +1040,8 @@ export struct CYLTagListView {
           Column()
             .width(d.width)
             .height(d.height)
-            .backgroundColor(d.color)
-            .borderRadius(d.radius)
+            // Flat color, or the core's Liquid Glass (the tags' modifier) with the card's corners.
+            .attributeModifier(new CYLAnimatedItemBackgroundModifier(d.background, d.color, d.radius))
             .accessibilityLevel('no')
             .position({ x: d.x, y: d.y })
         }, (d: CYLSectionDecoration) => d.key)

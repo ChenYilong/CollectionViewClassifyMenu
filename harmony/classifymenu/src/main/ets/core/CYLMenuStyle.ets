@@ -112,6 +112,8 @@ export class CYLSectionStyleColors {
   static readonly groupedBackground: ResourceColor = $r('app.color.cyl_section_grouped_background');
   /** The header divider: the system separator color. */
   static readonly separator: ResourceColor = $r('app.color.cyl_section_separator');
+  /** The tint of a Liquid Glass card with no `sectionBackgroundColor`: translucent white; translucent #1C1C1E in dark mode. */
+  static readonly glassTint: ResourceColor = $r('app.color.cyl_section_glass_tint');
 }
 
 /**
@@ -282,6 +284,12 @@ export class CYLMenuStyle {
   sectionStyle: CYLSectionStyle = CYLSectionStyle.plain;
   /** The card's color; undefined resolves to `CYLSectionStyleColors.card`. */
   sectionBackgroundColor?: ResourceColor = undefined;
+  /**
+   * The card's background: `flat` (the default) is the solid color; `liquidGlass` is the core's Liquid Glass material
+   * (the tags' drawing) with the card's corners, tinted with `sectionBackgroundColor`, else `CYLSectionStyleColors.glassTint`.
+   * Where the device draws no glass the card is flat (`resolvedSectionBackgroundStyle()`); the frames never change.
+   */
+  sectionBackgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.flat;
   sectionCornerRadius: number = CYLSectionStyleMetrics.cardCornerRadius;
   /** The padding inside the card around the tags (`insetGrouped`), vp. */
   sectionContentInsets: CYLEdgeInsets = new CYLEdgeInsets(CYLSectionStyleMetrics.cardPadding,
@@ -492,9 +500,17 @@ export class CYLMenuStyle {
     this.backgroundColorValue;
   }
 
-  /** The card's color as drawn. */
+  /** The card's background style as drawn: `sectionBackgroundStyle`, flat where `CYLLiquidGlass.isActive()` is false. */
+  resolvedSectionBackgroundStyle(): CYLTagBackgroundStyle {
+    return this.sectionBackgroundStyle === CYLTagBackgroundStyle.liquidGlass && CYLLiquidGlass.isActive() ?
+    CYLTagBackgroundStyle.liquidGlass : CYLTagBackgroundStyle.flat;
+  }
+
+  /** The card's color as drawn: the glass tint for the drawn glass (the app's color wins), else the solid color. */
   resolvedSectionBackgroundColor(): ResourceColor {
-    return this.sectionBackgroundColor ?? CYLSectionStyleColors.card;
+    const fallback = this.resolvedSectionBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass ?
+    CYLSectionStyleColors.glassTint : CYLSectionStyleColors.card;
+    return this.sectionBackgroundColor ?? fallback;
   }
 
   /** The divider's color as drawn. */
@@ -557,6 +573,7 @@ export class CYLMenuStyle {
     c.backgroundColorWasSet = this.backgroundColorWasSet;
     c.sectionStyle = this.sectionStyle;
     c.sectionBackgroundColor = this.sectionBackgroundColor;
+    c.sectionBackgroundStyle = this.sectionBackgroundStyle;
     c.sectionCornerRadius = this.sectionCornerRadius;
     c.sectionContentInsets = this.sectionContentInsets;
     c.headerBackgroundColor = this.headerBackgroundColor;
