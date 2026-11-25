@@ -102,6 +102,19 @@ The list cannot see the host's background, so the library must make its built-in
 - Tests per platform: tint on a light list background is dark and on a dark one light, whatever the system mode; unset + transparent
   follows the mode; a set `tintColor` wins; the band color is used when a band is shown; switching the mode re-resolves a shown list.
 
+## The default list background follows light / dark mode (bug reported by the CYLTabBarController examples, 2026-11-25)
+
+- The list's `backgroundColor` default was a fixed white on HarmonyOS, Android and the mini program: in dark mode headers and the
+  More control ended up white on white. The default (`backgroundColor` never set) is now mode-aware: the system background (white in
+  light mode, black in dark mode; iOS `systemBackground`); under `insetGrouped` it stays the grouped background (#F2F2F7 / black),
+  as before. An app that sets `backgroundColor` (including a clear color) wins in both modes. The tint rule (resolve against the
+  painted background) then gives black on white and white on black without any app code. No example needs a stopgap background.
+- HarmonyOS: the fold / More chevron icon is tinted with the resolved tint like the text (its default did not follow dark mode when the
+  list background was clear: dark on dark). Android's chevron was already fine.
+- Tests per platform: the default (unset) background is the light value in light mode and the dark value in dark mode; a set color
+  (clear or any) is kept in both; the tint on the default background is dark in light and light in dark; the chevron (Harmony) uses
+  the tint.
+
 ## Gates
 
 Every platform: all existing tests pass unchanged, plus one test that the default style gives the same frames as before.
