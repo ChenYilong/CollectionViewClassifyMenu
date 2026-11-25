@@ -63,6 +63,10 @@ Component({
     foldContent: 'title',
     foldColor: '#808080',
     backgroundStyle: '',
+    // Right to left (style key `direction`): the list's CSS direction is in backgroundStyle, this selects the mirrored wxss rules.
+    rtl: false,
+    // The fold / More control's capped font size (header and footer controls).
+    foldFontStyle: '',
     // The long-press callout {text, left, top, arrow, below}, or null.
     callout: null,
   },
@@ -107,7 +111,9 @@ Component({
         const fold = rows && !remeasure ? model.foldState(m, rows, expanded) : { canFold: false, visible: [] };
         const layout = model.sectionLayout(style);
         const tailStyle = model.tagLayout(style, { title: 'x', enabled: true }, 'normal', { kind: 'none' },
-          style.interitemSpacing, style.lineSpacing).cellStyle;
+          style.interitemSpacing, style.lineSpacing).cellStyle
+          // The More tag follows the tag's font size, capped (the system font size scales the text up).
+          + `; ${model.foldControlFontCSS(style.normal.font.size)}`;
         return {
           index: section.index,
           title: section.title,
@@ -143,7 +149,9 @@ Component({
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
         foldColor: m.foldControl.color || model.resolvedFoldControlColor(m.style, m.foldControl.position === 'headerTrailing'),
-        backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}`,
+        backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}${model.directionCSS(m.style)}`,
+        rtl: model.isRtl(m.style),
+        foldFontStyle: model.foldControlFontCSS(),
       }, () => {
         if (remeasure) this.measure();
         else this.reportHeight();
