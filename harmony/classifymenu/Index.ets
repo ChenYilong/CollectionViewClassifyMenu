@@ -27,7 +27,8 @@ export {
 } from './src/main/ets/core/CYLMenuStyle';
 export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';
 export { CYLImage, CYLImageIsSymbol, CYLResourceTypeSymbol, CYLColorKey } from './src/main/ets/core/CYLTypes';
-export { CYLMenuColorFromString, CYLMenuColorLuminance } from './src/main/ets/core/CYLMenuColor';
+export { CYLMenuColorFromString, CYLMenuColorLuminance, CYLMenuRelativeLuminance } from './src/main/ets/core/CYLMenuColor';
+export { CYLIconContrast, CYLRGBA, CYLHSL } from './src/main/ets/core/CYLIconContrast';
 export { CYLTag, CYLTagDataSource } from './src/main/ets/core/CYLTag';
 export {
   CYLTagModel, CYLTagGroup, CYLTagViewSectionInset, CYLTagViewCellSpacing, CYLTagDefaultListWidth

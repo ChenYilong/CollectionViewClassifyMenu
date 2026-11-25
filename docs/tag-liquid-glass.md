@@ -121,3 +121,16 @@ A Liquid Glass tag in a list has the root view as its backdrop source, which con
 Windows Android run on 4bc1ec1). CYLTabBarController `a5a2f1b1` makes `CYLLiquidGlassView` skip sampling when the view is inside its own source: it draws the tint only
 (no blur or refraction), and `CYLGlassBackdrop` guards the capture. iOS draws real glass. True glass for a list needs a backdrop source outside the list: `CYLTagListView.backdropSource` (docs/tag-section-style.md "Android backdropSource"); without it Android tags look like the default frosted tint (225, 222, 220 at 0.5 alpha, white 0.14 in dark mode).
 
+
+## Dark glass icon lift (2026-11-25)
+
+In dark mode the tag's glass is dark (the frosted default is white at 0.14, about #242424, over black), so a dark icon color the app set can nearly vanish on it. The reference is `CYLIconContrast` (iOS `CYLIconContrast.swift`); the rule is the same on every platform.
+
+- **When it applies.** Only where glass is really drawn AND the mode is dark AND the style has an EXPLICIT icon color for the state (`CYLTagAppearance` icon color set by `setIconColor` / a preset / the configuration). The result feeds both the image tint and the animation tint. Light mode, flat tags, glass where the system draws none, a built-in (unset) icon color, which follows the text color, and a color that already passes are never changed. A dynamic color (a theme resource, or on iOS a color whose light and dark values differ by 0.001 or more in any component) is unchanged: the system picks its dark value.
+- **The rule.** `minimumContrastRatio` 3, `frostedGlassWhiteAlpha` 0.14, `defaultGlassTintShare` 0.75, lightness step 0.005. Reference luminance (glass over black): no tint or alpha 0 is the WCAG luminance of grey 0.14; else the luminance of the tint's (r, g, b) times `s = tint alpha x (tint alpha of the state ?? 0.75)`. Contrast = (max + 0.05) / (min + 0.05). At 3 or more: unchanged. Else the color goes to HSL and its lightness rises in steps of 0.005 up to 1 (hue and saturation kept, alpha kept, never above white) until the contrast is 3. Pure and deterministic.
+
+| Platform | Status |
+|:--|:--|
+| iOS | `CYLIconContrast.liftedIconColor(_:glassTint:tintAlpha:)`, applied in `CYLTagButton` (reference) |
+| HarmonyOS | `CYLIconContrast` (`core/CYLIconContrast.ets`, exported from `Index.ets`); `CYLMenuStyle.explicitIconColor(state)` tells an explicit icon color from the built-in; `CYLTagButton.updateAppearance` lifts the tint when `resolvedBackgroundStyle()` is glass and `CYLTagButton.isDarkMode()` (AppStorage `cyl_colorMode`, as `cylanimateditem`; `darkModeOverride` for tests). Static '#RRGGBB' / '#AARRGGBB' strings only: resources and `Color` constants are dynamic, so unchanged. Tests: `entry/src/test/IconContrast.test.ets`, written statically, not yet compiled or run. A mode switch while a tag is shown re-resolves at the tag's next `updateAppearance` (no watcher on the mode yet) |
+| Android, Flutter, React Native, mini program | not yet |
