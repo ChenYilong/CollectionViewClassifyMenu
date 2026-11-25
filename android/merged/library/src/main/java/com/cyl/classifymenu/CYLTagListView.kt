@@ -55,6 +55,15 @@ private const val HEADER_MORE_GAP = 4f
 
 /** The title's top and bottom padding in a header: a header is at least a title line plus this, dp. */
 private const val HEADER_TITLE_VERTICAL_PADDING = 12f
+
+/**
+ * The title's top and bottom padding in a header that is sized to its text (insetGrouped, no header divider): 4 above, 4
+ * below, dp. See docs/tag-section-style.md "The gap between the header and the board is short when there is no divider".
+ */
+internal const val HEADER_BOARD_TITLE_PADDING = 8f
+
+/** The distance from such a header's bottom edge to the board's top, dp (instead of the section's top inset). */
+internal const val HEADER_BOARD_SPACING = 4f
 private const val TITLE_VERTICAL_INSET = 10f
 
 /**
@@ -782,7 +791,9 @@ open class CYLTagListView @JvmOverloads constructor(
     /**
      * The header's height: `headerHeight`, at least a line of the title and the fold control. With `headerMaxLines` above 1 the
      * title of `section` is wrapped at the room it has at the list width `width` ([headerTitleWidth]) and the header grows to
-     * the wrapped lines; `section` -1 (and the default one line) keeps the fixed height.
+     * the wrapped lines; `section` -1 (and the default one line) keeps the fixed height. A header sized to its text
+     * ([headerFitsItsText]) is the title lines plus [HEADER_BOARD_TITLE_PADDING], not below the fold control; `headerHeight`
+     * is a minimum there only when the app set it.
      */
     private fun headerHeight(section: Int = -1, width: Float = measuredContentWidth): Float {
         // Only a foldable section shows the header control, so only it reserves height (an unknown section -1 keeps the control's).
@@ -795,8 +806,24 @@ open class CYLTagListView @JvmOverloads constructor(
             val title = menuDataSource?.menuTitleForSection(section).orEmpty()
             text = CYLTagButton.wrappedTextHeight(title, font, headerTitleWidth(section, width), listStyle.headerMaxLines)
         }
+        if (headerFitsItsText()) {
+            val minimum = if (listStyle.isHeaderHeightSet) listStyle.headerHeight else 0f
+            return max(max(minimum, text + HEADER_BOARD_TITLE_PADDING), foldHeight)
+        }
         return max(max(listStyle.headerHeight, text + HEADER_TITLE_VERTICAL_PADDING), foldHeight)
     }
+
+    /** Whether the header is sized to its text and the board follows it closely: insetGrouped with no header divider. */
+    private fun headerFitsItsText(): Boolean =
+        listStyle.isInsetGrouped && listStyle.headerSeparatorStyle == CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone
+
+    /**
+     * The distance from a header's bottom edge (`header` tall) to the board's top: [HEADER_BOARD_SPACING] when the header is
+     * sized to its text and shown, else the section's top inset. The one place it comes from: the card, the tags, the section
+     * height and the content height all use it.
+     */
+    private fun headerBoardOffset(header: Float): Float =
+        if (header > 0f && headerFitsItsText()) HEADER_BOARD_SPACING else listStyle.sectionInsets.top
 
     /**
      * The room a header's title has at the list width `width` dp: the width between the header's edges minus the indicator bar,
@@ -1011,7 +1038,8 @@ open class CYLTagListView @JvmOverloads constructor(
                 val withFold = widths[section] + inlineFoldSize(section, true).width
                 rowCount = rowsFor(listOf(withFold), contentWidth).first().size
             }
-            height += headerHeight(section, width) + insets.top + insets.bottom + card.top + card.bottom
+            val header = headerHeight(section, width)
+            height += header + headerBoardOffset(header) + insets.bottom + card.top + card.bottom
             height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
             if (foldable && foldIsInFooter()) height += footerHeight()
         }
@@ -1999,8 +2027,9 @@ open class CYLTagListView @JvmOverloads constructor(
             val card = cardInsets()
             val column = columnAt(width)
             val headerEdges = headerEdgeInsets()
-            // The tags' insets: the section's, plus the card's padding (the same insets when the style is plain).
-            val tagInsets = CYLEdgeInsets(insets.top + card.top, insets.left + card.left, insets.bottom, insets.right + card.right)
+            // The tags' insets: the board's offset below the header plus the card's padding (the same insets when the style is plain).
+            val tagInsetsLeft = insets.left + card.left
+            val tagInsetsRight = insets.right + card.right
             val rtl = layoutDirection == LAYOUT_DIRECTION_RTL
             var y = 0f
             for (section in titles.indices) {
@@ -2024,7 +2053,9 @@ open class CYLTagListView @JvmOverloads constructor(
                     views.add(it)
                     sizes.add(inlineFoldSize(section, isSectionExpanded(section)))
                 }
-                val cardY = y + insets.top
+                val boardOffset = headerBoardOffset(header)
+                val tagInsets = CYLEdgeInsets(boardOffset + card.top, tagInsetsLeft, insets.bottom, tagInsetsRight)
+                val cardY = y + boardOffset
                 val (itemFrames, bottom) = layout.frames(sizes, y, width, tagInsets, listStyle.interitemSpacing, listStyle.lineSpacing, rtl)
                 views.forEachIndexed { index, view -> frames[view] = itemFrames[index] }
                 val cardBottom = (if (sizes.isEmpty()) y + tagInsets.top else bottom) + card.bottom

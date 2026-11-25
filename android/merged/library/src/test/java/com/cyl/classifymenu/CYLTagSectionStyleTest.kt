@@ -112,7 +112,10 @@ class CYLTagSectionStyleTest {
     fun theCardAddsItsPaddingToTheHeightAndNarrowsTheColumn() {
         val plain = makeList(plain(), 3)
         val grouped = makeList(insetGrouped(), 3)
-        assertEquals(plain.heightThatFitsWidth(WIDTH_PX.toFloat()) + 2 * CYLSectionStyleMetrics.CARD_PADDING, grouped.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.5f)
+        // The grouped header is sized to its text and the board is 4 below it (not the section's top inset): one section's difference.
+        val headerDelta = grouped.sectionFrame(0)!!.headerHeight - plain.sectionFrame(0)!!.headerHeight
+        val offsetDelta = HEADER_BOARD_SPACING - plain().sectionInsets.top
+        assertEquals(plain.heightThatFitsWidth(WIDTH_PX.toFloat()) + 2 * CYLSectionStyleMetrics.CARD_PADDING + headerDelta + offsetDelta, grouped.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.5f)
         assertEquals(grouped.contentHeight, grouped.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.5f)
         assertEquals(WIDTH_PX - 32f - 2 * CYLSectionStyleMetrics.CARD_PADDING, grouped.tagColumn(0).width)
         assertEquals(16f + CYLSectionStyleMetrics.CARD_PADDING, grouped.tagColumn(0).x)
