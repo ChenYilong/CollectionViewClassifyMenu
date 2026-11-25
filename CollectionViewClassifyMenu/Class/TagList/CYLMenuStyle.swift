@@ -1009,7 +1009,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
      */
     open func titleTextAttributes(for state: UIControl.State) -> [NSAttributedString.Key: Any] {
         let appearance = appearance(for: state)
-        return [.font: appearance.font, .foregroundColor: appearance.textColor]
+        return [.font: appearance.font, .foregroundColor: appearance.textColor as UIColor]
     }
 
     /**
@@ -1279,9 +1279,11 @@ public enum CYLTintContrast {
  * The icon contrast rule of a Liquid Glass tag in dark mode: an explicit, static icon color that is too dark for the glass is lifted.
  *
  * Applies only when ALL hold: glass is drawn, the mode is dark, the icon color is explicit and static (the same color resolved with the
- * light and the dark traits), and its WCAG contrast against the reference below is under `minimumContrastRatio`. Then the color gets
- * the lightest-needed HSL lightness (hue and saturation kept) that reaches the ratio, at most white (the label color in dark mode).
- * Light mode, flat tags, dynamic colors, built-in colors and colors that already pass are never changed.
+ * light and the dark traits), and its WCAG contrast is under `minimumContrastRatio` against EITHER of two references: the glass over a
+ * black backdrop (a dark page) and the glass over `brightBackdropReference` (a saturated blue page, glass is see-through). Then the
+ * color gets the smallest HSL lightness (hue and saturation kept, steps of `lightnessStep`) that reaches the ratio against both, at
+ * most white (the label color in dark mode): white is the cap, and a tint that is bright against a bright backdrop can leave the
+ * ratio below 3:1 even at white. Light mode, flat tags, dynamic colors, built-in colors and colors that already pass both are never changed.
  */
 public enum CYLIconContrast {
 
@@ -1301,6 +1303,17 @@ public enum CYLIconContrast {
     public static let defaultGlassTintShare: CGFloat = 0.75
 
     /**
+     * The bright-backdrop reference: a saturated mid blue, sRGB (0.29, 0.48, 0.88), about #4A7AE0, the glass is composited over like it is
+     * over black for the dark reference. The brightest page a dark-mode glass tag is expected to float on (a saturated gradient page).
+     */
+    public static let brightBackdropReference = UIColor(red: 0.29, green: 0.48, blue: 0.88, alpha: 1)
+
+    /**
+     * The lightness step of the lift (HSL, 0...1).
+     */
+    public static let lightnessStep: CGFloat = 0.005
+
+    /**
      * The WCAG contrast ratio of two relative luminances, 1 to 21.
      */
     public static func contrastRatio(_ first: CGFloat, _ second: CGFloat) -> CGFloat {
@@ -1308,19 +1321,31 @@ public enum CYLIconContrast {
     }
 
     /**
-     * The reference luminance the icon is judged against, with the glass over a black backdrop: the default frosted glass (`glassTint`
-     * nil or fully transparent) is white at `frostedGlassWhiteAlpha`; an explicit tint is its color times its alpha times `tintAlpha`
-     * (`defaultGlassTintShare` when nil).
+     * The reference luminance the icon is judged against, with the glass over `backdrop` (black when nil, the dark reference): the
+     * default frosted glass (`glassTint` nil or fully transparent) is white at `frostedGlassWhiteAlpha`; an explicit tint is its color
+     * times its alpha times `tintAlpha` (`defaultGlassTintShare` when nil). The glass is composited as source-over: glass * share +
+     * backdrop * (1 - share), per sRGB channel (over black the second term is 0).
      */
-    public static func glassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?) -> CGFloat {
+    public static func glassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?, over backdrop: UIColor? = nil) -> CGFloat {
         let dark = UITraitCollection(userInterfaceStyle: .dark)
+        var base: (red: CGFloat, green: CGFloat, blue: CGFloat) = (0, 0, 0)
+        if let backdrop {
+            var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+            if backdrop.resolvedColor(with: dark).getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
+                base = (red, green, blue)
+            }
+        }
+        func composite(_ glass: (red: CGFloat, green: CGFloat, blue: CGFloat), share: CGFloat) -> CGFloat {
+            let share = min(1, max(0, share))
+            return CYLTintContrast.relativeLuminance(red: glass.red * share + base.red * (1 - share),
+                                                     green: glass.green * share + base.green * (1 - share),
+                                                     blue: glass.blue * share + base.blue * (1 - share))
+        }
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         guard let tint = glassTint, tint.resolvedColor(with: dark).getRed(&red, green: &green, blue: &blue, alpha: &alpha), alpha > 0 else {
-            let white = frostedGlassWhiteAlpha
-            return CYLTintContrast.relativeLuminance(red: white, green: white, blue: white)
+            return composite((1, 1, 1), share: frostedGlassWhiteAlpha)
         }
-        let share = alpha * (tintAlpha ?? defaultGlassTintShare)
-        return CYLTintContrast.relativeLuminance(red: red * share, green: green * share, blue: blue * share)
+        return composite((red, green, blue), share: alpha * (tintAlpha ?? defaultGlassTintShare))
     }
 
     /**
@@ -1337,18 +1362,23 @@ public enum CYLIconContrast {
               abs(lr - red) < 0.001, abs(lg - green) < 0.001, abs(lb - blue) < 0.001, abs(la - alpha) < 0.001 else {
             return iconColor
         }
-        let reference = glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
-        func ratio(_ lightness: CGFloat, hue: CGFloat, saturation: CGFloat) -> CGFloat {
+        let darkReference = glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
+        let brightReference = glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha, over: brightBackdropReference)
+        func passes(_ lightness: CGFloat, hue: CGFloat, saturation: CGFloat) -> Bool {
             let rgb = rgbFromHSL(hue: hue, saturation: saturation, lightness: lightness)
-            return contrastRatio(CYLTintContrast.relativeLuminance(red: rgb.red, green: rgb.green, blue: rgb.blue), reference)
+            let luminance = CYLTintContrast.relativeLuminance(red: rgb.red, green: rgb.green, blue: rgb.blue)
+            return contrastRatio(luminance, darkReference) >= minimumContrastRatio
+                && contrastRatio(luminance, brightReference) >= minimumContrastRatio
         }
         let hsl = hslFromRGB(red: red, green: green, blue: blue)
-        guard ratio(hsl.lightness, hue: hsl.hue, saturation: hsl.saturation) < minimumContrastRatio else {
+        guard !passes(hsl.lightness, hue: hsl.hue, saturation: hsl.saturation) else {
             return iconColor
         }
+        // The contrast against the bright reference is not monotonic in lightness (it dips where the icon's luminance meets the
+        // reference), so the first lightness where BOTH pass is searched, upward only; white is the cap.
         var lightness = hsl.lightness
-        while lightness < 1, ratio(lightness, hue: hsl.hue, saturation: hsl.saturation) < minimumContrastRatio {
-            lightness = min(1, lightness + 0.005)
+        while lightness < 1, !passes(lightness, hue: hsl.hue, saturation: hsl.saturation) {
+            lightness = min(1, lightness + lightnessStep)
         }
         let rgb = rgbFromHSL(hue: hsl.hue, saturation: hsl.saturation, lightness: lightness)
         return UIColor(red: rgb.red, green: rgb.green, blue: rgb.blue, alpha: alpha)
