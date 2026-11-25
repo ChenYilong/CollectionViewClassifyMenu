@@ -42,8 +42,8 @@ export interface CYLMenuDataSource {
   /** The icon of a section header. */
   menuImageForSection?: (section: number) => CYLImage | undefined;
   /**
-   * A view at the trailing end of a section header, left of a trailing fold control, at most half the header's
-   * width (a builder that takes the section; ArkTS passes builders as WrappedBuilder).
+   * A view at the trailing end of a section header, left of a trailing fold control, at most
+   * `CYLHeaderAccessoryMaxFraction` (30%) of the header's inner width (a builder that takes the section; ArkTS passes builders as WrappedBuilder).
    */
   menuAccessoryViewForSection?: (section: number) => WrappedBuilder<[number]> | undefined;
   menuItemIsEnabled?: (indexPath: CYLIndexPath) => boolean;

@@ -12,7 +12,8 @@ import { CYLTagButtonComponent } from '../tagviews/CYLTagButton';
 import { CYLTagListCell, CYLTagListCellComponent } from '../tagviews/CYLTagListCell';
 import { CYLIndexPath, CYLTagListController, CYLTagTap } from './CYLTagListModel';
 import {
-  CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState
+  CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
+  HEADER_ITEM_SPACING
 } from './CYLTagListState';
 import { CYLMenuFoldControl, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
@@ -123,6 +124,10 @@ class CYLSectionRender {
   clearLabel: string = '';
   clearSide: number = 0;
   accessory?: WrappedBuilder<[number]>;
+  /** The title's width (`CYLTagListSectionFrame.headerTitleWidth`): the width the header height was computed for. */
+  titleMaxWidth: number = 0;
+  /** The accessory's maximum width (`CYLTagListSectionFrame.headerAccessoryMaxWidth`). */
+  accessoryMaxWidth: number = 0;
 }
 
 function imageKey(image: CYLImage | undefined): string {
@@ -524,7 +529,8 @@ export struct CYLTagListView {
     const m = this.model;
     const control = m.displayedFoldControl;
     const style = CYLTagFoldMetrics.style(control, m.style.resolvedFoldControlColor(onBand));
-    const r = this.foldItem(control, style, frame.expanded, m.headerFoldSize(frame.expanded), frame.section);
+    const r = this.foldItem(control, style, frame.expanded,
+      m.headerFoldSize(frame.expanded, m.layoutWidth, frame.section), frame.section);
     this.finishKey(r, 's');
     return r;
   }
@@ -595,6 +601,8 @@ export struct CYLTagListView {
     h.iconColor = view.iconView.tintColor;
     h.moreLabel = view.moreAccessibilityLabel;
     h.accessory = view.accessoryView;
+    h.titleMaxWidth = frame.headerTitleWidth;
+    h.accessoryMaxWidth = frame.headerAccessoryMaxWidth;
     h.showsClear = m.showsClearButton(h.section);
     if (h.showsClear) {
       h.clearImage = (style.clearButtonImage ?? CYLMenuResources.image('cyl_trash')) as ResourceStr;
@@ -605,7 +613,8 @@ export struct CYLTagListView {
     h.key = ['h', h.showsClear, h.clearLabel, h.clearSide, CYLColorKey(h.clearColor), h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
       h.insetLeft, h.insetRight, h.rtl, h.maxLines,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
-      h.fold.key, h.showsMore, CYLColorKey(h.moreColor), CYLColorKey(h.iconColor), h.moreLabel, h.accessory !== undefined].join('|');
+      h.fold.key, h.showsMore, CYLColorKey(h.moreColor), CYLColorKey(h.iconColor), h.moreLabel, h.accessory !== undefined,
+      h.titleMaxWidth, h.accessoryMaxWidth].join('|');
     return h;
   }
 
@@ -865,6 +874,8 @@ export struct CYLTagListView {
     .height(r.height)
     .padding({ left: r.paddingLeft, right: r.paddingRight })
     .justifyContent(FlexAlign.Center)
+    // The fold control keeps its width; the title is the one that shrinks.
+    .flexShrink(0)
     .id(`CYLTagListFold-${r.section}`)
     .accessibilityGroup(true)
     .accessibilityText(r.accessibilityText)
@@ -1069,15 +1080,16 @@ export struct CYLTagListView {
             .position({ x: d.x, y: d.y })
         }, (d: CYLSectionDecoration) => d.key)
         ForEach(this.headers, (h: CYLSectionRender) => {
-          Row({ space: 6 }) {
+          Row({ space: HEADER_ITEM_SPACING }) {
             if (h.showsFold && h.foldLeading) {
               this.foldButton(h.fold)
             }
             if (h.showsTitle && h.indicatorColor !== undefined) {
-              Column().width(h.indicatorWidth).height(h.indicatorHeight).backgroundColor(h.indicatorColor)
+              Column().width(h.indicatorWidth).height(h.indicatorHeight).backgroundColor(h.indicatorColor).flexShrink(0)
             }
             if (h.showsTitle && h.icon !== undefined) {
               Image(h.icon).width(h.indicatorHeight).height(h.indicatorHeight).fillColor(h.iconColor).accessibilityLevel('no')
+                .flexShrink(0)
             }
             Text(h.showsTitle ? h.title : '')
               .fontSize(h.fontSize)
@@ -1086,6 +1098,8 @@ export struct CYLTagListView {
               .maxLines(h.maxLines)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .textAlign(TextAlign.Start)
+              // The width the header height was computed for (`headerTitleRoom`), explicit: not left to the flex weight.
+              .constraintSize({ maxWidth: h.titleMaxWidth })
               .layoutWeight(1)
             if (h.showsClear && h.clearImage !== undefined) {
               // The section's clear button: its top and bottom the title text's, a 44 vp tap area around it.
@@ -1094,6 +1108,7 @@ export struct CYLTagListView {
                 .height(h.clearSide)
                 .objectFit(ImageFit.Contain)
                 .fillColor(h.clearColor)
+                .flexShrink(0)
                 .responseRegion({ x: -Math.max(0, (44 - h.clearSide) / 2), y: -Math.max(0, (44 - h.clearSide) / 2),
                   width: Math.max(44, h.clearSide), height: Math.max(44, h.clearSide) })
                 .id(CYLTagListAccessibilityIdentifier.clearButton)
@@ -1105,6 +1120,7 @@ export struct CYLTagListView {
                 .width(24)
                 .height(24)
                 .fillColor(h.moreColor)
+                .flexShrink(0)
                 .id(`CYLTagListMore-${h.section}`)
                 .accessibilityText(h.moreLabel)
                 .onClick(() => this.model.tapMoreButton(h.section))
@@ -1113,7 +1129,9 @@ export struct CYLTagListView {
               Row() {
                 h.accessory.builder(h.section)
               }
-              .constraintSize({ maxWidth: '50%' })
+              // At most `CYLHeaderAccessoryMaxFraction` of the inner width, the part the room math reserves for it.
+              .constraintSize({ maxWidth: h.accessoryMaxWidth })
+              .flexShrink(0)
               .height('100%')
               .alignItems(VerticalAlign.Center)
             }
