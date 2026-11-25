@@ -157,7 +157,7 @@ Component({
         backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}${model.directionCSS(m.style)}`,
         rtl: model.isRtl(m.style),
         foldFontStyle: model.foldControlFontCSS(),
-        foldHeaderStyle: model.foldHeaderWidthCSS(),
+        foldHeaderStyle: model.foldHeaderWidthCSS({ rtl: model.isRtl(m.style) }),
       }, () => {
         if (remeasure) this.measure();
         else this.reportHeight();
