@@ -194,7 +194,10 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
             trailing -= 8
         }
         if !foldButton.isHidden {
-            let size = CGSize(width: min(foldSize.width, width / 2), height: min(foldSize.height, height))
+            // At most 40% of the header (CYLTagFoldButton.maximumHeaderWidthFraction), so that the section title keeps
+            // the rest and is the one that truncates.
+            let maximumWidth = width * CYLTagFoldButton.maximumHeaderWidthFraction
+            let size = CGSize(width: min(foldSize.width, maximumWidth), height: min(foldSize.height, height))
             let y = floor((height - size.height) / 2)
             // The control's own margin lines its content up with the title.
             if foldAtLeadingEdge {
@@ -1418,7 +1421,6 @@ open class CYLTagListView: UIView {
         let sectionWidths = measured ? itemWidths : widths(forContentWidth: available)
         let sectionRows = measured ? rows : rows(forWidths: sectionWidths, contentWidth: available)
         let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths)
-        let header = headerHeight()
         let insets = style.sectionInsets
         var height: CGFloat = 0
         for section in sectionRows.indices {
@@ -1431,7 +1433,7 @@ open class CYLTagListView: UIView {
                 let withFold = sectionWidths[section] + [inlineFoldSize(inSection: section, expanded: true).width]
                 rowCount = rows(forWidths: [withFold], contentWidth: available).first?.count ?? 0
             }
-            height += header + insets.top + insets.bottom
+            height += headerHeight(foldable: foldable) + insets.top + insets.bottom
             height += heightOfRows(rowCount, rows: sectionRows[section],
                                    heights: section < sectionHeights.count ? sectionHeights[section] : [])
             if foldable && foldControlIsInFooter {
@@ -2188,9 +2190,10 @@ private extension CYLTagListView {
         max(Self.footerHeight, foldSize(expanded: false).height)
     }
 
-    func headerHeight() -> CGFloat {
-        // A fold control at the top needs the header, also when section titles are hidden.
-        let foldHeight = foldControlIsInHeader ? foldSize(expanded: false).height : 0
+    func headerHeight(foldable: Bool) -> CGFloat {
+        // A fold control at the top needs the header, also when section titles are hidden, but only in a section that
+        // can fold (the footer control's rule).
+        let foldHeight = foldControlIsInHeader && foldable ? foldSize(expanded: false).height : 0
         guard showsSectionHeaders else {
             return foldHeight
         }
@@ -3033,7 +3036,7 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                                referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let height = headerHeight()
+        let height = headerHeight(foldable: canFoldSection(section))
         return height > 0 ? CGSize(width: collectionView.bounds.width, height: height) : .zero
     }
 
