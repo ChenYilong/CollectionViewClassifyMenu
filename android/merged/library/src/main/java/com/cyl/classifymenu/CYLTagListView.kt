@@ -37,6 +37,18 @@ enum class CYLMenuFoldStyle { CYLMenuFoldStyleNone, CYLMenuFoldStyleHeaderButton
 private const val MORE_BUTTON_SIZE = 44f
 private const val FOOTER_HEIGHT = 28f
 private const val HEADER_ICON_SIZE = 16f
+
+/** The gap between a header's indicator bar / icon / clear button and what follows, dp. */
+private const val HEADER_GAP = 8f
+
+/** What a header's fold control takes beyond its own width (its 6 dp overhang is given back, then the 8 dp gap), dp. */
+private const val HEADER_FOLD_EXTRA = 2f
+
+/** The gap after a header's More button, dp. */
+private const val HEADER_MORE_GAP = 4f
+
+/** The title's top and bottom padding in a header: a header is at least a title line plus this, dp. */
+private const val HEADER_TITLE_VERTICAL_PADDING = 12f
 private const val TITLE_VERTICAL_INSET = 10f
 
 /**
@@ -761,11 +773,44 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun footerHeight(): Float = max(FOOTER_HEIGHT, foldSize(false).height)
 
-    private fun headerHeight(): Float {
+    /**
+     * The header's height: `headerHeight`, at least a line of the title and the fold control. With `headerMaxLines` above 1 the
+     * title of `section` is wrapped at the room it has at the list width `width` ([headerTitleWidth]) and the header grows to
+     * the wrapped lines; `section` -1 (and the default one line) keeps the fixed height.
+     */
+    private fun headerHeight(section: Int = -1, width: Float = measuredContentWidth): Float {
         val foldHeight = if (foldIsInHeader()) foldSize(false).height else 0f
         if (!showsSectionHeaders) return foldHeight
         val font = listStyle.headerFontForTraitCollection()
-        return max(max(listStyle.headerHeight, ceil(CYLTagButton.fontLineHeight(font)) + 12), foldHeight)
+        var text = ceil(CYLTagButton.fontLineHeight(font))
+        if (listStyle.headerMaxLines > CYLHeaderTitleMaxLines.SINGLE && section in titles.indices) {
+            val title = menuDataSource?.menuTitleForSection(section).orEmpty()
+            text = CYLTagButton.wrappedTextHeight(title, font, headerTitleWidth(section, width), listStyle.headerMaxLines)
+        }
+        return max(max(listStyle.headerHeight, text + HEADER_TITLE_VERTICAL_PADDING), foldHeight)
+    }
+
+    /**
+     * The room a header's title has at the list width `width` dp: the width between the header's edges minus the indicator bar,
+     * the icon, the fold control, the More and the clear buttons. The same subtractions as `HeaderView.onLayout`, rounded the
+     * safe way (a little too much taken off), so a header never reserves fewer lines than its title needs. An accessory view
+     * is not measured here.
+     */
+    private fun headerTitleWidth(section: Int, width: Float): Float {
+        val style = listStyle
+        val source = menuDataSource
+        val (leading, trailing) = headerEdgeInsetsAt(width)
+        var room = width - leading - trailing
+        if (style.headerIndicatorColor != null) room -= style.headerIndicatorSize.width + HEADER_GAP
+        if (source?.menuImageForSection(section) != null) room -= HEADER_ICON_SIZE + HEADER_GAP
+        if (foldIsInHeader() && section in rows.indices && canFoldRowCount(rows[section].size)) {
+            room -= max(foldSize(false).width, foldSize(true).width) + HEADER_FOLD_EXTRA
+        }
+        if (source?.menuShowsClearButtonForSection(section) == true) {
+            room -= ceil(CYLTagButton.fontLineHeight(style.headerFontForTraitCollection())) + HEADER_GAP
+        }
+        if (showsMoreButtonIn(section)) room -= MORE_BUTTON_SIZE - floor((MORE_BUTTON_SIZE - 22f) / 2) + HEADER_MORE_GAP
+        return max(0f, room)
     }
 
     /**
@@ -802,9 +847,10 @@ open class CYLTagListView @JvmOverloads constructor(
      * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
      * `headerHorizontalInset`.
      */
-    private fun headerEdgeInsets(): Pair<Float, Float> {
+    private fun headerEdgeInsets(): Pair<Float, Float> = headerEdgeInsetsAt(max(0f, measuredContentWidth))
+
+    private fun headerEdgeInsetsAt(width: Float): Pair<Float, Float> {
         val style = listStyle
-        val width = max(0f, measuredContentWidth)
         val column = columnAt(width)
         val rest = max(0f, width - column.x - column.width)
         if (style.isInsetGrouped) {
@@ -936,7 +982,6 @@ open class CYLTagListView @JvmOverloads constructor(
         val widths = if (same) itemWidths else widthsFor(contentWidth)
         val sectionRows = if (same) rows else rowsFor(widths, contentWidth)
         val heights = if (same) itemHeights else heightsForItems(widths)
-        val header = headerHeight()
         val insets = listStyle.sectionInsets
         val card = cardInsets()
         var height = 0f
@@ -949,7 +994,7 @@ open class CYLTagListView @JvmOverloads constructor(
                 val withFold = widths[section] + inlineFoldSize(section, true).width
                 rowCount = rowsFor(listOf(withFold), contentWidth).first().size
             }
-            height += header + insets.top + insets.bottom + card.top + card.bottom
+            height += headerHeight(section, width) + insets.top + insets.bottom + card.top + card.bottom
             height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
             if (foldable && foldIsInFooter()) height += footerHeight()
         }
@@ -1825,20 +1870,27 @@ open class CYLTagListView @JvmOverloads constructor(
         /** The card, header band and divider of each section, from the last `computeFrames`. */
         val sectionFrames = ArrayList<CYLTagListSectionFrame>()
 
+        /**
+         * The frames of one section. `column` and the header edges are leading-based (the column's x is the leading inset, the
+         * divider's `left` inset the leading one); right to left (`rtl`) mirrors the card, the band and the divider inside
+         * `width`, so with symmetric insets they are unchanged and with asymmetric ones they swap sides like the tags.
+         * `headerInsetLeft` / `headerInsetRight` stay the leading / trailing distances of the title.
+         */
         private fun sectionFrameOf(
             section: Int, top: Float, height: Float, header: Float, column: CYLRect, cardY: Float, cardBottom: Float,
-            headerEdges: Pair<Float, Float>,
+            headerEdges: Pair<Float, Float>, width: Float, rtl: Boolean,
         ): CYLTagListSectionFrame {
             val style = listStyle
-            val card = if (style.isInsetGrouped) CYLRect(column.x, cardY, column.width, cardBottom - cardY) else null
-            val band = if (header > 0f && style.headerBackgroundColor != null) CYLRect(column.x, top, column.width, header) else null
+            fun mirrored(rect: CYLRect?): CYLRect? = if (!rtl || rect == null) rect else CYLRect(width - rect.maxX, rect.y, rect.width, rect.height)
+            val card = mirrored(if (style.isInsetGrouped) CYLRect(column.x, cardY, column.width, cardBottom - cardY) else null)
+            val band = mirrored(if (header > 0f && style.headerBackgroundColor != null) CYLRect(column.x, top, column.width, header) else null)
             var separator: CYLRect? = null
             if (header > 0f && style.headerSeparatorStyle == CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine && style.headerSeparatorThickness > 0f) {
                 val separatorInsets = style.headerSeparatorInsets
                 val left = column.x + (separatorInsets?.left ?: 0f)
                 val right = column.x + column.width - (separatorInsets?.right ?: 0f)
                 val thickness = min(style.headerSeparatorThickness, header)
-                separator = CYLRect(left, top + header - thickness, max(0f, right - left), thickness)
+                separator = mirrored(CYLRect(left, top + header - thickness, max(0f, right - left), thickness))
             }
             return CYLTagListSectionFrame(section, top, height, header, card, band, separator, headerEdges.first, headerEdges.second)
         }
@@ -1937,7 +1989,7 @@ open class CYLTagListView @JvmOverloads constructor(
             for (section in titles.indices) {
                 sectionTops[section] = y
                 val sectionTop = y
-                val header = headerHeight()
+                val header = headerHeight(section, width)
                 headers[section]?.let { frames[it] = CYLRect(0f, y, width, header) }
                 y += header
                 val visible = numberOfVisibleItemsInSection(section)
@@ -1964,14 +2016,14 @@ open class CYLTagListView @JvmOverloads constructor(
                     frames[it] = CYLRect(0f, y, width, footerHeight())
                     y += footerHeight()
                 }
-                val sectionFrame = sectionFrameOf(section, sectionTop, y - sectionTop, header, column, cardY, cardBottom, headerEdges)
+                val sectionFrame = sectionFrameOf(section, sectionTop, y - sectionTop, header, column, cardY, cardBottom, headerEdges, width, rtl)
                 sectionFrames.add(sectionFrame)
                 glassCards[section]?.let { glass -> sectionFrame.card?.let { frames[glass] = it } }
             }
             if (showsAddItemView() && addItemView.parent === this) {
                 // Right below the sections, inside the content (it scrolls with the items), as iOS.
                 val height = addItemView.preferredHeight / density
-                frames[addItemView] = CYLRect(insets.left, y, max(0f, width - insets.left - insets.right), height)
+                frames[addItemView] = CYLRect(if (rtl) insets.right else insets.left, y, max(0f, width - insets.left - insets.right), height)
                 y += height + insets.bottom
             }
             totalHeight = ceil(y)
@@ -2133,9 +2185,10 @@ open class CYLTagListView @JvmOverloads constructor(
     private inner class HeaderView(context: Context, private val section: Int) : ViewGroup(context) {
         val iconView = ImageView(context).apply { scaleType = ImageView.ScaleType.FIT_CENTER }
         val titleLabel = TextView(context).apply {
-            maxLines = 1
+            maxLines = listStyle.headerMaxLines
             ellipsize = android.text.TextUtils.TruncateAt.END
-            gravity = android.view.Gravity.CENTER_VERTICAL
+            // START: right to left aligns the title text with the right edge, its leading one.
+            gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
             ViewCompat.setAccessibilityHeading(this, true)
         }
         val foldButton = CYLTagFoldButton(context)
@@ -2231,6 +2284,9 @@ open class CYLTagListView @JvmOverloads constructor(
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             val width = (r - l) / density
             val height = (b - t) / density
+            // Everything below is laid out leading-first (as left to right); `place` mirrors it in right to left.
+            laidOutWidth = width
+            mirrors = layoutDirection == LAYOUT_DIRECTION_RTL
             val (leadingInset, trailingInset) = headerEdgeInsets()
             var trailing = width - trailingInset
             var leading = leadingInset
@@ -2290,12 +2346,17 @@ open class CYLTagListView @JvmOverloads constructor(
          * Measures `view` at the size of `frame`, then lays it out there, so a label's vertical centering uses the
          * header's height (as the iOS frames do), not its own natural height.
          */
-        private fun place(view: View, frame: CYLRect) {
+        private fun place(view: View, leadingFrame: CYLRect) {
+            val frame = if (mirrors) CYLRect(laidOutWidth - leadingFrame.maxX, leadingFrame.y, leadingFrame.width, leadingFrame.height) else leadingFrame
             val width = px(frame.maxX) - px(frame.x)
             val height = px(frame.maxY) - px(frame.y)
             view.measure(MeasureSpec.makeMeasureSpec(maxOf(0, width), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(maxOf(0, height), MeasureSpec.EXACTLY))
             view.layout(px(frame.x), px(frame.y), px(frame.x) + maxOf(0, width), px(frame.y) + maxOf(0, height))
         }
+
+        /** The header's width in dp at the last layout, and whether it was laid out right to left (`place` mirrors then). */
+        private var laidOutWidth = 0f
+        private var mirrors = false
     }
 
     /** A section footer with the fold control at the bottom. */
