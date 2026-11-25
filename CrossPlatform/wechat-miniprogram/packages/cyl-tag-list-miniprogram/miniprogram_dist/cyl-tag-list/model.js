@@ -169,10 +169,18 @@ const LIGHT_TINT = '#000000';
 const SECTION_STYLES = { plain: 'plain', insetGrouped: 'insetGrouped' };
 const HEADER_SEPARATOR_STYLES = { none: 'none', line: 'line' };
 const SECTION_METRICS = { cardCornerRadius: 10, cardPadding: 12, headerBandPadding: 12, separatorThickness: 0.5 };
+/** The card's background: the solid color, or the glass of cyl-animated-item's tags (style key `sectionBackgroundStyle`). */
+const SECTION_BACKGROUND_STYLES = { flat: 'flat', liquidGlass: 'liquidGlass' };
 /** Card: white / #1C1C1E; header band: #EFEFF4 / #2C2C2E; grouped list background: #F2F2F7 / black; divider: the system separator. */
 const SECTION_COLORS = {
-  light: { card: '#FFFFFF', headerBand: '#EFEFF4', groupedBackground: '#F2F2F7', separator: 'rgba(60, 60, 67, 0.29)' },
-  dark: { card: '#1C1C1E', headerBand: '#2C2C2E', groupedBackground: '#000000', separator: 'rgba(84, 84, 88, 0.6)' },
+  light: {
+    card: '#FFFFFF', headerBand: '#EFEFF4', groupedBackground: '#F2F2F7', separator: 'rgba(60, 60, 67, 0.29)',
+    glassTint: 'rgba(255, 255, 255, 0.5)',
+  },
+  dark: {
+    card: '#1C1C1E', headerBand: '#2C2C2E', groupedBackground: '#000000', separator: 'rgba(84, 84, 88, 0.6)',
+    glassTint: 'rgba(28, 28, 30, 0.5)',
+  },
 };
 const ZERO_INSETS = { top: 0, left: 0, bottom: 0, right: 0 };
 
@@ -226,6 +234,9 @@ function namedValue(value, names) {
 function mergeSectionStyle(style, c) {
   const sectionStyle = namedValue(c.sectionStyle, SECTION_STYLES);
   if (sectionStyle) style.sectionStyle = sectionStyle;
+  // As `backgroundStyle`: 'flat' or 'liquidGlass' (case-insensitive, or 0 / 1); anything else keeps the style.
+  const cardBackground = namedValue(c.sectionBackgroundStyle, SECTION_BACKGROUND_STYLES);
+  if (cardBackground) style.sectionBackgroundStyle = cardBackground;
   const separatorStyle = namedValue(c.headerSeparatorStyle, HEADER_SEPARATOR_STYLES);
   if (separatorStyle) style.headerSeparatorStyle = separatorStyle;
   ['sectionBackgroundColor', 'headerBackgroundColor', 'headerSeparatorColor'].forEach((k) => {
@@ -283,9 +294,10 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     // True once a configuration sets `backgroundColor`: under insetGrouped an unset one is the grouped background.
     backgroundColorSet: false,
     // The section style (null colors resolve to `sectionPalette`, which follows the color mode).
-    sectionPalette: { ...(dark ? SECTION_COLORS.dark : SECTION_COLORS.light) },
+    sectionPalette: { ...(dark ? SECTION_COLORS.dark : SECTION_COLORS.light), dark: !!dark },
     sectionStyle: SECTION_STYLES.plain,
     sectionBackgroundColor: null,
+    sectionBackgroundStyle: SECTION_BACKGROUND_STYLES.flat,
     sectionCornerRadius: SECTION_METRICS.cardCornerRadius,
     sectionContentInsets: {
       top: SECTION_METRICS.cardPadding, left: SECTION_METRICS.cardPadding,
@@ -1083,9 +1095,30 @@ function resolvedBackgroundColor(style) {
   return isInsetGrouped(style) && !style.backgroundColorSet ? style.sectionPalette.groupedBackground : style.backgroundColor;
 }
 
-/** The card's color as drawn: its own, else the system card color of the color mode. */
+/**
+ * The card's background as drawn: `sectionBackgroundStyle`, flat where cyl-animated-item's rule says no glass (the rule of
+ * the glass tags). The frames never depend on it.
+ */
+function resolvedSectionBackgroundStyle(style) {
+  return style.sectionBackgroundStyle === SECTION_BACKGROUND_STYLES.liquidGlass && cylAnimatedItemLiquidGlassIsActive()
+    ? SECTION_BACKGROUND_STYLES.liquidGlass : SECTION_BACKGROUND_STYLES.flat;
+}
+
+/** The card's color as drawn: its own (the glass tint when glass), else the card color or the glass tint of the color mode. */
 function resolvedSectionBackgroundColor(style) {
-  return style.sectionBackgroundColor || style.sectionPalette.card;
+  const fallback = resolvedSectionBackgroundStyle(style) === SECTION_BACKGROUND_STYLES.liquidGlass
+    ? style.sectionPalette.glassTint : style.sectionPalette.card;
+  return style.sectionBackgroundColor || fallback;
+}
+
+/** The card's background CSS: the solid color, or the glass of the tags (blur and tint, clipped to the card's corners). */
+function sectionBackgroundCSS(style) {
+  const color = resolvedSectionBackgroundColor(style);
+  if (resolvedSectionBackgroundStyle(style) !== SECTION_BACKGROUND_STYLES.liquidGlass) return `background-color: ${color}`;
+  const glass = cylAnimatedItemBackground(SECTION_BACKGROUND_STYLES.liquidGlass, color, style.sectionCornerRadius, 0, '',
+    !!style.sectionPalette.dark, -1);
+  // The card has its own radius, and the tags' content inset does not apply to it.
+  return glass.css.replace(/border-radius:[^;]*;/, '').replace(/--cyl-item-inset:[^;]*;/, '');
 }
 
 /** The divider's color as drawn: its own, else the system separator of the color mode. */
@@ -1113,7 +1146,7 @@ function sectionLayout(style) {
     const card = style.sectionContentInsets;
     layout.listStyle = `padding: ${i.top}px ${i.right}px ${i.bottom}px ${i.left}px`;
     layout.itemsStyle += `; margin-bottom: -${style.lineSpacing}px`;
-    layout.cardStyle = `padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; background-color: ${resolvedSectionBackgroundColor(style)}`;
+    layout.cardStyle = `padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
   }
   if (isStyledHeader(style)) {
     const edges = headerEdges(style);
@@ -1147,7 +1180,7 @@ module.exports = {
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
-  SECTION_STYLES, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
+  SECTION_STYLES, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
 };

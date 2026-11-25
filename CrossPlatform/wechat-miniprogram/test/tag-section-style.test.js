@@ -282,3 +282,109 @@ test('a section style dictionary applies over the list style', () => {
   assert.equal(sections[1].style.sectionStyle, 'plain')
   assert.equal(sections[1].style.headerSeparatorStyle, 'line')
 })
+
+// MARK: - sectionBackgroundStyle (flat / liquidGlass) and the light / dark audit
+
+const GLASS_TINT = { light: 'rgba(255, 255, 255, 0.5)', dark: 'rgba(28, 28, 30, 0.5)' }
+const LIGHT_OPTIONS = { pixelRatio: 2, dark: false }
+const DARK_OPTIONS = { pixelRatio: 2, dark: true }
+const GLASS = { sectionStyle: 'insetGrouped', sectionBackgroundStyle: 'liquidGlass' }
+const glassRule = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-animated-item/cyl_animated_item_model')
+
+test('the card background is flat by default and the key parses', () => {
+  assert.equal(styleOf().sectionBackgroundStyle, 'flat')
+  assert.equal(model.resolvedSectionBackgroundStyle(styleOf({ sectionStyle: 'insetGrouped' })), 'flat')
+  assert.equal(styleOf({ sectionBackgroundStyle: 'LiquidGlass' }).sectionBackgroundStyle, 'liquidGlass')
+  assert.equal(styleOf({ sectionBackgroundStyle: 1 }).sectionBackgroundStyle, 'liquidGlass')
+  assert.equal(styleOf({ sectionBackgroundStyle: 'flat' }).sectionBackgroundStyle, 'flat')
+  assert.equal(styleOf({ sectionBackgroundStyle: 'frosted' }).sectionBackgroundStyle, 'flat')
+  assert.doesNotMatch(model.sectionLayout(styleOf({ sectionStyle: 'insetGrouped' })).cardStyle, /backdrop-filter/)
+})
+
+test('a glass card has the blur, the tint and the card corners, and the layout does not change', () => {
+  const flat = styleOf({ sectionStyle: 'insetGrouped' })
+  const glass = styleOf(GLASS)
+  const css = model.sectionLayout(glass)
+  assert.match(css.cardStyle, /backdrop-filter:blur\(16px\) saturate\(180%\)/)
+  assert.match(css.cardStyle, new RegExp(`border-radius: ${CARD_RADIUS}px`))
+  assert.doesNotMatch(css.cardStyle, /--cyl-item-inset/)
+  assert.match(css.cardStyle, new RegExp(`padding: ${CARD_PADDING}px ${CARD_PADDING}px ${CARD_PADDING}px ${CARD_PADDING}px`))
+  // Same geometry: everything but the card's own background is the flat one.
+  const flatCss = model.sectionLayout(flat)
+  assert.equal(css.listStyle, flatCss.listStyle)
+  assert.equal(css.itemsStyle, flatCss.itemsStyle)
+  assert.equal(css.headerStyle, flatCss.headerStyle)
+  assert.deepEqual(model.tagColumn(glass), model.tagColumn(flat))
+  assert.deepEqual(flow(glass, TAG_WIDTHS), flow(flat, TAG_WIDTHS))
+})
+
+test('the glass card falls back to flat, with the same layout, where there is no glass', () => {
+  glassRule.cylAnimatedItemLiquidGlassSetActiveOverride(false)
+  try {
+    const glass = styleOf(GLASS)
+    assert.equal(model.resolvedSectionBackgroundStyle(glass), 'flat')
+    const css = model.sectionLayout(glass)
+    assert.doesNotMatch(css.cardStyle, /backdrop-filter/)
+    assert.equal(css.cardStyle, model.sectionLayout(styleOf({ sectionStyle: 'insetGrouped' })).cardStyle)
+    assert.equal(model.resolvedSectionBackgroundColor(glass), LIGHT.card)
+  } finally {
+    glassRule.cylAnimatedItemLiquidGlassSetActiveOverride(undefined)
+  }
+})
+
+test('every unset color is resolved by the color mode: light and dark differ as named', () => {
+  const light = (style) => styleOf(style, LIGHT_OPTIONS)
+  const dark = (style) => styleOf(style, DARK_OPTIONS)
+  assert.equal(model.resolvedSectionBackgroundColor(light({ sectionStyle: 'insetGrouped' })), LIGHT.card)
+  assert.equal(model.resolvedSectionBackgroundColor(dark({ sectionStyle: 'insetGrouped' })), DARK.card)
+  assert.equal(model.resolvedSectionBackgroundColor(light(GLASS)), GLASS_TINT.light)
+  assert.equal(model.resolvedSectionBackgroundColor(dark(GLASS)), GLASS_TINT.dark)
+  assert.match(model.sectionLayout(light(GLASS)).cardStyle, /background-color:rgba\(255,255,255,0\.375\)/)
+  assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /background-color:rgba\(28,28,30,0\.375\)/)
+  assert.match(model.sectionLayout(light(GLASS)).cardStyle, /inset 0 1px 0 rgba\(255,255,255,0\.6\)/)
+  assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /inset 0 1px 0 rgba\(255,255,255,0\.18\)/)
+  assert.equal(light({}).sectionPalette.headerBand, LIGHT.headerBand)
+  assert.equal(dark({}).sectionPalette.headerBand, DARK.headerBand)
+  assert.equal(model.resolvedHeaderSeparatorColor(light({})), model.SECTION_COLORS.light.separator)
+  assert.equal(model.resolvedHeaderSeparatorColor(dark({})), model.SECTION_COLORS.dark.separator)
+  assert.match(model.sectionLayout(dark({ headerSeparatorStyle: 'line' })).headerLineStyle, /background-color: rgba\(84, 84, 88, 0\.6\)/)
+  assert.equal(model.resolvedBackgroundColor(light({ sectionStyle: 'insetGrouped' })), LIGHT.groupedBackground)
+  assert.equal(model.resolvedBackgroundColor(dark({ sectionStyle: 'insetGrouped' })), DARK.groupedBackground)
+  assert.equal(model.sectionLayout(dark({ sectionStyle: 'insetGrouped' })).backgroundStyle, 'background-color: #000000')
+})
+
+test('the colors a configuration sets win in light and in dark', () => {
+  const set = {
+    sectionStyle: 'insetGrouped', backgroundColor: CUSTOM_BACKGROUND, sectionBackgroundColor: '#112233',
+    headerBackgroundColor: '#445566', headerSeparatorStyle: 'line', headerSeparatorColor: '#778899',
+  }
+  const modes = [LIGHT_OPTIONS, DARK_OPTIONS]
+  modes.forEach((options) => {
+    const style = styleOf(set, options)
+    const css = model.sectionLayout(style)
+    assert.equal(model.resolvedBackgroundColor(style), CUSTOM_BACKGROUND)
+    assert.match(css.backgroundStyle, new RegExp(CUSTOM_BACKGROUND))
+    assert.match(css.cardStyle, /background-color: #112233/)
+    assert.match(css.headerStyle, /background-color: #445566/)
+    assert.match(css.headerLineStyle, /background-color: #778899/)
+    // A glass card tinted with the app's color keeps it (made translucent by the glass rule), in both modes.
+    const glass = styleOf({ ...set, sectionBackgroundStyle: 'liquidGlass' }, options)
+    assert.equal(model.resolvedSectionBackgroundColor(glass), '#112233')
+    assert.match(model.sectionLayout(glass).cardStyle, /background-color:rgba\(17,34,51,/)
+  })
+})
+
+test('the component builds the model again when the system theme changes, so unset colors follow it', () => {
+  const fs = require('node:fs')
+  const path = require('node:path')
+  const dir = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist', 'cyl-tag-list')
+  const source = fs.readFileSync(path.join(dir, 'cyl-tag-list.js'), 'utf8')
+  // rebuild() normalizes with the current mode, and the theme listener calls rebuild().
+  assert.match(source, /normalize\(this\.data\.configuration, \{ pixelRatio: pixelRatio\(\), dark: theme\.isDark\(\) \}\)/)
+  assert.match(source, /theme\.onChange\(\(\) => this\.rebuild\(\)\)/)
+  // The same configuration gives different unset colors in the two modes.
+  const configuration = { style: GLASS, sections: [{ title: TITLE, items: ['a'] }] }
+  const layoutIn = (dark) => model.sectionLayout(model.normalize(configuration, { pixelRatio: 2, dark }).sections[0].style)
+  assert.notEqual(layoutIn(false).cardStyle, layoutIn(true).cardStyle)
+  assert.notEqual(layoutIn(false).backgroundStyle, layoutIn(true).backgroundStyle)
+})
