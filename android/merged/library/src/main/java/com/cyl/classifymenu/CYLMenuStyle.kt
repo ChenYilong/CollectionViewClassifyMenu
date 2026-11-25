@@ -47,6 +47,8 @@ object CYLSectionStyleMetrics {
     const val HEADER_BAND_PADDING: Float = 12f
     /** The thickness of the header divider: one hairline. */
     const val SEPARATOR_THICKNESS: Float = 0.5f
+    /** The default size of a section header title (the table header look; its weight is [CYLFont.WEIGHT_SEMIBOLD]). */
+    const val HEADER_FONT_SIZE: Float = 17f
 }
 
 /**
@@ -286,7 +288,8 @@ class CYLMenuStyle {
      */
     var headerMaxLines: Int = CYLHeaderTitleMaxLines.SINGLE
         set(value) { field = max(CYLHeaderTitleMaxLines.SINGLE, value) }
-    var headerFont: CYLFont = CYLFont.systemFont(14f)
+    /** The section header title: 17 dp semibold ([CYLSectionStyleMetrics.HEADER_FONT_SIZE], weight 600), the table header look. */
+    var headerFont: CYLFont = CYLFont.semiboldSystemFont(CYLSectionStyleMetrics.HEADER_FONT_SIZE)
     /** null (the default): [tintColor], else its default by the background luminance ([resolvedHeaderTextColor]). */
     var headerTextColor: Int? = null
     var headerHorizontalInset: Float = 16f
