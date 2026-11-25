@@ -553,6 +553,11 @@ function itemDictionary(item) {
 }
 
 /** The fold control of `CYLMenuFoldControl(configuration:)`: a dictionary, or a position alone. */
+/** The content a fold control position has when none is given: the header controls show the icon and the title, the tail and the footer the icon only. */
+function usualFoldContent(position) {
+  return position === 'footer' || position === 'tail' ? 'icon' : 'iconAndTitle';
+}
+
 function foldControlValue(value) {
   const control = { position: 'none', content: 'title', title: '', collapseTitle: '', color: null };
   if (value == null) return control;
@@ -566,7 +571,7 @@ function foldControlValue(value) {
   if (position) control.position = position;
   const content = contents[String(dictionary.content || '').toLowerCase()];
   if (content) control.content = content;
-  else if (typeof value !== 'object') control.content = control.position === 'footer' ? 'icon' : 'iconAndTitle';
+  else if (control.position !== 'none') control.content = usualFoldContent(control.position);
   if (typeof dictionary.title === 'string') control.title = dictionary.title;
   if (typeof dictionary.collapseTitle === 'string') control.collapseTitle = dictionary.collapseTitle;
   control.color = color(dictionary.color);
