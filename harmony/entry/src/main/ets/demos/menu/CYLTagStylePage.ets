@@ -6,7 +6,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
  */
 import {
   CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLIndexPath, CYLMenuSelectionMode, CYLMenuStyle, CYLOffset,
-  CYLSize, CYLTagAppearance, CYLTagBackgroundStyle, CYLTagListController, CYLTagListState, CYLTagListView
+  CYLSize, CYLTagAppearance, CYLSectionStyle, CYLTagBackgroundStyle, CYLTagListController, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
 import {
@@ -153,6 +153,7 @@ export function demoStyle(): CYLMenuStyle {
   style.imageTitleSpacing = 4;
   style.itemHeight = 34;
   style.sectionInsets = new CYLEdgeInsets(12, 16, 12, 16);
+  style.sectionStyle = CYLSectionStyle.plain;
   return style;
 }
 
