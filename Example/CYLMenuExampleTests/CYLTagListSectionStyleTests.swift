@@ -493,9 +493,9 @@ final class CYLTagListSectionStyleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(glass.contentHeight, flatHeight, accuracy: 0.01)
         if #available(iOS 26.0, *) {
             XCTAssertEqual(glass.style.resolvedSectionBackgroundStyle, .liquidGlass)
-            // No sectionBackgroundColor: the untinted glass (CYLTagListSectionGlassTintTests has the tinted one).
-            let plainGlass = cardViews(glass).first?.value(forKey: "plainGlassView") as? UIVisualEffectView
-            XCTAssertTrue(plainGlass?.effect is UIGlassEffect, "The card is a plain Liquid Glass")
+            // No sectionBackgroundColor: the same glass as a tag (CYLTagListSectionGlassTintTests has the details).
+            let host = cardViews(glass).first?.value(forKey: "glassHost") as? CYLAnimatedItemView
+            XCTAssertEqual(host?.isHidden, false, "The card is Liquid Glass")
             XCTAssertNil(cardViews(glass).first?.backgroundColor)
             captureScreen(named: "test-section-style-glass-card")
         }

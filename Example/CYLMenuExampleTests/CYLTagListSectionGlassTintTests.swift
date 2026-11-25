@@ -2,8 +2,8 @@
 //  CYLTagListSectionGlassTintTests.swift
 //  CYLMenuExampleTests
 //
-//  CYLTagListView: the section glass card (`sectionBackgroundStyle = .liquidGlass`) is untinted, a plain `UIGlassEffect`, while
-//  `sectionBackgroundColor` is unset; a set color still tints it (docs/tag-section-style.md).
+//  CYLTagListView: the section glass card (`sectionBackgroundStyle = .liquidGlass`) is the same glass as a tag (`CYLAnimatedItemView`;
+//  an unset `sectionBackgroundColor` takes the tags' default frosted tint); a set color tints it (docs/tag-section-style.md).
 //
 
 import XCTest
@@ -36,21 +36,18 @@ final class CYLTagListSectionGlassTintTests: CYLMenuExampleTestCase {
             .first { NSStringFromClass(type(of: $0)).contains("CYLTagListCardView") }
     }
 
-    func testAnUnsetColorDrawsAnUntintedGlassWithTheCardCorners() throws {
+    func testAnUnsetColorDrawsTheTagGlassWithTheCardCorners() throws {
         guard #available(iOS 26.0, *) else {
             throw XCTSkip("UIGlassEffect needs iOS 26")
         }
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         let card = try XCTUnwrap(glassCard(color: nil))
-        let glass = try XCTUnwrap(card.value(forKey: "plainGlassView") as? UIVisualEffectView, "A plain UIGlassEffect view")
-        let effect = try XCTUnwrap(glass.effect as? UIGlassEffect)
-        XCTAssertNil(effect.tintColor, "No tint")
-        XCTAssertFalse(glass.isHidden)
-        XCTAssertEqual(glass.frame, card.bounds)
+        let host = try XCTUnwrap(card.value(forKey: "glassHost") as? CYLAnimatedItemView)
+        XCTAssertFalse(host.isHidden)
+        XCTAssertNotNil(host.itemLiquidGlassView, "The library's glass, like a tag")
+        XCTAssertNil(host.itemBackgroundColor, "Unset: the default frosted tint applies")
         XCTAssertNil(card.backgroundColor, "No flat color behind the glass")
         XCTAssertEqual(card.layer.cornerRadius, CYLSectionStyleMetrics.cardCornerRadius, accuracy: 0.01)
-        let host = card.value(forKey: "glassHost") as? CYLAnimatedItemView
-        XCTAssertTrue(host?.isHidden ?? false, "The tinted host is not drawn")
     }
 
     func testASetColorStillTintsTheGlass() throws {
@@ -63,13 +60,11 @@ final class CYLTagListSectionGlassTintTests: CYLMenuExampleTestCase {
         XCTAssertFalse(host.isHidden)
         XCTAssertNotNil(host.itemLiquidGlassView, "The library's glass, tinted")
         XCTAssertEqual(host.itemBackgroundColor, .systemPink)
-        XCTAssertTrue((card.value(forKey: "plainGlassView") as? UIView)?.isHidden ?? true, "The untinted glass is not shown")
     }
 
     func testTheFlatCardKeepsItsColorWhereGlassIsInactive() throws {
         CYLAnimatedItemView.liquidGlassActiveOverride = false
         let card = try XCTUnwrap(glassCard(color: nil))
         XCTAssertNotNil(card.backgroundColor, "Flat fallback")
-        XCTAssertNil(card.value(forKey: "plainGlassView"), "No glass view is made")
     }
 }

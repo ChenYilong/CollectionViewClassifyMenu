@@ -37,7 +37,7 @@ struct CYLTagListCardSpec {
      */
     let color: UIColor
     /**
-     * The glass tint: `sectionBackgroundColor` when the app set it, else `nil` (an untinted, see-through glass).
+     * The glass tint: `sectionBackgroundColor` when the app set it, else `nil` (the tags' default frosted tint applies).
      */
     let glassTint: UIColor?
     /**
@@ -89,12 +89,6 @@ final class CYLTagListCardView: UICollectionReusableView {
      */
     @objc let glassHost = CYLAnimatedItemView()
 
-    /**
-     * The untinted glass of a card whose `sectionBackgroundColor` is unset: a plain `UIGlassEffect` view (`CYLAnimatedItemView` maps a nil
-     * tint to the tags' default frosted tint, which the card must not have). A `UIVisualEffectView`, created on first use (iOS 26).
-     */
-    @objc private(set) var plainGlassView: UIView?
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
@@ -116,36 +110,6 @@ final class CYLTagListCardView: UICollectionReusableView {
         addSubview(glassHost)
     }
 
-    /**
-     * Draws the untinted glass (no `sectionBackgroundColor`): a `UIGlassEffect` view with the card's corner radius, clear of any
-     * flat color. `false`: not this case (a tinted card, a flat card, or no glass on this system).
-     */
-    private func applyPlainGlass(_ card: CYLTagListCardAttributes) -> Bool {
-        guard card.usesGlass, card.glassTint == nil, CYLAnimatedItemView.isLiquidGlassActive() else {
-            return false
-        }
-        guard #available(iOS 26.0, *) else {
-            return false
-        }
-        let view: UIVisualEffectView
-        if let existing = plainGlassView as? UIVisualEffectView {
-            view = existing
-        } else {
-            view = UIVisualEffectView(effect: UIGlassEffect())
-            view.isUserInteractionEnabled = false
-            view.isAccessibilityElement = false
-            view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            insertSubview(view, at: 0)
-            plainGlassView = view
-        }
-        view.frame = bounds
-        view.cornerConfiguration = .corners(radius: .fixed(card.cornerRadius))
-        view.isHidden = false
-        glassHost.isHidden = true
-        backgroundColor = nil
-        return true
-    }
-
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         // The glass resolves its tint with its own traits when it lays out.
@@ -158,12 +122,9 @@ final class CYLTagListCardView: UICollectionReusableView {
             return
         }
         layer.cornerRadius = card.cornerRadius
-        if applyPlainGlass(card) {
-            return
-        }
-        plainGlassView?.isHidden = true
+        // One glass style for the board and the tag capsule, lit edge included: an unset tint (nil) takes the tags' default frosted tint.
         glassHost.isHidden = !card.usesGlass
-        if card.usesGlass && card.glassTint != nil {
+        if card.usesGlass {
             glassHost.itemBackgroundStyle = .liquidGlass
             glassHost.itemBackgroundColor = card.glassTint
             glassHost.itemCornerRadius = card.cornerRadius
@@ -171,7 +132,7 @@ final class CYLTagListCardView: UICollectionReusableView {
             glassHost.layoutIfNeeded()
         }
         // Flat where the glass is not drawn.
-        let drawsGlass = card.usesGlass && card.glassTint != nil && glassHost.resolvedItemBackgroundStyle == .liquidGlass
+        let drawsGlass = card.usesGlass && glassHost.resolvedItemBackgroundStyle == .liquidGlass
         glassHost.isHidden = !drawsGlass
         backgroundColor = drawsGlass ? nil : card.color
     }
