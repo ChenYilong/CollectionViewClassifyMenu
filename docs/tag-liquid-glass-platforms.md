@@ -62,3 +62,13 @@ the reason is recorded here (a platform's row is not final until its assessment 
 - Item 3 (RN, Flutter): not sound as first written (RN renders native views); rewritten as four cases above.
 - HarmonyOS: a possible fourth deviation, checked: tab bar and item both use ArkUI `backgroundEffect` with the shared tokens, so no
   deviation; but the tail fold control is not glass on HarmonyOS yet (open, the examples rule needs it).
+
+## HarmonyOS capture (example page `CYLTagGlassDemoViewController`, 2026-11-26)
+
+`docs/assets/harmonyos-emulator-glass-demo-light.jpeg` and `harmonyos-emulator-glass-demo-dark.jpeg` (emulator, tab bar pin `b6e02875`):
+glass tags, the glass section board and the glass tail fold cell on a black / white / red / blue / green plate. Seen: the board and the tags
+both have the lit edge, the tail chevron is now a glass capsule like the tags (it was an opaque capsule), and in dark mode the long header
+title "滚动隐藏：模拟意外情况（issue #13）" wraps to two lines with the "More ⌄" fold control in full at the right end (the header-room model).
+Not seen: the More and clear icon buttons next to the fold control (the page's data source does not enable them), and the light-mode header
+text on the black band and the dark-mode tags on the white band are unreadable, because the plate is a fixed colour set in both modes (a
+property of the demo plate, not of the library). No "before" capture was taken.
