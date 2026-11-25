@@ -12,7 +12,7 @@ tags: [android, kotlin, api-parity, score]
 | 满分是没有 `TODO` 行，全部是 `TODO` 则为 0。循环（AGENTS.md「Parity tables and the score loop」）：把现有的 Android 代码对应到 `TODO` 行，评分，先在核心库中实现缺失的 Android API（逻辑和名称与 iOS 相同），再在 Android 示例中展示，重新评分，直到 100。评分历史见 [android.md](android.md)。 | Full marks when no row is `TODO`; 0 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO` rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the Android example, score again, until 100. The score history is in [android.md](android.md). |
 
 <!-- bilingual:keep -->
-**Score: 992 / 992 with an Android counterpart = 100.0 / 100.** 评分：992 / 992 个符号有 Android 对应项 = 100.0 / 100。
+**Score: 994 / 994 with an Android counterpart = 100.0 / 100.** 评分：994 / 994 个符号有 Android 对应项 = 100.0 / 100。
 
 <!-- bilingual:keep -->
 | iOS API | 说明 / Description | Android API |
@@ -469,8 +469,9 @@ tags: [android, kotlin, api-parity, score]
 | `CYLHeaderSeparatorStyle` | enum, `CYLMenuStyle.swift` | `CYLHeaderSeparatorStyle (same name in the Android core)` |
 | `CYLHeaderSeparatorStyleNone` | enum value, `CYLMenuStyle.swift` | `CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone` |
 | `CYLHeaderSeparatorStyleLine` | enum value, `CYLMenuStyle.swift` | `CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine` |
-| `CYLTintContrast` | enum, `CYLMenuStyle.swift` | `CYLMenuColorLuminance (the contrast rule of the default tint; Android compares the WCAG relative luminance, iOS the luma)` |
-| `CYLTintContrast.luminanceThreshold` | property, `CYLMenuStyle.swift` | `CYLTintLuminanceThreshold (the light/dark cut-off of the default tint: 0.179 on the WCAG relative luminance scale on Android, 0.5 on the luma scale on iOS)` |
+| `CYLTintContrast` | enum, `CYLMenuStyle.swift` | `CYLMenuColorLuminance (the contrast rule of the default tint; both platforms compare the WCAG relative luminance)` |
+| `CYLTintContrast.luminanceThreshold` | property, `CYLMenuStyle.swift` | `CYLTintLuminanceThreshold (the light/dark cut-off of the default tint: 0.179 on the WCAG relative luminance scale, the same on both platforms)` |
+| `CYLTintContrast +relativeLuminanceWithRed:green:blue:` | method, `CYLMenuStyle.swift` | `CYLMenuColorLuminance (the WCAG relative luminance of an opaque sRGB color; iOS takes the red, green and blue components in 0...1, Android takes the color as an Int and returns null for a translucent one)` |
 | `CYLSectionStyleMetrics` | enum, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics (same name in the Android core)` |
 | `CYLSectionStyleMetrics.cardCornerRadius` | property, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics.CARD_CORNER_RADIUS` |
 | `CYLSectionStyleMetrics.cardPadding` | property, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics.CARD_PADDING` |
@@ -605,6 +606,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagCreateCell +outlinedStyleFrom:` | method, `CYLTagCreateCell.swift` | `CYLTagCreateCell.styleWithStyle` |
 | `CYLTagCreateCell -configureWithName:style:isEnabled:` | method, `CYLTagCreateCell.swift` | `CYLTagCreateCell.configureWithName (same name in the Android core)` |
 | `CYLTagFoldButton` | class, `CYLTagFoldButton.swift` | `com.cyl.classifymenu.CYLTagFoldButton` |
+| `CYLTagFoldButton.maximumContentSizeCategory` | property, `CYLTagFoldButton.swift` | `CYL_FOLD_CONTROL_MAX_FONT_SCALE (the largest size the fold / More control scales to; iOS caps by content size category (accessibilityMedium), Android by a font scale factor (1.3))` |
 | `CYLTagFoldButton.foldControl` | property, `CYLTagFoldButton.swift` | `CYLTagFoldButton.foldControl` |
 | `CYLTagFoldButton.isExpanded` | property, `CYLTagFoldButton.swift` | `CYLTagFoldButton.isExpanded` |
 | `CYLTagFoldButton -applyFoldControl:color:expanded:animated:` | method, `CYLTagFoldButton.swift` | `CYLTagFoldButton.applyFoldControl` |

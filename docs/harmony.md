@@ -22,7 +22,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 ## 评分 / Score
 
 <!-- bilingual:keep -->
-**Score: 1055 / 1057 = 99.8 / 100** (API 1033 / 1035, demos 22 / 22). 评分：1055 / 1057 = 99.8 / 100（API 1033 / 1035，示例 22 / 22）。
+**Score: 1059 / 1059 = 100.0 / 100** (API 1037 / 1037, demos 22 / 22). 评分：1059 / 1059 = 100.0 / 100（API 1037 / 1037，示例 22 / 22）。
 
 | 中文 | English |
 |:---|:---|
@@ -450,7 +450,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyle.headerSeparatorColor` (CYLMenuStyle.swift) | `CYLMenuStyle.headerSeparatorColor` | property |
 | `CYLMenuStyle.headerSeparatorThickness` (CYLMenuStyle.swift) | `CYLMenuStyle.headerSeparatorThickness` | property |
 | `CYLMenuStyle.headerSeparatorInsets` (CYLMenuStyle.swift) | `CYLMenuStyle.headerSeparatorInsets` | property |
-| `CYLMenuStyle.isInsetGrouped` (CYLMenuStyle.swift) | TODO | property |
+| `CYLMenuStyle.isInsetGrouped` (CYLMenuStyle.swift) | `CYLMenuStyle.isInsetGrouped` (getter) | property |
 | `CYLMenuStyle.resolvedBackgroundColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedBackgroundColor()` | property |
 | `CYLMenuStyle.resolvedSectionBackgroundColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedSectionBackgroundColor()` | property |
 | `CYLMenuStyle.resolvedHeaderSeparatorColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedHeaderSeparatorColor()` | property |
@@ -469,7 +469,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyle.resolvedHeaderTextColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedHeaderTextColor(onBand)` | property |
 | `CYLMenuStyle.resolvedFoldControlColor(inHeader:)` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedFoldControlColor(onBand)` | method |
 | `CYLMenuStyle.resolvedMoreButtonColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedMoreButtonColor(onBand)` | property |
-| `CYLMenuStyle.resolvedClearButtonColor` (CYLMenuStyle.swift) | TODO | property |
+| `CYLMenuStyle.resolvedClearButtonColor` (CYLMenuStyle.swift) | `CYLMenuStyle.resolvedClearButtonColor(onBand)` | property |
 | `CYLMenuStyle.static tagCloud()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagCloud()` | method |
 | `CYLMenuStyle.static tagContainer()` (CYLMenuStyle.swift) | `CYLMenuStyle.static tagContainer()` | method |
 | `CYLMenuStyle.static gridStyle(itemsPerRow:)` (CYLMenuStyle.swift) | `CYLMenuStyle.static gridStyle(itemsPerRow)` | method |
@@ -495,6 +495,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLHeaderSeparatorStyle.line` (CYLMenuStyle.swift) | `CYLHeaderSeparatorStyle.line` | case |
 | `CYLTintContrast` (CYLMenuStyle.swift) | `CYLMenuStyle.tintOn(background)` with `CYLMenuColorLuminance` (core/CYLMenuColor.ets) | enum |
 | `CYLTintContrast.static luminanceThreshold` (CYLMenuStyle.swift) | `CYLTintLuminanceThreshold` | property |
+| `CYLTintContrast.static relativeLuminance(red:green:blue:)` (CYLMenuStyle.swift) | `CYLMenuColorLuminance(color)` (core/CYLMenuColor.ets; the WCAG relative luminance of an opaque color, taking the color instead of the three components) | method |
 | `CYLSectionStyleMetrics` (CYLMenuStyle.swift) | `class CYLSectionStyleMetrics` | enum |
 | `CYLSectionStyleMetrics.static cardCornerRadius` (CYLMenuStyle.swift) | `CYLSectionStyleMetrics.cardCornerRadius` | property |
 | `CYLSectionStyleMetrics.static cardPadding` (CYLMenuStyle.swift) | `CYLSectionStyleMetrics.cardPadding` | property |
@@ -638,6 +639,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagCreateCell.static outlinedStyle(from:)` (CYLTagCreateCell.swift) | `CYLTagCreateItem.outlinedStyle(style)` | method |
 | `CYLTagCreateCell.configure(name:style:isEnabled:)` (CYLTagCreateCell.swift) | `configureCreate(name, style, isEnabled)` | method |
 | `CYLTagFoldButton` (CYLTagFoldButton.swift) | `CYLTagFoldButton` (tagviews/CYLTagFoldButton.ets) | class |
+| `CYLTagFoldButton.static maximumContentSizeCategory` (CYLTagFoldButton.swift) | `CYLFoldControlMaxFontScale` (core/CYLMenuFoldControl.ets; HarmonyOS caps the fold control by a font scale factor, 1.3, applied in `CYLTagFoldMetrics.cappedFontScale`, not by a content size category) | property |
 | `CYLTagFoldButton.foldControl` (CYLTagFoldButton.swift) | `CYLTagFoldButton.foldControl` | property |
 | `CYLTagFoldButton.isExpanded` (CYLTagFoldButton.swift) | `CYLTagFoldButton.isExpanded` | property |
 | `CYLTagFoldButton.init?(coder:)` (CYLTagFoldButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |

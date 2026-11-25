@@ -12,7 +12,7 @@ tags: [android, ios, api-parity, score]
 | 满分是没有 `TODO` 行，全部是 `TODO` 则为 0。循环：把现有的 iOS 代码对应到 `TODO` 行，评分，先在核心库中实现缺失的 iOS API（逻辑和名称与 Android 相同），再在 iOS 示例（Android 示例的移植）中展示，重新评分，直到 100。 | Full marks when no row is `TODO`; 0 when every row is. Loop: match existing iOS code to the `TODO` rows, score, implement the missing iOS APIs in the core first (same logic and names as Android), show them in the iOS example (a port of the Android example), score again, until 100. |
 
 <!-- bilingual:keep -->
-**Score: 942 / 949 with an iOS counterpart = 99.3 / 100.** 评分：942 / 949 个符号有 iOS 对应项 = 99.3 / 100。
+**Score: 943 / 949 with an iOS counterpart = 99.4 / 100.** 评分：943 / 949 个符号有 iOS 对应项 = 99.4 / 100。
 
 <!-- bilingual:keep -->
 | Android API | 说明 / Description | iOS API |
@@ -201,8 +201,8 @@ tags: [android, ios, api-parity, score]
 | `CYLImageTagView.imageAccessibilityHint` | property, `CYLImageTagView.kt:150` | `CYLImageTagView.imageAccessibilityHint` |
 | `CYLImageTagView.longPressAccessibilityActionName` | property, `CYLImageTagView.kt:156` | `CYLImageTagView.longPressAccessibilityActionName` |
 | `CYLMenuColorFromString` | method, `CYLMenuColor.kt:9` | `UIColor.cylMenuColor(from:)` |
-| `CYLMenuColorLuminance` | method, `CYLMenuColor.kt:27` | `CYLTintContrast` (the contrast rule of the default tint; iOS takes the luma 0.299 R + 0.587 G + 0.114 B of the opaque background, Android the WCAG relative luminance) |
-| `CYLTintLuminanceThreshold` | read-only property, `CYLMenuColor.kt:40` | `CYLTintContrast.luminanceThreshold` (the light/dark cut-off of the default tint: 0.5 on the luma scale on iOS, 0.179 on the WCAG relative luminance scale on Android) |
+| `CYLMenuColorLuminance` | method, `CYLMenuColor.kt:27` | `CYLTintContrast.relativeLuminance(red:green:blue:)` (the WCAG relative luminance of an opaque color, the contrast rule of the default tint; iOS takes the components in 0...1, Android the color as an Int) |
+| `CYLTintLuminanceThreshold` | read-only property, `CYLMenuColor.kt:40` | `CYLTintContrast.luminanceThreshold` (the light/dark cut-off of the default tint: 0.179 on the WCAG relative luminance scale, the same on both platforms) |
 | `CYLMenuItemType` | class, `CYLMenuDataSource.kt:8` | `CYLMenuItemType` |
 | `CYLMenuDataSource` | interface, `CYLMenuDataSource.kt:14` | `CYLMenuDataSource` |
 | `CYLMenuDataSource.numberOfSectionsInMenu` | method, `CYLMenuDataSource.kt:15` | `CYLMenuDataSource.numberOfSectionsInMenu()` |
@@ -571,7 +571,7 @@ tags: [android, ios, api-parity, score]
 | `CYLTagColors.styleByApplyingToStyle` | method, `CYLTagColors.kt:32` | `CYLTagColors.styleByApplying(to:)` |
 | `CYLTagCreateCell` | class, `CYLTagCreateCell.kt:13` | `CYLTagCreateCell` |
 | `CYLTagCreateCell.configureWithName` | method, `CYLTagCreateCell.kt:16` | `CYLTagCreateCell.configure(name:style:isEnabled:)` |
-| `CYL_FOLD_CONTROL_MAX_FONT_SCALE` | read-only property, `CYLTagFoldButton.kt:15` | TODO |
+| `CYL_FOLD_CONTROL_MAX_FONT_SCALE` | read-only property, `CYLTagFoldButton.kt:15` | `CYLTagFoldButton.maximumContentSizeCategory` (the largest size the fold / More control scales to; iOS caps by content size category (accessibilityMedium), Android by a font scale factor (1.3)) |
 | `CYLTagFoldButton` | class, `CYLTagFoldButton.kt:21` | `CYLTagFoldButton` |
 | `CYLTagFoldButton.foldControl` | property, `CYLTagFoldButton.kt:23` | `CYLTagFoldButton.foldControl` |
 | `CYLTagFoldButton.isExpanded` | property, `CYLTagFoldButton.kt:26` | `CYLTagFoldButton.isExpanded` |

@@ -598,7 +598,7 @@ export struct CYLTagListView {
     h.showsClear = m.showsClearButton(h.section);
     if (h.showsClear) {
       h.clearImage = (style.clearButtonImage ?? CYLMenuResources.image('cyl_trash')) as ResourceStr;
-      h.clearColor = style.clearButtonColor ?? style.resolvedHeaderTextColor(onBand);
+      h.clearColor = style.resolvedClearButtonColor(onBand);
       h.clearLabel = m.clearButtonLabel(h.section);
       h.clearSide = Math.min(h.height, Math.ceil(CYLTagButtonMetrics.lineHeight(style.headerFontFor(m.fontScale))));
     }

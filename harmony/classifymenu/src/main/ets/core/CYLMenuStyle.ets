@@ -615,6 +615,11 @@ export class CYLMenuStyle {
     return this.headerTextColorValue ?? this.resolvedTintColor(onBand);
   }
 
+  /** The clear button's color as drawn: the one the app set, else the section title's color. */
+  resolvedClearButtonColor(onBand: boolean = false): ResourceColor {
+    return this.clearButtonColor ?? this.resolvedHeaderTextColor(onBand);
+  }
+
   /** The fold controls' color as drawn (a control's own color still wins): the one the app set, else the tint. */
   resolvedFoldControlColor(onBand: boolean = false): ResourceColor {
     return this.foldControlColorValue ?? this.resolvedTintColor(onBand);
