@@ -941,17 +941,31 @@ open class CYLTagListView @JvmOverloads constructor(
     }
 
     /**
-     * The board's padding around the content column (the tags and the header block): under `insetGrouped`, `sectionContentInsets`
-     * with its leading and trailing parts replaced by `sectionBoardInset` when that is set (one value for both sides; the top and
-     * bottom stay); none in the plain style. The one place the board's horizontal inset comes from.
+     * The card's padding around the tags: `sectionContentInsets` under `insetGrouped`, none in the plain style. It narrows the
+     * section column to the tag column and never depends on `sectionBoardInset`.
      */
-    private fun cardInsets(): CYLEdgeInsets {
+    private fun cardInsets(): CYLEdgeInsets = if (listStyle.isInsetGrouped) listStyle.sectionContentInsets else CYLEdgeInsets.ZERO
+
+    /**
+     * The board's column (the card, the header band and the divider) at the list width `width` dp: the tag column extended
+     * outward by `sectionBoardInset` on both sides (a negative value is 0); by `sectionContentInsets` leading / trailing when it
+     * is unset, which is the section column; the section column in the plain style. A set value above the default can push the
+     * board past the list's margin.
+     */
+    private fun boardColumnAt(width: Float): CYLRect {
+        val column = columnAt(width)
         val style = listStyle
-        if (!style.isInsetGrouped) return CYLEdgeInsets.ZERO
+        if (!style.isInsetGrouped) return column
+        val tags = tagColumnAt(width)
         val content = style.sectionContentInsets
-        val inset = style.sectionBoardInset ?: return content
-        return CYLEdgeInsets(content.top, inset, content.bottom, inset)
+        val inset = style.sectionBoardInset
+        val leading = inset ?: content.left
+        val trailing = inset ?: content.right
+        return CYLRect(tags.x - leading, 0f, tags.width + leading + trailing, 0f)
     }
+
+    /** The board's column at the current layout width (see [boardColumnAt]). */
+    fun boardColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = boardColumnAt(max(0f, measuredContentWidth))
 
     /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
     fun contentColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = columnAt(max(0f, measuredContentWidth))
@@ -2003,7 +2017,7 @@ open class CYLTagListView @JvmOverloads constructor(
         val sectionFrames = ArrayList<CYLTagListSectionFrame>()
 
         /**
-         * The frames of one section. `column` and the header edges are leading-based (the column's x is the leading inset, the
+         * The frames of one section. `column` is the board's column ([boardColumnAt]); it and the header edges are leading-based (the column's x is the leading inset, the
          * divider's `left` inset the leading one); right to left (`rtl`) mirrors the card, the band and the divider inside
          * `width`, so with symmetric insets they are unchanged and with asymmetric ones they swap sides like the tags.
          * `headerInsetLeft` / `headerInsetRight` stay the leading / trailing distances of the title.
@@ -2132,7 +2146,7 @@ open class CYLTagListView @JvmOverloads constructor(
             val width = measuredContentWidth.coerceAtLeast(0f)
             val insets = listStyle.sectionInsets
             val card = cardInsets()
-            val column = columnAt(width)
+            val column = boardColumnAt(width)
             val headerEdges = headerEdgeInsets()
             // The tags' insets: the board's offset below the header plus the card's padding (the same insets when the style is plain).
             val tagInsetsLeft = insets.left + card.left

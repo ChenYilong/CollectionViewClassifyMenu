@@ -191,29 +191,53 @@ class CYLTagSectionStyleTest {
     }
 
     @Test
-    fun theBoardIsTheInsetBeyondTheContentColumnOnBothSides() {
+    fun theBoardIsTheTagColumnExtendedByTheInsetOnBothSides() {
         for (inset in listOf(0f, 4f, 20f)) {
             val list = makeList(insetGrouped().also { it.sectionBoardInset = inset }, 4)
             val card = list.sectionFrame(0)!!.card!!
-            val content = list.tagColumn(0)
-            assertEquals("board left == content left - inset", content.x - inset, card.x, 0.001f)
-            assertEquals("board right == content right + inset", content.maxX + inset, card.maxX, 0.001f)
-            // The board is the margin column whatever the inset.
-            assertEquals(16f, card.x, 0.001f)
-            assertEquals(WIDTH_PX - 16f, card.maxX, 0.001f)
+            val tags = list.tagColumn(0)
+            assertEquals("board left == tag left - inset", tags.x - inset, card.x, 0.001f)
+            assertEquals("board right == tag right + inset", tags.maxX + inset, card.maxX, 0.001f)
+            assertEquals(list.boardColumn(0).x, card.x, 0.001f)
+            assertEquals(list.boardColumn(0).maxX, card.maxX, 0.001f)
+            // The tag column never depends on the inset: the section column minus the content insets.
+            assertEquals(28f, tags.x, 0.001f)
+            assertEquals(292f, tags.maxX, 0.001f)
             val title = descendants(list).filterIsInstance<TextView>().first { it.text == "Section 0" }
-            assertEquals(content.x, title.left.toFloat(), 0.5f)
-            assertEquals(content.x, tagFrame(list, 0, 0).x, 0.5f)
+            assertEquals(tags.x, title.left.toFloat(), 0.5f)
+            assertEquals(tags.x, tagFrame(list, 0, 0).x, 0.5f)
         }
     }
 
     @Test
-    fun anInsetOfZeroHugsTheTags() {
+    fun anInsetOfZeroHugsTheTagsWithoutWideningThem() {
         val list = makeList(insetGrouped().also { it.sectionBoardInset = 0f }, 4)
-        assertEquals(list.contentColumn(0), list.tagColumn(0))
-        assertEquals(16f, list.tagColumn(0).x, 0.001f)
-        assertEquals(WIDTH_PX - 16f, list.tagColumn(0).maxX, 0.001f)
-        assertEquals(list.sectionFrame(0)!!.card!!.x, tagFrame(list, 0, 0).x, 0.5f)
+        val card = list.sectionFrame(0)!!.card!!
+        assertEquals(list.tagColumn(0).x, card.x, 0.001f)
+        assertEquals(list.tagColumn(0).maxX, card.maxX, 0.001f)
+        // The tag column is still 28..292, not the section column 16..304.
+        assertEquals(28f, list.tagColumn(0).x, 0.001f)
+        assertEquals(292f, list.tagColumn(0).maxX, 0.001f)
+        assertEquals(28f, card.x, 0.001f)
+        assertEquals(292f, card.maxX, 0.001f)
+        assertEquals(card.x, tagFrame(list, 0, 0).x, 0.5f)
+    }
+
+    @Test
+    fun aSetInsetAboveTheDefaultPushesTheBoardPastTheMarginButNotTheTags() {
+        val list = makeList(insetGrouped().also { it.sectionBoardInset = 20f }, 4)
+        val card = list.sectionFrame(0)!!.card!!
+        assertEquals(8f, card.x, 0.001f)
+        assertEquals(312f, card.maxX, 0.001f)
+        assertEquals(28f, list.tagColumn(0).x, 0.001f)
+        assertEquals(292f, list.tagColumn(0).maxX, 0.001f)
+        // The header band and the divider span the board.
+        val banded = makeList(insetGrouped().also {
+            it.sectionBoardInset = 20f
+            it.headerBackgroundColor = CYLSectionStyleColors.HEADER_BAND
+        }, 4)
+        assertEquals(8f, banded.sectionFrame(0)!!.headerBand!!.x, 0.001f)
+        assertEquals(312f, banded.sectionFrame(0)!!.headerBand!!.maxX, 0.001f)
     }
 
     @Test
@@ -224,13 +248,18 @@ class CYLTagSectionStyleTest {
         }
         val list = makeList(style, 4)
         val card = list.sectionFrame(0)!!.card!!
+        // The tag column still comes from the content insets (16 + 40 .. 304 - 8); the board is 6 beyond it.
+        assertEquals(56f, list.tagColumn(0).x, 0.001f)
+        assertEquals(296f, list.tagColumn(0).maxX, 0.001f)
         assertEquals(card.x + 6f, list.tagColumn(0).x, 0.001f)
         assertEquals(card.maxX - 6f, list.tagColumn(0).maxX, 0.001f)
-        // Unset: the content insets' own leading and trailing parts, as before.
+        // Unset: the content insets' own leading and trailing parts, so the board is the section column.
         val unset = makeList(insetGrouped().also { it.sectionContentInsets = CYLEdgeInsets(30f, 40f, 30f, 8f) }, 4)
         val unsetCard = unset.sectionFrame(0)!!.card!!
         assertEquals(unsetCard.x + 40f, unset.tagColumn(0).x, 0.001f)
         assertEquals(unsetCard.maxX - 8f, unset.tagColumn(0).maxX, 0.001f)
+        assertEquals(56f, unset.tagColumn(0).x, 0.001f)
+        assertEquals(296f, unset.tagColumn(0).maxX, 0.001f)
     }
 
     @Test
