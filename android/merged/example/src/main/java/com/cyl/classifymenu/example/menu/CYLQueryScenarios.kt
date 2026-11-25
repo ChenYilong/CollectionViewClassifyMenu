@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -13,9 +12,23 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
+import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
+import com.cyl.classifymenu.CYLAppTintColor
+import com.cyl.classifymenu.CYLControlState
+import com.cyl.classifymenu.CYLEdgeInsets
+import com.cyl.classifymenu.CYLFont
+import com.cyl.classifymenu.CYLMenuDataSource
+import com.cyl.classifymenu.CYLMenuFoldControl
+import com.cyl.classifymenu.CYLMenuFoldControlContent
+import com.cyl.classifymenu.CYLMenuFoldControlPosition
+import com.cyl.classifymenu.CYLMenuSelectionMode
+import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLSize
+import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.CYLTagLongPressActions
 import com.cyl.classifymenu.CYLClassifyMenuViewController
 import com.cyl.classifymenu.CYLFilterBaseController
 import com.cyl.classifymenu.CYLFilterControllerDelegate
@@ -27,7 +40,6 @@ import com.cyl.classifymenu.example.classify.ClassifyDemoDataSource
 import com.cyl.classifymenu.example.classify.ClassifyPlacesDatabase
 import com.cyl.classifymenu.example.classify.ClassifyResultsView
 import com.cyl.classifymenu.example.classify.ClassifySQLQuery
-import com.cyl.classifymenu.example.tageditor.CYLSymbolDrawable
 
 /**
  * The `selections` table of `CYLExampleDatabase`: the conditions each demo last confirmed, restored when it opens
@@ -81,16 +93,85 @@ enum class CYLQueryScenario { REVIEWS_DATABASE, REVIEWS_MEMORY, REVIEWS_NETWORK,
 
 /**
  * `CYLQueryScenariosViewController` (the iOS example's plus page): the query scenarios (the review filter in its
- * three modes, the menu linkage, search history and discover) and the database's tables with their row counts.
+ * three modes, the menu linkage, search history and discover) and the database's tables with their row counts, as one
+ * `CYLTagListView` (docs/instructions/examples.md "Sectioned lists in demos use the tag list"): a section per group, the
+ * group's title as the header, a tag with only the title and the icon, the More / Less control on a section that needs
+ * more than `defaultVisibleRows` rows. A tap opens the scenario like the old row did; the old group footer (the
+ * explanation) is the tags' subtitle, shown in the callout of a long press.
  */
-class CYLQueryScenariosScreen(private val context: Context, private val navigator: CYLMenuNavigator) : CYLMenuScreen, CYLMenuScreenLifecycle {
+class CYLQueryScenariosScreen(private val context: Context, private val navigator: CYLMenuNavigator) : CYLMenuScreen, CYLMenuScreenLifecycle, CYLMenuDataSource, CYLMenuDelegate {
     override val title: CharSequence = CYLExampleLocalizedString(context, "查询筛选")
-    private val list = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-    private val d = context.resources.displayMetrics.density
-    override val view: View = ScrollView(context).apply { setBackgroundColor(Color.rgb(242, 242, 247)); addView(list) }
+    private var tableCounts: List<Pair<String, Int>> = emptyList()
+
+    /** The one tag list of the screen. */
+    val tagList = CYLTagListView(context, CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon))
+    override val view: View = tagList
 
     companion object {
         const val DATABASE_SECTION = 3
+        const val DEFAULT_VISIBLE_ROWS = 2
+        private const val SECTION_COUNT = DATABASE_SECTION + 1
+        private const val CELL_SEPARATOR = " · "
+        private const val SCREEN_BACKGROUND_RED = 242
+        private const val SCREEN_BACKGROUND_GREEN = 242
+        private const val SCREEN_BACKGROUND_BLUE = 247
+        private const val TAG_BACKGROUND = 0xFFFFFFFF.toInt()
+        private const val TAG_TEXT_SIZE_SP = 15f
+        private const val TAG_ITEM_HEIGHT_DP = 44f
+        private const val TAG_ICON_SIZE_DP = 20f
+        private const val TAG_ICON_TITLE_SPACING_DP = 8f
+        private const val TAG_MARGIN_DP = 12f
+        private const val TAG_CORNER_RADIUS_DP = 10f
+        private const val TAG_SPACING_DP = 10f
+        private const val SECTION_INSET_TOP_DP = 4f
+        private const val SECTION_INSET_SIDE_DP = 16f
+        private const val SECTION_INSET_BOTTOM_DP = 16f
+        private const val HEADER_HEIGHT_DP = 44f
+        private const val HEADER_TEXT_SIZE_SP = 20f
+        private const val TAG_TITLE_MAX_LINES = 3
+        private val HEADERS = listOf("场景：查询参数设置（多选）", "场景：菜单选择（移植原 Demo）", "场景：搜索历史与发现", "数据库（SQLite）")
+        private val FOOTERS = listOf(
+            "淘宝评价默认显示全部；条件太多时，由用户多选输入筛选条件，标签列表就是为此而做。每次选择后按全部条件（AND）刷新列表。",
+            "原 Demo 只实现了筛选界面，没有筛选数据；现在每次选择都会生成 SQL、查询数据库并显示结果，选择也保存在数据库中。",
+            "最近搜索折叠为两行，箭头是最后一个标签；发现每行两个，超出部分显示省略号，右上角的更多按钮随机刷新。数据来自本地 JSON。",
+            "每次启动时由 App 内的数据重新生成，selections 表保留各演示最后确认的条件。")
+        private val SCENARIO_ICONS = mapOf(CYLQueryScenario.REVIEWS_DATABASE to R.drawable.ic_query_database, CYLQueryScenario.REVIEWS_MEMORY to R.drawable.ic_query_memory,
+            CYLQueryScenario.REVIEWS_NETWORK to R.drawable.ic_query_network, CYLQueryScenario.MENU_LINKAGE to R.drawable.ic_query_grid, CYLQueryScenario.SEARCH_DISCOVER to R.drawable.ic_search_magnifier)
+        private val TABLE_ICONS = mapOf("reviews" to R.drawable.ic_style_message, "places" to R.drawable.ic_style_mappin, "selections" to R.drawable.ic_style_star)
+    }
+
+    init {
+        tagList.style = tagStyle(monospaced = false)
+        tagList.selectionMode = CYLMenuSelectionMode.CYLMenuSelectionModeNone
+        tagList.defaultVisibleRows = DEFAULT_VISIBLE_ROWS
+        tagList.longPressAction = CYLTagLongPressActions.callout
+        tagList.menuDelegate = this
+        tagList.menuDataSource = this
+        reload()
+    }
+
+    private fun tagStyle(monospaced: Boolean) = CYLMenuStyle().apply {
+        backgroundColor = Color.rgb(SCREEN_BACKGROUND_RED, SCREEN_BACKGROUND_GREEN, SCREEN_BACKGROUND_BLUE)
+        titleMaxLines = TAG_TITLE_MAX_LINES
+        itemHeight = TAG_ITEM_HEIGHT_DP
+        imageSize = CYLSize(TAG_ICON_SIZE_DP, TAG_ICON_SIZE_DP)
+        imageTitleSpacing = TAG_ICON_TITLE_SPACING_DP
+        interitemSpacing = TAG_SPACING_DP
+        lineSpacing = TAG_SPACING_DP
+        sectionInsets = CYLEdgeInsets(SECTION_INSET_TOP_DP, SECTION_INSET_SIDE_DP, SECTION_INSET_BOTTOM_DP, SECTION_INSET_SIDE_DP)
+        headerHeight = HEADER_HEIGHT_DP
+        headerFont = CYLFont(HEADER_TEXT_SIZE_SP, Typeface.DEFAULT_BOLD)
+        headerTextColor = Color.BLACK
+        headerHorizontalInset = SECTION_INSET_SIDE_DP
+        for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
+            appearanceForState(state).apply {
+                backgroundColor = TAG_BACKGROUND
+                cornerRadius = TAG_CORNER_RADIUS_DP
+                margin = TAG_MARGIN_DP
+                textColor = Color.BLACK
+                font = CYLFont(TAG_TEXT_SIZE_SP, if (monospaced) Typeface.MONOSPACE else Typeface.DEFAULT)
+            }
+        }
     }
 
     fun scenarios(section: Int) = when (section) {
@@ -122,87 +203,43 @@ class CYLQueryScenariosScreen(private val context: Context, private val navigato
     fun open(scenario: CYLQueryScenario) = screen(scenario)?.also { navigator.push(it) }
 
     /**
-     * `-viewWillAppear:` reloads the table (the selections count changes after the linkage demo).
+     * `-viewWillAppear:` reloads the list (the selections count changes after the linkage demo).
      */
     override fun screenDidAppear(navigator: CYLMenuNavigator) = reload()
 
     private fun reload() {
-        list.removeAllViews()
-        val headers = listOf("场景：查询参数设置（多选）", "场景：菜单选择（移植原 Demo）", "场景：搜索历史与发现", "数据库（SQLite）")
-        val footers = listOf(
-            "淘宝评价默认显示全部；条件太多时，由用户多选输入筛选条件，标签列表就是为此而做。每次选择后按全部条件（AND）刷新列表。",
-            "原 Demo 只实现了筛选界面，没有筛选数据；现在每次选择都会生成 SQL、查询数据库并显示结果，选择也保存在数据库中。",
-            "最近搜索折叠为两行，箭头是最后一个标签；发现每行两个，超出部分显示省略号，右上角的更多按钮随机刷新。数据来自本地 JSON。",
-            "每次启动时由 App 内的数据重新生成，selections 表保留各演示最后确认的条件。")
-        val icons = mapOf(CYLQueryScenario.REVIEWS_DATABASE to R.drawable.ic_query_database, CYLQueryScenario.REVIEWS_MEMORY to R.drawable.ic_query_memory,
-            CYLQueryScenario.REVIEWS_NETWORK to R.drawable.ic_query_network, CYLQueryScenario.MENU_LINKAGE to R.drawable.ic_query_grid, CYLQueryScenario.SEARCH_DISCOVER to R.drawable.ic_search_magnifier)
-        for (section in 0..DATABASE_SECTION) {
-            list.addView(caption(headers[section], 13f, top = 18f, bottom = 6f).also { androidx.core.view.ViewCompat.setAccessibilityHeading(it, true) })
-            val group = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-                background = GradientDrawable().apply { setColor(Color.WHITE); cornerRadius = 10 * d }
-                clipToOutline = true
-            }
-            if (section == DATABASE_SECTION) {
-                val database = ClassifyPlacesDatabase(context)
-                val counts = listOf("reviews" to database.countOfTable("reviews"), "places" to database.countOfTable("places"), "selections" to CYLExampleSelections.shared(context).count())
-                database.close()
-                counts.forEachIndexed { index, (table, count) ->
-                    if (index > 0) group.addView(separator(16f))
-                    group.addView(row(table, CYLExampleLocalizedString(context, "%ld 行", count), null, monospaced = true, action = null))
-                }
-            } else {
-                scenarios(section).forEachIndexed { index, scenario ->
-                    if (index > 0) group.addView(separator(56f))
-                    group.addView(row(title(scenario), null, icons[scenario], monospaced = false, action = if (screen(scenario) != null) ({ open(scenario) }) else null))
-                }
-            }
-            list.addView(group, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { leftMargin = (16 * d).toInt(); rightMargin = (16 * d).toInt() })
-            list.addView(caption(footers[section], 12f, top = 6f, bottom = 0f))
-        }
-        list.addView(View(context), LinearLayout.LayoutParams(1, (24 * d).toInt()))
+        val database = ClassifyPlacesDatabase(context)
+        val counts = listOf("reviews", "places").map { it to database.countOfTable(it) }
+        database.close()
+        tableCounts = counts + ("selections" to CYLExampleSelections.shared(context).count())
+        tagList.reloadMenuData()
     }
 
-    private fun caption(text: String, size: Float, top: Float, bottom: Float) = TextView(context).apply {
-        this.text = CYLExampleLocalizedString(context, text)
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, size)
-        setTextColor(Color.argb(153, 60, 60, 67))
-        setPadding((32 * d).toInt(), (top * d).toInt(), (32 * d).toInt(), (bottom * d).toInt())
-    }
+    // MARK: CYLMenuDataSource
 
-    private fun separator(inset: Float) = View(context).apply { setBackgroundColor(Color.rgb(224, 224, 224)) }.also {
-        it.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1).apply { leftMargin = (inset * d).toInt() }
-    }
+    private fun icon(resource: Int?): Drawable? = resource?.let { ContextCompat.getDrawable(context, it)?.mutate()?.also { drawable -> drawable.setTint(CYLAppTintColor) } }
 
-    private fun row(title: String, value: String?, icon: Int?, monospaced: Boolean, action: (() -> Unit)?) = LinearLayout(context).apply {
-        gravity = Gravity.CENTER_VERTICAL
-        minimumHeight = (44 * d).toInt()
-        setPadding((16 * d).toInt(), (10 * d).toInt(), (16 * d).toInt(), (10 * d).toInt())
-        icon?.let {
-            addView(android.widget.ImageView(context).apply {
-                setImageResource(it)
-                setColorFilter(com.cyl.classifymenu.CYLAppTintColor)
-                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-            }, LinearLayout.LayoutParams((24 * d).toInt(), (24 * d).toInt()).apply { rightMargin = (16 * d).toInt() })
-        }
-        addView(TextView(context).apply {
-            text = title
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-            setTextColor(if (action != null || value != null) Color.BLACK else Color.GRAY)
-            if (monospaced) typeface = Typeface.MONOSPACE
-        }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-        value?.let { addView(TextView(context).apply { text = it; setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f); setTextColor(Color.argb(153, 60, 60, 67)) }) }
-        if (action != null) {
-            addView(android.widget.ImageView(context).apply {
-                setImageDrawable(CYLSymbolDrawable("chevron.right", 14f, d).also { it.setTint(Color.rgb(196, 196, 199)) })
-                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-            }, LinearLayout.LayoutParams((14 * d).toInt(), (14 * d).toInt()))
-            isClickable = true
-            isFocusable = true
-            setBackgroundResource(TypedValue().also { context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true) }.resourceId)
-            setOnClickListener { action() }
-        }
-        contentDescription = if (value != null) "$title, $value" else title
+    override fun numberOfSectionsInMenu() = SECTION_COUNT
+
+    override fun menuNumberOfItemsInSection(section: Int) = if (section == DATABASE_SECTION) tableCounts.size else scenarios(section).size
+
+    override fun menuTitleForSection(section: Int) = CYLExampleLocalizedString(context, HEADERS[section])
+
+    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = if (indexPath.section == DATABASE_SECTION) {
+        tableCounts[indexPath.item].let { (table, count) -> table + CELL_SEPARATOR + CYLExampleLocalizedString(context, "%ld 行", count) }
+    } else title(scenarios(indexPath.section)[indexPath.item])
+
+    override fun menuSubtitleForItemAtIndexPath(indexPath: CYLIndexPath): String? = CYLExampleLocalizedString(context, FOOTERS[indexPath.section])
+
+    override fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath) = icon(if (indexPath.section == DATABASE_SECTION) TABLE_ICONS[tableCounts[indexPath.item].first] else SCENARIO_ICONS[scenarios(indexPath.section)[indexPath.item]])
+
+    /** The database tables were monospaced rows. */
+    override fun menuStyleForSection(section: Int): CYLMenuStyle? = if (section == DATABASE_SECTION) tagStyle(monospaced = true) else null
+
+    // MARK: CYLMenuDelegate
+
+    override fun menuDidSelectItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {
+        if (indexPath.section != DATABASE_SECTION) open(scenarios(indexPath.section)[indexPath.item])
     }
 }
 
