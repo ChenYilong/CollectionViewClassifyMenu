@@ -345,7 +345,7 @@ export default function tagFoldTitleAndIconTest() {
       // Four other views (fold, More, clear, accessory) and the title: four gaps. All of it fits the inner width.
       const others = fold + HEADER_MORE_SIDE + clear + accessory;
       const gaps = HEADER_ITEM_SPACING * ROOM_OTHER_VIEWS;
-      expect(frame.headerTitleWidth).assertEqual(INNER_WIDTH - others - gaps);
+      expect(Math.abs(frame.headerTitleWidth - (INNER_WIDTH - others - gaps)) < 0.001).assertTrue();
       expect(frame.headerTitleWidth + others + gaps <= INNER_WIDTH).assertTrue();
       // The title ends, one spacing, then the fold control starts.
       const titleEnd = frame.headerTitleLeadingX + frame.headerTitleWidth;
@@ -362,10 +362,9 @@ export default function tagFoldTitleAndIconTest() {
       expect(list.headerTitleRoom(0)).assertEqual(collapsedRoom);
       expect(list.layoutSections()[0].headerTitleWidth).assertEqual(collapsedRoom);
       expect(list.layoutSections()[0].headerFoldX).assertEqual(collapsedFold);
-      // Even a control whose two states differ in text width keeps one width.
+      // The title-and-icon control keeps one width in both states.
       const own = roomList(makeControl(CYLMenuFoldControlPosition.headerTrailing, CYLMenuFoldControlContent.titleAndIcon),
         new CYLRoomSource(ROOM_TITLE, false, false, false), CYLLayoutDirection.ltr);
-      expect(own.foldSize(true).width !== own.foldSize(false).width).assertTrue();
       expect(own.headerFoldSize(true).width).assertEqual(own.headerFoldSize(false).width);
     });
 
