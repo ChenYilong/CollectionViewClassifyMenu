@@ -394,6 +394,8 @@ open class CYLTagButton @JvmOverloads constructor(
         }
         animationView?.alpha = if (state == CYLControlState.DISABLED) 0.4f else 1f
         imageView.imageTintList = null
+        // The icon tint (and so the animation's, which the base class draws through the same icon view) is lifted by
+        // updateIconTint() once the glass state below is known.
         imageView.setColorFilter(style.iconColorForState(state))
         val icon = iconView.drawable
         if (icon is CYLBadgeDrawable || icon is CYLOriginalImageDrawable) imageView.clearColorFilter()
@@ -419,6 +421,14 @@ open class CYLTagButton @JvmOverloads constructor(
         itemBackgroundColor = if (drawsGlass && !highlighted) appearance.explicitBackgroundColor else backgroundColor
         // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
         itemGlassTintAlpha = if (state == CYLControlState.SELECTED) 1f else null
+        // Dark glass icon lift: only where glass is drawn, in night mode, for an EXPLICIT icon color; never otherwise.
+        val explicitIconColor = style.explicitIconColorForState(state)
+        if (drawsGlass && CYLSystemColors.isNight(context) && explicitIconColor != null) {
+            val lifted = CYLIconContrast.liftedIconColor(explicitIconColor, itemBackgroundColor, itemGlassTintAlpha)
+            if (lifted != explicitIconColor && iconView.drawable.let { it !is CYLBadgeDrawable && it !is CYLOriginalImageDrawable }) {
+                imageView.setColorFilter(lifted)
+            }
+        }
         // The appearance's radius (CYLAnimatedItemCornerRadiusCapsule by default, 0 is square), set with the style and not
         // only when the tag is laid out: the view's own default (null) is square for flat.
         itemCornerRadius = appearance.cornerRadius

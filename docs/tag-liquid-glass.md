@@ -121,3 +121,17 @@ A Liquid Glass tag in a list has the root view as its backdrop source, which con
 Windows Android run on 4bc1ec1). CYLTabBarController `a5a2f1b1` makes `CYLLiquidGlassView` skip sampling when the view is inside its own source: it draws the tint only
 (no blur or refraction), and `CYLGlassBackdrop` guards the capture. iOS draws real glass. True glass for a list needs a backdrop source outside the list: `CYLTagListView.backdropSource` (docs/tag-section-style.md "Android backdropSource"); without it Android tags look like the default frosted tint (225, 222, 220 at 0.5 alpha, white 0.14 in dark mode).
 
+
+## Dark glass icon lift
+
+An EXPLICIT icon color (the app called `setIconColor` for the state) that is too dark for dark Liquid Glass is lifted until it has a 3:1 WCAG contrast ratio against the glass, keeping hue, saturation and alpha (`CYLIconContrast`, a pure function; iOS reference `CYLIconContrast.swift`).
+
+- Reference luminance: the glass over black. No glass tint (or alpha 0): white at 0.14 (about #242424). An explicit tint: its color times `tint.alpha * (tintAlpha ?? 0.75)`; the selected tag uses tint alpha 1.
+- Rule: contrast `(max + 0.05) / (min + 0.05) >= 3` leaves the color unchanged; otherwise the HSL lightness rises in steps of 0.005 up to 1 (never above white).
+- Applies only where glass is really drawn AND the mode is dark AND the state has an explicit icon color. Light mode, flat tags, the built-in icon color (the text color) and colors that already pass never change. A dynamic (per-mode) color is never changed; Android and the other platforms with static colors have none.
+- The lifted color feeds both the image tint and the animation tint.
+
+| Platform | Status |
+|:--|:--|
+| iOS | Reference (`CYLIconContrast.swift`, `CYLTagButton`). |
+| Android | `CYLIconContrast.kt`; `CYLTagButton.updateAppearance` lifts the icon color filter (night mode = `CYLSystemColors.isNight`, glass = `resolvedBackgroundStyle`, explicit = `CYLMenuStyle.explicitIconColorForState`); `CYLIconContrastTest`, written statically, not yet run. |
