@@ -5,7 +5,7 @@
  * in text order, into the field. The message is localized (a greeting with a name to pick, an emoji and a space).
  */
 const { t } = require('../../utils/i18n.js');
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 
 /** The sender, and the name the message lets you pick (the same in every language). */
 const SENDER = 'Alex';

@@ -9,7 +9,7 @@
  */
 const { t } = require('../../utils/i18n.js');
 const { COLORS } = require('../../utils/android-sample.js');
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 const data = require('./data.js');
 
 /** The cyl-tag-cloud options a container leaves unset, so the component never receives undefined (XML defaults). */

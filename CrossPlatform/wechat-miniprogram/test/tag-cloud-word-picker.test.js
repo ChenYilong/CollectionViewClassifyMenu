@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 
 const PACKAGE = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
-const model = require(path.join(PACKAGE, 'cyl-tag-cloud/model.js'));
+const model = require(path.join(PACKAGE, 'cyl-tag-list/tag-model.js'));
 const MESSAGE = "Hi, I'm Alex from Design 👋";
 
 test('characters, the word picker style and the smear range', () => {

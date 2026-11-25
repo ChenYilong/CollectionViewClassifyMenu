@@ -73,7 +73,7 @@ function tap(index, extra = {}) {
 
 test('cyl-tag-cloud: taps, deletions and the tag methods', () => {
   i18n.setLanguage('zh_CN');
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
   const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
     tags: [model.makeTag('A'), model.makeTag('B', { isDeletable: true }), model.makeTag('C')],
     listStyle: model.tagCloudStyle(),
@@ -98,7 +98,7 @@ test('cyl-tag-cloud: taps, deletions and the tag methods', () => {
 });
 
 test('cyl-tag-cloud: a long press selects (in none mode) or reorders, and reports when it did not move', () => {
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
   const rects = [0, 1, 2].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
   const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
     tags: ['a', 'b', 'c'].map((title) => model.makeTag(title)),
@@ -273,7 +273,7 @@ test('the pages load with their titles and react as the iOS screens', () => {
 
 test('cyl-tag-cloud: a drag holds scrolling unless disablesScrollingWhileReordering is off; the template catches touchmove then', () => {
   const fs = require('node:fs');
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
   const wxml = fs.readFileSync(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.wxml'), 'utf8');
   assert.match(wxml, /catchtouchmove="\{\{allowsSmearSelection \|\| scrollLocked \? 'onTouchMove' : ''\}\}"/);
   assert.match(wxml, /bindtouchmove="\{\{allowsSmearSelection \|\| scrollLocked \? '' : 'onTouchMove'\}\}"/);
@@ -290,7 +290,7 @@ test('cyl-tag-cloud: a drag holds scrolling unless disablesScrollingWhileReorder
 });
 
 test('cyl-tag-cloud: editing catches touchmove from the first touch (scrolling cannot be stopped later) and a drag end keeps it', () => {
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
   const rects = [0, 1].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
   const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
     tags: ['a', 'b'].map((title) => model.makeTag(title)), listStyle: model.tagContainerStyle(),

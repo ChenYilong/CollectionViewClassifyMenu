@@ -47,10 +47,10 @@
  * <scroll-view> meanwhile (catching touchmove alone does not stop native scrolling). Needs `selectionMode` 'multiple';
  * `model.wordPickerStyle()` is the matching look.
  */
-const model = require('./model.js');
+const model = require('../cyl-tag-list/tag-model.js');
 const { coreString } = require('../core-strings.js');
-const { CYLTagListStore, loadSections, loadItems } = require('./cache.js');
-const { iconImage } = require('./editing-icons.js');
+const { CYLTagListStore, loadSections, loadItems } = require('../cyl-tag-list/cache.js');
+const { iconImage } = require('../cyl-tag-list/editing-icons.js');
 const locale = require('../locale.js');
 
 /**

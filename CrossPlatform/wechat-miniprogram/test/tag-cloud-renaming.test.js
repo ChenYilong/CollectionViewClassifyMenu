@@ -8,9 +8,9 @@ const path = require('node:path');
 const i18n = require('../miniprogram/utils/i18n.js');
 
 const PACKAGE = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
-const model = require(path.join(PACKAGE, 'cyl-tag-cloud/model.js'));
-const { CYLTagListStore, loadItems } = require(path.join(PACKAGE, 'cyl-tag-cloud/cache.js'));
-const { iconImage, base64 } = require(path.join(PACKAGE, 'cyl-tag-cloud/editing-icons.js'));
+const model = require(path.join(PACKAGE, 'cyl-tag-list/tag-model.js'));
+const { CYLTagListStore, loadItems } = require(path.join(PACKAGE, 'cyl-tag-list/cache.js'));
+const { iconImage, base64 } = require(path.join(PACKAGE, 'cyl-tag-list/editing-icons.js'));
 // The component's own locale: after `verify-package.js` the example's i18n reaches the installed copy in node_modules,
 // a separate module, so the language is set on both (and put back after each test).
 const packageLocale = require(path.join(PACKAGE, 'locale.js'));

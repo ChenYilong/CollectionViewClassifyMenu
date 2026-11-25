@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 
 const PACKAGE = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
-const model = require(path.join(PACKAGE, 'cyl-tag-cloud/model.js'));
+const model = require(path.join(PACKAGE, 'cyl-tag-list/tag-model.js'));
 
 /** Frames of `widths` laid out in rows of `rowWidth` with `spacing`, as flex wrap does. */
 function layOut(widths, rowWidth, spacing) {

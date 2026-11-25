@@ -11,7 +11,7 @@
  */
 module.exports = {
   tagList: require('./cyl-tag-list/model.js'),
-  tagCloud: require('./cyl-tag-cloud/model.js'),
+  tagCloud: require('./cyl-tag-list/tag-model.js'),
   tagImage: require('./cyl-tag-image/model.js'),
   symbols: require('./cyl-tag-list/symbols.js'),
   animations: require('./cyl-tag-list/animations.js'),
