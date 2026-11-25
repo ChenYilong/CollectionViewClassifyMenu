@@ -212,11 +212,13 @@ Component({
   observers: {
     tags(tags) {
       this._tagsSet = true;
+      this._markTagInput();
       this._tags = (tags || []).map(keyed);
       this._selection = [];
       this._render(true);
     },
     'listStyle, colorTheme, defaultTagImage, containerBorderWidth, containerBorderColor, containerCornerRadius'() {
+      this._markTagInput();
       this._render(false);
     },
     editing(value) {
@@ -257,6 +259,7 @@ Component({
       this._cache = CYLTagListStore.cache(this.data.cachePolicy, this.data.cacheName);
       // The initial tags, when the observer has not run for them.
       if (!this._tagsSet) this._tags = (this.data.tags || []).map(keyed);
+      if (this._tags.length || this.data.listStyle) this._markTagInput();
       this.rebuild();
       // The defaults follow dark mode: build again when the system theme changes.
       this.stopThemeChanges = theme.onChange(() => this.rebuild());
@@ -275,10 +278,23 @@ Component({
   },
 
   methods: {
-    /** Whether the list shows the flat tags: its configuration has no `sections`. */
-    _usesTags() {
+    /** Whether the configuration has `sections` (an empty array counts). */
+    _hasSections() {
       const configuration = this.data.configuration;
-      return !(configuration && Array.isArray(configuration.sections));
+      return !!configuration && Array.isArray(configuration.sections);
+    },
+
+    /**
+     * Whether the list shows the flat tags: its configuration has no `sections` and the host gave flat input (the
+     * `tags` or `listStyle` property, or a tag method). A list whose configuration is still empty shows nothing.
+     */
+    _usesTags() {
+      return !this._hasSections() && !!this._hasTagInput;
+    },
+
+    /** The host uses the flat tags. */
+    _markTagInput() {
+      this._hasTagInput = true;
     },
 
     _initTags() {
@@ -300,6 +316,13 @@ Component({
       this.dismissCallout();
       if (this._usesTags()) {
         this._render(false);
+        return;
+      }
+      if (!this._hasSections()) {
+        // Nothing to show yet (no sections, no flat tags): nothing is drawn or measured.
+        this.model = model.normalize(this.data.configuration, { pixelRatio: pixelRatio(), dark: theme.isDark() });
+        this.selection = [];
+        if (this.data.flat || this.data.sections.length) this.setData({ flat: false, sections: [], items: [], backgroundStyle: '' });
         return;
       }
       if (this.data.flat) this.setData({ flat: false, items: [] });
@@ -628,18 +651,21 @@ Component({
 
     /** Adds a tag (addTag(_:)). */
     addTag(tag) {
+      this._markTagInput();
       this._tags.push(keyed(tag));
       this._render(true);
     },
 
     /** Adds tags (addTags(_:)). */
     addTags(tags) {
+      this._markTagInput();
       this._tags.push(...tags.map(keyed));
       this._render(true);
     },
 
     /** Inserts a tag; selections at or after it move down; an index past the end adds it at the end. */
     insertTag(tag, index) {
+      this._markTagInput();
       const position = Math.min(Math.max(0, index), this._tags.length);
       this._tags.splice(position, 0, keyed(tag));
       this._selection = tagModel.shiftSelection(this._selection, position, 1);
@@ -656,6 +682,7 @@ Component({
 
     /** Removes every tag. */
     removeAllTags() {
+      this._markTagInput();
       this._tags = [];
       this._selection = [];
       this._render(true);
@@ -663,6 +690,7 @@ Component({
 
     /** Replaces the tags (setTags). */
     replaceTags(tags) {
+      this._markTagInput();
       this._tags = tags.map(keyed);
       this._selection = [];
       this._render(true);
@@ -686,6 +714,7 @@ Component({
 
     /** One tag per character of `text` (graphemes); keeps `selectionMode`, unlike setting `tags`. */
     setTagsWithCharactersOfText(text) {
+      this._markTagInput();
       this._tags = tagModel.characters(text).map((title) => keyed(tagModel.makeTag(title)));
       this._selection = [];
       this._render(true);
@@ -996,7 +1025,8 @@ Component({
     // MARK: Rendering of flat tags
 
     _style() {
-      return this.data.listStyle || tagModel.defaultStyle();
+      // Without a style of its own, the defaults follow dark mode as a section list's do.
+      return this.data.listStyle || tagModel.defaultStyle(theme.isDark());
     },
 
     _render(contentChanged) {
@@ -1041,6 +1071,7 @@ Component({
       const chevronSide = tagModel.editingIconSide(listStyle.normal.fontSize);
       this.setData({
         flat: true,
+        sections: [],
         backgroundStyle: '',
         items,
         list,

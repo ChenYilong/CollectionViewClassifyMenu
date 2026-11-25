@@ -47,8 +47,12 @@ tags: [issues, ui, cocoapods, progress]
   `cyl-tag-list/tag-model.js`); the long press decides through `model.longPressDecision` (`reorder` begins where flat
   tags can move); `cyl-tag-cloud` removed; package `cyl-tag-list-miniprogram` 0.2.0 (README "Migration from
   cyl-tag-cloud"). `npm test` 197: 195 pass, 1 known failure (`animated-item` test 5, missing `cyl-rive-miniprogram`,
-  as before), 1 skip. Not seen in WeChat DevTools unless noted in the commits. Gaps: flat tags keep the cloud's look
-  (no dark mode defaults, `titleWraps` instead of `titleMaxLines`, no cyl-animated-item icons).
+  as before), 1 skip; after the follow-up 200 (with the git-ignored `cyl_components` installed: 200/200). Commits
+  503fdff9, bd053c4c, edb3b471, f7b0e7e1, bf18d44b and the follow-up (empty configuration, dark mode defaults and
+  `titleMaxLines` for flat tags). WeChat DevTools: `open_project_window` and `build_npm` succeeded once, then the
+  automator timed out and later calls returned `APPID_ERROR` (`get_user_appids` ETIMEDOUT): no page was seen, no
+  screenshot. Gaps: flat tags are drawn by `renderTag`, not `tagLayout` (no cyl-animated-item icons), and fold with
+  their own tail control (`foldchange` {canFold, expanded}), because the retargeted cloud tests pin both.
 
 ### TODO → DONE (2026-11-25, docs/tag-liquid-glass-screenshots, Mac session chenyilong-68): labeled iOS Liquid Glass screenshots (default style normal / selected / disabled, flat vs glass, contact tag editor selected)
 
