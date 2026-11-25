@@ -4,7 +4,7 @@
 //
 //  CYLMenuStyle.headerMaxLines: the most lines a section header's title may take. 1 (default) leaves the header frames as they
 //  were; more lines (or `CYLHeaderTitleMaxLines.unlimited`) grow the header for a long title, measured at the room left of the
-//  fold control, plus 12 pt.
+//  fold control, plus 8 pt under the board without a divider (the default style), 12 pt otherwise.
 //
 
 import XCTest
@@ -13,6 +13,13 @@ import CollectionViewClassifyMenu
 @testable import CYLMenuExample
 
 final class CYLTagListHeaderMaxLinesTests: CYLMenuExampleTestCase {
+
+    /**
+     * The header of a title that fits one line, under the default style (the board, no divider): the line height plus 8.
+     */
+    private var oneLineHeight: CGFloat {
+        ceil(CYLMenuStyle().headerFont.lineHeight) + CYLSectionStyleMetrics.headerBoardTitlePadding
+    }
 
     private let longTitle = "A very long section title that cannot fit on one line of a narrow phone screen, so it needs to wrap onto several lines"
 
@@ -54,7 +61,7 @@ final class CYLTagListHeaderMaxLinesTests: CYLMenuExampleTestCase {
         let byDefault = headerHeight(maxLines: nil)
         let explicit = headerHeight(maxLines: CYLHeaderTitleMaxLines.single)
         XCTAssertEqual(byDefault.height, explicit.height)
-        XCTAssertEqual(byDefault.height, CYLMenuStyle().headerHeight, accuracy: 0.5, "a long title stays one truncated line in 36 pt")
+        XCTAssertEqual(byDefault.height, oneLineHeight, accuracy: 0.5, "a long title stays one truncated line in the text-sized header")
         XCTAssertEqual(byDefault.title, explicit.title)
         XCTAssertEqual(byDefault.lines, 1)
     }
@@ -64,8 +71,8 @@ final class CYLTagListHeaderMaxLinesTests: CYLMenuExampleTestCase {
         let three = headerHeight(maxLines: 3)
         XCTAssertGreaterThan(three.height, one.height)
         XCTAssertEqual(three.lines, 3, "the title takes three lines and is cut there")
-        let lineHeight = UIFont.systemFont(ofSize: 14).lineHeight
-        XCTAssertEqual(three.height, ceil(lineHeight * 3) + 12, accuracy: 3, "the title's height plus 12 pt")
+        let lineHeight = CYLMenuStyle().headerFont.lineHeight
+        XCTAssertEqual(three.height, ceil(lineHeight * 3) + 8, accuracy: 3, "the title's height plus 8 pt (the board, no divider)")
     }
 
     func testUnlimitedGrowsForALongTitleAndNeverBelowTheOldHeight() {
@@ -75,7 +82,7 @@ final class CYLTagListHeaderMaxLinesTests: CYLMenuExampleTestCase {
         XCTAssertGreaterThan(unlimited.height, three.height)
         XCTAssertGreaterThan(unlimited.lines, 3)
         let short = headerHeight(maxLines: CYLHeaderTitleMaxLines.unlimited, title: "Short")
-        XCTAssertEqual(short.height, CYLMenuStyle().headerHeight, accuracy: 0.5, "a title that fits keeps the old height")
+        XCTAssertEqual(short.height, oneLineHeight, accuracy: 0.5, "a title that fits keeps the one-line height")
         XCTAssertEqual(short.lines, 1)
     }
 
@@ -85,8 +92,8 @@ final class CYLTagListHeaderMaxLinesTests: CYLMenuExampleTestCase {
         XCTAssertLessThanOrEqual(result.title.maxX, result.fold?.minX ?? 0)
         let noFold = headerHeight(maxLines: CYLHeaderTitleMaxLines.unlimited)
         XCTAssertGreaterThanOrEqual(result.height, noFold.height, "less room: as many lines or more")
-        // The label's own height fills the header less the 12 pt of padding: no line is cut.
-        XCTAssertGreaterThanOrEqual(result.title.height + 12, result.height - 1)
+        // The label's own height fills the header less the 8 pt of padding: no line is cut.
+        XCTAssertGreaterThanOrEqual(result.title.height + 8, result.height - 1)
     }
 
     func testBelowOneClampsToOne() {
