@@ -1107,7 +1107,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         // Precedence: this item's or its stack's explicit icon color (the component's `itemAppearance`) > this class's built-in, which is the
         // style's explicit icon color, else the effective text color (the explicit one, else the tag default) > the component's built-in.
         // The tag's own built-ins keep the look of earlier versions; they are the level between, passed as the subclass color.
-        applyIconTintColor(style.iconColor(for: state))
         titleLabel.text = style.displayedTitle(forTitle: title)
         titleLabel.font = style.titleFont(for: state, traitCollection: traitCollection)
         titleLabel.textColor = appearance.textColor
@@ -1123,6 +1122,12 @@ open class CYLTagButton: CYLAnimatedItemView {
         itemBackgroundColor = drawsGlass && !pressed ? appearance.explicitBackgroundColor : background
         // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
         itemGlassTintAlpha = state == .selected ? 1 : nil
+        // An explicit, static icon color that would nearly vanish on dark glass is lifted (CYLIconContrast); everything else is as set.
+        var iconColor = style.iconColor(for: state)
+        if drawsGlass, traitCollection.userInterfaceStyle == .dark, let explicit = style.explicitIconColor(for: state) {
+            iconColor = CYLIconContrast.liftedIconColor(explicit, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha)
+        }
+        applyIconTintColor(iconColor)
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)
