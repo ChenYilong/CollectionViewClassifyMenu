@@ -1063,17 +1063,17 @@ function headerHeightOf(style) {
 }
 
 /**
- * The header divider as distances from the list's edges and its thickness, or null when there is none: it starts at the
- * header title (or `headerSeparatorInsets.left` from the column) and ends at the column's trailing edge. It sits at the
- * header's bottom inside the header height, so it adds no height.
+ * The header divider as distances from the list's edges and its thickness, or null when there is none: it has the same left
+ * and right edges as the card and the header band (the column's), never the title's x; `headerSeparatorInsets` (null by
+ * default) insets it from the column. It sits at the header's bottom inside the header height, so it adds no height.
  */
 function headerSeparator(style) {
   if (style.headerSeparatorStyle !== HEADER_SEPARATOR_STYLES.line || !(style.headerSeparatorThickness > 0)) return null;
   const column = contentColumn(style);
   const own = style.headerSeparatorInsets;
   return {
-    left: own ? column.left + own.left : headerEdges(style).left,
-    right: own ? column.right + own.right : column.right,
+    left: column.left + (own ? own.left : 0),
+    right: column.right + (own ? own.right : 0),
     thickness: Math.min(style.headerSeparatorThickness, headerHeightOf(style)),
   };
 }

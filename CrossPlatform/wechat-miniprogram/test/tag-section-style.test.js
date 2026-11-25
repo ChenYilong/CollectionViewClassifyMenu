@@ -149,9 +149,10 @@ test('the divider sits at the header bottom and adds no height', () => {
   assert.equal(css.listStyle, model.sectionLayout(without).listStyle)
   const line = model.headerSeparator(withLine)
   assert.equal(line.thickness, HAIRLINE)
-  // From the title x to the column's trailing edge (the header spans the whole list: its box starts at 0).
-  assert.equal(line.left, withLine.headerHorizontalInset)
+  // The column's edges, the same as the card and the band (the header spans the whole list: its box starts at 0).
+  assert.equal(line.left, withLine.sectionInsets.left)
   assert.equal(line.right, withLine.sectionInsets.right)
+  assert.deepEqual({ left: line.left, right: line.right }, model.contentColumn(withLine))
   assert.match(css.headerLineStyle, new RegExp(`left: ${line.left}px; right: ${line.right}px; height: ${HAIRLINE}px`))
   // Never taller than the header, and absent with thickness 0.
   assert.equal(model.headerSeparator(styleOf({ headerSeparatorStyle: 'line', headerSeparatorThickness: 1000 })).thickness,
@@ -159,15 +160,21 @@ test('the divider sits at the header bottom and adds no height', () => {
   assert.equal(model.headerSeparator(styleOf({ headerSeparatorStyle: 'line', headerSeparatorThickness: 0 })), null)
 })
 
-test('the divider insets are from the column, and its x follows the header box under insetGrouped', () => {
+test('the divider insets are from the column, and it has the card and band edges under every style', () => {
   const own = styleOf({ headerSeparatorStyle: 'line', headerSeparatorInsets: [0, 5, 0, 7] })
   assert.equal(model.headerSeparator(own).left, own.sectionInsets.left + 5)
   assert.equal(model.headerSeparator(own).right, own.sectionInsets.right + 7)
   const grouped = styleOf({ sectionStyle: 'insetGrouped', headerSeparatorStyle: 'line' })
   const line = model.headerSeparator(grouped)
-  assert.equal(line.left, model.headerEdges(grouped).left)
-  // The header element sits in the column, so the CSS left is relative to it.
-  assert.match(model.sectionLayout(grouped).headerLineStyle, new RegExp(`left: ${CARD_PADDING}px; right: 0px`))
+  assert.equal(line.left, model.contentColumn(grouped).left)
+  assert.equal(line.right, model.contentColumn(grouped).right)
+  // Not the title's x: the title is inside the card padding.
+  assert.notEqual(line.left, model.headerEdges(grouped).left)
+  // The header element sits in the column, so the CSS left and right are 0 (the column's edges).
+  assert.match(model.sectionLayout(grouped).headerLineStyle, /left: 0px; right: 0px/)
+  const banded = styleOf({ headerSeparatorStyle: 'line', headerBackgroundColor: LIGHT.headerBand })
+  assert.match(model.sectionLayout(banded).headerLineStyle, /left: 0px; right: 0px/)
+  assert.equal(model.headerSeparator(banded).left, model.contentColumn(banded).left)
 })
 
 test('the tags fold at the reduced width', () => {
