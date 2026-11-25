@@ -58,7 +58,7 @@ final class CYLTagFoldTailStyleTests: CYLMenuExampleTestCase {
         }
         let pair = try buttons(glass: true)
         XCTAssertEqual(pair.tag.itemBackgroundStyle, .liquidGlass)
-        XCTAssertNil(pair.tail.itemBackgroundColor, "Unset stays nil: the shared default frosted tint applies")
+        XCTAssertEqual(pair.tail.itemBackgroundColor, CYLMenuStyle.defaultGlassTint, "Unset: the shared low-alpha default tint")
         assertSameStyle(pair)
     }
 

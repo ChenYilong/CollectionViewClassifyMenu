@@ -491,24 +491,25 @@ final class CYLTagButtonTests: XCTestCase {
         let style = CYLMenuStyle()
         style.backgroundStyle = .liquidGlass
         let normal = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
-        XCTAssertNil(normal.itemBackgroundColor, "unset background: nothing handed to the glass")
+        XCTAssertEqual(normal.itemBackgroundColor, CYLMenuStyle.defaultGlassTint, "unset background: the low-alpha default tint")
+        XCTAssertEqual(normal.itemGlassTintAlpha, 1, "its own alpha is the tint")
         XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: normal, light)), CYLMenuFixtures.rgb(UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: 1)))
         var alpha: CGFloat = 0
         glassTint(of: normal, light)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
-        XCTAssertEqual(alpha, 0.5, accuracy: 0.01)
+        XCTAssertEqual(alpha, CYLMenuStyle.defaultGlassTintAlphaLight, accuracy: 0.01)
         XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: normal, dark)), CYLMenuFixtures.rgb(.white))
         glassTint(of: normal, dark)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
-        XCTAssertEqual(alpha, 0.14, accuracy: 0.01)
+        XCTAssertEqual(alpha, CYLMenuStyle.defaultGlassTintAlphaDark, accuracy: 0.01)
         let disabled = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
         disabled.isEnabled = false
-        XCTAssertNil(disabled.itemBackgroundColor)
+        XCTAssertEqual(disabled.itemBackgroundColor, CYLMenuStyle.defaultGlassTint)
         // Reset back to unset is unset again.
         style.normalAppearance.backgroundColor = .red
         normal.style = style
         XCTAssertEqual(normal.itemBackgroundColor, .red)
         style.normalAppearance.backgroundColor = nil
         normal.style = style
-        XCTAssertNil(normal.itemBackgroundColor)
+        XCTAssertEqual(normal.itemBackgroundColor, CYLMenuStyle.defaultGlassTint)
     }
 
     func testGlassTintsWithAnExplicitBackgroundAndASelectedTagKeepsAlphaOne() throws {

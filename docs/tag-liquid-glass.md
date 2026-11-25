@@ -149,3 +149,8 @@ colors that already pass and dynamic colors never change.
 A Liquid Glass tag in a list has the root view as its backdrop source, which contains the tag itself: sampling it re-enters the tag's own recording (a crash found by the
 Windows Android run on 4bc1ec1). CYLTabBarController `a5a2f1b1` makes `CYLLiquidGlassView` skip sampling when the view is inside its own source: it draws the tint only
 (no blur or refraction), and `CYLGlassBackdrop` guards the capture. iOS draws real glass. True glass for a list needs a backdrop source outside the list: `CYLTagListView.backdropSource` (docs/tag-section-style.md "Android backdropSource"); without it Android tags look like the default frosted tint (225, 222, 220 at 0.5 alpha, white 0.14 in dark mode).
+
+## Default glass tint: one low alpha for tags and boards (iOS, 2026-11-26)
+
+- Under glass with no explicit background color, a tag and a section board (`sectionBackgroundColor` unset) both get `CYLMenuStyle.defaultGlassTint`: 225, 222, 220 in light mode at `defaultGlassTintAlphaLight` 0.10, white in dark mode at `defaultGlassTintAlphaDark` 0.04, handed with `itemGlassTintAlpha` 1 (its own alpha is the tint). The component's own default (0.5 / 0.14) greyed the board interior (white minus black through it: light 95.5 to 67.4, dark 78.4 to 70.4 at `affb5bc8`); the lit edge stays.
+- The two alphas are estimates until the placeholder session measures them; they are the lever. Explicit colors are untouched (tags: tint x 0.75, selected 1; boards: as set). The other platforms still use the component default (0.5 / 0.14) until they port these two constants.

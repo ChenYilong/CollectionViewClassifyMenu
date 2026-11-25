@@ -369,9 +369,28 @@ open class CYLMenuStyle: NSObject, NSCopying {
     /**
      * The tag background: `.flat` (the default) is the solid color of each state's appearance; `.liquidGlass` draws a
      * Liquid Glass material behind the content, tinted with the state's explicit `backgroundColor` (an unset one is ignored, so the
-     * backdrop shows through the component's frosted default) and clipped to the corner radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     * backdrop shows through the low-alpha `defaultGlassTint`) and clipped to the corner radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
      */
     open var backgroundStyle: CYLTagBackgroundStyle = .flat
+
+    /**
+     * The tint alpha of the default Liquid Glass of a tag and of a section board, in light and in dark mode, where the background is unset.
+     * One value for both, so the board and the tags share one style. Low, so that the interior stays clear and the contrast through the glass
+     * stays near an untinted glass (the component's own default, alpha 0.5 light and 0.14 dark, greyed the board); the lit edge stays.
+     */
+    public static let defaultGlassTintAlphaLight: CGFloat = 0.10
+    public static let defaultGlassTintAlphaDark: CGFloat = 0.04
+
+    /**
+     * The tint of the default Liquid Glass (a tag or a board with no background color): the component's frosted gray (225, 222, 220) in
+     * light mode, white in dark mode, at `defaultGlassTintAlphaLight` / `defaultGlassTintAlphaDark`. Handed with tint alpha 1, so the alpha
+     * is the value that tints. An explicit color is never replaced by it.
+     */
+    public static let defaultGlassTint = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: defaultGlassTintAlphaDark)
+            : UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: defaultGlassTintAlphaLight)
+    }
 
     /**
      * The background style a tag really draws: `backgroundStyle`, or `.flat` where the system draws no Liquid Glass

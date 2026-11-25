@@ -37,7 +37,7 @@ struct CYLTagListCardSpec {
      */
     let color: UIColor
     /**
-     * The glass tint: `sectionBackgroundColor` when the app set it, else `nil` (the tags' default frosted tint applies).
+     * The glass tint: `sectionBackgroundColor` when the app set it, else `nil` (the default glass tint `CYLMenuStyle.defaultGlassTint` applies, as for a tag).
      */
     let glassTint: UIColor?
     /**
@@ -122,11 +122,13 @@ final class CYLTagListCardView: UICollectionReusableView {
             return
         }
         layer.cornerRadius = card.cornerRadius
-        // One glass style for the board and the tag capsule, lit edge included: an unset tint (nil) takes the tags' default frosted tint.
+        // One glass style for the board and the tag capsule, lit edge included: an unset tint (nil) takes the tags' low-alpha default tint.
         glassHost.isHidden = !card.usesGlass
         if card.usesGlass {
             glassHost.itemBackgroundStyle = .liquidGlass
-            glassHost.itemBackgroundColor = card.glassTint
+            // Unset: the same low-alpha default tint as a tag (alpha 1: its own alpha tints); explicit: as set.
+            glassHost.itemBackgroundColor = card.glassTint ?? CYLMenuStyle.defaultGlassTint
+            glassHost.itemGlassTintAlpha = card.glassTint == nil ? 1 : nil
             glassHost.itemCornerRadius = card.cornerRadius
             glassHost.frame = bounds
             glassHost.layoutIfNeeded()

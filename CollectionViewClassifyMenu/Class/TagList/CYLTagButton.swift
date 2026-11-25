@@ -1123,13 +1123,15 @@ open class CYLTagButton: CYLAnimatedItemView {
         // Pressed, as android-tagview's layoutColorPress.
         let background = pressed ? style.highlightedBackgroundColor : appearance.backgroundColor
         // The background is CYLAnimatedItemView's: flat color, or Liquid Glass tinted with it where the system draws it. Where glass is drawn only an
-        // EXPLICIT color tints it: an unset one (the built-in white, which would hide the backdrop) is nil, and the view uses its frosted default.
+        // EXPLICIT color tints it: an unset one (the built-in white, which would hide the backdrop) is replaced by the low-alpha `CYLMenuStyle.defaultGlassTint`.
         // The pressed color is always explicit. Flat (also where the system draws no glass) keeps the effective color.
         let drawsGlass = style.resolvedBackgroundStyle == .liquidGlass
         itemBackgroundStyle = style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat
-        itemBackgroundColor = drawsGlass && !pressed ? appearance.explicitBackgroundColor : background
+        let explicitGlassColor = drawsGlass && !pressed ? appearance.explicitBackgroundColor : nil
+        itemBackgroundColor = drawsGlass && !pressed ? (explicitGlassColor ?? CYLMenuStyle.defaultGlassTint) : background
         // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
-        itemGlassTintAlpha = state == .selected ? 1 : nil
+        // The default tint (no explicit color) is handed with alpha 1: its own low alpha is the tint, the same as the board's.
+        itemGlassTintAlpha = state == .selected || (drawsGlass && !pressed && explicitGlassColor == nil) ? 1 : nil
         // An explicit, static icon color that would nearly vanish on dark glass is lifted (CYLIconContrast); everything else is as set.
         var iconColor = style.iconColor(for: state)
         if drawsGlass, traitCollection.userInterfaceStyle == .dark, let explicit = style.explicitIconColor(for: state) {
