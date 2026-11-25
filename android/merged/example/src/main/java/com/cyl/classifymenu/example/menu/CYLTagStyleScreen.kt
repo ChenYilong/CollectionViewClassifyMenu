@@ -23,6 +23,7 @@ import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLOffset
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
 import com.cyl.classifymenu.example.R
 
 /**
@@ -54,7 +55,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
         private val palette = listOf(Color.rgb(255, 149, 0), Color.rgb(175, 82, 222), Color.rgb(48, 176, 199), Color.rgb(255, 45, 85), Color.rgb(88, 86, 214), Color.rgb(52, 199, 89))
         private val systemBlue = Color.rgb(0, 122, 255)
 
-        fun demoStyle() = CYLMenuStyle().apply {
+        fun demoStyle() = CYLMenuStyle().plainSections().apply {
             setIconColor(systemBlue, CYLControlState.NORMAL)
             setIconColor(Color.WHITE, CYLControlState.SELECTED)
             selectedAppearance.backgroundColor = systemBlue
