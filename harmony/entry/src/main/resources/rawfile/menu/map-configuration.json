@@ -10,6 +10,8 @@
   "0-1"
  ],
  "style": {
+  "sectionStyle": "insetGrouped",
+  "headerSeparatorStyle": "line",
   "backgroundStyle": "liquidGlass",
   "imageSize": "{20, 20}",
   "imageTitleSpacing": 4,
