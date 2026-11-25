@@ -337,21 +337,47 @@ public final class CYLTag {
     }
 
     /**
-     * A round badge image: `text` in white on a `color` circle `diameter` points wide (rendered as original).
+     * The side padding of a badge image's text, in points: 4, as `CYLTagButton`'s corner badge and the other platforms'
+     * (`BADGE_PADDING`).
+     */
+    public static let badgeImageTextPadding: CGFloat = 4
+
+    /**
+     * The text of a badge image and its font: bold, 0.6 of the diameter.
+     */
+    private static func badgeImageAttributes(diameter: CGFloat) -> [NSAttributedString.Key: Any] {
+        [.font: UIFont.boldSystemFont(ofSize: diameter * 0.6), .foregroundColor: UIColor.white]
+    }
+
+    /**
+     * The width of a badge image: the diameter (a circle) for a short text, or the text's width and `badgeImageTextPadding`
+     * on both sides when that is more (a capsule, as `CYLTagButton`'s corner badge: width = max(height, text + 2 * padding)).
+     */
+    public static func badgeImageWidth(text: String, diameter: CGFloat) -> CGFloat {
+        let side = max(1, diameter)
+        let textWidth = ceil((text as NSString).size(withAttributes: badgeImageAttributes(diameter: side)).width)
+        return max(side, textWidth + 2 * badgeImageTextPadding)
+    }
+
+    /**
+     * A badge image: `text` in white on a `color` capsule `diameter` points high (rendered as original). A short text
+     * (a character, a digit) keeps the circle; a longer one ("new", "99+") widens the capsule so that the text is whole
+     * and centered. The tag's icon slot follows the image's width (`CYLTagButton.iconSize(for:animated:style:)`).
      */
     public static func badgeImage(text: String, color: UIColor, diameter: CGFloat) -> UIImage {
         let side = max(1, diameter)
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side))
+        let width = badgeImageWidth(text: text, diameter: side)
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: side))
         let image = renderer.image { _ in
             color.setFill()
-            UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: side, height: side)).fill()
-            let attributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: side * 0.6),
-                                                             .foregroundColor: UIColor.white]
+            UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: width, height: side), cornerRadius: side / 2).fill()
+            let attributes = badgeImageAttributes(diameter: side)
             let size = (text as NSString).size(withAttributes: attributes)
-            (text as NSString).draw(at: CGPoint(x: (side - size.width) / 2, y: (side - size.height) / 2),
+            (text as NSString).draw(at: CGPoint(x: (width - size.width) / 2, y: (side - size.height) / 2),
                                     withAttributes: attributes)
         }.withRenderingMode(.alwaysOriginal)
         image.accessibilityLabel = text
+        image.cylIsBadgeImage = true
         return image
     }
 
@@ -363,6 +389,20 @@ public final class CYLTag {
             return nil
         }
         return value
+    }
+}
+
+extension UIImage {
+
+    private static var cylBadgeImageKey: UInt8 = 0
+
+    /**
+     * Whether this is a badge image (`CYLTag.badgeImage`), whose own width, not the style's square image size, is its
+     * icon slot's width.
+     */
+    var cylIsBadgeImage: Bool {
+        get { (objc_getAssociatedObject(self, &Self.cylBadgeImageKey) as? Bool) ?? false }
+        set { objc_setAssociatedObject(self, &Self.cylBadgeImageKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
 }
 

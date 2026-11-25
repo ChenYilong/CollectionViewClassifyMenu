@@ -835,7 +835,15 @@ open class CYLTagButton: CYLAnimatedItemView {
         guard let image else {
             return .zero
         }
-        return style.imageSize == .zero ? image.size : style.imageSize
+        if style.imageSize == .zero {
+            return image.size
+        }
+        // A badge capsule keeps the style's height; a wider one widens its slot, so the tag grows instead of the image
+        // overlapping the title.
+        if image.cylIsBadgeImage {
+            return CGSize(width: max(style.imageSize.width, image.size.width), height: style.imageSize.height)
+        }
+        return style.imageSize
     }
 
     /**

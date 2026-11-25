@@ -386,6 +386,33 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertNil(dataSource.menuImageForItem(at: IndexPath(item: 2, section: 0)))
     }
 
+    /// A multi-character badge text grows the round image into a capsule: as high as the diameter, wide enough for the
+    /// whole text; a single digit stays square; the dot is unchanged; the tag's icon slot follows the width.
+    func testBadgeImageGrowsIntoACapsuleForLongText() {
+        let diameter: CGFloat = 18
+        let font = UIFont.boldSystemFont(ofSize: diameter * 0.6)
+        for text in ["new", "NEW", "hot", "99+", "9+"] {
+            let image = CYLTag.badgeImage(text: text, color: .systemRed, diameter: diameter)
+            let textWidth = (text as NSString).size(withAttributes: [.font: font]).width
+            XCTAssertEqual(image.size.height, diameter, text)
+            XCTAssertGreaterThan(image.size.width, image.size.height, text)
+            XCTAssertLessThanOrEqual(textWidth + 2 * CYLTag.badgeImageTextPadding, image.size.width, text)
+            XCTAssertEqual(image.accessibilityLabel, text)
+        }
+        let digit = CYLTag.badgeImage(text: "9", color: .systemRed, diameter: diameter)
+        XCTAssertEqual(digit.size, CGSize(width: diameter, height: diameter))
+        XCTAssertEqual(CYLTag.badgeDotImage(color: .systemRed, canvas: diameter).size, CGSize(width: diameter, height: diameter))
+
+        let style = CYLMenuStyle()
+        style.imageSize = CGSize(width: diameter, height: diameter)
+        let wide = CYLTag.badgeImage(text: "99+", color: .systemRed, diameter: diameter)
+        XCTAssertEqual(CYLTagButton.iconSize(for: wide, animated: false, style: style),
+                       CGSize(width: wide.size.width, height: diameter))
+        XCTAssertEqual(CYLTagButton.iconSize(for: digit, animated: false, style: style), CGSize(width: diameter, height: diameter))
+        XCTAssertGreaterThan(CYLTagButton.width(forTitle: "Hot", image: wide, style: style, traitCollection: nil),
+                             CYLTagButton.width(forTitle: "Hot", image: digit, style: style, traitCollection: nil))
+    }
+
     // MARK: Word picker (选词填入)
 
     /// A pan recognizer whose state and location a test sets, to drive `allowsSmearSelection`.
