@@ -36,7 +36,9 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         XCTAssertEqual(firstTag()?.layer.cornerRadius ?? -1, (firstTag()?.bounds.height ?? 0) / 2, accuracy: 0.5)
 
         demo.performAction("iconColor.normal")
-        XCTAssertEqual(firstTag()?.imageView.tintColor, demo.style.iconColor(for: .normal))
+        // The component hands the animation / icon a color resolved with the item's own traits (live switches re-resolve it).
+        XCTAssertEqual(firstTag()?.imageView.tintColor?.resolvedColor(with: firstTag()?.traitCollection ?? UITraitCollection()),
+                       demo.style.iconColor(for: .normal).resolvedColor(with: firstTag()?.traitCollection ?? UITraitCollection()))
         captureScreen(named: "test-style-demo-capsule-icon-color")
 
         demo.performAction("content.iconOnly")

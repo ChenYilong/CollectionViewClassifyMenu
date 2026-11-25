@@ -136,7 +136,8 @@ public enum CYLMenuFoldControlKey {
     public static let position = "position"
 
     /**
-     * A `CYLMenuFoldControlContent` raw value, or "iconAndTitle" ("titleAndIcon"), "title", "icon".
+     * A `CYLMenuFoldControlContent` raw value, or "iconAndTitle" ("titleAndIcon"), "title", "icon",
+     * "titleAndIconAlways" (`.titleAndIcon`: the title and the icon in both states).
      */
     public static let content = "content"
 
@@ -1105,6 +1106,7 @@ extension CYLMenuFoldControl {
         }
         let contents = ["iconandtitle": CYLMenuFoldControlContent.iconAndTitle.rawValue,
                         "titleandicon": CYLMenuFoldControlContent.iconAndTitle.rawValue,
+                        "titleandiconalways": CYLMenuFoldControlContent.titleAndIcon.rawValue,
                         "title": CYLMenuFoldControlContent.title.rawValue,
                         "icon": CYLMenuFoldControlContent.icon.rawValue]
         if let raw = Value.rawValue(configuration[CYLMenuFoldControlKey.content], names: contents),
@@ -1145,10 +1147,10 @@ extension CYLTagAppearance {
         typealias Key = CYLTagAppearanceKey
         let baseURL = Value.baseURL(of: configuration)
         if let value = configuration[Key.backgroundColor] {
-            backgroundColor = Value.color(value) ?? CYLTagAppearance.defaultBackgroundColor
+            backgroundColor = Value.color(value)
         }
         if let value = configuration[Key.textColor] {
-            textColor = Value.color(value) ?? CYLTagAppearance.defaultTextColor
+            textColor = Value.color(value)
         }
         if let value = configuration[Key.font] {
             font = Value.font(value) ?? CYLTagAppearance.defaultFont

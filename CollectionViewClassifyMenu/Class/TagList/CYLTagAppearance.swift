@@ -47,15 +47,48 @@ public final class CYLTagAppearance {
     private static let defaultCornerRadius: CGFloat = CYLAnimatedItemCornerRadiusCapsule
     private static let defaultContentInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
 
-    /**
-     * Background color. White by default.
-     */
-    public var backgroundColor = CYLTagAppearance.defaultBackgroundColor
+    // The EXPLICIT colors: nil is "not set" (UIKit's null_resettable). The built-ins are functions of the traits and are never stored.
+    private var explicitBackground: UIColor?
+    private var explicitText: UIColor?
+    private var explicitIcon: UIColor?
 
     /**
-     * Title color. Dark gray by default.
+     * Background color, `null_resettable`: reads the EFFECTIVE value (the explicit color, else `defaultBackgroundColor`, never nil);
+     * assigning nil resets to the built-in. `explicitBackgroundColor` / `isBackgroundColorSet` tell whether one was set.
      */
-    public var textColor = CYLTagAppearance.defaultTextColor
+    public var backgroundColor: UIColor! {
+        get { explicitBackground ?? Self.defaultBackgroundColor }
+        set { explicitBackground = newValue }
+    }
+
+    /**
+     * The color set on `backgroundColor`; nil when unset (the class built-in applies).
+     */
+    public var explicitBackgroundColor: UIColor? { explicitBackground }
+
+    /**
+     * True when `backgroundColor` was set to a color (and not reset).
+     */
+    public var isBackgroundColorSet: Bool { explicitBackground != nil }
+
+    /**
+     * Title color, `null_resettable`: reads the EFFECTIVE value (the explicit color, else `defaultTextColor`, never nil);
+     * assigning nil resets to the built-in.
+     */
+    public var textColor: UIColor! {
+        get { explicitText ?? Self.defaultTextColor }
+        set { explicitText = newValue }
+    }
+
+    /**
+     * The color set on `textColor`; nil when unset.
+     */
+    public var explicitTextColor: UIColor? { explicitText }
+
+    /**
+     * True when `textColor` was set to a color (and not reset).
+     */
+    public var isTextColorSet: Bool { explicitText != nil }
 
     /**
      * Title font, the system font of 14 points by default. Scaled for Dynamic Type when the style's
@@ -67,14 +100,14 @@ public final class CYLTagAppearance {
      * Resets `backgroundColor` to `defaultBackgroundColor` (Android `resetBackgroundColor`).
      */
     public func resetBackgroundColor() {
-        backgroundColor = Self.defaultBackgroundColor
+        explicitBackground = nil
     }
 
     /**
      * Resets `textColor` to `defaultTextColor` (Android `resetTextColor`).
      */
     public func resetTextColor() {
-        textColor = Self.defaultTextColor
+        explicitText = nil
     }
 
     /**
@@ -85,10 +118,24 @@ public final class CYLTagAppearance {
     }
 
     /**
-     * Tint of template icons (like `UITabBarItemStateAppearance.iconColor`). `nil` (the default) uses `textColor`.
+     * Tint of template icons (like `UITabBarItemStateAppearance.iconColor`), `null_resettable`: reads the EFFECTIVE value (the explicit
+     * icon color, else the effective `textColor`, never nil); assigning nil resets so that the icon follows the text again.
      * Icons rendered as original keep their colors.
      */
-    public var iconColor: UIColor?
+    public var iconColor: UIColor! {
+        get { explicitIcon ?? textColor }
+        set { explicitIcon = newValue }
+    }
+
+    /**
+     * The color set on `iconColor`; nil when unset.
+     */
+    public var explicitIconColor: UIColor? { explicitIcon }
+
+    /**
+     * True when `iconColor` was set to a color (and not reset).
+     */
+    public var isIconColorSet: Bool { explicitIcon != nil }
 
     /**
      * Corner radius in points: 0 is square corners, and a value of half the tag height or more is a capsule (the radius
@@ -161,10 +208,10 @@ public final class CYLTagAppearance {
      * Restores every property to its built-in default.
      */
     public func reset() {
-        backgroundColor = Self.defaultBackgroundColor
-        textColor = Self.defaultTextColor
+        explicitBackground = nil
+        explicitText = nil
         font = Self.defaultFont
-        iconColor = nil
+        explicitIcon = nil
         cornerRadius = Self.defaultCornerRadius
         borderColor = nil
         borderWidth = 0
@@ -177,10 +224,11 @@ public final class CYLTagAppearance {
      */
     public func copy() -> CYLTagAppearance {
         let copy = CYLTagAppearance()
-        copy.backgroundColor = backgroundColor
-        copy.textColor = textColor
+        // The UNSET state is copied, not the resolved color: a copy of an untouched appearance keeps following the built-ins.
+        copy.explicitBackground = explicitBackground
+        copy.explicitText = explicitText
         copy.font = font
-        copy.iconColor = iconColor
+        copy.explicitIcon = explicitIcon
         copy.cornerRadius = cornerRadius
         copy.borderColor = borderColor
         copy.borderWidth = borderWidth
@@ -191,5 +239,18 @@ public final class CYLTagAppearance {
 
     private static func sanitized(_ value: CGFloat) -> CGFloat {
         value.isFinite && value > 0 ? value : 0
+    }
+}
+
+extension CYLTagAppearance: Equatable {
+
+    /**
+     * Equal when every property is equal; an unset color is not equal to a color set to the same value as the built-in.
+     */
+    public static func == (lhs: CYLTagAppearance, rhs: CYLTagAppearance) -> Bool {
+        lhs.explicitBackground == rhs.explicitBackground && lhs.explicitText == rhs.explicitText
+            && lhs.explicitIcon == rhs.explicitIcon && lhs.font == rhs.font && lhs.cornerRadius == rhs.cornerRadius
+            && lhs.borderColor == rhs.borderColor && lhs.borderWidth == rhs.borderWidth
+            && lhs.contentInsets == rhs.contentInsets && lhs.backgroundImage == rhs.backgroundImage
     }
 }
