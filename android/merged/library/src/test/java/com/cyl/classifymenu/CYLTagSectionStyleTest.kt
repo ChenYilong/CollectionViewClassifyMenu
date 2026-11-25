@@ -602,6 +602,28 @@ class CYLTagSectionStyleTest {
         assertEquals(flat.contentHeight, glass.contentHeight, 0f)
     }
 
+    /** One glass for the tag and the board: an unset board hands no tint, exactly like an unset glass tag, so the board has the tags' frosted default and the same lit edge. */
+    @Test
+    @Config(sdk = [34])
+    fun anUnsetGlassBoardIsTheSameGlassAsAGlassTagNoTintOfItsOwn() {
+        val style = insetGrouped().also {
+            it.sectionBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+            it.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        }
+        val list = makeList(style, 6, 3)
+        val board = glassCards(list).first() as com.cyl.animateditem.CYLAnimatedItemView
+        val tag = descendants(list).filterIsInstance<CYLTagButton>().first()
+        assertNull(board.itemBackgroundColor)
+        assertNull(tag.itemBackgroundColor)
+        assertEquals(tag.itemBackgroundStyle, board.itemBackgroundStyle)
+        // The edge highlight is the glass layer's own rim: both hosts draw it with the same view class.
+        val boardGlass = board.itemLiquidGlassView
+        val tagGlass = tag.itemLiquidGlassView
+        assertNotNull(boardGlass)
+        assertNotNull(tagGlass)
+        assertEquals(tagGlass!!.javaClass, boardGlass!!.javaClass)
+    }
+
     // MARK: copy() and configuration
 
     @Test

@@ -143,8 +143,12 @@ export class CYLSectionStyleColors {
   static readonly groupedBackground: ResourceColor = $r('app.color.cyl_section_grouped_background');
   /** The header divider: the system separator color. */
   static readonly separator: ResourceColor = $r('app.color.cyl_section_separator');
-  /** The tint of a Liquid Glass card with no `sectionBackgroundColor`: translucent white; translucent #1C1C1E in dark mode. */
-  static readonly glassTint: ResourceColor = $r('app.color.cyl_section_glass_tint');
+  /**
+   * What a Liquid Glass card with no `sectionBackgroundColor` hands to the glass: a transparent color, which
+   * `CYLAnimatedItemBackgroundModifier` reads as "no color", so the board draws the SAME frosted default tint and edge as a glass tag
+   * (one glass style for the tag and the board; it used to be a tint of its own).
+   */
+  static readonly glassTint: ResourceColor = Color.Transparent;
 }
 
 /**
@@ -703,7 +707,7 @@ export class CYLMenuStyle {
     CYLTagBackgroundStyle.liquidGlass : CYLTagBackgroundStyle.flat;
   }
 
-  /** The card's color as drawn: the glass tint for the drawn glass (the app's color wins), else the solid color. */
+  /** The card's color as drawn: for drawn glass the app's color, else "no color" (the tags' frosted default); else the solid color. */
   resolvedSectionBackgroundColor(): ResourceColor {
     const fallback = this.resolvedSectionBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass ?
     CYLSectionStyleColors.glassTint : CYLSectionStyleColors.card;

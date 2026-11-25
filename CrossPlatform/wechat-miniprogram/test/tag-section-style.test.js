@@ -496,7 +496,6 @@ test('a section style dictionary applies over the list style', () => {
 
 // MARK: - sectionBackgroundStyle (flat / liquidGlass) and the light / dark audit
 
-const GLASS_TINT = { light: 'rgba(255, 255, 255, 0.5)', dark: 'rgba(28, 28, 30, 0.5)' }
 const LIGHT_OPTIONS = { pixelRatio: 2, dark: false }
 const DARK_OPTIONS = { pixelRatio: 2, dark: true }
 const GLASS = { sectionStyle: 'insetGrouped', sectionBackgroundStyle: 'liquidGlass' }
@@ -548,10 +547,11 @@ test('every unset color is resolved by the color mode: light and dark differ as 
   const dark = (style) => styleOf(style, DARK_OPTIONS)
   assert.equal(model.resolvedSectionBackgroundColor(light({ sectionStyle: 'insetGrouped' })), LIGHT.card)
   assert.equal(model.resolvedSectionBackgroundColor(dark({ sectionStyle: 'insetGrouped' })), DARK.card)
-  assert.equal(model.resolvedSectionBackgroundColor(light(GLASS)), GLASS_TINT.light)
-  assert.equal(model.resolvedSectionBackgroundColor(dark(GLASS)), GLASS_TINT.dark)
-  assert.match(model.sectionLayout(light(GLASS)).cardStyle, /background-color:rgba\(255,255,255,0\.375\)/)
-  assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /background-color:rgba\(28,28,30,0\.375\)/)
+  // Unset glass: no color, so the card is the tags' default frosted glass (same tint and same rim) in each mode.
+  assert.equal(model.resolvedSectionBackgroundColor(light(GLASS)), '')
+  assert.equal(model.resolvedSectionBackgroundColor(dark(GLASS)), '')
+  assert.match(model.sectionLayout(light(GLASS)).cardStyle, /background-color:rgba\(225,222,220,0\.5\)/)
+  assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /background-color:rgba\(255,255,255,0\.14\)/)
   assert.match(model.sectionLayout(light(GLASS)).cardStyle, /inset 0 1px 0 rgba\(255,255,255,0\.6\)/)
   assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /inset 0 1px 0 rgba\(255,255,255,0\.18\)/)
   assert.equal(light({}).sectionPalette.headerBand, LIGHT.headerBand)
@@ -831,4 +831,19 @@ test('a header that wraps under the board is the title lines plus 8: min-height 
   const old = model.sectionLayout(styleOf({ ...WITH_DIVIDER, headerMaxLines: 3 })).headerStyle
   const wrap = model.HEADER_WRAP_VERTICAL_PADDING
   assert.match(old, new RegExp(`^min-height: ${FIXED_HEADER_HEIGHT}px; margin: 0 16px 0 16px; padding: ${wrap}px 12px ${wrap}px 12px; `))
+})
+
+// One liquid glass for the tag and the board: the card's blur, tint and EDGE highlight (the lit rim) come from the same helper as a glass
+// tag's, so they cannot drift apart (docs/tag-liquid-glass-platforms.md).
+test('the board shares the glass tag\'s tint, blur and edge highlight, light and dark', () => {
+  const animatedItem = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-animated-item/cyl_animated_item_model.js')
+  for (const [options, isDark] of [[LIGHT_OPTIONS, false], [DARK_OPTIONS, true]]) {
+    const tag = animatedItem.cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', isDark, -1).css
+    const card = model.sectionLayout(styleOf(GLASS, options)).cardStyle
+    for (const part of [/background-color:[^;]*;/, /backdrop-filter:[^;]*;/, /box-shadow:inset[^;]*;/]) {
+      assert.equal(card.match(part)[0], tag.match(part)[0])
+    }
+    // The lit edge is part of the card, not only the tint.
+    assert.match(card, isDark ? /inset 0 1px 0 rgba\(255,255,255,0\.18\)/ : /inset 0 1px 0 rgba\(255,255,255,0\.6\)/)
+  }
 })

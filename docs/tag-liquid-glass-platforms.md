@@ -17,6 +17,17 @@ does NOT use the tab bar's scheme, the reason is written in the row and the advi
 
 Verified by: iOS compile only so far (the Mac session; no capture in this table); HarmonyOS 180 host tests, 14 emulator UI tests and an emulator capture of the Flows tab (the tail fold control is NOT yet a glass tag there: open); mini program 284 tests, never seen in WeChat DevTools; Android 245 unit tests (8 new for `backdropSource`).
 
+**The board and the tag are one glass.** The section board (`sectionBackgroundStyle = liquidGlass`) is drawn by the same
+`CYLAnimatedItemView` glass as a tag capsule, so it has the same blur, the same frosted default tint and the same lit edge (the rim /
+top highlight); only the corner radius and the size differ. With no `sectionBackgroundColor` the board hands NO tint (exactly as an unset
+glass tag does), so the tag's default frosted tint applies to it. HarmonyOS and the mini program used to give the board a tint of its own
+(`cyl_section_glass_tint`, `SECTION_COLORS.*.glassTint`); both are removed (`CYLSectionStyleColors.glassTint` is now the "no color" value;
+mini: `resolvedSectionBackgroundColor` is `''` under unset glass). iOS drew an unset board with a plain `UIGlassEffect` view
+(`CYLTagListCardView.plainGlassView`); that path is to be removed so the board goes through `CYLAnimatedItemView` too (Mac session).
+Android already did. Tests: Android `anUnsetGlassBoardIsTheSameGlassAsAGlassTagNoTintOfItsOwn`, mini `the board shares the glass tag's
+tint, blur and edge highlight`, HarmonyOS `theGlassCardTintIsTheAppColorElseTheModeAwareDefault`. Edge-glow capture over a dark, high
+contrast plate: still to be taken on each platform.
+
 Platforms not yet in the table: React Native and Flutter (see "Deviations" item 3).
 
 ## Deviations and the advisor's assessment

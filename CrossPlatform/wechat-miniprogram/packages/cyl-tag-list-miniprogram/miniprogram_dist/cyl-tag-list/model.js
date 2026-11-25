@@ -219,11 +219,9 @@ const SECTION_BACKGROUND_STYLES = { flat: 'flat', liquidGlass: 'liquidGlass' };
 const SECTION_COLORS = {
   light: {
     card: '#FFFFFF', headerBand: '#EFEFF4', groupedBackground: '#F2F2F7', listBackground: '#FFFFFF', separator: 'rgba(60, 60, 67, 0.29)',
-    glassTint: 'rgba(255, 255, 255, 0.5)',
   },
   dark: {
     card: '#1C1C1E', headerBand: '#2C2C2E', groupedBackground: '#000000', listBackground: '#000000', separator: 'rgba(84, 84, 88, 0.6)',
-    glassTint: 'rgba(28, 28, 30, 0.5)',
   },
 };
 const ZERO_INSETS = { top: 0, left: 0, bottom: 0, right: 0 };
@@ -1493,10 +1491,13 @@ function resolvedFoldControlColor(style, inHeader = false) {
   return resolveTint(style, inHeader && hasHeaderBand(style) ? style.headerBackgroundColor : null);
 }
 
-/** The card's color as drawn: its own (the glass tint when glass), else the card color or the glass tint of the color mode. */
+/**
+ * The card's color as drawn: its own; for drawn glass '' when unset (no color: cyl-animated-item's default frosted tint, the same one a
+ * glass tag with no background gets, so the board and the tags are one glass style); else the card color of the color mode.
+ */
 function resolvedSectionBackgroundColor(style) {
   const fallback = resolvedSectionBackgroundStyle(style) === SECTION_BACKGROUND_STYLES.liquidGlass
-    ? style.sectionPalette.glassTint : style.sectionPalette.card;
+    ? '' : style.sectionPalette.card;
   return style.sectionBackgroundColor || fallback;
 }
 

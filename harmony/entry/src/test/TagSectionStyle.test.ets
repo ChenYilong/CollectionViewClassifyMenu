@@ -3,7 +3,7 @@ import { CYLLiquidGlass } from 'cylanimateditem';
 import {
   CYLColor, CYLColorKey, CYLControlState, CYLEdgeInsets, CYLFont, CYLHeaderSeparatorStyle, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuStyle, CYLRect, CYLSectionStyle, CYLSectionStyleColors,
-  CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTintLuminanceThreshold, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
+  CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButton, CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTintLuminanceThreshold, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
   CYLTextMeasurer
 } from '@cyl/classifymenu';
 
@@ -419,8 +419,10 @@ export default function tagSectionStyleTest() {
       const savedOverride = CYLLiquidGlass.activeOverride;
       try {
         CYLLiquidGlass.activeOverride = true;
-        // Unset: the resource tint (resources/base light, resources/dark dark), not a string baked at build time.
+        // Unset: "no color" (transparent), the same hand-over as a glass tag with no explicit background, so the board draws the
+        // tags' own frosted default tint and edge (one glass style).
         expect(style.resolvedSectionBackgroundColor()).assertEqual(CYLSectionStyleColors.glassTint);
+        expect(CYLSectionStyleColors.glassTint).assertEqual(CYLTagButton.GLASS_DEFAULT_TINT);
         expect(CYLSectionStyleColors.glassTint === CYLSectionStyleColors.card).assertFalse();
         // Set: the app's color wins in both modes.
         style.sectionBackgroundColor = RED;
@@ -435,7 +437,7 @@ export default function tagSectionStyleTest() {
       // Each named color is one ResourceColor, so the system picks its resources/base value in light mode and its
       // resources/dark value in dark mode while the list is shown; no unset color is a string.
       const named: ResourceColor[] = [CYLSectionStyleColors.card, CYLSectionStyleColors.headerBand,
-        CYLSectionStyleColors.groupedBackground, CYLSectionStyleColors.separator, CYLSectionStyleColors.glassTint];
+        CYLSectionStyleColors.groupedBackground, CYLSectionStyleColors.separator];
       named.forEach((color: ResourceColor) => expect(typeof color === 'string' || typeof color === 'number').assertFalse());
       const style = groupedStyle();
       expect(style.resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
