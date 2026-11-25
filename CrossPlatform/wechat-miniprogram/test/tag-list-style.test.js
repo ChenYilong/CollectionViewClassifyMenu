@@ -92,6 +92,9 @@ test('the fold control reads a dictionary or a position alone, as CYLMenuFoldCon
   assert.equal(model.foldControlValue({ position: 'tail', content: 'iconAndTitle' }).content, 'iconAndTitle');
   assert.equal(model.foldControlValue('headerRight').position, 'headerTrailing');
   assert.equal(model.foldControlValue('headerRight').content, 'iconAndTitle');
+  // The new fourth content: only "titleAndIconAlways" gives 'titleAndIcon'; the old aliases keep 'iconAndTitle'.
+  assert.equal(model.foldControlValue({ position: 'tail', content: 'titleAndIconAlways' }).content, 'titleAndIcon');
+  assert.equal(model.foldControlValue({ position: 'tail', content: 'titleAndIcon' }).content, 'iconAndTitle');
 });
 
 test('a disabled tag uses the disabled appearance; the icon color is iconColor, else the text color', () => {

@@ -32,6 +32,39 @@ export const CylSectionStyle = {
 
 export type CylSectionStyle = (typeof CylSectionStyle)[keyof typeof CylSectionStyle];
 
+/**
+ * What a fold control (More / Less) shows. `iconAndTitle`: "More v" folded, only the chevron turned 180 degrees expanded.
+ * `title`: "More" folded, "Less" expanded. `icon`: the chevron only. `titleAndIconAlways`: the title and the chevron in both
+ * states, "More v" folded and "Less ^" expanded. (The older names `iconAndTitle` / `titleAndIcon` in lower case still mean
+ * `iconAndTitle`.)
+ */
+export const CylFoldControlContent = {
+  iconAndTitle: 'iconAndTitle',
+  title: 'title',
+  icon: 'icon',
+  titleAndIconAlways: 'titleAndIconAlways',
+} as const;
+
+export type CylFoldControlContent = (typeof CylFoldControlContent)[keyof typeof CylFoldControlContent];
+
+/** Where the fold control is drawn. */
+export type CylFoldControlPosition = 'none' | 'footer' | 'headerTrailing' | 'headerLeading' | 'tail';
+
+/**
+ * The fold control of More / Less. `content` left out: the tail and the footer show the icon only, the header shows
+ * `iconAndTitle`. A control in a section header shows only on a section that can fold (no space is kept on one that cannot),
+ * its font is capped and its width is at most 40% of the header, where the section title truncates at the tail.
+ */
+export type CylFoldControl = {
+  position?: CylFoldControlPosition;
+  content?: CylFoldControlContent;
+  /** The folded title; defaults to the localized "More". */
+  title?: string;
+  /** The expanded title; defaults to the localized "Less" ("Collapse"). */
+  collapseTitle?: string;
+  color?: CylColorString;
+};
+
 /** The card's background: `flat` (the DEFAULT) is the solid card color; `liquidGlass` is the glass material, flat where unsupported. */
 export const CylSectionBackgroundStyle = {
   flat: 'flat',
@@ -120,8 +153,8 @@ export type CylTagListConfiguration = {
    * A long-press action name, or several tried in order (`report` is appended unless listed or `none` is given).
    */
   longPressAction?: CylTagLongPressActionName | CylTagLongPressActionName[];
-  /** The fold control of More / Less: a position name, or a dictionary of the core (position, content). */
-  foldControl?: string | Record<string, unknown>;
+  /** The fold control of More / Less: a position name, or the typed shape (position, content, title, collapseTitle, color). */
+  foldControl?: CylFoldControlPosition | CylFoldControl | string | Record<string, unknown>;
   /**
    * Style keys; `itemsPerRow` left out (0) makes each tag as wide as its content. Without any section key the list shows each
    * section on a rounded card (`sectionStyle: 'insetGrouped'`) and no header divider: set `sectionStyle: 'plain'` to remove the

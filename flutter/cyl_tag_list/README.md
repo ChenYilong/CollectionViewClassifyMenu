@@ -29,6 +29,12 @@ controller.playAll();     // from progress 0
 - `configuration` is the dictionary of `CYLTagListView(configuration:)` (keys `CYLTagListKey`, `CYLTagSectionKey`,
   `CYLTagItemKey`, `CYLMenuStyleKey`…; strings work for every value). A value `asset:<key>` becomes the path of that Flutter
   asset on the device.
+- `foldControl` is a position string (`none`, `footer`, `headerTrailing`, `headerLeading`, `tail`) or a map
+  `{'position': ..., 'content': ..., 'title': ..., 'collapseTitle': ..., 'color': ...}`. `content` strings: `iconAndTitle`
+  ("More v" folded, only the chevron turned 180 degrees expanded), `title`, `icon`, and `titleAndIconAlways` (the title and the
+  chevron in both states: "More v" folded, "Less ^" expanded). The old `titleAndIcon` string stays an alias of `iconAndTitle`.
+  Unset, the tail and the footer show the icon only and the header shows `iconAndTitle`. A control in a section header shows only
+  on a section that can fold, with a capped font and at most 40% of the header width (the section title truncates).
 - `CylTagListController` holds the playback controls of `docs/example-demo-rules.md` (Play all, speed, loop) and
   `state()`, which reads what the native list holds.
 - Status: iOS and Android pass the integration test and play the animated icons (see docs/cross-platform.md).

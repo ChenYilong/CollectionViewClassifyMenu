@@ -13,6 +13,7 @@ jest.mock('../CylTagListViewNativeComponent', () => {
 
 import { CylTagListView, type CylTagListHandle } from '../CylTagListView.native';
 import {
+  CylFoldControlContent,
   CylHeaderSeparatorStyle,
   CylSectionBackgroundStyle,
   CylSectionStyle,
@@ -119,6 +120,30 @@ describe('CylTagListView', () => {
     const sent = JSON.parse(screen.getByTestId('list').props.configuration);
     expect(sent).toEqual(configuration);
     expect(sent.style).toBeUndefined();
+  });
+
+  it('sends the typed foldControl unchanged, with titleAndIconAlways', () => {
+    const configuration: CylTagListConfiguration = {
+      defaultVisibleRows: 2,
+      foldControl: {
+        position: 'tail',
+        content: CylFoldControlContent.titleAndIconAlways,
+        title: 'More',
+        collapseTitle: 'Less',
+        color: '#007AFF',
+      },
+      sections: [{ title: 'Flows', items: [{ title: 'A' }] }],
+    };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.foldControl.content).toBe('titleAndIconAlways');
+    expect(CylFoldControlContent).toEqual({
+      iconAndTitle: 'iconAndTitle',
+      title: 'title',
+      icon: 'icon',
+      titleAndIconAlways: 'titleAndIconAlways',
+    });
   });
 
   it('runs the playAll command on the native view', () => {

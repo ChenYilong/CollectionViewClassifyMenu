@@ -7,10 +7,11 @@
   <view wx:for="{{sections}}" wx:for-item="section" wx:key="index" class="cyl-section" style="{{section.backgroundStyle}}">
     <view wx:if="{{section.showsHeader || (section.canFold && foldPosition === 'headerTrailing')}}" class="cyl-header" style="{{section.headerStyle}}">
       <text class="cyl-header-title" style="{{section.headerTitleStyle}}">{{section.showsHeader ? section.title : ''}}</text>
-      <view wx:if="{{section.canFold && foldPosition === 'headerTrailing'}}" class="cyl-fold-header" style="color: {{foldColor}}; {{foldFontStyle}};"
+      <view wx:if="{{section.canFold && foldPosition === 'headerTrailing'}}" class="cyl-fold-header" style="color: {{foldColor}}; {{foldFontStyle}}; {{foldHeaderStyle}};"
             data-section="{{section.index}}" bindtap="onFoldTap"
             aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
-        <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
+        <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}">{{section.foldTitle}}</text>
+        <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
         <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
       </view>
       <view wx:if="{{section.headerLineStyle}}" class="cyl-header-line" style="{{section.headerLineStyle}}" aria-hidden="true" />
@@ -47,7 +48,8 @@
       <view wx:if="{{section.canFold && foldPosition === 'tail'}}" class="cyl-item cyl-fold-tail"
             style="{{section.tailStyle}}; color: {{foldColor}};" data-section="{{section.index}}" bindtap="onFoldTap"
             aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
-        <text wx:if="{{foldContent !== 'icon'}}" class="cyl-fold-title">{{section.foldTitle}}</text>
+        <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}" class="cyl-fold-title">{{section.foldTitle}}</text>
+        <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
         <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
       </view>
     </view>
@@ -56,7 +58,8 @@
     <view wx:if="{{section.canFold && foldPosition === 'footer'}}" class="cyl-fold-footer" style="color: {{foldColor}}; {{foldFontStyle}};"
           data-section="{{section.index}}" bindtap="onFoldTap"
           aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
-      <text wx:if="{{foldContent !== 'icon'}}">{{section.foldTitle}}</text>
+      <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}">{{section.foldTitle}}</text>
+      <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
       <view wx:if="{{foldContent !== 'title'}}" class="cyl-footer-chevron {{section.expanded ? 'cyl-footer-chevron-up' : ''}}" />
     </view>
   </view>
