@@ -135,7 +135,7 @@ open class CYLTagFoldButton: CYLTagButton {
         let style = itemStyle.cylCopy()
         let normal = itemStyle.normalAppearance
         // The same color as the other fold controls (CYLMenuStyle.foldControlColor), lighter than the tags' titles.
-        let tint = control.color ?? itemStyle.foldControlColor
+        let tint = control.color ?? itemStyle.resolvedFoldControlColor(inHeader: false)
         for state in [UIControl.State.selected, .disabled] {
             let appearance = style.appearance(for: state)
             appearance.backgroundColor = normal.backgroundColor

@@ -2588,7 +2588,7 @@ private extension CYLTagListView {
      * Shows the fold control in a state, with its VoiceOver label ("<section> 更多/收起") and hint.
      */
     func configureFoldButton(_ button: CYLTagFoldButton, section: Int, expanded: Bool, animated: Bool) {
-        button.applyFoldControl(displayedFoldControl, color: style.foldControlColor, expanded: expanded,
+        button.applyFoldControl(displayedFoldControl, color: style.resolvedFoldControlColor(inHeader: foldControlIsInHeader), expanded: expanded,
                                 animated: animated)
         button.accessibilityLabel = foldAccessibilityLabel(forSection: section)
         button.accessibilityHint = expanded ? nil : CYLMenuLocalizedString("CYLMenuExpandHint")
@@ -3030,7 +3030,7 @@ extension CYLTagListView: UICollectionViewDataSource {
      * at the leading edge.
      */
     private func headerTitleStyle() -> CYLMenuStyle {
-        let titleStyle = CYLMenuStyle.sectionTitle(textColor: style.headerTextColor)
+        let titleStyle = CYLMenuStyle.sectionTitle(textColor: style.resolvedHeaderTextColor)
         for state in [UIControl.State.normal, .selected, .disabled] {
             titleStyle.appearance(for: state).font = style.headerFont
         }
@@ -3071,7 +3071,7 @@ extension CYLTagListView: UICollectionViewDataSource {
             // A vector by default (an SF Symbol: sharp at every scale, a template tinted with the one dynamic color); the bundled raster is the fallback.
             let image = style.clearButtonImage ?? UIImage(systemName: "trash") ?? CYLMenuResources.image(named: "cyl_trash")
             header.clearButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
-            header.clearButton.tintColor = style.clearButtonColor ?? style.headerTextColor
+            header.clearButton.tintColor = style.clearButtonColor ?? style.resolvedHeaderTextColor
             let title = source?.menuTitle(forSection: section) ?? ""
             let clear = CYLMenuLocalizedString("CYLMenuClearSection")
             header.clearButton.accessibilityLabel = title.isEmpty ? clear : "\(clear) \(title)"
@@ -3090,7 +3090,7 @@ extension CYLTagListView: UICollectionViewDataSource {
         if showsMore {
             let image = style.moreButtonImage ?? UIImage(systemName: "ellipsis") ?? CYLMenuResources.image(named: "cyl_more")
             header.moreButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
-            header.moreButton.tintColor = style.moreButtonColor
+            header.moreButton.tintColor = style.resolvedMoreButtonColor
             var label = source?.menuAccessibilityLabelForMoreButton?(inSection: section) ?? ""
             if label.isEmpty {
                 let title = source?.menuTitle(forSection: section) ?? ""

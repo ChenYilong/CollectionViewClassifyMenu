@@ -562,7 +562,12 @@ open class CYLMenuStyle: NSObject, NSCopying {
      * Header title color: the dynamic label color by default (`UIColor.label`, resolved per trait collection, so dark mode works), the one
      * tint of the list's own texts and icons together with `foldControlColor`, `moreButtonColor` and `clearButtonColor`.
      */
-    open var headerTextColor = UIColor.label
+    open var headerTextColor = UIColor.label {
+        didSet {
+            headerTextColorWasSet = true
+        }
+    }
+    private(set) var headerTextColorWasSet = false
 
     /**
      * Space before the header's title and after its controls, 16 by default.
@@ -574,7 +579,12 @@ open class CYLMenuStyle: NSObject, NSCopying {
     /**
      * The fold controls' color: the dynamic label color by default (`UIColor.label`; a control's own color wins), visible in dark mode and on glass.
      */
-    open var foldControlColor = UIColor.label
+    open var foldControlColor = UIColor.label {
+        didSet {
+            foldControlColorWasSet = true
+        }
+    }
+    private(set) var foldControlColorWasSet = false
 
     /**
      * Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
@@ -603,7 +613,63 @@ open class CYLMenuStyle: NSObject, NSCopying {
     /**
      * The color of the More button: the dynamic label color by default (`UIColor.label`).
      */
-    open var moreButtonColor = UIColor.label
+    open var moreButtonColor = UIColor.label {
+        didSet {
+            moreButtonColorWasSet = true
+        }
+    }
+    private(set) var moreButtonColorWasSet = false
+
+    // MARK: The tint of the built-in views
+
+    /**
+     * The one color of every built-in view that is not a tag: the header title, the section icon, the fold and More controls (text,
+     * icon, arrow). `nil` (the default) resolves against what is behind them (`resolvedTintColor(onHeaderBand:)`). A color set here wins in
+     * both modes; a `headerTextColor`, `foldControlColor`, `moreButtonColor` or `clearButtonColor` set on its own wins over it.
+     */
+    open var tintColor: UIColor?
+
+    /**
+     * The default tint of the built-in views, a dynamic color resolved with the traits of the view that shows it: `tintColor` when set;
+     * else black or white by the luminance of the opaque background behind the view (`CYLTintContrast.luminanceThreshold`): the header
+     * band's color when `onHeaderBand` and a band is shown, else the list's `resolvedBackgroundColor`; else (a transparent list) the
+     * system mode, `UIColor.label`.
+     */
+    public func resolvedTintColor(onHeaderBand: Bool) -> UIColor {
+        if let tintColor {
+            return tintColor
+        }
+        let candidates = [onHeaderBand ? headerBackgroundColor : nil, resolvedBackgroundColor].compactMap { $0 }
+        return UIColor { traits in
+            for candidate in candidates {
+                if let tint = CYLTintContrast.tint(on: candidate, traits: traits) {
+                    return tint
+                }
+            }
+            return UIColor.label.resolvedColor(with: traits)
+        }
+    }
+
+    /**
+     * The header title's (and section icon's) color as drawn.
+     */
+    public var resolvedHeaderTextColor: UIColor {
+        headerTextColorWasSet ? headerTextColor : resolvedTintColor(onHeaderBand: true)
+    }
+
+    /**
+     * The fold control's color as drawn; `inHeader` when the control sits in the section header (on the band).
+     */
+    public func resolvedFoldControlColor(inHeader: Bool) -> UIColor {
+        foldControlColorWasSet ? foldControlColor : resolvedTintColor(onHeaderBand: inHeader)
+    }
+
+    /**
+     * The More button's color as drawn (the button sits in the header).
+     */
+    public var resolvedMoreButtonColor: UIColor {
+        moreButtonColorWasSet ? moreButtonColor : resolvedTintColor(onHeaderBand: true)
+    }
 
     // MARK: - Initializers
 
@@ -1008,8 +1074,11 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.headerHeight = headerHeight
         copy.headerFont = headerFont
         copy.headerTextColor = headerTextColor
+        copy.headerTextColorWasSet = headerTextColorWasSet
+        copy.tintColor = tintColor
         copy.headerHorizontalInset = headerHorizontalInset
         copy.foldControlColor = foldControlColor
+        copy.foldControlColorWasSet = foldControlColorWasSet
         copy.foldChevronImage = foldChevronImage
         copy.expandTitle = expandTitle
         copy.collapseTitle = collapseTitle
@@ -1019,6 +1088,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.minimumTagSize = minimumTagSize
         copy.moreButtonImage = moreButtonImage
         copy.moreButtonColor = moreButtonColor
+        copy.moreButtonColorWasSet = moreButtonColorWasSet
         copy.highlightedBackgroundColor = highlightedBackgroundColor
         copy.deleteIndicatorTitle = deleteIndicatorTitle
         copy.deleteIndicatorColor = deleteIndicatorColor
@@ -1113,6 +1183,29 @@ public extension UIColor {
      * A line at the header's bottom edge.
      */
     case line
+}
+
+/**
+ * The contrast rule of the default tint: black on a light background, white on a dark one.
+ */
+public enum CYLTintContrast {
+
+    /**
+     * The luma (0 black, 1 white) above which a background counts as light and gets the dark tint.
+     */
+    public static let luminanceThreshold: CGFloat = 0.5
+
+    /**
+     * Black or white for `background` resolved with `traits`; `nil` when the background is not opaque (it shows what is behind it).
+     */
+    static func tint(on background: UIColor, traits: UITraitCollection) -> UIColor? {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        guard background.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha), alpha >= 1 else {
+            return nil
+        }
+        let luma = 0.299 * red + 0.587 * green + 0.114 * blue
+        return luma > luminanceThreshold ? .black : .white
+    }
 }
 
 /**

@@ -465,6 +465,11 @@ public enum CYLMenuStyleKey {
     public static let headerTextColor = "headerTextColor"
 
     /**
+     * A color: the one tint of the header title, the section icon and the fold and More controls; absent resolves against the background.
+     */
+    public static let tintColor = "tintColor"
+
+    /**
      * A color.
      */
     public static let foldControlColor = "foldControlColor"
@@ -1273,6 +1278,9 @@ extension CYLMenuStyle {
         }
         if let value = Value.color(configuration[Key.headerTextColor]) {
             headerTextColor = value
+        }
+        if let value = configuration[Key.tintColor] {
+            tintColor = Value.color(value)
         }
         if let value = Value.color(configuration[Key.foldControlColor]) {
             foldControlColor = value
