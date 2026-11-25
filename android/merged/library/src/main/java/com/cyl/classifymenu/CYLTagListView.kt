@@ -2502,7 +2502,7 @@ open class CYLTagListView @JvmOverloads constructor(
             val room = headerRoom(section, width, accessoryView?.let { it.measuredWidth / density })
             if (clearButton.visibility == VISIBLE) {
                 // A square as tall as a line of the title at the trailing inset, aligned with the title text.
-                val line = min(height, room.clearLine)
+                val line = min(height, ceil(titleLabel.lineHeight / density))
                 trailing -= line
                 place(clearButton, CYLRect(trailing, floor((height - line) / 2), line, line))
                 // A 44 dp touch area around it.

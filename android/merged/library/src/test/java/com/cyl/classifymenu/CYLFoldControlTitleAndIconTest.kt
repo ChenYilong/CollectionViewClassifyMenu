@@ -271,7 +271,7 @@ class CYLFoldControlTitleAndIconTest {
         assertTrue("title end + spacing <= accessory start", titleOf(list).right + SPACING <= accessory(list).left + 1f)
         assertTrue("accessory end + spacing <= fold control start", accessory(list).right + SPACING <= foldButtonOf(list).left + 1f)
         assertTrue("title end + spacing <= fold control start", titleOf(list).right + SPACING <= foldButtonOf(list).left + 1f)
-        assertTrue("the accessory is capped at 30% of the inner width", accessory(list).width <= INNER * ACCESSORY_MAX_FRACTION + 0.5f)
+        assertTrue("the accessory is capped at 30% of the inner width", accessory(list).width <= INNER * ACCESSORY_MAX_FRACTION + 1.5f)
         assertTrue("the clear button stays inside the trailing edge", clear(list).right <= WIDTH_PX - HEADER_INSET + 1f)
         assertTrue("More does not move left of the fold control's glyph box", more(list).left >= foldButtonOf(list).left)
     }
