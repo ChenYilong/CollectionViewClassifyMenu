@@ -105,6 +105,10 @@ function offsetValue(value) {
   return n ? { horizontal: n[0], vertical: n[1] } : null;
 }
 
+// The default section header font: the system table header look, 17 semibold (docs/tag-section-style.md).
+const HEADER_FONT_SIZE = 17;
+const HEADER_FONT_WEIGHT = 'semibold';
+
 const FONT_WEIGHTS = {
   ultralight: 100, thin: 200, light: 300, regular: 400, medium: 500, semibold: 600, bold: 700, heavy: 800, black: 900,
 };
@@ -316,7 +320,7 @@ function mergeSectionStyle(style, c) {
 /**
  * The core's `CYLMenuStyle()`: gray bordered tags (a hairline of UIColor(white: 0.82)), green selection with white
  * titles, light gray disabled tags; 14 × 14 icons, 4 between icon and title, 30 high tags, 10 between tags and lines,
- * section insets {10, 16, 10, 16}, 36 high headers with a gray 14 pt title.
+ * section insets {10, 16, 10, 16}, 36 high headers with a 17 pt semibold title.
  * @param {number} pixelRatio the screen scale, for the hairline (1 / scale)
  * @param {boolean} dark dark mode: the dark tag fill and title, the light tint of the list's texts and icons
  */
@@ -378,7 +382,7 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     foldControlColorSet: false,
     headerTextColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     foldControlColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
-    headerFont: { size: 14, weight: 'regular', italic: false },
+    headerFont: { size: HEADER_FONT_SIZE, weight: HEADER_FONT_WEIGHT, italic: false },
     headerHorizontalInset: 16,
     // The most lines a section header's title may take (HEADER_TITLE_MAX_LINES): one line with an ellipsis by default.
     headerMaxLines: HEADER_TITLE_MAX_LINES.single,
@@ -1170,12 +1174,13 @@ function isStyledHeader(style) {
 }
 
 /**
- * The distances from the list's edges to the header's title and fold control: the tags' edges inside the card
- * (insetGrouped), the band's edges plus `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
+ * The distances from the list's edges to the header's title and fold control: the board's (card's) edges, which are the
+ * column's, under insetGrouped (the title aligns with the board, not with the tags inside it), the band's edges plus
+ * `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
  */
 function headerEdges(style) {
   const column = contentColumn(style);
-  if (isInsetGrouped(style)) return tagColumn(style);
+  if (isInsetGrouped(style)) return column;
   if (hasHeaderBand(style)) {
     const band = physicalInsets(style, style.headerContentInsets);
     return { left: column.left + band.left, right: column.right + band.right };
@@ -1392,7 +1397,7 @@ module.exports = {
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
-  iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
+  iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
   SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
