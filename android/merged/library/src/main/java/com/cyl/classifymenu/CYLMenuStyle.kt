@@ -28,8 +28,9 @@ enum class CYLTagBackgroundStyle { CYLTagBackgroundStyleFlat, CYLTagBackgroundSt
 enum class CYLTagRowAlignment { CYLTagRowAlignmentLeading, CYLTagRowAlignmentCenter, CYLTagRowAlignmentTrailing }
 
 /**
- * `CYLSectionStyle`: how a section's tags sit in the list: `plain` (the default) on the list's background; `insetGrouped`
- * inside a rounded card (UITableView's inset grouped look), the header above it.
+ * `CYLSectionStyle`: how a section's tags sit in the list: `insetGrouped` (the default) inside a rounded card (UITableView's
+ * inset grouped look), the header above it; `plain` on the list's background (the opt-out: the look before the default
+ * changed).
  */
 enum class CYLSectionStyle { CYLSectionStylePlain, CYLSectionStyleInsetGrouped }
 
@@ -204,8 +205,11 @@ class CYLMenuStyle {
         }
 
     // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
-    /** `plain` (the default) or `insetGrouped`: the section's tags inside a rounded card. */
-    var sectionStyle: CYLSectionStyle = CYLSectionStyle.CYLSectionStylePlain
+    /**
+     * `insetGrouped` (the default): the section's tags inside a rounded card; `plain` opts out (the tags on the list's
+     * background). The library's own looks that must stay flat ([tagCloudStyle], [wordPicker], ...) set `plain`.
+     */
+    var sectionStyle: CYLSectionStyle = CYLSectionStyle.CYLSectionStyleInsetGrouped
     /** The card's color; null resolves to the system card color ([resolvedSectionBackgroundColor]). */
     var sectionBackgroundColor: Int? = null
     /**
@@ -496,10 +500,16 @@ class CYLMenuStyle {
         @JvmStatic
         fun defaultStyle() = CYLMenuStyle()
 
+        /**
+         * The base of every library look that is a complete look of its own (a tag cloud, a word picker, a grid, a tag of the
+         * classify menu): the default style with the section card opted out, so the look is the flat one it always was.
+         */
+        private fun plainBaseStyle(): CYLMenuStyle = defaultStyle().also { it.sectionStyle = CYLSectionStyle.CYLSectionStylePlain }
+
         /** `+tagCloudStyle`: android-tagview's look: blue square tags, white text, 5 dp spacing. */
         @JvmStatic
         fun tagCloudStyle(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             val blue = Color.rgb(0, 0xBF, 0xFF)
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = blue
@@ -527,7 +537,7 @@ class CYLMenuStyle {
          */
         @JvmStatic
         fun wordPicker(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             style.numberOfItemsPerRow = 9
             val font = CYLFont(18f, android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL))
             for (appearance in style.appearances()) {
@@ -555,7 +565,7 @@ class CYLMenuStyle {
         /** `+tagContainerStyle`: AndroidTagView's look: translucent red capsules, gray text, 23 characters at most. */
         @JvmStatic
         fun tagContainerStyle(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             val red = Color.rgb(0xF4, 0x43, 0x36)
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = CYLColor.withAlpha(red, 0x33 / 255f)
@@ -656,7 +666,7 @@ class CYLMenuStyle {
         @JvmStatic
         @JvmOverloads
         fun sectionTitle(fontSize: Float = 15f, textColor: Int = Color.BLACK, leadingInset: Float = 0f): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = CYLColor.CLEAR
                 appearance.borderWidth = 0f
@@ -678,7 +688,7 @@ class CYLMenuStyle {
          * The tags of the classify menu and the multiple filter: the tags' title font, small end margins, no border.
          */
         private fun compactTagStyle(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             val font = CYLFont.systemFont(CYLTagTitleFontSize)
             for (appearance in style.appearances()) {
                 appearance.font = font
@@ -695,7 +705,7 @@ class CYLMenuStyle {
         /** `+gridStyleWithNumberOfItemsPerRow:`: borderless items in `numberOfItemsPerRow` columns, icon after title. */
         @JvmStatic
         fun gridStyleWithNumberOfItemsPerRow(numberOfItemsPerRow: Int): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             style.numberOfItemsPerRow = max(1, numberOfItemsPerRow)
             val font = CYLFont.systemFont(17f)
             for (appearance in style.appearances()) {

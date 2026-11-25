@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -28,8 +30,10 @@ private class CYLDefaultFramesSource : CYLMenuDataSource {
 }
 
 /**
- * The default style gives the frames it gave before the section style (card, header band, header divider) existed: this
- * snapshot was taken from the code without it. A change to the default layout must be deliberate, and update it.
+ * `sectionStyle = plain` gives the frames the list gave before the section style (card, header band, header divider)
+ * existed: this snapshot was taken from the code without it, and its builder opts out of the card, now the default look.
+ * A change to the plain layout must be deliberate, and update it. The default (card) look is checked against the same
+ * snapshot's first tags, shifted by the card's padding.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -38,9 +42,11 @@ class CYLTagListDefaultFramesTest {
     private fun descendants(view: View): List<View> =
         if (view is ViewGroup) (0 until view.childCount).flatMap { val child = view.getChildAt(it); listOf(child) + descendants(child) } else emptyList()
 
-    private fun makeList(): CYLTagListView {
+    /** [plain] true: the card opted out (the snapshot's look); false: the list as an app gets it with no setup. */
+    private fun makeList(plain: Boolean = true): CYLTagListView {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val list = CYLTagListView(activity)
+        if (plain) list.usePlainSections()
         list.menuDataSource = CYLDefaultFramesSource()
         activity.setContentView(FrameLayout(activity).apply { addView(list, FrameLayout.LayoutParams(WIDTH_PX, FrameLayout.LayoutParams.WRAP_CONTENT)) })
         list.reloadMenuData()
@@ -72,14 +78,36 @@ class CYLTagListDefaultFramesTest {
         descendants(list).filter { it.javaClass.simpleName == "HeaderView" }.indexOf(header)
 
     @Test
-    fun theDefaultStyleKeepsEveryFrame() {
+    fun thePlainSectionStyleKeepsEveryFrame() {
         val lines = snapshot(makeList())
         assertEquals(EXPECTED, lines)
     }
 
+    @Test
+    fun theDefaultStyleIsTheCardWithTagsInsetByItsPadding() {
+        val list = makeList(plain = false)
+        assertEquals(CYLSectionStyle.CYLSectionStyleInsetGrouped, list.style!!.sectionStyle)
+        assertNotNull("a card frame in the first section", list.sectionFrame(0)?.card)
+        val plain = snapshot(makeList())
+        val card = snapshot(list)
+        // The first tags of the first and the second section sit one card padding (12) further in, at the same width.
+        assertEquals("tag 0.0 x", 16 + PADDING, tagBox(card, "tag 0.0")[0])
+        assertEquals("tag 0.0 width", tagBox(plain, "tag 0.0")[2], tagBox(card, "tag 0.0")[2])
+        assertEquals("tag 0.1 x", tagBox(plain, "tag 0.1")[0] + PADDING, tagBox(card, "tag 0.1")[0])
+        assertEquals("tag 1.0 x", 16 + PADDING, tagBox(card, "tag 1.0")[0])
+        assertTrue("the card's padding adds to the content height", list.contentHeight > 298f)
+        assertEquals(list.contentHeight, list.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.5f)
+    }
+
+    /** x, y, width, height of the snapshot line that starts with [prefix]. */
+    private fun tagBox(lines: List<String>, prefix: String): List<Int> =
+        lines.first { it.startsWith("$prefix ") }.removePrefix("$prefix ").split(",").map { it.toInt() }
+
     private companion object {
         const val WIDTH_PX = 320
         const val SECTIONS = 3
+        /** The card's padding in dp (and px at the test density): CYLSectionStyleMetrics.CARD_PADDING. */
+        const val PADDING = 12
         val EXPECTED: List<String> = listOf(
             "header 0 0,0,320,36",
             "tag 0.0 16,46,25,30",

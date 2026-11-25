@@ -39,6 +39,7 @@ class CYLTagListTailFoldTest {
     private fun makeList(count: Int): CYLTagListView {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val list = CYLTagListView(activity)
+        list.usePlainSections()
         list.menuDataSource = CYLTailFoldSource(count)
         list.showsSectionHeaders = false
         list.defaultVisibleRows = 2

@@ -53,6 +53,7 @@ class CYLTagReorderWidthTest {
     fun aDraggedTagAndItsNeighboursKeepTheWidthOfTheirOwnTitles() {
         val context = Robolectric.buildActivity(android.app.Activity::class.java).setup().get()
         val list = CYLTagListView(context)
+        list.usePlainSections()
         list.setTagsWithTitles(titles)
         list.allowsReordering = true
         var moved: Pair<Int, Int>? = null
