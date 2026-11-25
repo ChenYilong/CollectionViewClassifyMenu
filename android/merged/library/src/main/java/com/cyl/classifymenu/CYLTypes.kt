@@ -89,7 +89,7 @@ data class CYLFont(val size: Float, val typeface: Typeface = Typeface.DEFAULT) {
         @JvmStatic
         fun systemFont(size: Float, weight: Int): CYLFont {
             val typeface = if (android.os.Build.VERSION.SDK_INT >= 28) Typeface.create(Typeface.DEFAULT, weight, false)
-            else if (weight >= WEIGHT_SEMIBOLD) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+            else if (weight >= WEIGHT_SEMIBOLD) Typeface.create(Typeface.DEFAULT, Typeface.BOLD) else Typeface.DEFAULT
             return CYLFont(size, typeface)
         }
 
