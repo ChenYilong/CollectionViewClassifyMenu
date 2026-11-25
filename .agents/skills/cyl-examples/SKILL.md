@@ -1,6 +1,6 @@
 ---
 name: cyl-examples
-description: Build example (demo) screens in the CYL projects. A demo that needs a sectioned list uses CollectionViewClassifyMenu's tag list (titles and icons, More / Less, tap = cell tap, long press = subtitle callout, titleMaxLines) and re-tests contact-list reordering.
+description: Build example (demo) screens in the CYL projects. A demo that needs a sectioned list uses CollectionViewClassifyMenu's tag list (titles and icons, tail chevron fold control, tap = cell tap, long press = subtitle callout, titleMaxLines) and re-tests contact-list reordering.
 ---
 
 # Example (demo) screens
@@ -16,7 +16,7 @@ an inset-grouped list, ArkUI `List` with groups). Build it with the tag list, no
 ## How
 
 1. One tag list, one section per group. The section title is the header. A tag shows the **main title and the icon only**.
-2. More than `defaultVisibleRows` rows in a section: the core's More / Less fold control (`foldControl`, header trailing).
+2. Every example tag list: the tail fold control, icon only (`CYLMenuFoldControl(position: .tail, content: .icon)`; config `"foldControl": {"position": "tail", "content": "icon"}`). The last tag is the chevron button; no More / Less text. Only the fold-styles demo screen shows the other variants.
 3. A tap on a tag does what the replaced cell's tap did (open the screen, select the row). Do not leave the tag selected.
 4. The secondary line (detail, subtitle) is shown on a **long press** in a small floating callout with an arrow:
    - data: `menuSubtitleForItem` on the data source, `CYLTag.subtitle`, or the item key `subtitle` in a configuration;

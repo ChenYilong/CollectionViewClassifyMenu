@@ -25,8 +25,13 @@ means the section of that name here.
   grouped list. Use the tag list's section style:
   - One tag list; one section per group; the section title is the section header.
   - A tag shows only the **main title and the icon**. The secondary line (detail, subtitle) is not drawn in the tag.
-  - Sections that have more rows than `defaultVisibleRows` use the core's **More / Less** fold control
-    (`foldControl`, header trailing).
+  - Every example tag list uses the **tail** fold control: the last tag of the section is the expand / collapse button,
+    icon only (a chevron), no More / Less text. Code: `CYLMenuFoldControl(position: .tail, content: .icon)`;
+    configuration files: `"foldControl": { "position": "tail", "content": "icon" }`. Why: the tail control is a
+    tag-sized round button, so it never competes with the section title. Other positions and contents (`footer`,
+    `headerTrailing`, `title`, `iconAndTitle`) stay available in the core; only the fold-styles demo screen
+    (`CYLFoldStylesViewController`) shows them, because that screen exists to demo every variant. (Replaces the
+    earlier rule "More / Less, header trailing", 2026-11-25.)
   - A tap on a tag does exactly what a tap on the replaced cell did (open the screen, select the row). The tag does not
     stay selected unless the cell did.
   - A **long press** on a tag shows the secondary line in a small floating callout with an arrow, through the tag list's
