@@ -775,12 +775,19 @@ open class CYLTagListView @JvmOverloads constructor(
         }
     }
 
-    private fun heightsForItems(): List<List<Float>> {
+    private fun heightsForItems(widths: List<List<Float>> = itemWidths): List<List<Float>> {
         val listHeight = itemHeight()
         return titles.mapIndexed { section, items ->
             items.indices.map { item ->
-                val itemStyle = styleForItem(CYLIndexPath(item, section))
-                if (itemStyle === listStyle) listHeight else max(listHeight, CYLTagButton.heightForStyle(itemStyle))
+                val indexPath = CYLIndexPath(item, section)
+                val itemStyle = styleForItem(indexPath)
+                val width = widths.getOrNull(section)?.getOrNull(item) ?: 0f
+                if (itemStyle.titleMaxLines > CYLTagTitleMaxLines.SINGLE && width > 0f) {
+                    // A title that may wrap grows the tag: measured at the width it gets.
+                    val iconSize = CYLTagButton.iconSizeForImage(imageAt(indexPath), animationURLAt(indexPath) != null, itemStyle)
+                    val deletable = isDeletableAt(indexPath)
+                    max(listHeight, CYLTagButton.heightForTitleWidth(titles[section][item], iconSize, width, deletable, itemStyle))
+                } else if (itemStyle === listStyle) listHeight else max(listHeight, CYLTagButton.heightForStyle(itemStyle))
             }
         }
     }
@@ -833,7 +840,7 @@ open class CYLTagListView @JvmOverloads constructor(
         measuredContentWidth = width
         val contentWidth = contentWidthFor(width)
         itemWidths = widthsFor(contentWidth)
-        itemHeights = heightsForItems()
+        itemHeights = heightsForItems(itemWidths)
         rows = rowsFor(itemWidths, contentWidth)
     }
 
@@ -855,7 +862,7 @@ open class CYLTagListView @JvmOverloads constructor(
         val same = width == measuredContentWidth
         val widths = if (same) itemWidths else widthsFor(contentWidth)
         val sectionRows = if (same) rows else rowsFor(widths, contentWidth)
-        val heights = if (same) itemHeights else heightsForItems()
+        val heights = if (same) itemHeights else heightsForItems(widths)
         val header = headerHeight()
         val insets = listStyle.sectionInsets
         var height = 0f

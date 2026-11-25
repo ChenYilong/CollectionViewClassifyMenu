@@ -126,6 +126,14 @@ class CYLMenuStyle {
     var animationSpeed: Float = 1f
     var adjustsFontForContentSizeCategory: Boolean = true
     var itemHeight: Float = 30f
+
+    /**
+     * The most lines a title may take: a title too wide for its tag wraps onto more lines, up to this number, and the tag
+     * grows taller; beyond it the title is truncated. Default [CYLTagTitleMaxLines.SINGLE] (1, one line, truncated).
+     * [CYLTagTitleMaxLines.UNLIMITED] shows every line. The app chooses the number; a value below 1 is 1.
+     */
+    var titleMaxLines: Int = CYLTagTitleMaxLines.SINGLE
+        set(value) { field = max(CYLTagTitleMaxLines.SINGLE, value) }
     var numberOfItemsPerRow: Int = 0
 
     // Layout
@@ -265,6 +273,7 @@ class CYLMenuStyle {
         copy.animationSpeed = animationSpeed
         copy.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
         copy.itemHeight = itemHeight
+        copy.titleMaxLines = titleMaxLines
         copy.interitemSpacing = interitemSpacing
         copy.lineSpacing = lineSpacing
         copy.sectionInsets = sectionInsets
@@ -536,4 +545,13 @@ class CYLMenuStyle {
             return style
         }
     }
+}
+
+/** The line limits of a tag's title ([CYLMenuStyle.titleMaxLines]): named values, never a literal at a call site. */
+object CYLTagTitleMaxLines {
+    /** One line, the default: a title too wide for its tag is truncated. */
+    const val SINGLE: Int = 1
+
+    /** No limit: a title wraps onto as many lines as it needs (the MAX of the line counts). */
+    const val UNLIMITED: Int = Int.MAX_VALUE
 }

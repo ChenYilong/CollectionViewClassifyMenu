@@ -203,6 +203,8 @@ const val CYLMenuStyleImageTitleSpacing = "imageTitleSpacing"
  * Style key: a number.
  */
 const val CYLMenuStyleItemHeight = "itemHeight"
+/** The most lines a title may take: a whole number, or "unlimited". Default 1. */
+const val CYLMenuStyleTitleMaxLines = "titleMaxLines"
 /**
  * Style key: a number, 0 for flowing rows.
  */
@@ -747,6 +749,10 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     disabledAppearance.applyConfiguration(map(configuration[CYLMenuStyleDisabled]), context)
     number(configuration[CYLMenuStyleImageTitleSpacing])?.let { imageTitleSpacing = it.toFloat() }
     number(configuration[CYLMenuStyleItemHeight])?.let { itemHeight = it.toFloat() }
+    configuration[CYLMenuStyleTitleMaxLines].let { value ->
+        if (value == "unlimited") titleMaxLines = CYLTagTitleMaxLines.UNLIMITED
+        else number(value)?.let { titleMaxLines = it.toInt() }
+    }
     number(configuration[CYLMenuStyleNumberOfItemsPerRow])?.let { numberOfItemsPerRow = maxOf(0, it.toInt()) }
     number(configuration[CYLMenuStyleInteritemSpacing])?.let { interitemSpacing = it.toFloat() }
     number(configuration[CYLMenuStyleLineSpacing])?.let { lineSpacing = it.toFloat() }
