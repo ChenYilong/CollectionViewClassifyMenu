@@ -61,6 +61,20 @@ export class CYLTagAppearance {
     this.storedFont = value;
   }
 
+  /**
+   * The color set on `backgroundColor`; undefined when it was never set or was reset (the built-in default applies, which
+   * is never stored). Under Liquid Glass only this color tints the glass: an unset background hands no color, so the
+   * glass keeps its frosted default tint (iOS `explicitBackgroundColor`).
+   */
+  get explicitBackgroundColor(): ResourceColor | undefined {
+    return this.storedBackgroundColor;
+  }
+
+  /** True when `backgroundColor` was set to a color (and not reset). */
+  get isBackgroundColorSet(): boolean {
+    return this.storedBackgroundColor !== undefined;
+  }
+
   resetBackgroundColor(): void {
     this.storedBackgroundColor = undefined;
   }

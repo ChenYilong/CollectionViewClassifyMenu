@@ -117,6 +117,8 @@ export class CYLSectionStyleColors {
   static readonly card: ResourceColor = $r('app.color.cyl_section_card');
   /** The header band: #EFEFF4; #2C2C2E in dark mode. */
   static readonly headerBand: ResourceColor = $r('app.color.cyl_section_header_band');
+  /** The list background of a list whose `backgroundColor` was never set: the system background, white; black in dark mode. */
+  static readonly listBackground: ResourceColor = $r('app.color.cyl_list_background');
   /** The list background under `insetGrouped`: #F2F2F7; black in dark mode. */
   static readonly groupedBackground: ResourceColor = $r('app.color.cyl_section_grouped_background');
   /** The header divider: the system separator color. */
@@ -292,20 +294,24 @@ export class CYLMenuStyle {
   interitemSpacing: number = 10;
   lineSpacing: number = 10;
   sectionInsets: CYLEdgeInsets = new CYLEdgeInsets(10, 16, 10, 16);
-  private backgroundColorValue: string = CYLColor.WHITE;
-  private backgroundColorWasSet: boolean = false;
+  private backgroundColorValue?: ResourceColor = undefined;
 
   /**
-   * The list's background color, white by default. Under `insetGrouped` a list whose background the app never set shows
-   * the grouped background instead (`resolvedBackgroundColor()`).
+   * The list's background color: the system background by default (`CYLSectionStyleColors.listBackground`, a resource: white
+   * in light mode, black in dark mode). Under `insetGrouped` a list whose background the app never set shows the grouped
+   * background instead (`resolvedBackgroundColor()`). A color the app sets, a clear one included, wins in both modes.
    */
-  get backgroundColor(): string {
-    return this.backgroundColorValue;
+  get backgroundColor(): ResourceColor {
+    return this.backgroundColorValue ?? CYLSectionStyleColors.listBackground;
   }
 
-  set backgroundColor(value: string) {
+  set backgroundColor(value: ResourceColor) {
     this.backgroundColorValue = value;
-    this.backgroundColorWasSet = true;
+  }
+
+  /** True when the app set `backgroundColor` (a clear color counts); false while the mode-following default applies. */
+  get isBackgroundColorSet(): boolean {
+    return this.backgroundColorValue !== undefined;
   }
 
   // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
@@ -567,10 +573,15 @@ export class CYLMenuStyle {
     return this.sectionStyle === CYLSectionStyle.insetGrouped;
   }
 
-  /** The list background as drawn: the grouped background where `insetGrouped` and the app never set `backgroundColor`. */
+  /**
+   * The list background as drawn: the color the app set, else the grouped background under `insetGrouped`, else the system
+   * background (a resource that follows the mode).
+   */
   resolvedBackgroundColor(): ResourceColor {
-    return this.isInsetGrouped && !this.backgroundColorWasSet ? CYLSectionStyleColors.groupedBackground :
-    this.backgroundColorValue;
+    if (this.backgroundColorValue !== undefined) {
+      return this.backgroundColorValue;
+    }
+    return this.isInsetGrouped ? CYLSectionStyleColors.groupedBackground : CYLSectionStyleColors.listBackground;
   }
 
   /**
@@ -684,7 +695,6 @@ export class CYLMenuStyle {
     c.lineSpacing = this.lineSpacing;
     c.sectionInsets = this.sectionInsets;
     c.backgroundColorValue = this.backgroundColorValue;
-    c.backgroundColorWasSet = this.backgroundColorWasSet;
     c.sectionStyle = this.sectionStyle;
     c.sectionBackgroundColor = this.sectionBackgroundColor;
     c.sectionBackgroundStyle = this.sectionBackgroundStyle;

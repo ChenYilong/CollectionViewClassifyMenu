@@ -176,6 +176,22 @@ export class CYLTagButton {
   appearanceCornerRadius: number = 0;
   /** A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); -1 is the modifier's default share. */
   glassTintAlpha: number = -1;
+  /**
+   * What a glass tag with no explicit background color hands to `CYLAnimatedItemBackgroundModifier`: a transparent color means
+   * "no color", and the glass draws its frosted default tint (225, 222, 220 at 0.5; white at 0.14 in dark mode).
+   */
+  static readonly GLASS_DEFAULT_TINT: ResourceColor = Color.Transparent;
+
+  /**
+   * The color a glass tag hands to the modifier: the explicit color, or `GLASS_DEFAULT_TINT` ("no color") when there is none
+   * or it is fully transparent (a cleared color means "unset" under glass, as on iOS).
+   */
+  static glassTintColor(explicitColor: ResourceColor | undefined): ResourceColor {
+    if (explicitColor === undefined || explicitColor === Color.Transparent || explicitColor === CYLColor.CLEAR) {
+      return CYLTagButton.GLASS_DEFAULT_TINT;
+    }
+    return explicitColor;
+  }
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   /**
    * The background, radius and border are `cylanimateditem`'s (`CYLAnimatedItemBackgroundModifier`, the interface of
@@ -1083,9 +1099,15 @@ export class CYLTagButton {
     const pressed = this.highlightedValue && state !== CYLControlState.DISABLED &&
       style.highlightedBackgroundColor !== undefined;
     // Pressed, as android-tagview's layoutColorPress.
-    const stateBackground: ResourceColor = pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor;
-    // Liquid Glass: the state's background color tints the glass (CYLAnimatedItemBackgroundModifier, see build()).
+    // Liquid Glass: the state's background color tints the glass (CYLAnimatedItemBackgroundModifier, see build()). Where glass is
+    // drawn only an EXPLICIT color tints it: an unset background (the built-in default, which would hide the backdrop) hands no
+    // color, so the modifier uses the glass's frosted default tint. The pressed color is always explicit. Flat (also where the
+    // system draws no glass) keeps the effective color.
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    const explicitBackground: ResourceColor | undefined = pressed ? style.highlightedBackgroundColor :
+    appearance.explicitBackgroundColor;
+    const stateBackground: ResourceColor = glass ? CYLTagButton.glassTintColor(explicitBackground) :
+      (pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor);
     this.itemBackgroundStyle = glass ? CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
     this.appearanceCornerRadius = appearance.cornerRadius;
     this.glassTintAlpha = state === CYLControlState.SELECTED ? 1 : -1;

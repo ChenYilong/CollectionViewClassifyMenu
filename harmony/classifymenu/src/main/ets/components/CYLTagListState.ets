@@ -369,7 +369,12 @@ export class CYLTagFoldMetrics {
     const tint = control.color ?? itemStyle.resolvedFoldControlColor();
     [CYLControlState.SELECTED, CYLControlState.DISABLED].forEach((state: number) => {
       const appearance = style.appearance(state);
-      appearance.backgroundColor = normal.backgroundColor;
+      // The normal state's UNSET background stays unset: under Liquid Glass only an explicit color tints the glass.
+      if (normal.isBackgroundColorSet) {
+        appearance.backgroundColor = normal.backgroundColor;
+      } else {
+        appearance.resetBackgroundColor();
+      }
       appearance.borderColor = normal.borderColor;
       appearance.borderWidth = normal.borderWidth;
       appearance.cornerRadius = normal.cornerRadius;
@@ -430,7 +435,12 @@ export class CYLTagCreateItem {
   static outlinedStyle(style: CYLMenuStyle): CYLMenuStyle {
     const outlined = style.copy();
     const normal = outlined.normalAppearance;
-    normal.backgroundColor = style.backgroundColor;
+    // The list's own background, when the app set one; otherwise the tag's built-in (unset: frosted under Liquid Glass).
+    if (style.isBackgroundColorSet) {
+      normal.backgroundColor = style.backgroundColor;
+    } else {
+      normal.resetBackgroundColor();
+    }
     normal.borderColor = SEPARATOR;
     normal.borderWidth = 1;
     normal.textColor = SECONDARY_LABEL;

@@ -16,6 +16,7 @@ import tagTitleMaxLinesTest from './TagTitleMaxLines.test';
 import tagSectionStyleTest from './TagSectionStyle.test';
 import tagSectionRtlTest from './TagSectionRtl.test';
 import tagHeaderMaxLinesAndFoldScaleTest from './TagHeaderMaxLinesAndFoldScale.test';
+import tagGlassBackgroundTest from './TagGlassBackground.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -36,4 +37,5 @@ export default function testsuite() {
   tagSectionStyleTest();
   tagSectionRtlTest();
   tagHeaderMaxLinesAndFoldScaleTest();
+  tagGlassBackgroundTest();
 }

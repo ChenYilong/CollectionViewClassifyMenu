@@ -109,6 +109,7 @@ The list cannot see the host's background, so the library must make its built-in
   light mode, black in dark mode; iOS `systemBackground`); under `insetGrouped` it stays the grouped background (#F2F2F7 / black),
   as before. An app that sets `backgroundColor` (including a clear color) wins in both modes. The tint rule (resolve against the
   painted background) then gives black on white and white on black without any app code. No example needs a stopgap background.
+- HarmonyOS: the unset `backgroundColor` is the resource `cyl_list_background` (`CYLSectionStyleColors.listBackground`, `resources/base` white, `resources/dark` black; `isBackgroundColorSet` tells whether the app set one); `resolvedBackgroundColor()` is the set color, else the grouped background under `insetGrouped`, else that resource, and a resource background gives the mode-following system tint. The default fold chevron is now an SVG (`cyl_fold_chevron.svg`, replacing the PNG, which `fillColor` could not recolor), drawn with `fillColor(tint)` so it follows the mode; a custom bitmap image keeps its colors.
 - HarmonyOS: the fold / More chevron icon is tinted with the resolved tint like the text (its default did not follow dark mode when the
   list background was clear: dark on dark). Android's chevron was already fine.
 - Tests per platform: the default (unset) background is the light value in light mode and the dark value in dark mode; a set color

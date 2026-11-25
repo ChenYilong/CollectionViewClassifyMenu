@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import { CYLLiquidGlass } from 'cylanimateditem';
 import {
-  CYLColor, CYLColorKey, CYLEdgeInsets, CYLFont, CYLHeaderSeparatorStyle, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
+  CYLColor, CYLColorKey, CYLControlState, CYLEdgeInsets, CYLFont, CYLHeaderSeparatorStyle, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl,
   CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuStyle, CYLRect, CYLSectionStyle, CYLSectionStyleColors,
   CYLSectionStyleMetrics, CYLTagBackgroundStyle, CYLTagButtonMetrics, CYLTintLuminanceThreshold, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
   CYLTextMeasurer
@@ -176,8 +176,8 @@ export default function tagSectionStyleTest() {
         expect(s.headerBand === undefined).assertTrue();
         expect(s.headerSeparator === undefined).assertTrue();
       });
-      // The plain list background is today's white.
-      expect(list.style.resolvedBackgroundColor()).assertEqual(CYLColor.WHITE);
+      // The default list background is the system background resource (white in light mode, black in dark mode).
+      expect(list.style.resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.listBackground);
     });
 
     it('theCardContainsEveryTagFrameOfItsSection', 0, () => {
@@ -303,7 +303,27 @@ export default function tagSectionStyleTest() {
       expect(set.resolvedBackgroundColor()).assertEqual(CYLColor.CLEAR);
       expect(set.copy().resolvedBackgroundColor()).assertEqual(CYLColor.CLEAR);
       expect(groupedStyle().copy().resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.groupedBackground);
-      expect(plainStyle().resolvedBackgroundColor()).assertEqual(CYLColor.WHITE);
+      expect(plainStyle().resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.listBackground);
+    });
+
+    it('theDefaultListBackgroundIsTheModeFollowingResourceAndASetColorWins', 0, () => {
+      const style = plainStyle();
+      // Unset: the named resource (resources/base white, resources/dark black), never a string baked at build time.
+      expect(typeof style.resolvedBackgroundColor() === 'string').assertFalse();
+      expect(style.resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.listBackground);
+      expect(style.backgroundColor).assertEqual(CYLSectionStyleColors.listBackground);
+      expect(style.isBackgroundColorSet).assertFalse();
+      expect(style.copy().resolvedBackgroundColor()).assertEqual(CYLSectionStyleColors.listBackground);
+      expect(CYLColorKey(CYLSectionStyleColors.listBackground) === CYLColorKey(CYLSectionStyleColors.groupedBackground)).assertFalse();
+      // A resource background gives the system-mode tint, which flips with the resource.
+      expect(CYLColorKey(style.resolvedTintColor())).assertEqual(CYLColorKey(CYLSectionStyleColors.systemTint));
+      // A set color, a clear one included, wins and is copied.
+      style.backgroundColor = CYLColor.CLEAR;
+      expect(style.isBackgroundColorSet).assertTrue();
+      expect(style.resolvedBackgroundColor()).assertEqual(CYLColor.CLEAR);
+      expect(style.copy().resolvedBackgroundColor()).assertEqual(CYLColor.CLEAR);
+      style.backgroundColor = RED;
+      expect(style.resolvedBackgroundColor()).assertEqual(RED);
     });
 
     it('copyKeepsTheSectionStyle', 0, () => {
@@ -512,7 +532,28 @@ export default function tagSectionStyleTest() {
       expect(reverse.resolvedTintColor(false)).assertEqual(CYLColor.WHITE);
       expect(reverse.resolvedTintColor(true)).assertEqual(CYLColor.BLACK);
       // No band set: the list background decides, whatever `onBand` says.
-      expect(plainStyle().resolvedTintColor(true)).assertEqual(CYLColor.BLACK);
+      expect(CYLColorKey(plainStyle().resolvedTintColor(true))).assertEqual(CYLColorKey(CYLSectionStyleColors.systemTint));
+    });
+
+    it('theFoldChevronIsDrawnInTheResolvedTint', 0, () => {
+      // The chevron icon is the fold control's image, tinted with the style's resolved fold color (the value the view reads).
+      const control = new CYLMenuFoldControl();
+      expect(control.usesDefaultImage).assertTrue();
+      const style = plainStyle();
+      const onDefault = CYLTagFoldMetrics.style(control, style.resolvedFoldControlColor());
+      // Unset list background: the mode-following system tint, so the chevron is light in dark mode.
+      expect(CYLColorKey(onDefault.iconColor(CYLControlState.NORMAL)))
+        .assertEqual(CYLColorKey(CYLSectionStyleColors.systemTint));
+      expect(CYLColorKey(onDefault.appearance(CYLControlState.NORMAL).textColor))
+        .assertEqual(CYLColorKey(onDefault.iconColor(CYLControlState.NORMAL)));
+      // A set tint wins for the text and the chevron alike.
+      style.tintColor = RED;
+      const tinted = CYLTagFoldMetrics.style(control, style.resolvedFoldControlColor());
+      expect(tinted.iconColor(CYLControlState.NORMAL)).assertEqual(RED);
+      // The control's own color still wins.
+      control.color = BLUE;
+      expect(CYLTagFoldMetrics.style(control, style.resolvedFoldControlColor()).iconColor(CYLControlState.NORMAL))
+        .assertEqual(BLUE);
     });
 
     it('theTintColorKeyParsesAndCopyKeepsIt', 0, () => {
