@@ -197,14 +197,17 @@ const HEADER_SEPARATOR_STYLES = { none: 'none', line: 'line' };
 const SECTION_METRICS = { cardCornerRadius: 10, cardPadding: 12, headerBandPadding: 12, separatorThickness: 0.5 };
 /** The card's background: the solid color, or the glass of cyl-animated-item's tags (style key `sectionBackgroundStyle`). */
 const SECTION_BACKGROUND_STYLES = { flat: 'flat', liquidGlass: 'liquidGlass' };
-/** Card: white / #1C1C1E; header band: #EFEFF4 / #2C2C2E; grouped list background: #F2F2F7 / black; divider: the system separator. */
+/**
+ * Card: white / #1C1C1E; header band: #EFEFF4 / #2C2C2E; grouped list background: #F2F2F7 / black; divider: the system separator;
+ * `listBackground`: the default list background (the system background: white in light mode, black in dark mode).
+ */
 const SECTION_COLORS = {
   light: {
-    card: '#FFFFFF', headerBand: '#EFEFF4', groupedBackground: '#F2F2F7', separator: 'rgba(60, 60, 67, 0.29)',
+    card: '#FFFFFF', headerBand: '#EFEFF4', groupedBackground: '#F2F2F7', listBackground: '#FFFFFF', separator: 'rgba(60, 60, 67, 0.29)',
     glassTint: 'rgba(255, 255, 255, 0.5)',
   },
   dark: {
-    card: '#1C1C1E', headerBand: '#2C2C2E', groupedBackground: '#000000', separator: 'rgba(84, 84, 88, 0.6)',
+    card: '#1C1C1E', headerBand: '#2C2C2E', groupedBackground: '#000000', listBackground: '#000000', separator: 'rgba(84, 84, 88, 0.6)',
     glassTint: 'rgba(28, 28, 30, 0.5)',
   },
 };
@@ -245,9 +248,24 @@ function opaqueBackground(value) {
   return alpha && Number(alpha[1]) === 0 ? DEFAULT_TAG_BACKGROUND : parsed;
 }
 
+/**
+ * Whether a configured background is an explicit color of the app or a preset: a valid color that is not fully transparent.
+ * An unset, invalid, `transparent` or zero-alpha background falls back to the default fill, which is never explicit.
+ */
+function isExplicitBackground(value) {
+  const text = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  const parsed = text === 'transparent' ? null : color(value);
+  if (!parsed) return false;
+  const alpha = /^rgba\([^)]*,\s*([\d.]+)\s*\)$/i.exec(parsed);
+  return !(alpha && Number(alpha[1]) === 0);
+}
+
 function defaultAppearance(hairline, dark = false) {
   return {
     backgroundColor: dark ? DARK_TAG_BACKGROUND : DEFAULT_TAG_BACKGROUND,
+    // True when the state's background is the app's / a preset's color (the selected tint is): under Liquid Glass only an explicit
+    // background is handed to the glass, an unset one leaves the component's default frosted tint (docs/tag-liquid-glass.md).
+    backgroundExplicit: false,
     textColor: dark ? DARK_TEXT_COLOR : DEFAULT_TEXT_COLOR,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
@@ -303,7 +321,7 @@ function defaultStyle(pixelRatio = 2, dark = false) {
   const hairline = 1 / Math.max(1, pixelRatio || 1);
   const normal = { ...defaultAppearance(hairline, dark), borderColor: '#D1D1D1', borderWidth: hairline };
   const selected = {
-    ...defaultAppearance(hairline, dark), backgroundColor: APP_TINT_COLOR, textColor: '#FFFFFF', borderColor: APP_TINT_COLOR,
+    ...defaultAppearance(hairline, dark), backgroundColor: APP_TINT_COLOR, backgroundExplicit: true, textColor: '#FFFFFF', borderColor: APP_TINT_COLOR,
     borderWidth: hairline,
   };
   const disabled = { ...defaultAppearance(hairline, dark), textColor: '#B3B3B3', borderColor: '#E0E0E0', borderWidth: hairline };
@@ -396,6 +414,7 @@ function applyAppearance(appearance, configuration, allowsTransparent = false) {
   if (has('backgroundColor')) {
     appearance.backgroundColor = allowsTransparent ? tagBackground(configuration.backgroundColor)
       : opaqueBackground(configuration.backgroundColor);
+    appearance.backgroundExplicit = isExplicitBackground(configuration.backgroundColor);
   }
   if (has('textColor')) appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
   if (has('font')) appearance.font = fontValue(configuration.font) || { size: 14, weight: 'regular', italic: false };
@@ -972,7 +991,12 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   // The background, radius and border are cyl-animated-item's (the interface of CYLAnimatedItemView.itemBackgroundStyle…); the radius is
   // the appearance's, handed over as it is (the capsule constant by default): cyl-animated-item implements the capsule.
   const radius = appearance.cornerRadius;
-  const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, appearance.backgroundColor, radius, border, appearance.borderColor, false,
+  // Under drawn Liquid Glass an unset background hands no color ('': the glass component's default frosted tint, so a colorful
+  // backdrop shows through); an explicit one (selected tint, preset, app color) keeps the alpha x 0.75 rule. Flat is unchanged.
+  const glassDrawn = style.backgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive();
+  const handedColor = glassDrawn && !appearance.backgroundExplicit ? '' : appearance.backgroundColor;
+  const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, appearance.borderColor,
+    !!(style.sectionPalette && style.sectionPalette.dark), // the color mode picks the glass component's default tint
     state === 'selected' ? 1 : -1); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
   const glass = itemBackground.glass;
   const background = appearance.backgroundImage
@@ -1167,9 +1191,13 @@ function headerSeparator(style) {
   };
 }
 
-/** The list background as drawn: the grouped background where insetGrouped and the app never set `backgroundColor`. */
+/**
+ * The list background as drawn: the app's `backgroundColor` (even transparent) when set, else the grouped background under
+ * insetGrouped, else the system background (`listBackground`: white in light mode, black in dark mode).
+ */
 function resolvedBackgroundColor(style) {
-  return isInsetGrouped(style) && !style.backgroundColorSet ? style.sectionPalette.groupedBackground : style.backgroundColor;
+  if (style.backgroundColorSet) return style.backgroundColor;
+  return isInsetGrouped(style) ? style.sectionPalette.groupedBackground : style.sectionPalette.listBackground;
 }
 
 /**
@@ -1212,10 +1240,9 @@ function tintAgainst(background) {
   return luminance > TINT_LUMINANCE_THRESHOLD ? TINT_ON_LIGHT : TINT_ON_DARK;
 }
 
-/** The opaque background the list paints itself: the app's `backgroundColor`, else the grouped one under insetGrouped; else null. */
+/** The background the list paints itself (always one: the app's, the grouped one or the system background). */
 function paintedBackground(style) {
-  if (style.backgroundColorSet || isInsetGrouped(style)) return resolvedBackgroundColor(style);
-  return null;
+  return resolvedBackgroundColor(style);
 }
 
 /**

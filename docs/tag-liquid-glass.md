@@ -73,7 +73,7 @@ config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's explicit `ba
 | iOS | `CYLTagButton` sets `itemBackgroundStyle/Color/CornerRadius/Border…` | compile-only before the batch; earlier suites passed on the previous API (menu 37, tag 6, example 121, swift 23) |
 | Android | `CYLTagButton` (a `CYLAnimatedItemView`) sets the same properties; 0 is now square (closes the PR #35 gap) | static |
 | HarmonyOS | `.attributeModifier(CYLAnimatedItemBackgroundModifier(...))` from the re-vendored `cylanimateditem` | static |
-| Mini program | `model.js` calls `cylAnimatedItemBackground(...)` of the vendored `cyl-animated-item` | node tests 173 / 173 |
+| Mini program | `model.js` calls `cylAnimatedItemBackground(...)` of the vendored `cyl-animated-item` | node tests 173 / 173. Under glass only an EXPLICIT state background reaches the glass (the appearance has `backgroundExplicit`: true for a valid, non-transparent color set by the app or a preset and for the selected default tint, false for the default fill, which never counts as explicit); an unset normal / disabled background hands an empty color so the frosted default shows (225, 222, 220 at 0.5 light, white 0.14 dark); explicit colors keep alpha x 0.75, the selected tint alpha 1; flat and inactive glass are unchanged (`test/tag-glass-background.test.js`, written statically, not yet run) |
 
 Corner radius rule (owner's decision 2026-11-24, relayed by the CYLSearchViewController session and confirmed by the owner in this session; breaking on purpose,
 the pins of integrators move together later): 「统一，圆角逻辑。0就是方。胶囊用1000，但需要使用宏定义定义1000。用户应通过宏定义传入而非传入魔法数字。其他值没有特殊含义。删除CYLTagCornerRadiusSquare。」 — one rule: the
