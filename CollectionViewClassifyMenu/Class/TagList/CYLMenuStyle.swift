@@ -526,10 +526,17 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var headerSeparatorInsets = UIEdgeInsets.zero
 
     /**
+     * Whether the sections sit in cards (`sectionStyle` is `.insetGrouped`).
+     */
+    public var isInsetGrouped: Bool {
+        sectionStyle == .insetGrouped
+    }
+
+    /**
      * The list background as drawn: the grouped background where the style is `.insetGrouped` and the app never set `backgroundColor`.
      */
     public var resolvedBackgroundColor: UIColor {
-        sectionStyle == .insetGrouped && !backgroundColorWasSet ? CYLSectionStyleColors.groupedBackground : backgroundColor
+        isInsetGrouped && !backgroundColorWasSet ? CYLSectionStyleColors.groupedBackground : backgroundColor
     }
 
     /**
@@ -669,6 +676,13 @@ open class CYLMenuStyle: NSObject, NSCopying {
      */
     public var resolvedMoreButtonColor: UIColor {
         moreButtonColorWasSet ? moreButtonColor : resolvedTintColor(onHeaderBand: true)
+    }
+
+    /**
+     * The clear button's color as drawn: `clearButtonColor`, else the header title's (the button sits in the header).
+     */
+    public var resolvedClearButtonColor: UIColor {
+        clearButtonColor ?? resolvedHeaderTextColor
     }
 
     // MARK: - Initializers

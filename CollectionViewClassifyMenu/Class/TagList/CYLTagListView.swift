@@ -3071,7 +3071,7 @@ extension CYLTagListView: UICollectionViewDataSource {
             // A vector by default (an SF Symbol: sharp at every scale, a template tinted with the one dynamic color); the bundled raster is the fallback.
             let image = style.clearButtonImage ?? UIImage(systemName: "trash") ?? CYLMenuResources.image(named: "cyl_trash")
             header.clearButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
-            header.clearButton.tintColor = style.clearButtonColor ?? style.resolvedHeaderTextColor
+            header.clearButton.tintColor = style.resolvedClearButtonColor
             let title = source?.menuTitle(forSection: section) ?? ""
             let clear = CYLMenuLocalizedString("CYLMenuClearSection")
             header.clearButton.accessibilityLabel = title.isEmpty ? clear : "\(clear) \(title)"
