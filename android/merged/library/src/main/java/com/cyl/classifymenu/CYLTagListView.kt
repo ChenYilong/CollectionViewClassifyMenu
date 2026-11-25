@@ -38,20 +38,39 @@ private const val MORE_BUTTON_SIZE = 44f
 private const val FOOTER_HEIGHT = 28f
 private const val HEADER_ICON_SIZE = 16f
 
-/** The gap between a header's indicator bar / icon / clear button and what follows, dp. */
-private const val HEADER_GAP = 8f
+/**
+ * The one spacing between every two adjacent views of a header (indicator bar, icon, title, accessory, fold control, clear
+ * button), dp. `HeaderView.onLayout` and the title room ([headerRoom]) both use it. The More button (HEADER_MORE_GAP) and a
+ * leading fold control (HEADER_LEADING_FOLD_GAP) keep their own smaller gap, so the default geometry stays as it was.
+ */
+private const val HEADER_ITEM_SPACING = 8f
 
 /** The overhang of a header's fold control beyond the header's edge in the plain style (its glyph padding), dp. */
 private const val HEADER_FOLD_OVERHANG = 6f
 
-/** The gap between a header's fold control and the next control or the title, dp. */
-private const val HEADER_FOLD_GAP = 8f
+/** The most of the header's inner width the fold control takes when it is the only extra view (the title shrinks in the rest). */
+private const val HEADER_FOLD_ALONE_MAX_FRACTION = 0.4f
 
-/** The most of the header's width a title-and-icon fold control takes (the section title truncates in the rest). */
-private const val HEADER_FOLD_TITLE_AND_ICON_MAX_FRACTION = 0.4f
+/** The most of the header's inner width the fold control takes when a More button, a clear button or an accessory is shown too. */
+private const val HEADER_FOLD_SHARED_MAX_FRACTION = 0.3f
 
-/** The gap after a header's More button, dp. */
+/** The most of the header's inner width an accessory view takes. */
+private const val HEADER_ACCESSORY_MAX_FRACTION = 0.3f
+
+/** The floor of a header title's room, dp: the room is at least one em of the header font, and never below this. */
+private const val HEADER_TITLE_MIN_WIDTH = 1f
+
+/** The gap after a header's More button (its 44 dp box has transparent padding, so this is smaller than the spacing), dp. */
 private const val HEADER_MORE_GAP = 4f
+
+/** The gap between a leading fold control and the title (the control's glyph padding is on its outer side), dp. */
+private const val HEADER_LEADING_FOLD_GAP = 4f
+
+/**
+ * The widths of a header's views at one list width, all in dp. `titleWidth` is the one number the height (wrapping) and the
+ * render (the title's frame) share.
+ */
+private class HeaderRoom(val inner: Float, val titleWidth: Float, val foldWidth: Float, val accessoryWidth: Float, val clearLine: Float)
 
 /** The title's top and bottom padding in a header: a header is at least a title line plus this, dp. */
 private const val HEADER_TITLE_VERTICAL_PADDING = 12f
@@ -905,31 +924,51 @@ open class CYLTagListView @JvmOverloads constructor(
         if (header > 0f && headerFitsItsText()) HEADER_BOARD_SPACING else listStyle.sectionInsets.top
 
     /**
-     * The room a header's title has at the list width `width` dp: the width between the header's edges minus the indicator bar,
-     * the icon, the fold control, the More and the clear buttons. The same subtractions as `HeaderView.onLayout`, rounded the
-     * safe way (a little too much taken off), so a header never reserves fewer lines than its title needs. An accessory view
-     * is not measured here.
+     * The room a header's title has at the list width `width` dp. The ONE function the header height (wrapping) and
+     * `HeaderView.onLayout` (the title's frame) both call. INNER WIDTH is the width between the header's edges; the title gets
+     * the inner width minus the indicator bar, the icon, the clear button, the More button, the accessory and the fold control,
+     * each followed by one [HEADER_ITEM_SPACING] (More and a leading fold control have their own gap), but at least one em of
+     * the header font ([HEADER_TITLE_MIN_WIDTH] at the least). The fold control keeps its natural width up to a fraction of the
+     * inner width ([HEADER_FOLD_ALONE_MAX_FRACTION] alone, [HEADER_FOLD_SHARED_MAX_FRACTION] beside More, clear or an accessory):
+     * the title is the one that shrinks. `accessoryNatural` is the accessory's natural width, null with none. The fold width is
+     * the wider of the folded and expanded controls, so toggling never changes the title's room.
      */
-    private fun headerTitleWidth(section: Int, width: Float): Float {
+    private fun headerRoom(section: Int, width: Float, accessoryNatural: Float?): HeaderRoom {
         val style = listStyle
         val source = menuDataSource
+        val font = style.headerFontForTraitCollection()
         val (leading, trailing) = headerEdgeInsetsAt(width)
-        var room = width - leading - trailing
-        if (style.headerIndicatorColor != null) room -= style.headerIndicatorSize.width + HEADER_GAP
-        if (source?.menuImageForSection(section) != null) room -= HEADER_ICON_SIZE + HEADER_GAP
-        if (foldIsInHeader() && section in rows.indices && canFoldRowCount(rows[section].size)) {
-            room -= headerFoldWidth(max(foldSize(false).width, foldSize(true).width), width) + HEADER_FOLD_GAP - HEADER_FOLD_OVERHANG
+        val inner = max(0f, width - leading - trailing)
+        val showsClear = source?.menuShowsClearButtonForSection(section) == true
+        val showsMore = showsMoreButtonIn(section)
+        val showsFold = foldIsInHeader() && section in rows.indices && canFoldRowCount(rows[section].size)
+        val clearLine = ceil(CYLTagButton.fontLineHeight(font))
+        val accessoryWidth = if (accessoryNatural != null) min(accessoryNatural, inner * HEADER_ACCESSORY_MAX_FRACTION) else 0f
+        val foldCap = if (showsMore || showsClear || accessoryNatural != null) HEADER_FOLD_SHARED_MAX_FRACTION else HEADER_FOLD_ALONE_MAX_FRACTION
+        val foldWidth = if (showsFold) min(max(foldSize(false).width, foldSize(true).width), inner * foldCap) else 0f
+        var fixed = 0f
+        if (style.headerIndicatorColor != null) fixed += style.headerIndicatorSize.width + HEADER_ITEM_SPACING
+        if (source?.menuImageForSection(section) != null) fixed += HEADER_ICON_SIZE + HEADER_ITEM_SPACING
+        if (showsClear) fixed += clearLine + HEADER_ITEM_SPACING
+        if (showsMore) fixed += MORE_BUTTON_SIZE - floor((MORE_BUTTON_SIZE - 22f) / 2) + HEADER_MORE_GAP
+        if (showsFold) {
+            val gap = if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) HEADER_LEADING_FOLD_GAP else HEADER_ITEM_SPACING
+            fixed += foldWidth - HEADER_FOLD_OVERHANG + gap
         }
-        if (source?.menuShowsClearButtonForSection(section) == true) {
-            room -= ceil(CYLTagButton.fontLineHeight(style.headerFontForTraitCollection())) + HEADER_GAP
-        }
-        if (showsMoreButtonIn(section)) room -= MORE_BUTTON_SIZE - floor((MORE_BUTTON_SIZE - 22f) / 2) + HEADER_MORE_GAP
-        return max(0f, room)
+        if (accessoryNatural != null) fixed += accessoryWidth + HEADER_ITEM_SPACING
+        val title = max(max(HEADER_TITLE_MIN_WIDTH, font.size), inner - fixed)
+        return HeaderRoom(inner, title, foldWidth, accessoryWidth, clearLine)
     }
 
-    /** The width the header gives its fold control: `natural`, but at most 40% of the header `width` for the title-and-icon content. */
-    private fun headerFoldWidth(natural: Float, width: Float): Float =
-        if (_foldControl.content == CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon) min(natural, width * HEADER_FOLD_TITLE_AND_ICON_MAX_FRACTION) else min(natural, width / 2)
+    /** The title room of `section` at the list width `width` ([headerRoom]); measures the accessory like the header view does. */
+    private fun headerTitleWidth(section: Int, width: Float): Float = headerRoom(section, width, accessoryNaturalWidth(section)).titleWidth
+
+    /** The natural width of the section's accessory view in dp (measured unspecified, as `HeaderView.onMeasure` does), null with none. */
+    private fun accessoryNaturalWidth(section: Int): Float? {
+        val view = menuDataSource?.menuAccessoryViewForSection(section) ?: return null
+        view.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        return view.measuredWidth / density
+    }
 
     /**
      * The section's column at the list width `width` dp: the list width minus `sectionInsets` (x and width; y and height are
@@ -2459,16 +2498,18 @@ open class CYLTagListView @JvmOverloads constructor(
             val (leadingInset, trailingInset) = headerEdgeInsets()
             var trailing = width - trailingInset
             var leading = leadingInset
+            // The same room the header height wrapped the title at; every width below comes from it.
+            val room = headerRoom(section, width, accessoryView?.let { it.measuredWidth / density })
             if (clearButton.visibility == VISIBLE) {
                 // A square as tall as a line of the title at the trailing inset, aligned with the title text.
-                val line = min(height, ceil(titleLabel.lineHeight / density))
+                val line = min(height, room.clearLine)
                 trailing -= line
                 place(clearButton, CYLRect(trailing, floor((height - line) / 2), line, line))
                 // A 44 dp touch area around it.
                 val extra = max(0, ((44 - line) / 2 * density).roundToInt())
                 val bounds = android.graphics.Rect(clearButton.left - extra, clearButton.top - extra, clearButton.right + extra, clearButton.bottom + extra)
                 touchDelegate = android.view.TouchDelegate(bounds, clearButton)
-                trailing -= 8
+                trailing -= HEADER_ITEM_SPACING
             }
             if (moreButton.visibility == VISIBLE) {
                 val size = min(MORE_BUTTON_SIZE, if (height > 0) max(height, 30f) else MORE_BUTTON_SIZE)
@@ -2478,37 +2519,38 @@ open class CYLTagListView @JvmOverloads constructor(
                 trailing -= 4
             }
             if (foldButton.visibility == VISIBLE) {
-                val size = CYLSize(headerFoldWidth(foldSize.width, width), min(foldSize.height, height))
+                val size = CYLSize(room.foldWidth, min(foldSize.height, height))
                 val y = floor((height - size.height) / 2)
                 if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) {
                     place(foldButton, CYLRect(leading - HEADER_FOLD_OVERHANG, y, size.width, size.height))
-                    leading += size.width - HEADER_FOLD_OVERHANG + 4
+                    leading += size.width - HEADER_FOLD_OVERHANG + HEADER_LEADING_FOLD_GAP
                 } else {
                     trailing -= size.width - HEADER_FOLD_OVERHANG
                     place(foldButton, CYLRect(trailing, y, size.width, size.height))
-                    trailing -= HEADER_FOLD_GAP
+                    trailing -= HEADER_ITEM_SPACING
                 }
             }
             accessoryView?.let { view ->
-                val w = min(view.measuredWidth / density, width / 2)
+                val w = room.accessoryWidth
                 val h = min(max(view.measuredHeight / density, 1f), height)
                 trailing -= w
                 place(view, CYLRect(trailing, floor((height - h) / 2), w, h))
-                trailing -= 8
+                trailing -= HEADER_ITEM_SPACING
             }
             var x = leading
             if (indicatorView.visibility == VISIBLE) {
                 val bar = listStyle.headerIndicatorSize
                 place(indicatorView, CYLRect(x, floor((height - bar.height) / 2), bar.width, bar.height))
-                x += bar.width + 8
+                x += bar.width + HEADER_ITEM_SPACING
             }
             if (iconView.drawable != null && iconView.visibility == VISIBLE) {
                 place(iconView, CYLRect(x, floor((height - HEADER_ICON_SIZE) / 2), HEADER_ICON_SIZE, HEADER_ICON_SIZE))
-                x += HEADER_ICON_SIZE + 8
+                x += HEADER_ICON_SIZE + HEADER_ITEM_SPACING
             } else {
                 place(iconView, CYLRect())
             }
-            place(titleLabel, CYLRect(x, 0f, max(0f, trailing - x), height))
+            // The title is given exactly the room the height was computed for; the controls above keep their widths.
+            place(titleLabel, CYLRect(x, 0f, room.titleWidth, height))
         }
 
         /**
