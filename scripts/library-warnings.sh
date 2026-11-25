@@ -31,7 +31,7 @@ for ACTION in build analyze; do
     exit "$STATUS"
   fi
 done
-WARNINGS=$(grep -hE '/(CollectionViewClassifyMenu/Class|TagCollectionView/TagCollectionView)/[^:]+\.[mh]:[0-9]+:[0-9]+: warning: ' \
+WARNINGS=$(grep -hE '/(CollectionViewClassifyMenu/Class|TagCollectionView/TagCollectionView)/[^:]+\.(m|h|swift):[0-9]+:[0-9]+: warning: ' \
   build/library-build.log build/library-analyze.log | sed "s|$ROOT/||" | sort -u || true)
 COUNT=$(printf '%s' "$WARNINGS" | grep -c . || true)
 {
