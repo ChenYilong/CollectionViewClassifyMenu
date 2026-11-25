@@ -46,7 +46,7 @@ const DEFAULT_VISIBLE_ROWS = 2;
 const TITLE_MAX_LINES = 3;
 const SELECTION_NONE = 'none';
 const LONG_PRESS_CALLOUT = 'callout';
-const FOLD_HEADER_TRAILING = 'headerTrailing';
+const FOLD_TAIL = 'tail';
 const FOLD_CONTENT_ICON = 'icon';
 /** The format of a table's row count, a key of the strings table. */
 const ROW_COUNT_FORMAT = '%ld 行';
@@ -75,7 +75,7 @@ function configuration(t, counts) {
   return {
     selectionMode: SELECTION_NONE,
     defaultVisibleRows: DEFAULT_VISIBLE_ROWS,
-    foldControl: { position: FOLD_HEADER_TRAILING, content: FOLD_CONTENT_ICON },
+    foldControl: { position: FOLD_TAIL, content: FOLD_CONTENT_ICON },
     longPressAction: LONG_PRESS_CALLOUT,
     style: { titleMaxLines: TITLE_MAX_LINES },
     sections: scenarioSections.concat([databaseSection]),

@@ -41,7 +41,7 @@ test('the list folds sections of more than two rows behind More / Less in the he
   const normalized = tagModel.normalize(configuration());
   assert.equal(scenarios.DEFAULT_VISIBLE_ROWS, 2);
   assert.equal(normalized.defaultVisibleRows, 2);
-  assert.equal(normalized.foldControl.position, 'headerTrailing');
+  assert.equal(normalized.foldControl.position, 'tail');
   assert.equal(normalized.foldControl.content, 'icon');
   assert.equal(normalized.selectionMode, 'none');
   assert.deepEqual(normalized.longPressActions, ['callout', 'report']);
