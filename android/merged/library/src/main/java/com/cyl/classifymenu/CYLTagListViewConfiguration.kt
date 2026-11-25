@@ -43,6 +43,8 @@ const val CYLTagListViewAllowsEmptySelection = "allowsEmptySelection"
  * Tag list key: a Boolean.
  */
 const val CYLTagListViewShowsSectionHeaders = "showsSectionHeaders"
+/** What a long press does: "reorder", "callout", "report" or "none", or a list of them (the first that can begin wins). */
+const val CYLTagListViewLongPressAction = "longPressAction"
 /**
  * Tag list key: a Boolean.
  */
@@ -134,6 +136,8 @@ const val CYLTagSectionStyle = "style"
  * Item key: the title.
  */
 const val CYLTagItemTitle = "title"
+/** A longer description, shown in a callout on a long press (`longPressAction` "callout"). */
+const val CYLTagItemSubtitle = "subtitle"
 /**
  * Item key: an image name or path.
  */
@@ -603,6 +607,8 @@ private class CYLTagListConfigurationSource(
     override fun menuNumberOfItemsInSection(section: Int): Int = items(section).size
     override fun menuTitleForSection(section: Int): String = sections.getOrNull(section)?.get(CYLTagSectionTitle)?.toString() ?: ""
     override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath): String = item(indexPath)[CYLTagItemTitle]?.toString() ?: ""
+
+    override fun menuSubtitleForItemAtIndexPath(indexPath: CYLIndexPath): String? = item(indexPath)[CYLTagItemSubtitle]?.toString()
     override fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? = image(context, item(indexPath)[CYLTagItemImage], baseURL)
     override fun menuSelectedImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? = image(context, item(indexPath)[CYLTagItemSelectedImage], baseURL)
 
@@ -856,6 +862,7 @@ fun CYLTagListView.applyConfiguration(configuration: Map<String, Any?>) {
     image(context, configuration[CYLTagListViewTitleImage], baseURL)?.let { titleImage = it }
     (configuration[CYLTagListViewTitle] as? String)?.let { title = it }
     bool(configuration[CYLTagListViewAllowsEmptySelection])?.let { allowsEmptySelection = it }
+    longPressActionFromConfiguration(configuration[CYLTagListViewLongPressAction])?.let { longPressAction = it }
     bool(configuration[CYLTagListViewShowsSectionHeaders])?.let { showsSectionHeaders = it }
     bool(configuration[CYLTagListViewScrollEnabled])?.let { isScrollEnabled = it }
     number(configuration[CYLTagListViewDefaultVisibleRows])?.let { defaultVisibleRows = maxOf(0, it.toInt()) }
@@ -963,4 +970,24 @@ private fun plistValue(text: String): Any? {
         if (parser.eventType == XmlPullParser.START_TAG && parser.name != "plist") return read()
     }
     return null
+}
+
+/** A configuration's `longPressAction` (a name or a list of names) as an action; null when absent or unknown. */
+private fun longPressActionFromConfiguration(value: Any?): CYLTagLongPressAction? {
+    value ?: return null
+    val names = if (value is List<*>) value else listOf(value)
+    val actions = ArrayList<CYLTagLongPressAction>()
+    for (name in names) {
+        actions.add(when (name) {
+            "reorder" -> CYLTagLongPressActions.reorder
+            "callout" -> CYLTagLongPressActions.callout
+            "report" -> CYLTagLongPressActions.report
+            "none" -> CYLTagLongPressActions.none
+            else -> return null
+        })
+    }
+    if (actions.isEmpty()) return null
+    // The long press is still reported where no listed action takes it (a tag without a subtitle), unless "none".
+    if (CYLTagLongPressActions.none !in actions && CYLTagLongPressActions.report !in actions) actions.add(CYLTagLongPressActions.report)
+    return if (actions.size == 1) actions[0] else CYLTagLongPressActions.first(actions)
 }

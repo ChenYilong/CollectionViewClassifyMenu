@@ -29,6 +29,9 @@ class CYLTag(
     var title: String = title
         set(value) { field = value }
 
+    /** A longer description, shown in a callout on a long press (`CYLTagLongPressActions.callout`). */
+    var subtitle: String? = null
+
     var image: Drawable? = null
     var selectedImage: Drawable? = null
     var animationURL: Uri? = null
@@ -266,6 +269,8 @@ class CYLTagDataSource @JvmOverloads constructor(tags: List<CYLTag>? = null) : C
     override fun menuTitleForSection(section: Int): String = sectionTitle.orEmpty()
 
     override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath): String = tagAt(indexPath)?.title.orEmpty()
+
+    override fun menuSubtitleForItemAtIndexPath(indexPath: CYLIndexPath): String? = tagAt(indexPath)?.subtitle
 
     override fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? {
         val tag = tagAt(indexPath) ?: return null

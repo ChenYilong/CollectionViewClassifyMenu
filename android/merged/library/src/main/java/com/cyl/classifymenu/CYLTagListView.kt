@@ -48,7 +48,7 @@ private const val TITLE_VERTICAL_INSET = 10f
 open class CYLTagListView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : ViewGroup(context, attrs) {
+) : ViewGroup(context, attrs), CYLTagLongPressHost {
 
     private val density: Float get() = resources.displayMetrics.density
     private fun px(dp: Float): Int = (dp * density).roundToInt()
@@ -96,6 +96,13 @@ open class CYLTagListView @JvmOverloads constructor(
         addView(scrollView)
         addView(titleView)
         applyStyleColors()
+        // A scroll hides the callout.
+        scrollView.viewTreeObserver.addOnScrollChangedListener { dismissCallout() }
+    }
+
+    override fun onDetachedFromWindow() {
+        dismissCallout()
+        super.onDetachedFromWindow()
     }
 
     // MARK: Initializers (iOS)
@@ -648,6 +655,7 @@ open class CYLTagListView @JvmOverloads constructor(
 
     /** `-reloadMenuData`: reads the data source again and lays the list out. */
     fun reloadMenuData() {
+        dismissCallout()
         val source = menuDataSource
         if (source != null && source === _tagDataSource) _tagDataSource?.invalidateStyles()
         val sections = source?.numberOfSectionsInMenu() ?: 0
@@ -1167,10 +1175,97 @@ open class CYLTagListView @JvmOverloads constructor(
         canReorder() && isValid(indexPath) && (allowsReordering || sectionAllowsEditing(indexPath.section)) &&
             itemTypeAt(indexPath) != CYLMenuItemType.CYLMenuItemTypeCreate
 
-    private fun reportLongPress(indexPath: CYLIndexPath) {
+    override fun reportLongPress(indexPath: CYLIndexPath) {
         menuDelegate?.menuDidLongPressItemAtIndexPath(this, indexPath)
         val tag = tagAt(indexPath)
         if (tag != null) tagLongPressHandler?.invoke(indexPath.item, tag)
+    }
+
+    private var longPressActionValue: CYLTagLongPressAction = CYLTagLongPressActions.makeDefault()
+
+    /**
+     * What a long press on an item does: `CYLTagLongPressActions.first(reorder, report)` by default (reordering where the
+     * list can reorder, else the long press is reported). Set another built-in action, a combination or your own.
+     */
+    var longPressAction: CYLTagLongPressAction
+        get() = longPressActionValue
+        set(value) {
+            content.cancelDrag()
+            dismissCallout()
+            longPressActionValue = value
+        }
+
+    /** The item the current long press began on. */
+    private var pressedIndexPath: CYLIndexPath? = null
+
+    /** A long press began on an item: the action takes it when it can; true when it follows the finger. */
+    private fun beginLongPress(indexPath: CYLIndexPath): Boolean {
+        if (!isValid(indexPath)) return false
+        pressedIndexPath = indexPath
+        val action = longPressActionValue
+        if (!action.canBegin(this, indexPath)) {
+            pressedIndexPath = null
+            return false
+        }
+        val follows = action.begin(this, indexPath)
+        if (!follows) pressedIndexPath = null
+        return follows
+    }
+
+    private var calloutPopup: android.widget.PopupWindow? = null
+
+    // MARK: CYLTagLongPressHost
+
+    override fun subtitleForItem(indexPath: CYLIndexPath): String? = menuDataSource?.menuSubtitleForItemAtIndexPath(indexPath)
+
+    override fun showCallout(text: String, indexPath: CYLIndexPath) {
+        dismissCallout()
+        val cell = content.cellAt(indexPath) ?: return
+        val bubble = CYLTagCalloutBubble(context, text)
+        val display = android.graphics.Rect().also { getWindowVisibleDisplayFrame(it) }
+        bubble.measure(MeasureSpec.makeMeasureSpec(display.width(), MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(display.height(), MeasureSpec.AT_MOST))
+        val location = IntArray(2)
+        cell.getLocationOnScreen(location)
+        val cellCenterX = location[0] + cell.width / 2
+        val margin = px(8f)
+        val x = max(display.left + margin, min(display.right - margin - bubble.measuredWidth, cellCenterX - bubble.measuredWidth / 2))
+        // Above the tag; below it when there is no room.
+        val above = location[1] - bubble.measuredHeight >= display.top
+        bubble.arrowUp = !above
+        bubble.arrowCenter = (cellCenterX - x).toFloat()
+        val y = if (above) location[1] - bubble.measuredHeight + px(6f) else location[1] + cell.height - px(6f)
+        val popup = android.widget.PopupWindow(bubble, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, false)
+        popup.isOutsideTouchable = true
+        popup.setBackgroundDrawable(null)
+        popup.setOnDismissListener { if (calloutPopup === popup) calloutPopup = null }
+        calloutPopup = popup
+        popup.showAtLocation(this, android.view.Gravity.NO_GRAVITY, x, y)
+        bubble.contentDescription = text
+        bubble.announceForAccessibility(text)
+    }
+
+    /** The text of the callout that shows now, or null (for tests). */
+    internal val calloutText: String? get() = (calloutPopup?.contentView as? CYLTagCalloutBubble)?.text?.toString()
+
+    override fun dismissCallout() {
+        val popup = calloutPopup ?: return
+        calloutPopup = null
+        popup.dismiss()
+    }
+
+    override fun canReorderItem(indexPath: CYLIndexPath): Boolean = canMoveItemAt(indexPath)
+
+    override fun beginReordering(indexPath: CYLIndexPath) = content.beginDrag(indexPath)
+
+    override fun endReordering(destination: CYLIndexPath?, moved: Boolean) {
+        val source = pressedIndexPath
+        pressedIndexPath = null
+        if (source == null) return
+        if (!moved || destination == null) reportLongPress(source) else moveItem(source, destination)
+    }
+
+    override fun cancelReordering() {
+        pressedIndexPath = null
     }
 
     private fun reportSelectedDrag(indexPath: CYLIndexPath) {
@@ -1412,6 +1507,7 @@ open class CYLTagListView @JvmOverloads constructor(
     private fun selectedCount(section: Int): Int = selection.count { it.section == section }
 
     private fun handleTap(indexPath: CYLIndexPath) {
+        dismissCallout()
         if (!isEnabledAt(indexPath)) return
         val delegate = menuDelegate
         if (delegate != null && !delegate.menuShouldSelectItemAtIndexPath(this, indexPath)) return
@@ -1559,7 +1655,8 @@ open class CYLTagListView @JvmOverloads constructor(
         cell.renamesOnTitleTap = renamable && renamesOnTitleTapWhileEditing
         cell.renameHandler = if (renamable) ({ beginRenamingItemAtIndexPath(indexPath) }) else null
         cell.additionalAccessibilityActions = accessibilityActions(indexPath)
-        menuDataSource?.menuAccessibilityHintForItemAtIndexPath(indexPath)?.let { cell.accessibilityHint = it }
+        // A screen-reader user rarely long-presses: the subtitle is the hint when the data source gives none.
+        (menuDataSource?.menuAccessibilityHintForItemAtIndexPath(indexPath) ?: subtitleForItem(indexPath))?.let { cell.accessibilityHint = it }
     }
 
     private fun configureFoldCell(cell: CYLTagFoldCell, section: Int, animated: Boolean) {
@@ -1592,6 +1689,29 @@ open class CYLTagListView @JvmOverloads constructor(
         private var dragIndexPath: CYLIndexPath? = null
         private var dragStart = CYLPoint()
         private var dragMoved = false
+        /** The cell and the point the current long press began on, for the reordering action. */
+        private var pressCell: CYLTagListCell? = null
+        private var pressStart = CYLPoint()
+
+        /** Reordering picks the item up: the cell grows and follows the finger (the long-press action `reorder`). */
+        fun beginDrag(indexPath: CYLIndexPath) {
+            val cell = pressCell ?: return
+            reordering = true
+            menuDelegate?.menuDidChangeReordering(this@CYLTagListView, true)
+            dragCell = cell
+            dragIndexPath = indexPath
+            dragStart = pressStart
+            dragMoved = false
+            cell.bringToFront()
+            cell.animate().scaleX(1.1f).scaleY(1.1f).setDuration(120).start()
+            parent?.requestDisallowInterceptTouchEvent(true)
+            if (indexPath in selection) reportSelectedDrag(indexPath)
+        }
+
+        /** Puts a cell that was picked up back without moving anything. */
+        fun cancelDrag() {
+            if (dragCell != null) finishDrag(false)
+        }
 
         fun cellAt(indexPath: CYLIndexPath): CYLTagListCell? = cells[indexPath]
 
@@ -1721,20 +1841,10 @@ open class CYLTagListView @JvmOverloads constructor(
                 }
 
                 override fun onLongPress(e: MotionEvent) {
-                    if (canMoveItemAt(indexPath)) {
-                        reordering = true
-                        menuDelegate?.menuDidChangeReordering(this@CYLTagListView, true)
-                        dragCell = cell
-                        dragIndexPath = indexPath
-                        dragStart = CYLPoint(e.rawX, e.rawY)
-                        dragMoved = false
-                        cell.bringToFront()
-                        cell.animate().scaleX(1.1f).scaleY(1.1f).setDuration(120).start()
-                        parent?.requestDisallowInterceptTouchEvent(true)
-                        if (indexPath in selection) reportSelectedDrag(indexPath)
-                    } else {
-                        reportLongPress(indexPath)
-                    }
+                    // The long-press action decides what this does (reordering picks the item up through beginDrag).
+                    pressCell = cell
+                    pressStart = CYLPoint(e.rawX, e.rawY)
+                    beginLongPress(indexPath)
                 }
             })
             detector.setIsLongpressEnabled(true)
@@ -1832,12 +1942,15 @@ open class CYLTagListView @JvmOverloads constructor(
             cell.translationX = 0f
             cell.translationY = 0f
             requestLayout()
-            if (!released) return
-            if (!dragMoved) {
-                reportLongPress(source)
+            if (!released) {
+                longPressActionValue.cancel(this@CYLTagListView)
                 return
             }
-            center ?: return
+            // The long-press action ends the press: a press that did not move is reported, a moved one moves the item.
+            if (!dragMoved || center == null) {
+                longPressActionValue.end(this@CYLTagListView, null, false)
+                return
+            }
             val last = max(0, numberOfVisibleItemsInSection(source.section) - 1)
             var target = source.item
             var best = Float.MAX_VALUE
@@ -1850,7 +1963,7 @@ open class CYLTagListView @JvmOverloads constructor(
                     target = indexPath.item
                 }
             }
-            moveItem(source, CYLIndexPath(min(target, last), source.section))
+            longPressActionValue.end(this@CYLTagListView, CYLIndexPath(min(target, last), source.section), true)
         }
     }
 
