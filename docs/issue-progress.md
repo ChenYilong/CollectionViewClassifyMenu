@@ -35,6 +35,21 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO → DONE (2026-11-25, `refactor/mini-program-tag-cloud-merge`, Windows session): merge the mini program `cyl-tag-cloud` into `cyl-tag-list` and delete it
+
+- Context and requirements (owner's decision, given through the lead session): merge `cyl-tag-cloud` into `cyl-tag-list`
+  as iOS / Android / HarmonyOS `CYLTagListView` already do (sections and a flat tag API), then delete `cyl-tag-cloud`
+  with no shim or alias. Test first: the cloud tests are the spec, retargeted to `cyl-tag-list` without removing an
+  assertion; the list's own tests stay unchanged. Move the cloud's pure modules (`git mv`), flat tags are one section;
+  drag and long press go through the list's `longPressActions` (`reorder`) with begin / changed / end / cancel phases;
+  switch every consumer page, then `git rm`; package 0.2.0 with a migration section. No push, no merge.
+- Result: flat tags are section 0 of `cyl-tag-list` (`tags` property and the tag methods, drawn by
+  `cyl-tag-list/tag-model.js`); the long press decides through `model.longPressDecision` (`reorder` begins where flat
+  tags can move); `cyl-tag-cloud` removed; package `cyl-tag-list-miniprogram` 0.2.0 (README "Migration from
+  cyl-tag-cloud"). `npm test` 197: 195 pass, 1 known failure (`animated-item` test 5, missing `cyl-rive-miniprogram`,
+  as before), 1 skip. Not seen in WeChat DevTools unless noted in the commits. Gaps: flat tags keep the cloud's look
+  (no dark mode defaults, `titleWraps` instead of `titleMaxLines`, no cyl-animated-item icons).
+
 ### TODO → DONE (2026-11-25, docs/tag-liquid-glass-screenshots, Mac session chenyilong-68): labeled iOS Liquid Glass screenshots (default style normal / selected / disabled, flat vs glass, contact tag editor selected)
 
 - Context: handed over by Mac-CollectionViewClassifyMenu 6de126 for Mac-CYLSearchViewController's items 3 and 4 (PR #36, branch feat/tag-liquid-glass, frozen). This branch is based on 7c64042e. The PR owner wants the shots on CYLTabBarController 3f2a5b99 (or 5b8869b2): the Podfiles are changed locally to build and restored before committing; fallback dea0951e would be noted here.
