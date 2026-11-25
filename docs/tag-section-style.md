@@ -70,6 +70,20 @@ Consequences, so nobody is surprised:
 - A tag list inside a screen that already draws its own card (a tag bar in a toolbar, the classify menu, the multiple filter, the tab
   bar's popovers) must opt out; the library's own such screens are changed to `plain` in the same commit.
 
+## The card's background style, and light / dark mode for every new view (owner, 2026-11-25)
+
+- New property `sectionBackgroundStyle` (the same type as the tags' `backgroundStyle`: `flat` or `liquidGlass`; configuration key of the same
+  name, values `"flat"` / `"liquidGlass"`). Default `flat`: the card is the solid `sectionBackgroundColor` (or the system card color). With
+  `liquidGlass` the card is the core's Liquid Glass material (the same drawing as the glass tags, with the card's rounded corners),
+  tinted with `sectionBackgroundColor` when it is set; where the platform cannot draw glass the core falls back to the flat card
+  (never fake glass in the app). The header band stays flat. The two background styles are independent of the tags': flat tags in a
+  glass card and glass tags in a flat card are both allowed.
+- **Light and dark mode is part of every new view, in the core, with no app code:** the card (flat color and the glass tint, light and
+  dark values), the header band, the header divider, the grouped list background under `insetGrouped`. A color the app sets wins in
+  both modes; an unset color follows the mode, and changes when the mode changes while the list is shown (no reload by the app).
+  Tests per platform: each unset color resolves to its light value in light mode and its dark value in dark mode, switching the mode
+  updates a shown list, and a set color is kept in both modes.
+
 ## Gates
 
 Every platform: all existing tests pass unchanged, plus one test that the default style gives the same frames as before.
@@ -80,7 +94,7 @@ New tests: the card contains every tag frame; rows are counted at the reduced wi
 
 | Platform | State |
 | --- | --- |
-| HarmonyOS | Done in `harmony/classifymenu` (reference): `CYLMenuStyle` section style properties and configuration keys, `CYLTagListState.contentColumn` / `tagColumn` (one `columnAt` behind every measuring and layout pass), the card, band and divider frames on `CYLTagListSectionFrame`, drawn by `CYLTagListView`; colors in `resources/base` and `resources/dark` (`cyl_section_*`). Host tests 108/108 (96 before; 1 default-frames snapshot taken from the old code, 11 new). Seen on the HarmonyOS 6.0.1 x86_64 emulator, light and dark, in the "configuration" demo (`menu/map-configuration.json`: insetGrouped + divider). Not done: right-to-left (the state has no direction yet, rows and headers use physical left / right as before), the header band was only checked by host tests (not on the emulator). |
+| HarmonyOS | Done in `harmony/classifymenu` (reference): `CYLMenuStyle` section style properties and configuration keys, `CYLTagListState.contentColumn` / `tagColumn` (one `columnAt` behind every measuring and layout pass), the card, band and divider frames on `CYLTagListSectionFrame`, drawn by `CYLTagListView`; colors in `resources/base` and `resources/dark` (`cyl_section_*`). Host tests 108/108 (96 before; 1 default-frames snapshot taken from the old code, 11 new). Then `sectionBackgroundStyle` (`flat` default / `liquidGlass`, configuration key of the same name through the parser of `backgroundStyle`, kept by `copy()`): the card is drawn with `cylanimateditem`'s `CYLAnimatedItemBackgroundModifier` (the glass tags' drawing) with the card's corners and the tint `sectionBackgroundColor` else the resource `cyl_section_glass_tint` (translucent white; translucent #1C1C1E in dark); flat when `CYLLiquidGlass.isActive()` is false, frames identical in all cases. Light / dark audit: card, header band, divider, grouped background and glass tint are all `ResourceColor` resources (`resources/base` and `resources/dark`, `CYLSectionStyleColors`), none is a string; a color the app sets wins. Host tests 113/113 (5 new for the glass card and the color audit). Not verified: the glass card on the emulator, and the dark values at run time (host tests check that unset colors are the named resources and that set colors win; the light / dark values themselves are in the resource files). Seen on the HarmonyOS 6.0.1 x86_64 emulator, light and dark, in the "configuration" demo (`menu/map-configuration.json`: insetGrouped + divider). Not done: right-to-left (the state has no direction yet, rows and headers use physical left / right as before), the header band was only checked by host tests (not on the emulator). |
 | Android | not started |
 | Mini program | Done in `cyl-tag-list` (`CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/`): the same style keys, defaults and named constants in `model.js` (`SECTION_METRICS`, `SECTION_COLORS` light / dark carried by `defaultStyle(pixelRatio, dark)`); tags are laid out by CSS, so the geometry is two distances from the list's edges (`contentColumn`, then `tagColumn` narrowed by the card padding, `headerEdges`, `headerSeparator`; `columnAt` gives x and width), and `sectionLayout` derives the card, band and divider CSS (`cardStyle`, `headerStyle`, `headerLineStyle`, absent by default) from them. The DOM measuring of rows, fold state and content height follows the narrowed column by itself. The divider is 0.5 px (a physical pixel at 2x, one and a half at 3x). Node tests 209/209 (193 before, all passing after `node scripts/fetch-cyltabbar.js`; 1 default-layout snapshot taken from the old code, 15 new). The divider has the column's edges, the same as the card and the band (c5e54ba2). Not done: right-to-left; not seen in WeChat DevTools, only the model and CSS strings are tested. |
 | iOS | not started (Mac) |
