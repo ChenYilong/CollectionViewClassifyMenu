@@ -1,7 +1,8 @@
 /**
  * The fold control of a `CYLTagListView` ("更多 ⌄"), as iOS `CYLMenuFoldControl.swift`: where it is (below the
- * section, in the section header, or as the last tag) and what it shows (icon and title, title only, icon only).
- * Expanded, a control with an icon keeps only the icon, turned 180°; a title-only control shows its collapse title.
+ * section, in the section header, or as the last tag) and what it shows (icon and title, title only, icon only, or
+ * title and icon always). Expanded, a control with an icon keeps only the icon, turned 180°; a title-only control shows
+ * its collapse title; a title-and-icon-always control shows its collapse title and the turned icon.
  */
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLFont, CYLImage } from './CYLTypes';
@@ -11,6 +12,9 @@ import { CYLFont, CYLImage } from './CYLTypes';
  * control would otherwise dwarf the header; tags and titles keep scaling normally.
  */
 export const CYLFoldControlMaxFontScale: number = 1.3;
+
+/** The widest a fold control in a section header gets, as a fraction of the header's width (the title truncates). */
+export const CYLHeaderFoldMaxWidthFraction: number = 0.4;
 
 /** Where the fold control of a foldable section is. */
 export enum CYLMenuFoldControlPosition {
@@ -33,7 +37,13 @@ export enum CYLMenuFoldControlContent {
   /** "更多"; expanded, the collapse title ("收起"). */
   title = 1,
   /** "⌄"; expanded, the same icon, turned. */
-  icon = 2
+  icon = 2,
+  /**
+   * "更多 ⌄" collapsed and "收起 ⌃" expanded ("More ⌄" / "Less ⌃"): the title and the icon in both states, the icon
+   * turned 180° when expanded. In a configuration: "titleAndIconAlways" ("titleAndIcon" is an older alias of
+   * `iconAndTitle`).
+   */
+  titleAndIcon = 3
 }
 
 export class CYLMenuFoldControl {
@@ -64,7 +74,7 @@ export class CYLMenuFoldControl {
     this.customTitle = value;
   }
 
-  /** Shown while expanded by a title-only control; default the localized "收起" (`CYLMenuCollapse`). */
+  /** Shown while expanded by a control that keeps its title; default the localized "收起" (`CYLMenuCollapse`). */
   get collapseTitle(): string {
     return this.customCollapseTitle ?? CYLMenuLocalizedString('CYLMenuCollapse');
   }
@@ -96,6 +106,7 @@ export class CYLMenuFoldControl {
       case CYLMenuFoldControlContent.iconAndTitle:
         return !expanded;
       case CYLMenuFoldControlContent.title:
+      case CYLMenuFoldControlContent.titleAndIcon:
         return true;
       default:
         return false;

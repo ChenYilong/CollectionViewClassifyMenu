@@ -447,6 +447,7 @@ const FOLD_POSITIONS: Map<string, number> = new Map<string, number>([
 
 const FOLD_CONTENTS: Map<string, number> = new Map<string, number>([
   ['iconandtitle', CYLMenuFoldControlContent.iconAndTitle], ['titleandicon', CYLMenuFoldControlContent.iconAndTitle],
+  ['titleandiconalways', CYLMenuFoldControlContent.titleAndIcon],
   ['title', CYLMenuFoldControlContent.title], ['icon', CYLMenuFoldControlContent.icon]
 ]);
 
@@ -483,7 +484,7 @@ export class CYLMenuConfiguration {
     }
     const content = CYLConfigurationValue.rawValue(configuration[CYLMenuFoldControlKey.content], FOLD_CONTENTS);
     if (content !== undefined && content >= CYLMenuFoldControlContent.iconAndTitle &&
-      content <= CYLMenuFoldControlContent.icon) {
+      content <= CYLMenuFoldControlContent.titleAndIcon) {
       control.content = content as CYLMenuFoldControlContent;
     }
     const title = configuration[CYLMenuFoldControlKey.title];

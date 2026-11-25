@@ -21,7 +21,8 @@ import { CYLTagListCell } from '../tagviews/CYLTagListCell';
 import { CYLMenuDataSource, CYLMenuDefaults, CYLMenuDelegate, CYLMenuItemType } from '../core/CYLMenuDataSource';
 import { CYLTagLongPressAction, CYLTagLongPressActions, CYLTagLongPressHost } from '../core/CYLTagLongPressAction';
 import {
-  CYLFoldControlMaxFontScale, CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition
+  CYLFoldControlMaxFontScale, CYLHeaderFoldMaxWidthFraction, CYLMenuFoldControl, CYLMenuFoldControlContent,
+  CYLMenuFoldControlPosition
 } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import {
@@ -395,12 +396,26 @@ export class CYLTagFoldMetrics {
     return style;
   }
 
+  /**
+   * The width of the control's content in that state. A title-and-icon-always control measures both of its states and
+   * takes the wider (the longer of "More" and "Less"), so its size does not jump when it toggles.
+   */
+  private static contentWidth(control: CYLMenuFoldControl, expanded: boolean, style: CYLMenuStyle,
+    scale: number): number {
+    const states: boolean[] = control.content === CYLMenuFoldControlContent.titleAndIcon ? [false, true] : [expanded];
+    let width = 0;
+    states.forEach((state: boolean) => {
+      const icon = control.showsImage(state) ? control.image : undefined;
+      width = Math.max(width, CYLTagButtonMetrics.widthWithImage(control.titleWhenExpanded(state), icon, style, scale));
+    });
+    return width;
+  }
+
   /** The size the control needs in that state (at least a 44 vp wide touch target). */
   static size(control: CYLMenuFoldControl, expanded: boolean, fontScale: number = 1): CYLSize {
     const scale = CYLTagFoldMetrics.cappedFontScale(fontScale);
     const borderless = CYLTagFoldMetrics.style(control);
-    const icon = control.showsImage(expanded) ? control.image : undefined;
-    const width = CYLTagButtonMetrics.widthWithImage(control.titleWhenExpanded(expanded), icon, borderless, scale);
+    const width = CYLTagFoldMetrics.contentWidth(control, expanded, borderless, scale);
     return new CYLSize(Math.max(FOLD_MINIMUM_TOUCH_WIDTH, Math.ceil(width)),
       Math.max(FOLD_MINIMUM_HEIGHT, CYLTagButtonMetrics.height(borderless, scale)));
   }
@@ -410,9 +425,8 @@ export class CYLTagFoldMetrics {
     fontScale: number = 1): CYLSize {
     const scale = CYLTagFoldMetrics.cappedFontScale(fontScale);
     const inline = CYLTagFoldMetrics.inlineStyle(control, itemStyle);
-    const icon = control.showsImage(expanded) ? control.image : undefined;
     const side = CYLTagButtonMetrics.height(inline, scale);
-    const width = CYLTagButtonMetrics.widthWithImage(control.titleWhenExpanded(expanded), icon, inline, scale);
+    const width = CYLTagFoldMetrics.contentWidth(control, expanded, inline, scale);
     return new CYLSize(Math.max(side, Math.ceil(width)), side);
   }
 }
@@ -1834,7 +1848,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
         const r = this.rowsFor([withFold], available);
         rowCount = r.length > 0 ? r[0].length : 0;
       }
-      height += this.headerHeight(section, width) + insets.top + insets.bottom + card.top + card.bottom;
+      height += this.headerHeight(section, width, foldable) + insets.top + insets.bottom + card.top + card.bottom;
       height += this.heightOfRows(rowCount, sectionRows[section],
         section < sectionHeights.length ? sectionHeights[section] : []);
       if (foldable && this.foldControlIsInFooter) {
@@ -2813,6 +2827,15 @@ export class CYLTagListState implements CYLTagLongPressHost {
     return CYLTagFoldMetrics.size(this.foldControlStorage, expanded, this.fontScale);
   }
 
+  /**
+   * The fold control's size in a header: `foldSize`, at most `CYLHeaderFoldMaxWidthFraction` of the header's width
+   * (`width`, default the list width), so the section title keeps the rest and is the one that truncates.
+   */
+  headerFoldSize(expanded: boolean, width: number = this.layoutWidth): CYLSize {
+    const size = this.foldSize(expanded);
+    return width > 0 ? new CYLSize(Math.min(size.width, width * CYLHeaderFoldMaxWidthFraction), size.height) : size;
+  }
+
   get footerHeight(): number {
     return Math.max(FOOTER_HEIGHT, this.foldSize(false).height);
   }
@@ -2821,9 +2844,12 @@ export class CYLTagListState implements CYLTagLongPressHost {
    * The header's height: `headerHeight`, a line of the title plus its padding, or the fold control, whichever is most.
    * With `headerMaxLines` above 1 and a `section`, a title that wraps at the width left of the header's other views makes
    * it taller (the wrapped lines, up to the limit, plus the padding). `section` -1 (the default) is the one-line height.
+   * A fold control in the header counts only where it is shown: `foldable` says whether the section can fold at `width`
+   * (default: `canFoldSection(section)`, and true for no section), so an unfoldable section reserves nothing for it.
    */
-  headerHeight(section: number = -1, width: number = this.layoutWidth): number {
-    const foldHeight = this.foldControlIsInHeader ? this.foldSize(false).height : 0;
+  headerHeight(section: number = -1, width: number = this.layoutWidth, foldable?: boolean): number {
+    const foldShown = this.foldControlIsInHeader && (foldable ?? (section < 0 || this.canFoldSection(section)));
+    const foldHeight = foldShown ? this.foldSize(false).height : 0;
     if (!this.showsSectionHeadersStorage) {
       return foldHeight;
     }
@@ -2838,17 +2864,17 @@ export class CYLTagListState implements CYLTagLongPressHost {
     if (title.length === 0) {
       return oneLine;
     }
-    const text = CYLTagButtonMetrics.wrappedTextHeight(title, font, this.headerTitleRoom(section, width, font), maxLines);
+    const text = CYLTagButtonMetrics.wrappedTextHeight(title, font, this.headerTitleRoom(section, width, font, foldShown), maxLines);
     return Math.max(oneLine, Math.ceil(text) + HEADER_VERTICAL_PADDING);
   }
 
   /** The width a header's title has: the header's width inside its edges, less the other views of its row. */
-  private headerTitleRoom(section: number, width: number, font: CYLFont): number {
+  private headerTitleRoom(section: number, width: number, font: CYLFont, foldShown: boolean): number {
     const style = this.styleStorage;
     const edges = this.headerEdgeInsets(width);
     let room = width - edges[0] - edges[1];
-    if (this.foldControlIsInHeader) {
-      room -= this.foldSize(false).width + HEADER_ITEM_SPACING;
+    if (foldShown) {
+      room -= this.headerFoldSize(false, width).width + HEADER_ITEM_SPACING;
     }
     if (style.headerIndicatorColor !== undefined) {
       room -= style.headerIndicatorSize.width + HEADER_ITEM_SPACING;
@@ -3094,7 +3120,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
       if (this.showsHeaderFoldControl(section)) {
         // At the right end for `headerTrailing` in ltr and for `headerLeading` in rtl.
         const atRight = (this.foldControlStorage.position === CYLMenuFoldControlPosition.headerTrailing) !== this.isRtl;
-        frame.headerFoldX = atRight ? this.layoutWidth - headerEdges[1] - this.foldSize(frame.expanded).width :
+        frame.headerFoldX = atRight ? this.layoutWidth - headerEdges[1] - this.headerFoldSize(frame.expanded).width :
           headerEdges[0];
       }
       const visible = this.numberOfVisibleItems(section);

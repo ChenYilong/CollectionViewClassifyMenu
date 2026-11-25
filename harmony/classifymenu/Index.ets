@@ -33,7 +33,8 @@ export {
   CYLTagModel, CYLTagGroup, CYLTagViewSectionInset, CYLTagViewCellSpacing, CYLTagDefaultListWidth
 } from './src/main/ets/core/CYLTagModel';
 export {
-  CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent, CYLFoldControlMaxFontScale
+  CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent, CYLFoldControlMaxFontScale,
+  CYLHeaderFoldMaxWidthFraction
 } from './src/main/ets/core/CYLMenuFoldControl';
 export {
   CYLConfiguration, CYLTagListKey, CYLMenuFoldControlKey, CYLTagSectionKey, CYLTagItemKey, CYLMenuStyleKey,
