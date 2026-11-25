@@ -35,7 +35,8 @@ export {
 } from './src/main/ets/core/CYLTagModel';
 export {
   CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent, CYLFoldControlMaxFontScale,
-  CYLHeaderFoldMaxWidthFraction
+  CYLHeaderFoldMaxWidthFraction, CYLHeaderFoldAloneMaxFraction, CYLHeaderFoldSharedMaxFraction,
+  CYLHeaderAccessoryMaxFraction
 } from './src/main/ets/core/CYLMenuFoldControl';
 export {
   CYLConfiguration, CYLTagListKey, CYLMenuFoldControlKey, CYLTagSectionKey, CYLTagItemKey, CYLMenuStyleKey,
@@ -45,7 +46,7 @@ export {
 export {
   CYLTagListState, CYLMenuSelectionMode, CYLMenuTitlePosition, CYLMenuFoldStyle, CYLTagButtonMetrics,
   CYLTagFoldMetrics, CYLTagCreateItem, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListConfigurationSource,
-  CYLTextMeasurer
+  CYLTextMeasurer, HEADER_ITEM_SPACING
 } from './src/main/ets/components/CYLTagListState';
 export * from './src/main/ets/imagetag/ImageTagIndex';
 export * from './src/main/ets/classify/ClassifyIndex';
