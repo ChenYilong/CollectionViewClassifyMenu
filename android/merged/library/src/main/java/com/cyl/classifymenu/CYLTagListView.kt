@@ -2440,7 +2440,7 @@ open class CYLTagListView @JvmOverloads constructor(
                     label = if (title.isNotEmpty()) "$title $more" else more
                 }
                 moreButton.contentDescription = label
-                moreButton.tooltipText = label
+                androidx.appcompat.widget.TooltipCompat.setTooltipText(moreButton, label)
                 moreButton.setOnClickListener { menuDelegate?.menuDidTapMoreButtonInSection(this@CYLTagListView, section) }
             }
         }
