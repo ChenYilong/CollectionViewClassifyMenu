@@ -42,6 +42,7 @@ import com.cyl.classifymenu.CYLMenuTitlePosition
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagImagePlacement
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
 import com.cyl.classifymenu.example.classify.classifyNavigationBar
 import com.cyl.classifymenu.tagListViewWithConfigurationFile
 
@@ -118,7 +119,7 @@ object CYLTagEditorStyle {
     val linkColor: Int = Color.rgb(87, 107, 149)
 
     fun tagStyle(): CYLMenuStyle {
-        val style = CYLMenuStyle()
+        val style = CYLMenuStyle().plainSections()
         val font = CYLFont.systemFont(16f)
         for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
             val appearance = style.appearanceForState(state)
@@ -565,7 +566,8 @@ class CYLFoldStylesView(context: Context, val data: CYLTagData) : ScrollView(con
         }
         for (file in configurationFiles) {
             try {
-                add(CYLTagListView.tagListViewWithConfigurationFile(context, CYLTagEditorLocalization.path(file)))
+                // The shared fold-styles files set no sectionStyle: keep these lists flat, as they always were.
+                add(CYLTagListView.tagListViewWithConfigurationFile(context, CYLTagEditorLocalization.path(file)).also { it.plainSections() })
             } catch (e: Exception) {
                 configurationErrors[file] = e
                 stack.addView(TextView(context).apply {

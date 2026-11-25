@@ -134,7 +134,7 @@ open class CYLTagListView @JvmOverloads constructor(
         /** `+defaultTitleStyle`: a 17 sp headline in the label color, no box. */
         @JvmStatic
         fun defaultTitleStyle(): CYLMenuStyle {
-            val style = CYLMenuStyle.defaultStyle()
+            val style = CYLMenuStyle.defaultStyle().also { it.sectionStyle = CYLSectionStyle.CYLSectionStylePlain }
             val font = CYLFont.boldSystemFont(17f)
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 val appearance = style.appearanceForState(state)

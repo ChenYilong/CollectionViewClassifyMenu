@@ -56,6 +56,9 @@ class CYLTagSectionStyleTest {
 
     private fun insetGrouped(): CYLMenuStyle = CYLMenuStyle().also { it.sectionStyle = CYLSectionStyle.CYLSectionStyleInsetGrouped }
 
+    /** The default style with the card opted out: the look these tests were written against, before the default flipped. */
+    private fun plain(): CYLMenuStyle = CYLMenuStyle.plainSectionStyle()
+
     private fun descendants(view: View): List<View> =
         if (view is ViewGroup) (0 until view.childCount).flatMap { val child = view.getChildAt(it); listOf(child) + descendants(child) } else emptyList()
 
@@ -73,7 +76,7 @@ class CYLTagSectionStyleTest {
 
     @Test
     fun thePlainStyleDrawsNothingAndTheTagsSpanTheColumn() {
-        val list = makeList(CYLMenuStyle(), 6, 3)
+        val list = makeList(plain(), 6, 3)
         for (section in 0..1) {
             val frame = list.sectionFrame(section)!!
             assertNull(frame.card)
@@ -107,7 +110,7 @@ class CYLTagSectionStyleTest {
 
     @Test
     fun theCardAddsItsPaddingToTheHeightAndNarrowsTheColumn() {
-        val plain = makeList(CYLMenuStyle(), 3)
+        val plain = makeList(plain(), 3)
         val grouped = makeList(insetGrouped(), 3)
         assertEquals(plain.heightThatFitsWidth(WIDTH_PX.toFloat()) + 2 * CYLSectionStyleMetrics.CARD_PADDING, grouped.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.5f)
         assertEquals(grouped.contentHeight, grouped.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.5f)
@@ -118,11 +121,11 @@ class CYLTagSectionStyleTest {
     @Test
     fun rowsAreCountedAtTheReducedWidth() {
         val wide = CYLEdgeInsets(60f, 60f, 60f, 60f)
-        val plain = makeList(CYLMenuStyle(), 12)
+        val plain = makeList(plain(), 12)
         val style = insetGrouped().also { it.sectionContentInsets = wide }
         val grouped = makeList(style, 12)
         val tagWidth = tagFrame(plain, 0, 0).width
-        val spacing = CYLMenuStyle().interitemSpacing
+        val spacing = plain().interitemSpacing
         fun rowsAt(column: Float): Int {
             val perRow = ((column + spacing) / (tagWidth + spacing)).toInt()
             return (12 + perRow - 1) / perRow
@@ -147,7 +150,7 @@ class CYLTagSectionStyleTest {
 
     @Test
     fun aPlainHeaderWithABandInsetsItsTitleFromTheBand() {
-        val style = CYLMenuStyle().also { it.headerBackgroundColor = CYLSectionStyleColors.HEADER_BAND }
+        val style = plain().also { it.headerBackgroundColor = CYLSectionStyleColors.HEADER_BAND }
         val list = makeList(style, 4)
         val frame = list.sectionFrame(0)!!
         assertEquals(CYLRect(16f, 0f, WIDTH_PX - 32f, 36f), frame.headerBand)
@@ -155,13 +158,13 @@ class CYLTagSectionStyleTest {
         val title = descendants(list).filterIsInstance<TextView>().first { it.text == "Section 0" }
         assertEquals(frame.headerInsetLeft, title.left.toFloat(), 0.5f)
         // The band is inside the header: the frames of the tags did not move.
-        assertEquals(makeList(CYLMenuStyle(), 4).contentHeight, list.contentHeight, 0.5f)
+        assertEquals(makeList(plain(), 4).contentHeight, list.contentHeight, 0.5f)
     }
 
     @Test
     fun theDividerSitsAtTheHeaderBottomAndAddsNoHeight() {
-        val none = makeList(CYLMenuStyle(), 6, 3)
-        val style = CYLMenuStyle().also { it.headerSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine }
+        val none = makeList(plain(), 6, 3)
+        val style = plain().also { it.headerSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine }
         val line = makeList(style, 6, 3)
         assertEquals(none.contentHeight, line.contentHeight, 0.0f)
         assertEquals(none.heightThatFitsWidth(WIDTH_PX.toFloat()), line.heightThatFitsWidth(WIDTH_PX.toFloat()), 0.0f)
@@ -195,7 +198,7 @@ class CYLTagSectionStyleTest {
 
     @Test
     fun theDividerInsetsOverrideTheColumnEdges() {
-        val style = CYLMenuStyle().also {
+        val style = plain().also {
             it.headerSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine
             it.headerSeparatorInsets = CYLEdgeInsets(0f, 5f, 0f, 7f)
         }
@@ -211,7 +214,7 @@ class CYLTagSectionStyleTest {
             it.defaultVisibleRows = 2
             it.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.TAIL, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
         }
-        val plain = make(CYLMenuStyle())
+        val plain = make(plain())
         assertEquals(2, plain.numberOfRowsInSection(0))
         assertFalse(plain.canFoldSection(0))
         val narrow = make(insetGrouped().also { it.sectionContentInsets = CYLEdgeInsets(12f, 40f, 12f, 40f) })
@@ -264,7 +267,7 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "notnight")
     fun theGroupedBackgroundReplacesAnUnsetBackgroundOnlyUnderInsetGrouped() {
-        assertEquals(Color.WHITE, CYLMenuStyle().resolvedBackgroundColor(context))
+        assertEquals(Color.WHITE, plain().resolvedBackgroundColor(context))
         assertEquals(0xFFF2F2F7.toInt(), insetGrouped().resolvedBackgroundColor(context))
         // Set by the app: kept, even when it is the default white.
         val set = insetGrouped().also { it.backgroundColor = Color.WHITE }
@@ -280,7 +283,7 @@ class CYLTagSectionStyleTest {
     @Config(qualifiers = "notnight")
     fun theListDrawsTheGroupedBackgroundUnderInsetGrouped() {
         assertEquals(0xFFF2F2F7.toInt(), backgroundPixel(makeList(insetGrouped(), 3)))
-        assertEquals(Color.WHITE, backgroundPixel(makeList(CYLMenuStyle(), 3)))
+        assertEquals(Color.WHITE, backgroundPixel(makeList(plain(), 3)))
     }
 
     /** Switching the mode while the list is shown updates it, with no reload; colors the app set are kept. */
@@ -313,7 +316,7 @@ class CYLTagSectionStyleTest {
 
     @Test
     fun theCardIsFlatByDefaultAndTheKeyParses() {
-        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, CYLMenuStyle().sectionBackgroundStyle)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, plain().sectionBackgroundStyle)
         val style = CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleSectionBackgroundStyle to "liquidGlass"))
         assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style.sectionBackgroundStyle)
         assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style.copy().sectionBackgroundStyle)
@@ -360,7 +363,7 @@ class CYLTagSectionStyleTest {
     @Test
     fun theDefaultsAreTheNamedConstants() {
         val style = CYLMenuStyle()
-        assertEquals(CYLSectionStyle.CYLSectionStylePlain, style.sectionStyle)
+        assertEquals("the card is the default look (owner, revised decision)", CYLSectionStyle.CYLSectionStyleInsetGrouped, style.sectionStyle)
         assertEquals(10f, style.sectionCornerRadius)
         assertEquals(CYLEdgeInsets(12f, 12f, 12f, 12f), style.sectionContentInsets)
         assertEquals(0f, style.headerCornerRadius)
@@ -368,7 +371,75 @@ class CYLTagSectionStyleTest {
         assertEquals(CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone, style.headerSeparatorStyle)
         assertEquals(0.5f, style.headerSeparatorThickness)
         assertNull(style.headerSeparatorInsets)
-        assertFalse(style.isInsetGrouped)
+        assertNull("no header band by default", style.headerBackgroundColor)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style.sectionBackgroundStyle)
+        assertTrue(style.isInsetGrouped)
+    }
+
+    @Test
+    fun theNewDefaultIsTheCardAndPlainOptsOut() {
+        // A list that sets nothing draws the card, with the same frame function the explicit insetGrouped uses.
+        val list = makeList(CYLMenuStyle(), 6, 3)
+        for (section in 0..1) {
+            val frame = list.sectionFrame(section)!!
+            val card = frame.card
+            assertNotNull("the default list draws a card in section $section", card)
+            assertEquals(list.contentColumn(section).x, card!!.x)
+            assertEquals(list.contentColumn(section).width, card.width)
+            assertNull("the divider is off by default", frame.headerSeparator)
+            assertNull("the header band is off by default", frame.headerBand)
+        }
+        assertEquals(16f + CYLSectionStyleMetrics.CARD_PADDING, list.tagColumn(0).x)
+        assertEquals(WIDTH_PX - 32f - 2 * CYLSectionStyleMetrics.CARD_PADDING, list.tagColumn(0).width)
+        val optedOut = makeList(plain(), 6, 3)
+        assertNull("plain draws no card", optedOut.sectionFrame(0)!!.card)
+        assertEquals(CYLRect(16f, 0f, WIDTH_PX - 32f, 0f), optedOut.contentColumn(0))
+        assertTrue("the card adds its padding to the height", list.contentHeight > optedOut.contentHeight)
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun aDefaultListGetsTheGroupedBackgroundAndATintThatFollowsIt() {
+        assertEquals(0xFFF2F2F7.toInt(), backgroundPixel(makeList(CYLMenuStyle(), 3)))
+        assertEquals(0xFFF2F2F7.toInt(), CYLMenuStyle().resolvedBackgroundColor(context))
+        assertEquals("the tint is chosen against the grouped background", Color.BLACK, CYLMenuStyle().resolvedTintColor(context))
+        // An app that sets the background keeps it, and plain keeps the white the list painted before.
+        assertEquals(Color.WHITE, backgroundPixel(makeList(CYLMenuStyle().also { it.backgroundColor = Color.WHITE }, 3)))
+        assertEquals(Color.WHITE, backgroundPixel(makeList(plain(), 3)))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun aDefaultListIsBlackInDarkModeAndItsTintIsLight() {
+        assertEquals(Color.BLACK, backgroundPixel(makeList(CYLMenuStyle(), 3)))
+        assertEquals(Color.WHITE, CYLMenuStyle().resolvedTintColor(context))
+        // plain keeps the white the list painted before, so its tint stays dark in either mode.
+        assertEquals(Color.BLACK, plain().resolvedTintColor(context))
+    }
+
+    @Test
+    fun theConfigurationKeyPlainOptsOutAndAnEmptyConfigurationIsTheCard() {
+        val plainStyle = CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleSectionStyle to "plain"))
+        assertEquals(CYLSectionStyle.CYLSectionStylePlain, plainStyle.sectionStyle)
+        assertFalse(plainStyle.isInsetGrouped)
+        assertEquals(CYLSectionStyle.CYLSectionStylePlain, CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleSectionStyle to "Plain")).sectionStyle)
+        assertEquals(CYLSectionStyle.CYLSectionStylePlain, plainStyle.copy().sectionStyle)
+        assertEquals(CYLSectionStyle.CYLSectionStyleInsetGrouped, CYLMenuStyle.styleWithConfiguration(emptyMap()).sectionStyle)
+    }
+
+    @Test
+    fun everyLibraryLookThatIsACompleteLookOptsOut() {
+        val looks = mapOf(
+            "tagCloudStyle" to CYLMenuStyle.tagCloudStyle(),
+            "tagContainerStyle" to CYLMenuStyle.tagContainerStyle(),
+            "wordPicker" to CYLMenuStyle.wordPicker(),
+            "grid" to CYLMenuStyle.gridStyleWithNumberOfItemsPerRow(3),
+            "sectionTitle" to CYLMenuStyle.sectionTitle(),
+            "filterTag" to CYLMenuStyle.filterTag(),
+            "classifyMenuTag" to CYLMenuStyle.classifyMenuTag(),
+            "defaultTitleStyle" to CYLTagListView.defaultTitleStyle(),
+        )
+        for ((name, style) in looks) assertEquals("$name stays flat", CYLSectionStyle.CYLSectionStylePlain, style.sectionStyle)
     }
 
     @Test
@@ -427,7 +498,7 @@ class CYLTagSectionStyleTest {
         assertEquals(CYLEdgeInsets(0f, 11f, 0f, 12f), style.headerSeparatorInsets)
         // Absent keys keep the defaults, and an unknown value keeps the current one.
         val untouched = CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleSectionStyle to "nonsense"))
-        assertEquals(CYLSectionStyle.CYLSectionStylePlain, untouched.sectionStyle)
+        assertEquals(CYLSectionStyle.CYLSectionStyleInsetGrouped, untouched.sectionStyle)
         assertNull(untouched.headerBackgroundColor)
         assertNotNull(untouched.sectionContentInsets)
     }
@@ -439,7 +510,7 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "night")
     fun theTintIsDarkOnALightBackgroundWhateverTheMode() {
-        val style = CYLMenuStyle()
+        val style = plain()
         assertEquals(Color.BLACK, style.resolvedTintColor(context))
         assertEquals(Color.BLACK, style.resolvedHeaderTextColor(context))
         assertEquals(Color.BLACK, style.resolvedFoldControlColor(context))
@@ -453,10 +524,10 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "notnight")
     fun theTintIsLightOnADarkBackgroundWhateverTheMode() {
-        val style = CYLMenuStyle().also { it.backgroundColor = Color.BLACK }
+        val style = plain().also { it.backgroundColor = Color.BLACK }
         assertEquals(Color.WHITE, style.resolvedTintColor(context))
         assertEquals(Color.WHITE, titleColor(makeList(style, 2)))
-        assertEquals(Color.WHITE, CYLMenuStyle().also { it.backgroundColor = 0xFF1C1C1E.toInt() }.resolvedTintColor(context))
+        assertEquals(Color.WHITE, plain().also { it.backgroundColor = 0xFF1C1C1E.toInt() }.resolvedTintColor(context))
         assertEquals(Color.BLACK, insetGrouped().resolvedTintColor(context))
     }
 
@@ -472,14 +543,14 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "night")
     fun aTransparentListFollowsTheSystemModeInDark() {
-        val style = CYLMenuStyle().also { it.backgroundColor = Color.TRANSPARENT }
+        val style = plain().also { it.backgroundColor = Color.TRANSPARENT }
         assertEquals(CYLSystemColors.primary(context), style.resolvedTintColor(context))
     }
 
     @Test
     @Config(qualifiers = "notnight")
     fun aTransparentListFollowsTheSystemModeInLight() {
-        val style = CYLMenuStyle().also { it.backgroundColor = Color.TRANSPARENT }
+        val style = plain().also { it.backgroundColor = Color.TRANSPARENT }
         assertEquals(CYLSystemColors.primary(context), style.resolvedTintColor(context))
         assertEquals(CYLSystemColors.primary(context), style.resolvedHeaderTextColor(context))
     }
@@ -487,7 +558,7 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "night")
     fun aTintTheAppSetWinsInBothModes() {
-        val style = CYLMenuStyle().also { it.tintColor = Color.RED }
+        val style = plain().also { it.tintColor = Color.RED }
         assertEquals(Color.RED, style.resolvedTintColor(context))
         assertEquals(Color.RED, style.resolvedHeaderTextColor(context))
         assertEquals(Color.RED, style.resolvedFoldControlColor(context, true))
@@ -498,7 +569,7 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "notnight")
     fun underABandTheTintIsChosenAgainstTheBandColor() {
-        val style = CYLMenuStyle().also { it.headerBackgroundColor = CYLSectionStyleColors.HEADER_BAND_DARK }
+        val style = plain().also { it.headerBackgroundColor = CYLSectionStyleColors.HEADER_BAND_DARK }
         assertEquals(Color.WHITE, style.resolvedTintColor(context, true))
         assertEquals(Color.WHITE, style.resolvedHeaderTextColor(context, true))
         // Off the band the list's own white background decides.
@@ -509,7 +580,7 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "night")
     fun colorsSetOnAViewWinOverTheTint() {
-        val style = CYLMenuStyle().also {
+        val style = plain().also {
             it.tintColor = Color.RED
             it.headerTextColor = Color.GREEN
             it.foldControlColor = Color.BLUE
@@ -527,7 +598,7 @@ class CYLTagSectionStyleTest {
         val style = CYLMenuStyle.styleWithConfiguration(mapOf(CYLMenuStyleTintColor to "#112233"))
         assertEquals(Color.rgb(0x11, 0x22, 0x33), style.tintColor)
         assertEquals(Color.rgb(0x11, 0x22, 0x33), style.copy().tintColor)
-        assertNull(CYLMenuStyle().tintColor)
+        assertNull(plain().tintColor)
     }
 
     @Test

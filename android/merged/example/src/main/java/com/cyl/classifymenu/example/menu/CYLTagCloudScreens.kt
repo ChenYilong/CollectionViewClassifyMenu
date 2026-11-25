@@ -49,6 +49,8 @@ import com.cyl.classifymenu.CYLTagItemSelectedImage
 import com.cyl.classifymenu.CYLTagItemStyle
 import com.cyl.classifymenu.CYLTagItemTitle
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
+import com.cyl.classifymenu.CYLMenuStyleSectionStyle
 import com.cyl.classifymenu.CYLMenuStyle
 import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLMenuStyleBackgroundStyle
@@ -152,7 +154,7 @@ class CYLTagCloudScreen(private val context: Context) : CYLMenuScreen {
             val blue = mapOf(CYLMenuStyleNormal to mapOf(CYLTagAppearanceBackgroundColor to "#00BFFF", CYLTagAppearanceTextColor to "#FFFFFF",
                 CYLTagAppearanceBorderWidth to 0, CYLTagAppearanceCornerRadius to 0), CYLMenuStyleHighlightedBackgroundColor to "#88363636")
             return mapOf(
-                CYLTagListViewStyle to mapOf(CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleLineSpacing to 5, CYLMenuStyleInteritemSpacing to 3, CYLMenuStyleTagContentInsets to "{3, 10, 3, 10}"),
+                CYLTagListViewStyle to mapOf(CYLMenuStyleSectionStyle to "plain", CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleLineSpacing to 5, CYLMenuStyleInteritemSpacing to 3, CYLMenuStyleTagContentInsets to "{3, 10, 3, 10}"),
                 CYLTagListViewScrollEnabled to false,
                 CYLTagListViewTags to listOf("Asia", "Europe",
                     mapOf(CYLTagItemTitle to "Africa", CYLTagItemIdentifier to 3, CYLTagItemDeletable to true, CYLTagItemStyle to blue),
@@ -162,7 +164,7 @@ class CYLTagCloudScreen(private val context: Context) : CYLMenuScreen {
     }
 
     init {
-        codeTagListView.style = CYLMenuStyle().apply { backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass }
+        codeTagListView.style = CYLMenuStyle().plainSections().apply { backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass }
         codeTagListView.lineSpacing = 5f
         codeTagListView.interitemSpacing = 3f
         codeTagListView.tagContentInsets = CYLEdgeInsets(3f, 10f, 3f, 10f)
@@ -206,7 +208,7 @@ class CYLTagConfigurationScreen(private val context: Context) : CYLMenuScreen, C
             val indigo = Color.rgb(88, 86, 214)
             val normal = mapOf(CYLTagAppearanceIconColor to indigo, CYLTagAppearanceBorderColor to indigo, CYLTagAppearanceBorderWidth to 1, CYLTagAppearanceCornerRadius to 8)
             val selected = mapOf(CYLTagAppearanceBackgroundColor to indigo, CYLTagAppearanceBorderColor to indigo, CYLTagAppearanceIconColor to Color.WHITE, CYLTagAppearanceCornerRadius to 8)
-            val style = mapOf(CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleImageSize to CYLSize(20f, 20f), CYLMenuStyleImageTitleSpacing to 4, CYLMenuStyleItemHeight to 36,
+            val style = mapOf(CYLMenuStyleSectionStyle to "plain", CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleImageSize to CYLSize(20f, 20f), CYLMenuStyleImageTitleSpacing to 4, CYLMenuStyleItemHeight to 36,
                 CYLMenuStyleLayoutCentered to true, CYLMenuStyleNormal to normal, CYLMenuStyleSelected to selected)
             val items = listOf(
                 mapOf(CYLTagItemTitle to "Lottie", CYLTagItemAnimation to animation("Lottie/tab_me_animate.json")),
@@ -232,6 +234,8 @@ class CYLTagConfigurationScreen(private val context: Context) : CYLMenuScreen, C
         views.add(caption(context, CYLExampleLocalizedString(context, "配置文件初始化：%@", CONFIGURATION_FILE)))
         try {
             val list = CYLTagListView.tagListViewWithConfigurationFile(context, CONFIGURATION_FILE)
+            // The shared configuration file sets no sectionStyle: keep this screen flat, as it always was.
+            list.plainSections()
             list.menuDelegate = this
             fileTagListView = list
             views.add(list)

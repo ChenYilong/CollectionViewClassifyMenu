@@ -85,6 +85,7 @@ class CYLTagListRenamingTest {
     private fun makeList(source: CYLRenamableTagSource): CYLTagListView {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val list = CYLTagListView(activity)
+        list.usePlainSections()
         list.menuDataSource = source
         list.menuDelegate = source
         list.selectionMode = CYLMenuSelectionMode.CYLMenuSelectionModeMultiple

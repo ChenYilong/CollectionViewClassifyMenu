@@ -61,6 +61,7 @@ class CYLTagLongPressActionTest {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val source = CYLSubtitleSource()
         val list = CYLTagListView(activity)
+        list.usePlainSections()
         list.menuDataSource = source
         list.menuDelegate = source
         val root = FrameLayout(activity).apply { addView(list, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 600)) }
