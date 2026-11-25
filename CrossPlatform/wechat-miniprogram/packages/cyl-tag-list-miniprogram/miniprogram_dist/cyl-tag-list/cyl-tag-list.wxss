@@ -3,6 +3,8 @@
    sectionInsets with interitemSpacing and lineSpacing; a tag centers its icon slot and title with imageTitleSpacing
    between them. The numbers and colors are set inline from the style (model.js tagLayout / sectionLayout). */
 :host { display: block; }
+/* The callout is positioned absolutely against the list (its top is relative to the list), so the list is the containing block. */
+.cyl-tag-list { position: relative; }
 .cyl-header { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
 .cyl-header-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cyl-fold-header { display: flex; align-items: center; font-size: 13px; padding: 4px 0 4px 12px; }

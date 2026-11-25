@@ -135,6 +135,22 @@ class CYLTagLongPressActionTest {
     }
 
     @Test
+    fun theCalloutStaysAfterTheFingerLiftsAndTheNextTouchDownDismissesIt() {
+        val page = makePage()
+        page.list.longPressAction = CYLTagLongPressActions.callout
+        longPress(page, "y")
+        assertEquals("about y", page.list.calloutText)
+        // The popup must not dismiss itself on an outside touch: that made it vanish when the finger that began the press lifted.
+        val field = CYLTagListView::class.java.getDeclaredField("calloutPopup").apply { isAccessible = true }
+        val popup = field.get(page.list) as android.widget.PopupWindow
+        assertFalse(popup.isOutsideTouchable)
+        val down = android.view.MotionEvent.obtain(0L, 0L, android.view.MotionEvent.ACTION_DOWN, 1f, 1f, 0)
+        page.list.dispatchTouchEvent(down)
+        down.recycle()
+        assertNull(page.list.calloutText)
+    }
+
+    @Test
     fun noneAndHandlerReplaceTheBuiltInBehavior() {
         val page = makePage()
         page.list.longPressAction = CYLTagLongPressActions.none
