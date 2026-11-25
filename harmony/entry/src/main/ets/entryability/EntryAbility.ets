@@ -1,4 +1,4 @@
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { CYLMenuResources } from '@cyl/classifymenu';
@@ -7,6 +7,8 @@ import { CYLDemoNav } from '../demos/DemoNav';
 import { cylRegisterExampleAnimationEngines } from '../animation/CYLExampleAnimationViews';
 
 const DOMAIN = 0x0000;
+/** The AppStorage key of the app's color mode that `cylanimateditem` reads (see `syncGlassColorMode`). */
+const GLASS_COLOR_MODE_KEY: string = 'cyl_colorMode';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -40,6 +42,28 @@ export default class EntryAbility extends UIAbility {
       this.context.getApplicationContext().setColorMode(mode);
     } catch (error) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set the color mode: %{public}s', JSON.stringify(error));
+    }
+    this.syncGlassColorMode(mode);
+  }
+
+  /**
+   * The Liquid Glass of `cylanimateditem` (tint, edge) and the library's icon lift read the app's color mode from AppStorage
+   * `cyl_colorMode` ('dark' / 'light'); CYLTabBarController's `cyl_updateColorMode` sets it, and this example has no tab bar
+   * module, so it sets the key itself. Without it every glass is drawn in its light variant, also in dark mode.
+   * `launchMode`: the mode the launch options asked for; "not set" follows the system.
+   */
+  private syncGlassColorMode(launchMode: ConfigurationConstant.ColorMode): void {
+    const effective = launchMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET ?
+      this.context.config.colorMode : launchMode;
+    AppStorage.setOrCreate<string>(GLASS_COLOR_MODE_KEY,
+      effective === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 'dark' : 'light');
+  }
+
+  /** The system's light / dark switch while the app runs (unless the launch options pinned a mode). */
+  onConfigurationUpdate(config: Configuration): void {
+    if (CYLLaunchOptions.colorMode === '') {
+      AppStorage.setOrCreate<string>(GLASS_COLOR_MODE_KEY,
+        config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 'dark' : 'light');
     }
   }
 
