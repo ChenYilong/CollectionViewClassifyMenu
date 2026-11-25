@@ -27,7 +27,7 @@ Rules are grouped under tag headings (`## [<tag>] <title>`), the same tags as [A
 
 ## [testing] Testing, parity and CI
 
-- CI scripts follow CYLTabBarController: `unit-tests.sh <menu|tag|example>`, `library-warnings.sh`,
+- CI scripts follow CYLTabBarController: `unit-tests.sh <menu|example|swift>`, `library-warnings.sh`,
   `example-screenshots.sh` and `simulator-id.sh`. Keep them POSIX `sh` and clean under `shellcheck`.
 - `example-screenshots.sh` runs in every build CI run; keep it producing one PNG per Example screen.
 - `publish-screenshots.sh` copies them to the `ci-screenshots` branch, because artifact storage hosts change between runs.

@@ -152,11 +152,13 @@ class CYLTagContainerSampleScreen(private val context: Context) : CYLMenuScreen 
 
     companion object {
         val welcomeTitle = "Welcome to use Android ${Build.VERSION.RELEASE} CollectionViewClassifyMenu"
+        // NOLOCALIZE-BEGIN: deliberately multilingual sample tags, as iOS
         val list1 = listOf("Java", "C++", "Python", "Swift", "你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。你好，这是一个TAG。",
             "PHP", "JavaScript", "Html", welcomeTitle)
         val list2 = listOf("China", "USA", "Austria", "Japan", "Sudan", "Spain", "UK", "Germany", "Niger", "Poland", "Norway",
             "Uruguay", "Brazil")
         val list3 = listOf("Persian", "波斯语", "فارسی", "Hello", "你好", "سلام")
+        // NOLOCALIZE-END
         val list4 = listOf("Adele", "Whitney Houston")
         val list5 = listOf("Custom Red Color", "Custom Blue Color")
         val list6 = listOf("Starred", "A long tag that wraps onto a second line instead of leaving the container", "End")
