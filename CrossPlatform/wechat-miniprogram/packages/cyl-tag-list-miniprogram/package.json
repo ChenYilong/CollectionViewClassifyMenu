@@ -1,8 +1,8 @@
 {
   "name": "cyl-tag-list-miniprogram",
-  "version": "0.1.0",
-  "description": "CollectionViewClassifyMenu's tag list, tag cloud and image tag for WeChat Mini Programs",
-  "keywords": ["wechat", "miniprogram", "tag", "tag-list", "tag-cloud", "cyl"],
+  "version": "0.2.0",
+  "description": "CollectionViewClassifyMenu's tag list (sections or flat tags) and image tag for WeChat Mini Programs",
+  "keywords": ["wechat", "miniprogram", "tag", "tag-list", "cyl"],
   "homepage": "https://github.com/ChenYilong/CollectionViewClassifyMenu/tree/master/CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram",
   "repository": {
     "type": "git",

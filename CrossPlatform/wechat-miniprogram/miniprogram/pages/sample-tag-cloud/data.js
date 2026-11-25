@@ -4,7 +4,7 @@
  * calls.
  */
 const { t } = require('../../utils/i18n.js');
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 
 /** res/values/arrays.xml. */
 const CONTINENTS = ['AFRICA', 'EUROPE', 'ASIA', 'NORTH AMERICA', 'SOUTH AMERICA', 'ANTARCTICA', 'AUSTRALIA'];

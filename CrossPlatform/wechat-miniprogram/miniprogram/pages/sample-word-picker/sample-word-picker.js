@@ -1,11 +1,11 @@
 /**
  * 选词填入, 1:1 with the iOS example's `CYLWordPickerDemoViewController`: a remark field, the sender's message and a
- * "选词填入" link that opens a sheet where the message is one cell per character (`cyl-tag-cloud` with
+ * "选词填入" link that opens a sheet where the message is one cell per character (`cyl-tag-list` flat tags with
  * `model.wordPickerStyle()`, smear selection); "填入" (off until something is selected) puts the selected characters,
  * in text order, into the field. The message is localized (a greeting with a name to pick, an emoji and a space).
  */
 const { t } = require('../../utils/i18n.js');
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 
 /** The sender, and the name the message lets you pick (the same in every language). */
 const SENDER = 'Alex';

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Runs Gradle for one project in android/ from a mirror under /tmp: Gradle fails on the macOS `._*` files this
-# volume creates. Usage: android/scripts/gradle.sh <android-tagview|TagViewGroup|AndroidTagView|merged> <tasks...>
+# volume creates. Usage: android/scripts/gradle.sh <TagViewGroup|merged> <tasks...>
 #   ANDROID_MIRROR (default /tmp/xpa/android), ANDROID_JAVA_HOME (a JDK 17; default ~/develop/jdk/jdk-17.0.21+9,
 #   else JAVA_HOME) and ANDROID_HOME are used when set.
 set -eu

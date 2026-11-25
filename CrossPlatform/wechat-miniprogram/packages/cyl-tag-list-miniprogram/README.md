@@ -1,7 +1,7 @@
 # cyl-tag-list-miniprogram
 
-CollectionViewClassifyMenu's tag list, tag cloud and image tag for WeChat Mini Programs, the counterpart of the iOS
-`CYLTagListView` / `CYLTagCloudView` / `CYLImageTagView` (the example: `CrossPlatform/wechat-miniprogram`).
+CollectionViewClassifyMenu's tag list and image tag for WeChat Mini Programs, the counterpart of the iOS
+`CYLTagListView` / `CYLImageTagView` (the example: `CrossPlatform/wechat-miniprogram`).
 
 ## Install
 
@@ -17,7 +17,6 @@ Then in WeChat DevTools: **Tools → Build npm** (工具 → 构建 npm). It cop
 {
   "usingComponents": {
     "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
-    "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud",
     "cyl-tag-image": "cyl-tag-list-miniprogram/cyl-tag-image/cyl-tag-image",
     "cyl-tag-button": "cyl-tag-list-miniprogram/cyl-tag-button/cyl-tag-button"
   }
@@ -26,6 +25,24 @@ Then in WeChat DevTools: **Tools → Build npm** (工具 → 构建 npm). It cop
 
 ```xml
 <cyl-tag-list configuration="{{configuration}}" bind:tagtap="onTagTap" />
+```
+
+### Flat tags
+
+As `CYLTagListView` on iOS, Android and HarmonyOS, `cyl-tag-list` can also be filled with a flat array of tags (the
+android-tagview way): when its `configuration` has no `sections`, it shows the `tags` property as one section
+(section 0) and takes the tag methods through `selectComponent`: `addTag`, `addTags`, `insertTag`, `removeTag`,
+`removeAllTags`, `replaceTags`, `getTags`, `selectedIndexes`, `toggleSelection`, `deselectAll`, editing
+(`setEditing`, the add field, the cache), renaming, deleting, dragging, folding (`defaultVisibleRows`) and the word
+picker (`setTagsWithCharactersOfText`, `selectedText`, `allowsSmearSelection`). The tags and their styles come from
+`cyl-tag-list/tag-model.js` (`makeTag`, `defaultStyle()`, `tagCloudStyle()`, `tagContainerStyle()`,
+`wordPickerStyle()`). `selectedItems()` / `setSelectedItems()` use the keys `"0-<index>"`; a tag's `subtitle` is
+shown by the `longPressAction` "callout"; a long press drags a tag (the action "reorder") where the tags can move
+(`allows-reordering`, or while editing).
+
+```xml
+<cyl-tag-list tags="{{tags}}" list-style="{{style}}" allows-reordering="{{true}}"
+              bind:tagtap="onTagTap" bind:tagmove="onTagMove" />
 ```
 
 ### Corner radius
@@ -100,9 +117,9 @@ cyl-lottie, cyl-rive and cyl-pag.
 
 ## Scrolling while dragging or smearing
 
-`cyl-tag-cloud` catches `touchmove` on its tags while editing, during a drag (`disablesScrollingWhileReordering`, on
+`cyl-tag-list` catches `touchmove` on its flat tags while editing, during a drag (`disablesScrollingWhileReordering`, on
 by default) and during a word picker smear. In WeChat's render layer a catch binding only stops the event from
-bubbling; it does not stop native scrolling, so the scroller that contains the cloud turns its own scrolling off while
+bubbling; it does not stop native scrolling, so the scroller that contains the list turns its own scrolling off while
 a gesture is active.
 
 `reorderingchange` {reordering} and `smearingchange` {smearing} bubble and are composed (`{ bubbles: true, composed:
@@ -118,10 +135,29 @@ a container component (such as CYLSearchViewController's core content page) bind
 </scroll-view>
 ```
 
-A page that hosts the cloud directly can bind the same events on the cloud or on any ancestor view.
+A page that hosts the list directly can bind the same events on the list or on any ancestor view.
 
 The page itself must not scroll: give it a fixed-height column (`height: 100vh`, `overflow: hidden`, the scroller
 with `min-height: 0`) and `"disableScroll": true`, and let that one scroll view hold its `scroll-y`. WeChat's page-level
 switches do not help from a component: `<page-meta page-style>` works only as the first node of a page (inside a
 component it does nothing), and `wx.setPageStyle` is undocumented and changed nothing in DevTools (base library 3.6.6;
 real drags, CYLSearchViewController `docs/CYLTabBarController-Integration.md`, fourth pass).
+
+## Migration from cyl-tag-cloud (0.2.0)
+
+Version 0.2.0 removes the component `cyl-tag-cloud`: `cyl-tag-list` takes its flat tags, with the same properties,
+methods and events (there is no alias). Change the component path and the tag name; the rest stays.
+
+| cyl-tag-cloud (0.1.x) | cyl-tag-list (0.2.0) |
+| --- | --- |
+| `"cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud"` | `"cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list"` |
+| `<cyl-tag-cloud tags="…" list-style="…" …>` | `<cyl-tag-list tags="…" list-style="…" …>` (no `configuration`, or one without `sections`) |
+| `require('…/cyl-tag-cloud/model.js')` | `require('…/cyl-tag-list/tag-model.js')` |
+| `require('…/cyl-tag-cloud/cache.js')`, `…/editing-icons.js` | `require('…/cyl-tag-list/cache.js')`, `…/cyl-tag-list/editing-icons.js` |
+| `require('cyl-tag-list-miniprogram').tagCloud` | `require('cyl-tag-list-miniprogram').tagModel` |
+| properties `tags`, `list-style`, `color-theme`, `allows-tapping`, `removes-items-on-delete`, `allows-reordering`, `selection-mode`, `allows-empty-selection`, `default-tag-image`, `container-border-*`, `shows-section-headers`, `section-title`, `editing`, `shows-add-item-view-while-editing`, `cache-policy`, `cache-name`, `load-policy`, `supports-renaming-items`, `renames-on-title-tap-while-editing`, `shows-clear-button`, `default-visible-rows`, `allows-smear-selection`, `disables-scrolling-while-reordering`, `fold-control-content`, `fold-control-color` | the same names, same defaults |
+| events `tagtap`, `tagdelete`, `taglongpress` {position, tag}, `tagmove`, `selectedtagdrag`, `reorderingchange`, `smearingchange`, `selectionchange` {positions}, `foldchange` {canFold, expanded}, `editingchange`, `editingfinish`, `requestnewitem`, `tagrename`, `clearbuttontap`, `contentchange` | the same names and payloads for flat tags (a list built from `sections` keeps its own payloads) |
+| methods `getTags`, `addTag`, `addTags`, `insertTag`, `removeTag`, `removeAllTags`, `replaceTags`, `selectedIndexes`, `toggleSelection`, `deselectAll`, `setTagsWithCharactersOfText`, `selectedText`, `selectItemsFrom`, `isEditing`, `setEditing`, `cachedTitles`, `saveToCache`, `cachedItems`, `editableSectionTitles`, `editableSectionItems`, `loadSections`, `loadItems`, `setRemoteSource`, `renamingIndex`, `setRenameRequestHandler`, `isRenamable`, `beginRenaming`, `cancelRenaming`, `finishRenaming`, `submitNewItem`, `isExpanded` | the same names |
+| `setExpanded(expanded)` | `setExpanded(expanded)` or the list's `setExpanded(0, expanded)`; `isSectionExpanded(0)` |
+| a long press: drag where `allows-reordering` / editing, else `taglongpress` | the same, now through the list's long-press actions: the default of flat tags is `["reorder", "report"]`; `long-press-action` ("callout", "report", "none", or an array) changes it, and "callout" shows a tag's `subtitle` |
+| (none) | `selectedItems()` / `setSelectedItems(keys)` with the keys `"0-<index>"` |

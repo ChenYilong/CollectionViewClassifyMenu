@@ -117,7 +117,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
      */
     private fun selectAppTab(pageIdentifier: String) {
         val controller = (context as? com.cyl.classifymenu.example.MainActivity)?.tabBarController ?: return
-        val index = listOf("kaede", "lujun", "licrafter").indexOf(pageIdentifier)
+        val index = listOf("licrafter").indexOf(pageIdentifier)
         if (index < 0) return
         // Back to the Menu home first: it shows the app's tab bar again (hidden while a screen is pushed).
         while (navigator.pop()) Unit
@@ -193,9 +193,9 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "animationSpeed" -> style.animationSpeed = listOf(0.5f, 2f, 1f)[step % 3]
             "configuration" -> { navigator.push(CYLTagConfigurationScreen(context)); return }
             "tagCloud" -> { navigator.push(CYLTagCloudScreen(context)); return }
-            "sample.tagCloud" -> { selectAppTab("kaede"); return }
+            "sample.tagCloud" -> { navigator.push(CYLTagCloudSampleScreen(context)); return }
             "sample.imageTag" -> { selectAppTab("licrafter"); return }
-            "sample.tagContainer" -> { selectAppTab("lujun"); return }
+            "sample.tagContainer" -> { navigator.push(CYLTagContainerSampleScreen(context)); return }
             "sample.wordPicker" -> { navigator.push(CYLWordPickerScreen(context)); return }
             "reset" -> {
                 this.style = demoStyle()

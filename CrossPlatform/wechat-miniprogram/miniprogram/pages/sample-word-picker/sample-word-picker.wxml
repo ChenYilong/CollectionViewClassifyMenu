@@ -15,7 +15,8 @@
             aria-label="{{labels.fill}}" aria-disabled="{{!canFill}}">{{labels.fill}}</view>
     </view>
     <text class="hint" aria-role="heading">{{labels.hint}}</text>
-    <cyl-tag-cloud id="word-picker" list-style="{{pickerStyle}}" selection-mode="multiple"
+    <cyl-tag-list generic:cyl-lottie-view="cyl-tag-animation-view" generic:cyl-rive-view="cyl-tag-animation-view" generic:cyl-pag-view="cyl-tag-animation-view" generic:cyl-svga-view="cyl-tag-animation-view"
+                  id="word-picker" list-style="{{pickerStyle}}" selection-mode="multiple"
                    allows-smear-selection="{{true}}" bind:selectionchange="onSelectionChange" bind:tagtap="onCellTap" />
   </view>
 </view>

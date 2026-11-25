@@ -14,8 +14,7 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.source_files = [
-    'CollectionViewClassifyMenu/Class/**/*.swift',
-    'TagCollectionView/TagCollectionView/{CYLTagView,Model/*,Views/*}.swift'
+    'CollectionViewClassifyMenu/Class/**/*.swift'
   ]
   # The demo apps' Swift files live next to the core's sources; the patterns above match Swift files (the core moves to
   # Swift), so they are excluded by name, with AppleDouble files.
@@ -23,8 +22,7 @@ Pod::Spec.new do |s|
     '**/._*',
     'CollectionViewClassifyMenu/Class/ClassifyMenu/Controller/{CYLDemoDataSource,CYLFilterDemoViewController,CYLMainViewController}.swift',
     'CollectionViewClassifyMenu/Class/Other/Symtem/{CYLAppDelegate,CYLDemoLocalization}.swift',
-    'CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.swift',
-    'TagCollectionView/TagCollectionView/{CYLTagDemoAppDelegate,CYLTagDemoViewController}.swift'
+    'CollectionViewClassifyMenu/Class/Other/Tool/CYLDBManager.swift'
   ]
   s.resource_bundles = { 'CYLClassifyMenuResources' => [
     'CollectionViewClassifyMenu/Class/MultipleFilter/**/*.xib',
@@ -35,9 +33,7 @@ Pod::Spec.new do |s|
     'CollectionViewClassifyMenu/Resources/CYLClassifyMenuImages.bundle',
     'CollectionViewClassifyMenu/Resources/Privacy/PrivacyInfo.xcprivacy',
     # The license and the third-party notices ship inside the bundle (AGENTS.md, "License in every published package").
-    'CollectionViewClassifyMenu/Resources/License/*',
-    'TagCollectionView/TagCollectionView/CYLTagView.xib',
-    'TagCollectionView/TagCollectionView/Views/*.xib'
+    'CollectionViewClassifyMenu/Resources/License/*'
   ] }
   s.frameworks = 'UIKit', 'Accelerate'
   # The tag list cache's database store (CYLTagListCachePolicyDatabase) uses the system SQLite.

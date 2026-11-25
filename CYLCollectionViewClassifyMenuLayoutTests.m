@@ -84,7 +84,6 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertTrue([[dictionary cyl_descriptionWithLocale:nil] containsString:@"value"]);
     XCTAssertEqual(NSClassFromString(@"CYLCollectionViewLeftAlignedLayout"), [CYLCollectionViewLeftAlignedLayout class]);
     XCTAssertEqual(NSClassFromString(@"CYLFilterBaseController"), [CYLFilterBaseController class]);
-    XCTAssertEqual(NSClassFromString(@"CYLTagView"), [CYLTagView class]);
 }
 
 - (NSArray<NSArray<NSString *> *> *)longEmojiSections {

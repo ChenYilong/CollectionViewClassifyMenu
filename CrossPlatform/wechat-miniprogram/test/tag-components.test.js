@@ -71,10 +71,10 @@ function tap(index, extra = {}) {
   return { currentTarget: { dataset: { index, ...extra } }, touches: [{ clientX: 10, clientY: 10 }] };
 }
 
-test('cyl-tag-cloud: taps, deletions and the tag methods', () => {
+test('cyl-tag-list (flat tags): taps, deletions and the tag methods', () => {
   i18n.setLanguage('zh_CN');
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
-  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.js'), {
     tags: [model.makeTag('A'), model.makeTag('B', { isDeletable: true }), model.makeTag('C')],
     listStyle: model.tagCloudStyle(),
   });
@@ -97,17 +97,17 @@ test('cyl-tag-cloud: taps, deletions and the tag methods', () => {
   assert.notEqual(list.events[list.events.length - 1].name, 'tagtap');
 });
 
-test('cyl-tag-cloud: a long press selects (in none mode) or reorders, and reports when it did not move', () => {
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+test('cyl-tag-list (flat tags): a long press selects (in none mode) or reorders, and reports when it did not move', () => {
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
   const rects = [0, 1, 2].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
-  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.js'), {
     tags: ['a', 'b', 'c'].map((title) => model.makeTag(title)),
     listStyle: model.tagContainerStyle(),
     allowsReordering: true,
   }, (selector) => (selector === '.cyl-tc-item' ? rects : rects[0]));
   assert.equal(list.data.scrollLocked, false);
   list.onTouchStart(tap(0));
-  list.onLongPress(tap(0));
+  list.onItemLongPress(tap(0));
   assert.equal(list.events.pop().name, 'reorderingchange');
   // Dragging holds page scrolling (the item catches touchmove) until the drag ends.
   assert.equal(list.data.scrollLocked, true);
@@ -121,7 +121,7 @@ test('cyl-tag-cloud: a long press selects (in none mode) or reorders, and report
   assert.ok(!names.includes('taglongpress'));
   // Without moving: a long press.
   list.events.length = 0;
-  list.onLongPress(tap(1));
+  list.onItemLongPress(tap(1));
   list.onTouchEnd();
   assert.deepEqual(list.events.pop(), { name: 'taglongpress', detail: { position: 1, tag: { identifier: 0, title: 'c', isEnabled: true, isDeletable: false } } });
   // The third container: toggleSelection and deselectAll.
@@ -271,35 +271,35 @@ test('the pages load with their titles and react as the iOS screens', () => {
   delete global.Component;
 });
 
-test('cyl-tag-cloud: a drag holds scrolling unless disablesScrollingWhileReordering is off; the template catches touchmove then', () => {
+test('cyl-tag-list (flat tags): a drag holds scrolling unless disablesScrollingWhileReordering is off; the template catches touchmove then', () => {
   const fs = require('node:fs');
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
-  const wxml = fs.readFileSync(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.wxml'), 'utf8');
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
+  const wxml = fs.readFileSync(path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.wxml'), 'utf8');
   assert.match(wxml, /catchtouchmove="\{\{allowsSmearSelection \|\| scrollLocked \? 'onTouchMove' : ''\}\}"/);
   assert.match(wxml, /bindtouchmove="\{\{allowsSmearSelection \|\| scrollLocked \? '' : 'onTouchMove'\}\}"/);
   const rects = [0, 1].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
-  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.js'), {
     tags: ['a', 'b'].map((title) => model.makeTag(title)), listStyle: model.tagContainerStyle(), allowsReordering: true,
     disablesScrollingWhileReordering: false,
   }, (selector) => (selector === '.cyl-tc-item' ? rects : rects[0]));
   list.onTouchStart(tap(0));
-  list.onLongPress(tap(0));
+  list.onItemLongPress(tap(0));
   assert.equal(list.data.scrollLocked, false);
   list.onTouchCancel();
   assert.equal(list.data.scrollLocked, false);
 });
 
-test('cyl-tag-cloud: editing catches touchmove from the first touch (scrolling cannot be stopped later) and a drag end keeps it', () => {
-  const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+test('cyl-tag-list (flat tags): editing catches touchmove from the first touch (scrolling cannot be stopped later) and a drag end keeps it', () => {
+  const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
   const rects = [0, 1].map((i) => ({ left: i * 100, right: i * 100 + 90, top: 0, bottom: 30, width: 90, height: 30 }));
-  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-cloud/cyl-tag-cloud.js'), {
+  const list = mountComponent(path.join(PACKAGE, 'cyl-tag-list/cyl-tag-list.js'), {
     tags: ['a', 'b'].map((title) => model.makeTag(title)), listStyle: model.tagContainerStyle(),
   }, (selector) => (selector === '.cyl-tc-item' ? rects : rects[0]));
   assert.equal(list.data.scrollLocked, false);
   list.setEditing(true);
   assert.equal(list.data.scrollLocked, true);
   list.onTouchStart(tap(0));
-  list.onLongPress(tap(0));
+  list.onItemLongPress(tap(0));
   list.onTouchEnd();
   assert.equal(list.data.scrollLocked, true, 'still editing after the drop');
   list.setEditing(false);

@@ -72,6 +72,7 @@ Answered by the owner (2026-11-25): push the baseline first (done: PR #37 here, 
 mini program tag gets the interaction API wired by its container to the same strategy (not a whole tag as an item view); remove `cyl-tag-cloud`
 at once, without a shim.
 
-Open: delete the Android `TagContainerLayout` / `TagView` port and `android/AndroidTagView`, and the `CYLTagView` (TagCollectionView) port on
-iOS, Android and HarmonyOS, as the same policy? They are public API of this library and upstream ports with attribution; deleting them breaks
-anyone who calls them. The image tag groups and the classify / filter controllers stay.
+Decided by the owner (2026-11-25, "直接删，通知所有调用方适配新接口"): delete the Android `TagContainerLayout` / `TagView` ports and
+`android/AndroidTagView`, `android/android-tagview`, and the `CYLTagView` (TagCollectionView) port on iOS, Android and HarmonyOS, no shim. Done on
+branch `refactor/remove-duplicate-tag-containers`; the old -> new mapping and the list of callers is [tag-container-removal.md](tag-container-removal.md).
+The image tag groups and the classify / filter controllers stay.

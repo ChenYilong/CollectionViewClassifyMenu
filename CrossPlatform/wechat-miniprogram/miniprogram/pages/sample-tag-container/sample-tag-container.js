@@ -9,10 +9,10 @@
  */
 const { t } = require('../../utils/i18n.js');
 const { COLORS } = require('../../utils/android-sample.js');
-const model = require('cyl-tag-list-miniprogram/cyl-tag-cloud/model.js');
+const model = require('cyl-tag-list-miniprogram/cyl-tag-list/tag-model.js');
 const data = require('./data.js');
 
-/** The cyl-tag-cloud options a container leaves unset, so the component never receives undefined (XML defaults). */
+/** The cyl-tag-list flat tag options a container leaves unset, so the component never receives undefined (XML defaults). */
 const DEFAULT_OPTIONS = {
   colorTheme: 'none', defaultTagImage: '', containerBorderWidth: 0, containerBorderColor: '', containerCornerRadius: 0,
 };

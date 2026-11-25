@@ -3,7 +3,8 @@
   "navigationBarTextStyle": "white",
   "backgroundColor": "#FFFFFF",
   "usingComponents": {
-    "cyl-tag-cloud": "cyl-tag-list-miniprogram/cyl-tag-cloud/cyl-tag-cloud",
+    "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
+    "cyl-tag-animation-view": "/components/cyl-tag-animation-view/cyl-tag-animation-view",
     "cyl-sample-toast": "/components/cyl-sample-toast/cyl-sample-toast"
   }
 }
