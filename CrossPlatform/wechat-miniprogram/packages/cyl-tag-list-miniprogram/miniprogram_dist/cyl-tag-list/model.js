@@ -152,6 +152,29 @@ const DEFAULT_TAG_BACKGROUND = '#F2F2F7';
  * `single` is the default (a title too wide is truncated); `unlimited` shows every line.
  */
 const TITLE_MAX_LINES = { single: 1, unlimited: Number.MAX_SAFE_INTEGER };
+/**
+ * The line limits of a section header's title (style key `headerMaxLines`), the same named values as a tag's title:
+ * `single` (the default) keeps the one-line header with an ellipsis; a larger number or `unlimited` wraps the title and
+ * the header's height becomes a minimum.
+ */
+const HEADER_TITLE_MAX_LINES = { single: 1, unlimited: Number.MAX_SAFE_INTEGER };
+/** The padding above and below a header title that may wrap (px): half of the 12 the header height adds to a line. */
+const HEADER_WRAP_VERTICAL_PADDING = 6;
+
+/**
+ * The reading direction of the list (style key `direction`): `ltr` is the default, `rtl` mirrors the section views
+ * (CSS `direction: rtl` on the list and the leading / trailing distances of the layout). `auto` should follow the system
+ * language, but this component has no language-direction helper yet, so `auto` is `ltr`.
+ */
+const DIRECTIONS = { ltr: 'ltr', rtl: 'rtl', auto: 'auto' };
+const DEFAULT_DIRECTION = DIRECTIONS.ltr;
+
+/**
+ * The fold / More control's font (px): the mini program's text scales with the system font size, so the control's font is
+ * `min(size, FOLD_CONTROL_MAX_FONT_SIZE)`: unchanged below the cap, never larger than it. 13 is the header and footer control's size.
+ */
+const FOLD_CONTROL_FONT_SIZE = 13;
+const FOLD_CONTROL_MAX_FONT_SIZE = 20;
 
 /**
  * Dark mode, as iOS's dynamic defaults: a tag's fill is the secondary system background (#1C1C1E), its title the primary
@@ -336,6 +359,10 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     foldControlColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     headerFont: { size: 14, weight: 'regular', italic: false },
     headerHorizontalInset: 16,
+    // The most lines a section header's title may take (HEADER_TITLE_MAX_LINES): one line with an ellipsis by default.
+    headerMaxLines: HEADER_TITLE_MAX_LINES.single,
+    // 'ltr' (default), 'rtl' or 'auto' (which is 'ltr' here, see DIRECTIONS).
+    direction: DEFAULT_DIRECTION,
     highlightedBackgroundColor: null,
     allowsTransparentBackground: false,
   });
@@ -423,6 +450,16 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
     const lines = numberValue(c.titleMaxLines);
     style.titleMaxLines = lines !== null && lines >= TITLE_MAX_LINES.single ? Math.floor(lines) : TITLE_MAX_LINES.single;
   }
+  // The same rule for a section header's title (`headerMaxLines`).
+  if (c.headerMaxLines === 'unlimited') {
+    style.headerMaxLines = HEADER_TITLE_MAX_LINES.unlimited;
+  } else if (c.headerMaxLines !== undefined) {
+    const lines = numberValue(c.headerMaxLines);
+    style.headerMaxLines = lines !== null && lines >= HEADER_TITLE_MAX_LINES.single ? Math.floor(lines) : HEADER_TITLE_MAX_LINES.single;
+  }
+  // 'ltr' | 'rtl' | 'auto' (case-insensitive); anything else keeps the style's.
+  const direction = c.direction === undefined || c.direction === null ? null : namedValue(c.direction, DIRECTIONS);
+  if (direction) style.direction = direction;
   num('itemsPerRow', 'itemsPerRow', 0);
   num('interitemSpacing');
   num('lineSpacing');
@@ -910,6 +947,7 @@ function animatedIcon(item, state, style, url) {
  */
 function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixedHeight) {
   const appearance = style[state];
+  const rtl = isRtl(style);
   const height = fixedHeight > 0 ? fixedHeight : tagHeight(style);
   const border = appearance.borderColor ? appearance.borderWidth : 0;
   // Left and right at least the space the shape asks for between the border and the title: cyl-animated-item's
@@ -944,8 +982,9 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const wraps = style.titleMaxLines > TITLE_MAX_LINES.single;
   const cell = [
     wraps ? `min-height: ${height}px; white-space: normal; height: auto` : `height: ${height}px`,
-    `padding: 0 ${Math.max(0, right - border)}px 0 ${Math.max(0, left - border)}px`,
-    `margin: 0 ${interitemSpacing}px ${lineSpacing}px 0`,
+    // Right to left: the leading inset is on the right, so the physical sides swap (the same for the spacing after a tag).
+    `padding: 0 ${Math.max(0, (rtl ? left : right) - border)}px 0 ${Math.max(0, (rtl ? right : left) - border)}px`,
+    rtl ? `margin: 0 0 ${lineSpacing}px ${interitemSpacing}px` : `margin: 0 ${interitemSpacing}px ${lineSpacing}px 0`,
     fontCSS(appearance.font),
     `border-width: ${border}px`,
     `border-color: ${appearance.borderColor || 'transparent'}`,
@@ -960,8 +999,8 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const ii = style.imageInsets;
   const io = style.imagePositionAdjustment;
   const to = style.titlePositionAdjustment;
-  const gaps = { trailing: 'margin-left', top: 'margin-bottom', bottom: 'margin-top' };
-  const gap = gaps[style.imagePlacement] || 'margin-right';
+  const gaps = { trailing: rtl ? 'margin-right' : 'margin-left', top: 'margin-bottom', bottom: 'margin-top' };
+  const gap = gaps[style.imagePlacement] || (rtl ? 'margin-left' : 'margin-right');
   return {
     height,
     cellStyle: cell,
@@ -1042,14 +1081,28 @@ function isInsetGrouped(style) {
   return style.sectionStyle === SECTION_STYLES.insetGrouped;
 }
 
-/** The card's padding around the tags: `sectionContentInsets` under insetGrouped, else none. */
-function cardInsets(style) {
-  return isInsetGrouped(style) ? style.sectionContentInsets : ZERO_INSETS;
+/** True when the list reads right to left: the style's `direction` is `rtl` (`auto` is `ltr`, see DIRECTIONS). */
+function isRtl(style) {
+  return !!style && style.direction === DIRECTIONS.rtl;
 }
 
-/** The section's column: the list width minus `sectionInsets`, as distances from the list's left and right edges. */
+/**
+ * Insets as distances from the list's physical left and right edges. The style's left / right values are the leading /
+ * trailing ones, so right to left swaps the sides (top and bottom stay); left to right returns the insets as they are.
+ */
+function physicalInsets(style, value) {
+  return isRtl(style) ? { ...value, left: value.right, right: value.left } : value;
+}
+
+/** The card's padding around the tags: `sectionContentInsets` under insetGrouped, else none. */
+function cardInsets(style) {
+  return isInsetGrouped(style) ? physicalInsets(style, style.sectionContentInsets) : ZERO_INSETS;
+}
+
+/** The section's column: the list width minus `sectionInsets`, as distances from the list's left and right edges (leading / trailing mirrored). */
 function contentColumn(style) {
-  return { left: style.sectionInsets.left, right: style.sectionInsets.right };
+  const insets = physicalInsets(style, style.sectionInsets);
+  return { left: insets.left, right: insets.right };
 }
 
 /** The column the tags are laid in: `contentColumn` narrowed by the card's padding. Rows, folding and height follow it. */
@@ -1081,7 +1134,8 @@ function headerEdges(style) {
   const column = contentColumn(style);
   if (isInsetGrouped(style)) return tagColumn(style);
   if (hasHeaderBand(style)) {
-    return { left: column.left + style.headerContentInsets.left, right: column.right + style.headerContentInsets.right };
+    const band = physicalInsets(style, style.headerContentInsets);
+    return { left: column.left + band.left, right: column.right + band.right };
   }
   return { left: style.headerHorizontalInset, right: style.headerHorizontalInset };
 }
@@ -1104,7 +1158,8 @@ function headerHeightOf(style) {
 function headerSeparator(style) {
   if (style.headerSeparatorStyle !== HEADER_SEPARATOR_STYLES.line || !(style.headerSeparatorThickness > 0)) return null;
   const column = contentColumn(style);
-  const own = style.headerSeparatorInsets;
+  // The divider's leading / trailing insets swap sides right to left.
+  const own = style.headerSeparatorInsets ? physicalInsets(style, style.headerSeparatorInsets) : null;
   return {
     left: column.left + (own ? own.left : 0),
     right: column.right + (own ? own.right : 0),
@@ -1206,6 +1261,23 @@ function resolvedHeaderSeparatorColor(style) {
   return style.headerSeparatorColor || style.sectionPalette.separator;
 }
 
+/** The CSS of a header title that wraps: at most `maxLines` lines then an ellipsis (every line when unlimited), like a tag's title. */
+function headerTitleCSS(maxLines) {
+  return maxLines === HEADER_TITLE_MAX_LINES.unlimited
+    ? 'white-space: normal; overflow: visible; text-overflow: clip'
+    : `white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: ${maxLines}; overflow: hidden; text-overflow: ellipsis`;
+}
+
+/** The CSS font size of a fold / More control: `size` px, never above FOLD_CONTROL_MAX_FONT_SIZE (the system font size scales text up). */
+function foldControlFontCSS(size = FOLD_CONTROL_FONT_SIZE) {
+  return `font-size: min(${size}px, ${FOLD_CONTROL_MAX_FONT_SIZE}px)`;
+}
+
+/** The CSS appended to the list's own style: `direction: rtl` right to left, nothing (byte for byte as before) left to right. */
+function directionCSS(style) {
+  return isRtl(style) ? '; direction: rtl' : '';
+}
+
 /**
  * The CSS of a section: its insets (the last line's spacing taken off the bottom), the negative trailing margin
  * that absorbs the last tag's spacing, the header (headerHeight, headerFont, headerTextColor, headerHorizontalInset)
@@ -1215,17 +1287,26 @@ function resolvedHeaderSeparatorColor(style) {
  */
 function sectionLayout(style) {
   const i = style.sectionInsets;
+  // The column's distances from the physical left and right edges (the leading / trailing sides swapped right to left).
+  const column = contentColumn(style);
+  const rtl = isRtl(style);
   const headerHeight = headerHeightOf(style);
+  // A header title that may wrap (headerMaxLines above 1) grows the header: the height is a minimum, with a little padding.
+  const wraps = style.headerMaxLines > HEADER_TITLE_MAX_LINES.single;
+  const heightProperty = wraps ? 'min-height' : 'height';
+  const verticalPadding = wraps ? `${HEADER_WRAP_VERTICAL_PADDING}px` : '0';
   const layout = {
-    listStyle: `padding: ${i.top}px ${i.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${i.left}px`,
-    itemsStyle: `margin-right: -${style.interitemSpacing}px`,
-    headerStyle: `height: ${headerHeight}px; padding: 0 ${style.headerHorizontalInset}px; ${fontCSS(style.headerFont)}; color: ${resolvedHeaderTextColor(style)}`,
+    listStyle: `padding: ${i.top}px ${column.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${column.left}px`,
+    // The negative margin that absorbs the last tag's spacing is on the side the tags' spacing is on.
+    itemsStyle: `margin-${rtl ? 'left' : 'right'}: -${style.interitemSpacing}px`,
+    headerStyle: `${heightProperty}: ${headerHeight}px; padding: ${verticalPadding} ${style.headerHorizontalInset}px; ${fontCSS(style.headerFont)}; color: ${resolvedHeaderTextColor(style)}`,
     backgroundStyle: `background-color: ${resolvedBackgroundColor(style)}`,
   };
+  if (wraps) layout.headerTitleStyle = headerTitleCSS(style.headerMaxLines);
   if (isInsetGrouped(style)) {
     // The card holds the last line's spacing: the tags' bottom margin is taken off inside it, not off the list's padding.
-    const card = style.sectionContentInsets;
-    layout.listStyle = `padding: ${i.top}px ${i.right}px ${i.bottom}px ${i.left}px`;
+    const card = cardInsets(style);
+    layout.listStyle = `padding: ${i.top}px ${column.right}px ${i.bottom}px ${column.left}px`;
     layout.itemsStyle += `; margin-bottom: -${style.lineSpacing}px`;
     layout.cardStyle = `padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
   }
@@ -1234,7 +1315,7 @@ function sectionLayout(style) {
     const box = headerBox(style);
     const band = hasHeaderBand(style)
       ? `; background-color: ${style.headerBackgroundColor}; border-radius: ${style.headerCornerRadius}px` : '';
-    layout.headerStyle = `height: ${headerHeight}px; margin: 0 ${box.right}px 0 ${box.left}px; padding: 0 ${edges.right - box.right}px 0 ${edges.left - box.left}px; ${fontCSS(style.headerFont)}; color: ${resolvedHeaderTextColor(style)}${band}`;
+    layout.headerStyle = `${heightProperty}: ${headerHeight}px; margin: 0 ${box.right}px 0 ${box.left}px; padding: ${verticalPadding} ${edges.right - box.right}px ${verticalPadding} ${edges.left - box.left}px; ${fontCSS(style.headerFont)}; color: ${resolvedHeaderTextColor(style)}${band}`;
   }
   const line = headerSeparator(style);
   if (line) {
@@ -1265,4 +1346,6 @@ module.exports = {
   SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
+  HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
+  FOLD_CONTROL_FONT_SIZE, FOLD_CONTROL_MAX_FONT_SIZE, foldControlFontCSS,
 };

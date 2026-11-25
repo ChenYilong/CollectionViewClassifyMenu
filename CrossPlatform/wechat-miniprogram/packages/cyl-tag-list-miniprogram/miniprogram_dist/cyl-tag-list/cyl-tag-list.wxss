@@ -57,4 +57,7 @@
 }
 .cyl-footer-chevron-up { transform: rotate(225deg); margin-top: 5px; }
 .cyl-fold-arrow { display: inline-block; margin-left: 2px; transition: transform 0.2s; }
+/* Right to left (style key direction, class cyl-rtl on the list): the gap before the fold control and the arrow's gap change sides. */
+.cyl-rtl .cyl-fold-header { padding: 4px 12px 4px 0; }
+.cyl-rtl .cyl-fold-arrow { margin-left: 0; margin-right: 2px; }
 .cyl-up { transform: rotate(180deg); }
