@@ -202,6 +202,14 @@ const SECTION_STYLES = { plain: 'plain', insetGrouped: 'insetGrouped' };
 const DEFAULT_SECTION_STYLE = SECTION_STYLES.insetGrouped;
 const HEADER_SEPARATOR_STYLES = { none: 'none', line: 'line' };
 const SECTION_METRICS = { cardCornerRadius: 10, cardPadding: 12, headerBandPadding: 12, separatorThickness: 0.5 };
+/**
+ * Under the board (insetGrouped) with no header divider the header is sized to its text (docs/tag-section-style.md, "The gap
+ * between the header and the board is short when there is no divider"): the title's line height plus this padding (px; half
+ * above, half below), and never less than the fold / More control, which CSS min-height gives for free.
+ */
+const HEADER_BOARD_TITLE_PADDING = 8;
+/** The distance (px) from such a header's bottom to the board's top, instead of the section's top inset. */
+const HEADER_BOARD_SPACING = 4;
 /** The card's background: the solid color, or the glass of cyl-animated-item's tags (style key `sectionBackgroundStyle`). */
 const SECTION_BACKGROUND_STYLES = { flat: 'flat', liquidGlass: 'liquidGlass' };
 /**
@@ -341,6 +349,8 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     interitemSpacing: 10,
     lineSpacing: 10,
     headerHeight: 36,
+    // True once a configuration sets `headerHeight`: a header sized to its text takes it as its minimum only then.
+    headerHeightSet: false,
     animationSpeed: 1,
     layoutCentered: true,
     imagePlacement: 'leading',
@@ -490,6 +500,7 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   num('interitemSpacing');
   num('lineSpacing');
   num('headerHeight');
+  if (numberValue(c.headerHeight) !== null) style.headerHeightSet = true;
   num('animationSpeed');
   num('headerHorizontalInset');
   const centered = boolValue(c.layoutCentered);
@@ -1193,9 +1204,24 @@ function headerBox(style) {
   return isStyledHeader(style) ? contentColumn(style) : { left: 0, right: 0 };
 }
 
-/** The header's height (headerHeight, at least the title's line and 12). */
+/** True when the header is sized to its text and the board follows it closely: insetGrouped with no header divider. */
+function isHeaderTightToBoard(style) {
+  return isInsetGrouped(style) && style.headerSeparatorStyle !== HEADER_SEPARATOR_STYLES.line;
+}
+
+/** The distance from the header's bottom to the board's top: HEADER_BOARD_SPACING for a tight header, else the section's top inset. */
+function headerBoardOffset(style, hasHeader = true) {
+  return hasHeader && isHeaderTightToBoard(style) ? HEADER_BOARD_SPACING : style.sectionInsets.top;
+}
+
+/**
+ * The header's height (a minimum for a tight header): headerHeight, at least the title's line and 12. A tight header
+ * (isHeaderTightToBoard) is the title's line plus HEADER_BOARD_TITLE_PADDING, and `headerHeight` counts only when the app set it.
+ */
 function headerHeightOf(style) {
-  return Math.max(style.headerHeight, lineHeight(style.headerFont.size) + 12);
+  const line = lineHeight(style.headerFont.size);
+  if (isHeaderTightToBoard(style)) return Math.max(style.headerHeightSet ? style.headerHeight : 0, line + HEADER_BOARD_TITLE_PADDING);
+  return Math.max(style.headerHeight, line + 12);
 }
 
 /**
@@ -1337,20 +1363,25 @@ function directionCSS(style) {
 /**
  * The CSS of a section: its insets (the last line's spacing taken off the bottom), the negative trailing margin
  * that absorbs the last tag's spacing, the header (headerHeight, headerFont, headerTextColor, headerHorizontalInset)
- * and the list's background. It adds `cardStyle` (the default, insetGrouped), a band in `headerStyle` and `headerLineStyle`
+ * and the list's background. `options.hasHeader` (default true) is false for a section that shows no header (its board then
+ * starts at the section's top inset). It adds `cardStyle` (the default, insetGrouped), a band in `headerStyle` and `headerLineStyle`
  * (the divider, opt-in); under `sectionStyle: 'plain'` there is no `cardStyle` and the rest is what it was before the card
  * became the default.
  */
-function sectionLayout(style) {
+function sectionLayout(style, options = {}) {
   const i = style.sectionInsets;
+  const hasHeader = options.hasHeader !== false;
+  const tight = isHeaderTightToBoard(style);
   // The column's distances from the physical left and right edges (the leading / trailing sides swapped right to left).
   const column = contentColumn(style);
   const rtl = isRtl(style);
   const headerHeight = headerHeightOf(style);
   // A header title that may wrap (headerMaxLines above 1) grows the header: the height is a minimum, with a little padding.
   const wraps = style.headerMaxLines > HEADER_TITLE_MAX_LINES.single;
-  const heightProperty = wraps ? 'min-height' : 'height';
-  const verticalPadding = wraps ? `${HEADER_WRAP_VERTICAL_PADDING}px` : '0';
+  // A tight header (sized to its text) only has a minimum height: the fold control may be taller than the title.
+  const heightProperty = wraps || tight ? 'min-height' : 'height';
+  const wrapPadding = tight ? HEADER_BOARD_TITLE_PADDING / 2 : HEADER_WRAP_VERTICAL_PADDING;
+  const verticalPadding = wraps ? `${wrapPadding}px` : '0';
   const layout = {
     listStyle: `padding: ${i.top}px ${column.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${column.left}px`,
     // The negative margin that absorbs the last tag's spacing is on the side the tags' spacing is on.
@@ -1362,7 +1393,7 @@ function sectionLayout(style) {
   if (isInsetGrouped(style)) {
     // The card holds the last line's spacing: the tags' bottom margin is taken off inside it, not off the list's padding.
     const card = cardInsets(style);
-    layout.listStyle = `padding: ${i.top}px ${column.right}px ${i.bottom}px ${column.left}px`;
+    layout.listStyle = `padding: ${headerBoardOffset(style, hasHeader)}px ${column.right}px ${i.bottom}px ${column.left}px`;
     layout.itemsStyle += `; margin-bottom: -${style.lineSpacing}px`;
     layout.cardStyle = `padding: ${card.top}px ${card.right}px ${card.bottom}px ${card.left}px; border-radius: ${style.sectionCornerRadius}px; ${sectionBackgroundCSS(style)}`;
   }
@@ -1402,7 +1433,7 @@ module.exports = {
   SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
-  HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
+  HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, HEADER_BOARD_TITLE_PADDING, HEADER_BOARD_SPACING, isHeaderTightToBoard, headerBoardOffset, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
   FOLD_CONTROL_FONT_SIZE, FOLD_CONTROL_MAX_FONT_SIZE, foldControlFontCSS,
   FOLD_HEADER_MAX_WIDTH_PERCENT, foldHeaderWidthCSS, FOLD_CONTENT_TITLE_AND_ICON, longerFoldTitle,
 };
