@@ -185,6 +185,19 @@ const SECTION_COLORS = {
 const ZERO_INSETS = { top: 0, left: 0, bottom: 0, right: 0 };
 
 /**
+ * The default tint of the built-in views that are not tags (header title, fold / More control: text, icon, arrow) is
+ * chosen against the opaque background really behind them, black or white by relative luminance (WCAG): the one
+ * threshold is where black and white text have the same contrast (about 0.179). Without such a background it is the
+ * system mode's (black in light, white in dark). Style key `tintColor` wins in both modes.
+ */
+const TINT_LUMINANCE_THRESHOLD = 0.179;
+const TINT_ON_LIGHT = '#000000';
+const TINT_ON_DARK = '#FFFFFF';
+/** The alpha from which a background counts as opaque. */
+const OPAQUE_ALPHA = 1;
+const RGB_MAX = 255;
+
+/**
  * A background that may be transparent (style key `allowsTransparentBackground`): `transparent`, `clear` and zero alpha
  * are kept as `transparent`; a missing or invalid color is still the default tag fill.
  */
@@ -239,7 +252,7 @@ function mergeSectionStyle(style, c) {
   if (cardBackground) style.sectionBackgroundStyle = cardBackground;
   const separatorStyle = namedValue(c.headerSeparatorStyle, HEADER_SEPARATOR_STYLES);
   if (separatorStyle) style.headerSeparatorStyle = separatorStyle;
-  ['sectionBackgroundColor', 'headerBackgroundColor', 'headerSeparatorColor'].forEach((k) => {
+  ['sectionBackgroundColor', 'headerBackgroundColor', 'headerSeparatorColor', 'tintColor'].forEach((k) => {
     const value = color(c[k]);
     if (value) style[k] = value;
   });
@@ -310,6 +323,11 @@ function defaultStyle(pixelRatio = 2, dark = false) {
     headerSeparatorColor: null,
     headerSeparatorThickness: SECTION_METRICS.separatorThickness,
     headerSeparatorInsets: null,
+    // Nullable tint of every built-in non-tag view; null resolves against what is behind them (resolveTint).
+    tintColor: null,
+    // True once a configuration sets the color itself: it then wins over the tint.
+    headerTextColorSet: false,
+    foldControlColorSet: false,
     headerTextColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     foldControlColor: dark ? DARK_TEXT_COLOR : LIGHT_TINT,
     headerFont: { size: 14, weight: 'regular', italic: false },
@@ -436,7 +454,7 @@ function mergeStyle(configuration = {}, base = DEFAULT_STYLE) {
   ['backgroundColor', 'headerTextColor', 'foldControlColor'].forEach((k) => {
     const value = color(c[k]);
     if (value) style[k] = value;
-    if (value && k === 'backgroundColor') style.backgroundColorSet = true;
+    if (value) style[`${k}Set`] = true;
   });
   mergeSectionStyle(style, c);
   if (Object.prototype.hasOwnProperty.call(c, 'highlightedBackgroundColor')) {
@@ -1104,6 +1122,64 @@ function resolvedSectionBackgroundStyle(style) {
     ? SECTION_BACKGROUND_STYLES.liquidGlass : SECTION_BACKGROUND_STYLES.flat;
 }
 
+/** The {r, g, b, a} of a CSS color of `color()` ('#RRGGBB', rgb(), rgba()), or null. */
+function rgbaOf(text) {
+  const hex = /^#([0-9a-fA-F]{6})$/.exec(text);
+  if (hex) {
+    const n = parseInt(hex[1], 16);
+    return { r: Math.floor(n / 65536) % 256, g: Math.floor(n / 256) % 256, b: n % 256, a: OPAQUE_ALPHA };
+  }
+  const parts = /^rgba?\(([^)]*)\)$/i.exec(String(text).trim());
+  const v = parts ? parts[1].split(',').map((x) => Number(x.trim())) : [];
+  if (v.length < 3 || v.slice(0, 3).some((x) => !Number.isFinite(x))) return null;
+  return { r: v[0], g: v[1], b: v[2], a: v.length > 3 && Number.isFinite(v[3]) ? v[3] : OPAQUE_ALPHA };
+}
+
+/** Relative luminance (WCAG) of an opaque color text, or null when it is missing, invalid or not opaque. */
+function opaqueLuminance(text) {
+  const c = text ? rgbaOf(text) : null;
+  if (!c || c.a < OPAQUE_ALPHA) return null;
+  const channel = (x) => {
+    const s = x / RGB_MAX;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
+}
+
+/** Black on a light opaque background, white on a dark one; null when the background is not opaque. */
+function tintAgainst(background) {
+  const luminance = opaqueLuminance(background);
+  if (luminance === null) return null;
+  return luminance > TINT_LUMINANCE_THRESHOLD ? TINT_ON_LIGHT : TINT_ON_DARK;
+}
+
+/** The opaque background the list paints itself: the app's `backgroundColor`, else the grouped one under insetGrouped; else null. */
+function paintedBackground(style) {
+  if (style.backgroundColorSet || isInsetGrouped(style)) return resolvedBackgroundColor(style);
+  return null;
+}
+
+/**
+ * The tint of the built-in non-tag views: `tintColor` when set, else black / white against `against` (a header band's color,
+ * where one shows), else against the list's painted background, else the system mode's (`sectionPalette.dark`).
+ */
+function resolveTint(style, against) {
+  if (style.tintColor) return style.tintColor;
+  return tintAgainst(against) || tintAgainst(paintedBackground(style))
+    || (style.sectionPalette && style.sectionPalette.dark ? TINT_ON_DARK : TINT_ON_LIGHT);
+}
+
+/** The header title's color: the app's `headerTextColor`, else the tint (against the band when a band shows). */
+function resolvedHeaderTextColor(style) {
+  return style.headerTextColorSet ? style.headerTextColor : resolveTint(style, hasHeaderBand(style) ? style.headerBackgroundColor : null);
+}
+
+/** The fold / More control's color: the app's `foldControlColor`, else the tint (against the band for a control in the header). */
+function resolvedFoldControlColor(style, inHeader = false) {
+  if (style.foldControlColorSet) return style.foldControlColor;
+  return resolveTint(style, inHeader && hasHeaderBand(style) ? style.headerBackgroundColor : null);
+}
+
 /** The card's color as drawn: its own (the glass tint when glass), else the card color or the glass tint of the color mode. */
 function resolvedSectionBackgroundColor(style) {
   const fallback = resolvedSectionBackgroundStyle(style) === SECTION_BACKGROUND_STYLES.liquidGlass
@@ -1138,7 +1214,7 @@ function sectionLayout(style) {
   const layout = {
     listStyle: `padding: ${i.top}px ${i.right}px ${Math.max(0, i.bottom - style.lineSpacing)}px ${i.left}px`,
     itemsStyle: `margin-right: -${style.interitemSpacing}px`,
-    headerStyle: `height: ${headerHeight}px; padding: 0 ${style.headerHorizontalInset}px; ${fontCSS(style.headerFont)}; color: ${style.headerTextColor}`,
+    headerStyle: `height: ${headerHeight}px; padding: 0 ${style.headerHorizontalInset}px; ${fontCSS(style.headerFont)}; color: ${resolvedHeaderTextColor(style)}`,
     backgroundStyle: `background-color: ${resolvedBackgroundColor(style)}`,
   };
   if (isInsetGrouped(style)) {
@@ -1153,7 +1229,7 @@ function sectionLayout(style) {
     const box = headerBox(style);
     const band = hasHeaderBand(style)
       ? `; background-color: ${style.headerBackgroundColor}; border-radius: ${style.headerCornerRadius}px` : '';
-    layout.headerStyle = `height: ${headerHeight}px; margin: 0 ${box.right}px 0 ${box.left}px; padding: 0 ${edges.right - box.right}px 0 ${edges.left - box.left}px; ${fontCSS(style.headerFont)}; color: ${style.headerTextColor}${band}`;
+    layout.headerStyle = `height: ${headerHeight}px; margin: 0 ${box.right}px 0 ${box.left}px; padding: 0 ${edges.right - box.right}px 0 ${edges.left - box.left}px; ${fontCSS(style.headerFont)}; color: ${resolvedHeaderTextColor(style)}${band}`;
   }
   const line = headerSeparator(style);
   if (line) {
@@ -1180,6 +1256,7 @@ module.exports = {
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
+  TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
   SECTION_STYLES, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, cardInsets, contentColumn, tagColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,

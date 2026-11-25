@@ -388,3 +388,108 @@ test('the component builds the model again when the system theme changes, so uns
   assert.notEqual(layoutIn(false).cardStyle, layoutIn(true).cardStyle)
   assert.notEqual(layoutIn(false).backgroundStyle, layoutIn(true).backgroundStyle)
 })
+
+// MARK: - tintColor: the built-in non-tag views are legible on what is behind them
+
+const BLACK = '#000000'
+const WHITE = '#FFFFFF'
+const LIGHT_BACKGROUND = '#F2F2F7'
+const DARK_BACKGROUND = '#1C1C1E'
+const CLEAR = 'rgba(0, 0, 0, 0)'
+const MODES = [LIGHT_OPTIONS, DARK_OPTIONS]
+
+test('tintColor is nullable and the key parses', () => {
+  assert.equal(styleOf().tintColor, null)
+  assert.equal(styleOf({ tintColor: '#112233' }).tintColor, '#112233')
+  assert.equal(styleOf({ tintColor: 'systemBlue' }).tintColor, '#007AFF')
+  assert.equal(styleOf({ tintColor: 'not a color' }).tintColor, null)
+  assert.ok(model.TINT_LUMINANCE_THRESHOLD > 0 && model.TINT_LUMINANCE_THRESHOLD < 1)
+})
+
+test('a light list background gives a dark tint and a dark one a light tint, whatever the system mode', () => {
+  MODES.forEach((options) => {
+    const light = styleOf({ backgroundColor: LIGHT_BACKGROUND }, options)
+    const dark = styleOf({ backgroundColor: DARK_BACKGROUND }, options)
+    assert.equal(model.resolvedHeaderTextColor(light), BLACK)
+    assert.equal(model.resolvedFoldControlColor(light), BLACK)
+    assert.equal(model.resolvedHeaderTextColor(dark), WHITE)
+    assert.equal(model.resolvedFoldControlColor(dark), WHITE)
+    assert.match(model.sectionLayout(light).headerStyle, /color: #000000/)
+    assert.match(model.sectionLayout(dark).headerStyle, /color: #FFFFFF/)
+  })
+})
+
+test('under insetGrouped the grouped background decides when the app set none', () => {
+  // The grouped background is light (#F2F2F7) in light mode and black in dark mode.
+  assert.equal(model.resolvedHeaderTextColor(styleOf({ sectionStyle: 'insetGrouped' }, LIGHT_OPTIONS)), BLACK)
+  assert.equal(model.resolvedHeaderTextColor(styleOf({ sectionStyle: 'insetGrouped' }, DARK_OPTIONS)), WHITE)
+  // An app background wins over the grouped one: a light one in dark mode keeps the text dark.
+  assert.equal(model.resolvedHeaderTextColor(styleOf({ sectionStyle: 'insetGrouped', backgroundColor: LIGHT_BACKGROUND }, DARK_OPTIONS)), BLACK)
+})
+
+test('unset with a transparent or unset list background follows the system mode', () => {
+  assert.equal(model.resolvedHeaderTextColor(styleOf({}, LIGHT_OPTIONS)), BLACK)
+  assert.equal(model.resolvedHeaderTextColor(styleOf({}, DARK_OPTIONS)), WHITE)
+  assert.equal(model.resolvedFoldControlColor(styleOf({}, DARK_OPTIONS)), WHITE)
+  // A translucent background is not opaque: the mode decides.
+  assert.equal(model.resolvedHeaderTextColor(styleOf({ backgroundColor: CLEAR }, LIGHT_OPTIONS)), BLACK)
+  assert.equal(model.resolvedHeaderTextColor(styleOf({ backgroundColor: CLEAR }, DARK_OPTIONS)), WHITE)
+  assert.equal(model.resolvedHeaderTextColor(styleOf({ backgroundColor: 'rgba(0, 0, 0, 0.4)' }, LIGHT_OPTIONS)), BLACK)
+  assert.equal(model.resolvedHeaderTextColor(styleOf({ backgroundColor: 'rgba(255, 255, 255, 0.4)' }, DARK_OPTIONS)), WHITE)
+})
+
+test('the same transparent configuration differs between light and dark', () => {
+  const configuration = { style: { backgroundColor: CLEAR }, sections: [{ title: TITLE, items: ['a'] }] }
+  const layoutIn = (dark) => model.sectionLayout(model.normalize(configuration, { pixelRatio: 2, dark }).sections[0].style)
+  assert.notEqual(layoutIn(false).headerStyle, layoutIn(true).headerStyle)
+  assert.match(layoutIn(false).headerStyle, /color: #000000/)
+  assert.match(layoutIn(true).headerStyle, /color: #FFFFFF/)
+  // An opaque background gives the same texts in both modes.
+  const opaque = { style: { backgroundColor: LIGHT_BACKGROUND }, sections: configuration.sections }
+  const opaqueIn = (dark) => model.sectionLayout(model.normalize(opaque, { pixelRatio: 2, dark }).sections[0].style)
+  assert.equal(opaqueIn(false).headerStyle, opaqueIn(true).headerStyle)
+})
+
+test('a set tintColor wins in both modes, over every background', () => {
+  MODES.forEach((options) => {
+    ;[{}, { backgroundColor: LIGHT_BACKGROUND }, { backgroundColor: DARK_BACKGROUND }, { sectionStyle: 'insetGrouped' },
+      { headerBackgroundColor: LIGHT.headerBand }].forEach((extra) => {
+      const style = styleOf({ ...extra, tintColor: CUSTOM_COLOR }, options)
+      assert.equal(model.resolvedHeaderTextColor(style), CUSTOM_COLOR)
+      assert.equal(model.resolvedFoldControlColor(style, true), CUSTOM_COLOR)
+      assert.equal(model.resolveTint(style), CUSTOM_COLOR)
+    })
+  })
+})
+
+test('a header or fold color the app sets itself wins over the tint', () => {
+  MODES.forEach((options) => {
+    const style = styleOf({ backgroundColor: DARK_BACKGROUND, headerTextColor: '#112233', foldControlColor: '#445566', tintColor: CUSTOM_COLOR }, options)
+    assert.equal(model.resolvedHeaderTextColor(style), '#112233')
+    assert.equal(model.resolvedFoldControlColor(style), '#445566')
+  })
+})
+
+test('under a header band the tint is resolved against the band color', () => {
+  // A light band on a dark list in dark mode: the title is black; a dark band in light mode: white.
+  const lightBand = styleOf({ headerBackgroundColor: LIGHT.headerBand, backgroundColor: DARK_BACKGROUND }, DARK_OPTIONS)
+  assert.equal(model.resolvedHeaderTextColor(lightBand), BLACK)
+  assert.equal(model.resolvedFoldControlColor(lightBand, true), BLACK)
+  // The fold control outside the header sits on the list background.
+  assert.equal(model.resolvedFoldControlColor(lightBand, false), WHITE)
+  const darkBand = styleOf({ headerBackgroundColor: DARK.headerBand, backgroundColor: LIGHT_BACKGROUND }, LIGHT_OPTIONS)
+  assert.equal(model.resolvedHeaderTextColor(darkBand), WHITE)
+  assert.match(model.sectionLayout(darkBand).headerStyle, /color: #FFFFFF/)
+  // A band that is not opaque falls back to the list background, then the mode.
+  const clearBand = styleOf({ headerBackgroundColor: CLEAR }, DARK_OPTIONS)
+  assert.equal(model.resolvedHeaderTextColor(clearBand), WHITE)
+})
+
+test('the component draws the fold control with the resolved tint and re-resolves on a theme change', () => {
+  const fs = require('node:fs')
+  const path = require('node:path')
+  const dir = path.join(__dirname, '..', 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist', 'cyl-tag-list')
+  const source = fs.readFileSync(path.join(dir, 'cyl-tag-list.js'), 'utf8')
+  assert.match(source, /model\.resolvedFoldControlColor\(m\.style, m\.foldControl\.position === 'headerTrailing'\)/)
+  assert.match(source, /theme\.onChange\(\(\) => this\.rebuild\(\)\)/)
+})

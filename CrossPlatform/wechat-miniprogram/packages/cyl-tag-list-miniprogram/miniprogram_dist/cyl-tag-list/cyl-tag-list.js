@@ -142,7 +142,7 @@ Component({
         sections,
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
-        foldColor: m.foldControl.color || m.style.foldControlColor,
+        foldColor: m.foldControl.color || model.resolvedFoldControlColor(m.style, m.foldControl.position === 'headerTrailing'),
         backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}`,
       }, () => {
         if (remeasure) this.measure();
