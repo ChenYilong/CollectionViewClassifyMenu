@@ -13,7 +13,9 @@ Pod::Spec.new do |s|
   s.swift_version = '5.9'
   s.static_framework = true
 
-  s.source_files = 'CollectionViewClassifyMenu/Class/**/*.swift'
+  s.source_files = [
+    'CollectionViewClassifyMenu/Class/**/*.swift'
+  ]
   # The demo apps' Swift files live next to the core's sources; the patterns above match Swift files (the core moves to
   # Swift), so they are excluded by name, with AppleDouble files.
   s.exclude_files = [

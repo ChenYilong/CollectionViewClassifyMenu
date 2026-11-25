@@ -22,7 +22,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 ## 评分 / Score
 
 <!-- bilingual:keep -->
-**Score: 950 / 950 = 100.0 / 100** (API 928 / 928, demos 22 / 22). 评分：950 / 950 = 100.0 / 100（API 928 / 928，示例 22 / 22）。
+**Score: 904 / 955 = 94.7 / 100** (API 882 / 933, demos 22 / 22). 评分：904 / 955 = 94.7 / 100（API 882 / 933，示例 22 / 22）。
 
 | 中文 | English |
 |:---|:---|
@@ -278,6 +278,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuDataSource.menuImageForItem(at:)` (CYLMenuDataSource.swift) | `menuImageForItem?` | method |
 | `CYLMenuDataSource.menuSelectedImageForItem(at:)` (CYLMenuDataSource.swift) | `menuSelectedImageForItem?` | method |
 | `CYLMenuDataSource.menuAnimationURLForItem(at:)` (CYLMenuDataSource.swift) | `menuAnimationURLForItem?` | method |
+| `CYLMenuDataSource.menuSubtitleForItem(at:)` (CYLMenuDataSource.swift) | TODO | method |
 | `CYLMenuDataSource.menuAnimationRestingProgressForItem(at:)` (CYLMenuDataSource.swift) | `menuAnimationRestingProgressForItem?` | method |
 | `CYLMenuDataSource.menuStyle(forSection:)` (CYLMenuDataSource.swift) | `menuStyleForSection?` | method |
 | `CYLMenuDataSource.menuStyleForItem(at:)` (CYLMenuDataSource.swift) | `menuStyleForItem?` | method |
@@ -375,6 +376,9 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagContentAlignment` (CYLMenuStyle.swift) | `enum CYLTagContentAlignment` | enum |
 | `CYLTagContentAlignment.center` (CYLMenuStyle.swift) | `CYLTagContentAlignment.center` | case |
 | `CYLTagContentAlignment.leading` (CYLMenuStyle.swift) | `CYLTagContentAlignment.leading` | case |
+| `CYLTagBackgroundStyle` (CYLMenuStyle.swift) | TODO | enum |
+| `CYLTagBackgroundStyle.flat` (CYLMenuStyle.swift) | TODO | case |
+| `CYLTagBackgroundStyle.liquidGlass` (CYLMenuStyle.swift) | TODO | case |
 | `CYLTagRowAlignment` (CYLMenuStyle.swift) | `enum CYLTagRowAlignment` | enum |
 | `CYLTagRowAlignment.leading` (CYLMenuStyle.swift) | `CYLTagRowAlignment.leading` | case |
 | `CYLTagRowAlignment.center` (CYLMenuStyle.swift) | `CYLTagRowAlignment.center` | case |
@@ -415,11 +419,15 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyle.imagePositionAdjustment` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePositionAdjustment` | property |
 | `CYLMenuStyle.imagePlacement` (CYLMenuStyle.swift) | `CYLMenuStyle.imagePlacement` | property |
 | `CYLMenuStyle.imageFillsTagHeight` (CYLMenuStyle.swift) | `CYLMenuStyle.imageFillsTagHeight` (AndroidTagView's avatar, `fillsTagHeight`) | property |
+| `CYLMenuStyle.titleMaxLines` (CYLMenuStyle.swift) | TODO | property |
 | `CYLMenuStyle.titleWraps` (CYLMenuStyle.swift) | `CYLMenuStyle.titleWraps` (the title's `Text` takes as many lines as it needs) | property |
 | `CYLMenuStyle.elevation` (CYLMenuStyle.swift) | `CYLMenuStyle.elevation` (ArkUI `shadow`; the tag stops clipping) | property |
 | `CYLMenuStyle.deleteIndicatorImage` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorImage` (an image, or a system symbol drawn with `SymbolGlyph`) | property |
 | `CYLMenuStyle.layoutCentered` (CYLMenuStyle.swift) | `CYLMenuStyle.layoutCentered` | property |
 | `CYLMenuStyle.contentAlignment` (CYLMenuStyle.swift) | `CYLMenuStyle.contentAlignment` | property |
+| `CYLMenuStyle.backgroundStyle` (CYLMenuStyle.swift) | TODO | property |
+| `CYLMenuStyle.resolvedBackgroundStyle` (CYLMenuStyle.swift) | TODO | property |
+| `CYLMenuStyle.minimumTagSize` (CYLMenuStyle.swift) | TODO | property |
 | `CYLMenuStyle.animationSize` (CYLMenuStyle.swift) | `CYLMenuStyle.animationSize` | property |
 | `CYLMenuStyle.animationSpeed` (CYLMenuStyle.swift) | `CYLMenuStyle.animationSpeed` | property |
 | `CYLMenuStyle.adjustsFontForContentSizeCategory` (CYLMenuStyle.swift) | `CYLMenuStyle.adjustsFontForContentSizeCategory` | property |
@@ -456,9 +464,13 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyle.deleteIndicatorFont(for:traitCollection:)` (CYLMenuStyle.swift) | `CYLMenuStyle.deleteIndicatorFontFor(state, fontScale, boldText)` | method |
 | `CYLMenuStyle.headerFont(for:)` (CYLMenuStyle.swift) | `CYLMenuStyle.headerFontFor(fontScale, boldText)` | method |
 | `CYLMenuStyle.copy(with:)` (CYLMenuStyle.swift) | `CYLMenuStyle.copy()` | method |
+| `CYLTagTitleMaxLines` (CYLMenuStyle.swift) | TODO | enum |
+| `CYLTagTitleMaxLines.static single` (CYLMenuStyle.swift) | TODO | property |
+| `CYLTagTitleMaxLines.static unlimited` (CYLMenuStyle.swift) | TODO | property |
 | `CYLTag` (CYLTag.swift) | `class CYLTag` (core/CYLTag.ets) | class |
 | `CYLTag.identifier` (CYLTag.swift) | `CYLTag.identifier` | property |
 | `CYLTag.title` (CYLTag.swift) | `CYLTag.title` | property |
+| `CYLTag.subtitle` (CYLTag.swift) | TODO | property |
 | `CYLTag.image` (CYLTag.swift) | `CYLTag.image` | property |
 | `CYLTag.selectedImage` (CYLTag.swift) | `CYLTag.selectedImage` | property |
 | `CYLTag.animationURL` (CYLTag.swift) | `CYLTag.animationURL` | property |
@@ -507,6 +519,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagDataSource.menuNumberOfItems(inSection:)` (CYLTag.swift) | `menuNumberOfItemsInSection(section)` | method |
 | `CYLTagDataSource.menuTitle(forSection:)` (CYLTag.swift) | `menuTitleForSection(section)` | method |
 | `CYLTagDataSource.menuTitleForItem(at:)` (CYLTag.swift) | `menuTitleForItem(indexPath)` | method |
+| `CYLTagDataSource.menuSubtitleForItem(at:)` (CYLTag.swift) | TODO | method |
 | `CYLTagDataSource.menuImageForItem(at:)` (CYLTag.swift) | `menuImageForItem (badge drawn)` | method |
 | `CYLTagDataSource.menuSelectedImageForItem(at:)` (CYLTag.swift) | `menuSelectedImageForItem` | method |
 | `CYLTagDataSource.menuAnimationURLForItem(at:)` (CYLTag.swift) | `menuAnimationURLForItem` | method |
@@ -547,6 +560,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagButton.editingIndicatorsView` (CYLTagButton.swift) | `CYLTagButton.editingIndicatorsView` (a `CYLAnimatedItemStackModel`; the tag draws its two icons side by side) | property |
 | `CYLTagButton.style` (CYLTagButton.swift) | `CYLTagButton.style` | property |
 | `CYLTagButton.static isAnimationEngineAvailable` (CYLTagButton.swift) | `CYLTagButton.isAnimationEngineAvailable` | property |
+| `CYLTagButton.liquidGlassView` (CYLTagButton.swift) | TODO | property |
 | `CYLTagButton.init?(coder:)` (CYLTagButton.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
 | `CYLTagButton.init(title:image:)` (CYLTagButton.swift) | `new CYLTagButton(title, image)` | init |
 | `CYLTagButton.init(title:image:animationURL:)` (CYLTagButton.swift) | `new CYLTagButton(title, image, animationURL)` | init |
@@ -674,6 +688,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagListKey.static foldStyle` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.foldStyle` | property |
 | `CYLTagListKey.static allowsEmptySelection` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.allowsEmptySelection` | property |
 | `CYLTagListKey.static showsSectionHeaders` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.showsSectionHeaders` | property |
+| `CYLTagListKey.static longPressAction` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
 | `CYLTagListKey.static scrollEnabled` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.scrollEnabled` | property |
 | `CYLTagListKey.static defaultVisibleRows` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.defaultVisibleRows` | property |
 | `CYLTagListKey.static selectedItems` (CYLTagListView+CYLConfiguration.swift) | `CYLTagListKey.selectedItems` | property |
@@ -699,6 +714,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagSectionKey.static style` (CYLTagListView+CYLConfiguration.swift) | `CYLTagSectionKey.style` | property |
 | `CYLTagItemKey` (CYLTagListView+CYLConfiguration.swift) | `class CYLTagItemKey` (core/CYLTagListConfiguration.ets) | enum |
 | `CYLTagItemKey.static title` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.title` | property |
+| `CYLTagItemKey.static subtitle` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
 | `CYLTagItemKey.static image` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.image` | property |
 | `CYLTagItemKey.static selectedImage` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.selectedImage` | property |
 | `CYLTagItemKey.static animation` (CYLTagListView+CYLConfiguration.swift) | `CYLTagItemKey.animation` | property |
@@ -716,6 +732,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyleKey.static disabled` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.disabled` | property |
 | `CYLMenuStyleKey.static imageTitleSpacing` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.imageTitleSpacing` | property |
 | `CYLMenuStyleKey.static itemHeight` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.itemHeight` | property |
+| `CYLMenuStyleKey.static titleMaxLines` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
 | `CYLMenuStyleKey.static numberOfItemsPerRow` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.numberOfItemsPerRow` | property |
 | `CYLMenuStyleKey.static interitemSpacing` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.interitemSpacing` | property |
 | `CYLMenuStyleKey.static lineSpacing` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.lineSpacing` | property |
@@ -730,6 +747,8 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLMenuStyleKey.static layoutCentered` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.layoutCentered` | property |
 | `CYLMenuStyleKey.static imagePlacement` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.imagePlacement` | property |
 | `CYLMenuStyleKey.static contentAlignment` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.contentAlignment` | property |
+| `CYLMenuStyleKey.static backgroundStyle` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
+| `CYLMenuStyleKey.static minimumTagSize` (CYLTagListView+CYLConfiguration.swift) | TODO | property |
 | `CYLMenuStyleKey.static adjustsFontForContentSizeCategory` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.adjustsFontForContentSizeCategory` | property |
 | `CYLMenuStyleKey.static backgroundColor` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.backgroundColor` | property |
 | `CYLMenuStyleKey.static headerTextColor` (CYLTagListView+CYLConfiguration.swift) | `CYLMenuStyleKey.headerTextColor` | property |
@@ -830,6 +849,7 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagListView.allowsTapping` (CYLTagListView.swift) | `CYLTagListState.allowsTapping` | property |
 | `CYLTagListView.defaultTagImage` (CYLTagListView.swift) | `CYLTagListState.defaultTagImage` | property |
 | `CYLTagListView.removesItemsOnDelete` (CYLTagListView.swift) | `CYLTagListState.removesItemsOnDelete` | property |
+| `CYLTagListView.longPressAction` (CYLTagListView.swift) | TODO | property |
 | `CYLTagListView.tagLongPressHandler` (CYLTagListView.swift) | `CYLTagListState.tagLongPressHandler` | property |
 | `CYLTagListView.longPressAccessibilityActionName` (CYLTagListView.swift) | N/A: no custom accessibility actions in ArkUI (through API 21) | property |
 | `CYLTagListView.allowsReordering` (CYLTagListView.swift) | `CYLTagListState.allowsReordering` | property |
@@ -899,12 +919,14 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagListView.numberOfVisibleItems(inSection:)` (CYLTagListView.swift) | `numberOfVisibleItems(section)` | method |
 | `CYLTagListView.scroll(toSection:animated:)` (CYLTagListView.swift) | `scrollToSection(section, animated)` | method |
 | `CYLTagListView.scrollToItem(at:animated:)` (CYLTagListView.swift) | `scrollToItem(indexPath, animated)` | method |
+| `reportLongPress(at:)` (CYLTagListView.swift) | TODO | method |
 | `CYLTagListView.numberOfSections(in:)` (CYLTagListView.swift) | `CYLTagListState.numberOfSections()` | method |
 | `CYLTagListView.collectionView(_:numberOfItemsInSection:)` (CYLTagListView.swift) | `CYLTagListState.numberOfDisplayedItems(section)` | method |
 | `CYLTagListView.collectionView(_:cellForItemAt:)` (CYLTagListView.swift) | `CYLTagListState.cellForItemAt(indexPath)` (the rendered CYLTagListCell) | method |
 | `CYLTagListView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagListView.swift) | `CYLTagListState.viewForSupplementaryElementOfKind(kind, indexPath)` (CYLTagListSupplementaryView) | method |
 | `CYLTagListView.collectionView(_:canMoveItemAt:)` (CYLTagListView.swift) | `CYLTagListState.canMoveItem(indexPath)` | method |
 | `CYLTagListView.collectionView(_:moveItemAt:to:)` (CYLTagListView.swift) | `CYLTagListState.moveItem(source, destination)` | method |
+| `CYLTagListView.scrollViewWillBeginDragging(_:)` (CYLTagListView.swift) | TODO | method |
 | `CYLTagListView.collectionView(_:didSelectItemAt:)` (CYLTagListView.swift) | `CYLTagListState.tapItem(indexPath)` | method |
 | `CYLTagListView.collectionView(_:shouldHighlightItemAt:)` (CYLTagListView.swift) | `CYLTagListState.shouldHighlightItem(indexPath)` | method |
 | `CYLTagListView.collectionView(_:targetIndexPathForMoveOfItemFromOriginalIndexPath:atCurrentIndexPath:toProposedIndexPath:)` (CYLTagListView.swift) | `CYLTagListState.targetIndexPathForMove(original, proposed)` | method |
@@ -919,52 +941,35 @@ tags: [harmonyos, arkts, api-parity, cross-platform]
 | `CYLTagListView.setTags(withCharactersOf:)` (CYLTagListView.swift) | `CYLTagListState.setTagsWithCharactersOfText(text)` | method |
 | `CYLTagListView.selectedText` (CYLTagListView.swift) | `CYLTagListState.selectedText` | property |
 | `CYLTagListView.selectItems(from:through:)` (CYLTagListView.swift) | `CYLTagListState.selectItemsFrom(start, end)` | method |
-| `CYLTagView` (CYLTagView.swift) | `CYLTagView` (tagviews/CYLTagView.ets + CYLTagViewComponent) | class |
-| `CYLTagView.static sectionInset` (CYLTagView.swift) | `CYLTagView.sectionInset` | property |
-| `CYLTagView.static cellSpacing` (CYLTagView.swift) | `CYLTagView.cellSpacing` | property |
-| `CYLTagView.isShowHeader` (CYLTagView.swift) | `CYLTagView.isShowHeader` | property |
-| `CYLTagView.groups` (CYLTagView.swift) | `CYLTagView.groups` | property |
-| `CYLTagView.menuDataSource` (CYLTagView.swift) | `CYLTagView.menuDataSource` | property |
-| `CYLTagView.menuDelegate` (CYLTagView.swift) | `CYLTagView.menuDelegate` | property |
-| `CYLTagView.static makeTagView()` (CYLTagView.swift) | `CYLTagView.makeTagView()` | method |
-| `CYLTagView.init()` (CYLTagView.swift) | `new CYLTagView()` | init |
-| `CYLTagView.init?(coder:)` (CYLTagView.swift) | N/A: Interface Builder decoding (NSCoder, XIB, storyboard) does not exist on HarmonyOS; ArkUI builds every view in code | init |
-| `CYLTagView.reloadMenuData()` (CYLTagView.swift) | `reloadMenuData()` | method |
-| `CYLTagView.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagView.swift) | `tagHeaderCell(headerCell, section)` | method |
-| `CYLTagView.numberOfSections(in:)` (CYLTagView.swift) | `numberOfSections()` | method |
-| `CYLTagView.collectionView(_:numberOfItemsInSection:)` (CYLTagView.swift) | `numberOfItemsInSection(section)` | method |
-| `CYLTagView.numberOfVisibleItems(inSection:)` (CYLTagView.swift) | `CYLTagView.numberOfVisibleItems(section)` | method |
-| `CYLTagView.collectionView(_:cellForItemAt:)` (CYLTagView.swift) | `cellForItemAt(indexPath)` | method |
-| `CYLTagView.collectionView(_:viewForSupplementaryElementOfKind:at:)` (CYLTagView.swift) | `viewForSupplementaryElementOfKind(kind, indexPath)` | method |
-| `CYLTagView.collectionView(_:didSelectItemAt:)` (CYLTagView.swift) | `didSelectItemAt(indexPath)` | method |
-| `CYLTagView.collectionView(_:layout:sizeForItemAt:)` (CYLTagView.swift) | `sizeForItemAt(indexPath)` | method |
-| `CYLTagView.collectionView(_:layout:minimumInteritemSpacingForSectionAt:)` (CYLTagView.swift) | `minimumInteritemSpacingForSectionAt(section)` | method |
-| `CYLTagView.collectionView(_:layout:referenceSizeForHeaderInSection:)` (CYLTagView.swift) | `referenceSizeForHeaderInSection(section)` | method |
-| `CYLTagView.collectionView(_:layout:insetForSectionAt:)` (CYLTagView.swift) | `insetForSectionAt(section)` | method |
-| `CYLTagGroup` (CYLTagGroup.swift) | `class CYLTagGroup` (core/CYLTagModel.ets) | class |
-| `CYLTagGroup.groupName` (CYLTagGroup.swift) | `CYLTagGroup.groupName` | property |
-| `CYLTagGroup.width` (CYLTagGroup.swift) | `CYLTagGroup.width` | property |
-| `CYLTagGroup.height` (CYLTagGroup.swift) | `CYLTagGroup.height` | property |
-| `CYLTagGroup.isOpened` (CYLTagGroup.swift) | `CYLTagGroup.isOpened` | property |
-| `CYLTagGroup.section` (CYLTagGroup.swift) | `CYLTagGroup.section` | property |
-| `CYLTagGroup.items` (CYLTagGroup.swift) | `CYLTagGroup.items` | property |
-| `CYLTagGroup.cellCountsPerRow` (CYLTagGroup.swift) | `CYLTagGroup.cellCountsPerRow` | property |
-| `CYLTagGroup.invalidateRowCounts()` (CYLTagGroup.swift) | `invalidateRowCounts()` | method |
-| `CYLTagGroup.firstRowCellCount(forContentWidth:)` (CYLTagGroup.swift) | `firstRowCellCount(contentWidth)` | method |
-| `CYLTagModel` (CYLTagModel.swift) | `class CYLTagModel` (core/CYLTagModel.ets) | class |
-| `CYLTagModel.title` (CYLTagModel.swift) | `CYLTagModel.title` | property |
-| `CYLTagModel.width` (CYLTagModel.swift) | `CYLTagModel.width` | property |
-| `CYLTagModel.height` (CYLTagModel.swift) | `CYLTagModel.height` | property |
-| `CYLTagModel.init(title:)` (CYLTagModel.swift) | `new CYLTagModel(title)` | init |
-| `CYLTagModel.static titleFont(for:)` (CYLTagModel.swift) | `CYLTagModel.titleFont(fontScale)` | method |
-| `CYLTagModel.updateSize(for:)` (CYLTagModel.swift) | `updateSize(fontScale)` (MeasureText) | method |
-| `CYLTagCell` (CYLTagCell.swift) | `CYLTagCell` (tagviews/CYLTagView.ets) | class |
-| `CYLTagCell.model` (CYLTagCell.swift) | `CYLTagCell.model` | property |
-| `CYLTagHeaderCellDelegate` (CYLTagHeaderCell.swift) | `interface CYLTagHeaderCellDelegate` | protocol |
-| `CYLTagHeaderCellDelegate.tagHeaderCell(_:didToggleGroupInSection:)` (CYLTagHeaderCell.swift) | `tagHeaderCell(headerCell, section)` | method |
-| `CYLTagHeaderCell` (CYLTagHeaderCell.swift) | `CYLTagHeaderCell` (tagviews/CYLTagView.ets) | class |
-| `CYLTagHeaderCell.group` (CYLTagHeaderCell.swift) | `CYLTagHeaderCell.group` | property |
-| `CYLTagHeaderCell.delegate` (CYLTagHeaderCell.swift) | `CYLTagHeaderCell.delegate` | property |
+| `CYLTagListView.subtitleForItem(at:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.showCallout(_:at:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.dismissCallout()` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.canReorderItem(at:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.beginReordering(at:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.endReordering(destination:moved:)` (CYLTagListView.swift) | TODO | method |
+| `CYLTagListView.cancelReordering()` (CYLTagListView.swift) | TODO | method |
+| `CYLTagLongPressHost` (CYLTagLongPressAction.swift) | TODO | protocol |
+| `CYLTagLongPressHost.subtitleForItem(at:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressHost.showCallout(_:at:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressHost.dismissCallout()` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressHost.canReorderItem(at:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressHost.beginReordering(at:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressHost.endReordering(destination:moved:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressHost.cancelReordering()` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressHost.reportLongPress(at:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressAction` (CYLTagLongPressAction.swift) | TODO | protocol |
+| `CYLTagLongPressAction.canBegin(host:at:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressAction.begin(host:at:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressAction.end(host:destination:moved:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressAction.cancel(host:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressActions` (CYLTagLongPressAction.swift) | TODO | enum |
+| `CYLTagLongPressActions.static reorder` (CYLTagLongPressAction.swift) | TODO | property |
+| `CYLTagLongPressActions.static report` (CYLTagLongPressAction.swift) | TODO | property |
+| `CYLTagLongPressActions.static callout` (CYLTagLongPressAction.swift) | TODO | property |
+| `CYLTagLongPressActions.static none` (CYLTagLongPressAction.swift) | TODO | property |
+| `CYLTagLongPressActions.static handler()` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressActions.static first(_:)` (CYLTagLongPressAction.swift) | TODO | method |
+| `CYLTagLongPressActions.static makeDefault()` (CYLTagLongPressAction.swift) | TODO | method |
 
 ## 表 2：iOS 示例的演示 / Table 2: iOS example demos
 
