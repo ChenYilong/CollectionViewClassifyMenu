@@ -35,6 +35,14 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO → DONE on HarmonyOS (2026-11-25, `feat/tag-section-style`): the header divider and the section card did not share their left and right edges
+
+- **Prompt (verbatim):** "C:/w/ss_shots/ss-light.jpeg bug记录todo 将圆角背景板和头部分界线header应该左右边界对齐，图片中未对齐。该逻辑应在core中实现无需用户调整"
+- **Prompt (English):** log as a bug / TODO: the rounded section card and the header divider must have the same left and right edges; in the picture they are not aligned; the core does this, the user adjusts nothing.
+- **Cause:** the divider defaulted to start at the header title's x (16 vp inside the card) while the card and the band span the column.
+- **Fix (HarmonyOS, core):** the divider defaults to the column's edges, the same as the card and the band; `headerSeparatorInsets` is only for an app that wants an inset. Test `theDividerSitsAtTheHeaderBottomAndAddsNoHeight` asserts it; host tests 108/108.
+- **Still TODO:** the same default on Android, mini program, iOS (the in-flight ports used the title's x), then the screenshots.
+
 ### TODO → DONE (2026-11-25, docs/tag-liquid-glass-screenshots, Mac session chenyilong-68): labeled iOS Liquid Glass screenshots (default style normal / selected / disabled, flat vs glass, contact tag editor selected)
 
 - Context: handed over by Mac-CollectionViewClassifyMenu 6de126 for Mac-CYLSearchViewController's items 3 and 4 (PR #36, branch feat/tag-liquid-glass, frozen). This branch is based on 7c64042e. The PR owner wants the shots on CYLTabBarController 3f2a5b99 (or 5b8869b2): the Podfiles are changed locally to build and restored before committing; fallback dea0951e would be noted here.

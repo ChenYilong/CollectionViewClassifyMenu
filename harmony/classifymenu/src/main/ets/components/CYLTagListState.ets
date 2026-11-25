@@ -3034,7 +3034,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
       if (header > 0 && style.headerSeparatorStyle === CYLHeaderSeparatorStyle.line &&
         style.headerSeparatorThickness > 0) {
         const separatorInsets = style.headerSeparatorInsets;
-        const left = separatorInsets !== undefined ? column.x + separatorInsets.left : headerEdges[0];
+        const left = separatorInsets !== undefined ? column.x + separatorInsets.left : column.x;
         const right = separatorInsets !== undefined ? column.x + column.width - separatorInsets.right :
           column.x + column.width;
         const thickness = Math.min(style.headerSeparatorThickness, header);

@@ -298,7 +298,7 @@ export class CYLMenuStyle {
   headerSeparatorThickness: number = CYLSectionStyleMetrics.separatorThickness;
   /**
    * The divider's leading (left) and trailing (right) inset from the column's edges, vp; undefined: it starts at the
-   * header title and ends at the column's trailing edge.
+   * column's leading edge (the card's and the band's edge) and ends at its trailing edge: all three share the same left and right.
    */
   headerSeparatorInsets?: CYLEdgeInsets = undefined;
 

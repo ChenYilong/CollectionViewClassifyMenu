@@ -16,7 +16,7 @@ there is one. Every default reproduces today's look exactly (frames do not move 
 | --- | --- | --- |
 | Section card | `sectionStyle`: `plain` or `insetGrouped`; `sectionBackgroundColor` (nullable); `sectionCornerRadius`; `sectionContentInsets` (padding inside the card) | `plain`. Color null resolves to the system card color (white; #1C1C1E in dark mode). Radius = named constant 10. Padding = named constant 12 |
 | Header band | `headerBackgroundColor` (nullable); `headerCornerRadius`; `headerContentInsets` (leading / trailing) | null = no band (today's look). The named band color is #EFEFF4 (the TagCollectionView header) with a dark variant |
-| Header divider | `headerSeparatorStyle`: `none` or `line`; `headerSeparatorColor` (nullable); `headerSeparatorThickness`; `headerSeparatorInsets` (leading / trailing) | `none`. Color null resolves to the system separator (light and dark). Thickness = named hairline constant 0.5 (a point / vp / dp; the placeholder example's divider). Leading inset defaults to the header title's x, trailing to the column edge |
+| Header divider | `headerSeparatorStyle`: `none` or `line`; `headerSeparatorColor` (nullable); `headerSeparatorThickness`; `headerSeparatorInsets` (leading / trailing) | `none`. Color null resolves to the system separator (light and dark). Thickness = named hairline constant 0.5 (a point / vp / dp; the placeholder example's divider). Both insets default to 0: the divider has the same left and right edges as the card and the header band (the column's edges), never the title's x |
 
 Under `insetGrouped`, if the app never set the list's `backgroundColor`, it resolves to the grouped background (#F2F2F7; black in dark
 mode). Nullable colors follow the dark-mode defaults pattern of `CYLMenuColor` / `CYLSystemColors` / `theme.js`.
@@ -28,7 +28,7 @@ mode). Nullable colors follow the dark-mode defaults pattern of `CYLMenuColor` /
   then band leading + `headerContentInsets.leading`.
 - `insetGrouped`: the card spans the column; the tags sit inside it, inset by `sectionContentInsets`; the header title and the fold
   control align with the tags' leading / trailing edge inside the card.
-- The divider is drawn at the header's bottom edge, inside `headerHeight`: it adds no height. Heights, fold logic and `canFoldSection`
+- The divider is drawn at the header's bottom edge (full column width by default), inside `headerHeight`: it adds no height. Heights, fold logic and `canFoldSection`
   never see it.
 - The card padding narrows the width tags wrap in and adds top / bottom to the section's height: `widths`, `rowsFor`,
   `canFoldSection`, the content height and the layout all take the width from `contentColumn`.
