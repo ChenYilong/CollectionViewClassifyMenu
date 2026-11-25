@@ -2,5 +2,8 @@
   "navigationBarTitleText": "查询筛选",
   "navigationBarBackgroundColor": "#F2F2F7",
   "backgroundColor": "#F2F2F7",
-  "usingComponents": {}
+  "usingComponents": {
+    "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list",
+    "cyl-tag-animation-view": "/components/cyl-tag-animation-view/cyl-tag-animation-view"
+  }
 }
