@@ -413,7 +413,10 @@ open class CYLTagButton @JvmOverloads constructor(
         } else {
             CYLAnimatedItemBackgroundStyle.Flat
         }
-        itemBackgroundColor = backgroundColor
+        // Where glass is really drawn only an EXPLICIT color tints it: an unset one (the built-in default, which would hide the
+        // backdrop) is null and the view uses its frosted default. The pressed color is always explicit. Flat keeps the effective color.
+        val drawsGlass = style.resolvedBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        itemBackgroundColor = if (drawsGlass && !highlighted) appearance.explicitBackgroundColor else backgroundColor
         // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
         itemGlassTintAlpha = if (state == CYLControlState.SELECTED) 1f else null
         // The appearance's radius (CYLAnimatedItemCornerRadiusCapsule by default, 0 is square), set with the style and not

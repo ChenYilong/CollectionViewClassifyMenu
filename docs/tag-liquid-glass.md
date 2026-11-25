@@ -31,7 +31,7 @@ radius, `min(radius, height / 2)`).
 | Type | `CYLTagBackgroundStyle`: `flat` (default), `liquidGlass`. |
 | Where | A property of `CYLMenuStyle` (next to `tagContentAlignment`), copied with the style. |
 | Config key | `"backgroundStyle": "flat" \| "liquidGlass"`; an unknown value is `flat`. |
-| Tint | Each state's existing `backgroundColor` is the glass tint; no new appearance field. |
+| Tint | Under Liquid Glass only an EXPLICIT state `backgroundColor` tints the glass (the selected tag's tint, alpha 1; a color set by a preset or the app; the pressed color); alpha x 0.75 for the explicit non-selected colors. An UNSET one is ignored: the built-in default is not handed to the glass, so the component's frosted default shows and the backdrop shows through. Android: `CYLTagAppearance.explicitBackgroundColor` (null while never set; the built-in white / secondary system background does not count) is what `CYLTagButton` hands to `itemBackgroundColor` where glass is really drawn; the fold control and the outlined create cell copy a background only when it is set. Flat tags (and glass where none is drawn) are unchanged: the effective color. No new setter. |
 | Effective style | One function, `resolvedBackgroundStyle`: `liquidGlass` only when the platform's gate below is open; otherwise `flat` and every other parameter is unchanged. |
 | Radius | The glass is clipped to the resolved corner radius (PR #35: `min(radius, height / 2)`). |
 
@@ -64,7 +64,7 @@ blur or capsule code in this repository (grep clean), tests, labeled screenshots
 ## Interface (unchanged names)
 
 `CYLTagBackgroundStyle` `flat` (default) / `liquidGlass`; `CYLMenuStyle.backgroundStyle`, `resolvedBackgroundStyle`, `minimumTagSize`;
-config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's `backgroundColor` tints the glass.
+config keys `"backgroundStyle"` and `"minimumTagSize"`; the state's explicit `backgroundColor` tints the glass (Android: unset = `explicitBackgroundColor` null = frosted default).
 
 ## Status (2026-11-24): code on every platform, nothing tested on devices yet
 

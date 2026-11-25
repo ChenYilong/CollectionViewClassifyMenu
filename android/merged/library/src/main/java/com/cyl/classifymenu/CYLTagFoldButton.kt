@@ -89,7 +89,10 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
             val tint = control.color ?: itemStyle.foldControlColor ?: context?.let { itemStyle.resolvedTintColor(it) } ?: Color.BLACK
             for (state in listOf(CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 val appearance = style.appearanceForState(state)
-                appearance.backgroundColor = context?.let { normal.resolvedBackgroundColor(it) } ?: normal.backgroundColor
+                // Copied only when set: an unset background stays unset (never the resolved default as an explicit color), so
+                // under Liquid Glass the control gets the frosted default like the tags.
+                val normalBackground = normal.explicitBackgroundColor
+                if (normalBackground != null) appearance.backgroundColor = normalBackground else appearance.resetBackgroundColor()
                 appearance.borderColor = normal.borderColor
                 appearance.borderWidth = normal.borderWidth
                 appearance.cornerRadius = normal.cornerRadius

@@ -193,8 +193,9 @@ class CYLMenuStyle {
     private var backgroundColorWasSet: Boolean = false
 
     /**
-     * The list's background color, white by default. Under `insetGrouped` a list whose background the app never set shows
-     * the grouped background instead ([resolvedBackgroundColor]).
+     * The list's background color. Never set, the list paints the SYSTEM background (white in light mode, black in dark mode),
+     * or the grouped background under `insetGrouped` ([resolvedBackgroundColor], resolved per mode); this getter then returns
+     * white, the light value, because it has no context. A set color, even a transparent one, wins in both modes.
      */
     var backgroundColor: Int
         get() = backgroundColorValue
@@ -202,6 +203,9 @@ class CYLMenuStyle {
             backgroundColorValue = value
             backgroundColorWasSet = true
         }
+
+    /** The list background the app set, null while it was never set (the default follows light / dark mode). */
+    internal val explicitBackgroundColor: Int? get() = if (backgroundColorWasSet) backgroundColorValue else null
 
     // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
     /** `plain` (the default) or `insetGrouped`: the section's tags inside a rounded card. */
@@ -244,9 +248,15 @@ class CYLMenuStyle {
     /** True when the section style draws the cards. */
     val isInsetGrouped: Boolean get() = sectionStyle == CYLSectionStyle.CYLSectionStyleInsetGrouped
 
-    /** The list background in use: the grouped background where `insetGrouped` and the app never set [backgroundColor]. */
-    fun resolvedBackgroundColor(context: android.content.Context): Int =
-        if (isInsetGrouped && !backgroundColorWasSet) CYLSectionStyleColors.groupedBackground(context) else backgroundColorValue
+    /**
+     * The list background in use: [backgroundColor] when the app set it (even transparent); else the grouped background under
+     * `insetGrouped`, else the system background (white in light mode, black in dark mode).
+     */
+    fun resolvedBackgroundColor(context: android.content.Context): Int = when {
+        backgroundColorWasSet -> backgroundColorValue
+        isInsetGrouped -> CYLSectionStyleColors.groupedBackground(context)
+        else -> CYLSystemColors.systemBackground(context)
+    }
 
     /** The card's color in use. */
     fun resolvedSectionBackgroundColor(context: android.content.Context): Int = sectionBackgroundColor ?: CYLSectionStyleColors.card(context)
@@ -292,7 +302,7 @@ class CYLMenuStyle {
     /**
      * The tint as drawn: [tintColor], else the default against what is behind the view: the band color when `onBand` (a
      * header with a band) and a band is set, else the list's own background ([resolvedBackgroundColor]: the app's color, the
-     * grouped background under `insetGrouped`, the default white the list paints).
+     * grouped background under `insetGrouped`, the system background the list paints by default).
      */
     @JvmOverloads
     fun resolvedTintColor(context: android.content.Context, onBand: Boolean = false): Int {
