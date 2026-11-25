@@ -32,9 +32,10 @@ the reason is recorded here (a platform's row is not final until its assessment 
    behind the list that are not ancestors: only the app can name sibling content behind the list, so the library takes it as one parameter and does not guess.
    Follow-up (needs a CYLTabBarController change, the glass view takes a View, not a Drawable): the nearest ancestor's background
    `Drawable` is a legal source (drawing it redraws no recording view) and would cover "a gradient set as the page background" with no wiring.
-   Unverified: a tag moves with its list, the tab bar does not; whether the glass samples the right region while the list scrolls (it
-   may only update in `onDraw`) must be checked on an API 31+ device by scrolling over a striped plate; if stale, invalidate the glass
-   views from the list's scroll listener.
+   Scroll: a tag moves with its list, the tab bar does not. The check on an API 31+ emulator (CYLTabBarController `afc59d1c`, a plate
+   behind a `ListView` with the list as its header) showed the glass at rest samples the plate but is NOT resampled after a 600 px swipe
+   (the glass samples in `onDraw` only and the child display lists are cached). Fixed in `CYLTagListView` (a pre-draw listener that
+   invalidates the glass layers when the list's place in the window or its scroll offsets change); the capture after the fix is still to be taken.
 3. **React Native and Flutter (not done), four cases, not one:** React Native renders real native views, so the gradient behind an RN
    tag list is a native view: RN-iOS should already work through the system glass with a clear list background (to verify on the Mac),
    RN-Android needs the bridge to name that view (for example a `nativeID` or ref resolved natively to `backdropSource`). Flutter draws
@@ -46,7 +47,7 @@ the reason is recorded here (a platform's row is not final until its assessment 
 
 - Item 1 (iOS): sound; cite the code (done above); the below-iOS-26 fallback must be stated as it is (flat for the tag).
 - Item 2 (Android): acceptable for v1, but "only the app knows" was too strong (see the ancestor-background follow-up) and the scroll
-  behaviour is unverified: the row stays **pending** until the API 31+ capture and the scroll check are in.
+  behaviour is unverified: the row stays **pending** until the API 31+ capture after the scroll fix is in.
 - Item 3 (RN, Flutter): not sound as first written (RN renders native views); rewritten as four cases above.
 - HarmonyOS: a possible fourth deviation, checked: tab bar and item both use ArkUI `backgroundEffect` with the shared tokens, so no
   deviation; but the tail fold control is not glass on HarmonyOS yet (open, the examples rule needs it).

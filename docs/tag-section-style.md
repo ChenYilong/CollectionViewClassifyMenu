@@ -154,6 +154,13 @@ The integrator feedback "align the header title with the board's edge" is **decl
 
 ## Android backdropSource (a list of glass tags and boards that really samples)
 
+**Scrolling.** The glass samples only when it draws, and a moved view keeps its cached display list, so while the list is moved by an
+ancestor (for example a `ListView` header) or scrolls its own content the glass would keep the colors of its old place (reproduced on an
+emulator: cards at the top kept the cyan they had lower down). Fixed in the list: while `backdropSource` is set and the list is
+attached, a pre-draw listener compares the list's place in the window and its scroll offsets with the last frame and invalidates every
+glass layer when they changed; with no source nothing is observed. Unit-tested (invalidation on move, none at rest, none without a
+source); the device capture after the fix is still to be taken.
+
 Android's Liquid Glass (`CYLLiquidGlassView`) blurs and refracts a backdrop SOURCE view. The default source is the root of
 the window's views, which CONTAINS the list, so a tag, a fold control or a section board inside a list is inside its own
 source and draws only its tint and rim (docs/tag-liquid-glass.md). `CYLTagListView.backdropSource` (`var backdropSource: View? = null`) names another source.

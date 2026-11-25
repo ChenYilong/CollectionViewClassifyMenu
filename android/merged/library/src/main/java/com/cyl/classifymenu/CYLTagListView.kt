@@ -128,7 +128,52 @@ open class CYLTagListView @JvmOverloads constructor(
             field = value
             titleView.itemGlassBackdropSource = value
             content.applyBackdropSource()
+            updateGlassResampling()
         }
+
+    /**
+     * The glass samples its source only when it draws, and a moved view keeps its cached display list: while the list is moved
+     * by an ancestor (a ListView header, a ScrollView, an animation) or scrolls its own content, the glass would keep the colors
+     * of where it was. While `backdropSource` is set and the list is attached, a pre-draw listener compares the list's place in
+     * the window and its scroll offsets with the last frame and invalidates every glass host when they changed.
+     */
+    private val windowPosition = IntArray(WINDOW_POSITION_SIZE)
+    private val glassPlace = IntArray(GLASS_PLACE_SIZE)
+    private val lastGlassPlace = IntArray(GLASS_PLACE_SIZE) { Int.MIN_VALUE }
+    private var glassResamplingOn = false
+    private val glassResampleListener = android.view.ViewTreeObserver.OnPreDrawListener {
+        resampleGlassWhenMoved()
+        true
+    }
+
+    private fun updateGlassResampling() {
+        val wanted = backdropSource != null && isAttachedToWindow
+        if (wanted == glassResamplingOn) return
+        glassResamplingOn = wanted
+        if (wanted) {
+            lastGlassPlace.fill(Int.MIN_VALUE)
+            viewTreeObserver.addOnPreDrawListener(glassResampleListener)
+        } else {
+            viewTreeObserver.removeOnPreDrawListener(glassResampleListener)
+        }
+    }
+
+    private fun resampleGlassWhenMoved() {
+        getLocationInWindow(windowPosition)
+        glassPlace[PLACE_X] = windowPosition[0]
+        glassPlace[PLACE_Y] = windowPosition[1]
+        glassPlace[PLACE_SCROLL_X] = scrollView.scrollX
+        glassPlace[PLACE_SCROLL_Y] = scrollView.scrollY
+        if (glassPlace.contentEquals(lastGlassPlace)) return
+        glassPlace.copyInto(lastGlassPlace)
+        titleView.itemLiquidGlassView?.invalidate()
+        content.invalidateGlassHosts()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        updateGlassResampling()
+    }
 
     private var titles: List<List<String>> = emptyList()
     private var itemWidths: List<List<Float>> = emptyList()
@@ -155,6 +200,8 @@ open class CYLTagListView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         dismissCallout()
+        // isAttachedToWindow is already false here, so this removes the listener.
+        updateGlassResampling()
         super.onDetachedFromWindow()
     }
 
@@ -177,6 +224,14 @@ open class CYLTagListView @JvmOverloads constructor(
         this(context, foldControl, null, null, CYLMenuTitlePosition.CYLMenuTitlePositionTopLeading)
 
     companion object {
+        /** The slots of the place the glass last drew at: x and y in the window, then the scroll offsets of the content. */
+        private const val PLACE_X = 0
+        private const val PLACE_Y = 1
+        private const val PLACE_SCROLL_X = 2
+        private const val PLACE_SCROLL_Y = 3
+        private const val GLASS_PLACE_SIZE = 4
+        private const val WINDOW_POSITION_SIZE = 2
+
         /** `+tagListViewWithFoldPosition:content:`. */
         @JvmStatic
         fun tagListViewWithFoldPosition(context: Context, position: CYLMenuFoldControlPosition, content: CYLMenuFoldControlContent) =
@@ -1991,6 +2046,15 @@ open class CYLTagListView @JvmOverloads constructor(
             for (header in headers.values) header.foldButton.itemGlassBackdropSource = source
             for (footer in footers.values) footer.foldButton.itemGlassBackdropSource = source
             for (board in glassCards.values) board.itemGlassBackdropSource = source
+        }
+
+        /** Invalidates the glass layer of every host shown (see `resampleGlassWhenMoved`): the tags, fold controls and boards. */
+        fun invalidateGlassHosts() {
+            for (cell in cells.values) cell.button.itemLiquidGlassView?.invalidate()
+            for (cell in foldCells.values) cell.foldButton.itemLiquidGlassView?.invalidate()
+            for (header in headers.values) header.foldButton.itemLiquidGlassView?.invalidate()
+            for (footer in footers.values) footer.foldButton.itemLiquidGlassView?.invalidate()
+            for (board in glassCards.values) board.itemLiquidGlassView?.invalidate()
         }
 
         init {

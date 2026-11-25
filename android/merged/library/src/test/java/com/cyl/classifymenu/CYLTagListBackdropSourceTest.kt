@@ -199,7 +199,42 @@ class CYLTagListBackdropSourceTest {
         assertNull(outside.itemGlassBackdropSource)
     }
 
+    /** Moving the list (an ancestor scrolls it, an animation) invalidates every glass layer, so the glass samples its new place. */
+    @Test
+    @Config(sdk = [34])
+    fun movingTheListInvalidatesEveryGlassLayerWhileASourceIsSet() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        val list = makeList(sectionStyle(glassBoard = true))
+        val plate = View(context)
+        list.backdropSource = plate
+        list.viewTreeObserver.dispatchOnPreDraw()
+        val layers = glassHosts(list).mapNotNull { it.itemLiquidGlassView }
+        assertTrue(layers.isNotEmpty())
+        for (layer in layers) shadowOf(layer).clearWasInvalidated()
+
+        list.viewTreeObserver.dispatchOnPreDraw()
+        for (layer in layers) assertTrue("not moved: no invalidate", !shadowOf(layer).wasInvalidated())
+
+        list.translationY = MOVE_PX
+        list.viewTreeObserver.dispatchOnPreDraw()
+        for (layer in layers) assertTrue("moved: the glass is invalidated", shadowOf(layer).wasInvalidated())
+    }
+
+    /** Without a source nothing observes the list (the default is unchanged). */
+    @Test
+    @Config(sdk = [34])
+    fun noSourceInvalidatesNothingWhenTheListMoves() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        val list = makeList(sectionStyle(glassBoard = true))
+        val layers = glassHosts(list).mapNotNull { it.itemLiquidGlassView }
+        for (layer in layers) shadowOf(layer).clearWasInvalidated()
+        list.translationY = MOVE_PX
+        list.viewTreeObserver.dispatchOnPreDraw()
+        for (layer in layers) assertTrue(!shadowOf(layer).wasInvalidated())
+    }
+
     private companion object {
+        const val MOVE_PX = 50f
         const val WIDTH_PX = 320
         const val SECTION_COUNT = 2
         const val SHORT_SECTION_TAGS = 3
