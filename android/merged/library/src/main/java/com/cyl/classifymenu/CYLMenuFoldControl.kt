@@ -11,11 +11,15 @@ enum class CYLMenuFoldControlPosition {
     TAIL,
 }
 
-/** `CYLMenuFoldControlContent`: what a fold control shows. */
+/**
+ * `CYLMenuFoldControlContent`: what a fold control shows. The raw order matches iOS: IconAndTitle 0, Title 1, Icon 2,
+ * TitleAndIcon 3 (title and icon ALWAYS: "More" + chevron folded, "Less" + the chevron turned 180 degrees expanded).
+ */
 enum class CYLMenuFoldControlContent {
     CYLMenuFoldControlContentIconAndTitle,
     CYLMenuFoldControlContentTitle,
     CYLMenuFoldControlContentIcon,
+    CYLMenuFoldControlContentTitleAndIcon,
 }
 
 /**
@@ -54,11 +58,18 @@ class CYLMenuFoldControl {
     var font: CYLFont? = null
     var rotatesImageWhenExpanded: Boolean = true
 
-    fun showsImageWhenExpanded(expanded: Boolean): Boolean = content != CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle
+    fun showsImageWhenExpanded(expanded: Boolean): Boolean = when (content) {
+        CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle -> false
+        CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
+        CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon,
+        // Always shown; turned when expanded (`rotatesImageWhenExpanded`).
+        CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon -> true
+    }
 
     fun showsTitleWhenExpanded(expanded: Boolean): Boolean = when (content) {
         CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle -> !expanded
-        CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle -> true
+        CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle,
+        CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon -> true
         CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon -> false
     }
 
