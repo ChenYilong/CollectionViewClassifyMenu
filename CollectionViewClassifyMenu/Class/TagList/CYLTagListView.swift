@@ -64,6 +64,74 @@ import UIKit
     case truncate
 }
 
+// MARK: - Header room
+
+/**
+ * The widths inside a section header, one model for the layout (`CYLTagListHeaderView`) and the height (`headerHeight(forSection:)`):
+ * INNER WIDTH is the header's width between its leading and trailing insets; the views are separated by `spacing`; the fold control
+ * is `min(natural width of its wider state, cap x inner)` (cap 0.4 alone, 0.3 with More / clear / an accessory view, the same width
+ * collapsed and expanded); an accessory view is at most 0.3 of the inner width; only the title shrinks, to
+ * `max(one em, inner - the fixed parts - the spacings)`, or the inner width when nothing else is shown.
+ */
+struct CYLTagListHeaderRoom {
+
+    /**
+     * The gap between two adjacent header views.
+     */
+    static let spacing: CGFloat = 8
+    /**
+     * The fold control's cap as a fraction of the inner width: alone, and next to More / clear / an accessory view.
+     */
+    static let foldFractionAlone: CGFloat = 0.4
+    static let foldFractionShared: CGFloat = 0.3
+    /**
+     * The accessory view's cap as a fraction of the inner width.
+     */
+    static let accessoryFraction: CGFloat = 0.3
+    /**
+     * The control's own margin: its content lines up with the title, so it takes this much less than its width.
+     */
+    static let foldMargin: CGFloat = 6
+
+    let foldWidth: CGFloat
+    let accessoryWidth: CGFloat
+    let titleWidth: CGFloat
+
+    /**
+     * - `foldNaturalWidth`: the wider of the fold control's two states; `nil`: no fold control in this header.
+     * - `moreExtent`, `clearSide`, `accessoryNaturalWidth`: the width each takes; `nil`: not shown.
+     * - `indicatorWidth`: the indicator bar's width; `nil`: none.
+     */
+    init(inner: CGFloat, indicatorWidth: CGFloat?, foldNaturalWidth: CGFloat?, moreExtent: CGFloat?, clearSide: CGFloat?,
+         accessoryNaturalWidth: CGFloat?, em: CGFloat) {
+        let spacing = Self.spacing
+        let shares = moreExtent != nil || clearSide != nil || accessoryNaturalWidth != nil
+        var fixed: CGFloat = 0
+        if let indicatorWidth {
+            fixed += indicatorWidth + spacing
+        }
+        if let moreExtent {
+            fixed += moreExtent + spacing
+        }
+        if let clearSide {
+            fixed += clearSide + spacing
+        }
+        var accessory: CGFloat = 0
+        if let accessoryNaturalWidth {
+            accessory = min(accessoryNaturalWidth, inner * Self.accessoryFraction)
+            fixed += accessory + spacing
+        }
+        var fold: CGFloat = 0
+        if let foldNaturalWidth {
+            fold = min(foldNaturalWidth, inner * (shares ? Self.foldFractionShared : Self.foldFractionAlone))
+            fixed += fold - Self.foldMargin + spacing
+        }
+        foldWidth = fold
+        accessoryWidth = accessory
+        titleWidth = max(em, inner - fixed)
+    }
+}
+
 // MARK: - Header
 
 /**
@@ -78,6 +146,13 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
      */
     static let moreButtonSize: CGFloat = 44
     static let iconSize: CGFloat = 16
+
+    /**
+     * What the More button takes at the trailing edge: its touch target less the part that sticks out so the icon lines up with the inset.
+     */
+    static func moreExtent(iconWidth: CGFloat) -> CGFloat {
+        moreButtonSize - floor((moreButtonSize - iconWidth) / 2)
+    }
 
     /**
      * The section's icon and title: the same component as the tags, so a section icon can be anything a tag icon can.
@@ -220,56 +295,61 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
 
     private func layOutLeadingToTrailing(width: CGFloat, height: CGFloat) {
         layoutDecorations(width: width, height: height)
+        let spacing = CYLTagListHeaderRoom.spacing
+        let inner = max(0, width - leadingInset - trailingInset)
+        let moreSize = min(Self.moreButtonSize, height > 0 ? max(height, 30) : Self.moreButtonSize)
+        let moreIconWidth = moreButton.currentImage?.size.width ?? 22
+        let clearSide = min(height, ceil(titleButton.titleLabel.font?.lineHeight ?? 17))
+        let room = CYLTagListHeaderRoom(
+            inner: inner, indicatorWidth: indicatorView.isHidden ? nil : indicatorSize.width,
+            foldNaturalWidth: foldButton.isHidden ? nil : foldSize.width,
+            moreExtent: moreButton.isHidden ? nil : Self.moreExtent(iconWidth: moreIconWidth),
+            clearSide: clearButton.isHidden ? nil : ceil(titleButton.titleLabel.font?.lineHeight ?? 17),
+            accessoryNaturalWidth: accessoryView.map { $0.sizeThatFits(CGSize(width: inner, height: .greatestFiniteMagnitude)).width },
+            em: titleButton.titleLabel.font?.pointSize ?? 17)
         var trailing = width - trailingInset
         var leading = leadingInset
         if !moreButton.isHidden {
             // A 44 pt touch target whose icon lines up with the trailing inset.
-            let size = min(Self.moreButtonSize, height > 0 ? max(height, 30) : Self.moreButtonSize)
-            let iconWidth = moreButton.currentImage?.size.width ?? 22
-            trailing += floor((size - iconWidth) / 2)
-            trailing -= size
-            moreButton.frame = CGRect(x: trailing, y: floor((height - size) / 2), width: size, height: size)
-            trailing -= 4
+            moreButton.frame = CGRect(x: trailing + floor((moreSize - moreIconWidth) / 2) - moreSize, y: floor((height - moreSize) / 2),
+                                      width: moreSize, height: moreSize)
+            trailing -= Self.moreExtent(iconWidth: moreIconWidth) + spacing
         }
         if !clearButton.isHidden {
             // A square as tall as a line of the title, at the trailing inset; aligned with the title text below.
-            let side = min(height, ceil(titleButton.titleLabel.font?.lineHeight ?? 17))
-            trailing -= side
-            clearButton.frame = CGRect(x: trailing, y: floor((height - side) / 2), width: side, height: side)
-            trailing -= 8
+            trailing -= clearSide
+            clearButton.frame = CGRect(x: trailing, y: floor((height - clearSide) / 2), width: clearSide, height: clearSide)
+            trailing -= spacing
         }
         if !foldButton.isHidden {
-            // At most 40% of the header (CYLTagFoldButton.maximumHeaderWidthFraction), so that the section title keeps
-            // the rest and is the one that truncates.
-            let maximumWidth = width * CYLTagFoldButton.maximumHeaderWidthFraction
-            let size = CGSize(width: min(foldSize.width, maximumWidth), height: min(foldSize.height, height))
+            let size = CGSize(width: room.foldWidth, height: min(foldSize.height, height))
             let y = floor((height - size.height) / 2)
             // The control's own margin lines its content up with the title.
             if foldAtLeadingEdge {
-                foldButton.frame = CGRect(x: leading - 6, y: y, width: size.width, height: size.height)
-                leading += size.width - 6 + 4
+                foldButton.frame = CGRect(x: leading - CYLTagListHeaderRoom.foldMargin, y: y, width: size.width, height: size.height)
+                leading += size.width - CYLTagListHeaderRoom.foldMargin + spacing
             } else {
-                trailing -= size.width - 6
+                trailing -= size.width - CYLTagListHeaderRoom.foldMargin
                 foldButton.frame = CGRect(x: trailing, y: y, width: size.width, height: size.height)
-                trailing -= 8
+                trailing -= spacing
             }
         }
         if let accessoryView {
-            var size = accessoryView.sizeThatFits(CGSize(width: width / 2, height: height))
-            size.width = min(size.width, width / 2)
+            var size = accessoryView.sizeThatFits(CGSize(width: room.accessoryWidth, height: height))
+            size.width = room.accessoryWidth
             size.height = min(max(size.height, 1), height)
             trailing -= size.width
             accessoryView.frame = CGRect(x: trailing, y: floor((height - size.height) / 2), width: size.width,
                                          height: size.height)
-            trailing -= 8
+            trailing -= spacing
         }
         var x = leading
         if !indicatorView.isHidden {
             indicatorView.frame = CGRect(x: x, y: floor((height - indicatorSize.height) / 2),
                                          width: indicatorSize.width, height: indicatorSize.height)
-            x += indicatorSize.width + 8
+            x += indicatorSize.width + spacing
         }
-        titleButton.frame = CGRect(x: x, y: 0, width: max(0, trailing - x), height: height)
+        titleButton.frame = CGRect(x: x, y: 0, width: room.titleWidth, height: height)
         if !clearButton.isHidden {
             // The rule: the clear button's top and bottom are the title text's (the element to its left).
             titleButton.layoutIfNeeded()
@@ -2279,6 +2359,14 @@ private extension CYLTagListView {
         CYLTagFoldButton.size(for: foldControl, expanded: expanded, traitCollection: traitCollection)
     }
 
+    /**
+     * The fold control in a header: the wider of the two states' widths (the header does not change when the section folds), the height of `expanded`.
+     */
+    func headerFoldSize(expanded: Bool) -> CGSize {
+        let size = foldSize(expanded: expanded)
+        return CGSize(width: max(foldSize(expanded: false).width, foldSize(expanded: true).width), height: size.height)
+    }
+
     var footerHeight: CGFloat {
         max(Self.footerHeight, foldSize(expanded: false).height)
     }
@@ -2319,26 +2407,24 @@ private extension CYLTagListView {
         }
         let source = menuDataSource
         let edges = headerEdgeInsets(atWidth: width)
-        var room = width - edges.leading - edges.trailing
-        if style.headerIndicatorColor != nil {
-            room -= style.headerIndicatorSize.width + 8
-        }
-        if foldControlIsInHeader && canFold {
-            // The wider of the two states, so the header does not change height when the section folds.
-            let foldWidth = max(foldSize(expanded: false).width, foldSize(expanded: true).width)
-            room -= min(foldWidth, width / 2) - 6 + (foldControl.position == .headerLeading ? 4 : 8)
-        }
+        let font = style.headerFont(for: traitCollection)
+        var moreExtent: CGFloat?
         if showsMoreButton(inSection: section) {
             let image = style.moreButtonImage ?? UIImage(systemName: "ellipsis")
-            let iconWidth = image?.size.width ?? 22
-            room -= CYLTagListHeaderView.moreButtonSize - floor((CYLTagListHeaderView.moreButtonSize - iconWidth) / 2) + 4
+            moreExtent = CYLTagListHeaderView.moreExtent(iconWidth: image?.size.width ?? 22)
         }
-        if source?.menuShowsClearButton?(forSection: section) == true {
-            room -= ceil(style.headerFont(for: traitCollection).lineHeight) + 8
-        }
+        let inner = max(0, width - edges.leading - edges.trailing)
+        let room = CYLTagListHeaderRoom(
+            inner: inner, indicatorWidth: style.headerIndicatorColor == nil ? nil : style.headerIndicatorSize.width,
+            foldNaturalWidth: foldControlIsInHeader && canFold ? headerFoldSize(expanded: false).width : nil,
+            moreExtent: moreExtent,
+            clearSide: source?.menuShowsClearButton?(forSection: section) == true ? ceil(font.lineHeight) : nil,
+            accessoryNaturalWidth: source?.menuAccessoryView?(forSection: section)
+                .map { $0.sizeThatFits(CGSize(width: inner, height: .greatestFiniteMagnitude)).width },
+            em: font.pointSize)
         let icon = source?.menuImage?(forSection: section) == nil ? CGSize.zero
             : CGSize(width: CYLTagListHeaderView.iconSize, height: CYLTagListHeaderView.iconSize)
-        let text = CYLTagButton.height(forTitle: title, iconSize: icon, width: max(1, room), showsDeleteIndicator: false,
+        let text = CYLTagButton.height(forTitle: title, iconSize: icon, width: max(1, room.titleWidth), showsDeleteIndicator: false,
                                        style: headerTitleStyle(), traitCollection: traitCollection)
         return max(base, ceil(text) + (sizesHeaderToText ? CYLSectionStyleMetrics.headerBoardTitlePadding : 12))
     }
@@ -2672,7 +2758,7 @@ private extension CYLTagListView {
         }
         if let header = header(inSection: section), !header.foldButton.isHidden {
             configureFoldButton(header.foldButton, section: section, expanded: expanded, animated: animated)
-            header.foldSize = foldSize(expanded: expanded)
+            header.foldSize = headerFoldSize(expanded: expanded)
             header.setNeedsLayout()
         }
     }
@@ -3144,7 +3230,7 @@ extension CYLTagListView: UICollectionViewDataSource {
         if showsFoldButton {
             let expanded = isSectionExpanded(section)
             configureFoldButton(header.foldButton, section: section, expanded: expanded, animated: false)
-            header.foldSize = foldSize(expanded: expanded)
+            header.foldSize = headerFoldSize(expanded: expanded)
         }
         // Section titles hidden: the header only holds the fold control.
         header.titleButton.isHidden = !showsSectionHeaders
