@@ -17,6 +17,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.time.Duration
 
@@ -34,6 +35,7 @@ private class CYLTitleAndIconSource(count: Int) : CYLMenuDataSource {
  * "Less" + the chevron turned expanded; the control keeps its size in both states, and a header shows it only on a foldable section.
  */
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class CYLFoldControlTitleAndIconTest {
 
@@ -248,7 +250,7 @@ class CYLFoldControlTitleAndIconTest {
 
     @Test
     fun aLongCollapseTitleIsCappedAndTheTitleStillGetsItsRoom() {
-        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list" }
+        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" }
         val list = roomList(fixedSource(), fold)
         assertTrue("the natural width is above the cap", naturalFold(fold) > INNER * FOLD_ALONE_FRACTION)
         assertEquals(INNER * FOLD_ALONE_FRACTION, foldButtonOf(list).width.toFloat(), 1f)
@@ -257,7 +259,7 @@ class CYLFoldControlTitleAndIconTest {
 
     @Test
     fun foldMoreClearAndAccessoryTogetherFitTheInnerWidth() {
-        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list" }
+        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" }
         val list = roomList(fixedSource(more = true, clear = true, withAccessory = true), fold)
         val foldWidth = minOf(naturalFold(fold), INNER * FOLD_SHARED_FRACTION)
         assertTrue("the fold control is at most 30% of the inner width", foldButtonOf(list).width <= INNER * FOLD_SHARED_FRACTION + 0.5f)
@@ -276,12 +278,12 @@ class CYLFoldControlTitleAndIconTest {
 
     @Test
     fun collapsedAndExpandedGiveTheSameTitleRoomAndFoldWidth() {
-        val list = roomList(fixedSource(more = true), foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list" })
+        val list = roomList(fixedSource(more = true), foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" })
         val titleWidth = titleOf(list).width
         val foldWidth = foldButtonOf(list).width
         list.setExpanded(true, 0, false)
         frames()
-        assertEquals("Show fewer tags in this section of the list", foldButtonOf(list).titleLabel.text.toString())
+        assertEquals("Show fewer tags in this section of the list, and keep the rest of the page tidy for later", foldButtonOf(list).titleLabel.text.toString())
         assertEquals(titleWidth, titleOf(list).width)
         assertEquals(foldWidth, foldButtonOf(list).width)
     }
@@ -304,7 +306,7 @@ class CYLFoldControlTitleAndIconTest {
 
     @Test
     fun rightToLeftMirrorsTheFoldOnlyAndTheFullHeader() {
-        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list" }
+        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" }
         for (full in listOf(false, true)) {
             fun make(rtl: Boolean) = roomList(fixedSource(more = full, clear = full, withAccessory = full), fold, rtl)
             val ltr = make(false)

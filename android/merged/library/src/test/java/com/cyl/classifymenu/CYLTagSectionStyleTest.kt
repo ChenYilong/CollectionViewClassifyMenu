@@ -612,7 +612,7 @@ class CYLTagSectionStyleTest {
         }
         val list = makeList(style, 6, 3)
         val board = glassCards(list).first() as com.cyl.animateditem.CYLAnimatedItemView
-        val tag = descendants(list).filterIsInstance<CYLTagButton>().first()
+        val tag = list.tagButtonAtIndexPath(CYLIndexPath(0, 0))!!
         assertNull(board.itemBackgroundColor)
         assertNull(tag.itemBackgroundColor)
         assertEquals(tag.itemBackgroundStyle, board.itemBackgroundStyle)
