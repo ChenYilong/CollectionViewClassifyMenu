@@ -92,6 +92,9 @@ internal object CYLSystemColors {
         }
     }
 
+    /** The system background (iOS `systemBackground`): white in light mode, black in dark mode; the default list background. */
+    fun systemBackground(context: android.content.Context): Int = if (isNight(context)) Color.BLACK else Color.WHITE
+
     /** The secondary system background of dark mode (iOS #1C1C1E), the default tag background there. */
     const val SECONDARY_BACKGROUND_DARK: Int = -0xe3e3e2 // 0xFF1C1C1E
 }

@@ -28,6 +28,12 @@ class CYLTagAppearance : Cloneable {
     fun resolvedBackgroundColor(context: android.content.Context): Int =
         _backgroundColor ?: if (CYLSystemColors.isNight(context)) CYLSystemColors.SECONDARY_BACKGROUND_DARK else android.graphics.Color.WHITE
 
+    /**
+     * The background the app (or a style) set for this state, null while it was never set: the built-in default (white, or
+     * the secondary system background in night mode) does not count. Under Liquid Glass only this color tints the glass.
+     */
+    val explicitBackgroundColor: Int? get() = _backgroundColor
+
     /** The title color in use: [textColor] when set, else dark gray, or the list's primary tint in night mode. */
     fun resolvedTextColor(context: android.content.Context): Int =
         _textColor ?: if (CYLSystemColors.isNight(context)) CYLSystemColors.primary(context) else CYLColor.white(0.25f)

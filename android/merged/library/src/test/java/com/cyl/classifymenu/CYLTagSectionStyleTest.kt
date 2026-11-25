@@ -279,6 +279,62 @@ class CYLTagSectionStyleTest {
 
     private fun backgroundPixel(list: CYLTagListView): Int = list.backgroundColorInUse
 
+    // MARK: The default list background follows light / dark mode (docs/tag-section-style.md)
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun theDefaultListBackgroundIsWhiteInLightMode() {
+        assertEquals(Color.WHITE, CYLMenuStyle().resolvedBackgroundColor(context))
+        assertEquals(Color.WHITE, backgroundPixel(makeList(CYLMenuStyle(), 3)))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun theDefaultListBackgroundIsBlackInDarkMode() {
+        assertEquals(Color.BLACK, CYLMenuStyle().resolvedBackgroundColor(context))
+        assertEquals(Color.BLACK, backgroundPixel(makeList(CYLMenuStyle(), 3)))
+        assertEquals(Color.BLACK, CYLMenuStyle().copy().resolvedBackgroundColor(context))
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun aSetTransparentBackgroundWinsInLightMode() {
+        val style = CYLMenuStyle().also { it.backgroundColor = Color.TRANSPARENT }
+        assertEquals(Color.TRANSPARENT, style.resolvedBackgroundColor(context))
+        assertEquals(Color.TRANSPARENT, backgroundPixel(makeList(style, 3)))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun aSetTransparentBackgroundWinsInDarkMode() {
+        val style = CYLMenuStyle().also { it.backgroundColor = Color.TRANSPARENT }
+        assertEquals(Color.TRANSPARENT, style.resolvedBackgroundColor(context))
+        assertEquals(Color.TRANSPARENT, style.copy().resolvedBackgroundColor(context))
+        assertEquals(Color.TRANSPARENT, backgroundPixel(makeList(style, 3)))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun aSetWhiteBackgroundIsKeptInDarkMode() {
+        val style = CYLMenuStyle().also { it.backgroundColor = Color.WHITE }
+        assertEquals(Color.WHITE, style.resolvedBackgroundColor(context))
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun theTintOnTheDefaultBackgroundIsDarkInLightMode() {
+        assertEquals(Color.BLACK, CYLMenuStyle().resolvedTintColor(context))
+        assertEquals(Color.BLACK, titleColor(makeList(CYLMenuStyle(), 2)))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun theTintOnTheDefaultBackgroundIsLightInDarkMode() {
+        assertEquals(Color.WHITE, CYLMenuStyle().resolvedTintColor(context))
+        assertEquals(Color.WHITE, CYLMenuStyle().resolvedHeaderTextColor(context))
+        assertEquals(Color.WHITE, titleColor(makeList(CYLMenuStyle(), 2)))
+    }
+
     @Test
     @Config(qualifiers = "notnight")
     fun theListDrawsTheGroupedBackgroundUnderInsetGrouped() {
@@ -510,7 +566,8 @@ class CYLTagSectionStyleTest {
     @Test
     @Config(qualifiers = "night")
     fun theTintIsDarkOnALightBackgroundWhateverTheMode() {
-        val style = plain()
+        // A light background the app set (the unset default is black in dark mode, see theDefaultListBackgroundFollowsTheMode).
+        val style = plain().also { it.backgroundColor = Color.WHITE }
         assertEquals(Color.BLACK, style.resolvedTintColor(context))
         assertEquals(Color.BLACK, style.resolvedHeaderTextColor(context))
         assertEquals(Color.BLACK, style.resolvedFoldControlColor(context))
