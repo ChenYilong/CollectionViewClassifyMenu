@@ -269,3 +269,31 @@ This work existed only as uncommitted changes on one Mac. It is committed so tha
 |---|---|---|---|
 | [#40](https://github.com/ChenYilong/CollectionViewClassifyMenu/pull/40) `wip/ios-repin-1d356a0a-simulator-screenshots` into `feat/harmony` (conflicting) | Old component repin to `1d356a0a` and the TODO "run the simulator and take the screenshots" (2026-11-21). Not built; why it stopped is not recorded | Unfinished, pin part superseded | On `fix/shared-contrast-ios`: only add the screenshots if they are still missing, then close the pull request |
 | [#41](https://github.com/ChenYilong/CollectionViewClassifyMenu/pull/41) `wip/ios-corner-radius-pod-install-pbxproj` into `feat/corner-radius-numeric` | Example project file, apparently from a local `pod install`. Not built | Superseded: `fix/shared-contrast-ios` has the same kinds of entries | Close the pull request; do not merge the old project file over the current one |
+
+## 12. Added 2026-11-27 (Windows session): step 3, merge the Windows work into the head
+
+User prompt (verbatim): "拉取远端最新代码，找到本项目最近的一条commit所在分支，切换到最近提交所在分支。阅读分支下，docs 文件夹下的包含 handover 文字的文件夹，遍历文件夹中的所有文件以及子文件夹下的所有文件。阅读交接文档完成交接任务。开始编写代码。"
+
+Split with the Mac session: Mac takes steps 1 and 2 (iOS verification, CI path, `ios.yml`); Windows takes step 3. iOS sources, `ios.yml` and the 9 iOS pins are not touched here.
+
+**Facts that differ from section 0:** the Windows head is now `c75f81e3` (not `4c20779c`): 77 commits not in the head, Windows pins moved to CYLTabBarController `b5b36fbf` (pushed, checked with `gh api`). iOS stays on `4d0e00ae`: the iOS repin is macOS work.
+
+**Merge** (local branch `merge/glass-backdrop-into-head`, worktree `C:/w/cvcm-merge`, from `fix/shared-contrast-ios` `f32ffe6f`): 113 files, 2 conflicts.
+
+| File | Resolution |
+|---|---|
+| `docs/tag-liquid-glass.md` | Both sections kept (iOS wiring, then the Windows "Colour channels" section); platform table: iOS row from the head, the other rows and the "Glass border rule" section from Windows (the head's rows described the removed `CYLIconContrast`) |
+| `react-native/.../CylTagListConfiguration.ts` | Windows comment (the shared item adapts explicit and built-in colours; matches iOS) |
+
+**Tests on the merged tree (Windows):**
+
+| Suite | Result |
+|---|---|
+| Mini program `node --test` | 326 / 326 (after `node scripts/fetch-cyltabbar.js`; without it 1 module-not-found failure, the fetched folder is ignored) |
+| Android `testDebugUnitTest` | 305 tests, 1 failure: the known Windows path failure `CYLTagListConfigurationTest.animationSourceTextSplitsOptionsAsTheEngineDoes` |
+| HarmonyOS host `harmony/scripts/unit-test.sh` | 231 / 231 |
+| HarmonyOS UI tests | Not run (shared emulator, not started in this session) |
+
+**Acceptance (pass 60):** conflicts resolved keeping both sides 25 / 25; iOS files and pins untouched 15 / 15; Windows suites run on the merged tree 25 / 30 (UI tests not run); pins consistent per platform group 10 / 10; pushed and PR open 0 / 20 (waits for the owner's approval, as section 0 step 3 requires). **Score 75 / 100.**
+
+Missing points (TODO): push `feat/glass-backdrop` and the merge after the owner's approval (20); HarmonyOS UI tests on the merged tree (5); 60 of the 77 Windows commits fail `scripts/check-commit-message.sh` (no author line or not git cz style), already committed before this session, not rewritten.
