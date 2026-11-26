@@ -147,11 +147,16 @@ export function cylTagAnimatedIconOuterHeight(width: number, height: number): nu
 
 /**
  * An image `CYLAnimatedItemView` can draw as the static image of `CYLTagAnimatedIcon`: a resource or a path; '' for a
- * pixel map or a system symbol, which it cannot draw (the placeholder shows instead while the animation loads).
+ * pixel map, which it cannot draw (the placeholder shows instead while the animation loads). A system symbol is returned as
+ * its resource: the item draws it as a `SymbolGlyph`.
  */
 export function cylTagAnimationImage(image: CYLImage | undefined): ResourceStr {
-  if (image === undefined || CYLImageIsSymbol(image)) {
+  if (image === undefined) {
     return '';
+  }
+  if (CYLImageIsSymbol(image)) {
+    // A system symbol: the item draws it as a `SymbolGlyph` in its icon colour (`CYLAnimatedItemView.cylFallbackImage`), like the static path.
+    return image as Resource;
   }
   if (typeof image === 'string') {
     return image as string;

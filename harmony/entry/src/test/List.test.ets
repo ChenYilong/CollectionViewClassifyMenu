@@ -20,6 +20,7 @@ import tagGlassBackgroundTest from './TagGlassBackground.test';
 import tagFoldTitleAndIconTest from './TagFoldTitleAndIcon.test';
 import tagHeaderFontAndBoardAlignTest from './TagHeaderFontAndBoardAlign.test';
 import tagIconColorTest from './TagIconColor.test';
+import tagGlassIconCoverageTest from './TagGlassIconCoverage.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -44,4 +45,5 @@ export default function testsuite() {
   tagFoldTitleAndIconTest();
   tagHeaderFontAndBoardAlignTest();
   tagIconColorTest();
+  tagGlassIconCoverageTest();
 }
