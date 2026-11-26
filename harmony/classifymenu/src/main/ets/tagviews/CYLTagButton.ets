@@ -213,6 +213,27 @@ export class CYLTagButton {
     return glass ? CYLTagButton.glassTintColor(explicitBackground) :
       (pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor);
   }
+  /**
+   * Whether a tag in `appearance` hands a border to `CYLAnimatedItemBackgroundModifier`. Flat: any border colour. Where glass
+   * is drawn: only a colour the app / configuration / preset set (the built-in default is dropped so the shared glass rim
+   * shows); a width set without a colour draws none. The inline fold cell shares this rule.
+   */
+  static hasItemBorder(style: CYLMenuStyle, appearance: CYLTagAppearance): boolean {
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    return glass ? appearance.explicitBorderColor !== undefined : appearance.borderColor !== undefined;
+  }
+
+  /** The border colour a tag in `appearance` hands to the modifier (clear when `hasItemBorder` is false). */
+  static itemBorderColor(style: CYLMenuStyle, appearance: CYLTagAppearance): ResourceColor {
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    const color: ResourceColor | undefined = glass ? appearance.explicitBorderColor : appearance.borderColor;
+    return color ?? CYLColor.CLEAR;
+  }
+
+  /** The border width a tag in `appearance` hands to the modifier: 0 without a border (the shared glass rim then applies). */
+  static itemBorderWidth(style: CYLMenuStyle, appearance: CYLTagAppearance): number {
+    return CYLTagButton.hasItemBorder(style, appearance) ? appearance.borderWidth : 0;
+  }
   /** The key of the app's color mode ('dark' / 'light') in AppStorage, the one `cylanimateditem` reads (`cyl_colorMode`). */
   static readonly COLOR_MODE_KEY: string = 'cyl_colorMode';
   /** For tests: replaces the app's color mode of `isDarkMode()` (`undefined`, the default, reads AppStorage). */
@@ -1183,9 +1204,9 @@ export class CYLTagButton {
       Math.min(imageRadius, Math.min(style.imageSize.width, style.imageSize.height) / 2) : 0;
     this.deleteIndicatorLabel.font = style.deleteIndicatorFontFor(state, this.fontScale);
     this.deleteIndicatorLabel.textColor = style.deleteIndicatorColor ?? appearance.textColor;
-    const borderColor = appearance.borderColor;
-    this.borderColor = borderColor ?? CYLColor.CLEAR;
-    this.borderWidth = borderColor !== undefined ? appearance.borderWidth : 0;
+    // Liquid Glass hands only an explicit border; the built-in default is dropped so the shared glass rim shows.
+    this.borderColor = CYLTagButton.itemBorderColor(style, appearance);
+    this.borderWidth = CYLTagButton.itemBorderWidth(style, appearance);
     const badge = this.badgeValueStorage;
     this.badgeLabel.isHidden = badge === undefined;
     this.badgeLabel.text = badge !== undefined && badge.length > 0 ? badge : undefined;

@@ -386,8 +386,8 @@ export class CYLTagFoldMetrics {
       } else {
         appearance.resetBackgroundColor();
       }
-      appearance.borderColor = normal.borderColor;
-      appearance.borderWidth = normal.borderWidth;
+      // The normal border exactly, explicit flags included: an unset border stays unset (none under Liquid Glass).
+      appearance.inheritBorder(normal);
       appearance.cornerRadius = normal.cornerRadius;
       appearance.margin = normal.margin;
       appearance.font = normal.font;

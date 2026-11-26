@@ -475,15 +475,13 @@ export class CYLMenuStyle {
   }
 
   constructor() {
-    this.storedNormal.borderColor = CYLColor.white(0.82);
-    this.storedNormal.borderWidth = HAIRLINE;
+    // The built-in borders are defaults, not explicit: a Liquid Glass tag hands none of them (its shared rim applies).
+    this.storedNormal.setDefaultBorder(CYLColor.white(0.82), HAIRLINE);
     this.storedSelected.backgroundColor = CYLColor.APP_TINT;
     this.storedSelected.textColor = CYLColor.WHITE;
-    this.storedSelected.borderColor = CYLColor.APP_TINT;
-    this.storedSelected.borderWidth = HAIRLINE;
+    this.storedSelected.setDefaultBorder(CYLColor.APP_TINT, HAIRLINE);
     this.storedDisabled.textColor = CYLColor.white(0.7);
-    this.storedDisabled.borderColor = CYLColor.white(0.88);
-    this.storedDisabled.borderWidth = HAIRLINE;
+    this.storedDisabled.setDefaultBorder(CYLColor.white(0.88), HAIRLINE);
   }
 
   get normalAppearance(): CYLTagAppearance {
