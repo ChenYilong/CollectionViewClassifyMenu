@@ -352,9 +352,14 @@ public final class CYLTag {
     /**
      * The width of a badge image: the diameter (a circle) for a short text, or the text's width and `badgeImageTextPadding`
      * on both sides when that is more (a capsule, as `CYLTagButton`'s corner badge: width = max(height, text + 2 * padding)).
+     * One character (a digit, a letter, a CJK character such as "热") always keeps the circle: it fits inside without the
+     * padding.
      */
     public static func badgeImageWidth(text: String, diameter: CGFloat) -> CGFloat {
         let side = max(1, diameter)
+        guard text.count > 1 else {
+            return side
+        }
         let textWidth = ceil((text as NSString).size(withAttributes: badgeImageAttributes(diameter: side)).width)
         return max(side, textWidth + 2 * badgeImageTextPadding)
     }

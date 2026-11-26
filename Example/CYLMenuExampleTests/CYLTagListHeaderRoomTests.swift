@@ -67,7 +67,8 @@ final class CYLTagListHeaderRoomTests: CYLMenuExampleTestCase {
         let header = view.probe.header(inSection: 0)!
         header.layoutIfNeeded()
         let result = Shot(height: header.frame.height, title: view.probe.headerTitleFrame(inSection: 0)!,
-                          fold: view.probe.headerFoldButton(inSection: 0).map { header.convert($0.bounds, from: $0) },
+                          // The header always holds its fold button; a section that does not fold hides it.
+                          fold: view.probe.headerFoldButton(inSection: 0).flatMap { $0.isHidden ? nil : header.convert($0.bounds, from: $0) },
                           header: header.bounds)
         closeHostWindow()
         withExtendedLifetime(source) {}

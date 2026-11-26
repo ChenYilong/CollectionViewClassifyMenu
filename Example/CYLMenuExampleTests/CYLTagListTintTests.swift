@@ -168,6 +168,21 @@ final class CYLTagListTintTests: CYLMenuExampleTestCase {
         withExtendedLifetime(source) {}
     }
 
+    func testTheCreateItemsPlusIconReachesThreeToOneOnTheListBackground() {
+        let style = CYLTagCreateCell.outlinedStyle(from: CYLMenuStyle())
+        for mode in [UIUserInterfaceStyle.light, .dark] {
+            let background = CYLColorComponents(resolved(style.normalAppearance.backgroundColor, mode))
+            let icon = CYLColorComponents(resolved(style.iconColor(for: .normal), mode))
+            // The icon is translucent (a label color): judge it as drawn, over the background.
+            func over(_ top: CGFloat, _ bottom: CGFloat) -> CGFloat { top * icon.alpha + bottom * (1 - icon.alpha) }
+            let drawn = CYLTintContrast.relativeLuminance(red: over(icon.red, background.red), green: over(icon.green, background.green),
+                                                          blue: over(icon.blue, background.blue))
+            let behind = CYLTintContrast.relativeLuminance(red: background.red, green: background.green, blue: background.blue)
+            let ratio = (max(drawn, behind) + 0.05) / (min(drawn, behind) + 0.05)
+            XCTAssertGreaterThanOrEqual(ratio, 3, "mode \(mode.rawValue)")
+        }
+    }
+
     func testTheTintKeyParses() {
         let style = CYLMenuStyle(configuration: ["tintColor": "#FF0000"])
         XCTAssertEqual(CYLColorComponents(style.tintColor), CYLColorComponents(UIColor(red: 1, green: 0, blue: 0, alpha: 1)))
