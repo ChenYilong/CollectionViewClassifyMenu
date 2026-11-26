@@ -299,6 +299,10 @@ function defaultAppearance(hairline, dark = false) {
     cornerRadius: cylAnimatedItemCornerRadiusCapsule,
     borderColor: null,
     borderWidth: 0,
+    // True when the app / a configuration / a preset set the border color (width): under drawn Liquid Glass only an explicit border is
+    // handed to the glass, the built-in default border is dropped so the shared glass rim shows (docs/tag-liquid-glass.md).
+    borderColorExplicit: false,
+    borderWidthExplicit: false,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
     backgroundImage: '',
     hairline,
@@ -453,12 +457,18 @@ function applyAppearance(appearance, configuration, allowsTransparent = false) {
   if (has('textColor')) appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
   if (has('font')) appearance.font = fontValue(configuration.font) || { size: 14, weight: 'regular', italic: false };
   if (has('iconColor')) appearance.iconColor = color(configuration.iconColor);
-  if (has('borderColor')) appearance.borderColor = color(configuration.borderColor);
+  if (has('borderColor')) {
+    appearance.borderColor = color(configuration.borderColor);
+    appearance.borderColorExplicit = appearance.borderColor !== null;
+  }
   const sanitized = (n) => (Number.isFinite(n) && n > 0 ? n : 0);
   const radius = numberValue(configuration.cornerRadius);
   if (radius !== null) appearance.cornerRadius = sanitized(radius);
   const width = numberValue(configuration.borderWidth);
-  if (width !== null) appearance.borderWidth = sanitized(width);
+  if (width !== null) {
+    appearance.borderWidth = sanitized(width);
+    appearance.borderWidthExplicit = true;
+  }
   const margin = numberValue(configuration.margin);
   if (margin !== null) {
     appearance.contentInsets.left = sanitized(margin);
@@ -1019,7 +1029,9 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const appearance = style[state];
   const rtl = isRtl(style);
   const height = fixedHeight > 0 ? fixedHeight : tagHeight(style);
-  const border = appearance.borderColor ? appearance.borderWidth : 0;
+  // Under drawn glass only an explicit border is handed (an unset one is none: the glass rim applies); flat keeps the default border.
+  const handedBorder = glassHandedBorder(style, appearance);
+  const border = handedBorder.color ? handedBorder.width : 0;
   // Left and right at least the space the shape asks for between the border and the title: cyl-animated-item's
   // cylAnimatedItemLiquidGlassContentInset (14) on a drawn Liquid Glass tag, 0 on flat.
   const sideInset = style.backgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive() ? cylAnimatedItemLiquidGlassContentInset : 0;
@@ -1045,7 +1057,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   // Under drawn Liquid Glass an unset background hands no color ('': the glass component's default frosted tint, so a colorful
   // backdrop shows through); an explicit one (selected tint, preset, app color) keeps the alpha x 0.75 rule. Flat is unchanged.
   const handedColor = glassHandedColor(style, appearance);
-  const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, appearance.borderColor,
+  const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, handedBorder.color,
     !!(style.sectionPalette && style.sectionPalette.dark), // the color mode picks the glass component's default tint
     state === 'selected' ? 1 : -1); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
   const glass = itemBackground.glass;
@@ -1061,7 +1073,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     rtl ? `margin: 0 0 ${lineSpacing}px ${interitemSpacing}px` : `margin: 0 ${interitemSpacing}px ${lineSpacing}px 0`,
     fontCSS(appearance.font),
     `border-width: ${border}px`,
-    `border-color: ${appearance.borderColor || 'transparent'}`,
+    `border-color: ${handedBorder.color || 'transparent'}`,
     `color: ${appearance.textColor}`,
     itemBackground.css,
     style.minimumTagSizeWH.width > 0 ? `min-width: ${style.minimumTagSizeWH.width}px` : '',
@@ -1449,6 +1461,19 @@ function liftedIconColor(iconColor, glassTint, tintAlpha) {
 /** Whether the tag's Liquid Glass background is really drawn (the predicate of the glass background of `tagLayout`). */
 function isGlassDrawn(style) {
   return style.backgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive();
+}
+
+/**
+ * The border handed to the glass: under drawn glass an unset color or width is none (null / 0, the shared glass rim applies; the
+ * selected state's built-in app-tint border included), an explicit one is kept. Flat tags hand the appearance's border unchanged.
+ * @returns {{color: (string|null), width: number}}
+ */
+function glassHandedBorder(style, appearance) {
+  if (!isGlassDrawn(style)) return { color: appearance.borderColor, width: appearance.borderWidth };
+  return {
+    color: appearance.borderColorExplicit ? appearance.borderColor : null,
+    width: appearance.borderWidthExplicit ? appearance.borderWidth : 0,
+  };
 }
 
 /**
