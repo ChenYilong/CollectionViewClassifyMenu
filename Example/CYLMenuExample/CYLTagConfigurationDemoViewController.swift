@@ -87,13 +87,17 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
             CYLMenuStyleKey.selected: selected,
         ]
         let items: [Any] = [
-            // The artwork is one near-black color: an unset animation stays untinted (tint spec v2), so this entry opts in with the `tint` animation option
-            // and follows the title color (white on dark glass, dark on light).
+            // Every animated entry uses the unified policy `renderingMode=automatic` (the same for every engine): a ONE-color file is tinted like the title color
+            // (the near-black Lottie person icon follows the item's icon color: white on dark glass, dark on light); multi-colour or undetectable artwork
+            // (PAG, SVGA and Rive cannot be detected) keeps its own colors. `tint=title` would force the template look on every engine, even a multi-colour file.
             [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json"),
-             CYLTagItemKey.animationOptions: ["tint": "title"]] as [String: Any],
-            [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
-            [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv")] as [String: Any],
-            [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga")] as [String: Any],
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
+            [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif"),
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
+            [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv"),
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
+            [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga"),
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
             [CYLTagItemKey.image: likeImage("heart"), CYLTagItemKey.selectedImage: likeImage("heart.fill")] as [String: Any],
             "Text only",
         ]
