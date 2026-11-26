@@ -355,3 +355,35 @@ the role registry is pushed; macOS repins the 9 iOS pins, verifies, and hands th
 - Section 5 "the selected Lottie tag shows the house": covered on the Windows platforms. Android `CYLTagButton` and HarmonyOS `CYLTagAnimatedIcon` set `showsLastFrameWhenSelected`; the mini program tag lets the item drive playback, and the item's default already rests a selected item on its last frame. Not checked on screen.
 - Section 5 "Increase Contrast and Reduce Motion not ported to HarmonyOS / mini program": the HarmonyOS and mini program items have no such options, so this is component work. It is queued with the CYLTabBarController Windows session (default-off options in the item, then the tag turns them on after the repin).
 - Repin plan: one commit for all pins. The CYLTabBarController session sends the role-registry SHA; the Mac session repins and verifies iOS and sends the commit as a patch; Windows applies it, adds the Windows pins with `--amend`, runs the Windows suites and pushes.
+
+## 14. Added 2026-11-27 (macOS session): all-platform interface score, plan, repin to `dd691795`
+
+User prompt (verbatim): "continue TODO (missing points): advisor opus advisor点评目前全平台接口实现得分 以及下一步计划与建议。并立即让默认模型sonnet按照建议去实现。将得分优化到100转发合适任务给其他session 直接使用本机环境进行测试，iOS在macos机器，其余在windows机器。转发任务给相应session无需等待ci结果。集成方自己测试，只保留编译检查，不跑上面这完整套件"
+
+English: continue the TODO (missing points). The advisor (Opus) scores the all-platform interface implementation and gives the next plan; the default model (Sonnet) implements it at once, toward 100; forward suitable tasks to the other sessions, which test on their own machines (iOS on macOS, the rest on Windows), without waiting for CI. Integrators test; **iOS keeps a compile check only and does not run the full suites** (this answers the note in section 13: from now on `scripts/library-warnings.sh` + `xcodebuild build-for-testing`, plus `pod lib lint` and SwiftPM when pins or the podspec change).
+
+### Score: all-platform interface implementation (advisor rubric, a judgement from a read-only audit of `d22f3a93`, not a measurement)
+
+| Area | Weight | Score | Missing points (TODO) |
+|---|---|---|---|
+| Colour roles and the contrast rule on Android, HarmonyOS, mini program, RN, Flutter | 25 | 15 | Android built-in icon colour (SF Symbol star dark on dark glass); HarmonyOS delete / cross / editing roles and the disabled built-in; the flat-fill rule of `dd691795` on every platform |
+| Behaviour parity | 20 | 12 | Selected animation rests on the last frame: Android and HarmonyOS done, mini program not found; callout below the header on Android, HarmonyOS, mini program not verified. One-character badge: done on iOS, Android, HarmonyOS (the mini program draws no badge image) |
+| Accessibility options | 10 | 4 | Increase Contrast and Reduce Motion: Android has them; HarmonyOS and mini program do not; mini program stack-inherited level |
+| One component SHA everywhere | 15 | 5 | iOS `4d0e00ae`, Windows `b5b36fbf`; target `dd691795` (in progress) |
+| iOS reference complete | 10 | 6 | `scripts/swift-api-check.sh` reports the migration's API changes against a stale baseline (regenerate, list in `Swift-Migration.md`); owner decisions 8 and 10 |
+| Parity documents current | 10 | 6 | Header divider TODO entry stale; Liquid Glass notifications with hash and API names not recorded (sent in this step) |
+| Compiles on every platform | 10 | 9 | Windows compile at the new pin |
+| **Total** | 100 | **57** | About 15 to 20 points depend on owner decisions (section 6: #4 Android floor, #7 header spacing, #8 badge and FlatDesign, #10 `CYLIconContrast` alias); code alone does not reach 100 |
+
+Audit facts: RN (`CylTagListBridge.swift`) and Flutter (`CylTagListPlugin.swift`) iOS pass the whole configuration dictionary to the core parser, so new keys are not dropped. Header title, More, Clear and fold chevron all resolve through `resolvedTintColor` (Clear inherits the title's colour): the section 5 row "header controls outside the rule" is covered by design (opaque band, `CYLTagListTintTests`). `CYLIconContrast` remains only in historical comments.
+
+### Plan
+
+| Who | Task | Status |
+|---|---|---|
+| macOS | Repin the 9 iOS files to `dd691795`, compile check, hand the commit to Windows as a patch | TODO |
+| macOS | Regenerate `scripts/swift-api-baseline.json`, list the API changes in `Swift-Migration.md` | TODO |
+| Windows | Rows 1 to 3, the header divider check, re-vendoring at `dd691795`, one pin commit with iOS | Forwarded |
+| Tab bar session | `adaptedForContrast` comment still says `tertiaryLabel`; `module.modulemap` SwiftPM warning; dead GIF branch | Forwarded |
+| CYLTableViewPlaceHolder session | 8 pt dot badge fixture in its example | Forwarded |
+| Owner | Decisions #4, #7, #8, #10 | Asked |
