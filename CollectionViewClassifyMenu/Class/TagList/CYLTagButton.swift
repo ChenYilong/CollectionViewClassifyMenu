@@ -51,12 +51,12 @@ open class CYLTagButton: CYLAnimatedItemView {
     private static let states: [UIControl.State] = [.normal, .selected, .disabled]
 
     /**
-     * The space between the border and the content, left and right, that the shape asks for: `CYLAnimatedItemLiquidGlassContentInset` for a
+     * The space between the border and the content, left and right, that the shape asks for: `cylAnimatedItemLiquidGlassContentInset` for a
      * Liquid Glass style where the glass is really drawn (the same condition as the capsule), else 0 (CYLAnimatedItemView's
      * `itemContentHorizontalInset` left unset gives the same). The effective inset is the larger of this and the appearance's.
      */
     static func contentInset(for style: CYLMenuStyle) -> CGFloat {
-        style.resolvedBackgroundStyle == .liquidGlass ? CYLAnimatedItemLiquidGlassContentInset : 0
+        style.resolvedBackgroundStyle == .liquidGlass ? cylAnimatedItemLiquidGlassContentInset : 0
     }
     private static let disabledAnimationAlpha: CGFloat = 0.4
     /**

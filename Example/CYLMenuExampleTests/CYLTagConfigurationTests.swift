@@ -144,7 +144,7 @@ final class CYLTagConfigurationTests: XCTestCase {
     func testTheDefaultRadiusIsTheCapsuleConstantInEveryStyleAndASetRadiusCustomizesIt() throws {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
-        XCTAssertEqual(CYLMenuStyle().normalAppearance.cornerRadius, CYLAnimatedItemCornerRadiusCapsule)
+        XCTAssertEqual(CYLMenuStyle().normalAppearance.cornerRadius, cylAnimatedItemCornerRadiusCapsule)
         for background in [CYLTagBackgroundStyle.liquidGlass, .flat] {
             let style = CYLMenuStyle()
             style.backgroundStyle = background
@@ -175,7 +175,7 @@ final class CYLTagConfigurationTests: XCTestCase {
         }
         let flatWidth = CYLTagButton.width(forTitle: "Swift", iconSize: .zero, style: flat, traitCollection: nil)
         let glassWidth = CYLTagButton.width(forTitle: "Swift", iconSize: .zero, style: glass, traitCollection: nil)
-        XCTAssertEqual(glassWidth - flatWidth, 2 * (CYLAnimatedItemLiquidGlassContentInset - 10), accuracy: 0.01,
+        XCTAssertEqual(glassWidth - flatWidth, 2 * (cylAnimatedItemLiquidGlassContentInset - 10), accuracy: 0.01,
                        "measured: 14 each side on glass instead of the appearance's 10")
         // Laid out: the title starts 14 from the left edge, and its width fits the measured width.
         let button = CYLMenuFixtures.tagButton(title: "Swift", image: nil, style: glass, size: CGSize(width: glassWidth, height: 34))

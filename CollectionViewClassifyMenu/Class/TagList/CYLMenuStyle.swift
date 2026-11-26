@@ -781,7 +781,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
             appearance.borderWidth = 0
             // android-tagview's layoutBorderColor: a tag that sets only a border width gets a white border.
             appearance.borderColor = .white
-            appearance.cornerRadius = CYLAnimatedItemCornerRadiusCapsule
+            appearance.cornerRadius = cylAnimatedItemCornerRadiusCapsule
             appearance.font = UIFont.systemFont(ofSize: 14)
         }
         style.disabledAppearance.backgroundColor = blue.withAlphaComponent(0.4)

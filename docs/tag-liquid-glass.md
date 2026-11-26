@@ -84,7 +84,7 @@ tags are capsules and are handed to the view as a plain number; the presets that
 
 | Platform | Capsule constant (value 1000), defined once in `CYLAnimatedItemView`'s module | 0 |
 |:--|:--|:--|
-| iOS | `CYLAnimatedItemCornerRadiusCapsule` (`CYLAnimatedItemView.swift`) | square |
+| iOS | `cylAnimatedItemCornerRadiusCapsule` (`CYLAnimatedItemView.swift`) | square |
 | Android | `CYLAnimatedItemCornerRadiusCapsule` (`com.cyl.animateditem`) | square (was a capsule: breaking) |
 | HarmonyOS | `CYLAnimatedItemCornerRadiusCapsule` (exported by `cylanimateditem`) | square |
 | Mini program | `cylAnimatedItemCornerRadiusCapsule` (`cyl_animated_item_model.js`) | square |
