@@ -26,6 +26,7 @@ final class CYLReviewListViewController: UIViewController {
     private(set) var menuSource: CYLExampleMenuSource?
     private var filterHeight: NSLayoutConstraint?
     private let initialFilterIndex: Int
+    private var needsRevealOfPreselectedFilter = false
     private(set) var lastEvent: String?
 
     /// The orange review filter style, also used for the product page preview.
@@ -165,17 +166,27 @@ final class CYLReviewListViewController: UIViewController {
         let index = max(0, min(initialFilterIndex, items.count - 1))
         let selected = IndexPath(item: index, section: 0)
         filterView.selectedIndexPaths = [selected]
-        // A preselected chip hidden by folding would be confusing, so show it.
-        if index >= filterView.numberOfVisibleItems(inSection: 0) {
-            filterView.setExpanded(true, forSection: 0, animated: false)
-        }
+        // A preselected chip hidden by folding would be confusing: revealed once the list has a width (see revealPreselectedFilter).
+        needsRevealOfPreselectedFilter = true
         lastEvent = CYLExampleLocalizedString("点击「%@」", source.item(at: selected).title)
         refreshReviews()
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        revealPreselectedFilter()
         updateFilterHeight()
+    }
+
+    /// Folding depends on the width: with none, no chip is hidden. So the preselected chip is revealed at the first layout that has one.
+    private func revealPreselectedFilter() {
+        guard needsRevealOfPreselectedFilter, let filterView, view.bounds.width > 0 else { return }
+        filterView.layoutIfNeeded()
+        needsRevealOfPreselectedFilter = false
+        let index = max(0, min(initialFilterIndex, CYLReviewStore.shared().filters.count - 1))
+        if index >= filterView.numberOfVisibleItems(inSection: 0) {
+            filterView.setExpanded(true, forSection: 0, animated: false)
+        }
     }
 
     private func updateFilterHeight() {

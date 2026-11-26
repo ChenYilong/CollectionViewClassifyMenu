@@ -8,7 +8,9 @@
 import { CYLMenuColorFromString } from './CYLMenuColor';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from './CYLMenuFoldControl';
 import { CYLMenuResources } from './CYLMenuResources';
-import { CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagImagePlacement } from './CYLMenuStyle';
+import {
+  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagImagePlacement, CYLTagTitleMaxLines
+} from './CYLMenuStyle';
 import { CYLTag } from './CYLTag';
 import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
@@ -30,6 +32,8 @@ export class CYLTagListKey {
   static readonly foldStyle: string = 'foldStyle';
   static readonly allowsEmptySelection: string = 'allowsEmptySelection';
   static readonly showsSectionHeaders: string = 'showsSectionHeaders';
+  /** What a long press does: "reorder", "callout", "report" or "none", or an array of them (the first that can begin wins). */
+  static readonly longPressAction: string = 'longPressAction';
   static readonly scrollEnabled: string = 'scrollEnabled';
   static readonly defaultVisibleRows: string = 'defaultVisibleRows';
   /** An array of index paths ({section, item}), "section-item" strings or [section, item] arrays. */
@@ -71,6 +75,8 @@ export class CYLTagSectionKey {
 /** The keys of an item dictionary. */
 export class CYLTagItemKey {
   static readonly title: string = 'title';
+  /** A longer description, shown in a callout on a long press (`longPressAction` "callout"). */
+  static readonly subtitle: string = 'subtitle';
   static readonly image: string = 'image';
   static readonly selectedImage: string = 'selectedImage';
   /** A Lottie animation: `asset:<rawfile path>`, or the JSON text. */
@@ -94,6 +100,8 @@ export class CYLMenuStyleKey {
   static readonly disabled: string = 'disabled';
   static readonly imageTitleSpacing: string = 'imageTitleSpacing';
   static readonly itemHeight: string = 'itemHeight';
+  /** The most lines a title may take: a whole number, or "unlimited". Default 1. */
+  static readonly titleMaxLines: string = 'titleMaxLines';
   static readonly numberOfItemsPerRow: string = 'itemsPerRow';
   static readonly interitemSpacing: string = 'interitemSpacing';
   static readonly lineSpacing: string = 'lineSpacing';
@@ -568,6 +576,15 @@ export class CYLMenuConfiguration {
     const imageTitleSpacing = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.imageTitleSpacing]);
     if (imageTitleSpacing !== undefined) {
       style.imageTitleSpacing = imageTitleSpacing;
+    }
+    const maxLinesValue = configuration[CYLMenuStyleKey.titleMaxLines];
+    if (maxLinesValue === 'unlimited') {
+      style.titleMaxLines = CYLTagTitleMaxLines.unlimited;
+    } else {
+      const maxLines = CYLConfigurationValue.number(maxLinesValue);
+      if (maxLines !== undefined) {
+        style.titleMaxLines = maxLines;
+      }
     }
     const itemHeight = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.itemHeight]);
     if (itemHeight !== undefined) {

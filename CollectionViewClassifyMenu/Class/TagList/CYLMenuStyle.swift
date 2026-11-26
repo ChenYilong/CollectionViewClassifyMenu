@@ -316,10 +316,28 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var imageFillsTagHeight = false
 
     /**
-     * True: a title too wide for its row wraps onto more lines and the tag grows taller, instead of being truncated
-     * (AndroidTagView's tag_text_wrap). The list measures the taller tag at the width it gets. Default false.
+     * The most lines a title may take: a title too wide for its tag wraps onto more lines, up to this number, and the tag
+     * grows taller; beyond it the title is truncated. Default `CYLTagTitleMaxLines.single` (1, one line, truncated).
+     * `CYLTagTitleMaxLines.unlimited` shows every line. The list measures the taller tag at the width it gets. The number
+     * is the app's choice; a value below 1 is 1.
      */
-    open var titleWraps = false
+    open var titleMaxLines = CYLTagTitleMaxLines.single {
+        didSet {
+            if titleMaxLines < CYLTagTitleMaxLines.single {
+                titleMaxLines = CYLTagTitleMaxLines.single
+            }
+        }
+    }
+
+    /**
+     * True: a title too wide for its row wraps onto as many lines as it needs and the tag grows taller, instead of being
+     * truncated (AndroidTagView's tag_text_wrap): the same as `titleMaxLines` = `CYLTagTitleMaxLines.unlimited`; false:
+     * one line. The list measures the taller tag at the width it gets. Default false.
+     */
+    open var titleWraps: Bool {
+        get { titleMaxLines != CYLTagTitleMaxLines.single }
+        set { titleMaxLines = newValue ? CYLTagTitleMaxLines.unlimited : CYLTagTitleMaxLines.single }
+    }
 
     /**
      * A shadow under each tag, as Android's elevation in points (AndroidTagView's tag_elevation): offset down by half of
@@ -859,7 +877,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.imagePositionAdjustment = imagePositionAdjustment
         copy.imagePlacement = imagePlacement
         copy.imageFillsTagHeight = imageFillsTagHeight
-        copy.titleWraps = titleWraps
+        copy.titleMaxLines = titleMaxLines
         copy.elevation = elevation
         copy.deleteIndicatorImage = deleteIndicatorImage
         copy.layoutCentered = layoutCentered
@@ -951,4 +969,20 @@ public extension UIColor {
      */
     @objc(cyl_appTintColor)
     static let cylAppTint = UIColor(red: 42 / 255, green: 185 / 255, blue: 160 / 255, alpha: 1)
+}
+
+/**
+ * The line limits of a tag's title (`CYLMenuStyle.titleMaxLines`): named values, never a literal at a call site.
+ */
+public enum CYLTagTitleMaxLines {
+
+    /**
+     * One line, the default: a title too wide for its tag is truncated.
+     */
+    public static let single = 1
+
+    /**
+     * No limit: a title wraps onto as many lines as it needs (the MAX of the line counts).
+     */
+    public static let unlimited = Int.max
 }

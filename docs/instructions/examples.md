@@ -17,6 +17,32 @@ means the section of that name here.
   `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback controls in the animation examples").
 
 
+## Sectioned lists in demos use the tag list
+
+- **Rule (owner's request, 2026-11-25).** When an example (demo) screen needs a list with section groups, such as a
+  table view with sections, a list with section headers or an inset-grouped list, build it with
+  CollectionViewClassifyMenu's tag list (`CYLTagListView`, `CYLTagListState` on HarmonyOS) instead of the platform's own
+  grouped list. Use the tag list's section style:
+  - One tag list; one section per group; the section title is the section header.
+  - A tag shows only the **main title and the icon**. The secondary line (detail, subtitle) is not drawn in the tag.
+  - Sections that have more rows than `defaultVisibleRows` use the core's **More / Less** fold control
+    (`foldControl`, header trailing).
+  - A tap on a tag does exactly what a tap on the replaced cell did (open the screen, select the row). The tag does not
+    stay selected unless the cell did.
+  - A **long press** on a tag shows the secondary line in a small floating callout with an arrow, through the tag list's
+    long-press action API: data source `menuSubtitleForItem` (item key `subtitle`, `CYLTag.subtitle`) and
+    `longPressAction` `"callout"` / `CYLTagLongPressActions.callout` (contract:
+    [docs/tag-long-press-action.md](../tag-long-press-action.md)). Do not draw a popup in the example.
+  - A title that does not fit one line wraps through the style's `titleMaxLines` (default 1; any number; every line
+    shown with the named constant `CYLTagTitleMaxLinesUnlimited`, never a literal such as 0 or 999). The tag list leaves
+    the number to the app; an example picks its own (the placeholder example uses 3).
+  - If the tag list lacks an API the example needs, add it to CollectionViewClassifyMenu first (core first, every
+    platform, documented), then use it from the example.
+- **After such a change, re-test the contact-list long-press reordering.** Reordering is the tag list's built-in
+  `reorder` long-press action; it must behave exactly as before (host tests, ui-test and a look on the emulator).
+- Where the example lives in another repository, that repository vendors the library at a pinned commit (see
+  [dependencies.md](dependencies.md)); update the pin instead of copying the code by hand.
+
 ## Search bars
 
 - A search bar never covers any view, at any time: not the view controller's view, not a sibling, not a background

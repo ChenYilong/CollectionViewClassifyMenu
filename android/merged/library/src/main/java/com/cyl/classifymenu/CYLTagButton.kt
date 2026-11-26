@@ -403,6 +403,7 @@ open class CYLTagButton @JvmOverloads constructor(
         titleLabel.typeface = font.typeface
         val textColor = appearance.resolvedTextColor(context)
         titleLabel.setTextColor(textColor)
+        titleLabel.maxLines = style.titleMaxLines
         var backgroundColor = appearance.resolvedBackgroundColor(context)
         val highlighted = isHighlighted && state != CYLControlState.DISABLED && style.highlightedBackgroundColor != null
         if (highlighted) backgroundColor = style.highlightedBackgroundColor!!
@@ -529,7 +530,11 @@ open class CYLTagButton @JvmOverloads constructor(
         val available = max(0f, width - 2 * margin - if (showsImage) iconSize.width + spacing else 0f)
         val titleSize = if (showsTitle) CYLSize(titleLabel.paint.measureText(titleLabel.text.toString()) / density, lineHeight(titleLabel.paint)) else CYLSize.ZERO
         var titleWidth = fitTitle(available, ceil(titleSize.width))
-        val titleHeight = min(height, ceil(titleSize.height))
+        var titleHeight = min(height, ceil(titleSize.height))
+        // A title that may wrap (CYLMenuStyle.titleMaxLines above 1) takes as many lines as fit its width, up to the limit.
+        if (showsTitle && style.titleMaxLines > CYLTagTitleMaxLines.SINGLE && !style.imagePlacement.isVertical) {
+            titleHeight = min(height, ceil(wrappedTextHeight(titleLabel.text.toString(), style.titleFontForState(currentState()), titleWidth, style.titleMaxLines)))
+        }
         var imageX = 0f
         var titleX = 0f
         var imageY = centeredY(iconSize.height, contentTop, contentHeight, height)
@@ -736,6 +741,40 @@ open class CYLTagButton @JvmOverloads constructor(
         private fun lineHeight(paint: Paint): Float {
             val metrics = paint.fontMetrics
             return (metrics.descent - metrics.ascent) / systemDensity
+        }
+
+        /**
+         * The height of [text] in [font] wrapped to [width] dp and cut at [maxLines] lines, dp: what a title that may wrap needs.
+         */
+        internal fun wrappedTextHeight(text: String, font: CYLFont, width: Float, maxLines: Int): Float {
+            val line = ceil(fontLineHeight(font))
+            if (text.isEmpty() || width <= 0f) return line
+            val paint = android.text.TextPaint(paintFor(font))
+            val layout = android.text.StaticLayout.Builder.obtain(text, 0, text.length, paint, max(1, ceil(width * systemDensity).toInt()))
+                .setMaxLines(maxLines).setIncludePad(false).build()
+            return max(line, min(layout.lineCount, maxLines) * line)
+        }
+
+        /**
+         * The height of a tag [width] dp wide whose title may wrap ([CYLMenuStyle.titleMaxLines] above 1): the title wrapped to
+         * the room it has beside the icon and the delete indicator, cut at the limit, plus the insets; at least
+         * [heightForTitle]. A one-line style, or an icon above or below the title, keeps [heightForTitle].
+         */
+        @JvmStatic
+        fun heightForTitleWidth(title: String?, iconSize: CYLSize, width: Float, showsDeleteIndicator: Boolean, style: CYLMenuStyle): Float {
+            val single = heightForTitle(title, iconSize, style)
+            val text = style.displayedTitleForTitle(title)
+            if (style.titleMaxLines <= CYLTagTitleMaxLines.SINGLE || text.isEmpty() || style.imagePlacement.isVertical) return single
+            var height = single
+            for (state in states) {
+                val insets = style.appearanceForState(state).contentInsets
+                var room = width - insets.left - insets.right
+                if (iconSize.width > 0) room -= iconSize.width + style.imageTitleSpacing
+                if (showsDeleteIndicator) room -= style.imageTitleSpacing + deleteIndicatorWidthForState(state, style)
+                val lines = wrappedTextHeight(text, style.titleFontForState(state), room, style.titleMaxLines)
+                height = max(height, ceil(lines + insets.top + insets.bottom))
+            }
+            return height
         }
 
         /** The width of `text` in `font`, dp (`-sizeWithAttributes:`). */

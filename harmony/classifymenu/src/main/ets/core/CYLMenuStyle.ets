@@ -73,6 +73,16 @@ export interface CYLTitleTextAttributes {
  */
 const HAIRLINE: number = 0.5;
 
+/**
+ * The line limits of a tag's title (`CYLMenuStyle.titleMaxLines`): named values, never a literal in a call site.
+ */
+export class CYLTagTitleMaxLines {
+  /** One line, the default: a title too wide for its tag is truncated. */
+  static readonly single: number = 1;
+  /** No limit: a title wraps onto as many lines as it needs (the MAX of the line counts). */
+  static readonly unlimited: number = Number.MAX_SAFE_INTEGER;
+}
+
 export class CYLMenuStyle {
   private storedNormal: CYLTagAppearance = new CYLTagAppearance();
   private storedSelected: CYLTagAppearance = new CYLTagAppearance();
@@ -134,11 +144,34 @@ export class CYLMenuStyle {
   clearButtonImage?: CYLImage = undefined;
   /** The color of the clear button; undefined: `headerTextColor`. */
   clearButtonColor?: ResourceColor = undefined;
+  private titleMaxLinesValue: number = CYLTagTitleMaxLines.single;
+
   /**
-   * True: a title too wide for its row wraps onto more lines and the tag grows taller, instead of being truncated
-   * (AndroidTagView's tag_text_wrap). The list measures the taller tag at the width it gets. Default false.
+   * The most lines a title may take: a title too wide for its tag wraps onto more lines, up to this number, and the tag
+   * grows taller; beyond it the title is truncated. Default `CYLTagTitleMaxLines.single` (1, one line, truncated).
+   * `CYLTagTitleMaxLines.unlimited` shows every line. The list measures the taller tag at the width it gets. The number
+   * is the app's choice; a value that is not a whole number of 1 or more is 1.
    */
-  titleWraps: boolean = false;
+  get titleMaxLines(): number {
+    return this.titleMaxLinesValue;
+  }
+
+  set titleMaxLines(value: number) {
+    this.titleMaxLinesValue = Number.isFinite(value) || value === CYLTagTitleMaxLines.unlimited ?
+      Math.max(CYLTagTitleMaxLines.single, Math.floor(value)) : CYLTagTitleMaxLines.single;
+  }
+
+  /**
+   * True: a title wraps onto as many lines as it needs (AndroidTagView's tag_text_wrap), the same as `titleMaxLines` =
+   * `CYLTagTitleMaxLines.unlimited`; false: one line. Default false.
+   */
+  get titleWraps(): boolean {
+    return this.titleMaxLinesValue !== CYLTagTitleMaxLines.single;
+  }
+
+  set titleWraps(value: boolean) {
+    this.titleMaxLinesValue = value ? CYLTagTitleMaxLines.unlimited : CYLTagTitleMaxLines.single;
+  }
   /**
    * A shadow under each tag, as Android's elevation in vp (AndroidTagView's tag_elevation): offset down by half of it
    * and blurred by it. Default 0, no shadow.
@@ -393,7 +426,7 @@ export class CYLMenuStyle {
     c.editingIndicatorInsets = this.editingIndicatorInsets;
     c.clearButtonImage = this.clearButtonImage;
     c.clearButtonColor = this.clearButtonColor;
-    c.titleWraps = this.titleWraps;
+    c.titleMaxLines = this.titleMaxLines;
     c.elevation = this.elevation;
     c.deleteIndicatorImage = this.deleteIndicatorImage;
     c.imageTitleSpacing = this.imageTitleSpacing;

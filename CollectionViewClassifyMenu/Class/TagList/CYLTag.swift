@@ -38,6 +38,11 @@ public final class CYLTag {
     public var title: String
 
     /**
+     * A longer description, shown in a callout on a long press (`CYLTagLongPressActions.callout`).
+     */
+    public var subtitle: String?
+
+    /**
      * The icon, as the data source's `menuImageForItem(at:)`.
      */
     public var image: UIImage?
@@ -474,6 +479,10 @@ open class CYLTagDataSource: NSObject, CYLMenuDataSource {
 
     open func menuTitleForItem(at indexPath: IndexPath) -> String {
         tag(at: indexPath)?.title ?? ""
+    }
+
+    open func menuSubtitleForItem(at indexPath: IndexPath) -> String? {
+        tag(at: indexPath)?.subtitle
     }
 
     open func menuImageForItem(at indexPath: IndexPath) -> UIImage? {

@@ -123,9 +123,10 @@ verify the behavior and update the applicable documentation.
 ## [examples] Example demo rules
 
 - Animation screens on every platform offer Play all, a speed slider and a loop switch (`docs/example-demo-rules.md`).
+- A demo screen that needs a sectioned list uses the tag list (titles + icons, More / Less, tap = cell tap, long press = subtitle callout, `titleMaxLines`), then re-tests contact-list reordering.
 - A search bar never covers any view. Tab bars are always at the bottom; pushed screens hide the bottom bar; set
   `navigationItem.title`, not the tab root's `title`.
-- Sections: [Example demo rules](docs/instructions/examples.md#example-demo-rules) · [Search bars](docs/instructions/examples.md#search-bars) · [Tab bars](docs/instructions/examples.md#tab-bars).
+- Sections: [Example demo rules](docs/instructions/examples.md#example-demo-rules) · [Sectioned lists use the tag list](docs/instructions/examples.md#sectioned-lists-in-demos-use-the-tag-list) · [Search bars](docs/instructions/examples.md#search-bars) · [Tab bars](docs/instructions/examples.md#tab-bars).
 
 ## [i18n] Internationalization and localization
 

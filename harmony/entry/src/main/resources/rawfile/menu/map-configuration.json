@@ -5,6 +5,7 @@
   "content": "icon"
  },
  "scrollEnabled": false,
+ "longPressAction": "callout",
  "selectedItems": [
   "0-1"
  ],
@@ -33,10 +34,12 @@
    "items": [
     {
      "title": "Lottie",
+     "subtitle": "Long press: a callout shows this subtitle",
      "animation": "asset:tab_me_animate.json"
     },
     {
      "title": "GIF",
+     "subtitle": "A tag without a subtitle shows no callout",
      "animation": ""
     },
     {

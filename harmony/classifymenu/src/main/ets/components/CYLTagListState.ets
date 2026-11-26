@@ -2,7 +2,7 @@ import { CYLAnimatedItemLiquidGlassContentInset } from 'cylanimateditem';
 import { CYLMenuGestureState } from '../core/CYLMenuGestureState';
 import { CYLTagListCacheItem } from '../core/CYLTagListCache';
 import { CYLUIContext } from '../core/CYLUIContext';
-import { CYLTagBackgroundStyle } from '../core/CYLMenuStyle';
+import { CYLTagBackgroundStyle, CYLTagTitleMaxLines } from '../core/CYLMenuStyle';
 /**
  * The model and controller of a `CYLTagListView`, as iOS `CYLTagListView.swift` without its UIKit views: the data
  * source and delegate, the style, selection, folding, measurement and row layout, the title, the android-tagview tag
@@ -19,6 +19,7 @@ import {
 import { CYLTagButton, CYLTagButtonPart } from '../tagviews/CYLTagButton';
 import { CYLTagListCell } from '../tagviews/CYLTagListCell';
 import { CYLMenuDataSource, CYLMenuDefaults, CYLMenuDelegate, CYLMenuItemType } from '../core/CYLMenuDataSource';
+import { CYLTagLongPressAction, CYLTagLongPressActions, CYLTagLongPressHost } from '../core/CYLTagLongPressAction';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import {
@@ -243,16 +244,16 @@ export class CYLTagButtonMetrics {
    * The height of `text` in `font` wrapped to `width` vp. With the window's text metrics, ArkUI measures it; without
    * (host tests), the lines are the single-line width (`textMeasurer`) over `width`, rounded up.
    */
-  static wrappedTextHeight: (text: string, font: CYLFont, width: number) => number =
-    (text: string, font: CYLFont, width: number): number => {
+  static wrappedTextHeight: (text: string, font: CYLFont, width: number, maxLines?: number) => number =
+    (text: string, font: CYLFont, width: number, maxLines: number = CYLTagTitleMaxLines.unlimited): number => {
       const line = Math.ceil(CYLTagButtonMetrics.lineHeight(font));
       if (CYLUIContext.hasContext) {
         const size = CYLUIContext.measureTextSize({ textContent: text, fontSize: font.size, fontWeight: font.weight,
           constraintWidth: Math.max(1, width) } as MeasureOptions, font.size, font.weight, Math.max(1, width));
-        return Math.max(line, Math.ceil(size.height));
+        return Math.min(Math.max(line, Math.ceil(size.height)), Math.max(1, maxLines) * line);
       }
       const lines = Math.max(1, Math.ceil(CYLTagButtonMetrics.textMeasurer(text, font) / Math.max(1, width)));
-      return lines * line;
+      return Math.min(lines, Math.max(1, maxLines)) * line;
     };
 
   /**
@@ -281,7 +282,8 @@ export class CYLTagButtonMetrics {
       if (showsDeleteIndicator) {
         room -= style.imageTitleSpacing + CYLTagButtonMetrics.deleteIndicatorWidth(state, style, fontScale);
       }
-      const text = CYLTagButtonMetrics.wrappedTextHeight(displayed, style.titleFont(state, fontScale), room);
+      const text = CYLTagButtonMetrics.wrappedTextHeight(displayed, style.titleFont(state, fontScale), room,
+        style.titleMaxLines);
       height = Math.max(height, Math.ceil(text + insets.top + insets.bottom));
     });
     return height;
@@ -518,7 +520,7 @@ class CYLStyleCacheEntry {
 
 // MARK: - Tag list
 
-export class CYLTagListState {
+export class CYLTagListState implements CYLTagLongPressHost {
   /** The sections and items. */
   menuDataSource?: CYLMenuDataSource;
   /** Receives taps, selection changes, folding and size changes. */
@@ -580,6 +582,10 @@ export class CYLTagListState {
   private themeStyles: Map<string, CYLStyleCacheEntry> = new Map<string, CYLStyleCacheEntry>();
   private createItemStyle?: CYLStyleCacheEntry;
   private pressedIndexPath?: CYLIndexPath;
+  private longPressActionValue: CYLTagLongPressAction = CYLTagLongPressActions.makeDefault();
+  /** The item the callout points at and its text, or undefined while no callout shows (read by the view). */
+  calloutIndexPath?: CYLIndexPath;
+  calloutText: string = '';
   private changeListener?: () => void;
   private scrollHandler?: (offset: number, animated: boolean) => void;
   private playTokenStorage: number = 0;
@@ -1687,6 +1693,7 @@ export class CYLTagListState {
 
   /** Reads everything from the data source again; selections and expanded sections still in range are kept. */
   reloadMenuData(): void {
+    this.dismissCallout();
     this.viewGenerationStorage += 1;
     const source = this.menuDataSource;
     if (this.tagDataSourceStorage !== undefined && source === this.tagDataSourceStorage) {
@@ -2107,6 +2114,10 @@ export class CYLTagListState {
   /** Whether the section has more rows than `defaultVisibleRows` and can fold. */
   canFoldSection(section: number): boolean {
     this.measureIfNeeded();
+    // Without a known width every tag is laid out in a row of its own: that is no layout, so nothing can need a fold yet.
+    if (this.layoutWidth <= 0) {
+      return false;
+    }
     return section >= 0 && section < this.rows.length && this.canFold(this.rows[section].length);
   }
 
@@ -2233,6 +2244,7 @@ export class CYLTagListState {
 
   /** A tap on an item (`collectionView(_:didSelectItemAt:)`): the inline fold control folds, a tag is handled. */
   tapItem(indexPath: CYLIndexPath): void {
+    this.dismissCallout();
     if (this.isInlineFoldCell(indexPath)) {
       this.toggleSection(indexPath.section);
       return;
@@ -2321,23 +2333,114 @@ export class CYLTagListState {
       return false;
     }
     this.pressedIndexPath = indexPath;
-    if (this.canReorder) {
-      this.isReorderingStorage = true;
-      this.menuDelegate?.menuDidChangeReordering?.(this, true);
-      this.reportGestureState();
-      if (this.isSelected(indexPath)) {
-        this.reportSelectedDrag(indexPath);
-      }
-      this.setNeedsDisplay();
-      return true;
+    const action = this.longPressActionValue;
+    if (!action.canBegin(this, indexPath)) {
+      this.pressedIndexPath = undefined;
+      return false;
     }
-    this.reportLongPress(indexPath);
-    this.pressedIndexPath = undefined;
-    return false;
+    const follows = action.begin(this, indexPath);
+    if (!follows) {
+      this.pressedIndexPath = undefined;
+    }
+    return follows;
   }
 
-  /** The press ended: moved onto `destination`, or a press that did not move (reported as a long press). */
+  /** The press ended: moved onto `destination`, or a press that did not move; the long-press action decides what that does. */
   endLongPress(destination: CYLIndexPath | undefined, moved: boolean): void {
+    const action = this.longPressActionValue;
+    if (action.end !== undefined) {
+      action.end(this, destination, moved);
+    }
+    this.pressedIndexPath = undefined;
+  }
+
+  cancelLongPress(): void {
+    this.pressedIndexPath = undefined;
+    const action = this.longPressActionValue;
+    if (action.cancel !== undefined) {
+      action.cancel(this);
+    }
+  }
+
+  /** A configuration's `longPressAction` (a name or an array of names) as an action; undefined when absent or unknown. */
+  private static longPressActionFromConfiguration(value: Object | undefined): CYLTagLongPressAction | undefined {
+    if (value === undefined || value === null) {
+      return undefined;
+    }
+    const names: Object[] = Array.isArray(value) ? value as Object[] : [value];
+    const actions: CYLTagLongPressAction[] = [];
+    for (const name of names) {
+      if (name === 'reorder') {
+        actions.push(CYLTagLongPressActions.reorder);
+      } else if (name === 'callout') {
+        actions.push(CYLTagLongPressActions.callout);
+      } else if (name === 'report') {
+        actions.push(CYLTagLongPressActions.report);
+      } else if (name === 'none') {
+        actions.push(CYLTagLongPressActions.none);
+      } else {
+        return undefined;
+      }
+    }
+    if (actions.length === 0) {
+      return undefined;
+    }
+    // The long press is still reported where no listed action takes it (a tag without a subtitle), unless "none".
+    if (actions.indexOf(CYLTagLongPressActions.none) < 0 && actions.indexOf(CYLTagLongPressActions.report) < 0) {
+      actions.push(CYLTagLongPressActions.report);
+    }
+    return actions.length === 1 ? actions[0] : CYLTagLongPressActions.first(actions);
+  }
+
+  /**
+   * What a long press on an item does: `CYLTagLongPressActions.first([reorder, report])` by default (reordering where the list
+   * can reorder, else the long press is reported). Set another built-in action, a combination or your own.
+   */
+  get longPressAction(): CYLTagLongPressAction {
+    return this.longPressActionValue;
+  }
+
+  set longPressAction(value: CYLTagLongPressAction) {
+    this.cancelLongPress();
+    this.dismissCallout();
+    this.longPressActionValue = value;
+  }
+
+  // MARK: CYLTagLongPressHost
+
+  subtitleForItem(indexPath: CYLIndexPath): string | undefined {
+    return this.menuDataSource?.menuSubtitleForItem?.(indexPath);
+  }
+
+  showCallout(text: string, indexPath: CYLIndexPath): void {
+    this.calloutIndexPath = indexPath;
+    this.calloutText = text;
+    this.setNeedsDisplay();
+  }
+
+  dismissCallout(): void {
+    if (this.calloutIndexPath !== undefined) {
+      this.calloutIndexPath = undefined;
+      this.calloutText = '';
+      this.setNeedsDisplay();
+    }
+  }
+
+  canReorderItem(indexPath: CYLIndexPath): boolean {
+    return this.canReorder;
+  }
+
+  beginReordering(indexPath: CYLIndexPath): void {
+    this.isReorderingStorage = true;
+    this.menuDelegate?.menuDidChangeReordering?.(this, true);
+    this.reportGestureState();
+    if (this.isSelected(indexPath)) {
+      this.reportSelectedDrag(indexPath);
+    }
+    this.setNeedsDisplay();
+  }
+
+  endReordering(destination: CYLIndexPath | undefined, moved: boolean): void {
     const pressed = this.pressedIndexPath;
     this.pressedIndexPath = undefined;
     if (!this.isReorderingStorage) {
@@ -2354,8 +2457,7 @@ export class CYLTagListState {
     this.setNeedsDisplay();
   }
 
-  cancelLongPress(): void {
-    this.pressedIndexPath = undefined;
+  cancelReordering(): void {
     if (this.isReorderingStorage) {
       this.isReorderingStorage = false;
       this.menuDelegate?.menuDidChangeReordering?.(this, false);
@@ -2422,7 +2524,7 @@ export class CYLTagListState {
     return undefined;
   }
 
-  private reportLongPress(indexPath: CYLIndexPath): void {
+  reportLongPress(indexPath: CYLIndexPath): void {
     this.menuDelegate?.menuDidLongPressItem?.(this, indexPath);
     const tag = this.tagAt(indexPath);
     if (tag !== undefined) {
@@ -2516,7 +2618,8 @@ export class CYLTagListState {
   }
 
   accessibilityHintForItem(indexPath: CYLIndexPath): string | undefined {
-    return this.menuDataSource?.menuAccessibilityHintForItem?.(indexPath);
+    // A screen-reader user rarely long-presses: the subtitle is the hint when the data source gives none.
+    return this.menuDataSource?.menuAccessibilityHintForItem?.(indexPath) ?? this.subtitleForItem(indexPath);
   }
 
   /** The item's own look, or its section's (themed by `colorTheme`; outlined for a create item). */
@@ -3026,6 +3129,10 @@ export class CYLTagListState {
     if (allowsEmpty !== undefined) {
       this.allowsEmptySelection = allowsEmpty;
     }
+    const longPress = CYLTagListState.longPressActionFromConfiguration(configuration[CYLTagListKey.longPressAction]);
+    if (longPress !== undefined) {
+      this.longPressAction = longPress;
+    }
     const showsHeaders = CYLConfigurationValue.bool(configuration[CYLTagListKey.showsSectionHeaders]);
     if (showsHeaders !== undefined) {
       this.showsSectionHeaders = showsHeaders;
@@ -3138,6 +3245,9 @@ export class CYLTagListConfigurationSource implements CYLMenuDataSource {
   menuTitleForItem(indexPath: CYLIndexPath): string {
     return CYLConfigurationValue.text(this.item(indexPath)[CYLTagItemKey.title]) ?? '';
   }
+
+  menuSubtitleForItem = (indexPath: CYLIndexPath): string | undefined =>
+  CYLConfigurationValue.text(this.item(indexPath)[CYLTagItemKey.subtitle]);
 
   menuImageForItem = (indexPath: CYLIndexPath): CYLImage | undefined =>
   CYLConfigurationValue.image(this.item(indexPath)[CYLTagItemKey.image]);

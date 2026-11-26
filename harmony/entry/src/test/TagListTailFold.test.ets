@@ -94,6 +94,34 @@ export default function tagListTailFoldTest() {
       expect(list.numberOfDisplayedItems(0)).assertEqual(visible + 1);
       expect(isFoldCell(list, visible)).assertTrue();
     });
+
+    it('showsNoHeaderFoldControlWhenTheTagsFitDefaultVisibleRowsAndNoWidthIsKnownYet', 0, () => {
+      const list = new CYLTagListState();
+      list.menuDataSource = new CYLTailFoldSource(TAGS_IN_TWO_ROWS);
+      list.defaultVisibleRows = 2;
+      list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.headerTrailing, CYLMenuFoldControlContent.icon);
+      list.reloadMenuData();
+      // No width yet: the layout is unknown, so no section can need a fold.
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
+      list.setLayoutWidth(320);
+      expect(list.numberOfRows(0)).assertEqual(2);
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
+      list.setLayoutWidth(0);
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
+    });
+
+    it('showsTheHeaderFoldControlOnlyWhenTheRowsExceedDefaultVisibleRows', 0, () => {
+      const list = new CYLTagListState();
+      list.menuDataSource = new CYLTailFoldSource(TAGS_IN_THREE_ROWS);
+      list.defaultVisibleRows = 2;
+      list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.headerTrailing, CYLMenuFoldControlContent.icon);
+      list.setLayoutWidth(320);
+      list.reloadMenuData();
+      expect(list.showsHeaderFoldControl(0)).assertTrue();
+      list.setLayoutWidth(640);
+      expect(list.numberOfRows(0)).assertEqual(2);
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
+    });
   });
 }
 

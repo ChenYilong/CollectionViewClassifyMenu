@@ -20,6 +20,12 @@ interface CYLMenuDataSource {
     fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? = null
     fun menuSelectedImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? = null
     fun menuAnimationURLForItemAtIndexPath(indexPath: CYLIndexPath): Uri? = null
+
+    /**
+     * The item's subtitle, shown in a callout with an arrow on a long press when the list's `longPressAction` includes
+     * `CYLTagLongPressActions.callout` (a longer description of a short title). null or empty: none.
+     */
+    fun menuSubtitleForItemAtIndexPath(indexPath: CYLIndexPath): String? = null
     fun menuAnimationRestingProgressForItemAtIndexPath(indexPath: CYLIndexPath): Float? = null
     fun menuStyleForSection(section: Int): CYLMenuStyle? = null
     fun menuStyleForItemAtIndexPath(indexPath: CYLIndexPath): CYLMenuStyle? = null

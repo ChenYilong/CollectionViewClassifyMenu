@@ -31,6 +31,7 @@ class CylTagListViewManager : SimpleViewManager<CylTagListView>(), CylTagListVie
 
   override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> = MapBuilder.of(
     "topTagTap", MapBuilder.of("registrationName", "onTagTap"),
+    "topTagLongPress", MapBuilder.of("registrationName", "onTagLongPress"),
     "topSelectionChange", MapBuilder.of("registrationName", "onSelectionChange"),
     "topContentHeightChange", MapBuilder.of("registrationName", "onContentHeightChange"),
   )

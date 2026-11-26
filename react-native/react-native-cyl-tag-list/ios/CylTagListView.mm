@@ -39,6 +39,13 @@ using namespace facebook::react;
             [tag[@"section"] intValue], [tag[@"item"] intValue], std::string([tag[@"title"] UTF8String])});
       }
     };
+    _view.onLongPress = ^(NSDictionary<NSString *, id> *tag) {
+      auto emitter = [weakSelf emitter];
+      if (emitter) {
+        emitter->onTagLongPress(CylTagListViewEventEmitter::OnTagLongPress{
+            [tag[@"section"] intValue], [tag[@"item"] intValue], std::string([tag[@"title"] UTF8String])});
+      }
+    };
     _view.onSelection = ^(NSArray<NSDictionary<NSString *, id> *> *items) {
       auto emitter = [weakSelf emitter];
       if (emitter) {

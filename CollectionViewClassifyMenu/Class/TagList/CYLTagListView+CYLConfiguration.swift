@@ -70,6 +70,12 @@ public enum CYLTagListKey {
     public static let showsSectionHeaders = "showsSectionHeaders"
 
     /**
+     * What a long press does: "reorder", "callout", "report" or "none", or an array of them (the first that can begin
+     * wins). A list without "none" and without "report" also reports the long press where no listed action takes it.
+     */
+    public static let longPressAction = "longPressAction"
+
+    /**
      * A Boolean, or "true" / "false".
      */
     public static let scrollEnabled = "scrollEnabled"
@@ -203,6 +209,11 @@ public enum CYLTagItemKey {
     public static let title = "title"
 
     /**
+     * A string: a longer description, shown in a callout on a long press (`longPressAction` "callout").
+     */
+    public static let subtitle = "subtitle"
+
+    /**
      * A `UIImage`, or an image name, "system:<SF Symbol>" or a file path.
      */
     public static let image = "image"
@@ -291,6 +302,11 @@ public enum CYLMenuStyleKey {
      * A number.
      */
     public static let itemHeight = "itemHeight"
+
+    /**
+     * The most lines a title may take: a whole number, or "unlimited". Default 1.
+     */
+    public static let titleMaxLines = "titleMaxLines"
 
     /**
      * The grid's items per row (`CYLMenuStyle.numberOfItemsPerRow`); 0 for the flow layout.
@@ -880,6 +896,10 @@ final class CYLTagListConfigurationSource: NSObject, CYLMenuDataSource {
         item(at: indexPath)[CYLTagItemKey.title].map { "\($0)" } ?? ""
     }
 
+    func menuSubtitleForItem(at indexPath: IndexPath) -> String? {
+        item(at: indexPath)[CYLTagItemKey.subtitle].map { "\($0)" }
+    }
+
     func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
         CYLConfigurationValue.image(item(at: indexPath)[CYLTagItemKey.image], baseURL: baseURL)
     }
@@ -1116,6 +1136,13 @@ extension CYLMenuStyle {
         }
         if let value = Value.double(configuration[Key.itemHeight]) {
             itemHeight = value
+        }
+        if let value = configuration[Key.titleMaxLines] {
+            if let text = value as? String, text == "unlimited" {
+                titleMaxLines = CYLTagTitleMaxLines.unlimited
+            } else if let number = Value.number(value) {
+                titleMaxLines = number.intValue
+            }
         }
         if let value = Value.number(configuration[Key.numberOfItemsPerRow]) {
             numberOfItemsPerRow = max(0, value.intValue)
@@ -1388,6 +1415,9 @@ extension CYLTagListView {
         if let value = Value.bool(configuration[Key.allowsEmptySelection]) {
             allowsEmptySelection = value
         }
+        if let action = Self.longPressAction(fromConfiguration: configuration[Key.longPressAction]) {
+            longPressAction = action
+        }
         if let value = Value.bool(configuration[Key.showsSectionHeaders]) {
             showsSectionHeaders = value
         }
@@ -1465,5 +1495,36 @@ extension CYLTagListView {
         let copy = style.cylCopy()
         copy.applyConfiguration(configuration)
         style = copy
+    }
+}
+
+extension CYLTagListView {
+
+    /// A configuration's `longPressAction` (a name or an array of names) as an action; `nil` when absent or unknown.
+    static func longPressAction(fromConfiguration value: Any?) -> CYLTagLongPressAction? {
+        guard let value else {
+            return nil
+        }
+        let names: [Any] = (value as? [Any]) ?? [value]
+        var actions = [CYLTagLongPressAction]()
+        for name in names {
+            switch name as? String {
+            case "reorder": actions.append(CYLTagLongPressActions.reorder)
+            case "callout": actions.append(CYLTagLongPressActions.callout)
+            case "report": actions.append(CYLTagLongPressActions.report)
+            case "none": actions.append(CYLTagLongPressActions.none)
+            default: return nil
+            }
+        }
+        guard !actions.isEmpty else {
+            return nil
+        }
+        // The long press is still reported where no listed action takes it (a tag without a subtitle), unless "none".
+        let hasNone = actions.contains { $0 === CYLTagLongPressActions.none }
+        let hasReport = actions.contains { $0 === CYLTagLongPressActions.report }
+        if !hasNone && !hasReport {
+            actions.append(CYLTagLongPressActions.report)
+        }
+        return actions.count == 1 ? actions[0] : CYLTagLongPressActions.first(actions)
     }
 }

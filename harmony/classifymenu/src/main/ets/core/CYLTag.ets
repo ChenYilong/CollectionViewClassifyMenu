@@ -21,6 +21,8 @@ const SYSTEM_BLUE: string = '#FF007AFF';
 export class CYLTag {
   identifier: number;
   title: string;
+  /** A longer description, shown in a callout on a long press (`CYLTagLongPressActions.callout`). */
+  subtitle?: string;
   image?: CYLImage;
   selectedImage?: CYLImage;
   /** A Lottie animation: `asset:<rawfile path>` or the JSON text. */
@@ -303,6 +305,7 @@ export class CYLTagDataSource implements CYLMenuDataSource {
     }
     return tag.image;
   }
+  menuSubtitleForItem = (indexPath: CYLIndexPath): string | undefined => this.tagAt(indexPath)?.subtitle;
   menuSelectedImageForItem = (indexPath: CYLIndexPath): CYLImage | undefined => this.tagAt(indexPath)?.selectedImage;
   menuAnimationURLForItem = (indexPath: CYLIndexPath): string | undefined => this.tagAt(indexPath)?.animationURL;
   menuItemIsEnabled = (indexPath: CYLIndexPath): boolean => this.tagAt(indexPath)?.isEnabled ?? true;
