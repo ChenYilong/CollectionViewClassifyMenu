@@ -110,6 +110,8 @@ open class CYLTagButton @JvmOverloads constructor(
         titleView.gravity = Gravity.CENTER_VERTICAL
         // The disabled look comes from the style's appearance, not from the base class's alpha.
         disabledAlpha = 1f
+        // A selected tag rests on the LAST frame of its animation (iOS: showsLastFrameWhenSelected = true), not on frame 0.
+        showsLastFrameWhenSelected = true
         accessoryView = deleteIndicatorLabel
         badgeLabel.background = badgeBox
         addView(badgeLabel)

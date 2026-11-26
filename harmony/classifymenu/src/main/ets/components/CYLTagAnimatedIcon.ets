@@ -350,6 +350,8 @@ export struct CYLTagAnimatedIcon {
           image: this.image,
           selectedImage: this.selectedImage,
           isItemSelected: this.isSelected,
+          // A selected tag rests on the LAST frame of its animation (iOS: showsLastFrameWhenSelected = true).
+          showsLastFrameWhenSelected: true,
           subclassIconColor: this.subclassIconColor,
           subclassSelectedIconColor: this.subclassSelectedIconColor,
           builtInIconColor: this.builtInIconColor,
@@ -368,6 +370,8 @@ export struct CYLTagAnimatedIcon {
           image: this.image,
           selectedImage: this.selectedImage,
           isItemSelected: this.isSelected,
+          // A selected tag rests on the LAST frame of its animation (iOS: showsLastFrameWhenSelected = true).
+          showsLastFrameWhenSelected: true,
           subclassIconColor: this.subclassIconColor,
           subclassSelectedIconColor: this.subclassSelectedIconColor,
           builtInIconColor: this.builtInIconColor,
