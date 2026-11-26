@@ -144,3 +144,6 @@ harmony/**/BuildProfile.ets
 # From CYLTabBarController's .gitignore (b3c87fd1), with this project's name
 CollectionViewClassifyMenu.xcodeproj/project.xcworkspace/xcuserdata/chenyilong.xcuserdatad/UserInterfaceState.xcuserstate
 CollectionViewClassifyMenu.xcodeproj/xcuserdata/chenyilong.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
+
+# Local-only handover memory (docs/todo/<week>/<weekday>/memory/): never commit or push. 本机交接记忆，不提交、不上传。
+docs/todo/*/*/memory/
