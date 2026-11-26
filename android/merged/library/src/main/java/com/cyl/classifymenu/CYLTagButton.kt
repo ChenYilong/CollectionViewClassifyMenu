@@ -454,11 +454,16 @@ open class CYLTagButton @JvmOverloads constructor(
         deleteIndicatorLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, deleteFont.size)
         deleteIndicatorLabel.typeface = deleteFont.typeface
         deleteIndicatorLabel.setTextColor(style.deleteIndicatorColor ?: textColor)
-        var borderColor = appearance.borderColor
-        var borderWidth = if (borderColor != null) appearance.borderWidth else 0f
+        // Where glass is really drawn only an EXPLICIT border (setter, configuration, preset) is handed over: the built-in default
+        // border of the state is dropped (no border, width 0), so the glass's own rim shows. Flat keeps the default border.
+        val dropsDefaultBorder = drawsGlass && !appearance.hasExplicitBorder
+        val styleBorderColor = if (dropsDefaultBorder) null else appearance.borderColor
+        val styleBorderWidth = if (dropsDefaultBorder) 0f else appearance.borderWidth
+        var borderColor = styleBorderColor
+        var borderWidth = if (borderColor != null) styleBorderWidth else 0f
         if (CYLAccessibility.isIncreaseContrastEnabled(context)) {
-            borderColor = if (state == CYLControlState.SELECTED) appearance.borderColor ?: textColor else textColor
-            borderWidth = max(1f, appearance.borderWidth)
+            borderColor = if (state == CYLControlState.SELECTED) styleBorderColor ?: textColor else textColor
+            borderWidth = max(1f, styleBorderWidth)
         }
         // At least one pixel, as before; CYLAnimatedItemView draws the border.
         itemBorderWidth = if (borderWidth > 0) max(1f / density, borderWidth) else 0f

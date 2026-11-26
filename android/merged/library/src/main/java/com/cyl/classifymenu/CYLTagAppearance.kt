@@ -48,10 +48,49 @@ class CYLTagAppearance : Cloneable {
     var cornerRadius: Float = CYLAnimatedItemCornerRadiusCapsule
         set(value) { field = sanitized(value) }
 
-    var borderColor: Int? = null
+    private var _borderColor: Int? = null
+    private var _borderWidth: Float = 0f
+    private var borderColorWasSet = false
+    private var borderWidthWasSet = false
 
-    var borderWidth: Float = 0f
-        set(value) { field = sanitized(value) }
+    /** The border color in use: the built-in default of the style until one is set (setter, configuration key, preset). */
+    var borderColor: Int?
+        get() = _borderColor
+        set(value) {
+            _borderColor = value
+            borderColorWasSet = true
+        }
+
+    /** The border width in use (dp): the built-in default of the style until one is set. Negative or non-finite becomes 0. */
+    var borderWidth: Float
+        get() = _borderWidth
+        set(value) {
+            _borderWidth = sanitized(value)
+            borderWidthWasSet = true
+        }
+
+    /**
+     * Whether the app (a setter, a configuration key or a preset) set the border color or width of this state. The built-in
+     * default border ([setDefaultBorder]) does not count. Under drawn Liquid Glass only an explicit border is handed to the
+     * glass; otherwise the glass draws its own rim.
+     */
+    val hasExplicitBorder: Boolean get() = borderColorWasSet || borderWidthWasSet
+
+    /** The built-in default border of a state: readable through [borderColor] and [borderWidth] but NOT explicit. */
+    internal fun setDefaultBorder(color: Int?, width: Float) {
+        _borderColor = color
+        _borderWidth = sanitized(width)
+        borderColorWasSet = false
+        borderWidthWasSet = false
+    }
+
+    /** Takes the border of `other` with its explicit flags (the default stays a default). */
+    internal fun copyBorderFrom(other: CYLTagAppearance) {
+        _borderColor = other._borderColor
+        _borderWidth = other._borderWidth
+        borderColorWasSet = other.borderColorWasSet
+        borderWidthWasSet = other.borderWidthWasSet
+    }
 
     /** The larger of the left and right content insets; setting it sets both. */
     var margin: Float
@@ -73,8 +112,7 @@ class CYLTagAppearance : Cloneable {
         _font = null
         iconColor = null
         cornerRadius = CYLAnimatedItemCornerRadiusCapsule
-        borderColor = null
-        borderWidth = 0f
+        setDefaultBorder(null, 0f)
         contentInsets = CYLEdgeInsets(5f, 10f, 5f, 10f)
         backgroundImage = null
     }
@@ -95,8 +133,7 @@ class CYLTagAppearance : Cloneable {
         it._font = _font
         it.iconColor = iconColor
         it.cornerRadius = cornerRadius
-        it.borderColor = borderColor
-        it.borderWidth = borderWidth
+        it.copyBorderFrom(this)
         it.contentInsets = contentInsets
         it.backgroundImage = backgroundImage
     }
