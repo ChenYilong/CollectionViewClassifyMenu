@@ -45,8 +45,8 @@ final class CYLTagListSectionGlassTintTests: CYLMenuExampleTestCase {
         let host = try XCTUnwrap(card.value(forKey: "glassHost") as? CYLAnimatedItemView)
         XCTAssertFalse(host.isHidden)
         XCTAssertNotNil(host.itemLiquidGlassView, "The library's glass, like a tag")
-        XCTAssertEqual(host.itemBackgroundColor, CYLMenuStyle.defaultGlassTint, "Unset: the same low-alpha default tint as a tag")
-        XCTAssertEqual(host.itemGlassTintAlpha, 1)
+        XCTAssertNil(host.itemBackgroundColor, "Unset: nil, the item's default tint, the same as a tag")
+        XCTAssertNil(host.itemGlassTintAlpha)
         XCTAssertNil(card.backgroundColor, "No flat color behind the glass")
         XCTAssertEqual(card.layer.cornerRadius, CYLSectionStyleMetrics.cardCornerRadius, accuracy: 0.01)
     }

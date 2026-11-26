@@ -56,7 +56,7 @@ open class CYLTagButton: CYLAnimatedItemView {
      * `itemContentHorizontalInset` left unset gives the same). The effective inset is the larger of this and the appearance's.
      */
     static func contentInset(for style: CYLMenuStyle) -> CGFloat {
-        style.resolvedBackgroundStyle == .liquidGlass ? cylAnimatedItemLiquidGlassContentInset : 0
+        CYLAnimatedItemView.resolvedContentHorizontalInset(nil, style: style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat)
     }
     private static let disabledAnimationAlpha: CGFloat = 0.4
     /**
@@ -129,17 +129,6 @@ open class CYLTagButton: CYLAnimatedItemView {
     open override var selectedImage: UIImage? {
         didSet {
             updateAppearance()
-        }
-    }
-
-    /**
-     * The frame (0...1) of the animated icon shown while not selected (the base class's). Default 0, the first frame.
-     */
-    open override var animationRestingProgress: CGFloat {
-        didSet {
-            if oldValue != animationRestingProgress {
-                updateAnimationState()
-            }
         }
     }
 
@@ -263,14 +252,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
     }
 
-    /**
-     * Whether an animation engine is in the app (CYLTabBarController's `CYLTabBarItemAnimationFactory`, brought by an
-     * engine subspec such as `CYLAnimatedItem/LottieSwift`). The core links none: without one, tags
-     * show their static images.
-     */
-    @objc public static var isAnimationEngineAvailable: Bool {
-        NSClassFromString("CYLTabBarItemAnimationFactory") != nil
-    }
+    // `isAnimationEngineAvailable` is CYLAnimatedItemView's (inherited): a runtime check for an engine in the app.
 
     private var styleStorage = CYLMenuStyle()
     private var badgeColorStorage: UIColor = .systemRed
@@ -281,13 +263,13 @@ open class CYLTagButton: CYLAnimatedItemView {
     private var addsStateTraits = false
     private var followsStyleAnimationSpeed = true
     private var isApplyingStyleAnimationSpeed = false
-    private var appliedExplicitTitleColors: [UIColor?]?
     private let backgroundImageView = UIImageView()
 
     /**
      * The Liquid Glass layer behind the content (CYLAnimatedItemView's `itemLiquidGlassView`) while
-     * `style.resolvedBackgroundStyle` is `.liquidGlass`; `nil` when the tag is flat.
+     * `drawsLiquidGlass`; `nil` when the tag is flat.
      */
+    @available(*, deprecated, renamed: "itemLiquidGlassView")
     public var liquidGlassView: UIView? {
         itemLiquidGlassView
     }
@@ -364,6 +346,12 @@ open class CYLTagButton: CYLAnimatedItemView {
         layer.addSublayer(crossLayer)
         layer.masksToBounds = true
         self.iconSize = animationSize
+        // What the tag used to do by hand is now the item's options (the defaults of the item keep tab bar items as they were).
+        itemDisabledAnimationAlpha = Self.disabledAnimationAlpha
+        showsLastFrameWhenSelected = true
+        respectsReduceMotion = true
+        disabledWinsImage = true
+        showsOutlineWhenIncreaseContrast = true
         applyStyleAnimationSpeed()
         updateAppearance()
     }
@@ -371,23 +359,10 @@ open class CYLTagButton: CYLAnimatedItemView {
     // MARK: - Animation
 
     /**
-     * Plays the animated icon, as a tab icon plays when the tab is tapped; with Reduce Motion it shows the state's
-     * frame instead. Without an engine (or a file that cannot play) it does nothing.
-     */
-    open override func playAnimation() {
-        if UIAccessibility.isReduceMotionEnabled {
-            updateAnimationState()
-            return
-        }
-        super.playAnimation()
-    }
-
-    /**
-     * Builds the animation view again (a new file or size) and shows the state's frame.
+     * Builds the animation view again (a new file or size) and shows the state's frame (the base class does, `showsLastFrameWhenSelected`).
      */
     open override func reloadAnimation() {
         super.reloadAnimation()
-        updateAnimationState()
         updateAppearance()
     }
 
@@ -661,9 +636,6 @@ open class CYLTagButton: CYLAnimatedItemView {
 
     open override var isSelected: Bool {
         didSet {
-            if oldValue != isSelected {
-                updateAnimationState()
-            }
             updateAppearance()
         }
     }
@@ -1075,34 +1047,6 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
 
-    /**
-     * The explicit title colors of the style's states, as the item's `itemAppearance` title colors (only the colors that were set; an unset
-     * state keeps the item's built-in or the label color the tag set). Assigned only when they changed.
-     */
-    private func handExplicitTitleColorsToItem() {
-        let colors = [style.normalAppearance.explicitTextColor, style.selectedAppearance.explicitTextColor,
-                      style.disabledAppearance.explicitTextColor]
-        let changed = appliedExplicitTitleColors.map { !zip($0, colors).allSatisfy { $0 == $1 } } ?? true
-        appliedExplicitTitleColors = colors
-        guard colors.contains(where: { $0 != nil }) else {
-            if changed, itemAppearance != nil, !isItemAppearanceInherited {
-                itemAppearance = nil
-            }
-            return
-        }
-        if changed {
-            let appearance = UITabBarItemAppearance()
-            for (color, state) in zip(colors, [appearance.normal, appearance.selected, appearance.disabled]) {
-                if let color {
-                    state.titleTextAttributes = [.foregroundColor: color]
-                }
-            }
-            itemAppearance = appearance
-        }
-        // The label was just set to the effective color: the item applies (and, on drawn dark glass, adapts) the explicit one over it.
-        applyItemAppearance()
-    }
-
     private func applyStyleAnimationSpeed() {
         guard followsStyleAnimationSpeed else {
             return
@@ -1114,68 +1058,44 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
     /**
-     * Selected: the last frame (a selected tab's icon); otherwise the resting progress (the first frame by default).
+     * The color of the delete indicator (its label, cross, editing icons): the style's `deleteIndicatorColor`, else the state's text color. An EXPLICIT
+     * color (the style's, or an explicit text color) goes through the item's dark-glass rule (`adaptedOnGlass`); the tag default is as it is.
      */
-    private func updateAnimationState() {
-        guard animationView != nil else {
-            return
+    private func deleteIndicatorColor(_ appearance: CYLTagAppearance, kind: CYLAnimatedItemGlassColorKind) -> UIColor? {
+        if let explicit = style.deleteIndicatorColor ?? appearance.explicitTextColor {
+            return adaptedOnGlass(explicit, kind: kind)
         }
-        if isSelected {
-            showAnimationLastFrame()
-        } else {
-            stopAnimation()
-        }
+        return appearance.textColor
     }
 
     private func updateAppearance() {
         let style = styleStorage
         let state = currentState
         let appearance = style.appearance(for: state)
-        // The base class chooses the icon (the image, the selected image or its placeholder) and hides it while the
-        // animation shows; only a disabled selected tag shows `image`, as before (disabled wins over selected).
-        if let shown = imageView.image, shown === image || shown === selectedImage {
-            let icon = state == .selected && selectedImage != nil ? selectedImage : image
-            if icon !== shown {
-                imageView.image = icon
-            }
-        }
-        animationView?.alpha = state == .disabled ? Self.disabledAnimationAlpha : 1
-        // The component sets the icon's tint AND hands the color to the animation (`animationTint = "title"`), resolved with this view's own traits.
-        // Precedence: this item's or its stack's explicit icon color (the component's `itemAppearance`) > this class's built-in, which is the
-        // style's explicit icon color, else the effective text color (the explicit one, else the tag default) > the component's built-in.
-        // The tag's own built-ins keep the look of earlier versions; they are the level between, passed as the subclass color.
+        // The base class chooses the icon (the image, the selected image or its placeholder; disabled wins over selected, `disabledWinsImage`),
+        // dims the animation while disabled (`itemDisabledAnimationAlpha`) and shows the state's frame (`showsLastFrameWhenSelected`).
+        // Colors go to the item by its channels. Precedence (the item's): its own `itemAppearance` > the style's EXPLICIT colors (`setSubclassTitleColor` /
+        // `setSubclassIconColor`) > the stack's > this class's built-ins (`applyTitleTintColor` / `applyIconTintColor`: the effective colors) > the component's.
+        // The item adapts the explicit ones on drawn dark glass (and not the built-ins). The tag never sets `animationTint` or `itemAppearance`.
         titleLabel.text = style.displayedTitle(forTitle: title)
         titleLabel.font = style.titleFont(for: state, traitCollection: traitCollection)
 
-        let pressed = isHighlighted && state != .disabled && style.highlightedBackgroundColor != nil
-        // Pressed, as android-tagview's layoutColorPress.
-        let background = pressed ? style.highlightedBackgroundColor : appearance.backgroundColor
         // The background is CYLAnimatedItemView's: flat color, or Liquid Glass tinted with it where the system draws it. Where glass is drawn only an
-        // EXPLICIT color tints it: an unset one (the built-in white, which would hide the backdrop) is replaced by the low-alpha `CYLMenuStyle.defaultGlassTint`.
-        // The pressed color is always explicit. Flat (also where the system draws no glass) keeps the effective color.
-        let drawsGlass = style.resolvedBackgroundStyle == .liquidGlass
+        // EXPLICIT color tints it; an unset one is nil, so the item's default tint applies. The pressed color (`style.highlightedBackgroundColor`) is the
+        // item's `itemHighlightedBackgroundColor`. Flat (also where the system draws no glass) keeps the effective color.
         itemBackgroundStyle = style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat
-        let explicitGlassColor = drawsGlass && !pressed ? appearance.explicitBackgroundColor : nil
-        itemBackgroundColor = drawsGlass && !pressed ? (explicitGlassColor ?? CYLMenuStyle.defaultGlassTint) : background
-        // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
-        // The default tint (no explicit color) is handed with alpha 1: its own low alpha is the tint, the same as the board's.
-        itemGlassTintAlpha = state == .selected || (drawsGlass && !pressed && explicitGlassColor == nil) ? 1 : nil
-        // Dark drawn glass: an explicit, static title color (4.5:1) and icon color (3:1; only an EXPLICIT icon color: an icon that follows
-        // the text color is not lifted by itself, as on the other platforms) are lifted by the shared rule of the tab bar module, CYLAnimatedItemContrast (one reference: the
-        // glass over black). The item lifts only its own explicit colors (itemAppearance), and the tag hands its colors as the
-        // subclass level, so the tag asks the same function here. Built-in, dynamic and flat colors are as set.
-        let liftsOnGlass = drawsGlass && traitCollection.userInterfaceStyle == .dark
-        // The title color: the tag's colors (the effective one, else the explicit ones per state) go to the item as its `itemAppearance`
-        // title colors, so normal, selected and disabled titles share ONE pipeline of the item (its tint logic and the dark glass
-        // adaptation of an explicit color); the effective color is also set on the label for what the item leaves alone (unset states).
-        titleLabel.textColor = appearance.textColor
-        handExplicitTitleColorsToItem()
-        var iconColor = style.iconColor(for: state)
-        if liftsOnGlass, let explicit = style.explicitIconColor(for: state) {
-            iconColor = CYLAnimatedItemContrast.adjustedIcon(explicit, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha)
+        let drawsGlass = drawsLiquidGlass
+        itemBackgroundColor = drawsGlass ? appearance.explicitBackgroundColor : appearance.backgroundColor
+        itemHighlightedBackgroundColor = style.highlightedBackgroundColor
+        // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the item's default share.
+        itemGlassTintAlpha = state == .selected ? 1 : nil
+        for tagState in Self.states {
+            let stateAppearance = style.appearance(for: tagState)
+            setSubclassTitleColor(stateAppearance.explicitTextColor, for: tagState)
+            setSubclassIconColor(style.explicitIconColor(for: tagState), for: tagState)
         }
-        // The animation takes this color too (`animationTint = "title"`), so it is lifted with the icon.
-        applyIconTintColor(iconColor)
+        applyTitleTintColor(appearance.textColor)
+        applyIconTintColor(style.iconColor(for: state))
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)
@@ -1190,9 +1110,9 @@ open class CYLTagButton: CYLAnimatedItemView {
         deleteIndicatorImageView.isHidden = !showsDeleteIndicator || indicatorImage == nil || editingIcons
         if editingIcons || editingIndicatorsViewIsLoaded {
             editingIndicatorsView.isHidden = !editingIcons
-            let color = style.deleteIndicatorColor ?? appearance.textColor
+            let color = deleteIndicatorColor(appearance, kind: .icon)
             for icon in editingIndicatorsView.itemViews {
-                icon.imageView.tintColor = color
+                icon.applyIconTintColor(color)
             }
         }
         // A title that may wrap (CYLMenuStyle.titleMaxLines) takes that many lines (UIKit counts 0 as "as many as it needs").
@@ -1206,7 +1126,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         crossLayer.isHidden = !showsDeleteIndicator || !drawsCross || editingIcons
         crossLayer.lineWidth = style.deleteIndicatorLineWidth
-        crossLayer.strokeColor = (style.deleteIndicatorColor ?? appearance.textColor)?.cgColor
+        crossLayer.strokeColor = deleteIndicatorColor(appearance, kind: .icon)?.resolvedColor(with: traitCollection).cgColor
         let imageRadius = style.imageCornerRadius
         if !style.imageFillsTagHeight {
             // (An image that fills the tag's height is a circle: layOutTagHeightImage rounds it.)
@@ -1218,15 +1138,11 @@ open class CYLTagButton: CYLAnimatedItemView {
             }
         }
         deleteIndicatorLabel.font = style.deleteIndicatorFont(for: state, traitCollection: traitCollection)
-        deleteIndicatorLabel.textColor = style.deleteIndicatorColor ?? appearance.textColor
+        deleteIndicatorLabel.textColor = deleteIndicatorColor(appearance, kind: .title)
         // Under drawn glass only an explicit border is handed over (the built-in one would hide the shared glass rim); flat keeps the effective border.
-        var borderColor = drawsGlass ? appearance.glassBorderColor : appearance.borderColor
-        var borderWidth = borderColor != nil ? (drawsGlass ? appearance.glassBorderWidth : appearance.borderWidth) : 0
-        if UIAccessibility.isDarkerSystemColorsEnabled {
-            // Increase Contrast: a visible outline in the text color.
-            borderColor = state == .selected ? (appearance.borderColor ?? appearance.textColor) : appearance.textColor
-            borderWidth = max(1, appearance.borderWidth)
-        }
+        let borderColor = drawsGlass ? appearance.glassBorderColor : appearance.borderColor
+        let borderWidth = borderColor != nil ? (drawsGlass ? appearance.glassBorderWidth : appearance.borderWidth) : 0
+        // Increase Contrast: the item draws the outline (`showsOutlineWhenIncreaseContrast`).
         itemBorderColor = borderColor
         itemBorderWidth = borderWidth
         badgeLabel.isHidden = badgeValue == nil

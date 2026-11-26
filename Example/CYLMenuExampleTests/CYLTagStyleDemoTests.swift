@@ -158,7 +158,7 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
                 tag.isSelected = index == 1
                 canvas.addSubview(tag)
                 tag.layoutIfNeeded()
-                XCTAssertEqual(tag.liquidGlassView != nil, background == .liquidGlass)
+                XCTAssertEqual(tag.itemLiquidGlassView != nil, background == .liquidGlass)
             }
             y += 82
         }

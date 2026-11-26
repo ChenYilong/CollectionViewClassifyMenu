@@ -37,7 +37,7 @@ struct CYLTagListCardSpec {
      */
     let color: UIColor
     /**
-     * The glass tint: `sectionBackgroundColor` when the app set it, else `nil` (the default glass tint `CYLMenuStyle.defaultGlassTint` applies, as for a tag).
+     * The glass tint: `sectionBackgroundColor` when the app set it, else `nil` (the item's default glass tint `CYLAnimatedItemView.defaultGlassTint` applies, as for a tag).
      */
     let glassTint: UIColor?
     /**
@@ -126,15 +126,15 @@ final class CYLTagListCardView: UICollectionReusableView {
         glassHost.isHidden = !card.usesGlass
         if card.usesGlass {
             glassHost.itemBackgroundStyle = .liquidGlass
-            // Unset: the same low-alpha default tint as a tag (alpha 1: its own alpha tints); explicit: as set.
-            glassHost.itemBackgroundColor = card.glassTint ?? CYLMenuStyle.defaultGlassTint
-            glassHost.itemGlassTintAlpha = card.glassTint == nil ? 1 : nil
+            // Unset: nil, the item's default tint (the same as a tag's, CYLAnimatedItemView.defaultGlassTint); explicit: as set.
+            glassHost.itemBackgroundColor = card.glassTint
+            glassHost.itemGlassTintAlpha = nil
             glassHost.itemCornerRadius = card.cornerRadius
             glassHost.frame = bounds
             glassHost.layoutIfNeeded()
         }
         // Flat where the glass is not drawn.
-        let drawsGlass = card.usesGlass && glassHost.resolvedItemBackgroundStyle == .liquidGlass
+        let drawsGlass = card.usesGlass && glassHost.drawsLiquidGlass
         glassHost.isHidden = !drawsGlass
         backgroundColor = drawsGlass ? nil : card.color
     }

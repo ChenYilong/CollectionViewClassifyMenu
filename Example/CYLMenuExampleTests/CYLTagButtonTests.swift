@@ -478,7 +478,7 @@ final class CYLTagButtonTests: XCTestCase {
     // MARK: - Liquid Glass tint: an unset background is ignored
 
     private func glassTint(of button: CYLTagButton, _ traits: UITraitCollection) -> UIColor? {
-        guard #available(iOS 26.0, *), let glass = (button.liquidGlassView as? UIVisualEffectView)?.effect as? UIGlassEffect else { return nil }
+        guard #available(iOS 26.0, *), let glass = (button.itemLiquidGlassView as? UIVisualEffectView)?.effect as? UIGlassEffect else { return nil }
         return glass.tintColor?.resolvedColor(with: traits)
     }
 
@@ -491,12 +491,12 @@ final class CYLTagButtonTests: XCTestCase {
         let style = CYLMenuStyle()
         style.backgroundStyle = .liquidGlass
         let normal = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
-        XCTAssertEqual(normal.itemBackgroundColor, CYLMenuStyle.defaultGlassTint, "unset background: the low-alpha default tint")
-        XCTAssertEqual(normal.itemGlassTintAlpha, 1, "its own alpha is the tint")
+        XCTAssertNil(normal.itemBackgroundColor, "unset background: nil, the item's low-alpha default tint applies")
+        XCTAssertNil(normal.itemGlassTintAlpha, "the default tint never takes a share")
         XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: normal, light)), CYLMenuFixtures.rgb(UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: 1)))
         var alpha: CGFloat = 0
         glassTint(of: normal, light)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
-        XCTAssertEqual(alpha, CYLMenuStyle.defaultGlassTintAlphaLight, accuracy: 0.01)
+        XCTAssertEqual(alpha, CYLAnimatedItemView.defaultGlassTintAlphaLight, accuracy: 0.01)
         // The glass takes its tint resolved with the button's own traits: a dark-mode button for the dark values.
         let darkNormal = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
         // In a dark window: a detached view reports the light trait whatever its override says.
@@ -509,17 +509,17 @@ final class CYLTagButtonTests: XCTestCase {
         darkNormal.layoutIfNeeded()
         XCTAssertEqual(CYLMenuFixtures.rgb(glassTint(of: darkNormal, dark)), CYLMenuFixtures.rgb(.white))
         glassTint(of: darkNormal, dark)?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
-        XCTAssertEqual(alpha, CYLMenuStyle.defaultGlassTintAlphaDark, accuracy: 0.01)
+        XCTAssertEqual(alpha, CYLAnimatedItemView.defaultGlassTintAlphaDark, accuracy: 0.01)
         let disabled = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
         disabled.isEnabled = false
-        XCTAssertEqual(disabled.itemBackgroundColor, CYLMenuStyle.defaultGlassTint)
+        XCTAssertNil(disabled.itemBackgroundColor)
         // Reset back to unset is unset again.
         style.normalAppearance.backgroundColor = .red
         normal.style = style
         XCTAssertEqual(normal.itemBackgroundColor, .red)
         style.normalAppearance.backgroundColor = nil
         normal.style = style
-        XCTAssertEqual(normal.itemBackgroundColor, CYLMenuStyle.defaultGlassTint)
+        XCTAssertNil(normal.itemBackgroundColor)
     }
 
     func testGlassTintsWithAnExplicitBackgroundAndASelectedTagKeepsAlphaOne() throws {
@@ -587,5 +587,36 @@ final class CYLTagButtonTests: XCTestCase {
         for (name, backdrop) in [("blue", blue), ("black", black)] {
             XCTAssertGreaterThanOrEqual(contrast(white, over(white, 0.14, backdrop)), 3, "dark label on frosted tint over \(name)")
         }
+    }
+
+    // MARK: - The tag talks to the item by its channels
+
+    func testAnIntegratorsItemAppearanceWinsOverTheStylesExplicitTitleColorAndIsNotOverwritten() {
+        let style = CYLMenuStyle()
+        style.normalAppearance.textColor = .red
+        let button = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        XCTAssertEqual(button.titleLabel.textColor, .red, "the style's explicit color shows")
+        let appearance = UITabBarItemAppearance()
+        appearance.normal.titleTextAttributes = [.foregroundColor: UIColor.blue]
+        button.itemAppearance = appearance
+        XCTAssertFalse(button.isItemAppearanceInherited)
+        XCTAssertEqual(button.titleLabel.textColor, .blue, "the integrator's own appearance wins")
+        button.style = style
+        XCTAssertTrue(button.itemAppearance === appearance || button.itemAppearance?.normal.titleTextAttributes[.foregroundColor] as? UIColor == .blue,
+                      "a style update does not replace the integrator's appearance")
+        XCTAssertEqual(button.titleLabel.textColor, .blue)
+    }
+
+    func testAStacksInheritedAppearanceSurvivesTheTagsOwnColors() {
+        let style = CYLMenuStyle()
+        style.normalAppearance.textColor = .red
+        let button = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        let stackAppearance = UITabBarItemAppearance()
+        stackAppearance.normal.iconColor = .green
+        button.applyInheritedItemAppearance(stackAppearance)
+        button.style = style
+        XCTAssertTrue(button.isItemAppearanceInherited, "the tag never marks the appearance as its own")
+        XCTAssertEqual(button.imageView.tintColor?.resolvedColor(with: button.traitCollection), UIColor.green.resolvedColor(with: button.traitCollection),
+                       "the stack's icon color beats the tag's built-in icon color")
     }
 }

@@ -137,16 +137,29 @@ Applied only when glass is really drawn AND the mode is dark AND the color is EX
 explicit `textColor` of the state (title, 4.5) and its explicit `iconColor` (icon and animation tint, 3; an icon that only follows the text color
 is not lifted by itself). The built-in colors are never touched; light mode, flat tags, colors that already pass and dynamic colors never change.
 
-iOS wiring: `CYLAnimatedItemView` lifts its own explicit colors (the item's or the stack's `itemAppearance` icon color, the
-`titleTextAttributes` title color, a fixed `animationTint`). A tag hands its EXPLICIT title colors (normal, selected, disabled) to the item as
-its `itemAppearance` `titleTextAttributes` colors (`CYLTagButton.handExplicitTitleColorsToItem`), so every state's title goes through the item's one
-title pipeline, including the dark glass adaptation; an unset state keeps the effective label color the tag sets. The icon color is still handed as the
-subclass level (`applyIconTintColor`), which the item treats as built-in, so the tag calls `CYLAnimatedItemContrast.adjustedIcon` itself; the animation
-follows the lifted icon color (`animationTint = "title"`).
+iOS wiring (2026-11-26, the tag no longer re-implements the rule; CYLTabBarController item commit named in the repin): `CYLAnimatedItemView` owns it.
+Everything glass-only sits behind the item's `drawsLiquidGlass` (= `resolvedItemBackgroundStyle == .liquidGlass`: asked for AND drawn; `drawsFlatBackground` is the
+opposite, so glass asked for but not drawn is flat). A tag talks to the item by channels, never by `itemAppearance`:
+
+- Precedence of one state's colors, high to low: the integrator's own `itemAppearance` (`isItemAppearanceInherited` false) > the tag style's EXPLICIT colors
+  (`setSubclassTitleColor(_:for:)`, `setSubclassIconColor(_:for:)`: only `explicitTextColor` / `explicitIconColor`) > the stack's inherited `itemAppearance` >
+  the tag's built-ins (`applyTitleTintColor` / `applyIconTintColor`, the effective colors) > the component's built-ins. The channels never touch `itemAppearance`
+  or `isItemAppearanceInherited`, so a tag in a `CYLAnimatedItemStackView` keeps the stack's fonts and icon colors (the regression of 098809db: the removed
+  `handExplicitTitleColorsToItem` replaced the integrator's `itemAppearance`).
+- Levels 1 to 3 are explicit and are adapted on drawn dark glass (title 4.5, icon and animation tint 3); the built-ins are not. The tag has no
+  `CYLAnimatedItemContrast` call and no `liftsOnGlass`. The delete indicator (label, cross, editing icons) asks the item's public
+  `adaptedOnGlass(_:kind:)` for its explicit colors.
+- The tag never sets `animationTint` (older comments saying `animationTint = "title"` were wrong); the animation follows the effective icon color as the item decides.
+- Pressed look, disabled animation alpha (0.4), last frame when selected, Increase Contrast outline, Reduce Motion and disabled-wins image are item options
+  the tag turns on (`itemHighlightedBackgroundColor`, `itemDisabledAnimationAlpha`, `showsLastFrameWhenSelected`, `showsOutlineWhenIncreaseContrast`,
+  `respectsReduceMotion`, `disabledWinsImage`); their defaults keep tab bar items unchanged. Difference: with Increase Contrast a selected tag's outline is now
+  the title color (before: its explicit border color).
+- Stays in the tag, because it depends on `CYLMenuStyle` / `CYLTagAppearance`: the glass border rule (the explicit colour decides), the explicit-only background
+  under glass, selected tint alpha 1, the delete cross / image / hit frames, layout, measurement and elevation.
 
 | Platform | Status |
 |:--|:--|
-| iOS | `CYLAnimatedItemContrast` (CYLTabBarController module), applied in `CYLAnimatedItemView` and `CYLTagButton`; compiled, not yet run |
+| iOS | `CYLAnimatedItemContrast` (CYLTabBarController module), applied only in `CYLAnimatedItemView` (`adaptedOnGlass(_:kind:)` for hosts); compiled, not yet run |
 | Android | `CYLIconContrast.kt`; `CYLTagButton.updateAppearance` lifts the icon color filter (night mode = `CYLSystemColors.isNight`, glass = `resolvedBackgroundStyle`, explicit = `CYLMenuStyle.explicitIconColorForState`); `CYLIconContrastTest`, written statically, not yet run. |
 | HarmonyOS | `CYLIconContrast` (`core/CYLIconContrast.ets`, exported from `Index.ets`); `CYLMenuStyle.explicitIconColor(state)` tells an explicit icon color from the built-in; `CYLTagButton.updateAppearance` lifts the tint when `resolvedBackgroundStyle()` is glass and `CYLTagButton.isDarkMode()` (AppStorage `cyl_colorMode`, as `cylanimateditem`; `darkModeOverride` for tests). Static '#RRGGBB' / '#AARRGGBB' strings only: resources and `Color` constants are dynamic, so unchanged. Tests: `entry/src/test/IconContrast.test.ets`, written statically, not yet compiled or run. A mode switch while a tag is shown re-resolves at the tag's next `updateAppearance` (no watcher on the mode yet) |
 | Mini program | `model.js`: `liftedIconColor`, `glassReferenceLuminance`, `contrastRatio`, `hslFromRgb`, `rgbFromHsl`, `relativeLuminance`; `drawnIconColor(style, state)` feeds the symbol icon of `iconContent`. Explicit = the appearance's `iconColor` (null by default, so nothing to track). Dark = `style.sectionPalette.dark` (the section style's detection); glass drawn = `backgroundStyle === 'liquidGlass'` and `cylAnimatedItemLiquidGlassIsActive()` (`isGlassDrawn`, the predicate of the glass background). Colors are static strings, so there is no dynamic case; the Mini Program has no separate animation tint. `test/tag-icon-lift.test.js`, written statically, not yet run |
@@ -161,8 +174,9 @@ Windows Android run on 4bc1ec1). CYLTabBarController `a5a2f1b1` makes `CYLLiquid
 
 ## Default glass tint: one low alpha for tags and boards (iOS, 2026-11-26)
 
-- Under glass with no explicit background color, a tag and a section board (`sectionBackgroundColor` unset) both get `CYLMenuStyle.defaultGlassTint`: 225, 222, 220 in light mode at `defaultGlassTintAlphaLight` 0.10, white in dark mode at `defaultGlassTintAlphaDark` 0.04, handed with `itemGlassTintAlpha` 1 (its own alpha is the tint). The component's own default (0.5 / 0.14) greyed the board interior (white minus black through it: light 95.5 to 67.4, dark 78.4 to 70.4 at `affb5bc8`); the lit edge stays.
-- The two alphas are estimates until the placeholder session measures them; they are the lever. Explicit colors are untouched (tags: tint x 0.75, selected 1; boards: as set). The other platforms still use the component default (0.5 / 0.14) until they port these two constants.
+- Under glass with no explicit background color, a tag and a section board (`sectionBackgroundColor` unset) both hand the item nil (`itemBackgroundColor` nil, `itemGlassTintAlpha` nil), and the item's own default tint applies: `CYLAnimatedItemView.defaultGlassTint`, 225, 222, 220 in light mode at `defaultGlassTintAlphaLight` 0.10, white in dark mode at `defaultGlassTintAlphaDark` 0.04, used as it is (no 0.75 share). The default moved into the item (2026-11-26), so every iOS item changes, not only tags. `CYLMenuStyle.defaultGlassTint`, `defaultGlassTintAlphaLight` and `defaultGlassTintAlphaDark` are deprecated forwarders. The component's former default (0.5 / 0.14) greyed the board interior (white minus black through it: light 95.5 to 67.4, dark 78.4 to 70.4 at `affb5bc8`); the lit edge stays.
+- Consequence for the dark-glass lift: with nil the contrast reference is again the frosted white `frostedWhiteAlpha` 0.14, up from the 0.04 of the explicit-default path used before, so the lift is stronger (`frostedWhiteAlpha` unchanged).
+- The two alphas are estimates until the placeholder session measures them; they are the lever. Explicit colors are untouched (tags: tint x 0.75, selected 1; boards: as set). The other platforms still use 0.5 / 0.14 until they port the item default (the owner paused that port).
 
 ## No default border under glass (iOS, 2026-11-26)
 

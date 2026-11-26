@@ -137,7 +137,7 @@ final class CYLTagConfigurationTests: XCTestCase {
         XCTAssertEqual(style.backgroundStyle, .liquidGlass, "the parameter is kept")
         XCTAssertEqual(style.resolvedBackgroundStyle, .flat, "but ignored where glass is unavailable")
         let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style)
-        XCTAssertNil(button.liquidGlassView)
+        XCTAssertNil(button.itemLiquidGlassView)
         XCTAssertNotNil(button.layer.backgroundColor, "the flat background color is drawn")
     }
 
@@ -201,7 +201,7 @@ final class CYLTagConfigurationTests: XCTestCase {
         style.normalAppearance.cornerRadius = 12
         XCTAssertEqual(style.resolvedBackgroundStyle, .liquidGlass)
         let button = CYLMenuFixtures.tagButton(title: "Tag", image: nil, style: style)
-        let glass = try XCTUnwrap(button.liquidGlassView as? UIVisualEffectView, "a glass view behind the content")
+        let glass = try XCTUnwrap(button.itemLiquidGlassView as? UIVisualEffectView, "a glass view behind the content")
         XCTAssertTrue(glass.effect is UIGlassEffect)
         var tintAlpha: CGFloat = -1
         (glass.effect as? UIGlassEffect)?.tintColor?.getRed(nil, green: nil, blue: nil, alpha: &tintAlpha)
@@ -214,7 +214,7 @@ final class CYLTagConfigurationTests: XCTestCase {
         // Back to flat: the glass goes, the color returns.
         style.backgroundStyle = .flat
         button.style = style
-        XCTAssertNil(button.liquidGlassView)
+        XCTAssertNil(button.itemLiquidGlassView)
         XCTAssertNotNil(button.layer.backgroundColor)
     }
 
