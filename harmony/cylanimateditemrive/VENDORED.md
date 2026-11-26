@@ -8,7 +8,7 @@ CYLTabBarController ("Shared HarmonyOS Rive engine"), says an unpublished Harmon
 | Field | Value |
 |:---|:---|
 | Source repository | <https://github.com/ChenYilong/CYLTabBarController> |
-| Commit | [`284f423042ae6187e29be3eb1b311d1442d1afdf`](https://github.com/ChenYilong/CYLTabBarController/tree/284f423042ae6187e29be3eb1b311d1442d1afdf/CrossPlatform/harmonyos-cyltabbar/cylanimateditemrive) (2026-11-26; was `fa95e1aa`, `e014028f`, `98966c43`, `b6e02875`, `991f76cd`, `e5c622fa`, `08343e9f`, `6f563ef4`, `230b5266`, `3074c51d`, first vendored 2026-11-23; `cylanimateditem_rive` depends on it) |
+| Commit | [`dfbe91908472dfa4bb6aa27139aa6076134131f9`](https://github.com/ChenYilong/CYLTabBarController/tree/dfbe91908472dfa4bb6aa27139aa6076134131f9/CrossPlatform/harmonyos-cyltabbar/cylanimateditemrive) (2026-11-26; was `284f4230`, `fa95e1aa`, `e014028f`, `98966c43`, `b6e02875`, `991f76cd`, `e5c622fa`, `08343e9f`, `6f563ef4`, `230b5266`, `3074c51d`, first vendored 2026-11-23; `cylanimateditem_rive` depends on it) |
 | Source path | `CrossPlatform/harmonyos-cyltabbar/cylanimateditemrive` |
 | License | MIT, CYLTabBarController's own: [`LICENSE`](LICENSE), kept as it ships upstream |
 | Changes | None. Only this file (`VENDORED.md`) was added; `README.md` is upstream's own. |
