@@ -550,8 +550,8 @@ test('every unset color is resolved by the color mode: light and dark differ as 
   // Unset glass: no color, so the card is the tags' default frosted glass (same tint and same rim) in each mode.
   assert.equal(model.resolvedSectionBackgroundColor(light(GLASS)), '')
   assert.equal(model.resolvedSectionBackgroundColor(dark(GLASS)), '')
-  assert.match(model.sectionLayout(light(GLASS)).cardStyle, /background-color:rgba\(225,222,220,0\.5\)/)
-  assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /background-color:rgba\(255,255,255,0\.14\)/)
+  assert.match(model.sectionLayout(light(GLASS)).cardStyle, /background-color:rgba\(225,222,220,0\.10\)/)
+  assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /background-color:rgba\(255,255,255,0\.04\)/)
   assert.match(model.sectionLayout(light(GLASS)).cardStyle, /inset 0 1px 0 rgba\(255,255,255,0\.6\)/)
   assert.match(model.sectionLayout(dark(GLASS)).cardStyle, /inset 0 1px 0 rgba\(255,255,255,0\.18\)/)
   assert.equal(light({}).sectionPalette.headerBand, LIGHT.headerBand)

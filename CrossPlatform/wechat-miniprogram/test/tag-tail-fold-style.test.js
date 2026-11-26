@@ -44,7 +44,7 @@ test('in a glass list the tail cell has the tag\'s glass background, radius, bor
     assert.deepEqual(shapeOf(tailCss(config)), shapeOf(tagCss(config)));
     assert.match(tailCss(config), /backdrop-filter:blur/);
   });
-  assert.match(tailCss(GLASS), /background-color:rgba\(225,222,220,0\.5\)/, 'an unset background is the frosted default, not an opaque fill');
+  assert.match(tailCss(GLASS), /background-color:rgba\(225,222,220,0\.10\)/, 'an unset background is the frosted default, not an opaque fill');
   assert.doesNotMatch(tailCss(GLASS), /F2F2F7|242,242,247/i);
 });
 

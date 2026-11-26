@@ -216,9 +216,9 @@ class CYLTagConfigurationScreen(private val context: Context) : CYLMenuScreen, C
             val selected = mapOf(CYLTagAppearanceBackgroundColor to indigo, CYLTagAppearanceBorderColor to indigo, CYLTagAppearanceIconColor to Color.WHITE, CYLTagAppearanceCornerRadius to 8)
             val style = mapOf(CYLMenuStyleSectionStyle to "plain", CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleImageSize to CYLSize(20f, 20f), CYLMenuStyleImageTitleSpacing to 4, CYLMenuStyleItemHeight to 36,
                 CYLMenuStyleLayoutCentered to true, CYLMenuStyleNormal to normal, CYLMenuStyleSelected to selected)
-            val items = listOf(
+            val items = listOf<Any>(
                 // The artwork is one near-black colour: an unset animation stays untinted (tint spec v2), so this entry opts in to follow the icon colour.
-                mapOf(CYLTagItemTitle to "Lottie", CYLTagItemAnimation to animation("Lottie/tab_me_animate.json"), CYLTagItemAnimationOptions to mapOf("tint" to "title")),
+                mapOf<String, Any?>(CYLTagItemTitle to "Lottie", CYLTagItemAnimation to animation("Lottie/tab_me_animate.json"), CYLTagItemAnimationOptions to mapOf("tint" to "title")),
                 mapOf(CYLTagItemTitle to "GIF", CYLTagItemAnimation to animation("GIF/cyl_tab_sample_animated.gif")),
                 mapOf(CYLTagItemTitle to "Rive", CYLTagItemAnimation to animation("Rive/menu_button.riv")),
                 mapOf(CYLTagItemTitle to "SVGA", CYLTagItemAnimation to animation("SVGA/tab_chat.svga")),
