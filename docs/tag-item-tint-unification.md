@@ -213,3 +213,25 @@ applyBuiltInColor(.systemGray, role: <the same role>)                // optional
 **Public names that did not change** (Windows ports these): `setSubclassTitleColor(_:for:)`, `setSubclassIconColor(_:for:)`, `applyTitleTintColor(_:)`, `applyIconTintColor(_:)`, `adaptedOnGlass(_:kind:)`, `drawsLiquidGlass`, `drawsFlatBackground`. They are wrappers over the role API. New: `register(_:)`, `setSubclassColor(_:for:role:)`, `applyBuiltInColor(_:role:)`.
 
 **Flat tags (2026-11-26, tab bar `3013b646`).** The item's contrast rule no longer needs drawn glass: in dark mode it also adapts the explicit colors of a flat tag that draws a FILL (the style's background color, the pressed color included), against that fill composited over black. A flat tag with NO fill (a tag without a background) is not adapted: the item cannot know what is behind it. The glass-only rules in `CYLTagButton` (explicit background and glass border under drawn glass, the default tint) stay tag-specific; none of them gates the contrast. Light mode is never adapted; a light label on a mid-luminance fill is not fixed (the rule only raises lightness). 紧凑说明：深色模式下，绘制了填充的扁平标签的显式颜色也会按该填充（叠在黑色上）调整；没有填充的扁平标签不调整（条目无法知道其后是什么）；浅色模式从不调整。仅编译检查。
+
+## Coverage table (2026-11-26, tab bar `4d0e00ae`) 覆盖表
+
+| kind | role | glass (drawn, dark) | flat fill (dark) | limit |
+|:---|:---|:---|:---|:---|
+| title | `title` (tag title) | explicit and static built-in lifted to 4.5:1 | lifted against the fill over black | no fill: as set; light mode: as set; disabled look and explicit dynamic colors: never adapted |
+| icon | `icon` (SF Symbol or template image) | lifted to 3:1 (`tintColor`) | lifted to 3:1 | multicolor / palette symbols and `alwaysOriginal` images ignore `tintColor` (the role color is written, UIKit does not apply it) |
+| title | `tag.deleteIndicatorLabel` | explicit lifted (4.5:1), built-in as it is | same | `adaptsBuiltIn: false` |
+| icon | `tag.deleteIndicatorCross` | explicit lifted (3:1), built-in as it is | same | `adaptsBuiltIn: false` |
+| icon | `tag.deleteIndicatorImage` (NEW: `style.deleteIndicatorImage` in `deleteIndicatorImageView.tintColor`) | explicit lifted (3:1), built-in = the effective text color as it is | same | template images only; `adaptsBuiltIn: false` |
+| icon | `tag.editingIcons` | explicit lifted (3:1) | same | `adaptsBuiltIn: false` |
+| header / footer | More / Clear buttons, header title and icon, fold chevron | not the glass rule | not the glass rule | judged by the style's own `CYLTintContrast` against the opaque band / list background |
+| icon | created-cell plus icon | not adapted | not adapted | dynamic `tertiaryLabel` |
+| badge | dot and capsule images | not adapted | not adapted | `alwaysOriginal` bitmaps |
+
+**Half-alpha limit.** A fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is 1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1. On a dark half-alpha fill (white 0.15 alpha) 4.5:1 is reachable and tested.
+
+**Built-in vs explicit dynamic colors.** A dynamic built-in becomes static (resolved with the item's traits) and is then adapted; an explicit dynamic color is never adapted.
+
+**Selected Lottie tag.** It shows the LAST frame (progress 1: the circular arrow of `tab_home_animate.json`; the house is frame 0), by design.
+
+**Measured on iOS 27.2 (iPhone 18 Pro simulator, Configuration page, expanded fold; `docs` screenshots in /tmp/xpa/cm-final-out/raw/expanded-dark.png, expanded-light.png).** Dark: "SF Symbol" star 4.66:1 on the glass, title 6.95:1; "Disabled" icon 6.94:1, title 7.10:1. Light: star and title 10.21:1; "Disabled" 1.96:1 (the disabled look is deliberately not adapted).

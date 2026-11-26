@@ -373,6 +373,11 @@ open class CYLTagButton: CYLAnimatedItemView {
         CYLAnimatedItemColorRole(id: "tag.deleteIndicatorCross", kind: .icon, adaptsBuiltIn: false) { item, resolved in
             (item as? CYLTagButton)?.crossLayer.strokeColor = resolved.color?.resolvedColor(with: item.traitCollection).cgColor
         },
+        // [EN] `style.deleteIndicatorImage` is a template image in a plain image view: it takes the role color (an icon, 3:1) instead of the app tint.
+        // [CN] `style.deleteIndicatorImage` 是普通图片视图中的模板图片：使用角色颜色（图标，3:1），而不是应用 tint。
+        CYLAnimatedItemColorRole(id: "tag.deleteIndicatorImage", kind: .icon, adaptsBuiltIn: false) { item, resolved in
+            (item as? CYLTagButton)?.deleteIndicatorImageView.tintColor = resolved.color?.resolvedColor(with: item.traitCollection)
+        },
         // The editing icons (rename, delete) are items themselves; they take the color as their subclass built-in.
         CYLAnimatedItemColorRole(id: "tag.editingIcons", kind: .icon, adaptsBuiltIn: false) { item, resolved in
             guard let tag = item as? CYLTagButton,

@@ -625,4 +625,49 @@ final class CYLTagButtonTests: XCTestCase {
         XCTAssertEqual(button.imageView.tintColor?.resolvedColor(with: button.traitCollection), UIColor.green.resolvedColor(with: button.traitCollection),
                        "the stack's icon color beats the tag's built-in icon color")
     }
+
+    // MARK: - Delete indicator image role (tag.deleteIndicatorImage) 删除标记图片角色
+
+    func testAStaticDarkDeleteIndicatorColorIsLiftedForTheIndicatorImageOnDrawnDarkGlass() throws {
+        guard #available(iOS 26.0, *) else { throw XCTSkip("Liquid Glass needs iOS 26") }
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        defer { CYLAnimatedItemView.liquidGlassActiveOverride = nil }
+        let darkColor = UIColor(red: 0x3C / 255, green: 0x3C / 255, blue: 0x43 / 255, alpha: 1)
+        let style = CYLMenuStyle()
+        style.backgroundStyle = .liquidGlass
+        style.deleteIndicatorColor = darkColor
+        style.deleteIndicatorImage = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
+        // A dark window: a detached view reports the light trait whatever its override says.
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 300, height: 100))
+        window.overrideUserInterfaceStyle = .dark
+        window.isHidden = false
+        defer { window.isHidden = true }
+        let button = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        button.showsDeleteIndicator = true
+        window.addSubview(button)
+        button.style = style
+        button.layoutIfNeeded()
+        XCTAssertTrue(button.drawsLiquidGlass)
+        let imageView = button.deleteIndicatorLabel.subviews.compactMap { $0 as? UIImageView }.first
+        XCTAssertNotNil(imageView?.image)
+        func luminance(_ color: UIColor?) -> CGFloat {
+            var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+            color?.resolvedColor(with: UITraitCollection(userInterfaceStyle: .dark)).getRed(&r, green: &g, blue: &b, alpha: nil)
+            return CYLAnimatedItemContrast.relativeLuminance(red: r, green: g, blue: b)
+        }
+        XCTAssertGreaterThan(luminance(imageView?.tintColor), luminance(darkColor), "the image's tint is lifted on drawn dark glass (an explicit color is adapted)")
+        XCTAssertEqual(luminance(imageView?.tintColor), luminance(button.adaptedForContrast(darkColor, kind: .icon)), accuracy: 0.002, "the same icon rule as the cross")
+        // Light mode: as set.
+        let lightWindow = UIWindow(frame: CGRect(x: 0, y: 0, width: 300, height: 100))
+        lightWindow.overrideUserInterfaceStyle = .light
+        lightWindow.isHidden = false
+        defer { lightWindow.isHidden = true }
+        let lightButton = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
+        lightButton.showsDeleteIndicator = true
+        lightWindow.addSubview(lightButton)
+        lightButton.style = style
+        lightButton.layoutIfNeeded()
+        let lightImage = lightButton.deleteIndicatorLabel.subviews.compactMap { $0 as? UIImageView }.first
+        XCTAssertEqual(luminance(lightImage?.tintColor), luminance(darkColor), accuracy: 0.002, "light mode: not adapted")
+    }
 }
