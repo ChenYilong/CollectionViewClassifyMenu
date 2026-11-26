@@ -137,7 +137,7 @@ export type CylTagStateStyle = {
   /**
    * The icon's explicit color. Left out, the icon takes the title color (the built-in color). On a drawn Liquid Glass tag in dark
    * mode, an explicit color too dark for the glass (below 3:1 contrast) is lifted in lightness, hue and alpha kept, by the native
-   * core (docs/tag-liquid-glass.md "Dark glass icon lift"); light mode, flat tags and the built-in color never change.
+   * core (docs/tag-liquid-glass.md "Dark glass contrast (title and icon)"); light mode, flat tags and the built-in color never change.
    */
   iconColor?: CylColorString;
   [key: string]: unknown;

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5C0A11E2D3F4A5B6C7D8E9F3 /* CYLIconContrastTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0A11E2D3F4A5B6C7D8E9F4 /* CYLIconContrastTests.swift */; };
 		5C0A11E2D3F4A5B6C7D8E9F1 /* CYLTagCalloutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0A11E2D3F4A5B6C7D8E9F2 /* CYLTagCalloutTests.swift */; };
 		0490FE175868491DBA5FE998 /* Pods_CYLMenuExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */; };
 		061C4E059059E60FBD70C516 /* CYLSearchDiscoverData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B8534AE0C203B528AA9F7A /* CYLSearchDiscoverData.swift */; };
@@ -95,7 +94,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		5C0A11E2D3F4A5B6C7D8E9F4 /* CYLIconContrastTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLIconContrastTests.swift; sourceTree = "<group>"; };
 		5C0A11E2D3F4A5B6C7D8E9F2 /* CYLTagCalloutTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagCalloutTests.swift; sourceTree = "<group>"; };
 		0024268E58F4D239266D230B /* CYLReviewListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLReviewListViewController.swift; sourceTree = "<group>"; };
 		010FAC7A06390F2703522FE8 /* CYLSearchCategoryScenarioTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchCategoryScenarioTests.swift; sourceTree = "<group>"; };
@@ -311,7 +309,6 @@
 				DAB3543CBABA0EE86E689D85 /* CYLTagListFoldingTests.swift */,
 				A940537404525FA3A3ECCF66 /* CYLTagListTintTests.swift */,
 				5C0A11E2D3F4A5B6C7D8E9F2 /* CYLTagCalloutTests.swift */,
-				5C0A11E2D3F4A5B6C7D8E9F4 /* CYLIconContrastTests.swift */,
 				5A1C0DE1A1B2C3D4E5F60719 /* CYLTagListHeaderMaxLinesTests.swift */,
 				5A1C0E01A1B2C3D4E5F60A02 /* CYLTagListHeaderRoomTests.swift */,
 				5A1C0E11A1B2C3D4E5F60B02 /* CYLTagFoldTailStyleTests.swift */,
@@ -597,7 +594,6 @@
 				8EA32B4CA93024E7599B3F45 /* CYLTagListFoldingTests.swift in Sources */,
 				26298D4CFD1D7E912777B892 /* CYLTagListTintTests.swift in Sources */,
 				5C0A11E2D3F4A5B6C7D8E9F1 /* CYLTagCalloutTests.swift in Sources */,
-				5C0A11E2D3F4A5B6C7D8E9F3 /* CYLIconContrastTests.swift in Sources */,
 				5A1C0DE0A1B2C3D4E5F60718 /* CYLTagListHeaderMaxLinesTests.swift in Sources */,
 				5A1C0E00A1B2C3D4E5F60A01 /* CYLTagListHeaderRoomTests.swift in Sources */,
 				5A1C0E10A1B2C3D4E5F60B01 /* CYLTagFoldTailStyleTests.swift in Sources */,

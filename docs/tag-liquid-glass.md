@@ -115,29 +115,36 @@ Test conditions (advisor): no copies of glass code in this repository; static ch
 Code written on every platform: iOS 35, Android 20, HarmonyOS 15, mini program 10 = 80 once tested; screenshots and parity maps 10 and
 notifications 10 remain. Verified today: mini program node tests; everything else after the batch.
 
-## Dark glass icon lift
+## Dark glass contrast (title and icon)
 
-In dark mode the default frosted glass is white at 0.14 over the backdrop (about #242424 over black), so a dark explicit icon color
-can all but vanish. The lift raises such a color just enough to keep a 3:1 contrast. The algorithm is `CYLIconContrast`
-(`CYLIconContrast.swift`) on iOS, mirrored per platform.
+In dark mode the default frosted glass is white at 0.14 over the backdrop (about #242424 over black), so a dark explicit title or
+icon color can all but vanish. Since 2026-11-26 the rule lives in ONE place, the shared `CYLAnimatedItemContrast` of the
+CYLTabBarController `CYLAnimatedItem` module (iOS `CYLAnimatedItemContrast.swift`; Android `CYLAnimatedItemContrast.kt`, HarmonyOS
+`CYLAnimatedItemContrast.ets`, mini program `cyl_animated_item_contrast.js`, CYLTabBarController `e014028f`). ClassifyMenu's own iOS
+`CYLIconContrast` (which also judged the glass over a bright blue backdrop) is removed.
 
-Rule (identical on every platform; constants `minimumContrastRatio` 3, `frostedGlassWhiteAlpha` 0.14, `defaultGlassTintShare` 0.75,
-lightness step 0.005):
+Rule (identical on every platform; constants `titleMinimumContrast` 4.5, `iconMinimumContrast` 3, `frostedWhiteAlpha` 0.14,
+`defaultTintShare` 0.75, `lightnessStep` 0.005):
 
-1. Reference luminance (glass over black): no glass tint or tint alpha 0, the WCAG luminance of grey 0.14; else the luminance of
-   the tint's sRGB components times `tint.alpha * (tintAlpha ?? 0.75)` (a selected tag tints at alpha 1).
-2. Contrast = (max + 0.05) / (min + 0.05) of the two luminances. 3 or more: the color is unchanged.
-3. Else the lightness (HSL) rises in steps of 0.005, hue, saturation and alpha kept, up to white, until the contrast is 3.
-4. A dynamic color (its light and dark values differ) is unchanged. Pure and deterministic.
+1. ONE reference luminance, the glass over black: no glass tint or tint alpha 0, the WCAG luminance of grey 0.14; else the luminance
+   of the tint's sRGB components times `tint.alpha * (tintAlpha ?? 0.75)` (a selected tag tints at alpha 1).
+2. Contrast = (max + 0.05) / (min + 0.05) of the two luminances. At least the minimum (title text 4.5, icon or animation tint 3):
+   the color is unchanged.
+3. Else the lightness (HSL) rises in steps of 0.005, hue, saturation and alpha kept, up to white, until the contrast reaches the minimum.
+4. A dynamic color (its light and dark values differ) is unchanged. Pure and deterministic. Light glass is not adapted.
 
-Applied only when glass is really drawn AND the mode is dark AND the style has an EXPLICIT icon color for the state
-(`normal` / `selected` / `disabled` `iconColor`); the result feeds the icon tint (and the animation tint where the platform has
-one). Explicit means set by the app; the built-in icon color (unset: the title color) is never touched. Light mode, flat tags,
-colors that already pass and dynamic colors never change.
+Applied only when glass is really drawn AND the mode is dark AND the color is EXPLICIT (set by the app). On a tag: the style's
+explicit `textColor` of the state (title, 4.5) and its explicit `iconColor`, else the explicit `textColor` the icon follows (icon and
+animation tint, 3). The built-in colors are never touched; light mode, flat tags, colors that already pass and dynamic colors never change.
+
+iOS wiring: `CYLAnimatedItemView` lifts its own explicit colors (the item's or the stack's `itemAppearance` icon color, the
+`titleTextAttributes` title color, a fixed `animationTint`). A tag hands its colors as the subclass level (`applyIconTintColor`,
+`titleLabel.textColor`), which the item treats as built-in, so `CYLTagButton.updateAppearance` calls
+`CYLAnimatedItemContrast.adjustedTitle` / `adjustedIcon` itself; the animation follows the lifted icon color (`animationTint = "title"`).
 
 | Platform | Status |
 |:--|:--|
-| iOS | reference: `CYLIconContrast`, applied in `CYLTagButton` |
+| iOS | `CYLAnimatedItemContrast` (CYLTabBarController module), applied in `CYLAnimatedItemView` and `CYLTagButton`; compiled, not yet run |
 | Android | `CYLIconContrast.kt`; `CYLTagButton.updateAppearance` lifts the icon color filter (night mode = `CYLSystemColors.isNight`, glass = `resolvedBackgroundStyle`, explicit = `CYLMenuStyle.explicitIconColorForState`); `CYLIconContrastTest`, written statically, not yet run. |
 | HarmonyOS | `CYLIconContrast` (`core/CYLIconContrast.ets`, exported from `Index.ets`); `CYLMenuStyle.explicitIconColor(state)` tells an explicit icon color from the built-in; `CYLTagButton.updateAppearance` lifts the tint when `resolvedBackgroundStyle()` is glass and `CYLTagButton.isDarkMode()` (AppStorage `cyl_colorMode`, as `cylanimateditem`; `darkModeOverride` for tests). Static '#RRGGBB' / '#AARRGGBB' strings only: resources and `Color` constants are dynamic, so unchanged. Tests: `entry/src/test/IconContrast.test.ets`, written statically, not yet compiled or run. A mode switch while a tag is shown re-resolves at the tag's next `updateAppearance` (no watcher on the mode yet) |
 | Mini program | `model.js`: `liftedIconColor`, `glassReferenceLuminance`, `contrastRatio`, `hslFromRgb`, `rgbFromHsl`, `relativeLuminance`; `drawnIconColor(style, state)` feeds the symbol icon of `iconContent`. Explicit = the appearance's `iconColor` (null by default, so nothing to track). Dark = `style.sectionPalette.dark` (the section style's detection); glass drawn = `backgroundStyle === 'liquidGlass'` and `cylAnimatedItemLiquidGlassIsActive()` (`isGlassDrawn`, the predicate of the glass background). Colors are static strings, so there is no dynamic case; the Mini Program has no separate animation tint. `test/tag-icon-lift.test.js`, written statically, not yet run |
