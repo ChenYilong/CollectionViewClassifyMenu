@@ -317,6 +317,15 @@ open class CYLTagButton @JvmOverloads constructor(
         updateAppearance()
     }
 
+    /**
+     * The light / dark mode may have changed: the colors the style leaves unset (the text and icon default, the glass tint) resolve
+     * again, no app code needed. The base class re-applies its own colors first; the tag's own come after.
+     */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateAppearance()
+    }
+
     /** `isHighlighted`: pressed. */
     val isHighlighted: Boolean get() = isPressed
 
