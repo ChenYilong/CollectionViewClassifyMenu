@@ -189,8 +189,7 @@ open class CYLTagFoldButton: CYLTagButton {
         for state in [UIControl.State.selected, .disabled] {
             let appearance = style.appearance(for: state)
             appearance.backgroundColor = normal.explicitBackgroundColor
-            appearance.borderColor = normal.borderColor
-            appearance.borderWidth = normal.borderWidth
+            appearance.copyBorder(from: normal)
             appearance.cornerRadius = normal.cornerRadius
             appearance.margin = normal.margin
             appearance.font = normal.font

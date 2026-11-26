@@ -59,6 +59,7 @@
 		5A1C0DE0A1B2C3D4E5F60718 /* CYLTagListHeaderMaxLinesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0DE1A1B2C3D4E5F60719 /* CYLTagListHeaderMaxLinesTests.swift */; };
 		5A1C0E00A1B2C3D4E5F60A01 /* CYLTagListHeaderRoomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0E01A1B2C3D4E5F60A02 /* CYLTagListHeaderRoomTests.swift */; };
 		5A1C0E10A1B2C3D4E5F60B01 /* CYLTagFoldTailStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0E11A1B2C3D4E5F60B02 /* CYLTagFoldTailStyleTests.swift */; };
+		5A1C0E20A1B2C3D4E5F60C01 /* CYLGlassBorderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0E21A1B2C3D4E5F60C02 /* CYLGlassBorderTests.swift */; };
 		3D0D172C94CB61CD944BE02A /* CYLTagListSectionStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CA7751208D05397AA5225C /* CYLTagListSectionStyleTests.swift */; };
 		C8E3051FAF78996AEEC7D596 /* CYLTagListDefaultFramesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5451D9AA784D9BEAFF6E030A /* CYLTagListDefaultFramesTests.swift */; };
 		90641626E7CCAB0F86EE47A2 /* CYLTagListAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5392BAC27CC2C65DE9785A /* CYLTagListAccessibilityTests.swift */; };
@@ -167,6 +168,7 @@
 		5A1C0DE1A1B2C3D4E5F60719 /* CYLTagListHeaderMaxLinesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListHeaderMaxLinesTests.swift; sourceTree = "<group>"; };
 		5A1C0E01A1B2C3D4E5F60A02 /* CYLTagListHeaderRoomTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListHeaderRoomTests.swift; sourceTree = "<group>"; };
 		5A1C0E11A1B2C3D4E5F60B02 /* CYLTagFoldTailStyleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagFoldTailStyleTests.swift; sourceTree = "<group>"; };
+		5A1C0E21A1B2C3D4E5F60C02 /* CYLGlassBorderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLGlassBorderTests.swift; sourceTree = "<group>"; };
 		82CA7751208D05397AA5225C /* CYLTagListSectionStyleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListSectionStyleTests.swift; sourceTree = "<group>"; };
 		5451D9AA784D9BEAFF6E030A /* CYLTagListDefaultFramesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListDefaultFramesTests.swift; sourceTree = "<group>"; };
 		DF4F0ECB9D87E13E0D7FCA4D /* CYLAndroidSampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLAndroidSampleTests.swift; sourceTree = "<group>"; };
@@ -313,6 +315,7 @@
 				5A1C0DE1A1B2C3D4E5F60719 /* CYLTagListHeaderMaxLinesTests.swift */,
 				5A1C0E01A1B2C3D4E5F60A02 /* CYLTagListHeaderRoomTests.swift */,
 				5A1C0E11A1B2C3D4E5F60B02 /* CYLTagFoldTailStyleTests.swift */,
+				5A1C0E21A1B2C3D4E5F60C02 /* CYLGlassBorderTests.swift */,
 				5A1C0DE5A1B2C3D4E5F6071D /* CYLTagListSectionGlassTintTests.swift */,
 				5A1C0DE3A1B2C3D4E5F6071B /* CYLTagListHeaderBoardTests.swift */,
 				82CA7751208D05397AA5225C /* CYLTagListSectionStyleTests.swift */,
@@ -598,6 +601,7 @@
 				5A1C0DE0A1B2C3D4E5F60718 /* CYLTagListHeaderMaxLinesTests.swift in Sources */,
 				5A1C0E00A1B2C3D4E5F60A01 /* CYLTagListHeaderRoomTests.swift in Sources */,
 				5A1C0E10A1B2C3D4E5F60B01 /* CYLTagFoldTailStyleTests.swift in Sources */,
+				5A1C0E20A1B2C3D4E5F60C01 /* CYLGlassBorderTests.swift in Sources */,
 				5A1C0DE4A1B2C3D4E5F6071C /* CYLTagListSectionGlassTintTests.swift in Sources */,
 				5A1C0DE2A1B2C3D4E5F6071A /* CYLTagListHeaderBoardTests.swift in Sources */,
 				3D0D172C94CB61CD944BE02A /* CYLTagListSectionStyleTests.swift in Sources */,

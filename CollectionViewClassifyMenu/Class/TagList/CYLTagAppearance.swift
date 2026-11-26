@@ -148,18 +148,63 @@ public final class CYLTagAppearance {
         }
     }
 
-    /**
-     * Border color, `nil` (no border) by default. Drawn only when `borderWidth` > 0.
-     */
-    public var borderColor: UIColor?
+    // The border, like the background: the built-in (a default of the style, never explicit) and the EXPLICIT values the app, a
+    // configuration or a preset set. Under Liquid Glass only an explicit border is drawn (`glassBorderColor` / `glassBorderWidth`).
+    private var builtInBorderColor: UIColor?
+    private var builtInBorderWidth: CGFloat = 0
+    private var explicitBorderColorStorage: UIColor??
+    private var explicitBorderWidthStorage: CGFloat?
 
     /**
-     * Border width, 0 by default. Negative or non-finite values are treated as 0.
+     * Border color, `nil` (no border) by default. Drawn only when `borderWidth` > 0. Reads the effective value (the explicit one, else the
+     * style's built-in); assigning marks it explicit, also `nil` ("no border").
      */
-    public var borderWidth: CGFloat = 0 {
-        didSet {
-            borderWidth = Self.sanitized(borderWidth)
-        }
+    public var borderColor: UIColor? {
+        get { explicitBorderColorStorage ?? builtInBorderColor }
+        set { explicitBorderColorStorage = .some(newValue) }
+    }
+
+    /**
+     * Border width, 0 by default. Negative or non-finite values are treated as 0. Assigning marks it explicit.
+     */
+    public var borderWidth: CGFloat {
+        get { explicitBorderWidthStorage ?? builtInBorderWidth }
+        set { explicitBorderWidthStorage = Self.sanitized(newValue) }
+    }
+
+    /**
+     * True when `borderColor` / `borderWidth` was assigned (an app, a configuration, a preset), not the style's built-in default.
+     */
+    public var isBorderColorSet: Bool { explicitBorderColorStorage != nil }
+    public var isBorderWidthSet: Bool { explicitBorderWidthStorage != nil }
+
+    /**
+     * The border drawn under Liquid Glass: the effective border when the app set the color or the width, else none (the built-in
+     * border is not handed to the glass, so the shared glass rim shows).
+     */
+    public var glassBorderColor: UIColor? {
+        isBorderColorSet || isBorderWidthSet ? borderColor : nil
+    }
+    public var glassBorderWidth: CGFloat {
+        isBorderColorSet || isBorderWidthSet ? borderWidth : 0
+    }
+
+    /**
+     * Sets the style's built-in border, which is not explicit (the style's initializer).
+     */
+    func applyBuiltInBorder(color: UIColor?, width: CGFloat) {
+        builtInBorderColor = color
+        builtInBorderWidth = Self.sanitized(width)
+    }
+
+    /**
+     * Takes `other`'s border with its explicitness (the fold cell copying a tag's border).
+     */
+    func copyBorder(from other: CYLTagAppearance) {
+        builtInBorderColor = other.builtInBorderColor
+        builtInBorderWidth = other.builtInBorderWidth
+        explicitBorderColorStorage = other.explicitBorderColorStorage
+        explicitBorderWidthStorage = other.explicitBorderWidthStorage
     }
 
     /**
@@ -213,8 +258,10 @@ public final class CYLTagAppearance {
         font = Self.defaultFont
         explicitIcon = nil
         cornerRadius = Self.defaultCornerRadius
-        borderColor = nil
-        borderWidth = 0
+        builtInBorderColor = nil
+        builtInBorderWidth = 0
+        explicitBorderColorStorage = nil
+        explicitBorderWidthStorage = nil
         contentInsets = Self.defaultContentInsets
         backgroundImage = nil
     }
@@ -230,8 +277,7 @@ public final class CYLTagAppearance {
         copy.font = font
         copy.explicitIcon = explicitIcon
         copy.cornerRadius = cornerRadius
-        copy.borderColor = borderColor
-        copy.borderWidth = borderWidth
+        copy.copyBorder(from: self)
         copy.contentInsets = contentInsets
         copy.backgroundImage = backgroundImage
         return copy
@@ -251,6 +297,7 @@ extension CYLTagAppearance: Equatable {
         lhs.explicitBackground == rhs.explicitBackground && lhs.explicitText == rhs.explicitText
             && lhs.explicitIcon == rhs.explicitIcon && lhs.font == rhs.font && lhs.cornerRadius == rhs.cornerRadius
             && lhs.borderColor == rhs.borderColor && lhs.borderWidth == rhs.borderWidth
+            && lhs.isBorderColorSet == rhs.isBorderColorSet && lhs.isBorderWidthSet == rhs.isBorderWidthSet
             && lhs.contentInsets == rhs.contentInsets && lhs.backgroundImage == rhs.backgroundImage
     }
 }

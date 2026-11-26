@@ -1181,8 +1181,9 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         deleteIndicatorLabel.font = style.deleteIndicatorFont(for: state, traitCollection: traitCollection)
         deleteIndicatorLabel.textColor = style.deleteIndicatorColor ?? appearance.textColor
-        var borderColor = appearance.borderColor
-        var borderWidth = borderColor != nil ? appearance.borderWidth : 0
+        // Under drawn glass only an explicit border is handed over (the built-in one would hide the shared glass rim); flat keeps the effective border.
+        var borderColor = drawsGlass ? appearance.glassBorderColor : appearance.borderColor
+        var borderWidth = borderColor != nil ? (drawsGlass ? appearance.glassBorderWidth : appearance.borderWidth) : 0
         if UIAccessibility.isDarkerSystemColorsEnabled {
             // Increase Contrast: a visible outline in the text color.
             borderColor = state == .selected ? (appearance.borderColor ?? appearance.textColor) : appearance.textColor

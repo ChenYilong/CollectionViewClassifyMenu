@@ -154,3 +154,8 @@ Windows Android run on 4bc1ec1). CYLTabBarController `a5a2f1b1` makes `CYLLiquid
 
 - Under glass with no explicit background color, a tag and a section board (`sectionBackgroundColor` unset) both get `CYLMenuStyle.defaultGlassTint`: 225, 222, 220 in light mode at `defaultGlassTintAlphaLight` 0.10, white in dark mode at `defaultGlassTintAlphaDark` 0.04, handed with `itemGlassTintAlpha` 1 (its own alpha is the tint). The component's own default (0.5 / 0.14) greyed the board interior (white minus black through it: light 95.5 to 67.4, dark 78.4 to 70.4 at `affb5bc8`); the lit edge stays.
 - The two alphas are estimates until the placeholder session measures them; they are the lever. Explicit colors are untouched (tags: tint x 0.75, selected 1; boards: as set). The other platforms still use the component default (0.5 / 0.14) until they port these two constants.
+
+## No default border under glass (iOS, 2026-11-26)
+
+- `CYLTagAppearance` tracks the border like the background: `isBorderColorSet` / `isBorderWidthSet` (true after an assignment by the app, a configuration or a preset; the style's built-in border, set by `CYLMenuStyle.init` through `applyBuiltInBorder`, is not explicit; `copy()` and `reset()` keep or clear the flags). `glassBorderColor` / `glassBorderWidth` are the border handed to drawn glass: the effective border when either was set, else none (width 0).
+- `CYLTagButton`: under drawn Liquid Glass a tag (and the tail fold cell, which copies the tag's border with its explicitness) gets no border unless one is explicit, so the shared glass rim shows, as on the board; the selected built-in app-tint border is dropped too. Flat tags, and glass requested but not drawn, keep the effective border exactly.

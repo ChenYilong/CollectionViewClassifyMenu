@@ -755,17 +755,14 @@ open class CYLMenuStyle: NSObject, NSCopying {
     public required override init() {
         let hairline = 1 / max(1, UIScreen.main.scale)
         normalAppearance = CYLTagAppearance()
-        normalAppearance.borderColor = UIColor(white: 0.82, alpha: 1)
-        normalAppearance.borderWidth = hairline
+        normalAppearance.applyBuiltInBorder(color: UIColor(white: 0.82, alpha: 1), width: hairline)
         selectedAppearance = CYLTagAppearance()
         selectedAppearance.backgroundColor = Self.appTintColor
         selectedAppearance.textColor = .white
-        selectedAppearance.borderColor = Self.appTintColor
-        selectedAppearance.borderWidth = hairline
+        selectedAppearance.applyBuiltInBorder(color: Self.appTintColor, width: hairline)
         disabledAppearance = CYLTagAppearance()
         disabledAppearance.textColor = UIColor(white: 0.7, alpha: 1)
-        disabledAppearance.borderColor = UIColor(white: 0.88, alpha: 1)
-        disabledAppearance.borderWidth = hairline
+        disabledAppearance.applyBuiltInBorder(color: UIColor(white: 0.88, alpha: 1), width: hairline)
         super.init()
     }
 
