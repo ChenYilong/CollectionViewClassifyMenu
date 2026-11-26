@@ -182,11 +182,15 @@ class CYLTag(
         /**
          * `CYLTag.badgeImageWidth(text:diameter:)`: the width (dp) of a badge image: the diameter (a circle) for a short text, or the
          * text's width and [BADGE_IMAGE_TEXT_PADDING] on both sides when that is more (a capsule, as `CYLTagButton`'s corner badge).
+         * One character (a digit, a letter, a CJK character such as "热") always keeps the circle, as on iOS.
          */
         @JvmStatic
         fun badgeImageWidth(text: String, diameter: Float): Float {
             val density = Resources.getSystem().displayMetrics.density
             val side = max(1f, diameter)
+            if (text.codePointCount(0, text.length) <= 1) {
+                return side
+            }
             val textWidth = ceil(badgeTextPaint(side * density).measureText(text) / density)
             return max(side, textWidth + 2 * BADGE_IMAGE_TEXT_PADDING)
         }

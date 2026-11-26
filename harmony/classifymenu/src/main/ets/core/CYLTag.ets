@@ -219,6 +219,11 @@ export class CYLTag {
     return Math.max(side, Math.ceil(Math.max(0, textWidth)) + 2 * padding);
   }
 
+  /** One character (a digit, a letter, a CJK character such as "热") always keeps the circle, as on iOS. */
+  static badgeTextKeepsCircle(text: string): boolean {
+    return Array.from(text).length <= 1;
+  }
+
   /** The font of a badge image's text: bold, 60 % of the diameter, in vp (the canvas' default unit). */
   private static badgeImageFont(diameter: number): string {
     return `bold ${Math.round(diameter * BADGE_IMAGE_FONT_RATIO)}vp sans-serif`;
@@ -231,7 +236,8 @@ export class CYLTag {
     const font = CYLTag.badgeImageFont(pixelHeight);
     const probe = new OffscreenCanvas(1, 1).getContext('2d');
     probe.font = font;
-    const pixelWidth = Math.max(1, Math.round(CYLTag.badgeImageWidthForText(probe.measureText(text).width,
+    const textWidth = CYLTag.badgeTextKeepsCircle(text) ? 0 : probe.measureText(text).width;
+    const pixelWidth = Math.max(1, Math.round(CYLTag.badgeImageWidthForText(textWidth,
       pixelHeight, CYLUIContext.vp2px(CYLTag.badgeImageTextPadding))));
     const canvas = new OffscreenCanvas(pixelWidth, pixelHeight);
     const context = canvas.getContext('2d');

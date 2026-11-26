@@ -102,6 +102,7 @@ class CYLTagIosParityTest {
     fun aShortBadgeTextIsACircleAndALongOneIsAWiderCapsule() {
         val diameter = 18f
         assertEquals(diameter, CYLTag.badgeImageWidth("1", diameter), 0f)
+        assertEquals("one CJK character keeps the circle (iOS 09bc2413)", diameter, CYLTag.badgeImageWidth("热", diameter), 0f)
         val wide = CYLTag.badgeImageWidth("99+ new", diameter)
         assertTrue(wide > diameter)
         val image = CYLTag.badgeImageWithText("99+ new", null, diameter) as CYLBadgeDrawable

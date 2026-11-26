@@ -124,6 +124,10 @@ export default function styleAndModelsTest() {
       // The text width rounds up.
       expect(CYLTag.badgeImageWidthForText(BADGE_LONG_TEXT_WIDTH + 0.2, BADGE_DIAMETER))
         .assertEqual(BADGE_LONG_TEXT_WIDTH + 1 + 2 * BADGE_TEXT_PADDING);
+      // One character, a CJK one included, keeps the circle (iOS 09bc2413); two do not.
+      expect(CYLTag.badgeTextKeepsCircle('1')).assertTrue();
+      expect(CYLTag.badgeTextKeepsCircle('热')).assertTrue();
+      expect(CYLTag.badgeTextKeepsCircle('99')).assertFalse();
     });
   });
 }
