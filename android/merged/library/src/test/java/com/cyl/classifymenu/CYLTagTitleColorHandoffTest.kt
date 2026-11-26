@@ -8,6 +8,7 @@ import com.cyl.animateditem.CYLAnimatedItemView
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -52,6 +53,20 @@ class CYLTagTitleColorHandoffTest {
         assertNotEquals(DARK_TEXT, button.titleLabel.currentTextColor)
         assertTrue(Color.luminance(button.titleLabel.currentTextColor) > Color.luminance(DARK_TEXT))
         assertTrue(contrast(button.titleLabel.currentTextColor, DARK_GLASS_BACKDROP) >= 4.5)
+    }
+
+    /**
+     * A static icon (a system symbol, a template image) with NO icon colour follows the text colour. When that text colour is an
+     * explicit dark one (#3C3C43, the shared configuration file), the tag tints the image itself: the tint must go through the item's
+     * adaptation like the title, otherwise the symbol stays dark on dark glass while the title is lifted (the "SF Symbol" tag).
+     */
+    @Test
+    @Config(qualifiers = "night")
+    fun anIconFollowingAnExplicitDarkTextColorIsLiftedOnDarkGlassLikeTheTitle() {
+        val button = tag(DARK_TEXT, glass = true)
+        val lifted = button.adaptedOnGlass(DARK_TEXT, com.cyl.animateditem.CYLAnimatedItemColorKind.Icon)
+        assertTrue("the item lifts the dark icon colour: ${Integer.toHexString(lifted)}", Color.luminance(lifted) > Color.luminance(DARK_TEXT))
+        assertNotNull("the static image is tinted", button.imageView.colorFilter)
     }
 
     @Test

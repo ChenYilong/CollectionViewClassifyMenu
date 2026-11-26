@@ -21,6 +21,7 @@ import android.widget.TextView
 import com.cyl.animateditem.CYLAnimatedItemAccessoryPlacement
 import com.cyl.animateditem.CYLAnimatedItemAxis
 import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
+import com.cyl.animateditem.CYLAnimatedItemColorKind
 import com.cyl.animateditem.CYLAnimatedItemLiquidGlassContentInset
 import com.cyl.animateditem.CYLAnimatedItemStackView
 import com.cyl.animateditem.CYLAnimatedItemTitleState
@@ -427,7 +428,9 @@ open class CYLTagButton @JvmOverloads constructor(
         setSubclassIconColor(null, CYLAnimatedItemTitleState.Disabled)
         applyIconTintColor(builtInIconColor)
         if (explicitIconColor == null) {
-            if (builtInIconColor != null) imageView.setColorFilter(builtInIconColor) else imageView.clearColorFilter()
+            // The tag tints the static image itself here, so the colour goes through the item's own adaptation (dark drawn glass,
+            // not disabled): an icon that follows an explicit dark text colour (#3C3C43) must be as readable as the title.
+            if (builtInIconColor != null) imageView.setColorFilter(adaptedOnGlass(builtInIconColor, CYLAnimatedItemColorKind.Icon)) else imageView.clearColorFilter()
         }
         titleLabel.text = style.displayedTitleForTitle(rawTitle?.toString())
         val font = style.titleFontForState(state)
