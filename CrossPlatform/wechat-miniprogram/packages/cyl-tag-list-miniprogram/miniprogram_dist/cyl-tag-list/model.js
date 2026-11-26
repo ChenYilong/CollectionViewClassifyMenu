@@ -954,6 +954,54 @@ function resolvedIconColor(style, state) {
   return cylAnimatedItemResolvedIconColor(itemColorProperties(style, state));
 }
 
+// The icon colour channel properties of cyl-animated-item, all empty (nothing handed).
+const EMPTY_ICON_CHANNELS = {
+  subclassIconColor: '', subclassSelectedIconColor: '', subclassDisabledIconColor: '',
+  builtInIconColor: '', builtInSelectedIconColor: '', builtInDisabledIconColor: '',
+};
+
+/**
+ * The icon colour the tag hands to the cyl-animated-item that draws a NON-system image or an animation, and the colour of a glyph
+ * fallback. The item is NOT given the glass properties (it would draw a second glass inside the tag's own); instead the colour is
+ * resolved here by the item's own resolver with the tag's glass state (`itemColorProperties`), so it is already lifted on drawn dark
+ * Liquid Glass (icon 3:1), and unchanged on flat, light and disabled. An explicit colour goes through the state's `subclass...IconColor`
+ * channel (it tints a static image), an unset one through `builtIn...IconColor` (it never tints a still, only a one-colour animation).
+ * A baked `system:` symbol already carries its colour and gets no channel. The keys are the item's property names.
+ * @returns {object} the six channel properties and `glyphColor` ('' unless the icon is a glyph fallback)
+ */
+function iconColorData(item, state, style, icon) {
+  const image = state === 'selected' && item.selectedImage ? item.selectedImage : item.image;
+  const baked = icon.iconKind === 'image' && /^system:/.test(image || '');
+  const forwards = icon.iconKind === 'animation' || (icon.iconKind === 'image' && !baked);
+  const channels = { ...EMPTY_ICON_CHANNELS, glyphColor: icon.iconKind === 'glyph' ? resolvedIconColor(style, state) : '' };
+  if (!forwards) return channels;
+  const properties = itemColorProperties(style, state);
+  const part = CHANNEL_STATE_PART[state];
+  const explicitKey = `subclass${part}IconColor`;
+  const key = properties[explicitKey] ? explicitKey : `builtIn${part}IconColor`;
+  return { ...channels, [key]: cylAnimatedItemResolvedIconColor(properties) };
+}
+
+/**
+ * The title and icon colours of the TAIL fold tag (a drawn glass tag like any other): the fold colour is explicit when the app set it
+ * (`explicitColor`, else the style's `foldControlColor` when set), else the tint (built-in); both go through the item's resolvers with
+ * the tag's glass state, so on drawn dark glass they are lifted (title 4.5, icon 3) and elsewhere unchanged. Header and footer folds
+ * are flat and keep `resolvedFoldControlColor`.
+ * @returns {{titleColor: string, iconColor: string}}
+ */
+function tailFoldColors(style, explicitColor) {
+  const explicit = explicitColor || (style.foldControlColorSet ? style.foldControlColor : '');
+  const builtIn = explicitColor || resolvedFoldControlColor(style, false);
+  const properties = {
+    ...itemColorProperties(style, 'normal'),
+    subclassTitleColor: explicit, subclassIconColor: explicit, builtInTitleColor: builtIn, builtInIconColor: builtIn,
+  };
+  return {
+    titleColor: cylAnimatedItemResolvedTitleColor(properties) || builtIn,
+    iconColor: cylAnimatedItemResolvedIconColor(properties) || builtIn,
+  };
+}
+
 /** A CSS line height for a font size (UIFont.systemFont's lineHeight is about 1.19 times its size). */
 function lineHeight(size) {
   return Math.ceil(size * 1.194);
@@ -1677,7 +1725,7 @@ module.exports = {
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
-  iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
+  iconContent, animatedIcon, itemColorProperties, iconColorData, tailFoldColors, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
   SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, boardInset, cardInsets, contentColumn, tagColumn, boardColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,

@@ -70,3 +70,40 @@ test('the component takes tailStyle from model.tagLayout and adds only the fold 
   assert.match(JS, /const tailStyle = model\.tagLayout\(style, /);
   assert.match(WXML, /style="\{\{section\.tailStyle\}\}; color: \{\{foldColor\}\};"/);
 });
+
+// The tail fold tag is a drawn glass tag: its title and chevron go through the item's resolvers (explicit fold colour is explicit).
+const DARK_FOLD_COLOR = '#2C2C2E';
+const darkStyleOf = (config) => model.mergeStyle(config, model.defaultStyle(PIXEL_RATIO, true));
+const adapted = (color, kind, style) => glass.cylAnimatedItemAdaptedColor(color, kind, model.itemColorProperties(style, 'normal'));
+
+test('on dark glass an explicit dark fold colour is lifted for the tail title (4.5) and chevron (3)', () => {
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
+  const style = darkStyleOf({ backgroundStyle: 'liquidGlass', foldControlColor: DARK_FOLD_COLOR });
+  const colors = model.tailFoldColors(style, '');
+  assert.equal(colors.titleColor, adapted(DARK_FOLD_COLOR, 'title', style));
+  assert.equal(colors.iconColor, adapted(DARK_FOLD_COLOR, 'icon', style));
+  assert.notEqual(colors.titleColor.toUpperCase(), DARK_FOLD_COLOR);
+  assert.notEqual(colors.iconColor.toUpperCase(), DARK_FOLD_COLOR);
+  // The component-level fold colour is explicit too.
+  const given = model.tailFoldColors(darkStyleOf({ backgroundStyle: 'liquidGlass' }), DARK_FOLD_COLOR);
+  assert.equal(given.titleColor, colors.titleColor);
+});
+
+test('flat, light and unset fold colours are unchanged for the tail', () => {
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
+  const flat = darkStyleOf({ foldControlColor: DARK_FOLD_COLOR });
+  assert.deepEqual(model.tailFoldColors(flat, ''), { titleColor: DARK_FOLD_COLOR, iconColor: DARK_FOLD_COLOR }, 'flat');
+  const light = styleOf({ backgroundStyle: 'liquidGlass', foldControlColor: DARK_FOLD_COLOR });
+  assert.deepEqual(model.tailFoldColors(light, ''), { titleColor: DARK_FOLD_COLOR, iconColor: DARK_FOLD_COLOR }, 'light');
+  const unset = styleOf({ backgroundStyle: 'liquidGlass' });
+  const tint = model.resolvedFoldControlColor(unset, false);
+  assert.deepEqual(model.tailFoldColors(unset, ''), { titleColor: tint, iconColor: tint }, 'unset, light');
+});
+
+test('the tail title and chevron carry their resolved colours; header and footer folds keep foldColor', () => {
+  assert.match(JS, /model\.tailFoldColors\(style, m\.foldControl\.color\)/);
+  assert.match(WXML, /class="cyl-fold-title" style="color: \{\{section\.tailTitleColor\}\};"/);
+  assert.match(WXML, /class="cyl-fold-title-text" style="color: \{\{section\.tailTitleColor\}\};"/);
+  assert.match(WXML, /class="cyl-fold-arrow [^"]*" style="color: \{\{section\.tailIconColor\}\};"/);
+  assert.match(WXML, /class="cyl-fold-footer" style="color: \{\{foldColor\}\};/);
+});

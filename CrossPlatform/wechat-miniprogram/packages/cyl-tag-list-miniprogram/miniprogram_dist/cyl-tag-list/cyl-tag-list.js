@@ -146,6 +146,7 @@ Component({
           style.interitemSpacing, style.lineSpacing).cellStyle
           // The More tag follows the tag's font size, capped (the system font size scales the text up).
           + `; ${model.foldControlFontCSS(style.normal.font.size)}`;
+        const tailColors = model.tailFoldColors(style, m.foldControl.color);
         return {
           index: section.index,
           title: section.title,
@@ -156,6 +157,9 @@ Component({
           // The longer of the two titles: a hidden sizer in the "titleAndIcon" control, so it keeps its width when toggled.
           foldSizerTitle: model.longerFoldTitle(foldTitle(m.foldControl, false), foldTitle(m.foldControl, true)),
           tailStyle,
+          // The tail is a drawn glass tag: its title and chevron colours are adapted like any tag's (header and footer folds are flat).
+          tailTitleColor: tailColors.titleColor,
+          tailIconColor: tailColors.iconColor,
           ...layout,
           items: section.items.map((item, i) => {
             const selected = this.selection.includes(item.key);
@@ -169,6 +173,7 @@ Component({
               title: item.title,
               styleSpeed: style.animationSpeed,
               ...icon,
+              ...model.iconColorData(item, state, style, icon),
               enabled: item.enabled,
               selected,
               hidden: fold.visible.length ? !fold.visible[i] : false,
