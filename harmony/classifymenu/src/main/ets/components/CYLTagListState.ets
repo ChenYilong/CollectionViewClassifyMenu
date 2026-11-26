@@ -94,7 +94,11 @@ const HEADER_BOARD_SPACING: number = CYLSectionStyleMetrics.headerBoardSpacing;
  * The space between every two adjacent views of a header row, vp. The room math (`headerTitleRoom`) and `CYLTagListView`'s
  * header Row both use this one constant.
  */
-export const HEADER_ITEM_SPACING: number = 6;
+export const HEADER_ITEM_SPACING: number = 8;
+/** The gap between a long-press callout's arrow tip and the tag, vp (iOS `gap`). */
+export const CALLOUT_GAP: number = 4;
+/** The height of a one-line callout bubble with its arrow, vp: a 13 vp line, 8 vp padding twice, an 8 vp arrow. */
+export const CALLOUT_ESTIMATED_HEIGHT: number = 40;
 /** The least width a header's title has regardless of the other views (`HEADER_TITLE_MIN_WIDTH`: one em, at least this), vp. */
 const HEADER_TITLE_MIN_WIDTH_FLOOR: number = 1;
 /** The side of a header's More button, vp. */
@@ -2533,6 +2537,46 @@ export class CYLTagListState implements CYLTagLongPressHost {
     this.calloutIndexPath = indexPath;
     this.calloutText = text;
     this.setNeedsDisplay();
+  }
+
+  /**
+   * Whether a callout of `height` goes below the target (iOS `placesBelow`). Above first; below when it does not fit above
+   * (`safeTop`) or when it would cover the header (`headerTop`..`headerBottom`, the section header above a first-row tag)
+   * and it fits below (`bottomLimit`); above when neither side is free of the header and below does not fit. Pure; all
+   * values are in one coordinate space (the list's content).
+   */
+  static calloutPlacesBelow(targetTop: number, targetBottom: number, height: number, safeTop: number,
+    bottomLimit: number, headerTop: number | undefined, headerBottom: number | undefined): boolean {
+    const aboveTop = targetTop - height - CALLOUT_GAP;
+    const fitsAbove = aboveTop >= safeTop;
+    const fitsBelow = targetBottom + CALLOUT_GAP + height <= bottomLimit;
+    if (!fitsAbove) {
+      return true;
+    }
+    if (headerTop === undefined || headerBottom === undefined || headerBottom <= headerTop) {
+      return false;
+    }
+    const coversHeader = headerTop < aboveTop + height && headerBottom > aboveTop;
+    return coversHeader && fitsBelow;
+  }
+
+  /**
+   * Whether the callout of the item goes below it: the bubble above would cover the item's section header and fits below.
+   * The popup's own flip still handles a lack of room at the window's edges.
+   */
+  calloutPlacesBelowItem(indexPath: CYLIndexPath, height: number = CALLOUT_ESTIMATED_HEIGHT): boolean {
+    const frames = this.layoutSections();
+    if (indexPath.section < 0 || indexPath.section >= frames.length) {
+      return false;
+    }
+    const section = frames[indexPath.section];
+    const cell = section.items.find((candidate: CYLTagListItemFrame) => candidate.item === indexPath.item);
+    if (cell === undefined) {
+      return false;
+    }
+    const headerBottom = section.headerHeight > 0 ? section.y + section.headerHeight : undefined;
+    return CYLTagListState.calloutPlacesBelow(cell.y, cell.y + cell.height, height, Number.NEGATIVE_INFINITY,
+      this.contentHeightStorage, section.headerHeight > 0 ? section.y : undefined, headerBottom);
   }
 
   dismissCallout(): void {

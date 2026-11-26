@@ -45,7 +45,7 @@ export {
 export {
   CYLTagListState, CYLMenuSelectionMode, CYLMenuTitlePosition, CYLMenuFoldStyle, CYLTagButtonMetrics,
   CYLTagFoldMetrics, CYLTagCreateItem, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListConfigurationSource,
-  CYLTextMeasurer, HEADER_ITEM_SPACING
+  CYLTextMeasurer, HEADER_ITEM_SPACING, CALLOUT_GAP, CALLOUT_ESTIMATED_HEIGHT
 } from './src/main/ets/components/CYLTagListState';
 export * from './src/main/ets/imagetag/ImageTagIndex';
 export * from './src/main/ets/classify/ClassifyIndex';

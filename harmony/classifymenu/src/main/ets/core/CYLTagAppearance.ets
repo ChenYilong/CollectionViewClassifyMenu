@@ -127,6 +127,34 @@ export class CYLTagAppearance {
     return this.borderWidthWasSet;
   }
 
+  /**
+   * The border drawn under Liquid Glass: the EXPLICIT color decides (iOS `glassBorderColor`). An explicit color draws the
+   * border; nothing explicit (the built-in default, or a width set alone) draws none, so the shared glass rim shows.
+   */
+  get glassBorderColor(): ResourceColor | undefined {
+    return this.explicitBorderColor;
+  }
+
+  /** The width of the glass border: the effective width when `glassBorderColor` is defined, else 0 (iOS `glassBorderWidth`). */
+  get glassBorderWidth(): number {
+    return this.glassBorderColor !== undefined ? this.borderWidth : 0;
+  }
+
+  /** True when `textColor` was set to a color (and not reset or the style's built-in default; iOS `isTextColorSet`). */
+  get isTextColorSet(): boolean {
+    return this.textColorWasSet;
+  }
+
+  /** The color set on `iconColor`; undefined when it is unset and the icon follows the title (iOS `explicitIconColor`). */
+  get explicitIconColor(): ResourceColor | undefined {
+    return this.iconColor;
+  }
+
+  /** True when `iconColor` was set to a color (and not reset; iOS `isIconColorSet`). */
+  get isIconColorSet(): boolean {
+    return this.iconColor !== undefined;
+  }
+
   /** Sets the built-in border of the style: the effective border until the app sets one, never explicit. */
   setDefaultBorder(color: ResourceColor | undefined, width: number): void {
     this.defaultBorderColor = color;
