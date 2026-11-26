@@ -94,7 +94,7 @@ applyTitleTintColor(appearance.textColor)                                       
 applyIconTintColor(style.iconColor(for: state))
 
 // CYLAnimatedItemContrast (dfbe9190): the reference never goes below the rendered glass of this platform
-public static let renderedDarkGlassWhiteShare: CGFloat = 0.26                    // measured on iOS 27.2: tag glass Y 66, L about 0.055
+public static let renderedDarkGlassWhiteShare: CGFloat = 0.28                    // measured 0.26 on iOS 27.2 (tag glass Y 66, L about 0.055) plus a margin
 public static func renderedGlassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?) -> CGFloat {
     max(glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha),
         relativeLuminance(red: renderedDarkGlassWhiteShare, green: renderedDarkGlassWhiteShare, blue: renderedDarkGlassWhiteShare))
@@ -117,7 +117,7 @@ private func resolvedBuiltInColor(_ color: UIColor, state: IconState, minimumCon
 | 2 | Liquid/flat guards inside the item (`drawsLiquidGlass`, `drawsFlatBackground`); the tag reads them instead of `style.resolvedBackgroundStyle`. 条目内部的液态/扁平 guard，tag 读取它们。 | `CYLAnimatedItemView` | `7eea93b1` |
 | 3 | The item owns the default glass tint (0.10 light, 0.04 dark) and several options (pressed background, disabled animation alpha, last frame when selected, Increase Contrast outline, Reduce Motion, disabled-wins image). 默认玻璃着色与多个选项归条目所有。 | `CYLAnimatedItemView`, `CYLLiquidGlass` | `7eea93b1` |
 | 4 | One resolution for ALL built-in title and icon colors (component and subclass level, normal and selected): resolved with the item's own traits and adapted on drawn dark glass (not the disabled look); the default dark `UIColor.label` passes unchanged. 所有内置标题与图标颜色用同一处解析并适配。 | `CYLAnimatedItemView.resolvedBuiltInColor` | tab bar `9905aaa0` |
-| 5 | The rule judges against the rendered glass: `renderedDarkGlassWhiteShare` 0.26 (measured on iOS 27.2) and `renderedGlassReferenceLuminance = max(model, floor)`. Shared algorithm and constants unchanged. 规则对照实际渲染的玻璃：下限 0.26（iOS 27.2 实测），算法与共享常量不变。 | `CYLAnimatedItemContrast` | tab bar `dfbe9190` |
+| 5 | The rule judges against the rendered glass: `renderedDarkGlassWhiteShare` 0.28 (0.26 measured on iOS 27.2 plus a margin of about 0.02, tab bar `f9a9569c`) and `renderedGlassReferenceLuminance = max(model, floor)`. Shared algorithm and constants unchanged. 规则对照实际渲染的玻璃：下限 0.28（iOS 27.2 实测 0.26 再加约 0.02 的余量，tab bar `f9a9569c`），算法与共享常量不变。 | `CYLAnimatedItemContrast` | tab bar `dfbe9190` |
 | 6 | A detached item gets its built-in title once at set-up. 未加入窗口的条目在初始化时也获得内置标题颜色。 | `animatedItemSetUp` | `dfbe9190` |
 | 7 | `CYLTagButton` shrinks to hand-off: explicit colors via `setSubclassTitleColor` / `setSubclassIconColor`, unset ones via `applyTitleTintColor` / `applyIconTintColor`, tag-specific rules stay. `CYLTagButton` 缩减为交接：显式颜色走通道，未设置的走内置，tag 特有规则保留。 | `CYLTagButton.swift` | ClassifyMenu `99662054` and later |
 | 8 | Plus button: the title lines up with the tab titles by default (`+alignsTitleWithTabBarItemTitles` has a core default), fixing the dim gray plus title in dark mode. plus 按钮标题默认与 Tab 标题对齐（核心提供默认值），修复深色模式偏灰。 | `CYLPlusButton+CYLImplementation.swift` | tab bar `a59ecb55` |
@@ -147,7 +147,7 @@ Explicit levels and the built-in levels (except the disabled look) are adapted o
 | `respectsReduceMotion` | false | `playAnimation` shows the state frame. 遵守“减弱动态效果”。 |
 | `disabledWinsImage` | false | `selectedImage` only when selected and enabled. 禁用优先于选中图片。 |
 | static `resolvedContentHorizontalInset(_:style:)`, static `isAnimationEngineAvailable` | | Forwarders the tag used to re-implement. 标签原来自己实现的转发。 |
-| `CYLAnimatedItemContrast.renderedDarkGlassWhiteShare` 0.26, `renderedGlassReferenceLuminance(glassTint:tintAlpha:)` | | The per-platform floor of the reference and its use. 参考亮度的按平台下限及用法。 |
+| `CYLAnimatedItemContrast.renderedDarkGlassWhiteShare` 0.28, `renderedGlassReferenceLuminance(glassTint:tintAlpha:)` | | The per-platform floor of the reference and its use. 参考亮度的按平台下限及用法。 |
 
 Integrator example / 集成示例:
 
@@ -173,7 +173,7 @@ item.applyTitleTintColor(.secondaryLabel)     // built-in level: resolved with t
 - Built-in title/icon colors are adapted on drawn dark glass now (selected built-in too); Android adapts only the unselected enabled built-in, HarmonyOS and the mini program adapt no built-in colors.
   内置标题与图标颜色现在在深色绘制玻璃上也会适配（选中的内置颜色也是）；Android 只适配未选中且可用的内置颜色，HarmonyOS 与小程序不适配内置颜色。
 - The dark-glass reference is the iOS floor 0.26: lifts are stronger than the shared 0.14 model. Android and HarmonyOS are estimated about 0.19 and the mini program at the model; each platform measures its own.
-  深色玻璃的参考是 iOS 下限 0.26：提亮比共享的 0.14 模型更强。Android 与 HarmonyOS 估计约 0.19，小程序为模型值；各平台自己测量。
+  深色玻璃的参考是 iOS 下限 0.28：提亮比共享的 0.14 模型更强。Android 与 HarmonyOS 估计约 0.19，小程序为模型值；各平台自己测量。
 - `CYLMenuStyle.defaultGlassTint*` and `CYLTagButton.liquidGlassView` are deprecated forwarders; `CYLIconContrast` was removed.
   `CYLMenuStyle.defaultGlassTint*` 与 `CYLTagButton.liquidGlassView` 是弃用的转发；`CYLIconContrast` 已删除。
 
@@ -182,3 +182,12 @@ item.applyTitleTintColor(.secondaryLabel)     // built-in level: resolved with t
 Compile only on the author's side (`scripts/library-warnings.sh`, `build-for-testing` of `CYLMenuExample` and `CYLTabBarController-Framework`). The placeholder session ran 123 tab-bar Framework cases (0 failures)
 at `9905aaa0` and the Configuration page at `99662054` / `510ed988`; the calibrated reference (`dfbe9190`) is verified by the captures and measurements of section 1b (taken on `9cc46181`); unit tests were not run by the author.
 作者一侧只做编译检查。占位符会话在 `9905aaa0` 上跑了 123 个 tab bar Framework 用例（0 失败），并在 `99662054` / `510ed988` 上拍了 Configuration 页；校准后的参考亮度（`dfbe9190`）由 1b 节在 `9cc46181` 上的截图与测量验证；作者没有运行单元测试。
+
+## 7. Follow-up (2026-11-26): floor 0.28, the Lottie opt-in, plain sections in the Configuration example / 后续
+
+- GIF (4.48) and SVGA (4.43) were just under 4.5 at the floor 0.26 (anti-aliased glyph edges, glass Y 66 to 68): the floor is now 0.28 (tab bar `f9a9569c`); the effect is verified by a new capture, not yet in this document.
+  GIF（4.48）与 SVGA（4.43）在下限 0.26 时略低于 4.5（字形抗锯齿边缘、玻璃 Y 66 到 68）：下限现为 0.28（tab bar `f9a9569c`）；效果由新截图验证，尚未写入本文档。
+- The dictionary section's Lottie entry opts in with the URL option `tint=title` (an unset animation stays untinted, tint spec v2), so the near-black artwork follows the title color.
+  字典一节的 Lottie 条目用 URL 选项 `tint=title` 主动启用（未设置的动画保持不着色，tint 规范 v2），近黑的素材跟随标题颜色。
+- The Configuration example now matches Android: both lists use `sectionStyle = plain` (Android: `plainSections()` for the file list and `sectionStyle: "plain"` in the map style), so the config-file section shows all six tags next to the fold control, the "SF Symbol" tag included (the card's insets had hidden it).
+  Configuration 示例与 Android 对齐：两个列表都用 `sectionStyle = plain`（Android：配置文件列表用 `plainSections()`，字典样式里是 `sectionStyle: "plain"`），配置文件一节在折叠控件旁显示全部六个标签，包括被卡片缩进隐藏的 "SF Symbol"。

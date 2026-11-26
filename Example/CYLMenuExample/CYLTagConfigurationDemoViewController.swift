@@ -28,6 +28,11 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
     /// HarmonyOS and mini program examples, so its titles stay the source text and are looked up here.
     static func localizedFileConfiguration() throws -> [String: Any] {
         var configuration = try CYLTagListView.configuration(contentsOfFile: configurationFilePath())
+        // The shared configuration file sets no sectionStyle: keep this screen flat, as the Android example does (`plainSections()`): the full
+        // width shows every tag of the two rows next to the fold control (the card's insets hid the "SF Symbol" tag).
+        var style = configuration[CYLTagListKey.style] as? [String: Any] ?? [:]
+        style[CYLMenuStyleKey.sectionStyle] = "plain"
+        configuration[CYLTagListKey.style] = style
         if let sections = configuration[CYLTagListKey.sections] as? [[String: Any]] {
             configuration[CYLTagListKey.sections] = sections.map { section -> [String: Any] in
                 var section = section
@@ -53,8 +58,12 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
     }
 
     /// An animation URL, or "" (as the Objective-C example's `?: @""`) when the file is missing.
-    private static func animationValue(_ name: String) -> Any {
+    private static func animationValue(_ name: String, options: String? = nil) -> Any {
         if let url = animationNamed(name) {
+            if let options, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                components.query = options
+                return components.url ?? url
+            }
             return url
         }
         return ""
@@ -72,6 +81,7 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
                                        CYLTagAppearanceKey.iconColor: UIColor.white,
                                        CYLTagAppearanceKey.cornerRadius: 8]
         let style: [String: Any] = [
+            CYLMenuStyleKey.sectionStyle: "plain",
             CYLMenuStyleKey.backgroundStyle: "liquidGlass",
             CYLMenuStyleKey.imageSize: NSValue(cgSize: CGSize(width: 20, height: 20)),
             CYLMenuStyleKey.imageTitleSpacing: 4,
@@ -81,7 +91,9 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
             CYLMenuStyleKey.selected: selected,
         ]
         let items: [Any] = [
-            [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json")] as [String: Any],
+            // The artwork is one near-black color: an unset animation stays untinted (tint spec v2), so this entry opts in with the `tint=title` URL option
+            // and follows the title color (white on dark glass, dark on light).
+            [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json", options: "tint=title")] as [String: Any],
             [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
             [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv")] as [String: Any],
             [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga")] as [String: Any],
