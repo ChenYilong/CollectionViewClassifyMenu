@@ -260,3 +260,12 @@ Doc links are relative to this file.
 - Built from git, GitHub, a keyword search of the documents and the working notes of the last iteration. A TODO written without those keywords may be missing; read [issue-progress.md](../../issue-progress.md) once.
 - Branch percentages and "superseded" / "stale" labels are estimates; compare before deleting anything.
 - Windows-side results are quoted from its reports and were not re-run.
+
+## 10. Added 2026-11-26: unfinished local work, committed as draft pull requests
+
+This work existed only as uncommitted changes on one Mac. It is committed so that it is not lost. **Do not merge either pull request.** This section adds to section 4, which lists the branches as they were before.
+
+| Pull request | Content | Progress | Where to continue |
+|---|---|---|---|
+| [#40](https://github.com/ChenYilong/CollectionViewClassifyMenu/pull/40) `wip/ios-repin-1d356a0a-simulator-screenshots` into `feat/harmony` (conflicting) | Old component repin to `1d356a0a` and the TODO "run the simulator and take the screenshots" (2026-11-21). Not built; why it stopped is not recorded | Unfinished, pin part superseded | On `fix/shared-contrast-ios`: only add the screenshots if they are still missing, then close the pull request |
+| [#41](https://github.com/ChenYilong/CollectionViewClassifyMenu/pull/41) `wip/ios-corner-radius-pod-install-pbxproj` into `feat/corner-radius-numeric` | Example project file, apparently from a local `pod install`. Not built | Superseded: `fix/shared-contrast-ios` has the same kinds of entries | Close the pull request; do not merge the old project file over the current one |
