@@ -297,3 +297,39 @@ Split with the Mac session: Mac takes steps 1 and 2 (iOS verification, CI path, 
 **Acceptance (pass 60):** conflicts resolved keeping both sides 25 / 25; iOS files and pins untouched 15 / 15; Windows suites run on the merged tree 25 / 30 (UI tests not run); pins consistent per platform group 10 / 10; pushed and PR open 0 / 20 (waits for the owner's approval, as section 0 step 3 requires). **Score 75 / 100.**
 
 Missing points (TODO): push `feat/glass-backdrop` and the merge after the owner's approval (20); HarmonyOS UI tests on the merged tree (5); 60 of the 77 Windows commits fail `scripts/check-commit-message.sh` (no author line or not git cz style), already committed before this session, not rewritten.
+
+## 13. Added 2026-11-27 (macOS session): steps 1 and 2, iOS verification of the head and the CI path
+
+User prompts (verbatim): "拉取远端最新代码，找到本项目最近的一条commit所在分支，切换到最近提交所在分支。阅读分支下，docs 文件夹下的包含 handover 文字的文件夹，遍历文件夹中的所有文件以及子文件夹下的所有文件。阅读交接文档完成交接任务。开始编写代码。" and "阅读docs 文件夹下的包含 todo 文字的文件夹，遍历文件夹中的所有文件以及子文件夹下的所有文件。阅读交接文档完成交接任务。继续编写代码。"
+
+English: pull the newest code, switch to the branch with the newest commit, read the handover folder under `docs/` (every file and subfolder), complete the handover tasks and write code.
+
+Environment: macOS 27, Xcode 27.2, iOS 27.2 simulator `CB9BDA60` (iPhone, this session's own), worktree `/tmp/xpr/cvcm-contrast`.
+
+**Note on an older owner rule:** on 2026-11-26 the owner said the iOS side keeps only a compile check and does not run the suites (integrators test). Section 0 step 1 asks for the suites; this session followed the handover, the newer document.
+
+### Step 1: verify the head
+
+| Check | Commit | Result |
+|---|---|---|
+| `scripts/unit-tests.sh menu` | `f32ffe6f` | 37 / 37 |
+| `scripts/unit-tests.sh swift` | `f32ffe6f` | 23 / 23 |
+| `scripts/unit-tests.sh example` | `f32ffe6f` | **240 / 242**: two failures, fixed below |
+| `example` and `menu` after the fixes | `09bc2413` (iOS sources equal to `598fdb15` plus the fix) | 243 / 243 and 37 / 37 |
+| `scripts/cyl-tabbar-latest-commit.sh --check` | | Newest component commit `973c255a` (`feat/harmony-animated-item-engines`, 2026-11-26 23:27 +13); iOS pins `4d0e00ae`, Windows `b5b36fbf`: **TODO repin** after the tab bar owner announces the flat button batch |
+| `library-warnings.sh`, `pod lib lint`, SwiftPM, Example-Swift, React Native and Flutter iOS builds | | TODO (next) |
+
+Fixed in `fix: 🐛 one-character badges stay round, create-item plus icon reaches 3:1`:
+
+| Failure / defect | Cause | Fix |
+|---|---|---|
+| `CYLAndroidSampleTests.testListContainerFeatures`: badge "热" 18 × 16, expected 16 × 16 | `CYLTag.badgeImageWidth` widened any text whose width plus 2 × 4 pt passed the diameter; one CJK character did, against the method's own documentation | One character always keeps the circle (library) |
+| `CYLTagListHeaderRoomTests.testNoFoldTheTitleTakesTheInnerWidth`: fold frame `(0, 0, 0, 0)`, expected none | Test: the header always holds its fold button and hides it when the section does not fold | The test reads a hidden fold button as no fold, as the header room model does |
+| Section 5: create cell plus icon about 2.4:1 over black | `tertiaryLabel` | `secondaryLabel` (the title's colour); new test `testTheCreateItemsPlusIconReachesThreeToOneOnTheListBackground` (3:1 in light and dark) |
+
+The component's API comment on `adaptedForContrast` (CYLTabBarController `CYLAnimatedItemView.swift`) still says the plus icon is a `tertiaryLabel`: TODO for the tab bar session.
+
+### Step 2: CI
+
+- Draft pull request [#42](https://github.com/ChenYilong/CollectionViewClassifyMenu/pull/42) `fix/shared-contrast-ios` → `master` (owner's choice, 2026-11-27: a draft PR rather than a trigger change in `ios.yml`). Do not merge.
+- Why the iOS jobs stay queued: since about 2026-11-25 07:30 UTC no macOS job has started in this repository **or** in CYLTabBarController, while the Ubuntu jobs finish. The workflow is not the cause; the account's macOS runner allowance (minutes or spending limit) is the likely one. **TODO (owner):** check https://github.com/settings/billing.
