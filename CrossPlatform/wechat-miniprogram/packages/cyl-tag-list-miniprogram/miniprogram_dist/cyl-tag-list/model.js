@@ -1472,7 +1472,8 @@ function glassHandedBorder(style, appearance) {
   if (!isGlassDrawn(style)) return { color: appearance.borderColor, width: appearance.borderWidth };
   return {
     color: appearance.borderColorExplicit ? appearance.borderColor : null,
-    width: appearance.borderWidthExplicit ? appearance.borderWidth : 0,
+    // A width alone draws no border; with an explicit colour the width is the explicit one, else the default.
+    width: appearance.borderColorExplicit ? appearance.borderWidth : 0,
   };
 }
 

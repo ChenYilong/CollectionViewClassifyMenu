@@ -70,11 +70,12 @@ class CYLTagAppearance : Cloneable {
         }
 
     /**
-     * Whether the app (a setter, a configuration key or a preset) set the border color or width of this state. The built-in
+     * Whether the app (a setter, a configuration key or a preset) set the border COLOR of this state (a width alone draws no border
+     * under glass, as on HarmonyOS and the mini program; the width is then the explicit one, else the default). The built-in
      * default border ([setDefaultBorder]) does not count. Under drawn Liquid Glass only an explicit border is handed to the
      * glass; otherwise the glass draws its own rim.
      */
-    val hasExplicitBorder: Boolean get() = borderColorWasSet || borderWidthWasSet
+    val hasExplicitBorder: Boolean get() = borderColorWasSet
 
     /** The built-in default border of a state: readable through [borderColor] and [borderWidth] but NOT explicit. */
     internal fun setDefaultBorder(color: Int?, width: Float) {

@@ -41,8 +41,9 @@ test('glass and an explicit border (color and width) keep it exactly', () => {
   assert.match(cellOf({ ...GLASS_STYLE, normal: EXPLICIT_BORDER }), EXPLICIT_CSS);
   assert.match(cellOf({ ...GLASS_STYLE, selected: EXPLICIT_BORDER }, { selected: true }), EXPLICIT_CSS);
   assert.match(cellOf({ ...GLASS_STYLE, disabled: EXPLICIT_BORDER }, { enabled: false }), EXPLICIT_CSS);
-  // Only the color or only the width set: the unset half is none, so nothing is drawn (a border needs both).
-  assert.match(cellOf({ ...GLASS_STYLE, normal: { borderColor: '#0000FF' } }), NO_BORDER);
+  // Only the width set: no border (the colour decides). Only the colour set: kept, with the default width.
+  assert.doesNotMatch(cellOf({ ...GLASS_STYLE, normal: { borderColor: '#0000FF' } }), NO_BORDER);
+  assert.match(cellOf({ ...GLASS_STYLE, normal: { borderColor: '#0000FF' } }), /border-color: #0000FF/);
   assert.match(cellOf({ ...GLASS_STYLE, normal: { borderWidth: 2 } }), NO_BORDER);
 });
 

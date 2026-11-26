@@ -68,8 +68,8 @@ class CYLTagGlassBorderTest {
         assertTrue("clone keeps the flag", appearance.clone().hasExplicitBorder)
         assertEquals(Color.RED, appearance.clone().borderColor)
         val widthOnly = CYLTagAppearance().also { it.borderWidth = 2f }
-        assertTrue(widthOnly.hasExplicitBorder)
-        assertTrue(widthOnly.clone().hasExplicitBorder)
+        assertFalse("a width alone is not an explicit border under glass", widthOnly.hasExplicitBorder)
+        assertFalse(widthOnly.clone().hasExplicitBorder)
         assertFalse("a style copy keeps the default as a default", CYLMenuStyle().copy().normalAppearance.hasExplicitBorder)
         assertTrue(glassStyle().also { it.normalAppearance.borderColor = Color.BLUE }.copy().normalAppearance.hasExplicitBorder)
         appearance.reset()
