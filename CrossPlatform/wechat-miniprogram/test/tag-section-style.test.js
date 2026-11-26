@@ -515,7 +515,7 @@ test('a glass card has the blur, the tint and the card corners, and the layout d
   const flat = styleOf({ sectionStyle: 'insetGrouped' })
   const glass = styleOf(GLASS)
   const css = model.sectionLayout(glass)
-  assert.match(css.cardStyle, /backdrop-filter:blur\(16px\) saturate\(180%\)/)
+  assert.match(css.cardStyle, /backdrop-filter:blur\(16px\) saturate\(160%\) brightness\(1\.05\)/)
   assert.match(css.cardStyle, new RegExp(`border-radius: ${CARD_RADIUS}px`))
   assert.doesNotMatch(css.cardStyle, /--cyl-item-inset/)
   assert.match(css.cardStyle, new RegExp(`padding: ${CARD_PADDING}px ${CARD_PADDING}px ${CARD_PADDING}px ${CARD_PADDING}px`))
