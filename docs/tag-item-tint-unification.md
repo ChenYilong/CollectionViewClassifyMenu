@@ -33,6 +33,82 @@ Screenshot: `/tmp/xpa/cm-final-out/raw/a40c4ee4-dark.png` (iOS 27.2 simulator, C
    CYLTagButton 重复实现了 CYLAnimatedItemView 的功能（深色玻璃提亮、玻璃/扁平判断、按下外观、增强对比度、减弱动态效果等），tag 里修好的问题，直接使用条目的集成方仍然存在。
    中间一个版本（`098809db`）甚至覆盖了集成方的 `itemAppearance`。
 
+## 1b. Screenshots: bug and fix / 截图：问题与修复
+
+Labelled comparison (one column, original pixels, iOS 27.2 simulator, iPhone 18 Pro, Xcode 27.2, captured 2026-11-26; bug `a40c4ee4` at 14:18 NZDT, fix `9cc46181` at 16:45 NZDT):
+对照图（单列，原始像素，iOS 27.2 模拟器，iPhone 18 Pro，Xcode 27.2，2026-11-26 拍摄；问题 `a40c4ee4` 14:18，修复 `9cc46181` 16:45，新西兰时间）：
+
+![bug a40c4ee4 vs fix 9cc46181, Configuration page, dark](assets/ios-27.2-iphone18pro-sim-config-dark-bug-a40c4ee4-vs-fix-9cc46181.png)
+
+| Frame / 画面 | File / 文件 | Commit / 提交 | Taken / 时间 |
+|---|---|---|---|
+| Bug, dark, full page / 问题，深色，整页 | [ios-27.2-iphone18pro-sim-config-dark-bug-a40c4ee4-20261126-1418.png](assets/ios-27.2-iphone18pro-sim-config-dark-bug-a40c4ee4-20261126-1418.png) | `a40c4ee4`, CYLTabBarController `a59ecb55` | 2026-11-26 14:18 NZDT |
+| Fix, dark, full page / 修复，深色，整页 | [ios-27.2-iphone18pro-sim-config-dark-fix-9cc46181-20261126-1645.png](assets/ios-27.2-iphone18pro-sim-config-dark-fix-9cc46181-20261126-1645.png) | `9cc46181`, CYLTabBarController `dfbe9190` | 2026-11-26 16:45 NZDT |
+| Fix, light, full page / 修复，浅色，整页 | [ios-27.2-iphone18pro-sim-config-light-fix-9cc46181-20261126-1645.png](assets/ios-27.2-iphone18pro-sim-config-light-fix-9cc46181-20261126-1645.png) | `9cc46181`, CYLTabBarController `dfbe9190` | 2026-11-26 16:45 NZDT |
+
+Measured (Rec.601 luma of sRGB bytes; glyph = mean of the brightest 2.5% of the title box; contrast against the tag glass, Y 66 in dark mode): config-file titles PAG / Rive / SVGA / GIF, dark mode.
+实测（sRGB 字节的 Rec.601 亮度；字形为标题框内最亮 2.5% 像素的均值；对照标签玻璃，深色模式 Y 66）：配置文件标题，深色模式。
+
+| | Bug `a40c4ee4` | After the shared-path refactor `99662054` | Fix `9cc46181` |
+|---|---|---|---|
+| Glyph Y / 字形亮度 | 121.6 | 139.4 | 174.9 |
+| Contrast / 对比度 | 2.25 to 2.32 | 2.86 to 2.94 | PAG 4.56, Rive 4.55, GIF 4.48, SVGA 4.43 |
+
+PAG and Rive reach the 4.5 target; GIF (4.48) and SVGA (4.43) are just under it (the glyph pixels are anti-aliased and the box was placed by eye, so the numbers carry a small error). The dictionary section's titles (white, about 10:1), the glass interior (Y 66 to 68) and the selected tags are unchanged; the dictionary Lottie icon is still dark (artwork).
+PAG 与 Rive 达到 4.5 目标；GIF（4.48）与 SVGA（4.43）略低（字形边缘有抗锯齿，测量框是目测放置的，数字有小误差）。字典一节的标题（白色，约 10:1）、玻璃内部（Y 66 到 68）与选中的标签不变；字典里的 Lottie 图标仍是深色（素材颜色）。
+
+### Code, before (the bug) and after (the fix) / 代码：改动前（问题）与改动后（修复）
+
+**Before, the bug** (ClassifyMenu `a40c4ee4`, `CYLTagButton.updateAppearance`; CYLTabBarController `a59ecb55`, `CYLAnimatedItemContrast.adjusted`): the tag decided and lifted the colors itself, and the item judged them against the shared model only (white 0.14 over black, luminance about 0.017), so the config-file title `#3C3C43` was lifted only to about `#8A8A96`: 2.9:1 on the real glass, the dim gray in the first screenshot.
+**改动前（问题）：** tag 自己判断并提亮颜色，条目只对照共享模型（黑底上的 0.14 白，亮度约 0.017），所以配置文件标题 `#3C3C43` 只提亮到约 `#8A8A96`：在真实玻璃上 2.9:1，即第一张截图里发灰的标题。
+
+```swift
+// CYLTagButton.updateAppearance (a40c4ee4): the tag re-implements the item's dark-glass rule
+let liftsOnGlass = drawsGlass && traitCollection.userInterfaceStyle == .dark
+var textColor: UIColor = appearance.textColor
+if liftsOnGlass, let explicit = appearance.explicitTextColor {
+    textColor = CYLAnimatedItemContrast.adjustedTitle(explicit, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha)
+}
+titleLabel.textColor = textColor
+var iconColor = style.iconColor(for: state)
+if liftsOnGlass, let explicit = style.explicitIconColor(for: state) {
+    iconColor = CYLAnimatedItemContrast.adjustedIcon(explicit, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha)
+}
+applyIconTintColor(iconColor)
+
+// CYLAnimatedItemContrast.adjusted (a59ecb55): the reference is the model only
+let reference = glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)   // nil tint: white 0.14, L about 0.017
+```
+
+**After, the fix** (ClassifyMenu `9cc46181`, CYLTabBarController `dfbe9190`): the tag only hands colors to the item by channels; the item adapts explicit AND built-in colors for every state in one place, against the rendered glass.
+**改动后（修复）：** tag 只通过通道把颜色交给条目；条目在一处为所有状态适配显式与内置颜色，对照实际渲染的玻璃。
+
+```swift
+// CYLTagButton.updateAppearance (9cc46181): hand-off only, no contrast code, no itemAppearance, no liftsOnGlass
+for tagState in Self.states {
+    let stateAppearance = style.appearance(for: tagState)
+    setSubclassTitleColor(stateAppearance.explicitTextColor, for: tagState)      // explicit: adapted by the item
+    setSubclassIconColor(style.explicitIconColor(for: tagState), for: tagState)
+}
+applyTitleTintColor(appearance.textColor)                                         // built-in level (the effective color)
+applyIconTintColor(style.iconColor(for: state))
+
+// CYLAnimatedItemContrast (dfbe9190): the reference never goes below the rendered glass of this platform
+public static let renderedDarkGlassWhiteShare: CGFloat = 0.26                    // measured on iOS 27.2: tag glass Y 66, L about 0.055
+public static func renderedGlassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?) -> CGFloat {
+    max(glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha),
+        relativeLuminance(red: renderedDarkGlassWhiteShare, green: renderedDarkGlassWhiteShare, blue: renderedDarkGlassWhiteShare))
+}
+// adjusted(...) now: let reference = renderedGlassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
+
+// CYLAnimatedItemView (9905aaa0): ONE resolution of every built-in color, normal and selected alike
+private func resolvedBuiltInColor(_ color: UIColor, state: IconState, minimumContrast: CGFloat) -> UIColor {
+    let resolved = color.resolvedColor(with: traitCollection)                    // the item's own traits, a plain color
+    guard state != .disabled else { return resolved }
+    return glassAdapted(resolved, minimumContrast: minimumContrast)              // behind the item's drawsLiquidGlass guard
+}
+```
+
 ## 2. What was fixed, and how / 修复内容与方法
 
 | # | Change / 改动 | Where / 位置 | Commit / 提交 |
@@ -85,8 +161,8 @@ item.applyTitleTintColor(.secondaryLabel)     // built-in level: resolved with t
 
 ## 4. What this fixes, and what it does not / 修复了什么，没修复什么
 
-- Fixes (expected, not yet measured on the new head): an explicit dark title in the normal state on drawn dark glass (config-file `#3C3C43`) reaches 4.5:1 against the rendered glass (was about 2.9:1); the normal and selected built-in colors take one path; a detached item has its built-in title; the integrator's `itemAppearance` is never overwritten by the tag.
-  预期修复（新版本上尚未实测）：常态显式深色标题在深色绘制玻璃上对照实际玻璃达到 4.5:1（原约 2.9:1）；常态与选中的内置颜色走同一条路径；未加入窗口的条目有内置标题；tag 不再覆盖集成方的 `itemAppearance`。
+- Fixes (measured on `9cc46181`, section 1b): an explicit dark title in the normal state on drawn dark glass (config-file `#3C3C43`) now reaches 4.43 to 4.56:1 on the real glass (was 2.25 to 2.32:1; PAG and Rive pass 4.5, GIF 4.48 and SVGA 4.43 are just under); the normal and selected built-in colors take one path; a detached item has its built-in title; the integrator's `itemAppearance` is never overwritten by the tag.
+  修复（已在 `9cc46181` 上实测，见 1b）：常态显式深色标题在深色绘制玻璃上对照实际玻璃现在达到 4.43 到 4.56:1（原 2.25 到 2.32:1；PAG 与 Rive 达到 4.5，GIF 4.48 与 SVGA 4.43 略低）；常态与选中的内置颜色走同一条路径；未加入窗口的条目有内置标题；tag 不再覆盖集成方的 `itemAppearance`。
 - Does not fix / 未修复：the dictionary section's Lottie icon (artwork color, owner decision on recoloring an unset animation: tint spec v2, unset = untinted; an example can opt in with `animationTint = "title"`); the heart icon (explicit indigo, 2.8:1) and the config-file Rive icon (2.76) are explicit icon colors that the 3:1 rule should now lift, to be confirmed by a capture.
   字典一节的 Lottie 图标（素材自带颜色；未设置的动画是否重新着色是 owner 的决定：tint 规范 v2，未设置 = 不着色；示例可以用 `animationTint = "title"` 选择启用）；心形图标（显式靛蓝，2.8:1）与配置文件 Rive 图标（2.76）是显式图标颜色，3:1 规则现在应能提亮，待截图确认。
 
@@ -104,5 +180,5 @@ item.applyTitleTintColor(.secondaryLabel)     // built-in level: resolved with t
 ## 6. Verification status / 验证状态
 
 Compile only on the author's side (`scripts/library-warnings.sh`, `build-for-testing` of `CYLMenuExample` and `CYLTabBarController-Framework`). The placeholder session ran 123 tab-bar Framework cases (0 failures)
-at `9905aaa0` and the Configuration page at `99662054` / `510ed988`; the calibrated reference (`dfbe9190`) is verified by a capture only after the page is re-captured on `9cc46181`.
-作者一侧只做编译检查。占位符会话在 `9905aaa0` 上跑了 123 个 tab bar Framework 用例（0 失败），并在 `99662054` / `510ed988` 上拍了 Configuration 页；校准后的参考亮度（`dfbe9190`）要在 `9cc46181` 上重拍页面后才有截图验证。
+at `9905aaa0` and the Configuration page at `99662054` / `510ed988`; the calibrated reference (`dfbe9190`) is verified by the captures and measurements of section 1b (taken on `9cc46181`); unit tests were not run by the author.
+作者一侧只做编译检查。占位符会话在 `9905aaa0` 上跑了 123 个 tab bar Framework 用例（0 失败），并在 `99662054` / `510ed988` 上拍了 Configuration 页；校准后的参考亮度（`dfbe9190`）由 1b 节在 `9cc46181` 上的截图与测量验证；作者没有运行单元测试。
