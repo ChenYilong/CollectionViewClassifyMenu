@@ -442,7 +442,7 @@ class CYLMenuStyle {
 
     /**
      * The icon color the app set for `state`, null while it was never set: the built-in default (the text color) does not count.
-     * Only an explicit color takes the dark-glass lift ([CYLIconContrast]).
+     * The tag hands only an explicit color to the item as its icon color; the item adapts it on dark Liquid Glass.
      */
     internal fun explicitIconColorForState(state: Int): Int? = appearanceForState(state).iconColor
 
