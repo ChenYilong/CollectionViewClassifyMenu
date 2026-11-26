@@ -47,7 +47,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   /**
-   * The Liquid Glass of `cylanimateditem` (tint, edge) and the library's icon lift read the app's color mode from AppStorage
+   * The Liquid Glass of `cylanimateditem` (tint, edge, color adaptation) read the app's color mode from AppStorage
    * `cyl_colorMode` ('dark' / 'light'); CYLTabBarController's `cyl_updateColorMode` sets it, and this example has no tab bar
    * module, so it sets the key itself. Without it every glass is drawn in its light variant, also in dark mode.
    * `launchMode`: the mode the launch options asked for; "not set" follows the system.
