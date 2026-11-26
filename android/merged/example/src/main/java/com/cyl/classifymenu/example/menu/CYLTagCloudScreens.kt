@@ -42,6 +42,7 @@ import com.cyl.classifymenu.CYLTagAppearanceIconColor
 import com.cyl.classifymenu.CYLTagAppearanceTextColor
 import com.cyl.classifymenu.CYLTagButton
 import com.cyl.classifymenu.CYLTagItemAnimation
+import com.cyl.classifymenu.CYLTagItemAnimationOptions
 import com.cyl.classifymenu.CYLTagItemDeletable
 import com.cyl.classifymenu.CYLTagItemIdentifier
 import com.cyl.classifymenu.CYLTagItemImage

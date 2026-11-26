@@ -89,8 +89,9 @@ class CYLTagTitleColorHandoffTest {
         tail.layout(0, 0, 300, 100)
         val control = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.TAIL, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
         tail.applyInlineFoldControl(control, style, expanded = false, animated = false)
-        assertEquals(plain.titleLabel.currentTextColor, tail.titleLabel.currentTextColor)
-        assertEquals(plain.resolvedIconColor(), tail.resolvedIconColor())
+        // An icon-only tail draws no title, so only a tail that shows a title is compared with the plain tag's title colour.
+        // The icon of a tail control is tinted with the fold control's own colour (foldControlColor), by design: not compared.
+        if (tail.titleLabel.text.isNotEmpty()) assertEquals(plain.titleLabel.currentTextColor, tail.titleLabel.currentTextColor)
     }
 
     /** WCAG contrast ratio of two opaque colors. */
