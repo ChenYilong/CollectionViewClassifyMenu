@@ -13,7 +13,6 @@
 		07BF735A51B5864C52BCBCBA /* CYLScreenshotCapturing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FAB4A478457DBA65F03A60A /* CYLScreenshotCapturing.swift */; };
 		0A169BB600AB3F13C2FFB8A1 /* CYLTagCloudSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E8DABBA3215F5D3566A9E0 /* CYLTagCloudSample.swift */; };
 		0CA8FA5DC284C2D9D247254F /* pag-ios in Resources */ = {isa = PBXBuildFile; fileRef = BB7F96C76ED83BB97B6AC9F1 /* pag-ios */; };
-		C7DB5A1E00000000000000A2 /* cyl_places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = C7DB5A1E00000000000000A1 /* cyl_places.sqlite */; };
 		121A997B0DED01158F518FB9 /* CYLTagConfigurationDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0008E5DA42999E3A3A878B /* CYLTagConfigurationDemoViewController.swift */; };
 		15C61D1F142B19F72F304E61 /* CYLExampleLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18C5C1CE2BB110BBC6B9D78 /* CYLExampleLocalization.swift */; };
 		1F5ADF0DCFBE2B164FA15132 /* CYLConditionWaiting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39A05DED9378FD0740AE48E /* CYLConditionWaiting.swift */; };
@@ -58,6 +57,7 @@
 		AF3CCB34ADAFA899B53DBDA2 /* CYLRootTabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9670B53F28142CC98E9F2461 /* CYLRootTabBarTests.swift */; };
 		B06876E3E9F6C18479AC4F60 /* CYLProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8674172CC246C8221AC00F7 /* CYLProductViewController.swift */; };
 		BC6E447A812CE9C1F9CD73EE /* CYLMenuExample.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AFD7BBF629B39671C683BB5F /* CYLMenuExample.bundle */; };
+		C7DB5A1E00000000000000A2 /* cyl_places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = C7DB5A1E00000000000000A1 /* cyl_places.sqlite */; };
 		C8B9BDF0C2C6C74DB7CD345E /* CYLAccessibilityQuerying.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD58B693E047FDDE4D20BB91 /* CYLAccessibilityQuerying.swift */; };
 		D86D7925A7B7AF8AA9D300DE /* CYLExampleDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01D96891B8C4DDCD939B2C2 /* CYLExampleDatabase.swift */; };
 		E1DFF22D5486FD1C598621B1 /* CYLTagListLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED0DAFF475B5F3B3129285F /* CYLTagListLayoutTests.swift */; };
@@ -127,12 +127,12 @@
 		B90128FDEA2B2ED95A2F556D /* CYLTagListInspecting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagListInspecting.swift; sourceTree = "<group>"; };
 		B92E3BF9D9E55A1A7600BEB5 /* Pods_CYLMenuExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLMenuExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9D81B34178128DAE01A26C2 /* CYLImageTagSample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLImageTagSample.swift; sourceTree = "<group>"; };
-		C7DB5A1E00000000000000A1 /* cyl_places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = cyl_places.sqlite; path = "../Example-Shared/Database/cyl_places.sqlite"; sourceTree = SOURCE_ROOT; };
 		BB7F96C76ED83BB97B6AC9F1 /* pag-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "pag-ios"; path = "../Example-Shared/PAGResources/pag-ios"; sourceTree = SOURCE_ROOT; };
 		BBF31D9A985983B3B1BBF4F4 /* CYLSearchHomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLSearchHomeViewController.swift; sourceTree = "<group>"; };
 		C52CB3F20E9D8404E1462172 /* CYLMenuFixtures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLMenuFixtures.swift; sourceTree = "<group>"; };
 		C55FFF355A1E5A46E3D41489 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C6DCC7AC9D7295294C55A9F6 /* CYLTagAnimationDemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTagAnimationDemoViewController.swift; sourceTree = "<group>"; };
+		C7DB5A1E00000000000000A1 /* cyl_places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = cyl_places.sqlite; path = "../Example-Shared/Database/cyl_places.sqlite"; sourceTree = SOURCE_ROOT; };
 		C8CB85D75BD51CE115556AE7 /* CYLQueryScenariosViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLQueryScenariosViewController.swift; sourceTree = "<group>"; };
 		C9A6B5DDEB6D4C04FD03D9BF /* CYLTabBarInspecting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLTabBarInspecting.swift; sourceTree = "<group>"; };
 		D01D96891B8C4DDCD939B2C2 /* CYLExampleDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLExampleDatabase.swift; sourceTree = "<group>"; };
@@ -412,12 +412,14 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLMenuExample/Pods-CYLMenuExample-resources.sh",
+				"${PODS_ROOT}/CYLAnimatedItem/CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/CYLTabBarController/CYLTabBarController/Resources/CYLTabBarController.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/CollectionViewClassifyMenu/CYLClassifyMenuResources.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLClassifyMenuResources.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",

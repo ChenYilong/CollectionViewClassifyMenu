@@ -35,6 +35,20 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-21): run the simulator and take the screenshots
+
+- **Context:** branch `feat/harmony`, working tree clean at `d943da56`. `scripts/cyl-tabbar-latest-commit.sh --check`
+  fails: the three Podfiles pin CYLTabBarController at `117be52c`, while its newest commit over every branch is
+  `1d356a0a` (`feat/cross-platform-components`, 2026-11-20). AGENTS.md asks for the pin to be updated before every
+  build, and the upstream range contains the class switch of CYLTabBarController to Swift and a new pod,
+  `CYLAnimatedItem` (not on the CocoaPods trunk yet; the upstream Podfiles name it with the same source as
+  CYLTabBarController).
+- **Requirements:** run the app on the iOS simulator and take screenshots.
+- **Prompt (verbatim):** "运行模拟器并截图"
+- **Prompt (English):** run the simulator and take screenshots.
+- **Status:** TODO: the pins are updated, the Examples are built, the simulator screenshots are taken and
+  `screenshots.md` holds them.
+
 ### DONE (2026-11-16): more HarmonyOS pushed-page screenshots
 
 - **Context:** `screenshots.md` has six pushed pages; more screens open further pages (query scenarios, review

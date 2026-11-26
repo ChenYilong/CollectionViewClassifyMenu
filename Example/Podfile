@@ -8,7 +8,7 @@ project 'CYLMenuExample.xcodeproj'
 
 # The revision whose API the Example uses (feat/cross-platform-components); update together.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => '117be52cfc28109465d52544820f10cc3f00ba89' }
+                :commit => '1d356a0a8e74a1bbc4d81d1104b19cc955dddf3e' }
 
 # The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
 # revision whose API the Example uses (feat/search-bar-view); update together.
@@ -20,6 +20,9 @@ target 'CYLMenuExample' do
   use_frameworks!
   pod 'CollectionViewClassifyMenu', :path => '..'
   pod 'CYLTabBarController', CYL_TAB_BAR
+  # The animated item component's own pod (CYLAnimatedItem.podspec), not on the CocoaPods trunk yet: named with the
+  # same source as CYLTabBarController, as its own Podfiles do.
+  pod 'CYLAnimatedItem', CYL_TAB_BAR
   # Animated tag icons, the same libraries and animators as CYLTabBarController's tab icons.
   pod 'CYLTabBarController/Lottie', CYL_TAB_BAR
   pod 'CYLTabBarController/PAG', CYL_TAB_BAR
