@@ -98,3 +98,36 @@ import { CylTagListView, CylSectionStyle, CylHeaderSeparatorStyle, CylSectionBac
 />
 ```
 
+
+## Header
+
+The section header keys go in the configuration's `style` (typed in `CylTagListConfiguration`):
+
+- `headerMaxLines`: the line limit of a section header title. Default single (1): one line, truncated, the header exactly
+  `headerHeight` high. A number above 1 or `CylTagTitleMaxLinesUnlimited` wraps the title and the header grows taller.
+- `headerHeight`: the header's height (default 36). On a card with no header divider and no `headerHeight` set, the header is
+  sized to its text; a `headerHeight` you set is then the minimum.
+- `sectionBoardInset`: how far the board (card, header band and divider) extends beyond the tag column on the leading and
+  trailing sides. `0` makes the board's edges coincide with the tags' edges; left out, the board keeps the 12 of
+  `sectionContentInsets`. `0` is a set value, so send it as `0`, not `undefined`.
+- `headerTextColor`, `headerFont`, `foldControlColor`: the header title color and font and the More / Less color.
+- Fold content: `foldControl: { position: 'headerTrailing', content: CylFoldControlContent.titleAndIconAlways }` shows the
+  title and the chevron in both states ("More v" folded, "Less ^" expanded). `rotatesImageWhenExpanded` (default true) turns
+  the icon 180 degrees when expanded; `false` keeps it still. `image` and `font` replace the chevron and the title font.
+  An object `foldControl` without `content` shows the icon only; a bare position string picks the content that suits it (the
+  footer shows the icon only, the tail too on Android, a header shows `iconAndTitle`).
+
+## Glass rules
+
+- A tag has no default border, glass tags included. A border shows only when `borderColor` / `borderWidth` is set (in
+  `style.normal` / `selected` / `disabled`, or in an item's own `style`).
+- The explicit color decides: a `textColor`, `iconColor`, `backgroundColor` or `borderColor` you set is used as given; the tag
+  has no contrast code of its own.
+- Dark-glass adaptation is done by the shared item, not the tag: on drawn dark glass it adapts explicit and built-in colors
+  (title 4.5:1, icon 3:1 contrast). Light mode and flat tags never change. Details: `docs/tag-liquid-glass.md`.
+
+## Native version
+
+TODO: state the minimum native version that reads `headerMaxLines`, `headerHeight`, `sectionBoardInset` and
+`rotatesImageWhenExpanded` (the CollectionViewClassifyMenu pod and the `com.cyl:classifymenu` AAR) once it is released. No
+version is pinned here yet; until then an older native list ignores these keys.
