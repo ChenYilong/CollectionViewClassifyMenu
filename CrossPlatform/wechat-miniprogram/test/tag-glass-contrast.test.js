@@ -1,8 +1,8 @@
 'use strict';
 
-// The tag routes its EXPLICIT title colour and icon colour through the shared dark-glass adaptation of cyl-animated-item
-// (cylAnimatedItemAdaptedColor): only when Liquid Glass is really drawn, the mode is dark and the colour is explicit; title text
-// minimum contrast 4.5, icon tint 3. Unset / built-in, flat, light colours are unchanged; the tail fold cell equals a plain tag.
+// The tag hands its colours to the shared item through the colour CHANNELS of cyl-animated-item: an explicit title / icon colour
+// through subclass...Color, an unset one through builtIn...Color; cylAnimatedItemResolvedTitleColor / ...IconColor adapt both on
+// drawn dark glass (title minimum contrast 4.5, icon tint 3). Flat and light colours are unchanged; the tail fold cell equals a plain tag.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const model = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/model.js');
@@ -37,6 +37,17 @@ test('dark glass and an explicit dark title colour: the title is lifted to 4.5 a
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   const drawn = textColorOf(viewOf({ ...GLASS_STYLE, normal: { textColor: DARK_TEXT } }, true));
   assert.notEqual(drawn.toUpperCase(), DARK_TEXT);
+  assert.ok(ratioOf(drawn) >= contrast.CYL_TITLE_MINIMUM_CONTRAST, drawn);
+});
+
+test('an unset title colour with a dark built-in default (light-only theme) is readable in night on dark glass', () => {
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
+  // The built-in level of a light-only style is the dark default text; the item adapts it on drawn dark glass.
+  const lightOnly = { ...model.defaultStyle(PIXEL_RATIO, false), ...GLASS_STYLE, sectionPalette: { dark: true } };
+  assert.equal(lightOnly.normal.textColorExplicit, false);
+  const drawn = /(?:^|; )color: ([^;]+)/.exec(model.tagLayout(lightOnly, { title: 'Tag', enabled: true }, 'normal', { kind: 'none' },
+    lightOnly.interitemSpacing, lightOnly.lineSpacing).cellStyle)[1];
+  assert.notEqual(drawn.toUpperCase(), lightOnly.normal.textColor.toUpperCase());
   assert.ok(ratioOf(drawn) >= contrast.CYL_TITLE_MINIMUM_CONTRAST, drawn);
 });
 

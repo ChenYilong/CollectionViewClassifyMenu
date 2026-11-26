@@ -13,7 +13,7 @@ const { cylAnimatedItemType, cylAnimatedItemSource } = require('../cyl-animated-
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
 const {
   cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive,
-  cylAnimatedItemAdaptedColor, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT
+  cylAnimatedItemResolvedTitleColor, cylAnimatedItemResolvedIconColor
 } = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
@@ -299,7 +299,7 @@ function defaultAppearance(hairline, dark = false) {
     backgroundExplicit: false,
     textColor: dark ? DARK_TEXT_COLOR : DEFAULT_TEXT_COLOR,
     // True when the state's title colour was set by the app / a preset (a built-in default is not): only an explicit colour is
-    // adapted to dark Liquid Glass (cylAnimatedItemAdaptedColor); the built-in title colour keeps its own dark / light variants.
+    // handed through the item's subclass-explicit channel; an unset one goes through the subclass built-in level (cyl-animated-item adapts both).
     textColorExplicit: false,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
@@ -906,41 +906,50 @@ function glassTintAlpha(state) {
 }
 
 /**
- * The item properties the shared adaptation (`cylAnimatedItemAdaptedColor`) judges a tag by: the tag's background style, the tint
- * handed to the glass (explicit background or '') and its alpha, and the colour mode of the style. The shared function lifts an
- * explicit colour only when the glass is really drawn and the mode is dark.
+ * The effective icon tint of a state (`CYLMenuStyle.iconColor(for:)`): iconColor, else the text color. Kept for callers of the model;
+ * the drawn colour is resolved by the item (`itemColorProperties`).
  */
-function glassAdaptationProperties(style, state) {
-  return {
-    itemBackgroundStyle: style.backgroundStyle,
-    itemBackgroundColor: glassHandedColor(style, style[state]),
-    itemGlassTintAlpha: glassTintAlpha(state),
-    userInterfaceStyle: style.sectionPalette && style.sectionPalette.dark ? 'dark' : 'light',
-  };
-}
-
-/** The tag's title colour as drawn: an explicit one goes through the shared dark-glass adaptation, the built-in one is unchanged. */
-function adaptedTextColor(style, state) {
-  const appearance = style[state];
-  if (!appearance.textColorExplicit) return appearance.textColor;
-  return cylAnimatedItemAdaptedColor(appearance.textColor, CYL_ADAPTED_KIND_TEXT, glassAdaptationProperties(style, state));
-}
-
-/** The effective icon tint of a state (`CYLMenuStyle.iconColor(for:)`): iconColor, else the text color. */
 function iconColor(style, state) {
   const appearance = style[state];
   return appearance.iconColor || appearance.textColor;
 }
 
+// The state's part of the channel property names of cyl-animated-item ('' normal, 'Selected', 'Disabled').
+const CHANNEL_STATE_PART = { normal: '', selected: 'Selected', disabled: 'Disabled' };
+
 /**
- * The icon tint as drawn (baked into a `system:` symbol): an explicit icon colour, or an explicit title colour the icon follows,
- * goes through the shared dark-glass adaptation (minimum contrast 3); a built-in colour is unchanged.
+ * The item properties cyl-animated-item resolves a tag's colours by (the twin of CYLTagButton handing colours to CYLAnimatedItemView):
+ * the background style, the tint handed to the glass (explicit background or '') and its alpha, the colour mode of the style, and the
+ * COLOUR CHANNELS of the state. An explicit title colour (or an explicit icon colour; the icon follows an explicit title colour) goes
+ * through `subclass...Color`; the effective colour of an unset one goes through `builtIn...Color`. The tag never writes the integrator's
+ * `titleColor` / `iconTint` and has no contrast code: the item's resolvers decide precedence and dark-glass adaptation.
  */
-function adaptedIconColor(style, state) {
+function itemColorProperties(style, state) {
   const appearance = style[state];
-  const tint = iconColor(style, state);
-  if (!appearance.iconColor && !appearance.textColorExplicit) return tint;
-  return cylAnimatedItemAdaptedColor(tint, CYL_ADAPTED_KIND_ICON, glassAdaptationProperties(style, state));
+  const part = CHANNEL_STATE_PART[state];
+  const explicitIcon = appearance.iconColor || (appearance.textColorExplicit ? appearance.textColor : '');
+  return {
+    selected: state === 'selected',
+    enabled: state !== 'disabled',
+    itemBackgroundStyle: style.backgroundStyle,
+    itemBackgroundColor: glassHandedColor(style, appearance),
+    itemGlassTintAlpha: glassTintAlpha(state),
+    userInterfaceStyle: style.sectionPalette && style.sectionPalette.dark ? 'dark' : 'light',
+    [`subclass${part}TitleColor`]: appearance.textColorExplicit ? appearance.textColor : '',
+    [`builtIn${part}TitleColor`]: appearance.textColor,
+    [`subclass${part}IconColor`]: explicitIcon,
+    [`builtIn${part}IconColor`]: iconColor(style, state),
+  };
+}
+
+/** The tag's title colour as drawn: the item's resolved title colour of the state. */
+function resolvedTextColor(style, state) {
+  return cylAnimatedItemResolvedTitleColor(itemColorProperties(style, state));
+}
+
+/** The icon tint as drawn (baked into a `system:` symbol): the item's resolved icon colour of the state. */
+function resolvedIconColor(style, state) {
+  return cylAnimatedItemResolvedIconColor(itemColorProperties(style, state));
 }
 
 /** A CSS line height for a font size (UIFont.systemFont's lineHeight is about 1.19 times its size). */
@@ -1036,7 +1045,7 @@ function iconContent(item, state, style, animation) {
   if (!image) return { kind: 'none', src: '', glyph: '' };
   const system = /^system:(.+)$/.exec(image);
   if (!system) return { kind: 'image', src: image, glyph: '' };
-  const uri = symbols.symbolURI(system[1], adaptedIconColor(style, state));
+  const uri = symbols.symbolURI(system[1], resolvedIconColor(style, state));
   if (uri) return { kind: 'image', src: uri, glyph: '' };
   return { kind: 'glyph', src: '', glyph: symbols.glyph(system[1]) };
 }
@@ -1121,7 +1130,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     fontCSS(appearance.font),
     `border-width: ${border}px`,
     `border-color: ${handedBorder.color || 'transparent'}`,
-    `color: ${adaptedTextColor(style, state)}`,
+    `color: ${resolvedTextColor(style, state)}`,
     itemBackground.css,
     style.minimumTagSizeWH.width > 0 ? `min-width: ${style.minimumTagSizeWH.width}px` : '',
     `justify-content: ${justify}`,
