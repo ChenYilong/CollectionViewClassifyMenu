@@ -23,6 +23,7 @@ import com.cyl.animateditem.CYLAnimatedItemAxis
 import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
 import com.cyl.animateditem.CYLAnimatedItemLiquidGlassContentInset
 import com.cyl.animateditem.CYLAnimatedItemStackView
+import com.cyl.animateditem.CYLAnimatedItemTitleState
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLTabBarItemAnimationViewMaking
 import kotlin.math.ceil
@@ -389,7 +390,11 @@ open class CYLTagButton @JvmOverloads constructor(
         return displayed.ifEmpty { (super.image as? CYLBadgeDrawable)?.accessibilityLabel ?: "" }
     }
 
-    /** The tag colors its title itself (or hands the item an explicit color): the item's built-in colors must not fill in. */
+    /**
+     * The tag hands every color through the item's channels (explicit: setSubclass*Color; unset: apply*TintColor), so the component's own
+     * built-in level must not fill in. Kept (not removed): while disabled, the item's icon resolution puts the COMPONENT's disabled color
+     * above the subclass colors when this is true, and an icon that keeps its own colors (badge, original image) hands none at all.
+     */
     override val usesBuiltInColors: Boolean get() = false
 
     private fun updateAppearance() {
@@ -406,15 +411,23 @@ open class CYLTagButton @JvmOverloads constructor(
         }
         animationView?.alpha = if (state == CYLControlState.DISABLED) 0.4f else 1f
         imageView.imageTintList = null
-        // An EXPLICIT icon color goes to the item unchanged (iconColor): the item tints the icon and the animation with it and, on
-        // dark Liquid Glass, adapts it (CYLAnimatedItemContrast); the tag keeps no contrast rule of its own. An unset one is
-        // handed as null (the built-in default is not explicit, so the item never adapts it) and the tag tints with the default.
+        // The tag only HANDS colors over, the item resolves and adapts them (CYLAnimatedItemView: own > subclass-explicit > built-in; dark
+        // Liquid Glass lifts explicit and built-in alike) and the integrator-owned iconColor is never written. An EXPLICIT icon color goes
+        // through the subclass-explicit channel (it recolors the static image and tints the animation); an unset one through the
+        // built-in level (the animation) and, for the static image, the tag's own tint with the built-in default (spec v2: the item's
+        // built-in does not recolor the image).
         val icon = iconView.drawable
         val keepsOwnColors = icon is CYLBadgeDrawable || icon is CYLOriginalImageDrawable
-        iconColor = if (keepsOwnColors) null else style.explicitIconColorForState(state)
-        if (iconColor == null) {
-            imageView.setColorFilter(style.iconColorForState(state))
-            if (keepsOwnColors) imageView.clearColorFilter()
+        val explicitIconColor = if (keepsOwnColors) null else style.explicitIconColorForState(state)
+        val builtInIconColor = if (keepsOwnColors || explicitIconColor != null) null else appearance.resolvedTextColor(context)
+        // Only the current state's color is handed, in the normal slot: the item falls back to it for the selected and the disabled look,
+        // so another state's explicit color never leaks into this one (the tag re-hands on every state change).
+        setSubclassIconColor(explicitIconColor, CYLAnimatedItemTitleState.Normal)
+        setSubclassIconColor(null, CYLAnimatedItemTitleState.Selected)
+        setSubclassIconColor(null, CYLAnimatedItemTitleState.Disabled)
+        applyIconTintColor(builtInIconColor)
+        if (explicitIconColor == null) {
+            if (builtInIconColor != null) imageView.setColorFilter(builtInIconColor) else imageView.clearColorFilter()
         }
         titleLabel.text = style.displayedTitleForTitle(rawTitle?.toString())
         val font = style.titleFontForState(state)
@@ -440,13 +453,14 @@ open class CYLTagButton @JvmOverloads constructor(
         // The appearance's radius (CYLAnimatedItemCornerRadiusCapsule by default, 0 is square), set with the style and not
         // only when the tag is laid out: the view's own default (null) is square for flat.
         itemCornerRadius = appearance.cornerRadius
-        // An EXPLICIT text color goes to the item unchanged (titleColor): the item sets it on the title and, on dark Liquid Glass,
-        // adapts it (CYLAnimatedItemContrast, contrast 4.5); nothing sets the title color on top of it. An unset one is handed as
-        // null (the built-in default is not explicit, so the item never adapts it) and the tag colors the title itself. Set after
-        // the background and tint above, which the adaptation reads.
+        // Same hand-off for the title: an EXPLICIT text color through the subclass-explicit channel (never titleColor), an unset one
+        // through the built-in level; the item sets it on the title and adapts it on dark drawn Liquid Glass. Set after the background and
+        // tint above, which the adaptation reads.
         val explicitTextColor = style.explicitTextColorForState(state)
-        titleColor = explicitTextColor
-        if (explicitTextColor == null) titleLabel.setTextColor(textColor)
+        setSubclassTitleColor(explicitTextColor, CYLAnimatedItemTitleState.Normal)
+        setSubclassTitleColor(null, CYLAnimatedItemTitleState.Selected)
+        setSubclassTitleColor(null, CYLAnimatedItemTitleState.Disabled)
+        applyTitleTintColor(if (explicitTextColor == null) textColor else null)
         backgroundImageView.setImageDrawable(appearance.backgroundImage)
         backgroundImageView.visibility = if (appearance.backgroundImage == null || highlighted) GONE else VISIBLE
         // With the rename indicator, editingIndicatorsView draws both icons instead.

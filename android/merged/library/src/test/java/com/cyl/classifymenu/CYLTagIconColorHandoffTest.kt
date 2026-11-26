@@ -14,8 +14,9 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * On dark Liquid Glass the tag hands the item the style's explicit icon color unchanged; the dark-glass contrast adaptation is
- * the shared CYLAnimatedItemView's job (CYLAnimatedItemContrast), not the tag's. An unset icon color is handed as unset.
+ * The tag hands the style's explicit icon color through the item's subclass-explicit channel and an unset one through the built-in
+ * level; the integrator-owned `iconColor` is never written. The dark-glass contrast adaptation is the shared
+ * CYLAnimatedItemView's job (CYLAnimatedItemContrast), not the tag's.
  */
 @RunWith(RobolectricTestRunner::class)
 class CYLTagIconColorHandoffTest {
@@ -41,14 +42,20 @@ class CYLTagIconColorHandoffTest {
 
     @Test
     @Config(qualifiers = "night")
-    fun aDarkGlassTagHandsTheItemTheExplicitIconColorUnchanged() {
+    fun aDarkGlassTagHandsTheExplicitIconColorThroughTheChannelUnchanged() {
         val darkTeal = Color.rgb(0, 77, 77)
-        assertEquals(darkTeal, tag(darkTeal).iconColor)
+        val button = tag(darkTeal)
+        assertNull("the integrator-owned iconColor is never written", button.iconColor)
+        assertEquals(darkTeal, button.explicitIconColor)
+        assertEquals(darkTeal, button.resolvedIconColor())
     }
 
     @Test
     @Config(qualifiers = "night")
-    fun anUnsetIconColorIsHandedAsUnset() {
-        assertNull(tag(null).iconColor)
+    fun anUnsetIconColorGoesThroughTheBuiltInLevelNotTheExplicitOne() {
+        val button = tag(null)
+        assertNull(button.iconColor)
+        assertNull("an unset color is never explicit", button.explicitIconColor)
+        assertEquals(CYLTagAppearance().resolvedTextColor(context), button.resolvedIconColor())
     }
 }
