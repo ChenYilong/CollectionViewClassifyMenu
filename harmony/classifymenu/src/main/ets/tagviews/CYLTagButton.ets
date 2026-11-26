@@ -21,6 +21,7 @@ import {
 } from 'cylanimateditem';
 import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
 import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver, CYLLiquidGlass } from 'cylanimateditem';
+import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText } from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import {
   CYLTagAnimatedIcon, cylTagAnimatedIconOuterHeight, cylTagAnimatedIconOuterWidth, cylTagAnimationImage
@@ -173,6 +174,12 @@ export class CYLTagButton {
   editingIndicatorsFrame: CYLRect = new CYLRect();
   /** The color of the editing icons (`CYLMenuStyle.deleteIndicatorColor`, else the text color). */
   editingIconColor: ResourceColor = CYLColor.BLACK;
+  /**
+   * Whether `crossColor`, `editingIconColor` and the delete label's colour are EXPLICIT (the style's `deleteIndicatorColor`, or an
+   * explicit title colour they follow) rather than the built-in default text colour. Only an explicit colour is lifted on a disabled
+   * tag (the built-in disabled look is never adapted); the `resolvedCrossColor` family reads it.
+   */
+  indicatorColorIsExplicit: boolean = false;
   cornerRadius: number = 0;
   /** The appearance's radius as it is (the capsule constant by default): `cylanimateditem` implements the capsule. */
   appearanceCornerRadius: number = 0;
@@ -1181,6 +1188,63 @@ export class CYLTagButton {
     return CYLAnimatedItemColorResolver.resolvedIconColor(this.colorInput(false));
   }
 
+  /**
+   * The dark-glass rule for a colour the tag draws itself (the item's `adaptedOnGlass`, `CYLAnimatedItemContrast.adaptedOnGlassState`),
+   * judged against the tag's own glass state: `color` itself unless glass is drawn in dark mode, then lifted to 4.5:1 (`kind` text)
+   * or 3:1 (icon). A built-in colour (`explicit` false) of a disabled tag is never adapted; a dynamic colour (a resource) is never changed.
+   */
+  adaptedOnGlass(color: ResourceColor, kind: string, explicit: boolean): ResourceColor {
+    if (!explicit && !this.enabledValue) {
+      return color;
+    }
+    return CYLTagButton.adaptedOnGlassOf(color, kind, this.itemBackgroundStyle, this.glassTint, this.glassTintAlpha);
+  }
+
+  /**
+   * The same rule for any view that draws a glass of `backgroundStyle` (the inline fold cell shares it): `color` itself unless glass is
+   * really drawn and the mode is dark, then lifted against the glass of `glassTint` / `tintAlpha`.
+   */
+  static adaptedOnGlassOf(color: ResourceColor, kind: string, backgroundStyle: CYLAnimatedItemBackgroundStyle,
+    glassTint: ResourceColor | undefined, tintAlpha: number | undefined): ResourceColor {
+    return CYLAnimatedItemContrast.adaptedOnGlassState(color, kind, CYLAnimatedItemBackgroundModifier.isGlassDrawn(backgroundStyle),
+      CYLLiquidGlass.isDark(), glassTint, tintAlpha);
+  }
+
+  /** The delete cross's colour to draw (an icon: 3:1 on drawn dark glass). Read when the tag draws, so a light / dark switch re-resolves it. */
+  resolvedCrossColor(): ResourceColor {
+    return this.adaptedOnGlass(this.crossColor, CYLAnimatedItemContrastKindIcon, this.indicatorColorIsExplicit);
+  }
+
+  /** The delete label's colour to draw (a text: 4.5:1 on drawn dark glass). */
+  resolvedDeleteLabelColor(): ResourceColor {
+    return this.adaptedOnGlass(this.deleteIndicatorLabel.textColor, CYLAnimatedItemContrastKindText, this.indicatorColorIsExplicit);
+  }
+
+  /** The delete symbol image's colour to draw (an icon: 3:1). A delete bitmap keeps its own colours. */
+  resolvedDeleteSymbolColor(): ResourceColor {
+    return this.adaptedOnGlass(this.deleteIndicatorLabel.textColor, CYLAnimatedItemContrastKindIcon, this.indicatorColorIsExplicit);
+  }
+
+  /** The editing icons' colour (an icon: 3:1), the value `editingIndicatorsView.iconColor` gets when it is a static colour. */
+  resolvedEditingIconColor(): ResourceColor {
+    return this.adaptedOnGlass(this.editingIconColor, CYLAnimatedItemContrastKindIcon, this.indicatorColorIsExplicit);
+  }
+
+  /**
+   * The explicit icon colour handed to the animated icon (`CYLTagAnimatedIcon.subclassIconColor`), '' while there is none. The
+   * tag lifts it itself (3:1) because the inner `CYLAnimatedItemView` stays flat: giving it the glass state would make it draw a
+   * second glass inside the tag. The item then judges the lifted colour as flat and leaves it as it is.
+   */
+  resolvedAnimationIconColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.isSet(this.animationIconColor) ?
+    this.adaptedOnGlass(this.animationIconColor, CYLAnimatedItemContrastKindIcon, true) : '';
+  }
+
+  /** The built-in icon colour handed to the animated icon (`CYLTagAnimatedIcon.builtInIconColor`), lifted like `resolvedAnimationIconColor`. */
+  resolvedAnimationBuiltInIconColor(): ResourceColor {
+    return this.adaptedOnGlass(this.builtInIconColor, CYLAnimatedItemContrastKindIcon, false);
+  }
+
   protected updateAppearance(): void {
     const style = this.styleStorage;
     const state = this.currentState;
@@ -1229,8 +1293,9 @@ export class CYLTagButton {
     const indicatorImage: CYLImage | undefined = editingIcons ? undefined : style.deleteIndicatorImage;
     const drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage === undefined && !editingIcons;
     this.editingIconColor = style.deleteIndicatorColor ?? appearance.textColor;
+    this.indicatorColorIsExplicit = style.deleteIndicatorColor !== undefined || appearance.explicitTextColor !== undefined;
     if (editingIcons) {
-      const color = this.editingIconColor;
+      const color = this.resolvedEditingIconColor();
       this.editingIndicatorsView.iconColor = typeof color === 'string' ? color : '';
     }
     this.deleteIndicatorLabel.isHidden = !this.showsDeleteIndicatorValue || drawsCross || indicatorImage !== undefined ||
@@ -1367,10 +1432,10 @@ export struct CYLTagButtonComponent {
             animationURL: this.button.animationURL ?? '',
             image: this.button.animationImage,
             selectedImage: this.button.animationSelectedImage,
-            subclassIconColor: this.button.animationIconColor,
-            subclassSelectedIconColor: this.button.animationIconColor,
-            builtInIconColor: this.button.builtInIconColor,
-            builtInSelectedIconColor: this.button.builtInIconColor,
+            subclassIconColor: this.button.resolvedAnimationIconColor(),
+            subclassSelectedIconColor: this.button.resolvedAnimationIconColor(),
+            builtInIconColor: this.button.resolvedAnimationBuiltInIconColor(),
+            builtInSelectedIconColor: this.button.resolvedAnimationBuiltInIconColor(),
             isSelected: this.button.isSelected,
             iconWidth: this.af().width,
             iconHeight: this.af().height,
@@ -1396,7 +1461,7 @@ export struct CYLTagButtonComponent {
         Text(this.dl().text ?? '')
           .fontSize(this.dl().font.size)
           .fontWeight(this.dl().font.weight)
-          .fontColor(this.dl().textColor)
+          .fontColor(this.button.resolvedDeleteLabelColor())
           .textAlign(TextAlign.Center)
           .width(this.part(this.dl()).width)
           .height(this.part(this.dl()).height)
@@ -1422,7 +1487,7 @@ export struct CYLTagButtonComponent {
         // `CYLMenuStyle.deleteIndicatorImage` as a system symbol ($r('sys.symbol.xmark_circle_fill')), in the indicator color.
         SymbolGlyph(this.button.deleteIndicatorImage as Resource)
           .fontSize(this.button.deleteIndicatorImageFrame.height)
-          .fontColor([this.dl().textColor])
+          .fontColor([this.button.resolvedDeleteSymbolColor()])
           .width(this.button.deleteIndicatorImageFrame.width)
           .height(this.button.deleteIndicatorImageFrame.height)
           .position({ x: this.button.deleteIndicatorImageFrame.x, y: this.button.deleteIndicatorImageFrame.y })
@@ -1452,7 +1517,7 @@ export struct CYLTagButtonComponent {
           Line()
             .startPoint([line[0], line[1]])
             .endPoint([line[2], line[3]])
-            .stroke(this.button.crossColor)
+            .stroke(this.button.resolvedCrossColor())
             .strokeWidth(this.button.crossLineWidth)
             .strokeLineCap(LineCapStyle.Round)
             .position({ x: 0, y: 0 })
