@@ -292,11 +292,11 @@ Split with the Mac session: Mac takes steps 1 and 2 (iOS verification, CI path, 
 | Mini program `node --test` | 326 / 326 (after `node scripts/fetch-cyltabbar.js`; without it 1 module-not-found failure, the fetched folder is ignored) |
 | Android `testDebugUnitTest` | 305 tests, 1 failure: the known Windows path failure `CYLTagListConfigurationTest.animationSourceTextSplitsOptionsAsTheEngineDoes` |
 | HarmonyOS host `harmony/scripts/unit-test.sh` | 231 / 231 |
-| HarmonyOS UI tests | Not run (shared emulator, not started in this session) |
+| HarmonyOS UI tests `harmony/scripts/ui-test.sh` (emulator `127.0.0.1:5555`, at `00fc149e`) | 15 / 15 |
 
-**Acceptance (pass 60):** conflicts resolved keeping both sides 25 / 25; iOS files and pins untouched 15 / 15; Windows suites run on the merged tree 25 / 30 (UI tests not run); pins consistent per platform group 10 / 10; pushed and PR open 0 / 20 (waits for the owner's approval, as section 0 step 3 requires). **Score 75 / 100.**
+**Acceptance (pass 60):** conflicts resolved keeping both sides 25 / 25; iOS files and pins untouched 15 / 15; Windows suites run on the merged tree 30 / 30; pins consistent per platform group 10 / 10; pushed with the owner's approval, on PR #42, 20 / 20. **Score 100 / 100** (was 75 before the push and the UI tests).
 
-Missing points (TODO): push `feat/glass-backdrop` and the merge after the owner's approval (20); HarmonyOS UI tests on the merged tree (5); 60 of the 77 Windows commits fail `scripts/check-commit-message.sh` (no author line or not git cz style), already committed before this session, not rewritten.
+Notes (no missing points): 60 of the 77 Windows commits fail `scripts/check-commit-message.sh` (no author line or not git cz style), already committed before this session, not rewritten.
 
 ## 13. Added 2026-11-27 (macOS session): steps 1 and 2, iOS verification of the head and the CI path
 
@@ -335,3 +335,11 @@ The component's API comment on `adaptedForContrast` (CYLTabBarController `CYLAni
 - Why the iOS jobs stay queued: since about 2026-11-25 07:30 UTC no macOS job has started in this repository **or** in CYLTabBarController, while the Ubuntu jobs finish. The workflow is not the cause; the account's macOS runner allowance (minutes or spending limit) is the likely one. **TODO (owner):** check https://github.com/settings/billing.
 
 **Follow-up (Windows, 2026-11-27):** the Localization check failed on PR #42 after the merge (four Chinese sample titles in the HarmonyOS `CYLTagGlassPage.ets`); fixed with NOLOCALIZE in `598fdb15`, CI Localization and "Unit tests and data check" now pass. The iOS one-character badge rule of `09bc2413` is ported to Android (`CYLTag.badgeImageWidth`) and HarmonyOS (`CYLTag.badgeTextKeepsCircle`, used by `badgeImage`), with tests (Android `CYLTagIosParityTest` 14 / 14, HarmonyOS host 231 / 231). The mini program draws no badge image, nothing to port. Component repin: waiting for the CYLTabBarController role registry, then all pins in one commit with the Mac session.
+
+**Follow-up 2 (Windows, 2026-11-27):**
+
+- iOS at `b0f153fe` (Mac session): menu 37 / 37, example 243 / 243, swift 23 / 23, no library warnings, `pod lib lint` passed, SwiftPM build succeeded (2 warnings from the component's `CYLAnimatedItem/include/module.modulemap`, tab bar repository).
+- PR #41 closed as section 10 says (branch kept). PR #40 is left to the Mac session (it needs the iOS screenshot check).
+- Section 5 "the selected Lottie tag shows the house": covered on the Windows platforms. Android `CYLTagButton` and HarmonyOS `CYLTagAnimatedIcon` set `showsLastFrameWhenSelected`; the mini program tag lets the item drive playback, and the item's default already rests a selected item on its last frame. Not checked on screen.
+- Section 5 "Increase Contrast and Reduce Motion not ported to HarmonyOS / mini program": the HarmonyOS and mini program items have no such options, so this is component work. It is queued with the CYLTabBarController Windows session (default-off options in the item, then the tag turns them on after the repin).
+- Repin plan: one commit for all pins. The CYLTabBarController session sends the role-registry SHA; the Mac session repins and verifies iOS and sends the commit as a patch; Windows applies it, adds the Windows pins with `--amend`, runs the Windows suites and pushes.
