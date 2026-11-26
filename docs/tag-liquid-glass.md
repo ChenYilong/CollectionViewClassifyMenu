@@ -138,9 +138,11 @@ explicit `textColor` of the state (title, 4.5) and its explicit `iconColor` (ico
 is not lifted by itself). The built-in colors are never touched; light mode, flat tags, colors that already pass and dynamic colors never change.
 
 iOS wiring: `CYLAnimatedItemView` lifts its own explicit colors (the item's or the stack's `itemAppearance` icon color, the
-`titleTextAttributes` title color, a fixed `animationTint`). A tag hands its colors as the subclass level (`applyIconTintColor`,
-`titleLabel.textColor`), which the item treats as built-in, so `CYLTagButton.updateAppearance` calls
-`CYLAnimatedItemContrast.adjustedTitle` / `adjustedIcon` itself; the animation follows the lifted icon color (`animationTint = "title"`).
+`titleTextAttributes` title color, a fixed `animationTint`). A tag hands its EXPLICIT title colors (normal, selected, disabled) to the item as
+its `itemAppearance` `titleTextAttributes` colors (`CYLTagButton.handExplicitTitleColorsToItem`), so every state's title goes through the item's one
+title pipeline, including the dark glass adaptation; an unset state keeps the effective label color the tag sets. The icon color is still handed as the
+subclass level (`applyIconTintColor`), which the item treats as built-in, so the tag calls `CYLAnimatedItemContrast.adjustedIcon` itself; the animation
+follows the lifted icon color (`animationTint = "title"`).
 
 | Platform | Status |
 |:--|:--|

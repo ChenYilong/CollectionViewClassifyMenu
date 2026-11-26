@@ -281,6 +281,7 @@ open class CYLTagButton: CYLAnimatedItemView {
     private var addsStateTraits = false
     private var followsStyleAnimationSpeed = true
     private var isApplyingStyleAnimationSpeed = false
+    private var appliedExplicitTitleColors: [UIColor?]?
     private let backgroundImageView = UIImageView()
 
     /**
@@ -1074,6 +1075,34 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
 
+    /**
+     * The explicit title colors of the style's states, as the item's `itemAppearance` title colors (only the colors that were set; an unset
+     * state keeps the item's built-in or the label color the tag set). Assigned only when they changed.
+     */
+    private func handExplicitTitleColorsToItem() {
+        let colors = [style.normalAppearance.explicitTextColor, style.selectedAppearance.explicitTextColor,
+                      style.disabledAppearance.explicitTextColor]
+        let changed = appliedExplicitTitleColors.map { !zip($0, colors).allSatisfy { $0 == $1 } } ?? true
+        appliedExplicitTitleColors = colors
+        guard colors.contains(where: { $0 != nil }) else {
+            if changed, itemAppearance != nil, !isItemAppearanceInherited {
+                itemAppearance = nil
+            }
+            return
+        }
+        if changed {
+            let appearance = UITabBarItemAppearance()
+            for (color, state) in zip(colors, [appearance.normal, appearance.selected, appearance.disabled]) {
+                if let color {
+                    state.titleTextAttributes = [.foregroundColor: color]
+                }
+            }
+            itemAppearance = appearance
+        }
+        // The label was just set to the effective color: the item applies (and, on drawn dark glass, adapts) the explicit one over it.
+        applyItemAppearance()
+    }
+
     private func applyStyleAnimationSpeed() {
         guard followsStyleAnimationSpeed else {
             return
@@ -1136,11 +1165,11 @@ open class CYLTagButton: CYLAnimatedItemView {
         // glass over black). The item lifts only its own explicit colors (itemAppearance), and the tag hands its colors as the
         // subclass level, so the tag asks the same function here. Built-in, dynamic and flat colors are as set.
         let liftsOnGlass = drawsGlass && traitCollection.userInterfaceStyle == .dark
-        var textColor: UIColor = appearance.textColor
-        if liftsOnGlass, let explicit = appearance.explicitTextColor {
-            textColor = CYLAnimatedItemContrast.adjustedTitle(explicit, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha)
-        }
-        titleLabel.textColor = textColor
+        // The title color: the tag's colors (the effective one, else the explicit ones per state) go to the item as its `itemAppearance`
+        // title colors, so normal, selected and disabled titles share ONE pipeline of the item (its tint logic and the dark glass
+        // adaptation of an explicit color); the effective color is also set on the label for what the item leaves alone (unset states).
+        titleLabel.textColor = appearance.textColor
+        handExplicitTitleColorsToItem()
         var iconColor = style.iconColor(for: state)
         if liftsOnGlass, let explicit = style.explicitIconColor(for: state) {
             iconColor = CYLAnimatedItemContrast.adjustedIcon(explicit, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha)
