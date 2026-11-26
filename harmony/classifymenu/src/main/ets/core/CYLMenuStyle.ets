@@ -576,7 +576,7 @@ export class CYLMenuStyle {
 
   /**
    * The icon color the style set for `state` (`setIconColor`); undefined while it is unset, when the icon follows the text
-   * color (the built-in default, which the dark glass icon lift never touches: `CYLIconContrast`).
+   * color (the built-in default). The tag hands the item only an explicit color; the item adapts it on dark glass.
    */
   explicitIconColor(state: number): ResourceColor | undefined {
     return this.appearance(state).iconColor;

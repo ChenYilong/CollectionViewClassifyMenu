@@ -29,7 +29,6 @@ import {
   CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical,
   CYLTagTitleMaxLines
 } from '../core/CYLMenuStyle';
-import { CYLIconContrast } from '../core/CYLIconContrast';
 import { CYLTagAppearance } from '../core/CYLTagAppearance';
 import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
 import { CYLUIContext } from '../core/CYLUIContext';
@@ -233,26 +232,6 @@ export class CYLTagButton {
   /** The border width a tag in `appearance` hands to the modifier: 0 without a border (the shared glass rim then applies). */
   static itemBorderWidth(style: CYLMenuStyle, appearance: CYLTagAppearance): number {
     return CYLTagButton.hasItemBorder(style, appearance) ? appearance.borderWidth : 0;
-  }
-  /** The key of the app's color mode ('dark' / 'light') in AppStorage, the one `cylanimateditem` reads (`cyl_colorMode`). */
-  static readonly COLOR_MODE_KEY: string = 'cyl_colorMode';
-  /** For tests: replaces the app's color mode of `isDarkMode()` (`undefined`, the default, reads AppStorage). */
-  static darkModeOverride: boolean | undefined = undefined;
-
-  /**
-   * Whether the app is in dark mode: `darkModeOverride`, else `cyl_colorMode` of AppStorage as `cylanimateditem` reads it
-   * (light when it is unset or AppStorage is not available).
-   */
-  static isDarkMode(): boolean {
-    const override: boolean | undefined = CYLTagButton.darkModeOverride;
-    if (override !== undefined) {
-      return override;
-    }
-    try {
-      return AppStorage.get<string>(CYLTagButton.COLOR_MODE_KEY) === 'dark';
-    } catch (error) {
-      return false;
-    }
   }
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   /**
@@ -1162,18 +1141,15 @@ export class CYLTagButton {
     // drawn only an EXPLICIT color tints it: an unset background (the built-in default, which would hide the backdrop) hands no
     // color, so the modifier uses the glass's frosted default tint. The pressed color is always explicit. Flat (also where the
     // system draws no glass) keeps the effective color.
-    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
     const stateBackground: ResourceColor = CYLTagButton.itemBackgroundColor(style, appearance, pressed);
     this.itemBackgroundStyle = CYLTagButton.itemBackgroundStyleOf(style);
     this.appearanceCornerRadius = appearance.cornerRadius;
     this.glassTintAlpha = state === CYLControlState.SELECTED ? 1 : -1;
     this.backgroundColor = stateBackground;
-    // The icon tint. Dark glass lifts an EXPLICIT, static icon color that is too dark for it (`CYLIconContrast`); the result
-    // feeds the image tint and the animation tint. Light mode, flat tags and a built-in (unset) icon color are never changed.
+    // The icon tint: the style's icon color as set, never adapted here. On dark Liquid Glass `cylanimateditem` adapts an EXPLICIT
+    // icon color itself (`CYLAnimatedItemContrast`); an unset one (the built-in default) is handed to it as ''.
     const explicitIcon = style.explicitIconColor(state);
-    this.imageView.tintColor = glass && explicitIcon !== undefined && CYLTagButton.isDarkMode() ?
-    CYLIconContrast.liftedIconColor(explicitIcon, stateBackground, this.glassTintAlpha >= 0 ? this.glassTintAlpha : undefined) :
-    style.iconColor(state);
+    this.imageView.tintColor = style.iconColor(state);
     this.imageView.tintsImage = explicitIcon !== undefined;
     this.animationIconColor = animated && this.imageView.tintsImage ? this.imageView.tintColor : '';
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
