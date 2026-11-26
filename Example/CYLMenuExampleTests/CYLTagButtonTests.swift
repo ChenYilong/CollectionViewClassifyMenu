@@ -467,12 +467,12 @@ final class CYLTagButtonTests: XCTestCase {
         style.normalAppearance.textColor = nil
         style.setIconColor(nil, for: .normal)
         let builtIn = CYLMenuFixtures.tagButton(title: "首页", image: UIImage(systemName: "message"), style: style)
-        XCTAssertEqual(builtIn.titleLabel.textColor, CYLTagAppearance.defaultTextColor, "the tag's built-in text color, as before")
+        XCTAssertEqual(builtIn.titleLabel.textColor?.resolvedColor(with: builtIn.traitCollection), CYLTagAppearance.defaultTextColor.resolvedColor(with: builtIn.traitCollection), "the tag's built-in text color (the item resolves it with its traits), as before")
         XCTAssertEqual(builtIn.imageView.tintColor?.resolvedColor(with: builtIn.traitCollection), CYLTagAppearance.defaultTextColor.resolvedColor(with: builtIn.traitCollection), "the icon follows the built-in text color, as before")
         style.setIconColor(.systemTeal, for: .normal)
         let explicit = CYLMenuFixtures.tagButton(title: "首页", image: UIImage(systemName: "message"), style: style)
         XCTAssertEqual(explicit.imageView.tintColor?.resolvedColor(with: explicit.traitCollection), UIColor.systemTeal.resolvedColor(with: explicit.traitCollection), "an explicit icon color wins over the tag built-in")
-        XCTAssertEqual(explicit.titleLabel.textColor, CYLTagAppearance.defaultTextColor, "the title is not affected by the icon color")
+        XCTAssertEqual(explicit.titleLabel.textColor?.resolvedColor(with: explicit.traitCollection), CYLTagAppearance.defaultTextColor.resolvedColor(with: explicit.traitCollection), "the title is not affected by the icon color")
     }
 
     // MARK: - Liquid Glass tint: an unset background is ignored
