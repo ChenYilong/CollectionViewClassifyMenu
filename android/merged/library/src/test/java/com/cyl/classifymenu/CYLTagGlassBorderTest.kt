@@ -84,7 +84,7 @@ class CYLTagGlassBorderTest {
         appearance.applyConfiguration(mapOf(CYLTagAppearanceCornerRadius to 4))
         assertFalse(appearance.hasExplicitBorder)
         appearance.applyConfiguration(mapOf(CYLTagAppearanceBorderWidth to 2))
-        assertTrue(appearance.hasExplicitBorder)
+        assertFalse("a width alone is not an explicit border under glass", appearance.hasExplicitBorder)
         val colored = CYLTagAppearance().also { it.applyConfiguration(mapOf(CYLTagAppearanceBorderColor to "#FF0000")) }
         assertTrue(colored.hasExplicitBorder)
     }
