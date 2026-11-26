@@ -6,7 +6,7 @@ radius, `min(radius, height / 2)`).
 
 ## Task log
 
-- **TODO, 0 / 100** (2026-11-24, branch `feat/tag-liquid-glass`, Mac-CollectionViewClassifyMenu; the advisor designs the
+- **TODO → DONE, 80 / 100** (status 2026-11-27, see "Score"; opened 2026-11-24, branch `feat/tag-liquid-glass`, Mac-CollectionViewClassifyMenu; the advisor designs the
   interface, Sonnet implements): **a Liquid Glass background style for tags.**
   - User prompt, verbatim: 「advisor帮助设计新增接口：为tag 背景设置增加样式，目前实现封装为扁平样式，新增液态玻璃样式背景样式接口。遵循液态玻璃样式在cyltabbar的实现，cyltabbar上注意玻璃样式在iOS平台仅适用于iOS26及以上系统。其他平台也有不同系统限制。不适用液态玻璃是，忽略样式参数，保持目前的扁平样式。sonnet负责实现。无须要考虑兼容性，修改接口后通知使用了本仓库的其他session适配我们的新接口。」
   - English: the advisor helps design a new interface: add a style to the tag background setting. Today the tag is
@@ -114,6 +114,12 @@ Test conditions (advisor): no copies of glass code in this repository; static ch
 
 Code written on every platform: iOS 35, Android 20, HarmonyOS 15, mini program 10 = 80 once tested; screenshots and parity maps 10 and
 notifications 10 remain. Verified today: mini program node tests; everything else after the batch.
+
+Update 2026-11-27 (integration head `fix/shared-contrast-ios`): the code is tested on every platform, so **80 / 100**. iOS (macOS session, iOS 27.2 simulator,
+Xcode 27.2): ClassifyMenu suites menu 37 / 37, example 243 / 243, swift 23 / 23 at `09bc2413`; Windows session on the merged tree `598fdb15`:
+mini program 326 / 326, HarmonyOS host 231 / 231, Android 304 / 305 (the known Windows path failure). Missing points (TODO): labeled
+flat-against-glass screenshots and parity maps on every platform (10; iOS captures exist), the notifications with hash and API
+names are not confirmed in this document (10).
 
 ## Dark glass contrast (title and icon)
 

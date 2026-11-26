@@ -317,7 +317,12 @@ Environment: macOS 27, Xcode 27.2, iOS 27.2 simulator `CB9BDA60` (iPhone, this s
 | `scripts/unit-tests.sh example` | `f32ffe6f` | **240 / 242**: two failures, fixed below |
 | `example` and `menu` after the fixes | `09bc2413` (iOS sources equal to `598fdb15` plus the fix) | 243 / 243 and 37 / 37 |
 | `scripts/cyl-tabbar-latest-commit.sh --check` | | Newest component commit `973c255a` (`feat/harmony-animated-item-engines`, 2026-11-26 23:27 +13); iOS pins `4d0e00ae`, Windows `b5b36fbf`: **TODO repin** after the tab bar owner announces the flat button batch |
-| `library-warnings.sh`, `pod lib lint`, SwiftPM, Example-Swift, React Native and Flutter iOS builds | | TODO (next) |
+| `scripts/library-warnings.sh` | `b0f153fe` | No warnings |
+| `scripts/unit-tests.sh swift` after the fixes (Example-Swift build and tests) | `b0f153fe` | 23 / 23 |
+| `scripts/pod-lint.sh lib` | `b0f153fe` | Passed validation |
+| SwiftPM build (clean `git archive`, Xcode project removed, `generic/platform=iOS Simulator`) | `b0f153fe` | Build succeeded; 2 warnings from the component: `CYLAnimatedItem/include/module.modulemap` "no rule to process file" (TODO for the tab bar session) |
+| React Native example, iOS (`fetch-cyltabbar.sh`, `yarn`, `USE_FRAMEWORKS=static pod install`, Release, simulator) | `00fc149e` | Build succeeded |
+| Flutter example, iOS (`flutter build ios --simulator --debug`) | `00fc149e` | Built `Runner.app` |
 
 Fixed in `fix: 🐛 one-character badges stay round, create-item plus icon reaches 3:1`:
 
@@ -328,6 +333,13 @@ Fixed in `fix: 🐛 one-character badges stay round, create-item plus icon reach
 | Section 5: create cell plus icon about 2.4:1 over black | `tertiaryLabel` | `secondaryLabel` (the title's colour); new test `testTheCreateItemsPlusIconReachesThreeToOneOnTheListBackground` (3:1 in light and dark) |
 
 The component's API comment on `adaptedForContrast` (CYLTabBarController `CYLAnimatedItemView.swift`) still says the plus icon is a `tertiaryLabel`: TODO for the tab bar session.
+
+Also done: PR #40 closed (its screenshots exist since 2026-11-24: `docs/assets/ios-27-2-iphone18pro-example-main-tabs.png`);
+stale task-log headings in `tag-liquid-glass.md` (now 80 / 100) and `animated-item-migration.md` (engine API, 70 / 100) updated.
+
+**Step 1 status: DONE** for the head before the repin. Repin plan agreed with the Windows session: it sends the component SHA once
+the role registry is pushed; macOS repins the 9 iOS pins, verifies, and hands the commit over as a patch; Windows adds its pins with
+`--amend` (one commit) and pushes.
 
 ### Step 2: CI
 
