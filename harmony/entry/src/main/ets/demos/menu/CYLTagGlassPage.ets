@@ -14,11 +14,13 @@ import {
 } from '@cyl/classifymenu';
 import { CYLDemoBar } from '../DemoNav';
 
+// Sample section titles, kept as written: the long Chinese title reproduces issue #13. NOLOCALIZE-BEGIN
 /** The long header title of list A's first section (issue #13 of the repository). */
 export const GLASS_LONG_TITLE: string = '滚动隐藏：模拟意外情况（issue #13）';
 const SHORT_TITLE: string = '短标题';
 const TAIL_TITLE: string = '尾部折叠';
 const TAIL_SHORT_TITLE: string = '玻璃标签';
+// NOLOCALIZE-END
 /** The header fold control's titles: collapsed and expanded. */
 const FOLD_MORE_TITLE: string = 'More';
 const FOLD_LESS_TITLE: string = 'Less';
