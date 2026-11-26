@@ -446,6 +446,12 @@ class CYLMenuStyle {
      */
     internal fun explicitIconColorForState(state: Int): Int? = appearanceForState(state).iconColor
 
+    /**
+     * The text color the app set for `state`, null while it was never set: the built-in default does not count.
+     * The tag hands only an explicit color to the item as its title color; the item adapts it on dark Liquid Glass.
+     */
+    internal fun explicitTextColorForState(state: Int): Int? = appearanceForState(state).explicitTextColor
+
     /** `-iconColorForState:`: the icon color, else the text color. */
     fun iconColorForState(state: Int): Int {
         val appearance = appearanceForState(state)

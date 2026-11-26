@@ -380,6 +380,9 @@ open class CYLTagButton @JvmOverloads constructor(
         return displayed.ifEmpty { (super.image as? CYLBadgeDrawable)?.accessibilityLabel ?: "" }
     }
 
+    /** The tag colors its title itself (or hands the item an explicit color): the item's built-in colors must not fill in. */
+    override val usesBuiltInColors: Boolean get() = false
+
     private fun updateAppearance() {
         if (!ready) return
         val style = currentStyle
@@ -409,7 +412,6 @@ open class CYLTagButton @JvmOverloads constructor(
         titleLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, font.size)
         titleLabel.typeface = font.typeface
         val textColor = appearance.resolvedTextColor(context)
-        titleLabel.setTextColor(textColor)
         titleLabel.maxLines = style.titleMaxLines
         var backgroundColor = appearance.resolvedBackgroundColor(context)
         val highlighted = isHighlighted && state != CYLControlState.DISABLED && style.highlightedBackgroundColor != null
@@ -429,6 +431,13 @@ open class CYLTagButton @JvmOverloads constructor(
         // The appearance's radius (CYLAnimatedItemCornerRadiusCapsule by default, 0 is square), set with the style and not
         // only when the tag is laid out: the view's own default (null) is square for flat.
         itemCornerRadius = appearance.cornerRadius
+        // An EXPLICIT text color goes to the item unchanged (titleColor): the item sets it on the title and, on dark Liquid Glass,
+        // adapts it (CYLAnimatedItemContrast, contrast 4.5); nothing sets the title color on top of it. An unset one is handed as
+        // null (the built-in default is not explicit, so the item never adapts it) and the tag colors the title itself. Set after
+        // the background and tint above, which the adaptation reads.
+        val explicitTextColor = style.explicitTextColorForState(state)
+        titleColor = explicitTextColor
+        if (explicitTextColor == null) titleLabel.setTextColor(textColor)
         backgroundImageView.setImageDrawable(appearance.backgroundImage)
         backgroundImageView.visibility = if (appearance.backgroundImage == null || highlighted) GONE else VISIBLE
         // With the rename indicator, editingIndicatorsView draws both icons instead.

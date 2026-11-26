@@ -107,7 +107,10 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
                 appearance.cornerRadius = normal.cornerRadius
                 appearance.margin = normal.margin
                 appearance.font = normal.font
-                appearance.textColor = context?.let { normal.resolvedTextColor(it) } ?: normal.textColor
+                // Like the background: only a set text color is copied, so an unset one stays unset (the item adapts explicit colors only)
+                // and the control equals a plain tag under dark Liquid Glass.
+                val normalTextColor = normal.explicitTextColor
+                if (normalTextColor != null) appearance.textColor = normalTextColor else appearance.resetTextColor()
             }
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) style.setIconColor(tint, state)
             control.font?.let { font -> listOf(style.normalAppearance, style.selectedAppearance, style.disabledAppearance).forEach { it.font = font } }

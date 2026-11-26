@@ -34,6 +34,13 @@ class CYLTagAppearance : Cloneable {
      */
     val explicitBackgroundColor: Int? get() = _backgroundColor
 
+    /**
+     * The text color the app (or a style) set for this state, null while it was never set: the built-in default (dark gray, or the
+     * list's primary tint in night mode) does not count. The tag hands only an explicit color to the item as its title color; the
+     * item adapts it on dark Liquid Glass.
+     */
+    val explicitTextColor: Int? get() = _textColor
+
     /** The title color in use: [textColor] when set, else dark gray, or the list's primary tint in night mode. */
     fun resolvedTextColor(context: android.content.Context): Int =
         _textColor ?: if (CYLSystemColors.isNight(context)) CYLSystemColors.primary(context) else CYLColor.white(0.25f)
