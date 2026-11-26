@@ -12,7 +12,8 @@ const locale = require('../locale.js');
 const { cylAnimatedItemType, cylAnimatedItemSource } = require('../cyl-animated-item/cyl_animated_item_model');
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
 const {
-  cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive
+  cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive,
+  cylAnimatedItemAdaptedColor, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT
 } = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
@@ -193,6 +194,9 @@ const HEADER_FOLD_ALONE_MAX_FRACTION = 0.4;
 const HEADER_FOLD_SHARED_MAX_FRACTION = 0.3;
 const HEADER_TITLE_MIN_EM = 1;
 const HEADER_TITLE_MIN_WIDTH_PX = 1;
+/** The tint alpha of a selected Liquid Glass tag (full colour) and the value that leaves the component's default alpha. */
+const SELECTED_GLASS_TINT_ALPHA = 1;
+const DEFAULT_GLASS_TINT_ALPHA = -1;
 /** The percent of a fraction, for CSS (rounded so that 0.3 gives 30, not 30.000000000000004). */
 const PERCENT_PER_FRACTION = 100;
 const PERCENT_PRECISION = 1000;
@@ -294,6 +298,9 @@ function defaultAppearance(hairline, dark = false) {
     // background is handed to the glass, an unset one leaves the component's default frosted tint (docs/tag-liquid-glass.md).
     backgroundExplicit: false,
     textColor: dark ? DARK_TEXT_COLOR : DEFAULT_TEXT_COLOR,
+    // True when the state's title colour was set by the app / a preset (a built-in default is not): only an explicit colour is
+    // adapted to dark Liquid Glass (cylAnimatedItemAdaptedColor); the built-in title colour keeps its own dark / light variants.
+    textColorExplicit: false,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
     cornerRadius: cylAnimatedItemCornerRadiusCapsule,
@@ -454,7 +461,10 @@ function applyAppearance(appearance, configuration, allowsTransparent = false) {
       : opaqueBackground(configuration.backgroundColor);
     appearance.backgroundExplicit = isExplicitBackground(configuration.backgroundColor);
   }
-  if (has('textColor')) appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
+  if (has('textColor')) {
+    appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
+    appearance.textColorExplicit = color(configuration.textColor) !== null;
+  }
   if (has('font')) appearance.font = fontValue(configuration.font) || { size: 14, weight: 'regular', italic: false };
   if (has('iconColor')) appearance.iconColor = color(configuration.iconColor);
   if (has('borderColor')) {
@@ -890,10 +900,47 @@ function stateOf(item, selected) {
   return selected ? 'selected' : 'normal';
 }
 
+/** The tint alpha a tag's glass is drawn with: a selected tag keeps its full colour, the others use the component's default (-1). */
+function glassTintAlpha(state) {
+  return state === 'selected' ? SELECTED_GLASS_TINT_ALPHA : DEFAULT_GLASS_TINT_ALPHA;
+}
+
+/**
+ * The item properties the shared adaptation (`cylAnimatedItemAdaptedColor`) judges a tag by: the tag's background style, the tint
+ * handed to the glass (explicit background or '') and its alpha, and the colour mode of the style. The shared function lifts an
+ * explicit colour only when the glass is really drawn and the mode is dark.
+ */
+function glassAdaptationProperties(style, state) {
+  return {
+    itemBackgroundStyle: style.backgroundStyle,
+    itemBackgroundColor: glassHandedColor(style, style[state]),
+    itemGlassTintAlpha: glassTintAlpha(state),
+    userInterfaceStyle: style.sectionPalette && style.sectionPalette.dark ? 'dark' : 'light',
+  };
+}
+
+/** The tag's title colour as drawn: an explicit one goes through the shared dark-glass adaptation, the built-in one is unchanged. */
+function adaptedTextColor(style, state) {
+  const appearance = style[state];
+  if (!appearance.textColorExplicit) return appearance.textColor;
+  return cylAnimatedItemAdaptedColor(appearance.textColor, CYL_ADAPTED_KIND_TEXT, glassAdaptationProperties(style, state));
+}
+
 /** The effective icon tint of a state (`CYLMenuStyle.iconColor(for:)`): iconColor, else the text color. */
 function iconColor(style, state) {
   const appearance = style[state];
   return appearance.iconColor || appearance.textColor;
+}
+
+/**
+ * The icon tint as drawn (baked into a `system:` symbol): an explicit icon colour, or an explicit title colour the icon follows,
+ * goes through the shared dark-glass adaptation (minimum contrast 3); a built-in colour is unchanged.
+ */
+function adaptedIconColor(style, state) {
+  const appearance = style[state];
+  const tint = iconColor(style, state);
+  if (!appearance.iconColor && !appearance.textColorExplicit) return tint;
+  return cylAnimatedItemAdaptedColor(tint, CYL_ADAPTED_KIND_ICON, glassAdaptationProperties(style, state));
 }
 
 /** A CSS line height for a font size (UIFont.systemFont's lineHeight is about 1.19 times its size). */
@@ -989,7 +1036,7 @@ function iconContent(item, state, style, animation) {
   if (!image) return { kind: 'none', src: '', glyph: '' };
   const system = /^system:(.+)$/.exec(image);
   if (!system) return { kind: 'image', src: image, glyph: '' };
-  const uri = symbols.symbolURI(system[1], iconColor(style, state));
+  const uri = symbols.symbolURI(system[1], adaptedIconColor(style, state));
   if (uri) return { kind: 'image', src: uri, glyph: '' };
   return { kind: 'glyph', src: '', glyph: symbols.glyph(system[1]) };
 }
@@ -1059,7 +1106,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const handedColor = glassHandedColor(style, appearance);
   const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, handedBorder.color,
     !!(style.sectionPalette && style.sectionPalette.dark), // the color mode picks the glass component's default tint
-    state === 'selected' ? 1 : -1); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
+    glassTintAlpha(state)); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
   const glass = itemBackground.glass;
   const background = appearance.backgroundImage
     ? `background-image: url("${appearance.backgroundImage}"); background-size: 100% 100%`
@@ -1074,7 +1121,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     fontCSS(appearance.font),
     `border-width: ${border}px`,
     `border-color: ${handedBorder.color || 'transparent'}`,
-    `color: ${appearance.textColor}`,
+    `color: ${adaptedTextColor(style, state)}`,
     itemBackground.css,
     style.minimumTagSizeWH.width > 0 ? `min-width: ${style.minimumTagSizeWH.width}px` : '',
     `justify-content: ${justify}`,
