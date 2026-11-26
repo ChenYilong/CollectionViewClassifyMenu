@@ -528,8 +528,9 @@ export struct CYLTagListView {
     r.itemBackgroundStyle = CYLTagButton.itemBackgroundStyleOf(style);
     r.backgroundColor = CYLTagButton.itemBackgroundColor(style, normal);
     r.appearanceCornerRadius = normal.cornerRadius;
-    // As CYLTagButton: no border color means no border.
-    r.borderWidth = normal.borderColor !== undefined ? normal.borderWidth : 0;
+    // As CYLTagButton: no border (and under glass no unset default border) means width 0.
+    r.borderColor = CYLTagButton.itemBorderColor(style, normal);
+    r.borderWidth = CYLTagButton.itemBorderWidth(style, normal);
     r.x = cell.x;
     r.y = cell.y + titleHeight;
     this.finishKey(r, 'f');
