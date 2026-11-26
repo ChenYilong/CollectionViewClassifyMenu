@@ -115,34 +115,43 @@ Test conditions (advisor): no copies of glass code in this repository; static ch
 Code written on every platform: iOS 35, Android 20, HarmonyOS 15, mini program 10 = 80 once tested; screenshots and parity maps 10 and
 notifications 10 remain. Verified today: mini program node tests; everything else after the batch.
 
-## Dark glass icon lift
+## Colour channels and dark-glass adaptation (2026-11-26, replaces "Dark glass icon lift")
 
-In dark mode the default frosted glass is white at 0.14 over the backdrop (about #242424 over black), so a dark explicit icon color
-can all but vanish. The lift raises such a color just enough to keep a 3:1 contrast. The algorithm is `CYLIconContrast`
-(`CYLIconContrast.swift`) on iOS, mirrored per platform.
+The tag no longer lifts its own colours. It hands them to the shared item (`cylanimateditem`, pinned `b5b36fbf`) through the item's
+colour channels, and the item adapts what it draws. The old `CYLIconContrast` / `liftedIconColor` / `explicitIconColor` code paths are gone
+on Android, HarmonyOS and the mini program (iOS: see `docs/tag-item-tint-unification.md`, the common text).
 
-Rule (identical on every platform; constants `minimumContrastRatio` 3, `frostedGlassWhiteAlpha` 0.14, `defaultGlassTintShare` 0.75,
-lightness step 0.005):
+**Channels** (per state; subclass-explicit level): the tag sets the item's `subclassTitleColor` / `subclassIconColor` for normal, selected and
+disabled from the style; a colour the style leaves unset is handed down as the tag's built-in level (`applyTitleTintColor`,
+`applyIconTintColor`). Precedence: the item's own colour > subclass-explicit > stack-inherited > subclass built-in > component built-in.
 
-1. Reference luminance (glass over black): no glass tint or tint alpha 0, the WCAG luminance of grey 0.14; else the luminance of
-   the tint's sRGB components times `tint.alpha * (tintAlpha ?? 0.75)` (a selected tag tints at alpha 1).
-2. Contrast = (max + 0.05) / (min + 0.05) of the two luminances. 3 or more: the color is unchanged.
-3. Else the lightness (HSL) rises in steps of 0.005, hue, saturation and alpha kept, up to white, until the contrast is 3.
-4. A dynamic color (its light and dark values differ) is unchanged. Pure and deterministic.
+**Adaptation** (the item's `adaptedOnGlass(color, kind)`; mini `cylAnimatedItemAdaptedColor`): only RAISES HSL lightness, title to 4.5:1 and
+icon / animation to 3:1 against the dark glass; only where glass is really drawn, in dark mode, not for the disabled state, never in light
+mode or on flat fills; hue, saturation and alpha kept. Lightness floor of the glass per platform: iOS 0.28, Android 0.37 (measured),
+HarmonyOS 0.40 (measured), mini program 0.37 (calculated).
 
-Applied only when glass is really drawn AND the mode is dark AND the style has an EXPLICIT icon color for the state
-(`normal` / `selected` / `disabled` `iconColor`); the result feeds the icon tint (and the animation tint where the platform has
-one). Explicit means set by the app; the built-in icon color (unset: the title color) is never touched. Light mode, flat tags,
-colors that already pass and dynamic colors never change.
+**What the tag adapts**: title, SF Symbol / `system:` icon, static image tint, delete label, delete cross, editing icons and the tail fold
+cell (all through the item's resolvers; the disabled state is skipped in the tag because the item cannot know it). Selected tags show the last
+frame of their animation (`showsLastFrameWhenSelected`); the example Lottie entry opts in with `animationOptions.tint = "title"` until the item
+detects one-colour files.
 
-| Platform | Status |
+**Limits** (same list as iOS): a multi-colour image, GIF frames beyond the first, PAG / SVGA / Rive cannot be recoloured or detected; Lottie
+one-colour detection and the `renderingMode = automatic` policy come with the colour-roles refactor (not on the Windows platforms yet);
+the disabled look is deliberately not adapted (iOS agrees); HarmonyOS has no built-in disabled channel in the item yet, so an unset
+disabled colour keeps the style's default; the `deleteIndicatorImage` role is not wired on Android / HarmonyOS yet.
+
+| Platform | Where |
 |:--|:--|
-| iOS | reference: `CYLIconContrast`, applied in `CYLTagButton` |
-| Android | `CYLIconContrast.kt`; `CYLTagButton.updateAppearance` lifts the icon color filter (night mode = `CYLSystemColors.isNight`, glass = `resolvedBackgroundStyle`, explicit = `CYLMenuStyle.explicitIconColorForState`); `CYLIconContrastTest`, written statically, not yet run. |
-| HarmonyOS | `CYLIconContrast` (`core/CYLIconContrast.ets`, exported from `Index.ets`); `CYLMenuStyle.explicitIconColor(state)` tells an explicit icon color from the built-in; `CYLTagButton.updateAppearance` lifts the tint when `resolvedBackgroundStyle()` is glass and `CYLTagButton.isDarkMode()` (AppStorage `cyl_colorMode`, as `cylanimateditem`; `darkModeOverride` for tests). Static '#RRGGBB' / '#AARRGGBB' strings only: resources and `Color` constants are dynamic, so unchanged. Tests: `entry/src/test/IconContrast.test.ets`, written statically, not yet compiled or run. A mode switch while a tag is shown re-resolves at the tag's next `updateAppearance` (no watcher on the mode yet) |
-| Mini program | `model.js`: `liftedIconColor`, `glassReferenceLuminance`, `contrastRatio`, `hslFromRgb`, `rgbFromHsl`, `relativeLuminance`; `drawnIconColor(style, state)` feeds the symbol icon of `iconContent`. Explicit = the appearance's `iconColor` (null by default, so nothing to track). Dark = `style.sectionPalette.dark` (the section style's detection); glass drawn = `backgroundStyle === 'liquidGlass'` and `cylAnimatedItemLiquidGlassIsActive()` (`isGlassDrawn`, the predicate of the glass background). Colors are static strings, so there is no dynamic case; the Mini Program has no separate animation tint. `test/tag-icon-lift.test.js`, written statically, not yet run |
-| Flutter | through the native Android / iOS cores: the platform view passes the configuration map to the core, so `style.normal.iconColor` (also `selected`, `disabled`) gets the lift there. No new parameter and no Dart key: the configuration is an untyped map and `iconColor` already exists inside a state dictionary of `style` |
-| React Native | the same: the bridge forwards the configuration JSON to the native cores (generic pass-through). `style.normal.iconColor` is now typed as `CylTagStateStyle.iconColor` in `CylTagListConfiguration.ts`; it only types the key the core already reads, there is no new bridge code |
+| iOS | reference, see the common text |
+| Android | `CYLTagButton` (`adaptedUnlessDisabled`, channels), tests `CYLTagTitleColorHandoffTest`, `CYLTagIconColorHandoffTest`, `CYLTagDeleteIndicatorColorTest` |
+| HarmonyOS | `tagviews/CYLTagButton.ets`, `components/CYLTagAnimatedIcon.ets` (last frame while selected on both builders) |
+| Mini program | `cyl-tag-list/model.js` (`itemColorProperties`, `tailFoldColors`), tests `tag-glass-contrast.test.js`, `tag-tail-fold-style.test.js` |
+| Flutter / React Native | through the native cores; `style.normal.iconColor` / `textColor` are the channels (typed in `CylTagListConfiguration.ts`) |
+
+## Glass border rule (all platforms)
+
+Under drawn glass the explicit border COLOUR decides: a border width alone draws none, built-in borders are dropped (the glass has its own
+rim), flat tags are unchanged. The section board shares the tag's glass; an unset board colour counts as no colour, as an unset tag.
 
 ## Known limitation: Android glass tags in a list are tinted only (2026-11-24)
 
