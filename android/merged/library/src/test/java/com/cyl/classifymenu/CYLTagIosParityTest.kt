@@ -10,12 +10,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 
 /**
  * The iOS parity items of the tag: the callout that avoids the section header (`CYLTagCalloutBubble.placesBelow`), the badge dot
  * and capsule (`CYLTag.badgeDotImage`, `badgeImageWidth`) and the public "is set" flags of `CYLTagAppearance`.
  */
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 class CYLTagIosParityTest {
 
     private val density = Resources.getSystem().displayMetrics.density

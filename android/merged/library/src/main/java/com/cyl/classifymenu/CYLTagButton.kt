@@ -324,6 +324,13 @@ open class CYLTagButton @JvmOverloads constructor(
     }
 
     /**
+     * The colour the tag draws on its own surfaces: through the item's dark-glass adaptation (`adaptedOnGlass`: icon 3:1, title 4.5:1),
+     * except in the disabled state, whose look is never adapted (iOS: the disabled look is deliberately left as it is).
+     */
+    private fun adaptedUnlessDisabled(state: Int, color: Int, kind: CYLAnimatedItemColorKind): Int =
+        if (state == CYLControlState.DISABLED) color else adaptedOnGlass(color, kind)
+
+    /**
      * The light / dark mode may have changed: the colors the style leaves unset (the text and icon default, the glass tint) resolve
      * again, no app code needed. The base class re-applies its own colors first; the tag's own come after.
      */
@@ -434,7 +441,7 @@ open class CYLTagButton @JvmOverloads constructor(
         if (explicitIconColor == null) {
             // The tag tints the static image itself here, so the colour goes through the item's own adaptation (dark drawn glass,
             // not disabled): an icon that follows an explicit dark text colour (#3C3C43) must be as readable as the title.
-            if (builtInIconColor != null) imageView.setColorFilter(adaptedOnGlass(builtInIconColor, CYLAnimatedItemColorKind.Icon)) else imageView.clearColorFilter()
+            if (builtInIconColor != null) imageView.setColorFilter(adaptedUnlessDisabled(state, builtInIconColor, CYLAnimatedItemColorKind.Icon)) else imageView.clearColorFilter()
         }
         titleLabel.text = style.displayedTitleForTitle(rawTitle?.toString())
         val font = style.titleFontForState(state)
@@ -481,19 +488,19 @@ open class CYLTagButton @JvmOverloads constructor(
         if (editingIcons || editingIndicatorsViewIsLoaded) {
             editingIndicatorsView.visibility = if (editingIcons) VISIBLE else GONE
             // The inner icon items are flat and never adapt on their own: the tag lifts the colour on dark drawn glass (icon, 3:1).
-            editingIndicatorsView.iconColor = adaptedOnGlass(deleteColor, CYLAnimatedItemColorKind.Icon)
+            editingIndicatorsView.iconColor = adaptedUnlessDisabled(state, deleteColor, CYLAnimatedItemColorKind.Icon)
         }
         deleteIndicatorLabel.contentDescription = if (showsDeleteIndicator) CYLMenuLocalizedString("CYLMenuDeleteTag", "Deletes a tag") else null
         val placement = if (style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading)
             CYLAnimatedItemAccessoryPlacement.Leading else CYLAnimatedItemAccessoryPlacement.Trailing
         if (accessoryPlacement != placement) accessoryPlacement = placement
         crossPaint.strokeWidth = style.deleteIndicatorLineWidth * density
-        crossPaint.color = adaptedOnGlass(deleteColor, CYLAnimatedItemColorKind.Icon)
+        crossPaint.color = adaptedUnlessDisabled(state, deleteColor, CYLAnimatedItemColorKind.Icon)
         val deleteFont = style.deleteIndicatorFontForState(state)
         deleteIndicatorLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, deleteFont.size)
         deleteIndicatorLabel.typeface = deleteFont.typeface
         // The "x" label is text (title rule, 4.5:1); the drawn cross and the editing icons are icons (3:1).
-        deleteIndicatorLabel.setTextColor(adaptedOnGlass(deleteColor, CYLAnimatedItemColorKind.Title))
+        deleteIndicatorLabel.setTextColor(adaptedUnlessDisabled(state, deleteColor, CYLAnimatedItemColorKind.Title))
         // Where glass is really drawn only an EXPLICIT border (setter, configuration, preset) is handed over: the built-in default
         // border of the state is dropped (no border, width 0), so the glass's own rim shows. Flat keeps the default border.
         val styleBorderColor = if (drawsGlass) appearance.glassBorderColor else appearance.borderColor
