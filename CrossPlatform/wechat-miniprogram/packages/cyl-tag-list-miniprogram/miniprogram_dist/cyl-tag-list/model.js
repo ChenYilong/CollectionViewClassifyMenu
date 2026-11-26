@@ -12,7 +12,8 @@ const locale = require('../locale.js');
 const { cylAnimatedItemType, cylAnimatedItemSource } = require('../cyl-animated-item/cyl_animated_item_model');
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
 const {
-  cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive
+  cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive,
+  cylAnimatedItemAdaptedColor, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT
 } = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
@@ -193,6 +194,9 @@ const HEADER_FOLD_ALONE_MAX_FRACTION = 0.4;
 const HEADER_FOLD_SHARED_MAX_FRACTION = 0.3;
 const HEADER_TITLE_MIN_EM = 1;
 const HEADER_TITLE_MIN_WIDTH_PX = 1;
+/** The tint alpha of a selected Liquid Glass tag (full colour) and the value that leaves the component's default alpha. */
+const SELECTED_GLASS_TINT_ALPHA = 1;
+const DEFAULT_GLASS_TINT_ALPHA = -1;
 /** The percent of a fraction, for CSS (rounded so that 0.3 gives 30, not 30.000000000000004). */
 const PERCENT_PER_FRACTION = 100;
 const PERCENT_PRECISION = 1000;
@@ -294,6 +298,9 @@ function defaultAppearance(hairline, dark = false) {
     // background is handed to the glass, an unset one leaves the component's default frosted tint (docs/tag-liquid-glass.md).
     backgroundExplicit: false,
     textColor: dark ? DARK_TEXT_COLOR : DEFAULT_TEXT_COLOR,
+    // True when the state's title colour was set by the app / a preset (a built-in default is not): only an explicit colour is
+    // adapted to dark Liquid Glass (cylAnimatedItemAdaptedColor); the built-in title colour keeps its own dark / light variants.
+    textColorExplicit: false,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
     cornerRadius: cylAnimatedItemCornerRadiusCapsule,
@@ -454,7 +461,10 @@ function applyAppearance(appearance, configuration, allowsTransparent = false) {
       : opaqueBackground(configuration.backgroundColor);
     appearance.backgroundExplicit = isExplicitBackground(configuration.backgroundColor);
   }
-  if (has('textColor')) appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
+  if (has('textColor')) {
+    appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
+    appearance.textColorExplicit = color(configuration.textColor) !== null;
+  }
   if (has('font')) appearance.font = fontValue(configuration.font) || { size: 14, weight: 'regular', italic: false };
   if (has('iconColor')) appearance.iconColor = color(configuration.iconColor);
   if (has('borderColor')) {
@@ -890,10 +900,47 @@ function stateOf(item, selected) {
   return selected ? 'selected' : 'normal';
 }
 
+/** The tint alpha a tag's glass is drawn with: a selected tag keeps its full colour, the others use the component's default (-1). */
+function glassTintAlpha(state) {
+  return state === 'selected' ? SELECTED_GLASS_TINT_ALPHA : DEFAULT_GLASS_TINT_ALPHA;
+}
+
+/**
+ * The item properties the shared adaptation (`cylAnimatedItemAdaptedColor`) judges a tag by: the tag's background style, the tint
+ * handed to the glass (explicit background or '') and its alpha, and the colour mode of the style. The shared function lifts an
+ * explicit colour only when the glass is really drawn and the mode is dark.
+ */
+function glassAdaptationProperties(style, state) {
+  return {
+    itemBackgroundStyle: style.backgroundStyle,
+    itemBackgroundColor: glassHandedColor(style, style[state]),
+    itemGlassTintAlpha: glassTintAlpha(state),
+    userInterfaceStyle: style.sectionPalette && style.sectionPalette.dark ? 'dark' : 'light',
+  };
+}
+
+/** The tag's title colour as drawn: an explicit one goes through the shared dark-glass adaptation, the built-in one is unchanged. */
+function adaptedTextColor(style, state) {
+  const appearance = style[state];
+  if (!appearance.textColorExplicit) return appearance.textColor;
+  return cylAnimatedItemAdaptedColor(appearance.textColor, CYL_ADAPTED_KIND_TEXT, glassAdaptationProperties(style, state));
+}
+
 /** The effective icon tint of a state (`CYLMenuStyle.iconColor(for:)`): iconColor, else the text color. */
 function iconColor(style, state) {
   const appearance = style[state];
   return appearance.iconColor || appearance.textColor;
+}
+
+/**
+ * The icon tint as drawn (baked into a `system:` symbol): an explicit icon colour, or an explicit title colour the icon follows,
+ * goes through the shared dark-glass adaptation (minimum contrast 3); a built-in colour is unchanged.
+ */
+function adaptedIconColor(style, state) {
+  const appearance = style[state];
+  const tint = iconColor(style, state);
+  if (!appearance.iconColor && !appearance.textColorExplicit) return tint;
+  return cylAnimatedItemAdaptedColor(tint, CYL_ADAPTED_KIND_ICON, glassAdaptationProperties(style, state));
 }
 
 /** A CSS line height for a font size (UIFont.systemFont's lineHeight is about 1.19 times its size). */
@@ -989,7 +1036,7 @@ function iconContent(item, state, style, animation) {
   if (!image) return { kind: 'none', src: '', glyph: '' };
   const system = /^system:(.+)$/.exec(image);
   if (!system) return { kind: 'image', src: image, glyph: '' };
-  const uri = symbols.symbolURI(system[1], drawnIconColor(style, state));
+  const uri = symbols.symbolURI(system[1], adaptedIconColor(style, state));
   if (uri) return { kind: 'image', src: uri, glyph: '' };
   return { kind: 'glyph', src: '', glyph: symbols.glyph(system[1]) };
 }
@@ -1059,7 +1106,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const handedColor = glassHandedColor(style, appearance);
   const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, handedBorder.color,
     !!(style.sectionPalette && style.sectionPalette.dark), // the color mode picks the glass component's default tint
-    state === 'selected' ? 1 : -1); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
+    glassTintAlpha(state)); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
   const glass = itemBackground.glass;
   const background = appearance.backgroundImage
     ? `background-image: url("${appearance.backgroundImage}"); background-size: 100% 100%`
@@ -1074,7 +1121,7 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     fontCSS(appearance.font),
     `border-width: ${border}px`,
     `border-color: ${handedBorder.color || 'transparent'}`,
-    `color: ${appearance.textColor}`,
+    `color: ${adaptedTextColor(style, state)}`,
     itemBackground.css,
     style.minimumTagSizeWH.width > 0 ? `min-width: ${style.minimumTagSizeWH.width}px` : '',
     `justify-content: ${justify}`,
@@ -1345,17 +1392,8 @@ function opaqueLuminance(text) {
   return relativeLuminance(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX);
 }
 
-// MARK: - Dark glass icon lift (CYLIconContrast of the iOS core)
+// MARK: - Relative luminance (the legible tint)
 
-/** The least WCAG contrast ratio (3:1, the floor for graphics) an icon keeps against the glass. */
-const MINIMUM_CONTRAST_RATIO = 3;
-/** The white share of the default frosted glass in dark mode (white at 0.14; over black about #242424). */
-const FROSTED_GLASS_WHITE_ALPHA = 0.14;
-/** The share of an explicit glass tint's alpha that tints the glass when no tint alpha is given. */
-const DEFAULT_GLASS_TINT_SHARE = 0.75;
-/** The step in which the lift raises the HSL lightness. */
-const LIGHTNESS_STEP = 0.005;
-const LIGHTNESS_MAX = 1;
 const SRGB_LINEAR_CUTOFF = 0.03928;
 const SRGB_LINEAR_SLOPE = 12.92;
 const SRGB_GAMMA = 2.4;
@@ -1364,98 +1402,11 @@ const SRGB_SCALE = 1.055;
 const LUMA_RED = 0.2126;
 const LUMA_GREEN = 0.7152;
 const LUMA_BLUE = 0.0722;
-/** The flare term of the WCAG contrast ratio. */
-const CONTRAST_FLARE = 0.05;
-const HUE_SECTORS = 6;
 
 /** WCAG relative luminance of an sRGB color, components 0..1. */
 function relativeLuminance(red, green, blue) {
   const channel = (s) => (s <= SRGB_LINEAR_CUTOFF ? s / SRGB_LINEAR_SLOPE : ((s + SRGB_OFFSET) / SRGB_SCALE) ** SRGB_GAMMA);
   return LUMA_RED * channel(red) + LUMA_GREEN * channel(green) + LUMA_BLUE * channel(blue);
-}
-
-/** The WCAG contrast ratio of two relative luminances, 1 to 21. */
-function contrastRatio(first, second) {
-  return (Math.max(first, second) + CONTRAST_FLARE) / (Math.min(first, second) + CONTRAST_FLARE);
-}
-
-/**
- * The reference luminance the icon is judged against, with the glass over a black backdrop: the default frosted glass (`glassTint`
- * missing, invalid or fully transparent) is white at FROSTED_GLASS_WHITE_ALPHA; an explicit tint is its color times its alpha
- * times `tintAlpha` (DEFAULT_GLASS_TINT_SHARE when missing or negative, as the glass component's rule).
- */
-function glassReferenceLuminance(glassTint, tintAlpha) {
-  const tint = glassTint ? rgbaOf(color(glassTint) || glassTint) : null;
-  if (!tint || !(tint.a > 0)) return relativeLuminance(FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA);
-  const share = tint.a * (typeof tintAlpha === 'number' && tintAlpha >= 0 ? tintAlpha : DEFAULT_GLASS_TINT_SHARE);
-  return relativeLuminance((tint.r / RGB_MAX) * share, (tint.g / RGB_MAX) * share, (tint.b / RGB_MAX) * share);
-}
-
-/** HSL of an sRGB color (components 0..1): hue, saturation and lightness all 0..1. */
-function hslFromRgb(red, green, blue) {
-  const high = Math.max(red, green, blue);
-  const low = Math.min(red, green, blue);
-  const lightness = (high + low) / 2;
-  const delta = high - low;
-  if (!(delta > 0)) return { hue: 0, saturation: 0, lightness };
-  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
-  let hue;
-  if (high === red) {
-    hue = (green - blue) / delta;
-    if (hue < 0) hue += HUE_SECTORS;
-  } else if (high === green) {
-    hue = (blue - red) / delta + 2;
-  } else {
-    hue = (red - green) / delta + 4;
-  }
-  return { hue: hue / HUE_SECTORS, saturation, lightness };
-}
-
-/** The sRGB color {red, green, blue} (0..1) of an HSL triple (all 0..1). */
-function rgbFromHsl(hue, saturation, lightness) {
-  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
-  const sector = hue * HUE_SECTORS;
-  const second = chroma * (1 - Math.abs((sector % 2) - 1));
-  const base = lightness - chroma / 2;
-  const parts = [[chroma, second, 0], [second, chroma, 0], [0, chroma, second], [0, second, chroma], [second, 0, chroma],
-    [chroma, 0, second]][Math.floor(sector) % HUE_SECTORS];
-  return { red: parts[0] + base, green: parts[1] + base, blue: parts[2] + base };
-}
-
-/** A CSS color text of 0..1 components: '#RRGGBB' when opaque, else rgba(). */
-function cssFromUnit(red, green, blue, alpha) {
-  const byte = (x) => Math.max(0, Math.min(RGB_MAX, Math.round(x * RGB_MAX)));
-  if (alpha >= OPAQUE_ALPHA) return `#${[red, green, blue].map((x) => byte(x).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
-  return `rgba(${byte(red)}, ${byte(green)}, ${byte(blue)}, ${alpha})`;
-}
-
-/**
- * The icon color to draw in dark mode on glass: `iconColor` itself when the rule does not apply (an invalid color, or one that
- * already has MINIMUM_CONTRAST_RATIO against the glass), else the color with its HSL lightness raised in LIGHTNESS_STEP steps, hue,
- * saturation and alpha kept, up to white. Colors here are static (no per-mode colors exist), so the "dynamic" case never arises.
- * Pure: the same input gives the same output. The caller calls it only when glass is drawn and the mode is dark.
- * @param {string} iconColor a CSS color text ('#RRGGBB', rgb(), rgba(), a UIColor name)
- * @param {string} [glassTint] the explicit glass color ('' or missing: the default frosted glass)
- * @param {number} [tintAlpha] the tint alpha the glass uses (missing or negative: DEFAULT_GLASS_TINT_SHARE)
- */
-function liftedIconColor(iconColor, glassTint, tintAlpha) {
-  const c = rgbaOf(color(iconColor) || iconColor);
-  if (!c) return iconColor;
-  const reference = glassReferenceLuminance(glassTint, tintAlpha);
-  const hsl = hslFromRgb(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX);
-  // The contrast of the color as it is drawn: its components rounded to whole bytes, so the result keeps the ratio it was judged by.
-  const drawn = (x) => Math.round(Math.max(0, Math.min(1, x)) * RGB_MAX) / RGB_MAX;
-  const ratioAt = (lightness) => {
-    const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness);
-    return contrastRatio(relativeLuminance(drawn(rgb.red), drawn(rgb.green), drawn(rgb.blue)), reference);
-  };
-  if (ratioAt(hsl.lightness) >= MINIMUM_CONTRAST_RATIO) return iconColor;
-  let lightness = hsl.lightness;
-  while (lightness < LIGHTNESS_MAX && ratioAt(lightness) < MINIMUM_CONTRAST_RATIO) {
-    lightness = Math.min(LIGHTNESS_MAX, lightness + LIGHTNESS_STEP);
-  }
-  const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness);
-  return cssFromUnit(rgb.red, rgb.green, rgb.blue, c.a);
 }
 
 /** Whether the tag's Liquid Glass background is really drawn (the predicate of the glass background of `tagLayout`). */
@@ -1483,19 +1434,6 @@ function glassHandedBorder(style, appearance) {
  */
 function glassHandedColor(style, appearance) {
   return isGlassDrawn(style) && !appearance.backgroundExplicit ? '' : appearance.backgroundColor;
-}
-
-/**
- * The icon color a state draws: `iconColor` (the explicit color, else the text color), lifted by `liftedIconColor` only when
- * glass is drawn, the mode is dark (`sectionPalette.dark`) and the state has an EXPLICIT icon color. Light mode, flat tags,
- * the built-in (unset) icon color and colors that already pass are never changed. It feeds the icon tint; the Mini Program
- * has no separate animation tint (an animation is drawn by its engine as it is).
- */
-function drawnIconColor(style, state) {
-  const appearance = style[state];
-  const dark = !!(style.sectionPalette && style.sectionPalette.dark);
-  if (!appearance.iconColor || !dark || !isGlassDrawn(style)) return iconColor(style, state);
-  return liftedIconColor(appearance.iconColor, glassHandedColor(style, appearance), state === 'selected' ? 1 : null);
 }
 
 /** Black on a light opaque background, white on a dark one; null when the background is not opaque. */
@@ -1707,8 +1645,6 @@ module.exports = {
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
-  MINIMUM_CONTRAST_RATIO, FROSTED_GLASS_WHITE_ALPHA, DEFAULT_GLASS_TINT_SHARE, relativeLuminance, contrastRatio,
-  glassReferenceLuminance, hslFromRgb, rgbFromHsl, liftedIconColor, drawnIconColor,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
   SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, boardInset, cardInsets, contentColumn, tagColumn, boardColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,

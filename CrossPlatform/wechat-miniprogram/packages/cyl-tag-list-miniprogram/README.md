@@ -45,11 +45,6 @@ The keys go in the configuration's `style`:
 - `tintColor`: the one color of the built-in header title, icon and More / Less control. Left out, it is black or white,
   whichever is legible on the background behind them.
 - Every new color adapts to light and dark mode by itself; a color you set wins in both modes.
-- Dark glass icon lift: a tag's explicit `iconColor` (in `normal` / `selected` / `disabled`) that is too dark for dark Liquid Glass
-  (under 3:1) is lifted in lightness, hue and alpha kept. Light mode, flat tags and an unset `iconColor` never change
-  (`liftedIconColor`, `glassReferenceLuminance`, `contrastRatio`, `hslFromRgb`, `rgbFromHsl` in `model.js`; counterpart of the
-  iOS `CYLIconContrast`; docs/tag-liquid-glass.md).
-
 ### Migration: the default look changed
 
 This is a breaking visual change: a list that sets nothing now shows the rounded card and the grouped background. To get the

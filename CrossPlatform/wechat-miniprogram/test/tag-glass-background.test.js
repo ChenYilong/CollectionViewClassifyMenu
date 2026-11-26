@@ -94,3 +94,13 @@ test('a list tag takes the same rule through tagLayout', () => {
   const set = model.mergeStyle({ ...GLASS_STYLE, normal: { backgroundColor: EXPLICIT_RED } });
   assert.match(model.tagLayout(set, item, 'normal', { kind: 'none' }, 0, 0).cellStyle, RED_AT_GLASS_ALPHA);
 });
+
+// The dark glass contrast adaptation of an explicit icon color is the shared cyl-animated-item's job: the tag hands the style's icon
+// color unchanged (the symbol's SVG carries it).
+test('a dark glass tag hands the style icon color unchanged', () => {
+  glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
+  const darkTeal = '#004D4D';
+  const view = model.tagButtonView({ title: 'A', image: 'system:star', tagStyle: { ...GLASS_STYLE, normal: { iconColor: darkTeal } } }, '', 2, true);
+  const svg = Buffer.from(view.iconSrc.replace(/^data:image\/svg\+xml;base64,/, ''), 'base64').toString('utf8');
+  assert.equal(/stroke="([^"]+)"/.exec(svg)[1], darkTeal);
+});
