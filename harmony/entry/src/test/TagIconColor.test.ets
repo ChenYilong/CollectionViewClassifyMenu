@@ -59,8 +59,10 @@ function setMode(mode: string): void {
 }
 
 /**
- * The tag draws its title and static icons itself, so it hands an EXPLICIT color to the shared dark-glass adaptation
- * (`CYLAnimatedItemContrast.adaptedOnGlass`): lifted only where glass is drawn in dark mode; everything else is unchanged.
+ * The tag draws its title and static icons itself and hands the colours to the shared item through its CHANNELS: an EXPLICIT
+ * colour through the subclass-explicit level, an unset one through the subclass built-in level
+ * (`CYLAnimatedItemColorResolver`, the item's one precedence and adaptation path). The tag has no contrast code of its own:
+ * an explicit colour is lifted only where glass is drawn in dark mode; everything else is unchanged.
  */
 export default function tagIconColorTest() {
   let savedMeasurer: CYLTextMeasurer = FIXED;
@@ -83,23 +85,23 @@ export default function tagIconColorTest() {
       setMode(savedMode ?? '');
     });
 
-    it('theTagKeepsTheStylesIconColorAndAdaptsItWhenDrawn', 0, () => {
+    it('theTagHandsTheStylesIconColorThroughTheExplicitChannel', 0, () => {
       const style = glassStyle();
       style.setIconColor(DARK_TEAL, CYLControlState.NORMAL);
       const button = buttonWith(style);
       expect(button.imageView.tintColor).assertEqual(DARK_TEAL);
       expect(button.imageView.tintsImage).assertTrue();
-      expect(button.iconColorIsExplicit).assertTrue();
+      expect(button.subclassIconColor).assertEqual(DARK_TEAL);
     });
 
     it('darkGlassLiftsAnExplicitDarkTitleColor', 0, () => {
       const style = glassStyle();
       style.normalAppearance.textColor = DARK_TEXT;
       const button = buttonWith(style);
-      expect(button.titleColorIsExplicit).assertTrue();
+      expect(button.subclassTitleColor).assertEqual(DARK_TEXT);
       expect(contrastOnGlass(button, DARK_TEXT) < MINIMUM_TEXT_CONTRAST).assertTrue();
-      expect(button.adaptedTitleColor() === DARK_TEXT).assertFalse();
-      expect(contrastOnGlass(button, button.adaptedTitleColor()) >= MINIMUM_TEXT_CONTRAST).assertTrue();
+      expect(button.resolvedTitleColor() === DARK_TEXT).assertFalse();
+      expect(contrastOnGlass(button, button.resolvedTitleColor()) >= MINIMUM_TEXT_CONTRAST).assertTrue();
     });
 
     it('darkGlassLiftsAnExplicitDarkTitleColorOverAnExplicitTint', 0, () => {
@@ -108,20 +110,32 @@ export default function tagIconColorTest() {
       style.normalAppearance.backgroundColor = DARK_BLUE_TINT;
       const button = buttonWith(style);
       expect(button.glassTint).assertEqual(DARK_BLUE_TINT);
-      expect(contrastOnGlass(button, button.adaptedTitleColor()) >= MINIMUM_TEXT_CONTRAST).assertTrue();
+      expect(contrastOnGlass(button, button.resolvedTitleColor()) >= MINIMUM_TEXT_CONTRAST).assertTrue();
     });
 
-    it('anUnsetOrBuiltInTitleColorIsNeverAdapted', 0, () => {
+    it('anUnsetTitleColorGoesThroughTheBuiltInChannelAndStaysReadableInNight', 0, () => {
+      // Night mode (beforeEach) with a LIGHT-only theme: the unset title is the tag's built-in (mode-aware) default, handed
+      // as the built-in level; no explicit colour, and the dynamic default is never replaced by a lifted constant.
       const unset = buttonWith(glassStyle());
-      expect(unset.titleColorIsExplicit).assertFalse();
-      expect(unset.adaptedTitleColor()).assertEqual(CYLTagAppearance.defaultTextColor);
+      expect(unset.subclassTitleColor === undefined).assertTrue();
+      expect(unset.builtInTitleColor).assertEqual(CYLTagAppearance.defaultTextColor);
+      expect(unset.resolvedTitleColor()).assertEqual(CYLTagAppearance.defaultTextColor);
       const selected = buttonWith(glassStyle());
       selected.isSelected = true;
-      expect(selected.titleColorIsExplicit).assertFalse();
+      expect(selected.subclassTitleColor === undefined).assertTrue();
       const reset = glassStyle();
       reset.normalAppearance.textColor = DARK_TEXT;
       reset.normalAppearance.resetTextColor();
-      expect(buttonWith(reset).titleColorIsExplicit).assertFalse();
+      expect(buttonWith(reset).subclassTitleColor === undefined).assertTrue();
+    });
+
+    it('aSelectedTagWithoutAnExplicitColorDoesNotBorrowTheNormalOne', 0, () => {
+      const style = glassStyle();
+      style.normalAppearance.textColor = DARK_TEXT;
+      const button = buttonWith(style);
+      button.isSelected = true;
+      expect(button.subclassTitleColor === undefined).assertTrue();
+      expect(button.resolvedTitleColor() === DARK_TEXT).assertFalse();
     });
 
     it('anAppearanceTellsAnExplicitTitleColorFromTheBuiltInDefault', 0, () => {
@@ -140,20 +154,20 @@ export default function tagIconColorTest() {
     it('flatLightAndNonGlassTitlesAreUnchanged', 0, () => {
       const flat = new CYLMenuStyle();
       flat.normalAppearance.textColor = DARK_TEXT;
-      expect(buttonWith(flat).adaptedTitleColor()).assertEqual(DARK_TEXT);
+      expect(buttonWith(flat).resolvedTitleColor()).assertEqual(DARK_TEXT);
       const light = glassStyle();
       light.normalAppearance.textColor = DARK_TEXT;
       setMode(MODE_LIGHT);
-      expect(buttonWith(light).adaptedTitleColor()).assertEqual(DARK_TEXT);
+      expect(buttonWith(light).resolvedTitleColor()).assertEqual(DARK_TEXT);
       setMode(MODE_DARK);
       CYLLiquidGlass.activeOverride = false;
-      expect(buttonWith(light).adaptedTitleColor()).assertEqual(DARK_TEXT);
+      expect(buttonWith(light).resolvedTitleColor()).assertEqual(DARK_TEXT);
     });
 
     it('aReadableTitleColorIsHandedBackAsItIs', 0, () => {
       const style = glassStyle();
       style.normalAppearance.textColor = READABLE_WHITE;
-      expect(buttonWith(style).adaptedTitleColor()).assertEqual(READABLE_WHITE);
+      expect(buttonWith(style).resolvedTitleColor()).assertEqual(READABLE_WHITE);
     });
 
     it('darkGlassLiftsAnExplicitIconColorToThree', 0, () => {
@@ -161,7 +175,7 @@ export default function tagIconColorTest() {
       style.setIconColor(DARK_TEAL, CYLControlState.NORMAL);
       const button = buttonWith(style);
       expect(contrastOnGlass(button, DARK_TEAL) < MINIMUM_ICON_CONTRAST).assertTrue();
-      const adapted = button.adaptedIconColor(button.imageView.tintColor);
+      const adapted = button.resolvedIconColor();
       expect(adapted === DARK_TEAL).assertFalse();
       expect(contrastOnGlass(button, adapted) >= MINIMUM_ICON_CONTRAST).assertTrue();
     });
@@ -171,27 +185,39 @@ export default function tagIconColorTest() {
       style.normalAppearance.textColor = DARK_TEXT;
       const button = buttonWith(style);
       expect(button.imageView.tintsImage).assertFalse();
-      expect(button.iconColorIsExplicit).assertTrue();
-      expect(contrastOnGlass(button, button.adaptedIconColor(button.imageView.tintColor)) >= MINIMUM_ICON_CONTRAST).assertTrue();
+      expect(button.subclassIconColor).assertEqual(DARK_TEXT);
+      expect(contrastOnGlass(button, button.resolvedIconColor()) >= MINIMUM_ICON_CONTRAST).assertTrue();
     });
 
-    it('anUnsetIconColorAndNoTintAreUnchanged', 0, () => {
+    it('anUnsetIconColorGoesThroughTheBuiltInChannelAndTintsNothing', 0, () => {
       const button = buttonWith(glassStyle());
-      expect(button.iconColorIsExplicit).assertFalse();
-      expect(button.adaptedIconColor(button.imageView.tintColor)).assertEqual(button.imageView.tintColor);
-      const explicit = glassStyle();
-      explicit.setIconColor(DARK_TEAL, CYLControlState.NORMAL);
-      expect(buttonWith(explicit).adaptedIconColor('')).assertEqual('');
+      expect(button.subclassIconColor === undefined).assertTrue();
+      expect(button.imageView.tintsImage).assertFalse();
+      expect(button.resolvedIconColor()).assertEqual(button.imageView.tintColor);
     });
 
     it('flatAndLightIconsAreUnchanged', 0, () => {
       const flat = new CYLMenuStyle();
       flat.setIconColor(DARK_TEAL, CYLControlState.NORMAL);
-      expect(buttonWith(flat).adaptedIconColor(DARK_TEAL)).assertEqual(DARK_TEAL);
+      expect(buttonWith(flat).resolvedIconColor()).assertEqual(DARK_TEAL);
       const light = glassStyle();
       light.setIconColor(DARK_TEAL, CYLControlState.NORMAL);
       setMode(MODE_LIGHT);
-      expect(buttonWith(light).adaptedIconColor(DARK_TEAL)).assertEqual(DARK_TEAL);
+      expect(buttonWith(light).resolvedIconColor()).assertEqual(DARK_TEAL);
+    });
+
+    it('theTailCellResolvesTheSameColorsAsAPlainTag', 0, () => {
+      const explicit = glassStyle();
+      explicit.normalAppearance.textColor = DARK_TEXT;
+      const plain = buttonWith(explicit);
+      const cell = tailCell(explicit);
+      expect(cell.subclassTitleColor).assertEqual(plain.subclassTitleColor);
+      expect(cell.subclassIconColor).assertEqual(plain.subclassIconColor);
+      expect(cell.resolvedTitleColor()).assertEqual(plain.resolvedTitleColor());
+      expect(cell.resolvedIconColor()).assertEqual(plain.resolvedIconColor());
+      const unset = glassStyle();
+      expect(tailCell(unset).resolvedTitleColor()).assertEqual(buttonWith(unset).resolvedTitleColor());
+      expect(tailCell(unset).subclassIconColor === undefined).assertTrue();
     });
 
     it('theTailCellTakesTheTagsTitleColorAndItsExplicitFlag', 0, () => {

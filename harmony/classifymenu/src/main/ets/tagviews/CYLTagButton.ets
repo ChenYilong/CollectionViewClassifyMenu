@@ -20,9 +20,7 @@ import {
   CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel, CYLAnimatedItemStackView, cylIconColorFilter
 } from 'cylanimateditem';
 import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
-import {
-  CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText
-} from 'cylanimateditem';
+import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver, CYLLiquidGlass } from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import {
   CYLTagAnimatedIcon, cylTagAnimatedIconOuterHeight, cylTagAnimatedIconOuterWidth, cylTagAnimationImage
@@ -243,17 +241,24 @@ export class CYLTagButton {
    */
   itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
   /**
-   * What the tag hands the glass as its tint for the contrast rule: the explicit (or pressed) background color, undefined
+   * The glass tint the item's colour resolution judges a colour against: the explicit (or pressed) background color, undefined
    * while there is none (the frosted default tint). Not `backgroundColor`, which holds `GLASS_DEFAULT_TINT` for "none".
    */
   glassTint?: ResourceColor = undefined;
-  /** Whether the title color is explicit (set by the app / configuration / preset); the built-in default never is. */
-  titleColorIsExplicit: boolean = false;
   /**
-   * Whether the icon color is explicit: the style's icon color, or, while that is unset, an explicit title color the icon
-   * follows. The built-in default never is.
+   * The CHANNELS of the title colour, handed to `CYLAnimatedItemColorResolver` (the item's one precedence and adaptation path):
+   * the EXPLICIT colour of the current state (set by the app / configuration / preset: the subclass-explicit level), undefined
+   * while there is none; and the BUILT-IN one (the style's default: the subclass built-in level). The tag never writes the
+   * integrator-owned `titleColor` / `iconColor`.
    */
-  iconColorIsExplicit: boolean = false;
+  subclassTitleColor?: ResourceColor = undefined;
+  builtInTitleColor: ResourceColor = CYLTagAppearance.defaultTextColor;
+  /**
+   * The same two channels of the icon colour: the style's icon color, or, while that is unset, an explicit title color the icon
+   * follows; and the style's built-in colour (the icon follows the title's).
+   */
+  subclassIconColor?: ResourceColor = undefined;
+  builtInIconColor: ResourceColor = CYLTagAppearance.defaultTextColor;
   backgroundImage?: ResourceStr;
   borderColor: ResourceColor = CYLColor.CLEAR;
   borderWidth: number = 0;
@@ -271,8 +276,8 @@ export class CYLTagButton {
    */
   animationImage: ResourceStr = '';
   /**
-   * The color `CYLAnimatedItemView` tints the animated icon's static image with (`iconColor`: `animationImage` /
-   * `animationSelectedImage` while the animation loads and after it fails): the state's `CYLMenuStyle.iconColor` when
+   * The explicit color `CYLAnimatedItemView` tints the animated icon's static image with (its `subclassIconColor` channel:
+   * `animationImage` / `animationSelectedImage` while the animation loads and after it fails): the state's `CYLMenuStyle.iconColor` when
    * the style sets one, as the tag's own static icon is tinted; '' (the image's own colors) otherwise or without an
    * animation.
    */
@@ -1133,25 +1138,46 @@ export class CYLTagButton {
   }
 
   /**
-   * The title color to draw: the shared dark-glass adaptation (`CYLAnimatedItemContrast.adaptedOnGlass`, text contrast 4.5) of an
-   * EXPLICIT title color; the built-in default, flat tags, light mode and non-glass are unchanged. Read when the tag draws, so a
-   * light / dark switch re-resolves it.
+   * The input of the item's colour resolution for the current state (the title, or the icon): the tag's channels in the slot of
+   * the current state only (so the resolver's "missing selected value falls back to the normal one" never lends the normal
+   * state's explicit colour to a selected tag that has none), and the glass state the colour is judged against.
    */
-  adaptedTitleColor(): ResourceColor {
-    const color: ResourceColor = this.titleLabel.textColor;
-    return this.titleColorIsExplicit ? this.adaptedOnGlass(color, CYLAnimatedItemContrastKindText) : color;
+  private colorInput(title: boolean): CYLAnimatedItemColorInput {
+    const input = new CYLAnimatedItemColorInput();
+    const explicit: ResourceColor = (title ? this.subclassTitleColor : this.subclassIconColor) ?? '';
+    const builtIn: ResourceColor = title ? this.builtInTitleColor : this.builtInIconColor;
+    input.enabled = this.enabledValue;
+    input.selected = this.selectedValue;
+    if (!this.enabledValue) {
+      input.subclassExplicit.disabled = explicit;
+    } else if (this.selectedValue) {
+      input.subclassExplicit.selected = explicit;
+      input.subclassBuiltIn.selected = builtIn;
+    } else {
+      input.subclassExplicit.normal = explicit;
+      input.subclassBuiltIn.normal = builtIn;
+    }
+    input.dark = CYLLiquidGlass.isDark();
+    input.drawsGlass = CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.itemBackgroundStyle);
+    input.glassTint = this.glassTint;
+    input.tintAlpha = this.glassTintAlpha;
+    return input;
   }
 
   /**
-   * The icon color to draw (`imageView.tintColor`, or `animationIconColor`): the shared adaptation (icon contrast 3) of an
-   * EXPLICIT icon color; '' (no tint) and unset colors are unchanged.
+   * The title color to draw: the item's resolution (`CYLAnimatedItemColorResolver.resolvedTitleColor`) of the tag's channels.
+   * Read when the tag draws, so a light / dark switch re-resolves it.
    */
-  adaptedIconColor(color: ResourceColor): ResourceColor {
-    return this.iconColorIsExplicit && color !== '' ? this.adaptedOnGlass(color, CYLAnimatedItemContrastKindIcon) : color;
+  resolvedTitleColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.resolvedTitleColor(this.colorInput(true));
   }
 
-  private adaptedOnGlass(color: ResourceColor, kind: string): ResourceColor {
-    return CYLAnimatedItemContrast.adaptedOnGlass(color, kind, this.itemBackgroundStyle, this.glassTint, this.glassTintAlpha);
+  /**
+   * The icon color to draw (a symbol's font color, a bitmap's tint when `imageView.tintsImage`): the item's resolution
+   * (`CYLAnimatedItemColorResolver.resolvedIconColor`) of the tag's channels.
+   */
+  resolvedIconColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.resolvedIconColor(this.colorInput(false));
   }
 
   protected updateAppearance(): void {
@@ -1170,7 +1196,8 @@ export class CYLTagButton {
     this.titleLabel.text = style.displayedTitle(this.titleValue);
     this.titleLabel.font = style.titleFont(state, this.fontScale);
     this.titleLabel.textColor = appearance.textColor;
-    this.titleColorIsExplicit = appearance.explicitTextColor !== undefined;
+    this.subclassTitleColor = appearance.explicitTextColor;
+    this.builtInTitleColor = appearance.textColor;
 
     const pressed = this.highlightedValue && state !== CYLControlState.DISABLED &&
       style.highlightedBackgroundColor !== undefined;
@@ -1185,11 +1212,12 @@ export class CYLTagButton {
     this.glassTintAlpha = state === CYLControlState.SELECTED ? 1 : -1;
     this.glassTint = pressed ? style.highlightedBackgroundColor : appearance.explicitBackgroundColor;
     this.backgroundColor = stateBackground;
-    // The icon tint: the style's icon color as set. On dark Liquid Glass the tag draws an EXPLICIT one through the shared adaptation
-    // (`adaptedIconColor`, `CYLAnimatedItemContrast`); an unset one follows the title color, explicit only when that is. The
-    // animated icon's static image takes the same adapted color (`adaptedIconColor` in build()).
+    // The icon tint: the style's icon color as set is the EXPLICIT channel; an unset one follows the title color, explicit only
+    // when that is, else the built-in channel. The item's resolution (`resolvedIconColor`) picks and adapts; the animated icon's
+    // static image gets the same channels (`CYLTagAnimatedIcon`).
     const explicitIcon = style.explicitIconColor(state);
-    this.iconColorIsExplicit = explicitIcon !== undefined || appearance.explicitTextColor !== undefined;
+    this.subclassIconColor = explicitIcon ?? appearance.explicitTextColor;
+    this.builtInIconColor = appearance.textColor;
     this.imageView.tintColor = style.iconColor(state);
     this.imageView.tintsImage = explicitIcon !== undefined;
     this.animationIconColor = animated && this.imageView.tintsImage ? this.imageView.tintColor : '';
@@ -1293,7 +1321,7 @@ export struct CYLTagButtonComponent {
         Text(this.tl().text ?? '')
           .fontSize(this.tl().font.size)
           .fontWeight(this.tl().font.weight)
-          .fontColor(this.button.adaptedTitleColor())
+          .fontColor(this.button.resolvedTitleColor())
           // `CYLMenuStyle.titleMaxLines` lines at most (`CYLTagTitleMaxLines.unlimited`: as many as the title needs).
           .maxLines(this.tl().maxLines)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1305,7 +1333,7 @@ export struct CYLTagButtonComponent {
         // A system symbol (`$r('sys.symbol.camera')`): `SymbolGlyph`, its font color the icon color of the state.
         SymbolGlyph(this.iv().image as Resource)
           .fontSize(this.symbolSide())
-          .fontColor([this.button.adaptedIconColor(this.iv().tintColor)])
+          .fontColor([this.button.resolvedIconColor()])
           .width(this.part(this.iv()).width > 0 ? this.part(this.iv()).width : this.symbolSide())
           .height(this.part(this.iv()).height > 0 ? this.part(this.iv()).height : this.symbolSide())
           .position({ x: this.part(this.iv()).x, y: this.part(this.iv()).y })
@@ -1317,13 +1345,12 @@ export struct CYLTagButtonComponent {
           .width(this.part(this.iv()).width > 0 ? this.part(this.iv()).width : undefined)
           .height(this.part(this.iv()).height > 0 ? this.part(this.iv()).height : undefined)
           .position({ x: this.part(this.iv()).x, y: this.part(this.iv()).y })
-          .fillColor(this.button.adaptedIconColor(this.iv().tintColor))
+          .fillColor(this.button.resolvedIconColor())
           // Bitmaps too, when the style sets an icon color (see `tintsImage`): an orange PNG on an orange selected tag
           // stayed orange and invisible (HarmonyOS issue Y2). A drawing color filter (`ColorFilter`) applies to every
           // image source; the matrix form had no effect after `fillColor` on the emulator. The filter is the shared
           // component's (`cylIconColorFilter`, `CYLAnimatedItemView.iconColor`), as for the animated icon's static image.
-          .colorFilter(new ColorFilter(cylIconColorFilter(
-            this.iv().tintsImage ? this.button.adaptedIconColor(this.iv().tintColor) : '')))
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.iv().tintsImage ? this.button.resolvedIconColor() : '')))
           .objectFit(this.iv().cornerRadius > 0 ? ImageFit.Cover : ImageFit.Contain)
           .borderRadius(this.iv().cornerRadius)
           .clip(this.iv().cornerRadius > 0)
@@ -1339,7 +1366,10 @@ export struct CYLTagButtonComponent {
             animationURL: this.button.animationURL ?? '',
             image: this.button.animationImage,
             selectedImage: this.button.animationSelectedImage,
-            iconColor: this.button.adaptedIconColor(this.button.animationIconColor),
+            subclassIconColor: this.button.animationIconColor,
+            subclassSelectedIconColor: this.button.animationIconColor,
+            builtInIconColor: this.button.builtInIconColor,
+            builtInSelectedIconColor: this.button.builtInIconColor,
             isSelected: this.button.isSelected,
             iconWidth: this.af().width,
             iconHeight: this.af().height,
