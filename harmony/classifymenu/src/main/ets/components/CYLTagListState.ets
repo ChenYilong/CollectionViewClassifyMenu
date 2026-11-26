@@ -391,7 +391,8 @@ export class CYLTagFoldMetrics {
       appearance.cornerRadius = normal.cornerRadius;
       appearance.margin = normal.margin;
       appearance.font = normal.font;
-      appearance.textColor = normal.textColor;
+      // The normal title color exactly, explicit flag included: the tail cell adapts on dark glass as a plain tag does.
+      appearance.inheritTextColor(normal);
     });
     STATES.forEach((state: number) => style.setIconColor(tint, state));
     const font = control.font;

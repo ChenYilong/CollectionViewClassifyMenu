@@ -21,6 +21,7 @@ export class CYLTagAppearance {
   private storedCornerRadius: number = CYLAnimatedItemCornerRadiusCapsule;
   private storedBorderWidth: number = 0;
   private storedBorderColor?: ResourceColor;
+  private textColorWasSet: boolean = false;
   private borderColorWasSet: boolean = false;
   private borderWidthWasSet: boolean = false;
   /** The built-in border of the style (`CYLMenuStyle`'s constructor): read as the effective border, never explicit. */
@@ -53,6 +54,27 @@ export class CYLTagAppearance {
 
   set textColor(value: ResourceColor) {
     this.storedTextColor = value;
+    this.textColorWasSet = true;
+  }
+
+  /**
+   * The color set on `textColor` (setter, configuration key, preset); undefined when it was never set, was reset, or is the
+   * style's built-in default (`setDefaultTextColor`). On dark Liquid Glass only this color is adapted for contrast.
+   */
+  get explicitTextColor(): ResourceColor | undefined {
+    return this.textColorWasSet ? this.storedTextColor : undefined;
+  }
+
+  /** Sets the built-in title color of the style: the effective color until the app sets one, never explicit. */
+  setDefaultTextColor(color: ResourceColor): void {
+    this.storedTextColor = color;
+    this.textColorWasSet = false;
+  }
+
+  /** Takes over `source`'s title color exactly: the effective color and whether it is explicit. */
+  inheritTextColor(source: CYLTagAppearance): void {
+    this.storedTextColor = source.storedTextColor;
+    this.textColorWasSet = source.textColorWasSet;
   }
 
   get font(): CYLFont {
@@ -127,6 +149,7 @@ export class CYLTagAppearance {
 
   resetTextColor(): void {
     this.storedTextColor = undefined;
+    this.textColorWasSet = false;
   }
 
   resetFont(): void {
@@ -183,6 +206,7 @@ export class CYLTagAppearance {
   reset(): void {
     this.storedBackgroundColor = undefined;
     this.storedTextColor = undefined;
+    this.textColorWasSet = false;
     this.storedFont = undefined;
     this.iconColor = undefined;
     this.storedCornerRadius = CYLAnimatedItemCornerRadiusCapsule;
@@ -202,7 +226,7 @@ export class CYLTagAppearance {
   copy(): CYLTagAppearance {
     const result = new CYLTagAppearance();
     result.storedBackgroundColor = this.storedBackgroundColor;
-    result.storedTextColor = this.storedTextColor;
+    result.inheritTextColor(this);
     result.storedFont = this.storedFont;
     result.iconColor = this.iconColor;
     result.storedCornerRadius = this.storedCornerRadius;
