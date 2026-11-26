@@ -183,10 +183,14 @@ export struct CYLTagAnimatedIcon {
   @Prop selectedImage: ResourceStr = '';
   @Prop isSelected: boolean = false;
   /**
-   * The color the component tints the static image with (`CYLAnimatedItemView.iconColor`, the tag's
-   * `animationIconColor`); '' keeps the image's own colors.
+   * The tag's icon colour CHANNELS (the item's subclass-explicit and subclass built-in levels, never the integrator-owned
+   * `iconColor`): the explicit colour tints the static image and the animation (the tag's `animationIconColor`); '' keeps the
+   * image's own colors. The item resolves and adapts them on dark glass.
    */
-  @Prop iconColor: ResourceColor = '';
+  @Prop subclassIconColor: ResourceColor = '';
+  @Prop subclassSelectedIconColor: ResourceColor = '';
+  @Prop builtInIconColor: ResourceColor = '';
+  @Prop builtInSelectedIconColor: ResourceColor = '';
   /**
    * The playback speed passed to `CYLAnimatedItemView.animationSpeed` for a file drawn by a component-level builder.
    */
@@ -341,7 +345,10 @@ export struct CYLTagAnimatedIcon {
           image: this.image,
           selectedImage: this.selectedImage,
           isItemSelected: this.isSelected,
-          iconColor: this.iconColor,
+          subclassIconColor: this.subclassIconColor,
+          subclassSelectedIconColor: this.subclassSelectedIconColor,
+          builtInIconColor: this.builtInIconColor,
+          builtInSelectedIconColor: this.builtInSelectedIconColor,
           iconSize: this.side(),
           spacing: 0,
           drivesAnimationPlayback: false,
@@ -356,7 +363,10 @@ export struct CYLTagAnimatedIcon {
           image: this.image,
           selectedImage: this.selectedImage,
           isItemSelected: this.isSelected,
-          iconColor: this.iconColor,
+          subclassIconColor: this.subclassIconColor,
+          subclassSelectedIconColor: this.subclassSelectedIconColor,
+          builtInIconColor: this.builtInIconColor,
+          builtInSelectedIconColor: this.builtInSelectedIconColor,
           iconSize: this.side(),
           spacing: 0,
           animationSpeed: this.itemBuilder !== undefined ? this.animationSpeed : 1,
