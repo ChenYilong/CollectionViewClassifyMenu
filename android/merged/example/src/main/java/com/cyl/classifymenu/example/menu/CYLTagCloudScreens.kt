@@ -73,12 +73,18 @@ private fun caption(context: Context, text: String) = TextView(context).apply {
     val d = context.resources.displayMetrics.density
     this.text = text
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-    setTextColor(Color.argb(153, 60, 60, 67))
+    // The secondary label color of the mode (iOS secondaryLabel): dark on the light page, light on the dark page.
+    setTextColor(if (isNightMode(context)) Color.argb(153, 235, 235, 245) else Color.argb(153, 60, 60, 67))
     setPadding((16 * d).toInt(), (8 * d).toInt(), (16 * d).toInt(), 0)
 }
 
+/** Whether the app is in dark (night) mode: the example pages follow it for their own page background and captions. */
+private fun isNightMode(context: Context): Boolean =
+    (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
 private fun column(context: Context, views: List<View>): View = ScrollView(context).apply {
-    setBackgroundColor(Color.rgb(242, 242, 247))
+    // The grouped background of the mode (iOS systemGroupedBackground): #F2F2F7 in light mode, black in dark mode.
+    setBackgroundColor(if (isNightMode(context)) Color.BLACK else Color.rgb(242, 242, 247))
     addView(LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         setPadding(0, (12 * context.resources.displayMetrics.density).toInt(), 0, 0)
