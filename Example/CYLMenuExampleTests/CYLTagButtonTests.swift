@@ -545,7 +545,13 @@ final class CYLTagButtonTests: XCTestCase {
         style.highlightedBackgroundColor = .green
         let pressed = CYLMenuFixtures.tagButton(title: "A", image: nil, style: style)
         pressed.isHighlighted = true
-        XCTAssertEqual(pressed.itemBackgroundColor, .green)
+        // The item owns the pressed look: the tag hands the color as itemHighlightedBackgroundColor; itemBackgroundColor stays the normal one.
+        XCTAssertEqual(pressed.itemHighlightedBackgroundColor, .green)
+        pressed.layoutIfNeeded()
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0
+        glassTint(of: pressed, light)?.getRed(&red, green: &green, blue: &blue, alpha: nil)
+        XCTAssertGreaterThan(green, red, "the glass is tinted with the pressed color while pressed")
+        XCTAssertGreaterThan(green, blue)
     }
 
     func testFlatTagsStillResolveTheBuiltInBackground() {
