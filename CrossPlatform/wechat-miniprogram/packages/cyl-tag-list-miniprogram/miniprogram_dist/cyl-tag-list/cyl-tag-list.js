@@ -7,7 +7,9 @@
  * or an array: the first that can begin wins; this list does not reorder, cyl-tag-cloud does) or the property
  * `longPressAction` decides what a long press on an item does: a callout with the item's `subtitle` (a small bubble with an
  * arrow), or only the event `taglongpress` {section, item, title, subtitle}, which every long press sends (except "none").
- * A tap, a fold, a rebuild or another long press hides the callout; `dismissCallout()` does too. WeChat sends no tap for the
+ * A tap, a fold, a rebuild, a scroll (`onScroll()`, which the page calls from its scroller's `bindscroll` or `onPageScroll`)
+ * or another long press hides the callout; `dismissCallout()` does too. The callout goes below the tag when it would cover
+ * the section header (the core's `placesBelow`). WeChat sends no tap for the
  * release of a long press.
  *
  * Properties: `configuration`, `animationSpeed` (0, the default, uses each section's `style.animationSpeed`; above 0
@@ -38,6 +40,31 @@ function foldTitle(control, expanded) {
   return model.foldTitle(expanded);
 }
 
+/** The callout's font size, line height factor, paddings and line limit (the wxss .cyl-callout). */
+const CALLOUT_FONT_SIZE = 13;
+const CALLOUT_LINE_HEIGHT = 1.35;
+const CALLOUT_VERTICAL_PADDING = 16;
+const CALLOUT_HORIZONTAL_PADDING = 24;
+const CALLOUT_MAX_LINES = 3;
+/** The average glyph width as a fraction of the font size (the same estimate the bubble's width uses). */
+const CALLOUT_GLYPH_WIDTH = 0.9;
+
+/** The bubble's estimated height for a text of `length` characters in a bubble `width` wide. */
+function calloutHeight(width, length) {
+  const room = width - CALLOUT_HORIZONTAL_PADDING;
+  const lines = Math.min(CALLOUT_MAX_LINES, Math.max(1, Math.ceil(length * CALLOUT_FONT_SIZE * CALLOUT_GLYPH_WIDTH / room)));
+  return lines * CALLOUT_FONT_SIZE * CALLOUT_LINE_HEIGHT + CALLOUT_VERTICAL_PADDING;
+}
+
+/** The window's height, or no limit when it cannot be read. */
+function windowHeight() {
+  try {
+    return (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).windowHeight || Infinity;
+  } catch (error) {
+    return Infinity;
+  }
+}
+
 function pixelRatio() {
   try {
     return (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 2;
@@ -62,6 +89,8 @@ Component({
     foldPosition: 'none',
     foldContent: 'title',
     foldColor: '#808080',
+    // The fold chevron turns when expanded (foldControl `rotatesImageWhenExpanded`, true by default).
+    foldRotates: true,
     backgroundStyle: '',
     // Right to left (style key `direction`): the list's CSS direction is in backgroundStyle, this selects the mirrored wxss rules.
     rtl: false,
@@ -153,6 +182,7 @@ Component({
         sections,
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
+        foldRotates: m.foldControl.rotatesImage,
         foldColor: m.foldControl.color || model.resolvedFoldControlColor(m.style, m.foldControl.position === 'headerTrailing'),
         backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}${model.directionCSS(m.style)}`,
         rtl: model.isRtl(m.style),
@@ -258,6 +288,11 @@ Component({
       this.reportFoldState();
     },
 
+    /** The list scrolled (the page's scroller or `onPageScroll`): hides the callout, as the core does on a content offset change. */
+    onScroll() {
+      this.dismissCallout();
+    },
+
     /** Hides the long-press callout. */
     dismissCallout() {
       if (this.data.callout) this.setData({ callout: null });
@@ -282,13 +317,15 @@ Component({
       const query = this.createSelectorQuery();
       query.select(`#cyl-item-${item.key}`).boundingClientRect();
       query.select('.cyl-tag-list').boundingClientRect();
-      query.exec(([itemRect, listRect]) => {
+      // The item's section header, which the bubble must not cover (null when the section has none).
+      query.select(`#cyl-header-s${item.section}`).boundingClientRect();
+      query.exec(([itemRect, listRect, headerRect]) => {
         if (!itemRect || !listRect) return;
         const center = itemRect.left - listRect.left + itemRect.width / 2;
         // The bubble is at most 240 wide; keep it inside the list and point the arrow at the item.
         const width = Math.min(240, Math.max(60, item.subtitle.length * 13 * 0.9 + 24));
         const left = Math.max(8, Math.min(listRect.width - 8 - width, center - width / 2));
-        const below = itemRect.top < 60;
+        const below = model.calloutPlacesBelow(itemRect, calloutHeight(width, item.subtitle.length), headerRect, windowHeight());
         this.setData({
           callout: {
             text: item.subtitle,

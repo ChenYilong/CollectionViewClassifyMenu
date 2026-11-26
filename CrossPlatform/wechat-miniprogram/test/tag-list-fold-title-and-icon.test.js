@@ -59,7 +59,7 @@ test('the header, footer and tail controls show the title and the chevron for ti
 test('the header fold control shows only on foldable sections and reserves no header space on an unfoldable one', () => {
   assert.match(WXML, /wx:if="\{\{section\.canFold && foldPosition === 'headerTrailing'\}\}" class="cyl-fold-header"/);
   // The header itself shows for a title, or for a foldable section (never only for an unfoldable section's control).
-  assert.match(WXML, /<view wx:if="\{\{section\.showsHeader \|\| \(section\.canFold && foldPosition === 'headerTrailing'\)\}\}" class="cyl-header"/);
+  assert.match(WXML, /<view wx:if="\{\{section\.showsHeader \|\| \(section\.canFold && foldPosition === 'headerTrailing'\)\}\}" id="cyl-header-s\{\{section\.index\}\}" class="cyl-header"/);
 });
 
 test('the header fold control is at most 40% of the header and its font is capped; the section title truncates', () => {
@@ -178,6 +178,6 @@ test('room 7: a default single-line header with a short title is unchanged (no w
   const layout = model.sectionLayout(style);
   assert.equal(layout.headerTitleStyle, undefined);
   assert.equal(model.headerHeightForLines(style, 1), model.headerHeightOf(style));
-  // The 12 px spacing is what the control's padding was: the control's text sits where it did.
-  assert.equal(model.HEADER_ITEM_SPACING, 12);
+  // The spacing matches iOS (8 pt) and Android (8 dp); the mini program keeps px here, not rpx.
+  assert.equal(model.HEADER_ITEM_SPACING, 8);
 });
