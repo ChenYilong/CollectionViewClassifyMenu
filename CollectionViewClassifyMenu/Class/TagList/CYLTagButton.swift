@@ -363,7 +363,7 @@ open class CYLTagButton: CYLAnimatedItemView {
 
     /**
      * The delete indicator's elements as color roles of the item (`CYLAnimatedItemColorRole`): the item resolves their colors by its one precedence chain
-     * and adapts the explicit ones on drawn dark glass by the role's kind (label: title 4.5:1; cross and editing icons: icon 3:1). Built-ins are not adapted.
+     * and adapts the explicit ones in dark mode on drawn glass or a flat fill (a tag without a fill is not adapted) by the role's kind (label: title 4.5:1; cross and editing icons: icon 3:1). Built-ins are not adapted.
      * Each hook takes the item as a parameter, so a role holds no reference to its tag.
      */
     private static let indicatorRoles: [CYLAnimatedItemColorRole] = [
@@ -1092,7 +1092,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         // dims the animation while disabled (`itemDisabledAnimationAlpha`) and shows the state's frame (`showsLastFrameWhenSelected`).
         // Colors go to the item by its channels. Precedence (the item's): its own `itemAppearance` > the style's EXPLICIT colors (`setSubclassTitleColor` /
         // `setSubclassIconColor`) > the stack's > this class's built-ins (`applyTitleTintColor` / `applyIconTintColor`: the effective colors) > the component's.
-        // The item adapts the explicit ones on drawn dark glass (and not the built-ins). The tag never sets `animationTint` or `itemAppearance`.
+        // The item adapts the explicit ones in dark mode on drawn glass or a flat fill (and not the built-ins; a tag with no fill is not adapted). The tag never sets `animationTint` or `itemAppearance`.
         titleLabel.text = style.displayedTitle(forTitle: title)
         titleLabel.font = style.titleFont(for: state, traitCollection: traitCollection)
 
@@ -1112,8 +1112,8 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         applyTitleTintColor(appearance.textColor)
         applyIconTintColor(style.iconColor(for: state))
-        // The delete indicator's elements: the style's `deleteIndicatorColor`, else the state's explicit text color, is explicit (the item adapts it on
-        // drawn dark glass); the state's text color is the built-in (as it is).
+        // The delete indicator's elements: the style's `deleteIndicatorColor`, else the state's explicit text color, is explicit (the item adapts it in dark mode on
+        // drawn glass or a flat fill); the state's text color is the built-in (as it is).
         for role in Self.indicatorRoles {
             for tagState in Self.states {
                 setSubclassColor(style.deleteIndicatorColor ?? style.appearance(for: tagState).explicitTextColor, for: tagState, role: role)
