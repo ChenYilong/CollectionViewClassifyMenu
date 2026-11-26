@@ -3,7 +3,7 @@ import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle, CYLL
 import {
   CYLColor, CYLColorKey, CYLFont, CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition, CYLMenuStyle,
   CYLTagAppearance, CYLTagBackgroundStyle, CYLTagButton, CYLTagButtonMetrics, CYLTagFoldButton, CYLTagFoldMetrics,
-  CYLTagListState, CYLTextMeasurer
+  CYLTagListState, CYLTextMeasurer, CYLSectionStyleColors
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -236,6 +236,53 @@ export default function tagGlassBackgroundTest() {
       expect(appearance.isBorderWidthSet).assertFalse();
       expect(appearance.borderColor === undefined).assertTrue();
       expect(appearance.borderWidth).assertEqual(0);
+    });
+
+    it('theGlassBorderGettersFollowTheExplicitColourOnly', 0, () => {
+      const appearance = new CYLTagAppearance();
+      expect(appearance.glassBorderColor === undefined).assertTrue();
+      expect(appearance.glassBorderWidth).assertEqual(0);
+      // The built-in default draws no glass border.
+      appearance.setDefaultBorder(RED, 0.5);
+      expect(appearance.glassBorderColor === undefined).assertTrue();
+      expect(appearance.glassBorderWidth).assertEqual(0);
+      // A width set without a colour draws none either.
+      appearance.borderWidth = 2;
+      expect(appearance.glassBorderColor === undefined).assertTrue();
+      expect(appearance.glassBorderWidth).assertEqual(0);
+      // An explicit colour draws the effective width.
+      appearance.borderColor = BLUE;
+      expect(appearance.glassBorderColor).assertEqual(BLUE);
+      expect(appearance.glassBorderWidth).assertEqual(2);
+      // The button hands exactly these.
+      const style = glassStyle();
+      style.normalAppearance.borderColor = BLUE;
+      style.normalAppearance.borderWidth = 3;
+      expect(CYLTagButton.itemBorderWidth(style, style.normalAppearance)).assertEqual(3);
+      expect(CYLColorKey(CYLTagButton.itemBorderColor(style, style.normalAppearance))).assertEqual(CYLColorKey(BLUE));
+    });
+
+    it('theColourFlagsTellASetTextAndIconColourFromTheDefault', 0, () => {
+      const appearance = new CYLTagAppearance();
+      expect(appearance.isTextColorSet).assertFalse();
+      expect(appearance.isIconColorSet).assertFalse();
+      expect(appearance.explicitIconColor === undefined).assertTrue();
+      appearance.setDefaultTextColor(RED);
+      expect(appearance.isTextColorSet).assertFalse();
+      appearance.textColor = BLUE;
+      appearance.iconColor = RED;
+      expect(appearance.isTextColorSet).assertTrue();
+      expect(appearance.isIconColorSet).assertTrue();
+      expect(appearance.explicitIconColor).assertEqual(RED);
+      appearance.resetTextColor();
+      appearance.iconColor = undefined;
+      expect(appearance.isTextColorSet).assertFalse();
+      expect(appearance.isIconColorSet).assertFalse();
+    });
+
+    it('theBoardSharesTheTagGlassTint', 0, () => {
+      // Both hand "no colour" (transparent) so the glass keeps its frosted default tint.
+      expect(CYLColorKey(CYLSectionStyleColors.glassTint)).assertEqual(CYLColorKey(CYLTagButton.glassTintColor(undefined)));
     });
 
     it('theStyleAndTheConfigurationTellTheDefaultBorderFromAnExplicitOne', 0, () => {

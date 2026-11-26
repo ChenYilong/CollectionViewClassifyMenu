@@ -9,6 +9,8 @@ import {
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
 const LIST_WIDTH: number = 320;
+/** iOS 8 pt, Android 8 dp. */
+const HEADER_ITEM_SPACING_EXPECTED: number = 8;
 /** The default section insets, left and right. */
 const SIDE_INSET: number = 16;
 /** 28 characters are 280 vp wide: one line in the 288 vp a plain header has, two lines beside a fold control. */
@@ -423,6 +425,10 @@ export default function tagFoldTitleAndIconTest() {
       expect(frame.headerFoldX).assertEqual(LIST_WIDTH - SIDE_INSET - list.headerFoldSize(false, LIST_WIDTH, 0).width);
       // A short title fits the room it has.
       expect('Short'.length * CHARACTER_WIDTH <= frame.headerTitleWidth).assertTrue();
+    });
+
+    it('theHeaderItemSpacingIsEightLikeIosAndAndroid', 0, () => {
+      expect(HEADER_ITEM_SPACING).assertEqual(HEADER_ITEM_SPACING_EXPECTED);
     });
   });
 }

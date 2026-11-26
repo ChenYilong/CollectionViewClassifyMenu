@@ -947,7 +947,9 @@ export struct CYLTagListView {
     // The long-press callout: a small bubble with an arrow pointing at this item, above it (below when there is no room).
     .bindPopup(this.calloutKey === `${r.section}-${r.item}` && this.calloutText.length > 0, {
       message: this.calloutText,
-      placement: Placement.Top,
+      // Below the item when the bubble above would cover its section header (CYLTagListState.calloutPlacesBelowItem).
+      placement: this.calloutKey === `${r.section}-${r.item}` &&
+        this.model.calloutPlacesBelowItem({ section: r.section, item: r.item }) ? Placement.Bottom : Placement.Top,
       enableArrow: true,
       showInSubWindow: false,
       autoCancel: true,

@@ -220,19 +220,20 @@ export class CYLTagButton {
    */
   static hasItemBorder(style: CYLMenuStyle, appearance: CYLTagAppearance): boolean {
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
-    return glass ? appearance.explicitBorderColor !== undefined : appearance.borderColor !== undefined;
+    return glass ? appearance.glassBorderColor !== undefined : appearance.borderColor !== undefined;
   }
 
   /** The border colour a tag in `appearance` hands to the modifier (clear when `hasItemBorder` is false). */
   static itemBorderColor(style: CYLMenuStyle, appearance: CYLTagAppearance): ResourceColor {
     const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
-    const color: ResourceColor | undefined = glass ? appearance.explicitBorderColor : appearance.borderColor;
+    const color: ResourceColor | undefined = glass ? appearance.glassBorderColor : appearance.borderColor;
     return color ?? CYLColor.CLEAR;
   }
 
   /** The border width a tag in `appearance` hands to the modifier: 0 without a border (the shared glass rim then applies). */
   static itemBorderWidth(style: CYLMenuStyle, appearance: CYLTagAppearance): number {
-    return CYLTagButton.hasItemBorder(style, appearance) ? appearance.borderWidth : 0;
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    return glass ? appearance.glassBorderWidth : (appearance.borderColor !== undefined ? appearance.borderWidth : 0);
   }
   backgroundColor: ResourceColor = CYLColor.CLEAR;
   /**

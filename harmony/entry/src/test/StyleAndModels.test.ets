@@ -4,6 +4,12 @@ import {
   CYLTagModel
 } from '@cyl/classifymenu';
 
+const BADGE_DOT_DIAMETER: number = 8;
+const BADGE_TEXT_PADDING: number = 4;
+const BADGE_DIAMETER: number = 16;
+const BADGE_SHORT_TEXT_WIDTH: number = 6;
+const BADGE_LONG_TEXT_WIDTH: number = 24;
+
 /**
  * The style value types (CYLMenuStyle, colors) and the tag models (CYLTag, CYLTagModel, CYLTagGroup).
  */
@@ -105,6 +111,19 @@ export default function styleAndModelsTest() {
       const group = new CYLTagGroup();
       group.groupName = 'G';
       expect(group.groupName).assertEqual('G');
+    });
+
+    it('aBadgeDotIsEightVpAndACapsuleKeepsTheCircleForAShortText', 0, () => {
+      expect(CYLTag.badgeDotDiameter).assertEqual(BADGE_DOT_DIAMETER);
+      expect(CYLTag.badgeImageTextPadding).assertEqual(BADGE_TEXT_PADDING);
+      // A short text stays a circle of the diameter.
+      expect(CYLTag.badgeImageWidthForText(BADGE_SHORT_TEXT_WIDTH, BADGE_DIAMETER)).assertEqual(BADGE_DIAMETER);
+      // A long one widens the capsule to the text and the padding on both sides.
+      expect(CYLTag.badgeImageWidthForText(BADGE_LONG_TEXT_WIDTH, BADGE_DIAMETER))
+        .assertEqual(BADGE_LONG_TEXT_WIDTH + 2 * BADGE_TEXT_PADDING);
+      // The text width rounds up.
+      expect(CYLTag.badgeImageWidthForText(BADGE_LONG_TEXT_WIDTH + 0.2, BADGE_DIAMETER))
+        .assertEqual(BADGE_LONG_TEXT_WIDTH + 1 + 2 * BADGE_TEXT_PADDING);
     });
   });
 }
