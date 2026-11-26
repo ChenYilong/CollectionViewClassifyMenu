@@ -27,15 +27,15 @@ export {
 } from './src/main/ets/core/CYLMenuStyle';
 export { CYLTagColors, CYLTagColorTheme } from './src/main/ets/core/CYLTagColors';
 export { CYLImage, CYLImageIsSymbol, CYLResourceTypeSymbol, CYLColorKey } from './src/main/ets/core/CYLTypes';
-export { CYLMenuColorFromString, CYLMenuColorLuminance, CYLMenuRelativeLuminance } from './src/main/ets/core/CYLMenuColor';
-export { CYLIconContrast, CYLRGBA, CYLHSL } from './src/main/ets/core/CYLIconContrast';
+export { CYLMenuColorFromString, CYLMenuColorLuminance } from './src/main/ets/core/CYLMenuColor';
 export { CYLTag, CYLTagDataSource } from './src/main/ets/core/CYLTag';
 export {
   CYLTagModel, CYLTagGroup, CYLTagViewSectionInset, CYLTagViewCellSpacing, CYLTagDefaultListWidth
 } from './src/main/ets/core/CYLTagModel';
 export {
   CYLMenuFoldControl, CYLMenuFoldControlPosition, CYLMenuFoldControlContent, CYLFoldControlMaxFontScale,
-  CYLHeaderFoldMaxWidthFraction
+  CYLHeaderFoldMaxWidthFraction, CYLHeaderFoldAloneMaxFraction, CYLHeaderFoldSharedMaxFraction,
+  CYLHeaderAccessoryMaxFraction
 } from './src/main/ets/core/CYLMenuFoldControl';
 export {
   CYLConfiguration, CYLTagListKey, CYLMenuFoldControlKey, CYLTagSectionKey, CYLTagItemKey, CYLMenuStyleKey,
@@ -45,7 +45,7 @@ export {
 export {
   CYLTagListState, CYLMenuSelectionMode, CYLMenuTitlePosition, CYLMenuFoldStyle, CYLTagButtonMetrics,
   CYLTagFoldMetrics, CYLTagCreateItem, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListConfigurationSource,
-  CYLTextMeasurer
+  CYLTextMeasurer, HEADER_ITEM_SPACING, CALLOUT_GAP, CALLOUT_ESTIMATED_HEIGHT
 } from './src/main/ets/components/CYLTagListState';
 export * from './src/main/ets/imagetag/ImageTagIndex';
 export * from './src/main/ets/classify/ClassifyIndex';

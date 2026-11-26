@@ -30,6 +30,73 @@ export class CYLLiquidGlass {
   static readonly DARK_BRIGHTNESS: number = 0.9;
 
   /**
+   * [EN] The width of the glass rim, vp (Android: 1 dp). [CN] 玻璃边缘细边的宽度，单位 vp（Android 为 1 dp）。
+   */
+  static readonly RIM_WIDTH: number = 1;
+  /**
+   * [EN] Registers ArkUI's system color mode in AppStorage under 'colorMode' (`Environment.envProp`); idempotent, safe to call often. Without it
+   *      the system mode is not tracked. [CN] 把系统颜色模式登记到 AppStorage 的 'colorMode'（`Environment.envProp`）；幂等，可反复调用。
+   */
+  static trackSystemColorMode(): boolean {
+    if (!CYLLiquidGlass.systemModeTracked) {
+      CYLLiquidGlass.systemModeTracked = true;
+      Environment.envProp<ColorMode>('colorMode', ColorMode.LIGHT);
+    }
+    return CYLLiquidGlass.systemModeTracked;
+  }
+  private static systemModeTracked: boolean = false;
+
+  /**
+   * [EN] The one resolver of the color mode: `explicit` (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`) when it is 'dark' or
+   *      'light', else the system mode (`system`, AppStorage 'colorMode' as a ColorMode).
+   * [CN] 颜色模式的唯一解析：`explicit`（AppStorage 的 `cyl_colorMode`）为 'dark' 或 'light' 时取它，否则取系统模式（`system`）。
+   */
+  static resolveDark(explicit: string | undefined, system: number | undefined): boolean {
+    if (explicit === 'dark') {
+      return true;
+    }
+    if (explicit === 'light') {
+      return false;
+    }
+    return system === ColorMode.DARK;
+  }
+
+  /**
+   * [EN] Whether the color mode is dark: the explicit `cyl_colorMode` ('dark' / 'light', set by cyltabbar's `cyl_updateColorMode`) wins; when it
+   *      is unset the system dark / light mode decides. The rule of the rim and the sheen: read when the background is applied.
+   * [CN] 颜色模式是否为深色：明确的 `cyl_colorMode`（'dark' / 'light'，由 cyltabbar 的 `cyl_updateColorMode` 设置）优先；未设置时由系统深浅色决定。
+   *      细边与高光的规则：应用背景时读取。
+   */
+  static isDark(): boolean {
+    CYLLiquidGlass.trackSystemColorMode();
+    return CYLLiquidGlass.resolveDark(AppStorage.get<string>('cyl_colorMode'), AppStorage.get<number>('colorMode'));
+  }
+
+  /**
+   * [EN] The rim of every glass (a tag, a section card behind tags, an item, the tab bar capsule): the hairline of Android's sampled glass, the same on all four edges
+   *      (white 70% on light glass, white 22% on dark glass: the bright edge of the Android screenshots). One definition: the tag list applies it to its cards and tags through
+   *      `CYLAnimatedItemBackgroundModifier`, and no host keeps its own.
+   * [CN] 所有玻璃（标签、标签后的分组卡片、条目、TabBar 胶囊）的细边：Android 采样玻璃的细边，四条边相同（浅色玻璃上为白色 70%，深色玻璃上为白色 22%：Android 截图里明亮的边缘）。
+   *      只有这一份定义：标签列表通过 `CYLAnimatedItemBackgroundModifier` 把它用于卡片与标签，宿主不保留自己的。
+   */
+  static rimEdgeColors(dark: boolean): EdgeColors {
+    const edge: string = dark ? '#38FFFFFF' : '#B3FFFFFF';
+    const colors: EdgeColors = { top: edge, right: edge, bottom: edge, left: edge };
+    return colors;
+  }
+
+  /**
+   * [EN] The sheen of every glass over its tint, top to bottom: a specular band at the top fading down and a faint glow at the bottom (the light of
+   *      the tab bar capsule).
+   * [CN] 所有玻璃在着色之上的高光，自上而下：顶部向下渐隐的高光带与底部微弱的反光（TabBar 胶囊的光）。
+   */
+  static sheenColors(dark: boolean): Array<[ResourceColor, number]> {
+    return dark ?
+      [['#2EFFFFFF', 0], ['#0AFFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#12FFFFFF', 1]] :
+      [['#66FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]];
+  }
+
+  /**
    * [EN] For tests: replaces the rule of `isActive()` (`undefined`, the default, uses the rule). [CN] 供测试使用：替代 `isActive()` 的规则（默认 `undefined`，使用规则）。
    */
   static activeOverride: boolean | undefined = undefined;

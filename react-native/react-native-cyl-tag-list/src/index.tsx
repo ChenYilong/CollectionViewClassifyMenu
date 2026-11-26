@@ -5,6 +5,7 @@ export {
   CylHeaderSeparatorStyle,
   CylSectionBackgroundStyle,
   CylSectionStyle,
+  CylTagBackgroundStyle,
   CylTagLongPressActionName,
   CylTagTitleMaxLinesUnlimited,
 } from './CylTagListConfiguration';
@@ -15,6 +16,8 @@ export type {
   CylInsets,
   CylSectionStyleKeys,
   CylTagListConfiguration,
+  CylTagItemStyle,
+  CylTagLayoutKeys,
   CylTagListItem,
   CylTagListSection,
   CylTagStateStyle,

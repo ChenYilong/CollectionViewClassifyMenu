@@ -13,8 +13,23 @@ import { CYLFont, CYLImage } from './CYLTypes';
  */
 export const CYLFoldControlMaxFontScale: number = 1.3;
 
-/** The widest a fold control in a section header gets, as a fraction of the header's width (the title truncates). */
-export const CYLHeaderFoldMaxWidthFraction: number = 0.4;
+/**
+ * The widest a fold control in a section header gets when it is the only extra view of the header row, as a fraction of
+ * the header's inner width (the width between the header edges); the title gives way.
+ */
+export const CYLHeaderFoldAloneMaxFraction: number = 0.4;
+
+/**
+ * The widest a fold control in a section header gets when a More button, a clear button or an accessory is also shown,
+ * as a fraction of the header's inner width.
+ */
+export const CYLHeaderFoldSharedMaxFraction: number = 0.3;
+
+/** The widest a header accessory view gets, as a fraction of the header's inner width. */
+export const CYLHeaderAccessoryMaxFraction: number = 0.3;
+
+/** The widest a fold control in a section header gets alone: `CYLHeaderFoldAloneMaxFraction` (the older name). */
+export const CYLHeaderFoldMaxWidthFraction: number = CYLHeaderFoldAloneMaxFraction;
 
 /** Where the fold control of a foldable section is. */
 export enum CYLMenuFoldControlPosition {

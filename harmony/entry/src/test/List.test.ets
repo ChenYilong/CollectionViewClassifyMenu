@@ -19,7 +19,8 @@ import tagHeaderMaxLinesAndFoldScaleTest from './TagHeaderMaxLinesAndFoldScale.t
 import tagGlassBackgroundTest from './TagGlassBackground.test';
 import tagFoldTitleAndIconTest from './TagFoldTitleAndIcon.test';
 import tagHeaderFontAndBoardAlignTest from './TagHeaderFontAndBoardAlign.test';
-import iconContrastTest from './IconContrast.test';
+import tagIconColorTest from './TagIconColor.test';
+import tagGlassIconCoverageTest from './TagGlassIconCoverage.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -43,5 +44,6 @@ export default function testsuite() {
   tagGlassBackgroundTest();
   tagFoldTitleAndIconTest();
   tagHeaderFontAndBoardAlignTest();
-  iconContrastTest();
+  tagIconColorTest();
+  tagGlassIconCoverageTest();
 }

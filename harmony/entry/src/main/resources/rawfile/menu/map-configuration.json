@@ -37,7 +37,8 @@
     {
      "title": "Lottie",
      "subtitle": "Long press: a callout shows this subtitle",
-     "animation": "asset:tab_me_animate.json"
+     "animation": "asset:tab_me_animate.json",
+     "animationOptions": { "tint": "title" }
     },
     {
      "title": "GIF",

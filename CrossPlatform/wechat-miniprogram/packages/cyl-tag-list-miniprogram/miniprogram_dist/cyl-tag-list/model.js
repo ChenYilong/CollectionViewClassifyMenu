@@ -12,7 +12,8 @@ const locale = require('../locale.js');
 const { cylAnimatedItemType, cylAnimatedItemSource } = require('../cyl-animated-item/cyl_animated_item_model');
 // The rule for Liquid Glass of CYLTabBarController's cyl-animated-item (the same as iOS CYLAnimatedItemView.isLiquidGlassActive()).
 const {
-  cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive
+  cylAnimatedItemBackground, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylAnimatedItemLiquidGlassIsActive,
+  cylAnimatedItemResolvedTitleColor, cylAnimatedItemResolvedIconColor
 } = require('../cyl-animated-item/cyl_animated_item_model');
 
 // MARK: - Values (CYLConfigurationValue)
@@ -180,8 +181,25 @@ const DEFAULT_DIRECTION = DIRECTIONS.ltr;
 const FOLD_CONTROL_FONT_SIZE = 13;
 const FOLD_CONTROL_MAX_FONT_SIZE = 20;
 
-/** The widest a fold control in a section header may be, as a percentage of the header (the section title truncates at the tail). */
-const FOLD_HEADER_MAX_WIDTH_PERCENT = 40;
+/**
+ * The header room model (docs/tag-section-style.md). INNER WIDTH is the header's content box (the tag column: the list width
+ * minus the header edges). Every two adjacent header views are HEADER_ITEM_SPACING px apart (the fold control's margin on its
+ * leading side; 8 matches the iOS 8 pt and Android 8 dp gap). The fold control is at most
+ * HEADER_FOLD_ALONE_MAX_FRACTION of the inner width, or HEADER_FOLD_SHARED_MAX_FRACTION when More, a clear button or an
+ * accessory also shows (this component's header has none of those, so the alone value applies). The section title takes what
+ * is left, never less than HEADER_TITLE_MIN_EM of the header font (and at least HEADER_TITLE_MIN_WIDTH_PX).
+ */
+const HEADER_ITEM_SPACING = 8;
+const HEADER_FOLD_ALONE_MAX_FRACTION = 0.4;
+const HEADER_FOLD_SHARED_MAX_FRACTION = 0.3;
+const HEADER_TITLE_MIN_EM = 1;
+const HEADER_TITLE_MIN_WIDTH_PX = 1;
+/** The tint alpha of a selected Liquid Glass tag (full colour) and the value that leaves the component's default alpha. */
+const SELECTED_GLASS_TINT_ALPHA = 1;
+const DEFAULT_GLASS_TINT_ALPHA = -1;
+/** The percent of a fraction, for CSS (rounded so that 0.3 gives 30, not 30.000000000000004). */
+const PERCENT_PER_FRACTION = 100;
+const PERCENT_PRECISION = 1000;
 
 /**
  * Dark mode, as iOS's dynamic defaults: a tag's fill is the secondary system background (#1C1C1E), its title the primary
@@ -219,11 +237,9 @@ const SECTION_BACKGROUND_STYLES = { flat: 'flat', liquidGlass: 'liquidGlass' };
 const SECTION_COLORS = {
   light: {
     card: '#FFFFFF', headerBand: '#EFEFF4', groupedBackground: '#F2F2F7', listBackground: '#FFFFFF', separator: 'rgba(60, 60, 67, 0.29)',
-    glassTint: 'rgba(255, 255, 255, 0.5)',
   },
   dark: {
     card: '#1C1C1E', headerBand: '#2C2C2E', groupedBackground: '#000000', listBackground: '#000000', separator: 'rgba(84, 84, 88, 0.6)',
-    glassTint: 'rgba(28, 28, 30, 0.5)',
   },
 };
 const ZERO_INSETS = { top: 0, left: 0, bottom: 0, right: 0 };
@@ -282,11 +298,18 @@ function defaultAppearance(hairline, dark = false) {
     // background is handed to the glass, an unset one leaves the component's default frosted tint (docs/tag-liquid-glass.md).
     backgroundExplicit: false,
     textColor: dark ? DARK_TEXT_COLOR : DEFAULT_TEXT_COLOR,
+    // True when the state's title colour was set by the app / a preset (a built-in default is not): only an explicit colour is
+    // handed through the item's subclass-explicit channel; an unset one goes through the subclass built-in level (cyl-animated-item adapts both).
+    textColorExplicit: false,
     font: { size: 14, weight: 'regular', italic: false },
     iconColor: null,
     cornerRadius: cylAnimatedItemCornerRadiusCapsule,
     borderColor: null,
     borderWidth: 0,
+    // True when the app / a configuration / a preset set the border color (width): under drawn Liquid Glass only an explicit border is
+    // handed to the glass, the built-in default border is dropped so the shared glass rim shows (docs/tag-liquid-glass.md).
+    borderColorExplicit: false,
+    borderWidthExplicit: false,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
     backgroundImage: '',
     hairline,
@@ -438,15 +461,24 @@ function applyAppearance(appearance, configuration, allowsTransparent = false) {
       : opaqueBackground(configuration.backgroundColor);
     appearance.backgroundExplicit = isExplicitBackground(configuration.backgroundColor);
   }
-  if (has('textColor')) appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
+  if (has('textColor')) {
+    appearance.textColor = color(configuration.textColor) || DEFAULT_TEXT_COLOR;
+    appearance.textColorExplicit = color(configuration.textColor) !== null;
+  }
   if (has('font')) appearance.font = fontValue(configuration.font) || { size: 14, weight: 'regular', italic: false };
   if (has('iconColor')) appearance.iconColor = color(configuration.iconColor);
-  if (has('borderColor')) appearance.borderColor = color(configuration.borderColor);
+  if (has('borderColor')) {
+    appearance.borderColor = color(configuration.borderColor);
+    appearance.borderColorExplicit = appearance.borderColor !== null;
+  }
   const sanitized = (n) => (Number.isFinite(n) && n > 0 ? n : 0);
   const radius = numberValue(configuration.cornerRadius);
   if (radius !== null) appearance.cornerRadius = sanitized(radius);
   const width = numberValue(configuration.borderWidth);
-  if (width !== null) appearance.borderWidth = sanitized(width);
+  if (width !== null) {
+    appearance.borderWidth = sanitized(width);
+    appearance.borderWidthExplicit = true;
+  }
   const margin = numberValue(configuration.margin);
   if (margin !== null) {
     appearance.contentInsets.left = sanitized(margin);
@@ -582,7 +614,7 @@ function usualFoldContent(position) {
 }
 
 function foldControlValue(value) {
-  const control = { position: 'none', content: 'title', title: '', collapseTitle: '', color: null };
+  const control = { position: 'none', content: 'title', title: '', collapseTitle: '', color: null, rotatesImage: true };
   if (value == null) return control;
   const positions = {
     none: 'none', footer: 'footer', headertrailing: 'headerTrailing', headerright: 'headerTrailing',
@@ -601,6 +633,8 @@ function foldControlValue(value) {
   if (typeof dictionary.title === 'string') control.title = dictionary.title;
   if (typeof dictionary.collapseTitle === 'string') control.collapseTitle = dictionary.collapseTitle;
   control.color = color(dictionary.color);
+  // `rotatesImageWhenExpanded` (CYLMenuFoldControl): the chevron turns 180 degrees when expanded; true unless set to false.
+  if (boolValue(dictionary.rotatesImageWhenExpanded) === false) control.rotatesImage = false;
   return control;
 }
 
@@ -868,10 +902,104 @@ function stateOf(item, selected) {
   return selected ? 'selected' : 'normal';
 }
 
-/** The effective icon tint of a state (`CYLMenuStyle.iconColor(for:)`): iconColor, else the text color. */
+/** The tint alpha a tag's glass is drawn with: a selected tag keeps its full colour, the others use the component's default (-1). */
+function glassTintAlpha(state) {
+  return state === 'selected' ? SELECTED_GLASS_TINT_ALPHA : DEFAULT_GLASS_TINT_ALPHA;
+}
+
+/**
+ * The effective icon tint of a state (`CYLMenuStyle.iconColor(for:)`): iconColor, else the text color. Kept for callers of the model;
+ * the drawn colour is resolved by the item (`itemColorProperties`).
+ */
 function iconColor(style, state) {
   const appearance = style[state];
   return appearance.iconColor || appearance.textColor;
+}
+
+// The state's part of the channel property names of cyl-animated-item ('' normal, 'Selected', 'Disabled').
+const CHANNEL_STATE_PART = { normal: '', selected: 'Selected', disabled: 'Disabled' };
+
+/**
+ * The item properties cyl-animated-item resolves a tag's colours by (the twin of CYLTagButton handing colours to CYLAnimatedItemView):
+ * the background style, the tint handed to the glass (explicit background or '') and its alpha, the colour mode of the style, and the
+ * COLOUR CHANNELS of the state. An explicit title colour (or an explicit icon colour; the icon follows an explicit title colour) goes
+ * through `subclass...Color`; the effective colour of an unset one goes through `builtIn...Color`. The tag never writes the integrator's
+ * `titleColor` / `iconTint` and has no contrast code: the item's resolvers decide precedence and dark-glass adaptation.
+ */
+function itemColorProperties(style, state) {
+  const appearance = style[state];
+  const part = CHANNEL_STATE_PART[state];
+  const explicitIcon = appearance.iconColor || (appearance.textColorExplicit ? appearance.textColor : '');
+  return {
+    selected: state === 'selected',
+    enabled: state !== 'disabled',
+    itemBackgroundStyle: style.backgroundStyle,
+    itemBackgroundColor: glassHandedColor(style, appearance),
+    itemGlassTintAlpha: glassTintAlpha(state),
+    userInterfaceStyle: style.sectionPalette && style.sectionPalette.dark ? 'dark' : 'light',
+    [`subclass${part}TitleColor`]: appearance.textColorExplicit ? appearance.textColor : '',
+    [`builtIn${part}TitleColor`]: appearance.textColor,
+    [`subclass${part}IconColor`]: explicitIcon,
+    [`builtIn${part}IconColor`]: iconColor(style, state),
+  };
+}
+
+/** The tag's title colour as drawn: the item's resolved title colour of the state. */
+function resolvedTextColor(style, state) {
+  return cylAnimatedItemResolvedTitleColor(itemColorProperties(style, state));
+}
+
+/** The icon tint as drawn (baked into a `system:` symbol): the item's resolved icon colour of the state. */
+function resolvedIconColor(style, state) {
+  return cylAnimatedItemResolvedIconColor(itemColorProperties(style, state));
+}
+
+// The icon colour channel properties of cyl-animated-item, all empty (nothing handed).
+const EMPTY_ICON_CHANNELS = {
+  subclassIconColor: '', subclassSelectedIconColor: '', subclassDisabledIconColor: '',
+  builtInIconColor: '', builtInSelectedIconColor: '', builtInDisabledIconColor: '',
+};
+
+/**
+ * The icon colour the tag hands to the cyl-animated-item that draws a NON-system image or an animation, and the colour of a glyph
+ * fallback. The item is NOT given the glass properties (it would draw a second glass inside the tag's own); instead the colour is
+ * resolved here by the item's own resolver with the tag's glass state (`itemColorProperties`), so it is already lifted on drawn dark
+ * Liquid Glass (icon 3:1), and unchanged on flat, light and disabled. An explicit colour goes through the state's `subclass...IconColor`
+ * channel (it tints a static image), an unset one through `builtIn...IconColor` (it never tints a still, only a one-colour animation).
+ * A baked `system:` symbol already carries its colour and gets no channel. The keys are the item's property names.
+ * @returns {object} the six channel properties and `glyphColor` ('' unless the icon is a glyph fallback)
+ */
+function iconColorData(item, state, style, icon) {
+  const image = state === 'selected' && item.selectedImage ? item.selectedImage : item.image;
+  const baked = icon.iconKind === 'image' && /^system:/.test(image || '');
+  const forwards = icon.iconKind === 'animation' || (icon.iconKind === 'image' && !baked);
+  const channels = { ...EMPTY_ICON_CHANNELS, glyphColor: icon.iconKind === 'glyph' ? resolvedIconColor(style, state) : '' };
+  if (!forwards) return channels;
+  const properties = itemColorProperties(style, state);
+  const part = CHANNEL_STATE_PART[state];
+  const explicitKey = `subclass${part}IconColor`;
+  const key = properties[explicitKey] ? explicitKey : `builtIn${part}IconColor`;
+  return { ...channels, [key]: cylAnimatedItemResolvedIconColor(properties) };
+}
+
+/**
+ * The title and icon colours of the TAIL fold tag (a drawn glass tag like any other): the fold colour is explicit when the app set it
+ * (`explicitColor`, else the style's `foldControlColor` when set), else the tint (built-in); both go through the item's resolvers with
+ * the tag's glass state, so on drawn dark glass they are lifted (title 4.5, icon 3) and elsewhere unchanged. Header and footer folds
+ * are flat and keep `resolvedFoldControlColor`.
+ * @returns {{titleColor: string, iconColor: string}}
+ */
+function tailFoldColors(style, explicitColor) {
+  const explicit = explicitColor || (style.foldControlColorSet ? style.foldControlColor : '');
+  const builtIn = explicitColor || resolvedFoldControlColor(style, false);
+  const properties = {
+    ...itemColorProperties(style, 'normal'),
+    subclassTitleColor: explicit, subclassIconColor: explicit, builtInTitleColor: builtIn, builtInIconColor: builtIn,
+  };
+  return {
+    titleColor: cylAnimatedItemResolvedTitleColor(properties) || builtIn,
+    iconColor: cylAnimatedItemResolvedIconColor(properties) || builtIn,
+  };
 }
 
 /** A CSS line height for a font size (UIFont.systemFont's lineHeight is about 1.19 times its size). */
@@ -967,7 +1095,7 @@ function iconContent(item, state, style, animation) {
   if (!image) return { kind: 'none', src: '', glyph: '' };
   const system = /^system:(.+)$/.exec(image);
   if (!system) return { kind: 'image', src: image, glyph: '' };
-  const uri = symbols.symbolURI(system[1], drawnIconColor(style, state));
+  const uri = symbols.symbolURI(system[1], resolvedIconColor(style, state));
   if (uri) return { kind: 'image', src: uri, glyph: '' };
   return { kind: 'glyph', src: '', glyph: symbols.glyph(system[1]) };
 }
@@ -1007,7 +1135,9 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   const appearance = style[state];
   const rtl = isRtl(style);
   const height = fixedHeight > 0 ? fixedHeight : tagHeight(style);
-  const border = appearance.borderColor ? appearance.borderWidth : 0;
+  // Under drawn glass only an explicit border is handed (an unset one is none: the glass rim applies); flat keeps the default border.
+  const handedBorder = glassHandedBorder(style, appearance);
+  const border = handedBorder.color ? handedBorder.width : 0;
   // Left and right at least the space the shape asks for between the border and the title: cyl-animated-item's
   // cylAnimatedItemLiquidGlassContentInset (14) on a drawn Liquid Glass tag, 0 on flat.
   const sideInset = style.backgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive() ? cylAnimatedItemLiquidGlassContentInset : 0;
@@ -1033,9 +1163,9 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
   // Under drawn Liquid Glass an unset background hands no color ('': the glass component's default frosted tint, so a colorful
   // backdrop shows through); an explicit one (selected tint, preset, app color) keeps the alpha x 0.75 rule. Flat is unchanged.
   const handedColor = glassHandedColor(style, appearance);
-  const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, appearance.borderColor,
+  const itemBackground = cylAnimatedItemBackground(style.backgroundStyle, handedColor, radius, border, handedBorder.color,
     !!(style.sectionPalette && style.sectionPalette.dark), // the color mode picks the glass component's default tint
-    state === 'selected' ? 1 : -1); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
+    glassTintAlpha(state)); // a selected Liquid Glass tag keeps its full color (tint alpha 1, still glass)
   const glass = itemBackground.glass;
   const background = appearance.backgroundImage
     ? `background-image: url("${appearance.backgroundImage}"); background-size: 100% 100%`
@@ -1049,8 +1179,8 @@ function tagLayout(style, item, state, icon, interitemSpacing, lineSpacing, fixe
     rtl ? `margin: 0 0 ${lineSpacing}px ${interitemSpacing}px` : `margin: 0 ${interitemSpacing}px ${lineSpacing}px 0`,
     fontCSS(appearance.font),
     `border-width: ${border}px`,
-    `border-color: ${appearance.borderColor || 'transparent'}`,
-    `color: ${appearance.textColor}`,
+    `border-color: ${handedBorder.color || 'transparent'}`,
+    `color: ${resolvedTextColor(style, state)}`,
     itemBackground.css,
     style.minimumTagSizeWH.width > 0 ? `min-width: ${style.minimumTagSizeWH.width}px` : '',
     `justify-content: ${justify}`,
@@ -1321,17 +1451,8 @@ function opaqueLuminance(text) {
   return relativeLuminance(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX);
 }
 
-// MARK: - Dark glass icon lift (CYLIconContrast of the iOS core)
+// MARK: - Relative luminance (the legible tint)
 
-/** The least WCAG contrast ratio (3:1, the floor for graphics) an icon keeps against the glass. */
-const MINIMUM_CONTRAST_RATIO = 3;
-/** The white share of the default frosted glass in dark mode (white at 0.14; over black about #242424). */
-const FROSTED_GLASS_WHITE_ALPHA = 0.14;
-/** The share of an explicit glass tint's alpha that tints the glass when no tint alpha is given. */
-const DEFAULT_GLASS_TINT_SHARE = 0.75;
-/** The step in which the lift raises the HSL lightness. */
-const LIGHTNESS_STEP = 0.005;
-const LIGHTNESS_MAX = 1;
 const SRGB_LINEAR_CUTOFF = 0.03928;
 const SRGB_LINEAR_SLOPE = 12.92;
 const SRGB_GAMMA = 2.4;
@@ -1340,98 +1461,11 @@ const SRGB_SCALE = 1.055;
 const LUMA_RED = 0.2126;
 const LUMA_GREEN = 0.7152;
 const LUMA_BLUE = 0.0722;
-/** The flare term of the WCAG contrast ratio. */
-const CONTRAST_FLARE = 0.05;
-const HUE_SECTORS = 6;
 
 /** WCAG relative luminance of an sRGB color, components 0..1. */
 function relativeLuminance(red, green, blue) {
   const channel = (s) => (s <= SRGB_LINEAR_CUTOFF ? s / SRGB_LINEAR_SLOPE : ((s + SRGB_OFFSET) / SRGB_SCALE) ** SRGB_GAMMA);
   return LUMA_RED * channel(red) + LUMA_GREEN * channel(green) + LUMA_BLUE * channel(blue);
-}
-
-/** The WCAG contrast ratio of two relative luminances, 1 to 21. */
-function contrastRatio(first, second) {
-  return (Math.max(first, second) + CONTRAST_FLARE) / (Math.min(first, second) + CONTRAST_FLARE);
-}
-
-/**
- * The reference luminance the icon is judged against, with the glass over a black backdrop: the default frosted glass (`glassTint`
- * missing, invalid or fully transparent) is white at FROSTED_GLASS_WHITE_ALPHA; an explicit tint is its color times its alpha
- * times `tintAlpha` (DEFAULT_GLASS_TINT_SHARE when missing or negative, as the glass component's rule).
- */
-function glassReferenceLuminance(glassTint, tintAlpha) {
-  const tint = glassTint ? rgbaOf(color(glassTint) || glassTint) : null;
-  if (!tint || !(tint.a > 0)) return relativeLuminance(FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA, FROSTED_GLASS_WHITE_ALPHA);
-  const share = tint.a * (typeof tintAlpha === 'number' && tintAlpha >= 0 ? tintAlpha : DEFAULT_GLASS_TINT_SHARE);
-  return relativeLuminance((tint.r / RGB_MAX) * share, (tint.g / RGB_MAX) * share, (tint.b / RGB_MAX) * share);
-}
-
-/** HSL of an sRGB color (components 0..1): hue, saturation and lightness all 0..1. */
-function hslFromRgb(red, green, blue) {
-  const high = Math.max(red, green, blue);
-  const low = Math.min(red, green, blue);
-  const lightness = (high + low) / 2;
-  const delta = high - low;
-  if (!(delta > 0)) return { hue: 0, saturation: 0, lightness };
-  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
-  let hue;
-  if (high === red) {
-    hue = (green - blue) / delta;
-    if (hue < 0) hue += HUE_SECTORS;
-  } else if (high === green) {
-    hue = (blue - red) / delta + 2;
-  } else {
-    hue = (red - green) / delta + 4;
-  }
-  return { hue: hue / HUE_SECTORS, saturation, lightness };
-}
-
-/** The sRGB color {red, green, blue} (0..1) of an HSL triple (all 0..1). */
-function rgbFromHsl(hue, saturation, lightness) {
-  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
-  const sector = hue * HUE_SECTORS;
-  const second = chroma * (1 - Math.abs((sector % 2) - 1));
-  const base = lightness - chroma / 2;
-  const parts = [[chroma, second, 0], [second, chroma, 0], [0, chroma, second], [0, second, chroma], [second, 0, chroma],
-    [chroma, 0, second]][Math.floor(sector) % HUE_SECTORS];
-  return { red: parts[0] + base, green: parts[1] + base, blue: parts[2] + base };
-}
-
-/** A CSS color text of 0..1 components: '#RRGGBB' when opaque, else rgba(). */
-function cssFromUnit(red, green, blue, alpha) {
-  const byte = (x) => Math.max(0, Math.min(RGB_MAX, Math.round(x * RGB_MAX)));
-  if (alpha >= OPAQUE_ALPHA) return `#${[red, green, blue].map((x) => byte(x).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
-  return `rgba(${byte(red)}, ${byte(green)}, ${byte(blue)}, ${alpha})`;
-}
-
-/**
- * The icon color to draw in dark mode on glass: `iconColor` itself when the rule does not apply (an invalid color, or one that
- * already has MINIMUM_CONTRAST_RATIO against the glass), else the color with its HSL lightness raised in LIGHTNESS_STEP steps, hue,
- * saturation and alpha kept, up to white. Colors here are static (no per-mode colors exist), so the "dynamic" case never arises.
- * Pure: the same input gives the same output. The caller calls it only when glass is drawn and the mode is dark.
- * @param {string} iconColor a CSS color text ('#RRGGBB', rgb(), rgba(), a UIColor name)
- * @param {string} [glassTint] the explicit glass color ('' or missing: the default frosted glass)
- * @param {number} [tintAlpha] the tint alpha the glass uses (missing or negative: DEFAULT_GLASS_TINT_SHARE)
- */
-function liftedIconColor(iconColor, glassTint, tintAlpha) {
-  const c = rgbaOf(color(iconColor) || iconColor);
-  if (!c) return iconColor;
-  const reference = glassReferenceLuminance(glassTint, tintAlpha);
-  const hsl = hslFromRgb(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX);
-  // The contrast of the color as it is drawn: its components rounded to whole bytes, so the result keeps the ratio it was judged by.
-  const drawn = (x) => Math.round(Math.max(0, Math.min(1, x)) * RGB_MAX) / RGB_MAX;
-  const ratioAt = (lightness) => {
-    const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness);
-    return contrastRatio(relativeLuminance(drawn(rgb.red), drawn(rgb.green), drawn(rgb.blue)), reference);
-  };
-  if (ratioAt(hsl.lightness) >= MINIMUM_CONTRAST_RATIO) return iconColor;
-  let lightness = hsl.lightness;
-  while (lightness < LIGHTNESS_MAX && ratioAt(lightness) < MINIMUM_CONTRAST_RATIO) {
-    lightness = Math.min(LIGHTNESS_MAX, lightness + LIGHTNESS_STEP);
-  }
-  const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness);
-  return cssFromUnit(rgb.red, rgb.green, rgb.blue, c.a);
 }
 
 /** Whether the tag's Liquid Glass background is really drawn (the predicate of the glass background of `tagLayout`). */
@@ -1440,24 +1474,25 @@ function isGlassDrawn(style) {
 }
 
 /**
+ * The border handed to the glass: under drawn glass an unset color or width is none (null / 0, the shared glass rim applies; the
+ * selected state's built-in app-tint border included), an explicit one is kept. Flat tags hand the appearance's border unchanged.
+ * @returns {{color: (string|null), width: number}}
+ */
+function glassHandedBorder(style, appearance) {
+  if (!isGlassDrawn(style)) return { color: appearance.borderColor, width: appearance.borderWidth };
+  return {
+    color: appearance.borderColorExplicit ? appearance.borderColor : null,
+    // A width alone draws no border; with an explicit colour the width is the explicit one, else the default.
+    width: appearance.borderColorExplicit ? appearance.borderWidth : 0,
+  };
+}
+
+/**
  * The color handed to the glass: under drawn glass an unset background hands none (''), else the appearance's own color.
  * Flat tags hand it unchanged.
  */
 function glassHandedColor(style, appearance) {
   return isGlassDrawn(style) && !appearance.backgroundExplicit ? '' : appearance.backgroundColor;
-}
-
-/**
- * The icon color a state draws: `iconColor` (the explicit color, else the text color), lifted by `liftedIconColor` only when
- * glass is drawn, the mode is dark (`sectionPalette.dark`) and the state has an EXPLICIT icon color. Light mode, flat tags,
- * the built-in (unset) icon color and colors that already pass are never changed. It feeds the icon tint; the Mini Program
- * has no separate animation tint (an animation is drawn by its engine as it is).
- */
-function drawnIconColor(style, state) {
-  const appearance = style[state];
-  const dark = !!(style.sectionPalette && style.sectionPalette.dark);
-  if (!appearance.iconColor || !dark || !isGlassDrawn(style)) return iconColor(style, state);
-  return liftedIconColor(appearance.iconColor, glassHandedColor(style, appearance), state === 'selected' ? 1 : null);
 }
 
 /** Black on a light opaque background, white on a dark one; null when the background is not opaque. */
@@ -1493,10 +1528,13 @@ function resolvedFoldControlColor(style, inHeader = false) {
   return resolveTint(style, inHeader && hasHeaderBand(style) ? style.headerBackgroundColor : null);
 }
 
-/** The card's color as drawn: its own (the glass tint when glass), else the card color or the glass tint of the color mode. */
+/**
+ * The card's color as drawn: its own; for drawn glass '' when unset (no color: cyl-animated-item's default frosted tint, the same one a
+ * glass tag with no background gets, so the board and the tags are one glass style); else the card color of the color mode.
+ */
 function resolvedSectionBackgroundColor(style) {
   const fallback = resolvedSectionBackgroundStyle(style) === SECTION_BACKGROUND_STYLES.liquidGlass
-    ? style.sectionPalette.glassTint : style.sectionPalette.card;
+    ? '' : style.sectionPalette.card;
   return style.sectionBackgroundColor || fallback;
 }
 
@@ -1522,12 +1560,68 @@ function headerTitleCSS(maxLines) {
     : `white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: ${maxLines}; overflow: hidden; text-overflow: ellipsis`;
 }
 
-/** The CSS font size of a fold / More control: `size` px, never above FOLD_CONTROL_MAX_FONT_SIZE (the system font size scales text up). */
-/** The CSS width cap of a fold control in a section header: at most FOLD_HEADER_MAX_WIDTH_PERCENT of the header. */
-function foldHeaderWidthCSS() {
-  return `max-width: ${FOLD_HEADER_MAX_WIDTH_PERCENT}%`;
+/** The header's INNER WIDTH at the list width `listWidth`: between the header edges (the tag column), never negative. */
+function headerInnerWidth(style, listWidth) {
+  const edges = headerEdges(style);
+  return Math.max(0, listWidth - edges.left - edges.right);
 }
 
+/** The fold control's width cap as a fraction of the inner width: the shared one when More, clear or an accessory also shows. */
+function headerFoldMaxFraction(shared = false) {
+  return shared ? HEADER_FOLD_SHARED_MAX_FRACTION : HEADER_FOLD_ALONE_MAX_FRACTION;
+}
+
+/**
+ * The fold control's width: its natural width in the WIDER of the collapsed and expanded states, capped at the fraction of the
+ * inner width. One number for both states, so the title room does not change when the control is toggled. Pure.
+ */
+function headerFoldWidth(innerWidth, collapsedWidth, expandedWidth, shared = false) {
+  return Math.min(Math.max(collapsedWidth, expandedWidth), headerFoldMaxFraction(shared) * innerWidth);
+}
+
+/**
+ * The title's maximum width (px): the inner width minus the fixed parts present (`fixedWidths`, the fold control's width and any
+ * other part's) minus HEADER_ITEM_SPACING for each of them, never below the title's minimum (HEADER_TITLE_MIN_EM of the header
+ * font, at least HEADER_TITLE_MIN_WIDTH_PX). With no fixed part it is the inner width. The title wraps to `headerMaxLines` at
+ * exactly this width; the CSS reaches the same width by giving the fixed parts `flex: none` and the title `flex: 0 1 auto` with
+ * `min-width` of the minimum. Pure.
+ */
+function headerTitleMaxWidth(style, innerWidth, fixedWidths = []) {
+  const minimum = Math.max(HEADER_TITLE_MIN_WIDTH_PX, HEADER_TITLE_MIN_EM * style.headerFont.size);
+  const taken = fixedWidths.reduce((sum, width) => sum + width, 0) + HEADER_ITEM_SPACING * fixedWidths.length;
+  return fixedWidths.length ? Math.max(minimum, innerWidth - taken) : innerWidth;
+}
+
+/** The number of lines a title of `textWidth` px takes at `room` px, at most `maxLines` (an even split of whole lines; at least one). */
+function headerTitleLines(textWidth, room, maxLines) {
+  return Math.min(maxLines, Math.max(1, Math.ceil(textWidth / Math.max(1, room))));
+}
+
+/**
+ * The header's height for a title of `lines` lines: the fixed (or minimum) headerHeight for a one-line header, and for a wrapping
+ * one (headerMaxLines above 1) the minimum or the lines plus the wrap padding, whichever is taller; the same numbers
+ * `sectionLayout` writes into the CSS (`min-height`, `padding`).
+ */
+function headerHeightForLines(style, lines) {
+  const minimum = headerHeightOf(style);
+  if (!(style.headerMaxLines > HEADER_TITLE_MAX_LINES.single)) return minimum;
+  const padding = isHeaderTightToBoard(style) ? HEADER_BOARD_TITLE_PADDING / 2 : HEADER_WRAP_VERTICAL_PADDING;
+  return Math.max(minimum, lines * lineHeight(style.headerFont.size) + 2 * padding);
+}
+
+/**
+ * The CSS of the fold control in a section header: it never shrinks (`flex: none`), is at most the fraction of the header's
+ * content box, and sits HEADER_ITEM_SPACING from the title on its leading side (the physical side swaps right to left).
+ * `options.rtl`, `options.shared` (More, clear or an accessory also shows).
+ */
+function foldHeaderWidthCSS(options = {}) {
+  const percent = Math.round(headerFoldMaxFraction(options.shared) * PERCENT_PER_FRACTION * PERCENT_PRECISION) / PERCENT_PRECISION;
+  const near = options.rtl ? 'right' : 'left';
+  const far = options.rtl ? 'left' : 'right';
+  return `flex: none; max-width: ${percent}%; margin-${near}: ${HEADER_ITEM_SPACING}px; margin-${far}: 0`;
+}
+
+/** The CSS font size of a fold / More control: `size` px, never above FOLD_CONTROL_MAX_FONT_SIZE (the system font size scales text up). */
 function foldControlFontCSS(size = FOLD_CONTROL_FONT_SIZE) {
   return `font-size: min(${size}px, ${FOLD_CONTROL_MAX_FONT_SIZE}px)`;
 }
@@ -1601,7 +1695,29 @@ function coderString(value) {
   return `{${n(value.top)}, ${n(value.left)}, ${n(value.bottom)}, ${n(value.right)}}`;
 }
 
+/** The gap between the callout bubble and the tag (the wxss translateY of .cyl-callout) and the room it needs above the tag. */
+const CALLOUT_GAP = 8;
+const CALLOUT_MIN_ROOM_ABOVE = 60;
+
+/**
+ * Whether the callout goes below the tag (the core's `CYLTagLongPressAction.placesBelow`). Above first; below when there is
+ * no room above (the tag's top is under CALLOUT_MIN_ROOM_ABOVE) or when the bubble would cover `header` (the section header
+ * above a first-row tag) and it fits below; above when neither side is free of the header and below does not fit. Pure:
+ * `target` and `header` are {top, bottom} in one coordinate space; `header` may be null; `bottomLimit` may be omitted
+ * (no limit).
+ */
+function calloutPlacesBelow(target, height, header, bottomLimit = Infinity) {
+  if (target.top < CALLOUT_MIN_ROOM_ABOVE) return true;
+  if (!header || !(header.bottom > header.top)) return false;
+  const aboveTop = target.top - height - CALLOUT_GAP;
+  // Compare the vertical ranges only: the bubble is clamped horizontally and may be wider than the header's text.
+  const coversHeader = header.top < aboveTop + height && header.bottom > aboveTop;
+  const fitsBelow = target.bottom + CALLOUT_GAP + height <= bottomLimit;
+  return coversHeader && fitsBelow;
+}
+
 module.exports = {
+  calloutPlacesBelow, CALLOUT_GAP, CALLOUT_MIN_ROOM_ABOVE,
   cylAnimatedItemCornerRadiusCapsule,
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
@@ -1609,14 +1725,13 @@ module.exports = {
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
   foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
-  iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
-  MINIMUM_CONTRAST_RATIO, FROSTED_GLASS_WHITE_ALPHA, DEFAULT_GLASS_TINT_SHARE, relativeLuminance, contrastRatio,
-  glassReferenceLuminance, hslFromRgb, rgbFromHsl, liftedIconColor, drawnIconColor,
+  iconContent, animatedIcon, itemColorProperties, iconColorData, tailFoldColors, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS, lineHeight,
   TINT_LUMINANCE_THRESHOLD, resolveTint, resolvedHeaderTextColor, resolvedFoldControlColor,
   SECTION_STYLES, DEFAULT_SECTION_STYLE, SECTION_BACKGROUND_STYLES, resolvedSectionBackgroundStyle, HEADER_SEPARATOR_STYLES, SECTION_METRICS, SECTION_COLORS, isInsetGrouped, boardInset, cardInsets, contentColumn, tagColumn, boardColumn,
   columnAt, headerEdges, headerHeightOf, headerSeparator, resolvedBackgroundColor, resolvedSectionBackgroundColor,
   resolvedHeaderSeparatorColor,
   HEADER_TITLE_MAX_LINES, HEADER_WRAP_VERTICAL_PADDING, HEADER_BOARD_TITLE_PADDING, HEADER_BOARD_SPACING, isHeaderTightToBoard, headerBoardOffset, DIRECTIONS, DEFAULT_DIRECTION, isRtl, directionCSS,
   FOLD_CONTROL_FONT_SIZE, FOLD_CONTROL_MAX_FONT_SIZE, foldControlFontCSS,
-  FOLD_HEADER_MAX_WIDTH_PERCENT, foldHeaderWidthCSS, FOLD_CONTENT_TITLE_AND_ICON, longerFoldTitle,
+  HEADER_ITEM_SPACING, HEADER_FOLD_ALONE_MAX_FRACTION, HEADER_FOLD_SHARED_MAX_FRACTION, HEADER_TITLE_MIN_EM, HEADER_TITLE_MIN_WIDTH_PX,
+  headerInnerWidth, headerFoldMaxFraction, headerFoldWidth, headerTitleMaxWidth, headerTitleLines, headerHeightForLines, foldHeaderWidthCSS,FOLD_CONTENT_TITLE_AND_ICON, longerFoldTitle,
 };

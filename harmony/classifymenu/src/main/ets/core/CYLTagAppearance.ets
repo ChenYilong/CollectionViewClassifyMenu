@@ -20,15 +20,18 @@ export class CYLTagAppearance {
   private storedFont?: CYLFont;
   private storedCornerRadius: number = CYLAnimatedItemCornerRadiusCapsule;
   private storedBorderWidth: number = 0;
+  private storedBorderColor?: ResourceColor;
+  private textColorWasSet: boolean = false;
+  private borderColorWasSet: boolean = false;
+  private borderWidthWasSet: boolean = false;
+  /** The built-in border of the style (`CYLMenuStyle`'s constructor): read as the effective border, never explicit. */
+  private defaultBorderColor?: ResourceColor;
+  private defaultBorderWidth: number = 0;
   private storedContentInsets: CYLEdgeInsets = new CYLEdgeInsets(5, 10, 5, 10);
   /**
    * The icon tint; undefined uses `textColor`. Any `ResourceColor`, a theme color included.
    */
   iconColor?: ResourceColor;
-  /**
-   * The border; undefined draws none. Any `ResourceColor`.
-   */
-  borderColor?: ResourceColor;
   backgroundImage?: ResourceStr;
 
   /**
@@ -51,6 +54,27 @@ export class CYLTagAppearance {
 
   set textColor(value: ResourceColor) {
     this.storedTextColor = value;
+    this.textColorWasSet = true;
+  }
+
+  /**
+   * The color set on `textColor` (setter, configuration key, preset); undefined when it was never set, was reset, or is the
+   * style's built-in default (`setDefaultTextColor`). On dark Liquid Glass only this color is adapted for contrast.
+   */
+  get explicitTextColor(): ResourceColor | undefined {
+    return this.textColorWasSet ? this.storedTextColor : undefined;
+  }
+
+  /** Sets the built-in title color of the style: the effective color until the app sets one, never explicit. */
+  setDefaultTextColor(color: ResourceColor): void {
+    this.storedTextColor = color;
+    this.textColorWasSet = false;
+  }
+
+  /** Takes over `source`'s title color exactly: the effective color and whether it is explicit. */
+  inheritTextColor(source: CYLTagAppearance): void {
+    this.storedTextColor = source.storedTextColor;
+    this.textColorWasSet = source.textColorWasSet;
   }
 
   get font(): CYLFont {
@@ -75,12 +99,85 @@ export class CYLTagAppearance {
     return this.storedBackgroundColor !== undefined;
   }
 
+  /**
+   * The border; undefined draws none. Any `ResourceColor`. Reads the effective color (the style's built-in default until the
+   * app sets one); under Liquid Glass only an explicit one is drawn (`explicitBorderColor`).
+   */
+  get borderColor(): ResourceColor | undefined {
+    return this.borderColorWasSet ? this.storedBorderColor : this.defaultBorderColor;
+  }
+
+  set borderColor(value: ResourceColor | undefined) {
+    this.storedBorderColor = value;
+    this.borderColorWasSet = true;
+  }
+
+  /** The color set on `borderColor`; undefined when it was never set, was reset, or was set to none. */
+  get explicitBorderColor(): ResourceColor | undefined {
+    return this.borderColorWasSet ? this.storedBorderColor : undefined;
+  }
+
+  /** True when `borderColor` was set (setter, configuration key, preset), even to none; false for the built-in default. */
+  get isBorderColorSet(): boolean {
+    return this.borderColorWasSet;
+  }
+
+  /** True when `borderWidth` was set (setter, configuration key, preset); false for the built-in default. */
+  get isBorderWidthSet(): boolean {
+    return this.borderWidthWasSet;
+  }
+
+  /**
+   * The border drawn under Liquid Glass: the EXPLICIT color decides (iOS `glassBorderColor`). An explicit color draws the
+   * border; nothing explicit (the built-in default, or a width set alone) draws none, so the shared glass rim shows.
+   */
+  get glassBorderColor(): ResourceColor | undefined {
+    return this.explicitBorderColor;
+  }
+
+  /** The width of the glass border: the effective width when `glassBorderColor` is defined, else 0 (iOS `glassBorderWidth`). */
+  get glassBorderWidth(): number {
+    return this.glassBorderColor !== undefined ? this.borderWidth : 0;
+  }
+
+  /** True when `textColor` was set to a color (and not reset or the style's built-in default; iOS `isTextColorSet`). */
+  get isTextColorSet(): boolean {
+    return this.textColorWasSet;
+  }
+
+  /** The color set on `iconColor`; undefined when it is unset and the icon follows the title (iOS `explicitIconColor`). */
+  get explicitIconColor(): ResourceColor | undefined {
+    return this.iconColor;
+  }
+
+  /** True when `iconColor` was set to a color (and not reset; iOS `isIconColorSet`). */
+  get isIconColorSet(): boolean {
+    return this.iconColor !== undefined;
+  }
+
+  /** Sets the built-in border of the style: the effective border until the app sets one, never explicit. */
+  setDefaultBorder(color: ResourceColor | undefined, width: number): void {
+    this.defaultBorderColor = color;
+    this.defaultBorderWidth = sanitized(width);
+  }
+
+  /** Takes over `source`'s border exactly: the values, which of them are explicit, and the built-in default. */
+  inheritBorder(source: CYLTagAppearance): void {
+    this.storedBorderColor = source.storedBorderColor;
+    this.borderColorWasSet = source.borderColorWasSet;
+    this.storedBorderWidth = source.storedBorderWidth;
+    this.borderWidthWasSet = source.borderWidthWasSet;
+    this.defaultBorderColor = source.defaultBorderColor;
+    this.defaultBorderWidth = source.defaultBorderWidth;
+  }
+
   resetBackgroundColor(): void {
     this.storedBackgroundColor = undefined;
   }
 
   resetTextColor(): void {
     this.storedTextColor = undefined;
+    this.textColorWasSet = false;
   }
 
   resetFont(): void {
@@ -101,11 +198,12 @@ export class CYLTagAppearance {
   }
 
   get borderWidth(): number {
-    return this.storedBorderWidth;
+    return this.borderWidthWasSet ? this.storedBorderWidth : this.defaultBorderWidth;
   }
 
   set borderWidth(value: number) {
     this.storedBorderWidth = sanitized(value);
+    this.borderWidthWasSet = true;
   }
 
   get contentInsets(): CYLEdgeInsets {
@@ -136,11 +234,16 @@ export class CYLTagAppearance {
   reset(): void {
     this.storedBackgroundColor = undefined;
     this.storedTextColor = undefined;
+    this.textColorWasSet = false;
     this.storedFont = undefined;
     this.iconColor = undefined;
     this.storedCornerRadius = CYLAnimatedItemCornerRadiusCapsule;
-    this.borderColor = undefined;
+    this.storedBorderColor = undefined;
+    this.borderColorWasSet = false;
+    this.defaultBorderColor = undefined;
     this.storedBorderWidth = 0;
+    this.borderWidthWasSet = false;
+    this.defaultBorderWidth = 0;
     this.storedContentInsets = new CYLEdgeInsets(5, 10, 5, 10);
     this.backgroundImage = undefined;
   }
@@ -151,12 +254,11 @@ export class CYLTagAppearance {
   copy(): CYLTagAppearance {
     const result = new CYLTagAppearance();
     result.storedBackgroundColor = this.storedBackgroundColor;
-    result.storedTextColor = this.storedTextColor;
+    result.inheritTextColor(this);
     result.storedFont = this.storedFont;
     result.iconColor = this.iconColor;
     result.storedCornerRadius = this.storedCornerRadius;
-    result.borderColor = this.borderColor;
-    result.storedBorderWidth = this.storedBorderWidth;
+    result.inheritBorder(this);
     result.storedContentInsets = this.storedContentInsets;
     result.backgroundImage = this.backgroundImage;
     return result;

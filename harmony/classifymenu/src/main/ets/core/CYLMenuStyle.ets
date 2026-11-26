@@ -143,8 +143,12 @@ export class CYLSectionStyleColors {
   static readonly groupedBackground: ResourceColor = $r('app.color.cyl_section_grouped_background');
   /** The header divider: the system separator color. */
   static readonly separator: ResourceColor = $r('app.color.cyl_section_separator');
-  /** The tint of a Liquid Glass card with no `sectionBackgroundColor`: translucent white; translucent #1C1C1E in dark mode. */
-  static readonly glassTint: ResourceColor = $r('app.color.cyl_section_glass_tint');
+  /**
+   * What a Liquid Glass card with no `sectionBackgroundColor` hands to the glass: a transparent color, which
+   * `CYLAnimatedItemBackgroundModifier` reads as "no color", so the board draws the SAME frosted default tint and edge as a glass tag
+   * (one glass style for the tag and the board; it used to be a tint of its own).
+   */
+  static readonly glassTint: ResourceColor = Color.Transparent;
 }
 
 /**
@@ -471,15 +475,13 @@ export class CYLMenuStyle {
   }
 
   constructor() {
-    this.storedNormal.borderColor = CYLColor.white(0.82);
-    this.storedNormal.borderWidth = HAIRLINE;
+    // The built-in borders are defaults, not explicit: a Liquid Glass tag hands none of them (its shared rim applies).
+    this.storedNormal.setDefaultBorder(CYLColor.white(0.82), HAIRLINE);
     this.storedSelected.backgroundColor = CYLColor.APP_TINT;
-    this.storedSelected.textColor = CYLColor.WHITE;
-    this.storedSelected.borderColor = CYLColor.APP_TINT;
-    this.storedSelected.borderWidth = HAIRLINE;
-    this.storedDisabled.textColor = CYLColor.white(0.7);
-    this.storedDisabled.borderColor = CYLColor.white(0.88);
-    this.storedDisabled.borderWidth = HAIRLINE;
+    this.storedSelected.setDefaultTextColor(CYLColor.WHITE);
+    this.storedSelected.setDefaultBorder(CYLColor.APP_TINT, HAIRLINE);
+    this.storedDisabled.setDefaultTextColor(CYLColor.white(0.7));
+    this.storedDisabled.setDefaultBorder(CYLColor.white(0.88), HAIRLINE);
   }
 
   get normalAppearance(): CYLTagAppearance {
@@ -574,7 +576,7 @@ export class CYLMenuStyle {
 
   /**
    * The icon color the style set for `state` (`setIconColor`); undefined while it is unset, when the icon follows the text
-   * color (the built-in default, which the dark glass icon lift never touches: `CYLIconContrast`).
+   * color (the built-in default). The tag hands the item only an explicit color; the item adapts it on dark glass.
    */
   explicitIconColor(state: number): ResourceColor | undefined {
     return this.appearance(state).iconColor;
@@ -703,7 +705,7 @@ export class CYLMenuStyle {
     CYLTagBackgroundStyle.liquidGlass : CYLTagBackgroundStyle.flat;
   }
 
-  /** The card's color as drawn: the glass tint for the drawn glass (the app's color wins), else the solid color. */
+  /** The card's color as drawn: for drawn glass the app's color, else "no color" (the tags' frosted default); else the solid color. */
   resolvedSectionBackgroundColor(): ResourceColor {
     const fallback = this.resolvedSectionBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass ?
     CYLSectionStyleColors.glassTint : CYLSectionStyleColors.card;

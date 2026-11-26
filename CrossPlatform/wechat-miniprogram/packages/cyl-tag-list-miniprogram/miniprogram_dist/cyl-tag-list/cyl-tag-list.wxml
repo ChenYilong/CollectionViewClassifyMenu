@@ -5,14 +5,14 @@
     <view class="cyl-callout-arrow" style="left: {{callout.arrow}}px;" />
   </view>
   <view wx:for="{{sections}}" wx:for-item="section" wx:key="index" class="cyl-section" style="{{section.backgroundStyle}}">
-    <view wx:if="{{section.showsHeader || (section.canFold && foldPosition === 'headerTrailing')}}" class="cyl-header" style="{{section.headerStyle}}">
+    <view wx:if="{{section.showsHeader || (section.canFold && foldPosition === 'headerTrailing')}}" id="cyl-header-s{{section.index}}" class="cyl-header" style="{{section.headerStyle}}">
       <text class="cyl-header-title" style="{{section.headerTitleStyle}}">{{section.showsHeader ? section.title : ''}}</text>
       <view wx:if="{{section.canFold && foldPosition === 'headerTrailing'}}" class="cyl-fold-header" style="color: {{foldColor}}; {{foldFontStyle}}; {{foldHeaderStyle}};"
             data-section="{{section.index}}" bindtap="onFoldTap"
             aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
-        <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}">{{section.foldTitle}}</text>
-        <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
-        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
+        <!-- Every text content sizes by the wider of the two titles (hidden sizer), so the title room is the same collapsed and expanded. -->
+        <view wx:if="{{foldContent !== 'icon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded && foldRotates ? 'cyl-up' : ''}}">▾</text>
       </view>
       <view wx:if="{{section.headerLineStyle}}" class="cyl-header-line" style="{{section.headerLineStyle}}" aria-hidden="true" />
     </view>
@@ -25,7 +25,7 @@
               style="{{item.cellStyle}}" data-key="{{item.key}}" bindtap="onItemTap" bindlongpress="onItemLongPress"
               aria-role="button" aria-label="{{item.subtitle ? item.title + ', ' + item.subtitle : item.title}}" aria-selected="{{item.selected}}" aria-disabled="{{!item.enabled}}">
           <view wx:if="{{item.iconKind !== 'none'}}" class="cyl-icon-slot" style="{{item.slotStyle}}">
-            <text wx:if="{{item.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{item.iconStyle}}; font-size: {{item.glyphSize}}px;">{{item.glyph}}</text>
+            <text wx:if="{{item.iconKind === 'glyph'}}" class="cyl-icon cyl-glyph" style="{{item.iconStyle}}; font-size: {{item.glyphSize}}px; color: {{item.glyphColor}};">{{item.glyph}}</text>
             <!-- CYLTabBarController's cyl-animated-item draws the icon: the animation through the app's engine
                  components (forwarded abstract nodes), else, and until the engine is ready, the static image. -->
             <view wx:else class="cyl-icon" style="{{item.iconStyle}}" aria-hidden="true">
@@ -35,6 +35,8 @@
                                  animation-url="{{item.animationUrl}}" image="{{item.iconSrc}}" icon-size="{{item.iconSize}}"
                                  speed="{{animationSpeed > 0 ? animationSpeed : item.styleSpeed}}" loop="{{animationLoops}}"
                                  selected="{{item.selected}}" enabled="{{item.iconEnabled}}"
+                                 subclass-icon-color="{{item.subclassIconColor}}" subclass-selected-icon-color="{{item.subclassSelectedIconColor}}" subclass-disabled-icon-color="{{item.subclassDisabledIconColor}}"
+                                 built-in-icon-color="{{item.builtInIconColor}}" built-in-selected-icon-color="{{item.builtInSelectedIconColor}}" built-in-disabled-icon-color="{{item.builtInDisabledIconColor}}"
                                  gif-first-frame="{{item.gifFirstFrame}}" gif-last-frame="{{item.gifLastFrame}}" gif-duration="{{item.gifDuration}}" autoplay="{{item.autoplay}}" />
             </view>
           </view>
@@ -48,9 +50,9 @@
       <view wx:if="{{section.canFold && foldPosition === 'tail'}}" class="cyl-item cyl-fold-tail"
             style="{{section.tailStyle}}; color: {{foldColor}};" data-section="{{section.index}}" bindtap="onFoldTap"
             aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
-        <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}" class="cyl-fold-title">{{section.foldTitle}}</text>
-        <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
-        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded ? 'cyl-up' : ''}}">▾</text>
+        <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}" class="cyl-fold-title" style="color: {{section.tailTitleColor}};">{{section.foldTitle}}</text>
+        <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text" style="color: {{section.tailTitleColor}};">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
+        <text wx:if="{{foldContent !== 'title'}}" class="cyl-fold-arrow {{section.expanded && foldRotates ? 'cyl-up' : ''}}" style="color: {{section.tailIconColor}};">▾</text>
       </view>
     </view>
     </view>
@@ -60,7 +62,7 @@
           aria-role="button" aria-label="{{section.title}} {{section.foldTitle}}">
       <text wx:if="{{foldContent === 'title' || foldContent === 'iconAndTitle'}}">{{section.foldTitle}}</text>
       <view wx:if="{{foldContent === 'titleAndIcon'}}" class="cyl-fold-title-box"><text class="cyl-fold-title-text">{{section.foldTitle}}</text><text class="cyl-fold-sizer" aria-hidden="true">{{section.foldSizerTitle}}</text></view>
-      <view wx:if="{{foldContent !== 'title'}}" class="cyl-footer-chevron {{section.expanded ? 'cyl-footer-chevron-up' : ''}}" />
+      <view wx:if="{{foldContent !== 'title'}}" class="cyl-footer-chevron {{section.expanded && foldRotates ? 'cyl-footer-chevron-up' : ''}}" />
     </view>
   </view>
 </view>

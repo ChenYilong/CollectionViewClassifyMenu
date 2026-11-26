@@ -9,7 +9,7 @@ const model = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl
 const glass = require('../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-animated-item/cyl_animated_item_model.js');
 
 const GLASS_STYLE = { backgroundStyle: 'liquidGlass' };
-const DEFAULT_FROSTED_TINT = /background-color:rgba\(225,222,220,0\.5\)/;
+const DEFAULT_FROSTED_TINT = /background-color:rgba\(225,222,220,0\.10\)/;
 const EXPLICIT_RED = '#FF0000';
 const RED_AT_GLASS_ALPHA = /background-color:rgba\(255,0,0,0\.75\)/;
 const SELECTED_TINT = /background-color:rgba\(42,185,160,1\)/;
@@ -82,7 +82,7 @@ test('a configuration without a background never writes the default as explicit'
 test('the dark default fill is not handed to the glass either', () => {
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   const cell = model.tagButtonView({ title: 'Tag', tagStyle: GLASS_STYLE }, '', 2, true).cellStyle;
-  assert.match(cell, /background-color:rgba\(255,255,255,0\.14\)/, 'the glass component picks its dark default tint');
+  assert.match(cell, /background-color:rgba\(255,255,255,0\.04\)/, 'the glass component picks its dark default tint');
   assert.doesNotMatch(cell, /28,28,30|1C1C1E/i);
 });
 
@@ -94,3 +94,6 @@ test('a list tag takes the same rule through tagLayout', () => {
   const set = model.mergeStyle({ ...GLASS_STYLE, normal: { backgroundColor: EXPLICIT_RED } });
   assert.match(model.tagLayout(set, item, 'normal', { kind: 'none' }, 0, 0).cellStyle, RED_AT_GLASS_ALPHA);
 });
+
+// (The dark glass adaptation of an explicit icon / title colour is the shared cyl-animated-item's function, which the tag calls:
+// tested in tag-glass-contrast.test.js.)

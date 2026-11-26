@@ -24,7 +24,7 @@ test('a tag draws glass only where the cyl-animated-item rule is active, flat ot
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(true);
   const withGlass = model.tagButtonView(props, '', 2);
   assert.equal(withGlass.glass, true);
-  assert.match(withGlass.cellStyle, /backdrop-filter:blur\(16px\) saturate\(180%\)/, 'the state color tints the blur');
+  assert.match(withGlass.cellStyle, /backdrop-filter:blur\(16px\) saturate\(160%\) brightness\(1\.05\)/, 'the state color tints the blur');
 
   glass.cylAnimatedItemLiquidGlassSetActiveOverride(false);
   const flat = model.tagButtonView(props, '', 2);

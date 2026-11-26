@@ -17,6 +17,7 @@ import {
   CylHeaderSeparatorStyle,
   CylSectionBackgroundStyle,
   CylSectionStyle,
+  CylTagBackgroundStyle,
   CylTagLongPressActionName,
   CylTagTitleMaxLinesUnlimited,
   type CylTagListConfiguration,
@@ -144,6 +145,29 @@ describe('CylTagListView', () => {
       icon: 'icon',
       titleAndIconAlways: 'titleAndIconAlways',
     });
+  });
+
+  it('sends the header keys, the fold icon keys and the tag border keys unchanged', () => {
+    const configuration: CylTagListConfiguration = {
+      foldControl: { position: 'headerTrailing', rotatesImageWhenExpanded: false, image: 'system:chevron.down' },
+      style: {
+        headerMaxLines: CylTagTitleMaxLinesUnlimited,
+        headerHeight: 44,
+        sectionBoardInset: 0,
+        headerTextColor: '#112233',
+        foldControlColor: '#445566',
+        backgroundStyle: CylTagBackgroundStyle.liquidGlass,
+        normal: { borderColor: '#FF0000', borderWidth: 1, textColor: '#FFFFFF', backgroundColor: '#00000033' },
+      },
+      sections: [{ title: 'A long section title', items: [{ title: 'A', style: { selected: { borderWidth: 2 } } }] }],
+    };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.style.headerMaxLines).toBe('unlimited');
+    expect(sent.style.sectionBoardInset).toBe(0); // 0 is a set value, not "left out"
+    expect(sent.foldControl.rotatesImageWhenExpanded).toBe(false);
+    expect(CylTagBackgroundStyle).toEqual({ flat: 'flat', liquidGlass: 'liquidGlass' });
   });
 
   it('runs the playAll command on the native view', () => {

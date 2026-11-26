@@ -38,8 +38,20 @@ export enum CYLAnimatedItemBackgroundStyle {
  *      `cornerRadius` 为 -1 表示未设置：绘制玻璃时为胶囊，扁平时为直角；0 及以上的值用于自定义。
  */
 export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<CommonAttribute> {
-  /** [EN] The tint of a glass with no color (225, 222, 220 at alpha 0.5). [CN] 未设置颜色时玻璃的着色（225, 222, 220，透明度 0.5）。 */
-  static readonly DEFAULT_GLASS_TINT: string = '#80E1DEDC';
+  /** [EN] The default (unset) glass tint in a light app: (225, 222, 220) at alpha 0.10, handed with the item's own alpha (not the 0.75 share of an explicit color), as iOS `defaultGlassTint`. [CN] 浅色应用中未设置颜色时玻璃的默认着色：(225, 222, 220)，透明度 0.10，按条目自己的透明度交出（不乘显式颜色的 0.75），与 iOS `defaultGlassTint` 相同。 */
+  static readonly DEFAULT_GLASS_TINT: string = '#1AE1DEDC';
+  /** [EN] The default (unset) glass tint in a dark app: white at alpha 0.04, as iOS. [CN] 深色应用中未设置颜色时玻璃的默认着色：白色，透明度 0.04，与 iOS 相同。 */
+  static readonly DEFAULT_GLASS_TINT_DARK: string = '#0AFFFFFF';
+  /** [EN] The alpha of the default glass tint, light and dark (iOS `defaultGlassTintAlphaLight` / `defaultGlassTintAlphaDark`). [CN] 默认玻璃着色的透明度，浅色与深色（iOS `defaultGlassTintAlphaLight` / `defaultGlassTintAlphaDark`）。 */
+  static readonly DEFAULT_GLASS_TINT_ALPHA_LIGHT: number = 0.10;
+  static readonly DEFAULT_GLASS_TINT_ALPHA_DARK: number = 0.04;
+
+  /**
+   * [EN] The default tint of the app's color mode (`CYLLiquidGlass.isDark()`). [CN] 应用颜色模式（`CYLLiquidGlass.isDark()`）对应的默认着色。
+   */
+  static defaultGlassTint(): string {
+    return CYLLiquidGlass.isDark() ? CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT_DARK : CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT;
+  }
 
   style: CYLAnimatedItemBackgroundStyle;
 
@@ -103,10 +115,10 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
   static glassTint(color: ResourceColor, tintAlpha: number = -1): ResourceColor {
     // [EN] No color set: the default frosted tint (225, 222, 220 at alpha 0.5, as iOS in light mode). [CN] 未设置颜色：默认的磨砂着色（225, 222, 220，透明度 0.5，与 iOS 浅色模式相同）。
     if (color === Color.Transparent || color === '') {
-      return CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT;
+      return CYLAnimatedItemBackgroundModifier.defaultGlassTint();
     }
     if (typeof color === 'number' || typeof color === 'string') {
-      const tint: string | number | undefined = cylAnimatedItemGlassTintColor(color, CYLLiquidGlass.GLASS_TINT_ALPHA, CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT);
+      const tint: string | number | undefined = cylAnimatedItemGlassTintColor(color, CYLLiquidGlass.GLASS_TINT_ALPHA, CYLAnimatedItemBackgroundModifier.defaultGlassTint());
       if (tint !== undefined) {
         return tint;
       }
@@ -116,13 +128,23 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
 
   applyNormalAttribute(instance: CommonAttribute): void {
     const glass: boolean = CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.style);
+    // [EN] Only a drawn Liquid Glass gets the effect (flat: none). [CN] 只有绘制的液态玻璃才有该效果（扁平：没有）。
     instance.backgroundEffect(glass ?
       { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
       { radius: 0 });
     instance.backgroundColor(glass ? CYLAnimatedItemBackgroundModifier.glassTint(this.color, this.tintAlpha) : this.color);
     instance.borderRadius(CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.style, this.cornerRadius));
-    instance.borderWidth(this.borderWidth);
-    instance.borderColor(this.borderColor);
+    // [EN] A drawn glass without an explicit border gets the hairline rim of Android's `CYLLiquidGlassView` (1 vp, white: bright on a light page, faint on a dark one),
+    //      so the edge of a tag or a section card is visible on a plain or gradient page. [CN] 绘制的玻璃在没有显式边框时带有 Android `CYLLiquidGlassView` 的
+    //      细边（1 vp，白色：浅色页面上明亮、深色页面上微弱），使标签或分组卡片的边缘在纯色或渐变页面上可见。
+    const rim: boolean = glass && this.borderWidth <= 0;
+    instance.borderWidth(rim ? CYLLiquidGlass.RIM_WIDTH : this.borderWidth);
+    instance.borderColor(rim ? CYLLiquidGlass.rimEdgeColors(CYLLiquidGlass.isDark()) : this.borderColor);
+    // [EN] Every glass has the sheen and the uniform rim of CYLLiquidGlass (the tab bar capsule uses the same values). [CN] 所有玻璃都有 CYLLiquidGlass 的高光与均匀细边（TabBar 胶囊使用相同的数值）。
+    const sheen: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(CYLLiquidGlass.isDark());
+    if (glass && sheen.length > 0) {
+      instance.linearGradient({ direction: GradientDirection.Bottom, colors: sheen });
+    }
     instance.clip(glass);
   }
 }

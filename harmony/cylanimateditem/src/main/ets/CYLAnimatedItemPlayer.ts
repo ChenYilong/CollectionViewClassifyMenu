@@ -103,14 +103,17 @@ export class CYLAnimatedItemPlayer {
    *      undefined 恢复文件自身的颜色。`supportsColors` 为 false 时为空操作。
    */
   applyColors(colors: Map<string, string> | undefined): void {
+    // Intentionally empty: the base player has no colors to change; engine players that support colors override it.
   }
 
   /** [EN] Plays from progress 0. [CN] 从进度 0 播放。 */
   play(): void {
+    // Intentionally empty: the base player has nothing to play; engine players override it.
   }
 
   /** [EN] Stops at `progress` (0...1; 1 is the last frame). [CN] 停在 `progress`（0...1；1 为最后一帧）。 */
   stopAtProgress(progress: number): void {
+    // Intentionally empty: the base player has no frames to stop at; engine players override it.
   }
 
   /** [EN] Releases the engine's resources. [CN] 释放引擎资源。 */
@@ -126,9 +129,11 @@ export class CYLAnimatedItemPlayer {
   }
 
   protected applySpeed(): void {
+    // Intentionally empty: the base player has no engine to forward the speed to; engine players override it.
   }
 
   protected applyLoops(): void {
+    // Intentionally empty: the base player has no engine to forward the loop setting to; engine players override it.
   }
 }
 
@@ -178,6 +183,7 @@ export class CYLAnimatedItemTimedPlayer extends CYLAnimatedItemPlayer {
 
   /** [EN] Shows `progressValue`. [CN] 显示 `progressValue`。 */
   protected render(): void {
+    // Intentionally empty: the base player draws nothing; timed players override it to show `progressValue`.
   }
 
   play(): void {
@@ -241,6 +247,11 @@ export interface CYLAnimatedItemPlayback {
   speed: number;
   loops: boolean;
   restartToken: number;
+  /**
+   * [EN] true: a selected item rests on the last frame (progress 1) instead of playing (iOS showsLastFrameWhenSelected); a restart still plays. Absent = false.
+   * [CN] true：选中的条目停在最后一帧（进度 1）而不是播放（iOS showsLastFrameWhenSelected）；重播仍会播放。缺省为 false。
+   */
+  showsLastFrameWhenSelected?: boolean;
 }
 
 /**
@@ -257,7 +268,7 @@ export class CYLAnimatedItemPlaybackDriver {
     player.speed = playback.speed;
     player.loops = playback.loops;
     if (playback.selected) {
-      player.play();
+      CYLAnimatedItemPlaybackDriver.playSelected(player, playback);
     } else {
       player.stopAtProgress(0);
     }
@@ -286,10 +297,21 @@ export class CYLAnimatedItemPlaybackDriver {
       player.play();
     } else if (playback.selected !== last.selected) {
       if (playback.selected) {
-        player.play();
+        CYLAnimatedItemPlaybackDriver.playSelected(player, playback);
       } else {
         player.stopAtProgress(0);
       }
+    } else if (playback.selected && (playback.showsLastFrameWhenSelected === true) !== (last.showsLastFrameWhenSelected === true)) {
+      CYLAnimatedItemPlaybackDriver.playSelected(player, playback);
+    }
+  }
+
+  /** [EN] A selected item plays, or rests on the last frame. [CN] 选中的条目播放，或停在最后一帧。 */
+  private static playSelected(player: CYLAnimatedItemPlayer, playback: CYLAnimatedItemPlayback): void {
+    if (playback.showsLastFrameWhenSelected === true) {
+      player.stopAtProgress(1);
+    } else {
+      player.play();
     }
   }
 
@@ -300,7 +322,8 @@ export class CYLAnimatedItemPlaybackDriver {
 
   private static copy(playback: CYLAnimatedItemPlayback): CYLAnimatedItemPlayback {
     return {
-      selected: playback.selected, speed: playback.speed, loops: playback.loops, restartToken: playback.restartToken
+      selected: playback.selected, speed: playback.speed, loops: playback.loops, restartToken: playback.restartToken,
+      showsLastFrameWhenSelected: playback.showsLastFrameWhenSelected
     };
   }
 }
@@ -333,7 +356,7 @@ export interface CYLAnimatedItemEngineHost extends CYLAnimatedItemPlayback {
 export class CYLAnimatedItemEngineBinding {
   private host?: CYLAnimatedItemEngineHost;
   private player?: CYLAnimatedItemPlayer;
-  private driver: CYLAnimatedItemPlaybackDriver = new CYLAnimatedItemPlaybackDriver();
+  private readonly driver: CYLAnimatedItemPlaybackDriver = new CYLAnimatedItemPlaybackDriver();
 
   /** [EN] The player now, if any. [CN] 当前的播放器（如有）。 */
   get current(): CYLAnimatedItemPlayer | undefined {

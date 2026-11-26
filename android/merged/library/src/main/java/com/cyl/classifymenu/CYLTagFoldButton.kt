@@ -102,12 +102,15 @@ class CYLTagFoldButton @JvmOverloads constructor(context: Context, attrs: Attrib
                 // under Liquid Glass the control gets the frosted default like the tags.
                 val normalBackground = normal.explicitBackgroundColor
                 if (normalBackground != null) appearance.backgroundColor = normalBackground else appearance.resetBackgroundColor()
-                appearance.borderColor = normal.borderColor
-                appearance.borderWidth = normal.borderWidth
+                // With its explicit flags: an unset (default) border stays unset, so under glass the control equals a tag.
+                appearance.copyBorderFrom(normal)
                 appearance.cornerRadius = normal.cornerRadius
                 appearance.margin = normal.margin
                 appearance.font = normal.font
-                appearance.textColor = context?.let { normal.resolvedTextColor(it) } ?: normal.textColor
+                // Like the background: only a set text color is copied, so an unset one stays unset (the item adapts explicit colors only)
+                // and the control equals a plain tag under dark Liquid Glass.
+                val normalTextColor = normal.explicitTextColor
+                if (normalTextColor != null) appearance.textColor = normalTextColor else appearance.resetTextColor()
             }
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) style.setIconColor(tint, state)
             control.font?.let { font -> listOf(style.normalAppearance, style.selectedAppearance, style.disabledAppearance).forEach { it.font = font } }

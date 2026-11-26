@@ -1,8 +1,13 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
   CYLFont, CYLIndexPath, CYLMenuDataSource, CYLMenuDelegate, CYLMenuStyle, CYLTagListState, CYLTextMeasurer, CYLTagLongPressAction,
-  CYLTagLongPressActions, CYLTagLongPressHost
+  CYLTagLongPressActions, CYLTagLongPressHost, CALLOUT_GAP, CALLOUT_ESTIMATED_HEIGHT
 } from '@cyl/classifymenu';
+
+const CALLOUT_TARGET_TOP: number = 200;
+const CALLOUT_TARGET_BOTTOM: number = 240;
+const CALLOUT_HEIGHT: number = 40;
+const CALLOUT_BOTTOM_LIMIT: number = 800;
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
 
@@ -201,6 +206,37 @@ export default function tagLongPressActionTest() {
       expect(state.isReordering).assertTrue();
       state.longPressAction = CYLTagLongPressActions.none;
       expect(state.isReordering).assertFalse();
+    });
+
+    it('theCalloutGoesAboveWhenItFitsAndNothingIsCovered', 0, () => {
+      expect(CYLTagListState.calloutPlacesBelow(CALLOUT_TARGET_TOP, CALLOUT_TARGET_BOTTOM, CALLOUT_HEIGHT, 0,
+        CALLOUT_BOTTOM_LIMIT, undefined, undefined)).assertFalse();
+      // A header far above the bubble is not covered.
+      expect(CYLTagListState.calloutPlacesBelow(CALLOUT_TARGET_TOP, CALLOUT_TARGET_BOTTOM, CALLOUT_HEIGHT, 0,
+        CALLOUT_BOTTOM_LIMIT, 0, 20)).assertFalse();
+    });
+
+    it('theCalloutGoesBelowWhenItDoesNotFitAbove', 0, () => {
+      expect(CYLTagListState.calloutPlacesBelow(10, 50, CALLOUT_HEIGHT, 0, CALLOUT_BOTTOM_LIMIT, undefined, undefined))
+        .assertTrue();
+    });
+
+    it('theCalloutGoesBelowWhenItWouldCoverTheHeaderAndFitsBelow', 0, () => {
+      // The bubble above spans 156..196 (top = 200 - 40 - 4); the header band 150..190 overlaps it.
+      expect(CYLTagListState.calloutPlacesBelow(CALLOUT_TARGET_TOP, CALLOUT_TARGET_BOTTOM, CALLOUT_HEIGHT, 0,
+        CALLOUT_BOTTOM_LIMIT, 150, 190)).assertTrue();
+      // Neither side is free of the header and below does not fit: above.
+      expect(CYLTagListState.calloutPlacesBelow(CALLOUT_TARGET_TOP, CALLOUT_TARGET_BOTTOM, CALLOUT_HEIGHT, 0,
+        CALLOUT_TARGET_BOTTOM + CALLOUT_GAP, 150, 190)).assertFalse();
+      // An empty header covers nothing.
+      expect(CYLTagListState.calloutPlacesBelow(CALLOUT_TARGET_TOP, CALLOUT_TARGET_BOTTOM, CALLOUT_HEIGHT, 0,
+        CALLOUT_BOTTOM_LIMIT, 160, 160)).assertFalse();
+    });
+
+    it('anUnknownItemNeverAsksForBelow', 0, () => {
+      const state = list('ABC');
+      expect(state.calloutPlacesBelowItem(path(99), CALLOUT_ESTIMATED_HEIGHT)).assertFalse();
+      expect(state.calloutPlacesBelowItem({ section: 9, item: 0 })).assertFalse();
     });
   });
 }

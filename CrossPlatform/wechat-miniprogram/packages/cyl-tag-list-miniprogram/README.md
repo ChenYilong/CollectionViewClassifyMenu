@@ -45,11 +45,6 @@ The keys go in the configuration's `style`:
 - `tintColor`: the one color of the built-in header title, icon and More / Less control. Left out, it is black or white,
   whichever is legible on the background behind them.
 - Every new color adapts to light and dark mode by itself; a color you set wins in both modes.
-- Dark glass icon lift: a tag's explicit `iconColor` (in `normal` / `selected` / `disabled`) that is too dark for dark Liquid Glass
-  (under 3:1) is lifted in lightness, hue and alpha kept. Light mode, flat tags and an unset `iconColor` never change
-  (`liftedIconColor`, `glassReferenceLuminance`, `contrastRatio`, `hslFromRgb`, `rgbFromHsl` in `model.js`; counterpart of the
-  iOS `CYLIconContrast`; docs/tag-liquid-glass.md).
-
 ### Migration: the default look changed
 
 This is a breaking visual change: a list that sets nothing now shows the rounded card and the grouped background. To get the
@@ -112,7 +107,39 @@ icon and title). `content`: `icon`, `title`, `iconAndTitle` (the aliases `iconan
 and the chevron turned 180 degrees). `title` and `collapseTitle` replace the localized texts. The control is as wide as its longer
 title, so it does not jump when toggled. A control in the section header shows only on a section that can fold (an unfoldable
 section has no control and no space for it); its font is capped (20 px) and its width is at most 40% of the header, where the
-section title is truncated with an ellipsis.
+section title is truncated with an ellipsis. The gap between the section title and the header control is 8 px (iOS 8 pt,
+Android 8 dp). `rotatesImageWhenExpanded` (default `true`) turns the chevron 180 degrees when the section is expanded; `false`
+keeps it still.
+
+### Section header keys
+
+In the configuration's `style`: `headerHeight` (default 36 px; the fixed height of a one-line header, and only a minimum for a
+header that wraps or is tight to the card) and `headerMaxLines` (default `1`, one line with an ellipsis; a number above 1 or
+`"unlimited"` wraps the title and grows the header).
+
+### Internal model fields
+
+`borderColorExplicit`, `borderWidthExplicit`, `textColorExplicit` and `backgroundExplicit` in the normalized appearance
+(`model.normalize(...).style.normal` and the other states) are internal: the configuration parser sets them when the app gave
+that value, so the defaults that follow dark mode and glass apply only where the app set nothing. Do not put them in a
+configuration; they are ignored there.
+
+### Long-press callout
+
+With `longPressAction: "callout"` an item's `subtitle` shows in a bubble above the tag, or below it when there is no room
+above or the bubble would cover the section header. A tap, a fold, a rebuild or another long press hides it. The list has no
+scroller of its own, so a scroll hides it only when the page tells the component: call `onScroll()` (or `dismissCallout()`)
+from the scroller's `bindscroll` or from the page's `onPageScroll`.
+
+```js
+onScroll() { this.selectComponent('#tags').onScroll(); },
+```
+
+### Configuration keys the iOS list has and this component does not
+
+Unsupported here (ignored): `scrollEnabled` (the component draws no scroller; the page's own `scroll-view` scrolls it),
+`titleImage`, `titlePosition`, `deletable`, `deleteIndicatorTitle`, `deleteIndicatorColor`, `deleteIndicatorFont`,
+`adjustsFontForContentSizeCategory`, `foldStyle` and `id`.
 
 ### One tag on its own
 

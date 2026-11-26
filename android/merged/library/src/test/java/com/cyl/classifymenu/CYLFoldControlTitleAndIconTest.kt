@@ -17,6 +17,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.time.Duration
 
@@ -34,6 +35,7 @@ private class CYLTitleAndIconSource(count: Int) : CYLMenuDataSource {
  * "Less" + the chevron turned expanded; the control keeps its size in both states, and a header shows it only on a foldable section.
  */
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class CYLFoldControlTitleAndIconTest {
 
@@ -162,5 +164,200 @@ class CYLFoldControlTitleAndIconTest {
         val none = makeList(2, CYLMenuFoldControl.noFoldControl(), headers = true)
         fun sectionTitle(list: CYLTagListView) = descendants(list).filterIsInstance<TextView>().first { it.text.toString() == "Section" }
         assertEquals("the title has the same room as with no fold control", sectionTitle(none).width, sectionTitle(unfoldable).width)
+    }
+
+    // MARK: The title's room next to the fold control, More, clear and the accessory (docs/tag-section-style.md)
+
+    private fun roomList(
+        source: CYLMenuDataSource, fold: CYLMenuFoldControl, rtl: Boolean = false, maxLines: Int = CYLHeaderTitleMaxLines.SINGLE,
+    ): CYLTagListView {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        // The app's android:supportsRtl: without it a view always resolves to left to right.
+        activity.applicationInfo.flags = activity.applicationInfo.flags or android.content.pm.ApplicationInfo.FLAG_SUPPORTS_RTL
+        val list = CYLTagListView(activity)
+        if (rtl) list.layoutDirection = View.LAYOUT_DIRECTION_RTL
+        list.style = CYLMenuStyle.plainSectionStyle().also { it.headerMaxLines = maxLines }
+        list.menuDataSource = source
+        list.defaultVisibleRows = 2
+        list.foldControl = fold
+        activity.setContentView(FrameLayout(activity).apply { addView(list, FrameLayout.LayoutParams(WIDTH_PX, FrameLayout.LayoutParams.WRAP_CONTENT)) })
+        list.reloadMenuData()
+        frames()
+        return list
+    }
+
+    private fun accessory(list: CYLTagListView) = descendants(list).first { it.tag == ACCESSORY_TAG }
+
+    private fun more(list: CYLTagListView) = descendants(list).first { it.cyl_accessibilityIdentifier == CYLTagListMoreButtonAccessibilityIdentifier }
+
+    private fun clear(list: CYLTagListView) = descendants(list).first { it.cyl_accessibilityIdentifier == CYLTagListClearButtonAccessibilityIdentifier }
+
+    private fun foldButtonOf(list: CYLTagListView) = descendants(list).filterIsInstance<CYLTagFoldButton>().single()
+
+    private fun titleOf(list: CYLTagListView) = descendants(list).filterIsInstance<TextView>().first { it.text.toString() == ROOM_TITLE }
+
+    private fun headerOf(list: CYLTagListView) = list.sectionFrame(0)!!.headerHeight
+
+    /** The fold control's natural width: the wider of the folded and expanded control. */
+    private fun naturalFold(fold: CYLMenuFoldControl) =
+        maxOf(CYLTagFoldButton.sizeForFoldControl(fold, false).width, CYLTagFoldButton.sizeForFoldControl(fold, true).width)
+
+    private fun headerFont() = CYLMenuStyle.plainSectionStyle().headerFontForTraitCollection()
+
+    /** What the other header views take: the clear line, More (its box minus the transparent trailing padding) and the accessory. */
+    private fun clearTake() = Math.ceil(CYLTagButton.fontLineHeight(headerFont()).toDouble()).toFloat() + SPACING
+
+    private fun moreTake() = MORE_SIZE - Math.floor(((MORE_SIZE - MORE_GLYPH) / 2).toDouble()).toFloat() + MORE_GAP
+
+    private fun accessoryTake(inner: Float) = minOf(ACCESSORY_WIDTH, inner * ACCESSORY_MAX_FRACTION) + SPACING
+
+    private fun trailingFold(foldWidth: Float) = foldWidth - OVERHANG + SPACING
+
+    private fun fixedSource(more: Boolean = false, clear: Boolean = false, withAccessory: Boolean = false, title: String = ROOM_TITLE): CYLMenuDataSource =
+        object : CYLMenuDataSource {
+            private val accessoryView = View(context).apply { tag = ACCESSORY_TAG; minimumWidth = ACCESSORY_WIDTH.toInt(); minimumHeight = 10 }
+            override fun numberOfSectionsInMenu() = 1
+            override fun menuNumberOfItemsInSection(section: Int) = 20
+            override fun menuTitleForSection(section: Int) = title
+            override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = "Tag %02d".format(indexPath.item)
+            override fun menuShowsMoreButtonInSection(section: Int) = more
+            override fun menuShowsClearButtonForSection(section: Int) = clear
+            override fun menuAccessoryViewForSection(section: Int): View? = if (withAccessory) accessoryView else null
+        }
+
+    private fun foldTrailing() = titleAndIcon(CYLMenuFoldControlPosition.HEADER_TRAILING)
+
+    @Test
+    fun withNoFoldControlTheTitleRoomIsTheInnerWidth() {
+        val list = roomList(fixedSource(), CYLMenuFoldControl.noFoldControl())
+        assertEquals(INNER, titleOf(list).width.toFloat(), 0.5f)
+        assertEquals(HEADER_INSET, titleOf(list).left.toFloat(), 0.5f)
+        // An unfoldable section reserves nothing even with the control set.
+        val unfoldable = roomList(object : CYLMenuDataSource by fixedSource() { override fun menuNumberOfItemsInSection(section: Int) = 2 }, foldTrailing())
+        assertEquals(INNER, titleOf(unfoldable).width.toFloat(), 0.5f)
+    }
+
+    @Test
+    fun theFoldControlAloneTakesAtMostFortyPercentAndTheTitleKeepsTheRest() {
+        val fold = foldTrailing()
+        val list = roomList(fixedSource(), fold)
+        val foldWidth = minOf(naturalFold(fold), INNER * FOLD_ALONE_FRACTION)
+        assertTrue("the fold control is at most 40% of the inner width", foldButtonOf(list).width <= INNER * FOLD_ALONE_FRACTION + 0.5f)
+        assertEquals(foldWidth, foldButtonOf(list).width.toFloat(), 1f)
+        assertEquals(INNER - trailingFold(foldWidth), titleOf(list).width.toFloat(), 1f)
+        assertTrue("the title ends one spacing before the fold control", titleOf(list).right + SPACING <= foldButtonOf(list).left + 1f)
+    }
+
+    @Test
+    fun aLongCollapseTitleIsCappedAndTheTitleStillGetsItsRoom() {
+        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" }
+        val list = roomList(fixedSource(), fold)
+        assertTrue("the natural width is above the cap", naturalFold(fold) > INNER * FOLD_ALONE_FRACTION)
+        assertEquals(INNER * FOLD_ALONE_FRACTION, foldButtonOf(list).width.toFloat(), 1f)
+        assertEquals(INNER - trailingFold(INNER * FOLD_ALONE_FRACTION), titleOf(list).width.toFloat(), 1f)
+    }
+
+    @Test
+    fun foldMoreClearAndAccessoryTogetherFitTheInnerWidth() {
+        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" }
+        val list = roomList(fixedSource(more = true, clear = true, withAccessory = true), fold)
+        val foldWidth = minOf(naturalFold(fold), INNER * FOLD_SHARED_FRACTION)
+        assertTrue("the fold control is at most 30% of the inner width", foldButtonOf(list).width <= INNER * FOLD_SHARED_FRACTION + 0.5f)
+        assertEquals(foldWidth, foldButtonOf(list).width.toFloat(), 1f)
+        val fixed = clearTake() + moreTake() + trailingFold(foldWidth) + accessoryTake(INNER)
+        assertEquals(maxOf(headerFont().size, INNER - fixed), titleOf(list).width.toFloat(), 1f)
+        assertTrue("the title and everything beside it fit the inner width", titleOf(list).width + fixed <= INNER + 1f)
+        // The accessory is the view next to the title: the title ends one spacing before it, which ends one spacing before the fold control.
+        assertTrue("title end + spacing <= accessory start", titleOf(list).right + SPACING <= accessory(list).left + 1f)
+        assertTrue("accessory end + spacing <= fold control start", accessory(list).right + SPACING <= foldButtonOf(list).left + 1f)
+        assertTrue("title end + spacing <= fold control start", titleOf(list).right + SPACING <= foldButtonOf(list).left + 1f)
+        assertTrue("the accessory is capped at 30% of the inner width", accessory(list).width <= INNER * ACCESSORY_MAX_FRACTION + 1.5f)
+        assertTrue("the clear button stays inside the trailing edge", clear(list).right <= WIDTH_PX - HEADER_INSET + 1f)
+        assertTrue("More does not move left of the fold control's glyph box", more(list).left >= foldButtonOf(list).left)
+    }
+
+    @Test
+    fun collapsedAndExpandedGiveTheSameTitleRoomAndFoldWidth() {
+        val list = roomList(fixedSource(more = true), foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" })
+        val titleWidth = titleOf(list).width
+        val foldWidth = foldButtonOf(list).width
+        list.setExpanded(true, 0, false)
+        frames()
+        assertEquals("Show fewer tags in this section of the list, and keep the rest of the page tidy for later", foldButtonOf(list).titleLabel.text.toString())
+        assertEquals(titleWidth, titleOf(list).width)
+        assertEquals(foldWidth, foldButtonOf(list).width)
+    }
+
+    @Test
+    fun aTwoLineAndAnUnlimitedHeaderWrapAtTheSameRoomTheRenderGivesTheTitle() {
+        val font = headerFont()
+        val line = Math.ceil(CYLTagButton.fontLineHeight(font).toDouble()).toFloat()
+        val fold = foldTrailing()
+        val room = INNER - trailingFold(minOf(naturalFold(fold), INNER * FOLD_ALONE_FRACTION))
+        for (maxLines in listOf(2, CYLHeaderTitleMaxLines.UNLIMITED)) {
+            val list = roomList(fixedSource(title = ROOM_LONG_TITLE), fold, maxLines = maxLines)
+            val label = descendants(list).filterIsInstance<TextView>().first { it.text.toString() == ROOM_LONG_TITLE }
+            assertEquals("the render's title width is the height's room", room, label.width.toFloat(), 1f)
+            val text = CYLTagButton.wrappedTextHeight(ROOM_LONG_TITLE, font, room, maxLines)
+            assertEquals("the header grows by the wrapped lines at that room", maxOf(maxOf(CYLMenuStyle.plainSectionStyle().headerHeight, text + HEADER_PADDING), CYLTagFoldButton.sizeForFoldControl(fold, false).height), headerOf(list), 0.5f)
+            if (line > 0f) assertEquals("whole lines", 0f, (text / line) - Math.rint((text / line).toDouble()).toFloat(), 0.01f)
+        }
+    }
+
+    @Test
+    fun rightToLeftMirrorsTheFoldOnlyAndTheFullHeader() {
+        val fold = foldTrailing().also { it.collapseTitle = "Show fewer tags in this section of the list, and keep the rest of the page tidy for later" }
+        for (full in listOf(false, true)) {
+            fun make(rtl: Boolean) = roomList(fixedSource(more = full, clear = full, withAccessory = full), fold, rtl)
+            val ltr = make(false)
+            val rtl = make(true)
+            fun mirrored(message: String, a: View, b: View) {
+                assertEquals("$message right edge", WIDTH_PX - a.left.toFloat(), b.right.toFloat(), 1f)
+                assertEquals("$message left edge", WIDTH_PX - a.right.toFloat(), b.left.toFloat(), 1f)
+            }
+            mirrored("fold control (full=$full)", foldButtonOf(ltr), foldButtonOf(rtl))
+            assertEquals("same title room (full=$full)", titleOf(ltr).width, titleOf(rtl).width)
+            assertEquals("the title starts at the leading edge, from the right", WIDTH_PX - HEADER_INSET, titleOf(rtl).right.toFloat(), 1f)
+            assertTrue("title end + spacing <= fold control start, mirrored", titleOf(rtl).left - SPACING >= foldButtonOf(rtl).right - 1f)
+            if (full) {
+                mirrored("accessory", accessory(ltr), accessory(rtl))
+                mirrored("More", more(ltr), more(rtl))
+                mirrored("clear", clear(ltr), clear(rtl))
+                assertTrue("fold width <= 30% of the inner width", foldButtonOf(rtl).width <= INNER * FOLD_SHARED_FRACTION + 0.5f)
+            }
+        }
+    }
+
+    @Test
+    fun aShortTitleInADefaultSingleLineHeaderKeepsItsGeometry() {
+        val noFold = roomList(fixedSource(title = ROOM_TITLE), CYLMenuFoldControl.noFoldControl())
+        assertEquals(CYLMenuStyle.plainSectionStyle().headerHeight, headerOf(noFold), 0.001f)
+        assertEquals(HEADER_INSET, titleOf(noFold).left.toFloat(), 0.5f)
+        val withFold = roomList(fixedSource(title = ROOM_TITLE), foldTrailing())
+        assertEquals(HEADER_INSET, titleOf(withFold).left.toFloat(), 0.5f)
+        assertEquals("the control's right edge keeps the 6 dp overhang", WIDTH_PX - HEADER_INSET + OVERHANG, foldButtonOf(withFold).right.toFloat(), 0.5f)
+        val foldHeight = CYLTagFoldButton.sizeForFoldControl(foldTrailing(), false).height
+        assertEquals(maxOf(headerOf(noFold), foldHeight), headerOf(withFold), 0.5f)
+    }
+
+    private companion object {
+        const val WIDTH_PX = 320
+        /** The plain header's horizontal inset (`CYLMenuStyle.headerHorizontalInset`), dp. */
+        const val HEADER_INSET = 16f
+        const val INNER = WIDTH_PX - 2 * HEADER_INSET
+        /** HEADER_ITEM_SPACING, HEADER_FOLD_OVERHANG, HEADER_MORE_GAP and the fractions of the list view. */
+        const val SPACING = 8f
+        const val OVERHANG = 6f
+        const val MORE_GAP = 4f
+        const val MORE_SIZE = 44f
+        const val MORE_GLYPH = 22f
+        const val FOLD_ALONE_FRACTION = 0.4f
+        const val FOLD_SHARED_FRACTION = 0.3f
+        const val ACCESSORY_MAX_FRACTION = 0.3f
+        const val ACCESSORY_WIDTH = 200f
+        const val HEADER_PADDING = 12f
+        const val ACCESSORY_TAG = "headerRoomAccessory"
+        const val ROOM_TITLE = "Section room"
+        const val ROOM_LONG_TITLE = "A very long section header that cannot fit one line next to a fold control, so it wraps onto several lines when it may, one two three four five six seven eight nine ten"
     }
 }

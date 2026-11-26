@@ -42,6 +42,7 @@ import com.cyl.classifymenu.CYLTagAppearanceIconColor
 import com.cyl.classifymenu.CYLTagAppearanceTextColor
 import com.cyl.classifymenu.CYLTagButton
 import com.cyl.classifymenu.CYLTagItemAnimation
+import com.cyl.classifymenu.CYLTagItemAnimationOptions
 import com.cyl.classifymenu.CYLTagItemDeletable
 import com.cyl.classifymenu.CYLTagItemIdentifier
 import com.cyl.classifymenu.CYLTagItemImage
@@ -73,12 +74,18 @@ private fun caption(context: Context, text: String) = TextView(context).apply {
     val d = context.resources.displayMetrics.density
     this.text = text
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-    setTextColor(Color.argb(153, 60, 60, 67))
+    // The secondary label color of the mode (iOS secondaryLabel): dark on the light page, light on the dark page.
+    setTextColor(if (isNightMode(context)) Color.argb(153, 235, 235, 245) else Color.argb(153, 60, 60, 67))
     setPadding((16 * d).toInt(), (8 * d).toInt(), (16 * d).toInt(), 0)
 }
 
+/** Whether the app is in dark (night) mode: the example pages follow it for their own page background and captions. */
+private fun isNightMode(context: Context): Boolean =
+    (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
 private fun column(context: Context, views: List<View>): View = ScrollView(context).apply {
-    setBackgroundColor(Color.rgb(242, 242, 247))
+    // The grouped background of the mode (iOS systemGroupedBackground): #F2F2F7 in light mode, black in dark mode.
+    setBackgroundColor(if (isNightMode(context)) Color.BLACK else Color.rgb(242, 242, 247))
     addView(LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         setPadding(0, (12 * context.resources.displayMetrics.density).toInt(), 0, 0)
@@ -210,8 +217,9 @@ class CYLTagConfigurationScreen(private val context: Context) : CYLMenuScreen, C
             val selected = mapOf(CYLTagAppearanceBackgroundColor to indigo, CYLTagAppearanceBorderColor to indigo, CYLTagAppearanceIconColor to Color.WHITE, CYLTagAppearanceCornerRadius to 8)
             val style = mapOf(CYLMenuStyleSectionStyle to "plain", CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleImageSize to CYLSize(20f, 20f), CYLMenuStyleImageTitleSpacing to 4, CYLMenuStyleItemHeight to 36,
                 CYLMenuStyleLayoutCentered to true, CYLMenuStyleNormal to normal, CYLMenuStyleSelected to selected)
-            val items = listOf(
-                mapOf(CYLTagItemTitle to "Lottie", CYLTagItemAnimation to animation("Lottie/tab_me_animate.json")),
+            val items = listOf<Any>(
+                // The artwork is one near-black colour: an unset animation stays untinted (tint spec v2), so this entry opts in to follow the icon colour.
+                mapOf<String, Any?>(CYLTagItemTitle to "Lottie", CYLTagItemAnimation to animation("Lottie/tab_me_animate.json"), CYLTagItemAnimationOptions to mapOf("tint" to "title")),
                 mapOf(CYLTagItemTitle to "GIF", CYLTagItemAnimation to animation("GIF/cyl_tab_sample_animated.gif")),
                 mapOf(CYLTagItemTitle to "Rive", CYLTagItemAnimation to animation("Rive/menu_button.riv")),
                 mapOf(CYLTagItemTitle to "SVGA", CYLTagItemAnimation to animation("SVGA/tab_chat.svga")),

@@ -11,9 +11,10 @@
 /* The section card (sectionStyle "insetGrouped"): padding, radius and color inline; plain, it is a bare block. */
 .cyl-card { box-sizing: border-box; }
 .cyl-header-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* The header fold control: never wider than 40% (inline max-width from model.foldHeaderWidthCSS; FOLD_HEADER_MAX_WIDTH_PERCENT); the section title truncates at the tail. */
-.cyl-fold-header { display: flex; flex: 0 1 auto; align-items: center; box-sizing: border-box; min-width: 0; overflow: hidden; font-size: 13px; padding: 4px 0 4px 12px; }
-.cyl-header-title { flex: 0 1 auto; min-width: 0; }
+/* The header fold control keeps its natural width (flex: none) up to its cap (inline max-width and the HEADER_ITEM_SPACING margin from
+   model.foldHeaderWidthCSS); the section title is the view that shrinks (flex 0 1 auto, never below one em) and truncates at the tail. */
+.cyl-fold-header { display: flex; flex: none; align-items: center; box-sizing: border-box; min-width: 0; overflow: hidden; font-size: 13px; padding: 4px 0; }
+.cyl-header-title { flex: 0 1 auto; min-width: 1em; }
 .cyl-fold-header .cyl-fold-arrow { flex: none; }
 .cyl-items { display: flex; flex-wrap: wrap; }
 .cyl-item {
@@ -64,7 +65,6 @@
 }
 .cyl-footer-chevron-up { transform: rotate(225deg); margin-top: 5px; }
 .cyl-fold-arrow { display: inline-block; margin-left: 2px; transition: transform 0.2s; }
-/* Right to left (style key direction, class cyl-rtl on the list): the gap before the fold control and the arrow's gap change sides. */
-.cyl-rtl .cyl-fold-header { padding: 4px 12px 4px 0; }
+/* Right to left (style key direction, class cyl-rtl on the list): the arrow's gap changes sides (the fold control's own margin swaps inline). */
 .cyl-rtl .cyl-fold-arrow { margin-left: 0; margin-right: 2px; }
 .cyl-up { transform: rotate(180deg); }

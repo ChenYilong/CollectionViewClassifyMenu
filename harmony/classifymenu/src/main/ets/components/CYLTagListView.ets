@@ -8,22 +8,24 @@ import { CYLTagAnimatedIcon, cylTagAnimationImage } from './CYLTagAnimatedIcon';
 import {
   CYLTagListElementKindSectionFooter, CYLTagListElementKindSectionHeader, CYLTagListSupplementaryView
 } from './CYLTagListSupplementaryView';
-import { CYLTagButtonComponent } from '../tagviews/CYLTagButton';
+import { CYLTagButton, CYLTagButtonComponent } from '../tagviews/CYLTagButton';
 import { CYLTagListCell, CYLTagListCellComponent } from '../tagviews/CYLTagListCell';
 import { CYLIndexPath, CYLTagListController, CYLTagTap } from './CYLTagListModel';
 import {
-  CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState
+  CYLTagButtonMetrics, CYLTagFoldMetrics, CYLTagListItemFrame, CYLTagListSectionFrame, CYLTagListState,
+  HEADER_ITEM_SPACING
 } from './CYLTagListState';
 import { CYLMenuFoldControl, CYLMenuFoldControlPosition } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
 import { CYLTagListAccessibilityIdentifier } from '../tagviews/CYLTagListAccessibility';
 import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
+import { CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText } from 'cylanimateditem';
 import {
   CYLLayoutDirection, CYLMenuStyle, CYLSectionStyleColors, CYLTagBackgroundStyle, CYLTagContentAlignment,
   CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement
 } from '../core/CYLMenuStyle';
 import { CYLConfiguration, CYLConfigurationValue } from '../core/CYLTagListConfiguration';
-import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLRect, CYLSize } from '../core/CYLTypes';
+import { CYLColor, CYLColorKey, CYLControlState, CYLImage, CYLImageIsSymbol, CYLRect, CYLSize } from '../core/CYLTypes';
 
 /** The most lines a header title is given to ArkUI (`CYLHeaderTitleMaxLines.unlimited` is too large for a Text). */
 const HEADER_TITLE_LINES_CEILING: number = 1000;
@@ -48,6 +50,31 @@ class CYLTagRenderItem {
   borderColor: ResourceColor = CYLColor.CLEAR;
   borderWidth: number = 0;
   cornerRadius: number = 0;
+  /** The inline fold cell: the background style a tag of its list draws (glass or flat). */
+  itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  /** The inline fold cell: the appearance's radius as it is (the capsule constant by default), as `CYLTagButton`. */
+  appearanceCornerRadius: number = 0;
+  /** The inline fold cell: the explicit glass tint (the normal appearance's explicit background), undefined for the frosted default. */
+  glassTint?: ResourceColor = undefined;
+
+  /**
+   * The dark-glass rule for a colour this item draws (`CYLTagButton.adaptedOnGlassOf`, the tag's own rule):
+   * the colour itself unless this item draws glass (`itemBackgroundStyle`: only the inline fold cell does) in dark mode, then lifted
+   * to 4.5:1 (text) or 3:1 (icon). Read when the item draws, so a light / dark switch re-resolves it.
+   */
+  adaptedOnGlass(color: ResourceColor, kind: string): ResourceColor {
+    return CYLTagButton.adaptedOnGlassOf(color, kind, this.itemBackgroundStyle, this.glassTint, undefined);
+  }
+
+  /** The title colour to draw. */
+  resolvedTextColor(): ResourceColor {
+    return this.adaptedOnGlass(this.textColor, CYLAnimatedItemContrastKindText);
+  }
+
+  /** The icon colour to draw (the fold control's own colour stays explicit, and is lifted like any explicit icon colour). */
+  resolvedIconColor(): ResourceColor {
+    return this.adaptedOnGlass(this.iconColor, CYLAnimatedItemContrastKindIcon);
+  }
   paddingLeft: number = 0;
   paddingRight: number = 0;
   image?: CYLImage;
@@ -123,6 +150,10 @@ class CYLSectionRender {
   clearLabel: string = '';
   clearSide: number = 0;
   accessory?: WrappedBuilder<[number]>;
+  /** The title's width (`CYLTagListSectionFrame.headerTitleWidth`): the width the header height was computed for. */
+  titleMaxWidth: number = 0;
+  /** The accessory's maximum width (`CYLTagListSectionFrame.headerAccessoryMaxWidth`). */
+  accessoryMaxWidth: number = 0;
 }
 
 function imageKey(image: CYLImage | undefined): string {
@@ -385,7 +416,7 @@ export struct CYLTagListView {
     r.key = [extra, r.section, r.item, rive ? 'riv' : r.x, rive ? '' : r.y, rive ? '' : r.width, rive ? '' : r.height,
       r.title, r.fontSize, r.fontWeight, CYLColorKey(r.textColor),
       CYLColorKey(r.backgroundColor), CYLColorKey(r.highlightedBackgroundColor), CYLColorKey(r.borderColor),
-      r.borderWidth, r.cornerRadius,
+      r.borderWidth, r.cornerRadius, r.itemBackgroundStyle, r.appearanceCornerRadius,
       r.paddingLeft, r.paddingRight, imageKey(r.image), r.animation ?? '', r.iconWidth, r.iconHeight,
       CYLColorKey(r.iconColor),
       r.iconRotation, r.imageTrailing, r.alignLeading, r.spacing, r.selected, r.enabled, r.deletable, r.deleteTitle,
@@ -513,6 +544,16 @@ export struct CYLTagListView {
     const r = this.foldItem(control, style, frame.expanded, new CYLSize(cell.width, cell.height), cell.section);
     r.item = cell.item;
     r.isFoldCell = true;
+    // The same background strategy as a tag (CYLTagButton): the list's glass or flat style, only an explicit normal
+    // background tints the glass, the tag's radius and border. foldControlColor tints the icon only.
+    const normal = style.normalAppearance;
+    r.itemBackgroundStyle = CYLTagButton.itemBackgroundStyleOf(style);
+    r.backgroundColor = CYLTagButton.itemBackgroundColor(style, normal);
+    r.appearanceCornerRadius = normal.cornerRadius;
+    r.glassTint = normal.explicitBackgroundColor;
+    // As CYLTagButton: no border (and under glass no unset default border) means width 0.
+    r.borderColor = CYLTagButton.itemBorderColor(style, normal);
+    r.borderWidth = CYLTagButton.itemBorderWidth(style, normal);
     r.x = cell.x;
     r.y = cell.y + titleHeight;
     this.finishKey(r, 'f');
@@ -524,7 +565,8 @@ export struct CYLTagListView {
     const m = this.model;
     const control = m.displayedFoldControl;
     const style = CYLTagFoldMetrics.style(control, m.style.resolvedFoldControlColor(onBand));
-    const r = this.foldItem(control, style, frame.expanded, m.headerFoldSize(frame.expanded), frame.section);
+    const r = this.foldItem(control, style, frame.expanded,
+      m.headerFoldSize(frame.expanded, m.width, frame.section), frame.section);
     this.finishKey(r, 's');
     return r;
   }
@@ -595,6 +637,8 @@ export struct CYLTagListView {
     h.iconColor = view.iconView.tintColor;
     h.moreLabel = view.moreAccessibilityLabel;
     h.accessory = view.accessoryView;
+    h.titleMaxWidth = frame.headerTitleWidth;
+    h.accessoryMaxWidth = frame.headerAccessoryMaxWidth;
     h.showsClear = m.showsClearButton(h.section);
     if (h.showsClear) {
       h.clearImage = (style.clearButtonImage ?? CYLMenuResources.image('cyl_trash')) as ResourceStr;
@@ -605,7 +649,8 @@ export struct CYLTagListView {
     h.key = ['h', h.showsClear, h.clearLabel, h.clearSide, CYLColorKey(h.clearColor), h.section, h.y, h.height, h.showsTitle, h.title, h.fontSize, h.fontWeight, CYLColorKey(h.textColor),
       h.insetLeft, h.insetRight, h.rtl, h.maxLines,
       h.indicatorColor ?? '', h.indicatorWidth, h.indicatorHeight, imageKey(h.icon), h.showsFold, h.foldLeading,
-      h.fold.key, h.showsMore, CYLColorKey(h.moreColor), CYLColorKey(h.iconColor), h.moreLabel, h.accessory !== undefined].join('|');
+      h.fold.key, h.showsMore, CYLColorKey(h.moreColor), CYLColorKey(h.iconColor), h.moreLabel, h.accessory !== undefined,
+      h.titleMaxWidth, h.accessoryMaxWidth].join('|');
     return h;
   }
 
@@ -694,14 +739,6 @@ export struct CYLTagListView {
     r.accessibilityText = (m.title ?? '').length > 0 ? (m.title ?? '') : '';
     this.finishKey(r, 'title');
     return r;
-  }
-
-  /**
-   * The corner radius a tag draws (CYLTagButton's rule): points, at most half the height (0 is square, half the height
-   * or more a capsule). The inline fold cell uses it too, so it has the tags' shape.
-   */
-  private tagCornerRadius(r: CYLTagRenderItem): number {
-    return Math.min(r.cornerRadius, r.height / 2);
   }
 
   private frameOf(r: CYLTagRenderItem): number[] {
@@ -806,7 +843,7 @@ export struct CYLTagListView {
       Image(r.image)
         .width(r.iconWidth > 0 ? r.iconWidth : undefined)
         .height(r.iconHeight > 0 ? r.iconHeight : undefined)
-        .fillColor(r.iconColor)
+        .fillColor(r.resolvedIconColor())
         .objectFit(ImageFit.Contain)
         .rotate({ angle: r.iconRotation })
         .animation({ duration: 250 })
@@ -837,7 +874,7 @@ export struct CYLTagListView {
       Text(r.title)
         .fontSize(r.fontSize)
         .fontWeight(r.fontWeight)
-        .fontColor(r.textColor)
+        .fontColor(r.resolvedTextColor())
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .flexShrink(1)
@@ -865,6 +902,8 @@ export struct CYLTagListView {
     .height(r.height)
     .padding({ left: r.paddingLeft, right: r.paddingRight })
     .justifyContent(FlexAlign.Center)
+    // The fold control keeps its width; the title is the one that shrinks.
+    .flexShrink(0)
     .id(`CYLTagListFold-${r.section}`)
     .accessibilityGroup(true)
     .accessibilityText(r.accessibilityText)
@@ -882,8 +921,9 @@ export struct CYLTagListView {
     .height(r.height)
     .padding({ left: r.paddingLeft, right: r.paddingRight })
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(r.backgroundColor)
-    .border({ width: r.borderWidth, color: r.borderColor, radius: this.tagCornerRadius(r) })
+    // Background, radius and border: cylanimateditem's one interface, as a tag (CYLTagButtonComponent).
+    .attributeModifier(new CYLAnimatedItemBackgroundModifier(r.itemBackgroundStyle, r.backgroundColor,
+      r.appearanceCornerRadius, r.borderWidth, r.borderColor))
     .position({ x: r.x, y: r.y })
     .id(`CYLTagListFold-${r.section}`)
     .accessibilityGroup(true)
@@ -930,7 +970,9 @@ export struct CYLTagListView {
     // The long-press callout: a small bubble with an arrow pointing at this item, above it (below when there is no room).
     .bindPopup(this.calloutKey === `${r.section}-${r.item}` && this.calloutText.length > 0, {
       message: this.calloutText,
-      placement: Placement.Top,
+      // Below the item when the bubble above would cover its section header (CYLTagListState.calloutPlacesBelowItem).
+      placement: this.calloutKey === `${r.section}-${r.item}` &&
+        this.model.calloutPlacesBelowItem({ section: r.section, item: r.item }) ? Placement.Bottom : Placement.Top,
       enableArrow: true,
       showInSubWindow: false,
       autoCancel: true,
@@ -1069,15 +1111,20 @@ export struct CYLTagListView {
             .position({ x: d.x, y: d.y })
         }, (d: CYLSectionDecoration) => d.key)
         ForEach(this.headers, (h: CYLSectionRender) => {
-          Row({ space: 6 }) {
+          Row({ space: HEADER_ITEM_SPACING }) {
             if (h.showsFold && h.foldLeading) {
               this.foldButton(h.fold)
             }
             if (h.showsTitle && h.indicatorColor !== undefined) {
-              Column().width(h.indicatorWidth).height(h.indicatorHeight).backgroundColor(h.indicatorColor)
+              Column().width(h.indicatorWidth).height(h.indicatorHeight).backgroundColor(h.indicatorColor).flexShrink(0)
             }
-            if (h.showsTitle && h.icon !== undefined) {
+            if (h.showsTitle && h.icon !== undefined && CYLImageIsSymbol(h.icon)) {
+              // A system symbol (`$r('sys.symbol...')`): `Image.fillColor` draws nothing for it, `SymbolGlyph` takes the tint as its font color.
+              SymbolGlyph(h.icon as Resource).fontSize(h.indicatorHeight).fontColor([h.iconColor]).width(h.indicatorHeight)
+                .height(h.indicatorHeight).accessibilityLevel('no').flexShrink(0)
+            } else if (h.showsTitle && h.icon !== undefined) {
               Image(h.icon).width(h.indicatorHeight).height(h.indicatorHeight).fillColor(h.iconColor).accessibilityLevel('no')
+                .flexShrink(0)
             }
             Text(h.showsTitle ? h.title : '')
               .fontSize(h.fontSize)
@@ -1086,25 +1133,53 @@ export struct CYLTagListView {
               .maxLines(h.maxLines)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .textAlign(TextAlign.Start)
+              // The width the header height was computed for (`headerTitleRoom`), explicit: not left to the flex weight.
+              .constraintSize({ maxWidth: h.titleMaxWidth })
               .layoutWeight(1)
-            if (h.showsClear && h.clearImage !== undefined) {
+            if (h.showsClear && h.clearImage !== undefined && CYLImageIsSymbol(h.clearImage)) {
+              // A symbol clear button: `SymbolGlyph` in the clear colour, the same size, tap area and identifier as the image below.
+              SymbolGlyph(h.clearImage as Resource)
+                .fontSize(h.clearSide)
+                .fontColor([h.clearColor])
+                .width(h.clearSide)
+                .height(h.clearSide)
+                .flexShrink(0)
+                .responseRegion({ x: -Math.max(0, (44 - h.clearSide) / 2), y: -Math.max(0, (44 - h.clearSide) / 2),
+                  width: Math.max(44, h.clearSide), height: Math.max(44, h.clearSide) })
+                .id(CYLTagListAccessibilityIdentifier.clearButton)
+                .accessibilityText(h.clearLabel)
+                .onClick(() => this.model.tapClearButton(h.section))
+            } else if (h.showsClear && h.clearImage !== undefined) {
               // The section's clear button: its top and bottom the title text's, a 44 vp tap area around it.
               Image(h.clearImage)
                 .width(h.clearSide)
                 .height(h.clearSide)
                 .objectFit(ImageFit.Contain)
                 .fillColor(h.clearColor)
+                .flexShrink(0)
                 .responseRegion({ x: -Math.max(0, (44 - h.clearSide) / 2), y: -Math.max(0, (44 - h.clearSide) / 2),
                   width: Math.max(44, h.clearSide), height: Math.max(44, h.clearSide) })
                 .id(CYLTagListAccessibilityIdentifier.clearButton)
                 .accessibilityText(h.clearLabel)
                 .onClick(() => this.model.tapClearButton(h.section))
             }
-            if (h.showsMore && h.moreImage !== undefined) {
+            if (h.showsMore && h.moreImage !== undefined && CYLImageIsSymbol(h.moreImage)) {
+              // A symbol More button: `SymbolGlyph` in the More colour.
+              SymbolGlyph(h.moreImage as Resource)
+                .fontSize(24)
+                .fontColor([h.moreColor])
+                .width(24)
+                .height(24)
+                .flexShrink(0)
+                .id(`CYLTagListMore-${h.section}`)
+                .accessibilityText(h.moreLabel)
+                .onClick(() => this.model.tapMoreButton(h.section))
+            } else if (h.showsMore && h.moreImage !== undefined) {
               Image(h.moreImage)
                 .width(24)
                 .height(24)
                 .fillColor(h.moreColor)
+                .flexShrink(0)
                 .id(`CYLTagListMore-${h.section}`)
                 .accessibilityText(h.moreLabel)
                 .onClick(() => this.model.tapMoreButton(h.section))
@@ -1113,7 +1188,9 @@ export struct CYLTagListView {
               Row() {
                 h.accessory.builder(h.section)
               }
-              .constraintSize({ maxWidth: '50%' })
+              // At most `CYLHeaderAccessoryMaxFraction` of the inner width, the part the room math reserves for it.
+              .constraintSize({ maxWidth: h.accessoryMaxWidth })
+              .flexShrink(0)
               .height('100%')
               .alignItems(VerticalAlign.Center)
             }

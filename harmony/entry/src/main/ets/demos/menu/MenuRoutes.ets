@@ -8,6 +8,7 @@ import { CYLMenuLinkagePage } from './CYLMenuLinkagePage';
 import { CYLTagStylePage } from './CYLTagStylePage';
 import { CYLTagAnimationPage } from './CYLTagAnimationPage';
 import { CYLTagConfigurationPage } from './CYLTagConfigurationPage';
+import { CYLTagGlassPage } from './CYLTagGlassPage';
 
 @Builder
 function queryScenariosBuilder(param: Object) {
@@ -34,11 +35,17 @@ function tagConfigurationBuilder(param: Object) {
   CYLTagConfigurationPage()
 }
 
+@Builder
+function tagGlassBuilder(param: Object) {
+  CYLTagGlassPage()
+}
+
 export const MENU_ROUTES: Map<string, WrappedBuilder<[Object]>> =
   new Map<string, WrappedBuilder<[Object]>>([
     ['CYLQueryScenariosViewController', wrapBuilder(queryScenariosBuilder)],
     ['CYLMenuLinkageViewController', wrapBuilder(menuLinkageBuilder)],
     ['CYLTagStyleDemoViewController', wrapBuilder(tagStyleBuilder)],
     ['CYLTagAnimationDemoViewController', wrapBuilder(tagAnimationBuilder)],
-    ['CYLTagConfigurationDemoViewController', wrapBuilder(tagConfigurationBuilder)]
+    ['CYLTagConfigurationDemoViewController', wrapBuilder(tagConfigurationBuilder)],
+    ['CYLTagGlassDemoViewController', wrapBuilder(tagGlassBuilder)]
   ]);

@@ -602,7 +602,12 @@ private fun image(context: Context?, value: Any?, baseURL: Uri?): Drawable? {
         // underscores, e.g. "system:star.fill" -> R.drawable.cyl_system_star_fill), tinted like a template image.
         context ?: return null
         val id = context.resources.getIdentifier("cyl_system_" + name.replace('.', '_').replace('-', '_').lowercase(), "drawable", context.packageName)
-        return if (id != 0) androidx.core.content.ContextCompat.getDrawable(context, id) else null
+        if (id == 0) {
+            // A missing drawable leaves the icon slot empty (no crash): the warning names the drawable to add.
+            android.util.Log.w("CYLTagList", "No drawable cyl_system_" + name.replace('.', '_').replace('-', '_').lowercase() + " for \"" + string + "\"")
+            return null
+        }
+        return androidx.core.content.ContextCompat.getDrawable(context, id)
     }
     if (context != null) {
         val name = string.substringBeforeLast('.').replace('-', '_').lowercase()

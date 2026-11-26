@@ -21,7 +21,8 @@ import { CYLTagListCell } from '../tagviews/CYLTagListCell';
 import { CYLMenuDataSource, CYLMenuDefaults, CYLMenuDelegate, CYLMenuItemType } from '../core/CYLMenuDataSource';
 import { CYLTagLongPressAction, CYLTagLongPressActions, CYLTagLongPressHost } from '../core/CYLTagLongPressAction';
 import {
-  CYLFoldControlMaxFontScale, CYLHeaderFoldMaxWidthFraction, CYLMenuFoldControl, CYLMenuFoldControlContent,
+  CYLFoldControlMaxFontScale, CYLHeaderAccessoryMaxFraction, CYLHeaderFoldAloneMaxFraction,
+  CYLHeaderFoldSharedMaxFraction, CYLMenuFoldControl, CYLMenuFoldControlContent,
   CYLMenuFoldControlPosition
 } from '../core/CYLMenuFoldControl';
 import { CYLMenuLocalizedString, CYLMenuResources } from '../core/CYLMenuResources';
@@ -89,8 +90,17 @@ const HEADER_VERTICAL_PADDING: number = 12;
 const HEADER_BOARD_TITLE_PADDING: number = CYLSectionStyleMetrics.headerBoardTitlePadding;
 /** The space between that header's bottom and the board's top, vp. */
 const HEADER_BOARD_SPACING: number = CYLSectionStyleMetrics.headerBoardSpacing;
-/** The space between the views of a header row (`CYLTagListView`'s header Row), vp. */
-const HEADER_ITEM_SPACING: number = 6;
+/**
+ * The space between every two adjacent views of a header row, vp. The room math (`headerTitleRoom`) and `CYLTagListView`'s
+ * header Row both use this one constant.
+ */
+export const HEADER_ITEM_SPACING: number = 8;
+/** The gap between a long-press callout's arrow tip and the tag, vp (iOS `gap`). */
+export const CALLOUT_GAP: number = 4;
+/** The height of a one-line callout bubble with its arrow, vp: a 13 vp line, 8 vp padding twice, an 8 vp arrow. */
+export const CALLOUT_ESTIMATED_HEIGHT: number = 40;
+/** The least width a header's title has regardless of the other views (`HEADER_TITLE_MIN_WIDTH`: one em, at least this), vp. */
+const HEADER_TITLE_MIN_WIDTH_FLOOR: number = 1;
 /** The side of a header's More button, vp. */
 const HEADER_MORE_BUTTON_SIDE: number = 24;
 const CREATE_ICON_SIDE: number = 14;
@@ -380,12 +390,13 @@ export class CYLTagFoldMetrics {
       } else {
         appearance.resetBackgroundColor();
       }
-      appearance.borderColor = normal.borderColor;
-      appearance.borderWidth = normal.borderWidth;
+      // The normal border exactly, explicit flags included: an unset border stays unset (none under Liquid Glass).
+      appearance.inheritBorder(normal);
       appearance.cornerRadius = normal.cornerRadius;
       appearance.margin = normal.margin;
       appearance.font = normal.font;
-      appearance.textColor = normal.textColor;
+      // The normal title color exactly, explicit flag included: the tail cell adapts on dark glass as a plain tag does.
+      appearance.inheritTextColor(normal);
     });
     STATES.forEach((state: number) => style.setIconColor(tint, state));
     const font = control.font;
@@ -558,6 +569,13 @@ export class CYLTagListSectionFrame {
    * at the trailing side (`headerTrailing`) or the leading side (`headerLeading`); rtl mirrors both.
    */
   headerFoldX?: number = undefined;
+  /**
+   * The title's maximum width (`CYLTagListState.headerTitleRoom`): the width the header height is computed for and the
+   * width the title is drawn at.
+   */
+  headerTitleWidth: number = 0;
+  /** The header accessory's maximum width (`CYLHeaderAccessoryMaxFraction` of the inner width); 0 without an accessory. */
+  headerAccessoryMaxWidth: number = 0;
 }
 
 function key(section: number, item: number): string {
@@ -2521,6 +2539,46 @@ export class CYLTagListState implements CYLTagLongPressHost {
     this.setNeedsDisplay();
   }
 
+  /**
+   * Whether a callout of `height` goes below the target (iOS `placesBelow`). Above first; below when it does not fit above
+   * (`safeTop`) or when it would cover the header (`headerTop`..`headerBottom`, the section header above a first-row tag)
+   * and it fits below (`bottomLimit`); above when neither side is free of the header and below does not fit. Pure; all
+   * values are in one coordinate space (the list's content).
+   */
+  static calloutPlacesBelow(targetTop: number, targetBottom: number, height: number, safeTop: number,
+    bottomLimit: number, headerTop: number | undefined, headerBottom: number | undefined): boolean {
+    const aboveTop = targetTop - height - CALLOUT_GAP;
+    const fitsAbove = aboveTop >= safeTop;
+    const fitsBelow = targetBottom + CALLOUT_GAP + height <= bottomLimit;
+    if (!fitsAbove) {
+      return true;
+    }
+    if (headerTop === undefined || headerBottom === undefined || headerBottom <= headerTop) {
+      return false;
+    }
+    const coversHeader = headerTop < aboveTop + height && headerBottom > aboveTop;
+    return coversHeader && fitsBelow;
+  }
+
+  /**
+   * Whether the callout of the item goes below it: the bubble above would cover the item's section header and fits below.
+   * The popup's own flip still handles a lack of room at the window's edges.
+   */
+  calloutPlacesBelowItem(indexPath: CYLIndexPath, height: number = CALLOUT_ESTIMATED_HEIGHT): boolean {
+    const frames = this.layoutSections();
+    if (indexPath.section < 0 || indexPath.section >= frames.length) {
+      return false;
+    }
+    const section = frames[indexPath.section];
+    const cell = section.items.find((candidate: CYLTagListItemFrame) => candidate.item === indexPath.item);
+    if (cell === undefined) {
+      return false;
+    }
+    const headerBottom = section.headerHeight > 0 ? section.y + section.headerHeight : undefined;
+    return CYLTagListState.calloutPlacesBelow(cell.y, cell.y + cell.height, height, Number.NEGATIVE_INFINITY,
+      this.contentHeightStorage, section.headerHeight > 0 ? section.y : undefined, headerBottom);
+  }
+
   dismissCallout(): void {
     if (this.calloutIndexPath !== undefined) {
       this.calloutIndexPath = undefined;
@@ -2833,12 +2891,49 @@ export class CYLTagListState implements CYLTagLongPressHost {
   }
 
   /**
-   * The fold control's size in a header: `foldSize`, at most `CYLHeaderFoldMaxWidthFraction` of the header's width
-   * (`width`, default the list width), so the section title keeps the rest and is the one that truncates.
+   * The header's inner width at the list width `width` (default the list width): the width between the header edges
+   * (the tag column: the width minus the leading and trailing header edges).
    */
-  headerFoldSize(expanded: boolean, width: number = this.layoutWidth): CYLSize {
-    const size = this.foldSize(expanded);
-    return width > 0 ? new CYLSize(Math.min(size.width, width * CYLHeaderFoldMaxWidthFraction), size.height) : size;
+  headerInnerWidth(width: number = this.layoutWidth): number {
+    const edges = this.headerEdgeInsets(width);
+    return Math.max(0, width - edges[0] - edges[1]);
+  }
+
+  /**
+   * The fold control's size in a header. Its width is the same collapsed and expanded (so the title room never changes
+   * when toggling): the wider of the two natural widths, at most `CYLHeaderFoldAloneMaxFraction` of the header's inner
+   * width, or `CYLHeaderFoldSharedMaxFraction` when `section` also shows a More button, a clear button or an accessory.
+   * The title keeps the rest and is the one that shrinks. `section` -1 (the default) means the fold control alone.
+   */
+  headerFoldSize(expanded: boolean, width: number = this.layoutWidth, section: number = -1): CYLSize {
+    const height = this.foldSize(expanded).height;
+    const natural = Math.max(this.foldSize(false).width, this.foldSize(true).width);
+    const inner = this.headerInnerWidth(width);
+    if (inner <= 0) {
+      return new CYLSize(natural, height);
+    }
+    const shared = section >= 0 && this.headerSharesRowWithFold(section);
+    const fraction = shared ? CYLHeaderFoldSharedMaxFraction : CYLHeaderFoldAloneMaxFraction;
+    return new CYLSize(Math.min(natural, inner * fraction), height);
+  }
+
+  /** Whether `section`'s header row also shows a More button, a clear button or an accessory (the fold's smaller cap). */
+  private headerSharesRowWithFold(section: number): boolean {
+    return this.showsMoreButton(section) || this.showsClearButton(section) || this.showsHeaderAccessory(section);
+  }
+
+  /** Whether `section`'s header shows an accessory view (`menuAccessoryViewForSection`). */
+  showsHeaderAccessory(section: number): boolean {
+    return this.menuDataSource?.menuAccessoryViewForSection?.(section) !== undefined;
+  }
+
+  /**
+   * The most width a header accessory takes: `CYLHeaderAccessoryMaxFraction` of the inner width, 0 when `section` has no
+   * accessory. An accessory has no measured width on HarmonyOS (it is a builder), so this cap is what the room math
+   * reserves for it and what the render constrains it to.
+   */
+  headerAccessoryMaxWidth(section: number, width: number = this.layoutWidth): number {
+    return this.showsHeaderAccessory(section) ? this.headerInnerWidth(width) * CYLHeaderAccessoryMaxFraction : 0;
   }
 
   get footerHeight(): number {
@@ -2871,7 +2966,7 @@ export class CYLTagListState implements CYLTagLongPressHost {
     if (title.length === 0) {
       return oneLine;
     }
-    const text = CYLTagButtonMetrics.wrappedTextHeight(title, font, this.headerTitleRoom(section, width, font, foldShown), maxLines);
+    const text = CYLTagButtonMetrics.wrappedTextHeight(title, font, this.headerTitleRoom(section, width, foldShown), maxLines);
     return Math.max(oneLine, Math.ceil(text) + padding);
   }
 
@@ -2893,13 +2988,21 @@ export class CYLTagListState implements CYLTagLongPressHost {
     return header > 0 && this.headerIsSizedToText() ? HEADER_BOARD_SPACING : this.styleStorage.sectionInsets.top;
   }
 
-  /** The width a header's title has: the header's width inside its edges, less the other views of its row. */
-  private headerTitleRoom(section: number, width: number, font: CYLFont, foldShown: boolean): number {
+  /**
+   * The title's maximum width in `section`'s header at the list width `width`: the inner width less the fixed views of
+   * the row (indicator bar, section icon, clear button, More button, accessory, fold control) and `HEADER_ITEM_SPACING`
+   * for each of them, at least one em of the header font (and 1). With no other view it is the inner width. The title
+   * wraps to `headerMaxLines` at exactly this width. The one function the header height and the render both use (the
+   * frame's `headerTitleWidth`). `foldShown` says whether the fold control is in the header (default: the section's
+   * header shows it).
+   */
+  headerTitleRoom(section: number, width: number = this.layoutWidth, foldShown?: boolean): number {
     const style = this.styleStorage;
-    const edges = this.headerEdgeInsets(width);
-    let room = width - edges[0] - edges[1];
-    if (foldShown) {
-      room -= this.headerFoldSize(false, width).width + HEADER_ITEM_SPACING;
+    const font = style.headerFontFor(this.fontScale);
+    const showsFold = foldShown ?? this.showsHeaderFoldControl(section);
+    let room = this.headerInnerWidth(width);
+    if (showsFold) {
+      room -= this.headerFoldSize(false, width, section).width + HEADER_ITEM_SPACING;
     }
     if (style.headerIndicatorColor !== undefined) {
       room -= style.headerIndicatorSize.width + HEADER_ITEM_SPACING;
@@ -2913,7 +3016,10 @@ export class CYLTagListState implements CYLTagLongPressHost {
     if (this.showsClearButton(section)) {
       room -= Math.ceil(CYLTagButtonMetrics.lineHeight(font)) + HEADER_ITEM_SPACING;
     }
-    return Math.max(1, room);
+    if (this.showsHeaderAccessory(section)) {
+      room -= this.headerAccessoryMaxWidth(section, width) + HEADER_ITEM_SPACING;
+    }
+    return Math.max(HEADER_TITLE_MIN_WIDTH_FLOOR, font.size, room);
   }
 
   /**
@@ -3168,11 +3274,13 @@ export class CYLTagListState implements CYLTagLongPressHost {
       frame.headerInsetRight = headerEdges[1];
       frame.isRtl = this.isRtl;
       frame.headerTitleLeadingX = this.isRtl ? this.layoutWidth - headerEdges[1] : headerEdges[0];
+      frame.headerTitleWidth = this.headerTitleRoom(section, this.layoutWidth);
+      frame.headerAccessoryMaxWidth = this.headerAccessoryMaxWidth(section);
       if (this.showsHeaderFoldControl(section)) {
         // At the right end for `headerTrailing` in ltr and for `headerLeading` in rtl.
         const atRight = (this.foldControlStorage.position === CYLMenuFoldControlPosition.headerTrailing) !== this.isRtl;
-        frame.headerFoldX = atRight ? this.layoutWidth - headerEdges[1] - this.headerFoldSize(frame.expanded).width :
-          headerEdges[0];
+        const foldWidth = this.headerFoldSize(frame.expanded, this.layoutWidth, section).width;
+        frame.headerFoldX = atRight ? this.layoutWidth - headerEdges[1] - foldWidth : headerEdges[0];
       }
       const visible = this.numberOfVisibleItems(section);
       const cells: CYLTagListItemFrame[] = [];

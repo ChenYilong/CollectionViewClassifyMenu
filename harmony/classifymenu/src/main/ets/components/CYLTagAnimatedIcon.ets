@@ -147,11 +147,16 @@ export function cylTagAnimatedIconOuterHeight(width: number, height: number): nu
 
 /**
  * An image `CYLAnimatedItemView` can draw as the static image of `CYLTagAnimatedIcon`: a resource or a path; '' for a
- * pixel map or a system symbol, which it cannot draw (the placeholder shows instead while the animation loads).
+ * pixel map, which it cannot draw (the placeholder shows instead while the animation loads). A system symbol is returned as
+ * its resource: the item draws it as a `SymbolGlyph`.
  */
 export function cylTagAnimationImage(image: CYLImage | undefined): ResourceStr {
-  if (image === undefined || CYLImageIsSymbol(image)) {
+  if (image === undefined) {
     return '';
+  }
+  if (CYLImageIsSymbol(image)) {
+    // A system symbol: the item draws it as a `SymbolGlyph` in its icon colour (`CYLAnimatedItemView.cylFallbackImage`), like the static path.
+    return image as Resource;
   }
   if (typeof image === 'string') {
     return image as string;
@@ -183,10 +188,14 @@ export struct CYLTagAnimatedIcon {
   @Prop selectedImage: ResourceStr = '';
   @Prop isSelected: boolean = false;
   /**
-   * The color the component tints the static image with (`CYLAnimatedItemView.iconColor`, the tag's
-   * `animationIconColor`); '' keeps the image's own colors.
+   * The tag's icon colour CHANNELS (the item's subclass-explicit and subclass built-in levels, never the integrator-owned
+   * `iconColor`): the explicit colour tints the static image and the animation (the tag's `animationIconColor`); '' keeps the
+   * image's own colors. The item resolves and adapts them on dark glass.
    */
-  @Prop iconColor: ResourceColor = '';
+  @Prop subclassIconColor: ResourceColor = '';
+  @Prop subclassSelectedIconColor: ResourceColor = '';
+  @Prop builtInIconColor: ResourceColor = '';
+  @Prop builtInSelectedIconColor: ResourceColor = '';
   /**
    * The playback speed passed to `CYLAnimatedItemView.animationSpeed` for a file drawn by a component-level builder.
    */
@@ -341,7 +350,12 @@ export struct CYLTagAnimatedIcon {
           image: this.image,
           selectedImage: this.selectedImage,
           isItemSelected: this.isSelected,
-          iconColor: this.iconColor,
+          // A selected tag rests on the LAST frame of its animation (iOS: showsLastFrameWhenSelected = true).
+          showsLastFrameWhenSelected: true,
+          subclassIconColor: this.subclassIconColor,
+          subclassSelectedIconColor: this.subclassSelectedIconColor,
+          builtInIconColor: this.builtInIconColor,
+          builtInSelectedIconColor: this.builtInSelectedIconColor,
           iconSize: this.side(),
           spacing: 0,
           drivesAnimationPlayback: false,
@@ -356,7 +370,12 @@ export struct CYLTagAnimatedIcon {
           image: this.image,
           selectedImage: this.selectedImage,
           isItemSelected: this.isSelected,
-          iconColor: this.iconColor,
+          // A selected tag rests on the LAST frame of its animation (iOS: showsLastFrameWhenSelected = true).
+          showsLastFrameWhenSelected: true,
+          subclassIconColor: this.subclassIconColor,
+          subclassSelectedIconColor: this.subclassSelectedIconColor,
+          builtInIconColor: this.builtInIconColor,
+          builtInSelectedIconColor: this.builtInSelectedIconColor,
           iconSize: this.side(),
           spacing: 0,
           animationSpeed: this.itemBuilder !== undefined ? this.animationSpeed : 1,

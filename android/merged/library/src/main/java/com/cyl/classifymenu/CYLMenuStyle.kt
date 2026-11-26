@@ -378,15 +378,13 @@ class CYLMenuStyle {
 
     init {
         val hairline = 1f / max(1f, Resources.getSystem().displayMetrics.density)
-        normalAppearance.borderColor = CYLColor.white(0.82f)
-        normalAppearance.borderWidth = hairline
+        // The built-in default borders are not explicit: under drawn Liquid Glass they are dropped (the glass draws its own rim).
+        normalAppearance.setDefaultBorder(CYLColor.white(0.82f), hairline)
         selectedAppearance.backgroundColor = CYLAppTintColor
         selectedAppearance.textColor = Color.WHITE
-        selectedAppearance.borderColor = CYLAppTintColor
-        selectedAppearance.borderWidth = hairline
+        selectedAppearance.setDefaultBorder(CYLAppTintColor, hairline)
         disabledAppearance.textColor = CYLColor.white(0.7f)
-        disabledAppearance.borderColor = CYLColor.white(0.88f)
-        disabledAppearance.borderWidth = hairline
+        disabledAppearance.setDefaultBorder(CYLColor.white(0.88f), hairline)
     }
 
     /** The content insets of every state; reads the normal state's. */
@@ -444,9 +442,15 @@ class CYLMenuStyle {
 
     /**
      * The icon color the app set for `state`, null while it was never set: the built-in default (the text color) does not count.
-     * Only an explicit color takes the dark-glass lift ([CYLIconContrast]).
+     * The tag hands only an explicit color to the item as its icon color; the item adapts it on dark Liquid Glass.
      */
     internal fun explicitIconColorForState(state: Int): Int? = appearanceForState(state).iconColor
+
+    /**
+     * The text color the app set for `state`, null while it was never set: the built-in default does not count.
+     * The tag hands only an explicit color to the item as its title color; the item adapts it on dark Liquid Glass.
+     */
+    internal fun explicitTextColorForState(state: Int): Int? = appearanceForState(state).explicitTextColor
 
     /** `-iconColorForState:`: the icon color, else the text color. */
     fun iconColorForState(state: Int): Int {

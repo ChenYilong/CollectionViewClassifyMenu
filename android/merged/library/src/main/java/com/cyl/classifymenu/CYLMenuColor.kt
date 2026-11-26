@@ -81,15 +81,26 @@ internal object CYLSystemColors {
         (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
             android.content.res.Configuration.UI_MODE_NIGHT_YES
 
+    /** The relative luminance (0...1) at or above which a color counts as light; the midpoint between black and white text. */
+    private const val LIGHT_COLOR_LUMINANCE = 0.5
+
     /**
      * The one tint of the list's texts and icons: the theme's `textColorPrimary` (what `UIColor.label` is on iOS), else white in
-     * night mode and black otherwise.
+     * night mode and black otherwise. The theme's color counts only where it agrees with the mode: a host theme that is not a
+     * DayNight theme keeps a DARK `textColorPrimary` in night mode (and a light one in day mode), which would put dark text on dark
+     * glass; there the label color of the mode (white in night mode, black otherwise) is used.
      */
     fun primary(context: android.content.Context): Int {
-        val fallback = if (isNight(context)) Color.WHITE else Color.BLACK
+        val night = isNight(context)
+        val fallback = if (night) Color.WHITE else Color.BLACK
         val attributes = context.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
         return try {
-            attributes.getColorStateList(0)?.defaultColor ?: fallback
+            val theme = attributes.getColorStateList(0)?.defaultColor ?: return fallback
+            val luminance = CYLMenuRelativeLuminance(
+                Color.red(theme) / CYLTintChannelMax.toDouble(), Color.green(theme) / CYLTintChannelMax.toDouble(),
+                Color.blue(theme) / CYLTintChannelMax.toDouble(),
+            )
+            if (night == (luminance >= LIGHT_COLOR_LUMINANCE)) theme else fallback
         } catch (error: Throwable) {
             fallback
         } finally {
