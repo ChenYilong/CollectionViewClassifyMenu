@@ -353,8 +353,35 @@ open class CYLTagButton: CYLAnimatedItemView {
         disabledWinsImage = true
         showsOutlineWhenIncreaseContrast = true
         applyStyleAnimationSpeed()
+        for role in Self.indicatorRoles {
+            register(role)
+        }
         updateAppearance()
     }
+
+    // MARK: - Delete indicator colors
+
+    /**
+     * The delete indicator's elements as color roles of the item (`CYLAnimatedItemColorRole`): the item resolves their colors by its one precedence chain
+     * and adapts the explicit ones on drawn dark glass by the role's kind (label: title 4.5:1; cross and editing icons: icon 3:1). Built-ins are not adapted.
+     * Each hook takes the item as a parameter, so a role holds no reference to its tag.
+     */
+    private static let indicatorRoles: [CYLAnimatedItemColorRole] = [
+        CYLAnimatedItemColorRole(id: "tag.deleteIndicatorLabel", kind: .title, adaptsBuiltIn: false) { item, resolved in
+            (item as? CYLTagButton)?.deleteIndicatorLabel.textColor = resolved.color
+        },
+        CYLAnimatedItemColorRole(id: "tag.deleteIndicatorCross", kind: .icon, adaptsBuiltIn: false) { item, resolved in
+            (item as? CYLTagButton)?.crossLayer.strokeColor = resolved.color?.resolvedColor(with: item.traitCollection).cgColor
+        },
+        // The editing icons (rename, delete) are items themselves; they take the color as their subclass built-in.
+        CYLAnimatedItemColorRole(id: "tag.editingIcons", kind: .icon, adaptsBuiltIn: false) { item, resolved in
+            guard let tag = item as? CYLTagButton,
+                  (tag.showsDeleteIndicator && tag.showsRenameIndicator) || tag.editingIndicatorsViewIsLoaded else { return }
+            for icon in tag.editingIndicatorsView.itemViews {
+                icon.applyIconTintColor(resolved.color)
+            }
+        },
+    ]
 
     // MARK: - Animation
 
@@ -1057,17 +1084,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         isApplyingStyleAnimationSpeed = false
     }
 
-    /**
-     * The color of the delete indicator (its label, cross, editing icons): the style's `deleteIndicatorColor`, else the state's text color. An EXPLICIT
-     * color (the style's, or an explicit text color) goes through the item's dark-glass rule (`adaptedOnGlass`); the tag default is as it is.
-     */
-    private func deleteIndicatorColor(_ appearance: CYLTagAppearance, kind: CYLAnimatedItemGlassColorKind) -> UIColor? {
-        if let explicit = style.deleteIndicatorColor ?? appearance.explicitTextColor {
-            return adaptedOnGlass(explicit, kind: kind)
-        }
-        return appearance.textColor
-    }
-
     private func updateAppearance() {
         let style = styleStorage
         let state = currentState
@@ -1096,6 +1112,14 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         applyTitleTintColor(appearance.textColor)
         applyIconTintColor(style.iconColor(for: state))
+        // The delete indicator's elements: the style's `deleteIndicatorColor`, else the state's explicit text color, is explicit (the item adapts it on
+        // drawn dark glass); the state's text color is the built-in (as it is).
+        for role in Self.indicatorRoles {
+            for tagState in Self.states {
+                setSubclassColor(style.deleteIndicatorColor ?? style.appearance(for: tagState).explicitTextColor, for: tagState, role: role)
+            }
+            applyBuiltInColor(appearance.textColor, role: role)
+        }
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)
@@ -1110,10 +1134,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         deleteIndicatorImageView.isHidden = !showsDeleteIndicator || indicatorImage == nil || editingIcons
         if editingIcons || editingIndicatorsViewIsLoaded {
             editingIndicatorsView.isHidden = !editingIcons
-            let color = deleteIndicatorColor(appearance, kind: .icon)
-            for icon in editingIndicatorsView.itemViews {
-                icon.applyIconTintColor(color)
-            }
         }
         // A title that may wrap (CYLMenuStyle.titleMaxLines) takes that many lines (UIKit counts 0 as "as many as it needs").
         titleLabel.numberOfLines = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? Self.uiKitUnlimitedLines : style.titleMaxLines
@@ -1126,7 +1146,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         crossLayer.isHidden = !showsDeleteIndicator || !drawsCross || editingIcons
         crossLayer.lineWidth = style.deleteIndicatorLineWidth
-        crossLayer.strokeColor = deleteIndicatorColor(appearance, kind: .icon)?.resolvedColor(with: traitCollection).cgColor
         let imageRadius = style.imageCornerRadius
         if !style.imageFillsTagHeight {
             // (An image that fills the tag's height is a circle: layOutTagHeightImage rounds it.)
@@ -1138,7 +1157,6 @@ open class CYLTagButton: CYLAnimatedItemView {
             }
         }
         deleteIndicatorLabel.font = style.deleteIndicatorFont(for: state, traitCollection: traitCollection)
-        deleteIndicatorLabel.textColor = deleteIndicatorColor(appearance, kind: .title)
         // Under drawn glass only an explicit border is handed over (the built-in one would hide the shared glass rim); flat keeps the effective border.
         let borderColor = drawsGlass ? appearance.glassBorderColor : appearance.borderColor
         let borderWidth = borderColor != nil ? (drawsGlass ? appearance.glassBorderWidth : appearance.borderWidth) : 0

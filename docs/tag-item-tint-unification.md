@@ -191,3 +191,23 @@ at `9905aaa0` and the Configuration page at `99662054` / `510ed988`; the calibra
   字典一节的 Lottie 条目用条目的动画选项 `animationOptions: ["tint": "title"]` 主动启用（未设置的动画保持不着色，tint 规范 v2；直接在文件 URL 上加 `?tint=title` 查询会被忽略）。"title" 指条目的图标颜色，所以图标跟随字典样式里显式设置的靛蓝图标色，和心形图标一致：深色和浅色模式下都可见（原为深灰 (34, 34, 34)，在深色玻璃上对比度 1.59）。
 - The Configuration example now matches Android: both lists use `sectionStyle = plain` (Android: `plainSections()` for the file list and `sectionStyle: "plain"` in the map style), so both sections are flat and full width, like Android. The config-file list folds after two rows with the fold control at the end: on iOS the "SF Symbol" tag (the 6th) does not fit next to the fold control by a hair and stays hidden until expanded (Android shows it; the iOS tag text is slightly wider). Accepted by the owner: the configuration itself is complete (all entries are in the shared file). Shrinking the tag margin to force it was tried and reverted.
   Configuration 示例与 Android 对齐：两个列表都用 `sectionStyle = plain`（Android：配置文件列表用 `plainSections()`，字典样式里是 `sectionStyle: "plain"`），两节都是扁平、全宽，和 Android 一致。配置文件列表在两行后折叠，折叠控件在末尾：iOS 上第 6 个标签 "SF Symbol" 与折叠控件并排时差一点点放不下，展开前保持隐藏（Android 会显示；iOS 标签文字稍宽）。owner 接受：配置本身是完整的（所有条目都在共享文件里）。曾尝试缩小标签 margin 强行放下，已撤回。
+
+## Color roles 颜色角色
+
+**What a role is.** A `CYLAnimatedItemColorRole` (a struct, so subclasses can add roles) declares ONE element whose color the item resolves and writes: `id`, `kind` (`.title` 4.5:1 or `.icon` 3:1), an extractor of the explicit color from a `UITabBarItemStateAppearance` (nil for a subclass-only role), the role's own built-in per state, and an `apply` hook that takes the ITEM as a parameter (no capture, no retain cycle). The item registers three: `.icon`, `.animationTint` (derived from the icon role, the same for every animation engine) and `.title`. 一个角色声明一个元素的颜色：id、kind、显式颜色提取器、各状态内置值、以条目为参数的 apply 钩子。
+
+**The resolver.** `resolvedColor(role, state)`: own `itemAppearance` > subclass-explicit (`setSubclassColor(_:for:role:)`) > the stack's inherited `itemAppearance` > subclass built-in (`applyBuiltInColor(_:role:)`) > the role's built-in. The explicit level is adapted ONCE on drawn dark glass (`glassAdapted`, by `role.kind`); the built-in levels are resolved with the item's traits into a plain color and, if `role.adaptsBuiltIn`, adapted too (not the disabled look). Dynamic colors are never adapted. ONE `refreshColors()` runs every role on every change of state, appearance, tint, traits, glass and icon.
+
+**The tag's roles.** `CYLTagButton` registers `tag.deleteIndicatorLabel` (title), `tag.deleteIndicatorCross` and `tag.editingIcons` (icon; the rename and delete icons are one role) with `adaptsBuiltIn: false` (the tag default is as it is, as before), gives them the style's `deleteIndicatorColor` / the state's explicit text color as explicit, the state's text color as built-in, and no longer calls `adaptedOnGlass`. The badge stays deferred.
+
+**How to add a third element** (nothing else to plumb):
+
+```swift
+register(CYLAnimatedItemColorRole(id: "mine.hint", kind: .title,
+    componentBuiltIn: { _, _ in .secondaryLabel },
+    apply: { item, resolved in (item as? MyItem)?.hintLabel.textColor = resolved.color }))
+setSubclassColor(.systemBlue, for: .normal, role: <the same role>)   // optional explicit color
+applyBuiltInColor(.systemGray, role: <the same role>)                // optional subclass built-in
+```
+
+**Public names that did not change** (Windows ports these): `setSubclassTitleColor(_:for:)`, `setSubclassIconColor(_:for:)`, `applyTitleTintColor(_:)`, `applyIconTintColor(_:)`, `adaptedOnGlass(_:kind:)`, `drawsLiquidGlass`, `drawsFlatBackground`. They are wrappers over the role API. New: `register(_:)`, `setSubclassColor(_:for:role:)`, `applyBuiltInColor(_:role:)`.
