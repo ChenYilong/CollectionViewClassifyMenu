@@ -3,7 +3,7 @@
 //  CYLMenuExampleTests
 //
 //  A glass tag does not carry the style's DEFAULT border: under drawn Liquid Glass a border color / width the app, a configuration or a
-//  preset did not set is handed over as no border (width 0), so the shared glass rim shows; an explicit border is kept; a flat tag keeps
+//  preset did not set is handed over as no border (width 0), so the shared glass rim shows; the explicit color decides (a width alone draws nothing); a flat tag keeps
 //  the default border exactly. The selected built-in app-tint border is dropped the same way.
 //
 
@@ -70,8 +70,18 @@ final class CYLGlassBorderTests: XCTestCase {
         }
         XCTAssertEqual(tag.itemBorderColor, .systemRed)
         XCTAssertEqual(tag.itemBorderWidth, 2)
+        // The explicit color decides: a color alone keeps the default width, a width alone draws nothing.
+        let onlyColor = button(glass: true) { $0.normalAppearance.borderColor = .systemBlue }
+        XCTAssertEqual(onlyColor.itemBorderColor, .systemBlue)
+        XCTAssertEqual(onlyColor.itemBorderWidth, CYLMenuStyle().normalAppearance.borderWidth, "The default width")
         let onlyWidth = button(glass: true) { $0.normalAppearance.borderWidth = 3 }
-        XCTAssertEqual(onlyWidth.itemBorderWidth, 3, "A set width draws the effective color")
+        XCTAssertEqual(onlyWidth.itemBorderWidth ?? 0, 0, "A width without an explicit color: no border under glass")
+        XCTAssertNil(onlyWidth.itemBorderColor)
+        let noColor = button(glass: true) {
+            $0.normalAppearance.borderColor = nil
+            $0.normalAppearance.borderWidth = 2
+        }
+        XCTAssertEqual(noColor.itemBorderWidth ?? 0, 0, "An explicit nil color is no border")
     }
 
     func testAFlatTagKeepsTheDefaultBorder() {

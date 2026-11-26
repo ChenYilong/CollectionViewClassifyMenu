@@ -149,7 +149,7 @@ public final class CYLTagAppearance {
     }
 
     // The border, like the background: the built-in (a default of the style, never explicit) and the EXPLICIT values the app, a
-    // configuration or a preset set. Under Liquid Glass only an explicit border is drawn (`glassBorderColor` / `glassBorderWidth`).
+    // configuration or a preset set. Under Liquid Glass only an explicit color draws a border (`glassBorderColor` / `glassBorderWidth`).
     private var builtInBorderColor: UIColor?
     private var builtInBorderWidth: CGFloat = 0
     private var explicitBorderColorStorage: UIColor??
@@ -179,14 +179,14 @@ public final class CYLTagAppearance {
     public var isBorderWidthSet: Bool { explicitBorderWidthStorage != nil }
 
     /**
-     * The border drawn under Liquid Glass: the effective border when the app set the color or the width, else none (the built-in
-     * border is not handed to the glass, so the shared glass rim shows).
+     * The border drawn under Liquid Glass: the EXPLICIT color decides. An explicit color draws the border (the explicit width, else the
+     * default width); a width set without an explicit color, or nothing explicit, draws none (the shared glass rim shows).
      */
     public var glassBorderColor: UIColor? {
-        isBorderColorSet || isBorderWidthSet ? borderColor : nil
+        isBorderColorSet ? borderColor : nil
     }
     public var glassBorderWidth: CGFloat {
-        isBorderColorSet || isBorderWidthSet ? borderWidth : 0
+        glassBorderColor != nil ? borderWidth : 0
     }
 
     /**
