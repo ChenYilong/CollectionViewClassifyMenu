@@ -123,7 +123,7 @@ CYLTabBarController `CYLAnimatedItem` module (iOS `CYLAnimatedItemContrast.swift
 `CYLAnimatedItemContrast.ets`, mini program `cyl_animated_item_contrast.js`, CYLTabBarController `e014028f`). ClassifyMenu's own iOS
 `CYLIconContrast` (which also judged the glass over a bright blue backdrop) is removed.
 
-Rule (identical on every platform; constants `titleMinimumContrast` 4.5, `iconMinimumContrast` 3, `frostedWhiteAlpha` 0.14,
+Rule (the shared rule of every CYLAnimatedItem platform; constants `titleMinimumContrast` 4.5, `iconMinimumContrast` 3, `frostedWhiteAlpha` 0.14,
 `defaultTintShare` 0.75, `lightnessStep` 0.005):
 
 1. ONE reference luminance, the glass over black: no glass tint or tint alpha 0, the WCAG luminance of grey 0.14; else the luminance
@@ -133,7 +133,7 @@ Rule (identical on every platform; constants `titleMinimumContrast` 4.5, `iconMi
 3. Else the lightness (HSL) rises in steps of 0.005, hue, saturation and alpha kept, up to white, until the contrast reaches the minimum.
 4. A dynamic color (its light and dark values differ) is unchanged. Pure and deterministic. Light glass is not adapted.
 
-Applied only when glass is really drawn AND the mode is dark AND the color is EXPLICIT (set by the app). On a tag: the style's
+Applied only when glass is really drawn AND the mode is dark AND the color is EXPLICIT (set by the app). On an iOS tag (CYLTabBarController `f1673f32`; the Android, HarmonyOS and mini program ClassifyMenu rows below still use their local icon-only lift until they move to the shared rule): the style's
 explicit `textColor` of the state (title, 4.5) and its explicit `iconColor`, else the explicit `textColor` the icon follows (icon and
 animation tint, 3). The built-in colors are never touched; light mode, flat tags, colors that already pass and dynamic colors never change.
 
