@@ -35,7 +35,7 @@ dependencies:
   flutter_cyltabbar:
     git:
       url: https://github.com/ChenYilong/CYLTabBarController.git
-      ref: bb4bc53b9b42a5797871414ee4e5038666c21524
+      ref: 9905aaa029a64d09a3c06484c7ce7ab5fc4a1ce3
       path: CrossPlatform/flutter_cyltabbar
   cupertino_icons: ^1.0.8
   sqflite: ^2.4.6
