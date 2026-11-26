@@ -54,6 +54,10 @@ function tailCell(style: CYLMenuStyle): CYLTagFoldButton {
   return cell;
 }
 
+function setMode(mode: string): void {
+  AppStorage.setOrCreate<string>(COLOR_MODE_KEY, mode);
+}
+
 /**
  * The tag draws its title and static icons itself, so it hands an EXPLICIT color to the shared dark-glass adaptation
  * (`CYLAnimatedItemContrast.adaptedOnGlass`): lifted only where glass is drawn in dark mode; everything else is unchanged.
@@ -62,10 +66,6 @@ export default function tagIconColorTest() {
   let savedMeasurer: CYLTextMeasurer = FIXED;
   let savedGlass: boolean | undefined = undefined;
   let savedMode: string | undefined = undefined;
-
-  function setMode(mode: string): void {
-    AppStorage.setOrCreate<string>(COLOR_MODE_KEY, mode);
-  }
 
   describe('CYLTagIconColor', () => {
     beforeEach(() => {
