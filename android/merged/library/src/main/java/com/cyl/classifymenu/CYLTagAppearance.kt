@@ -84,6 +84,30 @@ class CYLTagAppearance : Cloneable {
      */
     val hasExplicitBorder: Boolean get() = borderColorWasSet
 
+    /** Whether the border COLOR was set by the app, a configuration or a preset (not the style's built-in default); as iOS `isBorderColorSet`. */
+    val isBorderColorSet: Boolean get() = borderColorWasSet
+
+    /** Whether the border WIDTH was set by the app, a configuration or a preset (not the style's built-in default); as iOS `isBorderWidthSet`. */
+    val isBorderWidthSet: Boolean get() = borderWidthWasSet
+
+    /**
+     * The border drawn under Liquid Glass: the EXPLICIT color decides. An explicit color draws the border (the explicit width, else
+     * the default width); a width set without an explicit color, or nothing explicit, draws none (the shared glass rim shows).
+     */
+    val glassBorderColor: Int? get() = if (isBorderColorSet) borderColor else null
+
+    /** The width (dp) of [glassBorderColor]: the effective width while there is a glass border color, else 0. */
+    val glassBorderWidth: Float get() = if (glassBorderColor != null) borderWidth else 0f
+
+    /** Whether the background color was set (and not reset); as iOS `isBackgroundColorSet`. */
+    val isBackgroundColorSet: Boolean get() = _backgroundColor != null
+
+    /** Whether the text color was set (and not reset); as iOS `isTextColorSet`. */
+    val isTextColorSet: Boolean get() = _textColor != null
+
+    /** Whether the icon color was set (and not reset); as iOS `isIconColorSet`. */
+    val isIconColorSet: Boolean get() = iconColor != null
+
     /** The built-in default border of a state: readable through [borderColor] and [borderWidth] but NOT explicit. */
     internal fun setDefaultBorder(color: Int?, width: Float) {
         _borderColor = color

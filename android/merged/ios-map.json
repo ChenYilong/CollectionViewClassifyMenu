@@ -98,5 +98,17 @@
  "CYLSectionStyleColors.GROUPED_BACKGROUND": "`CYLSectionStyleColors.groupedBackground` (the light value of the dynamic color)",
  "CYLSectionStyleColors.GROUPED_BACKGROUND_DARK": "`CYLSectionStyleColors.groupedBackground` (the dark value of the dynamic color)",
  "CYLSectionStyleColors.SEPARATOR": "`CYLSectionStyleColors.separator` (the light value of the dynamic color)",
- "CYLSectionStyleColors.SEPARATOR_DARK": "`CYLSectionStyleColors.separator` (the dark value of the dynamic color)"
+ "CYLSectionStyleColors.SEPARATOR_DARK": "`CYLSectionStyleColors.separator` (the dark value of the dynamic color)",
+ "CYLTag.BADGE_DOT_DIAMETER": "`CYLTag.badgeDotDiameter` (8 pt; Android: dp)",
+ "CYLTag.BADGE_IMAGE_TEXT_PADDING": "`CYLTag.badgeImageTextPadding` (4 pt; Android: dp)",
+ "CYLTag.badgeDotImage": "`CYLTag.badgeDotImage(color:canvas:)` (Android takes a nullable ARGB color, null is system red, and returns a `CYLBadgeDrawable`)",
+ "CYLTag.badgeImageWidth": "`CYLTag.badgeImageWidth(text:diameter:)` (dp)",
+ "CYLTagCalloutBubble.placesBelow": "`CYLTagCalloutView.placesBelow(target:height:safeTop:bottomLimit:header:)` (Android takes screen pixels as ints, the header as its top and bottom, and the bubble's shadow margin, which the drawn bubble does not cover)",
+ "CYLTagAppearance.isBorderColorSet": "`CYLTagAppearance.isBorderColorSet`",
+ "CYLTagAppearance.isBorderWidthSet": "`CYLTagAppearance.isBorderWidthSet`",
+ "CYLTagAppearance.glassBorderColor": "`CYLTagAppearance.glassBorderColor`",
+ "CYLTagAppearance.glassBorderWidth": "`CYLTagAppearance.glassBorderWidth`",
+ "CYLTagAppearance.isBackgroundColorSet": "`CYLTagAppearance.isBackgroundColorSet`",
+ "CYLTagAppearance.isTextColorSet": "`CYLTagAppearance.isTextColorSet`",
+ "CYLTagAppearance.isIconColorSet": "`CYLTagAppearance.isIconColorSet`"
 }

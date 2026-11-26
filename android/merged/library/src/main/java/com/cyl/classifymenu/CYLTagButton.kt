@@ -485,9 +485,8 @@ open class CYLTagButton @JvmOverloads constructor(
         deleteIndicatorLabel.setTextColor(style.deleteIndicatorColor ?: textColor)
         // Where glass is really drawn only an EXPLICIT border (setter, configuration, preset) is handed over: the built-in default
         // border of the state is dropped (no border, width 0), so the glass's own rim shows. Flat keeps the default border.
-        val dropsDefaultBorder = drawsGlass && !appearance.hasExplicitBorder
-        val styleBorderColor = if (dropsDefaultBorder) null else appearance.borderColor
-        val styleBorderWidth = if (dropsDefaultBorder) 0f else appearance.borderWidth
+        val styleBorderColor = if (drawsGlass) appearance.glassBorderColor else appearance.borderColor
+        val styleBorderWidth = if (drawsGlass) appearance.glassBorderWidth else appearance.borderWidth
         var borderColor = styleBorderColor
         var borderWidth = if (borderColor != null) styleBorderWidth else 0f
         if (CYLAccessibility.isIncreaseContrastEnabled(context)) {
@@ -845,7 +844,14 @@ open class CYLTagButton @JvmOverloads constructor(
 
         private fun iconSize(image: Drawable?, style: CYLMenuStyle): CYLSize {
             if (image == null) return CYLSize.ZERO
-            if (style.imageSize != CYLSize.ZERO) return style.imageSize
+            if (style.imageSize != CYLSize.ZERO) {
+                // A badge capsule keeps the style's height; a wider one widens its slot, so the tag grows instead of the image
+                // overlapping the title (iOS `iconSize(for:style:)` with `cylIsBadgeImage`).
+                if (image is CYLBadgeDrawable) {
+                    return CYLSize(max(style.imageSize.width, image.intrinsicWidth / systemDensity), style.imageSize.height)
+                }
+                return style.imageSize
+            }
             return CYLSize(image.intrinsicWidth / systemDensity, image.intrinsicHeight / systemDensity)
         }
 

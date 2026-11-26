@@ -1539,8 +1539,15 @@ open class CYLTagListView @JvmOverloads constructor(
         val cellCenterX = location[0] + cell.width / 2
         val margin = px(8f)
         val x = max(display.left + margin, min(display.right - margin - bubble.measuredWidth, cellCenterX - bubble.measuredWidth / 2))
-        // Above the tag; below it when there is no room.
-        val above = location[1] - bubble.measuredHeight >= display.top
+        // The section header above a first-row tag stays visible: the bubble goes below the tag then, where there is room.
+        val headerView = content.headerViewAt(indexPath.section)?.takeIf { it.isShown && it.height > 0 }
+        val headerLocation = IntArray(2)
+        headerView?.getLocationOnScreen(headerLocation)
+        // Above the tag; below it when there is no room or when it would cover the header.
+        val above = !CYLTagCalloutBubble.placesBelow(
+            targetTop = location[1], targetBottom = location[1] + cell.height, height = bubble.measuredHeight,
+            safeTop = display.top, bottomLimit = display.bottom, shadowMargin = px(6f),
+            headerTop = headerView?.let { headerLocation[1] }, headerBottom = headerView?.let { headerLocation[1] + it.height })
         bubble.arrowUp = !above
         bubble.arrowCenter = (cellCenterX - x).toFloat()
         val y = if (above) location[1] - bubble.measuredHeight + px(6f) else location[1] + cell.height - px(6f)
@@ -2039,6 +2046,9 @@ open class CYLTagListView @JvmOverloads constructor(
         }
 
         fun cellAt(indexPath: CYLIndexPath): CYLTagListCell? = cells[indexPath]
+
+        /** The section's header view, or null (no title row, or the section is not built). */
+        fun headerViewAt(section: Int): View? = headers[section]
 
         fun forEachTagButton(body: (CYLTagButton) -> Unit) {
             for (cell in cells.values) body(cell.button)

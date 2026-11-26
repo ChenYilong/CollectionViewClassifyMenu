@@ -212,6 +212,26 @@ internal class CYLTagCalloutBubble(context: Context, text: String) : androidx.ap
         updatePadding()
     }
 
+    companion object {
+        /**
+         * Whether the callout goes below the tag (arrow up), as iOS `CYLTagCalloutView.placesBelow`. Above first (the contract); below
+         * when it does not fit above, or when it would cover the header (the section header above a first-row tag) and it fits below;
+         * above when neither side is free of the header and below does not fit. Pure: all values are in screen pixels.
+         * [height] is the bubble view's height, which includes [shadowMargin] on both sides; the drawn bubble is smaller.
+         */
+        @JvmStatic
+        fun placesBelow(targetTop: Int, targetBottom: Int, height: Int, safeTop: Int, bottomLimit: Int, shadowMargin: Int,
+                        headerTop: Int?, headerBottom: Int?): Boolean {
+            val aboveTop = targetTop - height
+            if (aboveTop < safeTop) return true
+            if (headerTop == null || headerBottom == null || headerBottom <= headerTop) return false
+            // The bubble is clamped horizontally and may be wider than the header's text: compare the vertical ranges only.
+            val coversHeader = headerTop < targetTop && headerBottom > aboveTop + 2 * shadowMargin
+            val fitsBelow = targetBottom + height - 2 * shadowMargin <= bottomLimit
+            return coversHeader && fitsBelow
+        }
+    }
+
     private fun updatePadding() {
         val horizontal = (12 * density).toInt()
         val vertical = (8 * density).toInt()
