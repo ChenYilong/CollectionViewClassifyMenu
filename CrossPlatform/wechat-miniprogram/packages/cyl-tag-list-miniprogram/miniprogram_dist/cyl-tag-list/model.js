@@ -184,12 +184,12 @@ const FOLD_CONTROL_MAX_FONT_SIZE = 20;
 /**
  * The header room model (docs/tag-section-style.md). INNER WIDTH is the header's content box (the tag column: the list width
  * minus the header edges). Every two adjacent header views are HEADER_ITEM_SPACING px apart (the fold control's margin on its
- * leading side; 12 is what the control's padding was, so the default look is unchanged). The fold control is at most
+ * leading side; 8 matches the iOS 8 pt and Android 8 dp gap). The fold control is at most
  * HEADER_FOLD_ALONE_MAX_FRACTION of the inner width, or HEADER_FOLD_SHARED_MAX_FRACTION when More, a clear button or an
  * accessory also shows (this component's header has none of those, so the alone value applies). The section title takes what
  * is left, never less than HEADER_TITLE_MIN_EM of the header font (and at least HEADER_TITLE_MIN_WIDTH_PX).
  */
-const HEADER_ITEM_SPACING = 12;
+const HEADER_ITEM_SPACING = 8;
 const HEADER_FOLD_ALONE_MAX_FRACTION = 0.4;
 const HEADER_FOLD_SHARED_MAX_FRACTION = 0.3;
 const HEADER_TITLE_MIN_EM = 1;
@@ -614,7 +614,7 @@ function usualFoldContent(position) {
 }
 
 function foldControlValue(value) {
-  const control = { position: 'none', content: 'title', title: '', collapseTitle: '', color: null };
+  const control = { position: 'none', content: 'title', title: '', collapseTitle: '', color: null, rotatesImage: true };
   if (value == null) return control;
   const positions = {
     none: 'none', footer: 'footer', headertrailing: 'headerTrailing', headerright: 'headerTrailing',
@@ -633,6 +633,8 @@ function foldControlValue(value) {
   if (typeof dictionary.title === 'string') control.title = dictionary.title;
   if (typeof dictionary.collapseTitle === 'string') control.collapseTitle = dictionary.collapseTitle;
   control.color = color(dictionary.color);
+  // `rotatesImageWhenExpanded` (CYLMenuFoldControl): the chevron turns 180 degrees when expanded; true unless set to false.
+  if (boolValue(dictionary.rotatesImageWhenExpanded) === false) control.rotatesImage = false;
   return control;
 }
 
@@ -1645,7 +1647,29 @@ function coderString(value) {
   return `{${n(value.top)}, ${n(value.left)}, ${n(value.bottom)}, ${n(value.right)}}`;
 }
 
+/** The gap between the callout bubble and the tag (the wxss translateY of .cyl-callout) and the room it needs above the tag. */
+const CALLOUT_GAP = 8;
+const CALLOUT_MIN_ROOM_ABOVE = 60;
+
+/**
+ * Whether the callout goes below the tag (the core's `CYLTagLongPressAction.placesBelow`). Above first; below when there is
+ * no room above (the tag's top is under CALLOUT_MIN_ROOM_ABOVE) or when the bubble would cover `header` (the section header
+ * above a first-row tag) and it fits below; above when neither side is free of the header and below does not fit. Pure:
+ * `target` and `header` are {top, bottom} in one coordinate space; `header` may be null; `bottomLimit` may be omitted
+ * (no limit).
+ */
+function calloutPlacesBelow(target, height, header, bottomLimit = Infinity) {
+  if (target.top < CALLOUT_MIN_ROOM_ABOVE) return true;
+  if (!header || !(header.bottom > header.top)) return false;
+  const aboveTop = target.top - height - CALLOUT_GAP;
+  // Compare the vertical ranges only: the bubble is clamped horizontally and may be wider than the header's text.
+  const coversHeader = header.top < aboveTop + height && header.bottom > aboveTop;
+  const fitsBelow = target.bottom + CALLOUT_GAP + height <= bottomLimit;
+  return coversHeader && fitsBelow;
+}
+
 module.exports = {
+  calloutPlacesBelow, CALLOUT_GAP, CALLOUT_MIN_ROOM_ABOVE,
   cylAnimatedItemCornerRadiusCapsule,
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,

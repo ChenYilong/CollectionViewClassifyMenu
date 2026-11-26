@@ -124,6 +124,56 @@ test('cyl-tag-list: with no action configured a long press is only reported', ()
   assert.equal(list.events.pop().name, 'taglongpress');
 });
 
+test('calloutPlacesBelow: above first; below with no room above or when the bubble would cover the header and it fits below', () => {
+  const target = { top: 200, bottom: 230 };
+  const height = 34;
+  // The bubble spans [158, 192] above the tag.
+  assert.equal(model.calloutPlacesBelow(target, height, null), false);
+  assert.equal(model.calloutPlacesBelow(target, height, { top: 100, bottom: 136 }), false);
+  assert.equal(model.calloutPlacesBelow(target, height, { top: 170, bottom: 198 }), true);
+  // Empty header: nothing to avoid.
+  assert.equal(model.calloutPlacesBelow(target, height, { top: 170, bottom: 170 }), false);
+  // Covering the header but no room below: stays above.
+  assert.equal(model.calloutPlacesBelow(target, height, { top: 170, bottom: 198 }, 250), false);
+  // No room above at all.
+  assert.equal(model.calloutPlacesBelow({ top: model.CALLOUT_MIN_ROOM_ABOVE - 1, bottom: 80 }, height, null), true);
+});
+
+test('cyl-tag-list: the callout goes below the tag when it would cover the section header', () => {
+  const rects = (selector) => {
+    if (selector === '.cyl-tag-list') return { left: 0, top: 100, width: 390, height: 300 };
+    if (selector === '#cyl-header-s0') return { left: 0, right: 390, top: 170, bottom: 198, width: 390, height: 28 };
+    return { left: 40, right: 140, top: 200, bottom: 230, width: 100, height: 30 };
+  };
+  const list = mount({ configuration: configuration({ longPressAction: 'callout' }) }, rects);
+  list.onItemLongPress(pressOf('0-0'));
+  assert.equal(list.data.callout.below, true);
+  assert.equal(list.data.callout.top, 130);
+});
+
+test('cyl-tag-list: a scroll hides the callout', () => {
+  const rects = (selector) => (selector === '.cyl-tag-list'
+    ? { left: 0, top: 100, width: 390, height: 300 }
+    : { left: 40, right: 140, top: 200, bottom: 230, width: 100, height: 30 });
+  const list = mount({ configuration: configuration({ longPressAction: 'callout' }) }, rects);
+  list.onItemLongPress(pressOf('0-0'));
+  assert.ok(list.data.callout);
+  list.onScroll();
+  assert.equal(list.data.callout, null);
+});
+
+test('foldControl rotatesImageWhenExpanded: true by default, false turns the chevron rotation off', () => {
+  assert.equal(model.foldControlValue({ position: 'tail' }).rotatesImage, true);
+  assert.equal(model.foldControlValue({ position: 'tail', rotatesImageWhenExpanded: false }).rotatesImage, false);
+  assert.equal(model.foldControlValue({ position: 'tail', rotatesImageWhenExpanded: true }).rotatesImage, true);
+  assert.equal(model.foldControlValue('footer').rotatesImage, true);
+  const list = mount({ configuration: configuration({ foldControl: { position: 'footer', rotatesImageWhenExpanded: false } }) });
+  assert.equal(list.data.foldRotates, false);
+  const wxml = require('node:fs').readFileSync(path.join(PACKAGE, 'cyl-tag-list', 'cyl-tag-list.wxml'), 'utf8');
+  assert.equal((wxml.match(/section\.expanded && foldRotates \? 'cyl-up'/g) || []).length, 2);
+  assert.ok(wxml.includes("section.expanded && foldRotates ? 'cyl-footer-chevron-up'"));
+});
+
 test('the list is the containing block of the absolutely positioned callout', () => {
   const css = require('node:fs').readFileSync(
     require('node:path').join(__dirname, '../packages/cyl-tag-list-miniprogram/miniprogram_dist/cyl-tag-list/cyl-tag-list.wxss'), 'utf8');
