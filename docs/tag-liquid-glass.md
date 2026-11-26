@@ -134,8 +134,8 @@ Rule (the shared rule of every CYLAnimatedItem platform; constants `titleMinimum
 4. A dynamic color (its light and dark values differ) is unchanged. Pure and deterministic. Light glass is not adapted.
 
 Applied only when glass is really drawn AND the mode is dark AND the color is EXPLICIT (set by the app). On an iOS tag (CYLTabBarController `f1673f32`; the Android, HarmonyOS and mini program ClassifyMenu rows below still use their local icon-only lift until they move to the shared rule): the style's
-explicit `textColor` of the state (title, 4.5) and its explicit `iconColor`, else the explicit `textColor` the icon follows (icon and
-animation tint, 3). The built-in colors are never touched; light mode, flat tags, colors that already pass and dynamic colors never change.
+explicit `textColor` of the state (title, 4.5) and its explicit `iconColor` (icon and animation tint, 3; an icon that only follows the text color
+is not lifted by itself). The built-in colors are never touched; light mode, flat tags, colors that already pass and dynamic colors never change.
 
 iOS wiring: `CYLAnimatedItemView` lifts its own explicit colors (the item's or the stack's `itemAppearance` icon color, the
 `titleTextAttributes` title color, a fixed `animationTint`). A tag hands its colors as the subclass level (`applyIconTintColor`,

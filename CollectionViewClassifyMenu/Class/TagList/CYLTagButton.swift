@@ -1131,8 +1131,8 @@ open class CYLTagButton: CYLAnimatedItemView {
         // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the view's default share.
         // The default tint (no explicit color) is handed with alpha 1: its own low alpha is the tint, the same as the board's.
         itemGlassTintAlpha = state == .selected || (drawsGlass && !pressed && explicitGlassColor == nil) ? 1 : nil
-        // Dark drawn glass: an explicit, static title color (4.5:1) and icon color (3:1; the explicit icon color, else the explicit
-        // title color it follows) are lifted by the shared rule of the tab bar module, CYLAnimatedItemContrast (one reference: the
+        // Dark drawn glass: an explicit, static title color (4.5:1) and icon color (3:1; only an EXPLICIT icon color: an icon that follows
+        // the text color is not lifted by itself, as on the other platforms) are lifted by the shared rule of the tab bar module, CYLAnimatedItemContrast (one reference: the
         // glass over black). The item lifts only its own explicit colors (itemAppearance), and the tag hands its colors as the
         // subclass level, so the tag asks the same function here. Built-in, dynamic and flat colors are as set.
         let liftsOnGlass = drawsGlass && traitCollection.userInterfaceStyle == .dark
@@ -1142,7 +1142,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         titleLabel.textColor = textColor
         var iconColor = style.iconColor(for: state)
-        if liftsOnGlass, let explicit = style.explicitIconColor(for: state) ?? appearance.explicitTextColor {
+        if liftsOnGlass, let explicit = style.explicitIconColor(for: state) {
             iconColor = CYLAnimatedItemContrast.adjustedIcon(explicit, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha)
         }
         // The animation takes this color too (`animationTint = "title"`), so it is lifted with the icon.
