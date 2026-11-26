@@ -1713,7 +1713,7 @@ open class CYLTagListView @JvmOverloads constructor(
     /** `-removeTagsAtIndexes:`. */
     fun removeTagsAtIndexes(indexes: Collection<Int>) {
         val source = showTags()
-        for (index in indexes.toSortedSet().reversed()) {
+        for (index in indexes.distinct().sortedDescending()) {
             if (index in source.tags.indices) {
                 source.removeTagAtIndex(index)
                 removeSelection(CYLIndexPath(index, 0))
