@@ -91,6 +91,8 @@ open class CYLTagButton @JvmOverloads constructor(
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
     }
+    /** The colour the delete cross is drawn with (after the glass adaptation); read by the tests. */
+    internal val drawnCrossColor: Int get() = crossPaint.color
     private val crossPath = Path()
     private var drawsCross = false
     /** False until this class's views exist: the base class calls the hooks while it is being built. */
@@ -466,6 +468,8 @@ open class CYLTagButton @JvmOverloads constructor(
         applyTitleTintColor(if (explicitTextColor == null) textColor else null)
         backgroundImageView.setImageDrawable(appearance.backgroundImage)
         backgroundImageView.visibility = if (appearance.backgroundImage == null || highlighted) GONE else VISIBLE
+        // The delete / rename indicator colour before the item's glass adaptation (adaptedOnGlass lifts it on dark drawn glass only).
+        val deleteColor = style.deleteIndicatorColor ?: textColor
         // With the rename indicator, editingIndicatorsView draws both icons instead.
         val editingIcons = showsDeleteIndicator && showsRenameIndicator
         drawsCross = showsDeleteIndicator && style.deleteIndicatorLineWidth > 0 && !editingIcons
@@ -474,18 +478,20 @@ open class CYLTagButton @JvmOverloads constructor(
         deleteIndicatorLabel.text = if (showsDeleteIndicator && !drawsCross && !editingIcons) style.deleteIndicatorTitle else null
         if (editingIcons || editingIndicatorsViewIsLoaded) {
             editingIndicatorsView.visibility = if (editingIcons) VISIBLE else GONE
-            editingIndicatorsView.iconColor = style.deleteIndicatorColor ?: textColor
+            // The inner icon items are flat and never adapt on their own: the tag lifts the colour on dark drawn glass (icon, 3:1).
+            editingIndicatorsView.iconColor = adaptedOnGlass(deleteColor, CYLAnimatedItemColorKind.Icon)
         }
         deleteIndicatorLabel.contentDescription = if (showsDeleteIndicator) CYLMenuLocalizedString("CYLMenuDeleteTag", "Deletes a tag") else null
         val placement = if (style.deleteIndicatorPlacement == CYLTagDeleteIndicatorPlacement.CYLTagDeleteIndicatorPlacementLeading)
             CYLAnimatedItemAccessoryPlacement.Leading else CYLAnimatedItemAccessoryPlacement.Trailing
         if (accessoryPlacement != placement) accessoryPlacement = placement
         crossPaint.strokeWidth = style.deleteIndicatorLineWidth * density
-        crossPaint.color = style.deleteIndicatorColor ?: textColor
+        crossPaint.color = adaptedOnGlass(deleteColor, CYLAnimatedItemColorKind.Icon)
         val deleteFont = style.deleteIndicatorFontForState(state)
         deleteIndicatorLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, deleteFont.size)
         deleteIndicatorLabel.typeface = deleteFont.typeface
-        deleteIndicatorLabel.setTextColor(style.deleteIndicatorColor ?: textColor)
+        // The "x" label is text (title rule, 4.5:1); the drawn cross and the editing icons are icons (3:1).
+        deleteIndicatorLabel.setTextColor(adaptedOnGlass(deleteColor, CYLAnimatedItemColorKind.Title))
         // Where glass is really drawn only an EXPLICIT border (setter, configuration, preset) is handed over: the built-in default
         // border of the state is dropped (no border, width 0), so the glass's own rim shows. Flat keeps the default border.
         val styleBorderColor = if (drawsGlass) appearance.glassBorderColor else appearance.borderColor
