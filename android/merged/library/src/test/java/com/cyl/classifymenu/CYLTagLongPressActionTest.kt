@@ -141,13 +141,53 @@ class CYLTagLongPressActionTest {
         page.list.longPressAction = CYLTagLongPressActions.callout
         longPress(page, "y")
         assertEquals("about y", page.list.calloutText)
-        // The popup must not dismiss itself on an outside touch: that made it vanish when the finger that began the press lifted.
-        val field = CYLTagListView::class.java.getDeclaredField("calloutPopup").apply { isAccessible = true }
-        val popup = field.get(page.list) as android.widget.PopupWindow
-        assertFalse(popup.isOutsideTouchable)
         val down = android.view.MotionEvent.obtain(0L, 0L, android.view.MotionEvent.ACTION_DOWN, 1f, 1f, 0)
         page.list.dispatchTouchEvent(down)
         down.recycle()
+        assertNull(page.list.calloutText)
+    }
+
+    /** The popup's window (its decor view), where an outside touch arrives. */
+    private fun calloutWindow(list: CYLTagListView): View {
+        val field = CYLTagListView::class.java.getDeclaredField("calloutPopup").apply { isAccessible = true }
+        return (field.get(list) as android.widget.PopupWindow).contentView.parent as View
+    }
+
+    private fun outsideTouch(window: View) {
+        val outside = MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_OUTSIDE, 1f, 1f, 0)
+        window.dispatchTouchEvent(outside)
+        outside.recycle()
+    }
+
+    @Test
+    fun anOutsideTouchDismissesTheCalloutButNotDuringTheListsOwnGesture() {
+        val page = makePage()
+        page.list.longPressAction = CYLTagLongPressActions.callout
+        val cell = cells(page.list).first { it.button.title.toString() == "y" }
+        val (x, y) = center(cell)
+        val start = SystemClock.uptimeMillis()
+        // The finger that began the long press is still down: an outside event (its lift) keeps the callout.
+        touch(page, MotionEvent.ACTION_DOWN, start, x, y)
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(800))
+        assertEquals("about y", page.list.calloutText)
+        outsideTouch(calloutWindow(page.list))
+        assertEquals("about y", page.list.calloutText)
+        touch(page, MotionEvent.ACTION_UP, start, x, y)
+        frames()
+        assertEquals("about y", page.list.calloutText)
+        // A tap on blank space or another view (outside the list and the bubble) dismisses it.
+        outsideTouch(calloutWindow(page.list))
+        assertNull(page.list.calloutText)
+    }
+
+    @Test
+    fun hidingTheListDismissesTheCallout() {
+        val page = makePage()
+        page.list.longPressAction = CYLTagLongPressActions.callout
+        longPress(page, "y")
+        assertEquals("about y", page.list.calloutText)
+        // A hidden fragment hides its view (the list stays attached).
+        page.root.visibility = View.GONE
         assertNull(page.list.calloutText)
     }
 

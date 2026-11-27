@@ -1552,9 +1552,16 @@ open class CYLTagListView @JvmOverloads constructor(
         bubble.arrowCenter = (cellCenterX - x).toFloat()
         val y = if (above) location[1] - bubble.measuredHeight + px(6f) else location[1] + cell.height - px(6f)
         val popup = android.widget.PopupWindow(bubble, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, false)
-        // Not outside-touchable: the popup would dismiss itself when the finger that began the long press lifts. The list dismisses
-        // the callout on the next touch down, a tap, a scroll, a reload or another long press.
-        popup.isOutsideTouchable = false
+        // The popup watches touches outside itself (a tap on blank space or on another view dismisses it), but the popup's own
+        // outside-dismiss never runs: it made the callout vanish when the finger that began the long press lifted. An outside event
+        // dismisses only while no gesture of the list is in progress; the list itself dismisses on its next touch down, a scroll,
+        // a reload, another long press, and when it is hidden or detached.
+        popup.isOutsideTouchable = true
+        popup.setTouchInterceptor { _, event ->
+            if (event.actionMasked != MotionEvent.ACTION_OUTSIDE) return@setTouchInterceptor false
+            if (!touchInProgress) dismissCallout()
+            true
+        }
         popup.setBackgroundDrawable(null)
         popup.setOnDismissListener { if (calloutPopup === popup) calloutPopup = null }
         calloutPopup = popup
@@ -1566,9 +1573,27 @@ open class CYLTagListView @JvmOverloads constructor(
     /** The text of the callout that shows now, or null (for tests). */
     internal val calloutText: String? get() = (calloutPopup?.contentView as? CYLTagCalloutBubble)?.text?.toString()
 
+    /** Whether a gesture of the list is in progress (down seen, up or cancel not yet): the callout ignores outside touches then. */
+    private var touchInProgress = false
+
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) dismissCallout()
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> { dismissCallout(); touchInProgress = true }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> touchInProgress = false
+        }
         return super.dispatchTouchEvent(event)
+    }
+
+    /** Hidden (this view or an ancestor, as a hidden fragment's view): the callout of a list nobody sees goes away. */
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        if (visibility != VISIBLE) dismissCallout()
+    }
+
+    /** The window is hidden (another activity, the app in the background): the callout goes away. */
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (visibility != VISIBLE) dismissCallout()
     }
 
     override fun dismissCallout() {
