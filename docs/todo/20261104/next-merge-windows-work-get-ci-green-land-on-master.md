@@ -392,7 +392,7 @@ Audit facts: RN (`CylTagListBridge.swift`) and Flutter (`CylTagListPlugin.swift`
 
 | # | Decision | Owner's answer | Who does it |
 |---|---|---|---|
-| 7 | One header spacing value | **8 logical units (16 rpx)**: iOS 8 pt and Android 8 dp stay; HarmonyOS 6 → 8 vp; mini program 12 px → 16 rpx | Windows |
+| 7 | One header spacing value | **8 logical units (16 rpx)**. Already met: the header-room spacing is iOS `CYLTagListHeaderRoom.spacing` 8 pt, Android 8 dp, HarmonyOS `HEADER_ITEM_SPACING` 8 vp, mini program `HEADER_ITEM_SPACING` 8 px (= 16 rpx at the 375 design width; kept in px because the room model measures text in px). The "6 vp / 12 px" in section 5 was stale (6 is `FOLD_CONTENT_MARGIN`, iOS `foldMargin` 6) | None (verified by Windows) |
 | 10 | `CYLIconContrast` deprecated alias | **Document the break** (no forwarder): `Swift-Migration.md` step 13 | macOS (done) |
 | 4 | Android floor | **Raise to 0.44** (the brightest spot of the board glass), so top-row tags reach 4.5:1 | Windows |
 | 8 | Badge and FlatDesign contrast | **Leave outside** the rule (explicit colours stay; documented) | Docs only |
@@ -403,3 +403,11 @@ Decisions 1 (merge order of #31 to #39, #38), 2 (darkening rule or accent colour
 
 - Forwarded (2026-11-27): Windows (rows 1 to 3, header divider check, decisions #7 and #4, the iOS API names: Liquid Glass notification); tab bar session (three component items: done in CYLTabBarController `97d98842`: `adaptedForContrast` comment, `module.modulemap` excluded from SwiftPM sources, dead GIF branch removed; Framework 404 tests, 0 failures); CYLTableViewPlaceHolder session (8 pt dot fixture, after the repin SHA).
 - Repin: compile check passed at CYLTabBarController `5167f13c` (`library-warnings` none; `build-for-testing` of the menu, Example and Example-Swift schemes; `pod lib lint`; SwiftPM). Held until the tab bar pin is frozen (one more Android fix after `97d98842`), then relabelled and handed to Windows as one pin commit.
+
+### Re-score after the Windows check (2026-11-27)
+
+| Area | Before | Now | Why |
+|---|---|---|---|
+| Behaviour parity | 12 | 16 / 20 | Mini program already rests a selected animation on its last frame; callout below the header unit-tested on Android, HarmonyOS, mini program (not seen on screen: 4 points) |
+| Parity documents current | 6 | 8 / 10 | Header divider on the column edges on all four platforms (`issue-progress.md` updated); header spacing entry corrected; Liquid Glass API names sent to Windows (record of the other sessions still missing) |
+| **Total** | 57 | **63 / 100** | Open: colour roles on Windows platforms, accessibility options, the one-SHA repin (frozen SHA pending), Swift API baseline at the repin |
