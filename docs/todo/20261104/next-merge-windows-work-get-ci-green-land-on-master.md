@@ -387,3 +387,19 @@ Audit facts: RN (`CylTagListBridge.swift`) and Flutter (`CylTagListPlugin.swift`
 | Tab bar session | `adaptedForContrast` comment still says `tertiaryLabel`; `module.modulemap` SwiftPM warning; dead GIF branch | Forwarded |
 | CYLTableViewPlaceHolder session | 8 pt dot badge fixture in its example | Forwarded |
 | Owner | Decisions #4, #7, #8, #10 | Asked |
+
+### Owner's decisions (2026-11-27, answers to section 6)
+
+| # | Decision | Owner's answer | Who does it |
+|---|---|---|---|
+| 7 | One header spacing value | **8 logical units (16 rpx)**: iOS 8 pt and Android 8 dp stay; HarmonyOS 6 → 8 vp; mini program 12 px → 16 rpx | Windows |
+| 10 | `CYLIconContrast` deprecated alias | **Document the break** (no forwarder): `Swift-Migration.md` step 13 | macOS (done) |
+| 4 | Android floor | **Raise to 0.44** (the brightest spot of the board glass), so top-row tags reach 4.5:1 | Windows |
+| 8 | Badge and FlatDesign contrast | **Leave outside** the rule (explicit colours stay; documented) | Docs only |
+
+Decisions 1 (merge order of #31 to #39, #38), 2 (darkening rule or accent colour), 3 (disabled minimum contrast), 5 (glass tint on the other platforms), 6 (tint specification change) and 9 (release) remain open.
+
+### Progress
+
+- Forwarded (2026-11-27): Windows (rows 1 to 3, header divider check, decisions #7 and #4, the iOS API names: Liquid Glass notification); tab bar session (three component items: done in CYLTabBarController `97d98842`: `adaptedForContrast` comment, `module.modulemap` excluded from SwiftPM sources, dead GIF branch removed; Framework 404 tests, 0 failures); CYLTableViewPlaceHolder session (8 pt dot fixture, after the repin SHA).
+- Repin: compile check passed at CYLTabBarController `5167f13c` (`library-warnings` none; `build-for-testing` of the menu, Example and Example-Swift schemes; `pod lib lint`; SwiftPM). Held until the tab bar pin is frozen (one more Android fix after `97d98842`), then relabelled and handed to Windows as one pin commit.
