@@ -42,6 +42,7 @@ tags: [issues, ui, cocoapods, progress]
 - **Cause:** the divider defaulted to start at the header title's x (16 vp inside the card) while the card and the band span the column.
 - **Fix (HarmonyOS, core):** the divider defaults to the column's edges, the same as the card and the band; `headerSeparatorInsets` is only for an app that wants an inset. Test `theDividerSitsAtTheHeaderBottomAndAddsNoHeight` asserts it; host tests 108/108.
 - **Still TODO:** the same default on Android, mini program, iOS (the in-flight ports used the title's x), then the screenshots.
+- **Checked 2026-11-27 (Windows session, `fix/shared-contrast-ios`, code reading):** done in the core on every platform; the divider spans the column (the card's and the band's edges) and `headerSeparatorInsets` (zero / null by default) only insets it. iOS `CYLTagListView.swift` (`separatorEdges = (column.minX + insets.left, rest + insets.right)`), Android `CYLTagListView.kt` (`column.x + (separatorInsets?.left ?: 0f)`), mini program `cyl-tag-list/model.js` `headerSeparator` (`column.left` / `column.right`), HarmonyOS as above. Remaining TODO: screenshots of a section with `headerSeparatorStyle = line` on each platform.
 
 ### TODO → DONE (2026-11-25, docs/tag-liquid-glass-screenshots, Mac session chenyilong-68): labeled iOS Liquid Glass screenshots (default style normal / selected / disabled, flat vs glass, contact tag editor selected)
 
